@@ -20,8 +20,6 @@ class GTK_Main:
         window.add(vbox)
         hbox = gtk.HBox()
         vbox.pack_start(hbox, False)
-        self.entry = gtk.Entry()
-        hbox.add(self.entry)
         self.button = gtk.Button("Start")
         hbox.pack_start(self.button, False)
         self.button.connect("clicked", self.start_stop)
