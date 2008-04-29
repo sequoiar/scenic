@@ -4,14 +4,19 @@
 #include <string>
 
 /*
- *  Embedded Python example
+ * Embedded Python example
  *  
- *  Exporting C++ module to python requires 
+ * Exporting C++ module to python requires 
  *
- *  PyImport_AppendInittab()
+ * PyImport_AppendInittab()
  *
+ * boost_python provides an init function 
+ * called init{modulename}
  *
- * /
+ * PyImport_AppendInittab((char*)"hello",&inithello);
+ *
+ * must come before PyInitialize()
+ */
 
 using namespace boost::python;
 
@@ -47,6 +52,7 @@ BOOST_PYTHON_MODULE(hello)
     .def("greet", &hello::greet)
     .def("set_name",&hello::set_name);
 }
+
 
 int main(int argc, char *argv[])
 {
