@@ -7,11 +7,11 @@ pygst.require("0.10")
 import gst
 
 class GTK_Main:
-    """A simple program that gets dv from a camera over firewire and outputs
-        its video and sound, modified from python-gstreamer examples."
-       """
+    """Get dv from a camera over firewire and output its video and sound."""
 
     def __init__(self):
+        """Create gtk window and widgets, as well as the gst pipeline."""
+
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_title("dv-Player")
         window.set_default_size(500, 400)
@@ -31,7 +31,8 @@ class GTK_Main:
         
         """ Create pipeline. All the examples I've seen for DV use
             gst.parse_launch() but I would be interested to try it by
-            instantiating all the elements seperately."""
+            instantiating all the elements seperately.
+        """
 
         self.pipeline = gst.parse_launch("dv1394src ! dvdemux name=demux \
                                           demux. ! queue ! dvdec ! \
@@ -44,7 +45,8 @@ class GTK_Main:
             from the pipeline threads to an application in its own thread 
             context. The advantage of a bus is that an application does not 
             need to be thread-aware in order to use GStreamer, even though 
-            GStreamer  itself is heavily threaded.""" 
+            GStreamer  itself is heavily threaded.
+        """ 
     
         bus = self.pipeline.get_bus()
         bus.add_signal_watch()
@@ -53,6 +55,7 @@ class GTK_Main:
         bus.connect('sync-message::element', self.on_sync_message)
         
     def start_stop(self, w):
+        """Respond to start/stop button being toggled."""
         if self.button.get_label() == "Start":
             self.button.set_label("Stop")
             self.pipeline.set_state(gst.STATE_PLAYING)
@@ -61,6 +64,7 @@ class GTK_Main:
             self.button.set_label("Start")
                         
     def on_message(self, bus, message):
+        """Have pipeline respond to msgs from bus."""
         t = message.type
         if t == gst.MESSAGE_EOS:
             self.pipeline.set_state(gst.STATE_NULL)
