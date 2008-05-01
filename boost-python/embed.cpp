@@ -1,7 +1,7 @@
 #include <boost/python.hpp>
 #include <stdio.h>
-#include <iostream>
-#include <string>
+
+#include "hello.h"
 
 /*
  * Embedded Python example
@@ -19,30 +19,6 @@
  */
 
 using namespace boost::python;
-/*
-class hello
-{
-    std::string s;
-public:
-    const char * greet();
-    void set_name(char const* n);
-
-
-};
-
-const char * hello::greet()
-{
-    static std::string ts;
-    ts = "hello "+ s;
-    
-    return ts.c_str();
-
-}
-
-void hello::set_name(char const* n)
-{
-    s = n;
-}*/
 
 
 
