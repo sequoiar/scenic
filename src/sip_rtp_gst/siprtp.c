@@ -1263,6 +1263,26 @@ static int media_thread(void *arg)
     GMainLoop *loop;
     GError *error;
 
+    // init gstreamer
+    gst_init(&argc, &argv);
+    loop = g_main_loop_new(NULL, FALSE);
+
+    // setup pipeline which takes DV from camera, demuxes and decodes
+    // to get video, maps raw video to ffmpegcolorspace, encodes with x264
+    // and packetizes for rtp transport
+    
+    pipeline = gst_parse_launch("dv1394src ! dvdemux ! dvdec ! \
+                                 ffmpegcolorspace ! x264enc threads=4 \
+                                 ! rtph264pay", &error);
+
+    // setup fake sink
+    fakesink = gst_element_factory_make("fakesink", "sink");
+    g_object_set(G_OBJECT(fakesink), "signal-handoffs", TRUE, NULL);
+    g_signal_connect(fakesink, "handoff", G_CALLBACK (cb_handoff), NULL);
+
+    
+
+
 
     /* Boost thread priority if necessary */
     boost_priority();
