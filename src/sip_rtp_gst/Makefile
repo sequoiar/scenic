@@ -7,6 +7,7 @@ LDFLAGS = $(APP_LDFLAGS)
 LDLIBS = $(APP_LDLIBS)
 CFLAGS = $(APP_CFLAGS)
 CPPFLAGS = ${CFLAGS}
+BINDIR = ../../bin
 
 all: siprtp
 
