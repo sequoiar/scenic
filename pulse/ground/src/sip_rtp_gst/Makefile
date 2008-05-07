@@ -18,5 +18,5 @@ CPPFLAGS = ${CFLAGS}
 
 all: siprtp
 
-siprtp: siprtp.c
+siprtp: siprtp.c main_entry.c
 	$(CC) -o ${BINDIR}$@ $< $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 

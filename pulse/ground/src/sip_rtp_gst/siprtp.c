@@ -202,6 +202,10 @@ static struct app
  * Prototypes:
  */
 
+
+//temporary main
+int sip_main(int argc, char *argv[]);
+
 /* Callback to be called when SDP negotiation is done in the call: */
 static void call_on_media_update( pjsip_inv_session *inv,
 				  pj_status_t status);
