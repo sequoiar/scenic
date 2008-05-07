@@ -76,6 +76,10 @@ static const char *USAGE =
 
 #include <stdlib.h>
 
+// FIXME
+#include "myGstApp.h"
+// END FIXME
+
 /* Uncomment these to disable threads.
  * NOTE:
  *   when threading is disabled, siprtp won't transmit any
@@ -2120,7 +2124,8 @@ int main(int argc, char *argv[])
 
     /* Init media */
     status = init_media();
-    if (status != PJ_SUCCESS) {
+    if (status != PJ_SUCCESS) 
+    {
         app_perror(THIS_FILE, "Media initialization failed", status);
         destroy_sip();
         return 1;
@@ -2128,14 +2133,16 @@ int main(int argc, char *argv[])
 
     /* Start worker threads */
 #if PJ_HAS_THREADS
-    for (i=0; i<app.thread_count; ++i) {
+    for (i=0; i<app.thread_count; ++i) 
+    {
         pj_thread_create( app.pool, "app", &sip_worker_thread, NULL,
                 0, 0, &app.sip_thread[i]);
     }
 #endif
 
     /* If URL is specified, then make call immediately */
-    if (app.uri_to_call.slen) {
+    if (app.uri_to_call.slen) 
+    {
         unsigned i;
 
         PJ_LOG(3,(THIS_FILE, "Making %d calls to %s..", app.max_calls,

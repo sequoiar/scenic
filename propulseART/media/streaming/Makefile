@@ -1,4 +1,4 @@
-PJBASE=/home/${USER}/pjsip
+PJBASE=/home/${USER}/devel/pjsip
 
 include $(PJBASE)/build.mak
 

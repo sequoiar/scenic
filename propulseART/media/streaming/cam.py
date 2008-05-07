@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys, os
-import pygtk, gtk, gobject
+import gtk
 import pygst
 pygst.require("0.10")
 import gst
@@ -14,7 +14,7 @@ class GTK_Main:
 
         window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         window.set_title("dv-Player")
-        window.set_default_size(500, 400)
+        window.set_default_size(300, 200)
         window.connect("destroy", gtk.main_quit, "WM destroy")
         vbox = gtk.VBox()
         window.add(vbox)
@@ -26,17 +26,17 @@ class GTK_Main:
         self.movie_window = gtk.DrawingArea()
         vbox.add(self.movie_window)
         window.show_all()
+
+#       fromPipe, toPipe = os.pipe() 
         
         """ Create pipeline. All the examples I've seen for DV use
             gst.parse_launch() but I would be interested to try it by
             instantiating all the elements seperately.
         """
 
-        self.pipeline = gst.parse_launch("dv1394src ! dvdemux name=demux \
-                                          demux. ! queue ! dvdec ! \
-                                          xvimagesink sync=false demux. ! \
-                                          queue ! audioconvert ! \
-                                          alsasink sync=false")
+        self.pipeline = gst.parse_launch("dv1394src ! dvdemux ! dvdec ! \
+                                          ffmpegcolorspace ! x264enc threads=4 \
+                                          ! rtph264pay ! fdsink")
 
         """ Create bus. From the documentation:
             A bus is a simple system that takes care of forwarding messages 
