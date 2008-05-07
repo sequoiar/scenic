@@ -1128,25 +1128,23 @@ static void boost_priority(void)
     int rc;
 
     if (sched_get_priority_min(POLICY) < sched_get_priority_max(POLICY))
-        max_prio = sched_get_priority_max(POLICY)-1;
+	max_prio = sched_get_priority_max(POLICY)-1;
     else
-        max_prio = sched_get_priority_max(POLICY)+1;
+	max_prio = sched_get_priority_max(POLICY)+1;
 
     /*
      * Adjust process scheduling algorithm and priority
      */
     rc = sched_getparam(0, &tp);
-    if (rc != 0) 
-    {
-        app_perror( THIS_FILE, "sched_getparam error",
-                PJ_RETURN_OS_ERROR(rc));
-        return;
+    if (rc != 0) {
+	app_perror( THIS_FILE, "sched_getparam error",
+		    PJ_RETURN_OS_ERROR(rc));
+	return;
     }
     tp.__sched_priority = max_prio;
 
     rc = sched_setscheduler(0, POLICY, &tp);
-    if (rc != 0) 
-    {
+    if (rc != 0) {
 	app_perror( THIS_FILE, "sched_setscheduler error",
 		    PJ_RETURN_OS_ERROR(rc));
     }
@@ -1253,6 +1251,8 @@ static void on_rx_rtcp(void *user_data, void *pkt, pj_ssize_t size)
 }
 
 
+void rtp_setup(void *arg);
+
 /* 
  * Media thread 
  *
@@ -1260,19 +1260,16 @@ static void on_rx_rtcp(void *user_data, void *pkt, pj_ssize_t size)
  */
 static int media_thread(void *arg)
 {
-    enum { RTCP_INTERVAL = 5000, RTCP_RAND = 2000 };
-    struct media_stream *strm = arg;
-    char packet[1500];
-    unsigned msec_interval;
-    pj_timestamp freq, next_rtp, next_rtcp;
 
-/*----------------------------------------------*/ 
-/*          begin GSTREAMER                    */
-/*----------------------------------------------*/ 
     // create gstreamer components
     GstElement *pipeline, *fakesink;
     GMainLoop *loop;
     GError *error;
+
+/*----------------------------------------------*/ 
+    //media_stream 
+    rtp_setup(arg);
+/*----------------------------------------------*/ 
 
     // init gstreamer
     gst_init(0, NULL);  // normally should get argc argv
@@ -1296,16 +1293,30 @@ static int media_thread(void *arg)
 
     // play
     gst_element_set_state(pipeline, GST_STATE_PLAYING);
+
+
+
+/*----------------------------------------------*/ 
     g_main_loop_run(loop);
+/*----------------------------------------------*/ 
 
     // cleanup
     gst_element_set_state(pipeline, GST_STATE_NULL);
     gst_object_unref(GST_OBJECT(pipeline));
-    
-/*----------------------------------------------*/ 
-/*          end GSTREAMER                       */
-/*----------------------------------------------*/ 
 
+    return 0;
+}
+
+
+enum { RTCP_INTERVAL = 5000, RTCP_RAND = 2000 };
+char packet[1500];
+struct media_stream *strm; 
+unsigned msec_interval;
+pj_timestamp freq, next_rtp, next_rtcp;
+
+void rtp_setup(void *arg)
+{ 
+    strm = arg;
     /* Boost thread priority if necessary */
     boost_priority();
 
@@ -1320,10 +1331,11 @@ static int media_thread(void *arg)
 
     next_rtcp = next_rtp;
     next_rtcp.u64 += (freq.u64 * (RTCP_INTERVAL+(pj_rand()%RTCP_RAND)) / 1000);
+}
 
 
-    while (!strm->thread_quit_flag) 
-    {
+void temp_cb(GstBuffer *buffer)
+{
         pj_timestamp now, lesser;
         pj_time_val timeout;
         pj_bool_t send_rtp, send_rtcp;
@@ -1357,7 +1369,7 @@ static int media_thread(void *arg)
         //if (timeout.sec!=0 && timeout.msec!=0) {
         pj_thread_sleep(PJ_TIME_VAL_MSEC(timeout));
         if (strm->thread_quit_flag)
-            break;
+           return; //break
         //}
 
         pj_get_timestamp(&now);
@@ -1435,17 +1447,16 @@ static int media_thread(void *arg)
             next_rtcp.u64 += (freq.u64 * (RTCP_INTERVAL+(pj_rand()%RTCP_RAND)) /
                     1000);
         }
-    }
 
-    return 0;
 }
 
 // Callback for fakesink data
 static void cb_handoff(GstElement *fakesink, GstBuffer *buffer, 
         GstPad *pad, gpointer user_data)
 {
+    temp_cb(buffer);
     // for now: zero out buffer
-    pj_memset(GST_BUFFER_DATA(buffer), 0, GST_BUFFER_SIZE (buffer));
+    //pj_memset(GST_BUFFER_DATA(buffer), 0, GST_BUFFER_SIZE (buffer));
 }
 
 /* Callback to be called when SDP negotiation is done in the call: */
