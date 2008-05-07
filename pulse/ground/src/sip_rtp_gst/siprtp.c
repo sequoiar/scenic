@@ -2089,7 +2089,7 @@ void app_logging_shutdown(void)
 /*
  * main()
  */
-int main(int argc, char *argv[])
+int sip_main(int argc, char *argv[])
 {
     unsigned i;
     pj_status_t status;
