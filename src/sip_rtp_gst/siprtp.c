@@ -79,6 +79,8 @@ static const char *USAGE =
 // gstreamer includes
 #include <gst/gst.h>
 
+#include "siprtp.h"
+
 /* Uncomment these to disable threads.
  * NOTE:
  *   when threading is disabled, siprtp won't transmit any
@@ -202,9 +204,9 @@ static struct app
  * Prototypes:
  */
 
-
-//temporary main
-int sip_main(int argc, char *argv[]);
+// gstreamer callback to deal with buffer from fakesink
+static void cb_handoff(GstElement *fakesink, GstBuffer *buffer, 
+        GstPad *pad, gpointer user_data);
 
 /* Callback to be called when SDP negotiation is done in the call: */
 static void call_on_media_update( pjsip_inv_session *inv,
@@ -1268,7 +1270,7 @@ static int media_thread(void *arg)
     GError *error;
 
     // init gstreamer
-    gst_init(&argc, &argv);
+    gst_init(0, NULL);  // normally should get argc argv
     loop = g_main_loop_new(NULL, FALSE);
 
     // setup pipeline which takes DV from camera, demuxes and decodes
@@ -1284,7 +1286,16 @@ static int media_thread(void *arg)
     g_object_set(G_OBJECT(fakesink), "signal-handoffs", TRUE, NULL);
     g_signal_connect(fakesink, "handoff", G_CALLBACK (cb_handoff), NULL);
 
-    
+    // link pipeline to fake sink
+    gst_bin_add_many(GST_BIN(pipeline), fakesink, NULL);
+
+    // play
+    gst_element_set_state(pipeline, GST_STATE_PLAYING);
+    g_main_loop_run(loop);
+
+    // cleanup
+    gst_element_set_state(pipeline, GST_STATE_NULL);
+    gst_object_unref(GST_OBJECT(pipeline));
 
 
 
@@ -1304,127 +1315,135 @@ static int media_thread(void *arg)
     next_rtcp.u64 += (freq.u64 * (RTCP_INTERVAL+(pj_rand()%RTCP_RAND)) / 1000);
 
 
-    while (!strm->thread_quit_flag) {
-	pj_timestamp now, lesser;
-	pj_time_val timeout;
-	pj_bool_t send_rtp, send_rtcp;
+    while (!strm->thread_quit_flag) 
+    {
+        pj_timestamp now, lesser;
+        pj_time_val timeout;
+        pj_bool_t send_rtp, send_rtcp;
 
-	send_rtp = send_rtcp = PJ_FALSE;
+        send_rtp = send_rtcp = PJ_FALSE;
 
-	/* Determine how long to sleep */
-	if (next_rtp.u64 < next_rtcp.u64) {
-	    lesser = next_rtp;
-	    send_rtp = PJ_TRUE;
-	} else {
-	    lesser = next_rtcp;
-	    send_rtcp = PJ_TRUE;
-	}
+        /* Determine how long to sleep */
+        if (next_rtp.u64 < next_rtcp.u64) {
+            lesser = next_rtp;
+            send_rtp = PJ_TRUE;
+        } else {
+            lesser = next_rtcp;
+            send_rtcp = PJ_TRUE;
+        }
 
-	pj_get_timestamp(&now);
-	if (lesser.u64 <= now.u64) {
-	    timeout.sec = timeout.msec = 0;
-	    //printf("immediate "); fflush(stdout);
-	} else {
-	    pj_uint64_t tick_delay;
-	    tick_delay = lesser.u64 - now.u64;
-	    timeout.sec = 0;
-	    timeout.msec = (pj_uint32_t)(tick_delay * 1000 / freq.u64);
-	    pj_time_val_normalize(&timeout);
+        pj_get_timestamp(&now);
+        if (lesser.u64 <= now.u64) {
+            timeout.sec = timeout.msec = 0;
+            //printf("immediate "); fflush(stdout);
+        } else {
+            pj_uint64_t tick_delay;
+            tick_delay = lesser.u64 - now.u64;
+            timeout.sec = 0;
+            timeout.msec = (pj_uint32_t)(tick_delay * 1000 / freq.u64);
+            pj_time_val_normalize(&timeout);
 
-	    //printf("%d:%03d ", timeout.sec, timeout.msec); fflush(stdout);
-	}
+            //printf("%d:%03d ", timeout.sec, timeout.msec); fflush(stdout);
+        }
 
-	/* Wait for next interval */
-	//if (timeout.sec!=0 && timeout.msec!=0) {
-	    pj_thread_sleep(PJ_TIME_VAL_MSEC(timeout));
-	    if (strm->thread_quit_flag)
-		break;
-	//}
+        /* Wait for next interval */
+        //if (timeout.sec!=0 && timeout.msec!=0) {
+        pj_thread_sleep(PJ_TIME_VAL_MSEC(timeout));
+        if (strm->thread_quit_flag)
+            break;
+        //}
 
-	pj_get_timestamp(&now);
+        pj_get_timestamp(&now);
 
-	if (send_rtp || next_rtp.u64 <= now.u64) {
-	    /*
-	     * Time to send RTP packet.
-	     */
-	    pj_status_t status;
-	    const void *p_hdr;
-	    const pjmedia_rtp_hdr *hdr;
-	    pj_ssize_t size;
-	    int hdrlen;
+        if (send_rtp || next_rtp.u64 <= now.u64) {
+            /*
+             * Time to send RTP packet.
+             */
+            pj_status_t status;
+            const void *p_hdr;
+            const pjmedia_rtp_hdr *hdr;
+            pj_ssize_t size;
+            int hdrlen;
 
-	    /* Format RTP header */
-	    status = pjmedia_rtp_encode_rtp( &strm->out_sess, strm->si.tx_pt,
-					     0, /* marker bit */
-					     strm->bytes_per_frame, 
-					     strm->samples_per_frame,
-					     &p_hdr, &hdrlen);
-	    if (status == PJ_SUCCESS) {
+            /* Format RTP header */
+            status = pjmedia_rtp_encode_rtp( &strm->out_sess, strm->si.tx_pt,
+                    0, /* marker bit */
+                    strm->bytes_per_frame, 
+                    strm->samples_per_frame,
+                    &p_hdr, &hdrlen);
+            if (status == PJ_SUCCESS) {
 
-		//PJ_LOG(4,(THIS_FILE, "\t\tTx seq=%d", pj_ntohs(hdr->seq)));
-		
-		hdr = (const pjmedia_rtp_hdr*) p_hdr;
+                //PJ_LOG(4,(THIS_FILE, "\t\tTx seq=%d", pj_ntohs(hdr->seq)));
 
-		/* Copy RTP header to packet */
-		pj_memcpy(packet, hdr, hdrlen);
+                hdr = (const pjmedia_rtp_hdr*) p_hdr;
 
-		/* Zero the payload */
-		/* TODO: put gstreamer data in here */
-		pj_bzero(packet+hdrlen, strm->bytes_per_frame);
+                /* Copy RTP header to packet */
+                pj_memcpy(packet, hdr, hdrlen);
 
-		/* Send RTP packet */
-		size = hdrlen + strm->bytes_per_frame;
-		status = pjmedia_transport_send_rtp(strm->transport, 
-						    packet, size);
-		if (status != PJ_SUCCESS)
-		    app_perror(THIS_FILE, "Error sending RTP packet", status);
+                /* Zero the payload */
+                /* TODO: put gstreamer data in here */
+                pj_bzero(packet+hdrlen, strm->bytes_per_frame);
 
-	    } else {
-		pj_assert(!"RTP encode() error");
-	    }
+                /* Send RTP packet */
+                size = hdrlen + strm->bytes_per_frame;
+                status = pjmedia_transport_send_rtp(strm->transport, 
+                        packet, size);
+                if (status != PJ_SUCCESS)
+                    app_perror(THIS_FILE, "Error sending RTP packet", status);
 
-	    /* Update RTCP SR */
-	    pjmedia_rtcp_tx_rtp( &strm->rtcp, (pj_uint16_t)strm->bytes_per_frame);
+            } else {
+                pj_assert(!"RTP encode() error");
+            }
 
-	    /* Schedule next send */
-	    next_rtp.u64 += (msec_interval * freq.u64 / 1000);
-	}
+            /* Update RTCP SR */
+            pjmedia_rtcp_tx_rtp( &strm->rtcp, (pj_uint16_t)strm->bytes_per_frame);
+
+            /* Schedule next send */
+            next_rtp.u64 += (msec_interval * freq.u64 / 1000);
+        }
 
 
-	if (send_rtcp || next_rtcp.u64 <= now.u64) {
-	    /*
-	     * Time to send RTCP packet.
-	     */
-	    void *rtcp_pkt;
-	    int rtcp_len;
-	    pj_ssize_t size;
-	    pj_status_t status;
+        if (send_rtcp || next_rtcp.u64 <= now.u64) {
+            /*
+             * Time to send RTCP packet.
+             */
+            void *rtcp_pkt;
+            int rtcp_len;
+            pj_ssize_t size;
+            pj_status_t status;
 
-	    /* Build RTCP packet */
-	    pjmedia_rtcp_build_rtcp(&strm->rtcp, &rtcp_pkt, &rtcp_len);
+            /* Build RTCP packet */
+            pjmedia_rtcp_build_rtcp(&strm->rtcp, &rtcp_pkt, &rtcp_len);
 
-    
-	    /* Send packet */
-	    size = rtcp_len;
-	    status = pjmedia_transport_send_rtcp(strm->transport,
-						 rtcp_pkt, size);
-	    if (status != PJ_SUCCESS) {
-		app_perror(THIS_FILE, "Error sending RTCP packet", status);
-	    }
-	    
-	    /* Schedule next send */
-    	    next_rtcp.u64 += (freq.u64 * (RTCP_INTERVAL+(pj_rand()%RTCP_RAND)) /
-			      1000);
-	}
+
+            /* Send packet */
+            size = rtcp_len;
+            status = pjmedia_transport_send_rtcp(strm->transport,
+                    rtcp_pkt, size);
+            if (status != PJ_SUCCESS) {
+                app_perror(THIS_FILE, "Error sending RTCP packet", status);
+            }
+
+            /* Schedule next send */
+            next_rtcp.u64 += (freq.u64 * (RTCP_INTERVAL+(pj_rand()%RTCP_RAND)) /
+                    1000);
+        }
     }
 
     return 0;
 }
 
+// Callback for fakesink data
+static void cb_handoff(GstElement *fakesink, GstBuffer *buffer, 
+        GstPad *pad, gpointer user_data)
+{
+    // for now: zero out buffer
+    pj_memset(GST_BUFFER_DATA(buffer), 0, GST_BUFFER_SIZE (buffer));
+}
 
 /* Callback to be called when SDP negotiation is done in the call: */
 static void call_on_media_update( pjsip_inv_session *inv,
-				  pj_status_t status)
+        pj_status_t status)
 {
     struct call *call;
     pj_pool_t *pool;
@@ -1439,43 +1458,43 @@ static void call_on_media_update( pjsip_inv_session *inv,
 
     /* If this is a mid-call media update, then destroy existing media */
     if (audio->thread != NULL)
-	destroy_call_media(call->index);
+        destroy_call_media(call->index);
 
 
     /* Do nothing if media negotiation has failed */
     if (status != PJ_SUCCESS) {
-	app_perror(THIS_FILE, "SDP negotiation failed", status);
-	return;
+        app_perror(THIS_FILE, "SDP negotiation failed", status);
+        return;
     }
 
-    
+
     /* Capture stream definition from the SDP */
     pjmedia_sdp_neg_get_active_local(inv->neg, &local_sdp);
     pjmedia_sdp_neg_get_active_remote(inv->neg, &remote_sdp);
 
     status = pjmedia_stream_info_from_sdp(&audio->si, inv->pool, app.med_endpt,
-					  local_sdp, remote_sdp, 0);
+            local_sdp, remote_sdp, 0);
     if (status != PJ_SUCCESS) {
-	app_perror(THIS_FILE, "Error creating stream info from SDP", status);
-	return;
+        app_perror(THIS_FILE, "Error creating stream info from SDP", status);
+        return;
     }
 
     /* Get the remainder of codec information from codec descriptor */
     if (audio->si.fmt.pt == app.audio_codec.pt)
-	codec_desc = &app.audio_codec;
+        codec_desc = &app.audio_codec;
     else {
-	/* Find the codec description in codec array */
-	for (i=0; i<PJ_ARRAY_SIZE(audio_codecs); ++i) {
-	    if (audio_codecs[i].pt == audio->si.fmt.pt) {
-		codec_desc = &audio_codecs[i];
-		break;
-	    }
-	}
+        /* Find the codec description in codec array */
+        for (i=0; i<PJ_ARRAY_SIZE(audio_codecs); ++i) {
+            if (audio_codecs[i].pt == audio->si.fmt.pt) {
+                codec_desc = &audio_codecs[i];
+                break;
+            }
+        }
 
-	if (codec_desc == NULL) {
-	    PJ_LOG(3, (THIS_FILE, "Error: Invalid codec payload type"));
-	    return;
-	}
+        if (codec_desc == NULL) {
+            PJ_LOG(3, (THIS_FILE, "Error: Invalid codec payload type"));
+            return;
+        }
     }
 
     audio->clock_rate = audio->si.fmt.clock_rate;
@@ -1484,32 +1503,32 @@ static void call_on_media_update( pjsip_inv_session *inv,
 
 
     pjmedia_rtp_session_init(&audio->out_sess, audio->si.tx_pt, 
-			     pj_rand());
+            pj_rand());
     pjmedia_rtp_session_init(&audio->in_sess, audio->si.fmt.pt, 0);
     pjmedia_rtcp_init(&audio->rtcp, "rtcp", audio->clock_rate, 
-		      audio->samples_per_frame, 0);
+            audio->samples_per_frame, 0);
 
 
     /* Attach media to transport */
     status = pjmedia_transport_attach(audio->transport, audio, 
-				      &audio->si.rem_addr, 
-				      &audio->si.rem_rtcp, 
-				      sizeof(pj_sockaddr_in),
-				      &on_rx_rtp,
-				      &on_rx_rtcp);
+            &audio->si.rem_addr, 
+            &audio->si.rem_rtcp, 
+            sizeof(pj_sockaddr_in),
+            &on_rx_rtp,
+            &on_rx_rtcp);
     if (status != PJ_SUCCESS) {
-	app_perror(THIS_FILE, "Error on pjmedia_transport_attach()", status);
-	return;
+        app_perror(THIS_FILE, "Error on pjmedia_transport_attach()", status);
+        return;
     }
 
     /* Start media thread. */
     audio->thread_quit_flag = 0;
 #if PJ_HAS_THREADS
     status = pj_thread_create( inv->pool, "media", &media_thread, audio,
-			       0, 0, &audio->thread);
+            0, 0, &audio->thread);
     if (status != PJ_SUCCESS) {
-	app_perror(THIS_FILE, "Error creating media thread", status);
-	return;
+        app_perror(THIS_FILE, "Error creating media thread", status);
+        return;
     }
 #endif
 
@@ -1525,21 +1544,21 @@ static void destroy_call_media(unsigned call_index)
     struct media_stream *audio = &app.call[call_index].media[0];
 
     if (audio) {
-	audio->active = PJ_FALSE;
+        audio->active = PJ_FALSE;
 
-	if (audio->thread) {
-	    audio->thread_quit_flag = 1;
-	    pj_thread_join(audio->thread);
-	    pj_thread_destroy(audio->thread);
-	    audio->thread = NULL;
-	    audio->thread_quit_flag = 0;
-	}
+        if (audio->thread) {
+            audio->thread_quit_flag = 1;
+            pj_thread_join(audio->thread);
+            pj_thread_destroy(audio->thread);
+            audio->thread = NULL;
+            audio->thread_quit_flag = 0;
+        }
 
-	pjmedia_transport_detach(audio->transport, audio);
+        pjmedia_transport_detach(audio->transport, audio);
     }
 }
 
- 
+
 /*****************************************************************************
  * USER INTERFACE STUFFS
  */
@@ -1552,16 +1571,16 @@ static void call_get_duration(int call_index, pj_time_val *dur)
     dur->sec = dur->msec = 0;
 
     if (!call)
-	return;
+        return;
 
     inv = call->inv;
     if (!inv)
-	return;
+        return;
 
     if (inv->state >= PJSIP_INV_STATE_CONFIRMED && call->connect_time.sec) {
 
-	pj_gettimeofday(dur);
-	PJ_TIME_VAL_SUB((*dur), call->connect_time);
+        pj_gettimeofday(dur);
+        PJ_TIME_VAL_SUB((*dur), call->connect_time);
     }
 }
 
@@ -1569,15 +1588,15 @@ static void call_get_duration(int call_index, pj_time_val *dur)
 static const char *good_number(char *buf, pj_int32_t val)
 {
     if (val < 1000) {
-	pj_ansi_sprintf(buf, "%d", val);
+        pj_ansi_sprintf(buf, "%d", val);
     } else if (val < 1000000) {
-	pj_ansi_sprintf(buf, "%d.%02dK", 
-			val / 1000,
-			(val % 1000) / 100);
+        pj_ansi_sprintf(buf, "%d.%02dK", 
+                val / 1000,
+                (val % 1000) / 100);
     } else {
-	pj_ansi_sprintf(buf, "%d.%02dM", 
-			val / 1000000,
-			(val % 1000000) / 10000);
+        pj_ansi_sprintf(buf, "%d.%02dM", 
+                val / 1000000,
+                (val % 1000000) / 10000);
     }
 
     return buf;
@@ -1593,7 +1612,7 @@ static void print_avg_stat(void)
 #define BIGVAL		    0x7FFFFFFFL
     struct stat_entry
     {
-	int min, avg, max;
+        int min, avg, max;
     };
 
     struct stat_entry call_dur, call_pdd;
@@ -1628,219 +1647,219 @@ static void print_avg_stat(void)
 
     for (i=0, count=0; i<app.max_calls; ++i) {
 
-	struct call *call = &app.call[i];
-	struct media_stream *audio = &call->media[0];
-	pj_time_val dur;
-	unsigned msec_dur;
+        struct call *call = &app.call[i];
+        struct media_stream *audio = &call->media[0];
+        pj_time_val dur;
+        unsigned msec_dur;
 
-	if (call->inv == NULL || 
-	    call->inv->state < PJSIP_INV_STATE_CONFIRMED ||
-	    call->connect_time.sec == 0) 
-	{
-	    continue;
-	}
+        if (call->inv == NULL || 
+                call->inv->state < PJSIP_INV_STATE_CONFIRMED ||
+                call->connect_time.sec == 0) 
+        {
+            continue;
+        }
 
-	/* Duration */
-	call_get_duration(i, &dur);
-	msec_dur = PJ_TIME_VAL_MSEC(dur);
+        /* Duration */
+        call_get_duration(i, &dur);
+        msec_dur = PJ_TIME_VAL_MSEC(dur);
 
-	MIN_(call_dur.min, msec_dur);
-	MAX_(call_dur.max, msec_dur);
-	AVG_(call_dur.avg, msec_dur);
+        MIN_(call_dur.min, msec_dur);
+        MAX_(call_dur.max, msec_dur);
+        AVG_(call_dur.avg, msec_dur);
 
-	/* Connect delay */
-	if (call->connect_time.sec) {
-	    pj_time_val t = call->connect_time;
-	    PJ_TIME_VAL_SUB(t, call->start_time);
-	    msec_dur = PJ_TIME_VAL_MSEC(t);
-	} else {
-	    msec_dur = 10;
-	}
+        /* Connect delay */
+        if (call->connect_time.sec) {
+            pj_time_val t = call->connect_time;
+            PJ_TIME_VAL_SUB(t, call->start_time);
+            msec_dur = PJ_TIME_VAL_MSEC(t);
+        } else {
+            msec_dur = 10;
+        }
 
-	MIN_(call_pdd.min, msec_dur);
-	MAX_(call_pdd.max, msec_dur);
-	AVG_(call_pdd.avg, msec_dur);
+        MIN_(call_pdd.min, msec_dur);
+        MAX_(call_pdd.max, msec_dur);
+        AVG_(call_pdd.avg, msec_dur);
 
-	/* RX Statistisc: */
+        /* RX Statistisc: */
 
-	/* Packets */
-	MIN_(min_stat.rx.pkt, audio->rtcp.stat.rx.pkt);
-	MAX_(max_stat.rx.pkt, audio->rtcp.stat.rx.pkt);
-	AVG_(avg_stat.rx.pkt, audio->rtcp.stat.rx.pkt);
+        /* Packets */
+        MIN_(min_stat.rx.pkt, audio->rtcp.stat.rx.pkt);
+        MAX_(max_stat.rx.pkt, audio->rtcp.stat.rx.pkt);
+        AVG_(avg_stat.rx.pkt, audio->rtcp.stat.rx.pkt);
 
-	/* Bytes */
-	MIN_(min_stat.rx.bytes, audio->rtcp.stat.rx.bytes);
-	MAX_(max_stat.rx.bytes, audio->rtcp.stat.rx.bytes);
-	AVG_(avg_stat.rx.bytes, audio->rtcp.stat.rx.bytes);
-
-
-	/* Packet loss */
-	MIN_(min_stat.rx.loss, audio->rtcp.stat.rx.loss);
-	MAX_(max_stat.rx.loss, audio->rtcp.stat.rx.loss);
-	AVG_(avg_stat.rx.loss, audio->rtcp.stat.rx.loss);
-
-	/* Packet dup */
-	MIN_(min_stat.rx.dup, audio->rtcp.stat.rx.dup);
-	MAX_(max_stat.rx.dup, audio->rtcp.stat.rx.dup);
-	AVG_(avg_stat.rx.dup, audio->rtcp.stat.rx.dup);
-
-	/* Packet reorder */
-	MIN_(min_stat.rx.reorder, audio->rtcp.stat.rx.reorder);
-	MAX_(max_stat.rx.reorder, audio->rtcp.stat.rx.reorder);
-	AVG_(avg_stat.rx.reorder, audio->rtcp.stat.rx.reorder);
-
-	/* Jitter  */
-	MIN_(min_stat.rx.jitter.min, audio->rtcp.stat.rx.jitter.min);
-	MAX_(max_stat.rx.jitter.max, audio->rtcp.stat.rx.jitter.max);
-	AVG_(avg_stat.rx.jitter.avg, audio->rtcp.stat.rx.jitter.avg);
+        /* Bytes */
+        MIN_(min_stat.rx.bytes, audio->rtcp.stat.rx.bytes);
+        MAX_(max_stat.rx.bytes, audio->rtcp.stat.rx.bytes);
+        AVG_(avg_stat.rx.bytes, audio->rtcp.stat.rx.bytes);
 
 
-	/* TX Statistisc: */
+        /* Packet loss */
+        MIN_(min_stat.rx.loss, audio->rtcp.stat.rx.loss);
+        MAX_(max_stat.rx.loss, audio->rtcp.stat.rx.loss);
+        AVG_(avg_stat.rx.loss, audio->rtcp.stat.rx.loss);
 
-	/* Packets */
-	MIN_(min_stat.tx.pkt, audio->rtcp.stat.tx.pkt);
-	MAX_(max_stat.tx.pkt, audio->rtcp.stat.tx.pkt);
-	AVG_(avg_stat.tx.pkt, audio->rtcp.stat.tx.pkt);
+        /* Packet dup */
+        MIN_(min_stat.rx.dup, audio->rtcp.stat.rx.dup);
+        MAX_(max_stat.rx.dup, audio->rtcp.stat.rx.dup);
+        AVG_(avg_stat.rx.dup, audio->rtcp.stat.rx.dup);
 
-	/* Bytes */
-	MIN_(min_stat.tx.bytes, audio->rtcp.stat.tx.bytes);
-	MAX_(max_stat.tx.bytes, audio->rtcp.stat.tx.bytes);
-	AVG_(avg_stat.tx.bytes, audio->rtcp.stat.tx.bytes);
+        /* Packet reorder */
+        MIN_(min_stat.rx.reorder, audio->rtcp.stat.rx.reorder);
+        MAX_(max_stat.rx.reorder, audio->rtcp.stat.rx.reorder);
+        AVG_(avg_stat.rx.reorder, audio->rtcp.stat.rx.reorder);
 
-	/* Packet loss */
-	MIN_(min_stat.tx.loss, audio->rtcp.stat.tx.loss);
-	MAX_(max_stat.tx.loss, audio->rtcp.stat.tx.loss);
-	AVG_(avg_stat.tx.loss, audio->rtcp.stat.tx.loss);
-
-	/* Packet dup */
-	MIN_(min_stat.tx.dup, audio->rtcp.stat.tx.dup);
-	MAX_(max_stat.tx.dup, audio->rtcp.stat.tx.dup);
-	AVG_(avg_stat.tx.dup, audio->rtcp.stat.tx.dup);
-
-	/* Packet reorder */
-	MIN_(min_stat.tx.reorder, audio->rtcp.stat.tx.reorder);
-	MAX_(max_stat.tx.reorder, audio->rtcp.stat.tx.reorder);
-	AVG_(avg_stat.tx.reorder, audio->rtcp.stat.tx.reorder);
-
-	/* Jitter  */
-	MIN_(min_stat.tx.jitter.min, audio->rtcp.stat.tx.jitter.min);
-	MAX_(max_stat.tx.jitter.max, audio->rtcp.stat.tx.jitter.max);
-	AVG_(avg_stat.tx.jitter.avg, audio->rtcp.stat.tx.jitter.avg);
+        /* Jitter  */
+        MIN_(min_stat.rx.jitter.min, audio->rtcp.stat.rx.jitter.min);
+        MAX_(max_stat.rx.jitter.max, audio->rtcp.stat.rx.jitter.max);
+        AVG_(avg_stat.rx.jitter.avg, audio->rtcp.stat.rx.jitter.avg);
 
 
-	/* RTT */
-	MIN_(min_stat.rtt.min, audio->rtcp.stat.rtt.min);
-	MAX_(max_stat.rtt.max, audio->rtcp.stat.rtt.max);
-	AVG_(avg_stat.rtt.avg, audio->rtcp.stat.rtt.avg);
+        /* TX Statistisc: */
 
-	++count;
+        /* Packets */
+        MIN_(min_stat.tx.pkt, audio->rtcp.stat.tx.pkt);
+        MAX_(max_stat.tx.pkt, audio->rtcp.stat.tx.pkt);
+        AVG_(avg_stat.tx.pkt, audio->rtcp.stat.tx.pkt);
+
+        /* Bytes */
+        MIN_(min_stat.tx.bytes, audio->rtcp.stat.tx.bytes);
+        MAX_(max_stat.tx.bytes, audio->rtcp.stat.tx.bytes);
+        AVG_(avg_stat.tx.bytes, audio->rtcp.stat.tx.bytes);
+
+        /* Packet loss */
+        MIN_(min_stat.tx.loss, audio->rtcp.stat.tx.loss);
+        MAX_(max_stat.tx.loss, audio->rtcp.stat.tx.loss);
+        AVG_(avg_stat.tx.loss, audio->rtcp.stat.tx.loss);
+
+        /* Packet dup */
+        MIN_(min_stat.tx.dup, audio->rtcp.stat.tx.dup);
+        MAX_(max_stat.tx.dup, audio->rtcp.stat.tx.dup);
+        AVG_(avg_stat.tx.dup, audio->rtcp.stat.tx.dup);
+
+        /* Packet reorder */
+        MIN_(min_stat.tx.reorder, audio->rtcp.stat.tx.reorder);
+        MAX_(max_stat.tx.reorder, audio->rtcp.stat.tx.reorder);
+        AVG_(avg_stat.tx.reorder, audio->rtcp.stat.tx.reorder);
+
+        /* Jitter  */
+        MIN_(min_stat.tx.jitter.min, audio->rtcp.stat.tx.jitter.min);
+        MAX_(max_stat.tx.jitter.max, audio->rtcp.stat.tx.jitter.max);
+        AVG_(avg_stat.tx.jitter.avg, audio->rtcp.stat.tx.jitter.avg);
+
+
+        /* RTT */
+        MIN_(min_stat.rtt.min, audio->rtcp.stat.rtt.min);
+        MAX_(max_stat.rtt.max, audio->rtcp.stat.rtt.max);
+        AVG_(avg_stat.rtt.avg, audio->rtcp.stat.rtt.avg);
+
+        ++count;
     }
 
     if (count == 0) {
-	puts("No active calls");
-	return;
+        puts("No active calls");
+        return;
     }
 
     printf("Total %d call(s) active.\n"
-	   "                    Average Statistics\n"
-	   "                    min     avg     max \n"
-	   "                -----------------------\n"
-	   " call duration: %7d %7d %7d %s\n"
-	   " connect delay: %7d %7d %7d %s\n"
-	   " RX stat:\n"
-	   "       packets: %7s %7s %7s %s\n"
-	   "       payload: %7s %7s %7s %s\n"
-	   "          loss: %7d %7d %7d %s\n"
-	   "  percent loss: %7.3f %7.3f %7.3f %s\n"
-	   "           dup: %7d %7d %7d %s\n"
-	   "       reorder: %7d %7d %7d %s\n"
-	   "        jitter: %7.3f %7.3f %7.3f %s\n"
-	   " TX stat:\n"
-	   "       packets: %7s %7s %7s %s\n"
-	   "       payload: %7s %7s %7s %s\n"
-	   "          loss: %7d %7d %7d %s\n"
-	   "  percent loss: %7.3f %7.3f %7.3f %s\n"
-	   "           dup: %7d %7d %7d %s\n"
-	   "       reorder: %7d %7d %7d %s\n"
-	   "        jitter: %7.3f %7.3f %7.3f %s\n"
-	   " RTT          : %7.3f %7.3f %7.3f %s\n"
-	   ,
-	   count,
-	   call_dur.min/1000, call_dur.avg/1000, call_dur.max/1000, 
-	   "seconds",
+            "                    Average Statistics\n"
+            "                    min     avg     max \n"
+            "                -----------------------\n"
+            " call duration: %7d %7d %7d %s\n"
+            " connect delay: %7d %7d %7d %s\n"
+            " RX stat:\n"
+            "       packets: %7s %7s %7s %s\n"
+            "       payload: %7s %7s %7s %s\n"
+            "          loss: %7d %7d %7d %s\n"
+            "  percent loss: %7.3f %7.3f %7.3f %s\n"
+            "           dup: %7d %7d %7d %s\n"
+            "       reorder: %7d %7d %7d %s\n"
+            "        jitter: %7.3f %7.3f %7.3f %s\n"
+            " TX stat:\n"
+            "       packets: %7s %7s %7s %s\n"
+            "       payload: %7s %7s %7s %s\n"
+            "          loss: %7d %7d %7d %s\n"
+            "  percent loss: %7.3f %7.3f %7.3f %s\n"
+            "           dup: %7d %7d %7d %s\n"
+            "       reorder: %7d %7d %7d %s\n"
+            "        jitter: %7.3f %7.3f %7.3f %s\n"
+            " RTT          : %7.3f %7.3f %7.3f %s\n"
+            ,
+        count,
+        call_dur.min/1000, call_dur.avg/1000, call_dur.max/1000, 
+        "seconds",
 
-	   call_pdd.min, call_pdd.avg, call_pdd.max, 
-	   "ms",
+        call_pdd.min, call_pdd.avg, call_pdd.max, 
+        "ms",
 
-	   /* rx */
+        /* rx */
 
-	   good_number(srx_min, min_stat.rx.pkt),
-	   good_number(srx_avg, avg_stat.rx.pkt),
-	   good_number(srx_max, max_stat.rx.pkt),
-	   "packets",
+        good_number(srx_min, min_stat.rx.pkt),
+        good_number(srx_avg, avg_stat.rx.pkt),
+        good_number(srx_max, max_stat.rx.pkt),
+        "packets",
 
-	   good_number(brx_min, min_stat.rx.bytes),
-	   good_number(brx_avg, avg_stat.rx.bytes),
-	   good_number(brx_max, max_stat.rx.bytes),
-	   "bytes",
+        good_number(brx_min, min_stat.rx.bytes),
+        good_number(brx_avg, avg_stat.rx.bytes),
+        good_number(brx_max, max_stat.rx.bytes),
+        "bytes",
 
-	   min_stat.rx.loss, avg_stat.rx.loss, max_stat.rx.loss,
-	   "packets",
-	   
-	   min_stat.rx.loss*100.0/(min_stat.rx.pkt+min_stat.rx.loss),
-	   avg_stat.rx.loss*100.0/(avg_stat.rx.pkt+avg_stat.rx.loss),
-	   max_stat.rx.loss*100.0/(max_stat.rx.pkt+max_stat.rx.loss),
-	   "%",
+        min_stat.rx.loss, avg_stat.rx.loss, max_stat.rx.loss,
+        "packets",
+
+        min_stat.rx.loss*100.0/(min_stat.rx.pkt+min_stat.rx.loss),
+        avg_stat.rx.loss*100.0/(avg_stat.rx.pkt+avg_stat.rx.loss),
+        max_stat.rx.loss*100.0/(max_stat.rx.pkt+max_stat.rx.loss),
+        "%",
 
 
-	   min_stat.rx.dup, avg_stat.rx.dup, max_stat.rx.dup,
-	   "packets",
+        min_stat.rx.dup, avg_stat.rx.dup, max_stat.rx.dup,
+        "packets",
 
-	   min_stat.rx.reorder, avg_stat.rx.reorder, max_stat.rx.reorder,
-	   "packets",
+        min_stat.rx.reorder, avg_stat.rx.reorder, max_stat.rx.reorder,
+        "packets",
 
-	   min_stat.rx.jitter.min/1000.0, 
-	   avg_stat.rx.jitter.avg/1000.0, 
-	   max_stat.rx.jitter.max/1000.0,
-	   "ms",
-	
-	   /* tx */
+        min_stat.rx.jitter.min/1000.0, 
+        avg_stat.rx.jitter.avg/1000.0, 
+        max_stat.rx.jitter.max/1000.0,
+        "ms",
 
-	   good_number(stx_min, min_stat.tx.pkt),
-	   good_number(stx_avg, avg_stat.tx.pkt),
-	   good_number(stx_max, max_stat.tx.pkt),
-	   "packets",
+        /* tx */
 
-	   good_number(btx_min, min_stat.tx.bytes),
-	   good_number(btx_avg, avg_stat.tx.bytes),
-	   good_number(btx_max, max_stat.tx.bytes),
-	   "bytes",
+        good_number(stx_min, min_stat.tx.pkt),
+        good_number(stx_avg, avg_stat.tx.pkt),
+        good_number(stx_max, max_stat.tx.pkt),
+        "packets",
 
-	   min_stat.tx.loss, avg_stat.tx.loss, max_stat.tx.loss,
-	   "packets",
-	   
-	   min_stat.tx.loss*100.0/(min_stat.tx.pkt+min_stat.tx.loss),
-	   avg_stat.tx.loss*100.0/(avg_stat.tx.pkt+avg_stat.tx.loss),
-	   max_stat.tx.loss*100.0/(max_stat.tx.pkt+max_stat.tx.loss),
-	   "%",
+        good_number(btx_min, min_stat.tx.bytes),
+        good_number(btx_avg, avg_stat.tx.bytes),
+        good_number(btx_max, max_stat.tx.bytes),
+        "bytes",
 
-	   min_stat.tx.dup, avg_stat.tx.dup, max_stat.tx.dup,
-	   "packets",
+        min_stat.tx.loss, avg_stat.tx.loss, max_stat.tx.loss,
+        "packets",
 
-	   min_stat.tx.reorder, avg_stat.tx.reorder, max_stat.tx.reorder,
-	   "packets",
+        min_stat.tx.loss*100.0/(min_stat.tx.pkt+min_stat.tx.loss),
+        avg_stat.tx.loss*100.0/(avg_stat.tx.pkt+avg_stat.tx.loss),
+        max_stat.tx.loss*100.0/(max_stat.tx.pkt+max_stat.tx.loss),
+        "%",
 
-	   min_stat.tx.jitter.min/1000.0, 
-	   avg_stat.tx.jitter.avg/1000.0, 
-	   max_stat.tx.jitter.max/1000.0,
-	   "ms",
+        min_stat.tx.dup, avg_stat.tx.dup, max_stat.tx.dup,
+        "packets",
 
-	   /* rtt */
-	   min_stat.rtt.min/1000.0, 
-	   avg_stat.rtt.avg/1000.0, 
-	   max_stat.rtt.max/1000.0,
-	   "ms"
-	   );
+        min_stat.tx.reorder, avg_stat.tx.reorder, max_stat.tx.reorder,
+        "packets",
+
+        min_stat.tx.jitter.min/1000.0, 
+        avg_stat.tx.jitter.avg/1000.0, 
+        max_stat.tx.jitter.max/1000.0,
+        "ms",
+
+        /* rtt */
+        min_stat.rtt.min/1000.0, 
+        avg_stat.rtt.avg/1000.0, 
+        max_stat.rtt.max/1000.0,
+        "ms"
+            );
 
 }
 
@@ -1853,9 +1872,9 @@ static void list_calls()
     unsigned i;
     puts("List all calls:");
     for (i=0; i<app.max_calls; ++i) {
-	if (!app.call[i].inv)
-	    continue;
-	print_call(i);
+        if (!app.call[i].inv)
+            continue;
+        print_call(i);
     }
 }
 
@@ -1865,27 +1884,27 @@ static void hangup_call(unsigned index)
     pj_status_t status;
 
     if (app.call[index].inv == NULL)
-	return;
+        return;
 
     status = pjsip_inv_end_session(app.call[index].inv, 603, NULL, &tdata);
     if (status==PJ_SUCCESS && tdata!=NULL)
-	pjsip_inv_send_msg(app.call[index].inv, tdata);
+        pjsip_inv_send_msg(app.call[index].inv, tdata);
 }
 
 static void hangup_all_calls()
 {
     unsigned i;
     for (i=0; i<app.max_calls; ++i) {
-	if (!app.call[i].inv)
-	    continue;
-	hangup_call(i);
-	pj_thread_sleep(app.call_gap);
+        if (!app.call[i].inv)
+            continue;
+        hangup_call(i);
+        pj_thread_sleep(app.call_gap);
     }
-    
+
     /* Wait until all calls are terminated */
     for (i=0; i<app.max_calls; ++i) {
-	while (app.call[i].inv)
-	    pj_thread_sleep(10);
+        while (app.call[i].inv)
+            pj_thread_sleep(10);
     }
 }
 
@@ -1898,13 +1917,13 @@ static pj_bool_t simple_input(const char *title, char *buf, pj_size_t len)
 
     /* Remove trailing newlines. */
     for (p=buf; ; ++p) {
-	if (*p=='\r' || *p=='\n') *p='\0';
-	else if (!*p) break;
+        if (*p=='\r' || *p=='\n') *p='\0';
+        else if (!*p) break;
     }
 
     if (!*buf)
-	return PJ_FALSE;
-    
+        return PJ_FALSE;
+
     return PJ_TRUE;
 }
 
@@ -1929,41 +1948,41 @@ static void console_main()
     printf("%s", MENU);
 
     for (;;) {
-	printf(">>> "); fflush(stdout);
-	fgets(input1, sizeof(input1), stdin);
+        printf(">>> "); fflush(stdout);
+        fgets(input1, sizeof(input1), stdin);
 
-	switch (input1[0]) {
+        switch (input1[0]) {
 
-	case 's':
-	    print_avg_stat();
-	    break;
+            case 's':
+                print_avg_stat();
+                break;
 
-	case 'l':
-	    list_calls();
-	    break;
+            case 'l':
+                list_calls();
+                break;
 
-	case 'h':
-	    if (!simple_input("Call number to hangup", input1, sizeof(input1)))
-		break;
+            case 'h':
+                if (!simple_input("Call number to hangup", input1, sizeof(input1)))
+                    break;
 
-	    i = atoi(input1);
-	    hangup_call(i);
-	    break;
+                i = atoi(input1);
+                hangup_call(i);
+                break;
 
-	case 'H':
-	    hangup_all_calls();
-	    break;
+            case 'H':
+                hangup_all_calls();
+                break;
 
-	case 'q':
-	    goto on_exit;
+            case 'q':
+                goto on_exit;
 
-	default:
-	    puts("Invalid command");
-	    printf("%s", MENU);
-	    break;
-	}
+            default:
+                puts("Invalid command");
+                printf("%s", MENU);
+                break;
+        }
 
-	fflush(stdout);
+        fflush(stdout);
     }
 
 on_exit:
@@ -1980,14 +1999,14 @@ on_exit:
 static pj_bool_t logger_on_rx_msg(pjsip_rx_data *rdata)
 {
     PJ_LOG(4,(THIS_FILE, "RX %d bytes %s from %s:%d:\n"
-			 "%s\n"
-			 "--end msg--",
-			 rdata->msg_info.len,
-			 pjsip_rx_data_get_info(rdata),
-			 rdata->pkt_info.src_name,
-			 rdata->pkt_info.src_port,
-			 rdata->msg_info.msg_buf));
-    
+                "%s\n"
+                "--end msg--",
+                rdata->msg_info.len,
+                pjsip_rx_data_get_info(rdata),
+                rdata->pkt_info.src_name,
+                rdata->pkt_info.src_port,
+                rdata->msg_info.msg_buf));
+
     /* Always return false, otherwise messages will not get processed! */
     return PJ_FALSE;
 }
@@ -1995,7 +2014,7 @@ static pj_bool_t logger_on_rx_msg(pjsip_rx_data *rdata)
 /* Notification on outgoing messages */
 static pj_status_t logger_on_tx_msg(pjsip_tx_data *tdata)
 {
-    
+
     /* Important note:
      *	tp_info field is only valid after outgoing messages has passed
      *	transport layer. So don't try to access tp_info when the module
@@ -2003,13 +2022,13 @@ static pj_status_t logger_on_tx_msg(pjsip_tx_data *tdata)
      */
 
     PJ_LOG(4,(THIS_FILE, "TX %d bytes %s to %s:%d:\n"
-			 "%s\n"
-			 "--end msg--",
-			 (tdata->buf.cur - tdata->buf.start),
-			 pjsip_tx_data_get_info(tdata),
-			 tdata->tp_info.dst_name,
-			 tdata->tp_info.dst_port,
-			 tdata->buf.start));
+                "%s\n"
+                "--end msg--",
+                (tdata->buf.cur - tdata->buf.start),
+                pjsip_tx_data_get_info(tdata),
+                tdata->tp_info.dst_name,
+                tdata->tp_info.dst_port,
+                tdata->buf.start));
 
     /* Always return success, otherwise message will not get sent! */
     return PJ_SUCCESS;
@@ -2049,11 +2068,11 @@ static void app_log_writer(int level, const char *buffer, int len)
     /* Write to both stdout and file. */
 
     if (level <= app.app_log_level)
-	pj_log_write(level, buffer, len);
+        pj_log_write(level, buffer, len);
 
     if (log_file) {
-	fwrite(buffer, len, 1, log_file);
-	fflush(log_file);
+        fwrite(buffer, len, 1, log_file);
+        fflush(log_file);
     }
 }
 
@@ -2067,12 +2086,12 @@ pj_status_t app_logging_init(void)
     /* If output log file is desired, create the file: */
 
     if (app.log_filename) {
-	log_file = fopen(app.log_filename, "wt");
-	if (log_file == NULL) {
-	    PJ_LOG(1,(THIS_FILE, "Unable to open log file %s", 
-		      app.log_filename));   
-	    return -1;
-	}
+        log_file = fopen(app.log_filename, "wt");
+        if (log_file == NULL) {
+            PJ_LOG(1,(THIS_FILE, "Unable to open log file %s", 
+                        app.log_filename));   
+            return -1;
+        }
     }
 
     return PJ_SUCCESS;
@@ -2084,8 +2103,8 @@ void app_logging_shutdown(void)
     /* Close logging file, if any: */
 
     if (log_file) {
-	fclose(log_file);
-	log_file = NULL;
+        fclose(log_file);
+        log_file = NULL;
     }
 }
 
@@ -2101,33 +2120,33 @@ int sip_main(int argc, char *argv[])
     /* Must init PJLIB first */
     status = pj_init();
     if (status != PJ_SUCCESS)
-	return 1;
+        return 1;
 
     /* Get command line options */
     status = init_options(argc, argv);
     if (status != PJ_SUCCESS)
-	return 1;
+        return 1;
 
     /* Verify options: */
 
     /* Auto-quit can not be specified for UAS */
     if (app.auto_quit && app.uri_to_call.slen == 0) {
-	printf("Error: --auto-quit option only valid for outgoing "
-	       "mode (UAC) only\n");
-	return 1;
+        printf("Error: --auto-quit option only valid for outgoing "
+                "mode (UAC) only\n");
+        return 1;
     }
 
     /* Init logging */
     status = app_logging_init();
     if (status != PJ_SUCCESS)
-	return 1;
+        return 1;
 
     /* Init SIP etc */
     status = init_sip();
     if (status != PJ_SUCCESS) {
-	app_perror(THIS_FILE, "Initialization has failed", status);
-	destroy_sip();
-	return 1;
+        app_perror(THIS_FILE, "Initialization has failed", status);
+        destroy_sip();
+        return 1;
     }
 
     /* Register module to log incoming/outgoing messages */
@@ -2136,74 +2155,74 @@ int sip_main(int argc, char *argv[])
     /* Init media */
     status = init_media();
     if (status != PJ_SUCCESS) {
-	app_perror(THIS_FILE, "Media initialization failed", status);
-	destroy_sip();
-	return 1;
+        app_perror(THIS_FILE, "Media initialization failed", status);
+        destroy_sip();
+        return 1;
     }
 
     /* Start worker threads */
 #if PJ_HAS_THREADS
     for (i=0; i<app.thread_count; ++i) {
-	pj_thread_create( app.pool, "app", &sip_worker_thread, NULL,
-			  0, 0, &app.sip_thread[i]);
+        pj_thread_create( app.pool, "app", &sip_worker_thread, NULL,
+                0, 0, &app.sip_thread[i]);
     }
 #endif
 
     /* If URL is specified, then make call immediately */
     if (app.uri_to_call.slen) {
-	unsigned i;
+        unsigned i;
 
-	PJ_LOG(3,(THIS_FILE, "Making %d calls to %s..", app.max_calls,
-		  app.uri_to_call.ptr));
+        PJ_LOG(3,(THIS_FILE, "Making %d calls to %s..", app.max_calls,
+                    app.uri_to_call.ptr));
 
-	for (i=0; i<app.max_calls; ++i) {
-	    status = make_call(&app.uri_to_call);
-	    if (status != PJ_SUCCESS) {
-		app_perror(THIS_FILE, "Error making call", status);
-		break;
-	    }
-	    pj_thread_sleep(app.call_gap);
-	}
+        for (i=0; i<app.max_calls; ++i) {
+            status = make_call(&app.uri_to_call);
+            if (status != PJ_SUCCESS) {
+                app_perror(THIS_FILE, "Error making call", status);
+                break;
+            }
+            pj_thread_sleep(app.call_gap);
+        }
 
-	if (app.auto_quit) {
-	    /* Wait for calls to complete */
-	    while (app.uac_calls < app.max_calls)
-		pj_thread_sleep(100);
-	    pj_thread_sleep(200);
-	} else {
+        if (app.auto_quit) {
+            /* Wait for calls to complete */
+            while (app.uac_calls < app.max_calls)
+                pj_thread_sleep(100);
+            pj_thread_sleep(200);
+        } else {
 #if PJ_HAS_THREADS
-	    /* Start user interface loop */
-	    console_main();
+            /* Start user interface loop */
+            console_main();
 #endif
-	}
+        }
 
     } else {
 
-	PJ_LOG(3,(THIS_FILE, "Ready for incoming calls (max=%d)", 
-		  app.max_calls));
+        PJ_LOG(3,(THIS_FILE, "Ready for incoming calls (max=%d)", 
+                    app.max_calls));
 
 #if PJ_HAS_THREADS
-	/* Start user interface loop */
-	console_main();
+        /* Start user interface loop */
+        console_main();
 #endif
     }
 
 #if !PJ_HAS_THREADS
     PJ_LOG(3,(THIS_FILE, "Press Ctrl-C to quit"));
     for (;;) {
-	pj_time_val t = {0, 10};
-	pjsip_endpt_handle_events(app.sip_endpt, &t);
+        pj_time_val t = {0, 10};
+        pjsip_endpt_handle_events(app.sip_endpt, &t);
     }
 #endif
-    
+
     /* Shutting down... */
     destroy_sip();
     destroy_media();
 
     if (app.pool) {
-	pj_pool_release(app.pool);
-	app.pool = NULL;
-	pj_caching_pool_destroy(&app.cp);
+        pj_pool_release(app.pool);
+        app.pool = NULL;
+        pj_caching_pool_destroy(&app.cp);
     }
 
     app_logging_shutdown();
