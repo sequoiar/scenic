@@ -1,2 +1,0 @@
-Reduce stprtp to the barest minimum required to have a bidirectional 
-sip rtp session. As much as possible should be done in Python.
