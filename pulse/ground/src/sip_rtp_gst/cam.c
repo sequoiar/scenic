@@ -13,8 +13,7 @@ cb_handoff (GstElement *fakesink,
         gpointer    user_data)
 {
     /* TODO: send buffer from here? */
-    memset (GST_BUFFER_DATA (buffer), 0,
-            GST_BUFFER_SIZE (buffer));
+    memset (GST_BUFFER_DATA (buffer), 0, GST_BUFFER_SIZE (buffer));
 }
 
 gint
@@ -23,7 +22,7 @@ main (gint   argc,
 {
     GstElement *pipeline, *fakesink;
     GMainLoop *loop;
-    GError **error;
+    GError *error;
 
     /* init GStreamer */
     gst_init (&argc, &argv);
@@ -32,7 +31,7 @@ main (gint   argc,
     /* setup pipeline */
     pipeline = gst_parse_launch("dv1394src ! dvdemux ! dvdec ! \
                                 ffmpegcolorspace ! x264enc threads=4 \
-                                ! rtph264pay", error);
+                                ! rtph264pay", &error);
 
     fakesink = gst_element_factory_make("fakesink", "sink");
     
