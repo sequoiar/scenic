@@ -1128,23 +1128,25 @@ static void boost_priority(void)
     int rc;
 
     if (sched_get_priority_min(POLICY) < sched_get_priority_max(POLICY))
-	max_prio = sched_get_priority_max(POLICY)-1;
+        max_prio = sched_get_priority_max(POLICY)-1;
     else
-	max_prio = sched_get_priority_max(POLICY)+1;
+        max_prio = sched_get_priority_max(POLICY)+1;
 
     /*
      * Adjust process scheduling algorithm and priority
      */
     rc = sched_getparam(0, &tp);
-    if (rc != 0) {
-	app_perror( THIS_FILE, "sched_getparam error",
-		    PJ_RETURN_OS_ERROR(rc));
-	return;
+    if (rc != 0) 
+    {
+        app_perror( THIS_FILE, "sched_getparam error",
+                PJ_RETURN_OS_ERROR(rc));
+        return;
     }
     tp.__sched_priority = max_prio;
 
     rc = sched_setscheduler(0, POLICY, &tp);
-    if (rc != 0) {
+    if (rc != 0) 
+    {
 	app_perror( THIS_FILE, "sched_setscheduler error",
 		    PJ_RETURN_OS_ERROR(rc));
     }
@@ -1264,6 +1266,9 @@ static int media_thread(void *arg)
     unsigned msec_interval;
     pj_timestamp freq, next_rtp, next_rtcp;
 
+/*----------------------------------------------*/ 
+/*          begin GSTREAMER                    */
+/*----------------------------------------------*/ 
     // create gstreamer components
     GstElement *pipeline, *fakesink;
     GMainLoop *loop;
@@ -1296,8 +1301,10 @@ static int media_thread(void *arg)
     // cleanup
     gst_element_set_state(pipeline, GST_STATE_NULL);
     gst_object_unref(GST_OBJECT(pipeline));
-
-
+    
+/*----------------------------------------------*/ 
+/*          end GSTREAMER                       */
+/*----------------------------------------------*/ 
 
     /* Boost thread priority if necessary */
     boost_priority();
