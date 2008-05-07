@@ -21,7 +21,6 @@ gint
 main (gint   argc,
       gchar *argv[])
 {
-    static const int RTP_PACKET_SZ = 1500;
     GstElement *pipeline, *fakesink;
     GMainLoop *loop;
     GError **error;
@@ -34,12 +33,11 @@ main (gint   argc,
     pipeline = gst_parse_launch("dv1394src ! dvdemux ! dvdec ! \
                                 ffmpegcolorspace ! x264enc threads=4 \
                                 ! rtph264pay", error);
+
+    fakesink = gst_element_factory_make("fakesink", "sink");
     
     /* setup fake sink */
-    g_object_set (G_OBJECT (fakesink),
-            "signal-handoffs", TRUE,
-            "sizemax", RTP_PACKET_SZ,
-            "sizetype", 2, NULL);
+    g_object_set (G_OBJECT (fakesink), "signal-handoffs", TRUE, NULL);
     g_signal_connect (fakesink, "handoff", G_CALLBACK (cb_handoff), NULL);
 
     /* setup */
