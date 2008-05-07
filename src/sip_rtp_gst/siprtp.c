@@ -76,6 +76,9 @@ static const char *USAGE =
 
 #include <stdlib.h>
 
+// gstreamer includes
+#include <gst/gst.h>
+
 /* Uncomment these to disable threads.
  * NOTE:
  *   when threading is disabled, siprtp won't transmit any
@@ -1255,6 +1258,11 @@ static int media_thread(void *arg)
     unsigned msec_interval;
     pj_timestamp freq, next_rtp, next_rtcp;
 
+    // create gstreamer components
+    GstElement *pipeline, *fakesink;
+    GMainLoop *loop;
+    GError *error;
+
 
     /* Boost thread priority if necessary */
     boost_priority();
@@ -1337,6 +1345,7 @@ static int media_thread(void *arg)
 		pj_memcpy(packet, hdr, hdrlen);
 
 		/* Zero the payload */
+		/* TODO: put gstreamer data in here */
 		pj_bzero(packet+hdrlen, strm->bytes_per_frame);
 
 		/* Send RTP packet */
