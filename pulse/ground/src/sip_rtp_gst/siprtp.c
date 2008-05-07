@@ -1367,7 +1367,7 @@ void temp_cb(GstBuffer *buffer)
 
         /* Wait for next interval */
         //if (timeout.sec!=0 && timeout.msec!=0) {
-        pj_thread_sleep(PJ_TIME_VAL_MSEC(timeout));
+        //koya pj_thread_sleep(PJ_TIME_VAL_MSEC(timeout));
         if (strm->thread_quit_flag)
            return; //break
         //}
