@@ -33,7 +33,9 @@ void rtp_setup(void *arg)
 
 
 
-void rtp_cb(GstBuffer *buffer)
+// Callback for fakesink data
+void cb_handoff(GstElement *fakesink, GstBuffer *buffer, 
+        GstPad *pad, gpointer user_data)
 {
     pj_timestamp now, lesser;
     pj_time_val timeout;
@@ -174,8 +176,6 @@ void rtp_cb(GstBuffer *buffer)
                 1000);
     }
     /**************************************************/
-
-
 }
 
 
