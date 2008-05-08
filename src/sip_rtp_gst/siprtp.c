@@ -64,7 +64,7 @@ static const char *USAGE =
 */
 ;
 
-#include "siprtp.h"
+#include "gst_sip_rtp.h"
 
 /* Uncomment these to disable threads.
  * NOTE:
@@ -159,9 +159,6 @@ static struct app
  * Prototypes:
  */
 
-// gstreamer callback to deal with buffer from fakesink
-static void cb_handoff(GstElement *fakesink, GstBuffer *buffer, 
-        GstPad *pad, gpointer user_data);
 
 /* Callback to be called when SDP negotiation is done in the call: */
 static void call_on_media_update( pjsip_inv_session *inv,
@@ -1257,15 +1254,6 @@ static int media_thread(void *arg)
     return 0;
 }
 
-
-// Callback for fakesink data
-static void cb_handoff(GstElement *fakesink, GstBuffer *buffer, 
-        GstPad *pad, gpointer user_data)
-{
-    rtp_cb(buffer);
-    // for now: zero out buffer
-    //pj_memset(GST_BUFFER_DATA(buffer), 0, GST_BUFFER_SIZE (buffer));
-}
 
 /* Callback to be called when SDP negotiation is done in the call: */
 static void call_on_media_update( pjsip_inv_session *inv,

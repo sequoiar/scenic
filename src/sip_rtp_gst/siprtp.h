@@ -18,9 +18,9 @@
 
 void rtp_setup(void *);
 
-
-void rtp_cb(GstBuffer*);
-
+// gstreamer callback to deal with buffer from fakesink
+void cb_handoff(GstElement *fakesink, GstBuffer *buffer, 
+        GstPad *pad, gpointer user_data);
 
 int sip_main(int argc, char *argv[]);
 
