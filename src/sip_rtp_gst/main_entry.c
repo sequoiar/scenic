@@ -1,6 +1,6 @@
 // main_entry.c
 
-#include "siprtp.h"
+#include "gst_sip_rtp.h"
 
 int main(int argc, char *argv[])
 {
