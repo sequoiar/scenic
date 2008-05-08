@@ -12,21 +12,14 @@
 // gstreamer includes
 #include <gst/gst.h>
 //gstbuff_ready_cb.c
+
 void rtp_setup(void *);
+
+
 void rtp_cb(GstBuffer*);
+
+
 int sip_main(int argc, char *argv[]);
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* Display error */
@@ -34,19 +27,7 @@ void app_perror(const char *sender, const char *title,
 		       pj_status_t status);
 
 
-
-
-
-
 void boost_priority(void);
-
-
-
-
-
-
-
-
 
 
 /* A bidirectional media stream created when the call is active. */
