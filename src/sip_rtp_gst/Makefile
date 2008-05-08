@@ -6,27 +6,32 @@ PJBASE=$(BASE_ROOT)/pjsip
 
 include $(PJBASE)/build.mak
 
-BINDIR=$(BASE)bin/
+BINDIR=$(BASE)bin
+OBJDIR=$(BASE)obj
+vpath %.o $(OBJDIR)
+
+OBJS=main_entry.o siprtp.o gstbuff_ready_cb.o
 
 #OBJS=main_entry.o siprtp.o
 
-GST_FLAGS=`pkg-config --cflags --libs gstreamer-0.10`
+GST_FLAGS=$(shell pkg-config --cflags --libs gstreamer-0.10)
 
 APP_CFLAGS+=-g -Wall $(GST_FLAGS)
-SOURCES=main_entry.c siprtp.c gstbuff_ready_cb.c
-OBJS:=$(addsuffix .o, $(basename $(SOURCES)))
 CC		= $(APP_CC)
 LDFLAGS = $(APP_LDFLAGS)
 LDLIBS = $(APP_LDLIBS)
 CFLAGS = $(APP_CFLAGS)
 CPPFLAGS = $(CFLAGS)
 
-all: $(APPLICATION)
+%.o : %.c
+	$(CC) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -c $(<) -o $(OBJDIR)/$@ 
 
 $(APPLICATION) : $(OBJS)
-	$(CC) -o $(BINDIR)$@ $< $(CPPFLAGS) $(LDFLAGS) $^ $(LDLIBS) 
+	$(CC) -o $(BINDIR)/$@ $(OBJDIR)/*.o $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
 
+all: $(APPLICATION)
 
 .PHONY: clean
 clean:
-	rm $(BINDIR)$(APPLICATION)
+	rm $(OBJDIR)/*.o
+	rm $(BINDIR)/$(APPLICATION)
