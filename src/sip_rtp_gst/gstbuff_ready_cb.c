@@ -1,4 +1,4 @@
-#include "siprtp.h"
+#nclude "siprtp.h"
 
 struct media_stream *strm; 
 
@@ -6,6 +6,8 @@ enum { RTCP_INTERVAL = 5000, RTCP_RAND = 2000 };
 unsigned msec_interval;
 pj_timestamp freq, next_rtp, next_rtcp;
 char packet[1500];
+
+
 void rtp_setup(void *arg)
 { 
     strm = arg;
@@ -162,7 +164,7 @@ void rtp_cb(GstBuffer *buffer)
     /**************************************************/
 
 
-    }
+}
 
 
 
