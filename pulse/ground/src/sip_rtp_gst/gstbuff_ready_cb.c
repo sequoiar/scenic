@@ -2,7 +2,7 @@
 
 #include "gst_sip_rtp.h"
 
-// FIXME: shouldn't be global
+// FIXME: these shouldn't be global
 
 struct media_stream *strm; 
 enum { RTCP_INTERVAL = 5000, RTCP_RAND = 2000 };
@@ -37,12 +37,6 @@ void rtp_setup(void *arg)
 void cb_handoff(GstElement *fakesink, GstBuffer *buffer, 
         GstPad *pad, gpointer user_data)
 {
-    static gboolean white = FALSE;
-
-    /* this makes the image black/white */
-    memset (GST_BUFFER_DATA (buffer), white ? 0xff : 0x0,
-            GST_BUFFER_SIZE (buffer));
-    white = !white;
 
     pj_timestamp now, lesser;
     pj_time_val timeout;
@@ -51,7 +45,6 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
 
     //printf("!");
     //fflush(stdout);
-
 
     /* Determine how long to sleep */
     if (next_rtp.u64 < next_rtcp.u64) 
@@ -104,6 +97,20 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
 
     if (send_rtp || next_rtp.u64 <= now.u64) 
     {
+/*----------------------------------------------*/ 
+//      Manipulate gstreamer buffer
+/*----------------------------------------------*/ 
+        static gboolean white = FALSE;
+
+        /* this makes the image black/white */
+        memset (GST_BUFFER_DATA (buffer), white ? 0xff : 0x0,
+                GST_BUFFER_SIZE (buffer));
+        white = !white;
+
+/*----------------------------------------------*/ 
+//      End manipulate gstreamer buffer
+/*----------------------------------------------*/ 
+
         /*
          * Time to send RTP packet.
          */
@@ -187,11 +194,4 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
     }
     /**************************************************/
 }
-
-
-
-
-
-
-
 
