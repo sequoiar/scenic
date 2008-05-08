@@ -37,6 +37,13 @@ void rtp_setup(void *arg)
 void cb_handoff(GstElement *fakesink, GstBuffer *buffer, 
         GstPad *pad, gpointer user_data)
 {
+    static gboolean white = FALSE;
+
+    /* this makes the image black/white */
+    memset (GST_BUFFER_DATA (buffer), white ? 0xff : 0x0,
+            GST_BUFFER_SIZE (buffer));
+    white = !white;
+
     pj_timestamp now, lesser;
     pj_time_val timeout;
     pj_bool_t send_rtp, send_rtcp;
