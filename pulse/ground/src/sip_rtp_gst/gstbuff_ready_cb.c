@@ -42,6 +42,9 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
     pj_bool_t send_rtp, send_rtcp;
     send_rtp = send_rtcp = PJ_FALSE;
 
+    printf("!");
+    fflush(stdout);
+
 
     /* Determine how long to sleep */
     if (next_rtp.u64 < next_rtcp.u64) 
