@@ -1968,7 +1968,8 @@ int sip_main(int argc, char *argv[])
 
     /* Init SIP etc */
     status = init_sip();
-    if (status != PJ_SUCCESS) {
+    if (status != PJ_SUCCESS) 
+    {
         app_perror(THIS_FILE, "Initialization has failed", status);
         destroy_sip();
         return 1;
@@ -1979,7 +1980,8 @@ int sip_main(int argc, char *argv[])
 
     /* Init media */
     status = init_media();
-    if (status != PJ_SUCCESS) {
+    if (status != PJ_SUCCESS) 
+    {
         app_perror(THIS_FILE, "Media initialization failed", status);
         destroy_sip();
         return 1;
@@ -1987,20 +1989,23 @@ int sip_main(int argc, char *argv[])
 
     /* Start worker threads */
 #if PJ_HAS_THREADS
-    for (i=0; i<app.thread_count; ++i) {
+    for (i=0; i<app.thread_count; ++i) 
+    {
         pj_thread_create( app.pool, "app", &sip_worker_thread, NULL,
                 0, 0, &app.sip_thread[i]);
     }
 #endif
 
     /* If URL is specified, then make call immediately */
-    if (app.uri_to_call.slen) {
+    if (app.uri_to_call.slen) 
+    {
         unsigned i;
 
         PJ_LOG(3,(THIS_FILE, "Making %d calls to %s..", app.max_calls,
                     app.uri_to_call.ptr));
 
-        for (i=0; i<app.max_calls; ++i) {
+        for (i=0; i<app.max_calls; ++i) 
+        {
             status = make_call(&app.uri_to_call);
             if (status != PJ_SUCCESS) {
                 app_perror(THIS_FILE, "Error making call", status);
@@ -2009,19 +2014,24 @@ int sip_main(int argc, char *argv[])
             pj_thread_sleep(app.call_gap);
         }
 
-        if (app.auto_quit) {
+        if (app.auto_quit) 
+        {
             /* Wait for calls to complete */
             while (app.uac_calls < app.max_calls)
                 pj_thread_sleep(100);
             pj_thread_sleep(200);
-        } else {
+        } 
+        else 
+        {
 #if PJ_HAS_THREADS
             /* Start user interface loop */
             console_main();
 #endif
         }
 
-    } else {
+    } 
+    else 
+    {
 
         PJ_LOG(3,(THIS_FILE, "Ready for incoming calls (max=%d)", 
                     app.max_calls));
