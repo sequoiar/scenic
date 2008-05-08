@@ -19,8 +19,6 @@
 
 
 
-
-
 /* Usage */
 static const char *USAGE = 
 " PURPOSE:								    \n"
@@ -64,6 +62,7 @@ static const char *USAGE =
 */
 ;
 
+#include <stdio.h>
 #include "gst_sip_rtp.h"
 
 /* Uncomment these to disable threads.
@@ -446,21 +445,24 @@ static void destroy_media()
 {
     unsigned i;
 
-    for (i=0; i<app.max_calls; ++i) {
-	unsigned j;
-	for (j=0; j<PJ_ARRAY_SIZE(app.call[0].media); ++j) {
-	    struct media_stream *m = &app.call[i].media[j];
+    for (i=0; i<app.max_calls; ++i) 
+    {
+        unsigned j;
+        for (j=0; j<PJ_ARRAY_SIZE(app.call[0].media); ++j) 
+        {
+            struct media_stream *m = &app.call[i].media[j];
 
-	    if (m->transport) {
-		pjmedia_transport_close(m->transport);
-		m->transport = NULL;
-	    }
-	}
+            if (m->transport) {
+                pjmedia_transport_close(m->transport);
+                m->transport = NULL;
+            }
+        }
     }
 
-    if (app.med_endpt) {
-	pjmedia_endpt_destroy(app.med_endpt);
-	app.med_endpt = NULL;
+    if (app.med_endpt) 
+    {
+        pjmedia_endpt_destroy(app.med_endpt);
+        app.med_endpt = NULL;
     }
 }
 
@@ -479,26 +481,28 @@ static pj_status_t make_call(const pj_str_t *dst_uri)
 
 
     /* Find unused call slot */
-    for (i=0; i<app.max_calls; ++i) {
-	if (app.call[i].inv == NULL)
-	    break;
+    for (i=0; i<app.max_calls; ++i) 
+    {
+        if (app.call[i].inv == NULL)
+            break;
     }
 
     if (i == app.max_calls)
-	return PJ_ETOOMANY;
+        return PJ_ETOOMANY;
 
     call = &app.call[i];
 
     /* Create UAC dialog */
     status = pjsip_dlg_create_uac( pjsip_ua_instance(), 
-				   &app.local_uri,	/* local URI	    */
-				   &app.local_contact,	/* local Contact    */
-				   dst_uri,		/* remote URI	    */
-				   dst_uri,		/* remote target    */
-				   &dlg);		/* dialog	    */
-    if (status != PJ_SUCCESS) {
-	++app.uac_calls;
-	return status;
+            &app.local_uri,	/* local URI	    */
+            &app.local_contact,	/* local Contact    */
+            dst_uri,		/* remote URI	    */
+            dst_uri,		/* remote target    */
+            &dlg);		/* dialog	    */
+    if (status != PJ_SUCCESS) 
+    {
+        ++app.uac_calls;
+        return status;
     }
 
     /* Create SDP */
@@ -506,10 +510,11 @@ static pj_status_t make_call(const pj_str_t *dst_uri)
 
     /* Create the INVITE session. */
     status = pjsip_inv_create_uac( dlg, sdp, 0, &call->inv);
-    if (status != PJ_SUCCESS) {
-	pjsip_dlg_terminate(dlg);
-	++app.uac_calls;
-	return status;
+    if (status != PJ_SUCCESS) 
+    {
+        pjsip_dlg_terminate(dlg);
+        ++app.uac_calls;
+        return status;
     }
 
 
@@ -553,17 +558,19 @@ static void process_incoming_call(pjsip_rx_data *rdata)
     pj_status_t status;
 
     /* Find free call slot */
-    for (i=0; i<app.max_calls; ++i) {
-	if (app.call[i].inv == NULL)
-	    break;
+    for (i = 0; i < app.max_calls; ++i) 
+    {
+        if (app.call[i].inv == NULL)
+            break;
     }
 
-    if (i == app.max_calls) {
-	const pj_str_t reason = pj_str("Too many calls");
-	pjsip_endpt_respond_stateless( app.sip_endpt, rdata, 
-				       500, &reason,
-				       NULL, NULL);
-	return;
+    if (i == app.max_calls) 
+    {
+        const pj_str_t reason = pj_str("Too many calls");
+        pjsip_endpt_respond_stateless( app.sip_endpt, rdata, 
+                500, &reason,
+                NULL, NULL);
+        return;
     }
 
     call = &app.call[i];
@@ -571,37 +578,41 @@ static void process_incoming_call(pjsip_rx_data *rdata)
     /* Verify that we can handle the request. */
     options = 0;
     status = pjsip_inv_verify_request(rdata, &options, NULL, NULL,
-  				   app.sip_endpt, &tdata);
-    if (status != PJ_SUCCESS) {
-	/*
-	 * No we can't handle the incoming INVITE request.
-	 */
-	if (tdata) {
-	    pjsip_response_addr res_addr;
-	    
-	    pjsip_get_response_addr(tdata->pool, rdata, &res_addr);
-	    pjsip_endpt_send_response(app.sip_endpt, &res_addr, tdata,
-		NULL, NULL);
-	    
-	} else {
-	    
-	    /* Respond with 500 (Internal Server Error) */
-	    pjsip_endpt_respond_stateless(app.sip_endpt, rdata, 500, NULL,
-		NULL, NULL);
-	}
-	
-	return;
+            app.sip_endpt, &tdata);
+    if (status != PJ_SUCCESS) 
+    {
+        /*
+         * No we can't handle the incoming INVITE request.
+         */
+        if (tdata) 
+        {
+            pjsip_response_addr res_addr;
+
+            pjsip_get_response_addr(tdata->pool, rdata, &res_addr);
+            pjsip_endpt_send_response(app.sip_endpt, &res_addr, tdata,
+                    NULL, NULL);
+
+        } 
+        else 
+        {
+            /* Respond with 500 (Internal Server Error) */
+            pjsip_endpt_respond_stateless(app.sip_endpt, rdata, 500, NULL,
+                    NULL, NULL);
+        }
+
+        return;
     }
 
     /* Create UAS dialog */
     status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata,
-				   &app.local_contact, &dlg);
-    if (status != PJ_SUCCESS) {
-	const pj_str_t reason = pj_str("Unable to create dialog");
-	pjsip_endpt_respond_stateless( app.sip_endpt, rdata, 
-				       500, &reason,
-				       NULL, NULL);
-	return;
+            &app.local_contact, &dlg);
+    if (status != PJ_SUCCESS) 
+    {
+        const pj_str_t reason = pj_str("Unable to create dialog");
+        pjsip_endpt_respond_stateless( app.sip_endpt, rdata, 
+                500, &reason,
+                NULL, NULL);
+        return;
     }
 
     /* Create SDP */
@@ -609,12 +620,13 @@ static void process_incoming_call(pjsip_rx_data *rdata)
 
     /* Create UAS invite session */
     status = pjsip_inv_create_uas( dlg, rdata, sdp, 0, &call->inv);
-    if (status != PJ_SUCCESS) {
-	pjsip_dlg_create_response(dlg, rdata, 500, NULL, &tdata);
-	pjsip_dlg_send_response(dlg, pjsip_rdata_get_tsx(rdata), tdata);
-	return;
+    if (status != PJ_SUCCESS) 
+    {
+        pjsip_dlg_create_response(dlg, rdata, 500, NULL, &tdata);
+        pjsip_dlg_send_response(dlg, pjsip_rdata_get_tsx(rdata), tdata);
+        return;
     }
-    
+
 
     /* Attach call data to invite session */
     call->inv->mod_data[mod_siprtp.id] = call;
@@ -626,16 +638,17 @@ static void process_incoming_call(pjsip_rx_data *rdata)
 
     /* Create 200 response .*/
     status = pjsip_inv_initial_answer(call->inv, rdata, 200, 
-				      NULL, NULL, &tdata);
-    if (status != PJ_SUCCESS) {
-	status = pjsip_inv_initial_answer(call->inv, rdata, 
-					  PJSIP_SC_NOT_ACCEPTABLE,
-					  NULL, NULL, &tdata);
-	if (status == PJ_SUCCESS)
-	    pjsip_inv_send_msg(call->inv, tdata); 
-	else
-	    pjsip_inv_terminate(call->inv, 500, PJ_FALSE);
-	return;
+            NULL, NULL, &tdata);
+    if (status != PJ_SUCCESS) 
+    {
+        status = pjsip_inv_initial_answer(call->inv, rdata, 
+                PJSIP_SC_NOT_ACCEPTABLE,
+                NULL, NULL, &tdata);
+        if (status == PJ_SUCCESS)
+            pjsip_inv_send_msg(call->inv, tdata); 
+        else
+            pjsip_inv_terminate(call->inv, 500, PJ_FALSE);
+        return;
     }
 
 
@@ -654,7 +667,7 @@ static void call_on_forked(pjsip_inv_session *inv, pjsip_event *e)
     PJ_UNUSED_ARG(inv);
     PJ_UNUSED_ARG(e);
 
-//koya    PJ_TODO( HANDLE_FORKING );
+    //koya    PJ_TODO( HANDLE_FORKING );
 }
 
 
@@ -663,15 +676,16 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata )
 {
     /* Ignore strandled ACKs (must not send respone */
     if (rdata->msg_info.msg->line.req.method.id == PJSIP_ACK_METHOD)
-	return PJ_FALSE;
+        return PJ_FALSE;
 
     /* Respond (statelessly) any non-INVITE requests with 500  */
-    if (rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD) {
-	pj_str_t reason = pj_str("Unsupported Operation");
-	pjsip_endpt_respond_stateless( app.sip_endpt, rdata, 
-				       500, &reason,
-				       NULL, NULL);
-	return PJ_TRUE;
+    if (rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD) 
+    {
+        pj_str_t reason = pj_str("Unsupported Operation");
+        pjsip_endpt_respond_stateless( app.sip_endpt, rdata, 
+                500, &reason,
+                NULL, NULL);
+        return PJ_TRUE;
     }
 
     /* Handle incoming INVITE */
@@ -684,7 +698,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata )
 
 /* Callback timer to disconnect call (limiting call duration) */
 static void timer_disconnect_call( pj_timer_heap_t *timer_heap,
-				   struct pj_timer_entry *entry)
+        struct pj_timer_entry *entry)
 {
     struct call *call = entry->user_data;
 
@@ -697,77 +711,84 @@ static void timer_disconnect_call( pj_timer_heap_t *timer_heap,
 
 /* Callback to be called when invite session's state has changed: */
 static void call_on_state_changed( pjsip_inv_session *inv, 
-				   pjsip_event *e)
+        pjsip_event *e)
 {
     struct call *call = inv->mod_data[mod_siprtp.id];
 
     PJ_UNUSED_ARG(e);
 
     if (!call)
-	return;
+        return;
 
-    if (inv->state == PJSIP_INV_STATE_DISCONNECTED) {
-	
-	pj_time_val null_time = {0, 0};
+    if (inv->state == PJSIP_INV_STATE_DISCONNECTED) 
+    {
+        pj_time_val null_time = {0, 0};
 
-	if (call->d_timer.id != 0) {
-	    pjsip_endpt_cancel_timer(app.sip_endpt, &call->d_timer);
-	    call->d_timer.id = 0;
-	}
+        if (call->d_timer.id != 0) 
+        {
+            pjsip_endpt_cancel_timer(app.sip_endpt, &call->d_timer);
+            call->d_timer.id = 0;
+        }
 
-	PJ_LOG(3,(THIS_FILE, "Call #%d disconnected. Reason=%d (%.*s)",
-		  call->index,
-		  inv->cause,
-		  (int)inv->cause_text.slen,
-		  inv->cause_text.ptr));
+        PJ_LOG(3,(THIS_FILE, "Call #%d disconnected. Reason=%d (%.*s)",
+                    call->index,
+                    inv->cause,
+                    (int)inv->cause_text.slen,
+                    inv->cause_text.ptr));
 
-	if (app.call_report) {
-	    PJ_LOG(3,(THIS_FILE, "Call #%d statistics:", call->index));
-	    print_call(call->index);
-	}
+        if (app.call_report) 
+        {
+            PJ_LOG(3,(THIS_FILE, "Call #%d statistics:", call->index));
+            print_call(call->index);
+        }
 
 
-	call->inv = NULL;
-	inv->mod_data[mod_siprtp.id] = NULL;
+        call->inv = NULL;
+        inv->mod_data[mod_siprtp.id] = NULL;
 
-	destroy_call_media(call->index);
+        destroy_call_media(call->index);
 
-	call->start_time = null_time;
-	call->response_time = null_time;
-	call->connect_time = null_time;
+        call->start_time = null_time;
+        call->response_time = null_time;
+        call->connect_time = null_time;
 
-	++app.uac_calls;
+        ++app.uac_calls;
 
-    } else if (inv->state == PJSIP_INV_STATE_CONFIRMED) {
+    } 
+    else if (inv->state == PJSIP_INV_STATE_CONFIRMED) 
+    {
 
-	pj_time_val t;
+        pj_time_val t;
 
-	pj_gettimeofday(&call->connect_time);
-	if (call->response_time.sec == 0)
-	    call->response_time = call->connect_time;
+        pj_gettimeofday(&call->connect_time);
+        if (call->response_time.sec == 0)
+            call->response_time = call->connect_time;
 
-	t = call->connect_time;
-	PJ_TIME_VAL_SUB(t, call->start_time);
+        t = call->connect_time;
+        PJ_TIME_VAL_SUB(t, call->start_time);
 
-	PJ_LOG(3,(THIS_FILE, "Call #%d connected in %d ms", call->index,
-		  PJ_TIME_VAL_MSEC(t)));
+        PJ_LOG(3,(THIS_FILE, "Call #%d connected in %d ms", call->index,
+                    PJ_TIME_VAL_MSEC(t)));
 
-	if (app.duration != 0) {
-	    call->d_timer.id = 1;
-	    call->d_timer.user_data = call;
-	    call->d_timer.cb = &timer_disconnect_call;
+        if (app.duration != 0) 
+        {
+            call->d_timer.id = 1;
+            call->d_timer.user_data = call;
+            call->d_timer.cb = &timer_disconnect_call;
 
-	    t.sec = app.duration;
-	    t.msec = 0;
+            t.sec = app.duration;
+            t.msec = 0;
 
-	    pjsip_endpt_schedule_timer(app.sip_endpt, &call->d_timer, &t);
-	}
+            pjsip_endpt_schedule_timer(app.sip_endpt, &call->d_timer, &t);
+        }
 
-    } else if (	inv->state == PJSIP_INV_STATE_EARLY ||
-		inv->state == PJSIP_INV_STATE_CONNECTING) {
+    } 
+    else if (inv->state == PJSIP_INV_STATE_EARLY ||
+             inv->state == PJSIP_INV_STATE_CONNECTING) 
+    {
 
-	if (call->response_time.sec == 0)
-	    pj_gettimeofday(&call->response_time);
+        if (call->response_time.sec == 0)
+            pj_gettimeofday(&call->response_time);
 
     }
 }
@@ -775,7 +796,7 @@ static void call_on_state_changed( pjsip_inv_session *inv,
 
 /* Utility */
 void app_perror(const char *sender, const char *title, 
-		       pj_status_t status)
+        pj_status_t status)
 {
     char errmsg[PJ_ERR_MSG_SIZE];
 
@@ -789,9 +810,10 @@ static int sip_worker_thread(void *arg)
 {
     PJ_UNUSED_ARG(arg);
 
-    while (!app.thread_quit) {
-	pj_time_val timeout = {0, 10};
-	pjsip_endpt_handle_events(app.sip_endpt, &timeout);
+    while (!app.thread_quit) 
+    {
+        pj_time_val timeout = {0, 10};
+        pjsip_endpt_handle_events(app.sip_endpt, &timeout);
     }
 
     return 0;
@@ -804,50 +826,50 @@ static pj_status_t init_options(int argc, char *argv[])
     static char ip_addr[32];
     static char local_uri[64];
 
-    enum { OPT_START,
-	   OPT_APP_LOG_LEVEL, OPT_LOG_FILE, 
-	   OPT_A_PT, OPT_A_NAME, OPT_A_CLOCK, OPT_A_BITRATE, OPT_A_PTIME,
-	   OPT_REPORT_FILE };
+    enum { OPT_START, OPT_APP_LOG_LEVEL, OPT_LOG_FILE, 
+        OPT_A_PT, OPT_A_NAME, OPT_A_CLOCK, OPT_A_BITRATE, OPT_A_PTIME,
+        OPT_REPORT_FILE };
 
-    struct pj_getopt_option long_options[] = {
-	{ "count",	    1, 0, 'c' },
-	{ "gap",            1, 0, 'g' },
-	{ "call-report",    0, 0, 'R' },
-	{ "duration",	    1, 0, 'd' },
-	{ "auto-quit",	    0, 0, 'q' },
-	{ "local-port",	    1, 0, 'p' },
-	{ "rtp-port",	    1, 0, 'r' },
-	{ "ip-addr",	    1, 0, 'i' },
+    struct pj_getopt_option long_options[] = 
+    {
+        { "count",	        1, 0, 'c' },
+        { "gap",            1, 0, 'g' },
+        { "call-report",    0, 0, 'R' },
+        { "duration",	    1, 0, 'd' },
+        { "auto-quit",	    0, 0, 'q' },
+        { "local-port",	    1, 0, 'p' },
+        { "rtp-port",	    1, 0, 'r' },
+        { "ip-addr",	    1, 0, 'i' },
 
-	{ "log-level",	    1, 0, 'l' },
-	{ "app-log-level",  1, 0, OPT_APP_LOG_LEVEL },
-	{ "log-file",	    1, 0, OPT_LOG_FILE },
+        { "log-level",	    1, 0, 'l' },
+        { "app-log-level",  1, 0, OPT_APP_LOG_LEVEL },
+        { "log-file",	    1, 0, OPT_LOG_FILE },
 
-	{ "report-file",    1, 0, OPT_REPORT_FILE },
+        { "report-file",    1, 0, OPT_REPORT_FILE },
 
-	/* Don't support this anymore, see comments in USAGE above.
-	{ "a-pt",	    1, 0, OPT_A_PT },
-	{ "a-name",	    1, 0, OPT_A_NAME },
-	{ "a-clock",	    1, 0, OPT_A_CLOCK },
-	{ "a-bitrate",	    1, 0, OPT_A_BITRATE },
-	{ "a-ptime",	    1, 0, OPT_A_PTIME },
-	*/
+        /* Don't support this anymore, see comments in USAGE above.
+           { "a-pt",	    1, 0, OPT_A_PT },
+           { "a-name",	    1, 0, OPT_A_NAME },
+           { "a-clock",	    1, 0, OPT_A_CLOCK },
+           { "a-bitrate",	    1, 0, OPT_A_BITRATE },
+           { "a-ptime",	    1, 0, OPT_A_PTIME },
+           */
 
-	{ NULL, 0, 0, 0 },
+        { NULL, 0, 0, 0 },
     };
     int c;
     int option_index;
 
     /* Get local IP address for the default IP address */
     {
-	const pj_str_t *hostname;
-	pj_sockaddr_in tmp_addr;
-	char *addr;
+        const pj_str_t *hostname;
+        pj_sockaddr_in tmp_addr;
+        char *addr;
 
-	hostname = pj_gethostname();
-	pj_sockaddr_in_init(&tmp_addr, hostname, 0);
-	addr = pj_inet_ntoa(tmp_addr.sin_addr);
-	pj_ansi_strcpy(ip_addr, addr);
+        hostname = pj_gethostname();
+        pj_sockaddr_in_init(&tmp_addr, hostname, 0);
+        addr = pj_inet_ntoa(tmp_addr.sin_addr);
+        pj_ansi_strcpy(ip_addr, addr);
     }
 
     /* Init defaults */
@@ -866,77 +888,93 @@ static pj_status_t init_options(int argc, char *argv[])
     /* Parse options */
     pj_optind = 0;
     while((c=pj_getopt_long(argc,argv, "c:d:p:r:i:l:g:qR", 
-			    long_options, &option_index))!=-1) 
+                    long_options, &option_index))!=-1) 
     {
-	switch (c) {
-	case 'c':
-	    app.max_calls = atoi(pj_optarg);
-	    if (app.max_calls < 0 || app.max_calls > MAX_CALLS) {
-		PJ_LOG(3,(THIS_FILE, "Invalid max calls value %s", pj_optarg));
-		return 1;
-	    }
-	    break;
-	case 'g':
-	    app.call_gap = atoi(pj_optarg);
-	    break;
-	case 'R':
-	    app.call_report = PJ_TRUE;
-	    break;
-	case 'd':
-	    app.duration = atoi(pj_optarg);
-	    break;
-	case 'q':
-	    app.auto_quit = 1;
-	    break;
+        switch (c) 
+        {
+            case 'c':
+                app.max_calls = atoi(pj_optarg);
+                if (app.max_calls < 0 || app.max_calls > MAX_CALLS) 
+                {
+                    PJ_LOG(3,(THIS_FILE, "Invalid max calls value %s", 
+                                pj_optarg));
+                    return 1;
+                }
+                break;
 
-	case 'p':
-	    app.sip_port = atoi(pj_optarg);
-	    break;
-	case 'r':
-	    app.rtp_start_port = atoi(pj_optarg);
-	    break;
-	case 'i':
-	    app.local_addr = pj_str(pj_optarg);
-	    break;
+            case 'g':
+                app.call_gap = atoi(pj_optarg);
+                break;
 
-	case 'l':
-	    app.log_level = atoi(pj_optarg);
-	    break;
-	case OPT_APP_LOG_LEVEL:
-	    app.app_log_level = atoi(pj_optarg);
-	    break;
-	case OPT_LOG_FILE:
-	    app.log_filename = pj_optarg;
-	    break;
+            case 'R':
+                app.call_report = PJ_TRUE;
+                break;
 
-	case OPT_A_PT:
-	    app.audio_codec.pt = atoi(pj_optarg);
-	    break;
-	case OPT_A_NAME:
-	    app.audio_codec.name = pj_optarg;
-	    break;
-	case OPT_A_CLOCK:
-	    app.audio_codec.clock_rate = atoi(pj_optarg);
-	    break;
-	case OPT_A_BITRATE:
-	    app.audio_codec.bit_rate = atoi(pj_optarg);
-	    break;
-	case OPT_A_PTIME:
-	    app.audio_codec.ptime = atoi(pj_optarg);
-	    break;
-	case OPT_REPORT_FILE:
-	    app.report_filename = pj_optarg;
-	    break;
+            case 'd':
+                app.duration = atoi(pj_optarg);
+                break;
 
-	default:
-	    puts(USAGE);
-	    return 1;
-	}
+            case 'q':
+                app.auto_quit = 1;
+                break;
+
+            case 'p':
+                app.sip_port = atoi(pj_optarg);
+                break;
+
+            case 'r':
+                app.rtp_start_port = atoi(pj_optarg);
+                break;
+
+            case 'i':
+                app.local_addr = pj_str(pj_optarg);
+                break;
+
+            case 'l':
+                app.log_level = atoi(pj_optarg);
+                break;
+
+            case OPT_APP_LOG_LEVEL:
+                app.app_log_level = atoi(pj_optarg);
+                break;
+
+            case OPT_LOG_FILE:
+                app.log_filename = pj_optarg;
+                break;
+
+            case OPT_A_PT:
+                app.audio_codec.pt = atoi(pj_optarg);
+                break;
+
+            case OPT_A_NAME:
+                app.audio_codec.name = pj_optarg;
+                break;
+
+            case OPT_A_CLOCK:
+                app.audio_codec.clock_rate = atoi(pj_optarg);
+                break;
+
+            case OPT_A_BITRATE:
+                app.audio_codec.bit_rate = atoi(pj_optarg);
+                break;
+
+            case OPT_A_PTIME:
+                app.audio_codec.ptime = atoi(pj_optarg);
+                break;
+
+            case OPT_REPORT_FILE:
+                app.report_filename = pj_optarg;
+                break;
+
+            default:
+                puts(USAGE);
+                return 1;
+        }
     }
 
     /* Check if URL is specified */
     if (pj_optind < argc)
-	app.uri_to_call = pj_str(argv[pj_optind]);
+        app.uri_to_call = pj_str(argv[pj_optind]);
 
     /* Build local URI and contact */
     pj_ansi_sprintf( local_uri, "sip:%s:%d", app.local_addr.ptr, app.sip_port);
@@ -955,9 +993,8 @@ static pj_status_t init_options(int argc, char *argv[])
 /*
  * Create SDP session for a call.
  */
-static pj_status_t create_sdp( pj_pool_t *pool,
-			       struct call *call,
-			       pjmedia_sdp_session **p_sdp)
+static pj_status_t create_sdp( pj_pool_t *pool, struct call *call,
+        pjmedia_sdp_session **p_sdp)
 {
     pj_time_val tv;
     pjmedia_sdp_session *sdp;
@@ -1014,19 +1051,19 @@ static pj_status_t create_sdp( pj_pool_t *pool,
     m->attr_count = 0;
 
     {
-	pjmedia_sdp_rtpmap rtpmap;
-	pjmedia_sdp_attr *attr;
-	char ptstr[10];
+        pjmedia_sdp_rtpmap rtpmap;
+        pjmedia_sdp_attr *attr;
+        char ptstr[10];
 
-	sprintf(ptstr, "%d", app.audio_codec.pt);
-	pj_strdup2(pool, &m->desc.fmt[0], ptstr);
-	rtpmap.pt = m->desc.fmt[0];
-	rtpmap.clock_rate = app.audio_codec.clock_rate;
-	rtpmap.enc_name = pj_str(app.audio_codec.name);
-	rtpmap.param.slen = 0;
+        sprintf(ptstr, "%d", app.audio_codec.pt);
+        pj_strdup2(pool, &m->desc.fmt[0], ptstr);
+        rtpmap.pt = m->desc.fmt[0];
+        rtpmap.clock_rate = app.audio_codec.clock_rate;
+        rtpmap.enc_name = pj_str(app.audio_codec.name);
+        rtpmap.param.slen = 0;
 
-	pjmedia_sdp_rtpmap_to_attr(pool, &rtpmap, &attr);
-	m->attr[m->attr_count++] = attr;
+        pjmedia_sdp_rtpmap_to_attr(pool, &rtpmap, &attr);
+        m->attr[m->attr_count++] = attr;
     }
 
     /* Add sendrecv attribute. */
@@ -1077,55 +1114,55 @@ void boost_priority(void)
     int rc;
 
     if (sched_get_priority_min(POLICY) < sched_get_priority_max(POLICY))
-	max_prio = sched_get_priority_max(POLICY)-1;
+        max_prio = sched_get_priority_max(POLICY)-1;
     else
-	max_prio = sched_get_priority_max(POLICY)+1;
+        max_prio = sched_get_priority_max(POLICY)+1;
 
     /*
      * Adjust process scheduling algorithm and priority
      */
     rc = sched_getparam(0, &tp);
     if (rc != 0) {
-	app_perror( THIS_FILE, "sched_getparam error",
-		    PJ_RETURN_OS_ERROR(rc));
-	return;
+        app_perror( THIS_FILE, "sched_getparam error",
+                PJ_RETURN_OS_ERROR(rc));
+        return;
     }
     tp.__sched_priority = max_prio;
 
     rc = sched_setscheduler(0, POLICY, &tp);
     if (rc != 0) {
-	app_perror( THIS_FILE, "sched_setscheduler error",
-		    PJ_RETURN_OS_ERROR(rc));
+        app_perror( THIS_FILE, "sched_setscheduler error",
+                PJ_RETURN_OS_ERROR(rc));
     }
 
     PJ_LOG(4, (THIS_FILE, "New process policy=%d, priority=%d",
-	      policy, tp.__sched_priority));
+                policy, tp.__sched_priority));
 
     /*
      * Adjust thread scheduling algorithm and priority
      */
     rc = pthread_getschedparam(pthread_self(), &policy, &tp);
     if (rc != 0) {
-	app_perror( THIS_FILE, "pthread_getschedparam error",
-		    PJ_RETURN_OS_ERROR(rc));
-	return;
+        app_perror( THIS_FILE, "pthread_getschedparam error",
+                PJ_RETURN_OS_ERROR(rc));
+        return;
     }
 
     PJ_LOG(4, (THIS_FILE, "Old thread policy=%d, priority=%d",
-	      policy, tp.__sched_priority));
+                policy, tp.__sched_priority));
 
     policy = POLICY;
     tp.__sched_priority = max_prio;
 
     rc = pthread_setschedparam(pthread_self(), policy, &tp);
     if (rc != 0) {
-	app_perror( THIS_FILE, "pthread_setschedparam error",
-		    PJ_RETURN_OS_ERROR(rc));
-	return;
+        app_perror( THIS_FILE, "pthread_setschedparam error",
+                PJ_RETURN_OS_ERROR(rc));
+        return;
     }
 
     PJ_LOG(4, (THIS_FILE, "New thread policy=%d, priority=%d",
-	      policy, tp.__sched_priority));
+                policy, tp.__sched_priority));
 }
 
 #else
@@ -1148,28 +1185,28 @@ static void on_rx_rtp(void *user_data, void *pkt, pj_ssize_t size)
 
     /* Discard packet if media is inactive */
     if (!strm->active)
-	return;
+        return;
 
     /* Check for errors */
     if (size < 0) {
-	app_perror(THIS_FILE, "RTP recv() error", -size);
-	return;
+        app_perror(THIS_FILE, "RTP recv() error", -size);
+        return;
     }
 
     /* Decode RTP packet. */
     status = pjmedia_rtp_decode_rtp(&strm->in_sess, 
-				    pkt, size, 
-				    &hdr, &payload, &payload_len);
+            pkt, size, 
+            &hdr, &payload, &payload_len);
     if (status != PJ_SUCCESS) {
-	app_perror(THIS_FILE, "RTP decode error", status);
-	return;
+        app_perror(THIS_FILE, "RTP decode error", status);
+        return;
     }
 
     //PJ_LOG(4,(THIS_FILE, "Rx seq=%d", pj_ntohs(hdr->seq)));
 
     /* Update the RTCP session. */
     pjmedia_rtcp_rx_rtp(&strm->rtcp, pj_ntohs(hdr->seq),
-			pj_ntohl(hdr->ts), payload_len);
+            pj_ntohl(hdr->ts), payload_len);
 
     /* Update RTP session */
     pjmedia_rtp_session_update(&strm->in_sess, hdr, NULL);
@@ -1187,12 +1224,12 @@ static void on_rx_rtcp(void *user_data, void *pkt, pj_ssize_t size)
 
     /* Discard packet if media is inactive */
     if (!strm->active)
-	return;
+        return;
 
     /* Check for errors */
     if (size < 0) {
-	app_perror(THIS_FILE, "Error receiving RTCP packet", -size);
-	return;
+        app_perror(THIS_FILE, "Error receiving RTCP packet", -size);
+        return;
     }
 
     /* Update RTCP session */
@@ -1213,10 +1250,10 @@ static int media_thread(void *arg)
     GMainLoop *loop;
     GError *error;
 
-/*----------------------------------------------*/ 
+    /*----------------------------------------------*/ 
     //media_stream 
     rtp_setup(arg);
-/*----------------------------------------------*/ 
+    /*----------------------------------------------*/ 
 
     // init gstreamer
     gst_init(0, NULL);  // normally should get argc argv
@@ -1225,27 +1262,36 @@ static int media_thread(void *arg)
     // setup pipeline which takes DV from camera, demuxes and decodes
     // to get video, maps raw video to ffmpegcolorspace, encodes with x264
     // and packetizes for rtp transport
-    
+
     pipeline = gst_parse_launch("dv1394src ! dvdemux ! dvdec ! \
-                                 ffmpegcolorspace ! x264enc threads=4 \
-                                 ! rtph264pay", &error);
+            ffmpegcolorspace ! x264enc threads=4 \
+            ! rtph264pay", &error);
+    if (!pipeline)
+        fprintf(stdout, "Pipeline is bogus.");
 
     // setup fake sink
     fakesink = gst_element_factory_make("fakesink", "sink");
+    if (!fakesink)
+        fprintf(stdout, "Pipeline is bogus.");
+    
     g_object_set(G_OBJECT(fakesink), "signal-handoffs", TRUE, NULL);
-    g_signal_connect(fakesink, "handoff", G_CALLBACK (cb_handoff), NULL);
+
+    if (!g_signal_connect(fakesink, "handoff", G_CALLBACK(cb_handoff), NULL))
+        fprintf(stdout, "Failed to connect callback.");
 
     // link pipeline to fake sink
     gst_bin_add_many(GST_BIN(pipeline), fakesink, NULL);
+
+    printf("got here.");
+    fflush(stdout);
 
     // play
     gst_element_set_state(pipeline, GST_STATE_PLAYING);
 
 
-
-/*----------------------------------------------*/ 
+    /*----------------------------------------------*/ 
     g_main_loop_run(loop);
-/*----------------------------------------------*/ 
+    /*----------------------------------------------*/ 
 
     // cleanup
     gst_element_set_state(pipeline, GST_STATE_NULL);
