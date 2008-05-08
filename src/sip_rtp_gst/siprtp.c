@@ -64,23 +64,7 @@ static const char *USAGE =
 */
 ;
 
-
-/* Include all headers. */
-#include <pjsip.h>
-#include <pjmedia.h>
-#include <pjmedia-codec.h>
-#include <pjsip_ua.h>
-#include <pjsip_simple.h>
-#include <pjlib-util.h>
-#include <pjlib.h>
-
-#include <stdlib.h>
-
-// gstreamer includes
-#include <gst/gst.h>
-
 #include "siprtp.h"
-
 /* Uncomment these to disable threads.
  * NOTE:
  *   when threading is disabled, siprtp won't transmit any
@@ -113,36 +97,6 @@ struct codec
 };
 
 
-/* A bidirectional media stream created when the call is active. */
-struct media_stream
-{
-    /* Static: */
-    unsigned		 call_index;	    /* Call owner.		*/
-    unsigned		 media_index;	    /* Media index in call.	*/
-    pjmedia_transport   *transport;	    /* To send/recv RTP/RTCP	*/
-
-    /* Active? */
-    pj_bool_t		 active;	    /* Non-zero if is in call.	*/
-
-    /* Current stream info: */
-    pjmedia_stream_info	 si;		    /* Current stream info.	*/
-
-    /* More info: */
-    unsigned		 clock_rate;	    /* clock rate		*/
-    unsigned		 samples_per_frame; /* samples per frame	*/
-    unsigned		 bytes_per_frame;   /* frame size.		*/
-
-    /* RTP session: */
-    pjmedia_rtp_session	 out_sess;	    /* outgoing RTP session	*/
-    pjmedia_rtp_session	 in_sess;	    /* incoming RTP session	*/
-
-    /* RTCP stats: */
-    pjmedia_rtcp_session rtcp;		    /* incoming RTCP session.	*/
-
-    /* Thread: */
-    pj_bool_t		 thread_quit_flag;  /* Stop media thread.	*/
-    pj_thread_t		*thread;	    /* Media thread.		*/
-};
 
 
 /* This is a call structure that is created when the application starts
@@ -245,9 +199,6 @@ static void on_rx_rtp(void *user_data, void *pkt, pj_ssize_t size);
 /* This callback is called by media transport on receipt of RTCP packet. */
 static void on_rx_rtcp(void *user_data, void *pkt, pj_ssize_t size);
 
-/* Display error */
-static void app_perror(const char *sender, const char *title, 
-		       pj_status_t status);
 
 /* Print call */
 static void print_call(int call_index);
@@ -705,7 +656,7 @@ static void call_on_forked(pjsip_inv_session *inv, pjsip_event *e)
     PJ_UNUSED_ARG(inv);
     PJ_UNUSED_ARG(e);
 
-    PJ_TODO( HANDLE_FORKING );
+//koya    PJ_TODO( HANDLE_FORKING );
 }
 
 
@@ -825,7 +776,7 @@ static void call_on_state_changed( pjsip_inv_session *inv,
 
 
 /* Utility */
-static void app_perror(const char *sender, const char *title, 
+void app_perror(const char *sender, const char *title, 
 		       pj_status_t status)
 {
     char errmsg[PJ_ERR_MSG_SIZE];
@@ -1111,7 +1062,7 @@ static pj_status_t create_sdp( pj_pool_t *pool,
 
 #if defined(PJ_WIN32) && PJ_WIN32 != 0
 #include <windows.h>
-static void boost_priority(void)
+void boost_priority(void)
 {
     SetPriorityClass( GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
     SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
@@ -1119,7 +1070,7 @@ static void boost_priority(void)
 
 #elif defined(PJ_LINUX) && PJ_LINUX != 0
 #include <pthread.h>
-static void boost_priority(void)
+void boost_priority(void)
 {
 #define POLICY	SCHED_FIFO
     struct sched_param tp;
@@ -1251,8 +1202,6 @@ static void on_rx_rtcp(void *user_data, void *pkt, pj_ssize_t size)
 }
 
 
-void rtp_setup(void *arg);
-
 /* 
  * Media thread 
  *
@@ -1308,153 +1257,11 @@ static int media_thread(void *arg)
 }
 
 
-enum { RTCP_INTERVAL = 5000, RTCP_RAND = 2000 };
-char packet[1500];
-struct media_stream *strm; 
-unsigned msec_interval;
-pj_timestamp freq, next_rtp, next_rtcp;
-
-void rtp_setup(void *arg)
-{ 
-    strm = arg;
-    /* Boost thread priority if necessary */
-    boost_priority();
-
-    /* Let things settle */
-    pj_thread_sleep(100);
-
-    msec_interval = strm->samples_per_frame * 1000 / strm->clock_rate;
-    pj_get_timestamp_freq(&freq);
-
-    pj_get_timestamp(&next_rtp);
-    next_rtp.u64 += (freq.u64 * msec_interval / 1000);
-
-    next_rtcp = next_rtp;
-    next_rtcp.u64 += (freq.u64 * (RTCP_INTERVAL+(pj_rand()%RTCP_RAND)) / 1000);
-}
-
-
-void temp_cb(GstBuffer *buffer)
-{
-        pj_timestamp now, lesser;
-        pj_time_val timeout;
-        pj_bool_t send_rtp, send_rtcp;
-
-        send_rtp = send_rtcp = PJ_FALSE;
-
-        /* Determine how long to sleep */
-        if (next_rtp.u64 < next_rtcp.u64) {
-            lesser = next_rtp;
-            send_rtp = PJ_TRUE;
-        } else {
-            lesser = next_rtcp;
-            send_rtcp = PJ_TRUE;
-        }
-
-        pj_get_timestamp(&now);
-        if (lesser.u64 <= now.u64) {
-            timeout.sec = timeout.msec = 0;
-            //printf("immediate "); fflush(stdout);
-        } else {
-            pj_uint64_t tick_delay;
-            tick_delay = lesser.u64 - now.u64;
-            timeout.sec = 0;
-            timeout.msec = (pj_uint32_t)(tick_delay * 1000 / freq.u64);
-            pj_time_val_normalize(&timeout);
-
-            //printf("%d:%03d ", timeout.sec, timeout.msec); fflush(stdout);
-        }
-
-        /* Wait for next interval */
-        //if (timeout.sec!=0 && timeout.msec!=0) {
-        //koya pj_thread_sleep(PJ_TIME_VAL_MSEC(timeout));
-        if (strm->thread_quit_flag)
-           return; //break
-        //}
-
-        pj_get_timestamp(&now);
-
-        if (send_rtp || next_rtp.u64 <= now.u64) {
-            /*
-             * Time to send RTP packet.
-             */
-            pj_status_t status;
-            const void *p_hdr;
-            const pjmedia_rtp_hdr *hdr;
-            pj_ssize_t size;
-            int hdrlen;
-
-            /* Format RTP header */
-            status = pjmedia_rtp_encode_rtp( &strm->out_sess, strm->si.tx_pt,
-                    0, /* marker bit */
-                    strm->bytes_per_frame, 
-                    strm->samples_per_frame,
-                    &p_hdr, &hdrlen);
-            if (status == PJ_SUCCESS) {
-
-                //PJ_LOG(4,(THIS_FILE, "\t\tTx seq=%d", pj_ntohs(hdr->seq)));
-
-                hdr = (const pjmedia_rtp_hdr*) p_hdr;
-
-                /* Copy RTP header to packet */
-                pj_memcpy(packet, hdr, hdrlen);
-
-                /* Zero the payload */
-                /* TODO: put gstreamer data in here */
-                pj_bzero(packet+hdrlen, strm->bytes_per_frame);
-
-                /* Send RTP packet */
-                size = hdrlen + strm->bytes_per_frame;
-                status = pjmedia_transport_send_rtp(strm->transport, 
-                        packet, size);
-                if (status != PJ_SUCCESS)
-                    app_perror(THIS_FILE, "Error sending RTP packet", status);
-
-            } else {
-                pj_assert(!"RTP encode() error");
-            }
-
-            /* Update RTCP SR */
-            pjmedia_rtcp_tx_rtp( &strm->rtcp, (pj_uint16_t)strm->bytes_per_frame);
-
-            /* Schedule next send */
-            next_rtp.u64 += (msec_interval * freq.u64 / 1000);
-        }
-
-
-        if (send_rtcp || next_rtcp.u64 <= now.u64) {
-            /*
-             * Time to send RTCP packet.
-             */
-            void *rtcp_pkt;
-            int rtcp_len;
-            pj_ssize_t size;
-            pj_status_t status;
-
-            /* Build RTCP packet */
-            pjmedia_rtcp_build_rtcp(&strm->rtcp, &rtcp_pkt, &rtcp_len);
-
-
-            /* Send packet */
-            size = rtcp_len;
-            status = pjmedia_transport_send_rtcp(strm->transport,
-                    rtcp_pkt, size);
-            if (status != PJ_SUCCESS) {
-                app_perror(THIS_FILE, "Error sending RTCP packet", status);
-            }
-
-            /* Schedule next send */
-            next_rtcp.u64 += (freq.u64 * (RTCP_INTERVAL+(pj_rand()%RTCP_RAND)) /
-                    1000);
-        }
-
-}
-
 // Callback for fakesink data
 static void cb_handoff(GstElement *fakesink, GstBuffer *buffer, 
         GstPad *pad, gpointer user_data)
 {
-    temp_cb(buffer);
+    rtp_cb(buffer);
     // for now: zero out buffer
     //pj_memset(GST_BUFFER_DATA(buffer), 0, GST_BUFFER_SIZE (buffer));
 }
