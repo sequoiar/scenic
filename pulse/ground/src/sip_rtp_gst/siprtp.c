@@ -65,6 +65,7 @@ static const char *USAGE =
 ;
 
 #include "siprtp.h"
+
 /* Uncomment these to disable threads.
  * NOTE:
  *   when threading is disabled, siprtp won't transmit any

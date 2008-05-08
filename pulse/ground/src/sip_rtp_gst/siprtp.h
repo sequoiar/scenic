@@ -1,5 +1,8 @@
+// siprtp.h
+
 #ifndef _SIP_RTP_H_
 #define _SIP_RTP_H_
+
 /* Include all headers. */
 #include <pjsip.h>
 #include <pjmedia.h>
@@ -9,9 +12,9 @@
 #include <pjlib-util.h>
 #include <pjlib.h>
 #include <stdlib.h>
+
 // gstreamer includes
 #include <gst/gst.h>
-//gstbuff_ready_cb.c
 
 void rtp_setup(void *);
 
@@ -63,3 +66,4 @@ struct media_stream
 
 
 #endif // _SIP_RTP_H_
+
