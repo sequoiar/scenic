@@ -1,6 +1,6 @@
 // gstbuff_ready_cb.c
 
-#include "siprtp.h"
+#include "gst_sip_rtp.h"
 
 // FIXME: shouldn't be global
 
