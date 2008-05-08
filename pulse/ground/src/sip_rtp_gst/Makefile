@@ -1,10 +1,11 @@
 APPLICATION=siprtp
 
-PJBASE=~/devel/pjsip
+include ../base.mak
+
+PJBASE=$(BASE_ROOT)/pjsip
 
 include $(PJBASE)/build.mak
 
-BASE=~/devel/miville/trunk/pulse/ground/
 BINDIR=$(BASE)bin/
 
 #OBJS=main_entry.o siprtp.o
