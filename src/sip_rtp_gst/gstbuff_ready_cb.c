@@ -1,13 +1,14 @@
+// gstbuff_ready_cb.c
+
 #include "siprtp.h"
 
-struct media_stream *strm; 
+// FIXME: shouldn't be global
 
+struct media_stream *strm; 
 enum { RTCP_INTERVAL = 5000, RTCP_RAND = 2000 };
 static unsigned msec_interval;
 static pj_timestamp freq, next_rtp, next_rtcp;
 static char packet[1500];
-
-
 
 
 
@@ -40,7 +41,6 @@ void rtp_cb(GstBuffer *buffer)
     send_rtp = send_rtcp = PJ_FALSE;
 
 
-
     /* Determine how long to sleep */
     if (next_rtp.u64 < next_rtcp.u64) 
     {
@@ -53,8 +53,9 @@ void rtp_cb(GstBuffer *buffer)
         send_rtcp = PJ_TRUE;
     }
 
-
-//TIMESTAMP
+    /*----------------------------------------------*/ 
+    //  TIMESTAMP
+    /*----------------------------------------------*/ 
     pj_get_timestamp(&now);
 
 
@@ -83,10 +84,10 @@ void rtp_cb(GstBuffer *buffer)
 
     //}
 
-
-    /////////TIME STAMP
+    /*----------------------------------------------*/ 
+    //  TIME STAMP
+    /*----------------------------------------------*/ 
     pj_get_timestamp(&now);
-
 
 
     if (send_rtp || next_rtp.u64 <= now.u64) 
@@ -118,7 +119,6 @@ void rtp_cb(GstBuffer *buffer)
 
             /* Zero the payload */
             pj_bzero(packet+hdrlen, strm->bytes_per_frame);
-
 
 
             size = hdrlen + strm->bytes_per_frame;
