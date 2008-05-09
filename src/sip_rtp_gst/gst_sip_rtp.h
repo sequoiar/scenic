@@ -13,14 +13,10 @@
 #include <pjlib.h>
 #include <stdlib.h>
 
-// gstreamer includes
-#include <gst/gst.h>
-
 void rtp_setup(void *);
 
-// gstreamer callback to deal with buffer from fakesink
-void cb_handoff(GstElement *fakesink, GstBuffer *buffer, 
-        GstPad *pad, gpointer user_data);
+// create gstreamer pipeline and go
+void gst_run();
 
 int sip_main(int argc, char *argv[]);
 

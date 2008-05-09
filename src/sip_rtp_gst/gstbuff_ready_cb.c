@@ -1,6 +1,7 @@
 // gstbuff_ready_cb.c
 
 #include "gst_sip_rtp.h"
+#include <gst/gst.h>
 
 // FIXME: these shouldn't be global
 
@@ -10,7 +11,11 @@ static unsigned msec_interval;
 static pj_timestamp freq, next_rtp, next_rtcp;
 static char packet[1500];
 
+// our callback to get buffer from pipeline and send it on its merry way via
+// rtp
 
+void cb_handoff(GstElement *fakesink, GstBuffer *buffer, 
+        GstPad *pad, gpointer user_data);
 
 void rtp_setup(void *arg)
 { 
@@ -30,6 +35,60 @@ void rtp_setup(void *arg)
     next_rtcp = next_rtp;
     next_rtcp.u64 += (freq.u64 * (RTCP_INTERVAL+(pj_rand()%RTCP_RAND)) / 1000);
 }
+
+void gst_run()
+{
+    // create gstreamer components
+    GstElement *pipeline, *fakesrc, *flt, *conv, *videosink;
+    GMainLoop *loop;
+    
+    // init gstreamer
+    gst_init(0, NULL);  // normally should get argc argv
+    loop = g_main_loop_new(NULL, FALSE);
+
+    if (!(pipeline = gst_pipeline_new("pipeline")))
+        fprintf(stdout, "Pipeline is bogus.");
+    if (!(fakesrc = gst_element_factory_make ("fakesrc", "source")))
+        fprintf(stdout, "Fakesrc is bogus.");
+    if (!(flt = gst_element_factory_make ("capsfilter", "flt")))
+        fprintf(stdout, "FLT is bogus.");
+    if (!(conv = gst_element_factory_make ("ffmpegcolorspace", "conv")))
+        fprintf(stdout, "ffmpegcolorspace is bogus.");
+    if (!(videosink = gst_element_factory_make ("xvimagesink", "videosink")))
+        fprintf(stdout, "Videosink is bogus.");
+ 
+    /* setup */
+    g_object_set (G_OBJECT (flt), "caps",
+            gst_caps_new_simple ("video/x-raw-rgb",
+                "width", G_TYPE_INT, 384,
+                "height", G_TYPE_INT, 288,
+                "framerate", GST_TYPE_FRACTION, 1, 1,
+                "bpp", G_TYPE_INT, 16,
+                "depth", G_TYPE_INT, 16,
+                "endianness", G_TYPE_INT, G_BYTE_ORDER,
+                NULL), NULL);
+    gst_bin_add_many (GST_BIN (pipeline), fakesrc, flt, conv, videosink, NULL);
+    gst_element_link_many (fakesrc, flt, conv, videosink, NULL);
+
+    /* setup fake source */
+    g_object_set (G_OBJECT (fakesrc),
+            "signal-handoffs", TRUE,
+            "sizemax", 384 * 288 * 2,
+            "sizetype", 2, NULL);
+    g_signal_connect (fakesrc, "handoff", G_CALLBACK (cb_handoff), NULL);
+
+    // play
+    gst_element_set_state(pipeline, GST_STATE_PLAYING);
+
+    /*----------------------------------------------*/ 
+    g_main_loop_run(loop);
+    /*----------------------------------------------*/ 
+
+    // cleanup
+    gst_element_set_state(pipeline, GST_STATE_NULL);
+    gst_object_unref(GST_OBJECT(pipeline));
+}
+
 
 
 
