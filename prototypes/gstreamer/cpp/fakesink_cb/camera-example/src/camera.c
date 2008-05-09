@@ -8,11 +8,8 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <gtk/gtk.h>
 #include <gst/gst.h>
 #include <gst/interfaces/xoverlay.h>
-#include <hildon-widgets/hildon-banner.h>
-#include <hildon-widgets/hildon-program.h>
 #include <jpeglib.h>
 #include <libgnomevfs/gnome-vfs.h>
 
@@ -21,16 +18,12 @@
 #define PHOTO_NAME_DEFAULT	 "Picture"
 #define PHOTO_NAME_SUFIX_DEFAULT ".jpg"
 
-static void create_jpeg(unsigned char *buffer);
-static void take_photo(GtkWidget * widget, gpointer data);
 static gboolean cb_have_data(GstPad * pad, GstBuffer * buffer,
 			     gpointer u_data);
-static gboolean expose_cb(GtkWidget * widget, GdkEventExpose * event,
-			  gpointer data);
 static void show_note(char *note);
 
 int picture_requested = 0;
-static /*HILDON_WINDOW */ GtkWidget *window;
+//static /*HILDON_WINDOW */ GtkWidget *window;
 
 static gboolean
 cb_have_data(GstPad * pad, GstBuffer * buffer, gpointer u_data)
@@ -39,51 +32,35 @@ cb_have_data(GstPad * pad, GstBuffer * buffer, gpointer u_data)
 	    (unsigned char *) GST_BUFFER_DATA(buffer);
 	if (picture_requested) {
 		picture_requested = 0;
-		create_jpeg(data_photo);
+//		create_jpeg(data_photo);
 	}
 	return TRUE;
-}
-
-static void take_photo(GtkWidget * widget, gpointer buffer)
-{
-	picture_requested = 1;
-	//show_note("Photo Saved");
-}
-
-
-static gboolean
-expose_cb(GtkWidget * widget, GdkEventExpose * event, gpointer data)
-{
-
-	gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(data),
-				     GDK_WINDOW_XWINDOW(widget->window));
-	return FALSE;
 }
 
 int main(int argc, char **argv)
 {
 
-	HildonProgram *program;
-	GtkWidget *screen, *button, *hbox, *vbox_button, *vbox;
+//	HildonProgram *program;
+//	GtkWidget *screen, *button, *hbox, *vbox_button, *vbox;
 
 	GstElement *pipeline, *src, *sink, *csp, *csp2, *flt;
 	GstPad *pad;
 	GstCaps *caps;
 	gboolean link_ok;
 
-	gtk_init(&argc, &argv);
+//	gtk_init(&argc, &argv);
 	gst_init(&argc, &argv);
 	gnome_vfs_init();
 
-	program = HILDON_PROGRAM(hildon_program_get_instance());
+//	program = HILDON_PROGRAM(hildon_program_get_instance());
 	g_set_application_name("Test camera");
 
 	/* Create HildonWindow and set it to HildonProgram */
-	window = /*HILDON_WINDOW */ GTK_WIDGET(hildon_window_new());
-	hildon_program_add_window(program, HILDON_WINDOW(window));
+//	window = /*HILDON_WINDOW */ GTK_WIDGET(hildon_window_new());
+//	hildon_program_add_window(program, HILDON_WINDOW(window));
 
 	/* Connect signal to X in the upper corner */
-	g_signal_connect(G_OBJECT(window), "delete_event",
+/*	g_signal_connect(G_OBJECT(window), "delete_event",
 			 G_CALLBACK(gtk_main_quit), NULL);
 
 	vbox = gtk_vbox_new(FALSE, 0);
@@ -104,9 +81,9 @@ int main(int argc, char **argv)
 	g_signal_connect(G_OBJECT(button), "clicked",
 			 G_CALLBACK(take_photo), NULL);
 	gtk_container_add(GTK_CONTAINER(window), hbox);
-
+*/
 	/* Begin the main application */
-	gtk_widget_show_all(GTK_WIDGET(window));
+//	gtk_widget_show_all(GTK_WIDGET(window));
 
 	// Pipeline elements
 	pipeline = gst_pipeline_new("test-camera");
@@ -127,8 +104,8 @@ int main(int argc, char **argv)
 	gst_element_link_many(src, flt, csp, NULL);
 
 	// As soon as screen is exposed, window ID will be advised to the sink
-	g_signal_connect(screen, "expose-event", G_CALLBACK(expose_cb),
-			 sink);
+//	g_signal_connect(screen, "expose-event", G_CALLBACK(expose_cb),
+//			 sink);
 
 	// caps between csp and csp2, links Second Filter (csp) -> Third Filter (csp2)
 	// with a caps between them
@@ -167,7 +144,7 @@ int main(int argc, char **argv)
 	gst_object_unref(pad);
 
 	gst_element_set_state(pipeline, GST_STATE_PLAYING);
-	gtk_main();
+	//gtk_main();
 
 	gst_element_set_state(pipeline, GST_STATE_NULL);
 	gst_object_unref(pipeline);
@@ -244,6 +221,6 @@ static void create_jpeg(unsigned char *data)
 static void show_note(char *note)
 {
 
-	g_assert(window != NULL);
-	hildon_banner_show_information(GTK_WIDGET(window), NULL, note);
+	//g_assert(window != NULL);
+	//hildon_banner_show_information(GTK_WIDGET(window), NULL, note);
 }
