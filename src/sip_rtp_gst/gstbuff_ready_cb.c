@@ -38,7 +38,8 @@ void rtp_setup(void *arg)
 void gst_run()
 {
     // create gstreamer components
-    GstElement *pipeline, *fakesrc, *flt, *conv, *videosink;
+    GstElement *pipeline, *src, *sink, *csp, *flt;
+    GstPad *pad;
     GMainLoop *loop;
     
     // init gstreamer
@@ -47,15 +48,28 @@ void gst_run()
 
     if (!(pipeline = gst_pipeline_new("pipeline")))
         fprintf(stdout, "Pipeline is bogus.");
-    if (!(fakesrc = gst_element_factory_make ("fakesrc", "source")))
-        fprintf(stdout, "Fakesrc is bogus.");
+    if (!(src = gst_element_factory_make ("videotestsrc", "src")))
+        fprintf(stdout, "Src is bogus.");
     if (!(flt = gst_element_factory_make ("capsfilter", "flt")))
         fprintf(stdout, "FLT is bogus.");
-    if (!(conv = gst_element_factory_make ("ffmpegcolorspace", "conv")))
-        fprintf(stdout, "ffmpegcolorspace is bogus.");
-    if (!(videosink = gst_element_factory_make ("xvimagesink", "videosink")))
-        fprintf(stdout, "Videosink is bogus.");
+    if (!(csp = gst_element_factory_make ("ffmpegcolorspace", "csp")))
+        fprintf(stdout, "csp is bogus.");
+    if (!(sink = gst_element_factory_make ("fakesink", "sink")))
+        fprintf(stdout, "Sink is bogus.");
+
+    gst_bin_add_many(GST_BIN(pipeline), src, flt, csp, sink, NULL);
  
+    // links camera first filter and second filter (csp)
+    gst_element_link_many(src, flt, csp, sink, NULL);
+
+    // pad refers to input of sink element
+    pad = gst_element_get_pad(GST_ELEMENT(sink), "sink");
+
+    // add probe to sink's input
+    gst_pad_add_buffer_probe(pad, G_CALLBACK(cb_handoff), NULL);
+    gst_object_unref(pad); 
+
+#if 0
     /* setup */
     g_object_set (G_OBJECT (flt), "caps",
             gst_caps_new_simple ("video/x-raw-rgb",
@@ -75,6 +89,7 @@ void gst_run()
             "sizemax", 384 * 288 * 2,
             "sizetype", 2, NULL);
     g_signal_connect (fakesrc, "handoff", G_CALLBACK (cb_handoff), NULL);
+#endif 
 
     // play
     gst_element_set_state(pipeline, GST_STATE_PLAYING);

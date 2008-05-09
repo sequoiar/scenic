@@ -1208,7 +1208,7 @@ static void on_rx_rtp(void *user_data, void *pkt, pj_ssize_t size) {
         printf("NEITHER!\n");
 #endif
 
-    printf("%.10x\n", *(short int *)payload);
+    printf("%d\n", *(short*)payload);
     fflush(stdout);
 
     if (status != PJ_SUCCESS) 
@@ -1390,7 +1390,6 @@ static void call_on_media_update( pjsip_inv_session *inv,
     audio->clock_rate = audio->si.fmt.clock_rate;
     audio->samples_per_frame = audio->clock_rate * codec_desc->ptime / 1000;
     audio->bytes_per_frame = codec_desc->bit_rate * codec_desc->ptime / 1000 / 8;
-
 
     pjmedia_rtp_session_init(&audio->out_sess, audio->si.tx_pt, 
             pj_rand());
