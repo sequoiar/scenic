@@ -9,7 +9,6 @@ struct media_stream *strm;
 enum { RTCP_INTERVAL = 5000, RTCP_RAND = 2000 };
 static unsigned msec_interval;
 static pj_timestamp freq, next_rtp, next_rtcp;
-static char packet[1500];
 
 // our callback to get buffer from pipeline and send it on its merry way via
 // rtp
@@ -97,13 +96,11 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
         GstPad *pad, gpointer user_data)
 {
 
+    static char packet[1500];
     pj_timestamp now, lesser;
     pj_time_val timeout;
     pj_bool_t send_rtp, send_rtcp;
     send_rtp = send_rtcp = PJ_FALSE;
-
-    //printf("!");
-    //fflush(stdout);
 
     /* Determine how long to sleep */
     if (next_rtp.u64 < next_rtcp.u64) 
@@ -185,6 +182,7 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
                 strm->bytes_per_frame, 
                 strm->samples_per_frame,
                 &p_hdr, &hdrlen);
+
         if (status == PJ_SUCCESS) 
         {
 
@@ -195,9 +193,11 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
             /* Copy RTP header to packet */
             pj_memcpy(packet, hdr, hdrlen);
 
-            /* Zero the payload */
-            pj_bzero(packet+hdrlen, strm->bytes_per_frame);
+            ///* Zero the payload */
+            //pj_bzero(packet+hdrlen, strm->bytes_per_frame);
 
+            /* copy part of gstreamer buffer the payload */
+            pj_memcpy(packet + hdrlen, buffer, strm->bytes_per_frame);
 
             size = hdrlen + strm->bytes_per_frame;
 
@@ -205,17 +205,12 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
             status = pjmedia_transport_send_rtp(strm->transport, 
                     packet, size);
 
-
             if (status != PJ_SUCCESS)
                 app_perror("cb", "Error sending RTP packet", status);
 
         } 
         else 
-        {
             pj_assert(!"RTP encode() error");
-        }
-
-
 
         /* Update RTCP SR */
         pjmedia_rtcp_tx_rtp( &strm->rtcp, (pj_uint16_t)strm->bytes_per_frame);
@@ -243,7 +238,8 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
         size = rtcp_len;
         status = pjmedia_transport_send_rtcp(strm->transport,
                 rtcp_pkt, size);
-        if (status != PJ_SUCCESS) {
+        if (status != PJ_SUCCESS) 
+        {
             app_perror("cb", "Error sending RTCP packet", status);
         }
 
