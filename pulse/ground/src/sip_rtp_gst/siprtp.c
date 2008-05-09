@@ -1208,8 +1208,8 @@ static void on_rx_rtp(void *user_data, void *pkt, pj_ssize_t size) {
         printf("NEITHER!\n");
 #endif
 
-    printf("%d\n", *(short*)payload);
-    fflush(stdout);
+//    printf("%d\n", *(short*)payload);
+//    fflush(stdout);
 
     if (status != PJ_SUCCESS) 
     {
