@@ -54,7 +54,6 @@ void gst_run()
         fprintf(stdout, "FLT is bogus.");
     if (!(csp = gst_element_factory_make ("ffmpegcolorspace", "csp")))
         fprintf(stdout, "csp is bogus.");
-    //if (!(x264 = gst_element_factory_make ("x264enc bitrate=1000 byte-stream=true threads=4", "x264")))
     if (!(x264 = gst_element_factory_make ("x264enc", "x264")))
         fprintf(stdout, "x264 is bogus.");
     if (!(rtph264pay = gst_element_factory_make ("rtph264pay", "rtph264pay")))
