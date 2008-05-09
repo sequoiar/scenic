@@ -38,7 +38,7 @@ void rtp_setup(void *arg)
 void gst_run()
 {
     // create gstreamer components
-    GstElement *pipeline, *src, *sink, *csp, *flt;
+    GstElement *pipeline, *src, *sink, *csp, *flt, *x264, *rtph264pay;
     GstPad *pad;
     GMainLoop *loop;
     
@@ -54,13 +54,25 @@ void gst_run()
         fprintf(stdout, "FLT is bogus.");
     if (!(csp = gst_element_factory_make ("ffmpegcolorspace", "csp")))
         fprintf(stdout, "csp is bogus.");
+    //if (!(x264 = gst_element_factory_make ("x264enc bitrate=1000 byte-stream=true threads=4", "x264")))
+    if (!(x264 = gst_element_factory_make ("x264enc", "x264")))
+        fprintf(stdout, "x264 is bogus.");
+    if (!(rtph264pay = gst_element_factory_make ("rtph264pay", "rtph264pay")))
+        fprintf(stdout, "rtph264pay is bogus.");
     if (!(sink = gst_element_factory_make ("fakesink", "sink")))
         fprintf(stdout, "Sink is bogus.");
 
-    gst_bin_add_many(GST_BIN(pipeline), src, flt, csp, sink, NULL);
+    g_object_set(G_OBJECT(x264),"bitrate", 1000, NULL);
+    g_object_set(G_OBJECT(x264),"byte-stream", 1, NULL);
+    g_object_set(G_OBJECT(x264),"threads", 4, NULL);
+    
+
+
+
+    gst_bin_add_many(GST_BIN(pipeline), src, flt, csp, x264, rtph264pay, sink, NULL);
  
     // links camera first filter and second filter (csp)
-    gst_element_link_many(src, flt, csp, sink, NULL);
+    gst_element_link_many(src, flt, csp, x264, rtph264pay, sink, NULL);
 
     // pad refers to input of sink element
     pad = gst_element_get_pad(GST_ELEMENT(sink), "sink");
