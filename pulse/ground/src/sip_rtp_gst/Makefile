@@ -6,8 +6,8 @@ PJBASE=$(BASE_ROOT)/pjsip
 
 include $(PJBASE)/build.mak
 
-BINDIR=$(BASE)bin
-OBJDIR=$(BASE)obj
+BINDIR=$(BASE)/bin
+OBJDIR=$(BASE)/obj
 vpath %.o $(OBJDIR)
 
 OBJS=main_entry.o siprtp.o gstbuff_ready_cb.o
