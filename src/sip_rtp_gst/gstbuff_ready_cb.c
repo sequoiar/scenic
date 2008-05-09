@@ -222,11 +222,14 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
             ///* Zero the payload */
             //pj_bzero(packet+hdrlen, strm->bytes_per_frame);
     
-            printf("%d\n",GST_BUFFER_SIZE(buffer));
-            /* copy part of gstreamer buffer the payload */
-            pj_memcpy(packet + hdrlen, GST_BUFFER_DATA(buffer), strm->bytes_per_frame);
+            //printf("%d\n",GST_BUFFER_SIZE(buffer));
 
-            size = hdrlen + strm->bytes_per_frame;
+            /* copy part of gstreamer buffer the payload */
+    //        pj_memcpy(packet + hdrlen, GST_BUFFER_DATA(buffer), strm->bytes_per_frame);
+            pj_memcpy(packet + hdrlen, GST_BUFFER_DATA(buffer), GST_BUFFER_SIZE(buffer));
+
+            size = hdrlen + GST_BUFFER_SIZE(buffer);
+     //       size = strm->bytes_per_frame;
 
             /* Send RTP packet */
             status = pjmedia_transport_send_rtp(strm->transport, 
