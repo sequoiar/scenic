@@ -1,0 +1,12 @@
+Source: camera
+Section: user/multimedia
+Priority: optional
+Maintainer: Talita Menezes
+Build-Depends: hildon-lgpl-dev, libgtk2.0-0 (>= 2.2), libgtk2.0-dev (>= 2.2), libgstreamer0.10-dev (>= 0.10.5-osso1)
+Standards-Version: 3.6.0
+
+Package: camera
+Architecture: any
+Depends: hildon-lgpl0 (>= 0.12.1-4), libgtk2.0-0 (>= 2.2), libgstreamer0.10-0 (>= 0.10.5-osso1)
+Description: Camera takes picture from video frames
+ This package contains the Camera for Maemo.
