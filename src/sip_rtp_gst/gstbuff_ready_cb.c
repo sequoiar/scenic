@@ -197,7 +197,7 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
             //pj_bzero(packet+hdrlen, strm->bytes_per_frame);
 
             /* copy part of gstreamer buffer the payload */
-            pj_memcpy(packet + hdrlen, buffer, strm->bytes_per_frame);
+            pj_memcpy(packet + hdrlen, GST_BUFFER_DATA(buffer), strm->bytes_per_frame);
 
             size = hdrlen + strm->bytes_per_frame;
 
