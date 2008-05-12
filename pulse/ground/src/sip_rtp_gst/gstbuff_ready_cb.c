@@ -44,7 +44,7 @@ void gst_run()
     GstElement *txPipeline, *txSrc, *txSink, *txCsp, 
                *txFlt, *x264enc, *rtph264pay;
     GstElement *rxPipeline, *rxSrc, *ffdec_h264, *rtph264depay, *rxSink;
-    GstPad *txPad, *rxPad;
+    GstPad *txPad;
     GMainLoop *loop;
     
     // init gstreamer
@@ -95,17 +95,25 @@ void gst_run()
         fprintf(stdout, "ffdec_h264 is bogus.");
     if (!(rxSink= gst_element_factory_make("xvimagesink", "rxSink")))
         fprintf(stdout, "rxSink is bogus.");
+    
 
     gst_bin_add_many(GST_BIN(rxPipeline), rxSrc, rtph264depay, ffdec_h264, rxSink, NULL); 
  
     gst_element_link_many(rxSrc, rtph264depay, ffdec_h264, rxSink, NULL);
     
+    // set buffer size to 1400
+    g_object_set(G_OBJECT(rxSrc), "signal-handoffs", TRUE, 
+                    "sizemax", 1400, "sizetype", 2, NULL);
+    g_signal_connect(rxSrc, "handoff", G_CALLBACK(fakesrc_handoff), NULL);
+
+#if 0
     // pad refers to input of src element
     rxPad = gst_element_get_pad(GST_ELEMENT(rxSrc), "src");
 
     // add probe to source's input
     gst_pad_add_buffer_probe(rxPad, G_CALLBACK(fakesrc_handoff), NULL);
     gst_object_unref(rxPad); 
+#endif
 
 #if 0
     /* setup */
@@ -319,10 +327,5 @@ void fakesrc_handoff(GstElement *fakesink, GstBuffer *buffer,
 
     // poll to see if new packet has been received, copy it if has been,
     // otherwise.....?
-    static gboolean white = FALSE;
-
-    /* this makes the image black/white */
-    memset (GST_BUFFER_DATA (buffer), white ? 0xff : 0x0,
-            GST_BUFFER_SIZE (buffer));
-    white = !white;
+    memset (GST_BUFFER_DATA (buffer), 0x0, GST_BUFFER_SIZE (buffer));
 }
