@@ -18,8 +18,6 @@ void rtp_setup(void *);
 // create gstreamer pipeline and go
 void gst_run();
 
-int sip_main(int argc, char *argv[]);
-
 
 /* Display error */
 void app_perror(const char *sender, const char *title, 
