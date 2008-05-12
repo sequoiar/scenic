@@ -58,6 +58,5 @@ struct media_stream
     pj_thread_t		*thread;	    /* Media thread.		*/
 };
 
-
 #endif // _SIP_RTP_H_
 

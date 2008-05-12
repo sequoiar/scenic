@@ -44,7 +44,7 @@ void gst_run()
     GstElement *txPipeline, *txSrc, *txSink, *txCsp, 
                *txFlt, *x264enc, *rtph264pay;
     GstElement *rxPipeline, *rxSrc, *ffdec_h264, *rtph264depay, *rxSink;
-    GstPad *txPad;
+    GstCaps *caps;
     GMainLoop *loop;
     
     // init gstreamer
@@ -63,12 +63,15 @@ void gst_run()
         fprintf(stdout, "x264 is bogus.");
     if (!(rtph264pay = gst_element_factory_make ("rtph264pay", "rtph264pay")))
         fprintf(stdout, "rtph264pay is bogus.");
-    if (!(txSink = gst_element_factory_make ("fakesink", "txSink")))
+    if (!(txSink = gst_element_factory_make ("udpsink", "txSink")))
         fprintf(stdout, "Sink is bogus.");
 
     g_object_set(G_OBJECT(x264enc),"bitrate", 1000, NULL);
     g_object_set(G_OBJECT(x264enc),"byte-stream", 1, NULL);
-    g_object_set(G_OBJECT(x264enc),"threads", 4, NULL);
+    g_object_set(G_OBJECT(x264enc),"threads", 1, NULL);
+    
+    g_object_set(G_OBJECT(txSink), "host", "localhost", "port", 5062, NULL);
+    
     
 
     gst_bin_add_many(GST_BIN(txPipeline), txSrc, txFlt, txCsp, x264enc, 
@@ -78,16 +81,25 @@ void gst_run()
     gst_element_link_many(txSrc, txFlt, txCsp, x264enc, rtph264pay, 
             txSink, NULL);
 
+#if 0
     // pad refers to input of sink element
     txPad = gst_element_get_pad(GST_ELEMENT(txSink), "sink");
 
     // add probe to sink's input
     gst_pad_add_buffer_probe(txPad, G_CALLBACK(fakesink_handoff), NULL);
     gst_object_unref(txPad); 
+#endif 
+    
+/*----------------------------------------------*/ 
+//  Create receive pipeline
+/*----------------------------------------------*/ 
+    caps = gst_caps_new_simple("application/x-rtp", NULL);
+    if (!caps)
+        fprintf(stdout, "caps are bogus.");
 
     if (!(rxPipeline = gst_pipeline_new("rxPipeline")))
         fprintf(stdout, "rxPipeline is bogus.");
-    if (!(rxSrc = gst_element_factory_make("fakesrc", "rxSrc")))
+    if (!(rxSrc = gst_element_factory_make("udpsrc", "rxSrc")))
         fprintf(stdout, "Src is bogus.");
     if (!(rtph264depay = gst_element_factory_make("rtph264depay","rtph264depay")))
         fprintf(stdout, "rtph264depay is bogus.");
@@ -99,43 +111,18 @@ void gst_run()
 
     gst_bin_add_many(GST_BIN(rxPipeline), rxSrc, rtph264depay, ffdec_h264, rxSink, NULL); 
  
+    g_object_set(G_OBJECT(rxSrc), "port", 5063, NULL);
+    g_object_set(G_OBJECT(rxSrc), "caps", caps, NULL);
+    g_object_set(G_OBJECT(rxSink), "sync", FALSE, NULL);
+
     gst_element_link_many(rxSrc, rtph264depay, ffdec_h264, rxSink, NULL);
     
+#if 0
     // set buffer size to 1400
     g_object_set(G_OBJECT(rxSrc), "signal-handoffs", TRUE, 
                     "sizemax", 1400, "sizetype", 2, NULL);
     g_signal_connect(rxSrc, "handoff", G_CALLBACK(fakesrc_handoff), NULL);
-
-#if 0
-    // pad refers to input of src element
-    rxPad = gst_element_get_pad(GST_ELEMENT(rxSrc), "src");
-
-    // add probe to source's input
-    gst_pad_add_buffer_probe(rxPad, G_CALLBACK(fakesrc_handoff), NULL);
-    gst_object_unref(rxPad); 
 #endif
-
-#if 0
-    /* setup */
-    g_object_set (G_OBJECT (flt), "caps",
-            gst_caps_new_simple ("video/x-raw-rgb",
-                "width", G_TYPE_INT, 384,
-                "height", G_TYPE_INT, 288,
-                "framerate", GST_TYPE_FRACTION, 1, 1,
-                "bpp", G_TYPE_INT, 16,
-                "depth", G_TYPE_INT, 16,
-                "endianness", G_TYPE_INT, G_BYTE_ORDER,
-                NULL), NULL);
-    gst_bin_add_many (GST_BIN (pipeline), fakesrc, flt, conv, videosink, NULL);
-    gst_element_link_many (fakesrc, flt, conv, videosink, NULL);
-
-    /* setup fake source */
-    g_object_set (G_OBJECT (fakesrc),
-            "signal-handoffs", TRUE,
-            "sizemax", 384 * 288 * 2,
-            "sizetype", 2, NULL);
-    g_signal_connect (fakesrc, "handoff", G_CALLBACK (cb_handoff), NULL);
-#endif 
 
     // play
     gst_element_set_state(txPipeline, GST_STATE_PLAYING);
@@ -146,8 +133,8 @@ void gst_run()
     /*----------------------------------------------*/ 
 
     // cleanup
-   // gst_element_set_state(rxPipeline, GST_STATE_NULL);
-    //gst_object_unref(GST_OBJECT(rxPipeline));
+    gst_element_set_state(rxPipeline, GST_STATE_NULL);
+    gst_object_unref(GST_OBJECT(rxPipeline));
 
     gst_element_set_state(txPipeline, GST_STATE_NULL);
     gst_object_unref(GST_OBJECT(txPipeline));
@@ -183,7 +170,6 @@ void fakesink_handoff(GstElement *fakesink, GstBuffer *buffer,
     //  TIMESTAMP
     /*----------------------------------------------*/ 
     pj_get_timestamp(&now);
-
 
     if (lesser.u64 <= now.u64) 
     {
@@ -315,7 +301,7 @@ void fakesink_handoff(GstElement *fakesink, GstBuffer *buffer,
         }
 
         /* Schedule next send */
-        next_rtcp.u64 += (freq.u64 * (RTCP_INTERVAL+(pj_rand()%RTCP_RAND)) /
+        next_rtcp.u64 += (freq.u64 * (RTCP_INTERVAL + (pj_rand() % RTCP_RAND)) /
                 1000);
     }
     /**************************************************/
@@ -324,8 +310,13 @@ void fakesink_handoff(GstElement *fakesink, GstBuffer *buffer,
 void fakesrc_handoff(GstElement *fakesink, GstBuffer *buffer, 
         GstPad *pad, gpointer user_data)
 {
-
     // poll to see if new packet has been received, copy it if has been,
     // otherwise.....?
-    memset (GST_BUFFER_DATA (buffer), 0x0, GST_BUFFER_SIZE (buffer));
+        // sleep maybe?
+   
+    //printf("waiting for packet!\n");
+    //fflush(stdout);
+   // printf("packet received!\n");
+    //fflush(stdout);
+
 }
