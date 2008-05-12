@@ -59,8 +59,8 @@ void gst_run()
         fprintf(stdout, "Pipeline is bogus.");
     if (!(txSrc = gst_element_factory_make("v4l2src", "txSrc")))
         fprintf(stdout, "txSrc is bogus.");
-    if (!(txFlt = gst_element_factory_make("capsfilter", "txFlt")))
-        fprintf(stdout, "FLT is bogus.");
+    //if (!(txFlt = gst_element_factory_make("capsfilter", "txFlt")))
+     //   fprintf(stdout, "FLT is bogus.");
     if (!(txCsp = gst_element_factory_make("ffmpegcolorspace", "txCsp")))
         fprintf(stdout, "csp is bogus.");
     if (!(x264enc = gst_element_factory_make("x264enc", "x264enc")))
@@ -78,11 +78,11 @@ void gst_run()
     
     
 
-    gst_bin_add_many(GST_BIN(txPipeline), txSrc, txFlt, txCsp, x264enc, 
+    gst_bin_add_many(GST_BIN(txPipeline), txSrc, txCsp, x264enc, 
             rtph264pay, txSink, NULL);
  
     // links camera first filter and second filter (csp)
-    gst_element_link_many(txSrc, txFlt, txCsp, x264enc, rtph264pay, 
+    gst_element_link_many(txSrc, txCsp, x264enc, rtph264pay, 
             txSink, NULL);
 
 #if 0
