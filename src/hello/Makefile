@@ -1,2 +1,2 @@
 all:
-	c++ -c hello.c
+	c++ -c hello.cpp

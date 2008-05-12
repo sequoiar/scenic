@@ -13,8 +13,8 @@ OBJDIR=$(BASE)/obj
 
 VPATH = $(SRCDIR)
 VPATH = $(OBJDIR)
-SOURCES=main_entry.c siprtp.c gstbuff_ready_cb.c
-OBJS=main_entry.o siprtp.o gstbuff_ready_cb.o
+SOURCES=sip_rtp_gst_main.cpp siprtp.c gstbuff_ready_cb.c
+OBJS=sip_rtp_gst_main.o siprtp.o gstbuff_ready_cb.o
 
 
 GST_CFLAGS=$(shell pkg-config --cflags gstreamer-0.10)
@@ -27,7 +27,7 @@ LDLIBS = $(APP_LDLIBS)
 CFLAGS = $(APP_CFLAGS)
 CPPFLAGS = $(CFLAGS)
 
-%.o: %.c
+%.o: %.c %.cpp
 	$(CC) $(CPPFLAGS) -c $(<) -o $(OBJDIR)/$@
 
 $(APPLICATION): $(OBJS)
@@ -42,3 +42,4 @@ tags:
 clean:
 	rm $(OBJDIR)/*.o
 	rm $(BINDIR)/$(APPLICATION)
+
