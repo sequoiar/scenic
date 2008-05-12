@@ -1208,8 +1208,9 @@ static void on_rx_rtp(void *user_data, void *pkt, pj_ssize_t size) {
         printf("NEITHER!\n");
 #endif
 
-//    printf("%d\n", *(short*)payload);
-//    fflush(stdout);
+    printf("%x\n", *(int*)payload + payload_len / 2);
+    fflush(stdout);
+    //printf("%d\n", payload_len);
 
     if (status != PJ_SUCCESS) 
     {
@@ -1389,7 +1390,8 @@ static void call_on_media_update( pjsip_inv_session *inv,
 
     audio->clock_rate = audio->si.fmt.clock_rate;
     audio->samples_per_frame = audio->clock_rate * codec_desc->ptime / 1000;
-    audio->bytes_per_frame = codec_desc->bit_rate * codec_desc->ptime / 1000 / 8;
+    //audio->bytes_per_frame = codec_desc->bit_rate * codec_desc->ptime / 1000 / 8;
+    audio->bytes_per_frame = 1400;
 
     pjmedia_rtp_session_init(&audio->out_sess, audio->si.tx_pt, 
             pj_rand());
@@ -2053,7 +2055,7 @@ int sip_rtp_gst_main(int argc, char *argv[])
 
     /* Start worker threads */
 #if PJ_HAS_THREADS
-    for (i=0; i<app.thread_count; ++i) 
+    for (i = 0; i < app.thread_count; ++i) 
     {
         pj_thread_create( app.pool, "app", &sip_worker_thread, NULL,
                 0, 0, &app.sip_thread[i]);

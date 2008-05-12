@@ -38,7 +38,10 @@ void rtp_setup(void *arg)
 void gst_run()
 {
     // create gstreamer components
-    GstElement *pipeline, *src, *sink, *csp, *flt, *x264, *rtph264pay;
+    GstElement *txPipeline, *txSrc, *txSink, *txCsp, 
+               *txFlt, *x264enc, *rtph264pay;
+    GstElement *rxPipeline, *rxSrc, *rxSink, *rxCsp, 
+               *rxFlt, *x264dec, *rtph264depay;
     GstPad *pad;
     GMainLoop *loop;
     
@@ -46,35 +49,37 @@ void gst_run()
     gst_init(0, NULL);  // normally should get argc argv
     loop = g_main_loop_new(NULL, FALSE);
 
-    if (!(pipeline = gst_pipeline_new("pipeline")))
+    if (!(txPipeline = gst_pipeline_new("txPipeline")))
         fprintf(stdout, "Pipeline is bogus.");
-    if (!(src = gst_element_factory_make ("videotestsrc", "src")))
-        fprintf(stdout, "Src is bogus.");
-    if (!(flt = gst_element_factory_make ("capsfilter", "flt")))
+    if (!(txSrc = gst_element_factory_make ("videotestsrc", "txSrc")))
+        fprintf(stdout, "txSrc is bogus.");
+    if (!(txFlt = gst_element_factory_make ("capsfilter", "txFlt")))
         fprintf(stdout, "FLT is bogus.");
-    if (!(csp = gst_element_factory_make ("ffmpegcolorspace", "csp")))
+    if (!(txCsp = gst_element_factory_make ("ffmpegcolorspace", "txCsp")))
         fprintf(stdout, "csp is bogus.");
-    if (!(x264 = gst_element_factory_make ("x264enc", "x264")))
+    if (!(x264enc = gst_element_factory_make ("x264enc", "x264enc")))
         fprintf(stdout, "x264 is bogus.");
     if (!(rtph264pay = gst_element_factory_make ("rtph264pay", "rtph264pay")))
         fprintf(stdout, "rtph264pay is bogus.");
-    if (!(sink = gst_element_factory_make ("fakesink", "sink")))
+    if (!(txSink = gst_element_factory_make ("fakesink", "txSink")))
         fprintf(stdout, "Sink is bogus.");
 
-    g_object_set(G_OBJECT(x264),"bitrate", 1000, NULL);
-    g_object_set(G_OBJECT(x264),"byte-stream", 1, NULL);
-    g_object_set(G_OBJECT(x264),"threads", 4, NULL);
+    g_object_set(G_OBJECT(x264enc),"bitrate", 1000, NULL);
+    g_object_set(G_OBJECT(x264enc),"byte-stream", 1, NULL);
+    g_object_set(G_OBJECT(x264enc),"threads", 4, NULL);
     
 
 
 
-    gst_bin_add_many(GST_BIN(pipeline), src, flt, csp, x264, rtph264pay, sink, NULL);
+    gst_bin_add_many(GST_BIN(txPipeline), txSrc, txFlt, txCsp, x264enc, 
+            rtph264pay, txSink, NULL);
  
     // links camera first filter and second filter (csp)
-    gst_element_link_many(src, flt, csp, x264, rtph264pay, sink, NULL);
+    gst_element_link_many(txSrc, txFlt, txCsp, x264enc, rtph264pay, 
+            txSink, NULL);
 
     // pad refers to input of sink element
-    pad = gst_element_get_pad(GST_ELEMENT(sink), "sink");
+    pad = gst_element_get_pad(GST_ELEMENT(txSink), "txSink");
 
     // add probe to sink's input
     gst_pad_add_buffer_probe(pad, G_CALLBACK(cb_handoff), NULL);
@@ -103,15 +108,15 @@ void gst_run()
 #endif 
 
     // play
-    gst_element_set_state(pipeline, GST_STATE_PLAYING);
+    gst_element_set_state(txPipeline, GST_STATE_PLAYING);
 
     /*----------------------------------------------*/ 
     g_main_loop_run(loop);
     /*----------------------------------------------*/ 
 
     // cleanup
-    gst_element_set_state(pipeline, GST_STATE_NULL);
-    gst_object_unref(GST_OBJECT(pipeline));
+    gst_element_set_state(txPipeline, GST_STATE_NULL);
+    gst_object_unref(GST_OBJECT(txPipeline));
 }
 
 
@@ -179,6 +184,7 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
 
     if (send_rtp || next_rtp.u64 <= now.u64) 
     {
+#if 0
 /*----------------------------------------------*/ 
 //      Manipulate gstreamer buffer
 /*----------------------------------------------*/ 
@@ -192,6 +198,7 @@ void cb_handoff(GstElement *fakesink, GstBuffer *buffer,
 /*----------------------------------------------*/ 
 //      End manipulate gstreamer buffer
 /*----------------------------------------------*/ 
+#endif
 
         /*
          * Time to send RTP packet.
