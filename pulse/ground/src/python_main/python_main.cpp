@@ -1,7 +1,6 @@
 #include <boost/python.hpp>
 #include <stdio.h>
 
-#include "py_exp.h"
 
 /*
  * Embedded Python example
@@ -22,12 +21,8 @@ using namespace boost::python;
 
 
 
-BOOST_PYTHON_MODULE(hello)
-{
-    class_<hello>("hello")
-    .def("greet", &hello::greet)
-    .def("set_name",&hello::set_name);
-}
+#include "python_module_inc.cpp"
+
 
 
 int main(int argc, char *argv[])
@@ -35,7 +30,7 @@ int main(int argc, char *argv[])
     object imp;
     
     // This line is needed for python to see the module hello
-    PyImport_AppendInittab((char*)"hello",&inithello);
+    PyImport_AppendInittab((char*)MODULE_STR,&MODULE_INIT);
     Py_Initialize();
 
     object main_module = import("__main__");
@@ -46,7 +41,7 @@ int main(int argc, char *argv[])
         if(main_module)
         {
             exec("import readline",main_namespace,main_namespace);
-            exec("import hello; from hello import *",main_namespace,main_namespace);
+            exec("import " MODULE_STR "; from " MODULE_STR " import *",main_namespace,main_namespace);
             exec("from code import InteractiveConsole",main_namespace,main_namespace);		
             exec("i = InteractiveConsole(globals())",main_namespace,main_namespace);
             exec("i.interact()",main_namespace,main_namespace);
