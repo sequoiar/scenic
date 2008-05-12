@@ -1175,7 +1175,8 @@ void boost_priority(void)
 /*
  * This callback is called by media transport on receipt of RTP packet.
  */
-static void on_rx_rtp(void *user_data, void *pkt, pj_ssize_t size) {
+static void on_rx_rtp(void *user_data, void *pkt, pj_ssize_t size) 
+{
     struct media_stream *strm;
     pj_status_t status;
     const pjmedia_rtp_hdr *hdr;
@@ -1199,15 +1200,6 @@ static void on_rx_rtp(void *user_data, void *pkt, pj_ssize_t size) {
     status = pjmedia_rtp_decode_rtp(&strm->in_sess, 
             pkt, size, &hdr, &payload, &payload_len);
 
-#if 0 
-    if (pj_memcmp(payload, "0000000000", 10) == 0)
-        printf("BLACK!\n");
-    else if (memcmp(payload, "1111111111", 10) == 0)
-        printf("WHITE!\n");
-    else
-        printf("NEITHER!\n");
-#endif
-
     //printf("%x\n", *(int*)payload + payload_len / 2);
     //fflush(stdout);
     //printf("%d\n", payload_len);
@@ -1219,7 +1211,6 @@ static void on_rx_rtp(void *user_data, void *pkt, pj_ssize_t size) {
     }
 
     // pass payload to gstreamer pipeline?
-
 
     //PJ_LOG(4,(THIS_FILE, "Rx seq=%d", pj_ntohs(hdr->seq)));
 
