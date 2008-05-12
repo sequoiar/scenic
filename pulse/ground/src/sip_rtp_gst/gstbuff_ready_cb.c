@@ -85,7 +85,6 @@ void gst_run()
     gst_pad_add_buffer_probe(txPad, G_CALLBACK(fakesink_handoff), NULL);
     gst_object_unref(txPad); 
 
-#if 0
     if (!(rxPipeline = gst_pipeline_new("rxPipeline")))
         fprintf(stdout, "rxPipeline is bogus.");
     if (!(rxSrc = gst_element_factory_make("fakesrc", "rxSrc")))
@@ -107,7 +106,6 @@ void gst_run()
     // add probe to source's input
     gst_pad_add_buffer_probe(rxPad, G_CALLBACK(fakesrc_handoff), NULL);
     gst_object_unref(rxPad); 
-#endif
 
 #if 0
     /* setup */
@@ -133,7 +131,7 @@ void gst_run()
 
     // play
     gst_element_set_state(txPipeline, GST_STATE_PLAYING);
-    //gst_element_set_state(rxPipeline, GST_STATE_PLAYING);
+    gst_element_set_state(rxPipeline, GST_STATE_PLAYING);
 
     /*----------------------------------------------*/ 
     g_main_loop_run(loop);
