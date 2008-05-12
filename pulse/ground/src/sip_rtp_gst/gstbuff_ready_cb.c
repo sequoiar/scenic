@@ -51,24 +51,28 @@ void gst_run()
     gst_init(0, NULL);  // normally should get argc argv
     loop = g_main_loop_new(NULL, FALSE);
 
+/*----------------------------------------------*/ 
+//  Create sender pipeline
+/*----------------------------------------------*/ 
+
     if (!(txPipeline = gst_pipeline_new("txPipeline")))
         fprintf(stdout, "Pipeline is bogus.");
-    if (!(txSrc = gst_element_factory_make ("videotestsrc", "txSrc")))
+    if (!(txSrc = gst_element_factory_make("v4l2src", "txSrc")))
         fprintf(stdout, "txSrc is bogus.");
-    if (!(txFlt = gst_element_factory_make ("capsfilter", "txFlt")))
+    if (!(txFlt = gst_element_factory_make("capsfilter", "txFlt")))
         fprintf(stdout, "FLT is bogus.");
-    if (!(txCsp = gst_element_factory_make ("ffmpegcolorspace", "txCsp")))
+    if (!(txCsp = gst_element_factory_make("ffmpegcolorspace", "txCsp")))
         fprintf(stdout, "csp is bogus.");
-    if (!(x264enc = gst_element_factory_make ("x264enc", "x264enc")))
+    if (!(x264enc = gst_element_factory_make("x264enc", "x264enc")))
         fprintf(stdout, "x264 is bogus.");
-    if (!(rtph264pay = gst_element_factory_make ("rtph264pay", "rtph264pay")))
+    if (!(rtph264pay = gst_element_factory_make("rtph264pay", "rtph264pay")))
         fprintf(stdout, "rtph264pay is bogus.");
-    if (!(txSink = gst_element_factory_make ("udpsink", "txSink")))
+    if (!(txSink = gst_element_factory_make("udpsink", "txSink")))
         fprintf(stdout, "Sink is bogus.");
 
     g_object_set(G_OBJECT(x264enc),"bitrate", 1000, NULL);
-    g_object_set(G_OBJECT(x264enc),"byte-stream", 1, NULL);
-    g_object_set(G_OBJECT(x264enc),"threads", 1, NULL);
+    g_object_set(G_OBJECT(x264enc),"byte-stream", TRUE, NULL);
+    g_object_set(G_OBJECT(x264enc),"threads", 4, NULL);
     
     g_object_set(G_OBJECT(txSink), "host", "localhost", "port", 5062, NULL);
     
@@ -91,11 +95,8 @@ void gst_run()
 #endif 
     
 /*----------------------------------------------*/ 
-//  Create receive pipeline
+//  Create receiver pipeline
 /*----------------------------------------------*/ 
-    caps = gst_caps_new_simple("application/x-rtp", NULL);
-    if (!caps)
-        fprintf(stdout, "caps are bogus.");
 
     if (!(rxPipeline = gst_pipeline_new("rxPipeline")))
         fprintf(stdout, "rxPipeline is bogus.");
@@ -111,8 +112,13 @@ void gst_run()
 
     gst_bin_add_many(GST_BIN(rxPipeline), rxSrc, rtph264depay, ffdec_h264, rxSink, NULL); 
  
-    g_object_set(G_OBJECT(rxSrc), "port", 5063, NULL);
+    caps = gst_caps_new_simple("application/x-rtp", NULL);
+    if (!caps)
+        fprintf(stdout, "caps are bogus.");
+
     g_object_set(G_OBJECT(rxSrc), "caps", caps, NULL);
+
+    g_object_set(G_OBJECT(rxSrc), "port", 5062, NULL);
     g_object_set(G_OBJECT(rxSink), "sync", FALSE, NULL);
 
     gst_element_link_many(rxSrc, rtph264depay, ffdec_h264, rxSink, NULL);
