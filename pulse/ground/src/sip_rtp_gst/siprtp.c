@@ -1208,8 +1208,8 @@ static void on_rx_rtp(void *user_data, void *pkt, pj_ssize_t size) {
         printf("NEITHER!\n");
 #endif
 
-    printf("%x\n", *(int*)payload + payload_len / 2);
-    fflush(stdout);
+    //printf("%x\n", *(int*)payload + payload_len / 2);
+    //fflush(stdout);
     //printf("%d\n", payload_len);
 
     if (status != PJ_SUCCESS) 
@@ -1217,6 +1217,9 @@ static void on_rx_rtp(void *user_data, void *pkt, pj_ssize_t size) {
         app_perror(THIS_FILE, "RTP decode error", status);
         return;
     }
+
+    // pass payload to gstreamer pipeline?
+
 
     //PJ_LOG(4,(THIS_FILE, "Rx seq=%d", pj_ntohs(hdr->seq)));
 
