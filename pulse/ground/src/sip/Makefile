@@ -1,5 +1,5 @@
 SHELL=/bin/sh
-APPLICATION=siprtp
+APPLICATION=sipstateless
 
 include ../base.mak
 
@@ -12,15 +12,15 @@ OBJDIR=$(BASE)/obj
 
 VPATH = $(SRCDIR)
 VPATH = $(OBJDIR)
-SOURCES=sip_rtp_gst_main.cpp siprtp.c gstbuff_ready_cb.c
-OBJS=sip_rtp_gst_main.o siprtp.o gstbuff_ready_cb.o
+SOURCES=sipstateless.c
+OBJS=sipstateless.c
 
 
 GST_CFLAGS=$(shell pkg-config --cflags gstreamer-0.10)
 GST_LDFLAGS=$(shell pkg-config --libs gstreamer-0.10)
 
-APP_CFLAGS+= -g -Wall $(GST_CFLAGS) 
-CC = $(APP_CC) 
+APP_CFLAGS+=-g -Wall $(GST_CFLAGS) 
+CC		= $(APP_CC) 
 CPP_CC  = g++
 LDFLAGS = $(APP_LDFLAGS) $(GST_LDFLAGS)
 LDLIBS = $(APP_LDLIBS) 
