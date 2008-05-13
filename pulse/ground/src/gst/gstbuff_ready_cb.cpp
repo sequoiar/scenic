@@ -1,14 +1,15 @@
 // gstbuff_ready_cb.c
 
 //#include "gst_sip_rtp.h"
+#include <iostream>
 #include <gst/gst.h>
 
 // Prototypes
-void gst_run();
-void initTxPipeline(GstElement* txPipeline);
-void initRxPipeline(GstElement* rxPipeline);
+void gst_run(long port);
+void initTxPipeline(GstElement* txPipeline, long port);
+void initRxPipeline(GstElement* rxPipeline, long port);
 
-void gst_run()
+void gst_run(long port)
 {
     // create gstreamer components
     GstElement *txPipeline, *rxPipeline; 
@@ -24,8 +25,8 @@ void gst_run()
         fprintf(stdout, "Pipeline is bogus.");
 
     // TODO: Figure out why this is way slower when order is reversed
-    initRxPipeline(rxPipeline);
-    initTxPipeline(txPipeline);
+    initRxPipeline(rxPipeline, port);
+    initTxPipeline(txPipeline, port);
     
     // SPIN HERE
     /*----------------------------------------------*/ 
@@ -42,7 +43,7 @@ void gst_run()
 
 
 
-void initTxPipeline(GstElement *txPipeline)
+void initTxPipeline(GstElement *txPipeline, long port)
 {
     GstElement *txSrc, *txSink, *txCsp, *x264enc, *rtph264pay;
 /*----------------------------------------------*/ 
@@ -64,7 +65,7 @@ void initTxPipeline(GstElement *txPipeline)
     g_object_set(G_OBJECT(x264enc),"byte-stream", TRUE, NULL);
     g_object_set(G_OBJECT(x264enc),"threads", 4, NULL);
     
-    g_object_set(G_OBJECT(txSink), "host", "localhost", "port", 5062, NULL);
+    g_object_set(G_OBJECT(txSink), "host", "localhost", "port", port, NULL);
     
 
     gst_bin_add_many(GST_BIN(txPipeline), txSrc, txCsp, x264enc, 
@@ -78,7 +79,7 @@ void initTxPipeline(GstElement *txPipeline)
     gst_element_set_state(txPipeline, GST_STATE_PLAYING);
 }
 
-void initRxPipeline(GstElement *rxPipeline)
+void initRxPipeline(GstElement *rxPipeline, long port)
 {
     GstElement *rxSrc, *ffdec_h264, *rtph264depay, *rxSink;
     GstCaps *caps;
@@ -105,7 +106,7 @@ void initRxPipeline(GstElement *rxPipeline)
         fprintf(stdout, "caps are bogus.");
 
     g_object_set(G_OBJECT(rxSrc), "caps", caps, NULL);
-    g_object_set(G_OBJECT(rxSrc), "port", 5062, NULL);
+    g_object_set(G_OBJECT(rxSrc), "port", port, NULL);
     g_object_set(G_OBJECT(rxSink), "sync", FALSE, NULL);
 
     gst_element_link_many(rxSrc, rtph264depay, ffdec_h264, rxSink, NULL);
@@ -118,6 +119,14 @@ void initRxPipeline(GstElement *rxPipeline)
 
 void gst_main(int argc, char *argv[])
 {
-    gst_run();
+    long port = 5060;
+
+    if (argc > 1)
+        port = atoi(argv[1]);
+
+    std::cout.flush();
+    std::cout << "Using port " << port << std::endl;
+
+    gst_run(port);
 }
 
