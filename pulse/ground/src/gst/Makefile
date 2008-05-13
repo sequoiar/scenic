@@ -8,10 +8,9 @@ BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
 #SRCDIR=$(BASE)/src
 
-VPATH = $(SRCDIR)
-VPATH = $(OBJDIR)
-SOURCES=gst_main.cpp gstbuff_ready_cb.cpp
-OBJS=gst_main.o gstbuff_ready_cb.o
+#VPATH = $(SRCDIR)
+#VPATH = $(OBJDIR)
+OBJS=gst_main.o gstApp.o
 
 
 GST_CFLAGS=$(shell pkg-config --cflags gstreamer-0.10)

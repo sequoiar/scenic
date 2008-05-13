@@ -1,4 +1,4 @@
-// gstbuff_ready_cb.c
+// gstApp.cpp
 
 //#include "gst_sip_rtp.h"
 #include <iostream>
