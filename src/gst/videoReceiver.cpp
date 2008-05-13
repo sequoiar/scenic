@@ -60,6 +60,8 @@ VideoReceiver::VideoReceiver(int port)
 
 VideoReceiver::~VideoReceiver()
 {
+    std::cout.flush();
+    std::cout << "Receiver: I'm melting!!!" << std::endl;
     stop();
     gst_object_unref(GST_OBJECT(pipeline_));
 }
