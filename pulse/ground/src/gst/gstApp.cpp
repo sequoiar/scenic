@@ -31,20 +31,28 @@ void eventLoop()
 
 void gst_main(int argc, char *argv[])
 {
-    long port = 5060;
+    long txPort = 5060;
+    long rxPort = 5061;
 
-    if (argc > 1)
-        port = atoi(argv[1]);
+    if (argc > 2)
+    {
+        txPort = atoi(argv[1]);
+        rxPort = atoi(argv[2]);
+    }
+    else
+        std::cout << "Usage: " << std::endl << 
+                     "gst <sendToPort> <listenToPort>" 
+                     << std::endl << std::endl;
 
     //    std::cout.flush();
-    std::cout << "Using port " << port << std::endl;
+    std::cout << "Sending to port " << txPort << std::endl;
+    std::cout << "Listening to port " << rxPort << std::endl;
 
     // init gstreamer
     gst_init(0, NULL);  // normally should get argc argv
 
-    // TODO: Figure out why this is way slower when order is reversed
-    VideoReceiver rx(port);
-    VideoSender tx(port);
+    VideoSender tx(txPort);
+    VideoReceiver rx(rxPort);
 
     tx.start();
     rx.start();
