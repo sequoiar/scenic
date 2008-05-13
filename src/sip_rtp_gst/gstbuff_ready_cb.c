@@ -57,7 +57,7 @@ void gst_run()
 
     if (!(txPipeline = gst_pipeline_new("txPipeline")))
         fprintf(stdout, "Pipeline is bogus.");
-    if (!(txSrc = gst_element_factory_make("v4l2src", "txSrc")))
+    if (!(txSrc = gst_element_factory_make("videotestsrc", "txSrc")))
         fprintf(stdout, "txSrc is bogus.");
     //if (!(txFlt = gst_element_factory_make("capsfilter", "txFlt")))
      //   fprintf(stdout, "FLT is bogus.");
