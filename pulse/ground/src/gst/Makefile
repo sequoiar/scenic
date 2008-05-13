@@ -10,7 +10,7 @@ OBJDIR=$(BASE)/obj
 
 #VPATH = $(SRCDIR)
 #VPATH = $(OBJDIR)
-OBJS=gst_main.o gstApp.o
+OBJS=gst_main.o gstApp.o videoReceiver.o videoSender.o
 
 
 GST_CFLAGS=$(shell pkg-config --cflags gstreamer-0.10)
@@ -27,7 +27,7 @@ CPPFLAGS = $(CFLAGS)
 %.o: %.c 
 	$(CC) $(CPPFLAGS) -c $(<) -o $@
 
-%.o: %.cpp
+%.o: %.cpp %.h
 	$(CPP_CC) $(CPPFLAGS) -c $(<) -o $@
 
 $(APPLICATION): $(OBJS)
