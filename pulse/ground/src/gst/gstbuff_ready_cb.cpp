@@ -49,16 +49,24 @@ void initTxPipeline(GstElement *txPipeline, long port)
 /*----------------------------------------------*/ 
 //  Create sender pipeline
 /*----------------------------------------------*/ 
-
-    if (!(txSrc = gst_element_factory_make("videotestsrc", "txSrc")))
+    txSrc = gst_element_factory_make("videotestsrc", "txSrc");
+    if (!txSrc)
         fprintf(stdout, "txSrc is bogus.");
-    if (!(txCsp = gst_element_factory_make("ffmpegcolorspace", "txCsp")))
+
+    txCsp = gst_element_factory_make("ffmpegcolorspace", "txCsp");
+    if (!txCsp)
         fprintf(stdout, "csp is bogus.");
-    if (!(x264enc = gst_element_factory_make("x264enc", "x264enc")))
+
+    x264enc = gst_element_factory_make("x264enc", "x264enc");
+    if (!x264enc)
         fprintf(stdout, "x264 is bogus.");
-    if (!(rtph264pay = gst_element_factory_make("rtph264pay", "rtph264pay")))
+
+    rtph264pay = gst_element_factory_make("rtph264pay", "rtph264pay");
+    if (!rtph264pay)
         fprintf(stdout, "rtph264pay is bogus.");
-    if (!(txSink = gst_element_factory_make("udpsink", "txSink")))
+
+    txSink = gst_element_factory_make("udpsink", "txSink");
+    if (!txSink)
         fprintf(stdout, "Sink is bogus.");
 
     g_object_set(G_OBJECT(x264enc),"bitrate", 1000, NULL);
@@ -87,17 +95,22 @@ void initRxPipeline(GstElement *rxPipeline, long port)
 /*----------------------------------------------*/ 
 //  Create receiver pipeline
 /*----------------------------------------------*/ 
-
-    if (!(rxSrc = gst_element_factory_make("udpsrc", "rxSrc")))
+    rxSrc = gst_element_factory_make("udpsrc", "rxSrc");
+    if (!rxSrc)
         fprintf(stdout, "Src is bogus.");
-    if (!(rtph264depay = gst_element_factory_make("rtph264depay", "rtph264depay")))
+
+    rtph264depay = gst_element_factory_make("rtph264depay", "rtph264depay");
+    if (!rtph264depay)
         fprintf(stdout, "rtph264depay is bogus.");
-    if (!(ffdec_h264= gst_element_factory_make("ffdec_h264", "ffdec_h264")))
+
+    ffdec_h264 = gst_element_factory_make("ffdec_h264", "ffdec_h264");
+    if (!ffdec_h264)
         fprintf(stdout, "ffdec_h264 is bogus.");
-    if (!(rxSink= gst_element_factory_make("xvimagesink", "rxSink")))
+
+    rxSink = gst_element_factory_make("xvimagesink", "rxSink");
+    if (!rxSink)
         fprintf(stdout, "rxSink is bogus.");
     
-
     gst_bin_add_many(GST_BIN(rxPipeline), rxSrc, rtph264depay, 
                         ffdec_h264, rxSink, NULL); 
  
