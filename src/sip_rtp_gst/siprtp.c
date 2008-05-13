@@ -70,10 +70,8 @@ static const char *USAGE =
  *   when threading is disabled, siprtp won't transmit any
  *   RTP packets.
  */
-/*
 #undef PJ_HAS_THREADS
 #define PJ_HAS_THREADS 0
-*/
 
 
 #if PJ_HAS_HIGH_RES_TIMER==0
@@ -2038,6 +2036,7 @@ int sip_rtp_gst_main(int argc, char *argv[])
     /* Register module to log incoming/outgoing messages */
     pjsip_endpt_register_module(app.sip_endpt, &msg_logger);
 
+#if 0
     /* Init media */
     status = init_media();
     if (status != PJ_SUCCESS) 
@@ -2046,6 +2045,7 @@ int sip_rtp_gst_main(int argc, char *argv[])
         destroy_sip();
         return 1;
     }
+#endif
 
     /* Start worker threads */
 #if PJ_HAS_THREADS
