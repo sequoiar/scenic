@@ -64,6 +64,7 @@ VideoSender::VideoSender(int port)
 
 VideoSender::~VideoSender()
 {
+    std::cout << "Sender: I'm melting!!!" << std::endl;
     stop();
     gst_object_unref(GST_OBJECT(pipeline_));
 }
