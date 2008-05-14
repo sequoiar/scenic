@@ -83,7 +83,7 @@ sip_singleton* sip_singleton::Instance()
 static pj_bool_t on_rx_response( pjsip_rx_data *rdata )
 {
 
-    sip_singleton *sip = sip_singleton::Instance();
+    SipSingleton *sip = SipSingleton::Instance();
     //    if (rdata->msg_info.msg->line.req.method.id == PJSIP_OTHER_METHOD)
     //{
     if(rdata->msg_info.msg->body != NULL){
@@ -102,7 +102,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata )
     /* Respond (statelessly) all incoming requests (except ACK!) 
      * with 501 (Not Implemented)
      */
-    sip_singleton *sip = sip_singleton::Instance();
+    SipSingleton *sip = SipSingleton::Instance();
 
     if (rdata->msg_info.msg->line.req.method.id != PJSIP_ACK_METHOD) 
     {
