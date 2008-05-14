@@ -8,11 +8,7 @@ PJBASE=$(BASE_ROOT)/pjsip
 include $(PJBASE)/build.mak 
 BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
-#SRCDIR=$(BASE)/src
 
-VPATH = $(SRCDIR)
-VPATH = $(OBJDIR)
-SOURCES=sipstateless.c
 OBJS=sipstateless.o
 
 
