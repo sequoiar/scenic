@@ -14,6 +14,8 @@ class VideoReceiver
         void stop();
 
     private:
+        void init();
+
         int port_;
         GstElement *pipeline_;
 };

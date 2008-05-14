@@ -13,9 +13,7 @@
 
 VideoSender::VideoSender(int port) : port_(port < 1000 ? 5060 : port)
 {
-    /*----------------------------------------------*/ 
     //  Create sender pipeline
-    /*----------------------------------------------*/ 
 #if DV
     initDv();
 #else
@@ -77,7 +75,7 @@ void VideoSender::initTest()
     gst_bin_add_many(GST_BIN(pipeline_), txSrc, txCsp, x264enc, rtph264pay, 
                      txSink, NULL);
  
-    // links camera first filter and second filter (csp)
+    // links testsrc, colorspace converter, encoder, payloader and udpsink
     gst_element_link_many(txSrc, txCsp, x264enc, rtph264pay, txSink, NULL);
 }
 
@@ -85,7 +83,6 @@ void VideoSender::initTest()
 
 VideoSender::~VideoSender()
 {
-    std::cout << "Sender: I'm melting!!!" << std::endl;
     stop();
     gst_object_unref(GST_OBJECT(pipeline_));
 }
