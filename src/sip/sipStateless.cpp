@@ -190,7 +190,7 @@ void send_request(char *str)
  * main()
  *
  */
-int sip_init(void)
+int sip_init()
 {
     pjsip_module mod_app = 
     {
@@ -297,6 +297,7 @@ int sip_init(void)
 
     PJ_LOG(3, (THIS_FILE, "Press Ctrl-C to quit.."));
  
+    return 0;
 }
 
 
@@ -346,6 +347,7 @@ int main(int argc, char *argv[])
     {
         if(sip_handle_events())
         {
+            std::cout << "HANDLED EVENT" << std::endl;
 
         }
     }
