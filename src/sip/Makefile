@@ -13,7 +13,7 @@ OBJDIR=$(BASE)/obj
 VPATH = $(SRCDIR)
 VPATH = $(OBJDIR)
 SOURCES=sipstateless.c
-OBJS=sipstateless.c
+OBJS=sipstateless.o
 
 
 GST_CFLAGS=$(shell pkg-config --cflags gstreamer-0.10)
