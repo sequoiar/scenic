@@ -297,10 +297,6 @@ int sip_init(void)
 
     PJ_LOG(3, (THIS_FILE, "Press Ctrl-C to quit.."));
  
-    for (;;) 
-    {
-        pjsip_endpt_handle_events(sip_endpt, NULL);
-    }
 }
 
 
@@ -338,13 +334,13 @@ int main(int argc, char *argv[])
             break;
     }
 
+    sip_init();  
 
     if(to_port[0])
     {
         send_request((char*)"HEllo World");
     }
 
-    sip_init();  
 
     for(;;)
     {
