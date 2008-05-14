@@ -2,6 +2,7 @@
 // videoSender.cpp
 
 #include <iostream>
+#include <cassert>
 #include <gst/gst.h>
 
 #include "videoSender.h"
@@ -23,28 +24,22 @@ VideoSender::VideoSender(int port)
     //  Create sender pipeline
     /*----------------------------------------------*/ 
     pipeline_ = gst_pipeline_new("rxPipeline");
-    if (!pipeline_)
-        std::cerr << "Pipeline is bogus." << std::endl;
+    assert(pipeline_);
 
     txSrc = gst_element_factory_make("videotestsrc", "txSrc");
-    if (!txSrc)
-        std::cerr << "txSrc is bogus." << std::endl;
+    assert(txSrc);
 
     txCsp = gst_element_factory_make("ffmpegcolorspace", "txCsp");
-    if (!txCsp)
-        std::cerr <<  "csp is bogus." << std::endl;
+    assert(txCsp);
 
     x264enc = gst_element_factory_make("x264enc", "x264enc");
-    if (!x264enc)
-        std::cerr << "x264 is bogus." << std::endl;
+    assert(x264enc);
 
     rtph264pay = gst_element_factory_make("rtph264pay", "rtph264pay");
-    if (!rtph264pay)
-        std::cerr << "rtph264pay is bogus." << std::endl;
+    assert(rtph264pay);
 
     txSink = gst_element_factory_make("udpsink", "txSink");
-    if (!txSink)
-        std::cerr << "Sink is bogus." << std::endl;
+    assert(txSink);
 
     g_object_set(G_OBJECT(x264enc),"bitrate", 1000, NULL);
     g_object_set(G_OBJECT(x264enc),"byte-stream", TRUE, NULL);
