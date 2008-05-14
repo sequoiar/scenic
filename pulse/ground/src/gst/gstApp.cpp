@@ -19,8 +19,9 @@ void eventLoop()
     //
     // #include <unistd.h>
     //
-    // while(!done)
-    // usleep(10000);
+    //bool done = false;
+    //while(!done)
+    //usleep(10000);
     
     // Approach 3: Block waiting for character input
     std::cout << "Hit any key and <cr> to exit." << std::endl << std::endl;
