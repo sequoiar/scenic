@@ -6,23 +6,19 @@
 
 #include "videoReceiver.h"
 
-VideoReceiver::VideoReceiver(int port)
+VideoReceiver::VideoReceiver(int port) : port_(port < 1000 ? 5060 : port)
 {
+    init();
+}
+
+
+
+void VideoReceiver::init()
+{
+    //  Create receiver pipeline
     GstElement *rxSrc, *ffdec_h264, *rtph264depay, *rxSink;
     GstCaps *caps;
 
-    // validate port number
-    if (port < 1000)
-    {
-        std::cerr << "Port is too low, defaulting to 5060";
-        port = 5060;
-    }
-        
-    port_ = port;
-
-/*----------------------------------------------*/ 
-//  Create receiver pipeline
-/*----------------------------------------------*/ 
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
 
@@ -45,7 +41,7 @@ VideoReceiver::VideoReceiver(int port)
     assert(caps);
 
     g_object_set(G_OBJECT(rxSrc), "caps", caps, NULL);
-    g_object_set(G_OBJECT(rxSrc), "port", port, NULL);
+    g_object_set(G_OBJECT(rxSrc), "port", port_, NULL);
     g_object_set(G_OBJECT(rxSink), "sync", FALSE, NULL);
 
     gst_element_link_many(rxSrc, rtph264depay, ffdec_h264, rxSink, NULL);
@@ -55,8 +51,6 @@ VideoReceiver::VideoReceiver(int port)
 
 VideoReceiver::~VideoReceiver()
 {
-    std::cout.flush();
-    std::cout << "Receiver: I'm melting!!!" << std::endl;
     stop();
     gst_object_unref(GST_OBJECT(pipeline_));
 }
