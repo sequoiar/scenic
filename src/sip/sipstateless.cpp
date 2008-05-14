@@ -25,12 +25,11 @@
  * is 501/Not Implemented).
  */
 
+#include <iostream>
 
-/* Include all headers. */
 #include <pjsip.h>
 #include <pjlib-util.h>
 #include <pjlib.h>
-
 
 #include "sip_singleton.h"
 
@@ -316,6 +315,12 @@ int main(int argc, char *argv[])
             break;
 
         case 1:         // no args
+            std::cerr << "Usage: " << std::endl 
+                      << "sipstateless <fromIP> <fromPort> <toIP> <toPort>" 
+                      << std::endl
+                      << "or" << std::endl
+                      << "sipstateless <listenPort>"
+                      << std::endl;
             return -1;
 
         default:        // 1 or more args (but not 4)
@@ -331,11 +336,14 @@ int main(int argc, char *argv[])
     }
 
     sip_init();  
+
     for(;;)
+    {
         if(sip_handle_events())
         {
-            
+
         }
+    }
 
     return 0;
 }
