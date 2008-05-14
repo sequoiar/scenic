@@ -14,6 +14,9 @@ class VideoSender
         void stop();
 
     private:
+        void initDv();
+        void initTest();
+
         int port_;
         GstElement *pipeline_;
 };

@@ -2,27 +2,53 @@
 // videoSender.cpp
 
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <cassert>
 #include <gst/gst.h>
 
 #include "videoSender.h"
 
-VideoSender::VideoSender(int port)
+#define DV 0        // if set to 0, a test src will be used instead of dv1394
+
+VideoSender::VideoSender(int port) : port_(port < 1000 ? 5060 : port)
 {
-    GstElement *txSrc, *txSink, *txCsp, *x264enc, *rtph264pay;
-
-    // validate port number
-    if (port < 1000)
-    {
-        std::cerr << "Port is too low, defaulting to 5060";
-        port = 5060;
-    }
-        
-    port_ = port;
-
     /*----------------------------------------------*/ 
     //  Create sender pipeline
     /*----------------------------------------------*/ 
+#if DV
+    initDv();
+#else
+    initTest();
+#endif
+}
+
+
+
+void VideoSender::initDv()
+{
+    GError *error;
+    std::string launchStr = "dv1394src ! dvdemux name=demux demux. ! \
+                                  queue ! dvdec ! ffmpegcolorspace \
+                                  ! x264enc bitrate=12000 byte-stream=true \
+                                  threads=4 ! rtph264pay ! \
+                                  udpsink host=localhost port = "; 
+                                  
+    std::stringstream istream;
+    istream << port_;           
+    launchStr += istream.str();     // get port number into launch string
+    launchStr += " demux. ! queue ! fakesink";
+
+    pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
+    assert(pipeline_);
+}
+
+
+
+void VideoSender::initTest()
+{
+    GstElement *txSrc, *txSink, *txCsp, *x264enc, *rtph264pay;
+
     pipeline_ = gst_pipeline_new("rxPipeline");
     assert(pipeline_);
 
@@ -48,8 +74,8 @@ VideoSender::VideoSender(int port)
     g_object_set(G_OBJECT(txSink), "host", "localhost", "port", port_, NULL);
     
 
-    gst_bin_add_many(GST_BIN(pipeline_), txSrc, txCsp, x264enc, 
-            rtph264pay, txSink, NULL);
+    gst_bin_add_many(GST_BIN(pipeline_), txSrc, txCsp, x264enc, rtph264pay, 
+                     txSink, NULL);
  
     // links camera first filter and second filter (csp)
     gst_element_link_many(txSrc, txCsp, x264enc, rtph264pay, txSink, NULL);

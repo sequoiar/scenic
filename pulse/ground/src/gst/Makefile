@@ -6,10 +6,7 @@ include ../base.mak
 
 BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
-#SRCDIR=$(BASE)/src
 
-#VPATH = $(SRCDIR)
-#VPATH = $(OBJDIR)
 OBJS=gst_main.o gstApp.o videoReceiver.o videoSender.o
 
 

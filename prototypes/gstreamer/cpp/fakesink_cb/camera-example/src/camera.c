@@ -21,6 +21,7 @@
 static gboolean cb_have_data(GstPad * pad, GstBuffer * buffer,
 			     gpointer u_data);
 static void show_note(char *note);
+static void create_jpeg(unsigned char *data);
 
 int picture_requested = 0;
 //static /*HILDON_WINDOW */ GtkWidget *window;
@@ -28,11 +29,13 @@ int picture_requested = 0;
 static gboolean
 cb_have_data(GstPad * pad, GstBuffer * buffer, gpointer u_data)
 {
+    printf("Called.\n");
 	unsigned char *data_photo =
 	    (unsigned char *) GST_BUFFER_DATA(buffer);
-	if (picture_requested) {
+//	if (picture_requested) 
+    {
 		picture_requested = 0;
-//		create_jpeg(data_photo);
+		create_jpeg(data_photo);
 	}
 	return TRUE;
 }
@@ -47,9 +50,11 @@ int main(int argc, char **argv)
 	GstPad *pad;
 	GstCaps *caps;
 	gboolean link_ok;
+    GMainLoop *loop;
 
 //	gtk_init(&argc, &argv);
 	gst_init(&argc, &argv);
+    loop = g_main_loop_new(NULL, FALSE);
 	gnome_vfs_init();
 
 //	program = HILDON_PROGRAM(hildon_program_get_instance());
@@ -145,6 +150,7 @@ int main(int argc, char **argv)
 
 	gst_element_set_state(pipeline, GST_STATE_PLAYING);
 	//gtk_main();
+    g_main_loop_run(loop);
 
 	gst_element_set_state(pipeline, GST_STATE_NULL);
 	gst_object_unref(pipeline);
