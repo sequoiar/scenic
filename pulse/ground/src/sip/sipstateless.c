@@ -148,7 +148,7 @@ void send_request(pjsip_endpoint *endp)
  * main()
  *
  */
-int sip_init(const char *from_addr,const char *from_port,const char *to_addr,const char *to_port)
+int sip_init(void)
 {
     pjsip_module mod_app = 
     {
@@ -167,6 +167,8 @@ int sip_init(const char *from_addr,const char *from_port,const char *to_addr,con
         NULL,			    /* on_tsx_state()		*/
     };
     pj_status_t status;
+
+
 
     /* Must init PJLIB first: */
     status = pj_init();
@@ -289,7 +291,7 @@ int main(int argc, char *argv[])
     }
 
 
-    sip_init(from_addr,from_port,to_addr,to_port);
+    sip_init();  
     
     // MAIN EVENT LOOP
     for(;;)
