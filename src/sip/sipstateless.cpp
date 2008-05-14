@@ -31,7 +31,7 @@
 #include <pjlib-util.h>
 #include <pjlib.h>
 
-#include "sip_singleton.h"
+#include "sipSingleton.h"
 
 /* If this macro is set, UDP transport will be initialized at port 5060 */
 #define HAS_UDP_TRANSPORT
