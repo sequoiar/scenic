@@ -9,7 +9,7 @@
 
 #include "videoSender.h"
 
-#define DV 0        // if set to 0, a test src will be used instead of dv1394
+#define DV 1        // if set to 0, a test src will be used instead of dv1394
 
 VideoSender::VideoSender(int port) : port_(port < 1000 ? 5060 : port)
 {
@@ -65,7 +65,7 @@ void VideoSender::initTest()
     txSink = gst_element_factory_make("udpsink", "txSink");
     assert(txSink);
 
-    g_object_set(G_OBJECT(x264enc),"bitrate", 1000, NULL);
+    g_object_set(G_OBJECT(x264enc),"bitrate", 1500, NULL);
     g_object_set(G_OBJECT(x264enc),"byte-stream", TRUE, NULL);
     g_object_set(G_OBJECT(x264enc),"threads", 4, NULL);
     
