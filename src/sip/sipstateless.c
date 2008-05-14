@@ -163,7 +163,7 @@ void send_request(pjsip_endpoint *endp)
  * main()
  *
  */
-int main(int argc, char *argv[])
+int sip_init(const char *from_addr,const char *from_port,const char *to_addr,const char *to_port)
 {
     pjsip_module mod_app = 
     {
@@ -182,24 +182,6 @@ int main(int argc, char *argv[])
         NULL,			    /* on_tsx_state()		*/
     };
     pj_status_t status;
-
-    switch (argc)
-    {
-        case 5:         // 4 args
-            strcpy(from_addr,argv[1]);
-            strcpy(to_port,argv[4]);
-            strcpy(to_addr,argv[3]);
-            strcpy(from_port,argv[2]);
-            break;
-
-        case 1:         // no args
-            return -1;
-
-        default:        // 1 or more args (but not 4)
-            to_port[0] = 0;
-            strcpy(from_port,argv[1]);
-            break;
-    }
 
     /* Must init PJLIB first: */
     status = pj_init();
@@ -294,6 +276,39 @@ int main(int argc, char *argv[])
     {
         pjsip_endpt_handle_events(sip_endpt, NULL);
     }
+}
+
+void sip_handle_events(void)
+{
+   pjsip_endpt_handle_events(sip_endpt, NULL);
+}
+
+int main(int argc, char *argv[])
+{
+    switch (argc)
+    {
+        case 5:         // 4 args
+            strcpy(from_addr,argv[1]);
+            strcpy(to_port,argv[4]);
+            strcpy(to_addr,argv[3]);
+            strcpy(from_port,argv[2]);
+            break;
+
+        case 1:         // no args
+            return -1;
+
+        default:        // 1 or more args (but not 4)
+            to_port[0] = 0;
+            strcpy(from_port,argv[1]);
+            break;
+    }
+
+
+    sip_init(from_addr,from_port,to_addr,to_port);
+    for(;;)
+        sip_handle_events();
+
+    return 0;
 }
 
 #if 0
