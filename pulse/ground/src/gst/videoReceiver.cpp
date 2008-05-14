@@ -1,6 +1,7 @@
 // videoReceiver.cpp
 
 #include <iostream>
+#include <cassert>
 #include <gst/gst.h>
 
 #include "videoReceiver.h"
@@ -23,31 +24,25 @@ VideoReceiver::VideoReceiver(int port)
 //  Create receiver pipeline
 /*----------------------------------------------*/ 
     pipeline_ = gst_pipeline_new("txPipeline");
-    if (!pipeline_)
-        std::cerr << "Pipeline is bogus." << std::endl;
+    assert(pipeline_);
 
     rxSrc = gst_element_factory_make("udpsrc", "rxSrc");
-    if (!rxSrc)
-        std::cerr << "Src is bogus." << std::endl;
+    assert(rxSrc);
 
     rtph264depay = gst_element_factory_make("rtph264depay", "rtph264depay");
-    if (!rtph264depay)
-        std::cerr << "rtph264depay is bogus." << std::endl;
+    assert(rtph264depay);
 
     ffdec_h264 = gst_element_factory_make("ffdec_h264", "ffdec_h264");
-    if (!ffdec_h264)
-        std::cerr << "ffdec_h264 is bogus." << std::endl;
+    assert(ffdec_h264);
 
     rxSink = gst_element_factory_make("xvimagesink", "rxSink");
-    if (!rxSink)
-        std::cerr << "rxSink is bogus." << std::endl;
+    assert(rxSink);
     
     gst_bin_add_many(GST_BIN(pipeline_), rxSrc, rtph264depay, 
                         ffdec_h264, rxSink, NULL); 
  
     caps = gst_caps_new_simple("application/x-rtp", NULL);
-    if (!caps)
-        std::cerr << "caps are bogus." << std::endl;
+    assert(caps);
 
     g_object_set(G_OBJECT(rxSrc), "caps", caps, NULL);
     g_object_set(G_OBJECT(rxSrc), "port", port, NULL);
