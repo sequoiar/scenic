@@ -9,7 +9,7 @@ include $(PJBASE)/build.mak
 BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
 
-OBJS=sipstateless.o sip_singleton.o
+OBJS=sipstateless.o sipSingleton.o
 
 
 GST_CFLAGS=$(shell pkg-config --cflags gstreamer-0.10)
