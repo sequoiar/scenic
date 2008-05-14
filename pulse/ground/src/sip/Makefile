@@ -38,7 +38,7 @@ $(APPLICATION): $(OBJS)
 
 all: $(APPLICATION)
 
-tags:
+tags: $(OBJS)
 	ctags *.c *.cpp *.h
 
 .PHONY: clean

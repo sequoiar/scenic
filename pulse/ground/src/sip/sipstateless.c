@@ -290,6 +290,8 @@ int main(int argc, char *argv[])
 
 
     sip_init(from_addr,from_port,to_addr,to_port);
+    
+    // MAIN EVENT LOOP
     for(;;)
         sip_handle_events();
 
