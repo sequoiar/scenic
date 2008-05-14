@@ -1,5 +1,5 @@
 SHELL=/bin/sh
-APPLICATION=sipstateless
+APPLICATION=sipStateless
 
 include ../base.mak
 
@@ -9,7 +9,7 @@ include $(PJBASE)/build.mak
 BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
 
-OBJS=sipstateless.o sipSingleton.o
+OBJS=sipStateless.o sipSingleton.o
 
 
 GST_CFLAGS=$(shell pkg-config --cflags gstreamer-0.10)
@@ -39,6 +39,6 @@ tags: $(OBJS)
 
 .PHONY: clean
 clean:
-	rm $(OBJS)
+	rm *.o
 	rm $(BINDIR)/$(APPLICATION)
 

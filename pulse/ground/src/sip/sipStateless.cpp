@@ -160,9 +160,9 @@ void send_request(char *str)
         pjsip_tx_data *request;
         pj_str_t body = pj_str(str);
 
-        status = pjsip_endpt_create_request(sip_endpt, &message_method, &str_target,
-                                            &str_from, &str_to,&str_contact, 
-                                            NULL, -1, &body,&request);
+        status = pjsip_endpt_create_request(sip_endpt, &message_method, 
+                 &str_target, &str_from, &str_to, &str_contact, NULL, -1, 
+                 &body, &request);
 
         if (status != PJ_SUCCESS) 
         {
@@ -170,7 +170,16 @@ void send_request(char *str)
             //app_perror("    error: unable to create request", status);
             //    return status;
         }
-        status = pjsip_endpt_send_request_stateless(sip_endpt, request, NULL, NULL);	
+
+        status = pjsip_endpt_send_request_stateless(sip_endpt, request, 
+                 NULL, NULL);	
+
+        if (status != PJ_SUCCESS) 
+        {
+            exit(-1); 
+            //app_perror("    error: unable to create request", status);
+            //    return status;
+        }
     }
 }
 
@@ -316,10 +325,10 @@ int main(int argc, char *argv[])
 
         case 1:         // no args
             std::cerr << "Usage: " << std::endl 
-                      << "sipstateless <fromIP> <fromPort> <toIP> <toPort>" 
+                      << "sipStateless <fromIP> <fromPort> <toIP> <toPort>" 
                       << std::endl
                       << "or" << std::endl
-                      << "sipstateless <listenPort>"
+                      << "sipStateless <listenPort>"
                       << std::endl;
             return -1;
 
