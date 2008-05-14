@@ -1,0 +1,20 @@
+"Tristan's vimrc file
+
+syntax enable
+set formatoptions=tcqro2
+set autoindent
+set smartindent
+set cindent
+set tags=./tags
+set wildmenu wildmode=longest:full,full
+
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+
+ab #d #define
+ab #i #include
+ab #b /************************************************
+ab #e ************************************************/
+ab #l /*----------------------------------------------*/
