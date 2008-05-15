@@ -40,10 +40,6 @@
 /* If this macro is set, TCP transport will be initialized at port 5060 */
 #define HAS_TCP_TRANSPORT   (1 && PJ_HAS_TCP)
 
-/* Log identification */
-#define THIS_FILE	"sipStateless.cpp"
-
-
 /* Global SIP endpoint */
 static pjsip_endpoint *sip_endpt;
 
@@ -92,7 +88,7 @@ static pj_bool_t on_rx_response(pjsip_rx_data *rdata)
     //{
     if (rdata->msg_info.msg->body != NULL)
     {
-        PJ_LOG(3,(THIS_FILE, "response body:%s",
+        PJ_LOG(3,(__FILE__, "response body:%s",
                   rdata->msg_info.msg->body->data));
         sip->rx_res((const char*)rdata->msg_info.msg->body->data,
                     rdata->msg_info.msg->body->len);
@@ -124,7 +120,7 @@ static pj_bool_t on_rx_request(pjsip_rx_data *rdata)
 
             body = pjsip_msg_body_create(pool, &t, &s, &data);
 
-            PJ_LOG(3,(THIS_FILE, "request body:%s",
+            PJ_LOG(3,(__FILE__, "request body:%s",
                       rdata->msg_info.msg->body->data));
 
             pjsip_endpt_respond_stateless(sip_endpt, rdata, 200, NULL,
@@ -277,7 +273,7 @@ int sip_init()
 
     /* Done. Loop forever to handle incoming events. */
 
-    PJ_LOG(3, (THIS_FILE, "Press Ctrl-C to quit.."));
+    PJ_LOG(3, (__FILE__, "Press Ctrl-C to quit.."));
 
     return 0;
 }
