@@ -6,16 +6,17 @@ SipSingleton* SipSingleton::s = 0;
 
 using namespace std;
 
-char* SipSingleton::rx_req(char *data, unsigned int len) 
+const char* SipSingleton::rx_req(char *data, unsigned int len) 
 {
     cerr << "rx_request: " ;
     cerr.write(data,len);
     cerr <<endl;
+
     if (!strncmp(data,"Hello",5))
     {
-        return (char*)"Yourself";
+        return "Yourself";
     }
-    return (char*)"what?";
+    return "what?";
 }
 
 

@@ -8,7 +8,7 @@ public:
 
     //called inside pjsip rx_request 
     //must return pchar to desired response
-    char *rx_req(char *data, unsigned int len);
+    const char *rx_req(char *data, unsigned int len);
     
     //called inside pjsip rx_response
     void rx_res(char *data, unsigned int len);
