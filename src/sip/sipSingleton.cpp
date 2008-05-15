@@ -5,7 +5,7 @@
 
 SipSingleton* SipSingleton::s = 0;
 
-const char* SipSingleton::rx_req(char *data, unsigned int len) 
+const char* SipSingleton::rx_req(const char *data, unsigned int len) 
 {
     //std::cerr << "__THIS_FILE__";
     std::cerr << "rx_request: " ;
@@ -22,7 +22,7 @@ const char* SipSingleton::rx_req(char *data, unsigned int len)
 
 
 
-void SipSingleton::rx_res(char *data, unsigned int len) 
+void SipSingleton::rx_res(const char *data, unsigned int len) 
 {
     std::cerr << "rx_response:" ;
     std::cerr.write(data,len);
