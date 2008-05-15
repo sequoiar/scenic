@@ -290,9 +290,9 @@ unsigned int sip_handle_events(void)
     return count;
 }
 
-
-int main(int argc, char *argv[])
+int sip_pass_args(int argc, char *argv[])
 {
+
     switch (argc)
     {
     case 5:         // 4 args
@@ -316,6 +316,17 @@ int main(int argc, char *argv[])
         strcpy(from_port,argv[1]);
         break;
     }
+
+    return 0;
+}
+
+
+
+int main(int argc, char *argv[])
+{
+
+    if(sip_pass_args(argc,argv) < 0)
+        return -1;
 
     sip_init();
 
