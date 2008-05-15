@@ -338,10 +338,10 @@ int main(int argc, char *argv[])
 
     for (;;)
     {
-        if (sip_handle_events())
+        static int eventCount;
+        if (eventCount += sip_handle_events())
         {
-            std::cout << "HANDLED EVENT" << std::endl;
-
+            std::cout << "HANDLED " << eventCount << " EVENTS " << std::endl;
         }
     }
 
