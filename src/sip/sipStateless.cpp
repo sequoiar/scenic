@@ -94,7 +94,7 @@ static pj_bool_t on_rx_response(pjsip_rx_data *rdata)
     {
         PJ_LOG(3,(THIS_FILE, "response body:%s",
                   rdata->msg_info.msg->body->data));
-        sip->rx_res(rdata->msg_info.msg->body->data,
+        sip->rx_res((char*)rdata->msg_info.msg->body->data,
                     rdata->msg_info.msg->body->len);
     }
     //}
@@ -117,7 +117,7 @@ static pj_bool_t on_rx_request(pjsip_rx_data *rdata)
             pjsip_msg_body *body;
             pj_str_t t = pj_str((char*)"text");
             pj_str_t s = pj_str((char*)"plain");
-            pj_str_t data = pj_str(sip->rx_req(rdata->msg_info.msg->body->data,
+            pj_str_t data = pj_str(sip->rx_req((char*)rdata->msg_info.msg->body->data,
                                                rdata->msg_info.msg->body->len));
 
             body = pjsip_msg_body_create(pool,&t,&s,&data);
