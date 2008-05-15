@@ -26,6 +26,7 @@
  */
 
 #include <iostream>
+#include <cassert>
 
 #include <pjsip.h>
 #include <pjlib-util.h>
@@ -56,16 +57,16 @@ struct pjsip_hdr hdr_list;
 
 #if 0
 class sip_singleton{
-public:
-    static sip_singleton* Instance();
-    char *rx_req(void *data,unsigned int len ) {return NULL;};
-    void rx_res(void *data,unsigned int len ) {};
-protected:
-    sip_singleton(){};
+    public:
+        static sip_singleton* Instance();
+        char *rx_req(void *data,unsigned int len ) {return NULL;};
+        void rx_res(void *data,unsigned int len ) {};
+    protected:
+        sip_singleton(){};
 
 
-    // Incomming data -> char* response
-    static sip_singleton *s;
+        // Incomming data -> char* response
+        static sip_singleton *s;
 };
 
 sip_singleton* sip_singleton::s = 0;
@@ -80,16 +81,18 @@ sip_singleton* sip_singleton::Instance()
 #endif
 
 /* Callback to handle response to our request */
-static pj_bool_t on_rx_response( pjsip_rx_data *rdata )
+static pj_bool_t on_rx_response(pjsip_rx_data *rdata)
 {
 
     SipSingleton *sip = SipSingleton::Instance();
     //    if (rdata->msg_info.msg->line.req.method.id == PJSIP_OTHER_METHOD)
     //{
-    if(rdata->msg_info.msg->body != NULL){
+    if(rdata->msg_info.msg->body != NULL)
+    {
         PJ_LOG(3,(THIS_FILE, "response body:%s", 
-               rdata->msg_info.msg->body->data));
-        sip->rx_res(rdata->msg_info.msg->body->data, rdata->msg_info.msg->body->len);
+                    rdata->msg_info.msg->body->data));
+        sip->rx_res(rdata->msg_info.msg->body->data, 
+                rdata->msg_info.msg->body->len);
     }
     //}
     return PJ_TRUE;
@@ -107,24 +110,24 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata )
     if (rdata->msg_info.msg->line.req.method.id != PJSIP_ACK_METHOD) 
     {
         if (rdata->msg_info.msg->line.req.method.id == PJSIP_OTHER_METHOD)
-       {
+        {
             pjsip_msg_body *body;
             pj_str_t t = pj_str((char*)"text");
             pj_str_t s = pj_str((char*)"plain");
-            pj_str_t data = pj_str(sip->rx_req(rdata->msg_info.msg->body->data, rdata->msg_info.msg->body->len));
-
+            pj_str_t data = pj_str(sip->rx_req(rdata->msg_info.msg->body->data,
+                        rdata->msg_info.msg->body->len));
 
             body = pjsip_msg_body_create(pool,&t,&s,&data);
 
             PJ_LOG(3,(THIS_FILE, "request body:%s",
-                   rdata->msg_info.msg->body->data));
+                        rdata->msg_info.msg->body->data));
 
             pjsip_endpt_respond_stateless(sip_endpt, rdata, 200, NULL, 
-                                          &hdr_list, body);
+                    &hdr_list, body);
         }
         else
             pjsip_endpt_respond_stateless(sip_endpt, rdata, code, NULL, 
-                                          &hdr_list, NULL);
+                    &hdr_list, NULL);
     }
     return PJ_TRUE;
 }
@@ -134,7 +137,6 @@ const pjsip_method message_method =
     PJSIP_OTHER_METHOD,
     {(char*) "MESSAGE", 7 }
 };
-
 
 char from_port[8];
 char to_port[8];
@@ -161,25 +163,13 @@ void send_request(char *str)
         pj_str_t body = pj_str(str);
 
         status = pjsip_endpt_create_request(sip_endpt, &message_method, 
-                 &str_target, &str_from, &str_to, &str_contact, NULL, -1, 
-                 &body, &request);
-
-        if (status != PJ_SUCCESS) 
-        {
-            exit(-1); 
-            //app_perror("    error: unable to create request", status);
-            //    return status;
-        }
+                &str_target, &str_from, &str_to, &str_contact, NULL, -1, 
+                &body, &request);
+        assert(status == PJ_SUCCESS);
 
         status = pjsip_endpt_send_request_stateless(sip_endpt, request, 
-                 NULL, NULL);	
-
-        if (status != PJ_SUCCESS) 
-        {
-            exit(-1); 
-            //app_perror("    error: unable to create request", status);
-            //    return status;
-        }
+                NULL, NULL);	
+        assert(status == PJ_SUCCESS);
     }
 }
 
@@ -214,12 +204,12 @@ int sip_init()
 
     /* Must init PJLIB first: */
     status = pj_init();
-    PJ_ASSERT_RETURN(status == PJ_SUCCESS, 1);
+    assert(status == PJ_SUCCESS);
 
 
     /* Then init PJLIB-UTIL: */
     status = pjlib_util_init();
-    PJ_ASSERT_RETURN(status == PJ_SUCCESS, 1);
+    assert(status == PJ_SUCCESS);
 
     /* Must create a pool factory before we can allocate any memory. */
     pj_caching_pool_init(&cp, &pj_pool_factory_default_policy, 0);
@@ -233,7 +223,7 @@ int sip_init()
 
         /* Create the endpoint: */
         status = pjsip_endpt_create(&cp.factory, "sipstateless", &sip_endpt);
-        PJ_ASSERT_RETURN(status == PJ_SUCCESS, 1);
+        assert(status == PJ_SUCCESS);
     }
 
     pj_optind = 0;
@@ -254,13 +244,7 @@ int sip_init()
         addr.sin_port = pj_htons(atoi(from_port));
 
         status = pjsip_udp_transport_start( sip_endpt, &addr, NULL, 1, NULL);
-
-        if (status != PJ_SUCCESS) 
-        {
-            PJ_LOG(3,(THIS_FILE,
-                   "Error starting UDP transport (port in use?)"));
-            return 1;
-        }
+        assert(status == PJ_SUCCESS);
     }
 #endif
 
@@ -276,12 +260,7 @@ int sip_init()
         addr.sin_port = pj_htons(atoi(from_port));
 
         status = pjsip_tcp_transport_start(sip_endpt, &addr, 1, NULL);
-        if (status != PJ_SUCCESS) 
-        {
-            PJ_LOG(3,(THIS_FILE, 
-                   "Error starting TCP transport (port in use?)"));
-            return 1;
-        }
+        assert(status == PJ_SUCCESS);
     }
 #endif
 
@@ -289,23 +268,21 @@ int sip_init()
      * Register our module to receive incoming requests.
      */
     status = pjsip_endpt_register_module(sip_endpt, &mod_app);
-    PJ_ASSERT_RETURN(status == PJ_SUCCESS, 1);
-
-
+    assert(status == PJ_SUCCESS);
 
     /* Done. Loop forever to handle incoming events. */
 
     PJ_LOG(3, (THIS_FILE, "Press Ctrl-C to quit.."));
- 
+
     return 0;
 }
 
 
 unsigned int sip_handle_events(void)
 {
-   unsigned int count;
-   pjsip_endpt_handle_events2(sip_endpt, NULL,&count);
-   return count;
+    unsigned int count;
+    pjsip_endpt_handle_events2(sip_endpt, NULL,&count);
+    return count;
 }
 
 
@@ -322,11 +299,11 @@ int main(int argc, char *argv[])
 
         case 1:         // no args
             std::cerr << "Usage: " << std::endl 
-                      << "sipStateless <fromIP> <fromPort> <toIP> <toPort>" 
-                      << std::endl
-                      << "or" << std::endl
-                      << "sipStateless <listenPort>"
-                      << std::endl;
+                << "sipStateless <fromIP> <fromPort> <toIP> <toPort>" 
+                << std::endl
+                << "or" << std::endl
+                << "sipStateless <listenPort>"
+                << std::endl;
             return -1;
 
         default:        // 1 or more args (but not 4)
@@ -354,5 +331,4 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
 
