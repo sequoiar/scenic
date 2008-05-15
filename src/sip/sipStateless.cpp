@@ -41,7 +41,7 @@
 #define HAS_TCP_TRANSPORT   (1 && PJ_HAS_TCP)
 
 /* Log identification */
-#define THIS_FILE	"sipstateless.c"
+#define THIS_FILE	"sipStateless.cpp"
 
 
 /* Global SIP endpoint */
@@ -117,8 +117,7 @@ static pj_bool_t on_rx_request(pjsip_rx_data *rdata)
             pjsip_msg_body *body;
             pj_str_t t = pj_str((char*)"text");
             pj_str_t s = pj_str((char*)"plain");
-            pj_str_t data = pj_str(sip->rx_req((char*)rdata->msg_info.msg->body->data,
-                                               rdata->msg_info.msg->body->len));
+            pj_str_t data = pj_str(sip->rx_req((char*)rdata->msg_info.msg->body->data, rdata->msg_info.msg->body->len));
 
             body = pjsip_msg_body_create(pool,&t,&s,&data);
 
@@ -176,7 +175,6 @@ void send_request(char *str)
         assert(status == PJ_SUCCESS);
     }
 }
-
 
 
 
