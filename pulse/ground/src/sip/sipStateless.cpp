@@ -33,6 +33,7 @@
 #include <pjlib.h>
 
 #include "sipSingleton.h"
+#include "sipPrivate.h"
 
 /* If this macro is set, UDP transport will be initialized at port 5060 */
 #define HAS_UDP_TRANSPORT
@@ -316,31 +317,4 @@ int sip_pass_args(int argc, char *argv[])
     return 0;
 }
 
-
-
-int main(int argc, char *argv[])
-{
-
-    if(sip_pass_args(argc,argv) < 0)
-        return -1;
-
-    sip_init();
-
-    if (to_port[0])
-    {
-        send_request((char*)"Hello World");
-    }
-
-
-    for (;;)
-    {
-        static int eventCount;
-        if (eventCount += sip_handle_events())
-        {
-            std::cout << "HANDLED " << eventCount << " EVENTS " << std::endl;
-        }
-    }
-
-    return 0;
-}
 
