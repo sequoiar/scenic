@@ -16,7 +16,7 @@ public:
 private:
     SipSingleton(){};
 
-    // Incomming data -> char* response
+    // Incoming data -> char* response
     static SipSingleton *s;
 };
 
