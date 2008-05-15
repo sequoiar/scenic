@@ -7,14 +7,13 @@ SipSingleton* SipSingleton::s = 0;
 
 const char* SipSingleton::rx_req(const char *data, unsigned int len) 
 {
-    std::cerr << "TRISTAN SAYS: __THIS_FILE__";
     std::cerr << "rx_request: " ;
     std::cerr.write(data, len);
     std::cerr << std::endl;
 
     if (!strncmp(data,"Hello",5))
     {
-        return "Yourself";
+        return "Break Yourself!";
     }
 
     return "what?";
