@@ -145,7 +145,7 @@ char to_port[8];
 char from_addr[64];
 char to_addr[64];
 
-void send_request(char *str)
+void send_request(const char *str)
 {
     static char target[64];
     static char from[64];
@@ -162,7 +162,7 @@ void send_request(char *str)
         pj_str_t str_contact = str_from;
         pj_status_t status;
         pjsip_tx_data *request;
-        pj_str_t body = pj_str(str);
+        pj_str_t body = pj_str((char*)str);
 
         status = pjsip_endpt_create_request(sip_endpt, &message_method,
                                             &str_target, &str_from, &str_to,
