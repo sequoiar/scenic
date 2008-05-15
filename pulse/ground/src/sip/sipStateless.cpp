@@ -192,7 +192,7 @@ void send_request(char *str)
  */
 int sip_init()
 {
-    pjsip_module mod_app = 
+    static pjsip_module mod_app = 
     {
         NULL, NULL,		    /* prev, next.		*/
         {(char*) "mod-app", 7 },	    /* Name.			*/
