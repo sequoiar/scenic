@@ -1,5 +1,5 @@
 /* $Id: sipstateless.c 1937 2008-04-22 18:32:53Z bennylp $ */
-/* 
+/*
  * Copyright (C) 2003-2007 Benny Prijono <benny@prijono.org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA 
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 /**
@@ -56,23 +56,27 @@ static int code = PJSIP_SC_NOT_IMPLEMENTED;
 struct pjsip_hdr hdr_list;
 
 #if 0
-class sip_singleton{
-    public:
-        static sip_singleton* Instance();
-        char *rx_req(void *data,unsigned int len ) {return NULL;};
-        void rx_res(void *data,unsigned int len ) {};
-    protected:
-        sip_singleton(){};
+class sip_singleton
+{
+public:
+    static sip_singleton* Instance();
+    char *rx_req(void *data,unsigned int len )
+    {
+        return NULL;
+    };
+    void rx_res(void *data,unsigned int len ) {};
+protected:
+    sip_singleton(){};
 
 
-        // Incomming data -> char* response
-        static sip_singleton *s;
+    // Incomming data -> char* response
+    static sip_singleton *s;
 };
 
 sip_singleton* sip_singleton::s = 0;
 sip_singleton* sip_singleton::Instance()
 {
-    if(s == 0)
+    if (s == 0)
         s = new sip_singleton();
 
     return s;
@@ -83,16 +87,15 @@ sip_singleton* sip_singleton::Instance()
 /* Callback to handle response to our request */
 static pj_bool_t on_rx_response(pjsip_rx_data *rdata)
 {
-
     SipSingleton *sip = SipSingleton::Instance();
     //    if (rdata->msg_info.msg->line.req.method.id == PJSIP_OTHER_METHOD)
     //{
-    if(rdata->msg_info.msg->body != NULL)
+    if (rdata->msg_info.msg->body != NULL)
     {
-        PJ_LOG(3,(THIS_FILE, "response body:%s", 
-                    rdata->msg_info.msg->body->data));
-        sip->rx_res(rdata->msg_info.msg->body->data, 
-                rdata->msg_info.msg->body->len);
+        PJ_LOG(3,(THIS_FILE, "response body:%s",
+                  rdata->msg_info.msg->body->data));
+        sip->rx_res(rdata->msg_info.msg->body->data,
+                    rdata->msg_info.msg->body->len);
     }
     //}
     return PJ_TRUE;
@@ -100,14 +103,14 @@ static pj_bool_t on_rx_response(pjsip_rx_data *rdata)
 
 
 /* Callback to handle incoming requests. */
-static pj_bool_t on_rx_request( pjsip_rx_data *rdata )
+static pj_bool_t on_rx_request(pjsip_rx_data *rdata)
 {
-    /* Respond (statelessly) all incoming requests (except ACK!) 
+    /* Respond (statelessly) all incoming requests (except ACK!)
      * with 501 (Not Implemented)
      */
     SipSingleton *sip = SipSingleton::Instance();
 
-    if (rdata->msg_info.msg->line.req.method.id != PJSIP_ACK_METHOD) 
+    if (rdata->msg_info.msg->line.req.method.id != PJSIP_ACK_METHOD)
     {
         if (rdata->msg_info.msg->line.req.method.id == PJSIP_OTHER_METHOD)
         {
@@ -115,24 +118,24 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata )
             pj_str_t t = pj_str((char*)"text");
             pj_str_t s = pj_str((char*)"plain");
             pj_str_t data = pj_str(sip->rx_req(rdata->msg_info.msg->body->data,
-                        rdata->msg_info.msg->body->len));
+                                               rdata->msg_info.msg->body->len));
 
             body = pjsip_msg_body_create(pool,&t,&s,&data);
 
             PJ_LOG(3,(THIS_FILE, "request body:%s",
-                        rdata->msg_info.msg->body->data));
+                      rdata->msg_info.msg->body->data));
 
-            pjsip_endpt_respond_stateless(sip_endpt, rdata, 200, NULL, 
-                    &hdr_list, body);
+            pjsip_endpt_respond_stateless(sip_endpt, rdata, 200, NULL,
+                                          &hdr_list, body);
         }
         else
-            pjsip_endpt_respond_stateless(sip_endpt, rdata, code, NULL, 
-                    &hdr_list, NULL);
+            pjsip_endpt_respond_stateless(sip_endpt, rdata, code, NULL,
+                                          &hdr_list, NULL);
     }
     return PJ_TRUE;
 }
 
-const pjsip_method message_method = 
+const pjsip_method message_method =
 {
     PJSIP_OTHER_METHOD,
     {(char*) "MESSAGE", 7 }
@@ -162,13 +165,14 @@ void send_request(char *str)
         pjsip_tx_data *request;
         pj_str_t body = pj_str(str);
 
-        status = pjsip_endpt_create_request(sip_endpt, &message_method, 
-                &str_target, &str_from, &str_to, &str_contact, NULL, -1, 
-                &body, &request);
+        status = pjsip_endpt_create_request(sip_endpt, &message_method,
+                                            &str_target, &str_from, &str_to,
+                                            &str_contact, NULL, -1, &body,
+                                            &request);
         assert(status == PJ_SUCCESS);
 
-        status = pjsip_endpt_send_request_stateless(sip_endpt, request, 
-                NULL, NULL);	
+        status = pjsip_endpt_send_request_stateless(sip_endpt, request,
+                 NULL, NULL);
         assert(status == PJ_SUCCESS);
     }
 }
@@ -182,7 +186,7 @@ void send_request(char *str)
  */
 int sip_init()
 {
-    static pjsip_module mod_app = 
+    static pjsip_module mod_app =
     {
         NULL, NULL,		    /* prev, next.		*/
         {(char*) "mod-app", 7 },	    /* Name.			*/
@@ -229,10 +233,10 @@ int sip_init()
     pj_optind = 0;
     pj_list_init(&hdr_list);
 
-    if (pool == NULL) 
+    if (pool == NULL)
         pool = pj_pool_create(&cp.factory, "sipstateless", 1000, 1000, NULL);
-    /* 
-     * Add UDP transport, with hard-coded port 
+    /*
+     * Add UDP transport, with hard-coded port
      */
 
 #ifdef HAS_UDP_TRANSPORT
@@ -249,8 +253,8 @@ int sip_init()
 #endif
 
 #if HAS_TCP_TRANSPORT
-    /* 
-     * Add UDP transport, with hard-coded port 
+    /*
+     * Add UDP transport, with hard-coded port
      */
     {
         pj_sockaddr_in addr;
@@ -290,39 +294,39 @@ int main(int argc, char *argv[])
 {
     switch (argc)
     {
-        case 5:         // 4 args
-            strcpy(from_addr,argv[1]);
-            strcpy(to_port,argv[4]);
-            strcpy(to_addr,argv[3]);
-            strcpy(from_port,argv[2]);
-            break;
+    case 5:         // 4 args
+        strcpy(from_addr,argv[1]);
+        strcpy(to_port,argv[4]);
+        strcpy(to_addr,argv[3]);
+        strcpy(from_port,argv[2]);
+        break;
 
-        case 1:         // no args
-            std::cerr << "Usage: " << std::endl 
-                << "sipStateless <fromIP> <fromPort> <toIP> <toPort>" 
-                << std::endl
-                << "or" << std::endl
-                << "sipStateless <listenPort>"
-                << std::endl;
-            return -1;
+    case 1:         // no args
+        std::cerr << "Usage: " << std::endl
+        << "sipStateless <fromIP> <fromPort> <toIP> <toPort>"
+        << std::endl
+        << "or" << std::endl
+        << "sipStateless <listenPort>"
+        << std::endl;
+        return -1;
 
-        default:        // 1 or more args (but not 4)
-            to_port[0] = 0;
-            strcpy(from_port,argv[1]);
-            break;
+    default:        // 1 or more args (but not 4)
+        to_port[0] = 0;
+        strcpy(from_port,argv[1]);
+        break;
     }
 
-    sip_init();  
+    sip_init();
 
-    if(to_port[0])
+    if (to_port[0])
     {
         send_request((char*)"HEllo World");
     }
 
 
-    for(;;)
+    for (;;)
     {
-        if(sip_handle_events())
+        if (sip_handle_events())
         {
             std::cout << "HANDLED EVENT" << std::endl;
 
