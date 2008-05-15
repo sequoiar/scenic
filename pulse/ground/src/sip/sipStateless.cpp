@@ -320,7 +320,7 @@ int main(int argc, char *argv[])
 
     if (to_port[0])
     {
-        send_request((char*)"HEllo World");
+        send_request((char*)"Hello World");
     }
 
 
