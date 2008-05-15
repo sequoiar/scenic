@@ -2,6 +2,7 @@
 #include <sstream>
 
 #include "sipSingleton.h"
+#include "sipPrivate.h"
 
 SipSingleton* SipSingleton::s = 0;
 
@@ -36,5 +37,33 @@ SipSingleton* SipSingleton::Instance()
         s = new SipSingleton();
 
     return s;
+}
+
+
+
+int main(int argc, char *argv[])
+{
+
+    if(sip_pass_args(argc,argv) < 0)
+        return -1;
+
+    sip_init();
+
+    if (argc == 5)
+    {
+        send_request((char*)"Hello World");
+    }
+
+
+    for (;;)
+    {
+        static int eventCount;
+        if (eventCount += sip_handle_events())
+        {
+            std::cout << "HANDLED " << eventCount << " EVENTS " << std::endl;
+        }
+    }
+
+    return 0;
 }
 
