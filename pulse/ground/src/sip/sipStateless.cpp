@@ -115,11 +115,14 @@ static pj_bool_t on_rx_request(pjsip_rx_data *rdata)
         if (rdata->msg_info.msg->line.req.method.id == PJSIP_OTHER_METHOD)
         {
             pjsip_msg_body *body;
+
             pj_str_t t = pj_str((char*)"text");
             pj_str_t s = pj_str((char*)"plain");
-            pj_str_t data = pj_str((char*)sip->rx_req((const char*)rdata->msg_info.msg->body->data, rdata->msg_info.msg->body->len));
+            pj_str_t data = pj_str((char*)sip->rx_req((const char*)
+                        rdata->msg_info.msg->body->data, 
+                        rdata->msg_info.msg->body->len));
 
-            body = pjsip_msg_body_create(pool,&t,&s,&data);
+            body = pjsip_msg_body_create(pool, &t, &s, &data);
 
             PJ_LOG(3,(THIS_FILE, "request body:%s",
                       rdata->msg_info.msg->body->data));
