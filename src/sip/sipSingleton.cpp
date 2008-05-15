@@ -1,19 +1,31 @@
+#include <iostream>
+#include <sstream>
 #include "sipSingleton.h"
 
 SipSingleton* SipSingleton::s = 0;
 
+using namespace std;
 
-
-char* SipSingleton::rx_req(void *data, unsigned int len) 
+char* SipSingleton::rx_req(char *data, unsigned int len) 
 {
-    return 0;
+    cerr << "rx_request: " ;
+    cerr.write(data,len);
+    cerr <<endl;
+    if (!strncmp(data,"Hello",5))
+    {
+        return (char*)"Yourself";
+    }
+    return (char*)"what?";
 }
 
 
 
-void SipSingleton::rx_res(void *data, unsigned int len ) 
+void SipSingleton::rx_res(char *data, unsigned int len ) 
 {
-    // empty
+    std::cerr << "rx_response:" ;
+    cerr.write(data,len);
+    cerr<< endl;
+ 
 }
 
 
