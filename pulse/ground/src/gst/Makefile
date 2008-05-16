@@ -3,6 +3,10 @@ APPLICATION=gst
 
 include ../base.mak
 
+PJBASE=$(BASE_ROOT)/pjsip
+
+include $(PJBASE)/build.mak 
+
 
 BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
@@ -28,7 +32,7 @@ CPPFLAGS = $(CFLAGS)
 	$(CPP_CC) $(CPPFLAGS) -c $(<) -o $@
 
 $(APPLICATION): $(OBJS)
-	$(CPP_CC) $(OBJS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
+	$(CPP_CC) $(OBJS) ../sip/sipSingleton.o ../sip/sipStateless.o -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
 
 all: $(APPLICATION)
 
