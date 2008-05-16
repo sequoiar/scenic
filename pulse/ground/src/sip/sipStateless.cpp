@@ -252,8 +252,12 @@ int sip_init()
 unsigned int sip_handle_events(void)
 {
     unsigned int count;
-    // has a queue of events
-    pjsip_endpt_handle_events2(sip_endpt, NULL,&count);     
+    pj_time_val maxTimeOut;
+    maxTimeOut.sec = 0;
+    maxTimeOut.msec = 0;
+
+    // has a queue of events, returns on event or after 10ms
+    pjsip_endpt_handle_events2(sip_endpt, &maxTimeOut, &count);     
     return count;
 }
 

@@ -50,23 +50,30 @@ SipSingleton* SipSingleton::Instance()
     return s_;
 }
 
+
+
 void SipSingleton::send_request(const char* msg)
 {
     ::send_request(msg);
 }
+
+
 
 int SipSingleton::handle_events(void)
 {
     return ::sip_handle_events();
 }
 
+
+
 bool SipSingleton::init(const char* local_port)
 {
     sip_set_local(local_port);
-
     sip_init();
     return true;
 }
+
+
 
 bool SipSingleton::init(const char* local_ip,const char* local_port,
                         const char* remote_ip, const char* remote_port)
