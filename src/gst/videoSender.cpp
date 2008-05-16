@@ -83,7 +83,7 @@ void VideoSender::initTest()
     g_object_set(G_OBJECT(x264enc),"byte-stream", TRUE, NULL);
     g_object_set(G_OBJECT(x264enc),"threads", 4, NULL);
     
-    g_object_set(G_OBJECT(txSink), "host", "192.168.1.183", "port", port_, NULL);
+    g_object_set(G_OBJECT(txSink), "host", "192.168.1.164", "port", port_, NULL);
     
 
     gst_bin_add_many(GST_BIN(pipeline_), txSrc, txCsp, x264enc, rtph264pay, 
