@@ -38,6 +38,7 @@ void SipSingleton::rx_res(const char *data, unsigned int len)
     std::cerr << "rx_response:" ;
     std::cerr.write(data,len);
     std::cerr << std::endl;
+    rx_port_ = atoi(data);
 }
 
 
