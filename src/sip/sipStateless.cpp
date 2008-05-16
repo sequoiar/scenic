@@ -287,6 +287,20 @@ unsigned int sip_handle_events(void)
     return count;
 }
 
+void sip_set_local(const char* host, const char* port)
+{
+    strcpy(from_addr,host);
+    strcpy(from_port,port);
+}
+
+void sip_set_remote(const char* host, const char* port)
+{
+    strcpy(to_addr,host);
+    strcpy(to_port,port);
+
+}
+
+
 int sip_pass_args(int argc, char *argv[])
 {
 

@@ -8,6 +8,7 @@ public:
 
     //called inside pjsip rx_request 
     //must return pchar to desired response
+    // Incoming data -> char* response
     const char *rx_req(const char *msg, unsigned int len);
     
     //called inside pjsip rx_response
@@ -19,11 +20,16 @@ public:
 
     bool init(int argc, char* argv[]);
 
+    bool init(const char* local_ip,const char* local_port,
+              const char* remote_ip, const char* remote_port);
 
+    void set_service_port(int p){port=p;}
 private:
     SipSingleton(){};
 
-    // Incoming data -> char* response
+    char service[32];
+    int port;
+
     static SipSingleton *s;
 };
 

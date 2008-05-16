@@ -8,9 +8,20 @@ SipSingleton* SipSingleton::s = 0;
 
 const char* SipSingleton::rx_req(const char *data, unsigned int len) 
 {
+    static char ser[16];
+    static char p[8];
     std::cerr << "rx_request: " ;
     std::cerr.write(data, len);
     std::cerr << std::endl;
+    sscanf(data,"%s",ser);
+
+    strcpy(service,ser);
+
+    std::cerr << ser << " port:" << port;
+
+    sprintf(p,"%d",port);
+    if(!strcmp(ser,"h264.1"))
+        return p;
 
     if (!strncmp(data,"Hello",5))
     {
@@ -59,33 +70,17 @@ bool SipSingleton::init(int argc, char* argv[])
     return true;
 }
 
-
-
-
-
-
-int main(int argc, char *argv[])
+bool SipSingleton::init(const char* local_ip,const char* local_port,
+                        const char* remote_ip, const char* remote_port)
 {
-    SipSingleton &sip = *SipSingleton::Instance();
+    sip_set_local(local_ip,local_port);
+    sip_set_remote(remote_ip, remote_port);
 
-    if(!sip.init(argc,argv))
-        return -1;
-
-    if (argc == 5)
-    {
-        sip.send_request("Hello World");
-    }
-
-
-    for (;;)
-    {
-        static int eventCount;
-        if (eventCount += sip.handle_events())
-        {
-            std::cout << "HANDLED " << eventCount << " EVENTS " << std::endl;
-        }
-    }
-
-    return 0;
+    sip_init();
+    return true;
 }
+
+
+
+
 
