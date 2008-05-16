@@ -94,6 +94,7 @@ void gst_main(int argc, char *argv[])
             {
                 std::cout << "!!!!!!!!" << sip.get_rx_port() << std::endl;
                 rx.init(sip.get_rx_port());
+                sip.zero_rx_port();
                 rx.start();
             }
         }
