@@ -20,8 +20,19 @@ class SipSingleton
 
         bool init(const char* local_port);
 
-        bool init(const char* local_ip,const char* local_port,
+    bool init(const char* local_ip,const char* local_port,
                 const char* remote_ip, const char* remote_port);
+
+    void set_service_port(int p){port=p;}
+
+    void zero_rx_port(){rx_port = 0;}
+
+    int get_rx_port(){return rx_port;}
+    int get_tx_port(){return port;}
+    char* get_service(){return service;}
+private:
+    SipSingleton():port(0),rx_port(0){};
+        
 
         void set_service_port(int p) { port_ = p; }
 
@@ -29,7 +40,7 @@ class SipSingleton
         SipSingleton(){};
 
         char service_[32];
-        int port_;
+        int port_,rx_port;
 
         static SipSingleton *s_;
 };
