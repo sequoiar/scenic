@@ -49,6 +49,8 @@ void gst_main(int argc, char *argv[])
     long txPort = 15060;
     long rxPort = 15061;
    
+    VideoSender tx;
+    VideoReceiver rx;
 #if 0
     if (argc > 2)
     {
@@ -78,13 +80,13 @@ void gst_main(int argc, char *argv[])
         {
             if(!strcmp(sip.get_service(),"h264.1"))
             {
-                static VideoSender tx(sip.get_rx_port());
+                tx.init(sip.get_rx_port());
                 tx.start();
                 sip.zero_rx_port();
             }
             if(sip.get_rx_port())
             {
-                static VideoReceiver rx(sip.get_tx_port());
+                rx.init(sip.get_tx_port());
                 rx.start();
             }
         }
