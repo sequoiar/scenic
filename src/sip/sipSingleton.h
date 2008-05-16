@@ -18,20 +18,20 @@ class SipSingleton
 
         int handle_events(void);
 
-        bool init(int argc, char* argv[]);
+        bool init(const char* local_port);
 
         bool init(const char* local_ip,const char* local_port,
                 const char* remote_ip, const char* remote_port);
 
-        void set_service_port(int p){port=p;}
+        void set_service_port(int p) { port_ = p; }
 
     private:
         SipSingleton(){};
 
-        char service[32];
-        int port;
+        char service_[32];
+        int port_;
 
-        static SipSingleton *s;
+        static SipSingleton *s_;
 };
 
 #endif

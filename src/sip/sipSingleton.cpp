@@ -4,7 +4,7 @@
 #include "sipSingleton.h"
 #include "sipPrivate.h"
 
-SipSingleton* SipSingleton::s = 0;
+SipSingleton* SipSingleton::s_ = 0;
 
 const char* SipSingleton::rx_req(const char *data, unsigned int len) 
 {
@@ -13,13 +13,13 @@ const char* SipSingleton::rx_req(const char *data, unsigned int len)
     std::cerr << "rx_request: " ;
     std::cerr.write(data, len);
     std::cerr << std::endl;
-    sscanf(data,"%s",ser);
+    sscanf(data,"%s", ser);
 
-    strcpy(service,ser);
+    strcpy(service_, ser);
 
-    std::cerr << ser << " port:" << port;
+    std::cerr << ser << " port:" << port_;
 
-    sprintf(p,"%d",port);
+    sprintf(p, "%d", port_);
     if(!strcmp(ser,"h264.1"))
         return p;
 
@@ -44,16 +44,15 @@ void SipSingleton::rx_res(const char *data, unsigned int len)
 
 SipSingleton* SipSingleton::Instance()
 {
-    if(s == 0)
-        s = new SipSingleton();
+    if(s_ == 0)
+        s_ = new SipSingleton();
 
-    return s;
+    return s_;
 }
 
 void SipSingleton::send_request(const char* msg)
 {
     ::send_request(msg);
-
 }
 
 int SipSingleton::handle_events(void)
@@ -61,10 +60,9 @@ int SipSingleton::handle_events(void)
     return ::sip_handle_events();
 }
 
-bool SipSingleton::init(int argc, char* argv[])
+bool SipSingleton::init(const char* local_port)
 {
-    if(sip_pass_args(argc,argv) < 0)
-        return false;
+    sip_set_local(local_port);
 
     sip_init();
     return true;
@@ -79,8 +77,4 @@ bool SipSingleton::init(const char* local_ip,const char* local_port,
     sip_init();
     return true;
 }
-
-
-
-
 
