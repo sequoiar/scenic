@@ -283,7 +283,8 @@ int sip_init()
 unsigned int sip_handle_events(void)
 {
     unsigned int count;
-    pjsip_endpt_handle_events2(sip_endpt, NULL,&count);
+    // has a queue of events
+    pjsip_endpt_handle_events2(sip_endpt, NULL,&count);     
     return count;
 }
 
