@@ -3,34 +3,35 @@
 
 class SipSingleton
 {
-public:
-    static SipSingleton* Instance();
+    public:
+        static SipSingleton* Instance();
 
-    //called inside pjsip rx_request 
-    //must return pchar to desired response
-    // Incoming data -> char* response
-    const char *rx_req(const char *msg, unsigned int len);
-    
-    //called inside pjsip rx_response
-    void rx_res(const char *msg, unsigned int len);
+        //called inside pjsip rx_request 
+        //must return pchar to desired response
+        // Incoming data -> char* response
+        const char *rx_req(const char *msg, unsigned int len);
 
-    void send_request(const char* msg);
+        //called inside pjsip rx_response
+        void rx_res(const char *msg, unsigned int len);
 
-    int handle_events(void);
+        void send_request(const char* msg);
 
-    bool init(int argc, char* argv[]);
+        int handle_events(void);
 
-    bool init(const char* local_ip,const char* local_port,
-              const char* remote_ip, const char* remote_port);
+        bool init(int argc, char* argv[]);
 
-    void set_service_port(int p){port=p;}
-private:
-    SipSingleton(){};
+        bool init(const char* local_ip,const char* local_port,
+                const char* remote_ip, const char* remote_port);
 
-    char service[32];
-    int port;
+        void set_service_port(int p){port=p;}
 
-    static SipSingleton *s;
+    private:
+        SipSingleton(){};
+
+        char service[32];
+        int port;
+
+        static SipSingleton *s;
 };
 
 #endif
