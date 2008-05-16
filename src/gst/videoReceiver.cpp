@@ -8,7 +8,6 @@
 
 VideoReceiver::VideoReceiver(int port) : port_(port < 1000 ? 5060 : port)
 {
-    init();
 }
 
 

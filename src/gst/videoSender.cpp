@@ -9,9 +9,16 @@
 
 #include "videoSender.h"
 
-#define DV 1        // if set to 0, a test src will be used instead of dv1394
+#define DV 0        // if set to 0, a test src will be used instead of dv1394
 
 VideoSender::VideoSender(int port) : port_(port < 1000 ? 5060 : port)
+{
+    // empty
+}
+
+
+
+void VideoSender::init() 
 {
     //  Create sender pipeline
 #if DV
