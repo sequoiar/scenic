@@ -23,24 +23,21 @@ class SipSingleton
     bool init(const char* local_ip,const char* local_port,
                 const char* remote_ip, const char* remote_port);
 
-    void set_service_port(int p){port=p;}
+    void set_service_port(int p){port_=p;}
 
-    void zero_rx_port(){rx_port = 0;}
+    void zero_rx_port(){rx_port_ = 0;}
 
-    int get_rx_port(){return rx_port;}
-    int get_tx_port(){return port;}
-    char* get_service(){return service;}
+    int get_rx_port(){return rx_port_;}
+    int get_tx_port(){return port_;}
+    char* get_service(){return service_;}
 private:
-    SipSingleton():port(0),rx_port(0){};
+    SipSingleton():port_(0),rx_port_(0){};
         
 
-        void set_service_port(int p) { port_ = p; }
 
-    private:
-        SipSingleton(){};
 
         char service_[32];
-        int port_,rx_port;
+        int port_,rx_port_;
 
         static SipSingleton *s_;
 };
