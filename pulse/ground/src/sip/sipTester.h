@@ -14,6 +14,8 @@ class SipTester
         
         // some tests
         void create_session();
+        
+        void create_req_session();
 
         void send_messages();
     

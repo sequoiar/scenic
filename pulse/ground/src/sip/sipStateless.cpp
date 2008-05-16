@@ -52,41 +52,11 @@ static int code = PJSIP_SC_NOT_IMPLEMENTED;
 /* Additional header list */
 struct pjsip_hdr hdr_list;
 
-#if 0
-class sip_singleton
-{
-public:
-    static sip_singleton* Instance();
-    char *rx_req(void *data,unsigned int len )
-    {
-        return NULL;
-    };
-    void rx_res(void *data,unsigned int len ) {};
-protected:
-    sip_singleton(){};
-
-
-    // Incomming data -> char* response
-    static sip_singleton *s;
-};
-
-sip_singleton* sip_singleton::s = 0;
-sip_singleton* sip_singleton::Instance()
-{
-    if (s == 0)
-        s = new sip_singleton();
-
-    return s;
-
-}
-#endif
-
 /* Callback to handle response to our request */
 static pj_bool_t on_rx_response(pjsip_rx_data *rdata)
 {
     SipSingleton *sip = SipSingleton::Instance();
-    //    if (rdata->msg_info.msg->line.req.method.id == PJSIP_OTHER_METHOD)
-    //{
+
     if (rdata->msg_info.msg->body != NULL)
     {
         PJ_LOG(3,(__FILE__, "response body:%s",
@@ -94,7 +64,7 @@ static pj_bool_t on_rx_response(pjsip_rx_data *rdata)
         sip->rx_res((const char*)rdata->msg_info.msg->body->data,
                     rdata->msg_info.msg->body->len);
     }
-    //}
+
     return PJ_TRUE;
 }
 
@@ -177,7 +147,6 @@ void send_request(const char *str)
 }
 
 
-
 /*
  * main()
  *
@@ -245,7 +214,7 @@ int sip_init()
         addr.sin_addr.s_addr = 0;
         addr.sin_port = pj_htons(atoi(from_port));
 
-        status = pjsip_udp_transport_start( sip_endpt, &addr, NULL, 1, NULL);
+        status = pjsip_udp_transport_start(sip_endpt, &addr, NULL, 1, NULL);
         assert(status == PJ_SUCCESS);
     }
 #endif
@@ -288,6 +257,11 @@ unsigned int sip_handle_events(void)
     return count;
 }
 
+void sip_set_local(const char* port)
+{
+    strcpy(from_port, port);
+}
+
 void sip_set_local(const char* host, const char* port)
 {
     strcpy(from_addr,host);
@@ -298,38 +272,38 @@ void sip_set_remote(const char* host, const char* port)
 {
     strcpy(to_addr,host);
     strcpy(to_port,port);
-
 }
 
 
+#if 0
 int sip_pass_args(int argc, char *argv[])
 {
 
     switch (argc)
     {
-    case 5:         // 4 args
-        strcpy(from_addr,argv[1]);
-        strcpy(to_port,argv[4]);
-        strcpy(to_addr,argv[3]);
-        strcpy(from_port,argv[2]);
-        break;
+        case 5:         // 4 args
+            strcpy(from_addr,argv[1]);
+            strcpy(to_port,argv[4]);
+            strcpy(to_addr,argv[3]);
+            strcpy(from_port,argv[2]);
+            break;
 
-    case 1:         // no args
-        std::cerr << "Usage: " << std::endl
-        << "sipStateless <fromIP> <fromPort> <toIP> <toPort>"
-        << std::endl
-        << "or" << std::endl
-        << "sipStateless <listenPort>"
-        << std::endl;
-        return -1;
-
-    default:        // 1 or more args (but not 4)
-        to_port[0] = 0;
-        strcpy(from_port,argv[1]);
-        break;
+        case 2:        // 1 or more args (but not 4)
+            to_port[0] = 0;
+            strcpy(from_port, argv[1]);
+            break;
+        
+        default:         // no args
+            std::cerr << "Usage: " << std::endl
+                << "sipStateless <fromIP> <fromPort> <toIP> <toPort>"
+                << std::endl
+                << "or" << std::endl
+                << "sipStateless <listenPort>"
+                << std::endl;
+            return -1;
     }
 
     return 0;
 }
-
+#endif
 

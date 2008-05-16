@@ -8,8 +8,15 @@ int main(int argc, char *argv[])
     SipSingleton &sip = *SipSingleton::Instance();
 
     SipTester client(sip);
-    client.create_session();
-    client.send_messages();
+
+    if (argc > 1)           //  any arg will do
+    {
+        client.create_req_session();
+        client.send_messages();
+    }
+    else
+        client.create_session();
+
 
     for (;;)
     {
