@@ -8,13 +8,13 @@
 class VideoSender
 {
     public:
-        VideoSender(int port = DEF_PORT);
+        VideoSender();
         ~VideoSender();
+        void init(int port = DEF_PORT);
         void start();
         void stop();
 
     private:
-        void init();
         void initDv();
         void initTest();
 
