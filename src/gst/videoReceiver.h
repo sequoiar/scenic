@@ -8,7 +8,7 @@
 class VideoReceiver
 {
     public:
-        VideoReceiver(int port);
+        VideoReceiver(int port = DEF_PORT);
         ~VideoReceiver();
         void start();
         void stop();
@@ -17,6 +17,7 @@ class VideoReceiver
         void init();
 
         int port_;
+        static const int DEF_PORT;
         GstElement *pipeline_;
 };
 
