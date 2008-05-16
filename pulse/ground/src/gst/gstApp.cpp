@@ -84,9 +84,11 @@ void gst_main(int argc, char *argv[])
         {
             if(!strcmp(sip.get_service(),"h264.1"))
             {
+                
                 tx.init(sip.get_service_port());
                 tx.start();
                 sip.zero_service_port();
+                sip.zero_service_desc();
             }
 
             if(sip.get_rx_port())

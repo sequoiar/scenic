@@ -27,6 +27,7 @@ public:
     int get_service_port(){return service_port_;}
 
     void zero_service_port(){service_port_ = 0;}
+    void zero_service_desc(){service_[0] = 0;}
 
     int get_rx_port(){return rx_port_;}
     char* get_service(){return service_;}
