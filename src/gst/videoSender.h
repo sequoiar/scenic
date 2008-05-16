@@ -13,6 +13,7 @@ class VideoSender
         void init(int port = DEF_PORT);
         void start();
         void stop();
+        int port() const { return port_; }
 
     private:
         void initDv();

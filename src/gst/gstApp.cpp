@@ -2,14 +2,13 @@
 
 //#include "gst_sip_rtp.h"
 #include <iostream>
+#include <cassert>
 #include <gst/gst.h>
 
 #include "../sip/sipSingleton.h"
 
 #include "videoReceiver.h"
 #include "videoSender.h"
-
-
 
 
 
@@ -33,10 +32,16 @@ int eventLoop()
     std::cout << "Hit any key and <cr> to exit." << std::endl << std::endl;
     char c;
     std::cin >> c;
-    if (c == 'q')
-        return -1;
-    if (c == 'r')
-        return 1;
+
+    switch(c)
+    {
+        case 'q':
+            exit(-1);       // FIXME: should quit gracefully
+        
+        case 'r':
+            SipSingleton::Instance()->send_request("h264.1");
+            break;
+    }
 
     return 0;
 }
@@ -65,7 +70,7 @@ void gst_main(int argc, char *argv[])
     
     sip.set_service_port(rxPort);
 
-    sip.init(argv[1],argv[2],argv[3],argv[4]);
+    sip.init(argv[1], argv[2], argv[3],argv[4]);
 //    sip.init("192.168.1.164","5060","192.168.1.164","5061");
 
     // init gstreamer
@@ -83,23 +88,18 @@ void gst_main(int argc, char *argv[])
                 tx.start();
                 sip.zero_rx_port();
             }
+
             if(sip.get_rx_port())
             {
                 rx.init(sip.get_tx_port());
                 rx.start();
             }
         }
-        switch (eventLoop())
-        {
-            case 0: break;
-            case 1: sip.send_request("h264.1");break;
-            case -1: exit(-1);
 
-            default:;
-        }
+        eventLoop();
     }
 
-    
+
 #if 0
     /*----------------------------------------------*/ 
     //    std::cout.flush();
@@ -130,7 +130,7 @@ int gst_main(int argc, char *argv[])
 
     if (argc == 5)
     {
-//        sip.send_request("h264.1");
+        //        sip.send_request("h264.1");
     }
 
 
