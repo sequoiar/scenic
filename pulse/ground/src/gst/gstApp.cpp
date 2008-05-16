@@ -29,8 +29,6 @@ int eventLoop()
     //while(!done)
     //usleep(10000);
     
-
-
     // Approach 3: Block waiting for character input
     std::cout << "Hit any key and <cr> to exit." << std::endl << std::endl;
     char c;
@@ -47,7 +45,7 @@ int eventLoop()
 void gst_main(int argc, char *argv[])
 {
     long txPort = 15060;
-    long rxPort = 15061;
+    long rxPort = txPort;
    
     VideoSender tx;
     VideoReceiver rx;
