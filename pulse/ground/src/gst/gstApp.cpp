@@ -65,7 +65,8 @@ void gst_main(int argc, char *argv[])
     
     sip.set_service_port(rxPort);
 
-    sip.init("192.168.1.164","5061","192.168.1.164","5060");
+    sip.init(argv[1],argv[2],argv[3],argv[4]);
+//    sip.init("192.168.1.164","5060","192.168.1.164","5061");
 
     // init gstreamer
     gst_init(0, NULL);  // normally should get argc argv
