@@ -1,21 +1,15 @@
 #include <iostream>
 #include "sipSingleton.h"
+#include "sipTester.h"
 
 
 int main(int argc, char *argv[])
 {
     SipSingleton &sip = *SipSingleton::Instance();
 
-    sip.set_service_port(10010);
-
-    if(!sip.init(argc,argv))
-        return -1;
-
-    if (argc == 5)
-    {
-        sip.send_request("h264.1");
-    }
-
+    SipTester client(sip);
+    client.create_session();
+    client.send_messages();
 
     for (;;)
     {
