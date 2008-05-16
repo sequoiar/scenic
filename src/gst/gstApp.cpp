@@ -49,7 +49,7 @@ int eventLoop()
 
 void gst_main(int argc, char *argv[])
 {
-    long txPort = 15060;
+    long txPort = 10060;
     long rxPort = txPort;
    
     VideoSender tx;
@@ -84,14 +84,14 @@ void gst_main(int argc, char *argv[])
         {
             if(!strcmp(sip.get_service(),"h264.1"))
             {
-                tx.init(sip.get_rx_port());
+                tx.init(sip.get_service_port());
                 tx.start();
-                sip.zero_rx_port();
+                sip.zero_service_port();
             }
 
             if(sip.get_rx_port())
             {
-                rx.init(sip.get_tx_port());
+                rx.init(sip.get_service_port());
                 rx.start();
             }
         }
