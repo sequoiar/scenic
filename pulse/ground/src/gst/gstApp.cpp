@@ -87,13 +87,13 @@ void gst_main(int argc, char *argv[])
                 
                 tx.init(sip.get_service_port());
                 tx.start();
-                sip.zero_service_port();
                 sip.zero_service_desc();
             }
 
             if(sip.get_rx_port())
             {
-                rx.init(sip.get_service_port());
+                std::cout << "!!!!!!!!" << sip.get_rx_port() << std::endl;
+                rx.init(sip.get_rx_port());
                 rx.start();
             }
         }
