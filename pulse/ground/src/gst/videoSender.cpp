@@ -11,7 +11,9 @@
 
 #define DV 0        // if set to 0, a test src will be used instead of dv1394
 
-VideoSender::VideoSender(int port) : port_(port < 1000 ? 5060 : port)
+const int VideoSender::DEF_PORT = 10010;
+
+VideoSender::VideoSender(int port) : port_(port < 1000 ? DEF_PORT : port)
 {
     // empty
 }
@@ -91,7 +93,8 @@ void VideoSender::initTest()
 VideoSender::~VideoSender()
 {
     stop();
-    gst_object_unref(GST_OBJECT(pipeline_));
+    if (pipeline_)
+        gst_object_unref(GST_OBJECT(pipeline_));
 }
 
 

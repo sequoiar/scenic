@@ -8,7 +8,7 @@
 class VideoSender
 {
     public:
-        VideoSender(int port);
+        VideoSender(int port = DEF_PORT);
         ~VideoSender();
         void start();
         void stop();
@@ -19,6 +19,7 @@ class VideoSender
         void initTest();
 
         int port_;
+        static const int DEF_PORT;
         GstElement *pipeline_;
 };
 

@@ -6,7 +6,9 @@
 
 #include "videoReceiver.h"
 
-VideoReceiver::VideoReceiver(int port) : port_(port < 1000 ? 5060 : port)
+const int VideoReceiver::DEF_PORT = 10010;
+
+VideoReceiver::VideoReceiver(int port) : port_(port < 1000 ? DEF_PORT : port)
 {
 }
 
