@@ -8,14 +8,19 @@
 
 const int VideoReceiver::DEF_PORT = 10010;
 
-VideoReceiver::VideoReceiver(int port) : port_(port < 1000 ? DEF_PORT : port)
+VideoReceiver::VideoReceiver()
 {
 }
 
 
 
-void VideoReceiver::init()
+void VideoReceiver::init(int port)
 {
+    if (port < 1000)
+        port_ = DEF_PORT;
+    else
+        port_ = port;
+
     //  Create receiver pipeline
     GstElement *rxSrc, *ffdec_h264, *rtph264depay, *rxSink;
     GstCaps *caps;

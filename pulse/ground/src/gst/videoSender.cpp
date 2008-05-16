@@ -13,15 +13,20 @@
 
 const int VideoSender::DEF_PORT = 10010;
 
-VideoSender::VideoSender(int port) : port_(port < 1000 ? DEF_PORT : port)
+VideoSender::VideoSender() 
 {
     // empty
 }
 
 
 
-void VideoSender::init() 
+void VideoSender::init(int port) 
 {
+    if (port < 1000)
+        port_ = DEF_PORT;
+    else
+        port_ = port;
+
     //  Create sender pipeline
 #if DV
     initDv();
