@@ -14,6 +14,7 @@ class VideoSender
         void stop();
 
     private:
+        void init();
         void initDv();
         void initTest();
 
