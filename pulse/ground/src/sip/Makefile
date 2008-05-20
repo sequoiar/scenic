@@ -9,7 +9,9 @@ include $(PJBASE)/build.mak
 BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
 
-OBJS=sipStateless.o sipSingleton.o sipMain.o sipTester.o
+OBJS=sipStateless.o sipSingleton.o 
+MAINOBJS=$(OBJS) sipMain.o
+TESTOBJS=$(OBJS) sipTestSuite.o
 
 
 GST_CFLAGS=$(shell pkg-config --cflags gstreamer-0.10)
@@ -29,8 +31,11 @@ CPPFLAGS = $(CFLAGS)
 %.o: %.cpp
 	$(CPP_CC) $(CPPFLAGS) -c $(<) -o $@
 
-$(APPLICATION): $(OBJS)
-	$(CPP_CC) $(OBJS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
+$(APPLICATION): $(MAINOBJS)
+	$(CPP_CC) $(MAINOBJS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
+
+tests : $(TESTOBJS)
+	$(CPP_CC) $(TESTOBJS) `pkg-config libcpptest --libs --cflags` -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
 
 all: $(APPLICATION)
 

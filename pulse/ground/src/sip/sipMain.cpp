@@ -1,12 +1,12 @@
 #include <iostream>
 #include "sipSingleton.h"
-#include "sipTester.h"
 
 
 int main(int argc, char *argv[])
 {
     SipSingleton &sip = *SipSingleton::Instance();
 
+#if 0    
     SipTester client(sip);
 
     if (argc > 1)           //  any arg will do
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     else
         client.create_session();
 
-
+#endif
     for (;;)
     {
         static int eventCount;
