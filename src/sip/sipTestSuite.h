@@ -4,6 +4,7 @@
 #define _SIP_TEST_SUITE_H_
 
 #include <cpptest.h>
+#include "sipSingleton.h"
 
 class SipTestSuite : public Test::Suite
 {
@@ -11,8 +12,8 @@ class SipTestSuite : public Test::Suite
 
         SipTestSuite()
         {
-            TEST_ADD(SipTestSuite::first_test)
-            TEST_ADD(SipTestSuite::second_test)
+            TEST_ADD(SipTestSuite::init_test)
+            TEST_ADD(SipTestSuite::instance_test)
         }
         
         // some tests
@@ -26,10 +27,15 @@ class SipTestSuite : public Test::Suite
     private:
         SipSingleton &sip;
 #endif
+    protected:
+        virtual void setup();       // setup resources common to all tests  
+        virtual void tear_down();   // destroy common resources
 
     private:
-        void first_test();        
-        void second_test();
+        SipSingleton *sip_;
+        void instance_test();        
+        void init_test();
+
 };
 
 #endif // _SIP_TESTER_H_
