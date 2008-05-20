@@ -31,6 +31,8 @@ int eventLoop()
     
     // Approach 3: Block waiting for character input
     std::cout << "Hit r and <cr> to send a request." << std::endl << std::endl;
+    std::cout << "Hit any key and <cr> to accept a request." 
+              << std::endl << std::endl;
     char c;
     std::cin >> c;
 
@@ -99,7 +101,6 @@ void gst_main(int argc, char *argv[])
 
             if(sip.get_rx_port())
             {
-                std::cout << "!!!!!!!!" << sip.get_rx_port() << std::endl;
                 rx.init(sip.get_rx_port());
                 sip.zero_rx_port();
                 rx.start();

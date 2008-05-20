@@ -59,15 +59,17 @@ static int code = PJSIP_SC_NOT_IMPLEMENTED;
 /* Additional header list */
 struct pjsip_hdr hdr_list;
 
-/* Callback to handle response to our request */
-static pj_bool_t on_rx_response(pjsip_rx_data *rdata)
-{
+/* Callback to handle response to our request */ 
+static pj_bool_t on_rx_response(pjsip_rx_data *rdata) 
+{ 
     SipSingleton *sip = SipSingleton::Instance();
 
     if (rdata->msg_info.msg->body != NULL)
     {
+#if 0
         PJ_LOG(3,(__FILE__, "response body:%s",
                   rdata->msg_info.msg->body->data));
+#endif 
         sip->rx_res((const char*)rdata->msg_info.msg->body->data,
                     rdata->msg_info.msg->body->len);
     }
@@ -99,8 +101,10 @@ static pj_bool_t on_rx_request(pjsip_rx_data *rdata)
 
             body = pjsip_msg_body_create(pool, &t, &s, &data);
 
+#if 0
             PJ_LOG(3,(__FILE__, "request body:%s",
                       rdata->msg_info.msg->body->data));
+#endif
 
             pjsip_endpt_respond_stateless(sip_endpt, rdata, 200, NULL,
                                           &hdr_list, body);
@@ -182,7 +186,8 @@ int sip_init()
     };
     pj_status_t status;
 
-
+    // set log level
+    pj_log_set_level(0);
 
     /* Must init PJLIB first: */
     status = pj_init();
@@ -230,7 +235,7 @@ int sip_init()
     }
 #endif
 
-#if HAS_TCP_TRANSPORT
+#if 0 && HAS_TCP_TRANSPORT
     /*
      * Add TCP transport, with hard-coded port
      */
@@ -292,6 +297,19 @@ void sip_set_remote(const char* host, const char* port)
 
 
 
+bool isInetAddress(const char* ip)
+{
+    const char prefix[] = "127";
+    const short prefixLength = strlen(prefix);
+    
+    if(strncmp(ip, prefix, prefixLength) != 0)
+        return true;
+    else 
+        return false;
+}
+
+
+
 void sip_default_local_host()
 {
      int i;
@@ -306,12 +324,13 @@ void sip_default_local_host()
          ifr.ifr_ifindex = i;
          if (ioctl (s, SIOCGIFNAME, &ifr) < 0)
          {
-               if (strncmp(ip, "127", 3) != 0)
-               {
-                   std::cout << "Local host address is: " << ip << std::endl;
-                   strncpy(from_addr, ip, strlen(ip));
-                   break;
-               }
+             if(isInetAddress(ip))
+             {
+                 strncpy(from_addr, ip, strlen(ip));
+                 std::cout << "Local host address is: " << from_addr 
+                           << std::endl;
+                 break;
+             }
          }
 
          /* now ifr.ifr_name is set */
@@ -323,6 +342,8 @@ void sip_default_local_host()
 
      close(s);
 }
+
+
 
 #if 0
 int sip_pass_args(int argc, char *argv[])
