@@ -1,23 +1,40 @@
 
 #include <cpptest.h>
 #include "sipTestSuite.h"
+#include "sipSingleton.h"
+#include "../gst/defaultAddresses.h"
 
-void SipTestSuite::first_test()
+void SipTestSuite::setup()
 {
-    TEST_ASSERT(1 + 1 == 2);
-
+    sip_ = SipSingleton::Instance();
 }
 
 
 
-void SipTestSuite::second_test()
+
+void SipTestSuite::tear_down()
 {
-    TEST_ASSERT_DELTA(0.5, 0.7, 0.3);
+    // empty
 }
 
 
 
-int main()
+void SipTestSuite::init_test()
+{
+    sip_->init(MY_ADDRESS, "5060", THEIR_ADDRESS, "5061");
+//    TEST_ASSERT(sip_ != 0);
+}
+
+
+
+void SipTestSuite::instance_test()
+{
+    TEST_ASSERT(SipSingleton::Instance() != 0);
+}
+
+
+
+int main(int argc, char** argv)
 {
     SipTestSuite sts;
     Test::TextOutput output(Test::TextOutput::Verbose);
