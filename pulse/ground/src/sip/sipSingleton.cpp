@@ -10,7 +10,7 @@ const char* SipSingleton::rx_req(const char *data, unsigned int len)
 {
     static char ser[16];
     static char p[8];
-    std::cerr << "rx_request: " ;
+    std::cerr << __FILE__ << ": rx_request: " ;
     std::cerr.write(data, len);
     std::cerr << std::endl;
     sscanf(data,"%s", ser);
@@ -35,9 +35,10 @@ const char* SipSingleton::rx_req(const char *data, unsigned int len)
 
 void SipSingleton::rx_res(const char *data, unsigned int len) 
 {
-    std::cerr << "rx_response:" ;
+    std::cerr << __FILE__ << ": rx_response:" ;
     std::cerr.write(data,len);
     std::cerr << std::endl;
+    
     rx_port_ = atoi(data);
 }
 

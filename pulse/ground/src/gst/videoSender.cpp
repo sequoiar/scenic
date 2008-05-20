@@ -9,7 +9,7 @@
 
 #include "videoSender.h"
 
-#define DV 0        // if set to 0, a test src will be used instead of dv1394
+#define DV 1        // if set to 0, a test src will be used instead of dv1394
 
 const int VideoSender::DEF_PORT = 10010;
 

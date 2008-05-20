@@ -1,5 +1,5 @@
 SHELL=/bin/sh
-APPLICATION=sipStateless
+APPLICATION=sipStateless 
 
 include ../base.mak
 
