@@ -25,10 +25,10 @@ LDLIBS = $(APP_LDLIBS)
 CFLAGS = $(APP_CFLAGS)
 CPPFLAGS = $(CFLAGS)
 
-%.o: %.c 
+%.o: %.c ../sip/%.o
 	$(CC) $(CPPFLAGS) -c $(<) -o $@
 
-%.o: %.cpp %.h
+%.o: %.cpp %.h ../sip/%.o 
 	$(CPP_CC) $(CPPFLAGS) -c $(<) -o $@
 
 $(APPLICATION): $(OBJS)
@@ -37,7 +37,7 @@ $(APPLICATION): $(OBJS)
 all: $(APPLICATION)
 
 tags: $(OBJS)
-	ctags *.c *.cpp *.h
+	ctags *.c *.cpp *.h ../sip/*.c ../sip/*.cpp ../sip/*.h
 
 .PHONY: clean
 clean:

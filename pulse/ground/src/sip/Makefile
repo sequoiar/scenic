@@ -35,7 +35,7 @@ $(APPLICATION): $(OBJS)
 all: $(APPLICATION)
 
 tags: $(OBJS)
-	ctags *.c *.cpp *.h
+	ctags *.c *.cpp *.h ../gst/*.c ../gst/*.cpp ../gst/*.h
 
 .PHONY: clean
 clean:

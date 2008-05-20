@@ -10,6 +10,7 @@
 #include "videoReceiver.h"
 #include "videoSender.h"
 
+#include "defaultAddresses.h"
 
 
 int eventLoop()
@@ -29,14 +30,14 @@ int eventLoop()
     //usleep(10000);
     
     // Approach 3: Block waiting for character input
-    std::cout << "Hit any key and <cr> to exit." << std::endl << std::endl;
+    std::cout << "Hit r and <cr> to send a request." << std::endl << std::endl;
     char c;
     std::cin >> c;
 
     switch(c)
     {
         case 'q':
-            exit(-1);       // FIXME: should quit gracefully
+            exit(-1);       // FIXME: should rather quit gracefully
         
         case 'r':
             SipSingleton::Instance()->send_request("h264.1");
@@ -70,8 +71,10 @@ void gst_main(int argc, char *argv[])
     
     sip.set_service_port(rxPort);
 
-    sip.init(argv[1], argv[2], argv[3],argv[4]);
-//    sip.init("192.168.1.164","5060","192.168.1.164","5061");
+    if (argc == 5)
+        sip.init(argv[1], argv[2], argv[3],argv[4]);
+    else
+        sip.init(MY_ADDRESS, "5060", THEIR_ADDRESS, "5061");
 
     // init gstreamer
     gst_init(0, NULL);  // normally should get argc argv
