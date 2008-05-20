@@ -9,5 +9,6 @@ void send_request(const char *str);
 
 void  sip_set_local(const char* host, const char* port);
 void  sip_set_local(const char* port);
+void  sip_default_local_host();   
 void  sip_set_remote(const char* host, const char* port);
 #endif

@@ -28,6 +28,13 @@
 #include <iostream>
 #include <cassert>
 
+// includes to get local ip address
+
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
 #include <pjsip.h>
 #include <pjlib-util.h>
 #include <pjlib.h>
@@ -67,6 +74,7 @@ static pj_bool_t on_rx_response(pjsip_rx_data *rdata)
 
     return PJ_TRUE;
 }
+
 
 
 /* Callback to handle incoming requests. */
@@ -124,6 +132,9 @@ void send_request(const char *str)
     sprintf(target, "sip:someuser@%s:%s", to_addr, to_port);
     sprintf(from, "\"Local User\" <sip:localuser@%s:%s>", from_addr, from_port);
     sprintf(to, "\"Remote User\" <sip:remoteuser@%s:%s>", to_addr,to_port);
+
+    std::cout << "Sending request from " << from << std::endl;
+    std::cout << "To " << to << std::endl;
 
     {
         pj_str_t str_target = pj_str(target);
@@ -221,7 +232,7 @@ int sip_init()
 
 #if HAS_TCP_TRANSPORT
     /*
-     * Add UDP transport, with hard-coded port
+     * Add TCP transport, with hard-coded port
      */
     {
         pj_sockaddr_in addr;
@@ -264,6 +275,7 @@ unsigned int sip_handle_events(void)
 void sip_set_local(const char* port)
 {
     strcpy(from_port, port);
+    sip_default_local_host();   // gets IP from this machine
 }
 
 void sip_set_local(const char* host, const char* port)
@@ -278,6 +290,39 @@ void sip_set_remote(const char* host, const char* port)
     strcpy(to_port,port);
 }
 
+
+
+void sip_default_local_host()
+{
+     int i;
+     int s = socket (PF_INET, SOCK_STREAM, 0);
+
+     for (i = 1; ; i++)
+     {
+         struct ifreq ifr;
+         struct sockaddr_in *sin = (struct sockaddr_in *) &ifr.ifr_addr;
+         char *ip;
+
+         ifr.ifr_ifindex = i;
+         if (ioctl (s, SIOCGIFNAME, &ifr) < 0)
+         {
+               if (strncmp(ip, "127", 3) != 0)
+               {
+                   std::cout << "Local host address is: " << ip << std::endl;
+                   strncpy(from_addr, ip, strlen(ip));
+                   break;
+               }
+         }
+
+         /* now ifr.ifr_name is set */
+         if (ioctl (s, SIOCGIFADDR, &ifr) < 0)
+             continue;
+
+         ip = inet_ntoa(sin->sin_addr);
+     }
+
+     close(s);
+}
 
 #if 0
 int sip_pass_args(int argc, char *argv[])
@@ -296,7 +341,7 @@ int sip_pass_args(int argc, char *argv[])
             to_port[0] = 0;
             strcpy(from_port, argv[1]);
             break;
-        
+
         default:         // no args
             std::cerr << "Usage: " << std::endl
                 << "sipStateless <fromIP> <fromPort> <toIP> <toPort>"
