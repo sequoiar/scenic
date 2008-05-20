@@ -50,7 +50,7 @@ int eventLoop()
 
 void gst_main(int argc, char *argv[])
 {
-    long txPort = 10060;
+    long txPort = 10010;
     long rxPort = txPort;
    
     VideoSender tx;
@@ -74,7 +74,10 @@ void gst_main(int argc, char *argv[])
     if (argc == 5)
         sip.init(argv[1], argv[2], argv[3],argv[4]);
     else
+    {
+        std::cout << "Using default args." << std::endl;
         sip.init(MY_ADDRESS, "5060", THEIR_ADDRESS, "5061");
+    }
 
     // init gstreamer
     gst_init(0, NULL);  // normally should get argc argv
@@ -83,12 +86,13 @@ void gst_main(int argc, char *argv[])
     for(;;)
     {
         std::cout << "inloop" << std::endl;
+
         if(sip.handle_events())
         {
-            if(!strcmp(sip.get_service(),"h264.1"))
+            if(!strcmp(sip.get_service(), "h264.1"))
             {
                 
-                tx.init(sip.get_service_port());
+                tx.init(sip.get_service_port(), std::string(MY_ADDRESS));
                 tx.start();
                 sip.zero_service_desc();
             }

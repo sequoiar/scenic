@@ -20,12 +20,14 @@ VideoSender::VideoSender()
 
 
 
-void VideoSender::init(int port) 
+void VideoSender::init(const int port, const std::string addr) 
 {
     if (port < 1000)
         port_ = DEF_PORT;
     else
         port_ = port;
+
+    remoteHost_ = std::string(addr);
 
     //  Create sender pipeline
 #if DV
@@ -44,10 +46,10 @@ void VideoSender::initDv()
                                   queue ! dvdec ! ffmpegcolorspace \
                                   ! x264enc bitrate=12000 byte-stream=true \
                                   threads=4 ! rtph264pay ! \
-                                  udpsink host=localhost port = "; 
+                                  udpsink host="; 
                                   
     std::stringstream istream;
-    istream << port_;           
+    istream << remoteHost_ << " port = " << port_;           
     launchStr += istream.str();     // get port number into launch string
     launchStr += " demux. ! queue ! fakesink";
 
@@ -83,7 +85,7 @@ void VideoSender::initTest()
     g_object_set(G_OBJECT(x264enc),"byte-stream", TRUE, NULL);
     g_object_set(G_OBJECT(x264enc),"threads", 4, NULL);
     
-    g_object_set(G_OBJECT(txSink), "host", "192.168.1.164", "port", port_, NULL);
+    g_object_set(G_OBJECT(txSink), "host", remoteHost_.c_str(), "port", port_, NULL);
     
 
     gst_bin_add_many(GST_BIN(pipeline_), txSrc, txCsp, x264enc, rtph264pay, 
@@ -106,6 +108,8 @@ VideoSender::~VideoSender()
 
 void VideoSender::start()
 {
+    std::cout << "Sending media on port " << port_ << " to host " << remoteHost_
+        << std::endl;
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
 }
 
