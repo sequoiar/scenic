@@ -38,7 +38,7 @@ private:
     SipSingleton():service_port_(0),rx_port_(0){};
         
     char service_[32];
-    int service_port_,rx_port_;
+    int service_port_, rx_port_;
 
     static SipSingleton *s_;
 };
