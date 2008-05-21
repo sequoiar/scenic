@@ -34,6 +34,7 @@ bool VideoSender::init(const int port, const std::string addr, const std::string
     remoteHost_ = std::string(addr);
 
     //  Create sender pipeline
+    //  TODO: should these be subclasses of VideoSender?
     if (!service.compare("dv"))
     {
             initDv();

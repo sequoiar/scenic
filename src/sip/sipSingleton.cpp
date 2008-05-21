@@ -15,13 +15,18 @@ const char* SipSingleton::rx_req(const char *data, unsigned int len)
     std::cerr << std::endl;
     sscanf(data,"%s", ser);
 
-    strcpy(service_, ser);
+    //std::string temp(ser);
 
-    std::cerr << ser << " port:" << service_port_ << std::endl;
+    if (isValidService(std::string(ser)))
+    {
+        strcpy(service_, ser);
 
-    sprintf(p, "%d", service_port_);
-    if(!strcmp(ser,"h264.1") || !strcmp(ser, "dv") || !strcmp(ser, "test"))
+        std::cerr << ser << " port:" << service_port_ << std::endl;
+
+        sprintf(p, "%d", service_port_);
+
         return p;
+    }
 
     if (!strncmp(data,"Hello",5))
     {
@@ -32,6 +37,15 @@ const char* SipSingleton::rx_req(const char *data, unsigned int len)
 }
 
 
+
+bool SipSingleton::isValidService(std::string ser)
+{
+    if(!ser.compare("h264.1") || !ser.compare("dv") 
+            || !ser.compare("test"))
+        return true;
+    else
+        return false;
+}
 
 void SipSingleton::rx_res(const char *data, unsigned int len) 
 {
@@ -61,7 +75,7 @@ void SipSingleton::send_request(const char* msg)
 
 
 
-int SipSingleton::handle_events(void)
+int SipSingleton::handle_events()
 {
     return ::sip_handle_events();
 }

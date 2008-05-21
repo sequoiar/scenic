@@ -1,6 +1,8 @@
 #ifndef _SIP_SINGLETON_H_
 #define _SIP_SINGLETON_H_
 
+#include <string>
+
 class SipSingleton
 {
 
@@ -17,12 +19,14 @@ public:
 
     void send_request(const char* msg);
 
-    int handle_events(void);
+    int handle_events();
 
     bool init(const char* local_port);
 
     bool init(const char* local_ip,const char* local_port,
             const char* remote_ip, const char* remote_port);
+
+    bool isValidService(std::string service);
 
     void set_service_port(int p) {service_port_ = p;}
     int get_service_port() {return service_port_;}
@@ -32,7 +36,7 @@ public:
 
     int get_rx_port(){ return rx_port_; }
     void zero_rx_port(){ rx_port_ = 0; }
-    char* get_service(){ return service_; }
+    char* get_service() { return service_; }
 
 private:
     SipSingleton():service_port_(0),rx_port_(0){};
