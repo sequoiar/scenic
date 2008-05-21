@@ -9,18 +9,16 @@
 
 #include "videoSender.h"
 
-#define DV 1        // if set to 0, a test src will be used instead of dv1394
-
 const int VideoSender::DEF_PORT = 10010;
 
-VideoSender::VideoSender() 
+VideoSender::VideoSender() : isPlaying_(false)
 {
     // empty
 }
 
 
 
-void VideoSender::init(const int port, const std::string addr) 
+bool VideoSender::init(const int port, const std::string addr, const std::string service) 
 {
     if (port < 1000)
         port_ = DEF_PORT;
@@ -30,11 +28,21 @@ void VideoSender::init(const int port, const std::string addr)
     remoteHost_ = std::string(addr);
 
     //  Create sender pipeline
-#if DV
-    initDv();
-#else
-    initTest();
-#endif
+    if (!service.compare("dv"))
+    {
+            initDv();
+            return true;
+    }
+    else if (!service.compare("test"))
+    {
+            initTest();
+            return true;
+    }
+    else
+    {
+        std::cout << "Invalid service type." << std::endl;
+        return false;
+    }
 }
 
 
@@ -111,6 +119,7 @@ void VideoSender::start()
     std::cout << "Sending media on port " << port_ << " to host " << remoteHost_
         << std::endl;
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
+    isPlaying_ = true;
 }
 
 
@@ -118,4 +127,12 @@ void VideoSender::start()
 void VideoSender::stop()
 {
     gst_element_set_state(pipeline_, GST_STATE_NULL);
+    isPlaying_ = false;
+}
+
+
+
+bool VideoSender::isPlaying()
+{
+    return isPlaying_;
 }

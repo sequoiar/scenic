@@ -285,8 +285,8 @@ void sip_set_local(const char* port)
 
 void sip_set_local(const char* host, const char* port)
 {
-    strcpy(from_addr,host);
-    strcpy(from_port,port);
+    strcpy(from_addr, host);
+    strcpy(from_port, port);
 }
 
 void sip_set_remote(const char* host, const char* port)

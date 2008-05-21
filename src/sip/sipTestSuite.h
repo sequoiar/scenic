@@ -14,15 +14,15 @@ class SipTestSuite : public Test::Suite
         {
             TEST_ADD(SipTestSuite::init_test)
             TEST_ADD(SipTestSuite::instance_test)
+            TEST_ADD(SipTestSuite::create_session)
+            TEST_ADD(SipTestSuite::send_messages)
         }
         
         // some tests
 #if 0
-        void create_session();
         
         void create_req_session();
 
-        void send_messages();
     
     private:
         SipSingleton &sip;
@@ -35,7 +35,8 @@ class SipTestSuite : public Test::Suite
         SipSingleton *sip_;
         void instance_test();        
         void init_test();
-
+        void create_session();
+        void send_messages();
 };
 
 #endif // _SIP_TESTER_H_

@@ -17,10 +17,10 @@ const char* SipSingleton::rx_req(const char *data, unsigned int len)
 
     strcpy(service_, ser);
 
-    std::cerr << ser << " port:" << service_port_;
+    std::cerr << ser << " port:" << service_port_ << std::endl;
 
     sprintf(p, "%d", service_port_);
-    if(!strcmp(ser,"h264.1"))
+    if(!strcmp(ser,"h264.1") || !strcmp(ser, "dv") || !strcmp(ser, "test"))
         return p;
 
     if (!strncmp(data,"Hello",5))
