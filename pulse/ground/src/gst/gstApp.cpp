@@ -90,7 +90,7 @@ void gst_main(int argc, char *argv[])
     {
         if(sip.handle_events()) // if events are queued up
         {
-            if(!tx.isPlaying())
+            if(sip.isValidService(sip.get_service()) && !tx.isPlaying())
             {
                 if(tx.init(sip.get_service_port(), std::string(MY_ADDRESS), 
                             sip.get_service()))
