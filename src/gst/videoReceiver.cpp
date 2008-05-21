@@ -4,12 +4,19 @@
 #include <cassert>
 #include <gst/gst.h>
 
+#include "videoBase.h"
 #include "videoReceiver.h"
 
-const int VideoReceiver::DEF_PORT = 10010;
-
-VideoReceiver::VideoReceiver() : isPlaying_(false)
+VideoReceiver::VideoReceiver() : VideoBase()
 {
+    // empty
+}
+
+
+
+VideoReceiver::~VideoReceiver() 
+{
+    // empty
 }
 
 
@@ -56,33 +63,3 @@ bool VideoReceiver::init(int port)
     return true;
 }
 
-
-
-VideoReceiver::~VideoReceiver()
-{
-    stop();
-    gst_object_unref(GST_OBJECT(pipeline_));
-}
-
-
-
-void VideoReceiver::start()
-{
-    gst_element_set_state(pipeline_, GST_STATE_PLAYING);
-    isPlaying_ = true;
-}
-
-
-
-bool VideoReceiver::isPlaying()
-{
-    return isPlaying_;
-}
-
-
-
-void VideoReceiver::stop()
-{
-    gst_element_set_state(pipeline_, GST_STATE_NULL);
-    isPlaying_ = false;
-}

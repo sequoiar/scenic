@@ -7,11 +7,17 @@
 #include <cassert>
 #include <gst/gst.h>
 
+#include "videoBase.h"
 #include "videoSender.h"
 
-const int VideoSender::DEF_PORT = 10010;
+VideoSender::VideoSender() : VideoBase()
+{
+    // empty
+}
 
-VideoSender::VideoSender() : isPlaying_(false)
+
+
+VideoSender::~VideoSender() 
 {
     // empty
 }
@@ -103,36 +109,10 @@ void VideoSender::initTest()
     gst_element_link_many(txSrc, txCsp, x264enc, rtph264pay, txSink, NULL);
 }
 
-
-
-VideoSender::~VideoSender()
-{
-    stop();
-    if (pipeline_)
-        gst_object_unref(GST_OBJECT(pipeline_));
-}
-
-
-
 void VideoSender::start()
 {
     std::cout << "Sending media on port " << port_ << " to host " << remoteHost_
         << std::endl;
-    gst_element_set_state(pipeline_, GST_STATE_PLAYING);
-    isPlaying_ = true;
-}
 
-
-
-void VideoSender::stop()
-{
-    gst_element_set_state(pipeline_, GST_STATE_NULL);
-    isPlaying_ = false;
-}
-
-
-
-bool VideoSender::isPlaying()
-{
-    return isPlaying_;
+    VideoBase::start();
 }
