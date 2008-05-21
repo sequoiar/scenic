@@ -8,14 +8,14 @@
 class VideoBase
 {
     public:
-        VideoBase();
-        virtual ~VideoBase();
         bool isPlaying() { return isPlaying_; }
         virtual void start();
         void stop();
         int port() const { return port_; }
 
     protected:
+        VideoBase();
+        virtual ~VideoBase();
         int port_;
         static const int DEF_PORT;
         GstElement *pipeline_;
