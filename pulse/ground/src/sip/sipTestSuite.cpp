@@ -22,7 +22,6 @@ void SipTestSuite::tear_down()
 void SipTestSuite::init_test()
 {
     sip_->init(MY_ADDRESS, "5060", THEIR_ADDRESS, "5061");
-//    TEST_ASSERT(sip_ != 0);
 }
 
 
@@ -30,6 +29,21 @@ void SipTestSuite::init_test()
 void SipTestSuite::instance_test()
 {
     TEST_ASSERT(SipSingleton::Instance() != 0);
+}
+
+
+
+void SipTestSuite::create_session()
+{
+    sip_->set_service_port(10010);
+    //sip_->init("5061");
+}
+
+
+
+void SipTestSuite::send_messages()
+{
+    sip_->send_request("DV");
 }
 
 
@@ -42,24 +56,11 @@ int main(int argc, char** argv)
 }
 
 #if 0
+
 void SipTester::create_req_session()
 {
     sip.set_service_port(10010);
     sip.init("192.168.1.183","5060","192.168.1.183","5061");
-}
- 
-
-void SipTester::create_session()
-{
-    sip.set_service_port(10010);
-    sip.init("5061");
-}
-
-
-
-void SipTester::send_messages()
-{
-    sip.send_request("h264.1");
 }
 
 #endif 

@@ -8,13 +8,13 @@
 
 const int VideoReceiver::DEF_PORT = 10010;
 
-VideoReceiver::VideoReceiver()
+VideoReceiver::VideoReceiver() : isPlaying_(false)
 {
 }
 
 
 
-void VideoReceiver::init(int port)
+bool VideoReceiver::init(int port)
 {
     if (port < 1000)
         port_ = DEF_PORT;
@@ -39,10 +39,10 @@ void VideoReceiver::init(int port)
 
     rxSink = gst_element_factory_make("xvimagesink", "rxSink");
     assert(rxSink);
-    
+
     gst_bin_add_many(GST_BIN(pipeline_), rxSrc, rtph264depay, 
-                        ffdec_h264, rxSink, NULL); 
- 
+            ffdec_h264, rxSink, NULL); 
+
     caps = gst_caps_new_simple("application/x-rtp", NULL);
     assert(caps);
 
@@ -52,6 +52,8 @@ void VideoReceiver::init(int port)
 
     std::cout << "Receiving media on port : " << port_ << std::endl;
     gst_element_link_many(rxSrc, rtph264depay, ffdec_h264, rxSink, NULL);
+
+    return true;
 }
 
 
@@ -67,6 +69,14 @@ VideoReceiver::~VideoReceiver()
 void VideoReceiver::start()
 {
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
+    isPlaying_ = true;
+}
+
+
+
+bool VideoReceiver::isPlaying()
+{
+    return isPlaying_;
 }
 
 
@@ -74,4 +84,5 @@ void VideoReceiver::start()
 void VideoReceiver::stop()
 {
     gst_element_set_state(pipeline_, GST_STATE_NULL);
+    isPlaying_ = false;
 }

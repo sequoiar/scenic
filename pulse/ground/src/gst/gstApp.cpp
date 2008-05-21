@@ -30,9 +30,11 @@ int eventLoop()
     //usleep(10000);
     
     // Approach 3: Block waiting for character input
-    std::cout << "Hit r and <cr> to send a request." << std::endl << std::endl;
-    std::cout << "Hit any key and <cr> to accept a request." 
-              << std::endl << std::endl;
+    std::cout << "Hit t and <cr> to send testfile." << std::endl;
+    std::cout << "Hit d and <cr> to send dv." << std::endl;
+    std::cout << "Hit a and <cr> to accept a request." << std::endl; 
+    std::cout << "Hit q and <cr> to quit." << std::endl; 
+
     char c;
     std::cin >> c;
 
@@ -43,6 +45,17 @@ int eventLoop()
         
         case 'r':
             SipSingleton::Instance()->send_request("h264.1");
+            break;
+
+        case 'd':
+            SipSingleton::Instance()->send_request("dv");
+            break;
+
+        case 't':
+            SipSingleton::Instance()->send_request("test");
+            break;
+
+        default:
             break;
     }
 
@@ -57,17 +70,6 @@ void gst_main(int argc, char *argv[])
    
     VideoSender tx;
     VideoReceiver rx;
-#if 0
-    if (argc > 2)
-    {
-        txPort = atoi(argv[1]);
-        rxPort = atoi(argv[2]);
-    }
-    else
-        std::cout << "Usage: " << std::endl << 
-                     "gst <sendToPort> <listenToPort>" 
-                     << std::endl << std::endl;
-#endif
     
     SipSingleton &sip = *SipSingleton::Instance();
     
@@ -83,78 +85,36 @@ void gst_main(int argc, char *argv[])
 
     // init gstreamer
     gst_init(0, NULL);  // normally should get argc argv
-//    sip.send_request("h264.1");
     /*----------------------------------------------*/ 
     for(;;)
     {
-        std::cout << "inloop" << std::endl;
-
-        if(sip.handle_events())
+        if(sip.handle_events()) // if events are queued up
         {
-            if(!strcmp(sip.get_service(), "h264.1"))
+            if(!tx.isPlaying())
             {
-                
-                tx.init(sip.get_service_port(), std::string(MY_ADDRESS));
-                tx.start();
-                sip.zero_service_desc();
+                if(tx.init(sip.get_service_port(), std::string(MY_ADDRESS), 
+                            sip.get_service()))
+                {
+                    tx.start();
+                    sip.zero_service_desc();
+                }
             }
 
-            if(sip.get_rx_port())
+
+            if (!rx.isPlaying())
             {
-                rx.init(sip.get_rx_port());
-                sip.zero_rx_port();
-                rx.start();
+                if(sip.get_rx_port())
+                {
+                    if(rx.init(sip.get_rx_port()))
+                    {
+                        sip.zero_rx_port();
+                        rx.start();
+                    }
+                }
             }
         }
 
-        eventLoop();
+        eventLoop();        // sends requests
     }
-
-
-#if 0
-    /*----------------------------------------------*/ 
-    //    std::cout.flush();
-    std::cout << "Sending to port " << txPort << std::endl;
-    std::cout << "Listening to port " << rxPort << std::endl;
-
-    VideoSender tx(txPort);
-    VideoReceiver rx(rxPort);
-
-    tx.start();
-    rx.start();
-
-
-    rx.stop();
-    tx.stop();
-#endif
 }
 
-#if 0
-int gst_main(int argc, char *argv[])
-{
-    SipSingleton &sip = *SipSingleton::Instance();
-
-    sip.set_service_port(10010);
-
-    if(!sip.init(argc,argv))
-        return -1;
-
-    if (argc == 5)
-    {
-        //        sip.send_request("h264.1");
-    }
-
-
-    for (;;)
-    {
-        static int eventCount;
-        std::cout << "here" << std::endl;
-        if (eventCount += sip.handle_events())
-        {
-            std::cout << "HANDLED " << eventCount << " EVENTS " << std::endl;
-        }
-    }
-
-    return 0;
-}
-#endif

@@ -10,13 +10,15 @@ class VideoReceiver
     public:
         VideoReceiver();
         ~VideoReceiver();
-        void init(int port = DEF_PORT);
+        bool init(int port = DEF_PORT);
         void start();
         void stop();
+        bool isPlaying();
         int port() const { return port_; }
 
     private:
         int port_;
+        bool isPlaying_;
         static const int DEF_PORT;
         GstElement *pipeline_;
 };
