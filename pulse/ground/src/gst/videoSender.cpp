@@ -78,7 +78,7 @@ void VideoSender::initTest()
 {
     GstElement *txSrc, *txSink, *txCsp, *x264enc, *rtph264pay;
 
-    pipeline_ = gst_pipeline_new("rxPipeline");
+    pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
 
     txSrc = gst_element_factory_make("videotestsrc", "txSrc");
