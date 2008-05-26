@@ -11,7 +11,8 @@ include $(PJBASE)/build.mak
 BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
 
-OBJS=gst_main.o gstApp.o videoReceiver.o videoSender.o videoBase.o
+OBJS=gst_main.o gstApp.o videoReceiver.o videoSender.o videoBase.o audioBase.o \
+	 audioSender.o
 
 
 GST_CFLAGS=$(shell pkg-config --cflags gstreamer-0.10)
