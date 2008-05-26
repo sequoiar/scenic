@@ -30,8 +30,7 @@ int eventLoop()
     //usleep(10000);
     
     // Approach 3: Block waiting for character input
-    std::cout << "Hit t and <cr> to send testfile." << std::endl;
-    std::cout << "Hit d and <cr> to send dv." << std::endl;
+    std::cout << "Hit r and <cr> to request h264.1." << std::endl;
     std::cout << "Hit a and <cr> to accept a request." << std::endl; 
     std::cout << "Hit q and <cr> to quit." << std::endl; 
 
@@ -47,6 +46,7 @@ int eventLoop()
             SipSingleton::Instance()->send_request("h264.1");
             break;
 
+#if 0
         case 'd':
             SipSingleton::Instance()->send_request("dv");
             break;
@@ -54,6 +54,7 @@ int eventLoop()
         case 't':
             SipSingleton::Instance()->send_request("test");
             break;
+#endif
 
         default:
             break;
@@ -92,8 +93,7 @@ void gst_main(int argc, char *argv[])
         {
             if(sip.isValidService(sip.get_service()) && !tx.isPlaying())
             {
-                if(tx.init(sip.get_service_port(), std::string(MY_ADDRESS), 
-                            sip.get_service()))
+                if(tx.init(sip.get_service_port(), std::string(MY_ADDRESS), "test"))
                 {
                     tx.start();
                     sip.zero_service_desc();

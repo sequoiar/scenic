@@ -24,7 +24,7 @@ VideoSender::~VideoSender()
 
 
 
-bool VideoSender::init(const int port, const std::string addr, const std::string service) 
+bool VideoSender::init(const int port, const std::string addr, const std::string media) 
 {
     if (port < 1000)
         port_ = DEF_PORT;
@@ -35,12 +35,12 @@ bool VideoSender::init(const int port, const std::string addr, const std::string
 
     //  Create sender pipeline
     //  TODO: should these be subclasses of VideoSender?
-    if (!service.compare("dv"))
+    if (!media.compare("dv"))
     {
             initDv();
             return true;
     }
-    else if (!service.compare("test"))
+    else if (!media.compare("test"))
     {
             initTest();
             return true;

@@ -40,8 +40,7 @@ const char* SipSingleton::rx_req(const char *data, unsigned int len)
 
 bool SipSingleton::isValidService(std::string ser)
 {
-    if(!ser.compare("h264.1") || !ser.compare("dv") 
-            || !ser.compare("test"))
+    if(!ser.compare("h264.1"))
         return true;
     else
         return false;
