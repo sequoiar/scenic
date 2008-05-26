@@ -8,9 +8,9 @@
 class VideoBase
 {
     public:
-        bool isPlaying() { return isPlaying_; }
         virtual void start();
         void stop();
+        bool isPlaying();
         int port() const { return port_; }
 
     protected:
@@ -21,7 +21,8 @@ class VideoBase
         GstElement *pipeline_;
 
     private:
-        bool isPlaying_;
+        // FIXME: This info should come directly from pipeline
+        //bool isPlaying_;
 };
 
 #endif // _VIDEO_BASE_H_
