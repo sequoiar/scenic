@@ -18,16 +18,18 @@ AudioBase::~AudioBase()
 
 
 
-void AudioBase::start()
+bool AudioBase::start()
 {
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
+    return isPlaying();
 }
 
 
 
-void AudioBase::stop()
+bool AudioBase::stop()
 {
     gst_element_set_state(pipeline_, GST_STATE_NULL);
+    return !isPlaying();
 }
 
 

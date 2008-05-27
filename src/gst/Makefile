@@ -50,7 +50,7 @@ tags: $(OBJS)
 
 .PHONY: clean
 clean:
-	rm $(OBJS)
+	rm *.o
 	rm $(BINDIR)/$(APPLICATION)
 	rm $(BINDIR)/gstTester
 
