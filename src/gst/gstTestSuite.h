@@ -11,13 +11,16 @@ class GstTestSuite : public Test::Suite
 
         GstTestSuite()
         {
-            TEST_ADD(GstTestSuite::init_test)
-            TEST_ADD(GstTestSuite::start_video)
-            TEST_ADD(GstTestSuite::stop_video)
-            TEST_ADD(GstTestSuite::start_and_stop_video)
-            TEST_ADD(GstTestSuite::start_audio)
-            TEST_ADD(GstTestSuite::stop_audio)
-            TEST_ADD(GstTestSuite::start_and_stop_audio)
+//            TEST_ADD(GstTestSuite::init_test)
+ //           TEST_ADD(GstTestSuite::start_video)
+  //          TEST_ADD(GstTestSuite::stop_video)
+   //         TEST_ADD(GstTestSuite::start_and_stop_video)
+            TEST_ADD(GstTestSuite::start_mono_audio)
+            TEST_ADD(GstTestSuite::stop_mono_audio)
+            TEST_ADD(GstTestSuite::start_and_stop_mono_audio)
+            TEST_ADD(GstTestSuite::start_stereo_audio)
+            TEST_ADD(GstTestSuite::stop_stereo_audio)
+            TEST_ADD(GstTestSuite::start_and_stop_stereo_audio)
         }
         
         // some tests
@@ -31,9 +34,12 @@ class GstTestSuite : public Test::Suite
         void start_video();
         void stop_video();
         void start_and_stop_video();
-        void start_audio();
-        void stop_audio();
-        void start_and_stop_audio();
+        void start_mono_audio();
+        void stop_mono_audio();
+        void start_and_stop_mono_audio();
+        void start_stereo_audio();
+        void stop_stereo_audio();
+        void start_and_stop_stereo_audio();
 };
 
 #endif // _GST_TEST_SUITE_H_
