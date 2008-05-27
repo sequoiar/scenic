@@ -16,13 +16,17 @@ class AudioSender : public AudioBase
         virtual ~AudioSender(); 
         bool init(const int port = DEF_PORT, 
                   const std::string addr = THEIR_ADDRESS,
-                  const std::string media = "test");
+                  const std::string media = "monoTest");
         virtual void start();
 
     private:
-        void initTest();
+        void initMonoTest();
+        void initStereoTest();
+        void initMultiChannelTest();
+        bool connect_audio(); 
 
         std::string remoteHost_;
+        int numChannels_;
 };
 
 #endif // _AUDIO_SENDER_H_

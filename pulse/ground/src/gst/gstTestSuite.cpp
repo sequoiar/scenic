@@ -66,12 +66,12 @@ void GstTestSuite::start_and_stop_video()
 
 
 
-void GstTestSuite::start_audio()
+void GstTestSuite::start_mono_audio()
 {
     char c;
     AudioSender tx;
 
-    tx.init(10010, THEIR_ADDRESS, "test");
+    tx.init(10010, THEIR_ADDRESS, "monoTest");
     tx.start();
     // block
     std::cout << "Enter any key: ";
@@ -80,21 +80,59 @@ void GstTestSuite::start_audio()
 
 
 
-void GstTestSuite::stop_audio()
+void GstTestSuite::stop_mono_audio()
 {
     AudioSender tx;
-    tx.init(10010, THEIR_ADDRESS, "test");
+    tx.init(10010, THEIR_ADDRESS, "monoTest");
     tx.stop();
 }
 
 
 
-void GstTestSuite::start_and_stop_audio()
+void GstTestSuite::start_and_stop_mono_audio()
 {
     char c;
     AudioSender tx;
 
-    tx.init(10010, THEIR_ADDRESS, "test");
+    tx.init(10010, THEIR_ADDRESS, "monoTest");
+    tx.start();
+    // block
+    std::cout << "Enter any key: ";
+    std::cin >> c;
+    tx.stop();
+}
+
+
+
+void GstTestSuite::start_stereo_audio()
+{
+    char c;
+    AudioSender tx;
+
+    tx.init(10010, THEIR_ADDRESS, "stereoTest");
+    tx.start();
+    // block
+    std::cout << "Enter any key: ";
+    std::cin >> c;
+}
+
+
+
+void GstTestSuite::stop_stereo_audio()
+{
+    AudioSender tx;
+    tx.init(10010, THEIR_ADDRESS, "stereoTest");
+    tx.stop();
+}
+
+
+
+void GstTestSuite::start_and_stop_stereo_audio()
+{
+    char c;
+    AudioSender tx;
+
+    tx.init(10010, THEIR_ADDRESS, "stereoTest");
     tx.start();
     // block
     std::cout << "Enter any key: ";
@@ -106,6 +144,7 @@ void GstTestSuite::start_and_stop_audio()
 
 int main(int argc, char** argv)
 {
+    std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
     GstTestSuite tester;
     Test::TextOutput output(Test::TextOutput::Verbose);
     return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;

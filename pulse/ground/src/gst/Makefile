@@ -16,13 +16,17 @@ OBJS=videoReceiver.o videoSender.o videoBase.o audioBase.o \
 APPOBJS=$(OBJS) gst_main.o gstApp.o 
 TESTOBJS=$(OBJS) gstTestSuite.o 
 
-GST_CFLAGS=$(shell pkg-config --cflags gstreamer-0.10)
-GST_LDFLAGS=$(shell pkg-config --libs gstreamer-0.10)
+GST_CFLAGS=-pthread -I/usr/local/include/gstreamer-0.10 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/libxml2 
+GST_LDFLAGS=-pthread -L/usr/local/lib -lgstreamer-0.10 -lgobject-2.0 -lgmodule-2.0 -ldl -lgthread-2.0 -lrt -lxml2 -lglib-2.0  
 
-APP_CFLAGS+=-g -Wall $(GST_CFLAGS) 
+JACK_LDFLAGS=-ljack -lrt
+
+CPPTEST_LDFLAGS=-lcpptest
+
+APP_CFLAGS+=-g -Wall $(GST_CFLAGS) $(JACK_CFLAGS)
 CC	= g++
 CPP_CC  = g++
-LDFLAGS = $(APP_LDFLAGS) $(GST_LDFLAGS)
+LDFLAGS = $(APP_LDFLAGS) $(GST_LDFLAGS) $(JACK_LDFLAGS)
 LDLIBS = $(APP_LDLIBS) 
 CFLAGS = $(APP_CFLAGS)
 CPPFLAGS = $(CFLAGS)
@@ -37,7 +41,7 @@ $(APPLICATION): $(APPOBJS)
 	$(CPP_CC) $(APPOBJS) ../sip/sipSingleton.o ../sip/sipStateless.o -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
 
 tests : $(TESTOBJS)
-	$(CPP_CC) $(TESTOBJS) `pkg-config libcpptest --libs --cflags` -o $(BINDIR)/gstTester $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
+	$(CPP_CC) $(TESTOBJS) $(CPPTEST_LDFLAGS) -o $(BINDIR)/gstTester $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
 					 
 all: $(APPLICATION)
 
@@ -48,4 +52,5 @@ tags: $(OBJS)
 clean:
 	rm $(OBJS)
 	rm $(BINDIR)/$(APPLICATION)
+	rm $(BINDIR)/gstTester
 
