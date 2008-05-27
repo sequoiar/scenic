@@ -8,8 +8,8 @@
 class AudioBase 
 {
     public:
-        virtual void start();
-        void stop();
+        virtual bool start();
+        bool stop();
         bool isPlaying();
         int port() const { return port_; }
 

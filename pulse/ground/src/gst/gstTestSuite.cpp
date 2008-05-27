@@ -72,7 +72,7 @@ void GstTestSuite::start_mono_audio()
     AudioSender tx;
 
     tx.init(10010, THEIR_ADDRESS, "monoTest");
-    tx.start();
+    TEST_ASSERT(tx.start());
     // block
     std::cout << "Enter any key: ";
     std::cin >> c;
@@ -84,7 +84,7 @@ void GstTestSuite::stop_mono_audio()
 {
     AudioSender tx;
     tx.init(10010, THEIR_ADDRESS, "monoTest");
-    tx.stop();
+    TEST_ASSERT(tx.stop());
 }
 
 
@@ -95,11 +95,11 @@ void GstTestSuite::start_and_stop_mono_audio()
     AudioSender tx;
 
     tx.init(10010, THEIR_ADDRESS, "monoTest");
-    tx.start();
+    TEST_ASSERT(tx.start());
     // block
     std::cout << "Enter any key: ";
     std::cin >> c;
-    tx.stop();
+    TEST_ASSERT(tx.stop());
 }
 
 
@@ -110,7 +110,7 @@ void GstTestSuite::start_stereo_audio()
     AudioSender tx;
 
     tx.init(10010, THEIR_ADDRESS, "stereoTest");
-    tx.start();
+    TEST_ASSERT(tx.start());
     // block
     std::cout << "Enter any key: ";
     std::cin >> c;
@@ -122,7 +122,7 @@ void GstTestSuite::stop_stereo_audio()
 {
     AudioSender tx;
     tx.init(10010, THEIR_ADDRESS, "stereoTest");
-    tx.stop();
+    TEST_ASSERT(tx.stop());
 }
 
 
@@ -133,11 +133,49 @@ void GstTestSuite::start_and_stop_stereo_audio()
     AudioSender tx;
 
     tx.init(10010, THEIR_ADDRESS, "stereoTest");
-    tx.start();
+    TEST_ASSERT(tx.start());
     // block
     std::cout << "Enter any key: ";
     std::cin >> c;
-    tx.stop();
+    TEST_ASSERT(tx.stop());
+}
+
+
+
+void GstTestSuite::start_multi_audio()
+{
+    char c;
+    AudioSender tx;
+
+    tx.init(10010, THEIR_ADDRESS, "multiTest");
+    TEST_ASSERT(tx.start());
+    // block
+    std::cout << "Enter any key: ";
+    std::cin >> c;
+}
+
+
+
+void GstTestSuite::stop_multi_audio()
+{
+    AudioSender tx;
+    tx.init(10010, THEIR_ADDRESS, "multiTest");
+    TEST_ASSERT(tx.stop());
+}
+
+
+
+void GstTestSuite::start_and_stop_multi_audio()
+{
+    char c;
+    AudioSender tx;
+
+    tx.init(10010, THEIR_ADDRESS, "multiTest");
+    TEST_ASSERT(tx.start());
+    // block
+    std::cout << "Enter any key: ";
+    std::cin >> c;
+    TEST_ASSERT(tx.stop());
 }
 
 
