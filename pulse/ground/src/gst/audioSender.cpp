@@ -75,7 +75,7 @@ void AudioSender::initTest()
 
 void AudioSender::start()
 {
-    std::cout << "Sending audio on port " << port_ << " to host " << remoteHost_
+    std::cout << "NOT Sending audio on port " << port_ << " to host " << remoteHost_
         << std::endl;
 
     AudioBase::start();

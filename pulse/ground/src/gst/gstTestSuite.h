@@ -14,6 +14,10 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::init_test)
             TEST_ADD(GstTestSuite::start_video)
             TEST_ADD(GstTestSuite::stop_video)
+            TEST_ADD(GstTestSuite::start_and_stop_video)
+            TEST_ADD(GstTestSuite::start_audio)
+            TEST_ADD(GstTestSuite::stop_audio)
+            TEST_ADD(GstTestSuite::start_and_stop_audio)
         }
         
         // some tests
@@ -26,6 +30,10 @@ class GstTestSuite : public Test::Suite
         void init_test();
         void start_video();
         void stop_video();
+        void start_and_stop_video();
+        void start_audio();
+        void stop_audio();
+        void start_and_stop_audio();
 };
 
 #endif // _GST_TEST_SUITE_H_
