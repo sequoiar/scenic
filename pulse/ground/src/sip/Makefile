@@ -14,8 +14,11 @@ APPOBJS=$(OBJS) sipMain.o
 TESTOBJS=$(OBJS) sipTestSuite.o
 
 
-GST_CFLAGS=$(shell pkg-config --cflags gstreamer-0.10)
-GST_LDFLAGS=$(shell pkg-config --libs gstreamer-0.10)
+GST_CFLAGS=-pthread -I/usr/local/include/gstreamer-0.10 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/libxml2 
+
+GST_LDFLAGS=-pthread -L/usr/local/lib -lgstreamer-0.10 -lgobject-2.0 -lgmodule-2.0 -ldl -lgthread-2.0 -lrt -lxml2 -lglib-2.0  
+
+CPPTEST_LDFLAGS=-lcpptest
 
 APP_CFLAGS+=-g -Wall $(GST_CFLAGS) 
 CC		= $(APP_CC) 
@@ -35,7 +38,7 @@ $(APPLICATION): $(APPOBJS)
 	$(CPP_CC) $(APPOBJS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
 
 tests : $(TESTOBJS)
-	$(CPP_CC) $(TESTOBJS) `pkg-config libcpptest --libs --cflags` -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
+	$(CPP_CC) $(TESTOBJS) $(CPPTEST_LDFLAGS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
 
 all: $(APPLICATION)
 
