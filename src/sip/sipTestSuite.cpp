@@ -1,4 +1,6 @@
 
+// sipTestSuite.cpp
+
 #include <cpptest.h>
 #include "sipTestSuite.h"
 #include "sipSingleton.h"
@@ -55,12 +57,3 @@ int main(int argc, char** argv)
     return sts.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-#if 0
-
-void SipTester::create_req_session()
-{
-    sip.set_service_port(10010);
-    sip.init("192.168.1.183","5060","192.168.1.183","5061");
-}
-
-#endif 
