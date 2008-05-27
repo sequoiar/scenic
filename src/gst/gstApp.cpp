@@ -16,6 +16,7 @@
 
 int eventLoop()
 {
+    char c;
     // Approach 1: GMainloop
     //GMainLoop *loop;
     //loop = g_main_loop_new(NULL, FALSE);
@@ -35,7 +36,6 @@ int eventLoop()
     std::cout << "Hit a and <cr> to accept a request." << std::endl; 
     std::cout << "Hit q and <cr> to quit." << std::endl; 
 
-    char c;
     std::cin >> c;
 
     switch(c)
