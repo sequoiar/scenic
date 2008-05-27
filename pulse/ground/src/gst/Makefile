@@ -11,9 +11,10 @@ include $(PJBASE)/build.mak
 BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
 
-OBJS=gst_main.o gstApp.o videoReceiver.o videoSender.o videoBase.o audioBase.o \
+OBJS=videoReceiver.o videoSender.o videoBase.o audioBase.o \
 	 audioSender.o
-
+APPOBJS=$(OBJS) gst_main.o gstApp.o 
+TESTOBJS=$(OBJS) gstTestSuite.o 
 
 GST_CFLAGS=$(shell pkg-config --cflags gstreamer-0.10)
 GST_LDFLAGS=$(shell pkg-config --libs gstreamer-0.10)
@@ -32,9 +33,12 @@ CPPFLAGS = $(CFLAGS)
 %.o: %.cpp %.h ../sip/%.o 
 	$(CPP_CC) $(CPPFLAGS) -c $(<) -o $@
 
-$(APPLICATION): $(OBJS)
-	$(CPP_CC) $(OBJS) ../sip/sipSingleton.o ../sip/sipStateless.o -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
+$(APPLICATION): $(APPOBJS)
+	$(CPP_CC) $(APPOBJS) ../sip/sipSingleton.o ../sip/sipStateless.o -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
 
+tests : $(TESTOBJS)
+	$(CPP_CC) $(TESTOBJS) `pkg-config libcpptest --libs --cflags` -o $(BINDIR)/gstTester $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
+					 
 all: $(APPLICATION)
 
 tags: $(OBJS)

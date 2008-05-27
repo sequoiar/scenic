@@ -10,7 +10,7 @@ BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
 
 OBJS=sipStateless.o sipSingleton.o 
-MAINOBJS=$(OBJS) sipMain.o
+APPOBJS=$(OBJS) sipMain.o
 TESTOBJS=$(OBJS) sipTestSuite.o
 
 
@@ -31,8 +31,8 @@ CPPFLAGS = $(CFLAGS)
 %.o: %.cpp
 	$(CPP_CC) $(CPPFLAGS) -c $(<) -o $@
 
-$(APPLICATION): $(MAINOBJS)
-	$(CPP_CC) $(MAINOBJS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
+$(APPLICATION): $(APPOBJS)
+	$(CPP_CC) $(APPOBJS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
 
 tests : $(TESTOBJS)
 	$(CPP_CC) $(TESTOBJS) `pkg-config libcpptest --libs --cflags` -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)

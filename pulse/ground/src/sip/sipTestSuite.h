@@ -1,4 +1,5 @@
-// sipTester.h
+
+// sipTestSuite.h
 
 #ifndef _SIP_TEST_SUITE_H_
 #define _SIP_TEST_SUITE_H_
@@ -39,4 +40,4 @@ class SipTestSuite : public Test::Suite
         void send_messages();
 };
 
-#endif // _SIP_TESTER_H_
+#endif // _SIP_TEST_SUITE_H_

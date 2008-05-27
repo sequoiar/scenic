@@ -9,6 +9,7 @@
 
 #include "videoReceiver.h"
 #include "videoSender.h"
+#include "audioSender.h"
 
 #include "defaultAddresses.h"
 
@@ -45,16 +46,6 @@ int eventLoop()
         case 'r':
             SipSingleton::Instance()->send_request("h264.1");
             break;
-
-#if 0
-        case 'd':
-            SipSingleton::Instance()->send_request("dv");
-            break;
-
-        case 't':
-            SipSingleton::Instance()->send_request("test");
-            break;
-#endif
 
         default:
             break;
