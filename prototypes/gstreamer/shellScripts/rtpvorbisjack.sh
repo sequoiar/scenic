@@ -8,6 +8,6 @@ gst-launch-0.10 -v interleave name=i ! vorbisenc ! rtpvorbispay ! rtpvorbisdepay
  audiotestsrc volume=0.1 freq=500 is-live=false ! audioconvert ! queue ! i. \
  audiotestsrc volume=0.1 freq=700 is-live=false ! audioconvert ! queue ! i. \
  audiotestsrc volume=0.1 freq=900 is-live=false ! audioconvert ! queue ! i. \
- audiotestsrc volume=0.1 freq=1100 is-live=false ! audioconvert ! queue ! i. 
-#  audiotestsrc volume=0.1 freq=1300 is-live=false ! audioconvert ! queue ! i. \
-#  audiotestsrc volume=0.1 freq=1400 is-live=false ! audioconvert ! queue ! i. 
+ audiotestsrc volume=0.1 freq=1100 is-live=false ! audioconvert ! queue ! i. \
+ audiotestsrc volume=0.1 freq=1300 is-live=false ! audioconvert ! queue ! i. \
+ audiotestsrc volume=0.1 freq=1400 is-live=false ! audioconvert ! queue ! i. 
