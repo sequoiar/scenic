@@ -1,0 +1,15 @@
+To compile, create a file in src/gst called defaultAddresses.h, substituting 
+the IP addresses with yours and another host's (or yours again for local 
+testing). See example below:
+
+/*---------------------------------------------------------------------------*/ 
+
+#ifndef _DEFAULT_ADDRESSES_H_
+#define _DEFAULT_ADDRESSES_H_
+
+#define MY_ADDRESS  "192.168.1.183"
+#define THEIR_ADDRESS "192.168.1.164"
+
+#endif
+
+/*---------------------------------------------------------------------------*/ 
