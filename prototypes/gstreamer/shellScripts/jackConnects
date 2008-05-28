@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LIMIT=6
+LIMIT=8
 
 for ((i=0, j=1; i < LIMIT ; i++, j++))
 do 
