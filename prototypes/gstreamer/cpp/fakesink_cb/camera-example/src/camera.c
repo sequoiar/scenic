@@ -26,6 +26,7 @@ static void create_jpeg(unsigned char *data);
 int picture_requested = 0;
 //static /*HILDON_WINDOW */ GtkWidget *window;
 
+static void create_jpeg(unsigned char *data);
 static gboolean
 cb_have_data(GstPad * pad, GstBuffer * buffer, gpointer u_data)
 {
