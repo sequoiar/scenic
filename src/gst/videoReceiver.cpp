@@ -2,12 +2,13 @@
 
 #include <iostream>
 #include <cassert>
-#include <gst/gst.h>
 
 #include "videoBase.h"
 #include "videoReceiver.h"
 
-VideoReceiver::VideoReceiver() : VideoBase()
+#include <gst/gst.h>
+
+VideoReceiver::VideoReceiver() : MediaBase()
 {
     // empty
 }

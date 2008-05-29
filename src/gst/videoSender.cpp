@@ -7,10 +7,10 @@
 #include <cassert>
 #include <gst/gst.h>
 
-#include "videoBase.h"
+#include "mediaBase.h"
 #include "videoSender.h"
 
-VideoSender::VideoSender() : VideoBase()
+VideoSender::VideoSender() : MediaBase()
 {
     // empty
 }
@@ -110,10 +110,10 @@ void VideoSender::initTest()
     gst_element_link_many(txSrc, txCsp, x264enc, rtph264pay, txSink, NULL);
 }
 
-void VideoSender::start()
+bool VideoSender::start()
 {
     std::cout << "Sending media on port " << port_ << " to host " << remoteHost_
         << std::endl;
 
-    VideoBase::start();
+    return MediaBase::start();
 }

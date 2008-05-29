@@ -8,7 +8,6 @@
 
 void GstTestSuite::setup()
 {
-    gst_init(0, NULL);
     // empty
 }
 

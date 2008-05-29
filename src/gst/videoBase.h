@@ -3,7 +3,7 @@
 #ifndef _VIDEO_BASE_H_
 #define _VIDEO_BASE_H_
 
-#include <gst/gst.h>
+typedef struct _GstElement GstElement;
 
 class VideoBase
 {
@@ -21,8 +21,6 @@ class VideoBase
         GstElement *pipeline_;
 
     private:
-        // FIXME: This info should come directly from pipeline
-        //bool isPlaying_;
 };
 
 #endif // _VIDEO_BASE_H_

@@ -3,11 +3,9 @@
 #ifndef _VIDEO_RECEIVER_H_
 #define _VIDEO_RECEIVER_H_
 
-#include <gst/gst.h>
+#include "mediaBase.h"
 
-#include "videoBase.h"
-
-class VideoReceiver : public VideoBase
+class VideoReceiver : public MediaBase 
 {
     public:
         VideoReceiver();

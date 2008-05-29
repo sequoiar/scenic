@@ -4,12 +4,11 @@
 #define _AUDIO_SENDER_H_
 
 #include <string>
-#include <gst/gst.h>
 #include "defaultAddresses.h"
 
-#include "audioBase.h"
+#include "mediaBase.h"
 
-class AudioSender : public AudioBase
+class AudioSender : public MediaBase
 {
     public:
         AudioSender();

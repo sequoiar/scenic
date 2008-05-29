@@ -1,17 +1,24 @@
 
 #include <gst/gst.h>
-#include "audioBase.h"
 
-const int AudioBase::DEF_PORT = 10020;
+#include "mediaBase.h"
 
-AudioBase::AudioBase() : pipeline_(0)
+const int MediaBase::DEF_PORT = 10010;
+bool MediaBase::gstInitialized_ = false;
+
+MediaBase::MediaBase() : pipeline_(0)
 {
-    // empty
+    if (!gstInitialized_)
+    {
+        gstInitialized_ = true;
+        // should only be called once in a process
+        gst_init(0, NULL);
+    }
 }
 
 
 
-AudioBase::~AudioBase()
+MediaBase::~MediaBase()
 {
     stop();
     gst_object_unref(GST_OBJECT(pipeline_));
@@ -19,7 +26,7 @@ AudioBase::~AudioBase()
 
 
 
-bool AudioBase::start()
+bool MediaBase::start()
 {
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
     return isPlaying();
@@ -27,7 +34,7 @@ bool AudioBase::start()
 
 
 
-bool AudioBase::stop()
+bool MediaBase::stop()
 {
     gst_element_set_state(pipeline_, GST_STATE_NULL);
     return !isPlaying();
@@ -35,7 +42,7 @@ bool AudioBase::stop()
 
 
 
-bool AudioBase::isPlaying() 
+bool MediaBase::isPlaying() 
 { 
     if (pipeline_ && GST_STATE(pipeline_) == GST_STATE_PLAYING)
         return true; 
