@@ -30,11 +30,24 @@ void pyInterpreter::interact()
 
 std::string pyInterpreter::run_str(std::string s)
 {
+    std::string t_str = "i.push('";
+    t_str += s;
+    t_str += "')";
+    object ret = eval(t_str.c_str(),main_namespace,main_namespace);
+//BROKEN
+    extract<char const*> get_str(ret);
+    if(get_str.check())
+        return std::string(get_str());
+    else
+    return std::string("");
+}
+
+std::string pyInterpreter::run_input()
+{
     exec("i.push(i.raw_input())",main_namespace,main_namespace);
 
     return std::string("");
 }
-
 
 
 int pyInterpreter::init(int argc, char *argv[])
@@ -57,8 +70,6 @@ int pyInterpreter::init(int argc, char *argv[])
             exec("from code import InteractiveConsole",main_namespace,main_namespace);	
             PYTHON_EXEC_IMPORT(main_namespace,main_namespace);
             exec("i = InteractiveConsole(globals())",main_namespace,main_namespace);
-            exec("i.interact()",main_namespace,main_namespace);
-            exec("i.interact()",main_namespace,main_namespace);
         }
         else
             PyErr_Print();
