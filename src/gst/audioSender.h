@@ -19,9 +19,10 @@ class AudioSender : public MediaBase
         virtual bool start();
 
     private:
-        void initMonoTest();
-        void initStereoTest();
-        void initMultiTest();
+        void init_mono_test();
+        void init_stereo_test();
+        void init_multi_test();
+        void init_multi_rtp_test();
         bool connect_audio(); 
 
         std::string remoteHost_;
