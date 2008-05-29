@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cassert>
 
-#include "videoBase.h"
+#include "mediaBase.h"
 #include "videoReceiver.h"
 
 #include <gst/gst.h>

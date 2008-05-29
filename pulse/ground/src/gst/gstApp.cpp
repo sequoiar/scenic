@@ -76,7 +76,7 @@ void gst_main(int argc, char *argv[])
     }
 
     // init gstreamer, moved to MediaBase constructor
-    gst_init(0, NULL);  // normally should get argc argv
+    // gst_init(0, NULL);  // normally should get argc argv
     /*----------------------------------------------*/ 
     for(;;)
     {
