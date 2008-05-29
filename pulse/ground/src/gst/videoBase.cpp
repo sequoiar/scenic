@@ -1,4 +1,5 @@
 
+#include <gst/gst.h>
 #include "videoBase.h"
 
 const int VideoBase::DEF_PORT = 10010;

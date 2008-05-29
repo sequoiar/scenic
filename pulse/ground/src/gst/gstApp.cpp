@@ -75,7 +75,7 @@ void gst_main(int argc, char *argv[])
         sip.init(MY_ADDRESS, "5060", THEIR_ADDRESS, "5061");
     }
 
-    // init gstreamer
+    // init gstreamer, moved to MediaBase constructor
     gst_init(0, NULL);  // normally should get argc argv
     /*----------------------------------------------*/ 
     for(;;)

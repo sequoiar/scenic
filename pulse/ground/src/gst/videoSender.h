@@ -4,12 +4,11 @@
 #define _VIDEO_SENDER_H_
 
 #include <string>
-#include <gst/gst.h>
 #include "defaultAddresses.h"
 
-#include "videoBase.h"
+#include "mediaBase.h"
 
-class VideoSender : public VideoBase
+class VideoSender : public MediaBase
 {
     public:
         VideoSender();
@@ -17,7 +16,7 @@ class VideoSender : public VideoBase
         bool init(const int port = DEF_PORT, 
                   const std::string addr = THEIR_ADDRESS,
                   const std::string media = "test");
-        virtual void start();
+        virtual bool start();
 
     private:
         void initDv();

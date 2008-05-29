@@ -10,11 +10,11 @@
 
 #include <jack/jack.h>
 
-#include "audioBase.h"
+#include "mediaBase.h"
 #include "audioSender.h"
 
 
-AudioSender::AudioSender() : AudioBase()
+AudioSender::AudioSender() : MediaBase()
 {
     // empty
 }
@@ -288,7 +288,7 @@ bool AudioSender::connect_audio()
 
 bool AudioSender::start()
 {
-    AudioBase::start();
+    MediaBase::start();
 
     std::cout << "About to connect ports, enter key to continue" << std::endl;
     char c;
