@@ -11,7 +11,7 @@ include $(PJBASE)/build.mak
 BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
 
-OBJS=videoReceiver.o videoSender.o mediaBase.o audioSender.o
+OBJS=videoReceiver.o videoSender.o mediaBase.o audioSender.o audioReceiver.o
 APPOBJS=$(OBJS) gst_main.o gstApp.o 
 TESTOBJS=$(OBJS) gstTestSuite.o 
 PYTHONOBJS=$(OBJS) py$(APPLICATION)Module.o
@@ -45,7 +45,7 @@ tests : $(TESTOBJS)
 					 
 all: $(APPLICATION)
 
-tags: $(OBJS)
+tags: 
 	ctags *.c *.cpp *.h ../sip/*.c ../sip/*.cpp ../sip/*.h
 
 .PHONY: clean

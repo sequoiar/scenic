@@ -5,6 +5,9 @@
 #include "gstTestSuite.h"
 #include "videoSender.h"
 #include "audioSender.h"
+#include "audioReceiver.h"
+
+#define BLOCKING 1
 
 void GstTestSuite::setup()
 {
@@ -20,10 +23,23 @@ void GstTestSuite::tear_down()
 
 
 
+
+void GstTestSuite::block()
+{
+    char c;
+    std::cout << __FILE__ << ": blocking, enter any key." << std::endl;
+    std::cin >> c;
+}
+
+
+
 void GstTestSuite::init_test()
 {
     VideoSender tx;
     tx.init(10010, THEIR_ADDRESS, "test");
+#if BLOCKING
+    block();
+#endif
 }
 
 
@@ -33,8 +49,9 @@ void GstTestSuite::start_video()
     VideoSender tx;
     tx.init(10010, THEIR_ADDRESS, "test");
     tx.start();
-    char c;
-    std::cin >> c;
+#if BLOCKING
+    block();
+#endif
 }
 
 
@@ -43,23 +60,23 @@ void GstTestSuite::stop_video()
 {
     VideoSender tx;
     tx.init(10010, THEIR_ADDRESS, "test");
+#if BLOCKING
+    block();
+#endif
     tx.stop();
-    char c;
-    std::cin >> c;
 }
 
 
 
-void GstTestSuite::start_and_stop_video()
+void GstTestSuite::start_stop_video()
 {
-    char c;
     VideoSender tx;
 
     tx.init(10010, THEIR_ADDRESS, "test");
     tx.start();
-    // block
-    std::cout << "Enter any key: ";
-    std::cin >> c;
+#if BLOCKING
+    block();
+#endif
     tx.stop();
 }
 
@@ -67,14 +84,13 @@ void GstTestSuite::start_and_stop_video()
 
 void GstTestSuite::start_mono_audio()
 {
-    char c;
     AudioSender tx;
 
     tx.init(10010, THEIR_ADDRESS, "monoTest");
     TEST_ASSERT(tx.start());
-    // block
-    std::cout << "Enter any key: ";
-    std::cin >> c;
+#if BLOCKING
+    block();
+#endif
 }
 
 
@@ -84,20 +100,22 @@ void GstTestSuite::stop_mono_audio()
     AudioSender tx;
     tx.init(10010, THEIR_ADDRESS, "monoTest");
     TEST_ASSERT(tx.stop());
+#if BLOCKING
+    block();
+#endif
 }
 
 
 
-void GstTestSuite::start_and_stop_mono_audio()
+void GstTestSuite::start_stop_mono_audio()
 {
-    char c;
     AudioSender tx;
 
     tx.init(10010, THEIR_ADDRESS, "monoTest");
     TEST_ASSERT(tx.start());
-    // block
-    std::cout << "Enter any key: ";
-    std::cin >> c;
+#if BLOCKING
+    block();
+#endif
     TEST_ASSERT(tx.stop());
 }
 
@@ -105,14 +123,13 @@ void GstTestSuite::start_and_stop_mono_audio()
 
 void GstTestSuite::start_stereo_audio()
 {
-    char c;
     AudioSender tx;
 
     tx.init(10010, THEIR_ADDRESS, "stereoTest");
     TEST_ASSERT(tx.start());
-    // block
-    std::cout << "Enter any key: ";
-    std::cin >> c;
+#if BLOCKING
+    block();
+#endif
 }
 
 
@@ -121,21 +138,23 @@ void GstTestSuite::stop_stereo_audio()
 {
     AudioSender tx;
     tx.init(10010, THEIR_ADDRESS, "stereoTest");
+#if BLOCKING
+    block();
+#endif
     TEST_ASSERT(tx.stop());
 }
 
 
 
-void GstTestSuite::start_and_stop_stereo_audio()
+void GstTestSuite::start_stop_stereo_audio()
 {
-    char c;
     AudioSender tx;
 
     tx.init(10010, THEIR_ADDRESS, "stereoTest");
     TEST_ASSERT(tx.start());
-    // block
-    std::cout << "Enter any key: ";
-    std::cin >> c;
+#if BLOCKING
+    block();
+#endif
     TEST_ASSERT(tx.stop());
 }
 
@@ -143,14 +162,13 @@ void GstTestSuite::start_and_stop_stereo_audio()
 
 void GstTestSuite::start_multi_audio()
 {
-    char c;
     AudioSender tx;
 
     tx.init(10010, THEIR_ADDRESS, "multiTest");
     TEST_ASSERT(tx.start());
-    // block
-    std::cout << "Enter any key: ";
-    std::cin >> c;
+#if BLOCKING
+    block();
+#endif
 }
 
 
@@ -159,21 +177,72 @@ void GstTestSuite::stop_multi_audio()
 {
     AudioSender tx;
     tx.init(10010, THEIR_ADDRESS, "multiTest");
+#if BLOCKING
+    block();
+#endif
     TEST_ASSERT(tx.stop());
 }
 
 
 
-void GstTestSuite::start_and_stop_multi_audio()
+void GstTestSuite::start_stop_multi_audio()
 {
-    char c;
     AudioSender tx;
 
     tx.init(10010, THEIR_ADDRESS, "multiTest");
     TEST_ASSERT(tx.start());
-    // block
-    std::cout << "Enter any key: ";
-    std::cin >> c;
+#if BLOCKING
+    block();
+#endif
+    TEST_ASSERT(tx.stop());
+}
+
+
+
+void GstTestSuite::start_multi_rtp_audio()
+{
+    AudioSender tx;
+    AudioReceiver rx;
+
+    tx.init(10010, THEIR_ADDRESS, "multiRtpTest");
+    rx.init(10010);
+    TEST_ASSERT(tx.start());
+    TEST_ASSERT(rx.start());
+#if BLOCKING
+    block();
+#endif
+}
+
+
+
+void GstTestSuite::stop_multi_rtp_audio()
+{
+    AudioSender tx;
+    AudioReceiver rx;
+    tx.init(10010, THEIR_ADDRESS, "multiRtpTest");
+    rx.init(10010);
+#if BLOCKING
+    block();
+#endif
+    TEST_ASSERT(tx.stop());
+    TEST_ASSERT(rx.stop());
+}
+
+
+
+void GstTestSuite::start_stop_multi_rtp_audio()
+{
+    AudioSender tx;
+    AudioSender rx;
+
+    tx.init(10010, THEIR_ADDRESS, "multiRtpTest");
+    rx.init(10010, THEIR_ADDRESS, "multiRtpTest");
+    TEST_ASSERT(tx.start());
+    TEST_ASSERT(rx.start());
+#if BLOCKING
+    block();
+#endif
+    TEST_ASSERT(rx.stop());
     TEST_ASSERT(tx.stop());
 }
 

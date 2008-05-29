@@ -2,11 +2,11 @@
 
 #include <iostream>
 #include <cassert>
+#include <gst/gst.h>
 
 #include "mediaBase.h"
 #include "videoReceiver.h"
 
-#include <gst/gst.h>
 
 VideoReceiver::VideoReceiver() : MediaBase()
 {
