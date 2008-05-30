@@ -23,16 +23,6 @@ void GstTestSuite::tear_down()
 
 
 
-
-void GstTestSuite::block()
-{
-    char c;
-    std::cout << __FILE__ << ": blocking, enter any key." << std::endl;
-    std::cin >> c;
-}
-
-
-
 void GstTestSuite::init_test()
 {
     VideoSender tx;
@@ -162,6 +152,7 @@ void GstTestSuite::start_stop_stereo_audio()
 
 void GstTestSuite::start_multi_audio()
 {
+    std::cout << "I tend to hang, possibly related to the errormsg I put out?" << std::endl;
     AudioSender tx;
 
     tx.init(10010, THEIR_ADDRESS, "multiTest");
@@ -246,6 +237,19 @@ void GstTestSuite::start_stop_multi_rtp_audio()
     TEST_ASSERT(tx.stop());
 }
 
+
+
+void GstTestSuite::start_6ch_audio()
+{
+    std::cout << "6 ch " << std::endl;
+    AudioSender tx;
+
+    tx.init(10010, THEIR_ADDRESS, "6chTest");
+    TEST_ASSERT(tx.start());
+#if BLOCKING
+    block();
+#endif
+}
 
 
 int main(int argc, char** argv)

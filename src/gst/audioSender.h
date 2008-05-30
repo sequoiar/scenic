@@ -21,9 +21,9 @@ class AudioSender : public MediaBase
     private:
         void init_mono_test();
         void init_stereo_test();
+        void init_6_ch_test();
         void init_multi_test();
         void init_multi_rtp_test();
-        bool connect_audio(); 
 
         std::string remoteHost_;
         int numChannels_;

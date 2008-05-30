@@ -22,9 +22,10 @@ class GstTestSuite : public Test::Suite
                 TEST_ADD(GstTestSuite::stop_stereo_audio)
                 TEST_ADD(GstTestSuite::start_stop_stereo_audio)
                
-                TEST_ADD(GstTestSuite::start_multi_audio)
-                TEST_ADD(GstTestSuite::stop_multi_audio)
-                TEST_ADD(GstTestSuite::start_stop_multi_audio)
+                TEST_ADD(GstTestSuite::start_6ch_audio);
+                //TEST_ADD(GstTestSuite::start_multi_audio)
+                //TEST_ADD(GstTestSuite::stop_multi_audio)
+                //TEST_ADD(GstTestSuite::start_stop_multi_audio)
                 
               
                 //TEST_ADD(GstTestSuite::start_multi_rtp_audio)
@@ -32,8 +33,6 @@ class GstTestSuite : public Test::Suite
                 TEST_ADD(GstTestSuite::stop_multi_rtp_audio)
                 TEST_ADD(GstTestSuite::start_stop_multi_rtp_audio)
                 */
-                
-                
         }
 
         // some tests
@@ -43,7 +42,7 @@ class GstTestSuite : public Test::Suite
         virtual void tear_down();   // destroy common resources
 
     private:
-        void block();       // not a unit test
+        void block(); // inline
         void init_test();
         void start_video();
         void stop_video();
@@ -60,7 +59,17 @@ class GstTestSuite : public Test::Suite
         void start_multi_rtp_audio();
         void stop_multi_rtp_audio();
         void start_stop_multi_rtp_audio();
+        void start_6ch_audio();
 };
+
+inline
+void GstTestSuite::block()
+{
+    char c;
+    std::cout.flush();
+    std::cout << __FILE__ << ": blocking, enter any key." << std::endl;
+    std::cin >> c;
+}
 
 #endif // _GST_TEST_SUITE_H_
 

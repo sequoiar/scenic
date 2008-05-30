@@ -29,7 +29,8 @@ MediaBase::~MediaBase()
 bool MediaBase::start()
 {
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
-    return isPlaying();
+    //return isPlaying();
+    return true;
 }
 
 
