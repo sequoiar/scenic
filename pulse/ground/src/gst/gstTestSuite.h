@@ -70,9 +70,13 @@ class GstTestSuite : public Test::Suite
         void stop_8ch_audio();
         void start_stop_8ch_audio();
 
-        void start_8ch_rtp_audio();
-        void stop_8ch_rtp_audio();
-        void start_stop_8ch_rtp_audio();
+        void start_8ch_comp_rtp_audio();
+        void stop_8ch_comp_rtp_audio();
+        void start_stop_8ch_comp_rtp_audio();
+        
+        void start_8ch_uncomp_rtp_audio();
+        void stop_8ch_uncomp_rtp_audio();
+        void start_stop_8ch_uncomp_rtp_audio();
 };
 
 inline
