@@ -44,8 +44,14 @@ std::string pyInterpreter::run_str(std::string s)
 
 std::string pyInterpreter::run_input()
 {
-    exec("i.push(i.raw_input())",main_namespace,main_namespace);
-
+try
+{
+    exec("i.push(i.raw_input('" PROMPT "'))",main_namespace,main_namespace);
+}
+catch(boost::python::error_already_set)
+{    
+    return std::string("EOF");
+}
     return std::string("");
 }
 

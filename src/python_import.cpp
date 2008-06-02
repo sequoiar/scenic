@@ -8,6 +8,18 @@
 using namespace boost::python;
 
 
+#define PROMPT  "gp: >> "
+
+
+#ifndef __GROUND_LOOP__
+int GROUND_LOOP(int result, int argc, char* argv[])
+{
+    if (result == -1)
+        return 0;
+    return 1;
+}
+#endif
+
 BOOST_PYTHON_MODULE(hello)
 {
     class_<hello>("hello")
