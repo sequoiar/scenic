@@ -15,15 +15,15 @@ class AudioSender : public MediaBase
         virtual ~AudioSender(); 
         bool init(const int port = DEF_PORT, 
                   const std::string addr = THEIR_ADDRESS,
-                  const std::string media = "monoTest");
+                  const std::string media = "1chTest");
         virtual bool start();
 
     private:
-        void init_mono_test();
-        void init_stereo_test();
-        void init_6_ch_test();
-        void init_multi_test();
-        void init_multi_rtp_test();
+        void init_1ch_test();
+        void init_2ch_test();
+        void init_6ch_test();
+        void init_8ch_test();
+        void init_8ch_rtp_test();
 
         std::string remoteHost_;
         int numChannels_;

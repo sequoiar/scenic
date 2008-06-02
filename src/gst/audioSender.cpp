@@ -39,29 +39,29 @@ bool AudioSender::init(const int port, const std::string addr, const std::string
 
     //  Create sender pipeline
     //  TODO: should these be subclasses?
-    if (!media.compare("monoTest"))
+    if (!media.compare("1chTest"))
     {
-        init_mono_test();
+        init_1ch_test();
         return true;
     }
-    else if (!media.compare("stereoTest"))
+    else if (!media.compare("2chTest"))
     {
-        init_stereo_test();
+        init_2ch_test();
         return true;
     }
     else if (!media.compare("6chTest"))
     {
-        init_6_ch_test();
+        init_6ch_test();
         return true;
     }
-    else if (!media.compare("multiTest"))
+    else if (!media.compare("8chTest"))
     {
-        init_multi_test();
+        init_8ch_test();
         return true;
     }
-    else if (!media.compare("multiRtpTest"))
+    else if (!media.compare("8chRtpTest"))
     {
-        init_multi_rtp_test();
+        init_8ch_rtp_test();
         return true;
     }
     else
@@ -73,7 +73,7 @@ bool AudioSender::init(const int port, const std::string addr, const std::string
 
 
 
-void AudioSender::init_mono_test()
+void AudioSender::init_1ch_test()
 {
     numChannels_ = 1;
     GstElement *txSrc1, *aconv1, *txSink1;
@@ -100,7 +100,7 @@ void AudioSender::init_mono_test()
 
 
 
-void AudioSender::init_stereo_test()
+void AudioSender::init_2ch_test()
 {
     numChannels_ = 2;
 
@@ -160,7 +160,7 @@ void AudioSender::init_stereo_test()
 
 
 
-void AudioSender::init_6_ch_test()
+void AudioSender::init_6ch_test()
 {
     numChannels_ = 6;
 
@@ -182,7 +182,7 @@ void AudioSender::init_6_ch_test()
     assert(aconv0);
     queue0 = gst_element_factory_make("queue", "queue0");
     assert(queue0);
-    txSink1 = gst_element_factory_make("jackaudiosink", "txSink1");
+    txSink1 = gst_element_factory_make("alsasink", "txSink1");
     assert(txSink1);
 
 
@@ -271,7 +271,7 @@ void AudioSender::init_6_ch_test()
 
 
 
-void AudioSender::init_multi_test()
+void AudioSender::init_8ch_test()
 {
     numChannels_ = 8;
 
@@ -407,7 +407,7 @@ void AudioSender::init_multi_test()
 
 
 
-void AudioSender::init_multi_rtp_test()
+void AudioSender::init_8ch_rtp_test()
 {
     numChannels_ = 8;
 
