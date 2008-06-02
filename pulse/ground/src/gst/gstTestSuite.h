@@ -15,17 +15,22 @@ class GstTestSuite : public Test::Suite
                 TEST_ADD(GstTestSuite::start_video)
                 TEST_ADD(GstTestSuite::stop_video)
                 TEST_ADD(GstTestSuite::start_stop_video)
-                TEST_ADD(GstTestSuite::start_mono_audio)
-                TEST_ADD(GstTestSuite::stop_mono_audio)
-                TEST_ADD(GstTestSuite::start_stop_mono_audio)
-                TEST_ADD(GstTestSuite::start_stereo_audio)
-                TEST_ADD(GstTestSuite::stop_stereo_audio)
-                TEST_ADD(GstTestSuite::start_stop_stereo_audio)
-               
+                
+                TEST_ADD(GstTestSuite::start_1ch_audio)
+                TEST_ADD(GstTestSuite::stop_1ch_audio)
+                TEST_ADD(GstTestSuite::start_stop_1ch_audio)
+
+                TEST_ADD(GstTestSuite::start_2ch_audio)
+                TEST_ADD(GstTestSuite::stop_2ch_audio)
+                TEST_ADD(GstTestSuite::start_stop_2ch_audio)
+
                 TEST_ADD(GstTestSuite::start_6ch_audio);
-                //TEST_ADD(GstTestSuite::start_multi_audio)
-                //TEST_ADD(GstTestSuite::stop_multi_audio)
-                //TEST_ADD(GstTestSuite::start_stop_multi_audio)
+                TEST_ADD(GstTestSuite::stop_6ch_audio)
+                TEST_ADD(GstTestSuite::start_stop_6ch_audio)
+
+                TEST_ADD(GstTestSuite::start_8ch_audio)
+                TEST_ADD(GstTestSuite::stop_8ch_audio)
+                TEST_ADD(GstTestSuite::start_stop_8ch_audio)
                 
               
                 //TEST_ADD(GstTestSuite::start_multi_rtp_audio)
@@ -44,22 +49,30 @@ class GstTestSuite : public Test::Suite
     private:
         void block(); // inline
         void init_test();
+
         void start_video();
         void stop_video();
         void start_stop_video();
-        void start_mono_audio();
-        void stop_mono_audio();
-        void start_stop_mono_audio();
-        void start_stereo_audio();
-        void stop_stereo_audio();
-        void start_stop_stereo_audio();
-        void start_multi_audio();
-        void stop_multi_audio();
-        void start_stop_multi_audio();
-        void start_multi_rtp_audio();
-        void stop_multi_rtp_audio();
-        void start_stop_multi_rtp_audio();
+
+        void start_1ch_audio();
+        void stop_1ch_audio();
+        void start_stop_1ch_audio();
+
+        void start_2ch_audio();
+        void stop_2ch_audio();
+        void start_stop_2ch_audio();
+
         void start_6ch_audio();
+        void stop_6ch_audio();
+        void start_stop_6ch_audio();
+
+        void start_8ch_audio();
+        void stop_8ch_audio();
+        void start_stop_8ch_audio();
+
+        void start_8ch_rtp_audio();
+        void stop_8ch_rtp_audio();
+        void start_stop_8ch_rtp_audio();
 };
 
 inline
