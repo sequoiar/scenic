@@ -17,7 +17,7 @@
 #include "pyInterpreter.h"
 
 
-#include "python_module_inc.cpp"
+#include "../python_import.cpp"
 
 static object main_module;
 static object main_namespace;
