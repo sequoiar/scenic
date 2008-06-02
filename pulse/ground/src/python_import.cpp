@@ -1,7 +1,7 @@
 #include <boost/python.hpp>
 
 
-#include "../hello/hello.h"
+#include "hello/hello.h"
 
 using namespace boost::python;
 
