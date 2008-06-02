@@ -15,10 +15,17 @@ BOOST_PYTHON_MODULE(hello)
     .def("set_name",&hello::set_name);
 }
 
+
+
+
+// Default variable overloads
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(VideoSender_init_overloads, init, 0, 3)
+
+
 BOOST_PYTHON_MODULE(VideoSender)
 {
     class_<VideoSender>("VideoSender")
-    .def("init", &VideoSender::init)
+    .def("init", &VideoSender::init, VideoSender_init_overloads())
     .def("start", &VideoSender::start)
     .def("stop",  &VideoSender::stop);
 
