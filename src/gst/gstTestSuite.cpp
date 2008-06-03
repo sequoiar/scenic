@@ -71,6 +71,45 @@ void GstTestSuite::start_stop_video()
 }
 
 
+
+void GstTestSuite::start_v4l()
+{
+    VideoSender tx;
+    tx.init("v4l", 10010, THEIR_ADDRESS);
+    tx.start();
+#if BLOCKING
+    block();
+#endif
+}
+
+
+
+void GstTestSuite::stop_v4l()
+{
+    VideoSender tx;
+    tx.init("v4l", 10010, THEIR_ADDRESS);
+#if BLOCKING
+    block();
+#endif
+    tx.stop();
+}
+
+
+
+void GstTestSuite::start_stop_v4l()
+{
+    VideoSender tx;
+
+    tx.init("v4l", 10010, THEIR_ADDRESS);
+    tx.start();
+#if BLOCKING
+    block();
+#endif
+    tx.stop();
+}
+
+
+
 void GstTestSuite::start_dv()
 {
     VideoSender tx;
