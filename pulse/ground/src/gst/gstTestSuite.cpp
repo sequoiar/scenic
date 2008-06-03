@@ -5,8 +5,12 @@
 #include <cpptest.h>
 #include <iostream>
 
+#include <unistd.h>
+#include <sys/wait.h>
+
 #include "gstTestSuite.h"
 #include "videoSender.h"
+#include "videoReceiver.h"
 #include "audioSender.h"
 #include "audioReceiver.h"
 
@@ -15,7 +19,7 @@
 // this macro to 1.
 /*----------------------------------------------*/ 
 
-#define BLOCKING 0
+#define BLOCKING 1
 
 void GstTestSuite::setup()
 {
@@ -120,11 +124,11 @@ void GstTestSuite::start_stop_v4l()
 
 void GstTestSuite::start_v4l_rtp()
 {
-    VideoSender tx;
-    tx.init("v4lRtp", 10010, THEIR_ADDRESS);
-    tx.start();
+        VideoSender tx;
+        tx.init("v4lRtp", 10010, THEIR_ADDRESS);
+        tx.start();
 #if BLOCKING
-    block();
+        block();
 #endif
 }
 
