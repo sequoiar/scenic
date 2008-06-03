@@ -13,9 +13,9 @@ class AudioSender : public MediaBase
     public:
         AudioSender();
         virtual ~AudioSender(); 
-        bool init(const int port = DEF_PORT, 
-                  const std::string addr = THEIR_ADDRESS,
-                  const std::string media = "1chTest");
+        bool init(const std::string media = "1chTest", 
+                  const int port = DEF_PORT, 
+                  const std::string addr = THEIR_ADDRESS);
         virtual bool start();
 
     private:

@@ -40,6 +40,11 @@ bool VideoSender::init(const std::string media,const int port, const std::string
             initDv();
             return true;
     }
+    else if (!media.compare("dvRtp"))
+    {
+            initDvRtp();
+            return true;
+    }
     else if (!media.compare("v4l"))
     {
             initV4l();
@@ -61,12 +66,22 @@ bool VideoSender::init(const std::string media,const int port, const std::string
 
 void VideoSender::initDv()
 {
-    GError *error;
-    std::string launchStr = "dv1394src ! dvdemux name=demux demux. ! \
-                                  queue ! dvdec ! ffmpegcolorspace \
-                                  ! x264enc bitrate=12000 byte-stream=true \
-                                  threads=4 ! rtph264pay ! \
-                                  udpsink host="; 
+    GError* error = NULL;
+    std::string launchStr = "dv1394src ! dvdemux name=demux demux. ! queue ! dvdec ! xvimagesink "
+                            "sync=false demux. ! queue ! audioconvert ! alsasink sync=false";
+
+    pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
+    assert(pipeline_);
+}
+
+
+
+void VideoSender::initDvRtp()
+{
+    GError* error = NULL;
+    std::string launchStr = "dv1394src ! dvdemux name=demux demux. ! queue ! dvdec ! ffmpegcolorspace !"
+                            "x264enc bitrate=12000 byte-stream=true threads=4 ! rtph264pay ! "
+                            "udpsink host="; 
                                   
     std::stringstream istream;
     istream << remoteHost_ << " port = " << port_;           
@@ -77,9 +92,11 @@ void VideoSender::initDv()
     assert(pipeline_);
 }
 
+
+
 void VideoSender::initV4l()
 {
-    GError *error;
+    GError *error = NULL;
     std::string launchStr = "v4l2src ! ffmpegcolorspace ! xvimagesink";
 //        "v4l2src ! ffmpegcolorspace ! x264enc bitrate=12000 byte-stream=true threads=4 ! rtph264pay !  udpsink host="; 
 //    std::stringstream istream;
@@ -130,6 +147,8 @@ void VideoSender::initTest()
     // links testsrc, colorspace converter, encoder, payloader and udpsink
     gst_element_link_many(txSrc, txCsp, x264enc, rtph264pay, txSink, NULL);
 }
+
+
 
 bool VideoSender::start()
 {

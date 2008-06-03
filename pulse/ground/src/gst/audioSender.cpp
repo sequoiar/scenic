@@ -28,7 +28,7 @@ AudioSender::~AudioSender()
 
 
 
-bool AudioSender::init(const int port, const std::string addr, const std::string media) 
+bool AudioSender::init(const std::string media, const int port, const std::string addr) 
 {
     if (port < 1000)
         port_ = DEF_PORT;
@@ -39,6 +39,9 @@ bool AudioSender::init(const int port, const std::string addr, const std::string
 
     //  Create sender pipeline
     //  TODO: should these be subclasses?
+    std::cout.flush();
+    std::cout << std::endl;
+    std::cout << media << std::endl;
     if (!media.compare("1chTest"))
     {
         init_1ch_test();
@@ -71,7 +74,7 @@ bool AudioSender::init(const int port, const std::string addr, const std::string
     }
     else
     {
-        std::cout << "Invalid service type." << std::endl;
+        std::cout << "Invalid service type " << media << std::endl;
         return false;
     }
 }
@@ -187,7 +190,7 @@ void AudioSender::init_6ch_test()
     assert(aconv0);
     queue0 = gst_element_factory_make("queue", "queue0");
     assert(queue0);
-    txSink1 = gst_element_factory_make("alsasink", "txSink1");
+    txSink1 = gst_element_factory_make("jackaudiosink", "txSink1");
     assert(txSink1);
 
 
@@ -548,6 +551,7 @@ void AudioSender::init_8ch_comp_rtp_test()
     g_object_set(G_OBJECT(txSrc7), "volume", 0.125, "freq", 800.0, "is-live", TRUE, NULL);
     g_object_set(G_OBJECT(txSrc8), "volume", 0.125, "freq", 900.0, "is-live", TRUE, NULL);
 }
+
 
 
 // not actually uncompressed yet
