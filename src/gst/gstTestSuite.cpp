@@ -1,4 +1,7 @@
 
+// gstTestSuite.cpp
+
+
 #include <cpptest.h>
 #include <iostream>
 
@@ -7,7 +10,12 @@
 #include "audioSender.h"
 #include "audioReceiver.h"
 
-#define BLOCKING 1
+/*----------------------------------------------*/ 
+// To actually observe the tests (watch/listen), set
+// this macro to 1.
+/*----------------------------------------------*/ 
+
+#define BLOCKING 0
 
 void GstTestSuite::setup()
 {
@@ -101,6 +109,44 @@ void GstTestSuite::start_stop_v4l()
     VideoSender tx;
 
     tx.init("v4l", 10010, THEIR_ADDRESS);
+    tx.start();
+#if BLOCKING
+    block();
+#endif
+    tx.stop();
+}
+
+
+
+void GstTestSuite::start_v4l_rtp()
+{
+    VideoSender tx;
+    tx.init("v4lRtp", 10010, THEIR_ADDRESS);
+    tx.start();
+#if BLOCKING
+    block();
+#endif
+}
+
+
+
+void GstTestSuite::stop_v4l_rtp()
+{
+    VideoSender tx;
+    tx.init("v4lRtp", 10010, THEIR_ADDRESS);
+#if BLOCKING
+    block();
+#endif
+    tx.stop();
+}
+
+
+
+void GstTestSuite::start_stop_v4l_rtp()
+{
+    VideoSender tx;
+
+    tx.init("v4lRtp", 10010, THEIR_ADDRESS);
     tx.start();
 #if BLOCKING
     block();
