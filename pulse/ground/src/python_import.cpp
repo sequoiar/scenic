@@ -12,12 +12,16 @@ using namespace boost::python;
 
 
 #ifndef __GROUND_LOOP__
-int _ground_loop(int result, int argc, char* argv[])
+int _ground_loop(int result)
 {
     if (result == -1)
         return 0;
     return 1;
 }
+#endif
+
+#ifndef __GROUND_INIT__
+int _ground_init(int argc, char* argv[]) { return 0;}
 #endif
 
 BOOST_PYTHON_MODULE(hello)
