@@ -84,7 +84,7 @@ void gst_main(int argc, char *argv[])
         {
             if(sip.isValidService(sip.get_service()) && !tx.isPlaying())
             {
-                if(tx.init(sip.get_service_port(), std::string(MY_ADDRESS), "test"))
+                if(tx.init("test",sip.get_service_port(), std::string(MY_ADDRESS)))
                 {
                     tx.start();
                     sip.zero_service_desc();
