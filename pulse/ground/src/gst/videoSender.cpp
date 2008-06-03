@@ -24,7 +24,7 @@ VideoSender::~VideoSender()
 
 
 
-bool VideoSender::init(const int port, const std::string addr, const std::string media) 
+bool VideoSender::init(const std::string media,const int port, const std::string addr) 
 {
     if (port < 1000)
         port_ = DEF_PORT;

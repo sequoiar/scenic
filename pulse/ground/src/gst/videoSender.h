@@ -13,9 +13,9 @@ class VideoSender : public MediaBase
     public:
         VideoSender();
         virtual ~VideoSender(); 
-        bool init(const int port = DEF_PORT, 
-                  const std::string addr = THEIR_ADDRESS,
-                  const std::string media = "test");
+        bool init(const std::string media = "test",
+                  const int port = DEF_PORT, 
+                  const std::string addr = THEIR_ADDRESS );
         virtual bool start();
 
     private:
