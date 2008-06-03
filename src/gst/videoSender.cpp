@@ -85,13 +85,14 @@ void VideoSender::initDvRtp()
 {
     GError* error = NULL;
     std::string launchStr = "dv1394src ! dvdemux name=demux demux. ! queue ! dvdec ! ffmpegcolorspace !"
-                            "x264enc bitrate=12000 byte-stream=true threads=4 ! rtph264pay ! "
+                            "x264enc byte-stream=true threads=4 ! rtph264pay ! "
                             "udpsink host="; 
+                            //"x264enc bitrate=10000 byte-stream=true threads=4 ! rtph264pay ! "
                                   
     std::stringstream istream;
     istream << remoteHost_ << " port = " << port_;           
     launchStr += istream.str();     // get port number into launch string
-    launchStr += " demux. ! queue ! fakesink";
+    //launchStr += " demux. ! queue ! fakesink";
 
     pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
     assert(pipeline_);
