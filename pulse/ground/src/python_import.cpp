@@ -12,7 +12,7 @@ using namespace boost::python;
 
 
 #ifndef __GROUND_LOOP__
-int GROUND_LOOP(int result, int argc, char* argv[])
+int _ground_loop(int result, int argc, char* argv[])
 {
     if (result == -1)
         return 0;
