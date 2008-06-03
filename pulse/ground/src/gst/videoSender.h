@@ -22,6 +22,7 @@ class VideoSender : public MediaBase
         void initDv();
         void initDvRtp();
         void initV4l();
+        void initV4lRtp();
         void initTest();
 
         std::string remoteHost_;

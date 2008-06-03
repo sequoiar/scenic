@@ -50,6 +50,11 @@ bool VideoSender::init(const std::string media,const int port, const std::string
             initV4l();
             return true;
     }
+    else if (!media.compare("v4lRtp"))
+    {
+            initV4l();
+            return true;
+    }
     else if (!media.compare("test"))
     {
             initTest();
@@ -98,14 +103,23 @@ void VideoSender::initV4l()
 {
     GError *error = NULL;
     std::string launchStr = "v4l2src ! ffmpegcolorspace ! xvimagesink";
-//        "v4l2src ! ffmpegcolorspace ! x264enc bitrate=12000 byte-stream=true threads=4 ! rtph264pay !  udpsink host="; 
-//    std::stringstream istream;
-//    istream << remoteHost_ << " port = " << port_;           
-//    launchStr += istream.str();     // get port number into launch string
-//    launchStr += " demux. ! queue ! fakesink";
 
-    std::cout << "!L!" << launchStr << std::endl;
-    std::cout.flush();
+    pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
+    assert(pipeline_);
+}
+
+
+
+void VideoSender::initV4lRtp()
+{
+    GError *error = NULL;
+    std::string launchStr = "v4l2src ! ffmpegcolorspace ! x264enc bitrate=12000 byte-stream=true" 
+                            "threads=4 ! rtph264pay !  udpsink host="; 
+    std::stringstream istream;
+    istream << remoteHost_ << " port = " << port_;           
+    launchStr += istream.str();     // get port number into launch string
+    launchStr += " demux. ! queue ! fakesink";
+
     pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
     assert(pipeline_);
 }

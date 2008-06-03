@@ -24,6 +24,10 @@ class GstTestSuite : public Test::Suite
                 TEST_ADD(GstTestSuite::start_v4l)
                 TEST_ADD(GstTestSuite::stop_v4l)
                 TEST_ADD(GstTestSuite::start_stop_v4l)
+                
+                TEST_ADD(GstTestSuite::start_v4l_rtp)
+                TEST_ADD(GstTestSuite::stop_v4l_rtp)
+                TEST_ADD(GstTestSuite::start_stop_v4l_rtp)
 
                 TEST_ADD(GstTestSuite::start_dv_rtp)
                 TEST_ADD(GstTestSuite::stop_dv_rtp)
@@ -73,6 +77,10 @@ class GstTestSuite : public Test::Suite
         void start_v4l();
         void stop_v4l();
         void start_stop_v4l();
+        
+        void start_v4l_rtp();
+        void stop_v4l_rtp();
+        void start_stop_v4l_rtp();
 
         void start_dv();
         void stop_dv();
