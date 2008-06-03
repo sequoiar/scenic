@@ -8,8 +8,6 @@
 #include <sstream>
 #include <gst/gst.h>
 
-#include <jack/jack.h>
-
 #include "mediaBase.h"
 #include "audioSender.h"
 
@@ -38,10 +36,10 @@ bool AudioSender::init(const std::string media, const int port, const std::strin
     remoteHost_ = std::string(addr);
 
     //  Create sender pipeline
-    //  TODO: should these be subclasses?
     std::cout.flush();
     std::cout << std::endl;
     std::cout << media << std::endl;
+    //  TODO: should these just be separate public methods?
     if (!media.compare("1chTest"))
     {
         init_1ch_test();
@@ -692,40 +690,6 @@ void AudioSender::init_8ch_uncomp_rtp_test()
     g_object_set(G_OBJECT(txSrc8), "volume", 0.125, "freq", 900.0, "is-live", TRUE, NULL);
 }
 
-#if 0
-bool AudioSender::connect_audio()
-{
-    // make jack output ports and input ports connect, via jack api
-    jack_client_t *client;
-
-    /* try to become a client of the JACK server */
-
-    if ((client = jack_client_new ("test_client")) == 0)
-    {
-        std::cerr << "jack server not running?" << std::endl;
-        return false;
-    }
-
-    for (int i = 1; i <= numChannels_; i++)
-    {
-        std::stringstream istream;
-        istream << i;
-        std::string outputName = "<unknown>:out_txSink" + istream.str() + "_1";
-        std::string inputName = "system:playback_" + istream.str();
-        std::cout << "Connecting " << outputName << " to " << inputName 
-            << std::endl;
-        if (jack_connect(client, outputName.c_str(), inputName.c_str()))
-        {
-            std::cerr << "cannot connect input ports" << std::endl;
-            jack_client_close(client);
-            return false;
-        }
-    }
-    jack_client_close(client);
-    return true;
-}
-
-#endif
 
 
 bool AudioSender::start()

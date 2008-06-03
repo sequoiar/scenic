@@ -1,4 +1,5 @@
-// gstTestSutie.h
+
+// gstTestSuite.h
 
 #ifndef _GST_TEST_SUITE_H_
 #define _GST_TEST_SUITE_H_
@@ -120,7 +121,7 @@ void GstTestSuite::block()
 {
     char c;
     std::cout.flush();
-    std::cout << __FILE__ << ": blocking, enter any key." << std::endl;
+    std::cout << __FILE__ << ":" << __LINE__ << ": blocking, enter any key." << std::endl;
     std::cin >> c;
 }
 
