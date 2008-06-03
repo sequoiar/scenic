@@ -80,16 +80,15 @@ void VideoSender::initDv()
 void VideoSender::initV4l()
 {
     GError *error;
-    std::string launchStr = " v4l2src ! ffmpegcolorspace \
-                                  ! x264enc bitrate=12000 byte-stream=true \
-                                  threads=4 ! rtph264pay ! \
-                                  udpsink host="; 
-                                  
-    std::stringstream istream;
-    istream << remoteHost_ << " port = " << port_;           
-    launchStr += istream.str();     // get port number into launch string
-    launchStr += " demux. ! queue ! fakesink";
+    std::string launchStr = "v4l2src ! ffmpegcolorspace ! xvimagesink";
+//        "v4l2src ! ffmpegcolorspace ! x264enc bitrate=12000 byte-stream=true threads=4 ! rtph264pay !  udpsink host="; 
+//    std::stringstream istream;
+//    istream << remoteHost_ << " port = " << port_;           
+//    launchStr += istream.str();     // get port number into launch string
+//    launchStr += " demux. ! queue ! fakesink";
 
+    std::cout << "!L!" << launchStr << std::endl;
+    std::cout.flush();
     pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
     assert(pipeline_);
 }
