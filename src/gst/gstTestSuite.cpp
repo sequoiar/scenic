@@ -26,7 +26,7 @@ void GstTestSuite::tear_down()
 void GstTestSuite::init_test()
 {
     VideoSender tx;
-    tx.init(10010, THEIR_ADDRESS, "test");
+    tx.init("test", 10010, THEIR_ADDRESS);
 #if BLOCKING
     block();
 #endif
@@ -37,7 +37,7 @@ void GstTestSuite::init_test()
 void GstTestSuite::start_video()
 {
     VideoSender tx;
-    tx.init(10010, THEIR_ADDRESS, "test");
+    tx.init("test", 10010, THEIR_ADDRESS);
     tx.start();
 #if BLOCKING
     block();
@@ -49,7 +49,7 @@ void GstTestSuite::start_video()
 void GstTestSuite::stop_video()
 {
     VideoSender tx;
-    tx.init(10010, THEIR_ADDRESS, "test");
+    tx.init("test", 10010, THEIR_ADDRESS);
 #if BLOCKING
     block();
 #endif
@@ -62,7 +62,82 @@ void GstTestSuite::start_stop_video()
 {
     VideoSender tx;
 
-    tx.init(10010, THEIR_ADDRESS, "test");
+    tx.init("test", 10010, THEIR_ADDRESS);
+    tx.start();
+#if BLOCKING
+    block();
+#endif
+    tx.stop();
+}
+
+
+void GstTestSuite::start_dv()
+{
+    VideoSender tx;
+    tx.init("dv", 10010, THEIR_ADDRESS);
+    tx.start();
+#if BLOCKING
+    block();
+#endif
+}
+
+
+
+void GstTestSuite::stop_dv()
+{
+    VideoSender tx;
+    tx.init("dv", 10010, THEIR_ADDRESS);
+#if BLOCKING
+    block();
+#endif
+    tx.stop();
+}
+
+
+
+void GstTestSuite::start_stop_dv()
+{
+    VideoSender tx;
+
+    tx.init("dv", 10010, THEIR_ADDRESS);
+    tx.start();
+#if BLOCKING
+    block();
+#endif
+    tx.stop();
+}
+
+
+
+void GstTestSuite::start_dv_rtp()
+{
+    VideoSender tx;
+    tx.init("dvRtp", 10010, THEIR_ADDRESS);
+    tx.start();
+#if BLOCKING
+    block();
+#endif
+}
+
+
+
+void GstTestSuite::stop_dv_rtp()
+{
+    VideoSender tx;
+    tx.init("dvRtp", 10010, THEIR_ADDRESS);
+#if BLOCKING
+    block();
+#endif
+    tx.stop();
+}
+
+
+
+void GstTestSuite::start_stop_dv_rtp()
+{
+    VideoSender tx;
+
+    tx.init("dvRtp", 10010, THEIR_ADDRESS);
     tx.start();
 #if BLOCKING
     block();
@@ -76,7 +151,7 @@ void GstTestSuite::start_1ch_audio()
 {
     AudioSender tx;
 
-    tx.init(10010, THEIR_ADDRESS, "1chTest");
+    tx.init("1chTest", 10010, THEIR_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
     block();
@@ -88,7 +163,7 @@ void GstTestSuite::start_1ch_audio()
 void GstTestSuite::stop_1ch_audio()
 {
     AudioSender tx;
-    tx.init(10010, THEIR_ADDRESS, "1chTest");
+    tx.init("1chTest", 10010, THEIR_ADDRESS);
     TEST_ASSERT(tx.stop());
 #if BLOCKING
     block();
@@ -101,7 +176,7 @@ void GstTestSuite::start_stop_1ch_audio()
 {
     AudioSender tx;
 
-    tx.init(10010, THEIR_ADDRESS, "1chTest");
+    tx.init("1chTest", 10010, THEIR_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
     block();
@@ -115,7 +190,7 @@ void GstTestSuite::start_2ch_audio()
 {
     AudioSender tx;
 
-    tx.init(10010, THEIR_ADDRESS, "2chTest");
+    tx.init("2chTest", 10010, THEIR_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
     block();
@@ -127,7 +202,7 @@ void GstTestSuite::start_2ch_audio()
 void GstTestSuite::stop_2ch_audio()
 {
     AudioSender tx;
-    tx.init(10010, THEIR_ADDRESS, "2chTest");
+    tx.init("2chTest", 10010, THEIR_ADDRESS);
 #if BLOCKING
     block();
 #endif
@@ -140,7 +215,7 @@ void GstTestSuite::start_stop_2ch_audio()
 {
     AudioSender tx;
 
-    tx.init(10010, THEIR_ADDRESS, "2chTest");
+    tx.init("2chTest", 10010, THEIR_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
     block();
@@ -152,10 +227,9 @@ void GstTestSuite::start_stop_2ch_audio()
 
 void GstTestSuite::start_6ch_audio()
 {
-    std::cout << "I tend to hang, possibly related to the errormsg I put out?" << std::endl;
     AudioSender tx;
 
-    tx.init(10010, THEIR_ADDRESS, "6chTest");
+    tx.init("6chTest", 10010, THEIR_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
     block();
@@ -167,7 +241,7 @@ void GstTestSuite::start_6ch_audio()
 void GstTestSuite::stop_6ch_audio()
 {
     AudioSender tx;
-    tx.init(10010, THEIR_ADDRESS, "6chTest");
+    tx.init("6chTest", 10010, THEIR_ADDRESS);
 #if BLOCKING
     block();
 #endif
@@ -180,7 +254,7 @@ void GstTestSuite::start_stop_6ch_audio()
 {
     AudioSender tx;
 
-    tx.init(10010, THEIR_ADDRESS, "6chTest");
+    tx.init("6chTest", 10010, THEIR_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
     block();
@@ -192,10 +266,9 @@ void GstTestSuite::start_stop_6ch_audio()
 
 void GstTestSuite::start_8ch_audio()
 {
-    std::cout << "I tend to hang, possibly related to the errormsg I put out?" << std::endl;
     AudioSender tx;
 
-    tx.init(10010, THEIR_ADDRESS, "8chTest");
+    tx.init("8chTest", 10010, THEIR_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
     block();
@@ -207,7 +280,7 @@ void GstTestSuite::start_8ch_audio()
 void GstTestSuite::stop_8ch_audio()
 {
     AudioSender tx;
-    tx.init(10010, THEIR_ADDRESS, "8chTest");
+    tx.init("8chTest", 10010, THEIR_ADDRESS);
 #if BLOCKING
     block();
 #endif
@@ -220,7 +293,7 @@ void GstTestSuite::start_stop_8ch_audio()
 {
     AudioSender tx;
 
-    tx.init(10010, THEIR_ADDRESS, "8chTest");
+    tx.init("8chTest", 10010, THEIR_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
     block();
@@ -229,13 +302,16 @@ void GstTestSuite::start_stop_8ch_audio()
 }
 
 
+/*----------------------------------------------*/ 
+/* Forks, a little much for a unit test.        */
+/*----------------------------------------------*/ 
 
 void GstTestSuite::start_8ch_comp_rtp_audio()
 {
     AudioSender tx;
     AudioReceiver rx;
 
-    tx.init(10010, THEIR_ADDRESS, "8chRtpTest");
+    tx.init("8chCompRtpTest", 10010, THEIR_ADDRESS);
     rx.init(10010);
     TEST_ASSERT(tx.start());
     TEST_ASSERT(rx.start());
@@ -250,7 +326,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audio()
 {
     AudioSender tx;
     AudioReceiver rx;
-    tx.init(10010, THEIR_ADDRESS, "8chRtpTest");
+    tx.init("8chCompRtpTest", 10010, THEIR_ADDRESS);
     rx.init(10010);
 #if BLOCKING
     block();
@@ -264,10 +340,10 @@ void GstTestSuite::stop_8ch_comp_rtp_audio()
 void GstTestSuite::start_stop_8ch_comp_rtp_audio()
 {
     AudioSender tx;
-    AudioSender rx;
+    AudioReceiver rx;
 
-    tx.init(10010, THEIR_ADDRESS, "8chCompRtpTest");
-    rx.init(10010, THEIR_ADDRESS, "8chCompRtpTest");
+    tx.init("8chCompRtpTest", 10010, THEIR_ADDRESS);
+    rx.init(10010);
     TEST_ASSERT(tx.start());
     TEST_ASSERT(rx.start());
 #if BLOCKING
@@ -284,7 +360,7 @@ void GstTestSuite::start_8ch_uncomp_rtp_audio()
     AudioSender tx;
     AudioReceiver rx;
 
-    tx.init(10010, THEIR_ADDRESS, "8chUncompRtpTest");
+    tx.init("8chUncompRtpTest", 10010, THEIR_ADDRESS);
     rx.init(10010);
     TEST_ASSERT(tx.start());
     TEST_ASSERT(rx.start());
@@ -299,7 +375,7 @@ void GstTestSuite::stop_8ch_uncomp_rtp_audio()
 {
     AudioSender tx;
     AudioReceiver rx;
-    tx.init(10010, THEIR_ADDRESS, "8chUncompRtpTest");
+    tx.init("8chUncompRtpTest", 10010, THEIR_ADDRESS);
     rx.init(10010);
 #if BLOCKING
     block();
@@ -313,10 +389,10 @@ void GstTestSuite::stop_8ch_uncomp_rtp_audio()
 void GstTestSuite::start_stop_8ch_uncomp_rtp_audio()
 {
     AudioSender tx;
-    AudioSender rx;
+    AudioReceiver rx;
 
-    tx.init(10010, THEIR_ADDRESS, "8chUncompRtpTest");
-    rx.init(10010, THEIR_ADDRESS, "8chUncompRtpTest");
+    tx.init("8chUncompRtpTest", 10010, THEIR_ADDRESS);
+    rx.init(10010);
     TEST_ASSERT(tx.start());
     TEST_ASSERT(rx.start());
 #if BLOCKING

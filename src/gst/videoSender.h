@@ -20,6 +20,7 @@ class VideoSender : public MediaBase
 
     private:
         void initDv();
+        void initDvRtp();
         void initV4l();
         void initTest();
 

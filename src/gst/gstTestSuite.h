@@ -11,11 +11,20 @@ class GstTestSuite : public Test::Suite
 
         GstTestSuite()
         {
-            TEST_ADD(GstTestSuite::init_test)
+                TEST_ADD(GstTestSuite::init_test)
+                    
                 TEST_ADD(GstTestSuite::start_video)
                 TEST_ADD(GstTestSuite::stop_video)
                 TEST_ADD(GstTestSuite::start_stop_video)
                 
+                TEST_ADD(GstTestSuite::start_dv)
+                TEST_ADD(GstTestSuite::stop_dv)
+                TEST_ADD(GstTestSuite::start_stop_dv)
+
+                TEST_ADD(GstTestSuite::start_dv_rtp)
+                TEST_ADD(GstTestSuite::stop_dv_rtp)
+                TEST_ADD(GstTestSuite::start_stop_dv_rtp)
+
                 TEST_ADD(GstTestSuite::start_1ch_audio)
                 TEST_ADD(GstTestSuite::stop_1ch_audio)
                 TEST_ADD(GstTestSuite::start_stop_1ch_audio)
@@ -31,13 +40,16 @@ class GstTestSuite : public Test::Suite
                 TEST_ADD(GstTestSuite::start_8ch_audio)
                 TEST_ADD(GstTestSuite::stop_8ch_audio)
                 TEST_ADD(GstTestSuite::start_stop_8ch_audio)
-                
               
-                //TEST_ADD(GstTestSuite::start_multi_rtp_audio)
-                /*
-                TEST_ADD(GstTestSuite::stop_multi_rtp_audio)
-                TEST_ADD(GstTestSuite::start_stop_multi_rtp_audio)
-                */
+                TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audio)
+                TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audio)
+                TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audio)
+
+#if 0
+                TEST_ADD(GstTestSuite::start_8ch_uncomp_rtp_audio)
+                TEST_ADD(GstTestSuite::stop_8ch_uncomp_rtp_audio)
+                TEST_ADD(GstTestSuite::start_stop_8ch_uncomp_rtp_audio)
+#endif
         }
 
         // some tests
@@ -53,6 +65,14 @@ class GstTestSuite : public Test::Suite
         void start_video();
         void stop_video();
         void start_stop_video();
+
+        void start_dv();
+        void stop_dv();
+        void start_stop_dv();
+
+        void start_dv_rtp();
+        void stop_dv_rtp();
+        void start_stop_dv_rtp();
 
         void start_1ch_audio();
         void stop_1ch_audio();
