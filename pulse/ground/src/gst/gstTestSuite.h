@@ -1,5 +1,10 @@
 
 // gstTestSuite.h
+//
+// Declares and registers a series of unit tests. Note that currently, these tests are quite simple. 
+// A more comprehensive/detailed testsuite would have to cover specific
+// usecases and look more like client code. The current set of tests just does a quick probe of our 
+// media interface.
 
 #ifndef _GST_TEST_SUITE_H_
 #define _GST_TEST_SUITE_H_
@@ -32,42 +37,45 @@ class GstTestSuite : public Test::Suite
 
                 TEST_ADD(GstTestSuite::start_dv_rtp)
                 TEST_ADD(GstTestSuite::stop_dv_rtp)
-                TEST_ADD(GstTestSuite::start_stop_dv_rtp)
+                    TEST_ADD(GstTestSuite::start_stop_dv_rtp)
 
-                TEST_ADD(GstTestSuite::start_1ch_audio)
-                TEST_ADD(GstTestSuite::stop_1ch_audio)
-                TEST_ADD(GstTestSuite::start_stop_1ch_audio)
+                    TEST_ADD(GstTestSuite::start_1ch_audio)
+                    TEST_ADD(GstTestSuite::stop_1ch_audio)
+                    TEST_ADD(GstTestSuite::start_stop_1ch_audio)
 
-                TEST_ADD(GstTestSuite::start_2ch_audio)
-                TEST_ADD(GstTestSuite::stop_2ch_audio)
-                TEST_ADD(GstTestSuite::start_stop_2ch_audio)
+                    TEST_ADD(GstTestSuite::start_2ch_audio)
+                    TEST_ADD(GstTestSuite::stop_2ch_audio)
+                    TEST_ADD(GstTestSuite::start_stop_2ch_audio)
 
-                TEST_ADD(GstTestSuite::start_6ch_audio);
-                TEST_ADD(GstTestSuite::stop_6ch_audio)
-                TEST_ADD(GstTestSuite::start_stop_6ch_audio)
+                    TEST_ADD(GstTestSuite::start_6ch_audio);
+                    TEST_ADD(GstTestSuite::stop_6ch_audio)
+                    TEST_ADD(GstTestSuite::start_stop_6ch_audio)
 
-                TEST_ADD(GstTestSuite::start_8ch_audio)
-                TEST_ADD(GstTestSuite::stop_8ch_audio)
-                TEST_ADD(GstTestSuite::start_stop_8ch_audio)
-              
-                TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audio)
-                TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audio)
-                TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audio)
-
+                    TEST_ADD(GstTestSuite::start_8ch_audio)
+                    TEST_ADD(GstTestSuite::stop_8ch_audio)
+                    TEST_ADD(GstTestSuite::start_stop_8ch_audio)
+                  
+                    TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audio)
+                    TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audio)
+                    TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audio)
 #if 0
-                TEST_ADD(GstTestSuite::start_8ch_uncomp_rtp_audio)
-                TEST_ADD(GstTestSuite::stop_8ch_uncomp_rtp_audio)
-                TEST_ADD(GstTestSuite::start_stop_8ch_uncomp_rtp_audio)
+                    TEST_ADD(GstTestSuite::start_8ch_uncomp_rtp_audio)
+                    TEST_ADD(GstTestSuite::stop_8ch_uncomp_rtp_audio)
+                    TEST_ADD(GstTestSuite::start_stop_8ch_uncomp_rtp_audio)
 #endif
-        }
+            }
 
-        // some tests
+            void set_id(int id);
 
-    protected:
-        virtual void setup();       // setup resources common to all tests  
-        virtual void tear_down();   // destroy common resources
+            // some tests
 
-    private:
+        protected:
+            virtual void setup();       // setup resources common to all tests  
+            virtual void tear_down();   // destroy common resources
+
+        private:
+            static int testCounter_;
+        int id_;
         void block(); // inline
         void init_test();
 
