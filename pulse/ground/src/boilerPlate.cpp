@@ -1,5 +1,5 @@
 
-// gst_main.cpp
+// boilerPlate.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
 // This file is part of [propulse]ART.
@@ -17,13 +17,4 @@
 // You should have received a copy of the GNU General Public License
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
-
-
-int gst_main(int argc, char *argv[]);
-    
-
-int main(int argc, char *argv[])
-{
-    return gst_main(argc,argv);
-}
 

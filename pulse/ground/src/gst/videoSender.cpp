@@ -1,5 +1,23 @@
 
 // videoSender.cpp
+// Copyright 2008 Koya Charles & Tristan Matthews 
+//     
+// This file is part of [propulse]ART.
+//
+// [propulse]ART is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// [propulse]ART is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+//
+
 
 #include <iostream>
 #include <sstream>
@@ -72,8 +90,7 @@ bool VideoSender::init(const std::string media,const int port, const std::string
 void VideoSender::initDv()
 {
     GError* error = NULL;
-    std::string launchStr = "dv1394src ! dvdemux name=demux demux. ! queue ! dvdec ! xvimagesink "
-                            "sync=false demux. ! queue ! audioconvert ! alsasink sync=false";
+    std::string launchStr = "dv1394src ! dvdemux ! dvdec ! xvimagesink sync=false";
 
     pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
     assert(pipeline_);
