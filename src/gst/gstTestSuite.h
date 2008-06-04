@@ -142,10 +142,9 @@ class GstTestSuite : public Test::Suite
 inline
 void GstTestSuite::block()
 {
-    char c;
     std::cout.flush();
     std::cout << __FILE__ << ":" << __LINE__ << ": blocking, enter any key." << std::endl;
-    std::cin >> c;
+    std::cin.get();
 }
 
 #endif // _GST_TEST_SUITE_H_

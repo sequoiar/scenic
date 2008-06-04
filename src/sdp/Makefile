@@ -48,7 +48,5 @@ tags:
 
 .PHONY: clean
 clean:
-	rm *.o
-	rm $(BINDIR)/$(APPLICATION)
-	rm $(BINDIR)/$(APPLICATION)Tester
+	rm *.o; rm $(BINDIR)/$(APPLICATION); rm $(BINDIR)/$(APPLICATION)Tester
 
