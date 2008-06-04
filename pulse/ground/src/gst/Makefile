@@ -39,7 +39,7 @@ $(APPLICATION): $(APPOBJS)
 	$(CPP_CC) $(APPOBJS) ../sip/sipSingleton.o ../sip/sipStateless.o -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
 
 tests : $(TESTOBJS)
-	$(CPP_CC) $(TESTOBJS) $(CPPTEST_LDFLAGS) -o $(BINDIR)/gstTester $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
+	$(CPP_CC) $(TESTOBJS) $(CPPTEST_LDFLAGS) -o $(BINDIR)/$(APPICATION)Tester $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
 					 
 all: $(APPLICATION)
 
@@ -50,5 +50,5 @@ tags:
 clean:
 	rm *.o
 	rm $(BINDIR)/$(APPLICATION)
-	rm $(BINDIR)/gstTester
+	rm $(BINDIR)/$(APPLICATION)Tester
 
