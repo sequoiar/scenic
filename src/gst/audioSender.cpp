@@ -1,5 +1,23 @@
 
 // audioSender.cpp
+// Copyright 2008 Koya Charles & Tristan Matthews 
+//     
+// This file is part of [propulse]ART.
+//
+// [propulse]ART is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// [propulse]ART is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+//
+
 
 #include <iostream>
 #include <sstream>
@@ -538,7 +556,7 @@ void AudioSender::init_8ch_comp_rtp_test()
     gst_element_link_many(txSrc8, aconv8, queue8, interleave, NULL);
 
     // FIXME: these should be set to private class variables, not hardcoded
-    g_object_set(G_OBJECT(txSink1), "host", "localhost", "port", 5060, NULL);
+    g_object_set(G_OBJECT(txSink1), "host", remoteHost_.c_str(), "port", port_, NULL);
 
     g_object_set(G_OBJECT(txSrc1), "volume", 0.125, "freq", 200.0, "is-live", TRUE, NULL);
     g_object_set(G_OBJECT(txSrc2), "volume", 0.125, "freq", 300.0, "is-live", TRUE, NULL);
@@ -678,7 +696,7 @@ void AudioSender::init_8ch_uncomp_rtp_test()
     gst_element_link_many(txSrc8, aconv8, queue8, interleave, NULL);
 
     // FIXME: these should be set to private class variables, not hardcoded
-    g_object_set(G_OBJECT(txSink1), "host", "localhost", "port", 5060, NULL);
+    g_object_set(G_OBJECT(txSink1), "host", remoteHost_, "port", port_, NULL);
 
     g_object_set(G_OBJECT(txSrc1), "volume", 0.125, "freq", 200.0, "is-live", TRUE, NULL);
     g_object_set(G_OBJECT(txSrc2), "volume", 0.125, "freq", 300.0, "is-live", TRUE, NULL);

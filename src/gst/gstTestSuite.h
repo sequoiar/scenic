@@ -1,6 +1,23 @@
 
 // gstTestSuite.h
+// Copyright 2008 Koya Charles & Tristan Matthews 
+//     
+// This file is part of [propulse]ART.
 //
+// [propulse]ART is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// [propulse]ART is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+//
+
 // Declares and registers a series of unit tests. Note that currently, these tests are quite simple. 
 // A more comprehensive/detailed testsuite would have to cover specific
 // usecases and look more like client code. The current set of tests just does a quick probe of our 
@@ -17,64 +34,62 @@ class GstTestSuite : public Test::Suite
 
         GstTestSuite()
         {
-                TEST_ADD(GstTestSuite::init_test)
-                    
-                TEST_ADD(GstTestSuite::start_video)
-                TEST_ADD(GstTestSuite::stop_video)
-                TEST_ADD(GstTestSuite::start_stop_video)
-                
-                TEST_ADD(GstTestSuite::start_dv)
-                TEST_ADD(GstTestSuite::stop_dv)
-                TEST_ADD(GstTestSuite::start_stop_dv)
-                
-                TEST_ADD(GstTestSuite::start_v4l)
-                TEST_ADD(GstTestSuite::stop_v4l)
-                TEST_ADD(GstTestSuite::start_stop_v4l)
-                
-                TEST_ADD(GstTestSuite::start_v4l_rtp)
-                TEST_ADD(GstTestSuite::stop_v4l_rtp)
-                TEST_ADD(GstTestSuite::start_stop_v4l_rtp)
+            TEST_ADD(GstTestSuite::init_test)
 
-                TEST_ADD(GstTestSuite::start_dv_rtp)
-                TEST_ADD(GstTestSuite::stop_dv_rtp)
-                    TEST_ADD(GstTestSuite::start_stop_dv_rtp)
+            TEST_ADD(GstTestSuite::start_video)
+            TEST_ADD(GstTestSuite::stop_video)
+            TEST_ADD(GstTestSuite::start_stop_video)
 
-                    TEST_ADD(GstTestSuite::start_1ch_audio)
-                    TEST_ADD(GstTestSuite::stop_1ch_audio)
-                    TEST_ADD(GstTestSuite::start_stop_1ch_audio)
+            TEST_ADD(GstTestSuite::start_dv)
+            TEST_ADD(GstTestSuite::stop_dv)
+            TEST_ADD(GstTestSuite::start_stop_dv)
 
-                    TEST_ADD(GstTestSuite::start_2ch_audio)
-                    TEST_ADD(GstTestSuite::stop_2ch_audio)
-                    TEST_ADD(GstTestSuite::start_stop_2ch_audio)
+            TEST_ADD(GstTestSuite::start_v4l)
+            TEST_ADD(GstTestSuite::stop_v4l)
+            TEST_ADD(GstTestSuite::start_stop_v4l)
 
-                    TEST_ADD(GstTestSuite::start_6ch_audio);
-                    TEST_ADD(GstTestSuite::stop_6ch_audio)
-                    TEST_ADD(GstTestSuite::start_stop_6ch_audio)
+            TEST_ADD(GstTestSuite::start_v4l_rtp)
+            TEST_ADD(GstTestSuite::stop_v4l_rtp)
+            TEST_ADD(GstTestSuite::start_stop_v4l_rtp)
 
-                    TEST_ADD(GstTestSuite::start_8ch_audio)
-                    TEST_ADD(GstTestSuite::stop_8ch_audio)
-                    TEST_ADD(GstTestSuite::start_stop_8ch_audio)
-                  
-                    TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audio)
-                    TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audio)
-                    TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audio)
+            TEST_ADD(GstTestSuite::start_dv_rtp)
+            TEST_ADD(GstTestSuite::stop_dv_rtp)
+            TEST_ADD(GstTestSuite::start_stop_dv_rtp)
+
+            TEST_ADD(GstTestSuite::start_1ch_audio)
+            TEST_ADD(GstTestSuite::stop_1ch_audio)
+            TEST_ADD(GstTestSuite::start_stop_1ch_audio)
+
+            TEST_ADD(GstTestSuite::start_2ch_audio)
+            TEST_ADD(GstTestSuite::stop_2ch_audio)
+            TEST_ADD(GstTestSuite::start_stop_2ch_audio)
+
+            TEST_ADD(GstTestSuite::start_6ch_audio);
+            TEST_ADD(GstTestSuite::stop_6ch_audio)
+            TEST_ADD(GstTestSuite::start_stop_6ch_audio)
+
+            TEST_ADD(GstTestSuite::start_8ch_audio)
+            TEST_ADD(GstTestSuite::stop_8ch_audio)
+            TEST_ADD(GstTestSuite::start_stop_8ch_audio)
+            TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audio)
+            TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audio)
+            TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audio)
 #if 0
-                    TEST_ADD(GstTestSuite::start_8ch_uncomp_rtp_audio)
-                    TEST_ADD(GstTestSuite::stop_8ch_uncomp_rtp_audio)
-                    TEST_ADD(GstTestSuite::start_stop_8ch_uncomp_rtp_audio)
+                TEST_ADD(GstTestSuite::start_8ch_uncomp_rtp_audio)
+                TEST_ADD(GstTestSuite::stop_8ch_uncomp_rtp_audio)
+                TEST_ADD(GstTestSuite::start_stop_8ch_uncomp_rtp_audio)
 #endif
-            }
+        }
 
-            void set_id(int id);
+        void set_id(int id);
 
-            // some tests
+        // some tests
 
-        protected:
-            virtual void setup();       // setup resources common to all tests  
-            virtual void tear_down();   // destroy common resources
+    protected:
+        virtual void setup();       // setup resources common to all tests  
+        virtual void tear_down();   // destroy common resources
 
-        private:
-            static int testCounter_;
+    private:
         int id_;
         void block(); // inline
         void init_test();
@@ -82,11 +97,11 @@ class GstTestSuite : public Test::Suite
         void start_video();
         void stop_video();
         void start_stop_video();
-        
+
         void start_v4l();
         void stop_v4l();
         void start_stop_v4l();
-        
+
         void start_v4l_rtp();
         void stop_v4l_rtp();
         void start_stop_v4l_rtp();
@@ -118,7 +133,7 @@ class GstTestSuite : public Test::Suite
         void start_8ch_comp_rtp_audio();
         void stop_8ch_comp_rtp_audio();
         void start_stop_8ch_comp_rtp_audio();
-        
+
         void start_8ch_uncomp_rtp_audio();
         void stop_8ch_uncomp_rtp_audio();
         void start_stop_8ch_uncomp_rtp_audio();

@@ -1,5 +1,23 @@
 
 // gstTestSuite.cpp
+// Copyright 2008 Koya Charles & Tristan Matthews 
+//     
+// This file is part of [propulse]ART.
+//
+// [propulse]ART is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// [propulse]ART is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+//
+
 
 
 #include <cpptest.h>
@@ -18,8 +36,6 @@
 
 #define BLOCKING 1
 
-int GstTestSuite::testCounter_ = 0;
-
 void GstTestSuite::set_id(int id)
 {
     if (id == 1 || id == 0)
@@ -37,8 +53,6 @@ void GstTestSuite::setup()
 {
     std::cout.flush();
     std::cout << std::endl;
-    std::cout << "This is test " << testCounter_ << std::endl;
-    testCounter_++;
 }
 
 
@@ -52,6 +66,9 @@ void GstTestSuite::tear_down()
 
 void GstTestSuite::init_test()
 {
+    if (id_ == 1)
+        return;
+
     VideoSender tx;
     tx.init("test", 10010, MY_ADDRESS);
 #if BLOCKING
@@ -63,6 +80,9 @@ void GstTestSuite::init_test()
 
 void GstTestSuite::start_video()
 {
+    if (id_ == 1)
+        return;
+
     VideoSender tx;
     tx.init("test", 10010, MY_ADDRESS);
     tx.start();
@@ -75,6 +95,9 @@ void GstTestSuite::start_video()
 
 void GstTestSuite::stop_video()
 {
+    if (id_ == 1)
+        return;
+
     VideoSender tx;
     tx.init("test", 10010, MY_ADDRESS);
 #if BLOCKING
@@ -87,6 +110,9 @@ void GstTestSuite::stop_video()
 
 void GstTestSuite::start_stop_video()
 {
+    if (id_ == 1)
+        return;
+
     VideoSender tx;
 
     tx.init("test", 10010, MY_ADDRESS);
@@ -101,6 +127,9 @@ void GstTestSuite::start_stop_video()
 
 void GstTestSuite::start_v4l()
 {
+    if (id_ == 1)
+        return;
+
     VideoSender tx;
     tx.init("v4l", 10010, MY_ADDRESS);
     tx.start();
@@ -113,6 +142,9 @@ void GstTestSuite::start_v4l()
 
 void GstTestSuite::stop_v4l()
 {
+    if (id_ == 1)
+        return;
+
     VideoSender tx;
     tx.init("v4l", 10010, MY_ADDRESS);
 #if BLOCKING
@@ -125,6 +157,9 @@ void GstTestSuite::stop_v4l()
 
 void GstTestSuite::start_stop_v4l()
 {
+    if (id_ == 1)
+        return;
+
     VideoSender tx;
 
     tx.init("v4l", 10010, MY_ADDRESS);
@@ -163,32 +198,59 @@ void GstTestSuite::start_v4l_rtp()
 
 void GstTestSuite::stop_v4l_rtp()
 {
-    VideoSender tx;
-    tx.init("v4lRtp", 10010, MY_ADDRESS);
+    if (id_ == 0)
+    {
+        VideoSender tx;
+        tx.init("v4lRtp", 10010, MY_ADDRESS);
 #if BLOCKING
-    block();
+        block();
 #endif
-    tx.stop();
+        tx.stop();
+    }
+    else
+    {
+        VideoReceiver rx;
+        rx.init(10010);
+#if BLOCKING
+        block();
+#endif
+        rx.stop();
+    }
 }
 
 
 
 void GstTestSuite::start_stop_v4l_rtp()
 {
-    VideoSender tx;
-
-    tx.init("v4lRtp", 10010, MY_ADDRESS);
-    tx.start();
+    if (id_ == 0)
+    {
+        VideoSender tx;
+        tx.init("v4lRtp", 10010, MY_ADDRESS);
+        tx.start();
 #if BLOCKING
-    block();
+        block();
 #endif
-    tx.stop();
+        tx.stop();
+    }
+    else
+    {
+        VideoReceiver rx;
+        rx.init(10010);
+        rx.start();
+#if BLOCKING
+        block();
+#endif
+        rx.stop();
+    }
 }
 
 
 
 void GstTestSuite::start_dv()
 {
+    if (id_ == 1)
+        return;
+
     VideoSender tx;
     tx.init("dv", 10010, MY_ADDRESS);
     tx.start();
@@ -201,6 +263,9 @@ void GstTestSuite::start_dv()
 
 void GstTestSuite::stop_dv()
 {
+    if (id_ == 1)
+        return;
+
     VideoSender tx;
     tx.init("dv", 10010, MY_ADDRESS);
 #if BLOCKING
@@ -213,8 +278,10 @@ void GstTestSuite::stop_dv()
 
 void GstTestSuite::start_stop_dv()
 {
-    VideoSender tx;
+    if (id_ == 1)
+        return;
 
+    VideoSender tx;
     tx.init("dv", 10010, MY_ADDRESS);
     tx.start();
 #if BLOCKING
@@ -252,32 +319,59 @@ void GstTestSuite::start_dv_rtp()
 
 void GstTestSuite::stop_dv_rtp()
 {
-    VideoSender tx;
-    tx.init("dvRtp", 10010, MY_ADDRESS);
+    if (id_ == 0)
+    {
+        VideoReceiver rx;
+        rx.init(10010);
 #if BLOCKING
-    block();
+        block();
 #endif
-    tx.stop();
+        rx.stop();
+    }
+    else
+    {
+        VideoSender tx;
+        tx.init("dvRtp", 10010, MY_ADDRESS);
+#if BLOCKING
+        block();
+#endif
+        tx.stop();
+    }
 }
 
 
 
 void GstTestSuite::start_stop_dv_rtp()
 {
-    VideoSender tx;
-
-    tx.init("dvRtp", 10010, MY_ADDRESS);
-    tx.start();
+    if (id_ == 0)
+    {
+        VideoReceiver rx;
+        rx.init(10010);
+        rx.start();
 #if BLOCKING
-    block();
+        block();
 #endif
-    tx.stop();
+        rx.stop();
+    }
+    else
+    {
+        VideoSender tx;
+        tx.init("dvRtp", 10010, MY_ADDRESS);
+        tx.start();
+#if BLOCKING
+        block();
+#endif
+        tx.stop();
+    }
 }
 
 
 
 void GstTestSuite::start_1ch_audio()
 {
+    if (id_ == 1)
+        return;
+
     AudioSender tx;
 
     tx.init("1chTest", 10010, MY_ADDRESS);
@@ -291,6 +385,9 @@ void GstTestSuite::start_1ch_audio()
 
 void GstTestSuite::stop_1ch_audio()
 {
+    if (id_ == 1)
+        return;
+
     AudioSender tx;
     tx.init("1chTest", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.stop());
@@ -303,6 +400,9 @@ void GstTestSuite::stop_1ch_audio()
 
 void GstTestSuite::start_stop_1ch_audio()
 {
+    if (id_ == 1)
+        return;
+
     AudioSender tx;
 
     tx.init("1chTest", 10010, MY_ADDRESS);
@@ -317,8 +417,10 @@ void GstTestSuite::start_stop_1ch_audio()
 
 void GstTestSuite::start_2ch_audio()
 {
-    AudioSender tx;
+    if (id_ == 1)
+        return;
 
+    AudioSender tx;
     tx.init("2chTest", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
@@ -330,6 +432,9 @@ void GstTestSuite::start_2ch_audio()
 
 void GstTestSuite::stop_2ch_audio()
 {
+    if (id_ == 1)
+        return;
+
     AudioSender tx;
     tx.init("2chTest", 10010, MY_ADDRESS);
 #if BLOCKING
@@ -342,8 +447,10 @@ void GstTestSuite::stop_2ch_audio()
 
 void GstTestSuite::start_stop_2ch_audio()
 {
-    AudioSender tx;
+    if (id_ == 1)
+        return;
 
+    AudioSender tx;
     tx.init("2chTest", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
@@ -356,8 +463,10 @@ void GstTestSuite::start_stop_2ch_audio()
 
 void GstTestSuite::start_6ch_audio()
 {
-    AudioSender tx;
+    if (id_ == 1)
+        return;
 
+    AudioSender tx;
     tx.init("6chTest", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
@@ -369,6 +478,8 @@ void GstTestSuite::start_6ch_audio()
 
 void GstTestSuite::stop_6ch_audio()
 {
+    if (id_ == 1)
+        return;
     AudioSender tx;
     tx.init("6chTest", 10010, MY_ADDRESS);
 #if BLOCKING
@@ -381,8 +492,10 @@ void GstTestSuite::stop_6ch_audio()
 
 void GstTestSuite::start_stop_6ch_audio()
 {
-    AudioSender tx;
+    if (id_ == 1)
+        return;
 
+    AudioSender tx;
     tx.init("6chTest", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
@@ -395,8 +508,10 @@ void GstTestSuite::start_stop_6ch_audio()
 
 void GstTestSuite::start_8ch_audio()
 {
-    AudioSender tx;
+    if (id_ == 1)
+        return;
 
+    AudioSender tx;
     tx.init("8chTest", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 #if BLOCKING
@@ -408,6 +523,9 @@ void GstTestSuite::start_8ch_audio()
 
 void GstTestSuite::stop_8ch_audio()
 {
+    if (id_ == 1)
+        return;
+
     AudioSender tx;
     tx.init("8chTest", 10010, MY_ADDRESS);
 #if BLOCKING
@@ -420,6 +538,9 @@ void GstTestSuite::stop_8ch_audio()
 
 void GstTestSuite::start_stop_8ch_audio()
 {
+    if (id_ == 1)
+        return;
+
     AudioSender tx;
 
     tx.init("8chTest", 10010, MY_ADDRESS);
@@ -431,55 +552,77 @@ void GstTestSuite::start_stop_8ch_audio()
 }
 
 
-/*----------------------------------------------*/ 
-/* Forks, a little much for a unit test.        */
-/*----------------------------------------------*/ 
 
 void GstTestSuite::start_8ch_comp_rtp_audio()
 {
-    AudioSender tx;
-    AudioReceiver rx;
-
-    tx.init("8chCompRtpTest", 10010, MY_ADDRESS);
-    rx.init(10010);
-    TEST_ASSERT(tx.start());
-    TEST_ASSERT(rx.start());
+    if (id_ == 0)
+    {
+        AudioReceiver rx;
+        rx.init(10010);
+        rx.start();
 #if BLOCKING
-    block();
+        block();
 #endif
+    }
+    else
+    {
+        AudioSender tx;
+        tx.init("8chCompRtpTest", 10010, MY_ADDRESS);
+        tx.start();
+#if BLOCKING
+        block();
+#endif
+    }
 }
 
 
 
 void GstTestSuite::stop_8ch_comp_rtp_audio()
 {
-    AudioSender tx;
-    AudioReceiver rx;
-    tx.init("8chCompRtpTest", 10010, MY_ADDRESS);
-    rx.init(10010);
+    if (id_ == 0)
+    {
+        AudioReceiver rx;
+        rx.init(10010);
 #if BLOCKING
-    block();
+        block();
 #endif
-    TEST_ASSERT(tx.stop());
-    TEST_ASSERT(rx.stop());
+        rx.stop();
+    }
+    else
+    {
+        AudioSender tx;
+        tx.init("8chCompRtpTest", 10010, MY_ADDRESS);
+#if BLOCKING
+        block();
+#endif
+        tx.stop();
+    }
 }
 
 
 
 void GstTestSuite::start_stop_8ch_comp_rtp_audio()
 {
-    AudioSender tx;
-    AudioReceiver rx;
-
-    tx.init("8chCompRtpTest", 10010, MY_ADDRESS);
-    rx.init(10010);
-    TEST_ASSERT(tx.start());
-    TEST_ASSERT(rx.start());
+    if (id_ == 0)
+    {
+        AudioReceiver rx;
+        rx.init(10010);
+        TEST_ASSERT(rx.start());
 #if BLOCKING
-    block();
+        block();
 #endif
-    TEST_ASSERT(rx.stop());
-    TEST_ASSERT(tx.stop());
+        TEST_ASSERT(rx.stop());
+    }
+    else
+    {
+        AudioSender tx;
+        tx.init("8chCompRtpTest", 10010, MY_ADDRESS);
+        TEST_ASSERT(tx.start());
+#if BLOCKING
+        block();
+#endif
+        TEST_ASSERT(tx.stop());
+    }
 }
 
 
