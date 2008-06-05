@@ -28,6 +28,9 @@
 
 #include <cpptest.h>
 
+#define BLOCKING 1
+
+
 class GstTestSuite : public Test::Suite
 {
     public:
@@ -139,13 +142,15 @@ class GstTestSuite : public Test::Suite
         void start_stop_8ch_uncomp_rtp_audio();
 };
 
-inline
-void GstTestSuite::block()
-{
-    std::cout.flush();
-    std::cout << __FILE__ << ":" << __LINE__ << ": blocking, enter any key." << std::endl;
-    std::cin.get();
-}
+#if BLOCKING
+    #define BLOCK() std::cout.flush();                              \
+                    std::cout << __FILE__ << ":" << __LINE__        \
+                    << ": blocking, enter any key." << std::endl;   \
+                    std::cin.get()
+#elif
+    #define BLOCK()
+#endif 
+
 
 #endif // _GST_TEST_SUITE_H_
 
