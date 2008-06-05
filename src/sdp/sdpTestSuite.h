@@ -34,13 +34,16 @@ class SdpTestSuite : public Test::Suite
         void sdp_av();
 };
 
-inline
-void SdpTestSuite::block()
-{
-    std::cout.flush();
-    std::cout << __FILE__ << ":" << __LINE__ << ": blocking, enter any key." << std::endl;
-    std::cin.get();
-}
+#define BLOCKING 1
+
+#if BLOCKING
+    #define BLOCK() std::cout.flush();                              \
+                    std::cout << __FILE__ << ":" << __LINE__        \
+                    << ": blocking, enter any key." << std::endl;   \
+                    std::cin.get()
+#elif
+    #define BLOCK()
+#endif 
 
 #endif // _SDP_TEST_SUITE_H_
 

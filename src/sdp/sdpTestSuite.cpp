@@ -14,7 +14,6 @@
 // this macro to 1.
 /*----------------------------------------------*/ 
 
-#define BLOCKING 1
 
 void SdpTestSuite::setup()
 {
@@ -34,9 +33,7 @@ void SdpTestSuite::tear_down()
 void SdpTestSuite::init_test()
 {
     std::cout << "Init Test" << std::endl;
-#if BLOCKING
-    block();
-#endif
+    BLOCK();
 }
 
 void SdpTestSuite::sdp_header()
@@ -53,13 +50,16 @@ void SdpTestSuite::sdp_video()
 {
 
     Sdp sdp("Try","127.0.0.1");
-    SdpVideo sdpv("192.168.1.183",10010);
+    SdpMedia sdpv = SdpMediaFactory::clone("H264");
+    sdpv.set_ip("192.168.1.183");
+    sdpv.set_port(10010);
 
-    sdp.add_media(sdpv);
+    TEST_ASSERT(sdp.add_media(sdpv))
 
     std::cout << sdp.str() << std::endl;
 
     TEST_ASSERT(!sdp.str().empty());
+    BLOCK();
 }
 
 void SdpTestSuite::sdp_audio()
