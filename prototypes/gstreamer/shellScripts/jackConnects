@@ -1,11 +1,12 @@
 #!/bin/bash
 
 LIMIT=8
+APPNAME=gst-launch-0.10
 
 for ((i=0, j=1; i < LIMIT ; i++, j++))
 do 
-    SRC=gst-launch-0.10:out_jackaudiosink${i}_1
-    DEST=system:playback_${j}
+    SRC=${APPNAME}:out_jackaudiosink0_${j}
+    DEST=jmeters:in-${j}
     echo connecting port ${SRC} to ${DEST}
-    jack_connect gst-launch-0.10:out_jackaudiosink${i}_1 system:playback_${j}
+    jack_connect ${SRC} ${DEST}
 done

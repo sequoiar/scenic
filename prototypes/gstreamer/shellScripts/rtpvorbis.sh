@@ -1,12 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
-
-gst-launch-0.10 -v interleave name=i ! vorbisenc ! vorbisdec ! audioconvert ! alsasink \
- audiotestsrc volume=0.5 freq=200 is-live=false ! audioconvert ! queue ! i. \
- audiotestsrc volume=0.1 freq=300 is-live=false ! audioconvert ! queue ! i. \
- audiotestsrc volume=0.1 freq=500 is-live=false ! audioconvert ! queue ! i. \
- audiotestsrc volume=0.1 freq=700 is-live=false ! audioconvert ! queue ! i. \
- audiotestsrc volume=0.1 freq=900 is-live=false ! audioconvert ! queue ! i. \
- audiotestsrc volume=0.1 freq=1100 is-live=false ! audioconvert ! queue ! i. \
- audiotestsrc volume=0.1 freq=1300 is-live=false ! audioconvert ! queue ! i. \
- audiotestsrc volume=0.1 freq=1400 is-live=false ! audioconvert ! queue ! i. 
+gst-launch-0.10 -v interleave name=i ! audioconvert ! jackaudiosink sync=false \
+audiotestsrc volume=0.5 freq=200  ! "audio/x-raw-int, channel-position=(GstAudioChannelPosition)GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT" ! audioconvert ! queue ! i. \
+audiotestsrc volume=0.1 freq=300  ! "audio/x-raw-int, channel-position=(GstAudioChannelPosition)GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT" ! audioconvert ! queue ! i. \
+audiotestsrc volume=0.1 freq=300  ! "audio/x-raw-int, channel-position=(GstAudioChannelPosition)GST_AUDIO_CHANNEL_POSITION_REAR_LEFT" ! audioconvert ! queue ! i. \
+audiotestsrc volume=0.1 freq=300  ! "audio/x-raw-int, channel-position=(GstAudioChannelPosition)GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT" ! audioconvert ! queue ! i. \
+audiotestsrc volume=0.5 freq=200  ! "audio/x-raw-int, channel-position=(GstAudioChannelPosition)GST_AUDIO_CHANNEL_POSITION_LFE" ! audioconvert ! queue ! i. \
+audiotestsrc volume=0.1 freq=300  ! "audio/x-raw-int, channel-position=(GstAudioChannelPosition)GST_AUDIO_CHANNEL_POSITION_SIDE_LEFT" ! audioconvert ! queue ! i. \
+audiotestsrc volume=0.1 freq=300  ! "audio/x-raw-int, channel-position=(GstAudioChannelPosition)GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT" ! audioconvert ! queue ! i. \
+audiotestsrc volume=0.1 freq=300  ! "audio/x-raw-int, channel-position=(GstAudioChannelPosition)GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT_OF_CENTER" ! audioconvert ! queue ! i. 
