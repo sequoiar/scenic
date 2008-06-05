@@ -4,24 +4,25 @@
 #include <string>
 #include <sstream>
 #include <list>
+#include <map>
 
-#define MAX_MEDIA 2
 
 class SdpMedia
 {
 public:
-    SdpMedia(std::string _name, std::string _address, int _port, int _avp_type)
-        :name(_name),address(_address),port(_port),num_attrib(0),avp_type(_avp_type)
+    SdpMedia(std::string _name, std::string _codec, int _avp_type)
+        :name(_name),codec(_codec),num_attrib(0),avp_type(_avp_type)
     {}
+    SdpMedia(){}
 
-    SdpMedia()
-    {}
-
-    void add_attribute(std::string _attrib);
-
+    void add_attribute(std::string _attrib){attrib.push_back(_attrib);}
+    void set_ip(std::string _address){address = _address;}
+    void set_port(int _port){port = _port;}
+    int get_port(){return port;}
+    std::string& get_ip(){return address;} 
     std::string str();
 protected:
-    std::string name,address;
+    std::string name,address,codec;
     std::list<std::string> attrib;
     int port;
     int num_attrib;
@@ -29,6 +30,16 @@ protected:
 };
 
 
+class SdpMediaFactory
+{
+public:
+    static const SdpMedia& clone(std::string);
+    
+private:
+    static std::map<std::string,SdpMedia> _sdpMedia_prototypes;
+};
+
+/*
 class SdpVideo: public SdpMedia
 {
 public:
@@ -39,18 +50,18 @@ public:
 private:
 
 };
-
+*/
 
 
 
 class Sdp
 {
 public:
-    Sdp(std::string _session_name,std::string _address)
+    Sdp(std::string _session_name,std::string _address = "127.0.0.0")
         :session_name(_session_name),address(_address),num_media(0)
         {}
 
-    void add_media(SdpMedia _m);
+    bool add_media(SdpMedia _m);
     std::string str();
 
 private:
