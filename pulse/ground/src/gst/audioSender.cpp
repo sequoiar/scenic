@@ -24,7 +24,9 @@
 #include <string>
 #include <cassert>
 #include <sstream>
+
 #include <gst/gst.h>
+//#include <gst/audio/multichannel.h>
 
 #include "mediaBase.h"
 #include "audioSender.h"
@@ -436,6 +438,10 @@ void AudioSender::init_8ch_comp_rtp_test()
     numChannels_ = 8;
 
     GstElement *interleave, *encoder, *payloader, *txSink1;
+    // layout stuff
+    //GValue val = { 0, };
+    //GValueArray *arr;
+    
     GstElement *txSrc1, *aconv1, *queue1; 
     GstElement *txSrc2, *aconv2, *queue2;
     GstElement *txSrc3, *aconv3, *queue3;
@@ -452,6 +458,39 @@ void AudioSender::init_8ch_comp_rtp_test()
     
     interleave = gst_element_factory_make("interleave", "interleave");
     assert(interleave);
+
+#if 0
+    g_object_set(interleave, "channel-positions-from-input", FALSE, NULL);
+    arr = g_value_array_new(8);
+    g_value_init(&val, GST_TYPE_AUDIO_CHANNEL_POSITION);
+    g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT);
+    g_value_array_append(arr, &val);
+    g_value_reset(&val);
+    g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT);
+    g_value_array_append(arr, &val);
+    g_value_reset(&val);
+    g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_REAR_LEFT);
+    g_value_array_append(arr, &val);
+    g_value_reset(&val);
+    g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT);
+    g_value_array_append(arr, &val);
+    g_value_reset(&val);
+    g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_LFE);
+    g_value_array_append(arr, &val);
+    g_value_reset(&val);
+    g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_SIDE_LEFT);
+    g_value_array_append(arr, &val);
+    g_value_reset(&val);
+    g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT);
+    g_value_array_append(arr, &val);
+    g_value_reset(&val);
+    g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT_OF_CENTER);
+    g_value_array_append(arr, &val);
+    g_value_unset(&val);
+    g_object_set(interleave, "channel-positions", arr, NULL);
+    g_value_array_free(arr);
+#endif 
+
     encoder = gst_element_factory_make("vorbisenc", "encoder");
     assert(encoder);
     payloader = gst_element_factory_make("rtpvorbispay", "payloader");
@@ -555,7 +594,6 @@ void AudioSender::init_8ch_comp_rtp_test()
     gst_element_link_many(txSrc7, aconv7, queue7, interleave, NULL);
     gst_element_link_many(txSrc8, aconv8, queue8, interleave, NULL);
 
-    // FIXME: these should be set to private class variables, not hardcoded
     g_object_set(G_OBJECT(txSink1), "host", remoteHost_.c_str(), "port", port_, NULL);
 
     g_object_set(G_OBJECT(txSrc1), "volume", 0.125, "freq", 200.0, "is-live", TRUE, NULL);
@@ -695,8 +733,7 @@ void AudioSender::init_8ch_uncomp_rtp_test()
     gst_element_link_many(txSrc7, aconv7, queue7, interleave, NULL);
     gst_element_link_many(txSrc8, aconv8, queue8, interleave, NULL);
 
-    // FIXME: these should be set to private class variables, not hardcoded
-    g_object_set(G_OBJECT(txSink1), "host", remoteHost_, "port", port_, NULL);
+    g_object_set(G_OBJECT(txSink1), "host", remoteHost_.c_str(), "port", port_, NULL);
 
     g_object_set(G_OBJECT(txSrc1), "volume", 0.125, "freq", 200.0, "is-live", TRUE, NULL);
     g_object_set(G_OBJECT(txSrc2), "volume", 0.125, "freq", 300.0, "is-live", TRUE, NULL);
@@ -712,6 +749,7 @@ void AudioSender::init_8ch_uncomp_rtp_test()
 
 bool AudioSender::start()
 {
+    std::cout << "Sending audio to host " << remoteHost_ << " on port " << port_ << std::endl;
     MediaBase::start();
     return true;
 }
