@@ -74,6 +74,7 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::start_8ch_audio)
             TEST_ADD(GstTestSuite::stop_8ch_audio)
             TEST_ADD(GstTestSuite::start_stop_8ch_audio)
+
             TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audio)
@@ -141,7 +142,6 @@ class GstTestSuite : public Test::Suite
         void stop_8ch_uncomp_rtp_audio();
         void start_stop_8ch_uncomp_rtp_audio();
 };
-
 #if BLOCKING
     #define BLOCK() std::cout.flush();                              \
                     std::cout << __FILE__ << ":" << __LINE__        \

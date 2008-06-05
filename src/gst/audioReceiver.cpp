@@ -84,6 +84,15 @@ bool AudioReceiver::init(int port)
     return true;
 }
 
+
+
+bool AudioReceiver::start()
+{
+    std::cout << "Receiving audio on port " << port_ << std::endl;
+    MediaBase::start();
+    return true;
+}
+
 // FIXME: Shouldn't hardcode this string, should get it from sender somehow.
 
 const std::string AudioReceiver::CAPS_STR = 

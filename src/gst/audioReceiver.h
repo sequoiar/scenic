@@ -31,6 +31,7 @@ class AudioReceiver : public MediaBase
         AudioReceiver();
         virtual ~AudioReceiver();
         bool init(int port = DEF_PORT);
+        virtual bool start();
 
     private:
         static const std::string CAPS_STR;
