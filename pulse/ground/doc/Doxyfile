@@ -60,14 +60,14 @@ CREATE_SUBDIRS         = NO
 # Portuguese, Romanian, Russian, Serbian, Slovak, Slovene, Spanish, Swedish, 
 # and Ukrainian.
 
-OUTPUT_LANGUAGE        = English
+OUTPUT_LANGUAGE        = French
 
 # If the BRIEF_MEMBER_DESC tag is set to YES (the default) Doxygen will 
 # include brief member descriptions after the members that are listed in 
 # the file and class documentation (similar to JavaDoc). 
 # Set to NO to disable this.
 
-BRIEF_MEMBER_DESC      = YES
+BRIEF_MEMBER_DESC      = NO
 
 # If the REPEAT_BRIEF tag is set to YES (the default) Doxygen will prepend 
 # the brief description of a member or function before the detailed description. 
@@ -735,7 +735,7 @@ HTML_FOOTER            = footer.html
 # the style sheet file to the HTML output directory, so don't put your own 
 # stylesheet in the HTML output directory as well, or it will be erased!
 
-HTML_STYLESHEET        = stylesheet.css
+HTML_STYLESHEET        = #stylesheet.css
 
 # If the HTML_ALIGN_MEMBERS tag is set to YES, the members of classes, 
 # files or namespaces will be aligned in HTML using tables. If set to 
