@@ -1,4 +1,3 @@
-
 // boilerPlate.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
@@ -17,4 +16,14 @@
 // You should have received a copy of the GNU General Public License
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
+
+/** \brief Brief boilerPlate description.
+ *          This Brief is continued here.
+ *
+ *      Detailed description here.
+ *      Continues here.
+ *      And more.
+ *      And more.
+ */
+
 
