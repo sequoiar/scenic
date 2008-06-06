@@ -551,12 +551,86 @@ void GstTestSuite::start_stop_8ch_audio()
 
 
 
+void GstTestSuite::start_2ch_comp_rtp_audio()
+{
+    if (id_ == 0)
+    {
+        AudioReceiver rx;
+        rx.init(10010, 2);
+        rx.start();
+
+        BLOCK();
+        TEST_ASSERT(rx.isPlaying());
+    }
+    else
+    {
+        AudioSender tx;
+        tx.init("2chCompRtpTest", 10010, MY_ADDRESS);
+        tx.start();
+
+        BLOCK();
+        TEST_ASSERT(tx.isPlaying());
+    }
+}
+
+
+
+void GstTestSuite::stop_2ch_comp_rtp_audio()
+{
+    if (id_ == 0)
+    {
+        AudioReceiver rx;
+        rx.init(10010, 2);
+
+        BLOCK();
+
+        rx.stop();
+    }
+    else
+    {
+        AudioSender tx;
+        tx.init("2chCompRtpTest", 10010, MY_ADDRESS);
+
+        BLOCK();
+
+        tx.stop();
+    }
+}
+
+
+
+void GstTestSuite::start_stop_2ch_comp_rtp_audio()
+{
+    if (id_ == 0)
+    {
+        AudioReceiver rx;
+        rx.init(10010, 2);
+        TEST_ASSERT(rx.start());
+
+        BLOCK();
+
+        TEST_ASSERT(rx.stop());
+    }
+    else
+    {
+        AudioSender tx;
+        tx.init("2chCompRtpTest", 10010, MY_ADDRESS);
+        TEST_ASSERT(tx.start());
+
+        BLOCK();
+
+        TEST_ASSERT(tx.stop());
+    }
+}
+
+
+
 void GstTestSuite::start_8ch_comp_rtp_audio()
 {
     if (id_ == 0)
     {
         AudioReceiver rx;
-        rx.init(10010);
+        rx.init(10010, 8);
         rx.start();
 
         BLOCK();
@@ -580,7 +654,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audio()
     if (id_ == 0)
     {
         AudioReceiver rx;
-        rx.init(10010);
+        rx.init(10010, 8);
 
         BLOCK();
 
@@ -604,7 +678,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audio()
     if (id_ == 0)
     {
         AudioReceiver rx;
-        rx.init(10010);
+        rx.init(10010, 8);
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -631,7 +705,7 @@ void GstTestSuite::start_8ch_uncomp_rtp_audio()
     AudioReceiver rx;
 
     tx.init("8chUncompRtpTest", 10010, MY_ADDRESS);
-    rx.init(10010);
+    rx.init(10010, 8);
     TEST_ASSERT(tx.start());
     TEST_ASSERT(rx.start());
 
@@ -646,7 +720,7 @@ void GstTestSuite::stop_8ch_uncomp_rtp_audio()
     AudioSender tx;
     AudioReceiver rx;
     tx.init("8chUncompRtpTest", 10010, MY_ADDRESS);
-    rx.init(10010);
+    rx.init(10010, 8);
 
     BLOCK();
 
@@ -662,7 +736,7 @@ void GstTestSuite::start_stop_8ch_uncomp_rtp_audio()
     AudioReceiver rx;
 
     tx.init("8chUncompRtpTest", 10010, MY_ADDRESS);
-    rx.init(10010);
+    rx.init(10010, 8);
     TEST_ASSERT(tx.start());
     TEST_ASSERT(rx.start());
 
