@@ -45,11 +45,11 @@ int _ground_loop(int result)
 int _ground_init(int argc, char* argv[]) { return 0;}
 #endif
 
-BOOST_PYTHON_MODULE(hello)
+BOOST_PYTHON_MODULE(Hello)
 {
-    class_<hello>("hello")
-    .def("greet", &hello::greet)
-    .def("set_name",&hello::set_name);
+    class_<Hello>("Hello")
+    .def("greet", &Hello::greet)
+    .def("set_name",&Hello::set_name);
 }
 
 
@@ -77,14 +77,14 @@ BOOST_PYTHON_MODULE(VideoSender)
 void BOOST_PY_IMPORT()
 {
     PyImport_AppendInittab((char*)"VideoSender",&initVideoSender);
-    PyImport_AppendInittab((char*)"hello",&inithello);
+    PyImport_AppendInittab((char*)"Hello",&initHello);
 }
 
 void PYTHON_EXEC_IMPORT(object mm, object mn)
 {
     if(mm)
     {
-        exec("import hello; from hello import *",mm,mn);
+        exec("import Hello; from Hello import *",mm,mn);
         exec("import VideoSender; from VideoSender import *",mm,mn);
     }
 }
