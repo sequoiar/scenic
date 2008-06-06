@@ -1,5 +1,5 @@
 SHELL=/bin/sh
-APPLICATION=sipStateless 
+APPLICATION=sip
 
 include ../base.mak
 
@@ -9,11 +9,11 @@ include $(PJBASE)/build.mak
 BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
 
-OBJS=sipStateless.o sipSingleton.o 
+EXT_OBJS=../sdp/sdp.o ../gst/mediaBase.o ../gst/videoSender.o ../gst/videoReceiver.o ../gst/audioSender.o ../gst/audioReceiver.o
+OBJS=$(EXT_OBJS) sipStateless.o sipSingleton.o 
 APPOBJS=$(OBJS) sipMain.o
 TESTOBJS=$(OBJS) sipTestSuite.o
 
-EXT_OBJS=../sdp/sdp.o ../gst/mediaBase.o ../gst/videoSender.o ../gst/videoReceiver.o ../gst/audioSender.o ../gst/audioReceiver.o
 
 
 GST_CFLAGS=-pthread -I/usr/local/include/gstreamer-0.10 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/libxml2 
@@ -37,10 +37,10 @@ CPPFLAGS = $(CFLAGS)
 	$(CPP_CC) $(CPPFLAGS) -c $(<) -o $@
 
 $(APPLICATION): $(APPOBJS)
-	$(CPP_CC) $(APPOBJS) $(EXT_OBJS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
+	$(CPP_CC) $(APPOBJS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
 
 tests : $(TESTOBJS)
-	$(CPP_CC) $(TESTOBJS) $(CPPTEST_LDFLAGS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
+	$(CPP_CC) $(TESTOBJS) $(CPPTEST_LDFLAGS) -o $(BINDIR)/$(APPLICATION)Tester $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
 
 all: $(APPLICATION)
 

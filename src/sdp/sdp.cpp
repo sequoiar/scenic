@@ -8,7 +8,7 @@ bool Sdp::add_media(SdpMedia _m)
         if (_m.get_ip().empty() && !ip.empty())
             _m.set_ip(ip);
 
-    if (!_m.get_ip().empty() && _m.get_port() != 0)
+    if (!_m.media_type.empty() && !_m.get_ip().empty() && _m.get_port() != 0)
         media.push_back(_m);
     else
         return 0;
@@ -16,7 +16,20 @@ bool Sdp::add_media(SdpMedia _m)
     return 1;
 
 }
+/*
+SdpMedia& SdpMedia::operator=(const SdpMedia& m)
+{ 
+    if(&m == this)
+        return *this;
+    
+    ip = m.ip;
+    attrib = m.attrib;
+    port = m.port;
 
+
+    return *this;
+}
+*/
 std::string SdpMedia::str()
 {
     std::stringstream ret;

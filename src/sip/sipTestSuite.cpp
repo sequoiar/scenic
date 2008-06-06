@@ -4,7 +4,7 @@
 #include <cpptest.h>
 #include "sipTestSuite.h"
 #include "sipSingleton.h"
-#include "../gst/defaultAddresses.h"
+#include "defaultAddresses.h"
 
 void SipTestSuite::setup()
 {
