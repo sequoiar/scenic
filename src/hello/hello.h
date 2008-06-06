@@ -17,13 +17,9 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \brief hello simple example class for pyInterpreter.
- *          Instantiate, set_name then call greet.
+/** Simple example class for pyInterpreter.
  *
- *      Detailed description here.
- *      Continues here.
- *      And more.
- *      And more.
+ *          Instantiate, set_name then call greet.
  */
 
 #ifndef _HELLO_H_
@@ -31,11 +27,17 @@
 
 #include <string>
 
-class hello
+class Hello
 {
     std::string s;
 public:
+    /** Get a char* containing  "hello {name}". */
     const char * greet();
+
+    /** Set the name of who gets greeted.
+     *
+     *  More DESC here.
+     */
     void set_name(char const* n);
 };
 
