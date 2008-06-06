@@ -3,11 +3,15 @@
 
 #include <string>
 
+#include "sdp/sdp.h"
+
 class SipSingleton
 {
 
 public:
     static SipSingleton* Instance();
+
+
 
     //called inside pjsip rx_request 
     //must return pchar to desired response
@@ -26,7 +30,7 @@ public:
     bool init(const char* local_ip,const char* local_port,
             const char* remote_ip, const char* remote_port);
 
-    bool isValidService(std::string service);
+    bool isValidService();
 
     void set_service_port(int p) {service_port_ = p;}
     int get_service_port() {return service_port_;}
@@ -43,6 +47,8 @@ private:
         
     char service_[32];
     int service_port_, rx_port_;
+
+    Sdp sdp_;
 
     static SipSingleton *s_;
 };

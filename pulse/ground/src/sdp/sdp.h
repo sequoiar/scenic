@@ -33,7 +33,7 @@
 #include <sstream>
 #include <list>
 #include <map>
-
+#include <cassert>
 
 class SdpMedia;
 /** Incapsulates the sdp protocol. 
@@ -45,7 +45,7 @@ class SdpMedia;
 class Sdp
 {
 public:
-    Sdp(std::string _session_name)
+    Sdp(std::string _session_name = "<No Title>")
         :session_name(_session_name)
         {}
 
@@ -53,6 +53,7 @@ public:
     std::string str();
 
     std::list<SdpMedia>& get_media() {return media;}
+    bool is_valid(){ return !media.empty();}
 private:
     std::string session_name, ip;
 
@@ -68,23 +69,24 @@ class SdpMedia
 {
 public:
     SdpMedia(std::string _media_type, std::string _codec, int _avp_type)
-        :media_type(_media_type),codec(_codec),num_attrib(0),avp_type(_avp_type)
-    {}
-    SdpMedia(){}
+        :media_type(_media_type),codec(_codec),avp_type(_avp_type) {}
+
+    SdpMedia():media_type(""),codec(""),avp_type(0) {}
+
+    std::string media_type,codec;
+    int avp_type;
 
     void add_attribute(std::string _attrib){attrib.push_back(_attrib);}
     void set_ip(std::string _ip){ip = _ip;}
     void set_port(int _port){port = _port;}
     int get_port(){return port;}
-    std::string get_media_type(){return media_type;}
     std::string& get_ip(){return ip;} 
     std::string str();
+ //   SdpMedia& operator=(const SdpMedia& m);
 protected:
-    std::string media_type,ip,codec;
+    std::string ip;
     std::list<std::string> attrib;
     int port;
-    int num_attrib;
-    int avp_type;
 };
 
 /** use clone to get a copy of various SdpMedia prototypes */

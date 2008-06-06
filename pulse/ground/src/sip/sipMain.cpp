@@ -33,7 +33,7 @@
 
 int eventLoop()
 {
-    char c;
+    char c[2];
     // Approach 1: GMainloop
     //GMainLoop *loop;
     //loop = g_main_loop_new(NULL, FALSE);
@@ -53,15 +53,16 @@ int eventLoop()
     std::cout << "Hit a and <cr> to accept a request." << std::endl; 
     std::cout << "Hit q and <cr> to quit." << std::endl; 
 
-    std::cin >> c;
+    std::cin.getline(c,2);
 
-    switch(c)
+
+    switch(c[0])
     {
         case 'q':
             exit(-1);       // FIXME: should rather quit gracefully
         
         case 'r':
-            SipSingleton::Instance()->send_request("h264.1");
+            SipSingleton::Instance()->send_request("H264");
             break;
 
         default:
@@ -99,7 +100,7 @@ int main(int argc, char *argv[])
     {
         if(sip.handle_events()) // if events are queued up
         {
-            if(sip.isValidService(sip.get_service()) && !tx.isPlaying())
+            if(sip.isValidService() && !tx.isPlaying())
             {
                 if(tx.init("test",sip.get_service_port(), std::string(MY_ADDRESS)))
                 {
