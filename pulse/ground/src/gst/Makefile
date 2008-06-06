@@ -16,6 +16,9 @@ APPOBJS=$(OBJS) gst_main.o gstApp.o
 TESTOBJS=$(OBJS) gstTestSuite.o 
 PYTHONOBJS=$(OBJS) py$(APPLICATION)Module.o
 
+
+EXT_OBJS= ../sip/sipSingleton.o ../sip/sipStateless.o
+
 GST_CFLAGS=-pthread -I/usr/local/include/gstreamer-0.10 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/libxml2 
 GST_LDFLAGS=-pthread -L/usr/local/lib -lgstreamer-0.10 -lgobject-2.0 -lgmodule-2.0 -ldl -lgthread-2.0 -lrt -lxml2 -lglib-2.0  
 
@@ -36,7 +39,7 @@ CPPFLAGS = $(CFLAGS)
 	$(CPP_CC) $(CPPFLAGS) -c $(<) -o $@
 
 $(APPLICATION): $(APPOBJS)
-	$(CPP_CC) $(APPOBJS) ../sip/sipSingleton.o ../sip/sipStateless.o -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
+	$(CPP_CC) $(APPOBJS) $(EXT_OBJS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
 
 tests : $(TESTOBJS)
 	$(CPP_CC) $(TESTOBJS) $(CPPTEST_LDFLAGS) -o $(BINDIR)/$(APPICATION)Tester $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
