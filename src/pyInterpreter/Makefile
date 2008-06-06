@@ -17,6 +17,8 @@ APPOBJS=$(OBJS) pyInterpreter_main.o
 TESTOBJS=$(OBJS) gstTestSuite.o 
 PYTHONOBJS=$(OBJS) py$(APPLICATION)Module.o
 
+EXT_OBJS=../gst/mediaBase.o ../gst/videoSender.o ../hello/hello.o
+
 GST_CFLAGS=-pthread -I/usr/local/include/gstreamer-0.10 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/libxml2 
 GST_LDFLAGS=-pthread -L/usr/local/lib -lgstreamer-0.10 -lgobject-2.0 -lgmodule-2.0 -ldl -lgthread-2.0 -lrt -lxml2 -lglib-2.0  
 
@@ -27,7 +29,7 @@ JACK_LDFLAGS=-ljack -lrt
 
 CPPTEST_LDFLAGS=-lcpptest
 
-APP_CFLAGS+=-g -Wall $(GST_CFLAGS) $(JACK_CFLAGS)
+APP_CFLAGS+=-g -Wall $(GST_CFLAGS) $(JACK_CFLAGS) -I../
 CC	= g++
 CPP_CC  = g++
 LDFLAGS = $(APP_LDFLAGS) $(GST_LDFLAGS) $(JACK_LDFLAGS)
@@ -42,7 +44,7 @@ CPPFLAGS = $(CFLAGS)
 	$(CPP_CC) $(CPPFLAGS) -c $(<) -o $@
 
 $(APPLICATION): $(APPOBJS)
-	$(CPP_CC) $(APPOBJS) ../gst/mediaBase.o ../gst/videoSender.o ../hello/hello.o -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
+	$(CPP_CC) $(APPOBJS) $(EXT_OBJS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
 
 tests : $(TESTOBJS)
 	$(CPP_CC) $(TESTOBJS) $(CPPTEST_LDFLAGS) -o $(BINDIR)/gstTester $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
@@ -54,5 +56,4 @@ tags:
 
 .PHONY: clean
 clean:
-	rm *.o
-	rm $(BINDIR)/$(APPLICATION)
+	rm *.o; rm $(BINDIR)/$(APPLICATION)
