@@ -17,8 +17,8 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \brief Brief boilerPlate description.
- *          This Brief is continued here.
+/** \file 
+ *      Just the License GPL 3+ 
  *
  *      Detailed description here.
  *      Continues here.
