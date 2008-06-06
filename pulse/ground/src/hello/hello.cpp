@@ -1,6 +1,6 @@
 #include "hello.h"
 
-const char * hello::greet()
+const char * Hello::greet()
 {
     static std::string ts;
     ts = "hello " + s;
@@ -8,7 +8,7 @@ const char * hello::greet()
     return ts.c_str();
 }
 
-void hello::set_name(char const* n)
+void Hello::set_name(char const* n)
 {
     s = n;
 }
