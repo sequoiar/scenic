@@ -41,6 +41,8 @@ class AudioSender : public MediaBase
         void init_2ch_test();
         void init_6ch_test();
         void init_8ch_test();
+
+        void init_2ch_comp_rtp_test();
         void init_8ch_comp_rtp_test();
         void init_8ch_uncomp_rtp_test();
 

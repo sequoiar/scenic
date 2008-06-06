@@ -30,11 +30,13 @@ class AudioReceiver : public MediaBase
     public:
         AudioReceiver();
         virtual ~AudioReceiver();
-        bool init(int port = DEF_PORT);
+        bool init(int port = DEF_PORT, int numChannels = 2);
         virtual bool start();
 
     private:
-        static const std::string CAPS_STR;
+        int numChannels_;
+        static const std::string CAPS_STR_2CH;
+        static const std::string CAPS_STR_8CH;
 };
 
 #endif // _AUDIO_RECEIVER_H_

@@ -94,6 +94,8 @@ void VideoSender::initDv()
 
     pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
     assert(pipeline_);
+
+    make_verbose();
 }
 
 
@@ -113,6 +115,8 @@ void VideoSender::initDvRtp()
 
     pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
     assert(pipeline_);
+
+    make_verbose();
 }
 
 
@@ -124,6 +128,8 @@ void VideoSender::initV4l()
 
     pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
     assert(pipeline_);
+    
+    make_verbose();
 }
 
 
@@ -140,6 +146,8 @@ void VideoSender::initV4lRtp()
 
     pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
     assert(pipeline_);
+
+    make_verbose();
 }
 
 
@@ -150,6 +158,8 @@ void VideoSender::initTest()
 
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
+
+    make_verbose();
 
     txSrc = gst_element_factory_make("videotestsrc", "txSrc");
     assert(txSrc);

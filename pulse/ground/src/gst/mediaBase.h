@@ -34,6 +34,7 @@ class MediaBase
     protected:
         MediaBase();
         virtual ~MediaBase(); int port_; static const int DEF_PORT;
+        void make_verbose();
         GstElement *pipeline_;
         bool verbose_;
 

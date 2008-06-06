@@ -25,7 +25,7 @@
 const int MediaBase::DEF_PORT = 10010;
 bool MediaBase::gstInitialized_ = false;
 
-MediaBase::MediaBase() : pipeline_(0), verbose_(false)
+MediaBase::MediaBase() : pipeline_(0), verbose_(true)
 {
     if (!gstInitialized_)
     {
@@ -76,3 +76,17 @@ int MediaBase::port() const
     return port_;
 }
 
+
+
+void MediaBase::make_verbose()
+{
+    // Get verbose output
+    if (verbose_) 
+    {
+        gchar *exclude_args = NULL; // set args to be excluded from output
+        gchar **exclude_list =
+            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
+        g_signal_connect (pipeline_, "deep_notify",
+                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
+    }
+}

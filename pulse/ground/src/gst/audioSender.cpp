@@ -27,7 +27,7 @@
 
 #include <gst/gst.h>
 //#include <gst/audio/multichannel.h>
-
+//#include <gst/audio/multichannel-enumtypes.h>
 #include "mediaBase.h"
 #include "audioSender.h"
 
@@ -80,6 +80,11 @@ bool AudioSender::init(const std::string media, const int port, const std::strin
         init_8ch_test();
         return true;
     }
+    else if (!media.compare("2chCompRtpTest"))
+    {
+        init_2ch_comp_rtp_test();
+        return true;
+    }
     else if (!media.compare("8chCompRtpTest"))
     {
         init_8ch_comp_rtp_test();
@@ -107,15 +112,7 @@ void AudioSender::init_1ch_test()
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
 
-    // Get verbose output
-    if (verbose_) 
-    {
-        gchar *exclude_args = NULL; // set args to be excluded from output
-        gchar **exclude_list =
-            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
-        g_signal_connect (pipeline_, "deep_notify",
-                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
-    }
+    make_verbose();
 
     txSrc1 = gst_element_factory_make("audiotestsrc", "txSrc1");
     assert(txSrc1);
@@ -146,16 +143,8 @@ void AudioSender::init_2ch_test()
 
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
-
-    // Get verbose output
-    if (verbose_) 
-    {
-        gchar *exclude_args = NULL; // set args to be excluded from output
-        gchar **exclude_list =
-            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
-        g_signal_connect (pipeline_, "deep_notify",
-                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
-    }
+    
+    make_verbose();
 
     // main line
 
@@ -221,15 +210,7 @@ void AudioSender::init_6ch_test()
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
     
-    // Get verbose output
-    if (verbose_) 
-    {
-        gchar *exclude_args = NULL; // set args to be excluded from output
-        gchar **exclude_list =
-            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
-        g_signal_connect (pipeline_, "deep_notify",
-                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
-    }
+    make_verbose();
 
     // Main pipeline
     interleave = gst_element_factory_make("interleave", "interleave");
@@ -344,15 +325,7 @@ void AudioSender::init_8ch_test()
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
     
-    // Get verbose output
-    if (verbose_) 
-    {
-        gchar *exclude_args = NULL; // set args to be excluded from output
-        gchar **exclude_list =
-            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
-        g_signal_connect (pipeline_, "deep_notify",
-                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
-    }
+    make_verbose();
 
     // Main pipeline
     interleave = gst_element_factory_make("interleave", "interleave");
@@ -473,14 +446,82 @@ void AudioSender::init_8ch_test()
 
 
 
+void AudioSender::init_2ch_comp_rtp_test()
+{
+    numChannels_ = 2;
+
+    GstElement *interleave, *encoder, *payloader, *txSink1;
+    // layout stuff
+    //GValue val = { 0, };
+    //GValueArray *arr;
+    
+    GstElement *txSrc1, *aconv1, *queue1; 
+    GstElement *txSrc2, *aconv2, *queue2;
+
+    pipeline_ = gst_pipeline_new("txPipeline");
+    assert(pipeline_);
+
+    make_verbose();
+
+    // Transmission
+    
+    interleave = gst_element_factory_make("interleave", "interleave");
+    assert(interleave);
+
+    encoder = gst_element_factory_make("vorbisenc", "encoder");
+    assert(encoder);
+    payloader = gst_element_factory_make("rtpvorbispay", "payloader");
+    assert(payloader);
+    txSink1 = gst_element_factory_make("udpsink", "txSink1");
+    assert(txSink1);
+
+    // channel 1
+
+    txSrc1 = gst_element_factory_make("audiotestsrc", "txSrc1");
+    assert(txSrc1);
+    aconv1 = gst_element_factory_make("audioconvert", "aconv1");
+    assert(aconv1);
+    queue1 = gst_element_factory_make("queue", "queue1");
+    assert(queue1);
+
+    // channel 2
+
+    txSrc2 = gst_element_factory_make("audiotestsrc", "txSrc2");
+    assert(txSrc2);
+    aconv2 = gst_element_factory_make("audioconvert", "aconv2");
+    assert(aconv2);
+    queue2 = gst_element_factory_make("queue", "queue2");
+    assert(queue2);
+
+    // end of channels
+
+    gst_bin_add_many(GST_BIN(pipeline_), 
+            interleave, encoder, payloader, txSink1, 
+            txSrc1, aconv1, queue1, 
+            txSrc2, aconv2, queue2,
+            NULL);
+
+    // links transmission line, and audiotestsrcs
+    gst_element_link_many(interleave, encoder, payloader, txSink1, NULL);
+    gst_element_link_many(txSrc1, aconv1, queue1, interleave, NULL);
+    gst_element_link_many(txSrc2, aconv2, queue2, interleave, NULL);
+
+    g_object_set(G_OBJECT(txSink1), "host", remoteHost_.c_str(), "port", port_, NULL);
+
+    g_object_set(G_OBJECT(txSrc1), "volume", 0.125, "freq", 200.0, "is-live", TRUE, NULL);
+    g_object_set(G_OBJECT(txSrc2), "volume", 0.125, "freq", 300.0, "is-live", TRUE, NULL);
+}
+
+
+
 void AudioSender::init_8ch_comp_rtp_test()
 {
     numChannels_ = 8;
 
     GstElement *interleave, *encoder, *payloader, *txSink1;
     // layout stuff
-    //GValue val = { 0, };
-    //GValueArray *arr;
+    // GValue val = { 0, };
+    // GValueArray *arr;
     
     GstElement *txSrc1, *aconv1, *queue1; 
     GstElement *txSrc2, *aconv2, *queue2;
@@ -494,21 +535,13 @@ void AudioSender::init_8ch_comp_rtp_test()
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
 
-    // Get verbose output
-    if (verbose_) 
-    {
-        gchar *exclude_args = NULL; // set args to be excluded from output
-        gchar **exclude_list =
-            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
-        g_signal_connect (pipeline_, "deep_notify",
-                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
-    }
+    make_verbose();
 
     // Transmission
     
     interleave = gst_element_factory_make("interleave", "interleave");
     assert(interleave);
-
+    
 #if 0
     g_object_set(interleave, "channel-positions-from-input", FALSE, NULL);
     arr = g_value_array_new(8);
@@ -539,7 +572,7 @@ void AudioSender::init_8ch_comp_rtp_test()
     g_value_unset(&val);
     g_object_set(interleave, "channel-positions", arr, NULL);
     g_value_array_free(arr);
-#endif 
+#endif
 
     encoder = gst_element_factory_make("vorbisenc", "encoder");
     assert(encoder);
@@ -676,15 +709,7 @@ void AudioSender::init_8ch_uncomp_rtp_test()
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
 
-    // Get verbose output
-    if (verbose_) 
-    {
-        gchar *exclude_args = NULL; // set args to be excluded from output
-        gchar **exclude_list =
-            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
-        g_signal_connect (pipeline_, "deep_notify",
-                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
-    }
+    make_verbose();
 
     // Transmission
     
