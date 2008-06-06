@@ -376,7 +376,7 @@ void GstTestSuite::start_1ch_audio()
     TEST_ASSERT(tx.start());
 
     BLOCK();
-
+    TEST_ASSERT(tx.isPlaying());
 }
 
 
@@ -407,6 +407,8 @@ void GstTestSuite::start_stop_1ch_audio()
     TEST_ASSERT(tx.start());
 
     BLOCK();
+
+    TEST_ASSERT(tx.isPlaying());
 
     TEST_ASSERT(tx.stop());
 }
@@ -558,7 +560,7 @@ void GstTestSuite::start_8ch_comp_rtp_audio()
         rx.start();
 
         BLOCK();
-
+        TEST_ASSERT(rx.isPlaying());
     }
     else
     {
@@ -567,7 +569,7 @@ void GstTestSuite::start_8ch_comp_rtp_audio()
         tx.start();
 
         BLOCK();
-
+        TEST_ASSERT(tx.isPlaying());
     }
 }
 

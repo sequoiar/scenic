@@ -25,7 +25,7 @@
 const int MediaBase::DEF_PORT = 10010;
 bool MediaBase::gstInitialized_ = false;
 
-MediaBase::MediaBase() : pipeline_(0)
+MediaBase::MediaBase() : pipeline_(0), verbose_(false)
 {
     if (!gstInitialized_)
     {
@@ -48,7 +48,6 @@ MediaBase::~MediaBase()
 bool MediaBase::start()
 {
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
-    //return isPlaying();
     return true;
 }
 
@@ -64,7 +63,7 @@ bool MediaBase::stop()
 
 bool MediaBase::isPlaying() 
 { 
-    if (pipeline_ && GST_STATE(pipeline_) == GST_STATE_PLAYING)
+    if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_PLAYING))
         return true; 
     else
         return false;

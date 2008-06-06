@@ -29,6 +29,9 @@
 #include <cpptest.h>
 
 #define BLOCKING 1
+#define VIDEO 0
+#define AUDIO 1
+#define RTP 1
 
 
 class GstTestSuite : public Test::Suite
@@ -37,6 +40,7 @@ class GstTestSuite : public Test::Suite
 
         GstTestSuite()
         {
+#if VIDEO
             TEST_ADD(GstTestSuite::init_test)
 
             TEST_ADD(GstTestSuite::start_video)
@@ -51,6 +55,7 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::stop_v4l)
             TEST_ADD(GstTestSuite::start_stop_v4l)
 
+#if RTP
             TEST_ADD(GstTestSuite::start_v4l_rtp)
             TEST_ADD(GstTestSuite::stop_v4l_rtp)
             TEST_ADD(GstTestSuite::start_stop_v4l_rtp)
@@ -58,11 +63,12 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::start_dv_rtp)
             TEST_ADD(GstTestSuite::stop_dv_rtp)
             TEST_ADD(GstTestSuite::start_stop_dv_rtp)
-
+#endif // RTP
+#endif // VIDEO
+#if AUDIO
             TEST_ADD(GstTestSuite::start_1ch_audio)
             TEST_ADD(GstTestSuite::stop_1ch_audio)
             TEST_ADD(GstTestSuite::start_stop_1ch_audio)
-
             TEST_ADD(GstTestSuite::start_2ch_audio)
             TEST_ADD(GstTestSuite::stop_2ch_audio)
             TEST_ADD(GstTestSuite::start_stop_2ch_audio)
@@ -74,10 +80,13 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::start_8ch_audio)
             TEST_ADD(GstTestSuite::stop_8ch_audio)
             TEST_ADD(GstTestSuite::start_stop_8ch_audio)
-
+#if RTP
             TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audio)
+#endif // RTP
+#endif // AUDIO
+
 #if 0
                 TEST_ADD(GstTestSuite::start_8ch_uncomp_rtp_audio)
                 TEST_ADD(GstTestSuite::stop_8ch_uncomp_rtp_audio)
