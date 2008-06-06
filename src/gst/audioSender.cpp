@@ -107,6 +107,16 @@ void AudioSender::init_1ch_test()
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
 
+    // Get verbose output
+    if (verbose_) 
+    {
+        gchar *exclude_args = NULL; // set args to be excluded from output
+        gchar **exclude_list =
+            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
+        g_signal_connect (pipeline_, "deep_notify",
+                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
+    }
+
     txSrc1 = gst_element_factory_make("audiotestsrc", "txSrc1");
     assert(txSrc1);
 
@@ -136,6 +146,16 @@ void AudioSender::init_2ch_test()
 
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
+
+    // Get verbose output
+    if (verbose_) 
+    {
+        gchar *exclude_args = NULL; // set args to be excluded from output
+        gchar **exclude_list =
+            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
+        g_signal_connect (pipeline_, "deep_notify",
+                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
+    }
 
     // main line
 
@@ -201,6 +221,16 @@ void AudioSender::init_6ch_test()
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
     
+    // Get verbose output
+    if (verbose_) 
+    {
+        gchar *exclude_args = NULL; // set args to be excluded from output
+        gchar **exclude_list =
+            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
+        g_signal_connect (pipeline_, "deep_notify",
+                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
+    }
+
     // Main pipeline
     interleave = gst_element_factory_make("interleave", "interleave");
     assert(interleave);
@@ -314,6 +344,16 @@ void AudioSender::init_8ch_test()
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
     
+    // Get verbose output
+    if (verbose_) 
+    {
+        gchar *exclude_args = NULL; // set args to be excluded from output
+        gchar **exclude_list =
+            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
+        g_signal_connect (pipeline_, "deep_notify",
+                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
+    }
+
     // Main pipeline
     interleave = gst_element_factory_make("interleave", "interleave");
     assert(interleave);
@@ -453,6 +493,16 @@ void AudioSender::init_8ch_comp_rtp_test()
 
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
+
+    // Get verbose output
+    if (verbose_) 
+    {
+        gchar *exclude_args = NULL; // set args to be excluded from output
+        gchar **exclude_list =
+            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
+        g_signal_connect (pipeline_, "deep_notify",
+                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
+    }
 
     // Transmission
     
@@ -625,6 +675,16 @@ void AudioSender::init_8ch_uncomp_rtp_test()
 
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
+
+    // Get verbose output
+    if (verbose_) 
+    {
+        gchar *exclude_args = NULL; // set args to be excluded from output
+        gchar **exclude_list =
+            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
+        g_signal_connect (pipeline_, "deep_notify",
+                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
+    }
 
     // Transmission
     

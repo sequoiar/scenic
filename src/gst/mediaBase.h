@@ -35,6 +35,7 @@ class MediaBase
         MediaBase();
         virtual ~MediaBase(); int port_; static const int DEF_PORT;
         GstElement *pipeline_;
+        bool verbose_;
 
     private:
         static bool gstInitialized_;
