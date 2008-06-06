@@ -38,7 +38,7 @@ void SdpTestSuite::init_test()
 
 void SdpTestSuite::sdp_header()
 {
-    Sdp sdp("Try","127.0.0.1");
+    Sdp sdp("Try");
 
     std::cout << sdp.str() << std::endl;
 
@@ -49,23 +49,30 @@ void SdpTestSuite::sdp_header()
 void SdpTestSuite::sdp_video()
 {
 
-    Sdp sdp("Try","127.0.0.1");
+    Sdp sdp("Try");
     SdpMedia sdpv = SdpMediaFactory::clone("H264");
     sdpv.set_ip("192.168.1.183");
     sdpv.set_port(10010);
 
-    TEST_ASSERT(sdp.add_media(sdpv))
+    TEST_ASSERT(sdp.add_media(sdpv));
 
     std::cout << sdp.str() << std::endl;
 
     TEST_ASSERT(!sdp.str().empty());
+
+
+    for(std::list<SdpMedia>::iterator it = sdp.get_media().begin(); 
+            it != sdp.get_media().end(); it++)
+    {
+        std::cout << "Got media: " << it->get_media_type() << std::endl;
+    }
     BLOCK();
 }
 
 void SdpTestSuite::sdp_audio()
 {
 
-    Sdp sdp("Try","127.0.0.1");
+    Sdp sdp("Try");
 
     std::cout << sdp.str() << std::endl;
 
@@ -75,7 +82,7 @@ void SdpTestSuite::sdp_audio()
 void SdpTestSuite::sdp_av()
 {
 
-    Sdp sdp("Try","127.0.0.1");
+    Sdp sdp("Try");
 
     std::cout << sdp.str() << std::endl;
 

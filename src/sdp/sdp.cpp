@@ -3,6 +3,11 @@
 
 bool Sdp::add_media(SdpMedia _m)
 {
+
+    if(_m.get_port() != 0)
+        if (_m.get_ip().empty() && !ip.empty())
+            _m.set_ip(ip);
+
     if (!_m.get_ip().empty() && _m.get_port() != 0)
         media.push_back(_m);
     else
@@ -16,9 +21,13 @@ std::string SdpMedia::str()
 {
     std::stringstream ret;
 
-    ret << "m=" << name << " " << port << " RTP/AVP " << avp_type << std::endl;
-    if(!address.empty())
-        ret << "c=IN IP4 " << address << std::endl;
+    ret << "m=" << media_type << " " << port << " RTP/AVP " << avp_type << std::endl;
+    if(!ip.empty())
+        ret << "c=IN IP4 " << ip << std::endl;
+
+    ret << "a=rtpmap:" << avp_type << " " << codec << std::endl;
+
+    ret << "a=fmtp:" << avp_type << std::endl;
 
     for(std::list<std::string>::iterator it = attrib.begin();it != attrib.end(); it++)
         ret << "a=" << *it << std::endl;
@@ -33,11 +42,15 @@ std::string Sdp::str()
     std::stringstream ret;
 
     ret << "v=0" << std::endl;
-    ret << "o=- 304958 309458 IN IP4 " << address << std::endl;
+    if(ip.empty())
+        ret << "o=- 304958 309458 IN IP4 " << "127.0.0.0" << std::endl;
+    else
+        ret << "o=- 304958 309458 IN IP4 " << ip << std::endl;
+
     ret << "s=" << session_name << std::endl;
 
-    if(address != "127.0.0.0")
-        ret << "c=IN IP4 " << address << std::endl;
+    if(!ip.empty())
+        ret << "c=IN IP4 " << ip << std::endl;
 
     for(std::list<SdpMedia>::iterator it = media.begin();it != media.end(); it++)
         ret <<  it->str() << std::endl;
