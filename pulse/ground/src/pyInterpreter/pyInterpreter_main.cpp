@@ -1,4 +1,3 @@
-
 // pyInterpreter.h
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
@@ -18,6 +17,13 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
+
+/** \file
+ *      Main python loop
+ *
+ *      _ground_loop() called on every return\n
+ *      See python_import.cpp
+ */
 
 #include "pyInterpreter.h"
 
