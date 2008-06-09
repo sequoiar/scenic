@@ -38,8 +38,8 @@
 class SdpMedia;
 /** Incapsulates the sdp protocol. 
  *
- *  Valid Sdp class has one or many SdpMedia objects.\n
- *   
+ *  Valid Sdp class has one or many SdpMedia objects.   \n
+ *  SdpMediaFactory delivers SdpMedia prototypes.       \n
  *  TODO Parse SDP stream
  */
 class Sdp
@@ -73,8 +73,8 @@ public:
 
     SdpMedia():media_type(""),codec(""),avp_type(0) {}
 
-    std::string media_type,codec;
-    int avp_type;
+    const std::string media_type,codec;
+    const int avp_type;
 
     void add_attribute(std::string _attrib){attrib.push_back(_attrib);}
     void set_ip(std::string _ip){ip = _ip;}
@@ -82,7 +82,7 @@ public:
     int get_port(){return port;}
     std::string& get_ip(){return ip;} 
     std::string str();
- //   SdpMedia& operator=(const SdpMedia& m);
+    SdpMedia& operator=(const SdpMedia& m);
 protected:
     std::string ip;
     std::list<std::string> attrib;
