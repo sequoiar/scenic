@@ -9,10 +9,6 @@
 
 #include "sdpTestSuite.h"
 
-/*----------------------------------------------*/ 
-// To actually observe the tests (watch/listen), set
-// this macro to 1.
-/*----------------------------------------------*/ 
 
 
 void SdpTestSuite::setup()
@@ -61,17 +57,13 @@ void SdpTestSuite::sdp_video()
     TEST_ASSERT(!sdp.str().empty());
 
 
-    for(std::list<SdpMedia>::iterator it = sdp.get_media().begin(); 
-            it != sdp.get_media().end(); it++)
-    {
-        std::cout << "Got media: " << it->media_type << std::endl;
-    }
+    sdp.list_media();
+    
     BLOCK();
 }
 
 void SdpTestSuite::sdp_audio()
 {
-
     Sdp sdp("Try");
 
     std::cout << sdp.str() << std::endl;
@@ -81,8 +73,6 @@ void SdpTestSuite::sdp_audio()
 
 void SdpTestSuite::sdp_av()
 {
-
-
     Sdp sdp("Try");
 
     std::cout << sdp.str() << std::endl;
