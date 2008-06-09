@@ -10,7 +10,7 @@ BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
 
 EXT_OBJS=../sdp/sdp.o ../gst/mediaBase.o ../gst/videoSender.o ../gst/videoReceiver.o ../gst/audioSender.o ../gst/audioReceiver.o
-OBJS=$(EXT_OBJS) sipStateless.o sipSingleton.o 
+OBJS=$(EXT_OBJS) sipStateless.o sip.o 
 APPOBJS=$(OBJS) sipMain.o
 TESTOBJS=$(OBJS) sipTestSuite.o
 

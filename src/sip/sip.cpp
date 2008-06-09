@@ -28,7 +28,7 @@
 
 #include <sstream>
 
-#include "sipSingleton.h"
+#include "sip.h"
 #include "sipPrivate.h"
 
 SipSingleton* SipSingleton::s_ = 0;
