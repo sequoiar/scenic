@@ -21,7 +21,9 @@
 // Declares and registers a series of unit tests. Note that currently, these tests are quite simple. 
 // A more comprehensive/detailed testsuite would have to cover specific
 // usecases and look more like client code. The current set of tests just does a quick probe of our 
-// media interface.
+// gstreamer interface.
+// Several of the tests (specifically those sending over udp) require two instances of the Tester
+// to be running, one with an argument of 0 and the other with an argument of 1.
 
 #ifndef _GST_TEST_SUITE_H_
 #define _GST_TEST_SUITE_H_
@@ -85,9 +87,11 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::stop_2ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::start_stop_2ch_comp_rtp_audio)
 
+#if 0
             TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audio)
+#endif // 0
 
 #endif // RTP
 #endif // AUDIO
