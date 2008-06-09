@@ -31,7 +31,7 @@
 
 #include <string>
 #include <sstream>
-#include <list>
+#include <vector>
 #include <map>
 #include <cassert>
 
@@ -42,6 +42,9 @@ class SdpMedia;
  *  SdpMediaFactory delivers SdpMedia prototypes.       \n
  *  TODO Parse SDP stream
  */
+
+typedef std::vector<SdpMedia>::iterator SdpMediaIterator;
+
 class Sdp
 {
 public:
@@ -52,15 +55,16 @@ public:
     bool add_media(SdpMedia m);
     std::string str();
 
-    // FIXME: is this function still needed? If so it should be const
-    std::list<SdpMedia>& get_media() { return media_; }
-    bool is_valid(){ return !media_.empty(); }
+    std::vector<SdpMedia>& get_media();
+
+    bool is_valid() const { return !media_.empty(); }
+    
     void list_media();
 
 private:
     std::string session_name_, ip_;
 
-    std::list<SdpMedia> media_;
+    std::vector<SdpMedia> media_;
 };
 
 /** Holds the media section of sdp protocol 
@@ -89,7 +93,7 @@ protected:
     std::string media_type_, codec_;
     int avp_type_;
     std::string ip_;
-    std::list<std::string> attrib_;
+    std::vector<std::string> attrib_;
     int port_;
 };
 

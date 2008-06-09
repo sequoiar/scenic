@@ -100,8 +100,15 @@ int main(int argc, char *argv[])
     {
         if(sip.handle_events()) // if events are queued up
         {
-            if(sip.isValidService() && !tx.isPlaying())
+            Sdp& sdp_t = sip.get_sdp();
+            if(sdp_t.is_valid() && !tx.isPlaying())
             {
+                
+                for(SdpMediaIterator it=sdp_t.get_media().begin();it != sdp_t.get_media().end();it++)
+                {
+
+                }
+                
                 if(tx.init("test",sip.get_service_port(), std::string(MY_ADDRESS)))
                 {
                     tx.start();
