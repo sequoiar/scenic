@@ -73,17 +73,18 @@ public:
 
     SdpMedia():media_type(""),codec(""),avp_type(0) {}
 
-    const std::string media_type,codec;
-    const int avp_type;
 
     void add_attribute(std::string _attrib){attrib.push_back(_attrib);}
     void set_ip(std::string _ip){ip = _ip;}
     void set_port(int _port){port = _port;}
     int get_port(){return port;}
     std::string& get_ip(){return ip;} 
+    std::string& get_media_type(){return media_type;}
     std::string str();
-    SdpMedia& operator=(const SdpMedia& m);
+    //SdpMedia& operator=(const SdpMedia& m);
 protected:
+    std::string media_type,codec;
+    int avp_type;
     std::string ip;
     std::list<std::string> attrib;
     int port;
