@@ -22,7 +22,7 @@
 #include <cassert>
 #include <gst/gst.h>
 
-#include "sipSingleton.h"
+#include "sip.h"
 
 #include "gst/videoReceiver.h"
 #include "gst/videoSender.h"

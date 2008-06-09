@@ -1,4 +1,3 @@
-
 // python_import.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
@@ -17,6 +16,14 @@
 // You should have received a copy of the GNU General Public License
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
+
+/** \file 
+ *      This file gets included in python module
+ *
+ *
+ *      Exposes object modules to python interpreter.
+ *
+ */
 
 
 #include <boost/python.hpp>
