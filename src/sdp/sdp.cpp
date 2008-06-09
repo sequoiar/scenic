@@ -27,7 +27,7 @@
 #include "sdp.h"
 
 
-bool Sdp::add_media(SdpMedia m)
+bool Sdp::add_media(SdpMedia m) 
 {
     if(m.get_port() != 0)
         if (m.get_ip().empty() && !ip_.empty())
@@ -72,7 +72,7 @@ std::string SdpMedia::str()
 
     ret << "a=fmtp:" << avp_type_ << std::endl;
 
-    for(std::list<std::string>::iterator it = attrib_.begin(); it != attrib_.end(); it++)
+    for(std::vector<std::string>::iterator it = attrib_.begin(); it != attrib_.end(); it++)
         ret << "a=" << *it << std::endl;
 
     return ret.str();
@@ -96,7 +96,7 @@ std::string Sdp::str()
     if(!ip_.empty())
         ret << "c=IN IP4 " << ip_ << std::endl;
 
-    for(std::list<SdpMedia>::iterator it = media_.begin(); it != media_.end(); it++)
+    for(std::vector<SdpMedia>::iterator it = media_.begin(); it != media_.end(); it++)
         ret << it->str() << std::endl;
 
     return ret.str();
@@ -106,12 +106,17 @@ std::string Sdp::str()
 
 void Sdp::list_media()
 {
-    for(std::list<SdpMedia>::iterator it = media_.begin(); it != media_.end(); it++)
+    for(std::vector<SdpMedia>::iterator it = media_.begin(); it != media_.end(); it++)
     {
         std::cout << "Got media: " << it->get_media_type() << std::endl;
     }
 }
 
+
+std::vector<SdpMedia>& Sdp::get_media()  
+{
+    return media_;
+}
 
 
 /*

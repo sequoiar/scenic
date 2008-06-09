@@ -66,7 +66,8 @@ public:
     int get_rx_port(){ return rx_port_; }
     void zero_rx_port(){ rx_port_ = 0; }
     char* get_service() { return service_; }
-
+    
+    Sdp& get_sdp(){return sdp_;}
 private:
     SipSingleton():service_port_(0),rx_port_(0){};
         
@@ -79,3 +80,4 @@ private:
 };
 
 #endif
+

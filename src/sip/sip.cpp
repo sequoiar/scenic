@@ -50,7 +50,7 @@ const char* SipSingleton::rx_req(const char *data, unsigned int len)
     //std::string temp(ser);
 
     SdpMedia sdpv = SdpMediaFactory::clone(ser);
-    sdpv.set_ip(THEIR_ADDRESS);
+    sdpv.set_ip(MY_ADDRESS);
     sdpv.set_port(service_port_);
 
     std::cout << sdp.str();
@@ -63,11 +63,11 @@ const char* SipSingleton::rx_req(const char *data, unsigned int len)
 
     if (sdp.is_valid())
     {
-        strcpy(service_, ser);
+      //  strcpy(service_, ser);
 
         std::cerr << ser << " port:" << service_port_ << std::endl;
 
-        sprintf(p, "%d", service_port_);
+       // sprintf(p, "%d", service_port_);
 
         return sdp.str().c_str();
     }
