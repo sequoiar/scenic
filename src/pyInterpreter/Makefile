@@ -11,11 +11,9 @@ include ../base.mak
 BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
 
-#OBJS=videoReceiver.o videoSender.o mediaBase.o audioSender.o audioReceiver.o
 OBJS=pyInterpreter.o
 APPOBJS=$(OBJS) pyInterpreter_main.o
 TESTOBJS=$(OBJS) gstTestSuite.o 
-PYTHONOBJS=$(OBJS) py$(APPLICATION)Module.o
 
 EXT_OBJS=../gst/mediaBase.o ../gst/videoSender.o ../hello/hello.o
 
@@ -47,7 +45,7 @@ $(APPLICATION): $(APPOBJS)
 	$(CPP_CC) $(APPOBJS) $(EXT_OBJS) -o $(BINDIR)/$@ $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) 
 
 tests : $(TESTOBJS)
-	$(CPP_CC) $(TESTOBJS) $(CPPTEST_LDFLAGS) -o $(BINDIR)/gstTester $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
+	$(CPP_CC) $(TESTOBJS) $(CPPTEST_LDFLAGS) -o $(BINDIR)/$(APPLICATION)Tester $(CPPFLAGS) $(LDFLAGS) $(LDLIBS)
 					 
 all: $(APPLICATION)
 

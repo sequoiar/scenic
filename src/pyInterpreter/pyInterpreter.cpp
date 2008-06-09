@@ -1,4 +1,3 @@
-
 // pyInterpreter.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
@@ -18,7 +17,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/*
+/** \file
  * Embedded Python example
  *  
  * Exporting C++ module to python requires 
