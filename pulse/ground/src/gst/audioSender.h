@@ -38,12 +38,13 @@ class AudioSender : public MediaBase
 
     private:
         void init_1ch_test();
-        void init_2ch_test();
-        void init_6ch_test();
-        void init_8ch_test();
+        void init_local_test(int numChannels = 2);
 
+        // void init_rtp_test(int numChannels = 1);
         void init_2ch_comp_rtp_test();
         void init_8ch_comp_rtp_test();
+        
+        // void init_uncomp_rtp_test(int numChannels = 1);
         void init_1ch_uncomp_rtp_test();
 
         std::string remoteHost_;
