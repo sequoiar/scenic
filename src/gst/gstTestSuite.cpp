@@ -638,9 +638,9 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audio()
         AudioReceiver rx;
         rx.init(10010, 2);
         TEST_ASSERT(rx.start());
-        TEST_ASSERT(rx.isPlaying());
 
         BLOCK();
+        TEST_ASSERT(rx.isPlaying());
 
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());

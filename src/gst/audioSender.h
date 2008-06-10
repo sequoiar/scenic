@@ -22,6 +22,7 @@
 #define _AUDIO_SENDER_H_
 
 #include <string>
+#include <gst/audio/multichannel.h>
 #include "defaultAddresses.h"
 
 #include "mediaBase.h"
@@ -40,15 +41,16 @@ class AudioSender : public MediaBase
         void init_1ch_test();
         void init_local_test(int numChannels = 2);
 
-        // void init_rtp_test(int numChannels = 1);
-        void init_2ch_comp_rtp_test();
-        void init_8ch_comp_rtp_test();
+        void init_rtp_test(int numChannels = 2);
         
         // void init_uncomp_rtp_test(int numChannels = 1);
-        void init_1ch_uncomp_rtp_test();
+        void init_uncomp_rtp_test();
+
+        void set_channel_layout(GValueArray *arr);
 
         std::string remoteHost_;
         int numChannels_;
+        static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
 };
 
 #endif // _AUDIO_SENDER_H_
