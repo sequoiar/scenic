@@ -33,7 +33,7 @@
 #define BLOCKING 1
 #define VIDEO 0
 #define AUDIO 1
-#define RTP 1
+#define RTP 0
 
 
 class GstTestSuite : public Test::Suite
@@ -57,7 +57,7 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::stop_v4l)
             TEST_ADD(GstTestSuite::start_stop_v4l)
 
-#if RTP
+    #if RTP
             TEST_ADD(GstTestSuite::start_v4l_rtp)
             TEST_ADD(GstTestSuite::stop_v4l_rtp)
             TEST_ADD(GstTestSuite::start_stop_v4l_rtp)
@@ -65,10 +65,10 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::start_dv_rtp)
             TEST_ADD(GstTestSuite::stop_dv_rtp)
             TEST_ADD(GstTestSuite::start_stop_dv_rtp)
-#endif // RTP
+    #endif // RTP
 #endif // VIDEO
+
 #if AUDIO
-#if 0
             TEST_ADD(GstTestSuite::start_1ch_audio)
             TEST_ADD(GstTestSuite::stop_1ch_audio)
             TEST_ADD(GstTestSuite::start_stop_1ch_audio)
@@ -83,25 +83,22 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::start_8ch_audio)
             TEST_ADD(GstTestSuite::stop_8ch_audio)
             TEST_ADD(GstTestSuite::start_stop_8ch_audio)
-#endif
-#if RTP
-#if 0
+    #if RTP
             TEST_ADD(GstTestSuite::start_2ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::stop_2ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::start_stop_2ch_comp_rtp_audio)
-#endif // 0
             TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audio)
 
-#endif // RTP
+    #endif // RTP
 #endif // AUDIO
 
 #if 0
                 TEST_ADD(GstTestSuite::start_8ch_uncomp_rtp_audio)
                 TEST_ADD(GstTestSuite::stop_8ch_uncomp_rtp_audio)
                 TEST_ADD(GstTestSuite::start_stop_8ch_uncomp_rtp_audio)
-#endif
+#endif // 0
         }
 
         void set_id(int id);
