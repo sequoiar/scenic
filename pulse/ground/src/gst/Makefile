@@ -19,14 +19,14 @@ TESTOBJS=$(OBJS) gstTestSuite.o
 EXT_OBJS= ../sip/sip.o ../sip/sipStateless.o
 
 GST_CFLAGS=-pthread -I/usr/local/include/gstreamer-0.10 -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/libxml2 
-GST_LDFLAGS=-pthread -L/usr/local/lib -lgstreamer-0.10 -lgobject-2.0 -lgmodule-2.0 -ldl -lgthread-2.0 -lrt -lxml2 -lglib-2.0  
+GST_LDFLAGS=-pthread -L/usr/local/lib -lgstreamer-0.10 -lgstbase-0.10 -lgobject-2.0 -lgmodule-2.0 -ldl -lgthread-2.0 -lrt -lxml2 -lglib-2.0 -lgstaudio-0.10
 
 CPPTEST_LDFLAGS=-lcpptest
 
-APP_CFLAGS+=-g -Wall $(GST_CFLAGS) $(JACK_CFLAGS) -I../
+APP_CFLAGS+=-g -Wall $(GST_CFLAGS) -I../
 CC	= g++
 CPP_CC  = g++
-LDFLAGS = $(APP_LDFLAGS) $(GST_LDFLAGS) $(JACK_LDFLAGS)
+LDFLAGS = $(APP_LDFLAGS) $(GST_LDFLAGS) 
 LDLIBS = $(APP_LDLIBS) 
 CFLAGS = $(APP_CFLAGS)
 CPPFLAGS = $(CFLAGS)

@@ -68,6 +68,7 @@ class GstTestSuite : public Test::Suite
 #endif // RTP
 #endif // VIDEO
 #if AUDIO
+#if 0
             TEST_ADD(GstTestSuite::start_1ch_audio)
             TEST_ADD(GstTestSuite::stop_1ch_audio)
             TEST_ADD(GstTestSuite::start_stop_1ch_audio)
@@ -82,16 +83,16 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::start_8ch_audio)
             TEST_ADD(GstTestSuite::stop_8ch_audio)
             TEST_ADD(GstTestSuite::start_stop_8ch_audio)
+#endif
 #if RTP
+#if 0
             TEST_ADD(GstTestSuite::start_2ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::stop_2ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::start_stop_2ch_comp_rtp_audio)
-
-#if 0
+#endif // 0
             TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audio)
-#endif // 0
 
 #endif // RTP
 #endif // AUDIO
@@ -113,7 +114,6 @@ class GstTestSuite : public Test::Suite
 
     private:
         int id_;
-        void block(); // inline
         void init_test();
 
         void start_video();
