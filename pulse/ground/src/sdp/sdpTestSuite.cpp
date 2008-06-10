@@ -42,6 +42,24 @@ void SdpTestSuite::sdp_header()
 }
 
 
+void SdpTestSuite::sdp_parse()
+{
+    Sdp sdp2;
+
+    Sdp sdp("Try");
+    SdpMedia sdpv = SdpMediaFactory::clone("H264");
+    sdpv.set_ip("192.168.1.183");
+    sdpv.set_port(10010);
+    TEST_ASSERT(sdp.add_media(sdpv));
+
+
+    sdp2.parse(sdp.str());
+    std::cout << "PARSE:" << std::endl;
+    std::cout << sdp2.str() << std::endl;
+    TEST_ASSERT(!sdp2.str().empty());
+}
+
+
 void SdpTestSuite::sdp_video()
 {
 

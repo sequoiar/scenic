@@ -5,7 +5,7 @@
 #define _SIP_TEST_SUITE_H_
 
 #include <cpptest.h>
-#include "sipSingleton.h"
+#include "sip.h"
 
 class SipTestSuite : public Test::Suite
 {
