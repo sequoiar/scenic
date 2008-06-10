@@ -3,7 +3,7 @@
 
 #include <cpptest.h>
 #include "sipTestSuite.h"
-#include "sipSingleton.h"
+#include "sip.h"
 #include "defaultAddresses.h"
 
 void SipTestSuite::setup()

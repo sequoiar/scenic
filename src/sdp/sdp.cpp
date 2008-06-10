@@ -26,6 +26,78 @@
 #include <iostream>
 #include "sdp.h"
 
+#include <string.h>
+
+/** Parse a sdp string and build object.
+ *
+ *
+ */
+bool Sdp::parse(std::string sdp_str)
+{
+    int ver,i=0;
+    char *p_str, *p2_str;
+    static char s[80][80];
+   
+//    sscanf(sdp_str.c_str(),"v=%d\no=%s %s", &ver,s);
+
+    p_str = strtok((char*)sdp_str.c_str(),"\n");
+    while(p_str != 0)
+    {
+        p2_str = strtok(0,"\n");
+        if(p2_str != 0)
+            strncpy(s[i++],p_str,p2_str-p_str);
+        else
+            strcpy(s[i],p_str);
+
+        p_str = p2_str;
+
+    }
+    
+    i=0;
+
+    char ip[20], sess_name[20], codec[20], m_type[20];
+    int port, avp;
+
+
+    while(s[i][0])
+    {
+        switch(s[i][0])
+        {
+            case 'v':   sscanf(s[i],"v=%d",&ver);
+                break;
+            case 'c':   sscanf(s[i],"c=IN IP4 %20s",ip);
+                break;
+            case 's':   if(sscanf(s[i],"s=%20s",sess_name))
+                            session_name_ = sess_name;
+
+                break;
+            case 'a':   if(sscanf(s[i],"a=rtpmap:%d %20s", &avp, codec)) 
+                        {
+                            if(!strncmp(codec,"H264",4))
+                            {
+                                SdpMedia m=SdpMediaFactory::clone("H264");
+                                m.set_ip(ip);
+                                m.set_port(port);
+                                add_media(m);
+                            }
+                        }
+                        else sscanf(s[i],"a=fmtp:%d", &avp);
+
+                break;
+            case 'm': sscanf(s[i],"m=%20s %d RTP/AVP %d", m_type, &port, &avp);
+                break;
+            case 'o':
+                break;
+
+        default:
+                ;
+        }
+        i++;
+    }
+
+
+    return 1;
+}
 
 bool Sdp::add_media(SdpMedia m) 
 {
@@ -113,10 +185,6 @@ void Sdp::list_media()
 }
 
 
-std::vector<SdpMedia>& Sdp::get_media()  
-{
-    return media_;
-}
 
 
 /*

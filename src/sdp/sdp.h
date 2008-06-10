@@ -43,7 +43,7 @@ class SdpMedia;
  *  TODO Parse SDP stream
  */
 
-typedef std::vector<SdpMedia>::iterator SdpMediaIterator;
+typedef std::vector<SdpMedia>::const_iterator SdpMediaIterator;
 
 class Sdp
 {
@@ -55,9 +55,13 @@ public:
     bool add_media(SdpMedia m);
     std::string str();
 
-    std::vector<SdpMedia>& get_media();
+    std::vector<SdpMedia>::const_iterator get_media_begin() {return media_.begin();}
+    std::vector<SdpMedia>::const_iterator get_media_end() {return media_.end();}
+
 
     bool is_valid() const { return !media_.empty(); }
+   
+    bool parse(std::string);
     
     void list_media();
 
@@ -84,8 +88,8 @@ public:
     void add_attribute(std::string attrib) { attrib_.push_back(attrib); }
     void set_ip(std::string ip) {ip_ = ip;}
     void set_port(int port) {port_ = port;}
-    int get_port() { return port_; }
-    std::string& get_ip() { return ip_; }  
+    int get_port() const { return port_; }
+    const std::string& get_ip() const { return ip_; }  
     const std::string& get_media_type() const { return media_type_; }
     std::string str();
     //SdpMedia& operator=(const SdpMedia& m);

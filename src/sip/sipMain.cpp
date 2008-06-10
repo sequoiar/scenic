@@ -31,7 +31,7 @@
 #include "defaultAddresses.h"
 
 
-int eventLoop()
+bool eventLoop()
 {
     char c[2];
     // Approach 1: GMainloop
@@ -49,8 +49,8 @@ int eventLoop()
     //usleep(10000);
     
     // Approach 3: Block waiting for character input
-    std::cout << "Hit r and <cr> to request h264.1." << std::endl;
-    std::cout << "Hit a and <cr> to accept a request." << std::endl; 
+    std::cout << "Hit r and <cr> to request H264" << std::endl;
+//    std::cout << "Hit a and <cr> to accept a request." << std::endl; 
     std::cout << "Hit q and <cr> to quit." << std::endl; 
 
     std::cin.getline(c,2);
@@ -59,23 +59,31 @@ int eventLoop()
     switch(c[0])
     {
         case 'q':
-            exit(-1);       // FIXME: should rather quit gracefully
-        
+            return 0;
+            break;
+
         case 'r':
-            SipSingleton::Instance()->send_request("H264");
+            {
+                Sdp sdp("sipT");
+                SdpMedia sdpm = SdpMediaFactory::clone("H264");
+                sdpm.set_ip(MY_ADDRESS);
+                sdpm.set_port(SipSingleton::Instance()->get_service_port());
+                sdp.add_media(sdpm);
+                SipSingleton::Instance()->send_request(sdp.str());
+            }
             break;
 
         default:
             break;
     }
 
-    return 0;
+    return 1;
 }
 
 
 int main(int argc, char *argv[])
 {
-    long txPort = 10010;
+    long txPort = 11001;
     long rxPort = txPort;
    
     VideoSender tx;
@@ -96,41 +104,39 @@ int main(int argc, char *argv[])
     // init gstreamer, moved to MediaBase constructor
     // gst_init(0, NULL);  // normally should get argc argv
     /*----------------------------------------------*/ 
-    for(;;)
+    while(eventLoop())        // sends requests
     {
         if(sip.handle_events()) // if events are queued up
         {
             Sdp& sdp_t = sip.get_sdp();
             if(sdp_t.is_valid() && !tx.isPlaying())
             {
-                
-                for(SdpMediaIterator it=sdp_t.get_media().begin();it != sdp_t.get_media().end();it++)
+                for(SdpMediaIterator it=sdp_t.get_media_begin();it != sdp_t.get_media_end();it++)
                 {
-
-                }
-                
-                if(tx.init("test",sip.get_service_port(), std::string(MY_ADDRESS)))
-                {
-                    tx.start();
-                    sip.zero_service_desc();
+                    std::cout << it->get_media_type() << " MEDIA TYPE" << std::endl;
+                    if(!it->get_media_type().compare("video"))
+                        if(tx.init("test",it->get_port(), it->get_ip()))
+                        {
+                            tx.start();
+                            sip.zero_service_desc();
+                        }
                 }
             }
 
 
             if (!rx.isPlaying())
             {
-                if(sip.get_rx_port())
+                if(sip.response_ok())
                 {
-                    if(rx.init(sip.get_rx_port()))
+                    if(rx.init(sip.get_service_port()))
                     {
-                        sip.zero_rx_port();
+                        sip.zero_service_port();
                         rx.start();
                     }
                 }
             }
         }
 
-        eventLoop();        // sends requests
     }
     return 0;
 }

@@ -14,6 +14,7 @@ class SdpTestSuite : public Test::Suite
         {
                 TEST_ADD(SdpTestSuite::init_test)
                 TEST_ADD(SdpTestSuite::sdp_header)
+                TEST_ADD(SdpTestSuite::sdp_parse)
                 TEST_ADD(SdpTestSuite::sdp_video)
                 TEST_ADD(SdpTestSuite::sdp_audio)
                 TEST_ADD(SdpTestSuite::sdp_av)
@@ -26,9 +27,9 @@ class SdpTestSuite : public Test::Suite
         virtual void tear_down();   // destroy common resources
 
     private:
-        void block(); // inline
         void init_test();
         void sdp_header();
+        void sdp_parse();
         void sdp_video();
         void sdp_audio();
         void sdp_av();

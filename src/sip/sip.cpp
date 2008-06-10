@@ -39,16 +39,14 @@ SipSingleton* SipSingleton::s_ = 0;
 
 const char* SipSingleton::rx_req(const char *data, unsigned int len) 
 {
-    static char ser[16];
-    static char p[8];
-    Sdp sdp("resp");
     std::cerr << __FILE__ << ": rx_request: " ;
     std::cerr.write(data, len);
     std::cerr << std::endl;
-    sscanf(data,"%4s", ser);
+//    sscanf(data,"%4s", ser);
 
+    sdp_.parse(std::string(data,len));
     //std::string temp(ser);
-
+/*
     SdpMedia sdpv = SdpMediaFactory::clone(ser);
     sdpv.set_ip(MY_ADDRESS);
     sdpv.set_port(service_port_);
@@ -56,20 +54,21 @@ const char* SipSingleton::rx_req(const char *data, unsigned int len)
     std::cout << sdp.str();
 
     sdp.add_media(sdpv);
-
-    std::cout << sdp.str();
+*/
+    std::cout << sdp_.str();
 
     std::cout << "-----------" << std::endl;
 
-    if (sdp.is_valid())
+    if (sdp_.is_valid())
     {
       //  strcpy(service_, ser);
 
-        std::cerr << ser << " port:" << service_port_ << std::endl;
+        std::cerr << sdp_.get_media_begin()->get_ip() << " port:" 
+            << sdp_.get_media_begin()->get_port() << std::endl;
 
        // sprintf(p, "%d", service_port_);
 
-        return sdp.str().c_str();
+        return "OK";
     }
 
     if (!strncmp(data,"Hello",5))
@@ -93,18 +92,9 @@ void SipSingleton::rx_res(const char *data, unsigned int len)
     std::cerr << __FILE__ << ": rx_response:" ;
     std::cerr.write(data,len);
     std::cerr << std::endl;
-    
-    //parse sdp
-    Sdp sdp_l;
-    SdpMedia sdpm = SdpMediaFactory::clone("H264");
 
-    sdpm.set_ip(THEIR_ADDRESS);
-    sdpm.set_port(11111);
-    sdp_l.add_media(sdpm);
-    sdp_ = sdp_l;
-    //
-
-    rx_port_ = 11111; //atoi(data);
+    if(!strncmp(data,"OK",2))
+        response = true;
 
 }
 
@@ -120,9 +110,9 @@ SipSingleton* SipSingleton::Instance()
 
 
 
-void SipSingleton::send_request(const char* msg)
+void SipSingleton::send_request(std::string msg)
 {
-    ::send_request(msg);
+    ::send_request(msg.c_str());
 }
 
 

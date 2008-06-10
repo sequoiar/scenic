@@ -46,7 +46,7 @@ public:
     //called inside pjsip rx_response
     void rx_res(const char *msg, unsigned int len);
 
-    void send_request(const char* msg);
+    void send_request(std::string);
 
     int handle_events();
 
@@ -67,12 +67,15 @@ public:
     void zero_rx_port(){ rx_port_ = 0; }
     char* get_service() { return service_; }
     
+    bool response_ok(){return response;}
     Sdp& get_sdp(){return sdp_;}
 private:
-    SipSingleton():service_port_(0),rx_port_(0){};
+    SipSingleton():service_port_(0),rx_port_(0),response(false){};
         
     char service_[32];
     int service_port_, rx_port_;
+
+    bool response;
 
     Sdp sdp_;
 
