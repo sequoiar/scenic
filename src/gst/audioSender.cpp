@@ -26,8 +26,11 @@
 #include <sstream>
 
 #include <gst/gst.h>
-//#include <gst/audio/multichannel.h>
+#include <gst/audio/multichannel.h>
 //#include <gst/audio/multichannel-enumtypes.h>
+// FIXME!!!!!
+//#include </home/tristan/gst-plugins-base/gst-libs/gst/audio/multichannel-enumtypes.c>
+
 #include "mediaBase.h"
 #include "audioSender.h"
 
@@ -90,11 +93,13 @@ bool AudioSender::init(const std::string media, const int port, const std::strin
         init_8ch_comp_rtp_test();
         return true;
     }
+    /*
     else if (!media.compare("8chUncompRtpTest"))
     {
         init_8ch_uncomp_rtp_test();
         return true;
     }
+    */
     else
     {
         std::cout << "Invalid service type " << media << std::endl;
@@ -520,8 +525,8 @@ void AudioSender::init_8ch_comp_rtp_test()
 
     GstElement *interleave, *encoder, *payloader, *txSink1;
     // layout stuff
-    // GValue val = { 0, };
-    // GValueArray *arr;
+    GValueArray *arr;
+    GValue val = { 0, };
     
     GstElement *txSrc1, *aconv1, *queue1; 
     GstElement *txSrc2, *aconv2, *queue2;
@@ -542,7 +547,6 @@ void AudioSender::init_8ch_comp_rtp_test()
     interleave = gst_element_factory_make("interleave", "interleave");
     assert(interleave);
     
-#if 0
     g_object_set(interleave, "channel-positions-from-input", FALSE, NULL);
     arr = g_value_array_new(8);
     g_value_init(&val, GST_TYPE_AUDIO_CHANNEL_POSITION);
@@ -558,6 +562,9 @@ void AudioSender::init_8ch_comp_rtp_test()
     g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT);
     g_value_array_append(arr, &val);
     g_value_reset(&val);
+    g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER);
+    g_value_array_append(arr, &val);
+    g_value_reset(&val);
     g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_LFE);
     g_value_array_append(arr, &val);
     g_value_reset(&val);
@@ -566,13 +573,9 @@ void AudioSender::init_8ch_comp_rtp_test()
     g_value_reset(&val);
     g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT);
     g_value_array_append(arr, &val);
-    g_value_reset(&val);
-    g_value_set_enum(&val, GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT_OF_CENTER);
-    g_value_array_append(arr, &val);
     g_value_unset(&val);
     g_object_set(interleave, "channel-positions", arr, NULL);
     g_value_array_free(arr);
-#endif
 
     encoder = gst_element_factory_make("vorbisenc", "encoder");
     assert(encoder);
@@ -691,143 +694,56 @@ void AudioSender::init_8ch_comp_rtp_test()
 
 
 
-// not actually uncompressed yet
-void AudioSender::init_8ch_uncomp_rtp_test()
+// FIXME THIS DOESN'T WORK YET
+void AudioSender::init_1ch_uncomp_rtp_test()
 {
-    numChannels_ = 8;
+    numChannels_ = 1;
 
-    GstElement *interleave, *encoder, *payloader, *txSink1;
-    GstElement *txSrc1, *aconv1, *queue1; 
-    GstElement *txSrc2, *aconv2, *queue2;
-    GstElement *txSrc3, *aconv3, *queue3;
-    GstElement *txSrc4, *aconv4, *queue4;
-    GstElement *txSrc5, *aconv5, *queue5;
-    GstElement *txSrc6, *aconv6, *queue6;
-    GstElement *txSrc7, *aconv7, *queue7;
-    GstElement *txSrc8, *aconv8, *queue8;
+    GstElement *rtpbin;
+    GstElement *audioSrc1, *aconv1, *encoder, *payloader;
+    GstElement *udpSrc1, *udpSink1, *udpSink2;
 
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
 
     make_verbose();
 
-    // Transmission
-    
-    interleave = gst_element_factory_make("interleave", "interleave");
-    assert(interleave);
+    // channel 1
+
+    audioSrc1 = gst_element_factory_make("audiotestsrc", "audioSrc1");
+    assert(audioSrc1);
+    aconv1 = gst_element_factory_make("audioconvert", "aconv1");
+    assert(aconv1);
     encoder = gst_element_factory_make("alawenc", "encoder");
     assert(encoder);
     payloader = gst_element_factory_make("rtppcmapay", "payloader");
     assert(payloader);
-    txSink1 = gst_element_factory_make("udpsink", "txSink1");
-    assert(txSink1);
 
-    // channel 1
+    // Transmission
+    
+    rtpbin = gst_element_factory_make("gstrtpbin", "rtpbin");
+    assert(rtpbin);
+    udpSrc1 = gst_element_factory_make("udpsrc", "udpSrc1"); // for tcp
+    assert(udpSrc1);
+    udpSink1 = gst_element_factory_make("udpsink", "udpSink1");
+    assert(udpSink1);
+    udpSink2 = gst_element_factory_make("udpsink", "udpSink2");
+    assert(udpSink2);
 
-    txSrc1 = gst_element_factory_make("audiotestsrc", "txSrc1");
-    assert(txSrc1);
-    aconv1 = gst_element_factory_make("audioconvert", "aconv1");
-    assert(aconv1);
-    queue1 = gst_element_factory_make("queue", "queue1");
-    assert(queue1);
-
-    // channel 2
-
-    txSrc2 = gst_element_factory_make("audiotestsrc", "txSrc2");
-    assert(txSrc2);
-    aconv2 = gst_element_factory_make("audioconvert", "aconv2");
-    assert(aconv2);
-    queue2 = gst_element_factory_make("queue", "queue2");
-    assert(queue2);
-
-    // channel 3
-
-    txSrc3 = gst_element_factory_make("audiotestsrc", "txSrc3");
-    assert(txSrc3);
-    aconv3 = gst_element_factory_make("audioconvert", "aconv3");
-    assert(aconv3);
-    queue3 = gst_element_factory_make("queue", "queue3");
-    assert(queue3);
-
-    // channel 4
-
-    txSrc4 = gst_element_factory_make("audiotestsrc", "txSrc4");
-    assert(txSrc4);
-    aconv4 = gst_element_factory_make("audioconvert", "aconv4");
-    assert(aconv4);
-    queue4 = gst_element_factory_make("queue", "queue4");
-    assert(queue4);
-
-    // channel 5
-
-    txSrc5 = gst_element_factory_make("audiotestsrc", "txSrc5");
-    assert(txSrc5);
-    aconv5 = gst_element_factory_make("audioconvert", "aconv5");
-    assert(aconv5);
-    queue5 = gst_element_factory_make("queue", "queue5");
-    assert(queue5);
-
-    // channel 6
-
-    txSrc6 = gst_element_factory_make("audiotestsrc", "txSrc6");
-    assert(txSrc6);
-    aconv6 = gst_element_factory_make("audioconvert", "aconv6");
-    assert(aconv6);
-    queue6 = gst_element_factory_make("queue", "queue6");
-    assert(queue6);
-
-    // channel 7
-
-    txSrc7 = gst_element_factory_make("audiotestsrc", "txSrc7");
-    assert(txSrc7);
-    aconv7 = gst_element_factory_make("audioconvert", "aconv7");
-    assert(aconv7);
-    queue7 = gst_element_factory_make("queue", "queue7");
-    assert(queue7);
-
-    // channel 8
-
-    txSrc8 = gst_element_factory_make("audiotestsrc", "txSrc8");
-    assert(txSrc8);
-    aconv8 = gst_element_factory_make("audioconvert", "aconv8");
-    assert(aconv8);
-    queue8 = gst_element_factory_make("queue", "queue8");
-    assert(queue8);
 
     // end of channels
 
     gst_bin_add_many(GST_BIN(pipeline_), 
-            interleave, encoder, payloader, txSink1, 
-            txSrc1, aconv1, queue1, 
-            txSrc2, aconv2, queue2,
-            txSrc3, aconv3, queue3,
-            txSrc4, aconv4, queue4, 
-            txSrc5, aconv5, queue5, 
-            txSrc6, aconv6, queue6, 
-            txSrc7, aconv7, queue7, 
-            txSrc8, aconv8, queue8, NULL);
+            rtpbin, audioSrc1, aconv1, encoder, payloader, udpSink1, udpSink2, 
+            udpSrc1, 
+            NULL);
 
     // links transmission line, and audiotestsrcs
-    gst_element_link_many(interleave, encoder, payloader, txSink1, NULL);
-    gst_element_link_many(txSrc1, aconv1, queue1, interleave, NULL);
-    gst_element_link_many(txSrc2, aconv2, queue2, interleave, NULL);
-    gst_element_link_many(txSrc3, aconv3, queue3, interleave, NULL);
-    gst_element_link_many(txSrc4, aconv4, queue4, interleave, NULL);
-    gst_element_link_many(txSrc5, aconv5, queue5, interleave, NULL);
-    gst_element_link_many(txSrc6, aconv6, queue6, interleave, NULL);
-    gst_element_link_many(txSrc7, aconv7, queue7, interleave, NULL);
-    gst_element_link_many(txSrc8, aconv8, queue8, interleave, NULL);
+    gst_element_link_many(audioSrc1, aconv1, encoder, payloader, rtpbin, NULL);
 
-    g_object_set(G_OBJECT(txSink1), "host", remoteHost_.c_str(), "port", port_, NULL);
+    g_object_set(G_OBJECT(udpSink1), "host", remoteHost_.c_str(), "port", port_, NULL);
 
-    g_object_set(G_OBJECT(txSrc1), "volume", 0.125, "freq", 200.0, "is-live", TRUE, NULL);
-    g_object_set(G_OBJECT(txSrc2), "volume", 0.125, "freq", 300.0, "is-live", TRUE, NULL);
-    g_object_set(G_OBJECT(txSrc3), "volume", 0.125, "freq", 400.0, "is-live", TRUE, NULL);
-    g_object_set(G_OBJECT(txSrc4), "volume", 0.125, "freq", 500.0, "is-live", TRUE, NULL);
-    g_object_set(G_OBJECT(txSrc5), "volume", 0.125, "freq", 600.0, "is-live", TRUE, NULL);
-    g_object_set(G_OBJECT(txSrc6), "volume", 0.125, "freq", 700.0, "is-live", TRUE, NULL);
-    g_object_set(G_OBJECT(txSrc7), "volume", 0.125, "freq", 800.0, "is-live", TRUE, NULL);
-    g_object_set(G_OBJECT(txSrc8), "volume", 0.125, "freq", 900.0, "is-live", TRUE, NULL);
+    g_object_set(G_OBJECT(audioSrc1), "volume", 0.125, "freq", 200.0, "is-live", TRUE, NULL);
 }
 
 

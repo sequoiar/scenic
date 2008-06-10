@@ -44,7 +44,7 @@ class AudioSender : public MediaBase
 
         void init_2ch_comp_rtp_test();
         void init_8ch_comp_rtp_test();
-        void init_8ch_uncomp_rtp_test();
+        void init_1ch_uncomp_rtp_test();
 
         std::string remoteHost_;
         int numChannels_;
