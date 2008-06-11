@@ -86,6 +86,22 @@ const GstAudioChannelPosition AudioSender::VORBIS_CHANNEL_POSITIONS[][8] = {
     },
 };
 
+// callback which gets signalled when dynamic pad is created
+
+static void cb_new_pad(GstElement *element, GstPad *pad, gpointer data)
+{
+    gchar *name;
+
+    name = gst_pad_get_name (pad);
+    g_print ("A new pad %s was created\n", name);
+    g_free (name);
+
+    /* here, setup a new pad link for the newly created pad */
+
+
+
+}
+
 
 
 AudioSender::AudioSender() : MediaBase()
@@ -149,7 +165,7 @@ bool AudioSender::init(const std::string media, const int port, const std::strin
     }
     else if (!media.compare("1chUncompRtpTest"))
     {
-        init_uncomp_rtp_test();
+        init_uncomp_rtp_test(1);
         return true;
     }
     else
@@ -317,7 +333,7 @@ void AudioSender::init_rtp_test(int numChannels)
     }
 
     gst_bin_add_many(GST_BIN(pipeline_), interleave, encoder, payloader, sink, NULL);
-    
+
     for (int channelIdx = 0; channelIdx < numChannels_; channelIdx++)
     {
         gst_bin_add_many(GST_BIN(pipeline_), sources[channelIdx], aconvs[channelIdx], 
@@ -330,7 +346,7 @@ void AudioSender::init_rtp_test(int numChannels)
     {
         gst_element_link_many(sources[channelIdx], aconvs[channelIdx], interleave, NULL);
         g_object_set(G_OBJECT(sources[channelIdx]), "volume", gain, "freq", 100.0 * (channelIdx + 1),
-                    "is-live", TRUE, NULL);
+                "is-live", TRUE, NULL);
     }
 
     g_object_set(G_OBJECT(sink), "host", remoteHost_.c_str(), "port", port_, NULL);
@@ -377,8 +393,11 @@ void AudioSender::init_uncomp_rtp_test(int numChannels)
     // get pads from rtpbin
     send_rtp_sink = gst_element_get_request_pad(rtpbin, "send_rtp_sink_%d");
     assert(send_rtp_sink);
-    send_rtp_src = gst_element_get_request_pad(rtpbin, "send_rtp_src_%d");
-    assert(send_rtp_src);
+
+    // FIXME: this pad is only available SOMETIMES, so it has to be added dynamically via a callback
+    //send_rtp_src = gst_element_get_request_pad(rtpbin, "send_rtp_src_%d");
+    //assert(send_rtp_src);
+    
     send_rtcp_src = gst_element_get_request_pad(rtpbin, "send_rtcp_src_%d"); 
     assert(send_rtcp_src);
     recv_rtcp_sink = gst_element_get_request_pad(rtpbin, "recv_rtcp_sink_%d"); 
@@ -397,9 +416,9 @@ void AudioSender::init_uncomp_rtp_test(int numChannels)
     gst_pad_link(tempPad, send_rtp_sink);
     gst_object_unref(GST_OBJECT(tempPad));
 
-    tempPad = gst_element_get_pad(udpSink1, "sink");
-    gst_pad_link(send_rtp_src, tempPad);
-    gst_object_unref(GST_OBJECT(tempPad));
+   // tempPad = gst_element_get_pad(udpSink1, "sink");
+   // gst_pad_link(send_rtp_src, tempPad);
+   // gst_object_unref(GST_OBJECT(tempPad));
 
     tempPad = gst_element_get_pad(udpSink2, "sink");
     gst_pad_link(send_rtcp_src, tempPad);
@@ -412,7 +431,7 @@ void AudioSender::init_uncomp_rtp_test(int numChannels)
     // release requested pads in reverse order
     gst_element_release_request_pad(rtpbin, recv_rtcp_sink);
     gst_element_release_request_pad(rtpbin, send_rtcp_src);
-    gst_element_release_request_pad(rtpbin, send_rtp_src);
+    //gst_element_release_request_pad(rtpbin, send_rtp_src);
     gst_element_release_request_pad(rtpbin, send_rtp_sink);
 
     g_object_set(G_OBJECT(udpSink1), "host", remoteHost_.c_str(), "port", port_, NULL);
@@ -421,6 +440,9 @@ void AudioSender::init_uncomp_rtp_test(int numChannels)
     g_object_set(G_OBJECT(udpSrc1), "port", port_ + 2, NULL);
 
     g_object_set(G_OBJECT(audioSrc1), "volume", 0.125, "freq", 200.0, "is-live", TRUE, NULL);
+
+    // connect signal for when pad is added
+    g_signal_connect(rtpbin, "pad-added", G_CALLBACK(cb_new_pad), NULL);
 }
 
 
