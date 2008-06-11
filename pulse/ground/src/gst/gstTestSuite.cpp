@@ -742,51 +742,116 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audio()
 
 
 
-void GstTestSuite::start_8ch_uncomp_rtp_audio()
+void GstTestSuite::start_1ch_uncomp_rtp_audio()
 {
-    AudioSender tx;
-    AudioReceiver rx;
+    int numChannels = 1;
+    int port = 10010;
 
-    tx.init("8chUncompRtpTest", 10010, MY_ADDRESS);
-    rx.init(10010, 8);
-    TEST_ASSERT(tx.start());
-    TEST_ASSERT(rx.start());
+    if (id_ == 0)
+    {
+        AudioReceiver rx;
+        rx.init_uncomp(port, numChannels);
+        TEST_ASSERT(rx.start());
 
-    BLOCK();
+        BLOCK();
 
+        TEST_ASSERT(rx.isPlaying());
+    }
+    else
+    {
+        AudioSender tx;
+        tx.init("1chUncompRtpTest", port + 100, MY_ADDRESS);
+        TEST_ASSERT(tx.start());
+
+        BLOCK();
+
+        TEST_ASSERT(tx.isPlaying());
+    }
 }
 
 
 
-void GstTestSuite::stop_8ch_uncomp_rtp_audio()
+void GstTestSuite::stop_1ch_uncomp_rtp_audio()
 {
-    AudioSender tx;
-    AudioReceiver rx;
-    tx.init("8chUncompRtpTest", 10010, MY_ADDRESS);
-    rx.init(10010, 8);
+    int numChannels = 1;
+    int port = 10010;
 
-    BLOCK();
+    if (id_ == 0)
+    {
+        AudioReceiver rx;
+        rx.init_uncomp(port, numChannels);
 
-    TEST_ASSERT(tx.stop());
-    TEST_ASSERT(rx.stop());
+        BLOCK();
+
+        TEST_ASSERT(rx.stop());
+        TEST_ASSERT(!rx.isPlaying());
+    }
+    else
+    {
+        AudioSender tx;
+        tx.init("1chUncompRtpTest", port + 100, MY_ADDRESS);
+
+        BLOCK();
+
+        TEST_ASSERT(tx.stop());
+        TEST_ASSERT(!tx.isPlaying());
+    }
 }
 
 
 
-void GstTestSuite::start_stop_8ch_uncomp_rtp_audio()
+void GstTestSuite::start_stop_1ch_uncomp_rtp_audio()
 {
-    AudioSender tx;
-    AudioReceiver rx;
+    int numChannels = 1;
+    int port = 10010;
 
-    tx.init("8chUncompRtpTest", 10010, MY_ADDRESS);
-    rx.init(10010, 8);
-    TEST_ASSERT(tx.start());
-    TEST_ASSERT(rx.start());
+    if (id_ == 0)
+    {
+        AudioReceiver rx;
+        rx.init_uncomp(port, numChannels);
+        TEST_ASSERT(rx.start());
 
-    BLOCK();
+        BLOCK();
+        
+        TEST_ASSERT(rx.isPlaying());
 
-    TEST_ASSERT(rx.stop());
-    TEST_ASSERT(tx.stop());
+        TEST_ASSERT(rx.stop());
+        TEST_ASSERT(!rx.isPlaying());
+    }
+    else
+    {
+        AudioSender tx;
+        tx.init("1chUncompRtpTest", port + 100, MY_ADDRESS);
+        TEST_ASSERT(tx.start());
+
+        BLOCK();
+
+        TEST_ASSERT(tx.isPlaying());
+
+        TEST_ASSERT(tx.stop());
+        TEST_ASSERT(!tx.isPlaying());
+    }
+}
+
+
+
+void start_8ch_uncomp_rtp_audio()
+{
+    // not yet implemented
+}
+
+
+
+void stop_8ch_uncomp_rtp_audio()
+{
+    // not yet implemented
+}
+
+
+
+void start_stop_8ch_uncomp_rtp_audio()
+{
+    // not yet implemented
 }
 
 

@@ -31,6 +31,7 @@ class AudioReceiver : public MediaBase
         AudioReceiver();
         virtual ~AudioReceiver();
         bool init(int port = DEF_PORT, int numChannels = 2);
+        bool init_uncomp(int port = DEF_PORT, int numChannels = 1);
         virtual bool start();
 
     private:

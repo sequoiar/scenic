@@ -71,6 +71,7 @@ bool AudioReceiver::init(int port, int numChannels)
 
     assert(caps);
     g_object_set(G_OBJECT(rxSrc), "caps", caps, NULL);
+    gst_caps_unref(caps);
 
     g_object_set(G_OBJECT(rxSrc), "port", port_, NULL);
 
@@ -89,6 +90,112 @@ bool AudioReceiver::init(int port, int numChannels)
 
     std::cout << "Receiving media on port : " << port_ << std::endl;
     gst_element_link_many(rxSrc, depayloader, decoder, rxSink, NULL);
+
+    return true;
+}
+
+
+
+bool AudioReceiver::init_uncomp(int port, int numChannels)
+{
+    if (numChannels != 1)
+    {
+        std::cout << __FILE__ << __LINE__ << ":I'm not yet built for " << numChannels << std::endl; 
+        return false;
+    }
+
+    numChannels_ = numChannels;
+
+    if (port < 1000)
+        port_ = DEF_PORT;
+    else
+        port_ = port;
+
+    //  Create receiver pipeline
+    GstElement *rtpbin, *udpSrc1, *udpSrc2, *depayloader, *decoder, *aConv, *aResample, *aSink, 
+               *udpSink;
+    GstCaps *caps;
+    GstPad *recv_rtp_sink, *recv_rtcp_sink, *send_rtcp_src, *tempPad;
+
+    pipeline_ = gst_pipeline_new("rxPipeline");
+    assert(pipeline_);
+
+    make_verbose();
+    
+/*----------------------------------------------*/ 
+// create elements
+/*----------------------------------------------*/ 
+    
+    rtpbin = gst_element_factory_make("gstrtpbin", "rtpbin");
+    assert(rtpbin);
+
+    // pads from rtpbin
+    
+    recv_rtp_sink = gst_element_get_request_pad(rtpbin, "recv_rtp_sink_%d"); 
+    assert(recv_rtp_sink);
+    recv_rtcp_sink = gst_element_get_request_pad(rtpbin, "recv_rtcp_sink_%d"); 
+    assert(recv_rtcp_sink);
+    send_rtcp_src = gst_element_get_request_pad(rtpbin, "send_rtcp_src_%d"); 
+    assert(send_rtcp_src);
+
+    udpSrc1 = gst_element_factory_make("udpsrc", "udpSrc1");
+    assert(udpSrc1);
+    
+    // FIXME: caps shouldn't be hardcoded
+    const char * capsString = "application/x-rtp,media=(string)audio,clock-rate=(int)8000,"
+        "encoding-name=(string)PCMA"; 
+
+    caps = gst_caps_from_string(capsString);
+    assert(caps);
+    g_object_set(G_OBJECT(udpSrc1), "caps", caps, NULL);
+    gst_caps_unref(caps);
+
+    g_object_set(G_OBJECT(udpSrc1), "port", port_, NULL);
+
+    depayloader = gst_element_factory_make("rtppcmadepay", "depayloader");
+    assert(depayloader);
+
+    decoder = gst_element_factory_make("alawdec", "decoder");
+    assert(decoder);
+
+    aConv = gst_element_factory_make("audioconvert", "aConv");
+    assert(aConv);
+    
+    aResample = gst_element_factory_make("audioresample", "aResample");
+    assert(aResample);
+
+    aSink = gst_element_factory_make("jackaudiosink", "aSink");
+    assert(aSink);
+
+    udpSrc2 = gst_element_factory_make("udpsrc", "udpSrc2");
+    assert(udpSrc2);
+    g_object_set(G_OBJECT(udpSrc1), "port", port_ + 1, NULL);
+
+    udpSink = gst_element_factory_make("udpsink", "udpSink");
+    assert(udpSink);
+    // FIXME: host ip should be a private member
+    g_object_set(G_OBJECT(udpSink), "port", port_ + 2, "host", "localhost", "sync", FALSE, "async", 
+            FALSE, NULL);
+
+    gst_bin_add_many(GST_BIN(pipeline_), rtpbin, udpSrc1, depayloader, decoder, aConv, aResample, aSink,
+            udpSrc2, udpSink, NULL); 
+
+    gst_element_link_many(rtpbin, depayloader, decoder, aConv, aResample, aSink, NULL);
+   
+    // link rtpbin pads
+    tempPad = gst_element_get_pad(udpSrc1, "src");
+    gst_pad_link(tempPad, recv_rtp_sink);
+    gst_object_unref(GST_OBJECT(tempPad));
+
+    tempPad = gst_element_get_pad(udpSrc2, "src");
+    gst_pad_link(tempPad, recv_rtcp_sink);
+    gst_object_unref(GST_OBJECT(tempPad));
+
+    tempPad = gst_element_get_pad(udpSink, "sink");
+    gst_pad_link(send_rtcp_src, tempPad);
+    gst_object_unref(GST_OBJECT(tempPad));
+
+    std::cout << "Receiving media on port : " << port_ << std::endl;
 
     return true;
 }
