@@ -46,7 +46,6 @@ int main(int argc, char* argv[])
     std::cout << "Brought to you by The Military Industrial Complex." << std::endl;
     while(1)
     {
-        std::cout << "GL: ";
         if(_ground_loop(count))
         {
             if(!py.run_input().empty())
