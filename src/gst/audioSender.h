@@ -43,8 +43,7 @@ class AudioSender : public MediaBase
 
         void init_rtp_test(int numChannels = 2);
         
-        // void init_uncomp_rtp_test(int numChannels = 1);
-        void init_uncomp_rtp_test();
+        void init_uncomp_rtp_test(int numChannels = 1);
 
         void set_channel_layout(GValueArray *arr);
 

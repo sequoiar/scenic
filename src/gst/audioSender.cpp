@@ -147,13 +147,11 @@ bool AudioSender::init(const std::string media, const int port, const std::strin
         init_rtp_test(8);
         return true;
     }
-    /*
-       else if (!media.compare("8chUncompRtpTest"))
-       {
-       init_8ch_uncomp_rtp_test();
-       return true;
-       }
-       */
+    else if (!media.compare("1chUncompRtpTest"))
+    {
+        init_uncomp_rtp_test();
+        return true;
+    }
     else
     {
         std::cout << "Invalid service type " << media << std::endl;
@@ -339,15 +337,15 @@ void AudioSender::init_rtp_test(int numChannels)
 }
 
 
-
 // FIXME THIS DOESN'T WORK YET
-void AudioSender::init_uncomp_rtp_test()
+void AudioSender::init_uncomp_rtp_test(int numChannels)
 {
-    numChannels_ = 1;
+    numChannels_ = numChannels;
 
     GstElement *rtpbin;
     GstElement *audioSrc1, *aconv1, *encoder, *payloader;
     GstElement *udpSrc1, *udpSink1, *udpSink2;
+    GstPad *send_rtp_sink, *send_rtp_src, *send_rtcp_src, *recv_rtcp_sink, *tempPad;
 
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
@@ -376,18 +374,51 @@ void AudioSender::init_uncomp_rtp_test()
     udpSink2 = gst_element_factory_make("udpsink", "udpSink2");
     assert(udpSink2);
 
+    // get pads from rtpbin
+    send_rtp_sink = gst_element_get_request_pad(rtpbin, "send_rtp_sink_%d");
+    assert(send_rtp_sink);
+    send_rtp_src = gst_element_get_request_pad(rtpbin, "send_rtp_src_%d");
+    assert(send_rtp_src);
+    send_rtcp_src = gst_element_get_request_pad(rtpbin, "send_rtcp_src_%d"); 
+    assert(send_rtcp_src);
+    recv_rtcp_sink = gst_element_get_request_pad(rtpbin, "recv_rtcp_sink_%d"); 
+    assert(recv_rtcp_sink);
 
     // end of channels
-
-    gst_bin_add_many(GST_BIN(pipeline_), 
-            rtpbin, audioSrc1, aconv1, encoder, payloader, udpSink1, udpSink2, 
-            udpSrc1, 
-            NULL);
+    gst_bin_add_many(GST_BIN(pipeline_), rtpbin, audioSrc1, aconv1, encoder, payloader, udpSink1, 
+            udpSink2, udpSrc1, NULL);
 
     // links transmission line, and audiotestsrcs
-    gst_element_link_many(audioSrc1, aconv1, encoder, payloader, rtpbin, NULL);
+    gst_element_link_many(audioSrc1, aconv1, encoder, payloader, NULL);
+
+    // link rtpbin pads
+    // FIXME: should there be checks here?
+    tempPad = gst_element_get_pad(payloader, "src");
+    gst_pad_link(tempPad, send_rtp_sink);
+    gst_object_unref(GST_OBJECT(tempPad));
+
+    tempPad = gst_element_get_pad(udpSink1, "sink");
+    gst_pad_link(send_rtp_src, tempPad);
+    gst_object_unref(GST_OBJECT(tempPad));
+
+    tempPad = gst_element_get_pad(udpSink2, "sink");
+    gst_pad_link(send_rtcp_src, tempPad);
+    gst_object_unref(GST_OBJECT(tempPad));
+
+    tempPad = gst_element_get_pad(udpSrc1, "src");
+    gst_pad_link(tempPad, recv_rtcp_sink);
+    gst_object_unref(GST_OBJECT(tempPad));
+
+    // release requested pads in reverse order
+    gst_element_release_request_pad(rtpbin, recv_rtcp_sink);
+    gst_element_release_request_pad(rtpbin, send_rtcp_src);
+    gst_element_release_request_pad(rtpbin, send_rtp_src);
+    gst_element_release_request_pad(rtpbin, send_rtp_sink);
 
     g_object_set(G_OBJECT(udpSink1), "host", remoteHost_.c_str(), "port", port_, NULL);
+    g_object_set(G_OBJECT(udpSink2), "host", remoteHost_.c_str(), "port", port_ + 1, "sync", FALSE, 
+            "async", FALSE, NULL);
+    g_object_set(G_OBJECT(udpSrc1), "port", port_ + 2, NULL);
 
     g_object_set(G_OBJECT(audioSrc1), "volume", 0.125, "freq", 200.0, "is-live", TRUE, NULL);
 }
