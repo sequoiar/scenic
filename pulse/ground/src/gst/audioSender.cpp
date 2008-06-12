@@ -17,12 +17,14 @@
 // You should have received a copy of the GNU General Public License
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
+//
+// TODO: Client code should just call this with some kind of parameter object which
+// specifies number of channels, how to compress it (if at all), and host and port info.
 
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <cassert>
-#include <sstream>
 #include <vector>
 
 #include <gst/gst.h>
@@ -88,19 +90,24 @@ const GstAudioChannelPosition AudioSender::VORBIS_CHANNEL_POSITIONS[][8] = {
 
 // callback which gets signalled when dynamic pad is created
 
-static void cb_new_pad(GstElement *element, GstPad *pad, gpointer data)
+#if 0
+void AudioSender::cb_new_pad(GstElement *element, GstPad *pad, gpointer data)
 {
     gchar *name;
+    GstPad *tempPad;
+    AudioSender *sender = (AudioSender*) data;
+    sender->print_address();
 
     name = gst_pad_get_name (pad);
     g_print ("A new pad %s was created\n", name);
     g_free (name);
 
     /* here, setup a new pad link for the newly created pad */
-
-
-
+   tempPad = gst_element_get_pad(sender->udpSink1_, "sink");
+   gst_pad_link(pad, tempPad);
+   gst_object_unref(GST_OBJECT(tempPad));
 }
+#endif
 
 
 
@@ -135,7 +142,7 @@ bool AudioSender::init(const std::string media, const int port, const std::strin
     //  FIXME: This is ugly
     if (!media.compare("1chTest"))
     {
-        init_1ch_test();
+        init_local_test(1);
         return true;
     }
     else if (!media.compare("2chTest"))
@@ -182,8 +189,11 @@ void AudioSender::init_local_test(int numChannels)
     std::vector<GstElement*> sources, aconvs, queues; 
     GstElement *interleave, *sink;
 
+    // FIXME: this logic should be moved to init 
     numChannels_ = numChannels;
-    if (numChannels_ < 2)
+    if (numChannels_ == 1)
+        return init_1ch_test();
+    else if (numChannels_ < 2)
         numChannels_ = 2;
     else if (numChannels_ > 8)
         numChannels_ = 8;
@@ -353,15 +363,34 @@ void AudioSender::init_rtp_test(int numChannels)
 }
 
 
-// FIXME THIS DOESN'T WORK YET
+
+// FIXME THIS IS AWFUL but works
 void AudioSender::init_uncomp_rtp_test(int numChannels)
 {
+    GError* error = NULL;
     numChannels_ = numChannels;
+    
+    std::stringstream port1, port2, port3;
+    port1  << port_; 
+    port2 << port_ + 1; 
+    port3 << port_ + 5;
 
+    std::string launchStr = " gstrtpbin name=rtpbin \\ " 
+        "audiotestsrc ! audioconvert ! alawenc ! rtppcmapay ! rtpbin.send_rtp_sink_0  \\ "
+        "rtpbin.send_rtp_src_0 ! udpsink port=" + port1.str() + " host=localhost \\ "
+        "rtpbin.send_rtcp_src_0 ! udpsink port=" + port2.str() + 
+        " host=localhost sync=false async=false \\ "
+        "udpsrc port=" + port3.str() + " ! rtpbin.recv_rtcp_sink_0";
+
+    pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
+    assert(pipeline_);
+    make_verbose();
+
+#if 0
     GstElement *rtpbin;
     GstElement *audioSrc1, *aconv1, *encoder, *payloader;
-    GstElement *udpSrc1, *udpSink1, *udpSink2;
-    GstPad *send_rtp_sink, *send_rtp_src, *send_rtcp_src, *recv_rtcp_sink, *tempPad;
+    GstElement *udpSrc1, /**udpSink1,*/ *udpSink2;
+    GstPad *send_rtp_sink, *send_rtcp_src, *recv_rtcp_sink, *tempPad;
 
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
@@ -385,34 +414,34 @@ void AudioSender::init_uncomp_rtp_test(int numChannels)
     assert(rtpbin);
     udpSrc1 = gst_element_factory_make("udpsrc", "udpSrc1"); // for tcp
     assert(udpSrc1);
-    udpSink1 = gst_element_factory_make("udpsink", "udpSink1");
-    assert(udpSink1);
+    udpSink1_ = gst_element_factory_make("udpsink", "udpSink1");
+    assert(udpSink1_);
     udpSink2 = gst_element_factory_make("udpsink", "udpSink2");
     assert(udpSink2);
 
     // get pads from rtpbin
-    send_rtp_sink = gst_element_get_request_pad(rtpbin, "send_rtp_sink_%d");
+    send_rtp_sink = gst_element_get_request_pad(rtpbin, "send_rtp_sink_0");
     assert(send_rtp_sink);
 
     // FIXME: this pad is only available SOMETIMES, so it has to be added dynamically via a callback
     //send_rtp_src = gst_element_get_request_pad(rtpbin, "send_rtp_src_%d");
     //assert(send_rtp_src);
     
-    send_rtcp_src = gst_element_get_request_pad(rtpbin, "send_rtcp_src_%d"); 
+    send_rtcp_src = gst_element_get_request_pad(rtpbin, "send_rtcp_src_0"); 
     assert(send_rtcp_src);
-    recv_rtcp_sink = gst_element_get_request_pad(rtpbin, "recv_rtcp_sink_%d"); 
+    recv_rtcp_sink = gst_element_get_request_pad(rtpbin, "recv_rtcp_sink_0"); 
     assert(recv_rtcp_sink);
 
     // end of channels
-    gst_bin_add_many(GST_BIN(pipeline_), rtpbin, audioSrc1, aconv1, encoder, payloader, udpSink1, 
+    gst_bin_add_many(GST_BIN(pipeline_), rtpbin, audioSrc1, aconv1, encoder, payloader, udpSink1_, 
             udpSink2, udpSrc1, NULL);
 
     // links transmission line, and audiotestsrcs
     gst_element_link_many(audioSrc1, aconv1, encoder, payloader, NULL);
 
     // link rtpbin pads
-    // FIXME: should there be checks here?
     tempPad = gst_element_get_pad(payloader, "src");
+    assert(tempPad);
     gst_pad_link(tempPad, send_rtp_sink);
     gst_object_unref(GST_OBJECT(tempPad));
 
@@ -421,10 +450,12 @@ void AudioSender::init_uncomp_rtp_test(int numChannels)
    // gst_object_unref(GST_OBJECT(tempPad));
 
     tempPad = gst_element_get_pad(udpSink2, "sink");
+    assert(tempPad);
     gst_pad_link(send_rtcp_src, tempPad);
     gst_object_unref(GST_OBJECT(tempPad));
 
     tempPad = gst_element_get_pad(udpSrc1, "src");
+    assert(tempPad);
     gst_pad_link(tempPad, recv_rtcp_sink);
     gst_object_unref(GST_OBJECT(tempPad));
 
@@ -434,15 +465,17 @@ void AudioSender::init_uncomp_rtp_test(int numChannels)
     //gst_element_release_request_pad(rtpbin, send_rtp_src);
     gst_element_release_request_pad(rtpbin, send_rtp_sink);
 
-    g_object_set(G_OBJECT(udpSink1), "host", remoteHost_.c_str(), "port", port_, NULL);
-    g_object_set(G_OBJECT(udpSink2), "host", remoteHost_.c_str(), "port", port_ + 1, "sync", FALSE, 
+    // FIXME: host ip should be a private member
+    g_object_set(G_OBJECT(udpSink1_), "host", "localhost", "port", port_, NULL);
+    g_object_set(G_OBJECT(udpSink2), "host", "localhost", "port", port_ + 1, "sync", FALSE, 
             "async", FALSE, NULL);
-    g_object_set(G_OBJECT(udpSrc1), "port", port_ + 2, NULL);
+    g_object_set(G_OBJECT(udpSrc1), "port", port_ + 5, NULL);
 
     g_object_set(G_OBJECT(audioSrc1), "volume", 0.125, "freq", 200.0, "is-live", TRUE, NULL);
 
     // connect signal for when pad is added
-    g_signal_connect(rtpbin, "pad-added", G_CALLBACK(cb_new_pad), NULL);
+    g_signal_connect(rtpbin, "pad-added", G_CALLBACK(cb_new_pad), (void *) this);
+#endif
 }
 
 

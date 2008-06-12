@@ -170,7 +170,7 @@ class GstTestSuite : public Test::Suite
                     std::cout << __FILE__ << ":" << __LINE__        \
                     << ": blocking, enter any key." << std::endl;   \
                     std::cin.get()
-#elif
+#else
     #define BLOCK()
 #endif 
 

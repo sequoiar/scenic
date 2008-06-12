@@ -745,7 +745,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audio()
 void GstTestSuite::start_1ch_uncomp_rtp_audio()
 {
     int numChannels = 1;
-    int port = 10010;
+    int port = 5002;
 
     if (id_ == 0)
     {
@@ -760,7 +760,7 @@ void GstTestSuite::start_1ch_uncomp_rtp_audio()
     else
     {
         AudioSender tx;
-        tx.init("1chUncompRtpTest", port + 100, MY_ADDRESS);
+        tx.init("1chUncompRtpTest", port, MY_ADDRESS);
         TEST_ASSERT(tx.start());
 
         BLOCK();
@@ -774,7 +774,7 @@ void GstTestSuite::start_1ch_uncomp_rtp_audio()
 void GstTestSuite::stop_1ch_uncomp_rtp_audio()
 {
     int numChannels = 1;
-    int port = 10010;
+    int port = 5002;
 
     if (id_ == 0)
     {
@@ -789,7 +789,7 @@ void GstTestSuite::stop_1ch_uncomp_rtp_audio()
     else
     {
         AudioSender tx;
-        tx.init("1chUncompRtpTest", port + 100, MY_ADDRESS);
+        tx.init("1chUncompRtpTest", port, MY_ADDRESS);
 
         BLOCK();
 
@@ -803,7 +803,7 @@ void GstTestSuite::stop_1ch_uncomp_rtp_audio()
 void GstTestSuite::start_stop_1ch_uncomp_rtp_audio()
 {
     int numChannels = 1;
-    int port = 10010;
+    int port = 5002;
 
     if (id_ == 0)
     {
@@ -821,7 +821,7 @@ void GstTestSuite::start_stop_1ch_uncomp_rtp_audio()
     else
     {
         AudioSender tx;
-        tx.init("1chUncompRtpTest", port + 100, MY_ADDRESS);
+        tx.init("1chUncompRtpTest", port, MY_ADDRESS);
         TEST_ASSERT(tx.start());
 
         BLOCK();

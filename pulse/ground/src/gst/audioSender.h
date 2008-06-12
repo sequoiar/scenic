@@ -36,6 +36,7 @@ class AudioSender : public MediaBase
                   const int port = DEF_PORT, 
                   const std::string addr = THEIR_ADDRESS);
         virtual bool start();
+        void print_address() { std::cout << "I'm a sender at address" << this << std::endl; }
 
     private:
         void init_1ch_test();
@@ -45,10 +46,16 @@ class AudioSender : public MediaBase
         
         void init_uncomp_rtp_test(int numChannels = 1);
 
+        // helper methods
+       
         void set_channel_layout(GValueArray *arr);
+
+        // callback to link new pads
+//        static void cb_new_pad(GstElement *element, GstPad *pad, gpointer data);
 
         std::string remoteHost_;
         int numChannels_;
+//        GstElement *udpSink1_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
 };
 
