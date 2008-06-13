@@ -90,3 +90,11 @@ void MediaBase::make_verbose()
                 G_CALLBACK (gst_object_default_deep_notify), exclude_list);
     }
 }
+
+
+bool MediaBase::check_pipeline()
+{
+    // FIXME: i should be checking all elements the pipeline
+    return true;
+}
+

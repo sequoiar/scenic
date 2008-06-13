@@ -31,9 +31,11 @@ class MediaBase
         bool isPlaying();
         int port() const;
 
+
     protected:
         MediaBase();
         virtual ~MediaBase(); int port_; static const int DEF_PORT;
+        bool check_pipeline();
         void make_verbose();
         GstElement *pipeline_;
         bool verbose_;

@@ -26,17 +26,20 @@
 #include "defaultAddresses.h"
 
 #include "mediaBase.h"
+#include "audioSession.h"
 
 class AudioSender : public MediaBase
 {
     public:
+        AudioSender(const AudioSession& session);
         AudioSender();
         virtual ~AudioSender(); 
-        bool init(const std::string media = "1chTest", 
+        bool init();
+        bool init(const std::string media, 
                   const int port = DEF_PORT, 
                   const std::string addr = THEIR_ADDRESS);
         virtual bool start();
-        void print_address() { std::cout << "I'm a sender at address" << this << std::endl; }
+        //void print_address() { std::cout << "I'm a sender at address" << this << std::endl; }
 
     private:
         void init_1ch_test();
@@ -53,6 +56,7 @@ class AudioSender : public MediaBase
         // callback to link new pads
 //        static void cb_new_pad(GstElement *element, GstPad *pad, gpointer data);
 
+        AudioSession session_;
         std::string remoteHost_;
         int numChannels_;
 //        GstElement *udpSink1_;
