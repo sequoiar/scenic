@@ -26,25 +26,30 @@
 #include "defaultAddresses.h"
 
 #include "mediaBase.h"
+#include "videoSession.h" 
 
 class VideoSender : public MediaBase
 {
     public:
-        VideoSender();
+        VideoSender(const VideoSession& session);
         virtual ~VideoSender(); 
-        bool init(const std::string media = "test",
+        /*bool init(const std::string media = "test",
                   const int port = DEF_PORT, 
                   const std::string addr = THEIR_ADDRESS );
+                  */
+        bool init();
         virtual bool start();
 
-    private:
+#if 0
         void initDv();
         void initDvRtp();
         void initV4l();
         void initV4lRtp();
         void initTest();
+#endif
 
-        std::string remoteHost_;
+    private:
+        VideoSession session_;
 };
 
 #endif

@@ -11,7 +11,8 @@ include $(PJBASE)/build.mak
 BINDIR=$(BASE)/bin
 OBJDIR=$(BASE)/obj
 
-OBJS=videoReceiver.o videoSender.o mediaBase.o audioSender.o audioReceiver.o
+OBJS=videoReceiver.o videoSender.o mediaBase.o audioSender.o audioReceiver.o mediaSession.o \
+	 audioSession.o videoSession.o
 APPOBJS=$(OBJS) gst_main.o gstApp.o 
 TESTOBJS=$(OBJS) gstTestSuite.o 
 

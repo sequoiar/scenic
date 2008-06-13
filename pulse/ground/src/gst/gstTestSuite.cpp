@@ -25,9 +25,11 @@
 
 #include "gstTestSuite.h"
 #include "videoSender.h"
+#include "videoSession.h"
 #include "videoReceiver.h"
 #include "audioSender.h"
 #include "audioReceiver.h"
+#include "audioSession.h"
 
 /*----------------------------------------------*/ 
 // To actually observe the tests (watch/listen), set
@@ -67,21 +69,24 @@ void GstTestSuite::init_test()
     if (id_ == 1)
         return;
 
-    VideoSender tx;
-    tx.init("test", 10010, MY_ADDRESS);
+    VideoSession session("videotestsrc");
+    VideoSender tx(session);
+    tx.init();
 
     BLOCK();
 }
 
 
 
-void GstTestSuite::start_video()
+void GstTestSuite::start_test_video()
 {
     if (id_ == 1)
         return;
 
-    VideoSender tx;
-    tx.init("test", 10010, MY_ADDRESS);
+    VideoSession session("videotestsrc");
+    VideoSender tx(session);
+    tx.init();
+
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -91,13 +96,14 @@ void GstTestSuite::start_video()
 
 
 
-void GstTestSuite::stop_video()
+void GstTestSuite::stop_test_video()
 {
     if (id_ == 1)
         return;
-
-    VideoSender tx;
-    tx.init("test", 10010, MY_ADDRESS);
+    
+    VideoSession session("videotestsrc");
+    VideoSender tx(session);
+    tx.init();
 
     BLOCK();
 
@@ -107,14 +113,15 @@ void GstTestSuite::stop_video()
 
 
 
-void GstTestSuite::start_stop_video()
+void GstTestSuite::start_stop_test_video()
 {
     if (id_ == 1)
         return;
 
-    VideoSender tx;
+    VideoSession session("videotestsrc");
+    VideoSender tx(session);
+    tx.init();
 
-    tx.init("test", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -131,8 +138,10 @@ void GstTestSuite::start_v4l()
     if (id_ == 1)
         return;
 
-    VideoSender tx;
-    tx.init("v4l", 10010, MY_ADDRESS);
+    VideoSession session("v4l2src");
+    VideoSender tx(session);
+    tx.init();
+
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -146,8 +155,9 @@ void GstTestSuite::stop_v4l()
     if (id_ == 1)
         return;
 
-    VideoSender tx;
-    tx.init("v4l", 10010, MY_ADDRESS);
+    VideoSession session("v4l2src");
+    VideoSender tx(session);
+    tx.init();
 
     BLOCK();
 
@@ -162,9 +172,10 @@ void GstTestSuite::start_stop_v4l()
     if (id_ == 1)
         return;
 
-    VideoSender tx;
+    VideoSession session("v4l2src");
+    VideoSender tx(session);
+    tx.init();
 
-    tx.init("v4l", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -180,8 +191,9 @@ void GstTestSuite::start_v4l_rtp()
 {
     if (id_ == 0)
     {
-        VideoSender tx;
-        tx.init("v4lRtp", 10010, MY_ADDRESS);
+        VideoSession session("v4l2src", "h264", MY_ADDRESS, 10010);
+        VideoSender tx(session);
+        tx.init();
         TEST_ASSERT(tx.start());
 
         BLOCK();
@@ -189,8 +201,10 @@ void GstTestSuite::start_v4l_rtp()
     }
     else
     {
-        VideoReceiver rx;
-        rx.init(10010);
+        VideoSession session(10010);
+        VideoReceiver rx(session);
+        rx.init();
+
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -204,8 +218,9 @@ void GstTestSuite::stop_v4l_rtp()
 {
     if (id_ == 0)
     {
-        VideoSender tx;
-        tx.init("v4lRtp", 10010, MY_ADDRESS);
+        VideoSession session("v4l2src", "h264", MY_ADDRESS, 10010);
+        VideoSender tx(session);
+        tx.init();
 
         BLOCK();
 
@@ -214,8 +229,9 @@ void GstTestSuite::stop_v4l_rtp()
     }
     else
     {
-        VideoReceiver rx;
-        rx.init(10010);
+        VideoSession session(10010);
+        VideoReceiver rx(session);
+        rx.init();
 
         BLOCK();
 
@@ -230,8 +246,10 @@ void GstTestSuite::start_stop_v4l_rtp()
 {
     if (id_ == 0)
     {
-        VideoSender tx;
-        tx.init("v4lRtp", 10010, MY_ADDRESS);
+        VideoSession session("v4l2src", "h264", MY_ADDRESS, 10010);
+        VideoSender tx(session);
+        tx.init();
+        
         TEST_ASSERT(tx.start());
 
         BLOCK();
@@ -242,8 +260,10 @@ void GstTestSuite::start_stop_v4l_rtp()
     }
     else
     {
-        VideoReceiver rx;
-        rx.init(10010);
+        VideoSession session(10010);
+        VideoReceiver rx(session);
+        rx.init();
+        
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -260,9 +280,11 @@ void GstTestSuite::start_dv()
 {
     if (id_ == 1)
         return;
+        
+    VideoSession session("dv1394src");
+    VideoSender tx(session);
+    tx.init();
 
-    VideoSender tx;
-    tx.init("dv", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -276,8 +298,9 @@ void GstTestSuite::stop_dv()
     if (id_ == 1)
         return;
 
-    VideoSender tx;
-    tx.init("dv", 10010, MY_ADDRESS);
+    VideoSession session("dv1394src");
+    VideoSender tx(session);
+    tx.init();
 
     BLOCK();
 
@@ -292,8 +315,10 @@ void GstTestSuite::start_stop_dv()
     if (id_ == 1)
         return;
 
-    VideoSender tx;
-    tx.init("dv", 10010, MY_ADDRESS);
+    VideoSession session("dv1394src");
+    VideoSender tx(session);
+    tx.init();
+    
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -310,8 +335,10 @@ void GstTestSuite::start_dv_rtp()
     // receiver should be started first, of course there's no guarantee that it will at this point
     if (id_ == 0)
     {
-        VideoReceiver rx;
-        rx.init(10010);
+        VideoSession session(10010);
+        VideoReceiver rx(session);
+        rx.init();
+
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -319,8 +346,10 @@ void GstTestSuite::start_dv_rtp()
     }
     else
     {
-        VideoSender tx;
-        tx.init("dvRtp", 10010, MY_ADDRESS);
+        VideoSession session("dv1394src", "h264", MY_ADDRESS, 10010);
+        VideoSender tx(session);
+        tx.init();
+        
         TEST_ASSERT(tx.start());
 
         BLOCK();
@@ -334,8 +363,9 @@ void GstTestSuite::stop_dv_rtp()
 {
     if (id_ == 0)
     {
-        VideoReceiver rx;
-        rx.init(10010);
+        VideoSession session(10010);
+        VideoReceiver rx(session);
+        rx.init();
 
         BLOCK();
 
@@ -344,8 +374,9 @@ void GstTestSuite::stop_dv_rtp()
     }
     else
     {
-        VideoSender tx;
-        tx.init("dvRtp", 10010, MY_ADDRESS);
+        VideoSession session("dv1394src", "h264", MY_ADDRESS, 10010);
+        VideoSender tx(session);
+        tx.init();
 
         BLOCK();
 
@@ -360,8 +391,10 @@ void GstTestSuite::start_stop_dv_rtp()
 {
     if (id_ == 0)
     {
-        VideoReceiver rx;
-        rx.init(10010);
+        VideoSession session(10010);
+        VideoReceiver rx(session);
+        rx.init();
+
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -371,8 +404,10 @@ void GstTestSuite::start_stop_dv_rtp()
     }
     else
     {
-        VideoSender tx;
-        tx.init("dvRtp", 10010, MY_ADDRESS);
+        VideoSession session("dv1394src", "h264", MY_ADDRESS, 10010);
+        VideoSender tx(session);
+        tx.init();
+        
         TEST_ASSERT(tx.start());
 
         BLOCK();
@@ -390,9 +425,11 @@ void GstTestSuite::start_1ch_audio()
     if (id_ == 1)
         return;
 
-    AudioSender tx;
+    int numChannels;
+    AudioSession session(numChannels);
+    AudioSender tx(session);
+    tx.init();
 
-    tx.init("1chTest", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -406,8 +443,10 @@ void GstTestSuite::stop_1ch_audio()
     if (id_ == 1)
         return;
 
-    AudioSender tx;
-    tx.init("1chTest", 10010, MY_ADDRESS);
+    int numChannels = 1;
+    AudioSession session(numChannels);
+    AudioSender tx(session);
+    tx.init();
     TEST_ASSERT(tx.stop());
 
     BLOCK();
@@ -421,9 +460,11 @@ void GstTestSuite::start_stop_1ch_audio()
     if (id_ == 1)
         return;
 
-    AudioSender tx;
-
-    tx.init("1chTest", 10010, MY_ADDRESS);
+    int numChannels = 1;
+    AudioSession session(numChannels);
+    AudioSender tx(session);
+    tx.init();
+    
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -440,9 +481,12 @@ void GstTestSuite::start_2ch_audio()
 {
     if (id_ == 1)
         return;
+    
+    int numChannels = 2;
+    AudioSession session(numChannels);
+    AudioSender tx(session);
+    tx.init();
 
-    AudioSender tx;
-    tx.init("2chTest", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -455,9 +499,11 @@ void GstTestSuite::stop_2ch_audio()
 {
     if (id_ == 1)
         return;
-
-    AudioSender tx;
-    tx.init("2chTest", 10010, MY_ADDRESS);
+    
+    int numChannels = 2;
+    AudioSession session(numChannels);
+    AudioSender tx(session);
+    tx.init();
 
     BLOCK();
 
@@ -471,9 +517,12 @@ void GstTestSuite::start_stop_2ch_audio()
 {
     if (id_ == 1)
         return;
+    
+    int numChannels = 2;
+    AudioSession session(numChannels);
+    AudioSender tx(session);
+    tx.init();
 
-    AudioSender tx;
-    tx.init("2chTest", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -489,9 +538,12 @@ void GstTestSuite::start_6ch_audio()
 {
     if (id_ == 1)
         return;
+    
+    int numChannels = 6;
+    AudioSession session(numChannels);
+    AudioSender tx(session);
+    tx.init();
 
-    AudioSender tx;
-    tx.init("6chTest", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -504,8 +556,11 @@ void GstTestSuite::stop_6ch_audio()
 {
     if (id_ == 1)
         return;
-    AudioSender tx;
-    tx.init("6chTest", 10010, MY_ADDRESS);
+    
+    int numChannels = 6;
+    AudioSession session(numChannels);
+    AudioSender tx(session);
+    tx.init();
 
     BLOCK();
 
@@ -520,11 +575,15 @@ void GstTestSuite::start_stop_6ch_audio()
     if (id_ == 1)
         return;
 
-    AudioSender tx;
-    tx.init("6chTest", 10010, MY_ADDRESS);
+    int numChannels = 6;
+    AudioSession session(numChannels);
+    AudioSender tx(session);
+    tx.init();
+
     TEST_ASSERT(tx.start());
 
     BLOCK();
+
     TEST_ASSERT(tx.isPlaying());
 
     TEST_ASSERT(tx.stop());
@@ -537,9 +596,12 @@ void GstTestSuite::start_8ch_audio()
 {
     if (id_ == 1)
         return;
+    
+    int numChannels = 8;
+    AudioSession session(numChannels);
+    AudioSender tx(session);
+    tx.init();
 
-    AudioSender tx;
-    tx.init("8chTest", 10010, MY_ADDRESS);
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -552,9 +614,12 @@ void GstTestSuite::stop_8ch_audio()
 {
     if (id_ == 1)
         return;
+    
+    int numChannels = 8;
+    AudioSession session(numChannels);
+    AudioSender tx(session);
+    tx.init();
 
-    AudioSender tx;
-    tx.init("8chTest", 10010, MY_ADDRESS);
     BLOCK();
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
@@ -566,10 +631,12 @@ void GstTestSuite::start_stop_8ch_audio()
 {
     if (id_ == 1)
         return;
-
-    AudioSender tx;
-
-    tx.init("8chTest", 10010, MY_ADDRESS);
+    
+    int numChannels = 8;
+    AudioSession session(numChannels);
+    AudioSender tx(session);
+    tx.init();
+    
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -583,6 +650,7 @@ void GstTestSuite::start_stop_8ch_audio()
 
 void GstTestSuite::start_2ch_comp_rtp_audio()
 {
+    int numChannels = 2;
     if (id_ == 0)
     {
         AudioReceiver rx;
@@ -594,8 +662,10 @@ void GstTestSuite::start_2ch_comp_rtp_audio()
     }
     else
     {
-        AudioSender tx;
-        tx.init("2chCompRtpTest", 10010, MY_ADDRESS);
+        AudioSession session(numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioSender tx(session);
+        tx.init();
+    
         TEST_ASSERT(tx.start());
 
         BLOCK();
@@ -607,6 +677,8 @@ void GstTestSuite::start_2ch_comp_rtp_audio()
 
 void GstTestSuite::stop_2ch_comp_rtp_audio()
 {
+    int numChannels = 2;
+
     if (id_ == 0)
     {
         AudioReceiver rx;
@@ -619,8 +691,9 @@ void GstTestSuite::stop_2ch_comp_rtp_audio()
     }
     else
     {
-        AudioSender tx;
-        tx.init("2chCompRtpTest", 10010, MY_ADDRESS);
+        AudioSession session(numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioSender tx(session);
+        tx.init();
 
         BLOCK();
 
@@ -633,6 +706,7 @@ void GstTestSuite::stop_2ch_comp_rtp_audio()
 
 void GstTestSuite::start_stop_2ch_comp_rtp_audio()
 {
+    int numChannels = 2;
     if (id_ == 0)
     {
         AudioReceiver rx;
@@ -647,8 +721,10 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audio()
     }
     else
     {
-        AudioSender tx;
-        tx.init("2chCompRtpTest", 10010, MY_ADDRESS);
+        AudioSession session(numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioSender tx(session);
+        tx.init();
+        
         TEST_ASSERT(tx.start());
 
         BLOCK();
@@ -663,6 +739,8 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audio()
 
 void GstTestSuite::start_8ch_comp_rtp_audio()
 {
+    int numChannels = 8;
+
     if (id_ == 0)
     {
         AudioReceiver rx;
@@ -674,8 +752,10 @@ void GstTestSuite::start_8ch_comp_rtp_audio()
     }
     else
     {
-        AudioSender tx;
-        tx.init("8chCompRtpTest", 10010, MY_ADDRESS);
+        AudioSession session(numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioSender tx(session);
+        tx.init();
+        
         TEST_ASSERT(tx.start());
 
         BLOCK();
@@ -687,6 +767,7 @@ void GstTestSuite::start_8ch_comp_rtp_audio()
 
 void GstTestSuite::stop_8ch_comp_rtp_audio()
 {
+    int numChannels = 8;
     if (id_ == 0)
     {
         AudioReceiver rx;
@@ -699,8 +780,9 @@ void GstTestSuite::stop_8ch_comp_rtp_audio()
     }
     else
     {
-        AudioSender tx;
-        tx.init("8chCompRtpTest", 10010, MY_ADDRESS);
+        AudioSession session(numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioSender tx(session);
+        tx.init();
 
         BLOCK();
 
@@ -713,6 +795,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audio()
 
 void GstTestSuite::start_stop_8ch_comp_rtp_audio()
 {
+    int numChannels = 8;
     if (id_ == 0)
     {
         AudioReceiver rx;
@@ -727,8 +810,10 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audio()
     }
     else
     {
-        AudioSender tx;
-        tx.init("8chCompRtpTest", 10010, MY_ADDRESS);
+        AudioSession session(numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioSender tx(session);
+        TEST_ASSERT(tx.init());
+        
         TEST_ASSERT(tx.start());
 
         BLOCK();

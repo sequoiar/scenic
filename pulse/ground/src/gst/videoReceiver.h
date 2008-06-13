@@ -22,13 +22,18 @@
 #define _VIDEO_RECEIVER_H_
 
 #include "mediaBase.h"
+#include "videoSession.h"
 
 class VideoReceiver : public MediaBase 
 {
     public:
-        VideoReceiver();
+        VideoReceiver(const VideoSession& session);
         virtual ~VideoReceiver();
-        bool init(int port = DEF_PORT);
+        //bool init(int port = DEF_PORT);
+        bool init();
+
+    private:
+        VideoSession session_;
 };
 
 #endif
