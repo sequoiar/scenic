@@ -24,7 +24,7 @@ GST_LDFLAGS=-pthread -L/usr/local/lib -lgstreamer-0.10 -lgstbase-0.10 -lgobject-
 
 CPPTEST_LDFLAGS=-lcpptest
 
-APP_CFLAGS+=-g -Wall $(GST_CFLAGS) -I../
+APP_CFLAGS+=-g -Wall -O0 $(GST_CFLAGS) -I../
 CC	= g++
 CPP_CC  = g++
 LDFLAGS = $(APP_LDFLAGS) $(GST_LDFLAGS) 

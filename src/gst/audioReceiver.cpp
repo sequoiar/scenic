@@ -293,7 +293,7 @@ bool AudioReceiver::init_uncomp(int port, int numChannels)
 
 bool AudioReceiver::start()
 {
-    std::cout << "Receiving audio on port " << port_ << std::endl;
+    std::cout << "Receiving audio on port " << session_.port() << std::endl;
     MediaBase::start();
     return true;
 }

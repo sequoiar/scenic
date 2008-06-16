@@ -28,13 +28,13 @@ class MediaBase
     public:
         virtual bool start();
         virtual bool stop();
-        bool isPlaying();
-        int port() const;
+        bool isPlaying() const;
+        //int port() const;
 
 
     protected:
         MediaBase();
-        virtual ~MediaBase(); int port_; static const int DEF_PORT;
+        virtual ~MediaBase(); 
         bool check_pipeline();
         void make_verbose();
         GstElement *pipeline_;

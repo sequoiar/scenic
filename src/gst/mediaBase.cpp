@@ -22,7 +22,7 @@
 
 #include "mediaBase.h"
 
-const int MediaBase::DEF_PORT = 10010;
+//const int MediaBase::DEF_PORT = 10010;
 bool MediaBase::gstInitialized_ = false;
 
 MediaBase::MediaBase() : pipeline_(0), verbose_(true)
@@ -61,7 +61,7 @@ bool MediaBase::stop()
 
 
 
-bool MediaBase::isPlaying() 
+bool MediaBase::isPlaying() const 
 { 
     if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_PLAYING))
         return true; 
@@ -70,11 +70,13 @@ bool MediaBase::isPlaying()
 }
 
 
+#if 0
 
 int MediaBase::port() const
 {
     return port_;
 }
+#endif
 
 
 
