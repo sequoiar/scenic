@@ -24,20 +24,23 @@
 #include <string>
 
 #include "mediaBase.h"
+#include "audioSession.h"
 
 class AudioReceiver : public MediaBase 
 {
     public:
         AudioReceiver();
+        AudioReceiver(const AudioSession& session);
         virtual ~AudioReceiver();
-        bool init(int port = DEF_PORT, int numChannels = 2);
-        bool init_uncomp(int port = DEF_PORT, int numChannels = 1);
+        bool init();
+        //bool init(int port = DEF_PORT, int numChannels = 2);
+        //bool init_uncomp(int port = DEF_PORT, int numChannels = 1);
         virtual bool start();
 
     private:
         int numChannels_;
-        static const std::string CAPS_STR_2CH;
-        static const std::string CAPS_STR_8CH;
+        AudioSession session_;
+        static const std::string CAPS_STR[2];
 };
 
 #endif // _AUDIO_RECEIVER_H_

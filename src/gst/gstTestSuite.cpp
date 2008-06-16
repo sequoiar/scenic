@@ -653,8 +653,9 @@ void GstTestSuite::start_2ch_comp_rtp_audio()
     int numChannels = 2;
     if (id_ == 0)
     {
-        AudioReceiver rx;
-        rx.init(10010, 2);
+        AudioSession session(numChannels, "vorbis", 10010);
+        AudioReceiver rx(session);
+        rx.init();
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -681,8 +682,9 @@ void GstTestSuite::stop_2ch_comp_rtp_audio()
 
     if (id_ == 0)
     {
-        AudioReceiver rx;
-        rx.init(10010, 2);
+        AudioSession session(numChannels, "vorbis", 10010);
+        AudioReceiver rx(session);
+        rx.init();
 
         BLOCK();
 
@@ -709,8 +711,10 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audio()
     int numChannels = 2;
     if (id_ == 0)
     {
-        AudioReceiver rx;
-        rx.init(10010, 2);
+        AudioSession session(numChannels, "vorbis", 10010);
+        AudioReceiver rx(session);
+        rx.init();
+        
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -743,8 +747,10 @@ void GstTestSuite::start_8ch_comp_rtp_audio()
 
     if (id_ == 0)
     {
-        AudioReceiver rx;
-        rx.init(10010, 8);
+        AudioSession session(numChannels, "vorbis", 10010);
+        AudioReceiver rx(session);
+        rx.init();
+        
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -770,8 +776,9 @@ void GstTestSuite::stop_8ch_comp_rtp_audio()
     int numChannels = 8;
     if (id_ == 0)
     {
-        AudioReceiver rx;
-        rx.init(10010, 8);
+        AudioSession session(numChannels, "vorbis", 10010);
+        AudioReceiver rx(session);
+        rx.init();
 
         BLOCK();
 
@@ -798,8 +805,10 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audio()
     int numChannels = 8;
     if (id_ == 0)
     {
-        AudioReceiver rx;
-        rx.init(10010, 8);
+        AudioSession session(numChannels, "vorbis", 10010);
+        AudioReceiver rx(session);
+        rx.init();
+
         TEST_ASSERT(rx.start());
 
         BLOCK();
