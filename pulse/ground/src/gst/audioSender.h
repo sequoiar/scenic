@@ -35,6 +35,7 @@ class AudioSender : public MediaBase
         AudioSender();
         virtual ~AudioSender(); 
         bool init();
+        const std::string caps_str() const;
 #if 0
         bool init(const std::string media, 
                   const int port = DEF_PORT, 
@@ -61,8 +62,8 @@ class AudioSender : public MediaBase
 //        static void cb_new_pad(GstElement *element, GstPad *pad, gpointer data);
 
         AudioSession session_;
-        std::string remoteHost_;
-        int numChannels_;
+        //std::string remoteHost_;
+        //int numChannels_;
 //        GstElement *udpSink1_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
 };

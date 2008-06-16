@@ -38,7 +38,7 @@ class AudioReceiver : public MediaBase
         virtual bool start();
 
     private:
-        int numChannels_;
+//        int numChannels_;
         AudioSession session_;
         static const std::string CAPS_STR[2];
 };

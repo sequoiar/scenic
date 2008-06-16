@@ -135,66 +135,6 @@ AudioSender::~AudioSender()
 }
 
 
-#if 0
-bool AudioSender::init(const std::string media, const int port, const std::string addr) 
-{
-    if (port < 1000)
-        port_ = DEF_PORT;
-    else
-        port_ = port;
-
-    remoteHost_ = std::string(addr);
-
-    //  Create sender pipeline
-    std::cout.flush();
-    std::cout << std::endl;
-    std::cout << media << std::endl;
-
-    //  FIXME: This is ugly
-    if (!media.compare("1chTest"))
-    {
-        init_local_test(1);
-        return true;
-    }
-    else if (!media.compare("2chTest"))
-    {
-        init_local_test(2);
-        return true;
-    }
-    else if (!media.compare("6chTest"))
-    {
-        init_local_test(6);
-        return true;
-    }
-    else if (!media.compare("8chTest"))
-    {
-        init_local_test(8);
-        return true;
-    }
-    else if (!media.compare("2chCompRtpTest"))
-    {
-        init_rtp_test(2);
-        return true;
-    }
-    else if (!media.compare("8chCompRtpTest"))
-    {
-        init_rtp_test(8);
-        return true;
-    }
-    else if (!media.compare("1chUncompRtpTest"))
-    {
-        init_uncomp_rtp_test(1);
-        return true;
-    }
-    else
-    {
-        std::cout << "Invalid service type " << media << std::endl;
-        return false;
-    }
-}
-#endif
-
-
 
 bool AudioSender::init()
 {
@@ -212,7 +152,7 @@ bool AudioSender::init()
 
     make_verbose();
 
-    if (session_.numChannels() == 1)    // no need for interleave, exception case
+    if (session_.numChannels() == 1)    // no need for interleave, special case
     {
         sources.push_back(gst_element_factory_make("audiotestsrc", NULL));
         assert(sources[0]);
@@ -232,14 +172,12 @@ bool AudioSender::init()
         return true;
     }
 
-/*----------------------------------------------*/ 
-
     interleave = gst_element_factory_make("interleave", NULL);
     assert(interleave);
 
     g_object_set(interleave, "channel-positions-from-input", FALSE, NULL);
     arr = g_value_array_new(session_.numChannels());
-    set_channel_layout(arr);
+    set_channel_layout(arr);        // helper method
     g_object_set(interleave, "channel-positions", arr, NULL);
     g_value_array_free(arr);
 
@@ -297,56 +235,60 @@ bool AudioSender::init()
     }
 
     return true;
-#if 0
-
-
-    // interleave needs its own audioconvert and queue
-    interleave = gst_element_factory_make("interleave", NULL);
-    assert(interleave);
-
-    aconvs.push_back(gst_element_factory_make("audioconvert", NULL));
-    assert(aconvs[0]);
-
-    queues.push_back(gst_element_factory_make("queue", NULL));
-    assert(queues[0]);
-
-    for (int channelIdx = 1; channelIdx <= session_.numChannels(); channelIdx++)
-    {
-        sources.push_back(gst_element_factory_make("audiotestsrc", NULL));
-        assert(sources[channelIdx - 1]);
-        aconvs.push_back(gst_element_factory_make("audioconvert", NULL));
-        assert(aconvs[channelIdx]);
-        queues.push_back(gst_element_factory_make("queue", NULL));
-        assert(queues[channelIdx]);
-    }
-
-    sink = gst_element_factory_make("jackaudiosink", NULL);
-    assert(sink);
-
-    gst_bin_add_many(GST_BIN(pipeline_), interleave, aconvs[0], queues[0], sink, NULL);
-
-    for (int channelIdx = 1; channelIdx <= session_.numChannels(); channelIdx++)
-    {
-        gst_bin_add(GST_BIN(pipeline_), sources[channelIdx - 1]);
-        gst_bin_add(GST_BIN(pipeline_), aconvs[channelIdx]);
-        gst_bin_add(GST_BIN(pipeline_), queues[channelIdx]);
-    }
-
-    gst_element_link_many(interleave, aconvs[0], queues[0], sink, NULL);
-
-    for (int channelIdx = 1; channelIdx <= session_.numChannels(); channelIdx++)
-    {
-        gst_element_link_many(sources[channelIdx - 1], aconvs[channelIdx], 
-                queues[channelIdx], interleave, NULL);
-        g_object_set(G_OBJECT(sources[channelIdx - 1]), "volume", 0.125, "freq", 100.0 * channelIdx, 
-                "is-live", TRUE, NULL);
-    }
-
-    g_object_set(G_OBJECT(sink), "sync", FALSE, NULL);
-
-#endif // 0
 }
 
+
+
+const std::string AudioSender::caps_str() const
+{
+    bool done = false;
+    std::string result;
+    gpointer gsink;
+    GstPad *pad;
+    GstCaps *caps;
+    GstIterator *it; 
+
+    if (!isPlaying())
+    {
+        std::cout << "Cannot return caps, pipeline hasn't been started yet.";
+        return result;
+    }
+
+    it = gst_bin_iterate_sinks (GST_BIN (pipeline_));
+
+    while (!done) 
+    {
+        switch (gst_iterator_next(it, &gsink)) 
+        {
+            case GST_ITERATOR_OK:
+                // marco TODO FIX beurk class-type case
+                pad = gst_element_get_pad(GST_ELEMENT(gsink), "sink");
+                std::cout << gst_element_get_name(GST_ELEMENT(gsink)) << std::endl;
+                assert(pad); 
+                caps = gst_pad_get_negotiated_caps(pad);
+                assert(caps);
+                result = std::string(gst_caps_to_string(caps));
+                gst_object_unref(pad);
+                gst_object_unref(gsink);
+                done = true;  
+                break;
+            case GST_ITERATOR_RESYNC:
+                gst_iterator_resync(it);
+                break;
+            case GST_ITERATOR_ERROR:
+                done = true;
+                break;
+            case GST_ITERATOR_DONE:
+                done = true;
+                break;
+        }
+    }
+    gst_iterator_free(it);
+
+    //GST_LOG("caps are %" GST_PTR_FORMAT, &caps);
+
+    return result;
+}
 
 #if 0
 void AudioSender::init_local_test(int numChannels)
