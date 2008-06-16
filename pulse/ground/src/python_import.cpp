@@ -31,7 +31,7 @@
 
 #include "hello/hello.h"
 
-#include "gst/videoSender.h"
+#include "gst/videoLocal.h"
 
 using namespace boost::python;
 
@@ -63,15 +63,15 @@ BOOST_PYTHON_MODULE(Hello)
 
 
 // Default variable overloads
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(VideoSender_init_overloads, init, 0, 3)
+//BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(VideoLocal_init_overloads, init, 0, 3)
 
 
-BOOST_PYTHON_MODULE(VideoSender)
+BOOST_PYTHON_MODULE(VideoLocal)
 {
-    class_<VideoSender>("VideoSender")
-    .def("init", &VideoSender::init, VideoSender_init_overloads())
-    .def("start", &VideoSender::start)
-    .def("stop",  &VideoSender::stop);
+    class_<VideoLocal>("VideoLocal")
+    .def("init", &VideoLocal::init)
+    .def("start", &VideoLocal::start)
+    .def("stop",  &VideoLocal::stop);
 
 
 }
@@ -83,7 +83,7 @@ BOOST_PYTHON_MODULE(VideoSender)
 
 void BOOST_PY_IMPORT()
 {
-    PyImport_AppendInittab((char*)"VideoSender",&initVideoSender);
+    PyImport_AppendInittab((char*)"VideoLocal",&initVideoLocal);
     PyImport_AppendInittab((char*)"Hello",&initHello);
 }
 
@@ -92,7 +92,7 @@ void PYTHON_EXEC_IMPORT(object mm, object mn)
     if(mm)
     {
         exec("import Hello; from Hello import *",mm,mn);
-        exec("import VideoSender; from VideoSender import *",mm,mn);
+        exec("import VideoLocal; from VideoLocal import *",mm,mn);
     }
 }
 
