@@ -37,7 +37,7 @@ SipSingleton* SipSingleton::s_ = 0;
 #include "defaultAddresses.h"
 
 
-const char* SipSingleton::rx_req(const char *data, unsigned int len) 
+const char* SipSingleton::rx_invite(const char *data, unsigned int len) 
 {
     std::cerr << __FILE__ << ": rx_request: " ;
     std::cerr.write(data, len);

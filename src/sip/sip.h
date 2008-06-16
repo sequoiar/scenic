@@ -41,7 +41,7 @@ public:
     //called inside pjsip rx_request 
     //must return pchar to desired response
     // Incoming data -> char* response
-    const char *rx_req(const char *msg, unsigned int len);
+    const char *rx_invite(const char *msg, unsigned int len);
 
     //called inside pjsip rx_response
     void rx_res(const char *msg, unsigned int len);

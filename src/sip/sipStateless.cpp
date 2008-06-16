@@ -64,7 +64,9 @@ static pj_bool_t on_rx_response(pjsip_rx_data *rdata)
 { 
     SipSingleton *sip = SipSingleton::Instance();
 
-    if (rdata->msg_info.msg->body != NULL)
+//    if ((rdata->msg_info.msg->line.req.method.id == PJSIP_ACK_METHOD)
+//        &&   
+    if((rdata->msg_info.msg->body != NULL) && (rdata->msg_info.msg->line.status.code == 200))
     {
 #if 0
         PJ_LOG(3,(__FILE__, "response body:%s",
@@ -73,6 +75,8 @@ static pj_bool_t on_rx_response(pjsip_rx_data *rdata)
         sip->rx_res((const char*)rdata->msg_info.msg->body->data,
                     rdata->msg_info.msg->body->len);
     }
+    else
+        return PJ_FALSE;
 
     return PJ_TRUE;
 }
@@ -89,13 +93,13 @@ static pj_bool_t on_rx_request(pjsip_rx_data *rdata)
 
     if (rdata->msg_info.msg->line.req.method.id != PJSIP_ACK_METHOD)
     {
-        if (rdata->msg_info.msg->line.req.method.id == PJSIP_OTHER_METHOD)
+        if (rdata->msg_info.msg->line.req.method.id == PJSIP_INVITE_METHOD)
         {
             pjsip_msg_body *body;
 
             pj_str_t t = pj_str((char*)"text");
             pj_str_t s = pj_str((char*)"plain");
-            pj_str_t data = pj_str((char*)sip->rx_req((const char*)
+            pj_str_t data = pj_str((char*)sip->rx_invite((const char*)
                         rdata->msg_info.msg->body->data, 
                         rdata->msg_info.msg->body->len));
 
@@ -148,8 +152,11 @@ void send_request(const char *str)
         pj_status_t status;
         pjsip_tx_data *request;
         pj_str_t body = pj_str((char*)str);
+        pjsip_method method;
+    
 
-        status = pjsip_endpt_create_request(sip_endpt, &message_method,
+        pjsip_method_set(&method, PJSIP_INVITE_METHOD);
+        status = pjsip_endpt_create_request(sip_endpt, &method,
                                             &str_target, &str_from, &str_to,
                                             &str_contact, NULL, -1, &body,
                                             &request);
