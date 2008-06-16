@@ -92,9 +92,11 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audio)
             TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audio)
 
+#if 0
             TEST_ADD(GstTestSuite::start_1ch_uncomp_rtp_audio)
             TEST_ADD(GstTestSuite::stop_1ch_uncomp_rtp_audio)
             TEST_ADD(GstTestSuite::start_stop_1ch_uncomp_rtp_audio)
+#endif
     #endif // RTP
 #endif // AUDIO
         }
@@ -155,7 +157,7 @@ class GstTestSuite : public Test::Suite
         void start_8ch_comp_rtp_audio();
         void stop_8ch_comp_rtp_audio();
         void start_stop_8ch_comp_rtp_audio();
-
+#if 0
         void start_1ch_uncomp_rtp_audio();
         void stop_1ch_uncomp_rtp_audio();
         void start_stop_1ch_uncomp_rtp_audio();
@@ -163,6 +165,7 @@ class GstTestSuite : public Test::Suite
         void start_8ch_uncomp_rtp_audio();
         void stop_8ch_uncomp_rtp_audio();
         void start_stop_8ch_uncomp_rtp_audio();
+#endif
 };
 
 #if BLOCKING

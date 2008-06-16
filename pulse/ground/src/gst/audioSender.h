@@ -35,19 +35,23 @@ class AudioSender : public MediaBase
         AudioSender();
         virtual ~AudioSender(); 
         bool init();
+#if 0
         bool init(const std::string media, 
                   const int port = DEF_PORT, 
                   const std::string addr = THEIR_ADDRESS);
+#endif
         virtual bool start();
         //void print_address() { std::cout << "I'm a sender at address" << this << std::endl; }
 
     private:
+#if 0
         void init_1ch_test();
         void init_local_test(int numChannels = 2);
 
         void init_rtp_test(int numChannels = 2);
         
         void init_uncomp_rtp_test(int numChannels = 1);
+#endif
 
         // helper methods
        

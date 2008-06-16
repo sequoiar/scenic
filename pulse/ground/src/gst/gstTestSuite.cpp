@@ -425,7 +425,7 @@ void GstTestSuite::start_1ch_audio()
     if (id_ == 1)
         return;
 
-    int numChannels;
+    int numChannels = 1;
     AudioSession session(numChannels);
     AudioSender tx(session);
     tx.init();
@@ -825,7 +825,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audio()
     }
 }
 
-
+#if 0
 
 void GstTestSuite::start_1ch_uncomp_rtp_audio()
 {
@@ -939,7 +939,7 @@ void start_stop_8ch_uncomp_rtp_audio()
     // not yet implemented
 }
 
-
+#endif
 
 int main(int argc, char** argv)
 {
