@@ -38,14 +38,17 @@
 
 const GstAudioChannelPosition AudioSender::VORBIS_CHANNEL_POSITIONS[][8] = {
     {                             /* Mono */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_MONO},
+        GST_AUDIO_CHANNEL_POSITION_FRONT_MONO
+    },
     {                             /* Stereo */
         GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT},
+        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT
+    },
     {                             /* Stereo + Centre */
         GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
         GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT},
+        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT
+    },
     {                             /* Quadraphonic */
         GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
         GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
@@ -110,11 +113,12 @@ void AudioSender::cb_new_pad(GstElement *element, GstPad *pad, gpointer data)
 #endif
 
 
-
-AudioSender::AudioSender() : session_(0, "")
+#if 0
+AudioSender::AudioSender() : session_(2, "")
 {
     // empty
 }
+#endif
 
 
 
@@ -131,7 +135,7 @@ AudioSender::~AudioSender()
 }
 
 
-
+#if 0
 bool AudioSender::init(const std::string media, const int port, const std::string addr) 
 {
     if (port < 1000)
@@ -188,6 +192,7 @@ bool AudioSender::init(const std::string media, const int port, const std::strin
         return false;
     }
 }
+#endif
 
 
 
@@ -238,7 +243,7 @@ bool AudioSender::init()
     g_object_set(interleave, "channel-positions", arr, NULL);
     g_value_array_free(arr);
 
-    for (int channelIdx = 0; channelIdx < numChannels_; channelIdx++)
+    for (int channelIdx = 0; channelIdx < session_.numChannels(); channelIdx++)
     {
         sources.push_back(gst_element_factory_make("audiotestsrc", NULL));
         assert(sources[channelIdx]);
@@ -271,7 +276,7 @@ bool AudioSender::init()
         gst_bin_add_many(GST_BIN(pipeline_), interleave, sink, NULL);
     }
 
-    for (int channelIdx = 0; channelIdx < numChannels_; channelIdx++)
+    for (int channelIdx = 0; channelIdx < session_.numChannels(); channelIdx++)
     {
         gst_bin_add_many(GST_BIN(pipeline_), sources[channelIdx], aconvs[channelIdx], 
                 queues[channelIdx], NULL);
@@ -284,7 +289,7 @@ bool AudioSender::init()
     else
         gst_element_link_many(interleave, sink, NULL);
 
-    for (int channelIdx = 0; channelIdx < numChannels_; channelIdx++)
+    for (int channelIdx = 0; channelIdx < session_.numChannels(); channelIdx++)
     {
         gst_element_link_many(sources[channelIdx], aconvs[channelIdx], interleave, NULL);
         g_object_set(G_OBJECT(sources[channelIdx]), "volume", gain, "freq", 100.0 * (channelIdx + 1),
@@ -343,7 +348,7 @@ bool AudioSender::init()
 }
 
 
-
+#if 0
 void AudioSender::init_local_test(int numChannels)
 {
     std::vector<GstElement*> sources, aconvs, queues; 
@@ -407,9 +412,9 @@ void AudioSender::init_local_test(int numChannels)
 
     g_object_set(G_OBJECT(sink), "sync", FALSE, NULL);
 }
+#endif
 
-
-
+#if 0
 void AudioSender::init_1ch_test()
 {
     numChannels_ = 1;
@@ -436,6 +441,7 @@ void AudioSender::init_1ch_test()
     // links testsrc, audio converter, and jack sink
     gst_element_link_many(txSrc1, aconv1, txSink1, NULL);
 }
+#endif
 
 
 
@@ -444,9 +450,9 @@ void AudioSender::set_channel_layout(GValueArray *arr)
     GValue val = { 0, };
     g_value_init(&val, GST_TYPE_AUDIO_CHANNEL_POSITION);
 
-    for (int channelIdx = 0; channelIdx < numChannels_; channelIdx++)
+    for (int channelIdx = 0; channelIdx < session_.numChannels(); channelIdx++)
     {
-        g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[numChannels_ - 1][channelIdx]);        
+        g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[session_.numChannels() - 1][channelIdx]);        
         g_value_array_append(arr, &val);
         g_value_reset(&val);
     }
@@ -454,7 +460,7 @@ void AudioSender::set_channel_layout(GValueArray *arr)
 }
 
 
-
+#if 0
 void AudioSender::init_rtp_test(int numChannels)
 {
     std::vector<GstElement*> sources, aconvs, queues; 
@@ -521,9 +527,9 @@ void AudioSender::init_rtp_test(int numChannels)
 
     g_object_set(G_OBJECT(sink), "host", remoteHost_.c_str(), "port", port_, NULL);
 }
+#endif
 
-
-
+#if 0
 // FIXME THIS IS AWFUL but works
 void AudioSender::init_uncomp_rtp_test(int numChannels)
 {
@@ -637,12 +643,13 @@ void AudioSender::init_uncomp_rtp_test(int numChannels)
     g_signal_connect(rtpbin, "pad-added", G_CALLBACK(cb_new_pad), (void *) this);
 #endif
 }
+#endif
 
 
 
 bool AudioSender::start()
 {
-    std::cout << "Sending audio to host " << remoteHost_ << " on port " << port_ << std::endl;
+    std::cout << "Sending audio to host " << session_.remoteHost() << " on port " << session_.port() << std::endl;
     MediaBase::start();
     return true;
 }
