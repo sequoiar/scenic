@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
-
+/// \file should be a test file
 
 #include <iostream>
 #include <cassert>
