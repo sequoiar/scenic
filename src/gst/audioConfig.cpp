@@ -26,8 +26,18 @@
 #include <string>
 #include "audioConfig.h"
 
-AudioConfig::AudioConfig(int numChannels, std::string codec, std::string remoteHost, int port) 
-: MediaConfig(codec, remoteHost, port),  numChannels_(numChannels)
+AudioConfig::AudioConfig(std::string source, int numChannels, std::string codec, 
+        std::string remoteHost, int port) 
+: MediaConfig(source, codec, remoteHost, port),  numChannels_(numChannels)
+{
+    // empty
+}
+
+
+
+
+AudioConfig::AudioConfig(std::string source, int numChannels) 
+: MediaConfig(source),  numChannels_(numChannels)
 {
     // empty
 }

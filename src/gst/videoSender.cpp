@@ -25,7 +25,6 @@
 #include <cassert>
 #include <gst/gst.h>
 
-#include "mediaBase.h"
 #include "videoSender.h"
 
 VideoSender::VideoSender(const VideoConfig& config) : config_(config)
@@ -47,21 +46,19 @@ bool VideoSender::init()
     GError* error = NULL;
     std::string launchStr = config_.source();
 
-    if (!launchStr.compare("dv1394src")) // need to demux and decode dv
+    if (!launchStr.compare("dv1394src")) // need to demux and decode dv first
         launchStr += " ! dvdemux name=demux demux. ! queue ! dvdec";
 
     if (!config_.codec().compare("h264"))
         launchStr += " ! ffmpegcolorspace ! x264enc bitrate=2048 byte-stream=true threads=4";
     
-    if (config_.port() != 0)
+    if (config_.isNetworked())
     {
         launchStr += " ! rtph264pay ! udpsink host=" + config_.remoteHost(); 
-        //"x264enc bitrate=10000 byte-stream=true threads=4 ! rtph264pay ! "
 
         std::stringstream istream;
         istream << " port = " << config_.port();           
         launchStr += istream.str();     // get port number into launch string
-        //launchStr += " demux. ! queue ! fakesink";
     }
     else // local test only
         launchStr += " ! xvimagesink sync=false"; 

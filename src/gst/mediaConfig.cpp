@@ -33,6 +33,29 @@ MediaConfig::MediaConfig(std::string codec, std::string remoteHost, int port)
 
 
 
+MediaConfig::MediaConfig(std::string source, std::string codec, std::string remoteHost, int port) 
+: source_(source), codec_(codec), remoteHost_(remoteHost), port_(port)
+{
+    // empty
+}
+
+
+
+MediaConfig::MediaConfig(std::string source)
+: source_(source), port_(0)
+{
+    // empty
+}
+
+
+
+const std::string & MediaConfig::source() const
+{
+    return source_;
+}
+
+
+
 const std::string & MediaConfig::codec() const
 {
     return codec_;
@@ -50,5 +73,12 @@ const std::string & MediaConfig::remoteHost() const
 const int MediaConfig::port() const
 {
     return port_;
+}
+
+
+
+const bool MediaConfig::isNetworked() const
+{
+    return port_ != 0;
 }
 

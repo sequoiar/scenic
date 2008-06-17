@@ -30,12 +30,6 @@
 #include "audioReceiver.h"
 #include "audioConfig.h"
 
-AudioReceiver::AudioReceiver() : config_(0)
-{
-    // empty
-}
-
-
 
 
 AudioReceiver::AudioReceiver(const AudioConfig& config) : config_(config)

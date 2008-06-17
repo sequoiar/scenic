@@ -32,9 +32,10 @@
 class AudioConfig : public MediaConfig
 {
     public:
-        // this might need a source param
-        AudioConfig(int numChannels, std::string codec, std::string remoteHost, int port); 
-        AudioConfig(int numChannels, std::string codec = "vorbis", int port = 0); 
+        AudioConfig(std::string source, int numChannels, std::string codec, 
+                std::string remoteHost, int port); // sender
+        AudioConfig(int numChannels, std::string codec, int port); // receiver
+        AudioConfig(std::string source, int numChannels); // localtest
         
         const int numChannels() const;
 

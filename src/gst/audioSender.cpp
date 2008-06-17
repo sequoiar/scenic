@@ -30,7 +30,6 @@
 #include <gst/gst.h>
 #include <gst/audio/multichannel.h>
 
-#include "mediaBase.h"
 #include "audioSender.h"
 
 
@@ -111,10 +110,8 @@ bool AudioSender::init()
 {
     std::vector<GstElement*> sources, aconvs, queues; 
     GstElement *interleave, *encoder, *payloader, *sink;
-    double gain;
-    GValueArray *arr;       // for channel position layout
-
-    gain = 1.0 / config_.numChannels(); // so sum of tones equals 1.0
+    GstIter source, aconv, queue;
+    
 
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
@@ -136,7 +133,6 @@ bool AudioSender::init()
 
         gst_bin_add_many(GST_BIN(pipeline_), sources[0], aconvs[0], sink, NULL);
 
-    // links testsrc, audio converter, and jack sink
         gst_element_link_many(sources[0], aconvs[0], sink, NULL);
         return true;
     }
@@ -144,12 +140,8 @@ bool AudioSender::init()
     interleave = gst_element_factory_make("interleave", NULL);
     assert(interleave);
 
-    g_object_set(interleave, "channel-positions-from-input", FALSE, NULL);
-    arr = g_value_array_new(config_.numChannels());
-    set_channel_layout(arr);        // helper method
-    g_object_set(interleave, "channel-positions", arr, NULL);
-    g_value_array_free(arr);
-
+    set_channel_layout(interleave);
+    
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
         sources.push_back(gst_element_factory_make("audiotestsrc", NULL));
@@ -160,7 +152,7 @@ bool AudioSender::init()
         assert(queues[channelIdx]);
     }
 
-    if (isNetworked()) 
+    if (config_.isNetworked()) 
     {
         encoder = gst_element_factory_make("vorbisenc", NULL);
         assert(encoder);
@@ -174,7 +166,7 @@ bool AudioSender::init()
 
         gst_bin_add_many(GST_BIN(pipeline_), interleave, encoder, payloader, sink, NULL);
     }
-    else
+    else // local version
     {
         sink = gst_element_factory_make("jackaudiosink", NULL);
         assert(sink);
@@ -183,28 +175,37 @@ bool AudioSender::init()
         gst_bin_add_many(GST_BIN(pipeline_), interleave, sink, NULL);
     }
 
-    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
-    {
-        gst_bin_add_many(GST_BIN(pipeline_), sources[channelIdx], aconvs[channelIdx], 
-                queues[channelIdx], NULL);
-    }
+    for (source = sources.begin(), aconv = aconvs.begin(), queue = queues.begin(); 
+         source != sources.end() && aconv != aconvs.end() && queue != queues.end();
+         source++, aconv++, queue++)
+        gst_bin_add_many(GST_BIN(pipeline_), *source, *aconv, *queue, NULL);
 
-    if (isNetworked()) 
-    {
+    if (config_.isNetworked()) 
         gst_element_link_many(interleave, encoder, payloader, sink, NULL);
-    }
     else
         gst_element_link_many(interleave, sink, NULL);
 
-    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
-    {
-        static const float FUNDAMENTAL = 100.0;
-        gst_element_link_many(sources[channelIdx], aconvs[channelIdx], interleave, NULL);
-        g_object_set(G_OBJECT(sources[channelIdx]), "volume", gain, "freq", 
-                FUNDAMENTAL * (channelIdx + 1), "is-live", TRUE, NULL);
-    }
+    for (source = sources.begin(), aconv = aconvs.begin(); 
+            source != sources.end() && aconv != aconvs.end(); source++, aconv++)
+        gst_element_link_many(*source, *aconv, interleave, NULL);
+
+    init_test_sources(sources);
 
     return true;
+}
+
+
+
+void AudioSender::init_test_sources(std::vector<GstElement*> & sources)
+{
+    const double GAIN = 1.0 / config_.numChannels(); // so sum of tones equals 1.0
+    double frequency = 100.0;
+    
+    for (GstIter iter = sources.begin(); iter != sources.end(); iter++)
+    {
+        g_object_set(G_OBJECT(*iter), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
+        frequency += 100.0;
+    }
 }
 
 
@@ -255,16 +256,19 @@ const std::string AudioSender::caps_str() const
     }
     gst_iterator_free(it);
 
-    //GST_LOG("caps are %" GST_PTR_FORMAT, &caps);
-
     return result;
 }
 
 
 
-void AudioSender::set_channel_layout(GValueArray *arr)
+void AudioSender::set_channel_layout(GstElement *interleave)
 {
     GValue val = { 0, };
+    GValueArray *arr;       // for channel position layout
+    arr = g_value_array_new(config_.numChannels());
+
+    g_object_set(interleave, "channel-positions-from-input", FALSE, NULL);
+
     g_value_init(&val, GST_TYPE_AUDIO_CHANNEL_POSITION);
 
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
@@ -274,14 +278,13 @@ void AudioSender::set_channel_layout(GValueArray *arr)
         g_value_reset(&val);
     }
     g_value_unset(&val);
+
+    g_object_set(interleave, "channel-positions", arr, NULL);
+    g_value_array_free(arr);
 }
 
 
 
-const bool AudioSender::isNetworked() const
-{
-    return config_.port() != 0;
-}
 
 
 #if 0

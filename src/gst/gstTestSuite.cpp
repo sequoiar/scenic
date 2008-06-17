@@ -426,7 +426,7 @@ void GstTestSuite::start_1ch_audio()
         return;
 
     int numChannels = 1;
-    AudioConfig config(numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
 
@@ -444,7 +444,7 @@ void GstTestSuite::stop_1ch_audio()
         return;
 
     int numChannels = 1;
-    AudioConfig config(numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
     TEST_ASSERT(tx.stop());
@@ -461,7 +461,7 @@ void GstTestSuite::start_stop_1ch_audio()
         return;
 
     int numChannels = 1;
-    AudioConfig config(numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
     
@@ -483,7 +483,7 @@ void GstTestSuite::start_2ch_audio()
         return;
     
     int numChannels = 2;
-    AudioConfig config(numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
 
@@ -501,7 +501,7 @@ void GstTestSuite::stop_2ch_audio()
         return;
     
     int numChannels = 2;
-    AudioConfig config(numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
 
@@ -519,7 +519,7 @@ void GstTestSuite::start_stop_2ch_audio()
         return;
     
     int numChannels = 2;
-    AudioConfig config(numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
 
@@ -540,7 +540,7 @@ void GstTestSuite::start_6ch_audio()
         return;
     
     int numChannels = 6;
-    AudioConfig config(numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
 
@@ -558,7 +558,7 @@ void GstTestSuite::stop_6ch_audio()
         return;
     
     int numChannels = 6;
-    AudioConfig config(numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
 
@@ -576,7 +576,7 @@ void GstTestSuite::start_stop_6ch_audio()
         return;
 
     int numChannels = 6;
-    AudioConfig config(numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
 
@@ -598,7 +598,7 @@ void GstTestSuite::start_8ch_audio()
         return;
     
     int numChannels = 8;
-    AudioConfig config(numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
 
@@ -616,7 +616,7 @@ void GstTestSuite::stop_8ch_audio()
         return;
     
     int numChannels = 8;
-    AudioConfig config(numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
 
@@ -633,7 +633,7 @@ void GstTestSuite::start_stop_8ch_audio()
         return;
     
     int numChannels = 8;
-    AudioConfig config(numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
     
@@ -663,7 +663,7 @@ void GstTestSuite::start_2ch_comp_rtp_audio()
     }
     else
     {
-        AudioConfig config(numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioConfig config("audiotestsrc", numChannels, "vorbis", MY_ADDRESS, 10010);
         AudioSender tx(config);
         tx.init();
     
@@ -693,7 +693,7 @@ void GstTestSuite::stop_2ch_comp_rtp_audio()
     }
     else
     {
-        AudioConfig config(numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioConfig config("audiotestsrc", numChannels, "vorbis", MY_ADDRESS, 10010);
         AudioSender tx(config);
         tx.init();
 
@@ -725,7 +725,7 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audio()
     }
     else
     {
-        AudioConfig config(numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioConfig config("audiotestsrc", numChannels, "vorbis", MY_ADDRESS, 10010);
         AudioSender tx(config);
         tx.init();
         
@@ -758,7 +758,7 @@ void GstTestSuite::start_8ch_comp_rtp_audio()
     }
     else
     {
-        AudioConfig config(numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioConfig config("audiotestsrc", numChannels, "vorbis", MY_ADDRESS, 10010);
         AudioSender tx(config);
         tx.init();
         
@@ -787,7 +787,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audio()
     }
     else
     {
-        AudioConfig config(numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioConfig config("audiotestsrc", numChannels, "vorbis", MY_ADDRESS, 10010);
         AudioSender tx(config);
         tx.init();
 
@@ -819,7 +819,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audio()
     }
     else
     {
-        AudioConfig config(numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioConfig config("audiotestsrc", numChannels, "vorbis", MY_ADDRESS, 10010);
         AudioSender tx(config);
         TEST_ASSERT(tx.init());
         
