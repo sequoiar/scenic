@@ -30,13 +30,18 @@
 class MediaConfig
 {
     public:
-        MediaConfig(std::string codec, std::string remoteHost = "", int port = 0); 
+        MediaConfig(std::string source, std::string codec, std::string remoteHost, int port); 
+        MediaConfig(std::string codec, std::string remoteHost, int port); 
+        MediaConfig(std::string source);
 
+        const std::string & source() const;
         const std::string & codec() const;
         const std::string & remoteHost() const;
         const int port() const;
+        const bool isNetworked() const;
 
     protected: 
+        const std::string source_;
         const std::string codec_;
         const std::string remoteHost_;
         const int port_;

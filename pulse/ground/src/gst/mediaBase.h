@@ -21,7 +21,10 @@
 #ifndef _MEDIA_BASE_H_
 #define _MEDIA_BASE_H_
 
+#include <vector>
+
 typedef struct _GstElement GstElement;
+typedef std::vector<GstElement*>::iterator GstIter;
 
 class MediaBase
 {

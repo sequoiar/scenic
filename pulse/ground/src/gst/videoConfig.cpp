@@ -28,20 +28,24 @@
 #include "videoConfig.h"
 
 VideoConfig::VideoConfig(std::string source, std::string codec, std::string remoteHost, int port) 
-: MediaConfig(codec, remoteHost, port), source_(source)
+: MediaConfig(source, codec, remoteHost, port) // for sender
+{
+    // empty
+}
+
+
+
+VideoConfig::VideoConfig(std::string source) 
+: MediaConfig(source) // for sender
 {
     // empty
 }
 
     
 
-VideoConfig::VideoConfig(int port) 
-    : MediaConfig("", "", port), source_("")
+VideoConfig::VideoConfig(int port)  // for receiver
+    : MediaConfig("", "", port)
 {
     // empty
 }
 
-const std::string & VideoConfig::source() const
-{
-    return source_;
-}

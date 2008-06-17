@@ -42,7 +42,8 @@ class AudioSender : public MediaBase
 
         // helper methods
        
-        void set_channel_layout(GValueArray *arr);
+        void set_channel_layout(GstElement *interleave);
+        void init_test_sources(std::vector<GstElement*> & sources);
         const bool isNetworked() const;
 
         // data 
