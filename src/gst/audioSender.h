@@ -26,12 +26,12 @@
 #include "defaultAddresses.h"
 
 #include "mediaBase.h"
-#include "audioSession.h"
+#include "audioConfig.h"
 
 class AudioSender : public MediaBase
 {
     public:
-        AudioSender(const AudioSession& session);
+        AudioSender(const AudioConfig& config);
         AudioSender();
         virtual ~AudioSender(); 
         bool init();
@@ -46,7 +46,7 @@ class AudioSender : public MediaBase
         const bool isNetworked() const;
 
         // data 
-        AudioSession session_;
+        AudioConfig config_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
 };
 

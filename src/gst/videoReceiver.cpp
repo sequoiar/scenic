@@ -27,7 +27,7 @@
 #include "videoReceiver.h"
 
 
-VideoReceiver::VideoReceiver(const VideoSession& session) : session_(session)
+VideoReceiver::VideoReceiver(const VideoConfig& config) : config_(config)
 {
     // empty
 }
@@ -69,10 +69,10 @@ bool VideoReceiver::init()
     assert(caps);
 
     g_object_set(G_OBJECT(rxSrc), "caps", caps, NULL);
-    g_object_set(G_OBJECT(rxSrc), "port", session_.port(), NULL);
+    g_object_set(G_OBJECT(rxSrc), "port", config_.port(), NULL);
     g_object_set(G_OBJECT(rxSink), "sync", FALSE, NULL);
 
-    std::cout << "Receiving media on port : " << session_.port() << std::endl;
+    std::cout << "Receiving media on port : " << config_.port() << std::endl;
     gst_element_link_many(rxSrc, rtph264depay, ffdec_h264, rxSink, NULL);
 
     return true;

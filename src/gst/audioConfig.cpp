@@ -1,5 +1,5 @@
 
-// audioSession.h
+// audioConfig.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
 // This file is part of [propulse]ART.
@@ -23,24 +23,26 @@
  *
  */
 
-#ifndef _AUDIO_SESSION_H_
-#define _AUDIO_SESSION_H_
-
 #include <string>
-#include "mediaSession.h"
+#include "audioConfig.h"
 
-class AudioSession : public MediaSession
+AudioConfig::AudioConfig(int numChannels, std::string codec, std::string remoteHost, int port) 
+: MediaConfig(codec, remoteHost, port),  numChannels_(numChannels)
 {
-    public:
-        // this might need a source
-        AudioSession(int numChannels, std::string codec, std::string remoteHost, int port); 
-        AudioSession(int numChannels, std::string codec = "vorbis", int port = 0); 
-        
-        const int numChannels() const;
+    // empty
+}
 
-    protected: 
-        const int numChannels_;
-};
 
-#endif // _AUDIO_SESSION_H_
+
+AudioConfig::AudioConfig(int numChannels, std::string codec, int port) 
+: MediaConfig(codec, "localhost", port),  numChannels_(numChannels)
+{
+    // empty
+}
+
+
+const int AudioConfig::numChannels() const
+{
+    return numChannels_;
+}
 

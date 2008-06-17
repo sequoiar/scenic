@@ -1,5 +1,6 @@
-
-// audioSession.cpp
+// 
+// videoConfig.cpp
+//
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
 // This file is part of [propulse]ART.
@@ -19,30 +20,28 @@
 //
 
 /** \file 
- *      Class for audio parameter objects.
+ *      Class for video parameter objects.
  *
  */
 
 #include <string>
-#include "audioSession.h"
+#include "videoConfig.h"
 
-AudioSession::AudioSession(int numChannels, std::string codec, std::string remoteHost, int port) 
-: MediaSession(codec, remoteHost, port),  numChannels_(numChannels)
+VideoConfig::VideoConfig(std::string source, std::string codec, std::string remoteHost, int port) 
+: MediaConfig(codec, remoteHost, port), source_(source)
 {
     // empty
 }
 
+    
 
-
-AudioSession::AudioSession(int numChannels, std::string codec, int port) 
-: MediaSession(codec, "localhost", port),  numChannels_(numChannels)
+VideoConfig::VideoConfig(int port) 
+    : MediaConfig("", "", port), source_("")
 {
     // empty
 }
 
-
-const int AudioSession::numChannels() const
+const std::string & VideoConfig::source() const
 {
-    return numChannels_;
+    return source_;
 }
-

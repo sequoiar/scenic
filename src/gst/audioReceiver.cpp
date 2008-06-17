@@ -28,9 +28,9 @@
 
 #include "mediaBase.h"
 #include "audioReceiver.h"
-#include "audioSession.h"
+#include "audioConfig.h"
 
-AudioReceiver::AudioReceiver() : session_(0)
+AudioReceiver::AudioReceiver() : config_(0)
 {
     // empty
 }
@@ -38,7 +38,7 @@ AudioReceiver::AudioReceiver() : session_(0)
 
 
 
-AudioReceiver::AudioReceiver(const AudioSession& session) : session_(session)
+AudioReceiver::AudioReceiver(const AudioConfig& config) : config_(config)
 {
    // empty 
 }
@@ -68,16 +68,16 @@ bool AudioReceiver::init()
     assert(rxSrc);
     
     // FIXME: caps shouldn't be hardcoded
-    if (session_.numChannels() == 2)
+    if (config_.numChannels() == 2)
         caps = gst_caps_from_string(AudioReceiver::CAPS_STR[0].c_str());
-    else if (session_.numChannels() == 8)
+    else if (config_.numChannels() == 8)
         caps = gst_caps_from_string(AudioReceiver::CAPS_STR[1].c_str());
 
     assert(caps);
     g_object_set(G_OBJECT(rxSrc), "caps", caps, NULL);
     gst_caps_unref(caps);
 
-    g_object_set(G_OBJECT(rxSrc), "port", session_.port(), NULL);
+    g_object_set(G_OBJECT(rxSrc), "port", config_.port(), NULL);
 
     depayloader = gst_element_factory_make("rtpvorbisdepay", "depayloader");
     assert(depayloader);
@@ -92,7 +92,7 @@ bool AudioReceiver::init()
     gst_bin_add_many(GST_BIN(pipeline_), rxSrc, depayloader, 
             decoder, rxSink, NULL); 
 
-    std::cout << "Receiving media on port : " << session_.port() << std::endl;
+    std::cout << "Receiving media on port : " << config_.port() << std::endl;
     gst_element_link_many(rxSrc, depayloader, decoder, rxSink, NULL);
 
     return true;
@@ -293,7 +293,7 @@ bool AudioReceiver::init_uncomp(int port, int numChannels)
 
 bool AudioReceiver::start()
 {
-    std::cout << "Receiving audio on port " << session_.port() << std::endl;
+    std::cout << "Receiving audio on port " << config_.port() << std::endl;
     MediaBase::start();
     return true;
 }

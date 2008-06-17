@@ -1,6 +1,5 @@
-// 
-// videoSession.cpp
-//
+
+// audioConfig.h
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
 // This file is part of [propulse]ART.
@@ -20,28 +19,28 @@
 //
 
 /** \file 
- *      Base class for media parameter objects.
+ *      Immutable class that is used to setup AudioSender/AudioReceiver objects.
  *
  */
 
+#ifndef _AUDIO_CONFIG_H_
+#define _AUDIO_CONFIG_H_
+
 #include <string>
-#include "videoSession.h"
+#include "mediaConfig.h"
 
-VideoSession::VideoSession(std::string source, std::string codec, std::string remoteHost, int port) 
-: MediaSession(codec, remoteHost, port), source_(source)
+class AudioConfig : public MediaConfig
 {
-    // empty
-}
+    public:
+        // this might need a source param
+        AudioConfig(int numChannels, std::string codec, std::string remoteHost, int port); 
+        AudioConfig(int numChannels, std::string codec = "vorbis", int port = 0); 
+        
+        const int numChannels() const;
 
-    
+    protected: 
+        const int numChannels_;
+};
 
-VideoSession::VideoSession(int port) 
-    : MediaSession("", "", port), source_("")
-{
-    // empty
-}
+#endif // _AUDIO_CONFIG_H_
 
-const std::string & VideoSession::source() const
-{
-    return source_;
-}

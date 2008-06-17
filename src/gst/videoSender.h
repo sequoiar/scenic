@@ -26,18 +26,18 @@
 #include "defaultAddresses.h"
 
 #include "mediaBase.h"
-#include "videoSession.h" 
+#include "videoConfig.h" 
 
 class VideoSender : public MediaBase
 {
     public:
-        VideoSender(const VideoSession& session);
+        VideoSender(const VideoConfig& config);
         virtual ~VideoSender(); 
         bool init();
         virtual bool start();
 
     private:
-        VideoSession session_;
+        VideoConfig config_;
 };
 
 #endif
