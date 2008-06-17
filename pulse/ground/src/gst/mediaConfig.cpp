@@ -49,23 +49,23 @@ MediaConfig::MediaConfig(std::string source)
 
 
 
-const std::string & MediaConfig::source() const
+const char * MediaConfig::source() const
 {
-    return source_;
+    return source_.c_str();
 }
 
 
 
-const std::string & MediaConfig::codec() const
+const char * MediaConfig::codec() const
 {
-    return codec_;
+    return codec_.c_str();
 }
 
 
 
-const std::string & MediaConfig::remoteHost() const
+const char * MediaConfig::remoteHost() const
 {
-    return remoteHost_;
+    return remoteHost_.c_str();
 }
 
 

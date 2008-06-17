@@ -34,9 +34,9 @@ class MediaConfig
         MediaConfig(std::string codec, std::string remoteHost, int port); 
         MediaConfig(std::string source);
 
-        const std::string & source() const;
-        const std::string & codec() const;
-        const std::string & remoteHost() const;
+        const char * source() const;
+        const char * codec() const;
+        const char * remoteHost() const;
         const int port() const;
         const bool isNetworked() const;
 

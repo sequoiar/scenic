@@ -49,12 +49,13 @@ bool VideoSender::init()
     if (!launchStr.compare("dv1394src")) // need to demux and decode dv first
         launchStr += " ! dvdemux name=demux demux. ! queue ! dvdec";
 
-    if (!config_.codec().compare("h264"))
+    if (!std::string("h264").compare(config_.codec()))
         launchStr += " ! ffmpegcolorspace ! x264enc bitrate=2048 byte-stream=true threads=4";
     
     if (config_.isNetworked())
     {
-        launchStr += " ! rtph264pay ! udpsink host=" + config_.remoteHost(); 
+        launchStr += " ! rtph264pay ! udpsink host="; 
+        launchStr += config_.remoteHost(); 
 
         std::stringstream istream;
         istream << " port = " << config_.port();           
@@ -68,7 +69,7 @@ bool VideoSender::init()
 
     make_verbose();
 
-    // FIXME: this method should really check the pipeline
+    // FIXME: this method should actually check the pipeline
     return check_pipeline();
 }
 
