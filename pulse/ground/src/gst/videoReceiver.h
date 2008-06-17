@@ -29,7 +29,6 @@ class VideoReceiver : public MediaBase
     public:
         VideoReceiver(const VideoSession& session);
         virtual ~VideoReceiver();
-        //bool init(int port = DEF_PORT);
         bool init();
 
     private:
