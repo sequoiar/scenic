@@ -1,4 +1,4 @@
-// mediaSession.h
+// mediaConfig.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
 // This file is part of [propulse]ART.
@@ -23,9 +23,9 @@
  */
 
 #include <string>
-#include "mediaSession.h"
+#include "mediaConfig.h"
 
-MediaSession::MediaSession(std::string codec, std::string remoteHost, int port) 
+MediaConfig::MediaConfig(std::string codec, std::string remoteHost, int port) 
 : codec_(codec), remoteHost_(remoteHost), port_(port)
 {
     // empty
@@ -33,21 +33,21 @@ MediaSession::MediaSession(std::string codec, std::string remoteHost, int port)
 
 
 
-const std::string & MediaSession::codec() const
+const std::string & MediaConfig::codec() const
 {
     return codec_;
 }
 
 
 
-const std::string & MediaSession::remoteHost() const
+const std::string & MediaConfig::remoteHost() const
 {
     return remoteHost_;
 }
 
 
         
-const int MediaSession::port() const
+const int MediaConfig::port() const
 {
     return port_;
 }

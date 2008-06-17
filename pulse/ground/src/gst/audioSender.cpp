@@ -93,7 +93,7 @@ const GstAudioChannelPosition AudioSender::VORBIS_CHANNEL_POSITIONS[][8] = {
 
 
 
-AudioSender::AudioSender(const AudioSession& session) : session_(session)
+AudioSender::AudioSender(const AudioConfig& config) : config_(config)
 {
     // empty
 }
@@ -114,14 +114,14 @@ bool AudioSender::init()
     double gain;
     GValueArray *arr;       // for channel position layout
 
-    gain = 1.0 / session_.numChannels(); // so sum of tones equals 1.0
+    gain = 1.0 / config_.numChannels(); // so sum of tones equals 1.0
 
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
 
     make_verbose();
 
-    if (session_.numChannels() == 1)    // no need for interleave, special case
+    if (config_.numChannels() == 1)    // no need for interleave, special case
     {
         sources.push_back(gst_element_factory_make("audiotestsrc", NULL));
         assert(sources[0]);
@@ -145,12 +145,12 @@ bool AudioSender::init()
     assert(interleave);
 
     g_object_set(interleave, "channel-positions-from-input", FALSE, NULL);
-    arr = g_value_array_new(session_.numChannels());
+    arr = g_value_array_new(config_.numChannels());
     set_channel_layout(arr);        // helper method
     g_object_set(interleave, "channel-positions", arr, NULL);
     g_value_array_free(arr);
 
-    for (int channelIdx = 0; channelIdx < session_.numChannels(); channelIdx++)
+    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
         sources.push_back(gst_element_factory_make("audiotestsrc", NULL));
         assert(sources[channelIdx]);
@@ -169,7 +169,7 @@ bool AudioSender::init()
         sink = gst_element_factory_make("udpsink", NULL);
         assert(sink);
     
-        g_object_set(G_OBJECT(sink), "host", session_.remoteHost().c_str(), "port", session_.port(), 
+        g_object_set(G_OBJECT(sink), "host", config_.remoteHost().c_str(), "port", config_.port(), 
                 NULL);
 
         gst_bin_add_many(GST_BIN(pipeline_), interleave, encoder, payloader, sink, NULL);
@@ -183,7 +183,7 @@ bool AudioSender::init()
         gst_bin_add_many(GST_BIN(pipeline_), interleave, sink, NULL);
     }
 
-    for (int channelIdx = 0; channelIdx < session_.numChannels(); channelIdx++)
+    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
         gst_bin_add_many(GST_BIN(pipeline_), sources[channelIdx], aconvs[channelIdx], 
                 queues[channelIdx], NULL);
@@ -196,7 +196,7 @@ bool AudioSender::init()
     else
         gst_element_link_many(interleave, sink, NULL);
 
-    for (int channelIdx = 0; channelIdx < session_.numChannels(); channelIdx++)
+    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
         static const float FUNDAMENTAL = 100.0;
         gst_element_link_many(sources[channelIdx], aconvs[channelIdx], interleave, NULL);
@@ -267,9 +267,9 @@ void AudioSender::set_channel_layout(GValueArray *arr)
     GValue val = { 0, };
     g_value_init(&val, GST_TYPE_AUDIO_CHANNEL_POSITION);
 
-    for (int channelIdx = 0; channelIdx < session_.numChannels(); channelIdx++)
+    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
-        g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[session_.numChannels() - 1][channelIdx]);        
+        g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[config_.numChannels() - 1][channelIdx]);        
         g_value_array_append(arr, &val);
         g_value_reset(&val);
     }
@@ -280,7 +280,7 @@ void AudioSender::set_channel_layout(GValueArray *arr)
 
 const bool AudioSender::isNetworked() const
 {
-    return session_.port() != 0;
+    return config_.port() != 0;
 }
 
 
@@ -404,7 +404,7 @@ void AudioSender::init_uncomp_rtp_test(int numChannels)
 
 bool AudioSender::start()
 {
-    std::cout << "Sending audio to host " << session_.remoteHost() << " on port " << session_.port() << std::endl;
+    std::cout << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port() << std::endl;
     MediaBase::start();
     return true;
 }

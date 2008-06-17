@@ -1,4 +1,5 @@
-// mediaSession.h
+
+// videoConfig.h
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
 // This file is part of [propulse]ART.
@@ -18,29 +19,28 @@
 //
 
 /** \file 
- *      Immutable base class for media parameter objects.
+ *      Class for video parameter objects.
  *
  */
 
-#ifndef _MEDIA_SESSION_H_
-#define _MEDIA_SESSION_H_
+#ifndef _VIDEO_CONFIG_H_
+#define _VIDEO_CONFIG_H_
 
 #include <string>
+#include "mediaConfig.h"
 
-class MediaSession
+class VideoConfig : public MediaConfig
 {
     public:
-        MediaSession(std::string codec, std::string remoteHost = "", int port = 0); 
+        VideoConfig(std::string source, 
+                std::string codec = "", std::string remoteHost = "", int port = 0); // used by sender
+        VideoConfig(int port = 0);     // used by receiver
 
-        const std::string & codec() const;
-        const std::string & remoteHost() const;
-        const int port() const;
-
-    protected: 
-        const std::string codec_;
-        const std::string remoteHost_;
-        const int port_;
+        const std::string & source() const;
+        
+    private:
+        const std::string source_;
 };
 
-#endif // _MEDIA_SESSION_H_
+#endif // _VIDEO_CONFIG_H_
 

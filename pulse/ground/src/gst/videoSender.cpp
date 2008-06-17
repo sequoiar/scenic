@@ -28,7 +28,7 @@
 #include "mediaBase.h"
 #include "videoSender.h"
 
-VideoSender::VideoSender(const VideoSession& session) : session_(session)
+VideoSender::VideoSender(const VideoConfig& config) : config_(config)
 {
     // empty
 }
@@ -45,21 +45,21 @@ VideoSender::~VideoSender()
 bool VideoSender::init()
 {
     GError* error = NULL;
-    std::string launchStr = session_.source();
+    std::string launchStr = config_.source();
 
     if (!launchStr.compare("dv1394src")) // need to demux and decode dv
         launchStr += " ! dvdemux name=demux demux. ! queue ! dvdec";
 
-    if (!session_.codec().compare("h264"))
+    if (!config_.codec().compare("h264"))
         launchStr += " ! ffmpegcolorspace ! x264enc bitrate=2048 byte-stream=true threads=4";
     
-    if (session_.port() != 0)
+    if (config_.port() != 0)
     {
-        launchStr += " ! rtph264pay ! udpsink host=" + session_.remoteHost(); 
+        launchStr += " ! rtph264pay ! udpsink host=" + config_.remoteHost(); 
         //"x264enc bitrate=10000 byte-stream=true threads=4 ! rtph264pay ! "
 
         std::stringstream istream;
-        istream << " port = " << session_.port();           
+        istream << " port = " << config_.port();           
         launchStr += istream.str();     // get port number into launch string
         //launchStr += " demux. ! queue ! fakesink";
     }
@@ -79,9 +79,9 @@ bool VideoSender::init()
 
 bool VideoSender::start()
 {
-    if (session_.port())
+    if (config_.port())
     {
-        std::cout << "Sending media on port " << session_.port() << " to host " << session_.remoteHost()
+        std::cout << "Sending media on port " << config_.port() << " to host " << config_.remoteHost()
             << std::endl;
     }
 
