@@ -120,7 +120,7 @@ bool AudioSender::init()
 
     if (config_.numChannels() == 1)    // no need for interleave, special case
     {
-        sources.push_back(gst_element_factory_make("audiotestsrc", NULL));
+        sources.push_back(gst_element_factory_make(config_.source(), NULL));
         assert(sources[0]);
 
         aconvs.push_back(gst_element_factory_make("audioconvert", NULL));
@@ -133,7 +133,7 @@ bool AudioSender::init()
 
         gst_bin_add_many(GST_BIN(pipeline_), sources[0], aconvs[0], sink, NULL);
 
-        gst_element_link_many(sources[0], aconvs[0], sink, NULL);
+        assert(gst_element_link_many(sources[0], aconvs[0], sink, NULL));
         return true;
     }
 
@@ -144,7 +144,7 @@ bool AudioSender::init()
     
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
-        sources.push_back(gst_element_factory_make("audiotestsrc", NULL));
+        sources.push_back(gst_element_factory_make(config_.source(), NULL));
         assert(sources[channelIdx]);
         aconvs.push_back(gst_element_factory_make("audioconvert", NULL));
         assert(aconvs[channelIdx]);
@@ -161,7 +161,7 @@ bool AudioSender::init()
         sink = gst_element_factory_make("udpsink", NULL);
         assert(sink);
     
-        g_object_set(G_OBJECT(sink), "host", config_.remoteHost().c_str(), "port", config_.port(), 
+        g_object_set(G_OBJECT(sink), "host", config_.remoteHost(), "port", config_.port(), 
                 NULL);
 
         gst_bin_add_many(GST_BIN(pipeline_), interleave, encoder, payloader, sink, NULL);
@@ -181,13 +181,13 @@ bool AudioSender::init()
         gst_bin_add_many(GST_BIN(pipeline_), *source, *aconv, *queue, NULL);
 
     if (config_.isNetworked()) 
-        gst_element_link_many(interleave, encoder, payloader, sink, NULL);
+        assert(gst_element_link_many(interleave, encoder, payloader, sink, NULL));
     else
-        gst_element_link_many(interleave, sink, NULL);
+        assert(gst_element_link_many(interleave, sink, NULL));
 
     for (source = sources.begin(), aconv = aconvs.begin(); 
             source != sources.end() && aconv != aconvs.end(); source++, aconv++)
-        gst_element_link_many(*source, *aconv, interleave, NULL);
+        assert(gst_element_link_many(*source, *aconv, interleave, NULL));
 
     init_test_sources(sources);
 

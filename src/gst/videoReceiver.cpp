@@ -73,7 +73,7 @@ bool VideoReceiver::init()
     g_object_set(G_OBJECT(rxSink), "sync", FALSE, NULL);
 
     std::cout << "Receiving media on port : " << config_.port() << std::endl;
-    gst_element_link_many(rxSrc, rtph264depay, ffdec_h264, rxSink, NULL);
+    assert(gst_element_link_many(rxSrc, rtph264depay, ffdec_h264, rxSink, NULL));
 
     return true;
 }

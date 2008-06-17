@@ -87,7 +87,7 @@ bool AudioReceiver::init()
             decoder, rxSink, NULL); 
 
     std::cout << "Receiving media on port : " << config_.port() << std::endl;
-    gst_element_link_many(rxSrc, depayloader, decoder, rxSink, NULL);
+    assert(gst_element_link_many(rxSrc, depayloader, decoder, rxSink, NULL));
 
     return true;
 }
