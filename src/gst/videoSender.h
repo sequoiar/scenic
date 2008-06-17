@@ -33,20 +33,8 @@ class VideoSender : public MediaBase
     public:
         VideoSender(const VideoSession& session);
         virtual ~VideoSender(); 
-        /*bool init(const std::string media = "test",
-                  const int port = DEF_PORT, 
-                  const std::string addr = THEIR_ADDRESS );
-                  */
         bool init();
         virtual bool start();
-
-#if 0
-        void initDv();
-        void initDvRtp();
-        void initV4l();
-        void initV4lRtp();
-        void initTest();
-#endif
 
     private:
         VideoSession session_;

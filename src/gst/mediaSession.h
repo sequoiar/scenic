@@ -1,5 +1,4 @@
-
-// mediaBase.h
+// mediaSession.h
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
 // This file is part of [propulse]ART.
@@ -18,29 +17,30 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _MEDIA_BASE_H_
-#define _MEDIA_BASE_H_
+/** \file 
+ *      Immutable base class for media parameter objects.
+ *
+ */
 
-typedef struct _GstElement GstElement;
+#ifndef _MEDIA_SESSION_H_
+#define _MEDIA_SESSION_H_
 
-class MediaBase
+#include <string>
+
+class MediaSession
 {
     public:
-        virtual bool start();
-        virtual bool stop();
-        bool isPlaying() const;
+        MediaSession(std::string codec, std::string remoteHost = "", int port = 0); 
 
+        const std::string & codec() const;
+        const std::string & remoteHost() const;
+        const int port() const;
 
-    protected:
-        MediaBase();
-        virtual ~MediaBase(); 
-        bool check_pipeline();
-        void make_verbose();
-        GstElement *pipeline_;
-        bool verbose_;
-
-    private:
-        static bool gstInitialized_;
+    protected: 
+        const std::string codec_;
+        const std::string remoteHost_;
+        const int port_;
 };
 
-#endif // _MEDIA_BASE_H_
+#endif // _MEDIA_SESSION_H_
+

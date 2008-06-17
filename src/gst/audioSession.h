@@ -1,5 +1,5 @@
 
-// mediaBase.h
+// audioSession.h
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
 // This file is part of [propulse]ART.
@@ -18,29 +18,29 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _MEDIA_BASE_H_
-#define _MEDIA_BASE_H_
+/** \file 
+ *      Class for audio parameter objects.
+ *
+ */
 
-typedef struct _GstElement GstElement;
+#ifndef _AUDIO_SESSION_H_
+#define _AUDIO_SESSION_H_
 
-class MediaBase
+#include <string>
+#include "mediaSession.h"
+
+class AudioSession : public MediaSession
 {
     public:
-        virtual bool start();
-        virtual bool stop();
-        bool isPlaying() const;
+        // this might need a source
+        AudioSession(int numChannels, std::string codec, std::string remoteHost, int port); 
+        AudioSession(int numChannels, std::string codec = "vorbis", int port = 0); 
+        
+        const int numChannels() const;
 
-
-    protected:
-        MediaBase();
-        virtual ~MediaBase(); 
-        bool check_pipeline();
-        void make_verbose();
-        GstElement *pipeline_;
-        bool verbose_;
-
-    private:
-        static bool gstInitialized_;
+    protected: 
+        const int numChannels_;
 };
 
-#endif // _MEDIA_BASE_H_
+#endif // _AUDIO_SESSION_H_
+

@@ -36,35 +36,17 @@ class AudioSender : public MediaBase
         virtual ~AudioSender(); 
         bool init();
         const std::string caps_str() const;
-#if 0
-        bool init(const std::string media, 
-                  const int port = DEF_PORT, 
-                  const std::string addr = THEIR_ADDRESS);
-#endif
         virtual bool start();
-        //void print_address() { std::cout << "I'm a sender at address" << this << std::endl; }
 
     private:
-#if 0
-        void init_1ch_test();
-        void init_local_test(int numChannels = 2);
-
-        void init_rtp_test(int numChannels = 2);
-        
-        void init_uncomp_rtp_test(int numChannels = 1);
-#endif
 
         // helper methods
        
         void set_channel_layout(GValueArray *arr);
+        const bool isNetworked() const;
 
-        // callback to link new pads
-//        static void cb_new_pad(GstElement *element, GstPad *pad, gpointer data);
-
+        // data 
         AudioSession session_;
-        //std::string remoteHost_;
-        //int numChannels_;
-//        GstElement *udpSink1_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
 };
 
