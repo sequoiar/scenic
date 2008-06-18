@@ -39,8 +39,6 @@ class AudioConfig : public MediaConfig
         
         const int numChannels() const;
         const bool hasFileSrc() const;
-        const bool isMono() const;
-
 
     protected: 
         const int numChannels_;
