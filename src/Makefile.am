@@ -1,1 +1,1 @@
-SUBDIRS = sdp sdp/test sip sip/test
+SUBDIRS = sdp sdp/test
