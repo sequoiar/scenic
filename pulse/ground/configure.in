@@ -52,6 +52,8 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/sdp/Makefile
                  src/sdp/test/Makefile
+                 src/gst/Makefile
+                 src/gst/test/Makefile
                  ])
 AC_OUTPUT
 
