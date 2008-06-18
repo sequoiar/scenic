@@ -420,7 +420,7 @@ void GstTestSuite::start_stop_dv_rtp()
 
 
 
-void GstTestSuite::start_1ch_audio()
+void GstTestSuite::start_1ch_audiotest()
 {
     if (id_ == 1)
         return;
@@ -438,7 +438,7 @@ void GstTestSuite::start_1ch_audio()
 
 
 
-void GstTestSuite::stop_1ch_audio()
+void GstTestSuite::stop_1ch_audiotest()
 {
     if (id_ == 1)
         return;
@@ -455,7 +455,7 @@ void GstTestSuite::stop_1ch_audio()
 
 
 
-void GstTestSuite::start_stop_1ch_audio()
+void GstTestSuite::start_stop_1ch_audiotest()
 {
     if (id_ == 1)
         return;
@@ -477,7 +477,7 @@ void GstTestSuite::start_stop_1ch_audio()
 
 
 
-void GstTestSuite::start_2ch_audio()
+void GstTestSuite::start_2ch_audiotest()
 {
     if (id_ == 1)
         return;
@@ -495,7 +495,7 @@ void GstTestSuite::start_2ch_audio()
 
 
 
-void GstTestSuite::stop_2ch_audio()
+void GstTestSuite::stop_2ch_audiotest()
 {
     if (id_ == 1)
         return;
@@ -513,7 +513,7 @@ void GstTestSuite::stop_2ch_audio()
 
 
 
-void GstTestSuite::start_stop_2ch_audio()
+void GstTestSuite::start_stop_2ch_audiotest()
 {
     if (id_ == 1)
         return;
@@ -534,7 +534,7 @@ void GstTestSuite::start_stop_2ch_audio()
 
 
 
-void GstTestSuite::start_6ch_audio()
+void GstTestSuite::start_6ch_audiotest()
 {
     if (id_ == 1)
         return;
@@ -552,7 +552,7 @@ void GstTestSuite::start_6ch_audio()
 
 
 
-void GstTestSuite::stop_6ch_audio()
+void GstTestSuite::stop_6ch_audiotest()
 {
     if (id_ == 1)
         return;
@@ -570,7 +570,7 @@ void GstTestSuite::stop_6ch_audio()
 
 
 
-void GstTestSuite::start_stop_6ch_audio()
+void GstTestSuite::start_stop_6ch_audiotest()
 {
     if (id_ == 1)
         return;
@@ -592,7 +592,7 @@ void GstTestSuite::start_stop_6ch_audio()
 
 
 
-void GstTestSuite::start_8ch_audio()
+void GstTestSuite::start_8ch_audiotest()
 {
     if (id_ == 1)
         return;
@@ -610,7 +610,7 @@ void GstTestSuite::start_8ch_audio()
 
 
 
-void GstTestSuite::stop_8ch_audio()
+void GstTestSuite::stop_8ch_audiotest()
 {
     if (id_ == 1)
         return;
@@ -627,7 +627,7 @@ void GstTestSuite::stop_8ch_audio()
 
 
 
-void GstTestSuite::start_stop_8ch_audio()
+void GstTestSuite::start_stop_8ch_audiotest()
 {
     if (id_ == 1)
         return;
@@ -648,7 +648,7 @@ void GstTestSuite::start_stop_8ch_audio()
 
 
 
-void GstTestSuite::start_2ch_comp_rtp_audio()
+void GstTestSuite::start_2ch_comp_rtp_audiotest()
 {
     int numChannels = 2;
     if (id_ == 0)
@@ -676,7 +676,7 @@ void GstTestSuite::start_2ch_comp_rtp_audio()
 
 
 
-void GstTestSuite::stop_2ch_comp_rtp_audio()
+void GstTestSuite::stop_2ch_comp_rtp_audiotest()
 {
     int numChannels = 2;
 
@@ -706,7 +706,7 @@ void GstTestSuite::stop_2ch_comp_rtp_audio()
 
 
 
-void GstTestSuite::start_stop_2ch_comp_rtp_audio()
+void GstTestSuite::start_stop_2ch_comp_rtp_audiotest()
 {
     int numChannels = 2;
     if (id_ == 0)
@@ -741,7 +741,7 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audio()
 
 
 
-void GstTestSuite::start_8ch_comp_rtp_audio()
+void GstTestSuite::start_8ch_comp_rtp_audiotest()
 {
     int numChannels = 8;
 
@@ -771,7 +771,7 @@ void GstTestSuite::start_8ch_comp_rtp_audio()
 
 
 
-void GstTestSuite::stop_8ch_comp_rtp_audio()
+void GstTestSuite::stop_8ch_comp_rtp_audiotest()
 {
     int numChannels = 8;
     if (id_ == 0)
@@ -800,7 +800,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audio()
 
 
 
-void GstTestSuite::start_stop_8ch_comp_rtp_audio()
+void GstTestSuite::start_stop_8ch_comp_rtp_audiotest()
 {
     int numChannels = 8;
     if (id_ == 0)
@@ -834,9 +834,106 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audio()
     }
 }
 
+
+
+void GstTestSuite::start_8ch_comp_rtp_audiofile()
+{
+    int numChannels = 8;
+
+    if (id_ == 0)
+    {
+        AudioConfig config(numChannels, "vorbis", 10010);
+        AudioReceiver rx(config);
+        rx.init();
+        
+        TEST_ASSERT(rx.start());
+
+        BLOCK();
+        TEST_ASSERT(rx.isPlaying());
+    }
+    else
+    {
+        AudioConfig config("filesrc", numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioSender tx(config);
+        tx.init();
+        
+        TEST_ASSERT(tx.start());
+
+        BLOCK();
+        TEST_ASSERT(tx.isPlaying());
+    }
+}
+
+
+
+void GstTestSuite::stop_8ch_comp_rtp_audiofile()
+{
+    int numChannels = 8;
+    if (id_ == 0)
+    {
+        AudioConfig config(numChannels, "vorbis", 10010);
+        AudioReceiver rx(config);
+        rx.init();
+
+        BLOCK();
+
+        TEST_ASSERT(rx.stop());
+        TEST_ASSERT(!rx.isPlaying());
+    }
+    else
+    {
+        AudioConfig config("filesrc", numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioSender tx(config);
+        tx.init();
+
+        BLOCK();
+
+        TEST_ASSERT(tx.stop());
+        TEST_ASSERT(!tx.isPlaying());
+    }
+}
+
+
+
+void GstTestSuite::start_stop_8ch_comp_rtp_audiofile()
+{
+    int numChannels = 8;
+    if (id_ == 0)
+    {
+        AudioConfig config(numChannels, "vorbis", 10010);
+        AudioReceiver rx(config);
+        rx.init();
+
+        TEST_ASSERT(rx.start());
+
+        BLOCK();
+        TEST_ASSERT(rx.isPlaying());
+
+        TEST_ASSERT(rx.stop());
+        TEST_ASSERT(!rx.isPlaying());
+    }
+    else
+    {
+        AudioConfig config("filesrc", numChannels, "vorbis", MY_ADDRESS, 10010);
+        AudioSender tx(config);
+        TEST_ASSERT(tx.init());
+        
+        TEST_ASSERT(tx.start());
+
+        BLOCK();
+        TEST_ASSERT(tx.isPlaying());
+
+        TEST_ASSERT(tx.stop());
+        TEST_ASSERT(!tx.isPlaying());
+
+    }
+}
+
+
+
 #if 0
 
-void GstTestSuite::start_1ch_uncomp_rtp_audio()
+void GstTestSuite::start_1ch_uncomp_rtp_audiotest()
 {
     int numChannels = 1;
     int port = 5002;
@@ -865,7 +962,7 @@ void GstTestSuite::start_1ch_uncomp_rtp_audio()
 
 
 
-void GstTestSuite::stop_1ch_uncomp_rtp_audio()
+void GstTestSuite::stop_1ch_uncomp_rtp_audiotest()
 {
     int numChannels = 1;
     int port = 5002;
@@ -894,7 +991,7 @@ void GstTestSuite::stop_1ch_uncomp_rtp_audio()
 
 
 
-void GstTestSuite::start_stop_1ch_uncomp_rtp_audio()
+void GstTestSuite::start_stop_1ch_uncomp_rtp_audiotest()
 {
     int numChannels = 1;
     int port = 5002;
@@ -929,21 +1026,21 @@ void GstTestSuite::start_stop_1ch_uncomp_rtp_audio()
 
 
 
-void start_8ch_uncomp_rtp_audio()
+void start_8ch_uncomp_rtp_audiotest()
 {
     // not yet implemented
 }
 
 
 
-void stop_8ch_uncomp_rtp_audio()
+void stop_8ch_uncomp_rtp_audiotest()
 {
     // not yet implemented
 }
 
 
 
-void start_stop_8ch_uncomp_rtp_audio()
+void start_stop_8ch_uncomp_rtp_audiotest()
 {
     // not yet implemented
 }

@@ -56,3 +56,16 @@ const int AudioConfig::numChannels() const
     return numChannels_;
 }
 
+
+
+const bool AudioConfig::hasFileSrc() const
+{
+    return !source_.compare("filesrc");
+}
+
+
+
+const bool AudioConfig::isMono() const 
+{
+    return (numChannels_ == 1);
+}

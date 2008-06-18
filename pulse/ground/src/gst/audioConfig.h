@@ -38,6 +38,9 @@ class AudioConfig : public MediaConfig
         AudioConfig(std::string source, int numChannels); // localtest
         
         const int numChannels() const;
+        const bool hasFileSrc() const;
+        const bool isMono() const;
+
 
     protected: 
         const int numChannels_;
