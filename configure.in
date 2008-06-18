@@ -1,0 +1,67 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.61)
+AC_INIT(GROUND-FLOOR, 0.01 )
+AC_CONFIG_SRCDIR([src/gst/mediaBase.h])
+#AC_CONFIG_HEADER([src/config.h])
+
+AM_INIT_AUTOMAKE()
+dnl Debug mode 
+AM_MAINTAINER_MODE
+# Check for C and C++ compilers
+AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_RANLIB
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([arpa/inet.h stdlib.h string.h sys/ioctl.h unistd.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_C_CONST
+
+AC_MSG_WARN([not found.])
+
+# Checks for library functions.
+AC_PROG_GCC_TRADITIONAL
+AC_CHECK_FUNCS([inet_ntoa memset socket])
+
+#Trying to set GST_CFLAGS GST_LIBS using pkg-config
+PKG_CHECK_MODULES(CPPTEST, libcpptest, have_cpptest=true, have_cpptest=false)
+if test "x${have_cpptest}" = "xfalse" ; then
+    AC_MSG_WARN([libcpptest not found.])
+fi
+
+
+
+#Trying to set CPPTEST_LIBS using pkg-config
+PKG_CHECK_MODULES(GST, gstreamer-0.10, have_gstreamer=true, have_gstreamer=false)
+if test "x${have_gstreamer}" = "xfalse" ; then
+    AC_MSG_WARN([GStreamer not found.])
+fi
+
+#Trying to set CPPTEST_LIBS using pkg-config
+PKG_CHECK_MODULES(GSTAUDIO, gstreamer-audio-0.10, have_gstreamer_audio=true, have_gstreamer_audio=false)
+if test "x${have_gstreamer_audio}" = "xfalse" ; then
+    AC_MSG_WARN([GStreamer-audio not found.])
+fi
+
+AC_CONFIG_FILES([Makefile
+                 src/Makefile
+                 src/sdp/Makefile
+                 src/sdp/test/Makefile
+                 ])
+AC_OUTPUT
+
+
+
+
+#                src/gst/Makefile
+#                src/hello/Makefile
+#                src/pyInterpreter/Makefile
+#                 src/sdp/Makefile
+# src/sip/Makefile
+
+
