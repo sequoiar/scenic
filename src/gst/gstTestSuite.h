@@ -69,33 +69,37 @@ class GstTestSuite : public Test::Suite
 #endif // VIDEO
 
 #if AUDIO
-            TEST_ADD(GstTestSuite::start_1ch_audio)
-            TEST_ADD(GstTestSuite::stop_1ch_audio)
-            TEST_ADD(GstTestSuite::start_stop_1ch_audio)
-            TEST_ADD(GstTestSuite::start_2ch_audio)
-            TEST_ADD(GstTestSuite::stop_2ch_audio)
-            TEST_ADD(GstTestSuite::start_stop_2ch_audio)
+            TEST_ADD(GstTestSuite::start_1ch_audiotest)
+            TEST_ADD(GstTestSuite::stop_1ch_audiotest)
+            TEST_ADD(GstTestSuite::start_stop_1ch_audiotest)
+            TEST_ADD(GstTestSuite::start_2ch_audiotest)
+            TEST_ADD(GstTestSuite::stop_2ch_audiotest)
+            TEST_ADD(GstTestSuite::start_stop_2ch_audiotest)
 
-            TEST_ADD(GstTestSuite::start_6ch_audio);
-            TEST_ADD(GstTestSuite::stop_6ch_audio)
-            TEST_ADD(GstTestSuite::start_stop_6ch_audio)
+            TEST_ADD(GstTestSuite::start_6ch_audiotest);
+            TEST_ADD(GstTestSuite::stop_6ch_audiotest)
+            TEST_ADD(GstTestSuite::start_stop_6ch_audiotest)
 
-            TEST_ADD(GstTestSuite::start_8ch_audio)
-            TEST_ADD(GstTestSuite::stop_8ch_audio)
-            TEST_ADD(GstTestSuite::start_stop_8ch_audio)
+            TEST_ADD(GstTestSuite::start_8ch_audiotest)
+            TEST_ADD(GstTestSuite::stop_8ch_audiotest)
+            TEST_ADD(GstTestSuite::start_stop_8ch_audiotest)
     #if RTP
-            TEST_ADD(GstTestSuite::start_2ch_comp_rtp_audio)
-            TEST_ADD(GstTestSuite::stop_2ch_comp_rtp_audio)
-            TEST_ADD(GstTestSuite::start_stop_2ch_comp_rtp_audio)
+            TEST_ADD(GstTestSuite::start_2ch_comp_rtp_audiotest)
+            TEST_ADD(GstTestSuite::stop_2ch_comp_rtp_audiotest)
+            TEST_ADD(GstTestSuite::start_stop_2ch_comp_rtp_audiotest)
 
-            TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audio)
-            TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audio)
-            TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audio)
+            TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiotest)
+            TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiotest)
+            TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiotest)
+
+            TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile)
+            TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile)
+            TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile)
 
 #if 0
-            TEST_ADD(GstTestSuite::start_1ch_uncomp_rtp_audio)
-            TEST_ADD(GstTestSuite::stop_1ch_uncomp_rtp_audio)
-            TEST_ADD(GstTestSuite::start_stop_1ch_uncomp_rtp_audio)
+            TEST_ADD(GstTestSuite::start_1ch_uncomp_rtp_audiotest)
+            TEST_ADD(GstTestSuite::stop_1ch_uncomp_rtp_audiotest)
+            TEST_ADD(GstTestSuite::start_stop_1ch_uncomp_rtp_audiotest)
 #endif
     #endif // RTP
 #endif // AUDIO
@@ -134,37 +138,41 @@ class GstTestSuite : public Test::Suite
         void stop_dv_rtp();
         void start_stop_dv_rtp();
 
-        void start_1ch_audio();
-        void stop_1ch_audio();
-        void start_stop_1ch_audio();
+        void start_1ch_audiotest();
+        void stop_1ch_audiotest();
+        void start_stop_1ch_audiotest();
 
-        void start_2ch_audio();
-        void stop_2ch_audio();
-        void start_stop_2ch_audio();
+        void start_2ch_audiotest();
+        void stop_2ch_audiotest();
+        void start_stop_2ch_audiotest();
 
-        void start_6ch_audio();
-        void stop_6ch_audio();
-        void start_stop_6ch_audio();
+        void start_6ch_audiotest();
+        void stop_6ch_audiotest();
+        void start_stop_6ch_audiotest();
 
-        void start_8ch_audio();
-        void stop_8ch_audio();
-        void start_stop_8ch_audio();
+        void start_8ch_audiotest();
+        void stop_8ch_audiotest();
+        void start_stop_8ch_audiotest();
 
-        void start_2ch_comp_rtp_audio();
-        void stop_2ch_comp_rtp_audio();
-        void start_stop_2ch_comp_rtp_audio();
+        void start_2ch_comp_rtp_audiotest();
+        void stop_2ch_comp_rtp_audiotest();
+        void start_stop_2ch_comp_rtp_audiotest();
 
-        void start_8ch_comp_rtp_audio();
-        void stop_8ch_comp_rtp_audio();
-        void start_stop_8ch_comp_rtp_audio();
+        void start_8ch_comp_rtp_audiotest();
+        void stop_8ch_comp_rtp_audiotest();
+        void start_stop_8ch_comp_rtp_audiotest();
+
+        void start_8ch_comp_rtp_audiofile();
+        void stop_8ch_comp_rtp_audiofile();
+        void start_stop_8ch_comp_rtp_audiofile();
 #if 0
-        void start_1ch_uncomp_rtp_audio();
-        void stop_1ch_uncomp_rtp_audio();
-        void start_stop_1ch_uncomp_rtp_audio();
+        void start_1ch_uncomp_rtp_audiotest();
+        void stop_1ch_uncomp_rtp_audiotest();
+        void start_stop_1ch_uncomp_rtp_audiotest();
 
-        void start_8ch_uncomp_rtp_audio();
-        void stop_8ch_uncomp_rtp_audio();
-        void start_stop_8ch_uncomp_rtp_audio();
+        void start_8ch_uncomp_rtp_audiotest();
+        void stop_8ch_uncomp_rtp_audiotest();
+        void start_stop_8ch_uncomp_rtp_audiotest();
 #endif
 };
 

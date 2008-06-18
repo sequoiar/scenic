@@ -105,7 +105,10 @@ AudioSender::~AudioSender()
 }
 
 
+
 // pipeline could also be built with parse launch
+// FIXME: this needs to be refactored, possibly with template method pattern
+// 
 bool AudioSender::init()
 {
     std::vector<GstElement*> sources, aconvs, queues; 
@@ -118,10 +121,13 @@ bool AudioSender::init()
 
     make_verbose();
 
-    if (config_.numChannels() == 1)    // no need for interleave, special case
+    if (config_.isMono())    // no need for interleave, special case
     {
         sources.push_back(gst_element_factory_make(config_.source(), NULL));
         assert(sources[0]);
+
+        if (config_.hasFileSrc())
+            g_object_set(G_OBJECT(sources[0]), "location", "audiofile.pcm", NULL);
 
         aconvs.push_back(gst_element_factory_make("audioconvert", NULL));
         assert(aconvs[0]);
@@ -189,18 +195,25 @@ bool AudioSender::init()
             source != sources.end() && aconv != aconvs.end(); source++, aconv++)
         assert(gst_element_link_many(*source, *aconv, interleave, NULL));
 
-    init_test_sources(sources);
+    init_sources(sources);
 
     return true;
 }
 
 
 
-void AudioSender::init_test_sources(std::vector<GstElement*> & sources)
+void AudioSender::init_sources(std::vector<GstElement*> & sources)
 {
+    if (config_.hasFileSrc())
+    {
+        for (GstIter iter = sources.begin(); iter != sources.end(); iter++)
+            g_object_set(G_OBJECT(*iter), "location", "audiofile.pcm", NULL);
+        return;
+    }
+
     const double GAIN = 1.0 / config_.numChannels(); // so sum of tones equals 1.0
     double frequency = 100.0;
-    
+
     for (GstIter iter = sources.begin(); iter != sources.end(); iter++)
     {
         g_object_set(G_OBJECT(*iter), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
@@ -261,6 +274,7 @@ const std::string AudioSender::caps_str() const
 
 
 
+// set channel layout for interleave element
 void AudioSender::set_channel_layout(GstElement *interleave)
 {
     GValue val = { 0, };

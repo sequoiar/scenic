@@ -43,8 +43,9 @@ class AudioSender : public MediaBase
         // helper methods
        
         void set_channel_layout(GstElement *interleave);
-        void init_test_sources(std::vector<GstElement*> & sources);
-        const bool isNetworked() const;
+        void init_sources(std::vector<GstElement*> & sources);
+        const bool hasFileSrc() const;
+        const bool isMono() const;
 
         // data 
         AudioConfig config_;
