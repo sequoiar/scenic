@@ -32,6 +32,8 @@
 
 
 int eventLoop()
+{}
+#if 0
 {
     char c;
     // Approach 1: GMainloop
@@ -70,9 +72,11 @@ int eventLoop()
 
     return 0;
 }
-
+#endif
 
 void gst_main(int argc, char *argv[])
+{}
+#if 0
 {
     long txPort = 10010;
     long rxPort = txPort;
@@ -125,4 +129,4 @@ void gst_main(int argc, char *argv[])
         eventLoop();        // sends requests
     }
 }
-
+#endif
