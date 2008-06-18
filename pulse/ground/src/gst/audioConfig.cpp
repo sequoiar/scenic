@@ -64,8 +64,3 @@ const bool AudioConfig::hasFileSrc() const
 }
 
 
-
-const bool AudioConfig::isMono() const 
-{
-    return (numChannels_ == 1);
-}
