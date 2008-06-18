@@ -23,6 +23,7 @@
 
 #include <vector>
 
+
 typedef struct _GstElement GstElement;
 typedef std::vector<GstElement*>::iterator GstIter;
 
