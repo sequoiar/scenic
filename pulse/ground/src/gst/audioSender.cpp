@@ -230,16 +230,12 @@ void AudioSender::init_sinks()
 
 
 
-// finds last sink ELEMENT, returns a string representation of its sink pad's caps
-// FIXME: what if sink was stored as a member variable?
+// returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
 const std::string AudioSender::caps_str() const
 {
-    //bool done = false;
     std::string result;
-    //gpointer gsink;
     GstPad *pad;
     GstCaps *caps;
-    //GstIterator *it; 
 
     if (!isPlaying())
     {
@@ -253,41 +249,7 @@ const std::string AudioSender::caps_str() const
     assert(caps);
     result = std::string(gst_caps_to_string(caps));
     gst_object_unref(pad);
-    //gst_object_unref(gsink);
-
-#if 0
-    // get pipeline's last sink
-    it = gst_bin_iterate_sinks(GST_BIN (pipeline_));
-
-    while (!done) 
-    {
-        switch (gst_iterator_next(it, &gsink)) 
-        {
-            case GST_ITERATOR_OK:
-                pad = gst_element_get_pad(GST_ELEMENT(gsink), "sink");
-                std::cout << gst_element_get_name(GST_ELEMENT(gsink)) << std::endl;
-                assert(pad); 
-                caps = gst_pad_get_negotiated_caps(pad);
-                assert(caps);
-                result = std::string(gst_caps_to_string(caps));
-                gst_object_unref(pad);
-                gst_object_unref(gsink);
-                done = true;  
-                break;
-            case GST_ITERATOR_RESYNC:
-                gst_iterator_resync(it);
-                break;
-            case GST_ITERATOR_ERROR:
-                done = true;
-                break;
-            case GST_ITERATOR_DONE:
-                done = true;
-                break;
-        }
-    }
-    gst_iterator_free(it);
-
-#endif
+    
     return result;
 }
 

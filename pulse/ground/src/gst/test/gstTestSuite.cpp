@@ -671,6 +671,8 @@ void GstTestSuite::start_2ch_comp_rtp_audiotest()
 
         BLOCK();
         TEST_ASSERT(tx.isPlaying());
+        std::cout << "HERE COMES THE CAPS!!!!" << std::endl; 
+        std::cout << tx.caps_str() << std::endl;
     }
 }
 
