@@ -128,7 +128,6 @@ bool AudioSender::init()
 
     init_sinks();
 
-    std::cout << caps_str();
     return true;
 }
 
