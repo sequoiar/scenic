@@ -128,6 +128,7 @@ bool AudioSender::init()
 
     init_sinks();
 
+    std::cout << caps_str();
     return true;
 }
 
@@ -202,8 +203,6 @@ void AudioSender::init_sources()
 
 void AudioSender::init_sinks()
 {
-    GstElement *sink;       // maybe should be stored as a member variable
-
     if (config_.isNetworked()) 
     {
         GstElement *encoder, *payloader;
@@ -211,22 +210,22 @@ void AudioSender::init_sinks()
         assert(encoder);
         payloader = gst_element_factory_make("rtpvorbispay", NULL);
         assert(payloader);
-        sink = gst_element_factory_make("udpsink", NULL);
-        assert(sink);
+        sink_ = gst_element_factory_make("udpsink", NULL);
+        assert(sink_);
     
-        g_object_set(G_OBJECT(sink), "host", config_.remoteHost(), "port", config_.port(), NULL);
+        g_object_set(G_OBJECT(sink_), "host", config_.remoteHost(), "port", config_.port(), NULL);
 
-        gst_bin_add_many(GST_BIN(pipeline_), encoder, payloader, sink, NULL);
-        assert(gst_element_link_many(interleave_, encoder, payloader, sink, NULL));
+        gst_bin_add_many(GST_BIN(pipeline_), encoder, payloader, sink_, NULL);
+        assert(gst_element_link_many(interleave_, encoder, payloader, sink_, NULL));
     }
     else // local version
     {
-        sink = gst_element_factory_make("jackaudiosink", NULL);
-        assert(sink);
-        g_object_set(G_OBJECT(sink), "sync", FALSE, NULL);
+        sink_ = gst_element_factory_make("jackaudiosink", NULL);
+        assert(sink_);
+        g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
-        gst_bin_add(GST_BIN(pipeline_), sink);
-        assert(gst_element_link_many(interleave_, sink, NULL));
+        gst_bin_add(GST_BIN(pipeline_), sink_);
+        assert(gst_element_link_many(interleave_, sink_, NULL));
     }
 }
 
@@ -236,19 +235,28 @@ void AudioSender::init_sinks()
 // FIXME: what if sink was stored as a member variable?
 const std::string AudioSender::caps_str() const
 {
-    bool done = false;
+    //bool done = false;
     std::string result;
-    gpointer gsink;
+    //gpointer gsink;
     GstPad *pad;
     GstCaps *caps;
-    GstIterator *it; 
+    //GstIterator *it; 
 
     if (!isPlaying())
     {
         std::cout << "Cannot return caps, pipeline hasn't been started yet.";
         return result;
     }
+    pad = gst_element_get_pad(GST_ELEMENT(sink_), "sink");
+    std::cout << gst_element_get_name(GST_ELEMENT(sink_)) << std::endl;
+    assert(pad); 
+    caps = gst_pad_get_negotiated_caps(pad);
+    assert(caps);
+    result = std::string(gst_caps_to_string(caps));
+    gst_object_unref(pad);
+    //gst_object_unref(gsink);
 
+#if 0
     // get pipeline's last sink
     it = gst_bin_iterate_sinks(GST_BIN (pipeline_));
 
@@ -280,6 +288,7 @@ const std::string AudioSender::caps_str() const
     }
     gst_iterator_free(it);
 
+#endif
     return result;
 }
 
