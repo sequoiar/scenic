@@ -28,7 +28,7 @@ AC_MSG_WARN([not found.])
 AC_PROG_GCC_TRADITIONAL
 AC_CHECK_FUNCS([inet_ntoa memset socket])
 
-#Trying to set GST_CFLAGS GST_LIBS using pkg-config
+#Trying to set CPPTEST_LIBS using pkg-config
 PKG_CHECK_MODULES(CPPTEST, libcpptest, have_cpptest=true, have_cpptest=false)
 if test "x${have_cpptest}" = "xfalse" ; then
     AC_MSG_WARN([libcpptest not found.])
@@ -36,17 +36,26 @@ fi
 
 
 
-#Trying to set CPPTEST_LIBS using pkg-config
+#Trying to set GST_CFLAGS GST_LIBS using pkg-config
 PKG_CHECK_MODULES(GST, gstreamer-0.10, have_gstreamer=true, have_gstreamer=false)
 if test "x${have_gstreamer}" = "xfalse" ; then
     AC_MSG_WARN([GStreamer not found.])
 fi
 
-#Trying to set CPPTEST_LIBS using pkg-config
+
+#Trying to set GSTAUDIO using pkg-config
 PKG_CHECK_MODULES(GSTAUDIO, gstreamer-audio-0.10, have_gstreamer_audio=true, have_gstreamer_audio=false)
 if test "x${have_gstreamer_audio}" = "xfalse" ; then
     AC_MSG_WARN([GStreamer-audio not found.])
 fi
+
+
+#Trying to set CPPTEST_LIBS using pkg-config
+PKG_CHECK_MODULES(PJSIP, libpj, have_libpj=true, have_libpj=false)
+if test "x${have_libpj_audio}" = "xfalse" ; then
+    AC_MSG_WARN([PJSIP not found.])
+fi
+
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
@@ -54,16 +63,8 @@ AC_CONFIG_FILES([Makefile
                  src/sdp/test/Makefile
                  src/gst/Makefile
                  src/gst/test/Makefile
+                 src/sip/Makefile
+                 src/sip/test/Makefile
                  ])
 AC_OUTPUT
-
-
-
-
-#                src/gst/Makefile
-#                src/hello/Makefile
-#                src/pyInterpreter/Makefile
-#                 src/sdp/Makefile
-# src/sip/Makefile
-
 
