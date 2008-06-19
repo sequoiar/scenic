@@ -109,44 +109,102 @@ AudioSender::~AudioSender()
 // pipeline could also be built with parse launch
 // FIXME: this needs to be refactored, possibly with template method pattern
 // 
+
 bool AudioSender::init()
 {
-    std::vector<GstElement*> sources, dbins, aconvs, queues; 
-    GstElement *interleave, *encoder, *payloader, *sink;
-    GstIter source, dbin, aconv, queue;
-    
-
     pipeline_ = gst_pipeline_new("txPipeline");
     assert(pipeline_);
 
     make_verbose();
 
-    interleave = gst_element_factory_make("interleave", NULL);
-    assert(interleave);
+    interleave_ = gst_element_factory_make("interleave", NULL);
+    assert(interleave_);
 
-    set_channel_layout(interleave);
+    gst_bin_add(GST_BIN(pipeline_), interleave_);
+
+    set_channel_layout();
     
+    init_sources();
+
+    init_sinks();
+
+    return true;
+}
+
+
+
+void AudioSender::init_sources()
+{
+    GstIter src, aconv, queue;
+
+    // common to all
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
-        sources.push_back(gst_element_factory_make(config_.source(), NULL));
-        assert(sources[channelIdx]);
-        if (config_.hasFileSrc())
-        {
-            g_object_set(G_OBJECT(sources[channelIdx]), "location", "audiofile.pcm", NULL);
-            dbins.push_back(gst_element_factory_make("decodebin", NULL));
-            assert(dbins[channelIdx]);
-        }
-        aconvs.push_back(gst_element_factory_make("audioconvert", NULL));
-        assert(aconvs[channelIdx]);
-        queues.push_back(gst_element_factory_make("queue", NULL));
-        assert(queues[channelIdx]);
+        sources_.push_back(gst_element_factory_make(config_.source(), NULL));
+        assert(sources_[channelIdx]);
+        aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
+        assert(aconvs_[channelIdx]);
+        queues_.push_back(gst_element_factory_make("queue", NULL));
+        assert(queues_[channelIdx]);
+        
+        gst_bin_add_many(GST_BIN(pipeline_), sources_[channelIdx], aconvs_[channelIdx], 
+                queues_[channelIdx], NULL);
     }
 
-    if (!config_.hasFileSrc())
-        init_sources(sources);
+    // FIXME: replace with subclasses?
+    if (config_.hasTestSrc())
+    {
+        const double GAIN = 1.0 / config_.numChannels(); // so sum of tones equals 1.0
+        double frequency = 100.0;
+
+        for (src = sources_.begin(); src != sources_.end(); ++src)
+        {
+            g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
+            frequency += 100.0;
+        }
+        
+
+        for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(); ++src, ++aconv)
+            assert(gst_element_link_many(*src, *aconv, interleave_, NULL));
+    }
+    else if (config_.hasFileSrc())      // adds decoder, which has a dynamic pad
+    {
+        GstIter dec;
+
+        for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
+        {
+            decoders_.push_back(gst_element_factory_make("wavparse", NULL));
+            assert(decoders_[channelIdx]);
+        }
+
+        for (src = sources_.begin(); src != sources_.end(); ++src) 
+            g_object_set(G_OBJECT(*src), "location", "audiofile.pcm", NULL);
+        
+        for (dec = decoders_.begin(); dec != decoders_.end(); ++dec)
+            gst_bin_add(GST_BIN(pipeline_), *dec);
+        
+        for (src = sources_.begin(), dec = decoders_.begin(); src != sources_.end(); ++src, ++dec)
+            assert(gst_element_link(*src, *dec));
+    }
+    else if (config_.hasAlsaSrc())
+    {
+        // initialize alsa source(s) 
+    }
+    else if (config_.hasJackSrc())
+    {
+        // initialize jack source(s) 
+    }
+}
+
+
+
+void AudioSender::init_sinks()
+{
+    GstElement *sink;
 
     if (config_.isNetworked()) 
     {
+        GstElement *encoder, *payloader;
         encoder = gst_element_factory_make("vorbisenc", NULL);
         assert(encoder);
         payloader = gst_element_factory_make("rtpvorbispay", NULL);
@@ -154,10 +212,10 @@ bool AudioSender::init()
         sink = gst_element_factory_make("udpsink", NULL);
         assert(sink);
     
-        g_object_set(G_OBJECT(sink), "host", config_.remoteHost(), "port", config_.port(), 
-                NULL);
+        g_object_set(G_OBJECT(sink), "host", config_.remoteHost(), "port", config_.port(), NULL);
 
-        gst_bin_add_many(GST_BIN(pipeline_), interleave, encoder, payloader, sink, NULL);
+        gst_bin_add_many(GST_BIN(pipeline_), encoder, payloader, sink, NULL);
+        assert(gst_element_link_many(interleave_, encoder, payloader, sink, NULL));
     }
     else // local version
     {
@@ -165,60 +223,11 @@ bool AudioSender::init()
         assert(sink);
         g_object_set(G_OBJECT(sink), "sync", FALSE, NULL);
 
-        gst_bin_add_many(GST_BIN(pipeline_), interleave, sink, NULL);
-    }
-
-    if (config_.hasFileSrc())
-    {
-        for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
-            gst_bin_add_many(GST_BIN(pipeline_), sources[channelIdx], dbins[channelIdx], 
-                    aconvs[channelIdx], queues[channelIdx], NULL);
-    }
-    else
-    {
-        for (source = sources.begin(), aconv = aconvs.begin(), queue = queues.begin(); 
-                source != sources.end() && aconv != aconvs.end() && queue != queues.end();
-                source++, aconv++, queue++)
-            gst_bin_add_many(GST_BIN(pipeline_), *source, *aconv, *queue, NULL);
-    }
-
-    if (config_.isNetworked()) 
-        assert(gst_element_link_many(interleave, encoder, payloader, sink, NULL));
-    else
-        assert(gst_element_link_many(interleave, sink, NULL));
-
-    if (config_.hasFileSrc())
-    {
-        for (source = sources.begin(), dbin = dbins.begin(), aconv = aconvs.begin(); 
-                source != sources.end() && dbin != dbins.end() && aconv != aconvs.end(); 
-                source++, dbin++, aconv++)
-            assert(gst_element_link_many(*source, *dbin, *aconv, interleave, NULL));
-    }
-    else
-    {
-        for (source = sources.begin(), aconv = aconvs.begin(); 
-                source != sources.end() && aconv != aconvs.end(); source++, aconv++)
-            assert(gst_element_link_many(*source, *aconv, interleave, NULL));
-    }
-
-
-    return true;
-}
-
-
-
-void AudioSender::init_sources(std::vector<GstElement*> & sources)
-{
-
-    const double GAIN = 1.0 / config_.numChannels(); // so sum of tones equals 1.0
-    double frequency = 100.0;
-
-    for (GstIter iter = sources.begin(); iter != sources.end(); iter++)
-    {
-        g_object_set(G_OBJECT(*iter), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
-        frequency += 100.0;
+        gst_bin_add(GST_BIN(pipeline_), sink);
+        assert(gst_element_link_many(interleave_, sink, NULL));
     }
 }
+
 
 
 // finds last sink ELEMENT, returns a string representation of its sink pad's caps
@@ -274,13 +283,13 @@ const std::string AudioSender::caps_str() const
 
 
 // set channel layout for interleave element
-void AudioSender::set_channel_layout(GstElement *interleave)
+void AudioSender::set_channel_layout()
 {
     GValue val = { 0, };
     GValueArray *arr;       // for channel position layout
     arr = g_value_array_new(config_.numChannels());
 
-    g_object_set(interleave, "channel-positions-from-input", FALSE, NULL);
+    g_object_set(interleave_, "channel-positions-from-input", FALSE, NULL);
 
     g_value_init(&val, GST_TYPE_AUDIO_CHANNEL_POSITION);
 
@@ -292,7 +301,7 @@ void AudioSender::set_channel_layout(GstElement *interleave)
     }
     g_value_unset(&val);
 
-    g_object_set(interleave, "channel-positions", arr, NULL);
+    g_object_set(interleave_, "channel-positions", arr, NULL);
     g_value_array_free(arr);
 }
 

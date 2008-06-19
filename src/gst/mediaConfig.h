@@ -30,9 +30,9 @@
 class MediaConfig
 {
     public:
-        MediaConfig(std::string source, std::string codec, std::string remoteHost, int port); 
-        MediaConfig(std::string codec, std::string remoteHost, int port); 
-        MediaConfig(std::string source);
+        MediaConfig(std::string source, std::string codec, std::string remoteHost, int port); // sender
+        MediaConfig(std::string codec, int port); // receiver
+        MediaConfig(std::string source); // local sender
 
         const char * source() const;
         const char * codec() const;

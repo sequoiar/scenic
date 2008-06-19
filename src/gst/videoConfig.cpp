@@ -43,8 +43,8 @@ VideoConfig::VideoConfig(std::string source)
 
     
 
-VideoConfig::VideoConfig(int port)  // for receiver
-    : MediaConfig("", "", port)
+VideoConfig::VideoConfig(std::string codec, int port)  // for receiver
+    : MediaConfig(codec, port)
 {
     // empty
 }
