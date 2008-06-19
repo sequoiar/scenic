@@ -31,7 +31,6 @@
 
 #include "hello/hello.h"
 
-#include "gst/videoLocal.h"
 
 using namespace boost::python;
 
@@ -65,7 +64,7 @@ BOOST_PYTHON_MODULE(Hello)
 // Default variable overloads
 //BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(VideoLocal_init_overloads, init, 0, 3)
 
-
+/*
 BOOST_PYTHON_MODULE(VideoLocal)
 {
     class_<VideoLocal>("VideoLocal")
@@ -75,7 +74,7 @@ BOOST_PYTHON_MODULE(VideoLocal)
 
 
 }
-
+*/
 
 
 
@@ -83,7 +82,6 @@ BOOST_PYTHON_MODULE(VideoLocal)
 
 void BOOST_PY_IMPORT()
 {
-    PyImport_AppendInittab((char*)"VideoLocal",&initVideoLocal);
     PyImport_AppendInittab((char*)"Hello",&initHello);
 }
 
@@ -92,7 +90,6 @@ void PYTHON_EXEC_IMPORT(object mm, object mn)
     if(mm)
     {
         exec("import Hello; from Hello import *",mm,mn);
-        exec("import VideoLocal; from VideoLocal import *",mm,mn);
     }
 }
 

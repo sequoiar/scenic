@@ -30,7 +30,12 @@
 
 #include "defaultAddresses.h"
 
-
+int main(int argc, char *argv[])
+{
+    SipSingleton &sip = *SipSingleton::Instance();
+    return 0;
+}
+#if 0
 bool eventLoop()
 {
     char c[2];
@@ -140,4 +145,5 @@ int main(int argc, char *argv[])
     }
     return 0;
 }
+#endif
 
