@@ -183,6 +183,8 @@ void AudioSender::init_sources()
         for (dec = decoders_.begin(); dec != decoders_.end(); ++dec)
             gst_bin_add(GST_BIN(pipeline_), *dec);
         
+        // FIXME: decoder has dynamic sink, must be linked by callback to audioconvert 
+        // and then interleave...i think
         for (src = sources_.begin(), dec = decoders_.begin(); src != sources_.end(); ++src, ++dec)
             assert(gst_element_link(*src, *dec));
     }
@@ -200,7 +202,7 @@ void AudioSender::init_sources()
 
 void AudioSender::init_sinks()
 {
-    GstElement *sink;
+    GstElement *sink;       // maybe should be stored as a member variable
 
     if (config_.isNetworked()) 
     {
@@ -231,6 +233,7 @@ void AudioSender::init_sinks()
 
 
 // finds last sink ELEMENT, returns a string representation of its sink pad's caps
+// FIXME: what if sink was stored as a member variable?
 const std::string AudioSender::caps_str() const
 {
     bool done = false;
