@@ -35,10 +35,15 @@ class AudioConfig : public MediaConfig
         AudioConfig(std::string source, int numChannels, std::string codec, 
                 std::string remoteHost, int port); // sender
         AudioConfig(int numChannels, std::string codec, int port); // receiver
-        AudioConfig(std::string source, int numChannels); // localtest
+        AudioConfig(std::string source, int numChannels); // local sender
         
         const int numChannels() const;
+        
+        // to be replaced
+        const bool hasTestSrc() const;
         const bool hasFileSrc() const;
+        const bool hasAlsaSrc() const;
+        const bool hasJackSrc() const;
 
     protected: 
         const int numChannels_;

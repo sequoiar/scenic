@@ -96,13 +96,14 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile)
             TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile)
 
-#if 0
-            TEST_ADD(GstTestSuite::start_1ch_uncomp_rtp_audiotest)
-            TEST_ADD(GstTestSuite::stop_1ch_uncomp_rtp_audiotest)
-            TEST_ADD(GstTestSuite::start_stop_1ch_uncomp_rtp_audiotest)
-#endif
     #endif // RTP
 #endif // AUDIO
+#if 0
+            TEST_ADD(GstTestSuite::start_8ch_comp_audiofile)
+            TEST_ADD(GstTestSuite::stop_8ch_comp_audiofile)
+            TEST_ADD(GstTestSuite::start_stop_8ch_comp_audiofile)
+#endif
+
         }
 
         void set_id(int id);
@@ -162,6 +163,10 @@ class GstTestSuite : public Test::Suite
         void stop_8ch_comp_rtp_audiotest();
         void start_stop_8ch_comp_rtp_audiotest();
 
+        void start_8ch_comp_audiofile();
+        void stop_8ch_comp_audiofile();
+        void start_stop_8ch_comp_audiofile();
+        
         void start_8ch_comp_rtp_audiofile();
         void stop_8ch_comp_rtp_audiofile();
         void start_stop_8ch_comp_rtp_audiofile();

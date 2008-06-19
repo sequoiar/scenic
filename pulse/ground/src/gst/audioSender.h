@@ -42,13 +42,15 @@ class AudioSender : public MediaBase
 
         // helper methods
        
-        void set_channel_layout(GstElement *interleave);
-        void init_sources(std::vector<GstElement*> & sources);
-        const bool hasFileSrc() const;
-        const bool isMono() const;
+        static void cb_new_pad(GstElement *element, GstPad *pad, gpointer data);
+        void set_channel_layout();
+        void init_sources();
+        void init_sinks();
 
         // data 
         AudioConfig config_;
+        std::vector<GstElement*> sources_, decoders_, aconvs_, queues_;
+        GstElement* interleave_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
 };
 

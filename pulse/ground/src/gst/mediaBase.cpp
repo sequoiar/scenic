@@ -22,7 +22,6 @@
 
 #include "mediaBase.h"
 
-//const int MediaBase::DEF_PORT = 10010;
 bool MediaBase::gstInitialized_ = false;
 
 MediaBase::MediaBase() : pipeline_(0), verbose_(true)

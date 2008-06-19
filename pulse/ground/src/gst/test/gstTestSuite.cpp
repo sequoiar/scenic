@@ -201,7 +201,7 @@ void GstTestSuite::start_v4l_rtp()
     }
     else
     {
-        VideoConfig config(10010);
+        VideoConfig config("h264", 10010);
         VideoReceiver rx(config);
         rx.init();
 
@@ -229,7 +229,7 @@ void GstTestSuite::stop_v4l_rtp()
     }
     else
     {
-        VideoConfig config(10010);
+        VideoConfig config("h264", 10010);
         VideoReceiver rx(config);
         rx.init();
 
@@ -260,7 +260,7 @@ void GstTestSuite::start_stop_v4l_rtp()
     }
     else
     {
-        VideoConfig config(10010);
+        VideoConfig config("h264", 10010);
         VideoReceiver rx(config);
         rx.init();
         
@@ -335,7 +335,7 @@ void GstTestSuite::start_dv_rtp()
     // receiver should be started first, of course there's no guarantee that it will at this point
     if (id_ == 0)
     {
-        VideoConfig config(10010);
+        VideoConfig config("h264", 10010);
         VideoReceiver rx(config);
         rx.init();
 
@@ -363,7 +363,7 @@ void GstTestSuite::stop_dv_rtp()
 {
     if (id_ == 0)
     {
-        VideoConfig config(10010);
+        VideoConfig config("h264", 10010);
         VideoReceiver rx(config);
         rx.init();
 
@@ -391,7 +391,7 @@ void GstTestSuite::start_stop_dv_rtp()
 {
     if (id_ == 0)
     {
-        VideoConfig config(10010);
+        VideoConfig config("h264", 10010);
         VideoReceiver rx(config);
         rx.init();
 
@@ -836,6 +836,65 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiotest()
 
 
 
+void GstTestSuite::start_8ch_comp_audiofile()
+{
+    int numChannels = 8;
+
+    if (id_ == 1)
+        return;
+        
+    AudioConfig config("filesrc", numChannels);
+    AudioSender tx(config);
+    tx.init();
+        
+    TEST_ASSERT(tx.start());
+
+    BLOCK();
+    TEST_ASSERT(tx.isPlaying());
+}
+
+
+
+void GstTestSuite::stop_8ch_comp_audiofile()
+{
+    int numChannels = 8;
+    if (id_ == 1)
+        return;
+        
+    AudioConfig config("filesrc", numChannels);
+    AudioSender tx(config);
+    tx.init();
+
+    BLOCK();
+
+    TEST_ASSERT(tx.stop());
+    TEST_ASSERT(!tx.isPlaying());
+}
+
+
+
+void GstTestSuite::start_stop_8ch_comp_audiofile()
+{
+    int numChannels = 8;
+    if (id_ == 1)
+        return;
+
+    AudioConfig config("filesrc", numChannels);
+    AudioSender tx(config);
+    TEST_ASSERT(tx.init());
+
+    TEST_ASSERT(tx.start());
+
+    BLOCK();
+    TEST_ASSERT(tx.isPlaying());
+
+    TEST_ASSERT(tx.stop());
+    TEST_ASSERT(!tx.isPlaying());
+
+}
+
+
+
 void GstTestSuite::start_8ch_comp_rtp_audiofile()
 {
     int numChannels = 8;
@@ -845,7 +904,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiofile()
         AudioConfig config(numChannels, "vorbis", 10010);
         AudioReceiver rx(config);
         rx.init();
-        
+
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -856,7 +915,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiofile()
         AudioConfig config("filesrc", numChannels, "vorbis", MY_ADDRESS, 10010);
         AudioSender tx(config);
         tx.init();
-        
+
         TEST_ASSERT(tx.start());
 
         BLOCK();
@@ -917,7 +976,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile()
         AudioConfig config("filesrc", numChannels, "vorbis", MY_ADDRESS, 10010);
         AudioSender tx(config);
         TEST_ASSERT(tx.init());
-        
+
         TEST_ASSERT(tx.start());
 
         BLOCK();
@@ -1003,7 +1062,7 @@ void GstTestSuite::start_stop_1ch_uncomp_rtp_audiotest()
         TEST_ASSERT(rx.start());
 
         BLOCK();
-        
+
         TEST_ASSERT(rx.isPlaying());
 
         TEST_ASSERT(rx.stop());
