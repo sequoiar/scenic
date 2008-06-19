@@ -1,3 +1,3 @@
-noinst_LIBRARY= libhello.a
+noinst_LIBRARIES= libhello.a
 
-libhello_a_SOURCES = hello.c
+libhello_a_SOURCES = hello.cpp

@@ -22,7 +22,6 @@ AC_CHECK_HEADERS([arpa/inet.h stdlib.h string.h sys/ioctl.h unistd.h])
 AC_HEADER_STDBOOL
 AC_C_CONST
 
-AC_MSG_WARN([not found.])
 
 # Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
@@ -52,9 +51,19 @@ fi
 
 #Trying to set CPPTEST_LIBS using pkg-config
 PKG_CHECK_MODULES(PJSIP, libpj, have_libpj=true, have_libpj=false)
-if test "x${have_libpj_audio}" = "xfalse" ; then
+if test "x${have_libpj}" = "xfalse" ; then
     AC_MSG_WARN([PJSIP not found.])
 fi
+
+
+PYTHON_CFLAGS="-I/usr/include/boost/python "
+PYTHON_CFLAGS+=`python-config --includes` 
+PYTHON_LIBS="/usr/lib/libboost_python.so "
+PYTHON_LIBS+=`python-config --ldflags` 
+
+AC_SUBST(PYTHON_CFLAGS)
+AC_SUBST(PYTHON_LIBS)
+
 
 
 AC_CONFIG_FILES([Makefile
@@ -65,6 +74,8 @@ AC_CONFIG_FILES([Makefile
                  src/gst/test/Makefile
                  src/sip/Makefile
                  src/sip/test/Makefile
+                 src/hello/Makefile
+                 src/pyInterpreter/Makefile
                  ])
 AC_OUTPUT
 
