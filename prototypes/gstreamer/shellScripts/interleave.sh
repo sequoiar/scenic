@@ -1,4 +1,4 @@
-gst-launch-0.10 -v interleave name=i ! audioconvert  ! queue ! alsasink \
+gst-launch-0.10 -v interleave name=i ! audioconvert  ! queue ! jackaudiosink \
  audiotestsrc volume=0.5 freq=200 is-live=true ! audioconvert ! queue ! i. \
  audiotestsrc volume=0.1 freq=300 is-live=true ! audioconvert  ! queue ! i. \
  audiotestsrc volume=0.1 freq=500 is-live=true ! audioconvert ! queue ! i. \

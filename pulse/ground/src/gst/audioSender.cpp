@@ -30,6 +30,7 @@
 #include <gst/gst.h>
 #include <gst/audio/multichannel.h>
 
+#include "logWriter.h"
 #include "audioSender.h"
 
 
@@ -104,8 +105,6 @@ AudioSender::~AudioSender()
     // empty
 }
 
-
-
 // pipeline could also be built with parse launch
 // FIXME: this needs to be refactored, possibly with template method pattern
 // 
@@ -117,18 +116,38 @@ bool AudioSender::init()
 
     make_verbose();
 
-    interleave_ = gst_element_factory_make("interleave", NULL);
-    assert(interleave_);
-
-    gst_bin_add(GST_BIN(pipeline_), interleave_);
-
-    set_channel_layout();
+    init_interleave();
     
     init_sources();
 
     init_sinks();
 
     return true;
+}
+
+
+
+void AudioSender::init_interleave()
+{
+    interleave_ = gst_element_factory_make("interleave", NULL);
+    assert(interleave_);
+
+    gst_bin_add(GST_BIN(pipeline_), interleave_);
+
+    set_channel_layout();
+}
+
+
+
+void AudioSender::cb_new_pad(GstElement *decoder, GstPad *srcPad, gpointer data)
+{
+    GstElement *aconv = (GstElement *) data;
+    GstPad *sinkPad;
+    LOG("Dynamic pad created, linking src and sinkpad.");
+    
+    sinkPad = gst_element_get_static_pad(aconv, "sink");
+    assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
+    gst_object_unref(sinkPad);
 }
 
 
@@ -157,13 +176,9 @@ void AudioSender::init_sources()
         const double GAIN = 1.0 / config_.numChannels(); // so sum of tones equals 1.0
         double frequency = 100.0;
 
-        for (src = sources_.begin(); src != sources_.end(); ++src)
-        {
+        for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
             g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
-            frequency += 100.0;
-        }
         
-
         for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(); ++src, ++aconv)
             assert(gst_element_link_many(*src, *aconv, interleave_, NULL));
     }
@@ -180,13 +195,19 @@ void AudioSender::init_sources()
         for (src = sources_.begin(); src != sources_.end(); ++src) 
             g_object_set(G_OBJECT(*src), "location", "audiofile.pcm", NULL);
         
-        for (dec = decoders_.begin(); dec != decoders_.end(); ++dec)
+        for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
+        {
             gst_bin_add(GST_BIN(pipeline_), *dec);
+            g_signal_connect(*dec, "pad-added", G_CALLBACK(cb_new_pad), (void *) *aconv);
+        }
         
         // FIXME: decoder has dynamic sink, must be linked by callback to audioconvert 
         // and then interleave...i think
         for (src = sources_.begin(), dec = decoders_.begin(); src != sources_.end(); ++src, ++dec)
             assert(gst_element_link(*src, *dec));
+        
+        for (aconv = aconvs_.begin(), aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
+            assert(gst_element_link(*aconv, interleave_));
     }
     else if (config_.hasAlsaSrc())
     {
@@ -277,9 +298,6 @@ void AudioSender::set_channel_layout()
     g_object_set(interleave_, "channel-positions", arr, NULL);
     g_value_array_free(arr);
 }
-
-
-
 
 
 #if 0
@@ -398,11 +416,13 @@ void AudioSender::init_uncomp_rtp_test(int numChannels)
 }
 #endif
 
-
-
 bool AudioSender::start()
 {
-    std::cout << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port() << std::endl;
+    if (config_.isNetworked())
+    {
+    std::cout << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port() 
+        << std::endl;
+    }
     MediaBase::start();
     return true;
 }
