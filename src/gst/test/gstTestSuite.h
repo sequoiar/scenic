@@ -102,7 +102,6 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile)
             TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile)
             TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile)
-
         }
 
         void set_id(int id);

@@ -26,13 +26,15 @@
 #include <cassert>
 #include <gst/gst.h>
 
+#include "lo/lo.h"
+
 #include "mediaBase.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
 
 
 
-AudioReceiver::AudioReceiver(const AudioConfig& config) : config_(config)
+AudioReceiver::AudioReceiver(const AudioConfig& config) : config_(config), gotCaps_(false)
 {
    // empty 
 }
@@ -44,6 +46,40 @@ AudioReceiver::~AudioReceiver()
     // empty
 }
 
+
+
+void AudioReceiver::wait_for_caps() 
+{
+    bool done = false;
+    lo_server_thread st = lo_server_thread_new("7770", NULL);
+
+    //int (AudioReceiver::*funcPtr)(const char*, const char*, lo_arg **, int, void *, void*) = &AudioReceiver::caps_handler;
+
+    lo_server_thread_add_method(st, NULL, NULL, caps_handler, (void *) this); 
+
+    while (!gotCaps_)
+        usleep(1000);
+
+    lo_server_thread_free(st);
+}
+
+void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
+{
+        printf("liblo server error %d in path %s: %s\n", num, path, msg);
+            fflush(stdout);
+}
+
+
+int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg **argv, int argc, 
+        void *data, void *user_data)
+{
+    std::cout << " GOT CAPS!!!!" << std::endl;
+    std::cout.flush();
+    AudioReceiver *receiver = (AudioReceiver*) user_data;
+    receiver->capsStr_ = std::string(path);
+    receiver->gotCaps_ = true;
+    return 0;
+}
 
 
 
@@ -62,10 +98,16 @@ bool AudioReceiver::init()
     assert(rxSrc);
     
     // FIXME: caps shouldn't be hardcoded
+#if 0
     if (config_.numChannels() == 2)
         caps = gst_caps_from_string(AudioReceiver::CAPS_STR[0].c_str());
     else if (config_.numChannels() == 8)
         caps = gst_caps_from_string(AudioReceiver::CAPS_STR[1].c_str());
+#endif
+    std::cout << "Waiting for caps" << std::endl;
+    wait_for_caps();
+    assert(!capsStr_.compare(""));
+    caps = gst_caps_from_string(capsStr_.c_str());
 
     assert(caps);
     g_object_set(G_OBJECT(rxSrc), "caps", caps, NULL);

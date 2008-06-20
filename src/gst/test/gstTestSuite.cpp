@@ -919,6 +919,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiofile()
 
         BLOCK();
         TEST_ASSERT(tx.isPlaying());
+        tx.send_caps();
     }
 }
 
