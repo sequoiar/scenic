@@ -30,6 +30,8 @@
 #include <gst/gst.h>
 #include <gst/audio/multichannel.h>
 
+#include "lo/lo.h"
+
 #include "logWriter.h"
 #include "audioSender.h"
 
@@ -264,14 +266,23 @@ const std::string AudioSender::caps_str() const
         return result;
     }
     pad = gst_element_get_pad(GST_ELEMENT(sink_), "sink");
-    std::cout << gst_element_get_name(GST_ELEMENT(sink_)) << std::endl;
     assert(pad); 
     caps = gst_pad_get_negotiated_caps(pad);
     assert(caps);
-    result = std::string(gst_caps_to_string(caps));
     gst_object_unref(pad);
+
+    result = std::string(gst_caps_to_string(caps));
     
     return result;
+}
+
+
+
+void AudioSender::send_caps() const
+{
+    lo_address t = lo_address_new(NULL, "7770");
+    if (lo_send(t, caps_str().c_str(), NULL) == -1)
+        std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
 }
 
 
@@ -424,6 +435,7 @@ bool AudioSender::start()
         << std::endl;
     }
     MediaBase::start();
+    
     return true;
 }
 

@@ -23,6 +23,8 @@
 
 #include <string>
 
+#include "lo/lo.h"
+
 #include "mediaBase.h"
 #include "audioConfig.h"
 
@@ -39,9 +41,17 @@ class AudioReceiver : public MediaBase
 
     private:
 //        int numChannels_;
+        void wait_for_caps();
+        static int caps_handler(const char *path, const char *types, lo_arg **argv, int argc, 
+                void *data, void *user_data);
+
+        static void liblo_error(int num, const char *msg, const char *path);
         AudioConfig config_;
+        bool gotCaps_;
+        std::string capsStr_;
         static const std::string CAPS_STR[2];
 };
+
 
 #endif // _AUDIO_RECEIVER_H_
 

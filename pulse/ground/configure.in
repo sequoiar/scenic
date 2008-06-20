@@ -49,12 +49,17 @@ if test "x${have_gstreamer_audio}" = "xfalse" ; then
 fi
 
 
-#Trying to set CPPTEST_LIBS using pkg-config
+#Trying to set PJSIP using pkg-config
 PKG_CHECK_MODULES(PJSIP, libpj, have_libpj=true, have_libpj=false)
 if test "x${have_libpj}" = "xfalse" ; then
     AC_MSG_WARN([PJSIP not found.])
 fi
 
+#Trying to set LIBLO using pkg-config
+PKG_CHECK_MODULES(LIBLO, liblo, have_liblo=true, have_liblo=false)
+if test "x${have_liblo}" = "xfalse" ; then
+    AC_MSG_WARN([LIBLO not found.])
+fi
 
 PYTHON_CFLAGS="-I/usr/include/boost/python "
 PYTHON_CFLAGS+=`python-config --includes` 
