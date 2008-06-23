@@ -55,7 +55,7 @@ void AudioReceiver::wait_for_caps()
 
     lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
-    lo_server_thread_add_method(st, NULL, NULL, caps_handler, (void *) this); 
+    lo_server_thread_add_method(st, "/audio/rx", "s", caps_handler, (void *) this); 
 
     lo_server_thread_start(st);
 
@@ -75,7 +75,7 @@ void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
 int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg **argv, int argc, 
         void *data, void *user_data)
 {
-    static_cast<AudioReceiver*>(user_data)->set_caps(path);
+    static_cast<AudioReceiver*>(user_data)->set_caps(&argv[0]->s);
     return 0;
 }
 

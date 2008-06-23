@@ -277,7 +277,7 @@ void AudioSender::send_caps() const
 {
     LOG("Sending caps...");
     lo_address t = lo_address_new(NULL, "7770");
-    if (lo_send(t, caps_str().c_str(), NULL) == -1)
+    if (lo_send(t, "/audio/rx", "s", caps_str().c_str()) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
 }
 
