@@ -1,5 +1,6 @@
 proj_src = $(top_srcdir)/src
 INCLUDES = -I$(proj_src)/include -I$(proj_src)
+OBJDIR=obj
 
 noinst_LIBRARIES = libsdp.a
 
