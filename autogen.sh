@@ -3,5 +3,5 @@
 aclocal
 autoconf
 automake -a
-./configure --prefix `pwd`
+./configure 
 

@@ -30,7 +30,7 @@
 
 #include <iostream>
 
-#define LOGGING 1
+#define LOGGING 0
 
 #if LOGGING
     #define LOG(x) \
