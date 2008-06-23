@@ -249,16 +249,13 @@ void AudioSender::init_sinks()
 }
 
 
-
 // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
-const std::string AudioSender::caps_str() const
+const char * AudioSender::caps_str() const
 {
-    std::string result;
+    assert(isPlaying());
+
     GstPad *pad;
     GstCaps *caps;
-
-    while (!isPlaying())
-        usleep(1000);
 
     pad = gst_element_get_pad(GST_ELEMENT(sink_), "sink");
     assert(pad); 
@@ -266,9 +263,7 @@ const std::string AudioSender::caps_str() const
     assert(caps);
     gst_object_unref(pad);
 
-    result = std::string(gst_caps_to_string(caps));
-    
-    return result;
+    return gst_caps_to_string(caps);
 }
 
 
@@ -276,8 +271,9 @@ const std::string AudioSender::caps_str() const
 void AudioSender::send_caps() const
 {
     LOG("Sending caps...");
+    
     lo_address t = lo_address_new(NULL, "7770");
-    if (lo_send(t, "/audio/rx", "s", caps_str().c_str()) == -1)
+    if (lo_send(t, "/audio/rx", "s", caps_str()) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
 }
 
@@ -427,11 +423,13 @@ bool AudioSender::start()
 {
     MediaBase::start();
 
-    if (config_.isNetworked())
+    if (config_.isNetworked())    
     {
         std::cout << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port() 
             << std::endl;
-        send_caps();
+        
+        wait_until_playing();
+        send_caps();   
     }
 
     return true;

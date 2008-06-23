@@ -40,6 +40,7 @@ class MediaBase
         virtual ~MediaBase(); 
         void init_pipeline();
         void make_verbose();
+        void wait_until_playing();
         bool check_pipeline();
 
         GstElement *pipeline_;
