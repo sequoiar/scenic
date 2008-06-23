@@ -102,6 +102,15 @@ void MediaBase::make_verbose()
 }
 
 
+
+void MediaBase::wait_until_playing()
+{
+    while (!isPlaying())  // wait for pipeline to get rolling
+        usleep(1000);
+}
+
+
+
 bool MediaBase::check_pipeline()
 {
     // FIXME: i should be checking all elements the pipeline

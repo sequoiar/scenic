@@ -40,7 +40,7 @@ VideoSender::~VideoSender()
 }
 
 
-
+// FIXME: make this more like AudioSender::init()
 bool VideoSender::init()
 {
     GError* error = NULL;
@@ -69,7 +69,7 @@ bool VideoSender::init()
 
     make_verbose();
 
-    // FIXME: this method should actually check the pipeline
+    // FIXME: this method should actually check the pipeline, currently does nothing
     return check_pipeline();
 }
 
