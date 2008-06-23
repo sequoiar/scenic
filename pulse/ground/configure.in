@@ -70,7 +70,6 @@ AC_SUBST(PYTHON_CFLAGS)
 AC_SUBST(PYTHON_LIBS)
 
 
-
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/sdp/Makefile
