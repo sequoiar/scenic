@@ -8,7 +8,7 @@ make install
 
 files will be in ./bin
 
-To compile, create a file in src/gst called defaultAddresses.h, substituting 
+To compile, create a file in src/include called defaultAddresses.h, substituting 
 the IP addresses with yours and another host's (or yours again for local 
 testing). See example below:
 
