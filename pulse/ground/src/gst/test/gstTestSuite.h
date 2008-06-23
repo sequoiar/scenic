@@ -32,8 +32,8 @@
 
 #define BLOCKING 1
 #define VIDEO 0
-#define AUDIO 0
-#define RTP 0
+#define AUDIO 1
+#define RTP 1
 
 
 class GstTestSuite : public Test::Suite
@@ -96,12 +96,16 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiotest)
             TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiotest)
 
-    #endif // RTP
-#endif // AUDIO
-
             TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile)
             TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile)
             TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile)
+
+    #endif // RTP
+#endif // AUDIO
+
+/*----------------------------------------------*/ 
+/*      SANDBOX                                 */
+/*----------------------------------------------*/ 
         }
 
         void set_id(int id);
@@ -164,19 +168,19 @@ class GstTestSuite : public Test::Suite
         void start_8ch_comp_audiofile();
         void stop_8ch_comp_audiofile();
         void start_stop_8ch_comp_audiofile();
-        
+
         void start_8ch_comp_rtp_audiofile();
         void stop_8ch_comp_rtp_audiofile();
         void start_stop_8ch_comp_rtp_audiofile();
 };
 
 #if BLOCKING
-    #define BLOCK() std::cout.flush();                              \
-                    std::cout << __FILE__ << ":" << __LINE__        \
-                    << ": blocking, enter any key." << std::endl;   \
-                    std::cin.get()
+#define BLOCK() std::cout.flush();                              \
+    std::cout << __FILE__ << ":" << __LINE__        \
+<< ": blocking, enter any key." << std::endl;   \
+std::cin.get()
 #else
-    #define BLOCK()
+#define BLOCK()
 #endif 
 
 

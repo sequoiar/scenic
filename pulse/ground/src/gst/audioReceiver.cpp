@@ -28,6 +28,7 @@
 
 #include "lo/lo.h"
 
+#include "logWriter.h"
 #include "mediaBase.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
@@ -50,12 +51,13 @@ AudioReceiver::~AudioReceiver()
 
 void AudioReceiver::wait_for_caps() 
 {
-    bool done = false;
-    lo_server_thread st = lo_server_thread_new("7770", NULL);
+    LOG("Waiting for caps...");
 
-    //int (AudioReceiver::*funcPtr)(const char*, const char*, lo_arg **, int, void *, void*) = &AudioReceiver::caps_handler;
+    lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
     lo_server_thread_add_method(st, NULL, NULL, caps_handler, (void *) this); 
+
+    lo_server_thread_start(st);
 
     while (!gotCaps_)
         usleep(1000);
@@ -73,12 +75,20 @@ void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
 int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg **argv, int argc, 
         void *data, void *user_data)
 {
-    std::cout << " GOT CAPS!!!!" << std::endl;
-    std::cout.flush();
-    AudioReceiver *receiver = (AudioReceiver*) user_data;
-    receiver->capsStr_ = std::string(path);
-    receiver->gotCaps_ = true;
+    static_cast<AudioReceiver*>(user_data)->set_caps(path);
     return 0;
+}
+
+
+
+void AudioReceiver::set_caps(const char *capsStr)
+{
+    GstCaps *caps;
+    caps = gst_caps_from_string(capsStr);
+    assert(caps);
+    g_object_set(G_OBJECT(source_), "caps", caps, NULL);
+    gst_caps_unref(caps);
+    gotCaps_ = true;
 }
 
 
@@ -86,34 +96,36 @@ int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg **ar
 bool AudioReceiver::init()
 {
     //  Create receiver pipeline
-    GstElement *rxSrc, *depayloader, *decoder, *rxSink;
-    GstCaps *caps;
+    GstElement *depayloader, *decoder, *rxSink;
+    //GstCaps *caps;
 
-    pipeline_ = gst_pipeline_new("rxPipeline");
-    assert(pipeline_);
+    init_pipeline();
 
-    make_verbose();
-
-    rxSrc = gst_element_factory_make("udpsrc", "rxSrc");
-    assert(rxSrc);
+    source_= gst_element_factory_make("udpsrc", "source");
+    assert(source_);
     
-    // FIXME: caps shouldn't be hardcoded
 #if 0
     if (config_.numChannels() == 2)
         caps = gst_caps_from_string(AudioReceiver::CAPS_STR[0].c_str());
     else if (config_.numChannels() == 8)
         caps = gst_caps_from_string(AudioReceiver::CAPS_STR[1].c_str());
 #endif
+    // FIXME: caps will be null if sender isn't playing anything
+    
+#if 0
     std::cout << "Waiting for caps" << std::endl;
     wait_for_caps();
-    assert(!capsStr_.compare(""));
+#endif
+    
+#if 0
     caps = gst_caps_from_string(capsStr_.c_str());
 
     assert(caps);
     g_object_set(G_OBJECT(rxSrc), "caps", caps, NULL);
     gst_caps_unref(caps);
+#endif
 
-    g_object_set(G_OBJECT(rxSrc), "port", config_.port(), NULL);
+    g_object_set(G_OBJECT(source_), "port", config_.port(), NULL);
 
     depayloader = gst_element_factory_make("rtpvorbisdepay", "depayloader");
     assert(depayloader);
@@ -125,11 +137,11 @@ bool AudioReceiver::init()
     assert(rxSink);
     g_object_set(G_OBJECT(rxSink), "sync", FALSE, NULL);
 
-    gst_bin_add_many(GST_BIN(pipeline_), rxSrc, depayloader, 
+    gst_bin_add_many(GST_BIN(pipeline_), source_, depayloader, 
             decoder, rxSink, NULL); 
 
     std::cout << "Receiving media on port : " << config_.port() << std::endl;
-    assert(gst_element_link_many(rxSrc, depayloader, decoder, rxSink, NULL));
+    assert(gst_element_link_many(source_, depayloader, decoder, rxSink, NULL));
 
     return true;
 }
@@ -329,6 +341,7 @@ bool AudioReceiver::init_uncomp(int port, int numChannels)
 
 bool AudioReceiver::start()
 {
+    wait_for_caps();
     std::cout << "Receiving audio on port " << config_.port() << std::endl;
     MediaBase::start();
     return true;

@@ -38,7 +38,6 @@ class AudioSender : public MediaBase
         const std::string caps_str() const;
         virtual bool start();
 
-        void send_caps() const;
     private:
 
         // helper methods
@@ -49,6 +48,7 @@ class AudioSender : public MediaBase
         void init_sources();
         void init_sinks();
 
+        void send_caps() const;
 
         // data 
         AudioConfig config_;

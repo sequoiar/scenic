@@ -47,8 +47,7 @@ bool VideoReceiver::init()
     GstElement *rxSrc, *ffdec_h264, *rtph264depay, *rxSink;
     GstCaps *caps;
 
-    pipeline_ = gst_pipeline_new("txPipeline");
-    assert(pipeline_);
+    init_pipeline();
 
     rxSrc = gst_element_factory_make("udpsrc", "rxSrc");
     assert(rxSrc);

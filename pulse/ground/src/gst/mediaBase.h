@@ -38,12 +38,14 @@ class MediaBase
     protected:
         MediaBase();
         virtual ~MediaBase(); 
-        bool check_pipeline();
+        void init_pipeline();
         void make_verbose();
+        bool check_pipeline();
+
         GstElement *pipeline_;
-        bool verbose_;
 
     private:
+        bool verbose_;
         static bool gstInitialized_;
 };
 
