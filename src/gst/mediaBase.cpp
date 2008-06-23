@@ -19,12 +19,13 @@
 //
 
 #include <gst/gst.h>
+#include <cassert>
 
 #include "mediaBase.h"
 
 bool MediaBase::gstInitialized_ = false;
 
-MediaBase::MediaBase() : pipeline_(0), verbose_(true)
+MediaBase::MediaBase() : pipeline_(0), verbose_(false)
 {
     if (!gstInitialized_)
     {
@@ -77,6 +78,14 @@ int MediaBase::port() const
 }
 #endif
 
+void MediaBase::init_pipeline()
+{
+    pipeline_ = gst_pipeline_new("pipeline");
+    assert(pipeline_);
+
+    if (verbose_)
+        make_verbose();
+}
 
 
 void MediaBase::make_verbose()

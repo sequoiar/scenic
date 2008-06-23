@@ -113,10 +113,7 @@ AudioSender::~AudioSender()
 
 bool AudioSender::init()
 {
-    pipeline_ = gst_pipeline_new("txPipeline");
-    assert(pipeline_);
-
-    make_verbose();
+    init_pipeline();
 
     init_interleave();
     
@@ -260,11 +257,9 @@ const std::string AudioSender::caps_str() const
     GstPad *pad;
     GstCaps *caps;
 
-    if (!isPlaying())
-    {
-        std::cout << "Cannot return caps, pipeline hasn't been started yet.";
-        return result;
-    }
+    while (!isPlaying())
+        usleep(1000);
+
     pad = gst_element_get_pad(GST_ELEMENT(sink_), "sink");
     assert(pad); 
     caps = gst_pad_get_negotiated_caps(pad);
@@ -280,6 +275,7 @@ const std::string AudioSender::caps_str() const
 
 void AudioSender::send_caps() const
 {
+    LOG("Sending caps...");
     lo_address t = lo_address_new(NULL, "7770");
     if (lo_send(t, caps_str().c_str(), NULL) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
@@ -429,13 +425,15 @@ void AudioSender::init_uncomp_rtp_test(int numChannels)
 
 bool AudioSender::start()
 {
+    MediaBase::start();
+
     if (config_.isNetworked())
     {
-    std::cout << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port() 
-        << std::endl;
+        std::cout << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port() 
+            << std::endl;
+        send_caps();
     }
-    MediaBase::start();
-    
+
     return true;
 }
 
