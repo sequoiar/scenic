@@ -1,5 +1,5 @@
 /* GTHREAD-QUEUE-PAIR - Library of Thread Queue Routines for GLIB
- * Copyright (C) 2008	Koya Charles, Tristan Matthews 
+ * Copyright 2008  Koya Charles & Tristan Matthews 
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
