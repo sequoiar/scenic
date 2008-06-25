@@ -34,13 +34,13 @@ class AudioReceiver : public MediaBase
         AudioReceiver();
         AudioReceiver(const AudioConfig& config);
         virtual ~AudioReceiver();
-        bool init();
-        //bool init(int port = DEF_PORT, int numChannels = 2);
-        //bool init_uncomp(int port = DEF_PORT, int numChannels = 1);
         virtual bool start();
 
     private:
-//        int numChannels_;
+        virtual void init_source();
+        virtual void init_codec();
+        virtual void init_sink();
+
         static int caps_handler(const char *path, const char *types, lo_arg **argv, int argc, 
                 void *data, void *user_data);
         
@@ -49,11 +49,9 @@ class AudioReceiver : public MediaBase
         
         void wait_for_caps();
 
-        GstElement *source_;
+        GstElement *source_, *depayloader_, *decoder_, *sink_;
         AudioConfig config_;
         bool gotCaps_;
-        //std::string capsStr_;
-        static const std::string CAPS_STR[2];
 };
 
 

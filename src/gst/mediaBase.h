@@ -34,6 +34,7 @@ class MediaBase
         virtual bool start();
         virtual bool stop();
         bool isPlaying() const;
+        bool init();
 
 
     protected:
@@ -41,6 +42,9 @@ class MediaBase
         MediaBase();
         virtual ~MediaBase(); 
         virtual void init_pipeline();
+        virtual void init_source() = 0;
+        virtual void init_codec() = 0;
+        virtual void init_sink() = 0;
         void make_verbose();
         void wait_until_playing();
 

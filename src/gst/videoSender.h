@@ -33,15 +33,13 @@ class VideoSender : public MediaBase
     public:
         VideoSender(const VideoConfig& config);
         virtual ~VideoSender(); 
-        bool init();
-        bool init_old();
         virtual bool start();
 
     private:
         static void cb_new_src_pad(GstElement *element, GstPad *srcPad, void *data);
-        void init_source();
-        void init_codec();
-        void init_sink();
+        virtual void init_source();
+        virtual void init_codec();
+        virtual void init_sink();
         VideoConfig config_;
         GstElement *source_, *demux_, *queue_, *dvdec_, *colorspc_, *encoder_, *payloader_, *sink_;
         GstElement *lastLinked_;     // FIXME: hack

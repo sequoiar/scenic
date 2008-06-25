@@ -41,57 +41,6 @@ VideoSender::~VideoSender()
 }
 
 
-// FIXME: make this more like AudioSender::init()
-bool VideoSender::init_old()
-{
-    GError* error = NULL;
-    std::string launchStr = config_.source();
-
-    if (!launchStr.compare("dv1394src")) // need to demux and decode dv first
-        launchStr += " ! dvdemux name=demux demux. ! queue ! dvdec";
-
-    if (!std::string("h264").compare(config_.codec()))
-        launchStr += " ! ffmpegcolorspace ! x264enc bitrate=2048 byte-stream=true threads=4";
-    
-    if (config_.isNetworked())
-    {
-        launchStr += " ! rtph264pay ! udpsink host="; 
-        launchStr += config_.remoteHost(); 
-
-        std::stringstream istream;
-        istream << " port = " << config_.port();           
-        launchStr += istream.str();     // get port number into launch string
-    }
-    else // local test only
-        launchStr += " ! xvimagesink sync=false"; 
-
-    pipeline_ = gst_parse_launch(launchStr.c_str(), &error);
-    assert(pipeline_);
-
-    make_verbose();
-
-    // FIXME: this method should actually check the pipeline, currently does nothing
-    return true;
-}
-
-
-
-// FIXME: make this more like AudioSender::init()
-bool VideoSender::init()
-{
-    init_pipeline();
-
-    init_source();
-
-    init_codec();
-    
-    init_sink();
-    
-    // FIXME: this method should actually check the pipeline, currently does nothing
-    return true;
-}
-
-
 
 void VideoSender::init_source()
 {
@@ -145,7 +94,6 @@ void VideoSender::init_codec()
 {
     if (!std::string("h264").compare(config_.codec()))
     {
-    //    launchStr += " ! ffmpegcolorspace ! x264enc bitrate=2048 byte-stream=true threads=4";
         colorspc_ = gst_element_factory_make("ffmpegcolorspace", NULL);
         assert(colorspc_);
         encoder_ = gst_element_factory_make("x264enc", NULL);

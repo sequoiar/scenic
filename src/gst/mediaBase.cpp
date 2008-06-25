@@ -125,3 +125,11 @@ void MediaBase::cb_new_src_pad(GstElement *srcElement, GstPad *srcPad, void * da
 
 
 
+bool MediaBase::init()
+{
+    init_pipeline();
+    // these methods are defined in subclasses
+    init_source();
+    init_codec();
+    init_sink();
+}

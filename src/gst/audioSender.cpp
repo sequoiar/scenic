@@ -107,24 +107,6 @@ AudioSender::~AudioSender()
     // empty
 }
 
-// pipeline could also be built with parse launch
-// FIXME: this needs to be refactored, possibly with template method pattern
-// 
-
-bool AudioSender::init()
-{
-    init_pipeline();
-
-    init_interleave();
-    
-    init_sources();
-
-    init_sinks();
-
-    return true;
-}
-
-
 
 void AudioSender::init_interleave()
 {
@@ -138,8 +120,10 @@ void AudioSender::init_interleave()
 
 
 
-void AudioSender::init_sources()
+void AudioSender::init_source()
 {
+    init_interleave();
+
     GstIter src, aconv, queue;
 
     // common to all
@@ -206,7 +190,14 @@ void AudioSender::init_sources()
 
 
 
-void AudioSender::init_sinks()
+void AudioSender::init_codec()
+{
+    // empty
+}
+
+
+
+void AudioSender::init_sink()
 {
     if (config_.isNetworked()) 
     {

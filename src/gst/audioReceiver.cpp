@@ -92,96 +92,44 @@ void AudioReceiver::set_caps(const char *capsStr)
 }
 
 
-// FIXME: make more like AudioSender
 
-bool AudioReceiver::init()
+void AudioReceiver::init_source()
 {
-    //  Create receiver pipeline
-    GstElement *depayloader, *decoder, *rxSink;
-
-    init_pipeline();
-
     source_= gst_element_factory_make("udpsrc", "source");
     assert(source_);
     
     g_object_set(G_OBJECT(source_), "port", config_.port(), NULL);
 
-    depayloader = gst_element_factory_make("rtpvorbisdepay", "depayloader");
-    assert(depayloader);
-
-    decoder = gst_element_factory_make("vorbisdec", "decoder");
-    assert(decoder);
-
-    rxSink = gst_element_factory_make("jackaudiosink", "rxSink");
-    assert(rxSink);
-    g_object_set(G_OBJECT(rxSink), "sync", FALSE, NULL);
-
-    gst_bin_add_many(GST_BIN(pipeline_), source_, depayloader, 
-            decoder, rxSink, NULL); 
-
-    std::cout << "Receiving media on port : " << config_.port() << std::endl;
-    assert(gst_element_link_many(source_, depayloader, decoder, rxSink, NULL));
-
-    return true;
+    gst_bin_add(GST_BIN(pipeline_), source_);
 }
 
 
 
-#if 0
-bool AudioReceiver::init(int port, int numChannels)
+void AudioReceiver::init_codec()
 {
-    numChannels_ = numChannels;
+    depayloader_ = gst_element_factory_make("rtpvorbisdepay", NULL);
+    assert(depayloader_);
 
-    if (port < 1000)
-        port_ = DEF_PORT;
-    else
-        port_ = port;
+    decoder_ = gst_element_factory_make("vorbisdec", NULL);
+    assert(decoder_);
 
-    //  Create receiver pipeline
-    GstElement *rxSrc, *depayloader, *decoder, *rxSink;
-    GstCaps *caps;
+    gst_bin_add_many(GST_BIN(pipeline_), depayloader_, decoder_, NULL);
 
-    pipeline_ = gst_pipeline_new("rxPipeline");
-    assert(pipeline_);
-
-    make_verbose();
-
-    rxSrc = gst_element_factory_make("udpsrc", "rxSrc");
-    assert(rxSrc);
-    
-    // FIXME: caps shouldn't be hardcoded
-    if (numChannels_ == 2)
-        caps = gst_caps_from_string(AudioReceiver::CAPS_STR[0].c_str());
-    else if (numChannels_ == 8)
-        caps = gst_caps_from_string(AudioReceiver::CAPS_STR[1].c_str());
-
-    assert(caps);
-    g_object_set(G_OBJECT(rxSrc), "caps", caps, NULL);
-    gst_caps_unref(caps);
-
-    g_object_set(G_OBJECT(rxSrc), "port", port_, NULL);
-
-    depayloader = gst_element_factory_make("rtpvorbisdepay", "depayloader");
-    assert(depayloader);
-
-    decoder = gst_element_factory_make("vorbisdec", "decoder");
-    assert(decoder);
-
-    rxSink = gst_element_factory_make("jackaudiosink", "rxSink");
-    assert(rxSink);
-    g_object_set(G_OBJECT(rxSink), "sync", FALSE, NULL);
-
-    gst_bin_add_many(GST_BIN(pipeline_), rxSrc, depayloader, 
-            decoder, rxSink, NULL); 
-
-    std::cout << "Receiving media on port : " << port_ << std::endl;
-    gst_element_link_many(rxSrc, depayloader, decoder, rxSink, NULL);
-
-    return true;
+    assert(gst_element_link_many(source_, depayloader_, decoder_, NULL));
 }
-#endif
 
 
+
+void AudioReceiver::init_sink()
+{
+    sink_ = gst_element_factory_make("jackaudiosink", NULL);
+    assert(sink_);
+    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    
+    gst_bin_add(GST_BIN(pipeline_), sink_); 
+
+    assert(gst_element_link(decoder_, sink_));
+}
 
 #if 0
 bool AudioReceiver::init_uncomp(int port, int numChannels)
