@@ -29,11 +29,7 @@ class InvertQueuePair: public QueuePair
 public:
 	InvertQueuePair(QueuePair *q)                             
 	:QueuePair(q->second,q->first)
-	{                                                        
-		// Invert received queues IN->OUT OUT->IN	
-//		first = q->second; second = q->first;
-	}                         
-
+	{}                         
 };
  
 template <class T>
@@ -41,6 +37,7 @@ T queue_pair_pop(QueuePair qp)
 {                                                
 	return(static_cast<T>(g_async_queue_pop(qp.first)));
 }
+
 template <class T>
 void queue_pair_push(QueuePair qp,T t)
 {
@@ -61,4 +58,3 @@ GThread* thread_create_queue_pair(T (thread)(T),QueuePair* q,GError **err){
 	return(g_thread_create(thread,static_cast<void*>(q),TRUE,err));
 }
 
-                                                      
