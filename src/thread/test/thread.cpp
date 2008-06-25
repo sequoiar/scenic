@@ -21,31 +21,43 @@
 #include <iostream>
 #include "gThreadQueue.h"
 
+namespace message {
+    enum type 
+    { 
+        undefined, err, ok, ack, open, close, start, stop, pause, quit, info 
+    };
+    const char* str[] = 
+    { 
+        "undefined","err","ok","ack","open","close","start","stop","pause","quit","info" 
+    };
+};
 
-struct foo
+struct Message
 {
-	foo(int i):x(i){}                    
-	void s(int y){x=y;}
-	int x;
-	void operator()(){  std::cout << (long)g_thread_self()  << "---op()" << x << std::endl;}
-};                            
-                                                     
-
+	Message(message::type m):type(m){}                    
+    message::type type;
+	void operator()()
+    {  
+        std::cout.flush(); 
+        std::cout << "::" <<(long)g_thread_self()  << "-op()-" << message::str[type] << std::endl;
+        std::cout.flush();
+    }
+};
 
 void* thread_main(void* v)
 {
     QueuePair &queue = *(static_cast<QueuePair*>(v));
 
-	foo f(18);
+	static Message r(message::ok);
     int count=0;
     while(1) 
     { 
-        foo& f = *queue_pair_pop<foo*>(queue);
+        Message& f = *queue_pair_pop<Message*>(queue);
         f();
-		queue_pair_push(queue,&f);
+		queue_pair_push(queue,&r);
 		if(count++ == 1000) 
 		{
-			static foo f(0);			
+			static Message f(message::quit);			
 			queue_pair_push(queue,&f);
 	    return 0;
 		}
@@ -57,7 +69,7 @@ return 0;
 int main (int argc, char** argv) 
 { 
     GError *err=0;
-    foo f(10);                                   
+    Message f(message::start);                                   
     
 	
     g_thread_init(NULL);
@@ -69,14 +81,13 @@ int main (int argc, char** argv)
     while(err==NULL)
     {
 		queue_pair_push(queue,&f);
-		if(foo* f = queue_pair_timed_pop<foo*>(queue,10))
+		if(Message* f = queue_pair_timed_pop<Message*>(queue,10))
 		{
-			if(f->x == 0)
+			if(f->type == message::quit)
 			  break;  
-			std::cout << ":LKJ"<< f->x;
+            (*f)();
 		}
 		
-		f.x++;
 		std::cout << "sent it";
 	}
 	g_async_queue_unref(queue.first);
