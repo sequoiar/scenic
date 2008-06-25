@@ -41,39 +41,45 @@ VideoReceiver::~VideoReceiver()
 
 
 
-bool VideoReceiver::init()
+void VideoReceiver::init_source()
 {
-    //  Create receiver pipeline
-    GstElement *rxSrc, *ffdec_h264, *rtph264depay, *rxSink;
     GstCaps *caps;
-
-    init_pipeline();
-
-    rxSrc = gst_element_factory_make("udpsrc", "rxSrc");
-    assert(rxSrc);
-
-    rtph264depay = gst_element_factory_make("rtph264depay", "rtph264depay");
-    assert(rtph264depay);
-
-    ffdec_h264 = gst_element_factory_make("ffdec_h264", "ffdec_h264");
-    assert(ffdec_h264);
-
-    rxSink = gst_element_factory_make("xvimagesink", "rxSink");
-    assert(rxSink);
-
-    gst_bin_add_many(GST_BIN(pipeline_), rxSrc, rtph264depay, 
-            ffdec_h264, rxSink, NULL); 
-
     caps = gst_caps_new_simple("application/x-rtp", NULL);
     assert(caps);
 
-    g_object_set(G_OBJECT(rxSrc), "caps", caps, NULL);
-    g_object_set(G_OBJECT(rxSrc), "port", config_.port(), NULL);
-    g_object_set(G_OBJECT(rxSink), "sync", FALSE, NULL);
+    src_ = gst_element_factory_make("udpsrc", NULL);
+    assert(src_);
 
-    std::cout << "Receiving media on port : " << config_.port() << std::endl;
-    assert(gst_element_link_many(rxSrc, rtph264depay, ffdec_h264, rxSink, NULL));
+    g_object_set(G_OBJECT(src_), "caps", caps, NULL);
+    g_object_set(G_OBJECT(src_), "port", config_.port(), NULL);
+    
+    gst_bin_add(GST_BIN(pipeline_), src_);
+    gst_caps_unref(caps);
+}
 
-    return true;
+
+
+void VideoReceiver::init_codec()
+{
+    depayloader_ = gst_element_factory_make("rtph264depay", NULL);
+    assert(depayloader_);
+
+    decoder_ = gst_element_factory_make("ffdec_h264", NULL);
+    assert(decoder_);
+    
+    gst_bin_add_many(GST_BIN(pipeline_), depayloader_, decoder_, NULL);
+    assert(gst_element_link_many(src_, depayloader_, decoder_, NULL));
+}
+
+
+
+void VideoReceiver::init_sink()
+{
+    sink_ = gst_element_factory_make("xvimagesink", NULL);
+    assert(sink_);
+    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+
+    gst_bin_add(GST_BIN(pipeline_), sink_);
+    assert(gst_element_link(decoder_, sink_));
 }
 

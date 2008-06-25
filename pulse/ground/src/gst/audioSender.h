@@ -34,17 +34,17 @@ class AudioSender : public MediaBase
         AudioSender(const AudioConfig& config);
         AudioSender();
         virtual ~AudioSender(); 
-        bool init();
         virtual bool start();
 
     private:
-
         // helper methods
        
         void set_channel_layout();
         void init_interleave();
-        void init_sources();
-        void init_sinks();
+        
+        virtual void init_source();
+        virtual void init_codec(); 
+        virtual void init_sink();
 
         void send_caps() const;
         const char * caps_str() const;
