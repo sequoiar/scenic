@@ -1,4 +1,4 @@
-/* GTHREAD-QUEUE-PAIR - Library of Thread Queue Routines for GLIB
+/* GTHREAD-QUEUE-PAIR - Library of BaseThread Queue Routines for GLIB
  * Copyright (C) 2008	Koya Charles, Tristan Matthews 
  *
  * This library is free software; you can redistribute it and/or
@@ -30,6 +30,12 @@ public:
 	InvertQueuePair(QueuePair *q)                             
 	:QueuePair(q->second,q->first)
 	{}                         
+	InvertQueuePair(QueuePair &q)                             
+	:QueuePair(q.second,q.first)
+	{}                         
+	InvertQueuePair(GAsyncQueue*f,GAsyncQueue*s)                             
+	:QueuePair(s,f)
+	{}                         
 };
  
 template <class T>
@@ -54,7 +60,24 @@ T queue_pair_timed_pop(QueuePair p,int ms)
 }
 
 template<class T>
-GThread* thread_create_queue_pair(T (thread)(T),QueuePair* q,GError **err){
-	return(g_thread_create(thread,static_cast<void*>(q),TRUE,err));
+GThread* thread_create_queue_pair(void* (thread)(void*),T t,GError **err){
+	return(g_thread_create(thread,static_cast<void*>(t),TRUE,err));
 }
+
+class BaseThread
+{
+public:
+    BaseThread();
+    ~BaseThread();
+
+    QueuePair getInvertQueue(){return InvertQueuePair(queue);}
+    bool run();
+private:
+    virtual int main(){}
+    GThread* th;
+    QueuePair queue;
+static void* thread_main(void* v);
+};
+
+
 
