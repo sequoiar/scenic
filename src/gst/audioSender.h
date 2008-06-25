@@ -41,7 +41,6 @@ class AudioSender : public MediaBase
 
         // helper methods
        
-        static void cb_new_pad(GstElement *element, GstPad *srcPad, gpointer data);
         void set_channel_layout();
         void init_interleave();
         void init_sources();

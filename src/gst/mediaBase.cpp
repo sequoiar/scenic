@@ -22,6 +22,7 @@
 #include <cassert>
 
 #include "mediaBase.h"
+#include "logWriter.h"
 
 bool MediaBase::gstInitialized_ = false;
 
@@ -111,9 +112,16 @@ void MediaBase::wait_until_playing()
 
 
 
-bool MediaBase::check_pipeline()
+void MediaBase::cb_new_src_pad(GstElement *srcElement, GstPad *srcPad, void * data)
 {
-    // FIXME: i should be checking all elements the pipeline
-    return true;
+    GstElement *sinkElement = (GstElement *) data;
+    GstPad *sinkPad;
+    LOG("Dynamic pad created, linking new srcpad and sinkpad.");
+    
+    sinkPad = gst_element_get_static_pad(sinkElement, "sink");
+    assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
+    gst_object_unref(sinkPad);
 }
+
+
 

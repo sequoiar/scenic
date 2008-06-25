@@ -25,6 +25,7 @@
 
 
 typedef struct _GstElement GstElement;
+typedef struct _GstPad GstPad;
 typedef std::vector<GstElement*>::iterator GstIter;
 
 class MediaBase
@@ -36,12 +37,12 @@ class MediaBase
 
 
     protected:
+        static void cb_new_src_pad(GstElement *element, GstPad *srcPad, void *data);
         MediaBase();
         virtual ~MediaBase(); 
-        void init_pipeline();
+        virtual void init_pipeline();
         void make_verbose();
         void wait_until_playing();
-        bool check_pipeline();
 
         GstElement *pipeline_;
 
