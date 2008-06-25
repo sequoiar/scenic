@@ -37,17 +37,21 @@ struct Message
 	Message(message::type m):type(m){}                    
     message::type type;
 	void operator()()
-    {  
+    { 
+        long l= (long)g_thread_self();
         std::cout.flush(); 
-        std::cout << "::" <<(long)g_thread_self()  << "-op()-" << message::str[type] << std::endl;
+        std::cout << "::" << l  << "-op()-" << message::str[type] << std::endl;
         std::cout.flush();
     }
 };
 
-void* thread_main(void* v)
+class Thread : public BaseThread
 {
-    QueuePair &queue = *(static_cast<QueuePair*>(v));
+    int main();
+};
 
+int Thread::main()
+{
 	static Message r(message::ok);
     int count=0;
     while(1) 
@@ -59,7 +63,7 @@ void* thread_main(void* v)
 		{
 			static Message f(message::quit);			
 			queue_pair_push(queue,&f);
-	    return 0;
+    	    break;
 		}
     }
 return 0; 
@@ -68,17 +72,14 @@ return 0;
 
 int main (int argc, char** argv) 
 { 
-    GError *err=0;
     Message f(message::start);                                   
-    
-	
-    g_thread_init(NULL);
+    Thread t;
 
-    QueuePair queue (g_async_queue_new(), g_async_queue_new());
-	InvertQueuePair tq(&queue);
-    GThread* th = thread_create_queue_pair(thread_main,&tq,&err);
+    QueuePair queue = t.getInvertQueue();
+    if(!t.run())
+        return -1;
     
-    while(err==NULL)
+    while(1)
     {
 		queue_pair_push(queue,&f);
 		if(Message* f = queue_pair_timed_pop<Message*>(queue,10))
@@ -90,10 +91,8 @@ int main (int argc, char** argv)
 		
 		std::cout << "sent it";
 	}
-	g_async_queue_unref(queue.first);
-	g_async_queue_unref(queue.second);
 
-	g_thread_join(th);
+
 return 0;
 }
 
