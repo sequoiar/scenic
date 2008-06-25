@@ -92,6 +92,7 @@ void AudioReceiver::set_caps(const char *capsStr)
 }
 
 
+// FIXME: make more like AudioSender
 
 bool AudioReceiver::init()
 {

@@ -31,7 +31,7 @@
 #include <cpptest.h>
 
 #define BLOCKING 1
-#define VIDEO 0
+#define VIDEO 1
 #define AUDIO 1
 #define RTP 1
 

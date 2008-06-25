@@ -138,19 +138,6 @@ void AudioSender::init_interleave()
 
 
 
-void AudioSender::cb_new_pad(GstElement *decoder, GstPad *srcPad, gpointer data)
-{
-    GstElement *aconv = (GstElement *) data;
-    GstPad *sinkPad;
-    LOG("Dynamic pad created, linking src and sinkpad.");
-    
-    sinkPad = gst_element_get_static_pad(aconv, "sink");
-    assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
-    gst_object_unref(sinkPad);
-}
-
-
-
 void AudioSender::init_sources()
 {
     GstIter src, aconv, queue;
@@ -191,17 +178,16 @@ void AudioSender::init_sources()
             assert(decoders_[channelIdx]);
         }
 
+        // FIXME: location should be changeable
         for (src = sources_.begin(); src != sources_.end(); ++src) 
             g_object_set(G_OBJECT(*src), "location", "audiofile.pcm", NULL);
         
         for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
         {
             gst_bin_add(GST_BIN(pipeline_), *dec);
-            g_signal_connect(*dec, "pad-added", G_CALLBACK(cb_new_pad), (void *) *aconv);
+            g_signal_connect(*dec, "pad-added", G_CALLBACK(cb_new_src_pad), (void *) *aconv);
         }
         
-        // FIXME: decoder has dynamic sink, must be linked by callback to audioconvert 
-        // and then interleave...i think
         for (src = sources_.begin(), dec = decoders_.begin(); src != sources_.end(); ++src, ++dec)
             assert(gst_element_link(*src, *dec));
         
@@ -225,6 +211,7 @@ void AudioSender::init_sinks()
     if (config_.isNetworked()) 
     {
         GstElement *encoder, *payloader;
+        // FIXME: move to init_codec
         encoder = gst_element_factory_make("vorbisenc", NULL);
         assert(encoder);
         payloader = gst_element_factory_make("rtpvorbispay", NULL);
