@@ -71,13 +71,6 @@ bool MediaBase::isPlaying() const
 }
 
 
-#if 0
-
-int MediaBase::port() const
-{
-    return port_;
-}
-#endif
 
 void MediaBase::init_pipeline()
 {

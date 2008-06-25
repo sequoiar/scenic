@@ -234,6 +234,7 @@ const char * AudioSender::caps_str() const
 
     GstPad *pad;
     GstCaps *caps;
+    std::string result;
 
     pad = gst_element_get_pad(GST_ELEMENT(sink_), "sink");
     assert(pad); 
@@ -241,7 +242,9 @@ const char * AudioSender::caps_str() const
     assert(caps);
     gst_object_unref(pad);
 
-    return gst_caps_to_string(caps);
+    result = gst_caps_to_string(caps);
+    gst_caps_unref(caps);
+    return result.c_str();
 }
 
 
