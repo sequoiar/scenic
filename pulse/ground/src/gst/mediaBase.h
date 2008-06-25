@@ -45,13 +45,13 @@ class MediaBase
         virtual void init_source() = 0;
         virtual void init_codec() = 0;
         virtual void init_sink() = 0;
-        void make_verbose();
         void wait_until_playing();
 
         GstElement *pipeline_;
 
     private:
         bool verbose_;
+        void make_verbose();
         static bool gstInitialized_;
 };
 

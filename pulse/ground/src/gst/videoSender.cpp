@@ -49,8 +49,7 @@ void VideoSender::init_source()
     gst_bin_add(GST_BIN(pipeline_), source_);
     lastLinked_ = source_;
 
-    // FIXME this is ugly
-    if (!std::string("dv1394src").compare(config_.source())) // need to demux and decode dv first
+    if (config_.has_dv()) // need to demux and decode dv first
     {
         demux_ = gst_element_factory_make("dvdemux", NULL);
         assert(demux_);
@@ -67,7 +66,6 @@ void VideoSender::init_source()
 
         assert(gst_element_link(source_, demux_));
         assert(gst_element_link(queue_, dvdec_));
-        //launchStr += " ! dvdemux name=demux demux. ! queue ! dvdec";
         lastLinked_ = dvdec_;
     }
 }
@@ -92,7 +90,7 @@ void VideoSender::cb_new_src_pad(GstElement *srcElement, GstPad *srcPad, void * 
 
 void VideoSender::init_codec()
 {
-    if (!std::string("h264").compare(config_.codec()))
+    if (config_.has_h264())
     {
         colorspc_ = gst_element_factory_make("ffmpegcolorspace", NULL);
         assert(colorspc_);

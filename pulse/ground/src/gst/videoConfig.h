@@ -35,6 +35,9 @@ class VideoConfig : public MediaConfig
         VideoConfig(std::string source, std::string codec, std::string remoteHost, int port); // used by sender
         VideoConfig(std::string codec, int port);     // used by receiver
         VideoConfig(std::string source);     // used by local sender
+
+        const bool has_dv() const;
+        const bool has_h264() const;
 };
 
 #endif // _VIDEO_CONFIG_H_
