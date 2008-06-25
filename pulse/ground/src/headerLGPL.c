@@ -1,5 +1,5 @@
-/* GTHREAD-QUEUE-PAIR - Library of Thread Queue Routines for GLIB
- * Copyright (C) 2008	Koya Charles, Tristan Matthews 
+/* headerLGPL.c
+ * Copyright 2008 Koya Charles & Tristan Matthews 
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,3 +16,14 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
+/** \file 
+ *      Just the License GPL 3+ 
+ *
+ *      Detailed description here.
+ *      Continues here.
+ *      And more.
+ *      And more.
+ */
+
+
