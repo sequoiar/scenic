@@ -31,9 +31,10 @@
 #include <cpptest.h>
 
 #define BLOCKING 1
-#define VIDEO 1
-#define AUDIO 1
-#define RTP 1
+
+#define VIDEO 0
+#define AUDIO 0
+#define RTP 0
 
 
 class GstTestSuite : public Test::Suite
@@ -106,6 +107,9 @@ class GstTestSuite : public Test::Suite
 /*----------------------------------------------*/ 
 /*      SANDBOX                                 */
 /*----------------------------------------------*/ 
+            TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile_dv)
+            TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile_dv)
+            TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv)
         }
 
         void set_id(int id);
@@ -172,6 +176,10 @@ class GstTestSuite : public Test::Suite
         void start_8ch_comp_rtp_audiofile();
         void stop_8ch_comp_rtp_audiofile();
         void start_stop_8ch_comp_rtp_audiofile();
+
+        void start_8ch_comp_rtp_audiofile_dv();
+        void stop_8ch_comp_rtp_audiofile_dv();
+        void start_stop_8ch_comp_rtp_audiofile_dv();
 };
 
 #if BLOCKING
