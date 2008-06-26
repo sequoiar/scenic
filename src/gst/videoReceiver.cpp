@@ -61,14 +61,19 @@ void VideoReceiver::init_source()
 
 void VideoReceiver::init_codec()
 {
-    depayloader_ = gst_element_factory_make("rtph264depay", NULL);
-    assert(depayloader_);
+    if (config_.has_h264())
+    {
+        depayloader_ = gst_element_factory_make("rtph264depay", NULL);
+        assert(depayloader_);
 
-    decoder_ = gst_element_factory_make("ffdec_h264", NULL);
-    assert(decoder_);
-    
-    gst_bin_add_many(GST_BIN(pipeline_), depayloader_, decoder_, NULL);
-    assert(gst_element_link_many(src_, depayloader_, decoder_, NULL));
+        decoder_ = gst_element_factory_make("ffdec_h264", NULL);
+        assert(decoder_);
+
+    //    g_object_set(G_OBJECT(decoder_), "debug-mv", TRUE, NULL);
+
+        gst_bin_add_many(GST_BIN(pipeline_), depayloader_, decoder_, NULL);
+        assert(gst_element_link_many(src_, depayloader_, decoder_, NULL));
+    }
 }
 
 
