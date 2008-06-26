@@ -39,6 +39,7 @@ class MediaConfig
         const char * remoteHost() const;
         const int port() const;
         const bool isNetworked() const;
+        const bool hasCodec() const;
 
     protected: 
         const std::string source_;

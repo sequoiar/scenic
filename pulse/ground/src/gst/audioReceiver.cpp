@@ -55,7 +55,7 @@ void AudioReceiver::wait_for_caps()
 
     lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
-    lo_server_thread_add_method(st, "/audio/rx", "s", caps_handler, (void *) this); 
+    lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler, (void *) this); 
 
     lo_server_thread_start(st);
 
@@ -83,6 +83,8 @@ int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg **ar
 
 void AudioReceiver::set_caps(const char *capsStr)
 {
+    LOG("CAPS STRING:");
+    LOG(capsStr);
     GstCaps *caps;
     caps = gst_caps_from_string(capsStr);
     assert(caps);
@@ -110,7 +112,7 @@ void AudioReceiver::init_codec()
     depayloader_ = gst_element_factory_make("rtpvorbisdepay", NULL);
     assert(depayloader_);
 
-    decoder_ = gst_element_factory_make("vorbisdec", NULL);
+    decoder_ = gst_element_factory_make(config_.codec(), NULL);
     assert(decoder_);
 
     gst_bin_add_many(GST_BIN(pipeline_), depayloader_, decoder_, NULL);

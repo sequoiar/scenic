@@ -52,6 +52,7 @@ class AudioSender : public MediaBase
         // data 
         AudioConfig config_;
         std::vector<GstElement*> sources_, decoders_, aconvs_, queues_;
+        GstElement* encoder_;
         GstElement* interleave_;
         GstElement* sink_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];

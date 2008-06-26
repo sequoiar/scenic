@@ -192,7 +192,11 @@ void AudioSender::init_source()
 
 void AudioSender::init_codec()
 {
-    // empty
+    if (!config_.hasCodec())
+    {
+        encoder_ = gst_element_factory_make(config_.codec(), NULL);
+        assert(encoder_);
+    }
 }
 
 
@@ -201,10 +205,7 @@ void AudioSender::init_sink()
 {
     if (config_.isNetworked()) 
     {
-        GstElement *encoder, *payloader;
-        // FIXME: move to init_codec
-        encoder = gst_element_factory_make("vorbisenc", NULL);
-        assert(encoder);
+        GstElement *payloader;
         payloader = gst_element_factory_make("rtpvorbispay", NULL);
         assert(payloader);
         sink_ = gst_element_factory_make("udpsink", NULL);
@@ -212,8 +213,8 @@ void AudioSender::init_sink()
     
         g_object_set(G_OBJECT(sink_), "host", config_.remoteHost(), "port", config_.port(), NULL);
 
-        gst_bin_add_many(GST_BIN(pipeline_), encoder, payloader, sink_, NULL);
-        assert(gst_element_link_many(interleave_, encoder, payloader, sink_, NULL));
+        gst_bin_add_many(GST_BIN(pipeline_), encoder_, payloader, sink_, NULL);
+        assert(gst_element_link_many(interleave_, encoder_, payloader, sink_, NULL));
     }
     else // local version
     {
@@ -234,7 +235,6 @@ const char * AudioSender::caps_str() const
 
     GstPad *pad;
     GstCaps *caps;
-    std::string result;
 
     pad = gst_element_get_pad(GST_ELEMENT(sink_), "sink");
     assert(pad); 
@@ -242,9 +242,9 @@ const char * AudioSender::caps_str() const
     assert(caps);
     gst_object_unref(pad);
 
-    result = gst_caps_to_string(caps);
-    gst_caps_unref(caps);
-    return result.c_str();
+    const char * result = gst_caps_to_string(caps);
+    gst_caps_unref(caps); 
+    return result; 
 }
 
 
@@ -254,7 +254,7 @@ void AudioSender::send_caps() const
     LOG("Sending caps...");
     
     lo_address t = lo_address_new(NULL, "7770");
-    if (lo_send(t, "/audio/rx", "s", caps_str()) == -1)
+    if (lo_send(t, "/audio/rx/caps", "s", caps_str()) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
 }
 

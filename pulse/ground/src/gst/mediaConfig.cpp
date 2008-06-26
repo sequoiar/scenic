@@ -82,3 +82,9 @@ const bool MediaConfig::isNetworked() const
     return port_ != 0;
 }
 
+
+
+const bool MediaConfig::hasCodec() const
+{
+    return codec_.empty();
+}
