@@ -34,6 +34,11 @@ if test "x${have_cpptest}" = "xfalse" ; then
 fi
 
 
+#Trying to set CPPTEST_LIBS using pkg-config
+PKG_CHECK_MODULES(GLIB, [glib-2.0 gthread-2.0], have_glib=true, have_glib=false)
+if test "x${have_glib}" = "xfalse" ; then
+    AC_MSG_WARN([glib not found.])
+fi
 
 #Trying to set GST_CFLAGS GST_LIBS using pkg-config
 PKG_CHECK_MODULES(GST, gstreamer-0.10, have_gstreamer=true, have_gstreamer=false)
@@ -78,6 +83,8 @@ AC_CONFIG_FILES([Makefile
                  src/gst/test/Makefile
                  src/sip/Makefile
                  src/sip/test/Makefile
+                 src/thread/Makefile
+                 src/thread/test/Makefile
                  src/hello/Makefile
                  src/pyInterpreter/Makefile
                  ])

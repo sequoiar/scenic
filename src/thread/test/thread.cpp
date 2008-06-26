@@ -19,31 +19,8 @@
 
 #include <glib.h>
 #include <iostream>
-#include "gThreadQueue.h"
-
-namespace message {
-    enum type 
-    { 
-        undefined, err, ok, ack, open, close, start, stop, pause, quit, info 
-    };
-    const char* str[] = 
-    { 
-        "undefined","err","ok","ack","open","close","start","stop","pause","quit","info" 
-    };
-};
-
-struct Message
-{
-	Message(message::type m):type(m){}                    
-    message::type type;
-	void operator()()
-    { 
-        long l= (long)g_thread_self();
-        std::cout.flush(); 
-        std::cout << "::" << l  << "-op()-" << message::str[type] << std::endl;
-        std::cout.flush();
-    }
-};
+#include "baseThread.h"
+#include "message.h"
 
 class Thread : public BaseThread
 {
@@ -57,7 +34,7 @@ int Thread::main()
     while(1) 
     { 
         Message& f = *queue_pair_pop<Message*>(queue);
-        f();
+        std::cout << message::str[f.type];
 		queue_pair_push(queue,&r);
 		if(count++ == 1000) 
 		{
@@ -82,16 +59,17 @@ int main (int argc, char** argv)
     while(1)
     {
 		queue_pair_push(queue,&f);
+		std::cout << "sent it" << std::endl;
 		if(Message* f = queue_pair_timed_pop<Message*>(queue,10))
 		{
+            std::cout << message::str[f->type];
 			if(f->type == message::quit)
 			  break;  
-            (*f)();
 		}
 		
-		std::cout << "sent it";
 	}
 
+    std::cout << "Done!" << std::endl;
 
 return 0;
 }
