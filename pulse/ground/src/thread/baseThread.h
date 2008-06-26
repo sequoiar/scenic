@@ -19,7 +19,6 @@
 
 #include <glib.h>
 #include <utility>
-#include "message.h"
 
 typedef GAsyncQueue GAsyncQueue;
 
@@ -75,42 +74,46 @@ public:
 
 };
 */
-class QueuePair : public BaseQueuePair
+
+template <class T>
+class QueuePair_ : public BaseQueuePair
 {
 public:
-    QueuePair(GAsyncQueue*f,GAsyncQueue*s):BaseQueuePair(f,s){}
-    QueuePair():BaseQueuePair(){}
-    Message* timed_pop(int ms){ return(queue_pair_timed_pop<Message*>(*this,ms));}
-    Message copy_timed_pop(int ms){ Message *s = timed_pop(ms); if(s) return *s; return Message(message::undefined); }
-    void push(Message pt){ queue_pair_push(*this,&pt);}
+    QueuePair_<T>(GAsyncQueue*f,GAsyncQueue*s):BaseQueuePair(f,s){}
+    QueuePair_<T>():BaseQueuePair(){}
+    T* timed_pop(int ms){ return(queue_pair_timed_pop<T*>(*this,ms));}
+    T copy_timed_pop(int ms){ T *s = timed_pop(ms); if(s) return *s; return T(); }
+    void push(T pt){ queue_pair_push(*this,&pt);}
 };
-
+template <class T>
 class BaseThread
 {
 public:
-    BaseThread();
-    ~BaseThread();
+    BaseThread<T>();
+    ~BaseThread<T>();
 
-    QueuePair getInvertQueue(){return (QueuePair(queue.second,queue.first));}
+    QueuePair_<T> getInvertQueue(){return (QueuePair_<T>(queue.second,queue.first));}
     GAsyncQueue* getPushQueue(){return queue.first;}
     GAsyncQueue* getPopQueue(){return queue.second;}
     bool run();
 protected:
     virtual int main(){}
     GThread* th;
-    QueuePair queue;
+    QueuePair_<T> queue;
 static void* thread_main(void* v);
 };
 
 
-BaseThread::BaseThread():th(0)
+template <class T>
+BaseThread<T>::BaseThread():th(0)
 {
     g_thread_init(NULL);
     queue.first = g_async_queue_new();
     queue.second = g_async_queue_new();
 }
 
-BaseThread::~BaseThread()
+template <class T>
+BaseThread<T>::~BaseThread()
 {
     if(th)
     	g_thread_join(th);
@@ -120,7 +123,8 @@ BaseThread::~BaseThread()
 
 }
 
-bool BaseThread::run()
+template <class T>
+bool BaseThread<T>::run()
 {
     GError *err=0;
 
@@ -137,7 +141,8 @@ bool BaseThread::run()
 }
 
 
-void* BaseThread::thread_main(void* v)
+template <class T>
+void* BaseThread<T>::thread_main(void* v)
 {
     return((void*)(static_cast<BaseThread*>(v)->main()));
 }
