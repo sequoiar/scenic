@@ -22,7 +22,9 @@
 #include "baseThread.h"
 #include "message.h"
 
-class Thread : public BaseThread
+typedef QueuePair_<Message> QueuePair;
+
+class Thread : public BaseThread<Message>
 {
     int main();
 };

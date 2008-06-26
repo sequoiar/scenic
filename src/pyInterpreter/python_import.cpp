@@ -38,7 +38,9 @@ using namespace boost::python;
 
 #define PROMPT  "gp: >> "
 
-class Thread : public BaseThread
+
+
+class Thread : public BaseThread<Message>
 {
     int main();
 };
@@ -102,6 +104,8 @@ BOOST_PYTHON_MODULE(Message)
 
 }
 
+typedef QueuePair_<Message> QueuePair;
+
 BOOST_PYTHON_MODULE(QueuePair)
 {
     class_<QueuePair>("QueuePair")
@@ -109,22 +113,6 @@ BOOST_PYTHON_MODULE(QueuePair)
         .def("push",&QueuePair::push);
 }
 
-        //.def(init<GAsyncQueue*,GAsyncQueue*>())
-
-// Default variable overloads
-//BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(VideoLocal_init_overloads, init, 0, 3)
-
-/*
-BOOST_PYTHON_MODULE(VideoLocal)
-{
-    class_<VideoLocal>("VideoLocal")
-    .def("init", &VideoLocal::init)
-    .def("start", &VideoLocal::start)
-    .def("stop",  &VideoLocal::stop);
-
-
-}
-*/
 
 
 
@@ -148,4 +136,23 @@ void PYTHON_EXEC_IMPORT(object mm, object mn)
         exec("import Message; from Message import *",mm,mn);
     }
 }
+
+
+
+
+
+// Default variable overloads
+//BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(VideoLocal_init_overloads, init, 0, 3)
+
+/*
+BOOST_PYTHON_MODULE(VideoLocal)
+{
+    class_<VideoLocal>("VideoLocal")
+    .def("init", &VideoLocal::init)
+    .def("start", &VideoLocal::start)
+    .def("stop",  &VideoLocal::stop);
+
+
+}
+*/
 
