@@ -29,8 +29,8 @@
 
 #include <iostream>
 
-int _ground_init(int argc, char* argv[]);
-int _ground_loop(int result);
+int ground_init(int argc, char* argv[]);
+int ground_loop(int result);
 
 int main(int argc, char* argv[])
 {
@@ -40,13 +40,13 @@ int main(int argc, char* argv[])
 
     py.init(argc,argv);
 
-    _ground_init(argc,argv);
+    ground_init(argc,argv);
 
     std::cout << std::endl << "Welcome to the Console" << std::endl;
-    std::cout << "Brought to you by The Military Industrial Complex." << std::endl;
+    std::cout << "Brought to you by The Hawfullpuf Industrial Complex." << std::endl;
     while(1)
     {
-        if(_ground_loop(count))
+        if(ground_loop(count))
         {
             if(!py.run_input().empty())
                 count = -1;
@@ -57,3 +57,4 @@ int main(int argc, char* argv[])
 
     std::cout << std::endl << "going down - CLEANUP ----" << std::endl;
 }
+

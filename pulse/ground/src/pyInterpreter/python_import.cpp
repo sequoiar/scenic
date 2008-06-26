@@ -25,21 +25,46 @@
  *
  */
 
-
+#include <iostream>
 #include <boost/python.hpp>
 
 
 #include "hello/hello.h"
-
+#include "thread/baseThread.h"
+#include "thread/message.h"
 
 using namespace boost::python;
 
 
 #define PROMPT  "gp: >> "
 
+class Thread : public BaseThread
+{
+    int main();
+};
+
+int Thread::main()
+{
+	static Message r(message::ok);
+    int count=0;
+    while(1) 
+    { 
+        Message& f = *queue_pair_pop<Message*>(queue);
+        std::cout << message::str[f.type];
+
+		queue_pair_push(queue,&r);
+		if(count++ == 1000) 
+		{
+			static Message f(message::quit);			
+			queue_pair_push(queue,&f);
+    	    break;
+		}
+    }
+return 0; 
+}
 
 #ifndef __GROUND_LOOP__
-int _ground_loop(int result)
+int ground_loop(int result)
 {
     if (result == -1)
         return 0;
@@ -48,7 +73,11 @@ int _ground_loop(int result)
 #endif
 
 #ifndef __GROUND_INIT__
-int _ground_init(int argc, char* argv[]) { return 0;}
+int ground_init(int argc, char* argv[]) 
+{ 
+    
+    return 0;
+}
 #endif
 
 BOOST_PYTHON_MODULE(Hello)
@@ -58,8 +87,29 @@ BOOST_PYTHON_MODULE(Hello)
     .def("set_name",&Hello::set_name);
 }
 
+BOOST_PYTHON_MODULE(Thread)
+{
+    class_<Thread>("Thread")
+    .def("getInvertQueue",&Thread::getInvertQueue)
+    .def("run",&Thread::run);
+     
+}
 
+BOOST_PYTHON_MODULE(Message)
+{
+    class_<Message>("Message",init<int>())
+        .def("getInt",&Message::getInt);
 
+}
+
+BOOST_PYTHON_MODULE(QueuePair)
+{
+    class_<QueuePair>("QueuePair")
+        .def("copy_timed_pop",&QueuePair::copy_timed_pop)
+        .def("push",&QueuePair::push);
+}
+
+        //.def(init<GAsyncQueue*,GAsyncQueue*>())
 
 // Default variable overloads
 //BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(VideoLocal_init_overloads, init, 0, 3)
@@ -83,6 +133,9 @@ BOOST_PYTHON_MODULE(VideoLocal)
 void BOOST_PY_IMPORT()
 {
     PyImport_AppendInittab((char*)"Hello",&initHello);
+    PyImport_AppendInittab((char*)"Thread",&initThread);
+    PyImport_AppendInittab((char*)"QueuePair",&initQueuePair);
+    PyImport_AppendInittab((char*)"Message",&initMessage);
 }
 
 void PYTHON_EXEC_IMPORT(object mm, object mn)
@@ -90,6 +143,9 @@ void PYTHON_EXEC_IMPORT(object mm, object mn)
     if(mm)
     {
         exec("import Hello; from Hello import *",mm,mn);
+        exec("import Thread; from Thread import *",mm,mn);
+        exec("import QueuePair; from QueuePair import *",mm,mn);
+        exec("import Message; from Message import *",mm,mn);
     }
 }
 
