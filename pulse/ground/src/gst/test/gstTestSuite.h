@@ -33,8 +33,8 @@
 #define BLOCKING 1
 
 #define VIDEO 0
-#define AUDIO 0
-#define RTP 0
+#define AUDIO 1
+#define RTP 1
 
 
 class GstTestSuite : public Test::Suite
