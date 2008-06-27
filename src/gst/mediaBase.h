@@ -22,11 +22,6 @@
 #define _MEDIA_BASE_H_
 
 #include <vector>
-
-typedef struct _GstElement GstElement;
-typedef struct _GstPad GstPad;
-typedef std::vector<GstElement*>::iterator GstIter;
-
 class MediaBase
 {
     public:
@@ -37,7 +32,14 @@ class MediaBase
 
 
     protected:
+
+        typedef struct _GstElement GstElement;
+        typedef struct _GstPad GstPad;
+        typedef std::vector<GstElement*>::iterator GstIter;
+
+        // call back to attach new src pad
         static void cb_new_src_pad(GstElement *element, GstPad *srcPad, void *data);
+
         MediaBase();
         virtual ~MediaBase(); 
         virtual void init_pipeline();
@@ -49,6 +51,7 @@ class MediaBase
         GstElement *pipeline_, *rtpbin_;
 
     private:
+
         bool verbose_;
         void make_verbose();
         static bool gstInitialized_;
