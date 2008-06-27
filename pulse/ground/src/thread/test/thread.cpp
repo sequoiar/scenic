@@ -37,6 +37,7 @@ int Thread::main()
     { 
         Message& f = *queue_pair_pop<Message*>(queue);
         std::cout << message::str[f.type];
+        queue.done(&f);
 		queue_pair_push(queue,&r);
 		if(count++ == 1000) 
 		{
@@ -65,8 +66,13 @@ int main (int argc, char** argv)
 		if(Message* f = queue_pair_timed_pop<Message*>(queue,10))
 		{
             std::cout << message::str[f->type];
-			if(f->type == message::quit)
-			  break;  
+			if(f->type == message::quit){
+                queue.done(f);
+			    break;  
+            }
+            else
+                queue.done(f);
+
 		}
 		
 	}
