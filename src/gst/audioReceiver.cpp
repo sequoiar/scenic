@@ -84,11 +84,11 @@ int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg **ar
 void AudioReceiver::set_caps(const char *capsStr)
 {
     LOG("CAPS STRING:");
-    LOG(capsStr);
+    //LOG(capsStr);
     GstCaps *caps;
     caps = gst_caps_from_string(capsStr);
     assert(caps);
-    g_object_set(G_OBJECT(source_), "caps", caps, NULL);
+    g_object_set(G_OBJECT(rtp_receiver_), "caps", caps, NULL);
     gst_caps_unref(caps);
     gotCaps_ = true;
 }
@@ -97,12 +97,31 @@ void AudioReceiver::set_caps(const char *capsStr)
 
 void AudioReceiver::init_source()
 {
+    rtpbin_ = gst_element_factory_make("gstrtpbin", NULL);
+    assert(rtpbin_);
+    
+    rtp_receiver_ = gst_element_factory_make("udpsrc", NULL);
+    assert(rtp_receiver_);
+	g_object_set(rtp_receiver_, "port", config_.port(), NULL);
+
+    rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL);
+    assert(rtcp_receiver_);
+	g_object_set(rtcp_receiver_, "port", config_.port() + 1, NULL);
+
+    rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
+    assert(rtcp_sender_);
+	g_object_set(rtcp_sender_, "host", config_.remoteHost(), "port", config_.port() + 5, "sync", FALSE, "async", FALSE, NULL);
+
+    gst_bin_add_many(GST_BIN(pipeline_), rtpbin_, rtp_receiver_, rtcp_receiver_, rtcp_sender_, NULL);
+
+#if 0
     source_= gst_element_factory_make("udpsrc", "source");
     assert(source_);
     
     g_object_set(G_OBJECT(source_), "port", config_.port(), NULL);
 
     gst_bin_add(GST_BIN(pipeline_), source_);
+#endif
 }
 
 
@@ -117,9 +136,51 @@ void AudioReceiver::init_codec()
 
     gst_bin_add_many(GST_BIN(pipeline_), depayloader_, decoder_, NULL);
 
-    assert(gst_element_link_many(source_, depayloader_, decoder_, NULL));
+    assert(gst_element_link_many(depayloader_, decoder_, NULL));
+
+    init_rtp();
 }
 
+
+
+void AudioReceiver::init_rtp()
+{
+
+	GstPad *recv_rtp_sink = gst_element_get_request_pad(rtpbin_, "recv_rtp_sink_0");
+    assert(recv_rtp_sink);
+	//GstPad *recv_rtp_src = gst_element_get_request_pad(rtpbin_, "recv_rtp_src_0");
+    //assert(recv_rtp_src);
+	GstPad *send_rtcp_src = gst_element_get_request_pad(rtpbin_, "send_rtcp_src_0");
+    assert(send_rtcp_src);
+	GstPad *recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, "recv_rtcp_sink_0");
+    assert(recv_rtcp_sink);
+
+    GstPad *rtpReceiverSrc = gst_element_get_static_pad(rtp_receiver_, "src");
+    assert(rtpReceiverSrc);
+    GstPad *rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src");
+    assert(rtcpReceiverSrc);
+    GstPad *rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink");
+    assert(rtcpSenderSink);
+
+    assert(gst_pad_link(rtpReceiverSrc, recv_rtp_sink) == GST_PAD_LINK_OK);
+    assert(gst_pad_link(rtcpReceiverSrc, recv_rtcp_sink) == GST_PAD_LINK_OK);
+    assert(gst_pad_link(send_rtcp_src, rtcpSenderSink) == GST_PAD_LINK_OK);
+	
+    // when pad is created, it must be linked to depayloader
+    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(cb_new_src_pad), (void *)depayloader_);
+
+    // release request pads (in reverse order)
+    gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);
+    gst_element_release_request_pad(rtpbin_, send_rtcp_src);
+    //gst_element_release_request_pad(rtpbin_, recv_rtp_src);
+    gst_element_release_request_pad(rtpbin_, recv_rtp_sink);
+
+    // release static pads (in reverse order)
+    gst_object_unref(GST_OBJECT(rtcpSenderSink));
+    gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
+    gst_object_unref(GST_OBJECT(rtpReceiverSrc));
+}
+    
 
 
 void AudioReceiver::init_sink()
@@ -270,6 +331,7 @@ bool AudioReceiver::init_uncomp(int port, int numChannels)
 
 bool AudioReceiver::start()
 {
+    // FIXME: caps are only sent if sender is started after
     wait_for_caps();
     std::cout << "Receiving audio on port " << config_.port() << std::endl;
     MediaBase::start();
