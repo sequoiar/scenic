@@ -26,7 +26,7 @@
 
 bool MediaBase::gstInitialized_ = false;
 
-MediaBase::MediaBase() : pipeline_(0), verbose_(false)
+MediaBase::MediaBase() : pipeline_(0), verbose_(true)
 {
     if (!gstInitialized_)
     {

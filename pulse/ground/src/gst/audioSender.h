@@ -44,6 +44,7 @@ class AudioSender : public MediaBase
         
         virtual void init_source();
         virtual void init_codec(); 
+        virtual void init_rtp(); 
         virtual void init_sink();
 
         void send_caps() const;
@@ -52,9 +53,11 @@ class AudioSender : public MediaBase
         // data 
         AudioConfig config_;
         std::vector<GstElement*> sources_, decoders_, aconvs_, queues_;
-        GstElement* encoder_;
-        GstElement* interleave_;
-        GstElement* sink_;
+        GstElement *rtp_sender_, *rtcp_sender_, *rtcp_receiver_;
+        GstElement *encoder_;
+        GstElement *payloader_;
+        GstElement *interleave_;
+        GstElement *sink_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
 };
 

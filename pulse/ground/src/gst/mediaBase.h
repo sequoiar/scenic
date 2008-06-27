@@ -33,7 +33,7 @@ class MediaBase
         virtual bool start();
         virtual bool stop();
         bool isPlaying() const;
-        bool init();
+        virtual bool init();
 
 
     protected:
@@ -46,7 +46,7 @@ class MediaBase
         virtual void init_sink() = 0;
         void wait_until_playing();
 
-        GstElement *pipeline_;
+        GstElement *pipeline_, *rtpbin_;
 
     private:
         bool verbose_;
