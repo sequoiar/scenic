@@ -85,6 +85,8 @@ AC_CONFIG_FILES([Makefile
                  src/sip/test/Makefile
                  src/thread/Makefile
                  src/thread/test/Makefile
+                 src/osc/Makefile
+                 src/osc/test/Makefile
                  src/hello/Makefile
                  src/pyInterpreter/Makefile
                  ])

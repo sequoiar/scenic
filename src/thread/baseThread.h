@@ -16,9 +16,12 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+#ifndef __BASE_THREAD_H__
+#define __BASE_THREAD_H__
 
 #include <glib.h>
 #include <utility>
+#include <list>
 
 typedef GAsyncQueue GAsyncQueue;
 
@@ -82,9 +85,61 @@ public:
     QueuePair_<T>(GAsyncQueue*f,GAsyncQueue*s):BaseQueuePair(f,s){}
     QueuePair_<T>():BaseQueuePair(){}
     T* timed_pop(int ms){ return(queue_pair_timed_pop<T*>(*this,ms));}
-    T copy_timed_pop(int ms){ T *s = timed_pop(ms); if(s) return *s; return T(); }
-    void push(T pt){ queue_pair_push(*this,&pt);}
+    T copy_timed_pop(int ms)
+    { 
+        T *s = timed_pop(ms); 
+        if(s) {
+            return *s; 
+        }
+        return T(); 
+    }
+    void push(T pt);
+
+    void done(T t);
+    void done(T* pt);
+    static void init();
+private:
+    static GMutex *mutex;
+    static std::list<T*> l;
+   
 };
+
+template <class T> 
+GMutex *QueuePair_<T>::mutex = NULL;
+
+template <class T>
+std::list<T*> QueuePair_<T>::l;
+
+template <class T> 
+void QueuePair_<T>::push(T pt)
+{ 
+    g_mutex_lock(mutex);
+    T *t = new T(pt);
+    l.push_front(t); 
+    
+    queue_pair_push(*this,t);
+    g_mutex_unlock(mutex);
+}
+
+
+template <class T> 
+void QueuePair_<T>::done(T *t)
+{
+    g_mutex_lock(mutex);
+    l.remove(t);
+    g_mutex_unlock(mutex);
+}
+
+
+
+
+template <class T>
+void QueuePair_<T>::init()
+{
+    if(!mutex)
+        mutex = g_mutex_new ();
+}
+
 template <class T>
 class BaseThread
 {
@@ -108,6 +163,7 @@ template <class T>
 BaseThread<T>::BaseThread():th(0)
 {
     g_thread_init(NULL);
+    queue.init();
     queue.first = g_async_queue_new();
     queue.second = g_async_queue_new();
 }
@@ -146,3 +202,5 @@ void* BaseThread<T>::thread_main(void* v)
 {
     return((void*)(static_cast<BaseThread*>(v)->main()));
 }
+
+#endif
