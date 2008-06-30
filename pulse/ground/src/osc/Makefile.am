@@ -1,8 +1,8 @@
 include $(top_srcdir)/src/globals.mak
 
-noinst_LIBRARIES = libOscThread.a
+noinst_LIBRARIES = libOsc.a
 
-libOscThread_a_SOURCES = oscThread.cpp 
+libOsc_a_SOURCES = osc.cpp 
 
-libOscThread_a_CPPFLAGS= $(CPPFLAGS) $(LLO_CFLAGS) $(GLIB_CFLAGS)
+libOsc_a_CPPFLAGS= $(CPPFLAGS) $(LLO_CFLAGS) $(GLIB_CFLAGS)
 

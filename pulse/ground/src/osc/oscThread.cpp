@@ -1,5 +1,4 @@
-
-// python_import.cpp
+// 
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
 // This file is part of [propulse]ART.
@@ -19,32 +18,43 @@
 //
 
 /** \filep
- *      This file gets included in python module
+ *      
  *
  *
- *      Exposes object modules to python interpreter.
+ *      
  *
  */
 
 #include <iostream>
 
-
-#include "thread/baseThread.h"
-//#include "thread/message.h"
 #include <lo/lo.h>
-#include "oscThread.h"
+#include "osc.h"
 
 
-int OscThread::generic_handler_static(const char *path, const char *types, lo_arg **argv, int argc,
-                void *data, void *user_data)
+OscMessage::OscMessage(const char*p,const char *t, lo_arg **v, int c,void* d)
+        :path(p),types(t),argc(c),data(d) 
+{
+	for(int i=0;i<c;i++)
+	{
+		args.push_back(MyLo(t,i,v[i]));
+		std::cerr << t[i] << " from " << p << std::endl;
+	}
+
+}
+ 
+
+
+
+int OscThread::generic_handler_static(const char *path, const char *types,
+		lo_arg **argv, int argc, void *data, void *user_data)
 {
    OscThread* t = static_cast<OscThread*>(user_data);
    return (t->generic_handler(path,types,argv,argc,data));
 }
 
 
-int OscThread::generic_handler(const char *path, const char *types, lo_arg **argv, int argc,
-                void *data)
+int OscThread::generic_handler(const char *path, const char *types,
+		lo_arg **argv, int argc, void *data)
 {
    queue.push(OscMessage(path,types,argv,argc,data));
 }
@@ -65,12 +75,13 @@ int OscThread::main()
 
     while(1) 
     { 
-        OscMessage msg = queue.copy_timed_pop(1000);
+		usleep(1000);
+/*        OscMessage msg = queue.copy_timed_pop(1000);
         if (!msg.path.empty())
         {
-            queue.push(msg);
+            //queue.push(msg);
         }
-
+*/
 
     }
 return 0; 
@@ -79,12 +90,4 @@ return 0;
 
 
 
-/*		queue_pair_push(queue,&r);
-		if(count++ == 1000) 
-		{
-			static Message f(message::quit);			
-			queue_pair_push(queue,&f);
-    	    break;
-		}
-*/
 

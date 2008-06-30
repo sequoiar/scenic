@@ -27,20 +27,43 @@ typedef GAsyncQueue GAsyncQueue;
 
 typedef std::pair<GAsyncQueue*,GAsyncQueue*> BaseQueuePair;
 
-
-class InvertBaseQueuePair: public BaseQueuePair
+template <class T>
+class QueuePair_ : public BaseQueuePair
 {
 public:
-	InvertBaseQueuePair(BaseQueuePair *q)                             
-	:BaseQueuePair(q->second,q->first)
-	{}                         
-	InvertBaseQueuePair(BaseQueuePair &q)                             
-	:BaseQueuePair(q.second,q.first)
-	{}                         
-	InvertBaseQueuePair(GAsyncQueue*f,GAsyncQueue*s)                             
-	:BaseQueuePair(s,f)
-	{}                         
+    QueuePair_<T>(GAsyncQueue*f,GAsyncQueue*s):BaseQueuePair(f,s){}
+    QueuePair_<T>():BaseQueuePair(){}
+    T copy_timed_pop(int ms);
+    void push(T pt);
+
+    void done(T t);
+    void done(T* pt);
+    static void init();
+private:
+    T* timed_pop(int ms);
+    static GMutex *mutex;
+    static std::list<T*> l;
+   
 };
+
+template <class T>
+class BaseThread
+{
+public:
+    BaseThread<T>();
+    ~BaseThread<T>();
+
+    QueuePair_<T> getInvertQueue(){return (QueuePair_<T>(queue.second,queue.first));}
+    GAsyncQueue* getPushQueue(){return queue.first;}
+    GAsyncQueue* getPopQueue(){return queue.second;}
+    bool run();
+protected:
+    virtual int main(){ return 0;}
+    GThread* th;
+    QueuePair_<T> queue;
+static void* thread_main(void* v);
+};
+
  
 template <class T>
 T queue_pair_pop(BaseQueuePair qp)
@@ -78,37 +101,34 @@ public:
 };
 */
 
-template <class T>
-class QueuePair_ : public BaseQueuePair
-{
-public:
-    QueuePair_<T>(GAsyncQueue*f,GAsyncQueue*s):BaseQueuePair(f,s){}
-    QueuePair_<T>():BaseQueuePair(){}
-    T* timed_pop(int ms){ return(queue_pair_timed_pop<T*>(*this,ms));}
-    T copy_timed_pop(int ms)
-    { 
-        T *s = timed_pop(ms); 
-        if(s) {
-            return *s; 
-        }
-        return T(); 
-    }
-    void push(T pt);
-
-    void done(T t);
-    void done(T* pt);
-    static void init();
-private:
-    static GMutex *mutex;
-    static std::list<T*> l;
-   
-};
 
 template <class T> 
 GMutex *QueuePair_<T>::mutex = NULL;
 
 template <class T>
 std::list<T*> QueuePair_<T>::l;
+
+template <class T>
+T* QueuePair_<T>::timed_pop(int ms)
+{ 
+	return(queue_pair_timed_pop<T*>(*this,ms));
+}
+
+template <class T>
+T QueuePair_<T>::copy_timed_pop(int ms)
+{ 
+	static T n;
+	T *s = timed_pop(ms); 
+	if(s) {
+		n = *s;
+		done(s);
+		return n;
+	}
+	else
+		n = T();
+
+	return n; 
+}
 
 template <class T> 
 void QueuePair_<T>::push(T pt)
@@ -122,16 +142,20 @@ void QueuePair_<T>::push(T pt)
 }
 
 
+#include <iostream>
 template <class T> 
 void QueuePair_<T>::done(T *t)
 {
     g_mutex_lock(mutex);
-    l.remove(t);
+
+	std::cout << "ptr:" << t << std::endl;
+	if( l.end() != find(l.begin(),l.end(),t)){
+		std::cout << "got one delete" << std::endl;
+		delete(t);
+    	l.remove(t);
+	}
     g_mutex_unlock(mutex);
 }
-
-
-
 
 template <class T>
 void QueuePair_<T>::init()
@@ -140,23 +164,6 @@ void QueuePair_<T>::init()
         mutex = g_mutex_new ();
 }
 
-template <class T>
-class BaseThread
-{
-public:
-    BaseThread<T>();
-    ~BaseThread<T>();
-
-    QueuePair_<T> getInvertQueue(){return (QueuePair_<T>(queue.second,queue.first));}
-    GAsyncQueue* getPushQueue(){return queue.first;}
-    GAsyncQueue* getPopQueue(){return queue.second;}
-    bool run();
-protected:
-    virtual int main(){}
-    GThread* th;
-    QueuePair_<T> queue;
-static void* thread_main(void* v);
-};
 
 
 template <class T>

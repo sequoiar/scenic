@@ -1,33 +1,97 @@
+// headerGPL.c
+// Copyright 2008 Koya Charles & Tristan Matthews 
+//     
+// This file is part of [propulse]ART.
+//
+// [propulse]ART is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// [propulse]ART is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+/** \file 
+ *      Just the License GPL 3+ 
+ *
+ *      Detailed description here.
+ *      Continues here.
+ *      And more.
+ *      And more.
+ */
+
+
 #ifndef __OSC_THREAD_H__
 #define __OSC_THREAD_H__
 
 #include "thread/baseThread.h"
-#include "lo/lo.h"
+#include <lo/lo.h>
 #include <string>
+#include <vector>
+#include <iostream>
+
+class MyLo;
 class OscMessage
 {
 public:
-    OscMessage(const char*p,const char *t, lo_arg **v, int c,void* d)
-        :path(p),types(t),argv(v),argc(c),data(d) {}
+    OscMessage(const char*p,const char *t, lo_arg **v, int c,void* d);
     OscMessage(){}
     std::string path,types;
-    lo_arg** argv;
+	std::vector<MyLo> args;
     int argc;
     void* data;
 
 };
 
-typedef QueuePair_<OscMessage> QueuePairOfOscMessage;
-
+typedef QueuePair_<OscMessage> QueuePairOfOscMessage; 
 class OscThread : public BaseThread<OscMessage>
 {
     int main();
-    static int generic_handler_static(const char *path, const char *types, lo_arg **argv, int argc,
-                void *data, void *user_data);
+
+    static int generic_handler_static(const char *path, const char *types,
+				lo_arg **argv, int argc, void *data, void *user_data);
  
-    int generic_handler(const char *path, const char *types, lo_arg **argv, int argc,
-                void *data);
+    int generic_handler(const char *path, const char *types, 
+				lo_arg **argv, int argc, void *data);
+
     static void liblo_error(int num, const char *msg, const char *path){}
+
 };
+class MyLo 
+{
+public:
+   	MyLo(const char *pchar, int index, lo_arg* a)
+	{
+		switch(pchar[index])
+		{
+            case 's':
+			{
+				s = static_cast<char*>(&(a->s));
+			break;
+			}
+            case 'i':
+			{
+				i = static_cast<int>(a->s);
+			break;
+			}
+			
+		}
+		
+     	
+	}
+
+	int i;
+
+
+  	std::string s;
+};
+
+
 
 #endif
