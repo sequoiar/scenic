@@ -9,7 +9,7 @@ namespace message {
     { 
         "undefined","err","ok","ack","open","close","start","stop","pause","quit","info" 
     };
-};
+}
 
 struct Message
 {
