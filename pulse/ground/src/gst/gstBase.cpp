@@ -1,5 +1,5 @@
 
-// mediaBase.cpp
+// gstBase.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
 // This file is part of [propulse]ART.
@@ -21,43 +21,33 @@
 #include <gst/gst.h>
 #include <cassert>
 
-#include "mediaBase.h"
-#include "mediaConfig.h"
+#include "gstBase.h"
 #include "logWriter.h"
 
+bool GstBase::gstInitialized_ = false;
 
-MediaBase::MediaBase(const MediaConfig &config) : config_(config)
+GstBase::GstBase() 
+{
+    if (!gstInitialized_)
+    {
+        gstInitialized_ = true;
+        // should only be called once in a process
+        gst_init(0, NULL);
+        pipeline_.init();
+    }
+}
+
+
+
+GstBase::~GstBase()
 {
 }
 
 
 
-MediaBase::~MediaBase()
+void GstBase::wait_until_playing()
 {
-    pipeline_.stop();
-}
-
-
-
-bool MediaBase::start()
-{
-    return pipeline_.start();
-}
-
-
-
-bool MediaBase::stop()
-{
-    return pipeline_.stop();
-}
-
-
-
-bool MediaBase::init()
-{
-    // these methods are defined in subclasses
-    init_source();
-    init_codec();
-    init_sink();
+    while (!pipeline_.isPlaying())  // wait for pipeline to get rolling
+        usleep(1000);
 }
 

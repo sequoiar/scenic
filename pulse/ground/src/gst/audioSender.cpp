@@ -35,7 +35,7 @@
 #include "logWriter.h"
 #include "audioSender.h"
 
-AudioSender::AudioSender(const AudioConfig& config) : config_(config)
+AudioSender::AudioSender(const AudioConfig& config) : MediaBase(dynamic_cast<const MediaConfig&>(config)) , config_(config)
 {
     // empty
 }
@@ -53,7 +53,7 @@ void AudioSender::init_interleave()
     interleave_ = gst_element_factory_make("interleave", NULL);
     assert(interleave_);
 
-    gst_bin_add(GST_BIN(pipeline_), interleave_);
+    pipeline_.add(interleave_);
 
     set_channel_layout();
 }
@@ -76,9 +76,11 @@ void AudioSender::init_source()
         queues_.push_back(gst_element_factory_make("queue", NULL));
         assert(queues_[channelIdx]);
         
-        gst_bin_add_many(GST_BIN(pipeline_), sources_[channelIdx], aconvs_[channelIdx], 
-                queues_[channelIdx], NULL);
     }
+
+    pipeline_.add_vector(sources_);
+    pipeline_.add_vector(aconvs_);
+    pipeline_.add_vector(queues_);
 
     // FIXME: replace with subclasses?
     if (config_.hasTestSrc())
@@ -101,15 +103,17 @@ void AudioSender::init_source()
             decoders_.push_back(gst_element_factory_make("wavparse", NULL));
             assert(decoders_[channelIdx]);
         }
+        
+        pipeline_.add_vector(decoders_);
 
         // FIXME: location should be changeable
         for (src = sources_.begin(); src != sources_.end(); ++src) 
             g_object_set(G_OBJECT(*src), "location", "audiofile.pcm", NULL);
         
+
         for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
         {
-            gst_bin_add(GST_BIN(pipeline_), *dec);
-            g_signal_connect(*dec, "pad-added", G_CALLBACK(cb_new_src_pad), (void *) *aconv);
+            g_signal_connect(*dec, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *) *aconv);
         }
         
         for (src = sources_.begin(), dec = decoders_.begin(); src != sources_.end(); ++src, ++dec)
@@ -148,7 +152,9 @@ void AudioSender::init_sink()
         payloader_ = gst_element_factory_make("rtpvorbispay", NULL);
         assert(payloader_);
 
-        gst_bin_add_many(GST_BIN(pipeline_), encoder_, payloader_, NULL);
+        pipeline_.add(encoder_);
+        pipeline_.add(payloader_);
+
         assert(gst_element_link_many(interleave_, encoder_, payloader_, NULL));
 
         init_rtp();
@@ -168,7 +174,8 @@ void AudioSender::init_sink()
         assert(sink_);
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
-        gst_bin_add(GST_BIN(pipeline_), sink_);
+        pipeline_.add(sink_);
+
         assert(gst_element_link_many(interleave_, sink_, NULL));
     }
 }
@@ -194,7 +201,10 @@ void AudioSender::init_rtp()
     assert(rtcp_receiver_);
 	g_object_set(rtcp_receiver_, "port", config_.port() + 5, NULL);
 
-    gst_bin_add_many(GST_BIN(pipeline_), rtpbin_, rtp_sender_, rtcp_sender_, rtcp_receiver_, NULL);
+    pipeline_.add(rtpbin_); 
+    pipeline_.add(rtp_sender_);
+    pipeline_.add(rtcp_sender_);
+    pipeline_.add(rtcp_receiver_);
 	
     GstPad *send_rtp_sink = gst_element_get_request_pad(rtpbin_, "send_rtp_sink_0");
     assert(send_rtp_sink);
@@ -237,7 +247,7 @@ void AudioSender::init_rtp()
 // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
 const char * AudioSender::caps_str() const
 {
-    assert(isPlaying());
+    assert(pipeline_.isPlaying());
     
     GstPad *pad;
     GstCaps *caps;
@@ -267,7 +277,6 @@ void AudioSender::send_caps() const
     if (lo_send(t, "/audio/rx/caps", "s", caps_str()) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
 }
-
 
 
 // set channel layout for interleave element

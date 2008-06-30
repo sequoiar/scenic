@@ -27,7 +27,7 @@
 #include "videoReceiver.h"
 
 
-VideoReceiver::VideoReceiver(const VideoConfig& config) : config_(config)
+VideoReceiver::VideoReceiver(const VideoConfig& config) : MediaBase(dynamic_cast<const MediaConfig&>(config)), config_(config)
 {
     // empty
 }
@@ -53,7 +53,7 @@ void VideoReceiver::init_source()
     g_object_set(G_OBJECT(src_), "caps", caps, NULL);
     g_object_set(G_OBJECT(src_), "port", config_.port(), NULL);
     
-    gst_bin_add(GST_BIN(pipeline_), src_);
+    pipeline_.add(src_);
     gst_caps_unref(caps);
 }
 
@@ -71,7 +71,8 @@ void VideoReceiver::init_codec()
 
     //    g_object_set(G_OBJECT(decoder_), "debug-mv", TRUE, NULL);
 
-        gst_bin_add_many(GST_BIN(pipeline_), depayloader_, decoder_, NULL);
+        pipeline_.add(depayloader_);
+        pipeline_.add(decoder_);
         assert(gst_element_link_many(src_, depayloader_, decoder_, NULL));
     }
 }
@@ -84,7 +85,7 @@ void VideoReceiver::init_sink()
     assert(sink_);
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
-    gst_bin_add(GST_BIN(pipeline_), sink_);
+    pipeline_.add(sink_);
     assert(gst_element_link(decoder_, sink_));
 }
 

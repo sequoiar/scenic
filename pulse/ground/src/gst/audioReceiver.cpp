@@ -35,7 +35,8 @@
 
 
 
-AudioReceiver::AudioReceiver(const AudioConfig& config) : config_(config), gotCaps_(false)
+AudioReceiver::AudioReceiver(const AudioConfig& config) : MediaBase(dynamic_cast<const MediaConfig&>(config)), 
+    config_(config), gotCaps_(false)
 {
    // empty 
 }
@@ -112,7 +113,10 @@ void AudioReceiver::init_source()
     assert(rtcp_sender_);
 	g_object_set(rtcp_sender_, "host", config_.remoteHost(), "port", config_.port() + 5, "sync", FALSE, "async", FALSE, NULL);
 
-    gst_bin_add_many(GST_BIN(pipeline_), rtpbin_, rtp_receiver_, rtcp_receiver_, rtcp_sender_, NULL);
+    pipeline_.add(rtpbin_);
+    pipeline_.add(rtp_receiver_);
+    pipeline_.add(rtcp_receiver_);
+    pipeline_.add(rtcp_sender_);
 
 #if 0
     source_= gst_element_factory_make("udpsrc", "source");
@@ -134,7 +138,8 @@ void AudioReceiver::init_codec()
     decoder_ = gst_element_factory_make(config_.codec(), NULL);
     assert(decoder_);
 
-    gst_bin_add_many(GST_BIN(pipeline_), depayloader_, decoder_, NULL);
+    pipeline_.add(depayloader_);
+    pipeline_.add(decoder_);
 
     assert(gst_element_link_many(depayloader_, decoder_, NULL));
 
@@ -167,7 +172,7 @@ void AudioReceiver::init_rtp()
     assert(gst_pad_link(send_rtcp_src, rtcpSenderSink) == GST_PAD_LINK_OK);
 	
     // when pad is created, it must be linked to depayloader
-    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(cb_new_src_pad), (void *)depayloader_);
+    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *)depayloader_);
 
     // release request pads (in reverse order)
     gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);
@@ -189,7 +194,7 @@ void AudioReceiver::init_sink()
     assert(sink_);
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     
-    gst_bin_add(GST_BIN(pipeline_), sink_); 
+    pipeline_.add(sink_);
 
     assert(gst_element_link(decoder_, sink_));
 }

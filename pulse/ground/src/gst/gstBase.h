@@ -1,5 +1,5 @@
 
-// mediaBase.cpp
+// gstBase.h
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
 // This file is part of [propulse]ART.
@@ -18,46 +18,33 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <gst/gst.h>
-#include <cassert>
+#ifndef _GST_BASE_H_
+#define _GST_BASE_H_
 
-#include "mediaBase.h"
-#include "mediaConfig.h"
-#include "logWriter.h"
+#include "pipeline.h"
 
-
-MediaBase::MediaBase(const MediaConfig &config) : config_(config)
+class GstBase
 {
-}
+    public:
+        
+    protected:
+        typedef std::vector<GstElement*>::iterator GstIter;
 
+        GstBase();
+        virtual ~GstBase();
+        static void wait_until_playing();
 
+        static Pipeline pipeline_;
+        // FIXME : get rid of me
+        GstElement *rtpbin_;
 
-MediaBase::~MediaBase()
-{
-    pipeline_.stop();
-}
+    private:
+#if 0
+        typedef struct _GstElement GstElement;
+        typedef struct _GstPad GstPad;
+#endif
+        static bool gstInitialized_;
+};
 
-
-
-bool MediaBase::start()
-{
-    return pipeline_.start();
-}
-
-
-
-bool MediaBase::stop()
-{
-    return pipeline_.stop();
-}
-
-
-
-bool MediaBase::init()
-{
-    // these methods are defined in subclasses
-    init_source();
-    init_codec();
-    init_sink();
-}
+#endif // _GST_BASE_H_
 
