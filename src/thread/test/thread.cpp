@@ -31,18 +31,17 @@ class Thread : public BaseThread<Message>
 
 int Thread::main()
 {
-	static Message r(message::ok);
+	Message r(message::ok);
     int count=0;
     while(1) 
     { 
-        Message& f = *queue_pair_pop<Message*>(queue);
+        Message f = queue.copy_timed_pop(1);
         std::cout << message::str[f.type];
-        queue.done(&f);
-		queue_pair_push(queue,&r);
+		queue.push(r);
 		if(count++ == 1000) 
 		{
-			static Message f(message::quit);			
-			queue_pair_push(queue,&f);
+			Message f(message::quit);			
+			queue.push(f);
     	    break;
 		}
     }
@@ -61,19 +60,16 @@ int main (int argc, char** argv)
     
     while(1)
     {
-		queue_pair_push(queue,&f);
+		queue.push(f);
 		std::cout << "sent it" << std::endl;
-		if(Message* f = queue_pair_timed_pop<Message*>(queue,10))
-		{
-            std::cout << message::str[f->type];
-			if(f->type == message::quit){
-                queue.done(f);
-			    break;  
-            }
-            else
-                queue.done(f);
+		Message f = queue.copy_timed_pop(10);
+		
+            std::cout << message::str[f.type];
+			if(f.type == message::quit){
+				break;
+			}
 
-		}
+		
 		
 	}
 

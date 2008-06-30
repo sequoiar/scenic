@@ -1,4 +1,4 @@
-#include "oscThread.h"
+#include "osc.h"
 #include <iostream>
 
 #include <list>
@@ -14,11 +14,13 @@ int main(int argc,char** argv)
 
    while(1)
    {
-        OscMessage m = q.copy_timed_pop(100);
+        OscMessage m = q.copy_timed_pop(1000);
+ 
+        if(!m.path.empty())                  
+		{
+            std::cout <<"main"<< m.path << m.args[0].s << m.args[1].i << std::endl; 
+		}
 
-        if(!m.path.empty())
-            std::cout << m.path << std::endl;
-        q.done(&m);
     }
 
 }
