@@ -3,5 +3,5 @@
 aclocal
 autoconf
 automake -a
-./configure 
+./configure CXXFLAGS='-O0 -g -Wall -Wfatal-errors'
 
