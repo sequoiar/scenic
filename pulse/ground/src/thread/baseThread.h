@@ -22,6 +22,8 @@
 #include <glib.h>
 #include <utility>
 #include <list>
+#include <map>
+#include <string>
 
 typedef GAsyncQueue GAsyncQueue;
 
@@ -53,7 +55,7 @@ public:
     BaseThread<T>();
     ~BaseThread<T>();
 
-    QueuePair_<T> getInvertQueue(){return (QueuePair_<T>(queue.second,queue.first));}
+    QueuePair_<T> getQueue(std::string s);
     GAsyncQueue* getPushQueue(){return queue.first;}
     GAsyncQueue* getPopQueue(){return queue.second;}
     bool run();
@@ -61,9 +63,24 @@ protected:
     virtual int main(){ return 0;}
     GThread* th;
     QueuePair_<T> queue;
+    std::map<std::string,QueuePair_<T> > queue_map;
 static void* thread_main(void* v);
 };
 
+    
+template <class T>
+QueuePair_<T> BaseThread<T>::getQueue(std::string s)
+{
+    if(s.empty())
+        return (QueuePair_<T>(queue.second,queue.first));
+
+    if(queue_map.find(s) == queue_map.end()){
+        GAsyncQueue* q = g_async_queue_new();
+        queue_map[s] = QueuePair_<T>(queue.first,q);
+    }
+        
+    return QueuePair_<T>(queue_map[s].second,queue_map[s].first);
+}
  
 template <class T>
 T queue_pair_pop(BaseQueuePair qp)
@@ -173,6 +190,7 @@ BaseThread<T>::BaseThread():th(0)
     queue.init();
     queue.first = g_async_queue_new();
     queue.second = g_async_queue_new();
+    queue_map[""] = queue;
 }
 
 template <class T>
@@ -181,8 +199,12 @@ BaseThread<T>::~BaseThread()
     if(th)
     	g_thread_join(th);
 
-	g_async_queue_unref(queue.first);
 	g_async_queue_unref(queue.second);
+
+    for(;queue_map.begin() != queue_map.end();
+            queue_map.erase(queue_map.begin()))
+            g_async_queue_unref(queue_map.begin()->second.first);
+
 
 }
 
