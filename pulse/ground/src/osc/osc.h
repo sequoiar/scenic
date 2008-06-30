@@ -18,7 +18,7 @@
 //
 
 /** \file 
- *      Just the License GPL 3+ 
+ *      Osc Message and Thread
  *
  *      Detailed description here.
  *      Continues here.
@@ -36,14 +36,15 @@
 #include <vector>
 #include <iostream>
 
-class MyLo;
+class LoArgs;
+typedef std::vector<LoArgs> OscArgs;
 class OscMessage
 {
 public:
     OscMessage(const char*p,const char *t, lo_arg **v, int c,void* d);
     OscMessage(){}
     std::string path,types;
-	std::vector<MyLo> args;
+	OscArgs args;
     int argc;
     void* data;
 
@@ -62,13 +63,16 @@ class OscThread : public BaseThread<OscMessage>
 
     static void liblo_error(int num, const char *msg, const char *path){}
 
+
+    void send(OscMessage& osc);
 };
-class MyLo 
+class LoArgs 
 {
 public:
-   	MyLo(const char *pchar, int index, lo_arg* a)
+   	LoArgs(const char *pchar, int index, lo_arg* a)
 	{
-		switch(pchar[index])
+        type = (lo_type)pchar[index];
+		switch((char)type)
 		{
             case 's':
 			{
@@ -85,7 +89,7 @@ public:
 		
      	
 	}
-
+    lo_type type;
 	int i;
 
 

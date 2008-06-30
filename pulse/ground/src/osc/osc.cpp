@@ -17,7 +17,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \filep
+/** \file
  *      
  *
  *
@@ -36,7 +36,7 @@ OscMessage::OscMessage(const char*p,const char *t, lo_arg **v, int c,void* d)
 {
 	for(int i=0;i<c;i++)
 	{
-		args.push_back(MyLo(t,i,v[i]));
+		args.push_back(LoArgs(t,i,v[i]));
 		std::cerr << t[i] << " from " << p << std::endl;
 	}
 
@@ -57,6 +57,9 @@ int OscThread::generic_handler(const char *path, const char *types,
 		lo_arg **argv, int argc, void *data)
 {
    queue.push(OscMessage(path,types,argv,argc,data));
+   if(queue_map.find(std::string(path)) != queue_map.end())
+       queue_map[std::string(path)].push(OscMessage(path,types,argv,argc,data));
+   return 0;
 }
 
 
@@ -65,7 +68,6 @@ int OscThread::generic_handler(const char *path, const char *types,
 int OscThread::main()
 {
 //	static Message r(message::ok);
-    int count=0;
 
     lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
@@ -76,18 +78,43 @@ int OscThread::main()
     while(1) 
     { 
 		usleep(1000);
-/*        OscMessage msg = queue.copy_timed_pop(1000);
+        OscMessage msg = queue.copy_timed_pop(1000);
         if (!msg.path.empty())
         {
-            //queue.push(msg);
+            send(msg);
         }
-*/
+
 
     }
 return 0; 
 }
 
 
+void OscThread::send(OscMessage& osc)
+{
+    lo_address t = lo_address_new(NULL,"7771");
+    lo_message m = lo_message_new();
 
+    for(OscArgs::iterator it=osc.args.begin();it != osc.args.end();++it)
+    {
+        switch((char)it->type)
+        {
+            case 's':
+            {
+                lo_message_add_string(m,it->s.c_str());
+                break;
+            }
+            case 'i':
+            {
+                lo_message_add_int32(m,it->i);
+                break;
+            }
+       }
+
+    }
+
+    lo_send_message(t,osc.path.c_str(),m);
+
+}
 
 
