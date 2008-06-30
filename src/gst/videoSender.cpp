@@ -28,7 +28,7 @@
 #include "videoSender.h"
 #include "logWriter.h"
 
-VideoSender::VideoSender(const VideoConfig& config) : config_(config)
+VideoSender::VideoSender(const VideoConfig& config) : MediaBase(dynamic_cast<const MediaConfig&>(config)), config_(config)
 {
     // empty
 }
@@ -46,7 +46,7 @@ void VideoSender::init_source()
 {
     source_ = gst_element_factory_make(config_.source(), NULL);
     assert(source_);
-    gst_bin_add(GST_BIN(pipeline_), source_);
+    pipeline_.add(source_);
     lastLinked_ = source_;
 
     if (config_.has_dv()) // need to demux and decode dv first
@@ -59,7 +59,9 @@ void VideoSender::init_source()
         assert(dvdec_);
 
         // demux has dynamic pads
-        gst_bin_add_many(GST_BIN(pipeline_), demux_, queue_, dvdec_, NULL);
+        pipeline_.add(demux_);
+        pipeline_.add(queue_);
+        pipeline_.add(dvdec_);
 
         // demux srcpad must be linked to queue sink pad at runtime
         g_signal_connect(demux_, "pad-added", G_CALLBACK(cb_new_src_pad), (void *) queue_);
@@ -97,7 +99,8 @@ void VideoSender::init_codec()
         encoder_ = gst_element_factory_make("x264enc", NULL);
         assert(encoder_);
         g_object_set(G_OBJECT(encoder_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4, NULL);
-        gst_bin_add_many(GST_BIN(pipeline_), colorspc_, encoder_, NULL);
+        pipeline_.add(colorspc_);
+        pipeline_.add(encoder_);
         assert(gst_element_link_many(lastLinked_, colorspc_, encoder_, NULL));
         lastLinked_ = encoder_;
     }
@@ -113,14 +116,15 @@ void VideoSender::init_sink()
         assert(payloader_);
         sink_ = gst_element_factory_make("udpsink", NULL);
         g_object_set(G_OBJECT(sink_), "host", config_.remoteHost(), "port", config_.port(), NULL);
-        gst_bin_add_many(GST_BIN(pipeline_), payloader_, sink_, NULL);
+        pipeline_.add(payloader_);
+        pipeline_.add(sink_);
         assert(gst_element_link_many(lastLinked_, payloader_, sink_, NULL));
     }
     else // local test only
     {
         sink_ = gst_element_factory_make("xvimagesink", NULL);
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-        gst_bin_add(GST_BIN(pipeline_), sink_);
+        pipeline_.add(sink_);
         assert(gst_element_link(lastLinked_, sink_));
     }
 }

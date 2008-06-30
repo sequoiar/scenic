@@ -21,40 +21,28 @@
 #ifndef _MEDIA_BASE_H_
 #define _MEDIA_BASE_H_
 
-#include <vector>
-class MediaBase
+#include "mediaConfig.h"
+#include "gstBase.h"
+
+class MediaBase : public GstBase
 {
     public:
         virtual bool start();
         virtual bool stop();
-        bool isPlaying() const;
+
         virtual bool init();
-
-
+        
     protected:
 
-        typedef struct _GstElement GstElement;
-        typedef struct _GstPad GstPad;
-        typedef std::vector<GstElement*>::iterator GstIter;
-
-        // call back to attach new src pad
-        static void cb_new_src_pad(GstElement *element, GstPad *srcPad, void *data);
-
-        MediaBase();
+        MediaBase(const MediaConfig &config);
         virtual ~MediaBase(); 
-        virtual void init_pipeline();
         virtual void init_source() = 0;
         virtual void init_codec() = 0;
         virtual void init_sink() = 0;
-        void wait_until_playing();
 
-        GstElement *pipeline_, *rtpbin_;
+        const MediaConfig config_;
 
     private:
-
-        bool verbose_;
-        void make_verbose();
-        static bool gstInitialized_;
 };
 
 #endif // _MEDIA_BASE_H_
