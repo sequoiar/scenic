@@ -11,6 +11,8 @@ dnl Debug mode
 AM_MAINTAINER_MODE
 # Check for C and C++ compilers
 AC_PROG_CXX
+
+
 AC_PROG_CC
 AC_PROG_RANLIB
 
@@ -30,49 +32,58 @@ AC_CHECK_FUNCS([inet_ntoa memset socket])
 #Trying to set CPPTEST_LIBS using pkg-config
 PKG_CHECK_MODULES(CPPTEST, libcpptest, have_cpptest=true, have_cpptest=false)
 if test "x${have_cpptest}" = "xfalse" ; then
-    AC_MSG_WARN([libcpptest not found.])
+    AC_MSG_ERROR([libcpptest not found.-- ubuntu: sudo apt-get install libcpptest-dev])
 fi
 
 
 #Trying to set CPPTEST_LIBS using pkg-config
 PKG_CHECK_MODULES(GLIB, [glib-2.0 gthread-2.0], have_glib=true, have_glib=false)
 if test "x${have_glib}" = "xfalse" ; then
-    AC_MSG_WARN([glib not found.])
+    AC_MSG_ERROR([glib not found.])
 fi
 
 #Trying to set GST_CFLAGS GST_LIBS using pkg-config
 PKG_CHECK_MODULES(GST, gstreamer-0.10, have_gstreamer=true, have_gstreamer=false)
 if test "x${have_gstreamer}" = "xfalse" ; then
-    AC_MSG_WARN([GStreamer not found.])
+    AC_MSG_ERROR([GStreamer not found.])
 fi
 
 
 #Trying to set GSTAUDIO using pkg-config
 PKG_CHECK_MODULES(GSTAUDIO, gstreamer-audio-0.10, have_gstreamer_audio=true, have_gstreamer_audio=false)
 if test "x${have_gstreamer_audio}" = "xfalse" ; then
-    AC_MSG_WARN([GStreamer-audio not found.])
+    AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
 fi
 
+#Trying to set PJSIP using pkg-config
+PKG_CHECK_MODULES(UUID, uuid, have_uuid=true, have_uuid=false)
+if test "x${have_libuuid}" = "xfalse" ; then
+    AC_MSG_ERROR([UUID not found. pkg libuuid1])
+fi
 
 #Trying to set PJSIP using pkg-config
 PKG_CHECK_MODULES(PJSIP, libpj, have_libpj=true, have_libpj=false)
 if test "x${have_libpj}" = "xfalse" ; then
-    AC_MSG_WARN([PJSIP not found.])
+    AC_MSG_ERROR([PJSIP not found. http://www.pjsip.org/download.htm])
 fi
 
 #Trying to set LIBLO using pkg-config
 PKG_CHECK_MODULES(LIBLO, liblo, have_liblo=true, have_liblo=false)
 if test "x${have_liblo}" = "xfalse" ; then
-    AC_MSG_WARN([LIBLO not found.])
+    AC_MSG_ERROR([LIBLO missing. pkg - liblo0,liblo0-dev ])
 fi
 
-PYTHON_CFLAGS="-I/usr/include/boost/python "
-PYTHON_CFLAGS+=`python-config --includes` 
-PYTHON_LIBS="/usr/lib/libboost_python.so "
-PYTHON_LIBS+=`python-config --ldflags` 
+#PYTHON_CFLAGS="-I/usr/include/boost/python "
+#PYTHON_CFLAGS+=`python-config --includes` 
+#PYTHON_LIBS="/usr/lib/libboost_python.so "
+#PYTHON_LIBS+=`python-config --ldflags` 
 
-AC_SUBST(PYTHON_CFLAGS)
-AC_SUBST(PYTHON_LIBS)
+#AC_SUBST(PYTHON_CFLAGS)
+#AC_SUBST(PYTHON_LIBS)
+
+AX_PYTHON
+AX_BOOST_PYTHON
+
 
 
 AC_CONFIG_FILES([Makefile
