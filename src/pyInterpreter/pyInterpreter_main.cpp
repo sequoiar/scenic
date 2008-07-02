@@ -29,26 +29,26 @@
 
 #include <iostream>
 
-int ground_init(int argc, char* argv[]);
+int ground_init(int argc, char *argv[]);
 int ground_loop(int result);
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     static int count;
     std::string result;
     pyInterpreter py;
 
-    py.init(argc,argv);
+    py.init(argc, argv);
 
-    ground_init(argc,argv);
+    ground_init(argc, argv);
 
     std::cout << std::endl << "Welcome to the Console" << std::endl;
     std::cout << "Brought to you by The Hawfullpuf Industrial Complex." << std::endl;
-    while(1)
+    while (1)
     {
-        if(ground_loop(count))
+        if (ground_loop(count))
         {
-            if(!py.run_input().empty())
+            if (!py.run_input().empty())
                 count = -1;
         }
         else
@@ -57,4 +57,3 @@ int main(int argc, char* argv[])
 
     std::cout << std::endl << "going down - CLEANUP ----" << std::endl;
 }
-
