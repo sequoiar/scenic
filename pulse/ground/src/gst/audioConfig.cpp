@@ -26,60 +26,46 @@
 #include <string>
 #include "audioConfig.h"
 
-AudioConfig::AudioConfig(std::string source, int numChannels, std::string codec, 
-        std::string remoteHost, int port) 
-: MediaConfig(source, codec, remoteHost, port),  numChannels_(numChannels)
+AudioConfig::AudioConfig(std::string source, int numChannels, std::string codec, std::string remoteHost, int port):MediaConfig(source, codec, remoteHost, port),
+numChannels_
+(numChannels)
 {
     // empty
 }
 
-
-
-
-AudioConfig::AudioConfig(std::string source, int numChannels) 
-: MediaConfig(source),  numChannels_(numChannels)
+AudioConfig::AudioConfig(std::string source, int numChannels):MediaConfig(source),
+numChannels_(numChannels)
 {
     // empty
 }
 
-
-
-AudioConfig::AudioConfig(int numChannels, std::string codec, int port) 
-: MediaConfig(codec, port),  numChannels_(numChannels)
+AudioConfig::AudioConfig(int numChannels, std::string codec, int port):MediaConfig(codec, port),
+numChannels_(numChannels)
 {
     // empty
 }
 
-
-const int AudioConfig::numChannels() const
+const int AudioConfig::numChannels() const const
 {
     return numChannels_;
 }
 
-
-
-const bool AudioConfig::hasTestSrc() const
+const bool AudioConfig::hasTestSrc() const const
 {
     return !source_.compare("audiotestsrc");
 }
 
-
-
-const bool AudioConfig::hasFileSrc() const
+const bool AudioConfig::hasFileSrc() const const
 {
     return !source_.compare("filesrc");
 }
 
-
-
-const bool AudioConfig::hasAlsaSrc() const
+const bool AudioConfig::hasAlsaSrc() const const
 {
     return !source_.compare("alsasrc");
 }
 
-
-
-const bool AudioConfig::hasJackSrc() const
+const bool AudioConfig::hasJackSrc() const const
 {
     return !source_.compare("jackaudiosrc");
 }

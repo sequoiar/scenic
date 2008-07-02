@@ -18,7 +18,6 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 #include <iostream>
 #include <cassert>
 #include <gst/gst.h>
@@ -26,15 +25,13 @@
 #include "mediaBase.h"
 #include "videoReceiver.h"
 
-
-VideoReceiver::VideoReceiver(const VideoConfig& config) : MediaBase(dynamic_cast<const MediaConfig&>(config)), config_(config)
+VideoReceiver::VideoReceiver(const VideoConfig & config):MediaBase(dynamic_cast < const MediaConfig & >(config)),
+config_(config)
 {
     // empty
 }
 
-
-
-VideoReceiver::~VideoReceiver() 
+VideoReceiver::~VideoReceiver()
 {
     assert(stop());
 
@@ -43,8 +40,6 @@ VideoReceiver::~VideoReceiver()
     pipeline_.remove(depayloader_);
     pipeline_.remove(sink_);
 }
-
-
 
 void VideoReceiver::init_source()
 {
@@ -57,12 +52,10 @@ void VideoReceiver::init_source()
 
     g_object_set(G_OBJECT(src_), "caps", caps, NULL);
     g_object_set(G_OBJECT(src_), "port", config_.port(), NULL);
-    
+
     pipeline_.add(src_);
     gst_caps_unref(caps);
 }
-
-
 
 void VideoReceiver::init_codec()
 {
@@ -74,15 +67,13 @@ void VideoReceiver::init_codec()
         decoder_ = gst_element_factory_make("ffdec_h264", NULL);
         assert(decoder_);
 
-    //    g_object_set(G_OBJECT(decoder_), "debug-mv", TRUE, NULL);
+        //    g_object_set(G_OBJECT(decoder_), "debug-mv", TRUE, NULL);
 
         pipeline_.add(depayloader_);
         pipeline_.add(decoder_);
         assert(gst_element_link_many(src_, depayloader_, decoder_, NULL));
     }
 }
-
-
 
 void VideoReceiver::init_sink()
 {
@@ -93,4 +84,3 @@ void VideoReceiver::init_sink()
     pipeline_.add(sink_);
     assert(gst_element_link(decoder_, sink_));
 }
-

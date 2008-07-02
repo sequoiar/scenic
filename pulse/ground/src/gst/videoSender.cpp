@@ -18,7 +18,6 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -28,14 +27,14 @@
 #include "videoSender.h"
 #include "logWriter.h"
 
-VideoSender::VideoSender(const VideoConfig& config) : MediaBase(dynamic_cast<const MediaConfig&>(config)), config_(config)
+VideoSender::VideoSender(const VideoConfig & config):MediaBase(dynamic_cast <
+                                                               const MediaConfig & >(config)),
+config_(config)
 {
     // empty
 }
 
-
-
-VideoSender::~VideoSender() 
+VideoSender::~VideoSender()
 {
     assert(stop());
     pipeline_.remove(source_);
@@ -48,8 +47,6 @@ VideoSender::~VideoSender()
     pipeline_.remove(sink_);
 }
 
-
-
 void VideoSender::init_source()
 {
     source_ = gst_element_factory_make(config_.source(), NULL);
@@ -57,7 +54,7 @@ void VideoSender::init_source()
     pipeline_.add(source_);
     lastLinked_ = source_;
 
-    if (config_.has_dv()) // need to demux and decode dv first
+    if (config_.has_dv())       // need to demux and decode dv first
     {
         demux_ = gst_element_factory_make("dvdemux", NULL);
         assert(demux_);
@@ -80,9 +77,7 @@ void VideoSender::init_source()
     }
 }
 
-
-
-void VideoSender::cb_new_src_pad(GstElement *srcElement, GstPad *srcPad, void * data)
+void VideoSender::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
 {
     // ignore audio from dvsrc
     if (!std::string("audio").compare(gst_pad_get_name(srcPad)))
@@ -91,12 +86,11 @@ void VideoSender::cb_new_src_pad(GstElement *srcElement, GstPad *srcPad, void * 
     GstElement *sinkElement = (GstElement *) data;
     GstPad *sinkPad;
     LOG("Dynamic pad created, linking new srcpad and sinkpad.");
-    
+
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
     assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
     gst_object_unref(sinkPad);
 }
-
 
 void VideoSender::init_codec()
 {
@@ -114,8 +108,6 @@ void VideoSender::init_codec()
     }
 }
 
-
-
 void VideoSender::init_sink()
 {
     if (config_.isNetworked())
@@ -128,7 +120,7 @@ void VideoSender::init_sink()
         pipeline_.add(sink_);
         assert(gst_element_link_many(lastLinked_, payloader_, sink_, NULL));
     }
-    else // local test only
+    else                        // local test only
     {
         sink_ = gst_element_factory_make("xvimagesink", NULL);
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
@@ -136,7 +128,6 @@ void VideoSender::init_sink()
         assert(gst_element_link(lastLinked_, sink_));
     }
 }
-
 
 bool VideoSender::start()
 {
@@ -148,4 +139,3 @@ bool VideoSender::start()
 
     return MediaBase::start();
 }
-

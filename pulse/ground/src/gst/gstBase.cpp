@@ -25,28 +25,21 @@
 #include "logWriter.h"
 
 // this initializes pipeline only once/process
-GstBase::GstBase() : pipeline_(Pipeline::Instance())
+GstBase::GstBase():pipeline_(Pipeline::Instance())
 {
 }
-
-
 
 GstBase::~GstBase()
 {
 }
-
-
 
 bool GstBase::isPlaying()
 {
     return pipeline_.isPlaying();
 }
 
-
-
 void GstBase::wait_until_playing()
 {
-    while (!pipeline_.isPlaying())  // wait for pipeline to get rolling
+    while (!pipeline_.isPlaying())      // wait for pipeline to get rolling
         usleep(1000);
 }
-

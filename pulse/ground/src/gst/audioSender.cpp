@@ -35,15 +35,14 @@
 #include "logWriter.h"
 #include "audioSender.h"
 
-AudioSender::AudioSender(const AudioConfig& config) : MediaBase(dynamic_cast<const MediaConfig&>(config)) , 
-    config_(config), sink_(0)
+AudioSender::AudioSender(const AudioConfig & config):MediaBase(dynamic_cast <
+                                                               const MediaConfig & >(config)),
+config_(config), sink_(0)
 {
     // empty
 }
 
-
-
-AudioSender::~AudioSender() 
+AudioSender::~AudioSender()
 {
     assert(stop());
 
@@ -59,7 +58,6 @@ AudioSender::~AudioSender()
         pipeline_.remove(sink_);
 }
 
-
 void AudioSender::init_interleave()
 {
     interleave_ = gst_element_factory_make("interleave", NULL);
@@ -69,8 +67,6 @@ void AudioSender::init_interleave()
 
     set_channel_layout();
 }
-
-
 
 void AudioSender::init_source()
 {
@@ -87,7 +83,7 @@ void AudioSender::init_source()
         assert(aconvs_[channelIdx]);
         queues_.push_back(gst_element_factory_make("queue", NULL));
         assert(queues_[channelIdx]);
-        
+
     }
 
     pipeline_.add_vector(sources_);
@@ -97,12 +93,12 @@ void AudioSender::init_source()
     // FIXME: replace with subclasses?
     if (config_.hasTestSrc())
     {
-        const double GAIN = 1.0 / config_.numChannels(); // so sum of tones equals 1.0
+        const double GAIN = 1.0 / config_.numChannels();        // so sum of tones equals 1.0
         double frequency = 100.0;
 
         for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
             g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
-        
+
         for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(); ++src, ++aconv)
             assert(gst_element_link_many(*src, *aconv, interleave_, NULL));
     }
@@ -115,22 +111,21 @@ void AudioSender::init_source()
             decoders_.push_back(gst_element_factory_make("wavparse", NULL));
             assert(decoders_[channelIdx]);
         }
-        
+
         pipeline_.add_vector(decoders_);
 
         // FIXME: location should be changeable
-        for (src = sources_.begin(); src != sources_.end(); ++src) 
+        for (src = sources_.begin(); src != sources_.end(); ++src)
             g_object_set(G_OBJECT(*src), "location", "audiofile.pcm", NULL);
-        
 
         for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
         {
             g_signal_connect(*dec, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *) *aconv);
         }
-        
+
         for (src = sources_.begin(), dec = decoders_.begin(); src != sources_.end(); ++src, ++dec)
             assert(gst_element_link(*src, *dec));
-        
+
         for (aconv = aconvs_.begin(), aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
             assert(gst_element_link(*aconv, interleave_));
     }
@@ -144,8 +139,6 @@ void AudioSender::init_source()
     }
 }
 
-
-
 void AudioSender::init_codec()
 {
     if (!config_.hasCodec())
@@ -155,11 +148,9 @@ void AudioSender::init_codec()
     }
 }
 
-
-
 void AudioSender::init_sink()
 {
-    if (config_.isNetworked()) 
+    if (config_.isNetworked())
     {
         payloader_ = gst_element_factory_make("rtpvorbispay", NULL);
         assert(payloader_);
@@ -170,19 +161,19 @@ void AudioSender::init_sink()
         assert(gst_element_link_many(interleave_, encoder_, payloader_, NULL));
 
 //      init_rtp();
-        session_.add(payloader_, dynamic_cast<const MediaConfig&>(config_));
+        session_.add(payloader_, dynamic_cast < const MediaConfig & >(config_));
 
-#if 0 
+#if 0
         sink_ = gst_element_factory_make("udpsink", NULL);
         assert(sink_);
-    
+
         g_object_set(G_OBJECT(sink_), "host", config_.remoteHost(), "port", config_.port(), NULL);
 
         gst_bin_add_many(GST_BIN(pipeline_), encoder_, payloader_, sink_, NULL);
         assert(gst_element_link_many(interleave_, encoder_, payloader_, sink_, NULL));
 #endif
     }
-    else // local version
+    else                        // local version
     {
         sink_ = gst_element_factory_make("jackaudiosink", NULL);
         assert(sink_);
@@ -194,8 +185,6 @@ void AudioSender::init_sink()
     }
 }
 
-
-
 #if 0
 // FIXME: Rtp stuff is important/big/used enough to be in its own class
 void AudioSender::init_rtp()
@@ -206,28 +195,30 @@ void AudioSender::init_rtp()
     rtp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtp_sender_);
     //TODO: ts-offset
-	g_object_set(rtp_sender_, "host", config_.remoteHost(), "port", config_.port(), "sync", FALSE, "async", FALSE, NULL); 
+    g_object_set(rtp_sender_, "host", config_.remoteHost(), "port", config_.port(), "sync", FALSE,
+                 "async", FALSE, NULL);
 
     rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtcp_sender_);
-	g_object_set(rtcp_sender_, "host", config_.remoteHost(), "port", config_.port() + 1, "sync", FALSE, "async", FALSE, NULL); 
+    g_object_set(rtcp_sender_, "host", config_.remoteHost(), "port", config_.port() + 1, "sync", FALSE,
+                 "async", FALSE, NULL);
 
     rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL);
     assert(rtcp_receiver_);
-	g_object_set(rtcp_receiver_, "port", config_.port() + 5, NULL);
+    g_object_set(rtcp_receiver_, "port", config_.port() + 5, NULL);
 
-    pipeline_.add(rtpbin_); 
+    pipeline_.add(rtpbin_);
     pipeline_.add(rtp_sender_);
     pipeline_.add(rtcp_sender_);
     pipeline_.add(rtcp_receiver_);
-	
+
     GstPad *send_rtp_sink = gst_element_get_request_pad(rtpbin_, "send_rtp_sink_0");
     assert(send_rtp_sink);
-	GstPad *send_rtp_src = gst_element_get_static_pad(rtpbin_, "send_rtp_src_0");
+    GstPad *send_rtp_src = gst_element_get_static_pad(rtpbin_, "send_rtp_src_0");
     assert(send_rtp_src);
-	GstPad *send_rtcp_src = gst_element_get_request_pad(rtpbin_, "send_rtcp_src_0");
+    GstPad *send_rtcp_src = gst_element_get_request_pad(rtpbin_, "send_rtcp_src_0");
     assert(send_rtcp_src);
-	GstPad *recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, "recv_rtcp_sink_0");
+    GstPad *recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, "recv_rtcp_sink_0");
     assert(recv_rtcp_sink);
 
     GstPad *payloadSrc = gst_element_get_static_pad(payloader_, "src");
@@ -258,18 +249,17 @@ void AudioSender::init_rtp()
     gst_element_release_request_pad(rtpbin_, send_rtp_sink);
 }
 #endif
-    
 
 // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
-const char * AudioSender::caps_str() const
+const char *AudioSender::caps_str() const const
 {
     assert(pipeline_.isPlaying());
-    
+
     GstPad *pad;
     GstCaps *caps;
 
     pad = gst_element_get_pad(GST_ELEMENT(session_.rtp_sender_), "sink");
-    assert(pad); 
+    assert(pad);
 
     do
         caps = gst_pad_get_negotiated_caps(pad);
@@ -278,14 +268,12 @@ const char * AudioSender::caps_str() const
 
     gst_object_unref(pad);
 
-    const char * result = gst_caps_to_string(caps);
-    gst_caps_unref(caps); 
-    return result; 
+    const char *result = gst_caps_to_string(caps);
+    gst_caps_unref(caps);
+    return result;
 }
 
-
-
-void AudioSender::send_caps() const
+void AudioSender::send_caps() const const
 {
     LOG("Sending caps...");
 
@@ -294,12 +282,11 @@ void AudioSender::send_caps() const
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
 }
 
-
 // set channel layout for interleave element
 void AudioSender::set_channel_layout()
 {
     GValue val = { 0, };
-    GValueArray *arr;       // for channel position layout
+    GValueArray *arr;           // for channel position layout
     arr = g_value_array_new(config_.numChannels());
 
     g_object_set(interleave_, "channel-positions-from-input", FALSE, NULL);
@@ -308,7 +295,7 @@ void AudioSender::set_channel_layout()
 
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
-        g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[config_.numChannels() - 1][channelIdx]);        
+        g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[config_.numChannels() - 1][channelIdx]);
         g_value_array_append(arr, &val);
         g_value_reset(&val);
     }
@@ -318,19 +305,17 @@ void AudioSender::set_channel_layout()
     g_value_array_free(arr);
 }
 
-
-
 bool AudioSender::start()
 {
     MediaBase::start();
 
-    if (config_.isNetworked())    
+    if (config_.isNetworked())
     {
-        std::cout << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port() 
+        std::cout << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port()
             << std::endl;
 
         wait_until_playing();
-        send_caps();   
+        send_caps();
     }
 
     return true;
@@ -339,56 +324,53 @@ bool AudioSender::start()
 // courtesy of vorbisenc.c
 
 const GstAudioChannelPosition AudioSender::VORBIS_CHANNEL_POSITIONS[][8] = {
-    {                             /* Mono */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_MONO
-    },
-    {                             /* Stereo */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT
-    },
-    {                             /* Stereo + Centre */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT
-    },
-    {                             /* Quadraphonic */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
-    },
-    {                             /* Stereo + Centre + rear stereo */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
-    },
-    {                             /* Full 5.1 Surround */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_LFE,
-    },
-    {                             /* Not defined by spec, GStreamer default */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
-        GST_AUDIO_CHANNEL_POSITION_LFE,
-        GST_AUDIO_CHANNEL_POSITION_REAR_CENTER,
-    },
-    {                             /* Not defined by spec, GStreamer default */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
-        GST_AUDIO_CHANNEL_POSITION_LFE,
-        GST_AUDIO_CHANNEL_POSITION_SIDE_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT,
-    },
+    {                           /* Mono */
+     GST_AUDIO_CHANNEL_POSITION_FRONT_MONO},
+    {                           /* Stereo */
+     GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT},
+    {                           /* Stereo + Centre */
+     GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
+     GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT},
+    {                           /* Quadraphonic */
+     GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
+     GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
+     },
+    {                           /* Stereo + Centre + rear stereo */
+     GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
+     GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
+     GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
+     },
+    {                           /* Full 5.1 Surround */
+     GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
+     GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
+     GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
+     GST_AUDIO_CHANNEL_POSITION_LFE,
+     },
+    {                           /* Not defined by spec, GStreamer default */
+     GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
+     GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
+     GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
+     GST_AUDIO_CHANNEL_POSITION_LFE,
+     GST_AUDIO_CHANNEL_POSITION_REAR_CENTER,
+     },
+    {                           /* Not defined by spec, GStreamer default */
+     GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
+     GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
+     GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
+     GST_AUDIO_CHANNEL_POSITION_LFE,
+     GST_AUDIO_CHANNEL_POSITION_SIDE_LEFT,
+     GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT,
+     },
 };

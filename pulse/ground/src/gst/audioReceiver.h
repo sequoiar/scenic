@@ -29,33 +29,31 @@
 #include "audioConfig.h"
 #include "rtpSession.h"
 
-class AudioReceiver : public MediaBase 
+class AudioReceiver:public MediaBase
 {
-    public:
-        AudioReceiver();
-        AudioReceiver(const AudioConfig& config);
-        virtual ~AudioReceiver();
-        virtual bool start();
+  public:
+    AudioReceiver();
+    AudioReceiver(const AudioConfig & config);
+      virtual ~ AudioReceiver();
+    virtual bool start();
 
-    private:
-        virtual void init_source();
-        virtual void init_codec();
-        virtual void init_sink();
+  private:
+      virtual void init_source();
+    virtual void init_codec();
+    virtual void init_sink();
 
-        static int caps_handler(const char *path, const char *types, lo_arg **argv, int argc, 
-                void *data, void *user_data);
-        
-        void set_caps(const char *caps);
-        static void liblo_error(int num, const char *msg, const char *path);
-        
-        void wait_for_caps();
+    static int caps_handler(const char *path, const char *types, lo_arg ** argv, int argc,
+                            void *data, void *user_data);
 
-        RtpReceiver session_;
-        GstElement *depayloader_, *decoder_, *sink_;
-        AudioConfig config_;
-        bool gotCaps_;
+    void set_caps(const char *caps);
+    static void liblo_error(int num, const char *msg, const char *path);
+
+    void wait_for_caps();
+
+    RtpReceiver session_;
+    GstElement *depayloader_, *decoder_, *sink_;
+    AudioConfig config_;
+    bool gotCaps_;
 };
 
-
 #endif // _AUDIO_RECEIVER_H_
-

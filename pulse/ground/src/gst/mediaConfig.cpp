@@ -25,66 +25,49 @@
 #include <string>
 #include "mediaConfig.h"
 
-MediaConfig::MediaConfig(std::string codec, int port) // receiver
-: codec_(codec), remoteHost_(""), port_(port)
+MediaConfig::MediaConfig(std::string codec, int port)   // receiver
+:codec_(codec), remoteHost_(""), port_(port)
 {
     // empty
 }
 
-
-
-MediaConfig::MediaConfig(std::string source, std::string codec, std::string remoteHost, int port) 
-: source_(source), codec_(codec), remoteHost_(remoteHost), port_(port) // remote sender
+MediaConfig::MediaConfig(std::string source, std::string codec, std::string remoteHost, int port):source_(source), codec_(codec), remoteHost_(remoteHost), port_(port)  // remote sender
 {
     // empty
 }
 
-
-
-MediaConfig::MediaConfig(std::string source)        // local sender
-: source_(source), remoteHost_(""), port_(0)
+MediaConfig::MediaConfig(std::string source)    // local sender
+:  source_(source), remoteHost_(""), port_(0)
 {
     // empty
 }
 
-
-
-const char * MediaConfig::source() const
+const char *MediaConfig::source() const const
 {
     return source_.c_str();
 }
 
-
-
-const char * MediaConfig::codec() const
+const char *MediaConfig::codec() const const
 {
     return codec_.c_str();
 }
 
-
-
-const char * MediaConfig::remoteHost() const
+const char *MediaConfig::remoteHost() const const
 {
     return remoteHost_.c_str();
 }
 
-
-        
-const int MediaConfig::port() const
+const int MediaConfig::port() const const
 {
     return port_;
 }
 
-
-
-const bool MediaConfig::isNetworked() const
+const bool MediaConfig::isNetworked() const const
 {
     return port_ != 0;
 }
 
-
-
-const bool MediaConfig::hasCodec() const
+const bool MediaConfig::hasCodec() const const
 {
     return codec_.empty();
 }
