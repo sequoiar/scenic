@@ -26,24 +26,22 @@
 class GstBase
 {
     public:
+        bool isPlaying();
         
     protected:
         typedef std::vector<GstElement*>::iterator GstIter;
 
         GstBase();
         virtual ~GstBase();
-        static void wait_until_playing();
+        void wait_until_playing();
 
-        static Pipeline pipeline_;
-        // FIXME : get rid of me
-        GstElement *rtpbin_;
+        Pipeline &pipeline_;
 
     private:
 #if 0
         typedef struct _GstElement GstElement;
         typedef struct _GstPad GstPad;
 #endif
-        static bool gstInitialized_;
 };
 
 #endif // _GST_BASE_H_

@@ -992,7 +992,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiofile_dv()
 {
     int numChannels = 8;
     int vPort = 10010;
-    int aPort = vPort + 1;
+    int aPort = vPort + 1000;
 
     if (id_ == 0)
     {
@@ -1037,7 +1037,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audiofile_dv()
 {
     int numChannels = 8;
     int vPort = 10010;
-    int aPort = vPort + 1;
+    int aPort = vPort + 1000;
 
     if (id_ == 0)
     {
@@ -1082,7 +1082,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
 {
     int numChannels = 8;
     int vPort = 10010;
-    int aPort = vPort + 1;
+    int aPort = vPort + 1000;
 
     if (id_ == 0)
     {

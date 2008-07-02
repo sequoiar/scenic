@@ -20,7 +20,6 @@
 
 
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <stdlib.h>
 #include <cassert>
@@ -45,7 +44,11 @@ AudioReceiver::AudioReceiver(const AudioConfig& config) : MediaBase(dynamic_cast
 
 AudioReceiver::~AudioReceiver() 
 {
-    // empty
+    assert(stop());
+
+    pipeline_.remove(depayloader_);
+    pipeline_.remove(decoder_);
+    pipeline_.remove(sink_);
 }
 
 
@@ -89,7 +92,7 @@ void AudioReceiver::set_caps(const char *capsStr)
     GstCaps *caps;
     caps = gst_caps_from_string(capsStr);
     assert(caps);
-    g_object_set(G_OBJECT(rtp_receiver_), "caps", caps, NULL);
+    g_object_set(G_OBJECT(session_.rtp_receiver_), "caps", caps, NULL);
     gst_caps_unref(caps);
     gotCaps_ = true;
 }
@@ -98,6 +101,12 @@ void AudioReceiver::set_caps(const char *capsStr)
 
 void AudioReceiver::init_source()
 {
+    depayloader_ = gst_element_factory_make("rtpvorbisdepay", NULL);
+    assert(depayloader_);
+
+    pipeline_.add(depayloader_);
+
+#if 0
     rtpbin_ = gst_element_factory_make("gstrtpbin", NULL);
     assert(rtpbin_);
     
@@ -117,6 +126,7 @@ void AudioReceiver::init_source()
     pipeline_.add(rtp_receiver_);
     pipeline_.add(rtcp_receiver_);
     pipeline_.add(rtcp_sender_);
+#endif
 
 #if 0
     source_= gst_element_factory_make("udpsrc", "source");
@@ -132,22 +142,20 @@ void AudioReceiver::init_source()
 
 void AudioReceiver::init_codec()
 {
-    depayloader_ = gst_element_factory_make("rtpvorbisdepay", NULL);
-    assert(depayloader_);
 
     decoder_ = gst_element_factory_make(config_.codec(), NULL);
     assert(decoder_);
 
-    pipeline_.add(depayloader_);
     pipeline_.add(decoder_);
 
     assert(gst_element_link_many(depayloader_, decoder_, NULL));
 
-    init_rtp();
+    // init_rtp();
+    session_.add(depayloader_, dynamic_cast<const MediaConfig&>(config_));
 }
 
 
-
+#if 0
 void AudioReceiver::init_rtp()
 {
 
@@ -185,6 +193,7 @@ void AudioReceiver::init_rtp()
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
     gst_object_unref(GST_OBJECT(rtpReceiverSrc));
 }
+#endif
     
 
 

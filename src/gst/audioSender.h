@@ -27,6 +27,7 @@
 
 #include "mediaBase.h"
 #include "audioConfig.h"
+#include "rtpSession.h"
 
 class AudioSender : public MediaBase
 {
@@ -44,7 +45,6 @@ class AudioSender : public MediaBase
         
         virtual void init_source();
         virtual void init_codec(); 
-        virtual void init_rtp(); 
         virtual void init_sink();
 
         void send_caps() const;
@@ -52,8 +52,8 @@ class AudioSender : public MediaBase
 
         // data 
         AudioConfig config_;
+        RtpSender session_;
         std::vector<GstElement*> sources_, decoders_, aconvs_, queues_;
-        GstElement *rtp_sender_, *rtcp_sender_, *rtcp_receiver_;
         GstElement *encoder_;
         GstElement *payloader_;
         GstElement *interleave_;

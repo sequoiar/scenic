@@ -35,7 +35,8 @@
 #include "logWriter.h"
 #include "audioSender.h"
 
-AudioSender::AudioSender(const AudioConfig& config) : MediaBase(dynamic_cast<const MediaConfig&>(config)) , config_(config)
+AudioSender::AudioSender(const AudioConfig& config) : MediaBase(dynamic_cast<const MediaConfig&>(config)) , 
+    config_(config), sink_(0)
 {
     // empty
 }
@@ -44,7 +45,18 @@ AudioSender::AudioSender(const AudioConfig& config) : MediaBase(dynamic_cast<con
 
 AudioSender::~AudioSender() 
 {
-    // empty
+    assert(stop());
+
+    pipeline_.remove_vector(sources_);
+    pipeline_.remove_vector(decoders_);
+    pipeline_.remove_vector(aconvs_);
+    pipeline_.remove_vector(queues_);
+
+    pipeline_.remove(encoder_);
+    pipeline_.remove(payloader_);
+    pipeline_.remove(interleave_);
+    if (sink_)
+        pipeline_.remove(sink_);
 }
 
 
@@ -157,7 +169,9 @@ void AudioSender::init_sink()
 
         assert(gst_element_link_many(interleave_, encoder_, payloader_, NULL));
 
-        init_rtp();
+//      init_rtp();
+        session_.add(payloader_, dynamic_cast<const MediaConfig&>(config_));
+
 #if 0 
         sink_ = gst_element_factory_make("udpsink", NULL);
         assert(sink_);
@@ -182,6 +196,7 @@ void AudioSender::init_sink()
 
 
 
+#if 0
 // FIXME: Rtp stuff is important/big/used enough to be in its own class
 void AudioSender::init_rtp()
 {
@@ -242,6 +257,7 @@ void AudioSender::init_rtp()
     gst_object_unref(GST_OBJECT(send_rtp_src));
     gst_element_release_request_pad(rtpbin_, send_rtp_sink);
 }
+#endif
     
 
 // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
@@ -252,7 +268,7 @@ const char * AudioSender::caps_str() const
     GstPad *pad;
     GstCaps *caps;
 
-    pad = gst_element_get_pad(GST_ELEMENT(rtp_sender_), "sink");
+    pad = gst_element_get_pad(GST_ELEMENT(session_.rtp_sender_), "sink");
     assert(pad); 
 
     do

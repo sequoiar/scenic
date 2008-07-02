@@ -27,6 +27,7 @@
 
 #include "mediaBase.h"
 #include "audioConfig.h"
+#include "rtpSession.h"
 
 class AudioReceiver : public MediaBase 
 {
@@ -39,7 +40,6 @@ class AudioReceiver : public MediaBase
     private:
         virtual void init_source();
         virtual void init_codec();
-        virtual void init_rtp();
         virtual void init_sink();
 
         static int caps_handler(const char *path, const char *types, lo_arg **argv, int argc, 
@@ -50,8 +50,8 @@ class AudioReceiver : public MediaBase
         
         void wait_for_caps();
 
+        RtpReceiver session_;
         GstElement *depayloader_, *decoder_, *sink_;
-        GstElement *rtp_receiver_, *rtcp_receiver_, *rtcp_sender_;
         AudioConfig config_;
         bool gotCaps_;
 };

@@ -37,7 +37,15 @@ VideoSender::VideoSender(const VideoConfig& config) : MediaBase(dynamic_cast<con
 
 VideoSender::~VideoSender() 
 {
-    // empty
+    assert(stop());
+    pipeline_.remove(source_);
+    pipeline_.remove(demux_);
+    pipeline_.remove(queue_);
+    pipeline_.remove(dvdec_);
+    pipeline_.remove(colorspc_);
+    pipeline_.remove(encoder_);
+    pipeline_.remove(payloader_);
+    pipeline_.remove(sink_);
 }
 
 
