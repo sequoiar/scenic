@@ -30,89 +30,76 @@
 #include <lo/lo.h>
 #include "osc.h"
 
-
-OscMessage::OscMessage(const char*p,const char *t, lo_arg **v, int c,void* d)
-        :path(p),types(t),argc(c),data(d) 
+OscMessage::OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d):path(p), types(t),
+argc(c), data(d)
 {
-	for(int i=0;i<c;i++)
-	{
-		args.push_back(LoArgs(t,i,v[i]));
-	}
+    for (int i = 0; i < c; i++)
+    {
+        args.push_back(LoArgs(t, i, v[i]));
+    }
 
 }
- 
-
-
 
 int OscThread::generic_handler_static(const char *path, const char *types,
-		lo_arg **argv, int argc, void *data, void *user_data)
+                                      lo_arg ** argv, int argc, void *data, void *user_data)
 {
-   OscThread* t = static_cast<OscThread*>(user_data);
-   return (t->generic_handler(path,types,argv,argc,data));
+    OscThread *t = static_cast < OscThread * >(user_data);
+    return (t->generic_handler(path, types, argv, argc, data));
 }
 
-
-int OscThread::generic_handler(const char *path, const char *types,
-		lo_arg **argv, int argc, void *data)
+int OscThread::generic_handler(const char *path, const char *types, lo_arg ** argv, int argc, void *data)
 {
-   queue.push(OscMessage(path,types,argv,argc,data));
-   if(queue_map.find(path) != queue_map.end())
-       queue_map[path].push(OscMessage(path,types,argv,argc,data));
-   return 0;
+    queue.push(OscMessage(path, types, argv, argc, data));
+    if (queue_map.find(path) != queue_map.end())
+        queue_map[path].push(OscMessage(path, types, argv, argc, data));
+    return 0;
 }
-
-
-
 
 int OscThread::main()
 {
-//	static Message r(message::ok);
+//      static Message r(message::ok);
 
     lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
-    lo_server_thread_add_method(st, NULL,NULL, generic_handler_static, this);
+    lo_server_thread_add_method(st, NULL, NULL, generic_handler_static, this);
 
     lo_server_thread_start(st);
 
-    while(1) 
-    { 
+    while (1)
+    {
         OscMessage msg = queue.copy_timed_pop(20);
         if (!msg.path.empty())
         {
             send(msg);
         }
 
-
     }
-return 0; 
+    return 0;
 }
 
-
-void OscThread::send(OscMessage& osc)
+void OscThread::send(OscMessage & osc)
 {
-    lo_address t = lo_address_new(NULL,"7771");
+    lo_address t = lo_address_new(NULL, "7771");
     lo_message m = lo_message_new();
 
-    for(OscArgs::iterator it=osc.args.begin();it != osc.args.end();++it)
+    for (OscArgs::iterator it = osc.args.begin(); it != osc.args.end(); ++it)
     {
-        switch((char)it->type)
+        switch ((char) it->type)
         {
-            case 's':
+        case 's':
             {
-                lo_message_add_string(m,it->s.c_str());
+                lo_message_add_string(m, it->s.c_str());
                 break;
             }
-            case 'i':
+        case 'i':
             {
-                lo_message_add_int32(m,it->i);
+                lo_message_add_int32(m, it->i);
                 break;
             }
-       }
+        }
 
     }
 
-    lo_send_message(t,osc.path.c_str(),m);
+    lo_send_message(t, osc.path.c_str(), m);
 
 }
-
-

@@ -34,16 +34,14 @@
 
 #include "pyInterpreter.h"
 
-
 #include "python_import.cpp"
 
 static object main_module;
 static object main_namespace;
 
-
 void pyInterpreter::interact()
 {
-    exec("i.interact()",main_namespace,main_namespace);
+    exec("i.interact()", main_namespace, main_namespace);
 }
 
 std::string pyInterpreter::run_str(std::string s)
@@ -51,33 +49,32 @@ std::string pyInterpreter::run_str(std::string s)
     std::string t_str = "i.push('";
     t_str += s;
     t_str += "')";
-    object ret = eval(t_str.c_str(),main_namespace,main_namespace);
+    object ret = eval(t_str.c_str(), main_namespace, main_namespace);
 //BROKEN
-    extract<char const*> get_str(ret);
-    if(get_str.check())
+    extract < char const *>get_str(ret);
+    if (get_str.check())
         return std::string(get_str());
     else
-    return std::string("");
+        return std::string("");
 }
 
 std::string pyInterpreter::run_input()
 {
-try
-{
-    exec("i.push(i.raw_input('" PROMPT "'))",main_namespace,main_namespace);
-}
-catch(boost::python::error_already_set)
-{    
-    return std::string("EOF");
-}
+    try
+    {
+        exec("i.push(i.raw_input('" PROMPT "'))", main_namespace, main_namespace);
+    }
+    catch(boost::python::error_already_set)
+    {
+        return std::string("EOF");
+    }
     return std::string("");
 }
-
 
 int pyInterpreter::init(int argc, char *argv[])
 {
     object imp;
-    
+
     // This line is needed for python 
     BOOST_PY_IMPORT();
 
@@ -88,12 +85,12 @@ int pyInterpreter::init(int argc, char *argv[])
 
     try
     {
-        if(main_module)
+        if (main_module)
         {
-            exec("import readline",main_namespace,main_namespace);
-            exec("from code import InteractiveConsole",main_namespace,main_namespace);	
-            PYTHON_EXEC_IMPORT(main_namespace,main_namespace);
-            exec("i = InteractiveConsole(globals())",main_namespace,main_namespace);
+            exec("import readline", main_namespace, main_namespace);
+            exec("from code import InteractiveConsole", main_namespace, main_namespace);
+            PYTHON_EXEC_IMPORT(main_namespace, main_namespace);
+            exec("i = InteractiveConsole(globals())", main_namespace, main_namespace);
         }
         else
             PyErr_Print();

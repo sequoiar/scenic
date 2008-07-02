@@ -59,21 +59,19 @@ static int code = PJSIP_SC_NOT_IMPLEMENTED;
 /* Additional header list */
 struct pjsip_hdr hdr_list;
 
-/* Callback to handle response to our request */ 
-static pj_bool_t on_rx_response(pjsip_rx_data *rdata) 
-{ 
+/* Callback to handle response to our request */
+static pj_bool_t on_rx_response(pjsip_rx_data * rdata)
+{
     SipSingleton *sip = SipSingleton::Instance();
 
 //    if ((rdata->msg_info.msg->line.req.method.id == PJSIP_ACK_METHOD)
 //        &&   
-    if((rdata->msg_info.msg->body != NULL) && (rdata->msg_info.msg->line.status.code == 200))
+    if ((rdata->msg_info.msg->body != NULL) && (rdata->msg_info.msg->line.status.code == 200))
     {
 #if 0
-        PJ_LOG(3,(__FILE__, "response body:%s",
-                  rdata->msg_info.msg->body->data));
-#endif 
-        sip->rx_res((const char*)rdata->msg_info.msg->body->data,
-                    rdata->msg_info.msg->body->len);
+        PJ_LOG(3, (__FILE__, "response body:%s", rdata->msg_info.msg->body->data));
+#endif
+        sip->rx_res((const char *) rdata->msg_info.msg->body->data, rdata->msg_info.msg->body->len);
     }
     else
         return PJ_FALSE;
@@ -81,10 +79,8 @@ static pj_bool_t on_rx_response(pjsip_rx_data *rdata)
     return PJ_TRUE;
 }
 
-
-
 /* Callback to handle incoming requests. */
-static pj_bool_t on_rx_request(pjsip_rx_data *rdata)
+static pj_bool_t on_rx_request(pjsip_rx_data * rdata)
 {
     /* Respond (statelessly) all incoming requests (except ACK!)
      * with 501 (Not Implemented)
@@ -97,33 +93,29 @@ static pj_bool_t on_rx_request(pjsip_rx_data *rdata)
         {
             pjsip_msg_body *body;
 
-            pj_str_t t = pj_str((char*)"text");
-            pj_str_t s = pj_str((char*)"plain");
-            pj_str_t data = pj_str((char*)sip->rx_invite((const char*)
-                        rdata->msg_info.msg->body->data, 
-                        rdata->msg_info.msg->body->len));
+            pj_str_t t = pj_str((char *) "text");
+            pj_str_t s = pj_str((char *) "plain");
+            pj_str_t data = pj_str((char *) sip->rx_invite((const char *)
+                                                           rdata->msg_info.msg->body->data,
+                                                           rdata->msg_info.msg->body->len));
 
             body = pjsip_msg_body_create(pool, &t, &s, &data);
 
 #if 0
-            PJ_LOG(3,(__FILE__, "request body:%s",
-                      rdata->msg_info.msg->body->data));
+            PJ_LOG(3, (__FILE__, "request body:%s", rdata->msg_info.msg->body->data));
 #endif
 
-            pjsip_endpt_respond_stateless(sip_endpt, rdata, 200, NULL,
-                                          &hdr_list, body);
+            pjsip_endpt_respond_stateless(sip_endpt, rdata, 200, NULL, &hdr_list, body);
         }
         else
-            pjsip_endpt_respond_stateless(sip_endpt, rdata, code, NULL,
-                                          &hdr_list, NULL);
+            pjsip_endpt_respond_stateless(sip_endpt, rdata, code, NULL, &hdr_list, NULL);
     }
     return PJ_TRUE;
 }
 
-const pjsip_method message_method =
-{
+const pjsip_method message_method = {
     PJSIP_OTHER_METHOD,
-    {(char*) "MESSAGE", 7 }
+    {(char *) "MESSAGE", 7}
 };
 
 char from_port[8];
@@ -139,7 +131,7 @@ void send_request(const char *str)
 
     sprintf(target, "sip:someuser@%s:%s", to_addr, to_port);
     sprintf(from, "\"Local User\" <sip:localuser@%s:%s>", from_addr, from_port);
-    sprintf(to, "\"Remote User\" <sip:remoteuser@%s:%s>", to_addr,to_port);
+    sprintf(to, "\"Remote User\" <sip:remoteuser@%s:%s>", to_addr, to_port);
 
     std::cout << "Sending request from " << from << std::endl;
     std::cout << "To " << to << std::endl;
@@ -151,23 +143,19 @@ void send_request(const char *str)
         pj_str_t str_contact = str_from;
         pj_status_t status;
         pjsip_tx_data *request;
-        pj_str_t body = pj_str((char*)str);
+        pj_str_t body = pj_str((char *) str);
         pjsip_method method;
-    
 
         pjsip_method_set(&method, PJSIP_INVITE_METHOD);
         status = pjsip_endpt_create_request(sip_endpt, &method,
                                             &str_target, &str_from, &str_to,
-                                            &str_contact, NULL, -1, &body,
-                                            &request);
+                                            &str_contact, NULL, -1, &body, &request);
         assert(status == PJ_SUCCESS);
 
-        status = pjsip_endpt_send_request_stateless(sip_endpt, request,
-                 NULL, NULL);
+        status = pjsip_endpt_send_request_stateless(sip_endpt, request, NULL, NULL);
         assert(status == PJ_SUCCESS);
     }
 }
-
 
 /*
  * main()
@@ -175,21 +163,20 @@ void send_request(const char *str)
  */
 int sip_init()
 {
-    static pjsip_module mod_app =
-    {
-        NULL, NULL,		    /* prev, next.		*/
-        {(char*) "mod-app", 7 },	    /* Name.			*/
-        -1,				    /* Id		*/
-        PJSIP_MOD_PRIORITY_APPLICATION, /* Priority		*/
-        NULL,			    /* load()			*/
-        NULL,			    /* start()			*/
-        NULL,			    /* stop()			*/
-        NULL,			    /* unload()			*/
-        &on_rx_request,		    /* on_rx_request()		*/
-        &on_rx_response,			    /* on_rx_response()		*/
-        NULL,			    /* on_tx_request.		*/
-        NULL,			    /* on_tx_response()		*/
-        NULL,			    /* on_tsx_state()		*/
+    static pjsip_module mod_app = {
+        NULL, NULL,             /* prev, next.              */
+        {(char *) "mod-app", 7},        /* Name.                    */
+        -1,                     /* Id               */
+        PJSIP_MOD_PRIORITY_APPLICATION, /* Priority             */
+        NULL,                   /* load()                   */
+        NULL,                   /* start()                  */
+        NULL,                   /* stop()                   */
+        NULL,                   /* unload()                 */
+        &on_rx_request,         /* on_rx_request()          */
+        &on_rx_response,        /* on_rx_response()         */
+        NULL,                   /* on_tx_request.           */
+        NULL,                   /* on_tx_response()         */
+        NULL,                   /* on_tsx_state()           */
     };
     pj_status_t status;
 
@@ -199,7 +186,6 @@ int sip_init()
     /* Must init PJLIB first: */
     status = pj_init();
     assert(status == PJ_SUCCESS);
-
 
     /* Then init PJLIB-UTIL: */
     status = pjlib_util_init();
@@ -271,7 +257,6 @@ int sip_init()
     return 0;
 }
 
-
 unsigned int sip_handle_events(void)
 {
     unsigned int count;
@@ -280,77 +265,70 @@ unsigned int sip_handle_events(void)
     maxTimeOut.msec = 0;
 
     // has a queue of events, returns on event or after 10ms
-    pjsip_endpt_handle_events2(sip_endpt, &maxTimeOut, &count);     
+    pjsip_endpt_handle_events2(sip_endpt, &maxTimeOut, &count);
     return count;
 }
 
-void sip_set_local(const char* port)
+void sip_set_local(const char *port)
 {
     strcpy(from_port, port);
     sip_default_local_host();   // gets IP from this machine
 }
 
-void sip_set_local(const char* host, const char* port)
+void sip_set_local(const char *host, const char *port)
 {
     strcpy(from_addr, host);
     strcpy(from_port, port);
 }
 
-void sip_set_remote(const char* host, const char* port)
+void sip_set_remote(const char *host, const char *port)
 {
-    strcpy(to_addr,host);
-    strcpy(to_port,port);
+    strcpy(to_addr, host);
+    strcpy(to_port, port);
 }
 
-
-
-bool isInetAddress(const char* ip)
+bool isInetAddress(const char *ip)
 {
     const char prefix[] = "127";
     const short prefixLength = strlen(prefix);
-    
-    if(strncmp(ip, prefix, prefixLength) != 0)
+
+    if (strncmp(ip, prefix, prefixLength) != 0)
         return true;
-    else 
+    else
         return false;
 }
 
-
-
 void sip_default_local_host()
 {
-     int i;
-     int s = socket (PF_INET, SOCK_STREAM, 0);
+    int i;
+    int s = socket(PF_INET, SOCK_STREAM, 0);
 
-     for (i = 1; ; i++)
-     {
-         struct ifreq ifr;
-         struct sockaddr_in *sin = (struct sockaddr_in *) &ifr.ifr_addr;
-         char *ip;
+    for (i = 1;; i++)
+    {
+        struct ifreq ifr;
+        struct sockaddr_in *sin = (struct sockaddr_in *) &ifr.ifr_addr;
+        char *ip;
 
-         ifr.ifr_ifindex = i;
-         if (ioctl (s, SIOCGIFNAME, &ifr) < 0)
-         {
-             if(isInetAddress(ip))
-             {
-                 strncpy(from_addr, ip, strlen(ip));
-                 std::cout << "Local host address is: " << from_addr 
-                           << std::endl;
-                 break;
-             }
-         }
+        ifr.ifr_ifindex = i;
+        if (ioctl(s, SIOCGIFNAME, &ifr) < 0)
+        {
+            if (isInetAddress(ip))
+            {
+                strncpy(from_addr, ip, strlen(ip));
+                std::cout << "Local host address is: " << from_addr << std::endl;
+                break;
+            }
+        }
 
-         /* now ifr.ifr_name is set */
-         if (ioctl (s, SIOCGIFADDR, &ifr) < 0)
-             continue;
+        /* now ifr.ifr_name is set */
+        if (ioctl(s, SIOCGIFADDR, &ifr) < 0)
+            continue;
 
-         ip = inet_ntoa(sin->sin_addr);
-     }
+        ip = inet_ntoa(sin->sin_addr);
+    }
 
-     close(s);
+    close(s);
 }
-
-
 
 #if 0
 int sip_pass_args(int argc, char *argv[])
@@ -358,29 +336,25 @@ int sip_pass_args(int argc, char *argv[])
 
     switch (argc)
     {
-        case 5:         // 4 args
-            strcpy(from_addr,argv[1]);
-            strcpy(to_port,argv[4]);
-            strcpy(to_addr,argv[3]);
-            strcpy(from_port,argv[2]);
-            break;
+    case 5:                    // 4 args
+        strcpy(from_addr, argv[1]);
+        strcpy(to_port, argv[4]);
+        strcpy(to_addr, argv[3]);
+        strcpy(from_port, argv[2]);
+        break;
 
-        case 2:        // 1 or more args (but not 4)
-            to_port[0] = 0;
-            strcpy(from_port, argv[1]);
-            break;
+    case 2:                    // 1 or more args (but not 4)
+        to_port[0] = 0;
+        strcpy(from_port, argv[1]);
+        break;
 
-        default:         // no args
-            std::cerr << "Usage: " << std::endl
-                << "sipStateless <fromIP> <fromPort> <toIP> <toPort>"
-                << std::endl
-                << "or" << std::endl
-                << "sipStateless <listenPort>"
-                << std::endl;
-            return -1;
+    default:                   // no args
+        std::cerr << "Usage: " << std::endl
+            << "sipStateless <fromIP> <fromPort> <toIP> <toPort>"
+            << std::endl << "or" << std::endl << "sipStateless <listenPort>" << std::endl;
+        return -1;
     }
 
     return 0;
 }
 #endif
-

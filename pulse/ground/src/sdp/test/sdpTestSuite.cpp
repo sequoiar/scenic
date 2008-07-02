@@ -1,7 +1,6 @@
 
 // sdpTestSuite.cpp
 
-
 #include <cpptest.h>
 #include <iostream>
 
@@ -9,22 +8,16 @@
 
 #include "sdpTestSuite.h"
 
-
-
 void SdpTestSuite::setup()
 {
     std::cout.flush();
     std::cout << std::endl;
 }
 
-
-
 void SdpTestSuite::tear_down()
 {
     // empty
 }
-
-
 
 void SdpTestSuite::init_test()
 {
@@ -41,7 +34,6 @@ void SdpTestSuite::sdp_header()
     TEST_ASSERT(!sdp.str().empty());
 }
 
-
 void SdpTestSuite::sdp_parse()
 {
     Sdp sdp2;
@@ -52,13 +44,11 @@ void SdpTestSuite::sdp_parse()
     sdpv.set_port(10010);
     TEST_ASSERT(sdp.add_media(sdpv));
 
-
     sdp2.parse(sdp.str());
     std::cout << "PARSE:" << std::endl;
     std::cout << sdp2.str() << std::endl;
     TEST_ASSERT(!sdp2.str().empty());
 }
-
 
 void SdpTestSuite::sdp_video()
 {
@@ -74,9 +64,8 @@ void SdpTestSuite::sdp_video()
 
     TEST_ASSERT(!sdp.str().empty());
 
-
     sdp.list_media();
-    
+
     BLOCK();
 }
 
@@ -98,13 +87,10 @@ void SdpTestSuite::sdp_av()
     TEST_ASSERT(!sdp.str().empty());
 }
 
-
-
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
     SdpTestSuite tester;
     Test::TextOutput output(Test::TextOutput::Verbose);
     return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-

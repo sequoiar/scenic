@@ -22,76 +22,76 @@
 #include <boost/signal.hpp>
 #include "gThreadQueue.h"
 
-
 struct foo
 {
-	foo(int i):x(i){}                    
-	void s(int y){x=y;}
-	int x;
-	void operator()(){  std::cout << (long)g_thread_self()  << "---op()" << x << std::endl;}
-};                            
-                                                     
-typedef boost::signal<void ()> Sig;
-
-
-void* thread_main(void* v)
-{
-    QueuePair &queue = *(static_cast<QueuePair*>(v));
-
-	foo f(18);
-    int count=0;
-    while(1) 
-    { 
-        Sig& signal = *queue_pair_pop<Sig*>(queue);
-
-		signal();
-		queue_pair_push(queue,&f);
-		if(count++ == 1000) 
-		{
-			static foo f(0);			
-			queue_pair_push(queue,&f);
-	    return 0;
-		}
+    foo(int i):x(i)
+    {
     }
-return 0; 
+    void s(int y)
+    {
+        x = y;
+    }
+    int x;
+    void operator() ()
+    {
+        std::cout << (long) g_thread_self() << "---op()" << x << std::endl;
+    }
+};
+
+typedef boost::signal < void () > Sig;
+
+void *thread_main(void *v)
+{
+    QueuePair & queue = *(static_cast < QueuePair * >(v));
+
+    foo f(18);
+    int count = 0;
+    while (1)
+    {
+        Sig & signal = *queue_pair_pop < Sig * >(queue);
+
+        signal();
+        queue_pair_push(queue, &f);
+        if (count++ == 1000)
+        {
+            static foo f(0);
+            queue_pair_push(queue, &f);
+            return 0;
+        }
+    }
+    return 0;
 }
 
+int main(int argc, char **argv)
+{
+    GError *err = 0;
+    Sig sig;
+    foo f(10);
+    sig.connect(f);
 
-int main (int argc, char** argv) 
-{ 
-    GError *err=0;
-	Sig sig;
-    foo f(10);                                   
-	sig.connect(f);
-    
-	
     g_thread_init(NULL);
 
-    QueuePair queue (g_async_queue_new(), g_async_queue_new());
-	InvertQueuePair tq(&queue);
-    GThread* th = thread_create_queue_pair(thread_main,&tq,&err);
-    
-    while(err==NULL)
+    QueuePair queue(g_async_queue_new(), g_async_queue_new());
+    InvertQueuePair tq(&queue);
+    GThread *th = thread_create_queue_pair(thread_main, &tq, &err);
+
+    while (err == NULL)
     {
-		queue_pair_push(queue,&sig);
-		sig();
-		if(foo* f = queue_pair_timed_pop<foo*>(queue,10))
-		{
-			if(f->x == 0)
-			  break;  
-			std::cout << ":LKJ"<< f->x;
-		}
-		
-		f.x++;
-		std::cout << "sent it";
-	}
-	g_async_queue_unref(queue.first);
-	g_async_queue_unref(queue.second);
+        queue_pair_push(queue, &sig);
+        sig();
+        if (foo * f = queue_pair_timed_pop < foo * >(queue, 10))
+        {
+            if (f->x == 0)
+                break;
+            std::cout << ":LKJ" << f->x;
+        }
 
-	g_thread_join(th);
-return 0;
+        f.x++;
+        std::cout << "sent it";
+    }
+    g_async_queue_unref(queue.first);
+    g_async_queue_unref(queue.second);
+
+    g_thread_join(th);
+    return 0;
 }
-
-
-
-

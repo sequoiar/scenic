@@ -25,7 +25,6 @@
  *  TODO - Currently only writes SDP 
  */
 
-
 #ifndef _SDP_
 #define _SDP_
 
@@ -43,32 +42,40 @@ class SdpMedia;
  *  TODO Parse SDP stream
  */
 
-typedef std::vector<SdpMedia>::const_iterator SdpMediaIterator;
+typedef std::vector < SdpMedia >::const_iterator SdpMediaIterator;
 
 class Sdp
 {
-public:
-    Sdp(std::string session_name = "<No Title>")
-        :session_name_(session_name)
-        {}
+  public:
+  Sdp(std::string session_name = "<No Title>"):session_name_(session_name)
+    {
+    }
 
     bool add_media(SdpMedia m);
     std::string str();
 
-    std::vector<SdpMedia>::const_iterator get_media_begin() {return media_.begin();}
-    std::vector<SdpMedia>::const_iterator get_media_end() {return media_.end();}
+    std::vector < SdpMedia >::const_iterator get_media_begin()
+    {
+        return media_.begin();
+    }
+    std::vector < SdpMedia >::const_iterator get_media_end()
+    {
+        return media_.end();
+    }
 
+    bool is_valid() const
+    {
+        return !media_.empty();
+    }
 
-    bool is_valid() const { return !media_.empty(); }
-   
     bool parse(std::string);
-    
+
     void list_media();
 
-private:
+  private:
     std::string session_name_, ip_;
 
-    std::vector<SdpMedia> media_;
+    std::vector < SdpMedia > media_;
 };
 
 /** Holds the media section of sdp protocol 
@@ -78,40 +85,58 @@ private:
  */
 class SdpMedia
 {
-public:
-    SdpMedia(std::string media_type, std::string codec, int avp_type)
-        : media_type_(media_type), codec_(codec), avp_type_(avp_type) {}
+  public:
+    SdpMedia(std::string media_type, std::string codec, int avp_type):media_type_(media_type),
+        codec_(codec), avp_type_(avp_type)
+    {
+    }
 
-    SdpMedia():media_type_(""), codec_(""), avp_type_(0) {}
+    SdpMedia():media_type_(""), codec_(""), avp_type_(0)
+    {
+    }
 
-
-    void add_attribute(std::string attrib) { attrib_.push_back(attrib); }
-    void set_ip(std::string ip) {ip_ = ip;}
-    void set_port(int port) {port_ = port;}
-    int get_port() const { return port_; }
-    const std::string& get_ip() const { return ip_; }  
-    const std::string& get_media_type() const { return media_type_; }
+    void add_attribute(std::string attrib)
+    {
+        attrib_.push_back(attrib);
+    }
+    void set_ip(std::string ip)
+    {
+        ip_ = ip;
+    }
+    void set_port(int port)
+    {
+        port_ = port;
+    }
+    int get_port() const
+    {
+        return port_;
+    }
+    const std::string & get_ip() const
+    {
+        return ip_;
+    }
+    const std::string & get_media_type() const
+    {
+        return media_type_;
+    }
     std::string str();
     //SdpMedia& operator=(const SdpMedia& m);
-protected:
+  protected:
     std::string media_type_, codec_;
     int avp_type_;
     std::string ip_;
-    std::vector<std::string> attrib_;
+    std::vector < std::string > attrib_;
     int port_;
 };
 
 /** use clone to get a copy of various SdpMedia prototypes */
 class SdpMediaFactory
 {
-public:
-    static const SdpMedia& clone(std::string);
-    
-private:
-    static std::map<std::string, SdpMedia> sdpMedia_prototypes_;
+  public:
+    static const SdpMedia & clone(std::string);
+
+  private:
+    static std::map < std::string, SdpMedia > sdpMedia_prototypes_;
 };
 
-
-
 #endif
-
