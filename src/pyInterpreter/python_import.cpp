@@ -67,7 +67,7 @@ BOOST_PYTHON_MODULE(Hello)
 BOOST_PYTHON_MODULE(OscThread)
 {
     class_<OscThread>("OscThread")
-    .def("getInvertQueue",&OscThread::getInvertQueue)
+    .def("getQueue",&OscThread::getQueue)
     .def("run",&OscThread::run);
      
 }

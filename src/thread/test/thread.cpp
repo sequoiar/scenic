@@ -38,7 +38,7 @@ int Thread::main()
         Message f = queue.copy_timed_pop(1);
         std::cout << message::str[f.type];
 		queue.push(r);
-		if(count++ == 1000) 
+		if(count++ == 100000) 
 		{
 			Message f(message::quit);			
 			queue.push(f);
@@ -54,7 +54,8 @@ int main (int argc, char** argv)
     Message f(message::start);                                   
     Thread t;
 
-    QueuePair queue = t.getInvertQueue();
+    QueuePair queue = t.getQueue("");
+    QueuePair queue2 = t.getQueue("a");
     if(!t.run())
         return -1;
     
@@ -63,6 +64,7 @@ int main (int argc, char** argv)
 		queue.push(f);
 		std::cout << "sent it" << std::endl;
 		Message f = queue.copy_timed_pop(10);
+		Message f2 = queue2.copy_timed_pop(10);
 		
             std::cout << message::str[f.type];
 			if(f.type == message::quit){

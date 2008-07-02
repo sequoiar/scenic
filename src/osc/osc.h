@@ -81,7 +81,7 @@ public:
 			}
             case 'i':
 			{
-				i = static_cast<int>(a->s);
+				i = static_cast<int>(a->i);
 			break;
 			}
 			
