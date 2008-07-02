@@ -17,7 +17,6 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 #include <iostream>
 #include <cassert>
 #include <gst/gst.h>
@@ -30,9 +29,10 @@
 
 #include "defaultAddresses.h"
 
-
 int eventLoop()
-{}
+{
+}
+
 #if 0
 {
     char c;
@@ -49,25 +49,25 @@ int eventLoop()
     //bool done = false;
     //while(!done)
     //usleep(10000);
-    
+
     // Approach 3: Block waiting for character input
     std::cout << "Hit r and <cr> to request h264.1." << std::endl;
-    std::cout << "Hit a and <cr> to accept a request." << std::endl; 
-    std::cout << "Hit q and <cr> to quit." << std::endl; 
+    std::cout << "Hit a and <cr> to accept a request." << std::endl;
+    std::cout << "Hit q and <cr> to quit." << std::endl;
 
     std::cin >> c;
 
-    switch(c)
+    switch (c)
     {
-        case 'q':
-            exit(-1);       // FIXME: should rather quit gracefully
-        
-        case 'r':
-            SipSingleton::Instance()->send_request("h264.1");
-            break;
+    case 'q':
+        exit(-1);               // FIXME: should rather quit gracefully
 
-        default:
-            break;
+    case 'r':
+        SipSingleton::Instance()->send_request("h264.1");
+        break;
+
+    default:
+        break;
     }
 
     return 0;
@@ -75,21 +75,23 @@ int eventLoop()
 #endif
 
 void gst_main(int argc, char *argv[])
-{}
+{
+}
+
 #if 0
 {
     long txPort = 10010;
     long rxPort = txPort;
-   
+
     VideoSender tx;
     VideoReceiver rx;
-    
-    SipSingleton &sip = *SipSingleton::Instance();
-    
+
+    SipSingleton & sip = *SipSingleton::Instance();
+
     sip.set_service_port(rxPort);
 
     if (argc == 5)
-        sip.init(argv[1], argv[2], argv[3],argv[4]);
+        sip.init(argv[1], argv[2], argv[3], argv[4]);
     else
     {
         std::cout << "Using default args." << std::endl;
@@ -98,26 +100,25 @@ void gst_main(int argc, char *argv[])
 
     // init gstreamer, moved to MediaBase constructor
     // gst_init(0, NULL);  // normally should get argc argv
-    /*----------------------------------------------*/ 
-    for(;;)
+    /*----------------------------------------------*/
+    for (;;)
     {
-        if(sip.handle_events()) // if events are queued up
+        if (sip.handle_events())        // if events are queued up
         {
-            if(/*sip.isValidService(sip.get_service()) &&*/ !tx.isPlaying())
+            if ( /*sip.isValidService(sip.get_service()) && */ !tx.isPlaying())
             {
-                if(tx.init("test",sip.get_service_port(), std::string(MY_ADDRESS)))
+                if (tx.init("test", sip.get_service_port(), std::string(MY_ADDRESS)))
                 {
                     tx.start();
                     sip.zero_service_desc();
                 }
             }
 
-
             if (!rx.isPlaying())
             {
-                if(sip.get_rx_port())
+                if (sip.get_rx_port())
                 {
-                    if(rx.init(sip.get_rx_port()))
+                    if (rx.init(sip.get_rx_port()))
                     {
                         sip.zero_rx_port();
                         rx.start();
@@ -126,7 +127,7 @@ void gst_main(int argc, char *argv[])
             }
         }
 
-        eventLoop();        // sends requests
+        eventLoop();            // sends requests
     }
 }
 #endif

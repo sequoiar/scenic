@@ -24,25 +24,25 @@
 #include "mediaConfig.h"
 #include "gstBase.h"
 
-class MediaBase : public GstBase
+class MediaBase:public GstBase
 {
-    public:
-        virtual bool start();
-        virtual bool stop();
+  public:
+    virtual bool start();
+    virtual bool stop();
 
-        virtual bool init();
-        
-    protected:
+    virtual bool init();
 
-        MediaBase(const MediaConfig &config);
-        virtual ~MediaBase(); 
-        virtual void init_source() = 0;
-        virtual void init_codec() = 0;
-        virtual void init_sink() = 0;
+  protected:
 
-        const MediaConfig config_;
+      MediaBase(const MediaConfig & config);
+      virtual ~ MediaBase();
+    virtual void init_source() = 0;
+    virtual void init_codec() = 0;
+    virtual void init_sink() = 0;
 
-    private:
+    const MediaConfig config_;
+
+  private:
 };
 
 #endif // _MEDIA_BASE_H_

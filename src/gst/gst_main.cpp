@@ -18,12 +18,9 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 int gst_main(int argc, char *argv[]);
-    
 
 int main(int argc, char *argv[])
 {
-    return gst_main(argc,argv);
+    return gst_main(argc, argv);
 }
-

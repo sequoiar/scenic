@@ -28,53 +28,52 @@
 
 class MediaConfig;
 
-class RtpSession : public GstBase
+class RtpSession:public GstBase
 {
-    public:
-        virtual ~RtpSession();
-        virtual bool init();
-        virtual void add(GstElement *elem, const MediaConfig &config);
-        virtual void addDerived(GstElement *elem, const MediaConfig &config) = 0;
+  public:
+    virtual ~ RtpSession();
+    virtual bool init();
+    virtual void add(GstElement * elem, const MediaConfig & config);
+    virtual void addDerived(GstElement * elem, const MediaConfig & config) = 0;
 
-    protected: 
-        RtpSession();
-        static const char *padStr(const char* padName);
-        static GstElement *rtpbin_;
-        static int counter_;
-        GstElement *rtcp_sender_, *rtcp_receiver_;
+  protected:
+      RtpSession();
+    static const char *padStr(const char *padName);
+    static GstElement *rtpbin_;
+    static int counter_;
+    GstElement *rtcp_sender_, *rtcp_receiver_;
 };
 
-
-
-class RtpSender : public RtpSession
+class RtpSender:public RtpSession
 {
-    public:
-        RtpSender() {};
-        virtual ~RtpSender();
+  public:
+    RtpSender()
+    {
+    };
+    virtual ~ RtpSender();
 
-    protected:
-        virtual void addDerived(GstElement *src, const MediaConfig &config);
+  protected:
+    virtual void addDerived(GstElement * src, const MediaConfig & config);
 
-    private:
-        friend class AudioSender;
-        GstElement *rtp_sender_; 
+  private:
+    friend class AudioSender;
+    GstElement *rtp_sender_;
 };
 
-
-
-class RtpReceiver : public RtpSession
+class RtpReceiver:public RtpSession
 {
-    public:
-        RtpReceiver() {};
-        virtual ~RtpReceiver();
+  public:
+    RtpReceiver()
+    {
+    };
+    virtual ~ RtpReceiver();
 
-    protected:
-        virtual void addDerived(GstElement *sink, const MediaConfig &config);
+  protected:
+    virtual void addDerived(GstElement * sink, const MediaConfig & config);
 
-    private:
-        friend class AudioReceiver;
-        GstElement *rtp_receiver_;
+  private:
+    friend class AudioReceiver;
+    GstElement *rtp_receiver_;
 };
 
 #endif // _RTP_SESSION_H_
-

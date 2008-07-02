@@ -24,20 +24,19 @@
 #include "mediaBase.h"
 #include "videoConfig.h"
 
-class VideoReceiver : public MediaBase 
+class VideoReceiver:public MediaBase
 {
-    public:
-        VideoReceiver(const VideoConfig& config);
-        virtual ~VideoReceiver();
+  public:
+    VideoReceiver(const VideoConfig & config);
+      virtual ~ VideoReceiver();
 
-    private:
-        virtual void init_source();
-        virtual void init_codec();
-        virtual void init_sink();
+  private:
+      virtual void init_source();
+    virtual void init_codec();
+    virtual void init_sink();
 
-        GstElement *src_, *decoder_, *depayloader_, *sink_;
-        VideoConfig config_;
+    GstElement *src_, *decoder_, *depayloader_, *sink_;
+    VideoConfig config_;
 };
 
 #endif
-

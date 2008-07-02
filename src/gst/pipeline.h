@@ -26,35 +26,34 @@
 
 class Pipeline
 {
-    public:
-        static Pipeline &Instance();
-        void add(GstElement *element);
-        void add_vector(std::vector <GstElement*> &elementVec);
-        void remove(GstElement *element);
-        void remove_vector(std::vector <GstElement*> &elementVec);
-        bool isPlaying() const;
-        void init();
-        bool start();
-        bool stop();
-        
-        // call back to attach new src pad
-        static void cb_new_src_pad(GstElement *element, GstPad *srcPad, void *data);
-        static void cb_new_sink_pad(GstElement *element, GstPad *sinkPad, void *data);
+  public:
+    static Pipeline & Instance();
+    void add(GstElement * element);
+    void add_vector(std::vector < GstElement * >&elementVec);
+    void remove(GstElement * element);
+    void remove_vector(std::vector < GstElement * >&elementVec);
+    bool isPlaying() const;
+    void init();
+    bool start();
+    bool stop();
 
-    private:
-        Pipeline(); 
-        ~Pipeline(); 
+    // call back to attach new src pad
+    static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
+    static void cb_new_sink_pad(GstElement * element, GstPad * sinkPad, void *data);
+
+  private:
+      Pipeline();
+     ~Pipeline();
 #if 0
-        typedef struct _GstElement GstElement;
-        typedef struct _GstPad GstPad;
-        typedef std::vector<GstElement*>::iterator GstIter;
+    typedef struct _GstElement GstElement;
+    typedef struct _GstPad GstPad;
+    typedef std::vector < GstElement * >::iterator GstIter;
 #endif
-        static Pipeline* instance_;
+    static Pipeline *instance_;
 
-        void make_verbose();
-        GstElement *pipeline_;
-        bool verbose_;
+    void make_verbose();
+    GstElement *pipeline_;
+    bool verbose_;
 };
 
 #endif // _PIPELINE_H_
-

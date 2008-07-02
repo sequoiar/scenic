@@ -24,15 +24,13 @@
 #include "pipeline.h"
 #include "logWriter.h"
 
-Pipeline* Pipeline::instance_ = 0;
+Pipeline *Pipeline::instance_ = 0;
 
-Pipeline::Pipeline() : pipeline_(0), verbose_(false)
+Pipeline::Pipeline():pipeline_(0), verbose_(false)
 {
 }
 
-
-
-Pipeline &Pipeline::Instance()
+Pipeline & Pipeline::Instance()
 {
     if (instance_ == 0)
     {
@@ -43,14 +41,10 @@ Pipeline &Pipeline::Instance()
     return *instance_;
 }
 
-
-
 Pipeline::~Pipeline()
 {
     gst_object_unref(GST_OBJECT(pipeline_));
 }
-
-
 
 void Pipeline::init()
 {
@@ -65,23 +59,19 @@ void Pipeline::init()
     }
 }
 
-
 void Pipeline::make_verbose()
 {
     // Get verbose output
-    if (verbose_) 
+    if (verbose_)
     {
-        gchar *exclude_args = NULL; // set args to be excluded from output
-        gchar **exclude_list =
-            exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
-        g_signal_connect (pipeline_, "deep_notify",
-                G_CALLBACK (gst_object_default_deep_notify), exclude_list);
+        gchar *exclude_args = NULL;     // set args to be excluded from output
+        gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
+        g_signal_connect(pipeline_, "deep_notify",
+                         G_CALLBACK(gst_object_default_deep_notify), exclude_list);
     }
 }
 
-
-
-void Pipeline::cb_new_src_pad(GstElement *srcElement, GstPad *srcPad, void * data)
+void Pipeline::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
 {
     GstElement *sinkElement = (GstElement *) data;
     GstPad *sinkPad;
@@ -92,9 +82,7 @@ void Pipeline::cb_new_src_pad(GstElement *srcElement, GstPad *srcPad, void * dat
     gst_object_unref(sinkPad);
 }
 
-
-
-void Pipeline::cb_new_sink_pad(GstElement *sinkElement, GstPad *sinkPad, void * data)
+void Pipeline::cb_new_sink_pad(GstElement * sinkElement, GstPad * sinkPad, void *data)
 {
     GstElement *srcElement = (GstElement *) data;
     GstPad *srcPad;
@@ -105,25 +93,19 @@ void Pipeline::cb_new_sink_pad(GstElement *sinkElement, GstPad *sinkPad, void * 
     gst_object_unref(srcPad);
 }
 
-
-
-bool Pipeline::isPlaying() const 
-{ 
+bool Pipeline::isPlaying() const const
+{
     if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_PLAYING))
-        return true; 
+        return true;
     else
         return false;
 }
 
-
-
-bool Pipeline::start() 
+bool Pipeline::start()
 {
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
     return isPlaying();
 }
-
-
 
 bool Pipeline::stop()
 {
@@ -131,35 +113,26 @@ bool Pipeline::stop()
     return !isPlaying();
 }
 
-
-
-void Pipeline::add(GstElement *element)
+void Pipeline::add(GstElement * element)
 {
     gst_bin_add(GST_BIN(pipeline_), element);
 }
 
-
-
-void Pipeline::add_vector(std::vector <GstElement*> &elementVec)
+void Pipeline::add_vector(std::vector < GstElement * >&elementVec)
 {
-    std::vector<GstElement*>::iterator iter;
+    std::vector < GstElement * >::iterator iter;
     for (iter = elementVec.begin(); iter != elementVec.end(); iter++)
         gst_bin_add(GST_BIN(pipeline_), *iter);
 }
 
-
-
-void Pipeline::remove(GstElement* element)
+void Pipeline::remove(GstElement * element)
 {
     assert(gst_bin_remove(GST_BIN(pipeline_), element));
 }
 
-
-
-void Pipeline::remove_vector(std::vector <GstElement*> &elementVec)
+void Pipeline::remove_vector(std::vector < GstElement * >&elementVec)
 {
-    std::vector<GstElement*>::iterator iter;
+    std::vector < GstElement * >::iterator iter;
     for (iter = elementVec.begin(); iter != elementVec.end(); iter++)
         assert(gst_bin_remove(GST_BIN(pipeline_), *iter));
 }
-

@@ -29,16 +29,15 @@
 #include <string>
 #include "mediaConfig.h"
 
-class VideoConfig : public MediaConfig
+class VideoConfig:public MediaConfig
 {
-    public:
-        VideoConfig(std::string source, std::string codec, std::string remoteHost, int port); // used by sender
-        VideoConfig(std::string codec, int port);     // used by receiver
-        VideoConfig(std::string source);     // used by local sender
+  public:
+    VideoConfig(std::string source, std::string codec, std::string remoteHost, int port);       // used by sender
+      VideoConfig(std::string codec, int port); // used by receiver
+      VideoConfig(std::string source);  // used by local sender
 
-        const bool has_dv() const;
-        const bool has_h264() const;
+    const bool has_dv() const;
+    const bool has_h264() const;
 };
 
 #endif // _VIDEO_CONFIG_H_
-

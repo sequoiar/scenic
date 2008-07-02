@@ -35,8 +35,6 @@ RtpSession::RtpSession()
     counter_++;
 }
 
-
-
 bool RtpSession::init()
 {
     // only initialize rtpbin once per process
@@ -50,27 +48,21 @@ bool RtpSession::init()
     return true;
 }
 
-
-
-void RtpSession::add(GstElement *elem, const MediaConfig &config)
+void RtpSession::add(GstElement * elem, const MediaConfig & config)
 {
     RtpSession::init();
     addDerived(elem, config);
 }
 
-
-
-const char *RtpSession::padStr(const char* padName)
+const char *RtpSession::padStr(const char *padName)
 {
-    std::string result(padName); 
+    std::string result(padName);
     std::stringstream istream;
-    
-    istream << counter_;    // 0-based
+
+    istream << counter_;        // 0-based
     result = result + istream.str();
     return result.c_str();
 }
-
-
 
 RtpSession::~RtpSession()
 {
@@ -87,15 +79,11 @@ RtpSession::~RtpSession()
     }
 }
 
-
-
 RtpSender::~RtpSender()
 {
     assert(pipeline_.stop());
     pipeline_.remove(rtp_sender_);
 }
-
-
 
 RtpReceiver::~RtpReceiver()
 {
@@ -103,20 +91,17 @@ RtpReceiver::~RtpReceiver()
     pipeline_.remove(rtp_receiver_);
 }
 
-
-
-
-void RtpSender::addDerived(GstElement *newSrc, const MediaConfig &config)
+void RtpSender::addDerived(GstElement * newSrc, const MediaConfig & config)
 {
     rtp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtp_sender_);
-    g_object_set(rtp_sender_, "host", config.remoteHost(), "port", config.port(), "sync", 
-            FALSE, "async", FALSE, NULL);
+    g_object_set(rtp_sender_, "host", config.remoteHost(), "port", config.port(), "sync",
+                 FALSE, "async", FALSE, NULL);
 
     rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtcp_sender_);
-    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.port() + 1, "sync", 
-            FALSE, "async", FALSE, NULL);
+    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.port() + 1, "sync",
+                 FALSE, "async", FALSE, NULL);
 
     rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL);
     assert(rtcp_receiver_);
@@ -129,16 +114,16 @@ void RtpSender::addDerived(GstElement *newSrc, const MediaConfig &config)
     GstPad *send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_"));
     assert(send_rtp_sink);
 
-    GstPad *send_rtp_src = gst_element_get_static_pad(rtpbin_, 
-            padStr("send_rtp_src_"));
+    GstPad *send_rtp_src = gst_element_get_static_pad(rtpbin_,
+                                                      padStr("send_rtp_src_"));
     assert(send_rtp_src);
 
-    GstPad *send_rtcp_src = gst_element_get_request_pad(rtpbin_, 
-            padStr("send_rtcp_src_"));
+    GstPad *send_rtcp_src = gst_element_get_request_pad(rtpbin_,
+                                                        padStr("send_rtcp_src_"));
     assert(send_rtcp_src);
 
-    GstPad *recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, 
-            padStr("recv_rtcp_sink_"));
+    GstPad *recv_rtcp_sink = gst_element_get_request_pad(rtpbin_,
+                                                         padStr("recv_rtcp_sink_"));
     assert(recv_rtcp_sink);
 
     GstPad *payloadSrc = gst_element_get_static_pad(newSrc, "src");
@@ -169,9 +154,7 @@ void RtpSender::addDerived(GstElement *newSrc, const MediaConfig &config)
     gst_element_release_request_pad(rtpbin_, send_rtp_sink);
 }
 
-
-
-void RtpReceiver::addDerived(GstElement *newSink, const MediaConfig &config)
+void RtpReceiver::addDerived(GstElement * newSink, const MediaConfig & config)
 {
     rtp_receiver_ = gst_element_factory_make("udpsrc", NULL);
     assert(rtp_receiver_);
@@ -183,7 +166,8 @@ void RtpReceiver::addDerived(GstElement *newSink, const MediaConfig &config)
 
     rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtcp_sender_);
-    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.port() + 5, "sync", FALSE, "async", FALSE, NULL);
+    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.port() + 5, "sync", FALSE,
+                 "async", FALSE, NULL);
 
     pipeline_.add(rtp_receiver_);
     pipeline_.add(rtcp_receiver_);
@@ -208,7 +192,7 @@ void RtpReceiver::addDerived(GstElement *newSink, const MediaConfig &config)
     assert(gst_pad_link(send_rtcp_src, rtcpSenderSink) == GST_PAD_LINK_OK);
 
     // when pad is created, it must be linked to new sink
-    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *)newSink);
+    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *) newSink);
 
     // release request pads (in reverse order)
     gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);
@@ -221,4 +205,3 @@ void RtpReceiver::addDerived(GstElement *newSink, const MediaConfig &config)
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
     gst_object_unref(GST_OBJECT(rtpReceiverSrc));
 }
-
