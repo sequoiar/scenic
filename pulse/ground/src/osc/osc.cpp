@@ -37,7 +37,6 @@ OscMessage::OscMessage(const char*p,const char *t, lo_arg **v, int c,void* d)
 	for(int i=0;i<c;i++)
 	{
 		args.push_back(LoArgs(t,i,v[i]));
-		std::cerr << t[i] << " from " << p << std::endl;
 	}
 
 }
@@ -57,8 +56,8 @@ int OscThread::generic_handler(const char *path, const char *types,
 		lo_arg **argv, int argc, void *data)
 {
    queue.push(OscMessage(path,types,argv,argc,data));
-   if(queue_map.find(std::string(path)) != queue_map.end())
-       queue_map[std::string(path)].push(OscMessage(path,types,argv,argc,data));
+   if(queue_map.find(path) != queue_map.end())
+       queue_map[path].push(OscMessage(path,types,argv,argc,data));
    return 0;
 }
 
@@ -77,8 +76,7 @@ int OscThread::main()
 
     while(1) 
     { 
-		usleep(1000);
-        OscMessage msg = queue.copy_timed_pop(1000);
+        OscMessage msg = queue.copy_timed_pop(20);
         if (!msg.path.empty())
         {
             send(msg);

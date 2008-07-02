@@ -24,7 +24,7 @@
 #include <list>
 #include <map>
 #include <string>
-
+#include <set>
 typedef GAsyncQueue GAsyncQueue;
 
 typedef std::pair<GAsyncQueue*,GAsyncQueue*> BaseQueuePair;
@@ -33,20 +33,27 @@ template <class T>
 class QueuePair_ : public BaseQueuePair
 {
 public:
-    QueuePair_<T>(GAsyncQueue*f,GAsyncQueue*s):BaseQueuePair(f,s){}
-    QueuePair_<T>():BaseQueuePair(){}
+    QueuePair_<T>(GAsyncQueue*f,GAsyncQueue*s):BaseQueuePair(f,s){qstor.insert(this);}
+    QueuePair_<T>():BaseQueuePair(){qstor.insert(this);}
+	~QueuePair_<T>(){qstor.erase(this);}
     T copy_timed_pop(int ms);
     void push(T pt);
 
     void done(T t);
     void done(T* pt);
     static void init();
+	typedef std::set<QueuePair_<T>* > SetOfQueues;
 private:
-    T* timed_pop(int ms);
+	static SetOfQueues qstor;
+
+    T* timed_pop(int ms);  
     static GMutex *mutex;
     static std::list<T*> l;
    
 };
+
+template <class T>
+std::set<QueuePair_<T>*> QueuePair_<T>::qstor;
 
 template <class T>
 class BaseThread
@@ -127,22 +134,31 @@ std::list<T*> QueuePair_<T>::l;
 
 template <class T>
 T* QueuePair_<T>::timed_pop(int ms)
-{ 
-	return(queue_pair_timed_pop<T*>(*this,ms));
+{   
+    typename std::set<QueuePair_<T>*>::iterator it;
+	for(it=qstor.begin();
+		it != qstor.end(); ++it)
+	{
+		if(g_async_queue_length((*it)->first)>0)
+			if (*it == this)
+				return(queue_pair_timed_pop<T*>(*this,ms));
+    }
+	
+	return 0;
 }
 
 template <class T>
 T QueuePair_<T>::copy_timed_pop(int ms)
-{ 
-	static T n;
-	T *s = timed_pop(ms); 
+{         
+	T n;
+	T *s = timed_pop(ms);
 	if(s) {
 		n = *s;
 		done(s);
-		return n;
 	}
 	else
 		n = T();
+
 
 	return n; 
 }
@@ -159,26 +175,24 @@ void QueuePair_<T>::push(T pt)
 }
 
 
-#include <iostream>
 template <class T> 
 void QueuePair_<T>::done(T *t)
 {
     g_mutex_lock(mutex);
 
-	std::cout << "ptr:" << t << std::endl;
 	if( l.end() != find(l.begin(),l.end(),t)){
-		std::cout << "got one delete" << std::endl;
 		delete(t);
     	l.remove(t);
 	}
     g_mutex_unlock(mutex);
 }
-
+                             
 template <class T>
 void QueuePair_<T>::init()
 {
     if(!mutex)
         mutex = g_mutex_new ();
+
 }
 
 
