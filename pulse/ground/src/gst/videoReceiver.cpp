@@ -36,7 +36,12 @@ VideoReceiver::VideoReceiver(const VideoConfig& config) : MediaBase(dynamic_cast
 
 VideoReceiver::~VideoReceiver() 
 {
-    // empty
+    assert(stop());
+
+    pipeline_.remove(src_);
+    pipeline_.remove(decoder_);
+    pipeline_.remove(depayloader_);
+    pipeline_.remove(sink_);
 }
 
 

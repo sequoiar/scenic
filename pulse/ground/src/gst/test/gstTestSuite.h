@@ -33,8 +33,8 @@
 #define BLOCKING 1
 
 #define VIDEO 0
-#define AUDIO 1
-#define RTP 1
+#define AUDIO 0
+#define RTP 0
 
 
 class GstTestSuite : public Test::Suite
@@ -89,10 +89,6 @@ class GstTestSuite : public Test::Suite
             TEST_ADD(GstTestSuite::stop_8ch_comp_audiofile)
             TEST_ADD(GstTestSuite::start_stop_8ch_comp_audiofile)
     #if RTP
-            TEST_ADD(GstTestSuite::start_2ch_comp_rtp_audiotest)
-            TEST_ADD(GstTestSuite::stop_2ch_comp_rtp_audiotest)
-            TEST_ADD(GstTestSuite::start_stop_2ch_comp_rtp_audiotest)
-
             TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiotest)
             TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiotest)
             TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiotest)

@@ -24,23 +24,22 @@
 #include "gstBase.h"
 #include "logWriter.h"
 
-bool GstBase::gstInitialized_ = false;
-
-GstBase::GstBase() 
+// this initializes pipeline only once/process
+GstBase::GstBase() : pipeline_(Pipeline::Instance())
 {
-    if (!gstInitialized_)
-    {
-        gstInitialized_ = true;
-        // should only be called once in a process
-        gst_init(0, NULL);
-        pipeline_.init();
-    }
 }
 
 
 
 GstBase::~GstBase()
 {
+}
+
+
+
+bool GstBase::isPlaying()
+{
+    return pipeline_.isPlaying();
 }
 
 

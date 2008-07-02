@@ -59,5 +59,6 @@ bool MediaBase::init()
     init_source();
     init_codec();
     init_sink();
+    return true;
 }
 

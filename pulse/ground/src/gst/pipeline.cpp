@@ -24,8 +24,23 @@
 #include "pipeline.h"
 #include "logWriter.h"
 
-Pipeline::Pipeline() : pipeline_(0), verbose_(true)
+Pipeline* Pipeline::instance_ = 0;
+
+Pipeline::Pipeline() : pipeline_(0), verbose_(false)
 {
+}
+
+
+
+Pipeline &Pipeline::Instance()
+{
+    if (instance_ == 0)
+    {
+        instance_ = new Pipeline();
+        instance_->init();
+
+    }
+    return *instance_;
 }
 
 
@@ -39,11 +54,15 @@ Pipeline::~Pipeline()
 
 void Pipeline::init()
 {
-    pipeline_ = gst_pipeline_new("pipeline");
-    assert(pipeline_);
+    if (!pipeline_)
+    {
+        gst_init(0, NULL);
+        pipeline_ = gst_pipeline_new("pipeline");
+        assert(pipeline_);
 
-    if (verbose_)
-        make_verbose();
+        if (verbose_)
+            make_verbose();
+    }
 }
 
 
@@ -54,7 +73,7 @@ void Pipeline::make_verbose()
     {
         gchar *exclude_args = NULL; // set args to be excluded from output
         gchar **exclude_list =
-            exclude_args ? g_strsplit (exclude_args, ",", 0) : NULL;
+            exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
         g_signal_connect (pipeline_, "deep_notify",
                 G_CALLBACK (gst_object_default_deep_notify), exclude_list);
     }
@@ -67,7 +86,7 @@ void Pipeline::cb_new_src_pad(GstElement *srcElement, GstPad *srcPad, void * dat
     GstElement *sinkElement = (GstElement *) data;
     GstPad *sinkPad;
     LOG("Dynamic pad created, linking new srcpad and sinkpad.");
-    
+
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
     assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
     gst_object_unref(sinkPad);
@@ -80,7 +99,7 @@ void Pipeline::cb_new_sink_pad(GstElement *sinkElement, GstPad *sinkPad, void * 
     GstElement *srcElement = (GstElement *) data;
     GstPad *srcPad;
     LOG("Dynamic pad created, linking new srcpad and sinkpad.");
-    
+
     srcPad = gst_element_get_static_pad(srcElement, "src");
     assert(gst_pad_link(sinkPad, srcPad) == GST_PAD_LINK_OK);
     gst_object_unref(srcPad);
@@ -127,3 +146,20 @@ void Pipeline::add_vector(std::vector <GstElement*> &elementVec)
     for (iter = elementVec.begin(); iter != elementVec.end(); iter++)
         gst_bin_add(GST_BIN(pipeline_), *iter);
 }
+
+
+
+void Pipeline::remove(GstElement* element)
+{
+    assert(gst_bin_remove(GST_BIN(pipeline_), element));
+}
+
+
+
+void Pipeline::remove_vector(std::vector <GstElement*> &elementVec)
+{
+    std::vector<GstElement*>::iterator iter;
+    for (iter = elementVec.begin(); iter != elementVec.end(); iter++)
+        assert(gst_bin_remove(GST_BIN(pipeline_), *iter));
+}
+

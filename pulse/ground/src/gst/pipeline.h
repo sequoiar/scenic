@@ -27,10 +27,11 @@
 class Pipeline
 {
     public:
-        Pipeline(); 
-        ~Pipeline(); 
+        static Pipeline &Instance();
         void add(GstElement *element);
         void add_vector(std::vector <GstElement*> &elementVec);
+        void remove(GstElement *element);
+        void remove_vector(std::vector <GstElement*> &elementVec);
         bool isPlaying() const;
         void init();
         bool start();
@@ -41,11 +42,14 @@ class Pipeline
         static void cb_new_sink_pad(GstElement *element, GstPad *sinkPad, void *data);
 
     private:
+        Pipeline(); 
+        ~Pipeline(); 
 #if 0
         typedef struct _GstElement GstElement;
         typedef struct _GstPad GstPad;
         typedef std::vector<GstElement*>::iterator GstIter;
 #endif
+        static Pipeline* instance_;
 
         void make_verbose();
         GstElement *pipeline_;
