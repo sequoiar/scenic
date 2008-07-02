@@ -93,7 +93,7 @@ void Pipeline::cb_new_sink_pad(GstElement * sinkElement, GstPad * sinkPad, void 
     gst_object_unref(srcPad);
 }
 
-bool Pipeline::isPlaying() const const
+bool Pipeline::isPlaying() const
 {
     if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_PLAYING))
         return true;

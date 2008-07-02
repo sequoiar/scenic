@@ -42,32 +42,33 @@ MediaConfig::MediaConfig(std::string source)    // local sender
     // empty
 }
 
-const char *MediaConfig::source() const const
+const char *MediaConfig::source() const 
 {
     return source_.c_str();
 }
 
-const char *MediaConfig::codec() const const
+const char *MediaConfig::codec() const
 {
     return codec_.c_str();
 }
 
-const char *MediaConfig::remoteHost() const const
+const char *MediaConfig::remoteHost() const
 {
     return remoteHost_.c_str();
 }
 
-const int MediaConfig::port() const const
+const int MediaConfig::port() const 
 {
     return port_;
 }
 
-const bool MediaConfig::isNetworked() const const
+const bool MediaConfig::isNetworked() const
 {
     return port_ != 0;
 }
 
-const bool MediaConfig::hasCodec() const const
+const bool MediaConfig::hasCodec() const
 {
     return codec_.empty();
 }
+

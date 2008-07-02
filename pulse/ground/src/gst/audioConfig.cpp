@@ -45,27 +45,27 @@ numChannels_(numChannels)
     // empty
 }
 
-const int AudioConfig::numChannels() const const
+const int AudioConfig::numChannels() const
 {
     return numChannels_;
 }
 
-const bool AudioConfig::hasTestSrc() const const
+const bool AudioConfig::hasTestSrc() const
 {
     return !source_.compare("audiotestsrc");
 }
 
-const bool AudioConfig::hasFileSrc() const const
+const bool AudioConfig::hasFileSrc() const 
 {
     return !source_.compare("filesrc");
 }
 
-const bool AudioConfig::hasAlsaSrc() const const
+const bool AudioConfig::hasAlsaSrc() const
 {
     return !source_.compare("alsasrc");
 }
 
-const bool AudioConfig::hasJackSrc() const const
+const bool AudioConfig::hasJackSrc() const
 {
     return !source_.compare("jackaudiosrc");
 }

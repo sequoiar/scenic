@@ -45,12 +45,12 @@ VideoConfig::VideoConfig(std::string codec, int port)   // for receiver
     // empty
 }
 
-const bool VideoConfig::has_dv() const const
+const bool VideoConfig::has_dv() const
 {
     return !source_.compare("dv1394src");
 }
 
-const bool VideoConfig::has_h264() const const
+const bool VideoConfig::has_h264() const
 {
     return !codec_.compare("h264");
 }
