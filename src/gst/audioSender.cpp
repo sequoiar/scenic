@@ -251,7 +251,7 @@ void AudioSender::init_rtp()
 #endif
 
 // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
-const char *AudioSender::caps_str() const const
+const char *AudioSender::caps_str() const
 {
     assert(pipeline_.isPlaying());
 
@@ -273,7 +273,7 @@ const char *AudioSender::caps_str() const const
     return result;
 }
 
-void AudioSender::send_caps() const const
+void AudioSender::send_caps() const
 {
     LOG("Sending caps...");
 
