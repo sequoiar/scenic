@@ -10,28 +10,28 @@ class SdpTestSuite : public Test::Suite
 {
 public:
 
-SdpTestSuite()
-{
-	TEST_ADD(SdpTestSuite::init_test)
-	TEST_ADD(SdpTestSuite::sdp_header)
-	TEST_ADD(SdpTestSuite::sdp_parse)
-	TEST_ADD(SdpTestSuite::sdp_video)
-	TEST_ADD(SdpTestSuite::sdp_audio) TEST_ADD(SdpTestSuite::sdp_av)
-}
+	SdpTestSuite()
+	{
+		TEST_ADD(SdpTestSuite::init_test)
+		TEST_ADD(SdpTestSuite::sdp_header)
+		TEST_ADD(SdpTestSuite::sdp_parse)
+		TEST_ADD(SdpTestSuite::sdp_video)
+		TEST_ADD(SdpTestSuite::sdp_audio) TEST_ADD(SdpTestSuite::sdp_av)
+	}
 
 // some tests
 
 protected:
-virtual void setup();           // setup resources common to all tests
-virtual void tear_down();       // destroy common resources
+	virtual void setup();       // setup resources common to all tests
+	virtual void tear_down();   // destroy common resources
 
 private:
-void init_test();
-void sdp_header();
-void sdp_parse();
-void sdp_video();
-void sdp_audio();
-void sdp_av();
+	void init_test();
+	void sdp_header();
+	void sdp_parse();
+	void sdp_video();
+	void sdp_audio();
+	void sdp_av();
 };
 
 #define BLOCKING 1

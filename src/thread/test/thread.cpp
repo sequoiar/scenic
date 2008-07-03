@@ -26,7 +26,7 @@ typedef QueuePair_ < Message > QueuePair;
 
 class Thread : public BaseThread < Message >
 {
-int main();
+	int main();
 };
 
 int Thread::main()

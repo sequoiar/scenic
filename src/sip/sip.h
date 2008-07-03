@@ -33,79 +33,79 @@ class SipSingleton
 {
 
 public:
-static SipSingleton *Instance();
+	static SipSingleton *Instance();
 
 //called inside pjsip rx_request
 //must return pchar to desired response
 // Incoming data -> char* response
-const char *rx_invite(const char *msg, unsigned int len);
+	const char *rx_invite(const char *msg, unsigned int len);
 
 //called inside pjsip rx_response
-void rx_res(const char *msg, unsigned int len);
+	void rx_res(const char *msg, unsigned int len);
 
-void send_request(std::string);
+	void send_request(std::string);
 
-int handle_events();
+	int handle_events();
 
-bool init(const char *local_port);
+	bool init(const char *local_port);
 
-bool init(const char *local_ip, const char *local_port,
-          const char *remote_ip, const char *remote_port);
+	bool init(const char *local_ip, const char *local_port,
+	          const char *remote_ip, const char *remote_port);
 
-bool isValidService();
+	bool isValidService();
 
-void set_service_port(int p)
-{
-	service_port_ = p;
-}
-int get_service_port()
-{
-	return service_port_;
-}
+	void set_service_port(int p)
+	{
+		service_port_ = p;
+	}
+	int get_service_port()
+	{
+		return service_port_;
+	}
 
-void zero_service_port()
-{
-	service_port_ = 0;
-}
-void zero_service_desc()
-{
-	service_[0] = 0;
-}
+	void zero_service_port()
+	{
+		service_port_ = 0;
+	}
+	void zero_service_desc()
+	{
+		service_[0] = 0;
+	}
 
-int get_rx_port()
-{
-	return rx_port_;
-}
-void zero_rx_port()
-{
-	rx_port_ = 0;
-}
-char *get_service()
-{
-	return service_;
-}
+	int get_rx_port()
+	{
+		return rx_port_;
+	}
+	void zero_rx_port()
+	{
+		rx_port_ = 0;
+	}
+	char *get_service()
+	{
+		return service_;
+	}
 
-bool response_ok()
-{
-	return response;
-}
-Sdp & get_sdp()
-{
-	return sdp_;
-}
+	bool response_ok()
+	{
+		return response;
+	}
+	Sdp & get_sdp()
+	{
+		return sdp_;
+	}
 private:
-SipSingleton() : service_port_(0), rx_port_(0), response(false)
-{
-};
+	SipSingleton() : service_port_(0), rx_port_(0), response(false)
+	{
+	};
 
-char service_[32];
-int service_port_, rx_port_;
+	char service_[32];
+	int service_port_, rx_port_;
 
-bool response;
+	bool response;
 
-Sdp sdp_;
+	Sdp sdp_;
 
-static SipSingleton *s_;
+	static SipSingleton *s_;
 };
 
 #endif

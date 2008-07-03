@@ -40,59 +40,59 @@ typedef std::vector < LoArgs > OscArgs;
 class OscMessage
 {
 public:
-OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d);
-OscMessage()
-{
-}
-std::string path, types;
-OscArgs args;
-int argc;
-void *data;
+	OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d);
+	OscMessage()
+	{
+	}
+	std::string path, types;
+	OscArgs args;
+	int argc;
+	void *data;
 
 };
 
 typedef QueuePair_ < OscMessage > QueuePairOfOscMessage;
 class OscThread : public BaseThread < OscMessage >
 {
-int main();
+	int main();
 
-static int generic_handler_static(const char *path, const char *types,
-                                  lo_arg ** argv, int argc, void *data, void *user_data);
+	static int generic_handler_static(const char *path, const char *types,
+	                                  lo_arg ** argv, int argc, void *data, void *user_data);
 
-int generic_handler(const char *path, const char *types, lo_arg ** argv, int argc, void *data);
+	int generic_handler(const char *path, const char *types, lo_arg ** argv, int argc, void *data);
 
-static void liblo_error(int num, const char *msg, const char *path)
-{
-}
+	static void liblo_error(int num, const char *msg, const char *path)
+	{
+	}
 
-void send(OscMessage & osc);
+	void send(OscMessage & osc);
 };
 class LoArgs
 {
 public:
-LoArgs(const char *pchar, int index, lo_arg * a)
-{
-	type = (lo_type) pchar[index];
-	switch ((char) type)
+	LoArgs(const char *pchar, int index, lo_arg * a)
 	{
-	case 's':
-	{
-		s = static_cast < char *>(&(a->s));
-		break;
-	}
-	case 'i':
-	{
-		i = static_cast < int >(a->i);
-		break;
-	}
+		type = (lo_type) pchar[index];
+		switch ((char) type)
+		{
+		case 's':
+		{
+			s = static_cast < char *>(&(a->s));
+			break;
+		}
+		case 'i':
+		{
+			i = static_cast < int >(a->i);
+			break;
+		}
+
+		}
 
 	}
+	lo_type type;
+	int i;
 
-}
-lo_type type;
-int i;
-
-std::string s;
+	std::string s;
 };
 
 #endif
