@@ -44,11 +44,6 @@ public:
 private:
 	Pipeline();
 	~Pipeline();
-#if 0
-	typedef struct _GstElement GstElement;
-	typedef struct _GstPad GstPad;
-	typedef std::vector < GstElement * >::iterator GstIter;
-#endif
 	static Pipeline *instance_;
 
 	void make_verbose();
@@ -57,3 +52,4 @@ private:
 };
 
 #endif // _PIPELINE_H_
+

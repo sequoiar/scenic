@@ -114,13 +114,6 @@ void VideoSender::init_sink()
 		pipeline_.add(payloader_);
 		assert(gst_element_link(lastLinked_, payloader_));
 		session_.add(payloader_, dynamic_cast<const MediaConfig&>(config_));
-#if 0
-		sink_ = gst_element_factory_make("udpsink", NULL);
-		g_object_set(G_OBJECT(sink_), "host", config_.remoteHost(), "port", config_.port(), NULL);
-		pipeline_.add(payloader_);
-		pipeline_.add(sink_);
-		assert(gst_element_link_many(lastLinked_, payloader_, sink_, NULL));
-#endif
 	}
 	else                        // local test only
 	{
@@ -140,3 +133,4 @@ bool VideoSender::start()
 
 	return MediaBase::start();
 }
+

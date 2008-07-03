@@ -38,10 +38,6 @@ protected:
 	Pipeline & pipeline_;
 
 private:
-#if 0
-	typedef struct _GstElement GstElement;
-	typedef struct _GstPad GstPad;
-#endif
 };
 
 #endif // _GST_BASE_H_
