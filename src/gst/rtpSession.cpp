@@ -69,8 +69,7 @@ RtpSession::~RtpSession()
     assert(pipeline_.stop());
     pipeline_.remove(rtcp_sender_);
     pipeline_.remove(rtcp_receiver_);
-    instanceCount_--;
-    if (instanceCount_ < 0)
+    if (--instanceCount_ < 0)
     {
         pipeline_.remove(rtpbin_);
         rtpbin_ = 0;
