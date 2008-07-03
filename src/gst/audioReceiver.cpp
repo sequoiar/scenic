@@ -32,7 +32,7 @@
 #include "audioConfig.h"
 
 AudioReceiver::AudioReceiver(const AudioConfig & config):MediaBase(dynamic_cast < const MediaConfig & >(config)),
-config_(config), gotCaps_(false)
+config_(config), gotCaps_(false), depayloader_(0), decoder_(0), sink_(0)
 {
     // empty 
 }
