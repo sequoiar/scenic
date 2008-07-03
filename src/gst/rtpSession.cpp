@@ -28,11 +28,11 @@
 #include "logWriter.h"
 
 GstElement *RtpSession::rtpbin_ = 0;
-int RtpSession::counter_ = -1;
+int RtpSession::instanceCount_ = -1;
 
 RtpSession::RtpSession() : rtcp_sender_(0), rtcp_receiver_(0)
 {
-    counter_++;
+    instanceCount_++;
 }
 
 bool RtpSession::init()
@@ -59,7 +59,7 @@ const char *RtpSession::padStr(const char *padName)
     std::string result(padName);
     std::stringstream istream;
 
-    istream << counter_;        // 0-based
+    istream << instanceCount_;        // 0-based
     result = result + istream.str();
     return result.c_str();
 }
@@ -69,13 +69,12 @@ RtpSession::~RtpSession()
     assert(pipeline_.stop());
     pipeline_.remove(rtcp_sender_);
     pipeline_.remove(rtcp_receiver_);
-    counter_--;
-    if (counter_ < 0)
+    instanceCount_--;
+    if (instanceCount_ < 0)
     {
-        std::cout << "Goodbye rtpbin" << std::endl;
         pipeline_.remove(rtpbin_);
         rtpbin_ = 0;
-        assert(counter_ == -1);
+        assert(instanceCount_ == -1);
     }
 }
 
@@ -89,6 +88,27 @@ RtpSender::~RtpSender()
     pipeline_.remove(rtp_sender_);
 }
 
+const char *RtpSender::caps_str() const
+{
+    assert(pipeline_.isPlaying());
+
+    GstPad *pad;
+    GstCaps *caps;
+
+    pad = gst_element_get_pad(GST_ELEMENT(rtp_sender_), "sink");
+    assert(pad);
+
+    do
+        caps = gst_pad_get_negotiated_caps(pad);
+    while (caps == NULL);
+    assert(caps != NULL);
+
+    gst_object_unref(pad);
+
+    const char *result = gst_caps_to_string(caps);
+    gst_caps_unref(caps);
+    return result;
+}
 
 void RtpSender::addDerived(GstElement * newSrc, const MediaConfig & config)
 {
@@ -161,6 +181,15 @@ RtpReceiver::~RtpReceiver()
 {
     assert(pipeline_.stop());
     pipeline_.remove(rtp_receiver_);
+}
+
+void RtpReceiver::set_caps(const char *capsStr)
+{
+    GstCaps *caps;
+    caps = gst_caps_from_string(capsStr);
+    assert(caps);
+    g_object_set(G_OBJECT(rtp_receiver_), "caps", caps, NULL);
+    gst_caps_unref(caps);
 }
 
 void RtpReceiver::addDerived(GstElement * newSink, const MediaConfig & config)

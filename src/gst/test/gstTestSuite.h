@@ -51,14 +51,16 @@ class GstTestSuite:public Test::Suite
                 TEST_ADD(GstTestSuite::stop_dv)
                 TEST_ADD(GstTestSuite::start_stop_dv)
                 TEST_ADD(GstTestSuite::start_v4l)
-                TEST_ADD(GstTestSuite::stop_v4l) TEST_ADD(GstTestSuite::start_stop_v4l)
+                TEST_ADD(GstTestSuite::stop_v4l) 
+                TEST_ADD(GstTestSuite::start_stop_v4l)
 #if RTP
                 TEST_ADD(GstTestSuite::start_v4l_rtp)
                 TEST_ADD(GstTestSuite::stop_v4l_rtp)
                 TEST_ADD(GstTestSuite::start_stop_v4l_rtp)
                 TEST_ADD(GstTestSuite::start_dv_rtp)
-                TEST_ADD(GstTestSuite::stop_dv_rtp) TEST_ADD(GstTestSuite::start_stop_dv_rtp)
-#endif // RTP
+                TEST_ADD(GstTestSuite::stop_dv_rtp) 
+                TEST_ADD(GstTestSuite::start_stop_dv_rtp)
+#endif // RTP && VIDEO
 #endif // VIDEO
 #if AUDIO
                 TEST_ADD(GstTestSuite::start_1ch_audiotest)
@@ -85,11 +87,13 @@ class GstTestSuite:public Test::Suite
                 TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile)
                 TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile)
                 TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile)
+#if VIDEO
                 TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile_dv)
                 TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile_dv)
                 TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv)
-#endif                          // RTP
-#endif                          // AUDIO
+#endif                          // RTP && VIDEO && AUDIO
+#endif                          // RTP  && AUDIO
+#endif                          // AUDIO    
                 /*----------------------------------------------*/
                 /*      SANDBOX                                 */
                 /*----------------------------------------------*/

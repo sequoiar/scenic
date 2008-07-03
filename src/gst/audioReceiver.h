@@ -38,12 +38,12 @@ class AudioReceiver:public MediaBase
     virtual bool start();
 
   private:
-      virtual void init_source();
+    virtual void init_source();
     virtual void init_codec();
     virtual void init_sink();
 
     static int caps_handler(const char *path, const char *types, lo_arg ** argv, int argc,
-                            void *data, void *user_data);
+            void *data, void *user_data);
 
     void set_caps(const char *caps);
     static void liblo_error(int num, const char *msg, const char *path);

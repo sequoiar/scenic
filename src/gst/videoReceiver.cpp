@@ -26,7 +26,7 @@
 #include "videoReceiver.h"
 
 VideoReceiver::VideoReceiver(const VideoConfig & config):MediaBase(dynamic_cast < const MediaConfig & >(config)),
-config_(config)
+config_(config), decoder_(0), depayloader_(0), sink_(0)
 {
     // empty
 }
@@ -35,7 +35,6 @@ VideoReceiver::~VideoReceiver()
 {
     assert(stop());
 
-    pipeline_.remove(src_);
     pipeline_.remove(decoder_);
     pipeline_.remove(depayloader_);
     pipeline_.remove(sink_);
@@ -43,18 +42,6 @@ VideoReceiver::~VideoReceiver()
 
 void VideoReceiver::init_source()
 {
-    GstCaps *caps;
-    caps = gst_caps_new_simple("application/x-rtp", NULL);
-    assert(caps);
-
-    src_ = gst_element_factory_make("udpsrc", NULL);
-    assert(src_);
-
-    g_object_set(G_OBJECT(src_), "caps", caps, NULL);
-    g_object_set(G_OBJECT(src_), "port", config_.port(), NULL);
-
-    pipeline_.add(src_);
-    gst_caps_unref(caps);
 }
 
 void VideoReceiver::init_codec()
@@ -67,12 +54,14 @@ void VideoReceiver::init_codec()
         decoder_ = gst_element_factory_make("ffdec_h264", NULL);
         assert(decoder_);
 
-        //    g_object_set(G_OBJECT(decoder_), "debug-mv", TRUE, NULL);
-
-        pipeline_.add(depayloader_);
-        pipeline_.add(decoder_);
-        assert(gst_element_link_many(src_, depayloader_, decoder_, NULL));
     }
+
+    pipeline_.add(depayloader_);
+    pipeline_.add(decoder_);
+    assert(gst_element_link_many(depayloader_, decoder_, NULL));
+
+    session_.add(depayloader_, dynamic_cast <const MediaConfig &>(config_));
+    session_.set_caps("application/x-rtp");
 }
 
 void VideoReceiver::init_sink()
@@ -84,3 +73,4 @@ void VideoReceiver::init_sink()
     pipeline_.add(sink_);
     assert(gst_element_link(decoder_, sink_));
 }
+
