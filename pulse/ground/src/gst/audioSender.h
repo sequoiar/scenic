@@ -27,7 +27,7 @@
 
 #include "mediaBase.h"
 #include "audioConfig.h"
-#include "rtpSession.h"
+#include "rtpSender.h"
 
 class AudioSender : public MediaBase
 {

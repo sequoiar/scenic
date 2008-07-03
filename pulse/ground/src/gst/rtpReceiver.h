@@ -1,5 +1,5 @@
 
-// videoReceiver.h
+// rtpReceiver.h
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -18,28 +18,28 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _VIDEO_RECEIVER_H_
-#define _VIDEO_RECEIVER_H_
+#ifndef _RTP_RECEIVER_H_
+#define _RTP_RECEIVER_H_
 
-#include "mediaBase.h"
-#include "videoConfig.h"
-#include "rtpReceiver.h"
+#include <vector>
+#include <gst/gst.h>
+#include "rtpSession.h"
 
-class VideoReceiver : public MediaBase
+class MediaConfig;
+
+class RtpReceiver : public RtpSession
 {
 public:
-	VideoReceiver(const VideoConfig & config);
-	virtual ~VideoReceiver();
+	RtpReceiver();
+	void set_caps(const char *capsStr);
+	virtual ~RtpReceiver();
+
+protected:
+	virtual void addDerived(GstElement * sink, const MediaConfig & config);
 
 private:
-	void set_caps(const char* capsStr);
-	virtual void init_source();
-	virtual void init_codec();
-	virtual void init_sink();
-
-	RtpReceiver session_;
-	VideoConfig config_;
-	GstElement *decoder_, *depayloader_, *sink_;
+	GstElement *rtp_receiver_;
 };
 
-#endif
+#endif // _RTP_RECEIVER_H_
+
