@@ -30,7 +30,7 @@
 GstElement *RtpSession::rtpbin_ = 0;
 int RtpSession::counter_ = -1;
 
-RtpSession::RtpSession()
+RtpSession::RtpSession() : rtcp_sender_(0), rtcp_receiver_(0)
 {
     counter_++;
 }
@@ -79,17 +79,16 @@ RtpSession::~RtpSession()
     }
 }
 
+RtpSender::RtpSender() : rtp_sender_(0)
+{
+}
+
 RtpSender::~RtpSender()
 {
     assert(pipeline_.stop());
     pipeline_.remove(rtp_sender_);
 }
 
-RtpReceiver::~RtpReceiver()
-{
-    assert(pipeline_.stop());
-    pipeline_.remove(rtp_receiver_);
-}
 
 void RtpSender::addDerived(GstElement * newSrc, const MediaConfig & config)
 {
@@ -152,6 +151,16 @@ void RtpSender::addDerived(GstElement * newSrc, const MediaConfig & config)
     gst_element_release_request_pad(rtpbin_, send_rtcp_src);
     gst_object_unref(GST_OBJECT(send_rtp_src));
     gst_element_release_request_pad(rtpbin_, send_rtp_sink);
+}
+
+RtpReceiver::RtpReceiver() : rtp_receiver_(0)
+{
+}
+
+RtpReceiver::~RtpReceiver()
+{
+    assert(pipeline_.stop());
+    pipeline_.remove(rtp_receiver_);
 }
 
 void RtpReceiver::addDerived(GstElement * newSink, const MediaConfig & config)

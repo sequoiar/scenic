@@ -33,135 +33,136 @@
 #define BLOCKING 1
 
 #define VIDEO 0
-#define AUDIO 0
-#define RTP 0
+#define AUDIO 1
+#define RTP 1
 
 class GstTestSuite:public Test::Suite
 {
-  public:
+    public:
 
-    GstTestSuite()
-    {
+        GstTestSuite()
+        {
 #if VIDEO
-        TEST_ADD(GstTestSuite::init_test)
-            TEST_ADD(GstTestSuite::start_test_video)
-            TEST_ADD(GstTestSuite::stop_test_video)
-            TEST_ADD(GstTestSuite::start_stop_test_video)
-            TEST_ADD(GstTestSuite::start_dv)
-            TEST_ADD(GstTestSuite::stop_dv)
-            TEST_ADD(GstTestSuite::start_stop_dv)
-            TEST_ADD(GstTestSuite::start_v4l)
-            TEST_ADD(GstTestSuite::stop_v4l) TEST_ADD(GstTestSuite::start_stop_v4l)
+            TEST_ADD(GstTestSuite::init_test)
+                TEST_ADD(GstTestSuite::start_test_video)
+                TEST_ADD(GstTestSuite::stop_test_video)
+                TEST_ADD(GstTestSuite::start_stop_test_video)
+                TEST_ADD(GstTestSuite::start_dv)
+                TEST_ADD(GstTestSuite::stop_dv)
+                TEST_ADD(GstTestSuite::start_stop_dv)
+                TEST_ADD(GstTestSuite::start_v4l)
+                TEST_ADD(GstTestSuite::stop_v4l) TEST_ADD(GstTestSuite::start_stop_v4l)
 #if RTP
-            TEST_ADD(GstTestSuite::start_v4l_rtp)
-            TEST_ADD(GstTestSuite::stop_v4l_rtp)
-            TEST_ADD(GstTestSuite::start_stop_v4l_rtp)
-            TEST_ADD(GstTestSuite::start_dv_rtp)
-            TEST_ADD(GstTestSuite::stop_dv_rtp) TEST_ADD(GstTestSuite::start_stop_dv_rtp)
+                TEST_ADD(GstTestSuite::start_v4l_rtp)
+                TEST_ADD(GstTestSuite::stop_v4l_rtp)
+                TEST_ADD(GstTestSuite::start_stop_v4l_rtp)
+                TEST_ADD(GstTestSuite::start_dv_rtp)
+                TEST_ADD(GstTestSuite::stop_dv_rtp) TEST_ADD(GstTestSuite::start_stop_dv_rtp)
 #endif // RTP
 #endif // VIDEO
 #if AUDIO
-            TEST_ADD(GstTestSuite::start_1ch_audiotest)
-            TEST_ADD(GstTestSuite::stop_1ch_audiotest)
-            TEST_ADD(GstTestSuite::start_stop_1ch_audiotest)
-            TEST_ADD(GstTestSuite::start_2ch_audiotest)
-            TEST_ADD(GstTestSuite::stop_2ch_audiotest)
-            TEST_ADD(GstTestSuite::start_stop_2ch_audiotest) TEST_ADD(GstTestSuite::start_6ch_audiotest);
-        TEST_ADD(GstTestSuite::stop_6ch_audiotest)
-            TEST_ADD(GstTestSuite::start_stop_6ch_audiotest)
-            TEST_ADD(GstTestSuite::start_8ch_audiotest)
-            TEST_ADD(GstTestSuite::stop_8ch_audiotest)
-            TEST_ADD(GstTestSuite::start_stop_8ch_audiotest)
-            TEST_ADD(GstTestSuite::start_8ch_comp_audiofile)
-            TEST_ADD(GstTestSuite::stop_8ch_comp_audiofile)
-            TEST_ADD(GstTestSuite::start_stop_8ch_comp_audiofile)
+                TEST_ADD(GstTestSuite::start_1ch_audiotest)
+                TEST_ADD(GstTestSuite::stop_1ch_audiotest)
+                TEST_ADD(GstTestSuite::start_stop_1ch_audiotest)
+                TEST_ADD(GstTestSuite::start_2ch_audiotest)
+                TEST_ADD(GstTestSuite::stop_2ch_audiotest)
+                TEST_ADD(GstTestSuite::start_stop_2ch_audiotest) TEST_ADD(GstTestSuite::start_6ch_audiotest);
+            TEST_ADD(GstTestSuite::stop_6ch_audiotest)
+                TEST_ADD(GstTestSuite::start_stop_6ch_audiotest)
+                TEST_ADD(GstTestSuite::start_8ch_audiotest)
+                TEST_ADD(GstTestSuite::stop_8ch_audiotest)
+                TEST_ADD(GstTestSuite::start_stop_8ch_audiotest)
+                TEST_ADD(GstTestSuite::start_8ch_comp_audiofile)
+                TEST_ADD(GstTestSuite::stop_8ch_comp_audiofile)
+                TEST_ADD(GstTestSuite::start_stop_8ch_comp_audiofile)
 #if RTP
-        TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiotest)
-            TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiotest)
-            TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiotest)
-            TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile)
-            TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile)
-            TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile)
-            TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile_dv)
-            TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile_dv)
-            TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv)
+                TEST_ADD(GstTestSuite::start_2ch_comp_rtp_audiotest)
+                TEST_ADD(GstTestSuite::stop_2ch_comp_rtp_audiotest)
+                TEST_ADD(GstTestSuite::start_stop_2ch_comp_rtp_audiotest)
+                TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiotest)
+                TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiotest)
+                TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiotest)
+                TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile)
+                TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile)
+                TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile)
+                TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile_dv)
+                TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile_dv)
+                TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv)
 #endif                          // RTP
 #endif                          // AUDIO
-/*----------------------------------------------*/
-/*      SANDBOX                                 */
-/*----------------------------------------------*/
-    TEST_ADD(GstTestSuite::start_2ch_comp_rtp_audiotest)
-            TEST_ADD(GstTestSuite::stop_2ch_comp_rtp_audiotest)
-            TEST_ADD(GstTestSuite::start_stop_2ch_comp_rtp_audiotest)}
+                /*----------------------------------------------*/
+                /*      SANDBOX                                 */
+                /*----------------------------------------------*/
+        }
 
-    void set_id(int id);
+        void set_id(int id);
 
-    // some tests
+        // some tests
 
-  protected:
-    virtual void setup();       // setup resources common to all tests  
-    virtual void tear_down();   // destroy common resources
+    protected:
+        virtual void setup();       // setup resources common to all tests  
+        virtual void tear_down();   // destroy common resources
 
-  private:
-    int id_;
+    private:
+        int id_;
 
-    void init_test();
+        void init_test();
 
-    void start_test_video();
-    void stop_test_video();
-    void start_stop_test_video();
+        void start_test_video();
+        void stop_test_video();
+        void start_stop_test_video();
 
-    void start_v4l();
-    void stop_v4l();
-    void start_stop_v4l();
+        void start_v4l();
+        void stop_v4l();
+        void start_stop_v4l();
 
-    void start_v4l_rtp();
-    void stop_v4l_rtp();
-    void start_stop_v4l_rtp();
+        void start_v4l_rtp();
+        void stop_v4l_rtp();
+        void start_stop_v4l_rtp();
 
-    void start_dv();
-    void stop_dv();
-    void start_stop_dv();
+        void start_dv();
+        void stop_dv();
+        void start_stop_dv();
 
-    void start_dv_rtp();
-    void stop_dv_rtp();
-    void start_stop_dv_rtp();
+        void start_dv_rtp();
+        void stop_dv_rtp();
+        void start_stop_dv_rtp();
 
-    void start_1ch_audiotest();
-    void stop_1ch_audiotest();
-    void start_stop_1ch_audiotest();
+        void start_1ch_audiotest();
+        void stop_1ch_audiotest();
+        void start_stop_1ch_audiotest();
 
-    void start_2ch_audiotest();
-    void stop_2ch_audiotest();
-    void start_stop_2ch_audiotest();
+        void start_2ch_audiotest();
+        void stop_2ch_audiotest();
+        void start_stop_2ch_audiotest();
 
-    void start_6ch_audiotest();
-    void stop_6ch_audiotest();
-    void start_stop_6ch_audiotest();
+        void start_6ch_audiotest();
+        void stop_6ch_audiotest();
+        void start_stop_6ch_audiotest();
 
-    void start_8ch_audiotest();
-    void stop_8ch_audiotest();
-    void start_stop_8ch_audiotest();
+        void start_8ch_audiotest();
+        void stop_8ch_audiotest();
+        void start_stop_8ch_audiotest();
 
-    void start_2ch_comp_rtp_audiotest();
-    void stop_2ch_comp_rtp_audiotest();
-    void start_stop_2ch_comp_rtp_audiotest();
+        void start_2ch_comp_rtp_audiotest();
+        void stop_2ch_comp_rtp_audiotest();
+        void start_stop_2ch_comp_rtp_audiotest();
 
-    void start_8ch_comp_rtp_audiotest();
-    void stop_8ch_comp_rtp_audiotest();
-    void start_stop_8ch_comp_rtp_audiotest();
+        void start_8ch_comp_rtp_audiotest();
+        void stop_8ch_comp_rtp_audiotest();
+        void start_stop_8ch_comp_rtp_audiotest();
 
-    void start_8ch_comp_audiofile();
-    void stop_8ch_comp_audiofile();
-    void start_stop_8ch_comp_audiofile();
+        void start_8ch_comp_audiofile();
+        void stop_8ch_comp_audiofile();
+        void start_stop_8ch_comp_audiofile();
 
-    void start_8ch_comp_rtp_audiofile();
-    void stop_8ch_comp_rtp_audiofile();
-    void start_stop_8ch_comp_rtp_audiofile();
+        void start_8ch_comp_rtp_audiofile();
+        void stop_8ch_comp_rtp_audiofile();
+        void start_stop_8ch_comp_rtp_audiofile();
 
-    void start_8ch_comp_rtp_audiofile_dv();
-    void stop_8ch_comp_rtp_audiofile_dv();
-    void start_stop_8ch_comp_rtp_audiofile_dv();
+        void start_8ch_comp_rtp_audiofile_dv();
+        void stop_8ch_comp_rtp_audiofile_dv();
+        void start_stop_8ch_comp_rtp_audiofile_dv();
 };
 
 #if BLOCKING

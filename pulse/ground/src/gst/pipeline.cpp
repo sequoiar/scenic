@@ -127,7 +127,8 @@ void Pipeline::add_vector(std::vector < GstElement * >&elementVec)
 
 void Pipeline::remove(GstElement * element)
 {
-    assert(gst_bin_remove(GST_BIN(pipeline_), element));
+    if (element)
+        assert(gst_bin_remove(GST_BIN(pipeline_), element));
 }
 
 void Pipeline::remove_vector(std::vector < GstElement * >&elementVec)

@@ -37,7 +37,7 @@
 
 AudioSender::AudioSender(const AudioConfig & config):MediaBase(dynamic_cast <
                                                                const MediaConfig & >(config)),
-config_(config), sink_(0)
+    config_(config), encoder_(0), payloader_(0), interleave_(0), sink_(0)
 {
     // empty
 }
@@ -54,8 +54,7 @@ AudioSender::~AudioSender()
     pipeline_.remove(encoder_);
     pipeline_.remove(payloader_);
     pipeline_.remove(interleave_);
-    if (sink_)
-        pipeline_.remove(sink_);
+    pipeline_.remove(sink_);
 }
 
 void AudioSender::init_interleave()

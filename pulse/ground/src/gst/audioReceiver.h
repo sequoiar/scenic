@@ -51,9 +51,10 @@ class AudioReceiver:public MediaBase
     void wait_for_caps();
 
     RtpReceiver session_;
-    GstElement *depayloader_, *decoder_, *sink_;
     AudioConfig config_;
     bool gotCaps_;
+    GstElement *depayloader_, *decoder_, *sink_;
 };
 
 #endif // _AUDIO_RECEIVER_H_
+

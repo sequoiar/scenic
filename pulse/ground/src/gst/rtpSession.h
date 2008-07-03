@@ -47,9 +47,7 @@ class RtpSession:public GstBase
 class RtpSender:public RtpSession
 {
   public:
-    RtpSender()
-    {
-    };
+    RtpSender();
     virtual ~ RtpSender();
 
   protected:
@@ -63,9 +61,7 @@ class RtpSender:public RtpSession
 class RtpReceiver:public RtpSession
 {
   public:
-    RtpReceiver()
-    {
-    };
+    RtpReceiver();
     virtual ~ RtpReceiver();
 
   protected:
