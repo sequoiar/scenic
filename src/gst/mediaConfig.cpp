@@ -1,6 +1,6 @@
 // mediaConfig.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file 
+/** \file
  *      Base class for media parameter objects.
  *
  */
@@ -26,49 +26,49 @@
 #include "mediaConfig.h"
 
 MediaConfig::MediaConfig(std::string codec, int port)   // receiver
-:codec_(codec), remoteHost_(""), port_(port)
+	: codec_(codec), remoteHost_(""), port_(port)
 {
-    // empty
+	// empty
 }
 
-MediaConfig::MediaConfig(std::string source, std::string codec, std::string remoteHost, int port):source_(source), codec_(codec), remoteHost_(remoteHost), port_(port)  // remote sender
+MediaConfig::MediaConfig(std::string source, std::string codec, std::string remoteHost, int port) : source_(source), codec_(codec), remoteHost_(remoteHost), port_(port)  // remote sender
 {
-    // empty
+	// empty
 }
 
 MediaConfig::MediaConfig(std::string source)    // local sender
-:  source_(source), remoteHost_(""), port_(0)
+	:  source_(source), remoteHost_(""), port_(0)
 {
-    // empty
+	// empty
 }
 
-const char *MediaConfig::source() const 
+const char *MediaConfig::source() const
 {
-    return source_.c_str();
+	return source_.c_str();
 }
 
 const char *MediaConfig::codec() const
 {
-    return codec_.c_str();
+	return codec_.c_str();
 }
 
 const char *MediaConfig::remoteHost() const
 {
-    return remoteHost_.c_str();
+	return remoteHost_.c_str();
 }
 
-const int MediaConfig::port() const 
+const int MediaConfig::port() const
 {
-    return port_;
+	return port_;
 }
 
 const bool MediaConfig::isNetworked() const
 {
-    return port_ != 0;
+	return port_ != 0;
 }
 
 const bool MediaConfig::hasCodec() const
 {
-    return codec_.empty();
+	return codec_.empty();
 }
 

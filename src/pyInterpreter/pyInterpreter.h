@@ -1,6 +1,6 @@
 // pyInterpreter.h
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -27,13 +27,13 @@
 
 class pyInterpreter
 {
-  public:
+public:
 
-    int init(int argc, char *argv[]);
+int init(int argc, char *argv[]);
 
-      std::string run_str(std::string s);
-      std::string run_input();
-    void interact();
-    int result();
+std::string run_str(std::string s);
+std::string run_input();
+void interact();
+int result();
 
 };

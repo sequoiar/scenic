@@ -1,5 +1,5 @@
 /* GTHREAD-QUEUE-PAIR - Library of Thread Queue Routines for GLIB
- * Copyright 2008  Koya Charles & Tristan Matthews 
+ * Copyright 2008  Koya Charles & Tristan Matthews
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,56 +24,54 @@
 
 typedef QueuePair_ < Message > QueuePair;
 
-class Thread:public BaseThread < Message >
+class Thread : public BaseThread < Message >
 {
-    int main();
+int main();
 };
 
 int Thread::main()
 {
-    Message r(message::ok);
-    int count = 0;
-    while (1)
-    {
-        Message f = queue.copy_timed_pop(1);
-        std::cout << message::str[f.type];
-        queue.push(r);
-        if (count++ == 100000)
-        {
-            Message f(message::quit);
-            queue.push(f);
-            break;
-        }
-    }
-    return 0;
+	Message r(message::ok);
+	int count = 0;
+	while (1)
+	{
+		Message f = queue.copy_timed_pop(1);
+		std::cout << message::str[f.type];
+		queue.push(r);
+		if (count++ == 100000) {
+			Message f(message::quit);
+			queue.push(f);
+			break;
+		}
+	}
+	return 0;
 }
 
 int main(int argc, char **argv)
 {
-    Message f(message::start);
-    Thread t;
+	Message f(message::start);
+	Thread t;
 
-    QueuePair queue = t.getQueue("");
-    QueuePair queue2 = t.getQueue("a");
-    if (!t.run())
-        return -1;
+	QueuePair queue = t.getQueue("");
+	QueuePair queue2 = t.getQueue("a");
+	if (!t.run())
+		return -1;
 
-    while (1)
-    {
-        queue.push(f);
-        std::cout << "sent it" << std::endl;
-        Message f = queue.copy_timed_pop(10);
-        Message f2 = queue2.copy_timed_pop(10);
+	while (1)
+	{
+		queue.push(f);
+		std::cout << "sent it" << std::endl;
+		Message f = queue.copy_timed_pop(10);
+		Message f2 = queue2.copy_timed_pop(10);
 
-        std::cout << message::str[f.type];
-        if (f.type == message::quit)
-        {
-            break;
-        }
+		std::cout << message::str[f.type];
+		if (f.type == message::quit) {
+			break;
+		}
 
-    }
+	}
 
-    std::cout << "Done!" << std::endl;
+	std::cout << "Done!" << std::endl;
 
-    return 0;
+	return 0;
 }

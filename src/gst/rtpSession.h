@@ -1,7 +1,7 @@
 
 // rtpSession.h
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -28,48 +28,48 @@
 
 class MediaConfig;
 
-class RtpSession:public GstBase
+class RtpSession : public GstBase
 {
-  public:
-    virtual ~ RtpSession();
-    virtual bool init();
-    virtual void add(GstElement * elem, const MediaConfig & config);
-    virtual void addDerived(GstElement * elem, const MediaConfig & config) = 0;
+public:
+virtual ~RtpSession();
+virtual bool init();
+virtual void add(GstElement * elem, const MediaConfig & config);
+virtual void addDerived(GstElement * elem, const MediaConfig & config) = 0;
 
-  protected:
-      RtpSession();
-    static const char *padStr(const char *padName);
-    static GstElement *rtpbin_;
-    static int instanceCount_;
-    GstElement *rtcp_sender_, *rtcp_receiver_;
+protected:
+RtpSession();
+static const char *padStr(const char *padName);
+static GstElement *rtpbin_;
+static int instanceCount_;
+GstElement *rtcp_sender_, *rtcp_receiver_;
 };
 
-class RtpSender:public RtpSession
+class RtpSender : public RtpSession
 {
-  public:
-    RtpSender();
-    const char *caps_str() const;
-    virtual ~ RtpSender();
+public:
+RtpSender();
+const char *caps_str() const;
+virtual ~RtpSender();
 
-  protected:
-    virtual void addDerived(GstElement * src, const MediaConfig & config);
+protected:
+virtual void addDerived(GstElement * src, const MediaConfig & config);
 
-  private:
-    GstElement *rtp_sender_;
+private:
+GstElement *rtp_sender_;
 };
 
-class RtpReceiver:public RtpSession
+class RtpReceiver : public RtpSession
 {
-  public:
-    RtpReceiver();
-    void set_caps(const char *capsStr);
-    virtual ~ RtpReceiver();
+public:
+RtpReceiver();
+void set_caps(const char *capsStr);
+virtual ~RtpReceiver();
 
-  protected:
-    virtual void addDerived(GstElement * sink, const MediaConfig & config);
+protected:
+virtual void addDerived(GstElement * sink, const MediaConfig & config);
 
-  private:
-    GstElement *rtp_receiver_;
+private:
+GstElement *rtp_receiver_;
 };
 
 #endif // _RTP_SESSION_H_

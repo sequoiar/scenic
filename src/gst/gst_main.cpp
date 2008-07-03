@@ -1,7 +1,7 @@
 
 // gst_main.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -22,5 +22,5 @@ int gst_main(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
-    return gst_main(argc, argv);
+	return gst_main(argc, argv);
 }

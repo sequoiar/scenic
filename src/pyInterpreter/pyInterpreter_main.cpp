@@ -1,6 +1,6 @@
 // pyInterpreter.h
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -34,26 +34,25 @@ int ground_loop(int result);
 
 int main(int argc, char *argv[])
 {
-    static int count;
-    std::string result;
-    pyInterpreter py;
+	static int count;
+	std::string result;
+	pyInterpreter py;
 
-    py.init(argc, argv);
+	py.init(argc, argv);
 
-    ground_init(argc, argv);
+	ground_init(argc, argv);
 
-    std::cout << std::endl << "Welcome to the Console" << std::endl;
-    std::cout << "Brought to you by The Hawfullpuf Industrial Complex." << std::endl;
-    while (1)
-    {
-        if (ground_loop(count))
-        {
-            if (!py.run_input().empty())
-                count = -1;
-        }
-        else
-            break;
-    }
+	std::cout << std::endl << "Welcome to the Console" << std::endl;
+	std::cout << "Brought to you by The Hawfullpuf Industrial Complex." << std::endl;
+	while (1)
+	{
+		if (ground_loop(count)) {
+			if (!py.run_input().empty())
+				count = -1;
+		}
+		else
+			break;
+	}
 
-    std::cout << std::endl << "going down - CLEANUP ----" << std::endl;
+	std::cout << std::endl << "going down - CLEANUP ----" << std::endl;
 }

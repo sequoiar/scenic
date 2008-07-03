@@ -1,6 +1,6 @@
 // hello.h
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -29,16 +29,16 @@
 
 class Hello
 {
-    std::string s;
-  public:
-    /** Get a char* containing  "hello {name}". */
-    const char *greet();
+std::string s;
+public:
+/** Get a char* containing  "hello {name}". */
+const char *greet();
 
-    /** Set the name of who gets greeted.
-     *
-     *  More DESC here.
-     */
-    void set_name(char const *n);
+/** Set the name of who gets greeted.
+ *
+ *  More DESC here.
+ */
+void set_name(char const *n);
 };
 
 #endif //_HELLO_H_

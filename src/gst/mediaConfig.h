@@ -1,6 +1,6 @@
 // mediaConfig.h
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file 
+/** \file
  *      Immutable base class for media parameter objects.
  *
  */
@@ -29,23 +29,23 @@
 
 class MediaConfig
 {
-  public:
-    MediaConfig(std::string source, std::string codec, std::string remoteHost, int port);       // remote sender
-      MediaConfig(std::string codec, int port); // receiver
-      MediaConfig(std::string source);  // local sender
+public:
+MediaConfig(std::string source, std::string codec, std::string remoteHost, int port);           // remote sender
+MediaConfig(std::string codec, int port);       // receiver
+MediaConfig(std::string source);        // local sender
 
-    const char *source() const;
-    const char *codec() const;
-    const char *remoteHost() const;
-    const int port() const;
-    const bool isNetworked() const;
-    const bool hasCodec() const;
+const char *source() const;
+const char *codec() const;
+const char *remoteHost() const;
+const int port() const;
+const bool isNetworked() const;
+const bool hasCodec() const;
 
-  protected:
-    const std::string source_;
-    const std::string codec_;
-    const std::string remoteHost_;
-    const int port_;
+protected:
+const std::string source_;
+const std::string codec_;
+const std::string remoteHost_;
+const int port_;
 };
 
 #endif // _MEDIA_CONFIG_H_

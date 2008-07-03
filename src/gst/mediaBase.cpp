@@ -1,7 +1,7 @@
 
 // mediaBase.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -25,30 +25,30 @@
 #include "mediaConfig.h"
 #include "logWriter.h"
 
-MediaBase::MediaBase(const MediaConfig & config):config_(config)
+MediaBase::MediaBase(const MediaConfig & config) : config_(config)
 {
 }
 
 MediaBase::~MediaBase()
 {
-    pipeline_.stop();
+	pipeline_.stop();
 }
 
 bool MediaBase::start()
 {
-    return pipeline_.start();
+	return pipeline_.start();
 }
 
 bool MediaBase::stop()
 {
-    return pipeline_.stop();
+	return pipeline_.stop();
 }
 
 bool MediaBase::init()
 {
-    // these methods are defined in subclasses
-    init_source();
-    init_codec();
-    init_sink();
-    return true;
+	// these methods are defined in subclasses
+	init_source();
+	init_codec();
+	init_sink();
+	return true;
 }
