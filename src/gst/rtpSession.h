@@ -44,32 +44,4 @@ protected:
 	GstElement *rtcp_sender_, *rtcp_receiver_;
 };
 
-class RtpSender : public RtpSession
-{
-public:
-	RtpSender();
-	const char *caps_str() const;
-	virtual ~RtpSender();
-
-protected:
-	virtual void addDerived(GstElement * src, const MediaConfig & config);
-
-private:
-	GstElement *rtp_sender_;
-};
-
-class RtpReceiver : public RtpSession
-{
-public:
-	RtpReceiver();
-	void set_caps(const char *capsStr);
-	virtual ~RtpReceiver();
-
-protected:
-	virtual void addDerived(GstElement * sink, const MediaConfig & config);
-
-private:
-	GstElement *rtp_receiver_;
-};
-
 #endif // _RTP_SESSION_H_

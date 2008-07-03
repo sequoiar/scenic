@@ -26,7 +26,7 @@
 
 #include "mediaBase.h"
 #include "videoConfig.h"
-#include "rtpSession.h"
+#include "rtpSender.h"
 
 class VideoSender : public MediaBase
 {
