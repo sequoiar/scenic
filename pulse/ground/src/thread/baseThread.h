@@ -32,29 +32,29 @@ typedef std::pair < GAsyncQueue *, GAsyncQueue * >BaseQueuePair;
 template < class T > class QueuePair_ : public BaseQueuePair
 {
 public:
-QueuePair_ < T > (GAsyncQueue * f, GAsyncQueue * s) : BaseQueuePair(f, s)
-{
-}
-QueuePair_ < T > () : BaseQueuePair(0, 0)
-{
-}
-~QueuePair_ < T > ()
-{
-}
-T copy_timed_pop(int ms);
-void push(T pt);
+	QueuePair_ < T > (GAsyncQueue * f, GAsyncQueue * s) : BaseQueuePair(f, s)
+	{
+	}
+	QueuePair_ < T > () : BaseQueuePair(0, 0)
+	{
+	}
+	~QueuePair_ < T > ()
+	{
+	}
+	T copy_timed_pop(int ms);
+	void push(T pt);
 
-void done(T t);
-void done(T * pt);
-void init();
-typedef std::set < GAsyncQueue * >SetOfQueues;
+	void done(T t);
+	void done(T * pt);
+	void init();
+	typedef std::set < GAsyncQueue * >SetOfQueues;
 
 private:
-static SetOfQueues qstor;
+	static SetOfQueues qstor;
 
-T *timed_pop(int ms);
-static GMutex *mutex;
-static std::list < T * >l;
+	T *timed_pop(int ms);
+	static GMutex *mutex;
+	static std::list < T * >l;
 
 };
 
@@ -63,30 +63,30 @@ template < class T > std::set < GAsyncQueue * >QueuePair_ < T >::qstor;
 template < class T > class BaseThread
 {
 public:
-BaseThread < T > ();
-~BaseThread < T > ();
+	BaseThread < T > ();
+	~BaseThread < T > ();
 
-QueuePair_ < T > getQueue(std::string s);
-GAsyncQueue *getPushQueue()
-{
-	return queue.first;
-}
-GAsyncQueue *getPopQueue()
-{
-	return queue.second;
-}
-bool run();
+	QueuePair_ < T > getQueue(std::string s);
+	GAsyncQueue *getPushQueue()
+	{
+		return queue.first;
+	}
+	GAsyncQueue *getPopQueue()
+	{
+		return queue.second;
+	}
+	bool run();
 
 protected:
-virtual int main()
-{
-	return 0;
-}
-GThread *th;
+	virtual int main()
+	{
+		return 0;
+	}
+	GThread *th;
 
-QueuePair_ < T > queue;
-std::map < std::string, QueuePair_ < T > >queue_map;
-static void *thread_main(void *v);
+	QueuePair_ < T > queue;
+	std::map < std::string, QueuePair_ < T > >queue_map;
+	static void *thread_main(void *v);
 };
 
 template < class T > QueuePair_ < T > BaseThread < T >::getQueue(std::string s)

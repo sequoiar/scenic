@@ -29,16 +29,16 @@
 
 class Hello
 {
-std::string s;
+	std::string s;
 public:
 /** Get a char* containing  "hello {name}". */
-const char *greet();
+	const char *greet();
 
 /** Set the name of who gets greeted.
  *
  *  More DESC here.
  */
-void set_name(char const *n);
+	void set_name(char const *n);
 };
 
 #endif //_HELLO_H_
