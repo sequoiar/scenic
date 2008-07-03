@@ -1,6 +1,6 @@
 // logWriter.h
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file 
+/** \file
  *      Log writer macro, usage:
  *
  *      LOG("This is a log");
@@ -34,9 +34,9 @@
 
 #if LOGGING
 #define LOG(x) \
-                std::cerr << std::endl; \
-                std::cerr << __FILE__ << ":" << __LINE__ << ": " << x; \
-                std::cerr << " at " << __TIME__ << " on " << __DATE__ << std::endl
+    std::cerr << std::endl; \
+    std::cerr << __FILE__ << ":" << __LINE__ << ": " << x; \
+    std::cerr << " at " << __TIME__ << " on " << __DATE__ << std::endl
 #else
 #define LOG(x)
 #endif

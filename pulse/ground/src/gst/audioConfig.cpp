@@ -1,7 +1,7 @@
 
 // audioConfig.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file 
+/** \file
  *      Class for audio parameter objects.
  *
  */
@@ -26,46 +26,46 @@
 #include <string>
 #include "audioConfig.h"
 
-AudioConfig::AudioConfig(std::string source, int numChannels, std::string codec, std::string remoteHost, int port):MediaConfig(source, codec, remoteHost, port),
-numChannels_
-(numChannels)
+AudioConfig::AudioConfig(std::string source, int numChannels, std::string codec, std::string remoteHost, int port) : MediaConfig(source, codec, remoteHost, port),
+	numChannels_
+	(numChannels)
 {
-    // empty
+	// empty
 }
 
-AudioConfig::AudioConfig(std::string source, int numChannels):MediaConfig(source),
-numChannels_(numChannels)
+AudioConfig::AudioConfig(std::string source, int numChannels) : MediaConfig(source),
+	numChannels_(numChannels)
 {
-    // empty
+	// empty
 }
 
-AudioConfig::AudioConfig(int numChannels, std::string codec, int port):MediaConfig(codec, port),
-numChannels_(numChannels)
+AudioConfig::AudioConfig(int numChannels, std::string codec, int port) : MediaConfig(codec, port),
+	numChannels_(numChannels)
 {
-    // empty
+	// empty
 }
 
 const int AudioConfig::numChannels() const
 {
-    return numChannels_;
+	return numChannels_;
 }
 
 const bool AudioConfig::hasTestSrc() const
 {
-    return !source_.compare("audiotestsrc");
+	return !source_.compare("audiotestsrc");
 }
 
-const bool AudioConfig::hasFileSrc() const 
+const bool AudioConfig::hasFileSrc() const
 {
-    return !source_.compare("filesrc");
+	return !source_.compare("filesrc");
 }
 
 const bool AudioConfig::hasAlsaSrc() const
 {
-    return !source_.compare("alsasrc");
+	return !source_.compare("alsasrc");
 }
 
 const bool AudioConfig::hasJackSrc() const
 {
-    return !source_.compare("jackaudiosrc");
+	return !source_.compare("jackaudiosrc");
 }

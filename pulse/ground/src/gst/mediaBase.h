@@ -1,7 +1,7 @@
 
 // mediaBase.h
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -24,25 +24,25 @@
 #include "mediaConfig.h"
 #include "gstBase.h"
 
-class MediaBase:public GstBase
+class MediaBase : public GstBase
 {
-  public:
-    virtual bool start();
-    virtual bool stop();
+public:
+virtual bool start();
+virtual bool stop();
 
-    virtual bool init();
+virtual bool init();
 
-  protected:
+protected:
 
-      MediaBase(const MediaConfig & config);
-      virtual ~ MediaBase();
-    virtual void init_source() = 0;
-    virtual void init_codec() = 0;
-    virtual void init_sink() = 0;
+MediaBase(const MediaConfig & config);
+virtual ~MediaBase();
+virtual void init_source() = 0;
+virtual void init_codec() = 0;
+virtual void init_sink() = 0;
 
-    const MediaConfig config_;
+const MediaConfig config_;
 
-  private:
+private:
 };
 
 #endif // _MEDIA_BASE_H_

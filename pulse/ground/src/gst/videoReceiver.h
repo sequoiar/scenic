@@ -1,7 +1,7 @@
 
 // videoReceiver.h
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -25,21 +25,21 @@
 #include "videoConfig.h"
 #include "rtpSession.h"
 
-class VideoReceiver:public MediaBase
+class VideoReceiver : public MediaBase
 {
-    public:
-        VideoReceiver(const VideoConfig & config);
-        virtual ~ VideoReceiver();
+public:
+VideoReceiver(const VideoConfig & config);
+virtual ~VideoReceiver();
 
-    private:
-        void set_caps(const char* capsStr);
-        virtual void init_source();
-        virtual void init_codec();
-        virtual void init_sink();
+private:
+void set_caps(const char* capsStr);
+virtual void init_source();
+virtual void init_codec();
+virtual void init_sink();
 
-        RtpReceiver session_;
-        VideoConfig config_;
-        GstElement *decoder_, *depayloader_, *sink_;
+RtpReceiver session_;
+VideoConfig config_;
+GstElement *decoder_, *depayloader_, *sink_;
 };
 
 #endif

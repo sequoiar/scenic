@@ -1,6 +1,6 @@
 // python_import.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file 
+/** \file
  *      This file gets included in python module
  *
  *
@@ -38,9 +38,9 @@ using namespace boost::python;
 #ifndef __GROUND_LOOP__
 int ground_loop(int result)
 {
-    if (result == -1)
-        return 0;
-    return 1;
+	if (result == -1)
+		return 0;
+	return 1;
 }
 #endif
 
@@ -48,65 +48,64 @@ int ground_loop(int result)
 int ground_init(int argc, char *argv[])
 {
 
-    return 0;
+	return 0;
 }
 #endif
 
 BOOST_PYTHON_MODULE(Hello)
 {
-    class_ < Hello > ("Hello").def("greet", &Hello::greet).def("set_name", &Hello::set_name);
+	class_ < Hello > ("Hello").def("greet", &Hello::greet).def("set_name", &Hello::set_name);
 }
 
 BOOST_PYTHON_MODULE(OscThread)
 {
-    class_ < OscThread > ("OscThread").def("getQueue", &OscThread::getQueue).def("run", &OscThread::run);
+	class_ < OscThread > ("OscThread").def("getQueue", &OscThread::getQueue).def("run", &OscThread::run);
 
 }
 
 BOOST_PYTHON_MODULE(OscMessage)
 {
-    class_ < OscMessage > ("OscMessage").def_readonly("path", &OscMessage::path);
+	class_ < OscMessage > ("OscMessage").def_readonly("path", &OscMessage::path);
 
 }
 
 BOOST_PYTHON_MODULE(QueuePairOfOscMessage)
 {
-    class_ < QueuePairOfOscMessage > ("QueuePairOfOscMessage").def("copy_timed_pop",
-                                                                   &QueuePairOfOscMessage::
-                                                                   copy_timed_pop).def("push",
-                                                                                       &QueuePairOfOscMessage::
-                                                                                       push);
+	class_ < QueuePairOfOscMessage > ("QueuePairOfOscMessage").def("copy_timed_pop",
+	                                                               &QueuePairOfOscMessage::
+	                                                                copy_timed_pop).def("push",
+	                                                                                    &QueuePairOfOscMessage::
+	                                                                                     push);
 }
 
 void BOOST_PY_IMPORT()
 {
-    PyImport_AppendInittab((char *) "Hello", &initHello);
-    PyImport_AppendInittab((char *) "OscThread", &initOscThread);
-    PyImport_AppendInittab((char *) "QueuePairOfOscMessage", &initQueuePairOfOscMessage);
-    PyImport_AppendInittab((char *) "OscMessage", &initOscMessage);
+	PyImport_AppendInittab((char *) "Hello", &initHello);
+	PyImport_AppendInittab((char *) "OscThread", &initOscThread);
+	PyImport_AppendInittab((char *) "QueuePairOfOscMessage", &initQueuePairOfOscMessage);
+	PyImport_AppendInittab((char *) "OscMessage", &initOscMessage);
 }
 
 void PYTHON_EXEC_IMPORT(object mm, object mn)
 {
-    if (mm)
-    {
-        exec("import Hello; from Hello import *", mm, mn);
-        exec("import OscThread; from OscThread import *", mm, mn);
-        exec("import QueuePairOfOscMessage; from QueuePairOfOscMessage import *", mm, mn);
-        exec("import OscMessage; from OscMessage import *", mm, mn);
-    }
+	if (mm) {
+		exec("import Hello; from Hello import *", mm, mn);
+		exec("import OscThread; from OscThread import *", mm, mn);
+		exec("import QueuePairOfOscMessage; from QueuePairOfOscMessage import *", mm, mn);
+		exec("import OscMessage; from OscMessage import *", mm, mn);
+	}
 }
 
 // Default variable overloads
 //BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(VideoLocal_init_overloads, init, 0, 3)
 
 /*
-BOOST_PYTHON_MODULE(VideoLocal)
-{
-    class_<VideoLocal>("VideoLocal")
-    .def("init", &VideoLocal::init)
-    .def("start", &VideoLocal::start)
-    .def("stop",  &VideoLocal::stop);
+   BOOST_PYTHON_MODULE(VideoLocal)
+   {
+   	class_<VideoLocal>("VideoLocal")
+   	.def("init", &VideoLocal::init)
+   	.def("start", &VideoLocal::start)
+   	.def("stop",  &VideoLocal::stop);
 
-}
-*/
+   }
+ */

@@ -1,7 +1,7 @@
 
 // gstBase.h
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -25,22 +25,22 @@
 
 class GstBase
 {
-  public:
-    bool isPlaying();
+public:
+bool isPlaying();
 
-  protected:
-    typedef std::vector < GstElement * >::iterator GstIter;
+protected:
+typedef std::vector < GstElement * >::iterator GstIter;
 
-      GstBase();
-      virtual ~ GstBase();
-    void wait_until_playing();
+GstBase();
+virtual ~GstBase();
+void wait_until_playing();
 
-      Pipeline & pipeline_;
+Pipeline & pipeline_;
 
-  private:
+private:
 #if 0
-    typedef struct _GstElement GstElement;
-    typedef struct _GstPad GstPad;
+typedef struct _GstElement GstElement;
+typedef struct _GstPad GstPad;
 #endif
 };
 

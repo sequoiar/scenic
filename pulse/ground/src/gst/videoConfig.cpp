@@ -1,8 +1,8 @@
-// 
+//
 // videoConfig.cpp
 //
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file 
+/** \file
  *      Class for video parameter objects.
  *
  */
@@ -27,30 +27,30 @@
 #include <string>
 #include "videoConfig.h"
 
-VideoConfig::VideoConfig(std::string source, std::string codec, std::string remoteHost, int port):MediaConfig(source, codec, remoteHost, port)
-                                                // for sender (remote)
+VideoConfig::VideoConfig(std::string source, std::string codec, std::string remoteHost, int port) : MediaConfig(source, codec, remoteHost, port)
+	// for sender (remote)
 {
-    // empty
+	// empty
 }
 
-VideoConfig::VideoConfig(std::string source):MediaConfig(source)
-                                // for sender (local)
+VideoConfig::VideoConfig(std::string source) : MediaConfig(source)
+	// for sender (local)
 {
-    // empty
+	// empty
 }
 
 VideoConfig::VideoConfig(std::string codec, int port)   // for receiver
-:MediaConfig(codec, port)
+	: MediaConfig(codec, port)
 {
-    // empty
+	// empty
 }
 
 const bool VideoConfig::has_dv() const
 {
-    return !source_.compare("dv1394src");
+	return !source_.compare("dv1394src");
 }
 
 const bool VideoConfig::has_h264() const
 {
-    return !codec_.compare("h264");
+	return !codec_.compare("h264");
 }

@@ -1,7 +1,7 @@
 
 // audioConfig.h
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file 
+/** \file
  *      Immutable class that is used to setup AudioSender/AudioReceiver objects.
  *
  */
@@ -29,23 +29,23 @@
 #include <string>
 #include "mediaConfig.h"
 
-class AudioConfig:public MediaConfig
+class AudioConfig : public MediaConfig
 {
-  public:
-    AudioConfig(std::string source, int numChannels, std::string codec, std::string remoteHost, int port);      // sender
-      AudioConfig(int numChannels, std::string codec, int port);        // receiver
-      AudioConfig(std::string source, int numChannels); // local sender
+public:
+AudioConfig(std::string source, int numChannels, std::string codec, std::string remoteHost, int port);          // sender
+AudioConfig(int numChannels, std::string codec, int port);              // receiver
+AudioConfig(std::string source, int numChannels);       // local sender
 
-    const int numChannels() const;
+const int numChannels() const;
 
-    // to be replaced
-    const bool hasTestSrc() const;
-    const bool hasFileSrc() const;
-    const bool hasAlsaSrc() const;
-    const bool hasJackSrc() const;
+// to be replaced
+const bool hasTestSrc() const;
+const bool hasFileSrc() const;
+const bool hasAlsaSrc() const;
+const bool hasJackSrc() const;
 
-  protected:
-    const int numChannels_;
+protected:
+const int numChannels_;
 };
 
 #endif // _AUDIO_CONFIG_H_

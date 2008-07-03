@@ -1,7 +1,7 @@
 
 // gstBase.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@
 #include "logWriter.h"
 
 // this initializes pipeline only once/process
-GstBase::GstBase():pipeline_(Pipeline::Instance())
+GstBase::GstBase() : pipeline_(Pipeline::Instance())
 {
 }
 
@@ -35,11 +35,11 @@ GstBase::~GstBase()
 
 bool GstBase::isPlaying()
 {
-    return pipeline_.isPlaying();
+	return pipeline_.isPlaying();
 }
 
 void GstBase::wait_until_playing()
 {
-    while (!pipeline_.isPlaying())      // wait for pipeline to get rolling
-        usleep(1000);
+	while (!pipeline_.isPlaying())  // wait for pipeline to get rolling
+		usleep(1000);
 }
