@@ -23,7 +23,6 @@
 
 #include <string>
 #include <gst/audio/multichannel.h>
-#include "defaultAddresses.h"
 
 #include "mediaBase.h"
 #include "audioConfig.h"
