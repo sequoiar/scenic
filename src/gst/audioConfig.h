@@ -32,20 +32,20 @@
 class AudioConfig : public MediaConfig
 {
 public:
-AudioConfig(std::string source, int numChannels, std::string codec, std::string remoteHost, int port);          // sender
-AudioConfig(int numChannels, std::string codec, int port);              // receiver
-AudioConfig(std::string source, int numChannels);       // local sender
+	AudioConfig(std::string source, int numChannels, std::string codec, std::string remoteHost, int port);      // sender
+	AudioConfig(int numChannels, std::string codec, int port);          // receiver
+	AudioConfig(std::string source, int numChannels);   // local sender
 
-const int numChannels() const;
+	const int numChannels() const;
 
 // to be replaced
-const bool hasTestSrc() const;
-const bool hasFileSrc() const;
-const bool hasAlsaSrc() const;
-const bool hasJackSrc() const;
+	const bool hasTestSrc() const;
+	const bool hasFileSrc() const;
+	const bool hasAlsaSrc() const;
+	const bool hasJackSrc() const;
 
 protected:
-const int numChannels_;
+	const int numChannels_;
 };
 
 #endif // _AUDIO_CONFIG_H_

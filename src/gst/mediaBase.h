@@ -27,20 +27,20 @@
 class MediaBase : public GstBase
 {
 public:
-virtual bool start();
-virtual bool stop();
+	virtual bool start();
+	virtual bool stop();
 
-virtual bool init();
+	virtual bool init();
 
 protected:
 
-MediaBase(const MediaConfig & config);
-virtual ~MediaBase();
-virtual void init_source() = 0;
-virtual void init_codec() = 0;
-virtual void init_sink() = 0;
+	MediaBase(const MediaConfig & config);
+	virtual ~MediaBase();
+	virtual void init_source() = 0;
+	virtual void init_codec() = 0;
+	virtual void init_sink() = 0;
 
-const MediaConfig config_;
+	const MediaConfig config_;
 
 private:
 };

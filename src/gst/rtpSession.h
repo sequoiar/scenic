@@ -31,45 +31,45 @@ class MediaConfig;
 class RtpSession : public GstBase
 {
 public:
-virtual ~RtpSession();
-virtual bool init();
-virtual void add(GstElement * elem, const MediaConfig & config);
-virtual void addDerived(GstElement * elem, const MediaConfig & config) = 0;
+	virtual ~RtpSession();
+	virtual bool init();
+	virtual void add(GstElement * elem, const MediaConfig & config);
+	virtual void addDerived(GstElement * elem, const MediaConfig & config) = 0;
 
 protected:
-RtpSession();
-static const char *padStr(const char *padName);
-static GstElement *rtpbin_;
-static int instanceCount_;
-GstElement *rtcp_sender_, *rtcp_receiver_;
+	RtpSession();
+	static const char *padStr(const char *padName);
+	static GstElement *rtpbin_;
+	static int instanceCount_;
+	GstElement *rtcp_sender_, *rtcp_receiver_;
 };
 
 class RtpSender : public RtpSession
 {
 public:
-RtpSender();
-const char *caps_str() const;
-virtual ~RtpSender();
+	RtpSender();
+	const char *caps_str() const;
+	virtual ~RtpSender();
 
 protected:
-virtual void addDerived(GstElement * src, const MediaConfig & config);
+	virtual void addDerived(GstElement * src, const MediaConfig & config);
 
 private:
-GstElement *rtp_sender_;
+	GstElement *rtp_sender_;
 };
 
 class RtpReceiver : public RtpSession
 {
 public:
-RtpReceiver();
-void set_caps(const char *capsStr);
-virtual ~RtpReceiver();
+	RtpReceiver();
+	void set_caps(const char *capsStr);
+	virtual ~RtpReceiver();
 
 protected:
-virtual void addDerived(GstElement * sink, const MediaConfig & config);
+	virtual void addDerived(GstElement * sink, const MediaConfig & config);
 
 private:
-GstElement *rtp_receiver_;
+	GstElement *rtp_receiver_;
 };
 
 #endif // _RTP_SESSION_H_

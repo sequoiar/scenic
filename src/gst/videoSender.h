@@ -31,19 +31,19 @@
 class VideoSender : public MediaBase
 {
 public:
-VideoSender(const VideoConfig & config);
-virtual ~VideoSender();
-virtual bool start();
+	VideoSender(const VideoConfig & config);
+	virtual ~VideoSender();
+	virtual bool start();
 
 private:
-static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
-virtual void init_source();
-virtual void init_codec();
-virtual void init_sink();
-VideoConfig config_;
-GstElement *source_, *demux_, *queue_, *dvdec_, *colorspc_, *encoder_, *payloader_, *sink_;
-RtpSender session_;
-GstElement *lastLinked_;        // FIXME: hack
+	static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
+	virtual void init_source();
+	virtual void init_codec();
+	virtual void init_sink();
+	VideoConfig config_;
+	GstElement *source_, *demux_, *queue_, *dvdec_, *colorspc_, *encoder_, *payloader_, *sink_;
+	RtpSender session_;
+	GstElement *lastLinked_;    // FIXME: hack
 };
 
 #endif
