@@ -88,7 +88,13 @@ void AudioSender::init_source()
     pipeline_.add_vector(aconvs_);
     pipeline_.add_vector(queues_);
 
-    // FIXME: replace with subclasses?
+    // FIXME: replace with subclassed AudioSrc object?
+    // audioSrc_ = AudioSrc::create(config_.source())
+    // audioSrc_->init(interleave_);
+    //
+    // 
+    // in destructor...
+    // delete audioSrc_;
     if (config_.hasTestSrc()) {
         const double GAIN = 1.0 / config_.numChannels();        // so sum of tones equals 1.0
         double frequency = 100.0;
