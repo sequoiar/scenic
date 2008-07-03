@@ -26,21 +26,21 @@
 class GstBase
 {
 public:
-bool isPlaying();
+	bool isPlaying();
 
 protected:
-typedef std::vector < GstElement * >::iterator GstIter;
+	typedef std::vector < GstElement * >::iterator GstIter;
 
-GstBase();
-virtual ~GstBase();
-void wait_until_playing();
+	GstBase();
+	virtual ~GstBase();
+	void wait_until_playing();
 
-Pipeline & pipeline_;
+	Pipeline & pipeline_;
 
 private:
 #if 0
-typedef struct _GstElement GstElement;
-typedef struct _GstPad GstPad;
+	typedef struct _GstElement GstElement;
+	typedef struct _GstPad GstPad;
 #endif
 };
 
