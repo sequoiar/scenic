@@ -31,34 +31,34 @@
 
 class AudioSender:public MediaBase
 {
-  public:
-    AudioSender(const AudioConfig & config);
-      AudioSender();
-      virtual ~ AudioSender();
-    virtual bool start();
+    public:
+        AudioSender(const AudioConfig & config);
+        AudioSender();
+        virtual ~ AudioSender();
+        virtual bool start();
 
-  private:
-    // helper methods
+    private:
+        // helper methods
 
-    void set_channel_layout();
-    void init_interleave();
+        void set_channel_layout();
+        void init_interleave();
 
-    virtual void init_source();
-    virtual void init_codec();
-    virtual void init_sink();
+        virtual void init_source();
+        virtual void init_codec();
+        virtual void init_sink();
 
-    void send_caps() const;
-    const char *caps_str() const;
+        void send_caps() const;
+        const char *caps_str() const;
 
-    // data 
-    AudioConfig config_;
-    RtpSender session_;
-      std::vector < GstElement * >sources_, decoders_, aconvs_, queues_;
-    GstElement *encoder_;
-    GstElement *payloader_;
-    GstElement *interleave_;
-    GstElement *sink_;
-    static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
+        // data 
+        AudioConfig config_;
+        RtpSender session_;
+        std::vector < GstElement * >sources_, decoders_, aconvs_, queues_;
+        GstElement *encoder_;
+        GstElement *payloader_;
+        GstElement *interleave_;
+        GstElement *sink_;
+        static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
 };
 
 #endif // _AUDIO_SENDER_H_

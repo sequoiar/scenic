@@ -29,7 +29,7 @@
 
 VideoSender::VideoSender(const VideoConfig & config):MediaBase(dynamic_cast <
                                                                const MediaConfig & >(config)),
-config_(config)
+config_(config), source_(0), demux_(0), queue_(0), dvdec_(0), colorspc_(0), encoder_(0), payloader_(0), sink_(0)
 {
     // empty
 }
@@ -37,14 +37,14 @@ config_(config)
 VideoSender::~VideoSender()
 {
     assert(stop());
-    pipeline_.remove(source_);
-    pipeline_.remove(demux_);
-    pipeline_.remove(queue_);
-    pipeline_.remove(dvdec_);
-    pipeline_.remove(colorspc_);
-    pipeline_.remove(encoder_);
-    pipeline_.remove(payloader_);
     pipeline_.remove(sink_);
+    pipeline_.remove(payloader_);
+    pipeline_.remove(encoder_);
+    pipeline_.remove(colorspc_);
+    pipeline_.remove(dvdec_);
+    pipeline_.remove(queue_);
+    pipeline_.remove(demux_);
+    pipeline_.remove(source_);
 }
 
 void VideoSender::init_source()
@@ -114,11 +114,16 @@ void VideoSender::init_sink()
     {
         payloader_ = gst_element_factory_make("rtph264pay", NULL);
         assert(payloader_);
+        pipeline_.add(payloader_);
+        assert(gst_element_link(lastLinked_, payloader_));
+        session_.add(payloader_, dynamic_cast<const MediaConfig&>(config_));
+#if 0
         sink_ = gst_element_factory_make("udpsink", NULL);
         g_object_set(G_OBJECT(sink_), "host", config_.remoteHost(), "port", config_.port(), NULL);
         pipeline_.add(payloader_);
         pipeline_.add(sink_);
         assert(gst_element_link_many(lastLinked_, payloader_, sink_, NULL));
+#endif
     }
     else                        // local test only
     {

@@ -26,6 +26,7 @@
 
 #include "mediaBase.h"
 #include "videoConfig.h"
+#include "rtpSession.h"
 
 class VideoSender:public MediaBase
 {
@@ -41,6 +42,7 @@ class VideoSender:public MediaBase
     virtual void init_sink();
     VideoConfig config_;
     GstElement *source_, *demux_, *queue_, *dvdec_, *colorspc_, *encoder_, *payloader_, *sink_;
+    RtpSender session_;
     GstElement *lastLinked_;    // FIXME: hack
 };
 

@@ -40,7 +40,7 @@ class RtpSession:public GstBase
       RtpSession();
     static const char *padStr(const char *padName);
     static GstElement *rtpbin_;
-    static int counter_;
+    static int instanceCount_;
     GstElement *rtcp_sender_, *rtcp_receiver_;
 };
 
@@ -48,13 +48,13 @@ class RtpSender:public RtpSession
 {
   public:
     RtpSender();
+    const char *caps_str() const;
     virtual ~ RtpSender();
 
   protected:
     virtual void addDerived(GstElement * src, const MediaConfig & config);
 
   private:
-    friend class AudioSender;
     GstElement *rtp_sender_;
 };
 
@@ -62,13 +62,13 @@ class RtpReceiver:public RtpSession
 {
   public:
     RtpReceiver();
+    void set_caps(const char *capsStr);
     virtual ~ RtpReceiver();
 
   protected:
     virtual void addDerived(GstElement * sink, const MediaConfig & config);
 
   private:
-    friend class AudioReceiver;
     GstElement *rtp_receiver_;
 };
 

@@ -46,15 +46,15 @@ AudioSender::~AudioSender()
 {
     assert(stop());
 
-    pipeline_.remove_vector(sources_);
-    pipeline_.remove_vector(decoders_);
-    pipeline_.remove_vector(aconvs_);
     pipeline_.remove_vector(queues_);
+    pipeline_.remove_vector(aconvs_);
+    pipeline_.remove_vector(decoders_);
+    pipeline_.remove_vector(sources_);
 
-    pipeline_.remove(encoder_);
-    pipeline_.remove(payloader_);
-    pipeline_.remove(interleave_);
     pipeline_.remove(sink_);
+    pipeline_.remove(payloader_);
+    pipeline_.remove(encoder_);
+    pipeline_.remove(interleave_);
 }
 
 void AudioSender::init_interleave()
@@ -159,18 +159,7 @@ void AudioSender::init_sink()
 
         assert(gst_element_link_many(interleave_, encoder_, payloader_, NULL));
 
-//      init_rtp();
         session_.add(payloader_, dynamic_cast < const MediaConfig & >(config_));
-
-#if 0
-        sink_ = gst_element_factory_make("udpsink", NULL);
-        assert(sink_);
-
-        g_object_set(G_OBJECT(sink_), "host", config_.remoteHost(), "port", config_.port(), NULL);
-
-        gst_bin_add_many(GST_BIN(pipeline_), encoder_, payloader_, sink_, NULL);
-        assert(gst_element_link_many(interleave_, encoder_, payloader_, sink_, NULL));
-#endif
     }
     else                        // local version
     {
@@ -250,34 +239,13 @@ void AudioSender::init_rtp()
 #endif
 
 // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
-const char *AudioSender::caps_str() const
-{
-    assert(pipeline_.isPlaying());
-
-    GstPad *pad;
-    GstCaps *caps;
-
-    pad = gst_element_get_pad(GST_ELEMENT(session_.rtp_sender_), "sink");
-    assert(pad);
-
-    do
-        caps = gst_pad_get_negotiated_caps(pad);
-    while (caps == NULL);
-    assert(caps != NULL);
-
-    gst_object_unref(pad);
-
-    const char *result = gst_caps_to_string(caps);
-    gst_caps_unref(caps);
-    return result;
-}
 
 void AudioSender::send_caps() const
 {
     LOG("Sending caps...");
 
     lo_address t = lo_address_new(NULL, "7770");
-    if (lo_send(t, "/audio/rx/caps", "s", caps_str()) == -1)
+    if (lo_send(t, "/audio/rx/caps", "s", session_.caps_str()) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
 }
 
@@ -373,3 +341,4 @@ const GstAudioChannelPosition AudioSender::VORBIS_CHANNEL_POSITIONS[][8] = {
      GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT,
      },
 };
+
