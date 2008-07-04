@@ -51,6 +51,6 @@ const int AudioConfig::numChannels() const
 
 const char * AudioConfig::source() const
 {
-    return source_.c_str();
+	return source_.c_str();
 }
 

@@ -21,14 +21,8 @@
 // TODO: Client code should just call this with some kind of parameter object which
 // specifies number of channels, how to compress it (if at all), and host and port info.
 
-#include <iostream>
-#include <sstream>
-#include <string>
 #include <cassert>
-#include <vector>
-
 #include <gst/gst.h>
-#include <gst/audio/multichannel.h>
 
 #include "lo/lo.h"
 
@@ -50,13 +44,13 @@ AudioSender::~AudioSender()
 	pipeline_.remove(sink_);
 	pipeline_.remove(payloader_);
 	pipeline_.remove(encoder_);
-    delete source_;
+	delete source_;
 }
 
 void AudioSender::init_source()
 {
-    source_ = AudioSource::create(config_);
-    source_->init();
+	source_ = AudioSource::create(config_);
+	source_->init();
 }
 
 void AudioSender::init_codec()
@@ -73,7 +67,6 @@ void AudioSender::init_sink()
 	if (config_.isNetworked()) {
 		payloader_ = gst_element_factory_make("rtpvorbispay", NULL);
 		assert(payloader_);
-
 		pipeline_.add(payloader_);
 
 		assert(gst_element_link_many(source_->interleave(), encoder_, payloader_, NULL));

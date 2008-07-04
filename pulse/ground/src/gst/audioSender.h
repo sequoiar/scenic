@@ -21,9 +21,6 @@
 #ifndef _AUDIO_SENDER_H_
 #define _AUDIO_SENDER_H_
 
-#include <string>
-#include <gst/audio/multichannel.h>
-
 #include "mediaBase.h"
 #include "audioConfig.h"
 #include "rtpSender.h"
@@ -39,10 +36,7 @@ public:
 	virtual bool start();
 
 private:
-// helper methods
-
-	void set_channel_layout();
-	void init_interleave();
+	// helper methods
 
 	virtual void init_source();
 	virtual void init_codec();
@@ -51,16 +45,11 @@ private:
 	void send_caps() const;
 	const char *caps_str() const;
 
-// data
+	// data
 	AudioConfig config_;
 	RtpSender session_;
-    AudioSource *source_;
+	AudioSource *source_;
 
-#if 0
-	std::vector < GstElement * >sources_, decoders_, aconvs_, queues_;
-	GstElement *interleave_;
-	static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
-#endif
 	GstElement *encoder_;
 	GstElement *payloader_;
 	GstElement *sink_;

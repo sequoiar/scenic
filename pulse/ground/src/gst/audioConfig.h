@@ -38,7 +38,7 @@ public:
 
 	const int numChannels() const;
 
-    const char * source() const;
+	const char * source() const;
 
 protected:
 	const int numChannels_;
