@@ -22,7 +22,6 @@
 #ifndef _RTP_SESSION_H_
 #define _RTP_SESSION_H_
 
-#include <vector>
 #include <gst/gst.h>
 #include "gstBase.h"
 
@@ -45,3 +44,4 @@ protected:
 };
 
 #endif // _RTP_SESSION_H_
+

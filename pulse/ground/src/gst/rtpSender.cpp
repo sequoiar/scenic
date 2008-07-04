@@ -20,7 +20,6 @@
 
 #include <gst/gst.h>
 #include <cassert>
-#include <sstream>
 
 #include "rtpSender.h"
 #include "mediaConfig.h"
