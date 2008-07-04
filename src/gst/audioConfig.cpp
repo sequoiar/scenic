@@ -26,8 +26,8 @@
 #include <string>
 #include "audioConfig.h"
 
-AudioConfig::AudioConfig(std::string source, int numChannels, std::string codec, std::string remoteHost, int port) 
-    : MediaConfig(source, codec, remoteHost, port), numChannels_(numChannels)
+AudioConfig::AudioConfig(std::string source, int numChannels, std::string codec, std::string remoteHost, int port)
+	: MediaConfig(source, codec, remoteHost, port), numChannels_(numChannels)
 {
 	// empty
 }
@@ -49,22 +49,8 @@ const int AudioConfig::numChannels() const
 	return numChannels_;
 }
 
-const bool AudioConfig::hasTestSrc() const
+const char * AudioConfig::source() const
 {
-	return !source_.compare("audiotestsrc");
+    return source_.c_str();
 }
 
-const bool AudioConfig::hasFileSrc() const
-{
-	return !source_.compare("filesrc");
-}
-
-const bool AudioConfig::hasAlsaSrc() const
-{
-	return !source_.compare("alsasrc");
-}
-
-const bool AudioConfig::hasJackSrc() const
-{
-	return !source_.compare("jackaudiosrc");
-}
