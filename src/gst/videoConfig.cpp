@@ -27,30 +27,32 @@
 #include <string>
 #include "videoConfig.h"
 
-VideoConfig::VideoConfig(std::string source, std::string codec, std::string remoteHost, int port) : MediaConfig(source, codec, remoteHost, port)
-	// for sender (remote)
+// for sender (remote)
+VideoConfig::VideoConfig(const std::string &source, const std::string &codec, 
+        const std::string &remoteHost, int port) 
+: MediaConfig(source, codec, remoteHost, port)
 {
-	// empty
+    // empty
 }
 
-VideoConfig::VideoConfig(std::string source) : MediaConfig(source)
-	// for sender (local)
+// for sender (local)
+VideoConfig::VideoConfig(const std::string &source) : MediaConfig(source)
 {
-	// empty
+    // empty
 }
 
-VideoConfig::VideoConfig(std::string codec, int port)   // for receiver
-	: MediaConfig(codec, port)
+// for receiver
+VideoConfig::VideoConfig(const std::string &codec, int port) : MediaConfig(codec, port)
 {
-	// empty
+    // empty
 }
 
 const bool VideoConfig::has_dv() const
 {
-	return !source_.compare("dv1394src");
+    return !source_.compare("dv1394src");
 }
 
 const bool VideoConfig::has_h264() const
 {
-	return !codec_.compare("h264");
+    return !codec_.compare("h264");
 }

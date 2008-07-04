@@ -26,19 +26,20 @@
 #include <string>
 #include "audioConfig.h"
 
-AudioConfig::AudioConfig(std::string source, int numChannels, std::string codec, std::string remoteHost, int port)
+AudioConfig::AudioConfig(const std::string &source, int numChannels, const std::string &codec, const std::string &remoteHost, 
+        int port)
 	: MediaConfig(source, codec, remoteHost, port), numChannels_(numChannels)
 {
 	// empty
 }
 
-AudioConfig::AudioConfig(std::string source, int numChannels) : MediaConfig(source),
+AudioConfig::AudioConfig(const std::string & source, int numChannels) : MediaConfig(source),
 	numChannels_(numChannels)
 {
 	// empty
 }
 
-AudioConfig::AudioConfig(int numChannels, std::string codec, int port) : MediaConfig(codec, port),
+AudioConfig::AudioConfig(int numChannels, const std::string &codec, int port) : MediaConfig(codec, port),
 	numChannels_(numChannels)
 {
 	// empty
@@ -47,10 +48,5 @@ AudioConfig::AudioConfig(int numChannels, std::string codec, int port) : MediaCo
 const int AudioConfig::numChannels() const
 {
 	return numChannels_;
-}
-
-const char * AudioConfig::source() const
-{
-	return source_.c_str();
 }
 
