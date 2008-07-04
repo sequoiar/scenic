@@ -38,11 +38,7 @@ public:
 
 	const int numChannels() const;
 
-// to be replaced
-	const bool hasTestSrc() const;
-	const bool hasFileSrc() const;
-	const bool hasAlsaSrc() const;
-	const bool hasJackSrc() const;
+    const char * source() const;
 
 protected:
 	const int numChannels_;

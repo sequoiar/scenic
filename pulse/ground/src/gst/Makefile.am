@@ -6,7 +6,7 @@ noinst_LIBRARIES = libgst.a
 libgst_a_SOURCES = videoReceiver.cpp videoSender.cpp mediaBase.cpp \
 				   audioSender.cpp audioReceiver.cpp mediaConfig.cpp \
 				   audioConfig.cpp videoConfig.cpp rtpSession.cpp pipeline.cpp \
-				   gstBase.cpp rtpSender.cpp rtpReceiver.cpp
+				   gstBase.cpp rtpSender.cpp rtpReceiver.cpp audioSource.cpp
 
 libgst_a_CPPFLAGS= $(CPPFLAGS) $(GST_CFLAGS) $(LLO_CFLAGS) 
 

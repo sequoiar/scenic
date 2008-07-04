@@ -28,6 +28,8 @@
 #include "audioConfig.h"
 #include "rtpSender.h"
 
+class AudioSource;
+
 class AudioSender : public MediaBase
 {
 public:
@@ -52,12 +54,16 @@ private:
 // data
 	AudioConfig config_;
 	RtpSender session_;
+    AudioSource *source_;
+
+#if 0
 	std::vector < GstElement * >sources_, decoders_, aconvs_, queues_;
+	GstElement *interleave_;
+	static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
+#endif
 	GstElement *encoder_;
 	GstElement *payloader_;
-	GstElement *interleave_;
 	GstElement *sink_;
-	static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
 };
 
 #endif // _AUDIO_SENDER_H_
