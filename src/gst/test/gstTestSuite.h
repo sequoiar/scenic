@@ -33,8 +33,8 @@
 #define BLOCKING 1
 
 #define VIDEO 0
-#define AUDIO 1
-#define RTP 1
+#define AUDIO 0
+#define RTP 0
 
 class GstTestSuite : public Test::Suite
 {
@@ -54,10 +54,7 @@ public:
 		TEST_ADD(GstTestSuite::stop_v4l)
 		TEST_ADD(GstTestSuite::start_stop_v4l)
 #if RTP
-		TEST_ADD(GstTestSuite::start_v4l_rtp)
-		TEST_ADD(GstTestSuite::stop_v4l_rtp)
-		TEST_ADD(GstTestSuite::start_stop_v4l_rtp)
-		TEST_ADD(GstTestSuite::start_dv_rtp)
+        TEST_ADD(GstTestSuite::start_dv_rtp)
 		TEST_ADD(GstTestSuite::stop_dv_rtp)
 		TEST_ADD(GstTestSuite::start_stop_dv_rtp)
 #endif // RTP && VIDEO
@@ -87,6 +84,7 @@ public:
 		TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile)
 		TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile)
 		TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile)
+
 #if VIDEO
 		TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile_dv)
 		TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile_dv)
@@ -97,6 +95,10 @@ public:
 		/*----------------------------------------------*/
 		/*      SANDBOX                                 */
 		/*----------------------------------------------*/
+		TEST_ADD(GstTestSuite::start_v4l_rtp)
+		TEST_ADD(GstTestSuite::stop_v4l_rtp)
+		TEST_ADD(GstTestSuite::start_stop_v4l_rtp)
+		
 	}
 
 	void set_id(int id);

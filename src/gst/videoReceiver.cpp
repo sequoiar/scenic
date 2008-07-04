@@ -26,7 +26,7 @@
 #include "videoReceiver.h"
 
 VideoReceiver::VideoReceiver(const VideoConfig & config) : MediaBase(dynamic_cast < const MediaConfig & >(config)),
-	config_(config), decoder_(0), depayloader_(0), sink_(0)
+	config_(config), depayloader_(0), decoder_(0), sink_(0)
 {
 	// empty
 }
@@ -35,9 +35,9 @@ VideoReceiver::~VideoReceiver()
 {
 	assert(stop());
 
+	pipeline_.remove(sink_);
 	pipeline_.remove(decoder_);
 	pipeline_.remove(depayloader_);
-	pipeline_.remove(sink_);
 }
 
 void VideoReceiver::init_source()
@@ -46,30 +46,39 @@ void VideoReceiver::init_source()
 
 void VideoReceiver::init_codec()
 {
-	if (config_.has_h264()) {
+	if(config_.has_h264())
+    {
 		depayloader_ = gst_element_factory_make("rtph264depay", NULL);
 		assert(depayloader_);
+
 
 		decoder_ = gst_element_factory_make("ffdec_h264", NULL);
 		assert(decoder_);
 
 	}
 
-	pipeline_.add(depayloader_);
-	pipeline_.add(decoder_);
-	assert(gst_element_link_many(depayloader_, decoder_, NULL));
+    pipeline_.add(depayloader_);
+    pipeline_.add(decoder_);
+    assert(gst_element_link(depayloader_, decoder_));
 
-	session_.add(depayloader_, dynamic_cast <const MediaConfig &>(config_));
-	session_.set_caps("application/x-rtp");
+    session_.add(depayloader_, dynamic_cast <const MediaConfig &>(config_));
+    session_.set_caps("application/x-rtp");
 }
 
 void VideoReceiver::init_sink()
 {
-	sink_ = gst_element_factory_make("xvimagesink", NULL);
-	assert(sink_);
-	g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    sink_ = gst_element_factory_make("xvimagesink", NULL);
+    assert(sink_);
+    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
-	pipeline_.add(sink_);
-	assert(gst_element_link(decoder_, sink_));
+    pipeline_.add(sink_);
+    assert(gst_element_link(decoder_, sink_));
+}
+
+bool VideoReceiver::start()
+{
+	std::cout << "Receiving video on port " << config_.port() << std::endl;
+	MediaBase::start();
+	return true;
 }
 

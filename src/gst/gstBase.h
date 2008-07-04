@@ -33,7 +33,6 @@ protected:
 
 	GstBase();
 	virtual ~GstBase();
-	void wait_until_playing();
 
 	Pipeline & pipeline_;
 

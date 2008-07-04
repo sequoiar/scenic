@@ -69,7 +69,7 @@ void AudioSender::init_sink()
 		assert(payloader_);
 		pipeline_.add(payloader_);
 
-		assert(gst_element_link_many(source_->interleave(), encoder_, payloader_, NULL));
+		assert(gst_element_link_many(source_->interleave_, encoder_, payloader_, NULL));
 
 		session_.add(payloader_, dynamic_cast < const MediaConfig & >(config_));
 	}
@@ -78,10 +78,9 @@ void AudioSender::init_sink()
 		sink_ = gst_element_factory_make("jackaudiosink", NULL);
 		assert(sink_);
 		g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-
 		pipeline_.add(sink_);
 
-		assert(gst_element_link_many(source_->interleave(), sink_, NULL));
+		assert(gst_element_link(source_->interleave_, sink_));
 	}
 }
 
@@ -104,7 +103,7 @@ bool AudioSender::start()
 		std::cout << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port()
 		          << std::endl;
 
-		wait_until_playing();
+		pipeline_.wait_until_playing();
 		send_caps();
 	}
 

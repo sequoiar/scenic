@@ -28,8 +28,10 @@
 #include "logWriter.h"
 
 VideoSender::VideoSender(const VideoConfig & config) :
-	MediaBase(dynamic_cast <const MediaConfig & >(config)), config_(config), source_(0), demux_(0), queue_(0),
-	dvdec_(0), colorspc_(0), encoder_(0), payloader_(0), sink_(0)
+	MediaBase(dynamic_cast <const MediaConfig & >(config)), 
+    config_(config), 
+    source_(0), demux_(0), queue_(0), dvdec_(0), colorspc_(0), 
+    encoder_(0), payloader_(0), sink_(0)
 {
 	// empty
 }
@@ -96,10 +98,10 @@ void VideoSender::init_codec()
 	if (config_.has_h264()) {
 		colorspc_ = gst_element_factory_make("ffmpegcolorspace", NULL);
 		assert(colorspc_);
+		pipeline_.add(colorspc_);
 		encoder_ = gst_element_factory_make("x264enc", NULL);
 		assert(encoder_);
 		g_object_set(G_OBJECT(encoder_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4, NULL);
-		pipeline_.add(colorspc_);
 		pipeline_.add(encoder_);
 		assert(gst_element_link_many(lastLinked_, colorspc_, encoder_, NULL));
 		lastLinked_ = encoder_;
