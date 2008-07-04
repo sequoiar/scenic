@@ -38,8 +38,3 @@ bool GstBase::isPlaying()
 	return pipeline_.isPlaying();
 }
 
-void GstBase::wait_until_playing()
-{
-	while (!pipeline_.isPlaying())  // wait for pipeline to get rolling
-		usleep(1000);
-}

@@ -29,6 +29,7 @@ class VideoReceiver : public MediaBase
 {
 public:
 	VideoReceiver(const VideoConfig & config);
+    virtual bool start();
 	virtual ~VideoReceiver();
 
 private:
@@ -39,7 +40,7 @@ private:
 
 	RtpReceiver session_;
 	VideoConfig config_;
-	GstElement *decoder_, *depayloader_, *sink_;
+	GstElement *depayloader_, *decoder_, *sink_;
 };
 
 #endif

@@ -167,18 +167,11 @@ void GstTestSuite::start_stop_v4l()
 
 void GstTestSuite::start_v4l_rtp()
 {
-	if (id_ == 0) {
-		VideoConfig config("v4l2src", "h264", MY_ADDRESS, 10010);
-		VideoSender tx(config);
-		tx.init();
-		TEST_ASSERT(tx.start());
+	int port = 10010;
 
-		BLOCK();
-		TEST_ASSERT(tx.isPlaying());
-	}
-	else
+    if (id_ == 0)	
 	{
-		VideoConfig config("h264", 10010);
+		VideoConfig config("h264", port);
 		VideoReceiver rx(config);
 		rx.init();
 
@@ -186,24 +179,24 @@ void GstTestSuite::start_v4l_rtp()
 
 		BLOCK();
 		TEST_ASSERT(rx.isPlaying());
+	}
+    else {
+		VideoConfig config("v4l2src", "h264", MY_ADDRESS, port);
+		VideoSender tx(config);
+		tx.init();
+
+		TEST_ASSERT(tx.start());
+
+		BLOCK();
+		TEST_ASSERT(tx.isPlaying());
 	}
 }
 
 void GstTestSuite::stop_v4l_rtp()
 {
+    int port = 10010;
 	if (id_ == 0) {
-		VideoConfig config("v4l2src", "h264", MY_ADDRESS, 10010);
-		VideoSender tx(config);
-		tx.init();
-
-		BLOCK();
-
-		TEST_ASSERT(tx.stop());
-		TEST_ASSERT(!tx.isPlaying());
-	}
-	else
-	{
-		VideoConfig config("h264", 10010);
+		VideoConfig config("h264", port);
 		VideoReceiver rx(config);
 		rx.init();
 
@@ -212,26 +205,24 @@ void GstTestSuite::stop_v4l_rtp()
 		TEST_ASSERT(rx.stop());
 		TEST_ASSERT(!rx.isPlaying());
 	}
-}
-
-void GstTestSuite::start_stop_v4l_rtp()
-{
-	if (id_ == 0) {
-		VideoConfig config("v4l2src", "h264", MY_ADDRESS, 10010);
+	else
+	{
+		VideoConfig config("v4l2src", "h264", MY_ADDRESS, port);
 		VideoSender tx(config);
 		tx.init();
 
-		TEST_ASSERT(tx.start());
-
 		BLOCK();
-		TEST_ASSERT(tx.isPlaying());
 
 		TEST_ASSERT(tx.stop());
 		TEST_ASSERT(!tx.isPlaying());
 	}
-	else
-	{
-		VideoConfig config("h264", 10010);
+}
+
+void GstTestSuite::start_stop_v4l_rtp()
+{
+    int port = 10010;
+	if (id_ == 0) {
+		VideoConfig config("h264", port);
 		VideoReceiver rx(config);
 		rx.init();
 
@@ -242,6 +233,20 @@ void GstTestSuite::start_stop_v4l_rtp()
 
 		TEST_ASSERT(rx.stop());
 		TEST_ASSERT(!rx.isPlaying());
+	}
+	else
+	{
+		VideoConfig config("v4l2src", "h264", MY_ADDRESS, port);
+		VideoSender tx(config);
+		tx.init();
+
+		TEST_ASSERT(tx.start());
+
+		BLOCK();
+		TEST_ASSERT(tx.isPlaying());
+
+		TEST_ASSERT(tx.stop());
+		TEST_ASSERT(!tx.isPlaying());
 	}
 }
 
@@ -346,21 +351,23 @@ void GstTestSuite::stop_dv_rtp()
 
 void GstTestSuite::start_stop_dv_rtp()
 {
+    int port = 10010;
 	if (id_ == 0) {
-		VideoConfig config("h264", 10010);
+		VideoConfig config("h264", port);
 		VideoReceiver rx(config);
 		rx.init();
 
 		TEST_ASSERT(rx.start());
 
 		BLOCK();
+		TEST_ASSERT(rx.isPlaying());
 
 		TEST_ASSERT(rx.stop());
 		TEST_ASSERT(!rx.isPlaying());
 	}
 	else
 	{
-		VideoConfig config("dv1394src", "h264", MY_ADDRESS, 10010);
+		VideoConfig config("dv1394src", "h264", MY_ADDRESS, port);
 		VideoSender tx(config);
 		tx.init();
 
@@ -1024,109 +1031,6 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
 	}
 }
 
-#if 0
-
-void GstTestSuite::start_1ch_uncomp_rtp_audiotest()
-{
-	int numChannels = 1;
-	int ort = 5002;
-
-	if (id_ == 0) {
-		AudioReceiver rx;
-		rx.init_uncomp(port, numChannels);
-		TEST_ASSERT(rx.start());
-
-		BLOCK();
-
-		TEST_ASSERT(rx.isPlaying());
-	}
-	else
-	{
-		AudioSender tx;
-		tx.init("1chUncompRtpTest", port, MY_ADDRESS);
-		TEST_ASSERT(tx.start());
-
-		BLOCK();
-
-		TEST_ASSERT(tx.isPlaying());
-	}
-}
-
-void GstTestSuite::stop_1ch_uncomp_rtp_audiotest()
-{
-	int numChannels = 1;
-	int port = 5002;
-
-	if (id_ == 0) {
-		AudioReceiver rx;
-		rx.init_uncomp(port, numChannels);
-
-		BLOCK();
-
-		TEST_ASSERT(rx.stop());
-		TEST_ASSERT(!rx.isPlaying());
-	}
-	else
-	{
-		AudioSender tx;
-		tx.init("1chUncompRtpTest", port, MY_ADDRESS);
-
-		BLOCK();
-
-		TEST_ASSERT(tx.stop());
-		TEST_ASSERT(!tx.isPlaying());
-	}
-}
-
-void GstTestSuite::start_stop_1ch_uncomp_rtp_audiotest()
-{
-	int numChannels = 1;
-	int port = 5002;
-
-	if (id_ == 0) {
-		AudioReceiver rx;
-		rx.init_uncomp(port, numChannels);
-		TEST_ASSERT(rx.start());
-
-		BLOCK();
-
-		TEST_ASSERT(rx.isPlaying());
-
-		TEST_ASSERT(rx.stop());
-		TEST_ASSERT(!rx.isPlaying());
-	}
-	else
-	{
-		AudioSender tx;
-		tx.init("1chUncompRtpTest", port, MY_ADDRESS);
-		TEST_ASSERT(tx.start());
-
-		BLOCK();
-
-		TEST_ASSERT(tx.isPlaying());
-
-		TEST_ASSERT(tx.stop());
-		TEST_ASSERT(!tx.isPlaying());
-	}
-}
-
-void start_8ch_uncomp_rtp_audiotest()
-{
-	// not yet implemented
-}
-
-void stop_8ch_uncomp_rtp_audiotest()
-{
-	// not yet implemented
-}
-
-void start_stop_8ch_uncomp_rtp_audiotest()
-{
-	// not yet implemented
-}
-
-#endif
-
 int main(int argc, char **argv)
 {
 	if (argc != 2) {
@@ -1141,3 +1045,4 @@ int main(int argc, char **argv)
 	Test::TextOutput output(Test::TextOutput::Verbose);
 	return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
+

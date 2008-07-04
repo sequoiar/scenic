@@ -88,7 +88,6 @@ void RtpReceiver::addDerived(GstElement * newSink, const MediaConfig & config)
 	// release request pads (in reverse order)
 	gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);
 	gst_element_release_request_pad(rtpbin_, send_rtcp_src);
-	//gst_element_release_request_pad(rtpbin_, recv_rtp_src);
 	gst_element_release_request_pad(rtpbin_, recv_rtp_sink);
 
 	// release static pads (in reverse order)

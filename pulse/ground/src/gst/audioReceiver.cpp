@@ -41,9 +41,9 @@ AudioReceiver::~AudioReceiver()
 {
 	assert(stop());
 
-	pipeline_.remove(depayloader_);
-	pipeline_.remove(decoder_);
 	pipeline_.remove(sink_);
+	pipeline_.remove(decoder_);
+	pipeline_.remove(depayloader_);
 }
 
 void AudioReceiver::wait_for_caps()
@@ -95,7 +95,7 @@ void AudioReceiver::init_codec()
 
 	pipeline_.add(decoder_);
 
-	assert(gst_element_link_many(depayloader_, decoder_, NULL));
+	assert(gst_element_link(depayloader_, decoder_));
 
 	session_.add(depayloader_, dynamic_cast < const MediaConfig & >(config_));
 }

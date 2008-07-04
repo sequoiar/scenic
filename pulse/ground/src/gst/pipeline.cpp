@@ -26,7 +26,7 @@
 
 Pipeline *Pipeline::instance_ = 0;
 
-Pipeline::Pipeline() : pipeline_(0), verbose_(false)
+Pipeline::Pipeline() : pipeline_(0), verbose_(true)
 {
 }
 
@@ -96,6 +96,12 @@ bool Pipeline::isPlaying() const
 		return true;
 	else
 		return false;
+}
+
+void Pipeline::wait_until_playing() const
+{
+    while (!isPlaying())
+        usleep(1000);
 }
 
 bool Pipeline::start()
