@@ -32,13 +32,17 @@
 class OptionArgs
 {
 	typedef std::vector<GOptionEntry> Options;
+    std::vector<char **> str_dump;
 	Options options;
 public:
+	void add(const char*,char, bool *,const char*);
 	void add(const char*,char, int *,const char*,const char*);
+	void add(const char*,char, char **,const char*,const char*);
 
 	GOptionEntry* getArray();
 
-	int doit(int argc,char **argv);
+	int parse(int argc,char **argv);
+    ~OptionArgs();
 };
 
 

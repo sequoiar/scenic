@@ -29,6 +29,29 @@
 #include "optionArgs.h"
 #include <glib.h>
 
+OptionArgs::~OptionArgs()
+{
+    for(;str_dump.begin() != str_dump.end();)
+    {
+        free(**str_dump.begin());
+        str_dump.erase(str_dump.begin());
+    }
+
+}
+void OptionArgs::add(const char* l_flag, char s_flag, bool* ret, const char* desc)
+{
+	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_NONE,ret,desc};
+	options.push_back(e);
+
+}
+
+void OptionArgs::add(const char* l_flag, char s_flag, char** ret, const char* desc, const char* arg_desc)
+{
+	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_STRING,ret,desc,arg_desc};
+    str_dump.push_back(ret);
+	options.push_back(e);
+}
+
 void OptionArgs::add(const char* l_flag, char s_flag, int * ret, const char* desc, const char* arg_desc)
 {
 	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_INT,ret,desc,arg_desc};
@@ -53,7 +76,7 @@ GOptionEntry* OptionArgs::getArray()
 
 	return pA;
 }
-int OptionArgs::doit(int argc,char **argv)
+int OptionArgs::parse(int argc,char **argv)
 {
 
 	GError *error = NULL;
