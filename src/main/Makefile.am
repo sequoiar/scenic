@@ -1,9 +1,7 @@
 include $(top_srcdir)/src/globals.mak
 
-bin_PROGRAMS = main
+noinst_LIBRARIES = libArgs.a
 
-main_SOURCES = main.cpp
+libArgs_a_SOURCES = optionArgs.cpp 
 
-LDADD = $(GLIB_LIBS)
-AM_CPPFLAGS= $(GLIB_CFLAGS) 
 
