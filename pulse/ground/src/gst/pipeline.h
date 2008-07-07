@@ -33,7 +33,7 @@ public:
 	void remove(GstElement * element);
 	void remove_vector(std::vector < GstElement * >&elementVec);
 	bool isPlaying() const;
-    void wait_until_playing() const;
+	void wait_until_playing() const;
 	void init();
 	bool start();
 	bool stop();

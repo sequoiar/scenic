@@ -46,33 +46,30 @@ void VideoReceiver::init_source()
 
 void VideoReceiver::init_codec()
 {
-	if(config_.has_h264())
-    {
+	if(config_.has_h264()) {
 		depayloader_ = gst_element_factory_make("rtph264depay", NULL);
 		assert(depayloader_);
 
-
 		decoder_ = gst_element_factory_make("ffdec_h264", NULL);
 		assert(decoder_);
-
 	}
 
-    pipeline_.add(depayloader_);
-    pipeline_.add(decoder_);
-    assert(gst_element_link(depayloader_, decoder_));
+	pipeline_.add(depayloader_);
+	pipeline_.add(decoder_);
+	assert(gst_element_link(depayloader_, decoder_));
 
-    session_.add(depayloader_, dynamic_cast <const MediaConfig &>(config_));
-    session_.set_caps("application/x-rtp");
+	session_.add(depayloader_, dynamic_cast <const MediaConfig &>(config_));
+	session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264");
 }
 
 void VideoReceiver::init_sink()
 {
-    sink_ = gst_element_factory_make("xvimagesink", NULL);
-    assert(sink_);
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+	sink_ = gst_element_factory_make("xvimagesink", NULL);
+	assert(sink_);
+	g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
-    pipeline_.add(sink_);
-    assert(gst_element_link(decoder_, sink_));
+	pipeline_.add(sink_);
+	assert(gst_element_link(decoder_, sink_));
 }
 
 bool VideoReceiver::start()

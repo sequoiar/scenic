@@ -100,8 +100,8 @@ bool Pipeline::isPlaying() const
 
 void Pipeline::wait_until_playing() const
 {
-    while (!isPlaying())
-        usleep(1000);
+	while (!isPlaying())
+		usleep(1000);
 }
 
 bool Pipeline::start()

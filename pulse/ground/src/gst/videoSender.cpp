@@ -28,10 +28,10 @@
 #include "logWriter.h"
 
 VideoSender::VideoSender(const VideoConfig & config) :
-	MediaBase(dynamic_cast <const MediaConfig & >(config)), 
-    config_(config), 
-    source_(0), demux_(0), queue_(0), dvdec_(0), colorspc_(0), 
-    encoder_(0), payloader_(0), sink_(0)
+	MediaBase(dynamic_cast <const MediaConfig & >(config)),
+	config_(config),
+	source_(0), demux_(0), queue_(0), dvdec_(0), colorspc_(0),
+	encoder_(0), payloader_(0), sink_(0)
 {
 	// empty
 }
