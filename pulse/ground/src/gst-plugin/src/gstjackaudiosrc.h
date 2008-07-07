@@ -89,7 +89,7 @@ typedef enum {
 
 struct _GstJackAudioSrc
 {
-    GstAudioSrc src;
+    GstBaseAudioSrc src;
 
     /*< private >*/
     /* cached caps */
@@ -109,7 +109,7 @@ struct _GstJackAudioSrc
 
 struct _GstJackAudioSrcClass 
 {
-    GstAudioSrcClass parent_class;
+    GstBaseAudioSrcClass parent_class;
 };
 
 GType gst_jackaudiosrc_get_type (void);

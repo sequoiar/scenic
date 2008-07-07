@@ -712,8 +712,8 @@ static GstStaticPadTemplate src_factory =
 #define _do_init(bla) \
         GST_DEBUG_CATEGORY_INIT (gst_jackaudiosrc_debug, "jacksrc", 0, "jacksrc element");
 
-    GST_BOILERPLATE_FULL (GstJackAudioSrc, gst_jackaudiosrc, GstAudioSrc,
-            GST_TYPE_AUDIO_SRC, _do_init);
+    GST_BOILERPLATE_FULL (GstJackAudioSrc, gst_jackaudiosrc, GstBaseAudioSrc,
+            GST_TYPE_BASE_AUDIO_SRC, _do_init);
 
 static void gst_jackaudiosrc_set_property (GObject * object, guint prop_id,
         const GValue * value, GParamSpec * pspec);
@@ -749,14 +749,12 @@ gst_jackaudiosrc_class_init (GstJackAudioSrcClass * klass)
     GstElementClass *gstelement_class;
     GstBaseSrcClass *gstbasesrc_class;
     GstBaseAudioSrcClass *gstbaseaudiosrc_class;
-    GstAudioSrcClass *gstaudiosrc_class;
 
     gobject_class = (GObjectClass *) klass;
     gstelement_class = (GstElementClass *) klass;
 
     gstbasesrc_class = (GstBaseSrcClass *) klass;
     gstbaseaudiosrc_class = (GstBaseAudioSrcClass *) klass;
-    gstaudiosrc_class = (GstAudioSrcClass *) klass;
 
     gobject_class->set_property = GST_DEBUG_FUNCPTR(gst_jackaudiosrc_set_property);
     gobject_class->get_property = GST_DEBUG_FUNCPTR(gst_jackaudiosrc_get_property);
