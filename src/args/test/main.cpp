@@ -27,14 +27,23 @@
  */
 #include "config.h"
 #include "optionArgs.h"
+#include "logWriter.h"
 
 int main (int argc, char **argv)
 {
-	int result;
+	int result = 0;
+    char* str = 0;
+    bool b = false;
 	OptionArgs options;
 
-	options.add("try", 't', &result,"try it out", "arg desc") ;
-	options.doit(argc,argv);
+	options.add("flag", 'f', &b,"Set f") ;
+	options.add("try", 't', &result,"try it out", "pass an int") ;
+	options.add("str", 's', &str,"try it out", "pass a string") ;
+	options.parse(argc,argv);
+
+    LOG(b); 
+    LOG(result);
+    LOG(str);
 	return 0;
 }
 
