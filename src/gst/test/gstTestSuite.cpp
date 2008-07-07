@@ -167,11 +167,10 @@ void GstTestSuite::start_stop_v4l()
 
 void GstTestSuite::start_v4l_rtp()
 {
-	int port = 10010;
+	const int PORT = 10010;
 
-    if (id_ == 0)	
-	{
-		VideoConfig config("h264", port);
+	if (id_ == 0) {
+		VideoConfig config("h264", PORT);
 		VideoReceiver rx(config);
 		rx.init();
 
@@ -180,8 +179,8 @@ void GstTestSuite::start_v4l_rtp()
 		BLOCK();
 		TEST_ASSERT(rx.isPlaying());
 	}
-    else {
-		VideoConfig config("v4l2src", "h264", MY_ADDRESS, port);
+	else {
+		VideoConfig config("v4l2src", "h264", MY_ADDRESS, PORT);
 		VideoSender tx(config);
 		tx.init();
 
@@ -194,9 +193,9 @@ void GstTestSuite::start_v4l_rtp()
 
 void GstTestSuite::stop_v4l_rtp()
 {
-    int port = 10010;
+	const int PORT = 10010;
 	if (id_ == 0) {
-		VideoConfig config("h264", port);
+		VideoConfig config("h264", PORT);
 		VideoReceiver rx(config);
 		rx.init();
 
@@ -207,7 +206,7 @@ void GstTestSuite::stop_v4l_rtp()
 	}
 	else
 	{
-		VideoConfig config("v4l2src", "h264", MY_ADDRESS, port);
+		VideoConfig config("v4l2src", "h264", MY_ADDRESS, PORT);
 		VideoSender tx(config);
 		tx.init();
 
@@ -220,9 +219,9 @@ void GstTestSuite::stop_v4l_rtp()
 
 void GstTestSuite::start_stop_v4l_rtp()
 {
-    int port = 10010;
+    const int PORT = 10010;
 	if (id_ == 0) {
-		VideoConfig config("h264", port);
+		VideoConfig config("h264", PORT);
 		VideoReceiver rx(config);
 		rx.init();
 
@@ -236,7 +235,7 @@ void GstTestSuite::start_stop_v4l_rtp()
 	}
 	else
 	{
-		VideoConfig config("v4l2src", "h264", MY_ADDRESS, port);
+		VideoConfig config("v4l2src", "h264", MY_ADDRESS, PORT);
 		VideoSender tx(config);
 		tx.init();
 
@@ -300,9 +299,10 @@ void GstTestSuite::start_stop_dv()
 
 void GstTestSuite::start_dv_rtp()
 {
+    const int PORT = 10010;
 	// receiver should be started first, of course there's no guarantee that it will at this point
 	if (id_ == 0) {
-		VideoConfig config("h264", 10010);
+		VideoConfig config("h264", PORT);
 		VideoReceiver rx(config);
 		rx.init();
 
@@ -313,7 +313,7 @@ void GstTestSuite::start_dv_rtp()
 	}
 	else
 	{
-		VideoConfig config("dv1394src", "h264", MY_ADDRESS, 10010);
+		VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
 		VideoSender tx(config);
 		tx.init();
 
@@ -326,8 +326,9 @@ void GstTestSuite::start_dv_rtp()
 
 void GstTestSuite::stop_dv_rtp()
 {
+    const int PORT = 10010;
 	if (id_ == 0) {
-		VideoConfig config("h264", 10010);
+		VideoConfig config("h264", PORT);
 		VideoReceiver rx(config);
 		rx.init();
 
@@ -338,7 +339,7 @@ void GstTestSuite::stop_dv_rtp()
 	}
 	else
 	{
-		VideoConfig config("dv1394src", "h264", MY_ADDRESS, 10010);
+		VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
 		VideoSender tx(config);
 		tx.init();
 
@@ -351,9 +352,9 @@ void GstTestSuite::stop_dv_rtp()
 
 void GstTestSuite::start_stop_dv_rtp()
 {
-    int port = 10010;
+	const int PORT = 10010;
 	if (id_ == 0) {
-		VideoConfig config("h264", port);
+		VideoConfig config("h264", PORT);
 		VideoReceiver rx(config);
 		rx.init();
 
@@ -367,7 +368,7 @@ void GstTestSuite::start_stop_dv_rtp()
 	}
 	else
 	{
-		VideoConfig config("dv1394src", "h264", MY_ADDRESS, port);
+		VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
 		VideoSender tx(config);
 		tx.init();
 
@@ -640,8 +641,9 @@ void GstTestSuite::stop_2ch_comp_rtp_audiotest()
 void GstTestSuite::start_stop_2ch_comp_rtp_audiotest()
 {
 	int numChannels = 2;
+    const int PORT = 10010;
 	if (id_ == 0) {
-		AudioConfig config(numChannels, "vorbisdec", 10010);
+		AudioConfig config(numChannels, "vorbisdec", PORT);
 		AudioReceiver rx(config);
 		rx.init();
 
@@ -655,7 +657,7 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audiotest()
 	}
 	else
 	{
-		AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+		AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, PORT);
 		AudioSender tx(config);
 		tx.init();
 
@@ -671,10 +673,11 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audiotest()
 
 void GstTestSuite::start_8ch_comp_rtp_audiotest()
 {
-	int numChannels = 8;
+    const int PORT = 10010; 
+    const int numChannels = 8;
 
 	if (id_ == 0) {
-		AudioConfig config(numChannels, "vorbisdec", 10010);
+		AudioConfig config(numChannels, "vorbisdec", PORT);
 		AudioReceiver rx(config);
 		rx.init();
 
@@ -685,7 +688,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiotest()
 	}
 	else
 	{
-		AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+		AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, PORT);
 		AudioSender tx(config);
 		tx.init();
 

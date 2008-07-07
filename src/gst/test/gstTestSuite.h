@@ -54,9 +54,6 @@ public:
 		TEST_ADD(GstTestSuite::stop_v4l)
 		TEST_ADD(GstTestSuite::start_stop_v4l)
 #if RTP
-        TEST_ADD(GstTestSuite::start_dv_rtp)
-		TEST_ADD(GstTestSuite::stop_dv_rtp)
-		TEST_ADD(GstTestSuite::start_stop_dv_rtp)
 #endif // RTP && VIDEO
 #endif // VIDEO
 #if AUDIO
@@ -95,10 +92,13 @@ public:
 		/*----------------------------------------------*/
 		/*      SANDBOX                                 */
 		/*----------------------------------------------*/
+		TEST_ADD(GstTestSuite::start_dv_rtp)
+		TEST_ADD(GstTestSuite::stop_dv_rtp)
+		TEST_ADD(GstTestSuite::start_stop_dv_rtp)
 		TEST_ADD(GstTestSuite::start_v4l_rtp)
 		TEST_ADD(GstTestSuite::stop_v4l_rtp)
 		TEST_ADD(GstTestSuite::start_stop_v4l_rtp)
-		
+
 	}
 
 	void set_id(int id);
