@@ -133,6 +133,9 @@ bool VideoSender::start()
 		          << std::endl;
 	}
 
-	return MediaBase::start();
+    bool result = MediaBase::start();
+
+    // FIXME: start thread that expects a stop message
+	return result;
 }
 

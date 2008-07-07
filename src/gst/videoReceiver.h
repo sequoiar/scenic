@@ -30,6 +30,7 @@ class VideoReceiver : public MediaBase
 public:
 	VideoReceiver(const VideoConfig & config);
 	virtual bool start();
+    virtual bool stop();
 	virtual ~VideoReceiver();
 
 private:
