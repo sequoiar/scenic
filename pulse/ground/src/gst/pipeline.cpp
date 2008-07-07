@@ -26,7 +26,7 @@
 
 Pipeline *Pipeline::instance_ = 0;
 
-Pipeline::Pipeline() : pipeline_(0), verbose_(true)
+Pipeline::Pipeline() : pipeline_(0), verbose_(false)
 {
 }
 
@@ -72,7 +72,7 @@ void Pipeline::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *da
 {
 	GstElement *sinkElement = (GstElement *) data;
 	GstPad *sinkPad;
-	LOG("Dynamic pad created, linking new srcpad and sinkpad.");
+	LOG("Dynamic pad created, linking new srcpad to existing sinkpad.");
 
 	sinkPad = gst_element_get_static_pad(sinkElement, "sink");
 	assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
@@ -83,7 +83,7 @@ void Pipeline::cb_new_sink_pad(GstElement * sinkElement, GstPad * sinkPad, void 
 {
 	GstElement *srcElement = (GstElement *) data;
 	GstPad *srcPad;
-	LOG("Dynamic pad created, linking new srcpad and sinkpad.");
+	LOG("Dynamic pad created, linking new sinkpad to existing srcpad.");
 
 	srcPad = gst_element_get_static_pad(srcElement, "src");
 	assert(gst_pad_link(sinkPad, srcPad) == GST_PAD_LINK_OK);
