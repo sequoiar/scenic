@@ -219,7 +219,7 @@ void GstTestSuite::stop_v4l_rtp()
 
 void GstTestSuite::start_stop_v4l_rtp()
 {
-    const int PORT = 10010;
+	const int PORT = 10010;
 	if (id_ == 0) {
 		VideoConfig config("h264", PORT);
 		VideoReceiver rx(config);
@@ -299,7 +299,7 @@ void GstTestSuite::start_stop_dv()
 
 void GstTestSuite::start_dv_rtp()
 {
-    const int PORT = 10010;
+	const int PORT = 10010;
 	// receiver should be started first, of course there's no guarantee that it will at this point
 	if (id_ == 0) {
 		VideoConfig config("h264", PORT);
@@ -326,7 +326,7 @@ void GstTestSuite::start_dv_rtp()
 
 void GstTestSuite::stop_dv_rtp()
 {
-    const int PORT = 10010;
+	const int PORT = 10010;
 	if (id_ == 0) {
 		VideoConfig config("h264", PORT);
 		VideoReceiver rx(config);
@@ -641,7 +641,7 @@ void GstTestSuite::stop_2ch_comp_rtp_audiotest()
 void GstTestSuite::start_stop_2ch_comp_rtp_audiotest()
 {
 	int numChannels = 2;
-    const int PORT = 10010;
+	const int PORT = 10010;
 	if (id_ == 0) {
 		AudioConfig config(numChannels, "vorbisdec", PORT);
 		AudioReceiver rx(config);
@@ -673,8 +673,8 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audiotest()
 
 void GstTestSuite::start_8ch_comp_rtp_audiotest()
 {
-    const int PORT = 10010; 
-    const int numChannels = 8;
+	const int PORT = 10010;
+	const int numChannels = 8;
 
 	if (id_ == 0) {
 		AudioConfig config(numChannels, "vorbisdec", PORT);
