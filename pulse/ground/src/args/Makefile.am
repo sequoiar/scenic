@@ -4,4 +4,5 @@ noinst_LIBRARIES = libArgs.a
 
 libArgs_a_SOURCES = optionArgs.cpp 
 
+libArgs_a_CPPFLAGS = $(GST_CFLAGS) 
 

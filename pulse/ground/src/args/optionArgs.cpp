@@ -29,7 +29,7 @@
 #include "optionArgs.h"
 #include <glib.h>
 
-void OptionArgs::add(char* l_flag, char* s_flag, int * ret, char* desc, char* arg_desc)
+void OptionArgs::add(const char* l_flag, char s_flag, int * ret, const char* desc, const char* arg_desc)
 {
 	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_INT,ret,desc,arg_desc};
 	options.push_back(e);
@@ -75,16 +75,6 @@ int OptionArgs::doit(int argc,char **argv)
 		return 1;
 	}
 
-	return 0;
-}
-
-int main (int argc, char **argv)
-{
-	OptionArgs options;
-	int result;
-	GOptionEntry o = { "try", 't', 0, G_OPTION_ARG_INT, &result,"try it out", "arg desc" };
-	options.add(o);
-	options.doit(argc,argv);
 	return 0;
 }
 
