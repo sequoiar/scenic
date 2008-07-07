@@ -1,9 +1,0 @@
-{ global:
-gst_jack_audio_client_free;
-gst_jack_audio_client_get_client;
-gst_jack_audio_client_init;
-gst_jack_audio_client_new;
-gst_jack_audio_client_set_active;
-gst_jackaudiosrc_get_type;
-gst_plugin_desc;
-local: *; };
