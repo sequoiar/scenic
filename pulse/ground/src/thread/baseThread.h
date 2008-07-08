@@ -25,6 +25,8 @@
 #include <map>
 #include <string>
 #include <set>
+#include "baseModule.h"
+
 typedef GAsyncQueue GAsyncQueue;
 
 typedef std::pair < GAsyncQueue *, GAsyncQueue * >BaseQueuePair;
@@ -60,7 +62,10 @@ private:
 
 template < class T > std::set < GAsyncQueue * >QueuePair_ < T >::qstor;
 
-template < class T > class BaseThread
+
+
+
+template < class T > class BaseThread : public BaseModule
 {
 public:
 	BaseThread < T > ();
