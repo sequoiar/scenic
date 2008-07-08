@@ -71,25 +71,6 @@ G_BEGIN_DECLS
 typedef struct _GstJackAudioSrc GstJackAudioSrc;
 typedef struct _GstJackAudioSrcClass GstJackAudioSrcClass;
 
-#if 0
-/**
- * GstJackConnect:
- * @GST_JACK_CONNECT_NONE: Don't automatically connect to physical ports.
- *     In this mode, the element will accept any number of output channels and will
- *     create (but not connect) an input port for each channel.
- * @GST_JACK_CONNECT_AUTO: In this mode, the element will try to connect each
- *     input port to a random physical jack output pin. The src will
- *     expose the number of physical channels on its pad caps.
- *
- * Specify how the input ports will be connected.
- */
-
-typedef enum {
-	GST_JACK_CONNECT_NONE,
-	GST_JACK_CONNECT_AUTO
-} GstJackConnect;
-#endif
-
 struct _GstJackAudioSrc
 {
 	GstBaseAudioSrc src;
