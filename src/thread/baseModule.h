@@ -29,7 +29,7 @@
 #ifndef __BASE_MODULE_H__
 #define __BASE_MODULE_H__
 
-#include "args/optionArgs.h"
+#include "optionArgs.h"
 
 class BaseModule
 {

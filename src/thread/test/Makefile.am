@@ -5,5 +5,5 @@ bin_PROGRAMS = threadTester
 
 threadTester_SOURCES = thread.cpp
 
-threadTester_LDADD = $(GLIB_LIBS) 
+threadTester_LDADD = $(GLIB_LIBS) ../libGUtil.a
 threadTester_CPPFLAGS = $(GLIB_CFLAGS) -I..
