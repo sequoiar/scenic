@@ -27,6 +27,7 @@
 #include <gst/gst.h>
 #include <gst/audio/gstbaseaudiosink.h>
 
+#include "gstjack.h"
 #include "gstjackaudioclient.h"
 
 G_BEGIN_DECLS
@@ -52,10 +53,12 @@ typedef struct _GstJackAudioSinkClass GstJackAudioSinkClass;
  *
  * Specify how the output ports will be connected.
  */
+#if 0
 typedef enum {
   GST_JACK_CONNECT_NONE,
   GST_JACK_CONNECT_AUTO
 } GstJackConnect;
+#endif
 
 /**
  * GstJackAudioSink:
@@ -85,7 +88,7 @@ struct _GstJackAudioSinkClass {
   GstBaseAudioSinkClass parent_class;
 };
 
-GType gst_jack_audio_sink_get_type (void);
+GType gst_jack_audio_sink_get_type ();
 
 G_END_DECLS
 
