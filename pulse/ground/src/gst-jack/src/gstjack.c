@@ -24,6 +24,7 @@
 #include "gstjackaudiosrc.h"
 #include "gstjackaudiosink.h"
 
+
 static gboolean
 plugin_init (GstPlugin * plugin)
 {
