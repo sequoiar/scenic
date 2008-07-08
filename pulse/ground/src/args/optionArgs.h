@@ -24,7 +24,7 @@
  *      Continues here.
  *      And more.
  *      And more.#ifndef __BASE_THREAD_H__
-#define __BASE_THREAD_H__
+ #define __BASE_THREAD_H__
 
 
  */
@@ -41,7 +41,7 @@
 class OptionArgs
 {
 	typedef std::vector<GOptionEntry> Options;
-    std::vector<char **> str_dump;
+	std::vector<char **> str_dump;
 	Options options;
 public:
 	void add(bool *,const char*,char, const char*);
@@ -51,7 +51,7 @@ public:
 	GOptionEntry* getArray();
 
 	int parse(int argc,char **argv);
-    ~OptionArgs();
+	~OptionArgs();
 };
 
 

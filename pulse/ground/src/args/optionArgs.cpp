@@ -31,11 +31,11 @@
 
 OptionArgs::~OptionArgs()
 {
-    for(;str_dump.begin() != str_dump.end();)
-    {
-        free(**str_dump.begin());
-        str_dump.erase(str_dump.begin());
-    }
+	for(; str_dump.begin() != str_dump.end();)
+	{
+		free(**str_dump.begin());
+		str_dump.erase(str_dump.begin());
+	}
 
 }
 void OptionArgs::add(bool* ret, const char* l_flag, char s_flag, const char* desc)
@@ -48,7 +48,7 @@ void OptionArgs::add(bool* ret, const char* l_flag, char s_flag, const char* des
 void OptionArgs::add(char** ret, const char* l_flag, char s_flag, const char* desc, const char* arg_desc)
 {
 	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_STRING,ret,desc,arg_desc};
-    str_dump.push_back(ret);
+	str_dump.push_back(ret);
 	options.push_back(e);
 }
 

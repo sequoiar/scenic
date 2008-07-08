@@ -32,8 +32,8 @@
 int main (int argc, char **argv)
 {
 	int result = 0;
-    char* str = 0;
-    bool b = false;
+	char* str = 0;
+	bool b = false;
 	OptionArgs options;
 
 	options.add(&b,"flag", 'f', "Set f") ;
@@ -41,9 +41,9 @@ int main (int argc, char **argv)
 	options.add( &str,"str", 's',"try it out", "pass a string") ;
 	options.parse(argc,argv);
 
-    LOG(b); 
-    LOG(result);
-    LOG(str);
+	LOG(b);
+	LOG(result);
+	LOG(str);
 	return 0;
 }
 
