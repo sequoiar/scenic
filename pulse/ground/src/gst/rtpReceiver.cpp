@@ -23,7 +23,6 @@
 
 #include "rtpReceiver.h"
 #include "mediaConfig.h"
-#include "logWriter.h"
 
 
 RtpReceiver::RtpReceiver() : rtp_receiver_(0)

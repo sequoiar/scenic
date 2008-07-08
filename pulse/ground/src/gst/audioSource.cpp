@@ -17,6 +17,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <iostream>
 #include <string>
 #include <cassert>
 #include "audioSource.h"
@@ -107,8 +108,8 @@ AudioSource::~AudioSource()
 
 void AudioTestSource::init()
 {
-	GstIter src, aconv;
 	AudioSource::init();
+	GstIter src, aconv;
 
 	const double GAIN = 1.0 / config_.numChannels();        // so sum of tones' amplitude equals 1.0
 	double frequency = 100.0;
@@ -135,13 +136,16 @@ void AudioFileSource::init()
 	pipeline_.add_vector(decoders_);
 
 	// FIXME: location should be changeable
+    int counter = 1;
 	for (src = sources_.begin(); src != sources_.end(); ++src)
-		g_object_set(G_OBJECT(*src), "location", "audiofile.pcm", NULL);
+    {
+        char filename[15];
+        sprintf(filename, "audiofile%d.pcm", counter++);
+		g_object_set(G_OBJECT(*src), "location", filename, NULL);
+    }
 
 	for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
-	{
 		g_signal_connect(*dec, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *) *aconv);
-	}
 
 	for (src = sources_.begin(), dec = decoders_.begin(); src != sources_.end(); ++src, ++dec)
 		assert(gst_element_link(*src, *dec));
