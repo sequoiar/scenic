@@ -689,25 +689,10 @@ enum
   PROP_LAST
 };
 
+#if 0
 #define GST_TYPE_JACK_CONNECT (gst_jack_connect_get_type())
 GType
 gst_jack_connect_get_type();
-#if 0
-{
-  static GType jack_connect_type = 0;
-  static const GEnumValue jack_connect[] = {
-    {GST_JACK_CONNECT_NONE,
-        "Don't automatically connect ports to physical ports", "none"},
-    {GST_JACK_CONNECT_AUTO,
-        "Automatically connect ports to physical ports", "auto"},
-    {0, NULL, NULL},
-  };
-
-  if (!jack_connect_type) {
-    jack_connect_type = g_enum_register_static ("GstJackConnect", jack_connect);
-  }
-  return jack_connect_type;
-}
 #endif
 
 #define _do_init(bla) \
@@ -850,8 +835,9 @@ gst_jack_audio_sink_getcaps (GstBaseSink * bsink)
         JackPortIsPhysical | JackPortIsInput);
     max = 0;
     if (ports != NULL) {
-      for (; ports[max]; max++);
-      free (ports);
+        for (; ports[max]; max++);
+
+        free (ports);
     } else
       max = 0;
   } else {
