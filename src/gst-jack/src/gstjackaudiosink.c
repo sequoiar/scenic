@@ -1,31 +1,7 @@
-/*
- * GStreamer
- * Copyright (C) 2005 Thomas Vander Stichele <thomas@apestaart.org>
- * Copyright (C) 2005 Ronald S. Bultje <rbultje@ronald.bitfreak.net>
- * Copyright (C) 2008  <<user@hostname.org>>
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+/* GStreamer
+ * Copyright (C) 2006 Wim Taymans <wim@fluendo.com>
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *
- * Alternatively, the contents of this file may be used under the
- * GNU Lesser General Public License Version 2.1 (the "LGPL"), in
- * which case the following provisions apply instead of the ones
- * mentioned above:
+ * gstjackaudiosink.c: jack audio sink implementation
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -44,25 +20,48 @@
  */
 
 /**
- * SECTION:element-jackaudiosrc
+ * SECTION:element-jackaudiosink
+ * @see_also: #GstBaseAudioSink, #GstRingBuffer
  *
+ * A Sink that outputs data to Jack ports.
+ * 
+ * It will create N Jack ports named out_&lt;name&gt;_&lt;num&gt; where 
+ * &lt;name&gt; is the element name and &lt;num&gt; is starting from 1.
+ * Each port corresponds to a gstreamer channel.
+ * 
+ * The samplerate as exposed on the caps is always the same as the samplerate of
+ * the jack server.
+ * 
+ * When the #GstJackAudioSink:connect property is set to auto, this element
+ * will try to connect each output port to a random physical jack input pin. In
+ * this mode, the sink will expose the number of physical channels on its pad
+ * caps.
+ * 
+ * When the #GstJackAudioSink:connect property is set to none, the element will
+ * accept any number of input channels and will create (but not connect) an
+ * output port for each channel.
+ * 
+ * The element will generate an error when the Jack server is shut down when it
+ * was PAUSED or PLAYING. This element does not support dynamic rate and buffer
+ * size changes at runtime.
+ * 
  * <refsect2>
  * <title>Example launch line</title>
- * <para>
- * <programlisting>
- * gst-launch -v -m audiotestsrc ! jackaudiosrc ! fakesink silent=TRUE
- * </programlisting>
- * </para>
+ * |[
+ * gst-launch audiotestsrc ! jackaudiosink
+ * ]| Play a sine wave to using jack.
  * </refsect2>
+ *
+ * Last reviewed on 2006-11-30 (0.10.4)
  */
 
-#include <gst/gst.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include "gstjackaudiosrc.h"
+#include "gstjackaudiosink.h"
 
-GST_DEBUG_CATEGORY_STATIC (gst_jackaudiosrc_debug);
-#define GST_CAT_DEFAULT gst_jackaudiosrc_debug
+GST_DEBUG_CATEGORY_STATIC (gst_jack_audio_sink_debug);
+#define GST_CAT_DEFAULT gst_jack_audio_sink_debug
 
 typedef jack_default_audio_sample_t sample_t;
 
@@ -117,35 +116,35 @@ static gboolean gst_jack_ring_buffer_stop (GstRingBuffer * buf);
 static guint gst_jack_ring_buffer_delay (GstRingBuffer * buf);
 
 static gboolean
-gst_jack_audio_src_allocate_channels (GstJackAudioSrc * src, gint channels)
+gst_jack_audio_sink_allocate_channels (GstJackAudioSink * sink, gint channels)
 {
   jack_client_t *client;
 
-  client = gst_jack_audio_client_get_client (src->client);
+  client = gst_jack_audio_client_get_client (sink->client);
 
   /* remove ports we don't need */
-  while (src->port_count > channels) {
-    jack_port_unregister (client, src->ports[--src->port_count]);
+  while (sink->port_count > channels) {
+    jack_port_unregister (client, sink->ports[--sink->port_count]);
   }
 
-  /* alloc enough input ports */
-  src->ports = g_realloc (src->ports, sizeof (jack_port_t *) * channels);
+  /* alloc enough output ports */
+  sink->ports = g_realloc (sink->ports, sizeof (jack_port_t *) * channels);
 
-  /* create an input port for each channel */
-  while (src->port_count < channels) {
+  /* create an output port for each channel */
+  while (sink->port_count < channels) {
     gchar *name;
 
     /* port names start from 1 and are local to the element */
     name =
-        g_strdup_printf ("in_%s_%d", GST_ELEMENT_NAME (src),
-        src->port_count + 1);
-    src->ports[src->port_count] =
+        g_strdup_printf ("out_%s_%d", GST_ELEMENT_NAME (sink),
+        sink->port_count + 1);
+    sink->ports[sink->port_count] =
         jack_port_register (client, name, JACK_DEFAULT_AUDIO_TYPE,
-        JackPortIsInput, 0);
-    if (src->ports[src->port_count] == NULL)
+        JackPortIsOutput, 0);
+    if (sink->ports[sink->port_count] == NULL)
       return FALSE;
 
-    src->port_count++;
+    sink->port_count++;
 
     g_free (name);
   }
@@ -153,23 +152,23 @@ gst_jack_audio_src_allocate_channels (GstJackAudioSrc * src, gint channels)
 }
 
 static void
-gst_jack_audio_src_free_channels (GstJackAudioSrc * src)
+gst_jack_audio_sink_free_channels (GstJackAudioSink * sink)
 {
   gint res, i = 0;
   jack_client_t *client;
 
-  client = gst_jack_audio_client_get_client (src->client);
+  client = gst_jack_audio_client_get_client (sink->client);
 
   /* get rid of all ports */
-  while (src->port_count) {
-    GST_LOG_OBJECT (src, "unregister port %d", i);
-    if ((res = jack_port_unregister (client, src->ports[i++]))) {
-      GST_DEBUG_OBJECT (src, "unregister of port failed (%d)", res);
+  while (sink->port_count) {
+    GST_LOG_OBJECT (sink, "unregister port %d", i);
+    if ((res = jack_port_unregister (client, sink->ports[i++]))) {
+      GST_DEBUG_OBJECT (sink, "unregister of port failed (%d)", res);
     }
-    src->port_count--;
+    sink->port_count--;
   }
-  g_free (src->ports);
-  src->ports = NULL;
+  g_free (sink->ports);
+  sink->ports = NULL;
 }
 
 /* ringbuffer abstract base class */
@@ -194,7 +193,7 @@ gst_jack_ring_buffer_get_type (void)
 
     ringbuffer_type =
         g_type_register_static (GST_TYPE_RING_BUFFER,
-        "GstJackAudioSrcRingBuffer", &ringbuffer_info, 0);
+        "GstJackAudioSinkRingBuffer", &ringbuffer_info, 0);
   }
   return ringbuffer_type;
 }
@@ -236,7 +235,7 @@ gst_jack_ring_buffer_class_init (GstJackRingBufferClass * klass)
 static int
 jack_process_cb (jack_nframes_t nframes, void *arg)
 {
-  GstJackAudioSrc *src;
+  GstJackAudioSink *sink;
   GstRingBuffer *buf;
   GstJackRingBuffer *abuf;
   gint readseg, len;
@@ -246,7 +245,7 @@ jack_process_cb (jack_nframes_t nframes, void *arg)
 
   buf = GST_RING_BUFFER_CAST (arg);
   abuf = GST_JACK_RING_BUFFER_CAST (arg);
-  src = GST_JACKAUDIOSRC (GST_OBJECT_PARENT (buf));
+  sink = GST_JACK_AUDIO_SINK (GST_OBJECT_PARENT (buf));
 
   channels = buf->spec.channels;
 
@@ -255,7 +254,7 @@ jack_process_cb (jack_nframes_t nframes, void *arg)
 
   /* get target buffers */
   for (i = 0; i < channels; i++) {
-    buffers[i] = (sample_t *) jack_port_get_buffer (src->ports[i], nframes);
+    buffers[i] = (sample_t *) jack_port_get_buffer (sink->ports[i], nframes);
   }
 
   if (gst_ring_buffer_prepare_read (buf, &readseg, &readptr, &len)) {
@@ -294,7 +293,7 @@ jack_process_cb (jack_nframes_t nframes, void *arg)
   /* ERRORS */
 wrong_size:
   {
-    GST_ERROR_OBJECT (src, "nbytes (%d) != flen (%d)",
+    GST_ERROR_OBJECT (sink, "nbytes (%d) != flen (%d)",
         nframes * sizeof (sample_t), flen);
     return 1;
   }
@@ -304,11 +303,11 @@ wrong_size:
 static int
 jack_sample_rate_cb (jack_nframes_t nframes, void *arg)
 {
-  GstJackAudioSrc *src;
+  GstJackAudioSink *sink;
   GstJackRingBuffer *abuf;
 
   abuf = GST_JACK_RING_BUFFER_CAST (arg);
-  src = GST_JACKAUDIOSRC (GST_OBJECT_PARENT (arg));
+  sink = GST_JACK_AUDIO_SINK (GST_OBJECT_PARENT (arg));
 
   if (abuf->sample_rate != -1 && abuf->sample_rate != nframes)
     goto not_supported;
@@ -318,7 +317,7 @@ jack_sample_rate_cb (jack_nframes_t nframes, void *arg)
   /* ERRORS */
 not_supported:
   {
-    GST_ELEMENT_ERROR (src, RESOURCE, SETTINGS,
+    GST_ELEMENT_ERROR (sink, RESOURCE, SETTINGS,
         (NULL), ("Jack changed the sample rate, which is not supported"));
     return 1;
   }
@@ -328,11 +327,11 @@ not_supported:
 static int
 jack_buffer_size_cb (jack_nframes_t nframes, void *arg)
 {
-  GstJackAudioSrc *src;
+  GstJackAudioSink *sink;
   GstJackRingBuffer *abuf;
 
   abuf = GST_JACK_RING_BUFFER_CAST (arg);
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT (arg));
+  sink = GST_JACK_AUDIO_SINK (GST_OBJECT_PARENT (arg));
 
   if (abuf->buffer_size != -1 && abuf->buffer_size != nframes)
     goto not_supported;
@@ -342,7 +341,7 @@ jack_buffer_size_cb (jack_nframes_t nframes, void *arg)
   /* ERRORS */
 not_supported:
   {
-    GST_ELEMENT_ERROR (src, RESOURCE, SETTINGS,
+    GST_ELEMENT_ERROR (sink, RESOURCE, SETTINGS,
         (NULL), ("Jack changed the buffer size, which is not supported"));
     return 1;
   }
@@ -351,13 +350,13 @@ not_supported:
 static void
 jack_shutdown_cb (void *arg)
 {
-  GstJackAudioSrc *src;
+  GstJackAudioSink *sink;
 
-  src = GST_JACKAUDIOSRC (GST_OBJECT_PARENT (arg));
+  sink = GST_JACK_AUDIO_SINK (GST_OBJECT_PARENT (arg));
 
-  GST_DEBUG_OBJECT (src, "shutdown");
+  GST_DEBUG_OBJECT (sink, "shutdown");
 
-  GST_ELEMENT_ERROR (src, RESOURCE, NOT_FOUND,
+  GST_ELEMENT_ERROR (sink, RESOURCE, NOT_FOUND,
       (NULL), ("Jack server shutdown"));
 }
 
@@ -391,26 +390,26 @@ gst_jack_ring_buffer_finalize (GObject * object)
 static gboolean
 gst_jack_ring_buffer_open_device (GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
+  GstJackAudioSink *sink;
   jack_status_t status = 0;
   const gchar *name;
 
-  src = GST_JACKAUDIOSRC (GST_OBJECT_PARENT (buf));
+  sink = GST_JACK_AUDIO_SINK (GST_OBJECT_PARENT (buf));
 
-  GST_DEBUG_OBJECT (src, "open");
+  GST_DEBUG_OBJECT (sink, "open");
 
   name = g_get_application_name ();
   if (!name)
     name = "GStreamer";
 
-  src->client = gst_jack_audio_client_new (name, src->server,
-      GST_JACK_CLIENT_SOURCE,
+  sink->client = gst_jack_audio_client_new (name, sink->server,
+      GST_JACK_CLIENT_SINK,
       jack_shutdown_cb,
       jack_process_cb, jack_buffer_size_cb, jack_sample_rate_cb, buf, &status);
-  if (src->client == NULL)
+  if (sink->client == NULL)
     goto could_not_open;
 
-  GST_DEBUG_OBJECT (src, "opened");
+  GST_DEBUG_OBJECT (sink, "opened");
 
   return TRUE;
 
@@ -418,10 +417,10 @@ gst_jack_ring_buffer_open_device (GstRingBuffer * buf)
 could_not_open:
   {
     if (status & JackServerFailed) {
-      GST_ELEMENT_ERROR (src, RESOURCE, NOT_FOUND,
+      GST_ELEMENT_ERROR (sink, RESOURCE, NOT_FOUND,
           (NULL), ("Cannot connect to the Jack server (status %d)", status));
     } else {
-      GST_ELEMENT_ERROR (src, RESOURCE, OPEN_WRITE,
+      GST_ELEMENT_ERROR (sink, RESOURCE, OPEN_WRITE,
           (NULL), ("Jack client open error (status %d)", status));
     }
     return FALSE;
@@ -433,19 +432,18 @@ could_not_open:
 static gboolean
 gst_jack_ring_buffer_close_device (GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
+  GstJackAudioSink *sink;
 
-  src = GST_JACKAUDIOSRC (GST_OBJECT_PARENT (buf));
+  sink = GST_JACK_AUDIO_SINK (GST_OBJECT_PARENT (buf));
 
-  GST_DEBUG_OBJECT (src, "close");
+  GST_DEBUG_OBJECT (sink, "close");
 
-  gst_jack_audio_src_free_channels (src);
-  gst_jack_audio_client_free (src->client);
-  src->client = NULL;
+  gst_jack_audio_sink_free_channels (sink);
+  gst_jack_audio_client_free (sink->client);
+  sink->client = NULL;
 
   return TRUE;
 }
-
 
 /* allocate a buffer and setup resources to process the audio samples of
  * the format as specified in @spec.
@@ -461,19 +459,19 @@ gst_jack_ring_buffer_close_device (GstRingBuffer * buf)
 static gboolean
 gst_jack_ring_buffer_acquire (GstRingBuffer * buf, GstRingBufferSpec * spec)
 {
-  GstJackAudioSrc *src;
+  GstJackAudioSink *sink;
   GstJackRingBuffer *abuf;
   const char **ports;
   gint sample_rate, buffer_size;
   gint i, channels, res;
   jack_client_t *client;
 
-  src = GST_JACKAUDIOSRC (GST_OBJECT_PARENT (buf));
+  sink = GST_JACK_AUDIO_SINK (GST_OBJECT_PARENT (buf));
   abuf = GST_JACK_RING_BUFFER_CAST (buf);
 
-  GST_DEBUG_OBJECT (src, "acquire");
+  GST_DEBUG_OBJECT (sink, "acquire");
 
-  client = gst_jack_audio_client_get_client (src->client);
+  client = gst_jack_audio_client_get_client (sink->client);
 
   /* sample rate must be that of the server */
   sample_rate = jack_get_sample_rate (client);
@@ -482,7 +480,7 @@ gst_jack_ring_buffer_acquire (GstRingBuffer * buf, GstRingBufferSpec * spec)
 
   channels = spec->channels;
 
-  if (!gst_jack_audio_src_allocate_channels (src, channels))
+  if (!gst_jack_audio_sink_allocate_channels (sink, channels))
     goto out_of_ports;
 
   buffer_size = jack_get_buffer_size (client);
@@ -495,19 +493,19 @@ gst_jack_ring_buffer_acquire (GstRingBuffer * buf, GstRingBufferSpec * spec)
   /* segtotal based on buffer-time latency */
   spec->segtotal = spec->buffer_time / spec->latency_time;
 
-  GST_DEBUG_OBJECT (src, "segsize %d, segtotal %d", spec->segsize,
+  GST_DEBUG_OBJECT (sink, "segsize %d, segtotal %d", spec->segsize,
       spec->segtotal);
 
   /* allocate the ringbuffer memory now */
   buf->data = gst_buffer_new_and_alloc (spec->segtotal * spec->segsize);
   memset (GST_BUFFER_DATA (buf->data), 0, GST_BUFFER_SIZE (buf->data));
 
-  if ((res = gst_jack_audio_client_set_active (src->client, TRUE)))
+  if ((res = gst_jack_audio_client_set_active (sink->client, TRUE)))
     goto could_not_activate;
 
   /* if we need to automatically connect the ports, do so now. We must do this
    * after activating the client. */
-  if (src->connect == GST_JACK_CONNECT_AUTO) {
+  if (sink->connect == GST_JACK_CONNECT_AUTO) {
     /* find all the physical input ports. A physical input port is a port
      * associated with a hardware device. Someone needs connect to a physical
      * port in order to hear something. */
@@ -516,23 +514,23 @@ gst_jack_ring_buffer_acquire (GstRingBuffer * buf, GstRingBufferSpec * spec)
     if (ports == NULL) {
       /* no ports? fine then we don't do anything except for posting a warning
        * message. */
-      GST_ELEMENT_WARNING (src, RESOURCE, NOT_FOUND, (NULL),
-          ("No physical output ports found, leaving ports unconnected"));
+      GST_ELEMENT_WARNING (sink, RESOURCE, NOT_FOUND, (NULL),
+          ("No physical input ports found, leaving ports unconnected"));
       goto done;
     }
 
     for (i = 0; i < channels; i++) {
-      /* stop when all output ports are exhausted */
+      /* stop when all input ports are exhausted */
       if (ports[i] == NULL) {
         /* post a warning that we could not connect all ports */
-        GST_ELEMENT_WARNING (src, RESOURCE, NOT_FOUND, (NULL),
+        GST_ELEMENT_WARNING (sink, RESOURCE, NOT_FOUND, (NULL),
             ("No more physical ports, leaving some ports unconnected"));
         break;
       }
-      GST_DEBUG_OBJECT (src, "try connecting to %s",
-          jack_port_name (src->ports[i]));
+      GST_DEBUG_OBJECT (sink, "try connecting to %s",
+          jack_port_name (sink->ports[i]));
       /* connect the port to a physical port */
-      res = jack_connect (client, jack_port_name (src->ports[i]), ports[i]);
+      res = jack_connect (client, jack_port_name (sink->ports[i]), ports[i]);
       if (res != 0 && res != EEXIST)
         goto cannot_connect;
     }
@@ -549,27 +547,27 @@ done:
   /* ERRORS */
 wrong_samplerate:
   {
-    GST_ELEMENT_ERROR (src, RESOURCE, SETTINGS, (NULL),
+    GST_ELEMENT_ERROR (sink, RESOURCE, SETTINGS, (NULL),
         ("Wrong samplerate, server is running at %d and we received %d",
             sample_rate, spec->rate));
     return FALSE;
   }
 out_of_ports:
   {
-    GST_ELEMENT_ERROR (src, RESOURCE, SETTINGS, (NULL),
+    GST_ELEMENT_ERROR (sink, RESOURCE, SETTINGS, (NULL),
         ("Cannot allocate more Jack ports"));
     return FALSE;
   }
 could_not_activate:
   {
-    GST_ELEMENT_ERROR (src, RESOURCE, SETTINGS, (NULL),
+    GST_ELEMENT_ERROR (sink, RESOURCE, SETTINGS, (NULL),
         ("Could not activate client (%d:%s)", res, g_strerror (res)));
     return FALSE;
   }
 cannot_connect:
   {
-    GST_ELEMENT_ERROR (src, RESOURCE, SETTINGS, (NULL),
-        ("Could not connect input ports to physical ports (%d:%s)",
+    GST_ELEMENT_ERROR (sink, RESOURCE, SETTINGS, (NULL),
+        ("Could not connect output ports to physical ports (%d:%s)",
             res, g_strerror (res)));
     free (ports);
     return FALSE;
@@ -580,19 +578,19 @@ cannot_connect:
 static gboolean
 gst_jack_ring_buffer_release (GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
+  GstJackAudioSink *sink;
   GstJackRingBuffer *abuf;
   gint res;
 
   abuf = GST_JACK_RING_BUFFER_CAST (buf);
-  src = GST_JACKAUDIOSRC (GST_OBJECT_PARENT (buf));
+  sink = GST_JACK_AUDIO_SINK (GST_OBJECT_PARENT (buf));
 
-  GST_DEBUG_OBJECT (src, "release");
+  GST_DEBUG_OBJECT (sink, "release");
 
-  if ((res = gst_jack_audio_client_set_active (src->client, FALSE))) {
+  if ((res = gst_jack_audio_client_set_active (sink->client, FALSE))) {
     /* we only warn, this means the server is probably shut down and the client
      * is gone anyway. */
-    GST_ELEMENT_WARNING (src, RESOURCE, CLOSE, (NULL),
+    GST_ELEMENT_WARNING (sink, RESOURCE, CLOSE, (NULL),
         ("Could not deactivate Jack client (%d)", res));
   }
 
@@ -610,11 +608,11 @@ gst_jack_ring_buffer_release (GstRingBuffer * buf)
 static gboolean
 gst_jack_ring_buffer_start (GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
+  GstJackAudioSink *sink;
 
-  src = GST_JACKAUDIOSRC (GST_OBJECT_PARENT (buf));
+  sink = GST_JACK_AUDIO_SINK (GST_OBJECT_PARENT (buf));
 
-  GST_DEBUG_OBJECT (src, "start");
+  GST_DEBUG_OBJECT (sink, "start");
 
   return TRUE;
 }
@@ -622,11 +620,11 @@ gst_jack_ring_buffer_start (GstRingBuffer * buf)
 static gboolean
 gst_jack_ring_buffer_pause (GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
+  GstJackAudioSink *sink;
 
-  src = GST_JACKAUDIOSRC (GST_OBJECT_PARENT (buf));
+  sink = GST_JACK_AUDIO_SINK (GST_OBJECT_PARENT (buf));
 
-  GST_DEBUG_OBJECT (src, "pause");
+  GST_DEBUG_OBJECT (sink, "pause");
 
   return TRUE;
 }
@@ -634,11 +632,11 @@ gst_jack_ring_buffer_pause (GstRingBuffer * buf)
 static gboolean
 gst_jack_ring_buffer_stop (GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
+  GstJackAudioSink *sink;
 
-  src = GST_JACKAUDIOSRC (GST_OBJECT_PARENT (buf));
+  sink = GST_JACK_AUDIO_SINK (GST_OBJECT_PARENT (buf));
 
-  GST_DEBUG_OBJECT (src, "stop");
+  GST_DEBUG_OBJECT (sink, "stop");
 
   return TRUE;
 }
@@ -646,21 +644,38 @@ gst_jack_ring_buffer_stop (GstRingBuffer * buf)
 static guint
 gst_jack_ring_buffer_delay (GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
+  GstJackAudioSink *sink;
   guint res = 0;
 
-  src = GST_JACKAUDIOSRC (GST_OBJECT_PARENT (buf));
+  sink = GST_JACK_AUDIO_SINK (GST_OBJECT_PARENT (buf));
 
-  GST_DEBUG_OBJECT (src, "delay %u", res);
+  GST_DEBUG_OBJECT (sink, "delay %u", res);
 
   return res;
 }
 
-/* Audiosrc signals and args */
+/* elementfactory information */
+static const GstElementDetails gst_jack_audio_sink_details =
+GST_ELEMENT_DETAILS ("Audio Sink (Jack)",
+    "Sink/Audio",
+    "Output to Jack",
+    "Wim Taymans <wim@fluendo.com>");
+
+static GstStaticPadTemplate jackaudiosink_sink_factory =
+GST_STATIC_PAD_TEMPLATE ("sink",
+    GST_PAD_SINK,
+    GST_PAD_ALWAYS,
+    GST_STATIC_CAPS ("audio/x-raw-float, "
+        "endianness = (int) { " G_STRINGIFY (G_BYTE_ORDER) " }, "
+        "width = (int) 32, "
+        "rate = (int) [ 1, MAX ], " "channels = (int) [ 1, MAX ]")
+    );
+
+/* AudioSink signals and args */
 enum
 {
   /* FILL ME */
-    LAST_SIGNAL
+  SIGNAL_LAST
 };
 
 #define DEFAULT_PROP_CONNECT 	GST_JACK_CONNECT_AUTO
@@ -674,8 +689,6 @@ enum
   PROP_LAST
 };
 
-
-#if 0
 #define GST_TYPE_JACK_CONNECT (gst_jack_connect_get_type())
 static GType
 gst_jack_connect_get_type (void)
@@ -694,88 +707,65 @@ gst_jack_connect_get_type (void)
   }
   return jack_connect_type;
 }
-#endif
-
-
-/* the capabilities of the inputs and outputs.
- *
- * describe the real formats here.
- */
-
-static GstStaticPadTemplate src_factory = 
-    GST_STATIC_PAD_TEMPLATE ("src",
-    GST_PAD_SRC,
-    GST_PAD_ALWAYS,
-    GST_STATIC_CAPS ("audio/x-raw-float, "
-        "endianness = (int) { " G_STRINGIFY (G_BYTE_ORDER) " }, "
-        "width = (int) 32, "
-        "rate = (int) [ 1, MAX ], " "channels = (int) [ 1, MAX ]")
-    );
 
 #define _do_init(bla) \
-        GST_DEBUG_CATEGORY_INIT (gst_jackaudiosrc_debug, "jacksrc", 0, "jacksrc element");
+    GST_DEBUG_CATEGORY_INIT (gst_jack_audio_sink_debug, "jacksink", 0, "jacksink element");
 
-    GST_BOILERPLATE_FULL (GstJackAudioSrc, gst_jackaudiosrc, GstBaseAudioSrc,
-            GST_TYPE_BASE_AUDIO_SRC, _do_init);
+GST_BOILERPLATE_FULL (GstJackAudioSink, gst_jack_audio_sink, GstBaseAudioSink,
+    GST_TYPE_BASE_AUDIO_SINK, _do_init);
 
-static void gst_jackaudiosrc_set_property (GObject * object, guint prop_id,
-        const GValue * value, GParamSpec * pspec);
-static void gst_jackaudiosrc_get_property (GObject * object, guint prop_id,
-        GValue * value, GParamSpec * pspec);
+static void gst_jack_audio_sink_set_property (GObject * object, guint prop_id,
+    const GValue * value, GParamSpec * pspec);
+static void gst_jack_audio_sink_get_property (GObject * object, guint prop_id,
+    GValue * value, GParamSpec * pspec);
 
-static GstCaps *gst_jackaudiosrc_getcaps(GstBaseSrc * bsrc);
-static GstRingBuffer *gst_jackaudiosrc_create_ringbuffer (GstBaseAudioSrc *src);
+static GstCaps *gst_jack_audio_sink_getcaps (GstBaseSink * bsink);
+static GstRingBuffer *gst_jack_audio_sink_create_ringbuffer (GstBaseAudioSink *
+    sink);
 
-/* GObject vmethod implementations */
-
-    static void
-gst_jackaudiosrc_base_init (gpointer gclass)
+static void
+gst_jack_audio_sink_base_init (gpointer g_class)
 {
-    static GstElementDetails gst_jackaudiosrc_details = {
-        "Audio Source (Jack)",
-        "Source/Audio",
-        "Input from Jack",
-        " <<tristan@sat.qc.ca>>"
-    };
-    GstElementClass *element_class = GST_ELEMENT_CLASS (gclass);
+  GstElementClass *element_class = GST_ELEMENT_CLASS (g_class);
 
-    gst_element_class_add_pad_template (element_class,
-            gst_static_pad_template_get (&src_factory));
-    gst_element_class_set_details (element_class, &gst_jackaudiosrc_details);
+  gst_element_class_set_details (element_class, &gst_jack_audio_sink_details);
+
+  gst_element_class_add_pad_template (element_class,
+      gst_static_pad_template_get (&jackaudiosink_sink_factory));
 }
 
-/* initialize the jackaudiosrc's class */
-    static void
-gst_jackaudiosrc_class_init (GstJackAudioSrcClass * klass)
+static void
+gst_jack_audio_sink_class_init (GstJackAudioSinkClass * klass)
 {
-    gst_jack_connect_get_type();
-    GObjectClass *gobject_class;
-    GstElementClass *gstelement_class;
-    GstBaseSrcClass *gstbasesrc_class;
-    GstBaseAudioSrcClass *gstbaseaudiosrc_class;
+  GObjectClass *gobject_class;
+  GstElementClass *gstelement_class;
+  GstBaseSinkClass *gstbasesink_class;
+  GstBaseAudioSinkClass *gstbaseaudiosink_class;
 
-    gobject_class = (GObjectClass *) klass;
-    gstelement_class = (GstElementClass *) klass;
+  gobject_class = (GObjectClass *) klass;
+  gstelement_class = (GstElementClass *) klass;
+  gstbasesink_class = (GstBaseSinkClass *) klass;
+  gstbaseaudiosink_class = (GstBaseAudioSinkClass *) klass;
 
-    gstbasesrc_class = (GstBaseSrcClass *) klass;
-    gstbaseaudiosrc_class = (GstBaseAudioSrcClass *) klass;
+  gobject_class->get_property =
+      GST_DEBUG_FUNCPTR (gst_jack_audio_sink_get_property);
+  gobject_class->set_property =
+      GST_DEBUG_FUNCPTR (gst_jack_audio_sink_set_property);
 
-    gobject_class->set_property = GST_DEBUG_FUNCPTR(gst_jackaudiosrc_set_property);
-    gobject_class->get_property = GST_DEBUG_FUNCPTR(gst_jackaudiosrc_get_property);
+  g_object_class_install_property (gobject_class, PROP_CONNECT,
+      g_param_spec_enum ("connect", "Connect",
+          "Specify how the output ports will be connected",
+          GST_TYPE_JACK_CONNECT, DEFAULT_PROP_CONNECT, G_PARAM_READWRITE));
 
-    g_object_class_install_property (gobject_class, PROP_CONNECT,
-            g_param_spec_enum ("connect", "Connect",
-                "Specify how the output ports will be connected",
-                gst_jack_connect_get_type()/*GST_TYPE_JACK_CONNECT*/, DEFAULT_PROP_CONNECT, G_PARAM_READWRITE));
+  g_object_class_install_property (gobject_class, PROP_SERVER,
+      g_param_spec_string ("server", "Server",
+          "The Jack server to connect to (NULL = default)",
+          DEFAULT_PROP_SERVER, G_PARAM_READWRITE));
 
-    g_object_class_install_property (gobject_class, PROP_SERVER,
-            g_param_spec_string ("server", "Server",
-                "The Jack server to connect to (NULL = default)",
-                DEFAULT_PROP_SERVER, G_PARAM_READWRITE));
-  
-    gstbasesrc_class->get_caps = GST_DEBUG_FUNCPTR (gst_jackaudiosrc_getcaps);
-  gstbaseaudiosrc_class->create_ringbuffer =
-      GST_DEBUG_FUNCPTR (gst_jackaudiosrc_create_ringbuffer);
+  gstbasesink_class->get_caps = GST_DEBUG_FUNCPTR (gst_jack_audio_sink_getcaps);
+
+  gstbaseaudiosink_class->create_ringbuffer =
+      GST_DEBUG_FUNCPTR (gst_jack_audio_sink_create_ringbuffer);
 
   /* ref class from a thread-safe context to work around missing bit of
    * thread-safety in GObject */
@@ -784,79 +774,78 @@ gst_jackaudiosrc_class_init (GstJackAudioSrcClass * klass)
   gst_jack_audio_client_init ();
 }
 
-/* initialize the new element
- * instantiate pads and add them to element
- * set pad calback functions
- * initialize instance structure
- */
-    static void
-gst_jackaudiosrc_init (GstJackAudioSrc * src,
-        GstJackAudioSrcClass * gclass)
+static void
+gst_jack_audio_sink_init (GstJackAudioSink * sink,
+    GstJackAudioSinkClass * g_class)
 {
-    src->connect = DEFAULT_PROP_CONNECT;
-    src->server = g_strdup(DEFAULT_PROP_SERVER);
-    src->ports = NULL;
-    src->port_count = 0;
+  sink->connect = DEFAULT_PROP_CONNECT;
+  sink->server = g_strdup (DEFAULT_PROP_SERVER);
+  sink->ports = NULL;
+  sink->port_count = 0;
 }
 
-    static void
-gst_jackaudiosrc_set_property (GObject * object, guint prop_id,
-        const GValue * value, GParamSpec * pspec)
+static void
+gst_jack_audio_sink_set_property (GObject * object, guint prop_id,
+    const GValue * value, GParamSpec * pspec)
 {
-    GstJackAudioSrc *src = GST_JACKAUDIOSRC (object);
+  GstJackAudioSink *sink;
 
-    switch (prop_id) {
-        case PROP_CONNECT:
-            src->connect = g_value_get_enum (value);
-            break;
-        case PROP_SERVER:
-            g_free(src->server);
-            src->server = g_value_dup_string(value);
-            break;
-        default:
-            G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-            break;
-    }
+  sink = GST_JACK_AUDIO_SINK (object);
+
+  switch (prop_id) {
+    case PROP_CONNECT:
+      sink->connect = g_value_get_enum (value);
+      break;
+    case PROP_SERVER:
+      g_free (sink->server);
+      sink->server = g_value_dup_string (value);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+  }
 }
 
-    static void
-gst_jackaudiosrc_get_property (GObject * object, guint prop_id,
-        GValue * value, GParamSpec * pspec)
+static void
+gst_jack_audio_sink_get_property (GObject * object, guint prop_id,
+    GValue * value, GParamSpec * pspec)
 {
-    GstJackAudioSrc *src = GST_JACKAUDIOSRC (object);
+  GstJackAudioSink *sink;
 
-    switch (prop_id) {
-        case PROP_CONNECT:
-            g_value_set_enum (value, src->connect);
-            break;
-        case PROP_SERVER:
-            g_value_set_string(value, src->server);
-            break;
-        default:
-            G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-            break;
-    }
+  sink = GST_JACK_AUDIO_SINK (object);
+
+  switch (prop_id) {
+    case PROP_CONNECT:
+      g_value_set_enum (value, sink->connect);
+      break;
+    case PROP_SERVER:
+      g_value_set_string (value, sink->server);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+  }
 }
 
 static GstCaps *
-gst_jackaudiosrc_getcaps (GstBaseSrc * bsrc)
+gst_jack_audio_sink_getcaps (GstBaseSink * bsink)
 {
-  GstJackAudioSrc *src = GST_JACKAUDIOSRC (bsrc);
+  GstJackAudioSink *sink = GST_JACK_AUDIO_SINK (bsink);
   const char **ports;
   gint min, max;
   gint rate;
   jack_client_t *client;
 
-  if (src->client == NULL)
+  if (sink->client == NULL)
     goto no_client;
 
-  client = gst_jack_audio_client_get_client (src->client);
+  client = gst_jack_audio_client_get_client (sink->client);
 
-  if (src->connect == GST_JACK_CONNECT_AUTO) {
+  if (sink->connect == GST_JACK_CONNECT_AUTO) {
     /* get a port count, this is the number of channels we can automatically
      * connect. */
     ports = jack_get_ports (client, NULL, NULL,
-        JackPortIsPhysical | JackPortIsOutput);
+        JackPortIsPhysical | JackPortIsInput);
     max = 0;
     if (ports != NULL) {
       for (; ports[max]; max++);
@@ -872,36 +861,35 @@ gst_jackaudiosrc_getcaps (GstBaseSrc * bsrc)
 
   rate = jack_get_sample_rate (client);
 
-  GST_DEBUG_OBJECT (src, "got %d-%d ports, samplerate: %d", min, max, rate);
+  GST_DEBUG_OBJECT (sink, "got %d-%d ports, samplerate: %d", min, max, rate);
 
-  if (!src->caps) {
-    src->caps = gst_caps_new_simple ("audio/x-raw-float",
+  if (!sink->caps) {
+    sink->caps = gst_caps_new_simple ("audio/x-raw-float",
         "endianness", G_TYPE_INT, G_BYTE_ORDER,
         "width", G_TYPE_INT, 32,
         "rate", G_TYPE_INT, rate,
         "channels", GST_TYPE_INT_RANGE, min, max, NULL);
   }
-  GST_INFO_OBJECT (src, "returning caps %" GST_PTR_FORMAT, src->caps);
+  GST_INFO_OBJECT (sink, "returning caps %" GST_PTR_FORMAT, sink->caps);
 
-  return gst_caps_ref (src->caps);
+  return gst_caps_ref (sink->caps);
 
   /* ERRORS */
 no_client:
   {
-    GST_DEBUG_OBJECT (src, "device not open, using template caps");
+    GST_DEBUG_OBJECT (sink, "device not open, using template caps");
     /* base class will get template caps for us when we return NULL */
     return NULL;
   }
 }
 
 static GstRingBuffer *
-gst_jackaudiosrc_create_ringbuffer (GstBaseAudioSrc * src)
+gst_jack_audio_sink_create_ringbuffer (GstBaseAudioSink * sink)
 {
   GstRingBuffer *buffer;
 
   buffer = g_object_new (GST_TYPE_JACK_RING_BUFFER, NULL);
-  GST_DEBUG_OBJECT (src, "created ringbuffer @%p", buffer);
+  GST_DEBUG_OBJECT (sink, "created ringbuffer @%p", buffer);
 
   return buffer;
 }
-

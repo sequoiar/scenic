@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-#include "gstjack.h"
+//#include "gstjack.h"
 
 
 static GstBinClass *parent_class = NULL;

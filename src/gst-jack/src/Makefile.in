@@ -55,7 +55,8 @@ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(plugindir)"
 pluginLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(plugin_LTLIBRARIES)
-libgstjack_la_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+libgstjack_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_libgstjack_la_OBJECTS = libgstjack_la-gstjack.lo \
 	libgstjack_la-gstjackaudiosrc.lo \
 	libgstjack_la-gstjackaudiosink.lo \
@@ -134,6 +135,8 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+JACK_CFLAGS = @JACK_CFLAGS@
+JACK_LIBS = @JACK_LIBS@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
