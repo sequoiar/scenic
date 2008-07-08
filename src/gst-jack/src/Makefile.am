@@ -14,7 +14,7 @@ plugin_LTLIBRARIES = libgstjack.la
 ##############################################################################
 
 # sources used to compile this plug-in
-libgstjack_la_SOURCES = gstjack.c gstjackaudiosrc.c gstjackaudioclient.c 
+libgstjack_la_SOURCES = gstjack.c gstjackaudiosrc.c gstjackaudiosink.c gstjackaudioclient.c
 
 # flags used to compile this plugin
 # add other _CFLAGS and _LIBS as needed
@@ -23,6 +23,6 @@ libgstjack_la_LIBADD = $(GST_PLUGINS_BASE_LIBS) -lgstaudio-$(GST_MAJORMINOR) $(J
 libgstjack_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
 
 # headers we need but don't want installed
-noinst_HEADERS = gstjackaudiosrc.h gstjackaudioclient.h
+noinst_HEADERS = gstjackaudiosrc.h gstjackaudiosink.h gstjackaudioclient.h gstjack.h
 
 

@@ -22,12 +22,16 @@
 #endif
 
 #include "gstjackaudiosrc.h"
+#include "gstjackaudiosink.h"
 
 static gboolean
 plugin_init (GstPlugin * plugin)
 {
   if (!gst_element_register (plugin, "jackaudiosrc", GST_RANK_PRIMARY,
           GST_TYPE_JACKAUDIOSRC))
+    return FALSE;
+  if (!gst_element_register (plugin, "jackaudiosink", GST_RANK_PRIMARY,
+          GST_TYPE_JACK_AUDIO_SINK))
     return FALSE;
 
   return TRUE;
@@ -40,8 +44,8 @@ plugin_init (GstPlugin * plugin)
 GST_PLUGIN_DEFINE (
         GST_VERSION_MAJOR,
         GST_VERSION_MINOR,
-        "jackaudiosrc",
-        "Template jackaudiosrc",
+        "jack",
+        "Jack elements",
         plugin_init,
         VERSION,
         "LGPL",

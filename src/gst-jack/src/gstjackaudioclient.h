@@ -36,10 +36,10 @@ typedef enum
 
 typedef struct _GstJackAudioClient GstJackAudioClient;
 
-void                  gst_jack_audio_client_init           (void);
+void gst_jack_audio_client_init(void);
 
 
-GstJackAudioClient *  gst_jack_audio_client_new            (const gchar *id, const gchar *server,
+GstJackAudioClient *  gst_jack_audio_client_new (const gchar *id, const gchar *server,
         GstJackClientType type,
         void (*shutdown) (void *arg),
         JackProcessCallback    process,
@@ -47,11 +47,12 @@ GstJackAudioClient *  gst_jack_audio_client_new            (const gchar *id, con
         JackSampleRateCallback sample_rate,
         gpointer user_data,
         jack_status_t *status);
-void                  gst_jack_audio_client_free           (GstJackAudioClient *client);
 
-jack_client_t *       gst_jack_audio_client_get_client     (GstJackAudioClient *client);
+void gst_jack_audio_client_free(GstJackAudioClient *client);
 
-gboolean              gst_jack_audio_client_set_active     (GstJackAudioClient *client, gboolean active);
+jack_client_t * gst_jack_audio_client_get_client(GstJackAudioClient *client);
+
+gboolean gst_jack_audio_client_set_active(GstJackAudioClient *client, gboolean active);
 
 G_END_DECLS
 
