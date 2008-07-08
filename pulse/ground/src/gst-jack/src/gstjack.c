@@ -21,8 +21,27 @@
 #include "config.h"
 #endif
 
+#include "gstjack.h"
 #include "gstjackaudiosrc.h"
 #include "gstjackaudiosink.h"
+
+GType
+gst_jack_connect_get_type()
+{
+  static GType jack_connect_type = 0;
+  static const GEnumValue jack_connect[] = {
+    {GST_JACK_CONNECT_NONE,
+        "Don't automatically connect ports to physical ports", "none"},
+    {GST_JACK_CONNECT_AUTO,
+        "Automatically connect ports to physical ports", "auto"},
+    {0, NULL, NULL},
+  };
+
+  if (!jack_connect_type) {
+    jack_connect_type = g_enum_register_static ("GstJackConnect", jack_connect);
+  }
+  return jack_connect_type;
+}
 
 
 static gboolean
