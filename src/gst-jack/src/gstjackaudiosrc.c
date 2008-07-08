@@ -2,7 +2,7 @@
  * GStreamer
  * Copyright (C) 2005 Thomas Vander Stichele <thomas@apestaart.org>
  * Copyright (C) 2005 Ronald S. Bultje <rbultje@ronald.bitfreak.net>
- * Copyright (C) 2008  <<user@hostname.org>>
+ * Copyright (C) 2008 Tristan Matthews <tristan@sat.qc.ca>
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -206,243 +206,243 @@ static
     void
 gst_jack_ring_buffer_class_init(GstJackRingBufferClass * klass)
 {
-  GObjectClass *gobject_class;
-  GstObjectClass *gstobject_class;
-  GstRingBufferClass *gstringbuffer_class;
+    GObjectClass *gobject_class;
+    GstObjectClass *gstobject_class;
+    GstRingBufferClass *gstringbuffer_class;
 
-  gobject_class = (GObjectClass *) klass;
-  gstobject_class = (GstObjectClass *) klass;
-  gstringbuffer_class = (GstRingBufferClass *) klass;
+    gobject_class = (GObjectClass *) klass;
+    gstobject_class = (GstObjectClass *) klass;
+    gstringbuffer_class = (GstRingBufferClass *) klass;
 
-  ring_parent_class = g_type_class_peek_parent(klass);
+    ring_parent_class = g_type_class_peek_parent(klass);
 
-  gobject_class->dispose = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_dispose);
-  gobject_class->finalize = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_finalize);
+    gobject_class->dispose = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_dispose);
+    gobject_class->finalize = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_finalize);
 
-  gstringbuffer_class->open_device =
-      GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_open_device);
-  gstringbuffer_class->close_device =
-      GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_close_device);
-  gstringbuffer_class->acquire =
-      GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_acquire);
-  gstringbuffer_class->release =
-      GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_release);
-  gstringbuffer_class->start = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_start);
-  gstringbuffer_class->pause = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_pause);
-  gstringbuffer_class->resume = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_start);
-  gstringbuffer_class->stop = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_stop);
+    gstringbuffer_class->open_device =
+        GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_open_device);
+    gstringbuffer_class->close_device =
+        GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_close_device);
+    gstringbuffer_class->acquire =
+        GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_acquire);
+    gstringbuffer_class->release =
+        GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_release);
+    gstringbuffer_class->start = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_start);
+    gstringbuffer_class->pause = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_pause);
+    gstringbuffer_class->resume = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_start);
+    gstringbuffer_class->stop = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_stop);
 
-  gstringbuffer_class->delay = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_delay);
+    gstringbuffer_class->delay = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_delay);
 }
 
 /* this is the callback of jack. This should RT-safe.
- */
+*/
 static 
     int
 jack_process_cb(jack_nframes_t nframes, void *arg)
 {
-  GstJackAudioSrc *src;
-  GstRingBuffer *buf;
-  GstJackRingBuffer *abuf;
-  gint readseg, len;
-  guint8 *readptr;
-  gint i, j, flen, channels;
-  sample_t **buffers, *data;
+    GstJackAudioSrc *src;
+    GstRingBuffer *buf;
+    GstJackRingBuffer *abuf;
+    gint readseg, len;
+    guint8 *readptr;
+    gint i, j, flen, channels;
+    sample_t **buffers, *data;
 
-  buf = GST_RING_BUFFER_CAST(arg);
-  abuf = GST_JACK_RING_BUFFER_CAST(arg);
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
+    buf = GST_RING_BUFFER_CAST(arg);
+    abuf = GST_JACK_RING_BUFFER_CAST(arg);
+    src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
 
-  channels = buf->spec.channels;
+    channels = buf->spec.channels;
 
-  /* alloc pointers to samples */
-  buffers = g_alloca(sizeof(sample_t *) * channels);
+    /* alloc pointers to samples */
+    buffers = g_alloca(sizeof(sample_t *) * channels);
 
-  /* get target buffers */
-  for (i = 0; i < channels; i++) 
-    buffers[i] = (sample_t *)jack_port_get_buffer(src->ports[i], nframes);
-
-  if (gst_ring_buffer_prepare_read(buf, &readseg, &readptr, &len)) {
-    flen = len / channels;
-
-    /* the number of samples must be exactly the segment size */
-    if (nframes * sizeof(sample_t) != flen)
-      goto wrong_size;
-
-    GST_DEBUG("copy %d frames: %p, %d bytes, %d channels", nframes, readptr,
-        flen, channels);
-    data = (sample_t *) readptr;
-
-    /* the samples in the ringbuffer have the channels interleaved, we need to
-     * deinterleave into the jack target buffers */
-    for (i = 0; i < nframes; i++) 
-      for (j = 0; j < channels; j++) 
-        buffers[j][i] = *data++;
-      
-    /* clear written samples in the ringbuffer */
-    gst_ring_buffer_clear(buf, readseg);
-
-    /* we wrote one segment */
-    gst_ring_buffer_advance(buf, 1);
-  } else {
-    /* We are not allowed to read from the ringbuffer, write silence to all
-     * jack output buffers */
+    /* get target buffers */
     for (i = 0; i < channels; i++) 
-      memset(buffers[i], 0, nframes * sizeof(sample_t));
-  }
-  return 0;
+        buffers[i] = (sample_t *)jack_port_get_buffer(src->ports[i], nframes);
 
-  /* ERRORS */
+    if (gst_ring_buffer_prepare_read(buf, &readseg, &readptr, &len)) {
+        flen = len / channels;
+
+        /* the number of samples must be exactly the segment size */
+        if (nframes * sizeof(sample_t) != flen)
+            goto wrong_size;
+
+        GST_DEBUG("copy %d frames: %p, %d bytes, %d channels", nframes, readptr,
+                flen, channels);
+        data = (sample_t *) readptr;
+
+        /* the samples in the ringbuffer have the channels interleaved, we need to
+         * deinterleave into the jack target buffers */
+        for (i = 0; i < nframes; i++) 
+            for (j = 0; j < channels; j++) 
+                buffers[j][i] = *data++;
+
+        /* clear written samples in the ringbuffer */
+        gst_ring_buffer_clear(buf, readseg);
+
+        /* we wrote one segment */
+        gst_ring_buffer_advance(buf, 1);
+    } else {
+        /* We are not allowed to read from the ringbuffer, write silence to all
+         * jack output buffers */
+        for (i = 0; i < channels; i++) 
+            memset(buffers[i], 0, nframes * sizeof(sample_t));
+    }
+    return 0;
+
+    /* ERRORS */
 wrong_size:
-  {
-    GST_ERROR_OBJECT(src, "nbytes (%d) != flen (%d)",
-        nframes * sizeof(sample_t), flen);
-    return 1;
-  }
+    {
+        GST_ERROR_OBJECT(src, "nbytes (%d) != flen (%d)",
+                nframes * sizeof(sample_t), flen);
+        return 1;
+    }
 }
 
 /* we error out */
-static int
+    static int
 jack_sample_rate_cb(jack_nframes_t nframes, void *arg)
 {
-  GstJackAudioSrc *src;
-  GstJackRingBuffer *abuf;
+    GstJackAudioSrc *src;
+    GstJackRingBuffer *abuf;
 
-  abuf = GST_JACK_RING_BUFFER_CAST(arg);
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(arg));
+    abuf = GST_JACK_RING_BUFFER_CAST(arg);
+    src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(arg));
 
-  if (abuf->sample_rate != -1 && abuf->sample_rate != nframes)
-    goto not_supported;
+    if (abuf->sample_rate != -1 && abuf->sample_rate != nframes)
+        goto not_supported;
 
-  return 0;
+    return 0;
 
-  /* ERRORS */
+    /* ERRORS */
 not_supported:
-  {
-    GST_ELEMENT_ERROR(src, RESOURCE, SETTINGS,
-        (NULL), ("Jack changed the sample rate, which is not supported"));
-    return 1;
-  }
+    {
+        GST_ELEMENT_ERROR(src, RESOURCE, SETTINGS,
+                (NULL), ("Jack changed the sample rate, which is not supported"));
+        return 1;
+    }
 }
 
 /* we error out */
-static int
+    static int
 jack_buffer_size_cb(jack_nframes_t nframes, void *arg)
 {
-  GstJackAudioSrc *src;
-  GstJackRingBuffer *abuf;
+    GstJackAudioSrc *src;
+    GstJackRingBuffer *abuf;
 
-  abuf = GST_JACK_RING_BUFFER_CAST(arg);
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(arg));
+    abuf = GST_JACK_RING_BUFFER_CAST(arg);
+    src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(arg));
 
-  if (abuf->buffer_size != -1 && abuf->buffer_size != nframes)
-    goto not_supported;
+    if (abuf->buffer_size != -1 && abuf->buffer_size != nframes)
+        goto not_supported;
 
-  return 0;
+    return 0;
 
-  /* ERRORS */
+    /* ERRORS */
 not_supported:
-  {
-    GST_ELEMENT_ERROR(src, RESOURCE, SETTINGS,
-        (NULL), ("Jack changed the buffer size, which is not supported"));
-    return 1;
-  }
+    {
+        GST_ELEMENT_ERROR(src, RESOURCE, SETTINGS,
+                (NULL), ("Jack changed the buffer size, which is not supported"));
+        return 1;
+    }
 }
 
-static void
+    static void
 jack_shutdown_cb(void *arg)
 {
-  GstJackAudioSrc *src;
+    GstJackAudioSrc *src;
 
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(arg));
+    src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(arg));
 
-  GST_DEBUG_OBJECT(src, "shutdown");
+    GST_DEBUG_OBJECT(src, "shutdown");
 
-  GST_ELEMENT_ERROR(src, RESOURCE, NOT_FOUND,
-      (NULL), ("Jack server shutdown"));
+    GST_ELEMENT_ERROR(src, RESOURCE, NOT_FOUND,
+            (NULL), ("Jack server shutdown"));
 }
 
-static void
+    static void
 gst_jack_ring_buffer_init(GstJackRingBuffer * buf,
-    GstJackRingBufferClass * g_class)
+        GstJackRingBufferClass * g_class)
 {
-  buf->channels = -1;
-  buf->buffer_size = -1;
-  buf->sample_rate = -1;
+    buf->channels = -1;
+    buf->buffer_size = -1;
+    buf->sample_rate = -1;
 }
 
-static void
+    static void
 gst_jack_ring_buffer_dispose(GObject * object)
 {
-  G_OBJECT_CLASS(ring_parent_class)->dispose(object);
+    G_OBJECT_CLASS(ring_parent_class)->dispose(object);
 }
 
-static void
+    static void
 gst_jack_ring_buffer_finalize(GObject * object)
 {
-  GstJackRingBuffer *ringbuffer;
-  ringbuffer = GST_JACK_RING_BUFFER_CAST(object);
-  G_OBJECT_CLASS(ring_parent_class)->finalize(object);
+    GstJackRingBuffer *ringbuffer;
+    ringbuffer = GST_JACK_RING_BUFFER_CAST(object);
+    G_OBJECT_CLASS(ring_parent_class)->finalize(object);
 }
 
 /* the _open_device method should make a connection with the server
- */
-static gboolean
+*/
+    static gboolean
 gst_jack_ring_buffer_open_device(GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
-  jack_status_t status = 0;
-  const gchar *name;
+    GstJackAudioSrc *src;
+    jack_status_t status = 0;
+    const gchar *name;
 
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
+    src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
 
-  GST_DEBUG_OBJECT(src, "open");
+    GST_DEBUG_OBJECT(src, "open");
 
-  name = g_get_application_name();
-  if (!name)
-    name = "GStreamer";
+    name = g_get_application_name();
+    if (!name)
+        name = "GStreamer";
 
-  src->client = gst_jack_audio_client_new(name, src->server,
-      GST_JACK_CLIENT_SOURCE,
-      jack_shutdown_cb,
-      jack_process_cb, jack_buffer_size_cb, jack_sample_rate_cb, buf, &status);
-  if (src->client == NULL)
-    goto could_not_open;
+    src->client = gst_jack_audio_client_new(name, src->server,
+            GST_JACK_CLIENT_SOURCE,
+            jack_shutdown_cb,
+            jack_process_cb, jack_buffer_size_cb, jack_sample_rate_cb, buf, &status);
+    if (src->client == NULL)
+        goto could_not_open;
 
-  GST_DEBUG_OBJECT(src, "opened");
+    GST_DEBUG_OBJECT(src, "opened");
 
-  return TRUE;
+    return TRUE;
 
-  /* ERRORS */
+    /* ERRORS */
 could_not_open:
-  {
-    if (status & JackServerFailed) {
-      GST_ELEMENT_ERROR(src, RESOURCE, NOT_FOUND,
-          (NULL), ("Cannot connect to the Jack server (status %d)", status));
-    } else {
-      GST_ELEMENT_ERROR(src, RESOURCE, OPEN_WRITE,
-          (NULL), ("Jack client open error (status %d)", status));
+    {
+        if (status & JackServerFailed) {
+            GST_ELEMENT_ERROR(src, RESOURCE, NOT_FOUND,
+                    (NULL), ("Cannot connect to the Jack server (status %d)", status));
+        } else {
+            GST_ELEMENT_ERROR(src, RESOURCE, OPEN_WRITE,
+                    (NULL), ("Jack client open error (status %d)", status));
+        }
+        return FALSE;
     }
-    return FALSE;
-  }
 }
 
 /* close the connection with the server
- */
-static gboolean
+*/
+    static gboolean
 gst_jack_ring_buffer_close_device(GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
+    GstJackAudioSrc *src;
 
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
+    src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
 
-  GST_DEBUG_OBJECT(src, "close");
+    GST_DEBUG_OBJECT(src, "close");
 
-  gst_jack_audio_src_free_channels(src);
-  gst_jack_audio_client_free(src->client);
-  src->client = NULL;
+    gst_jack_audio_src_free_channels(src);
+    gst_jack_audio_client_free(src->client);
+    src->client = NULL;
 
-  return TRUE;
+    return TRUE;
 }
 
 
@@ -460,205 +460,207 @@ gst_jack_ring_buffer_close_device(GstRingBuffer * buf)
 static gboolean
 gst_jack_ring_buffer_acquire(GstRingBuffer * buf, GstRingBufferSpec * spec)
 {
-  GstJackAudioSrc *src;
-  GstJackRingBuffer *abuf;
-  const char **ports;
-  gint sample_rate, buffer_size;
-  gint i, channels, res;
-  jack_client_t *client;
+    GstJackAudioSrc *src;
+    GstJackRingBuffer *abuf;
+    const char **ports;
+    gint sample_rate, buffer_size;
+    gint i, channels, res;
+    jack_client_t *client;
 
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
-  abuf = GST_JACK_RING_BUFFER_CAST(buf);
+    src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
+    abuf = GST_JACK_RING_BUFFER_CAST(buf);
 
-  GST_DEBUG_OBJECT(src, "acquire");
+    GST_DEBUG_OBJECT(src, "acquire");
 
-  client = gst_jack_audio_client_get_client(src->client);
+    client = gst_jack_audio_client_get_client(src->client);
 
-  /* sample rate must be that of the server */
-  sample_rate = jack_get_sample_rate(client);
-  if (sample_rate != spec->rate)
-    goto wrong_samplerate;
+    /* sample rate must be that of the server */
+    sample_rate = jack_get_sample_rate(client);
+    if (sample_rate != spec->rate)
+        goto wrong_samplerate;
 
-  channels = spec->channels;
+    channels = spec->channels;
 
-  if (!gst_jack_audio_src_allocate_channels(src, channels))
-    goto out_of_ports;
+    if (!gst_jack_audio_src_allocate_channels(src, channels))
+        goto out_of_ports;
 
-  buffer_size = jack_get_buffer_size(client);
+    buffer_size = jack_get_buffer_size(client);
 
-  /* the segment size in bytes, this is large enough to hold a buffer of 32bit floats
-   * for all channels  */
-  spec->segsize = buffer_size * sizeof(gfloat) * channels;
-  spec->latency_time = gst_util_uint64_scale(spec->segsize,
-      (GST_SECOND / GST_USECOND), spec->rate * spec->bytes_per_sample);
-  /* segtotal based on buffer-time latency */
-  spec->segtotal = spec->buffer_time / spec->latency_time;
+    /* the segment size in bytes, this is large enough to hold a buffer of 32bit floats
+     * for all channels  */
+    spec->segsize = buffer_size * sizeof(gfloat) * channels;
+    spec->latency_time = gst_util_uint64_scale(spec->segsize,
+            (GST_SECOND / GST_USECOND), spec->rate * spec->bytes_per_sample);
+    /* segtotal based on buffer-time latency */
+    spec->segtotal = spec->buffer_time / spec->latency_time;
 
-  GST_DEBUG_OBJECT(src, "segsize %d, segtotal %d", spec->segsize,
-      spec->segtotal);
+    GST_DEBUG_OBJECT(src, "segsize %d, segtotal %d", spec->segsize,
+            spec->segtotal);
 
-  /* allocate the ringbuffer memory now */
-  buf->data = gst_buffer_new_and_alloc(spec->segtotal * spec->segsize);
-  memset(GST_BUFFER_DATA(buf->data), 0, GST_BUFFER_SIZE(buf->data));
+    /* allocate the ringbuffer memory now */
+    buf->data = gst_buffer_new_and_alloc(spec->segtotal * spec->segsize);
+    memset(GST_BUFFER_DATA(buf->data), 0, GST_BUFFER_SIZE(buf->data));
 
-  if ((res = gst_jack_audio_client_set_active(src->client, TRUE)))
-    goto could_not_activate;
+    if ((res = gst_jack_audio_client_set_active(src->client, TRUE)))
+        goto could_not_activate;
 
-  /* if we need to automatically connect the ports, do so now. We must do this
-   * after activating the client. */
-  if (src->connect == GST_JACK_CONNECT_AUTO) {
-    /* find all the physical input ports. A physical input port is a port
-     * associated with a hardware device. Someone needs connect to a physical
-     * port in order to hear something. */
-    ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
-    if (ports == NULL) {
-      /* no ports? fine then we don't do anything except for posting a warning
-       * message. */
-      GST_ELEMENT_WARNING(src, RESOURCE, NOT_FOUND, (NULL),
-          ("No physical output ports found, leaving ports unconnected"));
-      goto done;
+    /* if we need to automatically connect the ports, do so now. We must do this
+     * after activating the client. */
+    if (src->connect == GST_JACK_CONNECT_AUTO) {
+        /* find all the physical input ports. A physical input port is a port
+         * associated with a hardware device. Someone needs connect to a physical
+         * port in order to hear something. */
+        ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
+        if (ports == NULL) {
+            /* no ports? fine then we don't do anything except for posting a warning
+             * message. */
+            GST_ELEMENT_WARNING(src, RESOURCE, NOT_FOUND, (NULL),
+                    ("No physical output ports found, leaving ports unconnected"));
+            goto done;
+        }
+
+        for (i = 0; i < channels; i++) 
+        {
+            /* stop when all output ports are exhausted */
+            if (ports[i] == NULL) {
+                /* post a warning that we could not connect all ports */
+                GST_ELEMENT_WARNING(src, RESOURCE, NOT_FOUND, (NULL),
+                        ("No more physical ports, leaving some ports unconnected"));
+                break;
+            }
+            GST_DEBUG_OBJECT(src, "try connecting to %s",
+                    jack_port_name(src->ports[i]));
+            /* connect the physical port to a port */
+            
+            res = jack_connect(client, ports[i], jack_port_name(src->ports[i]));
+            g_print("connecting to %s\n", jack_port_name(src->ports[i]));
+            if (res != 0 && res != EEXIST)
+                goto cannot_connect;
+        }
+        free(ports);
     }
-
-    for (i = 0; i < channels; i++) 
-    {
-      /* stop when all output ports are exhausted */
-      if (ports[i] == NULL) {
-        /* post a warning that we could not connect all ports */
-        GST_ELEMENT_WARNING(src, RESOURCE, NOT_FOUND, (NULL),
-            ("No more physical ports, leaving some ports unconnected"));
-        break;
-      }
-      GST_DEBUG_OBJECT(src, "try connecting to %s",
-          jack_port_name(src->ports[i]));
-      /* connect the port to a physical port */
-      res = jack_connect(client, jack_port_name(src->ports[i]), ports[i]);
-      if (res != 0 && res != EEXIST)
-        goto cannot_connect;
-    }
-    free(ports);
-  }
 done:
 
-  abuf->sample_rate = sample_rate;
-  abuf->buffer_size = buffer_size;
-  abuf->channels = spec->channels;
+    abuf->sample_rate = sample_rate;
+    abuf->buffer_size = buffer_size;
+    abuf->channels = spec->channels;
 
-  return TRUE;
+    return TRUE;
 
-  /* ERRORS */
+    /* ERRORS */
 wrong_samplerate:
-  {
-    GST_ELEMENT_ERROR(src, RESOURCE, SETTINGS, (NULL),
-        ("Wrong samplerate, server is running at %d and we received %d",
-            sample_rate, spec->rate));
-    return FALSE;
-  }
+    {
+        GST_ELEMENT_ERROR(src, RESOURCE, SETTINGS, (NULL),
+                ("Wrong samplerate, server is running at %d and we received %d",
+                 sample_rate, spec->rate));
+        return FALSE;
+    }
 out_of_ports:
-  {
-    GST_ELEMENT_ERROR(src, RESOURCE, SETTINGS, (NULL),
-        ("Cannot allocate more Jack ports"));
-    return FALSE;
-  }
+    {
+        GST_ELEMENT_ERROR(src, RESOURCE, SETTINGS, (NULL),
+                ("Cannot allocate more Jack ports"));
+        return FALSE;
+    }
 could_not_activate:
-  {
-    GST_ELEMENT_ERROR(src, RESOURCE, SETTINGS, (NULL),
-        ("Could not activate client (%d:%s)", res, g_strerror(res)));
-    return FALSE;
-  }
+    {
+        GST_ELEMENT_ERROR(src, RESOURCE, SETTINGS, (NULL),
+                ("Could not activate client (%d:%s)", res, g_strerror(res)));
+        return FALSE;
+    }
 cannot_connect:
-  {
-    GST_ELEMENT_ERROR(src, RESOURCE, SETTINGS, (NULL),
-        ("Could not connect input ports to physical ports (%d:%s)",
-            res, g_strerror(res)));
-    free(ports);
-    return FALSE;
-  }
+    {
+        GST_ELEMENT_ERROR(src, RESOURCE, SETTINGS, (NULL),
+                ("Could not connect input ports to physical ports (%d:%s)",
+                 res, g_strerror(res)));
+        free(ports);
+        return FALSE;
+    }
 }
 
 /* function is called with LOCK */
-static gboolean
+    static gboolean
 gst_jack_ring_buffer_release(GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
-  GstJackRingBuffer *abuf;
-  gint res;
+    GstJackAudioSrc *src;
+    GstJackRingBuffer *abuf;
+    gint res;
 
-  abuf = GST_JACK_RING_BUFFER_CAST(buf);
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
+    abuf = GST_JACK_RING_BUFFER_CAST(buf);
+    src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
 
-  GST_DEBUG_OBJECT(src, "release");
+    GST_DEBUG_OBJECT(src, "release");
 
-  if ((res = gst_jack_audio_client_set_active(src->client, FALSE))) {
-    /* we only warn, this means the server is probably shut down and the client
-     * is gone anyway. */
-    GST_ELEMENT_WARNING(src, RESOURCE, CLOSE, (NULL),
-        ("Could not deactivate Jack client (%d)", res));
-  }
+    if ((res = gst_jack_audio_client_set_active(src->client, FALSE))) {
+        /* we only warn, this means the server is probably shut down and the client
+         * is gone anyway. */
+        GST_ELEMENT_WARNING(src, RESOURCE, CLOSE, (NULL),
+                ("Could not deactivate Jack client (%d)", res));
+    }
 
-  abuf->channels = -1;
-  abuf->buffer_size = -1;
-  abuf->sample_rate = -1;
+    abuf->channels = -1;
+    abuf->buffer_size = -1;
+    abuf->sample_rate = -1;
 
-  /* free the buffer */
-  gst_buffer_unref(buf->data);
-  buf->data = NULL;
+    /* free the buffer */
+    gst_buffer_unref(buf->data);
+    buf->data = NULL;
 
-  return TRUE;
+    return TRUE;
 }
 
-static gboolean
+    static gboolean
 gst_jack_ring_buffer_start(GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
+    GstJackAudioSrc *src;
 
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
+    src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
 
-  GST_DEBUG_OBJECT(src, "start");
+    GST_DEBUG_OBJECT(src, "start");
 
-  return TRUE;
+    return TRUE;
 }
 
-static gboolean
+    static gboolean
 gst_jack_ring_buffer_pause(GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
+    GstJackAudioSrc *src;
 
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
+    src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
 
-  GST_DEBUG_OBJECT(src, "pause");
+    GST_DEBUG_OBJECT(src, "pause");
 
-  return TRUE;
+    return TRUE;
 }
 
-static gboolean
+    static gboolean
 gst_jack_ring_buffer_stop(GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
+    GstJackAudioSrc *src;
 
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
+    src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
 
-  GST_DEBUG_OBJECT(src, "stop");
+    GST_DEBUG_OBJECT(src, "stop");
 
-  return TRUE;
+    return TRUE;
 }
 
-static guint
+    static guint
 gst_jack_ring_buffer_delay(GstRingBuffer * buf)
 {
-  GstJackAudioSrc *src;
-  guint res = 0;
+    GstJackAudioSrc *src;
+    guint res = 0;
 
-  src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
+    src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
 
-  GST_DEBUG_OBJECT(src, "delay %u", res);
+    GST_DEBUG_OBJECT(src, "delay %u", res);
 
-  return res;
+    return res;
 }
 
 /* Audiosrc signals and args */
 enum
 {
-  /* FILL ME */
+    /* FILL ME */
     LAST_SIGNAL
 };
 
@@ -667,10 +669,10 @@ enum
 
 enum
 {
-  PROP_0,
-  PROP_CONNECT,
-  PROP_SERVER,
-  PROP_LAST
+    PROP_0,
+    PROP_CONNECT,
+    PROP_SERVER,
+    PROP_LAST
 };
 
 
@@ -873,7 +875,7 @@ no_client:
 }
 
 static 
-GstRingBuffer *
+    GstRingBuffer *
 gst_jackaudiosrc_create_ringbuffer(GstBaseAudioSrc * src)
 {
     GstRingBuffer *buffer;
