@@ -52,6 +52,7 @@
 #include <gst/audio/gstaudiosrc.h>
 
 #include "gstjackaudioclient.h"
+#include "gstjack.h"
 
 G_BEGIN_DECLS
 
@@ -70,6 +71,7 @@ G_BEGIN_DECLS
 typedef struct _GstJackAudioSrc      GstJackAudioSrc;
 typedef struct _GstJackAudioSrcClass GstJackAudioSrcClass;
 
+#if 0
 /**
  * GstJackConnect:
  * @GST_JACK_CONNECT_NONE: Don't automatically connect to physical ports.
@@ -86,6 +88,7 @@ typedef enum {
   GST_JACK_CONNECT_NONE,
   GST_JACK_CONNECT_AUTO
 } GstJackConnect;
+#endif
 
 struct _GstJackAudioSrc
 {

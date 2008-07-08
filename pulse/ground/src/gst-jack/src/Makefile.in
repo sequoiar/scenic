@@ -58,6 +58,7 @@ LTLIBRARIES = $(plugin_LTLIBRARIES)
 libgstjack_la_DEPENDENCIES =
 am_libgstjack_la_OBJECTS = libgstjack_la-gstjack.lo \
 	libgstjack_la-gstjackaudiosrc.lo \
+	libgstjack_la-gstjackaudiosink.lo \
 	libgstjack_la-gstjackaudioclient.lo
 libgstjack_la_OBJECTS = $(am_libgstjack_la_OBJECTS)
 libgstjack_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -225,7 +226,7 @@ plugin_LTLIBRARIES = libgstjack.la
 ##############################################################################
 
 # sources used to compile this plug-in
-libgstjack_la_SOURCES = gstjack.c gstjackaudiosrc.c gstjackaudioclient.c 
+libgstjack_la_SOURCES = gstjack.c gstjackaudiosrc.c gstjackaudiosink.c gstjackaudioclient.c
 
 # flags used to compile this plugin
 # add other _CFLAGS and _LIBS as needed
@@ -234,7 +235,7 @@ libgstjack_la_LIBADD = $(GST_PLUGINS_BASE_LIBS) -lgstaudio-$(GST_MAJORMINOR) $(J
 libgstjack_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
 
 # headers we need but don't want installed
-noinst_HEADERS = gstjackaudiosrc.h gstjackaudioclient.h
+noinst_HEADERS = gstjackaudiosrc.h gstjackaudiosink.h gstjackaudioclient.h gstjack.h
 all: all-am
 
 .SUFFIXES:
@@ -306,6 +307,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstjack_la-gstjack.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstjack_la-gstjackaudioclient.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstjack_la-gstjackaudiosink.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstjack_la-gstjackaudiosrc.Plo@am__quote@
 
 .c.o:
@@ -342,6 +344,13 @@ libgstjack_la-gstjackaudiosrc.lo: gstjackaudiosrc.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gstjackaudiosrc.c' object='libgstjack_la-gstjackaudiosrc.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstjack_la_CFLAGS) $(CFLAGS) -c -o libgstjack_la-gstjackaudiosrc.lo `test -f 'gstjackaudiosrc.c' || echo '$(srcdir)/'`gstjackaudiosrc.c
+
+libgstjack_la-gstjackaudiosink.lo: gstjackaudiosink.c
+@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstjack_la_CFLAGS) $(CFLAGS) -MT libgstjack_la-gstjackaudiosink.lo -MD -MP -MF $(DEPDIR)/libgstjack_la-gstjackaudiosink.Tpo -c -o libgstjack_la-gstjackaudiosink.lo `test -f 'gstjackaudiosink.c' || echo '$(srcdir)/'`gstjackaudiosink.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libgstjack_la-gstjackaudiosink.Tpo $(DEPDIR)/libgstjack_la-gstjackaudiosink.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gstjackaudiosink.c' object='libgstjack_la-gstjackaudiosink.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstjack_la_CFLAGS) $(CFLAGS) -c -o libgstjack_la-gstjackaudiosink.lo `test -f 'gstjackaudiosink.c' || echo '$(srcdir)/'`gstjackaudiosink.c
 
 libgstjack_la-gstjackaudioclient.lo: gstjackaudioclient.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstjack_la_CFLAGS) $(CFLAGS) -MT libgstjack_la-gstjackaudioclient.lo -MD -MP -MF $(DEPDIR)/libgstjack_la-gstjackaudioclient.Tpo -c -o libgstjack_la-gstjackaudioclient.lo `test -f 'gstjackaudioclient.c' || echo '$(srcdir)/'`gstjackaudioclient.c
