@@ -135,7 +135,7 @@ void AudioFileSource::init()
 
 	pipeline_.add_vector(decoders_);
 
-	// FIXME: location should be changeable
+	// FIXME: location should be changeable somewhere else
 	int counter = 1;
 	for (src = sources_.begin(); src != sources_.end(); ++src)
 	{
