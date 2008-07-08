@@ -1,6 +1,6 @@
 // headerGPL.c
-// Copyright 2008 Koya Charles & Tristan Matthews
-//
+// Copyright 2008 Koya Charles & Tristan Matthews 
+//     
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -17,35 +17,58 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file
- *      Just the License GPL 3+
+/** \file 
+ *      Just the License GPL 3+ 
  *
  *      Detailed description here.
  *      Continues here.
  *      And more.
  *      And more.
  */
-#include "config.h"
-#include "optionArgs.h"
+
+
+#include <glib.h>
+#include <iostream>
+#include "gutil/baseModule.h"
 #include "logWriter.h"
+#include "gutil/optionArgs.h"
 
-int main (int argc, char **argv)
+class DModule : public BaseModule
 {
-	int result = 0;
-	char* str = 0;
-	bool b = false;
-	OptionArgs options;
+	bool pass;
+public:
+	bool run();
+	void init(OptionArgs &);
+};
 
-	options.add(&b,"flag", 'f', "Set f") ;
-	options.add(&result,"try", 't', "try it out", "pass an int") ;
-	options.add( &str,"str", 's',"try it out", "pass a string") ;
-	options.parse(argc,argv);
+void DModule::init(OptionArgs &args)
+{
+	pass = false;
+	args.add(&pass,"pass",'p',"bypass this module");
 
-	LOG(b);
-	LOG(result);
-	LOG(str);
+}
+
+bool DModule::run()
+{
+	if(!pass)
+		while(1){ LOG("x "); }
+
+    return true;
+}
+
+int main (int argc, char** argv)
+{
+	DModule m;
+	OptionArgs opts;
+
+	m.init(opts);
+	if(!opts.parse(argc,argv))
+		return 1;
+
+	m.run();
 	return 0;
 }
+
 
 
 

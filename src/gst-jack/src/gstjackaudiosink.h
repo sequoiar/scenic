@@ -55,37 +55,37 @@ typedef struct _GstJackAudioSinkClass GstJackAudioSinkClass;
  */
 #if 0
 typedef enum {
-  GST_JACK_CONNECT_NONE,
-  GST_JACK_CONNECT_AUTO
+	GST_JACK_CONNECT_NONE,
+	GST_JACK_CONNECT_AUTO
 } GstJackConnect;
 #endif
 
 /**
  * GstJackAudioSink:
- * 
+ *
  * Opaque #GstJackAudioSink.
  */
 struct _GstJackAudioSink {
-  GstBaseAudioSink element;
+	GstBaseAudioSink element;
 
-  /*< private >*/
-  /* cached caps */
-  GstCaps         *caps;
+	/*< private >*/
+	/* cached caps */
+	GstCaps         *caps;
 
-  /* properties */
-  GstJackConnect   connect;
-  gchar           *server;
+	/* properties */
+	GstJackConnect connect;
+	gchar           *server;
 
-  /* our client */
-  GstJackAudioClient *client;
+	/* our client */
+	GstJackAudioClient *client;
 
-  /* our ports */
-  jack_port_t    **ports;
-  int              port_count;
+	/* our ports */
+	jack_port_t    **ports;
+	int port_count;
 };
 
 struct _GstJackAudioSinkClass {
-  GstBaseAudioSinkClass parent_class;
+	GstBaseAudioSinkClass parent_class;
 };
 
 GType gst_jack_audio_sink_get_type ();

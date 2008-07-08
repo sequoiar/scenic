@@ -90,8 +90,6 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/sdp/Makefile
                  src/sdp/test/Makefile
-                 src/args/Makefile
-                 src/args/test/Makefile
                  src/gst/Makefile
                  src/gst/test/Makefile
                  src/sip/Makefile
@@ -100,6 +98,7 @@ AC_CONFIG_FILES([Makefile
                  src/gutil/test/Makefile
                  src/osc/Makefile
                  src/osc/test/Makefile
+                 src/main/Makefile
                  src/hello/Makefile
                  src/hello/test/Makefile
                  src/pyInterpreter/Makefile
