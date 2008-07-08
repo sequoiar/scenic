@@ -56,6 +56,9 @@ PKG_CHECK_MODULES(GST, \
   gstreamer-$GST_MAJORMINOR >= $GST_REQUIRED,
   HAVE_GST=yes,HAVE_GST=no)
 
+dnl *** Jack ***
+PKG_CHECK_MODULES(JACK, jack >= 0.99.10, HAVE_JACK="yes", HAVE_JACK="no")
+
 dnl Give error and exit if we don't have gstreamer
 if test "x$HAVE_GST" = "xno"; then
   AC_MSG_ERROR(you need gstreamer development packages installed !)
