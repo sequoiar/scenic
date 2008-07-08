@@ -1,6 +1,6 @@
 // headerGPL.c
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -17,8 +17,8 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file 
- *      Just the License GPL 3+ 
+/** \file
+ *      Just the License GPL 3+
  *
  *      Detailed description here.
  *      Continues here.
@@ -35,10 +35,15 @@ class BaseModule
 {
 public:
 
-	virtual void init(OptionArgs &){} 
-	virtual void init_args(int argc,char** argv){}
-	virtual bool run(){return 1;}
-	virtual ~BaseModule(){}
+	virtual void init(OptionArgs &){
+	}
+	virtual void init_args(int argc,char** argv){
+	}
+	virtual bool run(){
+		return 1;
+	}
+	virtual ~BaseModule(){
+	}
 };
 
 #endif

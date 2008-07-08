@@ -1,5 +1,5 @@
 /* GTHREAD-QUEUE-PAIR - Library of Thread Queue Routines for GLIB
- * Copyright 2008  Koya Charles & Tristan Matthews 
+ * Copyright 2008  Koya Charles & Tristan Matthews
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,8 +27,8 @@ class DModule : public BaseModule
 {
 	bool pass;
 public:
-bool run();
-void init(OptionArgs &);
+	bool run();
+	void init(OptionArgs &);
 };
 
 void DModule::init(OptionArgs &args)
@@ -41,11 +41,11 @@ void DModule::init(OptionArgs &args)
 bool DModule::run()
 {
 	if(!pass)
-	while(1){ LOG("x ");	}
+		while(1){ LOG("x "); }
 }
 
-int main (int argc, char** argv) 
-{ 
+int main (int argc, char** argv)
+{
 	DModule m;
 	OptionArgs opts;
 
@@ -54,7 +54,7 @@ int main (int argc, char** argv)
 		return 1;
 
 	m.run();
-return 0;
+	return 0;
 }
 
 

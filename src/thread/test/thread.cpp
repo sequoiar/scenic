@@ -1,5 +1,5 @@
 /* GTHREAD-QUEUE-PAIR - Library of Thread Queue Routines for GLIB
- * Copyright 2008  Koya Charles & Tristan Matthews 
+ * Copyright 2008  Koya Charles & Tristan Matthews
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,56 +26,55 @@ typedef QueuePair_<BaseMessage> QueuePair;
 
 class Thread : public BaseThread<BaseMessage>
 {
-    int main();
+	int main();
 };
 
 int Thread::main()
 {
 	BaseMessage r(BaseMessage::ping);
-    int count=0;
-    while(1) 
-    { 
-        BaseMessage f = queue.copy_timed_pop(1);
+	int count=0;
+	while(1)
+	{
+		BaseMessage f = queue.copy_timed_pop(1);
 		queue.push(r);
-		if(count++ == 10000) 
-		{
-			BaseMessage f(BaseMessage::quit);			
+		if(count++ == 10000) {
+			BaseMessage f(BaseMessage::quit);
 			queue.push(f);
-    	    break;
+			break;
 		}
-    }
-return 0; 
+	}
+	return 0;
 }
 
 
-int main (int argc, char** argv) 
-{ 
-    Thread t;
-	
+int main (int argc, char** argv)
+{
+	Thread t;
 
-    QueuePair queue = t.getQueue("");
-    QueuePair queue2 = t.getQueue("a");
-    if(!t.run())
-        return -1;
-    
-    while(1)
-    {
-    	BaseMessage f(BaseMessage::ok);                                   
+
+	QueuePair queue = t.getQueue("");
+	QueuePair queue2 = t.getQueue("a");
+	if(!t.run())
+		return -1;
+
+	while(1)
+	{
+		BaseMessage f(BaseMessage::ok);
 		queue.push(f);
 		f = queue.copy_timed_pop(1);
 		BaseMessage f2 = queue2.copy_timed_pop(1);
-		
-		if(f.get_type() == BaseMessage::quit){
+
+		if(f.get_type() == BaseMessage::quit) {
 			break;
 		}
 
-		
-		
+
+
 	}
 
-    std::cout << "Done!" << std::endl;
+	std::cout << "Done!" << std::endl;
 
-return 0;
+	return 0;
 }
 
 

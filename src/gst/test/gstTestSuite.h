@@ -68,8 +68,8 @@ public:
 		TEST_ADD(GstTestSuite::start_stop_1ch_audiotest)
 		TEST_ADD(GstTestSuite::start_2ch_audiotest)
 		TEST_ADD(GstTestSuite::stop_2ch_audiotest)
-		TEST_ADD(GstTestSuite::start_stop_2ch_audiotest) 
-        TEST_ADD(GstTestSuite::start_6ch_audiotest);
+		TEST_ADD(GstTestSuite::start_stop_2ch_audiotest)
+		TEST_ADD(GstTestSuite::start_6ch_audiotest);
 		TEST_ADD(GstTestSuite::stop_6ch_audiotest)
 		TEST_ADD(GstTestSuite::start_stop_6ch_audiotest)
 		TEST_ADD(GstTestSuite::start_8ch_audiotest)

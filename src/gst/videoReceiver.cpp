@@ -81,7 +81,7 @@ bool VideoReceiver::start()
 
 bool VideoReceiver::stop()
 {
-    MediaBase::stop();
-    // FIXME: ADD CODE tell sender to stop to avoid crash when going from DV to v4l
-    return true;
+	MediaBase::stop();
+	// FIXME: ADD CODE tell sender to stop to avoid crash when going from DV to v4l
+	return true;
 }
