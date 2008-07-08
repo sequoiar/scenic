@@ -29,6 +29,7 @@
 
 #include <glib.h>
 #include <iostream>
+#include <unistd.h>
 #include "gutil/baseModule.h"
 #include "logWriter.h"
 #include "gutil/optionArgs.h"
@@ -51,7 +52,7 @@ void DModule::init(OptionArgs &args)
 bool DModule::run()
 {
 	if(!pass)
-		while(1){ LOG("x "); }
+		while(1){ usleep(100000);LOG("x "); }
 
 	return true;
 }

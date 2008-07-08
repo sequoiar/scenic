@@ -21,13 +21,27 @@
 #include <iostream>
 #include "baseThread.h"
 #include "baseMessage.h"
+#include "optionArgs.h"
+#include "logWriter.h"
 
 typedef QueuePair_<BaseMessage> QueuePair;
 
 class Thread : public BaseThread<BaseMessage>
 {
 	int main();
+    int max_count;
+public:
+    void init(OptionArgs &);
+
 };
+
+    
+void Thread::init(OptionArgs &args)
+{
+   max_count = 1000;
+   args.add(&max_count,"count",'c',"count it", "number of messages");
+
+}
 
 int Thread::main()
 {
@@ -37,7 +51,8 @@ int Thread::main()
 	{
 		BaseMessage f = queue.copy_timed_pop(1);
 		queue.push(r);
-		if(count++ == 10000) {
+        LOG(" here ");
+		if(count++ == max_count) {
 			BaseMessage f(BaseMessage::quit);
 			queue.push(f);
 			break;
@@ -50,7 +65,11 @@ int Thread::main()
 int main (int argc, char** argv)
 {
 	Thread t;
+    OptionArgs opts;
 
+    t.init(opts);
+    if(!opts.parse(argc,argv))
+        return 1;
 
 	QueuePair queue = t.getQueue("");
 	QueuePair queue2 = t.getQueue("a");
