@@ -19,9 +19,9 @@
 
 #include <glib.h>
 #include <iostream>
-#include "baseModule.h"
+#include "gutil/baseModule.h"
 #include "logWriter.h"
-#include "args/optionArgs.h"
+#include "gutil/optionArgs.h"
 
 class DModule : public BaseModule
 {
