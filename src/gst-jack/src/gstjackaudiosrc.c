@@ -675,7 +675,6 @@ enum
 };
 
 
-#if 0
 #define GST_TYPE_JACK_CONNECT (gst_jack_connect_get_type())
 static GType
 gst_jack_connect_get_type (void)
@@ -694,7 +693,6 @@ gst_jack_connect_get_type (void)
   }
   return jack_connect_type;
 }
-#endif
 
 
 /* the capabilities of the inputs and outputs.
@@ -748,7 +746,6 @@ gst_jackaudiosrc_base_init (gpointer gclass)
     static void
 gst_jackaudiosrc_class_init (GstJackAudioSrcClass * klass)
 {
-    gst_jack_connect_get_type();
     GObjectClass *gobject_class;
     GstElementClass *gstelement_class;
     GstBaseSrcClass *gstbasesrc_class;
@@ -766,7 +763,7 @@ gst_jackaudiosrc_class_init (GstJackAudioSrcClass * klass)
     g_object_class_install_property (gobject_class, PROP_CONNECT,
             g_param_spec_enum ("connect", "Connect",
                 "Specify how the output ports will be connected",
-                gst_jack_connect_get_type()/*GST_TYPE_JACK_CONNECT*/, DEFAULT_PROP_CONNECT, G_PARAM_READWRITE));
+                GST_TYPE_JACK_CONNECT, DEFAULT_PROP_CONNECT, G_PARAM_READWRITE));
 
     g_object_class_install_property (gobject_class, PROP_SERVER,
             g_param_spec_string ("server", "Server",
