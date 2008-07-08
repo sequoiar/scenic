@@ -29,7 +29,7 @@
 #ifndef __OSC_THREAD_H__
 #define __OSC_THREAD_H__
 
-#include "thread/baseThread.h"
+#include "gutil/baseThread.h"
 #include <lo/lo.h>
 #include <string>
 #include <vector>

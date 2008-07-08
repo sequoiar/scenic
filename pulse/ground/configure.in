@@ -96,11 +96,12 @@ AC_CONFIG_FILES([Makefile
                  src/gst/test/Makefile
                  src/sip/Makefile
                  src/sip/test/Makefile
-                 src/thread/Makefile
-                 src/thread/test/Makefile
+                 src/gutil/Makefile
+                 src/gutil/test/Makefile
                  src/osc/Makefile
                  src/osc/test/Makefile
                  src/hello/Makefile
+                 src/hello/test/Makefile
                  src/pyInterpreter/Makefile
                  ])
 AC_OUTPUT

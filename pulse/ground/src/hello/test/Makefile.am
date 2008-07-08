@@ -5,5 +5,5 @@ bin_PROGRAMS = helloTester
 
 helloTester_SOURCES = test.cpp
 
-LDADD = -L../.. $(GLIB_LIBS) ../libhello.a $(proj_src)/args/libArgs.a
+LDADD = -L../.. $(GLIB_LIBS) ../libhello.a $(proj_src)/gutil/libGUtil.a
 AM_CPPFLAGS= $(GLIB_CFLAGS) -I..
