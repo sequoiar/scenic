@@ -690,8 +690,9 @@ enum
 };
 
 #define GST_TYPE_JACK_CONNECT (gst_jack_connect_get_type())
-static GType
-gst_jack_connect_get_type (void)
+GType
+gst_jack_connect_get_type();
+#if 0
 {
   static GType jack_connect_type = 0;
   static const GEnumValue jack_connect[] = {
@@ -707,6 +708,7 @@ gst_jack_connect_get_type (void)
   }
   return jack_connect_type;
 }
+#endif
 
 #define _do_init(bla) \
     GST_DEBUG_CATEGORY_INIT (gst_jack_audio_sink_debug, "jacksink", 0, "jacksink element");

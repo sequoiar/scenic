@@ -676,23 +676,25 @@ enum
 
 
 #define GST_TYPE_JACK_CONNECT (gst_jack_connect_get_type())
-static GType
-gst_jack_connect_get_type (void)
+GType
+gst_jack_connect_get_type();
+#if 0
 {
-  static GType jack_connect_type = 0;
-  static const GEnumValue jack_connect[] = {
-    {GST_JACK_CONNECT_NONE,
-        "Don't automatically connect ports to physical ports", "none"},
-    {GST_JACK_CONNECT_AUTO,
-        "Automatically connect ports to physical ports", "auto"},
-    {0, NULL, NULL},
-  };
+    static GType jack_connect_type = 0;
+    static const GEnumValue jack_connect[] = {
+        {GST_JACK_CONNECT_NONE,
+            "Don't automatically connect ports to physical ports", "none"},
+        {GST_JACK_CONNECT_AUTO,
+            "Automatically connect ports to physical ports", "auto"},
+        {0, NULL, NULL},
+    };
 
-  if (!jack_connect_type) {
-    jack_connect_type = g_enum_register_static ("GstJackConnect", jack_connect);
-  }
-  return jack_connect_type;
+    if (!jack_connect_type) {
+        jack_connect_type = g_enum_register_static ("GstJackConnect", jack_connect);
+    }
+    return jack_connect_type;
 }
+#endif
 
 
 /* the capabilities of the inputs and outputs.
@@ -701,20 +703,20 @@ gst_jack_connect_get_type (void)
  */
 
 static GstStaticPadTemplate src_factory = 
-    GST_STATIC_PAD_TEMPLATE ("src",
-    GST_PAD_SRC,
-    GST_PAD_ALWAYS,
-    GST_STATIC_CAPS ("audio/x-raw-float, "
-        "endianness = (int) { " G_STRINGIFY (G_BYTE_ORDER) " }, "
-        "width = (int) 32, "
-        "rate = (int) [ 1, MAX ], " "channels = (int) [ 1, MAX ]")
-    );
+GST_STATIC_PAD_TEMPLATE ("src",
+        GST_PAD_SRC,
+        GST_PAD_ALWAYS,
+        GST_STATIC_CAPS ("audio/x-raw-float, "
+            "endianness = (int) { " G_STRINGIFY (G_BYTE_ORDER) " }, "
+            "width = (int) 32, "
+            "rate = (int) [ 1, MAX ], " "channels = (int) [ 1, MAX ]")
+        );
 
 #define _do_init(bla) \
-        GST_DEBUG_CATEGORY_INIT (gst_jackaudiosrc_debug, "jacksrc", 0, "jacksrc element");
+    GST_DEBUG_CATEGORY_INIT (gst_jackaudiosrc_debug, "jacksrc", 0, "jacksrc element");
 
-    GST_BOILERPLATE_FULL (GstJackAudioSrc, gst_jackaudiosrc, GstBaseAudioSrc,
-            GST_TYPE_BASE_AUDIO_SRC, _do_init);
+GST_BOILERPLATE_FULL (GstJackAudioSrc, gst_jackaudiosrc, GstBaseAudioSrc,
+        GST_TYPE_BASE_AUDIO_SRC, _do_init);
 
 static void gst_jackaudiosrc_set_property (GObject * object, guint prop_id,
         const GValue * value, GParamSpec * pspec);
@@ -769,16 +771,16 @@ gst_jackaudiosrc_class_init (GstJackAudioSrcClass * klass)
             g_param_spec_string ("server", "Server",
                 "The Jack server to connect to (NULL = default)",
                 DEFAULT_PROP_SERVER, G_PARAM_READWRITE));
-  
+
     gstbasesrc_class->get_caps = GST_DEBUG_FUNCPTR (gst_jackaudiosrc_getcaps);
-  gstbaseaudiosrc_class->create_ringbuffer =
-      GST_DEBUG_FUNCPTR (gst_jackaudiosrc_create_ringbuffer);
+    gstbaseaudiosrc_class->create_ringbuffer =
+        GST_DEBUG_FUNCPTR (gst_jackaudiosrc_create_ringbuffer);
 
-  /* ref class from a thread-safe context to work around missing bit of
-   * thread-safety in GObject */
-  g_type_class_ref (GST_TYPE_JACK_RING_BUFFER);
+    /* ref class from a thread-safe context to work around missing bit of
+     * thread-safety in GObject */
+    g_type_class_ref (GST_TYPE_JACK_RING_BUFFER);
 
-  gst_jack_audio_client_init ();
+    gst_jack_audio_client_init ();
 }
 
 /* initialize the new element
@@ -835,70 +837,70 @@ gst_jackaudiosrc_get_property (GObject * object, guint prop_id,
     }
 }
 
-static GstCaps *
+    static GstCaps *
 gst_jackaudiosrc_getcaps (GstBaseSrc * bsrc)
 {
-  GstJackAudioSrc *src = GST_JACKAUDIOSRC (bsrc);
-  const char **ports;
-  gint min, max;
-  gint rate;
-  jack_client_t *client;
+    GstJackAudioSrc *src = GST_JACKAUDIOSRC (bsrc);
+    const char **ports;
+    gint min, max;
+    gint rate;
+    jack_client_t *client;
 
-  if (src->client == NULL)
-    goto no_client;
+    if (src->client == NULL)
+        goto no_client;
 
-  client = gst_jack_audio_client_get_client (src->client);
+    client = gst_jack_audio_client_get_client (src->client);
 
-  if (src->connect == GST_JACK_CONNECT_AUTO) {
-    /* get a port count, this is the number of channels we can automatically
-     * connect. */
-    ports = jack_get_ports (client, NULL, NULL,
-        JackPortIsPhysical | JackPortIsOutput);
-    max = 0;
-    if (ports != NULL) {
-      for (; ports[max]; max++);
-      free (ports);
-    } else
-      max = 0;
-  } else {
-    /* we allow any number of pads, something else is going to connect the
-     * pads. */
-    max = G_MAXINT;
-  }
-  min = MIN (1, max);
+    if (src->connect == GST_JACK_CONNECT_AUTO) {
+        /* get a port count, this is the number of channels we can automatically
+         * connect. */
+        ports = jack_get_ports (client, NULL, NULL,
+                JackPortIsPhysical | JackPortIsOutput);
+        max = 0;
+        if (ports != NULL) {
+            for (; ports[max]; max++);
+            free (ports);
+        } else
+            max = 0;
+    } else {
+        /* we allow any number of pads, something else is going to connect the
+         * pads. */
+        max = G_MAXINT;
+    }
+    min = MIN (1, max);
 
-  rate = jack_get_sample_rate (client);
+    rate = jack_get_sample_rate (client);
 
-  GST_DEBUG_OBJECT (src, "got %d-%d ports, samplerate: %d", min, max, rate);
+    GST_DEBUG_OBJECT (src, "got %d-%d ports, samplerate: %d", min, max, rate);
 
-  if (!src->caps) {
-    src->caps = gst_caps_new_simple ("audio/x-raw-float",
-        "endianness", G_TYPE_INT, G_BYTE_ORDER,
-        "width", G_TYPE_INT, 32,
-        "rate", G_TYPE_INT, rate,
-        "channels", GST_TYPE_INT_RANGE, min, max, NULL);
-  }
-  GST_INFO_OBJECT (src, "returning caps %" GST_PTR_FORMAT, src->caps);
+    if (!src->caps) {
+        src->caps = gst_caps_new_simple ("audio/x-raw-float",
+                "endianness", G_TYPE_INT, G_BYTE_ORDER,
+                "width", G_TYPE_INT, 32,
+                "rate", G_TYPE_INT, rate,
+                "channels", GST_TYPE_INT_RANGE, min, max, NULL);
+    }
+    GST_INFO_OBJECT (src, "returning caps %" GST_PTR_FORMAT, src->caps);
 
-  return gst_caps_ref (src->caps);
+    return gst_caps_ref (src->caps);
 
-  /* ERRORS */
+    /* ERRORS */
 no_client:
-  {
-    GST_DEBUG_OBJECT (src, "device not open, using template caps");
-    /* base class will get template caps for us when we return NULL */
-    return NULL;
-  }
+    {
+        GST_DEBUG_OBJECT (src, "device not open, using template caps");
+        /* base class will get template caps for us when we return NULL */
+        return NULL;
+    }
 }
 
-static GstRingBuffer *
+    static GstRingBuffer *
 gst_jackaudiosrc_create_ringbuffer (GstBaseAudioSrc * src)
 {
-  GstRingBuffer *buffer;
+    GstRingBuffer *buffer;
 
-  buffer = g_object_new (GST_TYPE_JACK_RING_BUFFER, NULL);
-  GST_DEBUG_OBJECT (src, "created ringbuffer @%p", buffer);
+    buffer = g_object_new (GST_TYPE_JACK_RING_BUFFER, NULL);
+    GST_DEBUG_OBJECT (src, "created ringbuffer @%p", buffer);
 
-  return buffer;
+    return buffer;
 }
 
