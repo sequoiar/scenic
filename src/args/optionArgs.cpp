@@ -38,21 +38,21 @@ OptionArgs::~OptionArgs()
     }
 
 }
-void OptionArgs::add(const char* l_flag, char s_flag, bool* ret, const char* desc)
+void OptionArgs::add(bool* ret, const char* l_flag, char s_flag, const char* desc)
 {
 	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_NONE,ret,desc};
 	options.push_back(e);
 
 }
 
-void OptionArgs::add(const char* l_flag, char s_flag, char** ret, const char* desc, const char* arg_desc)
+void OptionArgs::add(char** ret, const char* l_flag, char s_flag, const char* desc, const char* arg_desc)
 {
 	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_STRING,ret,desc,arg_desc};
     str_dump.push_back(ret);
 	options.push_back(e);
 }
 
-void OptionArgs::add(const char* l_flag, char s_flag, int * ret, const char* desc, const char* arg_desc)
+void OptionArgs::add(int * ret,const char* l_flag, char s_flag,  const char* desc, const char* arg_desc)
 {
 	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_INT,ret,desc,arg_desc};
 	options.push_back(e);
@@ -95,10 +95,10 @@ int OptionArgs::parse(int argc,char **argv)
 
 	if (!g_option_context_parse (context, &argc, &argv, &error)) {
 		g_print ("option parsing failed: %s\n", error->message);
-		return 1;
+		return 0;
 	}
 
-	return 0;
+	return 1;
 }
 
 

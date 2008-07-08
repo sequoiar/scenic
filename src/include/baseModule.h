@@ -1,6 +1,6 @@
 // headerGPL.c
-// Copyright 2008 Koya Charles & Tristan Matthews
-//
+// Copyright 2008 Koya Charles & Tristan Matthews 
+//     
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -17,43 +17,28 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file
- *      Just the License GPL 3+
+/** \file 
+ *      Just the License GPL 3+ 
  *
  *      Detailed description here.
  *      Continues here.
  *      And more.
- *      And more.#ifndef __BASE_THREAD_H__
-#define __BASE_THREAD_H__
-
-
+ *      And more.
  */
-#ifndef __OPTION_ARGS_H__
-#define __OPTION_ARGS_H__
 
+#ifndef __BASE_MODULE_H__
+#define __BASE_MODULE_H__
 
+#include "args/optionArgs.h"
 
-
-#include "config.h"
-#include <vector>
-#include <glib.h>
-
-class OptionArgs
+class BaseModule
 {
-	typedef std::vector<GOptionEntry> Options;
-    std::vector<char **> str_dump;
-	Options options;
 public:
-	void add(bool *,const char*,char, const char*);
-	void add(int *,const char*,char, const char*,const char*);
-	void add(char **,const char*,char,const char*,const char*);
 
-	GOptionEntry* getArray();
-
-	int parse(int argc,char **argv);
-    ~OptionArgs();
+	virtual void init(OptionArgs &){} 
+	virtual void init_args(int argc,char** argv){}
+	virtual bool run(){return 1;}
+	virtual ~BaseModule(){}
 };
-
-
 
 #endif
