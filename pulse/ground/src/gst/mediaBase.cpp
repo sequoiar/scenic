@@ -22,10 +22,8 @@
 #include <cassert>
 
 #include "mediaBase.h"
-#include "mediaConfig.h"
-#include "logWriter.h"
 
-MediaBase::MediaBase(const MediaConfig & config) : config_(config)
+MediaBase::MediaBase()
 {
 }
 

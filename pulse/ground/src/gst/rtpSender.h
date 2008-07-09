@@ -35,7 +35,7 @@ public:
 	virtual ~RtpSender();
 
 protected:
-	virtual void addDerived(GstElement * src, const MediaConfig & config);
+	virtual void addDerived(GstElement * src, const MediaConfig * config);
 
 private:
 	GstElement *rtp_sender_;

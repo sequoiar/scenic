@@ -35,7 +35,7 @@ public:
 	virtual ~RtpReceiver();
 
 protected:
-	virtual void addDerived(GstElement * sink, const MediaConfig & config);
+	virtual void addDerived(GstElement * sink, const MediaConfig * config);
 
 private:
 	GstElement *rtp_receiver_;

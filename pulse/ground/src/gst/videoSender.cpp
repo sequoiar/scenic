@@ -28,7 +28,6 @@
 #include "logWriter.h"
 
 VideoSender::VideoSender(const VideoConfig & config) :
-	MediaBase(dynamic_cast <const MediaConfig & >(config)),
 	config_(config),
 	source_(0), demux_(0), queue_(0), dvdec_(0), colorspc_(0),
 	encoder_(0), payloader_(0), sink_(0)
@@ -115,7 +114,7 @@ void VideoSender::init_sink()
 		assert(payloader_);
 		pipeline_.add(payloader_);
 		assert(gst_element_link(lastLinked_, payloader_));
-		session_.add(payloader_, dynamic_cast<const MediaConfig&>(config_));
+		session_.add(payloader_, &config_);
 	}
 	else                        // local test only
 	{

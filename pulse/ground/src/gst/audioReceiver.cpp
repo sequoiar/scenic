@@ -31,7 +31,7 @@
 #include "audioReceiver.h"
 #include "audioConfig.h"
 
-AudioReceiver::AudioReceiver(const AudioConfig & config) : MediaBase(dynamic_cast < const MediaConfig & >(config)),
+AudioReceiver::AudioReceiver(const AudioConfig & config) :
 	config_(config), gotCaps_(false), depayloader_(0), decoder_(0), sink_(0)
 {
 	// empty
@@ -97,7 +97,7 @@ void AudioReceiver::init_codec()
 
 	assert(gst_element_link(depayloader_, decoder_));
 
-	session_.add(depayloader_, dynamic_cast < const MediaConfig & >(config_));
+	session_.add(depayloader_, &config_);
 }
 
 

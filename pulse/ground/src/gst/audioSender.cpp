@@ -31,7 +31,7 @@
 #include "audioSource.h"
 
 AudioSender::AudioSender(const AudioConfig & config)
-	: MediaBase(dynamic_cast < const MediaConfig & >(config)), config_(config), encoder_(0),
+	: config_(config), encoder_(0),
 	payloader_(0), sink_(0)
 {
 	// empty
@@ -71,7 +71,7 @@ void AudioSender::init_sink()
 
 		assert(gst_element_link_many(source_->interleave_, encoder_, payloader_, NULL));
 
-		session_.add(payloader_, dynamic_cast < const MediaConfig & >(config_));
+		session_.add(payloader_, &config_);
 	}
 	else                        // local version
 	{

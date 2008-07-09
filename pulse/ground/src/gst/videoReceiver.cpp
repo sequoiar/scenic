@@ -25,7 +25,7 @@
 #include "mediaBase.h"
 #include "videoReceiver.h"
 
-VideoReceiver::VideoReceiver(const VideoConfig & config) : MediaBase(dynamic_cast < const MediaConfig & >(config)),
+VideoReceiver::VideoReceiver(const VideoConfig & config) :
 	config_(config), depayloader_(0), decoder_(0), sink_(0)
 {
 	// empty
@@ -58,7 +58,7 @@ void VideoReceiver::init_codec()
 	pipeline_.add(decoder_);
 	assert(gst_element_link(depayloader_, decoder_));
 
-	session_.add(depayloader_, dynamic_cast <const MediaConfig &>(config_));
+	session_.add(depayloader_, &config_);
 	session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264");
 }
 

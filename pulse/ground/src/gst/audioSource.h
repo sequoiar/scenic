@@ -33,7 +33,7 @@ public:
 	virtual void init();
 protected:
 	AudioSource(const AudioConfig &config);
-	const AudioConfig& config_;
+	const AudioConfig &config_;
 	std::vector < GstElement * >sources_, aconvs_, queues_;
 	GstElement *interleave_;
 private:
@@ -47,7 +47,7 @@ class AudioTestSource : public AudioSource
 {
 public:
 	virtual ~AudioTestSource(){
-	};
+	}
 	virtual void init();
 	AudioTestSource(const AudioConfig &config) : AudioSource(config) {
 	}

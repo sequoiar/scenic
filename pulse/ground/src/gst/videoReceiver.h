@@ -40,7 +40,7 @@ private:
 	virtual void init_sink();
 
 	RtpReceiver session_;
-	VideoConfig config_;
+	const VideoConfig &config_;
 	GstElement *depayloader_, *decoder_, *sink_;
 };
 

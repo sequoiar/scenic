@@ -58,14 +58,14 @@ const char *RtpSender::caps_str() const
 	return result;
 }
 
-void RtpSender::addDerived(GstElement * newSrc, const MediaConfig & config)
+void RtpSender::addDerived(GstElement * newSrc, const MediaConfig * config)
 {
 	GstPad *send_rtp_sink, *send_rtp_src, *send_rtcp_src, *recv_rtcp_sink, *payloadSrc,
 	*rtpSenderSink, *rtcpSenderSink, *rtcpReceiverSrc;
 
 	rtp_sender_ = gst_element_factory_make("udpsink", NULL);
 	assert(rtp_sender_);
-	g_object_set(rtp_sender_, "host", config.remoteHost(), "port", config.port(), "sync",
+	g_object_set(rtp_sender_, "host", config->remoteHost(), "port", config->port(), "sync",
 	             FALSE, "async", FALSE, NULL);
 	pipeline_.add(rtp_sender_);
 

@@ -32,8 +32,8 @@ class RtpSession : public GstBase
 public:
 	virtual ~RtpSession();
 	virtual bool init();
-	virtual void add(GstElement * elem, const MediaConfig & config);
-	virtual void addDerived(GstElement * elem, const MediaConfig & config) = 0;
+	virtual void add(GstElement * elem, const MediaConfig * config);
+	virtual void addDerived(GstElement * elem, const MediaConfig * config) = 0;
 
 protected:
 	RtpSession();
