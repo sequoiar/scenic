@@ -235,7 +235,7 @@ gst_jack_ring_buffer_class_init(GstJackRingBufferClass * klass)
     gstringbuffer_class->delay = GST_DEBUG_FUNCPTR(gst_jack_ring_buffer_delay);
 }
 
-/* this is the callback of jack. This should RT-safe.
+/* this is the callback of jack. This should be RT-safe.
 */
 static 
     int
@@ -510,7 +510,7 @@ gst_jack_ring_buffer_acquire(GstRingBuffer * buf, GstRingBufferSpec * spec)
         /* find all the physical input ports. A physical input port is a port
          * associated with a hardware device. Someone needs connect to a physical
          * port in order to hear something. */
-        ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical | JackPortIsInput);
+        ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
         if (ports == NULL) {
             /* no ports? fine then we don't do anything except for posting a warning
              * message. */
