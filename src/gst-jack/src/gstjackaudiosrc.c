@@ -236,17 +236,17 @@ gst_jack_ring_buffer_class_init(GstJackRingBufferClass * klass)
 }
 
 /* this is the callback of jack. This should be RT-safe.
+ * Writes samples from the jack input port's buffer to the gst ring buffer.
 */
-static 
-    int
+static int
 jack_process_cb(jack_nframes_t nframes, void *arg)
 {
     GstJackAudioSrc *src;
     GstRingBuffer *buf;
     GstJackRingBuffer *abuf;
-    gint readseg, len;
-    guint8 *readptr;
-    gint i, j, flen, channels;
+    gint len;
+    guchar *writeptr;
+    gint i, j, channels;
     sample_t **buffers, *data;
 
     buf = GST_RING_BUFFER_CAST(arg);
@@ -254,51 +254,46 @@ jack_process_cb(jack_nframes_t nframes, void *arg)
     src = GST_JACKAUDIOSRC(GST_OBJECT_PARENT(buf));
 
     channels = buf->spec.channels;
+    len = sizeof(sample_t) * nframes * channels;
 
     /* alloc pointers to samples */
     buffers = g_alloca(sizeof(sample_t *) * channels);
+    data = g_alloca(len);
 
-    /* get target buffers */
+    /* get input buffers */
     for (i = 0; i < channels; i++) 
         buffers[i] = (sample_t *)jack_port_get_buffer(src->ports[i], nframes);
 
-    if (gst_ring_buffer_prepare_read(buf, &readseg, &readptr, &len)) {
-        flen = len / channels;
+    writeptr = (guchar *) data;
 
-        /* the number of samples must be exactly the segment size */
-        if (nframes * sizeof(sample_t) != flen)
-            goto wrong_size;
+    /* the samples in the jack input buffers have to be interleaved into the 
+     * ringbuffer 
+     */
+    for (i = 0; i < nframes; i++) 
+        for (j = 0; j < channels; j++) 
+            *data++ = buffers[j][i]; 
 
-        GST_DEBUG("copy %d frames: %p, %d bytes, %d channels", nframes, readptr,
-                flen, channels);
-        data = (sample_t *) readptr;
+    if (gst_ring_buffer_commit(buf, gst_ring_buffer_samples_done(buf), writeptr, len)) {
 
-        /* the samples in the ringbuffer have the channels interleaved, we need to
-         * deinterleave into the jack target buffers */
-        for (i = 0; i < nframes; i++) 
-            for (j = 0; j < channels; j++) 
-                buffers[j][i] = *data++;
+        GST_DEBUG("copy %d frames: %p, %d bytes, %d channels", nframes, writeptr,
+                len / channels, channels);
 
         /* clear written samples in the ringbuffer */
-        gst_ring_buffer_clear(buf, readseg);
+       // gst_ring_buffer_clear(buf, 0);
 
         /* we wrote one segment */
         gst_ring_buffer_advance(buf, 1);
-    } else {
-        /* We are not allowed to read from the ringbuffer, write silence to all
-         * jack output buffers */
+    }
+    // Should we do anything if we can't write to the ring buffer?
+#if 0
+    else {
+        /* We are not allowed to write to the ringbuffer, write silence to all
+         * jack input buffers */
         for (i = 0; i < channels; i++) 
             memset(buffers[i], 0, nframes * sizeof(sample_t));
     }
+#endif
     return 0;
-
-    /* ERRORS */
-wrong_size:
-    {
-        GST_ERROR_OBJECT(src, "nbytes (%d) != flen (%d)",
-                nframes * sizeof(sample_t), flen);
-        return 1;
-    }
 }
 
 /* we error out */
@@ -457,7 +452,7 @@ gst_jack_ring_buffer_close_device(GstRingBuffer * buf)
  * getcaps method will always provide correct values. If unacceptable caps are
  * received for some reason, we fail here.
  */
-static gboolean
+    static gboolean
 gst_jack_ring_buffer_acquire(GstRingBuffer * buf, GstRingBufferSpec * spec)
 {
     GstJackAudioSrc *src;
@@ -507,9 +502,9 @@ gst_jack_ring_buffer_acquire(GstRingBuffer * buf, GstRingBufferSpec * spec)
     /* if we need to automatically connect the ports, do so now. We must do this
      * after activating the client. */
     if (src->connect == GST_JACK_CONNECT_AUTO) {
-        /* find all the physical input ports. A physical input port is a port
+        /* find all the physical output ports. A physical output port is a port
          * associated with a hardware device. Someone needs connect to a physical
-         * port in order to hear something. */
+         * port in order to capture something. */
         ports = jack_get_ports(client, NULL, NULL, JackPortIsPhysical | JackPortIsOutput);
         if (ports == NULL) {
             /* no ports? fine then we don't do anything except for posting a warning
@@ -531,7 +526,7 @@ gst_jack_ring_buffer_acquire(GstRingBuffer * buf, GstRingBufferSpec * spec)
             GST_DEBUG_OBJECT(src, "try connecting to %s",
                     jack_port_name(src->ports[i]));
             /* connect the physical port to a port */
-            
+
             res = jack_connect(client, ports[i], jack_port_name(src->ports[i]));
             g_print("connecting to %s\n", jack_port_name(src->ports[i]));
             if (res != 0 && res != EEXIST)
@@ -743,7 +738,7 @@ gst_jackaudiosrc_class_init(GstJackAudioSrcClass * klass)
 
     g_object_class_install_property(gobject_class, PROP_CONNECT,
             g_param_spec_enum("connect", "Connect",
-                "Specify how the output ports will be connected",
+                "Specify how the input ports will be connected",
                 GST_TYPE_JACK_CONNECT, DEFAULT_PROP_CONNECT, G_PARAM_READWRITE));
 
     g_object_class_install_property(gobject_class, PROP_SERVER,
