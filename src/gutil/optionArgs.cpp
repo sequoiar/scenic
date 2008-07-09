@@ -25,10 +25,10 @@
  *      And more.
  *      And more.
  */
+#include <glib.h>
 #include "config.h"
 #include "optionArgs.h"
-#include <glib.h>
-
+#include "logWriter.h"
 OptionArgs::~OptionArgs()
 {
 	for(; str_dump.begin() != str_dump.end();)
@@ -38,25 +38,61 @@ OptionArgs::~OptionArgs()
 	}
 
 }
-void OptionArgs::add(bool* ret, const char* l_flag, char s_flag, const char* desc)
+void OptionArgs::add(BaseModule::ArgList args)
 {
-	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_NONE,ret,desc};
-	options.push_back(e);
-
+	for(BaseModule::iterator it= args.begin(); it != args.end(); ++it){
+		add(*it);
+		free(*it);
+	}
 }
 
-void OptionArgs::add(char** ret, const char* l_flag, char s_flag, const char* desc, const char* arg_desc)
+
+void OptionArgs::add(BaseArg *ba)
 {
-	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_STRING,ret,desc,arg_desc};
-	str_dump.push_back(ret);
-	options.push_back(e);
+	if(ba->type == 'i') {
+		IntArg* arg = dynamic_cast<IntArg*>(ba);
+		GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
+			              G_OPTION_ARG_INT, arg->arg, arg->desc.c_str(), arg->arg_desc.c_str()};
+		options.push_back(e);
+	}
+	else if (ba->type == 'b') {
+		BoolArg* arg = dynamic_cast<BoolArg*>(ba);
+		GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
+			              G_OPTION_ARG_NONE, arg->arg, arg->desc.c_str()};
+		options.push_back(e);
+	}
+	else if (ba->type == 's') {
+		StringArg* arg = dynamic_cast<StringArg*>(ba);
+		GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
+			              G_OPTION_ARG_STRING, arg->arg, arg->desc.c_str(), arg->arg_desc.c_str()};
+		options.push_back(e);
+	}
+	else{
+		LOG("Bad BaseArg type");
+	}
 }
 
-void OptionArgs::add(int * ret,const char* l_flag, char s_flag,  const char* desc, const char* arg_desc)
-{
-	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_INT,ret,desc,arg_desc};
-	options.push_back(e);
-}
+/*
+   void OptionArgs::add(bool* ret, const char* l_flag, char s_flag, const char* desc)
+   {
+   	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_NONE,ret,desc};
+   	options.push_back(e);
+
+   }
+
+   void OptionArgs::add(char** ret, const char* l_flag, char s_flag, const char* desc, const char* arg_desc)
+   {
+   	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_STRING,ret,desc,arg_desc};
+   	str_dump.push_back(ret);
+   	options.push_back(e);
+   }
+
+   void OptionArgs::add(int * ret,const char* l_flag, char s_flag,  const char* desc, const char* arg_desc)
+   {
+   	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_INT,ret,desc,arg_desc};
+   	options.push_back(e);
+   }
+ */
 
 
 GOptionEntry* OptionArgs::getArray()

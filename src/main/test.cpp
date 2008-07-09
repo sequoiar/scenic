@@ -39,20 +39,13 @@ class DModule : public BaseModule
 	bool pass;
 public:
 	bool run();
-	void init(OptionArgs &);
 };
 
-void DModule::init(OptionArgs &args)
-{
-	pass = false;
-	args.add(&pass,"pass",'p',"bypass this module");
-
-}
 
 bool DModule::run()
 {
 	if(!pass)
-		while(1){ usleep(100000);LOG("x "); }
+		while(1){ usleep(100000); LOG("x "); }
 
 	return true;
 }
@@ -60,11 +53,6 @@ bool DModule::run()
 int main (int argc, char** argv)
 {
 	DModule m;
-	OptionArgs opts;
-
-	m.init(opts);
-	if(!opts.parse(argc,argv))
-		return 1;
 
 	m.run();
 	return 0;

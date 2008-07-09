@@ -29,17 +29,18 @@ typedef QueuePair_<BaseMessage> QueuePair;
 class Thread : public BaseThread<BaseMessage>
 {
 	int main();
-    int max_count;
+	int max_count;
 public:
-    void init(OptionArgs &);
-
+	ArgList args();
 };
 
-    
-void Thread::init(OptionArgs &args)
+
+BaseModule::ArgList Thread::args()
 {
-   max_count = 1000;
-   args.add(&max_count,"count",'c',"count it", "number of messages");
+	ArgList args;
+	max_count = 1000;
+	args.push_back(new IntArg(&max_count,"count",'c',"count it", "number of messages"));
+	return args;
 
 }
 
@@ -51,7 +52,7 @@ int Thread::main()
 	{
 		BaseMessage f = queue.copy_timed_pop(1);
 		queue.push(r);
-        LOG(" here ");
+		LOG(" here ");
 		if(count++ == max_count) {
 			BaseMessage f(BaseMessage::quit);
 			queue.push(f);
@@ -65,11 +66,11 @@ int Thread::main()
 int main (int argc, char** argv)
 {
 	Thread t;
-    OptionArgs opts;
+	OptionArgs opts;
 
-    t.init(opts);
-    if(!opts.parse(argc,argv))
-        return 1;
+	opts.add(t.args());
+	if(!opts.parse(argc,argv))
+		return 1;
 
 	QueuePair queue = t.getQueue("");
 	QueuePair queue2 = t.getQueue("a");

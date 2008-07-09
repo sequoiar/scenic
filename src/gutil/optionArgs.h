@@ -37,6 +37,7 @@
 #include "config.h"
 #include <vector>
 #include <glib.h>
+#include "baseModule.h"
 
 class OptionArgs
 {
@@ -44,9 +45,11 @@ class OptionArgs
 	std::vector<char **> str_dump;
 	Options options;
 public:
-	void add(bool *,const char*,char, const char*);
-	void add(int *,const char*,char, const char*,const char*);
-	void add(char **,const char*,char,const char*,const char*);
+	void add(BaseModule::ArgList);
+	void add(BaseArg*);
+//	void add(bool *,const char*,char, const char*);
+//	void add(int *,const char*,char, const char*,const char*);
+//	void add(char **,const char*,char,const char*,const char*);
 
 	GOptionEntry* getArray();
 
