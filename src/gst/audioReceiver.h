@@ -32,12 +32,12 @@
 class AudioReceiver : public MediaBase
 {
 public:
-	AudioReceiver();
 	AudioReceiver(const AudioConfig & config);
 	virtual ~AudioReceiver();
 	virtual bool start();
 
 private:
+	AudioReceiver();
 	virtual void init_source();
 	virtual void init_codec();
 	virtual void init_sink();
@@ -51,7 +51,7 @@ private:
 	void wait_for_caps();
 
 	RtpReceiver session_;
-	AudioConfig config_;
+	const AudioConfig &config_;
 	bool gotCaps_;
 	GstElement *depayloader_, *decoder_, *sink_;
 };

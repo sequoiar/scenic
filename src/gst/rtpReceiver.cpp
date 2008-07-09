@@ -44,19 +44,19 @@ void RtpReceiver::set_caps(const char *capsStr)
 	gst_caps_unref(caps);
 }
 
-void RtpReceiver::addDerived(GstElement * newSink, const MediaConfig & config)
+void RtpReceiver::addDerived(GstElement * newSink, const MediaConfig * config)
 {
 	rtp_receiver_ = gst_element_factory_make("udpsrc", NULL);
 	assert(rtp_receiver_);
-	g_object_set(rtp_receiver_, "port", config.port(), NULL);
+	g_object_set(rtp_receiver_, "port", config->port(), NULL);
 
 	rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL);
 	assert(rtcp_receiver_);
-	g_object_set(rtcp_receiver_, "port", config.port() + 1, NULL);
+	g_object_set(rtcp_receiver_, "port", config->port() + 1, NULL);
 
 	rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
 	assert(rtcp_sender_);
-	g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.port() + 5, "sync", FALSE,
+	g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port() + 5, "sync", FALSE,
 	             "async", FALSE, NULL);
 
 	pipeline_.add(rtp_receiver_);

@@ -40,7 +40,7 @@ private:
 	virtual void init_source();
 	virtual void init_codec();
 	virtual void init_sink();
-	VideoConfig config_;
+	const VideoConfig &config_;
 	GstElement *source_, *demux_, *queue_, *dvdec_, *colorspc_, *encoder_, *payloader_, *sink_;
 	RtpSender session_;
 	GstElement *lastLinked_;    // FIXME: hack

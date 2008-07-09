@@ -21,7 +21,6 @@
 #ifndef _MEDIA_BASE_H_
 #define _MEDIA_BASE_H_
 
-#include "mediaConfig.h"
 #include "gstBase.h"
 
 class MediaBase : public GstBase
@@ -34,15 +33,11 @@ public:
 
 protected:
 
-	MediaBase(const MediaConfig & config);
+	MediaBase();
 	virtual ~MediaBase();
 	virtual void init_source() = 0;
 	virtual void init_codec() = 0;
 	virtual void init_sink() = 0;
-
-	const MediaConfig config_;
-
-private:
 };
 
 #endif // _MEDIA_BASE_H_

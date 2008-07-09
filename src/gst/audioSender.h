@@ -46,7 +46,7 @@ private:
 	const char *caps_str() const;
 
 	// data
-	AudioConfig config_;
+	const AudioConfig &config_;
 	RtpSender session_;
 	AudioSource *source_;
 
