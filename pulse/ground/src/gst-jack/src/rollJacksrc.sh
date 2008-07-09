@@ -2,4 +2,5 @@
 
 LEVEL=2
 #FLAGS="-v -m --gst-debug-level=${LEVEL}"
-gst-launch $FLAGS jackaudiosrc connect=0 ! jackaudiosink
+gst-launch $FLAGS audiotestsrc ! jackaudiosink name=SineOutput \
+jackaudiosrc ! jackaudiosink name=InputOutput
