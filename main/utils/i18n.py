@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Sropulpof
@@ -18,6 +19,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
-# App imports
-from common import *
-from api import ControllerApi
+
+# System imports
+import codecs
+
+
+def to_utf(obj, encoding='utf-8'):
+    if isinstance(obj, basestring):
+        if not isinstance(obj, unicode):
+            obj = unicode(obj, encoding)
+    return obj
+
+def open(filename, mode):
+    return codecs.open(filename, mode, encoding='utf-8')
+

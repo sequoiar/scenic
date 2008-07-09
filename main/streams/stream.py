@@ -18,6 +18,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
-# App imports
-from common import *
-from api import ControllerApi
+
+
+       
+class Stream:
+    """That represent all the settings of a stream to send """
+    pass
+
+
+class LocalStream(Stream):
+    """That represent all the settings of a stream to send """
+
+    def __init__(self):
+        self.a_codec = ""
+        self.v_codec = ""
+        self.address = ""
+    
+    def connect(self, address=""):
+        print "Connecting to %s" % (address)
+    
+    def status(self):
+        return (self.a_codec, self.v_codec, self.address)

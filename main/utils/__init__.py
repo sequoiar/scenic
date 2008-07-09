@@ -19,5 +19,9 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 # App imports
-from common import *
-from api import ControllerApi
+from observer import Observer, Subject
+
+import sys
+
+def get_def_name():
+    return sys._getframe(1).f_code.co_name

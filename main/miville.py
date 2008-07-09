@@ -1,122 +1,70 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Sropulpof
+# Copyright (C) 2008 Société des arts technoligiques (SAT)
+# http://www.sat.qc.ca
+# All rights reserved.
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# Sropulpof is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+
 
 # Twisted imports
-from twisted.internet import reactor
+from twisted.internet import reactor, task
 
+# App imports
 import ui
-
-# this is the base class mediator, implemented
-# as a template pattern. The main controller should inherit from this.
-class Mediator:
-    def __init__(self):
-        pass
-
-    def colleague_changed(self, colleague, event):
-        """Template pattern interface method, intended to be called directly"""
-        self._colleague_changed(colleague, event)
-
-    def _colleague_changed(self, colleague, event):
-        """Template pattern polymorphic method, intended to be inherited"""
-    
-
-# this is the base class colleague, implemented
-# as a template pattern. The input classes should inherit from this.
-class Colleague:
-    def __init__(self, mediator):
-        self.mediator = mediator
-
-    def changed(self, colleague, event):
-        """Template pattern inteface method, intended to be called directly"""
-        self._changed(colleague, event)
-
-    def _changed(self, colleague, event):
-        """Template pattern interface method, intended to be inherited"""
-        self.mediator.colleague_changed(colleague, event)
+import stream
+from utils import log, Subject
+import addressbook
 
 
-class ColleagueExample(Colleague):
-    """This takes part in the Mediator/Colleague pattern"""
-
-    def __init__(self, mediator, *_args, **_kwargs):
-        # somewhat wacky initialization of parent control
-        Colleague.__init__(self, mediator)
-
-    def on_event(self, event):
-        self.changed(self, event)
-
-
-# main frame of our application
-class MediatorExample(Mediator):
-    """The MainFrame of the application"""
+class Core(ui.ControllerApi):
+    """Main class of the application and representing the 'Model' in the MVC"""
     
     def __init__(self):
-        Mediator.__init__(self)
-
-    def _colleague_changed(self, colleague, event, *args, **kargs):
-        """This method gets called when when of the colleagues has changed.
-        This is the central 'clearing' house for all changes and orchestrates
-        these changes among the cooperating controls"""
-
-        if event[0] != '_':
+        ui.ControllerApi.__init__(self)
+        self.uis = None
+        self.startup()
+    
+    def startup(self):
+        self.load_uis()
+        self.adb = addressbook.AddressBook('sropulpof')
+        
+    def load_uis(self):
+        self.uis = ui.load(ui.find_all())
+        for mod in self.uis:
             try:
-                callback = getattr(self, event)
+                mod.start(self)
             except:
-                print "The callback %s doesn't exist." % (event)
-            if callback:          
-                 callback(colleague, *args, **kargs)
-       
-
-# main frame of our application
-class MivilleMediator(Mediator):
-    """The MainFrame of the application"""
-    
-    def __init__(self):
-        Mediator.__init__(self)
-        all_ui = ui.find_ui()
-        ui.cli.start()
+                log.error('Unable to start UI module %s.' % mod.__name__)
 
 
-    def _colleague_changed(self, colleague, event, *args, **kargs):
-        """This method gets called when when of the colleagues has changed.
-        This is the central 'clearing' house for all changes and orchestrates
-        these changes among the cooperating controls"""
 
-        if event[0] != '_':
-            try:
-                callback = getattr(self, event)
-            except:
-                print "The callback %s doesn't exist." % (event)
-            if callback:          
-                 callback(colleague, *args, **kargs)
-       
+def chk_ob(core):
+    print "Obs: %r" % core.observers.valuerefs()
+#    print dir(ui.cli)
+                    
 
-
-class LocalStream:
-    """That represent all the settings of a stream to send """
-
-    def __init__(self):
-        self.a_codec = ""
-        self.v_codec = ""
-        self.address = ""
-    
-    def connect(self, address=""):
-        print "Connecting to %s" % (address)
-    
-    def status(self):
-        return (self.a_codec, self.v_codec, self.address)
-
-
-def main():
-    all_ui = ui.find_ui()
-    print all_ui
-#    for each_ui in all_ui:
-#        each_ui.start()
-    ui.cli.start()
+def main():    
+    core = Core()
+    l = task.LoopingCall(chk_ob, core)
+    l.start(1.0, False)
     reactor.run()
 
 
 if __name__ == '__main__':
-    med = MivilleMediator()
-    reactor.run()
-    
-
+    log.start()
+    log.info('Starting Miville (or Sropulpof?)...')
+    main()
