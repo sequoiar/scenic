@@ -28,37 +28,41 @@ class DModule : public BaseModule
 	bool pass;
 public:
 	bool run();
-
-	ArgList args();
+	void init();
 };
 
-BaseModule::ArgList DModule::args()
+void DModule::init()
 {
-	ArgList args;
 	pass = false;
 	args.push_back(new BoolArg(&pass,"pass",'p',"bypass this module"));
-	return args;
 }
 
 bool DModule::run()
 {
-	if(!pass)
-		while(1){ LOG("x "); }
+	if(!pass) {
+		LOG("x ");
+	}
 
 	return true;
 }
-
-int main (int argc, char** argv)
+int my_main(int argc, char** argv)
 {
+
 	DModule m;
 	OptionArgs opts;
-
-	opts.add(m.args());
+	m.init();
+	opts.add(m.get_args());
 	if(!opts.parse(argc,argv))
 		return 1;
 
 	m.run();
-	return 0;
+
+    return 0;
+}
+
+int main (int argc, char** argv)
+{
+	return my_main(argc,argv);
 }
 
 

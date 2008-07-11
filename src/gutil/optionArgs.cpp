@@ -31,18 +31,17 @@
 #include "logWriter.h"
 OptionArgs::~OptionArgs()
 {
-	for(; str_dump.begin() != str_dump.end();)
+/*	for(; str_dump.begin() != str_dump.end();)
 	{
-		delete (**str_dump.begin());
+		delete (*str_dump.begin());
 		str_dump.erase(str_dump.begin());
 	}
-
+*/
 }
 void OptionArgs::add(BaseModule::ArgList args)
 {
 	for(BaseModule::iterator it= args.begin(); it != args.end(); ++it){
 		add(*it);
-//		delete(*it);
 	}
 }
 
@@ -72,33 +71,11 @@ void OptionArgs::add(BaseArg *ba)
 	}
 }
 
-/*
-   void OptionArgs::add(bool* ret, const char* l_flag, char s_flag, const char* desc)
-   {
-   	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_NONE,ret,desc};
-   	options.push_back(e);
-
-   }
-
-   void OptionArgs::add(char** ret, const char* l_flag, char s_flag, const char* desc, const char* arg_desc)
-   {
-   	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_STRING,ret,desc,arg_desc};
-   	str_dump.push_back(ret);
-   	options.push_back(e);
-   }
-
-   void OptionArgs::add(int * ret,const char* l_flag, char s_flag,  const char* desc, const char* arg_desc)
-   {
-   	GOptionEntry e = {l_flag,s_flag,0,G_OPTION_ARG_INT,ret,desc,arg_desc};
-   	options.push_back(e);
-   }
- */
 
 
 GOptionEntry* OptionArgs::getArray()
 {
-	GOptionEntry *pA;
-	static GOptionEntry n = { NULL };
+	GOptionEntry n = { NULL };
 	int count = 0;
 	if(options.empty())
 		return 0;
@@ -114,7 +91,7 @@ GOptionEntry* OptionArgs::getArray()
 }
 int OptionArgs::parse(int argc,char **argv)
 {
-
+	int ret = 1;
 	GError *error = NULL;
 	GOptionContext *context;
 	GOptionEntry *pGOptions;
@@ -132,10 +109,14 @@ int OptionArgs::parse(int argc,char **argv)
 
 	if (!g_option_context_parse (context, &argc, &argv, &error)) {
 		g_print ("option parsing failed: %s\n", error->message);
-		return 0;
+		ret = 0;
 	}
 
-	return 1;
+	g_option_context_free(context);
+	delete[] pA;
+
+
+	return ret;
 }
 
 
