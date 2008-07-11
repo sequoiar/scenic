@@ -169,6 +169,14 @@ void AudioAlsaSource::init()
 void AudioJackSource::init()
 {
 	AudioSource::init();
+
+    GstIter src, aconv;
+    // turn off autoconnect
+	for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(); ++src, ++aconv)
+    {
+        g_object_set(G_OBJECT(*src), "connect", 0, NULL);
+        assert(gst_element_link_many(*src, *aconv, interleave_, NULL));
+    }
 	// init jack source(s)
 }
 
