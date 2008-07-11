@@ -27,7 +27,7 @@
 #include <iostream>
 
 #include <sstream>
-
+#include <string.h>
 #include "sip.h"
 #include "sipPrivate.h"
 
@@ -69,9 +69,6 @@ const char *SipSingleton::rx_invite(const char *data, unsigned int len)
 		return "OK";
 	}
 
-	if (!strncmp(data, "Hello", 5)) {
-		return "Break Yourself!";
-	}
 
 	return "what?";
 }

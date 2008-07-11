@@ -92,5 +92,5 @@ int main(int argc, char **argv)
 	std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
 	SdpTestSuite tester;
 	Test::TextOutput output(Test::TextOutput::Verbose);
-	return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
+	return tester.run(output) ;
 }
