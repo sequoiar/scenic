@@ -1,6 +1,7 @@
 #!/bin/sh
 
-LEVEL=2
-FLAGS="-v -m --gst-debug-level=${LEVEL}"
-AUTOCONNECT=0
-gst-launch $FLAGS jackaudiosrc connect=$AUTOCONNECT ! jackaudiosink connect=$AUTOCONNECT 
+LEVEL=5
+ELEMENT="jackaudiosrc:"
+FLAGS="-m --gst-debug-level=${ELEMENT}${LEVEL}"
+AUTOCONNECT="connect=0"
+gst-launch $FLAGS jackaudiosrc $AUTOCONNECT ! jackaudiosink $AUTOCONNECT sync=FALSE
