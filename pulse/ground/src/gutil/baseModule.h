@@ -60,7 +60,7 @@ class BoolArg : public BaseArg
 {
 public:
 	bool* arg;
-	BoolArg(bool* b,std::string l, char s, std::string d, std::string a) :
+	BoolArg(bool* b,std::string l, char s, std::string d) :
 		BaseArg('b',l,s,d, std::string()),arg(b){
 	}
 };

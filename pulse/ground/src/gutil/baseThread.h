@@ -81,6 +81,7 @@ public:
 		return queue.second;
 	}
 	bool run();
+	virtual bool pre_run(){return true;}
 
 protected:
 	virtual int main()
@@ -100,7 +101,6 @@ template < class T > QueuePair_ < T > BaseThread < T >::getQueue(std::string s)
 		return (QueuePair_ < T > (queue.second, queue.first));
 
 	if (queue_map.find(s) == queue_map.end()) {
-		GAsyncQueue *q = g_async_queue_new();
 
 		QueuePair_ < T > qp = QueuePair_ < T > (queue.first, 0);
 		qp.init();
@@ -193,12 +193,19 @@ template < class T > void QueuePair_ < T >::push(T pt)
 
 template < class T > void QueuePair_ < T >::done(T * t)
 {
-	g_mutex_lock(mutex);
+	typename std::list<T*>::iterator it;
 
-	if (l.end() != find(l.begin(), l.end(), t)) {
-		delete (t);
-		l.remove(t);
+	g_mutex_lock(mutex);
+	
+	for(it = l.begin();it != l.end();++it)
+	{
+	 	if(*it == t) {
+			delete (t);
+			l.remove(t);
+			break;
+	  	}
 	}
+
 	g_mutex_unlock(mutex);
 }
 
@@ -234,6 +241,7 @@ template < class T > BaseThread < T >::~BaseThread()
 
 }
 
+
 template < class T > bool BaseThread < T >::run()
 {
 	GError *err = 0;
@@ -241,6 +249,10 @@ template < class T > bool BaseThread < T >::run()
 	//No thread yet
 	if (th)
 		return false;
+
+	if(!pre_run()) //for derived classes 
+		return false;
+
 
 	th = thread_create_queue_pair(BaseThread::thread_main, this, &err);
 

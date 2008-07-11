@@ -33,7 +33,7 @@ OptionArgs::~OptionArgs()
 {
 	for(; str_dump.begin() != str_dump.end();)
 	{
-		free(**str_dump.begin());
+		delete(**str_dump.begin());
 		str_dump.erase(str_dump.begin());
 	}
 
@@ -42,7 +42,7 @@ void OptionArgs::add(BaseModule::ArgList args)
 {
 	for(BaseModule::iterator it= args.begin(); it != args.end(); ++it){
 		add(*it);
-		free(*it);
+//		delete(*it);
 	}
 }
 
@@ -127,7 +127,8 @@ int OptionArgs::parse(int argc,char **argv)
 	pGOptions = getArray();
 	g_option_context_add_main_entries(context, pGOptions,NULL);
 
-	free(pGOptions);
+	//afteradd delete?
+	//delele(pGOptions);
 
 	if (!g_option_context_parse (context, &argc, &argv, &error)) {
 		g_print ("option parsing failed: %s\n", error->message);

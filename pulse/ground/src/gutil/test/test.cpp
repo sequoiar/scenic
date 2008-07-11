@@ -34,6 +34,7 @@ public:
 
 BaseModule::ArgList DModule::args()
 {
+	ArgList args;
 	pass = false;
 	args.push_back(new BoolArg(&pass,"pass",'p',"bypass this module"));
 	return args;
@@ -43,6 +44,8 @@ bool DModule::run()
 {
 	if(!pass)
 		while(1){ LOG("x "); }
+
+	return true;
 }
 
 int main (int argc, char** argv)

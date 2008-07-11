@@ -41,5 +41,5 @@ int main(int argc, char **argv)
 {
 	SipTestSuite sts;
 	Test::TextOutput output(Test::TextOutput::Verbose);
-	return sts.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
+	return sts.run(output) ;
 }

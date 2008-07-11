@@ -34,6 +34,11 @@
 #include "logWriter.h"
 #include "gutil/optionArgs.h"
 
+#include "gst/videoSender.h"
+#include "gst/videoConfig.h"
+
+
+
 class DModule : public BaseModule
 {
 	bool pass;
