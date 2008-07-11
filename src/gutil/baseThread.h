@@ -81,7 +81,9 @@ public:
 		return queue.second;
 	}
 	bool run();
-	virtual bool pre_run(){return true;}
+	virtual bool pre_run(){
+		return true;
+	}
 
 protected:
 	virtual int main()
@@ -196,14 +198,14 @@ template < class T > void QueuePair_ < T >::done(T * t)
 	typename std::list<T*>::iterator it;
 
 	g_mutex_lock(mutex);
-	
-	for(it = l.begin();it != l.end();++it)
+
+	for(it = l.begin(); it != l.end(); ++it)
 	{
-	 	if(*it == t) {
+		if(*it == t) {
 			delete (t);
 			l.remove(t);
 			break;
-	  	}
+		}
 	}
 
 	g_mutex_unlock(mutex);
@@ -250,7 +252,7 @@ template < class T > bool BaseThread < T >::run()
 	if (th)
 		return false;
 
-	if(!pre_run()) //for derived classes 
+	if(!pre_run())  //for derived classes
 		return false;
 
 

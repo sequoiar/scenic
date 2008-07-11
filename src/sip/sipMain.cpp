@@ -31,7 +31,7 @@
 
 int main(int argc, char *argv[])
 {
-	SipSingleton & sip = *SipSingleton::Instance();
+	//SipSingleton & sip = *SipSingleton::Instance();
 	return 0;
 }
 
