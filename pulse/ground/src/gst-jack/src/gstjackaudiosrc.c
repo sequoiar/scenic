@@ -271,7 +271,6 @@ static int jack_process_cb(jack_nframes_t nframes, void *arg)
 
     // TODO: check if interleaving is necessary, check if there's a performance difference
     // between ringbuffer commit and ring buffer prepare read + memcpy
-    // NOTE: It seems to be faster to do read+memcpy than commit.
 
     //if (gst_ring_buffer_commit(buf, gst_ring_buffer_samples_done(buf), dataStart, len)) 
     if (gst_ring_buffer_prepare_read(buf, &writeseg, &writeptr, &givenLen))
