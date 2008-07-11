@@ -42,7 +42,7 @@
 class OptionArgs
 {
 	typedef std::vector<GOptionEntry> Options;
-	std::vector<char **> str_dump;
+//	std::vector<char **> str_dump;
 	Options options;
 public:
 	void add(BaseModule::ArgList);
@@ -53,6 +53,7 @@ public:
 
 	GOptionEntry* getArray();
 
+	GOptionEntry* pA;
 	int parse(int argc,char **argv);
 	~OptionArgs();
 };

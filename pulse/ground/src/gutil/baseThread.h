@@ -40,9 +40,7 @@ public:
 	QueuePair_ < T > () : BaseQueuePair(0, 0)
 	{
 	}
-	~QueuePair_ < T > ()
-	{
-	}
+	~QueuePair_ < T > ();
 	T copy_timed_pop(int ms);
 	void push(T pt);
 
@@ -50,10 +48,11 @@ public:
 	void done(T * pt);
 	void init();
 	typedef std::set < GAsyncQueue * >SetOfQueues;
+	void del(bool);
 
 private:
 	static SetOfQueues qstor;
-
+	bool own[2];
 	T *timed_pop(int ms);
 	static GMutex *mutex;
 	static std::list < T * >l;
@@ -112,23 +111,23 @@ template < class T > QueuePair_ < T > BaseThread < T >::getQueue(std::string s)
 	return QueuePair_ < T > (queue_map[s].second, queue_map[s].first);
 }
 
-template < class T > T queue_pair_pop(BaseQueuePair qp)
+template < class T > T* queue_pair_pop(BaseQueuePair qp)
 {
-	return (static_cast < T > (g_async_queue_pop(qp.first)));
+	return (static_cast < T* > (g_async_queue_pop(qp.first)));
 }
 
-template < class T > void queue_pair_push(BaseQueuePair qp, T t)
+template < class T > void queue_pair_push(BaseQueuePair qp, T* t)
 {
 	g_async_queue_push(qp.second, t);
 }
 
-template < class T > T queue_pair_timed_pop(BaseQueuePair p, int ms)
+template < class T > T* queue_pair_timed_pop(BaseQueuePair* p, int ms)
 {
 	GTimeVal t;
 
 	g_get_current_time(&t);
 	g_time_val_add(&t, ms);
-	return (static_cast < T > (g_async_queue_timed_pop(p.first, &t)));
+	return (static_cast < T* > (g_async_queue_timed_pop(p->first, &t)));
 }
 
 template < class T > GThread * thread_create_queue_pair(void *(thread) (void *), T t, GError ** err)
@@ -151,6 +150,10 @@ template < class T > GMutex * QueuePair_ < T >::mutex = NULL;
 
 template < class T > std::list < T * >QueuePair_ < T >::l;
 
+
+
+
+
 template < class T > T * QueuePair_ < T >::timed_pop(int ms)
 {
 	typename SetOfQueues::iterator it;
@@ -159,7 +162,7 @@ template < class T > T * QueuePair_ < T >::timed_pop(int ms)
 	{
 		if (g_async_queue_length((*it)) > 0)
 			if (*it == first)
-				return (queue_pair_timed_pop < T * >(*this, ms));
+				return (queue_pair_timed_pop < T >(this, ms));
 	}
 
 	return 0;
@@ -216,13 +219,44 @@ template < class T > void QueuePair_ < T >::init()
 	if (!mutex)
 		mutex = g_mutex_new();
 
-	if (first == 0)
+	if (first == 0) {
+		own[0] = true;
 		first = g_async_queue_new();
-	if (second == 0)
+		qstor.insert(first);
+	}
+	else
+		own[0] = false;
+	if (second == 0) {
+		own[1] = true;
 		second = g_async_queue_new();
+		qstor.insert(second);
+	}
+	else
+		own[1] = false;
 
-	qstor.insert(first);
-	qstor.insert(second);
+}
+template < class T> void QueuePair_<T>::del(bool one)
+{
+    T *t;
+    GAsyncQueue *q;
+    if(one)
+        q = first;
+    else
+        q = second;
+    do
+    {
+        t = static_cast<T*>(g_async_queue_try_pop(q));
+        if(t)
+            delete t;
+    }
+    while(t);
+    
+    g_async_queue_unref(q);
+    qstor.erase(q);
+}
+
+template < class T > QueuePair_<T>::~QueuePair_ ()
+{
 
 }
 
@@ -235,12 +269,15 @@ template < class T > BaseThread < T >::BaseThread() : th(0)
 
 template < class T > BaseThread < T >::~BaseThread()
 {
+	queue.del(true);
+	queue.del(false);
+    for(;queue_map.begin() != queue_map.end();queue_map.erase(queue_map.begin()))
+        queue_map.begin()->second.del(false);
 	if (th)
 		g_thread_join(th);
 
-	for (; queue_map.begin() != queue_map.end(); queue_map.erase(queue_map.begin()))
-		g_async_queue_unref(queue_map.begin()->second.first);
-
+//	for (; queue_map.begin() != queue_map.end(); queue_map.erase(queue_map.begin()))
+//            delete(*queue_map.begin());
 }
 
 

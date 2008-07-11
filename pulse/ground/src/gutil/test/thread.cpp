@@ -31,17 +31,15 @@ class Thread : public BaseThread<BaseMessage>
 	int main();
 	int max_count;
 public:
-	ArgList args();
+	bool init();
 };
 
 
-BaseModule::ArgList Thread::args()
+bool Thread::init()
 {
-	ArgList args;
 	max_count = 1000;
 	args.push_back(new IntArg(&max_count,"count",'c',"count it", "number of messages"));
-	return args;
-
+	return true;
 }
 
 int Thread::main()
@@ -51,7 +49,6 @@ int Thread::main()
 	while(1)
 	{
 		BaseMessage f = queue.copy_timed_pop(1);
-		queue.push(r);
 		LOG(" here ");
 		if(count++ == max_count) {
 			BaseMessage f(BaseMessage::quit);
@@ -63,17 +60,20 @@ int Thread::main()
 }
 
 
-int main (int argc, char** argv)
+int my_main (int argc, char** argv)
 {
 	Thread t;
 	OptionArgs opts;
 
-	opts.add(t.args());
+	if(!t.init())
+		return 1;
+
+	opts.add(t.get_args());
 	if(!opts.parse(argc,argv))
 		return 1;
 
 	QueuePair queue = t.getQueue("");
-	QueuePair queue2 = t.getQueue("a");
+//	QueuePair queue2 = t.getQueue("a");
 	if(!t.run())
 		return -1;
 
@@ -81,8 +81,9 @@ int main (int argc, char** argv)
 	{
 		BaseMessage f(BaseMessage::ok);
 		queue.push(f);
+        usleep(10);
 		f = queue.copy_timed_pop(1);
-		BaseMessage f2 = queue2.copy_timed_pop(1);
+//		BaseMessage f2 = queue2.copy_timed_pop(1);
 
 		if(f.get_type() == BaseMessage::quit) {
 			break;
@@ -91,12 +92,15 @@ int main (int argc, char** argv)
 
 
 	}
-
 	std::cout << "Done!" << std::endl;
-
 	return 0;
 }
 
-
+int main(int argc, char** argv)
+{
+    my_main(argc,argv);
+    exit(0);
+    return 0;
+}
 
 

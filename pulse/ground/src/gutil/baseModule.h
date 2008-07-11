@@ -83,13 +83,21 @@ class BaseModule
 public:
 	typedef std::list<BaseArg*> ArgList;
 	typedef std::list<BaseArg*>::iterator iterator;
-	virtual ArgList args(){
-		return ArgList();
+	ArgList args;
+	ArgList& get_args(){
+		return args;
 	}
 	virtual bool run(){
 		return 1;
 	}
+	bool init(){
+		return 1;
+	}
 	virtual ~BaseModule(){
+		for(iterator it = args.begin(); it != args.end(); ++it)
+		{
+			delete (*it);
+		}
 	}
 };
 
