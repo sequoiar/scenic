@@ -35,6 +35,8 @@ bool DModule::run()
 {
 	if(!pass)
 		while(1){ LOG("x "); }
+
+	return true;
 }
 
 int main (int argc, char** argv)

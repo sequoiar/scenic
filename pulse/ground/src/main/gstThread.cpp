@@ -73,7 +73,7 @@ int GstThread::main()
 		BaseMessage f = queue.copy_timed_pop(1000);
 		//queue.push(r);
 		LOG(" here ");
-		
+
 		if(count++ == 1000) {
 			BaseMessage f(BaseMessage::quit);
 			queue.push(f);
