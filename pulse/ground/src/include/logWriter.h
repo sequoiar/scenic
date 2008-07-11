@@ -33,16 +33,18 @@
 
 #define LOGGING 1
 
-static time_t rawtime;
-static struct tm * timeinfo;
 
 #if LOGGING
-#define LOG(x) \
-    time ( &rawtime ); \
-    timeinfo = localtime ( &rawtime ); \
-    std::cerr << std::endl; \
-    std::cerr << __FILE__ << ":" << __LINE__ << ": " << x; \
-    std::cerr << " at " << asctime(timeinfo) << std::endl
+#define LOG(x)                                                              \
+{                                                                           \
+    time_t rawtime;                                                         \
+    struct tm * timeinfo;                                                   \
+    time ( &rawtime );                                                      \
+    timeinfo = localtime ( &rawtime );                                      \
+    std::cerr << std::endl;                                                 \
+    std::cerr << __FILE__ << ":" << __LINE__ << ": " << x;                  \
+    std::cerr << " at " << asctime(timeinfo) << std::endl;                  \
+}
 #else
 #define LOG(x)
 #endif
