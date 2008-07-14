@@ -78,7 +78,10 @@ public:
         TEST_ADD(GstTestSuite::start_8ch_comp_audiofile)
         TEST_ADD(GstTestSuite::stop_8ch_comp_audiofile)
         TEST_ADD(GstTestSuite::start_stop_8ch_comp_audiofile)
-#if RTP
+        TEST_ADD(GstTestSuite::start_8ch_alsa)
+        TEST_ADD(GstTestSuite::stop_8ch_alsa)
+        TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
+#if RTP // AND AUDIO
         TEST_ADD(GstTestSuite::start_2ch_comp_rtp_audiotest)
         TEST_ADD(GstTestSuite::stop_2ch_comp_rtp_audiotest)
         TEST_ADD(GstTestSuite::start_stop_2ch_comp_rtp_audiotest)
@@ -102,9 +105,6 @@ public:
         TEST_ADD(GstTestSuite::start_8ch_jack)
         TEST_ADD(GstTestSuite::stop_8ch_jack)
         TEST_ADD(GstTestSuite::start_stop_8ch_jack)
-        TEST_ADD(GstTestSuite::start_8ch_alsa)
-        TEST_ADD(GstTestSuite::stop_8ch_alsa)
-        TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
     }
 
     void set_id(int id);
