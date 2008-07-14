@@ -157,14 +157,15 @@ template < class T > std::list < T * >QueuePair_ < T >::l;
 template < class T > T * QueuePair_ < T >::timed_pop(int ms)
 {
     typename SetOfQueues::iterator it;
-
+/*
     for (it = qstor.begin(); it != qstor.end(); ++it)
     {
         if (g_async_queue_length((*it)) > 0)
             if (*it == first)
                 return (queue_pair_timed_pop < T >(this, ms));
     }
-
+*/
+                return (queue_pair_timed_pop < T >(this, ms));
     return 0;
 }
 

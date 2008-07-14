@@ -4,38 +4,51 @@
 
 int main (int argc, char** argv)
 {
-    GstThread t;
+    GstThread gst;
     OscThread o;
     OptionArgs opts;
 
-    opts.add(t.get_args());
+    opts.add(gst.get_args());
     opts.add(o.get_args());
 
     if(!opts.parse(argc,argv))
         return 1;
 
-    QueuePair queue = t.getQueue("");
-    if(!t.run())
+    QueuePair gst_queue = gst.getQueue("");
+    QueuePairOfOscMessage osc_queue = o.getQueue("");
+    if(!gst.run())
         return -1;
 
-    BaseMessage in(BaseMessage::init);
-    queue.push(in);
+    if(!o.run())
+        return -1;
+
     while(1)
     {
-        BaseMessage start(BaseMessage::start);
-        queue.push(start);
-        usleep(1000000);
+        OscMessage m = osc_queue.copy_timed_pop(10000);
+        if(m.path.empty() || m.path.compare("/gst"))
+            continue;
 
-        BaseMessage stop(BaseMessage::stop);
-        queue.push(stop);
-        usleep(1000000);
-
-        BaseMessage f = queue.copy_timed_pop(1);
-
-        if(f.get_type() == BaseMessage::quit) {
-            break;
+        LOG(m.args[0].s);
+        if(!m.args[0].s.compare("init")){
+            BaseMessage in(BaseMessage::init);
+            gst_queue.push(in);
         }
 
+        if(!m.args[0].s.compare("start")){
+            BaseMessage start(BaseMessage::start);
+            gst_queue.push(start);
+        }
+        if(!m.args[0].s.compare("stop")){
+            BaseMessage stop(BaseMessage::stop);
+            gst_queue.push(stop);
+        }
+/*
+        BaseMessage f = queue.copy_timed_pop(1);
+
+        if(m.get_type() == BaseMessage::quit) {
+            break;
+        }
+*/
 
 
     }
@@ -45,4 +58,4 @@ int main (int argc, char** argv)
     return 0;
 }
 
-
+//./mainTester -s videotestsrc --oscLocal=7770 --oscRemote=7771 --oscRemoteHost=127.0.0.1

@@ -65,7 +65,9 @@ class OscThread : public BaseThread < OscMessage >
     static void liblo_error(int num, const char *msg, const char *path)
     {
     }
-    char* port_;
+    char* local_port_;
+    char* remote_port_;
+    char* remote_host_;
     void send(OscMessage & osc);
 public:
     OscThread();
