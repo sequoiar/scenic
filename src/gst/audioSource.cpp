@@ -36,10 +36,10 @@ AudioSource *AudioSource::create(const AudioConfig &config)
 	else if (!source.compare("jackaudiosrc"))
 		return new AudioJackSource(config);
 	else
-    {
-        std::cerr << "Invalid source!" << std::endl;
-        return 0;
-    }
+	{
+		std::cerr << "Invalid source!" << std::endl;
+		return 0;
+	}
 }
 
 AudioSource::AudioSource(const AudioConfig &config) : config_(config), interleave_(0)
@@ -127,7 +127,7 @@ void AudioTestSource::init()
 	for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
 		g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
 
-    linkElements();
+	linkElements();
 }
 
 void AudioFileSource::init()
@@ -156,7 +156,7 @@ void AudioFileSource::init()
 	for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
 		g_signal_connect(*dec, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *) *aconv);
 
-    linkElements(); // overloaded
+	linkElements(); // overloaded
 }
 
 void AudioFileSource::linkElements()
@@ -180,19 +180,19 @@ void AudioAlsaSource::init()
 {
 	AudioSource::init();
 	// init alsa source(s)
-    linkElements();
+	linkElements();
 }
 
 void AudioJackSource::init()
 {
 	AudioSource::init();
 
-    // turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
-    // jackOut -> jackIn -> jackOut ->jackIn.....
+	// turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
+	// jackOut -> jackIn -> jackOut ->jackIn.....
 	for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
-        g_object_set(G_OBJECT(*src), "connect", 0, NULL);
+		g_object_set(G_OBJECT(*src), "connect", 0, NULL);
 	// init jack source(s)
-    linkElements();
+	linkElements();
 }
 
 // courtesy of vorbisenc.c
