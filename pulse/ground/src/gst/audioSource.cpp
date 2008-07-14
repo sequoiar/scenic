@@ -42,48 +42,15 @@ AudioSource *AudioSource::create(const AudioConfig &config)
     }
 }
 
-AudioSource::AudioSource(const AudioConfig &config) : config_(config), interleave_(0)
+AudioSource::AudioSource(const AudioConfig &config) : config_(config), interleave_(config)
 {
 }
 
-// set channel layout for interleave element
-void AudioSource::set_channel_layout()
-{
-    GValue val = { 0, };
-    GValueArray *arr;           // for channel position layout
-    arr = g_value_array_new(config_.numChannels());
-
-    g_object_set(interleave_, "channel-positions-from-input", FALSE, NULL);
-
-    g_value_init(&val, GST_TYPE_AUDIO_CHANNEL_POSITION);
-
-    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
-    {
-        g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[config_.numChannels() - 1][channelIdx]);
-        g_value_array_append(arr, &val);
-        g_value_reset(&val);
-    }
-    g_value_unset(&val);
-
-    g_object_set(interleave_, "channel-positions", arr, NULL);
-    g_value_array_free(arr);
-}
-
-void AudioSource::init_interleave()
-{
-    interleave_ = gst_element_factory_make("interleave", NULL);
-    assert(interleave_);
-
-    pipeline_.add(interleave_);
-
-    set_channel_layout();
-}
-
+// parts of init that are common to all AudioSource classes
 void AudioSource::init()
 {
-    init_interleave();
+    interleave_.init();
 
-    // common to all
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
         sources_.push_back(gst_element_factory_make(config_.source(), NULL));
@@ -106,14 +73,16 @@ AudioSource::~AudioSource()
     pipeline_.remove_vector(queues_);
     pipeline_.remove_vector(aconvs_);
     pipeline_.remove_vector(sources_);
-    pipeline_.remove(interleave_);
 }
 
 void AudioSource::linkElements()
 {
     GstIter src, aconv;
     for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(); ++src, ++aconv)
-        assert(gst_element_link_many(*src, *aconv, interleave_, NULL));
+    {
+        assert(gst_element_link(*src, *aconv));
+        interleave_.linkInput(*aconv);
+    }
 }
 
 void AudioTestSource::init()
@@ -166,7 +135,7 @@ void AudioFileSource::linkElements()
         assert(gst_element_link(*src, *dec));
 
     for (aconv = aconvs_.begin(), aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
-        assert(gst_element_link(*aconv, interleave_));
+        interleave_.linkInput(*aconv);
 }
 
 
@@ -179,7 +148,6 @@ AudioFileSource::~AudioFileSource()
 void AudioAlsaSource::init()
 {
     AudioSource::init();
-    // init alsa source(s)
     linkElements();
 }
 
@@ -191,64 +159,7 @@ void AudioJackSource::init()
     // jackOut -> jackIn -> jackOut ->jackIn.....
     for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
-    // init jack source(s)
+
     linkElements();
 }
-
-// courtesy of vorbisenc.c
-
-const GstAudioChannelPosition AudioSource::VORBIS_CHANNEL_POSITIONS[][8] = {
-    {                           /* Mono */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_MONO
-    },
-    {                           /* Stereo */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT
-    },
-    {                           /* Stereo + Centre */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT
-    },
-    {                           /* Quadraphonic */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
-    },
-    {                           /* Stereo + Centre + rear stereo */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
-    },
-    {                           /* Full 5.1 Surround */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_LFE,
-    },
-    {                           /* Not defined by spec, GStreamer default */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
-        GST_AUDIO_CHANNEL_POSITION_LFE,
-        GST_AUDIO_CHANNEL_POSITION_REAR_CENTER,
-    },
-    {                           /* Not defined by spec, GStreamer default */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
-        GST_AUDIO_CHANNEL_POSITION_LFE,
-        GST_AUDIO_CHANNEL_POSITION_SIDE_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT,
-    },
-};
 
