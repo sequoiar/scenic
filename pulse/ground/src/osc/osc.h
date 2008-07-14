@@ -68,6 +68,7 @@ class OscThread : public BaseThread < OscMessage >
     char* local_port_;
     char* remote_port_;
     char* remote_host_;
+    bool running;
     void send(OscMessage & osc);
 public:
     OscThread();

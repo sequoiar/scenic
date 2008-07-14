@@ -2,8 +2,10 @@
 #include "osc/osc.h"
 #include "gutil/optionArgs.h"
 
-int main (int argc, char** argv)
+
+int m (int argc, char** argv)
 {
+    g_thread_init(NULL);
     GstThread gst;
     OscThread o;
     OptionArgs opts;
@@ -13,7 +15,6 @@ int main (int argc, char** argv)
 
     if(!opts.parse(argc,argv))
         return 1;
-
     QueuePair gst_queue = gst.getQueue("");
     QueuePairOfOscMessage osc_queue = o.getQueue("");
     if(!gst.run())
@@ -25,7 +26,17 @@ int main (int argc, char** argv)
     while(1)
     {
         OscMessage m = osc_queue.copy_timed_pop(10000);
-        if(m.path.empty() || m.path.compare("/gst"))
+        
+        if(m.path.empty())
+            continue;
+        if(!m.path.compare("/quit"))
+        {
+            BaseMessage in(BaseMessage::quit);
+            gst_queue.push(in);
+            break;
+        }
+
+        if(m.path.compare("/gst"))
             continue;
 
         LOG(m.args[0].s);
@@ -42,13 +53,6 @@ int main (int argc, char** argv)
             BaseMessage stop(BaseMessage::stop);
             gst_queue.push(stop);
         }
-/*
-        BaseMessage f = queue.copy_timed_pop(1);
-
-        if(m.get_type() == BaseMessage::quit) {
-            break;
-        }
-*/
 
 
     }
@@ -56,6 +60,11 @@ int main (int argc, char** argv)
     std::cout << "Done!" << std::endl;
 
     return 0;
+}
+
+int main (int argc, char** argv)
+{
+    return m(argc,argv);
 }
 
 //./mainTester -s videotestsrc --oscLocal=7770 --oscRemote=7771 --oscRemoteHost=127.0.0.1

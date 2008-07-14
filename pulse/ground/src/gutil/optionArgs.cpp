@@ -31,12 +31,8 @@
 #include "logWriter.h"
 OptionArgs::~OptionArgs()
 {
-/*	for(; str_dump.begin() != str_dump.end();)
-    {
-        delete (*str_dump.begin());
-        str_dump.erase(str_dump.begin());
-    }
- */
+    if(pA)
+        delete[] pA;
 }
 void OptionArgs::add(BaseModule::ArgList args)
 {
@@ -79,7 +75,8 @@ GOptionEntry* OptionArgs::getArray()
     int count = 0;
     if(options.empty())
         return 0;
-
+    if(pA)
+        delete[] pA;
     pA = new GOptionEntry[options.size()+1];
     for(Options::iterator it= options.begin(); it != options.end(); ++it)
     {
