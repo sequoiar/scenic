@@ -109,6 +109,13 @@ AudioSource::~AudioSource()
 	pipeline_.remove(interleave_);
 }
 
+void AudioSource::linkElements()
+{
+	GstIter src, aconv;
+	for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(); ++src, ++aconv)
+		assert(gst_element_link_many(*src, *aconv, interleave_, NULL));
+}
+
 void AudioTestSource::init()
 {
 	AudioSource::init();
@@ -120,8 +127,7 @@ void AudioTestSource::init()
 	for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
 		g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
 
-	for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(); ++src, ++aconv)
-		assert(gst_element_link_many(*src, *aconv, interleave_, NULL));
+    linkElements();
 }
 
 void AudioFileSource::init()
@@ -150,12 +156,19 @@ void AudioFileSource::init()
 	for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
 		g_signal_connect(*dec, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *) *aconv);
 
+    linkElements(); // overloaded
+}
+
+void AudioFileSource::linkElements()
+{
+	GstIter src, aconv, dec;
 	for (src = sources_.begin(), dec = decoders_.begin(); src != sources_.end(); ++src, ++dec)
 		assert(gst_element_link(*src, *dec));
 
 	for (aconv = aconvs_.begin(), aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
 		assert(gst_element_link(*aconv, interleave_));
 }
+
 
 AudioFileSource::~AudioFileSource()
 {
@@ -165,27 +178,21 @@ AudioFileSource::~AudioFileSource()
 
 void AudioAlsaSource::init()
 {
-    // FIXME: This will crash if Jack is running, how can this be avoided?
 	AudioSource::init();
 	// init alsa source(s)
-    GstIter src, aconv;
-	for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(); ++src, ++aconv)
-        assert(gst_element_link_many(*src, *aconv, interleave_, NULL));
+    linkElements();
 }
 
 void AudioJackSource::init()
 {
 	AudioSource::init();
 
-    GstIter src, aconv;
     // turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
     // jackOut -> jackIn -> jackOut ->jackIn.....
-	for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(); ++src, ++aconv)
-    {
+	for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
-        assert(gst_element_link_many(*src, *aconv, interleave_, NULL));
-    }
 	// init jack source(s)
+    linkElements();
 }
 
 // courtesy of vorbisenc.c
