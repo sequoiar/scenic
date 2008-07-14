@@ -1,11 +1,12 @@
 proj_src = $(top_srcdir)/src
 INCLUDES = -I$(proj_src)/include -I$(proj_src)
 
-bin_PROGRAMS = threadTester argsTester emptyTester
+bin_PROGRAMS = threadTester argsTester 
+#emptyTester
 
 threadTester_SOURCES = thread.cpp
 argsTester_SOURCES = test.cpp
-emptyTester_SOURCES = test2.cpp
+#emptyTester_SOURCES = test2.cpp
 
 LDADD = $(GLIB_LIBS) ../libGUtil.a
 AM_CPPFLAGS = $(GLIB_CFLAGS) -I..
