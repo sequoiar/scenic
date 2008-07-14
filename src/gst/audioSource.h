@@ -20,8 +20,9 @@
 #ifndef _AUDIO_SOURCE_H_
 #define _AUDIO_SOURCE_H_
 
-#include "gstBase.h"
 #include <gst/audio/multichannel.h>
+#include "gstBase.h"
+#include "interleave.h"
 
 class AudioConfig;
 
@@ -36,12 +37,9 @@ protected:
     virtual void linkElements();
     const AudioConfig &config_;
     std::vector < GstElement * >sources_, aconvs_, queues_;
-    GstElement *interleave_;
+    Interleave interleave_;
 private:
     friend class AudioSender;
-    static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
-    void init_interleave();
-    void set_channel_layout();
 };
 
 class AudioTestSource : public AudioSource

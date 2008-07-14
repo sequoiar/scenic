@@ -70,7 +70,8 @@ void AudioSender::init_sink()
         assert(payloader_);
         pipeline_.add(payloader_);
 
-        assert(gst_element_link_many(source_->interleave_, encoder_, payloader_, NULL));
+        source_->interleave_.linkOutput(encoder_);
+        assert(gst_element_link(encoder_, payloader_));
 
         session_.add(payloader_, &config_);
     }
@@ -81,7 +82,7 @@ void AudioSender::init_sink()
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
         pipeline_.add(sink_);
 
-        assert(gst_element_link(source_->interleave_, sink_));
+        source_->interleave_.linkOutput(sink_);
     }
 }
 
