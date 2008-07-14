@@ -758,6 +758,55 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiotest()
 	}
 }
 
+void GstTestSuite::start_8ch_alsa()
+{
+    if (id_ == 1)
+        return;
+
+    int numChannels = 8;
+    AudioConfig config("alsasrc", numChannels);
+    AudioSender tx(config);
+    TEST_ASSERT(tx.init());
+
+    TEST_ASSERT(tx.start());
+
+    BLOCK();
+    TEST_ASSERT(tx.isPlaying());
+}
+
+void GstTestSuite::stop_8ch_alsa()
+{
+    if (id_ == 1)
+        return;
+
+    int numChannels = 8;
+    AudioConfig config("alsasrc", numChannels);
+    AudioSender tx(config);
+    TEST_ASSERT(tx.init());
+
+    BLOCK();
+    TEST_ASSERT(tx.stop());
+    TEST_ASSERT(!tx.isPlaying());
+}
+
+void GstTestSuite::start_stop_8ch_alsa()
+{
+    if (id_ == 1)
+        return;
+
+    int numChannels = 8;
+    AudioConfig config("alsasrc", numChannels);
+    AudioSender tx(config);
+    TEST_ASSERT(tx.init());
+    TEST_ASSERT(tx.start());
+
+    BLOCK();
+    TEST_ASSERT(tx.isPlaying());
+
+    TEST_ASSERT(tx.stop());
+    TEST_ASSERT(!tx.isPlaying());
+}
+
 void GstTestSuite::start_8ch_jack()
 {
     if (id_ == 1)

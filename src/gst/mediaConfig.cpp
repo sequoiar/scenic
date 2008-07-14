@@ -70,6 +70,6 @@ const bool MediaConfig::isNetworked() const
 
 const bool MediaConfig::hasCodec() const
 {
-	return codec_.empty();
+	return !codec_.empty();
 }
 

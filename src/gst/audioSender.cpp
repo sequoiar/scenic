@@ -50,12 +50,14 @@ AudioSender::~AudioSender()
 void AudioSender::init_source()
 {
 	source_ = AudioSource::create(config_);
+    assert(source_);
 	source_->init();
 }
 
 void AudioSender::init_codec()
 {
-	if (!config_.hasCodec()) {
+	if (config_.hasCodec()) 
+    {
 		encoder_ = gst_element_factory_make(config_.codec(), NULL);
 		assert(encoder_);
 		pipeline_.add(encoder_);

@@ -31,12 +31,15 @@ AudioSource *AudioSource::create(const AudioConfig &config)
 		return new AudioTestSource(config);
 	else if (!source.compare("filesrc"))
 		return new AudioFileSource(config);
-	else if (!source.compare("alsarc"))
+	else if (!source.compare("alsasrc"))
 		return new AudioAlsaSource(config);
 	else if (!source.compare("jackaudiosrc"))
 		return new AudioJackSource(config);
 	else
-		return 0;
+    {
+        std::cerr << "Invalid source!" << std::endl;
+        return 0;
+    }
 }
 
 AudioSource::AudioSource(const AudioConfig &config) : config_(config), interleave_(0)
@@ -162,8 +165,12 @@ AudioFileSource::~AudioFileSource()
 
 void AudioAlsaSource::init()
 {
+    // FIXME: This will crash if Jack is running, how can this be avoided?
 	AudioSource::init();
 	// init alsa source(s)
+    GstIter src, aconv;
+	for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(); ++src, ++aconv)
+        assert(gst_element_link_many(*src, *aconv, interleave_, NULL));
 }
 
 void AudioJackSource::init()
@@ -171,7 +178,8 @@ void AudioJackSource::init()
 	AudioSource::init();
 
     GstIter src, aconv;
-    // turn off autoconnect
+    // turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
+    // jackOut -> jackIn -> jackOut ->jackIn.....
 	for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(); ++src, ++aconv)
     {
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
