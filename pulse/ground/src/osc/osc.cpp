@@ -30,8 +30,7 @@
 #include <lo/lo.h>
 #include "osc.h"
 
-OscMessage::OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d) : path(p), types(t),
-	argc(c), data(d)
+OscMessage::OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d) : path(p), types(t), argc(c), data(d)
 {
 	for (int i = 0; i < c; i++)
 	{
@@ -39,6 +38,14 @@ OscMessage::OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d
 	}
 
 }
+
+OscThread::OscThread()
+{
+	args.clear();
+	args.push_back(new StringArg(&port_,"osc",'\0',"osc port", "port num"));
+
+}
+
 
 int OscThread::generic_handler_static(const char *path, const char *types,
                                       lo_arg ** argv, int argc, void *data, void *user_data)
@@ -58,8 +65,10 @@ int OscThread::generic_handler(const char *path, const char *types, lo_arg ** ar
 int OscThread::main()
 {
 //      static Message r(message::ok);
+	if(!port_)
+		return -1;
 
-	lo_server_thread st = lo_server_thread_new("7770", liblo_error);
+	lo_server_thread st = lo_server_thread_new(port_, liblo_error);
 
 	lo_server_thread_add_method(st, NULL, NULL, generic_handler_static, this);
 

@@ -262,7 +262,7 @@ template < class T > QueuePair_<T>::~QueuePair_ ()
 
 template < class T > BaseThread < T >::BaseThread() : th(0)
 {
-	g_thread_init(NULL);
+	if (!g_thread_supported ()) g_thread_init (NULL);
 	queue.init();
 	queue_map[""] = queue;
 }

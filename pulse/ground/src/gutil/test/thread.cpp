@@ -99,7 +99,6 @@ int my_main (int argc, char** argv)
 int main(int argc, char** argv)
 {
     my_main(argc,argv);
-    exit(0);
     return 0;
 }
 

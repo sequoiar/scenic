@@ -11,7 +11,7 @@
 class BaseMessage
 {
 public:
-	enum type { error =-2, undefined=-1,zero=0,ok='=',quit='Q',system='!',ping='.',string='s'};
+	enum type { error =-2, undefined=-1,zero=0,ok='=',quit='Q',init='I',start='S',stop='!',system='*',ping='.',string='s'};
 
 	BaseMessage(unsigned short i) : t_(static_cast<unsigned char>(i)){
 	}
