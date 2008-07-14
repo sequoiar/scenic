@@ -21,50 +21,50 @@
 //Caller gains ownership of args in list
 GstThread::GstThread()
 {
-	args.clear();
-	args.push_back(new StringArg(&conf_str,"sender",'s',"video", "try videotestsrc"));
+    args.clear();
+    args.push_back(new StringArg(&conf_str,"sender",'s',"video", "try videotestsrc"));
 }
 
 
 int GstThread::main()
 {
-	BaseMessage r(BaseMessage::ping);
-	conf = new VideoConfig(conf_str);
-	sender = new VideoSender(*conf);
-	bool quit = false;
-	while(!quit)
-	{
-		BaseMessage f = queue.copy_timed_pop(100);
-		switch(f.get_type())
-		{
-		case BaseMessage::quit:
-		{
-			BaseMessage f(BaseMessage::quit);
-			queue.push(f);
-			quit = true;
-		}
-			break;
-		case BaseMessage::start:
-		{
-			sender->start();
-		}
-			break;
-		case BaseMessage::init:
-		{
-			sender->init();
-		}
-			break;
-		case BaseMessage::stop:
-		{
-			sender->stop();
-		}
-			break;
+    BaseMessage r(BaseMessage::ping);
+    conf = new VideoConfig(conf_str);
+    sender = new VideoSender(*conf);
+    bool quit = false;
+    while(!quit)
+    {
+        BaseMessage f = queue.copy_timed_pop(100);
+        switch(f.get_type())
+        {
+        case BaseMessage::quit:
+        {
+            BaseMessage f(BaseMessage::quit);
+            queue.push(f);
+            quit = true;
+        }
+            break;
+        case BaseMessage::start:
+        {
+            sender->start();
+        }
+            break;
+        case BaseMessage::init:
+        {
+            sender->init();
+        }
+            break;
+        case BaseMessage::stop:
+        {
+            sender->stop();
+        }
+            break;
 
-		default:
-			break;
-		}
-	}
-	return 0;
+        default:
+            break;
+        }
+    }
+    return 0;
 }
 
 

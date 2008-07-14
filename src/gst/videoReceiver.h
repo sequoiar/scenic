@@ -28,20 +28,20 @@
 class VideoReceiver : public MediaBase
 {
 public:
-	VideoReceiver(const VideoConfig & config);
-	virtual bool start();
-	virtual bool stop();
-	virtual ~VideoReceiver();
+    VideoReceiver(const VideoConfig & config);
+    virtual bool start();
+    virtual bool stop();
+    virtual ~VideoReceiver();
 
 private:
-	void set_caps(const char* capsStr);
-	virtual void init_source();
-	virtual void init_codec();
-	virtual void init_sink();
+    void set_caps(const char* capsStr);
+    virtual void init_source();
+    virtual void init_codec();
+    virtual void init_sink();
 
-	RtpReceiver session_;
-	const VideoConfig &config_;
-	GstElement *depayloader_, *decoder_, *sink_;
+    RtpReceiver session_;
+    const VideoConfig &config_;
+    GstElement *depayloader_, *decoder_, *sink_;
 };
 
 #endif

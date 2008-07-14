@@ -35,23 +35,23 @@
 class BaseArg
 {
 public:
-	BaseArg(char t,std::string l, char s, std::string d, std::string a)
-		: type(t),l_arg(l),desc(d),arg_desc(a),s_arg(s){
-	}
-	char type;
-	std::string l_arg, desc, arg_desc;
-	char s_arg;
-	virtual ~BaseArg(){
-	}
+    BaseArg(char t,std::string l, char s, std::string d, std::string a)
+        : type(t),l_arg(l),desc(d),arg_desc(a),s_arg(s){
+    }
+    char type;
+    std::string l_arg, desc, arg_desc;
+    char s_arg;
+    virtual ~BaseArg(){
+    }
 };
 
 class IntArg : public BaseArg
 {
 public:
-	int* arg;
-	IntArg(int* i,std::string l, char s, std::string d, std::string a) :
-		BaseArg('i',l,s,d,a),arg(i){
-	}
+    int* arg;
+    IntArg(int* i,std::string l, char s, std::string d, std::string a) :
+        BaseArg('i',l,s,d,a),arg(i){
+    }
 
 
 };
@@ -59,19 +59,19 @@ public:
 class BoolArg : public BaseArg
 {
 public:
-	bool* arg;
-	BoolArg(bool* b,std::string l, char s, std::string d) :
-		BaseArg('b',l,s,d, std::string()),arg(b){
-	}
+    bool* arg;
+    BoolArg(bool* b,std::string l, char s, std::string d) :
+        BaseArg('b',l,s,d, std::string()),arg(b){
+    }
 };
 
 class StringArg : public BaseArg
 {
 public:
-	char** arg ;
-	StringArg(char** ppc,std::string l, char s, std::string d, std::string a) :
-		BaseArg('s',l, s, d, a),arg(ppc){
-	}
+    char** arg ;
+    StringArg(char** ppc,std::string l, char s, std::string d, std::string a) :
+        BaseArg('s',l, s, d, a),arg(ppc){
+    }
 };
 
 
@@ -81,24 +81,24 @@ public:
 class BaseModule
 {
 public:
-	typedef std::list<BaseArg*> ArgList;
-	typedef std::list<BaseArg*>::iterator iterator;
-	ArgList args;
-	ArgList& get_args(){
-		return args;
-	}
-	virtual bool run(){
-		return 1;
-	}
-	bool init(){
-		return 1;
-	}
-	virtual ~BaseModule(){
-		for(iterator it = args.begin(); it != args.end(); ++it)
-		{
-			delete (*it);
-		}
-	}
+    typedef std::list<BaseArg*> ArgList;
+    typedef std::list<BaseArg*>::iterator iterator;
+    ArgList args;
+    ArgList& get_args(){
+        return args;
+    }
+    virtual bool run(){
+        return 1;
+    }
+    bool init(){
+        return 1;
+    }
+    virtual ~BaseModule(){
+        for(iterator it = args.begin(); it != args.end(); ++it)
+        {
+            delete (*it);
+        }
+    }
 };
 
 #endif

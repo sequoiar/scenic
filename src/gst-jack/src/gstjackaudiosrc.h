@@ -73,27 +73,27 @@ typedef struct _GstJackAudioSrcClass GstJackAudioSrcClass;
 
 struct _GstJackAudioSrc
 {
-	GstBaseAudioSrc src;
+    GstBaseAudioSrc src;
 
-	/*< private >*/
-	/* cached caps */
-	GstCaps         *caps;
+    /*< private >*/
+    /* cached caps */
+    GstCaps         *caps;
 
-	/* properties */
-	GstJackConnect connect;
-	gchar           *server;
+    /* properties */
+    GstJackConnect connect;
+    gchar           *server;
 
-	/* our client */
-	GstJackAudioClient *client;
+    /* our client */
+    GstJackAudioClient *client;
 
-	/* our ports */
-	jack_port_t    **ports;
-	int port_count;
+    /* our ports */
+    jack_port_t    **ports;
+    int port_count;
 };
 
 struct _GstJackAudioSrcClass
 {
-	GstBaseAudioSrcClass parent_class;
+    GstBaseAudioSrcClass parent_class;
 };
 
 GType gst_jackaudiosrc_get_type (void);

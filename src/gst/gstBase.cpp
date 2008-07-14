@@ -35,6 +35,6 @@ GstBase::~GstBase()
 
 bool GstBase::isPlaying()
 {
-	return pipeline_.isPlaying();
+    return pipeline_.isPlaying();
 }
 

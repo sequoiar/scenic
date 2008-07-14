@@ -30,8 +30,8 @@ G_BEGIN_DECLS
 
 typedef enum
 {
-	GST_JACK_CLIENT_SOURCE,
-	GST_JACK_CLIENT_SINK
+    GST_JACK_CLIENT_SOURCE,
+    GST_JACK_CLIENT_SINK
 } GstJackClientType;
 
 typedef struct _GstJackAudioClient GstJackAudioClient;

@@ -28,78 +28,78 @@ typedef QueuePair_<BaseMessage> QueuePair;
 
 class Thread : public BaseThread<BaseMessage>
 {
-	int main();
-	int max_count;
+    int main();
+    int max_count;
 public:
-	bool init();
+    bool init();
 };
 
 
 bool Thread::init()
 {
-	max_count = 1000;
-	args.push_back(new IntArg(&max_count,"count",'c',"count it", "number of messages"));
-	return true;
+    max_count = 1000;
+    args.push_back(new IntArg(&max_count,"count",'c',"count it", "number of messages"));
+    return true;
 }
 
 int Thread::main()
 {
-	BaseMessage r(BaseMessage::ping);
-	int count=0;
-	while(1)
-	{
-		BaseMessage f = queue.copy_timed_pop(1);
-		LOG(" here ");
-		if(count++ == max_count) {
-			BaseMessage f(BaseMessage::quit);
-			queue.push(f);
-			break;
-		}
-	}
-	return 0;
+    BaseMessage r(BaseMessage::ping);
+    int count=0;
+    while(1)
+    {
+        BaseMessage f = queue.copy_timed_pop(1);
+        LOG(" here ");
+        if(count++ == max_count) {
+            BaseMessage f(BaseMessage::quit);
+            queue.push(f);
+            break;
+        }
+    }
+    return 0;
 }
 
 
 int my_main (int argc, char** argv)
 {
-	Thread t;
-	OptionArgs opts;
+    Thread t;
+    OptionArgs opts;
 
-	if(!t.init())
-		return 1;
+    if(!t.init())
+        return 1;
 
-	opts.add(t.get_args());
-	if(!opts.parse(argc,argv))
-		return 1;
+    opts.add(t.get_args());
+    if(!opts.parse(argc,argv))
+        return 1;
 
-	QueuePair queue = t.getQueue("");
+    QueuePair queue = t.getQueue("");
 //	QueuePair queue2 = t.getQueue("a");
-	if(!t.run())
-		return -1;
+    if(!t.run())
+        return -1;
 
-	while(1)
-	{
-		BaseMessage f(BaseMessage::ok);
-		queue.push(f);
-		usleep(10);
-		f = queue.copy_timed_pop(1);
+    while(1)
+    {
+        BaseMessage f(BaseMessage::ok);
+        queue.push(f);
+        usleep(10);
+        f = queue.copy_timed_pop(1);
 //		BaseMessage f2 = queue2.copy_timed_pop(1);
 
-		if(f.get_type() == BaseMessage::quit) {
-			break;
-		}
+        if(f.get_type() == BaseMessage::quit) {
+            break;
+        }
 
 
 
-	}
-	std::cout << "Done!" << std::endl;
-	return 0;
+    }
+    std::cout << "Done!" << std::endl;
+    return 0;
 }
 
 int main(int argc, char** argv)
 {
-	my_main(argc,argv);
-	return 0;
+    my_main(argc,argv);
+    return 0;
 }
 
 

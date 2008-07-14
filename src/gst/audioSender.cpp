@@ -31,83 +31,83 @@
 #include "audioSource.h"
 
 AudioSender::AudioSender(const AudioConfig & config)
-	: config_(config), encoder_(0),
-	payloader_(0), sink_(0)
+    : config_(config), encoder_(0),
+    payloader_(0), sink_(0)
 {
-	// empty
+    // empty
 }
 
 AudioSender::~AudioSender()
 {
-	assert(stop());
+    assert(stop());
 
-	pipeline_.remove(sink_);
-	pipeline_.remove(payloader_);
-	pipeline_.remove(encoder_);
-	delete source_;
+    pipeline_.remove(sink_);
+    pipeline_.remove(payloader_);
+    pipeline_.remove(encoder_);
+    delete source_;
 }
 
 void AudioSender::init_source()
 {
-	source_ = AudioSource::create(config_);
-	assert(source_);
-	source_->init();
+    source_ = AudioSource::create(config_);
+    assert(source_);
+    source_->init();
 }
 
 void AudioSender::init_codec()
 {
-	if (config_.hasCodec()) {
-		encoder_ = gst_element_factory_make(config_.codec(), NULL);
-		assert(encoder_);
-		pipeline_.add(encoder_);
-	}
+    if (config_.hasCodec()) {
+        encoder_ = gst_element_factory_make(config_.codec(), NULL);
+        assert(encoder_);
+        pipeline_.add(encoder_);
+    }
 }
 
 void AudioSender::init_sink()
 {
-	if (config_.isNetworked()) {
-		payloader_ = gst_element_factory_make("rtpvorbispay", NULL);
-		assert(payloader_);
-		pipeline_.add(payloader_);
+    if (config_.isNetworked()) {
+        payloader_ = gst_element_factory_make("rtpvorbispay", NULL);
+        assert(payloader_);
+        pipeline_.add(payloader_);
 
-		assert(gst_element_link_many(source_->interleave_, encoder_, payloader_, NULL));
+        assert(gst_element_link_many(source_->interleave_, encoder_, payloader_, NULL));
 
-		session_.add(payloader_, &config_);
-	}
-	else                        // local version
-	{
-		sink_ = gst_element_factory_make("jackaudiosink", NULL);
-		assert(sink_);
-		g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-		pipeline_.add(sink_);
+        session_.add(payloader_, &config_);
+    }
+    else                        // local version
+    {
+        sink_ = gst_element_factory_make("jackaudiosink", NULL);
+        assert(sink_);
+        g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+        pipeline_.add(sink_);
 
-		assert(gst_element_link(source_->interleave_, sink_));
-	}
+        assert(gst_element_link(source_->interleave_, sink_));
+    }
 }
 
 // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
 
 void AudioSender::send_caps() const
 {
-	LOG("Sending caps...");
+    LOG("Sending caps...");
 
-	lo_address t = lo_address_new(NULL, "7770");
-	if (lo_send(t, "/audio/rx/caps", "s", session_.caps_str()) == -1)
-		std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
+    lo_address t = lo_address_new(NULL, "7770");
+    if (lo_send(t, "/audio/rx/caps", "s", session_.caps_str()) == -1)
+        std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
 }
 
 bool AudioSender::start()
 {
-	MediaBase::start();
+    MediaBase::start();
 
-	if (config_.isNetworked()) {
-		std::cout << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port()
-		          << std::endl;
+    if (config_.isNetworked()) {
+        std::cout << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port()
+                  << std::endl;
 
-		pipeline_.wait_until_playing();
-		send_caps();
-	}
+        pipeline_.wait_until_playing();
+        send_caps();
+    }
 
-	return true;
+    return true;
 }
 

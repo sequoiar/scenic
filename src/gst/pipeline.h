@@ -27,29 +27,29 @@
 class Pipeline
 {
 public:
-	static Pipeline & Instance();
-	void add(GstElement * element);
-	void add_vector(std::vector < GstElement * >&elementVec);
-	void remove(GstElement * element);
-	void remove_vector(std::vector < GstElement * >&elementVec);
-	bool isPlaying() const;
-	void wait_until_playing() const;
-	void init();
-	bool start();
-	bool stop();
+    static Pipeline & Instance();
+    void add(GstElement * element);
+    void add_vector(std::vector < GstElement * >&elementVec);
+    void remove(GstElement * element);
+    void remove_vector(std::vector < GstElement * >&elementVec);
+    bool isPlaying() const;
+    void wait_until_playing() const;
+    void init();
+    bool start();
+    bool stop();
 
 // call back to attach new src pad
-	static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
-	static void cb_new_sink_pad(GstElement * element, GstPad * sinkPad, void *data);
+    static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
+    static void cb_new_sink_pad(GstElement * element, GstPad * sinkPad, void *data);
 
 private:
-	Pipeline();
-	~Pipeline();
-	static Pipeline *instance_;
+    Pipeline();
+    ~Pipeline();
+    static Pipeline *instance_;
 
-	void make_verbose();
-	GstElement *pipeline_;
-	bool verbose_;
+    void make_verbose();
+    GstElement *pipeline_;
+    bool verbose_;
 };
 
 #endif // _PIPELINE_H_

@@ -31,61 +31,61 @@ int RtpSession::instanceCount_ = -1;
 
 RtpSession::RtpSession() : rtcp_sender_(0), rtcp_receiver_(0)
 {
-	instanceCount_++;
+    instanceCount_++;
 }
 
 bool RtpSession::init()
 {
-	// only initialize rtpbin once per process
-	if (!rtpbin_) {
-		rtpbin_ = gst_element_factory_make("gstrtpbin", NULL);
-		assert(rtpbin_);
+    // only initialize rtpbin once per process
+    if (!rtpbin_) {
+        rtpbin_ = gst_element_factory_make("gstrtpbin", NULL);
+        assert(rtpbin_);
 
-		pipeline_.add(rtpbin_);
-	}
-	return true;
+        pipeline_.add(rtpbin_);
+    }
+    return true;
 }
 
 void RtpSession::add(GstElement * elem, const MediaConfig * config)
 {
-	RtpSession::init();
+    RtpSession::init();
 
-	rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
-	assert(rtcp_sender_);
-	g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port() + 1, "sync",
-	             FALSE, "async", FALSE, NULL);
+    rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
+    assert(rtcp_sender_);
+    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port() + 1, "sync",
+                 FALSE, "async", FALSE, NULL);
 
-	rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL);
-	assert(rtcp_receiver_);
-	g_object_set(rtcp_receiver_, "port", config->port() + 5, NULL);
+    rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL);
+    assert(rtcp_receiver_);
+    g_object_set(rtcp_receiver_, "port", config->port() + 5, NULL);
 
-	pipeline_.add(rtcp_sender_);
-	pipeline_.add(rtcp_receiver_);
+    pipeline_.add(rtcp_sender_);
+    pipeline_.add(rtcp_receiver_);
 
-	addDerived(elem, config);
+    addDerived(elem, config);
 }
 
 const char *RtpSession::padStr(const char *padName)
 {
-	std::string result(padName);
-	std::stringstream istream;
+    std::string result(padName);
+    std::stringstream istream;
 
-	istream << instanceCount_;        // 0-based
-	result = result + istream.str();
-	return result.c_str();
+    istream << instanceCount_;        // 0-based
+    result = result + istream.str();
+    return result.c_str();
 }
 
 RtpSession::~RtpSession()
 {
-	assert(pipeline_.stop());
+    assert(pipeline_.stop());
 
-	pipeline_.remove(rtcp_sender_);
-	pipeline_.remove(rtcp_receiver_);
+    pipeline_.remove(rtcp_sender_);
+    pipeline_.remove(rtcp_receiver_);
 
-	if (--instanceCount_ < 0) {
-		assert(instanceCount_ == -1);
-		pipeline_.remove(rtpbin_);
-		rtpbin_ = 0;
-	}
+    if (--instanceCount_ < 0) {
+        assert(instanceCount_ == -1);
+        pipeline_.remove(rtpbin_);
+        rtpbin_ = 0;
+    }
 }
 

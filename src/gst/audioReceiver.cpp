@@ -32,50 +32,50 @@
 #include "audioConfig.h"
 
 AudioReceiver::AudioReceiver(const AudioConfig & config) :
-	config_(config), gotCaps_(false), depayloader_(0), decoder_(0), sink_(0)
+    config_(config), gotCaps_(false), depayloader_(0), decoder_(0), sink_(0)
 {
-	// empty
+    // empty
 }
 
 AudioReceiver::~AudioReceiver()
 {
-	assert(stop());
+    assert(stop());
 
-	pipeline_.remove(sink_);
-	pipeline_.remove(decoder_);
-	pipeline_.remove(depayloader_);
+    pipeline_.remove(sink_);
+    pipeline_.remove(decoder_);
+    pipeline_.remove(depayloader_);
 }
 
 void AudioReceiver::wait_for_caps()
 {
-	LOG("Waiting for caps...");
+    LOG("Waiting for caps...");
 
-	lo_server_thread st = lo_server_thread_new("7770", liblo_error);
+    lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
-	lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler, (void *) this);
+    lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler, (void *) this);
 
-	lo_server_thread_start(st);
+    lo_server_thread_start(st);
 
-	while (!gotCaps_)
-		usleep(1000);
+    while (!gotCaps_)
+        usleep(1000);
 
-	lo_server_thread_free(st);
+    lo_server_thread_free(st);
 }
 
 void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
 {
-	printf("liblo server error %d in path %s: %s\n", num, path, msg);
-	fflush(stdout);
+    printf("liblo server error %d in path %s: %s\n", num, path, msg);
+    fflush(stdout);
 }
 
 int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg ** argv, int argc,
                                 void *data, void *user_data)
 {
-	AudioReceiver *context = static_cast < AudioReceiver * >(user_data);
-	context->session_.set_caps(&argv[0]->s);
-	context->gotCaps_ = true;
+    AudioReceiver *context = static_cast < AudioReceiver * >(user_data);
+    context->session_.set_caps(&argv[0]->s);
+    context->gotCaps_ = true;
 
-	return 0;
+    return 0;
 }
 
 
@@ -85,40 +85,40 @@ void AudioReceiver::init_source()
 
 void AudioReceiver::init_codec()
 {
-	depayloader_ = gst_element_factory_make("rtpvorbisdepay", NULL);
-	assert(depayloader_);
+    depayloader_ = gst_element_factory_make("rtpvorbisdepay", NULL);
+    assert(depayloader_);
 
-	pipeline_.add(depayloader_);
+    pipeline_.add(depayloader_);
 
-	decoder_ = gst_element_factory_make(config_.codec(), NULL);
-	assert(decoder_);
+    decoder_ = gst_element_factory_make(config_.codec(), NULL);
+    assert(decoder_);
 
-	pipeline_.add(decoder_);
+    pipeline_.add(decoder_);
 
-	assert(gst_element_link(depayloader_, decoder_));
+    assert(gst_element_link(depayloader_, decoder_));
 
-	session_.add(depayloader_, &config_);
+    session_.add(depayloader_, &config_);
 }
 
 
 void AudioReceiver::init_sink()
 {
-	sink_ = gst_element_factory_make("jackaudiosink", NULL);
-	assert(sink_);
-	g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    sink_ = gst_element_factory_make("jackaudiosink", NULL);
+    assert(sink_);
+    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
-	pipeline_.add(sink_);
+    pipeline_.add(sink_);
 
-	assert(gst_element_link(decoder_, sink_));
+    assert(gst_element_link(decoder_, sink_));
 }
 
 
 bool AudioReceiver::start()
 {
-	// FIXME: caps are only sent if sender is started after
-	wait_for_caps();
-	std::cout << "Receiving audio on port " << config_.port() << std::endl;
-	MediaBase::start();
-	return true;
+    // FIXME: caps are only sent if sender is started after
+    wait_for_caps();
+    std::cout << "Receiving audio on port " << config_.port() << std::endl;
+    MediaBase::start();
+    return true;
 }
 

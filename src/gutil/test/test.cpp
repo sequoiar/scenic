@@ -25,44 +25,44 @@
 
 class DModule : public BaseModule
 {
-	bool pass;
+    bool pass;
 public:
-	bool run();
-	void init();
+    bool run();
+    void init();
 };
 
 void DModule::init()
 {
-	pass = false;
-	args.push_back(new BoolArg(&pass,"pass",'p',"bypass this module"));
+    pass = false;
+    args.push_back(new BoolArg(&pass,"pass",'p',"bypass this module"));
 }
 
 bool DModule::run()
 {
-	if(!pass) {
-		LOG("x ");
-	}
+    if(!pass) {
+        LOG("x ");
+    }
 
-	return true;
+    return true;
 }
 int my_main(int argc, char** argv)
 {
 
-	DModule m;
-	OptionArgs opts;
-	m.init();
-	opts.add(m.get_args());
-	if(!opts.parse(argc,argv))
-		return 1;
+    DModule m;
+    OptionArgs opts;
+    m.init();
+    opts.add(m.get_args());
+    if(!opts.parse(argc,argv))
+        return 1;
 
-	m.run();
+    m.run();
 
-	return 0;
+    return 0;
 }
 
 int main (int argc, char** argv)
 {
-	return my_main(argc,argv);
+    return my_main(argc,argv);
 }
 
 

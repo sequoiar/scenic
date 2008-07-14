@@ -30,29 +30,29 @@ class AudioSource;
 class AudioSender : public MediaBase
 {
 public:
-	AudioSender(const AudioConfig & config);
-	AudioSender();
-	virtual ~AudioSender();
-	virtual bool start();
+    AudioSender(const AudioConfig & config);
+    AudioSender();
+    virtual ~AudioSender();
+    virtual bool start();
 
 private:
-	// helper methods
+    // helper methods
 
-	virtual void init_source();
-	virtual void init_codec();
-	virtual void init_sink();
+    virtual void init_source();
+    virtual void init_codec();
+    virtual void init_sink();
 
-	void send_caps() const;
-	const char *caps_str() const;
+    void send_caps() const;
+    const char *caps_str() const;
 
-	// data
-	const AudioConfig &config_;
-	RtpSender session_;
-	AudioSource *source_;
+    // data
+    const AudioConfig &config_;
+    RtpSender session_;
+    AudioSource *source_;
 
-	GstElement *encoder_;
-	GstElement *payloader_;
-	GstElement *sink_;
+    GstElement *encoder_;
+    GstElement *payloader_;
+    GstElement *sink_;
 };
 
 #endif // _AUDIO_SENDER_H_

@@ -32,91 +32,91 @@
 OptionArgs::~OptionArgs()
 {
 /*	for(; str_dump.begin() != str_dump.end();)
-   	{
-   		delete (*str_dump.begin());
-   		str_dump.erase(str_dump.begin());
-   	}
+    {
+        delete (*str_dump.begin());
+        str_dump.erase(str_dump.begin());
+    }
  */
 }
 void OptionArgs::add(BaseModule::ArgList args)
 {
-	for(BaseModule::iterator it= args.begin(); it != args.end(); ++it){
-		add(*it);
-	}
+    for(BaseModule::iterator it= args.begin(); it != args.end(); ++it){
+        add(*it);
+    }
 }
 
 
 void OptionArgs::add(BaseArg *ba)
 {
-	if(ba->type == 'i') {
-		IntArg* arg = dynamic_cast<IntArg*>(ba);
-		GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
-			              G_OPTION_ARG_INT, arg->arg, arg->desc.c_str(), arg->arg_desc.c_str()};
-		options.push_back(e);
-	}
-	else if (ba->type == 'b') {
-		BoolArg* arg = dynamic_cast<BoolArg*>(ba);
-		GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
-			              G_OPTION_ARG_NONE, arg->arg, arg->desc.c_str()};
-		options.push_back(e);
-	}
-	else if (ba->type == 's') {
-		StringArg* arg = dynamic_cast<StringArg*>(ba);
-		GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
-			              G_OPTION_ARG_STRING, arg->arg, arg->desc.c_str(), arg->arg_desc.c_str()};
-		options.push_back(e);
-	}
-	else{
-		LOG("Bad BaseArg type");
-	}
+    if(ba->type == 'i') {
+        IntArg* arg = dynamic_cast<IntArg*>(ba);
+        GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
+                          G_OPTION_ARG_INT, arg->arg, arg->desc.c_str(), arg->arg_desc.c_str()};
+        options.push_back(e);
+    }
+    else if (ba->type == 'b') {
+        BoolArg* arg = dynamic_cast<BoolArg*>(ba);
+        GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
+                          G_OPTION_ARG_NONE, arg->arg, arg->desc.c_str()};
+        options.push_back(e);
+    }
+    else if (ba->type == 's') {
+        StringArg* arg = dynamic_cast<StringArg*>(ba);
+        GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
+                          G_OPTION_ARG_STRING, arg->arg, arg->desc.c_str(), arg->arg_desc.c_str()};
+        options.push_back(e);
+    }
+    else{
+        LOG("Bad BaseArg type");
+    }
 }
 
 
 
 GOptionEntry* OptionArgs::getArray()
 {
-	GOptionEntry n = { NULL };
-	int count = 0;
-	if(options.empty())
-		return 0;
+    GOptionEntry n = { NULL };
+    int count = 0;
+    if(options.empty())
+        return 0;
 
-	pA = new GOptionEntry[options.size()+1];
-	for(Options::iterator it= options.begin(); it != options.end(); ++it)
-	{
-		pA[count++] = *it;
-	}
-	pA[count] =  n ;
+    pA = new GOptionEntry[options.size()+1];
+    for(Options::iterator it= options.begin(); it != options.end(); ++it)
+    {
+        pA[count++] = *it;
+    }
+    pA[count] =  n ;
 
-	return pA;
+    return pA;
 }
 int OptionArgs::parse(int argc,char **argv)
 {
-	int ret = 1;
-	GError *error = NULL;
-	GOptionContext *context;
-	GOptionEntry *pGOptions;
+    int ret = 1;
+    GError *error = NULL;
+    GOptionContext *context;
+    GOptionEntry *pGOptions;
 
 
 
-	context = g_option_context_new (0);
-	g_option_context_set_summary(context, PACKAGE " ver. " PACKAGE_VERSION);
+    context = g_option_context_new (0);
+    g_option_context_set_summary(context, PACKAGE " ver. " PACKAGE_VERSION);
 
-	pGOptions = getArray();
-	g_option_context_add_main_entries(context, pGOptions,NULL);
+    pGOptions = getArray();
+    g_option_context_add_main_entries(context, pGOptions,NULL);
 
-	//afteradd delete?
-	//delele(pGOptions);
+    //afteradd delete?
+    //delele(pGOptions);
 
-	if (!g_option_context_parse (context, &argc, &argv, &error)) {
-		g_print ("option parsing failed: %s\n", error->message);
-		ret = 0;
-	}
+    if (!g_option_context_parse (context, &argc, &argv, &error)) {
+        g_print ("option parsing failed: %s\n", error->message);
+        ret = 0;
+    }
 
-	g_option_context_free(context);
-	delete[] pA;
+    g_option_context_free(context);
+    delete[] pA;
 
 
-	return ret;
+    return ret;
 }
 
 
