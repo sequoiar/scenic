@@ -57,7 +57,7 @@ int my_main(int argc, char** argv)
 
 	m.run();
 
-    return 0;
+	return 0;
 }
 
 int main (int argc, char** argv)

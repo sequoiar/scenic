@@ -47,9 +47,11 @@ private:
 class AudioTestSource : public AudioSource
 {
 public:
-	virtual ~AudioTestSource(){}
+	virtual ~AudioTestSource(){
+	}
 	virtual void init();
-	AudioTestSource(const AudioConfig &config) : AudioSource(config) {}
+	AudioTestSource(const AudioConfig &config) : AudioSource(config) {
+	}
 };
 
 class AudioFileSource : public AudioSource
@@ -57,7 +59,8 @@ class AudioFileSource : public AudioSource
 public:
 	virtual ~AudioFileSource();
 	virtual void init();
-	AudioFileSource(const AudioConfig &config) : AudioSource(config) {}
+	AudioFileSource(const AudioConfig &config) : AudioSource(config) {
+	}
 private:
 	virtual void linkElements();
 	std::vector<GstElement *> decoders_;
@@ -66,17 +69,21 @@ private:
 class AudioAlsaSource : public AudioSource
 {
 public:
-	virtual ~AudioAlsaSource(){}
+	virtual ~AudioAlsaSource(){
+	}
 	virtual void init();
-	AudioAlsaSource(const AudioConfig &config) : AudioSource(config) {}
+	AudioAlsaSource(const AudioConfig &config) : AudioSource(config) {
+	}
 };
 
 class AudioJackSource : public AudioSource
 {
 public:
-	virtual ~AudioJackSource(){}
+	virtual ~AudioJackSource(){
+	}
 	virtual void init();
-	AudioJackSource(const AudioConfig &config) : AudioSource(config) {}
+	AudioJackSource(const AudioConfig &config) : AudioSource(config) {
+	}
 };
 
 #endif //_AUDIO_SOURCE_H_

@@ -237,22 +237,22 @@ template < class T > void QueuePair_ < T >::init()
 }
 template < class T> void QueuePair_<T>::del(bool one)
 {
-    T *t;
-    GAsyncQueue *q;
-    if(one)
-        q = first;
-    else
-        q = second;
-    do
-    {
-        t = static_cast<T*>(g_async_queue_try_pop(q));
-        if(t)
-            delete t;
-    }
-    while(t);
-    
-    g_async_queue_unref(q);
-    qstor.erase(q);
+	T *t;
+	GAsyncQueue *q;
+	if(one)
+		q = first;
+	else
+		q = second;
+	do
+	{
+		t = static_cast<T*>(g_async_queue_try_pop(q));
+		if(t)
+			delete t;
+	}
+	while(t);
+
+	g_async_queue_unref(q);
+	qstor.erase(q);
 }
 
 template < class T > QueuePair_<T>::~QueuePair_ ()
@@ -271,8 +271,8 @@ template < class T > BaseThread < T >::~BaseThread()
 {
 	queue.del(true);
 	queue.del(false);
-    for(;queue_map.begin() != queue_map.end();queue_map.erase(queue_map.begin()))
-        queue_map.begin()->second.del(false);
+	for(; queue_map.begin() != queue_map.end(); queue_map.erase(queue_map.begin()))
+		queue_map.begin()->second.del(false);
 	if (th)
 		g_thread_join(th);
 
