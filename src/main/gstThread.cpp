@@ -22,19 +22,31 @@
 GstThread::GstThread()
 {
     args.clear();
+    conf_str = 0;
     args.push_back(new StringArg(&conf_str,"sender",'s',"video", "try videotestsrc"));
 }
 
 
 int GstThread::main()
 {
-    BaseMessage r(BaseMessage::ping);
-    conf = new VideoConfig(conf_str);
-    sender = new VideoSender(*conf);
     bool quit = false;
+
+    if(conf_str)
+    {
+        conf = new VideoConfig(conf_str);
+        if(conf)
+            sender = new VideoSender(*conf);
+        if(!sender)
+        {
+            BaseMessage m(BaseMessage::quit);
+            queue.push(m);
+            quit = true;
+        }
+    }
+    
     while(!quit)
     {
-        BaseMessage f = queue.copy_timed_pop(100);
+        BaseMessage f = queue.copy_timed_pop(10000);
         switch(f.get_type())
         {
         case BaseMessage::quit:
@@ -42,28 +54,30 @@ int GstThread::main()
             BaseMessage f(BaseMessage::quit);
             queue.push(f);
             quit = true;
-        }
             break;
+        }
         case BaseMessage::start:
         {
             sender->start();
-        }
             break;
+        }
         case BaseMessage::init:
         {
             sender->init();
-        }
             break;
+        }
         case BaseMessage::stop:
         {
             sender->stop();
-        }
             break;
+        }
 
         default:
             break;
         }
     }
+
+
     return 0;
 }
 

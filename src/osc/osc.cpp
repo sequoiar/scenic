@@ -42,7 +42,11 @@ OscMessage::OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d
 OscThread::OscThread()
 {
     args.clear();
-    args.push_back(new StringArg(&port_,"osc",'\0',"osc port", "port num"));
+    local_port_ = remote_port_ = remote_host_ = 0;
+    args.push_back(new StringArg(&local_port_,"oscLocal",'\0',"local osc port", "port num"));
+    args.push_back(new StringArg(&remote_port_,"oscRemote",'\0',"remote osc port", "port num"));
+    args.push_back(new StringArg(&remote_host_,"oscRemoteHost",'\0',"host", "host address"));
+
 
 }
 
@@ -65,10 +69,10 @@ int OscThread::generic_handler(const char *path, const char *types, lo_arg ** ar
 int OscThread::main()
 {
 //      static Message r(message::ok);
-    if(!port_)
+    if(!local_port_)
         return -1;
 
-    lo_server_thread st = lo_server_thread_new(port_, liblo_error);
+    lo_server_thread st = lo_server_thread_new(local_port_, liblo_error);
 
     lo_server_thread_add_method(st, NULL, NULL, generic_handler_static, this);
 
@@ -76,7 +80,7 @@ int OscThread::main()
 
     while (1)
     {
-        OscMessage msg = queue.copy_timed_pop(20);
+        OscMessage msg = queue.copy_timed_pop(10000);
         if (!msg.path.empty()) {
             send(msg);
         }
@@ -87,7 +91,10 @@ int OscThread::main()
 
 void OscThread::send(OscMessage & osc)
 {
-    lo_address t = lo_address_new(NULL, "7771");
+    if(!remote_port_)
+        return;
+
+    lo_address t = lo_address_new(remote_host_, remote_port_);
     lo_message m = lo_message_new();
 
     for (OscArgs::iterator it = osc.args.begin(); it != osc.args.end(); ++it)
