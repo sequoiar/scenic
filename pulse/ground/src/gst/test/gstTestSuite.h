@@ -99,12 +99,12 @@ public:
 		/*----------------------------------------------*/
 		/*      SANDBOX                                 */
 		/*----------------------------------------------*/
-        TEST_ADD(GstTestSuite::start_8ch_jack)
-        TEST_ADD(GstTestSuite::stop_8ch_jack)
-        TEST_ADD(GstTestSuite::start_stop_8ch_jack)
-    TEST_ADD(GstTestSuite::start_8ch_alsa)
-    TEST_ADD(GstTestSuite::stop_8ch_alsa)
-    TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
+		TEST_ADD(GstTestSuite::start_8ch_jack)
+		TEST_ADD(GstTestSuite::stop_8ch_jack)
+		TEST_ADD(GstTestSuite::start_stop_8ch_jack)
+		TEST_ADD(GstTestSuite::start_8ch_alsa)
+		TEST_ADD(GstTestSuite::stop_8ch_alsa)
+		TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
 	}
 
 	void set_id(int id);
@@ -172,13 +172,13 @@ private:
 	void stop_8ch_comp_rtp_audiofile();
 	void start_stop_8ch_comp_rtp_audiofile();
 
-    void start_8ch_jack();
-    void stop_8ch_jack();
-    void start_stop_8ch_jack();
-    
-    void start_8ch_alsa();
-    void stop_8ch_alsa();
-    void start_stop_8ch_alsa();
+	void start_8ch_jack();
+	void stop_8ch_jack();
+	void start_stop_8ch_jack();
+
+	void start_8ch_alsa();
+	void stop_8ch_alsa();
+	void start_stop_8ch_alsa();
 
 	void start_8ch_comp_rtp_audiofile_dv();
 	void stop_8ch_comp_rtp_audiofile_dv();
