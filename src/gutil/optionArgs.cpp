@@ -32,11 +32,11 @@
 OptionArgs::~OptionArgs()
 {
 /*	for(; str_dump.begin() != str_dump.end();)
-	{
-		delete (*str_dump.begin());
-		str_dump.erase(str_dump.begin());
-	}
-*/
+   	{
+   		delete (*str_dump.begin());
+   		str_dump.erase(str_dump.begin());
+   	}
+ */
 }
 void OptionArgs::add(BaseModule::ArgList args)
 {

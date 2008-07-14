@@ -18,14 +18,14 @@ int main (int argc, char** argv)
 	if(!t.run())
 		return -1;
 
-		BaseMessage in(BaseMessage::init);
-		queue.push(in);
+	BaseMessage in(BaseMessage::init);
+	queue.push(in);
 	while(1)
 	{
 		BaseMessage start(BaseMessage::start);
 		queue.push(start);
 		usleep(1000000);
-		
+
 		BaseMessage stop(BaseMessage::stop);
 		queue.push(stop);
 		usleep(1000000);

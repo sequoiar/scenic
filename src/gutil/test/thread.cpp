@@ -81,7 +81,7 @@ int my_main (int argc, char** argv)
 	{
 		BaseMessage f(BaseMessage::ok);
 		queue.push(f);
-        usleep(10);
+		usleep(10);
 		f = queue.copy_timed_pop(1);
 //		BaseMessage f2 = queue2.copy_timed_pop(1);
 
@@ -98,8 +98,8 @@ int my_main (int argc, char** argv)
 
 int main(int argc, char** argv)
 {
-    my_main(argc,argv);
-    return 0;
+	my_main(argc,argv);
+	return 0;
 }
 
 
