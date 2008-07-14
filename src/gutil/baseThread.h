@@ -68,7 +68,7 @@ template < class T > class BaseThread : public BaseModule
 {
 public:
     BaseThread < T > ();
-    ~BaseThread < T > ();
+    virtual ~BaseThread < T > ();
 
     QueuePair_ < T > getQueue(std::string s);
     GAsyncQueue *getPushQueue()
@@ -271,7 +271,7 @@ template < class T > BaseThread < T >::BaseThread() : th(0)
 template < class T > BaseThread < T >::~BaseThread()
 {
     queue.del(true);
-    queue.del(false);
+    //queue.del(false);
     for(; queue_map.begin() != queue_map.end(); queue_map.erase(queue_map.begin()))
         queue_map.begin()->second.del(false);
     if (th)

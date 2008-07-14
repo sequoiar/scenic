@@ -55,6 +55,7 @@ public:
 
     GOptionEntry* pA;
     int parse(int argc,char **argv);
+    OptionArgs():pA(0){}
     ~OptionArgs();
 };
 
