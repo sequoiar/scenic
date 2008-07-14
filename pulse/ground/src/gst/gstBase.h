@@ -26,15 +26,15 @@
 class GstBase
 {
 public:
-	bool isPlaying();
+    bool isPlaying();
 
 protected:
-	typedef std::vector < GstElement * >::iterator GstIter;
+    typedef std::vector < GstElement * >::iterator GstIter;
 
-	GstBase();
-	virtual ~GstBase();
+    GstBase();
+    virtual ~GstBase();
 
-	Pipeline & pipeline_;
+    Pipeline & pipeline_;
 
 private:
 };

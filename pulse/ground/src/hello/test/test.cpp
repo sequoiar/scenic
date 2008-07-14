@@ -25,27 +25,27 @@
 
 class DModule : public BaseModule
 {
-	bool pass;
+    bool pass;
 public:
-	bool run();
+    bool run();
 };
 
 
 bool DModule::run()
 {
-	if(!pass)
-		while(1){ LOG("x "); }
+    if(!pass)
+        while(1){ LOG("x "); }
 
-	return true;
+    return true;
 }
 
 int main (int argc, char** argv)
 {
-	DModule m;
+    DModule m;
 
 
-	m.run();
-	return 0;
+    m.run();
+    return 0;
 }
 
 

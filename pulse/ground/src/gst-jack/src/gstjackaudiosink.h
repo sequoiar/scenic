@@ -48,26 +48,26 @@ typedef struct _GstJackAudioSinkClass GstJackAudioSinkClass;
  * Opaque #GstJackAudioSink.
  */
 struct _GstJackAudioSink {
-	GstBaseAudioSink element;
+    GstBaseAudioSink element;
 
-	/*< private >*/
-	/* cached caps */
-	GstCaps         *caps;
+    /*< private >*/
+    /* cached caps */
+    GstCaps         *caps;
 
-	/* properties */
-	GstJackConnect connect;
-	gchar           *server;
+    /* properties */
+    GstJackConnect connect;
+    gchar           *server;
 
-	/* our client */
-	GstJackAudioClient *client;
+    /* our client */
+    GstJackAudioClient *client;
 
-	/* our ports */
-	jack_port_t    **ports;
-	int port_count;
+    /* our ports */
+    jack_port_t    **ports;
+    int port_count;
 };
 
 struct _GstJackAudioSinkClass {
-	GstBaseAudioSinkClass parent_class;
+    GstBaseAudioSinkClass parent_class;
 };
 
 GType gst_jack_audio_sink_get_type ();

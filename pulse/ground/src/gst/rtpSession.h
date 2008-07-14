@@ -30,17 +30,17 @@ class MediaConfig;
 class RtpSession : public GstBase
 {
 public:
-	virtual ~RtpSession();
-	virtual bool init();
-	virtual void add(GstElement * elem, const MediaConfig * config);
-	virtual void addDerived(GstElement * elem, const MediaConfig * config) = 0;
+    virtual ~RtpSession();
+    virtual bool init();
+    virtual void add(GstElement * elem, const MediaConfig * config);
+    virtual void addDerived(GstElement * elem, const MediaConfig * config) = 0;
 
 protected:
-	RtpSession();
-	static const char *padStr(const char *padName);
-	static GstElement *rtpbin_;
-	static int instanceCount_;
-	GstElement *rtcp_sender_, *rtcp_receiver_;
+    RtpSession();
+    static const char *padStr(const char *padName);
+    static GstElement *rtpbin_;
+    static int instanceCount_;
+    GstElement *rtcp_sender_, *rtcp_receiver_;
 };
 
 #endif // _RTP_SESSION_H_

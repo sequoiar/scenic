@@ -28,25 +28,25 @@
 
 AudioConfig::AudioConfig(const std::string &source, int numChannels, const std::string &codec, const std::string &remoteHost,
                          int port)
-	: MediaConfig(source, codec, remoteHost, port), numChannels_(numChannels)
+    : MediaConfig(source, codec, remoteHost, port), numChannels_(numChannels)
 {
-	// empty
+    // empty
 }
 
 AudioConfig::AudioConfig(const std::string & source, int numChannels) : MediaConfig(source),
-	numChannels_(numChannels)
+    numChannels_(numChannels)
 {
-	// empty
+    // empty
 }
 
 AudioConfig::AudioConfig(int numChannels, const std::string &codec, int port) : MediaConfig(codec, port),
-	numChannels_(numChannels)
+    numChannels_(numChannels)
 {
-	// empty
+    // empty
 }
 
 const int AudioConfig::numChannels() const
 {
-	return numChannels_;
+    return numChannels_;
 }
 

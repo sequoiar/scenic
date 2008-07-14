@@ -29,24 +29,24 @@ MediaBase::MediaBase()
 
 MediaBase::~MediaBase()
 {
-	pipeline_.stop();
+    pipeline_.stop();
 }
 
 bool MediaBase::start()
 {
-	return pipeline_.start();
+    return pipeline_.start();
 }
 
 bool MediaBase::stop()
 {
-	return pipeline_.stop();
+    return pipeline_.stop();
 }
 
 bool MediaBase::init()
 {
-	// these methods are defined in subclasses
-	init_source();
-	init_codec();
-	init_sink();
-	return true;
+    // these methods are defined in subclasses
+    init_source();
+    init_codec();
+    init_sink();
+    return true;
 }

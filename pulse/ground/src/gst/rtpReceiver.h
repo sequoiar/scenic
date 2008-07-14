@@ -30,15 +30,15 @@ class MediaConfig;
 class RtpReceiver : public RtpSession
 {
 public:
-	RtpReceiver();
-	void set_caps(const char *capsStr);
-	virtual ~RtpReceiver();
+    RtpReceiver();
+    void set_caps(const char *capsStr);
+    virtual ~RtpReceiver();
 
 protected:
-	virtual void addDerived(GstElement * sink, const MediaConfig * config);
+    virtual void addDerived(GstElement * sink, const MediaConfig * config);
 
 private:
-	GstElement *rtp_receiver_;
+    GstElement *rtp_receiver_;
 };
 
 #endif // _RTP_RECEIVER_H_

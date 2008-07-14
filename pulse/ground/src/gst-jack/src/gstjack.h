@@ -36,8 +36,8 @@
  */
 
 typedef enum {
-	GST_JACK_CONNECT_NONE,
-	GST_JACK_CONNECT_AUTO
+    GST_JACK_CONNECT_NONE,
+    GST_JACK_CONNECT_AUTO
 } GstJackConnect;
 
 
