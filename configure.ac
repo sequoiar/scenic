@@ -88,12 +88,9 @@ AX_BOOST_PYTHON
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 src/sdp/Makefile
-                 src/sdp/test/Makefile
                  src/gst/Makefile
                  src/gst/test/Makefile
                  src/sip/Makefile
-                 src/sip/test/Makefile
                  src/gutil/Makefile
                  src/gutil/test/Makefile
                  src/osc/Makefile
