@@ -270,13 +270,13 @@ template < class T > BaseThread < T >::BaseThread() : th(0)
 
 template < class T > BaseThread < T >::~BaseThread()
 {
+    if (th)
+        g_thread_join(th);
+
     queue.del(true);
     //queue.del(false);
     for(; queue_map.begin() != queue_map.end(); queue_map.erase(queue_map.begin()))
         queue_map.begin()->second.del(false);
-    if (th)
-        g_thread_join(th);
-
 //	for (; queue_map.begin() != queue_map.end(); queue_map.erase(queue_map.begin()))
 //            delete(*queue_map.begin());
 }

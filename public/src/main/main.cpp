@@ -5,7 +5,7 @@
 
 int m (int argc, char** argv)
 {
-    g_thread_init(NULL);
+//    g_thread_init(NULL);
     GstThread gst;
     OscThread o;
     OptionArgs opts;
@@ -59,7 +59,7 @@ int m (int argc, char** argv)
     }
 
     std::cout << "Done!" << std::endl;
-
+//    usleep(1000000);
     return 0;
 }
 
