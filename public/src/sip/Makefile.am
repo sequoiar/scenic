@@ -1,15 +1,15 @@
-proj_src = $(top_srcdir)/src
-INCLUDES = -I$(proj_src)/include -I$(proj_src)
+# Makefile for the sip module
 
-bin_PROGRAMS = sipMain
+BINdir = /usr/bin
 
-noinst_LIBRARIES = libsip.a
+BIN_PROGRAMS = session
 
-libsip_a_SOURCES = sip.cpp sipStateless.cpp
+sipsession_SOURCES = \
+		     session.c
 
-libsip_a_CPPFLAGS= $(PJSIP_CFLAGS) -I../
+sipsession_LDADD = 
+AM_CPPFLAGS = 
 
-sipMain_SOURCES = sipMain.cpp 
-sipMain_LDADD = libsip.a $(proj_src)/sdp/libsdp.a $(UUID_LIBS) $(PJSIP_LIBS) $(GST_LIBS) 
-sipMain_CPPFLAGS= $(PJSIP_CFLAGS) $(GST_CFLAGS) -I../
+noinst_HEADERS = \
+		 session.h 
 
