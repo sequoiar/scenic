@@ -29,6 +29,8 @@
 #include "audioReceiver.h"
 #include "audioConfig.h"
 
+#include "syncTester.h"
+
 /*----------------------------------------------*/
 // To actually observe the tests (watch/listen), set
 // this macro to 1.
@@ -1130,6 +1132,20 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
 
         TEST_ASSERT(!vTx.isPlaying());
         TEST_ASSERT(!aTx.isPlaying());
+    }
+}
+
+void GstTestSuite::sync()
+{
+    if (id_ == 0)
+    {
+        SyncTesterReceive rx;
+        rx.run();
+    }
+    else
+    {
+        SyncTesterSend tx;
+        tx.run();
     }
 }
 

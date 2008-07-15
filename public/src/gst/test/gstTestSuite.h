@@ -33,8 +33,8 @@
 #define BLOCKING 1
 
 #define VIDEO 0
-#define AUDIO 1
-#define RTP 1
+#define AUDIO 0
+#define RTP 0
 
 class GstTestSuite : public Test::Suite
 {
@@ -53,7 +53,7 @@ public:
         TEST_ADD(GstTestSuite::start_v4l)
         TEST_ADD(GstTestSuite::stop_v4l)
         TEST_ADD(GstTestSuite::start_stop_v4l)
-#if RTP
+#if RTP // AND VIDEO
         TEST_ADD(GstTestSuite::start_dv_rtp)
         TEST_ADD(GstTestSuite::stop_dv_rtp)
         TEST_ADD(GstTestSuite::start_stop_dv_rtp)
@@ -81,6 +81,10 @@ public:
         TEST_ADD(GstTestSuite::start_8ch_alsa)
         TEST_ADD(GstTestSuite::stop_8ch_alsa)
         TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
+        TEST_ADD(GstTestSuite::start_8ch_jack)
+        TEST_ADD(GstTestSuite::stop_8ch_jack)
+        TEST_ADD(GstTestSuite::start_stop_8ch_jack)
+
 #if RTP // AND AUDIO
         TEST_ADD(GstTestSuite::start_2ch_comp_rtp_audiotest)
         TEST_ADD(GstTestSuite::stop_2ch_comp_rtp_audiotest)
@@ -92,7 +96,7 @@ public:
         TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile)
         TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile)
 
-#if VIDEO
+#if VIDEO // AND RTP AND VIDEO
         TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile_dv)
         TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile_dv)
         TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv)
@@ -101,10 +105,11 @@ public:
 #endif                          // AUDIO
         /*----------------------------------------------*/
         /*      SANDBOX                                 */
+        /*                                              */
+        /*  Put newer tests here and set all defs to 0  */
+        /*  to test them by themselves.                 */
         /*----------------------------------------------*/
-        TEST_ADD(GstTestSuite::start_8ch_jack)
-        TEST_ADD(GstTestSuite::stop_8ch_jack)
-        TEST_ADD(GstTestSuite::start_stop_8ch_jack)
+        TEST_ADD(GstTestSuite::sync);
     }
 
     void set_id(int id);
@@ -183,6 +188,8 @@ private:
     void start_8ch_comp_rtp_audiofile_dv();
     void stop_8ch_comp_rtp_audiofile_dv();
     void start_stop_8ch_comp_rtp_audiofile_dv();
+
+    void sync();
 };
 
 #if BLOCKING
