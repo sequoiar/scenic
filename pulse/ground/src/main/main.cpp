@@ -33,6 +33,7 @@ int m (int argc, char** argv)
         {
             BaseMessage in(BaseMessage::quit);
             gst_queue.push(in);
+            osc_queue.push(OscMessage("/quit","",0,0,0));
             break;
         }
 

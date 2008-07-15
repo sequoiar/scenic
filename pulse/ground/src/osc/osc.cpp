@@ -60,8 +60,6 @@ int OscThread::generic_handler_static(const char *path, const char *types,
 
 int OscThread::generic_handler(const char *path, const char *types, lo_arg ** argv, int argc, void *data)
 {
-    if(!strcmp(path,"/quit"))
-        running = false;
 
     queue.push(OscMessage(path, types, argv, argc, data));
 //    if (queue_map.find(path) != queue_map.end())
@@ -85,8 +83,12 @@ int OscThread::main()
     while (running)
     {
         OscMessage msg = queue.copy_timed_pop(10000);
+        
         if (!msg.path.empty()) {
-            send(msg);
+            if(!msg.path.compare("/quit"))
+                return 0;
+            else
+                send(msg);
         }
 
     }
