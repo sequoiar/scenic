@@ -25,6 +25,7 @@ import optparse
 
 # Twisted imports
 from twisted.internet import reactor, protocol
+from twisted.conch import telnet
 
 #App imports
 from utils import Observer, log
@@ -89,7 +90,7 @@ class CliController(TelnetServer):
                           }
         
     def parse(self, data):
-        self.core = self.factory.subject
+        self.core = self.factory.subject.api
         data = to_utf(data)
         data = data.split()
         cmd = data[0]
@@ -340,6 +341,92 @@ class CliView(Observer):
 def bold(msg):
     return "%s[1m%s%s[0m" % (ESC, msg, ESC)
         
+
+class Test(telnet.Telnet):
+    
+    def __init__(self):
+        telnet.Telnet.__init__(self)
+        self.prompt = "pof: "
+        self.history = []
+        self.accept_options = (telnet.LINEMODE,
+                               telnet.ECHO,
+                               telnet.EC)
+        self.buffer = []
+        self.pos = 0
+        self.max_history = 10
+        
+    def write(self, msg, prompt=False):
+        self.transport.write(msg)
+        if prompt:
+            self.write_prompt()
+        
+    def applicationDataReceived(self, data):
+        print repr(data)
+        if data == "\r":
+            cmd = ''.join(self.buffer)
+            self.buffer = []
+            self.upd_history(cmd)
+            self.pos = 0
+            if cmd.lower() in ("exit", "quit"):
+                log.info("Telnet client at %s:%s has disconnected" % (self.addr.host, self.addr.port))
+                self.write("\r\nGood Bye\r\n")
+                self.transport.loseConnection()
+            else:
+                self.write_prompt()
+        elif data == ESC + '[A':
+            self.pos -= 1
+            if self.pos < len(self.history) * -1:
+                self.pos += 1
+                self.write(telnet.BEL)
+            else:
+                cmd = self.history[self.pos]
+                self.buffer = [cmd]
+                self.write('\r' + self.prompt + cmd)
+        elif data == ESC + '[B':
+            self.pos += 1
+            if self.pos == 0:
+                self.buffer = []
+                self.write('\r' + self.prompt)
+            elif self.pos > 0:
+                self.pos -= 1
+                self.write(telnet.BEL)
+            else:
+                cmd = self.history[self.pos]
+                self.buffer = [cmd]
+                self.write('\r' + self.prompt + cmd)
+        elif data == chr(127):
+            self.will(telnet.EL)
+#            self.write('\x08')
+            print "BACKSPACE"
+        else:
+            self.buffer.append(data)
+            self.write(data)
+    
+    def upd_history(self, cmd):
+        self.history.append(cmd)
+        if len(self.history) > self.max_history:
+            del self.history[0]
+        
+            
+    def parse(self, data):
+        """Method to be overidden when subclassing."""
+        self.write("command not found")
+        self.write_prompt()            
+            
+    def write_prompt(self):
+        self.transport.write("\r\n" + self.prompt)
+    
+    def connectionMade(self):
+        log.info("%s is connecting in Telnet on port %s" % (self.addr.host, self.addr.port))
+        self.write("Welcome to Sropulpof!", True)
+        self.do(telnet.LINEMODE)
+        self.will(telnet.ECHO)
+        
+    def enableRemote(self, option):
+        if option in self.accept_options:
+            return True
+        return False
+
 
 class CliFactory(protocol.ServerFactory):
     

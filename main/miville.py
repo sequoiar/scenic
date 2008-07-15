@@ -30,17 +30,18 @@ from utils import log, Subject
 import addressbook
 
 
-class Core(ui.ControllerApi):
+class Core(Subject):
     """Main class of the application and representing the 'Model' in the MVC"""
-    
+        
     def __init__(self):
-        ui.ControllerApi.__init__(self)
+        Subject.__init__(self)
         self.uis = None
         self.startup()
     
     def startup(self):
         self.load_uis()
         self.adb = addressbook.AddressBook('sropulpof')
+        self.api = ui.ControllerApi(self)
         
     def load_uis(self):
         self.uis = ui.load(ui.find_all())

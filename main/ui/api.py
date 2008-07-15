@@ -22,10 +22,11 @@ import sys
 
 from utils import Subject, get_def_name
 
-class ControllerApi(Subject):
+class ControllerApi():
     
-    def __init__(self):
-        Subject.__init__(self)
+    def __init__(self, core):
+        self.adb = core.adb
+        self.notify = core.notify
 
 
     ### Contacts ###
