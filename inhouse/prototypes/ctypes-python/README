@@ -1,0 +1,3 @@
+To build the shared library (non exhaustiv flag list):
+	gcc -c test.c
+	gcc -shared -o libsip.so test.o
