@@ -32,46 +32,61 @@
 const int SyncTester::V_PORT = 10010;
 const int SyncTester::A_PORT = 11010;
 
-SyncTester::SyncTester(const VideoConfig &vConf, const AudioConfig &aConf) : vConfig_(vConf), aConfig_(aConf)
+SyncTesterSend::SyncTesterSend()
 {
 }
 
-SyncTesterSend::SyncTesterSend() : SyncTester(VideoConfig("videotestsrc", "h264", MY_ADDRESS, V_PORT), 
-        AudioConfig("audiotestsrc", 8, "vorbisenc", MY_ADDRESS, A_PORT)), 
-        vTx_(vConfig_),
-        aTx_(aConfig_)
-{
-}
-
-SyncTesterReceive::SyncTesterReceive() : SyncTester(VideoConfig("h264", V_PORT), 
-        AudioConfig(8, "vorbisdec", A_PORT)), 
-        vRx_(vConfig_),
-        aRx_(aConfig_)
+SyncTesterReceive::SyncTesterReceive() 
 {
 }
 
 void SyncTesterSend::run()
 {
-        vTx_.init();
-        aTx_.init();
+    VideoConfig vConfig("videotestsrc", "h264", MY_ADDRESS, V_PORT);
+    VideoSender vTx(vConfig);
+    vTx.init();
+    
+    AudioConfig aConfig("audiotestsrc", 8, "vorbisenc", MY_ADDRESS, A_PORT);
+    AudioSender aTx(aConfig);
+    aTx.init();
 
-        assert(aTx_.start());
-        assert(vTx_.start());
+    assert(vTx.start());
+    assert(aTx.start());
 
-        BLOCK();
-        assert(vTx_.isPlaying());
-        assert(aTx_.isPlaying());
+    BLOCK();
+
+    assert(vTx.isPlaying());
+    assert(aTx.isPlaying());
+    
+    assert(vTx.stop());
+    assert(aTx.stop());
+
+    assert(!vTx.isPlaying());
+    assert(!aTx.isPlaying());
 }
 
 void SyncTesterReceive::run()
 {
-        vRx_.init();
-        aRx_.init();
+    VideoConfig vConfig("h264", V_PORT);
+    VideoReceiver vRx(vConfig);
+    vRx.init();
 
-        assert(vRx_.start());
-        assert(aRx_.start());
+    AudioConfig aConfig(8, "vorbisdec", A_PORT);
+    AudioReceiver aRx(aConfig);
+    aRx.init();
 
-        BLOCK();
-        assert(vRx_.isPlaying());
-        assert(aRx_.isPlaying());
+    assert(vRx.start());
+    assert(aRx.start());
+
+    BLOCK();
+
+    assert(vRx.isPlaying());
+    assert(aRx.isPlaying());
+
+    assert(vRx.stop());
+    assert(aRx.stop());
+        
+    assert(!vRx.isPlaying());
+    assert(!aRx.isPlaying());
 }
+

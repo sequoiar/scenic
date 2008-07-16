@@ -34,9 +34,7 @@ public:
     virtual void run() = 0;
 
 protected:
-    SyncTester(const VideoConfig &vConf, const AudioConfig &aConf);
-    const VideoConfig &vConfig_;
-    const AudioConfig &aConfig_;
+    SyncTester() {};
     static const int V_PORT;
     static const int A_PORT;
 };
@@ -46,10 +44,6 @@ class SyncTesterSend : public SyncTester
     public:
         SyncTesterSend();
         virtual void run();
-
-    private:
-        VideoSender vTx_;
-        AudioSender aTx_;
 };
 
 class SyncTesterReceive : public SyncTester
@@ -57,10 +51,6 @@ class SyncTesterReceive : public SyncTester
     public:
         SyncTesterReceive();
         virtual void run();
-
-    private:
-        VideoReceiver vRx_;
-        AudioReceiver aRx_;
 };
 
 #endif // _SYNC_TESTER_H_

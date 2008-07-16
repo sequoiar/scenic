@@ -21,7 +21,7 @@
 #ifndef _RTP_RECEIVER_H_
 #define _RTP_RECEIVER_H_
 
-#include <vector>
+#include <list>
 #include <gst/gst.h>
 #include "rtpSession.h"
 
@@ -38,7 +38,9 @@ protected:
     virtual void addDerived(GstElement * sink, const MediaConfig * config);
 
 private:
+    static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
     GstElement *rtp_receiver_;
+    static std::list<GstElement *> newSinks_;
 };
 
 #endif // _RTP_RECEIVER_H_
