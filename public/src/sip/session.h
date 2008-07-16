@@ -25,20 +25,24 @@
  * @brief	A class to manage sessions
  */
 
+#include <pjsip.h>
+#include <pjlib.h>
+#include <pjsip_ua.h>
+#include <pjlib-util.h>
+
 #define SIP_SESSION		0
 #define DEFAULT_SIP_PORT	5060
 
 struct _session{
-	int type; // SIP
 	char* local_ip;
 	char* remote_ip;
 	int local_port;
 	int remote_port;
 };
 
-void session_init( void );
+int session_init( void );
 
-int session_connect( );
+int session_connect( int r_port, char* r_ip );
 
 int session_disconnect( );
 
