@@ -70,6 +70,14 @@ void Pipeline::make_verbose()
 
 void Pipeline::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
 {
+    std::cout << "Element: " << gst_element_get_name(srcElement) << std::endl;
+    std::cout << "Pad: " << gst_pad_get_name(srcPad) << std::endl;
+    if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
+    {   
+        LOG("Dynamic pad creation: pad is not a source");
+        return;
+    }
+
     GstElement *sinkElement = (GstElement *) data;
     GstPad *sinkPad;
     LOG("Dynamic pad created, linking new srcpad to existing sinkpad.");
@@ -81,6 +89,14 @@ void Pipeline::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *da
 
 void Pipeline::cb_new_sink_pad(GstElement * sinkElement, GstPad * sinkPad, void *data)
 {
+    std::cout << "Element: " << gst_element_get_name(sinkElement) << std::endl;
+    std::cout << "Pad: " << gst_pad_get_name(sinkPad) << std::endl;
+    if (gst_pad_get_direction(sinkPad) != GST_PAD_SINK)
+    {
+        LOG("Dynamic pad creation: pad is not a sink");
+        return;
+    }
+
     GstElement *srcElement = (GstElement *) data;
     GstPad *srcPad;
     LOG("Dynamic pad created, linking new sinkpad to existing srcpad.");

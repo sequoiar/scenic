@@ -20,9 +20,14 @@
 
 #include <gst/gst.h>
 #include <cassert>
+#include <iostream>
+#include <list>
 
+#include "logWriter.h"
 #include "rtpReceiver.h"
 #include "mediaConfig.h"
+
+std::list<GstElement *> RtpReceiver::newSinks_;
 
 
 RtpReceiver::RtpReceiver() : rtp_receiver_(0)
@@ -33,6 +38,9 @@ RtpReceiver::~RtpReceiver()
 {
     assert(pipeline_.stop());
     pipeline_.remove(rtp_receiver_);
+    // FIXME: assumes this destructor will be called in the right order, maybe should 
+    // be replaced by observer
+    newSinks_.pop_front();
 }
 
 void RtpReceiver::set_caps(const char *capsStr)
@@ -42,6 +50,52 @@ void RtpReceiver::set_caps(const char *capsStr)
     assert(caps);
     g_object_set(G_OBJECT(rtp_receiver_), "caps", caps, NULL);
     gst_caps_unref(caps);
+}
+
+void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
+{
+    if (gst_pad_is_linked(srcPad))
+    {
+        LOG("Pad is already linked")
+            return;
+    }
+    if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
+    {   
+        LOG("Pad is not a source");
+        return;
+    }
+    if (strncmp(gst_pad_get_name(srcPad), "recv_rtp_src", 12))
+    {
+        LOG("Wrong pad");
+        return;
+    }
+    LOG("Dynamic pad created, linking new srcpad to existing sinkpad.");
+    std::cout << "SrcElement: " << gst_element_get_name(srcElement) << std::endl;
+    std::cout << "SrcPad: " << gst_pad_get_name(srcPad) << std::endl;
+
+    std::list<GstElement *> * sinkElements = (std::list<GstElement *> *) data;
+    std::cout << "You have " << sinkElements->size() << " sinks stored. " << std::endl;
+    
+    std::list<GstElement *>::iterator iter;
+    for (iter = sinkElements->begin(); iter != sinkElements->end(); ++iter)
+        std::cout << "SinkElement: " << gst_element_get_name(*iter) << std::endl;
+
+    GstPad *sinkPad;
+
+    sinkPad = gst_element_get_static_pad(sinkElements->front(), "sink");
+
+    iter = sinkElements->begin();
+    while (strncmp(gst_caps_to_string(gst_pad_get_caps(sinkPad)), gst_caps_to_string(gst_pad_get_caps(srcPad)), 37) 
+            && iter != sinkElements->end())
+    {
+        sinkPad = gst_element_get_static_pad(*iter, "sink");
+        ++iter;
+    }
+    std::cout << "SINKPAD CAPS: " << gst_caps_to_string(gst_pad_get_caps(sinkPad)) << std::endl;
+    std::cout << "SRCPAD CAPS: " << gst_caps_to_string(gst_pad_get_caps(srcPad)) << std::endl;
+
+    assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
+    gst_object_unref(sinkPad);
 }
 
 void RtpReceiver::addDerived(GstElement * newSink, const MediaConfig * config)
@@ -81,8 +135,9 @@ void RtpReceiver::addDerived(GstElement * newSink, const MediaConfig * config)
     assert(gst_pad_link(rtcpReceiverSrc, recv_rtcp_sink) == GST_PAD_LINK_OK);
     assert(gst_pad_link(send_rtcp_src, rtcpSenderSink) == GST_PAD_LINK_OK);
 
+    newSinks_.push_back(newSink);
     // when pad is created, it must be linked to new sink
-    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *) newSink);
+    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), (void *) &newSinks_);
 
     // release request pads (in reverse order)
     gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);

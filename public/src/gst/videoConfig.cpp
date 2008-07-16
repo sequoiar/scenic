@@ -25,6 +25,7 @@
  */
 
 #include <string>
+#include <iostream>
 #include "videoConfig.h"
 
 // for sender (remote)
@@ -49,10 +50,10 @@ VideoConfig::VideoConfig(const std::string &codec, int port) : MediaConfig(codec
 
 const bool VideoConfig::has_dv() const
 {
-    return !source_.compare("dv1394src");
+    return (source_ == "dv1394src");
 }
 
 const bool VideoConfig::has_h264() const
 {
-    return !codec_.compare("h264");
+    return (codec_ == "h264");
 }
