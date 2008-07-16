@@ -4,10 +4,10 @@ BINdir = /usr/bin
 
 BIN_PROGRAMS = session
 
-sipsession_SOURCES = \
+session_SOURCES = \
 		     session.c
 
-sipsession_LDADD = 
+session_LDADD = 
 AM_CPPFLAGS = 
 
 noinst_HEADERS = \
