@@ -35,12 +35,12 @@ public:
     virtual ~RtpReceiver();
 
 protected:
-    virtual void addDerived(GstElement * sink, const MediaConfig * config);
+    virtual void addDerived(GstElement * depayloader, const MediaConfig * config);
 
 private:
     static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
     GstElement *rtp_receiver_;
-    static std::list<GstElement *> newSinks_;
+    static std::list<GstElement *> depayloaders_;
 };
 
 #endif // _RTP_RECEIVER_H_

@@ -27,7 +27,7 @@
 #include "rtpReceiver.h"
 #include "mediaConfig.h"
 
-std::list<GstElement *> RtpReceiver::newSinks_;
+std::list<GstElement *> RtpReceiver::depayloaders_;
 
 
 RtpReceiver::RtpReceiver() : rtp_receiver_(0)
@@ -40,7 +40,7 @@ RtpReceiver::~RtpReceiver()
     pipeline_.remove(rtp_receiver_);
     // FIXME: assumes this destructor will be called in the right order, maybe should 
     // be replaced by observer
-    newSinks_.pop_front();
+    depayloaders_.pop_front();
 }
 
 void RtpReceiver::set_caps(const char *capsStr)
@@ -54,43 +54,54 @@ void RtpReceiver::set_caps(const char *capsStr)
 
 void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
 {
+    // FIXME: Once this callback is attached to the pad-added signal, it gets called like crazy, any time any pad 
+    // is added (regardless of whether or not it's a dynamic pad) to rtpbin.
+    // We only have this really stupid method of comparing the caps strings of all
+    // the sinks that have been attached to our RtpReceiver so far (stored in a list) against those of the new pad.
+
     if (gst_pad_is_linked(srcPad))
     {
         LOG("Pad is already linked")
             return;
     }
-    if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
+    else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
     {   
         LOG("Pad is not a source");
         return;
     }
-    if (strncmp(gst_pad_get_name(srcPad), "recv_rtp_src", 12))
+    else if (strncmp(gst_pad_get_name(srcPad), "recv_rtp_src", 12))
     {
         LOG("Wrong pad");
         return;
     }
+
     LOG("Dynamic pad created, linking new srcpad to existing sinkpad.");
     std::cout << "SrcElement: " << gst_element_get_name(srcElement) << std::endl;
     std::cout << "SrcPad: " << gst_pad_get_name(srcPad) << std::endl;
 
-    std::list<GstElement *> * sinkElements = (std::list<GstElement *> *) data;
-    std::cout << "You have " << sinkElements->size() << " sinks stored. " << std::endl;
+    std::list<GstElement *> * depayloaders = static_cast<std::list<GstElement *> *>(data);
+    std::cout << "You have " << depayloaders->size() << " depayloaders stored. " << std::endl;
     
     std::list<GstElement *>::iterator iter;
-    for (iter = sinkElements->begin(); iter != sinkElements->end(); ++iter)
-        std::cout << "SinkElement: " << gst_element_get_name(*iter) << std::endl;
+    for (iter = depayloaders->begin(); iter != depayloaders->end(); ++iter)
+        std::cout << "Depayloader: " << gst_element_get_name(*iter) << std::endl;
 
     GstPad *sinkPad;
 
-    sinkPad = gst_element_get_static_pad(sinkElements->front(), "sink");
+    sinkPad = gst_element_get_static_pad(depayloaders->front(), "sink");
 
-    iter = sinkElements->begin();
-    while (strncmp(gst_caps_to_string(gst_pad_get_caps(sinkPad)), gst_caps_to_string(gst_pad_get_caps(srcPad)), 37) 
-            && iter != sinkElements->end())
+    iter = depayloaders->begin();
+
+    // look for caps whose first 37 characters match (this includes the parameter that describes media type)
+    // FIXME: could just check the dedepayloader types
+    const int CAPS_LEN = 37;
+    while (strncmp(gst_caps_to_string(gst_pad_get_caps(sinkPad)), gst_caps_to_string(gst_pad_get_caps(srcPad)), CAPS_LEN) 
+            && iter != depayloaders->end())
     {
         sinkPad = gst_element_get_static_pad(*iter, "sink");
         ++iter;
     }
+
     std::cout << "SINKPAD CAPS: " << gst_caps_to_string(gst_pad_get_caps(sinkPad)) << std::endl;
     std::cout << "SRCPAD CAPS: " << gst_caps_to_string(gst_pad_get_caps(srcPad)) << std::endl;
 
@@ -98,7 +109,7 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
     gst_object_unref(sinkPad);
 }
 
-void RtpReceiver::addDerived(GstElement * newSink, const MediaConfig * config)
+void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * config)
 {
     rtp_receiver_ = gst_element_factory_make("udpsrc", NULL);
     assert(rtp_receiver_);
@@ -135,9 +146,9 @@ void RtpReceiver::addDerived(GstElement * newSink, const MediaConfig * config)
     assert(gst_pad_link(rtcpReceiverSrc, recv_rtcp_sink) == GST_PAD_LINK_OK);
     assert(gst_pad_link(send_rtcp_src, rtcpSenderSink) == GST_PAD_LINK_OK);
 
-    newSinks_.push_back(newSink);
+    depayloaders_.push_back(depayloader);
     // when pad is created, it must be linked to new sink
-    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), (void *) &newSinks_);
+    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), static_cast<void *>(&depayloaders_));
 
     // release request pads (in reverse order)
     gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);

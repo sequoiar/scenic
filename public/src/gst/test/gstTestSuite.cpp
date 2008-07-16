@@ -1135,6 +1135,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
     }
 }
 
+#if 0
 void GstTestSuite::sync()
 {
     int numChannels = 8;
@@ -1189,8 +1190,8 @@ void GstTestSuite::sync()
         TEST_ASSERT(!aTx.isPlaying());
     }
 }
+#endif
 
-#if 0
 void GstTestSuite::sync()
 {
     if (id_ == 0)
@@ -1204,7 +1205,6 @@ void GstTestSuite::sync()
         tx.run();
     }
 }
-#endif
 
 int main(int argc, char **argv)
 {
