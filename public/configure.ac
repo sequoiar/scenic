@@ -55,6 +55,12 @@ if test "x${have_gstreamer_audio}" = "xfalse" ; then
     AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
 fi
 
+#Trying to set GSTCONTROLLER using pkg-config
+PKG_CHECK_MODULES(GSTCONTROLLER, gstreamer-controller-0.10, have_gstreamer_controller=true, have_gstreamer_controller=false)
+if test "x${have_gstreamer_controller}" = "xfalse" ; then
+    AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
+fi
+
 #Trying to set PJSIP using pkg-config
 PKG_CHECK_MODULES(UUID, uuid, have_uuid=true, have_uuid=false)
 if test "x${have_libuuid}" = "xfalse" ; then
