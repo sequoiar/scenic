@@ -21,6 +21,7 @@
 #define _AUDIO_SOURCE_H_
 
 #include <gst/audio/multichannel.h>
+#include <gst/controller/gstcontroller.h>
 #include "gstBase.h"
 #include "interleave.h"
 
@@ -28,60 +29,63 @@ class AudioConfig;
 
 class AudioSource : public GstBase
 {
-public:
-    static AudioSource* create(const AudioConfig &config);
-    virtual ~AudioSource();
-    virtual void init();
-protected:
-    AudioSource(const AudioConfig &config);
-    virtual void linkElements();
-    const AudioConfig &config_;
-    std::vector < GstElement * >sources_, aconvs_, queues_;
-    Interleave interleave_;
-private:
-    friend class AudioSender;
+    public:
+        static AudioSource* create(const AudioConfig &config);
+        virtual ~AudioSource();
+        virtual void init();
+    protected:
+        AudioSource(const AudioConfig &config);
+        virtual void linkElements();
+        const AudioConfig &config_;
+        std::vector<GstElement *>sources_, aconvs_, queues_;
+        Interleave interleave_;
+
+    private:
+        friend class AudioSender;
 };
 
 class AudioTestSource : public AudioSource
 {
-public:
-    virtual ~AudioTestSource(){
-    }
-    virtual void init();
-    AudioTestSource(const AudioConfig &config) : AudioSource(config) {
-    }
+    public:
+        virtual ~AudioTestSource(){
+        }
+        virtual void init();
+        AudioTestSource(const AudioConfig &config) : AudioSource(config) {
+        }
+    private:
+        std::vector<GstController *> controllers_;
 };
 
 class AudioFileSource : public AudioSource
 {
-public:
-    virtual ~AudioFileSource();
-    virtual void init();
-    AudioFileSource(const AudioConfig &config) : AudioSource(config) {
-    }
-private:
-    virtual void linkElements();
-    std::vector<GstElement *> decoders_;
+    public:
+        virtual ~AudioFileSource();
+        virtual void init();
+        AudioFileSource(const AudioConfig &config) : AudioSource(config) {
+        }
+    private:
+        virtual void linkElements();
+        std::vector<GstElement *> decoders_;
 };
 
 class AudioAlsaSource : public AudioSource
 {
-public:
-    virtual ~AudioAlsaSource(){
-    }
-    virtual void init();
-    AudioAlsaSource(const AudioConfig &config) : AudioSource(config) {
-    }
+    public:
+        virtual ~AudioAlsaSource(){
+        }
+        virtual void init();
+        AudioAlsaSource(const AudioConfig &config) : AudioSource(config) {
+        }
 };
 
 class AudioJackSource : public AudioSource
 {
-public:
-    virtual ~AudioJackSource(){
-    }
-    virtual void init();
-    AudioJackSource(const AudioConfig &config) : AudioSource(config) {
-    }
+    public:
+        virtual ~AudioJackSource(){
+        }
+        virtual void init();
+        AudioJackSource(const AudioConfig &config) : AudioSource(config) {
+        }
 };
 
 #endif //_AUDIO_SOURCE_H_
