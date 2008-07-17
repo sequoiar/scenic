@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Sropulpof
-# Copyright (C) 2008 Société des arts technoligiques (SAT)
+# Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -18,3 +18,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+
+from streams import audio, video, data
+
+def load(setting=None):
+    current = {}
+    if setting:
+        return current
+    else:
+        current = {'audio': audio.gst.AudioGst(22222, 22223)
+                   }
+        return current

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Sropulpof
-# Copyright (C) 2008 Société des arts technoligiques (SAT)
+# Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -18,10 +18,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
+
 # App imports
-from observer import Observer, Subject
 
-import sys
-
-def get_def_name(level=2):
-    return sys._getframe(level).f_code.co_name

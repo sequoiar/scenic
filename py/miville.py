@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Sropulpof
-# Copyright (C) 2008 Société des arts technoligiques (SAT)
+# Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -25,9 +25,10 @@ from twisted.internet import reactor, task
 
 # App imports
 import ui
-import stream
+import streams
 from utils import log, Subject
 import addressbook
+import settings
 
 
 class Core(Subject):
@@ -42,6 +43,9 @@ class Core(Subject):
         self.load_uis()
         self.adb = addressbook.AddressBook('sropulpof')
         self.api = ui.ControllerApi(self)
+        self.curr_setting = settings.load()
+        
+        
         
     def load_uis(self):
         self.uis = ui.load(ui.find_all())
