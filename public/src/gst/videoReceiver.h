@@ -32,7 +32,8 @@ public:
     virtual bool start();
     virtual bool stop();
     virtual ~VideoReceiver();
-
+    
+    GstElement* getElement();
 private:
     void set_caps(const char* capsStr);
     virtual void init_source();

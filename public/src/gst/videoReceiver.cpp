@@ -40,6 +40,12 @@ VideoReceiver::~VideoReceiver()
     pipeline_.remove(depayloader_);
 }
 
+GstElement* VideoReceiver::getElement()
+{
+
+    return sink_;
+}
+
 void VideoReceiver::init_source()
 {
 }
