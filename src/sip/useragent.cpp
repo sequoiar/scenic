@@ -35,6 +35,7 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
 /* Called to handle incoming requests outside dialogs */
 static pj_bool_t on_rx_request( pjsip_rx_data *rdata );
 static pj_bool_t on_rx_response( pjsip_rx_data *rdata );
+static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer );
 
 static pjsip_endpoint *endpt;				/* SIP endpoint */
 static pj_caching_pool c_pool;				/* Global pool factory */
@@ -111,6 +112,7 @@ int UserAgent::init_pjsip_modules( void ){
 	inv_cb.on_new_session = &call_on_forked;
 	inv_cb.on_media_update = &call_on_media_update;
 	inv_cb.on_tsx_state_changed = &call_on_tsx_state_changed;
+	inv_cb.on_rx_offer = &on_rx_offer;
 
 	/* Initialize invite session module */
 	status = pjsip_inv_usage_init( endpt, &inv_cb );
@@ -126,7 +128,7 @@ int UserAgent::init_pjsip_modules( void ){
 	
 	PJ_LOG(3,(THIS_FILE, "Ready to accept incoming calls..."));
 
-	build_invite_request("\"Test\" <sip:136@asterix.savoirfairelinux.net:5060>", "", -1);
+	create_invite_session("\"Test\" <sip:136@asterix.savoirfairelinux.net:5060>", "", -1);
 	for(; !complete;) {
 		pj_time_val timeout = {0, 10};
 		pjsip_endpt_handle_events( endpt, &timeout );
@@ -136,7 +138,7 @@ int UserAgent::init_pjsip_modules( void ){
 }
 
 int 
-UserAgent::build_invite_request( std::string uri, std::string callerid, int port ){
+UserAgent::create_invite_session( std::string uri, std::string callerid, int port ){
 
 	pjsip_dialog *dialog;
 	pjsip_inv_session* inv;
@@ -198,9 +200,14 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
 }
 
 static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx, pjsip_event *e ){
-	printf("Method receiced: %s\n", tsx->method.name );
+	printf("%s\n", tsx->method.name );
 }
 
 static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 	printf("SDP negociation done!\n");
+}
+
+
+static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
+	printf("Invite session received new offer from peer - %s\n", offer->name);
 }

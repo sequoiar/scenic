@@ -1,6 +1,8 @@
 proj_src = $(top_srcdir)/src
 INCLUDES = -I$(proj_src)/include -I$(proj_src)
 
+PJSIP_LIBS = -lpjsip -lpjsip-ua  -lpjlib-util -lpj -lpjsua -lpjmedia
+
 bin_PROGRAMS = sipsessionTester
 
 sipsessionTester_SOURCES = sipsessionTest.cpp
