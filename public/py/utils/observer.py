@@ -19,7 +19,11 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 
-import weakref
+import weakref, sys
+
+def get_def_name(level=2):
+    return sys._getframe(level).f_code.co_name
+
 
 class Observer(object):
     """Instances of Observer are notified of changes happening in the
@@ -66,14 +70,10 @@ class Subject(object):
         ob_id = id(observer)
         if ob_id not in self.observers:
             self.observers[ob_id] = observer
-        
-#    def _detach(self, observer):
-#        pass
-#        ob_id = id(observer)
-#        if ob_id in self.observers:
-#            self.observers.remove(observer)
-            
-    def notify(self, caller, key, value):
+                    
+    def notify(self, caller, value, key=None):
+        if not key:
+            key = get_def_name()
         for observer in self.observers.itervalues():
             observer.update(caller, key, value)
             

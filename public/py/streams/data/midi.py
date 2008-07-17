@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Sropulpof
-# Copyright (C) 2008 Société des arts technoligiques (SAT)
+# Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -19,56 +19,40 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 
-class ConnectionFactory(object):
-    """Class that create an instance of a connection with the specified protocol.
+# App imports
+from protocols import osc_protocols
+from streams import stream
+
+
+class MidiStream(stream.DataStream):
+    """Class MIDI
     """
-    def __init__(self, protocol):
-        self.protocol = protocol
     
-    # Operations
-    def get_connection(self):
-        connection = self.protocol()
-        return connection
-
-
-class Sip(object):
-    """Sip connection protocol
-    """
-    def connect(self, address, port):
-        """function connect
+    def start_sending(self, address):
+        """function start_sending
         
         address: string
-        port: int
         
         returns 
         """
         return None # should raise NotImplementedError()
     
-    def disconnect(self):
-        """function disconnect
+    def stop_sending(self):
+        """function stop_sending
         
         returns 
         """
         return None # should raise NotImplementedError()
     
-    def accept(self):
-        """function accept
+    def start_receving(self):
+        """function start_receving
         
         returns 
         """
         return None # should raise NotImplementedError()
     
-    def refuse(self, reason):
-        """function refuse
-        
-        reason: 
-        
-        returns 
-        """
-        return None # should raise NotImplementedError()
-    
-    def build_sdp(self):
-        """function build_sdp
+    def stop_receving(self):
+        """function stop_receving
         
         returns 
         """

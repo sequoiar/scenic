@@ -86,7 +86,8 @@ class CliController(TelnetServer):
         self.core = None
         # build a dict of all semi-private methods
         self.callbacks = find_callbacks(self)
-        self.shortcuts = {'c': 'contacts'
+        self.shortcuts = {'c': 'contacts',
+                          'a': 'audio'
                           }
         
     def parse(self, data):
@@ -114,7 +115,9 @@ class CliController(TelnetServer):
         cp.add_option("-d", "--delete", help="Delete a contact")
         cp.add_option("-m", "--modify", help="Modify a contact")
         cp.add_option("-s", "--select", help="Select a contact")
+        
         (options, args) = cp.parse_args(data)
+        
         if options.list:
             self.core.get_contacts(self)
         elif options.add:
@@ -133,6 +136,42 @@ class CliController(TelnetServer):
             self.core.select_contact(self, options.select)
         else:
             cp.print_help()
+            
+    def _audio(self, data):
+        cp = CliParser(self, prog=data[0], description="Manage the audio stream.")
+        cp.add_option("-l", "--list", action='store_true', help="List all the audio settings")
+        cp.add_option("-t", "--container", "--tank", "--type", type="int", help="Set/get the container")
+        cp.add_option("-c", "--codec", help="Set/get the codec")
+        cp.add_option("-s", "--settings", help="Set/get the codec settings (set1:val,set2:val)")
+        cp.add_option("-d", "--bitdepth", type="int", help="Set/get the bitdepth of the audio (default: 16 bit)")
+        cp.add_option("-r", "--samplerate", type="int", help="Set/get the samplerate of the audio (default: 48000 Hz")
+        cp.add_option("-v", "--channels", "--voices", type="int", help="Set/get the number of audio channels (from 1 to 8)")
+        cp.add_option("-p", "--port", type="int", help="Set/get the network port (5020-5030)")
+        cp.add_option("-b", "--buffer", type="int", help="Set/get the latency buffer (in millisec)")
+
+        (options, args) = cp.parse_args(data)
+        
+        if options.list:
+            self.core.audio_status(self)
+        elif [opt for opt in options.__dict__.values() if opt]:
+            if options.container:
+                self.core.audio_container(self)
+            if options.codec:
+                self.core.audio_codec(self)
+            if options.bitdepth:
+                self.core.audio_bitdepth(self)
+            if options.samplerate:
+                self.core.audio_samplerate(self)
+            if options.channels:
+                self.core.audio_channels(self)
+            if options.port:
+                self.core.audio_port(self)
+            if options.buffer:
+                self.core.audio_buffer(self)
+        else:
+            cp.print_help()
+        
+        
 
 
 class CliParser(optparse.OptionParser):
@@ -295,7 +334,7 @@ class CliView(Observer):
         self.controller.write(msg)
         self.controller.write_prompt()
 
-    def _contacts(self, origin, data):
+    def _get_contacts(self, origin, data):
         if origin is self.controller:
             msg = []
             for contact in data:

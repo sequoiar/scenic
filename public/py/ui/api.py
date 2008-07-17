@@ -20,31 +20,30 @@
 
 import sys
 
-from utils import Subject, get_def_name
-
 class ControllerApi():
     
     def __init__(self, core):
         self.adb = core.adb
         self.notify = core.notify
+        self.audio = core.curr_setting['audio']
 
 
     ### Contacts ###
         
     def get_contacts(self, caller):
-        self.notify(caller, 'contacts', self.adb.contacts)
+        self.notify(caller, self.adb.contacts)
         
     def add_contact(self, caller, name, address):
-        self.notify(caller, get_def_name(), self.adb.add(name, address))
+        self.notify(caller, self.adb.add(name, address))
         
     def delete_contact(self, caller, name):
-        self.notify(caller, get_def_name(), self.adb.remove(name))
+        self.notify(caller, self.adb.remove(name))
         
     def modify_contact(self, caller, name, new_name, address):
-        self.notify(caller, get_def_name(), self.adb.modify(name, new_name, address))
+        self.notify(caller, self.adb.modify(name, new_name, address))
         
     def select_contact(self, caller, name):
-        self.notify(caller, get_def_name(), self.adb.select(name))
+        self.notify(caller, self.adb.select(name))
         
         
     ### Streams ###
@@ -52,3 +51,8 @@ class ControllerApi():
     def start_stream(self, stream):
         self.notify('stream_status', 'starté')
 
+
+    ### Audio ###
+    
+    def audio_container(self, caller, container):
+        self.notify(caller, self.audio.set_attr('container', container))
