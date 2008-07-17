@@ -1,0 +1,10 @@
+How to generate test video:
+
+make audiofile with:
+chuck --silent frameImpulse.ck
+
+make videofile with:
+./mkWhiteFrame.m
+
+mux the two with:
+./muxAv.sh
