@@ -103,7 +103,6 @@ AC_CONFIG_FILES([Makefile
                  src/osc/Makefile
                  src/osc/test/Makefile
                  src/main/Makefile
-                 src/prototypes/Makefile
                  src/prototypes/hello/Makefile
                  src/prototypes/hello/test/Makefile
                  src/prototypes/python/Makefile

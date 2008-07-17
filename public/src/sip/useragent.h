@@ -39,7 +39,7 @@ class UserAgent {
 
 		int init_pjsip_modules( void );
 
-		int build_invite_request( std::string uri, std::string callerid, int port );
+		int create_invite_session( std::string uri, std::string callerid, int port );
 	private:
 		std::string name;				/* Module name */
 		std::string hostname;				/* Module hostname */
