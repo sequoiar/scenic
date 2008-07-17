@@ -39,6 +39,7 @@ protected:
 
 private:
     static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
+    GstElement *depayloader_;
     GstElement *rtp_receiver_;
     static std::list<GstElement *> depayloaders_;
 };

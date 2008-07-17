@@ -19,6 +19,8 @@
 //
 
 #include <gst/gst.h>
+#include <gst/controller/gstcontroller.h>
+
 #include <cassert>
 
 #include "pipeline.h"
@@ -35,7 +37,6 @@ Pipeline & Pipeline::Instance()
     if (instance_ == 0) {
         instance_ = new Pipeline();
         instance_->init();
-
     }
     return *instance_;
 }
@@ -49,6 +50,7 @@ void Pipeline::init()
 {
     if (!pipeline_) {
         gst_init(0, NULL);
+        gst_controller_init(0, NULL);
         pipeline_ = gst_pipeline_new("pipeline");
         assert(pipeline_);
 

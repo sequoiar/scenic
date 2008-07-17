@@ -38,9 +38,14 @@ RtpReceiver::~RtpReceiver()
 {
     assert(pipeline_.stop());
     pipeline_.remove(rtp_receiver_);
-    // FIXME: assumes this destructor will be called in the right order, maybe should 
-    // be replaced by observer
-    depayloaders_.pop_front();
+    
+    std::list<GstElement *>::iterator iter;
+    iter = find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
+
+    // make sure we found it
+    assert(iter != depayloaders_.end());
+    // remove it
+    depayloaders_.erase(iter);
 }
 
 void RtpReceiver::set_caps(const char *capsStr)
@@ -111,6 +116,9 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
 
 void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * config)
 {
+    // store copy so that destructor knows which depayloader to remove from its list
+    depayloader_ = depayloader;
+
     rtp_receiver_ = gst_element_factory_make("udpsrc", NULL);
     assert(rtp_receiver_);
     g_object_set(rtp_receiver_, "port", config->port(), NULL);

@@ -17,6 +17,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <gst/controller/gstcontroller.h>
 #include <iostream>
 #include <string>
 #include <cassert>
@@ -94,7 +95,11 @@ void AudioTestSource::init()
     double frequency = 100.0;
 
     for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
+    {
         g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
+        // add controller for each source
+        controllers_.push_back(gst_controller_new(G_OBJECT(*src), "freq", NULL));
+    }
 
     linkElements();
 }

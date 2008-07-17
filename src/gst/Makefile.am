@@ -11,6 +11,7 @@ libgst_a_SOURCES = videoReceiver.cpp videoSender.cpp mediaBase.cpp \
 
 
 libgst_a_CPPFLAGS= $(CPPFLAGS) $(GST_CFLAGS) $(LLO_CFLAGS) 
+#libgst_a_LIBADD = $(GST_LIBS) $(GSTAUDIO_LIBS) $(GSTCONTROLLER_LIBS) 
 
 #bin_PROGRAMS = gstApp
 #gstApp_SOURCES = gst_main.cpp gstApp.cpp
