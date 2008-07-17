@@ -200,7 +200,7 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
 }
 
 static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx, pjsip_event *e ){
-	printf("%s\n", tsx->method.name );
+;//use autogen  for -Werror     	printf("%s\n", tsx->method.name );
 }
 
 static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
@@ -209,5 +209,5 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 
 
 static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
-	printf("Invite session received new offer from peer - %s\n", offer->name);
+;//use autogen for -Werror    printf("Invite session received new offer from peer - %s\n", offer->name);
 }
