@@ -39,6 +39,7 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata );
 static pjsip_endpoint *endpt;				/* SIP endpoint */
 static pj_caching_pool c_pool;				/* Global pool factory */
 static pjsip_module mod_ua;				/* The SIP module */
+
 static pj_bool_t complete;
 
 UserAgent::UserAgent(){}
@@ -90,11 +91,7 @@ int UserAgent::init_pjsip_modules( void ){
 	addr.sin_family = PJ_AF_INET;
 	addr.sin_addr.s_addr = 0;
 	addr.sin_port = pj_htons((pj_uint16_t)DEFAULT_SIP_PORT);
-<<<<<<< HEAD:trunk/public/src/sip/useragent.cpp
-	addrname.host = pj_str((char*)("192.168.1.204"));
-=======
 	addrname.host = pj_str((char*)addr_ip.c_str());
->>>>>>> switch pjsip-related variables to static attributes:trunk/public/src/sip/useragent.cpp
 	addrname.port = 5060;
 	status = pjsip_udp_transport_start( endpt, &addr, &addrname, 1, NULL );
 	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
