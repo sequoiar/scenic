@@ -12,8 +12,8 @@ BIN_PROGRAMS = session
 session_SOURCES = \
 		     session.c
 
-session_LDADD = $(PJSIP_LIBS) -lpthread 
-session_CFLAGS = $(PJSIP_CFLAGS)
+LDADD = $(PJSIP_LIBS) -lpthread 
+AM_CFLAGS = $(PJSIP_CFLAGS)
 
 noinst_HEADERS = \
 		 session.h 
