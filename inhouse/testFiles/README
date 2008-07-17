@@ -1,5 +1,11 @@
 How to generate test video:
 
+EITHER
+
+./mkMovie.sh
+
+OR
+
 make audiofile with:
 chuck --silent frameImpulse.ck
 
