@@ -31,7 +31,7 @@ static void call_on_forked( pjsip_inv_session *inv, pjsip_event *e ){}
 static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){}
 
 /* Called to handle incoming requests outside dialogs */
-static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){}
+//static pj_bool_t on_rx_request( pjsip_rx_data* d ){}
 
 UserAgent::UserAgent(){}
 
@@ -82,7 +82,7 @@ int UserAgent::init_pjsip_modules( void ){
 	addr.sin_family = PJ_AF_INET;
 	addr.sin_addr.s_addr = 0;
 	addr.sin_port = pj_htons((pj_uint16_t)DEFAULT_SIP_PORT);
-	addrname.host = pj_str("192.168.1.204");
+	addrname.host = pj_str((char*)("192.168.1.204"));
 	addrname.port = 5060;
 	status = pjsip_udp_transport_start( this->endpt, &addr, &addrname, 1, NULL );
 	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
@@ -123,6 +123,6 @@ int UserAgent::init_pjsip_modules( void ){
 		pjsip_endpt_handle_events( this->endpt, &timeout );
 	}
 
-
+    return 0;
 }
 
