@@ -39,17 +39,14 @@ class UserAgent {
 
 		int init_pjsip_modules( void );
 
+		int build_invite_request( std::string uri, std::string callerid, int port );
 	private:
-		std::string name;					/* Module name */
+		std::string name;				/* Module name */
 		std::string hostname;				/* Module hostname */
 		std::string address;				/* Local Ip address */
 		int port;					/* SIP port */		
 
-		pjsip_endpoint *endpt;				/* SIP endpoint */
-		pj_caching_pool c_pool;				/* Global pool factory */
-		struct pjsip_module* mod_ua;			/* The SIP module */
-
-		pj_bool_t complete;
+		void init_sip_module( void );
 
 };
 
