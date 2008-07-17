@@ -17,44 +17,26 @@
  * along with Sropulpof.  If not, see <http:*www.gnu.org*licenses*>.
  */
 
-#ifndef _SESSION_H
-#define _SESSION_H
+#include "sipsession.h"
 
-/*
- * @file 	session.h
- * @brief	An interface to expose to the core the available methods
- */
+SIPSession::SIPSession() : Session( SIP ){
 
-#include <pjsip.h>
-#include <pjlib.h>
-#include <pjsip_ua.h>
-#include <pjlib-util.h>
+	app_ua =  new UserAgent();
 
-#include <string>
+}
 
-//#include "sipsession.h"
-#include "useragent.h"
-//#include "sip_sdp.h"
+SIPSession::~SIPSession(){}
 
-#define SIP	0
+int SIPSession::session_connect( int r_port, std::string r_ip ){
+	this->init( r_port, r_ip );
+	return 0;
+}
 
-class Session {
-	public:
-		/* Class constructor */
-		Session( int type ) { _protocol = type; }
+int SIPSession::session_disconnect( void ){
+	return 0;
+}
 
-		/* Virtual class destructor */
-		~Session() {}
+void SIPSession::init( int r_port, std::string r_ip ) {
+	app_ua->init_pjsip_modules();
+}
 
-		/* API method */
-		virtual int session_connect( int r_port, std::string r_ip ) = 0;
-
-		/* API method */
-		virtual int session_disconnect( ) = 0;
-
-	private:
-		int _protocol;
-};
-
-
-#endif // _SESSION_H

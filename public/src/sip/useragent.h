@@ -17,13 +17,12 @@
  * along with Sropulpof.  If not, see <http:*www.gnu.org*licenses*>.
  */
 
-#ifndef _SESSION_H
-#define _SESSION_H
+#ifndef _USER_AGENT_H
+#define _USER_AGENT_H
 
-/*
- * @file 	session.h
- * @brief	An interface to expose to the core the available methods
- */
+#define THIS_FILE		"useragent.cpp"
+#define APP_NAME		"miville"
+#define DEFAULT_SIP_PORT	5060
 
 #include <pjsip.h>
 #include <pjlib.h>
@@ -32,29 +31,26 @@
 
 #include <string>
 
-//#include "sipsession.h"
-#include "useragent.h"
-//#include "sip_sdp.h"
+class UserAgent {
 
-#define SIP	0
-
-class Session {
 	public:
-		/* Class constructor */
-		Session( int type ) { _protocol = type; }
+		UserAgent();
+		~UserAgent();
 
-		/* Virtual class destructor */
-		~Session() {}
-
-		/* API method */
-		virtual int session_connect( int r_port, std::string r_ip ) = 0;
-
-		/* API method */
-		virtual int session_disconnect( ) = 0;
+		int init_pjsip_modules( void );
 
 	private:
-		int _protocol;
+		std::string name;					/* Module name */
+		std::string hostname;				/* Module hostname */
+		std::string address;				/* Local Ip address */
+		int port;					/* SIP port */		
+
+		pjsip_endpoint *endpt;				/* SIP endpoint */
+		pj_caching_pool c_pool;				/* Global pool factory */
+		struct pjsip_module* mod_ua;			/* The SIP module */
+
+		pj_bool_t complete;
+
 };
 
-
-#endif // _SESSION_H
+#endif // _USER_AGENT_H

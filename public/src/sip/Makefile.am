@@ -7,13 +7,18 @@ BINdir = /usr/bin
 # PJSIP_LIBS = -lpjsip -lpjsip-ua  -lpjlib-util -lpj -lpjsua -lpjsip-ua -lpjmedia -lpjmedia-codec
 PJSIP_LIBS = -lpjsip -lpjsip-ua  -lpjlib-util -lpj -lpjsua -lpjmedia 
 
-BIN_PROGRAMS = session
+#SUBDIRS=test
 
-session_SOURCES = \
-		     session.c
+noinst_LTLIBRARIES = libsip.la
 
-LDADD = $(PJSIP_LIBS) -lpthread 
-AM_CFLAGS = $(PJSIP_CFLAGS)
+libsip_la_SOURCES = \
+		     useragent.cpp \
+		     sipsession.cpp 
+
+libsip_la_LDFLAGS = $(PJSIP_LIBS) -lpthread 
+AM_CXXFLAGS = -I$(top_srcdir)/include $(PJSIP_CFLAGS)
 
 noinst_HEADERS = \
-		 session.h 
+		 useragent.h \
+		 session.h \
+		 sipsession.h 
