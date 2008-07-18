@@ -21,14 +21,14 @@
 
 SIPSession::SIPSession() : Session( SIP ){
 
-	app_ua =  new UserAgent();
+	_app_ua =  new UserAgent( _APP_NAME );
+	this->init(  );
 
 }
 
 SIPSession::~SIPSession(){}
 
 int SIPSession::session_connect( int r_port, std::string r_ip ){
-	this->init( r_port, r_ip );
 	return 0;
 }
 
@@ -36,7 +36,18 @@ int SIPSession::session_disconnect( void ){
 	return 0;
 }
 
-void SIPSession::init( int r_port, std::string r_ip ) {
-	app_ua->init_pjsip_modules();
+int SIPSession::accept( void ){
+	return 0;
+}
+
+int SIPSession::refuse( int reason ){
+	return 0;
+}
+
+void SIPSession::build_sdp( void ){
+}
+
+void SIPSession::init(  ) {
+	_app_ua->init_pjsip_modules();
 }
 

@@ -21,8 +21,13 @@
 #define _USER_AGENT_H
 
 #define THIS_FILE		"useragent.cpp"
-#define APP_NAME		"miville"
-#define DEFAULT_SIP_PORT	5060
+#define _DEFAULT_SIP_PORT	5060
+#define _LOCAL_IP_ADDRESS	"127.0.0.1"
+
+/* @file	useragent.h
+ * @brief	A SIP useragent. Implements the SIP stacks from the transaction layer to the transport layer as described in
+ * 		RFC 3261.
+ */
 
 #include <pjsip.h>
 #include <pjlib.h>
@@ -34,18 +39,45 @@
 class UserAgent {
 
 	public:
-		UserAgent();
+		/* 
+		 * Create a new UserAgent object
+		 * @param	name	The application name
+		 */
+		UserAgent( std::string name );
+		
+		/*
+		 * Class destructor
+		 */
 		~UserAgent();
 
+		/*
+		 * Initialize all the mandatory data structures from the PJSIP library
+		 * @return int	PJ_SUCCESS on success
+		 */
 		int init_pjsip_modules( void );
 
+		/*
+		 * Create an invite session. Handle the related incoming responses
+		 * @param	uri	The SIP address to create connection with
+		 * @param	callerid	The caller ID
+		 * @param	port		The remote SIP port
+		 * @return 	int	PJ_SUCCESS on success
+		 */
 		int create_invite_session( std::string uri, std::string callerid, int port );
-	private:
-		std::string name;				/* Module name */
-		std::string hostname;				/* Module hostname */
-		std::string address;				/* Local Ip address */
-		int port;					/* SIP port */		
 
+	private:
+		/* The module name */
+		std::string _name;
+
+		/* The local IP address */
+		std::string _localIP;	
+
+		/* The local SIP port */
+		int _sipPort;	
+
+		/* 
+		 * Initialize the pjsip_module structure
+		 */
 		void init_sip_module( void );
 
 };

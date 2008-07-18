@@ -43,14 +43,18 @@ static pjsip_module mod_ua;				/* The SIP module */
 
 static pj_bool_t complete;
 
-UserAgent::UserAgent(){}
+UserAgent::UserAgent( std::string name ){
+	_name = name ;
+	_localIP = _LOCAL_IP_ADDRESS;
+	_sipPort  = _DEFAULT_SIP_PORT;
+}
 
 UserAgent::~UserAgent(){}
 
 void
 UserAgent::init_sip_module( void ){
 	
-	mod_ua.name = pj_str((char*)this->name.c_str());
+	mod_ua.name = pj_str((char*)this->_name.c_str());
 	mod_ua.id = -1;
 	mod_ua.priority = PJSIP_MOD_PRIORITY_APPLICATION;
 	mod_ua.on_rx_request = &on_rx_request;
@@ -63,8 +67,6 @@ UserAgent::init_sip_module( void ){
 int UserAgent::init_pjsip_modules( void ){
 
 	pj_status_t status;
-
-	this->name = APP_NAME; 
 
 	// Init SIP module
 	init_sip_module();
@@ -85,15 +87,15 @@ int UserAgent::init_pjsip_modules( void ){
 	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
 
 	/* Add UDP Transport */
-	std::string addr_ip = "192.168.1.204";
+	//std::string addr_ip = "127.0.0.1";//"192.168.1.204";
 	pj_sockaddr_in addr;
 	pjsip_host_port addrname;
 	pj_bzero( &addr, sizeof(addr));
 	addr.sin_family = PJ_AF_INET;
 	addr.sin_addr.s_addr = 0;
-	addr.sin_port = pj_htons((pj_uint16_t)DEFAULT_SIP_PORT);
-	addrname.host = pj_str((char*)addr_ip.c_str());
-	addrname.port = 5060;
+	addr.sin_port = pj_htons((pj_uint16_t)this->_sipPort);
+	addrname.host = pj_str((char*)this->_localIP.c_str());
+	addrname.port = this->_sipPort;
 	status = pjsip_udp_transport_start( endpt, &addr, &addrname, 1, NULL );
 	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
 	
@@ -144,7 +146,8 @@ UserAgent::create_invite_session( std::string uri, std::string callerid, int por
 	pjsip_inv_session* inv;
 	pjsip_tx_data *tdata;
 	pj_status_t status;
-	std::string local = "\"Manu\" <sip:localuser@192.168.1.204:5060>";
+	//std::string local = "\"Manu\" <sip:localuser@192.168.1.204:5060>";
+	std::string local = "\"Manu\" <sip:localuser@127.0.0.1:5060>";
 
 	pj_str_t target = pj_str( (char*)uri.c_str() );
 	pj_str_t from = pj_str( (char*) local.c_str() );
@@ -200,7 +203,6 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
 }
 
 static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx, pjsip_event *e ){
-;//use autogen  for -Werror     	printf("%s\n", tsx->method.name );
 }
 
 static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
@@ -209,5 +211,5 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 
 
 static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
-;//use autogen for -Werror    printf("Invite session received new offer from peer - %s\n", offer->name);
+   	printf("Invite session received new offer from peer - %s\n", offer->name.ptr);
 }

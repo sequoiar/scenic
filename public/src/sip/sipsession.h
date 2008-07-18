@@ -20,25 +20,57 @@
 #ifndef _SIP_SESSION_H
 #define _SIP_SESSION_H
 
+/*
+ * @file 	sipsession.h
+ * @brief	The SIP implementation
+ */
+
 #include <string>
 
 #include "session.h"
 #include "useragent.h"
 
+#define _APP_NAME	"miville"
+
 class SIPSession : public Session {
 
 	public:
+		/*
+		 * Create a new SIP session object
+		 */
 		SIPSession();
+		
+		/*
+		 * Class destructor
+		 */
 		~SIPSession();
-
+		
+		/* 
+		 * Establishes a SIP connection with a remote host.
+		 * @param 	r_port	The remote connection port (default SIP port: 5060)
+		 * @param 	r_ip	The remote IP address 
+		 */
 		int session_connect( int r_port, std::string r_ip );
-
+		
+		/*
+		 * Terminate a current SIP remote connection
+		 */
 		int session_disconnect();
 
-	private:
-		void init( int r_port, std::string r_ip );
+		int accept( void );
 
-		UserAgent* app_ua;
+		int refuse( int reason );
+
+		void build_sdp( void );
+
+	private:
+		/*
+		 * Initialize a SIP connection.
+		 */
+		void init( );
+
+		/* The application SIP User Agent */
+		UserAgent* _app_ua;
 };
 
 #endif // _SIP_SESSION_H
