@@ -26,10 +26,6 @@
  */
 
 #include <string>
-#include <pjsip.h>
-#include <pjlib.h>
-#include <pjsip_ua.h>
-#include <pjlib-util.h>
 
 #include "useragent.h"
 

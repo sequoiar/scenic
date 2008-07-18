@@ -29,6 +29,7 @@
 
 #include "session.h"
 #include "useragent.h"
+#include "sdp.h"
 
 #define _APP_NAME	"miville"
 
@@ -71,6 +72,9 @@ class SIPSession : public Session {
 
 		/* The application SIP User Agent */
 		UserAgent* _app_ua;
+
+		/* A SDP (Session Description Protocol) instance to build the sdp body */
+		Sdp* _sdp;
 };
 
 #endif // _SIP_SESSION_H

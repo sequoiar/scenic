@@ -12,6 +12,8 @@ PJSIP_LIBS = -lpjsip -lpjsip-ua  -lpjlib-util -lpj -lpjsua -lpjmedia
 noinst_LTLIBRARIES = libsip.la
 
 libsip_la_SOURCES = \
+		     sdpcodec.cpp \
+		     sdp.cpp \
 		     useragent.cpp \
 		     sipsession.cpp 
 
@@ -19,6 +21,8 @@ libsip_la_LDFLAGS = $(PJSIP_LIBS) -lpthread
 AM_CXXFLAGS = -I$(top_srcdir)/include `pkg-config --cflags libpj` 
 
 noinst_HEADERS = \
+		 sdpcodec.h \
+		 sdp.h \
 		 useragent.h \
 		 session.h \
 		 sipsession.h 

@@ -17,39 +17,22 @@
  * along with Sropulpof.  If not, see <http:*www.gnu.org*licenses*>.
  */
 
-#include "sipsession.h"
+#ifndef _SDP_CODEC_H
+#define _SDP_CODEC_H
 
-SIPSession::SIPSession() : Session( SIP ){
+#include <string>
 
-	_app_ua =  new UserAgent( _APP_NAME );
-	_sdp = new Sdp();
-	this->init(  );
+class sdpCodec {
 
-}
+	public:
+		sdpCodec( std::string name );
+		~sdpCodec();
 
-SIPSession::~SIPSession(){}
+	private:
+		std::string _name;
+		int _payload;
+		int _frequency;
 
-int SIPSession::connect( int r_port, std::string r_uri ){
-	_app_ua->create_invite_session( r_uri, r_port );
-	return 0;
-}
+};
 
-int SIPSession::disconnect( void ){
-	return 0;
-}
-
-int SIPSession::accept( void ){
-	return 0;
-}
-
-int SIPSession::refuse( int reason ){
-	return 0;
-}
-
-void SIPSession::build_sdp( void ){
-}
-
-void SIPSession::init(  ) {
-	_app_ua->init_pjsip_modules();
-}
-
+#endif // _SDP_CODEC_H
