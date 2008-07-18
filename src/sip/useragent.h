@@ -21,7 +21,6 @@
 #define _USER_AGENT_H
 
 #define THIS_FILE		"useragent.cpp"
-#define _DEFAULT_SIP_PORT	5060
 #define _LOCAL_IP_ADDRESS	"127.0.0.1"
 
 /* @file	useragent.h
@@ -52,17 +51,26 @@ class UserAgent {
 
 		/*
 		 * Initialize all the mandatory data structures from the PJSIP library
+		 *
+		 * @param port	The port on which the user agent will listen
+		 *
 		 * @return int	PJ_SUCCESS on success
 		 */
-		int init_pjsip_modules( void );
+		int init_pjsip_modules( int port );
 
 		/*
 		 * Create an invite session. Handle the related incoming responses
+		 *
 		 * @param	uri	The SIP address to create connection with
 		 * @param	port		The remote SIP port
+		 *
 		 * @return 	int	PJ_SUCCESS on success
 		 */
 		int create_invite_session( std::string uri, int port );
+
+		pjsip_sip_uri* build_sip_uri( std::string user, std::string host );
+
+		void listen( void );
 
 	private:
 		/* The module name */
@@ -70,9 +78,6 @@ class UserAgent {
 
 		/* The local IP address */
 		std::string _localIP;	
-
-		/* The local SIP port */
-		int _sipPort;	
 
 		/* 
 		 * Initialize the pjsip_module structure
