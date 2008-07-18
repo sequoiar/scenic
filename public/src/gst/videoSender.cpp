@@ -38,6 +38,7 @@ VideoSender::VideoSender(const VideoConfig & config) :
 VideoSender::~VideoSender()
 {
     assert(stop());
+    gst_clock_id_unref(clockId_);
     pipeline_.remove(sink_);
     pipeline_.remove(payloader_);
     pipeline_.remove(encoder_);
@@ -48,6 +49,27 @@ VideoSender::~VideoSender()
     pipeline_.remove(source_);
 }
 
+// causes videotest src colour changes
+gboolean VideoSender::videotestsrc_cb(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
+{
+    GstElement *source = static_cast<GstElement*>(user_data);
+    const int BLACK = 2;    // gst-inspect property codes
+    const int WHITE = 3;
+    static int colour = BLACK;
+
+    g_object_set(G_OBJECT(source), "pattern", colour, NULL);
+    colour = (colour == BLACK) ? WHITE : BLACK;     // toggle black and white
+
+    return TRUE;
+}
+
+void VideoSender::add_clock_callback()
+{
+    // FIXME: this has to be set to start at same time as audio
+    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
+    gst_clock_id_wait_async(clockId_, videotestsrc_cb, source_);
+}
+
 void VideoSender::init_source()
 {
     source_ = gst_element_factory_make(config_.source(), NULL);
@@ -55,7 +77,12 @@ void VideoSender::init_source()
     pipeline_.add(source_);
     lastLinked_ = source_;
 
-    if (config_.has_dv()) {     // need to demux and decode dv first
+    if (config_.has_videotestsrc())
+    {
+        g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL);
+        add_clock_callback();
+    }
+    else if (config_.has_dv()) {     // need to demux and decode dv first
         demux_ = gst_element_factory_make("dvdemux", NULL);
         assert(demux_);
         queue_ = gst_element_factory_make("queue", NULL);
@@ -129,7 +156,7 @@ bool VideoSender::start()
 {
     if (config_.isNetworked()) {
         std::cout << "Sending video on port " << config_.port() << " to host " << config_.remoteHost()
-                  << std::endl;
+            << std::endl;
     }
 
     bool result = MediaBase::start();

@@ -21,7 +21,6 @@
 #define _AUDIO_SOURCE_H_
 
 #include <gst/audio/multichannel.h>
-#include <gst/controller/gstcontroller.h>
 #include "gstBase.h"
 #include "interleave.h"
 
@@ -47,13 +46,15 @@ class AudioSource : public GstBase
 class AudioTestSource : public AudioSource
 {
     public:
-        virtual ~AudioTestSource(){
-        }
+        virtual ~AudioTestSource();
         virtual void init();
         AudioTestSource(const AudioConfig &config) : AudioSource(config) {
         }
+
     private:
-        std::vector<GstController *> controllers_;
+        GstClockID clockId_;
+       void add_clock_callback();
+       static gboolean callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data);
 };
 
 class AudioFileSource : public AudioSource
