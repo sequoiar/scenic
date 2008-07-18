@@ -51,14 +51,14 @@ class Session {
 		/* 
 		 * Establishes a connection with a remote host.
 		 * @param 	r_port	The remote connection port
-		 * @param 	r_ip	The remote IP address 
+		 * @param 	r_uri	The remote SIP address 
 		 */
-		virtual int session_connect( int r_port, std::string r_ip ) = 0;
+		virtual int connect( int r_port, std::string r_uri ) = 0;
 
 		/*
 		 * Terminate a current remote connection
 		 */
-		virtual int session_disconnect( ) = 0;
+		virtual int disconnect( ) = 0;
 
 		/*
 		 * Accept incoming request 

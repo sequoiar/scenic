@@ -59,11 +59,10 @@ class UserAgent {
 		/*
 		 * Create an invite session. Handle the related incoming responses
 		 * @param	uri	The SIP address to create connection with
-		 * @param	callerid	The caller ID
 		 * @param	port		The remote SIP port
 		 * @return 	int	PJ_SUCCESS on success
 		 */
-		int create_invite_session( std::string uri, std::string callerid, int port );
+		int create_invite_session( std::string uri, int port );
 
 	private:
 		/* The module name */

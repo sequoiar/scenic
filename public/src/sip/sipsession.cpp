@@ -28,11 +28,12 @@ SIPSession::SIPSession() : Session( SIP ){
 
 SIPSession::~SIPSession(){}
 
-int SIPSession::session_connect( int r_port, std::string r_ip ){
+int SIPSession::connect( int r_port, std::string r_uri ){
+	_app_ua->create_invite_session( r_uri, r_port );
 	return 0;
 }
 
-int SIPSession::session_disconnect( void ){
+int SIPSession::disconnect( void ){
 	return 0;
 }
 

@@ -48,14 +48,14 @@ class SIPSession : public Session {
 		/* 
 		 * Establishes a SIP connection with a remote host.
 		 * @param 	r_port	The remote connection port (default SIP port: 5060)
-		 * @param 	r_ip	The remote IP address 
+		 * @param 	r_uri	The remote SIP address 
 		 */
-		int session_connect( int r_port, std::string r_ip );
+		int connect( int r_port, std::string r_uri );
 		
 		/*
 		 * Terminate a current SIP remote connection
 		 */
-		int session_disconnect();
+		int disconnect();
 
 		int accept( void );
 
