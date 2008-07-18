@@ -40,9 +40,13 @@ private:
     virtual void init_source();
     virtual void init_codec();
     virtual void init_sink();
+    void add_clock_callback();
+    static gboolean videotestsrc_cb(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data);
     const VideoConfig &config_;
+   
     GstElement *source_, *demux_, *queue_, *dvdec_, *colorspc_, *encoder_, *payloader_, *sink_;
     RtpSender session_;
+    GstClockID clockId_;
     GstElement *lastLinked_;    // FIXME: hack
 };
 

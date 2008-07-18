@@ -57,3 +57,8 @@ const bool VideoConfig::has_h264() const
 {
     return (codec_ == "h264");
 }
+
+const bool VideoConfig::has_videotestsrc() const
+{
+    return (source_ == "videotestsrc");
+}

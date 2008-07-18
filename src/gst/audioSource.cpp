@@ -17,7 +17,6 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <gst/controller/gstcontroller.h>
 #include <iostream>
 #include <string>
 #include <cassert>
@@ -86,6 +85,29 @@ void AudioSource::linkElements()
     }
 }
 
+gboolean AudioTestSource::callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
+{
+    static const double FREQUENCY[2][8] = {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
+                                    {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
+    static int offset = 0;
+    int i = 0;
+
+    std::vector<GstElement*> *sources = static_cast<std::vector<GstElement*> *>(user_data);
+    for (std::vector<GstElement*>::iterator iter = sources->begin(); iter != sources->end(); ++iter)
+        g_object_set(G_OBJECT(*iter), "freq", FREQUENCY[offset][i++], NULL);
+
+    offset = (offset == 0) ? 1 : 0;
+
+    return TRUE;
+}
+
+void AudioTestSource::add_clock_callback()
+{
+    // FIXME: this has to be set to start at same time as audio
+    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
+    gst_clock_id_wait_async(clockId_, callback, &sources_);
+}
+
 void AudioTestSource::init()
 {
     AudioSource::init();
@@ -94,14 +116,17 @@ void AudioTestSource::init()
     const double GAIN = 1.0 / config_.numChannels();        // so sum of tones' amplitude equals 1.0
     double frequency = 100.0;
 
-    for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
-    {
+    for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 200.0)
         g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
-        // add controller for each source
-        controllers_.push_back(gst_controller_new(G_OBJECT(*src), "freq", NULL));
-    }
 
+    add_clock_callback();
     linkElements();
+}
+
+AudioTestSource::~AudioTestSource()
+{
+    assert(pipeline_.stop());
+    gst_clock_id_unref(clockId_);
 }
 
 void AudioFileSource::init()

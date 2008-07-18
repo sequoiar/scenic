@@ -37,10 +37,13 @@ public:
     void init();
     bool start();
     bool stop();
+    const GstClockTime start_time() const { return startTime_; }
 
 // call back to attach new src pad
     static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
     static void cb_new_sink_pad(GstElement * element, GstPad * sinkPad, void *data);
+
+    GstClock* clock() const;
 
 private:
     Pipeline();
@@ -49,7 +52,9 @@ private:
 
     void make_verbose();
     GstElement *pipeline_;
+    GstClockTime startTime_;
     bool verbose_;
+    
 };
 
 #endif // _PIPELINE_H_

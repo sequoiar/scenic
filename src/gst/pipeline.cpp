@@ -19,7 +19,6 @@
 //
 
 #include <gst/gst.h>
-#include <gst/controller/gstcontroller.h>
 
 #include <cassert>
 
@@ -48,14 +47,16 @@ Pipeline::~Pipeline()
 
 void Pipeline::init()
 {
-    if (!pipeline_) {
+    if (!pipeline_) 
+    {
         gst_init(0, NULL);
-        gst_controller_init(0, NULL);
         pipeline_ = gst_pipeline_new("pipeline");
         assert(pipeline_);
 
         if (verbose_)
             make_verbose();
+
+        startTime_ = gst_clock_get_time(clock());
     }
 }
 
@@ -157,4 +158,9 @@ void Pipeline::remove_vector(std::vector < GstElement * >&elementVec)
     std::vector < GstElement * >::iterator iter;
     for (iter = elementVec.begin(); iter != elementVec.end(); iter++)
         assert(gst_bin_remove(GST_BIN(pipeline_), *iter));
+}
+
+GstClock * Pipeline::clock() const
+{
+    return gst_pipeline_get_clock(GST_PIPELINE(pipeline_));
 }
