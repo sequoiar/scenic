@@ -33,7 +33,6 @@
 
 #define _APP_NAME	"miville"
 #define _DEFAULT_SIP_PORT	5060
-#define _LOCAL_IP_ADDRESS	"127.0.0.1"
 
 class SIPSession : public Session {
 
@@ -77,6 +76,7 @@ class SIPSession : public Session {
 		UserAgent* _app_ua;
 
 		/* A SDP (Session Description Protocol) instance to build the sdp body */
+		/* Should be an attribute of the useragent class */
 		Sdp* _sdp;
 };
 

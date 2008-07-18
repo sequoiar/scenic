@@ -104,6 +104,11 @@ static pj_caching_pool c_pool;
 static pjsip_module mod_ua;
 
 /*
+ * 	The invite session
+ */
+pjsip_inv_session* inv_session;
+
+/*
  * 	A bool to indicate whether or not the connection is up
  */
 static pj_bool_t complete;
@@ -111,9 +116,10 @@ static pj_bool_t complete;
 /*************************************************************************************************/
 
 
-UserAgent::UserAgent( std::string name ){
+UserAgent::UserAgent( std::string name, int port ){
 	_name = name ;
 	_localIP = _LOCAL_IP_ADDRESS;
+	_lport = port;
 }
 
 UserAgent::~UserAgent(){}
@@ -130,7 +136,7 @@ UserAgent::init_sip_module( void ){
 }
 
 int 
-UserAgent::init_pjsip_modules( int port ){
+UserAgent::init_pjsip_modules(  ){
 
 	pj_status_t status;
 
@@ -158,10 +164,10 @@ UserAgent::init_pjsip_modules( int port ){
 	pj_bzero( &addr, sizeof(addr));
 	addr.sin_family = PJ_AF_INET;
 	addr.sin_addr.s_addr = 0;
-	addr.sin_port = pj_htons((pj_uint16_t)port);
+	addr.sin_port = pj_htons((pj_uint16_t)this->_lport);
 	addrname.host = pj_str((char*)this->_localIP.c_str());
-	printf("%s:%i", this->_localIP.c_str(), port);
-	addrname.port = port;
+	printf("%s:%i", this->_localIP.c_str(), this->_lport);
+	addrname.port = this->_lport;
 	status = pjsip_udp_transport_start( endpt, &addr, &addrname, 1, NULL );
 	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
 
@@ -203,15 +209,16 @@ int
 UserAgent::create_invite_session( std::string uri, int port ){
 
 	pjsip_dialog *dialog;
-	pjsip_inv_session* inv;
 	pjsip_tx_data *tdata;
 	pj_status_t status;
-	std::string local = "\"Manu\" <sip:localuser@127.0.0.1:5060>";
+	std::string local = "\"Test\" <sip:test@192.168.1.204:7777>";
 
 	pj_str_t target = pj_str( (char*)uri.c_str() );
 	pj_str_t from = pj_str( (char*) local.c_str() );
+	//pj_str_t from = build_contact_uri( "test", port );
+	//printf("contact uri: %s", from.ptr);
 	pj_str_t to = pj_str( (char*)uri.c_str() );
-	pj_str_t contact = from;
+	//pj_str_t contact = from;
 
 	status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from, 
 			&from,
@@ -220,13 +227,13 @@ UserAgent::create_invite_session( std::string uri, int port ){
 			&dialog );
 	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
 
-	status = pjsip_inv_create_uac( dialog, NULL, 0, &inv );
+	status = pjsip_inv_create_uac( dialog, NULL, 0, &inv_session );
 	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
 
-	status = pjsip_inv_invite( inv, &tdata );
+	status = pjsip_inv_invite( inv_session, &tdata );
 	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
 
-	status = pjsip_inv_send_msg( inv, tdata );
+	status = pjsip_inv_send_msg( inv_session, tdata );
 	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
 
 	// Start the mainloop
@@ -246,21 +253,30 @@ UserAgent::listen( void){
 
 }
 
-pjsip_sip_uri*
-UserAgent::build_sip_uri( std::string user, std::string host ){
+pj_str_t
+UserAgent::build_contact_uri( std::string user, int port ){
 
-	pj_pool_t *pool;
-	pjsip_sip_uri *sip_uri;
+	pj_sockaddr hostaddr;
+	char uri[80];
+       	char hostip[PJ_INET6_ADDRSTRLEN];
+	//std::string uri, hostip;
 
-	pool = pj_pool_create( &c_pool.factory, "pool", 4000, 4000, NULL );
-	sip_uri = pjsip_sip_uri_create( pool, PJ_FALSE );
-	sip_uri->user = pj_str( (char*)user.c_str() );
-	sip_uri->host = pj_str( (char*)host.c_str() );
+	if( pj_gethostip(pj_AF_INET(), &hostaddr) != PJ_SUCCESS ) {
+		printf("Unable to retrieve local host IP\n");
+	}
 
-	return sip_uri;
+	pj_sockaddr_print( &hostaddr, hostip, sizeof(hostip), 2 );
+
+	//printf("user = %s\n", user.c_str());
+	//printf("host ip = %s\n", hostip);
+	
+	pj_ansi_sprintf( uri, "<sip:%s@%s:%d>", user.c_str(), hostip, port );
+	
+	printf("contact uri: %s\n", pj_str(uri).ptr);
+
+	return pj_str(uri);
 
 }
-
 
 /********************** Callbacks Implementation **********************************/
 
@@ -274,11 +290,57 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
 
 static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
 
-	/* Respond statelessly any non-INVITE requests with 500 */
-	//if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
-	printf("on_rx_request\n");
-	return PJ_SUCCESS;
+	pj_status_t status;
+	pj_str_t reason;
+	unsigned options = 0;
+	pjsip_dialog* dialog;
+	//pjsip_tx_data *tdata;
 
+
+	/* Respond statelessly any non-INVITE requests with 500 */
+	if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
+		if( rdata->msg_info.msg->line.req.method.id != PJSIP_ACK_METHOD ) {
+			reason = pj_str((char*)" user agent unable to handle this request ");
+			pjsip_endpt_respond_stateless( endpt, rdata, 200, &reason, NULL, NULL );
+			return PJ_TRUE;
+		}
+	}
+
+	// Verify that we can handle the request
+	status = pjsip_inv_verify_request( rdata, &options, NULL, NULL, endpt, NULL );
+	if( status != PJ_SUCCESS ){
+		reason = pj_str((char*)" user agent unable to handle this INVITE ");
+		pjsip_endpt_respond_stateless( endpt, rdata, 200, &reason, NULL, NULL );
+		return PJ_TRUE;
+	}
+
+	/* Have to do some stuff here with the SDP */
+
+	/* Create the local dialog (UAS) */
+	pj_str_t contact = pj_str((char*) "<sip:toto@192.168.1.204:5060>");
+       	status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, &contact, &dialog );	
+	if( status != PJ_SUCCESS ) {
+		pjsip_endpt_respond_stateless( endpt, rdata, 200, &reason, NULL, NULL );
+		return PJ_TRUE;
+	}
+
+	status = pjsip_inv_create_uas( dialog, rdata, NULL, 0, &inv_session );
+	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
+
+	/* Send a 180(OK) response */
+	//status = pjsip_inv_initial_answer( inv_session, rdata, 180, NULL, NULL, &tdata );
+	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
+
+	/* Create and send a 200 response */
+	//status = pjsip_inv_answer( inv_session, 200, NULL, NULL, &tdata );
+	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
+
+	//status = pjsip_inv_send_msg( inv_session, tdata );
+	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
+
+	/* Done */
+
+	return PJ_SUCCESS;
 
 }
 
