@@ -24,7 +24,9 @@
  */
 
 #include <string>
+#include <iostream>
 #include "audioConfig.h"
+#include "audioSource.h"
 
 AudioConfig::AudioConfig(const std::string &source, int numChannels, const std::string &codec, const std::string &remoteHost,
                          int port)
@@ -48,5 +50,26 @@ AudioConfig::AudioConfig(int numChannels, const std::string &codec, int port) : 
 const int AudioConfig::numChannels() const
 {
     return numChannels_;
+}
+
+AudioSource* AudioConfig::createSource() const
+{
+    std::string s(source());
+
+    if (!s.compare("audiotestsrcDelay"))
+        return new AudioDelaySource<AudioTestSource>(*this);
+    else if (!s.compare("audiotestsrc"))
+        return new AudioTestSource(*this);
+    else if (!s.compare("filesrc"))
+        return new AudioFileSource(*this);
+    else if (!s.compare("alsasrc"))
+        return new AudioAlsaSource(*this);
+    else if (!s.compare("jackaudiosrc"))
+        return new AudioJackSource(*this);
+    else
+    {
+        std::cerr << "Invalid source!" << std::endl;
+        return 0;
+    }
 }
 

@@ -23,30 +23,12 @@
 #include "audioSource.h"
 #include "audioConfig.h"
 
-AudioSource *AudioSource::create(const AudioConfig &config)
-{
-    std::string source(config.source());
-
-    if (!source.compare("audiotestsrc"))
-        return new AudioTestSource(config);
-    else if (!source.compare("filesrc"))
-        return new AudioFileSource(config);
-    else if (!source.compare("alsasrc"))
-        return new AudioAlsaSource(config);
-    else if (!source.compare("jackaudiosrc"))
-        return new AudioJackSource(config);
-    else
-    {
-        std::cerr << "Invalid source!" << std::endl;
-        return 0;
-    }
-}
 
 AudioSource::AudioSource(const AudioConfig &config) : config_(config), interleave_(config)
 {
 }
 
-// parts of init that are common to all AudioSource classes
+// parts of sub_init that are common to all AudioSource classes
 void AudioSource::init()
 {
     interleave_.init();
@@ -65,6 +47,9 @@ void AudioSource::init()
     pipeline_.add_vector(sources_);
     pipeline_.add_vector(aconvs_);
     pipeline_.add_vector(queues_);
+
+    sub_init();
+    linkElements();
 }
 
 AudioSource::~AudioSource()
@@ -108,9 +93,8 @@ void AudioTestSource::add_clock_callback()
     gst_clock_id_wait_async(clockId_, callback, &sources_);
 }
 
-void AudioTestSource::init()
+void AudioTestSource::sub_init()
 {
-    AudioSource::init();
     GstIter src, aconv;
 
     const double GAIN = 1.0 / config_.numChannels();        // so sum of tones' amplitude equals 1.0
@@ -120,7 +104,6 @@ void AudioTestSource::init()
         g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
 
     add_clock_callback();
-    linkElements();
 }
 
 AudioTestSource::~AudioTestSource()
@@ -129,9 +112,8 @@ AudioTestSource::~AudioTestSource()
     gst_clock_id_unref(clockId_);
 }
 
-void AudioFileSource::init()
+void AudioFileSource::sub_init()
 {
-    AudioSource::init();
 
     GstIter src, aconv, dec;
 
@@ -155,7 +137,6 @@ void AudioFileSource::init()
     for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
         g_signal_connect(*dec, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *) *aconv);
 
-    linkElements(); // overloaded
 }
 
 void AudioFileSource::linkElements()
@@ -175,21 +156,14 @@ AudioFileSource::~AudioFileSource()
     pipeline_.remove_vector(decoders_);
 }
 
-void AudioAlsaSource::init()
-{
-    AudioSource::init();
-    linkElements();
-}
 
-void AudioJackSource::init()
+void AudioJackSource::sub_init()
 {
-    AudioSource::init();
 
     // turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
     // jackOut -> jackIn -> jackOut ->jackIn.....
     for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
 
-    linkElements();
 }
 

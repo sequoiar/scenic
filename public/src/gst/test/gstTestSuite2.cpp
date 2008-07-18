@@ -21,7 +21,7 @@
 #include <cpptest.h>
 #include <iostream>
 
-#include "gstTestSuite.h"
+#include "gstTestSuite2.h"
 #include "videoSender.h"
 #include "videoConfig.h"
 #include "videoReceiver.h"
@@ -179,7 +179,7 @@ void GstTestSuite::start_v4l_rtp()
         TEST_ASSERT(rx.start());
 
 
-        GstQuery *query;
+/*        GstQuery *query;
         gboolean res = false;
         GstElement *e = rx.getElement();
         query = gst_query_new_latency();
@@ -190,7 +190,7 @@ void GstTestSuite::start_v4l_rtp()
                std::cout << min << "min";
                std::cout << max << "max" << std::endl;
         }
-
+*/
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
@@ -419,7 +419,7 @@ void GstTestSuite::stop_1ch_audiotest()
         return;
 
     int numChannels = 1;
-    AudioConfig config("audiotestsrc", numChannels);
+    AudioConfig config("audiotestsrcDelay", numChannels);
     AudioSender tx(config);
     tx.init();
     TEST_ASSERT(tx.stop());
