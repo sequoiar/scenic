@@ -32,14 +32,18 @@
 #include "sdp.h"
 
 #define _APP_NAME	"miville"
+#define _DEFAULT_SIP_PORT	5060
+#define _LOCAL_IP_ADDRESS	"127.0.0.1"
 
 class SIPSession : public Session {
 
 	public:
 		/*
 		 * Create a new SIP session object
+		 *
+		 * @param port	The local protocol listening port.
 		 */
-		SIPSession();
+		SIPSession( int port );
 		
 		/*
 		 * Class destructor
@@ -48,10 +52,11 @@ class SIPSession : public Session {
 		
 		/* 
 		 * Establishes a SIP connection with a remote host.
-		 * @param 	r_port	The remote connection port (default SIP port: 5060)
+		 *
 		 * @param 	r_uri	The remote SIP address 
+		 * @param 	r_port	The remote connection port (default SIP port: 5060)
 		 */
-		int connect( int r_port, std::string r_uri );
+		int connect( std::string r_uri, int r_port );
 		
 		/*
 		 * Terminate a current SIP remote connection
@@ -64,12 +69,10 @@ class SIPSession : public Session {
 
 		void build_sdp( void );
 
-	private:
-		/*
-		 * Initialize a SIP connection.
-		 */
-		void init( );
+		void startMainloop();
 
+	private:
+		
 		/* The application SIP User Agent */
 		UserAgent* _app_ua;
 

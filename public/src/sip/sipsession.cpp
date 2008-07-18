@@ -19,17 +19,17 @@
 
 #include "sipsession.h"
 
-SIPSession::SIPSession() : Session( SIP ){
+SIPSession::SIPSession( int port ) : Session( SIP, port ){
 
 	_app_ua =  new UserAgent( _APP_NAME );
 	_sdp = new Sdp();
-	this->init(  );
+	_app_ua->init_pjsip_modules( port );
 
 }
 
 SIPSession::~SIPSession(){}
 
-int SIPSession::connect( int r_port, std::string r_uri ){
+int SIPSession::connect( std::string r_uri, int r_port ){
 	_app_ua->create_invite_session( r_uri, r_port );
 	return 0;
 }
@@ -49,7 +49,7 @@ int SIPSession::refuse( int reason ){
 void SIPSession::build_sdp( void ){
 }
 
-void SIPSession::init(  ) {
-	_app_ua->init_pjsip_modules();
+void SIPSession::startMainloop( void ){
+	_app_ua->listen();
 }
 

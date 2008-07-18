@@ -36,8 +36,12 @@ class Session {
 		/* 
 		 * Class construct. Create a new Session object.
 		 * @param type	The protocol type. As for now, only SIP (Session Initiation Protocol) is available
+		 * @param port	The local protocol listening port.
 		 */
-		Session( int type ) { _protocol = type; }
+		Session( int type, int port ) { 
+			_protocol = type; 
+			_port = port;
+		}
 
 		/* 
 		 * Class destructor 
@@ -46,10 +50,10 @@ class Session {
 
 		/* 
 		 * Establishes a connection with a remote host.
-		 * @param 	r_port	The remote connection port
 		 * @param 	r_uri	The remote SIP address 
+		 * @param 	r_port	The remote connection port
 		 */
-		virtual int connect( int r_port, std::string r_uri ) = 0;
+		virtual int connect( std::string r_uri, int r_port) = 0;
 
 		/*
 		 * Terminate a current remote connection
@@ -65,9 +69,16 @@ class Session {
 
 		virtual void build_sdp() = 0;
 
+		virtual void startMainloop() = 0;
+
+		int getSessionPort( void ){ return _port; }
+
 	private:
 		/* The communication protocol */
 		int _protocol;
+
+		/* The protocol listening port */
+		int _port;
 };
 
 

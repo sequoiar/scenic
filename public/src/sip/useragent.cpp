@@ -114,7 +114,6 @@ static pj_bool_t complete;
 UserAgent::UserAgent( std::string name ){
 	_name = name ;
 	_localIP = _LOCAL_IP_ADDRESS;
-	_sipPort  = _DEFAULT_SIP_PORT;
 }
 
 UserAgent::~UserAgent(){}
@@ -130,9 +129,8 @@ UserAgent::init_sip_module( void ){
 
 }
 
-
 int 
-UserAgent::init_pjsip_modules( void ){
+UserAgent::init_pjsip_modules( int port ){
 
 	pj_status_t status;
 
@@ -160,9 +158,10 @@ UserAgent::init_pjsip_modules( void ){
 	pj_bzero( &addr, sizeof(addr));
 	addr.sin_family = PJ_AF_INET;
 	addr.sin_addr.s_addr = 0;
-	addr.sin_port = pj_htons((pj_uint16_t)this->_sipPort);
+	addr.sin_port = pj_htons((pj_uint16_t)port);
 	addrname.host = pj_str((char*)this->_localIP.c_str());
-	addrname.port = this->_sipPort;
+	printf("%s:%i", this->_localIP.c_str(), port);
+	addrname.port = port;
 	status = pjsip_udp_transport_start( endpt, &addr, &addrname, 1, NULL );
 	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
 
@@ -197,7 +196,7 @@ UserAgent::init_pjsip_modules( void ){
 
 	PJ_LOG(3,(THIS_FILE, "Ready to accept incoming calls..."));
 
-	return 0;
+	return 1;
 }
 
 int 
@@ -230,14 +229,38 @@ UserAgent::create_invite_session( std::string uri, int port ){
 	status = pjsip_inv_send_msg( inv, tdata );
 	PJ_ASSERT_RETURN( status == PJ_SUCCESS , 1 );
 
+	// Start the mainloop
+	listen();
+	
+	return PJ_SUCCESS;	
+
+}
+
+void
+UserAgent::listen( void){
+	
 	for(; !complete;) {
 		pj_time_val timeout = {0, 10};
 		pjsip_endpt_handle_events( endpt, &timeout );
 	}
 
-	return PJ_SUCCESS;	
+}
+
+pjsip_sip_uri*
+UserAgent::build_sip_uri( std::string user, std::string host ){
+
+	pj_pool_t *pool;
+	pjsip_sip_uri *sip_uri;
+
+	pool = pj_pool_create( &c_pool.factory, "pool", 4000, 4000, NULL );
+	sip_uri = pjsip_sip_uri_create( pool, PJ_FALSE );
+	sip_uri->user = pj_str( (char*)user.c_str() );
+	sip_uri->host = pj_str( (char*)host.c_str() );
+
+	return sip_uri;
 
 }
+
 
 /********************** Callbacks Implementation **********************************/
 

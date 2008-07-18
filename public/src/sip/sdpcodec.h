@@ -25,7 +25,7 @@
 class sdpCodec {
 
 	public:
-		sdpCodec( std::string name );
+		sdpCodec( std::string type , std::string name );
 		~sdpCodec();
 
 	private:
