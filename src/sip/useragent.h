@@ -42,7 +42,7 @@ class UserAgent {
 		 * Create a new UserAgent object
 		 * @param	name	The application name
 		 */
-		UserAgent( std::string name );
+		UserAgent( std::string name, int port );
 		
 		/*
 		 * Class destructor
@@ -56,7 +56,7 @@ class UserAgent {
 		 *
 		 * @return int	PJ_SUCCESS on success
 		 */
-		int init_pjsip_modules( int port );
+		int init_pjsip_modules( );
 
 		/*
 		 * Create an invite session. Handle the related incoming responses
@@ -68,7 +68,7 @@ class UserAgent {
 		 */
 		int create_invite_session( std::string uri, int port );
 
-		pjsip_sip_uri* build_sip_uri( std::string user, std::string host );
+		pj_str_t build_contact_uri( std::string user, int port );
 
 		void listen( void );
 
@@ -78,6 +78,8 @@ class UserAgent {
 
 		/* The local IP address */
 		std::string _localIP;	
+			
+		int _lport;
 
 		/* 
 		 * Initialize the pjsip_module structure
