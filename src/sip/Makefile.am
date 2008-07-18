@@ -16,7 +16,7 @@ libsip_la_SOURCES = \
 		     sipsession.cpp 
 
 libsip_la_LDFLAGS = $(PJSIP_LIBS) -lpthread 
-AM_CXXFLAGS = -I$(top_srcdir)/include $(PJSIP_CFLAGS)
+AM_CXXFLAGS = -I$(top_srcdir)/include `pkg-config --cflags libpj` 
 
 noinst_HEADERS = \
 		 useragent.h \

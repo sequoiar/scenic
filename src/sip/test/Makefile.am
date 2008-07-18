@@ -7,6 +7,6 @@ bin_PROGRAMS = sipsessionTester
 
 sipsessionTester_SOURCES = sipsessionTest.cpp
 
-sipsessionTester_LDADD =     $(PJSIP_LIBS) ../libsip.la -lpthread  $(CPPTEST_LIBS)
-AM_CPPFLAGS= $(PJSIP_FLAGS) $(CPPTEST_CFLAGS) $(GST_CFLAGS)  -I../
+sipsessionTester_LDADD = $(PJSIP_LIBS) ../libsip.la -lpthread  $(CPPTEST_LIBS)
+AM_CPPFLAGS= `pkg-config libpj --cflags` $(CPPTEST_CFLAGS) $(GST_CFLAGS)  -I../
 
