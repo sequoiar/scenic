@@ -49,7 +49,7 @@ AudioSender::~AudioSender()
 
 void AudioSender::init_source()
 {
-    source_ = AudioSource::create(config_);
+    source_ = config_.createSource();
     assert(source_);
     source_->init();
 }

@@ -29,6 +29,7 @@
 #include <string>
 #include "mediaConfig.h"
 
+class AudioSource;
 class AudioConfig : public MediaConfig
 {
 public:
@@ -37,9 +38,10 @@ public:
     AudioConfig(const std::string & source, int numChannels);   // local sender
 
     const int numChannels() const;
-
+    AudioSource* createSource() const;
 protected:
     const int numChannels_;
+
 };
 
 #endif // _AUDIO_CONFIG_H_

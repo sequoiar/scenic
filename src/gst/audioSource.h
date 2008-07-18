@@ -29,9 +29,9 @@ class AudioConfig;
 class AudioSource : public GstBase
 {
     public:
-        static AudioSource* create(const AudioConfig &config);
         virtual ~AudioSource();
-        virtual void init();
+        void init();
+        virtual void sub_init(){}
     protected:
         AudioSource(const AudioConfig &config);
         virtual void linkElements();
@@ -47,7 +47,7 @@ class AudioTestSource : public AudioSource
 {
     public:
         virtual ~AudioTestSource();
-        virtual void init();
+        virtual void sub_init();
         AudioTestSource(const AudioConfig &config) : AudioSource(config) {
         }
 
@@ -61,7 +61,7 @@ class AudioFileSource : public AudioSource
 {
     public:
         virtual ~AudioFileSource();
-        virtual void init();
+        virtual void sub_init();
         AudioFileSource(const AudioConfig &config) : AudioSource(config) {
         }
     private:
@@ -72,9 +72,6 @@ class AudioFileSource : public AudioSource
 class AudioAlsaSource : public AudioSource
 {
     public:
-        virtual ~AudioAlsaSource(){
-        }
-        virtual void init();
         AudioAlsaSource(const AudioConfig &config) : AudioSource(config) {
         }
 };
@@ -82,12 +79,27 @@ class AudioAlsaSource : public AudioSource
 class AudioJackSource : public AudioSource
 {
     public:
-        virtual ~AudioJackSource(){
-        }
-        virtual void init();
+        virtual void sub_init();
         AudioJackSource(const AudioConfig &config) : AudioSource(config) {
         }
 };
+
+template <class T>
+class AudioDelaySource : public T
+{
+    public:
+
+        virtual void sub_init();
+        AudioDelaySource(const AudioConfig &config) : T(config) {
+        }
+};
+
+template <class T>
+void AudioDelaySource<T>::sub_init(){
+    
+    T::sub_init();
+
+}
 
 #endif //_AUDIO_SOURCE_H_
 

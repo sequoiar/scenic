@@ -42,29 +42,6 @@ public:
 
     GstTestSuite()
     {
-#if VIDEO
-/*        TEST_ADD(GstTestSuite::init_test)
-        TEST_ADD(GstTestSuite::start_test_video)
-        TEST_ADD(GstTestSuite::stop_test_video)
-        TEST_ADD(GstTestSuite::start_stop_test_video)
-        TEST_ADD(GstTestSuite::start_dv)
-        TEST_ADD(GstTestSuite::stop_dv)
-        TEST_ADD(GstTestSuite::start_stop_dv)
-        TEST_ADD(GstTestSuite::start_v4l)
-        TEST_ADD(GstTestSuite::stop_v4l)
-        TEST_ADD(GstTestSuite::start_stop_v4l)
-*/
-#if RTP // AND VIDEO
-//        TEST_ADD(GstTestSuite::start_dv_rtp)
-//        TEST_ADD(GstTestSuite::stop_dv_rtp)
-//        TEST_ADD(GstTestSuite::start_stop_dv_rtp)
-        TEST_ADD(GstTestSuite::start_v4l_rtp)
-        TEST_ADD(GstTestSuite::stop_v4l_rtp)
-        TEST_ADD(GstTestSuite::start_stop_v4l_rtp)
-#endif // RTP && VIDEO
-#endif // VIDEO
-        /*
-#if AUDIO
         TEST_ADD(GstTestSuite::start_1ch_audiotest)
         TEST_ADD(GstTestSuite::stop_1ch_audiotest)
         TEST_ADD(GstTestSuite::start_stop_1ch_audiotest)
@@ -77,35 +54,6 @@ public:
         TEST_ADD(GstTestSuite::start_8ch_audiotest)
         TEST_ADD(GstTestSuite::stop_8ch_audiotest)
         TEST_ADD(GstTestSuite::start_stop_8ch_audiotest)
-        TEST_ADD(GstTestSuite::start_8ch_comp_audiofile)
-        TEST_ADD(GstTestSuite::stop_8ch_comp_audiofile)
-        TEST_ADD(GstTestSuite::start_stop_8ch_comp_audiofile)
-        TEST_ADD(GstTestSuite::start_8ch_alsa)
-        TEST_ADD(GstTestSuite::stop_8ch_alsa)
-        TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
-        TEST_ADD(GstTestSuite::start_8ch_jack)
-        TEST_ADD(GstTestSuite::stop_8ch_jack)
-        TEST_ADD(GstTestSuite::start_stop_8ch_jack)
-
-#if RTP // AND AUDIO
-        TEST_ADD(GstTestSuite::start_2ch_comp_rtp_audiotest)
-        TEST_ADD(GstTestSuite::stop_2ch_comp_rtp_audiotest)
-        TEST_ADD(GstTestSuite::start_stop_2ch_comp_rtp_audiotest)
-        TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiotest)
-        TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiotest)
-        TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiotest)
-        TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile)
-        TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile)
-        TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile)
-
-#if VIDEO // AND RTP AND VIDEO
-        TEST_ADD(GstTestSuite::start_8ch_comp_rtp_audiofile_dv)
-        TEST_ADD(GstTestSuite::stop_8ch_comp_rtp_audiofile_dv)
-        TEST_ADD(GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv)
-#endif                          // RTP && VIDEO && AUDIO
-#endif                          // RTP  && AUDIO
-#endif                          // AUDIO
-*/
 
         /*----------------------------------------------*/
         /*      SANDBOX                                 */
@@ -113,7 +61,6 @@ public:
         /*  Put newer tests here and set all defs to 0  */
         /*  to test them by themselves.                 */
         /*----------------------------------------------*/
-//        TEST_ADD(GstTestSuite::sync);
     }
 
     void set_id(int id);
