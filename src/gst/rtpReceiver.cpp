@@ -18,11 +18,12 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <gst/gst.h>
 #include <cassert>
 #include <iostream>
 #include <list>
-
+#include <algorithm>
+#include <string.h>
+#include <gst/gst.h>
 #include "logWriter.h"
 #include "rtpReceiver.h"
 #include "mediaConfig.h"
@@ -40,7 +41,7 @@ RtpReceiver::~RtpReceiver()
     pipeline_.remove(rtp_receiver_);
     
     std::list<GstElement *>::iterator iter;
-    iter = find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
+    iter = std::find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
 
     // make sure we found it
     assert(iter != depayloaders_.end());
