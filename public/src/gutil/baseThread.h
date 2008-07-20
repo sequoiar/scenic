@@ -50,14 +50,11 @@ public:
     T timed_pop(int ms);
     void push(T pt);
 
-    void done(T t);
     void done(T * pt);
     void init();
-//    typedef std::set < GAsyncQueue * >SetOfQueues;
     void del(bool);
 
 private:
-//    static SetOfQueues qstor;
     bool own[2];
     T *timed_pop_(int ms);
     static GMutex *mutex;
@@ -65,7 +62,6 @@ private:
 
 };
 
-//template < class T > std::set < GAsyncQueue * >QueuePair_ < T >::qstor;
 
 
 
@@ -92,7 +88,6 @@ protected:
     GThread *th;
 
     QueuePair_ < T > queue;
-//    std::map < std::string, QueuePair_ < T > >queue_map;
     static void *thread_main(void *v);
 };
 
@@ -101,22 +96,6 @@ template < class T > QueuePair_ < T > BaseThread < T >::getQueue()
 	return (QueuePair_ < T > (queue.second, queue.first));
 }
 
-/*
-template < class T > QueuePair_ < T > BaseThread < T >::getQueue(std::string s)
-{
-    if (s.empty())
-        return (QueuePair_ < T > (queue.second, queue.first));
-
-    if (queue_map.find(s) == queue_map.end()) {
-
-        QueuePair_ < T > qp = QueuePair_ < T > (queue.first, 0);
-        qp.init();
-        queue_map[s] = qp;
-    }
-
-    return QueuePair_ < T > (queue_map[s].second, queue_map[s].first);
-}
-*/
 
 template < class T > T* queue_pair_pop(BaseQueuePair qp)
 {
@@ -153,21 +132,9 @@ template < class T > std::list < T * >QueuePair_ < T >::l;
 
 template < class T > T * QueuePair_ < T >::timed_pop_(int ms)
 {
-/*   typename SetOfQueues::iterator it;
-
-    for (it = qstor.begin(); it != qstor.end(); ++it)
-    {
-        if (g_async_queue_length((*it)) > 0)
-            if (*it == first)
-                return (queue_pair_timed_pop < T >(this, ms));
-    }
-*/
-                return (queue_pair_timed_pop < T >(this, ms));
-    return 0;
+	return (queue_pair_timed_pop < T >(this, ms));
 }
 
-/// copy time pop stuff.
-//
 template < class T > T QueuePair_ < T >::timed_pop(int ms)
 {
     T n;
@@ -220,14 +187,13 @@ template < class T > void QueuePair_ < T >::init()
     if (first == 0) {
         own[0] = true;
         first = g_async_queue_new();
-//        qstor.insert(first);
     }
     else
         own[0] = false;
+
     if (second == 0) {
         own[1] = true;
         second = g_async_queue_new();
-//        qstor.insert(second);
     }
     else
         own[1] = false;
@@ -250,7 +216,6 @@ template < class T> void QueuePair_<T>::del(bool one)
     while(t);
 
     g_async_queue_unref(q);
-//    qstor.erase(q);
 }
 
 template < class T > QueuePair_<T>::~QueuePair_ ()
@@ -262,7 +227,6 @@ template < class T > BaseThread < T >::BaseThread() : th(0)
 {
     if (!g_thread_supported ()) g_thread_init (NULL);
     queue.init();
-//    queue_map[""] = queue;
 }
 
 template < class T > BaseThread < T >::~BaseThread()
@@ -272,9 +236,6 @@ template < class T > BaseThread < T >::~BaseThread()
 
     queue.del(true);
     queue.del(false);
-//    for(; queue_map.begin() != queue_map.end(); 
-//    queue_map.erase(queue_map.begin()))
-//        queue_map.begin()->second.del(false);
 }
 
 
@@ -285,10 +246,6 @@ template < class T > bool BaseThread < T >::run()
     //No thread yet
     if (th)
         return false;
-
-//    if(!pre_run())  //for derived classes
-//        return false;
-
 
     th = thread_create_queue_pair(BaseThread::thread_main, this, &err);
 
@@ -304,3 +261,4 @@ template < class T > void *BaseThread < T >::thread_main(void *v)
 }
 
 #endif
+
