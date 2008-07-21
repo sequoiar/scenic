@@ -62,12 +62,28 @@ AudioSource::~AudioSource()
 
 void AudioSource::linkElements()
 {
-    GstIter src, aconv;
-    for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(); ++src, ++aconv)
-    {
-        assert(gst_element_link(*src, *aconv));
-        interleave_.linkInput(*aconv);
+    GstIter src, aconv, next, nextEnd;
+    
+    if(decoders_.begin() == decoders_.end()){
+        // No Decoder
+        next = aconvs_.begin();
+        nextEnd = aconvs_.end();
     }
+    else{
+        // Decoder used
+        // NOTE: Don't link decoder to aconv, that happens dynamically
+        next = decoders_.begin();
+        nextEnd = decoders_.end();
+    }
+    
+    for (src = sources_.begin(); 
+            src != sources_.end(), next != nextEnd; 
+            ++src, ++next)
+        assert(gst_element_link(*src, *next));
+
+    for (aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
+        interleave_.linkInput(*aconv);
+
 }
 
 gboolean AudioTestSource::callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
@@ -137,20 +153,6 @@ void AudioFileSource::sub_init()
 
     for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
         g_signal_connect(*dec, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *) *aconv);
-}
-
-void AudioFileSource::linkElements()
-{
-    // NOTE: Don't link decoder to aconv, that happens dynamically
-    GstIter src, dec, aconv;
-
-    for (src = sources_.begin(), dec = decoders_.begin(); 
-            src != sources_.end(), dec != decoders_.end(); 
-            ++src, ++dec)
-        assert(gst_element_link(*src, *dec));
-
-    for (aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
-        interleave_.linkInput(*aconv);
 }
 
 

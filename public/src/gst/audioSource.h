@@ -36,7 +36,7 @@ class AudioSource : public GstBase
         AudioSource(const AudioConfig &config);
         virtual void linkElements();
         const AudioConfig &config_;
-        std::vector<GstElement *>sources_, aconvs_, queues_;
+        std::vector<GstElement *>sources_, aconvs_, queues_, decoders_;
         Interleave interleave_;
 
     private:
@@ -46,13 +46,13 @@ class AudioSource : public GstBase
 class AudioTestSource : public AudioSource
 {
     public:
-        virtual ~AudioTestSource();
-        virtual void sub_init();
+        ~AudioTestSource();
+        void sub_init();
         AudioTestSource(const AudioConfig &config) : AudioSource(config) {
         }
 
     private:
-        GstClockID clockId_;
+       GstClockID clockId_;
        void add_clock_callback();
        static gboolean callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data);
 };
@@ -60,13 +60,11 @@ class AudioTestSource : public AudioSource
 class AudioFileSource : public AudioSource
 {
     public:
-        virtual ~AudioFileSource();
-        virtual void sub_init();
+        ~AudioFileSource();
+        void sub_init();
         AudioFileSource(const AudioConfig &config) : AudioSource(config) {
         }
     private:
-        virtual void linkElements();
-        std::vector<GstElement *> decoders_;
 };
 
 class AudioAlsaSource : public AudioSource
@@ -79,7 +77,7 @@ class AudioAlsaSource : public AudioSource
 class AudioJackSource : public AudioSource
 {
     public:
-        virtual void sub_init();
+        void sub_init();
         AudioJackSource(const AudioConfig &config) : AudioSource(config) {
         }
 };
@@ -89,7 +87,7 @@ class AudioDelaySource : public T
 {
     public:
 
-        virtual void sub_init();
+        void sub_init();
         AudioDelaySource(const AudioConfig &config) : T(config) {
         }
 };
