@@ -37,6 +37,7 @@ public:
     AudioConfig(int numChannels, const std::string & codec, int port);          // receiver
     AudioConfig(const std::string & source, int numChannels);   // local sender
 
+    const char *source() const;
     const int numChannels() const;
     AudioSource* createSource() const;
 protected:

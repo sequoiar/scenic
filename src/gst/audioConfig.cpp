@@ -52,11 +52,26 @@ const int AudioConfig::numChannels() const
     return numChannels_;
 }
 
+// strips .delay from source name
+const char *AudioConfig::source() const
+{ 
+    unsigned int pos = source_.find("."); 
+
+    if (pos < source_.size()) 
+    {
+        std::string result(source_);
+        return result.erase(pos, std::string(".delay").size()).c_str();
+    }
+    else
+        return MediaConfig::source();
+}
+
+
 AudioSource* AudioConfig::createSource() const
 {
-    std::string s(source());
+    std::string s(source_);
 
-    if (!s.compare("audiotestsrcDelay"))
+    if (!s.compare("audiotestsrc.delay"))
         return new AudioDelaySource<AudioTestSource>(*this);
     else if (!s.compare("audiotestsrc"))
         return new AudioTestSource(*this);

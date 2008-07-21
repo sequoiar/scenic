@@ -35,6 +35,7 @@ void AudioSource::init()
 
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
+        std::cout << "HERE'S YOUR SOURCE: " << config_.source() << std::endl;
         sources_.push_back(gst_element_factory_make(config_.source(), NULL));
         assert(sources_[channelIdx]);
         aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
@@ -62,27 +63,41 @@ AudioSource::~AudioSource()
 
 void AudioSource::linkElements()
 {
-    GstIter src, aconv, next, nextEnd;
+    std::vector<GstElement *> * next;
+    GstIter src, aconv, filter, nextIter;//, next, nextEnd;
     
-    if(decoders_.begin() == decoders_.end()){
+    if(decoders_.empty()) {
         // No Decoder
-        next = aconvs_.begin();
-        nextEnd = aconvs_.end();
+        next = &aconvs_;
+        //next = aconvs_.begin();
+        //nextEnd = aconvs_.end();
     }
-    else{
+    else {
         // Decoder used
         // NOTE: Don't link decoder to aconv, that happens dynamically
-        next = decoders_.begin();
-        nextEnd = decoders_.end();
+        //next = decoders_.begin();
+        //nextEnd = decoders_.end();
+        next = &decoders_;
     }
     
-    for (src = sources_.begin(); 
-            src != sources_.end(), next != nextEnd; 
-            ++src, ++next)
-        assert(gst_element_link(*src, *next));
-
-    for (aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
-        interleave_.linkInput(*aconv);
+    for (src = sources_.begin(), nextIter = next->begin(); 
+            src != sources_.end(), nextIter != next->end(); 
+            ++src, ++nextIter)
+        assert(gst_element_link(*src, *nextIter));
+    
+    if (!filters_.empty()) 
+    {
+        for (nextIter = next->begin(), filter = filters_.begin();
+                nextIter != next->end(), filter != filters_.end();
+                ++nextIter, ++filter)
+        {
+            assert(gst_element_link(*nextIter, *filter));
+            interleave_.linkInput(*filter);
+        }
+    }
+    else
+        for (aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
+            interleave_.linkInput(*aconv);
 
 }
 
@@ -173,3 +188,16 @@ void AudioJackSource::sub_init()
 
 }
 
+
+#if 0
+void AudioDelaySource<AudioSource>::sub_init()
+{
+    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
+    {
+        filters_.push_back(gst_element_factory_make("ladspa-delay-5s", NULL));
+        assert(filters_[channelIdx]);
+    }
+
+    pipeline_.add_vector(filters_);
+}
+#endif
