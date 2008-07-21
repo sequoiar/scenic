@@ -60,7 +60,7 @@ const char *AudioConfig::source() const
     if (pos < source_.size()) 
     {
         std::string result(source_);
-        return result.erase(pos, std::string(".delay").size()).c_str();
+        return result.erase(pos, strlen(".delay")).c_str();
     }
     else
         return MediaConfig::source();
