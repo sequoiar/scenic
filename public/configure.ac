@@ -61,6 +61,10 @@ if test "x${have_gstreamer_controller}" = "xfalse" ; then
     AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
 fi
 
+AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTCONTROLLER_LIBS")
+#AC_SUBST(ALL_GST_LIBS)
+
+
 #Trying to set PJSIP using pkg-config
 PKG_CHECK_MODULES(UUID, uuid, have_uuid=true, have_uuid=false)
 if test "x${have_libuuid}" = "xfalse" ; then
@@ -103,6 +107,7 @@ AC_CONFIG_FILES([Makefile
                  src/osc/Makefile
                  src/osc/test/Makefile
                  src/main/Makefile
+                 src/prototypes/Makefile
                  src/prototypes/hello/Makefile
                  src/prototypes/hello/test/Makefile
                  src/prototypes/python/Makefile
