@@ -41,7 +41,7 @@ RtpReceiver::~RtpReceiver()
     pipeline_.remove(rtp_receiver_);
     
     std::list<GstElement *>::iterator iter;
-    iter = std::find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
+    iter = find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
 
     // make sure we found it
     assert(iter != depayloaders_.end());
