@@ -85,24 +85,24 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
     std::cout << "SrcElement: " << gst_element_get_name(srcElement) << std::endl;
     std::cout << "SrcPad: " << gst_pad_get_name(srcPad) << std::endl;
 
-    std::list<GstElement *> * depayloaders = static_cast<std::list<GstElement *> *>(data);
-    std::cout << "You have " << depayloaders->size() << " depayloaders stored. " << std::endl;
+    //std::list<GstElement *> * depayloaders = static_cast<std::list<GstElement *> *>(data);
+    std::cout << "You have " << depayloaders_.size() << " depayloaders stored. " << std::endl;
     
     std::list<GstElement *>::iterator iter;
-    for (iter = depayloaders->begin(); iter != depayloaders->end(); ++iter)
+    for (iter = depayloaders_.begin(); iter != depayloaders_.end(); ++iter)
         std::cout << "Depayloader: " << gst_element_get_name(*iter) << std::endl;
 
     GstPad *sinkPad;
 
-    sinkPad = gst_element_get_static_pad(depayloaders->front(), "sink");
+    sinkPad = gst_element_get_static_pad(depayloaders_.front(), "sink");
 
-    iter = depayloaders->begin();
+    iter = depayloaders_.begin();
 
     // look for caps whose first 37 characters match (this includes the parameter that describes media type)
-    // FIXME: could just check the dedepayloader types
+    // FIXME: could just check the depayloader types/names
     const int CAPS_LEN = 37;
     while (strncmp(gst_caps_to_string(gst_pad_get_caps(sinkPad)), gst_caps_to_string(gst_pad_get_caps(srcPad)), CAPS_LEN) 
-            && iter != depayloaders->end())
+            && iter != depayloaders_.end())
     {
         sinkPad = gst_element_get_static_pad(*iter, "sink");
         ++iter;
@@ -157,7 +157,7 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * confi
 
     depayloaders_.push_back(depayloader);
     // when pad is created, it must be linked to new sink
-    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), static_cast<void *>(&depayloaders_));
+    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), NULL);
 
     // release request pads (in reverse order)
     gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);
