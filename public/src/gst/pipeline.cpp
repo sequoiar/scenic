@@ -42,6 +42,7 @@ Pipeline & Pipeline::Instance()
 
 Pipeline::~Pipeline()
 {
+    assert(stop());
     gst_object_unref(GST_OBJECT(pipeline_));
 }
 
@@ -61,6 +62,19 @@ void Pipeline::init()
         startTime_ = gst_clock_get_time(clock());
     }
 }
+
+// FIXME: check if this is safe, basically we're destroying and recreating the pipeline
+void Pipeline::reset()
+{
+    if (pipeline_)
+    {
+        assert(stop());
+        gst_object_unref(GST_OBJECT(pipeline_));
+        delete instance_;
+        instance_ = 0;
+    }
+}
+
 
 void Pipeline::make_verbose()
 {
