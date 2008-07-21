@@ -35,7 +35,6 @@ void AudioSource::init()
 
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
-        std::cout << "HERE'S YOUR SOURCE: " << config_.source() << std::endl;
         sources_.push_back(gst_element_factory_make(config_.source(), NULL));
         assert(sources_[channelIdx]);
         aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
