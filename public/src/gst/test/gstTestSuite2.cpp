@@ -419,7 +419,7 @@ void GstTestSuite::stop_1ch_audiotest()
         return;
 
     int numChannels = 1;
-    AudioConfig config("audiotestsrcDelay", numChannels);
+    AudioConfig config("audiotestsrc.delay", numChannels);
     AudioSender tx(config);
     tx.init();
     TEST_ASSERT(tx.stop());

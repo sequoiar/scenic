@@ -20,6 +20,7 @@
 #ifndef _AUDIO_SOURCE_H_
 #define _AUDIO_SOURCE_H_
 
+#include <cassert>
 #include <gst/audio/multichannel.h>
 #include "gstBase.h"
 #include "interleave.h"
@@ -36,7 +37,7 @@ class AudioSource : public GstBase
         AudioSource(const AudioConfig &config);
         virtual void linkElements();
         const AudioConfig &config_;
-        std::vector<GstElement *>sources_, aconvs_, queues_, decoders_;
+        std::vector<GstElement *>sources_, aconvs_, queues_, decoders_, filters_;
         Interleave interleave_;
 
     private:
@@ -64,7 +65,6 @@ class AudioFileSource : public AudioSource
         void sub_init();
         AudioFileSource(const AudioConfig &config) : AudioSource(config) {
         }
-    private:
 };
 
 class AudioAlsaSource : public AudioSource
@@ -82,21 +82,33 @@ class AudioJackSource : public AudioSource
         }
 };
 
-template <class T>
-class AudioDelaySource : public T
+template <typename T>
+class AudioDelaySource : public T//, virtual public AudioSource
 {
     public:
-
         void sub_init();
-        AudioDelaySource(const AudioConfig &config) : T(config) {
-        }
+        AudioDelaySource(const AudioConfig &config) : T(config) {} 
+        ~AudioDelaySource();
 };
 
-template <class T>
-void AudioDelaySource<T>::sub_init(){
-    
+template <typename T>
+void AudioDelaySource<T>::sub_init()
+{
     T::sub_init();
+    for (int channelIdx = 0; channelIdx < T::config_.numChannels(); channelIdx++)
+    {
+        T::filters_.push_back(gst_element_factory_make("ladspa-delay-5s", NULL));
+        assert(T::filters_[channelIdx]);
+    }
 
+    T::pipeline_.add_vector(T::filters_);
+}
+
+    template <typename T>
+AudioDelaySource<T>::~AudioDelaySource<T>()
+{
+    assert(T::pipeline_.stop());
+    T::pipeline_.remove_vector(T::filters_);
 }
 
 #endif //_AUDIO_SOURCE_H_
