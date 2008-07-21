@@ -109,6 +109,7 @@ void AudioTestSource::sub_init()
 AudioTestSource::~AudioTestSource()
 {
     assert(pipeline_.stop());
+    gst_clock_id_unschedule(clockId_);
     gst_clock_id_unref(clockId_);
 }
 
@@ -136,16 +137,18 @@ void AudioFileSource::sub_init()
 
     for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
         g_signal_connect(*dec, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *) *aconv);
-
 }
 
 void AudioFileSource::linkElements()
 {
-    GstIter src, aconv, dec;
-    for (src = sources_.begin(), dec = decoders_.begin(); src != sources_.end(); ++src, ++dec)
-        assert(gst_element_link(*src, *dec));
+    // NOTE: Don't link decoder to aconv, that happens dynamically
+    GstIter src, aconv;
+    for (src = sources_.begin(), aconv = aconvs_.begin(); 
+            src != sources_.end(), aconv != aconvs_.end(); 
+            ++src, ++aconv)
+        assert(gst_element_link(*src, *aconv));
 
-    for (aconv = aconvs_.begin(), aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
+    for (aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
         interleave_.linkInput(*aconv);
 }
 

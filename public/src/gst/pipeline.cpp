@@ -56,6 +56,8 @@ void Pipeline::init()
         if (verbose_)
             make_verbose();
 
+        // this will be used as a reference for future
+        // pipeline synchronization
         startTime_ = gst_clock_get_time(clock());
     }
 }
@@ -75,15 +77,21 @@ void Pipeline::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *da
 {
     std::cout << "Element: " << gst_element_get_name(srcElement) << std::endl;
     std::cout << "Pad: " << gst_pad_get_name(srcPad) << std::endl;
-    if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
+
+    if (gst_pad_is_linked(srcPad))
+    {
+        LOG("Pad is already linked.")
+            return;
+    }
+    else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
     {   
-        LOG("Dynamic pad creation: pad is not a source");
+        LOG("Pad is not a source");
         return;
     }
 
     GstElement *sinkElement = (GstElement *) data;
     GstPad *sinkPad;
-    LOG("Dynamic pad created, linking new srcpad to existing sinkpad.");
+    LOG("Dynamic pad created, linking new srcpad to existing sinkpad");
 
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
     assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
@@ -94,9 +102,14 @@ void Pipeline::cb_new_sink_pad(GstElement * sinkElement, GstPad * sinkPad, void 
 {
     std::cout << "Element: " << gst_element_get_name(sinkElement) << std::endl;
     std::cout << "Pad: " << gst_pad_get_name(sinkPad) << std::endl;
-    if (gst_pad_get_direction(sinkPad) != GST_PAD_SINK)
+    if (gst_pad_is_linked(sinkPad))
     {
-        LOG("Dynamic pad creation: pad is not a sink");
+        LOG("Pad is already linked")
+            return;
+    }
+    else if (gst_pad_get_direction(sinkPad) != GST_PAD_SINK)
+    {
+        LOG("Pad is not a sink");
         return;
     }
 
