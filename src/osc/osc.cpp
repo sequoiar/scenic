@@ -82,7 +82,7 @@ int OscThread::main()
     running = true;
     while (running)
     {
-        OscMessage msg = queue.copy_timed_pop(10000);
+        OscMessage msg = queue.timed_pop(10000);
         
         if (!msg.path.empty()) {
             if(!msg.path.compare("/quit"))

@@ -1,4 +1,4 @@
-// headerGPL.c
+// 
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -18,12 +18,8 @@
 //
 
 /** \file
- *      Just the License GPL 3+
+ *      The base class for all Modules and Threads
  *
- *      Detailed description here.
- *      Continues here.
- *      And more.
- *      And more.
  */
 
 #ifndef __BASE_MODULE_H__
@@ -32,6 +28,7 @@
 #include <string>
 #include <list>
 
+/// Base class of Arguments used in command line parsing
 class BaseArg
 {
 public:
@@ -45,6 +42,7 @@ public:
     }
 };
 
+///Integer argument
 class IntArg : public BaseArg
 {
 public:
@@ -56,6 +54,7 @@ public:
 
 };
 
+///Boolean argument
 class BoolArg : public BaseArg
 {
 public:
@@ -65,6 +64,7 @@ public:
     }
 };
 
+///String argument
 class StringArg : public BaseArg
 {
 public:
@@ -77,20 +77,20 @@ public:
 
 
 
-
+///BaseModule 
 class BaseModule
 {
 public:
     typedef std::list<BaseArg*> ArgList;
     typedef std::list<BaseArg*>::iterator iterator;
     ArgList args;
+
     ArgList& get_args(){
         return args;
     }
+
+	//run is the module's main
     virtual bool run(){
-        return 1;
-    }
-    bool init(){
         return 1;
     }
     virtual ~BaseModule(){
@@ -102,3 +102,4 @@ public:
 };
 
 #endif
+
