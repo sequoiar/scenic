@@ -32,9 +32,9 @@ public:
     void add_vector(std::vector < GstElement * >&elementVec);
     void remove(GstElement * element);
     void remove_vector(std::vector < GstElement * >&elementVec);
+    void reset();
     bool isPlaying() const;
     void wait_until_playing() const;
-    void init();
     bool start();
     bool stop();
     const GstClockTime start_time() const { return startTime_; }
@@ -46,6 +46,7 @@ public:
     GstClock* clock() const;
 
 private:
+    void init();
     Pipeline();
     ~Pipeline();
     static Pipeline *instance_;

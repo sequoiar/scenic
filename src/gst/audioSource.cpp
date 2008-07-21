@@ -142,11 +142,12 @@ void AudioFileSource::sub_init()
 void AudioFileSource::linkElements()
 {
     // NOTE: Don't link decoder to aconv, that happens dynamically
-    GstIter src, aconv;
-    for (src = sources_.begin(), aconv = aconvs_.begin(); 
-            src != sources_.end(), aconv != aconvs_.end(); 
-            ++src, ++aconv)
-        assert(gst_element_link(*src, *aconv));
+    GstIter src, dec, aconv;
+
+    for (src = sources_.begin(), dec = decoders_.begin(); 
+            src != sources_.end(), dec != decoders_.end(); 
+            ++src, ++dec)
+        assert(gst_element_link(*src, *dec));
 
     for (aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
         interleave_.linkInput(*aconv);
