@@ -48,7 +48,7 @@ int Thread::main()
     int count=0;
     while(1)
     {
-        BaseMessage f = queue.copy_timed_pop(1);
+        BaseMessage f = queue.timed_pop(1);
         LOG(" here ");
         if(count++ == max_count) {
             BaseMessage f(BaseMessage::quit);
@@ -72,8 +72,7 @@ int my_main (int argc, char** argv)
     if(!opts.parse(argc,argv))
         return 1;
 
-    QueuePair queue = t.getQueue("");
-//	QueuePair queue2 = t.getQueue("a");
+    QueuePair queue = t.getQueue();
     if(!t.run())
         return -1;
 
@@ -82,8 +81,7 @@ int my_main (int argc, char** argv)
         BaseMessage f(BaseMessage::ok);
         queue.push(f);
         usleep(10);
-        f = queue.copy_timed_pop(1);
-//		BaseMessage f2 = queue2.copy_timed_pop(1);
+        f = queue.timed_pop(1);
 
         if(f.get_type() == BaseMessage::quit) {
             break;

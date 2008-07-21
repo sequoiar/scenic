@@ -5,7 +5,6 @@
 
 int m (int argc, char** argv)
 {
-//    g_thread_init(NULL);
     GstThread gst;
     OscThread o;
     OptionArgs opts;
@@ -15,8 +14,8 @@ int m (int argc, char** argv)
 
     if(!opts.parse(argc,argv))
         return 1;
-    QueuePair gst_queue = gst.getQueue("");
-    QueuePairOfOscMessage osc_queue = o.getQueue("");
+    QueuePair gst_queue = gst.getQueue();
+    QueuePairOfOscMessage osc_queue = o.getQueue();
     if(!gst.run())
         return -1;
 
@@ -25,7 +24,7 @@ int m (int argc, char** argv)
 
     while(1)
     {
-        OscMessage m = osc_queue.copy_timed_pop(10000);
+        OscMessage m = osc_queue.timed_pop(10000);
         
         if(m.path.empty())
             continue;

@@ -18,7 +18,8 @@
  */
 #include "gstThread.h"
 
-//Caller gains ownership of args in list
+
+//BaseModule args get deleted in ~BaseModule
 GstThread::GstThread()
 {
     args.clear();
@@ -46,7 +47,7 @@ int GstThread::main()
     
     while(!quit)
     {
-        BaseMessage f = queue.copy_timed_pop(10000);
+        BaseMessage f = queue.timed_pop(10000);
         switch(f.get_type())
         {
         case BaseMessage::quit:
