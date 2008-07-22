@@ -62,7 +62,7 @@ AudioSource::~AudioSource()
 }
 
 
-// TODO: maybe move some of this logic to subclasses
+// FIXME: maybe move some of this logic to subclasses
 void AudioSource::linkElements()
 {
     std::vector<GstElement *> * next;
@@ -112,7 +112,6 @@ gboolean AudioTestSource::callback(GstClock *clock, GstClockTime time, GstClockI
 
 void AudioTestSource::add_clock_callback()
 {
-    // FIXME: this has to be set to start at same time as audio
     clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
     gst_clock_id_wait_async(clockId_, callback, &sources_);
 }
@@ -151,7 +150,7 @@ void AudioFileSource::sub_init()
 
     pipeline_.add_vector(decoders_);
 
-    // FIXME: location should be changeable somewhere else
+    // FIXME: location should be changeable at a higher level
     int counter = 1;
     for (src = sources_.begin(); src != sources_.end(); ++src)
     {

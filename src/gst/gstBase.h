@@ -37,6 +37,7 @@ protected:
     Pipeline & pipeline_;
 
 private:
+    static int refCount_;
 };
 
 #endif // _GST_BASE_H_

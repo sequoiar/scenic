@@ -55,13 +55,13 @@ if test "x${have_gstreamer_audio}" = "xfalse" ; then
     AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
 fi
 
-#Trying to set GSTCONTROLLER using pkg-config
-PKG_CHECK_MODULES(GSTCONTROLLER, gstreamer-controller-0.10, have_gstreamer_controller=true, have_gstreamer_controller=false)
-if test "x${have_gstreamer_controller}" = "xfalse" ; then
-    AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
+#Trying to set JACK using pkg-config
+PKG_CHECK_MODULES(JACK, jack, have_jack=true, have_jack=false)
+if test "x${have_jack}" = "xfalse" ; then
+    AC_MSG_ERROR([missing pkg -  libjack0 and/or libjack-dev])
 fi
 
-AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTCONTROLLER_LIBS")
+AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
 #AC_SUBST(ALL_GST_LIBS)
 
 
