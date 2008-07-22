@@ -31,14 +31,7 @@
 
 const int SyncTester::V_PORT = 10010;
 const int SyncTester::A_PORT = 11010;
-
-SyncTesterSend::SyncTesterSend()
-{
-}
-
-SyncTesterReceive::SyncTesterReceive() 
-{
-}
+const int SyncTester::NUM_CHANNELS = 8;
 
 void SyncTesterSend::run()
 {
@@ -46,7 +39,7 @@ void SyncTesterSend::run()
     VideoSender vTx(vConfig);
     vTx.init();
     
-    AudioConfig aConfig("audiotestsrc", 8, "vorbisenc", MY_ADDRESS, A_PORT);
+    AudioConfig aConfig("audiotestsrc", NUM_CHANNELS, "vorbisenc", MY_ADDRESS, A_PORT);
     AudioSender aTx(aConfig);
     aTx.init();
 
@@ -71,7 +64,7 @@ void SyncTesterReceive::run()
     VideoReceiver vRx(vConfig);
     vRx.init();
 
-    AudioConfig aConfig(8, "vorbisdec", A_PORT);
+    AudioConfig aConfig(NUM_CHANNELS, "vorbisdec", A_PORT);
     AudioReceiver aRx(aConfig);
     aRx.init();
 

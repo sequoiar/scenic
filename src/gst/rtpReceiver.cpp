@@ -81,16 +81,16 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
         return;
     }
 
-    LOG("Dynamic pad created, linking new srcpad to existing sinkpad.");
-    std::cout << "SrcElement: " << gst_element_get_name(srcElement) << std::endl;
-    std::cout << "SrcPad: " << gst_pad_get_name(srcPad) << std::endl;
+    //LOG("Dynamic pad created, linking new srcpad to existing sinkpad.");
+    //std::cout << "SrcElement: " << gst_element_get_name(srcElement) << std::endl;
+    //std::cout << "SrcPad: " << gst_pad_get_name(srcPad) << std::endl;
 
     //std::list<GstElement *> * depayloaders = static_cast<std::list<GstElement *> *>(data);
-    std::cout << "You have " << depayloaders_.size() << " depayloaders stored. " << std::endl;
+    //std::cout << "You have " << depayloaders_.size() << " depayloaders stored. " << std::endl;
     
     std::list<GstElement *>::iterator iter;
-    for (iter = depayloaders_.begin(); iter != depayloaders_.end(); ++iter)
-        std::cout << "Depayloader: " << gst_element_get_name(*iter) << std::endl;
+    //for (iter = depayloaders_.begin(); iter != depayloaders_.end(); ++iter)
+     //   std::cout << "Depayloader: " << gst_element_get_name(*iter) << std::endl;
 
     GstPad *sinkPad;
 
@@ -108,10 +108,50 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
         ++iter;
     }
 
-    std::cout << "SINKPAD CAPS: " << gst_caps_to_string(gst_pad_get_caps(sinkPad)) << std::endl;
-    std::cout << "SRCPAD CAPS: " << gst_caps_to_string(gst_pad_get_caps(srcPad)) << std::endl;
+    //std::cout << "SINKPAD CAPS: " << gst_caps_to_string(gst_pad_get_caps(sinkPad)) << std::endl;
+    //std::cout << "SRCPAD CAPS: " << gst_caps_to_string(gst_pad_get_caps(srcPad)) << std::endl;
 
-    assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
+    switch(gst_pad_link(srcPad, sinkPad))
+    {
+        case GST_PAD_LINK_OK:
+            LOG("link succeeded");
+            break;
+
+        case GST_PAD_LINK_WRONG_HIERARCHY:
+            LOG("pads have no common grandparent");
+            assert(0);
+            break;
+
+        case GST_PAD_LINK_WAS_LINKED:
+            LOG("pad was already linked");
+            assert(0);
+            break;
+
+        case GST_PAD_LINK_WRONG_DIRECTION:
+            LOG("pads have wrong direction");
+            assert(0);
+            break;
+
+        case GST_PAD_LINK_NOFORMAT:
+            LOG("pads do not have common format");
+            assert(0);
+            break;
+
+        case GST_PAD_LINK_NOSCHED:
+            LOG("pads cannot cooperate in scheduling");
+            assert(0);
+            break;
+
+        case GST_PAD_LINK_REFUSED:
+            LOG("refused for some reason");
+            assert(0);
+            break;
+
+        default:
+            assert(0);
+            break;
+    }
+
     gst_object_unref(sinkPad);
 }
 
@@ -131,7 +171,7 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * confi
     rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtcp_sender_);
     g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port() + 5, "sync", FALSE,
-                 "async", FALSE, NULL);
+            "async", FALSE, NULL);
 
     pipeline_.add(rtp_receiver_);
     pipeline_.add(rtcp_receiver_);

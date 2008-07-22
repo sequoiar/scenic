@@ -81,7 +81,7 @@ void AudioSender::init_sink()
         assert(jack_is_running());
         sink_ = gst_element_factory_make("jackaudiosink", NULL);
         assert(sink_);
-        g_object_set(G_OBJECT(sink_), "connect", 0, NULL); // turn off autoconnect
+        g_object_set(G_OBJECT(sink_), "connect", 1, NULL); // turn off autoconnect
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL); // important for latency
         pipeline_.add(sink_);
 

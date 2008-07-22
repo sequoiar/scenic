@@ -1135,63 +1135,6 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
     }
 }
 
-#if 0
-void GstTestSuite::sync()
-{
-    int numChannels = 8;
-    int vPort = 10010;
-    int aPort = vPort + 1000;
-
-    if (id_ == 0) {
-        VideoConfig vConfig("h264", vPort);
-        VideoReceiver vRx(vConfig);
-        vRx.init();
-
-        AudioConfig aConfig(numChannels, "vorbisdec", aPort);
-        AudioReceiver aRx(aConfig);
-        aRx.init();
-
-        TEST_ASSERT(vRx.start());
-        TEST_ASSERT(aRx.start());
-
-        BLOCK();
-
-        TEST_ASSERT(vRx.isPlaying());
-        TEST_ASSERT(aRx.isPlaying());
-
-        TEST_ASSERT(vRx.stop());
-        TEST_ASSERT(aRx.stop());
-
-        TEST_ASSERT(!vRx.isPlaying());
-        TEST_ASSERT(!aRx.isPlaying());
-    }
-    else
-    {
-        VideoConfig vConfig("videotestsrc", "h264", MY_ADDRESS, vPort);
-        VideoSender vTx(vConfig);
-        vTx.init();
-
-        AudioConfig aConfig("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
-        AudioSender aTx(aConfig);
-        aTx.init();
-
-        TEST_ASSERT(vTx.start());
-        TEST_ASSERT(aTx.start());
-
-        BLOCK();
-
-        TEST_ASSERT(vTx.isPlaying());
-        TEST_ASSERT(aTx.isPlaying());
-
-        TEST_ASSERT(vTx.stop());
-        TEST_ASSERT(aTx.stop());
-
-        TEST_ASSERT(!vTx.isPlaying());
-        TEST_ASSERT(!aTx.isPlaying());
-    }
-}
-#endif
-
 void GstTestSuite::sync()
 {
     if (id_ == 0)

@@ -33,7 +33,7 @@ public:
 
 protected:
 
-    MediaBase();
+    MediaBase(){};
     virtual ~MediaBase();
     virtual void init_source() = 0;
     virtual void init_codec() = 0;

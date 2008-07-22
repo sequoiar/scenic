@@ -88,8 +88,8 @@ void Pipeline::make_verbose()
 
 void Pipeline::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
 {
-    std::cout << "Element: " << gst_element_get_name(srcElement) << std::endl;
-    std::cout << "Pad: " << gst_pad_get_name(srcPad) << std::endl;
+    //std::cout << "Element: " << gst_element_get_name(srcElement) << std::endl;
+    //std::cout << "Pad: " << gst_pad_get_name(srcPad) << std::endl;
 
     if (gst_pad_is_linked(srcPad))
     {
@@ -104,7 +104,6 @@ void Pipeline::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *da
 
     GstElement *sinkElement = (GstElement *) data;
     GstPad *sinkPad;
-    LOG("Dynamic pad created, linking new srcpad to existing sinkpad");
 
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
     assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
@@ -113,8 +112,8 @@ void Pipeline::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *da
 
 void Pipeline::cb_new_sink_pad(GstElement * sinkElement, GstPad * sinkPad, void *data)
 {
-    std::cout << "Element: " << gst_element_get_name(sinkElement) << std::endl;
-    std::cout << "Pad: " << gst_pad_get_name(sinkPad) << std::endl;
+    //std::cout << "Element: " << gst_element_get_name(sinkElement) << std::endl;
+    //std::cout << "Pad: " << gst_pad_get_name(sinkPad) << std::endl;
     if (gst_pad_is_linked(sinkPad))
     {
         LOG("Pad is already linked")
@@ -128,7 +127,6 @@ void Pipeline::cb_new_sink_pad(GstElement * sinkElement, GstPad * sinkPad, void 
 
     GstElement *srcElement = (GstElement *) data;
     GstPad *srcPad;
-    LOG("Dynamic pad created, linking new sinkpad to existing srcpad.");
 
     srcPad = gst_element_get_static_pad(srcElement, "src");
     assert(gst_pad_link(sinkPad, srcPad) == GST_PAD_LINK_OK);
@@ -146,6 +144,12 @@ bool Pipeline::isPlaying() const
 void Pipeline::wait_until_playing() const
 {
     while (!isPlaying())
+        usleep(1000);
+}
+
+void Pipeline::wait_until_stopped() const
+{
+    while (isPlaying())
         usleep(1000);
 }
 
