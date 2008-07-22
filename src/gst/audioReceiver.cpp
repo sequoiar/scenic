@@ -30,6 +30,7 @@
 #include "mediaBase.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
+#include "jackUtils.h"
 
 AudioReceiver::AudioReceiver(const AudioConfig & config) :
     config_(config), gotCaps_(false), depayloader_(0), decoder_(0), sink_(0)
@@ -103,6 +104,7 @@ void AudioReceiver::init_codec()
 
 void AudioReceiver::init_sink()
 {
+    assert(jack_is_running());
     sink_ = gst_element_factory_make("jackaudiosink", NULL);
     assert(sink_);
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);

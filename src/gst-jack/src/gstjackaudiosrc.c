@@ -1,7 +1,4 @@
-/*
- * GStreamer
- * Copyright (C) 2005 Thomas Vander Stichele <thomas@apestaart.org>
- * Copyright (C) 2005 Ronald S. Bultje <rbultje@ronald.bitfreak.net>
+/* GStreamer
  * Copyright (C) 2008 Tristan Matthews <tristan@sat.qc.ca>
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -45,77 +42,46 @@
 
 /**
  * SECTION:element-jackaudiosrc
+ * @see_also: #GstBaseAudioSrc, #GstRingBuffer
  *
+ * A Src that inputs data from Jack ports.
+ * 
+ * It will create N Jack ports named in_&lt;name&gt;_&lt;num&gt; where 
+ * &lt;name&gt; is the element name and &lt;num&gt; is starting from 1.
+ * Each port corresponds to a gstreamer channel.
+ * 
+ * The samplerate as exposed on the caps is always the same as the samplerate of
+ * the jack server.
+ * 
+ * When the #GstJackAudioSrc:connect property is set to auto, this element
+ * will try to connect each input port to a random physical jack output pin. 
+ * 
+ * When the #GstJackAudioSrc:connect property is set to none, the element will
+ * accept any number of output channels and will create (but not connect) an
+ * input port for each channel.
+ * 
+ * The element will generate an error when the Jack server is shut down when it
+ * was PAUSED or PLAYING. This element does not support dynamic rate and buffer
+ * size changes at runtime.
+ * 
  * <refsect2>
  * <title>Example launch line</title>
- * <para>
- * <programlisting>
- * gst-launch -v -m jackaudiosrc ! fakesink silent=TRUE
- * </programlisting>
- * </para>
+ * |[
+ * gst-launch jackaudiosrc connect=0 ! jackaudiosink connect=0
+ * ]| Get audio input into gstreamer from jack.
  * </refsect2>
+ *
+ * Last reviewed on 2008-07-22 (0.10.4)
  */
 
 #include <gst/gst.h>
 #include <string.h>
-#include <assert.h>
 
 #include "gstjackaudiosrc.h"
+#include "gstjackringbuffer.h"
 
 GST_DEBUG_CATEGORY_STATIC(gst_jackaudiosrc_debug);
 #define GST_CAT_DEFAULT gst_jackaudiosrc_debug
-
-typedef jack_default_audio_sample_t sample_t;
-
-#define GST_TYPE_JACK_RING_BUFFER        \
-    (gst_jack_ring_buffer_get_type())
-#define GST_JACK_RING_BUFFER(obj)        \
-    (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_JACK_RING_BUFFER,GstJackRingBuffer))
-#define GST_JACK_RING_BUFFER_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_JACK_RING_BUFFER,GstJackRingBufferClass))
-#define GST_JACK_RING_BUFFER_GET_CLASS(obj) \
-    (G_TYPE_INSTANCE_GET_CLASS ((obj), GST_TYPE_JACK_RING_BUFFER, GstJackRingBufferClass))
-#define GST_JACK_RING_BUFFER_CAST(obj)        \
-    ((GstJackRingBuffer *)obj)
-#define GST_IS_JACK_RING_BUFFER(obj)     \
-    (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_JACK_RING_BUFFER))
-#define GST_IS_JACK_RING_BUFFER_CLASS(klass)\
-    (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_JACK_RING_BUFFER))
-
-typedef struct _GstJackRingBuffer GstJackRingBuffer;
-typedef struct _GstJackRingBufferClass GstJackRingBufferClass;
-
-struct _GstJackRingBuffer
-{
-    GstRingBuffer object;
-
-    gint sample_rate;
-    gint buffer_size;
-    gint channels;
-};
-
-struct _GstJackRingBufferClass
-{
-    GstRingBufferClass parent_class;
-};
-
-static void gst_jack_ring_buffer_class_init(GstJackRingBufferClass * klass);
-static void gst_jack_ring_buffer_init(GstJackRingBuffer * ringbuffer,
-        GstJackRingBufferClass * klass);
-static void gst_jack_ring_buffer_dispose(GObject * object);
-static void gst_jack_ring_buffer_finalize(GObject * object);
-
-static GstRingBufferClass *ring_parent_class = NULL;
-
-static gboolean gst_jack_ring_buffer_open_device(GstRingBuffer * buf);
-static gboolean gst_jack_ring_buffer_close_device(GstRingBuffer * buf);
-static gboolean gst_jack_ring_buffer_acquire(GstRingBuffer * buf,
-        GstRingBufferSpec * spec);
-static gboolean gst_jack_ring_buffer_release(GstRingBuffer * buf);
-static gboolean gst_jack_ring_buffer_start(GstRingBuffer * buf);
-static gboolean gst_jack_ring_buffer_pause(GstRingBuffer * buf);
-static gboolean gst_jack_ring_buffer_stop(GstRingBuffer * buf);
-static guint gst_jack_ring_buffer_delay(GstRingBuffer * buf);
 
 static gboolean gst_jack_audio_src_allocate_channels(GstJackAudioSrc * src, gint channels)
 {
@@ -251,7 +217,6 @@ static int jack_process_cb(jack_nframes_t nframes, void *arg)
 
     /* alloc pointers to samples */
     buffers = g_alloca(sizeof(sample_t *) * channels);
-    //expectedLen = sizeof(sample_t) * nframes * channels;
     data = g_alloca(len);
 
     /* get input buffers */
@@ -269,16 +234,11 @@ static int jack_process_cb(jack_nframes_t nframes, void *arg)
         for (j = 0; j < channels; j++) 
             *data++ = buffers[j][i]; 
 
-    // TODO: check if interleaving is necessary, check if there's a performance difference
-    // between ringbuffer commit and ring buffer prepare read + memcpy
-
-    //if (gst_ring_buffer_commit(buf, gst_ring_buffer_samples_done(buf), dataStart, len)) 
     if (gst_ring_buffer_prepare_read(buf, &writeseg, &writeptr, &givenLen))
     {
         memcpy(writeptr, (char *) dataStart, givenLen);
 
-        //GST_DEBUG("copy %d frames: %p, %d bytes, %d channels", nframes, writeptr,
-        //len / channels, channels);
+        GST_DEBUG("copy %d frames: %p, %d bytes, %d channels", nframes, writeptr, len / channels, channels);
 
         /* clear written samples in the ringbuffer */
         // gst_ring_buffer_clear(buf, 0);
