@@ -27,11 +27,11 @@
 #include "logWriter.h"
 
 GstElement *RtpSession::rtpbin_ = 0;
-int RtpSession::instanceCount_ = -1;
+int RtpSession::refCount_ = 0;
 
 RtpSession::RtpSession() : rtcp_sender_(0), rtcp_receiver_(0)
 {
-    instanceCount_++;
+    ++refCount_;
 }
 
 bool RtpSession::init()
@@ -70,7 +70,7 @@ const char *RtpSession::padStr(const char *padName)
     std::string result(padName);
     std::stringstream istream;
 
-    istream << instanceCount_;        // 0-based
+    istream << refCount_ - 1;        // 0-based
     result = result + istream.str();
     return result.c_str();
 }
@@ -82,8 +82,10 @@ RtpSession::~RtpSession()
     pipeline_.remove(rtcp_sender_);
     pipeline_.remove(rtcp_receiver_);
 
-    if (--instanceCount_ < 0) {
-        assert(instanceCount_ == -1);
+    --refCount_;
+    if (refCount_ <= 0) 
+    {
+        assert(refCount_ == 0);
         pipeline_.remove(rtpbin_);
         rtpbin_ = 0;
     }

@@ -94,6 +94,7 @@ void AudioSource::linkElements()
 
 }
 
+// defers to subclassses callback
 gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
 {
     return  (static_cast<AudioSource*>(user_data)->callback(clock,time,id));
@@ -128,7 +129,7 @@ void AudioTestSource::sub_init()
     for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
         g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL); 
 
-    offset_=0;
+    offset_= 0;
     clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
     gst_clock_id_wait_async(clockId_, base_callback, this);
 }

@@ -37,19 +37,18 @@ protected:
     SyncTester() {};
     static const int V_PORT;
     static const int A_PORT;
+    static const int NUM_CHANNELS;
 };
 
 class SyncTesterSend : public SyncTester
 {
     public:
-        SyncTesterSend();
         virtual void run();
 };
 
 class SyncTesterReceive : public SyncTester
 {
     public:
-        SyncTesterReceive();
         virtual void run();
 };
 

@@ -39,7 +39,7 @@ protected:
     RtpSession();
     static const char *padStr(const char *padName);
     static GstElement *rtpbin_;
-    static int instanceCount_;
+    static int refCount_;
     GstElement *rtcp_sender_, *rtcp_receiver_;
 };
 

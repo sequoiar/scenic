@@ -35,6 +35,7 @@ public:
     void reset();
     bool isPlaying() const;
     void wait_until_playing() const;
+    void wait_until_stopped() const;
     bool start();
     bool stop();
     const GstClockTime start_time() const { return startTime_; }

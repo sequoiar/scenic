@@ -23,10 +23,6 @@
 
 #include "mediaBase.h"
 
-MediaBase::MediaBase()
-{
-}
-
 MediaBase::~MediaBase()
 {
     pipeline_.stop();
