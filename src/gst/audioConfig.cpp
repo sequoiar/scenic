@@ -55,13 +55,11 @@ const int AudioConfig::numChannels() const
 // strips .delay from source name
 const char *AudioConfig::source() const
 { 
-    unsigned int pos = source_.find("."); 
+    // find last period
+    unsigned int pos = source_.rfind("."); 
 
     if (pos < source_.size()) 
-    {
-        std::string result(source_);
-        return result.erase(pos, strlen(".delay")).c_str();
-    }
+        return source_.substr(0, pos).c_str();
     else
         return MediaConfig::source();
 }
