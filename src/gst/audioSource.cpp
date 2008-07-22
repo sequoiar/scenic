@@ -94,27 +94,28 @@ void AudioSource::linkElements()
 
 }
 
-gboolean AudioTestSource::callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
+gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
+{
+    return  (static_cast<AudioSource*>(user_data)->callback(clock,time,id));
+}
+
+gboolean AudioTestSource::callback(GstClock *clock, GstClockTime time, GstClockID id)
 {
     static const double FREQUENCY[2][8] = {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
                                     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
-    static int offset = 0;
     int i = 0;
 
-    std::vector<GstElement*> *sources = static_cast<std::vector<GstElement*> *>(user_data);
-    for (std::vector<GstElement*>::iterator iter = sources->begin(); iter != sources->end(); ++iter)
-        g_object_set(G_OBJECT(*iter), "freq", FREQUENCY[offset][i++], NULL);
+    for (std::vector<GstElement*>::iterator iter = sources_.begin(); iter != sources_.end(); ++iter)
+        g_object_set(G_OBJECT(*iter), "freq", FREQUENCY[offset_][i++], NULL);
 
-    offset = (offset == 0) ? 1 : 0;     // toggle frequency
+    offset_ = (offset_ == 0) ? 1 : 0;     // toggle frequency
 
     return TRUE;
 }
 
-void AudioTestSource::add_clock_callback()
-{
-    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
-    gst_clock_id_wait_async(clockId_, callback, &sources_);
-}
+//void AudioTestSource::add_clock_callback()
+//{
+//}
 
 void AudioTestSource::sub_init()
 {
@@ -127,7 +128,9 @@ void AudioTestSource::sub_init()
     for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
         g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL); 
 
-    add_clock_callback();
+    offset_=0;
+    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
+    gst_clock_id_wait_async(clockId_, base_callback, this);
 }
 
 AudioTestSource::~AudioTestSource()
