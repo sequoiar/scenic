@@ -78,8 +78,7 @@ class AudioJackSource : public AudioSource
 {
     public:
         void sub_init();
-        AudioJackSource(const AudioConfig &config) : AudioSource(config) {
-        }
+        AudioJackSource(const AudioConfig &config): AudioSource(config) {} 
 };
 
 template <typename T>

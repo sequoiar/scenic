@@ -22,6 +22,7 @@
 #include <cassert>
 #include "audioSource.h"
 #include "audioConfig.h"
+#include "jackUtils.h"
 
 
 AudioSource::AudioSource(const AudioConfig &config) : config_(config), interleave_(config)
@@ -60,31 +61,24 @@ AudioSource::~AudioSource()
     pipeline_.remove_vector(sources_);
 }
 
+
+// TODO: maybe move some of this logic to subclasses
 void AudioSource::linkElements()
 {
     std::vector<GstElement *> * next;
     GstIter src, aconv, filter, nextIter;//, next, nextEnd;
     
-    if(decoders_.empty()) {
-        // No Decoder
+    if(decoders_.empty())   // No Decoder
         next = &aconvs_;
-        //next = aconvs_.begin();
-        //nextEnd = aconvs_.end();
-    }
-    else {
-        // Decoder used
-        // NOTE: Don't link decoder to aconv, that happens dynamically
-        //next = decoders_.begin();
-        //nextEnd = decoders_.end();
-        next = &decoders_;
-    }
+    else                    // Decoder used
+        next = &decoders_;  // NOTE: Don't link decoder to aconv, that happens dynamically
     
     for (src = sources_.begin(), nextIter = next->begin(); 
             src != sources_.end(), nextIter != next->end(); 
             ++src, ++nextIter)
         assert(gst_element_link(*src, *nextIter));
     
-    if (!filters_.empty()) 
+    if (!filters_.empty())  // with delays
     {
         for (nextIter = next->begin(), filter = filters_.begin();
                 nextIter != next->end(), filter != filters_.end();
@@ -111,7 +105,7 @@ gboolean AudioTestSource::callback(GstClock *clock, GstClockTime time, GstClockI
     for (std::vector<GstElement*>::iterator iter = sources->begin(); iter != sources->end(); ++iter)
         g_object_set(G_OBJECT(*iter), "freq", FREQUENCY[offset][i++], NULL);
 
-    offset = (offset == 0) ? 1 : 0;
+    offset = (offset == 0) ? 1 : 0;     // toggle frequency
 
     return TRUE;
 }
@@ -130,8 +124,9 @@ void AudioTestSource::sub_init()
     const double GAIN = 1.0 / config_.numChannels();        // so sum of tones' amplitude equals 1.0
     double frequency = 100.0;
 
-    for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 200.0)
-        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
+    // is-live must be true for clocked callback to work properly
+    for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
+        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL); 
 
     add_clock_callback();
 }
@@ -179,24 +174,10 @@ AudioFileSource::~AudioFileSource()
 
 void AudioJackSource::sub_init()
 {
-
+    assert(jack_is_running());
     // turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
     // jackOut -> jackIn -> jackOut ->jackIn.....
     for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
-
 }
 
-
-#if 0
-void AudioDelaySource<AudioSource>::sub_init()
-{
-    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
-    {
-        filters_.push_back(gst_element_factory_make("ladspa-delay-5s", NULL));
-        assert(filters_[channelIdx]);
-    }
-
-    pipeline_.add_vector(filters_);
-}
-#endif

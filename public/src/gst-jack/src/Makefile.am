@@ -23,6 +23,6 @@ libgstjack_la_LIBADD = $(GST_PLUGINS_BASE_LIBS) -lgstaudio-$(GST_MAJORMINOR) $(J
 libgstjack_la_LDFLAGS = $(GST_PLUGIN_LDFLAGS)
 
 # headers we need but don't want installed
-noinst_HEADERS = gstjackaudiosrc.h gstjackaudiosink.h gstjackaudioclient.h gstjack.h
+noinst_HEADERS = gstjackaudiosrc.h gstjackaudiosink.h gstjackaudioclient.h gstjack.h gstjackringbuffer.h
 
 

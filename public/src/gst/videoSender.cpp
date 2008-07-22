@@ -79,7 +79,7 @@ void VideoSender::init_source()
 
     if (config_.has_videotestsrc())
     {
-        g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL);
+        g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
         add_clock_callback();
     }
     else if (config_.has_dv()) {     // need to demux and decode dv first

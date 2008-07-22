@@ -29,6 +29,7 @@
 #include "logWriter.h"
 #include "audioSender.h"
 #include "audioSource.h"
+#include "jackUtils.h"
 
 AudioSender::AudioSender(const AudioConfig & config)
     : config_(config), encoder_(0),
@@ -77,6 +78,7 @@ void AudioSender::init_sink()
     }
     else                        // local version
     {
+        assert(jack_is_running());
         sink_ = gst_element_factory_make("jackaudiosink", NULL);
         assert(sink_);
         g_object_set(G_OBJECT(sink_), "connect", 0, NULL); // turn off autoconnect
