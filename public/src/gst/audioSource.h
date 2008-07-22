@@ -32,7 +32,7 @@ class AudioSource : public GstBase
     public:
         virtual ~AudioSource();
         void init();
-        virtual void sub_init(){}
+        virtual void sub_init() = 0;
     protected:
         AudioSource(const AudioConfig &config);
         virtual void linkElements();
@@ -72,6 +72,7 @@ class AudioAlsaSource : public AudioSource
     public:
         AudioAlsaSource(const AudioConfig &config) : AudioSource(config) {
         }
+        void sub_init(){};
 };
 
 class AudioJackSource : public AudioSource

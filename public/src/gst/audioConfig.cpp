@@ -67,17 +67,15 @@ const char *AudioConfig::source() const
 
 AudioSource* AudioConfig::createSource() const
 {
-    std::string s(source_);
-
-    if (!s.compare("audiotestsrc.delay"))
+    if (!source_.compare("audiotestsrc.delay"))
         return new AudioDelaySource<AudioTestSource>(*this);
-    else if (!s.compare("audiotestsrc"))
+    else if (!source_.compare("audiotestsrc"))
         return new AudioTestSource(*this);
-    else if (!s.compare("filesrc"))
+    else if (!source_.compare("filesrc"))
         return new AudioFileSource(*this);
-    else if (!s.compare("alsasrc"))
+    else if (!source_.compare("alsasrc"))
         return new AudioAlsaSource(*this);
-    else if (!s.compare("jackaudiosrc"))
+    else if (!source_.compare("jackaudiosrc"))
         return new AudioJackSource(*this);
     else
     {

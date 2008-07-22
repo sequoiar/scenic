@@ -24,13 +24,22 @@
 #include "gstBase.h"
 #include "logWriter.h"
 
+int GstBase::refCount_ = 0;
+
 // this initializes pipeline only once/process
 GstBase::GstBase() : pipeline_(Pipeline::Instance())
 {
+    ++refCount_;
 }
 
 GstBase::~GstBase()
 {
+    --refCount_;
+    if (refCount_ <= 0)
+    {
+        assert(refCount_ == 0);
+        pipeline_.reset();
+    }
 }
 
 bool GstBase::isPlaying()

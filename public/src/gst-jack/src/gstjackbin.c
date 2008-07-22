@@ -26,7 +26,6 @@
 #include <signal.h>
 //#include "gstjack.h"
 
-
 static GstBinClass *parent_class = NULL;
 
 static void gst_jack_bin_init (GstJackBin * this);

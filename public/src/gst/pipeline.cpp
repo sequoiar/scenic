@@ -69,7 +69,6 @@ void Pipeline::reset()
     if (pipeline_)
     {
         assert(stop());
-        gst_object_unref(GST_OBJECT(pipeline_));
         delete instance_;
         instance_ = 0;
     }
