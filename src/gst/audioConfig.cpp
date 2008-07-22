@@ -69,6 +69,12 @@ AudioSource* AudioConfig::createSource() const
 {
     if (!source_.compare("audiotestsrc.delay"))
         return new AudioDelaySource<AudioTestSource>(*this);
+    else if (!source_.compare("filesrc.delay"))
+        return new AudioDelaySource<AudioFileSource>(*this);
+    else if (!source_.compare("alsasrc.delay"))
+        return new AudioDelaySource<AudioAlsaSource>(*this);
+    else if (!source_.compare("jackaudiosrc.delay"))
+        return new AudioDelaySource<AudioJackSource>(*this);
     else if (!source_.compare("audiotestsrc"))
         return new AudioTestSource(*this);
     else if (!source_.compare("filesrc"))
