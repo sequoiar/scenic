@@ -6,6 +6,6 @@ gstTester_SOURCES = gstTestSuite.cpp
 gstTester2_SOURCES = gstTestSuite2.cpp
 
 LDADD = $(ALL_GST_LIBS) $(CPPTEST_LIBS) $(LIBLO_LIBS) ../libgst.a
-AM_CPPFLAGS= $(GST_CFLAGS) -I.. 
+AM_CPPFLAGS= $(GST_CFLAGS) 
 
 #LDADD = $(GST_LIBS) $(GSTAUDIO_LIBS) $(GSTCONTROLLER_LIBS) $(CPPTEST_LIBS) $(LIBLO_LIBS) ../libgst.a
