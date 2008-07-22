@@ -42,18 +42,10 @@ public:
 
     GstTestSuite()
     {
-        TEST_ADD(GstTestSuite::start_1ch_audiotest)
-        TEST_ADD(GstTestSuite::stop_1ch_audiotest)
         TEST_ADD(GstTestSuite::start_stop_1ch_audiotest)
-        TEST_ADD(GstTestSuite::start_2ch_audiotest)
-        TEST_ADD(GstTestSuite::stop_2ch_audiotest)
-        TEST_ADD(GstTestSuite::start_stop_2ch_audiotest)
-        TEST_ADD(GstTestSuite::start_6ch_audiotest);
-        TEST_ADD(GstTestSuite::stop_6ch_audiotest)
-        TEST_ADD(GstTestSuite::start_stop_6ch_audiotest)
-        TEST_ADD(GstTestSuite::start_8ch_audiotest)
-        TEST_ADD(GstTestSuite::stop_8ch_audiotest)
-        TEST_ADD(GstTestSuite::start_stop_8ch_audiotest)
+        TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
+//        TEST_ADD(GstTestSuite::start_stop_8ch_jack)
+//        TEST_ADD(GstTestSuite::start_stop_8ch_comp_audiofile)
 
         /*----------------------------------------------*/
         /*      SANDBOX                                 */

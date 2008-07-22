@@ -419,7 +419,7 @@ void GstTestSuite::stop_1ch_audiotest()
         return;
 
     int numChannels = 1;
-    AudioConfig config("audiotestsrc.delay", numChannels);
+    AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
     tx.init();
     TEST_ASSERT(tx.stop());
@@ -434,7 +434,7 @@ void GstTestSuite::start_stop_1ch_audiotest()
         return;
 
     int numChannels = 1;
-    AudioConfig config("audiotestsrc", numChannels);
+    AudioConfig config("audiotestsrc.delay", numChannels);
     AudioSender tx(config);
     tx.init();
 
@@ -810,7 +810,7 @@ void GstTestSuite::start_stop_8ch_alsa()
         return;
 
     int numChannels = 8;
-    AudioConfig config("alsasrc", numChannels);
+    AudioConfig config("alsasrc.delay", numChannels);
     AudioSender tx(config);
     TEST_ASSERT(tx.init());
     TEST_ASSERT(tx.start());
@@ -859,7 +859,7 @@ void GstTestSuite::start_stop_8ch_jack()
         return;
 
     int numChannels = 8;
-    AudioConfig config("jackaudiosrc", numChannels);
+    AudioConfig config("jackaudiosrc.delay", numChannels);
     AudioSender tx(config);
     TEST_ASSERT(tx.init());
     TEST_ASSERT(tx.start());
@@ -911,7 +911,7 @@ void GstTestSuite::start_stop_8ch_comp_audiofile()
     if (id_ == 1)
         return;
 
-    AudioConfig config("filesrc", numChannels);
+    AudioConfig config("filesrc.delay", numChannels);
     AudioSender tx(config);
     TEST_ASSERT(tx.init());
 
