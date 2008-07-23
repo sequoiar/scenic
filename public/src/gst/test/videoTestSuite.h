@@ -22,17 +22,18 @@
 #define _VIDEO_TEST_SUITE_H_
 
 #include <cpptest.h>
+#include "gstTestSuite.h"
 
-#define VIDEO 1
+#define LOCAL 1
 #define RTP 0
 
-class VideoTestSuite : public Test::Suite
+class VideoTestSuite : public GstTestSuite
 {
 public:
 
-    VideoTestSuite():id_(0)
+    VideoTestSuite()
     {
-#if VIDEO
+#if LOCAL 
         TEST_ADD(VideoTestSuite::init_test)
         TEST_ADD(VideoTestSuite::start_test_video)
         TEST_ADD(VideoTestSuite::stop_test_video)
@@ -43,15 +44,15 @@ public:
         TEST_ADD(VideoTestSuite::start_v4l)
         TEST_ADD(VideoTestSuite::stop_v4l)
         TEST_ADD(VideoTestSuite::start_stop_v4l)
-#if RTP // AND VIDEO
+#endif // LOCAL
+#if RTP 
         TEST_ADD(VideoTestSuite::start_dv_rtp)
         TEST_ADD(VideoTestSuite::stop_dv_rtp)
         TEST_ADD(VideoTestSuite::start_stop_dv_rtp)
         TEST_ADD(VideoTestSuite::start_v4l_rtp)
         TEST_ADD(VideoTestSuite::stop_v4l_rtp)
         TEST_ADD(VideoTestSuite::start_stop_v4l_rtp)
-#endif // RTP && VIDEO
-#endif // VIDEO
+#endif // RTP
         
         /*----------------------------------------------*/
         /*      SANDBOX                                 */
@@ -61,16 +62,10 @@ public:
         /*----------------------------------------------*/
     }
 
-    void set_id(int id);
 
 // some tests
 
-protected:
-    virtual void setup();           // setup resources common to all tests
-    virtual void tear_down();       // destroy common resources
-
 private:
-    int id_;
 
     void init_test();
 
@@ -96,3 +91,4 @@ private:
 };
 
 #endif // _VIDEO_TEST_SUITE_H_
+

@@ -21,39 +21,11 @@
 #include <cpptest.h>
 #include <iostream>
 
-#include "block.h"
 #include "defaultAddresses.h"
 #include "audioTestSuite.h"
 #include "audioSender.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
-
-/*----------------------------------------------*/
-// To actually observe the tests (watch/listen), set
-// this macro to 1.
-/*----------------------------------------------*/
-
-void AudioTestSuite::set_id(int id)
-{
-    if (id == 1 || id == 0)
-        id_ = id;
-    else
-    {
-        std::cerr << "Id must be 0 or 1." << std::endl;
-        exit(1);
-    }
-}
-
-void AudioTestSuite::setup()
-{
-    std::cout.flush();
-    std::cout << std::endl;
-}
-
-void AudioTestSuite::tear_down()
-{
-    // empty
-}
 
 void AudioTestSuite::start_1ch_audiotest()
 {
@@ -263,7 +235,7 @@ void AudioTestSuite::start_2ch_comp_rtp_audiotest()
 {
     int numChannels = 2;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbisdec", 10010);
+        AudioConfig config(numChannels, "vorbisdec", A_PORT);
         AudioReceiver rx(config);
         rx.init();
         TEST_ASSERT(rx.start());
@@ -273,7 +245,7 @@ void AudioTestSuite::start_2ch_comp_rtp_audiotest()
     }
     else
     {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -289,7 +261,7 @@ void AudioTestSuite::stop_2ch_comp_rtp_audiotest()
     int numChannels = 2;
 
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbisdec", 10010);
+        AudioConfig config(numChannels, "vorbisdec", A_PORT);
         AudioReceiver rx(config);
         rx.init();
 
@@ -300,7 +272,7 @@ void AudioTestSuite::stop_2ch_comp_rtp_audiotest()
     }
     else
     {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -314,9 +286,8 @@ void AudioTestSuite::stop_2ch_comp_rtp_audiotest()
 void AudioTestSuite::start_stop_2ch_comp_rtp_audiotest()
 {
     int numChannels = 2;
-    const int PORT = 10010;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbisdec", PORT);
+        AudioConfig config(numChannels, "vorbisdec", A_PORT);
         AudioReceiver rx(config);
         rx.init();
 
@@ -330,7 +301,7 @@ void AudioTestSuite::start_stop_2ch_comp_rtp_audiotest()
     }
     else
     {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, PORT);
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -346,11 +317,10 @@ void AudioTestSuite::start_stop_2ch_comp_rtp_audiotest()
 
 void AudioTestSuite::start_8ch_comp_rtp_audiotest()
 {
-    const int PORT = 10010;
     const int numChannels = 8;
 
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbisdec", PORT);
+        AudioConfig config(numChannels, "vorbisdec", A_PORT);
         AudioReceiver rx(config);
         rx.init();
 
@@ -361,7 +331,7 @@ void AudioTestSuite::start_8ch_comp_rtp_audiotest()
     }
     else
     {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, PORT);
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -376,7 +346,7 @@ void AudioTestSuite::stop_8ch_comp_rtp_audiotest()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbisdec", 10010);
+        AudioConfig config(numChannels, "vorbisdec", A_PORT);
         AudioReceiver rx(config);
         rx.init();
 
@@ -387,7 +357,7 @@ void AudioTestSuite::stop_8ch_comp_rtp_audiotest()
     }
     else
     {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -402,7 +372,7 @@ void AudioTestSuite::start_stop_8ch_comp_rtp_audiotest()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbisdec", 10010);
+        AudioConfig config(numChannels, "vorbisdec", A_PORT);
         AudioReceiver rx(config);
         rx.init();
 
@@ -416,7 +386,7 @@ void AudioTestSuite::start_stop_8ch_comp_rtp_audiotest()
     }
     else
     {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender tx(config);
         TEST_ASSERT(tx.init());
 
@@ -587,7 +557,7 @@ void AudioTestSuite::start_8ch_comp_rtp_audiofile()
     int numChannels = 8;
 
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbisdec", 10010);
+        AudioConfig config(numChannels, "vorbisdec", A_PORT);
         AudioReceiver rx(config);
         rx.init();
 
@@ -598,7 +568,7 @@ void AudioTestSuite::start_8ch_comp_rtp_audiofile()
     }
     else
     {
-        AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+        AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -613,7 +583,7 @@ void AudioTestSuite::stop_8ch_comp_rtp_audiofile()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbisdec", 10010);
+        AudioConfig config(numChannels, "vorbisdec", A_PORT);
         AudioReceiver rx(config);
         rx.init();
 
@@ -624,7 +594,7 @@ void AudioTestSuite::stop_8ch_comp_rtp_audiofile()
     }
     else
     {
-        AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+        AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -639,7 +609,7 @@ void AudioTestSuite::start_stop_8ch_comp_rtp_audiofile()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbisdec", 10010);
+        AudioConfig config(numChannels, "vorbisdec", A_PORT);
         AudioReceiver rx(config);
         rx.init();
 
@@ -653,7 +623,7 @@ void AudioTestSuite::start_stop_8ch_comp_rtp_audiofile()
     }
     else
     {
-        AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+        AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender tx(config);
         TEST_ASSERT(tx.init());
 

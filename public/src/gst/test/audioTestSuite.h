@@ -22,17 +22,18 @@
 #define _AUDIO_TEST_SUITE_H_
 
 #include <cpptest.h>
+#include "gstTestSuite.h"
 
-#define AUDIO 1
+#define LOCAL 1
 #define RTP 0
 
-class AudioTestSuite : public Test::Suite
+class AudioTestSuite : public GstTestSuite
 {
 public:
 
-    AudioTestSuite():id_(0)
+    AudioTestSuite()
     {
-#if AUDIO
+#if LOCAL
         TEST_ADD(AudioTestSuite::start_1ch_audiotest)
         TEST_ADD(AudioTestSuite::stop_1ch_audiotest)
         TEST_ADD(AudioTestSuite::start_stop_1ch_audiotest)
@@ -57,7 +58,8 @@ public:
         TEST_ADD(AudioTestSuite::start_8ch_comp_rtp_audiofile)
         TEST_ADD(AudioTestSuite::stop_8ch_comp_rtp_audiofile)
         TEST_ADD(AudioTestSuite::start_stop_8ch_comp_rtp_audiofile)
-#if RTP // AND AUDIO
+#endif                          //  LOCAL
+#if RTP 
         TEST_ADD(AudioTestSuite::start_2ch_comp_rtp_audiotest)
         TEST_ADD(AudioTestSuite::stop_2ch_comp_rtp_audiotest)
         TEST_ADD(AudioTestSuite::start_stop_2ch_comp_rtp_audiotest)
@@ -65,8 +67,7 @@ public:
         TEST_ADD(AudioTestSuite::stop_8ch_comp_rtp_audiotest)
         TEST_ADD(AudioTestSuite::start_stop_8ch_comp_rtp_audiotest)
 
-#endif                          // RTP  && AUDIO
-#endif                          // AUDIO
+#endif                          // RTP
         /*----------------------------------------------*/
         /*      SANDBOX                                 */
         /*                                              */
@@ -75,17 +76,9 @@ public:
         /*----------------------------------------------*/
     }
 
-    void set_id(int id);
-
 // some tests
 
-protected:
-    virtual void setup();           // setup resources common to all tests
-    virtual void tear_down();       // destroy common resources
-
 private:
-    int id_;
-
     void start_1ch_audiotest();
     void stop_1ch_audiotest();
     void start_stop_1ch_audiotest();
