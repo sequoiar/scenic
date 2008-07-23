@@ -40,7 +40,7 @@ class GstTestSuite : public Test::Suite
 {
 public:
 
-    GstTestSuite()
+    GstTestSuite():id_(0)
     {
         TEST_ADD(GstTestSuite::start_1ch_audiotest)
 //        TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
