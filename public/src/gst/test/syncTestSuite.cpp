@@ -29,8 +29,6 @@
 #include "audioReceiver.h"
 #include "audioConfig.h"
 
-#include "syncTester.h"
-
 
 void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
 {
