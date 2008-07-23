@@ -27,8 +27,6 @@
 #include "videoSource.h"
 #include "logWriter.h"
 
-// FIXME: pull out videoSource stuff into videoSource class hierarchy
-
 VideoSender::VideoSender(const VideoConfig & config) :
     config_(config), 
     session_(), 
