@@ -29,7 +29,6 @@ typedef QueuePair_<BaseMessage> QueuePair;
 class Thread : public BaseThread<BaseMessage>
 {
     int main();
-    int max_count;
 public:
     bool init();
 };
@@ -37,8 +36,7 @@ public:
 
 bool Thread::init()
 {
-    max_count = 1000;
-    args.push_back(new IntArg(&max_count,"count",'c',"count it", "number of messages"));
+    //args.push_back(new IntArg(&max_count,"count",'c',"count it", "number of messages"));
     return true;
 }
 
@@ -46,6 +44,7 @@ int Thread::main()
 {
     BaseMessage r(BaseMessage::ping);
     int count=0;
+    const int max_count = 1000;
     while(1)
     {
         BaseMessage f = queue.timed_pop(1);
