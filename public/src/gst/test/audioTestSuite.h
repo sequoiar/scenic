@@ -30,7 +30,7 @@ class AudioTestSuite : public Test::Suite
 {
 public:
 
-    AudioTestSuite()
+    AudioTestSuite():id_(0)
     {
 #if AUDIO
         TEST_ADD(AudioTestSuite::start_1ch_audiotest)
