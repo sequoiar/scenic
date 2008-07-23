@@ -35,6 +35,7 @@ class AudioSource : public GstBase
         virtual void sub_init() = 0;
     protected:
         AudioSource(const AudioConfig &config);
+        virtual void link_elements();
         virtual void link_interleave();
 
         const AudioConfig &config_;
@@ -68,6 +69,7 @@ class AudioTestSource : public AudioSource
 class AudioFileSource : public AudioSource
 {
     public:
+        void link_elements();
         ~AudioFileSource();
         void sub_init();
         AudioFileSource(const AudioConfig &config) : AudioSource(config), decoders_() {}
@@ -80,7 +82,7 @@ class AudioAlsaSource : public AudioSource
 {
     public:
         AudioAlsaSource(const AudioConfig &config) : AudioSource(config) {}
-        void sub_init();
+        void sub_init(){};
 };
 
 class AudioJackSource : public AudioSource
@@ -95,6 +97,7 @@ class AudioDelaySource : public T//, virtual public AudioSource
 {
     public:
         void sub_init();
+        void link_elements();
         void link_interleave();
         AudioDelaySource(const AudioConfig &config) : T(config), filters_() {} 
         ~AudioDelaySource();
@@ -107,8 +110,6 @@ class AudioDelaySource : public T//, virtual public AudioSource
 template <typename T>
 void AudioDelaySource<T>::sub_init()
 {
-    // FIXME: why can't I use GstIter typedef?
-    std::vector<GstElement*>::iterator aconv, filter;
 
     T::sub_init();
 
@@ -122,7 +123,16 @@ void AudioDelaySource<T>::sub_init()
 
     for (std::vector<GstElement*>::iterator iter = filters_.begin(); iter != filters_.end(); ++iter)
         g_object_set(G_OBJECT(*iter), "Delay", 0.5, NULL);
-    
+}
+
+template <typename T>
+void AudioDelaySource<T>::link_elements()
+{
+    T::link_elements(); // link elements that precede the filters
+
+    // FIXME: why can't I use GstIter typedef?
+    std::vector<GstElement*>::iterator aconv, filter;
+
     for (aconv = T::aconvs_.begin(), filter = filters_.begin(); 
             aconv != T::aconvs_.end(), filter != filters_.end(); ++aconv, ++filter)
         gst_element_link(*aconv, *filter);
