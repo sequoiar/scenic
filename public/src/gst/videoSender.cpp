@@ -31,7 +31,7 @@
 
 VideoSender::VideoSender(const VideoConfig & config) :
     config_(config),
-    colorspc_(0),
+    colorspc_(0), session_(), source_(0),
     encoder_(0), payloader_(0), sink_(0)
 {
     // empty

@@ -51,14 +51,17 @@ class AudioTestSource : public AudioSource
     public:
         ~AudioTestSource();
         void sub_init();
-        AudioTestSource(const AudioConfig &config) : AudioSource(config) {
+        AudioTestSource(const AudioConfig &config) : AudioSource(config),clockId_(0),offset_(0) {
         }
+    protected:
+       virtual gboolean callback();
 
     private:
        GstClockID clockId_;
        int offset_;
-    protected:
-       virtual gboolean callback();
+
+    AudioTestSource(const AudioTestSource&); //No Copy Constructor
+    AudioTestSource& operator=(const AudioTestSource&); //No Assignment Operator
 };
 
 class AudioFileSource : public AudioSource
@@ -66,7 +69,7 @@ class AudioFileSource : public AudioSource
     public:
         ~AudioFileSource();
         void sub_init();
-        AudioFileSource(const AudioConfig &config) : AudioSource(config) {}
+        AudioFileSource(const AudioConfig &config) : AudioSource(config), decoders_() {}
 
     private:
         std::vector<GstElement*> decoders_;
@@ -92,11 +95,12 @@ class AudioDelaySource : public T//, virtual public AudioSource
     public:
         void sub_init();
         void link_interleave();
-        AudioDelaySource(const AudioConfig &config) : T(config) {} 
+        AudioDelaySource(const AudioConfig &config) : T(config), filters_() {} 
         ~AudioDelaySource();
         gboolean callback(GstClock *clock, GstClockTime time, GstClockID id);
     private:
         std::vector<GstElement *> filters_;
+
 };
 
 template <typename T>
@@ -143,7 +147,7 @@ gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time, GstCl
     if (d_secs <= 0)
         d_secs = 5;
 
-    return TRUE; 
+    return T::callback();
 }
 
 template <typename T>

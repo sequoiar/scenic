@@ -54,6 +54,9 @@ class AudioReceiver : public MediaBase
         const AudioConfig &config_;
         bool gotCaps_;
         GstElement *depayloader_, *decoder_, *sink_;
+
+    AudioReceiver(const AudioReceiver&); //No Copy Constructor
+    AudioReceiver& operator=(const AudioReceiver&); //No Assignment Operator
 };
 
 #endif // _AUDIO_RECEIVER_H_

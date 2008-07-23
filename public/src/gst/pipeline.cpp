@@ -27,7 +27,7 @@
 
 Pipeline *Pipeline::instance_ = 0;
 
-Pipeline::Pipeline() : pipeline_(0), verbose_(false)
+Pipeline::Pipeline() : pipeline_(0), verbose_(false), startTime_(0)
 {
 }
 

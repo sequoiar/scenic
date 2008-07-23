@@ -32,7 +32,7 @@ class SyncTester
 {
 public:
     virtual void run() = 0;
-
+    virtual ~SyncTester(){}
 protected:
     SyncTester() {};
     static const int V_PORT;

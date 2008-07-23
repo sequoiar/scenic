@@ -48,6 +48,8 @@ public:
 
 private:
     void init();
+    Pipeline(const Pipeline&);
+    Pipeline& operator=(const Pipeline&);
     Pipeline();
     ~Pipeline();
     static Pipeline *instance_;

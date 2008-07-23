@@ -24,8 +24,8 @@
 #include "audioConfig.h"
 #include "jackUtils.h"
 
-
-AudioSource::AudioSource(const AudioConfig &config) : config_(config), interleave_(config)
+AudioSource::AudioSource(const AudioConfig &config) : config_(config), interleave_(config),
+                                                      sources_(0),aconvs_(0)
 {
 }
 

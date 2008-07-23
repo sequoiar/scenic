@@ -38,6 +38,9 @@ private:
     const AudioConfig &config_;
     static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
     void set_channel_layout();
+
+    Interleave(const Interleave&); //No Copy Constructor
+    Interleave& operator=(const Interleave&); //No Assignment Operator
 };
 
 #endif //_INTERLEAVE_H_
