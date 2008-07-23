@@ -27,29 +27,34 @@ class VideoConfig;
 
 class VideoSource : public GstBase
 {
-    public:
-        virtual ~VideoSource();
-        void init();
-        virtual void sub_init() = 0;
-        virtual GstElement *output() { return source_; }
-    protected:
-        VideoSource(const VideoConfig &config);
-        const VideoConfig &config_;
-        GstElement *source_;
-        static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data);
-        virtual gboolean callback() { return FALSE; }
+public:
+    virtual ~VideoSource();
+    void init();
+    virtual void sub_init() = 0;
+    virtual GstElement *output() { return source_; }
+protected:
+    VideoSource(const VideoConfig &config);
+    const VideoConfig &config_;
+    GstElement *source_;
+    static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data);
+    virtual gboolean callback() { return FALSE; }
+private:
+    VideoSource(const VideoSource&); //No Copy Constructor
+    VideoSource& operator=(const VideoSource&); //No Assignment Operator
 };
 
 class VideoTestSource : public VideoSource
 {
     public:
-        VideoTestSource(const VideoConfig &config) : VideoSource(config) {}
+        VideoTestSource(const VideoConfig &config) : VideoSource(config),clockId_(0) {}
         ~VideoTestSource();
         void sub_init();
         gboolean callback();
 
     private:
        GstClockID clockId_;
+    VideoTestSource(const VideoTestSource&); //No Copy Constructor
+    VideoTestSource& operator=(const VideoTestSource&); //No Assignment Operator
 };
 
 class VideoFileSource : public VideoSource
@@ -70,6 +75,8 @@ class VideoDvSource : public VideoSource
 
     private:
         GstElement *demux_, *queue_, *dvdec_;
+    VideoDvSource(const VideoDvSource&); //No Copy Constructor
+    VideoDvSource& operator=(const VideoDvSource&); //No Assignment Operator
 };
 
 class VideoV4lSource : public VideoSource

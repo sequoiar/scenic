@@ -41,6 +41,9 @@ protected:
     static GstElement *rtpbin_;
     static int refCount_;
     GstElement *rtcp_sender_, *rtcp_receiver_;
+private:
+    RtpSession(const RtpSession&); //No Copy Constructor
+    RtpSession& operator=(const RtpSession&); //No Assignment Operator
 };
 
 #endif // _RTP_SESSION_H_

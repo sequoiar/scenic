@@ -31,7 +31,7 @@
 std::list<GstElement *> RtpReceiver::depayloaders_;
 
 
-RtpReceiver::RtpReceiver() : rtp_receiver_(0)
+RtpReceiver::RtpReceiver() : rtp_receiver_(0), depayloader_(0)
 {
 }
 

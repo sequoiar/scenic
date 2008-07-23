@@ -42,6 +42,9 @@ private:
     RtpReceiver session_;
     const VideoConfig &config_;
     GstElement *depayloader_, *decoder_, *sink_;
+
+    VideoReceiver(const VideoReceiver&); //No Copy Constructor
+    VideoReceiver& operator=(const VideoReceiver&); //No Assignment Operator
 };
 
 #endif

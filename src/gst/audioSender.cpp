@@ -32,7 +32,7 @@
 #include "jackUtils.h"
 
 AudioSender::AudioSender(const AudioConfig & config)
-    : config_(config), encoder_(0),
+    : config_(config), encoder_(0),session_(),source_(0),
     payloader_(0), sink_(0)
 {
     // empty

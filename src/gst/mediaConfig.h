@@ -42,6 +42,7 @@ public:
     const bool isNetworked() const;
     const bool hasCodec() const;
 
+    virtual ~MediaConfig() = 0;
 protected:
     const std::string source_;
     const std::string codec_;

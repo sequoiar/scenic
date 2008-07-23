@@ -53,6 +53,9 @@ private:
     GstElement *encoder_;
     GstElement *payloader_;
     GstElement *sink_;
+
+    AudioSender(const AudioSender&); //No Copy Constructor
+    AudioSender& operator=(const AudioSender&); //No Assignment Operator
 };
 
 #endif // _AUDIO_SENDER_H_

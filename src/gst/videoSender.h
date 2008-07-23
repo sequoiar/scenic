@@ -47,6 +47,9 @@ private:
     const VideoConfig &config_;
     VideoSource *source_;
     GstElement *colorspc_, *encoder_, *payloader_, *sink_;
+
+    VideoSender(const VideoSender&); //No Copy Constructor
+    VideoSender& operator=(const VideoSender&); //No Assignment Operator
 };
 
 #endif

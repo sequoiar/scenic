@@ -38,7 +38,9 @@ protected:
     virtual void addDerived(GstElement * src, const MediaConfig * config);
 
 private:
-    GstElement *rtp_sender_;
+    GstElement *rtp_sender_;    
+    RtpSender(const RtpSender&); //No Copy Constructor
+    RtpSender& operator=(const RtpSender&); //No Assignment Operator
 };
 
 #endif // _RTP_SENDER_H_

@@ -42,6 +42,9 @@ private:
     GstElement *depayloader_;
     GstElement *rtp_receiver_;
     static std::list<GstElement *> depayloaders_;
+    
+    RtpReceiver(const RtpReceiver&); //No Copy Constructor
+    RtpReceiver& operator=(const RtpReceiver&); //No Assignment Operator
 };
 
 #endif // _RTP_RECEIVER_H_
