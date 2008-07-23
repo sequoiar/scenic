@@ -23,15 +23,19 @@
 
 #include <cpptest.h>
 
+#define DV 1
+
 class SyncTestSuite : public Test::Suite
 {
 public:
 
     SyncTestSuite()
     {
+#if DV
         TEST_ADD(SyncTestSuite::start_8ch_comp_rtp_audiofile_dv)
         TEST_ADD(SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv)
         TEST_ADD(SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv)
+#endif  // DV
 
         TEST_ADD(SyncTestSuite::sync);
     }

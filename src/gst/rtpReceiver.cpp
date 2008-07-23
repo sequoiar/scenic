@@ -110,6 +110,11 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
 
     //std::cout << "SINKPAD CAPS: " << gst_caps_to_string(gst_pad_get_caps(sinkPad)) << std::endl;
     //std::cout << "SRCPAD CAPS: " << gst_caps_to_string(gst_pad_get_caps(srcPad)) << std::endl;
+    if (gst_pad_is_linked(sinkPad))
+    {
+        LOG("sink pad is already linked.");
+        return;
+    }
 
     switch(gst_pad_link(srcPad, sinkPad))
     {

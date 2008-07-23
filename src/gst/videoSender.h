@@ -28,27 +28,25 @@
 #include "videoConfig.h"
 #include "rtpSender.h"
 
+class VideoSource;
+
 class VideoSender : public MediaBase
 {
 public:
     VideoSender(const VideoConfig & config);
     virtual ~VideoSender();
-    virtual bool start();
 
 private:
-    static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
     virtual void init_source();
     virtual void init_codec();
     virtual void init_sink();
-    void add_clock_callback();
-    static gboolean base_cb(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data);
-    gboolean toggleColour();
-    const VideoConfig &config_;
    
-    GstElement *source_, *demux_, *queue_, *dvdec_, *colorspc_, *encoder_, *payloader_, *sink_;
+    // data
+    
     RtpSender session_;
-    GstClockID clockId_;
-    GstElement *lastLinked_;    // FIXME: hack
+    const VideoConfig &config_;
+    VideoSource *source_;
+    GstElement *colorspc_, *encoder_, *payloader_, *sink_;
 };
 
 #endif

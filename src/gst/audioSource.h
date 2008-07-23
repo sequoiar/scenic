@@ -40,7 +40,7 @@ class AudioSource : public GstBase
         std::vector<GstElement *>sources_, aconvs_, queues_, decoders_, filters_;
         Interleave interleave_;
         static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data);
-        virtual gboolean callback(GstClock *clock, GstClockTime time, GstClockID id) { return TRUE; }
+        virtual gboolean callback() { return FALSE; }
 
     private:
         friend class AudioSender;
@@ -58,7 +58,7 @@ class AudioTestSource : public AudioSource
        GstClockID clockId_;
        int offset_;
     protected:
-       virtual gboolean callback(GstClock *clock, GstClockTime time, GstClockID id);
+       virtual gboolean callback();
 };
 
 class AudioFileSource : public AudioSource
