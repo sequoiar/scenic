@@ -21,15 +21,17 @@
 #ifndef _SYNC_TEST_SUITE_H_
 #define _SYNC_TEST_SUITE_H_
 
+#include "gstTestSuite.h"
+
 #include <cpptest.h>
 
 #define DV 1
 
-class SyncTestSuite : public Test::Suite
+class SyncTestSuite : public GstTestSuite
 {
 public:
 
-    SyncTestSuite():id_(0)
+    SyncTestSuite()
     {
 #if DV
         TEST_ADD(SyncTestSuite::start_8ch_comp_rtp_audiofile_dv)
@@ -40,16 +42,10 @@ public:
         TEST_ADD(SyncTestSuite::sync);
     }
 
-    void set_id(int id);
 
 // some tests
 
-protected:
-    virtual void setup();           // setup resources common to all tests
-    virtual void tear_down();       // destroy common resources
-
 private:
-    int id_;
 
     void start_8ch_comp_rtp_audiofile_dv();
     void stop_8ch_comp_rtp_audiofile_dv();

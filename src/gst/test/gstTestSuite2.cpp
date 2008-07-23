@@ -31,11 +31,6 @@
 
 #include "syncTester.h"
 
-/*----------------------------------------------*/
-// To actually observe the tests (watch/listen), set
-// this macro to 1.
-/*----------------------------------------------*/
-
 void GstTestSuite::set_id(int id)
 {
     if (id == 1 || id == 0)

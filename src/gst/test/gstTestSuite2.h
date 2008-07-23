@@ -25,8 +25,8 @@
 // Several of the tests (specifically those sending over udp) require two instances of the Tester
 // to be running, one with an argument of 0 and the other with an argument of 1.
 
-#ifndef _GST_TEST_SUITE_H_
-#define _GST_TEST_SUITE_H_
+#ifndef _GST_TEST_SUITE2_H_
+#define _GST_TEST_SUITE2_H_
 
 #include <cpptest.h>
 

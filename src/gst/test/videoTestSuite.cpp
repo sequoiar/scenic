@@ -21,33 +21,11 @@
 #include <cpptest.h>
 #include <iostream>
 
-#include "block.h"
 #include "videoTestSuite.h"
 #include "videoSender.h"
 #include "videoConfig.h"
 #include "videoReceiver.h"
 
-void VideoTestSuite::set_id(int id)
-{
-    if (id == 1 || id == 0)
-        id_ = id;
-    else
-    {
-        std::cerr << "Id must be 0 or 1." << std::endl;
-        exit(1);
-    }
-}
-
-void VideoTestSuite::setup()
-{
-    std::cout.flush();
-    std::cout << std::endl;
-}
-
-void VideoTestSuite::tear_down()
-{
-    // empty
-}
 
 void VideoTestSuite::init_test()
 {
@@ -160,10 +138,8 @@ void VideoTestSuite::start_stop_v4l()
 
 void VideoTestSuite::start_v4l_rtp()
 {
-    const int PORT = 10010;
-
     if (id_ == 0) {
-        VideoConfig config("h264", PORT);
+        VideoConfig config("h264", V_PORT);
         VideoReceiver rx(config);
         rx.init();
 
@@ -173,7 +149,7 @@ void VideoTestSuite::start_v4l_rtp()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        VideoConfig config("v4l2src", "h264", MY_ADDRESS, PORT);
+        VideoConfig config("v4l2src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -186,9 +162,8 @@ void VideoTestSuite::start_v4l_rtp()
 
 void VideoTestSuite::stop_v4l_rtp()
 {
-    const int PORT = 10010;
     if (id_ == 0) {
-        VideoConfig config("h264", PORT);
+        VideoConfig config("h264", V_PORT);
         VideoReceiver rx(config);
         rx.init();
 
@@ -199,7 +174,7 @@ void VideoTestSuite::stop_v4l_rtp()
     }
     else
     {
-        VideoConfig config("v4l2src", "h264", MY_ADDRESS, PORT);
+        VideoConfig config("v4l2src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -212,9 +187,8 @@ void VideoTestSuite::stop_v4l_rtp()
 
 void VideoTestSuite::start_stop_v4l_rtp()
 {
-    const int PORT = 10010;
     if (id_ == 0) {
-        VideoConfig config("h264", PORT);
+        VideoConfig config("h264", V_PORT);
         VideoReceiver rx(config);
         rx.init();
 
@@ -228,7 +202,7 @@ void VideoTestSuite::start_stop_v4l_rtp()
     }
     else
     {
-        VideoConfig config("v4l2src", "h264", MY_ADDRESS, PORT);
+        VideoConfig config("v4l2src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -292,10 +266,9 @@ void VideoTestSuite::start_stop_dv()
 
 void VideoTestSuite::start_dv_rtp()
 {
-    const int PORT = 10010;
     // receiver should be started first, of course there's no guarantee that it will at this point
     if (id_ == 0) {
-        VideoConfig config("h264", PORT);
+        VideoConfig config("h264", V_PORT);
         VideoReceiver rx(config);
         rx.init();
 
@@ -306,7 +279,7 @@ void VideoTestSuite::start_dv_rtp()
     }
     else
     {
-        VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
+        VideoConfig config("dv1394src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -319,9 +292,8 @@ void VideoTestSuite::start_dv_rtp()
 
 void VideoTestSuite::stop_dv_rtp()
 {
-    const int PORT = 10010;
     if (id_ == 0) {
-        VideoConfig config("h264", PORT);
+        VideoConfig config("h264", V_PORT);
         VideoReceiver rx(config);
         rx.init();
 
@@ -332,7 +304,7 @@ void VideoTestSuite::stop_dv_rtp()
     }
     else
     {
-        VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
+        VideoConfig config("dv1394src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -345,9 +317,8 @@ void VideoTestSuite::stop_dv_rtp()
 
 void VideoTestSuite::start_stop_dv_rtp()
 {
-    const int PORT = 10010;
     if (id_ == 0) {
-        VideoConfig config("h264", PORT);
+        VideoConfig config("h264", V_PORT);
         VideoReceiver rx(config);
         rx.init();
 
@@ -361,7 +332,7 @@ void VideoTestSuite::start_stop_dv_rtp()
     }
     else
     {
-        VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
+        VideoConfig config("dv1394src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
 
