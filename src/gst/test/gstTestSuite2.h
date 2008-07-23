@@ -132,7 +132,6 @@ private:
     void stop_8ch_comp_rtp_audiofile_dv();
     void start_stop_8ch_comp_rtp_audiofile_dv();
 
-    void sync();
 };
 
 #if BLOCKING

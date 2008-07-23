@@ -29,8 +29,6 @@
 #include "audioReceiver.h"
 #include "audioConfig.h"
 
-#include "syncTester.h"
-
 void GstTestSuite::set_id(int id)
 {
     if (id == 1 || id == 0)
@@ -1200,19 +1198,6 @@ void GstTestSuite::sync()
 }
 #endif
 
-void GstTestSuite::sync()
-{
-    if (id_ == 0)
-    {
-        SyncTesterReceive rx;
-        rx.run();
-    }
-    else
-    {
-        SyncTesterSend tx;
-        tx.run();
-    }
-}
 
 int main(int argc, char **argv)
 {
