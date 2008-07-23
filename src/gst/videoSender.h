@@ -41,7 +41,8 @@ private:
     virtual void init_codec();
     virtual void init_sink();
     void add_clock_callback();
-    static gboolean videotestsrc_cb(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data);
+    static gboolean base_cb(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data);
+    gboolean toggleColour();
     const VideoConfig &config_;
    
     GstElement *source_, *demux_, *queue_, *dvdec_, *colorspc_, *encoder_, *payloader_, *sink_;

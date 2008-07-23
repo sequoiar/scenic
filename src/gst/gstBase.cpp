@@ -38,7 +38,7 @@ GstBase::~GstBase()
     if (refCount_ <= 0)
     {
         assert(refCount_ == 0);
-        pipeline_.reset();
+        //pipeline_.reset();
     }
 }
 
