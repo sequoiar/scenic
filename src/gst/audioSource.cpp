@@ -46,6 +46,7 @@ void AudioSource::init()
     pipeline_.add_vector(aconvs_);
 
     sub_init();
+    link_elements();
     link_interleave();
 }
 
@@ -58,6 +59,14 @@ AudioSource::~AudioSource()
     pipeline_.remove_vector(sources_);
 }
 
+
+void AudioSource::link_elements()
+{
+    GstIter src, aconv;
+
+    for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(), aconv != aconvs_.end(); ++src, ++aconv)
+        gst_element_link(*src, *aconv);
+}
 
 void AudioSource::link_interleave()
 {
@@ -76,6 +85,7 @@ gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time, GstClock
 
 
 
+// toggles the frequency
 gboolean AudioTestSource::callback()
 {
     static const double FREQUENCY[2][8] = {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
@@ -108,8 +118,6 @@ void AudioTestSource::sub_init()
     clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND*10);
     gst_clock_id_wait_async(clockId_, base_callback, this);
 
-    for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(), aconv != aconvs_.end(); ++src, ++aconv)
-        gst_element_link(*src, *aconv);
 }
 
 
@@ -125,7 +133,6 @@ AudioTestSource::~AudioTestSource()
 
 void AudioFileSource::sub_init()
 {
-
     GstIter src, aconv, dec;
 
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
@@ -147,7 +154,13 @@ void AudioFileSource::sub_init()
 
     for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
         g_signal_connect(*dec, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *) *aconv);
+}
 
+
+
+void AudioFileSource::link_elements()
+{
+    GstIter src, dec;
     // link source to decoders
     for (src = sources_.begin(), dec = decoders_.begin(); src != sources_.end(), dec != decoders_.end(); ++src, ++dec)
         assert(gst_element_link(*src, *dec));
@@ -173,17 +186,4 @@ void AudioJackSource::sub_init()
     // jackOut -> jackIn -> jackOut ->jackIn.....
     for (src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
-    
-    for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(), aconv != aconvs_.end(); ++src, ++aconv)
-        gst_element_link(*src, *aconv);
 }
-
-
-
-void AudioAlsaSource::sub_init()
-{
-    GstIter src, aconv;
-    for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(), aconv != aconvs_.end(); ++src, ++aconv)
-        gst_element_link(*src, *aconv);
-}
-
