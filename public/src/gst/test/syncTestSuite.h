@@ -29,7 +29,7 @@ class SyncTestSuite : public Test::Suite
 {
 public:
 
-    SyncTestSuite()
+    SyncTestSuite():id_(0)
     {
 #if DV
         TEST_ADD(SyncTestSuite::start_8ch_comp_rtp_audiofile_dv)

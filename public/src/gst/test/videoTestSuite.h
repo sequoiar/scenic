@@ -30,7 +30,7 @@ class VideoTestSuite : public Test::Suite
 {
 public:
 
-    VideoTestSuite()
+    VideoTestSuite():id_(0)
     {
 #if VIDEO
         TEST_ADD(VideoTestSuite::init_test)
