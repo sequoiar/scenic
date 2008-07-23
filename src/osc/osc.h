@@ -41,14 +41,15 @@ class OscMessage
 {
 public:
     OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d);
+    OscMessage(){}
     std::string path, types;
     OscArgs args;
     int argc;
     void *data;
 
 private:
-    OscMessage(const OscMessage&); //No Copy Constructor
-    OscMessage& operator=(const OscMessage&); //No Assignment Operator
+//    OscMessage(const OscMessage&); //No Copy Constructor
+//    OscMessage& operator=(const OscMessage&); //No Assignment Operator
 };
 
 typedef QueuePair_ < OscMessage > QueuePairOfOscMessage;
