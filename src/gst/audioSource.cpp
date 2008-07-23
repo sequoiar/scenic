@@ -80,14 +80,15 @@ void AudioSource::linkElements()
     
     if (!filters_.empty())  // with delays
     {
-        for (nextIter = next->begin(), filter = filters_.begin();
-                nextIter != next->end(), filter != filters_.end();
-                ++nextIter, ++filter)
+        for (aconv = aconvs_.begin(), filter = filters_.begin();
+                aconv != aconvs_.end(), filter != filters_.end();
+                ++aconv, ++filter)
         {
-            assert(gst_element_link(*nextIter, *filter));
+            assert(gst_element_link(*aconv, *filter));
             interleave_.linkInput(*filter);
         }
     }
+
     else
         for (aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
             interleave_.linkInput(*aconv);
@@ -130,7 +131,7 @@ void AudioTestSource::sub_init()
         g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL); 
 
     offset_= 0;
-    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
+    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND*10);
     gst_clock_id_wait_async(clockId_, base_callback, this);
 }
 
@@ -159,7 +160,7 @@ void AudioFileSource::sub_init()
     for (src = sources_.begin(); src != sources_.end(); ++src)
     {
         char filename[15];
-        sprintf(filename, "audiofile%d.pcm", counter++);
+        sprintf(filename, "audiofile%d.wav", counter++);
         g_object_set(G_OBJECT(*src), "location", filename, NULL);
     }
 

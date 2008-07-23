@@ -42,8 +42,8 @@ public:
 
     GstTestSuite()
     {
-        TEST_ADD(GstTestSuite::start_stop_1ch_audiotest)
-        TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
+        TEST_ADD(GstTestSuite::start_1ch_audiotest)
+//        TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
 //        TEST_ADD(GstTestSuite::start_stop_8ch_jack)
 //        TEST_ADD(GstTestSuite::start_stop_8ch_comp_audiofile)
 

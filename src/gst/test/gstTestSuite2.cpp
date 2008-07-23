@@ -403,7 +403,7 @@ void GstTestSuite::start_1ch_audiotest()
         return;
 
     int numChannels = 1;
-    AudioConfig config("audiotestsrc", numChannels);
+    AudioConfig config("filesrc.delay", numChannels);
     AudioSender tx(config);
     tx.init();
 
