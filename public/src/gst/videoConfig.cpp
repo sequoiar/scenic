@@ -27,6 +27,7 @@
 #include <string>
 #include <iostream>
 #include "videoConfig.h"
+#include "videoSource.h"
 
 // for sender (remote)
 VideoConfig::VideoConfig(const std::string &source, const std::string &codec,
@@ -61,4 +62,21 @@ const bool VideoConfig::has_h264() const
 const bool VideoConfig::has_videotestsrc() const
 {
     return (source_ == "videotestsrc");
+}
+
+VideoSource * VideoConfig::createSource() const
+{
+    if (!source_.compare("videotestsrc"))
+        return new VideoTestSource(*this);
+    else if (!source_.compare("filesrc"))
+        return new VideoFileSource(*this);
+    else if (!source_.compare("v4l2src"))
+        return new VideoV4lSource(*this);
+    else if (!source_.compare("dv1394src"))
+        return new VideoDvSource(*this);
+    else
+    {
+        std::cerr << "Invalid source!" << std::endl;
+        return 0;
+    }
 }

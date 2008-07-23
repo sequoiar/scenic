@@ -40,9 +40,9 @@ public:
     const char *source() const;
     const int numChannels() const;
     AudioSource* createSource() const;
+
 protected:
     const int numChannels_;
-
 };
 
 #endif // _AUDIO_CONFIG_H_

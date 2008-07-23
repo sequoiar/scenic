@@ -98,10 +98,10 @@ void AudioSource::linkElements()
 // defers to subclassses callback
 gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
 {
-    return  (static_cast<AudioSource*>(user_data)->callback(clock,time,id));
+    return  (static_cast<AudioSource*>(user_data)->callback());
 }
 
-gboolean AudioTestSource::callback(GstClock *clock, GstClockTime time, GstClockID id)
+gboolean AudioTestSource::callback()
 {
     static const double FREQUENCY[2][8] = {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
                                     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};

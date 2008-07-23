@@ -18,119 +18,47 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#include <gst/gst.h>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <cassert>
-#include <gst/gst.h>
 
 #include "videoSender.h"
+#include "videoSource.h"
 #include "logWriter.h"
 
 // FIXME: pull out videoSource stuff into videoSource class hierarchy
 
 VideoSender::VideoSender(const VideoConfig & config) :
     config_(config),
-    source_(0), demux_(0), queue_(0), dvdec_(0), colorspc_(0),
+    colorspc_(0),
     encoder_(0), payloader_(0), sink_(0)
 {
     // empty
 }
 
+
+
 VideoSender::~VideoSender()
 {
     assert(stop());
-    if (config_.has_videotestsrc())
-    {
-        gst_clock_id_unschedule(clockId_);
-        gst_clock_id_unref(clockId_);
-    }
     pipeline_.remove(sink_);
     pipeline_.remove(payloader_);
     pipeline_.remove(encoder_);
     pipeline_.remove(colorspc_);
-    pipeline_.remove(dvdec_);
-    pipeline_.remove(queue_);
-    pipeline_.remove(demux_);
-    pipeline_.remove(source_);
+    delete source_;
 }
 
-// causes videotest src colour changes
-gboolean VideoSender::base_cb(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
-{
-    return (static_cast<VideoSender*>(user_data)->toggleColour());
-}
 
-gboolean VideoSender::toggleColour()
-{
-    if (!source_)
-        return FALSE;
-
-    const int BLACK = 2;    // gst-inspect property codes
-    const int WHITE = 3;
-    static int colour = BLACK;
-
-    g_object_set(G_OBJECT(source_), "pattern", colour, NULL);
-    colour = (colour == BLACK) ? WHITE : BLACK;     // toggle black and white
-
-    return TRUE;
-}
-
-void VideoSender::add_clock_callback()
-{
-    // FIXME: this has to be set to start at same time as audio
-    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
-    gst_clock_id_wait_async(clockId_, base_cb, this);
-}
 
 void VideoSender::init_source()
 {
-    source_ = gst_element_factory_make(config_.source(), NULL);
+    source_ = config_.createSource();
     assert(source_);
-    pipeline_.add(source_);
-    lastLinked_ = source_;
-
-    if (config_.has_videotestsrc())
-    {
-        g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
-        add_clock_callback();
-    }
-    else if (config_.has_dv()) {     // need to demux and decode dv first
-        demux_ = gst_element_factory_make("dvdemux", NULL);
-        assert(demux_);
-        queue_ = gst_element_factory_make("queue", NULL);
-        assert(queue_);
-        dvdec_ = gst_element_factory_make("dvdec", NULL);
-        assert(dvdec_);
-
-        // demux has dynamic pads
-        pipeline_.add(demux_);
-        pipeline_.add(queue_);
-        pipeline_.add(dvdec_);
-
-        // demux srcpad must be linked to queue sink pad at runtime
-        g_signal_connect(demux_, "pad-added", G_CALLBACK(cb_new_src_pad), (void *) queue_);
-
-        assert(gst_element_link(source_, demux_));
-        assert(gst_element_link(queue_, dvdec_));
-        lastLinked_ = dvdec_;
-    }
+    source_->init();
 }
 
-void VideoSender::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
-{
-    // ignore audio from dvsrc
-    if (!std::string("audio").compare(gst_pad_get_name(srcPad)))
-        return;
 
-    GstElement *sinkElement = (GstElement *) data;
-    GstPad *sinkPad;
-    LOG("Dynamic pad created, linking new srcpad and sinkpad.");
-
-    sinkPad = gst_element_get_static_pad(sinkElement, "sink");
-    assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
-    gst_object_unref(sinkPad);
-}
 
 void VideoSender::init_codec()
 {
@@ -142,10 +70,11 @@ void VideoSender::init_codec()
         assert(encoder_);
         g_object_set(G_OBJECT(encoder_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4, NULL);
         pipeline_.add(encoder_);
-        assert(gst_element_link_many(lastLinked_, colorspc_, encoder_, NULL));
-        lastLinked_ = encoder_;
+        assert(gst_element_link_many(source_->output(), colorspc_, encoder_, NULL));
     }
 }
+
+
 
 void VideoSender::init_sink()
 {
@@ -153,28 +82,15 @@ void VideoSender::init_sink()
         payloader_ = gst_element_factory_make("rtph264pay", NULL);
         assert(payloader_);
         pipeline_.add(payloader_);
-        assert(gst_element_link(lastLinked_, payloader_));
+        assert(gst_element_link(encoder_, payloader_));
         session_.add(payloader_, &config_);
     }
-    else                        // local test only
+    else                        // local test only, no encoding
     {
         sink_ = gst_element_factory_make("xvimagesink", NULL);
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
         pipeline_.add(sink_);
-        assert(gst_element_link(lastLinked_, sink_));
+        assert(gst_element_link(source_->output(), sink_));
     }
-}
-
-bool VideoSender::start()
-{
-    if (config_.isNetworked()) {
-        std::cout << "Sending video on port " << config_.port() << " to host " << config_.remoteHost()
-            << std::endl;
-    }
-
-    bool result = MediaBase::start();
-
-    // FIXME: start thread that expects a stop message
-    return result;
 }
 
