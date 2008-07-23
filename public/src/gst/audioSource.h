@@ -57,7 +57,8 @@ class AudioTestSource : public AudioSource
     private:
        GstClockID clockId_;
        int offset_;
-       gboolean callback(GstClock *clock, GstClockTime time, GstClockID id);
+    protected:
+       virtual gboolean callback(GstClock *clock, GstClockTime time, GstClockID id);
 };
 
 class AudioFileSource : public AudioSource
@@ -91,6 +92,7 @@ class AudioDelaySource : public T//, virtual public AudioSource
         void sub_init();
         AudioDelaySource(const AudioConfig &config) : T(config) {} 
         ~AudioDelaySource();
+        gboolean callback(GstClock *clock, GstClockTime time, GstClockID id);
 };
 
 template <typename T>
@@ -104,9 +106,29 @@ void AudioDelaySource<T>::sub_init()
     }
 
     T::pipeline_.add_vector(T::filters_);
+
+    for (std::vector<GstElement*>::iterator iter = T::filters_.begin(); iter != T::filters_.end(); ++iter)
+        g_object_set(G_OBJECT(*iter), "Delay", .5, NULL);
 }
 
-    template <typename T>
+template <typename T>
+gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time, GstClockID id)
+{
+
+    static double d_secs=5;
+
+    
+     for (std::vector<GstElement*>::iterator iter = T::filters_.begin(); iter != T::filters_.end(); ++iter)
+        g_object_set(G_OBJECT(*iter), "Delay", d_secs, NULL);
+
+    d_secs = d_secs - .5;
+    if(d_secs <= 0)
+        d_secs = 5;
+
+    return 1; //T::callback(clock,time,id);
+}
+
+template <typename T>
 AudioDelaySource<T>::~AudioDelaySource<T>()
 {
     assert(T::pipeline_.stop());
