@@ -27,6 +27,8 @@
 #include "videoSender.h"
 #include "logWriter.h"
 
+// FIXME: pull out videoSource stuff into videoSource class hierarchy
+
 VideoSender::VideoSender(const VideoConfig & config) :
     config_(config),
     source_(0), demux_(0), queue_(0), dvdec_(0), colorspc_(0),
@@ -38,7 +40,11 @@ VideoSender::VideoSender(const VideoConfig & config) :
 VideoSender::~VideoSender()
 {
     assert(stop());
-    gst_clock_id_unref(clockId_);
+    if (config_.has_videotestsrc())
+    {
+        gst_clock_id_unschedule(clockId_);
+        gst_clock_id_unref(clockId_);
+    }
     pipeline_.remove(sink_);
     pipeline_.remove(payloader_);
     pipeline_.remove(encoder_);
@@ -50,14 +56,21 @@ VideoSender::~VideoSender()
 }
 
 // causes videotest src colour changes
-gboolean VideoSender::videotestsrc_cb(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
+gboolean VideoSender::base_cb(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
 {
-    GstElement *source = static_cast<GstElement*>(user_data);
+    return (static_cast<VideoSender*>(user_data)->toggleColour());
+}
+
+gboolean VideoSender::toggleColour()
+{
+    if (!source_)
+        return FALSE;
+
     const int BLACK = 2;    // gst-inspect property codes
     const int WHITE = 3;
     static int colour = BLACK;
 
-    g_object_set(G_OBJECT(source), "pattern", colour, NULL);
+    g_object_set(G_OBJECT(source_), "pattern", colour, NULL);
     colour = (colour == BLACK) ? WHITE : BLACK;     // toggle black and white
 
     return TRUE;
@@ -67,7 +80,7 @@ void VideoSender::add_clock_callback()
 {
     // FIXME: this has to be set to start at same time as audio
     clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
-    gst_clock_id_wait_async(clockId_, videotestsrc_cb, source_);
+    gst_clock_id_wait_async(clockId_, base_cb, this);
 }
 
 void VideoSender::init_source()
