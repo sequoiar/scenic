@@ -39,8 +39,8 @@ protected:
 
 private:
     static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
-    GstElement *depayloader_;
     GstElement *rtp_receiver_;
+    GstElement *depayloader_;
     static std::list<GstElement *> depayloaders_;
     
     RtpReceiver(const RtpReceiver&); //No Copy Constructor

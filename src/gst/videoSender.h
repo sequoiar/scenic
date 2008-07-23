@@ -43,8 +43,8 @@ private:
    
     // data
     
-    RtpSender session_;
     const VideoConfig &config_;
+    RtpSender session_;
     VideoSource *source_;
     GstElement *colorspc_, *encoder_, *payloader_, *sink_;
 

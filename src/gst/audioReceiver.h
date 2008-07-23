@@ -50,8 +50,8 @@ class AudioReceiver : public MediaBase
 
         void wait_for_caps();
 
-        RtpReceiver session_;
         const AudioConfig &config_;
+        RtpReceiver session_;
         bool gotCaps_;
         GstElement *depayloader_, *decoder_, *sink_;
 

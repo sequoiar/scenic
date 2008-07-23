@@ -30,8 +30,9 @@
 // FIXME: pull out videoSource stuff into videoSource class hierarchy
 
 VideoSender::VideoSender(const VideoConfig & config) :
-    config_(config),
-    colorspc_(0), session_(), source_(0),
+    config_(config), 
+    session_(), 
+    source_(0), colorspc_(0), 
     encoder_(0), payloader_(0), sink_(0)
 {
     // empty

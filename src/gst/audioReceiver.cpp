@@ -33,7 +33,9 @@
 #include "jackUtils.h"
 
 AudioReceiver::AudioReceiver(const AudioConfig & config) :
-    config_(config), gotCaps_(false), depayloader_(0), decoder_(0), sink_(0), session_()
+    config_(config),  
+    session_(),
+    gotCaps_(false), depayloader_(0), decoder_(0), sink_(0)
 {
     // empty
 }

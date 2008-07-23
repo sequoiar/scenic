@@ -39,8 +39,8 @@ private:
     virtual void init_codec();
     virtual void init_sink();
 
-    RtpReceiver session_;
     const VideoConfig &config_;
+    RtpReceiver session_;
     GstElement *depayloader_, *decoder_, *sink_;
 
     VideoReceiver(const VideoReceiver&); //No Copy Constructor
