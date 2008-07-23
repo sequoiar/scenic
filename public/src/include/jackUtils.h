@@ -44,6 +44,7 @@ static bool jack_is_running()
         else 
             std::cerr << "jack_client_open() failed, status = 0x" << status << std::endl;
 
+        jack_client_close(client);
         return false;
     }
 
