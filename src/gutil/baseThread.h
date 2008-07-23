@@ -35,7 +35,23 @@
 
 typedef GAsyncQueue GAsyncQueue;
 
-typedef std::pair < GAsyncQueue *, GAsyncQueue * >BaseQueuePair;
+//typedef std::pair < GAsyncQueue *, GAsyncQueue * >BaseQueuePair;
+
+class BaseQueuePair
+{
+public:
+    BaseQueuePair(GAsyncQueue* f,GAsyncQueue* s):first(f),second(s){}
+    virtual ~BaseQueuePair(){}
+
+    GAsyncQueue *first, *second;
+    BaseQueuePair(const BaseQueuePair& in):first(in.first),second(in.second){}
+
+private:
+    BaseQueuePair& operator=(const BaseQueuePair&); //No Assignment Operator
+
+};
+
+
 
 template < class T > class QueuePair_ : public BaseQueuePair
 {
@@ -89,6 +105,10 @@ protected:
 
     QueuePair_ < T > queue;
     static void *thread_main(void *v);
+
+private:
+    BaseThread(const BaseThread&); //No Copy Constructor
+    BaseThread& operator=(const BaseThread&); //No Assignment Operator
 };
 
 template < class T > QueuePair_ < T > BaseThread < T >::getQueue()
@@ -223,7 +243,7 @@ template < class T > QueuePair_<T>::~QueuePair_ ()
 
 }
 
-template < class T > BaseThread < T >::BaseThread() : th(0)
+template < class T > BaseThread < T >::BaseThread() : th(0), queue()
 {
     if (!g_thread_supported ()) g_thread_init (NULL);
     queue.init();

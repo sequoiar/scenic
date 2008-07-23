@@ -50,8 +50,9 @@ public:
     IntArg(int* i,std::string l, char s, std::string d, std::string a) :
         BaseArg('i',l,s,d,a),arg(i){
     }
-
-
+private:
+    IntArg(const IntArg&); //No Copy Constructor
+    IntArg& operator=(const IntArg&); //No Assignment Operator
 };
 
 ///Boolean argument
@@ -62,6 +63,9 @@ public:
     BoolArg(bool* b,std::string l, char s, std::string d) :
         BaseArg('b',l,s,d, std::string()),arg(b){
     }
+private:
+    BoolArg(const BoolArg&); //No Copy Constructor
+    BoolArg& operator=(const BoolArg&); //No Assignment Operator
 };
 
 ///String argument
@@ -72,6 +76,9 @@ public:
     StringArg(char** ppc,std::string l, char s, std::string d, std::string a) :
         BaseArg('s',l, s, d, a),arg(ppc){
     }
+private:
+    StringArg(const StringArg&); //No Copy Constructor
+    StringArg& operator=(const StringArg&); //No Assignment Operator
 };
 
 
@@ -81,6 +88,7 @@ public:
 class BaseModule
 {
 public:
+    BaseModule():args(){}
     typedef std::list<BaseArg*> ArgList;
     typedef std::list<BaseArg*>::iterator iterator;
     ArgList args;

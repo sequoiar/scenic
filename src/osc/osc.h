@@ -41,19 +41,22 @@ class OscMessage
 {
 public:
     OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d);
-    OscMessage()
-    {
-    }
     std::string path, types;
     OscArgs args;
     int argc;
     void *data;
 
+private:
+    OscMessage(const OscMessage&); //No Copy Constructor
+    OscMessage& operator=(const OscMessage&); //No Assignment Operator
 };
 
 typedef QueuePair_ < OscMessage > QueuePairOfOscMessage;
 class OscThread : public BaseThread < OscMessage >
 {
+public:
+    OscThread();
+private:
     int main();
 
     static int generic_handler_static(const char *path, const char *types,
@@ -70,15 +73,16 @@ class OscThread : public BaseThread < OscMessage >
     char* remote_host_;
     bool running;
     void send(OscMessage & osc);
-public:
-    OscThread();
+
+    OscThread(const OscThread&); //No Copy Constructor
+    OscThread& operator=(const OscThread&); //No Assignment Operator
 };
 class LoArgs
 {
 public:
     LoArgs(const char *pchar, int index, lo_arg * a)
+        :type(static_cast<lo_type>(pchar[index])),i(0),s()
     {
-        type = (lo_type) pchar[index];
         switch ((char) type)
         {
         case 's':

@@ -27,13 +27,13 @@ class DModule : public BaseModule
 {
     bool pass;
 public:
+    DModule():pass(false){}
     bool run();
     void init();
 };
 
 void DModule::init()
 {
-    pass = false;
     args.push_back(new BoolArg(&pass,"pass",'p',"bypass this module"));
 }
 

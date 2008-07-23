@@ -55,8 +55,11 @@ public:
 
     GOptionEntry* pA;
     int parse(int argc,char **argv);
-    OptionArgs():pA(0){}
+    OptionArgs():options(),pA(0){}
     ~OptionArgs();
+private:
+    OptionArgs(const OptionArgs&); //No Copy Constructor
+    OptionArgs& operator=(const OptionArgs&); //No Assignment Operator
 };
 
 
