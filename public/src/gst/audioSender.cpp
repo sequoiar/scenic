@@ -31,8 +31,8 @@
 #include "audioSource.h"
 #include "jackUtils.h"
 
-AudioSender::AudioSender(const AudioConfig & config)
-    : config_(config), encoder_(0),session_(),source_(0),
+AudioSender::AudioSender(const AudioConfig & config) : 
+    config_(config), session_(), source_(0), encoder_(0), 
     payloader_(0), sink_(0)
 {
     // empty

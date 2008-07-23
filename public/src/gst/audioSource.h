@@ -36,9 +36,10 @@ class AudioSource : public GstBase
     protected:
         AudioSource(const AudioConfig &config);
         virtual void link_interleave();
+
         const AudioConfig &config_;
-        std::vector<GstElement *>sources_, aconvs_;
         Interleave interleave_;
+        std::vector<GstElement *>sources_, aconvs_;
         static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data);
         virtual gboolean callback() { return FALSE; }
 

@@ -26,7 +26,7 @@
 #include "videoReceiver.h"
 
 VideoReceiver::VideoReceiver(const VideoConfig & config) :
-    config_(config), depayloader_(0), decoder_(0), sink_(0), session_()
+    config_(config), session_(), depayloader_(0), decoder_(0), sink_(0)
 {
     // empty
 }
