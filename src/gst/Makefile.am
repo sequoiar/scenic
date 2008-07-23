@@ -6,7 +6,7 @@ libgst_a_SOURCES = videoReceiver.cpp videoSender.cpp videoSource.cpp mediaBase.c
 				   audioSender.cpp audioReceiver.cpp mediaConfig.cpp \
 				   audioConfig.cpp videoConfig.cpp rtpSession.cpp pipeline.cpp \
 				   gstBase.cpp rtpSender.cpp rtpReceiver.cpp audioSource.cpp \
-				   interleave.cpp syncTester.cpp
+				   interleave.cpp 
 
 
 libgst_a_CPPFLAGS= $(CPPFLAGS) $(GST_CFLAGS) $(LLO_CFLAGS) $(JACK_CFLAGS)

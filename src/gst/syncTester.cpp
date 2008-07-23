@@ -20,11 +20,6 @@
 
 #include <iostream>
 
-#define BLOCK() std::cout.flush();                              \
-    std::cout << __FILE__ << ":" << __LINE__        \
-              << ": blocking, enter any key." << std::endl;   \
-    std::cin.get()
-
 #include <cassert>
 #include "defaultAddresses.h"
 #include "syncTester.h"
@@ -35,51 +30,9 @@ const int SyncTester::NUM_CHANNELS = 8;
 
 void SyncTesterSend::run()
 {
-    VideoConfig vConfig("videotestsrc", "h264", MY_ADDRESS, V_PORT);
-    VideoSender vTx(vConfig);
-    vTx.init();
-    
-    AudioConfig aConfig("audiotestsrc", NUM_CHANNELS, "vorbisenc", MY_ADDRESS, A_PORT);
-    AudioSender aTx(aConfig);
-    aTx.init();
-
-    assert(vTx.start());
-    assert(aTx.start());
-
-    BLOCK();
-
-    assert(vTx.isPlaying());
-    assert(aTx.isPlaying());
-    
-    assert(vTx.stop());
-    assert(aTx.stop());
-
-    assert(!vTx.isPlaying());
-    assert(!aTx.isPlaying());
 }
 
 void SyncTesterReceive::run()
 {
-    VideoConfig vConfig("h264", V_PORT);
-    VideoReceiver vRx(vConfig);
-    vRx.init();
-
-    AudioConfig aConfig(NUM_CHANNELS, "vorbisdec", A_PORT);
-    AudioReceiver aRx(aConfig);
-    aRx.init();
-
-    assert(vRx.start());
-    assert(aRx.start());
-
-    BLOCK();
-
-    assert(vRx.isPlaying());
-    assert(aRx.isPlaying());
-
-    assert(vRx.stop());
-    assert(aRx.stop());
-        
-    assert(!vRx.isPlaying());
-    assert(!aRx.isPlaying());
 }
 
