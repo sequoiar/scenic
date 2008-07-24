@@ -42,6 +42,13 @@ void VideoSource::init()
 
 
 
+void VideoSource::link_element(GstElement *sinkElement)
+{
+    assert(gst_element_link(source_, sinkElement));
+}
+
+
+
 VideoSource::~VideoSource()
 {
     assert(pipeline_.stop());
@@ -80,6 +87,8 @@ void VideoTestSource::sub_init()
     gst_clock_id_wait_async(clockId_, base_callback, this);
 }
 
+
+
 VideoTestSource::~VideoTestSource()
 {
     assert(pipeline_.stop());
@@ -87,17 +96,97 @@ VideoTestSource::~VideoTestSource()
     gst_clock_id_unref(clockId_);
 }
 
+
+
 void VideoFileSource::sub_init()
 {
     // FIXME
     // to be implemented
+    decoder_ = gst_element_factory_make("decodebin", NULL);
+    assert(decoder_);
+
+    pipeline_.add(decoder_);
+
+    const char *filename = "videofile.mpeg";
+    g_object_set(G_OBJECT(source_), "location", filename, NULL);
+    assert(gst_element_link(source_, decoder_));
+    g_signal_connect(decoder_, "new-decoded-pad", G_CALLBACK(VideoFileSource::cb_new_src_pad), (void *)this);
 }
+
+
+
+void VideoFileSource::link_element(GstElement *sinkElement)
+{
+    // defer linking of elements to callback
+    sinkElement_ = sinkElement;
+}
+
+
+
+void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last, void *data)
+{
+    if (gst_pad_is_linked(srcPad))
+    {
+        LOG("Pad is already linked.")
+            return;
+    }
+    else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
+    {   
+        LOG("Pad is not a source");
+        return;
+    }
+  
+    VideoFileSource *context = static_cast<VideoFileSource*>(data);
+    GstStructure *str;
+    GstPad *sinkPad;
+    GstCaps *caps;
+
+    sinkPad = gst_element_get_static_pad(context->sinkElement_, "sink");
+    if (GST_PAD_IS_LINKED(sinkPad))
+    {
+        g_object_unref(sinkPad);        // don't link more than once
+        return;
+    }
+
+      /* check media type */
+    caps = gst_pad_get_caps(srcPad);
+    str = gst_caps_get_structure(caps, 0);
+    if (!g_strrstr(gst_structure_get_name(str), "video")) 
+    {
+        gst_caps_unref(caps);
+        gst_object_unref(srcPad);
+        return;
+    }
+    gst_caps_unref(caps);
+
+    assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
+    gst_object_unref(sinkPad);
+}
+
+
+
+VideoFileSource::~VideoFileSource()
+{
+    assert(pipeline_.stop());
+    pipeline_.remove(decoder_);
+}
+
+
 
 VideoDvSource::VideoDvSource(const VideoConfig &config) : 
     VideoSource(config), 
     demux_(0), queue_(0), dvdec_(0) 
 {
 }
+
+
+
+void VideoDvSource::link_element(GstElement *sinkElement)
+{
+    assert(gst_element_link(dvdec_, sinkElement));
+}
+
+
 
 void VideoDvSource::sub_init()
 {
@@ -120,11 +209,16 @@ void VideoDvSource::sub_init()
     assert(gst_element_link(queue_, dvdec_));
 }
 
+
+
 void VideoDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
 {
     // ignore audio from dvsrc
     if (!std::string("audio").compare(gst_pad_get_name(srcPad)))
+    {
+        LOG("Ignoring audio stream from DV");
         return;
+    }
 
     GstElement *sinkElement = (GstElement *) data;
     GstPad *sinkPad;
