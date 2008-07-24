@@ -95,13 +95,13 @@ AX_PYTHON
 AX_BOOST_PYTHON
 
 
+#                 src/sip/Makefile
+#                 src/sip/test/Makefile
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/gst/Makefile
                  src/gst/test/Makefile
-                 src/sip/Makefile
-                 src/sip/test/Makefile
                  src/gutil/Makefile
                  src/gutil/test/Makefile
                  src/osc/Makefile
