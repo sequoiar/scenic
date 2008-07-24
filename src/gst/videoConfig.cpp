@@ -49,19 +49,9 @@ VideoConfig::VideoConfig(const std::string &codec, int port) : MediaConfig(codec
     // empty
 }
 
-const bool VideoConfig::has_dv() const
-{
-    return (source_ == "dv1394src");
-}
-
 const bool VideoConfig::has_h264() const
 {
     return (codec_ == "h264");
-}
-
-const bool VideoConfig::has_videotestsrc() const
-{
-    return (source_ == "videotestsrc");
 }
 
 VideoSource * VideoConfig::createSource() const

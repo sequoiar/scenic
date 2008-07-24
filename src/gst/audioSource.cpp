@@ -20,12 +20,13 @@
 #include <iostream>
 #include <string>
 #include <cassert>
+#include "logWriter.h"
 #include "audioSource.h"
 #include "audioConfig.h"
 #include "jackUtils.h"
 
 AudioSource::AudioSource(const AudioConfig &config) : config_(config), interleave_(config),
-                                                      sources_(0),aconvs_(0)
+                                                      sources_(0), aconvs_(0)
 {
 }
 
@@ -113,11 +114,9 @@ void AudioTestSource::sub_init()
     for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
         g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL); 
 
-    offset_= 0;
-    // FIXME: move to pipeline class
-    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND*10);
+    // FIXME: move to pipeline class?
+    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
     gst_clock_id_wait_async(clockId_, base_callback, this);
-
 }
 
 
@@ -130,14 +129,14 @@ AudioTestSource::~AudioTestSource()
 }
 
 
-
+// FIXME: detect which decoder to use based on file 
 void AudioFileSource::sub_init()
 {
     GstIter src, aconv, dec;
 
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
-        decoders_.push_back(gst_element_factory_make("wavparse", NULL));
+        decoders_.push_back(gst_element_factory_make("decodebin", NULL));
         assert(decoders_[channelIdx]);
     }
 
@@ -153,7 +152,48 @@ void AudioFileSource::sub_init()
     }
 
     for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
-        g_signal_connect(*dec, "pad-added", G_CALLBACK(Pipeline::cb_new_src_pad), (void *) *aconv);
+        g_signal_connect(*dec, "new-decoded-pad", G_CALLBACK(AudioFileSource::cb_new_src_pad), (void *) *aconv);
+}
+
+
+
+void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last, void *data)
+{
+    if (gst_pad_is_linked(srcPad))
+    {
+        LOG("Pad is already linked.")
+            return;
+    }
+    else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
+    {   
+        LOG("Pad is not a source");
+        return;
+    }
+  
+    GstElement *sinkElement = (GstElement *) data;
+    GstStructure *str;
+    GstPad *sinkPad;
+    GstCaps *caps;
+
+    sinkPad = gst_element_get_static_pad(sinkElement, "sink");
+    if (GST_PAD_IS_LINKED(sinkPad))
+    {
+        g_object_unref(sinkPad);
+        return;
+    }
+
+      /* check media type */
+    caps = gst_pad_get_caps(srcPad);
+    str = gst_caps_get_structure(caps, 0);
+    if (!g_strrstr(gst_structure_get_name(str), "audio")) {
+        gst_caps_unref(caps);
+        gst_object_unref(srcPad);
+        return;
+    }
+    gst_caps_unref(caps);
+
+    assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
+    gst_object_unref(sinkPad);
 }
 
 

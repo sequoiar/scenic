@@ -21,7 +21,6 @@
 #define _AUDIO_SOURCE_H_
 
 #include <cassert>
-#include <gst/audio/multichannel.h>
 #include "gstBase.h"
 #include "interleave.h"
 
@@ -51,28 +50,28 @@ class AudioSource : public GstBase
 class AudioTestSource : public AudioSource
 {
     public:
+        AudioTestSource(const AudioConfig &config) : AudioSource(config), clockId_(0), offset_(0) {}
         ~AudioTestSource();
         void sub_init();
-        AudioTestSource(const AudioConfig &config) : AudioSource(config),clockId_(0),offset_(0) {
-        }
     protected:
-       virtual gboolean callback();
+        virtual gboolean callback();
 
     private:
-       GstClockID clockId_;
-       int offset_;
+        GstClockID clockId_;
+        int offset_;
 
-    AudioTestSource(const AudioTestSource&); //No Copy Constructor
-    AudioTestSource& operator=(const AudioTestSource&); //No Assignment Operator
+        AudioTestSource(const AudioTestSource&); //No Copy Constructor
+        AudioTestSource& operator=(const AudioTestSource&); //No Assignment Operator
 };
 
 class AudioFileSource : public AudioSource
 {
     public:
-        void link_elements();
+        AudioFileSource(const AudioConfig &config) : AudioSource(config), decoders_() {}
         ~AudioFileSource();
         void sub_init();
-        AudioFileSource(const AudioConfig &config) : AudioSource(config), decoders_() {}
+        void link_elements();
+        static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last, void *data);
 
     private:
         std::vector<GstElement*> decoders_;
@@ -88,8 +87,8 @@ class AudioAlsaSource : public AudioSource
 class AudioJackSource : public AudioSource
 {
     public:
-        void sub_init();
         AudioJackSource(const AudioConfig &config): AudioSource(config) {} 
+        void sub_init();
 };
 
 template <typename T>
@@ -104,13 +103,12 @@ class AudioDelaySource : public T//, virtual public AudioSource
         gboolean callback(GstClock *clock, GstClockTime time, GstClockID id);
     private:
         std::vector<GstElement *> filters_;
-
 };
 
-template <typename T>
+    template <typename T>
 void AudioDelaySource<T>::sub_init()
 {
-
+    std::vector<GstElement*>::iterator iter;
     T::sub_init();
 
     for (int channelIdx = 0; channelIdx < T::config_.numChannels(); channelIdx++)
@@ -121,11 +119,11 @@ void AudioDelaySource<T>::sub_init()
 
     T::pipeline_.add_vector(filters_);
 
-    for (std::vector<GstElement*>::iterator iter = filters_.begin(); iter != filters_.end(); ++iter)
+    for (iter = filters_.begin(); iter != filters_.end(); ++iter)
         g_object_set(G_OBJECT(*iter), "Delay", 0.5, NULL);
 }
 
-template <typename T>
+    template <typename T>
 void AudioDelaySource<T>::link_elements()
 {
     T::link_elements(); // link elements that precede the filters
@@ -138,7 +136,7 @@ void AudioDelaySource<T>::link_elements()
         gst_element_link(*aconv, *filter);
 }
 
-template <typename T>
+    template <typename T>
 void AudioDelaySource<T>::link_interleave()
 {
     std::vector<GstElement*>::iterator filter;
@@ -146,7 +144,7 @@ void AudioDelaySource<T>::link_interleave()
         T::interleave_.linkInput(*filter);
 }
 
-template <typename T>
+    template <typename T>
 gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time, GstClockID id)
 {
     static double d_secs = 5;
@@ -161,7 +159,7 @@ gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time, GstCl
     return T::callback();
 }
 
-template <typename T>
+    template <typename T>
 AudioDelaySource<T>::~AudioDelaySource<T>()
 {
     assert(T::pipeline_.stop());

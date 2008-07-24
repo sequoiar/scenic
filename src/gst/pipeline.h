@@ -1,5 +1,5 @@
 
-// pipline.h
+// pipeline.h
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -26,39 +26,35 @@
 
 class Pipeline
 {
-public:
-    static Pipeline & Instance();
-    void add(GstElement * element);
-    void add_vector(std::vector < GstElement * >&elementVec);
-    void remove(GstElement * element);
-    void remove_vector(std::vector < GstElement * >&elementVec);
-    void reset();
-    bool isPlaying() const;
-    void wait_until_playing() const;
-    void wait_until_stopped() const;
-    bool start();
-    bool stop();
-    const GstClockTime start_time() const { return startTime_; }
+    public:
+        static Pipeline & Instance();
+        void add(GstElement * element);
+        void add_vector(std::vector < GstElement * >&elementVec);
+        void remove(GstElement * element);
+        void remove_vector(std::vector < GstElement * >&elementVec);
+        void reset();
+        bool isPlaying() const;
+        void wait_until_playing() const;
+        void wait_until_stopped() const;
+        bool start();
+        bool stop();
+        const GstClockTime start_time() const { return startTime_; }
 
-// call back to attach new src pad
-    static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
-    static void cb_new_sink_pad(GstElement * element, GstPad * sinkPad, void *data);
+        GstClock* clock() const;
 
-    GstClock* clock() const;
+    private:
+        void init();
+        Pipeline(const Pipeline&);
+        Pipeline& operator=(const Pipeline&);
+        Pipeline();
+        ~Pipeline();
+        static Pipeline *instance_;
 
-private:
-    void init();
-    Pipeline(const Pipeline&);
-    Pipeline& operator=(const Pipeline&);
-    Pipeline();
-    ~Pipeline();
-    static Pipeline *instance_;
+        void make_verbose();
+        GstElement *pipeline_;
+        GstClockTime startTime_;
+        bool verbose_;
 
-    void make_verbose();
-    GstElement *pipeline_;
-    GstClockTime startTime_;
-    bool verbose_;
-    
 };
 
 #endif // _PIPELINE_H_

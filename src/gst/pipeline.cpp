@@ -31,6 +31,8 @@ Pipeline::Pipeline() : pipeline_(0), startTime_(0), verbose_(false)
 {
 }
 
+
+
 Pipeline & Pipeline::Instance()
 {
     if (instance_ == 0) {
@@ -40,11 +42,15 @@ Pipeline & Pipeline::Instance()
     return *instance_;
 }
 
+
+
 Pipeline::~Pipeline()
 {
     assert(stop());
     gst_object_unref(GST_OBJECT(pipeline_));
 }
+
+
 
 void Pipeline::init()
 {
@@ -63,6 +69,7 @@ void Pipeline::init()
     }
 }
 
+
 // FIXME: check if this is safe, basically we're destroying and recreating the pipeline
 void Pipeline::reset()
 {
@@ -73,6 +80,7 @@ void Pipeline::reset()
         instance_ = 0;
     }
 }
+
 
 
 void Pipeline::make_verbose()
@@ -86,52 +94,7 @@ void Pipeline::make_verbose()
     }
 }
 
-void Pipeline::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
-{
-    //std::cout << "Element: " << gst_element_get_name(srcElement) << std::endl;
-    //std::cout << "Pad: " << gst_pad_get_name(srcPad) << std::endl;
 
-    if (gst_pad_is_linked(srcPad))
-    {
-        LOG("Pad is already linked.")
-            return;
-    }
-    else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
-    {   
-        LOG("Pad is not a source");
-        return;
-    }
-
-    GstElement *sinkElement = (GstElement *) data;
-    GstPad *sinkPad;
-
-    sinkPad = gst_element_get_static_pad(sinkElement, "sink");
-    assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
-    gst_object_unref(sinkPad);
-}
-
-void Pipeline::cb_new_sink_pad(GstElement * sinkElement, GstPad * sinkPad, void *data)
-{
-    //std::cout << "Element: " << gst_element_get_name(sinkElement) << std::endl;
-    //std::cout << "Pad: " << gst_pad_get_name(sinkPad) << std::endl;
-    if (gst_pad_is_linked(sinkPad))
-    {
-        LOG("Pad is already linked")
-            return;
-    }
-    else if (gst_pad_get_direction(sinkPad) != GST_PAD_SINK)
-    {
-        LOG("Pad is not a sink");
-        return;
-    }
-
-    GstElement *srcElement = (GstElement *) data;
-    GstPad *srcPad;
-
-    srcPad = gst_element_get_static_pad(srcElement, "src");
-    assert(gst_pad_link(sinkPad, srcPad) == GST_PAD_LINK_OK);
-    gst_object_unref(srcPad);
-}
 
 bool Pipeline::isPlaying() const
 {
@@ -141,11 +104,15 @@ bool Pipeline::isPlaying() const
         return false;
 }
 
+
+
 void Pipeline::wait_until_playing() const
 {
     while (!isPlaying())
         usleep(1000);
 }
+
+
 
 void Pipeline::wait_until_stopped() const
 {
@@ -153,11 +120,15 @@ void Pipeline::wait_until_stopped() const
         usleep(1000);
 }
 
+
+
 bool Pipeline::start()
 {
     gst_element_set_state(pipeline_, GST_STATE_PLAYING);
     return isPlaying();
 }
+
+
 
 bool Pipeline::stop()
 {
@@ -165,10 +136,14 @@ bool Pipeline::stop()
     return !isPlaying();
 }
 
+
+
 void Pipeline::add(GstElement * element)
 {
     gst_bin_add(GST_BIN(pipeline_), element);
 }
+
+
 
 void Pipeline::add_vector(std::vector < GstElement * >&elementVec)
 {
@@ -177,11 +152,15 @@ void Pipeline::add_vector(std::vector < GstElement * >&elementVec)
         gst_bin_add(GST_BIN(pipeline_), *iter);
 }
 
+
+
 void Pipeline::remove(GstElement * element)
 {
     if (element)
         assert(gst_bin_remove(GST_BIN(pipeline_), element));
 }
+
+
 
 void Pipeline::remove_vector(std::vector < GstElement * >&elementVec)
 {
@@ -190,7 +169,10 @@ void Pipeline::remove_vector(std::vector < GstElement * >&elementVec)
         assert(gst_bin_remove(GST_BIN(pipeline_), *iter));
 }
 
+
+
 GstClock * Pipeline::clock() const
 {
     return gst_pipeline_get_clock(GST_PIPELINE(pipeline_));
 }
+
