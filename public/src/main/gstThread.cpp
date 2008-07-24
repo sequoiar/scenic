@@ -20,7 +20,7 @@
 
 
 //BaseModule args get deleted in ~BaseModule
-GstThread::GstThread()
+GstThread::GstThread():conf(),sender(),receiver(),conf_str(0)
 {
     args.clear();
     conf_str = 0;

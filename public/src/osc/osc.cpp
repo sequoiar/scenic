@@ -30,7 +30,7 @@
 #include <lo/lo.h>
 #include "osc.h"
 
-OscMessage::OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d) : path(p), types(t), argc(c), data(d)
+OscMessage::OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d) : path(p), types(t), args(), argc(c), data(d)
 {
     for (int i = 0; i < c; i++)
     {
@@ -39,7 +39,34 @@ OscMessage::OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d
 
 }
 
-OscThread::OscThread()
+OscMessage::OscMessage(const OscMessage& in):path(in.path), types(in.types), args(in.args), argc(in.argc), data(in.data)
+{
+        
+
+
+}
+
+
+
+
+
+OscMessage& OscMessage::operator=(const OscMessage& in)
+{
+    if(this == &in) return *this;
+
+    path = in.path;
+    types = in.types;
+    args = in.args;
+    argc = in.argc;
+    data = in.data;
+
+    return *this;
+}
+
+
+
+
+OscThread::OscThread():local_port_(0),remote_port_(0),remote_host_(),running(false)
 {
     args.clear();
     local_port_ = remote_port_ = remote_host_ = 0;
