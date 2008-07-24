@@ -6,5 +6,5 @@
 aclocal
 autoconf
 automake -a
-./configure CXXFLAGS='-O0 -g -Wall -Werror -Wfatal-errors'
+./configure '--enable-CXX_OPT=-O0 -g -Wall -Weffc++ -Werror -Wfatal-errors'
 

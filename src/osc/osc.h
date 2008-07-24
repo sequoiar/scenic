@@ -47,9 +47,8 @@ public:
     int argc;
     void *data;
 
-private:
-//    OscMessage(const OscMessage&); //No Copy Constructor
-//    OscMessage& operator=(const OscMessage&); //No Assignment Operator
+    OscMessage(const OscMessage&); //No Copy Constructor
+    OscMessage& operator=(const OscMessage&); //No Assignment Operator
 };
 
 typedef QueuePair_ < OscMessage > QueuePairOfOscMessage;
