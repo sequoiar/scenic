@@ -35,6 +35,7 @@ public:
     
 private:
     void set_caps(const char* capsStr);
+    void stop_sender();
     virtual void init_source();
     virtual void init_codec();
     virtual void init_sink();

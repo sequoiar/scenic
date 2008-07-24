@@ -23,6 +23,7 @@
 
 #include <string>
 #include "defaultAddresses.h"
+#include "lo/lo.h"
 
 #include "mediaBase.h"
 #include "videoConfig.h"
@@ -35,19 +36,25 @@ class VideoSender : public MediaBase
 public:
     VideoSender(const VideoConfig & config);
     bool start();
+    void wait_for_stop();
     virtual ~VideoSender();
 
 private:
     virtual void init_source();
     virtual void init_codec();
     virtual void init_sink();
-   
+
+    static int stop_handler(const char *path, const char *types, lo_arg ** argv, int argc,
+            void *data, void *user_data);
+
+    static void liblo_error(int num, const char *msg, const char *path);
     // data
     
     const VideoConfig &config_;
     RtpSender session_;
     VideoSource *source_;
     GstElement *colorspc_, *encoder_, *payloader_, *sink_;
+    bool stopped_;
 
     VideoSender(const VideoSender&); //No Copy Constructor
     VideoSender& operator=(const VideoSender&); //No Assignment Operator

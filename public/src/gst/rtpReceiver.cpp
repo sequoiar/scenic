@@ -113,6 +113,7 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
     if (gst_pad_is_linked(sinkPad))
     {
         LOG("sink pad is already linked.");
+        gst_object_unref(sinkPad);
         return;
     }
 

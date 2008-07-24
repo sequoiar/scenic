@@ -22,8 +22,11 @@
 #include <cassert>
 #include <gst/gst.h>
 
+#include "lo/lo.h"
+
 #include "mediaBase.h"
 #include "videoReceiver.h"
+#include "logWriter.h"
 
 VideoReceiver::VideoReceiver(const VideoConfig & config) :
     config_(config), session_(), depayloader_(0), decoder_(0), sink_(0)
@@ -84,5 +87,16 @@ bool VideoReceiver::stop()
 {
     MediaBase::stop();
     // FIXME: ADD CODE tell sender to stop to avoid crash when going from DV to v4l
+    stop_sender();
     return true;
 }
+
+void VideoReceiver::stop_sender()
+{
+    LOG("Telling sender to stop...");
+
+    lo_address t = lo_address_new(NULL, "7771");
+    if (lo_send(t, "/video/tx/stop", NULL) == -1)
+        std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
+}
+

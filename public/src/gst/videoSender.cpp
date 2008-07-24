@@ -31,7 +31,8 @@ VideoSender::VideoSender(const VideoConfig & config) :
     config_(config), 
     session_(), 
     source_(0), colorspc_(0), 
-    encoder_(0), payloader_(0), sink_(0)
+    encoder_(0), payloader_(0), sink_(0),
+    stopped_(false)
 {
     // empty
 }
@@ -88,7 +89,7 @@ void VideoSender::init_sink()
     else                        // local test only, no encoding
     {
         sink_ = gst_element_factory_make("xvimagesink", NULL);
-        //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+        g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
         pipeline_.add(sink_);
         source_->link_element(sink_);
     }
@@ -99,7 +100,45 @@ void VideoSender::init_sink()
 bool VideoSender::start()
 {
     MediaBase::start();
+
     pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
+    wait_for_stop();
     return true;
+}
+
+
+
+void VideoSender::wait_for_stop()
+{
+    LOG("Waiting for stop message...");
+
+    lo_server_thread st = lo_server_thread_new("7771", liblo_error);
+
+    lo_server_thread_add_method(st, "/video/tx/stop", "", stop_handler, (void *) this);
+
+    lo_server_thread_start(st);
+
+    while (!stopped_)
+        usleep(1000);
+
+    lo_server_thread_free(st);
+}
+
+void VideoSender::liblo_error(int num, const char *msg, const char *path)
+{
+    printf("liblo server error %d in path %s: %s\n", num, path, msg);
+    fflush(stdout);
+}
+
+int VideoSender::stop_handler(const char *path, const char *types, lo_arg ** argv, int argc,
+        void *data, void *user_data)
+{
+    VideoSender *context = static_cast<VideoSender*>(user_data);
+    context->stop();
+
+    LOG("STOPPPINNNNNGGGGGGG");
+    context->stopped_ = true;
+
+    return 0;
 }
 

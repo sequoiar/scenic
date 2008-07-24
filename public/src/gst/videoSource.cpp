@@ -82,7 +82,7 @@ void VideoTestSource::sub_init()
 {
     g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
 
-    // FIXME: move to pipeline class
+    // FIXME: move to pipeline class?
     clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
     gst_clock_id_wait_async(clockId_, base_callback, this);
 }
@@ -100,8 +100,6 @@ VideoTestSource::~VideoTestSource()
 
 void VideoFileSource::sub_init()
 {
-    // FIXME
-    // to be implemented
     decoder_ = gst_element_factory_make("decodebin", NULL);
     assert(decoder_);
 
@@ -117,8 +115,10 @@ void VideoFileSource::sub_init()
 
 void VideoFileSource::link_element(GstElement *sinkElement)
 {
-    // defer linking of elements to callback
+    // defer linking of decoder to this element to callback
     sinkElement_ = sinkElement;
+    if (!strncmp(gst_element_get_name(sinkElement_), "xvimagesink", strlen("xvimagesink")))
+        g_object_set(G_OBJECT(sinkElement_), "sync", TRUE, NULL);
 }
 
 
@@ -154,7 +154,7 @@ void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
     if (!g_strrstr(gst_structure_get_name(str), "video")) 
     {
         gst_caps_unref(caps);
-        gst_object_unref(srcPad);
+        gst_object_unref(sinkPad);
         return;
     }
     gst_caps_unref(caps);
