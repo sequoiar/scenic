@@ -30,14 +30,18 @@
 typedef QueuePair_<BaseMessage> QueuePair;
 class GstThread : public BaseThread<BaseMessage>
 {
+public:
+    GstThread();    
+private:
     VideoConfig* conf;
     VideoSender* sender;
     VideoReceiver* receiver;
 
     char* conf_str;
     int main();
-public:
-    GstThread();
+
+    GstThread(const GstThread&); //No Copy Constructor
+    GstThread& operator=(const GstThread&); //No Assignment Operator
 };
 
 
