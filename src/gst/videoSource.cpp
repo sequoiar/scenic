@@ -107,7 +107,7 @@ void VideoFileSource::sub_init()
 
     pipeline_.add(decoder_);
 
-    const char *filename = "videofile.mpeg";
+    const char *filename = "inputVid.avi";
     g_object_set(G_OBJECT(source_), "location", filename, NULL);
     assert(gst_element_link(source_, decoder_));
     g_signal_connect(decoder_, "new-decoded-pad", G_CALLBACK(VideoFileSource::cb_new_src_pad), (void *)this);

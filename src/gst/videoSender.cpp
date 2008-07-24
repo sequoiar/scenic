@@ -88,9 +88,18 @@ void VideoSender::init_sink()
     else                        // local test only, no encoding
     {
         sink_ = gst_element_factory_make("xvimagesink", NULL);
-        g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+        //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
         pipeline_.add(sink_);
         source_->link_element(sink_);
     }
+}
+
+
+
+bool VideoSender::start()
+{
+    MediaBase::start();
+    pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
+    return true;
 }
 
