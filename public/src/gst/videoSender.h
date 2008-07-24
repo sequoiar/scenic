@@ -34,6 +34,7 @@ class VideoSender : public MediaBase
 {
 public:
     VideoSender(const VideoConfig & config);
+    bool start();
     virtual ~VideoSender();
 
 private:

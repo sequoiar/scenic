@@ -346,6 +346,138 @@ void VideoTestSuite::start_stop_dv_rtp()
     }
 }
 
+
+
+void VideoTestSuite::start_file()
+{
+    if (id_ == 1)
+        return;
+
+    VideoConfig config("filesrc");
+    VideoSender tx(config);
+    tx.init();
+
+    TEST_ASSERT(tx.start());
+
+    BLOCK();
+    TEST_ASSERT(tx.isPlaying());
+}
+
+void VideoTestSuite::stop_file()
+{
+    if (id_ == 1)
+        return;
+
+    VideoConfig config("filesrc");
+    VideoSender tx(config);
+    tx.init();
+
+    BLOCK();
+
+    TEST_ASSERT(tx.stop());
+    TEST_ASSERT(!tx.isPlaying());
+}
+
+void VideoTestSuite::start_stop_file()
+{
+    if (id_ == 1)
+        return;
+
+    VideoConfig config("filesrc");
+    VideoSender tx(config);
+    tx.init();
+
+    TEST_ASSERT(tx.start());
+
+    BLOCK();
+    TEST_ASSERT(tx.isPlaying());
+
+    TEST_ASSERT(tx.stop());
+    TEST_ASSERT(!tx.isPlaying());
+}
+
+void VideoTestSuite::start_file_rtp()
+{
+    // receiver should be started first, of course there's no guarantee that it will at this point
+    if (id_ == 0) {
+        VideoConfig config("h264", V_PORT);
+        VideoReceiver rx(config);
+        rx.init();
+
+        TEST_ASSERT(rx.start());
+
+        BLOCK();
+        TEST_ASSERT(rx.isPlaying());
+    }
+    else
+    {
+        VideoConfig config("filesrc", "h264", MY_ADDRESS, V_PORT);
+        VideoSender tx(config);
+        tx.init();
+
+        TEST_ASSERT(tx.start());
+
+        BLOCK();
+        TEST_ASSERT(tx.isPlaying());
+    }
+}
+
+void VideoTestSuite::stop_file_rtp()
+{
+    if (id_ == 0) {
+        VideoConfig config("h264", V_PORT);
+        VideoReceiver rx(config);
+        rx.init();
+
+        BLOCK();
+
+        TEST_ASSERT(rx.stop());
+        TEST_ASSERT(!rx.isPlaying());
+    }
+    else
+    {
+        VideoConfig config("filesrc", "h264", MY_ADDRESS, V_PORT);
+        VideoSender tx(config);
+        tx.init();
+
+        BLOCK();
+
+        TEST_ASSERT(tx.stop());
+        TEST_ASSERT(!tx.isPlaying());
+    }
+}
+
+void VideoTestSuite::start_stop_file_rtp()
+{
+    if (id_ == 0) {
+        VideoConfig config("h264", V_PORT);
+        VideoReceiver rx(config);
+        rx.init();
+
+        TEST_ASSERT(rx.start());
+
+        BLOCK();
+        TEST_ASSERT(rx.isPlaying());
+
+        TEST_ASSERT(rx.stop());
+        TEST_ASSERT(!rx.isPlaying());
+    }
+    else
+    {
+        VideoConfig config("filesrc", "h264", MY_ADDRESS, V_PORT);
+        VideoSender tx(config);
+        tx.init();
+
+        TEST_ASSERT(tx.start());
+
+        BLOCK();
+        TEST_ASSERT(tx.isPlaying());
+
+        TEST_ASSERT(tx.stop());
+        TEST_ASSERT(!tx.isPlaying());
+    }
+}
+
 int main(int argc, char **argv)
 {
     if (argc != 2) {

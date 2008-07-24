@@ -24,7 +24,7 @@
 #include <cpptest.h>
 #include "gstTestSuite.h"
 
-#define LOCAL 1
+#define LOCAL 0
 #define RTP 0
 
 class VideoTestSuite : public GstTestSuite
@@ -52,7 +52,13 @@ public:
         TEST_ADD(VideoTestSuite::start_v4l_rtp)
         TEST_ADD(VideoTestSuite::stop_v4l_rtp)
         TEST_ADD(VideoTestSuite::start_stop_v4l_rtp)
+        TEST_ADD(VideoTestSuite::start_file_rtp)
+        TEST_ADD(VideoTestSuite::stop_file_rtp)
+        TEST_ADD(VideoTestSuite::start_stop_file_rtp)
 #endif // RTP
+        TEST_ADD(VideoTestSuite::start_file)
+        TEST_ADD(VideoTestSuite::stop_file)
+        TEST_ADD(VideoTestSuite::start_stop_file)
         
         /*----------------------------------------------*/
         /*      SANDBOX                                 */
@@ -88,6 +94,14 @@ private:
     void start_dv_rtp();
     void stop_dv_rtp();
     void start_stop_dv_rtp();
+
+    void start_file();
+    void stop_file();
+    void start_stop_file();
+    
+    void start_file_rtp();
+    void stop_file_rtp();
+    void start_stop_file_rtp();
 };
 
 #endif // _VIDEO_TEST_SUITE_H_
