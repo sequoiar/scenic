@@ -25,7 +25,7 @@
 #include "gstTestSuite.h"
 
 #define LOCAL 0
-#define RTP 0
+#define RTP 1
 
 class VideoTestSuite : public GstTestSuite
 {
@@ -44,6 +44,9 @@ public:
         TEST_ADD(VideoTestSuite::start_v4l)
         TEST_ADD(VideoTestSuite::stop_v4l)
         TEST_ADD(VideoTestSuite::start_stop_v4l)
+        TEST_ADD(VideoTestSuite::start_file)
+        TEST_ADD(VideoTestSuite::stop_file)
+        TEST_ADD(VideoTestSuite::start_stop_file)
 #endif // LOCAL
 #if RTP 
         TEST_ADD(VideoTestSuite::start_dv_rtp)
@@ -56,9 +59,6 @@ public:
         TEST_ADD(VideoTestSuite::stop_file_rtp)
         TEST_ADD(VideoTestSuite::start_stop_file_rtp)
 #endif // RTP
-        TEST_ADD(VideoTestSuite::start_file)
-        TEST_ADD(VideoTestSuite::stop_file)
-        TEST_ADD(VideoTestSuite::start_stop_file)
         
         /*----------------------------------------------*/
         /*      SANDBOX                                 */
