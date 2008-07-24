@@ -41,8 +41,6 @@ public:
     
     VideoSource* createSource() const;
 
-    const bool has_dv() const;
-    const bool has_videotestsrc() const;
     const bool has_h264() const;
 };
 
