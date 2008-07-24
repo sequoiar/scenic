@@ -41,7 +41,7 @@ class OscMessage
 {
 public:
     OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d);
-    OscMessage(){}
+    OscMessage():path(),types(),args(),argc(0),data(0){}
     std::string path, types;
     OscArgs args;
     int argc;
