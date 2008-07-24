@@ -69,7 +69,8 @@ void VideoSender::init_codec()
         assert(encoder_);
         g_object_set(G_OBJECT(encoder_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4, NULL);
         pipeline_.add(encoder_);
-        assert(gst_element_link_many(source_->output(), colorspc_, encoder_, NULL));
+        source_->link_element(colorspc_);
+        assert(gst_element_link(colorspc_, encoder_));
     }
 }
 
@@ -89,7 +90,7 @@ void VideoSender::init_sink()
         sink_ = gst_element_factory_make("xvimagesink", NULL);
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
         pipeline_.add(sink_);
-        assert(gst_element_link(source_->output(), sink_));
+        source_->link_element(sink_);
     }
 }
 

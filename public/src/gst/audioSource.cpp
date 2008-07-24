@@ -129,7 +129,7 @@ AudioTestSource::~AudioTestSource()
 }
 
 
-// FIXME: detect which decoder to use based on file 
+
 void AudioFileSource::sub_init()
 {
     GstIter src, aconv, dec;
@@ -170,7 +170,7 @@ void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
         return;
     }
   
-    GstElement *sinkElement = (GstElement *) data;
+    GstElement *sinkElement = static_cast<GstElement*>(data);
     GstStructure *str;
     GstPad *sinkPad;
     GstCaps *caps;
