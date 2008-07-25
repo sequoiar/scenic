@@ -98,7 +98,7 @@ class AudioJackSource : public AudioSource
 };
 
 template <typename T>
-class AudioDelaySource : public T//, virtual public AudioSource
+class AudioDelaySource : public T
 {
     public:
         void sub_init();
