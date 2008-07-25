@@ -1,5 +1,5 @@
 
-// audioSource.h
+// audioDelaySource.h
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -18,8 +18,8 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _AUDIO_SOURCE_H_
-#define _AUDIO_SOURCE_H_
+#ifndef _AUDIO_DELAY_SOURCE_H_
+#define _AUDIO_DELAY_SOURCE_H_
 
 #include <cassert>
 #include "gstBase.h"
