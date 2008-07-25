@@ -78,7 +78,8 @@ class AudioFileSource : public AudioSource
     protected:
         void sub_init();
         void link_elements();
-        void link_interleave(){};    // FIXME: AudioFileSource shouldn't even have an interleave, unless we support the option of
+        void link_interleave(){};    // FIXME: AudioFileSource shouldn't even have an 
+									 // interleave, unless we support the option of
         void init_source();          // multiple mono files combined into one stream
         std::vector<GstElement*> decoders_;
 };
@@ -100,6 +101,7 @@ class AudioJackSource : public AudioSource
 template <typename T>
 class AudioDelaySource : public T
 {
+	typedef typename GstBase::GstIter GstIter;
     public:
         void sub_init();
         void link_elements();
@@ -111,10 +113,10 @@ class AudioDelaySource : public T
         std::vector<GstElement *> filters_;
 };
 
-    template <typename T>
+template <typename T>
 void AudioDelaySource<T>::sub_init()
 {
-    std::vector<GstElement*>::iterator iter;
+    GstIter iter;
     T::sub_init();
 
     for (int channelIdx = 0; channelIdx < T::config_.numChannels(); channelIdx++)
@@ -129,33 +131,32 @@ void AudioDelaySource<T>::sub_init()
         g_object_set(G_OBJECT(*iter), "Delay", 0.5, NULL);
 }
 
-    template <typename T>
+template <typename T>
 void AudioDelaySource<T>::link_elements()
 {
     T::link_elements(); // link elements that precede the filters
-
-    // FIXME: why can't I use GstIter typedef?
-    std::vector<GstElement*>::iterator aconv, filter;
+    
+	GstIter aconv, filter;
 
     for (aconv = T::aconvs_.begin(), filter = filters_.begin(); 
             aconv != T::aconvs_.end(), filter != filters_.end(); ++aconv, ++filter)
         gst_element_link(*aconv, *filter);
 }
 
-    template <typename T>
+template <typename T>
 void AudioDelaySource<T>::link_interleave()
 {
-    std::vector<GstElement*>::iterator filter;
+    GstIter filter;
     for (filter = filters_.begin(); filter != filters_.end(); ++filter)
         T::interleave_.link_input(*filter);
 }
 
-    template <typename T>
+template <typename T>
 gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time, GstClockID id)
 {
     static double d_secs = 5;
 
-    for (std::vector<GstElement*>::iterator iter = filters_.begin(); iter != filters_.end(); ++iter)
+    for (GstIter iter = filters_.begin(); iter != filters_.end(); ++iter)
         g_object_set(G_OBJECT(*iter), "Delay", d_secs, NULL);
 
     d_secs = d_secs - 0.5;
@@ -165,7 +166,7 @@ gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time, GstCl
     return T::callback();
 }
 
-    template <typename T>
+template <typename T>
 AudioDelaySource<T>::~AudioDelaySource<T>()
 {
     assert(T::pipeline_.stop());
