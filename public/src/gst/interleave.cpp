@@ -71,14 +71,14 @@ void Interleave::init()
 
 
 
-void Interleave::linkOutput(GstElement* element)
+void Interleave::link_output(GstElement* element)
 {
     assert(gst_element_link(interleave_, element));
 }
 
 
 
-void Interleave::linkInput(GstElement *element)
+void Interleave::link_input(GstElement *element)
 {
     assert(gst_element_link(element, interleave_));
 }

@@ -36,6 +36,16 @@ AudioSource::AudioSource(const AudioConfig &config) :
 
 void AudioSource::init()
 {
+    init_source();
+    sub_init();
+    link_elements();
+    link_interleave();
+}
+
+
+
+void AudioSource::init_source()
+{
     interleave_.init();
 
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
@@ -48,10 +58,6 @@ void AudioSource::init()
 
     pipeline_.add_vector(sources_);
     pipeline_.add_vector(aconvs_);
-
-    sub_init();
-    link_elements();
-    link_interleave();
 }
 
 
@@ -79,7 +85,14 @@ void AudioSource::link_interleave()
 {
     GstIter aconv;
     for (aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
-        interleave_.linkInput(*aconv);
+        interleave_.link_input(*aconv);
+}
+
+
+
+void AudioSource::link_output(GstElement *sink)
+{
+    interleave_.link_output(sink);
 }
 
 
@@ -140,19 +153,10 @@ AudioTestSource::~AudioTestSource()
 
 
 
-void AudioFileSource::sub_init()
+void AudioFileSource::init_source()
 {
-    GstIter src, aconv, dec;
-
-    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
-    {
-        decoders_.push_back(gst_element_factory_make("decodebin", NULL));
-        assert(decoders_[channelIdx]);
-    }
-
-    pipeline_.add_vector(decoders_);
-
     // FIXME: location should be changeable at a higher level
+#if 0
     int counter = 1;
     for (src = sources_.begin(); src != sources_.end(); ++src)
     {
@@ -160,6 +164,29 @@ void AudioFileSource::sub_init()
         sprintf(filename, "audiofile%d.wav", counter++);
         g_object_set(G_OBJECT(*src), "location", filename, NULL);
     }
+#endif
+    // just make one multichannel filesrc
+    sources_.push_back(gst_element_factory_make(config_.source(), NULL));
+    assert(sources_[0]);
+    g_object_set(G_OBJECT(sources_[0]), "location", "test_signal8.wav", NULL);
+
+    aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
+    assert(aconvs_[0]);
+
+    pipeline_.add_vector(sources_);
+    pipeline_.add_vector(aconvs_);
+}
+
+
+
+void AudioFileSource::sub_init()
+{
+    GstIter aconv, dec;
+
+    decoders_.push_back(gst_element_factory_make("decodebin", NULL));
+    assert(decoders_[0]);
+
+    pipeline_.add_vector(decoders_);
 
     for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
         g_signal_connect(*dec, "new-decoded-pad", G_CALLBACK(AudioFileSource::cb_new_src_pad), (void *) *aconv);
@@ -214,6 +241,13 @@ void AudioFileSource::link_elements()
     // link source to decoders
     for (src = sources_.begin(), dec = decoders_.begin(); src != sources_.end(), dec != decoders_.end(); ++src, ++dec)
         assert(gst_element_link(*src, *dec));
+}
+
+
+
+void AudioFileSource::link_output(GstElement *sink)
+{
+    assert(gst_element_link(aconvs_[0], sink));
 }
 
 

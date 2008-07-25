@@ -31,8 +31,8 @@ class Interleave : public GstBase
         Interleave(const AudioConfig &config);
         ~Interleave();
         void init();
-        void linkInput(GstElement *element);
-        void linkOutput(GstElement *element);
+        void link_input(GstElement *element);
+        void link_output(GstElement *element);
     private:
         GstElement *interleave_;
         const AudioConfig &config_;
