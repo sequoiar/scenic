@@ -35,7 +35,7 @@ class VideoReceiver : public MediaBase
 
     private:
         void set_caps(const char* capsStr);
-        void stop_sender();
+        void stop_sender() const;
         virtual void init_source(){};
         virtual void init_codec();
         virtual void init_sink();

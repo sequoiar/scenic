@@ -33,8 +33,7 @@ VideoSender::VideoSender(const VideoConfig & config) :
     config_(config), 
     session_(), 
     source_(0), colorspc_(0), 
-    encoder_(0), payloader_(0), sink_(0),
-    stopped_(false)
+    encoder_(0), payloader_(0), sink_(0)
 {
     // empty
 }
@@ -43,7 +42,8 @@ VideoSender::VideoSender(const VideoConfig & config) :
 
 VideoSender::~VideoSender()
 {
-    assert(stop());
+    if (isPlaying())
+        assert(stop());
     pipeline_.remove(sink_);
     pipeline_.remove(payloader_);
     pipeline_.remove(encoder_);
@@ -102,9 +102,9 @@ void VideoSender::init_sink()
 bool VideoSender::start()
 {
     MediaBase::start();
-
-    //pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
-    wait_for_stop();
+    pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
+    //if (config_.isNetworked())
+     //   wait_for_stop();
     return true;
 }
 
@@ -114,14 +114,14 @@ void VideoSender::wait_for_stop()
 {
     LOG("Waiting for stop message...");
 
-    lo_server_thread st = lo_server_thread_new("7771", liblo_error);
+    lo_server_thread st = lo_server_thread_new("8880", liblo_error);
 
     lo_server_thread_add_method(st, "/video/tx/stop", "", stop_handler, (void *) this);
 
     lo_server_thread_start(st);
 
-    while (!stopped_)
-        usleep(1000);
+    while (isPlaying())
+        usleep(10000);
 
     lo_server_thread_free(st);
 }
@@ -139,11 +139,9 @@ void VideoSender::liblo_error(int num, const char *msg, const char *path)
 int VideoSender::stop_handler(const char *path, const char *types, lo_arg ** argv, int argc,
         void *data, void *user_data)
 {
+    LOG("STOPPPINNNNNGGGGGGG");
     VideoSender *context = static_cast<VideoSender*>(user_data);
     context->stop();
-
-    LOG("STOPPPINNNNNGGGGGGG");
-    context->stopped_ = true;
 
     return 0;
 }

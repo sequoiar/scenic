@@ -42,7 +42,8 @@ AudioSender::AudioSender(const AudioConfig & config) :
 
 AudioSender::~AudioSender()
 {
-    assert(stop());
+    if (isPlaying())
+        assert(stop());
 
     pipeline_.remove(sink_);
     pipeline_.remove(payloader_);

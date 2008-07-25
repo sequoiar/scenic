@@ -41,7 +41,8 @@ RtpReceiver::RtpReceiver() : rtp_receiver_(0), depayloader_(0)
 
 RtpReceiver::~RtpReceiver()
 {
-    assert(pipeline_.stop());
+    if (isPlaying())
+        assert(pipeline_.stop());
     pipeline_.remove(rtp_receiver_);
     
     std::list<GstElement *>::iterator iter;

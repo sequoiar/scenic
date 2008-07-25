@@ -55,7 +55,6 @@ class VideoSender : public MediaBase
         RtpSender session_;
         VideoSource *source_;
         GstElement *colorspc_, *encoder_, *payloader_, *sink_;
-        bool stopped_;
 
         // hidden
 
