@@ -25,7 +25,7 @@
 #include "gstTestSuite.h"
 
 #define LOCAL 1
-#define RTP 0
+#define RTP 1
 
 class AudioTestSuite : public GstTestSuite
 {
@@ -55,9 +55,6 @@ public:
         TEST_ADD(AudioTestSuite::start_8ch_jack)
         TEST_ADD(AudioTestSuite::stop_8ch_jack)
         TEST_ADD(AudioTestSuite::start_stop_8ch_jack)
-        TEST_ADD(AudioTestSuite::start_8ch_comp_rtp_audiofile)
-        TEST_ADD(AudioTestSuite::stop_8ch_comp_rtp_audiofile)
-        TEST_ADD(AudioTestSuite::start_stop_8ch_comp_rtp_audiofile)
 #endif                          //  LOCAL
 #if RTP 
         TEST_ADD(AudioTestSuite::start_2ch_comp_rtp_audiotest)
@@ -66,6 +63,9 @@ public:
         TEST_ADD(AudioTestSuite::start_8ch_comp_rtp_audiotest)
         TEST_ADD(AudioTestSuite::stop_8ch_comp_rtp_audiotest)
         TEST_ADD(AudioTestSuite::start_stop_8ch_comp_rtp_audiotest)
+        TEST_ADD(AudioTestSuite::start_8ch_comp_rtp_audiofile)
+        TEST_ADD(AudioTestSuite::stop_8ch_comp_rtp_audiofile)
+        TEST_ADD(AudioTestSuite::start_stop_8ch_comp_rtp_audiofile)
 
 #endif                          // RTP
         /*----------------------------------------------*/

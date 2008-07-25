@@ -79,7 +79,7 @@ void AudioSender::init_sink()
         assert(payloader_);
         pipeline_.add(payloader_);
 
-        source_->interleave_.linkOutput(encoder_);
+        source_->link_output(encoder_);
         assert(gst_element_link(encoder_, payloader_));
 
         session_.add(payloader_, &config_);
@@ -89,11 +89,11 @@ void AudioSender::init_sink()
         assert(jack_is_running());
         sink_ = gst_element_factory_make("jackaudiosink", NULL);
         assert(sink_);
-        g_object_set(G_OBJECT(sink_), "connect", 1, NULL); // turn off autoconnect
+        g_object_set(G_OBJECT(sink_), "connect", 1, NULL); // turn on autoconnect
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL); // important for latency
         pipeline_.add(sink_);
 
-        source_->interleave_.linkOutput(sink_);
+        source_->link_output(sink_);
     }
 }
 

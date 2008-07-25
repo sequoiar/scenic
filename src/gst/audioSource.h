@@ -31,9 +31,11 @@ class AudioSource : public GstBase
     public:
         virtual ~AudioSource();
         void init();
-        virtual void sub_init() = 0;
+        virtual void link_output(GstElement *sink);
     protected:
         AudioSource(const AudioConfig &config);
+        virtual void init_source();
+        virtual void sub_init() = 0;
         virtual void link_elements();
         virtual void link_interleave();
 
@@ -70,11 +72,14 @@ class AudioFileSource : public AudioSource
     public:
         AudioFileSource(const AudioConfig &config) : AudioSource(config), decoders_() {}
         ~AudioFileSource();
-        void sub_init();
-        void link_elements();
+        void link_output(GstElement *sink);
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last, void *data);
 
-    private:
+    protected:
+        void sub_init();
+        void link_elements();
+        void link_interleave(){};    // FIXME: AudioFileSource shouldn't even have an interleave, unless we support the option of
+        void init_source();          // multiple mono files combined into one stream
         std::vector<GstElement*> decoders_;
 };
 
@@ -142,7 +147,7 @@ void AudioDelaySource<T>::link_interleave()
 {
     std::vector<GstElement*>::iterator filter;
     for (filter = filters_.begin(); filter != filters_.end(); ++filter)
-        T::interleave_.linkInput(*filter);
+        T::interleave_.link_input(*filter);
 }
 
     template <typename T>
