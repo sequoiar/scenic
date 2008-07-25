@@ -23,13 +23,14 @@
 
 #include "pipeline.h"
 
+
 class GstBase
 {
     public:
         bool isPlaying();
 
     protected:
-        typedef std::vector < GstElement * >::iterator GstIter;
+		typedef std::vector < GstElement * >::iterator GstIter;
 
         GstBase();
         virtual ~GstBase();
