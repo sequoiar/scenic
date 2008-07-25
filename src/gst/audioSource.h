@@ -57,6 +57,7 @@ class AudioTestSource : public AudioSource
         virtual gboolean callback();
 
     private:
+        void toggle_frequency();
         GstClockID clockId_;
         int offset_;
 

@@ -29,6 +29,8 @@
 #include "videoConfig.h"
 #include "videoSource.h"
 
+
+
 // for sender (remote)
 VideoConfig::VideoConfig(const std::string &source, const std::string &codec,
                          const std::string &remoteHost, int port)
@@ -37,11 +39,15 @@ VideoConfig::VideoConfig(const std::string &source, const std::string &codec,
     // empty
 }
 
+
+
 // for sender (local)
 VideoConfig::VideoConfig(const std::string &source) : MediaConfig(source)
 {
     // empty
 }
+
+
 
 // for receiver
 VideoConfig::VideoConfig(const std::string &codec, int port) : MediaConfig(codec, port)
@@ -49,10 +55,14 @@ VideoConfig::VideoConfig(const std::string &codec, int port) : MediaConfig(codec
     // empty
 }
 
+
+
 const bool VideoConfig::has_h264() const
 {
     return (codec_ == "h264");
 }
+
+
 
 VideoSource * VideoConfig::createSource() const
 {
@@ -70,3 +80,4 @@ VideoSource * VideoConfig::createSource() const
         return 0;
     }
 }
+

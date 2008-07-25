@@ -31,9 +31,13 @@
 std::list<GstElement *> RtpReceiver::depayloaders_;
 
 
+
 RtpReceiver::RtpReceiver() : rtp_receiver_(0), depayloader_(0)
 {
+    // empty
 }
+
+
 
 RtpReceiver::~RtpReceiver()
 {
@@ -49,6 +53,8 @@ RtpReceiver::~RtpReceiver()
     depayloaders_.erase(iter);
 }
 
+
+
 void RtpReceiver::set_caps(const char *capsStr)
 {
     GstCaps *caps;
@@ -57,6 +63,8 @@ void RtpReceiver::set_caps(const char *capsStr)
     g_object_set(G_OBJECT(rtp_receiver_), "caps", caps, NULL);
     gst_caps_unref(caps);
 }
+
+
 
 void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
 {
@@ -87,10 +95,10 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
 
     //std::list<GstElement *> * depayloaders = static_cast<std::list<GstElement *> *>(data);
     //std::cout << "You have " << depayloaders_.size() << " depayloaders stored. " << std::endl;
-    
+
     std::list<GstElement *>::iterator iter;
     //for (iter = depayloaders_.begin(); iter != depayloaders_.end(); ++iter)
-     //   std::cout << "Depayloader: " << gst_element_get_name(*iter) << std::endl;
+    //   std::cout << "Depayloader: " << gst_element_get_name(*iter) << std::endl;
 
     GstPad *sinkPad;
 
@@ -117,49 +125,12 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
         return;
     }
 
-    switch(gst_pad_link(srcPad, sinkPad))
-    {
-        case GST_PAD_LINK_OK:
-            LOG("link succeeded");
-            break;
-
-        case GST_PAD_LINK_WRONG_HIERARCHY:
-            LOG("pads have no common grandparent");
-            assert(0);
-            break;
-
-        case GST_PAD_LINK_WAS_LINKED:
-            LOG("pad was already linked");
-            assert(0);
-            break;
-
-        case GST_PAD_LINK_WRONG_DIRECTION:
-            LOG("pads have wrong direction");
-            assert(0);
-            break;
-
-        case GST_PAD_LINK_NOFORMAT:
-            LOG("pads do not have common format");
-            assert(0);
-            break;
-
-        case GST_PAD_LINK_NOSCHED:
-            LOG("pads cannot cooperate in scheduling");
-            assert(0);
-            break;
-
-        case GST_PAD_LINK_REFUSED:
-            LOG("refused for some reason");
-            assert(0);
-            break;
-
-        default:
-            assert(0);
-            break;
-    }
+    assert(link_pads(srcPad, sinkPad));
 
     gst_object_unref(sinkPad);
 }
+
+
 
 void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * config)
 {

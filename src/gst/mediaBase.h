@@ -25,19 +25,20 @@
 
 class MediaBase : public GstBase
 {
-public:
-    virtual bool start();
-    virtual bool stop();
+    public:
+        virtual bool start();
+        virtual bool stop();
 
-    virtual bool init();
+        virtual bool init();
 
-protected:
+    protected:
 
-    MediaBase(){};
-    virtual ~MediaBase();
-    virtual void init_source() = 0;
-    virtual void init_codec() = 0;
-    virtual void init_sink() = 0;
+        MediaBase(){};
+        virtual ~MediaBase();
+        virtual void init_source() = 0;
+        virtual void init_codec() = 0;
+        virtual void init_sink() = 0;
 };
 
 #endif // _MEDIA_BASE_H_
+

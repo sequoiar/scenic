@@ -29,18 +29,18 @@ class MediaConfig;
 
 class RtpSender : public RtpSession
 {
-public:
-    RtpSender();
-    const char *caps_str() const;
-    virtual ~RtpSender();
+    public:
+        RtpSender();
+        const char *caps_str() const;
+        virtual ~RtpSender();
 
-protected:
-    virtual void addDerived(GstElement * src, const MediaConfig * config);
+    protected:
+        virtual void addDerived(GstElement * src, const MediaConfig * config);
 
-private:
-    GstElement *rtp_sender_;    
-    RtpSender(const RtpSender&); //No Copy Constructor
-    RtpSender& operator=(const RtpSender&); //No Assignment Operator
+    private:
+        GstElement *rtp_sender_;    
+        RtpSender(const RtpSender&); //No Copy Constructor
+        RtpSender& operator=(const RtpSender&); //No Assignment Operator
 };
 
 #endif // _RTP_SENDER_H_

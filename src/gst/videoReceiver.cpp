@@ -34,6 +34,8 @@ VideoReceiver::VideoReceiver(const VideoConfig & config) :
     // empty
 }
 
+
+
 VideoReceiver::~VideoReceiver()
 {
     assert(stop());
@@ -44,9 +46,6 @@ VideoReceiver::~VideoReceiver()
 }
 
 
-void VideoReceiver::init_source()
-{
-}
 
 void VideoReceiver::init_codec()
 {
@@ -66,6 +65,8 @@ void VideoReceiver::init_codec()
     session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264");
 }
 
+
+
 void VideoReceiver::init_sink()
 {
     sink_ = gst_element_factory_make("xvimagesink", NULL);
@@ -76,12 +77,16 @@ void VideoReceiver::init_sink()
     assert(gst_element_link(decoder_, sink_));
 }
 
+
+
 bool VideoReceiver::start()
 {
     std::cout << "Receiving video on port " << config_.port() << std::endl;
     MediaBase::start();
     return true;
 }
+
+
 
 bool VideoReceiver::stop()
 {
@@ -90,6 +95,8 @@ bool VideoReceiver::stop()
     stop_sender();
     return true;
 }
+
+
 
 void VideoReceiver::stop_sender()
 {

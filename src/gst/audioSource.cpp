@@ -25,12 +25,15 @@
 #include "audioConfig.h"
 #include "jackUtils.h"
 
-AudioSource::AudioSource(const AudioConfig &config) : config_(config), interleave_(config),
-                                                      sources_(0), aconvs_(0)
+AudioSource::AudioSource(const AudioConfig &config) : 
+    config_(config), 
+    interleave_(config),
+    sources_(0), aconvs_(0)
 {
 }
 
-// parts of sub_init that are common to all AudioSource classes
+
+
 void AudioSource::init()
 {
     interleave_.init();
@@ -61,6 +64,7 @@ AudioSource::~AudioSource()
 }
 
 
+
 void AudioSource::link_elements()
 {
     GstIter src, aconv;
@@ -68,6 +72,8 @@ void AudioSource::link_elements()
     for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(), aconv != aconvs_.end(); ++src, ++aconv)
         gst_element_link(*src, *aconv);
 }
+
+
 
 void AudioSource::link_interleave()
 {
@@ -78,16 +84,22 @@ void AudioSource::link_interleave()
 
 
 
-// defers to subclassses callback
 gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
 {
-    return  (static_cast<AudioSource*>(user_data)->callback());
+    return  (static_cast<AudioSource*>(user_data)->callback());     // deferred to subclass
 }
 
 
 
-// toggles the frequency
 gboolean AudioTestSource::callback()
+{
+    toggle_frequency();
+    return TRUE;
+}
+
+
+
+void AudioTestSource::toggle_frequency()
 {
     static const double FREQUENCY[2][8] = {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
                                     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
@@ -96,9 +108,7 @@ gboolean AudioTestSource::callback()
     for (std::vector<GstElement*>::iterator iter = sources_.begin(); iter != sources_.end(); ++iter)
         g_object_set(G_OBJECT(*iter), "freq", FREQUENCY[offset_][i++], NULL);
 
-    offset_ = (offset_ == 0) ? 1 : 0;     // toggle frequency
-
-    return TRUE;
+    offset_ = (offset_ == 0) ? 1 : 0;     
 }
 
 
@@ -169,7 +179,7 @@ void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
         LOG("Pad is not a source");
         return;
     }
-  
+
     GstElement *sinkElement = static_cast<GstElement*>(data);
     GstStructure *str;
     GstPad *sinkPad;
@@ -182,7 +192,7 @@ void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
         return;
     }
 
-      /* check media type */
+    /* check media type */
     caps = gst_pad_get_caps(srcPad);
     str = gst_caps_get_structure(caps, 0);
     if (!g_strrstr(gst_structure_get_name(str), "audio")) {
@@ -192,7 +202,7 @@ void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
     }
     gst_caps_unref(caps);
 
-    assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
+    assert(link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 
@@ -220,10 +230,9 @@ void AudioJackSource::sub_init()
 {
     assert(jack_is_running());
 
-    GstIter src, aconv;
-
     // turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
     // jackOut -> jackIn -> jackOut ->jackIn.....
-    for (src = sources_.begin(); src != sources_.end(); ++src)
+    for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
 }
+

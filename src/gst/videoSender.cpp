@@ -27,6 +27,8 @@
 #include "videoSource.h"
 #include "logWriter.h"
 
+
+
 VideoSender::VideoSender(const VideoConfig & config) :
     config_(config), 
     session_(), 
@@ -101,7 +103,7 @@ bool VideoSender::start()
 {
     MediaBase::start();
 
-    pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
+    //pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
     wait_for_stop();
     return true;
 }
@@ -124,11 +126,15 @@ void VideoSender::wait_for_stop()
     lo_server_thread_free(st);
 }
 
+
+
 void VideoSender::liblo_error(int num, const char *msg, const char *path)
 {
     printf("liblo server error %d in path %s: %s\n", num, path, msg);
     fflush(stdout);
 }
+
+
 
 int VideoSender::stop_handler(const char *path, const char *types, lo_arg ** argv, int argc,
         void *data, void *user_data)

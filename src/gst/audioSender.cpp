@@ -38,6 +38,8 @@ AudioSender::AudioSender(const AudioConfig & config) :
     // empty
 }
 
+
+
 AudioSender::~AudioSender()
 {
     assert(stop());
@@ -48,12 +50,16 @@ AudioSender::~AudioSender()
     delete source_;
 }
 
+
+
 void AudioSender::init_source()
 {
     source_ = config_.createSource();
     assert(source_);
     source_->init();
 }
+
+
 
 void AudioSender::init_codec()
 {
@@ -63,6 +69,8 @@ void AudioSender::init_codec()
         pipeline_.add(encoder_);
     }
 }
+
+
 
 void AudioSender::init_sink()
 {
@@ -89,16 +97,19 @@ void AudioSender::init_sink()
     }
 }
 
-// returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
+
 
 void AudioSender::send_caps() const
 {
+    // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
     LOG("Sending caps...");
 
     lo_address t = lo_address_new(NULL, "7770");
     if (lo_send(t, "/audio/rx/caps", "s", session_.caps_str()) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
 }
+
+
 
 bool AudioSender::start()
 {

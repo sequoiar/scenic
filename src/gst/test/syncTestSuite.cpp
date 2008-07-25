@@ -37,16 +37,17 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
     int aPort = vPort + 1000;
 
     if (id_ == 0) {
+        AudioConfig aConfig(numChannels, "vorbisdec", aPort);
+        AudioReceiver aRx(aConfig);
+        aRx.init();
+        
         VideoConfig vConfig("h264", vPort);
         VideoReceiver vRx(vConfig);
         vRx.init();
 
-        AudioConfig aConfig(numChannels, "vorbisdec", aPort);
-        AudioReceiver aRx(aConfig);
-        aRx.init();
 
-        TEST_ASSERT(vRx.start());
         TEST_ASSERT(aRx.start());
+        TEST_ASSERT(vRx.start());
 
         BLOCK();
         TEST_ASSERT(vRx.isPlaying());
@@ -55,20 +56,21 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
     }
     else
     {
+        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
+        AudioSender aTx(aConfig);
+        aTx.init();
+        
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
 
-        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
-        AudioSender aTx(aConfig);
-        aTx.init();
 
         TEST_ASSERT(aTx.start());
         TEST_ASSERT(vTx.start());
 
         BLOCK();
-        TEST_ASSERT(vTx.isPlaying());
         TEST_ASSERT(aTx.isPlaying());
+        TEST_ASSERT(vTx.isPlaying());
     }
 }
 
@@ -79,38 +81,40 @@ void SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv()
     int aPort = vPort + 1000;
 
     if (id_ == 0) {
+        AudioConfig aConfig(numChannels, "vorbisdec", aPort);
+        AudioReceiver aRx(aConfig);
+        aRx.init();
+        
         VideoConfig vConfig("h264", vPort);
         VideoReceiver vRx(vConfig);
         vRx.init();
 
-        AudioConfig aConfig(numChannels, "vorbisdec", aPort);
-        AudioReceiver aRx(aConfig);
-        aRx.init();
-
         BLOCK();
 
-        TEST_ASSERT(vRx.stop());
         TEST_ASSERT(aRx.stop());
+        TEST_ASSERT(vRx.stop());
 
-        TEST_ASSERT(!vRx.isPlaying());
         TEST_ASSERT(!aRx.isPlaying());
+        TEST_ASSERT(!vRx.isPlaying());
     }
     else
     {
+        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
+        AudioSender aTx(aConfig);
+        aTx.init();
+        
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
 
-        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
-        AudioSender aTx(aConfig);
-        aTx.init();
 
         BLOCK();
-        TEST_ASSERT(vTx.stop());
-        TEST_ASSERT(aTx.stop());
 
-        TEST_ASSERT(!vTx.isPlaying());
+        TEST_ASSERT(aTx.stop());
+        TEST_ASSERT(vTx.stop());
+
         TEST_ASSERT(!aTx.isPlaying());
+        TEST_ASSERT(!vTx.isPlaying());
     }
 }
 
@@ -121,51 +125,51 @@ void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
     int aPort = vPort + 1000;
 
     if (id_ == 0) {
-        VideoConfig vConfig("h264", vPort);
-        VideoReceiver vRx(vConfig);
-        vRx.init();
-
         AudioConfig aConfig(numChannels, "vorbisdec", aPort);
         AudioReceiver aRx(aConfig);
         aRx.init();
 
-        TEST_ASSERT(vRx.start());
+        VideoConfig vConfig("h264", vPort);
+        VideoReceiver vRx(vConfig);
+        vRx.init();
+
         TEST_ASSERT(aRx.start());
+        TEST_ASSERT(vRx.start());
 
         BLOCK();
 
-        TEST_ASSERT(vRx.isPlaying());
         TEST_ASSERT(aRx.isPlaying());
+        TEST_ASSERT(vRx.isPlaying());
 
-        TEST_ASSERT(vRx.stop());
         TEST_ASSERT(aRx.stop());
+        TEST_ASSERT(vRx.stop());
 
-        TEST_ASSERT(!vRx.isPlaying());
         TEST_ASSERT(!aRx.isPlaying());
+        TEST_ASSERT(!vRx.isPlaying());
     }
     else
     {
+        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
+        AudioSender aTx(aConfig);
+        aTx.init();
+        
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
 
-        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
-        AudioSender aTx(aConfig);
-        aTx.init();
-
-        TEST_ASSERT(vTx.start());
         TEST_ASSERT(aTx.start());
+        TEST_ASSERT(vTx.start());
 
         BLOCK();
 
-        TEST_ASSERT(vTx.isPlaying());
         TEST_ASSERT(aTx.isPlaying());
+        TEST_ASSERT(vTx.isPlaying());
 
-        TEST_ASSERT(vTx.stop());
         TEST_ASSERT(aTx.stop());
+        TEST_ASSERT(vTx.stop());
 
-        TEST_ASSERT(!vTx.isPlaying());
         TEST_ASSERT(!aTx.isPlaying());
+        TEST_ASSERT(!vTx.isPlaying());
     }
 }
 
@@ -173,53 +177,55 @@ void SyncTestSuite::sync()
 {
     if (id_ == 0)
     {
-        VideoConfig vConfig("h264", V_PORT);
-        VideoReceiver vRx(vConfig);
-        vRx.init();
-
         AudioConfig aConfig(NUM_CHANNELS, "vorbisdec", A_PORT);
         AudioReceiver aRx(aConfig);
         aRx.init();
 
-        TEST_ASSERT(vRx.start());
+        VideoConfig vConfig("h264", V_PORT);
+        VideoReceiver vRx(vConfig);
+        vRx.init();
+
         TEST_ASSERT(aRx.start());
+        TEST_ASSERT(vRx.start());
 
         BLOCK();
 
-        TEST_ASSERT(vRx.isPlaying());
         TEST_ASSERT(aRx.isPlaying());
+        TEST_ASSERT(vRx.isPlaying());
 
-        TEST_ASSERT(vRx.stop());
         TEST_ASSERT(aRx.stop());
+        TEST_ASSERT(vRx.stop());
 
-        TEST_ASSERT(!vRx.isPlaying());
         TEST_ASSERT(!aRx.isPlaying());
+        TEST_ASSERT(!vRx.isPlaying());
     }
     else
     {
-        VideoConfig vConfig("videotestsrc", "h264", MY_ADDRESS, V_PORT);
-        VideoSender vTx(vConfig);
-        vTx.init();
-
         AudioConfig aConfig("audiotestsrc", NUM_CHANNELS, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender aTx(aConfig);
         aTx.init();
 
-        TEST_ASSERT(vTx.start());
+        VideoConfig vConfig("videotestsrc", "h264", MY_ADDRESS, V_PORT);
+        VideoSender vTx(vConfig);
+        vTx.init();
+
         TEST_ASSERT(aTx.start());
+        TEST_ASSERT(vTx.start());
 
         BLOCK();
 
-        TEST_ASSERT(vTx.isPlaying());
         TEST_ASSERT(aTx.isPlaying());
+        TEST_ASSERT(vTx.isPlaying());
 
-        TEST_ASSERT(vTx.stop());
         TEST_ASSERT(aTx.stop());
+        TEST_ASSERT(vTx.stop());
 
-        TEST_ASSERT(!vTx.isPlaying());
         TEST_ASSERT(!aTx.isPlaying());
+        TEST_ASSERT(!vTx.isPlaying());
     }
 }
+
+
 
 int main(int argc, char **argv)
 {
