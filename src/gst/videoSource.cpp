@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <string>
+#include <string.h>
 #include <cassert>
 #include "videoSource.h"
 #include "videoConfig.h"
