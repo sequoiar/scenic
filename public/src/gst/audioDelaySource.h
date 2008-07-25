@@ -1,3 +1,4 @@
+
 // audioSource.h
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
@@ -22,86 +23,6 @@
 
 #include <cassert>
 #include "gstBase.h"
-#include "interleave.h"
-
-#include "audioDelaySource.h"
-
-class AudioConfig;
-
-class AudioSource : public GstBase
-{
-    public:
-        virtual ~AudioSource();
-        void init();
-        virtual void link_output(GstElement *sink);
-    protected:
-        AudioSource(const AudioConfig &config);
-        virtual void init_source();
-        virtual void sub_init() = 0;
-        virtual void link_elements();
-        virtual void link_interleave();
-
-        const AudioConfig &config_;
-        Interleave interleave_;
-        std::vector<GstElement *>sources_, aconvs_;
-        static gboolean base_callback(GstClock *clock, GstClockTime time, 
-										GstClockID id, gpointer user_data);
-        virtual gboolean callback() { return FALSE; }
-
-    private:
-        friend class AudioSender;
-};
-
-class AudioTestSource : public AudioSource
-{
-    public:
-        AudioTestSource(const AudioConfig &config) 
-			: AudioSource(config), clockId_(0), offset_(0) {}
-        ~AudioTestSource();
-        void sub_init();
-    protected:
-        virtual gboolean callback();
-
-    private:
-        void toggle_frequency();
-        GstClockID clockId_;
-        int offset_;
-
-        AudioTestSource(const AudioTestSource&); //No Copy Constructor
-        AudioTestSource& operator=(const AudioTestSource&); //No Assignment Operator
-};
-
-class AudioFileSource : public AudioSource
-{
-    public:
-        AudioFileSource(const AudioConfig &config) : AudioSource(config), decoders_() {}
-        ~AudioFileSource();
-        void link_output(GstElement *sink);
-        static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, 
-						gboolean last, void *data);
-
-    protected:
-        void sub_init();
-        void link_elements();
-        void link_interleave(){};    // FIXME: AudioFileSource shouldn't even have an 
-									 // interleave, unless we support the option of
-        void init_source();          // multiple mono files combined into one stream
-        std::vector<GstElement*> decoders_;
-};
-
-class AudioAlsaSource : public AudioSource
-{
-    public:
-        AudioAlsaSource(const AudioConfig &config) : AudioSource(config) {}
-        void sub_init(){};
-};
-
-class AudioJackSource : public AudioSource
-{
-    public:
-        AudioJackSource(const AudioConfig &config): AudioSource(config) {} 
-        void sub_init();
-};
 
 template <typename T>
 class AudioDelaySource : public T
