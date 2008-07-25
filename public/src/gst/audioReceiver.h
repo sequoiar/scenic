@@ -38,7 +38,7 @@ class AudioReceiver : public MediaBase
 
     private:
         AudioReceiver();
-        virtual void init_source();
+        virtual void init_source(){};
         virtual void init_codec();
         virtual void init_sink();
 

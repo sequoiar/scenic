@@ -35,11 +35,15 @@ AudioConfig::AudioConfig(const std::string &source, int numChannels, const std::
     // empty
 }
 
+
+
 AudioConfig::AudioConfig(const std::string & source, int numChannels) : MediaConfig(source),
     numChannels_(numChannels)
 {
     // empty
 }
+
+
 
 AudioConfig::AudioConfig(int numChannels, const std::string &codec, int port) : MediaConfig(codec, port),
     numChannels_(numChannels)
@@ -47,10 +51,13 @@ AudioConfig::AudioConfig(int numChannels, const std::string &codec, int port) : 
     // empty
 }
 
+
+
 const int AudioConfig::numChannels() const
 {
     return numChannels_;
 }
+
 
 // strips .delay from source name
 const char *AudioConfig::source() const
@@ -63,6 +70,7 @@ const char *AudioConfig::source() const
     else
         return MediaConfig::source();
 }
+
 
 
 AudioSource* AudioConfig::createSource() const

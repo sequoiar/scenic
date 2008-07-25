@@ -25,10 +25,12 @@
 #include "logWriter.h"
 
 
+
 VideoSource::VideoSource(const VideoConfig &config) : 
     config_(config), source_(0)
 {
 }
+
 
 // parts of sub_init that are common to all AudioSource classes
 void VideoSource::init()
@@ -62,21 +64,30 @@ gboolean VideoSource::base_callback(GstClock *clock, GstClockTime time, GstClock
     return (static_cast<VideoSource*>(user_data)->callback());
 }
 
+
 // toggle colour
 gboolean VideoTestSource::callback()
 {
     if (!source_)
         return FALSE;
 
+    toggle_colour();
+    return TRUE;
+}
+
+
+
+void VideoTestSource::toggle_colour()
+{
     const int BLACK = 2;    // gst-inspect property codes
     const int WHITE = 3;
     static int colour = BLACK;
 
     g_object_set(G_OBJECT(source_), "pattern", colour, NULL);
     colour = (colour == BLACK) ? WHITE : BLACK;     // toggle black and white
-
-    return TRUE;
 }
+
+
 
 void VideoTestSource::sub_init()
 {
@@ -130,11 +141,6 @@ void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
         LOG("Pad is already linked.")
             return;
     }
-    else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
-    {   
-        LOG("Pad is not a source");
-        return;
-    }
   
     VideoFileSource *context = static_cast<VideoFileSource*>(data);
     GstStructure *str;
@@ -159,7 +165,8 @@ void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
     }
     gst_caps_unref(caps);
 
-    assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
+    LOG("VideoFileSource: linking new srcpad and sinkpad.");
+    assert(link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 
@@ -222,10 +229,10 @@ void VideoDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, voi
 
     GstElement *sinkElement = (GstElement *) data;
     GstPad *sinkPad;
-    LOG("VideoDvSource: linking new srcpad and sinkpad.");
 
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
-    assert(gst_pad_link(srcPad, sinkPad) == GST_PAD_LINK_OK);
+    LOG("VideoDvSource: linking new srcpad and sinkpad.");
+    assert(link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 

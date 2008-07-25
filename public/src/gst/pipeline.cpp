@@ -29,6 +29,7 @@ Pipeline *Pipeline::instance_ = 0;
 
 Pipeline::Pipeline() : pipeline_(0), startTime_(0), verbose_(false)
 {
+    // empty
 }
 
 
@@ -70,7 +71,7 @@ void Pipeline::init()
 }
 
 
-// FIXME: check if this is safe, basically we're destroying and recreating the pipeline
+// FIXME: check if this is safe, we're destroying and recreating the pipeline
 void Pipeline::reset()
 {
     if (pipeline_)

@@ -45,3 +45,4 @@ public:
 };
 
 #endif // _VIDEO_CONFIG_H_
+

@@ -26,12 +26,15 @@ Interleave::Interleave(const AudioConfig &config) : interleave_(0), config_(conf
     // empty
 }
 
+
+
 Interleave::~Interleave()
 {
     pipeline_.remove(interleave_);
 }
 
-// set channel layout for interleave element
+
+
 void Interleave::set_channel_layout()
 {
     GValue val = { 0, };
@@ -54,6 +57,8 @@ void Interleave::set_channel_layout()
     g_value_array_free(arr);
 }
 
+
+
 void Interleave::init()
 {
     interleave_ = gst_element_factory_make("interleave", NULL);
@@ -64,18 +69,22 @@ void Interleave::init()
     set_channel_layout();
 }
 
+
+
 void Interleave::linkOutput(GstElement* element)
 {
     assert(gst_element_link(interleave_, element));
 }
+
+
 
 void Interleave::linkInput(GstElement *element)
 {
     assert(gst_element_link(element, interleave_));
 }
 
-// courtesy of vorbisenc.c
 
+// courtesy of vorbisenc.c
 const GstAudioChannelPosition Interleave::VORBIS_CHANNEL_POSITIONS[][8] = {
     {                           /* Mono */
         GST_AUDIO_CHANNEL_POSITION_FRONT_MONO

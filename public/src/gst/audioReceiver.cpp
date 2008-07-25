@@ -40,6 +40,8 @@ AudioReceiver::AudioReceiver(const AudioConfig & config) :
     // empty
 }
 
+
+
 AudioReceiver::~AudioReceiver()
 {
     assert(stop());
@@ -49,6 +51,10 @@ AudioReceiver::~AudioReceiver()
     pipeline_.remove(depayloader_);
 }
 
+
+
+// FIXME: waiting shouldn't happen here, have one msg waiting loop which takes advantage of 
+// path to dispatch messages appropriately
 void AudioReceiver::wait_for_caps()
 {
     LOG("Waiting for caps...");
@@ -59,17 +65,21 @@ void AudioReceiver::wait_for_caps()
 
     lo_server_thread_start(st);
 
-    while (!gotCaps_)
+    while (!gotCaps_)   
         usleep(1000);
 
     lo_server_thread_free(st);
 }
+
+
 
 void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
 {
     printf("liblo server error %d in path %s: %s\n", num, path, msg);
     fflush(stdout);
 }
+
+
 
 int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg ** argv, int argc,
         void *data, void *user_data)
@@ -82,9 +92,6 @@ int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg ** a
 }
 
 
-void AudioReceiver::init_source()
-{
-}
 
 void AudioReceiver::init_codec()
 {
@@ -104,6 +111,7 @@ void AudioReceiver::init_codec()
 }
 
 
+
 void AudioReceiver::init_sink()
 {
     assert(jack_is_running());
@@ -115,6 +123,7 @@ void AudioReceiver::init_sink()
 
     assert(gst_element_link(decoder_, sink_));
 }
+
 
 
 bool AudioReceiver::start()

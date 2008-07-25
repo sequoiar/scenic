@@ -35,12 +35,12 @@ public:
     MediaConfig(const std::string &codec, int port);   // receiver
     MediaConfig(const std::string &source);    // local sender
 
-    const char *source() const;
-    const char *codec() const;
-    const char *remoteHost() const;
-    const int port() const;
-    const bool isNetworked() const;
-    const bool hasCodec() const;
+    const char *source() const { return source_.c_str(); }
+    const char *codec() const { return codec_.c_str(); }
+    const char *remoteHost() const { return remoteHost_.c_str(); }
+    const int port() const { return port_; }
+    const bool isNetworked() const { return port_ != 0; }
+    const bool hasCodec() const { return !codec_.empty(); }
 
     virtual ~MediaConfig() {};
 protected:
@@ -51,3 +51,4 @@ protected:
 };
 
 #endif // _MEDIA_CONFIG_H_
+

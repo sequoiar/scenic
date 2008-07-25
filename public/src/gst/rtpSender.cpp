@@ -26,15 +26,20 @@
 #include "logWriter.h"
 
 
+
 RtpSender::RtpSender() : rtp_sender_(0)
 {
 }
+
+
 
 RtpSender::~RtpSender()
 {
     assert(pipeline_.stop());
     pipeline_.remove(rtp_sender_);
 }
+
+
 
 const char *RtpSender::caps_str() const
 {
@@ -57,6 +62,8 @@ const char *RtpSender::caps_str() const
     gst_caps_unref(caps);
     return result;
 }
+
+
 
 void RtpSender::addDerived(GstElement * newSrc, const MediaConfig * config)
 {

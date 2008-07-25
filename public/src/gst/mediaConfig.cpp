@@ -31,45 +31,19 @@ MediaConfig::MediaConfig(const std::string &codec, int port)   // receiver
     // empty
 }
 
+
+
 MediaConfig::MediaConfig(const std::string &source, const std::string &codec, const std::string &remoteHost, int port) :
     source_(source), codec_(codec), remoteHost_(remoteHost), port_(port)  // remote sender
 {
     // empty
 }
 
+
+
 MediaConfig::MediaConfig(const std::string &source)    // local sender
     : source_(source), codec_(""), remoteHost_(""), port_(0)  
 {
     // empty
-}
-
-const char *MediaConfig::source() const
-{
-    return source_.c_str();
-}
-
-const char *MediaConfig::codec() const
-{
-    return codec_.c_str();
-}
-
-const char *MediaConfig::remoteHost() const
-{
-    return remoteHost_.c_str();
-}
-
-const int MediaConfig::port() const
-{
-    return port_;
-}
-
-const bool MediaConfig::isNetworked() const
-{
-    return port_ != 0;
-}
-
-const bool MediaConfig::hasCodec() const
-{
-    return !codec_.empty();
 }
 

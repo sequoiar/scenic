@@ -52,7 +52,9 @@ class VideoTestSource : public VideoSource
         gboolean callback();
 
     private:
+        void toggle_colour();
         GstClockID clockId_;
+        // hidden
         VideoTestSource(const VideoTestSource&); //No Copy Constructor
         VideoTestSource& operator=(const VideoTestSource&); //No Assignment Operator
 };
