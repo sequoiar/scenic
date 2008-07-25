@@ -1,4 +1,4 @@
-
+#include <stdlib.h>
 #include "gstTestSuite.h"
 
 const int GstTestSuite::NUM_CHANNELS = 8;
