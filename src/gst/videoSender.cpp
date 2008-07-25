@@ -103,8 +103,8 @@ bool VideoSender::start()
 {
     MediaBase::start();
     pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
-    //if (config_.isNetworked())
-     //   wait_for_stop();
+    if (config_.isNetworked())
+        wait_for_stop();
     return true;
 }
 
