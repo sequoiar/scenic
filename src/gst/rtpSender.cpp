@@ -35,7 +35,8 @@ RtpSender::RtpSender() : rtp_sender_(0)
 
 RtpSender::~RtpSender()
 {
-    assert(pipeline_.stop());
+    if (isPlaying())
+        assert(pipeline_.stop());
     pipeline_.remove(rtp_sender_);
 }
 

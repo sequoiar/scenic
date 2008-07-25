@@ -38,8 +38,8 @@ VideoReceiver::VideoReceiver(const VideoConfig & config) :
 
 VideoReceiver::~VideoReceiver()
 {
-    assert(stop());
-
+    if (isPlaying())
+        assert(stop());
     pipeline_.remove(sink_);
     pipeline_.remove(decoder_);
     pipeline_.remove(depayloader_);
@@ -91,18 +91,18 @@ bool VideoReceiver::start()
 bool VideoReceiver::stop()
 {
     MediaBase::stop();
+    //stop_sender();
     // FIXME: ADD CODE tell sender to stop to avoid crash when going from DV to v4l
-    stop_sender();
     return true;
 }
 
 
 
-void VideoReceiver::stop_sender()
+void VideoReceiver::stop_sender() const
 {
     LOG("Telling sender to stop...");
 
-    lo_address t = lo_address_new(NULL, "7771");
+    lo_address t = lo_address_new(NULL, "8880");
     if (lo_send(t, "/video/tx/stop", NULL) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
 }

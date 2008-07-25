@@ -36,6 +36,9 @@ GstBase::GstBase() : pipeline_(Pipeline::Instance())
 
 GstBase::~GstBase()
 {
+    if (isPlaying())
+        assert(pipeline_.stop());
+
     --refCount_;
     if (refCount_ <= 0)
     {

@@ -50,8 +50,8 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(vRx.start());
 
         BLOCK();
-        TEST_ASSERT(vRx.isPlaying());
         TEST_ASSERT(aRx.isPlaying());
+        TEST_ASSERT(vRx.isPlaying());
 
     }
     else
@@ -63,7 +63,6 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
-
 
         TEST_ASSERT(aTx.start());
         TEST_ASSERT(vTx.start());

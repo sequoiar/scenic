@@ -64,7 +64,8 @@ void AudioSource::init_source()
 
 AudioSource::~AudioSource()
 {
-    assert(pipeline_.stop());
+    if (isPlaying())
+        assert(pipeline_.stop());
     pipeline_.remove_vector(aconvs_);
     pipeline_.remove_vector(sources_);
 }

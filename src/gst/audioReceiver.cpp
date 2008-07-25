@@ -44,8 +44,8 @@ AudioReceiver::AudioReceiver(const AudioConfig & config) :
 
 AudioReceiver::~AudioReceiver()
 {
-    assert(stop());
-
+    if (isPlaying())
+        assert(stop());
     pipeline_.remove(sink_);
     pipeline_.remove(decoder_);
     pipeline_.remove(depayloader_);
@@ -66,7 +66,7 @@ void AudioReceiver::wait_for_caps()
     lo_server_thread_start(st);
 
     while (!gotCaps_)   
-        usleep(1000);
+        usleep(10000);
 
     lo_server_thread_free(st);
 }

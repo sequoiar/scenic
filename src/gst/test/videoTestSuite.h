@@ -24,7 +24,7 @@
 #include <cpptest.h>
 #include "gstTestSuite.h"
 
-#define LOCAL 0
+#define LOCAL 1
 #define RTP 1
 
 class VideoTestSuite : public GstTestSuite

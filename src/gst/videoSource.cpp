@@ -54,7 +54,8 @@ void VideoSource::link_element(GstElement *sinkElement)
 
 VideoSource::~VideoSource()
 {
-    assert(pipeline_.stop());
+    if (isPlaying())
+        assert(pipeline_.stop());
     pipeline_.remove(source_);
 }
 
