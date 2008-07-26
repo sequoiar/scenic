@@ -25,27 +25,30 @@
 #include "videoConfig.h"
 #include "rtpReceiver.h"
 
-class VideoReceiver : public MediaBase
+class VideoReceiver
+    : public MediaBase
 {
-    public:
-        VideoReceiver(const VideoConfig & config);
-        virtual bool start();
-        virtual bool stop();
-        virtual ~VideoReceiver();
+public:
+    VideoReceiver(const VideoConfig & config);
+    virtual bool start();
+    virtual bool stop();
 
-    private:
-        void set_caps(const char* capsStr);
-        void stop_sender() const;
-        virtual void init_source(){};
-        virtual void init_codec();
-        virtual void init_sink();
+    virtual ~VideoReceiver();
 
-        const VideoConfig &config_;
-        RtpReceiver session_;
-        GstElement *depayloader_, *decoder_, *sink_;
+private:
+    void set_caps(const char* capsStr);
+    void stop_sender() const;
 
-        VideoReceiver(const VideoReceiver&); //No Copy Constructor
-        VideoReceiver& operator=(const VideoReceiver&); //No Assignment Operator
+    virtual void init_source(){};
+    virtual void init_codec();
+    virtual void init_sink();
+
+    const VideoConfig &config_;
+    RtpReceiver session_;
+    GstElement *depayloader_, *decoder_, *sink_;
+
+    VideoReceiver(const VideoReceiver&);     //No Copy Constructor
+    VideoReceiver& operator=(const VideoReceiver&);     //No Assignment Operator
 };
 
 #endif

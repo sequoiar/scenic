@@ -32,8 +32,6 @@
 #define __OPTION_ARGS_H__
 
 
-
-
 #include "config.h"
 #include <vector>
 #include <glib.h>
@@ -47,6 +45,7 @@ class OptionArgs
 public:
     void add(BaseModule::ArgList);
     void add(BaseArg*);
+
 //	void add(bool *,const char*,char, const char*);
 //	void add(int *,const char*,char, const char*,const char*);
 //	void add(char **,const char*,char,const char*,const char*);
@@ -55,13 +54,14 @@ public:
 
     GOptionEntry* pA;
     int parse(int argc,char **argv);
-    OptionArgs():options(),pA(0){}
+
+    OptionArgs()
+        : options(),pA(0){}
     ~OptionArgs();
 private:
     OptionArgs(const OptionArgs&); //No Copy Constructor
     OptionArgs& operator=(const OptionArgs&); //No Assignment Operator
 };
-
 
 
 #endif

@@ -32,15 +32,11 @@
 #include "audioConfig.h"
 #include "jackUtils.h"
 
-AudioReceiver::AudioReceiver(const AudioConfig & config) :
-    config_(config),  
-    session_(),
-    gotCaps_(false), depayloader_(0), decoder_(0), sink_(0)
-{
+AudioReceiver::AudioReceiver(const AudioConfig & config)
+    : config_(config),session_(),gotCaps_(false), depayloader_(0), decoder_(0),
+    sink_(0) {
     // empty
 }
-
-
 
 AudioReceiver::~AudioReceiver()
 {
@@ -51,9 +47,7 @@ AudioReceiver::~AudioReceiver()
     pipeline_.remove(depayloader_);
 }
 
-
-
-// FIXME: waiting shouldn't happen here, have one msg waiting loop which takes advantage of 
+// FIXME: waiting shouldn't happen here, have one msg waiting loop which takes advantage of
 // path to dispatch messages appropriately
 void AudioReceiver::wait_for_caps()
 {
@@ -61,17 +55,16 @@ void AudioReceiver::wait_for_caps()
 
     lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
-    lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler, (void *) this);
+    lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler
+                                ,(void *) this);
 
     lo_server_thread_start(st);
 
-    while (!gotCaps_)   
+    while (!gotCaps_)
         usleep(10000);
 
     lo_server_thread_free(st);
 }
-
-
 
 void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
 {
@@ -79,10 +72,9 @@ void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
     fflush(stdout);
 }
 
-
-
-int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg ** argv, int argc,
-        void *data, void *user_data)
+int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg ** argv,
+                                int argc,void *data,
+                                void *user_data)
 {
     AudioReceiver *context = static_cast < AudioReceiver * >(user_data);
     context->session_.set_caps(&argv[0]->s);
@@ -90,8 +82,6 @@ int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg ** a
 
     return 0;
 }
-
-
 
 void AudioReceiver::init_codec()
 {
@@ -110,8 +100,6 @@ void AudioReceiver::init_codec()
     session_.add(depayloader_, &config_);
 }
 
-
-
 void AudioReceiver::init_sink()
 {
     assert(jack_is_running());
@@ -123,8 +111,6 @@ void AudioReceiver::init_sink()
 
     assert(gst_element_link(decoder_, sink_));
 }
-
-
 
 bool AudioReceiver::start()
 {

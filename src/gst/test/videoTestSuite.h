@@ -27,13 +27,14 @@
 #define LOCAL 1
 #define RTP 1
 
-class VideoTestSuite : public GstTestSuite
+class VideoTestSuite
+    : public GstTestSuite
 {
 public:
 
     VideoTestSuite()
     {
-#if LOCAL 
+#if LOCAL
         TEST_ADD(VideoTestSuite::init_test)
         TEST_ADD(VideoTestSuite::start_test_video)
         TEST_ADD(VideoTestSuite::stop_test_video)
@@ -48,7 +49,7 @@ public:
         TEST_ADD(VideoTestSuite::stop_file)
         TEST_ADD(VideoTestSuite::start_stop_file)
 #endif // LOCAL
-#if RTP 
+#if RTP
         TEST_ADD(VideoTestSuite::start_dv_rtp)
         TEST_ADD(VideoTestSuite::stop_dv_rtp)
         TEST_ADD(VideoTestSuite::start_stop_dv_rtp)
@@ -59,7 +60,7 @@ public:
         TEST_ADD(VideoTestSuite::stop_file_rtp)
         TEST_ADD(VideoTestSuite::start_stop_file_rtp)
 #endif // RTP
-        
+
         /*----------------------------------------------*/
         /*      SANDBOX                                 */
         /*                                              */
@@ -67,7 +68,6 @@ public:
         /*  to test them by themselves.                 */
         /*----------------------------------------------*/
     }
-
 
 // some tests
 
@@ -98,7 +98,7 @@ private:
     void start_file();
     void stop_file();
     void start_stop_file();
-    
+
     void start_file_rtp();
     void stop_file_rtp();
     void start_stop_file_rtp();

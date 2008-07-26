@@ -31,7 +31,6 @@ void VideoTestSuite::init_test()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("videotestsrc");
     VideoSender tx(config);
     tx.init();
@@ -43,7 +42,6 @@ void VideoTestSuite::start_test_video()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("videotestsrc");
     VideoSender tx(config);
     tx.init();
@@ -59,7 +57,6 @@ void VideoTestSuite::stop_test_video()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("videotestsrc");
     VideoSender tx(config);
     tx.init();
@@ -74,7 +71,6 @@ void VideoTestSuite::start_stop_test_video()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("videotestsrc");
     VideoSender tx(config);
     tx.init();
@@ -92,7 +88,6 @@ void VideoTestSuite::start_v4l()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("v4l2src");
     VideoSender tx(config);
     tx.init();
@@ -107,7 +102,6 @@ void VideoTestSuite::stop_v4l()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("v4l2src");
     VideoSender tx(config);
     tx.init();
@@ -122,7 +116,6 @@ void VideoTestSuite::start_stop_v4l()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("v4l2src");
     VideoSender tx(config);
     tx.init();
@@ -172,8 +165,7 @@ void VideoTestSuite::stop_v4l_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("v4l2src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -200,8 +192,7 @@ void VideoTestSuite::start_stop_v4l_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("v4l2src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -220,7 +211,6 @@ void VideoTestSuite::start_dv()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("dv1394src");
     VideoSender tx(config);
     tx.init();
@@ -235,7 +225,6 @@ void VideoTestSuite::stop_dv()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("dv1394src");
     VideoSender tx(config);
     tx.init();
@@ -250,7 +239,6 @@ void VideoTestSuite::start_stop_dv()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("dv1394src");
     VideoSender tx(config);
     tx.init();
@@ -277,8 +265,7 @@ void VideoTestSuite::start_dv_rtp()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("dv1394src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -302,8 +289,7 @@ void VideoTestSuite::stop_dv_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("dv1394src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -330,8 +316,7 @@ void VideoTestSuite::start_stop_dv_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("dv1394src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -346,13 +331,10 @@ void VideoTestSuite::start_stop_dv_rtp()
     }
 }
 
-
-
 void VideoTestSuite::start_file()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("filesrc");
     VideoSender tx(config);
     tx.init();
@@ -367,7 +349,6 @@ void VideoTestSuite::stop_file()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("filesrc");
     VideoSender tx(config);
     tx.init();
@@ -382,7 +363,6 @@ void VideoTestSuite::start_stop_file()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("filesrc");
     VideoSender tx(config);
     tx.init();
@@ -409,8 +389,7 @@ void VideoTestSuite::start_file_rtp()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("filesrc", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -434,8 +413,7 @@ void VideoTestSuite::stop_file_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("filesrc", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -462,8 +440,7 @@ void VideoTestSuite::start_stop_file_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("filesrc", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -484,7 +461,6 @@ int main(int argc, char **argv)
         std::cerr << "Usage: " << "videoTester <0/1>" << std::endl;
         exit(1);
     }
-
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
     VideoTestSuite tester;
     tester.set_id(atoi(argv[1]));

@@ -13,3 +13,4 @@ void Hello::set_name(char const *n)
 {
     s = n;
 }
+

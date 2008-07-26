@@ -18,14 +18,12 @@ int m (int argc, char** argv)
     QueuePairOfOscMessage osc_queue = o.getQueue();
     if(!gst.run())
         return -1;
-
     if(!o.run())
         return -1;
-
     while(1)
     {
         OscMessage m = osc_queue.timed_pop(10000);
-        
+
         if(m.path.empty())
             continue;
         if(!m.path.compare("/quit"))
@@ -35,16 +33,13 @@ int m (int argc, char** argv)
             osc_queue.push(OscMessage("/quit","",0,0,0));
             break;
         }
-
         if(m.path.compare("/gst"))
             continue;
-
         LOG(m.args[0].s);
         if(!m.args[0].s.compare("init")){
             BaseMessage in(BaseMessage::init);
             gst_queue.push(in);
         }
-
         if(!m.args[0].s.compare("start")){
             BaseMessage start(BaseMessage::start);
             gst_queue.push(start);
@@ -53,8 +48,6 @@ int m (int argc, char** argv)
             BaseMessage stop(BaseMessage::stop);
             gst_queue.push(stop);
         }
-
-
     }
 
     std::cout << "Done!" << std::endl;

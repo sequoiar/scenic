@@ -25,14 +25,11 @@
 #include "audioConfig.h"
 #include "jackUtils.h"
 
-AudioSource::AudioSource(const AudioConfig &config) : 
-    config_(config), 
-    interleave_(config),
-    sources_(0), aconvs_(0)
-{
-}
-
-
+AudioSource::AudioSource(const AudioConfig &config)
+    : config_(config)
+    ,interleave_(config)
+    ,sources_(0), aconvs_(0)
+{}
 
 void AudioSource::init()
 {
@@ -41,8 +38,6 @@ void AudioSource::init()
     link_elements();
     link_interleave();
 }
-
-
 
 void AudioSource::init_source()
 {
@@ -60,8 +55,6 @@ void AudioSource::init_source()
     pipeline_.add_vector(aconvs_);
 }
 
-
-
 AudioSource::~AudioSource()
 {
     if (isPlaying())
@@ -70,17 +63,14 @@ AudioSource::~AudioSource()
     pipeline_.remove_vector(sources_);
 }
 
-
-
 void AudioSource::link_elements()
 {
     GstIter src, aconv;
 
-    for (src = sources_.begin(), aconv = aconvs_.begin(); src != sources_.end(), aconv != aconvs_.end(); ++src, ++aconv)
+    for (src = sources_.begin(), aconv = aconvs_.begin();
+         src != sources_.end(), aconv != aconvs_.end(); ++src, ++aconv)
         gst_element_link(*src, *aconv);
 }
-
-
 
 void AudioSource::link_interleave()
 {
@@ -89,21 +79,16 @@ void AudioSource::link_interleave()
         interleave_.link_input(*aconv);
 }
 
-
-
 void AudioSource::link_output(GstElement *sink)
 {
     interleave_.link_output(sink);
 }
 
-
-
-gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
+gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time,GstClockID id,
+                                    gpointer user_data)
 {
     return  (static_cast<AudioSource*>(user_data)->callback());     // deferred to subclass
 }
-
-
 
 gboolean AudioTestSource::callback()
 {
@@ -111,21 +96,20 @@ gboolean AudioTestSource::callback()
     return TRUE;
 }
 
-
-
 void AudioTestSource::toggle_frequency()
 {
-    static const double FREQUENCY[2][8] = {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
-                                    {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
+    static const double FREQUENCY[2][8] =
+    {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0}
+     ,{300.0, 400.0, 500.0, 600.0, 700.0
+       ,800.0, 900.0, 1000.0}};
     int i = 0;
 
-    for (std::vector<GstElement*>::iterator iter = sources_.begin(); iter != sources_.end(); ++iter)
+    for (std::vector<GstElement*>::iterator iter = sources_.begin();
+         iter != sources_.end(); ++iter)
         g_object_set(G_OBJECT(*iter), "freq", FREQUENCY[offset_][i++], NULL);
 
-    offset_ = (offset_ == 0) ? 1 : 0;     
+    offset_ = (offset_ == 0) ? 1 : 0;
 }
-
-
 
 void AudioTestSource::sub_init()
 {
@@ -136,14 +120,15 @@ void AudioTestSource::sub_init()
 
     // is-live must be true for clocked callback to work properly
     for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
-        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL); 
+        g_object_set(G_OBJECT(
+                         *src), "volume", GAIN, "freq", frequency, "is-live", TRUE
+                     ,NULL);
 
     // FIXME: move to pipeline class?
-    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
+    clockId_ = gst_clock_new_periodic_id(pipeline_.clock()
+                                         ,pipeline_.start_time(), GST_SECOND);
     gst_clock_id_wait_async(clockId_, base_callback, this);
 }
-
-
 
 AudioTestSource::~AudioTestSource()
 {
@@ -151,8 +136,6 @@ AudioTestSource::~AudioTestSource()
     gst_clock_id_unschedule(clockId_);
     gst_clock_id_unref(clockId_);
 }
-
-
 
 void AudioFileSource::init_source()
 {
@@ -166,6 +149,8 @@ void AudioFileSource::init_source()
         g_object_set(G_OBJECT(*src), "location", filename, NULL);
     }
 #endif
+
+
     // just make one multichannel filesrc
     sources_.push_back(gst_element_factory_make(config_.source(), NULL));
     assert(sources_[0]);
@@ -178,8 +163,6 @@ void AudioFileSource::init_source()
     pipeline_.add_vector(aconvs_);
 }
 
-
-
 void AudioFileSource::sub_init()
 {
     GstIter aconv, dec;
@@ -189,25 +172,27 @@ void AudioFileSource::sub_init()
 
     pipeline_.add_vector(decoders_);
 
-    for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end(); ++dec, ++aconv)
-        g_signal_connect(*dec, "new-decoded-pad", G_CALLBACK(AudioFileSource::cb_new_src_pad), (void *) *aconv);
+    for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end();
+         ++dec, ++aconv)
+        g_signal_connect(*dec, "new-decoded-pad"
+                         ,G_CALLBACK(
+                             AudioFileSource::cb_new_src_pad), (void *) *aconv);
 }
 
-
-
-void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last, void *data)
+void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,
+                                     gboolean last,
+                                     void *data)
 {
     if (gst_pad_is_linked(srcPad))
     {
         LOG("Pad is already linked.")
-            return;
+        return;
     }
     else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
-    {   
+    {
         LOG("Pad is not a source");
         return;
     }
-
     GstElement *sinkElement = static_cast<GstElement*>(data);
     GstStructure *str;
     GstPad *sinkPad;
@@ -219,7 +204,6 @@ void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
         g_object_unref(sinkPad);
         return;
     }
-
     /* check media type */
     caps = gst_pad_get_caps(srcPad);
     str = gst_caps_get_structure(caps, 0);
@@ -234,32 +218,25 @@ void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
     gst_object_unref(sinkPad);
 }
 
-
-
 void AudioFileSource::link_elements()
 {
     GstIter src, dec;
     // link source to decoders
-    for (src = sources_.begin(), dec = decoders_.begin(); src != sources_.end(), dec != decoders_.end(); ++src, ++dec)
+    for (src = sources_.begin(), dec = decoders_.begin();
+         src != sources_.end(), dec != decoders_.end(); ++src, ++dec)
         assert(gst_element_link(*src, *dec));
 }
-
-
 
 void AudioFileSource::link_output(GstElement *sink)
 {
     assert(gst_element_link(aconvs_[0], sink));
 }
 
-
-
 AudioFileSource::~AudioFileSource()
 {
     assert(pipeline_.stop());
     pipeline_.remove_vector(decoders_);
 }
-
-
 
 void AudioJackSource::sub_init()
 {

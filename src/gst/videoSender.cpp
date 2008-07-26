@@ -28,17 +28,14 @@
 #include "logWriter.h"
 
 
-
-VideoSender::VideoSender(const VideoConfig & config) :
-    config_(config), 
-    session_(), 
-    source_(0), colorspc_(0), 
-    encoder_(0), payloader_(0), sink_(0)
+VideoSender::VideoSender(const VideoConfig & config)
+    : config_(config)
+    ,session_()
+    ,source_(0), colorspc_(0)
+    ,encoder_(0), payloader_(0), sink_(0)
 {
     // empty
 }
-
-
 
 VideoSender::~VideoSender()
 {
@@ -51,16 +48,12 @@ VideoSender::~VideoSender()
     delete source_;
 }
 
-
-
 void VideoSender::init_source()
 {
     source_ = config_.createSource();
     assert(source_);
     source_->init();
 }
-
-
 
 void VideoSender::init_codec()
 {
@@ -70,14 +63,14 @@ void VideoSender::init_codec()
         pipeline_.add(colorspc_);
         encoder_ = gst_element_factory_make("x264enc", NULL);
         assert(encoder_);
-        g_object_set(G_OBJECT(encoder_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4, NULL);
+        g_object_set(G_OBJECT(
+                         encoder_), "bitrate", 2048, "byte-stream", TRUE, "threads"
+                     ,4, NULL);
         pipeline_.add(encoder_);
         source_->link_element(colorspc_);
         assert(gst_element_link(colorspc_, encoder_));
     }
 }
-
-
 
 void VideoSender::init_sink()
 {
@@ -88,16 +81,13 @@ void VideoSender::init_sink()
         assert(gst_element_link(encoder_, payloader_));
         session_.add(payloader_, &config_);
     }
-    else                        // local test only, no encoding
-    {
+    else{                       // local test only, no encoding
         sink_ = gst_element_factory_make("xvimagesink", NULL);
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
         pipeline_.add(sink_);
         source_->link_element(sink_);
     }
 }
-
-
 
 bool VideoSender::start()
 {
@@ -108,15 +98,14 @@ bool VideoSender::start()
     return true;
 }
 
-
-
 void VideoSender::wait_for_stop()
 {
     LOG("Waiting for stop message...");
 
     lo_server_thread st = lo_server_thread_new("8880", liblo_error);
 
-    lo_server_thread_add_method(st, "/video/tx/stop", "", stop_handler, (void *) this);
+    lo_server_thread_add_method(st, "/video/tx/stop", "", stop_handler
+                                ,(void *) this);
 
     lo_server_thread_start(st);
 
@@ -126,18 +115,15 @@ void VideoSender::wait_for_stop()
     lo_server_thread_free(st);
 }
 
-
-
 void VideoSender::liblo_error(int num, const char *msg, const char *path)
 {
     printf("liblo server error %d in path %s: %s\n", num, path, msg);
     fflush(stdout);
 }
 
-
-
-int VideoSender::stop_handler(const char *path, const char *types, lo_arg ** argv, int argc,
-        void *data, void *user_data)
+int VideoSender::stop_handler(const char *path, const char *types, lo_arg ** argv,
+                              int argc,void *data,
+                              void *user_data)
 {
     LOG("STOPPPINNNNNGGGGGGG");
     VideoSender *context = static_cast<VideoSender*>(user_data);

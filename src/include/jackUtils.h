@@ -36,18 +36,17 @@ static bool jack_is_running()
     /* Open a client connection to the JACK server.  Starting a
      * new server only to see if it's running is pointless, so we
      * specify JackNoStartServer. */
-    
+
     client = jack_client_open ("AudioJackSource", JackNoStartServer, &status);
     if (client == NULL) {
-        if (status & JackServerFailed) 
+        if (status & JackServerFailed)
             std::cerr << "JACK server not running" << std::endl;
-        else 
-            std::cerr << "jack_client_open() failed, status = 0x" << status << std::endl;
-
+        else
+            std::cerr << "jack_client_open() failed, status = 0x" << status <<
+            std::endl;
         jack_client_close(client);
         return false;
     }
-
     jack_client_close(client);
     return true;
 }

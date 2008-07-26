@@ -33,8 +33,7 @@ void GstTestSuite::set_id(int id)
 {
     if (id == 1 || id == 0)
         id_ = id;
-    else
-    {
+    else{
         std::cerr << "Id must be 0 or 1." << std::endl;
         exit(1);
     }
@@ -55,7 +54,6 @@ void GstTestSuite::init_test()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("videotestsrc");
     VideoSender tx(config);
     tx.init();
@@ -67,7 +65,6 @@ void GstTestSuite::start_test_video()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("videotestsrc");
     VideoSender tx(config);
     tx.init();
@@ -83,7 +80,6 @@ void GstTestSuite::stop_test_video()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("videotestsrc");
     VideoSender tx(config);
     tx.init();
@@ -98,7 +94,6 @@ void GstTestSuite::start_stop_test_video()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("videotestsrc");
     VideoSender tx(config);
     tx.init();
@@ -116,7 +111,6 @@ void GstTestSuite::start_v4l()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("v4l2src");
     VideoSender tx(config);
     tx.init();
@@ -131,7 +125,6 @@ void GstTestSuite::stop_v4l()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("v4l2src");
     VideoSender tx(config);
     tx.init();
@@ -146,7 +139,6 @@ void GstTestSuite::start_stop_v4l()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("v4l2src");
     VideoSender tx(config);
     tx.init();
@@ -183,7 +175,7 @@ void GstTestSuite::start_v4l_rtp()
                std::cout << min << "min";
                std::cout << max << "max" << std::endl;
         }
-*/
+ */
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
@@ -212,8 +204,7 @@ void GstTestSuite::stop_v4l_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("videotestsrc", "h264", MY_ADDRESS, PORT);
         VideoSender tx(config);
         tx.init();
@@ -241,8 +232,7 @@ void GstTestSuite::start_stop_v4l_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("videotestsrc", "h264", MY_ADDRESS, PORT);
         VideoSender tx(config);
         tx.init();
@@ -261,7 +251,6 @@ void GstTestSuite::start_dv()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("dv1394src");
     VideoSender tx(config);
     tx.init();
@@ -276,7 +265,6 @@ void GstTestSuite::stop_dv()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("dv1394src");
     VideoSender tx(config);
     tx.init();
@@ -291,7 +279,6 @@ void GstTestSuite::start_stop_dv()
 {
     if (id_ == 1)
         return;
-
     VideoConfig config("dv1394src");
     VideoSender tx(config);
     tx.init();
@@ -319,8 +306,7 @@ void GstTestSuite::start_dv_rtp()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
         VideoSender tx(config);
         tx.init();
@@ -345,8 +331,7 @@ void GstTestSuite::stop_dv_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
         VideoSender tx(config);
         tx.init();
@@ -374,8 +359,7 @@ void GstTestSuite::start_stop_dv_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
         VideoSender tx(config);
         tx.init();
@@ -394,7 +378,6 @@ void GstTestSuite::start_1ch_audiotest()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 1;
     AudioConfig config("filesrc.delay", numChannels);
     AudioSender tx(config);
@@ -410,7 +393,6 @@ void GstTestSuite::stop_1ch_audiotest()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 1;
     AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
@@ -425,7 +407,6 @@ void GstTestSuite::start_stop_1ch_audiotest()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 1;
     AudioConfig config("audiotestsrc.delay", numChannels);
     AudioSender tx(config);
@@ -445,7 +426,6 @@ void GstTestSuite::start_2ch_audiotest()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 2;
     AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
@@ -461,7 +441,6 @@ void GstTestSuite::stop_2ch_audiotest()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 2;
     AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
@@ -477,7 +456,6 @@ void GstTestSuite::start_stop_2ch_audiotest()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 2;
     AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
@@ -496,7 +474,6 @@ void GstTestSuite::start_6ch_audiotest()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 6;
     AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
@@ -512,7 +489,6 @@ void GstTestSuite::stop_6ch_audiotest()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 6;
     AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
@@ -528,7 +504,6 @@ void GstTestSuite::start_stop_6ch_audiotest()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 6;
     AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
@@ -548,7 +523,6 @@ void GstTestSuite::start_8ch_audiotest()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 8;
     AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
@@ -564,7 +538,6 @@ void GstTestSuite::stop_8ch_audiotest()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 8;
     AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
@@ -579,7 +552,6 @@ void GstTestSuite::start_stop_8ch_audiotest()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 8;
     AudioConfig config("audiotestsrc", numChannels);
     AudioSender tx(config);
@@ -606,9 +578,9 @@ void GstTestSuite::start_2ch_comp_rtp_audiotest()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else
-    {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+    else{
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
+                           ,10010);
         AudioSender tx(config);
         tx.init();
 
@@ -633,9 +605,9 @@ void GstTestSuite::stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+    else{
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
+                           ,10010);
         AudioSender tx(config);
         tx.init();
 
@@ -663,9 +635,9 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, PORT);
+    else{
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
+                           ,PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -694,9 +666,9 @@ void GstTestSuite::start_8ch_comp_rtp_audiotest()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else
-    {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, PORT);
+    else{
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
+                           ,PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -720,9 +692,9 @@ void GstTestSuite::stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+    else{
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
+                           ,10010);
         AudioSender tx(config);
         tx.init();
 
@@ -749,9 +721,9 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+    else{
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
+                           ,10010);
         AudioSender tx(config);
         TEST_ASSERT(tx.init());
 
@@ -762,7 +734,6 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiotest()
 
         TEST_ASSERT(tx.stop());
         TEST_ASSERT(!tx.isPlaying());
-
     }
 }
 
@@ -770,7 +741,6 @@ void GstTestSuite::start_8ch_alsa()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 8;
     AudioConfig config("alsasrc", numChannels);
     AudioSender tx(config);
@@ -786,7 +756,6 @@ void GstTestSuite::stop_8ch_alsa()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 8;
     AudioConfig config("alsasrc", numChannels);
     AudioSender tx(config);
@@ -801,7 +770,6 @@ void GstTestSuite::start_stop_8ch_alsa()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 8;
     AudioConfig config("alsasrc.delay", numChannels);
     AudioSender tx(config);
@@ -819,7 +787,6 @@ void GstTestSuite::start_8ch_jack()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 8;
     AudioConfig config("jackaudiosrc", numChannels);
     AudioSender tx(config);
@@ -835,7 +802,6 @@ void GstTestSuite::stop_8ch_jack()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 8;
     AudioConfig config("jackaudiosrc", numChannels);
     AudioSender tx(config);
@@ -850,7 +816,6 @@ void GstTestSuite::start_stop_8ch_jack()
 {
     if (id_ == 1)
         return;
-
     int numChannels = 8;
     AudioConfig config("jackaudiosrc.delay", numChannels);
     AudioSender tx(config);
@@ -864,14 +829,12 @@ void GstTestSuite::start_stop_8ch_jack()
     TEST_ASSERT(!tx.isPlaying());
 }
 
-
 void GstTestSuite::start_8ch_comp_audiofile()
 {
     int numChannels = 8;
 
     if (id_ == 1)
         return;
-
     AudioConfig config("filesrc", numChannels);
     AudioSender tx(config);
     tx.init();
@@ -887,7 +850,6 @@ void GstTestSuite::stop_8ch_comp_audiofile()
     int numChannels = 8;
     if (id_ == 1)
         return;
-
     AudioConfig config("filesrc", numChannels);
     AudioSender tx(config);
     tx.init();
@@ -903,7 +865,6 @@ void GstTestSuite::start_stop_8ch_comp_audiofile()
     int numChannels = 8;
     if (id_ == 1)
         return;
-
     AudioConfig config("filesrc.delay", numChannels);
     AudioSender tx(config);
     TEST_ASSERT(tx.init());
@@ -931,8 +892,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiofile()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else
-    {
+    else{
         AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
         AudioSender tx(config);
         tx.init();
@@ -957,8 +917,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
+    else{
         AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
         AudioSender tx(config);
         tx.init();
@@ -986,8 +945,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else
-    {
+    else{
         AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
         AudioSender tx(config);
         TEST_ASSERT(tx.init());
@@ -1023,10 +981,8 @@ void GstTestSuite::start_8ch_comp_rtp_audiofile_dv()
         BLOCK();
         TEST_ASSERT(vRx.isPlaying());
         TEST_ASSERT(aRx.isPlaying());
-
     }
-    else
-    {
+    else{
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
@@ -1067,8 +1023,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vRx.isPlaying());
         TEST_ASSERT(!aRx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
@@ -1115,8 +1070,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vRx.isPlaying());
         TEST_ASSERT(!aRx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
@@ -1171,13 +1125,13 @@ void GstTestSuite::sync()
         TEST_ASSERT(!vRx.isPlaying());
         TEST_ASSERT(!aRx.isPlaying());
     }
-    else
-    {
+    else{
         VideoConfig vConfig("videotestsrc", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
 
-        AudioConfig aConfig("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
+        AudioConfig aConfig("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
+                            ,aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
@@ -1196,6 +1150,7 @@ void GstTestSuite::sync()
         TEST_ASSERT(!aTx.isPlaying());
     }
 }
+
 #endif
 
 
@@ -1205,7 +1160,6 @@ int main(int argc, char **argv)
         std::cerr << "Usage: " << "gstTester <0/1>" << std::endl;
         exit(1);
     }
-
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
     GstTestSuite tester;
     tester.set_id(atoi(argv[1]));

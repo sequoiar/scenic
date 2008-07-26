@@ -36,14 +36,13 @@
  */
 
 typedef enum {
-    GST_JACK_CONNECT_NONE,
-    GST_JACK_CONNECT_AUTO
+    GST_JACK_CONNECT_NONE
+    ,GST_JACK_CONNECT_AUTO
 } GstJackConnect;
 
 typedef jack_default_audio_sample_t sample_t;
 
 #define GST_TYPE_JACK_CONNECT (gst_jack_connect_get_type())
-GType
-gst_jack_connect_get_type();
+GType gst_jack_connect_get_type();
 
 #endif  // _GST_JACK_H_

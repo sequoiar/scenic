@@ -34,6 +34,7 @@ OptionArgs::~OptionArgs()
     if(pA)
         delete[] pA;
 }
+
 void OptionArgs::add(BaseModule::ArgList args)
 {
     for(BaseModule::iterator it= args.begin(); it != args.end(); ++it){
@@ -41,33 +42,32 @@ void OptionArgs::add(BaseModule::ArgList args)
     }
 }
 
-
 void OptionArgs::add(BaseArg *ba)
 {
     if(ba->type == 'i') {
         IntArg* arg = dynamic_cast<IntArg*>(ba);
-        GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
-                          G_OPTION_ARG_INT, arg->arg, arg->desc.c_str(), arg->arg_desc.c_str()};
+        GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0
+                          ,G_OPTION_ARG_INT, arg->arg, arg->desc.c_str()
+                          ,arg->arg_desc.c_str()};
         options.push_back(e);
     }
     else if (ba->type == 'b') {
         BoolArg* arg = dynamic_cast<BoolArg*>(ba);
-        GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
-                          G_OPTION_ARG_NONE, arg->arg, arg->desc.c_str()};
+        GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0
+                          ,G_OPTION_ARG_NONE, arg->arg, arg->desc.c_str()};
         options.push_back(e);
     }
     else if (ba->type == 's') {
         StringArg* arg = dynamic_cast<StringArg*>(ba);
-        GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
-                          G_OPTION_ARG_STRING, arg->arg, arg->desc.c_str(), arg->arg_desc.c_str()};
+        GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0
+                          ,G_OPTION_ARG_STRING, arg->arg, arg->desc.c_str()
+                          ,arg->arg_desc.c_str()};
         options.push_back(e);
     }
     else{
         LOG("Bad BaseArg type");
     }
 }
-
-
 
 GOptionEntry* OptionArgs::getArray()
 {
@@ -82,17 +82,18 @@ GOptionEntry* OptionArgs::getArray()
     {
         pA[count++] = *it;
     }
+
     pA[count] =  n ;
 
     return pA;
 }
+
 int OptionArgs::parse(int argc,char **argv)
 {
     int ret = 1;
     GError *error = NULL;
     GOptionContext *context;
     GOptionEntry *pGOptions;
-
 
 
     context = g_option_context_new (0);
@@ -108,13 +109,10 @@ int OptionArgs::parse(int argc,char **argv)
         g_print ("option parsing failed: %s\n", error->message);
         ret = 0;
     }
-
     g_option_context_free(context);
     delete[] pA;
 
 
     return ret;
 }
-
-
 

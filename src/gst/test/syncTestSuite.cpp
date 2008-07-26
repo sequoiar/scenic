@@ -40,7 +40,7 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
         AudioConfig aConfig(numChannels, "vorbisdec", aPort);
         AudioReceiver aRx(aConfig);
         aRx.init();
-        
+
         VideoConfig vConfig("h264", vPort);
         VideoReceiver vRx(vConfig);
         vRx.init();
@@ -52,14 +52,12 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
         BLOCK();
         TEST_ASSERT(aRx.isPlaying());
         TEST_ASSERT(vRx.isPlaying());
-
     }
-    else
-    {
+    else{
         AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
         AudioSender aTx(aConfig);
         aTx.init();
-        
+
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
@@ -83,7 +81,7 @@ void SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv()
         AudioConfig aConfig(numChannels, "vorbisdec", aPort);
         AudioReceiver aRx(aConfig);
         aRx.init();
-        
+
         VideoConfig vConfig("h264", vPort);
         VideoReceiver vRx(vConfig);
         vRx.init();
@@ -96,12 +94,11 @@ void SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!aRx.isPlaying());
         TEST_ASSERT(!vRx.isPlaying());
     }
-    else
-    {
+    else{
         AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
         AudioSender aTx(aConfig);
         aTx.init();
-        
+
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
@@ -146,12 +143,11 @@ void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!aRx.isPlaying());
         TEST_ASSERT(!vRx.isPlaying());
     }
-    else
-    {
+    else{
         AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
         AudioSender aTx(aConfig);
         aTx.init();
-        
+
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
@@ -198,9 +194,9 @@ void SyncTestSuite::sync()
         TEST_ASSERT(!aRx.isPlaying());
         TEST_ASSERT(!vRx.isPlaying());
     }
-    else
-    {
-        AudioConfig aConfig("audiotestsrc", NUM_CHANNELS, "vorbisenc", MY_ADDRESS, A_PORT);
+    else{
+        AudioConfig aConfig("audiotestsrc", NUM_CHANNELS, "vorbisenc", MY_ADDRESS
+                            ,A_PORT);
         AudioSender aTx(aConfig);
         aTx.init();
 
@@ -224,15 +220,12 @@ void SyncTestSuite::sync()
     }
 }
 
-
-
 int main(int argc, char **argv)
 {
     if (argc != 2) {
         std::cerr << "Usage: " << "syncTester <0/1>" << std::endl;
         exit(1);
     }
-
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
     SyncTestSuite tester;
     tester.set_id(atoi(argv[1]));

@@ -31,35 +31,38 @@
 
 class VideoSource;
 
-class VideoSender : public MediaBase
+class VideoSender
+    : public MediaBase
 {
-    public:
-        VideoSender(const VideoConfig & config);
-        bool start();
-        void wait_for_stop();
-        virtual ~VideoSender();
+public:
+    VideoSender(const VideoConfig & config);
+    bool start();
+    void wait_for_stop();
 
-    private:
-        virtual void init_source();
-        virtual void init_codec();
-        virtual void init_sink();
+    virtual ~VideoSender();
 
-        static int stop_handler(const char *path, const char *types, lo_arg ** argv, int argc,
-                void *data, void *user_data);
+private:
+    virtual void init_source();
+    virtual void init_codec();
+    virtual void init_sink();
 
-        static void liblo_error(int num, const char *msg, const char *path);
+    static int stop_handler(const char *path, const char *types, lo_arg ** argv,
+                            int argc,void *data,
+                            void *user_data);
 
-        // data
+    static void liblo_error(int num, const char *msg, const char *path);
 
-        const VideoConfig &config_;
-        RtpSender session_;
-        VideoSource *source_;
-        GstElement *colorspc_, *encoder_, *payloader_, *sink_;
+    // data
 
-        // hidden
+    const VideoConfig &config_;
+    RtpSender session_;
+    VideoSource *source_;
+    GstElement *colorspc_, *encoder_, *payloader_, *sink_;
 
-        VideoSender(const VideoSender&); //No Copy Constructor
-        VideoSender& operator=(const VideoSender&); //No Assignment Operator
+    // hidden
+
+    VideoSender(const VideoSender&);     //No Copy Constructor
+    VideoSender& operator=(const VideoSender&);     //No Assignment Operator
 };
 
 #endif

@@ -26,35 +26,38 @@
 
 class Pipeline
 {
-    public:
-        static Pipeline & Instance();
-        void add(GstElement * element);
-        void add_vector(std::vector < GstElement * >&elementVec);
-        void remove(GstElement * element);
-        void remove_vector(std::vector < GstElement * >&elementVec);
-        void reset();
-        bool isPlaying() const;
-        void wait_until_playing() const;
-        void wait_until_stopped() const;
-        bool start();
-        bool stop();
-        const GstClockTime start_time() const { return startTime_; }
+public:
+    static Pipeline & Instance();
+    void add(GstElement * element);
+    void add_vector(std::vector < GstElement * >&elementVec);
+    void remove(GstElement * element);
+    void remove_vector(std::vector < GstElement * >&elementVec);
+    void reset();
+    bool isPlaying() const;
+    void wait_until_playing() const;
+    void wait_until_stopped() const;
+    bool start();
+    bool stop();
 
-        GstClock* clock() const;
+    const GstClockTime start_time() const { return startTime_; }
 
-    private:
-        void init();
-        Pipeline(const Pipeline&);
-        Pipeline& operator=(const Pipeline&);
-        Pipeline();
-        ~Pipeline();
-        static Pipeline *instance_;
+    GstClock* clock() const;
 
-        void make_verbose();
-        GstElement *pipeline_;
-        GstClockTime startTime_;
-        bool verbose_;
+private:
+    void init();
 
+    Pipeline(const Pipeline&);
+    Pipeline& operator=(const Pipeline&);
+
+    Pipeline();
+    ~Pipeline();
+    static Pipeline *instance_;
+
+    void make_verbose();
+
+    GstElement *pipeline_;
+    GstClockTime startTime_;
+    bool verbose_;
 };
 
 #endif // _PIPELINE_H_

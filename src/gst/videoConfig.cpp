@@ -28,39 +28,32 @@
 #include "videoSource.h"
 
 
-
 // for sender (remote)
-VideoConfig::VideoConfig(const std::string &source, const std::string &codec,
-                         const std::string &remoteHost, int port)
+VideoConfig::VideoConfig(const std::string &source, const std::string &codec
+                         ,const std::string &remoteHost, int port)
     : MediaConfig(source, codec, remoteHost, port)
 {
     // empty
 }
 
-
-
 // for sender (local)
-VideoConfig::VideoConfig(const std::string &source) : MediaConfig(source)
+VideoConfig::VideoConfig(const std::string &source)
+    : MediaConfig(source)
 {
     // empty
 }
-
-
 
 // for receiver
-VideoConfig::VideoConfig(const std::string &codec, int port) : MediaConfig(codec, port)
+VideoConfig::VideoConfig(const std::string &codec, int port)
+    : MediaConfig(codec, port)
 {
     // empty
 }
-
-
 
 const bool VideoConfig::has_h264() const
 {
     return (codec_ == "h264");
 }
-
-
 
 VideoSource * VideoConfig::createSource() const
 {
@@ -72,8 +65,7 @@ VideoSource * VideoConfig::createSource() const
         return new VideoV4lSource(*this);
     else if (!source_.compare("dv1394src"))
         return new VideoDvSource(*this);
-    else
-    {
+    else{
         std::cerr << "Invalid source!" << std::endl;
         return 0;
     }

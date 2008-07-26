@@ -41,13 +41,14 @@
 
 #include <cpptest.h>
 
-class GstTestSuite : public Test::Suite
+class GstTestSuite
+    : public Test::Suite
 {
 public:
 
-    GstTestSuite():id_(0)
-    {
-    }
+    GstTestSuite()
+        : id_(0)
+    {}
 
     void set_id(int id);
 

@@ -87,18 +87,17 @@ int pyInterpreter::init(int argc, char *argv[])
     {
         if (main_module) {
             exec("import readline", main_namespace, main_namespace);
-            exec("from code import InteractiveConsole", main_namespace, main_namespace);
+            exec("from code import InteractiveConsole", main_namespace
+                 ,main_namespace);
             PYTHON_EXEC_IMPORT(main_namespace, main_namespace);
             exec("i = InteractiveConsole(globals())", main_namespace, main_namespace);
         }
         else
             PyErr_Print();
-
     }
     catch(error_already_set const &)
     {
         PyErr_Print();
-
     }
 
     return 0;

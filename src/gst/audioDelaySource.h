@@ -25,18 +25,22 @@
 #include "gstBase.h"
 
 template <typename T>
-class AudioDelaySource : public T
+class AudioDelaySource
+    : public T
 {
-	typedef typename GstBase::GstIter GstIter;
-    public:
-        void sub_init();
-        void link_elements();
-        void link_interleave();
-        AudioDelaySource(const AudioConfig &config) : T(config), filters_() {} 
-        ~AudioDelaySource();
-        gboolean callback(GstClock *clock, GstClockTime time, GstClockID id);
-    private:
-        std::vector<GstElement *> filters_;
+    typedef typename GstBase::GstIter GstIter;
+public:
+    void sub_init();
+    void link_elements();
+    void link_interleave();
+
+    AudioDelaySource(const AudioConfig &config)
+        : T(config), filters_() {}
+    ~AudioDelaySource();
+    gboolean callback(GstClock *clock, GstClockTime time, GstClockID id);
+
+private:
+    std::vector<GstElement *> filters_;
 };
 
 template <typename T>
@@ -61,11 +65,11 @@ template <typename T>
 void AudioDelaySource<T>::link_elements()
 {
     T::link_elements(); // link elements that precede the filters
-    
-	GstIter aconv, filter;
 
-    for (aconv = T::aconvs_.begin(), filter = filters_.begin(); 
-            aconv != T::aconvs_.end(), filter != filters_.end(); ++aconv, ++filter)
+    GstIter aconv, filter;
+
+    for (aconv = T::aconvs_.begin(), filter = filters_.begin();
+         aconv != T::aconvs_.end(), filter != filters_.end(); ++aconv, ++filter)
         gst_element_link(*aconv, *filter);
 }
 
@@ -78,7 +82,8 @@ void AudioDelaySource<T>::link_interleave()
 }
 
 template <typename T>
-gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time, GstClockID id)
+gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time,
+                                       GstClockID id)
 {
     static double d_secs = 5;
 
@@ -88,7 +93,6 @@ gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time, GstCl
     d_secs = d_secs - 0.5;
     if (d_secs <= 0)
         d_secs = 5;
-
     return T::callback();
 }
 

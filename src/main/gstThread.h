@@ -28,10 +28,11 @@
 #include "gst/videoConfig.h"
 
 typedef QueuePair_<BaseMessage> QueuePair;
-class GstThread : public BaseThread<BaseMessage>
+class GstThread
+    : public BaseThread<BaseMessage>
 {
 public:
-    GstThread();    
+    GstThread();
 private:
     VideoConfig* conf;
     VideoSender* sender;
@@ -43,7 +44,5 @@ private:
     GstThread(const GstThread&); //No Copy Constructor
     GstThread& operator=(const GstThread&); //No Assignment Operator
 };
-
-
 
 
