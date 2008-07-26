@@ -55,9 +55,8 @@ void RtpSession::add(GstElement * elem, const MediaConfig * config)
 
     rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtcp_sender_);
-    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port"
-                 ,config->port() + 1, "sync"
-                 ,FALSE, "async", FALSE, NULL);
+    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port() + 1, "sync",
+                 FALSE, "async", FALSE, NULL);
 
     rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL);
     assert(rtcp_receiver_);

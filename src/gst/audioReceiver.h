@@ -43,8 +43,8 @@ private:
     virtual void init_codec();
     virtual void init_sink();
 
-    static int caps_handler(const char *path, const char *types, lo_arg ** argv,
-                            int argc,void *data,
+    static int caps_handler(const char *path, const char *types, lo_arg ** argv, int argc,
+                            void *data,
                             void *user_data);
 
     void set_caps(const char *caps);

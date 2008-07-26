@@ -29,10 +29,7 @@
 
 
 VideoSender::VideoSender(const VideoConfig & config)
-    : config_(config)
-    ,session_()
-    ,source_(0), colorspc_(0)
-    ,encoder_(0), payloader_(0), sink_(0)
+    : config_(config),session_(),source_(0), colorspc_(0),encoder_(0), payloader_(0), sink_(0)
 {
     // empty
 }
@@ -64,8 +61,7 @@ void VideoSender::init_codec()
         encoder_ = gst_element_factory_make("x264enc", NULL);
         assert(encoder_);
         g_object_set(G_OBJECT(
-                         encoder_), "bitrate", 2048, "byte-stream", TRUE, "threads"
-                     ,4, NULL);
+                         encoder_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4, NULL);
         pipeline_.add(encoder_);
         source_->link_element(colorspc_);
         assert(gst_element_link(colorspc_, encoder_));
@@ -104,8 +100,7 @@ void VideoSender::wait_for_stop()
 
     lo_server_thread st = lo_server_thread_new("8880", liblo_error);
 
-    lo_server_thread_add_method(st, "/video/tx/stop", "", stop_handler
-                                ,(void *) this);
+    lo_server_thread_add_method(st, "/video/tx/stop", "", stop_handler, (void *) this);
 
     lo_server_thread_start(st);
 
@@ -121,8 +116,8 @@ void VideoSender::liblo_error(int num, const char *msg, const char *path)
     fflush(stdout);
 }
 
-int VideoSender::stop_handler(const char *path, const char *types, lo_arg ** argv,
-                              int argc,void *data,
+int VideoSender::stop_handler(const char *path, const char *types, lo_arg ** argv, int argc,
+                              void *data,
                               void *user_data)
 {
     LOG("STOPPPINNNNNGGGGGGG");

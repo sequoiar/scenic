@@ -53,7 +53,7 @@ VideoSource::~VideoSource()
 }
 
 // defers to subclassses callback
-gboolean VideoSource::base_callback(GstClock *clock, GstClockTime time,GstClockID id,
+gboolean VideoSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                     gpointer user_data)
 {
     return (static_cast<VideoSource*>(user_data)->callback());
@@ -83,8 +83,7 @@ void VideoTestSource::sub_init()
     g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
 
     // FIXME: move to pipeline class?
-    clockId_ = gst_clock_new_periodic_id(pipeline_.clock()
-                                         ,pipeline_.start_time(), GST_SECOND);
+    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
     gst_clock_id_wait_async(clockId_, base_callback, this);
 }
 
@@ -105,21 +104,19 @@ void VideoFileSource::sub_init()
     const char *filename = "inputVid.avi";
     g_object_set(G_OBJECT(source_), "location", filename, NULL);
     assert(gst_element_link(source_, decoder_));
-    g_signal_connect(decoder_, "new-decoded-pad"
-                     ,G_CALLBACK(VideoFileSource::cb_new_src_pad), (void *)this);
+    g_signal_connect(decoder_, "new-decoded-pad", G_CALLBACK(VideoFileSource::cb_new_src_pad),
+                     (void *)this);
 }
 
 void VideoFileSource::link_element(GstElement *sinkElement)
 {
     // defer linking of decoder to this element to callback
     sinkElement_ = sinkElement;
-    if (!strncmp(gst_element_get_name(sinkElement_), "xvimagesink"
-                 ,strlen("xvimagesink")))
+    if (!strncmp(gst_element_get_name(sinkElement_), "xvimagesink", strlen("xvimagesink")))
         g_object_set(G_OBJECT(sinkElement_), "sync", TRUE, NULL);
 }
 
-void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,
-                                     gboolean last,
+void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
                                      void *data)
 {
     if (gst_pad_is_linked(srcPad))
@@ -161,8 +158,7 @@ VideoFileSource::~VideoFileSource()
 }
 
 VideoDvSource::VideoDvSource(const VideoConfig &config)
-    : VideoSource(config)
-    ,demux_(0), queue_(0), dvdec_(0)
+    : VideoSource(config),demux_(0), queue_(0), dvdec_(0)
 {}
 
 void VideoDvSource::link_element(GstElement *sinkElement)
@@ -185,15 +181,14 @@ void VideoDvSource::sub_init()
     pipeline_.add(dvdec_);
 
     // demux srcpad must be linked to queue sink pad at runtime
-    g_signal_connect(demux_, "pad-added", G_CALLBACK(VideoDvSource::cb_new_src_pad)
-                     ,(void *) queue_);
+    g_signal_connect(demux_, "pad-added", G_CALLBACK(
+                         VideoDvSource::cb_new_src_pad), (void *) queue_);
 
     assert(gst_element_link(source_, demux_));
     assert(gst_element_link(queue_, dvdec_));
 }
 
-void VideoDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,
-                                   void *data)
+void VideoDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
 {
     // ignore audio from dvsrc
     if (!std::string("audio").compare(gst_pad_get_name(srcPad)))

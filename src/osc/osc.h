@@ -64,12 +64,11 @@ public:
 private:
     int main();
 
-    static int generic_handler_static(const char *path, const char *types,
-                                      lo_arg ** argv, int argc, void *data,
+    static int generic_handler_static(const char *path, const char *types,lo_arg ** argv,
+                                      int argc, void *data,
                                       void *user_data);
 
-    int generic_handler(const char *path, const char *types, lo_arg ** argv,int argc,
-                        void *data);
+    int generic_handler(const char *path, const char *types, lo_arg ** argv,int argc,void *data);
 
     static void liblo_error(int num, const char *msg, const char *path){}
     char* local_port_;

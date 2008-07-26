@@ -93,8 +93,8 @@ void VideoReceiver::stop_sender() const
     lo_address t = lo_address_new(NULL, "8880");
     if (lo_send(t, "/video/tx/stop", NULL) == -1)
     {
-        std::cerr << "OSC error " << lo_address_errno(t) << ": " <<
-        lo_address_errstr(t) << std::endl;
+        std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) <<
+        std::endl;
         exit(EXIT_FAILURE);
     }
 }
