@@ -64,7 +64,8 @@ public:
     QueuePair_ < T > ()
         : BaseQueuePair(0, 0)
     {}
-    ~QueuePair_ < T > ();
+    ~QueuePair_ < T > ()
+	{}
     T timed_pop(int ms);
     void push(T pt);
 
@@ -236,8 +237,6 @@ template < class T> void QueuePair_<T>::del(bool one)
     g_async_queue_unref(q);
 }
 
-template < class T > QueuePair_<T>::~QueuePair_ ()
-{}
 
 template < class T > BaseThread < T >::BaseThread()
     : th(0), queue()
