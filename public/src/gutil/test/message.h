@@ -7,8 +7,7 @@ enum type
     undefined, err, ok, ack, open, close, start, stop, pause, quit, info
 };
 const char *str[] = {
-    "undefined", "err", "ok", "ack", "open", "close", "start", "stop", "pause"
-    ,"quit", "info"
+    "undefined", "err", "ok", "ack", "open", "close", "start", "stop", "pause", "quit", "info"
 };
 }
 

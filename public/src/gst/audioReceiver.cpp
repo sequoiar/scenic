@@ -33,8 +33,8 @@
 #include "jackUtils.h"
 
 AudioReceiver::AudioReceiver(const AudioConfig & config)
-    : config_(config),session_(),gotCaps_(false), depayloader_(0), decoder_(0),
-    sink_(0) {
+    : config_(config),session_(),gotCaps_(false), depayloader_(0), decoder_(0), sink_(0)
+{
     // empty
 }
 
@@ -55,8 +55,7 @@ void AudioReceiver::wait_for_caps()
 
     lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
-    lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler
-                                ,(void *) this);
+    lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler, (void *) this);
 
     lo_server_thread_start(st);
 
@@ -72,8 +71,8 @@ void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
     fflush(stdout);
 }
 
-int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg ** argv,
-                                int argc,void *data,
+int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg ** argv, int argc,
+                                void *data,
                                 void *user_data)
 {
     AudioReceiver *context = static_cast < AudioReceiver * >(user_data);

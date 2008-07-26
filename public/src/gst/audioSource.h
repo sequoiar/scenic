@@ -85,8 +85,7 @@ public:
         : AudioSource(config), decoders_() {}
     ~AudioFileSource();
     void link_output(GstElement *sink);
-    static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,
-                               gboolean last,
+    static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,gboolean last,
                                void *data);
 
 protected:

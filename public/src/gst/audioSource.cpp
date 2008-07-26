@@ -26,9 +26,7 @@
 #include "jackUtils.h"
 
 AudioSource::AudioSource(const AudioConfig &config)
-    : config_(config)
-    ,interleave_(config)
-    ,sources_(0), aconvs_(0)
+    : config_(config),interleave_(config),sources_(0), aconvs_(0)
 {}
 
 void AudioSource::init()
@@ -84,7 +82,7 @@ void AudioSource::link_output(GstElement *sink)
     interleave_.link_output(sink);
 }
 
-gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time,GstClockID id,
+gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                     gpointer user_data)
 {
     return  (static_cast<AudioSource*>(user_data)->callback());     // deferred to subclass
@@ -99,13 +97,13 @@ gboolean AudioTestSource::callback()
 void AudioTestSource::toggle_frequency()
 {
     static const double FREQUENCY[2][8] =
-    {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0}
-     ,{300.0, 400.0, 500.0, 600.0, 700.0
-       ,800.0, 900.0, 1000.0}};
+    {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
+     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0,
+      1000.0}};
     int i = 0;
 
-    for (std::vector<GstElement*>::iterator iter = sources_.begin();
-         iter != sources_.end(); ++iter)
+    for (std::vector<GstElement*>::iterator iter = sources_.begin(); iter != sources_.end();
+         ++iter)
         g_object_set(G_OBJECT(*iter), "freq", FREQUENCY[offset_][i++], NULL);
 
     offset_ = (offset_ == 0) ? 1 : 0;
@@ -120,13 +118,10 @@ void AudioTestSource::sub_init()
 
     // is-live must be true for clocked callback to work properly
     for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
-        g_object_set(G_OBJECT(
-                         *src), "volume", GAIN, "freq", frequency, "is-live", TRUE
-                     ,NULL);
+        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
 
     // FIXME: move to pipeline class?
-    clockId_ = gst_clock_new_periodic_id(pipeline_.clock()
-                                         ,pipeline_.start_time(), GST_SECOND);
+    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
     gst_clock_id_wait_async(clockId_, base_callback, this);
 }
 
@@ -174,13 +169,11 @@ void AudioFileSource::sub_init()
 
     for (dec = decoders_.begin(), aconv = aconvs_.begin(); dec != decoders_.end();
          ++dec, ++aconv)
-        g_signal_connect(*dec, "new-decoded-pad"
-                         ,G_CALLBACK(
-                             AudioFileSource::cb_new_src_pad), (void *) *aconv);
+        g_signal_connect(*dec, "new-decoded-pad", G_CALLBACK(AudioFileSource::cb_new_src_pad),
+                         (void *) *aconv);
 }
 
-void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,
-                                     gboolean last,
+void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
                                      void *data)
 {
     if (gst_pad_is_linked(srcPad))

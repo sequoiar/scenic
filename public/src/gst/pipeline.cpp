@@ -80,10 +80,9 @@ void Pipeline::make_verbose()
     // Get verbose output
     if (verbose_) {
         gchar *exclude_args = NULL;     // set args to be excluded from output
-        gchar **exclude_list =
-            exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
-        g_signal_connect(pipeline_, "deep_notify"
-                         ,G_CALLBACK(gst_object_default_deep_notify), exclude_list);
+        gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
+        g_signal_connect(pipeline_, "deep_notify",
+                         G_CALLBACK(gst_object_default_deep_notify), exclude_list);
     }
 }
 

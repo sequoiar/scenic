@@ -61,7 +61,7 @@ void RtpReceiver::set_caps(const char *capsStr)
     gst_caps_unref(caps);
 }
 
-void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,void *data)
+void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
 {
     // FIXME: Once this callback is attached to the pad-added signal, it gets called like crazy, any time any pad
     // is added (regardless of whether or not it's a dynamic pad) to rtpbin.
@@ -103,8 +103,8 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,void *
     // look for caps whose first 37 characters match (this includes the parameter that describes media type)
     // FIXME: could just check the depayloader types/names
     const int CAPS_LEN = 37;
-    while (strncmp(gst_caps_to_string(gst_pad_get_caps(sinkPad))
-                   ,gst_caps_to_string(gst_pad_get_caps(srcPad)), CAPS_LEN)
+    while (strncmp(gst_caps_to_string(gst_pad_get_caps(sinkPad)),
+                   gst_caps_to_string(gst_pad_get_caps(srcPad)), CAPS_LEN)
            && iter != depayloaders_.end())
     {
         sinkPad = gst_element_get_static_pad(*iter, "sink");
@@ -139,22 +139,19 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * confi
 
     rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtcp_sender_);
-    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port"
-                 ,config->port() + 5, "sync", FALSE
-                 ,"async", FALSE, NULL);
+    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port",
+                 config->port() + 5, "sync", FALSE,
+                 "async", FALSE, NULL);
 
     pipeline_.add(rtp_receiver_);
     pipeline_.add(rtcp_receiver_);
     pipeline_.add(rtcp_sender_);
 
-    GstPad *recv_rtp_sink =
-        gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_"));
+    GstPad *recv_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_"));
     assert(recv_rtp_sink);
-    GstPad *send_rtcp_src =
-        gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_"));
+    GstPad *send_rtcp_src = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_"));
     assert(send_rtcp_src);
-    GstPad *recv_rtcp_sink =
-        gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_"));
+    GstPad *recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_"));
     assert(recv_rtcp_sink);
 
     GstPad *rtpReceiverSrc = gst_element_get_static_pad(rtp_receiver_, "src");
@@ -170,8 +167,7 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * confi
 
     depayloaders_.push_back(depayloader);
     // when pad is created, it must be linked to new sink
-    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(
-                         RtpReceiver::cb_new_src_pad), NULL);
+    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), NULL);
 
     // release request pads (in reverse order)
     gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);

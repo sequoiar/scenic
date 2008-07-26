@@ -32,8 +32,7 @@
 #include "jackUtils.h"
 
 AudioSender::AudioSender(const AudioConfig & config)
-    : config_(config), session_(), source_(0), encoder_(0)
-    ,payloader_(0), sink_(0)
+    : config_(config), session_(), source_(0), encoder_(0),payloader_(0), sink_(0)
 {
     // empty
 }
@@ -95,8 +94,8 @@ void AudioSender::send_caps() const
 
     lo_address t = lo_address_new(NULL, "7770");
     if (lo_send(t, "/audio/rx/caps", "s", session_.caps_str()) == -1)
-        std::cerr << "OSC error " << lo_address_errno(t) << ": " <<
-        lo_address_errstr(t) << std::endl;
+        std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) <<
+        std::endl;
 }
 
 bool AudioSender::start()
@@ -104,8 +103,8 @@ bool AudioSender::start()
     MediaBase::start();
 
     if (config_.isNetworked()) {
-        std::cout << "Sending audio to host " << config_.remoteHost() <<
-        " on port " << config_.port()
+        std::cout << "Sending audio to host " << config_.remoteHost() << " on port " <<
+        config_.port()
                   << std::endl;
 
         pipeline_.wait_until_playing();

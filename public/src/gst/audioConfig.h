@@ -34,10 +34,8 @@ class AudioConfig
     : public MediaConfig
 {
 public:
-    AudioConfig(const std::string & source, int numChannels
-                ,const std::string & codec
-                ,const std::string & remoteHost
-                ,int port);                                     // sender
+    AudioConfig(const std::string & source, int numChannels, const std::string & codec,
+                const std::string & remoteHost, int port);      // sender
     AudioConfig(int numChannels, const std::string & codec, int port);      // receiver
     AudioConfig(const std::string & source, int numChannels);       // local sender
 
