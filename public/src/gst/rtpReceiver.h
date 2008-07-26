@@ -27,11 +27,13 @@
 
 class MediaConfig;
 
-class RtpReceiver : public RtpSession
+class RtpReceiver
+    : public RtpSession
 {
 public:
     RtpReceiver();
     void set_caps(const char *capsStr);
+
     virtual ~RtpReceiver();
 
 protected:
@@ -39,10 +41,11 @@ protected:
 
 private:
     static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
+
     GstElement *rtp_receiver_;
     GstElement *depayloader_;
     static std::list<GstElement *> depayloaders_;
-    
+
     RtpReceiver(const RtpReceiver&); //No Copy Constructor
     RtpReceiver& operator=(const RtpReceiver&); //No Assignment Operator
 };

@@ -27,7 +27,8 @@
 
 #define DV 1
 
-class SyncTestSuite : public GstTestSuite
+class SyncTestSuite
+    : public GstTestSuite
 {
 public:
 
@@ -41,7 +42,6 @@ public:
 
         TEST_ADD(SyncTestSuite::sync);
     }
-
 
 // some tests
 

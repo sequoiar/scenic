@@ -1,4 +1,4 @@
-// 
+//
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -33,62 +33,63 @@ class BaseArg
 {
 public:
     BaseArg(char t,std::string l, char s, std::string d, std::string a)
-        : type(t),l_arg(l),desc(d),arg_desc(a),s_arg(s){
-    }
+        : type(t),l_arg(l),desc(d),arg_desc(a),s_arg(s){}
+
     char type;
     std::string l_arg, desc, arg_desc;
     char s_arg;
-    virtual ~BaseArg(){
-    }
+    virtual ~BaseArg(){}
 };
 
 ///Integer argument
-class IntArg : public BaseArg
+class IntArg
+    : public BaseArg
 {
 public:
     int* arg;
-    IntArg(int* i,std::string l, char s, std::string d, std::string a) :
-        BaseArg('i',l,s,d,a),arg(i){
-    }
+    IntArg(int* i,std::string l, char s, std::string d, std::string a)
+        : BaseArg('i',l,s,d,a),arg(i){}
+
 private:
     IntArg(const IntArg&); //No Copy Constructor
     IntArg& operator=(const IntArg&); //No Assignment Operator
 };
 
 ///Boolean argument
-class BoolArg : public BaseArg
+class BoolArg
+    : public BaseArg
 {
 public:
     bool* arg;
-    BoolArg(bool* b,std::string l, char s, std::string d) :
-        BaseArg('b',l,s,d, std::string()),arg(b){
-    }
+    BoolArg(bool* b,std::string l, char s, std::string d)
+        : BaseArg('b',l,s,d, std::string()),arg(b){}
+
 private:
     BoolArg(const BoolArg&); //No Copy Constructor
     BoolArg& operator=(const BoolArg&); //No Assignment Operator
 };
 
 ///String argument
-class StringArg : public BaseArg
+class StringArg
+    : public BaseArg
 {
 public:
     char** arg ;
-    StringArg(char** ppc,std::string l, char s, std::string d, std::string a) :
-        BaseArg('s',l, s, d, a),arg(ppc){
-    }
+    StringArg(char** ppc,std::string l, char s, std::string d, std::string a)
+        : BaseArg('s',l, s, d, a),arg(ppc){}
+
 private:
     StringArg(const StringArg&); //No Copy Constructor
     StringArg& operator=(const StringArg&); //No Assignment Operator
 };
 
 
-
-
-///BaseModule 
+///BaseModule
 class BaseModule
 {
 public:
-    BaseModule():args(){}
+    BaseModule()
+        : args(){}
     typedef std::list<BaseArg*> ArgList;
     typedef std::list<BaseArg*>::iterator iterator;
     ArgList args;
@@ -97,10 +98,11 @@ public:
         return args;
     }
 
-	//run is the module's main
+    //run is the module's main
     virtual bool run(){
         return 1;
     }
+
     virtual ~BaseModule(){
         for(iterator it = args.begin(); it != args.end(); ++it)
         {

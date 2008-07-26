@@ -23,11 +23,13 @@
 #include "logWriter.h"
 #include "gutil/optionArgs.h"
 
-class DModule : public BaseModule
+class DModule
+    : public BaseModule
 {
     bool pass;
 public:
-    DModule():BaseModule(),pass(false){}
+    DModule()
+        : BaseModule(),pass(false){}
     bool run();
 };
 
@@ -35,8 +37,10 @@ public:
 bool DModule::run()
 {
     if(!pass)
-        while(1){ LOG("x "); }
-
+        while(1)
+        {
+            LOG("x ");
+        }
     return true;
 }
 
@@ -48,7 +52,4 @@ int main (int argc, char** argv)
     m.run();
     return 0;
 }
-
-
-
 

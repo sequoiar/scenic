@@ -20,8 +20,7 @@ void GstTestSuite::set_id(int id)
 {
     if (id == 1 || id == 0)
         id_ = id;
-    else
-    {
+    else{
         std::cerr << "Id must be 0 or 1." << std::endl;
         exit(1);
     }

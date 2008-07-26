@@ -28,50 +28,45 @@
 #include "audioConfig.h"
 #include "audioSource.h"
 
-AudioConfig::AudioConfig(const std::string &source, int numChannels, const std::string &codec, const std::string &remoteHost,
+AudioConfig::AudioConfig(const std::string &source, int numChannels
+                         ,const std::string &codec, const std::string &remoteHost
+                         ,
                          int port)
     : MediaConfig(source, codec, remoteHost, port), numChannels_(numChannels)
 {
     // empty
 }
 
-
-
-AudioConfig::AudioConfig(const std::string & source, int numChannels) : MediaConfig(source),
-    numChannels_(numChannels)
+AudioConfig::AudioConfig(const std::string & source, int numChannels)
+    : MediaConfig(source)
+    ,numChannels_(numChannels)
 {
     // empty
 }
 
-
-
-AudioConfig::AudioConfig(int numChannels, const std::string &codec, int port) : MediaConfig(codec, port),
-    numChannels_(numChannels)
+AudioConfig::AudioConfig(int numChannels, const std::string &codec, int port)
+    : MediaConfig(codec, port)
+    ,numChannels_(numChannels)
 {
     // empty
 }
-
-
 
 const int AudioConfig::numChannels() const
 {
     return numChannels_;
 }
 
-
 // strips .delay from source name
 const char *AudioConfig::source() const
-{ 
+{
     // find last period
-    unsigned int pos = source_.rfind("."); 
+    unsigned int pos = source_.rfind(".");
 
-    if (pos < source_.size()) 
+    if (pos < source_.size())
         return source_.substr(0, pos).c_str();
     else
         return MediaConfig::source();
 }
-
-
 
 AudioSource* AudioConfig::createSource() const
 {
@@ -91,8 +86,7 @@ AudioSource* AudioConfig::createSource() const
         return new AudioAlsaSource(*this);
     else if (!source_.compare("jackaudiosrc"))
         return new AudioJackSource(*this);
-    else
-    {
+    else{
         std::cerr << "Invalid source!" << std::endl;
         return 0;
     }

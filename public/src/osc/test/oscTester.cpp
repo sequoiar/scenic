@@ -18,10 +18,8 @@ int main(int argc, char **argv)
 
         if (!m.path.empty())
             std::cout << m.path << m.args[0].s << m.args[1].i << std::endl;
-
-		if (!m.path.compare("/echo"))
+        if (!m.path.compare("/echo"))
             q.push(m);
     }
-
 }
 

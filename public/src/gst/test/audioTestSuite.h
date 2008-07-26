@@ -27,7 +27,8 @@
 #define LOCAL 1
 #define RTP 1
 
-class AudioTestSuite : public GstTestSuite
+class AudioTestSuite
+    : public GstTestSuite
 {
 public:
 
@@ -56,7 +57,7 @@ public:
         TEST_ADD(AudioTestSuite::stop_8ch_jack)
         TEST_ADD(AudioTestSuite::start_stop_8ch_jack)
 #endif                          //  LOCAL
-#if RTP 
+#if RTP
         TEST_ADD(AudioTestSuite::start_2ch_comp_rtp_audiotest)
         TEST_ADD(AudioTestSuite::stop_2ch_comp_rtp_audiotest)
         TEST_ADD(AudioTestSuite::start_stop_2ch_comp_rtp_audiotest)
@@ -66,8 +67,8 @@ public:
         TEST_ADD(AudioTestSuite::start_8ch_comp_rtp_audiofile)
         TEST_ADD(AudioTestSuite::stop_8ch_comp_rtp_audiofile)
         TEST_ADD(AudioTestSuite::start_stop_8ch_comp_rtp_audiofile)
-
 #endif                          // RTP
+
         /*----------------------------------------------*/
         /*      SANDBOX                                 */
         /*                                              */
@@ -122,7 +123,6 @@ private:
     void start_8ch_comp_rtp_audiofile_dv();
     void stop_8ch_comp_rtp_audiofile_dv();
     void start_stop_8ch_comp_rtp_audiofile_dv();
-
 };
 
 

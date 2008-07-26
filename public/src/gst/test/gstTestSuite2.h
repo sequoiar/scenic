@@ -36,11 +36,13 @@
 #define AUDIO 0
 #define RTP 1
 
-class GstTestSuite : public Test::Suite
+class GstTestSuite
+    : public Test::Suite
 {
 public:
 
-    GstTestSuite():id_(0)
+    GstTestSuite()
+        : id_(0)
     {
         TEST_ADD(GstTestSuite::start_1ch_audiotest)
 //        TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
@@ -131,7 +133,6 @@ private:
     void start_8ch_comp_rtp_audiofile_dv();
     void stop_8ch_comp_rtp_audiofile_dv();
     void start_stop_8ch_comp_rtp_audiofile_dv();
-
 };
 
 #if BLOCKING

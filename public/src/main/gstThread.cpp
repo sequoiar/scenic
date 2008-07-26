@@ -20,13 +20,13 @@
 
 
 //BaseModule args get deleted in ~BaseModule
-GstThread::GstThread():conf(),sender(),receiver(),conf_str(0)
+GstThread::GstThread()
+    : conf(),sender(),receiver(),conf_str(0)
 {
     args.clear();
     conf_str = 0;
     args.push_back(new StringArg(&conf_str,"sender",'s',"video", "try videotestsrc"));
 }
-
 
 int GstThread::main()
 {
@@ -44,7 +44,6 @@ int GstThread::main()
             quit = true;
         }
     }
-    
     while(!quit)
     {
         BaseMessage f = queue.timed_pop(10000);
@@ -81,5 +80,4 @@ int GstThread::main()
 
     return 0;
 }
-
 

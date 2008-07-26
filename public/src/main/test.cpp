@@ -38,8 +38,8 @@
 #include "gst/videoConfig.h"
 
 
-
-class DModule : public BaseModule
+class DModule
+    : public BaseModule
 {
     bool pass;
 public:
@@ -50,8 +50,10 @@ public:
 bool DModule::run()
 {
     if(!pass)
-        while(1){ usleep(100000); LOG("x "); }
-
+        while(1)
+        {
+            usleep(100000); LOG("x ");
+        }
     return true;
 }
 
@@ -62,7 +64,4 @@ int main (int argc, char** argv)
     m.run();
     return 0;
 }
-
-
-
 

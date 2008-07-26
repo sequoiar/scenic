@@ -27,18 +27,15 @@
 #include "logWriter.h"
 
 
-
 GstElement *RtpSession::rtpbin_ = 0;
 int RtpSession::refCount_ = 0;
 
 
-
-RtpSession::RtpSession() : rtcp_sender_(0), rtcp_receiver_(0)
+RtpSession::RtpSession()
+    : rtcp_sender_(0), rtcp_receiver_(0)
 {
     ++refCount_;
 }
-
-
 
 bool RtpSession::init()
 {
@@ -52,16 +49,15 @@ bool RtpSession::init()
     return true;
 }
 
-
-
 void RtpSession::add(GstElement * elem, const MediaConfig * config)
 {
     RtpSession::init();
 
     rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtcp_sender_);
-    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port() + 1, "sync",
-                 FALSE, "async", FALSE, NULL);
+    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port"
+                 ,config->port() + 1, "sync"
+                 ,FALSE, "async", FALSE, NULL);
 
     rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL);
     assert(rtcp_receiver_);
@@ -73,8 +69,6 @@ void RtpSession::add(GstElement * elem, const MediaConfig * config)
     addDerived(elem, config);
 }
 
-
-
 const char *RtpSession::padStr(const char *padName)
 {
     std::string result(padName);
@@ -85,18 +79,15 @@ const char *RtpSession::padStr(const char *padName)
     return result.c_str();
 }
 
-
-
 RtpSession::~RtpSession()
 {
     if (isPlaying())
         assert(pipeline_.stop());
-
     pipeline_.remove(rtcp_sender_);
     pipeline_.remove(rtcp_receiver_);
 
     --refCount_;
-    if (refCount_ <= 0) 
+    if (refCount_ <= 0)
     {
         assert(refCount_ == 0);
         pipeline_.remove(rtpbin_);

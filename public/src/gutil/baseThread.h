@@ -40,28 +40,30 @@ typedef GAsyncQueue GAsyncQueue;
 class BaseQueuePair
 {
 public:
-    BaseQueuePair(GAsyncQueue* f,GAsyncQueue* s):first(f),second(s){}
+    BaseQueuePair(GAsyncQueue* f,GAsyncQueue* s)
+        : first(f),second(s){}
     virtual ~BaseQueuePair(){}
 
     GAsyncQueue *first, *second;
-    BaseQueuePair(const BaseQueuePair& in):first(in.first),second(in.second){}
+    BaseQueuePair(const BaseQueuePair& in)
+        : first(in.first),second(in.second){}
 
 private:
     BaseQueuePair& operator=(const BaseQueuePair&); //No Assignment Operator
-
 };
 
 
-
-template < class T > class QueuePair_ : public BaseQueuePair
+template < class T >
+class QueuePair_
+    : public BaseQueuePair
 {
 public:
-    QueuePair_ < T > (GAsyncQueue * f, GAsyncQueue * s) : BaseQueuePair(f, s)
-    {
-    }
-    QueuePair_ < T > () : BaseQueuePair(0, 0)
-    {
-    }
+    QueuePair_ < T > (GAsyncQueue * f, GAsyncQueue * s)
+        : BaseQueuePair(f, s)
+    {}
+    QueuePair_ < T > ()
+        : BaseQueuePair(0, 0)
+    {}
     ~QueuePair_ < T > ();
     T timed_pop(int ms);
     void push(T pt);
@@ -73,34 +75,37 @@ public:
 private:
     bool own[2];
     T *timed_pop_(int ms);
+
     static GMutex *mutex;
     static std::list < T * >l;
-
 };
 
 
-
-
-
-template < class T > class BaseThread : public BaseModule
+template < class T >
+class BaseThread
+    : public BaseModule
 {
 public:
     BaseThread < T > ();
     virtual ~BaseThread < T > ();
 
     QueuePair_ < T > getQueue();
+
     GAsyncQueue *getPushQueue() {
         return queue.first;
     }
+
     GAsyncQueue *getPopQueue() {
         return queue.second;
     }
+
     bool run();
 
 protected:
     virtual int main() {
         return 0;
     }
+
     GThread *th;
 
     QueuePair_ < T > queue;
@@ -113,9 +118,8 @@ private:
 
 template < class T > QueuePair_ < T > BaseThread < T >::getQueue()
 {
-	return (QueuePair_ < T > (queue.second, queue.first));
+    return (QueuePair_ < T > (queue.second, queue.first));
 }
-
 
 template < class T > T* queue_pair_pop(BaseQueuePair qp)
 {
@@ -136,23 +140,20 @@ template < class T > T* queue_pair_timed_pop(BaseQueuePair* p, int ms)
     return (static_cast < T* > (g_async_queue_timed_pop(p->first, &t)));
 }
 
-template < class T > GThread * thread_create_queue_pair(void *(thread) (void *), T t, GError ** err)
+template < class T > GThread * thread_create_queue_pair(void *(thread) (void *), T t,
+                                                        GError ** err)
 {
     return (g_thread_create(thread, static_cast < void *>(t), TRUE, err));
 }
-
 
 template < class T > GMutex * QueuePair_ < T >::mutex = NULL;
 
 template < class T > std::list < T * >QueuePair_ < T >::l;
 
 
-
-
-
 template < class T > T * QueuePair_ < T >::timed_pop_(int ms)
 {
-	return (queue_pair_timed_pop < T >(this, ms));
+    return (queue_pair_timed_pop < T >(this, ms));
 }
 
 template < class T > T QueuePair_ < T >::timed_pop(int ms)
@@ -166,7 +167,6 @@ template < class T > T QueuePair_ < T >::timed_pop(int ms)
     }
     else
         n = T();
-
     return n;
 }
 
@@ -203,22 +203,20 @@ template < class T > void QueuePair_ < T >::init()
 {
     if (!mutex)
         mutex = g_mutex_new();
-
     if (first == 0) {
         own[0] = true;
         first = g_async_queue_new();
     }
     else
         own[0] = false;
-
     if (second == 0) {
         own[1] = true;
         second = g_async_queue_new();
     }
     else
         own[1] = false;
-
 }
+
 template < class T> void QueuePair_<T>::del(bool one)
 {
     T *t;
@@ -239,13 +237,13 @@ template < class T> void QueuePair_<T>::del(bool one)
 }
 
 template < class T > QueuePair_<T>::~QueuePair_ ()
-{
+{}
 
-}
-
-template < class T > BaseThread < T >::BaseThread() : th(0), queue()
+template < class T > BaseThread < T >::BaseThread()
+    : th(0), queue()
 {
-    if (!g_thread_supported ()) g_thread_init (NULL);
+    if (!g_thread_supported ())
+        g_thread_init (NULL);
     queue.init();
 }
 
@@ -253,11 +251,9 @@ template < class T > BaseThread < T >::~BaseThread()
 {
     if (th)
         g_thread_join(th);
-
     queue.del(true);
     queue.del(false);
 }
-
 
 template < class T > bool BaseThread < T >::run()
 {
@@ -266,12 +262,10 @@ template < class T > bool BaseThread < T >::run()
     //No thread yet
     if (th)
         return false;
-
     th = thread_create_queue_pair(BaseThread::thread_main, this, &err);
 
     if (th)  //BaseThread running
         return true;
-
     return false;
 }
 

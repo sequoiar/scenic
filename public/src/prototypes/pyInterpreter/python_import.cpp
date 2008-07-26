@@ -42,47 +42,53 @@ int ground_loop(int result)
         return 0;
     return 1;
 }
+
 #endif
 
 #ifndef __GROUND_INIT__
 int ground_init(int argc, char *argv[])
 {
-
     return 0;
 }
+
 #endif
 
 BOOST_PYTHON_MODULE(Hello)
 {
-    class_ < Hello > ("Hello").def("greet", &Hello::greet).def("set_name", &Hello::set_name);
+    class_ < Hello > ("Hello").def("greet", &Hello::greet).def("set_name"
+                                                               ,&Hello::set_name);
 }
 
 BOOST_PYTHON_MODULE(OscThread)
 {
-    class_ < OscThread > ("OscThread").def("getQueue", &OscThread::getQueue).def("run", &OscThread::run);
-
+    class_ < OscThread > ("OscThread").def("getQueue", &OscThread::getQueue).def(
+        "run", &OscThread::run);
 }
 
 BOOST_PYTHON_MODULE(OscMessage)
 {
     class_ < OscMessage > ("OscMessage").def_readonly("path", &OscMessage::path);
-
 }
 
 BOOST_PYTHON_MODULE(QueuePairOfOscMessage)
 {
-    class_ < QueuePairOfOscMessage > ("QueuePairOfOscMessage").def("copy_timed_pop",
-                                                                   &QueuePairOfOscMessage::
-                                                                    copy_timed_pop).def("push",
-                                                                                        &QueuePairOfOscMessage::
-                                                                                         push);
+    class_ < QueuePairOfOscMessage > ("QueuePairOfOscMessage").def(
+        "copy_timed_pop"
+        ,&
+        QueuePairOfOscMessage::
+        copy_timed_pop).
+    def("push"
+        ,
+        &QueuePairOfOscMessage::
+        push);
 }
 
 void BOOST_PY_IMPORT()
 {
     PyImport_AppendInittab((char *) "Hello", &initHello);
     PyImport_AppendInittab((char *) "OscThread", &initOscThread);
-    PyImport_AppendInittab((char *) "QueuePairOfOscMessage", &initQueuePairOfOscMessage);
+    PyImport_AppendInittab((char *) "QueuePairOfOscMessage"
+                           ,&initQueuePairOfOscMessage);
     PyImport_AppendInittab((char *) "OscMessage", &initOscMessage);
 }
 
@@ -91,7 +97,8 @@ void PYTHON_EXEC_IMPORT(object mm, object mn)
     if (mm) {
         exec("import Hello; from Hello import *", mm, mn);
         exec("import OscThread; from OscThread import *", mm, mn);
-        exec("import QueuePairOfOscMessage; from QueuePairOfOscMessage import *", mm, mn);
+        exec("import QueuePairOfOscMessage; from QueuePairOfOscMessage import *", mm
+             ,mn);
         exec("import OscMessage; from OscMessage import *", mm, mn);
     }
 }

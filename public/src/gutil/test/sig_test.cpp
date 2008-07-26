@@ -24,13 +24,15 @@
 
 struct foo
 {
-    foo(int i) : x(i)
-    {
-    }
+    foo(int i)
+        : x(i)
+    {}
+
     void s(int y)
     {
         x = y;
     }
+
     int x;
     void operator() ()
     {
@@ -83,7 +85,6 @@ int main(int argc, char **argv)
                 break;
             std::cout << ":LKJ" << f->x;
         }
-
         f.x++;
         std::cout << "sent it";
     }
@@ -93,3 +94,4 @@ int main(int argc, char **argv)
     g_thread_join(th);
     return 0;
 }
+

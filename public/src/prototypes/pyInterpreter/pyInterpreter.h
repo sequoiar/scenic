@@ -35,5 +35,4 @@ public:
     std::string run_input();
     void interact();
     int result();
-
 };

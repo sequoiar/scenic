@@ -28,13 +28,11 @@
 #include "videoReceiver.h"
 #include "logWriter.h"
 
-VideoReceiver::VideoReceiver(const VideoConfig & config) :
-    config_(config), session_(), depayloader_(0), decoder_(0), sink_(0)
+VideoReceiver::VideoReceiver(const VideoConfig & config)
+    : config_(config), session_(), depayloader_(0), decoder_(0), sink_(0)
 {
     // empty
 }
-
-
 
 VideoReceiver::~VideoReceiver()
 {
@@ -45,8 +43,6 @@ VideoReceiver::~VideoReceiver()
     pipeline_.remove(depayloader_);
 }
 
-
-
 void VideoReceiver::init_codec()
 {
     if(config_.has_h264()) {
@@ -56,16 +52,14 @@ void VideoReceiver::init_codec()
         decoder_ = gst_element_factory_make("ffdec_h264", NULL);
         assert(decoder_);
     }
-
     pipeline_.add(depayloader_);
     pipeline_.add(decoder_);
     assert(gst_element_link(depayloader_, decoder_));
 
     session_.add(depayloader_, &config_);
-    session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264");
+    session_.set_caps(
+        "application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264");
 }
-
-
 
 void VideoReceiver::init_sink()
 {
@@ -77,16 +71,12 @@ void VideoReceiver::init_sink()
     assert(gst_element_link(decoder_, sink_));
 }
 
-
-
 bool VideoReceiver::start()
 {
     std::cout << "Receiving video on port " << config_.port() << std::endl;
     MediaBase::start();
     return true;
 }
-
-
 
 bool VideoReceiver::stop()
 {
@@ -96,8 +86,6 @@ bool VideoReceiver::stop()
     return true;
 }
 
-
-
 void VideoReceiver::stop_sender() const
 {
     LOG("Telling sender to stop...");
@@ -105,7 +93,8 @@ void VideoReceiver::stop_sender() const
     lo_address t = lo_address_new(NULL, "8880");
     if (lo_send(t, "/video/tx/stop", NULL) == -1)
     {
-        std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) << std::endl;
+        std::cerr << "OSC error " << lo_address_errno(t) << ": " <<
+        lo_address_errstr(t) << std::endl;
         exit(EXIT_FAILURE);
     }
 }

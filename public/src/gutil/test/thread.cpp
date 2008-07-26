@@ -26,9 +26,11 @@
 
 typedef QueuePair_<BaseMessage> QueuePair;
 
-class Thread : public BaseThread<BaseMessage>
+class Thread
+    : public BaseThread<BaseMessage>
 {
     int main();
+
 public:
     bool init();
 };
@@ -58,7 +60,6 @@ int Thread::main()
     return 0;
 }
 
-
 int my_main (int argc, char** argv)
 {
     Thread t;
@@ -66,15 +67,12 @@ int my_main (int argc, char** argv)
 
     if(!t.init())
         return 1;
-
     opts.add(t.get_args());
     if(!opts.parse(argc,argv))
         return 1;
-
     QueuePair queue = t.getQueue();
     if(!t.run())
         return -1;
-
     while(1)
     {
         BaseMessage f(BaseMessage::ok);
@@ -85,9 +83,6 @@ int my_main (int argc, char** argv)
         if(f.get_type() == BaseMessage::quit) {
             break;
         }
-
-
-
     }
     std::cout << "Done!" << std::endl;
     return 0;
@@ -98,5 +93,4 @@ int main(int argc, char** argv)
     my_main(argc,argv);
     return 0;
 }
-
 

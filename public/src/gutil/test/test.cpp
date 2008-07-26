@@ -23,11 +23,13 @@
 #include "logWriter.h"
 #include "gutil/optionArgs.h"
 
-class DModule : public BaseModule
+class DModule
+    : public BaseModule
 {
     bool pass;
 public:
-    DModule():pass(false){}
+    DModule()
+        : pass(false){}
     bool run();
     void init();
 };
@@ -42,19 +44,17 @@ bool DModule::run()
     if(!pass) {
         LOG("x ");
     }
-
     return true;
 }
+
 int my_main(int argc, char** argv)
 {
-
     DModule m;
     OptionArgs opts;
     m.init();
     opts.add(m.get_args());
     if(!opts.parse(argc,argv))
         return 1;
-
     m.run();
 
     return 0;
@@ -64,7 +64,4 @@ int main (int argc, char** argv)
 {
     return my_main(argc,argv);
 }
-
-
-
 

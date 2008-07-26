@@ -2,7 +2,7 @@
  * GStreamer
  * Copyright (C) 2006 Wim Taymans <wim@fluendo.com>
  * Copyright (C) 2008 Tristan Matthews <tristan@sat.qc.ca>
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation
@@ -48,9 +48,11 @@
 #define GST_JACK_RING_BUFFER(obj)        \
     (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_JACK_RING_BUFFER,GstJackRingBuffer))
 #define GST_JACK_RING_BUFFER_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_JACK_RING_BUFFER,GstJackRingBufferClass))
+    (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_JACK_RING_BUFFER \
+                             ,GstJackRingBufferClass))
 #define GST_JACK_RING_BUFFER_GET_CLASS(obj) \
-    (G_TYPE_INSTANCE_GET_CLASS ((obj), GST_TYPE_JACK_RING_BUFFER, GstJackRingBufferClass))
+    (G_TYPE_INSTANCE_GET_CLASS ((obj), GST_TYPE_JACK_RING_BUFFER \
+                                ,GstJackRingBufferClass))
 #define GST_JACK_RING_BUFFER_CAST(obj)        \
     ((GstJackRingBuffer *)obj)
 #define GST_IS_JACK_RING_BUFFER(obj)     \
@@ -77,7 +79,7 @@ struct _GstJackRingBufferClass
 
 static void gst_jack_ring_buffer_class_init(GstJackRingBufferClass * klass);
 static void gst_jack_ring_buffer_init(GstJackRingBuffer * ringbuffer,
-        GstJackRingBufferClass * klass);
+                                      GstJackRingBufferClass * klass);
 static void gst_jack_ring_buffer_dispose(GObject * object);
 static void gst_jack_ring_buffer_finalize(GObject * object);
 
@@ -86,7 +88,7 @@ static GstRingBufferClass *ring_parent_class = NULL;
 static gboolean gst_jack_ring_buffer_open_device(GstRingBuffer * buf);
 static gboolean gst_jack_ring_buffer_close_device(GstRingBuffer * buf);
 static gboolean gst_jack_ring_buffer_acquire(GstRingBuffer * buf,
-        GstRingBufferSpec * spec);
+                                             GstRingBufferSpec * spec);
 static gboolean gst_jack_ring_buffer_release(GstRingBuffer * buf);
 static gboolean gst_jack_ring_buffer_start(GstRingBuffer * buf);
 static gboolean gst_jack_ring_buffer_pause(GstRingBuffer * buf);

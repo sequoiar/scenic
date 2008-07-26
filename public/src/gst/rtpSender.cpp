@@ -26,12 +26,9 @@
 #include "logWriter.h"
 
 
-
-RtpSender::RtpSender() : rtp_sender_(0)
-{
-}
-
-
+RtpSender::RtpSender()
+    : rtp_sender_(0)
+{}
 
 RtpSender::~RtpSender()
 {
@@ -39,8 +36,6 @@ RtpSender::~RtpSender()
         assert(pipeline_.stop());
     pipeline_.remove(rtp_sender_);
 }
-
-
 
 const char *RtpSender::caps_str() const
 {
@@ -55,6 +50,7 @@ const char *RtpSender::caps_str() const
     do
         caps = gst_pad_get_negotiated_caps(pad);
     while (caps == NULL);
+
     assert(caps != NULL);
 
     gst_object_unref(pad);
@@ -64,17 +60,17 @@ const char *RtpSender::caps_str() const
     return result;
 }
 
-
-
 void RtpSender::addDerived(GstElement * newSrc, const MediaConfig * config)
 {
-    GstPad *send_rtp_sink, *send_rtp_src, *send_rtcp_src, *recv_rtcp_sink, *payloadSrc,
-           *rtpSenderSink, *rtcpSenderSink, *rtcpReceiverSrc;
+    GstPad *send_rtp_sink, *send_rtp_src, *send_rtcp_src, *recv_rtcp_sink
+    ,*payloadSrc
+    ,*rtpSenderSink, *rtcpSenderSink, *rtcpReceiverSrc;
 
     rtp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtp_sender_);
-    g_object_set(rtp_sender_, "host", config->remoteHost(), "port", config->port(), "sync",
-            FALSE, "async", FALSE, NULL);
+    g_object_set(rtp_sender_, "host", config->remoteHost(), "port"
+                 ,config->port(), "sync"
+                 ,FALSE, "async", FALSE, NULL);
     pipeline_.add(rtp_sender_);
 
     send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_"));

@@ -25,22 +25,24 @@
 
 class AudioConfig;
 
-class Interleave : public GstBase
+class Interleave
+    : public GstBase
 {
-    public:
-        Interleave(const AudioConfig &config);
-        ~Interleave();
-        void init();
-        void link_input(GstElement *element);
-        void link_output(GstElement *element);
-    private:
-        GstElement *interleave_;
-        const AudioConfig &config_;
-        static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
-        void set_channel_layout();
+public:
+    Interleave(const AudioConfig &config);
+    ~Interleave();
+    void init();
+    void link_input(GstElement *element);
+    void link_output(GstElement *element);
 
-        Interleave(const Interleave&); //No Copy Constructor
-        Interleave& operator=(const Interleave&); //No Assignment Operator
+private:
+    GstElement *interleave_;
+    const AudioConfig &config_;
+    static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
+    void set_channel_layout();
+
+    Interleave(const Interleave&);     //No Copy Constructor
+    Interleave& operator=(const Interleave&);     //No Assignment Operator
 };
 
 #endif //_INTERLEAVE_H_

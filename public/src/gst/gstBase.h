@@ -26,21 +26,21 @@
 
 class GstBase
 {
-    public:
-        bool isPlaying();
+public:
+    bool isPlaying();
 
-    protected:
-		typedef std::vector < GstElement * >::iterator GstIter;
+protected:
+    typedef std::vector < GstElement * >::iterator GstIter;
 
-        GstBase();
-        virtual ~GstBase();
+    GstBase();
+    virtual ~GstBase();
 
-        static bool link_pads(GstPad *srcPad, GstPad *sinkPad);
+    static bool link_pads(GstPad *srcPad, GstPad *sinkPad);
 
-        Pipeline & pipeline_;
+    Pipeline & pipeline_;
 
-    private:
-        static int refCount_;
+private:
+    static int refCount_;
 };
 
 #endif // _GST_BASE_H_
