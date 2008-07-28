@@ -5,7 +5,7 @@
 #uncrustify -c utils/uncrustify2.cfg --suffix "" `find . -name "*.h"`
 #exit 0
 aclocal
-autoconf 
+autoconf -f
 automake -a
-./configure '--enable-CXX_OPT=-O0 -g -Wall -Weffc++ -Werror -Wfatal-errors'
-
+#./configure '--enable-CXX_OPT=-O0 -g -Wall -Weffc++ -Werror -Wfatal-errors'
+./configure
