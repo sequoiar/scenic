@@ -75,7 +75,7 @@ void AudioSender::init_sink()
 
         session_.add(payloader_, &config_);
     }
-    else{                       // local version
+    else {                       // local version
         assert(jack_is_running());
         sink_ = gst_element_factory_make("jackaudiosink", NULL);
         assert(sink_);
@@ -94,8 +94,8 @@ void AudioSender::send_caps() const
 
     lo_address t = lo_address_new(NULL, "7770");
     if (lo_send(t, "/audio/rx/caps", "s", session_.caps_str()) == -1)
-        std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) <<
-        std::endl;
+        std::cerr << "OSC error " << lo_address_errno(t) << ": " << 
+            lo_address_errstr(t) << std::endl;
 }
 
 bool AudioSender::start()

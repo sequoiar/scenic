@@ -28,7 +28,7 @@
 Pipeline *Pipeline::instance_ = 0;
 
 Pipeline::Pipeline()
-    : pipeline_(0), startTime_(0), verbose_(true)
+    : pipeline_(0), startTime_(0), verbose_(false)
 {
     // empty
 }
