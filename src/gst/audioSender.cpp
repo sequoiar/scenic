@@ -32,10 +32,11 @@
 #include "jackUtils.h"
 
 AudioSender::AudioSender(const AudioConfig & config)
-    : config_(config), session_(), source_(0), encoder_(0),payloader_(0), sink_(0)
+    : config_(config), source_(0), encoder_(0),payloader_(0), sink_(0)
 {
     // empty
 }
+
 
 AudioSender::~AudioSender()
 {
@@ -47,12 +48,14 @@ AudioSender::~AudioSender()
     delete source_;
 }
 
+
 void AudioSender::init_source()
 {
     source_ = config_.createSource();
     assert(source_);
     source_->init();
 }
+
 
 void AudioSender::init_codec()
 {
@@ -62,6 +65,7 @@ void AudioSender::init_codec()
         pipeline_.add(encoder_);
     }
 }
+
 
 void AudioSender::init_sink()
 {
@@ -87,6 +91,7 @@ void AudioSender::init_sink()
     }
 }
 
+
 void AudioSender::send_caps() const
 {
     // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
@@ -94,16 +99,18 @@ void AudioSender::send_caps() const
 
     lo_address t = lo_address_new(NULL, "7770");
     if (lo_send(t, "/audio/rx/caps", "s", session_.caps_str()) == -1)
-        std::cerr << "OSC error " << lo_address_errno(t) << ": " << 
-            lo_address_errstr(t) << std::endl;
+        std::cerr << "OSC error " << lo_address_errno(t) << ": " <<
+        lo_address_errstr(t) << std::endl;
 }
+
 
 bool AudioSender::start()
 {
     MediaBase::start();
 
     if (config_.isNetworked()) {
-        std::cout << "Sending audio to host " << config_.remoteHost() << " on port " <<
+        std::cout << "Sending audio to host " << config_.remoteHost() <<
+        " on port " <<
         config_.port()
                   << std::endl;
 
@@ -112,4 +119,5 @@ bool AudioSender::start()
     }
     return true;
 }
+
 

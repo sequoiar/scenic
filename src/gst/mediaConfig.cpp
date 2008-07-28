@@ -31,17 +31,20 @@ MediaConfig::MediaConfig(const std::string &codec, int port)   // receiver
     // empty
 }
 
-MediaConfig::MediaConfig(const std::string &source, const std::string &codec,
-                         const std::string &remoteHost,
-                         int port)
+
+MediaConfig::MediaConfig(const std::string &source, const std::string &codec
+                         ,const std::string &remoteHost
+                         ,int port)
     : source_(source), codec_(codec), remoteHost_(remoteHost), port_(port) // remote sender
 {
     // empty
 }
+
 
 MediaConfig::MediaConfig(const std::string &source)    // local sender
     : source_(source), port_(0)
 {
     // empty
 }
+
 

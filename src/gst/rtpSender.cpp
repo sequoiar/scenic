@@ -37,6 +37,7 @@ RtpSender::~RtpSender()
     pipeline_.remove(rtp_sender_);
 }
 
+
 const char *RtpSender::caps_str() const
 {
     assert(pipeline_.isPlaying());
@@ -49,9 +50,7 @@ const char *RtpSender::caps_str() const
 
     do
         caps = gst_pad_get_negotiated_caps(pad);
-    while (caps == NULL);
-
-    assert(caps != NULL);
+    while (caps == NULL);       // goes until caps are initialized
 
     gst_object_unref(pad);
 
@@ -60,15 +59,22 @@ const char *RtpSender::caps_str() const
     return result;
 }
 
+
 void RtpSender::addDerived(GstElement * newSrc, const MediaConfig * config)
 {
-    GstPad *send_rtp_sink, *send_rtp_src, *send_rtcp_src, *recv_rtcp_sink, *payloadSrc,
-    *rtpSenderSink, *rtcpSenderSink, *rtcpReceiverSrc;
+    GstPad *send_rtp_sink; 
+    GstPad *send_rtp_src; 
+    GstPad *send_rtcp_src; 
+    GstPad *recv_rtcp_sink;
+    GstPad *payloadSrc;
+    GstPad *rtpSenderSink; 
+    GstPad *rtcpSenderSink; 
+    GstPad *rtcpReceiverSrc;
 
     rtp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtp_sender_);
     g_object_set(rtp_sender_, "host", config->remoteHost(), "port", config->port(), "sync",
-                 FALSE, "async", FALSE, NULL);
+            FALSE, "async", FALSE, NULL);
     pipeline_.add(rtp_sender_);
 
     send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_"));
@@ -93,10 +99,10 @@ void RtpSender::addDerived(GstElement * newSrc, const MediaConfig * config)
     assert(rtcpReceiverSrc);
 
     // link pads
-    assert(gst_pad_link(payloadSrc, send_rtp_sink) == GST_PAD_LINK_OK);
-    assert(gst_pad_link(send_rtp_src, rtpSenderSink) == GST_PAD_LINK_OK);
-    assert(gst_pad_link(send_rtcp_src, rtcpSenderSink) == GST_PAD_LINK_OK);
-    assert(gst_pad_link(rtcpReceiverSrc, recv_rtcp_sink) == GST_PAD_LINK_OK);
+    assert(link_pads(payloadSrc, send_rtp_sink));
+    assert(link_pads(send_rtp_src, rtpSenderSink));
+    assert(link_pads(send_rtcp_src, rtcpSenderSink));
+    assert(link_pads(rtcpReceiverSrc, recv_rtcp_sink));
 
     // release static pads (in reverse order)
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
@@ -110,4 +116,5 @@ void RtpSender::addDerived(GstElement * newSrc, const MediaConfig * config)
     gst_object_unref(GST_OBJECT(send_rtp_src));
     gst_element_release_request_pad(rtpbin_, send_rtp_sink);
 }
+
 

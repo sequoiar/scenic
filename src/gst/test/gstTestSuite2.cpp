@@ -33,11 +33,12 @@ void GstTestSuite::set_id(int id)
 {
     if (id == 1 || id == 0)
         id_ = id;
-    else{
+    else {
         std::cerr << "Id must be 0 or 1." << std::endl;
         exit(1);
     }
 }
+
 
 void GstTestSuite::setup()
 {
@@ -45,10 +46,12 @@ void GstTestSuite::setup()
     std::cout << std::endl;
 }
 
+
 void GstTestSuite::tear_down()
 {
     // empty
 }
+
 
 void GstTestSuite::init_test()
 {
@@ -60,6 +63,7 @@ void GstTestSuite::init_test()
 
     BLOCK();
 }
+
 
 void GstTestSuite::start_test_video()
 {
@@ -76,6 +80,7 @@ void GstTestSuite::start_test_video()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void GstTestSuite::stop_test_video()
 {
     if (id_ == 1)
@@ -89,6 +94,7 @@ void GstTestSuite::stop_test_video()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void GstTestSuite::start_stop_test_video()
 {
@@ -107,6 +113,7 @@ void GstTestSuite::start_stop_test_video()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void GstTestSuite::start_v4l()
 {
     if (id_ == 1)
@@ -121,6 +128,7 @@ void GstTestSuite::start_v4l()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void GstTestSuite::stop_v4l()
 {
     if (id_ == 1)
@@ -134,6 +142,7 @@ void GstTestSuite::stop_v4l()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void GstTestSuite::start_stop_v4l()
 {
@@ -151,6 +160,7 @@ void GstTestSuite::start_stop_v4l()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void GstTestSuite::start_v4l_rtp()
 {
@@ -191,6 +201,7 @@ void GstTestSuite::start_v4l_rtp()
     }
 }
 
+
 void GstTestSuite::stop_v4l_rtp()
 {
     const int PORT = 10010;
@@ -204,7 +215,7 @@ void GstTestSuite::stop_v4l_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("videotestsrc", "h264", MY_ADDRESS, PORT);
         VideoSender tx(config);
         tx.init();
@@ -215,6 +226,7 @@ void GstTestSuite::stop_v4l_rtp()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::start_stop_v4l_rtp()
 {
@@ -232,7 +244,7 @@ void GstTestSuite::start_stop_v4l_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("videotestsrc", "h264", MY_ADDRESS, PORT);
         VideoSender tx(config);
         tx.init();
@@ -246,6 +258,7 @@ void GstTestSuite::start_stop_v4l_rtp()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::start_dv()
 {
@@ -261,6 +274,7 @@ void GstTestSuite::start_dv()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void GstTestSuite::stop_dv()
 {
     if (id_ == 1)
@@ -274,6 +288,7 @@ void GstTestSuite::stop_dv()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void GstTestSuite::start_stop_dv()
 {
@@ -292,6 +307,7 @@ void GstTestSuite::start_stop_dv()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void GstTestSuite::start_dv_rtp()
 {
     const int PORT = 10010;
@@ -306,7 +322,7 @@ void GstTestSuite::start_dv_rtp()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
         VideoSender tx(config);
         tx.init();
@@ -317,6 +333,7 @@ void GstTestSuite::start_dv_rtp()
         TEST_ASSERT(tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::stop_dv_rtp()
 {
@@ -331,7 +348,7 @@ void GstTestSuite::stop_dv_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
         VideoSender tx(config);
         tx.init();
@@ -342,6 +359,7 @@ void GstTestSuite::stop_dv_rtp()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::start_stop_dv_rtp()
 {
@@ -359,7 +377,7 @@ void GstTestSuite::start_stop_dv_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
         VideoSender tx(config);
         tx.init();
@@ -373,6 +391,7 @@ void GstTestSuite::start_stop_dv_rtp()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::start_1ch_audiotest()
 {
@@ -389,6 +408,7 @@ void GstTestSuite::start_1ch_audiotest()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void GstTestSuite::stop_1ch_audiotest()
 {
     if (id_ == 1)
@@ -402,6 +422,7 @@ void GstTestSuite::stop_1ch_audiotest()
     BLOCK();
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void GstTestSuite::start_stop_1ch_audiotest()
 {
@@ -422,6 +443,7 @@ void GstTestSuite::start_stop_1ch_audiotest()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void GstTestSuite::start_2ch_audiotest()
 {
     if (id_ == 1)
@@ -437,6 +459,7 @@ void GstTestSuite::start_2ch_audiotest()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void GstTestSuite::stop_2ch_audiotest()
 {
     if (id_ == 1)
@@ -451,6 +474,7 @@ void GstTestSuite::stop_2ch_audiotest()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void GstTestSuite::start_stop_2ch_audiotest()
 {
@@ -470,6 +494,7 @@ void GstTestSuite::start_stop_2ch_audiotest()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void GstTestSuite::start_6ch_audiotest()
 {
     if (id_ == 1)
@@ -485,6 +510,7 @@ void GstTestSuite::start_6ch_audiotest()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void GstTestSuite::stop_6ch_audiotest()
 {
     if (id_ == 1)
@@ -499,6 +525,7 @@ void GstTestSuite::stop_6ch_audiotest()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void GstTestSuite::start_stop_6ch_audiotest()
 {
@@ -519,6 +546,7 @@ void GstTestSuite::start_stop_6ch_audiotest()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void GstTestSuite::start_8ch_audiotest()
 {
     if (id_ == 1)
@@ -534,6 +562,7 @@ void GstTestSuite::start_8ch_audiotest()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void GstTestSuite::stop_8ch_audiotest()
 {
     if (id_ == 1)
@@ -547,6 +576,7 @@ void GstTestSuite::stop_8ch_audiotest()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void GstTestSuite::start_stop_8ch_audiotest()
 {
@@ -566,6 +596,7 @@ void GstTestSuite::start_stop_8ch_audiotest()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void GstTestSuite::start_2ch_comp_rtp_audiotest()
 {
     int numChannels = 2;
@@ -578,7 +609,7 @@ void GstTestSuite::start_2ch_comp_rtp_audiotest()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
                            ,10010);
         AudioSender tx(config);
@@ -590,6 +621,7 @@ void GstTestSuite::start_2ch_comp_rtp_audiotest()
         TEST_ASSERT(tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::stop_2ch_comp_rtp_audiotest()
 {
@@ -605,7 +637,7 @@ void GstTestSuite::stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
                            ,10010);
         AudioSender tx(config);
@@ -617,6 +649,7 @@ void GstTestSuite::stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::start_stop_2ch_comp_rtp_audiotest()
 {
@@ -635,7 +668,7 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
                            ,PORT);
         AudioSender tx(config);
@@ -650,6 +683,7 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::start_8ch_comp_rtp_audiotest()
 {
@@ -666,7 +700,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiotest()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
                            ,PORT);
         AudioSender tx(config);
@@ -678,6 +712,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiotest()
         TEST_ASSERT(tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::stop_8ch_comp_rtp_audiotest()
 {
@@ -692,7 +727,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
                            ,10010);
         AudioSender tx(config);
@@ -704,6 +739,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::start_stop_8ch_comp_rtp_audiotest()
 {
@@ -721,7 +757,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
                            ,10010);
         AudioSender tx(config);
@@ -736,6 +772,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::start_8ch_alsa()
 {
@@ -752,6 +789,7 @@ void GstTestSuite::start_8ch_alsa()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void GstTestSuite::stop_8ch_alsa()
 {
     if (id_ == 1)
@@ -765,6 +803,7 @@ void GstTestSuite::stop_8ch_alsa()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void GstTestSuite::start_stop_8ch_alsa()
 {
@@ -783,6 +822,7 @@ void GstTestSuite::start_stop_8ch_alsa()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void GstTestSuite::start_8ch_jack()
 {
     if (id_ == 1)
@@ -798,6 +838,7 @@ void GstTestSuite::start_8ch_jack()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void GstTestSuite::stop_8ch_jack()
 {
     if (id_ == 1)
@@ -811,6 +852,7 @@ void GstTestSuite::stop_8ch_jack()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void GstTestSuite::start_stop_8ch_jack()
 {
@@ -829,6 +871,7 @@ void GstTestSuite::start_stop_8ch_jack()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void GstTestSuite::start_8ch_comp_audiofile()
 {
     int numChannels = 8;
@@ -845,6 +888,7 @@ void GstTestSuite::start_8ch_comp_audiofile()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void GstTestSuite::stop_8ch_comp_audiofile()
 {
     int numChannels = 8;
@@ -859,6 +903,7 @@ void GstTestSuite::stop_8ch_comp_audiofile()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void GstTestSuite::start_stop_8ch_comp_audiofile()
 {
@@ -878,6 +923,7 @@ void GstTestSuite::start_stop_8ch_comp_audiofile()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void GstTestSuite::start_8ch_comp_rtp_audiofile()
 {
     int numChannels = 8;
@@ -892,7 +938,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiofile()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
         AudioSender tx(config);
         tx.init();
@@ -903,6 +949,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiofile()
         TEST_ASSERT(tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::stop_8ch_comp_rtp_audiofile()
 {
@@ -917,7 +964,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
         AudioSender tx(config);
         tx.init();
@@ -928,6 +975,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::start_stop_8ch_comp_rtp_audiofile()
 {
@@ -945,7 +993,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
         AudioSender tx(config);
         TEST_ASSERT(tx.init());
@@ -959,6 +1007,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void GstTestSuite::start_8ch_comp_rtp_audiofile_dv()
 {
@@ -982,7 +1031,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(vRx.isPlaying());
         TEST_ASSERT(aRx.isPlaying());
     }
-    else{
+    else {
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
@@ -999,6 +1048,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(aTx.isPlaying());
     }
 }
+
 
 void GstTestSuite::stop_8ch_comp_rtp_audiofile_dv()
 {
@@ -1023,7 +1073,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vRx.isPlaying());
         TEST_ASSERT(!aRx.isPlaying());
     }
-    else{
+    else {
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
@@ -1040,6 +1090,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!aTx.isPlaying());
     }
 }
+
 
 void GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
 {
@@ -1070,7 +1121,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vRx.isPlaying());
         TEST_ASSERT(!aRx.isPlaying());
     }
-    else{
+    else {
         VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
@@ -1094,6 +1145,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!aTx.isPlaying());
     }
 }
+
 
 #if 0
 void GstTestSuite::sync()
@@ -1125,7 +1177,7 @@ void GstTestSuite::sync()
         TEST_ASSERT(!vRx.isPlaying());
         TEST_ASSERT(!aRx.isPlaying());
     }
-    else{
+    else {
         VideoConfig vConfig("videotestsrc", "h264", MY_ADDRESS, vPort);
         VideoSender vTx(vConfig);
         vTx.init();
@@ -1151,6 +1203,7 @@ void GstTestSuite::sync()
     }
 }
 
+
 #endif
 
 
@@ -1167,4 +1220,5 @@ int main(int argc, char **argv)
     Test::TextOutput output(Test::TextOutput::Verbose);
     return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
+
 

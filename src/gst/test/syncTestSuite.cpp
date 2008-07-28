@@ -53,7 +53,7 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(aRx.isPlaying());
         TEST_ASSERT(vRx.isPlaying());
     }
-    else{
+    else {
         AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
         AudioSender aTx(aConfig);
         aTx.init();
@@ -70,6 +70,7 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(vTx.isPlaying());
     }
 }
+
 
 void SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv()
 {
@@ -94,7 +95,7 @@ void SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!aRx.isPlaying());
         TEST_ASSERT(!vRx.isPlaying());
     }
-    else{
+    else {
         AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
         AudioSender aTx(aConfig);
         aTx.init();
@@ -113,6 +114,7 @@ void SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vTx.isPlaying());
     }
 }
+
 
 void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
 {
@@ -143,7 +145,7 @@ void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!aRx.isPlaying());
         TEST_ASSERT(!vRx.isPlaying());
     }
-    else{
+    else {
         AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
         AudioSender aTx(aConfig);
         aTx.init();
@@ -167,6 +169,7 @@ void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vTx.isPlaying());
     }
 }
+
 
 void SyncTestSuite::sync()
 {
@@ -194,7 +197,7 @@ void SyncTestSuite::sync()
         TEST_ASSERT(!aRx.isPlaying());
         TEST_ASSERT(!vRx.isPlaying());
     }
-    else{
+    else {
         AudioConfig aConfig("audiotestsrc", NUM_CHANNELS, "vorbisenc", MY_ADDRESS
                             ,A_PORT);
         AudioSender aTx(aConfig);
@@ -220,6 +223,7 @@ void SyncTestSuite::sync()
     }
 }
 
+
 int main(int argc, char **argv)
 {
     if (argc != 2) {
@@ -233,4 +237,5 @@ int main(int argc, char **argv)
     Test::TextOutput output(Test::TextOutput::Verbose);
     return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
+
 

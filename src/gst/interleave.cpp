@@ -27,10 +27,12 @@ Interleave::Interleave(const AudioConfig &config)
     // empty
 }
 
+
 Interleave::~Interleave()
 {
     pipeline_.remove(interleave_);
 }
+
 
 void Interleave::set_channel_layout()
 {
@@ -44,7 +46,9 @@ void Interleave::set_channel_layout()
 
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
-        g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[config_.numChannels() - 1][channelIdx]);
+        g_value_set_enum(&val
+                         ,VORBIS_CHANNEL_POSITIONS[config_.numChannels() -
+                                                   1][channelIdx]);
         g_value_array_append(arr, &val);
         g_value_reset(&val);
     }
@@ -54,6 +58,7 @@ void Interleave::set_channel_layout()
     g_object_set(interleave_, "channel-positions", arr, NULL);
     g_value_array_free(arr);
 }
+
 
 void Interleave::init()
 {
@@ -65,61 +70,64 @@ void Interleave::init()
     set_channel_layout();
 }
 
-void Interleave::link_output(GstElement* element)
+
+void Interleave::link_sink(GstElement* src)
 {
-    assert(gst_element_link(interleave_, element));
+    assert(gst_element_link(interleave_, src));
 }
 
-void Interleave::link_input(GstElement *element)
+
+void Interleave::link_src(GstElement *sink)
 {
-    assert(gst_element_link(element, interleave_));
+    assert(gst_element_link(sink, interleave_));
 }
+
 
 // courtesy of vorbisenc.c
 const GstAudioChannelPosition Interleave::VORBIS_CHANNEL_POSITIONS[][8] = {
     {                           /* Mono */
         GST_AUDIO_CHANNEL_POSITION_FRONT_MONO
     },
-    {                           /* Stereo */
+    {                          /* Stereo */
         GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
         GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT
     },
-    {                           /* Stereo + Centre */
+    {                          /* Stereo + Centre */
         GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
         GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
         GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT
     },
-    {                           /* Quadraphonic */
+    {                          /* Quadraphonic */
         GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
         GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
         GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
+        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT
     },
-    {                           /* Stereo + Centre + rear stereo */
+    {                          /* Stereo + Centre + rear stereo */
         GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
         GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
         GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
         GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
         GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
     },
-    {                           /* Full 5.1 Surround */
+    {                          /* Full 5.1 Surround */
         GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
         GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
         GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
         GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
         GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
+        GST_AUDIO_CHANNEL_POSITION_LFE
+    },
+    {                          /* Not defined by spec, GStreamer default */
+        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
+        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
+        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
+        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
+        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
         GST_AUDIO_CHANNEL_POSITION_LFE,
+        GST_AUDIO_CHANNEL_POSITION_REAR_CENTER
     },
-    {                           /* Not defined by spec, GStreamer default */
-        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
-        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
-        GST_AUDIO_CHANNEL_POSITION_LFE,
-        GST_AUDIO_CHANNEL_POSITION_REAR_CENTER,
-    },
-    {                           /* Not defined by spec, GStreamer default */
+    {                          /* Not defined by spec, GStreamer default */
         GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
         GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
         GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
@@ -127,7 +135,7 @@ const GstAudioChannelPosition Interleave::VORBIS_CHANNEL_POSITIONS[][8] = {
         GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
         GST_AUDIO_CHANNEL_POSITION_LFE,
         GST_AUDIO_CHANNEL_POSITION_SIDE_LEFT,
-        GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT,
+        GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT
     },
 };
 

@@ -32,8 +32,8 @@ public:
     Interleave(const AudioConfig &config);
     ~Interleave();
     void init();
-    void link_input(GstElement *element);
-    void link_output(GstElement *element);
+    void link_sink(GstElement *src);
+    void link_src(GstElement *sink);
 
 private:
     GstElement *interleave_;
