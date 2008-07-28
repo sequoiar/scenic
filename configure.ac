@@ -16,7 +16,6 @@ AC_PROG_CXX
 
 AC_PROG_CC
 
-CXX_OPT=-O0 -g -Wall -Weffc++ -Werror -Wfatal-errors
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([arpa/inet.h stdlib.h string.h sys/ioctl.h unistd.h])

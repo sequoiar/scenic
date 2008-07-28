@@ -86,7 +86,7 @@ class LoArgs
 {
 public:
     LoArgs(const char *pchar, int index, lo_arg * a)
-        : type(static_cast<lo_type>(pchar[index])), i(0)
+        : type(static_cast<lo_type>(pchar[index])), i(0),s()
     {
         switch ((char) type)
         {
