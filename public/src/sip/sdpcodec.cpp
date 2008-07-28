@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2008 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -19,6 +19,6 @@
 
 #include "sdpcodec.h"
 
-sdpCodec::sdpCodec( std::string type , std::string name ){}
+sdpCodec::sdpCodec( std::string type, std::string name ){}
 
 sdpCodec::~sdpCodec(){}

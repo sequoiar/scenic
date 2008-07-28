@@ -65,12 +65,13 @@ public:
         : BaseQueuePair(0, 0)
     {}
     ~QueuePair_ < T > ()
-	{}
+    {}
     T timed_pop(int ms);
     void push(T pt);
 
     void done(T * pt);
     void init();
+
     void del(bool);
 
 private:
@@ -96,9 +97,11 @@ public:
         return queue.first;
     }
 
+
     GAsyncQueue *getPopQueue() {
         return queue.second;
     }
+
 
     bool run();
 
@@ -106,6 +109,7 @@ protected:
     virtual int main() {
         return 0;
     }
+
 
     GThread *th;
 
@@ -122,15 +126,18 @@ template < class T > QueuePair_ < T > BaseThread < T >::getQueue()
     return (QueuePair_ < T > (queue.second, queue.first));
 }
 
+
 template < class T > T* queue_pair_pop(BaseQueuePair qp)
 {
     return (static_cast < T* > (g_async_queue_pop(qp.first)));
 }
 
+
 template < class T > void queue_pair_push(BaseQueuePair qp, T* t)
 {
     g_async_queue_push(qp.second, t);
 }
+
 
 template < class T > T* queue_pair_timed_pop(BaseQueuePair* p, int ms)
 {
@@ -141,11 +148,13 @@ template < class T > T* queue_pair_timed_pop(BaseQueuePair* p, int ms)
     return (static_cast < T* > (g_async_queue_timed_pop(p->first, &t)));
 }
 
+
 template < class T > GThread * thread_create_queue_pair(void *(thread) (void *), T t,
                                                         GError ** err)
 {
     return (g_thread_create(thread, static_cast < void *>(t), TRUE, err));
 }
+
 
 template < class T > GMutex * QueuePair_ < T >::mutex = NULL;
 
@@ -156,6 +165,7 @@ template < class T > T * QueuePair_ < T >::timed_pop_(int ms)
 {
     return (queue_pair_timed_pop < T >(this, ms));
 }
+
 
 template < class T > T QueuePair_ < T >::timed_pop(int ms)
 {
@@ -171,6 +181,7 @@ template < class T > T QueuePair_ < T >::timed_pop(int ms)
     return n;
 }
 
+
 template < class T > void QueuePair_ < T >::push(T pt)
 {
     g_mutex_lock(mutex);
@@ -181,6 +192,7 @@ template < class T > void QueuePair_ < T >::push(T pt)
     queue_pair_push(*this, t);
     g_mutex_unlock(mutex);
 }
+
 
 template < class T > void QueuePair_ < T >::done(T * t)
 {
@@ -200,6 +212,7 @@ template < class T > void QueuePair_ < T >::done(T * t)
     g_mutex_unlock(mutex);
 }
 
+
 template < class T > void QueuePair_ < T >::init()
 {
     if (!mutex)
@@ -217,6 +230,7 @@ template < class T > void QueuePair_ < T >::init()
     else
         own[1] = false;
 }
+
 
 template < class T> void QueuePair_<T>::del(bool one)
 {
@@ -246,6 +260,7 @@ template < class T > BaseThread < T >::BaseThread()
     queue.init();
 }
 
+
 template < class T > BaseThread < T >::~BaseThread()
 {
     if (th)
@@ -253,6 +268,7 @@ template < class T > BaseThread < T >::~BaseThread()
     queue.del(true);
     queue.del(false);
 }
+
 
 template < class T > bool BaseThread < T >::run()
 {
@@ -268,10 +284,12 @@ template < class T > bool BaseThread < T >::run()
     return false;
 }
 
+
 template < class T > void *BaseThread < T >::thread_main(void *v)
 {
     return ((void *) (static_cast < BaseThread * >(v)->main()));
 }
+
 
 #endif
 

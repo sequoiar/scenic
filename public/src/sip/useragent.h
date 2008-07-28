@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2008 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -20,8 +20,8 @@
 #ifndef _USER_AGENT_H
 #define _USER_AGENT_H
 
-#define THIS_FILE		"useragent.cpp"
-#define _LOCAL_IP_ADDRESS	"127.0.0.1"
+#define THIS_FILE       "useragent.cpp"
+#define _LOCAL_IP_ADDRESS   "127.0.0.1"
 
 /* @file	useragent.h
  * @brief	A SIP useragent. Implements the SIP stacks from the transaction layer to the transport layer as described in
@@ -35,57 +35,56 @@
 
 #include <string>
 
-class UserAgent {
+class UserAgent
+{
+public:
+    /*
+     * Create a new UserAgent object
+     * @param	name	The application name
+     */
+    UserAgent( std::string name, int port );
 
-	public:
-		/* 
-		 * Create a new UserAgent object
-		 * @param	name	The application name
-		 */
-		UserAgent( std::string name, int port );
-		
-		/*
-		 * Class destructor
-		 */
-		~UserAgent();
+    /*
+     * Class destructor
+     */
+    ~UserAgent();
 
-		/*
-		 * Initialize all the mandatory data structures from the PJSIP library
-		 *
-		 * @param port	The port on which the user agent will listen
-		 *
-		 * @return int	PJ_SUCCESS on success
-		 */
-		int init_pjsip_modules( );
+    /*
+     * Initialize all the mandatory data structures from the PJSIP library
+     *
+     * @param port	The port on which the user agent will listen
+     *
+     * @return int	PJ_SUCCESS on success
+     */
+    int init_pjsip_modules( );
 
-		/*
-		 * Create an invite session. Handle the related incoming responses
-		 *
-		 * @param	uri	The SIP address to create connection with
-		 * @param	port		The remote SIP port
-		 *
-		 * @return 	int	PJ_SUCCESS on success
-		 */
-		int create_invite_session( std::string uri, int port );
+    /*
+     * Create an invite session. Handle the related incoming responses
+     *
+     * @param	uri	The SIP address to create connection with
+     * @param	port		The remote SIP port
+     *
+     * @return 	int	PJ_SUCCESS on success
+     */
+    int create_invite_session( std::string uri, int port );
 
-		pj_str_t build_contact_uri( std::string user, int port );
+    pj_str_t build_contact_uri( std::string user, int port );
 
-		void listen( void );
+    void listen( void );
 
-	private:
-		/* The module name */
-		std::string _name;
+private:
+    /* The module name */
+    std::string _name;
 
-		/* The local IP address */
-		std::string _localIP;	
-			
-		int _lport;
+    /* The local IP address */
+    std::string _localIP;
 
-		/* 
-		 * Initialize the pjsip_module structure
-		 */
-		void init_sip_module( void );
+    int _lport;
 
+    /*
+     * Initialize the pjsip_module structure
+     */
+    void init_sip_module( void );
 };
 
 #endif // _USER_AGENT_H

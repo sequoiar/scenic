@@ -51,4 +51,5 @@ static bool jack_is_running()
     return true;
 }
 
+
 #endif //  _JACK_UTILS_H_

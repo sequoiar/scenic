@@ -9,8 +9,10 @@ const char *Hello::greet()
     return ts.c_str();
 }
 
+
 void Hello::set_name(char const *n)
 {
     s = n;
 }
+
 

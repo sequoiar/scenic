@@ -39,8 +39,9 @@
 class BaseMessage
 {
 public:
-    enum type { error =-2, undefined=-1,zero=0,ok='=',quit='Q',init='I',start='S',stop='!',
-                system='*',ping='.',string='s'};
+    enum type { error =-2, undefined=-1,zero=0,ok='=',quit='Q',init='I',start='S'
+                ,stop='!'
+                ,system='*',ping='.',string='s'};
 
     BaseMessage(unsigned short i)
         : t_(static_cast<unsigned char>(i)){}
@@ -58,13 +59,16 @@ public:
         return static_cast<int>(t_);
     }
 
+
     char get_char(){
         return t_;
     }
 
+
     type get_type(){
         return static_cast<type>(t_);
     }
+
 
     unsigned char t_;
 };

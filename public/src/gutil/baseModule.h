@@ -98,10 +98,12 @@ public:
         return args;
     }
 
+
     //run is the module's main
     virtual bool run(){
         return 1;
     }
+
 
     virtual ~BaseModule(){
         for(iterator it = args.begin(); it != args.end(); ++it)

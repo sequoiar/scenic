@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2008 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -22,17 +22,16 @@
 
 #include <string>
 
-class sdpCodec {
+class sdpCodec
+{
+public:
+    sdpCodec( std::string type, std::string name );
+    ~sdpCodec();
 
-	public:
-		sdpCodec( std::string type , std::string name );
-		~sdpCodec();
-
-	private:
-		std::string _name;
-		int _payload;
-		int _frequency;
-
+private:
+    std::string _name;
+    int _payload;
+    int _frequency;
 };
 
 #endif // _SDP_CODEC_H

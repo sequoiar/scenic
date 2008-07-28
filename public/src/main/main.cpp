@@ -54,9 +54,11 @@ int m (int argc, char** argv)
     return 0;
 }
 
+
 int main (int argc, char** argv)
 {
     return m(argc,argv);
 }
+
 
 //./mainTester -s videotestsrc --oscLocal=7770 --oscRemote=7771 --oscRemoteHost=127.0.0.1

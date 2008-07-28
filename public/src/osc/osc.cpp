@@ -37,11 +37,13 @@ OscMessage::OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d
         args.push_back(LoArgs(t, i, v[i]));
 }
 
+
 OscMessage::OscMessage(const OscMessage& in)
     : path(in.path), types(in.types), args(in.args), argc(in.argc), data(in.data)
 {
     // empty
 }
+
 
 OscMessage& OscMessage::operator=(const OscMessage& in)
 {
@@ -57,24 +59,32 @@ OscMessage& OscMessage::operator=(const OscMessage& in)
     return *this;
 }
 
+
 OscThread::OscThread()
     : local_port_(0),remote_port_(0),remote_host_(),running(false)
 {
     args.clear();
     local_port_ = remote_port_ = remote_host_ = 0;
-    args.push_back(new StringArg(&local_port_,"oscLocal",'\0',"local osc port", "port num"));
-    args.push_back(new StringArg(&remote_port_,"oscRemote",'\0',"remote osc port", "port num"));
-    args.push_back(new StringArg(&remote_host_,"oscRemoteHost",'\0',"host", "host address"));
+    args.push_back(new StringArg(&local_port_,"oscLocal",'\0',"local osc port"
+                                 ,"port num"));
+    args.push_back(new StringArg(&remote_port_,"oscRemote",'\0',"remote osc port"
+                                 ,"port num"));
+    args.push_back(new StringArg(&remote_host_,"oscRemoteHost",'\0',"host"
+                                 ,"host address"));
 }
 
-int OscThread::generic_handler_static(const char *path, const char *types,lo_arg ** argv,
-                                      int argc, void *data, void *user_data)
+
+int OscThread::generic_handler_static(const char *path, const char *types,
+                                      lo_arg ** argv,int argc, void *data,
+                                      void *user_data)
 {
     OscThread *t = static_cast < OscThread * >(user_data);
     return (t->generic_handler(path, types, argv, argc, data));
 }
 
-int OscThread::generic_handler(const char *path, const char *types, lo_arg ** argv, int argc,
+
+int OscThread::generic_handler(const char *path, const char *types, lo_arg ** argv,
+                               int argc,
                                void *data)
 {
     queue.push(OscMessage(path, types, argv, argc, data));
@@ -82,6 +92,7 @@ int OscThread::generic_handler(const char *path, const char *types, lo_arg ** ar
 //        queue_map[path].push(OscMessage(path, types, argv, argc, data));
     return 0;
 }
+
 
 int OscThread::main()
 {
@@ -109,6 +120,7 @@ int OscThread::main()
     return 0;
 }
 
+
 void OscThread::send(OscMessage & osc)
 {
     if(!remote_port_)
@@ -135,4 +147,5 @@ void OscThread::send(OscMessage & osc)
 
     lo_send_message(t, osc.path.c_str(), m);
 }
+
 

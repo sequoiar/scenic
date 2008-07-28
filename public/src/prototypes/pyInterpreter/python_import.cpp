@@ -43,6 +43,7 @@ int ground_loop(int result)
     return 1;
 }
 
+
 #endif
 
 #ifndef __GROUND_INIT__
@@ -50,6 +51,7 @@ int ground_init(int argc, char *argv[])
 {
     return 0;
 }
+
 
 #endif
 
@@ -92,6 +94,7 @@ void BOOST_PY_IMPORT()
     PyImport_AppendInittab((char *) "OscMessage", &initOscMessage);
 }
 
+
 void PYTHON_EXEC_IMPORT(object mm, object mn)
 {
     if (mm) {
@@ -102,6 +105,7 @@ void PYTHON_EXEC_IMPORT(object mm, object mn)
         exec("import OscMessage; from OscMessage import *", mm, mn);
     }
 }
+
 
 // Default variable overloads
 //BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(VideoLocal_init_overloads, init, 0, 3)

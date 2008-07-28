@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2008 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -19,36 +19,41 @@
 
 #include "sipsession.h"
 
-SIPSession::SIPSession( int port ) : Session( SIP, port ){
-
-	_app_ua =  new UserAgent( _APP_NAME, port );
-	_app_ua->init_pjsip_modules( );
-
+SIPSession::SIPSession( int port )
+    : Session( SIP, port ){
+    _app_ua =  new UserAgent( _APP_NAME, port );
+    _app_ua->init_pjsip_modules( );
 }
+
 
 SIPSession::~SIPSession(){}
 
 int SIPSession::connect( std::string r_uri, int r_port ){
-	_app_ua->create_invite_session( r_uri, r_port );
-	return 0;
+    _app_ua->create_invite_session( r_uri, r_port );
+    return 0;
 }
+
 
 int SIPSession::disconnect( void ){
-	return 0;
+    return 0;
 }
+
 
 int SIPSession::accept( void ){
-	return 0;
+    return 0;
 }
+
 
 int SIPSession::refuse( int reason ){
-	return 0;
+    return 0;
 }
 
-void SIPSession::build_sdp( void ){
-}
+
+void SIPSession::build_sdp( void ){}
+
 
 void SIPSession::startMainloop( void ){
-	_app_ua->listen();
+    _app_ua->listen();
 }
+
 

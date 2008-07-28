@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2008 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -26,39 +26,39 @@
 
 #include "sdpcodec.h"
 
-class Sdp {
+class Sdp
+{
+public:
+    /* Class constructors */
+    Sdp();
+    Sdp( int aport, int vport );
 
-	public:
-		/* Class constructors */
-		Sdp();
-		Sdp( int aport , int vport );
+    /* Class desctructor */
+    ~Sdp();
 
-		/* Class desctructor */
-		~Sdp();
+    void addAudioCodec( sdpCodec* codec );
 
-		void addAudioCodec( sdpCodec* codec );
-		
-		void addVideoCodec( sdpCodec* codec );
+    void addVideoCodec( sdpCodec* codec );
 
-		void setAudioPort( int aport );
+    void setAudioPort( int aport );
 
-		void setVideoPort( int vport );
+    void setVideoPort( int vport );
 
-		int getAudioPort( void ) { return _audioPort; }
+    int getAudioPort( void ) { return _audioPort; }
 
-		int getVideoPort( void ) { return _videoPort; }
+    int getVideoPort( void ) { return _videoPort; }
 
-		std::list<sdpCodec> getAudiocodecsList( void ) { return _audiocodecs; }
+    std::list<sdpCodec> getAudiocodecsList( void ) { return _audiocodecs; }
 
-		std::list<sdpCodec> getVideocodecList( void ) { return _videocodecs; }
+    std::list<sdpCodec> getVideocodecList( void ) { return _videocodecs; }
 
-	private:
-		std::string _sdpBody;
+private:
+    std::string _sdpBody;
 
-		std::list<sdpCodec> _audiocodecs;
-		std::list<sdpCodec> _videocodecs;
+    std::list<sdpCodec> _audiocodecs;
+    std::list<sdpCodec> _videocodecs;
 
-		int _audioPort, _videoPort;
+    int _audioPort, _videoPort;
 };
 
 #endif // _SDP_H
