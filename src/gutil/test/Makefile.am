@@ -6,5 +6,3 @@ threadTester_SOURCES = thread.cpp
 argsTester_SOURCES = test.cpp
 
 LDADD = $(GLIB_LIBS) ../libGUtil.a
-threadTester_CPPFLAGS = $(GLIB_CFLAGS) 
-argsTester_CPPFLAGS = $(GLIB_CFLAGS) 

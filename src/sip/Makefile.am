@@ -18,7 +18,7 @@ libsip_la_SOURCES = \
 			 sipsession.h 
 
 libsip_la_LDFLAGS = $(PJSIP_LIBS) -lpthread 
-AM_CXXFLAGS =  $(PJ_CFLAGS)
+libsip_la_CPPFLAGS =  $(PJ_CFLAGS)
 
 
 

@@ -95,8 +95,6 @@ AX_PYTHON
 AX_BOOST_PYTHON
 
 
-#                 src/sip/Makefile
-#                 src/sip/test/Makefile
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
@@ -107,6 +105,8 @@ AC_CONFIG_FILES([Makefile
                  src/osc/Makefile
                  src/osc/test/Makefile
                  src/main/Makefile
+                 src/sip/Makefile
+                 src/sip/test/Makefile
                  src/prototypes/Makefile
                  src/prototypes/hello/Makefile
                  src/prototypes/hello/test/Makefile
