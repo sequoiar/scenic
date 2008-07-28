@@ -57,8 +57,7 @@ RtpReceiver::~RtpReceiver()
 void RtpReceiver::set_caps(const char *capsStr)
 {
     GstCaps *caps;
-    caps = gst_caps_from_string(capsStr);
-    assert(caps);
+    assert(caps = gst_caps_from_string(capsStr));
     g_object_set(G_OBJECT(rtp_receiver_), "caps", caps, NULL);
     gst_caps_unref(caps);
 }
@@ -138,16 +137,13 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * confi
     // store copy so that destructor knows which depayloader to remove from its list
     depayloader_ = depayloader;
 
-    rtp_receiver_ = gst_element_factory_make("udpsrc", NULL);
-    assert(rtp_receiver_);
+    assert(rtp_receiver_ = gst_element_factory_make("udpsrc", NULL));
     g_object_set(rtp_receiver_, "port", config->port(), NULL);
 
-    rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL);
-    assert(rtcp_receiver_);
+    assert(rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL));
     g_object_set(rtcp_receiver_, "port", config->port() + 1, NULL);
 
-    rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
-    assert(rtcp_sender_);
+    assert(rtcp_sender_ = gst_element_factory_make("udpsink", NULL));
     g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port() + 5, "sync", 
             FALSE, "async", FALSE, NULL);
 

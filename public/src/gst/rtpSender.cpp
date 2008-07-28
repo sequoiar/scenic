@@ -45,8 +45,7 @@ const char *RtpSender::caps_str() const
     GstPad *pad;
     GstCaps *caps;
 
-    pad = gst_element_get_pad(GST_ELEMENT(rtp_sender_), "sink");
-    assert(pad);
+    assert(pad = gst_element_get_pad(GST_ELEMENT(rtp_sender_), "sink"));
 
     do
         caps = gst_pad_get_negotiated_caps(pad);
@@ -71,23 +70,17 @@ void RtpSender::addDerived(GstElement * newSrc, const MediaConfig * config)
     GstPad *rtcpSenderSink; 
     GstPad *rtcpReceiverSrc;
 
-    rtp_sender_ = gst_element_factory_make("udpsink", NULL);
-    assert(rtp_sender_);
+    assert(rtp_sender_ = gst_element_factory_make("udpsink", NULL));
     g_object_set(rtp_sender_, "host", config->remoteHost(), "port", config->port(), "sync",
             FALSE, "async", FALSE, NULL);
     pipeline_.add(rtp_sender_);
 
-    send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_"));
-    assert(send_rtp_sink);
+    assert(send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_")));
+    assert(send_rtp_src = gst_element_get_static_pad(rtpbin_, padStr("send_rtp_src_")));
 
-    send_rtp_src = gst_element_get_static_pad(rtpbin_, padStr("send_rtp_src_"));
-    assert(send_rtp_src);
+    assert(send_rtcp_src = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_")));
 
-    send_rtcp_src = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_"));
-    assert(send_rtcp_src);
-
-    recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_"));
-    assert(recv_rtcp_sink);
+    assert(recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
 
     assert(payloadSrc = gst_element_get_static_pad(newSrc, "src"));
     assert(rtpSenderSink = gst_element_get_static_pad(rtp_sender_, "sink"));

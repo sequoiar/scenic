@@ -73,21 +73,21 @@ const char *AudioConfig::source() const
 
 AudioSource* AudioConfig::createSource() const
 {
-    if (!source_.compare("audiotestsrc.delay"))
+    if (source_ == "audiotestsrc.delay")
         return new AudioDelaySource<AudioTestSource>(*this);
-    else if (!source_.compare("filesrc.delay"))
+    else if (source_ == "filesrc.delay")
         return new AudioDelaySource<AudioFileSource>(*this);
-    else if (!source_.compare("alsasrc.delay"))
+    else if (source_ == "alsasrc.delay")
         return new AudioDelaySource<AudioAlsaSource>(*this);
-    else if (!source_.compare("jackaudiosrc.delay"))
+    else if (source_ == "jackaudiosrc.delay")
         return new AudioDelaySource<AudioJackSource>(*this);
-    else if (!source_.compare("audiotestsrc"))
+    else if (source_ == "audiotestsrc")
         return new AudioTestSource(*this);
-    else if (!source_.compare("filesrc"))
+    else if (source_ == "filesrc")
         return new AudioFileSource(*this);
-    else if (!source_.compare("alsasrc"))
+    else if (source_ == "alsasrc")
         return new AudioAlsaSource(*this);
-    else if (!source_.compare("jackaudiosrc"))
+    else if (source_ == "jackaudiosrc")
         return new AudioJackSource(*this);
     else {
         std::cerr << "Invalid source!" << std::endl;

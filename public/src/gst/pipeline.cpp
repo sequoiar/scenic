@@ -56,8 +56,7 @@ void Pipeline::init()
     if (!pipeline_)
     {
         gst_init(0, NULL);
-        pipeline_ = gst_pipeline_new("pipeline");
-        assert(pipeline_);
+        assert(pipeline_ = gst_pipeline_new("pipeline"));
 
         if (verbose_)
             make_verbose();

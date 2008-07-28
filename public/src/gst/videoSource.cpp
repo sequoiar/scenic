@@ -33,8 +33,7 @@ VideoSource::VideoSource(const VideoConfig &config)
 // parts of sub_init that are common to all AudioSource classes
 void VideoSource::init()
 {
-    source_ = gst_element_factory_make(config_.source(), NULL);
-    assert(source_);
+    assert(source_ = gst_element_factory_make(config_.source(), NULL));
     pipeline_.add(source_);
 
     sub_init();
@@ -100,8 +99,7 @@ VideoTestSource::~VideoTestSource()
 
 void VideoFileSource::sub_init()
 {
-    decoder_ = gst_element_factory_make("decodebin", NULL);
-    assert(decoder_);
+    assert(decoder_ = gst_element_factory_make("decodebin", NULL));
 
     pipeline_.add(decoder_);
 
@@ -120,8 +118,9 @@ void VideoFileSource::link_element(GstElement *sinkElement)
 {
     // defer linking of decoder to this element to callback
     sinkElement_ = sinkElement;
-    if (!strncmp(gst_element_get_name(sinkElement_), "xvimagesink"
-                 ,strlen("xvimagesink")))
+
+    // set xvimagesink to true for filesrc to work properly
+    if (!strncmp(gst_element_get_name(sinkElement_), "xvimagesink", strlen("xvimagesink")))
         g_object_set(G_OBJECT(sinkElement_), "sync", TRUE, NULL);
 }
 
@@ -147,6 +146,7 @@ void VideoFileSource::cb_new_src_pad(GstElement * srcElement,
         g_object_unref(sinkPad);        // don't link more than once
         return;
     }
+
     /* check media type */
     caps = gst_pad_get_caps(srcPad);
     str = gst_caps_get_structure(caps, 0);
@@ -175,6 +175,7 @@ VideoDvSource::VideoDvSource(const VideoConfig &config)
     : VideoSource(config), demux_(0), queue_(0), dvdec_(0)
 {}
 
+
 void VideoDvSource::link_element(GstElement *sinkElement)
 {
     assert(gst_element_link(dvdec_, sinkElement));
@@ -183,12 +184,9 @@ void VideoDvSource::link_element(GstElement *sinkElement)
 
 void VideoDvSource::sub_init()
 {
-    demux_ = gst_element_factory_make("dvdemux", NULL);
-    assert(demux_);
-    queue_ = gst_element_factory_make("queue", NULL);
-    assert(queue_);
-    dvdec_ = gst_element_factory_make("dvdec", NULL);
-    assert(dvdec_);
+    assert(demux_ = gst_element_factory_make("dvdemux", NULL));
+    assert(queue_ = gst_element_factory_make("queue", NULL));
+    assert(dvdec_ = gst_element_factory_make("dvdec", NULL));
 
     // demux has dynamic pads
     pipeline_.add(demux_);
@@ -209,17 +207,24 @@ void VideoDvSource::cb_new_src_pad(GstElement * srcElement,
                                    GstPad * srcPad,
                                    void *data)
 {
-    // ignore audio from dvsrc
-    if (!std::string("audio").compare(gst_pad_get_name(srcPad)))
+    if (std::string("audio") == gst_pad_get_name(srcPad))
     {
         LOG("Ignoring audio stream from DV");
         return;
     }
+
     GstElement *sinkElement = (GstElement *) data;
     GstPad *sinkPad;
 
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
-    LOG("VideoDvSource: linking new srcpad and sinkpad.");
+    
+    if (GST_PAD_IS_LINKED(sinkPad))
+    {
+        g_object_unref(sinkPad);        // don't link more than once
+        return;
+    }
+
+    LOG("VideoDvSource: linking new srcpad to sinkpad.");
     assert(link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }

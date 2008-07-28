@@ -55,14 +55,11 @@ void RtpSession::add(GstElement * elem, const MediaConfig * config)
 {
     RtpSession::init();
 
-    rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
-    assert(rtcp_sender_);
-    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port(
-                     ) + 1, "sync"
-                 ,FALSE, "async", FALSE, NULL);
+    assert(rtcp_sender_ = gst_element_factory_make("udpsink", NULL));
+    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port() + 1, 
+                 "sync", FALSE, "async", FALSE, NULL);
 
-    rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL);
-    assert(rtcp_receiver_);
+    assert(rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL));
     g_object_set(rtcp_receiver_, "port", config->port() + 5, NULL);
 
     pipeline_.add(rtcp_sender_);
