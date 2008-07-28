@@ -71,15 +71,17 @@ void Interleave::init()
 }
 
 
-void Interleave::link_sink(GstElement* src)
+void Interleave::link_to_sink(GstElement* sink)
 {
-    assert(gst_element_link(interleave_, src));
+    assert(gst_element_link(interleave_, sink));
 }
 
 
-void Interleave::link_src(GstElement *sink)
+void Interleave::link_to_src_vector(std::vector<GstElement *> &sources)
 {
-    assert(gst_element_link(sink, interleave_));
+    GstIter src;
+    for (src = sources.begin(); src != sources.end(); ++src)
+        assert(gst_element_link(*src, interleave_));
 }
 
 

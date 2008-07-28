@@ -36,6 +36,7 @@ protected:
     virtual ~GstBase();
 
     static bool link_pads(GstPad *srcPad, GstPad *sinkPad);
+    static void link_element_vectors(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks);
 
     Pipeline & pipeline_;
 

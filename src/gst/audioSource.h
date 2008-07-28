@@ -34,7 +34,7 @@ class AudioSource
 public:
     virtual ~AudioSource();
     void init();
-    virtual void link_output(GstElement *sink);
+    virtual void link_to_sink(GstElement *sink);
 
 protected:
     AudioSource(const AudioConfig &config);
@@ -84,7 +84,7 @@ public:
     AudioFileSource(const AudioConfig &config)
         : AudioSource(config), decoders_() {}
     ~AudioFileSource();
-    void link_output(GstElement *sink);
+    void link_to_sink(GstElement *sink);
     static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,
                                gboolean last,
                                void *data);

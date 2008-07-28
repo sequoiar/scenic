@@ -24,6 +24,8 @@
 #include <cassert>
 #include "gstBase.h"
 
+// FIXME:  requires a specialization for AudioFileSrc that deinterleaves and interleaves the signal
+
 template <typename T>
 class AudioDelaySource
     : public T
@@ -67,20 +69,14 @@ void AudioDelaySource<T>::link_elements()
 {
     T::link_elements(); // link elements that precede the filters
 
-    GstIter aconv, filter;
-
-    for (aconv = T::aconvs_.begin(), filter = filters_.begin();
-         aconv != T::aconvs_.end(), filter != filters_.end(); ++aconv, ++filter)
-        gst_element_link(*aconv, *filter);
+    link_element_vectors(T::aconvs_, filters_);
 }
 
 
 template <typename T>
 void AudioDelaySource<T>::link_interleave()
 {
-    GstIter filter;
-    for (filter = filters_.begin(); filter != filters_.end(); ++filter)
-        T::interleave_.link_src(*filter);
+        T::interleave_.link_to_src_vector(filters_);
 }
 
 
