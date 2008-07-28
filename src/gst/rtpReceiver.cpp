@@ -128,6 +128,13 @@ GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
 
 void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * config)
 {
+    GstPad *recv_rtp_sink;
+    GstPad *send_rtcp_src;
+    GstPad *recv_rtcp_sink;
+    GstPad *rtpReceiverSrc;
+    GstPad *rtcpReceiverSrc;
+    GstPad *rtcpSenderSink;
+
     // store copy so that destructor knows which depayloader to remove from its list
     depayloader_ = depayloader;
 
@@ -148,19 +155,13 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * confi
     pipeline_.add(rtcp_receiver_);
     pipeline_.add(rtcp_sender_);
 
-    GstPad *recv_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_"));
-    assert(recv_rtp_sink);
-    GstPad *send_rtcp_src = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_"));
-    assert(send_rtcp_src);
-    GstPad *recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_"));
-    assert(recv_rtcp_sink);
+    assert(recv_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_")));
+    assert(send_rtcp_src = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_")));
+    assert(recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
 
-    GstPad *rtpReceiverSrc = gst_element_get_static_pad(rtp_receiver_, "src");
-    assert(rtpReceiverSrc);
-    GstPad *rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src");
-    assert(rtcpReceiverSrc);
-    GstPad *rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink");
-    assert(rtcpSenderSink);
+    assert(rtpReceiverSrc = gst_element_get_static_pad(rtp_receiver_, "src"));
+    assert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
+    assert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
 
     assert(link_pads(rtpReceiverSrc, recv_rtp_sink));
     assert(link_pads(rtcpReceiverSrc, recv_rtcp_sink));

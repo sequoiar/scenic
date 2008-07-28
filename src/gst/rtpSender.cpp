@@ -89,14 +89,10 @@ void RtpSender::addDerived(GstElement * newSrc, const MediaConfig * config)
     recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_"));
     assert(recv_rtcp_sink);
 
-    payloadSrc = gst_element_get_static_pad(newSrc, "src");
-    assert(payloadSrc);
-    rtpSenderSink = gst_element_get_static_pad(rtp_sender_, "sink");
-    assert(rtpSenderSink);
-    rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink");
-    assert(rtcpSenderSink);
-    rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src");
-    assert(rtcpReceiverSrc);
+    assert(payloadSrc = gst_element_get_static_pad(newSrc, "src"));
+    assert(rtpSenderSink = gst_element_get_static_pad(rtp_sender_, "sink"));
+    assert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
+    assert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
 
     // link pads
     assert(link_pads(payloadSrc, send_rtp_sink));
