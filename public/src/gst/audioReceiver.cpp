@@ -52,7 +52,14 @@ AudioReceiver::~AudioReceiver()
 void AudioReceiver::wait_for_caps()
 {
     LOG("Waiting for caps...");
-
+#if 1
+    lo_server st = lo_server_new("7770", liblo_error);
+    lo_server_add_method(st, "audio/rx/caps", "s", caps_handler, (void *) this);
+    while (!gotCaps_)
+        lo_server_recv_noblock(st, 100);     
+    lo_server_free(st);
+#endif
+#if 0
     lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
     lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler, (void *) this);
@@ -63,6 +70,7 @@ void AudioReceiver::wait_for_caps()
         usleep(10000);
 
     lo_server_thread_free(st);
+#endif
 }
 
 void AudioReceiver::liblo_error(int num, const char *msg, const char *path)

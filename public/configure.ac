@@ -57,7 +57,7 @@ if test "x${have_gstreamer_audio}" = "xfalse" ; then
 fi
 
 #Trying to set JACK using pkg-config
-PKG_CHECK_MODULES(JACK, jack, have_jack=true, have_jack=false)
+PKG_CHECK_MODULES(JACK, jack >= 0.99.10, have_jack=true, have_jack=false)
 if test "x${have_jack}" = "xfalse" ; then
     AC_MSG_ERROR([missing pkg -  libjack0 and/or libjack-dev])
 fi
@@ -79,7 +79,7 @@ if test "x${have_libpj}" = "xfalse" ; then
 fi
 
 #Trying to set LIBLO using pkg-config
-PKG_CHECK_MODULES(LIBLO, liblo, have_liblo=true, have_liblo=false)
+PKG_CHECK_MODULES(LIBLO, liblo >= 0.25, have_liblo=true, have_liblo=false)
 if test "x${have_liblo}" = "xfalse" ; then
     AC_MSG_ERROR([LIBLO missing. pkg - liblo0,liblo0-dev ])
 fi

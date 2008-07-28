@@ -98,6 +98,14 @@ void VideoSender::wait_for_stop()
 {
     LOG("Waiting for stop message...");
 
+#if 0
+    lo_server st = lo_server_new("8880", liblo_error);
+    lo_server_add_method(st, "video/tx/stop", "", stop_handler, (void *) this);
+    while (isPlaying())
+        lo_server_recv_noblock(st, 100);     
+    lo_server_free(st);
+#endif
+
     lo_server_thread st = lo_server_thread_new("8880", liblo_error);
 
     lo_server_thread_add_method(st, "/video/tx/stop", "", stop_handler, (void *) this);

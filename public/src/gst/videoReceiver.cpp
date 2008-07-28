@@ -82,7 +82,6 @@ bool VideoReceiver::stop()
 {
     MediaBase::stop();
     stop_sender();
-    // FIXME: ADD CODE tell sender to stop to avoid crash when going from DV to v4l
     return true;
 }
 
@@ -94,7 +93,7 @@ void VideoReceiver::stop_sender() const
     if (lo_send(t, "/video/tx/stop", NULL) == -1)
     {
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t) <<
-        std::endl;
+            std::endl;
         exit(EXIT_FAILURE);
     }
 }
