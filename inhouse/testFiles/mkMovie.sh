@@ -1,6 +1,6 @@
 #!/bin/sh
 
-chuck --silent frameImpulse.ck
+chuck --silent --srate48000 frameImpulse.ck
 ./mkWhiteFrame.m
 ./muxAv.sh
 

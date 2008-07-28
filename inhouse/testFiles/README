@@ -7,7 +7,7 @@ EITHER
 OR
 
 make audiofile with:
-chuck --silent frameImpulse.ck
+chuck --srate48000 --silent frameImpulse.ck
 
 make videofile with:
 ./mkWhiteFrame.m

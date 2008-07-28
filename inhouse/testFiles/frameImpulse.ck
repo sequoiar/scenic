@@ -9,7 +9,7 @@
 // chuck frameImpulse.ck
 //
 // or for the silent version, take the dac out of the signal chain below and run with:
-// chuck --silent frameImpulse.ck
+// chuck --silent --srate44100 frameImpulse.ck
 
 Step s => WvOut w => blackhole;
 
@@ -23,6 +23,7 @@ second / samp => float sampleRate;
 
 sampleRate / fps => float samplesPerFrame;
 
+<<<"sample rate is: " + sampleRate >>>;
 <<<"samples per frame: " + samplesPerFrame >>>;
 
 "impulse.wav" => w.wavFilename;
