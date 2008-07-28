@@ -5,8 +5,8 @@
 #uncrustify -c utils/uncrustify2.cfg --suffix "" `find . -name "*.h"`
 #exit 0
 aclocal
-libtoolize
+libtoolize --force
 autoconf -f
 automake -a
-#./configure 'CXXFLAGS=-O0 -g -Wall -Weffc++ -Werror -Wfatal-errors'
-./configure
+./configure 'CXXFLAGS=-O0 -g'
+#./configure
