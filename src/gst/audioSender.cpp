@@ -51,8 +51,7 @@ AudioSender::~AudioSender()
 
 void AudioSender::init_source()
 {
-    source_ = config_.createSource();
-    assert(source_);
+    assert(source_ = config_.createSource());
     source_->init();
 }
 
@@ -60,8 +59,7 @@ void AudioSender::init_source()
 void AudioSender::init_codec()
 {
     if (config_.hasCodec()) {
-        encoder_ = gst_element_factory_make(config_.codec(), NULL);
-        assert(encoder_);
+        assert(encoder_ = gst_element_factory_make(config_.codec(), NULL));
         pipeline_.add(encoder_);
     }
 }
@@ -69,9 +67,8 @@ void AudioSender::init_codec()
 
 void AudioSender::init_sink()
 {
-    if (config_.isNetworked()) {
-        payloader_ = gst_element_factory_make("rtpvorbispay", NULL);
-        assert(payloader_);
+    if (config_.isNetworked()) {     // remote version
+        assert(payloader_ = gst_element_factory_make("rtpvorbispay", NULL));
         pipeline_.add(payloader_);
 
         source_->link_to_sink(encoder_);
@@ -81,8 +78,7 @@ void AudioSender::init_sink()
     }
     else {                       // local version
         assert(jack_is_running());
-        sink_ = gst_element_factory_make("jackaudiosink", NULL);
-        assert(sink_);
+        assert(sink_ = gst_element_factory_make("jackaudiosink", NULL));
         g_object_set(G_OBJECT(sink_), "connect", 1, NULL); // turn on autoconnect
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL); // important for latency
         pipeline_.add(sink_);
@@ -108,11 +104,10 @@ bool AudioSender::start()
 {
     MediaBase::start();
 
-    if (config_.isNetworked()) {
-        std::cout << "Sending audio to host " << config_.remoteHost() <<
-        " on port " <<
-        config_.port()
-                  << std::endl;
+    if (config_.isNetworked()) 
+    {
+        std::cout << "Sending audio to host " << config_.remoteHost() << " on port " 
+            << config_.port() << std::endl;
 
         pipeline_.wait_until_playing();
         send_caps();

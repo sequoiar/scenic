@@ -48,12 +48,10 @@ VideoReceiver::~VideoReceiver()
 void VideoReceiver::init_codec()
 {
     if (config_.has_h264()) {
-        depayloader_ = gst_element_factory_make("rtph264depay", NULL);
-        assert(depayloader_);
-
-        decoder_ = gst_element_factory_make("ffdec_h264", NULL);
-        assert(decoder_);
+        assert(depayloader_ = gst_element_factory_make("rtph264depay", NULL));
+        assert(decoder_ = gst_element_factory_make("ffdec_h264", NULL));
     }
+
     pipeline_.add(depayloader_);
     pipeline_.add(decoder_);
     assert(gst_element_link(depayloader_, decoder_));
@@ -66,8 +64,7 @@ void VideoReceiver::init_codec()
 
 void VideoReceiver::init_sink()
 {
-    sink_ = gst_element_factory_make("xvimagesink", NULL);
-    assert(sink_);
+    assert(sink_ = gst_element_factory_make("xvimagesink", NULL));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     pipeline_.add(sink_);

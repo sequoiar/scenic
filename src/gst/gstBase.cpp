@@ -38,6 +38,7 @@ GstBase::~GstBase()
 {
     if (isPlaying())
         assert(pipeline_.stop());
+
     --refCount_;
     if (refCount_ <= 0)
     {
@@ -105,3 +106,5 @@ void GstBase::link_element_vectors(std::vector<GstElement*> &sources, std::vecto
     for (src = sources.begin(), sink = sinks.begin(); src != sources.end(), sink != sinks.end(); ++src, ++sink)
         assert(gst_element_link(*src, *sink));
 }
+
+

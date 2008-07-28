@@ -56,8 +56,8 @@ void AudioReceiver::wait_for_caps()
     LOG("Waiting for caps...");
     lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
-    lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler
-                                ,(void *) this);
+    lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler, 
+                                static_cast<void *>(this));
 
     lo_server_thread_start(st);
 
@@ -89,18 +89,13 @@ int AudioReceiver::caps_handler(const char *path, const char *types, lo_arg ** a
 
 void AudioReceiver::init_codec()
 {
-    depayloader_ = gst_element_factory_make("rtpvorbisdepay", NULL);
-    assert(depayloader_);
-
+    assert(depayloader_ = gst_element_factory_make("rtpvorbisdepay", NULL));
     pipeline_.add(depayloader_);
 
-    decoder_ = gst_element_factory_make(config_.codec(), NULL);
-    assert(decoder_);
-
+    assert(decoder_ = gst_element_factory_make(config_.codec(), NULL));
     pipeline_.add(decoder_);
 
     assert(gst_element_link(depayloader_, decoder_));
-
     session_.add(depayloader_, &config_);
 }
 
@@ -108,8 +103,7 @@ void AudioReceiver::init_codec()
 void AudioReceiver::init_sink()
 {
     assert(jack_is_running());
-    sink_ = gst_element_factory_make("jackaudiosink", NULL);
-    assert(sink_);
+    assert(sink_ = gst_element_factory_make("jackaudiosink", NULL));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     pipeline_.add(sink_);
@@ -120,7 +114,7 @@ void AudioReceiver::init_sink()
 
 bool AudioReceiver::start()
 {
-    // FIXME: caps are only sent if sender is started after
+    // FIXME: caps are only sent if sender is started after receiver
     wait_for_caps();
     std::cout << "Receiving audio on port " << config_.port() << std::endl;
     MediaBase::start();

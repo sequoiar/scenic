@@ -61,13 +61,13 @@ const bool VideoConfig::has_h264() const
 
 VideoSource * VideoConfig::createSource() const
 {
-    if (!source_.compare("videotestsrc"))
+    if (source_ == "videotestsrc")
         return new VideoTestSource(*this);
-    else if (!source_.compare("filesrc"))
+    else if (source_ == "filesrc")
         return new VideoFileSource(*this);
-    else if (!source_.compare("v4l2src"))
+    else if (source_ == "v4l2src")
         return new VideoV4lSource(*this);
-    else if (!source_.compare("dv1394src"))
+    else if (source_ == "dv1394src")
         return new VideoDvSource(*this);
     else {
         std::cerr << "Invalid source!" << std::endl;

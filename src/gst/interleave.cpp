@@ -46,9 +46,7 @@ void Interleave::set_channel_layout()
 
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
-        g_value_set_enum(&val
-                         ,VORBIS_CHANNEL_POSITIONS[config_.numChannels() -
-                                                   1][channelIdx]);
+        g_value_set_enum(&val, VORBIS_CHANNEL_POSITIONS[config_.numChannels() -1][channelIdx]);
         g_value_array_append(arr, &val);
         g_value_reset(&val);
     }
@@ -62,8 +60,7 @@ void Interleave::set_channel_layout()
 
 void Interleave::init()
 {
-    interleave_ = gst_element_factory_make("interleave", NULL);
-    assert(interleave_);
+    assert(interleave_ = gst_element_factory_make("interleave", NULL));
 
     pipeline_.add(interleave_);
 
@@ -79,8 +76,7 @@ void Interleave::link_to_sink(GstElement* sink)
 
 void Interleave::link_to_src_vector(std::vector<GstElement *> &sources)
 {
-    GstIter src;
-    for (src = sources.begin(); src != sources.end(); ++src)
+    for (GstIter src = sources.begin(); src != sources.end(); ++src)
         assert(gst_element_link(*src, interleave_));
 }
 
