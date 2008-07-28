@@ -66,29 +66,23 @@ AudioSource::~AudioSource()
 
 void AudioSource::link_elements()
 {
-    GstIter src, aconv;
-
-    for (src = sources_.begin(), aconv = aconvs_.begin();
-         src != sources_.end(), aconv != aconvs_.end(); ++src, ++aconv)
-        gst_element_link(*src, *aconv);
+    link_element_vectors(sources_, aconvs_);
 }
 
 
 void AudioSource::link_interleave()
 {
-    GstIter aconv;
-    for (aconv = aconvs_.begin(); aconv != aconvs_.end(); ++aconv)
-        interleave_.link_src(*aconv);
+    interleave_.link_to_src_vector(aconvs_);
 }
 
 
-void AudioSource::link_output(GstElement *sink)
+void AudioSource::link_to_sink(GstElement *sink)
 {
-    interleave_.link_sink(sink);
+    interleave_.link_to_sink(sink);
 }
 
 
-gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time,GstClockID id,
+gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                     gpointer user_data)
 {
     return  (static_cast<AudioSource*>(user_data)->callback());     // deferred to subclass
@@ -105,14 +99,12 @@ gboolean AudioTestSource::callback()
 void AudioTestSource::toggle_frequency()
 {
     static const double FREQUENCY[2][8] =
-    {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0}
-     ,{300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0
-       ,1000.0}};
+    {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
+     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
+    
     int i = 0;
 
-    for (std::vector<GstElement*>::iterator iter = sources_.begin();
-         iter != sources_.end();
-         ++iter)
+    for (GstIter iter = sources_.begin(); iter != sources_.end(); ++iter)
         g_object_set(G_OBJECT(*iter), "freq", FREQUENCY[offset_][i++], NULL);
 
     offset_ = (offset_ == 0) ? 1 : 0;
@@ -121,19 +113,15 @@ void AudioTestSource::toggle_frequency()
 
 void AudioTestSource::sub_init()
 {
-    GstIter src, aconv;
+    GstIter src;
 
     const double GAIN = 1.0 / config_.numChannels();        // so sum of tones' amplitude equals 1.0
     double frequency = 100.0;
 
     // is-live must be true for clocked callback to work properly
     for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
-        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", 
-                TRUE, NULL);
+        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
 
-    // FIXME: move to pipeline class?
-    //clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
-    //gst_clock_id_wait_async(clockId_, base_callback, this);
     clockId_ = pipeline_.add_clock_callback(base_callback, this);
 }
 
@@ -177,9 +165,8 @@ void AudioFileSource::sub_init()
 }
 
 
-void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,
-        gboolean last,
-        void *data)
+void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last, 
+        gpointer data)
 {
     if (gst_pad_is_linked(srcPad))
     {
@@ -219,15 +206,11 @@ void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,
 
 void AudioFileSource::link_elements()
 {
-    GstIter src, dec;
-    // link source to decoders
-    for (src = sources_.begin(), dec = decoders_.begin();
-            src != sources_.end(), dec != decoders_.end(); ++src, ++dec)
-        assert(gst_element_link(*src, *dec));
+    link_element_vectors(sources_, decoders_);
 }
 
 
-void AudioFileSource::link_output(GstElement *sink)
+void AudioFileSource::link_to_sink(GstElement *sink)
 {
     assert(gst_element_link(aconvs_[0], sink));
 }

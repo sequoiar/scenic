@@ -98,3 +98,10 @@ bool GstBase::link_pads(GstPad *srcPad, GstPad *sinkPad)
 }
 
 
+void GstBase::link_element_vectors(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks)
+{
+    GstIter src;
+    GstIter sink;
+    for (src = sources.begin(), sink = sinks.begin(); src != sources.end(), sink != sinks.end(); ++src, ++sink)
+        assert(gst_element_link(*src, *sink));
+}

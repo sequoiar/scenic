@@ -32,7 +32,7 @@
 #include "jackUtils.h"
 
 AudioSender::AudioSender(const AudioConfig & config)
-    : config_(config), source_(0), encoder_(0),payloader_(0), sink_(0)
+    : config_(config), session_(), source_(0), encoder_(0),payloader_(0), sink_(0)
 {
     // empty
 }
@@ -74,7 +74,7 @@ void AudioSender::init_sink()
         assert(payloader_);
         pipeline_.add(payloader_);
 
-        source_->link_output(encoder_);
+        source_->link_to_sink(encoder_);
         assert(gst_element_link(encoder_, payloader_));
 
         session_.add(payloader_, &config_);
@@ -87,7 +87,7 @@ void AudioSender::init_sink()
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL); // important for latency
         pipeline_.add(sink_);
 
-        source_->link_output(sink_);
+        source_->link_to_sink(sink_);
     }
 }
 
