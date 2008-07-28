@@ -39,6 +39,7 @@ void DModule::init()
     args.push_back(new BoolArg(&pass,"pass",'p',"bypass this module"));
 }
 
+
 bool DModule::run()
 {
     if(!pass) {
@@ -46,6 +47,7 @@ bool DModule::run()
     }
     return true;
 }
+
 
 int my_main(int argc, char** argv)
 {
@@ -60,8 +62,10 @@ int my_main(int argc, char** argv)
     return 0;
 }
 
+
 int main (int argc, char** argv)
 {
     return my_main(argc,argv);
 }
+
 

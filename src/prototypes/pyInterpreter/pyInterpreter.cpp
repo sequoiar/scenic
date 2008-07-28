@@ -44,6 +44,7 @@ void pyInterpreter::interact()
     exec("i.interact()", main_namespace, main_namespace);
 }
 
+
 std::string pyInterpreter::run_str(std::string s)
 {
     std::string t_str = "i.push('";
@@ -58,6 +59,7 @@ std::string pyInterpreter::run_str(std::string s)
         return std::string("");
 }
 
+
 std::string pyInterpreter::run_input()
 {
     try
@@ -70,6 +72,7 @@ std::string pyInterpreter::run_input()
     }
     return std::string("");
 }
+
 
 int pyInterpreter::init(int argc, char *argv[])
 {
@@ -102,5 +105,6 @@ int pyInterpreter::init(int argc, char *argv[])
 
     return 0;
 }
+
 
 // c++ -I /usr/include/python2.5 -I /usr/include/boost/python/ embed.cpp  /usr/lib/libboost_python-gcc42-1_34_1.a  /usr/lib/libpython2.5.so.1.0

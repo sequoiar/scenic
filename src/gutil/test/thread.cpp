@@ -42,6 +42,7 @@ bool Thread::init()
     return true;
 }
 
+
 int Thread::main()
 {
     BaseMessage r(BaseMessage::ping);
@@ -59,6 +60,7 @@ int Thread::main()
     }
     return 0;
 }
+
 
 int my_main (int argc, char** argv)
 {
@@ -88,9 +90,11 @@ int my_main (int argc, char** argv)
     return 0;
 }
 
+
 int main(int argc, char** argv)
 {
     my_main(argc,argv);
     return 0;
 }
+
 

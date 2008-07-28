@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2008 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -25,15 +25,11 @@ Sdp::Sdp( int aport, int vport ) {}
 
 Sdp::~Sdp(){}
 
-void 
-Sdp::addAudioCodec( sdpCodec* codec ){}
-		
-void 
-Sdp::addVideoCodec( sdpCodec* codec ){}
+void Sdp::addAudioCodec( sdpCodec* codec ){}
 
-void 
-setAudioPort( int aport ){}
+void Sdp::addVideoCodec( sdpCodec* codec ){}
 
-void 
-setVideoPort( int vport ){}
+void setAudioPort( int aport ){}
+
+void setVideoPort( int vport ){}
 

@@ -28,6 +28,7 @@ GstThread::GstThread()
     args.push_back(new StringArg(&conf_str,"sender",'s',"video", "try videotestsrc"));
 }
 
+
 int GstThread::main()
 {
     bool quit = false;
@@ -80,4 +81,5 @@ int GstThread::main()
 
     return 0;
 }
+
 

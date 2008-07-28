@@ -33,6 +33,7 @@ struct foo
         x = y;
     }
 
+
     int x;
     void operator() ()
     {
@@ -62,6 +63,7 @@ void *thread_main(void *v)
     }
     return 0;
 }
+
 
 int main(int argc, char **argv)
 {
@@ -94,4 +96,5 @@ int main(int argc, char **argv)
     g_thread_join(th);
     return 0;
 }
+
 
