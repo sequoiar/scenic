@@ -38,6 +38,7 @@ void VideoTestSuite::init_test()
     BLOCK();
 }
 
+
 void VideoTestSuite::start_test_video()
 {
     if (id_ == 1)
@@ -53,6 +54,7 @@ void VideoTestSuite::start_test_video()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void VideoTestSuite::stop_test_video()
 {
     if (id_ == 1)
@@ -66,6 +68,7 @@ void VideoTestSuite::stop_test_video()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void VideoTestSuite::start_stop_test_video()
 {
@@ -84,6 +87,7 @@ void VideoTestSuite::start_stop_test_video()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void VideoTestSuite::start_v4l()
 {
     if (id_ == 1)
@@ -98,6 +102,7 @@ void VideoTestSuite::start_v4l()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void VideoTestSuite::stop_v4l()
 {
     if (id_ == 1)
@@ -111,6 +116,7 @@ void VideoTestSuite::stop_v4l()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void VideoTestSuite::start_stop_v4l()
 {
@@ -128,6 +134,7 @@ void VideoTestSuite::start_stop_v4l()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void VideoTestSuite::start_v4l_rtp()
 {
@@ -153,6 +160,7 @@ void VideoTestSuite::start_v4l_rtp()
     }
 }
 
+
 void VideoTestSuite::stop_v4l_rtp()
 {
     if (id_ == 0) {
@@ -165,7 +173,7 @@ void VideoTestSuite::stop_v4l_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("v4l2src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -176,6 +184,7 @@ void VideoTestSuite::stop_v4l_rtp()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void VideoTestSuite::start_stop_v4l_rtp()
 {
@@ -192,7 +201,7 @@ void VideoTestSuite::start_stop_v4l_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("v4l2src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -206,6 +215,7 @@ void VideoTestSuite::start_stop_v4l_rtp()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void VideoTestSuite::start_dv()
 {
@@ -221,6 +231,7 @@ void VideoTestSuite::start_dv()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void VideoTestSuite::stop_dv()
 {
     if (id_ == 1)
@@ -234,6 +245,7 @@ void VideoTestSuite::stop_dv()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void VideoTestSuite::start_stop_dv()
 {
@@ -252,6 +264,7 @@ void VideoTestSuite::start_stop_dv()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void VideoTestSuite::start_dv_rtp()
 {
     // receiver should be started first, of course there's no guarantee that it will at this point
@@ -265,7 +278,7 @@ void VideoTestSuite::start_dv_rtp()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("dv1394src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -276,6 +289,7 @@ void VideoTestSuite::start_dv_rtp()
         TEST_ASSERT(tx.isPlaying());
     }
 }
+
 
 void VideoTestSuite::stop_dv_rtp()
 {
@@ -289,7 +303,7 @@ void VideoTestSuite::stop_dv_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("dv1394src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -300,6 +314,7 @@ void VideoTestSuite::stop_dv_rtp()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void VideoTestSuite::start_stop_dv_rtp()
 {
@@ -316,7 +331,7 @@ void VideoTestSuite::start_stop_dv_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("dv1394src", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -330,6 +345,7 @@ void VideoTestSuite::start_stop_dv_rtp()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void VideoTestSuite::start_file()
 {
@@ -345,6 +361,7 @@ void VideoTestSuite::start_file()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void VideoTestSuite::stop_file()
 {
     if (id_ == 1)
@@ -358,6 +375,7 @@ void VideoTestSuite::stop_file()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void VideoTestSuite::start_stop_file()
 {
@@ -376,6 +394,7 @@ void VideoTestSuite::start_stop_file()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void VideoTestSuite::start_file_rtp()
 {
     // receiver should be started first, of course there's no guarantee that it will at this point
@@ -389,7 +408,7 @@ void VideoTestSuite::start_file_rtp()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("filesrc", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -400,6 +419,7 @@ void VideoTestSuite::start_file_rtp()
         TEST_ASSERT(tx.isPlaying());
     }
 }
+
 
 void VideoTestSuite::stop_file_rtp()
 {
@@ -413,7 +433,7 @@ void VideoTestSuite::stop_file_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("filesrc", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -424,6 +444,7 @@ void VideoTestSuite::stop_file_rtp()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void VideoTestSuite::start_stop_file_rtp()
 {
@@ -440,7 +461,7 @@ void VideoTestSuite::start_stop_file_rtp()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         VideoConfig config("filesrc", "h264", MY_ADDRESS, V_PORT);
         VideoSender tx(config);
         tx.init();
@@ -455,6 +476,7 @@ void VideoTestSuite::start_stop_file_rtp()
     }
 }
 
+
 int main(int argc, char **argv)
 {
     if (argc != 2) {
@@ -468,4 +490,5 @@ int main(int argc, char **argv)
     Test::TextOutput output(Test::TextOutput::Verbose);
     return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
+
 

@@ -40,10 +40,12 @@ void VideoSource::init()
     sub_init();
 }
 
+
 void VideoSource::link_element(GstElement *sinkElement)
 {
     assert(gst_element_link(source_, sinkElement));
 }
+
 
 VideoSource::~VideoSource()
 {
@@ -52,12 +54,13 @@ VideoSource::~VideoSource()
     pipeline_.remove(source_);
 }
 
+
 // defers to subclassses callback
-gboolean VideoSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id,
-                                    gpointer user_data)
+gboolean VideoSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
 {
     return (static_cast<VideoSource*>(user_data)->callback());
 }
+
 
 // toggle colour
 gboolean VideoTestSource::callback()
@@ -67,6 +70,7 @@ gboolean VideoTestSource::callback()
     toggle_colour();
     return TRUE;
 }
+
 
 void VideoTestSource::toggle_colour()
 {
@@ -78,21 +82,21 @@ void VideoTestSource::toggle_colour()
     colour = (colour == BLACK) ? WHITE : BLACK;     // toggle black and white
 }
 
+
 void VideoTestSource::sub_init()
 {
     g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
 
-    // FIXME: move to pipeline class?
-    clockId_ = gst_clock_new_periodic_id(pipeline_.clock(), pipeline_.start_time(), GST_SECOND);
-    gst_clock_id_wait_async(clockId_, base_callback, this);
+    clockId_ = pipeline_.add_clock_callback(base_callback, this);
 }
+
 
 VideoTestSource::~VideoTestSource()
 {
     assert(pipeline_.stop());
-    gst_clock_id_unschedule(clockId_);
-    gst_clock_id_unref(clockId_);
+    pipeline_.remove_clock_callback(clockId_);
 }
+
 
 void VideoFileSource::sub_init()
 {
@@ -104,19 +108,27 @@ void VideoFileSource::sub_init()
     const char *filename = "inputVid.avi";
     g_object_set(G_OBJECT(source_), "location", filename, NULL);
     assert(gst_element_link(source_, decoder_));
-    g_signal_connect(decoder_, "new-decoded-pad", G_CALLBACK(VideoFileSource::cb_new_src_pad),
-                     (void *)this);
+
+    // bind callback
+    g_signal_connect(decoder_, "new-decoded-pad",
+            G_CALLBACK(VideoFileSource::cb_new_src_pad),
+            static_cast<void *>(this));
 }
+
 
 void VideoFileSource::link_element(GstElement *sinkElement)
 {
     // defer linking of decoder to this element to callback
     sinkElement_ = sinkElement;
-    if (!strncmp(gst_element_get_name(sinkElement_), "xvimagesink", strlen("xvimagesink")))
+    if (!strncmp(gst_element_get_name(sinkElement_), "xvimagesink"
+                 ,strlen("xvimagesink")))
         g_object_set(G_OBJECT(sinkElement_), "sync", TRUE, NULL);
 }
 
-void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
+
+void VideoFileSource::cb_new_src_pad(GstElement * srcElement, 
+                                     GstPad * srcPad,
+                                     gboolean last,
                                      void *data)
 {
     if (gst_pad_is_linked(srcPad))
@@ -151,20 +163,23 @@ void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
     gst_object_unref(sinkPad);
 }
 
+
 VideoFileSource::~VideoFileSource()
 {
     assert(pipeline_.stop());
     pipeline_.remove(decoder_);
 }
 
+
 VideoDvSource::VideoDvSource(const VideoConfig &config)
-    : VideoSource(config),demux_(0), queue_(0), dvdec_(0)
+    : VideoSource(config), demux_(0), queue_(0), dvdec_(0)
 {}
 
 void VideoDvSource::link_element(GstElement *sinkElement)
 {
     assert(gst_element_link(dvdec_, sinkElement));
 }
+
 
 void VideoDvSource::sub_init()
 {
@@ -181,14 +196,18 @@ void VideoDvSource::sub_init()
     pipeline_.add(dvdec_);
 
     // demux srcpad must be linked to queue sink pad at runtime
-    g_signal_connect(demux_, "pad-added", G_CALLBACK(
-                         VideoDvSource::cb_new_src_pad), (void *) queue_);
+    g_signal_connect(demux_, "pad-added", 
+            G_CALLBACK(VideoDvSource::cb_new_src_pad), 
+            static_cast<void *>(queue_));
 
     assert(gst_element_link(source_, demux_));
     assert(gst_element_link(queue_, dvdec_));
 }
 
-void VideoDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
+
+void VideoDvSource::cb_new_src_pad(GstElement * srcElement, 
+                                   GstPad * srcPad,
+                                   void *data)
 {
     // ignore audio from dvsrc
     if (!std::string("audio").compare(gst_pad_get_name(srcPad)))
@@ -204,4 +223,5 @@ void VideoDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, voi
     assert(link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
+
 

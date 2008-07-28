@@ -37,6 +37,7 @@ RtpSession::RtpSession()
     ++refCount_;
 }
 
+
 bool RtpSession::init()
 {
     // only initialize rtpbin once per process
@@ -49,14 +50,16 @@ bool RtpSession::init()
     return true;
 }
 
+
 void RtpSession::add(GstElement * elem, const MediaConfig * config)
 {
     RtpSession::init();
 
     rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtcp_sender_);
-    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port() + 1, "sync",
-                 FALSE, "async", FALSE, NULL);
+    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port(
+                     ) + 1, "sync"
+                 ,FALSE, "async", FALSE, NULL);
 
     rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL);
     assert(rtcp_receiver_);
@@ -68,6 +71,7 @@ void RtpSession::add(GstElement * elem, const MediaConfig * config)
     addDerived(elem, config);
 }
 
+
 const char *RtpSession::padStr(const char *padName)
 {
     std::string result(padName);
@@ -77,6 +81,7 @@ const char *RtpSession::padStr(const char *padName)
     result = result + istream.str();
     return result.c_str();
 }
+
 
 RtpSession::~RtpSession()
 {
@@ -93,4 +98,5 @@ RtpSession::~RtpSession()
         rtpbin_ = 0;
     }
 }
+
 

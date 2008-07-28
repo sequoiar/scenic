@@ -61,6 +61,7 @@ void AudioDelaySource<T>::sub_init()
         g_object_set(G_OBJECT(*iter), "Delay", 0.5, NULL);
 }
 
+
 template <typename T>
 void AudioDelaySource<T>::link_elements()
 {
@@ -73,16 +74,19 @@ void AudioDelaySource<T>::link_elements()
         gst_element_link(*aconv, *filter);
 }
 
+
 template <typename T>
 void AudioDelaySource<T>::link_interleave()
 {
     GstIter filter;
     for (filter = filters_.begin(); filter != filters_.end(); ++filter)
-        T::interleave_.link_input(*filter);
+        T::interleave_.link_src(*filter);
 }
 
+
 template <typename T>
-gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time, GstClockID id)
+gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time,
+                                       GstClockID id)
 {
     static double d_secs = 5;
 
@@ -94,6 +98,7 @@ gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time, GstCl
         d_secs = 5;
     return T::callback();
 }
+
 
 template <typename T>
 AudioDelaySource<T>::~AudioDelaySource<T>()

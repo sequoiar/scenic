@@ -37,20 +37,22 @@ RtpReceiver::RtpReceiver()
     // empty
 }
 
+
 RtpReceiver::~RtpReceiver()
 {
     if (isPlaying())
         assert(pipeline_.stop());
     pipeline_.remove(rtp_receiver_);
 
+    // find this->depayloader in the static list of depayloaders
     std::list<GstElement *>::iterator iter;
     iter = std::find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
 
-    // make sure we found it
+    // make sure we found it and remove it
     assert(iter != depayloaders_.end());
-    // remove it
     depayloaders_.erase(iter);
 }
+
 
 void RtpReceiver::set_caps(const char *capsStr)
 {
@@ -61,13 +63,11 @@ void RtpReceiver::set_caps(const char *capsStr)
     gst_caps_unref(caps);
 }
 
+
 void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
 {
     // FIXME: Once this callback is attached to the pad-added signal, it gets called like crazy, any time any pad
     // is added (regardless of whether or not it's a dynamic pad) to rtpbin.
-    // We only have this really stupid method of comparing the caps strings of all
-    // the sinks that have been attached to our RtpReceiver so far (stored in a list) against those of the new pad.
-
     if (gst_pad_is_linked(srcPad))
     {
         LOG("Pad is already linked")
@@ -83,46 +83,48 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
         LOG("Wrong pad");
         return;
     }
-    //LOG("Dynamic pad created, linking new srcpad to existing sinkpad.");
-    //std::cout << "SrcElement: " << gst_element_get_name(srcElement) << std::endl;
-    //std::cout << "SrcPad: " << gst_pad_get_name(srcPad) << std::endl;
 
-    //std::list<GstElement *> * depayloaders = static_cast<std::list<GstElement *> *>(data);
-    //std::cout << "You have " << depayloaders_.size() << " depayloaders stored. " << std::endl;
+    // FIXME: We only have this really stupid method of comparing the caps strings of all
+    // the sinks that have been attached to our RtpReceiver so far (stored in a list) against those of the new pad.
+    GstPad *sinkPad = get_matching_sink_pad(srcPad);
 
-    std::list<GstElement *>::iterator iter;
-    //for (iter = depayloaders_.begin(); iter != depayloaders_.end(); ++iter)
-    //   std::cout << "Depayloader: " << gst_element_get_name(*iter) << std::endl;
-
-    GstPad *sinkPad;
-
-    sinkPad = gst_element_get_static_pad(depayloaders_.front(), "sink");
-
-    iter = depayloaders_.begin();
-
-    // look for caps whose first 37 characters match (this includes the parameter that describes media type)
-    // FIXME: could just check the depayloader types/names
-    const int CAPS_LEN = 37;
-    while (strncmp(gst_caps_to_string(gst_pad_get_caps(sinkPad)),
-                   gst_caps_to_string(gst_pad_get_caps(srcPad)), CAPS_LEN)
-           && iter != depayloaders_.end())
-    {
-        sinkPad = gst_element_get_static_pad(*iter, "sink");
-        ++iter;
-    }
-
-    //std::cout << "SINKPAD CAPS: " << gst_caps_to_string(gst_pad_get_caps(sinkPad)) << std::endl;
-    //std::cout << "SRCPAD CAPS: " << gst_caps_to_string(gst_pad_get_caps(srcPad)) << std::endl;
-    if (gst_pad_is_linked(sinkPad))
+    if (gst_pad_is_linked(sinkPad)) // only link once
     {
         LOG("sink pad is already linked.");
         gst_object_unref(sinkPad);
         return;
     }
+
     assert(link_pads(srcPad, sinkPad));
 
     gst_object_unref(sinkPad);
 }
+
+
+GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
+{
+    GstPad *sinkPad;
+
+    sinkPad = gst_element_get_static_pad(depayloaders_.front(), "sink");
+
+    // look for caps whose first 37 characters match (this includes the parameter that describes media type)
+    // FIXME: could just check the depayloader types/names
+
+    const int CAPS_LEN = 37;
+    std::list<GstElement *>::iterator iter = depayloaders_.begin();
+    std::string srcCaps(gst_caps_to_string(gst_pad_get_caps(srcPad)));
+
+    while (strncmp(gst_caps_to_string(gst_pad_get_caps(sinkPad)), srcCaps.c_str(), CAPS_LEN)
+            && iter != depayloaders_.end())
+    {
+        gst_object_unref(sinkPad);
+        sinkPad = gst_element_get_static_pad(*iter, "sink");
+        ++iter;
+    }
+
+    return sinkPad;
+}
+
 
 void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * config)
 {
@@ -139,9 +141,8 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * confi
 
     rtcp_sender_ = gst_element_factory_make("udpsink", NULL);
     assert(rtcp_sender_);
-    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port",
-                 config->port() + 5, "sync", FALSE,
-                 "async", FALSE, NULL);
+    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port() + 5, "sync", 
+            FALSE, "async", FALSE, NULL);
 
     pipeline_.add(rtp_receiver_);
     pipeline_.add(rtcp_receiver_);
@@ -161,13 +162,14 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * confi
     GstPad *rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink");
     assert(rtcpSenderSink);
 
-    assert(gst_pad_link(rtpReceiverSrc, recv_rtp_sink) == GST_PAD_LINK_OK);
-    assert(gst_pad_link(rtcpReceiverSrc, recv_rtcp_sink) == GST_PAD_LINK_OK);
-    assert(gst_pad_link(send_rtcp_src, rtcpSenderSink) == GST_PAD_LINK_OK);
+    assert(link_pads(rtpReceiverSrc, recv_rtp_sink));
+    assert(link_pads(rtcpReceiverSrc, recv_rtcp_sink));
+    assert(link_pads(send_rtcp_src, rtcpSenderSink));
 
     depayloaders_.push_back(depayloader);
     // when pad is created, it must be linked to new sink
-    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), NULL);
+    g_signal_connect(rtpbin_, "pad-added", 
+            G_CALLBACK(RtpReceiver::cb_new_src_pad), NULL);
 
     // release request pads (in reverse order)
     gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);
@@ -179,4 +181,5 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * confi
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
     gst_object_unref(GST_OBJECT(rtpReceiverSrc));
 }
+
 

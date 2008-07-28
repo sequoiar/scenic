@@ -42,6 +42,7 @@ void AudioTestSuite::start_1ch_audiotest()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void AudioTestSuite::stop_1ch_audiotest()
 {
     if (id_ == 1)
@@ -55,6 +56,7 @@ void AudioTestSuite::stop_1ch_audiotest()
     BLOCK();
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void AudioTestSuite::start_stop_1ch_audiotest()
 {
@@ -75,6 +77,7 @@ void AudioTestSuite::start_stop_1ch_audiotest()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void AudioTestSuite::start_2ch_audiotest()
 {
     if (id_ == 1)
@@ -90,6 +93,7 @@ void AudioTestSuite::start_2ch_audiotest()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void AudioTestSuite::stop_2ch_audiotest()
 {
     if (id_ == 1)
@@ -104,6 +108,7 @@ void AudioTestSuite::stop_2ch_audiotest()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void AudioTestSuite::start_stop_2ch_audiotest()
 {
@@ -123,6 +128,7 @@ void AudioTestSuite::start_stop_2ch_audiotest()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void AudioTestSuite::start_6ch_audiotest()
 {
     if (id_ == 1)
@@ -138,6 +144,7 @@ void AudioTestSuite::start_6ch_audiotest()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void AudioTestSuite::stop_6ch_audiotest()
 {
     if (id_ == 1)
@@ -152,6 +159,7 @@ void AudioTestSuite::stop_6ch_audiotest()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void AudioTestSuite::start_stop_6ch_audiotest()
 {
@@ -172,6 +180,7 @@ void AudioTestSuite::start_stop_6ch_audiotest()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void AudioTestSuite::start_8ch_audiotest()
 {
     if (id_ == 1)
@@ -187,6 +196,7 @@ void AudioTestSuite::start_8ch_audiotest()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void AudioTestSuite::stop_8ch_audiotest()
 {
     if (id_ == 1)
@@ -200,6 +210,7 @@ void AudioTestSuite::stop_8ch_audiotest()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void AudioTestSuite::start_stop_8ch_audiotest()
 {
@@ -219,6 +230,7 @@ void AudioTestSuite::start_stop_8ch_audiotest()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void AudioTestSuite::start_2ch_comp_rtp_audiotest()
 {
     int numChannels = 2;
@@ -231,7 +243,7 @@ void AudioTestSuite::start_2ch_comp_rtp_audiotest()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
                            ,A_PORT);
         AudioSender tx(config);
@@ -243,6 +255,7 @@ void AudioTestSuite::start_2ch_comp_rtp_audiotest()
         TEST_ASSERT(tx.isPlaying());
     }
 }
+
 
 void AudioTestSuite::stop_2ch_comp_rtp_audiotest()
 {
@@ -258,7 +271,7 @@ void AudioTestSuite::stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
                            ,A_PORT);
         AudioSender tx(config);
@@ -270,6 +283,7 @@ void AudioTestSuite::stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void AudioTestSuite::start_stop_2ch_comp_rtp_audiotest()
 {
@@ -287,7 +301,7 @@ void AudioTestSuite::start_stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
                            ,A_PORT);
         AudioSender tx(config);
@@ -302,6 +316,7 @@ void AudioTestSuite::start_stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void AudioTestSuite::start_8ch_comp_rtp_audiotest()
 {
@@ -317,7 +332,7 @@ void AudioTestSuite::start_8ch_comp_rtp_audiotest()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
                            ,A_PORT);
         AudioSender tx(config);
@@ -329,6 +344,7 @@ void AudioTestSuite::start_8ch_comp_rtp_audiotest()
         TEST_ASSERT(tx.isPlaying());
     }
 }
+
 
 void AudioTestSuite::stop_8ch_comp_rtp_audiotest()
 {
@@ -343,7 +359,7 @@ void AudioTestSuite::stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
                            ,A_PORT);
         AudioSender tx(config);
@@ -355,6 +371,7 @@ void AudioTestSuite::stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void AudioTestSuite::start_stop_8ch_comp_rtp_audiotest()
 {
@@ -372,7 +389,7 @@ void AudioTestSuite::start_stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
                            ,A_PORT);
         AudioSender tx(config);
@@ -387,6 +404,7 @@ void AudioTestSuite::start_stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void AudioTestSuite::start_8ch_alsa()
 {
@@ -403,6 +421,7 @@ void AudioTestSuite::start_8ch_alsa()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void AudioTestSuite::stop_8ch_alsa()
 {
     if (id_ == 1)
@@ -416,6 +435,7 @@ void AudioTestSuite::stop_8ch_alsa()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void AudioTestSuite::start_stop_8ch_alsa()
 {
@@ -434,6 +454,7 @@ void AudioTestSuite::start_stop_8ch_alsa()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void AudioTestSuite::start_8ch_jack()
 {
     if (id_ == 1)
@@ -449,6 +470,7 @@ void AudioTestSuite::start_8ch_jack()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void AudioTestSuite::stop_8ch_jack()
 {
     if (id_ == 1)
@@ -462,6 +484,7 @@ void AudioTestSuite::stop_8ch_jack()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void AudioTestSuite::start_stop_8ch_jack()
 {
@@ -480,6 +503,7 @@ void AudioTestSuite::start_stop_8ch_jack()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void AudioTestSuite::start_8ch_comp_audiofile()
 {
     int numChannels = 8;
@@ -496,6 +520,7 @@ void AudioTestSuite::start_8ch_comp_audiofile()
     TEST_ASSERT(tx.isPlaying());
 }
 
+
 void AudioTestSuite::stop_8ch_comp_audiofile()
 {
     int numChannels = 8;
@@ -510,6 +535,7 @@ void AudioTestSuite::stop_8ch_comp_audiofile()
     TEST_ASSERT(tx.stop());
     TEST_ASSERT(!tx.isPlaying());
 }
+
 
 void AudioTestSuite::start_stop_8ch_comp_audiofile()
 {
@@ -529,6 +555,7 @@ void AudioTestSuite::start_stop_8ch_comp_audiofile()
     TEST_ASSERT(!tx.isPlaying());
 }
 
+
 void AudioTestSuite::start_8ch_comp_rtp_audiofile()
 {
     int numChannels = 8;
@@ -543,7 +570,7 @@ void AudioTestSuite::start_8ch_comp_rtp_audiofile()
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender tx(config);
         tx.init();
@@ -554,6 +581,7 @@ void AudioTestSuite::start_8ch_comp_rtp_audiofile()
         TEST_ASSERT(tx.isPlaying());
     }
 }
+
 
 void AudioTestSuite::stop_8ch_comp_rtp_audiofile()
 {
@@ -568,7 +596,7 @@ void AudioTestSuite::stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender tx(config);
         tx.init();
@@ -579,6 +607,7 @@ void AudioTestSuite::stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(!tx.isPlaying());
     }
 }
+
 
 void AudioTestSuite::start_stop_8ch_comp_rtp_audiofile()
 {
@@ -596,7 +625,7 @@ void AudioTestSuite::start_stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(rx.stop());
         TEST_ASSERT(!rx.isPlaying());
     }
-    else{
+    else {
         AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, A_PORT);
         AudioSender tx(config);
         TEST_ASSERT(tx.init());
@@ -611,6 +640,7 @@ void AudioTestSuite::start_stop_8ch_comp_rtp_audiofile()
     }
 }
 
+
 int main(int argc, char **argv)
 {
     if (argc != 2) {
@@ -624,4 +654,5 @@ int main(int argc, char **argv)
     Test::TextOutput output(Test::TextOutput::Verbose);
     return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
+
 

@@ -33,6 +33,7 @@ GstBase::GstBase()
     ++refCount_;
 }
 
+
 GstBase::~GstBase()
 {
     if (isPlaying())
@@ -45,50 +46,55 @@ GstBase::~GstBase()
     }
 }
 
+
 bool GstBase::isPlaying()
 {
     return pipeline_.isPlaying();
 }
 
+
+// with this method, we can find out why pads don't link 
+// if they fail
 bool GstBase::link_pads(GstPad *srcPad, GstPad *sinkPad)
 {
     bool linkOk = false;
 
     switch(gst_pad_link(srcPad, sinkPad))
     {
-    case GST_PAD_LINK_OK:
-        LOG("link succeeded");
-        linkOk = true;
-        break;
+        case GST_PAD_LINK_OK:
+            LOG("link succeeded");
+            linkOk = true;
+            break;
 
-    case GST_PAD_LINK_WRONG_HIERARCHY:
-        LOG("pads have no common grandparent");
-        break;
+        case GST_PAD_LINK_WRONG_HIERARCHY:
+            LOG("pads have no common grandparent");
+            break;
 
-    case GST_PAD_LINK_WAS_LINKED:
-        LOG("pad was already linked");
-        break;
+        case GST_PAD_LINK_WAS_LINKED:
+            LOG("pad was already linked");
+            break;
 
-    case GST_PAD_LINK_WRONG_DIRECTION:
-        LOG("pads have wrong direction");
-        break;
+        case GST_PAD_LINK_WRONG_DIRECTION:
+            LOG("pads have wrong direction");
+            break;
 
-    case GST_PAD_LINK_NOFORMAT:
-        LOG("pads do not have common format");
-        break;
+        case GST_PAD_LINK_NOFORMAT:
+            LOG("pads do not have common format");
+            break;
 
-    case GST_PAD_LINK_NOSCHED:
-        LOG("pads cannot cooperate in scheduling");
-        break;
+        case GST_PAD_LINK_NOSCHED:
+            LOG("pads cannot cooperate in scheduling");
+            break;
 
-    case GST_PAD_LINK_REFUSED:
-        LOG("refused for some reason");
-        break;
+        case GST_PAD_LINK_REFUSED:
+            LOG("refused for some reason");
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
 
     return linkOk;
 }
+
 

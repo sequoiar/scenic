@@ -40,6 +40,7 @@ protected:
     virtual void addDerived(GstElement * depayloader, const MediaConfig * config);
 
 private:
+    static GstPad *get_matching_sink_pad(GstPad *srcPad);
     static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
 
     GstElement *rtp_receiver_;

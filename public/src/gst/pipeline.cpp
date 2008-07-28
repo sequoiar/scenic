@@ -33,6 +33,7 @@ Pipeline::Pipeline()
     // empty
 }
 
+
 Pipeline & Pipeline::Instance()
 {
     if (instance_ == 0) {
@@ -42,11 +43,13 @@ Pipeline & Pipeline::Instance()
     return *instance_;
 }
 
+
 Pipeline::~Pipeline()
 {
     assert(stop());
     gst_object_unref(GST_OBJECT(pipeline_));
 }
+
 
 void Pipeline::init()
 {
@@ -64,6 +67,7 @@ void Pipeline::init()
     }
 }
 
+
 // FIXME: check if this is safe, we're destroying and recreating the pipeline
 void Pipeline::reset()
 {
@@ -75,16 +79,19 @@ void Pipeline::reset()
     }
 }
 
+
 void Pipeline::make_verbose()
 {
     // Get verbose output
     if (verbose_) {
         gchar *exclude_args = NULL;     // set args to be excluded from output
-        gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
-        g_signal_connect(pipeline_, "deep_notify",
-                         G_CALLBACK(gst_object_default_deep_notify), exclude_list);
+        gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ","
+                                                         ,0) : NULL;
+        g_signal_connect(pipeline_, "deep_notify"
+                         ,G_CALLBACK(gst_object_default_deep_notify), exclude_list);
     }
 }
+
 
 bool Pipeline::isPlaying() const
 {
@@ -94,17 +101,20 @@ bool Pipeline::isPlaying() const
         return false;
 }
 
+
 void Pipeline::wait_until_playing() const
 {
     while (!isPlaying())
-        usleep(1000);
+        usleep(10000);
 }
+
 
 void Pipeline::wait_until_stopped() const
 {
     while (isPlaying())
-        usleep(1000);
+        usleep(10000);
 }
+
 
 bool Pipeline::start()
 {
@@ -112,16 +122,19 @@ bool Pipeline::start()
     return isPlaying();
 }
 
+
 bool Pipeline::stop()
 {
     gst_element_set_state(pipeline_, GST_STATE_NULL);
     return !isPlaying();
 }
 
+
 void Pipeline::add(GstElement * element)
 {
     gst_bin_add(GST_BIN(pipeline_), element);
 }
+
 
 void Pipeline::add_vector(std::vector < GstElement * >&elementVec)
 {
@@ -130,11 +143,13 @@ void Pipeline::add_vector(std::vector < GstElement * >&elementVec)
         gst_bin_add(GST_BIN(pipeline_), *iter);
 }
 
+
 void Pipeline::remove(GstElement * element)
 {
     if (element)
         assert(gst_bin_remove(GST_BIN(pipeline_), element));
 }
+
 
 void Pipeline::remove_vector(std::vector < GstElement * >&elementVec)
 {
@@ -143,8 +158,23 @@ void Pipeline::remove_vector(std::vector < GstElement * >&elementVec)
         assert(gst_bin_remove(GST_BIN(pipeline_), *iter));
 }
 
+
 GstClock * Pipeline::clock() const
 {
     return gst_pipeline_get_clock(GST_PIPELINE(pipeline_));
 }
 
+
+GstClockID Pipeline::add_clock_callback(GstClockCallback callback, gpointer user_data)
+{
+    GstClockID clockId = gst_clock_new_periodic_id(clock(), start_time(), GST_SECOND);
+    gst_clock_id_wait_async(clockId, callback, user_data);
+    return clockId;
+}
+
+
+void Pipeline::remove_clock_callback(GstClockID clockId)
+{
+    gst_clock_id_unschedule(clockId);
+    gst_clock_id_unref(clockId);
+}
