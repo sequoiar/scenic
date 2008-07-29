@@ -72,8 +72,7 @@ OscThread::OscThread()
 
 
 int OscThread::generic_handler_static(const char *path, const char *types,lo_arg ** argv,
-                                      int argc, void *data,
-                                      void *user_data)
+                                      int argc, void *data, void *user_data)
 {
     OscThread *t = static_cast < OscThread * >(user_data);
     return (t->generic_handler(path, types, argv, argc, data));
