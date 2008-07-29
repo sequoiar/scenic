@@ -75,6 +75,7 @@
  */
 
 #include <gst/gst.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "gstjackaudiosrc.h"
