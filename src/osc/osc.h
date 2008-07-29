@@ -40,17 +40,17 @@ typedef std::vector < LoArgs > OscArgs;
 
 class OscMessage
 {
-public:
-    OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d);
-    OscMessage()
-        : path(),types(),args(),argc(0),data(0){}
-    std::string path, types;
-    OscArgs args;
-    int argc;
-    void *data;
+    public:
+        OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d);
+        OscMessage()
+            : path(),types(),args(),argc(0),data(0){}
+        std::string path, types;
+        OscArgs args;
+        int argc;
+        void *data;
 
-    OscMessage(const OscMessage&);     //No Copy Constructor
-    OscMessage& operator=(const OscMessage&);     //No Assignment Operator
+        OscMessage(const OscMessage&); //No Copy Constructor
+        OscMessage& operator=(const OscMessage&); //No Assignment Operator
 };
 
 
@@ -59,56 +59,56 @@ typedef QueuePair_ < OscMessage > QueuePairOfOscMessage;
 class OscThread
     : public BaseThread < OscMessage >
 {
-public:
-    OscThread();
-private:
-    int main();
+    public:
+        OscThread();
+    private:
+        int main();
 
-    static int generic_handler_static(const char *path, const char *types,lo_arg ** argv,
-                                      int argc,void *data,
-                                      void *user_data);
+        static int generic_handler_static(const char *path, const char *types,lo_arg ** argv,
+                                          int argc,void *data,
+                                          void *user_data);
 
-    int generic_handler(const char *path, const char *types, lo_arg ** argv,int argc,
-                        void *data);
+        int generic_handler(const char *path, const char *types, lo_arg ** argv,int argc,
+                            void *data);
 
-    static void liblo_error(int num, const char *msg, const char *path){}
-    char* local_port_;
-    char* remote_port_;
-    char* remote_host_;
-    bool running;
-    void send(OscMessage & osc);
+        static void liblo_error(int num, const char *msg, const char *path){}
+        char* local_port_;
+        char* remote_port_;
+        char* remote_host_;
+        bool running;
+        void send(OscMessage & osc);
 
-    OscThread(const OscThread&);     //No Copy Constructor
-    OscThread& operator=(const OscThread&);     //No Assignment Operator
+        OscThread(const OscThread&); //No Copy Constructor
+        OscThread& operator=(const OscThread&); //No Assignment Operator
 };
 
 
 class LoArgs
 {
-public:
-    LoArgs(const char *pchar, int index, lo_arg * a)
-        : type(static_cast<lo_type>(pchar[index])), i(0),s()
-    {
-        switch ((char) type)
+    public:
+        LoArgs(const char *pchar, int index, lo_arg * a)
+            : type(static_cast<lo_type>(pchar[index])), i(0),s()
         {
-        case 's':
-        {
-            s = static_cast < char *>(&(a->s));
-            break;
+            switch ((char) type)
+            {
+                case 's':
+                {
+                    s = static_cast < char *>(&(a->s));
+                    break;
+                }
+                case 'i':
+                {
+                    i = static_cast < int >(a->i);
+                    break;
+                }
+            }
         }
-        case 'i':
-        {
-            i = static_cast < int >(a->i);
-            break;
-        }
-        }
-    }
 
 
-    lo_type type;
-    int i;
+        lo_type type;
+        int i;
 
-    std::string s;
+        std::string s;
 };
 
 #endif
