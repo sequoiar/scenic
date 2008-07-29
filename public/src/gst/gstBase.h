@@ -27,7 +27,7 @@
 class GstBase
 {
     public:
-        bool isPlaying();
+        bool isPlaying() { return pipeline_.isPlaying(); }
 
     protected:
         typedef std::vector<GstElement *>::iterator GstIter;

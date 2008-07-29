@@ -47,12 +47,6 @@ GstBase::~GstBase()
 }
 
 
-bool GstBase::isPlaying()
-{
-    return pipeline_.isPlaying();
-}
-
-
 // with this method, we can find out why pads don't link
 // if they fail
 bool GstBase::link_pads(GstPad *srcPad, GstPad *sinkPad)
