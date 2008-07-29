@@ -39,17 +39,17 @@ typedef GAsyncQueue GAsyncQueue;
 
 class BaseQueuePair
 {
-public:
-    BaseQueuePair(GAsyncQueue* f,GAsyncQueue* s)
-        : first(f),second(s){}
-    virtual ~BaseQueuePair(){}
+    public:
+        BaseQueuePair(GAsyncQueue* f,GAsyncQueue* s)
+            : first(f),second(s){}
+        virtual ~BaseQueuePair(){}
 
-    GAsyncQueue *first, *second;
-    BaseQueuePair(const BaseQueuePair& in)
-        : first(in.first),second(in.second){}
+        GAsyncQueue *first, *second;
+        BaseQueuePair(const BaseQueuePair& in)
+            : first(in.first),second(in.second){}
 
-private:
-    BaseQueuePair& operator=(const BaseQueuePair&); //No Assignment Operator
+    private:
+        BaseQueuePair& operator=(const BaseQueuePair&); //No Assignment Operator
 };
 
 
@@ -57,29 +57,29 @@ template < class T >
 class QueuePair_
     : public BaseQueuePair
 {
-public:
-    QueuePair_ < T > (GAsyncQueue * f, GAsyncQueue * s)
-        : BaseQueuePair(f, s)
-    {}
-    QueuePair_ < T > ()
-        : BaseQueuePair(0, 0)
-    {}
-    ~QueuePair_ < T > ()
-    {}
-    T timed_pop(int ms);
-    void push(T pt);
+    public:
+        QueuePair_ < T > (GAsyncQueue * f, GAsyncQueue * s)
+            : BaseQueuePair(f, s)
+        {}
+        QueuePair_ < T > ()
+            : BaseQueuePair(0, 0)
+        {}
+        ~QueuePair_ < T > ()
+        {}
+        T timed_pop(int ms);
+        void push(T pt);
 
-    void done(T * pt);
-    void init();
+        void done(T * pt);
+        void init();
 
-    void del(bool);
+        void del(bool);
 
-private:
-    bool own[2];
-    T *timed_pop_(int ms);
+    private:
+        bool own[2];
+        T *timed_pop_(int ms);
 
-    static GMutex *mutex;
-    static std::list < T * >l;
+        static GMutex *mutex;
+        static std::list < T * >l;
 };
 
 
@@ -87,59 +87,63 @@ template < class T >
 class BaseThread
     : public BaseModule
 {
-public:
-    BaseThread < T > ();
-    virtual ~BaseThread < T > ();
+    public:
+        BaseThread < T > ();
+        virtual ~BaseThread < T > ();
 
-    QueuePair_ < T > getQueue();
+        QueuePair_ < T > getQueue();
 
-    GAsyncQueue *getPushQueue() {
-        return queue.first;
-    }
-
-
-    GAsyncQueue *getPopQueue() {
-        return queue.second;
-    }
+        GAsyncQueue *getPushQueue() {
+            return queue.first;
+        }
 
 
-    bool run();
-
-protected:
-    virtual int main() {
-        return 0;
-    }
+        GAsyncQueue *getPopQueue() {
+            return queue.second;
+        }
 
 
-    GThread *th;
+        bool run();
 
-    QueuePair_ < T > queue;
-    static void *thread_main(void *v);
+    protected:
+        virtual int main() {
+            return 0;
+        }
 
-private:
-    BaseThread(const BaseThread&); //No Copy Constructor
-    BaseThread& operator=(const BaseThread&); //No Assignment Operator
+
+        GThread *th;
+
+        QueuePair_ < T > queue;
+        static void *thread_main(void *v);
+
+    private:
+        BaseThread(const BaseThread&); //No Copy Constructor
+        BaseThread& operator=(const BaseThread&); //No Assignment Operator
 };
 
-template < class T > QueuePair_ < T > BaseThread < T >::getQueue()
+template < class T >
+QueuePair_ < T > BaseThread < T >::getQueue()
 {
     return (QueuePair_ < T > (queue.second, queue.first));
 }
 
 
-template < class T > T* queue_pair_pop(BaseQueuePair qp)
+template < class T >
+T* queue_pair_pop(BaseQueuePair qp)
 {
     return (static_cast < T* > (g_async_queue_pop(qp.first)));
 }
 
 
-template < class T > void queue_pair_push(BaseQueuePair qp, T* t)
+template < class T >
+void queue_pair_push(BaseQueuePair qp, T* t)
 {
     g_async_queue_push(qp.second, t);
 }
 
 
-template < class T > T* queue_pair_timed_pop(BaseQueuePair* p, int ms)
+template < class T >
+T* queue_pair_timed_pop(BaseQueuePair* p, int ms)
 {
     GTimeVal t;
 
@@ -149,25 +153,29 @@ template < class T > T* queue_pair_timed_pop(BaseQueuePair* p, int ms)
 }
 
 
-template < class T > GThread * thread_create_queue_pair(void *(thread) (void *), T t,
-                                                        GError ** err)
+template < class T >
+GThread * thread_create_queue_pair(void *(thread) (void *), T t,GError ** err)
 {
     return (g_thread_create(thread, static_cast < void *>(t), TRUE, err));
 }
 
 
-template < class T > GMutex * QueuePair_ < T >::mutex = NULL;
+template < class T >
+GMutex * QueuePair_ < T >::mutex = NULL;
 
-template < class T > std::list < T * >QueuePair_ < T >::l;
+template < class T >
+std::list < T * >QueuePair_ < T >::l;
 
 
-template < class T > T * QueuePair_ < T >::timed_pop_(int ms)
+template < class T >
+T * QueuePair_ < T >::timed_pop_(int ms)
 {
     return (queue_pair_timed_pop < T >(this, ms));
 }
 
 
-template < class T > T QueuePair_ < T >::timed_pop(int ms)
+template < class T >
+T QueuePair_ < T >::timed_pop(int ms)
 {
     T n;
     T *s = timed_pop_(ms);
@@ -182,7 +190,8 @@ template < class T > T QueuePair_ < T >::timed_pop(int ms)
 }
 
 
-template < class T > void QueuePair_ < T >::push(T pt)
+template < class T >
+void QueuePair_ < T >::push(T pt)
 {
     g_mutex_lock(mutex);
     T *t = new T(pt);
@@ -194,7 +203,8 @@ template < class T > void QueuePair_ < T >::push(T pt)
 }
 
 
-template < class T > void QueuePair_ < T >::done(T * t)
+template < class T >
+void QueuePair_ < T >::done(T * t)
 {
     typename std::list<T*>::iterator it;
 
@@ -213,7 +223,8 @@ template < class T > void QueuePair_ < T >::done(T * t)
 }
 
 
-template < class T > void QueuePair_ < T >::init()
+template < class T >
+void QueuePair_ < T >::init()
 {
     if (!mutex)
         mutex = g_mutex_new();
@@ -232,7 +243,8 @@ template < class T > void QueuePair_ < T >::init()
 }
 
 
-template < class T> void QueuePair_<T>::del(bool one)
+template < class T>
+void QueuePair_<T>::del(bool one)
 {
     T *t;
     GAsyncQueue *q;
@@ -252,7 +264,8 @@ template < class T> void QueuePair_<T>::del(bool one)
 }
 
 
-template < class T > BaseThread < T >::BaseThread()
+template < class T >
+BaseThread < T >::BaseThread()
     : th(0), queue()
 {
     if (!g_thread_supported ())
@@ -261,7 +274,8 @@ template < class T > BaseThread < T >::BaseThread()
 }
 
 
-template < class T > BaseThread < T >::~BaseThread()
+template < class T >
+BaseThread < T >::~BaseThread()
 {
     if (th)
         g_thread_join(th);
@@ -270,7 +284,8 @@ template < class T > BaseThread < T >::~BaseThread()
 }
 
 
-template < class T > bool BaseThread < T >::run()
+template < class T >
+bool BaseThread < T >::run()
 {
     GError *err = 0;
 
@@ -285,9 +300,10 @@ template < class T > bool BaseThread < T >::run()
 }
 
 
-template < class T > void *BaseThread < T >::thread_main(void *v)
+template < class T >
+void *BaseThread < T >::thread_main(void *v)
 {
-    return ((void *) (static_cast < BaseThread * >(v)->main()));
+    return ((void *)(static_cast < BaseThread * >(v)->main()));
 }
 
 
