@@ -30,29 +30,29 @@
 class SyncTestSuite
     : public GstTestSuite
 {
-public:
+    public:
 
-    SyncTestSuite()
-    {
+        SyncTestSuite()
+        {
 #if DV
-        TEST_ADD(SyncTestSuite::start_8ch_comp_rtp_audiofile_dv)
-        TEST_ADD(SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv)
-        TEST_ADD(SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv)
+            TEST_ADD(SyncTestSuite::start_8ch_comp_rtp_audiofile_dv)
+            TEST_ADD(SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv)
+            TEST_ADD(SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv)
 #endif  // DV
 
-        TEST_ADD(SyncTestSuite::sync);
-    }
+            TEST_ADD(SyncTestSuite::sync);
+        }
 
 
 // some tests
 
-private:
+    private:
 
-    void start_8ch_comp_rtp_audiofile_dv();
-    void stop_8ch_comp_rtp_audiofile_dv();
-    void start_stop_8ch_comp_rtp_audiofile_dv();
+        void start_8ch_comp_rtp_audiofile_dv();
+        void stop_8ch_comp_rtp_audiofile_dv();
+        void start_stop_8ch_comp_rtp_audiofile_dv();
 
-    void sync();
+        void sync();
 };
 
 #endif // _SYNC_TEST_SUITE_H_

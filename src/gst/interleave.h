@@ -28,21 +28,21 @@ class AudioConfig;
 class Interleave
     : public GstBase
 {
-public:
-    Interleave(const AudioConfig &config);
-    ~Interleave();
-    void init();
-    void link_to_sink(GstElement *sink);
-    void link_to_src_vector(std::vector<GstElement *> &sources);
+    public:
+        explicit Interleave(const AudioConfig &config);
+        ~Interleave();
+        void init();
+        void link_to_sink(GstElement *sink);
+        void link_to_sources(std::vector<GstElement *> &sources);
 
-private:
-    GstElement *interleave_;
-    const AudioConfig &config_;
-    static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
-    void set_channel_layout();
+    private:
+        GstElement *interleave_;
+        const AudioConfig &config_;
+        static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
+        void set_channel_layout();
 
-    Interleave(const Interleave&);         //No Copy Constructor
-    Interleave& operator=(const Interleave&);         //No Assignment Operator
+        Interleave(const Interleave&);     //No Copy Constructor
+        Interleave& operator=(const Interleave&);     //No Assignment Operator
 };
 
 #endif //_INTERLEAVE_H_

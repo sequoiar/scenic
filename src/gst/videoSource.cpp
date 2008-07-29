@@ -27,7 +27,7 @@
 
 
 VideoSource::VideoSource(const VideoConfig &config)
-    : config_(config), source_(0)
+    : config_(config),source_(0)
 {}
 
 // parts of sub_init that are common to all AudioSource classes
@@ -55,7 +55,7 @@ VideoSource::~VideoSource()
 
 
 // defers to subclassses callback
-gboolean VideoSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id,
+gboolean VideoSource::base_callback(GstClock *clock,GstClockTime time,GstClockID id,
                                     gpointer user_data)
 {
     return (static_cast<VideoSource*>(user_data)->callback());
@@ -109,9 +109,9 @@ void VideoFileSource::sub_init()
     assert(gst_element_link(source_, decoder_));
 
     // bind callback
-    g_signal_connect(decoder_, "new-decoded-pad"
-                     ,G_CALLBACK(VideoFileSource::cb_new_src_pad)
-                     ,static_cast<void *>(this));
+    g_signal_connect(decoder_, "new-decoded-pad",
+                     G_CALLBACK(VideoFileSource::cb_new_src_pad),
+                     static_cast<void *>(this));
 }
 
 
@@ -192,9 +192,9 @@ void VideoDvSource::sub_init()
     pipeline_.add(dvdec_);
 
     // demux srcpad must be linked to queue sink pad at runtime
-    g_signal_connect(demux_, "pad-added"
-                     ,G_CALLBACK(VideoDvSource::cb_new_src_pad)
-                     ,static_cast<void *>(queue_));
+    g_signal_connect(demux_, "pad-added",
+                     G_CALLBACK(VideoDvSource::cb_new_src_pad),
+                     static_cast<void *>(queue_));
 
     assert(gst_element_link(source_, demux_));
     assert(gst_element_link(queue_, dvdec_));

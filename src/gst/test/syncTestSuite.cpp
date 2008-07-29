@@ -198,8 +198,8 @@ void SyncTestSuite::sync()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("audiotestsrc", NUM_CHANNELS, "vorbisenc", MY_ADDRESS
-                            ,A_PORT);
+        AudioConfig aConfig("audiotestsrc", NUM_CHANNELS, "vorbisenc", MY_ADDRESS,
+                            A_PORT);
         AudioSender aTx(aConfig);
         aTx.init();
 

@@ -142,9 +142,8 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * confi
     g_object_set(rtcp_receiver_, "port", config->port() + 1, NULL);
 
     assert(rtcp_sender_ = gst_element_factory_make("udpsink", NULL));
-    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port", config->port(
-                     ) + 5, "sync"
-                 ,FALSE, "async", FALSE, NULL);
+    g_object_set(rtcp_sender_, "host", config->remoteHost(), "port",
+                 config->port() + 5, "sync", FALSE, "async", FALSE, NULL);
 
     pipeline_.add(rtp_receiver_);
     pipeline_.add(rtcp_receiver_);
@@ -164,8 +163,7 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * confi
 
     depayloaders_.push_back(depayloader);
     // when pad is created, it must be linked to new sink
-    g_signal_connect(rtpbin_, "pad-added"
-                     ,G_CALLBACK(RtpReceiver::cb_new_src_pad), NULL);
+    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), NULL);
 
     // release request pads (in reverse order)
     gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);

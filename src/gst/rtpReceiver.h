@@ -30,25 +30,25 @@ class MediaConfig;
 class RtpReceiver
     : public RtpSession
 {
-public:
-    RtpReceiver();
-    void set_caps(const char *capsStr);
+    public:
+        RtpReceiver();
+        void set_caps(const char *capsStr);
 
-    virtual ~RtpReceiver();
+        virtual ~RtpReceiver();
 
-protected:
-    virtual void addDerived(GstElement * depayloader, const MediaConfig * config);
+    protected:
+        virtual void addDerived(GstElement * depayloader, const MediaConfig * config);
 
-private:
-    static GstPad *get_matching_sink_pad(GstPad *srcPad);
-    static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
+    private:
+        static GstPad *get_matching_sink_pad(GstPad *srcPad);
+        static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
 
-    GstElement *rtp_receiver_;
-    GstElement *depayloader_;
-    static std::list<GstElement *> depayloaders_;
+        GstElement *rtp_receiver_;
+        GstElement *depayloader_;
+        static std::list<GstElement *> depayloaders_;
 
-    RtpReceiver(const RtpReceiver&); //No Copy Constructor
-    RtpReceiver& operator=(const RtpReceiver&); //No Assignment Operator
+        RtpReceiver(const RtpReceiver&); //No Copy Constructor
+        RtpReceiver& operator=(const RtpReceiver&); //No Assignment Operator
 };
 
 #endif // _RTP_RECEIVER_H_

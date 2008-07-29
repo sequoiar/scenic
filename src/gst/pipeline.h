@@ -26,40 +26,40 @@
 
 class Pipeline
 {
-public:
-    static Pipeline & Instance();
-    void add(GstElement * element);
-    void add_vector(std::vector < GstElement * >&elementVec);
-    GstClockID add_clock_callback(GstClockCallback callback, gpointer user_data);
-    void remove_clock_callback(GstClockID clockId);
-    void remove(GstElement * element);
-    void remove_vector(std::vector < GstElement * >&elementVec);
-    void reset();
-    bool isPlaying() const;
-    void wait_until_playing() const;
-    void wait_until_stopped() const;
-    bool start();
-    bool stop();
+    public:
+        static Pipeline & Instance();
+        void add(GstElement * element);
+        void add_vector(std::vector < GstElement * >&elementVec);
+        GstClockID add_clock_callback(GstClockCallback callback, gpointer user_data);
+        void remove_clock_callback(GstClockID clockId);
+        void remove(GstElement * element);
+        void remove_vector(std::vector < GstElement * >&elementVec);
+        void reset();
+        bool isPlaying() const;
+        void wait_until_playing() const;
+        void wait_until_stopped() const;
+        bool start();
+        bool stop();
 
-    const GstClockTime start_time() const { return startTime_; }
+        //const GstClockTime start_time() const { return startTime_; }
 
-    GstClock* clock() const;
+        GstClock* clock() const { return gst_pipeline_get_clock(GST_PIPELINE(pipeline_)); }
 
-private:
-    void init();
+    private:
+        void init();
 
-    Pipeline(const Pipeline&);
-    Pipeline& operator=(const Pipeline&);
+        Pipeline(const Pipeline&);
+        Pipeline& operator=(const Pipeline&);
 
-    Pipeline();
-    ~Pipeline();
-    static Pipeline *instance_;
+        Pipeline();
+        ~Pipeline();
+        static Pipeline *instance_;
 
-    void make_verbose();
+        void make_verbose();
 
-    GstElement *pipeline_;
-    GstClockTime startTime_;
-    bool verbose_;
+        GstElement *pipeline_;
+        GstClockTime startTime_;
+        bool verbose_;
 };
 
 #endif // _PIPELINE_H_

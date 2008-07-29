@@ -72,7 +72,7 @@ void AudioSource::link_elements()
 
 void AudioSource::link_interleave()
 {
-    interleave_.link_to_src_vector(aconvs_);
+    interleave_.link_to_sources(aconvs_);
 }
 
 
@@ -85,7 +85,7 @@ void AudioSource::link_to_sink(GstElement *sink)
 gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                     gpointer user_data)
 {
-    return  (static_cast<AudioSource*>(user_data)->callback());     // deferred to subclass
+    return (static_cast<AudioSource*>(user_data)->callback());     // deferred to subclass
 }
 
 
@@ -99,8 +99,8 @@ gboolean AudioTestSource::callback()
 void AudioTestSource::toggle_frequency()
 {
     static const double FREQUENCY[2][8] =
-    {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0}
-     ,{300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
+    {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
+     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
 
     int i = 0;
 
@@ -158,9 +158,9 @@ void AudioFileSource::sub_init()
     GstIter aconv = aconvs_.begin();
     for (; aconv != aconvs_.end(), dec != decoders_.end(); ++dec, ++aconv)
     {
-        g_signal_connect(*dec, "new-decoded-pad"
-                         ,G_CALLBACK(AudioFileSource::cb_new_src_pad)
-                         ,static_cast<void *>(*aconv));
+        g_signal_connect(*dec, "new-decoded-pad",
+                         G_CALLBACK(AudioFileSource::cb_new_src_pad),
+                         static_cast<void *>(*aconv));
     }
 }
 
