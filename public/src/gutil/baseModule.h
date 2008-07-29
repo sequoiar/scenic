@@ -31,7 +31,7 @@
 /// Base class of Arguments used in command line parsing
 class BaseArg
 {
-   public:
+public:
     BaseArg(char t,std::string l, char s, std::string d, std::string a)
         : type(t),l_arg(l),desc(d),arg_desc(a),s_arg(s){}
 
@@ -45,12 +45,12 @@ class BaseArg
 class IntArg
     : public BaseArg
 {
-   public:
+public:
     int* arg;
     IntArg(int* i,std::string l, char s, std::string d, std::string a)
         : BaseArg('i',l,s,d,a),arg(i){}
 
-   private:
+private:
     IntArg(const IntArg&); //No Copy Constructor
     IntArg& operator=(const IntArg&); //No Assignment Operator
 };
@@ -59,12 +59,12 @@ class IntArg
 class BoolArg
     : public BaseArg
 {
-   public:
+public:
     bool* arg;
     BoolArg(bool* b,std::string l, char s, std::string d)
         : BaseArg('b',l,s,d, std::string()),arg(b){}
 
-   private:
+private:
     BoolArg(const BoolArg&); //No Copy Constructor
     BoolArg& operator=(const BoolArg&); //No Assignment Operator
 };
@@ -73,12 +73,12 @@ class BoolArg
 class StringArg
     : public BaseArg
 {
-   public:
+public:
     char** arg ;
     StringArg(char** ppc,std::string l, char s, std::string d, std::string a)
         : BaseArg('s',l, s, d, a),arg(ppc){}
 
-   private:
+private:
     StringArg(const StringArg&); //No Copy Constructor
     StringArg& operator=(const StringArg&); //No Assignment Operator
 };
@@ -87,7 +87,7 @@ class StringArg
 ///BaseModule
 class BaseModule
 {
-   public:
+public:
     BaseModule()
         : args(){}
     typedef std::list<BaseArg*> ArgList;
@@ -99,7 +99,7 @@ class BaseModule
     }
 
 
-    //run is the module's main
+//run is the module's main
     virtual bool run(){
         return 1;
     }

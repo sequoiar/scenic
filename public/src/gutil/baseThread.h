@@ -39,7 +39,7 @@ typedef GAsyncQueue GAsyncQueue;
 
 class BaseQueuePair
 {
-   public:
+public:
     BaseQueuePair(GAsyncQueue* f,GAsyncQueue* s)
         : first(f),second(s){}
     virtual ~BaseQueuePair(){}
@@ -48,7 +48,7 @@ class BaseQueuePair
     BaseQueuePair(const BaseQueuePair& in)
         : first(in.first),second(in.second){}
 
-   private:
+private:
     BaseQueuePair& operator=(const BaseQueuePair&); //No Assignment Operator
 };
 
@@ -57,7 +57,7 @@ template < class T >
 class QueuePair_
     : public BaseQueuePair
 {
-   public:
+public:
     QueuePair_ < T > (GAsyncQueue * f, GAsyncQueue * s)
         : BaseQueuePair(f, s)
     {}
@@ -74,7 +74,7 @@ class QueuePair_
 
     void del(bool);
 
-   private:
+private:
     bool own[2];
     T *timed_pop_(int ms);
 
@@ -87,7 +87,7 @@ template < class T >
 class BaseThread
     : public BaseModule
 {
-   public:
+public:
     BaseThread < T > ();
     virtual ~BaseThread < T > ();
 
@@ -105,7 +105,7 @@ class BaseThread
 
     bool run();
 
-   protected:
+protected:
     virtual int main() {
         return 0;
     }
@@ -116,7 +116,7 @@ class BaseThread
     QueuePair_ < T > queue;
     static void *thread_main(void *v);
 
-   private:
+private:
     BaseThread(const BaseThread&); //No Copy Constructor
     BaseThread& operator=(const BaseThread&); //No Assignment Operator
 };

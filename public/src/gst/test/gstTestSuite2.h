@@ -39,7 +39,7 @@
 class GstTestSuite
     : public Test::Suite
 {
-   public:
+public:
 
     GstTestSuite()
         : id_(0)
@@ -62,11 +62,11 @@ class GstTestSuite
 
 // some tests
 
-   protected:
+protected:
     virtual void setup();           // setup resources common to all tests
     virtual void tear_down();       // destroy common resources
 
-   private:
+private:
     int id_;
 
     void init_test();

@@ -33,7 +33,7 @@ class AudioSource;
 class AudioConfig
     : public MediaConfig
 {
-   public:
+public:
     AudioConfig(const std::string & source, int numChannels
                 ,const std::string & codec
                 ,const std::string & remoteHost
@@ -45,7 +45,7 @@ class AudioConfig
     const int numChannels() const;
     AudioSource* createSource() const;
 
-   protected:
+protected:
     const int numChannels_;
 };
 

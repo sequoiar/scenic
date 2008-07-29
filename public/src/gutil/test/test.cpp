@@ -27,7 +27,7 @@ class DModule
     : public BaseModule
 {
     bool pass;
-   public:
+public:
     DModule()
         : pass(false){}
     bool run();

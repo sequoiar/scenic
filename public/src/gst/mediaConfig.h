@@ -29,8 +29,8 @@
 
 class MediaConfig
 {
-   public:
-    // remote sender
+public:
+// remote sender
     MediaConfig(const std::string & source, const std::string & codec
                 ,const std::string & remoteHost
                 ,int port);
@@ -45,7 +45,7 @@ class MediaConfig
     const bool hasCodec() const { return !codec_.empty(); }
 
     virtual ~MediaConfig() {};
-   protected:
+protected:
     const std::string source_;
     const std::string codec_;
     const std::string remoteHost_;

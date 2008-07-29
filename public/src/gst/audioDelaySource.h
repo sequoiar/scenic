@@ -31,7 +31,7 @@ class AudioDelaySource
     : public T
 {
     typedef typename GstBase::GstIter GstIter;
-   public:
+public:
     void sub_init();
     void link_elements();
     void link_interleave();
@@ -41,7 +41,7 @@ class AudioDelaySource
     ~AudioDelaySource();
     gboolean callback(GstClock *clock, GstClockTime time, GstClockID id);
 
-   private:
+private:
     std::vector<GstElement *> filters_;
 };
 

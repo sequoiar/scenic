@@ -30,14 +30,14 @@
 class AudioSender
     : public MediaBase
 {
-   public:
+public:
     AudioSender(const AudioConfig & config);
     AudioSender();
     virtual ~AudioSender();
     virtual bool start();
 
-   private:
-    // helper methods
+private:
+// helper methods
 
     virtual void init_source();
     virtual void init_codec();
@@ -46,7 +46,7 @@ class AudioSender
     void send_caps() const;
     const char *caps_str() const;
 
-    // data
+// data
     const AudioConfig &config_;
     RtpSender session_;
     AudioSource *source_;
