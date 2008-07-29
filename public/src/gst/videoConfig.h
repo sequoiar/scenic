@@ -34,7 +34,7 @@ class VideoSource;
 class VideoConfig
     : public MediaConfig
 {
-public:
+   public:
     // used by sender
     VideoConfig(const std::string & source, const std::string & codec
                 ,const std::string & remoteHost

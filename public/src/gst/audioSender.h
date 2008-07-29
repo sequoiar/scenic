@@ -30,13 +30,13 @@
 class AudioSender
     : public MediaBase
 {
-public:
+   public:
     AudioSender(const AudioConfig & config);
     AudioSender();
     virtual ~AudioSender();
     virtual bool start();
 
-private:
+   private:
     // helper methods
 
     virtual void init_source();

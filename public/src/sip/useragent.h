@@ -37,7 +37,7 @@
 
 class UserAgent
 {
-public:
+   public:
     /*
      * Create a new UserAgent object
      * @param	name	The application name
@@ -72,7 +72,7 @@ public:
 
     void listen( void );
 
-private:
+   private:
     /* The module name */
     std::string _name;
 

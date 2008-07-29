@@ -104,10 +104,10 @@ bool AudioSender::start()
 {
     MediaBase::start();
 
-    if (config_.isNetworked()) 
+    if (config_.isNetworked())
     {
-        std::cout << "Sending audio to host " << config_.remoteHost() << " on port " 
-            << config_.port() << std::endl;
+        std::cout << "Sending audio to host " << config_.remoteHost() << " on port "
+                  << config_.port() << std::endl;
 
         pipeline_.wait_until_playing();
         send_caps();

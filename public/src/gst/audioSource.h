@@ -31,12 +31,12 @@ class AudioConfig;
 class AudioSource
     : public GstBase
 {
-public:
+   public:
     virtual ~AudioSource();
     void init();
     virtual void link_to_sink(GstElement *sink);
 
-protected:
+   protected:
     AudioSource(const AudioConfig &config);
     virtual void init_source();
     virtual void sub_init() = 0;
@@ -51,23 +51,23 @@ protected:
 
     virtual gboolean callback() { return FALSE; }
 
-private:
+   private:
     friend class AudioSender;
 };
 
 class AudioTestSource
     : public AudioSource
 {
-public:
+   public:
     AudioTestSource(const AudioConfig &config)
         : AudioSource(config), clockId_(0), offset_(0) {}
     ~AudioTestSource();
     void sub_init();
 
-protected:
+   protected:
     virtual gboolean callback();
 
-private:
+   private:
     void toggle_frequency();
 
     GstClockID clockId_;
@@ -80,16 +80,15 @@ private:
 class AudioFileSource
     : public AudioSource
 {
-public:
+   public:
     AudioFileSource(const AudioConfig &config)
         : AudioSource(config), decoders_() {}
     ~AudioFileSource();
     void link_to_sink(GstElement *sink);
-    static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,
-                               gboolean last,
+    static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,gboolean last,
                                void *data);
 
-protected:
+   protected:
     void sub_init();
     void link_elements();
 
@@ -103,7 +102,7 @@ protected:
 class AudioAlsaSource
     : public AudioSource
 {
-public:
+   public:
     AudioAlsaSource(const AudioConfig &config)
         : AudioSource(config) {}
     void sub_init(){};
@@ -112,7 +111,7 @@ public:
 class AudioJackSource
     : public AudioSource
 {
-public:
+   public:
     AudioJackSource(const AudioConfig &config)
         : AudioSource(config) {}
     void sub_init();

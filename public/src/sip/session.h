@@ -33,7 +33,7 @@
 
 class Session
 {
-public:
+   public:
     /*
      * Class construct. Create a new Session object.
      * @param type	The protocol type. As for now, only SIP (Session Initiation Protocol) is available
@@ -75,7 +75,7 @@ public:
 
     int getSessionPort( void ){ return _port; }
 
-private:
+   private:
     /* The communication protocol */
     int _protocol;
 

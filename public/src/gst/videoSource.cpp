@@ -55,7 +55,8 @@ VideoSource::~VideoSource()
 
 
 // defers to subclassses callback
-gboolean VideoSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id, gpointer user_data)
+gboolean VideoSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id,
+                                    gpointer user_data)
 {
     return (static_cast<VideoSource*>(user_data)->callback());
 }
@@ -108,9 +109,9 @@ void VideoFileSource::sub_init()
     assert(gst_element_link(source_, decoder_));
 
     // bind callback
-    g_signal_connect(decoder_, "new-decoded-pad",
-            G_CALLBACK(VideoFileSource::cb_new_src_pad),
-            static_cast<void *>(this));
+    g_signal_connect(decoder_, "new-decoded-pad"
+                     ,G_CALLBACK(VideoFileSource::cb_new_src_pad)
+                     ,static_cast<void *>(this));
 }
 
 
@@ -125,9 +126,7 @@ void VideoFileSource::link_element(GstElement *sinkElement)
 }
 
 
-void VideoFileSource::cb_new_src_pad(GstElement * srcElement, 
-                                     GstPad * srcPad,
-                                     gboolean last,
+void VideoFileSource::cb_new_src_pad(GstElement * srcElement,GstPad * srcPad,gboolean last,
                                      void *data)
 {
     if (gst_pad_is_linked(srcPad))
@@ -146,7 +145,6 @@ void VideoFileSource::cb_new_src_pad(GstElement * srcElement,
         g_object_unref(sinkPad);        // don't link more than once
         return;
     }
-
     /* check media type */
     caps = gst_pad_get_caps(srcPad);
     str = gst_caps_get_structure(caps, 0);
@@ -194,36 +192,32 @@ void VideoDvSource::sub_init()
     pipeline_.add(dvdec_);
 
     // demux srcpad must be linked to queue sink pad at runtime
-    g_signal_connect(demux_, "pad-added", 
-            G_CALLBACK(VideoDvSource::cb_new_src_pad), 
-            static_cast<void *>(queue_));
+    g_signal_connect(demux_, "pad-added"
+                     ,G_CALLBACK(VideoDvSource::cb_new_src_pad)
+                     ,static_cast<void *>(queue_));
 
     assert(gst_element_link(source_, demux_));
     assert(gst_element_link(queue_, dvdec_));
 }
 
 
-void VideoDvSource::cb_new_src_pad(GstElement * srcElement, 
-                                   GstPad * srcPad,
-                                   void *data)
+void VideoDvSource::cb_new_src_pad(GstElement * srcElement,GstPad * srcPad,void *data)
 {
     if (std::string("audio") == gst_pad_get_name(srcPad))
     {
         LOG("Ignoring audio stream from DV");
         return;
     }
-
     GstElement *sinkElement = (GstElement *) data;
     GstPad *sinkPad;
 
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
-    
+
     if (GST_PAD_IS_LINKED(sinkPad))
     {
         g_object_unref(sinkPad);        // don't link more than once
         return;
     }
-
     LOG("VideoDvSource: linking new srcpad to sinkpad.");
     assert(link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);

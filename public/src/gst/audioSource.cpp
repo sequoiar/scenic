@@ -99,9 +99,9 @@ gboolean AudioTestSource::callback()
 void AudioTestSource::toggle_frequency()
 {
     static const double FREQUENCY[2][8] =
-    {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
-     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
-    
+    {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0}
+     ,{300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
+
     int i = 0;
 
     for (GstIter iter = sources_.begin(); iter != sources_.end(); ++iter)
@@ -154,24 +154,24 @@ void AudioFileSource::sub_init()
     assert(decoders_[0]);
     pipeline_.add_vector(decoders_);
 
-    GstIter dec = decoders_.begin(); 
+    GstIter dec = decoders_.begin();
     GstIter aconv = aconvs_.begin();
     for (; aconv != aconvs_.end(), dec != decoders_.end(); ++dec, ++aconv)
     {
-        g_signal_connect(*dec, "new-decoded-pad",
-                G_CALLBACK(AudioFileSource::cb_new_src_pad), 
-                static_cast<void *>(*aconv));
+        g_signal_connect(*dec, "new-decoded-pad"
+                         ,G_CALLBACK(AudioFileSource::cb_new_src_pad)
+                         ,static_cast<void *>(*aconv));
     }
 }
 
 
-void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last, 
-        gpointer data)
+void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
+                                     gpointer data)
 {
     if (gst_pad_is_linked(srcPad))
     {
         LOG("Pad is already linked.")
-            return;
+        return;
     }
     else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
     {

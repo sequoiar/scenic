@@ -31,7 +31,7 @@ class AudioDelaySource
     : public T
 {
     typedef typename GstBase::GstIter GstIter;
-public:
+   public:
     void sub_init();
     void link_elements();
     void link_interleave();
@@ -41,7 +41,7 @@ public:
     ~AudioDelaySource();
     gboolean callback(GstClock *clock, GstClockTime time, GstClockID id);
 
-private:
+   private:
     std::vector<GstElement *> filters_;
 };
 
@@ -76,13 +76,12 @@ void AudioDelaySource<T>::link_elements()
 template <typename T>
 void AudioDelaySource<T>::link_interleave()
 {
-        T::interleave_.link_to_src_vector(filters_);
+    T::interleave_.link_to_src_vector(filters_);
 }
 
 
 template <typename T>
-gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time,
-                                       GstClockID id)
+gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time,GstClockID id)
 {
     static double d_secs = 5;
 

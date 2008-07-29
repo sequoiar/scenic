@@ -49,7 +49,9 @@ const char *RtpSender::caps_str() const
 
     do
         caps = gst_pad_get_negotiated_caps(pad);
-    while (caps == NULL);       // goes until caps are initialized
+    while (caps == NULL);
+
+    // goes until caps are initialized
 
     gst_object_unref(pad);
 
@@ -61,18 +63,18 @@ const char *RtpSender::caps_str() const
 
 void RtpSender::addDerived(GstElement * newSrc, const MediaConfig * config)
 {
-    GstPad *send_rtp_sink; 
-    GstPad *send_rtp_src; 
-    GstPad *send_rtcp_src; 
+    GstPad *send_rtp_sink;
+    GstPad *send_rtp_src;
+    GstPad *send_rtcp_src;
     GstPad *recv_rtcp_sink;
     GstPad *payloadSrc;
-    GstPad *rtpSenderSink; 
-    GstPad *rtcpSenderSink; 
+    GstPad *rtpSenderSink;
+    GstPad *rtcpSenderSink;
     GstPad *rtcpReceiverSrc;
 
     assert(rtp_sender_ = gst_element_factory_make("udpsink", NULL));
-    g_object_set(rtp_sender_, "host", config->remoteHost(), "port", config->port(), "sync",
-            FALSE, "async", FALSE, NULL);
+    g_object_set(rtp_sender_, "host", config->remoteHost(), "port", config->port(), "sync"
+                 ,FALSE, "async", FALSE, NULL);
     pipeline_.add(rtp_sender_);
 
     assert(send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_")));
