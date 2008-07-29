@@ -29,27 +29,29 @@
 
 class MediaConfig
 {
-public:
-// remote sender
-    MediaConfig(const std::string & source, const std::string & codec
-                ,const std::string & remoteHost
-                ,int port);
-    MediaConfig(const std::string &codec, int port);   // receiver
-    MediaConfig(const std::string &source);    // local sender
+    public:
+        // remote sender
+        MediaConfig(const std::string & source, 
+                    const std::string & codec,
+                    const std::string & remoteHost,
+                    int port);
+        MediaConfig(const std::string &codec, int port); // receiver
+        explicit MediaConfig(const std::string &source); // local sender
 
-    const char *source() const { return source_.c_str(); }
-    const char *codec() const { return codec_.c_str(); }
-    const char *remoteHost() const { return remoteHost_.c_str(); }
-    const int port() const { return port_; }
-    const bool isNetworked() const { return port_ != 0; }
-    const bool hasCodec() const { return !codec_.empty(); }
+        const char *source() const { return source_.c_str(); }
+        const char *codec() const { return codec_.c_str(); }
+        const char *remoteHost() const { return remoteHost_.c_str(); }
+        const int port() const { return port_; }
+        const bool isNetworked() const { return port_ != 0; }
+        const bool hasCodec() const { return !codec_.empty(); }
 
-    virtual ~MediaConfig() {};
-protected:
-    const std::string source_;
-    const std::string codec_;
-    const std::string remoteHost_;
-    const int port_;
+        virtual ~MediaConfig() {};
+
+    protected:
+        const std::string source_;
+        const std::string codec_;
+        const std::string remoteHost_;
+        const int port_;
 };
 
 #endif // _MEDIA_CONFIG_H_

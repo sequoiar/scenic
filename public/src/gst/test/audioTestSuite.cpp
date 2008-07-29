@@ -244,8 +244,8 @@ void AudioTestSuite::start_2ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
-                           ,A_PORT);
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+                           A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -272,8 +272,8 @@ void AudioTestSuite::stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
-                           ,A_PORT);
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+                           A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -302,8 +302,8 @@ void AudioTestSuite::start_stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
-                           ,A_PORT);
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+                           A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -333,8 +333,8 @@ void AudioTestSuite::start_8ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
-                           ,A_PORT);
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+                           A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -360,8 +360,8 @@ void AudioTestSuite::stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
-                           ,A_PORT);
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+                           A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -390,8 +390,8 @@ void AudioTestSuite::start_stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS
-                           ,A_PORT);
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+                           A_PORT);
         AudioSender tx(config);
         TEST_ASSERT(tx.init());
 

@@ -29,8 +29,8 @@
 
 
 VideoSender::VideoSender(const VideoConfig & config)
-    : config_(config), session_(), source_(0), colorspc_(0), encoder_(0), payloader_(0)
-    ,sink_(0)
+    : config_(config), session_(), source_(0), colorspc_(0), encoder_(0), payloader_(0),
+    sink_(0)
 {
     // empty
 }
@@ -105,8 +105,8 @@ void VideoSender::wait_for_stop()
 
     lo_server_thread st = lo_server_thread_new("8880", liblo_error);
 
-    lo_server_thread_add_method(st, "/video/tx/stop", "", stop_handler
-                                ,static_cast<void *>(this));
+    lo_server_thread_add_method(st, "/video/tx/stop", "", stop_handler,
+                                static_cast<void *>(this));
 
     lo_server_thread_start(st);
 

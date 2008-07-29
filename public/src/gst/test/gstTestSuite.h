@@ -44,22 +44,21 @@
 class GstTestSuite
     : public Test::Suite
 {
-public:
+    public:
 
-    GstTestSuite()
-        : id_(0)
-    {}
+        GstTestSuite()
+            : id_(0)
+        {}
 
-    void set_id(int id);
+        void set_id(int id);
 
-protected:
-    virtual void setup();           // setup resources common to all tests
-    virtual void tear_down();       // destroy common resources
-
-    int id_;
-    const static int A_PORT;
-    const static int V_PORT;
-    const static int NUM_CHANNELS;
+    protected:
+        virtual void setup();       // setup resources common to all tests
+        virtual void tear_down();   // destroy common resources
+        int id_;
+        const static int A_PORT;
+        const static int V_PORT;
+        const static int NUM_CHANNELS;
 };
 
 #endif // _GST_TEST_SUITE_H_

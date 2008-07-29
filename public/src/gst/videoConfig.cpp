@@ -29,8 +29,8 @@
 
 
 // for sender (remote)
-VideoConfig::VideoConfig(const std::string &source, const std::string &codec
-                         ,const std::string &remoteHost, int port)
+VideoConfig::VideoConfig(const std::string &source, const std::string &codec,
+    const std::string &remoteHost, int port)
     : MediaConfig(source, codec, remoteHost, port)
 {
     // empty

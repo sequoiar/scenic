@@ -49,15 +49,13 @@ AudioReceiver::~AudioReceiver()
 }
 
 
-// FIXME: waiting shouldn't happen here, have one msg waiting loop which takes advantage of
-// path to dispatch messages appropriately
 void AudioReceiver::wait_for_caps()
 {
     LOG("Waiting for caps...");
     lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
-    lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler
-                                ,static_cast<void *>(this));
+    lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler,
+                                static_cast<void *>(this));
 
     lo_server_thread_start(st);
 
