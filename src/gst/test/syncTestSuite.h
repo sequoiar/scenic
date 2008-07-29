@@ -30,7 +30,7 @@
 class SyncTestSuite
     : public GstTestSuite
 {
-public:
+   public:
 
     SyncTestSuite()
     {
@@ -46,7 +46,7 @@ public:
 
 // some tests
 
-private:
+   private:
 
     void start_8ch_comp_rtp_audiofile_dv();
     void stop_8ch_comp_rtp_audiofile_dv();

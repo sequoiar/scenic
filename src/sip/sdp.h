@@ -28,7 +28,7 @@
 
 class Sdp
 {
-public:
+   public:
     /* Class constructors */
     Sdp();
     Sdp( int aport, int vport );
@@ -52,7 +52,7 @@ public:
 
     std::list<sdpCodec> getVideocodecList( void ) { return _videocodecs; }
 
-private:
+   private:
     std::string _sdpBody;
 
     std::list<sdpCodec> _audiocodecs;

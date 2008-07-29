@@ -51,14 +51,13 @@ void VideoReceiver::init_codec()
         assert(depayloader_ = gst_element_factory_make("rtph264depay", NULL));
         assert(decoder_ = gst_element_factory_make("ffdec_h264", NULL));
     }
-
     pipeline_.add(depayloader_);
     pipeline_.add(decoder_);
     assert(gst_element_link(depayloader_, decoder_));
 
     session_.add(depayloader_, &config_);
     session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,"
-                       "encoding-name=(string)H264");
+                      "encoding-name=(string)H264");
 }
 
 

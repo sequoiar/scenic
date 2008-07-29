@@ -177,3 +177,5 @@ void Pipeline::remove_clock_callback(GstClockID clockId)
     gst_clock_id_unschedule(clockId);
     gst_clock_id_unref(clockId);
 }
+
+

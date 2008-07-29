@@ -30,7 +30,7 @@
 class AudioTestSuite
     : public GstTestSuite
 {
-public:
+   public:
 
     AudioTestSuite()
     {
@@ -80,7 +80,7 @@ public:
 
 // some tests
 
-private:
+   private:
     void start_1ch_audiotest();
     void stop_1ch_audiotest();
     void start_stop_1ch_audiotest();

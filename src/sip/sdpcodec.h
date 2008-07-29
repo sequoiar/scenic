@@ -24,11 +24,11 @@
 
 class sdpCodec
 {
-public:
+   public:
     sdpCodec( std::string type, std::string name );
     ~sdpCodec();
 
-private:
+   private:
     std::string _name;
     int _payload;
     int _frequency;

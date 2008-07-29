@@ -26,13 +26,13 @@
 class MediaBase
     : public GstBase
 {
-public:
+   public:
     virtual bool start();
     virtual bool stop();
 
     virtual bool init();
 
-protected:
+   protected:
 
     MediaBase(){};
     virtual ~MediaBase();

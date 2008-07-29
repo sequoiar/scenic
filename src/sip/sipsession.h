@@ -37,7 +37,7 @@
 class SIPSession
     : public Session
 {
-public:
+   public:
     /*
      * Create a new SIP session object
      *
@@ -71,7 +71,7 @@ public:
 
     void startMainloop();
 
-private:
+   private:
 
     /* The application SIP User Agent */
     UserAgent* _app_ua;

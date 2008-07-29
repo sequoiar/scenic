@@ -31,9 +31,9 @@ typedef QueuePair_<BaseMessage> QueuePair;
 class GstThread
     : public BaseThread<BaseMessage>
 {
-public:
+   public:
     GstThread();
-private:
+   private:
     VideoConfig* conf;
     VideoSender* sender;
     VideoReceiver* receiver;

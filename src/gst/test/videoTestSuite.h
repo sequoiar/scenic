@@ -30,7 +30,7 @@
 class VideoTestSuite
     : public GstTestSuite
 {
-public:
+   public:
 
     VideoTestSuite()
     {
@@ -72,7 +72,7 @@ public:
 
 // some tests
 
-private:
+   private:
 
     void init_test();
 

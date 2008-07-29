@@ -32,19 +32,19 @@
 class AudioReceiver
     : public MediaBase
 {
-public:
+   public:
     AudioReceiver(const AudioConfig & config);
     virtual ~AudioReceiver();
     virtual bool start();
 
-private:
+   private:
     AudioReceiver();
     virtual void init_source(){};
     virtual void init_codec();
     virtual void init_sink();
 
-    static int caps_handler(const char *path, const char *types, lo_arg ** argv,
-                            int argc,void *data,
+    static int caps_handler(const char *path, const char *types, lo_arg ** argv,int argc,
+                            void *data,
                             void *user_data);
 
     void set_caps(const char *caps);

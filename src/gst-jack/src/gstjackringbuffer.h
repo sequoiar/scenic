@@ -87,8 +87,7 @@ static GstRingBufferClass *ring_parent_class = NULL;
 
 static gboolean gst_jack_ring_buffer_open_device(GstRingBuffer * buf);
 static gboolean gst_jack_ring_buffer_close_device(GstRingBuffer * buf);
-static gboolean gst_jack_ring_buffer_acquire(GstRingBuffer * buf,
-                                             GstRingBufferSpec * spec);
+static gboolean gst_jack_ring_buffer_acquire(GstRingBuffer * buf,GstRingBufferSpec * spec);
 static gboolean gst_jack_ring_buffer_release(GstRingBuffer * buf);
 static gboolean gst_jack_ring_buffer_start(GstRingBuffer * buf);
 static gboolean gst_jack_ring_buffer_pause(GstRingBuffer * buf);
