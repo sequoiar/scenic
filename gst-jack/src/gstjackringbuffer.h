@@ -57,7 +57,7 @@
     ((GstJackRingBuffer *)obj)
 #define GST_IS_JACK_RING_BUFFER(obj)     \
     (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_JACK_RING_BUFFER))
-#define GST_IS_JACK_RING_BUFFER_CLASS(klass)\
+#define GST_IS_JACK_RING_BUFFER_CLASS(klass) \
     (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_JACK_RING_BUFFER))
 
 typedef struct _GstJackRingBuffer GstJackRingBuffer;
