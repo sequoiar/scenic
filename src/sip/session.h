@@ -33,38 +33,38 @@
 
 class Session
 {
-   public:
-    /*
-     * Class construct. Create a new Session object.
-     * @param type	The protocol type. As for now, only SIP (Session Initiation Protocol) is available
-     * @param port	The local protocol listening port.
-     */
+public:
+/*
+ * Class construct. Create a new Session object.
+ * @param type	The protocol type. As for now, only SIP (Session Initiation Protocol) is available
+ * @param port	The local protocol listening port.
+ */
     Session( int type, int port ) {
         _protocol = type;
         _port = port;
     }
 
 
-    /*
-     * Class destructor
-     */
+/*
+ * Class destructor
+ */
     ~Session() {}
 
-    /*
-     * Establishes a connection with a remote host.
-     * @param 	r_uri	The remote SIP address
-     * @param 	r_port	The remote connection port
-     */
+/*
+ * Establishes a connection with a remote host.
+ * @param 	r_uri	The remote SIP address
+ * @param 	r_port	The remote connection port
+ */
     virtual int connect( std::string r_uri, int r_port) = 0;
 
-    /*
-     * Terminate a current remote connection
-     */
+/*
+ * Terminate a current remote connection
+ */
     virtual int disconnect( ) = 0;
 
-    /*
-     * Accept incoming request
-     */
+/*
+ * Accept incoming request
+ */
     virtual int accept( void ) = 0;
 
     virtual int refuse( int reason ) = 0;
@@ -75,11 +75,11 @@ class Session
 
     int getSessionPort( void ){ return _port; }
 
-   private:
-    /* The communication protocol */
+private:
+/* The communication protocol */
     int _protocol;
 
-    /* The protocol listening port */
+/* The protocol listening port */
     int _port;
 };
 

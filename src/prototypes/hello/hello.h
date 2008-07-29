@@ -30,7 +30,7 @@
 class Hello
 {
     std::string s;
-   public:
+public:
 /** Get a char* containing  "hello {name}". */
     const char *greet();
 

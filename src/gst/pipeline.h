@@ -26,7 +26,7 @@
 
 class Pipeline
 {
-   public:
+public:
     static Pipeline & Instance();
     void add(GstElement * element);
     void add_vector(std::vector < GstElement * >&elementVec);
@@ -45,7 +45,7 @@ class Pipeline
 
     GstClock* clock() const;
 
-   private:
+private:
     void init();
 
     Pipeline(const Pipeline&);

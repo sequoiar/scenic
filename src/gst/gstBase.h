@@ -26,10 +26,10 @@
 
 class GstBase
 {
-   public:
+public:
     bool isPlaying();
 
-   protected:
+protected:
     typedef std::vector < GstElement * >::iterator GstIter;
 
     GstBase();
@@ -41,7 +41,7 @@ class GstBase
 
     Pipeline & pipeline_;
 
-   private:
+private:
     static int refCount_;
 };
 

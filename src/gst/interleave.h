@@ -28,14 +28,14 @@ class AudioConfig;
 class Interleave
     : public GstBase
 {
-   public:
+public:
     Interleave(const AudioConfig &config);
     ~Interleave();
     void init();
     void link_to_sink(GstElement *sink);
     void link_to_src_vector(std::vector<GstElement *> &sources);
 
-   private:
+private:
     GstElement *interleave_;
     const AudioConfig &config_;
     static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];

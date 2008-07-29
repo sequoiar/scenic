@@ -32,12 +32,12 @@
 class AudioReceiver
     : public MediaBase
 {
-   public:
+public:
     AudioReceiver(const AudioConfig & config);
     virtual ~AudioReceiver();
     virtual bool start();
 
-   private:
+private:
     AudioReceiver();
     virtual void init_source(){};
     virtual void init_codec();

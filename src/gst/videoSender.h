@@ -34,14 +34,14 @@ class VideoSource;
 class VideoSender
     : public MediaBase
 {
-   public:
+public:
     VideoSender(const VideoConfig & config);
     bool start();
     void wait_for_stop();
 
     virtual ~VideoSender();
 
-   private:
+private:
     virtual void init_source();
     virtual void init_codec();
     virtual void init_sink();
@@ -52,14 +52,14 @@ class VideoSender
 
     static void liblo_error(int num, const char *msg, const char *path);
 
-    // data
+// data
 
     const VideoConfig &config_;
     RtpSender session_;
     VideoSource *source_;
     GstElement *colorspc_, *encoder_, *payloader_, *sink_;
 
-    // hidden
+// hidden
 
     VideoSender(const VideoSender&);     //No Copy Constructor
     VideoSender& operator=(const VideoSender&);     //No Assignment Operator

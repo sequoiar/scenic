@@ -38,7 +38,7 @@
 
 class BaseMessage
 {
-   public:
+public:
     enum type { error =-2, undefined=-1,zero=0,ok='=',quit='Q',init='I',start='S'
                 ,stop='!'
                 ,system='*',ping='.',string='s'};

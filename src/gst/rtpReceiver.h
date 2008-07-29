@@ -30,16 +30,16 @@ class MediaConfig;
 class RtpReceiver
     : public RtpSession
 {
-   public:
+public:
     RtpReceiver();
     void set_caps(const char *capsStr);
 
     virtual ~RtpReceiver();
 
-   protected:
+protected:
     virtual void addDerived(GstElement * depayloader, const MediaConfig * config);
 
-   private:
+private:
     static GstPad *get_matching_sink_pad(GstPad *srcPad);
     static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
 

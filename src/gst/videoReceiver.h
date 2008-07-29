@@ -28,14 +28,14 @@
 class VideoReceiver
     : public MediaBase
 {
-   public:
+public:
     VideoReceiver(const VideoConfig & config);
     virtual bool start();
     virtual bool stop();
 
     virtual ~VideoReceiver();
 
-   private:
+private:
     void set_caps(const char* capsStr);
     void stop_sender() const;
 
