@@ -93,6 +93,7 @@ void VideoTestSource::sub_init()
 
 VideoTestSource::~VideoTestSource()
 {
+    if (isPlaying())
     assert(pipeline_.stop());
     pipeline_.remove_clock_callback(clockId_);
 }
@@ -110,8 +111,8 @@ void VideoFileSource::sub_init()
 
     // bind callback
     g_signal_connect(decoder_, "new-decoded-pad",
-                     G_CALLBACK(VideoFileSource::cb_new_src_pad),
-                     static_cast<void *>(this));
+            G_CALLBACK(VideoFileSource::cb_new_src_pad),
+            static_cast<void *>(this));
 }
 
 
@@ -127,12 +128,12 @@ void VideoFileSource::link_element(GstElement *sinkElement)
 
 
 void VideoFileSource::cb_new_src_pad(GstElement * srcElement,GstPad * srcPad,gboolean last,
-                                     void *data)
+        void *data)
 {
     if (gst_pad_is_linked(srcPad))
     {
         LOG("Pad is already linked.")
-        return;
+            return;
     }
     VideoFileSource *context = static_cast<VideoFileSource*>(data);
     GstStructure *str;
@@ -169,8 +170,8 @@ VideoFileSource::~VideoFileSource()
 }
 
 
-VideoDvSource::VideoDvSource(const VideoConfig &config)
-    : VideoSource(config), demux_(0), queue_(0), dvdec_(0)
+    VideoDvSource::VideoDvSource(const VideoConfig &config)
+: VideoSource(config), demux_(0), queue_(0), dvdec_(0)
 {}
 
 
@@ -193,8 +194,8 @@ void VideoDvSource::sub_init()
 
     // demux srcpad must be linked to queue sink pad at runtime
     g_signal_connect(demux_, "pad-added",
-                     G_CALLBACK(VideoDvSource::cb_new_src_pad),
-                     static_cast<void *>(queue_));
+            G_CALLBACK(VideoDvSource::cb_new_src_pad),
+            static_cast<void *>(queue_));
 
     assert(gst_element_link(source_, demux_));
     assert(gst_element_link(queue_, dvdec_));

@@ -61,9 +61,7 @@ void Interleave::set_channel_layout()
 void Interleave::init()
 {
     assert(interleave_ = gst_element_factory_make("interleave", NULL));
-
     pipeline_.add(interleave_);
-
     set_channel_layout();
 }
 
