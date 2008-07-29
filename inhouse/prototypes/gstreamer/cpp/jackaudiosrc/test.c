@@ -1,6 +1,6 @@
 #include <gst/gst.h>
 
-static gboolean bus_call (GstBus *bus, GstMessage *msg, gpointer data)
+static gboolean bus_call(GstBus *bus, GstMessage *msg, gpointer data)
 {
     GMainLoop *loop = data;
 
@@ -75,7 +75,7 @@ gint main (gint argc, gchar *argv[])
     if (!sink)
         g_print ("output could not be found - check your install\n");
 
-    g_object_set(G_OBJECT (src), "connect", 0, NULL);
+   g_object_set(G_OBJECT (src), "connect", 0, NULL);
     g_object_set(G_OBJECT (sink), "connect", 0, NULL);
     g_object_set(G_OBJECT (sink), "sync", FALSE, NULL);
 
