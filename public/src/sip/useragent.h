@@ -25,7 +25,7 @@
 
 /* @file	useragent.h
  * @brief	A SIP useragent. Implements the SIP stacks from the transaction layer to the transport layer as described in
- * 		RFC 3261.
+ *      RFC 3261.
  */
 
 #include <pjsip.h>
@@ -37,17 +37,17 @@
 
 class UserAgent
 {
-public:
+    public:
 /*
  * Create a new UserAgent object
  * @param	name	The application name
  */
-    UserAgent( std::string name, int port );
+        UserAgent( std::string name, int port );
 
 /*
  * Class destructor
  */
-    ~UserAgent();
+        ~UserAgent();
 
 /*
  * Initialize all the mandatory data structures from the PJSIP library
@@ -56,7 +56,7 @@ public:
  *
  * @return int	PJ_SUCCESS on success
  */
-    int init_pjsip_modules( );
+        int init_pjsip_modules( );
 
 /*
  * Create an invite session. Handle the related incoming responses
@@ -64,27 +64,27 @@ public:
  * @param	uri	The SIP address to create connection with
  * @param	port		The remote SIP port
  *
- * @return 	int	PJ_SUCCESS on success
+ * @return  int	PJ_SUCCESS on success
  */
-    int create_invite_session( std::string uri, int port );
+        int create_invite_session( std::string uri, int port );
 
-    pj_str_t build_contact_uri( std::string user, int port );
+        pj_str_t build_contact_uri( std::string user, int port );
 
-    void listen( void );
+        void listen( void );
 
-private:
+    private:
 /* The module name */
-    std::string _name;
+        std::string _name;
 
 /* The local IP address */
-    std::string _localIP;
+        std::string _localIP;
 
-    int _lport;
+        int _lport;
 
 /*
  * Initialize the pjsip_module structure
  */
-    void init_sip_module( void );
+        void init_sip_module( void );
 };
 
 #endif // _USER_AGENT_H

@@ -27,11 +27,11 @@ class DModule
     : public BaseModule
 {
     bool pass;
-public:
-    DModule()
-        : pass(false){}
-    bool run();
-    void init();
+    public:
+        DModule()
+            : pass(false){}
+        bool run();
+        void init();
 };
 
 void DModule::init()

@@ -46,9 +46,7 @@ class VideoSender
         virtual void init_codec();
         virtual void init_sink();
 
-        static int stop_handler(const char *path, 
-                                const char *types, lo_arg ** argv,
-                                int argc,
+        static int stop_handler(const char *path,const char *types, lo_arg ** argv,int argc,
                                 void *data,
                                 void *user_data);
 

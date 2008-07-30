@@ -27,10 +27,10 @@ class DModule
     : public BaseModule
 {
     bool pass;
-public:
-    DModule()
-        : BaseModule(),pass(false){}
-    bool run();
+    public:
+        DModule()
+            : BaseModule(),pass(false){}
+        bool run();
 };
 
 

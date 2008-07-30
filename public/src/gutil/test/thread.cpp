@@ -31,8 +31,8 @@ class Thread
 {
     int main();
 
-public:
-    bool init();
+    public:
+        bool init();
 };
 
 

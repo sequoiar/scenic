@@ -27,12 +27,12 @@
 
 class pyInterpreter
 {
-public:
+    public:
 
-    int init(int argc, char *argv[]);
+        int init(int argc, char *argv[]);
 
-    std::string run_str(std::string s);
-    std::string run_input();
-    void interact();
-    int result();
+        std::string run_str(std::string s);
+        std::string run_input();
+        void interact();
+        int result();
 };

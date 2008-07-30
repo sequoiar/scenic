@@ -21,7 +21,7 @@
 #define _SIP_SESSION_H
 
 /*
- * @file 	sipsession.h
+ * @file    sipsession.h
  * @brief	The SIP implementation
  */
 
@@ -37,48 +37,48 @@
 class SIPSession
     : public Session
 {
-public:
+    public:
 /*
  * Create a new SIP session object
  *
  * @param port	The local protocol listening port.
  */
-    SIPSession( int port );
+        SIPSession( int port );
 
 /*
  * Class destructor
  */
-    ~SIPSession();
+        ~SIPSession();
 
 /*
  * Establishes a SIP connection with a remote host.
  *
- * @param 	r_uri	The remote SIP address
- * @param 	r_port	The remote connection port (default SIP port: 5060)
+ * @param   r_uri	The remote SIP address
+ * @param   r_port	The remote connection port (default SIP port: 5060)
  */
-    int connect( std::string r_uri, int r_port );
+        int connect( std::string r_uri, int r_port );
 
 /*
  * Terminate a current SIP remote connection
  */
-    int disconnect();
+        int disconnect();
 
-    int accept( void );
+        int accept( void );
 
-    int refuse( int reason );
+        int refuse( int reason );
 
-    void build_sdp( void );
+        void build_sdp( void );
 
-    void startMainloop();
+        void startMainloop();
 
-private:
+    private:
 
 /* The application SIP User Agent */
-    UserAgent* _app_ua;
+        UserAgent* _app_ua;
 
 /* A SDP (Session Description Protocol) instance to build the sdp body */
 /* Should be an attribute of the useragent class */
-    Sdp* _sdp;
+        Sdp* _sdp;
 };
 
 #endif // _SIP_SESSION_H
