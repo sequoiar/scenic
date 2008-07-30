@@ -271,17 +271,22 @@ class RSS(callbacks.Plugin):
         for d in feed['items']:
             if 'title' in d:
                 title = conv(d['title'])
-                title = re.sub(':.*$',':',title)
-                desc = conv(d['description'])
-                #link = d.get('link')
-                if 'author' in d:
-                    author = conv(d['author'])
-                    author = re.sub('@.*$','',author)
-                    headlines.append((title+author+'-> '+desc, None))
-                else:
-                    headlines.append((title+' '+desc, None))
-                    #headlines.append((title, None))
-        return headlines
+                title = re.sub(':.*$','',title)
+                if 'description' in d:
+                    desc = conv(d['description'])
+                    if len(desc) > 80:
+                        desc = desc[0:79] + re.sub('\..*$','.',desc[80:len(desc)])
+                    if len(desc) > 170:
+                        desc = desc[0:149] + re.sub('\s.*$','...',desc[149:len(desc)])
+                    #link = d.get('link')
+                    if 'author' in d:
+                        author = conv(d['author'])
+                        author = re.sub('@.*$','',author)
+                        headlines.append((author+':'+title+':'+desc, None))
+                    else:
+                        headlines.append((title+':'+desc, None))
+                        #headlines.append((title, None))
+            return headlines
 
     def makeFeedCommand(self, name, url):
         docstring = format("""[<number of headlines>]
