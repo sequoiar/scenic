@@ -55,6 +55,7 @@ class GstTestSuite
     protected:
         virtual void setup();       // setup resources common to all tests
         virtual void tear_down();   // destroy common resources
+
         int id_;
         const static int A_PORT;
         const static int V_PORT;

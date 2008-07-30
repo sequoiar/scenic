@@ -36,8 +36,8 @@ using namespace boost::python;
 
 BOOST_PYTHON_MODULE(libpyhello)
 {
-    class_ < Hello > ("Hello").def("greet", &Hello::greet).def("set_name"
-                                                               ,&Hello::set_name);
+    class_ < Hello > ("Hello").def("greet", &Hello::greet).def("set_name",
+                                                               &Hello::set_name);
 }
 
 

@@ -21,7 +21,7 @@
 #define _SESSION_H
 
 /*
- * @file 	session.h
+ * @file    session.h
  * @brief	An interface to expose to the core the available methods
  */
 
@@ -33,54 +33,54 @@
 
 class Session
 {
-public:
+    public:
 /*
  * Class construct. Create a new Session object.
  * @param type	The protocol type. As for now, only SIP (Session Initiation Protocol) is available
  * @param port	The local protocol listening port.
  */
-    Session( int type, int port ) {
-        _protocol = type;
-        _port = port;
-    }
+        Session( int type, int port ) {
+            _protocol = type;
+            _port = port;
+        }
 
 
 /*
  * Class destructor
  */
-    ~Session() {}
+        ~Session() {}
 
 /*
  * Establishes a connection with a remote host.
- * @param 	r_uri	The remote SIP address
- * @param 	r_port	The remote connection port
+ * @param   r_uri	The remote SIP address
+ * @param   r_port	The remote connection port
  */
-    virtual int connect( std::string r_uri, int r_port) = 0;
+        virtual int connect( std::string r_uri, int r_port) = 0;
 
 /*
  * Terminate a current remote connection
  */
-    virtual int disconnect( ) = 0;
+        virtual int disconnect( ) = 0;
 
 /*
  * Accept incoming request
  */
-    virtual int accept( void ) = 0;
+        virtual int accept( void ) = 0;
 
-    virtual int refuse( int reason ) = 0;
+        virtual int refuse( int reason ) = 0;
 
-    virtual void build_sdp() = 0;
+        virtual void build_sdp() = 0;
 
-    virtual void startMainloop() = 0;
+        virtual void startMainloop() = 0;
 
-    int getSessionPort( void ){ return _port; }
+        int getSessionPort( void ){ return _port; }
 
-private:
+    private:
 /* The communication protocol */
-    int _protocol;
+        int _protocol;
 
 /* The protocol listening port */
-    int _port;
+        int _port;
 };
 
 

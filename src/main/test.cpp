@@ -42,8 +42,8 @@ class DModule
     : public BaseModule
 {
     bool pass;
-public:
-    bool run();
+    public:
+        bool run();
 };
 
 

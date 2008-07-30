@@ -67,8 +67,8 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv,pjsip_transaction 
 
 /*
  * Called to handle incoming requests outside dialogs
- * @param 	rdata
- * @return 	pj_bool_t
+ * @param   rdata
+ * @return  pj_bool_t
  */
 static pj_bool_t on_rx_request( pjsip_rx_data *rdata );
 
@@ -95,7 +95,7 @@ static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offe
 static pjsip_endpoint *endpt;
 
 /*
- * 	The global pool factory
+ *  The global pool factory
  */
 static pj_caching_pool c_pool;
 
@@ -105,12 +105,12 @@ static pj_caching_pool c_pool;
 static pjsip_module mod_ua;
 
 /*
- * 	The invite session
+ *  The invite session
  */
 pjsip_inv_session* inv_session;
 
 /*
- * 	A bool to indicate whether or not the connection is up
+ *  A bool to indicate whether or not the connection is up
  */
 static pj_bool_t complete;
 
@@ -217,11 +217,11 @@ int UserAgent::create_invite_session( std::string uri, int port ){
     pj_str_t to = pj_str( (char*)uri.c_str() );
     //pj_str_t contact = from;
 
-    status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from
-                                   ,&from
-                                   ,&to
-                                   ,&to
-                                   ,&dialog );
+    status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
+                                   &from,
+                                   &to,
+                                   &to,
+                                   &dialog );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     status = pjsip_inv_create_uac( dialog, NULL, 0, &inv_session );

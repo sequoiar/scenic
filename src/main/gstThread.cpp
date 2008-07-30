@@ -50,31 +50,31 @@ int GstThread::main()
         BaseMessage f = queue.timed_pop(10000);
         switch(f.get_type())
         {
-        case BaseMessage::quit:
-        {
-            BaseMessage f(BaseMessage::quit);
-            queue.push(f);
-            quit = true;
-            break;
-        }
-        case BaseMessage::start:
-        {
-            sender->start();
-            break;
-        }
-        case BaseMessage::init:
-        {
-            sender->init();
-            break;
-        }
-        case BaseMessage::stop:
-        {
-            sender->stop();
-            break;
-        }
+            case BaseMessage::quit:
+            {
+                BaseMessage f(BaseMessage::quit);
+                queue.push(f);
+                quit = true;
+                break;
+            }
+            case BaseMessage::start:
+            {
+                sender->start();
+                break;
+            }
+            case BaseMessage::init:
+            {
+                sender->init();
+                break;
+            }
+            case BaseMessage::stop:
+            {
+                sender->stop();
+                break;
+            }
 
-        default:
-            break;
+            default:
+                break;
         }
     }
 

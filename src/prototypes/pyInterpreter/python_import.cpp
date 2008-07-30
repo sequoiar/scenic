@@ -57,8 +57,8 @@ int ground_init(int argc, char *argv[])
 
 BOOST_PYTHON_MODULE(Hello)
 {
-    class_ < Hello > ("Hello").def("greet", &Hello::greet).def("set_name"
-                                                               ,&Hello::set_name);
+    class_ < Hello > ("Hello").def("greet", &Hello::greet).def("set_name",
+                                                               &Hello::set_name);
 }
 
 BOOST_PYTHON_MODULE(OscThread)
@@ -75,8 +75,8 @@ BOOST_PYTHON_MODULE(OscMessage)
 BOOST_PYTHON_MODULE(QueuePairOfOscMessage)
 {
     class_ < QueuePairOfOscMessage > ("QueuePairOfOscMessage").def(
-        "copy_timed_pop"
-        ,&
+        "copy_timed_pop",
+        &
         QueuePairOfOscMessage::
         copy_timed_pop).
     def("push"
@@ -89,8 +89,8 @@ void BOOST_PY_IMPORT()
 {
     PyImport_AppendInittab((char *) "Hello", &initHello);
     PyImport_AppendInittab((char *) "OscThread", &initOscThread);
-    PyImport_AppendInittab((char *) "QueuePairOfOscMessage"
-                           ,&initQueuePairOfOscMessage);
+    PyImport_AppendInittab((char *) "QueuePairOfOscMessage",
+                           &initQueuePairOfOscMessage);
     PyImport_AppendInittab((char *) "OscMessage", &initOscMessage);
 }
 
@@ -100,8 +100,8 @@ void PYTHON_EXEC_IMPORT(object mm, object mn)
     if (mm) {
         exec("import Hello; from Hello import *", mm, mn);
         exec("import OscThread; from OscThread import *", mm, mn);
-        exec("import QueuePairOfOscMessage; from QueuePairOfOscMessage import *", mm
-             ,mn);
+        exec("import QueuePairOfOscMessage; from QueuePairOfOscMessage import *", mm,
+             mn);
         exec("import OscMessage; from OscMessage import *", mm, mn);
     }
 }

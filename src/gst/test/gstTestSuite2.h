@@ -45,9 +45,9 @@ class GstTestSuite
             : id_(0)
         {
             TEST_ADD(GstTestSuite::start_1ch_audiotest)
-        TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
-        TEST_ADD(GstTestSuite::start_stop_8ch_jack)
-        TEST_ADD(GstTestSuite::start_stop_8ch_comp_audiofile)
+            TEST_ADD(GstTestSuite::start_stop_8ch_alsa)
+            TEST_ADD(GstTestSuite::start_stop_8ch_jack)
+            TEST_ADD(GstTestSuite::start_stop_8ch_comp_audiofile)
 
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
