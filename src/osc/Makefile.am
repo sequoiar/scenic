@@ -4,5 +4,5 @@ noinst_LIBRARIES = libOsc.a
 
 libOsc_a_SOURCES = osc.cpp 
 
-libOsc_a_CPPFLAGS= $(LLO_CFLAGS) $(AM_CPPFLAGS) 
+libOsc_a_CPPFLAGS= $(LIBLO_CFLAGS) $(AM_CPPFLAGS) 
 
