@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
+import sys
+
 # twisted imports
 from twisted.internet import reactor, protocol
+
+sys.path.append("protocols")
 
 # OSC imports
 import osc_protocol
