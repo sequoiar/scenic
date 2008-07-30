@@ -1,4 +1,3 @@
-# Makefile for the sip module
 include $(top_srcdir)/src/globals.mak
 
 
