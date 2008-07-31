@@ -32,55 +32,7 @@
 #include <string>
 #include <set>
 #include "baseModule.h"
-
-typedef GAsyncQueue GAsyncQueue;
-
-//typedef std::pair < GAsyncQueue *, GAsyncQueue * >BaseQueuePair;
-
-class BaseQueuePair
-{
-    public:
-        BaseQueuePair(GAsyncQueue* f, GAsyncQueue* s)
-            : first(f), second(s){}
-        virtual ~BaseQueuePair(){}
-
-        GAsyncQueue *first, *second;
-        BaseQueuePair(const BaseQueuePair& in)
-            : first(in.first), second(in.second){}
-
-    private:
-        BaseQueuePair& operator=(const BaseQueuePair&); //No Assignment Operator
-};
-
-
-template < class T >
-class QueuePair_
-    : public BaseQueuePair
-{
-    public:
-        QueuePair_ < T > (GAsyncQueue * f, GAsyncQueue * s)
-            : BaseQueuePair(f, s)
-        {}
-        QueuePair_ < T > ()
-            : BaseQueuePair(0, 0)
-        {}
-        ~QueuePair_ < T > ()
-        {}
-        T timed_pop(int ms);
-        void push(T pt);
-
-        void done(T * pt);
-        void init();
-
-        void del(bool);
-
-    private:
-        bool own[2];
-        T *timed_pop_(int ms);
-
-        static GMutex *mutex;
-        static std::list < T * >l;
-};
+#include "queuePair.h"
 
 
 template < class T >
@@ -104,11 +56,11 @@ class BaseThread
 
 
         bool run();
-
     protected:
         virtual int main() {
             return 0;
         }
+        virtual bool ready(){ return true;}
 
 
         GThread *th;
@@ -127,141 +79,6 @@ QueuePair_ < T > BaseThread < T >::getQueue()
     return (QueuePair_ < T > (queue.second, queue.first));
 }
 
-
-template < class T >
-T* queue_pair_pop(BaseQueuePair qp)
-{
-    return (static_cast < T* > (g_async_queue_pop(qp.first)));
-}
-
-
-template < class T >
-void queue_pair_push(BaseQueuePair qp, T* t)
-{
-    g_async_queue_push(qp.second, t);
-}
-
-
-template < class T >
-T* queue_pair_timed_pop(BaseQueuePair* p, int ms)
-{
-    GTimeVal t;
-
-    g_get_current_time(&t);
-    g_time_val_add(&t, ms);
-    return (static_cast < T* > (g_async_queue_timed_pop(p->first, &t)));
-}
-
-
-template < class T >
-GThread * thread_create_queue_pair(void *(thread) (void *), T t, GError ** err)
-{
-    return (g_thread_create(thread, static_cast < void *>(t), TRUE, err));
-}
-
-
-template < class T >
-GMutex * QueuePair_ < T >::mutex = NULL;
-
-template < class T >
-std::list < T * >QueuePair_ < T >::l;
-
-
-template < class T >
-T * QueuePair_ < T >::timed_pop_(int ms)
-{
-    return (queue_pair_timed_pop < T >(this, ms));
-}
-
-
-template < class T >
-T QueuePair_ < T >::timed_pop(int ms)
-{
-    T n;
-    T *s = timed_pop_(ms);
-
-    if (s) {
-        n = *s;
-        done(s);
-    }
-    else
-        n = T();
-    return n;
-}
-
-
-template < class T >
-void QueuePair_ < T >::push(T pt)
-{
-    g_mutex_lock(mutex);
-    T *t = new T(pt);
-
-    l.push_front(t);
-
-    queue_pair_push(*this, t);
-    g_mutex_unlock(mutex);
-}
-
-
-template < class T >
-void QueuePair_ < T >::done(T * t)
-{
-    typename std::list<T*>::iterator it;
-
-    g_mutex_lock(mutex);
-
-    for(it = l.begin(); it != l.end(); ++it)
-    {
-        if(*it == t) {
-            delete (t);
-            l.remove(t);
-            break;
-        }
-    }
-
-    g_mutex_unlock(mutex);
-}
-
-
-template < class T >
-void QueuePair_ < T >::init()
-{
-    if (!mutex)
-        mutex = g_mutex_new();
-    if (first == 0) {
-        own[0] = true;
-        first = g_async_queue_new();
-    }
-    else
-        own[0] = false;
-    if (second == 0) {
-        own[1] = true;
-        second = g_async_queue_new();
-    }
-    else
-        own[1] = false;
-}
-
-
-template < class T>
-void QueuePair_<T>::del(bool one)
-{
-    T *t;
-    GAsyncQueue *q;
-    if(one)
-        q = first;
-    else
-        q = second;
-    do
-    {
-        t = static_cast<T*>(g_async_queue_try_pop(q));
-        if(t)
-            delete t;
-    }
-    while(t);
-
-    g_async_queue_unref(q);
-}
 
 
 template < class T >
@@ -290,7 +107,7 @@ bool BaseThread < T >::run()
     GError *err = 0;
 
     //No thread yet
-    if (th)
+    if (th || !ready())
         return false;
     th = thread_create_queue_pair(BaseThread::thread_main, this, &err);
 
