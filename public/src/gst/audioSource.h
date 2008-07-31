@@ -46,7 +46,7 @@ class AudioSource
         const AudioConfig &config_;
         Interleave interleave_;
         std::vector<GstElement *>sources_, aconvs_;
-        static gboolean base_callback(GstClock *clock, GstClockTime time,GstClockID id,
+        static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                       gpointer user_data);
 
         virtual gboolean callback() { return FALSE; }
@@ -85,7 +85,7 @@ class AudioFileSource
             : AudioSource(config), decoders_() {}
         ~AudioFileSource();
         void link_to_sink(GstElement *sink);
-        static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,gboolean last,
+        static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
                                    void *data);
 
     protected:

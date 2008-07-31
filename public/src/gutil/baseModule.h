@@ -32,8 +32,8 @@
 class BaseArg
 {
     public:
-        BaseArg(char t,std::string l, char s, std::string d, std::string a)
-            : type(t),l_arg(l),desc(d),arg_desc(a),s_arg(s){}
+        BaseArg(char t, std::string l, char s, std::string d, std::string a)
+            : type(t), l_arg(l), desc(d), arg_desc(a), s_arg(s){}
 
         char type;
         std::string l_arg, desc, arg_desc;
@@ -47,8 +47,8 @@ class IntArg
 {
     public:
         int* arg;
-        IntArg(int* i,std::string l, char s, std::string d, std::string a)
-            : BaseArg('i',l,s,d,a),arg(i){}
+        IntArg(int* i, std::string l, char s, std::string d, std::string a)
+            : BaseArg('i', l, s, d, a), arg(i){}
 
     private:
         IntArg(const IntArg&); //No Copy Constructor
@@ -61,8 +61,8 @@ class BoolArg
 {
     public:
         bool* arg;
-        BoolArg(bool* b,std::string l, char s, std::string d)
-            : BaseArg('b',l,s,d, std::string()),arg(b){}
+        BoolArg(bool* b, std::string l, char s, std::string d)
+            : BaseArg('b', l, s, d, std::string()), arg(b){}
 
     private:
         BoolArg(const BoolArg&); //No Copy Constructor
@@ -75,8 +75,8 @@ class StringArg
 {
     public:
         char** arg ;
-        StringArg(char** ppc,std::string l, char s, std::string d, std::string a)
-            : BaseArg('s',l, s, d, a),arg(ppc){}
+        StringArg(char** ppc, std::string l, char s, std::string d, std::string a)
+            : BaseArg('s', l, s, d, a), arg(ppc){}
 
     private:
         StringArg(const StringArg&); //No Copy Constructor

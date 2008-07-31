@@ -53,10 +53,10 @@ class OptionArgs
         GOptionEntry* getArray();
 
         GOptionEntry* pA;
-        int parse(int argc,char **argv);
+        int parse(int argc, char **argv);
 
         OptionArgs()
-            : options(),pA(0){}
+            : options(), pA(0){}
         ~OptionArgs();
     private:
         OptionArgs(const OptionArgs&); //No Copy Constructor

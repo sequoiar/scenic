@@ -62,7 +62,7 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status );
  * @param	tsx	A pointer on a pjsip_transaction structure
  * @param	e	A pointer on a pjsip_event structure
  */
-static void call_on_tsx_state_changed( pjsip_inv_session *inv,pjsip_transaction *tsx,
+static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
                                        pjsip_event *e );
 
 /*
@@ -198,7 +198,7 @@ int UserAgent::init_pjsip_modules(  ){
     status = pjsip_endpt_register_module( endpt, &mod_ua );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    PJ_LOG(3,(THIS_FILE, "Ready to accept incoming calls..."));
+    PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
 
     return 1;
 }
@@ -338,7 +338,7 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
 }
 
 
-static void call_on_tsx_state_changed( pjsip_inv_session *inv,pjsip_transaction *tsx,
+static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
                                        pjsip_event *e ){}
 
 

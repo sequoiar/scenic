@@ -43,7 +43,7 @@ class OscMessage
     public:
         OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d);
         OscMessage()
-            : path(),types(),args(),argc(0),data(0){}
+            : path(), types(), args(), argc(0), data(0){}
         std::string path, types;
         OscArgs args;
         int argc;
@@ -64,11 +64,11 @@ class OscThread
     private:
         int main();
 
-        static int generic_handler_static(const char *path, const char *types,lo_arg ** argv,
-                                          int argc,void *data,
+        static int generic_handler_static(const char *path, const char *types, lo_arg ** argv,
+                                          int argc, void *data,
                                           void *user_data);
 
-        int generic_handler(const char *path, const char *types, lo_arg ** argv,int argc,
+        int generic_handler(const char *path, const char *types, lo_arg ** argv, int argc,
                             void *data);
 
         static void liblo_error(int num, const char *msg, const char *path){}
@@ -87,7 +87,7 @@ class LoArgs
 {
     public:
         LoArgs(const char *pchar, int index, lo_arg * a)
-            : type(static_cast<lo_type>(pchar[index])), i(0),s()
+            : type(static_cast<lo_type>(pchar[index])), i(0), s()
         {
             switch ((char) type)
             {

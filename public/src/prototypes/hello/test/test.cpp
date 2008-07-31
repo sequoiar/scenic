@@ -29,7 +29,7 @@ class DModule
     bool pass;
     public:
         DModule()
-            : BaseModule(),pass(false){}
+            : BaseModule(), pass(false){}
         bool run();
 };
 

@@ -70,7 +70,7 @@ int my_main (int argc, char** argv)
     if(!t.init())
         return 1;
     opts.add(t.get_args());
-    if(!opts.parse(argc,argv))
+    if(!opts.parse(argc, argv))
         return 1;
     QueuePair queue = t.getQueue();
     if(!t.run())
@@ -93,7 +93,7 @@ int my_main (int argc, char** argv)
 
 int main(int argc, char** argv)
 {
-    my_main(argc,argv);
+    my_main(argc, argv);
     return 0;
 }
 

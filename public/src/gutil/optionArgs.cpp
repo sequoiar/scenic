@@ -92,7 +92,7 @@ GOptionEntry* OptionArgs::getArray()
 }
 
 
-int OptionArgs::parse(int argc,char **argv)
+int OptionArgs::parse(int argc, char **argv)
 {
     int ret = 1;
     GError *error = NULL;
@@ -104,7 +104,7 @@ int OptionArgs::parse(int argc,char **argv)
     g_option_context_set_summary(context, PACKAGE " ver. " PACKAGE_VERSION);
 
     pGOptions = getArray();
-    g_option_context_add_main_entries(context, pGOptions,NULL);
+    g_option_context_add_main_entries(context, pGOptions, NULL);
 
     //afteradd delete?
     //delele(pGOptions);
