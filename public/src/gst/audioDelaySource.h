@@ -97,11 +97,12 @@ gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time,GstClo
 
 
 template <typename T>
-AudioDelaySource<T>::~AudioDelaySource<T>()
+AudioDelaySource<T>::~AudioDelaySource()
 {
     assert(T::pipeline_.stop());
     T::pipeline_.remove_vector(filters_);
 }
+
 
 #endif //_AUDIO_SOURCE_H_
 
