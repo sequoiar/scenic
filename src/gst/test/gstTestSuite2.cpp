@@ -29,6 +29,8 @@
 #include "audioReceiver.h"
 #include "audioConfig.h"
 
+#include "hostIP.h"
+
 void GstTestSuite::set_id(int id)
 {
     if (id == 1 || id == 0)
@@ -190,7 +192,7 @@ void GstTestSuite::start_v4l_rtp()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        VideoConfig config("videotestsrc", "h264", MY_ADDRESS, PORT);
+        VideoConfig config("videotestsrc", "h264", get_host_ip(), PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -216,7 +218,7 @@ void GstTestSuite::stop_v4l_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("videotestsrc", "h264", MY_ADDRESS, PORT);
+        VideoConfig config("videotestsrc", "h264", get_host_ip(), PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -245,7 +247,7 @@ void GstTestSuite::start_stop_v4l_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("videotestsrc", "h264", MY_ADDRESS, PORT);
+        VideoConfig config("videotestsrc", "h264", get_host_ip(), PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -323,7 +325,7 @@ void GstTestSuite::start_dv_rtp()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
+        VideoConfig config("dv1394src", "h264", get_host_ip(), PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -349,7 +351,7 @@ void GstTestSuite::stop_dv_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
+        VideoConfig config("dv1394src", "h264", get_host_ip(), PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -378,7 +380,7 @@ void GstTestSuite::start_stop_dv_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("dv1394src", "h264", MY_ADDRESS, PORT);
+        VideoConfig config("dv1394src", "h264", get_host_ip(), PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -610,7 +612,7 @@ void GstTestSuite::start_2ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", get_host_ip(),
                            10010);
         AudioSender tx(config);
         tx.init();
@@ -638,7 +640,7 @@ void GstTestSuite::stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", get_host_ip(),
                            10010);
         AudioSender tx(config);
         tx.init();
@@ -669,7 +671,7 @@ void GstTestSuite::start_stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", get_host_ip(),
                            PORT);
         AudioSender tx(config);
         tx.init();
@@ -701,7 +703,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", get_host_ip(),
                            PORT);
         AudioSender tx(config);
         tx.init();
@@ -728,7 +730,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", get_host_ip(),
                            10010);
         AudioSender tx(config);
         tx.init();
@@ -758,7 +760,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiotest()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+        AudioConfig config("audiotestsrc", numChannels, "vorbisenc", get_host_ip(),
                            10010);
         AudioSender tx(config);
         TEST_ASSERT(tx.init());
@@ -939,7 +941,7 @@ void GstTestSuite::start_8ch_comp_rtp_audiofile()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+        AudioConfig config("filesrc", numChannels, "vorbisenc", get_host_ip(), 10010);
         AudioSender tx(config);
         tx.init();
 
@@ -965,7 +967,7 @@ void GstTestSuite::stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+        AudioConfig config("filesrc", numChannels, "vorbisenc", get_host_ip(), 10010);
         AudioSender tx(config);
         tx.init();
 
@@ -994,7 +996,7 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("filesrc", numChannels, "vorbisenc", MY_ADDRESS, 10010);
+        AudioConfig config("filesrc", numChannels, "vorbisenc", get_host_ip(), 10010);
         AudioSender tx(config);
         TEST_ASSERT(tx.init());
 
@@ -1032,11 +1034,11 @@ void GstTestSuite::start_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(aRx.isPlaying());
     }
     else {
-        VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
+        VideoConfig vConfig("dv1394src", "h264", get_host_ip(), vPort);
         VideoSender vTx(vConfig);
         vTx.init();
 
-        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
+        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", get_host_ip(), aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
@@ -1074,11 +1076,11 @@ void GstTestSuite::stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!aRx.isPlaying());
     }
     else {
-        VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
+        VideoConfig vConfig("dv1394src", "h264", get_host_ip(), vPort);
         VideoSender vTx(vConfig);
         vTx.init();
 
-        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
+        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", get_host_ip(), aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
@@ -1122,11 +1124,11 @@ void GstTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!aRx.isPlaying());
     }
     else {
-        VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
+        VideoConfig vConfig("dv1394src", "h264", get_host_ip(), vPort);
         VideoSender vTx(vConfig);
         vTx.init();
 
-        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
+        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", get_host_ip(), aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
@@ -1178,11 +1180,11 @@ void GstTestSuite::sync()
         TEST_ASSERT(!aRx.isPlaying());
     }
     else {
-        VideoConfig vConfig("videotestsrc", "h264", MY_ADDRESS, vPort);
+        VideoConfig vConfig("videotestsrc", "h264", get_host_ip(), vPort);
         VideoSender vTx(vConfig);
         vTx.init();
 
-        AudioConfig aConfig("audiotestsrc", numChannels, "vorbisenc", MY_ADDRESS,
+        AudioConfig aConfig("audiotestsrc", numChannels, "vorbisenc", get_host_ip(),
                             aPort);
         AudioSender aTx(aConfig);
         aTx.init();

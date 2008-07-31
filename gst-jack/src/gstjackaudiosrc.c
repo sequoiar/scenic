@@ -236,8 +236,8 @@ jack_process_cb(jack_nframes_t nframes, void *arg)
      * ringbuffer 
      */
 
-    for (i = 0; i < nframes; i++) 
-        for (j = 0; j < channels; j++) 
+    for (i = 0; i < nframes; ++i) 
+        for (j = 0; j < channels; ++j)
             *data++ = buffers[j][i]; 
 
     if (gst_ring_buffer_prepare_read(buf, &writeseg, &writeptr, &givenLen))

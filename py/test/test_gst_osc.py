@@ -28,7 +28,7 @@ def client2():
     message.append('start')
     message.append(334)
     c.send_message('127.0.0.1', 7770, message)
-    reactor.callLater(1, client3)
+    reactor.callLater(5, client3)
 
 def cquit():
     """Client example"""

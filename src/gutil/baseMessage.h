@@ -70,6 +70,7 @@ class BaseMessage
         }
 
 
+    private:
         unsigned char t_;
 };
 

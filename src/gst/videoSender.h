@@ -22,7 +22,6 @@
 #define _VIDEO_SENDER_H_
 
 #include <string>
-#include "defaultAddresses.h"
 #include "lo/lo.h"
 
 #include "mediaBase.h"
