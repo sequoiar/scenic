@@ -104,6 +104,7 @@ class LoArgs
             }
         }
 
+    private:
 
         lo_type type;
         int i;

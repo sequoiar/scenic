@@ -28,6 +28,7 @@
 #include "audioSender.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
+#include "hostIP.h"
 
 
 void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
@@ -54,11 +55,11 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
+        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", get_host_ip(), aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
-        VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
+        VideoConfig vConfig("dv1394src", "h264", get_host_ip(), vPort);
         VideoSender vTx(vConfig);
         vTx.init();
 
@@ -96,11 +97,11 @@ void SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
+        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", get_host_ip(), aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
-        VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
+        VideoConfig vConfig("dv1394src", "h264", get_host_ip(), vPort);
         VideoSender vTx(vConfig);
         vTx.init();
 
@@ -146,11 +147,11 @@ void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", MY_ADDRESS, aPort);
+        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", get_host_ip(), aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
-        VideoConfig vConfig("dv1394src", "h264", MY_ADDRESS, vPort);
+        VideoConfig vConfig("dv1394src", "h264", get_host_ip(), vPort);
         VideoSender vTx(vConfig);
         vTx.init();
 
@@ -198,12 +199,12 @@ void SyncTestSuite::sync()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("audiotestsrc", NUM_CHANNELS, "vorbisenc", MY_ADDRESS,
+        AudioConfig aConfig("audiotestsrc", NUM_CHANNELS, "vorbisenc", get_host_ip(),
                             A_PORT);
         AudioSender aTx(aConfig);
         aTx.init();
 
-        VideoConfig vConfig("videotestsrc", "h264", MY_ADDRESS, V_PORT);
+        VideoConfig vConfig("videotestsrc", "h264", get_host_ip(), V_PORT);
         VideoSender vTx(vConfig);
         vTx.init();
 
