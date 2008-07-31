@@ -40,8 +40,7 @@ RtpReceiver::RtpReceiver()
 
 RtpReceiver::~RtpReceiver()
 {
-    if (isPlaying())
-        assert(pipeline_.stop());
+    assert(stop());
     pipeline_.remove(rtp_receiver_);
 
     // find this->depayloader in the static list of depayloaders

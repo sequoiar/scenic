@@ -57,8 +57,7 @@ void AudioSource::init_source()
 
 AudioSource::~AudioSource()
 {
-    if (isPlaying())
-        assert(pipeline_.stop());
+    assert(stop());
     pipeline_.remove_vector(aconvs_);
     pipeline_.remove_vector(sources_);
 }
@@ -128,7 +127,7 @@ void AudioTestSource::sub_init()
 
 AudioTestSource::~AudioTestSource()
 {
-    assert(pipeline_.stop());
+    assert(stop());
     pipeline_.remove_clock_callback(clockId_);
 }
 
@@ -218,7 +217,7 @@ void AudioFileSource::link_to_sink(GstElement *sink)
 
 AudioFileSource::~AudioFileSource()
 {
-    assert(pipeline_.stop());
+    assert(stop());
     pipeline_.remove_vector(decoders_);
 }
 

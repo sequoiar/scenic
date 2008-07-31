@@ -30,6 +30,7 @@ Interleave::Interleave(const AudioConfig &config)
 
 Interleave::~Interleave()
 {
+    assert(stop());
     pipeline_.remove(interleave_);
 }
 

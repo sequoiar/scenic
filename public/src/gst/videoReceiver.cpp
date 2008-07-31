@@ -37,8 +37,7 @@ VideoReceiver::VideoReceiver(const VideoConfig & config)
 
 VideoReceiver::~VideoReceiver()
 {
-    if (isPlaying())
-        assert(stop());
+    assert(stop());
     pipeline_.remove(sink_);
     pipeline_.remove(decoder_);
     pipeline_.remove(depayloader_);

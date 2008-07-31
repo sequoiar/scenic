@@ -48,8 +48,7 @@ void VideoSource::link_element(GstElement *sinkElement)
 
 VideoSource::~VideoSource()
 {
-    if (isPlaying())
-        assert(pipeline_.stop());
+    assert(stop());
     pipeline_.remove(source_);
 }
 
@@ -93,8 +92,7 @@ void VideoTestSource::sub_init()
 
 VideoTestSource::~VideoTestSource()
 {
-    if (isPlaying())
-        assert(pipeline_.stop());
+    assert(stop());
     pipeline_.remove_clock_callback(clockId_);
 }
 
@@ -165,7 +163,7 @@ void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
 
 VideoFileSource::~VideoFileSource()
 {
-    assert(pipeline_.stop());
+    assert(stop());
     pipeline_.remove(decoder_);
 }
 

@@ -27,6 +27,8 @@
 class GstBase
 {
     public:
+        virtual bool start();
+        virtual bool stop();
         bool isPlaying() { return pipeline_.isPlaying(); }
 
     protected:
