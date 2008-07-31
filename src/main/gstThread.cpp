@@ -21,11 +21,11 @@
 
 //BaseModule args get deleted in ~BaseModule
 GstThread::GstThread()
-    : conf(),sender(),receiver(),conf_str(0)
+    : conf(), sender(), receiver(), conf_str(0)
 {
     args.clear();
     conf_str = 0;
-    args.push_back(new StringArg(&conf_str,"sender",'s',"video", "try videotestsrc"));
+    args.push_back(new StringArg(&conf_str, "sender", 's', "video", "try videotestsrc"));
 }
 
 

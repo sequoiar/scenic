@@ -36,7 +36,7 @@ class DModule
 
 void DModule::init()
 {
-    args.push_back(new BoolArg(&pass,"pass",'p',"bypass this module"));
+    args.push_back(new BoolArg(&pass, "pass", 'p', "bypass this module"));
 }
 
 
@@ -55,7 +55,7 @@ int my_main(int argc, char** argv)
     OptionArgs opts;
     m.init();
     opts.add(m.get_args());
-    if(!opts.parse(argc,argv))
+    if(!opts.parse(argc, argv))
         return 1;
     m.run();
 
@@ -65,7 +65,7 @@ int my_main(int argc, char** argv)
 
 int main (int argc, char** argv)
 {
-    return my_main(argc,argv);
+    return my_main(argc, argv);
 }
 
 

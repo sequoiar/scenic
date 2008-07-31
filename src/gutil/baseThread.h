@@ -40,13 +40,13 @@ typedef GAsyncQueue GAsyncQueue;
 class BaseQueuePair
 {
     public:
-        BaseQueuePair(GAsyncQueue* f,GAsyncQueue* s)
-            : first(f),second(s){}
+        BaseQueuePair(GAsyncQueue* f, GAsyncQueue* s)
+            : first(f), second(s){}
         virtual ~BaseQueuePair(){}
 
         GAsyncQueue *first, *second;
         BaseQueuePair(const BaseQueuePair& in)
-            : first(in.first),second(in.second){}
+            : first(in.first), second(in.second){}
 
     private:
         BaseQueuePair& operator=(const BaseQueuePair&); //No Assignment Operator
@@ -154,7 +154,7 @@ T* queue_pair_timed_pop(BaseQueuePair* p, int ms)
 
 
 template < class T >
-GThread * thread_create_queue_pair(void *(thread) (void *), T t,GError ** err)
+GThread * thread_create_queue_pair(void *(thread) (void *), T t, GError ** err)
 {
     return (g_thread_create(thread, static_cast < void *>(t), TRUE, err));
 }

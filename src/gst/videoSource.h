@@ -52,7 +52,7 @@ class VideoTestSource
 {
     public:
         explicit VideoTestSource(const VideoConfig &config)
-            : VideoSource(config),clockId_(0) {}
+            : VideoSource(config), clockId_(0) {}
         ~VideoTestSource();
         void sub_init();
         gboolean callback();
@@ -78,7 +78,7 @@ class VideoFileSource
 
     private:
         GstElement *decoder_, *sinkElement_;
-        static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad,gboolean last,
+        static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
                                    void *data);
 
         VideoFileSource(const VideoFileSource&);     //No Copy Constructor

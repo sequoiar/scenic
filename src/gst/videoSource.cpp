@@ -27,7 +27,7 @@
 
 
 VideoSource::VideoSource(const VideoConfig &config)
-    : config_(config),source_(0)
+    : config_(config), source_(0)
 {}
 
 // parts of sub_init that are common to all AudioSource classes
@@ -55,7 +55,7 @@ VideoSource::~VideoSource()
 
 
 // defers to subclassses callback
-gboolean VideoSource::base_callback(GstClock *clock,GstClockTime time,GstClockID id,
+gboolean VideoSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                     gpointer user_data)
 {
     return (static_cast<VideoSource*>(user_data)->callback());
@@ -127,7 +127,7 @@ void VideoFileSource::link_element(GstElement *sinkElement)
 }
 
 
-void VideoFileSource::cb_new_src_pad(GstElement * srcElement,GstPad * srcPad,gboolean last,
+void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
                                      void *data)
 {
     if (gst_pad_is_linked(srcPad))
@@ -202,7 +202,7 @@ void VideoDvSource::sub_init()
 }
 
 
-void VideoDvSource::cb_new_src_pad(GstElement * srcElement,GstPad * srcPad,void *data)
+void VideoDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
 {
     if (std::string("audio") == gst_pad_get_name(srcPad))
     {

@@ -82,7 +82,7 @@ void AudioDelaySource<T>::link_interleave()
 
 
 template <typename T>
-gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time,GstClockID id)
+gboolean AudioDelaySource<T>::callback(GstClock *clock, GstClockTime time, GstClockID id)
 {
     static double d_secs = 5;
 

@@ -124,7 +124,7 @@ void VideoSender::liblo_error(int num, const char *msg, const char *path)
 }
 
 
-int VideoSender::stop_handler(const char *path, const char *types, lo_arg ** argv,int argc,
+int VideoSender::stop_handler(const char *path, const char *types, lo_arg ** argv, int argc,
                               void *data,
                               void *user_data)
 {

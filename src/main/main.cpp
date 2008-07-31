@@ -12,7 +12,7 @@ int m (int argc, char** argv)
     opts.add(gst.get_args());
     opts.add(o.get_args());
 
-    if(!opts.parse(argc,argv))
+    if(!opts.parse(argc, argv))
         return 1;
     QueuePair gst_queue = gst.getQueue();
     QueuePairOfOscMessage osc_queue = o.getQueue();
@@ -30,7 +30,7 @@ int m (int argc, char** argv)
         {
             BaseMessage in(BaseMessage::quit);
             gst_queue.push(in);
-            osc_queue.push(OscMessage("/quit","",0,0,0));
+            osc_queue.push(OscMessage("/quit", "", 0, 0, 0));
             break;
         }
         if(m.path.compare("/gst"))
@@ -57,7 +57,7 @@ int m (int argc, char** argv)
 
 int main (int argc, char** argv)
 {
-    return m(argc,argv);
+    return m(argc, argv);
 }
 
 
