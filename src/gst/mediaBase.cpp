@@ -25,19 +25,7 @@
 
 MediaBase::~MediaBase()
 {
-    pipeline_.stop();
-}
-
-
-bool MediaBase::start()
-{
-    return pipeline_.start();
-}
-
-
-bool MediaBase::stop()
-{
-    return pipeline_.stop();
+    assert(stop());
 }
 
 

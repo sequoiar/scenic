@@ -36,14 +36,25 @@ GstBase::GstBase()
 
 GstBase::~GstBase()
 {
-    if (isPlaying())
-        assert(pipeline_.stop());
+    assert(stop());
     --refCount_;
     if (refCount_ <= 0)
     {
         assert(refCount_ == 0);
         //pipeline_.reset();
     }
+}
+
+
+bool GstBase::start()
+{
+    return pipeline_.start();
+}
+
+
+bool GstBase::stop()
+{
+    return pipeline_.stop();
 }
 
 

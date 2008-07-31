@@ -38,8 +38,7 @@ VideoSender::VideoSender(const VideoConfig & config)
 
 VideoSender::~VideoSender()
 {
-    if (isPlaying())
-        assert(stop());
+    assert(stop());
     pipeline_.remove(sink_);
     pipeline_.remove(payloader_);
     pipeline_.remove(encoder_);

@@ -82,8 +82,7 @@ const char *RtpSession::padStr(const char *padName)
 
 RtpSession::~RtpSession()
 {
-    if (isPlaying())
-        assert(pipeline_.stop());
+    assert(stop());
     pipeline_.remove(rtcp_sender_);
     pipeline_.remove(rtcp_receiver_);
 

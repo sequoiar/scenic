@@ -27,9 +27,6 @@ class MediaBase
     : public GstBase
 {
     public:
-        virtual bool start();
-        virtual bool stop();
-
         virtual bool init();
 
     protected:
