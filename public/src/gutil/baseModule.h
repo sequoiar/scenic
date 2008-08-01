@@ -26,6 +26,7 @@
 #define __BASE_MODULE_H__
 
 #include <string>
+#include <iostream>
 #include <list>
 
 /// Base class of Arguments used in command line parsing
@@ -35,7 +36,7 @@ class BaseArg
         BaseArg(char t, std::string l, char s, std::string d, std::string a)
             : type(t), l_arg(l), desc(d), arg_desc(a), s_arg(s){}
 
-        virtual ~BaseArg(){}
+        virtual ~BaseArg() {}
 
     protected:
         friend class OptionArgs;
@@ -109,12 +110,13 @@ class BaseModule
         }
 
 
-        virtual ~BaseModule(){
-            for(iterator it = args_.begin(); it != args_.end(); ++it)
+        virtual ~BaseModule()
+        {
+            for(; args_.begin() != args_.end();)
             {
-                if (*it)
-                    delete (*it);
-                args_.remove(*it);
+                if (*args_.begin())
+                    delete *args_.begin();
+                args_.remove(*args_.begin());
             }
         }
 
