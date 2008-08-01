@@ -56,10 +56,13 @@ class BaseThread
 
 
         bool run();
+
     protected:
         virtual int main() {
             return 0;
         }
+
+
         virtual bool ready(){ return true;}
 
 
@@ -78,7 +81,6 @@ QueuePair_ < T > BaseThread < T >::getQueue()
 {
     return (QueuePair_ < T > (queue.second, queue.first));
 }
-
 
 
 template < class T >
