@@ -63,9 +63,9 @@ OscMessage& OscMessage::operator=(const OscMessage& in)
 OscThread::OscThread()
     : local_port_(), remote_port_(), remote_host_(), arg_local_port_(0), running(false)
 {
-    args.clear();
+    args_.clear();
 //    local_port_ = remote_port_ = remote_host_ = 0;
-    args.push_back(new StringArg(&arg_local_port_, "oscLocal", 'p', "local osc port",
+    args_.push_back(new StringArg(&arg_local_port_, "oscLocal", 'p', "local osc port",
                                  "port num"));
 //args.push_back(new StringArg(&remote_port_, "oscRemote", '\0', "remote osc port",
 //                             "port num"));
@@ -85,7 +85,7 @@ int OscThread::generic_handler_static(const char *path, const char *types, lo_ar
 int OscThread::generic_handler(const char *path, const char *types, lo_arg ** argv, int argc,
                                void *data)
 {
-    queue.push(OscMessage(path, types, argv, argc, data));
+    queue_.push(OscMessage(path, types, argv, argc, data));
     return 0;
 }
 
@@ -103,7 +103,7 @@ int OscThread::main()
     running = true;
     while (running)
     {
-        OscMessage msg = queue.timed_pop(10000);
+        OscMessage msg = queue_.timed_pop(10000);
 
         if (!msg.path.empty()) {
             if(!msg.path.compare("/quit"))

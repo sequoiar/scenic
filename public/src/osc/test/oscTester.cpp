@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 {
     OscThread t;
 
-    OscQueue q = t.getQueue();
+    OscQueue &q = t.getQueue();
 
     t.run();
 

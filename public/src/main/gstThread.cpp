@@ -23,9 +23,9 @@
 GstThread::GstThread()
     : conf(), sender(), receiver(), conf_str(0)
 {
-    args.clear();
+    args_.clear();
     conf_str = 0;
-    args.push_back(new StringArg(&conf_str, "sender", 's', "video", "try videotestsrc"));
+    args_.push_back(new StringArg(&conf_str, "sender", 's', "video", "try videotestsrc"));
 }
 
 
@@ -41,19 +41,19 @@ int GstThread::main()
         if(!sender)
         {
             BaseMessage m(BaseMessage::quit);
-            queue.push(m);
+            queue_.push(m);
             quit = true;
         }
     }
     while(!quit)
     {
-        BaseMessage f = queue.timed_pop(10000);
+        BaseMessage f = queue_.timed_pop(10000);
         switch(f.get_type())
         {
             case BaseMessage::quit:
             {
                 BaseMessage f(BaseMessage::quit);
-                queue.push(f);
+                queue_.push(f);
                 quit = true;
                 break;
             }
