@@ -35,14 +35,14 @@ class BaseQueuePair
 {
     public:
         BaseQueuePair(GAsyncQueue* f, GAsyncQueue* s)
-            : first(f), second(s){}
+            : first_(f), second_(s){}
         virtual ~BaseQueuePair(){}
 
-        GAsyncQueue *first, *second;
-        BaseQueuePair(const BaseQueuePair& in)
-            : first(in.first), second(in.second){}
+    protected:
+        GAsyncQueue *first_, *second_;
 
     private:
+        BaseQueuePair(const BaseQueuePair& in);
         BaseQueuePair& operator=(const BaseQueuePair&); //No Assignment Operator
 };
 
@@ -52,68 +52,64 @@ class QueuePair_
     : public BaseQueuePair
 {
     public:
-        QueuePair_ < T > (GAsyncQueue * f, GAsyncQueue * s)
-            : BaseQueuePair(f, s)
-        {}
         QueuePair_ < T > ()
-            : BaseQueuePair(0, 0)
+            : BaseQueuePair(0, 0), destroyQueues_(false)
         {}
+
         ~QueuePair_ < T > ();
 
         T timed_pop(int ms);
         void push(T pt);
+        void flip(QueuePair_& in);
 
-        void done(T * pt);
         void init();
 
-        void del(bool);
-
+    protected:
+        T* pop_();
+        void push_(T* t);
     private:
-        bool own_[2];
+        QueuePair_(const QueuePair_& in);
+        QueuePair_& operator=(const QueuePair_&); //No Assignment Operator
         T *timed_pop_(int ms);
+        bool destroyQueues_;
 
         static GMutex *mutex_;
-        static std::list < T * >l_;
 };
 
 
 template < class T >
-T* queue_pair_pop(BaseQueuePair qp)
+T* QueuePair_< T >::pop_()
 {
-    return (static_cast < T* > (g_async_queue_pop(qp.first)));
+    return (static_cast < T* > (g_async_queue_pop(first_)));
 }
 
 
 template < class T >
-void queue_pair_push(BaseQueuePair qp, T* t)
+void QueuePair_< T >::push_(T* t)
 {
-    g_async_queue_push(qp.second, t);
+    g_async_queue_push(second_, t);
 }
 
-
-template < class T >
-T* queue_pair_timed_pop(BaseQueuePair* p, int ms)
+    template < class T >
+void QueuePair_< T >::flip(QueuePair_< T > &in)
 {
-    GTimeVal t;
-
-    g_get_current_time(&t);
-    g_time_val_add(&t, ms);
-    return (static_cast < T* > (g_async_queue_timed_pop(p->first, &t)));
+    second_ = in.first_;
+    first_ = in.second_;
 }
-
 
 
 template < class T >
 GMutex * QueuePair_ < T >::mutex_ = NULL;
 
-template < class T >
-std::list < T * >QueuePair_ < T >::l_;
-
 
 template < class T >
 T * QueuePair_ < T >::timed_pop_(int ms)
 {
-    return (queue_pair_timed_pop < T >(this, ms));
+    GTimeVal t;
+
+    g_get_current_time(&t);
+    g_time_val_add(&t, ms);
+    return (static_cast < T* > (g_async_queue_timed_pop(first_, &t)));
 }
 
 
@@ -125,7 +121,7 @@ T QueuePair_ < T >::timed_pop(int ms)
 
     if (s) {
         n = *s;
-        done(s);
+        delete s;
     }
     else
         n = T();
@@ -139,29 +135,7 @@ void QueuePair_ < T >::push(T pt)
     g_mutex_lock(mutex_);
     T *t = new T(pt);
 
-    l_.push_front(t);
-
-    queue_pair_push(*this, t);
-    g_mutex_unlock(mutex_);
-}
-
-
-template < class T >
-void QueuePair_ < T >::done(T * t)
-{
-    typename std::list<T*>::iterator it;
-
-    g_mutex_lock(mutex_);
-
-    for(it = l_.begin(); it != l_.end(); ++it)
-    {
-        if(*it == t) {
-            delete (t);
-            l_.remove(t);
-            break;
-        }
-    }
-
+    push_(t);
     g_mutex_unlock(mutex_);
 }
 
@@ -169,60 +143,44 @@ void QueuePair_ < T >::done(T * t)
 template < class T >
 QueuePair_ < T >::~QueuePair_()
 {
-    typename std::list<T*>::iterator it;
-
     g_mutex_lock(mutex_);
-
-    for(it = l_.begin(); it != l_.end(); ++it)
+    if (destroyQueues_)
     {
-            delete (*it);
-            l_.remove(*it);
-    }
+        T *t;
+        do
+        {
+            t = static_cast<T*>(g_async_queue_try_pop(first_));
+            if(t)
+                delete t;
+        }
+        while(t);
 
+        do
+        {
+            t = static_cast<T*>(g_async_queue_try_pop(second_));
+            if(t)
+                delete t;
+        }
+        while(t);
+        g_async_queue_unref(first_);
+        g_async_queue_unref(second_);
+    }
     g_mutex_unlock(mutex_);
 }
 
 
-template < class T >
+    template < class T >
 void QueuePair_ < T >::init()
 {
     if (!mutex_)
         mutex_ = g_mutex_new();
-    if (first == 0) {
-        own_[0] = true;
-        first = g_async_queue_new();
-    }
-    else
-        own_[0] = false;
-    if (second == 0) {
-        own_[1] = true;
-        second = g_async_queue_new();
-    }
-    else
-        own_[1] = false;
-}
-
-
-template < class T>
-void QueuePair_<T>::del(bool one)
-{
-    T *t;
-    GAsyncQueue *q;
-    if(one)
-        q = first;
-    else
-        q = second;
-    do
+    if (first_ == 0 && second_ == 0) 
     {
-        t = static_cast<T*>(g_async_queue_try_pop(q));
-        if(t)
-            delete t;
+        first_ = g_async_queue_new();
+        second_ = g_async_queue_new();
+        destroyQueues_ = true;
     }
-    while(t);
-
-    g_async_queue_unref(q);
 }
-
 
 #endif
 

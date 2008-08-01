@@ -43,18 +43,8 @@ class BaseThread
         BaseThread < T > ();
         virtual ~BaseThread < T > ();
 
-        QueuePair_ < T > getQueue();
-
-        GAsyncQueue *getPushQueue() {
-            return queue.first;
-        }
-
-
-        GAsyncQueue *getPopQueue() {
-            return queue.second;
-        }
-
-
+        QueuePair_ < T > &getQueue();
+        
         bool run();
 
     protected:
@@ -68,7 +58,8 @@ class BaseThread
 
         GThread *th;
 
-        QueuePair_ < T > queue;
+        QueuePair_ < T > queue_;
+        QueuePair_ < T > flippedQueue_;
         static void *thread_main(void *v);
 
     private:
@@ -77,19 +68,20 @@ class BaseThread
 };
 
 template < class T >
-QueuePair_ < T > BaseThread < T >::getQueue()
+QueuePair_ < T > &BaseThread < T >::getQueue()
 {
-    return (QueuePair_ < T > (queue.second, queue.first));
+    return flippedQueue_;
 }
 
 
 template < class T >
 BaseThread < T >::BaseThread()
-    : th(0), queue()
+    : th(0), queue_(), flippedQueue_()
 {
     if (!g_thread_supported ())
         g_thread_init (NULL);
-    queue.init();
+    queue_.init();
+    flippedQueue_.flip(queue_);
 }
 
 
@@ -98,8 +90,6 @@ BaseThread < T >::~BaseThread()
 {
     if (th)
         g_thread_join(th);
-    queue.del(true);
-    queue.del(false);
 }
 
 

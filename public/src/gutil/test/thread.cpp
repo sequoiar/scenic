@@ -50,11 +50,11 @@ int Thread::main()
     const int max_count = 1000;
     while(1)
     {
-        BaseMessage f = queue.timed_pop(1);
+        BaseMessage f = queue_.timed_pop(1);
         LOG(" here ");
         if(count++ == max_count) {
             BaseMessage f(BaseMessage::quit);
-            queue.push(f);
+            queue_.push(f);
             break;
         }
     }
@@ -72,15 +72,15 @@ int my_main (int argc, char** argv)
     opts.add(t.get_args());
     if(!opts.parse(argc, argv))
         return 1;
-    QueuePair queue = t.getQueue();
+    QueuePair &tempQueue = t.getQueue();
     if(!t.run())
         return -1;
     while(1)
     {
         BaseMessage f(BaseMessage::ok);
-        queue.push(f);
+        tempQueue.push(f);
         usleep(10);
-        f = queue.timed_pop(1);
+        f = tempQueue.timed_pop(1);
 
         if(f.get_type() == BaseMessage::quit) {
             break;
