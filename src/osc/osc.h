@@ -61,6 +61,7 @@ class OscThread
 {
     public:
         OscThread();
+        void set_local_port(std::string p){ local_port_ = p; }
     private:
         int main();
         bool ready();
