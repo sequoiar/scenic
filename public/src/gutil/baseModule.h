@@ -112,7 +112,8 @@ class BaseModule
         virtual ~BaseModule(){
             for(iterator it = args_.begin(); it != args_.end(); ++it)
             {
-                delete (*it);
+                if (*it)
+                    delete (*it);
                 args_.remove(*it);
             }
         }

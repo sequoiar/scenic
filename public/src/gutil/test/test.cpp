@@ -58,6 +58,7 @@ int my_main(int argc, char** argv)
     opts.add(m.get_args());
     if(!opts.parse(argc, argv))
         return 1;
+
     m.run();
 
     return 0;
