@@ -31,15 +31,15 @@
 #include "osc.h"
 
 OscMessage::OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d)
-    : path(p), types(t), args(), argc(c), data(d)
+    : path_(p), types_(t), args_(), argc_(c), data_(d)
 {
     for (int i = 0; i < c; i++)
-        args.push_back(LoArgs(t, i, v[i]));
+        args_.push_back(LoArg(t, i, v[i]));
 }
 
 
 OscMessage::OscMessage(const OscMessage& in)
-    : path(in.path), types(in.types), args(in.args), argc(in.argc), data(in.data)
+    : path_(in.path_), types_(in.types_), args_(in.args_), argc_(in.argc_), data_(in.data_)
 {
     // empty
 }
@@ -50,32 +50,79 @@ OscMessage& OscMessage::operator=(const OscMessage& in)
     if (this == &in)
         return *this; // gracefully handle self-assignment
 
-    path = in.path;
-    types = in.types;
-    args = in.args;
-    argc = in.argc;
-    data = in.data;
+    path_ = in.path_;
+    types_ = in.types_;
+    args_ = in.args_;
+    argc_ = in.argc_;
+    data_ = in.data_;
 
     return *this;
 }
 
 
+lo_message *OscMessage::init_msg(lo_message *msg)
+{
+    for (OscArgs::iterator it = args_.begin(); it != args_.end(); ++it)
+    {
+        switch ((char) it->type_)
+        {
+            case 's':
+            {
+                lo_message_add_string(msg, it->s_.c_str());
+                break;
+            }
+            case 'i':
+            {
+                lo_message_add_int32(msg, it->i_);
+                break;
+            }
+        }
+    }
+
+    return msg;
+}
+
+void OscMessage::print() 
+{ 
+    OscArgs::iterator iter;
+    for (iter = args_.begin(); iter != args_.end(); ++iter)
+        iter->print();
+    std::cout << std::endl;
+}
+
+
+void OscMessage::LoArg::print() const
+{
+    switch ((char) type_)
+    {
+        case 's':
+            std::cout << s_ << " ";
+            break;
+        case 'i':
+            std::cout << i_ << " ";
+            break;
+    }
+}
+
+
 OscThread::OscThread()
-    : local_port_(), remote_port_(), remote_host_(), arg_local_port_(0), running(false)
+    : local_port_("7770"), remote_port_(), remote_host_(), arg_local_port_(0), running_(false)
 {
     args_.clear();
-//    local_port_ = remote_port_ = remote_host_ = 0;
-    args_.push_back(new StringArg(&arg_local_port_, "oscLocal", 'p', "local osc port",
-                                 "port num"));
-//args.push_back(new StringArg(&remote_port_, "oscRemote", '\0', "remote osc port",
-//                             "port num"));
-//args.push_back(new StringArg(&remote_host_, "oscRemoteHost", '\0', "host", "host address"));
+    //    local_port_ = remote_port_ = remote_host_ = 0;
+    //args_.push_back(new StringArg(arg_local_port_, "oscLocal", 'p', "local osc port",
+    //                            "port num"));
+
+    //arg_local_port_ = reinterpret_cast<const char *>("7770");
+    //args.push_back(new StringArg(&remote_port_, "oscRemote", '\0', "remote osc port",
+    //                             "port num"));
+    //args.push_back(new StringArg(&remote_host_, "oscRemoteHost", '\0', "host", "host address"));
 }
 
 
 int OscThread::generic_handler_static(const char *path, const char *types, lo_arg ** argv,
-                                      int argc, void *data,
-                                      void *user_data)
+        int argc, void *data,
+        void *user_data)
 {
     OscThread *t = static_cast < OscThread * >(user_data);
     return (t->generic_handler(path, types, argv, argc, data));
@@ -83,7 +130,7 @@ int OscThread::generic_handler_static(const char *path, const char *types, lo_ar
 
 
 int OscThread::generic_handler(const char *path, const char *types, lo_arg ** argv, int argc,
-                               void *data)
+        void *data)
 {
     queue_.push(OscMessage(path, types, argv, argc, data));
     return 0;
@@ -100,13 +147,13 @@ int OscThread::main()
 
     lo_server_thread_start(st);
 
-    running = true;
-    while (running)
+    running_ = true;
+    while (running_)
     {
         OscMessage msg = queue_.timed_pop(10000);
 
-        if (!msg.path.empty()) {
-            if(!msg.path.compare("/quit"))
+        if (msg.pathIsSet()) {
+            if(!strncmp(msg.path(), "/quit", strlen("/quit")))
                 return 0;
             else
                 send(msg);
@@ -130,27 +177,13 @@ bool OscThread::send(OscMessage & osc)
 {
     if(remote_port_.empty())
         return false;
+
     lo_address t = lo_address_new(remote_host_.c_str(), remote_port_.c_str());
     lo_message m = lo_message_new();
 
-    for (OscArgs::iterator it = osc.args.begin(); it != osc.args.end(); ++it)
-    {
-        switch ((char) it->type)
-        {
-            case 's':
-            {
-                lo_message_add_string(m, it->s.c_str());
-                break;
-            }
-            case 'i':
-            {
-                lo_message_add_int32(m, it->i);
-                break;
-            }
-        }
-    }
+    osc.init_msg(&m);
 
-    lo_send_message(t, osc.path.c_str(), m);
+    lo_send_message(t, osc.path(), m);
 
     return true;
 }

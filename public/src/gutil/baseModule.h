@@ -40,7 +40,6 @@ class BaseArg
 
     protected:
         friend class OptionArgs;
-    //    friend class BaseModule;
         char type;
         std::string l_arg, desc, arg_desc;
         char s_arg;

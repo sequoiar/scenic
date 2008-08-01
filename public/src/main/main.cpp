@@ -92,18 +92,21 @@ bool MainModule::run()
     {
         OscMessage m = osc_queue.timed_pop(10000);
 
-        if(m.path.empty())
+        if(m.pathIsSet())
+        {
+            m.print();
             continue;
-        if(!m.path.compare("/quit"))
+        }
+        if(m.pathEquals("/quit"))
         {
 //            BaseMessage in(BaseMessage::QUIT);
 //            gst_queue.push(in);
             osc_queue.push(OscMessage("/quit", "", 0, 0, 0));
             break;
         }
-        if(m.path.compare("/gst"))
+        if(m.pathEquals("/gst"))
             continue;
-        LOG(m.args[0].s);
+        //LOG(m.args[0].s);
 /*        if(!m.args[0].s.compare("init")){
             BaseMessage in(BaseMessage::INIT);
             gst_queue.push(in);
