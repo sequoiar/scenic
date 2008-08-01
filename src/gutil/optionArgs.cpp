@@ -31,40 +31,39 @@
 #include "logWriter.h"
 OptionArgs::~OptionArgs()
 {
-    if(pA)
-        delete[] pA;
+    if(pA_)
+        delete[] pA_;
 }
 
 
 void OptionArgs::add(BaseModule::ArgList args)
 {
-    for(BaseModule::iterator it= args.begin(); it != args.end(); ++it){
+    for(BaseModule::iterator it= args.begin(); it != args.end(); ++it)
         add(*it);
-    }
 }
 
 
 void OptionArgs::add(BaseArg *ba)
 {
     if(ba->type == 'i') {
-        IntArg* arg = dynamic_cast<IntArg*>(ba);
+        IntArg* arg = static_cast<IntArg*>(ba);
         GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
                           G_OPTION_ARG_INT, arg->arg, arg->desc.c_str(),
                           arg->arg_desc.c_str()};
-        options.push_back(e);
+        options_.push_back(e);
     }
     else if (ba->type == 'b') {
-        BoolArg* arg = dynamic_cast<BoolArg*>(ba);
+        BoolArg* arg = static_cast<BoolArg*>(ba);
         GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
                           G_OPTION_ARG_NONE, arg->arg, arg->desc.c_str()};
-        options.push_back(e);
+        options_.push_back(e);
     }
     else if (ba->type == 's') {
-        StringArg* arg = dynamic_cast<StringArg*>(ba);
+        StringArg* arg = static_cast<StringArg*>(ba);
         GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
                           G_OPTION_ARG_STRING, arg->arg, arg->desc.c_str(),
                           arg->arg_desc.c_str()};
-        options.push_back(e);
+        options_.push_back(e);
     }
     else {
         LOG("Bad BaseArg type");
@@ -76,19 +75,19 @@ GOptionEntry* OptionArgs::getArray()
 {
     GOptionEntry n = { NULL };
     int count = 0;
-    if(options.empty())
+    if(options_.empty())
         return 0;
-    if(pA)
-        delete[] pA;
-    pA = new GOptionEntry[options.size()+1];
-    for(Options::iterator it= options.begin(); it != options.end(); ++it)
-    {
-        pA[count++] = *it;
-    }
 
-    pA[count] =  n ;
+    if(pA_)
+        delete[] pA_;
+    pA_ = new GOptionEntry[options_.size() + 1];
 
-    return pA;
+    for(Options::iterator it= options_.begin(); it != options_.end(); ++it)
+        pA_[count++] = *it;
+
+    pA_[count] =  n;
+
+    return pA_;
 }
 
 
@@ -114,7 +113,7 @@ int OptionArgs::parse(int argc, char **argv)
         ret = 0;
     }
     g_option_context_free(context);
-    delete[] pA;
+    delete[] pA_;
 
 
     return ret;

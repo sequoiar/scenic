@@ -104,6 +104,14 @@ BaseThread < T >::~BaseThread()
 
 
 template < class T >
+GThread * thread_create_queue_pair(void *(thread) (void *), T t, GError ** err)
+{
+    return (g_thread_create(thread, static_cast < void *>(t), TRUE, err));
+}
+
+
+
+template < class T >
 bool BaseThread < T >::run()
 {
     GError *err = 0;

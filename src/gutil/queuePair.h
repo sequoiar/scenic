@@ -58,8 +58,8 @@ class QueuePair_
         QueuePair_ < T > ()
             : BaseQueuePair(0, 0)
         {}
-        ~QueuePair_ < T > ()
-        {}
+        ~QueuePair_ < T > ();
+
         T timed_pop(int ms);
         void push(T pt);
 
@@ -69,11 +69,11 @@ class QueuePair_
         void del(bool);
 
     private:
-        bool own[2];
+        bool own_[2];
         T *timed_pop_(int ms);
 
-        static GMutex *mutex;
-        static std::list < T * >l;
+        static GMutex *mutex_;
+        static std::list < T * >l_;
 };
 
 
@@ -102,18 +102,12 @@ T* queue_pair_timed_pop(BaseQueuePair* p, int ms)
 }
 
 
-template < class T >
-GThread * thread_create_queue_pair(void *(thread) (void *), T t, GError ** err)
-{
-    return (g_thread_create(thread, static_cast < void *>(t), TRUE, err));
-}
-
 
 template < class T >
-GMutex * QueuePair_ < T >::mutex = NULL;
+GMutex * QueuePair_ < T >::mutex_ = NULL;
 
 template < class T >
-std::list < T * >QueuePair_ < T >::l;
+std::list < T * >QueuePair_ < T >::l_;
 
 
 template < class T >
@@ -142,13 +136,13 @@ T QueuePair_ < T >::timed_pop(int ms)
 template < class T >
 void QueuePair_ < T >::push(T pt)
 {
-    g_mutex_lock(mutex);
+    g_mutex_lock(mutex_);
     T *t = new T(pt);
 
-    l.push_front(t);
+    l_.push_front(t);
 
     queue_pair_push(*this, t);
-    g_mutex_unlock(mutex);
+    g_mutex_unlock(mutex_);
 }
 
 
@@ -157,38 +151,55 @@ void QueuePair_ < T >::done(T * t)
 {
     typename std::list<T*>::iterator it;
 
-    g_mutex_lock(mutex);
+    g_mutex_lock(mutex_);
 
-    for(it = l.begin(); it != l.end(); ++it)
+    for(it = l_.begin(); it != l_.end(); ++it)
     {
         if(*it == t) {
             delete (t);
-            l.remove(t);
+            l_.remove(t);
             break;
         }
     }
 
-    g_mutex_unlock(mutex);
+    g_mutex_unlock(mutex_);
+}
+
+
+template < class T >
+QueuePair_ < T >::~QueuePair_()
+{
+    typename std::list<T*>::iterator it;
+
+    g_mutex_lock(mutex_);
+
+    for(it = l_.begin(); it != l_.end(); ++it)
+    {
+            delete (*it);
+            l_.remove(*it);
+    }
+
+    g_mutex_unlock(mutex_);
 }
 
 
 template < class T >
 void QueuePair_ < T >::init()
 {
-    if (!mutex)
-        mutex = g_mutex_new();
+    if (!mutex_)
+        mutex_ = g_mutex_new();
     if (first == 0) {
-        own[0] = true;
+        own_[0] = true;
         first = g_async_queue_new();
     }
     else
-        own[0] = false;
+        own_[0] = false;
     if (second == 0) {
-        own[1] = true;
+        own_[1] = true;
         second = g_async_queue_new();
     }
     else
-        own[1] = false;
+        own_[1] = false;
 }
 
 

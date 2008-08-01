@@ -26,23 +26,24 @@
 class DModule
     : public BaseModule
 {
-    bool pass;
     public:
         DModule()
-            : pass(false){}
+            : pass_(false){}
         bool run();
         void init();
+    private:
+        bool pass_;
 };
 
 void DModule::init()
 {
-    args.push_back(new BoolArg(&pass, "pass", 'p', "bypass this module"));
+    args_.push_back(new BoolArg(&pass_, "pass", 'p', "bypass this module"));
 }
 
 
 bool DModule::run()
 {
-    if(!pass) {
+    if(!pass_) {
         LOG("x ");
     }
     return true;

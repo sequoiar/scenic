@@ -35,10 +35,14 @@ class BaseArg
         BaseArg(char t, std::string l, char s, std::string d, std::string a)
             : type(t), l_arg(l), desc(d), arg_desc(a), s_arg(s){}
 
+        virtual ~BaseArg(){}
+
+    protected:
+        friend class OptionArgs;
+    //    friend class BaseModule;
         char type;
         std::string l_arg, desc, arg_desc;
         char s_arg;
-        virtual ~BaseArg(){}
 };
 
 ///Integer argument
@@ -88,14 +92,14 @@ class StringArg
 class BaseModule
 {
     public:
-        BaseModule()
-            : args(){}
         typedef std::list<BaseArg*> ArgList;
         typedef std::list<BaseArg*>::iterator iterator;
-        ArgList args;
+
+        BaseModule()
+            : args_(){}
 
         ArgList& get_args(){
-            return args;
+            return args_;
         }
 
 
@@ -106,11 +110,11 @@ class BaseModule
 
 
         virtual ~BaseModule(){
-            for(iterator it = args.begin(); it != args.end(); ++it)
-            {
+            for(iterator it = args_.begin(); it != args_.end(); ++it)
                 delete (*it);
-            }
         }
+    protected:
+        ArgList args_;
 };
 
 #endif

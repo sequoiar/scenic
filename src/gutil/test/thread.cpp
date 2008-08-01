@@ -29,10 +29,10 @@ typedef QueuePair_<BaseMessage> QueuePair;
 class Thread
     : public BaseThread<BaseMessage>
 {
-    int main();
-
     public:
         bool init();
+    private:
+        int main();
 };
 
 
