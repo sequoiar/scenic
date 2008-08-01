@@ -39,9 +39,7 @@
 
 class OptionArgs
 {
-    typedef std::vector<GOptionEntry> Options;
 //	std::vector<char **> str_dump;
-    Options options;
     public:
         void add(BaseModule::ArgList);
         void add(BaseArg*);
@@ -52,15 +50,19 @@ class OptionArgs
 
         GOptionEntry* getArray();
 
-        GOptionEntry* pA;
         int parse(int argc, char **argv);
 
         OptionArgs()
-            : options(), pA(0){}
+            : options_(), pA_(0){}
         ~OptionArgs();
+
     private:
+        typedef std::vector<GOptionEntry> Options;
+
         OptionArgs(const OptionArgs&); //No Copy Constructor
         OptionArgs& operator=(const OptionArgs&); //No Assignment Operator
+        Options options_;
+        GOptionEntry* pA_;
 };
 
 
