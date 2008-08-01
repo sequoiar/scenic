@@ -28,7 +28,7 @@ int m (int argc, char** argv)
             continue;
         if(!m.path.compare("/quit"))
         {
-            BaseMessage in(BaseMessage::quit);
+            BaseMessage in(BaseMessage::QUIT);
             gst_queue.push(in);
             osc_queue.push(OscMessage("/quit", "", 0, 0, 0));
             break;
@@ -37,15 +37,15 @@ int m (int argc, char** argv)
             continue;
         LOG(m.args[0].s);
         if(!m.args[0].s.compare("init")){
-            BaseMessage in(BaseMessage::init);
+            BaseMessage in(BaseMessage::INIT);
             gst_queue.push(in);
         }
         if(!m.args[0].s.compare("start")){
-            BaseMessage start(BaseMessage::start);
+            BaseMessage start(BaseMessage::START);
             gst_queue.push(start);
         }
         if(!m.args[0].s.compare("stop")){
-            BaseMessage stop(BaseMessage::stop);
+            BaseMessage stop(BaseMessage::STOP);
             gst_queue.push(stop);
         }
     }
