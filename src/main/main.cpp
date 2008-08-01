@@ -15,7 +15,7 @@ int m (int argc, char** argv)
     if(!opts.parse(argc, argv))
         return 1;
     QueuePair gst_queue = gst.getQueue();
-    QueuePairOfOscMessage osc_queue = o.getQueue();
+    OscQueue osc_queue = o.getQueue();
     if(!gst.run())
         return -1;
     if(!o.run())

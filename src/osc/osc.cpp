@@ -1,4 +1,4 @@
-//
+/*
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -15,7 +15,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
+*/
 
 /** \file
  *
@@ -61,14 +61,14 @@ OscMessage& OscMessage::operator=(const OscMessage& in)
 
 
 OscThread::OscThread()
-    : local_port_(0), remote_port_(0), remote_host_(), running(false)
+    : local_port_(), remote_port_(), remote_host_(), arg_local_port_(0), running(false)
 {
     args.clear();
-    local_port_ = remote_port_ = remote_host_ = 0;
-    args.push_back(new StringArg(&local_port_, "oscLocal", '\0', "local osc port", "port num"));
-    args.push_back(new StringArg(&remote_port_, "oscRemote", '\0', "remote osc port",
-                                 "port num"));
-    args.push_back(new StringArg(&remote_host_, "oscRemoteHost", '\0', "host", "host address"));
+//    local_port_ = remote_port_ = remote_host_ = 0;
+    args.push_back(new StringArg(&arg_local_port_, "oscLocal", 'p', "local osc port", "port num"));
+//args.push_back(new StringArg(&remote_port_, "oscRemote", '\0', "remote osc port",
+//                             "port num"));
+//args.push_back(new StringArg(&remote_host_, "oscRemoteHost", '\0', "host", "host address"));
 }
 
 
@@ -91,9 +91,9 @@ int OscThread::generic_handler(const char *path, const char *types, lo_arg ** ar
 
 int OscThread::main()
 {
-    if(!local_port_)
+    if(local_port_.empty())
         return -1;
-    lo_server_thread st = lo_server_thread_new(local_port_, liblo_error);
+    lo_server_thread st = lo_server_thread_new(local_port_.c_str(), liblo_error);
 
     lo_server_thread_add_method(st, NULL, NULL, generic_handler_static, this);
 
@@ -114,12 +114,23 @@ int OscThread::main()
     return 0;
 }
 
-
-void OscThread::send(OscMessage & osc)
+bool OscThread::ready()
 {
-    if(!remote_port_)
-        return;
-    lo_address t = lo_address_new(remote_host_, remote_port_);
+    if(local_port_.empty() )
+        return false;
+
+    if(remote_host_.empty())
+        remote_host_ = "127.0.0.1";
+        
+    return true;
+}
+
+
+bool OscThread::send(OscMessage & osc)
+{
+    if(remote_port_.empty())
+        return false;
+    lo_address t = lo_address_new(remote_host_.c_str(), remote_port_.c_str());
     lo_message m = lo_message_new();
 
     for (OscArgs::iterator it = osc.args.begin(); it != osc.args.end(); ++it)
@@ -140,6 +151,8 @@ void OscThread::send(OscMessage & osc)
     }
 
     lo_send_message(t, osc.path.c_str(), m);
+
+    return true;
 }
 
 
