@@ -45,7 +45,7 @@ bool Thread::init()
 
 int Thread::main()
 {
-    BaseMessage r(BaseMessage::ping);
+    BaseMessage r(BaseMessage::PING);
     int count=0;
     const int max_count = 1000;
     while(1)
@@ -53,7 +53,7 @@ int Thread::main()
         BaseMessage f = queue_.timed_pop(1);
         LOG(" here ");
         if(count++ == max_count) {
-            BaseMessage f(BaseMessage::quit);
+            BaseMessage f(BaseMessage::QUIT);
             queue_.push(f);
             break;
         }
@@ -77,12 +77,12 @@ int my_main (int argc, char** argv)
         return -1;
     while(1)
     {
-        BaseMessage f(BaseMessage::ok);
+        BaseMessage f(BaseMessage::OK);
         tempQueue.push(f);
         usleep(10);
         f = tempQueue.timed_pop(1);
 
-        if(f.get_type() == BaseMessage::quit) {
+        if(f.get_type() == BaseMessage::QUIT) {
             break;
         }
     }

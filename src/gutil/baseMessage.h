@@ -39,8 +39,8 @@
 class BaseMessage
 {
     public:
-        enum type { error =-2, undefined=-1, zero=0, ok='=', quit='Q', init='I', start='S',
-                    stop='!', system='*', ping='.', string='s'};
+        enum type { ERROR = -2, UNDEFINED = -1, ZERO = 0, OK = '=', QUIT = 'Q', INIT = 'I', START = 'S',
+                    STOP = '!', SYSTEM = '*', PING = '.', STRING = 's'};
 
         BaseMessage(unsigned short i)
             : t_(static_cast<unsigned char>(i)){}
