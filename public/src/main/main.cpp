@@ -3,7 +3,7 @@
 #include "gutil/optionArgs.h"
 
 
-int m (int argc, char** argv)
+int appRun(int argc, char** argv)
 {
     GstThread gst;
     OscThread o;
@@ -14,12 +14,15 @@ int m (int argc, char** argv)
 
     if(!opts.parse(argc, argv))
         return 1;
+
     QueuePair &gst_queue = gst.getQueue();
     OscQueue &osc_queue = o.getQueue();
+
     if(!gst.run())
         return -1;
     if(!o.run())
         return -1;
+
     while(1)
     {
         OscMessage m = osc_queue.timed_pop(10000);
@@ -57,7 +60,7 @@ int m (int argc, char** argv)
 
 int main (int argc, char** argv)
 {
-    return m(argc, argv);
+    return appRun(argc, argv);
 }
 
 
