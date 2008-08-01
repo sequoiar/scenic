@@ -40,7 +40,7 @@ int GstThread::main()
             sender = new VideoSender(*conf);
         if(!sender)
         {
-            BaseMessage m(BaseMessage::quit);
+            BaseMessage m(BaseMessage::QUIT);
             queue_.push(m);
             quit = true;
         }
@@ -50,24 +50,24 @@ int GstThread::main()
         BaseMessage f = queue_.timed_pop(10000);
         switch(f.get_type())
         {
-            case BaseMessage::quit:
+            case BaseMessage::QUIT:
             {
-                BaseMessage f(BaseMessage::quit);
+                BaseMessage f(BaseMessage::QUIT);
                 queue_.push(f);
                 quit = true;
                 break;
             }
-            case BaseMessage::start:
+            case BaseMessage::START:
             {
                 sender->start();
                 break;
             }
-            case BaseMessage::init:
+            case BaseMessage::INIT:
             {
                 sender->init();
                 break;
             }
-            case BaseMessage::stop:
+            case BaseMessage::STOP:
             {
                 sender->stop();
                 break;
