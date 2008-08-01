@@ -29,6 +29,7 @@
 #include "config.h"
 #include "optionArgs.h"
 #include "logWriter.h"
+
 OptionArgs::~OptionArgs()
 {
     if(pA_)
@@ -38,7 +39,7 @@ OptionArgs::~OptionArgs()
 
 void OptionArgs::add(BaseModule::ArgList args)
 {
-    for(BaseModule::iterator it= args.begin(); it != args.end(); ++it)
+    for(BaseModule::iterator it = args.begin(); it != args.end(); ++it)
         add(*it);
 }
 
@@ -74,15 +75,19 @@ void OptionArgs::add(BaseArg *ba)
 GOptionEntry* OptionArgs::getArray()
 {
     GOptionEntry n = { NULL };
-    int count = 0;
+    unsigned int count = 0;
     if(options_.empty())
         return 0;
 
     if(pA_)
+    {
         delete[] pA_;
+        pA_ = 0;
+    }
+
     pA_ = new GOptionEntry[options_.size() + 1];
 
-    for(Options::iterator it= options_.begin(); it != options_.end(); ++it)
+    for(Options::iterator it = options_.begin(); it != options_.end(); ++it)
         pA_[count++] = *it;
 
     pA_[count] =  n;
@@ -113,7 +118,12 @@ int OptionArgs::parse(int argc, char **argv)
         ret = 0;
     }
     g_option_context_free(context);
-    delete[] pA_;
+
+    if(pA_)
+    {
+        delete[] pA_;
+        pA_ = 0;
+    }
 
 
     return ret;
