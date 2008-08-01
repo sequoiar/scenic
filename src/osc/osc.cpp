@@ -1,21 +1,21 @@
 /*
-// Copyright 2008 Koya Charles & Tristan Matthews
-//
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-*/
+   // Copyright 2008 Koya Charles & Tristan Matthews
+   //
+   // This file is part of [propulse]ART.
+   //
+   // [propulse]ART is free software: you can redistribute it and/or modify
+   // it under the terms of the GNU General Public License as published by
+   // the Free Software Foundation, either version 3 of the License, or
+   // (at your option) any later version.
+   //
+   // [propulse]ART is distributed in the hope that it will be useful,
+   // but WITHOUT ANY WARRANTY; without even the implied warranty of
+   // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   // GNU General Public License for more details.
+   //
+   // You should have received a copy of the GNU General Public License
+   // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /** \file
  *
@@ -65,7 +65,8 @@ OscThread::OscThread()
 {
     args.clear();
 //    local_port_ = remote_port_ = remote_host_ = 0;
-    args.push_back(new StringArg(&arg_local_port_, "oscLocal", 'p', "local osc port", "port num"));
+    args.push_back(new StringArg(&arg_local_port_, "oscLocal", 'p', "local osc port",
+                                 "port num"));
 //args.push_back(new StringArg(&remote_port_, "oscRemote", '\0', "remote osc port",
 //                             "port num"));
 //args.push_back(new StringArg(&remote_host_, "oscRemoteHost", '\0', "host", "host address"));
@@ -114,14 +115,13 @@ int OscThread::main()
     return 0;
 }
 
+
 bool OscThread::ready()
 {
     if(local_port_.empty() )
         return false;
-
     if(remote_host_.empty())
         remote_host_ = "127.0.0.1";
-        
     return true;
 }
 

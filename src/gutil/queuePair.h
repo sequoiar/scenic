@@ -213,6 +213,5 @@ void QueuePair_<T>::del(bool one)
 }
 
 
-
 #endif
 
