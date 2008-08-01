@@ -1,4 +1,4 @@
-// headerGPL.c
+/* headerGPL.c
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -15,7 +15,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
+*/
 
 /** \file
  *      Osc Message and Thread
@@ -54,7 +54,7 @@ class OscMessage
 };
 
 
-typedef QueuePair_ < OscMessage > QueuePairOfOscMessage;
+typedef QueuePair_ < OscMessage > OscQueue;
 
 class OscThread
     : public BaseThread < OscMessage >
@@ -63,6 +63,7 @@ class OscThread
         OscThread();
     private:
         int main();
+        bool ready();
 
         static int generic_handler_static(const char *path, const char *types, lo_arg ** argv,
                                           int argc, void *data,
@@ -72,11 +73,12 @@ class OscThread
                             void *data);
 
         static void liblo_error(int num, const char *msg, const char *path){}
-        char* local_port_;
-        char* remote_port_;
-        char* remote_host_;
+        std::string local_port_;
+        std::string remote_port_;
+        std::string remote_host_;
+        char * arg_local_port_;
         bool running;
-        void send(OscMessage & osc);
+        bool send(OscMessage & osc);
 
         OscThread(const OscThread&); //No Copy Constructor
         OscThread& operator=(const OscThread&); //No Assignment Operator
