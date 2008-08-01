@@ -47,7 +47,7 @@ class OscMessage
 
         const char* path() { return path_.c_str(); }
         bool pathIsSet() { return !path_.empty(); }
-        bool pathEquals(const char *str) { return !path_.compare(str); }
+        bool pathEquals(const char *str) { return path_ == str; }
 
         lo_message *init_msg(lo_message *msg);
         void print();
