@@ -16,9 +16,10 @@ int main(int argc, char **argv)
     {
         OscMessage m = q.timed_pop(1);
 
-        if (!m.path.empty())
-            std::cout << m.path << m.args[0].s << m.args[1].i << std::endl;
-        if (!m.path.compare("/echo"))
+        if (m.pathIsSet())
+            m.print();
+            //std::cout << m.path() << m.args[0].s << m.args[1].i << std::endl;
+        if (!strncmp(m.path(), "/echo", strlen("/echo")))
             q.push(m);
     }
 }

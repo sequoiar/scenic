@@ -35,29 +35,83 @@
 #include <vector>
 #include <iostream>
 
-class LoArgs;
-typedef std::vector < LoArgs > OscArgs;
-
 class OscMessage
 {
     public:
         OscMessage(const char *p, const char *t, lo_arg ** v, int c, void *d);
         OscMessage()
-            : path(), types(), args(), argc(0), data(0){}
-        std::string path, types;
-        OscArgs args;
-        int argc;
-        void *data;
+            : path_(), types_(), args_(), argc_(0), data_(0){}
 
-        OscMessage(const OscMessage&); //No Copy Constructor
-        OscMessage& operator=(const OscMessage&); //No Assignment Operator
+        OscMessage(const OscMessage& in); 
+        OscMessage& operator=(const OscMessage& in); 
+
+        const char* path() { return path_.c_str(); }
+        bool pathIsSet() { return !path_.empty(); }
+        bool pathEquals(const char *str) { return !path_.compare(str); }
+
+        lo_message *init_msg(lo_message *msg);
+        void print();
+
+        bool argEquals(const char *str, int idx) { return args_[idx].equals(str); }
+
+    private:
+        class LoArg
+        {
+            public:
+                LoArg(const char *pchar, int index, lo_arg * a)
+                    : type_(static_cast<lo_type>(pchar[index])), i_(0), s_()
+                {
+                    switch ((char) type_)
+                    {
+                        case 's':
+                            {
+                                s_ = static_cast < char *>(&(a->s));
+                                break;
+                            }
+                        case 'i':
+                            {
+                                i_ = static_cast < int >(a->i);
+                                break;
+                            }
+                    }
+                }
+
+                void print() const;
+
+                bool equals(const char *str)
+                {
+                    if ((char) type_ == 's')
+                        return s_ == str;
+
+                    return false;
+                }
+                
+                bool equals(int val)
+                {
+                    if ((char) type_ == 'i')
+                        return i_ == val;
+
+                    return false;
+                }
+
+
+                lo_type type_;
+                int i_;
+                std::string s_;
+        };
+
+        typedef std::vector < LoArg > OscArgs;
+        std::string path_, types_;
+        OscArgs args_;
+        int argc_;
+        void *data_;
 };
 
 
 typedef QueuePair_ < OscMessage > OscQueue;
 
 class OscThread
-    : public BaseThread < OscMessage >
+: public BaseThread < OscMessage >
 {
     public:
         OscThread();
@@ -67,51 +121,23 @@ class OscThread
         bool ready();
 
         static int generic_handler_static(const char *path, const char *types, lo_arg ** argv,
-                                          int argc, void *data,
-                                          void *user_data);
+                int argc, void *data,
+                void *user_data);
 
         int generic_handler(const char *path, const char *types, lo_arg ** argv, int argc,
-                            void *data);
+                void *data);
 
         static void liblo_error(int num, const char *msg, const char *path){}
+        bool send(OscMessage & osc);
+
+    private:
         std::string local_port_;
         std::string remote_port_;
         std::string remote_host_;
-        char * arg_local_port_;
-        bool running;
-        bool send(OscMessage & osc);
-
+        const char * arg_local_port_;
+        bool running_;
         OscThread(const OscThread&); //No Copy Constructor
         OscThread& operator=(const OscThread&); //No Assignment Operator
-};
-
-
-class LoArgs
-{
-    public:
-        LoArgs(const char *pchar, int index, lo_arg * a)
-            : type(static_cast<lo_type>(pchar[index])), i(0), s()
-        {
-            switch ((char) type)
-            {
-                case 's':
-                {
-                    s = static_cast < char *>(&(a->s));
-                    break;
-                }
-                case 'i':
-                {
-                    i = static_cast < int >(a->i);
-                    break;
-                }
-            }
-        }
-
-
-        lo_type type;
-        int i;
-
-        std::string s;
 };
 
 #endif
