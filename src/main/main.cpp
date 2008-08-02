@@ -92,15 +92,16 @@ bool MainModule::run()
     {
         OscMessage m = osc_queue.timed_pop(10000);
 
-        if(m.pathIsSet())
+        if(!m.pathIsSet())
         {
-            m.print();
             continue;
         }
+        m.print();
         if(m.pathEquals("/quit"))
         {
 //            BaseMessage in(BaseMessage::QUIT);
 //            gst_queue.push(in);
+//          LOG("in quit!"
             osc_queue.push(OscMessage("/quit", "", 0, 0, 0));
             break;
         }
