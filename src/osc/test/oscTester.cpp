@@ -1,5 +1,6 @@
 #include "osc.h"
 #include <iostream>
+#include <string.h>
 
 #include <list>
 #include <vector>
