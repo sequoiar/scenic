@@ -26,6 +26,7 @@
  */
 
 #include <iostream>
+#include <string.h>
 
 #include <lo/lo.h>
 #include "osc.h"
