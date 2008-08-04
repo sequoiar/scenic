@@ -29,7 +29,7 @@ MediaBase::~MediaBase()
 }
 
 
-bool MediaBase::init()
+bool MediaBase::init()  // template method
 {
     // these methods are defined in subclasses
     init_source();

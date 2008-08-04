@@ -34,10 +34,10 @@ class RtpReceiver
         RtpReceiver();
         void set_caps(const char *capsStr);
 
-        virtual ~RtpReceiver();
+        ~RtpReceiver();
 
     protected:
-        virtual void addDerived(GstElement * depayloader, const MediaConfig * config);
+        void addDerived(GstElement * depayloader, const MediaConfig * config);
 
     private:
         static GstPad *get_matching_sink_pad(GstPad *srcPad);

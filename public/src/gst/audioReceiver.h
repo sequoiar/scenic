@@ -34,14 +34,14 @@ class AudioReceiver
 {
     public:
         explicit AudioReceiver(const AudioConfig & config);
-        virtual ~AudioReceiver();
-        virtual bool start();
+        ~AudioReceiver();
+        bool start();
 
     private:
         AudioReceiver();
-        virtual void init_source(){};
-        virtual void init_codec();
-        virtual void init_sink();
+        void init_source(){};
+        void init_codec();
+        void init_sink();
 
         static int caps_handler(const char *path, const char *types, lo_arg ** argv, int argc,
                                 void *data,

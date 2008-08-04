@@ -33,15 +33,15 @@ class AudioSender
     public:
         explicit AudioSender(const AudioConfig & config);
         AudioSender();
-        virtual ~AudioSender();
-        virtual bool start();
+        ~AudioSender();
+        bool start();
 
     private:
         // helper methods
 
-        virtual void init_source();
-        virtual void init_codec();
-        virtual void init_sink();
+        void init_source();
+        void init_codec();
+        void init_sink();
 
         void send_caps() const;
         const char *caps_str() const;

@@ -37,8 +37,7 @@ class VideoConfig
     public:
         // used by sender
         VideoConfig(const std::string & source, const std::string & codec,
-        const std::string & remoteHost,
-        int port);
+        const std::string & remoteHost, int port);
         VideoConfig(const std::string & codec, int port); // used by receiver
         explicit VideoConfig(const std::string & source); // used by local sender
 
