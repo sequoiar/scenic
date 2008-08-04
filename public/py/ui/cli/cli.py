@@ -111,9 +111,9 @@ class CliController(TelnetServer):
     def _contacts(self, data):
         cp = CliParser(self, prog=data[0], description="Manage the address book.")
         cp.add_option("-l", "--list", action='store_true', help="List all the contacts")
-        cp.add_option("-a", "--add", help="Add a contact")
-        cp.add_option("-d", "--delete", help="Delete a contact")
-        cp.add_option("-m", "--modify", help="Modify a contact")
+        cp.add_option("-a", "--add", type="string", help="Add a contact")
+        cp.add_option("-d", "--delete", type="string", help="Delete a contact")
+        cp.add_option("-m", "--modify", type="string", help="Modify a contact")
         cp.add_option("-s", "--select", help="Select a contact")
         
         (options, args) = cp.parse_args(data)
@@ -140,9 +140,9 @@ class CliController(TelnetServer):
     def _audio(self, data):
         cp = CliParser(self, prog=data[0], description="Manage the audio stream.")
         cp.add_option("-l", "--list", action='store_true', help="List all the audio settings")
-        cp.add_option("-t", "--container", "--tank", "--type", type="int", help="Set/get the container")
-        cp.add_option("-c", "--codec", help="Set/get the codec")
-        cp.add_option("-s", "--settings", help="Set/get the codec settings (set1:val,set2:val)")
+        cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set/get the container")
+        cp.add_option("-c", "--codec", type="string", help="Set/get the codec")
+        cp.add_option("-s", "--settings", type="string", help="Set/get the codec settings (set1:val,set2:val)")
         cp.add_option("-d", "--bitdepth", type="int", help="Set/get the bitdepth of the audio (default: 16 bit)")
         cp.add_option("-r", "--samplerate", type="int", help="Set/get the samplerate of the audio (default: 48000 Hz")
         cp.add_option("-v", "--channels", "--voices", type="int", help="Set/get the number of audio channels (from 1 to 8)")
@@ -155,19 +155,19 @@ class CliController(TelnetServer):
             self.core.audio_status(self)
         elif [opt for opt in options.__dict__.values() if opt]:
             if options.container:
-                self.core.audio_container(self)
+                self.core.audio_container(self, options.container)
             if options.codec:
-                self.core.audio_codec(self)
+                self.core.audio_codec(self, options.codec)
             if options.bitdepth:
-                self.core.audio_bitdepth(self)
+                self.core.audio_bitdepth(self, options.bitdepth)
             if options.samplerate:
-                self.core.audio_samplerate(self)
+                self.core.audio_samplerate(self, options.samplerate)
             if options.channels:
-                self.core.audio_channels(self)
+                self.core.audio_channels(self, options.channels)
             if options.port:
-                self.core.audio_port(self)
+                self.core.audio_port(self, options.port)
             if options.buffer:
-                self.core.audio_buffer(self)
+                self.core.audio_buffer(self, options.buffer)
         else:
             cp.print_help()
         
@@ -193,7 +193,8 @@ class CliParser(optparse.OptionParser):
     def error(self, msg):
         if msg:
            self.output.write(msg, True)
-        self.print_usage()
+        else:
+            self.print_usage()
         
     def exit(self, status=0, msg=None):
         if msg:
