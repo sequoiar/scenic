@@ -1,5 +1,3 @@
-
-
 // headerGPL.c
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
@@ -77,7 +75,7 @@ int main (int argc, char** argv)
 
 bool MainModule::run()
 {
-//    QueuePair &gst_queue = gstThread_.getQueue();
+    QueuePair &gst_queue = gstThread_.getQueue();
     OscQueue &osc_queue = oscThread_.getQueue();
 
 //    if(!gstThread_.run())
@@ -105,22 +103,21 @@ bool MainModule::run()
             osc_queue.push(OscMessage("/quit", "", 0, 0, 0));
             break;
         }
-        if(m.pathEquals("/gst"))
+        if(!m.pathEquals("/gst"))
             continue;
-        //LOG(m.args[0].s);
-/*        if(!m.args[0].s.compare("init")){
+        if(m.argEquals("init",0)){
             BaseMessage in(BaseMessage::INIT);
             gst_queue.push(in);
         }
-        if(!m.args[0].s.compare("start")){
+        if(m.argEquals("start",0)){
             BaseMessage start(BaseMessage::START);
             gst_queue.push(start);
         }
-        if(!m.args[0].s.compare("stop")){
+        if(m.argEquals("stop",0)){
             BaseMessage stop(BaseMessage::STOP);
             gst_queue.push(stop);
         }
-*/
+
     }
 
     std::cout << "Done!" << std::endl;
