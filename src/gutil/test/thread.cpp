@@ -31,6 +31,7 @@ class Thread
 {
     public:
         bool init();
+
     private:
         int main();
 };

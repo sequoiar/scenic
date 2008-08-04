@@ -67,10 +67,12 @@ class QueuePair_
     protected:
         T* pop_();
         void push_(T* t);
+
     private:
         QueuePair_(const QueuePair_& in);
         QueuePair_& operator=(const QueuePair_&); //No Assignment Operator
         T *timed_pop_(int ms);
+
         bool destroyQueues_;
 
         static GMutex *mutex_;
@@ -90,7 +92,8 @@ void QueuePair_< T >::push_(T* t)
     g_async_queue_push(second_, t);
 }
 
-    template < class T >
+
+template < class T >
 void QueuePair_< T >::flip(QueuePair_< T > &in)
 {
     second_ = in.first_;
@@ -162,6 +165,7 @@ QueuePair_ < T >::~QueuePair_()
                 delete t;
         }
         while(t);
+
         g_async_queue_unref(first_);
         g_async_queue_unref(second_);
     }
@@ -169,18 +173,19 @@ QueuePair_ < T >::~QueuePair_()
 }
 
 
-    template < class T >
+template < class T >
 void QueuePair_ < T >::init()
 {
     if (!mutex_)
         mutex_ = g_mutex_new();
-    if (first_ == 0 && second_ == 0) 
+    if (first_ == 0 && second_ == 0)
     {
         first_ = g_async_queue_new();
         second_ = g_async_queue_new();
         destroyQueues_ = true;
     }
 }
+
 
 #endif
 

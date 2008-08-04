@@ -78,13 +78,11 @@ GOptionEntry* OptionArgs::getArray()
     unsigned int count = 0;
     if(options_.empty())
         return 0;
-
     if(pA_)
     {
         delete[] pA_;
         pA_ = 0;
     }
-
     pA_ = new GOptionEntry[options_.size() + 1];
 
     for(Options::iterator it = options_.begin(); it != options_.end(); ++it)
@@ -124,8 +122,6 @@ int OptionArgs::parse(int argc, char **argv)
         delete[] pA_;
         pA_ = 0;
     }
-
-
     return ret;
 }
 
