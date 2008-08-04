@@ -638,12 +638,6 @@ enum
   PROP_LAST
 };
 
-#if 0
-#define GST_TYPE_JACK_CONNECT (gst_jack_connect_get_type())
-GType
-gst_jack_connect_get_type();
-#endif
-
 #define _do_init(bla) \
   GST_DEBUG_CATEGORY_INIT (gst_jack_audio_sink_debug, "jacksink", 0, "jacksink element");
 
