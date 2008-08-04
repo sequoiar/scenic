@@ -43,43 +43,34 @@
  */
 
 
-#define GST_TYPE_JACK_RING_BUFFER        \
-    (gst_jack_ring_buffer_get_type())
-#define GST_JACK_RING_BUFFER(obj)        \
-    (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_JACK_RING_BUFFER,GstJackRingBuffer))
-#define GST_JACK_RING_BUFFER_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_JACK_RING_BUFFER \
-                             ,GstJackRingBufferClass))
-#define GST_JACK_RING_BUFFER_GET_CLASS(obj) \
-    (G_TYPE_INSTANCE_GET_CLASS ((obj), GST_TYPE_JACK_RING_BUFFER \
-                                ,GstJackRingBufferClass))
-#define GST_JACK_RING_BUFFER_CAST(obj)        \
-    ((GstJackRingBuffer *)obj)
-#define GST_IS_JACK_RING_BUFFER(obj)     \
-    (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_JACK_RING_BUFFER))
-#define GST_IS_JACK_RING_BUFFER_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_JACK_RING_BUFFER))
+#define GST_TYPE_JACK_RING_BUFFER               (gst_jack_ring_buffer_get_type())
+#define GST_JACK_RING_BUFFER(obj)               (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_JACK_RING_BUFFER,GstJackRingBuffer))
+#define GST_JACK_RING_BUFFER_CLASS(klass)       (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_JACK_RING_BUFFER,GstJackRingBufferClass))
+#define GST_JACK_RING_BUFFER_GET_CLASS(obj)     (G_TYPE_INSTANCE_GET_CLASS ((obj), GST_TYPE_JACK_RING_BUFFER,GstJackRingBufferClass))
+#define GST_JACK_RING_BUFFER_CAST(obj)          ((GstJackRingBuffer *)obj)
+#define GST_IS_JACK_RING_BUFFER(obj)            (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_JACK_RING_BUFFER))
+#define GST_IS_JACK_RING_BUFFER_CLASS(klass)    (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_JACK_RING_BUFFER))
 
 typedef struct _GstJackRingBuffer GstJackRingBuffer;
 typedef struct _GstJackRingBufferClass GstJackRingBufferClass;
 
 struct _GstJackRingBuffer
 {
-    GstRingBuffer object;
+  GstRingBuffer object;
 
-    gint sample_rate;
-    gint buffer_size;
-    gint channels;
+  gint sample_rate;
+  gint buffer_size;
+  gint channels;
 };
 
 struct _GstJackRingBufferClass
 {
-    GstRingBufferClass parent_class;
+  GstRingBufferClass parent_class;
 };
 
 static void gst_jack_ring_buffer_class_init(GstJackRingBufferClass * klass);
 static void gst_jack_ring_buffer_init(GstJackRingBuffer * ringbuffer,
-                                      GstJackRingBufferClass * klass);
+    GstJackRingBufferClass * klass);
 static void gst_jack_ring_buffer_dispose(GObject * object);
 static void gst_jack_ring_buffer_finalize(GObject * object);
 
