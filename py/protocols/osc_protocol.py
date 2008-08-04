@@ -41,7 +41,7 @@ class Osc(protocol.DatagramProtocol):
         @param addr: tuple of source of datagram.
         """
         self.client_host, self.client_port = addr
-        print "received %r from %s:%d" % (OSC.decodeOSC(datagram), self.client_host, self.client_port)
+#        print "received %r from %s:%d" % (OSC.decodeOSC(datagram), self.client_host, self.client_port)
         self.packet = datagram
         self.replies = []
         self.handle()

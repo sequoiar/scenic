@@ -22,7 +22,7 @@
 from twisted.internet import reactor
 
 # App imports
-from protocols.osc_protocols import Osc, OscMessage
+from protocols.osc_protocol import Osc, OscMessage
 from streams.stream import AudioStream, Stream
 
 
@@ -30,25 +30,25 @@ class AudioGst(AudioStream):
     """Class streams->audio->gst.AudioGst
     """
     
-    def __init__(self, s_port, r_port):
+    def __init__(self, s_port, r_port, address='127.0.0.1'):
         AudioStream.__init__(self)
         self.s_port = s_port
-        try:
-            getattr(Stream, osc)
-        except:
+        self.address = address
+        if not hasattr(Stream, 'osc'):
             Stream.osc = Osc()
             reactor.listenUDP(r_port, Stream.osc)
         
-        
+    def _send_message(self, name, value=None):
+        message = OscMessage()
+        message.setAddress('/audio/%s' % name)
+        message.append(value)
+        Stream.osc.send_message(self.address, self.s_port, message)
         
     def get_attr(self, name):
-        """function get_attr
-        
-        name: 
-        
-        returns 
+        """        
+        name: string
         """
-        return None # should raise NotImplementedError()
+        self._send_message(name)        
     
     def get_attrs(self):
         """function get_attrs
@@ -62,11 +62,7 @@ class AudioGst(AudioStream):
         name: string
         value: 
         """
-        message = OscMessage()
-        message.setAddress('/audio/%s' % name)
-        message.append(value)
-        Stream.osc.send_message('127.0.0.1', self.s_port, message)
-        
+        self._send_message(name, value)        
     
     def set_attrs(self):
         """function set_attrs

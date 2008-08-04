@@ -42,8 +42,8 @@ class Core(Subject):
     def startup(self):
         self.load_uis()
         self.adb = addressbook.AddressBook('sropulpof')
-        self.api = ui.ControllerApi(self)
         self.curr_setting = settings.load()
+        self.api = ui.ControllerApi(self)
         
         
         
