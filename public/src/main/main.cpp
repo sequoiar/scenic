@@ -37,24 +37,22 @@ class MainModule
 {
     public:
         bool run();
+
         MainModule();
     private:
         GstThread gstThread_;
         OscThread oscThread_;
 
-    int port_;
+        int port_;
 };
 
 
 MainModule::MainModule()
-    :BaseModule(),gstThread_(),oscThread_(),port_(0)
+    : BaseModule(), gstThread_(), oscThread_(), port_(0)
 {
-
-    args_.push_back(new IntArg(&port_, "oscPort", 'p', "Set the osc incomming port","port num"));
-
-
+    args_.push_back(new IntArg(&port_, "oscPort", 'p', "Set the osc incomming port",
+                               "port num"));
 }
-
 
 
 int main (int argc, char** argv)
@@ -63,14 +61,12 @@ int main (int argc, char** argv)
     OptionArgs opts;
 
     opts.add(m.get_args());
-    
+
     if(!opts.parse(argc, argv))
         return 1;
-
     m.run();
     return 0;
 }
-
 
 
 bool MainModule::run()
@@ -85,7 +81,6 @@ bool MainModule::run()
     oscThread_.set_local_port(s.str());
     if(!oscThread_.run())
         return 0;
-
     while(1)
     {
         OscMessage m = osc_queue.timed_pop(10000);
@@ -105,26 +100,23 @@ bool MainModule::run()
         }
         if(!m.pathEquals("/gst"))
             continue;
-        if(m.argEquals("init",0)){
+        if(m.argEquals("init", 0)){
             BaseMessage in(BaseMessage::INIT);
             gst_queue.push(in);
         }
-        if(m.argEquals("start",0)){
+        if(m.argEquals("start", 0)){
             BaseMessage start(BaseMessage::START);
             gst_queue.push(start);
         }
-        if(m.argEquals("stop",0)){
+        if(m.argEquals("stop", 0)){
             BaseMessage stop(BaseMessage::STOP);
             gst_queue.push(stop);
         }
-
     }
 
     std::cout << "Done!" << std::endl;
     return 0;
 }
-
-
 
 
 //./mainTester -s videotestsrc --oscLocal=7770 --oscRemote=7771 --oscRemoteHost=127.0.0.1

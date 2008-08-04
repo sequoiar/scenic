@@ -39,7 +39,8 @@
 class BaseMessage
 {
     public:
-        enum type { ERROR = -2, UNDEFINED = -1, ZERO = 0, OK = '=', QUIT = 'Q', INIT = 'I', START = 'S',
+        enum type { ERROR = -2, UNDEFINED = -1, ZERO = 0, OK = '=', QUIT = 'Q', INIT = 'I',
+                    START = 'S',
                     STOP = '!', SYSTEM = '*', PING = '.', STRING = 's'};
 
         BaseMessage(unsigned short i)

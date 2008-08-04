@@ -61,6 +61,7 @@ class OptionArgs
 
         OptionArgs(const OptionArgs&); //No Copy Constructor
         OptionArgs& operator=(const OptionArgs&); //No Assignment Operator
+
         Options options_;
         GOptionEntry* pA_;
 };

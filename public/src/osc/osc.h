@@ -1,21 +1,21 @@
 /* headerGPL.c
-// Copyright 2008 Koya Charles & Tristan Matthews
-//
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-*/
+   // Copyright 2008 Koya Charles & Tristan Matthews
+   //
+   // This file is part of [propulse]ART.
+   //
+   // [propulse]ART is free software: you can redistribute it and/or modify
+   // it under the terms of the GNU General Public License as published by
+   // the Free Software Foundation, either version 3 of the License, or
+   // (at your option) any later version.
+   //
+   // [propulse]ART is distributed in the hope that it will be useful,
+   // but WITHOUT ANY WARRANTY; without even the implied warranty of
+   // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   // GNU General Public License for more details.
+   //
+   // You should have received a copy of the GNU General Public License
+   // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /** \file
  *      Osc Message and Thread
@@ -40,7 +40,7 @@
 typedef QueuePair_ < OscMessage > OscQueue;
 
 class OscThread
-: public BaseThread < OscMessage >
+    : public BaseThread < OscMessage >
 {
     public:
         OscThread();
@@ -50,11 +50,11 @@ class OscThread
         bool ready();
 
         static int generic_handler_static(const char *path, const char *types, lo_arg ** argv,
-                int argc, void *data,
-                void *user_data);
+                                          int argc, void *data,
+                                          void *user_data);
 
         int generic_handler(const char *path, const char *types, lo_arg ** argv, int argc,
-                void *data);
+                            void *data);
 
         static void liblo_error(int num, const char *msg, const char *path){}
         bool send(OscMessage & osc);
