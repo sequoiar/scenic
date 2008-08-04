@@ -33,11 +33,10 @@ class RtpSender
     public:
         RtpSender();
         const char *caps_str() const;
-
-        virtual ~RtpSender();
+        ~RtpSender();
 
     protected:
-        virtual void addDerived(GstElement * src, const MediaConfig * config);
+        void addDerived(GstElement * src, const MediaConfig * config);
 
     private:
         GstElement *rtp_sender_;

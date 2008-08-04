@@ -38,17 +38,15 @@ class VideoSender
         bool start();
         void wait_for_stop();
 
-        virtual ~VideoSender();
+        ~VideoSender();
 
     private:
-        virtual void init_source();
-        virtual void init_codec();
-        virtual void init_sink();
+        void init_source();
+        void init_codec();
+        void init_sink();
 
         static int stop_handler(const char *path, const char *types, lo_arg ** argv, int argc,
-                                void *data,
-                                void *user_data);
-
+                                void *data, void *user_data);
         static void liblo_error(int num, const char *msg, const char *path);
 
         const VideoConfig &config_;

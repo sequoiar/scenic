@@ -61,8 +61,8 @@ void VideoSender::init_codec()
         pipeline_.add(colorspc_);
 
         assert(encoder_ = gst_element_factory_make("x264enc", NULL));
-        g_object_set(G_OBJECT(
-                         encoder_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4, NULL);
+        g_object_set(G_OBJECT(encoder_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4, 
+                NULL);
         pipeline_.add(encoder_);
 
         source_->link_element(colorspc_);
@@ -123,11 +123,10 @@ void VideoSender::liblo_error(int num, const char *msg, const char *path)
 }
 
 
-int VideoSender::stop_handler(const char *path, const char *types, lo_arg ** argv, int argc,
-                              void *data,
-                              void *user_data)
+int VideoSender::stop_handler(const char *path, const char *types, lo_arg ** argv, 
+                              int argc, void *data, void *user_data)
 {
-    LOG("STOPPPINNNNNGGGGGGG");
+    LOG("Being stopped by receiver.");
     VideoSender *context = static_cast<VideoSender*>(user_data);
     context->stop();
 

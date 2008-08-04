@@ -29,7 +29,7 @@ class VideoSource
     : public GstBase
 {
     public:
-        virtual ~VideoSource();
+        ~VideoSource();
         void init();
         virtual void sub_init() = 0;
         virtual void link_element(GstElement *sinkElement);
@@ -61,7 +61,9 @@ class VideoTestSource
         void toggle_colour();
 
         GstClockID clockId_;
-        // hidden
+        static const int BLACK;
+        static const int WHITE;
+        
         VideoTestSource(const VideoTestSource&);     //No Copy Constructor
         VideoTestSource& operator=(const VideoTestSource&);     //No Assignment Operator
 };

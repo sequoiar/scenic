@@ -57,9 +57,13 @@ VideoSource::~VideoSource()
 gboolean VideoSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                     gpointer user_data)
 {
-    return (static_cast<VideoSource*>(user_data)->callback());
+    VideoSource* context = static_cast<VideoSource*>(user_data);
+    return context->callback();
 }
 
+// gst-inspect property codes
+const int VideoTestSource::BLACK = 2;
+const int VideoTestSource::WHITE = 3;
 
 // toggle colour
 gboolean VideoTestSource::callback()
@@ -73,8 +77,6 @@ gboolean VideoTestSource::callback()
 
 void VideoTestSource::toggle_colour()
 {
-    const int BLACK = 2;    // gst-inspect property codes
-    const int WHITE = 3;
     static int colour = BLACK;
 
     g_object_set(G_OBJECT(source_), "pattern", colour, NULL);
@@ -85,6 +87,7 @@ void VideoTestSource::toggle_colour()
 void VideoTestSource::sub_init()
 {
     g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
+    g_object_set(G_OBJECT(source_), "pattern", WHITE, NULL); // necessary for clocked callback to work
 
     clockId_ = pipeline_.add_clock_callback(base_callback, this);
 }
@@ -125,14 +128,15 @@ void VideoFileSource::link_element(GstElement *sinkElement)
 }
 
 
-void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
-                                     void *data)
+void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last, 
+        void *data)
 {
     if (gst_pad_is_linked(srcPad))
     {
         LOG("Pad is already linked.")
         return;
     }
+
     VideoFileSource *context = static_cast<VideoFileSource*>(data);
     GstStructure *str;
     GstPad *sinkPad;

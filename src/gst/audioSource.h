@@ -65,7 +65,7 @@ class AudioTestSource
         void sub_init();
 
     protected:
-        virtual gboolean callback();
+        gboolean callback();
 
     private:
         void toggle_frequency();

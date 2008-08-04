@@ -30,18 +30,18 @@ class VideoReceiver
 {
     public:
         explicit VideoReceiver(const VideoConfig & config);
-        virtual bool start();
-        virtual bool stop();
+        bool start();
+        bool stop();
 
-        virtual ~VideoReceiver();
+        ~VideoReceiver();
 
     private:
         void set_caps(const char* capsStr);
         void stop_sender() const;
 
-        virtual void init_source(){};
-        virtual void init_codec();
-        virtual void init_sink();
+        void init_source(){};
+        void init_codec();
+        void init_sink();
 
         const VideoConfig &config_;
         RtpReceiver session_;

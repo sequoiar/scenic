@@ -41,8 +41,6 @@ class Pipeline
         bool start();
         bool stop();
 
-        //const GstClockTime start_time() const { return startTime_; }
-
         GstClock* clock() const { return gst_pipeline_get_clock(GST_PIPELINE(pipeline_)); }
 
     private:
