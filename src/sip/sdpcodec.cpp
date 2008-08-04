@@ -19,6 +19,10 @@
 
 #include "sdpcodec.h"
 
-sdpCodec::sdpCodec( std::string type, std::string name ){}
+sdpCodec::sdpCodec() : _name("")
+{}
+
+sdpCodec::sdpCodec( std::string type, std::string name ): 
+	_name(name) {}
 
 sdpCodec::~sdpCodec(){}

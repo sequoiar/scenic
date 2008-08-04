@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Sropulpof.  If not, see <http:*www.gnu.org*licenses*>.
  */
-
+	
 #ifndef _SDP_CODEC_H
 #define _SDP_CODEC_H
 
@@ -25,13 +25,14 @@
 class sdpCodec
 {
     public:
-        sdpCodec( std::string type, std::string name );
-        ~sdpCodec();
+    sdpCodec();
+	sdpCodec( std::string type, std::string name );
+	~sdpCodec();
 
     private:
-        std::string _name;
-        int _payload;
-        int _frequency;
+	std::string _name;
+	//int _payload;
+	//int _frequency;
 };
 
 #endif // _SDP_CODEC_H

@@ -29,7 +29,6 @@
 
 #include "session.h"
 #include "useragent.h"
-#include "sdp.h"
 
 #define _APP_NAME   "miville"
 #define _DEFAULT_SIP_PORT   5060
@@ -76,9 +75,9 @@ class SIPSession
 /* The application SIP User Agent */
         UserAgent* _app_ua;
 
-/* A SDP (Session Description Protocol) instance to build the sdp body */
-/* Should be an attribute of the useragent class */
-        Sdp* _sdp;
+        SIPSession(const SIPSession&); //No Copy Constructor
+        SIPSession& operator=(const SIPSession&); //No Assignment Operator
+
 };
 
 #endif // _SIP_SESSION_H
