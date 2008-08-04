@@ -1,8 +1,5 @@
-/*
- * GStreamer
- * Copyright (C) 2005 Thomas Vander Stichele <thomas@apestaart.org>
- * Copyright (C) 2005 Ronald S. Bultje <rbultje@ronald.bitfreak.net>
- * Copyright (C) 2008  <<user@hostname.org>>
+/* GStreamer
+ * Copyright (C) 2008 Tristan Matthews <tristan@sat.qc.ca>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -43,8 +40,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef __GST_JACKAUDIOSRC_H__
-#define __GST_JACKAUDIOSRC_H__
+#ifndef __GST_JACK_AUDIO_SRC_H__
+#define __GST_JACK_AUDIO_SRC_H__
 
 #include <jack/jack.h>
 
@@ -56,17 +53,11 @@
 
 G_BEGIN_DECLS
 
-/* #defines don't like whitespacey bits */
-#define GST_TYPE_JACKAUDIOSRC \
-    (gst_jackaudiosrc_get_type())
-#define GST_JACKAUDIOSRC(obj) \
-    (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_JACKAUDIOSRC,GstJackAudioSrc))
-#define GST_JACKAUDIOSRC_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_JACKAUDIOSRC,GstJackAudioSrcClass))
-#define GST_IS_JACKAUDIOSRC(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_JACKAUDIOSRC))
-#define GST_IS_JACKAUDIOSRC_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_JACKAUDIOSRC))
+#define GST_TYPE_JACK_AUDIO_SRC             (gst_jackaudiosrc_get_type())
+#define GST_JACK_AUDIO_SRC(obj)             (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_JACK_AUDIO_SRC,GstJackAudioSrc))
+#define GST_JACK_AUDIO_SRC_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_JACK_AUDIO_SRC,GstJackAudioSrcClass))
+#define GST_IS_JACK_AUDIO_SRC(obj)          (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_JACK_AUDIO_SRC))
+#define GST_IS_JACK_AUDIO_SRC_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_JACK_AUDIO_SRC))
 
 typedef struct _GstJackAudioSrc GstJackAudioSrc;
 typedef struct _GstJackAudioSrcClass GstJackAudioSrcClass;
@@ -100,4 +91,4 @@ GType gst_jackaudiosrc_get_type (void);
 
 G_END_DECLS
 
-#endif /* __GST_JACKAUDIOSRC_H__ */
+#endif /* __GST_JACK_AUDIO_SRC_H__ */

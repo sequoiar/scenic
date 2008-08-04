@@ -34,26 +34,26 @@ G_BEGIN_DECLS
 
 #define GST_TYPE_JACK_AUDIO_SINK             (gst_jack_audio_sink_get_type())
 #define GST_JACK_AUDIO_SINK(obj)             (G_TYPE_CHECK_INSTANCE_CAST((obj) \
-                                                                         , \
-                                                                         GST_TYPE_JACK_AUDIO_SINK \
-                                                                         , \
-                                                                         GstJackAudioSink))
+      , \
+      GST_TYPE_JACK_AUDIO_SINK \
+      , \
+      GstJackAudioSink))
 #define GST_JACK_AUDIO_SINK_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST((klass) \
-                                                                      , \
-                                                                      GST_TYPE_JACK_AUDIO_SINK \
-                                                                      , \
-                                                                      GstJackAudioSinkClass))
+      , \
+      GST_TYPE_JACK_AUDIO_SINK \
+      , \
+      GstJackAudioSinkClass))
 #define GST_JACK_AUDIO_SINK_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj) \
-                                                                         , \
-                                                                         GST_TYPE_JACK_AUDIO_SINK \
-                                                                         , \
-                                                                         GstJackAudioSinkClass))
+      , \
+      GST_TYPE_JACK_AUDIO_SINK \
+      , \
+      GstJackAudioSinkClass))
 #define GST_IS_JACK_AUDIO_SINK(obj)          (G_TYPE_CHECK_INSTANCE_TYPE((obj) \
-                                                                         , \
-                                                                         GST_TYPE_JACK_AUDIO_SINK))
+      , \
+      GST_TYPE_JACK_AUDIO_SINK))
 #define GST_IS_JACK_AUDIO_SINK_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE((klass) \
-                                                                      , \
-                                                                      GST_TYPE_JACK_AUDIO_SINK))
+      , \
+      GST_TYPE_JACK_AUDIO_SINK))
 
 typedef struct _GstJackAudioSink GstJackAudioSink;
 typedef struct _GstJackAudioSinkClass GstJackAudioSinkClass;
@@ -64,26 +64,26 @@ typedef struct _GstJackAudioSinkClass GstJackAudioSinkClass;
  * Opaque #GstJackAudioSink.
  */
 struct _GstJackAudioSink {
-    GstBaseAudioSink element;
+  GstBaseAudioSink element;
 
-    /*< private >*/
-    /* cached caps */
-    GstCaps         *caps;
+  /*< private >*/
+  /* cached caps */
+  GstCaps         *caps;
 
-    /* properties */
-    GstJackConnect connect;
-    gchar           *server;
+  /* properties */
+  GstJackConnect connect;
+  gchar           *server;
 
-    /* our client */
-    GstJackAudioClient *client;
+  /* our client */
+  GstJackAudioClient *client;
 
-    /* our ports */
-    jack_port_t    **ports;
-    int port_count;
+  /* our ports */
+  jack_port_t    **ports;
+  int port_count;
 };
 
 struct _GstJackAudioSinkClass {
-    GstBaseAudioSinkClass parent_class;
+  GstBaseAudioSinkClass parent_class;
 };
 
 GType gst_jack_audio_sink_get_type ();

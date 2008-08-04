@@ -30,9 +30,9 @@ gst_jack_connect_get_type()
   static GType jack_connect_type = 0;
   static const GEnumValue jack_connect[] = {
     {GST_JACK_CONNECT_NONE,
-        "Don't automatically connect ports to physical ports", "none"},
+      "Don't automatically connect ports to physical ports", "none"},
     {GST_JACK_CONNECT_AUTO,
-        "Automatically connect ports to physical ports", "auto"},
+      "Automatically connect ports to physical ports", "auto"},
     {0, NULL, NULL},
   };
 
@@ -47,10 +47,10 @@ static gboolean
 plugin_init (GstPlugin * plugin)
 {
   if (!gst_element_register (plugin, "jackaudiosrc", GST_RANK_PRIMARY,
-          GST_TYPE_JACKAUDIOSRC))
+        GST_TYPE_JACK_AUDIO_SRC))
     return FALSE;
   if (!gst_element_register (plugin, "jackaudiosink", GST_RANK_PRIMARY,
-          GST_TYPE_JACK_AUDIO_SINK))
+        GST_TYPE_JACK_AUDIO_SINK))
     return FALSE;
 
   return TRUE;
@@ -61,13 +61,13 @@ plugin_init (GstPlugin * plugin)
  * exchange the string 'Template jackaudiosrc' with your jackaudiosrc description
  */
 GST_PLUGIN_DEFINE (
-        GST_VERSION_MAJOR,
-        GST_VERSION_MINOR,
-        "jack",
-        "Jack elements",
-        plugin_init,
-        VERSION,
-        "LGPL",
-        "GStreamer",
-        "http://gstreamer.net/"
-        )
+    GST_VERSION_MAJOR,
+    GST_VERSION_MINOR,
+    "jack",
+    "Jack elements",
+    plugin_init,
+    VERSION,
+    "LGPL",
+    "GStreamer",
+    "http://gstreamer.net/"
+    )
