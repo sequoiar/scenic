@@ -72,8 +72,7 @@ gst_jack_audio_sink_allocate_channels(GstJackAudioSink * sink, gint channels)
   client = gst_jack_audio_client_get_client(sink->client);
 
   /* remove ports we don't need */
-  while (sink->port_count > channels) 
-  {
+  while (sink->port_count > channels) {
     jack_port_unregister(client, sink->ports[--sink->port_count]);
   }
 
@@ -81,8 +80,7 @@ gst_jack_audio_sink_allocate_channels(GstJackAudioSink * sink, gint channels)
   sink->ports = g_realloc(sink->ports, sizeof(jack_port_t *) * channels);
 
   /* create an output port for each channel */
-  while (sink->port_count < channels) 
-  {
+  while (sink->port_count < channels) {
     gchar *name;
 
     /* port names start from 1 and are local to the element */
@@ -111,8 +109,7 @@ gst_jack_audio_sink_free_channels(GstJackAudioSink * sink)
   client = gst_jack_audio_client_get_client(sink->client);
 
   /* get rid of all ports */
-  while (sink->port_count) 
-  {
+  while (sink->port_count) {
     GST_LOG_OBJECT(sink, "unregister port %d", i);
     if ((res = jack_port_unregister(client, sink->ports[i++]))) {
       GST_DEBUG_OBJECT(sink, "unregister of port failed (%d)", res);
@@ -205,8 +202,7 @@ jack_process_cb(jack_nframes_t nframes, void *arg)
   buffers = g_alloca(sizeof(sample_t *) * channels);
 
   /* get target buffers */
-  for (i = 0; i < channels; i++) 
-  {
+  for (i = 0; i < channels; i++) {
     buffers[i] = (sample_t *) jack_port_get_buffer(sink->ports[i], nframes);
   }
 
@@ -223,10 +219,8 @@ jack_process_cb(jack_nframes_t nframes, void *arg)
 
     /* the samples in the ringbuffer have the channels interleaved, we need to
      * deinterleave into the jack target buffers */
-    for (i = 0; i < nframes; i++) 
-    {
-      for (j = 0; j < channels; j++) 
-      {
+    for (i = 0; i < nframes; i++) {
+      for (j = 0; j < channels; j++) {
         buffers[j][i] = *data++;
       }
     }
@@ -239,8 +233,7 @@ jack_process_cb(jack_nframes_t nframes, void *arg)
   } else {
     /* We are not allowed to read from the ringbuffer, write silence to all
      * jack output buffers */
-    for (i = 0; i < channels; i++) 
-    {
+    for (i = 0; i < channels; i++) {
       memset(buffers[i], 0, nframes * sizeof(sample_t));
     }
   }
@@ -475,8 +468,7 @@ gst_jack_ring_buffer_acquire(GstRingBuffer * buf, GstRingBufferSpec * spec)
       goto done;
     }
 
-    for (i = 0; i < channels; i++) 
-    {
+    for (i = 0; i < channels; i++) {
       /* stop when all input ports are exhausted */
       if (ports[i] == NULL) {
         /* post a warning that we could not connect all ports */
@@ -736,8 +728,7 @@ gst_jack_audio_sink_set_property(GObject * object, guint prop_id,
 
   sink = GST_JACK_AUDIO_SINK(object);
 
-  switch (prop_id) 
-  {
+  switch (prop_id) {
     case PROP_CONNECT:
       sink->connect = g_value_get_enum(value);
       break;
@@ -759,8 +750,7 @@ gst_jack_audio_sink_get_property(GObject * object, guint prop_id,
 
   sink = GST_JACK_AUDIO_SINK(object);
 
-  switch (prop_id) 
-  {
+  switch (prop_id) {
     case PROP_CONNECT:
       g_value_set_enum(value, sink->connect);
       break;
@@ -787,15 +777,13 @@ gst_jack_audio_sink_getcaps(GstBaseSink * bsink)
 
   client = gst_jack_audio_client_get_client(sink->client);
 
-  if (sink->connect == GST_JACK_CONNECT_AUTO) 
-  {
+  if (sink->connect == GST_JACK_CONNECT_AUTO) {
     /* get a port count, this is the number of channels we can automatically
      * connect. */
     ports = jack_get_ports(client, NULL, NULL,
         JackPortIsPhysical | JackPortIsInput);
     max = 0;
-    if (ports != NULL) 
-    {
+    if (ports != NULL) {
       for (; ports[max]; max++);
 
       free(ports);
