@@ -1,7 +1,7 @@
 include $(top_srcdir)/src/globals.mak
 
 
-PJSIP_LIBS = -lpjsip -lpjsip-ua  -lpjlib-util -lpj -lpjsua -lpjmedia 
+PJSIP_LIBS = -lpjsip -lpjsip-ua  -lpjlib-util -lpj -lpjsua -lpjsdp
 
 noinst_LTLIBRARIES = libsip.la
 
@@ -17,7 +17,8 @@ libsip_la_SOURCES = \
 			 sipsession.h 
 
 libsip_la_LDFLAGS = $(PJSIP_LIBS) -lpthread 
-libsip_la_CPPFLAGS =  $(PJ_CFLAGS)
+libsip_la_CPPFLAGS =  $(AM_CPPFLAGS) $(PJ_CFLAGS)
+   
 
 
 

@@ -23,42 +23,43 @@
 #include <list>
 #include <pjmedia/sdp.h>
 #include <pjmedia/sdp_neg.h>
+#include <pj/pool.h>
+#include <pj/assert.h>
 
 #include "sdpcodec.h"
 
 class Sdp
 {
-    public:
-/* Class constructors */
-        Sdp();
-        Sdp( int aport, int vport );
 
-/* Class desctructor */
-        ~Sdp();
+	public:
+		/* Class constructors */
+		Sdp();
+		Sdp( int aport, int vport );
 
-        void addAudioCodec( sdpCodec* codec );
+		/* Class destructor */
+		~Sdp();
 
-        void addVideoCodec( sdpCodec* codec );
+		void addAudioCodec( sdpCodec* codec );
+		void addVideoCodec( sdpCodec* codec );
+		void setAudioPort( int aport ) { _audioPort = aport; }
+		void setVideoPort( int vport ) { _videoPort = vport; }
+		int getAudioPort( void ) { return _audioPort; }
+		int getVideoPort( void ) { return _videoPort; }
+		std::list<sdpCodec> getAudiocodecsList( void ) { return _audiocodecs; }
+		std::list<sdpCodec> getVideocodecList( void ) { return _videocodecs; }
+        pjmedia_sdp_session* getSDPSession( void ) { return _sdpSession; }
+        void setSDPSession( pj_pool_t *pool );
 
-        void setAudioPort( int aport );
+	private:
+		std::string _sdpBody;
+		int _audioPort, _videoPort;
+		std::list<sdpCodec> _audiocodecs;
+		std::list<sdpCodec> _videocodecs;
+        pjmedia_sdp_session *_sdpSession;
 
-        void setVideoPort( int vport );
+        Sdp(const Sdp&); //No Copy Constructor
+        Sdp& operator=(const Sdp&); //No Assignment Operator
 
-        int getAudioPort( void ) { return _audioPort; }
-
-        int getVideoPort( void ) { return _videoPort; }
-
-        std::list<sdpCodec> getAudiocodecsList( void ) { return _audiocodecs; }
-
-        std::list<sdpCodec> getVideocodecList( void ) { return _videocodecs; }
-
-    private:
-        std::string _sdpBody;
-
-        std::list<sdpCodec> _audiocodecs;
-        std::list<sdpCodec> _videocodecs;
-
-        int _audioPort, _videoPort;
 };
 
 #endif // _SDP_H

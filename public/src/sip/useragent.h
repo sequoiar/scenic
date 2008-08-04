@@ -35,6 +35,8 @@
 
 #include <string>
 
+#include "sdp.h"
+
 class UserAgent
 {
     public:
