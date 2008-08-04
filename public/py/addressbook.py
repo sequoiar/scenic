@@ -150,7 +150,7 @@ class Contact(object):
                 
                 
 if __name__ == '__main__':
-    adb = AddressBook('sropulpof')
+    adb = AddressBook('test')
     adb.add('Gaspésie', '111.23.111.32')
     adb.add('Simon', 'ppa.sat.qc.ca')
     adb.add('SIP contact', 'longjohn@monami.com')
