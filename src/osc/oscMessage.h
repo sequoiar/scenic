@@ -54,6 +54,7 @@ class OscMessage
         void print();
 
         bool argEquals(std::string str, int idx) { return args_[idx].equals(str); }
+        bool argEquals(int val, int idx) { return args_[idx].equals(val); }
 
     private:
         class LoArg

@@ -66,7 +66,7 @@ lo_message *OscMessage::init_msg(lo_message *msg)
 {
     for (OscArgs::iterator it = args_.begin(); it != args_.end(); ++it)
     {
-        switch ((char) it->type_)
+        switch (static_cast<char>(it->type_))
         {
             case 's':
             {
@@ -97,7 +97,7 @@ void OscMessage::print()
 
 void OscMessage::LoArg::print() const
 {
-    switch ((char) type_)
+    switch (static_cast<char>(type_))
     {
         case 's':
             std::cout << s_ << " ";
@@ -111,7 +111,7 @@ void OscMessage::LoArg::print() const
 
 bool OscMessage::LoArg::equals(std::string str)
 {
-    if ((char) type_ == 's')
+    if (static_cast<char>(type_) == 's')
         return s_ == str;
     return false;
 }
@@ -119,7 +119,7 @@ bool OscMessage::LoArg::equals(std::string str)
 
 bool OscMessage::LoArg::equals(int val)
 {
-    if ((char) type_ == 'i')
+    if (static_cast<char>(type_) == 'i')
         return i_ == val;
     return false;
 }
@@ -128,7 +128,7 @@ bool OscMessage::LoArg::equals(int val)
 OscMessage::LoArg::LoArg(const char *pchar, int index, lo_arg * a)
     : type_(static_cast<lo_type>(pchar[index])), i_(0), s_()
 {
-    switch ((char) type_)
+    switch (static_cast<char>(type_))
     {
         case 's':
         {
