@@ -38,7 +38,7 @@ class GstThread
         VideoSender* sender;
         VideoReceiver* receiver;
 
-        char* conf_str;
+        std::string conf_str_;
         int main();
 
         GstThread(const GstThread&); //No Copy Constructor
