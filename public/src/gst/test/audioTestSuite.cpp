@@ -296,6 +296,7 @@ void AudioTestSuite::start_stop_2ch_comp_rtp_audiotest()
         TEST_ASSERT(rx.start());
 
         BLOCK();
+
         TEST_ASSERT(rx.isPlaying());
 
         TEST_ASSERT(rx.stop());
