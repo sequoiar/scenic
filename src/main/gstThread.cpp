@@ -21,11 +21,13 @@
 
 //BaseModule args get deleted in ~BaseModule
 GstThread::GstThread()
-    : conf(), sender(), receiver(), conf_str(0)
+    : conf(), sender(), receiver(), conf_str_("videotestsrc")
 {
     args_.clear();
+#if 0
     conf_str = 0;
     args_.push_back(new StringArg(&conf_str, "sender", 's', "video", "try videotestsrc"));
+#endif
 }
 
 
@@ -33,11 +35,12 @@ int GstThread::main()
 {
     bool quit = false;
 
-    if(conf_str)
+    if(!conf_str_.empty())
     {
-        conf = new VideoConfig(conf_str);
+        conf = new VideoConfig(conf_str_);
         if(conf)
             sender = new VideoSender(*conf);
+
         if(!sender)
         {
             BaseMessage m(BaseMessage::QUIT);
@@ -45,6 +48,7 @@ int GstThread::main()
             quit = true;
         }
     }
+
     while(!quit)
     {
         BaseMessage f = queue_.timed_pop(10000);

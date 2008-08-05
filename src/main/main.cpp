@@ -74,41 +74,45 @@ bool MainModule::run()
     QueuePair &gst_queue = gstThread_.getQueue();
     OscQueue &osc_queue = oscThread_.getQueue();
 
-//    if(!gstThread_.run())
-//        return 0;
+    if(!gstThread_.run())
+        return 0;
     std::stringstream s;
     s << port_;
+
     oscThread_.set_local_port(s.str());
+    
     if(!oscThread_.run())
         return 0;
-    while(1)
+
+    while(true)
     {
         OscMessage m = osc_queue.timed_pop(10000);
 
-        if(!m.pathIsSet())
-        {
+        if (!m.pathIsSet())
             continue;
-        }
+
         m.print();
-        if(m.pathEquals("/quit"))
+
+        if (m.pathEquals("/quit"))
         {
-//            BaseMessage in(BaseMessage::QUIT);
-//            gst_queue.push(in);
-//          LOG("in quit!"
+            BaseMessage in(BaseMessage::QUIT);
+            gst_queue.push(in);
+            LOG("in quit!");
             osc_queue.push(OscMessage("/quit", "", 0, 0, 0));
             break;
         }
-        if(!m.pathEquals("/gst"))
+        else if (!m.pathEquals("/gst"))
             continue;
-        if(m.argEquals("init", 0)){
+
+        if (m.argEquals("init", 0)) {
             BaseMessage in(BaseMessage::INIT);
             gst_queue.push(in);
         }
-        if(m.argEquals("start", 0)){
+        else if (m.argEquals("start", 0)) {
             BaseMessage start(BaseMessage::START);
             gst_queue.push(start);
         }
-        if(m.argEquals("stop", 0)){
+        else if (m.argEquals("stop", 0)) {
             BaseMessage stop(BaseMessage::STOP);
             gst_queue.push(stop);
         }
