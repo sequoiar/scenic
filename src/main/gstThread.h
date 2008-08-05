@@ -33,10 +33,11 @@ class GstThread
 {
     public:
         GstThread();
+        ~GstThread();
     private:
-        VideoConfig* conf;
-        VideoSender* sender;
-        VideoReceiver* receiver;
+        VideoConfig* conf_;
+        VideoSender* sender_;
+        VideoReceiver* receiver_;
 
         std::string conf_str_;
         int main();

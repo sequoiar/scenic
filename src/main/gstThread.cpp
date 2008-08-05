@@ -18,10 +18,9 @@
  */
 #include "gstThread.h"
 
-
 //BaseModule args get deleted in ~BaseModule
 GstThread::GstThread()
-    : conf(), sender(), receiver(), conf_str_("videotestsrc")
+    : conf_(0), sender_(0), receiver_(0), conf_str_("dv1394src")
 {
     args_.clear();
 #if 0
@@ -30,6 +29,11 @@ GstThread::GstThread()
 #endif
 }
 
+GstThread::~GstThread()
+{
+    delete sender_;
+    delete conf_;
+}
 
 int GstThread::main()
 {
@@ -37,11 +41,11 @@ int GstThread::main()
 
     if(!conf_str_.empty())
     {
-        conf = new VideoConfig(conf_str_);
-        if(conf)
-            sender = new VideoSender(*conf);
+        conf_ = new VideoConfig(conf_str_);
+        if(conf_)
+            sender_ = new VideoSender(*conf_);
 
-        if(!sender)
+        if(!sender_)
         {
             BaseMessage m(BaseMessage::QUIT);
             queue_.push(m);
@@ -63,17 +67,17 @@ int GstThread::main()
             }
             case BaseMessage::START:
             {
-                sender->start();
+                sender_->start();
                 break;
             }
             case BaseMessage::INIT:
             {
-                sender->init();
+                sender_->init();
                 break;
             }
             case BaseMessage::STOP:
             {
-                sender->stop();
+                sender_->stop();
                 break;
             }
 

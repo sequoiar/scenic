@@ -119,7 +119,7 @@ bool BaseThread < T >::run()
 template < class T >
 void *BaseThread < T >::thread_main(void *v)
 {
-    return (reinterpret_cast<void *>((static_cast < BaseThread * >(v)->main())));
+    return (reinterpret_cast<void *>(static_cast < BaseThread * >(v)->main()));
 }
 
 
