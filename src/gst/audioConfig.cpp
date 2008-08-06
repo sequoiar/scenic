@@ -53,12 +53,6 @@ AudioConfig::AudioConfig(int numChannels, const std::string &codec, int port)
 }
 
 
-const int AudioConfig::numChannels() const
-{
-    return numChannels_;
-}
-
-
 // strips .delay from source name
 const char *AudioConfig::source() const
 {

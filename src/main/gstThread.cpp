@@ -19,6 +19,10 @@
 #include "gstThread.h"
 
 //BaseModule args get deleted in ~BaseModule
+// FIXME: sender and receiver should be in different processes, need to think about how 
+// we initiliaze VideoConfig, also should have AudioConfig. Are we ditching args_?
+// 
+
 GstThread::GstThread()
     : conf_(0), sender_(0), receiver_(0), conf_str_("dv1394src")
 {
@@ -39,7 +43,7 @@ GstThread::~GstThread()
 
 int GstThread::main()
 {
-    bool quit = false;
+    bool done = false;
 
     if(!conf_str_.empty())
     {
@@ -50,10 +54,10 @@ int GstThread::main()
         {
             BaseMessage m(BaseMessage::QUIT);
             queue_.push(m);
-            quit = true;
+            done = true;
         }
     }
-    while(!quit)
+    while(!done)
     {
         BaseMessage f = queue_.timed_pop(10000);
         switch(f.get_type())
@@ -62,7 +66,7 @@ int GstThread::main()
             {
                 BaseMessage f(BaseMessage::QUIT);
                 queue_.push(f);
-                quit = true;
+                done = true;
                 break;
             }
             case BaseMessage::START:
@@ -85,7 +89,6 @@ int GstThread::main()
                 break;
         }
     }
-
 
     return 0;
 }

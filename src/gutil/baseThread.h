@@ -53,10 +53,9 @@ class BaseThread
         }
 
 
-        virtual bool ready(){ return true;}
+        virtual bool ready() { return true; }
 
-
-        GThread *th;
+        GThread *th_;
 
         QueuePair_ < T > queue_;
         QueuePair_ < T > flippedQueue_;
@@ -76,7 +75,7 @@ QueuePair_ < T > &BaseThread < T >::getQueue()
 
 template < class T >
 BaseThread < T >::BaseThread()
-    : th(0), queue_(), flippedQueue_()
+    : th_(0), queue_(), flippedQueue_()
 {
     if (!g_thread_supported ())
         g_thread_init (NULL);
@@ -88,8 +87,8 @@ BaseThread < T >::BaseThread()
 template < class T >
 BaseThread < T >::~BaseThread()
 {
-    if (th)
-        g_thread_join(th);
+    if (th_)
+        g_thread_join(th_);
 }
 
 
@@ -106,11 +105,11 @@ bool BaseThread < T >::run()
     GError *err = 0;
 
     //No thread yet
-    if (th || !ready())
+    if (th_ || !ready())
         return false;
-    th = thread_create_queue_pair(BaseThread::thread_main, this, &err);
+    th_ = thread_create_queue_pair(BaseThread::thread_main, this, &err);
 
-    if (th)  //BaseThread running
+    if (th_)  //BaseThread running
         return true;
     return false;
 }
@@ -119,7 +118,8 @@ bool BaseThread < T >::run()
 template < class T >
 void *BaseThread < T >::thread_main(void *v)
 {
-    return (reinterpret_cast<void *>(static_cast < BaseThread * >(v)->main()));
+    // FIXME: this is unbelievably ugly. what's v? 
+    return reinterpret_cast<void *>(static_cast < BaseThread * >(v)->main());
 }
 
 

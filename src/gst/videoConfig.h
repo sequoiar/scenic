@@ -35,15 +35,17 @@ class VideoConfig
     : public MediaConfig
 {
     public:
-        // used by sender
-        VideoConfig(const std::string & source, const std::string & codec,
-        const std::string & remoteHost, int port);
+        
+        VideoConfig(const std::string & source, 
+                    const std::string & codec,
+                    const std::string & remoteHost, 
+                    int port); // used by sender
         VideoConfig(const std::string & codec, int port); // used by receiver
         explicit VideoConfig(const std::string & source); // used by local sender
 
-        VideoSource* createSource() const;
+        VideoSource* createSource() const;  // factory method
 
-        const bool has_h264() const;
+        const bool has_h264() const { return codec_ == "h264"; }
 };
 
 #endif // _VIDEO_CONFIG_H_
