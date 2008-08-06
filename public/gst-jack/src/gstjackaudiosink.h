@@ -1,7 +1,7 @@
 /* GStreamer
  * Copyright (C) 2006 Wim Taymans <wim@fluendo.com>
  *
- * gstjacksink.h:
+ * gstjackaudiosink.h:
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
