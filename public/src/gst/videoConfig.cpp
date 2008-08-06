@@ -53,12 +53,6 @@ VideoConfig::VideoConfig(const std::string &codec, int port)
 }
 
 
-const bool VideoConfig::has_h264() const
-{
-    return (codec_ == "h264");
-}
-
-
 VideoSource * VideoConfig::createSource() const
 {
     if (source_ == "videotestsrc")
