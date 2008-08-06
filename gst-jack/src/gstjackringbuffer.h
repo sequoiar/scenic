@@ -42,6 +42,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#ifndef __GST_JACK_RING_BUFFER_H__
+#define __GST_JACK_RING_BUFFER_H__
 
 #define GST_TYPE_JACK_RING_BUFFER               (gst_jack_ring_buffer_get_type())
 #define GST_JACK_RING_BUFFER(obj)               (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_JACK_RING_BUFFER,GstJackRingBuffer))
@@ -85,3 +87,4 @@ static gboolean gst_jack_ring_buffer_pause(GstRingBuffer * buf);
 static gboolean gst_jack_ring_buffer_stop(GstRingBuffer * buf);
 static guint gst_jack_ring_buffer_delay(GstRingBuffer * buf);
 
+#endif 
