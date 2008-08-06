@@ -29,8 +29,8 @@ class TcpThread
     : public BaseThread<BaseMessage>
 {
     public:
-        TcpThread();
-        ~TcpThread();
+        TcpThread(int inport):port_(inport){}
+        ~TcpThread(){}
     private:
 		int port_;
         int main();
