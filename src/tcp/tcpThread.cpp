@@ -18,19 +18,6 @@
  */
 #include "tcpThread.h"
 
-//BaseModule args get deleted in ~BaseModule
-TcpThread::TcpThread()
-    : port_(0)
-{
-
-}
-
-
-TcpThread::~TcpThread()
-{
-
-}
-
 
 int TcpThread::main()
 {
