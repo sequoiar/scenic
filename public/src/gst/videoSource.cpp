@@ -61,6 +61,7 @@ gboolean VideoSource::base_callback(GstClock *clock, GstClockTime time, GstClock
     return context->callback();
 }
 
+
 // gst-inspect property codes
 const int VideoTestSource::BLACK = 2;
 const int VideoTestSource::WHITE = 3;
@@ -128,15 +129,14 @@ void VideoFileSource::link_element(GstElement *sinkElement)
 }
 
 
-void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last, 
-        void *data)
+void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
+                                     void *data)
 {
     if (gst_pad_is_linked(srcPad))
     {
         LOG("Pad is already linked.")
         return;
     }
-
     VideoFileSource *context = static_cast<VideoFileSource*>(data);
     GstStructure *str;
     GstPad *sinkPad;
