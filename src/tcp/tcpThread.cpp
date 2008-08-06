@@ -1,4 +1,4 @@
-/* GTHREAD-QUEUE-PAIR - Library of GstThread Queue Routines for GLIB
+/* GTHREAD-QUEUE-PAIR - Library of TcpThread Queue Routines for GLIB
  * Copyright 2008  Koya Charles & Tristan Matthews
  *
  * This library is free software; you can redisttribute it and/or
@@ -16,43 +16,26 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-#include "gstThread.h"
+#include "tcpThread.h"
 
 //BaseModule args get deleted in ~BaseModule
-GstThread::GstThread()
-    : conf_(0), sender_(0), receiver_(0), conf_str_("dv1394src")
+TcpThread::TcpThread()
+    : port_(0)
 {
-    args_.clear();
-#if 0
-    conf_str = 0;
-    args_.push_back(new StringArg(&conf_str, "sender", 's', "video", "try videotestsrc"));
-#endif
+
 }
 
 
-GstThread::~GstThread()
+TcpThread::~TcpThread()
 {
-    delete sender_;
-    delete conf_;
+
 }
 
 
-int GstThread::main()
+int TcpThread::main()
 {
     bool quit = false;
 
-    if(!conf_str_.empty())
-    {
-        conf_ = new VideoConfig(conf_str_);
-        if(conf_)
-            sender_ = new VideoSender(*conf_);
-        if(!sender_)
-        {
-            BaseMessage m(BaseMessage::QUIT);
-            queue_.push(m);
-            quit = true;
-        }
-    }
     while(!quit)
     {
         BaseMessage f = queue_.timed_pop(10000);
@@ -65,22 +48,6 @@ int GstThread::main()
                 quit = true;
                 break;
             }
-            case BaseMessage::START:
-            {
-                sender_->start();
-                break;
-            }
-            case BaseMessage::INIT:
-            {
-                sender_->init();
-                break;
-            }
-            case BaseMessage::STOP:
-            {
-                sender_->stop();
-                break;
-            }
-
             default:
                 break;
         }

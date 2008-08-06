@@ -33,6 +33,7 @@ class RtpSender
     public:
         RtpSender();
         const char *caps_str() const;
+
         ~RtpSender();
 
     protected:

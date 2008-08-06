@@ -80,17 +80,15 @@ bool MainModule::run()
     s << port_;
 
     oscThread_.set_local_port(s.str());
-    
+
     if(!oscThread_.run())
         return 0;
-
     while(true)
     {
         OscMessage m = osc_queue.timed_pop(10000);
 
         if (!m.pathIsSet())
             continue;
-
         m.print();
 
         if (m.pathEquals("/quit"))
@@ -103,7 +101,6 @@ bool MainModule::run()
         }
         else if (!m.pathEquals("/gst"))
             continue;
-
         if (m.argEquals("init", 0)) {
             BaseMessage in(BaseMessage::INIT);
             gst_queue.push(in);
