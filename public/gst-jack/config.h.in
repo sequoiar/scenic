@@ -1,5 +1,14 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* GStreamer license */
+#undef GST_LICENSE
+
+/* Name */
+#undef GST_PACKAGE_NAME
+
+/* Origin URL */
+#undef GST_PACKAGE_ORIGIN
+
 /* Define the version */
 #undef GST_PLUGIN_VERSION
 
