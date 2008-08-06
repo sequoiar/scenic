@@ -25,7 +25,7 @@
 #include "gstjackaudiosink.h"
 
 GType
-gst_jack_connect_get_type()
+gst_jack_connect_get_type (void)
 {
   static GType jack_connect_type = 0;
   static const GEnumValue jack_connect[] = {
@@ -65,9 +65,4 @@ GST_PLUGIN_DEFINE (
     GST_VERSION_MINOR,
     "jack",
     "Jack elements",
-    plugin_init,
-    VERSION,
-    "LGPL",
-    "GStreamer",
-    "http://gstreamer.net/"
-    )
+    plugin_init, VERSION, GST_LICENSE, GST_PACKAGE_NAME, GST_PACKAGE_ORIGIN)

@@ -5,6 +5,19 @@ GST_MAJORMINOR=0.10
 GST_REQUIRED=0.10.0
 GSTPB_REQUIRED=0.10.0
 
+dnl set license and copyright notice
+GST_LICENSE="LGPL"
+AC_DEFINE_UNQUOTED(GST_LICENSE, "$GST_LICENSE", [GStreamer license])
+AC_SUBST(GST_LICENSE)
+
+GST_PACKAGE_ORIGIN="http://gstreamer.net"
+AC_DEFINE_UNQUOTED(GST_PACKAGE_ORIGIN, "$GST_PACKAGE_ORIGIN", [Origin URL])
+AC_SUBST(GST_PACKAGE_ORIGIN)
+
+GST_PACKAGE_NAME="jack"
+AC_DEFINE_UNQUOTED(GST_PACKAGE_NAME, "$GST_PACKAGE_NAME", [Name])
+AC_SUBST(GST_PACKAGE_NAME)
+
 dnl fill in your package name and version here
 dnl the fourth (nano) number should be 0 for a release, 1 for CVS,
 dnl and 2... for a prerelease

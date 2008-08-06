@@ -70,7 +70,7 @@ struct _GstJackAudioSinkClass {
   GstBaseAudioSinkClass parent_class;
 };
 
-GType gst_jack_audio_sink_get_type ();
+GType gst_jack_audio_sink_get_type (void);
 
 G_END_DECLS
 
