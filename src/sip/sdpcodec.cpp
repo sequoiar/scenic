@@ -19,10 +19,10 @@
 
 #include "sdpcodec.h"
 
-sdpCodec::sdpCodec() : _name("")
+sdpCodec::sdpCodec() : _name(""), _m_type("audio"), _payload(-1)
 {}
 
-sdpCodec::sdpCodec( std::string type, std::string name ): 
-	_name(name) {}
+sdpCodec::sdpCodec( std::string type, std::string name, int payload ): 
+	_name(name), _m_type( type ), _payload( payload ) {}
 
 sdpCodec::~sdpCodec(){}

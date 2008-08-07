@@ -15,15 +15,14 @@
  */
 
 sdpCodec* addCodecToSDPTest( void ) {
-    sdpCodec* gsm = new sdpCodec( "audio", "GSM" );
+    sdpCodec* gsm = new sdpCodec( "audio", "GSM", 3 );
     return gsm;
 }
 
-
-int main( int argc, char** argv ){
+void initiateSessionTest( int argc, char** argv ) {
 
     if( argc == 1 )
-	    return 0;
+        return;
 
     Session* sip = new SIPSession(std::atoi(argv[1]));
     if( argc <= 2 ){
@@ -34,7 +33,21 @@ int main( int argc, char** argv ){
         // Make call to the specified sip address
         sip->connect( argv[2], std::atoi(argv[3]) );
     }
+}
+
+void createSDPBodyTest() {
+
+    Session *sip = new SIPSession( 5060 );
+    sip->build_sdp();
+
+}
+
+int main( int argc, char** argv ){
+
+    initiateSessionTest( argc, argv );
+    //createSDPBodyTest();
     return 1;
+
 }
 
 

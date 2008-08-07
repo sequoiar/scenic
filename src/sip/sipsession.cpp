@@ -49,7 +49,9 @@ int SIPSession::refuse( int reason ){
 }
 
 
-void SIPSession::build_sdp( void ){}
+void SIPSession::build_sdp( void ){
+    _app_ua->buildSDP();
+}
 
 
 void SIPSession::startMainloop( void ){
