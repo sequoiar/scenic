@@ -67,7 +67,7 @@ void OptionArgs::add(BaseArg *ba)
         options_.push_back(e);
     }
     else {
-        LOG("Bad BaseArg type");
+        LOG("Bad BaseArg type", ERROR);
     }
 }
 

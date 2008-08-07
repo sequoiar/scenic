@@ -45,7 +45,7 @@ void DModule::init()
 bool DModule::run()
 {
     if(!pass_) {
-        LOG("x ");
+        LOG("x ", DEBUG);
     }
     return true;
 }

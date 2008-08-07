@@ -39,7 +39,7 @@ bool DModule::run()
     if(!pass)
         while(1)
         {
-            LOG("x ");
+            LOG("x ", DEBUG);
         }
     return true;
 }

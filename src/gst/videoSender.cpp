@@ -100,7 +100,7 @@ bool VideoSender::start()
 
 void VideoSender::wait_for_stop()
 {
-    LOG("Waiting for stop message...");
+    LOG("Waiting for stop message...", DEBUG);
 
     lo_server_thread st = lo_server_thread_new("8880", liblo_error);
 
@@ -127,7 +127,7 @@ int VideoSender::stop_handler(const char *path, const char *types, lo_arg ** arg
                               void *data,
                               void *user_data)
 {
-    LOG("Being stopped by receiver.");
+    LOG("Being stopped by receiver.", DEBUG);
     VideoSender *context = static_cast<VideoSender*>(user_data);
     context->stop();
 

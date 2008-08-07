@@ -52,11 +52,11 @@ def stop():
     logging.shutdown()
 
 def set_level(level, logger='twisted'):
-    levels = {'critical':logging.CRITICAL,
-              'error':logging.ERROR,
-              'warning':logging.WARNING,
-              'info':logging.INFO,
-              'debug':logging.DEBUG}
+    levels = {'critical':logging.CRITICAL,  # 50
+              'error':logging.ERROR,        # 40
+              'warning':logging.WARNING,    # 30
+              'info':logging.INFO,          # 20
+              'debug':logging.DEBUG}        #10
     logger = logging.getLogger(logger)
     if level in levels:
         logger.setLevel(levels[level])

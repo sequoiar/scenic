@@ -68,17 +68,17 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
     // is added (regardless of whether or not it's a dynamic pad) to rtpbin.
     if (gst_pad_is_linked(srcPad))
     {
-        LOG("Pad is already linked")
+        LOG("Pad is already linked", DEBUG)
         return;
     }
     else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
     {
-        LOG("Pad is not a source");
+        LOG("Pad is not a source", DEBUG);
         return;
     }
     else if (strncmp(gst_pad_get_name(srcPad), "recv_rtp_src", 12))
     {
-        LOG("Wrong pad");
+        LOG("Wrong pad", DEBUG);
         return;
     }
     // FIXME: We only have this really stupid method of comparing the caps strings of all
@@ -87,7 +87,7 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
 
     if (gst_pad_is_linked(sinkPad)) // only link once
     {
-        LOG("sink pad is already linked.");
+        LOG("sink pad is already linked.", WARNING);
         gst_object_unref(sinkPad);
         return;
     }

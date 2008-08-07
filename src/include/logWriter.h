@@ -30,23 +30,70 @@
 
 #include <iostream>
 #include <time.h>
+#include <sstream>
 
-#define LOGGING 1
+enum LogLevel { 
+    DEBUG = 10,
+    INFO = 20,
+    WARNING = 30,
+    ERROR = 40,
+    CRITICAL = 50
+};
 
+#define LOG_LEVEL DEBUG
 
-#if LOGGING
-#define LOG(x)                                                              \
-    {                                                                           \
-        time_t rawtime;                                                         \
-        struct tm * timeinfo;                                                   \
-        time ( &rawtime );                                                      \
-        timeinfo = localtime ( &rawtime );                                      \
-        std::cerr << std::endl;                                                 \
-        std::cerr << __FILE__ << ":" << __LINE__ << ": " << x;                  \
-        std::cerr << " " << asctime(timeinfo) << std::endl;                  \
-    }
+#if LOG_LEVEL 
+#define LOG(msg, level)                                                              \
+    log(msg, level, __FILE__, __LINE__);
 #else
-#define LOG(x)
+#define LOG(msg, level)
 #endif
+
+
+
+static bool logLevelIsValid(LogLevel level)
+{
+    switch (level)
+    {
+        case DEBUG:
+        case INFO:
+        case WARNING:
+        case ERROR:
+        case CRITICAL:
+            return true;
+            break;
+        default:
+            return false;
+            break;
+    }
+}
+
+
+static bool logLevelMatch(LogLevel level)
+{
+    if (level >= LOG_LEVEL && logLevelIsValid(level))
+        return true;
+    else
+        return false;
+}
+
+
+static void log(const std::string &msg, LogLevel level, const std::string &fileName, const int lineNum)
+{
+    if (logLevelMatch(level))
+    {
+        time_t rawtime;                                                         
+        struct tm * timeinfo;                                                   
+
+        time( &rawtime );                                                      
+        timeinfo = localtime(&rawtime);                                     
+        std::ostringstream logMsg;
+        logMsg << std::endl << fileName << ":" << lineNum << ": " << msg << " " << asctime(timeinfo) 
+            << std::endl;
+
+        // FIXME: send message to Core
+        std::cerr << logMsg.str();
+    }
+}
 
 #endif //  _LOG_WRITER_H_

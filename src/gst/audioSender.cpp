@@ -90,7 +90,7 @@ void AudioSender::init_sink()
 void AudioSender::send_caps() const
 {
     // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
-    LOG("Sending caps...");
+    LOG("Sending caps...", DEBUG);
 
     lo_address t = lo_address_new(NULL, "7770");
     if (lo_send(t, "/audio/rx/caps", "s", session_.caps_str()) == -1)

@@ -134,7 +134,7 @@ void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
 {
     if (gst_pad_is_linked(srcPad))
     {
-        LOG("Pad is already linked.")
+        LOG("Pad is already linked.", DEBUG)
         return;
     }
     VideoFileSource *context = static_cast<VideoFileSource*>(data);
@@ -159,7 +159,7 @@ void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
     }
     gst_caps_unref(caps);
 
-    LOG("VideoFileSource: linking new srcpad and sinkpad.");
+    LOG("VideoFileSource: linking new srcpad and sinkpad.", DEBUG);
     assert(link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
@@ -208,7 +208,7 @@ void VideoDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, voi
 {
     if (std::string("audio") == gst_pad_get_name(srcPad))
     {
-        LOG("Ignoring audio stream from DV");
+        LOG("Ignoring audio stream from DV", DEBUG);
         return;
     }
     GstElement *sinkElement = (GstElement *) data;
@@ -221,7 +221,7 @@ void VideoDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, voi
         g_object_unref(sinkPad);        // don't link more than once
         return;
     }
-    LOG("VideoDvSource: linking new srcpad to sinkpad.");
+    LOG("VideoDvSource: linking new srcpad to sinkpad.", DEBUG);
     assert(link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
