@@ -15,7 +15,7 @@
  */
 
 sdpCodec* addCodecToSDPTest( void ) {
-    sdpCodec* gsm = new sdpCodec( "audio", "GSM", 3 );
+    sdpCodec* gsm = new sdpCodec( "audio", "GSM", 3, 1 );
     return gsm;
 }
 

@@ -24,6 +24,8 @@
 
 /**************** STATIC VARIABLES AND FUNCTIONS (callbacks) **************************/
 
+static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp );
+
 // Documentated from the PJSIP Developer's Guide, available on the pjsip website
 
 /*
@@ -123,7 +125,7 @@ static Sdp *local_sdp;
 
 
 UserAgent::UserAgent( std::string name, int port )
-    : _name(name), _localIP( _LOCAL_IP_ADDRESS), _lport(port) 
+    : _name(name), _localIP( "" ), _lport(port) 
 {
     // nothing
 }
@@ -162,16 +164,19 @@ int UserAgent::init_pjsip_modules(  ){
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     /* Add UDP Transport */
-    pj_sockaddr_in addr;
+    const pj_str_t *hostname;
+    pj_sockaddr_in tmp_addr;
     pjsip_host_port addrname;
-    pj_bzero( &addr, sizeof(addr));
-    addr.sin_family = PJ_AF_INET;
-    addr.sin_addr.s_addr = 0;
-    addr.sin_port = pj_htons((pj_uint16_t) this->_lport);
+    char* addr;
+
+    hostname = pj_gethostname();
+    pj_sockaddr_in_init( &tmp_addr, hostname, 0 );
+    tmp_addr.sin_port = pj_htons((pj_uint16_t) this->_lport);
+    addr = pj_inet_ntoa( tmp_addr.sin_addr );
+    _localIP = addr;
     addrname.host = pj_str((char*)this->_localIP.c_str());
-    printf("%s:%i", this->_localIP.c_str(), this->_lport);
     addrname.port = this->_lport;
-    status = pjsip_udp_transport_start( endpt, &addr, &addrname, 1, NULL );
+    status = pjsip_udp_transport_start( endpt, &tmp_addr, &addrname, 1, NULL );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     /* Create transaction layer */
@@ -204,7 +209,9 @@ int UserAgent::init_pjsip_modules(  ){
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     /* Initialize the SDP class instance */
-    local_sdp = new Sdp();
+    int aport = 12488; // random TODO Get the transport ports from gstreamer
+    int vport = 12490; // random TODO Get the transport ports from gstreamer
+    local_sdp = new Sdp( _localIP, aport, vport );
 
     PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
 
@@ -232,10 +239,9 @@ int UserAgent::create_invite_session( std::string uri, int port ){
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     //TODO Create the local SDP offer
-    local_sdp->createLocalOffer( dialog->pool );
+    local_sdp->createInitialOffer( dialog->pool );
      
-
-    status = pjsip_inv_create_uac( dialog, NULL, 0, &inv_session );
+    status = pjsip_inv_create_uac( dialog, local_sdp->getLocalSDPSession(), 0, &inv_session );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     status = pjsip_inv_invite( inv_session, &tdata );
@@ -283,10 +289,26 @@ pj_str_t UserAgent::build_contact_uri( std::string user, int port ){
 void UserAgent::buildSDP( void ) {
 
     printf(" Build SDP body\n");
-    local_sdp->displayCodecsList();
+    //local_sdp->displayCodecsList();
     //local_sdp->toStringTest();
     
 }
+
+static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
+    
+    pjmedia_sdp_session *sdp;
+    pjsip_msg *msg;
+    pjsip_msg_body *body;
+
+    msg = rdata->msg_info.msg;
+    body = msg->body;
+    
+    pjmedia_sdp_parse( rdata->tp_info.pool, (char*)body->data, body->len, &sdp );
+
+    *r_sdp = sdp;
+
+}
+
 
 /********************** Callbacks Implementation **********************************/
 
@@ -298,12 +320,12 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
 
 static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
 
-
     pj_status_t status;
     pj_str_t reason;
     unsigned options = 0;
     pjsip_dialog* dialog;
     pjsip_tx_data *tdata;
+    pjmedia_sdp_session *r_sdp;
 
     /* Respond statelessly any non-INVITE requests with 500 */
     if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
@@ -317,28 +339,27 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     status = pjsip_inv_verify_request( rdata, &options, NULL, NULL, endpt, NULL );
     if( status != PJ_SUCCESS ){
         reason = pj_str((char*)" user agent unable to handle this INVITE ");
-        pjsip_endpt_respond_stateless( endpt, rdata, 500, &reason, NULL, NULL );
+        pjsip_endpt_respond_stateless( endpt, rdata, 405, &reason, NULL, NULL );
         return PJ_TRUE;
     }
-    /* Have to do some stuff here with the SDP */
+    // Have to do some stuff here with the SDP
+    // We retrieve the remote sdp offer in the rdata struct to begin the negociation
+    getRemoteSDPFromOffer( rdata, &r_sdp );
+    local_sdp->receivingInitialOffer( rdata->tp_info.pool, r_sdp );
 
     /* Create the local dialog (UAS) */
     pj_str_t contact = pj_str((char*) "<sip:test@127.0.0.1:5060>");
     //status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, &contact, &dialog );
-    status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL, &dialog );
+    status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL , &dialog );
     if( status != PJ_SUCCESS ) {
         pjsip_endpt_respond_stateless( endpt, rdata, 500, &reason, NULL, NULL );
         return PJ_TRUE;
     }
 
-    /* Take care of the SDP session */
-    //local_sdp->createLocalOffer( rdata->tp_info.pool );
-    // TODO SDP negociation
-    //local_sdp->receivingInitialOffer( rdata->tp_info.pool, );
 
     //status = pjsip_inv_create_uas( dialog, rdata, NULL, 0, &inv_session );
     // But should be:
-    status = pjsip_inv_create_uas( dialog, rdata, local_sdp->getSDPSession(), 0, &inv_session );
+    status = pjsip_inv_create_uas( dialog, rdata, local_sdp->getLocalSDPSession() , 0, &inv_session );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     /* Send a 180/Ringing response */
@@ -379,5 +400,6 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
     printf("Invite session received new offer from peer - %s\n", offer->name.ptr);
 }
+
 
 
