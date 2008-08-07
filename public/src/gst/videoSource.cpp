@@ -107,8 +107,7 @@ void VideoFileSource::sub_init()
 
     pipeline_.add(decoder_);
 
-    const char *filename = "inputVid.avi";
-    g_object_set(G_OBJECT(source_), "location", filename, NULL);
+    g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
     assert(gst_element_link(source_, decoder_));
 
     // bind callback

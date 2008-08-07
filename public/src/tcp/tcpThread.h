@@ -17,11 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <glib.h>
-#include <iostream>
 #include "gutil/baseThread.h"
 #include "gutil/baseMessage.h"
-#include "logWriter.h"
 
 
 typedef QueuePair_<BaseMessage> QueuePair;
