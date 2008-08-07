@@ -352,7 +352,7 @@ void VideoTestSuite::start_file()
 {
     if (id_ == 1)
         return;
-    VideoConfig config("filesrc");
+    VideoConfig config("filesrc", "inputVid.avi");
     VideoSender tx(config);
     tx.init();
 
@@ -367,7 +367,7 @@ void VideoTestSuite::stop_file()
 {
     if (id_ == 1)
         return;
-    VideoConfig config("filesrc");
+    VideoConfig config("filesrc", "inputVid.avi");
     VideoSender tx(config);
     tx.init();
 
@@ -382,7 +382,7 @@ void VideoTestSuite::start_stop_file()
 {
     if (id_ == 1)
         return;
-    VideoConfig config("filesrc");
+    VideoConfig config("filesrc", "inputVid.avi");
     VideoSender tx(config);
     tx.init();
 
@@ -410,7 +410,7 @@ void VideoTestSuite::start_file_rtp()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        VideoConfig config("filesrc", "h264", get_host_ip(), V_PORT);
+        VideoConfig config("filesrc", "inputVid.avi", "h264", get_host_ip(), V_PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -435,7 +435,7 @@ void VideoTestSuite::stop_file_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("filesrc", "h264", get_host_ip(), V_PORT);
+        VideoConfig config("filesrc", "inputVid.avi", "h264", get_host_ip(), V_PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -463,7 +463,7 @@ void VideoTestSuite::start_stop_file_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("filesrc", "h264", get_host_ip(), V_PORT);
+        VideoConfig config("filesrc", "inputVid.avi", "h264", get_host_ip(), V_PORT);
         VideoSender tx(config);
         tx.init();
 

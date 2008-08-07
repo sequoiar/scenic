@@ -24,6 +24,7 @@
 
 #include <string>
 #include <iostream>
+#include "logWriter.h"
 #include "videoConfig.h"
 #include "videoSource.h"
 
@@ -31,7 +32,19 @@
 // for sender (remote)
 VideoConfig::VideoConfig(const std::string &source, const std::string &codec,
     const std::string &remoteHost, int port)
-    : MediaConfig(source, codec, remoteHost, port)
+    : MediaConfig(source, codec, remoteHost, port), location_("")
+{
+    // empty
+}
+
+
+// for sender (remote)
+VideoConfig::VideoConfig(const std::string &source, 
+        const std::string &location, 
+        const std::string &codec,
+        const std::string &remoteHost, 
+        int port)
+: MediaConfig(source, codec, remoteHost, port), location_(location)
 {
     // empty
 }
@@ -39,7 +52,15 @@ VideoConfig::VideoConfig(const std::string &source, const std::string &codec,
 
 // for sender (local)
 VideoConfig::VideoConfig(const std::string &source)
-    : MediaConfig(source)
+    : MediaConfig(source), location_("")
+{
+    // empty
+}
+
+
+// for sender (local)
+VideoConfig::VideoConfig(const std::string &source, const std::string &location)
+    : MediaConfig(source), location_(location)
 {
     // empty
 }
@@ -47,7 +68,7 @@ VideoConfig::VideoConfig(const std::string &source)
 
 // for receiver
 VideoConfig::VideoConfig(const std::string &codec, int port)
-    : MediaConfig(codec, port)
+    : MediaConfig(codec, port), location_("")
 {
     // empty
 }
@@ -57,16 +78,27 @@ VideoSource * VideoConfig::createSource() const
 {
     if (source_ == "videotestsrc")
         return new VideoTestSource(*this);
-    else if (source_ == "filesrc")
-        return new VideoFileSource(*this);
     else if (source_ == "v4l2src")
         return new VideoV4lSource(*this);
     else if (source_ == "dv1394src")
         return new VideoDvSource(*this);
+    else if (source_ == "filesrc")
+        return new VideoFileSource(*this);
     else {
-        std::cerr << "Invalid source!" << std::endl;
+        LOG("Invalid source!", ERROR); 
         return 0;
     }
 }
 
+
+const char* VideoConfig::location() const 
+{ 
+    if (!location_.empty()) 
+        return location_.c_str(); 
+    else 
+    {
+        LOG("No location specified", ERROR); 
+        return "";
+    }
+}
 
