@@ -46,9 +46,9 @@ class OscMessage
         OscMessage(const OscMessage& in);
         OscMessage& operator=(const OscMessage& in);
 
-        const char* path() { return path_.c_str(); }
+        std::string path() { return path_; }
         bool pathIsSet() { return !path_.empty(); }
-        bool pathEquals(const char *str) { return path_ == str; }
+        bool pathEquals(std::string str) { return path_ == str; }
 
         lo_message *init_msg(lo_message *msg);
         void print();
@@ -60,14 +60,10 @@ class OscMessage
         class LoArg
         {
             public:
-                LoArg(const char *pchar, int index, lo_arg * a);
-
+                LoArg(std::string pchar, int index, lo_arg * a);
                 void print() const;
-
                 bool equals(std::string str);
-
                 bool equals(int val);
-
                 lo_type type_;
                 int i_;
                 std::string s_;
