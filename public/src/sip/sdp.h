@@ -20,7 +20,7 @@
 #ifndef _SDP_H
 #define _SDP_H
 
-#include <list>
+#include <vector>
 #include <pjmedia/sdp.h>
 #include <pjmedia/sdp_neg.h>
 #include <pj/pool.h>
@@ -45,21 +45,31 @@ class Sdp
 		void setVideoPort( int vport ) { _videoPort = vport; }
 		int getAudioPort( void ) { return _audioPort; }
 		int getVideoPort( void ) { return _videoPort; }
-		std::list<sdpCodec> getAudiocodecsList( void ) { return _audiocodecs; }
-		std::list<sdpCodec> getVideocodecList( void ) { return _videocodecs; }
-        pjmedia_sdp_session* getSDPSession( void ) { return _sdpSession; }
-        void setSDPSession( pj_pool_t *pool );
+		std::vector<sdpCodec*> getAudioCodecsList( void ) { return _audiocodecs; }
+		std::vector<sdpCodec*> getVideoCodecList( void ) { return _videocodecs; }
+        void setCodecsList( void );
+        void displayCodecsList( void );
+        pjmedia_sdp_session* getSDPSession( void ) { return _local_offer; }
+        void createLocalOffer( pj_pool_t *pool );
+        void toString( void );
+        pjmedia_sdp_media* getMediaDescriptorLine( pj_pool_t* pool );
+        void createInitialOffer( pj_pool_t* pool );
+        void receivingInitialOffer( pj_pool_t* pool, pjmedia_sdp_session* remote );
+
 
 	private:
 		std::string _sdpBody;
 		int _audioPort, _videoPort;
-		std::list<sdpCodec> _audiocodecs;
-		std::list<sdpCodec> _videocodecs;
-        pjmedia_sdp_session *_sdpSession;
+		std::vector<sdpCodec*> _audiocodecs;
+		std::vector<sdpCodec*> _videocodecs;
+        pjmedia_sdp_session *_local_offer;
+        pjmedia_sdp_neg *negociator;
 
         Sdp(const Sdp&); //No Copy Constructor
         Sdp& operator=(const Sdp&); //No Assignment Operator
 
+        bool audioMedia(){ return _audiocodecs.size() != 0; } 
+        bool videoMedia(){ return _videocodecs.size() != 0; }
 };
 
 #endif // _SDP_H

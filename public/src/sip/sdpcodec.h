@@ -26,12 +26,18 @@ class sdpCodec
 {
     public:
     sdpCodec();
-	sdpCodec( std::string type, std::string name );
+	sdpCodec( std::string type, std::string name, int payload );
 	~sdpCodec();
+
+    std::string getType( void ){ return _m_type; }
+    std::string getName( void ){ return _name; }
+    int getPayload( void ){ return _payload; }
+
 
     private:
 	std::string _name;
-	//int _payload;
+    std::string _m_type;
+	int _payload;
 	//int _frequency;
 };
 

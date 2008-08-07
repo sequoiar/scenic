@@ -40,52 +40,54 @@
 class UserAgent
 {
     public:
-/*
- * Create a new UserAgent object
- * @param	name	The application name
- */
+        /*
+         * Create a new UserAgent object
+         * @param	name	The application name
+         */
         UserAgent( std::string name, int port );
 
-/*
- * Class destructor
- */
+        /*
+         * Class destructor
+         */
         ~UserAgent();
 
-/*
- * Initialize all the mandatory data structures from the PJSIP library
- *
- * @param port	The port on which the user agent will listen
- *
- * @return int	PJ_SUCCESS on success
- */
+        /*
+         * Initialize all the mandatory data structures from the PJSIP library
+         *
+         * @param port	The port on which the user agent will listen
+         *
+         * @return int	PJ_SUCCESS on success
+         */
         int init_pjsip_modules( );
 
-/*
- * Create an invite session. Handle the related incoming responses
- *
- * @param	uri	The SIP address to create connection with
- * @param	port		The remote SIP port
- *
- * @return  int	PJ_SUCCESS on success
- */
+        /*
+         * Create an invite session. Handle the related incoming responses
+         *
+         * @param	uri	The SIP address to create connection with
+         * @param	port		The remote SIP port
+         *
+         * @return  int	PJ_SUCCESS on success
+         */
         int create_invite_session( std::string uri, int port );
 
         pj_str_t build_contact_uri( std::string user, int port );
 
         void listen( void );
 
+        void buildSDP( void );
+
     private:
-/* The module name */
+        /* The module name */
         std::string _name;
 
-/* The local IP address */
+        /* The local IP address */
         std::string _localIP;
 
         int _lport;
 
-/*
- * Initialize the pjsip_module structure
- */
+        /*
+         * Initialize the pjsip_module structure
+         */
         void init_sip_module( void );
 };
 

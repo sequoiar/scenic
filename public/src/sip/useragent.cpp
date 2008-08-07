@@ -211,12 +211,11 @@ int UserAgent::init_pjsip_modules(  ){
     return 1;
 }
 
-
 int UserAgent::create_invite_session( std::string uri, int port ){
     pjsip_dialog *dialog;
     pjsip_tx_data *tdata;
     pj_status_t status;
-    std::string local = "\"Test\" <sip:test@192.168.1.204:7777>";
+    std::string local = "\"Test\" <sip:test@192.168.1.230:7777>";
 
     pj_str_t target = pj_str( (char*)uri.c_str() );
     pj_str_t from = pj_str( (char*) local.c_str() );
@@ -231,6 +230,10 @@ int UserAgent::create_invite_session( std::string uri, int port ){
                                    &to,
                                    &dialog );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+
+    //TODO Create the local SDP offer
+    local_sdp->createLocalOffer( dialog->pool );
+     
 
     status = pjsip_inv_create_uac( dialog, NULL, 0, &inv_session );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
@@ -277,6 +280,13 @@ pj_str_t UserAgent::build_contact_uri( std::string user, int port ){
     return pj_str(uri);
 }
 
+void UserAgent::buildSDP( void ) {
+
+    printf(" Build SDP body\n");
+    local_sdp->displayCodecsList();
+    //local_sdp->toStringTest();
+    
+}
 
 /********************** Callbacks Implementation **********************************/
 
@@ -287,18 +297,19 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
 
 
 static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
+
+
     pj_status_t status;
     pj_str_t reason;
     unsigned options = 0;
     pjsip_dialog* dialog;
     pjsip_tx_data *tdata;
 
-
     /* Respond statelessly any non-INVITE requests with 500 */
     if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
         if( rdata->msg_info.msg->line.req.method.id != PJSIP_ACK_METHOD ) {
             reason = pj_str((char*)" user agent unable to handle this request ");
-            pjsip_endpt_respond_stateless( endpt, rdata, 200, &reason, NULL, NULL );
+            pjsip_endpt_respond_stateless( endpt, rdata, 500, &reason, NULL, NULL );
             return PJ_TRUE;
         }
     }
@@ -306,35 +317,39 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     status = pjsip_inv_verify_request( rdata, &options, NULL, NULL, endpt, NULL );
     if( status != PJ_SUCCESS ){
         reason = pj_str((char*)" user agent unable to handle this INVITE ");
-        pjsip_endpt_respond_stateless( endpt, rdata, 200, &reason, NULL, NULL );
+        pjsip_endpt_respond_stateless( endpt, rdata, 500, &reason, NULL, NULL );
         return PJ_TRUE;
     }
     /* Have to do some stuff here with the SDP */
 
     /* Create the local dialog (UAS) */
-    pj_str_t contact = pj_str((char*) "<sip:toto@192.168.1.204:5060>");
-    status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, &contact, &dialog );
+    pj_str_t contact = pj_str((char*) "<sip:test@127.0.0.1:5060>");
+    //status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, &contact, &dialog );
+    status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL, &dialog );
     if( status != PJ_SUCCESS ) {
-        pjsip_endpt_respond_stateless( endpt, rdata, 200, &reason, NULL, NULL );
+        pjsip_endpt_respond_stateless( endpt, rdata, 500, &reason, NULL, NULL );
         return PJ_TRUE;
     }
 
     /* Take care of the SDP session */
-    local_sdp->setSDPSession( rdata->tp_info.pool );
+    //local_sdp->createLocalOffer( rdata->tp_info.pool );
+    // TODO SDP negociation
+    //local_sdp->receivingInitialOffer( rdata->tp_info.pool, );
 
     //status = pjsip_inv_create_uas( dialog, rdata, NULL, 0, &inv_session );
     // But should be:
     status = pjsip_inv_create_uas( dialog, rdata, local_sdp->getSDPSession(), 0, &inv_session );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    /* Send a 180(OK) response */
+    /* Send a 180/Ringing response */
     status = pjsip_inv_initial_answer( inv_session, rdata, 180, NULL, NULL, &tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
+    status = pjsip_inv_send_msg( inv_session, tdata );
+    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+    
     /* Create and send a 200 response */
     status = pjsip_inv_answer( inv_session, 200, NULL, NULL, &tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
     status = pjsip_inv_send_msg( inv_session, tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
