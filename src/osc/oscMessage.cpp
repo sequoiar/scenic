@@ -125,7 +125,7 @@ bool OscMessage::LoArg::equals(int val)
 }
 
 
-OscMessage::LoArg::LoArg(const char *pchar, int index, lo_arg * a)
+OscMessage::LoArg::LoArg(std::string pchar, int index, lo_arg * a)
     : type_(static_cast<lo_type>(pchar[index])), i_(0), s_()
 {
     switch (static_cast<char>(type_))
