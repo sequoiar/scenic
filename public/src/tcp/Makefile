@@ -47,7 +47,8 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 libtcp_a_AR = $(AR) $(ARFLAGS)
 libtcp_a_LIBADD =
-am_libtcp_a_OBJECTS = libtcp_a-tcpThread.$(OBJEXT)
+am_libtcp_a_OBJECTS = libtcp_a-tcp.$(OBJEXT) \
+	libtcp_a-tcpThread.$(OBJEXT)
 libtcp_a_OBJECTS = $(am_libtcp_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -75,13 +76,13 @@ DIST_SOURCES = $(libtcp_a_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} /home/tristan/devel/miville/trunk/public/missing --run aclocal-1.10
+ACLOCAL = ${SHELL} /home/koya/devel/miville/trunk/public/missing --run aclocal-1.10
 ALL_GST_LIBS = -pthread -L/usr/local/lib -lgstreamer-0.10 -lgobject-2.0 -lgmodule-2.0 -ldl -lgthread-2.0 -lrt -lxml2 -lglib-2.0   -pthread -L/usr/local/lib -lgstaudio-0.10 -lgstbase-0.10 -lgstinterfaces-0.10 -lgstreamer-0.10 -lgobject-2.0 -lgmodule-2.0 -ldl -lgthread-2.0 -lrt -lxml2 -lglib-2.0  
-AMTAR = ${SHELL} /home/tristan/devel/miville/trunk/public/missing --run tar
+AMTAR = ${SHELL} /home/koya/devel/miville/trunk/public/missing --run tar
 AR = ar
-AUTOCONF = ${SHELL} /home/tristan/devel/miville/trunk/public/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/tristan/devel/miville/trunk/public/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/tristan/devel/miville/trunk/public/missing --run automake-1.10
+AUTOCONF = ${SHELL} /home/koya/devel/miville/trunk/public/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/koya/devel/miville/trunk/public/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/koya/devel/miville/trunk/public/missing --run automake-1.10
 AWK = mawk
 BOOST_PYTHON_LIB = boost_python
 CC = gcc
@@ -119,8 +120,8 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-JACK_CFLAGS = -I/usr/local/include  
-JACK_LIBS = -L/usr/local/lib -ljack -lpthread -lrt  
+JACK_CFLAGS =  
+JACK_LIBS = -ljack -lpthread -lrt  
 LDFLAGS = 
 LIBLO_CFLAGS = -I/usr/local/include  
 LIBLO_LIBS = -L/usr/local/lib -llo -lpthread  
@@ -129,7 +130,7 @@ LIBS =
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/tristan/devel/miville/trunk/public/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/koya/devel/miville/trunk/public/missing --run makeinfo
 MKDIR_P = /bin/mkdir -p
 NMEDIT = 
 OBJEXT = o
@@ -154,10 +155,10 @@ STRIP = strip
 UUID_CFLAGS = 
 UUID_LIBS = 
 VERSION = 0.01 
-abs_builddir = /home/tristan/devel/miville/trunk/public/src/tcp
-abs_srcdir = /home/tristan/devel/miville/trunk/public/src/tcp
-abs_top_builddir = /home/tristan/devel/miville/trunk/public
-abs_top_srcdir = /home/tristan/devel/miville/trunk/public
+abs_builddir = /home/koya/devel/miville/trunk/public/src/tcp
+abs_srcdir = /home/koya/devel/miville/trunk/public/src/tcp
+abs_top_builddir = /home/koya/devel/miville/trunk/public
+abs_top_srcdir = /home/koya/devel/miville/trunk/public
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 ac_ct_F77 = gfortran
@@ -186,7 +187,7 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = $(SHELL) /home/tristan/devel/miville/trunk/public/install-sh
+install_sh = $(SHELL) /home/koya/devel/miville/trunk/public/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -209,7 +210,7 @@ src = $(top_srcdir)/src
 INCLUDES = -I$(src)/include -I$(src) -I..
 AM_CPPFLAGS = $(GLIB_CFLAGS) -O0 -g -Werror -Wall -Weffc++ -Wfatal-errors
 noinst_LIBRARIES = libtcp.a
-libtcp_a_SOURCES = tcpThread.cpp tcpThread.h
+libtcp_a_SOURCES = tcp.cpp tcpThread.cpp tcpThread.h
 libtcp_a_CPPFLAGS = $(AM_CPPFLAGS) 
 all: all-am
 
@@ -258,6 +259,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+include ./$(DEPDIR)/libtcp_a-tcp.Po
 include ./$(DEPDIR)/libtcp_a-tcpThread.Po
 
 .cpp.o:
@@ -280,6 +282,20 @@ include ./$(DEPDIR)/libtcp_a-tcpThread.Po
 #	source='$<' object='$@' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(LTCXXCOMPILE) -c -o $@ $<
+
+libtcp_a-tcp.o: tcp.cpp
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libtcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libtcp_a-tcp.o -MD -MP -MF $(DEPDIR)/libtcp_a-tcp.Tpo -c -o libtcp_a-tcp.o `test -f 'tcp.cpp' || echo '$(srcdir)/'`tcp.cpp
+	mv -f $(DEPDIR)/libtcp_a-tcp.Tpo $(DEPDIR)/libtcp_a-tcp.Po
+#	source='tcp.cpp' object='libtcp_a-tcp.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libtcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libtcp_a-tcp.o `test -f 'tcp.cpp' || echo '$(srcdir)/'`tcp.cpp
+
+libtcp_a-tcp.obj: tcp.cpp
+	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libtcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libtcp_a-tcp.obj -MD -MP -MF $(DEPDIR)/libtcp_a-tcp.Tpo -c -o libtcp_a-tcp.obj `if test -f 'tcp.cpp'; then $(CYGPATH_W) 'tcp.cpp'; else $(CYGPATH_W) '$(srcdir)/tcp.cpp'; fi`
+	mv -f $(DEPDIR)/libtcp_a-tcp.Tpo $(DEPDIR)/libtcp_a-tcp.Po
+#	source='tcp.cpp' object='libtcp_a-tcp.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
+#	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libtcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libtcp_a-tcp.obj `if test -f 'tcp.cpp'; then $(CYGPATH_W) 'tcp.cpp'; else $(CYGPATH_W) '$(srcdir)/tcp.cpp'; fi`
 
 libtcp_a-tcpThread.o: tcpThread.cpp
 	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libtcp_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libtcp_a-tcpThread.o -MD -MP -MF $(DEPDIR)/libtcp_a-tcpThread.Tpo -c -o libtcp_a-tcpThread.o `test -f 'tcpThread.cpp' || echo '$(srcdir)/'`tcpThread.cpp
