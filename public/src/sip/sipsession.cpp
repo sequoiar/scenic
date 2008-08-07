@@ -21,7 +21,6 @@
 
 SIPSession::SIPSession( int port )
     : Session( SIP, port ), _app_ua( new UserAgent( _APP_NAME, port ) ){
-    //_app_ua =  new UserAgent( _APP_NAME, port );
     _app_ua->init_pjsip_modules( );
 }
 

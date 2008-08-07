@@ -19,10 +19,40 @@
 
 #include "sdpcodec.h"
 
-sdpCodec::sdpCodec() : _name(""), _m_type("audio"), _payload(-1)
-{}
+sdpCodec::sdpCodec( std::string name ) : _name(name), _m_type(""), _payload(-1), _frequency(-1), _channels(-1)
+{
+    // A codec is identified by its string name, as described in RFC 3551
 
-sdpCodec::sdpCodec( std::string type, std::string name, int payload ): 
-	_name(name), _m_type( type ), _payload( payload ) {}
+    if( name.compare( "PCMU" ) ){
+        _m_type = MIME_TYPE_AUDIO;
+        _payload = RTP_PAYLOAD_ULAW;
+        _frequency = 8000;
+        _channels = 1;
+    }
+    else if ( name.compare( "GSM ") ){
+        _m_type = MIME_TYPE_AUDIO;
+        _payload = RTP_PAYLOAD_GSM;
+        _frequency = 8000;
+        _channels = 1;
+    }
+    else if ( name.compare( "PCMA ") ){
+        _m_type = MIME_TYPE_AUDIO;
+        _payload = RTP_PAYLOAD_ALAW;
+        _frequency = 8000;
+        _channels = 1;
+    }
+    
+}
+
+sdpCodec::sdpCodec( std::string type, std::string name, int payload, int ch ): 
+	_name(name), _m_type( type ), _payload( payload ), _frequency(-1), _channels(ch) {}
 
 sdpCodec::~sdpCodec(){}
+
+std::string sdpCodec::getPayloadStr() {
+    
+    std::ostringstream ret;
+    ret << getPayload();
+    return ret.str();
+
+}
