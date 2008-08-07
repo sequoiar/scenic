@@ -88,7 +88,7 @@ bool VideoReceiver::stop()
 
 void VideoReceiver::stop_sender() const
 {
-    LOG("Telling sender to stop...");
+    LOG("Telling sender to stop...", DEBUG);
 
     lo_address t = lo_address_new(NULL, "8880");
     if (lo_send(t, "/video/tx/stop", NULL) == -1)

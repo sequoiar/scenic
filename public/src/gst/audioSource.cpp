@@ -169,12 +169,12 @@ void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
 {
     if (gst_pad_is_linked(srcPad))
     {
-        LOG("Pad is already linked.")
+        LOG("Pad is already linked.", DEBUG)
         return;
     }
     else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
     {
-        LOG("Pad is not a source");
+        LOG("Pad is not a source", DEBUG);
         return;
     }
     GstElement *sinkElement = static_cast<GstElement*>(data);

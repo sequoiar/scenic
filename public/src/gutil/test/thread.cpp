@@ -52,7 +52,7 @@ int Thread::main()
     while(1)
     {
         BaseMessage f = queue_.timed_pop(1);
-        LOG(" here ");
+        LOG(" here ", DEBUG);
         if(count++ == max_count) {
             BaseMessage f(BaseMessage::QUIT);
             queue_.push(f);

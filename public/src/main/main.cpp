@@ -95,7 +95,7 @@ bool MainModule::run()
         {
             BaseMessage in(BaseMessage::QUIT);
             gst_queue.push(in);
-            LOG("in quit!");
+            LOG("in quit!", DEBUG);
             osc_queue.push(OscMessage("/quit", "", 0, 0, 0));
             break;
         }
