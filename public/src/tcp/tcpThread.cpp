@@ -17,31 +17,46 @@
  * Boston, MA 02111-1307, USA.
  */
 #include "tcpThread.h"
-
+#include "tcpServer.h"
 
 int TcpThread::main()
 {
     bool quit = false;
+    std::string msg;
 
+    if(!serv_.socket_bind_listen())
+        return -1;
     while(!quit)
     {
-        BaseMessage f = queue_.timed_pop(10000);
-        switch(f.get_type())
+        usleep(10000);
+        if(!serv_.accept())
+            continue;
+
+		while(serv_.connected())
         {
-            case BaseMessage::QUIT:
+            if((quit = gotQuit()))
             {
-                BaseMessage f(BaseMessage::QUIT);
-                queue_.push(f);
-                quit = true;
                 break;
             }
-            default:
-                break;
+            if(serv_.read(msg))
+                queue_.push(BaseMessage(BaseMessage::STD, msg));
+            else
+                usleep(10000);
         }
     }
-
-
     return 0;
+}
+
+
+bool TcpThread::gotQuit()
+{
+    BaseMessage f = queue_.timed_pop(1);
+    if (f.get_type() == BaseMessage::QUIT)
+    {
+        queue_.push(f);
+        return true;
+    }
+    return false;
 }
 
 

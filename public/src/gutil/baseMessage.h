@@ -39,21 +39,24 @@
 class BaseMessage
 {
     public:
-        enum type { ERROR = -2, UNDEFINED = -1, ZERO = 0, OK = '=', QUIT = 'Q', INIT = 'I',
-                    START = 'S',
-                    STOP = '!', SYSTEM = '*', PING = '.', STRING = 's'};
+        enum type { ERROR = -2, UNDEFINED = -1, ZERO = 0, STD = 'm', OK = '=', QUIT = 'Q',
+                    INIT = 'I',
+                    START = 'S', STOP = '!', SYSTEM = '*', PING = '.', STRING = 's'};
 
         BaseMessage(unsigned short i)
-            : t_(static_cast<unsigned char>(i)){}
+            : t_(static_cast<unsigned char>(i)),msg_(){}
 
         BaseMessage(char i)
-            : t_(i){}
+            : t_(i), msg_(){}
+
+        BaseMessage(type t, std::string msg)
+            : t_(t), msg_(msg){}
 
         BaseMessage(type t)
-            : t_(t){}
+            : t_(t), msg_(){}
 
         BaseMessage()
-            : t_(0){}
+            : t_(0), msg_(){}
 
         int get_int(){
             return static_cast<int>(t_);
@@ -70,8 +73,12 @@ class BaseMessage
         }
 
 
+        std::string getMsg(){return msg_;}
+
     private:
         unsigned char t_;
+
+        std::string msg_;
 };
 
 

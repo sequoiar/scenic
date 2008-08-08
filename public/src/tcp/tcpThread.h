@@ -19,7 +19,7 @@
 
 #include "gutil/baseThread.h"
 #include "gutil/baseMessage.h"
-
+#include "tcpServer.h"
 
 typedef QueuePair_<BaseMessage> QueuePair;
 class TcpThread
@@ -27,11 +27,14 @@ class TcpThread
 {
     public:
         TcpThread(int inport)
-            : port_(inport){}
+            : serv_(inport){}
         ~TcpThread(){}
+        bool send(std::string& msg){ return serv_.send(msg);}
     private:
-        int port_;
         int main();
+		bool gotQuit();
+		
+        TcpServer serv_;
 
         TcpThread(const TcpThread&); //No Copy Constructor
         TcpThread& operator=(const TcpThread&); //No Assignment Operator
