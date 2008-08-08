@@ -32,7 +32,7 @@
 
 #if BLOCKING
 #define BLOCK() std::cout.flush();                              \
-    std::cout << __FILE__ << ":" << __LINE__        \
+    std::cout << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__        \
               << ": blocking, enter any key." << std::endl;   \
     std::cin.get()
 #else

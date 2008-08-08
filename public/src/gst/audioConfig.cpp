@@ -27,29 +27,49 @@
 #include <iostream>
 #include "audioConfig.h"
 #include "audioSource.h"
+#include "logWriter.h"
 
 AudioConfig::AudioConfig(const std::string &source,
     int numChannels,
     const std::string &codec,
     const std::string &remoteHost,
     int port)
-    : MediaConfig(source, codec, remoteHost, port), numChannels_(numChannels)
+    : MediaConfig(source, codec, remoteHost, port), numChannels_(numChannels), location_("")
 {
-    // empty
+    // rtp sender
+}
+
+
+AudioConfig::AudioConfig(const std::string &source,
+    const std::string &location,
+    int numChannels,
+    const std::string &codec,
+    const std::string &remoteHost,
+    int port)
+    : MediaConfig(source, codec, remoteHost, port), numChannels_(numChannels), location_(location)
+{
+    // rtp file sender
 }
 
 
 AudioConfig::AudioConfig(const std::string & source, int numChannels)
-    : MediaConfig(source), numChannels_(numChannels)
+    : MediaConfig(source), numChannels_(numChannels), location_("")
 {
-    // empty
+    // local sender
+}
+
+
+AudioConfig::AudioConfig(const std::string & source, const std::string & location, int numChannels)
+    : MediaConfig(source), numChannels_(numChannels), location_(location)
+{
+    // local file sender 
 }
 
 
 AudioConfig::AudioConfig(int numChannels, const std::string &codec, int port)
-    : MediaConfig(codec, port), numChannels_(numChannels)
+    : MediaConfig(codec, port), numChannels_(numChannels), location_("")
 {
-    // empty
+    // receiver 
 }
 
 
@@ -63,6 +83,17 @@ const char *AudioConfig::source() const
         return source_.substr(0, pos).c_str();
     else
         return MediaConfig::source();
+}
+
+
+const char* AudioConfig::location() const
+{
+    if (!location_.empty())
+        return location_.c_str();
+    else{
+        LOG("No location specified", ERROR);
+        return NULL;
+    }
 }
 
 

@@ -40,17 +40,28 @@ class AudioConfig
         const std::string & codec,
         const std::string & remoteHost,
         int port);                                                          // sender
+        
+        AudioConfig(const std::string & source,
+        const std::string & location,
+        int numChannels,
+        const std::string & codec,
+        const std::string & remoteHost,
+        int port);                                                          // sender
 
         AudioConfig(int numChannels, const std::string & codec, int port);  // receiver
         AudioConfig(const std::string & source, int numChannels);   // local sender
+        AudioConfig(const std::string & source, const std::string & location, int numChannels);   // local sender
 
         const char *source() const;
 
+        const char* location() const;
+        
         const int numChannels() const { return numChannels_; };
         AudioSource* createSource() const;
 
     protected:
         const int numChannels_;
+        const std::string location_;
 };
 
 #endif // _AUDIO_CONFIG_H_
