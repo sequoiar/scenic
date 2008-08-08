@@ -56,6 +56,7 @@ class VideoConfig
         const char* location() const;
 
         const bool has_h264() const { return codec_ == "h264"; }
+
     private:
         const std::string location_;
 };
