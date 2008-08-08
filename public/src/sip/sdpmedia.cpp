@@ -19,10 +19,13 @@
 
 #include "sdpmedia.h"
 
-sdpMedia::sdpMedia( int type ) : _type( type ), _codecList(0), _t_port( 0 ){}
+sdpMedia::sdpMedia( int type )
+    : _type( type ), _codecList(0), _t_port( 0 ){}
 
 sdpMedia::~sdpMedia(){}
 
 void sdpMedia::addCodec( sdpCodec *codec ){
     _codecList.push_back(codec);
 }
+
+

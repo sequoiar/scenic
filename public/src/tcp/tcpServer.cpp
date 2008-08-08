@@ -72,7 +72,7 @@ bool TcpServer::recv(std::string& out)
     n = ::read(newsockfd, buffer_, BUFFSIZE);
 
     if (n < 0 || buffer_[0] == 0)
-        return false;                               //error("ERROR reading from socket");
+        return false; //error("ERROR reading from socket");
     printf("Here is the message: %s\n", buffer_);
     return true;
 }
@@ -83,7 +83,7 @@ bool TcpServer::send(const std::string& in)
     int n=0;
     n = ::write(newsockfd, "I got your message\n", 19);
     if (n < 0)
-        return false;            //error("ERROR writing to socket");
+        return false; //error("ERROR writing to socket");
     return true;
 }
 
