@@ -24,8 +24,8 @@
 #include <sstream>
 #include <map>
 
-#define MIME_TYPE_AUDIO     "audio"
-#define MIME_TYPE_VIDEO     "video"
+#define MIME_TYPE_AUDIO    0 
+#define MIME_TYPE_VIDEO    1
 
 /*
  * Codecs RTP payload as defined in
@@ -38,8 +38,10 @@ typedef enum {
     RTP_PAYLOAD_GSM = 3,
 
     // media type = V - clock rate = 90000
-    RTP_PAYLOAD_H263 = 34
-} CodecRTPPayload;
+    RTP_PAYLOAD_H263 = 34,
+    RTP_PAYLOAD_H264 = 98
+
+}CodecRTPPayload;
 
 //typedef std::map< CodecRTPPayload , std::string > codecRTPMap;
 
@@ -47,15 +49,15 @@ class sdpCodec
 {
     public:
         sdpCodec( std::string name );
-        sdpCodec( std::string type, std::string name, int payload, int ch );
+        sdpCodec( int type, std::string name, int payload, int ch, int clockrate );
         ~sdpCodec();
 
         /*
          * Read accessor. Return the type of the media
          * audio / video
          */
-        std::string getType( void ){ return _m_type; }
-
+        int getType( void ){ return _m_type; }
+        
         /*
          * Read accessor. Return the name of the codec
          */
@@ -72,6 +74,11 @@ class sdpCodec
         std::string getPayloadStr( void );
 
         /*
+         * Read accessor. Return the codec's clock rate
+         */
+        int getClockrate( void ){ return _clockrate; } 
+
+        /*
          * Tells whether or not the RTp payload is static.
          *
          * @return bool     True if the payload is inferior to 96
@@ -84,13 +91,13 @@ class sdpCodec
         std::string _name;
 
         /* The media type */
-        std::string _m_type;
-
+        int _m_type;
+        
         /* The RTP paylaod */
         int _payload;
 
         /* The codec clock rate */
-        int _frequency;
+        int _clockrate;
 
         /* The number of channels */
         int _channels;

@@ -89,8 +89,6 @@ class UserAgent
          * Initialize the pjsip_module structure
          */
         void init_sip_module( void );
-
-        void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp );
 };
 
 #endif // _USER_AGENT_H
