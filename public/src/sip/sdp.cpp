@@ -107,7 +107,9 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
             rtpmap.pt = med->desc.fmt[i];
             rtpmap.enc_name = pj_str( (char*) codec->getName().c_str() );
             rtpmap.clock_rate = codec->getClockrate();
-            rtpmap.param.slen = 0;
+            // Add the channel number only if different from 1
+            if( codec->getChannels() > 1 )  rtpmap.param = pj_str( (char*) codec->getChannelsStr().c_str() );
+            else                            rtpmap.param.slen = 0;
 
             pjmedia_sdp_rtpmap_to_attr( pool, &rtpmap, &attr );
             med->attr[ med->attr_count++] = attr;
