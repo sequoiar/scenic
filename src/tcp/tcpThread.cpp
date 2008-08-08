@@ -38,7 +38,7 @@ int TcpThread::main()
             {
                 break;
             }
-            if(serv_.read(msg))
+            if(serv_.recv(msg))
                 queue_.push(BaseMessage(BaseMessage::STD, msg));
             else
                 usleep(10000);
