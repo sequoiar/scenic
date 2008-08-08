@@ -44,7 +44,7 @@ class BaseMessage
                     START = 'S', STOP = '!', SYSTEM = '*', PING = '.', STRING = 's'};
 
         BaseMessage(unsigned short i)
-            : t_(static_cast<unsigned char>(i)),msg_(){}
+            : t_(static_cast<unsigned char>(i)), msg_(){}
 
         BaseMessage(char i)
             : t_(i), msg_(){}

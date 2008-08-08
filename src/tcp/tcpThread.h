@@ -32,8 +32,8 @@ class TcpThread
         bool send(std::string& msg){ return serv_.send(msg);}
     private:
         int main();
-		bool gotQuit();
-		
+        bool gotQuit();
+
         TcpServer serv_;
 
         TcpThread(const TcpThread&); //No Copy Constructor
