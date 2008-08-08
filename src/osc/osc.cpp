@@ -80,7 +80,7 @@ int OscThread::main()
         OscMessage msg = queue_.timed_pop(10000);
 
         if (msg.pathIsSet()) {
-            if(msg.path().compare(0,5,"/quit"))
+            if(msg.path().compare(0, 5, "/quit"))
                 return 0;
             else
                 send(msg);

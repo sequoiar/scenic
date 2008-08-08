@@ -118,7 +118,7 @@ bool BaseThread < T >::run()
 template < class T >
 void *BaseThread < T >::thread_main(void *v)
 {
-    // FIXME: this is unbelievably ugly. what's v? 
+    // FIXME: this is unbelievably ugly. what's v?
     return reinterpret_cast<void *>(static_cast < BaseThread * >(v)->main());
 }
 

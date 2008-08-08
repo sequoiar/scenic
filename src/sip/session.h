@@ -39,7 +39,8 @@ class Session
          * @param type	The protocol type. As for now, only SIP (Session Initiation Protocol) is available
          * @param port	The local protocol listening port.
          */
-        Session( int type, int port ) : _protocol( type ), _port( port )
+        Session( int type, int port )
+            : _protocol( type ), _port( port )
         {
             // nothing else
         }

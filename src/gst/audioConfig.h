@@ -45,6 +45,7 @@ class AudioConfig
         AudioConfig(const std::string & source, int numChannels);   // local sender
 
         const char *source() const;
+
         const int numChannels() const { return numChannels_; };
         AudioSource* createSource() const;
 

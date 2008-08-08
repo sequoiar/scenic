@@ -26,10 +26,11 @@ class TcpThread
     : public BaseThread<BaseMessage>
 {
     public:
-        TcpThread(int inport):port_(inport){}
+        TcpThread(int inport)
+            : port_(inport){}
         ~TcpThread(){}
     private:
-		int port_;
+        int port_;
         int main();
 
         TcpThread(const TcpThread&); //No Copy Constructor

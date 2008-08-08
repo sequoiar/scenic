@@ -32,7 +32,7 @@
 #include <time.h>
 #include <sstream>
 
-enum LogLevel { 
+enum LogLevel {
     DEBUG = 10,
     INFO = 20,
     WARNING = 30,
@@ -42,13 +42,12 @@ enum LogLevel {
 
 #define LOG_LEVEL DEBUG
 
-#if LOG_LEVEL 
+#if LOG_LEVEL
 #define LOG(msg, level)                                                              \
     log(msg, level, __FILE__, __LINE__);
 #else
 #define LOG(msg, level)
 #endif
-
 
 
 static bool logLevelIsValid(LogLevel level)
@@ -78,22 +77,25 @@ static bool logLevelMatch(LogLevel level)
 }
 
 
-static void log(const std::string &msg, LogLevel level, const std::string &fileName, const int lineNum)
+static void log(const std::string &msg, LogLevel level, const std::string &fileName,
+                const int lineNum)
 {
     if (logLevelMatch(level))
     {
-        time_t rawtime;                                                         
-        struct tm * timeinfo;                                                   
+        time_t rawtime;
+        struct tm * timeinfo;
 
-        time( &rawtime );                                                      
-        timeinfo = localtime(&rawtime);                                     
+        time( &rawtime );
+        timeinfo = localtime(&rawtime);
         std::ostringstream logMsg;
-        logMsg << std::endl << fileName << ":" << lineNum << ": " << msg << " " << asctime(timeinfo) 
-            << std::endl;
+        logMsg << std::endl << fileName << ":" << lineNum << ": " << msg << " " << asctime(
+            timeinfo)
+               << std::endl;
 
         // FIXME: send message to Core
         std::cerr << logMsg.str();
     }
 }
+
 
 #endif //  _LOG_WRITER_H_
