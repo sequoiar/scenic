@@ -28,20 +28,25 @@
     switch( type ) {
         case MIME_TYPE_AUDIO:
             _m_type = MIME_TYPE_AUDIO;
-            if( name.compare( CODEC_STR_ULAW ) ){
+            if( name == CODEC_STR_ULAW ) {
                 _payload = RTP_PAYLOAD_ULAW;
             }
-            else if ( name.compare( CODEC_STR_GSM ) ){
+            else if ( name == CODEC_STR_GSM ) {
                 _payload = RTP_PAYLOAD_GSM;
             }
-            else if ( name.compare( CODEC_STR_ALAW) ){
+            else if ( name == CODEC_STR_ALAW) {
                 _payload = RTP_PAYLOAD_ALAW;
             }
-            else if ( name.compare( CODEC_STR_ILBC) ){
+            else if ( name == CODEC_STR_ILBC) {
                 _payload = RTP_PAYLOAD_ILBC;
             }
-            else if ( name.compare( CODEC_STR_SPEEX) ){
+            else if ( name == CODEC_STR_SPEEX) {
                 _payload = RTP_PAYLOAD_SPEEX;
+            }
+            else if ( name == CODEC_STR_VORBIS) {
+                _payload = RTP_PAYLOAD_VORBIS;
+                _clockrate = 48000;
+                _channels = 8;
             }
             else{
                 // unsupported audio codec
@@ -50,11 +55,13 @@
 
         case MIME_TYPE_VIDEO:
             _m_type = MIME_TYPE_VIDEO;
-            if( name.compare( CODEC_STR_H263 ) ){
+            if( name == CODEC_STR_H263 ){
                 _payload = RTP_PAYLOAD_H263;
+                _clockrate = 90000;
             }
-            else if( name.compare( CODEC_STR_H264 ) ){
+            else if( name == CODEC_STR_H264 ) {
                 _payload = RTP_PAYLOAD_H264;
+                _clockrate = 90000;
             }
             else{
                 // unsupported video codec
@@ -79,4 +86,9 @@ sdpCodec::sdpCodec( int type, std::string name, int payload, int ch, int clockra
         return ret.str();
     }
 
+std::string sdpCodec::getChannelsStr() {
+    std::ostringstream ret;
+    ret << getChannels();
+    return ret.str();
+}
 

@@ -38,6 +38,7 @@ typedef enum {
     RTP_PAYLOAD_GSM = 3,
     RTP_PAYLOAD_ILBC = 101,
     RTP_PAYLOAD_SPEEX = 102,
+    RTP_PAYLOAD_VORBIS = 103,
 
     // media type = V - clock rate = 90000
     RTP_PAYLOAD_H263 = 34,
@@ -54,6 +55,7 @@ typedef enum {
 #define CODEC_STR_G729A     "G729"
 #define CODEC_STR_SPEEX     "speex"
 #define CODEC_STR_ILBC      "iLBC"
+#define CODEC_STR_VORBIS    "vorbis"
 #define CODEC_STR_JPEG      "JPEG"
 #define CODEC_STR_PNG       "PNG"
 #define CODEC_STR_H263      "H263"
@@ -92,6 +94,12 @@ class sdpCodec
          * Read accessor. Return the codec's clock rate
          */
         int getClockrate( void ){ return _clockrate; }
+
+        /*
+         * Read accessor. Return the codec's channel number
+         */
+        int getChannels( void ){ return _channels; }
+        std::string getChannelsStr( void );
 
         /*
          * Tells whether or not the RTp payload is static.
