@@ -76,6 +76,7 @@ class UserAgent
 
         void buildSDP( void );
 
+        void addMediaToSession( int mime_type, std::string codecs );
     private:
         /* The module name */
         std::string _name;

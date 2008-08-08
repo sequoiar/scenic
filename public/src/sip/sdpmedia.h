@@ -32,15 +32,15 @@ class sdpMedia
 
         std::vector<sdpCodec*> getMediaCodecList() { return _codecList; }
         int getType() { return _type; }
-        int getPort() { return _t_port; }
-        void setPort( int port ) { _t_port = port; }
+        int getPort() { return _port; }
+        void setPort( int port ) { _port = port; }
 
         void addCodec( sdpCodec* codec );
 
     private:
         int _type;
         std::vector< sdpCodec* > _codecList;
-        int _t_port;
+        int _port;
 };
 
 #endif // _SDP_MEDIA

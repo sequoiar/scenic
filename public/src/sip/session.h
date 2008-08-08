@@ -74,6 +74,8 @@ class Session
 
         virtual void startMainloop() = 0;
 
+        virtual void addMedia( int mime_type, std::string codecs ) = 0;
+
         int getSessionPort( void ){ return _port; }
 
     private:

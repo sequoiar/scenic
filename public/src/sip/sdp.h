@@ -114,6 +114,8 @@ class Sdp
         int createInitialOffer( pj_pool_t* pool );
         int receivingInitialOffer( pj_pool_t* pool, pjmedia_sdp_session* remote );
 
+        void addMediaToSDP( int mime_type, std::string codecs );
+
     private:
         int _audioPort, _videoPort;
         std::vector<sdpMedia*> _sdpMediaList;
@@ -124,7 +126,7 @@ class Sdp
         Sdp(const Sdp&); //No Copy Constructor
         Sdp& operator=(const Sdp&); //No Assignment Operator
 
-        void addMedia( sdpMedia *media );
+        void addMedia( sdpMedia *media, int port );
 
         std::string getMediaPayloadList( std::string type );
 

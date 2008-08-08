@@ -70,6 +70,8 @@ class SIPSession
 
         void startMainloop();
 
+        void addMedia( int mime_type, std::string codecs );
+
     private:
 
         /* The application SIP User Agent */

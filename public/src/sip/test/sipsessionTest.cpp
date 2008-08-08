@@ -18,7 +18,12 @@
 void initiateSessionTest( int argc, char** argv ) {
     if( argc == 1 )
         return;
+
     Session* sip = new SIPSession(std::atoi(argv[1]));
+    // A way to add media to the session
+    sip->addMedia( MIME_TYPE_AUDIO, "GSM");
+    sip->addMedia( MIME_TYPE_VIDEO, "H264");
+    
     if( argc <= 2 ){
         // Listening mode
         sip->startMainloop();

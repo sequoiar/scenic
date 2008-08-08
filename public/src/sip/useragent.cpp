@@ -291,6 +291,9 @@ void UserAgent::buildSDP( void ) {
     //local_sdp->toStringTest();
 }
 
+void UserAgent::addMediaToSession( int mime_type, std::string codecs ){
+    local_sdp->addMediaToSDP( mime_type, codecs );    
+}
 
 static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
     pjmedia_sdp_session *sdp;
