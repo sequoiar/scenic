@@ -511,7 +511,7 @@ void AudioTestSuite::start_8ch_comp_audiofile()
 
     if (id_ == 1)
         return;
-    AudioConfig config("filesrc", numChannels);
+    AudioConfig config("filesrc", "test_signal8.wav", numChannels);
     AudioSender tx(config);
     tx.init();
 
@@ -527,7 +527,7 @@ void AudioTestSuite::stop_8ch_comp_audiofile()
     int numChannels = 8;
     if (id_ == 1)
         return;
-    AudioConfig config("filesrc", numChannels);
+    AudioConfig config("filesrc", "test_signal8.wav", numChannels);
     AudioSender tx(config);
     tx.init();
 
@@ -543,7 +543,7 @@ void AudioTestSuite::start_stop_8ch_comp_audiofile()
     int numChannels = 8;
     if (id_ == 1)
         return;
-    AudioConfig config("filesrc", numChannels);
+    AudioConfig config("filesrc", "test_signal8.wav", numChannels);
     AudioSender tx(config);
     TEST_ASSERT(tx.init());
 
@@ -572,7 +572,7 @@ void AudioTestSuite::start_8ch_comp_rtp_audiofile()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        AudioConfig config("filesrc", numChannels, "vorbisenc", get_host_ip(), A_PORT);
+        AudioConfig config("filesrc", "test_signal8.wav", numChannels, "vorbisenc", get_host_ip(), A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -598,7 +598,7 @@ void AudioTestSuite::stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("filesrc", numChannels, "vorbisenc", get_host_ip(), A_PORT);
+        AudioConfig config("filesrc", "test_signal8.wav", numChannels, "vorbisenc", get_host_ip(), A_PORT);
         AudioSender tx(config);
         tx.init();
 
@@ -627,7 +627,7 @@ void AudioTestSuite::start_stop_8ch_comp_rtp_audiofile()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("filesrc", numChannels, "vorbisenc", get_host_ip(), A_PORT);
+        AudioConfig config("filesrc", "test_signal8.wav", numChannels, "vorbisenc", get_host_ip(), A_PORT);
         AudioSender tx(config);
         TEST_ASSERT(tx.init());
 

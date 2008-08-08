@@ -137,7 +137,7 @@ void AudioFileSource::init_source()
     // just make one multichannel filesrc
     sources_.push_back(gst_element_factory_make(config_.source(), NULL));
     assert(sources_[0]);
-    g_object_set(G_OBJECT(sources_[0]), "location", "test_signal8.wav", NULL);
+    g_object_set(G_OBJECT(sources_[0]), "location", config_.location(), NULL);
 
     aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
     assert(aconvs_[0]);

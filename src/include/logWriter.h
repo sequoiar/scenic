@@ -32,6 +32,15 @@
 #include <time.h>
 #include <sstream>
 
+#define ENABLE_LOG 1
+
+#if ENABLE_LOG
+#define LOG(msg, level)                                                              \
+    log(msg, level, __FILE__, __FUNCTION__, __LINE__);
+#else
+#define LOG(msg, level)
+#endif
+
 enum LogLevel {
     DEBUG = 10,
     INFO = 20,
@@ -40,15 +49,7 @@ enum LogLevel {
     CRITICAL = 50
 };
 
-#define LOG_LEVEL DEBUG
-
-#if LOG_LEVEL
-#define LOG(msg, level)                                                              \
-    log(msg, level, __FILE__, __LINE__);
-#else
-#define LOG(msg, level)
-#endif
-
+static const LogLevel LOG_LEVEL = DEBUG;
 
 static bool logLevelIsValid(LogLevel level)
 {
@@ -77,7 +78,9 @@ static bool logLevelMatch(LogLevel level)
 }
 
 
-static void log(const std::string &msg, LogLevel level, const std::string &fileName,
+static void log(const std::string &msg, LogLevel level, 
+                const std::string &fileName,
+                const std::string &functionName,
                 const int lineNum)
 {
     if (logLevelMatch(level))
@@ -88,9 +91,8 @@ static void log(const std::string &msg, LogLevel level, const std::string &fileN
         time( &rawtime );
         timeinfo = localtime(&rawtime);
         std::ostringstream logMsg;
-        logMsg << std::endl << fileName << ":" << lineNum << ": " << msg << " " << asctime(
-            timeinfo)
-               << std::endl;
+        logMsg << std::endl << fileName << ":" << functionName << ":" << lineNum << ": " << msg << " " 
+            << asctime(timeinfo) << std::endl;
 
         // FIXME: send message to Core
         std::cerr << logMsg.str();
