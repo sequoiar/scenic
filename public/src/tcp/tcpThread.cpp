@@ -31,8 +31,7 @@ int TcpThread::main()
         usleep(10000);
         if(!serv_.accept())
             continue;
-
-		while(serv_.connected())
+        while(serv_.connected())
         {
             if((quit = gotQuit()))
             {
