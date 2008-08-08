@@ -227,10 +227,7 @@ int UserAgent::create_invite_session( std::string uri, int port ){
 
     pj_str_t target = pj_str( (char*)uri.c_str() );
     pj_str_t from = pj_str( (char*) local.c_str() );
-    //pj_str_t from = build_contact_uri( "test", port );
-    //printf("contact uri: %s", from.ptr);
     pj_str_t to = pj_str( (char*)uri.c_str() );
-    //pj_str_t contact = from;
 
     status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
                                    &from,
@@ -239,7 +236,7 @@ int UserAgent::create_invite_session( std::string uri, int port ){
                                    &dialog );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    //TODO Create the local SDP offer
+    // Building the local SDP offer
     local_sdp->createInitialOffer( dialog->pool );
 
     status = pjsip_inv_create_uac( dialog, local_sdp->getLocalSDPSession(), 0, &inv_session );
@@ -347,25 +344,23 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
 
     /* Create the local dialog (UAS) */
     pj_str_t contact = pj_str((char*) "<sip:test@127.0.0.1:5060>");
-    //status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, &contact, &dialog );
-    status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL, &dialog );
+    status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL , &dialog );
     if( status != PJ_SUCCESS ) {
         pjsip_endpt_respond_stateless( endpt, rdata, 500, &reason, NULL, NULL );
         return PJ_TRUE;
     }
-    //status = pjsip_inv_create_uas( dialog, rdata, NULL, 0, &inv_session );
-    // But should be:
-    status = pjsip_inv_create_uas( dialog, rdata,
-                                   local_sdp->getLocalSDPSession(), 0, &inv_session );
+
+    // Specify media capability during invite session creation 
+    status = pjsip_inv_create_uas( dialog, rdata, local_sdp->getLocalSDPSession() , 0, &inv_session );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    /* Send a 180/Ringing response */
+    // Send a 180/Ringing response
     status = pjsip_inv_initial_answer( inv_session, rdata, 180, NULL, NULL, &tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
     status = pjsip_inv_send_msg( inv_session, tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    /* Create and send a 200 response */
+    //Create and send a 200 response
     status = pjsip_inv_answer( inv_session, 200, NULL, NULL, &tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
     status = pjsip_inv_send_msg( inv_session, tdata );
@@ -390,12 +385,30 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
 
 
 static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
-    printf("SDP negociation done!\n");
+    
+    // We need to get the final media choice and send it to gstreamer 
+    // Maybe we want to start the data streaming now...
+
+    const pjmedia_sdp_session *r_sdp;
+    pjmedia_sdp_media *media;
+    int c_count;
+
+    // Get local and remote SDP
+    pjmedia_sdp_neg_get_active_remote( inv->neg, &r_sdp );
+     
+    // Retrieve the codecs
+    media = r_sdp->media[0];
+    c_count = media->desc.fmt_count;
+    //printf("Codec count: %i\n" , c_count);
+    //printf("Codec payload: %s\n" , media->desc.fmt[c_count-1].ptr);
+
 }
 
 
 static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
+
     printf("Invite session received new offer from peer - %s\n", offer->name.ptr);
+
 }
 
 

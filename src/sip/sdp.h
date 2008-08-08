@@ -27,6 +27,10 @@
 #include <pj/assert.h>
 
 #include "sdpcodec.h"
+#include "sdpmedia.h"
+
+#define AUDIO_OR_VIDEO  1
+#define AUDIO_AND_VIDEO 2
 
 class Sdp
 {
@@ -47,21 +51,7 @@ class Sdp
         ~Sdp();
 
         /*
-         * Add an audio codec to the list of supported codecs
-         *
-         * @param codec A pointer on the audio codec to add
-         */
-        void addAudioCodec( sdpCodec* codec );
-
-        /*
-         * Add a video codec to the list of supported codecs
-         *
-         * @param codec A pointer on the video codec to add
-         */
-        void addVideoCodec( sdpCodec* codec );
-
-        /*
-         * Write accessor. Modify the audio port to use for RTP transport
+        * Write accessor. Modify the audio port to use for RTP transport
          *
          * @param aport     the new audio port
          */
@@ -89,19 +79,12 @@ class Sdp
         int getVideoPort( void ) { return _videoPort; }
 
         /*
-         * Read accessor. Get the list of supported audio codecs
+         * Read accessor. Get the list of media
          *
          * @return std::vector<sdpCodec*>   the vector containing the audio codecs
          */
-        std::vector<sdpCodec*> getAudioCodecsList( void ) { return _audiocodecs; }
-
-        /*
-         * Read accessor. Get the list of supported video codecs
-         *
-         * @return std::vector<sdpCodec*>   the vector containing the video codecs
-         */
-        std::vector<sdpCodec*> getVideoCodecList( void ) { return _videocodecs; }
-
+       std::vector<sdpMedia*> getSDPMediaList( void ) { return _sdpMediaList; }
+        
         /*
          * The place to add the codecs in the list
          * Temporary - used for tests
@@ -126,26 +109,21 @@ class Sdp
          * A method to display the SDP body
          */
         void toString( void );
-
-        //pjmedia_sdp_media* getMediaDescriptorLine( pj_pool_t* pool );
-        void getMediaDescriptorLine( pj_pool_t* pool, pjmedia_sdp_media** p_med );
+        void getMediaDescriptorLine( sdpMedia* media,  pj_pool_t* pool, pjmedia_sdp_media** p_med );
         int createInitialOffer( pj_pool_t* pool );
         int receivingInitialOffer( pj_pool_t* pool, pjmedia_sdp_session* remote );
 
-
-    private:
-        int _audioPort, _videoPort;
+	private:
+		int _audioPort, _videoPort;
+        std::vector<sdpMedia*> _sdpMediaList;
         std::string _ip_addr;
-        std::vector<sdpCodec*> _audiocodecs;
-        std::vector<sdpCodec*> _videocodecs;
         pjmedia_sdp_session *_local_offer;
         pjmedia_sdp_neg *negociator;
 
         Sdp(const Sdp&); //No Copy Constructor
         Sdp& operator=(const Sdp&); //No Assignment Operator
 
-        bool audioMedia(){ return _audiocodecs.size() != 0; }
-        bool videoMedia(){ return _videocodecs.size() != 0; }
+        void addMedia( sdpMedia *media );
 
         std::string getMediaPayloadList( std::string type );
 

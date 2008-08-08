@@ -14,11 +14,6 @@
  *
  */
 
-sdpCodec* addCodecToSDPTest( void ) {
-    sdpCodec* gsm = new sdpCodec( "audio", "GSM", 3, 1 );
-    return gsm;
-}
-
 
 void initiateSessionTest( int argc, char** argv ) {
     if( argc == 1 )

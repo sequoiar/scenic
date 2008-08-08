@@ -21,7 +21,7 @@
 
 #include <pjlib.h>
 #include <sstream>
-#include <iostream>
+//#include <iostream>
 
 static const pj_str_t STR_AUDIO = { (char*)"audio", 5};
 static const pj_str_t STR_VIDEO = { (char*)"video", 5};
@@ -32,17 +32,15 @@ static const pj_str_t STR_RTP_AVP = { (char*)"RTP/AVP", 7 };
 static const pj_str_t STR_SDP_NAME = { (char*)"miville", 7 };
 static const pj_str_t STR_SENDRECV = { (char*)"sendrecv", 8 };
 
-Sdp::Sdp( )
-    : _audioPort(-1), _videoPort(0), _ip_addr( "" ), _audiocodecs(0), _videocodecs(0),
-    _local_offer( NULL), negociator(NULL)
+Sdp::Sdp( ) : 
+    _audioPort(-1), _videoPort(0), _sdpMediaList( 0 ), _ip_addr( "" ), _local_offer( NULL), negociator(NULL)
 {
     setCodecsList();
 }
 
 
-Sdp::Sdp( std::string ip_addr, int aport, int vport )
-    : _audioPort( aport ), _videoPort( vport ), _ip_addr( ip_addr ), _audiocodecs(0),
-    _videocodecs(0), _local_offer( NULL ), negociator(NULL)
+Sdp::Sdp( std::string ip_addr, int aport, int vport ): 
+    _audioPort( aport ), _videoPort( vport ), _sdpMediaList(0), _ip_addr( ip_addr ), _local_offer( NULL ), negociator(NULL)
 {
     setCodecsList();
 }
@@ -50,71 +48,103 @@ Sdp::Sdp( std::string ip_addr, int aport, int vport )
 
 Sdp::~Sdp(){}
 
-void Sdp::addAudioCodec( sdpCodec* codec ){
-    this->_audiocodecs.push_back( codec );
+void Sdp::addMedia( sdpMedia *media ){
+    _sdpMediaList.push_back( media );
 }
-
-
-void Sdp::addVideoCodec( sdpCodec* codec ){}
 
 void Sdp::setCodecsList( void ) {
-    sdpCodec *gsm = new sdpCodec(MIME_TYPE_AUDIO, "GSM", 3, 1);
-    addAudioCodec( gsm );
 
-    sdpCodec *ulaw = new sdpCodec(MIME_TYPE_AUDIO, "PCMU", 0, 1);
-    addAudioCodec( ulaw );
+    sdpMedia *audio = new sdpMedia( MIME_TYPE_AUDIO );
+    sdpCodec *gsm = new sdpCodec(MIME_TYPE_AUDIO, "GSM", RTP_PAYLOAD_GSM, 1, 8000);
+    audio->addCodec(gsm);
+    sdpCodec *ulaw = new sdpCodec(MIME_TYPE_AUDIO, "PCMU", RTP_PAYLOAD_ULAW, 1, 8000);
+    audio->addCodec(ulaw);
+
+    sdpMedia *video = new sdpMedia( MIME_TYPE_VIDEO );
+    sdpCodec *h264 = new sdpCodec(MIME_TYPE_VIDEO, "H264", RTP_PAYLOAD_H264, 0, 90000);
+    video->addCodec(h264);
+
+    addMedia( audio );
+    addMedia( video );
+
 }
 
+void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool, pjmedia_sdp_media** p_med ) {
 
-std::string Sdp::getMediaPayloadList( std::string type ) {
-    std::ostringstream list;
-    int size;
-    int i=0;
-    std::vector<sdpCodec*> codecs;
-
-    if( type == MIME_TYPE_AUDIO ) {
-        codecs = getAudioCodecsList();
-        size = codecs.size();
-        for(i=0; i<size; i++){
-            list << codecs[i]->getPayload() << " " ;
-        }
-    }
-    list << std::endl;
-
-    return list.str();
-}
-
-
-void Sdp::getMediaDescriptorLine( pj_pool_t *pool, pjmedia_sdp_media** p_med ) {
     pjmedia_sdp_media* med;
+    pjmedia_sdp_rtpmap rtpmap;
+    pjmedia_sdp_attr *attr;
+    int count, i;
+    sdpCodec *codec;
+
     med = PJ_POOL_ZALLOC_T( pool, pjmedia_sdp_media );
-    int count;
-    //int i;
-    // TODO Get the right media format
-    if( audioMedia() ){
-        // m=audio
+    // Get the right media format
+    if( media->getType() == MIME_TYPE_AUDIO ){
+
         pj_strdup(pool, &med->desc.media, &STR_AUDIO);
-        // Audio port
         med->desc.port_count = 1;
         med->desc.port = getAudioPort();
-        // RTP/AVP
         pj_strdup (pool, &med->desc.transport, &STR_RTP_AVP);
 
-        // Media format ( RTP payload )
-        count = getAudioCodecsList().size();
+        // Media format ( RTP payload ) 
+        count = media->getMediaCodecList().size();
         med->desc.fmt_count = count;
-        // add the payload list
-        //for(i=0;i<count;i++){
-        // med->desc.fmt[i] = pj_str( (char*) getAudioCodecsList()[i]->getPayloadStr().c_str());
-        //}
-        med->desc.fmt[0] = pj_str( (char*)"0" );
-        med->desc.fmt[1] = pj_str( (char*)"3" );
 
-        // no attributes (rtpmap, fmt , ...)
-        med->attr_count = 0;
+        // add the payload list
+        for(i=0;i<count;i++){
+               
+            codec = media->getMediaCodecList()[i];
+            pj_strdup2( pool, &med->desc.fmt[i], codec->getPayloadStr().c_str());
+
+            // Add a rtpmap field for dynamic payload
+            if( !codec->isPayloadStatic() ) {
+                
+                rtpmap.pt = med->desc.fmt[i];
+                rtpmap.enc_name = pj_str( (char*) codec->getName().c_str() );
+                rtpmap.clock_rate = codec->getClockrate();
+                rtpmap.param.slen = 0;
+
+                pjmedia_sdp_rtpmap_to_attr( pool, &rtpmap, &attr ); 
+                med->attr[ med->attr_count++] = attr;   
+            
+            }
+        }
     }
+
     // Then the video media
-    if( videoMedia() ){}
+    else if( media->getType() == MIME_TYPE_VIDEO ){
+
+        pj_strdup(pool, &med->desc.media, &STR_VIDEO);
+        med->desc.port_count = 1;
+        med->desc.port = getVideoPort();
+        pj_strdup (pool, &med->desc.transport, &STR_RTP_AVP);
+
+        // Media format ( RTP payload ) 
+        count = media->getMediaCodecList().size();
+        med->desc.fmt_count = count;
+
+        // add the payload list
+        for(i=0;i<count;i++){
+
+            codec = media->getMediaCodecList()[i];
+            pj_strdup2( pool, &med->desc.fmt[i], codec->getPayloadStr().c_str());
+            
+            if( !codec->isPayloadStatic() ) {
+                rtpmap.pt = med->desc.fmt[i];
+                rtpmap.enc_name = pj_str( (char*) codec->getName().c_str() );
+                rtpmap.clock_rate = codec->getClockrate();
+                rtpmap.param.slen = 0;
+
+                pjmedia_sdp_rtpmap_to_attr( pool, &rtpmap, &attr ); 
+                med->attr[ med->attr_count++] = attr;   
+            }
+        }
+    }
+
+    else {
+        // Media non supported
+    }
+
     *p_med = med;
 }
 
@@ -152,7 +182,6 @@ int Sdp::createInitialOffer( pj_pool_t* pool ){
     // Create the SDP negociator instance with local offer
     status = pjmedia_sdp_neg_create_w_local_offer( pool, getLocalSDPSession(), &negociator);
     state = pjmedia_sdp_neg_get_state( negociator );
-    printf( " STATE = %s\n", pjmedia_sdp_neg_state_str( state ) );
 
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
@@ -162,11 +191,15 @@ int Sdp::createInitialOffer( pj_pool_t* pool ){
 
 
 int Sdp::receivingInitialOffer( pj_pool_t* pool, pjmedia_sdp_session* remote ){
+    
     // Create the SDP negociator instance by calling
     // pjmedia_sdp_neg_create_w_remote_offer with the remote offer, and by providing the local offer ( optional )
 
     pj_status_t status;
     pjmedia_sdp_neg_state state;
+
+    // Create the SDP negociator instance by calling 
+    // pjmedia_sdp_neg_create_w_remote_offer with the remote offer, and by providing the local offer ( optional )
 
     // Build the local offer to respond
     createLocalOffer( pool );
@@ -174,7 +207,6 @@ int Sdp::receivingInitialOffer( pj_pool_t* pool, pjmedia_sdp_session* remote ){
     status = pjmedia_sdp_neg_create_w_remote_offer( pool,
                                                     getLocalSDPSession(), remote, &negociator );
     state = pjmedia_sdp_neg_get_state( negociator );
-    printf( " STATE = %s\n", pjmedia_sdp_neg_state_str( state ) );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     return PJ_SUCCESS;
@@ -213,11 +245,9 @@ void Sdp::sdp_addConnectionInfo( void ){
     this->_local_offer->conn->addr = _local_offer->origin.addr;
 }
 
-
 void Sdp::sdp_addTiming( void ){
     this->_local_offer->time.start = this->_local_offer->time.stop = 0;
 }
-
 
 void Sdp::sdp_addAttributes( pj_pool_t *pool ){
     pjmedia_sdp_attr *a;
@@ -227,16 +257,26 @@ void Sdp::sdp_addAttributes( pj_pool_t *pool ){
     _local_offer->attr[0] = a;
 }
 
-
 void Sdp::sdp_addMediaDescription( pj_pool_t* pool ){
-    pjmedia_sdp_media* med =  PJ_POOL_ZALLOC_T(pool, pjmedia_sdp_media);
-    this->_local_offer->media_count = 1;
-    getMediaDescriptorLine( pool, &med );
-    this->_local_offer->media[0] = med;
+
+    pjmedia_sdp_media* med;
+    int nbMedia, i;
+
+    med = PJ_POOL_ZALLOC_T(pool, pjmedia_sdp_media);
+    nbMedia = getSDPMediaList().size(); 
+    this->_local_offer->media_count = nbMedia;
+        
+    for( i=0; i<nbMedia; i++ ){
+        
+        getMediaDescriptorLine( getSDPMediaList()[i], pool, &med );
+        this->_local_offer->media[i] = med;
+    
+    }
 }
 
 
 void Sdp::toString(){
+/*
     std::ostringstream body;
     using std::cout; using std::endl;
     unsigned int i;
@@ -257,10 +297,13 @@ void Sdp::toString(){
     for( i=0; i<sdp->media[0]->desc.fmt_count; i++ ){
         printf(" %i nvlSJvbJSKLBV = %s\n", sdp->media[0]->desc.fmt_count,
                sdp->media[0]->desc.fmt[i].ptr);
+    body << "m=" << sdp->media[0]->desc.media.ptr << " " << getAudioPort() << " " << sdp->media[0]->desc.transport.ptr << " ";
+    for( i=0;i<sdp->media[0]->desc.fmt_count;i++ ){
         body << sdp->media[0]->desc.fmt[i].ptr << " ";
     }
 
     cout << body.str() << endl;
+*/
 }
 
 
