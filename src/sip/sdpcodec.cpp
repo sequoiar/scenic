@@ -19,7 +19,8 @@
 
 #include "sdpcodec.h"
 
-sdpCodec::sdpCodec( std::string name ) : _name(name), _m_type(-1), _payload(-1), _clockrate(-1), _channels(-1)
+sdpCodec::sdpCodec( std::string name )
+    : _name(name), _m_type(-1), _payload(-1), _clockrate(-1), _channels(-1)
 {
     // A codec is identified by its string name, as described in RFC 3551
 
@@ -43,8 +44,10 @@ sdpCodec::sdpCodec( std::string name ) : _name(name), _m_type(-1), _payload(-1),
     }
 }
 
-sdpCodec::sdpCodec( int type, std::string name, int payload, int ch, int clockrate ): 
-	_name(name), _m_type( type ), _payload( payload ), _clockrate(clockrate), _channels(ch) {}
+
+sdpCodec::sdpCodec( int type, std::string name, int payload, int ch, int clockrate )
+    : _name(name), _m_type( type ), _payload( payload ), _clockrate(clockrate),
+    _channels(ch) {}
 
 sdpCodec::~sdpCodec(){}
 

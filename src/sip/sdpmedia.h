@@ -24,8 +24,8 @@
 
 #include <vector>
 
-class sdpMedia {
-
+class sdpMedia
+{
     public:
         sdpMedia( int type );
         ~sdpMedia();
@@ -41,7 +41,6 @@ class sdpMedia {
         int _type;
         std::vector< sdpCodec* > _codecList;
         int _t_port;
-
 };
 
 #endif // _SDP_MEDIA

@@ -24,7 +24,7 @@
 #include <sstream>
 #include <map>
 
-#define MIME_TYPE_AUDIO    0 
+#define MIME_TYPE_AUDIO    0
 #define MIME_TYPE_VIDEO    1
 
 /*
@@ -40,8 +40,7 @@ typedef enum {
     // media type = V - clock rate = 90000
     RTP_PAYLOAD_H263 = 34,
     RTP_PAYLOAD_H264 = 98
-
-}CodecRTPPayload;
+} CodecRTPPayload;
 
 //typedef std::map< CodecRTPPayload , std::string > codecRTPMap;
 
@@ -57,7 +56,7 @@ class sdpCodec
          * audio / video
          */
         int getType( void ){ return _m_type; }
-        
+
         /*
          * Read accessor. Return the name of the codec
          */
@@ -76,7 +75,7 @@ class sdpCodec
         /*
          * Read accessor. Return the codec's clock rate
          */
-        int getClockrate( void ){ return _clockrate; } 
+        int getClockrate( void ){ return _clockrate; }
 
         /*
          * Tells whether or not the RTp payload is static.
@@ -92,7 +91,7 @@ class sdpCodec
 
         /* The media type */
         int _m_type;
-        
+
         /* The RTP paylaod */
         int _payload;
 

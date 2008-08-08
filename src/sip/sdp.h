@@ -51,7 +51,7 @@ class Sdp
         ~Sdp();
 
         /*
-        * Write accessor. Modify the audio port to use for RTP transport
+         * Write accessor. Modify the audio port to use for RTP transport
          *
          * @param aport     the new audio port
          */
@@ -83,8 +83,8 @@ class Sdp
          *
          * @return std::vector<sdpCodec*>   the vector containing the audio codecs
          */
-       std::vector<sdpMedia*> getSDPMediaList( void ) { return _sdpMediaList; }
-        
+        std::vector<sdpMedia*> getSDPMediaList( void ) { return _sdpMediaList; }
+
         /*
          * The place to add the codecs in the list
          * Temporary - used for tests
@@ -109,12 +109,13 @@ class Sdp
          * A method to display the SDP body
          */
         void toString( void );
-        void getMediaDescriptorLine( sdpMedia* media,  pj_pool_t* pool, pjmedia_sdp_media** p_med );
+        void getMediaDescriptorLine( sdpMedia* media, pj_pool_t* pool,
+                                     pjmedia_sdp_media** p_med );
         int createInitialOffer( pj_pool_t* pool );
         int receivingInitialOffer( pj_pool_t* pool, pjmedia_sdp_session* remote );
 
-	private:
-		int _audioPort, _videoPort;
+    private:
+        int _audioPort, _videoPort;
         std::vector<sdpMedia*> _sdpMediaList;
         std::string _ip_addr;
         pjmedia_sdp_session *_local_offer;

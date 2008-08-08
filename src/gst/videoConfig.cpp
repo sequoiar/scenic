@@ -95,7 +95,7 @@ const char* VideoConfig::location() const
 {
     if (!location_.empty())
         return location_.c_str();
-    else{
+    else {
         LOG("No location specified", ERROR);
         return "";
     }

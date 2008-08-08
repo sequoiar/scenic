@@ -344,14 +344,14 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
 
     /* Create the local dialog (UAS) */
     pj_str_t contact = pj_str((char*) "<sip:test@127.0.0.1:5060>");
-    status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL , &dialog );
+    status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL, &dialog );
     if( status != PJ_SUCCESS ) {
         pjsip_endpt_respond_stateless( endpt, rdata, 500, &reason, NULL, NULL );
         return PJ_TRUE;
     }
-
-    // Specify media capability during invite session creation 
-    status = pjsip_inv_create_uas( dialog, rdata, local_sdp->getLocalSDPSession() , 0, &inv_session );
+    // Specify media capability during invite session creation
+    status = pjsip_inv_create_uas( dialog, rdata, local_sdp->getLocalSDPSession(
+                                       ), 0, &inv_session );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     // Send a 180/Ringing response
@@ -385,8 +385,7 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
 
 
 static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
-    
-    // We need to get the final media choice and send it to gstreamer 
+    // We need to get the final media choice and send it to gstreamer
     // Maybe we want to start the data streaming now...
 
     const pjmedia_sdp_session *r_sdp;
@@ -395,20 +394,17 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 
     // Get local and remote SDP
     pjmedia_sdp_neg_get_active_remote( inv->neg, &r_sdp );
-     
+
     // Retrieve the codecs
     media = r_sdp->media[0];
     c_count = media->desc.fmt_count;
     //printf("Codec count: %i\n" , c_count);
     //printf("Codec payload: %s\n" , media->desc.fmt[c_count-1].ptr);
-
 }
 
 
 static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
-
     printf("Invite session received new offer from peer - %s\n", offer->name.ptr);
-
 }
 
 
