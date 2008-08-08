@@ -1,7 +1,7 @@
 /* GStreamer
  * Copyright (C) 2006 Wim Taymans <wim@fluendo.com>
  *
- * gstjackaudiosink.h:
+ * gstjacksink.h:
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -33,18 +33,18 @@
 G_BEGIN_DECLS
 
 #define GST_TYPE_JACK_AUDIO_SINK             (gst_jack_audio_sink_get_type())
-#define GST_JACK_AUDIO_SINK(obj)             (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_JACK_AUDIO_SINK, GstJackAudioSink))
-#define GST_JACK_AUDIO_SINK_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_JACK_AUDIO_SINK, GstJackAudioSinkClass))
-#define GST_JACK_AUDIO_SINK_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), GST_TYPE_JACK_AUDIO_SINK, GstJackAudioSinkClass))
-#define GST_IS_JACK_AUDIO_SINK(obj)          (G_TYPE_CHECK_INSTANCE_TYPE((obj), GST_TYPE_JACK_AUDIO_SINK))
-#define GST_IS_JACK_AUDIO_SINK_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE((klass), GST_TYPE_JACK_AUDIO_SINK))
+#define GST_JACK_AUDIO_SINK(obj)             (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_JACK_AUDIO_SINK,GstJackAudioSink))
+#define GST_JACK_AUDIO_SINK_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_JACK_AUDIO_SINK,GstJackAudioSinkClass))
+#define GST_JACK_AUDIO_SINK_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj),GST_TYPE_JACK_AUDIO_SINK,GstJackAudioSinkClass))
+#define GST_IS_JACK_AUDIO_SINK(obj)          (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_JACK_AUDIO_SINK))
+#define GST_IS_JACK_AUDIO_SINK_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_JACK_AUDIO_SINK))
 
 typedef struct _GstJackAudioSink GstJackAudioSink;
 typedef struct _GstJackAudioSinkClass GstJackAudioSinkClass;
 
 /**
  * GstJackAudioSink:
- *
+ * 
  * Opaque #GstJackAudioSink.
  */
 struct _GstJackAudioSink {
@@ -55,7 +55,7 @@ struct _GstJackAudioSink {
   GstCaps         *caps;
 
   /* properties */
-  GstJackConnect connect;
+  GstJackConnect   connect;
   gchar           *server;
 
   /* our client */
@@ -63,7 +63,7 @@ struct _GstJackAudioSink {
 
   /* our ports */
   jack_port_t    **ports;
-  int port_count;
+  int              port_count;
 };
 
 struct _GstJackAudioSinkClass {

@@ -85,11 +85,11 @@ gst_jack_audio_sink_allocate_channels (GstJackAudioSink * sink, gint channels)
 
     /* port names start from 1 and are local to the element */
     name =
-      g_strdup_printf ("out_%s_%d", GST_ELEMENT_NAME (sink),
-          sink->port_count + 1);
+        g_strdup_printf ("out_%s_%d", GST_ELEMENT_NAME (sink),
+        sink->port_count + 1);
     sink->ports[sink->port_count] =
-      jack_port_register (client, name, JACK_DEFAULT_AUDIO_TYPE,
-          JackPortIsOutput, 0);
+        jack_port_register (client, name, JACK_DEFAULT_AUDIO_TYPE,
+        JackPortIsOutput, 0);
     if (sink->ports[sink->port_count] == NULL)
       return FALSE;
 
@@ -141,8 +141,8 @@ gst_jack_ring_buffer_get_type (void)
     };
 
     ringbuffer_type =
-      g_type_register_static (GST_TYPE_RING_BUFFER,
-          "GstJackAudioSinkRingBuffer", &ringbuffer_info, 0);
+        g_type_register_static (GST_TYPE_RING_BUFFER,
+        "GstJackAudioSinkRingBuffer", &ringbuffer_info, 0);
   }
   return ringbuffer_type;
 }
@@ -164,13 +164,13 @@ gst_jack_ring_buffer_class_init (GstJackRingBufferClass * klass)
   gobject_class->finalize = GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_finalize);
 
   gstringbuffer_class->open_device =
-    GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_open_device);
+      GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_open_device);
   gstringbuffer_class->close_device =
-    GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_close_device);
+      GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_close_device);
   gstringbuffer_class->acquire =
-    GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_acquire);
+      GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_acquire);
   gstringbuffer_class->release =
-    GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_release);
+      GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_release);
   gstringbuffer_class->start = GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_start);
   gstringbuffer_class->pause = GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_pause);
   gstringbuffer_class->resume = GST_DEBUG_FUNCPTR (gst_jack_ring_buffer_start);
@@ -180,7 +180,7 @@ gst_jack_ring_buffer_class_init (GstJackRingBufferClass * klass)
 }
 
 /* this is the callback of jack. This should RT-safe.
-*/
+ */
 static int
 jack_process_cb (jack_nframes_t nframes, void *arg)
 {
@@ -335,7 +335,7 @@ gst_jack_ring_buffer_finalize (GObject * object)
 }
 
 /* the _open_device method should make a connection with the server
-*/
+ */
 static gboolean
 gst_jack_ring_buffer_open_device (GstRingBuffer * buf)
 {
@@ -347,7 +347,7 @@ gst_jack_ring_buffer_open_device (GstRingBuffer * buf)
 
   GST_DEBUG_OBJECT (sink, "open");
 
-  name = g_get_application_name();
+  name = g_get_application_name ();
   if (!name)
     name = "GStreamer";
 
@@ -377,7 +377,7 @@ could_not_open:
 }
 
 /* close the connection with the server
-*/
+ */
 static gboolean
 gst_jack_ring_buffer_close_device (GstRingBuffer * buf)
 {
@@ -463,7 +463,7 @@ gst_jack_ring_buffer_acquire (GstRingBuffer * buf, GstRingBufferSpec * spec)
     if (ports == NULL) {
       /* no ports? fine then we don't do anything except for posting a warning
        * message. */
-      GST_ELEMENT_WARNING(sink, RESOURCE, NOT_FOUND, (NULL),
+      GST_ELEMENT_WARNING (sink, RESOURCE, NOT_FOUND, (NULL),
           ("No physical input ports found, leaving ports unconnected"));
       goto done;
     }
@@ -498,7 +498,7 @@ wrong_samplerate:
   {
     GST_ELEMENT_ERROR (sink, RESOURCE, SETTINGS, (NULL),
         ("Wrong samplerate, server is running at %d and we received %d",
-         sample_rate, spec->rate));
+            sample_rate, spec->rate));
     return FALSE;
   }
 out_of_ports:
@@ -517,7 +517,7 @@ cannot_connect:
   {
     GST_ELEMENT_ERROR (sink, RESOURCE, SETTINGS, (NULL),
         ("Could not connect output ports to physical ports (%d:%s)",
-         res, g_strerror (res)));
+            res, g_strerror (res)));
     free (ports);
     return FALSE;
   }
@@ -615,9 +615,9 @@ GST_STATIC_PAD_TEMPLATE ("sink",
     GST_PAD_SINK,
     GST_PAD_ALWAYS,
     GST_STATIC_CAPS ("audio/x-raw-float, "
-      "endianness = (int) { " G_STRINGIFY (G_BYTE_ORDER) " }, "
-      "width = (int) 32, "
-      "rate = (int) [ 1, MAX ], " "channels = (int) [ 1, MAX ]")
+        "endianness = (int) { " G_STRINGIFY (G_BYTE_ORDER) " }, "
+        "width = (int) 32, "
+        "rate = (int) [ 1, MAX ], " "channels = (int) [ 1, MAX ]")
     );
 
 /* AudioSink signals and args */
@@ -639,7 +639,7 @@ enum
 };
 
 #define _do_init(bla) \
-  GST_DEBUG_CATEGORY_INIT (gst_jack_audio_sink_debug, "jacksink", 0, "jacksink element");
+    GST_DEBUG_CATEGORY_INIT (gst_jack_audio_sink_debug, "jacksink", 0, "jacksink element");
 
 GST_BOILERPLATE_FULL (GstJackAudioSink, gst_jack_audio_sink, GstBaseAudioSink,
     GST_TYPE_BASE_AUDIO_SINK, _do_init);
@@ -678,24 +678,24 @@ gst_jack_audio_sink_class_init (GstJackAudioSinkClass * klass)
   gstbaseaudiosink_class = (GstBaseAudioSinkClass *) klass;
 
   gobject_class->get_property =
-    GST_DEBUG_FUNCPTR (gst_jack_audio_sink_get_property);
+      GST_DEBUG_FUNCPTR (gst_jack_audio_sink_get_property);
   gobject_class->set_property =
-    GST_DEBUG_FUNCPTR (gst_jack_audio_sink_set_property);
+      GST_DEBUG_FUNCPTR (gst_jack_audio_sink_set_property);
 
   g_object_class_install_property (gobject_class, PROP_CONNECT,
       g_param_spec_enum ("connect", "Connect",
-        "Specify how the output ports will be connected",
-        GST_TYPE_JACK_CONNECT, DEFAULT_PROP_CONNECT, G_PARAM_READWRITE));
+          "Specify how the output ports will be connected",
+          GST_TYPE_JACK_CONNECT, DEFAULT_PROP_CONNECT, G_PARAM_READWRITE));
 
   g_object_class_install_property (gobject_class, PROP_SERVER,
       g_param_spec_string ("server", "Server",
-        "The Jack server to connect to (NULL = default)",
-        DEFAULT_PROP_SERVER, G_PARAM_READWRITE));
+          "The Jack server to connect to (NULL = default)",
+          DEFAULT_PROP_SERVER, G_PARAM_READWRITE));
 
   gstbasesink_class->get_caps = GST_DEBUG_FUNCPTR (gst_jack_audio_sink_getcaps);
 
   gstbaseaudiosink_class->create_ringbuffer =
-    GST_DEBUG_FUNCPTR (gst_jack_audio_sink_create_ringbuffer);
+      GST_DEBUG_FUNCPTR (gst_jack_audio_sink_create_ringbuffer);
 
   /* ref class from a thread-safe context to work around missing bit of
    * thread-safety in GObject */
