@@ -57,4 +57,6 @@ void SIPSession::startMainloop( void ){
     _app_ua->listen();
 }
 
-
+void SIPSession::addMedia( int mime_type, std::string codecs ){
+    _app_ua->addMediaToSession( mime_type, codecs );
+}

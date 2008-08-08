@@ -36,18 +36,34 @@ typedef enum {
     RTP_PAYLOAD_ULAW = 0,
     RTP_PAYLOAD_ALAW = 8,
     RTP_PAYLOAD_GSM = 3,
+    RTP_PAYLOAD_ILBC = 101,
+    RTP_PAYLOAD_SPEEX = 102,
 
     // media type = V - clock rate = 90000
     RTP_PAYLOAD_H263 = 34,
     RTP_PAYLOAD_H264 = 98
 } CodecRTPPayload;
 
-//typedef std::map< CodecRTPPayload , std::string > codecRTPMap;
+/*
+ * Codecs encoding names
+ */
+#define CODEC_STR_ULAW      "PCMU"
+#define CODEC_STR_ALAW      "PCMA"
+#define CODEC_STR_GSM       "GSM"
+#define CODEC_STR_G726      "G726-32"
+#define CODEC_STR_G729A     "G729"
+#define CODEC_STR_SPEEX     "speex"
+#define CODEC_STR_ILBC      "iLBC"
+#define CODEC_STR_JPEG      "JPEG"
+#define CODEC_STR_PNG       "PNG"
+#define CODEC_STR_H263      "H263"
+#define CODEC_STR_H264      "H264"
+
 
 class sdpCodec
 {
     public:
-        sdpCodec( std::string name );
+        sdpCodec( int type, std::string name );
         sdpCodec( int type, std::string name, int payload, int ch, int clockrate );
         ~sdpCodec();
 

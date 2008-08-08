@@ -19,42 +19,64 @@
 
 #include "sdpcodec.h"
 
-sdpCodec::sdpCodec( std::string name )
-    : _name(name), _m_type(-1), _payload(-1), _clockrate(-1), _channels(-1)
+
+    sdpCodec::sdpCodec( int type, std::string name )
+: _name(name), _m_type(-1), _payload(-1), _clockrate(8000), _channels(1)
 {
     // A codec is identified by its string name, as described in RFC 3551
 
-    if( name.compare( "PCMU" ) ){
-        _m_type = MIME_TYPE_AUDIO;
-        _payload = RTP_PAYLOAD_ULAW;
-        _clockrate = 8000;
-        _channels = 1;
-    }
-    else if ( name.compare( "GSM ") ){
-        _m_type = MIME_TYPE_AUDIO;
-        _payload = RTP_PAYLOAD_GSM;
-        _clockrate = 8000;
-        _channels = 1;
-    }
-    else if ( name.compare( "PCMA ") ){
-        _m_type = MIME_TYPE_AUDIO;
-        _payload = RTP_PAYLOAD_ALAW;
-        _clockrate = 8000;
-        _channels = 1;
+    switch( type ) {
+        case MIME_TYPE_AUDIO:
+            _m_type = MIME_TYPE_AUDIO;
+            if( name.compare( CODEC_STR_ULAW ) ){
+                _payload = RTP_PAYLOAD_ULAW;
+            }
+            else if ( name.compare( CODEC_STR_GSM ) ){
+                _payload = RTP_PAYLOAD_GSM;
+            }
+            else if ( name.compare( CODEC_STR_ALAW) ){
+                _payload = RTP_PAYLOAD_ALAW;
+            }
+            else if ( name.compare( CODEC_STR_ILBC) ){
+                _payload = RTP_PAYLOAD_ILBC;
+            }
+            else if ( name.compare( CODEC_STR_SPEEX) ){
+                _payload = RTP_PAYLOAD_SPEEX;
+            }
+            else{
+                // unsupported audio codec
+            }
+            break;
+
+        case MIME_TYPE_VIDEO:
+            _m_type = MIME_TYPE_VIDEO;
+            if( name.compare( CODEC_STR_H263 ) ){
+                _payload = RTP_PAYLOAD_H263;
+            }
+            else if( name.compare( CODEC_STR_H264 ) ){
+                _payload = RTP_PAYLOAD_H264;
+            }
+            else{
+                // unsupported video codec
+            }
+            break;
+
+        default:
+            // unsupported media type
+            break;
     }
 }
-
 
 sdpCodec::sdpCodec( int type, std::string name, int payload, int ch, int clockrate )
     : _name(name), _m_type( type ), _payload( payload ), _clockrate(clockrate),
     _channels(ch) {}
 
-sdpCodec::~sdpCodec(){}
+    sdpCodec::~sdpCodec(){}
 
-std::string sdpCodec::getPayloadStr() {
-    std::ostringstream ret;
-    ret << getPayload();
-    return ret.str();
-}
+    std::string sdpCodec::getPayloadStr() {
+        std::ostringstream ret;
+        ret << getPayload();
+        return ret.str();
+    }
 
 

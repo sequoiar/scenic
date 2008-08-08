@@ -20,7 +20,7 @@
 #include "sdpmedia.h"
 
 sdpMedia::sdpMedia( int type )
-    : _type( type ), _codecList(0), _t_port( 0 ){}
+    : _type( type ), _codecList(0), _port( 0 ){}
 
 sdpMedia::~sdpMedia(){}
 
