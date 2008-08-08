@@ -19,9 +19,9 @@
 #include "gstThread.h"
 
 //BaseModule args get deleted in ~BaseModule
-// FIXME: sender and receiver should be in different processes, need to think about how 
+// FIXME: sender and receiver should be in different processes, need to think about how
 // we initiliaze VideoConfig, also should have AudioConfig. Are we ditching args_?
-// 
+//
 
 GstThread::GstThread()
     : conf_(0), sender_(0), receiver_(0), conf_str_("dv1394src")

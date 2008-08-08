@@ -39,12 +39,12 @@ VideoConfig::VideoConfig(const std::string &source, const std::string &codec,
 
 
 // for sender (remote)
-VideoConfig::VideoConfig(const std::string &source, 
-        const std::string &location, 
-        const std::string &codec,
-        const std::string &remoteHost, 
-        int port)
-: MediaConfig(source, codec, remoteHost, port), location_(location)
+VideoConfig::VideoConfig(const std::string &source,
+    const std::string &location,
+    const std::string &codec,
+    const std::string &remoteHost,
+    int port)
+    : MediaConfig(source, codec, remoteHost, port), location_(location)
 {
     // empty
 }
@@ -85,20 +85,20 @@ VideoSource * VideoConfig::createSource() const
     else if (source_ == "filesrc")
         return new VideoFileSource(*this);
     else {
-        LOG("Invalid source!", ERROR); 
+        LOG("Invalid source!", ERROR);
         return 0;
     }
 }
 
 
-const char* VideoConfig::location() const 
-{ 
-    if (!location_.empty()) 
-        return location_.c_str(); 
-    else 
-    {
-        LOG("No location specified", ERROR); 
+const char* VideoConfig::location() const
+{
+    if (!location_.empty())
+        return location_.c_str();
+    else{
+        LOG("No location specified", ERROR);
         return "";
     }
 }
+
 

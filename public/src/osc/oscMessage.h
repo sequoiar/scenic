@@ -64,6 +64,7 @@ class OscMessage
                 void print() const;
                 bool equals(std::string str);
                 bool equals(int val);
+
                 lo_type type_;
                 int i_;
                 std::string s_;

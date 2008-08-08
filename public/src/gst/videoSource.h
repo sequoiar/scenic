@@ -72,7 +72,8 @@ class VideoFileSource
     : public VideoSource
 {
     public:
-        explicit VideoFileSource(const VideoConfig &config) : VideoSource(config), decoder_(0), sinkElement_(0) {}
+        explicit VideoFileSource(const VideoConfig &config)
+            : VideoSource(config), decoder_(0), sinkElement_(0) {}
         ~VideoFileSource();
         void sub_init();
         void link_element(GstElement *sinkElement);

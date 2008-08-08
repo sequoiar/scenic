@@ -19,11 +19,10 @@ sdpCodec* addCodecToSDPTest( void ) {
     return gsm;
 }
 
-void initiateSessionTest( int argc, char** argv ) {
 
+void initiateSessionTest( int argc, char** argv ) {
     if( argc == 1 )
         return;
-
     Session* sip = new SIPSession(std::atoi(argv[1]));
     if( argc <= 2 ){
         // Listening mode
@@ -35,19 +34,17 @@ void initiateSessionTest( int argc, char** argv ) {
     }
 }
 
-void createSDPBodyTest() {
 
+void createSDPBodyTest() {
     Session *sip = new SIPSession( 5060 );
     sip->build_sdp();
-
 }
 
-int main( int argc, char** argv ){
 
+int main( int argc, char** argv ){
     initiateSessionTest( argc, argv );
     //createSDPBodyTest();
     return 1;
-
 }
 
 

@@ -28,7 +28,7 @@
 #define MIME_TYPE_VIDEO     "video"
 
 /*
- * Codecs RTP payload as defined in 
+ * Codecs RTP payload as defined in
  * RFC 3551 - RTP Profile for Audio and Video Conferences with Minimal Control
  */
 typedef enum {
@@ -39,7 +39,7 @@ typedef enum {
 
     // media type = V - clock rate = 90000
     RTP_PAYLOAD_H263 = 34
-}CodecRTPPayload;
+} CodecRTPPayload;
 
 //typedef std::map< CodecRTPPayload , std::string > codecRTPMap;
 
@@ -55,17 +55,17 @@ class sdpCodec
          * audio / video
          */
         std::string getType( void ){ return _m_type; }
-        
+
         /*
          * Read accessor. Return the name of the codec
-         */  
+         */
         std::string getName( void ){ return _name; }
-        
+
         /*
          * Read accessor. Return the RTP payload
          */
         int getPayload( void ){ return _payload; }
-        
+
         /*
          * Return the RTP payload under a string form
          */
@@ -77,7 +77,7 @@ class sdpCodec
          * @return bool     True if the payload is inferior to 96
          *                  False otherwise
          */
-        bool isPayloadStatic( void ) { return _payload < 96; } 
+        bool isPayloadStatic( void ) { return _payload < 96; }
 
     private:
         /* The encoding name of the codec */
@@ -85,7 +85,7 @@ class sdpCodec
 
         /* The media type */
         std::string _m_type;
-        
+
         /* The RTP paylaod */
         int _payload;
 

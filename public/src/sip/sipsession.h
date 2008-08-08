@@ -34,7 +34,7 @@
 #define _DEFAULT_SIP_PORT   5060
 
 class SIPSession
-: public Session
+    : public Session
 {
     public:
         /*
@@ -77,7 +77,6 @@ class SIPSession
 
         SIPSession(const SIPSession&); //No Copy Constructor
         SIPSession& operator=(const SIPSession&); //No Assignment Operator
-
 };
 
 #endif // _SIP_SESSION_H
