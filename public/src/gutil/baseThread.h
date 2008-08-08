@@ -87,8 +87,9 @@ BaseThread < T >::BaseThread()
 template < class T >
 BaseThread < T >::~BaseThread()
 {
-    if (th_)
+    if (th_){
         g_thread_join(th_);
+    }
 }
 
 
@@ -110,7 +111,10 @@ bool BaseThread < T >::run()
     th_ = thread_create_queue_pair(BaseThread::thread_main, this, &err);
 
     if (th_)  //BaseThread running
+    {
+        usleep(1); // Insure thread started or g_thread_join returns before thread starts
         return true;
+    }
     return false;
 }
 

@@ -14,6 +14,8 @@ class TcpServer
         bool accept();
         bool close();
 
+        bool set_non_blocking(int sockfd);
+
         bool connected(){return connected_;}
     private:
         int sockfd, newsockfd;

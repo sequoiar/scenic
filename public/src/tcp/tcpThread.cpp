@@ -24,24 +24,32 @@ int TcpThread::main()
     bool quit = false;
     std::string msg;
 
+    std::cout << "got here - portnum:" << std::endl;
     if(!serv_.socket_bind_listen())
         return -1;
     while(!quit)
     {
-        usleep(10000);
-        if(!serv_.accept())
-            continue;
-        while(serv_.connected())
+        while(!quit)
         {
-            if((quit = gotQuit()))
-            {
-                break;
+            usleep(10000);
+            if(!serv_.accept()){
+                continue;
             }
-            if(serv_.recv(msg))
-                queue_.push(BaseMessage(BaseMessage::STD, msg));
-            else
-                usleep(10000);
+            while(serv_.connected())
+            {
+                if((quit = gotQuit()))
+                {
+                    break;
+                }
+                if(serv_.recv(msg))
+                {
+                    queue_.push(BaseMessage(BaseMessage::STD, msg));
+                }
+                else
+                    usleep(10000);
+            }
         }
+        serv_.close();
     }
     return 0;
 }

@@ -73,7 +73,7 @@ class BaseMessage
         }
 
 
-        std::string getMsg(){return msg_;}
+        std::string& getMsg(){return msg_;}
 
     private:
         unsigned char t_;
