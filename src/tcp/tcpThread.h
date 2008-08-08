@@ -21,7 +21,7 @@
 #include "gutil/baseMessage.h"
 #include "tcpServer.h"
 
-typedef QueuePair_<BaseMessage> QueuePair;
+typedef QueuePair_<BaseMessage> TcpQueue;
 class TcpThread
     : public BaseThread<BaseMessage>
 {

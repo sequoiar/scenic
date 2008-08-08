@@ -3,12 +3,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <strings.h>
 #include <error.h>
+#include <errno.h>
 
 #include <string>
 
@@ -17,7 +19,7 @@
 #ifdef ALLOW_ANY_ADDR
 #define INADDR   INADDR_ANY
 #else
-#define INADDR   inet_addr("10.12.110.57")
+#define INADDR   inet_addr("127.0.0.1")
 #endif
 
 
@@ -28,15 +30,35 @@ void error(const char *msg)
 }
 
 
+bool TcpServer::set_non_blocking(int sockfd)
+{
+    long arg;
+
+    // Set non-blocking
+    if( (arg = fcntl(sockfd, F_GETFL, NULL)) < 0)
+    {
+        return false;
+    }
+    arg |= O_NONBLOCK;
+    if( fcntl(sockfd, F_SETFL, arg) < 0)
+    {
+        return false;
+    }
+    return true;
+}
+
+
 bool TcpServer::socket_bind_listen()
 {
     struct sockaddr_in serv_addr;
     int optval = 1;
-
+    sockfd = 0;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0)
+    if (sockfd <= 0)
         error("ERROR opening socket");
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
+
+    set_non_blocking(sockfd);
 
     bzero((char *) &serv_addr, sizeof(serv_addr));
 
@@ -58,8 +80,16 @@ bool TcpServer::accept()
     struct sockaddr_in cli_addr;
     clilen = sizeof(cli_addr);
     newsockfd = ::accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-    if (newsockfd < 0)
-        error("ERROR on accept");
+    if (newsockfd <= 0){
+        if(newsockfd == -1 && errno == EWOULDBLOCK)
+            return false;
+        else
+            error("ERROR on accept");
+    }
+    connected_ = true;
+    set_non_blocking(newsockfd);
+
+
     return true;
 }
 
@@ -69,11 +99,20 @@ bool TcpServer::recv(std::string& out)
     int n=0;
     out.clear();
     bzero(buffer_, BUFFSIZE);
-    n = ::read(newsockfd, buffer_, BUFFSIZE);
-
-    if (n < 0 || buffer_[0] == 0)
+    n = ::recv(newsockfd, buffer_, BUFFSIZE, 0);
+    if(n == 0){
+        connected_ = false;
+        return false;
+    }
+    if (n <= 0 || buffer_[0] == 0){
+        if (errno != EWOULDBLOCK)
+            connected_ = false;
         return false; //error("ERROR reading from socket");
-    printf("Here is the message: %s\n", buffer_);
+    }
+    std::string temp_str(buffer_, n);
+
+    out = temp_str;
+
     return true;
 }
 
@@ -81,8 +120,8 @@ bool TcpServer::recv(std::string& out)
 bool TcpServer::send(const std::string& in)
 {
     int n=0;
-    n = ::write(newsockfd, "I got your message\n", 19);
-    if (n < 0)
+    n = ::write(newsockfd, in.c_str(), in.size());
+    if (n <= 0)
         return false; //error("ERROR writing to socket");
     return true;
 }
