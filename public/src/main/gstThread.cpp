@@ -26,11 +26,6 @@
 GstThread::GstThread()
     : conf_(0), sender_(0), receiver_(0), conf_str_("dv1394src")
 {
-    args_.clear();
-#if 0
-    conf_str = 0;
-    args_.push_back(new StringArg(&conf_str, "sender", 's', "video", "try videotestsrc"));
-#endif
 }
 
 
@@ -52,34 +47,34 @@ int GstThread::main()
             sender_ = new VideoSender(*conf_);
         if(!sender_)
         {
-            BaseMessage m(BaseMessage::QUIT);
+            StdMsg m(StdMsg::QUIT);
             queue_.push(m);
             done = true;
         }
     }
     while(!done)
     {
-        BaseMessage f = queue_.timed_pop(10000);
+        StdMsg f = queue_.timed_pop(10000);
         switch(f.get_type())
         {
-            case BaseMessage::QUIT:
+            case StdMsg::QUIT:
             {
-                BaseMessage f(BaseMessage::QUIT);
+                StdMsg f(StdMsg::QUIT);
                 queue_.push(f);
                 done = true;
                 break;
             }
-            case BaseMessage::START:
+            case StdMsg::START:
             {
                 sender_->start();
                 break;
             }
-            case BaseMessage::INIT:
+            case StdMsg::INIT:
             {
                 sender_->init();
                 break;
             }
-            case BaseMessage::STOP:
+            case StdMsg::STOP:
             {
                 sender_->stop();
                 break;

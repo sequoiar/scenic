@@ -93,7 +93,7 @@ bool MainModule::run()
 
         if (m.pathEquals("/quit"))
         {
-            BaseMessage in(BaseMessage::QUIT);
+            StdMsg in(StdMsg::QUIT);
             gst_queue.push(in);
             LOG("in quit!", DEBUG);
             osc_queue.push(OscMessage("/quit", "", 0, 0, 0));
@@ -102,15 +102,15 @@ bool MainModule::run()
         else if (!m.pathEquals("/gst"))
             continue;
         if (m.argEquals("init", 0)) {
-            BaseMessage in(BaseMessage::INIT);
+            StdMsg in(StdMsg::INIT);
             gst_queue.push(in);
         }
         else if (m.argEquals("start", 0)) {
-            BaseMessage start(BaseMessage::START);
+            StdMsg start(StdMsg::START);
             gst_queue.push(start);
         }
         else if (m.argEquals("stop", 0)) {
-            BaseMessage stop(BaseMessage::STOP);
+            StdMsg stop(StdMsg::STOP);
             gst_queue.push(stop);
         }
     }
