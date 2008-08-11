@@ -26,36 +26,29 @@
  */
 
 
-#ifndef __BASE_MESSAGE__
-#define __BASE_MESSAGE__
-/*
-   const char* str[] =
-   {
-    "undefined","err","ok","ack","open","close","start","stop",
-    "pause","quit","info"
-   };
- */
+#ifndef __STD_MSG__
+#define __STD_MSG__
 
-class BaseMessage
+class StdMsg
 {
     public:
-        enum type { ERROR = -2, UNDEFINED = -1, ZERO = 0, STD = 'm', OK = '=', QUIT = 'Q',
+        enum type { ERROR = -2, UNDEFINED = -1, NONE = 0, STD = 'm', OK = '=', QUIT = 'Q',
                     INIT = 'I',
                     START = 'S', STOP = '!', SYSTEM = '*', PING = '.', STRING = 's'};
 
-        BaseMessage(unsigned short i)
+        StdMsg(unsigned short i)
             : t_(static_cast<unsigned char>(i)), msg_(){}
 
-        BaseMessage(char i)
+        StdMsg(char i)
             : t_(i), msg_(){}
 
-        BaseMessage(type t, std::string msg)
+        StdMsg(type t, std::string msg)
             : t_(t), msg_(msg){}
 
-        BaseMessage(type t)
+        StdMsg(type t)
             : t_(t), msg_(){}
 
-        BaseMessage()
+        StdMsg()
             : t_(0), msg_(){}
 
         int get_int(){
@@ -82,5 +75,5 @@ class BaseMessage
 };
 
 
-#endif // __BASE_MESSAGE__
+#endif // __STD_MSG__
 

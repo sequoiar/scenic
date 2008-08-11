@@ -43,7 +43,7 @@ int TcpThread::main()
                 }
                 if(serv_.recv(msg))
                 {
-                    queue_.push(BaseMessage(BaseMessage::STD, msg));
+                    queue_.push(StdMsg(StdMsg::STD, msg));
                 }
                 else
                     usleep(10000);
@@ -57,8 +57,8 @@ int TcpThread::main()
 
 bool TcpThread::gotQuit()
 {
-    BaseMessage f = queue_.timed_pop(1);
-    if (f.get_type() == BaseMessage::QUIT)
+    StdMsg f = queue_.timed_pop(1);
+    if (f.get_type() == StdMsg::QUIT)
     {
         queue_.push(f);
         return true;

@@ -18,12 +18,12 @@
  */
 
 #include "gutil/baseThread.h"
-#include "gutil/baseMessage.h"
+#include "gutil/stdMsg.h"
 #include "tcpServer.h"
 
-typedef QueuePair_<BaseMessage> TcpQueue;
+typedef QueuePair_<StdMsg> TcpQueue;
 class TcpThread
-    : public BaseThread<BaseMessage>
+    : public BaseThread<StdMsg>
 {
     public:
         TcpThread(int inport)

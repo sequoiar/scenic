@@ -20,14 +20,14 @@
 #include <glib.h>
 #include <iostream>
 #include "baseThread.h"
-#include "baseMessage.h"
+#include "stdMsg.h"
 #include "optionArgs.h"
 #include "logWriter.h"
 
-typedef QueuePair_<BaseMessage> QueuePair;
+typedef QueuePair_<StdMsg> QueuePair;
 
 class Thread
-    : public BaseThread<BaseMessage>
+    : public BaseThread<StdMsg>
 {
     public:
         bool init();
@@ -46,15 +46,15 @@ bool Thread::init()
 
 int Thread::main()
 {
-    BaseMessage r(BaseMessage::PING);
+    StdMsg r(StdMsg::PING);
     int count=0;
     const int max_count = 1000;
     while(1)
     {
-        BaseMessage f = queue_.timed_pop(1);
+        StdMsg f = queue_.timed_pop(1);
         LOG(" here ", DEBUG);
         if(count++ == max_count) {
-            BaseMessage f(BaseMessage::QUIT);
+            StdMsg f(StdMsg::QUIT);
             queue_.push(f);
             break;
         }
@@ -78,12 +78,12 @@ int my_main (int argc, char** argv)
         return -1;
     while(1)
     {
-        BaseMessage f(BaseMessage::OK);
+        StdMsg f(StdMsg::OK);
         tempQueue.push(f);
         usleep(10);
         f = tempQueue.timed_pop(1);
 
-        if(f.get_type() == BaseMessage::QUIT) {
+        if(f.get_type() == StdMsg::QUIT) {
             break;
         }
     }

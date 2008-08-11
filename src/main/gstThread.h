@@ -20,16 +20,16 @@
 #include <glib.h>
 #include <iostream>
 #include "gutil/baseThread.h"
-#include "gutil/baseMessage.h"
+#include "gutil/stdMsg.h"
 #include "logWriter.h"
 
 #include "gst/videoSender.h"
 #include "gst/videoReceiver.h"
 #include "gst/videoConfig.h"
 
-typedef QueuePair_<BaseMessage> QueuePair;
+typedef QueuePair_<StdMsg> QueuePair;
 class GstThread
-    : public BaseThread<BaseMessage>
+    : public BaseThread<StdMsg>
 {
     public:
         GstThread();
