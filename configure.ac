@@ -103,7 +103,6 @@ AC_CONFIG_FILES([Makefile
                  src/gutil/Makefile
                  src/gutil/test/Makefile
                  src/tcp/Makefile
-                 src/tcp/test/Makefile
                  src/osc/Makefile
                  src/osc/test/Makefile
                  src/main/Makefile
