@@ -391,6 +391,9 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     // We need to get the final media choice and send it to gstreamer
     // Maybe we want to start the data streaming now...
 
+    if( status != PJ_SUCCESS )
+        return;
+
     const pjmedia_sdp_session *r_sdp;
     pjmedia_sdp_media *media;
     int c_count;

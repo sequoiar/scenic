@@ -72,6 +72,9 @@ class UserAgent
 
         pj_str_t build_contact_uri( std::string user, int port );
 
+        /*
+         * Start the main loop event
+         */
         void listen( void );
 
         void buildSDP( void );
@@ -84,6 +87,7 @@ class UserAgent
         /* The local IP address */
         std::string _localIP;
 
+        /* The local SIP port */
         int _lport;
 
         /*

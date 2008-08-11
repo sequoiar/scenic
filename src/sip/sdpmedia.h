@@ -24,22 +24,53 @@
 
 #include <vector>
 
+/*
+ * @file sdpmedia.h
+ * @brief   A class to describe a media. It can be either a video codec or an audio codec.
+ *          it maintains internally a list of codecs to use in the SDP session and negociation
+ */
+
 class sdpMedia
 {
     public:
         sdpMedia( int type );
         ~sdpMedia();
 
+        /*
+         * Read accessor. Return the list of codecs
+         */
         std::vector<sdpCodec*> getMediaCodecList() { return _codecList; }
+        
+        /*
+         * Read accessor. Return the type of media 
+         */
         int getType() { return _type; }
+        
+        /*
+         * Read accessor. Return the transport port
+         */
         int getPort() { return _port; }
+        
+        /*
+         * Write accessor. Set the transport port
+         */
         void setPort( int port ) { _port = port; }
 
+        /*
+         * Add a codec in the current media codecs vector
+         *
+         * @param codec     A pointer on the codec to add
+         */
         void addCodec( sdpCodec* codec );
 
     private:
+        /* The type of media ( AUDIO/ VIDEO ..) */
         int _type;
+
+        /* The media codec vector */
         std::vector< sdpCodec* > _codecList;
+        
+        /* the tranport port */
         int _port;
 };
 

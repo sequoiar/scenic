@@ -74,8 +74,16 @@ class Session
 
         virtual void startMainloop() = 0;
 
+        /*
+         * Add a media to the session. It will be used for SDP session
+         *
+         * @param mime_type   The type of media
+         * @param codecs    the formatted list of encoding codec names
+         *                  Pattern: separator: '/', must end with the separator
+         */
         virtual void addMedia( int mime_type, std::string codecs ) = 0;
 
+        /* Read accessor. Return the protocol port */
         int getSessionPort( void ){ return _port; }
 
     private:
