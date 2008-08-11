@@ -48,9 +48,9 @@ typedef enum {
 /*
  * Codecs encoding names
  */
-#define CODEC_STR_ULAW      "PCMU"
+#define CODEC_STR_ULAW      "PCMU" 
 #define CODEC_STR_ALAW      "PCMA"
-#define CODEC_STR_GSM       "GSM"
+#define CODEC_STR_GSM       "GSM" 
 #define CODEC_STR_G726      "G726-32"
 #define CODEC_STR_G729A     "G729"
 #define CODEC_STR_SPEEX     "speex"
@@ -61,11 +61,29 @@ typedef enum {
 #define CODEC_STR_H263      "H263"
 #define CODEC_STR_H264      "H264"
 
+/*
+ * @file sdpcodec.h
+ * @brief   A class to describe an audio or a video codec
+ */
 
 class sdpCodec
 {
     public:
+        /*
+         * Class constructor
+         * @param type  The type of media : AUDIO - VIDEO
+         * @param name  The encoding name of the codec
+         */
         sdpCodec( int type, std::string name );
+        
+        /*
+         * Class constructor
+         * @param type  The type of media : AUDIO - VIDEO
+         * @param name  The encoding name of the codec
+         * @param payload   The RTP payload type
+         * @param ch    The number of channels
+         * @param clockrate     The sample rate of the codec
+         */
         sdpCodec( int type, std::string name, int payload, int ch, int clockrate );
         ~sdpCodec();
 
@@ -86,7 +104,7 @@ class sdpCodec
         int getPayload( void ){ return _payload; }
 
         /*
-         * Return the RTP payload under a string form
+         * Return the RTP payload as a string
          */
         std::string getPayloadStr( void );
 
@@ -99,6 +117,10 @@ class sdpCodec
          * Read accessor. Return the codec's channel number
          */
         int getChannels( void ){ return _channels; }
+        
+        /*
+         * Read accessor. Return the codec's channel numbera as a string
+         */
         std::string getChannelsStr( void );
 
         /*

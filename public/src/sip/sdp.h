@@ -32,6 +32,12 @@
 #define AUDIO_OR_VIDEO  1
 #define AUDIO_AND_VIDEO 2
 
+/*
+ * @file    sdp.h
+ * @brief   A class to implement the Session Description Protocol.
+ *          Thsi class build the SDP body and takes care of SDP negociation
+ */
+
 class Sdp
 {
     public:
@@ -109,26 +115,71 @@ class Sdp
          * A method to display the SDP body
          */
         void toString( void );
+
+        /*
+         * Build the sdp media section
+         * Add rtpmap field if necessary
+         *
+         * @param media     The media to add to SDP
+         * @param pool  The pool to allocate memory
+         * @param med   The structure to receive the media section
+         */
         void getMediaDescriptorLine( sdpMedia* media, pj_pool_t* pool,
                                      pjmedia_sdp_media** p_med );
+
+        /*
+         * On building an invite outside a dialog, build the local offer and create the 
+         * SDP negociator instance with it.
+         * 
+         * @param pool  The pool to allocate memory
+         */
         int createInitialOffer( pj_pool_t* pool );
+        
+        /*
+         * On receiving an invite outside a dialog, build the local offer and create the 
+         * SDP negociator instance with the remote offer.
+         * 
+         * @param pool  The pool to allocate memory
+         * @param remote    The remote offer
+         */
+
         int receivingInitialOffer( pj_pool_t* pool, pjmedia_sdp_session* remote );
 
+        /*
+         * Parse a list of formatted encoding codecs name and add it to the session media
+         *
+         * @param mime_type The type of media
+         * @param codecs    The formatted list of codecs name (separator: '/')
+         */ 
         void addMediaToSDP( int mime_type, std::string codecs );
 
     private:
+
+        /* The media transport port */
         int _audioPort, _videoPort;
+
+        /* The media list */
         std::vector<sdpMedia*> _sdpMediaList;
+        
+        /* The local IP address */
         std::string _ip_addr;
+
+        /* The local SDP offer */
         pjmedia_sdp_session *_local_offer;
+        
+        /* The sdp negociator instance */ 
         pjmedia_sdp_neg *negociator;
 
         Sdp(const Sdp&); //No Copy Constructor
         Sdp& operator=(const Sdp&); //No Assignment Operator
 
+        /*
+         * Add the specified media in the vector of media
+         *
+         * @param media     A pointer on the media object
+         * @param port  The port on which transport the media 
+         */
         void addMedia( sdpMedia *media, int port );
-
-        std::string getMediaPayloadList( std::string type );
 
         /*
          *  Mandatory field: Protocol version ("v=")

@@ -47,16 +47,28 @@ Sdp::Sdp( )
     //setCodecsList();
 }
 
-
 Sdp::~Sdp(){}
 
 void Sdp::addMediaToSDP( int mime_type, std::string codecs ){
+
     sdpMedia *media;
     sdpCodec *codec;
+    size_t pos;
+    std::string tmp;
 
     media = new sdpMedia( mime_type );
-    codec = new sdpCodec( mime_type, codecs );
-    media->addCodec(codec);
+
+    // The string codecs can contains multiple codecs, 
+    // we have to parse by assuming that the delimiter is the '/' char
+    while( codecs.find("/", 0) != std::string::npos ){
+        pos = codecs.find("/", 0);
+        tmp = codecs.substr(0, pos);
+        codecs.erase(0, pos+1);
+    
+        codec = new sdpCodec( mime_type, tmp );
+        media->addCodec(codec);
+    }
+    
     addMedia( media, (mime_type == MIME_TYPE_AUDIO)? getAudioPort(): getVideoPort() ); 
 }
 
