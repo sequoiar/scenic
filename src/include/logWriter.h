@@ -78,8 +78,7 @@ static bool logLevelMatch(LogLevel level)
 }
 
 
-static void log(const std::string &msg, LogLevel level, 
-                const std::string &fileName,
+static void log(const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName,
                 const int lineNum)
 {
@@ -91,7 +90,8 @@ static void log(const std::string &msg, LogLevel level,
         time( &rawtime );
         timeinfo = localtime(&rawtime);
         std::ostringstream logMsg;
-        logMsg << std::endl << fileName << ":" << functionName << ":" << lineNum << ": " << msg << " " 
+        logMsg << std::endl << fileName << ":" << functionName << ":" << lineNum << ": " <<
+        msg << " "
             << asctime(timeinfo) << std::endl;
 
         // FIXME: send message to Core

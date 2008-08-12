@@ -40,7 +40,7 @@ class AudioConfig
         const std::string & codec,
         const std::string & remoteHost,
         int port);                                                          // sender
-        
+
         AudioConfig(const std::string & source,
         const std::string & location,
         int numChannels,
@@ -55,7 +55,7 @@ class AudioConfig
         const char *source() const;
 
         const char* location() const;
-        
+
         const int numChannels() const { return numChannels_; };
         AudioSource* createSource() const;
 
