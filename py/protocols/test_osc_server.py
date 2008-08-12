@@ -12,10 +12,10 @@ def test(pattern, tags, data, addr):
     print tags
     print data
     print addr
-#    message = osc_protocol.OscMessage()
-#    message.setAddress('/allo')
-#    message.append('grrr')
-#    s.send_message(addr[0], addr[1], message)
+    message = osc_protocol.OscMessage()
+    message.setAddress(pattern)
+    message.append('ACK')
+    s.send_message(addr[0], addr[1], message)
 
 
 

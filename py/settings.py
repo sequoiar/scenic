@@ -26,6 +26,6 @@ def load(setting=None):
     if setting:
         return current
     else:
-        current = {'audio': audio.gst.AudioGst(22222, 22223)
+        current = {'audio': audio.gst.AudioGst(22222)
                    }
         return current
