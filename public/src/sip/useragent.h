@@ -23,6 +23,13 @@
 #define THIS_FILE       "useragent.cpp"
 #define _LOCAL_IP_ADDRESS   "127.0.0.1"
 
+#define MSG_RINGING                 180
+#define MSG_OK                      200
+#define MSG_METHOD_NOT_ALLOWED      405
+#define MSG_NOT_ACCEPTABLE_HERE     488   
+#define MSG_SERVER_INTERNAL_ERROR   500
+
+
 /* @file	useragent.h
  * @brief	A SIP useragent. Implements the SIP stacks from the transaction layer to the transport layer as described in
  *      RFC 3261.
@@ -76,7 +83,7 @@ class UserAgent
          */
         void listen( void );
 
-        void addMediaToSession( int mime_type, std::string codecs );
+        void addMediaToSession( std::string codecs );
 
         URI* getLocalURI() { return _localURI; }
 

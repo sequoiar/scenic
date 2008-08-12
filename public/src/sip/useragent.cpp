@@ -261,18 +261,34 @@ int UserAgent::create_invite_session( std::string uri ){
 
 
 void UserAgent::listen( void){
+
     for(; !complete;) {
         pj_time_val timeout = {0, 10};
         pjsip_endpt_handle_events( endpt, &timeout );
     }
+
 }
 
 
-void UserAgent::addMediaToSession( int mime_type, std::string codecs ){
+void UserAgent::addMediaToSession( std::string codecs ){
+
+    size_t pos;
+    std::string media;
+    int mime_type;
+
+    // codecs looks like that: m=codec1/codec2/..../codecn/ where m = a for audio or v for video
+    // We have got to retreive the media type first:
+    pos = codecs.find("=", 0);
+    media = codecs.substr(0, pos );
+    codecs.erase(0, pos + 1);
+        
+    ( strcmp( media.c_str(), "a" ) || strcmp( media.c_str(), "A" ))? mime_type = MIME_TYPE_AUDIO : mime_type = MIME_TYPE_VIDEO;
     local_sdp->addMediaToSDP( mime_type, codecs );    
+
 }
 
 static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
+
     pjmedia_sdp_session *sdp;
     pjsip_msg *msg;
     pjsip_msg_body *body;
@@ -283,6 +299,7 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
     pjmedia_sdp_parse( rdata->tp_info.pool, (char*)body->data, body->len, &sdp );
 
     *r_sdp = sdp;
+
 }
 
 
@@ -307,7 +324,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
         if( rdata->msg_info.msg->line.req.method.id != PJSIP_ACK_METHOD ) {
             reason = pj_str((char*)" user agent unable to handle this request ");
-            pjsip_endpt_respond_stateless( endpt, rdata, 500, &reason, NULL, NULL );
+            pjsip_endpt_respond_stateless( endpt, rdata, MSG_METHOD_NOT_ALLOWED, &reason, NULL, NULL );
             return PJ_TRUE;
         }
     }
@@ -315,7 +332,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     status = pjsip_inv_verify_request( rdata, &options, NULL, NULL, endpt, NULL );
     if( status != PJ_SUCCESS ){
         reason = pj_str((char*)" user agent unable to handle this INVITE ");
-        pjsip_endpt_respond_stateless( endpt, rdata, 405, &reason, NULL, NULL );
+        pjsip_endpt_respond_stateless( endpt, rdata, MSG_METHOD_NOT_ALLOWED, &reason, NULL, NULL );
         return PJ_TRUE;
     }
     // Have to do some stuff here with the SDP
@@ -327,7 +344,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     //pj_str_t contact = pj_str((char*) "<sip:test@127.0.0.1:5060>");
     status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL, &dialog );
     if( status != PJ_SUCCESS ) {
-        pjsip_endpt_respond_stateless( endpt, rdata, 500, &reason, NULL, NULL );
+        pjsip_endpt_respond_stateless( endpt, rdata, MSG_SERVER_INTERNAL_ERROR, &reason, NULL, NULL );
         return PJ_TRUE;
     }
     // Specify media capability during invite session creation
@@ -335,16 +352,34 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     // Send a 180/Ringing response
-    status = pjsip_inv_initial_answer( inv_session, rdata, 180, NULL, NULL, &tdata );
+    status = pjsip_inv_initial_answer( inv_session, rdata, MSG_RINGING, NULL, NULL, &tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
     status = pjsip_inv_send_msg( inv_session, tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    //Create and send a 200 response
-    status = pjsip_inv_answer( inv_session, 200, NULL, NULL, &tdata );
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-    status = pjsip_inv_send_msg( inv_session, tdata );
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+    // Check if the SDP negociation has been succesfully done
+    status = local_sdp->startNegociation( rdata->tp_info.pool );
+    
+    if( status == PJ_SUCCESS ) {
+
+        // Create and send a 200(OK) response
+        status = pjsip_inv_answer( inv_session, MSG_OK, NULL, NULL, &tdata );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+        status = pjsip_inv_send_msg( inv_session, tdata );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+
+    }
+
+    else { // Negociation failed
+    
+        // Create and send a 488( Not acceptable here)
+        // Probably no compatible media found in the remote SDP offer
+        status = pjsip_inv_answer( inv_session, MSG_NOT_ACCEPTABLE_HERE, NULL, NULL, &tdata );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+        status = pjsip_inv_send_msg( inv_session, tdata );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+
+    }
 
     /* Done */
 

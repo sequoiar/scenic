@@ -72,11 +72,10 @@ class SIPSession
         /*
          * Add a media to the session. It will be used for SDP session
          *
-         * @param mime_type   The type of media
          * @param codecs    the formatted list of encoding codec names
          *                  Pattern: separator: '/', must end with the separator
          */
-        void addMedia( int mime_type, std::string codecs );
+        void addMedia( std::string codecs );
 
     private:
 
