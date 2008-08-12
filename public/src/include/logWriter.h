@@ -92,7 +92,7 @@ static void log(const std::string &msg, LogLevel level, const std::string &fileN
         std::ostringstream logMsg;
         logMsg << std::endl << fileName << ":" << functionName << ":" << lineNum << ": " <<
         msg << " "
-            << asctime(timeinfo) << std::endl;
+               << asctime(timeinfo) << std::endl;
 
         // FIXME: send message to Core
         std::cerr << logMsg.str();
