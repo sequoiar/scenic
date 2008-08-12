@@ -25,6 +25,7 @@ class Streams(object):
     def __init__(self):
         self.streams = {} 
         self.mode = None
+        self.port = None
     
     def start(self, address=None):
         """

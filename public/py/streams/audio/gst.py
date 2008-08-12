@@ -20,29 +20,53 @@
 
 # Twisted imports
 from twisted.internet import reactor
+from twisted.protocols.basic import LineReceiver
 
 # App imports
-from protocols.osc_protocol import Osc, OscMessage
+from protocols import icpc
 from streams.stream import AudioStream, Stream
+from utils import log
 
+log = log.start('info', 1, 0, 'audioGst')
 
 class AudioGst(AudioStream):
     """Class streams->audio->gst.AudioGst
     """
     
-    def __init__(self, s_port, r_port, address='127.0.0.1'):
+    def __init__(self, port, address='127.0.0.1'):
         AudioStream.__init__(self)
         self.s_port = s_port
         self.address = address
-        if not hasattr(Stream, 'osc'):
-            Stream.osc = Osc()
-            reactor.listenUDP(r_port, Stream.osc)
+        if not hasattr(Stream, 'gst'):
+            deferred = icpc.connect(address, port)
+            deferred.addCallback(self.connectionReady)
+            
+    def connectionReady(self, gst):
+        Stream.gst = gst
+        log.info('GST inter-process link created')
+            
+    def _unhandled_message(self, path, types, data, addr):
+        log.info('Unhandled OSC message comming from %s:%s with this address: %s' % (addr[0], addr[1], path))
+        
+    def _container(self, path, types, data, addr):
+        if data == 'ACK':
+            self.callbacks['container'] = 1
+        elif:
+            self.callbacks['container'] = 0
         
     def _send_message(self, name, value=None):
         message = OscMessage()
         message.setAddress('/audio/%s' % name)
         message.append(value)
         Stream.osc.send_message(self.address, self.s_port, message)
+        self.callbacks[name] = 0
+#        reactor.callLater(0.5, self.check_ack, name)
+#        
+#    def check_ack(self, name):
+#        if self.callbacks[name]:
+#            log.warning('Did not receive the ACK for %s' % name)
+#            self.callbacks[name] = 0
+            
         
     def get_attr(self, name):
         """        
