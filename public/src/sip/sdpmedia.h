@@ -40,17 +40,17 @@ class sdpMedia
          * Read accessor. Return the list of codecs
          */
         std::vector<sdpCodec*> getMediaCodecList() { return _codecList; }
-        
+
         /*
-         * Read accessor. Return the type of media 
+         * Read accessor. Return the type of media
          */
         int getType() { return _type; }
-        
+
         /*
          * Read accessor. Return the transport port
          */
         int getPort() { return _port; }
-        
+
         /*
          * Write accessor. Set the transport port
          */
@@ -69,7 +69,7 @@ class sdpMedia
 
         /* The media codec vector */
         std::vector< sdpCodec* > _codecList;
-        
+
         /* the tranport port */
         int _port;
 };

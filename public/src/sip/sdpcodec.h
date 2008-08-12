@@ -26,6 +26,7 @@
 
 #define MIME_TYPE_AUDIO    0
 #define MIME_TYPE_VIDEO    1
+#define MIME_TYPE_ERROR    2
 
 /*
  * Codecs RTP payload as defined in
@@ -48,9 +49,9 @@ typedef enum {
 /*
  * Codecs encoding names
  */
-#define CODEC_STR_ULAW      "PCMU" 
+#define CODEC_STR_ULAW      "PCMU"
 #define CODEC_STR_ALAW      "PCMA"
-#define CODEC_STR_GSM       "GSM" 
+#define CODEC_STR_GSM       "GSM"
 #define CODEC_STR_G726      "G726-32"
 #define CODEC_STR_G729A     "G729"
 #define CODEC_STR_SPEEX     "speex"
@@ -75,7 +76,7 @@ class sdpCodec
          * @param name  The encoding name of the codec
          */
         sdpCodec( int type, std::string name );
-        
+
         /*
          * Class constructor
          * @param type  The type of media : AUDIO - VIDEO
@@ -117,7 +118,7 @@ class sdpCodec
          * Read accessor. Return the codec's channel number
          */
         int getChannels( void ){ return _channels; }
-        
+
         /*
          * Read accessor. Return the codec's channel numbera as a string
          */

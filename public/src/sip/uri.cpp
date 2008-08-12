@@ -24,19 +24,18 @@
 #include <sstream>
 #include <iostream>
 
-URI::URI( int port ) : _hostName(""), _hostIP(""), _port(0) {
-
+URI::URI( int port )
+    : _hostName(""), _hostIP(""), _port(0) {
     // Guess the local parameters
     _hostIP = get_host_ip();
     _hostName = pj_gethostname()->ptr;
     _port = port;
-
 }
 
 
-URI::URI( std::string uri ) : _hostName(""), _hostIP(""), _port(0) {
-    
-    using std::cout; 
+URI::URI( std::string uri )
+    : _hostName(""), _hostIP(""), _port(0) {
+    using std::cout;
     using std::endl;
     size_t pos;
     std::string tmp;
@@ -47,9 +46,9 @@ URI::URI( std::string uri ) : _hostName(""), _hostIP(""), _port(0) {
     // First: Remove the unuseful stuff, ie '<sip:
     pos = tmp.find(":", 0);
     tmp.erase(0, pos+1);
-    // and '>' 
+    // and '>'
     tmp.erase( tmp.length() -1, tmp.length()-1);
-    
+
     // Retrieve the username
     pos = tmp.find("@", 0);
     _hostName = tmp.substr(0, pos);
@@ -58,29 +57,26 @@ URI::URI( std::string uri ) : _hostName(""), _hostIP(""), _port(0) {
     // Retrieve the host IP
     pos = tmp.find(":", 0);
     _hostIP = tmp.substr(0, pos);
-    tmp.erase(0, pos+1); 
+    tmp.erase(0, pos+1);
 
     // Finally the port number
-   _port = atoi(tmp.c_str());
-
+    _port = atoi(tmp.c_str());
 }
 
-URI::URI( std::string hostname, std::string hostip, int port ) : _hostName(hostname), _hostIP(hostip), _port(port) {}
+
+URI::URI( std::string hostname, std::string hostip, int port )
+    : _hostName(hostname), _hostIP(hostip), _port(port) {}
 
 std::string URI::getAddress(){
-
     std::ostringstream addr;
 
     addr << "<sip:" << getHostName() << "@" << getHostIP() << ":" << getPort() << ">";
 
     return addr.str();
-
 }
 
 
-
 void URI::toString(){
-
     using std::cout;
     using std::endl;
 
@@ -88,7 +84,7 @@ void URI::toString(){
     cout << "Host IP = " << getHostIP() << endl;
     cout << "Port = " << getPort() << endl;
     cout << "<sip:" << getHostName() << "@" << getHostIP() << ":" << getPort() << ">" << endl;
- 
 }
+
 
 /**************************** PRIVATE MEMBERS **************************************/
