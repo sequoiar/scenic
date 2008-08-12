@@ -20,12 +20,13 @@
 #include "sdpcodec.h"
 
 
-    sdpCodec::sdpCodec( int type, std::string name )
-: _name(name), _m_type(-1), _payload(-1), _clockrate(8000), _channels(1)
+sdpCodec::sdpCodec( int type, std::string name )
+    : _name(name), _m_type(-1), _payload(-1), _clockrate(8000), _channels(1)
 {
     // A codec is identified by its string name, as described in RFC 3551
 
-    switch( type ) {
+    switch( type )
+    {
         case MIME_TYPE_AUDIO:
             _m_type = MIME_TYPE_AUDIO;
             if( name == CODEC_STR_ULAW ) {
@@ -74,21 +75,24 @@
     }
 }
 
+
 sdpCodec::sdpCodec( int type, std::string name, int payload, int ch, int clockrate )
     : _name(name), _m_type( type ), _payload( payload ), _clockrate(clockrate),
     _channels(ch) {}
 
-    sdpCodec::~sdpCodec(){}
+sdpCodec::~sdpCodec(){}
 
-    std::string sdpCodec::getPayloadStr() {
-        std::ostringstream ret;
-        ret << getPayload();
-        return ret.str();
-    }
+std::string sdpCodec::getPayloadStr() {
+    std::ostringstream ret;
+    ret << getPayload();
+    return ret.str();
+}
+
 
 std::string sdpCodec::getChannelsStr() {
     std::ostringstream ret;
     ret << getChannels();
     return ret.str();
 }
+
 

@@ -128,17 +128,17 @@ class Sdp
                                      pjmedia_sdp_media** p_med );
 
         /*
-         * On building an invite outside a dialog, build the local offer and create the 
+         * On building an invite outside a dialog, build the local offer and create the
          * SDP negociator instance with it.
-         * 
+         *
          * @param pool  The pool to allocate memory
          */
         int createInitialOffer( pj_pool_t* pool );
-        
+
         /*
-         * On receiving an invite outside a dialog, build the local offer and create the 
+         * On receiving an invite outside a dialog, build the local offer and create the
          * SDP negociator instance with the remote offer.
-         * 
+         *
          * @param pool  The pool to allocate memory
          * @param remote    The remote offer
          */
@@ -150,12 +150,14 @@ class Sdp
          *
          * @param mime_type The type of media
          * @param codecs    The formatted list of codecs name (separator: '/')
-         */ 
+         */
         void addMediaToSDP( int mime_type, std::string codecs );
 
-        pjmedia_sdp_neg_state getSDPNegociationState(){ return pjmedia_sdp_neg_get_state( negociator ); }
+        pjmedia_sdp_neg_state getSDPNegociationState(){ return pjmedia_sdp_neg_get_state(
+                                                                   negociator ); }
 
-        pj_status_t startNegociation( pj_pool_t *pool ){ return pjmedia_sdp_neg_negotiate( pool, negociator, 0);  }
+        pj_status_t startNegociation( pj_pool_t *pool ){ return pjmedia_sdp_neg_negotiate(
+                                                                    pool, negociator, 0);  }
 
     private:
 
@@ -164,14 +166,14 @@ class Sdp
 
         /* The media list */
         std::vector<sdpMedia*> _sdpMediaList;
-        
+
         /* The local IP address */
         std::string _ip_addr;
 
         /* The local SDP offer */
         pjmedia_sdp_session *_local_offer;
-        
-        /* The sdp negociator instance */ 
+
+        /* The sdp negociator instance */
         pjmedia_sdp_neg *negociator;
 
         Sdp(const Sdp&); //No Copy Constructor
@@ -181,7 +183,7 @@ class Sdp
          * Add the specified media in the vector of media
          *
          * @param media     A pointer on the media object
-         * @param port  The port on which transport the media 
+         * @param port  The port on which transport the media
          */
         void addMedia( sdpMedia *media, int port );
 

@@ -40,17 +40,17 @@ Sdp::Sdp( )
 }
 
 
-    Sdp::Sdp( std::string ip_addr, int aport, int vport )
-: _audioPort( aport ), _videoPort( vport ), _sdpMediaList(0), _ip_addr( ip_addr ),
+Sdp::Sdp( std::string ip_addr, int aport, int vport )
+    : _audioPort( aport ), _videoPort( vport ), _sdpMediaList(0), _ip_addr( ip_addr ),
     _local_offer( NULL ), negociator(NULL)
 {
     //setCodecsList();
 }
 
+
 Sdp::~Sdp(){}
 
 void Sdp::addMediaToSDP( int mime_type, std::string codecs ){
-
     sdpMedia *media;
     sdpCodec *codec;
     size_t pos;
@@ -58,19 +58,21 @@ void Sdp::addMediaToSDP( int mime_type, std::string codecs ){
 
     media = new sdpMedia( mime_type );
 
-    // The string codecs can contains multiple codecs, 
+    // The string codecs can contains multiple codecs,
     // we have to parse by assuming that the delimiter is the '/' char
-    while( codecs.find("/", 0) != std::string::npos ){
+    while( codecs.find("/", 0) != std::string::npos )
+    {
         pos = codecs.find("/", 0);
         tmp = codecs.substr(0, pos);
         codecs.erase(0, pos+1);
-    
+
         codec = new sdpCodec( mime_type, tmp );
         media->addCodec(codec);
     }
-    
-    addMedia( media, (mime_type == MIME_TYPE_AUDIO)? getAudioPort(): getVideoPort() ); 
+
+    addMedia( media, (mime_type == MIME_TYPE_AUDIO) ? getAudioPort() : getVideoPort() );
 }
+
 
 void Sdp::setCodecsList( void ) {
     sdpMedia *audio = new sdpMedia( MIME_TYPE_AUDIO );
@@ -89,8 +91,7 @@ void Sdp::setCodecsList( void ) {
 
 
 void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
-        pjmedia_sdp_media** p_med ) {
-    
+                                  pjmedia_sdp_media** p_med ) {
     pjmedia_sdp_media* med;
     pjmedia_sdp_rtpmap rtpmap;
     pjmedia_sdp_attr *attr;
@@ -100,7 +101,8 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
     med = PJ_POOL_ZALLOC_T( pool, pjmedia_sdp_media );
 
     // Get the right media format
-    pj_strdup(pool, &med->desc.media, ( media->getType() == MIME_TYPE_AUDIO )? &STR_AUDIO : &STR_VIDEO );
+    pj_strdup(pool, &med->desc.media,
+              ( media->getType() == MIME_TYPE_AUDIO ) ? &STR_AUDIO : &STR_VIDEO );
     med->desc.port_count = 1;
     med->desc.port = media->getPort();
     pj_strdup (pool, &med->desc.transport, &STR_RTP_AVP);
@@ -120,9 +122,10 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
             rtpmap.enc_name = pj_str( (char*) codec->getName().c_str() );
             rtpmap.clock_rate = codec->getClockrate();
             // Add the channel number only if different from 1
-            if( codec->getChannels() > 1 )  rtpmap.param = pj_str( (char*) codec->getChannelsStr().c_str() );
-            else                            rtpmap.param.slen = 0;
-
+            if( codec->getChannels() > 1 )
+                rtpmap.param = pj_str( (char*) codec->getChannelsStr().c_str() );
+            else
+                rtpmap.param.slen = 0;
             pjmedia_sdp_rtpmap_to_attr( pool, &rtpmap, &attr );
             med->attr[ med->attr_count++] = attr;
         }
@@ -187,7 +190,7 @@ int Sdp::receivingInitialOffer( pj_pool_t* pool, pjmedia_sdp_session* remote ){
     createLocalOffer( pool );
 
     status = pjmedia_sdp_neg_create_w_remote_offer( pool,
-            getLocalSDPSession(), remote, &negociator );
+                                                    getLocalSDPSession(), remote, &negociator );
     state = pjmedia_sdp_neg_get_state( negociator );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
@@ -256,6 +259,7 @@ void Sdp::sdp_addMediaDescription( pj_pool_t* pool ){
     }
 }
 
+
 void Sdp::addMedia( sdpMedia *media, int port ){
     _sdpMediaList.push_back( media );
     media->setPort( port );
@@ -290,7 +294,7 @@ void Sdp::toString(){
        }
 
        cout << body.str() << endl;
-       */
+     */
 }
 
 

@@ -84,7 +84,6 @@ class SIPSession
 
         SIPSession(const SIPSession&); //No Copy Constructor
         SIPSession& operator=(const SIPSession&); //No Assignment Operator
-
 };
 
 #endif // _SIP_SESSION_H

@@ -24,11 +24,11 @@
 
 /*
  * @file uri.h
- * @brief   A class to manage SIP formatted address 
+ * @brief   A class to manage SIP formatted address
  */
 
-class URI {
-
+class URI
+{
     public:
         URI( int port );
         URI( std::string uri );
@@ -48,7 +48,6 @@ class URI {
         std::string _hostName;
         std::string _hostIP;
         int _port;
-
 };
 
 #endif // _SIP_URI

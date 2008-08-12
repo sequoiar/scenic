@@ -22,6 +22,10 @@
 #include <stdlib.h>
 #include <iostream>
 
+using std::cout;
+using std::cerr;
+using std::endl;
+
 
 /**************** STATIC VARIABLES AND FUNCTIONS (callbacks) **************************/
 
@@ -128,10 +132,8 @@ static Sdp *local_sdp;
 UserAgent::UserAgent( std::string name, int port )
     : _name(name), _localURI(0)
 {
-
     // Use the empty constructor, so that the URI could guess the local parameters
-   _localURI = new URI( port );
-
+    _localURI = new URI( port );
 }
 
 
@@ -147,7 +149,6 @@ void UserAgent::init_sip_module( void ){
 
 
 int UserAgent::init_pjsip_modules(  ){
-
     pj_status_t status;
     pj_sockaddr local;
     pj_uint16_t listeningPort;
@@ -172,8 +173,8 @@ int UserAgent::init_pjsip_modules(  ){
 
     /* Add UDP Transport */
     listeningPort = (pj_uint16_t) getLocalURI()->getPort();
-    pj_sockaddr_init( pj_AF_INET(), &local, NULL, listeningPort ); 
-    status = pjsip_udp_transport_start( endpt, &local.ipv4 , NULL, 1, NULL );
+    pj_sockaddr_init( pj_AF_INET(), &local, NULL, listeningPort );
+    status = pjsip_udp_transport_start( endpt, &local.ipv4, NULL, 1, NULL );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     /* Create transaction layer */
@@ -217,27 +218,26 @@ int UserAgent::init_pjsip_modules(  ){
 
 
 int UserAgent::create_invite_session( std::string uri ){
-
     pjsip_dialog *dialog;
     pjsip_tx_data *tdata;
     pj_status_t status;
     URI *remote, *local;
     pj_str_t from, to;
-    char tmp[90];
-    
+    char tmp[90], tmp1[90];
+
     remote = new URI( uri );
     local = getLocalURI();
 
-    pj_ansi_sprintf( tmp, remote->getAddress().c_str() );
+    pj_ansi_sprintf( tmp, local->getAddress().c_str() );
     from = pj_str(tmp);
 
-    to.ptr = (char*) remote->getAddress().c_str() ;
-    to.slen = remote->getAddress().length();
+    pj_ansi_sprintf( tmp1, remote->getAddress().c_str() );
+    to = pj_str(tmp1);
 
     status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
-                                  NULL, 
-                                  &to,
-                                  NULL,
+                                   NULL,
+                                   &to,
+                                   NULL,
                                    &dialog );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
@@ -261,17 +261,14 @@ int UserAgent::create_invite_session( std::string uri ){
 
 
 void UserAgent::listen( void){
-
     for(; !complete;) {
         pj_time_val timeout = {0, 10};
         pjsip_endpt_handle_events( endpt, &timeout );
     }
-
 }
 
 
 void UserAgent::addMediaToSession( std::string codecs ){
-
     size_t pos;
     std::string media;
     int mime_type;
@@ -281,14 +278,19 @@ void UserAgent::addMediaToSession( std::string codecs ){
     pos = codecs.find("=", 0);
     media = codecs.substr(0, pos );
     codecs.erase(0, pos + 1);
-        
-    ( strcmp( media.c_str(), "a" ) || strcmp( media.c_str(), "A" ))? mime_type = MIME_TYPE_AUDIO : mime_type = MIME_TYPE_VIDEO;
-    local_sdp->addMediaToSDP( mime_type, codecs );    
 
+    printf("%s \n", media.c_str());
+    strcmp( media.c_str(),
+            "a" ) == 0 ||
+    strcmp( media.c_str(),
+            "A" ) == 0 ? mime_type = MIME_TYPE_AUDIO :  mime_type = MIME_TYPE_VIDEO ;
+
+    printf("%s - %i\n", codecs.c_str(), mime_type);
+    local_sdp->addMediaToSDP( mime_type, codecs );
 }
 
-static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
 
+static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
     pjmedia_sdp_session *sdp;
     pjsip_msg *msg;
     pjsip_msg_body *body;
@@ -299,7 +301,6 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
     pjmedia_sdp_parse( rdata->tp_info.pool, (char*)body->data, body->len, &sdp );
 
     *r_sdp = sdp;
-
 }
 
 
@@ -312,7 +313,6 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
 
 
 static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
-    
     pj_status_t status;
     pj_str_t reason;
     unsigned options = 0;
@@ -324,7 +324,8 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
         if( rdata->msg_info.msg->line.req.method.id != PJSIP_ACK_METHOD ) {
             reason = pj_str((char*)" user agent unable to handle this request ");
-            pjsip_endpt_respond_stateless( endpt, rdata, MSG_METHOD_NOT_ALLOWED, &reason, NULL, NULL );
+            pjsip_endpt_respond_stateless( endpt, rdata, MSG_METHOD_NOT_ALLOWED, &reason, NULL,
+                                           NULL );
             return PJ_TRUE;
         }
     }
@@ -332,7 +333,8 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     status = pjsip_inv_verify_request( rdata, &options, NULL, NULL, endpt, NULL );
     if( status != PJ_SUCCESS ){
         reason = pj_str((char*)" user agent unable to handle this INVITE ");
-        pjsip_endpt_respond_stateless( endpt, rdata, MSG_METHOD_NOT_ALLOWED, &reason, NULL, NULL );
+        pjsip_endpt_respond_stateless( endpt, rdata, MSG_METHOD_NOT_ALLOWED, &reason, NULL,
+                                       NULL );
         return PJ_TRUE;
     }
     // Have to do some stuff here with the SDP
@@ -344,11 +346,13 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     //pj_str_t contact = pj_str((char*) "<sip:test@127.0.0.1:5060>");
     status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL, &dialog );
     if( status != PJ_SUCCESS ) {
-        pjsip_endpt_respond_stateless( endpt, rdata, MSG_SERVER_INTERNAL_ERROR, &reason, NULL, NULL );
+        pjsip_endpt_respond_stateless( endpt, rdata, MSG_SERVER_INTERNAL_ERROR, &reason, NULL,
+                                       NULL );
         return PJ_TRUE;
     }
     // Specify media capability during invite session creation
-    status = pjsip_inv_create_uas( dialog, rdata, local_sdp->getLocalSDPSession(), 0, &inv_session );
+    status = pjsip_inv_create_uas( dialog, rdata,
+                                   local_sdp->getLocalSDPSession(), 0, &inv_session );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     // Send a 180/Ringing response
@@ -359,28 +363,23 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
 
     // Check if the SDP negociation has been succesfully done
     status = local_sdp->startNegociation( rdata->tp_info.pool );
-    
-    if( status == PJ_SUCCESS ) {
 
+    if( status == PJ_SUCCESS ) {
         // Create and send a 200(OK) response
         status = pjsip_inv_answer( inv_session, MSG_OK, NULL, NULL, &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
     }
 
     else { // Negociation failed
-    
-        // Create and send a 488( Not acceptable here)
-        // Probably no compatible media found in the remote SDP offer
+           // Create and send a 488( Not acceptable here)
+           // Probably no compatible media found in the remote SDP offer
         status = pjsip_inv_answer( inv_session, MSG_NOT_ACCEPTABLE_HERE, NULL, NULL, &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
     }
-
     /* Done */
 
     return PJ_SUCCESS;
@@ -405,7 +404,6 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 
     if( status != PJ_SUCCESS )
         return;
-
     const pjmedia_sdp_session *r_sdp;
     pjmedia_sdp_media *media;
     int c_count;

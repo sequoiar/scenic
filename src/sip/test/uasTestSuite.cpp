@@ -19,31 +19,29 @@
 using std::cout;
 using std::endl;
 using std::cerr;
-    
+
 
 void initiateSessionTest( int argc, char** argv ) {
-    
-    if( argc == 1 )
-        return;
+    std::string media;
+    int nbMedia;
+    int i;
 
+    if( argc <= 1 ) {
+        cerr << "Wrong usage : ./uasTestSuite [lport] [media1] ... [media2] " << endl;
+        return;
+    }
     Session* sip = new SIPSession(std::atoi(argv[1]));
-    // A way to add media to the session
-    //sip->addMedia( MIME_TYPE_AUDIO, "vorbis/GSM/PCMU/PCMA/" );
-    //sip->addMedia( MIME_TYPE_VIDEO, "H263/H264/");
-    
-    if( argc == 3 ){
-        // Listening mode
-        sip->addMedia( argv[2] );
-        sip->startMainloop();
+    nbMedia = argc - 2;
+
+    // argv[1] -> listening port
+    // argv[2] ... argv[n] -> media to add to the session
+    // like this: a=GSM/vorbis/ or v=H264/H263/
+    for( i=2 ; i<2+nbMedia ; i++) {
+        media = argv[i];
+        sip->addMedia( media );
     }
-    else if( argc == 4){
-        // Make call to the specified sip address
-        sip->addMedia( argv[3] );
-        sip->connect( argv[2] );
-    }
-    else {
-        cerr << "Wrong number of arguments" << endl;
-    }
+
+    sip->startMainloop();
 }
 
 
@@ -52,8 +50,8 @@ void createSDPBodyTest() {
     sip->build_sdp();
 }
 
-void reconstructURITest() {
 
+void reconstructURITest() {
     using std::cout;
     using std::endl;
 
@@ -62,18 +60,17 @@ void reconstructURITest() {
     addr->toString();
 
     cout << addr->getAddress() << endl;
-
 }
 
-void localURITest() {
 
+void localURITest() {
     using std::cout;
     using std::endl;
 
     URI *local = new URI(5060);
     cout << local->getAddress() << endl;
-
 }
+
 
 int main( int argc, char** argv ){
     initiateSessionTest( argc, argv );

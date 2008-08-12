@@ -26,7 +26,7 @@
 #define MSG_RINGING                 180
 #define MSG_OK                      200
 #define MSG_METHOD_NOT_ALLOWED      405
-#define MSG_NOT_ACCEPTABLE_HERE     488   
+#define MSG_NOT_ACCEPTABLE_HERE     488
 #define MSG_SERVER_INTERNAL_ERROR   500
 
 
