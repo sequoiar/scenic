@@ -62,7 +62,7 @@ void VideoSender::init_codec()
 
         assert(encoder_ = gst_element_factory_make("x264enc", NULL));
         g_object_set(G_OBJECT(encoder_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4,
-                        NULL);
+                     NULL);
         pipeline_.add(encoder_);
 
         source_->link_element(colorspc_);

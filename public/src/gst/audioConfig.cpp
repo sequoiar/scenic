@@ -46,7 +46,8 @@ AudioConfig::AudioConfig(const std::string &source,
     const std::string &codec,
     const std::string &remoteHost,
     int port)
-    : MediaConfig(source, codec, remoteHost, port), numChannels_(numChannels), location_(location)
+    : MediaConfig(source, codec, remoteHost,
+                  port), numChannels_(numChannels), location_(location)
 {
     // rtp file sender
 }
@@ -59,17 +60,18 @@ AudioConfig::AudioConfig(const std::string & source, int numChannels)
 }
 
 
-AudioConfig::AudioConfig(const std::string & source, const std::string & location, int numChannels)
+AudioConfig::AudioConfig(const std::string & source, const std::string & location,
+    int numChannels)
     : MediaConfig(source), numChannels_(numChannels), location_(location)
 {
-    // local file sender 
+    // local file sender
 }
 
 
 AudioConfig::AudioConfig(int numChannels, const std::string &codec, int port)
     : MediaConfig(codec, port), numChannels_(numChannels), location_("")
 {
-    // receiver 
+    // receiver
 }
 
 

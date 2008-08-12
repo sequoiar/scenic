@@ -25,8 +25,7 @@
 
 GstThread::GstThread()
     : conf_(0), sender_(0), receiver_(0), conf_str_("dv1394src")
-{
-}
+{}
 
 
 GstThread::~GstThread()
