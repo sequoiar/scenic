@@ -17,47 +17,38 @@
  * along with Sropulpof.  If not, see <http:*www.gnu.org*licenses*>.
  */
 
-#include "sipsession.h"
+#ifndef _SIP_URI
+#define _SIP_URI
 
-SIPSession::SIPSession( int port )
-    : Session( SIP, port ), _app_ua( new UserAgent( _APP_NAME, port ) ){
+#include <string>
 
-        // Init the pjsip library modules 
-    _app_ua->init_pjsip_modules( );
-}
+/*
+ * @file uri.h
+ * @brief   A class to manage SIP formatted address 
+ */
 
+class URI {
 
-SIPSession::~SIPSession(){}
+    public:
+        URI( int port );
+        URI( std::string uri );
+        URI( std::string hostname, std::string hostip, int port );
 
-int SIPSession::connect( std::string r_uri ){
-    _app_ua->create_invite_session( r_uri );
-    return 0;
-}
+        ~URI();
 
+        std::string getHostName(){ return _hostName; }
+        std::string getHostIP(){ return _hostIP; }
+        int getPort(){ return _port; }
 
-int SIPSession::disconnect( void ){
-    return 0;
-}
+        std::string getAddress();
 
+        void toString();
 
-int SIPSession::accept( void ){
-    return 0;
-}
+    private:
+        std::string _hostName;
+        std::string _hostIP;
+        int _port;
 
+};
 
-int SIPSession::refuse( int reason ){
-    return 0;
-}
-
-
-void SIPSession::build_sdp( void ){
-}
-
-
-void SIPSession::startMainloop( void ){
-    _app_ua->listen();
-}
-
-void SIPSession::addMedia( int mime_type, std::string codecs ){
-    _app_ua->addMediaToSession( mime_type, codecs );
-}
+#endif // _SIP_URI

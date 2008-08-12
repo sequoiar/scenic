@@ -1,6 +1,8 @@
 #include <stdlib.h>
+#include <iostream>
 
 #include "../sipsession.h"
+#include "../uri.h"
 
 /*
  * Usage to test the communication into the local loop:
@@ -34,7 +36,7 @@ void initiateSessionTest( int argc, char** argv ) {
         // Make call to the specified sip address
         sip->addMedia( MIME_TYPE_AUDIO, "vorbis/PCMA/" );
         sip->addMedia( MIME_TYPE_VIDEO, "H263/");
-        sip->connect( argv[2], std::atoi(argv[3]) );
+        sip->connect( argv[2] );
     }
 }
 
@@ -44,10 +46,34 @@ void createSDPBodyTest() {
     sip->build_sdp();
 }
 
+void reconstructURITest() {
+
+    using std::cout;
+    using std::endl;
+
+    URI *addr = new URI("<sip:hello@192.168.1.230:50060>");
+    cout << "test URI " << endl;
+    addr->toString();
+
+    cout << addr->getAddress() << endl;
+
+}
+
+void localURITest() {
+
+    using std::cout;
+    using std::endl;
+
+    URI *local = new URI(5060);
+    cout << local->getAddress() << endl;
+
+}
 
 int main( int argc, char** argv ){
     initiateSessionTest( argc, argv );
     //createSDPBodyTest();
+    //reconstructURITest();
+    //localURITest();
     return 1;
 }
 

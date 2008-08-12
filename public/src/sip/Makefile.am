@@ -6,6 +6,8 @@ PJSIP_LIBS = -lpjsip -lpjsip-ua  -lpjlib-util -lpj -lpjsua -lpjsdp
 noinst_LTLIBRARIES = libsip.la
 
 libsip_la_SOURCES = \
+				uri.cpp \
+				uri.h \
 			 sdpmedia.cpp \
 			 sdpmedia.h \
 		     sdpcodec.cpp \

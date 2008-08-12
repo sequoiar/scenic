@@ -20,6 +20,7 @@
 #include "useragent.h"
 
 #include <stdlib.h>
+#include <iostream>
 
 
 /**************** STATIC VARIABLES AND FUNCTIONS (callbacks) **************************/
@@ -125,9 +126,12 @@ static Sdp *local_sdp;
 
 
 UserAgent::UserAgent( std::string name, int port )
-    : _name(name), _localIP( "" ), _lport(port)
+    : _name(name), _localURI(0)
 {
-    // nothing
+
+    // Use the empty constructor, so that the URI could guess the local parameters
+   _localURI = new URI( port );
+
 }
 
 
@@ -143,7 +147,10 @@ void UserAgent::init_sip_module( void ){
 
 
 int UserAgent::init_pjsip_modules(  ){
+
     pj_status_t status;
+    pj_sockaddr local;
+    pj_uint16_t listeningPort;
 
     // Init SIP module
     init_sip_module();
@@ -160,23 +167,13 @@ int UserAgent::init_pjsip_modules(  ){
     pj_caching_pool_init( &c_pool, &pj_pool_factory_default_policy, 0 );
 
     /* Create the endpoint */
-    status = pjsip_endpt_create( &c_pool.factory, pj_gethostname()->ptr, &endpt );
+    status = pjsip_endpt_create( &c_pool.factory, NULL, &endpt );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     /* Add UDP Transport */
-    const pj_str_t *hostname;
-    pj_sockaddr_in tmp_addr;
-    pjsip_host_port addrname;
-    char* addr;
-
-    hostname = pj_gethostname();
-    pj_sockaddr_in_init( &tmp_addr, hostname, 0 );
-    tmp_addr.sin_port = pj_htons((pj_uint16_t) this->_lport);
-    addr = pj_inet_ntoa( tmp_addr.sin_addr );
-    _localIP = addr;
-    addrname.host = pj_str((char*)this->_localIP.c_str());
-    addrname.port = this->_lport;
-    status = pjsip_udp_transport_start( endpt, &tmp_addr, &addrname, 1, NULL );
+    listeningPort = (pj_uint16_t) getLocalURI()->getPort();
+    pj_sockaddr_init( pj_AF_INET(), &local, NULL, listeningPort ); 
+    status = pjsip_udp_transport_start( endpt, &local.ipv4 , NULL, 1, NULL );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     /* Create transaction layer */
@@ -211,7 +208,7 @@ int UserAgent::init_pjsip_modules(  ){
     /* Initialize the SDP class instance */
     int aport = 12488; // random TODO Get the transport ports from gstreamer
     int vport = 12490; // random TODO Get the transport ports from gstreamer
-    local_sdp = new Sdp( _localIP, aport, vport );
+    local_sdp = new Sdp( getLocalURI()->getHostIP(), aport, vport );
 
     PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
 
@@ -219,20 +216,28 @@ int UserAgent::init_pjsip_modules(  ){
 }
 
 
-int UserAgent::create_invite_session( std::string uri, int port ){
+int UserAgent::create_invite_session( std::string uri ){
+
     pjsip_dialog *dialog;
     pjsip_tx_data *tdata;
     pj_status_t status;
-    std::string local = "\"Test\" <sip:test@192.168.1.230:7777>";
+    URI *remote, *local;
+    pj_str_t from, to;
+    char tmp[90];
+    
+    remote = new URI( uri );
+    local = getLocalURI();
 
-    pj_str_t target = pj_str( (char*)uri.c_str() );
-    pj_str_t from = pj_str( (char*) local.c_str() );
-    pj_str_t to = pj_str( (char*)uri.c_str() );
+    pj_ansi_sprintf( tmp, remote->getAddress().c_str() );
+    from = pj_str(tmp);
+
+    to.ptr = (char*) remote->getAddress().c_str() ;
+    to.slen = remote->getAddress().length();
 
     status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
-                                   &from,
-                                   &to,
-                                   &to,
+                                  NULL, 
+                                  &to,
+                                  NULL,
                                    &dialog );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
@@ -263,34 +268,6 @@ void UserAgent::listen( void){
 }
 
 
-pj_str_t UserAgent::build_contact_uri( std::string user, int port ){
-    pj_sockaddr hostaddr;
-    char uri[80];
-    char hostip[PJ_INET6_ADDRSTRLEN];
-    //std::string uri, hostip;
-
-    if( pj_gethostip(pj_AF_INET(), &hostaddr) != PJ_SUCCESS ) {
-        printf("Unable to retrieve local host IP\n");
-    }
-    pj_sockaddr_print( &hostaddr, hostip, sizeof(hostip), 2 );
-
-    //printf("user = %s\n", user.c_str());
-    //printf("host ip = %s\n", hostip);
-
-    pj_ansi_sprintf( uri, "<sip:%s@%s:%d>", user.c_str(), hostip, port );
-
-    printf("contact uri: %s\n", pj_str(uri).ptr);
-
-    return pj_str(uri);
-}
-
-
-void UserAgent::buildSDP( void ) {
-    printf(" Build SDP body\n");
-    //local_sdp->displayCodecsList();
-    //local_sdp->toStringTest();
-}
-
 void UserAgent::addMediaToSession( int mime_type, std::string codecs ){
     local_sdp->addMediaToSDP( mime_type, codecs );    
 }
@@ -318,6 +295,7 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
 
 
 static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
+    
     pj_status_t status;
     pj_str_t reason;
     unsigned options = 0;
@@ -346,15 +324,14 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     local_sdp->receivingInitialOffer( rdata->tp_info.pool, r_sdp );
 
     /* Create the local dialog (UAS) */
-    pj_str_t contact = pj_str((char*) "<sip:test@127.0.0.1:5060>");
+    //pj_str_t contact = pj_str((char*) "<sip:test@127.0.0.1:5060>");
     status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL, &dialog );
     if( status != PJ_SUCCESS ) {
         pjsip_endpt_respond_stateless( endpt, rdata, 500, &reason, NULL, NULL );
         return PJ_TRUE;
     }
     // Specify media capability during invite session creation
-    status = pjsip_inv_create_uas( dialog, rdata, local_sdp->getLocalSDPSession(
-                                       ), 0, &inv_session );
+    status = pjsip_inv_create_uas( dialog, rdata, local_sdp->getLocalSDPSession(), 0, &inv_session );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     // Send a 180/Ringing response

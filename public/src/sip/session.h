@@ -56,7 +56,7 @@ class Session
          * @param   r_uri	The remote SIP address
          * @param   r_port	The remote connection port
          */
-        virtual int connect( std::string r_uri, int r_port) = 0;
+        virtual int connect( std::string r_uri ) = 0;
 
         /*
          * Terminate a current remote connection

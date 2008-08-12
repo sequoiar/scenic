@@ -53,9 +53,8 @@ class SIPSession
          * Establishes a SIP connection with a remote host.
          *
          * @param   r_uri	The remote SIP address
-         * @param   r_port	The remote connection port (default SIP port: 5060)
          */
-        int connect( std::string r_uri, int r_port );
+        int connect( std::string r_uri );
 
         /*
          * Terminate a current SIP remote connection
@@ -86,6 +85,7 @@ class SIPSession
 
         SIPSession(const SIPSession&); //No Copy Constructor
         SIPSession& operator=(const SIPSession&); //No Assignment Operator
+
 };
 
 #endif // _SIP_SESSION_H

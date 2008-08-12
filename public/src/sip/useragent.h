@@ -36,6 +36,7 @@
 #include <string>
 
 #include "sdp.h"
+#include "uri.h"
 
 class UserAgent
 {
@@ -64,36 +65,35 @@ class UserAgent
          * Create an invite session. Handle the related incoming responses
          *
          * @param	uri	The SIP address to create connection with
-         * @param	port		The remote SIP port
+         *              Pattern: <sip:host@ip:port>
          *
          * @return  int	PJ_SUCCESS on success
          */
-        int create_invite_session( std::string uri, int port );
-
-        pj_str_t build_contact_uri( std::string user, int port );
+        int create_invite_session( std::string uri );
 
         /*
          * Start the main loop event
          */
         void listen( void );
 
-        void buildSDP( void );
-
         void addMediaToSession( int mime_type, std::string codecs );
+
+        URI* getLocalURI() { return _localURI; }
+
     private:
         /* The module name */
         std::string _name;
 
-        /* The local IP address */
-        std::string _localIP;
-
-        /* The local SIP port */
-        int _lport;
+        /* The local SIP address */
+        URI * _localURI;
 
         /*
          * Initialize the pjsip_module structure
          */
         void init_sip_module( void );
+
+        UserAgent(const UserAgent&); //No Copy Constructor
+        UserAgent& operator=(const UserAgent&); //No Assignment Operator
 };
 
 #endif // _USER_AGENT_H
