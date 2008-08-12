@@ -16,8 +16,13 @@
  *
  */
 
+using std::cout;
+using std::endl;
+using std::cerr;
+    
 
 void initiateSessionTest( int argc, char** argv ) {
+    
     if( argc == 1 )
         return;
 
@@ -26,17 +31,18 @@ void initiateSessionTest( int argc, char** argv ) {
     //sip->addMedia( MIME_TYPE_AUDIO, "vorbis/GSM/PCMU/PCMA/" );
     //sip->addMedia( MIME_TYPE_VIDEO, "H263/H264/");
     
-    if( argc <= 2 ){
+    if( argc == 3 ){
         // Listening mode
-        sip->addMedia( MIME_TYPE_AUDIO, "PCMU/GSM/vorbis" );
-        sip->addMedia( MIME_TYPE_VIDEO, "H264/H263/");
+        sip->addMedia( argv[2] );
         sip->startMainloop();
     }
-    else {
+    else if( argc == 4){
         // Make call to the specified sip address
-        sip->addMedia( MIME_TYPE_AUDIO, "vorbis/PCMA/" );
-        sip->addMedia( MIME_TYPE_VIDEO, "H263/");
+        sip->addMedia( argv[3] );
         sip->connect( argv[2] );
+    }
+    else {
+        cerr << "Wrong number of arguments" << endl;
     }
 }
 
