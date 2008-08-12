@@ -1,13 +1,13 @@
 #include <glib.h>
 #include <stdio.h>
 
-const char* str = "mystring=\"bar you\" Hello\twhat\fis 1\b the\r \\";
+const char* str = "mystring=\"bar you\" Hello tab:\twhat is 1 the \\";
 
 
 int main(int, char**)
 {
     printf("\nString:%s---\n", str);
-    gchar* g = g_strescape(str, 0);
+    gchar* g = g_strescape(str, "\b\r\f\t");
 
     printf("\nEsc String:%s---\n", g);
 
