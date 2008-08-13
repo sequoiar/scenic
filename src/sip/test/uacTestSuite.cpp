@@ -20,6 +20,21 @@ using std::cout;
 using std::endl;
 using std::cerr;
 
+SIPSession *sip;
+
+
+void instantMessageTest( ) {
+    int status;
+
+    std::string msg = "Hello World";
+    status = sip->sendInstantMessage( msg );
+
+    if( status == 0 )
+        printf(" Message sent successfully...\n");
+    else
+        printf(" Message sending failed...\n");
+}
+
 
 void initiateSessionTest( int argc, char** argv ) {
     std::string media;
@@ -32,7 +47,7 @@ void initiateSessionTest( int argc, char** argv ) {
         endl;
         return;
     }
-    Session* sip = new SIPSession(std::atoi(argv[1]));
+    sip = new SIPSession(std::atoi(argv[1]));
     nbMedia = argc - 3;
 
     // argv[1] -> listening port
@@ -46,6 +61,12 @@ void initiateSessionTest( int argc, char** argv ) {
     }
 
     sip->connect( peer );
+
+    instantMessageTest( );
+
+    //sip->disconnect(  );
+
+    printf("Done\n");
 }
 
 
