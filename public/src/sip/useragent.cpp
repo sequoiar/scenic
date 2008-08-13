@@ -49,7 +49,7 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e );
  * @param	inv	A pointer on a pjsip_inv_session structure
  * @param	e	A pointer on a pjsip_event structure
  */
-static void call_on_forked( pjsip_inv_session *inv, pjsip_event *e ){}
+static void call_on_forked( pjsip_inv_session *inv, pjsip_event *e );
 
 /*
  * Session callback
@@ -260,6 +260,37 @@ int UserAgent::create_invite_session( std::string uri ){
 }
 
 
+int UserAgent::terminate_invite_session( void ){
+    pj_status_t status;
+    pjsip_tx_data *tdata;
+
+    status = pjsip_inv_end_session( inv_session, 404, NULL, &tdata );
+    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+
+    //status = pjsip_inv_send_msg( inv_session, tdata );
+    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+
+    return PJ_SUCCESS;
+}
+
+
+int UserAgent::sendInstantMessage( std::string msg ){
+    pjsip_dialog *dlg;
+    pj_str_t text;
+    pj_status_t status;
+
+    // Get the dialog instance
+    dlg = inv_session->dlg;
+
+    // Call the private method to do the job
+    text = pj_str((char*)msg.c_str());
+    status = send_im_dialog( dlg, &text );
+    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+
+    return PJ_SUCCESS;
+}
+
+
 void UserAgent::listen( void){
     for(; !complete;) {
         pj_time_val timeout = {0, 10};
@@ -302,9 +333,47 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
 }
 
 
+pj_status_t UserAgent::send_im_dialog( pjsip_dialog *dlg, pj_str_t *msg ){
+    pjsip_method msg_method;
+    //pj_str_t name;
+    const pj_str_t STR_TEXT =  pj_str((char*)"text");;
+    const pj_str_t STR_PLAIN = pj_str((char*)"plain");
+    pjsip_tx_data *tdata;
+    pj_status_t status;
+
+    //name = pj_str((char*)"MESSAGE");
+    //name = { (char*)"MESSAGE" , 7};
+    //msg_method->PJSIP_OTHER_METHOD, name };
+    //msg_method = PJ_POOL_ZALLOC_T( dlg->pool , pjsip_method );
+    msg_method.id = PJSIP_OTHER_METHOD;
+    msg_method.name = pj_str((char*)"MESSAGE") ;
+
+
+    // Must lock dialog
+    pjsip_dlg_inc_lock( dlg );
+
+    // Create the message request
+    status = pjsip_dlg_create_request( dlg, &msg_method, -1 /*CSeq*/, &tdata );
+    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+
+    // Attach "text/plain" body */
+    tdata->msg->body = pjsip_msg_body_create( tdata->pool, &STR_TEXT, &STR_PLAIN, msg );
+
+    // Send the request
+    status = pjsip_dlg_send_request( dlg, tdata, -1, NULL);
+    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+
+    // Done
+    pjsip_dlg_dec_lock( dlg );
+
+    return PJ_SUCCESS;
+}
+
+
 /********************** Callbacks Implementation **********************************/
 
 static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
+    printf("Call state changed\n");
     if( inv->state == PJSIP_INV_STATE_DISCONNECTED )
         complete = 1;
 }
@@ -393,7 +462,33 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
 
 
 static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
-                                       pjsip_event *e ){}
+                                       pjsip_event *e ){
+    if( tsx->state == PJSIP_TSX_STATE_TERMINATED  &&
+        tsx->role == PJSIP_ROLE_UAC ) {
+        printf("stop loop\n");
+        complete = 1;
+    }
+
+    else if( tsx->state == PJSIP_TSX_STATE_TRYING &&
+             tsx->role == PJSIP_ROLE_UAS ){
+        pjsip_rx_data *rdata;
+        pjsip_msg *msg;
+        pj_status_t status;
+
+        // Incoming message request
+        cout << "Request received" << endl;
+
+        // Retrieve the body message
+        rdata = e->body.tsx_state.src.rdata;
+        msg = rdata->msg_info.msg;
+
+        // Respond with OK message
+        status = pjsip_dlg_respond( inv->dlg, rdata, MSG_OK, NULL, NULL, NULL );
+
+        // Display the message
+        cout << " ! New message : " << (char*)msg->body->data << endl;
+    }
+}
 
 
 static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
@@ -430,6 +525,12 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 
 static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
     printf("Invite session received new offer from peer - %s\n", offer->name.ptr);
+}
+
+
+static void call_on_forked( pjsip_inv_session *inv, pjsip_event *e ){
+    printf(
+        "The invite session module has created a new dialog because of forked outgoing request\n");
 }
 
 

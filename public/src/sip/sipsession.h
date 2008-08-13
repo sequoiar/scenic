@@ -61,6 +61,11 @@ class SIPSession
          */
         int disconnect();
 
+        /*
+         * Send an instant message
+         */
+        int sendInstantMessage( std::string msg );
+
         int accept( void );
 
         int refuse( int reason );

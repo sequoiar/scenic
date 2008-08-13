@@ -64,6 +64,11 @@ class Session
         virtual int disconnect( ) = 0;
 
         /*
+         * Send an instant message
+         */
+        virtual int sendInstantMessage( std::string msg ) = 0;
+
+        /*
          * Accept incoming request
          */
         virtual int accept( void ) = 0;

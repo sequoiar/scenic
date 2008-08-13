@@ -35,7 +35,13 @@ int SIPSession::connect( std::string r_uri ){
 
 
 int SIPSession::disconnect( void ){
+    _app_ua->terminate_invite_session();
     return 0;
+}
+
+
+int SIPSession::sendInstantMessage( std::string msg ){
+    return _app_ua->sendInstantMessage( msg );
 }
 
 
