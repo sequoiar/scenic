@@ -279,13 +279,11 @@ void UserAgent::addMediaToSession( std::string codecs ){
     media = codecs.substr(0, pos );
     codecs.erase(0, pos + 1);
 
-    printf("%s \n", media.c_str());
     strcmp( media.c_str(),
             "a" ) == 0 ||
     strcmp( media.c_str(),
             "A" ) == 0 ? mime_type = MIME_TYPE_AUDIO :  mime_type = MIME_TYPE_VIDEO ;
 
-    printf("%s - %i\n", codecs.c_str(), mime_type);
     local_sdp->addMediaToSDP( mime_type, codecs );
 }
 
@@ -372,9 +370,9 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
     }
 
-    else { // Negociation failed
-           // Create and send a 488( Not acceptable here)
-           // Probably no compatible media found in the remote SDP offer
+    else{ // Negociation failed
+          // Create and send a 488( Not acceptable here)
+          // Probably no compatible media found in the remote SDP offer
         status = pjsip_inv_answer( inv_session, MSG_NOT_ACCEPTABLE_HERE, NULL, NULL, &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
         status = pjsip_inv_send_msg( inv_session, tdata );
@@ -402,20 +400,31 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     // We need to get the final media choice and send it to gstreamer
     // Maybe we want to start the data streaming now...
 
-    if( status != PJ_SUCCESS )
-        return;
+    int nbMedia;
+    int nbCodecs;
+    int i, j;
     const pjmedia_sdp_session *r_sdp;
     pjmedia_sdp_media *media;
-    int c_count;
 
+    if( status != PJ_SUCCESS )
+        return;
     // Get local and remote SDP
-    pjmedia_sdp_neg_get_active_remote( inv->neg, &r_sdp );
+    pjmedia_sdp_neg_get_active_local( inv->neg, &r_sdp );
 
-    // Retrieve the codecs
-    media = r_sdp->media[0];
-    c_count = media->desc.fmt_count;
-    //printf("Codec count: %i\n" , c_count);
-    //printf("Codec payload: %s\n" , media->desc.fmt[c_count-1].ptr);
+    // Retrieve the media
+    nbMedia = r_sdp->media_count;
+    for( i=0; i<nbMedia ; i++ ){
+        printf("Media %i: ", i);
+        media = r_sdp->media[i];
+        nbCodecs = media->desc.fmt_count;
+        printf("Codec count: %i\n", nbCodecs);
+        for( j=0 ; j<nbCodecs ; j++ ){
+            printf("Codec payload: %s\n", media->desc.fmt[j].ptr);
+        }
+    }
+
+    //TODO Call to the core to update the selected codecs
+    // libboost
 }
 
 

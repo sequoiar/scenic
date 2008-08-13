@@ -153,11 +153,17 @@ class Sdp
          */
         void addMediaToSDP( int mime_type, std::string codecs );
 
-        pjmedia_sdp_neg_state getSDPNegociationState(){ return pjmedia_sdp_neg_get_state(
-                                                                   negociator ); }
+        pjmedia_sdp_neg_state getSDPNegociationState(){
+            return pjmedia_sdp_neg_get_state(
+                       negociator );
+        }
 
-        pj_status_t startNegociation( pj_pool_t *pool ){ return pjmedia_sdp_neg_negotiate(
-                                                                    pool, negociator, 0);  }
+
+        pj_status_t startNegociation( pj_pool_t *pool ){
+            return pjmedia_sdp_neg_negotiate(
+                       pool, negociator, 0);
+        }
+
 
     private:
 
