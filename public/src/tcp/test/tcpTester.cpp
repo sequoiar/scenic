@@ -1,6 +1,7 @@
-#include "tcp/tcpThread.h"
 #include <cassert>
 #include <iostream>
+#include <stdlib.h>
+#include "tcp/tcpThread.h"
 int main(int argc, char** argv)
 {
     if(argc < 2)
