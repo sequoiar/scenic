@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Sropulpof
-# Copyright (C) 2008 Société des arts technoligiques (SAT)
+# Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -22,11 +22,14 @@
 
 # System imports
 import os, os.path
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+#try:
+#    import cPickle as pickle
+#except ImportError:
+#    import pickle
 import re
+
+# Twisted imports
+from twisted.spread.jelly import jelly, unjelly
 
 # App imports
 from utils import log
@@ -81,11 +84,12 @@ class AddressBook(object):
 
     def read(self):
         try:
-            adb_file = open(self.filename, 'rb')
+            adb_file = open(self.filename, 'r')
         except:
             log.warning('Address Book file %s not found.' % self.filename)
         else:
-            self.contacts = pickle.load(adb_file)
+            self.contacts = unjelly(eval(adb_file.read().replace('\n', '').replace('\t', '')))
+#            self.contacts = pickle.load(adb_file)
             adb_file.close()
 
     def write(self):
@@ -98,11 +102,23 @@ class AddressBook(object):
                     log.warning('Could not create the directory %s.' % directory)
                     return
             try:
-                adb_file = open(self.filename, 'wb')
+                adb_file = open(self.filename, 'w')
             except:
                 log.warning('Could not open the Address Book file %s.' % self.filename)
             else:
-                pickle.dump(self.contacts, adb_file, 1)
+                dump = repr(jelly(self.contacts))
+                level = 0
+                nice_dump = []
+                for c in dump:
+                    if c == '[':
+                        if level > 0:
+                            nice_dump.append('\n' + '\t'*level)
+                        level += 1
+                    elif c == ']':
+                        level -= 1
+                    nice_dump.append(c)
+                adb_file.write(''.join(nice_dump))
+#                pickle.dump(self.contacts, adb_file, 1)
                 adb_file.close()
 
     
