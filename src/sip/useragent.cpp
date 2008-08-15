@@ -149,9 +149,11 @@ void UserAgent::init_sip_module( void ){
 
 
 int UserAgent::init_pjsip_modules(  ){
+    
     pj_status_t status;
     pj_sockaddr local;
     pj_uint16_t listeningPort;
+    URI *my_uri;
 
     // Init SIP module
     init_sip_module();
@@ -172,7 +174,8 @@ int UserAgent::init_pjsip_modules(  ){
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     /* Add UDP Transport */
-    listeningPort = (pj_uint16_t) getLocalURI()->getPort();
+    my_uri = getLocalURI();
+    listeningPort = (pj_uint16_t) my_uri->_port;
     pj_sockaddr_init( pj_AF_INET(), &local, NULL, listeningPort );
     status = pjsip_udp_transport_start( endpt, &local.ipv4, NULL, 1, NULL );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
@@ -207,9 +210,7 @@ int UserAgent::init_pjsip_modules(  ){
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     /* Initialize the SDP class instance */
-    int aport = 12488; // random TODO Get the transport ports from gstreamer
-    int vport = 12490; // random TODO Get the transport ports from gstreamer
-    local_sdp = new Sdp( getLocalURI()->getHostIP(), aport, vport );
+    local_sdp = new Sdp( my_uri->_hostIP );
 
     PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
 
@@ -267,7 +268,7 @@ int UserAgent::terminate_invite_session( void ){
     status = pjsip_inv_end_session( inv_session, 404, NULL, &tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    //status = pjsip_inv_send_msg( inv_session, tdata );
+    status = pjsip_inv_send_msg( inv_session, tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     return PJ_SUCCESS;
@@ -303,19 +304,27 @@ void UserAgent::addMediaToSession( std::string codecs ){
     size_t pos;
     std::string media;
     int mime_type;
+    int mport;
 
-    // codecs looks like that: m=codec1/codec2/..../codecn/ where m = a for audio or v for video
+    // codecs looks like that: m=codec1/codec2/..../codecn/:port where m = a for audio or v for video
     // We have got to retreive the media type first:
     pos = codecs.find("=", 0);
     media = codecs.substr(0, pos );
     codecs.erase(0, pos + 1);
+
+    // we retrieve the media transport port
+    pos = codecs.find(":",0);
+    mport = std::atoi( codecs.substr( pos+1, codecs.length() ).c_str() );
+    codecs.erase(pos, codecs.length());
+
+    cout << mport <<  endl;
 
     strcmp( media.c_str(),
             "a" ) == 0 ||
     strcmp( media.c_str(),
             "A" ) == 0 ? mime_type = MIME_TYPE_AUDIO :  mime_type = MIME_TYPE_VIDEO ;
 
-    local_sdp->addMediaToSDP( mime_type, codecs );
+    local_sdp->addMediaToSDP( mime_type, codecs, mport );
 }
 
 
@@ -335,16 +344,11 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
 
 pj_status_t UserAgent::send_im_dialog( pjsip_dialog *dlg, pj_str_t *msg ){
     pjsip_method msg_method;
-    //pj_str_t name;
     const pj_str_t STR_TEXT =  pj_str((char*)"text");;
     const pj_str_t STR_PLAIN = pj_str((char*)"plain");
     pjsip_tx_data *tdata;
     pj_status_t status;
 
-    //name = pj_str((char*)"MESSAGE");
-    //name = { (char*)"MESSAGE" , 7};
-    //msg_method->PJSIP_OTHER_METHOD, name };
-    //msg_method = PJ_POOL_ZALLOC_T( dlg->pool , pjsip_method );
     msg_method.id = PJSIP_OTHER_METHOD;
     msg_method.name = pj_str((char*)"MESSAGE") ;
 
@@ -486,7 +490,7 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
         status = pjsip_dlg_respond( inv->dlg, rdata, MSG_OK, NULL, NULL, NULL );
 
         // Display the message
-        cout << " ! New message : " << (char*)msg->body->data << endl;
+        cout << " ! bloub said : " << (char*)msg->body->data << endl;
     }
 }
 

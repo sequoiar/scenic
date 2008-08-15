@@ -48,41 +48,11 @@ class Sdp
          * Class Constructor.
          *
          * @param ip_addr
-         * @param aport     The port to transport audio media
-         * @param vport     The port to transport video media
          */
-        Sdp( std::string ip_addr, int aport, int vport );
+        Sdp( std::string ip_addr );
 
         /* Class destructor */
         ~Sdp();
-
-        /*
-         * Write accessor. Modify the audio port to use for RTP transport
-         *
-         * @param aport     the new audio port
-         */
-        void setAudioPort( int aport ) { _audioPort = aport; }
-
-        /*
-         * Write accessor. Modify the video port to use for RTP transport
-         *
-         * @param aport     the new video port
-         */
-        void setVideoPort( int vport ) { _videoPort = vport; }
-
-        /*
-         * Read accessor. Get the RTP audio port
-         *
-         * @return int  The audio port
-         */
-        int getAudioPort( void ) { return _audioPort; }
-
-        /*
-         * Read accessor. Get the RTP video port
-         *
-         * @return int  The video port
-         */
-        int getVideoPort( void ) { return _videoPort; }
 
         /*
          * Read accessor. Get the list of media
@@ -90,12 +60,6 @@ class Sdp
          * @return std::vector<sdpCodec*>   the vector containing the audio codecs
          */
         std::vector<sdpMedia*> getSDPMediaList( void ) { return _sdpMediaList; }
-
-        /*
-         * The place to add the codecs in the list
-         * Temporary - used for tests
-         */
-        void setCodecsList( void );
 
         /*
          *  Read accessor. Get the sdp session information
@@ -110,11 +74,6 @@ class Sdp
          * @param pool  The pool to allocate memory
          */
         int createLocalOffer( pj_pool_t *pool );
-
-        /*
-         * A method to display the SDP body
-         */
-        void toString( void );
 
         /*
          * Build the sdp media section
@@ -151,7 +110,7 @@ class Sdp
          * @param mime_type The type of media
          * @param codecs    The formatted list of codecs name (separator: '/')
          */
-        void addMediaToSDP( int mime_type, std::string codecs );
+        void addMediaToSDP( int mime_type, std::string codecs, int mport );
 
         pjmedia_sdp_neg_state getSDPNegociationState(){
             return pjmedia_sdp_neg_get_state(
@@ -166,9 +125,6 @@ class Sdp
 
 
     private:
-
-        /* The media transport port */
-        int _audioPort, _videoPort;
 
         /* The media list */
         std::vector<sdpMedia*> _sdpMediaList;

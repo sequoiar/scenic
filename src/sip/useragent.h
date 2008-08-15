@@ -91,6 +91,7 @@ class UserAgent
 
         int sendInstantMessage( std::string message );
 
+
     private:
         /* The module name */
         std::string _name;
@@ -107,6 +108,7 @@ class UserAgent
 
         UserAgent(const UserAgent&); //No Copy Constructor
         UserAgent& operator=(const UserAgent&); //No Assignment Operator
+        
 };
 
 #endif // _USER_AGENT_H

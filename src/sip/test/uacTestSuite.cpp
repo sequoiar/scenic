@@ -23,7 +23,7 @@ using std::cerr;
 SIPSession *sip;
 
 
-void instantMessageTest( ) {
+void sendInstantMessageTest( ) {
     int status;
 
     std::string msg = "Hello World";
@@ -62,9 +62,9 @@ void initiateSessionTest( int argc, char** argv ) {
 
     sip->connect( peer );
 
-    instantMessageTest( );
+    sendInstantMessageTest( );
 
-    //sip->disconnect(  );
+    sip->disconnect(  );
 
     printf("Done\n");
 }
