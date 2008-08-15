@@ -48,6 +48,8 @@ class URI
         std::string _hostName;
         std::string _hostIP;
         int _port;
+
+        friend class UserAgent;
 };
 
 #endif // _SIP_URI

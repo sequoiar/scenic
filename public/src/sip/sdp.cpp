@@ -21,7 +21,7 @@
 
 #include <pjlib.h>
 #include <sstream>
-//#include <iostream>
+#include <iostream>
 
 static const pj_str_t STR_AUDIO = { (char*)"audio", 5};
 static const pj_str_t STR_VIDEO = { (char*)"video", 5};
@@ -33,15 +33,15 @@ static const pj_str_t STR_SDP_NAME = { (char*)"miville", 7 };
 static const pj_str_t STR_SENDRECV = { (char*)"sendrecv", 8 };
 
 Sdp::Sdp( )
-    : _audioPort(-1), _videoPort(0), _sdpMediaList( 0 ), _ip_addr( "" ), _local_offer( NULL),
+    :  _sdpMediaList( 0 ), _ip_addr( "" ), _local_offer( NULL),
     negociator(NULL)
 {
     //setCodecsList();
 }
 
 
-Sdp::Sdp( std::string ip_addr, int aport, int vport )
-    : _audioPort( aport ), _videoPort( vport ), _sdpMediaList(0), _ip_addr( ip_addr ),
+Sdp::Sdp( std::string ip_addr )
+    : _sdpMediaList(0), _ip_addr( ip_addr ),
     _local_offer( NULL ), negociator(NULL)
 {
     //setCodecsList();
@@ -50,7 +50,7 @@ Sdp::Sdp( std::string ip_addr, int aport, int vport )
 
 Sdp::~Sdp(){}
 
-void Sdp::addMediaToSDP( int mime_type, std::string codecs ){
+void Sdp::addMediaToSDP( int mime_type, std::string codecs, int mport ){
     sdpMedia *media;
     sdpCodec *codec;
     size_t pos;
@@ -70,25 +70,8 @@ void Sdp::addMediaToSDP( int mime_type, std::string codecs ){
         media->addCodec(codec);
     }
 
-    addMedia( media, (mime_type == MIME_TYPE_AUDIO) ? getAudioPort() : getVideoPort() );
+    addMedia( media, mport );
 }
-
-
-void Sdp::setCodecsList( void ) {
-    sdpMedia *audio = new sdpMedia( MIME_TYPE_AUDIO );
-    sdpCodec *gsm = new sdpCodec(MIME_TYPE_AUDIO, "GSM", RTP_PAYLOAD_GSM, 1, 8000);
-    audio->addCodec(gsm);
-    sdpCodec *ulaw = new sdpCodec(MIME_TYPE_AUDIO, "PCMU", RTP_PAYLOAD_ULAW, 1, 8000);
-    audio->addCodec(ulaw);
-
-    sdpMedia *video = new sdpMedia( MIME_TYPE_VIDEO );
-    sdpCodec *h264 = new sdpCodec(MIME_TYPE_VIDEO, "H264", RTP_PAYLOAD_H264, 0, 90000);
-    video->addCodec(h264);
-
-    addMedia( audio, getAudioPort() );
-    addMedia( video, getVideoPort() );
-}
-
 
 void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
                                   pjmedia_sdp_media** p_med ) {
@@ -104,6 +87,7 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
     pj_strdup(pool, &med->desc.media,
               ( media->getType() == MIME_TYPE_AUDIO ) ? &STR_AUDIO : &STR_VIDEO );
     med->desc.port_count = 1;
+    std::cout <<  media->getPort() << std::endl;
     med->desc.port = media->getPort();
     pj_strdup (pool, &med->desc.transport, &STR_RTP_AVP);
 
@@ -262,39 +246,7 @@ void Sdp::sdp_addMediaDescription( pj_pool_t* pool ){
 
 void Sdp::addMedia( sdpMedia *media, int port ){
     _sdpMediaList.push_back( media );
+    std::cout << port << std::endl;
     media->setPort( port );
 }
-
-
-void Sdp::toString(){
-    /*
-       std::ostringstream body;
-       using std::cout; using std::endl;
-       unsigned int i;
-
-       pjmedia_sdp_session* sdp = getLocalSDPSession();
-
-       body << "v=" << sdp->origin.version << "\r\n";
-       body << "o=" << sdp->origin.user.ptr << " " << sdp->origin.id << " " << sdp->origin.id <<
-       " " << sdp->origin.net_type.ptr << " " << sdp->origin.addr_type.ptr << " " <<
-       sdp->origin.addr.ptr << "\r\n";
-       body << "s=" << sdp->name.ptr << "\r\n";
-       body << "c=" << sdp->origin.net_type.ptr << " " << sdp->origin.addr_type.ptr << " " <<
-       sdp->origin.addr.ptr << "\r\n";
-       body << "t=" << sdp->time.start << " " << sdp->time.stop << "\r\n";
-       body << "a=" << sdp->attr[0]->name.ptr << "\r\n";
-       body << "m=" << sdp->media[0]->desc.media.ptr << " " << getAudioPort() << " " <<
-       sdp->media[0]->desc.transport.ptr << " ";
-       for( i=0; i<sdp->media[0]->desc.fmt_count; i++ ){
-       printf(" %i nvlSJvbJSKLBV = %s\n", sdp->media[0]->desc.fmt_count,
-       sdp->media[0]->desc.fmt[i].ptr);
-       body << "m=" << sdp->media[0]->desc.media.ptr << " " << getAudioPort() << " " << sdp->media[0]->desc.transport.ptr << " ";
-       for( i=0;i<sdp->media[0]->desc.fmt_count;i++ ){
-       body << sdp->media[0]->desc.fmt[i].ptr << " ";
-       }
-
-       cout << body.str() << endl;
-     */
-}
-
 
