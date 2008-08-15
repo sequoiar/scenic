@@ -44,6 +44,8 @@ class AddressBook(object):
     
     def __init__(self, filename):
         filename = to_utf(filename)
+        self.major = None
+        self.minor = None
         self.contacts = {'_selected':None}
         self.filename = os.environ['HOME'] + '/.' + filename + '/' + filename + '.adb'
         self.read()
@@ -88,8 +90,19 @@ class AddressBook(object):
         except:
             log.warning('Address Book file %s not found.' % self.filename)
         else:
-            self.contacts = unjelly(eval(adb_file.read().replace('\n', '').replace('\t', '')))
-#            self.contacts = pickle.load(adb_file)
+            version = re.findall('v(\d+)\.(\d+)', adb_file.readline())
+            if version:
+                self.major = int(version[0][0])
+                self.minor = int(version[0][1])
+                
+                if self.major == 1:
+                    self.contacts = unjelly(eval(adb_file.read().replace('\n', '').replace('\t', '')))
+            else:
+                adb_file.seek(0)
+                try:
+                    self.contacts = pickle.load(adb_file)
+                except:
+                    log.warning('Unable to read the Address Book file %s. Bad format.' % self.filename)
             adb_file.close()
 
     def write(self):
@@ -106,19 +119,21 @@ class AddressBook(object):
             except:
                 log.warning('Could not open the Address Book file %s.' % self.filename)
             else:
-                dump = repr(jelly(self.contacts))
-                level = 0
-                nice_dump = []
-                for c in dump:
-                    if c == '[':
-                        if level > 0:
-                            nice_dump.append('\n' + '\t'*level)
-                        level += 1
-                    elif c == ']':
-                        level -= 1
-                    nice_dump.append(c)
-                adb_file.write(''.join(nice_dump))
-#                pickle.dump(self.contacts, adb_file, 1)
+                if self.major == 1:
+                    dump = repr(jelly(self.contacts))
+                    level = 0
+                    nice_dump = ['v1.0\n']
+                    for c in dump:
+                        if c == '[':
+                            if level > 0:
+                                nice_dump.append('\n' + '\t'*level)
+                            level += 1
+                        elif c == ']':
+                            level -= 1
+                        nice_dump.append(c)
+                    adb_file.write(''.join(nice_dump))
+                else:
+                    pickle.dump(self.contacts, adb_file, 1)
                 adb_file.close()
 
     
