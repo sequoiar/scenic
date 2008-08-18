@@ -314,7 +314,7 @@ void UserAgent::addMediaToSession( std::string codecs ){
 
     // we retrieve the media transport port
     pos = codecs.find(":",0);
-    mport = std::atoi( codecs.substr( pos+1, codecs.length() ).c_str() );
+    mport = atoi( codecs.substr( pos+1, codecs.length() ).c_str() );
     codecs.erase(pos, codecs.length());
 
     cout << mport <<  endl;
