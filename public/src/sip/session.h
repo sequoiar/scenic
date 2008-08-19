@@ -29,7 +29,7 @@
 
 #include "useragent.h"
 
-#define SIP 0
+#define PROTOCOL_SIP    0
 
 class Session
 {
@@ -97,6 +97,5 @@ class Session
         /* The protocol listening port */
         int _port;
 };
-
 
 #endif // _SESSION_H

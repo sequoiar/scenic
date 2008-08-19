@@ -34,7 +34,7 @@
 #define _DEFAULT_SIP_PORT   5060
 
 class SIPSession
-    : public Session
+: public Session
 {
     public:
         /*
@@ -82,13 +82,14 @@ class SIPSession
          */
         void addMedia( std::string codecs );
 
+        SIPSession(SIPSession const&); //No Copy Constructor
+        SIPSession& operator=(const SIPSession&); //No Assignment Operator
+
     private:
 
         /* The application SIP User Agent */
         UserAgent* _app_ua;
 
-        SIPSession(const SIPSession&); //No Copy Constructor
-        SIPSession& operator=(const SIPSession&); //No Assignment Operator
 };
 
 #endif // _SIP_SESSION_H

@@ -52,8 +52,6 @@ void createSDPBodyTest() {
 
 
 void reconstructURITest() {
-    using std::cout;
-    using std::endl;
 
     URI *addr = new URI("<sip:hello@192.168.1.230:50060>");
     cout << "test URI " << endl;
@@ -64,8 +62,6 @@ void reconstructURITest() {
 
 
 void localURITest() {
-    using std::cout;
-    using std::endl;
 
     URI *local = new URI(5060);
     cout << local->getAddress() << endl;
@@ -74,9 +70,6 @@ void localURITest() {
 
 int main( int argc, char** argv ){
     initiateSessionTest( argc, argv );
-    //createSDPBodyTest();
-    //reconstructURITest();
-    //localURITest();
     return 1;
 }
 
