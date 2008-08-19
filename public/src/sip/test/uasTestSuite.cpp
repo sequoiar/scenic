@@ -52,7 +52,6 @@ void createSDPBodyTest() {
 
 
 void reconstructURITest() {
-
     URI *addr = new URI("<sip:hello@192.168.1.230:50060>");
     cout << "test URI " << endl;
     addr->toString();
@@ -62,7 +61,6 @@ void reconstructURITest() {
 
 
 void localURITest() {
-
     URI *local = new URI(5060);
     cout << local->getAddress() << endl;
 }

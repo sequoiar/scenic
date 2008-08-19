@@ -4,13 +4,13 @@
 
 using namespace boost::python;
 
-BOOST_PYTHON_MODULE( sip_export ) {
-
+BOOST_PYTHON_MODULE( sip_export )
+{
     class_<SIPSession>("SIPSession", init<int>())
-        .def("connect", &SIPSession::connect)
-        .def("addMedia", &SIPSession::addMedia)
-        .def("disconnect", &SIPSession::disconnect)
-        .def("startMainloop", &SIPSession::startMainloop)
-        ;
+    .def("connect", &SIPSession::connect)
+    .def("addMedia", &SIPSession::addMedia)
+    .def("disconnect", &SIPSession::disconnect)
+    .def("startMainloop", &SIPSession::startMainloop)
+    ;
 }
 

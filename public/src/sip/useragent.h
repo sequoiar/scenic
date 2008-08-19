@@ -108,7 +108,6 @@ class UserAgent
 
         UserAgent(const UserAgent&); //No Copy Constructor
         UserAgent& operator=(const UserAgent&); //No Assignment Operator
-        
 };
 
 #endif // _USER_AGENT_H
