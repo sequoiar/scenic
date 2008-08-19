@@ -21,16 +21,18 @@
 
 SIPSession::SIPSession( int port )
     : Session( PROTOCOL_SIP, port ), _app_ua( new UserAgent( _APP_NAME, port ) ){
-
     // Init the pjsip library modules
     _app_ua->init_pjsip_modules( );
 }
+
 
 SIPSession::SIPSession( SIPSession const& )
-    : Session( PROTOCOL_SIP, _DEFAULT_SIP_PORT ), _app_ua( new UserAgent( _APP_NAME, _DEFAULT_SIP_PORT ) ){
+    : Session( PROTOCOL_SIP,
+               _DEFAULT_SIP_PORT ), _app_ua( new UserAgent( _APP_NAME, _DEFAULT_SIP_PORT ) ){
     // Init the pjsip library modules
     _app_ua->init_pjsip_modules( );
 }
+
 
 SIPSession::~SIPSession(){}
 
@@ -72,4 +74,5 @@ void SIPSession::startMainloop( void ){
 void SIPSession::addMedia( std::string codecs ){
     _app_ua->addMediaToSession( codecs );
 }
+
 

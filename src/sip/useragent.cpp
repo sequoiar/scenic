@@ -149,7 +149,6 @@ void UserAgent::init_sip_module( void ){
 
 
 int UserAgent::init_pjsip_modules(  ){
-    
     pj_status_t status;
     pj_sockaddr local;
     pj_uint16_t listeningPort;
@@ -313,7 +312,7 @@ void UserAgent::addMediaToSession( std::string codecs ){
     codecs.erase(0, pos + 1);
 
     // we retrieve the media transport port
-    pos = codecs.find(":",0);
+    pos = codecs.find(":", 0);
     mport = atoi( codecs.substr( pos+1, codecs.length() ).c_str() );
     codecs.erase(pos, codecs.length());
 

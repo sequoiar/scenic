@@ -33,16 +33,14 @@ static const pj_str_t STR_SDP_NAME = { (char*)"miville", 7 };
 static const pj_str_t STR_SENDRECV = { (char*)"sendrecv", 8 };
 
 Sdp::Sdp( )
-    :  _sdpMediaList( 0 ), _ip_addr( "" ), _local_offer( NULL),
-    negociator(NULL)
+    :  _sdpMediaList( 0 ), _ip_addr( "" ), _local_offer( NULL), negociator(NULL)
 {
     //setCodecsList();
 }
 
 
 Sdp::Sdp( std::string ip_addr )
-    : _sdpMediaList(0), _ip_addr( ip_addr ),
-    _local_offer( NULL ), negociator(NULL)
+    : _sdpMediaList(0), _ip_addr( ip_addr ), _local_offer( NULL ), negociator(NULL)
 {
     //setCodecsList();
 }
@@ -72,6 +70,7 @@ void Sdp::addMediaToSDP( int mime_type, std::string codecs, int mport ){
 
     addMedia( media, mport );
 }
+
 
 void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
                                   pjmedia_sdp_media** p_med ) {
@@ -249,4 +248,5 @@ void Sdp::addMedia( sdpMedia *media, int port ){
     std::cout << port << std::endl;
     media->setPort( port );
 }
+
 
