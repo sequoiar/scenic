@@ -469,7 +469,7 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
     if( tsx->state == PJSIP_TSX_STATE_TERMINATED  &&
         tsx->role == PJSIP_ROLE_UAC ) {
         printf("stop loop\n");
-        //complete = 1;
+        complete = 1;
     }
 
     else if( tsx->state == PJSIP_TSX_STATE_TRYING &&
