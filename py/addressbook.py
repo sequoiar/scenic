@@ -22,10 +22,10 @@
 
 # System imports
 import os, os.path
-#try:
-#    import cPickle as pickle
-#except ImportError:
-#    import pickle
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 import re
 
 # Twisted imports
