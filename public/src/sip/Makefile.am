@@ -1,16 +1,16 @@
 include $(top_srcdir)/src/globals.mak
-
 PJSIP_LIBS = -lpjsip -lpjsip-ua  -lpjlib-util -lpj -lpjsua -lpjsdp
 
-WRAPPER_LIBS =  /usr/lib/libpython2.5.so.1.0 -lboost_python 
-WRAPPER_FLAGS = -I /usr/include/python2.5 -I /usr/include/boost/python/
+## .so's are in .libs
+noinst_LTLIBRARIES = libsip.la libsip_export.la
 
-sip_export_so_SOURCES = sip_export.cpp
-sip_export_so_CXXFLAGS = -fPIC -g -Wall $(WRAPPER_FLAGS)
-sip_export_so_LDFLAGS = -shared $(WRAPPER_LIBS) libsip.la
+libsip_export_la_SOURCES = sip_export.cpp
+libsip_export_la_LDFLAGS = $(src)/sip/libsip.la -l$(BOOST_PYTHON_LIB)
 
-noinst_LTLIBRARIES = libsip.la
-noinst_PROGRAMS = sip_export.so
+libsip_export_la_CPPFLAGS =  $(AM_CPPFLAGS) $(PJ_CFLAGS) -I$(PYTHON_INCLUDE_DIR) 
+libsip_export_la_LIBADD = $(PJSIP_LIBS) -l$(BOOST_PYTHON_LIB) 
+
+
 
 libsip_la_SOURCES = \
 					uri.cpp \
@@ -27,7 +27,6 @@ libsip_la_SOURCES = \
 					session.h \
 					sipsession.h 
 
-libsip_la_LDFLAGS = $(PJSIP_LIBS) -lpthread $(WRAPPER_LIBS)
-libsip_la_CPPFLAGS =  $(AM_CPPFLAGS) $(PJ_CFLAGS) $(WRAPPER_FLAGS)
+libsip_la_CPPFLAGS =  $(AM_CPPFLAGS) $(PJ_CFLAGS) -I$(PYTHON_INCLUDE_DIR) 
 
 

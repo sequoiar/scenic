@@ -91,8 +91,8 @@ fi
 #AC_SUBST(PYTHON_CFLAGS)
 #AC_SUBST(PYTHON_LIBS)
 
-#AX_PYTHON
-#AX_BOOST_PYTHON
+AX_PYTHON
+AX_BOOST_PYTHON
 
 
 
@@ -104,6 +104,10 @@ AC_CONFIG_FILES([Makefile
                  src/gutil/test/Makefile
                  src/tcp/Makefile
                  src/tcp/test/Makefile
+                 src/prototypes/Makefile
+                 src/prototypes/hello/Makefile
+                 src/prototypes/hello/test/Makefile
+                 src/prototypes/python/Makefile
                  src/osc/Makefile
                  src/osc/test/Makefile
                  src/main/Makefile
@@ -112,7 +116,3 @@ AC_CONFIG_FILES([Makefile
                  ])
 AC_OUTPUT
 
-#                 src/prototypes/Makefile
-#                 src/prototypes/hello/Makefile
-#                 src/prototypes/hello/test/Makefile
-#                 src/prototypes/python/Makefile
