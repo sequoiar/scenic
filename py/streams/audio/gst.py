@@ -19,60 +19,41 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 # Twisted imports
-from twisted.internet import reactor
-from twisted.protocols.basic import LineReceiver
+from twisted.internet import reactor, protocol, defer
+#from twisted.protocols.basic import LineReceiver
 
 # App imports
-from protocols import icpc
+#from protocols import ipcp
 from streams.stream import AudioStream, Stream
+from streams.gst_client import GstClient
 from utils import log
 
 log = log.start('info', 1, 0, 'audioGst')
 
-class AudioGst(AudioStream):
+class AudioGst(AudioStream, GstClient):
     """Class streams->audio->gst.AudioGst
     """
     
     def __init__(self, port, address='127.0.0.1'):
         AudioStream.__init__(self)
-        self.s_port = s_port
-        self.address = address
-        if not hasattr(Stream, 'gst'):
-            deferred = icpc.connect(address, port)
-            deferred.addCallback(self.connectionReady)
-            
-    def connectionReady(self, gst):
-        Stream.gst = gst
-        log.info('GST inter-process link created')
-            
-    def _unhandled_message(self, path, types, data, addr):
-        log.info('Unhandled OSC message comming from %s:%s with this address: %s' % (addr[0], addr[1], path))
+        GstClient.__init__(self, port, address)
         
-    def _container(self, path, types, data, addr):
-        if data == 'ACK':
-            self.callbacks['container'] = 1
-        elif:
-            self.callbacks['container'] = 0
-        
-    def _send_message(self, name, value=None):
-        message = OscMessage()
-        message.setAddress('/audio/%s' % name)
-        message.append(value)
-        Stream.osc.send_message(self.address, self.s_port, message)
-        self.callbacks[name] = 0
-#        reactor.callLater(0.5, self.check_ack, name)
-#        
-#    def check_ack(self, name):
-#        if self.callbacks[name]:
-#            log.warning('Did not receive the ACK for %s' % name)
-#            self.callbacks[name] = 0
+        # Add callback for commands coming from GST
+#        Stream.gst.add_callback()
             
         
+#    @defer.inlineCallbacks
     def get_attr(self, name):
         """        
         name: string
         """
-        self._send_message(name)        
+        return getattr(self, name)
+#        self._send_cmd('audio_get', name)
+#        answer = self._send_cmd('audio_get', name)
+#        def got_answer(result):
+#            return result
+#        answer.addCallback(got_answer)
+#        return answer              
     
     def get_attrs(self):
         """function get_attrs
@@ -86,7 +67,10 @@ class AudioGst(AudioStream):
         name: string
         value: 
         """
-        self._send_message(name, value)        
+        if hasattr(self, name):
+            setattr(self, name, value)
+            return True, name, value
+        return False, name, value
     
     def set_attrs(self):
         """function set_attrs

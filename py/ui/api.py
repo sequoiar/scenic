@@ -20,12 +20,14 @@
 
 import sys
 
+# App imports
+
 class ControllerApi():
     
     def __init__(self, core):
         self.adb = core.adb
         self.notify = core.notify
-        self.audio = core.curr_setting['audio']
+        self.setting = core.curr_setting
 
 
     ### Contacts ###
@@ -54,5 +56,29 @@ class ControllerApi():
 
     ### Audio ###
     
-    def audio_container(self, caller, container):
-        self.notify(caller, self.audio.set_attr('container', container))
+    def audio_set(self, caller, name, attr, value):
+        stream = self.setting.get_stream(name, 'audio')
+        if stream:
+            self.notify(caller, (stream.set_attr(attr, value), name))
+        else:
+            self.notify(caller, name, 'not_found')
+
+    def audio_settings(self, caller, name):
+        self.notify(caller, (self.setting.get_stream(name, 'audio'), name))
+        
+    def audio_add(self, caller, name):
+        self.notify(caller, (self.setting.add_stream(name, 'audio'), name))
+        
+    def audio_delete(self, caller, name):
+        self.notify(caller, (self.setting.delete_stream(name, 'audio'), name))
+        
+    def audio_rename(self, caller, name, new_name):
+        self.notify(caller, (self.setting.rename_stream(name, new_name, 'audio'), name, new_name))
+        
+    def audio_list(self, caller):
+        self.notify(caller, self.setting.list_stream('audio'))
+
+
+
+
+                

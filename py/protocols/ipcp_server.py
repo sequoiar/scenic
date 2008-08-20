@@ -28,10 +28,11 @@ class IPCP(LineReceiver):
     
     def lineReceived(self, line):
         print "Client: " + line
+        self.sendLine('audio_get "ogg"')
 
     def connectionMade(self):
         print "A client is connecting!"
-        self.sendLine(r'You "are conn\"ected!" 56 45.33')
+#        self.sendLine(r'You "are conn\"ected!" 56 45.33')
         
         
 if __name__ == "__main__":

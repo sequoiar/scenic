@@ -44,7 +44,7 @@ class AddressBook(object):
     
     def __init__(self, filename):
         filename = to_utf(filename)
-        self.major = None
+        self.major = 1
         self.minor = None
         self.contacts = {'_selected':None}
         self.filename = os.environ['HOME'] + '/.' + filename + '/' + filename + '.adb'

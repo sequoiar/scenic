@@ -81,7 +81,8 @@ class Stream(object):
     def __init__(self):
         self.port = None  # (int) 
         self.buffer = None  # (int) 
-        self.mode = None  # (string) 
+        self.mode = None  # (string) send or receive
+        self.state = 0
     
     def start(self, address=None):
         """ 
