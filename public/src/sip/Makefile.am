@@ -1,4 +1,5 @@
 include $(top_srcdir)/src/globals.mak
+#if x86_64 pjsip must be built with -fPIC option see note below
 PJSIP_LIBS = -lpjsip -lpjsip-ua  -lpjlib-util -lpj -lpjsua -lpjsdp
 
 ## .so's are in .libs
@@ -30,4 +31,13 @@ libsip_la_SOURCES = \
 					sipsession.h 
 
 libsip_la_CPPFLAGS =  $(AM_CPPFLAGS) $(PJ_CFLAGS) -I$(PYTHON_INCLUDE_DIR) 
+
+# Note:
+#   To build pjsip for x86_64 in a shared lib context use
+#   ./aconfigure CFLAGS='-Wno-unused-label -fPIC' 
+#   when building pjsip
+#
+#   http://lists.pjsip.org/pipermail/pjsip_lists.pjsip.org/2007-November/000783.html
+#
+#
 
