@@ -22,7 +22,7 @@
 import re
 
 # twisted imports
-from twisted.internet import reactor, protocol
+from twisted.internet import reactor, protocol, defer
 from twisted.protocols.basic import LineReceiver
 
 # App imports
@@ -71,7 +71,8 @@ class IPCP(LineReceiver):
                         args[pos] = float(arg)
                     except:
                         log.debug('Invalid type for received argument %s.' % arg)
-            print cmd, args
+            print "Received: ", cmd, args
+    #        self.deferred.callback((cmd, args))
             self.callbacks[cmd](*args)
     
     def send_cmd(self, cmd, *args):
@@ -87,6 +88,8 @@ class IPCP(LineReceiver):
             else:
                 log.debug('Invalid type (%s) for argument %s to send.' % (type(arg), arg))
         self.sendLine(' '.join(line))
+#        self.deferred = defer.Deferred()
+#        return self.deferred
 
     def connectionLost(self, reason=protocol.connectionDone):
         log.info('Lost the server connection.')
@@ -97,10 +100,14 @@ def connect(addr, port, timeout=2, bindAddress=None):
     deferred = client_creator.connectTCP(addr, port, timeout, bindAddress)
     return deferred
 
+def connection_failed(protocol):
+    log.warning("Connection failed!")        
+        
 
 
-
-
+def grrr(test):
+    print test
+    print "yes!"
 
 def test(arg1, arg2, arg3):
     print "perte"
@@ -109,14 +116,17 @@ def test(arg1, arg2, arg3):
 # When connected, send a line
 def connectionReady(protocol):
     protocol.add_callback('You', test)
+    protocol.connectionLost = grrr
     protocol.sendLine('Hey there')
     protocol.send_cmd('test', 23.3, 34, 'gros bouton', 1)
-    reactor.callLater(2, reactor.stop)
-        
-        
+    reactor.callLater(10, protocol.sendLine, 'Coco')
+    reactor.callLater(20, reactor.stop)
+
+
 if __name__ == "__main__":
     # Client example
     # Create creator and connect
     deferred = connect('127.0.0.1', 22222)
     deferred.addCallback(connectionReady)
+    deferred.addErrback(connection_failed)
     reactor.run()

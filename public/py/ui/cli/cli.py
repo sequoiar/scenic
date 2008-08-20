@@ -112,7 +112,7 @@ class CliController(TelnetServer):
         cp = CliParser(self, prog=data[0], description="Manage the address book.")
         cp.add_option("-l", "--list", action='store_true', help="List all the contacts")
         cp.add_option("-a", "--add", type="string", help="Add a contact")
-        cp.add_option("-d", "--delete", type="string", help="Delete a contact")
+        cp.add_option("-e", "--erase", "-d", "--delete", type="string", help="Erase a contact")
         cp.add_option("-m", "--modify", type="string", help="Modify a contact")
         cp.add_option("-s", "--select", help="Select a contact")
         
@@ -138,16 +138,67 @@ class CliController(TelnetServer):
             cp.print_help()
             
     def _audio(self, data):
+        cp = CliParser(self, prog=data[0], description="Manage the audio streams.")
+        cp.add_option("-l", "--list", action='store_true', help="List all the audio streams or settings if stream is specified")
+
+        cp.add_option("-a", "--add", type="string", help="Add an audio stream")
+        cp.add_option("-e", "--erase", type="string", help="Erase an audio stream")
+        cp.add_option("-m", "--modify", type="string", help="Modify the name of an audio stream")
+        
+        cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
+        cp.add_option("-c", "--codec", type="string", help="Set the codec")
+        cp.add_option("-s", "--settings", type="string", help="Set the codec settings (set1:val,set2:val)")
+        cp.add_option("-d", "--bitdepth", type="int", help="Set the bitdepth of the audio (default: 16 bit)")
+        cp.add_option("-r", "--samplerate", type="int", help="Set the samplerate of the audio (default: 48000 Hz")
+        cp.add_option("-v", "--channels", "--voices", type="int", help="Set the number of audio channels (from 1 to 8)")
+        cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
+        cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
+
+        (options, args) = cp.parse_args(data)
+                
+        if len(args) > 1:
+            name = args[1]
+            if options.list:
+                self.core.audio_settings(self, name)
+            elif options.modify:
+                self.core.audio_rename(self, name, options.modify)
+            elif [opt for opt in options.__dict__.values() if opt]:
+                if options.container:
+                    self.core.audio_set(self, name, 'container', options.container)
+                if options.codec:
+                    self.core.audio_set(self, name, 'codec', options.codec)
+                if options.settings:
+                    self.core.audio_set(self, name, 'codec_settings', options.settings)
+                if options.bitdepth:
+                    self.core.audio_set(self, name, 'bitdepth', options.bitdepth)
+                if options.samplerate:
+                    self.core.audio_set(self, name, 'sample_rate', options.samplerate)
+                if options.channels:
+                    self.core.audio_set(self, name, 'channels', options.channels)
+                if options.port:
+                    self.core.audio_set(self, name, 'port', options.port)
+                if options.buffer:
+                    self.core.audio_set(self, name, 'buffer', options.buffer)
+        elif options.list:
+            self.core.audio_list(self)
+        elif options.add:
+            self.core.audio_add(self, options.add)
+        elif options.erase:
+            self.core.audio_delete(self, options.erase)
+        else:
+            cp.print_help()
+            
+    def _streams(self, data):
         cp = CliParser(self, prog=data[0], description="Manage the audio stream.")
         cp.add_option("-l", "--list", action='store_true', help="List all the audio settings")
-        cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set/get the container")
-        cp.add_option("-c", "--codec", type="string", help="Set/get the codec")
-        cp.add_option("-s", "--settings", type="string", help="Set/get the codec settings (set1:val,set2:val)")
-        cp.add_option("-d", "--bitdepth", type="int", help="Set/get the bitdepth of the audio (default: 16 bit)")
-        cp.add_option("-r", "--samplerate", type="int", help="Set/get the samplerate of the audio (default: 48000 Hz")
-        cp.add_option("-v", "--channels", "--voices", type="int", help="Set/get the number of audio channels (from 1 to 8)")
-        cp.add_option("-p", "--port", type="int", help="Set/get the network port (5020-5030)")
-        cp.add_option("-b", "--buffer", type="int", help="Set/get the latency buffer (in millisec)")
+        cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
+        cp.add_option("-c", "--codec", type="string", help="Set the codec")
+        cp.add_option("-s", "--settings", type="string", help="Set the codec settings (set1:val,set2:val)")
+        cp.add_option("-d", "--bitdepth", type="int", help="Set the bitdepth of the audio (default: 16 bit)")
+        cp.add_option("-r", "--samplerate", type="int", help="Set the samplerate of the audio (default: 48000 Hz")
+        cp.add_option("-v", "--channels", "--voices", type="int", help="Set the number of audio channels (from 1 to 8)")
+        cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
+        cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
 
         (options, args) = cp.parse_args(data)
         
@@ -155,19 +206,21 @@ class CliController(TelnetServer):
             self.core.audio_status(self)
         elif [opt for opt in options.__dict__.values() if opt]:
             if options.container:
-                self.core.audio_container(self, options.container)
+                self.core.audio_set(self, 'container', options.container)
             if options.codec:
-                self.core.audio_codec(self, options.codec)
+                self.core.audio_set(self, 'codec', options.codec)
+            if options.settings:
+                self.core.audio_set(self, 'codec_settings', options.settings)
             if options.bitdepth:
-                self.core.audio_bitdepth(self, options.bitdepth)
+                self.core.audio_set(self, 'bitdepth', options.bitdepth)
             if options.samplerate:
-                self.core.audio_samplerate(self, options.samplerate)
+                self.core.audio_set(self, 'sample_rate', options.samplerate)
             if options.channels:
-                self.core.audio_channels(self, options.channels)
+                self.core.audio_set(self, 'channels', options.channels)
             if options.port:
-                self.core.audio_port(self, options.port)
+                self.core.audio_set(self, 'port', options.port)
             if options.buffer:
-                self.core.audio_buffer(self, options.buffer)
+                self.core.audio_set(self, 'buffer', options.buffer)
         else:
             cp.print_help()
         
@@ -376,6 +429,87 @@ class CliView(Observer):
                 self.write('Contact selected')
             else:
                 self.write('Could not select this contact because this name doesn\'t exist.')
+
+    def _audio_set(self, origin, ((state, attr, value), name)):
+        if origin is self.controller:
+            if state:
+                self.write('%s of audio stream %s is set to %s.' % (attr, name, value))
+            else:
+                self.write('Unable to set %s of audio stream %s.' % (attr, name))
+                
+    def _not_found(self, origin, name):
+        if origin is self.controller:
+            self.write('There\'s no audio stream with the name %s' % name)
+                
+    def _audio_settings(self, origin, (data, name)):
+        if origin is self.controller:
+            if data:
+                if data.state == 0:
+                    state = 'idle'
+                elif data.state == 1:
+                    state = 'playing'
+                else:
+                    state = 'unknown'
+                msg = [bold('Audio Stream: ' + name)]
+                msg.append('\nstatus: ')
+                msg.append(state)
+                msg.append('\ncontainer: ')
+                msg.append(str(data.container))
+                msg.append('\ncodec: ')
+                msg.append(str(data.codec))
+                msg.append('\ncodec settings: ')
+                msg.append(str(data.codec_settings))
+                msg.append('\nbitdepth: ')
+                msg.append(str(data.bitdepth))
+                msg.append('\nsamplerate: ')
+                msg.append(str(data.sample_rate))
+                msg.append('\nchannels: ')
+                msg.append(str(data.channels))
+                msg.append('\nbuffer: ')
+                msg.append(str(data.buffer))
+                msg.append('\nport: ')
+                msg.append(str(data.port))
+                self.write("".join(msg))
+            else:
+                self._not_found(origin, name)
+            
+    def _audio_add(self, origin, (data, name)):
+        if origin is self.controller:
+            if data == 1:
+                self.write('Audio stream %s created.' % name)
+            elif data == 0:
+                self.write("Cannot create audio stream. Name '%s' already use." % name)
+            else:
+                self.write('Unable to create the audio stream %s.' % name)
+                
+    def _audio_delete(self, origin, (data, name)):
+        if origin is self.controller:
+            if data == 1:
+                self.write('Audio stream %s deleted.' % name)
+            elif data == 0:
+                self._not_found(origin, name)
+            else:
+                self.write('Unable to delete the audio stream %s.' % name)
+        
+    def _audio_rename(self, origin, (data, name, new_name)):
+        if origin is self.controller:
+            if data == 1:
+                self.write('Audio stream %s rename to %s.' % (name, new_name))
+            elif data == 0:
+                self._not_found(origin, name)
+            else:
+                self.write('Unable to rename the audio stream %s.' % name)
+        
+                
+    def _audio_list(self, origin, data):
+        if origin is self.controller:
+            if data:
+                keys = data.keys()
+                keys.sort()
+                self.write("\n".join(keys))
+            else:
+                self.write('There is no audio stream.')
+            
             
 
 def bold(msg):
