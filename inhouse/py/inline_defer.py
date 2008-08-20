@@ -26,9 +26,10 @@ def get_data(cmd):
 def test():
     print 'Start test'
     query = "http://www.google.com"
+    com = ComTest()
     prev = time.time()
     print 'before getPage', prev
-    content = yield get_data(query)
+    content = yield com.send(query)
 #    print content
     print 'after getPage', time.time() - prev
 #    return content
