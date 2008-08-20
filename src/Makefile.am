@@ -1,1 +1,1 @@
-SUBDIRS = gst gst/test gutil gutil/test tcp tcp/test osc osc/test main sip
+SUBDIRS = gst gst/test gutil gutil/test tcp tcp/test prototypes osc osc/test main sip
