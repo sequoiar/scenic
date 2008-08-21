@@ -30,13 +30,18 @@
 #include "session.h"
 #include "useragent.h"
 
-#define _APP_NAME   "miville"
-#define _DEFAULT_SIP_PORT   5060
+#define APP_NAME   "miville"
+#define DEFAULT_SIP_PORT   5060
 
 class SIPSession
     : public Session
 {
     public:
+        /*
+         * Create a new SIP session object
+         */
+        SIPSession( );
+        
         /*
          * Create a new SIP session object
          *

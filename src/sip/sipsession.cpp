@@ -20,21 +20,32 @@
 #include "sipsession.h"
 #include <iostream>
 
-SIPSession::SIPSession( int port )
-    : Session( PROTOCOL_SIP, port ), _app_ua( new UserAgent( _APP_NAME, port ) ){
-    pj_status_t status;
+SIPSession::SIPSession()
+    : Session( PROTOCOL_SIP, DEFAULT_SIP_PORT), _app_ua(NULL){
 
-    // Init the pjsip library modules
-    status = _app_ua->init_pjsip_modules( );
-}
+        _app_ua = new UserAgent( APP_NAME, DEFAULT_SIP_PORT );
+        _app_ua->init_pjsip_modules( );
+    }
+
+SIPSession::SIPSession( int port )
+    : Session( PROTOCOL_SIP, port ), _app_ua(NULL) {
+
+        pj_status_t status;
+
+        _app_ua = new UserAgent( APP_NAME, port );
+        // Init the pjsip library modules
+        status = _app_ua->init_pjsip_modules( );
+    }
 
 
 SIPSession::SIPSession( SIPSession const& )
     : Session( PROTOCOL_SIP,
-               _DEFAULT_SIP_PORT ), _app_ua( new UserAgent( _APP_NAME, _DEFAULT_SIP_PORT ) ){
-    // Init the pjsip library modules
-    _app_ua->init_pjsip_modules( );
-}
+            DEFAULT_SIP_PORT ), _app_ua( NULL ){
+        
+        _app_ua = new UserAgent( APP_NAME, DEFAULT_SIP_PORT );
+        // Init the pjsip library modules
+        _app_ua->init_pjsip_modules( );
+    }
 
 
 SIPSession::~SIPSession(){}
