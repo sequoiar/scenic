@@ -10,7 +10,6 @@ BOOST_PYTHON_MODULE( sip_export )
     .def("connect", &SIPSession::connect)
     .def("addMedia", &SIPSession::addMedia)
     .def("disconnect", &SIPSession::disconnect)
-    .def("startMainloop", &SIPSession::startMainloop)
     ;
 }
 

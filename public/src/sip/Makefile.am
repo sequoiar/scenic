@@ -15,6 +15,8 @@ libsip_export_la_LIBADD = libsip.la $(PJSIP_LIBS) -l$(BOOST_PYTHON_LIB)
 
 
 libsip_la_SOURCES = \
+					instantmessaging.cpp \
+					instantmessaging.h \
 					uri.cpp \
 					uri.h \
 					sdpmedia.cpp \
