@@ -70,14 +70,14 @@ void AudioDelaySource<T>::link_elements()
 {
     T::link_elements(); // link elements that precede the filters
 
-    link_element_vectors(T::aconvs_, filters_);
+    GstBase::link(T::aconvs_, filters_);
 }
 
 
 template <typename T>
 void AudioDelaySource<T>::link_interleave()
 {
-    T::interleave_.link_to_sources(filters_);
+    GstBase::link(filters_, T::interleave());
 }
 
 

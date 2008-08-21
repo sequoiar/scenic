@@ -65,19 +65,19 @@ AudioSource::~AudioSource()
 
 void AudioSource::link_elements()
 {
-    link_element_vectors(sources_, aconvs_);
+    link(sources_, aconvs_);
 }
 
 
 void AudioSource::link_interleave()
 {
-    interleave_.link_to_sources(aconvs_);
+     link(aconvs_, &interleave_);
 }
 
 
 void AudioSource::link_to_sink(GstElement *sink)
 {
-    interleave_.link_to_sink(sink);
+    link(&interleave_, sink);
 }
 
 
@@ -205,7 +205,7 @@ void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
 
 void AudioFileSource::link_elements()
 {
-    link_element_vectors(sources_, decoders_);
+    link(sources_, decoders_);
 }
 
 

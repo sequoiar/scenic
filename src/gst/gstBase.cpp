@@ -103,8 +103,7 @@ bool GstBase::link_pads(GstPad *srcPad, GstPad *sinkPad)
 }
 
 
-void GstBase::link_element_vectors(std::vector<GstElement*> &sources,
-                                   std::vector<GstElement*> &sinks)
+void GstBase::link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks)
 {
     GstIter src;
     GstIter sink;
@@ -113,4 +112,43 @@ void GstBase::link_element_vectors(std::vector<GstElement*> &sources,
         assert(gst_element_link(*src, *sink));
 }
 
+
+void GstBase::link(GstElement *src, GstElement *sink)
+{
+    assert(gst_element_link(src, sink));
+}
+
+
+void GstBase::link(GstBase *src, GstElement *sink)
+{
+    assert(gst_element_link(src->element(), sink));
+}
+
+
+void GstBase::link(GstElement *src, GstBase *sink)
+{
+    assert(gst_element_link(src, sink->element()));
+}
+
+
+void GstBase::link(GstBase *src, GstBase *sink)
+{
+    assert(gst_element_link(src->element(), sink->element()));
+}
+
+
+void GstBase::link(std::vector<GstElement*> &sources, GstBase *sink)
+{
+    GstIter src;
+    for (src = sources.begin(); src != sources.end(); ++src)
+        assert(gst_element_link(*src, sink->element()));
+}
+
+
+void GstBase::link(GstBase *src, std::vector<GstElement*> &sinks)
+{
+    GstIter sink;
+    for (sink = sinks.begin(); sink != sinks.end(); ++sink)
+        assert(gst_element_link(src->element(), *sink));
+}
 
