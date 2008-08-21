@@ -19,9 +19,14 @@ static std::string MENU =
 int main(int argc, char** argv){
     char input[50];
     std::string msg;
+    Session *sip;
 
     // Session creation
-    Session *sip = new SIPSession( atoi(argv[1]));
+    if( argc == 2 )
+        sip = new SIPSession( atoi(argv[1]));
+    else
+        sip = new SIPSession( );
+    
     sip->addMedia("a=vorbis/PCMA/:12345");
 
     // Console main
@@ -33,7 +38,7 @@ int main(int argc, char** argv){
         switch(input[0])
         {
             case 'c':
-                sip->connect("<sip:bloup@192.168.1.230:5060>");
+                sip->connect("<sip:bloup@192.168.1.230:0>");
                 break;
             case 'd':
                 sip->disconnect();

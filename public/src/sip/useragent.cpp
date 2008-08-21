@@ -26,6 +26,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+#define RANDOM_SIP_PORT   rand() % 64000 + 1024
 
 /**************** STATIC VARIABLES AND FUNCTIONS (callbacks) **************************/
 
@@ -146,11 +147,13 @@ UserAgent::UserAgent( std::string name, int port )
 {
     _localURI = new URI( port );
     _imModule = new InstantMessaging();
+    srand(time(NULL));
 }
 
 
 UserAgent::~UserAgent(){
     // TODO thread_join ...
+    // pj_shutdown
     thread_quit = 1;
 
     // Delete pointers reference
@@ -164,7 +167,6 @@ UserAgent::~UserAgent(){
     }
 }
 
-
 void UserAgent::init_sip_module( void ){
     mod_ua.name = pj_str((char*)this->_name.c_str());
     mod_ua.id = -1;
@@ -172,7 +174,6 @@ void UserAgent::init_sip_module( void ){
     mod_ua.on_rx_request = &on_rx_request;
     mod_ua.on_rx_response = &on_rx_response;
 }
-
 
 int UserAgent::init_pjsip_modules(  ){
     pj_status_t status;
@@ -206,6 +207,14 @@ int UserAgent::init_pjsip_modules(  ){
     listeningPort = (pj_uint16_t) my_uri->_port;
     pj_sockaddr_init( pj_AF_INET(), &local, NULL, listeningPort );
     status = pjsip_udp_transport_start( endpt, &local.ipv4, NULL, 1, NULL );
+    if( status != PJ_SUCCESS ){
+        // Maybe the port is already in use
+        // Try a random one
+        listeningPort = RANDOM_SIP_PORT;
+        pj_sockaddr_init( pj_AF_INET(), &local, NULL, listeningPort );
+        status = pjsip_udp_transport_start( endpt, &local.ipv4, NULL, 1, NULL );
+        my_uri->_port = listeningPort;
+    }
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     /* Create transaction layer */
@@ -248,7 +257,6 @@ int UserAgent::init_pjsip_modules(  ){
 
     return PJ_SUCCESS;
 }
-
 
 int UserAgent::create_invite_session( std::string uri ){
     pjsip_dialog *dialog;
