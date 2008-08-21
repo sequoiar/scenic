@@ -63,6 +63,8 @@ class Session
          */
         virtual int disconnect( ) = 0;
 
+        virtual int shutdown() = 0;
+
         /*
          * Send an instant message
          */

@@ -41,7 +41,7 @@ class SIPSession
          * Create a new SIP session object
          */
         SIPSession( );
-        
+
         /*
          * Create a new SIP session object
          *
@@ -65,6 +65,8 @@ class SIPSession
          * Terminate a current SIP remote connection
          */
         int disconnect();
+
+        int shutdown();
 
         /*
          * Send an instant message

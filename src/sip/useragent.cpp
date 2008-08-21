@@ -108,6 +108,11 @@ static pjsip_endpoint *endpt;
 static pj_caching_pool c_pool;
 
 /*
+ * The pool to allocate memory
+ */
+static pj_pool_t *app_pool;
+
+/*
  *	The SIP module
  */
 static pjsip_module mod_ua;
@@ -125,7 +130,7 @@ static pj_bool_t thread_quit = 0;
 /*
  * The main thread
  */
-static pj_thread_t *thread;
+static pj_thread_t *sipThread;
 
 static int startThread( void *arg );
 
@@ -146,26 +151,45 @@ UserAgent::UserAgent( std::string name, int port )
     : _name(name), _localURI(0)
 {
     _localURI = new URI( port );
+    // Instantiate the instant messaging module
     _imModule = new InstantMessaging();
+    // To generate a different random number at each time
     srand(time(NULL));
 }
 
 
 UserAgent::~UserAgent(){
-    // TODO thread_join ...
-    // pj_shutdown
-    thread_quit = 1;
-
     // Delete pointers reference
     delete local_sdp; local_sdp = 0;
     delete _imModule; _imModule = 0;
+
+    pjsip_shutdown();
+}
+
+
+int UserAgent::pjsip_shutdown(){
+    // Delete SIP thread
+    thread_quit = 1;
+    pj_thread_join( sipThread );
+    pj_thread_destroy( sipThread );
+    sipThread = NULL;
 
     // Delete SIP endpoint
     if(endpt) {
         pjsip_endpt_destroy( endpt );
         endpt = NULL;
     }
+    // Delete memory pools
+    if( app_pool ){
+        pj_pool_release( app_pool );
+        app_pool = NULL;
+        pj_caching_pool_destroy(&c_pool);
+    }
+    pj_shutdown();
+
+    return 0;
 }
+
 
 void UserAgent::init_sip_module( void ){
     mod_ua.name = pj_str((char*)this->_name.c_str());
@@ -175,13 +199,13 @@ void UserAgent::init_sip_module( void ){
     mod_ua.on_rx_response = &on_rx_response;
 }
 
+
 int UserAgent::init_pjsip_modules(  ){
     pj_status_t status;
     pj_sockaddr local;
     pj_uint16_t listeningPort;
     URI *my_uri;
     pjsip_inv_callback inv_cb;
-    pj_pool_t *pool;
 
 
     // Init SIP module
@@ -249,14 +273,15 @@ int UserAgent::init_pjsip_modules(  ){
     local_sdp = new Sdp( my_uri->_hostIP );
 
     /* Start working threads */
-    pool = pj_pool_create( &c_pool.factory, "pool", 4000, 4000, NULL );
-    pj_thread_create( pool, "app", &startThread, NULL, PJ_THREAD_DEFAULT_STACK_SIZE, 0,
-                      &thread );
+    app_pool = pj_pool_create( &c_pool.factory, "pool", 4000, 4000, NULL );
+    pj_thread_create( app_pool, "app", &startThread, NULL, PJ_THREAD_DEFAULT_STACK_SIZE, 0,
+                      &sipThread );
 
     PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
 
     return PJ_SUCCESS;
 }
+
 
 int UserAgent::create_invite_session( std::string uri ){
     pjsip_dialog *dialog;
