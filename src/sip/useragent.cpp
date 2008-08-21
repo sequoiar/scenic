@@ -18,7 +18,6 @@
  */
 
 #include "useragent.h"
-//#include "sipthread.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -125,8 +124,6 @@ static pj_bool_t thread_quit = 0;
 /*
  * The main thread
  */
-//static SIPThread *_evThread;
-
 static pj_thread_t *thread;
 
 static int startThread( void *arg );
@@ -136,28 +133,35 @@ static int startThread( void *arg );
  */
 static Sdp *local_sdp;
 
+/*
+ * The instant messaging module
+ */
+static InstantMessaging *_imModule;
+
 /*************************************************************************************************/
 
 
 UserAgent::UserAgent( std::string name, int port )
     : _name(name), _localURI(0)
 {
-    // Use the empty constructor, so that the URI could guess the local parameters
     _localURI = new URI( port );
-    //_evThread = new SIPThread(this);
+    _imModule = new InstantMessaging();
 }
 
 
 UserAgent::~UserAgent(){
-    //thread_quit = 1;
+    // TODO thread_join ...
+    thread_quit = 1;
 
-    //TODO Destroy the main thread
-    //delete _evThread; _evThread = 0;
+    // Delete pointers reference
+    delete local_sdp; local_sdp = 0;
+    delete _imModule; _imModule = 0;
 
-    /*if(endpt) {
+    // Delete SIP endpoint
+    if(endpt) {
         pjsip_endpt_destroy( endpt );
         endpt = NULL;
-       }*/
+    }
 }
 
 
@@ -175,6 +179,8 @@ int UserAgent::init_pjsip_modules(  ){
     pj_sockaddr local;
     pj_uint16_t listeningPort;
     URI *my_uri;
+    pjsip_inv_callback inv_cb;
+    pj_pool_t *pool;
 
 
     // Init SIP module
@@ -195,9 +201,6 @@ int UserAgent::init_pjsip_modules(  ){
     status = pjsip_endpt_create( &c_pool.factory, NULL, &endpt );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    /* TODO Start the main thread */
-    pj_pool_t *pool = pj_pool_create( &c_pool.factory, "toto", 4000, 4000, NULL );
-
     /* Add UDP Transport */
     my_uri = getLocalURI();
     listeningPort = (pj_uint16_t) my_uri->_port;
@@ -213,8 +216,7 @@ int UserAgent::init_pjsip_modules(  ){
     status = pjsip_ua_init_module( endpt, NULL );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    /* Init the callbacks for INVITE session */
-    pjsip_inv_callback inv_cb;
+    /* Register the callbacks for INVITE session */
     pj_bzero( &inv_cb, sizeof(inv_cb) );
     inv_cb.on_state_changed = &call_on_state_changed;
     inv_cb.on_new_session = &call_on_forked;
@@ -237,13 +239,14 @@ int UserAgent::init_pjsip_modules(  ){
     /* Initialize the SDP class instance */
     local_sdp = new Sdp( my_uri->_hostIP );
 
-    // Start working threads
+    /* Start working threads */
+    pool = pj_pool_create( &c_pool.factory, "pool", 4000, 4000, NULL );
     pj_thread_create( pool, "app", &startThread, NULL, PJ_THREAD_DEFAULT_STACK_SIZE, 0,
                       &thread );
 
     PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
 
-    return 1;
+    return PJ_SUCCESS;
 }
 
 
@@ -302,23 +305,18 @@ int UserAgent::terminate_invite_session( void ){
 
 
 int UserAgent::sendInstantMessage( std::string msg ){
-    pjsip_dialog *dlg;
-    pj_str_t text;
     pj_status_t status;
 
-    // Get the dialog instance
-    dlg = inv_session->dlg;
+    // Set the current dialog for the instant messaging module
+    _imModule->setDialog( inv_session->dlg );
+    _imModule->setText( msg );
 
-    // Call the private method to do the job
-    text = pj_str((char*)msg.c_str());
-    status = send_im_dialog( dlg, &text );
+    // Send the message through the im module
+    status = _imModule->sendMessage();
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     return PJ_SUCCESS;
 }
-
-
-void UserAgent::listen(void){}
 
 
 static int startThread( void *arg ){
@@ -350,8 +348,6 @@ void UserAgent::addMediaToSession( std::string codecs ){
     mport = atoi( codecs.substr( pos+1, codecs.length() ).c_str() );
     codecs.erase(pos, codecs.length());
 
-    cout << mport <<  endl;
-
     strcmp( media.c_str(),
             "a" ) == 0 ||
     strcmp( media.c_str(),
@@ -372,38 +368,6 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
     pjmedia_sdp_parse( rdata->tp_info.pool, (char*)body->data, body->len, &sdp );
 
     *r_sdp = sdp;
-}
-
-
-pj_status_t UserAgent::send_im_dialog( pjsip_dialog *dlg, pj_str_t *msg ){
-    pjsip_method msg_method;
-    const pj_str_t STR_TEXT =  pj_str((char*)"text");;
-    const pj_str_t STR_PLAIN = pj_str((char*)"plain");
-    pjsip_tx_data *tdata;
-    pj_status_t status;
-
-    msg_method.id = PJSIP_OTHER_METHOD;
-    msg_method.name = pj_str((char*)"MESSAGE") ;
-
-
-    // Must lock dialog
-    pjsip_dlg_inc_lock( dlg );
-
-    // Create the message request
-    status = pjsip_dlg_create_request( dlg, &msg_method, -1 /*CSeq*/, &tdata );
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
-    // Attach "text/plain" body */
-    tdata->msg->body = pjsip_msg_body_create( tdata->pool, &STR_TEXT, &STR_PLAIN, msg );
-
-    // Send the request
-    status = pjsip_dlg_send_request( dlg, tdata, -1, NULL);
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
-    // Done
-    pjsip_dlg_dec_lock( dlg );
-
-    return PJ_SUCCESS;
 }
 
 
@@ -429,7 +393,6 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     pjmedia_sdp_session *r_sdp;
 
     cout << "Callback on_rx_request entered" << endl;
-
 
     /* Respond statelessly any non-INVITE requests with 500 */
     if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
@@ -514,8 +477,6 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
 static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
                                        pjsip_event *e ){
     cout << "transaction state changed to " <<tsx->state << endl;
-    //cout << "Method : " << e->body.tsx_state.src.rdata->msg_info.msg->line.req.method.id << endl;
-
 
     if( tsx->state == PJSIP_TSX_STATE_TERMINATED  &&
         tsx->role == PJSIP_ROLE_UAC ) {
@@ -530,6 +491,7 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
         pjsip_rx_data *rdata;
         pjsip_msg *msg;
         pj_status_t status;
+        std::string text;
 
         // Incoming message request
         cout << "Request received" << endl;
@@ -542,7 +504,9 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
         status = pjsip_dlg_respond( inv->dlg, rdata, MSG_OK, NULL, NULL, NULL );
 
         // Display the message
-        cout << " ! bloub said : " << (char*)msg->body->data << endl;
+        text = (char*)msg->body->data;
+        _imModule->setResponse( text );
+        _imModule->displayResponse();
     }
 
     else {
@@ -559,33 +523,33 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     // Maybe we want to start the data streaming now...
 
     cout << "on media update" << endl;
-/*
-    int nbMedia;
-    int nbCodecs;
-    int i, j;
-    const pjmedia_sdp_session *r_sdp;
-    pjmedia_sdp_media *media;
+    /*
+       int nbMedia;
+       int nbCodecs;
+       int i, j;
+       const pjmedia_sdp_session *r_sdp;
+       pjmedia_sdp_media *media;
 
-    if( status != PJ_SUCCESS )
-        return;
-    // Get local and remote SDP
-    pjmedia_sdp_neg_get_active_local( inv->neg, &r_sdp );
+       if( status != PJ_SUCCESS )
+       return;
+       // Get local and remote SDP
+       pjmedia_sdp_neg_get_active_local( inv->neg, &r_sdp );
 
-    // Retrieve the media
-    nbMedia = r_sdp->media_count;
-    for( i=0; i<nbMedia ; i++ ){
-        printf("Media %i: ", i);
-        media = r_sdp->media[i];
-        nbCodecs = media->desc.fmt_count;
-        printf("Codec count: %i\n", nbCodecs);
-        for( j=0 ; j<nbCodecs ; j++ ){
-            printf("Codec payload: %s\n", media->desc.fmt[j].ptr);
-        }
-    }
+       // Retrieve the media
+       nbMedia = r_sdp->media_count;
+       for( i=0; i<nbMedia ; i++ ){
+       printf("Media %i: ", i);
+       media = r_sdp->media[i];
+       nbCodecs = media->desc.fmt_count;
+       printf("Codec count: %i\n", nbCodecs);
+       for( j=0 ; j<nbCodecs ; j++ ){
+       printf("Codec payload: %s\n", media->desc.fmt[j].ptr);
+       }
+       }
 
-    //TODO Call to the core to update the selected codecs
-    // libboost
- */
+       //TODO Call to the core to update the selected codecs
+       // libboost
+     */
 }
 
 

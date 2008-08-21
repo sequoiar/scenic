@@ -77,8 +77,6 @@ class Session
 
         virtual void build_sdp() = 0;
 
-        virtual void startMainloop() = 0;
-
         /*
          * Add a media to the session. It will be used for SDP session
          *

@@ -20,7 +20,7 @@
 #ifndef _USER_AGENT_H
 #define _USER_AGENT_H
 
-#define THIS_FILE       "useragent.cpp"
+#define THIS_FILE       "useragent"
 #define _LOCAL_IP_ADDRESS   "127.0.0.1"
 
 #define MSG_RINGING                 180
@@ -43,8 +43,7 @@
 
 #include "sdp.h"
 #include "uri.h"
-
-//class SIPThread;
+#include "instantmessaging.h"
 
 class UserAgent
 {
@@ -81,11 +80,6 @@ class UserAgent
 
         int terminate_invite_session();
 
-        /*
-         * Start the main loop event
-         */
-        void listen( void );
-
         void addMediaToSession( std::string codecs );
 
         URI* getLocalURI() { return _localURI; }
@@ -94,10 +88,14 @@ class UserAgent
 
 
     private:
-        /* The module name */
+        /*
+         * The SIP module name
+         */
         std::string _name;
 
-        /* The local SIP address */
+        /*
+         * The local SIP address
+         */
         URI * _localURI;
 
         /*

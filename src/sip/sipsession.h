@@ -72,8 +72,6 @@ class SIPSession
 
         void build_sdp( void );
 
-        void startMainloop();
-
         /*
          * Add a media to the session. It will be used for SDP session
          *

@@ -10,7 +10,9 @@ static std::string MENU =
     "Enter menu character:\n"
     "  c    Connect\n"
     "  d    Disconnect\n"
-    "  m    Say hello to peer\n"
+    "  a    Add media\n"
+    "  m    Chat\n"
+    "  h    Help\n"
     "  q    Quit\n"
     "\n";
 
@@ -36,10 +38,18 @@ int main(int argc, char** argv){
             case 'd':
                 sip->disconnect();
                 break;
+            case 'a':
+                cout << " Add a media: <<<< ";
+                cin >> msg;
+                sip->addMedia(msg);
+                break;
             case 'm':
                 cout << "Enter message <<<< ";
                 cin >> msg;
                 sip->sendInstantMessage(msg);
+                break;
+            case 'h':
+                cout << MENU << endl;
                 break;
             case 'q':
                 exit(0);
