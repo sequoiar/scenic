@@ -86,6 +86,7 @@ class UserAgent
 
         int sendInstantMessage( std::string message );
 
+        int pjsip_shutdown();
 
     private:
         /*

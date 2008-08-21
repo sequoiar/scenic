@@ -22,30 +22,28 @@
 
 SIPSession::SIPSession()
     : Session( PROTOCOL_SIP, DEFAULT_SIP_PORT), _app_ua(NULL){
+    _app_ua = new UserAgent( APP_NAME, DEFAULT_SIP_PORT );
+    _app_ua->init_pjsip_modules( );
+}
 
-        _app_ua = new UserAgent( APP_NAME, DEFAULT_SIP_PORT );
-        _app_ua->init_pjsip_modules( );
-    }
 
 SIPSession::SIPSession( int port )
     : Session( PROTOCOL_SIP, port ), _app_ua(NULL) {
+    pj_status_t status;
 
-        pj_status_t status;
-
-        _app_ua = new UserAgent( APP_NAME, port );
-        // Init the pjsip library modules
-        status = _app_ua->init_pjsip_modules( );
-    }
+    _app_ua = new UserAgent( APP_NAME, port );
+    // Init the pjsip library modules
+    status = _app_ua->init_pjsip_modules( );
+}
 
 
 SIPSession::SIPSession( SIPSession const& )
     : Session( PROTOCOL_SIP,
-            DEFAULT_SIP_PORT ), _app_ua( NULL ){
-        
-        _app_ua = new UserAgent( APP_NAME, DEFAULT_SIP_PORT );
-        // Init the pjsip library modules
-        _app_ua->init_pjsip_modules( );
-    }
+               DEFAULT_SIP_PORT ), _app_ua( NULL ){
+    _app_ua = new UserAgent( APP_NAME, DEFAULT_SIP_PORT );
+    // Init the pjsip library modules
+    _app_ua->init_pjsip_modules( );
+}
 
 
 SIPSession::~SIPSession(){}
@@ -59,6 +57,11 @@ int SIPSession::connect( std::string r_uri ){
 int SIPSession::disconnect( void ){
     _app_ua->terminate_invite_session();
     return 0;
+}
+
+
+int SIPSession::shutdown( void ){
+    return _app_ua->pjsip_shutdown();
 }
 
 

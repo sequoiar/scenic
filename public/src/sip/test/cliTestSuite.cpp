@@ -26,7 +26,6 @@ int main(int argc, char** argv){
         sip = new SIPSession( atoi(argv[1]));
     else
         sip = new SIPSession( );
-    
     sip->addMedia("a=vorbis/PCMA/:12345");
 
     // Console main
@@ -57,6 +56,7 @@ int main(int argc, char** argv){
                 cout << MENU << endl;
                 break;
             case 'q':
+                sip->shutdown();
                 exit(0);
             default:
                 cout << "unknown command" << endl;
