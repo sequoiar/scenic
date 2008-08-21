@@ -55,15 +55,15 @@ void initiateSessionTest( int argc, char** argv ) {
     // argv[3] ... argv[n] -> media to add to the session
     // like this: a=GSM/vorbis/ or v=H264/H263/
     /*peer = argv[2];
-    for( i=3 ; i<3+nbMedia ; i++) {
+       for( i=3 ; i<3+nbMedia ; i++) {
         media = argv[i];
         sip->addMedia( media );
-    }*/
-	sip->addMedia("a=GSM/PCMU/:12567");
-    
+       }*/
+    sip->addMedia("a=GSM/PCMU/:12567");
+
     cout << "Connecting to peer" << endl;
     //sip->connect( peer );
-	sip->connect("<sip:manu@192.168.1.104:5064>");
+    sip->connect("<sip:manu@192.168.1.104:5064>");
 
     cout << "Connection to peer done" << endl;
     //sendInstantMessageTest( );

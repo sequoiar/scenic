@@ -149,7 +149,6 @@ UserAgent::UserAgent( std::string name, int port )
 
 
 UserAgent::~UserAgent(){
-
     //thread_quit = 1;
 
     //TODO Destroy the main thread
@@ -158,8 +157,9 @@ UserAgent::~UserAgent(){
     /*if(endpt) {
         pjsip_endpt_destroy( endpt );
         endpt = NULL;
-    }*/
+       }*/
 }
+
 
 void UserAgent::init_sip_module( void ){
     mod_ua.name = pj_str((char*)this->_name.c_str());
@@ -175,7 +175,7 @@ int UserAgent::init_pjsip_modules(  ){
     pj_sockaddr local;
     pj_uint16_t listeningPort;
     URI *my_uri;
- 
+
 
     // Init SIP module
     init_sip_module();
@@ -196,7 +196,7 @@ int UserAgent::init_pjsip_modules(  ){
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     /* TODO Start the main thread */
-    pj_pool_t *pool = pj_pool_create( &c_pool.factory, "toto",  4000, 4000, NULL );
+    pj_pool_t *pool = pj_pool_create( &c_pool.factory, "toto", 4000, 4000, NULL );
 
     /* Add UDP Transport */
     my_uri = getLocalURI();
@@ -236,12 +236,13 @@ int UserAgent::init_pjsip_modules(  ){
 
     /* Initialize the SDP class instance */
     local_sdp = new Sdp( my_uri->_hostIP );
-    
+
     // Start working threads
-    pj_thread_create( pool, "app", &startThread, NULL, PJ_THREAD_DEFAULT_STACK_SIZE, 0, &thread );
+    pj_thread_create( pool, "app", &startThread, NULL, PJ_THREAD_DEFAULT_STACK_SIZE, 0,
+                      &thread );
 
     PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
-    
+
     return 1;
 }
 
@@ -287,7 +288,6 @@ int UserAgent::create_invite_session( std::string uri ){
 
 
 int UserAgent::terminate_invite_session( void ){
-
     pj_status_t status;
     pjsip_tx_data *tdata;
 
@@ -317,15 +317,14 @@ int UserAgent::sendInstantMessage( std::string msg ){
     return PJ_SUCCESS;
 }
 
-void UserAgent::listen(void){
 
-}
+void UserAgent::listen(void){}
 
 
 static int startThread( void *arg ){
-
-   PJ_UNUSED_ARG(arg);
-   while( !thread_quit ){
+    PJ_UNUSED_ARG(arg);
+    while( !thread_quit )
+    {
         pj_time_val timeout = {0, 10};
         pjsip_endpt_handle_events( endpt, &timeout );
     }
@@ -411,14 +410,13 @@ pj_status_t UserAgent::send_im_dialog( pjsip_dialog *dlg, pj_str_t *msg ){
 /********************** Callbacks Implementation **********************************/
 
 static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
-    
-	if( inv->state == PJSIP_INV_STATE_DISCONNECTED ){
-		cout << "Call state: " << pjsip_get_status_text(inv->cause)->ptr << endl;
-        	thread_quit = 1;
-	}
+    if( inv->state == PJSIP_INV_STATE_DISCONNECTED ){
+        cout << "Call state: " << pjsip_get_status_text(inv->cause)->ptr << endl;
+        thread_quit = 1;
+    }
 
-	else
-		cout << "Call state changed to " << pjsip_inv_state_name(inv->state) << endl;
+    else
+        cout << "Call state changed to " << pjsip_inv_state_name(inv->state) << endl;
 }
 
 
@@ -432,7 +430,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
 
     cout << "Callback on_rx_request entered" << endl;
 
-    
+
     /* Respond statelessly any non-INVITE requests with 500 */
     if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
         if( rdata->msg_info.msg->line.req.method.id != PJSIP_ACK_METHOD ) {
@@ -495,13 +493,12 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     }
     /* Done */
 
-	if (rdata->msg_info.msg->line.req.method.id == PJSIP_ACK_METHOD && pjsip_rdata_get_dlg(rdata)){
-	// process the ack request
-	cout << "ACK request" << endl;
-	return PJ_TRUE;
-	}
-
-
+    if (rdata->msg_info.msg->line.req.method.id == PJSIP_ACK_METHOD &&
+        pjsip_rdata_get_dlg(rdata)){
+        // process the ack request
+        cout << "ACK request" << endl;
+        return PJ_TRUE;
+    }
     return PJ_SUCCESS;
 }
 
@@ -516,21 +513,18 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
 
 static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
                                        pjsip_event *e ){
-
-    	cout << "transaction state changed to " <<tsx->state << endl;
-	//cout << "Method : " << e->body.tsx_state.src.rdata->msg_info.msg->line.req.method.id << endl;
+    cout << "transaction state changed to " <<tsx->state << endl;
+    //cout << "Method : " << e->body.tsx_state.src.rdata->msg_info.msg->line.req.method.id << endl;
 
 
     if( tsx->state == PJSIP_TSX_STATE_TERMINATED  &&
         tsx->role == PJSIP_ROLE_UAC ) {
-
         cout << "UAC: tsx state terminated" << endl;
         //thread_quit = 1;
     }
 
     else if( tsx->state == PJSIP_TSX_STATE_TRYING &&
              tsx->role == PJSIP_ROLE_UAS ){
-    
         cout << "UAC: tsx state trying" << endl;
 
         pjsip_rx_data *rdata;
@@ -552,12 +546,11 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
     }
 
     else {
-
-        cout << "Transaction state not handled .... " << tsx->state << "for " << tsx->role << endl;
+        cout << "Transaction state not handled .... " << tsx->state << "for " << tsx->role <<
+        endl;
         // TODO Return an error code if transaction failed
         // for instance the peer is not connected
     }
-
 }
 
 
@@ -565,7 +558,7 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     // We need to get the final media choice and send it to gstreamer
     // Maybe we want to start the data streaming now...
 
-	cout << "on media update" << endl;
+    cout << "on media update" << endl;
 /*
     int nbMedia;
     int nbCodecs;
@@ -592,7 +585,7 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 
     //TODO Call to the core to update the selected codecs
     // libboost
-*/
+ */
 }
 
 
@@ -602,7 +595,8 @@ static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offe
 
 
 static void call_on_forked( pjsip_inv_session *inv, pjsip_event *e ){
-    printf("The invite session module has created a new dialog because of forked outgoing request\n");
+    printf(
+        "The invite session module has created a new dialog because of forked outgoing request\n");
 }
 
 
