@@ -39,11 +39,12 @@
 #include <pjlib.h>
 #include <pjsip_ua.h>
 #include <pjlib-util.h>
-
 #include <string>
 
 #include "sdp.h"
 #include "uri.h"
+
+//class SIPThread;
 
 class UserAgent
 {

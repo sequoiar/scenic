@@ -40,31 +40,35 @@ void initiateSessionTest( int argc, char** argv ) {
     std::string media;
     std::string peer;
     int nbMedia;
-    int i;
+    //int i;
 
-    if( argc <= 2 ) {
+/*    if( argc <= 2 ) {
         cerr << "Wrong usage : ./uacTestSuite [lport] [uri_to_call] [media1] ... [media2] " <<
         endl;
         return;
-    }
-    sip = new SIPSession(std::atoi(argv[1]));
+    }*/
+    sip = new SIPSession(atoi(argv[1]));
     nbMedia = argc - 3;
 
     // argv[1] -> listening port
     // argv[2] -> SIP uri to call
     // argv[3] ... argv[n] -> media to add to the session
     // like this: a=GSM/vorbis/ or v=H264/H263/
-    peer = argv[2];
+    /*peer = argv[2];
     for( i=3 ; i<3+nbMedia ; i++) {
         media = argv[i];
         sip->addMedia( media );
-    }
+    }*/
+	sip->addMedia("a=GSM/PCMU/:12567");
+    
+    cout << "Connecting to peer" << endl;
+    //sip->connect( peer );
+	sip->connect("<sip:manu@192.168.1.104:5064>");
 
-    sip->connect( peer );
+    cout << "Connection to peer done" << endl;
+    //sendInstantMessageTest( );
 
-    sendInstantMessageTest( );
-
-    sip->disconnect(  );
+    //sip->disconnect(  );
 
     printf("Done\n");
 }

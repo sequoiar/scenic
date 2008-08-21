@@ -14,7 +14,6 @@ libsip_export_la_CPPFLAGS =  $(AM_CPPFLAGS) $(PJ_CFLAGS) -I$(PYTHON_INCLUDE_DIR)
 libsip_export_la_LIBADD = libsip.la $(PJSIP_LIBS) -l$(BOOST_PYTHON_LIB)  
 
 
-
 libsip_la_SOURCES = \
 					uri.cpp \
 					uri.h \
@@ -31,6 +30,7 @@ libsip_la_SOURCES = \
 					sipsession.h 
 
 libsip_la_CPPFLAGS =  $(AM_CPPFLAGS) $(PJ_CFLAGS) -I$(PYTHON_INCLUDE_DIR) 
+#libsip_la_LDFLAGS = $(PJSIP_LIBS) -lpthread $(WRAPPER_LIBS) 
 
 # Note:
 #   To build pjsip for x86_64 in a shared lib context use
