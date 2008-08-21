@@ -44,7 +44,10 @@ class AudioSource
         virtual void link_interleave();
 
         const AudioConfig &config_;
+
         Interleave interleave_;
+        Interleave *interleave() { return &interleave_; } // weird hack because audiodelaysource thinks it doesn't have
+                                                        // access to interleave_
         std::vector<GstElement *>sources_, aconvs_;
         static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                       gpointer user_data);

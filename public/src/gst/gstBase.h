@@ -39,8 +39,16 @@ class GstBase
         virtual ~GstBase();
 
         static bool link_pads(GstPad *srcPad, GstPad *sinkPad);
-        static void link_element_vectors(std::vector<GstElement*> &sources,
-                                         std::vector<GstElement*> &sinks);
+
+        static void link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks);
+        static void link(GstElement *src, GstElement *sink);
+        static void link(GstBase *src, GstElement *sink);
+        static void link(GstElement *src, GstBase *sink);
+        static void link(GstBase *src, GstBase *sink);
+        static void link(std::vector<GstElement*> &sources, GstBase *sink);
+        static void link(GstBase *source, std::vector<GstElement*> &sinks);
+
+        virtual GstElement *element() { return NULL; }
 
         Pipeline & pipeline_;
 

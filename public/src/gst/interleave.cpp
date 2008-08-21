@@ -18,6 +18,7 @@
 //
 
 #include <cassert>
+#include <gst/audio/multichannel.h>
 #include "interleave.h"
 #include "audioConfig.h"
 
@@ -64,19 +65,6 @@ void Interleave::init()
     assert(interleave_ = gst_element_factory_make("interleave", NULL));
     pipeline_.add(interleave_);
     set_channel_layout();
-}
-
-
-void Interleave::link_to_sink(GstElement* sink)
-{
-    assert(gst_element_link(interleave_, sink));
-}
-
-
-void Interleave::link_to_sources(std::vector<GstElement *> &sources)
-{
-    for (GstIter src = sources.begin(); src != sources.end(); ++src)
-        assert(gst_element_link(*src, interleave_));
 }
 
 

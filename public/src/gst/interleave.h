@@ -32,14 +32,13 @@ class Interleave
         explicit Interleave(const AudioConfig &config);
         ~Interleave();
         void init();
-        void link_to_sink(GstElement *sink);
-        void link_to_sources(std::vector<GstElement *> &sources);
 
     private:
         GstElement *interleave_;
         const AudioConfig &config_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
         void set_channel_layout();
+        GstElement *element() { return interleave_; }
 
         Interleave(const Interleave&);     //No Copy Constructor
         Interleave& operator=(const Interleave&);     //No Assignment Operator
