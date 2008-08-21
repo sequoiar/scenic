@@ -27,7 +27,7 @@ class ControllerApi():
     def __init__(self, core):
         self.adb = core.adb
         self.notify = core.notify
-        self.setting = core.curr_setting
+        self.streams = core.curr_setting.streams
 
 
     ### Contacts ###
@@ -50,33 +50,33 @@ class ControllerApi():
         
     ### Streams ###
     
-    def start_stream(self, stream):
+    def start_streams(self, stream):
         self.notify('stream_status', 'starté')
 
 
-    ### Audio ###
+    ### Stream ###
     
-    def audio_set(self, caller, name, attr, value):
-        stream = self.setting.get_stream(name, 'audio')
+    def set_stream(self, caller, name, kind, attr, value):
+        stream = self.streams.get(name, kind)
         if stream:
-            self.notify(caller, (stream.set_attr(attr, value), name))
+            self.notify(caller, (stream.set_attr(attr, value), name), kind + '_set')
         else:
             self.notify(caller, name, 'not_found')
 
-    def audio_settings(self, caller, name):
-        self.notify(caller, (self.setting.get_stream(name, 'audio'), name))
+    def settings_stream(self, caller, name, kind):
+        self.notify(caller, (self.streams.get(name, kind), name), kind + '_settings')
         
-    def audio_add(self, caller, name):
-        self.notify(caller, (self.setting.add_stream(name, 'audio'), name))
+    def add_stream(self, caller, name, stream, kind):
+        self.notify(caller, (self.streams.add(name, stream), name), kind + '_add')
         
-    def audio_delete(self, caller, name):
-        self.notify(caller, (self.setting.delete_stream(name, 'audio'), name))
+    def delete_stream(self, caller, name, kind):
+        self.notify(caller, (self.streams.delete(name, kind), name), kind + '_delete')
         
-    def audio_rename(self, caller, name, new_name):
-        self.notify(caller, (self.setting.rename_stream(name, new_name, 'audio'), name, new_name))
+    def rename_stream(self, caller, name, new_name, kind):
+        self.notify(caller, (self.streams.rename(name, new_name, kind), name, new_name), kind + '_rename')
         
-    def audio_list(self, caller):
-        self.notify(caller, self.setting.list_stream('audio'))
+    def list_stream(self, caller, kind):
+        self.notify(caller, self.streams.list(kind), kind + '_list')
 
 
 

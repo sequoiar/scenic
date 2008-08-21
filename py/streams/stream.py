@@ -18,14 +18,68 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
+# App imports
 
 class Streams(object):
     """Class representing a group of media streams, a master stream.
     """
+
     def __init__(self):
         self.streams = {} 
         self.mode = None
         self.port = None
+
+    def get_kind(self, stream):
+        if isinstance(stream, AudioStream):
+            return 'a'
+        elif isinstance(stream, VideoStream):
+            return 'v'
+        else:
+            return None
+
+    def add(self, name, stream):
+        kind = self.get_kind(stream)
+        if kind:
+            dict_name = "_".join([kind, name])
+            if dict_name in self.streams:
+                return 0
+            else:
+                self.streams[dict_name] = stream
+                return 1
+        else:
+            return -1
+
+    def delete(self, name, kind):
+        dict_name = "_".join([kind[0], name])
+        if dict_name in self.streams:
+            del self.streams[dict_name]
+            return 1
+        else:
+            return 0
+    
+    def rename(self, name, new_name, kind):
+        dict_name = "_".join([kind[0], name])
+        if dict_name in self.streams:
+            self.streams["_".join([kind[0], new_name])] = self.streams[dict_name]
+            del self.streams[dict_name]
+            return 1
+        else:
+            return 0
+    
+    def list(self, kind):
+        streams = [(name[2:], stream) for name, stream in self.streams.items() if name[0:2] == kind[0] + '_']
+        streams.sort()
+        return streams
+
+    def get(self, name, kind):
+        dict_name = "_".join([kind[0], name])
+        if dict_name in self.streams:
+            return self.streams[dict_name]
+        return None
+    
+    
+    
+    
     
     def start(self, address=None):
         """
@@ -47,22 +101,7 @@ class Streams(object):
         for stream in self.streams:
             self.streams[stream].stop()
     
-    def add(self, name, stream):
-        """
-        Add a media stream to the master stream.
-                
-        name: string
-        stream: stream
-        """
-        self.streams[name] = stream
     
-    def remove(self, name):
-        """
-        Add a media stream to the master stream.
-
-        name: string
-        """
-        del self.streams[name]
     
     def status(self):
         """
@@ -81,7 +120,7 @@ class Stream(object):
     def __init__(self):
         self.port = None  # (int) 
         self.buffer = None  # (int) 
-        self.mode = None  # (string) send or receive
+#        self.mode = None  # (string) send or receive
         self.state = 0
     
     def start(self, address=None):
