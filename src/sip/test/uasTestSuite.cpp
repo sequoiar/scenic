@@ -25,25 +25,25 @@ void initiateSessionTest( int argc, char** argv ) {
     std::string media;
     int nbMedia;
     //int i;
-	
-   /*
 
-    if( argc <= 1 ) {
-        cerr << "Wrong usage : ./uasTestSuite [lport] [media1] ... [media2] " << endl;
-        return;
-    } */
+    /*
+
+       if( argc <= 1 ) {
+         cerr << "Wrong usage : ./uasTestSuite [lport] [media1] ... [media2] " << endl;
+         return;
+       } */
     Session* sip = new SIPSession(atoi(argv[1]));
     nbMedia = argc - 2;
     sip->addMedia("a=GSM/PCMU/:12345");
-	/*
-    // argv[1] -> listening port
-    // argv[2] ... argv[n] -> media to add to the session
-    // like this: a=GSM/vorbis/ or v=H264/H263/
-    for( i=2 ; i<2+nbMedia ; i++) {
+    /*
+       // argv[1] -> listening port
+       // argv[2] ... argv[n] -> media to add to the session
+       // like this: a=GSM/vorbis/ or v=H264/H263/
+       for( i=2 ; i<2+nbMedia ; i++) {
         media = argv[i];
         sip->addMedia( media );
-    }
-	*/
+       }
+     */
     //sip->startMainloop();
 }
 
