@@ -20,8 +20,7 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 # App imports
-from streams import audio, video, data
-from streams.stream import AudioStream, VideoStream
+from streams.stream import Streams
 from utils import log
 from utils.i18n import to_utf
 
@@ -53,67 +52,9 @@ class Settings(object):
 class Setting(object):
     def __init__(self, name):
         self.name = name
-        self.streams = {}
+        self.streams = Streams()
         self.contact = None
-        self.kinds = {'audio': AudioStream,
-                      'video': VideoStream}
         
-    def add_stream(self, name, kind):
-        if name in self.streams:
-            return 0
-        else:
-            if kind == 'audio':
-                self.streams[name] = audio.gst.AudioGst(22222)
-                return 1
-            elif kind == 'video': 
-                self.streams[name] = video.gst.VideoGst(22222)
-                return 1
-#            elif kind == 'data'
-#                self.streams[name] = data
-            else:
-                return -1
-        
-    def delete_stream(self, name, kind):
-        if kind in self.kinds:
-            if name in self.streams:
-                klass = self.kinds[kind]
-                if isinstance(self.streams[name], klass):
-                    del self.streams[name]
-                    return 1
-            else:
-                return 0
-        return -1
-    
-    def rename_stream(self, name, new_name, kind):
-        if kind in self.kinds:
-            if name in self.streams:
-                klass = self.kinds[kind]
-                if isinstance(self.streams[name], klass):
-                    self.streams[new_name] = self.streams[name]
-                    del self.streams[name]
-                    return 1
-            else:
-                return 0
-        return -1
-    
-    def list_stream(self, kind):
-        streams = {}
-        if kind in self.kinds:
-            klass = self.kinds[kind]
-            for stream in self.streams:
-                if isinstance(self.streams[stream], klass):
-                    streams[stream] = self.streams[stream]
-        else:
-            log.warning('%s is not a valid type of stream.' % kind)
-        return streams
-
-    def get_stream(self, name, kind):
-        if name in self.streams:
-            if kind in self.kinds:
-                klass = self.kinds[kind]
-                if isinstance(self.streams[name], klass):
-                    return self.streams[name]
-        return None
 
 
 

@@ -32,6 +32,7 @@ from utils import Observer, log
 from utils.i18n import to_utf
 import ui
 from ui.common import find_callbacks
+from streams import audio, video, data
 
 
 log = log.start('info', 1, 0, 'cli')
@@ -138,6 +139,7 @@ class CliController(TelnetServer):
             cp.print_help()
             
     def _audio(self, data):
+        kind = 'audio'
         cp = CliParser(self, prog=data[0], description="Manage the audio streams.")
         cp.add_option("-l", "--list", action='store_true', help="List all the audio streams or settings if stream is specified")
 
@@ -159,32 +161,32 @@ class CliController(TelnetServer):
         if len(args) > 1:
             name = args[1]
             if options.list:
-                self.core.audio_settings(self, name)
+                self.core.settings_stream(self, name, kind)
             elif options.modify:
-                self.core.audio_rename(self, name, options.modify)
+                self.core.rename_stream(self, name, options.modify, kind)
             elif [opt for opt in options.__dict__.values() if opt]:
                 if options.container:
-                    self.core.audio_set(self, name, 'container', options.container)
+                    self.core.set_stream(self, name, kind, 'container', options.container)
                 if options.codec:
-                    self.core.audio_set(self, name, 'codec', options.codec)
+                    self.core.set_stream(self, name, kind, 'codec', options.codec)
                 if options.settings:
-                    self.core.audio_set(self, name, 'codec_settings', options.settings)
+                    self.core.set_stream(self, name, kind, 'codec_settings', options.settings)
                 if options.bitdepth:
-                    self.core.audio_set(self, name, 'bitdepth', options.bitdepth)
+                    self.core.set_stream(self, name, kind, 'bitdepth', options.bitdepth)
                 if options.samplerate:
-                    self.core.audio_set(self, name, 'sample_rate', options.samplerate)
+                    self.core.set_stream(self, name, kind, 'sample_rate', options.samplerate)
                 if options.channels:
-                    self.core.audio_set(self, name, 'channels', options.channels)
+                    self.core.set_stream(self, name, kind, 'channels', options.channels)
                 if options.port:
-                    self.core.audio_set(self, name, 'port', options.port)
+                    self.core.set_stream(self, name, kind, 'port', options.port)
                 if options.buffer:
-                    self.core.audio_set(self, name, 'buffer', options.buffer)
+                    self.core.set_stream(self, name, kind, 'buffer', options.buffer)
         elif options.list:
-            self.core.audio_list(self)
+            self.core.list_stream(self, kind)
         elif options.add:
-            self.core.audio_add(self, options.add)
+            self.core.add_stream(self, options.add, audio.gst.AudioGst(22222), kind)
         elif options.erase:
-            self.core.audio_delete(self, options.erase)
+            self.core.delete_stream(self, options.erase, kind)
         else:
             cp.print_help()
             
@@ -504,9 +506,8 @@ class CliView(Observer):
     def _audio_list(self, origin, data):
         if origin is self.controller:
             if data:
-                keys = data.keys()
-                keys.sort()
-                self.write("\n".join(keys))
+                names = [stream[0] for stream in data]
+                self.write("\n".join(names))
             else:
                 self.write('There is no audio stream.')
             
