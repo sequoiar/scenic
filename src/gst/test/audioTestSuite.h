@@ -13,8 +13,7 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
+// // You should have received a copy of the GNU General Public License
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
@@ -24,8 +23,8 @@
 #include <cpptest.h>
 #include "gstTestSuite.h"
 
-#define LOCAL 1
-#define RTP 1
+#define LOCAL 0
+#define RTP 0
 
 class AudioTestSuite
     : public GstTestSuite
@@ -75,6 +74,10 @@ class AudioTestSuite
             /*  Put newer tests here and set all defs to 0  */
             /*  to test them by themselves.                 */
             /*----------------------------------------------*/
+            TEST_ADD(AudioTestSuite::start_audio_dv)
+            TEST_ADD(AudioTestSuite::stop_audio_dv)
+            TEST_ADD(AudioTestSuite::start_stop_audio_dv)
+
         }
 
 
@@ -120,10 +123,10 @@ class AudioTestSuite
         void start_8ch_alsa();
         void stop_8ch_alsa();
         void start_stop_8ch_alsa();
-
-        void start_8ch_comp_rtp_audiofile_dv();
-        void stop_8ch_comp_rtp_audiofile_dv();
-        void start_stop_8ch_comp_rtp_audiofile_dv();
+            
+        void start_audio_dv();
+        void stop_audio_dv();
+        void start_stop_audio_dv();
 };
 
 

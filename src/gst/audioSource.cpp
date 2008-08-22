@@ -239,6 +239,10 @@ void AudioDvSource::sub_init()
 }
 
 
+AudioDvSource::AudioDvSource(const AudioConfig &config)
+    : AudioSource(config), demux_(0), queue_(0)
+{}
+
 void AudioDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
 {
     if (std::string("video") == gst_pad_get_name(srcPad))

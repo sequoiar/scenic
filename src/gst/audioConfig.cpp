@@ -117,6 +117,8 @@ AudioSource* AudioConfig::createSource() const
         return new AudioAlsaSource(*this);
     else if (source_ == "jackaudiosrc")
         return new AudioJackSource(*this);
+    else if (source_ == "dv1394src")
+        return new AudioDvSource(*this);
     else {
         std::cerr << "Invalid source!" << std::endl;
         return 0;

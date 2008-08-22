@@ -31,7 +31,7 @@ VideoSource::VideoSource(const VideoConfig &config)
     : config_(config), source_(0)
 {}
 
-// parts of sub_init that are common to all AudioSource classes
+// parts of sub_init that are common to all VideoSource classes
 void VideoSource::init()
 {
     assert(source_ = gst_element_factory_make(config_.source(), NULL));
