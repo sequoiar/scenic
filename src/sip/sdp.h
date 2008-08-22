@@ -110,7 +110,7 @@ class Sdp
          * @param mime_type The type of media
          * @param codecs    The formatted list of codecs name (separator: '/')
          */
-        void addMediaToSDP( int mime_type, std::string codecs, int mport );
+        void addMediaToSDP( std::string type, std::string codecs, int port );
 
         pjmedia_sdp_neg_state getSDPNegociationState(){
             return pjmedia_sdp_neg_get_state(
@@ -123,6 +123,7 @@ class Sdp
                        pool, negociator, 0);
         }
 
+        std::string mediaToString( void );
 
     private:
 

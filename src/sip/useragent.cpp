@@ -353,6 +353,7 @@ int UserAgent::inv_session_reinvite( void ){
 }
 
 int UserAgent::sendInstantMessage( std::string msg ){
+
     pj_status_t status;
 
     // Set the current dialog for the instant messaging module
@@ -368,6 +369,7 @@ int UserAgent::sendInstantMessage( std::string msg ){
 
 
 static int startThread( void *arg ){
+
     PJ_UNUSED_ARG(arg);
     while( !thread_quit )
     {
@@ -379,31 +381,13 @@ static int startThread( void *arg ){
 }
 
 
-void UserAgent::addMediaToSession( std::string codecs ){
-    size_t pos;
-    std::string media;
-    int mime_type;
-    int mport;
-
-    // codecs looks like that: m=codec1/codec2/..../codecn/:port where m = a for audio or v for video
-    // We have got to retreive the media type first:
-    pos = codecs.find("=", 0);
-    media = codecs.substr(0, pos );
-    codecs.erase(0, pos + 1);
-
-    // we retrieve the media transport port
-    pos = codecs.find(":", 0);
-    mport = atoi( codecs.substr( pos+1, codecs.length() ).c_str() );
-    codecs.erase(pos, codecs.length());
-
-    strcmp( media.c_str(),
-            "a" ) == 0 ||
-    strcmp( media.c_str(),
-            "A" ) == 0 ? mime_type = MIME_TYPE_AUDIO :  mime_type = MIME_TYPE_VIDEO ;
-
-    local_sdp->addMediaToSDP( mime_type, codecs, mport );
+void UserAgent::addMediaToSession( std::string type, std::string codecs, int port ){
+    local_sdp->addMediaToSDP( type, codecs, port );
 }
 
+std::string UserAgent::mediaToString( void ){
+    return local_sdp->mediaToString();
+}
 
 static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
     pjmedia_sdp_session *sdp;
@@ -417,7 +401,6 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
 
     *r_sdp = sdp;
 }
-
 
 /********************** Callbacks Implementation **********************************/
 

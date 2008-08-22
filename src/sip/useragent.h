@@ -80,15 +80,17 @@ class UserAgent
 
         int inv_session_end();
 
-	int inv_session_reinvite();
+	    int inv_session_reinvite();
 
-        void addMediaToSession( std::string codecs );
+        void addMediaToSession( std::string type, std::string codecs, int port );
 
         URI* getLocalURI() { return _localURI; }
 
         int sendInstantMessage( std::string message );
 
         int pjsip_shutdown();
+
+        std::string mediaToString( void );
 
     private:
         /*

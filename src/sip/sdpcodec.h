@@ -24,9 +24,9 @@
 #include <sstream>
 #include <map>
 
-#define MIME_TYPE_AUDIO    0
-#define MIME_TYPE_VIDEO    1
-#define MIME_TYPE_ERROR    2
+#define MIME_TYPE_AUDIO     0
+#define MIME_TYPE_VIDEO     1
+#define MIME_TYPE_UNKNOWN   2
 
 /*
  * Codecs RTP payload as defined in
@@ -131,6 +131,8 @@ class sdpCodec
          *                  False otherwise
          */
         bool isPayloadStatic( void ) { return _payload < 96; }
+
+        friend class sdpMedia;
 
     private:
         /* The encoding name of the codec */
