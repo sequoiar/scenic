@@ -58,7 +58,7 @@ void AudioDelaySource<T>::sub_init()
         assert(filters_[channelIdx]);
     }
 
-    T::pipeline_.add_vector(filters_);
+    T::pipeline_.add(filters_);
 
     for (iter = filters_.begin(); iter != filters_.end(); ++iter)
         g_object_set(G_OBJECT(*iter), "Delay", 0.5, NULL);
@@ -70,14 +70,14 @@ void AudioDelaySource<T>::link_elements()
 {
     T::link_elements(); // link elements that precede the filters
 
-    GstBase::link(T::aconvs_, filters_);
+    GstLinkable::link(T::aconvs_, filters_);
 }
 
 
 template <typename T>
 void AudioDelaySource<T>::link_interleave()
 {
-    GstBase::link(filters_, T::interleave());
+    GstLinkable::link(filters_, T::interleave_);
 }
 
 
@@ -100,7 +100,7 @@ template <typename T>
 AudioDelaySource<T>::~AudioDelaySource()
 {
     assert(T::pipeline_.stop());
-    T::pipeline_.remove_vector(filters_);
+    T::pipeline_.remove(filters_);
 }
 
 

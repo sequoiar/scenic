@@ -27,6 +27,7 @@
 #include "lo/lo.h"
 
 #include "logWriter.h"
+#include "gstLinkable.h"
 #include "mediaBase.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
@@ -92,7 +93,7 @@ void AudioReceiver::init_codec()
     assert(decoder_ = gst_element_factory_make(config_.codec(), NULL));
     pipeline_.add(decoder_);
 
-    assert(gst_element_link(depayloader_, decoder_));
+    GstLinkable::link(depayloader_, decoder_);
     session_.add(depayloader_, &config_);
 }
 
@@ -105,7 +106,7 @@ void AudioReceiver::init_sink()
 
     pipeline_.add(sink_);
 
-    assert(gst_element_link(decoder_, sink_));
+    GstLinkable::link(decoder_, sink_);
 }
 
 

@@ -20,6 +20,7 @@
 #include <iostream>
 #include <string>
 #include <cassert>
+#include "gstLinkable.h"
 #include "logWriter.h"
 #include "audioSource.h"
 #include "audioConfig.h"
@@ -50,34 +51,28 @@ void AudioSource::init_source()
         assert(aconvs_[channelIdx]);
     }
 
-    pipeline_.add_vector(sources_);
-    pipeline_.add_vector(aconvs_);
+    pipeline_.add(sources_);
+    pipeline_.add(aconvs_);
 }
 
 
 AudioSource::~AudioSource()
 {
     assert(stop());
-    pipeline_.remove_vector(aconvs_);
-    pipeline_.remove_vector(sources_);
+    pipeline_.remove(aconvs_);
+    pipeline_.remove(sources_);
 }
 
 
 void AudioSource::link_elements()
 {
-    link(sources_, aconvs_);
+    GstLinkable::link(sources_, aconvs_);
 }
 
 
 void AudioSource::link_interleave()
 {
-     link(aconvs_, &interleave_);
-}
-
-
-void AudioSource::link_to_sink(GstElement *sink)
-{
-    link(&interleave_, sink);
+     GstLinkable::link(aconvs_, interleave_);
 }
 
 
@@ -142,8 +137,8 @@ void AudioFileSource::init_source()
     aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
     assert(aconvs_[0]);
 
-    pipeline_.add_vector(sources_);
-    pipeline_.add_vector(aconvs_);
+    pipeline_.add(sources_);
+    pipeline_.add(aconvs_);
 }
 
 
@@ -151,7 +146,7 @@ void AudioFileSource::sub_init()
 {
     decoders_.push_back(gst_element_factory_make("decodebin", NULL));
     assert(decoders_[0]);
-    pipeline_.add_vector(decoders_);
+    pipeline_.add(decoders_);
 
     GstIter dec = decoders_.begin();
     GstIter aconv = aconvs_.begin();
@@ -198,27 +193,21 @@ void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
     }
     gst_caps_unref(caps);
 
-    assert(link_pads(srcPad, sinkPad));
+    assert(GstLinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 
 
 void AudioFileSource::link_elements()
 {
-    link(sources_, decoders_);
-}
-
-
-void AudioFileSource::link_to_sink(GstElement *sink)
-{
-    assert(gst_element_link(aconvs_[0], sink));
+    GstLinkable::link(sources_, decoders_);
 }
 
 
 AudioFileSource::~AudioFileSource()
 {
     assert(stop());
-    pipeline_.remove_vector(decoders_);
+    pipeline_.remove(decoders_);
 }
 
 

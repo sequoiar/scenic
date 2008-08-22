@@ -23,7 +23,6 @@
 
 #include "pipeline.h"
 
-
 class GstBase
 {
     public:
@@ -38,18 +37,8 @@ class GstBase
         GstBase();
         virtual ~GstBase();
 
-        static bool link_pads(GstPad *srcPad, GstPad *sinkPad);
-
-        static void link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks);
-        static void link(GstElement *src, GstElement *sink);
-        static void link(GstBase *src, GstElement *sink);
-        static void link(GstElement *src, GstBase *sink);
-        static void link(GstBase *src, GstBase *sink);
-        static void link(std::vector<GstElement*> &sources, GstBase *sink);
-        static void link(GstBase *source, std::vector<GstElement*> &sinks);
-
-        virtual GstElement *element() { return NULL; }
-
+//        static bool link_pads(GstPad *srcPad, GstPad *sinkPad);
+        
         Pipeline & pipeline_;
 
     private:
