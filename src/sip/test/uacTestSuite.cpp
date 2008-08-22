@@ -63,7 +63,7 @@ void initiateSessionTest( int argc, char** argv ) {
 
     cout << "Connecting to peer" << endl;
     //sip->connect( peer );
-    sip->connect("<sip:manu@192.168.1.104:5064>");
+    //sip->connect("<sip:manu@192.168.1.104:5064>");
 
     cout << "Connection to peer done" << endl;
     //sendInstantMessageTest( );
