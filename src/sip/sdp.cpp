@@ -121,7 +121,6 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
 int Sdp::createLocalOffer( pj_pool_t *pool ){
     // Reference: RFC 4566 [5]
 
-
     /* Create and initialize basic SDP session */
     this->_local_offer = PJ_POOL_ZALLOC_T(pool, pjmedia_sdp_session);
     this->_local_offer->conn = PJ_POOL_ZALLOC_T(pool, pjmedia_sdp_conn);
@@ -134,8 +133,6 @@ int Sdp::createLocalOffer( pj_pool_t *pool ){
     sdp_addTiming();
     sdp_addAttributes( pool );
     sdp_addMediaDescription( pool );
-
-    //toString();
 
     return PJ_SUCCESS;
 }
@@ -153,7 +150,6 @@ int Sdp::createInitialOffer( pj_pool_t* pool ){
     state = pjmedia_sdp_neg_get_state( negociator );
 
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
 
     return PJ_SUCCESS;
 }

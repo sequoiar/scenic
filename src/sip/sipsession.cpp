@@ -49,13 +49,13 @@ SIPSession::SIPSession( SIPSession const& )
 SIPSession::~SIPSession(){}
 
 int SIPSession::connect( std::string r_uri ){
-    _app_ua->create_invite_session( r_uri );
+    _app_ua->inv_session_create( r_uri );
     return 0;
 }
 
 
 int SIPSession::disconnect( void ){
-    _app_ua->terminate_invite_session();
+    _app_ua->inv_session_end();
     return 0;
 }
 
@@ -64,6 +64,9 @@ int SIPSession::shutdown( void ){
     return _app_ua->pjsip_shutdown();
 }
 
+int SIPSession::updateMedia( void ){ 
+    return _app_ua->inv_session_reinvite();
+}
 
 int SIPSession::sendInstantMessage( std::string msg ){
     return _app_ua->sendInstantMessage( msg );

@@ -11,6 +11,7 @@ static std::string MENU =
     "  c    Connect\n"
     "  d    Disconnect\n"
     "  a    Add media\n"
+    "  u    Reinvite\n"
     "  m    Chat\n"
     "  h    Help\n"
     "  q    Quit\n"
@@ -46,6 +47,9 @@ int main(int argc, char** argv){
                 cout << " Add a media: <<<< ";
                 cin >> msg;
                 sip->addMedia(msg);
+                break;
+            case 'u':
+		sip->updateMedia();
                 break;
             case 'm':
                 cout << "Enter message <<<< ";

@@ -68,6 +68,8 @@ class SIPSession
 
         int shutdown();
 
+	int updateMedia();
+
         /*
          * Send an instant message
          */
