@@ -49,7 +49,6 @@ Sdp::Sdp( std::string ip_addr )
 Sdp::~Sdp(){}
 
 void Sdp::addMediaToSDP( std::string type, std::string codecs, int port ){
-
     sdpMedia *media;
     size_t pos;
     std::string tmp;
@@ -62,7 +61,7 @@ void Sdp::addMediaToSDP( std::string type, std::string codecs, int port ){
     // If no media of ths type has been already created
     for( k = 0 ; k<(int)_sdpMediaList.size() ; k++ ) {
         if( strcmp( _sdpMediaList[k]->getMediaStr().c_str(), type.c_str()) == 0 ){
-            std::cout << "retrieve existing media" << std::endl; 
+            std::cout << "retrieve existing media" << std::endl;
             iter = _sdpMediaList.begin()+k;
             _sdpMediaList.erase(iter);
             //media  = _sdpMediaList[k];
@@ -70,12 +69,11 @@ void Sdp::addMediaToSDP( std::string type, std::string codecs, int port ){
             break;
         }
     }
-    
+
     if(!retrieved){
-        std::cout << "create new media" << std::endl; 
+        std::cout << "create new media" << std::endl;
         media = new sdpMedia( type, port );
     }
-
     // The string codecs can contains multiple codecs,
     // we have to parse by assuming that the delimiter is the '/' char
     while( codecs.find("/", 0) != std::string::npos )
@@ -260,19 +258,20 @@ void Sdp::sdp_addMediaDescription( pj_pool_t* pool ){
 }
 
 
-void Sdp::addMedia( sdpMedia *media, int port ){
-}
+void Sdp::addMedia( sdpMedia *media, int port ){}
+
 
 std::string Sdp::mediaToString( void ){
-    
     int size, i;
     std::ostringstream res;
 
     size = _sdpMediaList.size();
     for( i = 0; i < size ; i++ ){
         res << _sdpMediaList[i]->toString();
-    } 
-    
+    }
+
     res << std::endl;
     return res.str();
 }
+
+

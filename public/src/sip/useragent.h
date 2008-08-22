@@ -80,7 +80,7 @@ class UserAgent
 
         int inv_session_end();
 
-	    int inv_session_reinvite();
+        int inv_session_reinvite();
 
         void addMediaToSession( std::string type, std::string codecs, int port );
 

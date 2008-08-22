@@ -69,7 +69,7 @@ class sdpMedia
          * @param codec     A pointer on the codec to add
          */
         void addCodec( sdpCodec *codec );
-        
+
         void addCodec( std::string codecName );
 
         void removeCodec( std::string codecName );

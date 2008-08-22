@@ -82,6 +82,7 @@ class SIPSession
         void build_sdp( void );
 
         std::string mediaToString( void );
+
         /*
          * Add a media to the session. It will be used for SDP session
          *
