@@ -222,3 +222,55 @@ void AudioJackSource::sub_init()
 }
 
 
+void AudioDvSource::sub_init()
+{
+    assert(demux_ = gst_element_factory_make("dvdemux", NULL));
+    assert(queue_ = gst_element_factory_make("queue", NULL));
+
+    // demux has dynamic pads
+    pipeline_.add(demux_);
+    pipeline_.add(queue_);
+
+    // demux srcpad must be linked to queue sink pad at runtime
+    g_signal_connect(demux_, "pad-added",
+                     G_CALLBACK(AudioDvSource::cb_new_src_pad),
+                     static_cast<void *>(queue_));
+
+}
+
+
+void AudioDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
+{
+    if (std::string("video") == gst_pad_get_name(srcPad))
+    {
+        LOG("Ignoring video stream from DV", DEBUG);
+        return;
+    }
+
+    GstElement *sinkElement = static_cast<GstElement *>(data);
+    GstPad *sinkPad;
+
+    sinkPad = gst_element_get_static_pad(sinkElement, "sink");
+
+    if (GST_PAD_IS_LINKED(sinkPad))
+    {
+        g_object_unref(sinkPad);        // don't link more than once
+        return;
+    }
+    LOG("AudioDvSource: linking new srcpad to sinkpad.", DEBUG);
+    assert(GstLinkable::link_pads(srcPad, sinkPad));
+    gst_object_unref(sinkPad);
+}
+
+
+void AudioDvSource::link_elements()
+{
+    GstLinkable::link(sources_[0], demux_);
+}
+
+
+void AudioDvSource::link_interleave()
+{
+    GstLinkable::link(queue_, interleave_);
+}
+

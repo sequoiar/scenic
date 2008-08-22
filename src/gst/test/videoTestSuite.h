@@ -70,7 +70,7 @@ class VideoTestSuite
         }
 
 
-// some tests
+        // some tests
 
     private:
 

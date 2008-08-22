@@ -121,5 +121,23 @@ class AudioJackSource
 };
 
 
+class AudioDvSource
+    : public AudioSource 
+{
+    public:
+        explicit AudioDvSource(const AudioConfig &config);
+        void sub_init();
+        static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data);
+
+    protected:
+        void link_elements();
+        void link_interleave(); // FIXME: AudioFileSource shouldn't even have an
+
+        GstElement *demux_, *queue_;
+        AudioDvSource(const AudioDvSource&);     //No Copy Constructor
+        AudioDvSource& operator=(const AudioDvSource&);     //No Assignment Operator
+};
+
 #endif //_AUDIO_SOURCE_H_
+
 
