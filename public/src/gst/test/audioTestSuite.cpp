@@ -645,6 +645,57 @@ void AudioTestSuite::start_stop_8ch_comp_rtp_audiofile()
 }
 
 
+void AudioTestSuite::start_audio_dv()
+{
+    int numChannels = 2;
+    if (id_ == 1)
+        return;
+    AudioConfig config("dv1394src", numChannels);
+    AudioSender tx(config);
+    TEST_ASSERT(tx.init());
+
+    TEST_ASSERT(tx.start());
+
+    BLOCK();
+    TEST_ASSERT(tx.isPlaying());
+}
+
+
+void AudioTestSuite::stop_audio_dv()
+{
+    int numChannels = 2;
+    if (id_ == 1)
+        return;
+    AudioConfig config("dv1394src", numChannels);
+    AudioSender tx(config);
+    TEST_ASSERT(tx.init());
+    TEST_ASSERT(!tx.isPlaying());
+
+    BLOCK();
+    TEST_ASSERT(tx.stop());
+    TEST_ASSERT(!tx.isPlaying());
+}
+
+
+void AudioTestSuite::start_stop_audio_dv()
+{
+    int numChannels = 2;
+    if (id_ == 1)
+        return;
+    AudioConfig config("dv1394src", numChannels);
+    AudioSender tx(config);
+    TEST_ASSERT(tx.init());
+
+    TEST_ASSERT(tx.start());
+
+    BLOCK();
+    TEST_ASSERT(tx.isPlaying());
+
+    TEST_ASSERT(tx.stop());
+    TEST_ASSERT(!tx.isPlaying());
+}
+
+
 int main(int argc, char **argv)
 {
     if (argc != 2) {
