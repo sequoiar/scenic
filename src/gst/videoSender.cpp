@@ -23,6 +23,7 @@
 #include <string>
 #include <cassert>
 
+#include "gstLinkable.h"
 #include "videoSender.h"
 #include "videoSource.h"
 #include "logWriter.h"
@@ -66,7 +67,7 @@ void VideoSender::init_codec()
         pipeline_.add(encoder_);
 
         source_->link_element(colorspc_);
-        assert(gst_element_link(colorspc_, encoder_));
+        GstLinkable::link(colorspc_, encoder_);
     }
 }
 
@@ -76,7 +77,7 @@ void VideoSender::init_sink()
     if (config_.isNetworked()) {
         assert(payloader_ = gst_element_factory_make("rtph264pay", NULL));
         pipeline_.add(payloader_);
-        assert(gst_element_link(encoder_, payloader_));
+        GstLinkable::link(encoder_, payloader_);
         session_.add(payloader_, &config_);
     }
     else {                 // local test only, no encoding

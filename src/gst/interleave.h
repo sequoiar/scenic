@@ -20,25 +20,28 @@
 #ifndef _INTERLEAVE_H_
 #define _INTERLEAVE_H_
 
-#include "gstBase.h"
 #include <gst/audio/multichannel.h>
+#include "gstLinkable.h"
 
 class AudioConfig;
 
 class Interleave
-    : public GstBase
+    : public GstLinkable
 {
     public:
         explicit Interleave(const AudioConfig &config);
         ~Interleave();
         void init();
 
+    protected:
+        GstElement *element() { return interleave_; }
+
     private:
+        friend class AudioSource; 
         GstElement *interleave_;
         const AudioConfig &config_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
         void set_channel_layout();
-        GstElement *element() { return interleave_; }
 
         Interleave(const Interleave&);     //No Copy Constructor
         Interleave& operator=(const Interleave&);     //No Assignment Operator

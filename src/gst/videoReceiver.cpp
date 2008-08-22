@@ -25,6 +25,7 @@
 #include "lo/lo.h"
 
 #include "mediaBase.h"
+#include "gstLinkable.h"
 #include "videoReceiver.h"
 #include "logWriter.h"
 
@@ -52,7 +53,7 @@ void VideoReceiver::init_codec()
     }
     pipeline_.add(depayloader_);
     pipeline_.add(decoder_);
-    assert(gst_element_link(depayloader_, decoder_));
+    GstLinkable::link(depayloader_, decoder_);
 
     session_.add(depayloader_, &config_);
     session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,"
@@ -66,7 +67,7 @@ void VideoReceiver::init_sink()
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     pipeline_.add(sink_);
-    assert(gst_element_link(decoder_, sink_));
+    GstLinkable::link(decoder_, sink_);
 }
 
 

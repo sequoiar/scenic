@@ -21,7 +21,7 @@
 #define _AUDIO_SOURCE_H_
 
 #include <cassert>
-#include "gstBase.h"
+#include "gstLinkable.h"
 #include "interleave.h"
 
 #include "audioDelaySource.h"
@@ -29,12 +29,11 @@
 class AudioConfig;
 
 class AudioSource
-    : public GstBase
+    : public GstLinkable
 {
     public:
         virtual ~AudioSource();
         void init();
-        virtual void link_to_sink(GstElement *sink);
 
     protected:
         explicit AudioSource(const AudioConfig &config);
@@ -46,13 +45,13 @@ class AudioSource
         const AudioConfig &config_;
 
         Interleave interleave_;
-        Interleave *interleave() { return &interleave_; } // weird hack because audiodelaysource thinks it doesn't have
-                                                        // access to interleave_
+        
         std::vector<GstElement *>sources_, aconvs_;
         static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                       gpointer user_data);
 
         virtual gboolean callback() { return FALSE; }
+        GstElement *element() { return interleave_.element(); }
 
     private:
         friend class AudioSender;
@@ -87,7 +86,6 @@ class AudioFileSource
         explicit AudioFileSource(const AudioConfig &config)
             : AudioSource(config), decoders_() {}
         ~AudioFileSource();
-        void link_to_sink(GstElement *sink);
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
                                    void *data);
 
@@ -98,6 +96,8 @@ class AudioFileSource
         void link_interleave(){};        // FIXME: AudioFileSource shouldn't even have an
         // interleave, unless we support the option of
         void init_source();              // multiple mono files combined into one stream
+
+        GstElement *element() { return aconvs_[0]; }
 
         std::vector<GstElement*> decoders_;
 };

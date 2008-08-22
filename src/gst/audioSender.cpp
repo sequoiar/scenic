@@ -70,8 +70,8 @@ void AudioSender::init_sink()
         assert(payloader_ = gst_element_factory_make("rtpvorbispay", NULL));
         pipeline_.add(payloader_);
 
-        source_->link_to_sink(encoder_);
-        assert(gst_element_link(encoder_, payloader_));
+        GstLinkable::link(*source_, encoder_);
+        GstLinkable::link(encoder_, payloader_);
 
         session_.add(payloader_, &config_);
     }
@@ -82,7 +82,7 @@ void AudioSender::init_sink()
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL); // important for latency
         pipeline_.add(sink_);
 
-        source_->link_to_sink(sink_);
+        GstLinkable::link(*source_, sink_);
     }
 }
 

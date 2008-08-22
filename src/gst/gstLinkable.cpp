@@ -21,47 +21,61 @@
 #include <gst/gst.h>
 #include <cassert>
 
-#include "gstBase.h"
+#include "gstLinkable.h"
 #include "logWriter.h"
 
-int GstBase::refCount_ = 0;
-
-// this initializes pipeline only once/process
-GstBase::GstBase()
-    : pipeline_(Pipeline::Instance())
+void GstLinkable::link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks)
 {
-    ++refCount_;
+    GstIter src;
+    GstIter sink;
+    for (src = sources.begin(), sink = sinks.begin(); src != sources.end(), sink != sinks.end();
+         ++src, ++sink)
+        assert(gst_element_link(*src, *sink));
 }
 
 
-GstBase::~GstBase()
+void GstLinkable::link(GstElement *src, GstElement *sink)
 {
-    assert(stop());
-    --refCount_;
-    if (refCount_ <= 0)
-    {
-        assert(refCount_ == 0);
-        //pipeline_.reset();
-    }
+    assert(gst_element_link(src, sink));
 }
 
 
-bool GstBase::start()
+void GstLinkable::link(GstLinkable &src, GstElement *sink)
 {
-    return pipeline_.start();
+    assert(gst_element_link(src.element(), sink));
 }
 
 
-bool GstBase::stop()
+void GstLinkable::link(GstElement *src, GstLinkable &sink)
 {
-    return pipeline_.stop();
+    assert(gst_element_link(src, sink.element()));
 }
 
 
-#if 0
+void GstLinkable::link(GstLinkable &src, GstLinkable &sink)
+{
+    assert(gst_element_link(src.element(), sink.element()));
+}
+
+
+void GstLinkable::link(std::vector<GstElement*> &sources, GstLinkable &sink)
+{
+    GstIter src;
+    for (src = sources.begin(); src != sources.end(); ++src)
+        assert(gst_element_link(*src, sink.element()));
+}
+
+
+void GstLinkable::link(GstLinkable &src, std::vector<GstElement*> &sinks)
+{
+    GstIter sink;
+    for (sink = sinks.begin(); sink != sinks.end(); ++sink)
+        assert(gst_element_link(src.element(), *sink));
+}
+
 // with this method, we can find out why pads don't link
 // if they fail
-bool GstBase::link_pads(GstPad *srcPad, GstPad *sinkPad)
+bool GstLinkable::link_pads(GstPad *srcPad, GstPad *sinkPad)
 {
     bool linkOk = false;
 
@@ -103,4 +117,3 @@ bool GstBase::link_pads(GstPad *srcPad, GstPad *sinkPad)
     return linkOk;
 }
 
-#endif

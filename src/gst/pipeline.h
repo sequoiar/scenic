@@ -29,11 +29,11 @@ class Pipeline
     public:
         static Pipeline & Instance();
         void add(GstElement * element);
-        void add_vector(std::vector < GstElement * >&elementVec);
+        void add(std::vector < GstElement * >&elementVec);
         GstClockID add_clock_callback(GstClockCallback callback, gpointer user_data);
         void remove_clock_callback(GstClockID clockId);
         void remove(GstElement * element);
-        void remove_vector(std::vector < GstElement * >&elementVec);
+        void remove(std::vector < GstElement * >&elementVec);
         void reset();
         bool isPlaying() const;
         void wait_until_playing() const;

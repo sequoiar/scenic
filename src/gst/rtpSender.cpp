@@ -21,6 +21,7 @@
 #include <gst/gst.h>
 #include <cassert>
 
+#include "gstLinkable.h"
 #include "rtpSender.h"
 #include "mediaConfig.h"
 #include "logWriter.h"
@@ -89,10 +90,10 @@ void RtpSender::addDerived(GstElement * newSrc, const MediaConfig * config)
     assert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
 
     // link pads
-    assert(link_pads(payloadSrc, send_rtp_sink));
-    assert(link_pads(send_rtp_src, rtpSenderSink));
-    assert(link_pads(send_rtcp_src, rtcpSenderSink));
-    assert(link_pads(rtcpReceiverSrc, recv_rtcp_sink));
+    assert(GstLinkable::link_pads(payloadSrc, send_rtp_sink));
+    assert(GstLinkable::link_pads(send_rtp_src, rtpSenderSink));
+    assert(GstLinkable::link_pads(send_rtcp_src, rtcpSenderSink));
+    assert(GstLinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink));
 
     // release static pads (in reverse order)
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));

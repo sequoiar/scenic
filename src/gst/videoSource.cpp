@@ -21,6 +21,7 @@
 #include <string>
 #include <string.h>
 #include <cassert>
+#include "gstLinkable.h"
 #include "videoSource.h"
 #include "videoConfig.h"
 #include "logWriter.h"
@@ -42,7 +43,7 @@ void VideoSource::init()
 
 void VideoSource::link_element(GstElement *sinkElement)
 {
-    assert(gst_element_link(source_, sinkElement));
+    GstLinkable::link(source_, sinkElement);
 }
 
 
@@ -108,7 +109,7 @@ void VideoFileSource::sub_init()
     pipeline_.add(decoder_);
 
     g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
-    assert(gst_element_link(source_, decoder_));
+    GstLinkable::link(source_, decoder_);
 
     // bind callback
     g_signal_connect(decoder_, "new-decoded-pad",
@@ -136,6 +137,7 @@ void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
         LOG("Pad is already linked.", DEBUG)
         return;
     }
+
     VideoFileSource *context = static_cast<VideoFileSource*>(data);
     GstStructure *str;
     GstPad *sinkPad;
@@ -159,7 +161,7 @@ void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
     gst_caps_unref(caps);
 
     LOG("VideoFileSource: linking new srcpad and sinkpad.", DEBUG);
-    assert(link_pads(srcPad, sinkPad));
+    assert(GstLinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 
@@ -178,7 +180,7 @@ VideoDvSource::VideoDvSource(const VideoConfig &config)
 
 void VideoDvSource::link_element(GstElement *sinkElement)
 {
-    assert(gst_element_link(dvdec_, sinkElement));
+    GstLinkable::link(dvdec_, sinkElement);
 }
 
 
@@ -198,8 +200,8 @@ void VideoDvSource::sub_init()
                      G_CALLBACK(VideoDvSource::cb_new_src_pad),
                      static_cast<void *>(queue_));
 
-    assert(gst_element_link(source_, demux_));
-    assert(gst_element_link(queue_, dvdec_));
+    GstLinkable::link(source_, demux_);
+    GstLinkable::link(queue_, dvdec_);
 }
 
 
@@ -210,7 +212,7 @@ void VideoDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, voi
         LOG("Ignoring audio stream from DV", DEBUG);
         return;
     }
-    GstElement *sinkElement = (GstElement *) data;
+    GstElement *sinkElement = static_cast<GstElement *>(data);
     GstPad *sinkPad;
 
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
@@ -221,7 +223,7 @@ void VideoDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, voi
         return;
     }
     LOG("VideoDvSource: linking new srcpad to sinkpad.", DEBUG);
-    assert(link_pads(srcPad, sinkPad));
+    assert(GstLinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 

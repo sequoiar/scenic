@@ -25,6 +25,7 @@
 #include <string.h>
 #include <gst/gst.h>
 #include "logWriter.h"
+#include "gstLinkable.h"
 #include "rtpReceiver.h"
 #include "mediaConfig.h"
 
@@ -91,7 +92,7 @@ void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void 
         gst_object_unref(sinkPad);
         return;
     }
-    assert(link_pads(srcPad, sinkPad));
+    assert(GstLinkable::link_pads(srcPad, sinkPad));
 
     gst_object_unref(sinkPad);
 }
@@ -156,9 +157,9 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig * confi
     assert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
     assert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
 
-    assert(link_pads(rtpReceiverSrc, recv_rtp_sink));
-    assert(link_pads(rtcpReceiverSrc, recv_rtcp_sink));
-    assert(link_pads(send_rtcp_src, rtcpSenderSink));
+    assert(GstLinkable::link_pads(rtpReceiverSrc, recv_rtp_sink));
+    assert(GstLinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink));
+    assert(GstLinkable::link_pads(send_rtcp_src, rtcpSenderSink));
 
     depayloaders_.push_back(depayloader);
     // when pad is created, it must be linked to new sink
