@@ -7,7 +7,6 @@ using std::cout;
 using std::endl;
 
 void codecHandlingTest(){
-
     std::string res;
 
     cout << " Add GSM and PCMU in a new audio media " << endl;
@@ -43,32 +42,31 @@ void codecHandlingTest(){
 
     res = video_media->toString();
     cout << res << endl;
-
 }
 
-void codecHandlingAtSessionLevelTest( void ){
 
+void codecHandlingAtSessionLevelTest( void ){
     std::string res;
     // Use the default SIP port
     SIPSession *session = new SIPSession();
-    
+
     cout << " Add an audio and a video media with 2 codecs each" << endl;
-    session->addMedia( "audio" , "GSM/PCMU/" ,12354 );
+    session->addMedia( "audio", "GSM/PCMU/", 12354 );
     session->addMedia( "video", "H264/H263/", 14321 );
     res = session->mediaToString();
     cout << res << endl;
 
     cout << " Modify the media offer" << endl;
-    session->addMedia("audio", "vorbis/PCMA/",12354 );
+    session->addMedia("audio", "vorbis/PCMA/", 12354 );
     res = session->mediaToString();
     cout << res << endl;
-
 }
+
 
 int main(int argc, char** argv ) {
-
     codecHandlingAtSessionLevelTest();
-    
-    return 0;
 
+    return 0;
 }
+
+

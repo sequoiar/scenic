@@ -29,7 +29,7 @@ int main(int argc, char** argv){
         sip = new SIPSession( atoi(argv[1]));
     else
         sip = new SIPSession( );
-    sip->addMedia("audio", "vorbis/PCMA/" , 12345);
+    sip->addMedia("audio", "vorbis/PCMA/", 12345);
 
     // Console main
     cout << MENU << endl;

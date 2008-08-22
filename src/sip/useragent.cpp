@@ -336,24 +336,24 @@ int UserAgent::inv_session_end( void ){
     return PJ_SUCCESS;
 }
 
-int UserAgent::inv_session_reinvite( void ){
 
+int UserAgent::inv_session_reinvite( void ){
     pj_status_t status;
     pjsip_tx_data *tdata;
 
     local_sdp->createInitialOffer( inv_session->dlg->pool );
-    
+
     status = pjsip_inv_reinvite( inv_session, NULL, local_sdp->getLocalSDPSession(), &tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-    
+
     status = pjsip_inv_send_msg( inv_session, tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     return PJ_SUCCESS;
 }
 
-int UserAgent::sendInstantMessage( std::string msg ){
 
+int UserAgent::sendInstantMessage( std::string msg ){
     pj_status_t status;
 
     // Set the current dialog for the instant messaging module
@@ -369,7 +369,6 @@ int UserAgent::sendInstantMessage( std::string msg ){
 
 
 static int startThread( void *arg ){
-
     PJ_UNUSED_ARG(arg);
     while( !thread_quit )
     {
@@ -385,9 +384,11 @@ void UserAgent::addMediaToSession( std::string type, std::string codecs, int por
     local_sdp->addMediaToSDP( type, codecs, port );
 }
 
+
 std::string UserAgent::mediaToString( void ){
     return local_sdp->mediaToString();
 }
+
 
 static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
     pjmedia_sdp_session *sdp;
@@ -401,6 +402,7 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
 
     *r_sdp = sdp;
 }
+
 
 /********************** Callbacks Implementation **********************************/
 
@@ -585,14 +587,13 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 
 static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
     cout << "Invite session received new offer from peer -" <<  offer->name.ptr << endl;
-	
-    //pjmedia_sdp_session *sdp; 
-    pj_status_t status;    
+
+    //pjmedia_sdp_session *sdp;
+    pj_status_t status;
 
     local_sdp->receivingInitialOffer(app_pool, (pjmedia_sdp_session*)offer);
     status = pjsip_inv_set_sdp_answer( inv_session, local_sdp->getLocalSDPSession() );
     //PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
 }
 
 

@@ -64,9 +64,11 @@ int SIPSession::shutdown( void ){
     return _app_ua->pjsip_shutdown();
 }
 
+
 int SIPSession::reinvite( void ){
     return _app_ua->inv_session_reinvite();
 }
+
 
 int SIPSession::sendInstantMessage( std::string msg ){
     return _app_ua->sendInstantMessage( msg );
@@ -89,7 +91,9 @@ void SIPSession::addMedia( std::string type, std::string codecs, int port ){
     _app_ua->addMediaToSession( type, codecs, port );
 }
 
+
 std::string SIPSession::mediaToString( void ){
     return _app_ua->mediaToString();
 }
+
 
