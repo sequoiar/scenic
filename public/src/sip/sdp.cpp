@@ -48,13 +48,33 @@ Sdp::Sdp( std::string ip_addr )
 
 Sdp::~Sdp(){}
 
-void Sdp::addMediaToSDP( int mime_type, std::string codecs, int mport ){
+void Sdp::addMediaToSDP( std::string type, std::string codecs, int port ){
+
     sdpMedia *media;
-    sdpCodec *codec;
     size_t pos;
     std::string tmp;
+    int k;
+    bool retrieved = false;
+    std::vector<sdpMedia*>::iterator iter;
 
-    media = new sdpMedia( mime_type );
+    std::cout << "size= "<< _sdpMediaList.size() << std::endl;
+
+    // If no media of ths type has been already created
+    for( k = 0 ; k<(int)_sdpMediaList.size() ; k++ ) {
+        if( strcmp( _sdpMediaList[k]->getMediaStr().c_str(), type.c_str()) == 0 ){
+            std::cout << "retrieve existing media" << std::endl; 
+            iter = _sdpMediaList.begin()+k;
+            _sdpMediaList.erase(iter);
+            //media  = _sdpMediaList[k];
+            //retrieved = true;
+            break;
+        }
+    }
+    
+    if(!retrieved){
+        std::cout << "create new media" << std::endl; 
+        media = new sdpMedia( type, port );
+    }
 
     // The string codecs can contains multiple codecs,
     // we have to parse by assuming that the delimiter is the '/' char
@@ -64,11 +84,12 @@ void Sdp::addMediaToSDP( int mime_type, std::string codecs, int mport ){
         tmp = codecs.substr(0, pos);
         codecs.erase(0, pos+1);
 
-        codec = new sdpCodec( mime_type, tmp );
-        media->addCodec(codec);
+        media->addCodec(tmp);
     }
 
-    addMedia( media, mport );
+    // Add the media in the list
+    if(!retrieved)
+        _sdpMediaList.push_back( media );
 }
 
 
@@ -240,9 +261,18 @@ void Sdp::sdp_addMediaDescription( pj_pool_t* pool ){
 
 
 void Sdp::addMedia( sdpMedia *media, int port ){
-    _sdpMediaList.push_back( media );
-    std::cout << port << std::endl;
-    media->setPort( port );
 }
 
+std::string Sdp::mediaToString( void ){
+    
+    int size, i;
+    std::ostringstream res;
 
+    size = _sdpMediaList.size();
+    for( i = 0; i < size ; i++ ){
+        res << _sdpMediaList[i]->toString();
+    } 
+    
+    res << std::endl;
+    return res.str();
+}

@@ -64,7 +64,7 @@ int SIPSession::shutdown( void ){
     return _app_ua->pjsip_shutdown();
 }
 
-int SIPSession::updateMedia( void ){ 
+int SIPSession::reinvite( void ){
     return _app_ua->inv_session_reinvite();
 }
 
@@ -85,8 +85,11 @@ int SIPSession::refuse( int reason ){
 
 void SIPSession::build_sdp( void ){}
 
-void SIPSession::addMedia( std::string codecs ){
-    _app_ua->addMediaToSession( codecs );
+void SIPSession::addMedia( std::string type, std::string codecs, int port ){
+    _app_ua->addMediaToSession( type, codecs, port );
 }
 
+std::string SIPSession::mediaToString( void ){
+    return _app_ua->mediaToString();
+}
 

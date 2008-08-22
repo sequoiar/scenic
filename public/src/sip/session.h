@@ -65,8 +65,8 @@ class Session
 
         virtual int shutdown() = 0;
 
-	virtual int updateMedia() = 0;
-	
+        virtual int reinvite() = 0;
+
         /*
          * Send an instant message
          */
@@ -81,13 +81,15 @@ class Session
 
         virtual void build_sdp() = 0;
 
+        virtual std::string mediaToString() = 0;
+
         /*
          * Add a media to the session. It will be used for SDP session
          *
          * @param codecs    the formatted list of encoding codec names
          *                  Pattern: a=codec1/codec2/../codecn/ (a pour audio; v pour video)
          */
-        virtual void addMedia( std::string codecs ) = 0;
+        virtual void addMedia( std::string type, std::string codecs, int port ) = 0;
 
         /* Read accessor. Return the protocol port */
         int getSessionPort( void ){ return _port; }

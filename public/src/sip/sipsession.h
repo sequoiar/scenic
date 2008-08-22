@@ -68,7 +68,7 @@ class SIPSession
 
         int shutdown();
 
-	int updateMedia();
+        int reinvite();
 
         /*
          * Send an instant message
@@ -81,13 +81,14 @@ class SIPSession
 
         void build_sdp( void );
 
+        std::string mediaToString( void );
         /*
          * Add a media to the session. It will be used for SDP session
          *
          * @param codecs    the formatted list of encoding codec names
          *                  Pattern: separator: '/', must end with the separator
          */
-        void addMedia( std::string codecs );
+        void addMedia( std::string type, std::string codecs, int port );
 
         SIPSession(SIPSession const&); //No Copy Constructor
         SIPSession& operator=(const SIPSession&); //No Assignment Operator

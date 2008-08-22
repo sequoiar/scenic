@@ -34,6 +34,7 @@ class sdpMedia
 {
     public:
         sdpMedia( int type );
+        sdpMedia( std::string media, int port );
         ~sdpMedia();
 
         /*
@@ -45,6 +46,12 @@ class sdpMedia
          * Read accessor. Return the type of media
          */
         int getType() { return _type; }
+
+        /*
+         * Read accessor. Return the type of media
+         */
+        std::string getMediaStr() { return _mediaStr; }
+
 
         /*
          * Read accessor. Return the transport port
@@ -61,11 +68,22 @@ class sdpMedia
          *
          * @param codec     A pointer on the codec to add
          */
-        void addCodec( sdpCodec* codec );
+        void addCodec( sdpCodec *codec );
+        
+        void addCodec( std::string codecName );
+
+        void removeCodec( std::string codecName );
+
+        void clearCodecList( void );
+
+        std::string toString( void );
 
     private:
         /* The type of media ( AUDIO/ VIDEO ..) */
         int _type;
+
+        /* The media type, string form */
+        std::string _mediaStr;
 
         /* The media codec vector */
         std::vector< sdpCodec* > _codecList;
