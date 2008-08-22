@@ -76,9 +76,11 @@ class UserAgent
          *
          * @return  int	PJ_SUCCESS on success
          */
-        int create_invite_session( std::string uri );
+        int inv_session_create( std::string uri );
 
-        int terminate_invite_session();
+        int inv_session_end();
+
+	int inv_session_reinvite();
 
         void addMediaToSession( std::string codecs );
 

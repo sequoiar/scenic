@@ -65,6 +65,8 @@ class Session
 
         virtual int shutdown() = 0;
 
+	virtual int updateMedia() = 0;
+	
         /*
          * Send an instant message
          */
