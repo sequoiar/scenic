@@ -4,12 +4,16 @@
 
 using namespace boost::python;
 
-BOOST_PYTHON_MODULE( sip_export )
+BOOST_PYTHON_MODULE( libsip_export )
 {
     class_<SIPSession>("SIPSession", init<int>())
     .def("connect", &SIPSession::connect)
-    .def("addMedia", &SIPSession::addMedia)
     .def("disconnect", &SIPSession::disconnect)
+    .def("reinvite", &SIPSession::reinvite)
+    .def("shutdown", &SIPSession::shutdown)
+    .def("sendInstantMessage", &SIPSession::sendInstantMessage)
+    .def("addMedia", &SIPSession::addMedia)
+    .def("mediaToString", &SIPSession::mediaToString)
     ;
 }
 
