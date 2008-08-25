@@ -41,10 +41,16 @@ int main(int argc, char** argv){
         switch(input[0])
         {
             case 'c':
-                sip->connect("<sip:bloup@192.168.1.230:0>");
+                if (sip->connect("<sip:bloup@192.168.1.230:0>") == 1 ){
+                    msg = sip->getConnectionState();
+                    cout << msg << endl;
+                }
                 break;
             case 'd':
-                sip->disconnect();
+                if( sip->disconnect() == 1 ){
+                    msg = sip->getConnectionState();
+                    cout << msg << endl;
+                }
                 break;
             case 'a':
                 cout << " <<< media type : ";
@@ -59,12 +65,18 @@ int main(int argc, char** argv){
                 cout << sip->mediaToString() << endl;
                 break;
             case 'r':
-                sip->reinvite();
+                if( sip->reinvite() == 1 ){
+                    msg = sip->getConnectionState();
+                    cout << msg << endl;
+                }
                 break;
             case 'm':
                 cout << "Enter message <<<< ";
                 cin >> msg;
-                sip->sendInstantMessage(msg);
+                if( sip->sendInstantMessage(msg) == 1 ){
+                    msg = sip->getConnectionState();
+                    cout << msg << endl;
+                }
                 break;
             case 'i':
                 msg = sip->getConnectionState();

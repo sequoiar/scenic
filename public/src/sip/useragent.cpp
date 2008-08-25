@@ -136,7 +136,6 @@ static const char *stateStr[] =
     "CONNECTION_STATE_READY",
     "CONNECTION_STATE_INVITE_SENT",
     "CONNECTION_STATE_CONNECTED",
-    "CONNECTION_STATE_DISCONNECTED",
     "CONNECTION_STATE_FAILED",
 };
 
@@ -338,7 +337,7 @@ int UserAgent::inv_session_create( std::string uri ){
     pj_ansi_sprintf( tmp1, remote->getAddress().c_str() );
     to = pj_str(tmp1);
 
-    if( getConnectionState() == CONNECTION_STATE_READY ) {
+    if( _state == CONNECTION_STATE_READY ) {
         status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
                                        NULL,
                                        &to,
@@ -374,32 +373,38 @@ int UserAgent::inv_session_end( void ){
     pj_status_t status;
     pjsip_tx_data *tdata;
 
-    status = pjsip_inv_end_session( inv_session, 404, NULL, &tdata );
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+    if( _state == CONNECTION_STATE_CONNECTED ){
+        status = pjsip_inv_end_session( inv_session, 404, NULL, &tdata );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    status = pjsip_inv_send_msg( inv_session, tdata );
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
-    // Update the connection state. The call is disconnected
-    _state = CONNECTION_STATE_DISCONNECTED;
-
-    return PJ_SUCCESS;
+        status = pjsip_inv_send_msg( inv_session, tdata );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+    
+        return PJ_SUCCESS;
+    }
+    
+    return !PJ_SUCCESS;
 }
 
 
 int UserAgent::inv_session_reinvite( void ){
+
     pj_status_t status;
     pjsip_tx_data *tdata;
 
-    local_sdp->createInitialOffer( inv_session->dlg->pool );
+    if( _state == CONNECTION_STATE_CONNECTED || _state == CONNECTION_STATE_READY ) {
+        local_sdp->createInitialOffer( inv_session->dlg->pool );
 
-    status = pjsip_inv_reinvite( inv_session, NULL, local_sdp->getLocalSDPSession(), &tdata );
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+        status = pjsip_inv_reinvite( inv_session, NULL, local_sdp->getLocalSDPSession(), &tdata );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    status = pjsip_inv_send_msg( inv_session, tdata );
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+        status = pjsip_inv_send_msg( inv_session, tdata );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+    
+        return PJ_SUCCESS;
+    }
 
-    return PJ_SUCCESS;
+    return !PJ_SUCCESS;
 }
 
 
@@ -410,11 +415,14 @@ int UserAgent::sendInstantMessage( std::string msg ){
     _imModule->setDialog( inv_session->dlg );
     _imModule->setText( msg );
 
-    // Send the message through the im module
-    status = _imModule->sendMessage();
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+    if( _state == CONNECTION_STATE_CONNECTED ) {
+        // Send the message through the IM module
+        status = _imModule->sendMessage();
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+        return PJ_SUCCESS;
+    }
 
-    return PJ_SUCCESS;
+    return !PJ_SUCCESS;
 }
 
 
@@ -463,11 +471,19 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
     
     if( inv->state == PJSIP_INV_STATE_DISCONNECTED ){
         cout << "Call state: " << pjsip_get_status_text(inv->cause)->ptr << endl;
-        thread_quit = 1;
+        // Update the connection state
+        _state = CONNECTION_STATE_READY;
     }
 
-    else
+    else if( inv->state == PJSIP_INV_STATE_CONFIRMED ){
+        cout << "Call state confirmed " << endl;
+        _state = CONNECTION_STATE_CONNECTED;
+    }
+
+    else{
         cout << "Call state changed to " << pjsip_inv_state_name(inv->state) << endl;
+        cout << "Call state changed to " << inv->state << endl;
+    }
 }
 
 
@@ -620,7 +636,6 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     PJ_UNUSED_ARG( inv );
     PJ_UNUSED_ARG( status );
 
-    _state = CONNECTION_STATE_CONNECTED;
     cout << "on media update" << endl;
     /*
        int nbMedia;
