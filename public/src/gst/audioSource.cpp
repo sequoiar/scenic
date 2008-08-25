@@ -151,22 +151,9 @@ AudioTestSource::~AudioTestSource()
 }
 
 
-bool AudioFileSource::fileExists()
-{
-    FILE *file;
-    file = fopen(config_.location(), "r");
-    if (file != NULL)
-    {
-        fclose(file);
-        return true;
-    }
-    else
-        return false;
-}
-
 void AudioFileSource::sub_init()
 {
-    assert(fileExists());
+    assert(config_.fileExists());
 
     g_object_set(G_OBJECT(sources_[0]), "location", config_.location(), NULL);
 

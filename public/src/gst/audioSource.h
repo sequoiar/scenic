@@ -112,7 +112,6 @@ class AudioFileSource
 
     private:
         std::vector<GstElement*> decoders_;
-        bool fileExists();
 };
 
 

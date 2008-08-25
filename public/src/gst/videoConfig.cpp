@@ -32,7 +32,7 @@
 // for sender (remote)
 VideoConfig::VideoConfig(const std::string &source__, const std::string &codec__,
     const std::string &remoteHost__, int port__)
-    : MediaConfig(source__, codec__, remoteHost__, port__), location_("")
+    : MediaConfig(source__, codec__, remoteHost__, port__)
 {
     // empty
 }
@@ -44,7 +44,7 @@ VideoConfig::VideoConfig(const std::string &source__,
     const std::string &codec__,
     const std::string &remoteHost__,
     int port__)
-    : MediaConfig(source__, codec__, remoteHost__, port__), location_(location__)
+    : MediaConfig(source__, location__, codec__, remoteHost__, port__)
 {
     // empty
 }
@@ -52,7 +52,7 @@ VideoConfig::VideoConfig(const std::string &source__,
 
 // for sender (local)
 VideoConfig::VideoConfig(const std::string &source__)
-    : MediaConfig(source__), location_("")
+    : MediaConfig(source__)
 {
     // empty
 }
@@ -60,7 +60,7 @@ VideoConfig::VideoConfig(const std::string &source__)
 
 // for sender (local)
 VideoConfig::VideoConfig(const std::string &source__, const std::string &location__)
-    : MediaConfig(source__), location_(location__)
+    : MediaConfig(source__, location__)
 {
     // empty
 }
@@ -68,7 +68,7 @@ VideoConfig::VideoConfig(const std::string &source__, const std::string &locatio
 
 // for receiver
 VideoConfig::VideoConfig(const std::string &codec__, int port__)
-    : MediaConfig(codec__, port__), location_("")
+    : MediaConfig(codec__, port__)
 {
     // empty
 }
@@ -87,17 +87,6 @@ VideoSource * VideoConfig::createSource() const
     else {
         LOG("Invalid source!", ERROR);
         return 0;
-    }
-}
-
-
-const char* VideoConfig::location() const
-{
-    if (!location_.empty())
-        return location_.c_str();
-    else {
-        LOG("No location specified", ERROR);
-        return NULL;
     }
 }
 

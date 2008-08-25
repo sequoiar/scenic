@@ -34,7 +34,7 @@ AudioConfig::AudioConfig(const std::string &source__,
     const std::string &codec__,
     const std::string &remoteHost__,
     int port__)
-    : MediaConfig(source__, codec__, remoteHost__, port__), numChannels_(numChannels__), location_("")
+    : MediaConfig(source__, codec__, remoteHost__, port__), numChannels_(numChannels__)
 {
     // rtp sender
 }
@@ -46,15 +46,15 @@ AudioConfig::AudioConfig(const std::string &source__,
     const std::string &codec__,
     const std::string &remoteHost__,
     int port__)
-    : MediaConfig(source__, codec__, remoteHost__,
-                  port__), numChannels_(numChannels__), location_(location__)
+    : MediaConfig(source__, location__, codec__, remoteHost__,
+                  port__), numChannels_(numChannels__)
 {
     // rtp file sender
 }
 
 
 AudioConfig::AudioConfig(const std::string & source__, int numChannels__)
-    : MediaConfig(source__), numChannels_(numChannels__), location_("")
+    : MediaConfig(source__), numChannels_(numChannels__)
 {
     // local sender
 }
@@ -62,14 +62,14 @@ AudioConfig::AudioConfig(const std::string & source__, int numChannels__)
 
 AudioConfig::AudioConfig(const std::string & source__, const std::string & location__,
     int numChannels__)
-    : MediaConfig(source__), numChannels_(numChannels__), location_(location__)
+    : MediaConfig(source__, location__), numChannels_(numChannels__)
 {
     // local file sender
 }
 
 
 AudioConfig::AudioConfig(int numChannels__, const std::string &codec__, int port__)
-    : MediaConfig(codec__, port__), numChannels_(numChannels__), location_("")
+    : MediaConfig(codec__, port__), numChannels_(numChannels__)
 {
     // receiver
 }
@@ -85,17 +85,6 @@ const char *AudioConfig::source() const
         return source_.substr(0, pos).c_str();
     else
         return MediaConfig::source();
-}
-
-
-const char* AudioConfig::location() const
-{
-    if (!location_.empty())
-        return location_.c_str();
-    else{
-        LOG("No location specified", ERROR);
-        return NULL;
-    }
 }
 
 
