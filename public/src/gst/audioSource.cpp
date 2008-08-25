@@ -256,7 +256,7 @@ void AudioDvSource::sub_init()
 }
 
 
-void AudioDvSource::cb_new_src_pad(GstElement *  srcElement, GstPad * srcPad, void *data)
+void AudioDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, void *data)
 {
     if (std::string("video") == gst_pad_get_name(srcPad))
     {

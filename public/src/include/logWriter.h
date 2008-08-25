@@ -35,7 +35,7 @@
 #include "config.h"
 
 #define ENABLE_LOG 1
-#define ENABLE_GLOG 1
+#define ENABLE_GLOG 0
 
 
 #if !ENABLE_LOG
@@ -88,6 +88,27 @@ static bool logLevelIsValid(LogLevel level)
 }
 
 
+static const std::string logLevelStr(LogLevel level)
+{
+    switch (level)
+    {
+        case DEBUG:
+            return "DEBUG: ";
+        case INFO:
+            return "INFO: ";
+        case WARNING:
+            return "WARNING: ";
+        case ERROR:
+            return "ERROR: ";
+        case CRITICAL:
+            return "CRITICAL: ";
+        default:
+            return "INVALID LOG LEVEL: ";
+    }
+}
+
+
+
 static bool logLevelMatch(LogLevel level)
 {
     if (level >= LOG_LEVEL && logLevelIsValid(level))
@@ -95,10 +116,10 @@ static bool logLevelMatch(LogLevel level)
     else
         return false;
 }
-using std::string;
 
-static const string log_(const string &msg, LogLevel level, const string &fileName,
-                const string &functionName, const int lineNum)
+
+static const std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
+                const std::string &functionName, const int lineNum)
 {
     std::ostringstream logMsg;
     if (logLevelMatch(level))
@@ -108,9 +129,8 @@ static const string log_(const string &msg, LogLevel level, const string &fileNa
 
         time( &rawtime );
         timeinfo = localtime(&rawtime);
-        logMsg << std::endl << fileName << ":" << functionName << ":" << lineNum << ": " <<
-        msg << " "
-               << asctime(timeinfo) << std::endl;
+        logMsg << std::endl << logLevelStr(level) << fileName << ":" << functionName << ":" << lineNum << ": " <<
+            msg << " " << asctime(timeinfo) << std::endl;
 
         // FIXME: send message to Core
     }
@@ -119,7 +139,7 @@ static const string log_(const string &msg, LogLevel level, const string &fileNa
 }
 
 #if ENABLE_GLOG
-static void glog(const string& str, LogLevel level)
+static void glog(const std::string& str, LogLevel level)
 {
     if(str.empty())
         return;

@@ -108,6 +108,7 @@ void VideoFileSource::sub_init()
 
     pipeline_.add(decoder_);
 
+    assert(config_.fileExists());
     g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
     GstLinkable::link(source_, decoder_);
 
@@ -123,7 +124,7 @@ void VideoFileSource::link_element(GstElement *sinkElement)
     // defer linking of decoder to this element to callback
     sinkElement_ = sinkElement;
 
-    // set xvimagesink to true for filesrc to work properly
+    // set xvimagesink sync equal to true for filesrc to work properly
     if (!strncmp(gst_element_get_name(sinkElement_), "xvimagesink", strlen("xvimagesink")))
         g_object_set(G_OBJECT(sinkElement_), "sync", TRUE, NULL);
 }
