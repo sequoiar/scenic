@@ -24,6 +24,16 @@ AC_CHECK_HEADERS([arpa/inet.h stdlib.h string.h sys/ioctl.h unistd.h])
 AC_HEADER_STDBOOL
 AC_C_CONST
 
+AC_MSG_CHECKING(whether to enable debugging)
+AC_ARG_ENABLE(debug, [  --enable-debug=(yes/no) turn on debug symbols and extra warnings ],, 
+        enable_debug=yes)
+
+if test "x${enable_debug}" == "xyes" ; then
+    AC_DEFINE(CONFIG_DEBUG,[],[Debug define from configure])
+    CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall"
+#-Wno-unused-parameter -Wno-unused-variable"  
+fi
+
 
 # Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
