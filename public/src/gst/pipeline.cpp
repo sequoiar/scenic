@@ -23,7 +23,7 @@
 #include <cassert>
 
 #include "pipeline.h"
-#include "logWriter.h"
+//#include "logWriter.h"
 
 Pipeline *Pipeline::instance_ = 0;
 

@@ -31,6 +31,7 @@
 #include "osc/osc.h"
 #include "gutil/optionArgs.h"
 #include <sstream>
+#include "logWriter.h"
 
 class MainModule
     : public BaseModule

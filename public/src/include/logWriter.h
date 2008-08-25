@@ -31,18 +31,24 @@
 #include <iostream>
 #include <time.h>
 #include <sstream>
+#include <stdlib.h>
 #include "config.h"
 
 #define ENABLE_LOG 1
+#define ENABLE_GLOG 1
 
 
-
-#if ENABLE_LOG
-#define LOG(msg, level)                                                              \
-    log(msg, level, __FILE__, __FUNCTION__, __LINE__);
-#else
+#if !ENABLE_LOG
 #define LOG(msg, level)
-#endif
+#else
+    #if ENABLE_GLOG
+#include <glib.h>
+        #define LOG(msg, level)         \
+            glog(log_(msg, level, __FILE__, __FUNCTION__, __LINE__),level);
+        #else
+        #define LOG(msg, level)         \
+            std::cerr << log_(msg, level, __FILE__, __FUNCTION__, __LINE__);if(level == CRITICAL) abort(); 
+    #endif
 
 enum LogLevel {
     DEBUG = 10,
@@ -53,7 +59,7 @@ enum LogLevel {
 };
 
 #define LOG_ERROR(msg)      LOG(msg, ERROR);
-#define LOG_CRITCAL(msg)    LOG(msg, CRITICAL);
+#define LOG_CRITICAL(msg)   LOG(msg, CRITICAL);
 #define LOG_INFO(msg)       LOG(msg, INFO);
 #define LOG_WARNING(msg)    LOG(msg, WARNING);
 #define LOG_DEBUG(msg)      LOG(msg, DEBUG);
@@ -89,12 +95,12 @@ static bool logLevelMatch(LogLevel level)
     else
         return false;
 }
+using std::string;
 
-
-static void log(const std::string &msg, LogLevel level, const std::string &fileName,
-                const std::string &functionName,
-                const int lineNum)
+static const string log_(const string &msg, LogLevel level, const string &fileName,
+                const string &functionName, const int lineNum)
 {
+    std::ostringstream logMsg;
     if (logLevelMatch(level))
     {
         time_t rawtime;
@@ -102,15 +108,47 @@ static void log(const std::string &msg, LogLevel level, const std::string &fileN
 
         time( &rawtime );
         timeinfo = localtime(&rawtime);
-        std::ostringstream logMsg;
         logMsg << std::endl << fileName << ":" << functionName << ":" << lineNum << ": " <<
         msg << " "
                << asctime(timeinfo) << std::endl;
 
         // FIXME: send message to Core
-        std::cerr << logMsg.str();
     }
+
+    return logMsg.str();
 }
 
+#if ENABLE_GLOG
+static void glog(const string& str, LogLevel level)
+{
+    if(str.empty())
+        return;
+
+    switch(level)
+    {
+        case DEBUG: 
+            g_debug(str.c_str()); break;
+
+        case WARNING: 
+            g_warning(str.c_str()); break;
+
+        case INFO: 
+            g_message(str.c_str()); break;
+
+        case ERROR: 
+            g_critical(str.c_str()); break;
+
+        case CRITICAL: 
+            g_error(str.c_str()); break;
+                    
+        default:
+            break;
+
+
+    }
+
+}
+#endif
+#endif
 
 #endif //  _LOG_WRITER_H_

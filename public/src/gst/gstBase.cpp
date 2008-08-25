@@ -22,7 +22,7 @@
 #include <cassert>
 
 #include "gstBase.h"
-#include "logWriter.h"
+//#include "logWriter.h"
 
 int GstBase::refCount_ = 0;
 

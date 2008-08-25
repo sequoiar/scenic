@@ -21,7 +21,6 @@
 #include <iostream>
 #include "gutil/baseThread.h"
 #include "gutil/stdMsg.h"
-#include "logWriter.h"
 
 #include "gst/videoSender.h"
 #include "gst/videoReceiver.h"
