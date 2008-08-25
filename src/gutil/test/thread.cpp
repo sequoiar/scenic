@@ -54,8 +54,8 @@ int Thread::main()
         StdMsg f = queue_.timed_pop(1);
         LOG(" here ", DEBUG);
         if(count++ == max_count) {
-            StdMsg f(StdMsg::QUIT);
-            queue_.push(f);
+            StdMsg ff(StdMsg::QUIT);
+            queue_.push(ff);
             break;
         }
     }

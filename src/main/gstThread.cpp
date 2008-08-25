@@ -58,8 +58,8 @@ int GstThread::main()
         {
             case StdMsg::QUIT:
             {
-                StdMsg f(StdMsg::QUIT);
-                queue_.push(f);
+                StdMsg ff(StdMsg::QUIT);
+                queue_.push(ff);
                 done = true;
                 break;
             }

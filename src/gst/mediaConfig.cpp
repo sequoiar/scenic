@@ -25,23 +25,23 @@
 #include <string>
 #include "mediaConfig.h"
 
-MediaConfig::MediaConfig(const std::string &codec, int port)   // receiver
-    : source_(""), codec_(codec), remoteHost_(""), port_(port)
+MediaConfig::MediaConfig(const std::string &codec_param, int port_param)   // receiver
+    : source_(""), codec_(codec_param), remoteHost_(""), port_(port_param)
 {
     // empty
 }
 
 
-MediaConfig::MediaConfig(const std::string &source, const std::string &codec,
-    const std::string &remoteHost, int port)
-    : source_(source), codec_(codec), remoteHost_(remoteHost), port_(port) // remote sender
+MediaConfig::MediaConfig(const std::string &source_param, const std::string &codec_param,
+    const std::string &remoteHost_param, int port_param)
+    : source_(source_param), codec_(codec_param), remoteHost_(remoteHost_param), port_(port_param) // remote sender
 {
     // empty
 }
 
 
-MediaConfig::MediaConfig(const std::string &source)    // local sender
-    : source_(source), codec_(""), remoteHost_(""), port_(0)
+MediaConfig::MediaConfig(const std::string &source_param)    // local sender
+    : source_(source_param), codec_(""), remoteHost_(""), port_(0)
 {
     // empty
 }
