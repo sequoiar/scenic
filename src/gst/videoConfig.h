@@ -53,12 +53,7 @@ class VideoConfig
 
         VideoSource* createSource() const;  // factory method
 
-        const char* location() const;
-
         const bool has_h264() const { return codec_ == "h264"; }
-
-    private:
-        const std::string location_;
 };
 
 #endif // _VIDEO_CONFIG_H_

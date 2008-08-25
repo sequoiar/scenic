@@ -24,9 +24,10 @@
 
 #include <string>
 #include "mediaConfig.h"
+#include "logWriter.h"
 
 MediaConfig::MediaConfig(const std::string &codec_param, int port_param)   // receiver
-    : source_(""), codec_(codec_param), remoteHost_(""), port_(port_param)
+    : source_(""), location_(""), codec_(codec_param), remoteHost_(""), port_(port_param)
 {
     // empty
 }
@@ -34,16 +35,60 @@ MediaConfig::MediaConfig(const std::string &codec_param, int port_param)   // re
 
 MediaConfig::MediaConfig(const std::string &source_param, const std::string &codec_param,
     const std::string &remoteHost_param, int port_param)
-    : source_(source_param), codec_(codec_param), remoteHost_(remoteHost_param), port_(port_param) // remote sender
+    : source_(source_param), location_(""), codec_(codec_param), remoteHost_(remoteHost_param), port_(port_param) // remote sender
+{
+    // empty
+}
+
+
+MediaConfig::MediaConfig(const std::string &source_param, const std::string &location_param, const std::string &codec_param,
+    const std::string &remoteHost_param, int port_param)
+    : source_(source_param), location_(location_param), codec_(codec_param), remoteHost_(remoteHost_param), port_(port_param) // remote sender
 {
     // empty
 }
 
 
 MediaConfig::MediaConfig(const std::string &source_param)    // local sender
-    : source_(source_param), codec_(""), remoteHost_(""), port_(0)
+    : source_(source_param), location_(""), codec_(""), remoteHost_(""), port_(0)
 {
     // empty
+}
+
+
+MediaConfig::MediaConfig(const std::string &source_param, const std::string &location_param)    // local sender
+    : source_(source_param), location_(location_param), codec_(""), remoteHost_(""), port_(0)
+{
+    // empty
+}
+
+
+// FIXME: not every mediaconfig has a file
+const bool MediaConfig::fileExists() const
+{
+    if (location_.empty())
+        return false;
+
+    FILE *file;
+    file = fopen(location(), "r");
+    if (file != NULL)
+    {
+        fclose(file);
+        return true;
+    }
+    else
+        return false;
+}
+
+
+const char* MediaConfig::location() const
+{
+    if (!location_.empty())
+        return location_.c_str();
+    else {
+        LOG("No location specified", ERROR);
+        return NULL;
+    }
 }
 
 

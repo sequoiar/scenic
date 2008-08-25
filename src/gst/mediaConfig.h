@@ -35,20 +35,29 @@ class MediaConfig
         const std::string & codec,
         const std::string & remoteHost,
         int port);
+        MediaConfig(const std::string & source,
+        const std::string &location,
+        const std::string & codec,
+        const std::string & remoteHost,
+        int port);
         MediaConfig(const std::string &codec, int port); // receiver
         explicit MediaConfig(const std::string &source); // local sender
+        explicit MediaConfig(const std::string &source, const std::string &location); // local sender
 
         const char *source() const { return source_.c_str(); }
+        const char *location() const;
         const char *codec() const { return codec_.c_str(); }
         const char *remoteHost() const { return remoteHost_.c_str(); }
         const int port() const { return port_; }
         const bool isNetworked() const { return port_ != 0; }
         const bool hasCodec() const { return !codec_.empty(); }
+        const bool fileExists() const;
 
         virtual ~MediaConfig() {};
 
     protected:
         const std::string source_;
+        const std::string location_;
         const std::string codec_;
         const std::string remoteHost_;
         const int port_;

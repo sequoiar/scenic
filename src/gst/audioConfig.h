@@ -54,14 +54,11 @@ class AudioConfig
 
         const char *source() const;
 
-        const char* location() const;
-
         const int numChannels() const { return numChannels_; };
         AudioSource* createSource() const;
 
     protected:
         const int numChannels_;
-        const std::string location_;
 };
 
 #endif // _AUDIO_CONFIG_H_
