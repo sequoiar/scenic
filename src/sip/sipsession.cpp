@@ -49,14 +49,12 @@ SIPSession::SIPSession( SIPSession const& )
 SIPSession::~SIPSession(){}
 
 int SIPSession::connect( std::string r_uri ){
-    _app_ua->inv_session_create( r_uri );
-    return 0;
+    return _app_ua->inv_session_create( r_uri );
 }
 
 
 int SIPSession::disconnect( void ){
-    _app_ua->inv_session_end();
-    return 0;
+    return _app_ua->inv_session_end();
 }
 
 
