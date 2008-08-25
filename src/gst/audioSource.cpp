@@ -76,7 +76,7 @@ void AudioSource::link_interleave()
 }
 
 
-gboolean AudioSource::base_callback(GstClock *, GstClockTime , GstClockID ,
+gboolean AudioSource::base_callback(GstClock * /*clock*/, GstClockTime  /*time*/, GstClockID  /*id*/,
                                     gpointer user_data)
 {
     return (static_cast<AudioSource*>(user_data)->callback());     // deferred to subclass
@@ -159,7 +159,7 @@ void AudioFileSource::sub_init()
 }
 
 
-void AudioFileSource::cb_new_src_pad(GstElement * , GstPad * srcPad, gboolean ,
+void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean  /*last*/,
                                      gpointer data)
 {
     if (gst_pad_is_linked(srcPad))
@@ -243,7 +243,7 @@ AudioDvSource::AudioDvSource(const AudioConfig &config)
     : AudioSource(config), demux_(0), queue_(0)
 {}
 
-void AudioDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
+void AudioDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, void *data)
 {
     if (std::string("video") == gst_pad_get_name(srcPad))
     {

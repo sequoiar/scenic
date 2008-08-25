@@ -124,8 +124,8 @@ void VideoSender::liblo_error(int num, const char *msg, const char *path)
 }
 
 
-int VideoSender::stop_handler(const char *, const char *, lo_arg ** , int ,
-                              void *,
+int VideoSender::stop_handler(const char * /*path*/, const char * /*types*/, lo_arg ** /*argv*/, int /*argc*/,
+                              void * /*data*/,
                               void *user_data)
 {
     LOG("Being stopped by receiver.", DEBUG);
