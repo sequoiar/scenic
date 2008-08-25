@@ -257,10 +257,6 @@ void Sdp::sdp_addMediaDescription( pj_pool_t* pool ){
     }
 }
 
-
-void Sdp::addMedia( sdpMedia *media, int port ){}
-
-
 std::string Sdp::mediaToString( void ){
     int size, i;
     std::ostringstream res;

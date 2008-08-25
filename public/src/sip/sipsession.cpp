@@ -80,7 +80,7 @@ int SIPSession::accept( void ){
 }
 
 
-int SIPSession::refuse( int reason ){
+int SIPSession::refuse(  ){
     return 0;
 }
 

@@ -77,7 +77,7 @@ class SIPSession
 
         int accept( void );
 
-        int refuse( int reason );
+        int refuse( );
 
         void build_sdp( void );
 
