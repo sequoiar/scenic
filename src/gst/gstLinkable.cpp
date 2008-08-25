@@ -87,27 +87,27 @@ bool GstLinkable::link_pads(GstPad *srcPad, GstPad *sinkPad)
             break;
 
         case GST_PAD_LINK_WRONG_HIERARCHY:
-            LOG("pads have no common grandparent", DEBUG);
+            LOG("pads have no common grandparent", ERROR);
             break;
 
         case GST_PAD_LINK_WAS_LINKED:
-            LOG("pad was already linked", DEBUG);
+            LOG("pad was already linked", ERROR);
             break;
 
         case GST_PAD_LINK_WRONG_DIRECTION:
-            LOG("pads have wrong direction", DEBUG);
+            LOG("pads have wrong direction", ERROR);
             break;
 
         case GST_PAD_LINK_NOFORMAT:
-            LOG("pads do not have common format", DEBUG);
+            LOG("pads do not have common format", ERROR);
             break;
 
         case GST_PAD_LINK_NOSCHED:
-            LOG("pads cannot cooperate in scheduling", DEBUG);
+            LOG("pads cannot cooperate in scheduling", ERROR);
             break;
 
         case GST_PAD_LINK_REFUSED:
-            LOG("refused for some reason", DEBUG);
+            LOG("refused for some reason", ERROR);
             break;
 
         default:
