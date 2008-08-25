@@ -77,7 +77,6 @@ class AudioTestSuite
             TEST_ADD(AudioTestSuite::start_audio_dv)
             TEST_ADD(AudioTestSuite::stop_audio_dv)
             TEST_ADD(AudioTestSuite::start_stop_audio_dv)
-
         }
 
 
@@ -123,7 +122,7 @@ class AudioTestSuite
         void start_8ch_alsa();
         void stop_8ch_alsa();
         void start_stop_8ch_alsa();
-            
+
         void start_audio_dv();
         void stop_audio_dv();
         void start_stop_audio_dv();
