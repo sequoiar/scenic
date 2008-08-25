@@ -29,9 +29,6 @@
 #include "sdpcodec.h"
 #include "sdpmedia.h"
 
-#define AUDIO_OR_VIDEO  1
-#define AUDIO_AND_VIDEO 2
-
 /*
  * @file    sdp.h
  * @brief   A class to implement the Session Description Protocol.
@@ -112,17 +109,10 @@ class Sdp
          */
         void addMediaToSDP( std::string type, std::string codecs, int port );
 
-        pjmedia_sdp_neg_state getSDPNegociationState(){
-            return pjmedia_sdp_neg_get_state(
-                       negociator );
-        }
-
-
         pj_status_t startNegociation( pj_pool_t *pool ){
             return pjmedia_sdp_neg_negotiate(
                        pool, negociator, 0);
         }
-
 
         std::string mediaToString( void );
 
@@ -142,14 +132,6 @@ class Sdp
 
         Sdp(const Sdp&); //No Copy Constructor
         Sdp& operator=(const Sdp&); //No Assignment Operator
-
-        /*
-         * Add the specified media in the vector of media
-         *
-         * @param media     A pointer on the media object
-         * @param port  The port on which transport the media
-         */
-        void addMedia( sdpMedia *media, int port );
 
         /*
          *  Mandatory field: Protocol version ("v=")
