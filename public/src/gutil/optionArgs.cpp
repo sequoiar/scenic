@@ -56,7 +56,7 @@ void OptionArgs::add(BaseArg *ba)
     else if (ba->type == 'b') {
         BoolArg* arg = static_cast<BoolArg*>(ba);
         GOptionEntry e = {arg->l_arg.c_str(), arg->s_arg, 0,
-                          G_OPTION_ARG_NONE, arg->arg, arg->desc.c_str()};
+                          G_OPTION_ARG_NONE, arg->arg, arg->desc.c_str(),""};
         options_.push_back(e);
     }
     else if (ba->type == 's') {
@@ -74,7 +74,7 @@ void OptionArgs::add(BaseArg *ba)
 
 GOptionEntry* OptionArgs::getArray()
 {
-    GOptionEntry n = { NULL };
+    GOptionEntry n; // = { NULL };
     unsigned int count = 0;
     if(options_.empty())
         return 0;
