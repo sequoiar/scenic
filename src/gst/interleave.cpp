@@ -38,7 +38,8 @@ Interleave::~Interleave()
 
 void Interleave::set_channel_layout()
 {
-    GValue val = { 0, };
+    GValue val; // = { 0 };
+    memset(&val,0,sizeof(val));
     GValueArray *arr;           // for channel position layout
     arr = g_value_array_new(config_.numChannels());
 

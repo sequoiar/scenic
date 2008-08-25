@@ -31,8 +31,11 @@
 #include <iostream>
 #include <time.h>
 #include <sstream>
+#include "config.h"
 
 #define ENABLE_LOG 1
+
+
 
 #if ENABLE_LOG
 #define LOG(msg, level)                                                              \
@@ -49,7 +52,17 @@ enum LogLevel {
     CRITICAL = 50
 };
 
+#define LOG_ERROR(msg)      LOG(msg, ERROR);
+#define LOG_CRITCAL(msg)    LOG(msg, CRITICAL);
+#define LOG_INFO(msg)       LOG(msg, INFO);
+#define LOG_WARNING(msg)    LOG(msg, WARNING);
+#define LOG_DEBUG(msg)      LOG(msg, DEBUG);
+
+#ifdef CONFIG_DEBUG
 static const LogLevel LOG_LEVEL = DEBUG;
+#else
+static const LogLevel LOG_LEVEL = INFO;
+#endif
 
 static bool logLevelIsValid(LogLevel level)
 {

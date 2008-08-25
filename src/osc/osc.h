@@ -56,7 +56,7 @@ class OscThread
         int generic_handler(const char *path, const char *types, lo_arg ** argv, int argc,
                             void *data);
 
-        static void liblo_error(int num, const char *msg, const char *path){}
+        static void liblo_error(int , const char *, const char *){}
         bool send(OscMessage & osc);
 
     private:

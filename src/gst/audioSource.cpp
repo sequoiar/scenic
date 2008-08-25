@@ -76,7 +76,7 @@ void AudioSource::link_interleave()
 }
 
 
-gboolean AudioSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id,
+gboolean AudioSource::base_callback(GstClock *, GstClockTime , GstClockID ,
                                     gpointer user_data)
 {
     return (static_cast<AudioSource*>(user_data)->callback());     // deferred to subclass
@@ -159,7 +159,7 @@ void AudioFileSource::sub_init()
 }
 
 
-void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
+void AudioFileSource::cb_new_src_pad(GstElement * , GstPad * srcPad, gboolean ,
                                      gpointer data)
 {
     if (gst_pad_is_linked(srcPad))

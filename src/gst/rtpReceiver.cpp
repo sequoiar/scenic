@@ -63,7 +63,7 @@ void RtpReceiver::set_caps(const char *capsStr)
 }
 
 
-void RtpReceiver::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
+void RtpReceiver::cb_new_src_pad(GstElement * , GstPad * srcPad, void *)
 {
     // FIXME: Once this callback is attached to the pad-added signal, it gets called like crazy, any time any pad
     // is added (regardless of whether or not it's a dynamic pad) to rtpbin.

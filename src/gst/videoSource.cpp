@@ -55,7 +55,7 @@ VideoSource::~VideoSource()
 
 
 // defers to subclassses callback
-gboolean VideoSource::base_callback(GstClock *clock, GstClockTime time, GstClockID id,
+gboolean VideoSource::base_callback(GstClock *, GstClockTime , GstClockID ,
                                     gpointer user_data)
 {
     VideoSource* context = static_cast<VideoSource*>(user_data);
@@ -129,7 +129,7 @@ void VideoFileSource::link_element(GstElement *sinkElement)
 }
 
 
-void VideoFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
+void VideoFileSource::cb_new_src_pad(GstElement * , GstPad * srcPad, gboolean ,
                                      void *data)
 {
     if (gst_pad_is_linked(srcPad))
@@ -205,7 +205,7 @@ void VideoDvSource::sub_init()
 }
 
 
-void VideoDvSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data)
+void VideoDvSource::cb_new_src_pad(GstElement * , GstPad * srcPad, void *data)
 {
     if (std::string("audio") == gst_pad_get_name(srcPad))
     {
