@@ -39,7 +39,11 @@ bool DModule::run()
     if(!pass)
         while(1)
         {
-            LOG("x ", DEBUG);
+            LOG_DEBUG("More Dbug");
+            LOG_WARNING("--");
+            LOG_INFO("Just info");
+            LOG_ERROR("an error");
+            LOG_CRITICAL("FATAL");
         }
     return true;
 }

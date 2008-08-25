@@ -24,7 +24,7 @@
 #include "gstLinkable.h"
 #include "rtpSender.h"
 #include "mediaConfig.h"
-#include "logWriter.h"
+//#include "logWriter.h"
 
 
 RtpSender::RtpSender()
