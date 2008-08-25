@@ -123,6 +123,24 @@ static pjsip_module mod_ua;
 pjsip_inv_session* inv_session;
 
 /*
+ * The connection state
+ */
+static connectionState _state;
+
+/*
+ * The connection state string
+ */
+static const char *stateStr[] =
+{
+    "CONNECTION_STATE_NULL",
+    "CONNECTION_STATE_READY",
+    "CONNECTION_STATE_INVITE_SENT",
+    "CONNECTION_STATE_CONNECTED",
+    "CONNECTION_STATE_DISCONNECTED",
+    "CONNECTION_STATE_FAILED",
+};
+
+/*
  *  A bool to indicate whether or not the main thread is running
  */
 static pj_bool_t thread_quit = 0;
@@ -150,6 +168,7 @@ static InstantMessaging *_imModule;
 UserAgent::UserAgent( std::string name, int port )
     : _name(name), _localURI(0)
 {
+    _state = CONNECTION_STATE_NULL;
     _localURI = new URI( port );
     // Instantiate the instant messaging module
     _imModule = new InstantMessaging();
@@ -188,6 +207,22 @@ int UserAgent::pjsip_shutdown(){
     pj_shutdown();
 
     return 0;
+}
+
+
+std::string UserAgent::getConnectionStateStr( connectionState state ){
+    std::string res;
+
+    if (state >=0 && state < (connectionState)PJ_ARRAY_SIZE(stateStr))
+        res = stateStr[state];
+    else
+        res = "?UNKNOWN?";
+    return res;
+}
+
+
+connectionState UserAgent::getConnectionState( void ){
+    return _state;
 }
 
 
@@ -277,6 +312,9 @@ int UserAgent::init_pjsip_modules(  ){
     pj_thread_create( app_pool, "app", &startThread, NULL, PJ_THREAD_DEFAULT_STACK_SIZE, 0,
                       &sipThread );
 
+    // Update the connection state. The user agent is ready to receive or sent requests
+    _state = CONNECTION_STATE_READY;
+
     PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
 
     return PJ_SUCCESS;
@@ -300,26 +338,35 @@ int UserAgent::inv_session_create( std::string uri ){
     pj_ansi_sprintf( tmp1, remote->getAddress().c_str() );
     to = pj_str(tmp1);
 
-    status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
-                                   NULL,
-                                   &to,
-                                   NULL,
-                                   &dialog );
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+    if( getConnectionState() == CONNECTION_STATE_READY ) {
+        status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
+                                       NULL,
+                                       &to,
+                                       NULL,
+                                       &dialog );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    // Building the local SDP offer
-    local_sdp->createInitialOffer( dialog->pool );
+        // Building the local SDP offer
+        local_sdp->createInitialOffer( dialog->pool );
 
-    status = pjsip_inv_create_uac( dialog, local_sdp->getLocalSDPSession(), 0, &inv_session );
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+        status = pjsip_inv_create_uac( dialog,
+                                       local_sdp->getLocalSDPSession(), 0, &inv_session );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    status = pjsip_inv_invite( inv_session, &tdata );
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+        status = pjsip_inv_invite( inv_session, &tdata );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    status = pjsip_inv_send_msg( inv_session, tdata );
-    PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+        status = pjsip_inv_send_msg( inv_session, tdata );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    return PJ_SUCCESS;
+        // Update the connection status. The invite session has been created and sent.
+        _state = CONNECTION_STATE_INVITE_SENT;
+
+        return PJ_SUCCESS;
+    }
+
+    else
+        return !PJ_SUCCESS;
 }
 
 
@@ -332,6 +379,9 @@ int UserAgent::inv_session_end( void ){
 
     status = pjsip_inv_send_msg( inv_session, tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+
+    // Update the connection state. The call is disconnected
+    _state = CONNECTION_STATE_DISCONNECTED;
 
     return PJ_SUCCESS;
 }
@@ -494,6 +544,10 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
         cout << "ACK request" << endl;
         return PJ_TRUE;
     }
+    // Update the connection state. The invite session is up and the connection is established between
+    // the peers.
+    _state = CONNECTION_STATE_CONNECTED;
+
     return PJ_SUCCESS;
 }
 
@@ -554,6 +608,7 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     // We need to get the final media choice and send it to gstreamer
     // Maybe we want to start the data streaming now...
 
+    _state = CONNECTION_STATE_CONNECTED;
     cout << "on media update" << endl;
     /*
        int nbMedia;

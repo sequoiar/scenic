@@ -45,6 +45,17 @@
 #include "uri.h"
 #include "instantmessaging.h"
 
+enum connectionState {
+    CONNECTION_STATE_NULL,
+    CONNECTION_STATE_READY,
+    CONNECTION_STATE_INVITE_SENT,
+    CONNECTION_STATE_CONNECTED,
+    CONNECTION_STATE_DISCONNECTED,
+    CONNECTION_STATE_FAILED
+};
+
+typedef enum connectionState connectionState;
+
 class UserAgent
 {
     public:
@@ -91,6 +102,10 @@ class UserAgent
         int pjsip_shutdown();
 
         std::string mediaToString( void );
+
+        std::string getConnectionStateStr( connectionState state );
+
+        connectionState getConnectionState( void );
 
     private:
         /*

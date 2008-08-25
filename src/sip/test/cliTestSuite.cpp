@@ -14,6 +14,7 @@ static std::string MENU =
     "  l    List all media\n"
     "  r    Reinvite\n"
     "  m    Chat\n"
+    "  i    Get state of the connection\n"
     "  h    Help\n"
     "  q    Quit\n"
     "\n";
@@ -64,6 +65,10 @@ int main(int argc, char** argv){
                 cout << "Enter message <<<< ";
                 cin >> msg;
                 sip->sendInstantMessage(msg);
+                break;
+            case 'i':
+                msg = sip->getConnectionState();
+                cout << msg << endl;
                 break;
             case 'h':
                 cout << MENU << endl;

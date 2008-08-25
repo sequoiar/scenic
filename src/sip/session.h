@@ -91,6 +91,8 @@ class Session
          */
         virtual void addMedia( std::string type, std::string codecs, int port ) = 0;
 
+        virtual std::string getConnectionState( void ) = 0;
+
         /* Read accessor. Return the protocol port */
         int getSessionPort( void ){ return _port; }
 

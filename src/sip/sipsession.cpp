@@ -92,6 +92,11 @@ void SIPSession::addMedia( std::string type, std::string codecs, int port ){
 }
 
 
+std::string SIPSession::getConnectionState( void ){
+    return _app_ua->getConnectionStateStr( _app_ua->getConnectionState() );
+}
+
+
 std::string SIPSession::mediaToString( void ){
     return _app_ua->mediaToString();
 }

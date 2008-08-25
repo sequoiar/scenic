@@ -91,6 +91,8 @@ class SIPSession
          */
         void addMedia( std::string type, std::string codecs, int port );
 
+        std::string getConnectionState( void );
+
         SIPSession(SIPSession const&); //No Copy Constructor
         SIPSession& operator=(const SIPSession&); //No Assignment Operator
 
