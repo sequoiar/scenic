@@ -22,6 +22,7 @@
 
 #include <cassert>
 #include "gstLinkable.h"
+#include "logWriter.h"
 #include "interleave.h"
 
 #include "audioDelaySource.h"
@@ -29,40 +30,56 @@
 class AudioConfig;
 
 class AudioSource
-    : public GstLinkable
+    : public GstLinkableSource
 {
     public:
         virtual ~AudioSource();
-        void init();
+        virtual void init();
 
     protected:
         explicit AudioSource(const AudioConfig &config);
         virtual void init_source();
         virtual void sub_init() = 0;
         virtual void link_elements();
-        virtual void link_interleave();
 
         const AudioConfig &config_;
 
-        Interleave interleave_;
         
         std::vector<GstElement *>sources_, aconvs_;
         static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                       gpointer user_data);
 
         virtual gboolean callback() { return FALSE; }
-        GstElement *element() { return interleave_.element(); }
+        GstElement *srcElement() { return aconvs_[0]; }
 
     private:
         friend class AudioSender;
 };
 
+class InterleavedAudioSource
+: public AudioSource
+{
+    public:
+        void init();
+        ~InterleavedAudioSource() {};
+
+    protected:
+        explicit InterleavedAudioSource(const AudioConfig &config);
+        virtual void init_source();
+        virtual void link_elements();
+
+        Interleave interleave_;
+        GstElement *srcElement() { return interleave_.srcElement(); }
+
+};
+
+
 class AudioTestSource
-    : public AudioSource
+    : public InterleavedAudioSource
 {
     public:
         explicit AudioTestSource(const AudioConfig &config)
-            : AudioSource(config), clockId_(0), offset_(0) {}
+            : InterleavedAudioSource(config), clockId_(0), offset_(0) {}
         ~AudioTestSource();
         void sub_init();
 
@@ -93,30 +110,28 @@ class AudioFileSource
         void sub_init();
         void link_elements();
 
-        void link_interleave(){};        // FIXME: AudioFileSource shouldn't even have an
-        // interleave, unless we support the option of
-        void init_source();              // multiple mono files combined into one stream
-
-        GstElement *element() { return aconvs_[0]; }
-
+    private:
         std::vector<GstElement*> decoders_;
+        bool fileExists();
 };
 
+
 class AudioAlsaSource
-    : public AudioSource
+    : public InterleavedAudioSource
 {
     public:
         explicit AudioAlsaSource(const AudioConfig &config)
-            : AudioSource(config) {}
+            : InterleavedAudioSource(config) {}
         void sub_init(){};
 };
 
+
 class AudioJackSource
-    : public AudioSource
+    : public InterleavedAudioSource
 {
     public:
         explicit AudioJackSource(const AudioConfig &config)
-            : AudioSource(config) {}
+            : InterleavedAudioSource(config) {}
         void sub_init();
 };
 
@@ -131,7 +146,7 @@ class AudioDvSource
 
     protected:
         void link_elements();
-        void link_interleave(); // FIXME: AudioFileSource shouldn't even have an
+        GstElement *srcElement() { LOG("asked for audiodvsrc src", DEBUG); return aconvs_[0]; }
 
         GstElement *demux_, *queue_;
         AudioDvSource(const AudioDvSource&);     //No Copy Constructor

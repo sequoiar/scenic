@@ -40,37 +40,37 @@ void GstLinkable::link(GstElement *src, GstElement *sink)
 }
 
 
-void GstLinkable::link(GstLinkable &src, GstElement *sink)
+void GstLinkable::link(GstLinkableSource &src, GstElement *sink)
 {
-    assert(gst_element_link(src.element(), sink));
+    assert(gst_element_link(src.srcElement(), sink));
 }
 
 
-void GstLinkable::link(GstElement *src, GstLinkable &sink)
+void GstLinkable::link(GstElement *src, GstLinkableSink &sink)
 {
-    assert(gst_element_link(src, sink.element()));
+    assert(gst_element_link(src, sink.sinkElement()));
 }
 
 
-void GstLinkable::link(GstLinkable &src, GstLinkable &sink)
+void GstLinkable::link(GstLinkableSource &src, GstLinkableSink &sink)
 {
-    assert(gst_element_link(src.element(), sink.element()));
+    assert(gst_element_link(src.srcElement(), sink.sinkElement()));
 }
 
 
-void GstLinkable::link(std::vector<GstElement*> &sources, GstLinkable &sink)
+void GstLinkable::link(std::vector<GstElement*> &sources, GstLinkableSink &sink)
 {
     GstIter src;
     for (src = sources.begin(); src != sources.end(); ++src)
-        assert(gst_element_link(*src, sink.element()));
+        assert(gst_element_link(*src, sink.sinkElement()));
 }
 
 
-void GstLinkable::link(GstLinkable &src, std::vector<GstElement*> &sinks)
+void GstLinkable::link(GstLinkableSource &src, std::vector<GstElement*> &sinks)
 {
     GstIter sink;
     for (sink = sinks.begin(); sink != sinks.end(); ++sink)
-        assert(gst_element_link(src.element(), *sink));
+        assert(gst_element_link(src.srcElement(), *sink));
 }
 
 // with this method, we can find out why pads don't link

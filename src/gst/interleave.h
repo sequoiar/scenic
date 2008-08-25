@@ -26,7 +26,7 @@
 class AudioConfig;
 
 class Interleave
-    : public GstLinkable
+    : public GstLinkableFilter
 {
     public:
         explicit Interleave(const AudioConfig &config);
@@ -34,10 +34,11 @@ class Interleave
         void init();
 
     protected:
-        GstElement *element() { return interleave_; }
+        GstElement *srcElement() { return interleave_; }
+        GstElement *sinkElement() { return interleave_; }
 
     private:
-        friend class AudioSource; 
+        friend class InterleavedAudioSource; 
         GstElement *interleave_;
         const AudioConfig &config_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
