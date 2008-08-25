@@ -30,45 +30,45 @@
 
 
 // for sender (remote)
-VideoConfig::VideoConfig(const std::string &source, const std::string &codec,
-    const std::string &remoteHost, int port)
-    : MediaConfig(source, codec, remoteHost, port), location_("")
+VideoConfig::VideoConfig(const std::string &source__, const std::string &codec__,
+    const std::string &remoteHost__, int port__)
+    : MediaConfig(source__, codec__, remoteHost__, port__), location_("")
 {
     // empty
 }
 
 
 // for sender (remote)
-VideoConfig::VideoConfig(const std::string &source,
-    const std::string &location,
-    const std::string &codec,
-    const std::string &remoteHost,
-    int port)
-    : MediaConfig(source, codec, remoteHost, port), location_(location)
+VideoConfig::VideoConfig(const std::string &source__,
+    const std::string &location__,
+    const std::string &codec__,
+    const std::string &remoteHost__,
+    int port__)
+    : MediaConfig(source__, codec__, remoteHost__, port__), location_(location__)
 {
     // empty
 }
 
 
 // for sender (local)
-VideoConfig::VideoConfig(const std::string &source)
-    : MediaConfig(source), location_("")
+VideoConfig::VideoConfig(const std::string &source__)
+    : MediaConfig(source__), location_("")
 {
     // empty
 }
 
 
 // for sender (local)
-VideoConfig::VideoConfig(const std::string &source, const std::string &location)
-    : MediaConfig(source), location_(location)
+VideoConfig::VideoConfig(const std::string &source__, const std::string &location__)
+    : MediaConfig(source__), location_(location__)
 {
     // empty
 }
 
 
 // for receiver
-VideoConfig::VideoConfig(const std::string &codec, int port)
-    : MediaConfig(codec, port), location_("")
+VideoConfig::VideoConfig(const std::string &codec__, int port__)
+    : MediaConfig(codec__, port__), location_("")
 {
     // empty
 }

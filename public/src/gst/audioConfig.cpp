@@ -29,47 +29,47 @@
 #include "audioSource.h"
 #include "logWriter.h"
 
-AudioConfig::AudioConfig(const std::string &source,
-    int numChannels,
-    const std::string &codec,
-    const std::string &remoteHost,
-    int port)
-    : MediaConfig(source, codec, remoteHost, port), numChannels_(numChannels), location_("")
+AudioConfig::AudioConfig(const std::string &source__,
+    int numChannels__,
+    const std::string &codec__,
+    const std::string &remoteHost__,
+    int port__)
+    : MediaConfig(source__, codec__, remoteHost__, port__), numChannels_(numChannels__), location_("")
 {
     // rtp sender
 }
 
 
-AudioConfig::AudioConfig(const std::string &source,
-    const std::string &location,
-    int numChannels,
-    const std::string &codec,
-    const std::string &remoteHost,
-    int port)
-    : MediaConfig(source, codec, remoteHost,
-                  port), numChannels_(numChannels), location_(location)
+AudioConfig::AudioConfig(const std::string &source__,
+    const std::string &location__,
+    int numChannels__,
+    const std::string &codec__,
+    const std::string &remoteHost__,
+    int port__)
+    : MediaConfig(source__, codec__, remoteHost__,
+                  port__), numChannels_(numChannels__), location_(location__)
 {
     // rtp file sender
 }
 
 
-AudioConfig::AudioConfig(const std::string & source, int numChannels)
-    : MediaConfig(source), numChannels_(numChannels), location_("")
+AudioConfig::AudioConfig(const std::string & source__, int numChannels__)
+    : MediaConfig(source__), numChannels_(numChannels__), location_("")
 {
     // local sender
 }
 
 
-AudioConfig::AudioConfig(const std::string & source, const std::string & location,
-    int numChannels)
-    : MediaConfig(source), numChannels_(numChannels), location_(location)
+AudioConfig::AudioConfig(const std::string & source__, const std::string & location__,
+    int numChannels__)
+    : MediaConfig(source__), numChannels_(numChannels__), location_(location__)
 {
     // local file sender
 }
 
 
-AudioConfig::AudioConfig(int numChannels, const std::string &codec, int port)
-    : MediaConfig(codec, port), numChannels_(numChannels), location_("")
+AudioConfig::AudioConfig(int numChannels__, const std::string &codec__, int port__)
+    : MediaConfig(codec__, port__), numChannels_(numChannels__), location_("")
 {
     // receiver
 }

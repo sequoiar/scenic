@@ -30,7 +30,7 @@ AC_ARG_ENABLE(debug, [  --enable-debug=(yes/no) turn on debug symbols and extra 
 
 if test "x${enable_debug}" == "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG,[],[Debug define from configure])
-    CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall"
+    CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
 #-Wno-unused-parameter -Wno-unused-variable"  
 fi
 

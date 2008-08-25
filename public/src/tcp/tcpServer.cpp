@@ -30,17 +30,17 @@ void error(const char *msg)
 }
 
 
-bool TcpServer::set_non_blocking(int sockfd)
+bool TcpServer::set_non_blocking(int sockfd_param)
 {
     long arg;
 
     // Set non-blocking
-    if( (arg = fcntl(sockfd, F_GETFL, NULL)) < 0)
+    if( (arg = fcntl(sockfd_param, F_GETFL, NULL)) < 0)
     {
         return false;
     }
     arg |= O_NONBLOCK;
-    if( fcntl(sockfd, F_SETFL, arg) < 0)
+    if( fcntl(sockfd_param, F_SETFL, arg) < 0)
     {
         return false;
     }
