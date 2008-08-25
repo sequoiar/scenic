@@ -457,6 +457,10 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
 /********************** Callbacks Implementation **********************************/
 
 static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
+    
+    // To avoid unused arguments
+    PJ_UNUSED_ARG(e);
+    
     if( inv->state == PJSIP_INV_STATE_DISCONNECTED ){
         cout << "Call state: " << pjsip_get_status_text(inv->cause)->ptr << endl;
         thread_quit = 1;
@@ -476,6 +480,8 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     pjmedia_sdp_session *r_sdp;
 
     cout << "Callback on_rx_request entered" << endl;
+
+    PJ_UNUSED_ARG( rdata );
 
     /* Respond statelessly any non-INVITE requests with 500 */
     if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
@@ -554,7 +560,8 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
 
 static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
     /* Respond statelessly any non-INVITE requests with 500 */
-    //if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
+   //if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
+    PJ_UNUSED_ARG( rdata );
     cout << "on_rx_response" << endl;
     return PJ_SUCCESS;
 }
@@ -563,6 +570,8 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
 static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
                                        pjsip_event *e ){
     cout << "transaction state changed to " <<tsx->state << endl;
+
+    PJ_UNUSED_ARG(inv);
 
     if( tsx->state == PJSIP_TSX_STATE_TERMINATED  &&
         tsx->role == PJSIP_ROLE_UAC ) {
@@ -608,6 +617,9 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     // We need to get the final media choice and send it to gstreamer
     // Maybe we want to start the data streaming now...
 
+    PJ_UNUSED_ARG( inv );
+    PJ_UNUSED_ARG( status );
+
     _state = CONNECTION_STATE_CONNECTED;
     cout << "on media update" << endl;
     /*
@@ -643,6 +655,7 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
     cout << "Invite session received new offer from peer -" <<  offer->name.ptr << endl;
 
+    PJ_UNUSED_ARG( inv );
     //pjmedia_sdp_session *sdp;
     pj_status_t status;
 
@@ -653,6 +666,8 @@ static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offe
 
 
 static void call_on_forked( pjsip_inv_session *inv, pjsip_event *e ){
+    PJ_UNUSED_ARG( inv );
+    PJ_UNUSED_ARG( e );
     printf(
         "The invite session module has created a new dialog because of forked outgoing request\n");
 }

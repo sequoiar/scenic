@@ -77,7 +77,7 @@ class Session
          */
         virtual int accept( void ) = 0;
 
-        virtual int refuse( int reason ) = 0;
+        virtual int refuse( ) = 0;
 
         virtual void build_sdp() = 0;
 
