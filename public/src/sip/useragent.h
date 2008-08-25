@@ -123,8 +123,6 @@ class UserAgent
          */
         void init_sip_module( void );
 
-        pj_status_t send_im_dialog( pjsip_dialog *dlg, pj_str_t *msg );
-
         UserAgent(const UserAgent&); //No Copy Constructor
         UserAgent& operator=(const UserAgent&); //No Assignment Operator
 };
