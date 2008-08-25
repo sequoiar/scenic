@@ -379,31 +379,29 @@ int UserAgent::inv_session_end( void ){
 
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-    
+
         return PJ_SUCCESS;
     }
-    
     return !PJ_SUCCESS;
 }
 
 
 int UserAgent::inv_session_reinvite( void ){
-
     pj_status_t status;
     pjsip_tx_data *tdata;
 
     if( _state == CONNECTION_STATE_CONNECTED || _state == CONNECTION_STATE_READY ) {
         local_sdp->createInitialOffer( inv_session->dlg->pool );
 
-        status = pjsip_inv_reinvite( inv_session, NULL, local_sdp->getLocalSDPSession(), &tdata );
+        status = pjsip_inv_reinvite( inv_session, NULL,
+                                     local_sdp->getLocalSDPSession(), &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-    
+
         return PJ_SUCCESS;
     }
-
     return !PJ_SUCCESS;
 }
 
@@ -421,7 +419,6 @@ int UserAgent::sendInstantMessage( std::string msg ){
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
         return PJ_SUCCESS;
     }
-
     return !PJ_SUCCESS;
 }
 
@@ -465,10 +462,9 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
 /********************** Callbacks Implementation **********************************/
 
 static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
-    
     // To avoid unused arguments
     PJ_UNUSED_ARG(e);
-    
+
     if( inv->state == PJSIP_INV_STATE_DISCONNECTED ){
         cout << "Call state: " << pjsip_get_status_text(inv->cause)->ptr << endl;
         // Update the connection state
@@ -576,7 +572,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
 
 static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
     /* Respond statelessly any non-INVITE requests with 500 */
-   //if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
+    //if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
     PJ_UNUSED_ARG( rdata );
     cout << "on_rx_response" << endl;
     return PJ_SUCCESS;
