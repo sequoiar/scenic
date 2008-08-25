@@ -27,7 +27,7 @@
 #include "jackUtils.h"
 
 AudioSource::AudioSource(const AudioConfig &config)
-    : config_(config), interleave_(config), sources_(0), aconvs_(0)
+    : config_(config), sources_(0), aconvs_(0)
 {}
 
 void AudioSource::init()
@@ -35,21 +35,15 @@ void AudioSource::init()
     init_source();
     sub_init();
     link_elements();
-    link_interleave();
 }
 
 
 void AudioSource::init_source()
 {
-    interleave_.init();
-
-    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
-    {
-        sources_.push_back(gst_element_factory_make(config_.source(), NULL));
-        assert(sources_[channelIdx]);
-        aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
-        assert(aconvs_[channelIdx]);
-    }
+    sources_.push_back(gst_element_factory_make(config_.source(), NULL));
+    assert(sources_[0]);
+    aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
+    assert(aconvs_[0]);
 
     pipeline_.add(sources_);
     pipeline_.add(aconvs_);
@@ -70,16 +64,46 @@ void AudioSource::link_elements()
 }
 
 
-void AudioSource::link_interleave()
+gboolean AudioSource::base_callback(GstClock *, GstClockTime, GstClockID,
+        gpointer user_data)
 {
-     GstLinkable::link(aconvs_, interleave_);
+    return (static_cast<AudioSource*>(user_data)->callback());     // deferred to subclass
+}
+
+    
+InterleavedAudioSource::InterleavedAudioSource(const AudioConfig &config)
+: AudioSource(config), interleave_(config_)
+{}
+
+
+void InterleavedAudioSource::init()
+{
+    interleave_.init();
+    init_source();
+    sub_init();
+    link_elements();
 }
 
 
-gboolean AudioSource::base_callback(GstClock * /*clock*/, GstClockTime  /*time*/, GstClockID  /*id*/,
-                                    gpointer user_data)
+void InterleavedAudioSource::init_source()
 {
-    return (static_cast<AudioSource*>(user_data)->callback());     // deferred to subclass
+    for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
+    {
+        sources_.push_back(gst_element_factory_make(config_.source(), NULL));
+        assert(sources_[channelIdx]);
+        aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
+        assert(aconvs_[channelIdx]);
+    }
+
+    pipeline_.add(sources_);
+    pipeline_.add(aconvs_);
+}
+
+
+void InterleavedAudioSource::link_elements()
+{
+    GstLinkable::link(sources_, aconvs_);
+    GstLinkable::link(aconvs_, interleave_);
 }
 
 
@@ -94,7 +118,7 @@ void AudioTestSource::toggle_frequency()
 {
     static const double FREQUENCY[2][8] =
     {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
-     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
+        {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
 
     int i = 0;
 
@@ -127,23 +151,25 @@ AudioTestSource::~AudioTestSource()
 }
 
 
-void AudioFileSource::init_source()
+bool AudioFileSource::fileExists()
 {
-    // just make one multichannel filesrc
-    sources_.push_back(gst_element_factory_make(config_.source(), NULL));
-    assert(sources_[0]);
-    g_object_set(G_OBJECT(sources_[0]), "location", config_.location(), NULL);
-
-    aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
-    assert(aconvs_[0]);
-
-    pipeline_.add(sources_);
-    pipeline_.add(aconvs_);
+    FILE *file;
+    file = fopen(config_.location(), "r");
+    if (file != NULL)
+    {
+        fclose(file);
+        return true;
+    }
+    else
+        return false;
 }
-
 
 void AudioFileSource::sub_init()
 {
+    assert(fileExists());
+
+    g_object_set(G_OBJECT(sources_[0]), "location", config_.location(), NULL);
+
     decoders_.push_back(gst_element_factory_make("decodebin", NULL));
     assert(decoders_[0]);
     pipeline_.add(decoders_);
@@ -153,19 +179,19 @@ void AudioFileSource::sub_init()
     for (; aconv != aconvs_.end(), dec != decoders_.end(); ++dec, ++aconv)
     {
         g_signal_connect(*dec, "new-decoded-pad",
-                         G_CALLBACK(AudioFileSource::cb_new_src_pad),
-                         static_cast<void *>(*aconv));
+                G_CALLBACK(AudioFileSource::cb_new_src_pad),
+                static_cast<void *>(*aconv));
     }
 }
 
 
 void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean  /*last*/,
-                                     gpointer data)
+        gpointer data)
 {
     if (gst_pad_is_linked(srcPad))
     {
         LOG("Pad is already linked.", DEBUG)
-        return;
+            return;
     }
     else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
     {
@@ -221,6 +247,10 @@ void AudioJackSource::sub_init()
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
 }
 
+    AudioDvSource::AudioDvSource(const AudioConfig &config)
+: AudioSource(config), demux_(0), queue_(0)
+{}
+
 
 void AudioDvSource::sub_init()
 {
@@ -233,22 +263,22 @@ void AudioDvSource::sub_init()
 
     // demux srcpad must be linked to queue sink pad at runtime
     g_signal_connect(demux_, "pad-added",
-                     G_CALLBACK(AudioDvSource::cb_new_src_pad),
-                     static_cast<void *>(queue_));
+            G_CALLBACK(AudioDvSource::cb_new_src_pad),
+            static_cast<void *>(queue_));
 
 }
 
 
-AudioDvSource::AudioDvSource(const AudioConfig &config)
-    : AudioSource(config), demux_(0), queue_(0)
-{}
-
-void AudioDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, void *data)
+void AudioDvSource::cb_new_src_pad(GstElement *  srcElement, GstPad * srcPad, void *data)
 {
     if (std::string("video") == gst_pad_get_name(srcPad))
     {
-        LOG("Ignoring video stream from DV", DEBUG);
+        LOG("ignoring video stream from dv", DEBUG);
         return;
+    }
+    else if (std::string("audio") == gst_pad_get_name(srcPad))
+    {
+        LOG("Got audio stream from DV", DEBUG);
     }
 
     GstElement *sinkElement = static_cast<GstElement *>(data);
@@ -270,11 +300,6 @@ void AudioDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
 void AudioDvSource::link_elements()
 {
     GstLinkable::link(sources_[0], demux_);
-}
-
-
-void AudioDvSource::link_interleave()
-{
-    GstLinkable::link(queue_, interleave_);
+    GstLinkable::link(queue_, aconvs_[0]);
 }
 

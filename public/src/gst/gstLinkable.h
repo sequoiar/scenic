@@ -23,6 +23,9 @@
 
 #include "gstBase.h"
 
+class GstLinkableSource;
+class GstLinkableSink;
+
 class GstLinkable 
     : public GstBase
 {
@@ -30,18 +33,38 @@ class GstLinkable
         static bool link_pads(GstPad *srcPad, GstPad *sinkPad);
         static void link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks);
         static void link(GstElement *src, GstElement *sink);
-        static void link(GstLinkable &src, GstElement *sink);
-        static void link(GstElement *src, GstLinkable &sink);
-        static void link(GstLinkable &src, GstLinkable &sink);
-        static void link(std::vector<GstElement*> &sources, GstLinkable &sink);
-        static void link(GstLinkable &source, std::vector<GstElement*> &sinks);
+        static void link(GstLinkableSource &src, GstElement *sink);
+        static void link(GstElement *src, GstLinkableSink &sink);
+        static void link(GstLinkableSource &src, GstLinkableSink &sink);
+        static void link(std::vector<GstElement*> &sources, GstLinkableSink &sink);
+        static void link(GstLinkableSource &source, std::vector<GstElement*> &sinks);
         
     protected:
-
+        
         GstLinkable() {};
         ~GstLinkable() {};
+};
 
-        virtual GstElement *element() = 0;
+class GstLinkableSource 
+    : virtual public GstLinkable
+{
+    protected:
+        friend class GstLinkable;
+        virtual GstElement *srcElement() = 0;
+};
+
+
+class GstLinkableSink
+    : virtual public GstLinkable
+{
+    protected:
+        friend class GstLinkable;
+        virtual GstElement *sinkElement() = 0;
+};
+
+class GstLinkableFilter
+    : public GstLinkableSource, public GstLinkableSink
+{
 };
 
 #endif // _GST_LINKABLE_H_
