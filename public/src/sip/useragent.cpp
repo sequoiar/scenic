@@ -435,8 +435,8 @@ static int startThread( void *arg ){
 }
 
 
-void UserAgent::addMediaToSession( std::string type, std::string codecs, int port ){
-    local_sdp->addMediaToSDP( type, codecs, port );
+void UserAgent::setSessionMedia( std::string type, std::string codecs, int port ){
+    local_sdp->setSDPMedia( type, codecs, port );
 }
 
 

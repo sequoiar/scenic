@@ -48,7 +48,7 @@ Sdp::Sdp( std::string ip_addr )
 
 Sdp::~Sdp(){}
 
-void Sdp::addMediaToSDP( std::string type, std::string codecs, int port ){
+void Sdp::setSDPMedia( std::string type, std::string codecs, int port ){
     sdpMedia *media;
     size_t pos;
     std::string tmp;
@@ -58,7 +58,7 @@ void Sdp::addMediaToSDP( std::string type, std::string codecs, int port ){
 
     std::cout << "size= "<< _sdpMediaList.size() << std::endl;
 
-    // If no media of ths type has been already created
+    // If no media of this type has been already created
     for( k = 0 ; k<(int)_sdpMediaList.size() ; k++ ) {
         if( strcmp( _sdpMediaList[k]->getMediaStr().c_str(), type.c_str()) == 0 ){
             std::cout << "retrieve existing media" << std::endl;

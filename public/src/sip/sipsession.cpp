@@ -85,8 +85,8 @@ int SIPSession::refuse(  ){
 
 void SIPSession::build_sdp( void ){}
 
-void SIPSession::addMedia( std::string type, std::string codecs, int port ){
-    _app_ua->addMediaToSession( type, codecs, port );
+void SIPSession::setMedia( std::string type, std::string codecs, int port ){
+    _app_ua->setSessionMedia( type, codecs, port );
 }
 
 

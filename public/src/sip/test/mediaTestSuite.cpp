@@ -51,13 +51,13 @@ void codecHandlingAtSessionLevelTest( void ){
     SIPSession *session = new SIPSession();
 
     cout << " Add an audio and a video media with 2 codecs each" << endl;
-    session->addMedia( "audio", "GSM/PCMU/", 12354 );
-    session->addMedia( "video", "H264/H263/", 14321 );
+    session->setMedia( "audio", "GSM/PCMU/", 12354 );
+    session->setMedia( "video", "H264/H263/", 14321 );
     res = session->mediaToString();
     cout << res << endl;
 
     cout << " Modify the media offer" << endl;
-    session->addMedia("audio", "vorbis/PCMA/", 12354 );
+    session->setMedia("audio", "vorbis/PCMA/", 12354 );
     res = session->mediaToString();
     cout << res << endl;
 }

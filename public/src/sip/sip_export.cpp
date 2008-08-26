@@ -12,7 +12,7 @@ BOOST_PYTHON_MODULE( libsip_export )
     .def("reinvite", &SIPSession::reinvite)
     .def("shutdown", &SIPSession::shutdown)
     .def("sendInstantMessage", &SIPSession::sendInstantMessage)
-    .def("addMedia", &SIPSession::addMedia)
+    .def("setMedia", &SIPSession::setMedia)
     .def("mediaToString", &SIPSession::mediaToString)
     .def("getConnectionState", &SIPSession::getConnectionState)
     ;
