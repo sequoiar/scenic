@@ -22,12 +22,12 @@
 #include <cassert>
 #include <gst/gst.h>
 
-#include "lo/lo.h"
+//#include "lo/lo.h"
 
 #include "mediaBase.h"
 #include "gstLinkable.h"
 #include "videoReceiver.h"
-#include "logWriter.h"
+//#include "logWriter.h"
 
 VideoReceiver::VideoReceiver(const VideoConfig & config)
     : config_(config), session_(), depayloader_(0), decoder_(0), sink_(0)
@@ -82,11 +82,11 @@ bool VideoReceiver::start()
 bool VideoReceiver::stop()
 {
     MediaBase::stop();
-    stop_sender();
+    //stop_sender();
     return true;
 }
 
-
+#if 0
 void VideoReceiver::stop_sender() const
 {
     LOG("Telling sender to stop...", DEBUG);
@@ -100,5 +100,6 @@ void VideoReceiver::stop_sender() const
         exit(EXIT_FAILURE);
     }
 }
+#endif
 
 

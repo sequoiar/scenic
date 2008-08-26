@@ -37,7 +37,7 @@ class VideoReceiver
 
     private:
         void set_caps(const char* capsStr);
-        void stop_sender() const;
+        //void stop_sender() const;
 
         void init_source(){};
         void init_codec();

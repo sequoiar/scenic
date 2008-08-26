@@ -26,7 +26,7 @@
 #include "gstLinkable.h"
 #include "videoSender.h"
 #include "videoSource.h"
-#include "logWriter.h"
+//#include "logWriter.h"
 
 
 VideoSender::VideoSender(const VideoConfig & config)
@@ -93,12 +93,12 @@ bool VideoSender::start()
 {
     MediaBase::start();
     pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
-    if (config_.isNetworked())
-        wait_for_stop();
+    //if (config_.isNetworked())
+     //   wait_for_stop();
     return true;
 }
 
-
+#if 0
 void VideoSender::wait_for_stop()
 {
     LOG("Waiting for stop message...", DEBUG);
@@ -115,6 +115,7 @@ void VideoSender::wait_for_stop()
 
     lo_server_thread_free(st);
 }
+
 
 
 void VideoSender::liblo_error(int num, const char *msg, const char *path)
@@ -134,5 +135,5 @@ int VideoSender::stop_handler(const char * /*path*/, const char * /*types*/, lo_
 
     return 0;
 }
-
+#endif
 
