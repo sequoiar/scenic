@@ -75,7 +75,7 @@ void initiateSessionTest( int argc, char** argv ) {
 
 
 void createSDPBodyTest() {
-    Session *sip = new SIPSession( 5060 );
+    sip = new SIPSession( 5060 );
     sip->build_sdp();
 }
 

@@ -93,9 +93,6 @@ class Session
 
         virtual std::string getConnectionState( void ) = 0;
 
-        /* Read accessor. Return the protocol port */
-        int getSessionPort( void ){ return _port; }
-
     private:
         /* The communication protocol */
         int _protocol;
