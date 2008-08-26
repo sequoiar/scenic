@@ -42,7 +42,7 @@
 #define LOG(msg, level)
 #else
     #if ENABLE_GLOG
-#include <glib.h>
+    #include <glib.h>
         #define LOG(msg, level)         \
             glog(log_(msg, level, __FILE__, __FUNCTION__, __LINE__),level);
         #else
