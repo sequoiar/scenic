@@ -20,15 +20,15 @@
 #include <glib.h>
 #include <iostream>
 #include "gutil/baseThread.h"
-#include "gutil/stdMsg.h"
+#include "gstMsg.h"
 
 #include "gst/videoSender.h"
 #include "gst/videoReceiver.h"
 #include "gst/videoConfig.h"
 
-typedef QueuePair_<StdMsg> QueuePair;
+typedef QueuePair_<GstMsg> QueuePair;
 class GstThread
-    : public BaseThread<StdMsg>
+    : public BaseThread<GstMsg>
 {
     public:
         GstThread();
