@@ -22,7 +22,7 @@
 #define _VIDEO_SENDER_H_
 
 #include <string>
-#include "lo/lo.h"
+//#include "lo/lo.h"
 
 #include "mediaBase.h"
 #include "videoConfig.h"
@@ -36,7 +36,7 @@ class VideoSender
     public:
         explicit VideoSender(const VideoConfig & config);
         bool start();
-        void wait_for_stop();
+        //void wait_for_stop();
 
         ~VideoSender();
 
@@ -45,10 +45,12 @@ class VideoSender
         void init_codec();
         void init_sink();
 
+#if 0
         static int stop_handler(const char *path, const char *types, lo_arg ** argv, int argc,
                                 void *data,
                                 void *user_data);
         static void liblo_error(int num, const char *msg, const char *path);
+#endif
 
         const VideoConfig &config_;
         RtpSender session_;

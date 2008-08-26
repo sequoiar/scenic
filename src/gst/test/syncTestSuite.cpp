@@ -55,7 +55,7 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", get_host_ip(), aPort);
+        AudioConfig aConfig("filesrc", "test_signal8.wav", numChannels, "vorbisenc", get_host_ip(), aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
@@ -97,7 +97,7 @@ void SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", get_host_ip(), aPort);
+        AudioConfig aConfig("filesrc", "test_signal8.wav", numChannels, "vorbisenc", get_host_ip(), aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
@@ -147,7 +147,7 @@ void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", numChannels, "vorbisenc", get_host_ip(), aPort);
+        AudioConfig aConfig("filesrc", "test_signal8.wav", numChannels, "vorbisenc", get_host_ip(), aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
