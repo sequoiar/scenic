@@ -77,7 +77,7 @@ class Session
          */
         virtual int accept( void ) = 0;
 
-        virtual int refuse( ) = 0;
+        virtual int refuse( void ) = 0;
 
         virtual void build_sdp() = 0;
 
@@ -92,6 +92,8 @@ class Session
         virtual void setMedia( std::string type, std::string codecs, int port ) = 0;
 
         virtual std::string getConnectionState( void ) = 0;
+
+        virtual bool incomingInvite( void ) = 0;
 
     private:
         /* The communication protocol */

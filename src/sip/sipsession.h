@@ -77,7 +77,7 @@ class SIPSession
 
         int accept( void );
 
-        int refuse( );
+        int refuse( void );
 
         void build_sdp( void );
 
@@ -92,6 +92,8 @@ class SIPSession
         void setMedia( std::string type, std::string codecs, int port );
 
         std::string getConnectionState( void );
+
+        bool incomingInvite( void );
 
         SIPSession(SIPSession const&); //No Copy Constructor
         SIPSession& operator=(const SIPSession&); //No Assignment Operator
