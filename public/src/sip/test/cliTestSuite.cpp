@@ -36,6 +36,26 @@ int main(int argc, char** argv){
     cout << MENU << endl;
 
     for(;;) {
+
+        if( sip->incomingInvite() ){
+            cout << "incoming call";
+            cout << "accept(a) or refuse (r) ";
+            cin >> input;
+
+            switch(input[0])
+            {
+                case 'a':
+                    sip->accept();
+                    break;
+                case 'r':
+                    sip->refuse();
+                    break;
+                default:
+                    cout << "What?";
+                    break;
+            }
+        }
+
         cout << "<<<< ";
         cin >> input;
         switch(input[0])

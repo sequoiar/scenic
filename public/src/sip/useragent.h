@@ -49,6 +49,7 @@ enum connectionState {
     CONNECTION_STATE_NULL,
     CONNECTION_STATE_READY,
     CONNECTION_STATE_INVITE_SENT,
+    CONNECTION_STATE_RINGING,
     CONNECTION_STATE_CONNECTED,
     CONNECTION_STATE_DISCONNECTED,
     CONNECTION_STATE_FAILED
@@ -92,6 +93,10 @@ class UserAgent
         int inv_session_end();
 
         int inv_session_reinvite();
+
+        int inv_session_accept();
+
+        int inv_session_refuse();
 
         void setSessionMedia( std::string type, std::string codecs, int port );
 

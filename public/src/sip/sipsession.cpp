@@ -74,14 +74,13 @@ int SIPSession::sendInstantMessage( std::string msg ){
 
 
 int SIPSession::accept( void ){
-    return 0;
+    return _app_ua->inv_session_accept();
 }
 
 
-int SIPSession::refuse(  ){
-    return 0;
+int SIPSession::refuse( void ){
+    return _app_ua->inv_session_refuse();
 }
-
 
 void SIPSession::build_sdp( void ){}
 
@@ -97,6 +96,11 @@ std::string SIPSession::getConnectionState( void ){
 
 std::string SIPSession::mediaToString( void ){
     return _app_ua->mediaToString();
+}
+
+bool SIPSession::incomingInvite( void ){
+    
+    return (strcmp(getConnectionState().c_str(), "CONNECTION_STATE_RINGING") == 0 );
 }
 
 
