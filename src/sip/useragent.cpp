@@ -71,7 +71,7 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status );
  * @param	e	A pointer on a pjsip_event structure
  */
 static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
-        pjsip_event *e );
+                                       pjsip_event *e );
 
 /*
  * Called to handle incoming requests outside dialogs
@@ -166,8 +166,8 @@ static InstantMessaging *_imModule;
 /*************************************************************************************************/
 
 
-    UserAgent::UserAgent( std::string name, int port )
-: _name(name), _localURI(0)
+UserAgent::UserAgent( std::string name, int port )
+    : _name(name), _localURI(0)
 {
     _state = CONNECTION_STATE_NULL;
     _localURI = new URI( port );
@@ -311,7 +311,7 @@ int UserAgent::init_pjsip_modules(  ){
     /* Start working threads */
     app_pool = pj_pool_create( &c_pool.factory, "pool", 4000, 4000, NULL );
     pj_thread_create( app_pool, "app", &startThread, NULL, PJ_THREAD_DEFAULT_STACK_SIZE, 0,
-            &sipThread );
+                      &sipThread );
 
     // Update the connection state. The user agent is ready to receive or sent requests
     _state = CONNECTION_STATE_READY;
@@ -341,17 +341,17 @@ int UserAgent::inv_session_create( std::string uri ){
 
     if( _state == CONNECTION_STATE_READY ) {
         status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
-                NULL,
-                &to,
-                NULL,
-                &dialog );
+                                       NULL,
+                                       &to,
+                                       NULL,
+                                       &dialog );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         // Building the local SDP offer
         local_sdp->createInitialOffer( dialog->pool );
 
         status = pjsip_inv_create_uac( dialog,
-                local_sdp->getLocalSDPSession(), 0, &inv_session );
+                                       local_sdp->getLocalSDPSession(), 0, &inv_session );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         status = pjsip_inv_invite( inv_session, &tdata );
@@ -396,7 +396,7 @@ int UserAgent::inv_session_reinvite( void ){
         local_sdp->createInitialOffer( inv_session->dlg->pool );
 
         status = pjsip_inv_reinvite( inv_session, NULL,
-                local_sdp->getLocalSDPSession(), &tdata );
+                                     local_sdp->getLocalSDPSession(), &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         status = pjsip_inv_send_msg( inv_session, tdata );
@@ -407,8 +407,8 @@ int UserAgent::inv_session_reinvite( void ){
     return !PJ_SUCCESS;
 }
 
-int UserAgent::inv_session_accept( void ) {
 
+int UserAgent::inv_session_accept( void ) {
     pj_status_t status;
     pjsip_tx_data *tdata;
 
@@ -432,12 +432,11 @@ int UserAgent::inv_session_accept( void ) {
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
     }
-    
     return PJ_SUCCESS;
 }
 
-int UserAgent::inv_session_refuse( void ) {
 
+int UserAgent::inv_session_refuse( void ) {
     pj_status_t status;
     pjsip_tx_data *tdata;
 
@@ -449,8 +448,8 @@ int UserAgent::inv_session_refuse( void ) {
     _state = CONNECTION_STATE_READY;
 
     return PJ_SUCCESS;
-
 }
+
 
 int UserAgent::sendInstantMessage( std::string msg ){
     pj_status_t status;
@@ -484,6 +483,7 @@ static int startThread( void *arg ){
 void UserAgent::setSessionMedia( std::string type, std::string codecs, int port ){
     local_sdp->setSDPMedia( type, codecs, port );
 }
+
 
 std::string UserAgent::mediaToString( void ){
     return local_sdp->mediaToString();
@@ -545,7 +545,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
         if( rdata->msg_info.msg->line.req.method.id != PJSIP_ACK_METHOD ) {
             reason = pj_str((char*)" user agent unable to handle this request ");
             pjsip_endpt_respond_stateless( endpt, rdata, MSG_METHOD_NOT_ALLOWED, &reason, NULL,
-                    NULL );
+                                           NULL );
             return PJ_TRUE;
         }
     }
@@ -554,7 +554,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     if( status != PJ_SUCCESS ){
         reason = pj_str((char*)" user agent unable to handle this INVITE ");
         pjsip_endpt_respond_stateless( endpt, rdata, MSG_METHOD_NOT_ALLOWED, &reason, NULL,
-                NULL );
+                                       NULL );
         return PJ_TRUE;
     }
     // Have to do some stuff here with the SDP
@@ -566,12 +566,12 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL, &dialog );
     if( status != PJ_SUCCESS ) {
         pjsip_endpt_respond_stateless( endpt, rdata, MSG_SERVER_INTERNAL_ERROR, &reason, NULL,
-                NULL );
+                                       NULL );
         return PJ_TRUE;
     }
     // Specify media capability during invite session creation
     status = pjsip_inv_create_uas( dialog, rdata,
-            local_sdp->getLocalSDPSession(), 0, &inv_session );
+                                   local_sdp->getLocalSDPSession(), 0, &inv_session );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     // Send a 180/Ringing response
@@ -599,19 +599,19 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
 
 
 static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
-        pjsip_event *e ){
+                                       pjsip_event *e ){
     cout << "transaction state changed to " <<tsx->state << endl;
 
     PJ_UNUSED_ARG(inv);
 
     if( tsx->state == PJSIP_TSX_STATE_TERMINATED  &&
-            tsx->role == PJSIP_ROLE_UAC ) {
+        tsx->role == PJSIP_ROLE_UAC ) {
         cout << "UAC: tsx state terminated" << endl;
         //thread_quit = 1;
     }
 
     else if( tsx->state == PJSIP_TSX_STATE_TRYING &&
-            tsx->role == PJSIP_ROLE_UAS ){
+             tsx->role == PJSIP_ROLE_UAS ){
         cout << "UAC: tsx state trying" << endl;
 
         pjsip_rx_data *rdata;
@@ -637,7 +637,7 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
 
     else {
         cout << "Transaction state not handled .... " << tsx->state << "for " << tsx->role <<
-            endl;
+        endl;
         // TODO Return an error code if transaction failed
         // for instance the peer is not connected
     }
@@ -661,24 +661,24 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 
        if( status != PJ_SUCCESS )
        return;
-    // Get local and remote SDP
-    pjmedia_sdp_neg_get_active_local( inv->neg, &r_sdp );
+       // Get local and remote SDP
+       pjmedia_sdp_neg_get_active_local( inv->neg, &r_sdp );
 
-    // Retrieve the media
-    nbMedia = r_sdp->media_count;
-    for( i=0; i<nbMedia ; i++ ){
-    printf("Media %i: ", i);
-    media = r_sdp->media[i];
-    nbCodecs = media->desc.fmt_count;
-    printf("Codec count: %i\n", nbCodecs);
-    for( j=0 ; j<nbCodecs ; j++ ){
-    printf("Codec payload: %s\n", media->desc.fmt[j].ptr);
-    }
-    }
+       // Retrieve the media
+       nbMedia = r_sdp->media_count;
+       for( i=0; i<nbMedia ; i++ ){
+       printf("Media %i: ", i);
+       media = r_sdp->media[i];
+       nbCodecs = media->desc.fmt_count;
+       printf("Codec count: %i\n", nbCodecs);
+       for( j=0 ; j<nbCodecs ; j++ ){
+       printf("Codec payload: %s\n", media->desc.fmt[j].ptr);
+       }
+       }
 
-    //TODO Call to the core to update the selected codecs
-    // libboost
-    */
+       //TODO Call to the core to update the selected codecs
+       // libboost
+     */
 }
 
 
@@ -699,7 +699,7 @@ static void call_on_forked( pjsip_inv_session *inv, pjsip_event *e ){
     PJ_UNUSED_ARG( inv );
     PJ_UNUSED_ARG( e );
     printf(
-            "The invite session module has created a new dialog because of forked outgoing request\n");
+        "The invite session module has created a new dialog because of forked outgoing request\n");
 }
 
 

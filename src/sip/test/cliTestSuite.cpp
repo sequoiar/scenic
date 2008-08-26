@@ -36,7 +36,6 @@ int main(int argc, char** argv){
     cout << MENU << endl;
 
     for(;;) {
-
         if( sip->incomingInvite() ){
             cout << "incoming call";
             cout << "accept(a) or refuse (r) ";
@@ -55,7 +54,6 @@ int main(int argc, char** argv){
                     break;
             }
         }
-
         cout << "<<<< ";
         cin >> input;
         switch(input[0])
