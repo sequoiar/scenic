@@ -26,11 +26,8 @@
 #define __BASE_THREAD_H__
 
 #include <glib.h>
-#include <utility>
 #include <list>
-#include <map>
 #include <string>
-#include <set>
 #include "baseModule.h"
 #include "queuePair.h"
 
@@ -59,7 +56,7 @@ class BaseThread
 
         QueuePair_ < T > queue_;
         QueuePair_ < T > flippedQueue_;
-        static void *thread_main(void *v);
+        static void *thread_main(void *pThreadObj);
 
     private:
         BaseThread(const BaseThread&); //No Copy Constructor
@@ -94,7 +91,7 @@ BaseThread < T >::~BaseThread()
 
 
 template < class T >
-GThread * thread_create_queue_pair(void *(thread) (void *), T t, GError ** err)
+GThread * thread_create(void *(thread) (void *), T t, GError ** err)
 {
     return (g_thread_create(thread, static_cast < void *>(t), TRUE, err));
 }
@@ -108,7 +105,7 @@ bool BaseThread < T >::run()
     //No thread yet
     if (th_ || !ready())
         return false;
-    th_ = thread_create_queue_pair(BaseThread::thread_main, this, &err);
+    th_ = thread_create(BaseThread::thread_main, this, &err);
 
     if (th_)  //BaseThread running
     {
@@ -120,10 +117,9 @@ bool BaseThread < T >::run()
 
 
 template < class T >
-void *BaseThread < T >::thread_main(void *v)
+void *BaseThread < T >::thread_main(void *pThreadObj)
 {
-    // FIXME: this is unbelievably ugly. what's v?
-    return reinterpret_cast<void *>(static_cast < BaseThread * >(v)->main());
+    return reinterpret_cast<void *>(static_cast < BaseThread * >(pThreadObj)->main());
 }
 
 
