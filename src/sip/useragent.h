@@ -93,7 +93,7 @@ class UserAgent
 
         int inv_session_reinvite();
 
-        void addMediaToSession( std::string type, std::string codecs, int port );
+        void setSessionMedia( std::string type, std::string codecs, int port );
 
         URI* getLocalURI() { return _localURI; }
 

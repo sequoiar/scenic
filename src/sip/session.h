@@ -89,7 +89,7 @@ class Session
          * @param codecs    the formatted list of encoding codec names
          *                  Pattern: a=codec1/codec2/../codecn/ (a pour audio; v pour video)
          */
-        virtual void addMedia( std::string type, std::string codecs, int port ) = 0;
+        virtual void setMedia( std::string type, std::string codecs, int port ) = 0;
 
         virtual std::string getConnectionState( void ) = 0;
 
