@@ -114,6 +114,7 @@ class Sdp
                        pool, negociator, 0);
         }
 
+
         std::string mediaToString( void );
 
     private:

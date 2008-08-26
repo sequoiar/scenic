@@ -82,6 +82,7 @@ int SIPSession::refuse( void ){
     return _app_ua->inv_session_refuse();
 }
 
+
 void SIPSession::build_sdp( void ){}
 
 void SIPSession::setMedia( std::string type, std::string codecs, int port ){
@@ -98,8 +99,8 @@ std::string SIPSession::mediaToString( void ){
     return _app_ua->mediaToString();
 }
 
+
 bool SIPSession::incomingInvite( void ){
-    
     return (strcmp(getConnectionState().c_str(), "CONNECTION_STATE_RINGING") == 0 );
 }
 
