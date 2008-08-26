@@ -46,34 +46,34 @@ int GstThread::main()
             sender_ = new VideoSender(*conf_);
         if(!sender_)
         {
-            StdMsg m(StdMsg::QUIT);
+            GstMsg m(GstMsg::QUIT);
             queue_.push(m);
             done = true;
         }
     }
     while(!done)
     {
-        StdMsg f = queue_.timed_pop(10000);
+        GstMsg f = queue_.timed_pop(10000);
         switch(f.get_type())
         {
-            case StdMsg::QUIT:
+            case GstMsg::QUIT:
             {
-                StdMsg ff(StdMsg::QUIT);
+                GstMsg ff(GstMsg::QUIT);
                 queue_.push(ff);
                 done = true;
                 break;
             }
-            case StdMsg::START:
+            case GstMsg::START:
             {
                 sender_->start();
                 break;
             }
-            case StdMsg::INIT:
+            case GstMsg::INIT:
             {
                 sender_->init();
                 break;
             }
-            case StdMsg::STOP:
+            case GstMsg::STOP:
             {
                 sender_->stop();
                 break;
@@ -82,6 +82,8 @@ int GstThread::main()
             default:
                 break;
         }
+
+
     }
 
     return 0;
