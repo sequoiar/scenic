@@ -26,7 +26,7 @@ from twisted.internet import reactor, protocol, defer
 #from protocols import ipcp
 from streams.stream import AudioStream, Stream
 from streams.gst_client import GstClient
-from utils import log
+from utils import log, get_def_name
 
 log = log.start('info', 1, 0, 'audioGst')
 
@@ -34,8 +34,8 @@ class AudioGst(AudioStream, GstClient):
     """Class streams->audio->gst.AudioGst
     """
     
-    def __init__(self, port, address='127.0.0.1'):
-        AudioStream.__init__(self)
+    def __init__(self, port, address='127.0.0.1', core=None):
+        AudioStream.__init__(self, core)
         GstClient.__init__(self, port, address)
         
         # Add callback for commands coming from GST
@@ -81,13 +81,21 @@ class AudioGst(AudioStream, GstClient):
     
     def start_sending(self, address):
         """function start_sending
-        
         address: string
-        
         returns 
         """
-        return None # should raise NotImplementedError()
-    
+        attrs = [(attr, value) for attr, value in self.__dict__.items() if attr[0] != "_"]
+        self._send_cmd('start_audio', self.sending_started, ('address', address), *attrs)
+        
+    def sending_started(self, caps):
+#        print get_def_name(1)
+        self._del_callback(get_def_name(1))
+        if caps.isdigit():
+            self._core.notify(None, caps, 'audio_sending_started')
+        else:
+            self._core.notify(None, 1, 'audio_sending_started')
+            log.info('SHOULD SEND CAPS VIA TCP HERE!')
+   
     def stop_sending(self):
         """function stop_sending
         

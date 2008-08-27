@@ -50,8 +50,15 @@ class ControllerApi():
         
     ### Streams ###
     
-    def start_streams(self, stream):
-        self.notify('stream_status', 'starté')
+    def start_streams(self, caller, address):
+        self.notify(caller, self.streams.start(address))
+
+    def stop_streams(self, caller):
+        self.notify(caller, self.streams.stop())
+
+    def set_streams(self, caller, attr, value):
+        self.notify(caller, self.streams.set_attr(attr, value))
+
 
 
     ### Stream ###

@@ -33,6 +33,7 @@ from utils.i18n import to_utf
 import ui
 from ui.common import find_callbacks
 from streams import audio, video, data
+from streams.stream import AudioStream, VideoStream, DataStream
 
 
 log = log.start('info', 1, 0, 'cli')
@@ -88,7 +89,8 @@ class CliController(TelnetServer):
         # build a dict of all semi-private methods
         self.callbacks = find_callbacks(self)
         self.shortcuts = {'c': 'contacts',
-                          'a': 'audio'
+                          'a': 'audio',
+                          's': 'streams'
                           }
         
     def parse(self, data):
@@ -184,45 +186,42 @@ class CliController(TelnetServer):
         elif options.list:
             self.core.list_stream(self, kind)
         elif options.add:
-            self.core.add_stream(self, options.add, audio.gst.AudioGst(22222), kind)
+            print self.factory.subject
+            self.core.add_stream(self, options.add, audio.gst.AudioGst(22222, '127.0.0.1', self.factory.subject), kind)
         elif options.erase:
             self.core.delete_stream(self, options.erase, kind)
         else:
             cp.print_help()
             
     def _streams(self, data):
-        cp = CliParser(self, prog=data[0], description="Manage the audio stream.")
-        cp.add_option("-l", "--list", action='store_true', help="List all the audio settings")
+        cp = CliParser(self, prog=data[0], description="Manage the global stream.")
+        cp.add_option("-l", "--list", action='store_true', help="List all the streams included")
+
+#        cp.add_option("-a", "--add", type="string", help="Add a stream")
+#        cp.add_option("-e", "--erase", type="string", help="Erase a stream")
+#        cp.add_option("-m", "--modify", type="string", help="Modify the name of a stream")
+        
+        cp.add_option("-s", "--start", type="string", help="Start a stream of playing")
+        cp.add_option("-i", "--stop", "--interrupt", action='store_true', help="Stop a stream of playing")
+
         cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
-        cp.add_option("-c", "--codec", type="string", help="Set the codec")
-        cp.add_option("-s", "--settings", type="string", help="Set the codec settings (set1:val,set2:val)")
-        cp.add_option("-d", "--bitdepth", type="int", help="Set the bitdepth of the audio (default: 16 bit)")
-        cp.add_option("-r", "--samplerate", type="int", help="Set the samplerate of the audio (default: 48000 Hz")
-        cp.add_option("-v", "--channels", "--voices", type="int", help="Set the number of audio channels (from 1 to 8)")
         cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
-        cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
 
         (options, args) = cp.parse_args(data)
         
+        kind = 'streams'
+        
         if options.list:
-            self.core.audio_status(self)
+            self.core.list_stream(self, kind)
+        elif options.stop:
+            self.core.stop_streams(self, kind)
         elif [opt for opt in options.__dict__.values() if opt]:
             if options.container:
-                self.core.audio_set(self, 'container', options.container)
-            if options.codec:
-                self.core.audio_set(self, 'codec', options.codec)
-            if options.settings:
-                self.core.audio_set(self, 'codec_settings', options.settings)
-            if options.bitdepth:
-                self.core.audio_set(self, 'bitdepth', options.bitdepth)
-            if options.samplerate:
-                self.core.audio_set(self, 'sample_rate', options.samplerate)
-            if options.channels:
-                self.core.audio_set(self, 'channels', options.channels)
+                self.core.set_streams(self, 'container', options.container)
             if options.port:
-                self.core.audio_set(self, 'port', options.port)
-            if options.buffer:
-                self.core.audio_set(self, 'buffer', options.buffer)
+                self.core.set_streams(self, 'port', options.port)
+            if options.start:
+                self.core.start_streams(self, options.start)
         else:
             cp.print_help()
         
@@ -510,6 +509,37 @@ class CliView(Observer):
                 self.write("\n".join(names))
             else:
                 self.write('There is no audio stream.')
+                
+    
+    def _streams_list(self, origin, data):
+        if origin is self.controller:
+            if data:
+                names = []
+                for stream in data:
+                    kind = '?'
+                    if isinstance(stream[1], AudioStream):
+                        kind = 'audio'
+                    elif isinstance(stream[1], VideoStream):
+                        kind = 'video'
+                    names.append(stream[0] + ' (' + kind + ')')
+                self.write("\n".join(names))
+            else:
+                self.write('There is no stream.')
+            
+    def _set_streams(self, origin, (state, attr, value)):
+        if state:
+            self.write('The %s of the master stream is now set to %s' % (attr, value))
+        elif origin is self.controller:
+            self.write('Unable to set the %s of the master stream' % attr)
+            
+    def _start_streams(self, origin, data):
+        self.write(data)
+        
+    def _audio_sending_started(self, origin, data):
+        if data:
+            self.write('\nAudio sending started.')
+        else:
+            self.write('\nUnable to start audio sending.')
             
             
 
