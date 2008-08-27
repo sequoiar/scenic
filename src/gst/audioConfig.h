@@ -54,7 +54,7 @@ class AudioConfig
 
         const char *source() const;
 
-        const int numChannels() const { return numChannels_; };
+        int numChannels() const { return numChannels_; };
         AudioSource* createSource() const;
 
     protected:

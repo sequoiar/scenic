@@ -21,7 +21,7 @@
 #include <gst/gst.h>
 
 #include <cassert>
-
+#include <unistd.h>
 #include "pipeline.h"
 //#include "logWriter.h"
 

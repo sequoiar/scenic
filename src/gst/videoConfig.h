@@ -53,7 +53,7 @@ class VideoConfig
 
         VideoSource* createSource() const;  // factory method
 
-        const bool has_h264() const { return codec_ == "h264"; }
+        bool has_h264() const { return codec_ == "h264"; }
 };
 
 #endif // _VIDEO_CONFIG_H_
