@@ -26,6 +26,11 @@ import sys
 
 # Twisted imports
 import twisted.python.log as tw_log
+import twisted
+version = int(twisted.__version__.split('.')[0])
+if version < 8:
+    from utils.twisted_old import PythonLoggingObserver
+    tw_log.PythonLoggingObserver = PythonLoggingObserver
 
 
 def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
