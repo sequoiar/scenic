@@ -138,6 +138,7 @@ static const char *stateStr[] =
     "CONNECTION_STATE_RINGING",
     "CONNECTION_STATE_CONNECTED",
     "CONNECTION_STATE_DISCONNECTED",
+    "CONNECTION_STATE_TIMEOUT",
     "CONNECTION_STATE_FAILED",
 };
 
@@ -348,7 +349,7 @@ int UserAgent::inv_session_create( std::string uri ){
     pj_ansi_sprintf( tmp1, remote->getAddress().c_str() );
     to = pj_str(tmp1);
 
-    if( _state == CONNECTION_STATE_READY ) {
+    if( _state == CONNECTION_STATE_READY || _state == CONNECTION_STATE_TIMEOUT ) {
         status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
                                        NULL,
                                        &to,
@@ -401,26 +402,18 @@ int UserAgent::inv_session_reinvite( void ){
     pj_status_t status;
     pjsip_tx_data *tdata;
 
-    cout << "before" << endl;
-
     if( _state == CONNECTION_STATE_CONNECTED || _state == CONNECTION_STATE_READY ) {
-        cout << "after if" << endl;
         local_sdp->createInitialOffer( inv_session->dlg->pool );
-        cout << "after if" << endl;
 
         status = pjsip_inv_reinvite( inv_session, NULL,
                                      local_sdp->getLocalSDPSession(), &tdata );
-        cout << "after if" << endl;
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         status = pjsip_inv_send_msg( inv_session, tdata );
-        cout << "after if" << endl;
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         return PJ_SUCCESS;
     }
-
-    cout << "after else" << endl;
     return !PJ_SUCCESS;
 }
 
@@ -536,8 +529,10 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
 
     if( inv->state == PJSIP_INV_STATE_DISCONNECTED ){
         cout << "Call state: " << pjsip_get_status_text(inv->cause)->ptr << endl;
-        // Update the connection state
-        _state = CONNECTION_STATE_READY;
+        if( strcmp(pjsip_get_status_text(inv->cause)->ptr, "Request Timeout") == 0)
+            _state = CONNECTION_STATE_TIMEOUT;
+        else
+            _state = CONNECTION_STATE_READY;
     }
 
     else if( inv->state == PJSIP_INV_STATE_CONFIRMED ){
