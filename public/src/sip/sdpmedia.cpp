@@ -18,6 +18,7 @@
  */
 
 #include "sdpmedia.h"
+#include <string.h>
 #include <sstream>
 #include <iostream>
 
