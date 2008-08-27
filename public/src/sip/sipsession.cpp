@@ -104,4 +104,6 @@ bool SIPSession::incomingInvite( void ){
     return (strcmp(getConnectionState().c_str(), "CONNECTION_STATE_RINGING") == 0 );
 }
 
-
+void SIPSession::setAutoAnswer( bool mode ){
+    _app_ua->setInviteAutoAnswer( mode );
+}

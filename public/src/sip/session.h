@@ -95,6 +95,8 @@ class Session
 
         virtual bool incomingInvite( void ) = 0;
 
+        virtual void setAutoAnswer( bool mode ) = 0;
+
     private:
         /* The communication protocol */
         int _protocol;

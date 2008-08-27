@@ -163,6 +163,10 @@ static Sdp *local_sdp;
  */
 static InstantMessaging *_imModule;
 
+static bool INVITE_AUTO_ANSWER;
+
+static int inv_session_answer();
+
 /*************************************************************************************************/
 
 
@@ -170,6 +174,7 @@ UserAgent::UserAgent( std::string name, int port )
     : _name(name), _localURI(0)
 {
     _state = CONNECTION_STATE_NULL;
+    INVITE_AUTO_ANSWER = false;
     _localURI = new URI( port );
     // Instantiate the instant messaging module
     _imModule = new InstantMessaging();
@@ -226,6 +231,10 @@ connectionState UserAgent::getConnectionState( void ){
     return _state;
 }
 
+void UserAgent::setInviteAutoAnswer( bool mode ){
+    
+    INVITE_AUTO_ANSWER = mode;
+}
 
 void UserAgent::init_sip_module( void ){
     mod_ua.name = pj_str((char*)this->_name.c_str());
@@ -409,6 +418,12 @@ int UserAgent::inv_session_reinvite( void ){
 
 
 int UserAgent::inv_session_accept( void ) {
+    
+    return inv_session_answer();    
+}
+
+static int inv_session_answer(){
+    
     pj_status_t status;
     pjsip_tx_data *tdata;
 
@@ -421,7 +436,7 @@ int UserAgent::inv_session_accept( void ) {
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
+        
         _state = CONNECTION_STATE_CONNECTED;
     }
     else{
@@ -432,9 +447,10 @@ int UserAgent::inv_session_accept( void ) {
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
     }
-    return PJ_SUCCESS;
-}
 
+    return PJ_SUCCESS;
+
+}
 
 int UserAgent::inv_session_refuse( void ) {
     pj_status_t status;
@@ -582,6 +598,10 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
 
     // Update the connection state
     _state = CONNECTION_STATE_RINGING;
+
+    if( INVITE_AUTO_ANSWER ){
+        inv_session_answer();
+    }
 
     /* Done */
 

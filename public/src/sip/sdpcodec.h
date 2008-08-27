@@ -33,7 +33,7 @@
  * RFC 3551 - RTP Profile for Audio and Video Conferences with Minimal Control
  */
 typedef enum {
-    // media type = A - clock rate = 8000 - channels = 1
+    // media type = audio - clock rate = 8000 - channels = 1
     RTP_PAYLOAD_ULAW = 0,
     RTP_PAYLOAD_ALAW = 8,
     RTP_PAYLOAD_GSM = 3,
@@ -41,7 +41,7 @@ typedef enum {
     RTP_PAYLOAD_SPEEX = 102,
     RTP_PAYLOAD_VORBIS = 103,
 
-    // media type = V - clock rate = 90000
+    // media type = video - clock rate = 90000
     RTP_PAYLOAD_H263 = 34,
     RTP_PAYLOAD_H264 = 98
 } CodecRTPPayload;
