@@ -347,7 +347,7 @@ int UserAgent::inv_session_create( std::string uri ){
     pj_ansi_sprintf( tmp1, remote->getAddress().c_str() );
     to = pj_str(tmp1);
 
-    if( _state == CONNECTION_STATE_DISCONNECTED || _state == CONNECTION_STATE_TIMEOUT ) {
+    if( _state >= READY_TO_CONNECT ) {
         status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
                                        NULL,
                                        &to,
@@ -527,7 +527,7 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
 
     if( inv->state == PJSIP_INV_STATE_DISCONNECTED ){
         cout << "Call state: " << pjsip_get_status_text(inv->cause)->ptr << endl;
-        if( strcmp(pjsip_get_status_text(inv->cause)->ptr, "Request Timeout") == 0)
+        if( strcmp(pjsip_get_status_text(inv->cause)->ptr, REQUEST_TIMEOUT ) == 0)
             _state = CONNECTION_STATE_TIMEOUT;
         else
             _state = CONNECTION_STATE_DISCONNECTED;
