@@ -48,10 +48,10 @@ class MediaConfig
         const char *location() const;
         const char *codec() const { return codec_.c_str(); }
         const char *remoteHost() const { return remoteHost_.c_str(); }
-        const int port() const { return port_; }
-        const bool isNetworked() const { return port_ != 0; }
-        const bool hasCodec() const { return !codec_.empty(); }
-        const bool fileExists() const;
+        int port() const { return port_; }
+        bool isNetworked() const { return port_ != 0; }
+        bool hasCodec() const { return !codec_.empty(); }
+        bool fileExists() const;
 
         virtual ~MediaConfig() {};
 

@@ -64,7 +64,7 @@ MediaConfig::MediaConfig(const std::string &source_param, const std::string &loc
 
 
 // FIXME: not every mediaconfig has a file
-const bool MediaConfig::fileExists() const
+bool MediaConfig::fileExists() const
 {
     if (location_.empty())
         return false;
