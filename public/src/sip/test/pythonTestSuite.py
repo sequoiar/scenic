@@ -36,14 +36,18 @@ uac = sip.SIPSession( port )
 uac.setMedia("audio", "vorbis/PCMA/", 12345)
 print step+success
 
-step = " \nConnection to a UAS runnning on the local host on the port 5060 in AUTO answer mode  ..........................  "
+step = " \nDialog invite session creation ........................................................................................ "
 status = connect()
 if(status == 0):
     print step+success
 else:
     print step+failure
 
+step = " \nConnection to a UAS runnning on the local host on the port 5060 in AUTO answer mode  ..........................  "
 while( uac.getConnectionState() != 'CONNECTION_STATE_CONNECTED' ):
+    if( uac.getConnectionState() == 'CONNECTION_STATE_TIMEOUT' ):
+        print step+failure;
+        sys.exit(0)
     pass
 
 step = " \nList the enabled media list ....................................................................................  "
