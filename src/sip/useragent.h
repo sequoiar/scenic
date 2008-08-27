@@ -112,6 +112,8 @@ class UserAgent
 
         connectionState getConnectionState( void );
 
+        void setInviteAutoAnswer( bool mode );
+
     private:
         /*
          * The SIP module name

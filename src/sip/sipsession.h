@@ -95,6 +95,8 @@ class SIPSession
 
         bool incomingInvite( void );
 
+        void setAutoAnswer( bool mode );
+
         SIPSession(SIPSession const&); //No Copy Constructor
         SIPSession& operator=(const SIPSession&); //No Assignment Operator
 

@@ -15,6 +15,8 @@ static std::string MENU =
     "  r    Reinvite\n"
     "  m    Chat\n"
     "  i    Get state of the connection\n"
+    "  x    Enable auto invite answer mode\n"
+    "  y    Disable auto invite answer mode\n"
     "  h    Help\n"
     "  q    Quit\n"
     "\n";
@@ -99,6 +101,12 @@ int main(int argc, char** argv){
             case 'i':
                 msg = sip->getConnectionState();
                 cout << msg << endl;
+                break;
+            case 'x':
+                sip->setAutoAnswer( true );
+                break;
+            case 'y':
+                sip->setAutoAnswer( false );
                 break;
             case 'h':
                 cout << MENU << endl;
