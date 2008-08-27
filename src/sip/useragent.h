@@ -29,6 +29,8 @@
 #define MSG_NOT_ACCEPTABLE_HERE     488
 #define MSG_SERVER_INTERNAL_ERROR   500
 
+#define READY_TO_CONNECT    4
+#define REQUEST_TIMEOUT     "Request Timeout"
 
 /* @file	useragent.h
  * @brief	A SIP useragent. Implements the SIP stacks from the transaction layer to the transport layer as described in
@@ -55,6 +57,7 @@ enum connectionState {
 };
 
 typedef enum connectionState connectionState;
+
 
 class UserAgent
 {
