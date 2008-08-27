@@ -89,11 +89,13 @@ void AudioSender::init_sink()
 
 void AudioSender::send_caps() const
 {
+    //CapsSender::send(session_.caps_str());
+    
     // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
     LOG("Sending caps...", DEBUG);
 
     lo_address t = lo_address_new(NULL, "7770");
-    if (lo_send(t, "/audio/rx/caps", "s", session_.caps_str()) == -1)
+    if (lo_send(t, "/audio/rx/caps", "s", session_.getCaps().c_str()) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t)
                   << std::endl;
 }

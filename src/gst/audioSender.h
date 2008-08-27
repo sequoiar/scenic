@@ -32,6 +32,7 @@ class AudioSender
 {
     public:
         explicit AudioSender(const AudioConfig & config);
+        std::string getCaps() { return session_.getCaps(); }
         AudioSender();
         ~AudioSender();
         bool start();
@@ -44,7 +45,6 @@ class AudioSender
         void init_sink();
 
         void send_caps() const;
-        const char *caps_str() const;
 
         // data
         const AudioConfig &config_;

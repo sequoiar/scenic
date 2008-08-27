@@ -38,7 +38,7 @@ RtpSender::~RtpSender()
 }
 
 
-const char *RtpSender::caps_str() const
+std::string RtpSender::getCaps() const
 {
     assert(pipeline_.isPlaying());
 
@@ -55,7 +55,7 @@ const char *RtpSender::caps_str() const
 
     gst_object_unref(pad);
 
-    const char *result = gst_caps_to_string(caps);
+    std::string result(gst_caps_to_string(caps));
     gst_caps_unref(caps);
     return result;
 }

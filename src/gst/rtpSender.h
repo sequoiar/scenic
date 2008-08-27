@@ -32,7 +32,7 @@ class RtpSender
 {
     public:
         RtpSender();
-        const char *caps_str() const;
+        std::string getCaps() const;
 
         ~RtpSender();
 
