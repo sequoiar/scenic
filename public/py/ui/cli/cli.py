@@ -128,8 +128,8 @@ class CliController(TelnetServer):
                 self.core.add_contact(self, options.add, args[1])
             else:
                 self.write('You need to give an address.', True)
-        elif options.delete:
-            self.core.delete_contact(self, options.delete)
+        elif options.erase:
+            self.core.delete_contact(self, options.erase)
         elif options.modify:
             if len(args) > 2:
                 self.core.modify_contact(self, options.modify, args[1], args[2])
