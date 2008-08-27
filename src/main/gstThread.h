@@ -25,6 +25,10 @@
 #include "gst/videoSender.h"
 #include "gst/videoReceiver.h"
 #include "gst/videoConfig.h"
+#include "gst/audioSender.h"
+#include "gst/audioConfig.h"
+
+
 
 typedef QueuePair_<GstMsg> QueuePair;
 class GstThread
@@ -34,11 +38,12 @@ class GstThread
         GstThread();
         ~GstThread();
     private:
-        VideoConfig* conf_;
-        VideoSender* sender_;
-        VideoReceiver* receiver_;
-
+        VideoConfig* vconf_;
+        VideoSender* vsender_;
         std::string conf_str_;
+        AudioConfig* aconf_;
+        AudioSender* asender_;
+
         int main();
 
         GstThread(const GstThread&); //No Copy Constructor

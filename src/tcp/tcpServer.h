@@ -1,7 +1,9 @@
 #ifndef TCP_SERVER
 #define TCP_SERVER
 
-#define BUFFSIZE     256
+#include <string>
+
+#define BUFFSIZE     16
 
 class TcpServer
 {
