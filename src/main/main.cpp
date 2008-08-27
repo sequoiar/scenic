@@ -31,7 +31,7 @@
 #include "tcp/tcpThread.h"
 #include "gutil/optionArgs.h"
 #include <sstream>
-//#include "logWriter.h"
+#include "logWriter.h"
 
 class MainModule
     : public BaseModule
@@ -51,20 +51,19 @@ class MainModule
 MainModule::MainModule()
     : BaseModule(), gstThread_(), tcpThread_(10000), port_(0)
 {
-    args_.push_back(new IntArg(&port_, "tcpPort", 'p', "Set the tcp incomming port",
-                               "port num"));
+//args_.push_back(new IntArg(&port_, "tcpPort", 'p', "Set the tcp incomming port","port num"));
 }
 
 
-int main (int argc, char** argv)
+int main (int , char** )
 {
     MainModule m;
-    OptionArgs opts;
+    //OptionArgs opts;
 
-    opts.add(m.get_args());
+//    opts.add(m.get_args());
 
-    if(!opts.parse(argc, argv))
-        return 1;
+//    if(!opts.parse(argc, argv))
+//       return 1;
     m.run();
     return 0;
 }
@@ -72,7 +71,6 @@ int main (int argc, char** argv)
 
 bool MainModule::run()
 {
-#if 0 
     QueuePair &gst_queue = gstThread_.getQueue();
     TcpQueue &tcp_queue = tcpThread_.getQueue();
 
@@ -88,37 +86,44 @@ bool MainModule::run()
     while(true)
     {
         TcpMessage m = tcp_queue.timed_pop(10000);
+        std::string& mstr = m.getMsg();
+        GstMsg gmsg = gst_queue.timed_pop(1000);
+        if (!gmsg.getMsg().empty())
+            LOG_DEBUG(gmsg.getMsg());
 
-        if (m.getMsg().empty())
+        if (mstr.empty())
             continue;
-        LOG_DEBUG(m.getMsg());
 
-        if (m.pathEquals("/quit"))
+        mstr.erase(mstr.size()-2,2);
+
+        std::cout << m.getMsg().size();
+
+        if (!m.getMsg().compare("quit"))
         {
             GstMsg in(GstMsg::QUIT);
             gst_queue.push(in);
             LOG("in quit!", DEBUG);
-            tcp_queue.push(TcpMessage("/quit", "", 0, 0, 0));
+            tcp_queue.push(TcpMessage(TcpMessage::QUIT));
             break;
         }
-        else if (!m.pathEquals("/gst"))
-            continue;
-        if (m.argEquals("init", 0)) {
+        else if (!m.getMsg().compare("init")) {
             GstMsg in(GstMsg::INIT);
             gst_queue.push(in);
         }
-        else if (m.argEquals("start", 0)) {
+        else if (!m.getMsg().compare("start")) {
             GstMsg start(GstMsg::START);
             gst_queue.push(start);
+          
         }
-        else if (m.argEquals("stop", 0)) {
+        else if (!m.getMsg().compare("stop")) {
             GstMsg stop(GstMsg::STOP);
             gst_queue.push(stop);
         }
+        else
+            LOG_DEBUG("Unknown command");
     }
 
     std::cout << "Done!" << std::endl;
-#endif
     return 0;
 }
 
