@@ -133,13 +133,11 @@ static connectionState _state;
 static const char *stateStr[] =
 {
     "CONNECTION_STATE_NULL",
-    "CONNECTION_STATE_READY",
-    "CONNECTION_STATE_INVITE_SENT",
+    "CONNECTION_STATE_CONNECTING",
     "CONNECTION_STATE_RINGING",
     "CONNECTION_STATE_CONNECTED",
     "CONNECTION_STATE_DISCONNECTED",
-    "CONNECTION_STATE_TIMEOUT",
-    "CONNECTION_STATE_FAILED",
+    "CONNECTION_STATE_TIMEOUT"
 };
 
 /*
@@ -324,7 +322,7 @@ int UserAgent::init_pjsip_modules(  ){
                       &sipThread );
 
     // Update the connection state. The user agent is ready to receive or sent requests
-    _state = CONNECTION_STATE_READY;
+    _state = CONNECTION_STATE_DISCONNECTED;
 
     PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
 
@@ -349,7 +347,7 @@ int UserAgent::inv_session_create( std::string uri ){
     pj_ansi_sprintf( tmp1, remote->getAddress().c_str() );
     to = pj_str(tmp1);
 
-    if( _state == CONNECTION_STATE_READY || _state == CONNECTION_STATE_TIMEOUT ) {
+    if( _state == CONNECTION_STATE_DISCONNECTED || _state == CONNECTION_STATE_TIMEOUT ) {
         status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
                                        NULL,
                                        &to,
@@ -371,7 +369,7 @@ int UserAgent::inv_session_create( std::string uri ){
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         // Update the connection status. The invite session has been created and sent.
-        _state = CONNECTION_STATE_INVITE_SENT;
+        _state = CONNECTION_STATE_CONNECTING;
 
         return PJ_SUCCESS;
     }
@@ -402,7 +400,7 @@ int UserAgent::inv_session_reinvite( void ){
     pj_status_t status;
     pjsip_tx_data *tdata;
 
-    if( _state == CONNECTION_STATE_CONNECTED || _state == CONNECTION_STATE_READY ) {
+    if( _state == CONNECTION_STATE_CONNECTED ) {
         local_sdp->createInitialOffer( inv_session->dlg->pool );
 
         status = pjsip_inv_reinvite( inv_session, NULL,
@@ -462,7 +460,7 @@ int UserAgent::inv_session_refuse( void ) {
     status = pjsip_inv_send_msg( inv_session, tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    _state = CONNECTION_STATE_READY;
+    _state = CONNECTION_STATE_DISCONNECTED;
 
     return PJ_SUCCESS;
 }
@@ -524,7 +522,7 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
 /********************** Callbacks Implementation **********************************/
 
 static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
-    // To avoid unused arguments
+    // To avoid unused arguments compilation warnings
     PJ_UNUSED_ARG(e);
 
     if( inv->state == PJSIP_INV_STATE_DISCONNECTED ){
@@ -532,7 +530,7 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
         if( strcmp(pjsip_get_status_text(inv->cause)->ptr, "Request Timeout") == 0)
             _state = CONNECTION_STATE_TIMEOUT;
         else
-            _state = CONNECTION_STATE_READY;
+            _state = CONNECTION_STATE_DISCONNECTED;
     }
 
     else if( inv->state == PJSIP_INV_STATE_CONFIRMED ){
