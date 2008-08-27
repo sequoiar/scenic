@@ -64,6 +64,7 @@ int SIPSession::shutdown( void ){
 
 
 int SIPSession::reinvite( void ){
+    std::cout << "sdfdafvad" << std::endl;
     return _app_ua->inv_session_reinvite();
 }
 

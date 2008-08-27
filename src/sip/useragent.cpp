@@ -174,7 +174,7 @@ UserAgent::UserAgent( std::string name, int port )
     : _name(name), _localURI(0)
 {
     _state = CONNECTION_STATE_NULL;
-    INVITE_AUTO_ANSWER = false;
+    INVITE_AUTO_ANSWER = true;
     _localURI = new URI( port );
     // Instantiate the instant messaging module
     _imModule = new InstantMessaging();
@@ -401,18 +401,26 @@ int UserAgent::inv_session_reinvite( void ){
     pj_status_t status;
     pjsip_tx_data *tdata;
 
+    cout << "before" << endl;
+
     if( _state == CONNECTION_STATE_CONNECTED || _state == CONNECTION_STATE_READY ) {
+        cout << "after if" << endl;
         local_sdp->createInitialOffer( inv_session->dlg->pool );
+        cout << "after if" << endl;
 
         status = pjsip_inv_reinvite( inv_session, NULL,
                                      local_sdp->getLocalSDPSession(), &tdata );
+        cout << "after if" << endl;
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         status = pjsip_inv_send_msg( inv_session, tdata );
+        cout << "after if" << endl;
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         return PJ_SUCCESS;
     }
+
+    cout << "after else" << endl;
     return !PJ_SUCCESS;
 }
 
