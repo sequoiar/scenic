@@ -28,7 +28,7 @@ class IPCP(LineReceiver):
     
     def lineReceived(self, line):
         print "Client: " + line
-        self.sendLine('audio_get "ogg"')
+        self.sendLine('sending_started "ogg"')
 
     def connectionMade(self):
         print "A client is connecting!"

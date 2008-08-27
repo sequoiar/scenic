@@ -35,8 +35,6 @@ def find_all():
         if ui.isPackage() and not FilePath(ui.filePath.dirname() + '/off').exists():
             uis.append(ui)
     return uis
-#            print "Loading User interface: " + ui.name
-#                ui.load()
 
 def load(uis):
     """

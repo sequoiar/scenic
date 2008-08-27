@@ -26,7 +26,7 @@ class Streams(object):
 
     def __init__(self):
         self.streams = {} 
-        self.mode = None
+        self.mode = 'send'
         self.port = None
 
     def get_kind(self, stream):
@@ -67,7 +67,10 @@ class Streams(object):
             return 0
     
     def list(self, kind):
-        streams = [(name[2:], stream) for name, stream in self.streams.items() if name[0:2] == kind[0] + '_']
+        if kind == 'streams':
+            streams = [(name[2:], stream) for name, stream in self.streams.items()]
+        else:
+            streams = [(name[2:], stream) for name, stream in self.streams.items() if name[0:2] == kind[0] + '_']
         streams.sort()
         return streams
 
@@ -77,38 +80,51 @@ class Streams(object):
             return self.streams[dict_name]
         return None
     
+    def set_attr(self, name, value):
+        """
+        name: string
+        value: 
+        """
+        if hasattr(self, name):
+            setattr(self, name, value)
+            return True, name, value
+        return False, name, value
     
     
     
     
-    def start(self, address=None):
+    def start(self, address='127.0.0.1'):
         """
         Start all the sub-streams.
                 
         address: string or None
         """
         if address:
-            self.mode = 'local'
+            self.mode = 'send'
+            for stream in self.streams.values():
+                stream.start_sending(address)
+                return 'Starting sending...'
         else:
-            self.mode = 'remote'
-        for stream in self.streams:
-            self.streams[stream].start(address)
+            self.mode = 'receive'
+            for stream in self.streams.values():
+                stream.start_receving()
+                return 'Starting receving...'
+        
     
-    def stop(self):
+    def stop(self, mode='send'):
         """
         Stop all the sub-streams.
         """
-        for stream in self.streams:
-            self.streams[stream].stop()
+        self.mode = mode
+        if mode == 'send':
+            for stream in self.streams.values():
+                stream.stop_sending()
+        else:
+            for stream in self.streams.values():
+                stream.stop_receving()
     
     
     
-    def status(self):
-        """
-        Return the global status (started or not) and the status for each
-        sub-stream (settings).
-        """
-        return None
     
 
 
@@ -117,11 +133,12 @@ class Stream(object):
     Class representing one media stream.
     """
 
-    def __init__(self):
+    def __init__(self, core=None):
+        self._core = core
         self.port = None  # (int) 
         self.buffer = None  # (int) 
 #        self.mode = None  # (string) send or receive
-        self.state = 0
+        self._state = 0
     
     def start(self, address=None):
         """ 
@@ -142,8 +159,8 @@ class AudioStream(Stream):
     """
     Class representing an audio stream
     """
-    def __init__(self):
-        Stream.__init__(self)
+    def __init__(self, core=None):
+        Stream.__init__(self, core)
         self.container = None
         self.codec = None
         self.codec_settings = None
@@ -156,8 +173,8 @@ class VideoStream(Stream):
     """
     Class representing a video stream
     """
-    def __init__(self):
-        Stream.__init__(self)
+    def __init__(self, core=None):
+        Stream.__init__(self, core)
         self.container = None  # () 
         self.codec = None  # () 
         self.codec_settings = None  # () 
@@ -169,8 +186,8 @@ class DataStream(Stream):
     """
     Class representing a data stream
     """
-    def __init__(self, kind):
-        Stream.__init__(self)
+    def __init__(self, kind, core=None):
+        Stream.__init__(self, core)
         self.kind = kind  # (string) 
     
 

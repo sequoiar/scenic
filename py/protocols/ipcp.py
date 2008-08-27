@@ -20,6 +20,7 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 import re
+from types import NoneType, FunctionType
 
 # twisted imports
 from twisted.internet import reactor, protocol, defer
@@ -36,13 +37,17 @@ class IPCP(LineReceiver):
         self.r = re.compile(r'("([^"\\]|\\.)*"|[^ ]+)')
         self.callbacks = {}
 
-    def add_callback(self, name, cmd):
+    def add_callback(self, cmd, name=None):
+        if not name:
+            name = cmd.__name__
         if name not in self.callbacks:
             self.callbacks[name] = cmd
         else:
             log.debug('A callback with this %s is already registered.' % name)
             
     def del_callback(self, name):
+        if isinstance(name, FunctionType):
+            name = name.__name__
         if name in self.callbacks:
             del self.callbacks[name]
         else:
@@ -72,24 +77,38 @@ class IPCP(LineReceiver):
                     except:
                         log.debug('Invalid type for received argument %s.' % arg)
             print "Received: ", cmd, args
-    #        self.deferred.callback((cmd, args))
             self.callbacks[cmd](*args)
     
     def send_cmd(self, cmd, *args):
         line = []
         line.append(cmd)
         for arg in args:
-            if isinstance(arg, int) or isinstance(arg, float):
-                line.append(str(arg))
-            elif isinstance(arg, str):
-                line.append('"%s"' % arg.replace('\\', '\\\\') \
-                                        .replace("'", "\\'") \
-                                        .replace('"', '\\"'))
+            if isinstance(arg, tuple):
+                parg = self._process_arg(arg[1])
+                if parg:
+                    line.append(arg[0] + '=' + parg)
             else:
-                log.debug('Invalid type (%s) for argument %s to send.' % (type(arg), arg))
+                parg = self._process_arg(arg)
+                if parg:
+                    line.append(parg)
         self.sendLine(' '.join(line))
-#        self.deferred = defer.Deferred()
-#        return self.deferred
+        print ' '.join(line)
+
+    def _process_arg(self, arg):
+        if isinstance(arg, int) or isinstance(arg, float):
+            return str(arg)
+        elif isinstance(arg, unicode):
+            return '"%s"' % arg.encode('ascii', 'backslashreplace') \
+                                    .replace('\\', '\\\\') \
+                                    .replace("'", "\\'") \
+                                    .replace('"', '\\"')
+        elif isinstance(arg, str):
+            return '"%s"' % arg.replace('\\', '\\\\') \
+                                    .replace("'", "\\'") \
+                                    .replace('"', '\\"')
+        elif not isinstance(arg, NoneType):
+            log.debug('Invalid type (%s) for argument %s to send.' % (type(arg), arg))
+        return None
 
     def connectionLost(self, reason=protocol.connectionDone):
         log.info('Lost the server connection.')

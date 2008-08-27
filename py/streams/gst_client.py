@@ -31,13 +31,13 @@ log = log.start('info', 1, 0, 'gstClient')
 
 class GstClient(object):    
     def __init__(self, port, address='127.0.0.1'):
-        self.port = port
-        self.address = address
-#        if not hasattr(Stream, 'gst') or not Stream.gst_state:
-#            self.connect()
+        self._gst_port = port
+        self._gst_address = address
+        if not hasattr(Stream, 'gst') or not Stream.gst_state:
+            self.connect()
             
     def connect(self):
-        deferred = ipcp.connect(self.address, self.port)
+        deferred = ipcp.connect(self._gst_address, self._gst_port)
         deferred.addCallback(self.connection_ready)
         deferred.addErrback(self.connection_failed)
             
@@ -59,16 +59,18 @@ class GstClient(object):
 #        log.info('Trying to reconnect...')
 #        self.connect()
 
-#    @defer.inlineCallbacks
-    def _send_cmd(self, cmd, *args):
+    def _send_cmd(self, cmd, callback=None, *args):
         if not Stream.gst_state:
             self.connect()  # Should add verification if the GST process is running
             reactor.callLater(0.5, self._send_cmd, cmd, *args)
         else:
-            Stream.gst.add_callback(cmd, )
+            if callback:
+                Stream.gst.add_callback(callback)
             Stream.gst.send_cmd(cmd, *args)
-#            answer = yield Stream.gst.send_cmd(cmd, *args)
-#            defer.returnValue(answer)
+
+    def _del_callback(self, callback):
+        if hasattr(Stream, 'gst'):
+            Stream.gst.del_callback(callback)
                     
             
             
