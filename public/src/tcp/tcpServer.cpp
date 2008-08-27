@@ -13,7 +13,7 @@
 #include <errno.h>
 
 #include <string>
-
+//#include "logWriter.h"
 #include "tcpServer.h"
 
 #ifdef ALLOW_ANY_ADDR
@@ -98,20 +98,24 @@ bool TcpServer::recv(std::string& out)
 {
     int n=0;
     out.clear();
-    bzero(buffer_, BUFFSIZE);
-    n = ::recv(newsockfd, buffer_, BUFFSIZE, 0);
-    if(n == 0){
-        connected_ = false;
-        return false;
-    }
-    if (n <= 0 || buffer_[0] == 0){
-        if (errno != EWOULDBLOCK)
+    do
+    {
+        bzero(buffer_, BUFFSIZE);
+        n = ::recv(newsockfd, buffer_, BUFFSIZE, 0);
+        if (n <= 0 || buffer_[0] == 0)
+        {
+            if (n != 0 && errno == EWOULDBLOCK)
+                break;
+            
             connected_ = false;
-        return false; //error("ERROR reading from socket");
-    }
-    std::string temp_str(buffer_, n);
+            return false; //error("ERROR reading from socket");
+        }
+        out.append(buffer_,n);
 
-    out = temp_str;
+    } while(1);
+
+    if(out.empty())
+        return false;
 
     return true;
 }

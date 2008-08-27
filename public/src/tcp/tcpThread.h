@@ -20,7 +20,7 @@
 #include "gutil/baseThread.h"
 #include "gutil/stdMsg.h"
 #include "tcpServer.h"
-
+typedef StdMsg TcpMessage;
 typedef QueuePair_<StdMsg> TcpQueue;
 class TcpThread
     : public BaseThread<StdMsg>

@@ -25,6 +25,7 @@
 #include "videoSender.h"
 #include "videoConfig.h"
 #include "videoReceiver.h"
+#define USE_OSC
 #include "audioSender.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"

@@ -17,14 +17,13 @@
  * Boston, MA 02111-1307, USA.
  */
 #include "tcpThread.h"
-#include "tcpServer.h"
+#include "logWriter.h"
 
 int TcpThread::main()
 {
     bool quit = false;
     std::string msg;
 
-    std::cout << "got here - portnum:" << std::endl;
     if(!serv_.socket_bind_listen())
         return -1;
     while(!quit)
@@ -35,6 +34,7 @@ int TcpThread::main()
             if(!serv_.accept()){
                 continue;
             }
+            LOG_INFO("Got Connection.");
             while(serv_.connected())
             {
                 if((quit = gotQuit()))
@@ -48,6 +48,7 @@ int TcpThread::main()
                 else
                     usleep(10000);
             }
+            LOG_WARNING("Disconnected from Core.");
         }
         serv_.close();
     }

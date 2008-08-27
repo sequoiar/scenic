@@ -23,6 +23,7 @@
 
 #include "hostIP.h"
 #include "audioTestSuite.h"
+#define USE_OSC
 #include "audioSender.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"

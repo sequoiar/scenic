@@ -28,10 +28,10 @@
 
 
 #include "gstThread.h"
-#include "osc/osc.h"
+#include "tcp/tcpThread.h"
 #include "gutil/optionArgs.h"
 #include <sstream>
-#include "logWriter.h"
+//#include "logWriter.h"
 
 class MainModule
     : public BaseModule
@@ -42,16 +42,16 @@ class MainModule
         MainModule();
     private:
         GstThread gstThread_;
-        OscThread oscThread_;
+        TcpThread tcpThread_;
 
         int port_;
 };
 
 
 MainModule::MainModule()
-    : BaseModule(), gstThread_(), oscThread_(), port_(0)
+    : BaseModule(), gstThread_(), tcpThread_(10000), port_(0)
 {
-    args_.push_back(new IntArg(&port_, "oscPort", 'p', "Set the osc incomming port",
+    args_.push_back(new IntArg(&port_, "tcpPort", 'p', "Set the tcp incomming port",
                                "port num"));
 }
 
@@ -72,32 +72,33 @@ int main (int argc, char** argv)
 
 bool MainModule::run()
 {
+#if 0 
     QueuePair &gst_queue = gstThread_.getQueue();
-    OscQueue &osc_queue = oscThread_.getQueue();
+    TcpQueue &tcp_queue = tcpThread_.getQueue();
 
     if(!gstThread_.run())
         return 0;
     std::stringstream s;
     s << port_;
 
-    oscThread_.set_local_port(s.str());
+    //tcpThread_.set_local_port(s.str());
 
-    if(!oscThread_.run())
+    if(!tcpThread_.run())
         return 0;
     while(true)
     {
-        OscMessage m = osc_queue.timed_pop(10000);
+        TcpMessage m = tcp_queue.timed_pop(10000);
 
-        if (!m.pathIsSet())
+        if (m.getMsg().empty())
             continue;
-        m.print();
+        LOG_DEBUG(m.getMsg());
 
         if (m.pathEquals("/quit"))
         {
             GstMsg in(GstMsg::QUIT);
             gst_queue.push(in);
             LOG("in quit!", DEBUG);
-            osc_queue.push(OscMessage("/quit", "", 0, 0, 0));
+            tcp_queue.push(TcpMessage("/quit", "", 0, 0, 0));
             break;
         }
         else if (!m.pathEquals("/gst"))
@@ -117,8 +118,9 @@ bool MainModule::run()
     }
 
     std::cout << "Done!" << std::endl;
+#endif
     return 0;
 }
 
 
-//./mainTester -s videotestsrc --oscLocal=7770 --oscRemote=7771 --oscRemoteHost=127.0.0.1
+//./mainTester -s videotestsrc --tcpLocal=7770 --tcpRemote=7771 --tcpRemoteHost=127.0.0.1

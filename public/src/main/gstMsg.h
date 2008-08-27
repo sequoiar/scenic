@@ -32,7 +32,7 @@ class GstMsg
 {
     public:
         enum type { ERROR = -2, UNDEFINED = -1, NONE = 0, STD = 'm', OK = '=', QUIT = 'Q',
-                    INIT = 'I', LOG = 'L',
+                    INIT = 'I', LOG = 'L', CAPS = 'C',
                     START = 'S', STOP = '!', SYSTEM = '*', PING = '.', STRING = 's'};
 
         GstMsg(unsigned short i)

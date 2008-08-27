@@ -17,24 +17,76 @@
  * Boston, MA 02111-1307, USA.
  */
 #include "gstThread.h"
+#include "hostIP.h"
 
 //BaseModule args get deleted in ~BaseModule
 // FIXME: sender and receiver should be in different processes, need to think about how
 // we initiliaze VideoConfig, also should have AudioConfig. Are we ditching args_?
 //
 
+
+#define A_PORT 10010
+
 GstThread::GstThread()
-    : conf_(0), sender_(0), receiver_(0), conf_str_("dv1394src")
+    : vconf_(0), vsender_(0), conf_str_("dv1394src"), aconf_(0), asender_(0)
 {}
 
 
 GstThread::~GstThread()
 {
-    delete sender_;
-    delete conf_;
+    delete vsender_;
+    delete vconf_;
 }
 
+int GstThread::main()
+{
+    bool done = false;    
+    AudioConfig config("audiotestsrc", 2, "vorbisenc", get_host_ip(), A_PORT);
+    
+    asender_ = new AudioSender(config);
 
+    while(!done)
+    {
+        GstMsg f = queue_.timed_pop(10000);
+        switch(f.get_type())
+        {
+            case GstMsg::QUIT:
+            {
+                GstMsg ff(GstMsg::QUIT);
+                queue_.push(ff);
+                done = true;
+                break;
+            }
+            case GstMsg::START:
+            {
+                asender_->start();
+                GstMsg caps(GstMsg::CAPS,asender_->getCaps());
+                queue_.push(caps);
+                break;
+            }
+            case GstMsg::INIT:
+            {
+                asender_->init();
+                break;
+            }
+            case GstMsg::STOP:
+            {
+                asender_->stop();
+                break;
+            }
+
+            default:
+                break;
+        }
+
+
+    }
+
+    return 0;
+
+}
+
+#if 0 
 int GstThread::main()
 {
     bool done = false;
@@ -89,4 +141,5 @@ int GstThread::main()
     return 0;
 }
 
+#endif
 
