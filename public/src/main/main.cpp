@@ -29,7 +29,7 @@
 
 #include "gstThread.h"
 #include "tcp/tcpThread.h"
-#include "gutil/optionArgs.h"
+#include "strEsc.h"
 #include <sstream>
 #include "logWriter.h"
 
@@ -39,31 +39,36 @@ class MainModule
     public:
         bool run();
 
-        MainModule();
+        MainModule(int port);
     private:
         GstThread gstThread_;
         TcpThread tcpThread_;
 
-        int port_;
 };
 
 
-MainModule::MainModule()
-    : BaseModule(), gstThread_(), tcpThread_(10000), port_(0)
+MainModule::MainModule(int port)
+    : BaseModule(), gstThread_(), tcpThread_(port)
 {
 //args_.push_back(new IntArg(&port_, "tcpPort", 'p', "Set the tcp incomming port","port num"));
 }
 
 
-int main (int , char** )
+int main (int argc, char** argv)
 {
-    MainModule m;
-    //OptionArgs opts;
+    int port;
+    if(argc != 2)
+    {
+        LOG_INFO("Must provide a port");
+        return -1;
+    }
+    if(sscanf(argv[1],"%d",&port) != 1 || port < 1 || port > 65000)
+    {
+        LOG_INFO("Port must be in the range of 1-65000");
+        return -1;
+    }
 
-//    opts.add(m.get_args());
-
-//    if(!opts.parse(argc, argv))
-//       return 1;
+    MainModule m(port);
     m.run();
     return 0;
 }
@@ -76,10 +81,7 @@ bool MainModule::run()
 
     if(!gstThread_.run())
         return 0;
-    std::stringstream s;
-    s << port_;
 
-    //tcpThread_.set_local_port(s.str());
 
     if(!tcpThread_.run())
         return 0;
@@ -89,7 +91,7 @@ bool MainModule::run()
         std::string& mstr = m.getMsg();
         GstMsg gmsg = gst_queue.timed_pop(1000);
         if (!gmsg.getMsg().empty())
-            LOG_DEBUG(gmsg.getMsg());
+            LOG_DEBUG(strEsq(gmsg.getMsg()));
 
         if (mstr.empty())
             continue;
