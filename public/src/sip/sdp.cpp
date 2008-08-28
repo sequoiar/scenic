@@ -39,8 +39,8 @@ Sdp::Sdp( )
 }
 
 
-Sdp::Sdp( std::string ip_addr )
-    : _sdpMediaList(0), _ip_addr( ip_addr ), _local_offer( NULL ), negociator(NULL)
+    Sdp::Sdp( std::string ip_addr )
+: _sdpMediaList(0), _ip_addr( ip_addr ), _local_offer( NULL ), negociator(NULL)
 {
     //setCodecsList();
 }
@@ -60,7 +60,7 @@ void Sdp::setSDPMedia( std::string type, std::string codecs, int port ){
 
     // If no media of this type has been already created
     for( k = 0 ; k<(int)_sdpMediaList.size() ; k++ ) {
-        if( strcmp( _sdpMediaList[k]->getMediaStr().c_str(), type.c_str()) == 0 ){
+        if( strcmp( _sdpMediaList[k]->getMediaTypeStr().c_str(), type.c_str()) == 0 ){
             std::cout << "retrieve existing media" << std::endl;
             iter = _sdpMediaList.begin()+k;
             _sdpMediaList.erase(iter);
@@ -92,7 +92,7 @@ void Sdp::setSDPMedia( std::string type, std::string codecs, int port ){
 
 
 void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
-                                  pjmedia_sdp_media** p_med ) {
+        pjmedia_sdp_media** p_med ) {
     pjmedia_sdp_media* med;
     pjmedia_sdp_rtpmap rtpmap;
     pjmedia_sdp_attr *attr;
@@ -103,7 +103,7 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
 
     // Get the right media format
     pj_strdup(pool, &med->desc.media,
-              ( media->getType() == MIME_TYPE_AUDIO ) ? &STR_AUDIO : &STR_VIDEO );
+            ( media->getMediaType() == MIME_TYPE_AUDIO ) ? &STR_AUDIO : &STR_VIDEO );
     med->desc.port_count = 1;
     std::cout <<  media->getPort() << std::endl;
     med->desc.port = media->getPort();
@@ -118,19 +118,26 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
         codec = media->getMediaCodecList()[i];
         pj_strdup2( pool, &med->desc.fmt[i], codec->getPayloadStr().c_str());
 
-        // Add a rtpmap field for dynamic payload
-        if( !codec->isPayloadStatic() ) {
-            rtpmap.pt = med->desc.fmt[i];
-            rtpmap.enc_name = pj_str( (char*) codec->getName().c_str() );
-            rtpmap.clock_rate = codec->getClockrate();
-            // Add the channel number only if different from 1
-            if( codec->getChannels() > 1 )
-                rtpmap.param = pj_str( (char*) codec->getChannelsStr().c_str() );
-            else
-                rtpmap.param.slen = 0;
-            pjmedia_sdp_rtpmap_to_attr( pool, &rtpmap, &attr );
-            med->attr[ med->attr_count++] = attr;
-        }
+        // Add a rtpmap field for each codec
+        // We could add one only for dynamic payloads because the codecs with static RTP payloads 
+        // are entirely defined in the RFC 3351, but if we want to add other attributes like an asymmetric
+        // connection, the rtpmap attribute will be useful to specify for which codec it is applicable
+        rtpmap.pt = med->desc.fmt[i];
+        rtpmap.enc_name = pj_str( (char*) codec->getName().c_str() );
+        rtpmap.clock_rate = codec->getClockrate();
+        // Add the channel number only if different from 1
+        if( codec->getChannels() > 1 )
+            rtpmap.param = pj_str( (char*) codec->getChannelsStr().c_str() );
+        else
+            rtpmap.param.slen = 0;
+        pjmedia_sdp_rtpmap_to_attr( pool, &rtpmap, &attr );
+        med->attr[ med->attr_count++] = attr;
+
+        // Add the direction stream
+        attr = (pjmedia_sdp_attr*)pj_pool_zalloc( pool, sizeof(pjmedia_sdp_attr) );
+        attr->name = pj_str((char*)media->getStreamDirectionStr().c_str());
+        med->attr[ med->attr_count++] = attr;
+
     }
 
     *p_med = med;
@@ -138,6 +145,9 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
 
 
 int Sdp::createLocalOffer( pj_pool_t *pool ){
+
+    pj_status_t status;
+
     // Reference: RFC 4566 [5]
 
     /* Create and initialize basic SDP session */
@@ -150,8 +160,13 @@ int Sdp::createLocalOffer( pj_pool_t *pool ){
     sdp_addSessionName();
     sdp_addConnectionInfo();
     sdp_addTiming();
-    sdp_addAttributes( pool );
+    //sdp_addAttributes( pool );
     sdp_addMediaDescription( pool );
+
+    // Validate the sdp session
+    status = pjmedia_sdp_validate( this->_local_offer );
+    if (status != PJ_SUCCESS)
+        return status;
 
     return PJ_SUCCESS;
 }
@@ -188,7 +203,7 @@ int Sdp::receivingInitialOffer( pj_pool_t* pool, pjmedia_sdp_session* remote ){
     createLocalOffer( pool );
 
     status = pjmedia_sdp_neg_create_w_remote_offer( pool,
-                                                    getLocalSDPSession(), remote, &negociator );
+            getLocalSDPSession(), remote, &negociator );
     state = pjmedia_sdp_neg_get_state( negociator );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
@@ -233,7 +248,6 @@ void Sdp::sdp_addTiming( void ){
     this->_local_offer->time.start = this->_local_offer->time.stop = 0;
 }
 
-
 void Sdp::sdp_addAttributes( pj_pool_t *pool ){
     pjmedia_sdp_attr *a;
     this->_local_offer->attr_count = 1;
@@ -241,7 +255,6 @@ void Sdp::sdp_addAttributes( pj_pool_t *pool ){
     a->name=STR_SENDRECV;
     _local_offer->attr[0] = a;
 }
-
 
 void Sdp::sdp_addMediaDescription( pj_pool_t* pool ){
     pjmedia_sdp_media* med;

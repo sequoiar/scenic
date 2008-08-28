@@ -30,6 +30,26 @@
  *          it maintains internally a list of codecs to use in the SDP session and negociation
  */
 
+enum streamDirection {
+    SEND_RECEIVE,
+    SEND_ONLY,
+    RECEIVE_ONLY,
+    INACTIVE
+};
+
+typedef enum streamDirection streamDirection;
+
+enum mediaType {
+    AUDIO,
+    VIDEO,
+    APPLICATION,
+    TEXT,
+    IMAGE,
+    MESSAGE
+};
+
+typedef enum mediaType mediaType;
+
 class sdpMedia
 {
     public:
@@ -45,13 +65,12 @@ class sdpMedia
         /*
          * Read accessor. Return the type of media
          */
-        int getType() { return _type; }
+        mediaType getMediaType() { return _mediaType; }
 
         /*
          * Read accessor. Return the type of media
          */
-        std::string getMediaStr() { return _mediaStr; }
-
+        std::string getMediaTypeStr();
 
         /*
          * Read accessor. Return the transport port
@@ -78,18 +97,24 @@ class sdpMedia
 
         std::string toString( void );
 
-    private:
-        /* The type of media ( AUDIO/ VIDEO ..) */
-        int _type;
+        void setStreamDirection( int direction ) { _streamType = (streamDirection)direction; }
 
-        /* The media type, string form */
-        std::string _mediaStr;
+        streamDirection getStreamDirection( void ) { return _streamType; }
+
+        std::string getStreamDirectionStr( void );
+
+    private:
+        /* The type of media */
+        mediaType _mediaType;
 
         /* The media codec vector */
         std::vector< sdpCodec* > _codecList;
 
-        /* the tranport port */
+        /* the transport port */
         int _port;
+
+        /* The stream direction */
+        streamDirection _streamType;
 };
 
 #endif // _SDP_MEDIA

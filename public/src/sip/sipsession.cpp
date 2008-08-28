@@ -64,7 +64,6 @@ int SIPSession::shutdown( void ){
 
 
 int SIPSession::reinvite( void ){
-    std::cout << "sdfdafvad" << std::endl;
     return _app_ua->inv_session_reinvite();
 }
 
@@ -102,7 +101,7 @@ std::string SIPSession::mediaToString( void ){
 
 
 bool SIPSession::incomingInvite( void ){
-    return (strcmp(getConnectionState().c_str(), "CONNECTION_STATE_RINGING") == 0 );
+    return _app_ua->hasIncomingCall();
 }
 
 void SIPSession::setAutoAnswer( bool mode ){

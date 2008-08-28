@@ -141,7 +141,7 @@ class sdpCodec
         /* The media type */
         int _m_type;
 
-        /* The RTP paylaod */
+        /* The RTP payload */
         int _payload;
 
         /* The codec clock rate */

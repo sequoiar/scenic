@@ -134,7 +134,7 @@ static const char *stateStr[] =
 {
     "CONNECTION_STATE_NULL",
     "CONNECTION_STATE_CONNECTING",
-    "CONNECTION_STATE_RINGING",
+    "CONNECTION_STATE_INCOMING",
     "CONNECTION_STATE_CONNECTED",
     "CONNECTION_STATE_DISCONNECTED",
     "CONNECTION_STATE_TIMEOUT"
@@ -231,8 +231,11 @@ connectionState UserAgent::getConnectionState( void ){
 }
 
 void UserAgent::setInviteAutoAnswer( bool mode ){
-    
     INVITE_AUTO_ANSWER = mode;
+}
+
+bool UserAgent::hasIncomingCall( void ){
+    return getConnectionState() == CONNECTION_STATE_INCOMING;
 }
 
 void UserAgent::init_sip_module( void ){
@@ -371,6 +374,8 @@ int UserAgent::inv_session_create( std::string uri ){
         // Update the connection status. The invite session has been created and sent.
         _state = CONNECTION_STATE_CONNECTING;
 
+        //while( _state != CONNECTION_STATE_CONNECTED ){}
+
         return PJ_SUCCESS;
     }
 
@@ -395,13 +400,13 @@ int UserAgent::inv_session_end( void ){
     return !PJ_SUCCESS;
 }
 
-
 int UserAgent::inv_session_reinvite( void ){
     pj_status_t status;
     pjsip_tx_data *tdata;
 
     if( _state == CONNECTION_STATE_CONNECTED ) {
-        local_sdp->createInitialOffer( inv_session->dlg->pool );
+        status = local_sdp->createInitialOffer( inv_session->dlg->pool );
+        PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         status = pjsip_inv_reinvite( inv_session, NULL,
                                      local_sdp->getLocalSDPSession(), &tdata );
@@ -414,7 +419,6 @@ int UserAgent::inv_session_reinvite( void ){
     }
     return !PJ_SUCCESS;
 }
-
 
 int UserAgent::inv_session_accept( void ) {
     
@@ -465,7 +469,6 @@ int UserAgent::inv_session_refuse( void ) {
     return PJ_SUCCESS;
 }
 
-
 int UserAgent::sendInstantMessage( std::string msg ){
     pj_status_t status;
 
@@ -481,7 +484,6 @@ int UserAgent::sendInstantMessage( std::string msg ){
     }
     return !PJ_SUCCESS;
 }
-
 
 static int startThread( void *arg ){
     PJ_UNUSED_ARG(arg);
@@ -499,11 +501,9 @@ void UserAgent::setSessionMedia( std::string type, std::string codecs, int port 
     local_sdp->setSDPMedia( type, codecs, port );
 }
 
-
 std::string UserAgent::mediaToString( void ){
     return local_sdp->mediaToString();
 }
-
 
 static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
     pjmedia_sdp_session *sdp;
@@ -517,7 +517,6 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
 
     *r_sdp = sdp;
 }
-
 
 /********************** Callbacks Implementation **********************************/
 
@@ -537,13 +536,16 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
         cout << "Call state confirmed " << endl;
         _state = CONNECTION_STATE_CONNECTED;
     }
+    
+    else if( inv->state == PJSIP_INV_STATE_INCOMING ){
+        _state = CONNECTION_STATE_INCOMING;
+    }
 
     else{
         cout << "Call state changed to " << pjsip_inv_state_name(inv->state) << endl;
         cout << "Call state changed to " << inv->state << endl;
     }
 }
-
 
 static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     pj_status_t status;
@@ -597,9 +599,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     status = pjsip_inv_send_msg( inv_session, tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    // Update the connection state
-    _state = CONNECTION_STATE_RINGING;
-
+    // Auto answer to the invite session or not
     if( INVITE_AUTO_ANSWER ){
         inv_session_answer();
     }

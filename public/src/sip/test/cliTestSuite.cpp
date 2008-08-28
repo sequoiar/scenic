@@ -39,7 +39,7 @@ int main(int argc, char** argv){
 
     for(;;) {
         if( sip->incomingInvite() ){
-            cout << "incoming call";
+            cout << "Incoming call: ";
             cout << "accept(a) or refuse (r) ";
             cin >> input;
 
@@ -52,8 +52,9 @@ int main(int argc, char** argv){
                     sip->refuse();
                     break;
                 default:
-                    cout << "What?";
+                    sip->accept();
                     break;
+
             }
         }
         cout << "<<<< ";

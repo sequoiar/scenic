@@ -22,31 +22,43 @@
 #include <sstream>
 #include <iostream>
 
+
+static const char* streamDirectionStr[] = 
+{
+    "sendrecv",
+    "sendonly",
+    "recvonly",
+    "inactive"
+};
+
+static const char* mediaTypeStr[] =
+{
+    "audio",
+    "video",
+    "application",
+    "text",
+    "image",
+    "message"
+};
+
 sdpMedia::sdpMedia( int type )
-    : _type( type ), _mediaStr(""), _codecList(0), _port( 0 ){
-    switch( type )
-    {
-        case MIME_TYPE_AUDIO:
-            _mediaStr = "audio";
-            break;
-        case MIME_TYPE_VIDEO:
-            _mediaStr = "video";
-            break;
-        default:
-            _mediaStr = "unknown";
-            break;
-    }
+    : _mediaType( (mediaType)type ), _codecList(0), _port( 0 ), _streamType( SEND_RECEIVE ){
+    
 }
 
 
 sdpMedia::sdpMedia( std::string media, int port )
-    : _type( -1 ), _mediaStr(media), _codecList(0), _port( port ){
-    if( media == "audio" )
-        _type = MIME_TYPE_AUDIO;
-    else if ( media == "video" )
-        _type = MIME_TYPE_VIDEO;
-    else
-        _type = MIME_TYPE_UNKNOWN;
+    : _mediaType( (mediaType)-1 ), _codecList(0), _port( port ), _streamType( SEND_RECEIVE){
+
+    unsigned int i;
+    const char* tmp;
+
+    for( i=0 ; i<sizeof(mediaTypeStr) ; i++){
+        tmp = mediaTypeStr[i];
+        if( strcmp(media.c_str(), tmp) == 0 ){
+            _mediaType = (mediaType)i;
+        }
+    }
 }
 
 
@@ -57,6 +69,13 @@ sdpMedia::~sdpMedia()
         delete _codecList[i];
 }
 
+std::string sdpMedia::getMediaTypeStr( void ){
+
+    std::string value;
+
+    value = mediaTypeStr[ _mediaType ];
+    return value;
+}
 
 void sdpMedia::addCodec( sdpCodec *codec ){
     _codecList.push_back(codec);
@@ -67,7 +86,7 @@ void sdpMedia::addCodec( std::string codecName ){
     // We have to build the codec from its encoding name
     sdpCodec *codec;
 
-    codec = new sdpCodec( _type, codecName );
+    codec = new sdpCodec( _mediaType, codecName );
     _codecList.push_back(codec);
 }
 
@@ -100,6 +119,14 @@ void sdpMedia::clearCodecList( void ) {
     _codecList.clear();
 }
 
+std::string sdpMedia::getStreamDirectionStr( void ) {
+
+    std::string value;
+
+    value = streamDirectionStr[ _streamType ];
+    return value;
+
+}
 
 std::string sdpMedia::toString( void ){
     std::ostringstream display;
@@ -107,7 +134,7 @@ std::string sdpMedia::toString( void ){
 
     size = _codecList.size();
 
-    display << "TYPE = " << _mediaStr << std::endl;
+    display << "TYPE = " << getMediaTypeStr() << std::endl;
     display << "PORT = " << getPort() << std::endl;
     display << "CODECS = ";
     for(i=0; i<size; i++){
