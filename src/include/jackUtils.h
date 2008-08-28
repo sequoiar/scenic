@@ -27,6 +27,7 @@
 #define _JACK_UTILS_H_
 
 #include <jack/jack.h>
+#include <iostream>
 
 static bool jack_is_running()
 {

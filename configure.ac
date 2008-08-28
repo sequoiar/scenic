@@ -46,10 +46,17 @@ if test "x${have_cpptest}" = "xfalse" ; then
 fi
 
 
-#Trying to set CPPTEST_LIBS using pkg-config
+#Trying to set GLIB using pkg-config
 PKG_CHECK_MODULES(GLIB, [glib-2.0 gthread-2.0], have_glib=true, have_glib=false)
 if test "x${have_glib}" = "xfalse" ; then
     AC_MSG_ERROR([glib not found.])
+fi
+
+
+#Trying to set GTK+-2.0 using pkg-config
+PKG_CHECK_MODULES(GTK, [gtk+-2.0], have_gtk=true, have_gtk=false)
+if test "x${have_gtk}" = "xfalse" ; then
+    AC_MSG_ERROR([gtk not found.])
 fi
 
 #Trying to set GST_CFLAGS GST_LIBS using pkg-config
