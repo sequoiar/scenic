@@ -26,6 +26,7 @@
 
 #include "mediaBase.h"
 #include "videoConfig.h"
+#include "videoSink.h"
 #include "rtpSender.h"
 
 class VideoSource;
@@ -55,7 +56,8 @@ class VideoSender
         const VideoConfig &config_;
         RtpSender session_;
         VideoSource *source_;
-        GstElement *colorspc_, *encoder_, *payloader_, *sink_;
+        GstElement *colorspc_, *encoder_, *payloader_;//, *sink_;
+        VideoSink sink_;
 
         // hidden
 

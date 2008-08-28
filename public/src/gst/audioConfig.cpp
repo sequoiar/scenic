@@ -27,7 +27,6 @@
 #include <iostream>
 #include "audioConfig.h"
 #include "audioSource.h"
-#include "logWriter.h"
 
 AudioConfig::AudioConfig(const std::string &source__,
     int numChannels__,

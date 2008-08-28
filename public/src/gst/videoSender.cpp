@@ -26,12 +26,13 @@
 #include "gstLinkable.h"
 #include "videoSender.h"
 #include "videoSource.h"
+#include "videoSink.h"
 //#include "logWriter.h"
 
 
 VideoSender::VideoSender(const VideoConfig & config)
-    : config_(config), session_(), source_(0), colorspc_(0), encoder_(0), payloader_(0),
-    sink_(0)
+    : config_(config), session_(), source_(0), colorspc_(0), encoder_(0), payloader_(0), 
+    sink_()
 {
     // empty
 }
@@ -40,7 +41,7 @@ VideoSender::VideoSender(const VideoConfig & config)
 VideoSender::~VideoSender()
 {
     assert(stop());
-    pipeline_.remove(sink_);
+    //pipeline_.remove(sink_);
     pipeline_.remove(payloader_);
     pipeline_.remove(encoder_);
     pipeline_.remove(colorspc_);
@@ -58,7 +59,7 @@ void VideoSender::init_source()
 void VideoSender::init_codec()
 {
     if (config_.has_h264()) {
-        assert(colorspc_ = gst_element_factory_make("ffmpegcolorspace", NULL));
+        assert(colorspc_ = gst_element_factory_make("ffmpegcolorspace", "colorspc"));
         pipeline_.add(colorspc_);
 
         assert(encoder_ = gst_element_factory_make("x264enc", NULL));
@@ -66,7 +67,8 @@ void VideoSender::init_codec()
                      NULL);
         pipeline_.add(encoder_);
 
-        source_->link_element(colorspc_);
+        //source_->link_element(colorspc_);
+        GstLinkable::link(*source_, colorspc_);
         GstLinkable::link(colorspc_, encoder_);
     }
 }
@@ -81,10 +83,15 @@ void VideoSender::init_sink()
         session_.add(payloader_, &config_);
     }
     else {                 // local test only, no encoding
-        assert(sink_ = gst_element_factory_make("xvimagesink", NULL));
+#if 0
+        assert(sink_ = gst_element_factory_make("xvimagesink", "videosink"));
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+        g_object_set(G_OBJECT(sink_), "force-aspect-ratio", FALSE, NULL);
         pipeline_.add(sink_);
-        source_->link_element(sink_);
+#endif
+        //source_->link_element(sink_);
+        sink_.init();
+        GstLinkable::link(*source_, sink_);   // this shouldn't happen for VideoFileSource
     }
 }
 

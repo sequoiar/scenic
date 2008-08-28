@@ -24,7 +24,6 @@
 #include <string>
 
 #include "lo/lo.h"
-
 #include "mediaBase.h"
 #include "audioConfig.h"
 #include "rtpReceiver.h"

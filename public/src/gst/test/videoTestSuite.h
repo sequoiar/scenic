@@ -24,7 +24,7 @@
 #include <cpptest.h>
 #include "gstTestSuite.h"
 
-#define LOCAL 0
+#define LOCAL 1
 #define RTP 0
 
 class VideoTestSuite
@@ -56,6 +56,9 @@ class VideoTestSuite
             TEST_ADD(VideoTestSuite::start_file_rtp)
             TEST_ADD(VideoTestSuite::stop_file_rtp)
             TEST_ADD(VideoTestSuite::start_stop_file_rtp)
+            TEST_ADD(VideoTestSuite::start_dv_rtp)
+            TEST_ADD(VideoTestSuite::stop_dv_rtp)
+            TEST_ADD(VideoTestSuite::start_stop_dv_rtp)
 #endif  // RTP
 
             /*----------------------------------------------*/
@@ -64,9 +67,6 @@ class VideoTestSuite
             /*  Put newer tests here and set all defs to 0  */
             /*  to test them by themselves.                 */
             /*----------------------------------------------*/
-            TEST_ADD(VideoTestSuite::start_dv_rtp)
-            TEST_ADD(VideoTestSuite::stop_dv_rtp)
-            TEST_ADD(VideoTestSuite::start_stop_dv_rtp)
         }
 
 
