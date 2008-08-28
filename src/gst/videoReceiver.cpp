@@ -30,7 +30,7 @@
 //#include "logWriter.h"
 
 VideoReceiver::VideoReceiver(const VideoConfig & config)
-    : config_(config), session_(), depayloader_(0), decoder_(0), sink_(0)
+    : config_(config), session_(), depayloader_(0), decoder_(0), sink_()
 {
     // empty
 }
@@ -39,7 +39,7 @@ VideoReceiver::VideoReceiver(const VideoConfig & config)
 VideoReceiver::~VideoReceiver()
 {
     assert(stop());
-    pipeline_.remove(sink_);
+    //pipeline_.remove(sink_);
     pipeline_.remove(decoder_);
     pipeline_.remove(depayloader_);
 }
@@ -63,10 +63,14 @@ void VideoReceiver::init_codec()
 
 void VideoReceiver::init_sink()
 {
-    assert(sink_ = gst_element_factory_make("xvimagesink", NULL));
+    sink_.init();
+#if 0
+    assert(sink_ = gst_element_factory_make("xvimagesink", "videosink"));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
 
     pipeline_.add(sink_);
+#endif
     GstLinkable::link(decoder_, sink_);
 }
 

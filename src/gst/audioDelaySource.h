@@ -24,7 +24,7 @@
 #include <cassert>
 #include "gstBase.h"
 
-// FIXME:  requires a specialization for AudioFileSrc that deinterleaves and interleaves the signal
+// FIXME:  requires a specialization for AudioFileSrc that deinterleaves and interleaves the signal?
 
 template <typename T>
 class AudioDelaySource

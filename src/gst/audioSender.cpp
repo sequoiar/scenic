@@ -26,9 +26,9 @@
 
 #ifdef USE_OSC
 #include "lo/lo.h"
+#include "logWriter.h"
 #endif
 
-#include "logWriter.h"
 #include "audioSender.h"
 #include "audioSource.h"
 #include "jackUtils.h"

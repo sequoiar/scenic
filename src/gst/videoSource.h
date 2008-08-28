@@ -21,18 +21,19 @@
 #define _VIDEO_SOURCE_H_
 
 #include <cassert>
-#include "gstBase.h"
+#include "gstLinkable.h"
 
 class VideoConfig;
 
 class VideoSource
-    : public GstBase
+    : public GstLinkableSource
 {
     public:
         ~VideoSource();
         void init();
+        GstElement *srcElement() { return source_; }
         virtual void sub_init() = 0;
-        virtual void link_element(GstElement *sinkElement);
+        //virtual void link_element(GstElement *sinkElement);
 
     protected:
         explicit VideoSource(const VideoConfig &config);
@@ -75,8 +76,9 @@ class VideoFileSource
         explicit VideoFileSource(const VideoConfig &config)
             : VideoSource(config), decoder_(0), sinkElement_(0) {}
         ~VideoFileSource();
+        GstElement *srcElement() { return 0; }      // FIXME: HACK
         void sub_init();
-        void link_element(GstElement *sinkElement);
+        //void link_element(GstElement *sinkElement);
 
     private:
         GstElement *decoder_, *sinkElement_;
@@ -92,7 +94,8 @@ class VideoDvSource
 {
     public:
         explicit VideoDvSource(const VideoConfig &config);
-        void link_element(GstElement *sinkElement);
+        //void link_element(GstElement *sinkElement);
+        GstElement *srcElement() { return dvdec_; }
         void sub_init();
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data);
 

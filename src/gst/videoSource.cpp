@@ -41,10 +41,12 @@ void VideoSource::init()
 }
 
 
+#if 0
 void VideoSource::link_element(GstElement *sinkElement)
 {
     GstLinkable::link(source_, sinkElement);
 }
+#endif
 
 
 VideoSource::~VideoSource()
@@ -112,6 +114,14 @@ void VideoFileSource::sub_init()
     g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
     GstLinkable::link(source_, decoder_);
 
+    if (config_.isNetworked())
+        assert(sinkElement_ = pipeline_.findElement("colorspc"));
+    else
+    {
+        assert(sinkElement_ = pipeline_.findElement("videosink"));
+        g_object_set(G_OBJECT(sinkElement_), "sync", TRUE, NULL);
+    }
+
     // bind callback
     g_signal_connect(decoder_, "new-decoded-pad",
                      G_CALLBACK(VideoFileSource::cb_new_src_pad),
@@ -119,6 +129,7 @@ void VideoFileSource::sub_init()
 }
 
 
+#if 0
 void VideoFileSource::link_element(GstElement *sinkElement)
 {
     // defer linking of decoder to this element to callback
@@ -128,6 +139,7 @@ void VideoFileSource::link_element(GstElement *sinkElement)
     if (!strncmp(gst_element_get_name(sinkElement_), "xvimagesink", strlen("xvimagesink")))
         g_object_set(G_OBJECT(sinkElement_), "sync", TRUE, NULL);
 }
+#endif
 
 
 void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean  /*last*/,
@@ -145,6 +157,9 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
     GstCaps *caps;
 
     sinkPad = gst_element_get_static_pad(context->sinkElement_, "sink");
+    //GstElement *videoSink = gst_bin_get_by_name(GST_BIN(context->pipeline_), "videosink");
+    //sinkPad = gst_element_get_static_pad(videosink, "sink");
+
     if (GST_PAD_IS_LINKED(sinkPad))
     {
         g_object_unref(sinkPad);        // don't link more than once
@@ -178,12 +193,12 @@ VideoDvSource::VideoDvSource(const VideoConfig &config)
     : VideoSource(config), demux_(0), queue_(0), dvdec_(0)
 {}
 
-
+#if 0
 void VideoDvSource::link_element(GstElement *sinkElement)
 {
     GstLinkable::link(dvdec_, sinkElement);
 }
-
+#endif
 
 void VideoDvSource::sub_init()
 {

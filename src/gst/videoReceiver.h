@@ -24,6 +24,7 @@
 #include "mediaBase.h"
 #include "videoConfig.h"
 #include "rtpReceiver.h"
+#include "videoSink.h"
 
 class VideoReceiver
     : public MediaBase
@@ -45,7 +46,8 @@ class VideoReceiver
 
         const VideoConfig &config_;
         RtpReceiver session_;
-        GstElement *depayloader_, *decoder_, *sink_;
+        GstElement *depayloader_, *decoder_;// *sink_;
+        VideoSink sink_;
 
         VideoReceiver(const VideoReceiver&); //No Copy Constructor
         VideoReceiver& operator=(const VideoReceiver&); //No Assignment Operator

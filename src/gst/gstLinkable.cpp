@@ -53,8 +53,14 @@ void GstLinkable::link(GstElement *src, GstLinkableSink &sink)
 
 
 void GstLinkable::link(GstLinkableSource &src, GstLinkableSink &sink)
-{
-    assert(gst_element_link(src.srcElement(), sink.sinkElement()));
+{      
+    GstElement *srcElement = src.srcElement();
+    GstElement *sinkElement = sink.sinkElement();
+
+    //FIXME: this is a hack to deal with leaf classes that don't implement srcElement 
+    //and/or sinkElement
+    if (srcElement && sinkElement)
+        assert(gst_element_link(srcElement, sinkElement));
 }
 
 

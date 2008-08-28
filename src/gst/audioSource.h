@@ -20,9 +20,7 @@
 #ifndef _AUDIO_SOURCE_H_
 #define _AUDIO_SOURCE_H_
 
-#include <cassert>
 #include "gstLinkable.h"
-#include "logWriter.h"
 #include "interleave.h"
 
 #include "audioDelaySource.h"
@@ -145,7 +143,7 @@ class AudioDvSource
 
     protected:
         void link_elements();
-        GstElement *srcElement() { LOG("asked for audiodvsrc src", DEBUG); return aconvs_[0]; }
+        GstElement *srcElement() { return aconvs_[0]; }
 
         GstElement *demux_, *queue_;
         AudioDvSource(const AudioDvSource&);     //No Copy Constructor

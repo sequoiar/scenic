@@ -28,20 +28,20 @@ class GstLinkableSink;
 
 namespace GstLinkable 
 {
-        typedef std::vector<GstElement *>::iterator GstIter;
-        
-        bool link_pads(GstPad *srcPad, GstPad *sinkPad);
-        void link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks);
-        void link(GstElement *src, GstElement *sink);
-        void link(GstLinkableSource &src, GstElement *sink);
-        void link(GstElement *src, GstLinkableSink &sink);
-        void link(GstLinkableSource &src, GstLinkableSink &sink);
-        void link(std::vector<GstElement*> &sources, GstLinkableSink &sink);
-        void link(GstLinkableSource &source, std::vector<GstElement*> &sinks);
+    typedef std::vector<GstElement *>::iterator GstIter;
+
+    bool link_pads(GstPad *srcPad, GstPad *sinkPad);
+    void link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks);
+    void link(GstElement *src, GstElement *sink);
+    void link(GstLinkableSource &src, GstElement *sink);
+    void link(GstElement *src, GstLinkableSink &sink);
+    void link(GstLinkableSource &src, GstLinkableSink &sink);
+    void link(std::vector<GstElement*> &sources, GstLinkableSink &sink);
+    void link(GstLinkableSource &source, std::vector<GstElement*> &sinks);
 }
 
 class GstLinkableSource 
-    : virtual public GstBase
+: virtual public GstBase
 {
     public:
         virtual GstElement *srcElement() = 0;
@@ -49,14 +49,14 @@ class GstLinkableSource
 
 
 class GstLinkableSink
-    : virtual public GstBase
+: virtual public GstBase
 {
     public:
         virtual GstElement *sinkElement() = 0;
 };
 
 class GstLinkableFilter
-    : public GstLinkableSource, public GstLinkableSink
+: public GstLinkableSource, public GstLinkableSink
 {
 };
 
