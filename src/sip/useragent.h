@@ -50,7 +50,7 @@
 enum connectionState {
     CONNECTION_STATE_NULL,
     CONNECTION_STATE_CONNECTING,
-    CONNECTION_STATE_RINGING,
+    CONNECTION_STATE_INCOMING,
     CONNECTION_STATE_CONNECTED,
     CONNECTION_STATE_DISCONNECTED,
     CONNECTION_STATE_TIMEOUT
@@ -115,6 +115,8 @@ class UserAgent
         connectionState getConnectionState( void );
 
         void setInviteAutoAnswer( bool mode );
+
+        bool hasIncomingCall( void );
 
     private:
         /*

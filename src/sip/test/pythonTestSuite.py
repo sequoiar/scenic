@@ -36,7 +36,7 @@ uac = sip.SIPSession( port )
 uac.setMedia("audio", "vorbis/PCMA/", 12345)
 print step+success
 
-step = " \nDialog invite session creation ........................................................................................ "
+step = " \nDialog invite session creation ................................................................................. "
 status = connect()
 if(status == 0):
     print step+success
@@ -49,6 +49,7 @@ while( uac.getConnectionState() != 'CONNECTION_STATE_CONNECTED' ):
         print step+failure;
         sys.exit(0)
     pass
+print step+success
 
 step = " \nList the enabled media list ....................................................................................  "
 list = uac.mediaToString();
@@ -56,17 +57,17 @@ print list
 print step+success
 
 step = " \nChange the media and list it ...................................................................................  "
-#uac.setMedia("audio", "PCMA/vorbis/", 12345)
+uac.setMedia("audio", "PCMA/vorbis/", 12345)
 list = uac.mediaToString()
 print list
 print step+success
 
-#step = " \nReinvite the UAS with the new media description .................................................................."
-#status = uac.reinvite()
-#if(status == 0):
-#    print step+success
-#else:
-#    print step+failure
+step = " \nReinvite the UAS with the new media description .................................................................."
+status = uac.reinvite()
+if(status == 0):
+    print step+success
+else:
+    print step+failure
 
 step = " \nChat test. Envoi du message 'SALUT' .............................................................................. "
 uac.sendInstantMessage("SALUT")
