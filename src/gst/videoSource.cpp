@@ -114,6 +114,7 @@ void VideoFileSource::sub_init()
     g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
     GstLinkable::link(source_, decoder_);
 
+#if 0
     if (config_.isNetworked())
         assert(sinkElement_ = pipeline_.findElement("colorspc"));
     else
@@ -121,6 +122,7 @@ void VideoFileSource::sub_init()
         assert(sinkElement_ = pipeline_.findElement("videosink"));
         g_object_set(G_OBJECT(sinkElement_), "sync", TRUE, NULL);
     }
+#endif
 
     // bind callback
     g_signal_connect(decoder_, "new-decoded-pad",
@@ -155,10 +157,19 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
     GstStructure *str;
     GstPad *sinkPad;
     GstCaps *caps;
+    GstElement *sinkElement;
 
-    sinkPad = gst_element_get_static_pad(context->sinkElement_, "sink");
-    //GstElement *videoSink = gst_bin_get_by_name(GST_BIN(context->pipeline_), "videosink");
-    //sinkPad = gst_element_get_static_pad(videosink, "sink");
+    //sinkPad = gst_element_get_static_pad(context->sinkElement_, "sink");
+    // FIXME: HACK!!!!
+    if (context->config_.isNetworked())
+        sinkElement = context->pipeline_.findElement("colorspc");
+    else
+    {
+        sinkElement = context->pipeline_.findElement("videosink");
+        g_object_set(G_OBJECT(sinkElement), "sync", TRUE, NULL);
+    }
+    
+    sinkPad = gst_element_get_static_pad(sinkElement, "sink");
 
     if (GST_PAD_IS_LINKED(sinkPad))
     {
