@@ -74,14 +74,14 @@ class VideoFileSource
 {
     public:
         explicit VideoFileSource(const VideoConfig &config)
-            : VideoSource(config), decoder_(0), sinkElement_(0) {}
+            : VideoSource(config), decoder_(0) {}
         ~VideoFileSource();
         GstElement *srcElement() { return 0; }      // FIXME: HACK
         void sub_init();
         //void link_element(GstElement *sinkElement);
 
     private:
-        GstElement *decoder_, *sinkElement_;
+        GstElement *decoder_;
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
                                    void *data);
 

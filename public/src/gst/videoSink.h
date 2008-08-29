@@ -33,6 +33,7 @@ class VideoSink
         VideoSink() : sink_(0), window_(0) {};
         ~VideoSink();
         void init();
+        void showWindow();
 
     private:
         GstElement *sinkElement() { return sink_; } 

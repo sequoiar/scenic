@@ -20,12 +20,15 @@
 #include <iostream>
 #include <string>
 #include <cassert>
-#include "gstLinkable.h"
-#include "videoSink.h"
+
 #include <gtk/gtk.h>
 #include <gst/interfaces/xoverlay.h>
 #include <gdk/gdk.h>
 #include <gdk/gdkx.h>
+
+#include "gstLinkable.h"
+#include "videoSink.h"
+#include "logWriter.h"
 
 
 gboolean VideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
@@ -39,7 +42,10 @@ gboolean VideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gp
 gboolean VideoSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
     if (event->keyval != 'f')
+    {
+        g_print("you didn't hit f, jerk\n");
         return TRUE;
+    }
     else 
         g_print("you hit f\n");
 
@@ -57,7 +63,9 @@ gboolean VideoSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gp
 // parts of sub_init that are common to all VideoSource classes
 void VideoSink::init()
 {
-    gtk_init(0, NULL);
+    static bool gtk_initialized = false;
+    if (!gtk_initialized)
+        gtk_init(0, NULL);
 
     assert(sink_ = gst_element_factory_make("xvimagesink", "videosink"));
     pipeline_.add(sink_);
@@ -68,7 +76,11 @@ void VideoSink::init()
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(VideoSink::expose_cb), static_cast<void*>(sink_));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event", G_CALLBACK(VideoSink::key_press_event_cb), NULL);
-    
+}
+
+
+void VideoSink::showWindow()
+{
     gtk_widget_show_all(window_);
 }
 
@@ -77,6 +89,11 @@ VideoSink::~VideoSink()
 {
     assert(stop());
     pipeline_.remove(sink_);
+    if (window_)
+    {
+        LOG("Widget destroyed", DEBUG);
+        gtk_widget_destroy(window_);
+    }
 }
 
 

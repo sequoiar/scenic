@@ -29,3 +29,9 @@ void GstTestSuite::set_id(int id)
 }
 
 
+gboolean GstTestSuite::killMainLoop(gpointer data)
+{ 
+    GMainLoop *loop = static_cast<GMainLoop *>(data);
+    g_main_loop_quit(loop); 
+    return FALSE;       // won't be called again
+}

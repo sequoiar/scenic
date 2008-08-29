@@ -31,10 +31,16 @@
 #define BLOCKING 1
 
 #if BLOCKING
+#include <gst/gst.h>
 #define BLOCK() std::cout.flush();                              \
     std::cout << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__        \
-              << ": blocking, enter any key." << std::endl;   \
-    std::cin.get()
+              << ": blocking for " << testLength_ << " milliseconds" << std::endl;   \
+    GMainLoop *loop;                                             \
+    loop = g_main_loop_new (NULL, FALSE);                       \
+    g_timeout_add(testLength_, static_cast<GSourceFunc>(GstTestSuite::killMainLoop), static_cast<gpointer>(loop)); \
+    g_main_loop_run(loop);   \
+    g_main_loop_unref(loop)
+    //std::cin.get()
 #else
 #define BLOCK()
 #endif
@@ -47,7 +53,7 @@ class GstTestSuite
     public:
 
         GstTestSuite()
-            : id_(0)
+            : id_(0), testLength_(5000)
         {}
 
         void set_id(int id);
@@ -57,9 +63,11 @@ class GstTestSuite
         virtual void tear_down();   // destroy common resources
 
         int id_;
+        int testLength_;
         const static int A_PORT;
         const static int V_PORT;
         const static int NUM_CHANNELS;
+        static gboolean killMainLoop(gpointer data); 
 };
 
 #endif // _GST_TEST_SUITE_H_
