@@ -67,12 +67,9 @@ void Sdp::setSDPMedia( std::string type, std::string codecs, int port ){
     bool retrieved = false;
     std::vector<sdpMedia*>::iterator iter;
 
-    std::cout << "size= "<< _sdpMediaList.size() << std::endl;
-
     // If no media of this type has been already created
     for( k = 0 ; k<(int)_sdpMediaList.size() ; k++ ) {
         if( strcmp( _sdpMediaList[k]->getMediaTypeStr().c_str(), type.c_str()) == 0 ){
-            std::cout << "retrieve existing media" << std::endl;
             iter = _sdpMediaList.begin()+k;
             _sdpMediaList.erase(iter);
             //media  = _sdpMediaList[k];
@@ -82,7 +79,6 @@ void Sdp::setSDPMedia( std::string type, std::string codecs, int port ){
     }
 
     if(!retrieved){
-        std::cout << "create new media" << std::endl;
         media = new sdpMedia( type, port );
     }
     // The string codecs can contains multiple codecs,
@@ -116,7 +112,6 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
     pj_strdup(pool, &med->desc.media,
             ( media->getMediaType() == MIME_TYPE_AUDIO ) ? &STR_AUDIO : &STR_VIDEO );
     med->desc.port_count = 1;
-    std::cout <<  media->getPort() << std::endl;
     med->desc.port = media->getPort();
     pj_strdup (pool, &med->desc.transport, &STR_RTP_AVP);
 
