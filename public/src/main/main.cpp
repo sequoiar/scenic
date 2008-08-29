@@ -29,7 +29,7 @@
 
 #include "gstThread.h"
 #include "tcp/tcpThread.h"
-#include "strEsc.h"
+#include "tcp/parser.h"
 #include <sstream>
 #include "logWriter.h"
 
@@ -39,7 +39,8 @@ class MainModule
     public:
         bool run();
 
-        MainModule(int port);
+        MainModule(int port)
+            : BaseModule(), gstThread_(), tcpThread_(port){}
     private:
         GstThread gstThread_;
         TcpThread tcpThread_;
@@ -47,11 +48,6 @@ class MainModule
 };
 
 
-MainModule::MainModule(int port)
-    : BaseModule(), gstThread_(), tcpThread_(port)
-{
-//args_.push_back(new IntArg(&port_, "tcpPort", 'p', "Set the tcp incomming port","port num"));
-}
 
 
 int main (int argc, char** argv)
@@ -82,17 +78,21 @@ bool MainModule::run()
     if(!gstThread_.run())
         return 0;
 
-
     if(!tcpThread_.run())
         return 0;
+
     while(true)
     {
         TcpMessage m = tcp_queue.timed_pop(10000);
         std::string& mstr = m.getMsg();
         GstMsg gmsg = gst_queue.timed_pop(1000);
         if (!gmsg.getMsg().empty())
-            LOG_DEBUG(strEsq(gmsg.getMsg()));
-
+        {
+            std::string tstr;
+            tstr = strEsq(gmsg.getMsg());
+            LOG_DEBUG(tstr);
+            LOG_DEBUG(strUnEsq(tstr));
+        }
         if (mstr.empty())
             continue;
 
@@ -130,4 +130,3 @@ bool MainModule::run()
 }
 
 
-//./mainTester -s videotestsrc --tcpLocal=7770 --tcpRemote=7771 --tcpRemoteHost=127.0.0.1
