@@ -34,7 +34,8 @@ enum streamDirection {
     SEND_RECEIVE,
     SEND_ONLY,
     RECEIVE_ONLY,
-    INACTIVE
+    INACTIVE,
+    DIR_COUNT
 };
 
 typedef enum streamDirection streamDirection;
@@ -45,7 +46,8 @@ enum mediaType {
     APPLICATION,
     TEXT,
     IMAGE,
-    MESSAGE
+    MESSAGE,
+    MEDIA_COUNT
 };
 
 typedef enum mediaType mediaType;
@@ -71,6 +73,8 @@ class sdpMedia
          * Read accessor. Return the type of media
          */
         std::string getMediaTypeStr();
+
+        void setMediaType( int type ) { _mediaType = (mediaType)type; }
 
         /*
          * Read accessor. Return the transport port

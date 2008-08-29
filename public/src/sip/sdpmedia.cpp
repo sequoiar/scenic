@@ -73,7 +73,12 @@ std::string sdpMedia::getMediaTypeStr( void ){
 
     std::string value;
 
-    value = mediaTypeStr[ _mediaType ];
+    // Test the range to be sure we know the media
+    if( _mediaType >= 0 && _mediaType < MEDIA_COUNT )
+        value = mediaTypeStr[ _mediaType ];
+    else
+        value = "unknown";
+    
     return value;
 }
 
@@ -123,7 +128,12 @@ std::string sdpMedia::getStreamDirectionStr( void ) {
 
     std::string value;
 
-    value = streamDirectionStr[ _streamType ];
+    // Test the range of the value
+    if( _streamType >= 0 && _streamType < DIR_COUNT )
+        value = streamDirectionStr[ _streamType ];
+    else
+        value = "unknown";
+    
     return value;
 
 }
