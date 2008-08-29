@@ -46,7 +46,18 @@ Sdp::Sdp( )
 }
 
 
-Sdp::~Sdp(){}
+Sdp::~Sdp(){
+    
+    unsigned int k;
+
+    delete _local_offer; _local_offer = 0;
+
+    for( k=0; k<_sdpMediaList.size(); k++ ){
+        delete _sdpMediaList[k];
+        _sdpMediaList[k] = 0;
+    }
+
+}
 
 void Sdp::setSDPMedia( std::string type, std::string codecs, int port ){
     sdpMedia *media;
