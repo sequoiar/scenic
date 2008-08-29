@@ -29,9 +29,11 @@ class Pipeline
     public:
         static Pipeline & Instance();
         void add(GstElement * element);
-        void add(std::vector < GstElement * >&elementVec);
+        void add(std::vector< GstElement * >&elementVec);
+
         GstClockID add_clock_callback(GstClockCallback callback, gpointer user_data);
         void remove_clock_callback(GstClockID clockId);
+
         void remove(GstElement * element);
         void remove(std::vector < GstElement * >&elementVec);
         void reset();
@@ -41,8 +43,15 @@ class Pipeline
         bool start();
         bool stop();
 
-        GstClock* clock() const { return gst_pipeline_get_clock(GST_PIPELINE(pipeline_)); }
-        GstElement *findElement(const char *name) { return gst_bin_get_by_name(GST_BIN(pipeline_), name); }
+        GstClock* clock() const 
+        { 
+            return gst_pipeline_get_clock(GST_PIPELINE(pipeline_)); 
+        }
+
+        GstElement *findElement(const char *name) 
+        { 
+            return gst_bin_get_by_name(GST_BIN(pipeline_), name); 
+        }
 
     private:
         void init();

@@ -22,27 +22,27 @@
 #include <cassert>
 
 #include "gstBase.h"
-//#include "logWriter.h"
 
-int GstBase::refCount_ = 0;
+//int GstBase::refCount_ = 0;
 
 // this initializes pipeline only once/process
 GstBase::GstBase()
     : pipeline_(Pipeline::Instance())
 {
-    ++refCount_;
+//    ++refCount_;
 }
 
 
 GstBase::~GstBase()
 {
     assert(stop());
+    /*
     --refCount_;
     if (refCount_ <= 0)
     {
         assert(refCount_ == 0);
-        //pipeline_.reset();
-    }
+        pipeline_.reset();
+    }*/
 }
 
 
@@ -57,50 +57,3 @@ bool GstBase::stop()
     return pipeline_.stop();
 }
 
-
-#if 0
-// with this method, we can find out why pads don't link
-// if they fail
-bool GstBase::link_pads(GstPad *srcPad, GstPad *sinkPad)
-{
-    bool linkOk = false;
-
-    switch(gst_pad_link(srcPad, sinkPad))
-    {
-        case GST_PAD_LINK_OK:
-            LOG("link succeeded", DEBUG);
-            linkOk = true;
-            break;
-
-        case GST_PAD_LINK_WRONG_HIERARCHY:
-            LOG("pads have no common grandparent", DEBUG);
-            break;
-
-        case GST_PAD_LINK_WAS_LINKED:
-            LOG("pad was already linked", DEBUG);
-            break;
-
-        case GST_PAD_LINK_WRONG_DIRECTION:
-            LOG("pads have wrong direction", DEBUG);
-            break;
-
-        case GST_PAD_LINK_NOFORMAT:
-            LOG("pads do not have common format", DEBUG);
-            break;
-
-        case GST_PAD_LINK_NOSCHED:
-            LOG("pads cannot cooperate in scheduling", DEBUG);
-            break;
-
-        case GST_PAD_LINK_REFUSED:
-            LOG("refused for some reason", DEBUG);
-            break;
-
-        default:
-            break;
-    }
-
-    return linkOk;
-}
-
-#endif
