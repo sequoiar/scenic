@@ -62,11 +62,56 @@ void codecHandlingAtSessionLevelTest( void ){
     cout << res << endl;
 }
 
+void directionStreamTest( void ){
+
+    sdpMedia *media = new sdpMedia( "audio", 12345 );
+    media->addCodec("GSM");
+    cout << media->getStreamDirectionStr() << endl;
+
+    media->setStreamDirection(1);
+    cout << media->getStreamDirectionStr() << endl;
+
+    media->setStreamDirection(2);
+    cout << media->getStreamDirectionStr() << endl;
+
+    media->setStreamDirection(3);
+    cout << media->getStreamDirectionStr() << endl;
+
+    media->setStreamDirection(4);
+    cout << media->getStreamDirectionStr() << endl;
+}
+
+void mediaTypeTest( void ){
+
+    sdpMedia *media = new sdpMedia( "audio", 12345 );
+    media->addCodec("GSM");
+    cout << media->getMediaTypeStr() << endl;
+
+    media->setMediaType(1);
+    cout << media->getMediaTypeStr() << endl;
+
+    media->setMediaType(2);
+    cout << media->getMediaTypeStr() << endl;
+
+    media->setMediaType(3);
+    cout << media->getMediaTypeStr() << endl;
+
+    media->setMediaType(4);
+    cout << media->getMediaTypeStr() << endl;
+
+    media->setMediaType(5);
+    cout << media->getMediaTypeStr() << endl;
+
+    media->setMediaType(6);
+    cout << media->getMediaTypeStr() << endl;
+}
 
 int main(int argc, char** argv ) {
     (void)argc;
     (void)argv;
-    codecHandlingAtSessionLevelTest();
+    //codecHandlingAtSessionLevelTest();
+    directionStreamTest();
+    mediaTypeTest();
 
     return 0;
 }
