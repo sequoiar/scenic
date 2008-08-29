@@ -22,6 +22,7 @@
 
 #define THIS_FILE       "useragent"
 #define _LOCAL_IP_ADDRESS   "127.0.0.1"
+#define PJ_LOG_LEVEL        5
 
 #define MSG_RINGING                 180
 #define MSG_OK                      200

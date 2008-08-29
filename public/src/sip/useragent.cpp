@@ -18,6 +18,7 @@
  */
 
 #include "useragent.h"
+#include "logWriter.h"
 
 #include <stdlib.h>
 #include <iostream>
@@ -238,6 +239,28 @@ bool UserAgent::hasIncomingCall( void ){
     return getConnectionState() == CONNECTION_STATE_INCOMING;
 }
 
+static void pjsipLogWriter( int level, const char *data, int len ){
+    
+    PJ_UNUSED_ARG(len);
+
+    switch(level){
+        case 1:
+            LOG_ERROR(data);
+            break;
+        case 2:
+            LOG_CRITICAL(data);
+        case 3:
+            break;
+        case 4:
+            LOG_INFO(data);
+            break;
+        case 5:
+        case 6:
+            LOG_DEBUG(data)
+            break;
+    }
+}
+
 void UserAgent::init_sip_module( void ){
     mod_ua.name = pj_str((char*)this->_name.c_str());
     mod_ua.id = -1;
@@ -254,6 +277,9 @@ int UserAgent::init_pjsip_modules(  ){
     URI *my_uri;
     pjsip_inv_callback inv_cb;
 
+    // Redirect the library log output to our log system
+    pj_log_set_level( PJ_LOG_LEVEL );
+    pj_log_set_log_func( &pjsipLogWriter );
 
     // Init SIP module
     init_sip_module();
@@ -261,6 +287,7 @@ int UserAgent::init_pjsip_modules(  ){
     // Init the pj library. Must be called before using the library
     status = pj_init();
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+    LOG_INFO("Init the pj library");
 
     // Init the pjlib-util library.
     status = pjlib_util_init();
@@ -272,6 +299,7 @@ int UserAgent::init_pjsip_modules(  ){
     /* Create the endpoint */
     status = pjsip_endpt_create( &c_pool.factory, NULL, &endpt );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+    LOG_INFO( "" );
 
     /* Add UDP Transport */
     my_uri = getLocalURI();
@@ -525,7 +553,6 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
     PJ_UNUSED_ARG(e);
 
     if( inv->state == PJSIP_INV_STATE_DISCONNECTED ){
-        cout << "Call state: " << pjsip_get_status_text(inv->cause)->ptr << endl;
         if( strcmp(pjsip_get_status_text(inv->cause)->ptr, REQUEST_TIMEOUT ) == 0)
             _state = CONNECTION_STATE_TIMEOUT;
         else
@@ -533,7 +560,6 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
     }
 
     else if( inv->state == PJSIP_INV_STATE_CONFIRMED ){
-        cout << "Call state confirmed " << endl;
         _state = CONNECTION_STATE_CONNECTED;
     }
     
@@ -542,8 +568,6 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
     }
 
     else{
-        cout << "Call state changed to " << pjsip_inv_state_name(inv->state) << endl;
-        cout << "Call state changed to " << inv->state << endl;
     }
 }
 
@@ -555,7 +579,6 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     pjsip_tx_data *tdata;
     pjmedia_sdp_session *r_sdp;
 
-    cout << "Callback on_rx_request entered" << endl;
 
     PJ_UNUSED_ARG( rdata );
 
@@ -614,26 +637,22 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
     /* Respond statelessly any non-INVITE requests with 500 */
     //if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
     PJ_UNUSED_ARG( rdata );
-    cout << "on_rx_response" << endl;
     return PJ_SUCCESS;
 }
 
 
 static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
                                        pjsip_event *e ){
-    cout << "transaction state changed to " <<tsx->state << endl;
 
     PJ_UNUSED_ARG(inv);
 
     if( tsx->state == PJSIP_TSX_STATE_TERMINATED  &&
         tsx->role == PJSIP_ROLE_UAC ) {
-        cout << "UAC: tsx state terminated" << endl;
         //thread_quit = 1;
     }
 
     else if( tsx->state == PJSIP_TSX_STATE_TRYING &&
              tsx->role == PJSIP_ROLE_UAS ){
-        cout << "UAC: tsx state trying" << endl;
 
         pjsip_rx_data *rdata;
         pjsip_msg *msg;
@@ -641,7 +660,6 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
         std::string text;
 
         // Incoming message request
-        cout << "Request received" << endl;
 
         // Retrieve the body message
         rdata = e->body.tsx_state.src.rdata;
@@ -657,8 +675,6 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
     }
 
     else {
-        cout << "Transaction state not handled .... " << tsx->state << "for " << tsx->role <<
-        endl;
         // TODO Return an error code if transaction failed
         // for instance the peer is not connected
     }
@@ -672,7 +688,6 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     PJ_UNUSED_ARG( inv );
     PJ_UNUSED_ARG( status );
 
-    cout << "on media update" << endl;
     /*
        int nbMedia;
        int nbCodecs;
@@ -704,7 +719,6 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 
 
 static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
-    cout << "Invite session received new offer from peer -" <<  offer->name.ptr << endl;
 
     PJ_UNUSED_ARG( inv );
     //pjmedia_sdp_session *sdp;
