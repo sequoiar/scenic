@@ -37,12 +37,10 @@ class GstBase
         GstBase();
         virtual ~GstBase();
 
-//        static bool link_pads(GstPad *srcPad, GstPad *sinkPad);
-        
         Pipeline & pipeline_;
 
     private:
-        static int refCount_;
+        //static int refCount_;
 };
 
 #endif // _GST_BASE_H_
