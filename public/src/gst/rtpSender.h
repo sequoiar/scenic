@@ -22,6 +22,7 @@
 #define _RTP_SENDER_H_
 
 #include <vector>
+#include <string>
 #include <gst/gst.h>
 #include "rtpSession.h"
 
