@@ -1,6 +1,5 @@
 #include "parser.h"
-
-
+#include "logWriter.h"
 std::string strEsq(std::string& str)
 {
     std::string out;
@@ -15,7 +14,6 @@ std::string strEsq(std::string& str)
         else
             out.append(1,c);          
     }
-
     return out;
 }
 
@@ -34,12 +32,28 @@ std::string strUnEsq(std::string& str)
                 out.append("\\");
                 ++pos;
             }
-
         }
         else
             out.append(1,c);          
     }
-
     return out;
 }
+
+int get_end_of_quoted_string(std::string& str)
+{
+    if(str[0] != '\"'){
+        LOG_WARNING("String must start with \".");
+        return 0;   
+    }
+    for(unsigned int pos=1; pos < str.size(); ++pos)
+    {
+        if(str[pos] == '\"')
+            if(str[pos-1] != '\\')
+                return pos;
+    }
+
+    LOG_WARNING("String has no terminating \".");
+    return 0; 
+}
+
 

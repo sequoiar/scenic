@@ -32,6 +32,7 @@
 
 std::string strEsq(std::string& str);
 std::string strUnEsq(std::string& str);
+int get_end_of_quoted_string(std::string& str);
 
 #endif
 
