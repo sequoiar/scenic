@@ -93,30 +93,100 @@ class UserAgent
          */
         int inv_session_create( std::string uri );
 
+	/*
+         * Terminate an invite session. Send a bye to connected peer.
+         *
+         * @return int	0 on success
+	 *              1 otherwise
+         */
         int inv_session_end();
 
+        /*
+         * Send a invite inside an existing invite session.
+         * Used for updating or modifying the media offer for instance. 
+         * A new SDP negociation is done before validating the reinvite
+         *
+         * @return int	0 on success
+	 *              1 otherwise
+         */
         int inv_session_reinvite();
 
+        /*
+         * Accept an incoming call. Called when INVITE_AUTO_ANSWER = false
+         *
+         * @return int	0 on success
+	 *              1 otherwise
+         */
         int inv_session_accept();
-
+        
+        /*
+         * Refuse an incoming call. Called when INVITE_AUTO_ANSWER = false
+         *
+         * @return int	0 on success
+	 *              1 otherwise
+         */
         int inv_session_refuse();
 
+        /*
+         * Set the media offer for the session
+         *
+         * @param type	The media type. For instance: "audio"
+         * @param codecs  The list of the codec to use for the session. The codecs must
+	 *                be separated with / and the last character must be / 
+         * @param port The port to transport the media
+         */
         void setSessionMedia( std::string type, std::string codecs, int port );
 
+        /*
+         * Return the local sip address
+         */
         URI* getLocalURI() { return _localURI; }
 
+        /*
+         * Method the send an instant text message to the connected peer
+         * The connection has to be established, ie connectionState = CONNECTION_STATE_CONNECTED
+         *
+         * @param message	The text message to send. //TODO be able to send message with spaces in it
+         * @return int	0 on success
+         *               1 otherwise
+         */ 
         int sendInstantMessage( std::string message );
 
+        /*
+         * Free memory allocated by the pjsip library
+         *
+         * @return int	0 on success
+         *              1 otherwise
+         */
         int pjsip_shutdown();
 
+        /*
+         * Return a string form of the session media
+         */
         std::string mediaToString( void );
 
+        /*
+         * Return the connection state string value
+         */
         std::string getConnectionStateStr( connectionState state );
 
+        /*
+         * Return the connection state 
+         */
         connectionState getConnectionState( void );
 
+        /*
+         * Change the invite answer mode. In AUTO mode, any new invite session is automatically accepted 
+         * In manual mode, the user agent server can accept or refuse the incoming call
+         */
         void setInviteAutoAnswer( bool mode );
 
+        /*
+         * Test if the user has an incoming call  
+         *
+         * @return bool	true if a call is incoming
+         *               false otherwise
+         */
         bool hasIncomingCall( void );
 
     private:
