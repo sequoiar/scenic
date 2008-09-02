@@ -43,11 +43,11 @@ gboolean VideoSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gp
 {
     if (event->keyval != 'f')
     {
-        g_print("you didn't hit f, jerk\n");
+        LOG("user didn't hit f", DEBUG);
         return TRUE;
     }
     else 
-        g_print("you hit f\n");
+        LOG("you hit f", DEBUG);
 
     gboolean isFullscreen = (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
 

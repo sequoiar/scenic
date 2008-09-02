@@ -204,12 +204,6 @@ VideoDvSource::VideoDvSource(const VideoConfig &config)
     : VideoSource(config), demux_(0), queue_(0), dvdec_(0)
 {}
 
-#if 0
-void VideoDvSource::link_element(GstElement *sinkElement)
-{
-    GstLinkable::link(dvdec_, sinkElement);
-}
-#endif
 
 void VideoDvSource::sub_init()
 {

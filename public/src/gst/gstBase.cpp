@@ -37,12 +37,12 @@ GstBase::~GstBase()
 {
     assert(stop());
     /*
-    --refCount_;
-    if (refCount_ <= 0)
-    {
-        assert(refCount_ == 0);
-        pipeline_.reset();
-    }*/
+       --refCount_;
+       if (refCount_ <= 0)
+       {
+       assert(refCount_ == 0);
+       pipeline_.reset();
+       }*/
 }
 
 
@@ -56,4 +56,6 @@ bool GstBase::stop()
 {
     return pipeline_.stop();
 }
+
+
 
