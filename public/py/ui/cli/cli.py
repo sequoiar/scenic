@@ -98,9 +98,8 @@ class CliController(TelnetServer):
         data = to_utf(data)
         data = data.split()
         cmd = data[0]
-        if len(cmd) == 1:
+        if len(cmd) == 1 and self.shortcuts.has_key(cmd):
             cmd = self.shortcuts[cmd]
-#        del data[0]
         if cmd in self.callbacks:
             self.callbacks[cmd](data)
         else:
@@ -187,7 +186,7 @@ class CliController(TelnetServer):
             self.core.list_stream(self, kind)
         elif options.add:
             print self.factory.subject
-            self.core.add_stream(self, options.add, audio.gst.AudioGst(22222, '127.0.0.1', self.factory.subject), kind)
+            self.core.add_stream(self, options.add, audio.gst.AudioGst(10000, '127.0.0.1', self.factory.subject), kind)
         elif options.erase:
             self.core.delete_stream(self, options.erase, kind)
         else:
@@ -445,9 +444,9 @@ class CliView(Observer):
     def _audio_settings(self, origin, (data, name)):
         if origin is self.controller:
             if data:
-                if data.state == 0:
+                if data._state == 0:
                     state = 'idle'
-                elif data.state == 1:
+                elif data._state == 1:
                     state = 'playing'
                 else:
                     state = 'unknown'
@@ -504,6 +503,7 @@ class CliView(Observer):
                 
     def _audio_list(self, origin, data):
         if origin is self.controller:
+            print data
             if data:
                 names = [stream[0] for stream in data]
                 self.write("\n".join(names))
@@ -511,20 +511,25 @@ class CliView(Observer):
                 self.write('There is no audio stream.')
                 
     
-    def _streams_list(self, origin, data):
+    def _streams_list(self, origin, (streams, data)):
         if origin is self.controller:
-            if data:
-                names = []
-                for stream in data:
+            names = []
+            for attr, value in data.items():
+                if attr != "streams":
+                    names.append(attr + ': ' + str(value))
+            if names:
+                names.append('------------')
+            if streams:
+                for stream in streams:
                     kind = '?'
                     if isinstance(stream[1], AudioStream):
                         kind = 'audio'
                     elif isinstance(stream[1], VideoStream):
                         kind = 'video'
                     names.append(stream[0] + ' (' + kind + ')')
-                self.write("\n".join(names))
             else:
-                self.write('There is no stream.')
+                names.append('There is no stream.')
+            self.write("\n".join(names))
             
     def _set_streams(self, origin, (state, attr, value)):
         if state:
@@ -540,6 +545,12 @@ class CliView(Observer):
             self.write('\nAudio sending started.')
         else:
             self.write('\nUnable to start audio sending.')
+            
+    def _audio_sending_stopped(self, origin, data):
+        if data:
+            self.write('\nAudio sending stopped.')
+        else:
+            self.write('\nUnable to stop audio sending.')
             
             
 

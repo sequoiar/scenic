@@ -98,11 +98,13 @@ class AudioGst(AudioStream, GstClient):
    
     def stop_sending(self):
         """function stop_sending
-        
-        returns 
         """
-        return None # should raise NotImplementedError()
+        self._send_cmd('stop_audio', self.sending_stopped)
     
+    def sending_stopped(self, state):
+        self._del_callback(get_def_name(1))
+        self._core.notify(None, state, 'audio_sending_stopped')
+   
     def start_receving(self):
         """function start_receving
         
