@@ -38,7 +38,7 @@ class RtpSender
         ~RtpSender();
 
     protected:
-        void addDerived(GstElement * src, const MediaConfig * config);
+        void addDerived(GstElement * src, const MediaConfig & config);
 
     private:
         GstElement *rtp_sender_;

@@ -55,7 +55,7 @@ void VideoReceiver::init_codec()
     pipeline_.add(decoder_);
     GstLinkable::link(depayloader_, decoder_);
 
-    session_.add(depayloader_, &config_);
+    session_.add(depayloader_, config_);
     session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,"
                       "encoding-name=(string)H264");
 }

@@ -61,7 +61,7 @@ std::string RtpSender::getCaps() const
 }
 
 
-void RtpSender::addDerived(GstElement * newSrc, const MediaConfig * config)
+void RtpSender::addDerived(GstElement * newSrc, const MediaConfig & config)
 {
     GstPad *send_rtp_sink;
     GstPad *send_rtp_src;
@@ -73,7 +73,7 @@ void RtpSender::addDerived(GstElement * newSrc, const MediaConfig * config)
     GstPad *rtcpReceiverSrc;
 
     assert(rtp_sender_ = gst_element_factory_make("udpsink", NULL));
-    g_object_set(rtp_sender_, "host", config->remoteHost(), "port", config->port(), "sync",
+    g_object_set(rtp_sender_, "host", config.remoteHost(), "port", config.port(), "sync",
                  FALSE, "async", FALSE, NULL);
     pipeline_.add(rtp_sender_);
 
