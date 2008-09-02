@@ -1,22 +1,26 @@
 #include <glib.h>
 #include <stdio.h>
+#include <map>
+#include <string>
+#include "tcp/parser.h"
+#include "logWriter.h"
 
-const char* str = "mystring=\"bar you\" Hello tab:\twhat is 1 the \\";
+std::string str = "init: mystring=\"\\\"bar you\\\"\" Hellotab=1";
 
 
 int main(int, char**)
 {
-    printf("\nString:%s---\n", str);
-    gchar* g = g_strescape(str, "\b\r\f\t");
+    std::map<std::string,std::string> mymap;
+    if(tokenize(str,mymap))
+    {
+        LOG_DEBUG("Success");
+    }
+    else
+    {
+        LOG_DEBUG("Fail");
+    }
 
-    printf("\nEsc String:%s---\n", g);
-
-    gchar* g2 = g_strcompress(g);
-
-
-    printf("\nUnEsc String:%s---\n", g2);
-
-    printf("\nDONE.\n");
+    return 0;
 }
 
 
