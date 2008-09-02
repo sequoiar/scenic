@@ -37,7 +37,7 @@ class RtpReceiver
         ~RtpReceiver();
 
     protected:
-        void addDerived(GstElement * depayloader, const MediaConfig * config);
+        void addDerived(GstElement * depayloader, const MediaConfig & config);
 
     private:
         static GstPad *get_matching_sink_pad(GstPad *srcPad);

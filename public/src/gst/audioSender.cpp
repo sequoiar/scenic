@@ -75,7 +75,7 @@ void AudioSender::init_sink()
         GstLinkable::link(*source_, encoder_);
         GstLinkable::link(encoder_, payloader_);
 
-        session_.add(payloader_, &config_);
+        session_.add(payloader_, config_);
     }
     else {                       // local version
         assert(jack_is_running());

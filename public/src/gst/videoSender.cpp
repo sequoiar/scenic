@@ -80,7 +80,7 @@ void VideoSender::init_sink()
         assert(payloader_ = gst_element_factory_make("rtph264pay", NULL));
         pipeline_.add(payloader_);
         GstLinkable::link(encoder_, payloader_);
-        session_.add(payloader_, &config_);
+        session_.add(payloader_, config_);
     }
     else {                 // local test only, no encoding
 #if 0

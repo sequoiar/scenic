@@ -94,7 +94,7 @@ void AudioReceiver::init_codec()
     pipeline_.add(decoder_);
 
     GstLinkable::link(depayloader_, decoder_);
-    session_.add(depayloader_, &config_);
+    session_.add(depayloader_, config_);
 }
 
 
