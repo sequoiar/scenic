@@ -24,6 +24,7 @@
 #include <cassert>
 #include <gst/gst.h>
 
+#define USE_OSC 1
 #ifdef USE_OSC
 #include "lo/lo.h"
 #include "logWriter.h"

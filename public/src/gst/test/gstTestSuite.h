@@ -53,7 +53,7 @@ class GstTestSuite
     public:
 
         GstTestSuite()
-            : id_(0), testLength_(5000)
+            : id_(0), testLength_(10000)
         {}
 
         void set_id(int id);

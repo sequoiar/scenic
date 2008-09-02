@@ -134,10 +134,12 @@ class AudioJackSource
 
 
 class AudioDvSource
-    : public AudioSource 
+    : public InterleavedAudioSource 
 {
     public:
         explicit AudioDvSource(const AudioConfig &config);
+
+        void init_source();
         void sub_init();
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data);
 
@@ -146,6 +148,7 @@ class AudioDvSource
         GstElement *srcElement() { return aconvs_[0]; }
 
         GstElement *demux_, *queue_;
+        bool dvIsNew_;
         AudioDvSource(const AudioDvSource&);     //No Copy Constructor
         AudioDvSource& operator=(const AudioDvSource&);     //No Assignment Operator
 };

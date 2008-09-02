@@ -235,17 +235,43 @@ void AudioJackSource::sub_init()
 }
 
     AudioDvSource::AudioDvSource(const AudioConfig &config)
-: AudioSource(config), demux_(0), queue_(0)
+: InterleavedAudioSource(config), demux_(0), queue_(0), dvIsNew_(true)
 {}
+
+
+void AudioDvSource::init_source()
+{
+    sources_.push_back(pipeline_.findElement(config_.source()));  // see if it already exists from VideoDvSource
+    dvIsNew_ = sources_[0] == NULL;
+    
+    if (dvIsNew_)
+    {
+        sources_[0] = gst_element_factory_make(config_.source(), config_.source());
+        assert(sources_[0]);
+        pipeline_.add(sources_);
+    }
+
+    aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
+    assert(aconvs_[0]);
+
+    pipeline_.add(aconvs_);
+}
 
 
 void AudioDvSource::sub_init()
 {
-    assert(demux_ = gst_element_factory_make("dvdemux", NULL));
+    demux_ = pipeline_.findElement("dvdemux");
+    
+    if (dvIsNew_)
+        assert(demux_ = gst_element_factory_make("dvdemux", "dvdemux"));
+    else
+        assert(demux_);
+
     assert(queue_ = gst_element_factory_make("queue", NULL));
 
     // demux has dynamic pads
-    pipeline_.add(demux_);
+    if (dvIsNew_)
+        pipeline_.add(demux_);
     pipeline_.add(queue_);
 
     // demux srcpad must be linked to queue sink pad at runtime
@@ -286,7 +312,9 @@ void AudioDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
 
 void AudioDvSource::link_elements()
 {
-    GstLinkable::link(sources_[0], demux_);
+    if (dvIsNew_)
+        GstLinkable::link(sources_[0], demux_);
     GstLinkable::link(queue_, aconvs_[0]);
+    GstLinkable::link(aconvs_[0], interleave_);
 }
 
