@@ -23,7 +23,7 @@
 #include <cpptest.h>
 #include "gstTestSuite.h"
 
-#define LOCAL 0
+#define LOCAL 1
 #define RTP 0
 
 class AudioTestSuite
@@ -34,6 +34,7 @@ class AudioTestSuite
         AudioTestSuite()
         {
 #if LOCAL
+#if 0
             TEST_ADD(AudioTestSuite::start_1ch_audiotest)
             TEST_ADD(AudioTestSuite::stop_1ch_audiotest)
             TEST_ADD(AudioTestSuite::start_stop_1ch_audiotest)
@@ -55,6 +56,7 @@ class AudioTestSuite
             TEST_ADD(AudioTestSuite::start_8ch_jack)
             TEST_ADD(AudioTestSuite::stop_8ch_jack)
             TEST_ADD(AudioTestSuite::start_stop_8ch_jack)
+#endif
 
             TEST_ADD(AudioTestSuite::start_audio_dv)
             TEST_ADD(AudioTestSuite::stop_audio_dv)
@@ -72,7 +74,6 @@ class AudioTestSuite
             TEST_ADD(AudioTestSuite::start_stop_8ch_comp_rtp_audiofile)
 #endif                          // RTP
 
-            TEST_ADD(AudioTestSuite::start_1ch_audiotest)
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
             /*                                              */
