@@ -106,12 +106,12 @@ class Streams(object):
             self.mode = 'send'
             for stream in self.streams.values():
                 stream.start_sending(address)
-                return 'Starting sending...'
+            return 'Starting sending...'
         else:
             self.mode = 'receive'
             for stream in self.streams.values():
                 stream.start_receving()
-                return 'Starting receving...'
+            return 'Starting receving...'
         
     
     def stop(self, mode='send'):
@@ -122,9 +122,11 @@ class Streams(object):
         if mode == 'send':
             for stream in self.streams.values():
                 stream.stop_sending()
+            return 'Stopping sending...'
         else:
             for stream in self.streams.values():
                 stream.stop_receving()
+            return 'Stopping receving...'
     
     
     

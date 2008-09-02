@@ -24,7 +24,7 @@ from twisted.internet import reactor, protocol, defer
 # App imports
 from protocols import ipcp
 from streams.stream import AudioStream, Stream
-from utils import log
+from utils import log, get_def_name
 
 log = log.start('info', 1, 0, 'gstClient')
 
@@ -56,7 +56,7 @@ class GstClient(object):
 
     def connection_lost(self, reason=protocol.connectionDone):        
         Stream.gst_state = 0
-        log.info('Lost the server connection. Reason:\n%' % reason)
+        log.info('Lost the server connection. Reason:\n%s' % reason)
 #        log.info('Trying to reconnect...')
 #        self.connect()
 
@@ -69,9 +69,15 @@ class GstClient(object):
                 Stream.gst.add_callback(callback)
             Stream.gst.send_cmd(cmd, *args)
 
-    def _del_callback(self, callback):
+    def _del_callback(self, callback=None):
         if hasattr(Stream, 'gst'):
-            Stream.gst.del_callback(callback)
+            if callback:
+                Stream.gst.del_callback(callback)
+            else:
+                try:
+                    Stream.gst.del_callback(get_def_name())
+                except:
+                    log.debug("No callback to delete. (coming from: %s)." % get_def_name())
                     
             
             
