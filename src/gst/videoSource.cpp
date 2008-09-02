@@ -201,18 +201,39 @@ VideoFileSource::~VideoFileSource()
 
 
 VideoDvSource::VideoDvSource(const VideoConfig &config)
-    : VideoSource(config), demux_(0), queue_(0), dvdec_(0)
+    : VideoSource(config), demux_(0), queue_(0), dvdec_(0), dvIsNew_(true)
 {}
+
+
+void VideoDvSource::init()
+{
+    source_ = pipeline_.findElement(config_.source());
+    dvIsNew_ = source_ == NULL;
+    if (dvIsNew_)
+    {
+        assert(source_ = gst_element_factory_make(config_.source(), config_.source()));
+        pipeline_.add(source_);
+    }
+    sub_init();
+}
 
 
 void VideoDvSource::sub_init()
 {
-    assert(demux_ = gst_element_factory_make("dvdemux", NULL));
+    demux_ = pipeline_.findElement("dvdemux");
+    dvIsNew_ = demux_ == NULL;
+    if (dvIsNew_)
+    {
+        assert(demux_ = gst_element_factory_make("dvdemux", "dvdemux"));
+        // demux has dynamic pads
+        pipeline_.add(demux_);
+    }
+    else
+        assert(demux_);
+
     assert(queue_ = gst_element_factory_make("queue", NULL));
     assert(dvdec_ = gst_element_factory_make("dvdec", NULL));
 
-    // demux has dynamic pads
-    pipeline_.add(demux_);
     pipeline_.add(queue_);
     pipeline_.add(dvdec_);
 
@@ -221,7 +242,8 @@ void VideoDvSource::sub_init()
                      G_CALLBACK(VideoDvSource::cb_new_src_pad),
                      static_cast<void *>(queue_));
 
-    GstLinkable::link(source_, demux_);
+    if (dvIsNew_)
+        GstLinkable::link(source_, demux_);
     GstLinkable::link(queue_, dvdec_);
 }
 

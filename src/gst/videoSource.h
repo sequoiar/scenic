@@ -96,11 +96,13 @@ class VideoDvSource
         explicit VideoDvSource(const VideoConfig &config);
         //void link_element(GstElement *sinkElement);
         GstElement *srcElement() { return dvdec_; }
+        void init();
         void sub_init();
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data);
 
     private:
         GstElement *demux_, *queue_, *dvdec_;
+        bool dvIsNew_;
         VideoDvSource(const VideoDvSource&);     //No Copy Constructor
         VideoDvSource& operator=(const VideoDvSource&);     //No Assignment Operator
 };

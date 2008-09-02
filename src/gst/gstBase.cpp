@@ -23,26 +23,25 @@
 
 #include "gstBase.h"
 
-//int GstBase::refCount_ = 0;
+int GstBase::refCount_ = 0;
 
 // this initializes pipeline only once/process
 GstBase::GstBase()
     : pipeline_(Pipeline::Instance())
 {
-//    ++refCount_;
+    ++refCount_;
 }
 
 
 GstBase::~GstBase()
 {
     assert(stop());
-    /*
-       --refCount_;
-       if (refCount_ <= 0)
-       {
-       assert(refCount_ == 0);
-       pipeline_.reset();
-       }*/
+    --refCount_;
+    if (refCount_ <= 0)
+    {
+        assert(refCount_ == 0);
+        pipeline_.reset();
+    }
 }
 
 
