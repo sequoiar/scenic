@@ -105,13 +105,16 @@ static void set_channel_layout(GstElement *interleave)
 
 static gboolean bus_call(GstBus *bus, GstMessage *msg, gpointer data)
 {
-    GMainLoop *loop = data;
+//    GMainLoop *loop = data;
+    gboolean *done = (gboolean*) data;
 
     switch(GST_MESSAGE_TYPE(msg)) 
     {
         case GST_MESSAGE_EOS:
             g_print("End-of-stream\n");
-            g_main_loop_quit(loop);
+            *done = TRUE;
+            
+            //g_main_loop_quit(loop);
             break;
         case GST_MESSAGE_ERROR: 
             {
@@ -128,9 +131,13 @@ static gboolean bus_call(GstBus *bus, GstMessage *msg, gpointer data)
                     g_free(debug);
                 }
 
-                g_main_loop_quit(loop);
+                *done = TRUE;
+                //g_main_loop_quit(loop);
                 break;
             }
+        case GST_MESSAGE_STATE_CHANGED:
+            g_print("state changed \n");
+            break;
         default:
             break;
     }
@@ -147,6 +154,7 @@ gint main(gint argc, gchar *argv[])
     GstElement *sources[NUM_CHANNELS];
     GstElement *audioconverts[NUM_CHANNELS + 1];
     GstElement *queues[NUM_CHANNELS + 1];
+    gboolean done = FALSE;
     GMainLoop *loop;
     GstBus *bus;
 
@@ -160,7 +168,7 @@ gint main(gint argc, gchar *argv[])
     /* watch for messages on the pipeline's bus (note that this will only
      * work like this when a GLib main loop is running) */
     bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline));
-    gst_bus_add_watch(bus, bus_call, loop);
+    gst_bus_add_watch(bus, bus_call, &done);
     gst_object_unref(bus);
 
     if (!(interleave = gst_element_factory_make("interleave", NULL)))
@@ -211,6 +219,8 @@ gint main(gint argc, gchar *argv[])
 
     /* run */
     ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
+    ret = gst_element_set_state (pipeline, GST_STATE_PAUSED);
+    ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
     if (ret == GST_STATE_CHANGE_FAILURE) {
         g_print ("Failed to start up pipeline!\n");
 
@@ -227,6 +237,8 @@ gint main(gint argc, gchar *argv[])
         return -1;
     }
 
+    //while(done == FALSE)
+     //   usleep(10000);
     g_main_loop_run(loop);
 
     /* clean up */
