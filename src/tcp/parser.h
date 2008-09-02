@@ -29,10 +29,13 @@
 #define __PARSER_H__
 
 #include <string>
+#include <map>
 
 std::string strEsq(std::string& str);
 std::string strUnEsq(std::string& str);
 int get_end_of_quoted_string(std::string& str);
+
+bool tokenize(std::string& str, std::map<std::string,std::string> &cmd_map) ;
 
 #endif
 
