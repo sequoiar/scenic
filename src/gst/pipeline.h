@@ -43,6 +43,11 @@ class Pipeline
         bool start();
         bool stop();
 
+        GstBus* getBus() const
+        {
+            return gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
+        }
+
         GstClock* clock() const 
         { 
             return gst_pipeline_get_clock(GST_PIPELINE(pipeline_)); 
@@ -55,6 +60,8 @@ class Pipeline
 
     private:
         void init();
+        static gboolean bus_call(GstBus *bus, GstMessage *msg, gpointer data);
+        bool checkStateChange(GstStateChangeReturn ret);
 
         Pipeline(const Pipeline&);
         Pipeline& operator=(const Pipeline&);

@@ -22,8 +22,9 @@
 
 #include <cassert>
 #include <unistd.h>
+#include <cstdio>
 #include "pipeline.h"
-//#include "logWriter.h"
+#include "logWriter.h"
 
 Pipeline *Pipeline::instance_ = 0;
 
@@ -51,6 +52,105 @@ Pipeline::~Pipeline()
 }
 
 
+gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/)
+{
+    //    GMainLoop *loop = data;
+    //gboolean *done = static_cast<gboolean*>(data);
+
+    switch(GST_MESSAGE_TYPE(msg)) 
+    {
+        case GST_MESSAGE_UNKNOWN:
+            break;
+        case GST_MESSAGE_EOS:
+            g_print("End-of-stream\n");
+            //*done = TRUE;
+
+            //g_main_loop_quit(loop);
+            break;
+        case GST_MESSAGE_ERROR: 
+            {
+                gchar *debug = NULL;
+                GError *err = NULL;
+
+                gst_message_parse_error(msg, &err, &debug);
+
+                g_print("Error: %s\n", err->message);
+                g_error_free(err);
+
+                if (debug) {
+                    g_print("Debug details: %s\n", debug);
+                    g_free(debug);
+                }
+
+                //*done = TRUE;
+                //g_main_loop_quit(loop);
+                break;
+            }
+        case GST_MESSAGE_WARNING:
+            {
+                gchar *debug = NULL;
+                GError *err = NULL;
+
+                gst_message_parse_warning(msg, &err, &debug);
+
+                //g_print("Warning: %s\n", err->message);
+                LOG(err->message, WARNING);
+                g_error_free(err);
+
+                if (debug) {
+                    g_print("Debug details: %s\n", debug);
+                    g_free(debug);
+                }
+                break;
+            }
+        case GST_MESSAGE_INFO:
+            break;
+        case GST_MESSAGE_TAG:
+            break;
+        case GST_MESSAGE_BUFFERING:         
+            break;
+        case GST_MESSAGE_STATE_CHANGED:     
+            break;
+        case GST_MESSAGE_STATE_DIRTY: 
+            break;
+        case GST_MESSAGE_STEP_DONE:
+            break;
+        case GST_MESSAGE_CLOCK_PROVIDE:
+            break;
+        case GST_MESSAGE_CLOCK_LOST:
+            break;
+        case GST_MESSAGE_NEW_CLOCK:
+            break;
+        case GST_MESSAGE_STRUCTURE_CHANGE:
+            break;
+        case GST_MESSAGE_STREAM_STATUS:
+            break;
+        case GST_MESSAGE_APPLICATION:   
+            break;
+        case GST_MESSAGE_ELEMENT:
+            break;
+        case GST_MESSAGE_SEGMENT_START:
+            break;
+        case GST_MESSAGE_SEGMENT_DONE:
+            break;
+        case GST_MESSAGE_DURATION:
+            break;
+        case GST_MESSAGE_LATENCY:
+            break;
+        case GST_MESSAGE_ASYNC_START:       
+            break;
+        case GST_MESSAGE_ASYNC_DONE:      
+            break;
+        case GST_MESSAGE_ANY:
+            break;
+        default:
+            break;
+    }
+
+    return TRUE;
+}
+
+
 void Pipeline::init()
 {
     if (!pipeline_)
@@ -63,6 +163,13 @@ void Pipeline::init()
         // this will be used as a reference for future
         // pipeline synchronization
         startTime_ = gst_clock_get_time(clock());
+
+        /* watch for messages on the pipeline's bus (note that this will only
+         *      * work like this when a GLib main loop is running) */
+        GstBus *bus;
+        bus = getBus();
+        gst_bus_add_watch(bus, GstBusFunc(bus_call), static_cast<gpointer>(NULL));
+        gst_object_unref(bus);
     }
 }
 
@@ -86,7 +193,7 @@ void Pipeline::make_verbose()
         gchar *exclude_args = NULL;     // set args to be excluded from output
         gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
         g_signal_connect(pipeline_, "deep_notify",
-                         G_CALLBACK(gst_object_default_deep_notify), exclude_list);
+                G_CALLBACK(gst_object_default_deep_notify), exclude_list);
     }
 }
 
@@ -114,9 +221,34 @@ void Pipeline::wait_until_stopped() const
 }
 
 
+bool Pipeline::checkStateChange(GstStateChangeReturn ret)
+{
+    if (ret == GST_STATE_CHANGE_FAILURE) {
+        g_print ("Failed to start pipeline!\n");
+        GstBus *bus;
+        bus = getBus();
+
+        /* check if there is an error message with details on the bus */
+        GstMessage *msg = gst_bus_poll(bus, GST_MESSAGE_ERROR, 0);
+        if (msg) {
+            GError *err = NULL;
+
+            gst_message_parse_error(msg, &err, NULL);
+            g_print("ERROR: %s\n", err->message);
+            g_error_free(err);
+            gst_message_unref(msg);
+        }
+
+        gst_object_unref(bus);
+        return false;
+    }
+    else
+        return true;
+}
+
 bool Pipeline::start()
 {
-    gst_element_set_state(pipeline_, GST_STATE_PLAYING);
+    assert(checkStateChange(gst_element_set_state(pipeline_, GST_STATE_PLAYING))); // set it to playing
     return isPlaying();
 }
 
