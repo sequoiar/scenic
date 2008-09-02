@@ -145,7 +145,6 @@ class AudioDvSource
 
     protected:
         void link_elements();
-        GstElement *srcElement() { return aconvs_[0]; }
 
         GstElement *demux_, *queue_;
         bool dvIsNew_;

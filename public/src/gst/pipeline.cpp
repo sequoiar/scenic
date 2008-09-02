@@ -248,6 +248,7 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret)
 
 bool Pipeline::start()
 {
+    checkStateChange(gst_element_set_state(pipeline_, GST_STATE_PAUSED)); // set it to playing
     assert(checkStateChange(gst_element_set_state(pipeline_, GST_STATE_PLAYING))); // set it to playing
     return isPlaying();
 }
