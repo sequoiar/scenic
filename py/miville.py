@@ -65,8 +65,8 @@ def chk_ob(core):
 
 def main():    
     core = Core()
-    l = task.LoopingCall(chk_ob, core)
-    l.start(1.0, False)
+#    l = task.LoopingCall(chk_ob, core)
+#    l.start(1.0, False)
     reactor.run()
 
 

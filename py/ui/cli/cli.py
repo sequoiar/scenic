@@ -90,6 +90,7 @@ class CliController(TelnetServer):
         self.callbacks = find_callbacks(self)
         self.shortcuts = {'c': 'contacts',
                           'a': 'audio',
+                          'v': 'video',
                           's': 'streams'
                           }
         
@@ -185,8 +186,56 @@ class CliController(TelnetServer):
         elif options.list:
             self.core.list_stream(self, kind)
         elif options.add:
-            print self.factory.subject
             self.core.add_stream(self, options.add, audio.gst.AudioGst(10000, '127.0.0.1', self.factory.subject), kind)
+        elif options.erase:
+            self.core.delete_stream(self, options.erase, kind)
+        else:
+            cp.print_help()
+            
+    def _video(self, data):
+        kind = 'video'
+        cp = CliParser(self, prog=data[0], description="Manage the video streams.")
+        cp.add_option("-l", "--list", action='store_true', help="List all the video streams or settings if stream is specified")
+
+        cp.add_option("-a", "--add", type="string", help="Add an video stream")
+        cp.add_option("-e", "--erase", type="string", help="Erase an video stream")
+        cp.add_option("-m", "--modify", type="string", help="Modify the name of an video stream")
+        
+        cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
+        cp.add_option("-c", "--codec", type="string", help="Set the codec")
+        cp.add_option("-s", "--settings", type="string", help="Set the codec settings (set1:val,set2:val)")
+        cp.add_option("-w", "--width", type="int", help="Set the width of the video in pixels (default: 640 px)")
+        cp.add_option("-r", "--height", "--rise", type="int", help="Set the height of the video in pixels (default: 480 px")
+        cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
+        cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
+
+        (options, args) = cp.parse_args(data)
+                
+        if len(args) > 1:
+            name = args[1]
+            if options.list:
+                self.core.settings_stream(self, name, kind)
+            elif options.modify:
+                self.core.rename_stream(self, name, options.modify, kind)
+            elif [opt for opt in options.__dict__.values() if opt]:
+                if options.container:
+                    self.core.set_stream(self, name, kind, 'container', options.container)
+                if options.codec:
+                    self.core.set_stream(self, name, kind, 'codec', options.codec)
+                if options.settings:
+                    self.core.set_stream(self, name, kind, 'codec_settings', options.settings)
+                if options.width:
+                    self.core.set_stream(self, name, kind, 'width', options.width)
+                if options.height:
+                    self.core.set_stream(self, name, kind, 'height', options.height)
+                if options.port:
+                    self.core.set_stream(self, name, kind, 'port', options.port)
+                if options.buffer:
+                    self.core.set_stream(self, name, kind, 'buffer', options.buffer)
+        elif options.list:
+            self.core.list_stream(self, kind)
+        elif options.add:
+            self.core.add_stream(self, options.add, video.gst.VideoGst(10000, '127.0.0.1', self.factory.subject), kind)
         elif options.erase:
             self.core.delete_stream(self, options.erase, kind)
         else:
@@ -213,7 +262,7 @@ class CliController(TelnetServer):
         if options.list:
             self.core.list_stream(self, kind)
         elif options.stop:
-            self.core.stop_streams(self, kind)
+            self.core.stop_streams(self)
         elif [opt for opt in options.__dict__.values() if opt]:
             if options.container:
                 self.core.set_streams(self, 'container', options.container)
@@ -437,9 +486,9 @@ class CliView(Observer):
             else:
                 self.write('Unable to set %s of audio stream %s.' % (attr, name))
                 
-    def _not_found(self, origin, name):
+    def _not_found(self, origin, name, kind):
         if origin is self.controller:
-            self.write('There\'s no audio stream with the name %s' % name)
+            self.write('There\'s no %s stream with the name %s' % (kind, name))
                 
     def _audio_settings(self, origin, (data, name)):
         if origin is self.controller:
@@ -471,7 +520,7 @@ class CliView(Observer):
                 msg.append(str(data.port))
                 self.write("".join(msg))
             else:
-                self._not_found(origin, name)
+                self._not_found(origin, name, 'audio')
             
     def _audio_add(self, origin, (data, name)):
         if origin is self.controller:
@@ -487,7 +536,7 @@ class CliView(Observer):
             if data == 1:
                 self.write('Audio stream %s deleted.' % name)
             elif data == 0:
-                self._not_found(origin, name)
+                self._not_found(origin, name, 'audio')
             else:
                 self.write('Unable to delete the audio stream %s.' % name)
         
@@ -496,7 +545,7 @@ class CliView(Observer):
             if data == 1:
                 self.write('Audio stream %s rename to %s.' % (name, new_name))
             elif data == 0:
-                self._not_found(origin, name)
+                self._not_found(origin, name, 'audio')
             else:
                 self.write('Unable to rename the audio stream %s.' % name)
         
@@ -509,8 +558,100 @@ class CliView(Observer):
                 self.write("\n".join(names))
             else:
                 self.write('There is no audio stream.')
+                    
+    def _audio_sending_started(self, origin, data):
+        if data:
+            self.write('\nAudio sending started.')
+        else:
+            self.write('\nUnable to start audio sending.')
+            
+    def _audio_sending_stopped(self, origin, data):
+        if data:
+            self.write('\nAudio sending stopped.')
+        else:
+            self.write('\nUnable to stop audio sending.')
+            
+
+    def _video_settings(self, origin, (data, name)):
+        if origin is self.controller:
+            if data:
+                if data._state == 0:
+                    state = 'idle'
+                elif data._state == 1:
+                    state = 'playing'
+                else:
+                    state = 'unknown'
+                msg = [bold('Video Stream: ' + name)]
+                msg.append('\nstatus: ')
+                msg.append(state)
+                msg.append('\ncontainer: ')
+                msg.append(str(data.container))
+                msg.append('\ncodec: ')
+                msg.append(str(data.codec))
+                msg.append('\ncodec settings: ')
+                msg.append(str(data.codec_settings))
+                msg.append('\nwidth: ')
+                msg.append(str(data.width))
+                msg.append('\nheight: ')
+                msg.append(str(data.height))
+                msg.append('\nbuffer: ')
+                msg.append(str(data.buffer))
+                msg.append('\nport: ')
+                msg.append(str(data.port))
+                self.write("".join(msg))
+            else:
+                self._not_found(origin, name, 'video')
+            
+    def _video_add(self, origin, (data, name)):
+        if origin is self.controller:
+            if data == 1:
+                self.write('Video stream %s created.' % name)
+            elif data == 0:
+                self.write("Cannot create video stream. Name '%s' already use." % name)
+            else:
+                self.write('Unable to create the video stream %s.' % name)
                 
-    
+    def _video_delete(self, origin, (data, name)):
+        if origin is self.controller:
+            if data == 1:
+                self.write('Video stream %s deleted.' % name)
+            elif data == 0:
+                self._not_found(origin, name, 'video')
+            else:
+                self.write('Unable to delete the video stream %s.' % name)
+        
+    def _video_rename(self, origin, (data, name, new_name)):
+        if origin is self.controller:
+            if data == 1:
+                self.write('Video stream %s rename to %s.' % (name, new_name))
+            elif data == 0:
+                self._not_found(origin, name, 'video')
+            else:
+                self.write('Unable to rename the video stream %s.' % name)
+        
+                
+    def _video_list(self, origin, data):
+        if origin is self.controller:
+            print data
+            if data:
+                names = [stream[0] for stream in data]
+                self.write("\n".join(names))
+            else:
+                self.write('There is no video stream.')
+                    
+    def _video_sending_started(self, origin, data):
+        if data:
+            self.write('\nVideo sending started.')
+        else:
+            self.write('\nUnable to start video sending.')
+            
+    def _video_sending_stopped(self, origin, data):
+        if data:
+            self.write('\nVideo sending stopped.')
+        else:
+            self.write('\nUnable to stop video sending.')
+            
+
     def _streams_list(self, origin, (streams, data)):
         if origin is self.controller:
             names = []
@@ -540,18 +681,9 @@ class CliView(Observer):
     def _start_streams(self, origin, data):
         self.write(data)
         
-    def _audio_sending_started(self, origin, data):
-        if data:
-            self.write('\nAudio sending started.')
-        else:
-            self.write('\nUnable to start audio sending.')
-            
-    def _audio_sending_stopped(self, origin, data):
-        if data:
-            self.write('\nAudio sending stopped.')
-        else:
-            self.write('\nUnable to stop audio sending.')
-            
+    def _stop_streams(self, origin, data):
+        self.write(data)
+        
             
 
 def bold(msg):

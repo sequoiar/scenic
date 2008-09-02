@@ -20,13 +20,11 @@
 
 # Twisted imports
 from twisted.internet import reactor, protocol, defer
-#from twisted.protocols.basic import LineReceiver
 
 # App imports
-#from protocols import ipcp
 from streams.stream import AudioStream, Stream
 from streams.gst_client import GstClient
-from utils import log, get_def_name
+from utils import log
 
 log = log.start('info', 1, 0, 'audioGst')
 
@@ -37,30 +35,12 @@ class AudioGst(AudioStream, GstClient):
     def __init__(self, port, address='127.0.0.1', core=None):
         AudioStream.__init__(self, core)
         GstClient.__init__(self, port, address)
-        
-        # Add callback for commands coming from GST
-#        Stream.gst.add_callback()
             
-        
-#    @defer.inlineCallbacks
     def get_attr(self, name):
         """        
         name: string
         """
         return getattr(self, name)
-#        self._send_cmd('audio_get', name)
-#        answer = self._send_cmd('audio_get', name)
-#        def got_answer(result):
-#            return result
-#        answer.addCallback(got_answer)
-#        return answer              
-    
-    def get_attrs(self):
-        """function get_attrs
-        
-        returns 
-        """
-        return None # should raise NotImplementedError()
     
     def set_attr(self, name, value):
         """
@@ -72,24 +52,15 @@ class AudioGst(AudioStream, GstClient):
             return True, name, value
         return False, name, value
     
-    def set_attrs(self):
-        """function set_attrs
-        
-        returns 
-        """
-        return None # should raise NotImplementedError()
-    
     def start_sending(self, address):
         """function start_sending
         address: string
-        returns 
         """
         attrs = [(attr, value) for attr, value in self.__dict__.items() if attr[0] != "_"]
         self._send_cmd('start_audio', self.sending_started, ('address', address), *attrs)
         
     def sending_started(self, caps):
-#        print get_def_name(1)
-        self._del_callback(get_def_name(1))
+        self._del_callback()
         if caps.isdigit():
             self._core.notify(None, caps, 'audio_sending_started')
         else:
@@ -102,7 +73,7 @@ class AudioGst(AudioStream, GstClient):
         self._send_cmd('stop_audio', self.sending_stopped)
     
     def sending_stopped(self, state):
-        self._del_callback(get_def_name(1))
+        self._del_callback()
         self._core.notify(None, state, 'audio_sending_stopped')
    
     def start_receving(self):

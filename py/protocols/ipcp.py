@@ -39,19 +39,21 @@ class IPCP(LineReceiver):
 
     def add_callback(self, cmd, name=None):
         if not name:
-            name = cmd.__name__
+            name = cmd.im_class.__name__ + '/' + cmd.__name__
         if name not in self.callbacks:
             self.callbacks[name] = cmd
         else:
-            log.debug('A callback with this %s is already registered.' % name)
+            log.debug('A callback with this name %s is already registered.' % name)
+#        log.debug('Callback list: ' + repr(self.callbacks))
             
     def del_callback(self, name):
         if isinstance(name, FunctionType):
-            name = name.__name__
+            name = cmd.im_class.__name__ + '/' + cmd.__name__
         if name in self.callbacks:
             del self.callbacks[name]
         else:
             log.debug('This callback %s is not registered.' % name)
+#        log.debug('Callback list: ' + repr(self.callbacks))
               
     def connectionMade(self):
         log.info('Connection made to the server.')
@@ -76,7 +78,7 @@ class IPCP(LineReceiver):
                         args[pos] = float(arg)
                     except:
                         log.debug('Invalid type for received argument %s.' % arg)
-            print "Received: ", cmd, args
+            log.debug("Received: " + cmd + repr(args))
             self.callbacks[cmd](*args)
     
     def send_cmd(self, cmd, *args):
@@ -92,7 +94,7 @@ class IPCP(LineReceiver):
                 if parg:
                     line.append(parg)
         self.sendLine(' '.join(line))
-        print ' '.join(line)
+        log.debug('Sending: ' + ' '.join(line))
 
     def _process_arg(self, arg):
         if isinstance(arg, int) or isinstance(arg, float):

@@ -28,7 +28,7 @@ class IPCP(LineReceiver):
     
     def lineReceived(self, line):
         print "Client: " + line
-        self.sendLine('sending_started "ogg"')
+#        self.sendLine('sending_started "ogg"')
 
     def connectionMade(self):
         print "A client is connecting!"
@@ -36,9 +36,15 @@ class IPCP(LineReceiver):
         
         
 if __name__ == "__main__":
-    
+
     # Server example
+    import sys
+    
+    port = 10000
+    if len(sys.argv) > 1:
+        port = sys.argv[1]
+        
     factory = protocol.ServerFactory()
     factory.protocol = IPCP
-    reactor.listenTCP(22222, factory)
+    reactor.listenTCP(port, factory)
     reactor.run()
