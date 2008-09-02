@@ -49,6 +49,7 @@ class GstClient(object):
         
     def connection_failed(self, gst):
         ipcp.connection_failed(gst)
+        print self._gst_port, self._gst_address
         Stream.gst_state = 0
 #        log.info('Trying to reconnect...')
 #        self.connect()

@@ -27,6 +27,7 @@ class Streams(object):
     def __init__(self):
         self.streams = {} 
         self.mode = 'send'
+        self.container = None
         self.port = None
 
     def get_kind(self, stream):
@@ -69,10 +70,12 @@ class Streams(object):
     def list(self, kind):
         if kind == 'streams':
             streams = [(name[2:], stream) for name, stream in self.streams.items()]
+            streams.sort() 
+            return streams, self.__dict__
         else:
             streams = [(name[2:], stream) for name, stream in self.streams.items() if name[0:2] == kind[0] + '_']
-        streams.sort()
-        return streams
+            streams.sort() 
+            return streams
 
     def get(self, name, kind):
         dict_name = "_".join([kind[0], name])

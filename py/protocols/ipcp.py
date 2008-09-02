@@ -120,7 +120,7 @@ def connect(addr, port, timeout=2, bindAddress=None):
     return deferred
 
 def connection_failed(protocol):
-    log.warning("Connection failed!")        
+    log.warning("Connection failed! %s" % protocol.getErrorMessage())        
         
 
 
