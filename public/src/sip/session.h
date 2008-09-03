@@ -98,7 +98,9 @@ class Session
 
         virtual bool incomingInvite( void ) = 0;
 
-        virtual void setAutoAnswer( bool mode ) = 0;
+        virtual void setAnswerMode( int mode ) = 0;
+        
+        virtual std::string getAnswerMode( void ) = 0;
 
     private:
         /* The communication protocol */

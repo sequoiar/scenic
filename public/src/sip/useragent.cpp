@@ -166,7 +166,7 @@ static const char *stateStr[] =
     "CONNECTION_STATE_CONNECTING",
     "CONNECTION_STATE_INCOMING",
     "CONNECTION_STATE_CONNECTED",
-    "CONNECTION_STATE_DISCONNECTED",
+    "CONNECTION_STATE_DISCONNECTED / READY",
     "CONNECTION_STATE_TIMEOUT"
 };
 
@@ -193,7 +193,7 @@ static InstantMessaging *_imModule;
 /*
  * Should auto answer on a new invite request or wait for the user accept
  */
-static bool INVITE_AUTO_ANSWER;
+static answerMode _answerMode;
 
 /*************************************************************************************************/
 
@@ -201,11 +201,17 @@ static bool INVITE_AUTO_ANSWER;
 UserAgent::UserAgent( std::string name, int port )
     : _name(name), _localURI(0)
 {
+    // The state of the connection
     _state = CONNECTION_STATE_NULL;
-    INVITE_AUTO_ANSWER = true;
+
+    // Default behaviour on new incoming invite request
+    _answerMode = ANSWER_MODE_AUTO;
+    
     _localURI = new URI( port );
+    
     // Instantiate the instant messaging module
     _imModule = new InstantMessaging();
+    
     // To generate a different random number at each time
     // Useful for the random port selection if the default one is used
     srand(time(NULL));
@@ -277,10 +283,35 @@ std::string UserAgent::getConnectionStateStr( connectionState state ){
     return res;
 }
 
-void UserAgent::setInviteAutoAnswer( bool mode ){
+void UserAgent::setAnswerMode( int mode ){
 
-    INVITE_AUTO_ANSWER = mode;
+    // Validate the parameter
+    if( mode == 0 || mode == 1 ){
+        // 0 for auto mode
+        // 1 for manual mode
+        _answerMode = (answerMode)mode;
+    }
 }
+
+std::string UserAgent::getAnswerMode( void ){
+
+    std::string res;
+
+    switch( _answerMode ){
+        case ANSWER_MODE_AUTO:
+            res = "auto";
+            break;
+        case ANSWER_MODE_MANUAL:
+            res = "manual";
+            break;
+        default:
+            res = "unknown mode";
+            break;
+    }
+
+    return res;
+}
+
 
 bool UserAgent::hasIncomingCall( void ){
 
@@ -699,7 +730,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     // Auto answer to the invite session or not
-    if( INVITE_AUTO_ANSWER ){
+    if( _answerMode == ANSWER_MODE_AUTO ){
         inv_session_answer();
     }
 
