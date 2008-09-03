@@ -22,6 +22,7 @@
 
 #define THIS_FILE       "useragent"
 #define _LOCAL_IP_ADDRESS   "127.0.0.1"
+#define DEFAULT_SIP_PORT   5060
 #define PJ_LOG_LEVEL        5
 
 #define MSG_RINGING                 180
@@ -141,6 +142,8 @@ class UserAgent
          * Return the local sip address
          */
         URI* getLocalURI() { return _localURI; }
+
+        std::string buildDefaultLocalUri();
 
         /*
          * Method the send an instant text message to the connected peer

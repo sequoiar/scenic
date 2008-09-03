@@ -20,13 +20,6 @@
 #include "sipsession.h"
 #include <iostream>
 
-SIPSession::SIPSession()
-    : Session( PROTOCOL_SIP, DEFAULT_SIP_PORT), _app_ua(NULL){
-    _app_ua = new UserAgent( APP_NAME, DEFAULT_SIP_PORT );
-    _app_ua->init_pjsip_modules( );
-}
-
-
 SIPSession::SIPSession( int port )
     : Session( PROTOCOL_SIP, port ), _app_ua(NULL) {
     pj_status_t status;
@@ -88,7 +81,6 @@ void SIPSession::build_sdp( void ){}
 void SIPSession::setMedia( std::string type, std::string codecs, int port, std::string dir ){
     _app_ua->setSessionMedia( type, codecs, port, dir );
 }
-
 
 std::string SIPSession::getConnectionState( void ){
     return _app_ua->getConnectionStateStr( _app_ua->getConnectionState() );

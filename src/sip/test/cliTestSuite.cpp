@@ -8,10 +8,9 @@ using std::endl;
 static std::string MENU =
     "\n"
     "Enter menu character:\n"
-    "  c    Connect\n"
+    "  c    Local connection\n"
     "  d    Disconnect\n"
-    "  a    Add a media ( sendrecv )\n"
-    "  b    Add a media (with direction)\n"
+    "  a    Add a media\n"
     "  l    List all media\n"
     "  r    Reinvite\n"
     "  m    Chat\n"
@@ -33,7 +32,7 @@ int main(int argc, char** argv){
         sip = new SIPSession( atoi(argv[1]));
     else
         sip = new SIPSession( );
-    sip->setMedia("audio", "vorbis/PCMA/", 12345, "sendrecv");
+    sip->setMedia("audio", "vorbis/PCMA/", 12345);
 
     // Console main
     cout << MENU << endl;
@@ -63,7 +62,7 @@ int main(int argc, char** argv){
         switch(input[0])
         {
             case 'c':
-                if (sip->connect("<sip:bloup@192.168.1.230:0>") == 1 ){
+                if (sip->connect() == 1 ){
                     msg = sip->getConnectionState();
                     cout << msg << endl;
                 }
@@ -75,15 +74,6 @@ int main(int argc, char** argv){
                 }
                 break;
             case 'a':
-                cout << " <<< media type : ";
-                cin >> type;
-                cout << " <<< codecs : ";
-                cin >> codecs;
-                cout << " <<< port : ";
-                cin >> port;
-                sip->setMedia( type, codecs, atoi(port.c_str()), "sendrecv" );
-                break;
-            case 'b':
                 cout << " <<< media type : ";
                 cin >> type;
                 cout << " <<< codecs : ";

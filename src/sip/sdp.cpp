@@ -32,13 +32,6 @@ static const pj_str_t STR_RTP_AVP = { (char*)"RTP/AVP", 7 };
 static const pj_str_t STR_SDP_NAME = { (char*)"miville", 7 };
 static const pj_str_t STR_SENDRECV = { (char*)"sendrecv", 8 };
 
-Sdp::Sdp( )
-    :  _sdpMediaList( 0 ), _ip_addr( "" ), _local_offer( NULL), negociator(NULL)
-{
-    //setCodecsList();
-}
-
-
     Sdp::Sdp( std::string ip_addr )
 : _sdpMediaList(0), _ip_addr( ip_addr ), _local_offer( NULL ), negociator(NULL)
 {

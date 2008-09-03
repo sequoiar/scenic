@@ -31,23 +31,18 @@
 #include "useragent.h"
 
 #define APP_NAME   "miville"
-#define DEFAULT_SIP_PORT   5060
 
 class SIPSession
     : public Session
 {
     public:
-        /*
-         * Create a new SIP session object
-         */
-        SIPSession( );
 
         /*
          * Create a new SIP session object
          *
          * @param port	The local protocol listening port.
          */
-        SIPSession( int port );
+        SIPSession( int port = DEFAULT_SIP_PORT );
 
         /*
          * Class destructor
@@ -89,7 +84,7 @@ class SIPSession
          * @param codecs    the formatted list of encoding codec names
          *                  Pattern: separator: '/', must end with the separator
          */
-        void setMedia( std::string type, std::string codecs, int port, std::string dir );
+        void setMedia( std::string type, std::string codecs, int port, std::string dir = DEFAULT_PARAMETER );
 
         std::string getConnectionState( void );
 

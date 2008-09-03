@@ -51,22 +51,22 @@ void codecHandlingAtSessionLevelTest( void ){
     SIPSession *session = new SIPSession();
 
     cout << " Add an audio and a video media with 2 codecs each" << endl;
-    session->setMedia( "audio", "GSM/PCMU/", 12354, "sendrecv" );
-    session->setMedia( "video", "H264/H263/", 14321, "sendrecv" );
+    session->setMedia( "audio", "GSM/PCMU/", 12354 );
+    session->setMedia( "video", "H264/H263/", 14321  );
     res = session->mediaToString();
     cout << res << endl;
 
     cout << " Modify the media offer" << endl;
-    session->setMedia("audio", "vorbis/PCMA/", 12354, "sendrecv" );
+    session->setMedia("audio", "vorbis/PCMA/", 12354, "sendonly" );
     res = session->mediaToString();
     cout << res << endl;
 }
 
 void directionStreamTest( void ){
 
-    sdpMedia *media = new sdpMedia( "audio", 12345, "sendrecv" );
+    sdpMedia *media = new sdpMedia( "audio", 12345 );
     media->addCodec("GSM");
-    cout << media->getStreamDirectionStr() << endl;
+    cout << " " << media->getStreamDirectionStr() << endl;
 
     media->setStreamDirection(1);
     cout << media->getStreamDirectionStr() << endl;
@@ -80,9 +80,6 @@ void directionStreamTest( void ){
     media->setStreamDirection(4);
     cout << media->getStreamDirectionStr() << endl;
 
-    delete media; media = 0;
-    media = new sdpMedia("audio", 12345, "sendrecv");
-    cout << media->getStreamDirectionStr() << endl;
 }
 
 void mediaTypeTest( void ){
@@ -113,9 +110,9 @@ void mediaTypeTest( void ){
 int main(int argc, char** argv ) {
     (void)argc;
     (void)argv;
-    //codecHandlingAtSessionLevelTest();
-    directionStreamTest();
-    mediaTypeTest();
+    codecHandlingAtSessionLevelTest();
+    ///directionStreamTest();
+    //mediaTypeTest();
 
     return 0;
 }

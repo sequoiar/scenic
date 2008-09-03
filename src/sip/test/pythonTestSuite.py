@@ -33,7 +33,7 @@ print intro
 step = " \nLibrary initialisation and user agent instance creation  ....................................................... "
 port = int(sys.argv[1])
 uac = sip.SIPSession( port )
-uac.setMedia("audio", "vorbis/PCMA/", 12345)
+uac.setMedia("audio", "vorbis/PCMA/", 12345, "sendrecv")
 print step+success
 
 step = " \nDialog invite session creation ................................................................................. "
@@ -57,7 +57,7 @@ print list
 print step+success
 
 step = " \nChange the media and list it ...................................................................................  "
-uac.setMedia("audio", "PCMA/vorbis/", 12345)
+uac.setMedia("audio", "PCMA/vorbis/", 12345, "sendrecv")
 list = uac.mediaToString()
 print list
 print step+success

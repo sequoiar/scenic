@@ -22,7 +22,6 @@
 #include <sstream>
 #include <iostream>
 
-
 static const char* streamDirectionStr[] = 
 {
     "sendrecv",
@@ -46,22 +45,6 @@ sdpMedia::sdpMedia( int type )
     
 }
 
-
-sdpMedia::sdpMedia( std::string type, int port )
-    : _mediaType( (mediaType)-1 ), _codecList(0), _port( port ), _streamType( SEND_RECEIVE){
-
-    unsigned int i;
-    const char* tmp;
-
-    for( i=0 ; i<MEDIA_COUNT ; i++){
-        tmp = mediaTypeStr[i];
-        if( strcmp(type.c_str(), tmp) == 0 ){
-            _mediaType = (mediaType)i;
-            break;
-        }
-    }
-}
-
 sdpMedia::sdpMedia( std::string type, int port, std::string dir)
     : _mediaType( (mediaType)-1), _codecList(0), _port(port), _streamType((streamDirection)-1){
     
@@ -75,6 +58,9 @@ sdpMedia::sdpMedia( std::string type, int port, std::string dir)
             break;
         }
     }
+
+    if( strcmp( dir.c_str(), "default") == 0 )
+        dir = DEFAULT_STREAM_DIRECTION;
 
     for( i=0; i<DIR_COUNT; i++ ){
         tmp = streamDirectionStr[i];
