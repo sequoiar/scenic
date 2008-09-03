@@ -59,7 +59,7 @@ void initiateSessionTest( int argc, char** argv ) {
         media = argv[i];
         sip->setMedia( media );
        }*/
-    sip->setMedia("audio", "GSM/PCMU/", 12567);
+    sip->setMedia("audio", "GSM/PCMU/", 12567, "sendrecv");
 
     cout << "Connecting to peer" << endl;
     //sip->connect( peer );

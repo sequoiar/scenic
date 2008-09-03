@@ -59,7 +59,7 @@ Sdp::~Sdp(){
 
 }
 
-void Sdp::setSDPMedia( std::string type, std::string codecs, int port ){
+void Sdp::setSDPMedia( std::string type, std::string codecs, int port, std::string dir ){
     sdpMedia *media;
     size_t pos;
     std::string tmp;
@@ -79,7 +79,7 @@ void Sdp::setSDPMedia( std::string type, std::string codecs, int port ){
     }
 
     if(!retrieved){
-        media = new sdpMedia( type, port );
+        media = new sdpMedia( type, port, dir );
     }
     // The string codecs can contains multiple codecs,
     // we have to parse by assuming that the delimiter is the '/' char
@@ -138,13 +138,12 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
             rtpmap.param.slen = 0;
         pjmedia_sdp_rtpmap_to_attr( pool, &rtpmap, &attr );
         med->attr[ med->attr_count++] = attr;
-
-        // Add the direction stream
-        attr = (pjmedia_sdp_attr*)pj_pool_zalloc( pool, sizeof(pjmedia_sdp_attr) );
-        attr->name = pj_str((char*)media->getStreamDirectionStr().c_str());
-        med->attr[ med->attr_count++] = attr;
-
     }
+
+    // Add the direction stream
+    attr = (pjmedia_sdp_attr*)pj_pool_zalloc( pool, sizeof(pjmedia_sdp_attr) );
+    pj_strdup2( pool, &attr->name, media->getStreamDirectionStr().c_str());
+    med->attr[ med->attr_count++] = attr;
 
     *p_med = med;
 }
@@ -251,6 +250,11 @@ void Sdp::sdp_addConnectionInfo( void ){
 
 
 void Sdp::sdp_addTiming( void ){
+   
+    // RFC 3264: An offer/answer model session description protocol
+    // As the session is created and destroyed through an external signaling mean (SIP), the line
+    // should have a value of "0 0".
+
     this->_local_offer->time.start = this->_local_offer->time.stop = 0;
 }
 

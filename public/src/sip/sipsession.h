@@ -89,7 +89,7 @@ class SIPSession
          * @param codecs    the formatted list of encoding codec names
          *                  Pattern: separator: '/', must end with the separator
          */
-        void setMedia( std::string type, std::string codecs, int port );
+        void setMedia( std::string type, std::string codecs, int port, std::string dir );
 
         std::string getConnectionState( void );
 

@@ -135,7 +135,7 @@ class UserAgent
 	 *                be separated with / and the last character must be / 
          * @param port The port to transport the media
          */
-        void setSessionMedia( std::string type, std::string codecs, int port );
+        void setSessionMedia( std::string type, std::string codecs, int port, std::string dir );
 
         /*
          * Return the local sip address
