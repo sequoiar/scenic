@@ -10,7 +10,8 @@ static std::string MENU =
     "Enter menu character:\n"
     "  c    Connect\n"
     "  d    Disconnect\n"
-    "  a    Add a media\n"
+    "  a    Add a media ( sendrecv )\n"
+    "  b    Add a media (with direction)\n"
     "  l    List all media\n"
     "  r    Reinvite\n"
     "  m    Chat\n"
@@ -24,7 +25,7 @@ static std::string MENU =
 int main(int argc, char** argv){
     char input[50];
     std::string msg;
-    std::string type, codecs, port;
+    std::string type, codecs, port, dir;
     Session *sip;
 
     // Session creation
@@ -32,7 +33,7 @@ int main(int argc, char** argv){
         sip = new SIPSession( atoi(argv[1]));
     else
         sip = new SIPSession( );
-    sip->setMedia("audio", "vorbis/PCMA/", 12345);
+    sip->setMedia("audio", "vorbis/PCMA/", 12345, "sendrecv");
 
     // Console main
     cout << MENU << endl;
@@ -80,7 +81,18 @@ int main(int argc, char** argv){
                 cin >> codecs;
                 cout << " <<< port : ";
                 cin >> port;
-                sip->setMedia( type, codecs, atoi(port.c_str()) );
+                sip->setMedia( type, codecs, atoi(port.c_str()), "sendrecv" );
+                break;
+            case 'b':
+                cout << " <<< media type : ";
+                cin >> type;
+                cout << " <<< codecs : ";
+                cin >> codecs;
+                cout << " <<< port : ";
+                cin >> port;
+                cout << " <<< direction : ";
+                cin >> dir;
+                sip->setMedia( type, codecs, atoi(port.c_str()), dir );
                 break;
             case 'l':
                 cout << sip->mediaToString() << endl;

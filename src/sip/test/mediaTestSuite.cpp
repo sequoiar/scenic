@@ -79,6 +79,10 @@ void directionStreamTest( void ){
 
     media->setStreamDirection(4);
     cout << media->getStreamDirectionStr() << endl;
+
+    delete media; media = 0;
+    media = new sdpMedia("audio", 12345);
+    cout << media->getStreamDirectionStr() << endl;
 }
 
 void mediaTypeTest( void ){

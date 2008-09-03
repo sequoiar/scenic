@@ -30,6 +30,11 @@
  *          it maintains internally a list of codecs to use in the SDP session and negociation
  */
 
+/*
+ * This enum contains the different media stream direction.
+ * To be added in the SDP attributes
+ * The last one is only here to have to size information, otherwise the enum struct doesn't provide any means to know it
+ */
 enum streamDirection {
     SEND_RECEIVE,
     SEND_ONLY,
@@ -40,6 +45,11 @@ enum streamDirection {
 
 typedef enum streamDirection streamDirection;
 
+/*
+ * This enum contains the different media types.
+ * To be added in the SDP attributes
+ * The last one is only here to have to size information, otherwise the enum struct doesn't provide any means to know it
+ */
 enum mediaType {
     AUDIO,
     VIDEO,
@@ -56,7 +66,8 @@ class sdpMedia
 {
     public:
         sdpMedia( int type );
-        sdpMedia( std::string media, int port );
+        sdpMedia( std::string type, int port );
+        sdpMedia( std::string type, int port, std::string dir );
         ~sdpMedia();
 
         /*

@@ -34,7 +34,7 @@ void initiateSessionTest( int argc, char** argv ) {
        } */
     Session* sip = new SIPSession(atoi(argv[1]));
     nbMedia = argc - 2;
-    sip->setMedia("audio", "GSM/PCMU/", 12345);
+    sip->setMedia("audio", "GSM/PCMU/", 12345, "sendrecv");
     /*
        // argv[1] -> listening port
        // argv[2] ... argv[n] -> media to add to the session

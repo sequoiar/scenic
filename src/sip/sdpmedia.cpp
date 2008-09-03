@@ -47,20 +47,44 @@ sdpMedia::sdpMedia( int type )
 }
 
 
-sdpMedia::sdpMedia( std::string media, int port )
+sdpMedia::sdpMedia( std::string type, int port )
     : _mediaType( (mediaType)-1 ), _codecList(0), _port( port ), _streamType( SEND_RECEIVE){
 
     unsigned int i;
     const char* tmp;
 
-    for( i=0 ; i<sizeof(mediaTypeStr) ; i++){
+    for( i=0 ; i<MEDIA_COUNT ; i++){
         tmp = mediaTypeStr[i];
-        if( strcmp(media.c_str(), tmp) == 0 ){
+        if( strcmp(type.c_str(), tmp) == 0 ){
             _mediaType = (mediaType)i;
+            break;
         }
     }
 }
 
+sdpMedia::sdpMedia( std::string type, int port, std::string dir)
+    : _mediaType( (mediaType)-1), _codecList(0), _port(port), _streamType((streamDirection)-1){
+    
+    unsigned int i;
+    const char* tmp;
+
+    for( i=0 ; i<MEDIA_COUNT ; i++){
+        tmp = mediaTypeStr[i];
+        if( strcmp(type.c_str(), tmp) == 0 ){
+            _mediaType = (mediaType)i;
+            break;
+        }
+    }
+
+    for( i=0; i<DIR_COUNT; i++ ){
+        tmp = streamDirectionStr[i];
+        std::cout << "debug: " << tmp << std::endl;
+        if( strcmp(dir.c_str(), tmp) == 0){
+            _streamType = (streamDirection)i;
+            break;
+        }
+    }
+}
 
 sdpMedia::~sdpMedia()
 {
@@ -150,8 +174,8 @@ std::string sdpMedia::toString( void ){
     for(i=0; i<size; i++){
         display << _codecList[i]->_name << " ";
     }
-
     display << std::endl;
+    display << "DIRECTION = " << getStreamDirectionStr() << std::endl;
 
     return display.str();
 }

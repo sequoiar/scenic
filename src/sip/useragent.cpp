@@ -528,9 +528,9 @@ int UserAgent::sendInstantMessage( std::string msg ){
     return !PJ_SUCCESS;
 }
 
-void UserAgent::setSessionMedia( std::string type, std::string codecs, int port ){
+void UserAgent::setSessionMedia( std::string type, std::string codecs, int port, std::string dir ){
 
-    local_sdp->setSDPMedia( type, codecs, port );
+    local_sdp->setSDPMedia( type, codecs, port, dir );
 }
 
 std::string UserAgent::mediaToString( void ){
