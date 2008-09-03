@@ -99,6 +99,10 @@ bool SIPSession::incomingInvite( void ){
     return _app_ua->hasIncomingCall();
 }
 
-void SIPSession::setAutoAnswer( bool mode ){
-    _app_ua->setInviteAutoAnswer( mode );
+void SIPSession::setAnswerMode( int mode ){
+    _app_ua->setAnswerMode( mode );
+}
+        
+std::string SIPSession::getAnswerMode( void ){
+    return _app_ua->getAnswerMode();
 }

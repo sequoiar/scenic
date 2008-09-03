@@ -92,7 +92,9 @@ class SIPSession
 
         bool incomingInvite( void );
 
-        void setAutoAnswer( bool mode );
+        void setAnswerMode( int mode );
+
+        std::string getAnswerMode( void );
 
         SIPSession(SIPSession const&); //No Copy Constructor
         SIPSession& operator=(const SIPSession&); //No Assignment Operator

@@ -13,6 +13,8 @@ BOOST_PYTHON_MODULE( libsip_export )
     class_<SIPSession>("SIPSession", init<int>())
     .def(init<>())
     .def("connect", &SIPSession::connect, (arg("r_uri") = DEFAULT_PARAMETER))
+    .def("accept", &SIPSession::accept)
+    .def("refuse", &SIPSession::refuse)
     .def("disconnect", &SIPSession::disconnect)
     .def("reinvite", &SIPSession::reinvite)
     .def("shutdown", &SIPSession::shutdown)
@@ -21,6 +23,8 @@ BOOST_PYTHON_MODULE( libsip_export )
     .def("setMedia", &SIPSession::setMedia, (arg("dir") = DEFAULT_PARAMETER))
     .def("mediaToString", &SIPSession::mediaToString)
     .def("getConnectionState", &SIPSession::getConnectionState)
+    .def("getAnswerMode", &SIPSession::getAnswerMode)
+    .def("setAnswerMode", &SIPSession::setAnswerMode)
     ;
 }
 

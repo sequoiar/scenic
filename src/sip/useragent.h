@@ -58,8 +58,13 @@ enum connectionState {
     CONNECTION_STATE_TIMEOUT
 };
 
-typedef enum connectionState connectionState;
+enum answerMode {
+    ANSWER_MODE_AUTO,
+    ANSWER_MODE_MANUAL
+};
 
+typedef enum connectionState connectionState;
+typedef enum answerMode amswerMode;
 
 class UserAgent
 {
@@ -182,7 +187,9 @@ class UserAgent
          * Change the invite answer mode. In AUTO mode, any new invite session is automatically accepted 
          * In manual mode, the user agent server can accept or refuse the incoming call
          */
-        void setInviteAutoAnswer( bool mode );
+        void setAnswerMode( int mode );
+
+        std::string getAnswerMode( void );
 
         /*
          * Test if the user has an incoming call  
