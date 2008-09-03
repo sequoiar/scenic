@@ -209,6 +209,8 @@ UserAgent::UserAgent( std::string name, int port )
     // To generate a different random number at each time
     // Useful for the random port selection if the default one is used
     srand(time(NULL));
+
+    cout << "local default URI =  " << DEFAULT_SIP_ADDRESS << endl;
 }
 
 
@@ -243,6 +245,14 @@ int UserAgent::pjsip_shutdown(){
     pj_shutdown();
 
     return 0;
+}
+
+std::string UserAgent::buildDefaultLocalUri( void ){
+
+    URI *default_uri;
+
+    default_uri = new URI(DEFAULT_SIP_PORT);
+    return default_uri->getAddress();
 }
 
 connectionState UserAgent::getConnectionState( void ){
@@ -384,7 +394,16 @@ int UserAgent::inv_session_create( std::string uri ){
     pj_str_t from, to;
     char tmp[90], tmp1[90];
 
-    remote = new URI( uri );
+    // Check if the default address is called
+    if( strcmp( uri.c_str(), "default") == 0 ){
+        // the remote is actually the same host, binded on the port 5060
+        // Use for local tests
+        remote = new URI(DEFAULT_SIP_PORT);
+    }
+
+    else
+        remote = new URI( uri );
+    
     local = getLocalURI();
 
     pj_ansi_sprintf( tmp, local->getAddress().c_str() );

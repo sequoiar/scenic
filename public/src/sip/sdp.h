@@ -38,8 +38,6 @@
 class Sdp
 {
     public:
-        /* Class constructor */
-        Sdp();
 
         /*
          * Class Constructor.

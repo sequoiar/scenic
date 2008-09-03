@@ -30,6 +30,7 @@
 #include "useragent.h"
 
 #define PROTOCOL_SIP    0
+#define DEFAULT_PARAMETER "default"
 
 class Session
 {
@@ -56,7 +57,7 @@ class Session
          * @param   r_uri	The remote SIP address
          * @param   r_port	The remote connection port
          */
-        virtual int connect( std::string r_uri ) = 0;
+        virtual int connect( std::string r_uri = DEFAULT_PARAMETER ) = 0;
 
         /*
          * Terminate a current remote connection
@@ -89,7 +90,7 @@ class Session
          * @param codecs    the formatted list of encoding codec names
          *                  Pattern: a=codec1/codec2/../codecn/ (a pour audio; v pour video)
          */
-        virtual void setMedia( std::string type, std::string codecs, int port, std::string dir ) = 0;
+        virtual void setMedia( std::string type, std::string codecs, int port, std::string dir = DEFAULT_PARAMETER ) = 0;
 
         virtual std::string getConnectionState( void ) = 0;
 

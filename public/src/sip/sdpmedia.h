@@ -24,6 +24,8 @@
 
 #include <vector>
 
+#define DEFAULT_STREAM_DIRECTION    "sendrecv"
+
 /*
  * @file sdpmedia.h
  * @brief   A class to describe a media. It can be either a video codec or an audio codec.
@@ -66,8 +68,7 @@ class sdpMedia
 {
     public:
         sdpMedia( int type );
-        sdpMedia( std::string type, int port );
-        sdpMedia( std::string type, int port, std::string dir );
+        sdpMedia( std::string type, int port, std::string dir = DEFAULT_STREAM_DIRECTION);
         ~sdpMedia();
 
         /*
