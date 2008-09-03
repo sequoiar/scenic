@@ -24,9 +24,11 @@
 #include <cassert>
 #include <gst/gst.h>
 
+//#ifdef USE_OSC
 #include "lo/lo.h"
-
 #include "logWriter.h"
+//#endif
+
 #include "gstLinkable.h"
 #include "mediaBase.h"
 #include "audioReceiver.h"
@@ -48,7 +50,7 @@ AudioReceiver::~AudioReceiver()
     pipeline_.remove(depayloader_);
 }
 
-
+//#ifdef USE_OSC
 void AudioReceiver::wait_for_caps()
 {
     LOG("Waiting for caps...", DEBUG);
@@ -64,6 +66,7 @@ void AudioReceiver::wait_for_caps()
 
     lo_server_thread_free(st);
 }
+//#endif
 
 
 void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
@@ -113,7 +116,9 @@ void AudioReceiver::init_sink()
 bool AudioReceiver::start()
 {
     // FIXME: caps are only sent if sender is started after receiver
+#ifdef USE_OSC
     wait_for_caps();
+#endif
     std::cout << "Receiving audio on port " << config_.port() << std::endl;
     MediaBase::start();
     return true;
