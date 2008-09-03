@@ -210,7 +210,6 @@ UserAgent::UserAgent( std::string name, int port )
     // Useful for the random port selection if the default one is used
     srand(time(NULL));
 
-    cout << "local default URI =  " << DEFAULT_SIP_ADDRESS << endl;
 }
 
 
