@@ -24,11 +24,11 @@
 #include <cassert>
 #include <gst/gst.h>
 
-#define USE_OSC 1
-#ifdef USE_OSC
+//#define USE_OSC 
+//#ifdef USE_OSC
 #include "lo/lo.h"
 #include "logWriter.h"
-#endif
+//#endif
 
 #include "audioSender.h"
 #include "audioSource.h"
@@ -92,7 +92,7 @@ void AudioSender::init_sink()
 
 void AudioSender::send_caps() const
 {
-#ifdef USE_OSC
+//#ifdef USE_OSC
     //CapsSender::send(session_.caps_str());
     
     // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
@@ -102,7 +102,7 @@ void AudioSender::send_caps() const
     if (lo_send(t, "/audio/rx/caps", "s", session_.getCaps().c_str()) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t)
                   << std::endl;
-#endif
+//#endif
 }
 
 

@@ -20,7 +20,7 @@
 
 #include <cpptest.h>
 #include <iostream>
-
+//#define USE_OSC
 #include "syncTestSuite.h"
 #include "videoSender.h"
 #include "videoConfig.h"

@@ -9,7 +9,7 @@ libgst_a_SOURCES = videoReceiver.cpp videoSender.cpp videoSource.cpp mediaBase.c
 				   interleave.cpp gstLinkable.cpp videoSink.cpp
 
 
-libgst_a_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(LLO_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS)
+libgst_a_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(LIBLO_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS)
 #libgst_a_LIBADD = $(GST_LIBS) $(GSTAUDIO_LIBS) $(GSTCONTROLLER_LIBS) 
 
 #bin_PROGRAMS = gstApp
