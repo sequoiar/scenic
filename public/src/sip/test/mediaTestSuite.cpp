@@ -51,20 +51,20 @@ void codecHandlingAtSessionLevelTest( void ){
     SIPSession *session = new SIPSession();
 
     cout << " Add an audio and a video media with 2 codecs each" << endl;
-    session->setMedia( "audio", "GSM/PCMU/", 12354 );
-    session->setMedia( "video", "H264/H263/", 14321 );
+    session->setMedia( "audio", "GSM/PCMU/", 12354, "sendrecv" );
+    session->setMedia( "video", "H264/H263/", 14321, "sendrecv" );
     res = session->mediaToString();
     cout << res << endl;
 
     cout << " Modify the media offer" << endl;
-    session->setMedia("audio", "vorbis/PCMA/", 12354 );
+    session->setMedia("audio", "vorbis/PCMA/", 12354, "sendrecv" );
     res = session->mediaToString();
     cout << res << endl;
 }
 
 void directionStreamTest( void ){
 
-    sdpMedia *media = new sdpMedia( "audio", 12345 );
+    sdpMedia *media = new sdpMedia( "audio", 12345, "sendrecv" );
     media->addCodec("GSM");
     cout << media->getStreamDirectionStr() << endl;
 
@@ -81,13 +81,13 @@ void directionStreamTest( void ){
     cout << media->getStreamDirectionStr() << endl;
 
     delete media; media = 0;
-    media = new sdpMedia("audio", 12345);
+    media = new sdpMedia("audio", 12345, "sendrecv");
     cout << media->getStreamDirectionStr() << endl;
 }
 
 void mediaTypeTest( void ){
 
-    sdpMedia *media = new sdpMedia( "audio", 12345 );
+    sdpMedia *media = new sdpMedia( "audio", 12345, "sendrecv" );
     media->addCodec("GSM");
     cout << media->getMediaTypeStr() << endl;
 
