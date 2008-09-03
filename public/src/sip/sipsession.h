@@ -63,6 +63,8 @@ class SIPSession
 
         int shutdown();
 
+        int init();
+
         int reinvite();
 
         /*

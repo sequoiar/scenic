@@ -224,6 +224,13 @@ UserAgent::~UserAgent(){
 
 
 int UserAgent::pjsip_shutdown(){
+
+    if( _state == CONNECTION_STATE_NULL )
+        return 0;
+
+    if( _state == CONNECTION_STATE_CONNECTED )
+        inv_session_end();
+
     // Delete SIP thread
     thread_quit = 1;
     pj_thread_join( sipThread );
@@ -242,17 +249,11 @@ int UserAgent::pjsip_shutdown(){
         pj_caching_pool_destroy(&c_pool);
     }
     pj_shutdown();
+    _state = CONNECTION_STATE_NULL;
 
     return 0;
 }
 
-std::string UserAgent::buildDefaultLocalUri( void ){
-
-    URI *default_uri;
-
-    default_uri = new URI(DEFAULT_SIP_PORT);
-    return default_uri->getAddress();
-}
 
 connectionState UserAgent::getConnectionState( void ){
 

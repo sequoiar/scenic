@@ -17,6 +17,8 @@ static std::string MENU =
     "  i    Get state of the connection\n"
     "  x    Enable auto invite answer mode\n"
     "  y    Disable auto invite answer mode\n"
+    "  s    Shutdown library\n"
+    "  t    Init library\n"
     "  h    Help\n"
     "  q    Quit\n"
     "\n";
@@ -113,6 +115,12 @@ int main(int argc, char** argv){
                 break;
             case 'h':
                 cout << MENU << endl;
+                break;
+            case 's':
+                sip->shutdown();
+                break;
+            case 't':
+                sip->init();
                 break;
             case 'q':
                 sip->shutdown();

@@ -55,6 +55,9 @@ int SIPSession::shutdown( void ){
     return _app_ua->pjsip_shutdown();
 }
 
+int SIPSession::init( void ) {
+    return _app_ua->init_pjsip_modules();
+}
 
 int SIPSession::reinvite( void ){
     return _app_ua->inv_session_reinvite();
