@@ -28,19 +28,6 @@
 #include "hostIP.h"
 
 
-// does nothing, just runs the init funtion for videosender
-void VideoTestSuite::init_test()
-{
-    if (id_ == 1)
-        return;
-    VideoConfig config("videotestsrc");
-    VideoSender tx(config);
-    tx.init();
-
-    BLOCK();
-}
-
-
 void VideoTestSuite::start_test_video()
 {
     if (id_ == 1)

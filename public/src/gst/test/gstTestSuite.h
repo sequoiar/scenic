@@ -32,15 +32,7 @@
 
 #if BLOCKING
 #include <gst/gst.h>
-#define BLOCK() std::cout.flush();                              \
-    std::cout << __FILE__ << ":" << __FUNCTION__ << ":" << __LINE__        \
-              << ": blocking for " << testLength_ << " milliseconds" << std::endl;   \
-    GMainLoop *loop;                                             \
-    loop = g_main_loop_new (NULL, FALSE);                       \
-    g_timeout_add(testLength_, static_cast<GSourceFunc>(GstTestSuite::killMainLoop), static_cast<gpointer>(loop)); \
-    g_main_loop_run(loop);   \
-    g_main_loop_unref(loop)
-    //std::cin.get()
+#define BLOCK() GstTestSuite::block(__FILE__, __LINE__)
 #else
 #define BLOCK()
 #endif
@@ -53,12 +45,13 @@ class GstTestSuite
     public:
 
         GstTestSuite()
-            : id_(0), testLength_(10000)
+            : id_(0), testLength_(3000)
         {}
 
         void set_id(int id);
 
     protected:
+        void block(const char *filename, long lineNumber);
         virtual void setup();       // setup resources common to all tests
         virtual void tear_down();   // destroy common resources
 

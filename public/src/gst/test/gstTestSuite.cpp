@@ -35,3 +35,17 @@ gboolean GstTestSuite::killMainLoop(gpointer data)
     g_main_loop_quit(loop); 
     return FALSE;       // won't be called again
 }
+
+
+void GstTestSuite::block(const char * filename, long lineNumber)
+{
+    std::cout.flush();                              
+    std::cout << filename << ":" << __FUNCTION__ << ":" << lineNumber
+              << ": blocking for " << testLength_ << " milliseconds" << std::endl;   
+    GMainLoop *loop;                                             \
+    loop = g_main_loop_new (NULL, FALSE);                       \
+    g_timeout_add(testLength_, static_cast<GSourceFunc>(GstTestSuite::killMainLoop), static_cast<gpointer>(loop)); 
+    g_main_loop_run(loop);   
+    g_main_loop_unref(loop);
+    //std::cin.get()
+}
