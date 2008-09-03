@@ -66,6 +66,8 @@ class Session
 
         virtual int shutdown() = 0;
 
+        virtual int init() = 0;
+
         virtual int reinvite() = 0;
 
         /*
