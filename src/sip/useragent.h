@@ -56,8 +56,18 @@ enum answerMode {
     ANSWER_MODE_MANUAL
 };
 
+enum errorCode {
+    NO_ERROR,
+    ERROR_INIT_ALREADY_DONE,
+    ERROR_HOST_UNREACHABLE,
+    ERROR_NO_COMPATIBLE_MEDIA,
+    ERROR_CONNECTION_NOT_READY,
+    ERROR_NOT_CONNECTED
+};
+
 typedef enum connectionState connectionState;
 typedef enum answerMode amswerMode;
+typedef enum errorCode errorCode;
 
 class UserAgent
 {
@@ -173,6 +183,17 @@ class UserAgent
          * Return the connection state 
          */
         connectionState getConnectionState( void );
+
+        /*
+         * Return the error string reason
+         */
+        std::string getErrorReason( errorCode code ); 
+
+        /*
+         * Return the error code 
+         */
+        errorCode getErrorCode( void );
+
 
         /*
          * Change the invite answer mode. In AUTO mode, any new invite session is automatically accepted 

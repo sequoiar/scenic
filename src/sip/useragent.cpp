@@ -172,6 +172,18 @@ static const char *stateStr[] =
     "CONNECTION_STATE_NOT_ACCEPTABLE"
 };
 
+static errorCode _error;
+
+static const char *errorReason[] =
+{
+    "NO_ERROR",
+    "ERROR_INIT_ALREADY_DONE",
+    "ERROR_HOST_UNREACHABLE",
+    "ERROR_NO_COMPATIBLE_MEDIA",
+    "ERROR_CONNECTION_NOT_READY",
+    "ERROR_NOT_CONNECTED"
+};
+
 /*
  * A bool to indicate whether or not the main thread is running
  */
@@ -207,6 +219,9 @@ UserAgent::UserAgent( std::string name, int port )
 {
     // The state of the connection
     _state = CONNECTION_STATE_NULL;
+
+    // The error message
+    _error = NO_ERROR;
 
     // Default behaviour on new incoming invite request
     _answerMode = ANSWER_MODE_AUTO;
@@ -270,6 +285,11 @@ connectionState UserAgent::getConnectionState( void ){
     return _state;
 }
 
+errorCode UserAgent::getErrorCode( void ){
+
+    return _error;
+}
+
 std::string UserAgent::getConnectionStateStr( connectionState state ){
 
     std::string res;
@@ -282,6 +302,22 @@ std::string UserAgent::getConnectionStateStr( connectionState state ){
     else
     {
         // We dont know this state
+        res = "?UNKNOWN?";
+    }
+    return res;
+}
+
+std::string UserAgent::getErrorReason( errorCode code ){
+
+    std::string res;
+
+    // Check first if the index is acceptable
+    if (code >=0 && code < (errorCode)PJ_ARRAY_SIZE(errorReason)){
+        res = errorReason[code];
+    }
+    else
+    {
+        // We dont know this code
         res = "?UNKNOWN?";
     }
     return res;
@@ -348,6 +384,11 @@ int UserAgent::init_pjsip_modules(  ){
     pj_uint16_t listeningPort;
     URI *my_uri;
     pjsip_inv_callback inv_cb;
+
+    if( _state != CONNECTION_STATE_NULL ){
+        _error = ERROR_INIT_ALREADY_DONE;
+        return !PJ_SUCCESS;
+    }
 
     // Redirect the library log output to our log system
     pj_log_set_level( PJ_LOG_LEVEL );
@@ -425,6 +466,7 @@ int UserAgent::init_pjsip_modules(  ){
 
     // Update the connection state. The user agent is ready to receive or sent requests
     _state = CONNECTION_STATE_READY;
+    _error = NO_ERROR;
 
     PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
 
@@ -493,9 +535,10 @@ int UserAgent::inv_session_create( std::string uri ){
         */
         return PJ_SUCCESS;
     }
-
-    else
+    else {
+        _error = ERROR_CONNECTION_NOT_READY;
         return !PJ_SUCCESS;
+    }
 }
 
 
@@ -509,10 +552,13 @@ int UserAgent::inv_session_end( void ){
 
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
+            
         return PJ_SUCCESS;
     }
-    return !PJ_SUCCESS;
+    else {
+        _error = ERROR_NOT_CONNECTED;
+        return !PJ_SUCCESS;
+    }
 }
 
 int UserAgent::inv_session_reinvite( void ){
@@ -532,7 +578,11 @@ int UserAgent::inv_session_reinvite( void ){
 
         return PJ_SUCCESS;
     }
-    return !PJ_SUCCESS;
+
+    else{
+        _error = ERROR_NOT_CONNECTED;
+        return !PJ_SUCCESS;
+    }
 }
 
 int UserAgent::inv_session_accept( void ) {
@@ -556,6 +606,7 @@ static int inv_session_answer(){
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
         
         _state = CONNECTION_STATE_CONNECTED;
+        _error = NO_ERROR;
     }
     else{
         // Create and send a 488/Not acceptable here
@@ -566,6 +617,7 @@ static int inv_session_answer(){
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         _state = CONNECTION_STATE_NOT_ACCEPTABLE;
+        _error = ERROR_NO_COMPATIBLE_MEDIA;
     }
 
     return PJ_SUCCESS;
@@ -582,6 +634,7 @@ int UserAgent::inv_session_refuse( void ) {
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     _state = CONNECTION_STATE_DISCONNECTED;
+    _error = NO_ERROR;
 
     return PJ_SUCCESS;
 }
@@ -601,7 +654,10 @@ int UserAgent::sendInstantMessage( std::string msg ){
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
         return PJ_SUCCESS;
     }
-    return !PJ_SUCCESS;
+    else {
+        _error = ERROR_NOT_CONNECTED;
+        return !PJ_SUCCESS;
+    }
 }
 
 void UserAgent::setSessionMedia( std::string type, std::string codecs, int port, std::string dir ){
@@ -681,12 +737,15 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
             case PJSIP_SC_REQUEST_TIMEOUT:
                 // The host was probably unreachable: bad address, bad port, ...
                 _state = CONNECTION_STATE_TIMEOUT;
+                _error = ERROR_HOST_UNREACHABLE;
                 break;
             case PJSIP_SC_NOT_ACCEPTABLE_HERE:
                 _state = CONNECTION_STATE_NOT_ACCEPTABLE;
+                _error = ERROR_NO_COMPATIBLE_MEDIA;
                 break;
             default:
                 _state = CONNECTION_STATE_DISCONNECTED;
+                _error = NO_ERROR;
                 break;
         }
     }
@@ -694,6 +753,7 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
     else if( inv->state == PJSIP_INV_STATE_CONFIRMED ){
         // The connection is established
         _state = CONNECTION_STATE_CONNECTED;
+        _error = NO_ERROR;
     }
     
     else if( inv->state == PJSIP_INV_STATE_INCOMING ){

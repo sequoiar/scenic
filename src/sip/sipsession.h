@@ -89,6 +89,8 @@ class SIPSession
         void setMedia( std::string type, std::string codecs, int port, std::string dir = DEFAULT_PARAMETER );
 
         std::string getConnectionState( void );
+        
+        std::string getErrorReason( void );
 
         bool incomingInvite( void );
 

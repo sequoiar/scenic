@@ -95,6 +95,8 @@ class Session
         virtual void setMedia( std::string type, std::string codecs, int port, std::string dir = DEFAULT_PARAMETER ) = 0;
 
         virtual std::string getConnectionState( void ) = 0;
+        
+        virtual std::string getErrorReason( void ) = 0;
 
         virtual bool incomingInvite( void ) = 0;
 

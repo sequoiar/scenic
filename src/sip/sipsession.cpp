@@ -89,6 +89,10 @@ std::string SIPSession::getConnectionState( void ){
     return _app_ua->getConnectionStateStr( _app_ua->getConnectionState() );
 }
 
+std::string SIPSession::getErrorReason( void ){
+    return _app_ua->getErrorReason( _app_ua->getErrorCode() );
+}
+
 
 std::string SIPSession::mediaToString( void ){
     return _app_ua->mediaToString();
