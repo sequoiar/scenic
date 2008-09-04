@@ -179,6 +179,7 @@ void Pipeline::reset()
 {
     if (pipeline_)
     {
+        LOG("Pipeline is being reset.", DEBUG);
         assert(stop());
         delete instance_;
         instance_ = 0;
@@ -248,7 +249,7 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret)
 
 bool Pipeline::start()
 {
-    checkStateChange(gst_element_set_state(pipeline_, GST_STATE_PAUSED)); // set it to playing
+    checkStateChange(gst_element_set_state(pipeline_, GST_STATE_PAUSED)); // set it to paused 
     assert(checkStateChange(gst_element_set_state(pipeline_, GST_STATE_PLAYING))); // set it to playing
     return isPlaying();
 }

@@ -134,7 +134,7 @@ class AudioJackSource
 
 
 class AudioDvSource
-    : public InterleavedAudioSource 
+    : public AudioSource 
 {
     public:
         explicit AudioDvSource(const AudioConfig &config);

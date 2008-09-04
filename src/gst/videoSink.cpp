@@ -34,7 +34,7 @@
 gboolean VideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
 {
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(data), GDK_WINDOW_XWINDOW(widget->window));
-//    gtk_widget_show_all(widget);
+    gtk_widget_show_all(widget);
     return TRUE;
 }
 
@@ -91,6 +91,7 @@ void VideoSink::makeWindowBlack()
 void VideoSink::showWindow()
 {
     makeWindowBlack();
+    gtk_window_set_title(GTK_WINDOW(window_), "Sropulpof");
     gtk_widget_show_all(window_);
 }
 
