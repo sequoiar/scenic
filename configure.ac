@@ -23,6 +23,7 @@ AC_CHECK_HEADERS([arpa/inet.h stdlib.h string.h sys/ioctl.h unistd.h])
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_C_CONST
+PKG_PROG_PKG_CONFIG
 
 AC_MSG_CHECKING(whether to enable debugging)
 AC_ARG_ENABLE(debug, [  --enable-debug=(yes/no) turn on debug symbols and extra warnings ],, 
