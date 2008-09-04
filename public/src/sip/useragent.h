@@ -25,15 +25,6 @@
 #define DEFAULT_SIP_PORT   5060
 #define PJ_LOG_LEVEL        5
 
-#define MSG_RINGING                 180
-#define MSG_OK                      200
-#define MSG_METHOD_NOT_ALLOWED      405
-#define MSG_NOT_ACCEPTABLE_HERE     488
-#define MSG_SERVER_INTERNAL_ERROR   500
-
-#define READY_TO_CONNECT    4
-#define REQUEST_TIMEOUT     "Request Timeout"
-
 /* @file	useragent.h
  * @brief	A SIP useragent. Implements the SIP stacks from the transaction layer to the transport layer as described in
  *      RFC 3261.
