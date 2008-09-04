@@ -32,7 +32,7 @@
 
 #if BLOCKING
 #include <gst/gst.h>
-#define BLOCK() GstTestSuite::block(__FILE__, __LINE__)
+#define BLOCK() GstTestSuite::block(__FILE__, __FUNCTION__, __LINE__)
 #else
 #define BLOCK()
 #endif
@@ -51,7 +51,7 @@ class GstTestSuite
         void set_id(int id);
 
     protected:
-        void block(const char *filename, long lineNumber);
+        void block(const char *filename, const char *function, long lineNumber);
         virtual void setup();       // setup resources common to all tests
         virtual void tear_down();   // destroy common resources
 
