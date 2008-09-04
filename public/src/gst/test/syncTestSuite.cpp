@@ -175,6 +175,85 @@ void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
 void SyncTestSuite::start_dv_audio_dv_video()
 {
     int numChannels = 2;
+
+    if (id_ == 1) 
+        return;
+    
+    AudioConfig aConfig("dv1394src", numChannels);
+    AudioSender aTx(aConfig);
+    aTx.init();
+
+    VideoConfig vConfig("dv1394src", "h264");
+    VideoSender vTx(vConfig);
+    vTx.init();
+
+    TEST_ASSERT(aTx.start());
+    TEST_ASSERT(vTx.start());
+
+    BLOCK();
+    TEST_ASSERT(aTx.isPlaying());
+    TEST_ASSERT(vTx.isPlaying());
+}
+
+
+void SyncTestSuite::stop_dv_audio_dv_video()
+{
+    int numChannels = 2;
+    
+    if (id_ == 1)
+    return; 
+
+    AudioConfig aConfig("dv1394src", numChannels);
+    AudioSender aTx(aConfig);
+    aTx.init();
+
+    VideoConfig vConfig("dv1394src", "h264");
+    VideoSender vTx(vConfig);
+    vTx.init();
+
+    BLOCK();
+
+    TEST_ASSERT(aTx.stop());
+    TEST_ASSERT(vTx.stop());
+
+    TEST_ASSERT(!aTx.isPlaying());
+    TEST_ASSERT(!vTx.isPlaying());
+}
+
+
+void SyncTestSuite::start_stop_dv_audio_dv_video()
+{
+    int numChannels = 2;
+    
+    if (id_ == 1) 
+        return;
+    
+        AudioConfig aConfig("dv1394src", numChannels);
+        AudioSender aTx(aConfig);
+        aTx.init();
+
+        VideoConfig vConfig("dv1394src", "h264");
+        VideoSender vTx(vConfig);
+        vTx.init();
+
+        TEST_ASSERT(aTx.start());
+        TEST_ASSERT(vTx.start());
+
+        BLOCK();
+
+        TEST_ASSERT(aTx.isPlaying());
+        TEST_ASSERT(vTx.isPlaying());
+
+        TEST_ASSERT(aTx.stop());
+        TEST_ASSERT(vTx.stop());
+
+        TEST_ASSERT(!aTx.isPlaying());
+        TEST_ASSERT(!vTx.isPlaying());
+}
+
+void SyncTestSuite::start_dv_audio_dv_video_rtp()
+{
+    int numChannels = 2;
     int vPort = 10010;
     int aPort = vPort + 1000;
 
@@ -214,7 +293,7 @@ void SyncTestSuite::start_dv_audio_dv_video()
 }
 
 
-void SyncTestSuite::stop_dv_audio_dv_video()
+void SyncTestSuite::stop_dv_audio_dv_video_rtp()
 {
     int numChannels = 2;
     int vPort = 10010;
@@ -258,9 +337,9 @@ void SyncTestSuite::stop_dv_audio_dv_video()
 }
 
 
-void SyncTestSuite::start_stop_dv_audio_dv_video()
+void SyncTestSuite::start_stop_dv_audio_dv_video_rtp()
 {
-    int numChannels = 8;
+    int numChannels = 2;
     int vPort = 10010;
     int aPort = vPort + 1000;
 

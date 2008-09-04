@@ -255,6 +255,16 @@ void VideoDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
         LOG("Ignoring audio stream from DV", DEBUG);
         return;
     }
+    else if (std::string("video") == gst_pad_get_name(srcPad))
+    {
+        LOG("Got video stream from DV", DEBUG);
+    }
+    else
+    {
+        LOG("Ignoring unknown stream from DV", DEBUG);
+        return;
+    }
+
     GstElement *sinkElement = static_cast<GstElement *>(data);
     GstPad *sinkPad;
 

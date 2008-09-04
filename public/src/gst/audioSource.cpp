@@ -235,7 +235,7 @@ void AudioJackSource::sub_init()
 }
 
     AudioDvSource::AudioDvSource(const AudioConfig &config)
-: InterleavedAudioSource(config), demux_(0), queue_(0), dvIsNew_(true)
+: AudioSource(config), demux_(0), queue_(0), dvIsNew_(true)
 {}
 
 
@@ -261,7 +261,7 @@ void AudioDvSource::init_source()
 void AudioDvSource::sub_init()
 {
     demux_ = pipeline_.findElement("dvdemux");
-    
+    dvIsNew_ = demux_ == NULL;
     if (dvIsNew_)
         assert(demux_ = gst_element_factory_make("dvdemux", "dvdemux"));
     else
@@ -286,12 +286,17 @@ void AudioDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
 {
     if (std::string("video") == gst_pad_get_name(srcPad))
     {
-        LOG("ignoring video stream from dv", DEBUG);
+        LOG("Ignoring video stream from DV", DEBUG);
         return;
     }
     else if (std::string("audio") == gst_pad_get_name(srcPad))
     {
         LOG("Got audio stream from DV", DEBUG);
+    }
+    else
+    {
+        LOG("Ignoring unknown stream from DV", DEBUG);
+        return;
     }
 
     GstElement *sinkElement = static_cast<GstElement *>(data);
@@ -315,6 +320,6 @@ void AudioDvSource::link_elements()
     if (dvIsNew_)
         GstLinkable::link(sources_[0], demux_);
     GstLinkable::link(queue_, aconvs_[0]);
-    GstLinkable::link(aconvs_, interleave_);
+  //  GstLinkable::link(aconvs_, interleave_);
 }
 
