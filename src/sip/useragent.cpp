@@ -485,12 +485,13 @@ int UserAgent::inv_session_create( std::string uri ){
         // Update the connection status. The invite session has been created and sent.
         _state = CONNECTION_STATE_CONNECTING;
 
-        while( _state == CONNECTION_STATE_CONNECTING ){}
-        
-        return _state;
-        
-
-        //return PJ_SUCCESS;
+        /*while( _state == CONNECTION_STATE_CONNECTING ){}
+        if( _state == CONNECTION_STATE_CONNECTED )
+            return PJ_SUCCESS;
+        else
+            return !PJ_SUCCESS;
+*/
+        return PJ_SUCCESS;
     }
 
     else
@@ -549,7 +550,7 @@ static int inv_session_answer(){
 
     if( status == PJ_SUCCESS ){
         // Create and send a 200(OK) response
-        status = pjsip_inv_answer( inv_session, MSG_OK, NULL, NULL, &tdata );
+        status = pjsip_inv_answer( inv_session, PJSIP_SC_OK, NULL, NULL, &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
@@ -559,7 +560,7 @@ static int inv_session_answer(){
     else{
         // Create and send a 488/Not acceptable here
         // because the SDP negociation failed
-        status = pjsip_inv_answer( inv_session, MSG_NOT_ACCEPTABLE_HERE, NULL, NULL, &tdata );
+        status = pjsip_inv_answer( inv_session, PJSIP_SC_NOT_ACCEPTABLE_HERE, NULL, NULL, &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
@@ -674,15 +675,18 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
 
     // The call is terminated
     if( inv->state == PJSIP_INV_STATE_DISCONNECTED ){
-        if( strcmp(pjsip_get_status_text(inv->cause)->ptr, REQUEST_TIMEOUT ) == 0){
-            // The request timed out
-            // The host was probably unreachable: bad address, bad port, ...
-            _state = CONNECTION_STATE_TIMEOUT;
+        switch( inv->cause ){
+            case PJSIP_SC_REQUEST_TIMEOUT:
+                // The host was probably unreachable: bad address, bad port, ...
+                _state = CONNECTION_STATE_TIMEOUT;
+                break;
+            case PJSIP_SC_NOT_ACCEPTABLE_HERE:
+                _state = CONNECTION_STATE_NOT_ACCEPTABLE;
+                break;
+            default:
+                _state = CONNECTION_STATE_DISCONNECTED;
+                break;
         }
-        else{
-	    // The call ended
-            _state = CONNECTION_STATE_DISCONNECTED;
-    	}
     }
 
     else if( inv->state == PJSIP_INV_STATE_CONFIRMED ){
@@ -716,7 +720,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
         if( rdata->msg_info.msg->line.req.method.id != PJSIP_ACK_METHOD ) {
             reason = pj_str((char*)" user agent unable to handle this request ");
-            pjsip_endpt_respond_stateless( endpt, rdata, MSG_METHOD_NOT_ALLOWED, &reason, NULL,
+            pjsip_endpt_respond_stateless( endpt, rdata, PJSIP_SC_METHOD_NOT_ALLOWED, &reason, NULL,
                                            NULL );
             return PJ_TRUE;
         }
@@ -725,7 +729,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     status = pjsip_inv_verify_request( rdata, &options, NULL, NULL, endpt, NULL );
     if( status != PJ_SUCCESS ){
         reason = pj_str((char*)" user agent unable to handle this INVITE ");
-        pjsip_endpt_respond_stateless( endpt, rdata, MSG_METHOD_NOT_ALLOWED, &reason, NULL,
+        pjsip_endpt_respond_stateless( endpt, rdata, PJSIP_SC_METHOD_NOT_ALLOWED, &reason, NULL,
                                        NULL );
         return PJ_TRUE;
     }
@@ -737,7 +741,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     // Create the local dialog (UAS)
     status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL, &dialog );
     if( status != PJ_SUCCESS ) {
-        pjsip_endpt_respond_stateless( endpt, rdata, MSG_SERVER_INTERNAL_ERROR, &reason, NULL,
+        pjsip_endpt_respond_stateless( endpt, rdata, PJSIP_SC_INTERNAL_SERVER_ERROR, &reason, NULL,
                                        NULL );
         return PJ_TRUE;
     }
@@ -747,7 +751,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     // Send a 180/Ringing response
-    status = pjsip_inv_initial_answer( inv_session, rdata, MSG_RINGING, NULL, NULL, &tdata );
+    status = pjsip_inv_initial_answer( inv_session, rdata, PJSIP_SC_RINGING, NULL, NULL, &tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
     status = pjsip_inv_send_msg( inv_session, tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
@@ -795,7 +799,7 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
         msg = rdata->msg_info.msg;
 
         // Respond with OK message
-        status = pjsip_dlg_respond( inv->dlg, rdata, MSG_OK, NULL, NULL, NULL );
+        status = pjsip_dlg_respond( inv->dlg, rdata, PJSIP_SC_OK, NULL, NULL, NULL );
 
         // Display the message
         text = (char*)msg->body->data;
