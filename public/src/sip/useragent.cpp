@@ -195,6 +195,8 @@ static InstantMessaging *_imModule;
  */
 static answerMode _answerMode;
 
+
+
 /*************************************************************************************************/
 
 
@@ -594,7 +596,7 @@ static int startThread( void *arg ){
     while( !thread_quit )
     {
         pj_time_val timeout = {0, 10};
-	// Poll for sipevents
+	    // Poll for sip events
         pjsip_endpt_handle_events( endpt, &timeout );
     }
 
