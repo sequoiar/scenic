@@ -490,7 +490,7 @@ int UserAgent::inv_session_create( std::string uri ){
             return PJ_SUCCESS;
         else
             return !PJ_SUCCESS;
-*/
+        */
         return PJ_SUCCESS;
     }
 
@@ -589,9 +589,11 @@ int UserAgent::inv_session_refuse( void ) {
 int UserAgent::sendInstantMessage( std::string msg ){
     pj_status_t status;
 
-    // Set the current dialog for the instant messaging module
-    _imModule->setDialog( inv_session->dlg );
-    _imModule->setText( msg );
+    if( inv_session ){
+        // Set the current dialog for the instant messaging module
+        _imModule->setDialog( inv_session->dlg );
+        _imModule->setText( msg );
+    }
 
     if( _state == CONNECTION_STATE_CONNECTED ) {
         // Send the message through the IM module
