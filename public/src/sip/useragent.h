@@ -51,11 +51,13 @@
 
 enum connectionState {
     CONNECTION_STATE_NULL,
+    CONNECTION_STATE_READY,
     CONNECTION_STATE_CONNECTING,
     CONNECTION_STATE_INCOMING,
     CONNECTION_STATE_CONNECTED,
     CONNECTION_STATE_DISCONNECTED,
-    CONNECTION_STATE_TIMEOUT
+    CONNECTION_STATE_TIMEOUT,
+    CONNECTION_STATE_NOT_ACCEPTABLE
 };
 
 enum answerMode {
@@ -148,8 +150,6 @@ class UserAgent
          */
         URI* getLocalURI() { return _localURI; }
 
-        std::string buildDefaultLocalUri();
-
         /*
          * Method the send an instant text message to the connected peer
          * The connection has to be established, ie connectionState = CONNECTION_STATE_CONNECTED
@@ -214,6 +214,8 @@ class UserAgent
          * Initialize the pjsip_module structure
          */
         void init_sip_module( void );
+
+        void connection_prepare( void );
 
         UserAgent(const UserAgent&); //No Copy Constructor
         UserAgent& operator=(const UserAgent&); //No Assignment Operator
