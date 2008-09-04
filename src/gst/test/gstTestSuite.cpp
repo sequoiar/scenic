@@ -37,10 +37,10 @@ gboolean GstTestSuite::killMainLoop(gpointer data)
 }
 
 
-void GstTestSuite::block(const char * filename, long lineNumber)
+void GstTestSuite::block(const char * filename, const char *function, long lineNumber)
 {
     std::cout.flush();                              
-    std::cout << filename << ":" << __FUNCTION__ << ":" << lineNumber
+    std::cout << filename << ":" << function << ":" << lineNumber
               << ": blocking for " << testLength_ << " milliseconds" << std::endl;   
     GMainLoop *loop;                                             \
     loop = g_main_loop_new (NULL, FALSE);                       \
