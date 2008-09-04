@@ -18,18 +18,17 @@
  */
 
 #include "gutil/baseThread.h"
-#include "gutil/stdMsg.h"
+#include "gutil/strIntFloat.h"
 #include "tcpServer.h"
-typedef StdMsg TcpMessage;
-typedef QueuePair_<StdMsg> TcpQueue;
+typedef QueuePair_<MapMsg> TcpQueue;
 class TcpThread
-    : public BaseThread<StdMsg>
+    : public BaseThread<MapMsg>
 {
     public:
         TcpThread(int inport)
             : serv_(inport){}
         ~TcpThread(){}
-        bool send(std::string& msg){ return serv_.send(msg);}
+        bool send(MapMsg& msg);
     private:
         int main();
         bool gotQuit();

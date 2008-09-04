@@ -47,7 +47,7 @@
             glog(log_(msg, level, __FILE__, __FUNCTION__, __LINE__),level);
         #else
         #define LOG(msg, level)         \
-            std::cerr << log_(msg, level, __FILE__, __FUNCTION__, __LINE__);if(level == CRITICAL) abort(); 
+            {std::cerr << log_(msg, level, __FILE__, __FUNCTION__, __LINE__);if(level == CRITICAL) abort(); }
     #endif
 
 enum LogLevel {
@@ -58,11 +58,11 @@ enum LogLevel {
     CRITICAL = 50
 };
 
-#define LOG_ERROR(msg)      LOG(msg, ERROR);
-#define LOG_CRITICAL(msg)   LOG(msg, CRITICAL);
-#define LOG_INFO(msg)       LOG(msg, INFO);
-#define LOG_WARNING(msg)    LOG(msg, WARNING);
-#define LOG_DEBUG(msg)      LOG(msg, DEBUG);
+#define LOG_ERROR(msg)      LOG(msg, ERROR)
+#define LOG_CRITICAL(msg)   LOG(msg, CRITICAL)
+#define LOG_INFO(msg)       LOG(msg, INFO)
+#define LOG_WARNING(msg)    LOG(msg, WARNING)
+#define LOG_DEBUG(msg)      LOG(msg, DEBUG)
 
 #ifdef CONFIG_DEBUG
 static const LogLevel LOG_LEVEL = DEBUG;

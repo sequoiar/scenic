@@ -20,7 +20,7 @@
 #include <glib.h>
 #include <iostream>
 #include "gutil/baseThread.h"
-#include "gstMsg.h"
+#include "gutil/strIntFloat.h"
 
 #include "gst/videoSender.h"
 #include "gst/videoReceiver.h"
@@ -30,9 +30,9 @@
 
 
 
-typedef QueuePair_<GstMsg> QueuePair;
+typedef QueuePair_<MapMsg> QueuePair;
 class GstThread
-    : public BaseThread<GstMsg>
+    : public BaseThread<MapMsg>
 {
     public:
         GstThread();

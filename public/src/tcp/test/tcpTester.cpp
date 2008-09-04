@@ -2,6 +2,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include "tcp/tcpThread.h"
+#include "tcp/parser.h"
+
 int main(int argc, char** argv)
 {
     if(argc < 2)
@@ -14,18 +16,19 @@ int main(int argc, char** argv)
 
     while(1)
     {
-        StdMsg f = queue.timed_pop(1000000);
-        if(f.get_type() == StdMsg::STD)
+        MapMsg f = queue.timed_pop(1000000);
+        std::string command;
+        std::cout << f["command"].type() << std::endl;
+        if(f["command"].get(command))
         {
-            std::cout << f.getMsg() << std::endl;
-            if(!f.getMsg().compare(0, 4, "quit"))
+            std::cout << command << std::endl;
+            if(!command.compare("quit"))
             {
-                StdMsg q(StdMsg::QUIT);
-                queue.push(q);
+                queue.push(f);
                 break;
             }
             else{
-                tcp.send(f.getMsg());
+                tcp.send(f);
             }
         }
     }

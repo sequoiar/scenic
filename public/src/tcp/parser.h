@@ -30,12 +30,14 @@
 
 #include <string>
 #include <map>
+#include "gutil/strIntFloat.h"
 
 std::string strEsq(const std::string& str);
 std::string strUnEsq(const std::string& str);
 int get_end_of_quoted_string(const std::string& str);
 
-bool tokenize(const std::string& str, std::map<std::string,std::string> &cmd_map) ;
+bool stringify(std::map<std::string,StrIntFloat>& cmd_map, std::string& str);
+bool tokenize(const std::string& str, std::map<std::string,StrIntFloat>& cmd_map) ;
 
 #endif
 
