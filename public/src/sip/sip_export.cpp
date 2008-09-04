@@ -23,6 +23,7 @@ BOOST_PYTHON_MODULE( libsip_export )
     .def("setMedia", &SIPSession::setMedia, (arg("dir") = DEFAULT_PARAMETER))
     .def("mediaToString", &SIPSession::mediaToString)
     .def("getConnectionState", &SIPSession::getConnectionState)
+    .def("getErrorReason", &SIPSession::getErrorReason)
     .def("getAnswerMode", &SIPSession::getAnswerMode)
     .def("setAnswerMode", &SIPSession::setAnswerMode)
     ;

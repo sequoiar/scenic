@@ -15,6 +15,7 @@ static std::string MENU =
     "  r    Reinvite\n"
     "  m    Chat\n"
     "  i    Get state of the connection\n"
+    "  e    Get the error status report\n"
     "  x    Change invite answer mode\n"
     "  s    Shutdown library\n"
     "  t    Init library\n"
@@ -90,7 +91,7 @@ int main(int argc, char** argv){
                 break;
             case 'r':
                 if( sip->reinvite() == 1 ){
-                    msg = sip->getConnectionState();
+                    msg = sip->getErrorReason();
                     cout << msg << endl;
                 }
                 break;
@@ -98,12 +99,16 @@ int main(int argc, char** argv){
                 cout << "Enter message <<<< ";
                 cin >> msg;
                 if( sip->sendInstantMessage(msg) == 1 ){
-                    msg = sip->getConnectionState();
+                    msg = sip->getErrorReason();
                     cout << msg << endl;
                 }
                 break;
             case 'i':
                 msg = sip->getConnectionState();
+                cout << msg << endl;
+                break;
+            case 'e':
+                msg = sip->getErrorReason();
                 cout << msg << endl;
                 break;
             case 'x':
@@ -121,6 +126,8 @@ int main(int argc, char** argv){
                 break;
             case 't':
                 sip->init();
+                msg = sip->getErrorReason();
+                cout << msg << endl;
                 break;
             case 'q':
                 sip->shutdown();
