@@ -34,7 +34,7 @@
 gboolean VideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
 {
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(data), GDK_WINDOW_XWINDOW(widget->window));
-    gtk_widget_show_all(widget);
+//    gtk_widget_show_all(widget);
     return TRUE;
 }
 
@@ -71,16 +71,26 @@ void VideoSink::init()
     pipeline_.add(sink_);
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
-    
+
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(VideoSink::expose_cb), static_cast<void*>(sink_));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event", G_CALLBACK(VideoSink::key_press_event_cb), NULL);
+
+}
+
+
+void VideoSink::makeWindowBlack()
+{
+    GdkColor color;
+    gdk_color_parse ("black", &color);
+    gtk_widget_modify_bg(window_, GTK_STATE_NORMAL, &color);    // needed to ensure black background
 }
 
 
 void VideoSink::showWindow()
 {
+    makeWindowBlack();
     gtk_widget_show_all(window_);
 }
 
