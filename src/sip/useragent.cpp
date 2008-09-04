@@ -163,11 +163,13 @@ static connectionState _state;
 static const char *stateStr[] =
 {
     "CONNECTION_STATE_NULL",
+    "CONNECTION_STATE_READY",
     "CONNECTION_STATE_CONNECTING",
     "CONNECTION_STATE_INCOMING",
     "CONNECTION_STATE_CONNECTED",
-    "CONNECTION_STATE_DISCONNECTED / READY",
-    "CONNECTION_STATE_TIMEOUT"
+    "CONNECTION_STATE_DISCONNECTED",
+    "CONNECTION_STATE_TIMEOUT",
+    "CONNECTION_STATE_NOT_ACCEPTABLE"
 };
 
 /*
@@ -295,6 +297,17 @@ void UserAgent::setAnswerMode( int mode ){
     }
 }
 
+void UserAgent::connection_prepare( void ){
+
+    // Reset the state to READY
+    if( _state == CONNECTION_STATE_DISCONNECTED ||
+            _state == CONNECTION_STATE_NOT_ACCEPTABLE ||
+            _state == CONNECTION_STATE_TIMEOUT ){
+        _state = CONNECTION_STATE_READY;
+    }
+}
+
+
 std::string UserAgent::getAnswerMode( void ){
 
     std::string res;
@@ -411,7 +424,7 @@ int UserAgent::init_pjsip_modules(  ){
                       &sipThread );
 
     // Update the connection state. The user agent is ready to receive or sent requests
-    _state = CONNECTION_STATE_DISCONNECTED;
+    _state = CONNECTION_STATE_READY;
 
     PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
 
@@ -426,6 +439,9 @@ int UserAgent::inv_session_create( std::string uri ){
     URI *remote, *local;
     pj_str_t from, to;
     char tmp[90], tmp1[90];
+
+    // Prepare the connection
+    connection_prepare();
 
     // Check if the default address is called
     if( strcmp( uri.c_str(), "default") == 0 ){
@@ -445,7 +461,7 @@ int UserAgent::inv_session_create( std::string uri ){
     pj_ansi_sprintf( tmp1, remote->getAddress().c_str() );
     to = pj_str(tmp1);
 
-    if( _state >= READY_TO_CONNECT ) {
+    if( _state == CONNECTION_STATE_READY ) {
         status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
                                        NULL,
                                        &to,
@@ -469,9 +485,12 @@ int UserAgent::inv_session_create( std::string uri ){
         // Update the connection status. The invite session has been created and sent.
         _state = CONNECTION_STATE_CONNECTING;
 
-        //while( _state != CONNECTION_STATE_CONNECTED ){}
+        while( _state == CONNECTION_STATE_CONNECTING ){}
+        
+        return _state;
+        
 
-        return PJ_SUCCESS;
+        //return PJ_SUCCESS;
     }
 
     else
@@ -544,6 +563,8 @@ static int inv_session_answer(){
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+
+        _state = CONNECTION_STATE_NOT_ACCEPTABLE;
     }
 
     return PJ_SUCCESS;
