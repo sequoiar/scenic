@@ -18,6 +18,7 @@
  */
 #include "gstThread.h"
 #include "hostIP.h"
+#include "logWriter.h"
 
 //BaseModule args get deleted in ~BaseModule
 // FIXME: sender and receiver should be in different processes, need to think about how
@@ -47,36 +48,38 @@ int GstThread::main()
 
     while(!done)
     {
-        GstMsg f = queue_.timed_pop(10000);
-        switch(f.get_type())
+        MapMsg f = queue_.timed_pop(10000);
+        if(f["command"].type() == 's')
         {
-            case GstMsg::QUIT:
+            std::string s;
+            f["command"].get(s);
+
+            if(!s.compare("quit"))
             {
-                GstMsg ff(GstMsg::QUIT);
-                queue_.push(ff);
+                queue_.push(f);
                 done = true;
-                break;
-            }
-            case GstMsg::START:
+            } else 
+            if(!s.compare("start"))
             {
                 asender_->start();
-                GstMsg caps(GstMsg::CAPS,asender_->getCaps());
+                std::string caps_str;
+                MapMsg caps;
+                caps.insert( std::make_pair("command","caps"));
+                caps.insert( std::make_pair("caps_str",asender_->getCaps()));
                 queue_.push(caps);
-                break;
-            }
-            case GstMsg::INIT:
+            } else 
+            if(!s.compare("init"))
             {
                 asender_->init();
-                break;
-            }
-            case GstMsg::STOP:
+            } else 
+            if(!s.compare("stop"))
             {
                 asender_->stop();
-                break;
             }
-
-            default:
-                break;
+            else
+            {
+                LOG_WARNING("Unknown Command.")
+            }
         }
 
 

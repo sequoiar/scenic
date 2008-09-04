@@ -18,6 +18,7 @@
  */
 #include "tcpThread.h"
 #include "logWriter.h"
+#include "parser.h"
 
 int TcpThread::main()
 {
@@ -43,12 +44,16 @@ int TcpThread::main()
                 }
                 if(serv_.recv(msg))
                 {
-                    queue_.push(StdMsg(StdMsg::STD, msg));
+                    MapMsg mapMsg;
+                    if(tokenize(msg,mapMsg))
+                        queue_.push(mapMsg);
+                    else
+                        LOG_ERROR("Bad Msg Received.")
                 }
                 else
                     usleep(10000);
             }
-            LOG_WARNING("Disconnected from Core.");
+            LOG_WARNING("Disconnected from Core.")
         }
         serv_.close();
     }
@@ -58,8 +63,9 @@ int TcpThread::main()
 
 bool TcpThread::gotQuit()
 {
-    StdMsg f = queue_.timed_pop(1);
-    if (f.get_type() == StdMsg::QUIT)
+    MapMsg f = queue_.timed_pop(1);
+    std::string command;
+    if(f["command"].get(command)&& !command.compare("quit"))
     {
         queue_.push(f);
         return true;
@@ -67,4 +73,11 @@ bool TcpThread::gotQuit()
     return false;
 }
 
+bool TcpThread::send(MapMsg& msg)
+{
+    std::string msg_str;
+    stringify(msg,msg_str);
+    
+    return serv_.send(msg_str);
+}
 

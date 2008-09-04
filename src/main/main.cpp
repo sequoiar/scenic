@@ -58,7 +58,7 @@ int main (int argc, char** argv)
         LOG_INFO("Must provide a port");
         return -1;
     }
-    if(sscanf(argv[1],"%d",&port) != 1 || port < 1 || port > 65000)
+    if(sscanf(argv[1],"%d",&port) != 1 || port < 0 || port > 65000)
     {
         LOG_INFO("Port must be in the range of 1-65000");
         return -1;
@@ -83,43 +83,46 @@ bool MainModule::run()
 
     while(true)
     {
-        TcpMessage m = tcp_queue.timed_pop(10000);
-        std::string& mstr = m.getMsg();
-        GstMsg gmsg = gst_queue.timed_pop(1000);
-        if (!gmsg.getMsg().empty())
+        MapMsg tmsg = tcp_queue.timed_pop(10000);
+        MapMsg gmsg = gst_queue.timed_pop(1000);
+
+        if (gmsg["command"].type() != 'n')
         {
             std::string tstr;
-            tstr = strEsq(gmsg.getMsg());
+            gmsg["command"].get(tstr);
             LOG_DEBUG(tstr);
-            LOG_DEBUG(strUnEsq(tstr));
+            if(!tstr.compare("caps"))
+            {
+                std::string caps_str;
+                if(gmsg["caps_str"].get(caps_str))
+                {
+                    LOG_DEBUG(caps_str);
+                    tcpThread_.send(gmsg);
+                }
+            }
         }
-        if (mstr.empty())
+        if (tmsg["command"].type() == 'n')
+            continue;
+        
+        std::string command;
+        if(!tmsg["command"].get(command))
             continue;
 
-        mstr.erase(mstr.size()-2,2);
-
-        std::cout << m.getMsg().size();
-
-        if (!m.getMsg().compare("quit"))
+        if (!command.compare("quit"))
         {
-            GstMsg in(GstMsg::QUIT);
-            gst_queue.push(in);
+            gst_queue.push(tmsg);
             LOG("in quit!", DEBUG);
-            tcp_queue.push(TcpMessage(TcpMessage::QUIT));
+            tcp_queue.push(tmsg);
             break;
         }
-        else if (!m.getMsg().compare("init")) {
-            GstMsg in(GstMsg::INIT);
-            gst_queue.push(in);
+        else if (!command.compare("init")) {
+            gst_queue.push(tmsg);
         }
-        else if (!m.getMsg().compare("start")) {
-            GstMsg start(GstMsg::START);
-            gst_queue.push(start);
-          
+        else if (!command.compare("start")) {
+            gst_queue.push(tmsg);
         }
-        else if (!m.getMsg().compare("stop")) {
-            GstMsg stop(GstMsg::STOP);
-            gst_queue.push(stop);
+        else if (!command.compare("stop")) {
+            gst_queue.push(tmsg);
         }
         else
             LOG_DEBUG("Unknown command");
