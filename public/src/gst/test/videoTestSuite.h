@@ -24,7 +24,7 @@
 #include <cpptest.h>
 #include "gstTestSuite.h"
 
-#define LOCAL 1
+#define LOCAL 0
 #define RTP 1
 
 class VideoTestSuite
@@ -32,8 +32,9 @@ class VideoTestSuite
 {
     public:
 
-        VideoTestSuite()
+        VideoTestSuite() 
         {
+            testLength_ = 5000;
 #if LOCAL
             TEST_ADD(VideoTestSuite::start_test_video)
             TEST_ADD(VideoTestSuite::stop_test_video)

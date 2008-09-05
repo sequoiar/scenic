@@ -34,6 +34,7 @@ class AudioTestSuite
         AudioTestSuite()
         {
 #if LOCAL
+#if 0
             TEST_ADD(AudioTestSuite::start_1ch_audiotest)
             TEST_ADD(AudioTestSuite::stop_1ch_audiotest)
             TEST_ADD(AudioTestSuite::start_stop_1ch_audiotest)
@@ -55,12 +56,13 @@ class AudioTestSuite
             TEST_ADD(AudioTestSuite::start_8ch_jack)
             TEST_ADD(AudioTestSuite::stop_8ch_jack)
             TEST_ADD(AudioTestSuite::start_stop_8ch_jack)
-
+#endif
             TEST_ADD(AudioTestSuite::start_audio_dv)
             TEST_ADD(AudioTestSuite::stop_audio_dv)
             TEST_ADD(AudioTestSuite::start_stop_audio_dv)
 #endif                          //  LOCAL
 #if RTP
+#if 0
             TEST_ADD(AudioTestSuite::start_2ch_comp_rtp_audiotest)
             TEST_ADD(AudioTestSuite::stop_2ch_comp_rtp_audiotest)
             TEST_ADD(AudioTestSuite::start_stop_2ch_comp_rtp_audiotest)
@@ -70,6 +72,10 @@ class AudioTestSuite
             TEST_ADD(AudioTestSuite::start_8ch_comp_rtp_audiofile)
             TEST_ADD(AudioTestSuite::stop_8ch_comp_rtp_audiofile)
             TEST_ADD(AudioTestSuite::start_stop_8ch_comp_rtp_audiofile)
+#endif
+            TEST_ADD(AudioTestSuite::start_audio_dv_rtp)
+            TEST_ADD(AudioTestSuite::stop_audio_dv_rtp)
+            TEST_ADD(AudioTestSuite::start_stop_audio_dv_rtp)
 #endif                          // RTP
 
             /*----------------------------------------------*/
@@ -127,6 +133,10 @@ class AudioTestSuite
         void start_audio_dv();
         void stop_audio_dv();
         void start_stop_audio_dv();
+        
+        void start_audio_dv_rtp();
+        void stop_audio_dv_rtp();
+        void start_stop_audio_dv_rtp();
 };
 
 
