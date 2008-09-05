@@ -17,6 +17,9 @@
 // You should have received a copy of the GNU General Public License
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
+// NOTES:
+// Change verbose_ to true if you want Gstreamer to tell you everything that's going on 
+// in the pipeline
 
 #include <gst/gst.h>
 
@@ -29,7 +32,7 @@
 Pipeline *Pipeline::instance_ = 0;
 
 Pipeline::Pipeline()
-    : pipeline_(0), startTime_(0), verbose_(true)
+    : pipeline_(0), startTime_(0), verbose_(false)
 {
     // empty
 }

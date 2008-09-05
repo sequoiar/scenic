@@ -79,6 +79,7 @@ bool VideoReceiver::start()
 {
     std::cout << "Receiving video on port " << config_.port() << std::endl;
     MediaBase::start();
+    sink_.showWindow();
     return true;
 }
 
