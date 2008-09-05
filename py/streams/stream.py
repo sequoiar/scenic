@@ -145,7 +145,7 @@ class Stream(object):
 #        self.mode = None  # (string) send or receive
         self._state = 0
     
-    def start(self, address=None):
+    def start_sending(self, address=None):
         """ 
         To be overridden by the sub-subclass
                
@@ -153,7 +153,19 @@ class Stream(object):
         """
         raise NotImplementedError()
     
-    def stop(self):
+    def stop_sending(self):
+        """
+        To be overridden by the sub-subclass
+        """
+        raise NotImplementedError()
+
+    def start_receving(self):
+        """ 
+        To be overridden by the sub-subclass
+        """
+        raise NotImplementedError()
+    
+    def stop_receving(self):
         """
         To be overridden by the sub-subclass
         """
