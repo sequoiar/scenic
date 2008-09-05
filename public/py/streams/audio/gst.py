@@ -66,6 +66,7 @@ class AudioGst(AudioStream, GstClient):
         else:
             self._core.notify(None, 1, 'audio_sending_started')
             log.info('SHOULD SEND CAPS VIA TCP HERE!')
+#            self._core.connections.send_msg('audio_caps', caps)
    
     def stop_sending(self):
         """function stop_sending
