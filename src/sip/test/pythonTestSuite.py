@@ -1,13 +1,7 @@
 import sys
 
 # app import
-import libsip_export as sip
-
-def connect():
-    return uac.connect("<sip:bloup@192.168.1.230:5060>")
-
-def disconnect():
-    return uac.disconnect()
+import libsip_export as libsip
 
 intro = """\n
            Unitary tests.
@@ -32,12 +26,12 @@ print intro
 
 step = " \nLibrary initialisation and user agent instance creation  ....................................................... "
 port = int(sys.argv[1])
-uac = sip.SIPSession( port )
+uac = libsip.SIPSession( port )
 uac.setMedia("audio", "vorbis/PCMA/", 12345, "sendrecv")
 print step+success
 
 step = " \nDialog invite session creation ................................................................................. "
-status = connect()
+status = uac.connect("<sip:bloup@192.168.1.230:5060>")
 if(status == 0):
     print step+success
 else:
@@ -74,7 +68,7 @@ uac.sendInstantMessage("SALUT")
 print step+success
 
 step = " \nDeconnection from the UAS. Send BYE message .....................................................................  "
-status = disconnect()
+status = uac.disconnect()
 if(status == 0):
     print step+success
 else:
