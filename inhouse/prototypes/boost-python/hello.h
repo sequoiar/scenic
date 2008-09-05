@@ -9,6 +9,8 @@ class hello
 public:
     const char * greet();
     void set_name(char const* n);
+    void printTest1();
+    void printTest2();
 };
 
 #endif //_HELLO_H_

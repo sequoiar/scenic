@@ -26,7 +26,9 @@ BOOST_PYTHON_MODULE(hello)
 {
     class_<hello>("hello")
     .def("greet", &hello::greet)
-    .def("set_name",&hello::set_name);
+    .def("set_name",&hello::set_name)
+    .def("printTest1", &hello::printTest1)
+    .def("printTest2", &hello::printTest2);
 }
 
 

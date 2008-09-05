@@ -59,6 +59,7 @@ enum answerMode {
 enum errorCode {
     NO_ERROR,
     ERROR_INIT_ALREADY_DONE,
+    ERROR_SHUTDOWN_ALREADY_DONE,
     ERROR_HOST_UNREACHABLE,
     ERROR_NO_COMPATIBLE_MEDIA,
     ERROR_CONNECTION_NOT_READY,
@@ -228,6 +229,8 @@ class UserAgent
         void init_sip_module( void );
 
         void connection_prepare( void );
+
+        void init_python_module( void );
 
         UserAgent(const UserAgent&); //No Copy Constructor
         UserAgent& operator=(const UserAgent&); //No Assignment Operator
