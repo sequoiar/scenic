@@ -32,9 +32,8 @@ class RtpReceiver
 {
     public:
         RtpReceiver();
-        void set_caps(const char *capsStr);
-
         ~RtpReceiver();
+        void set_caps(const char* capsStr);
 
     protected:
         void addDerived(GstElement * depayloader, const MediaConfig & config);

@@ -25,7 +25,7 @@
 #include "gstTestSuite.h"
 
 #define LOCAL 0
-#define RTP 1
+#define RTP 0
 
 class VideoTestSuite
     : public GstTestSuite
@@ -34,7 +34,7 @@ class VideoTestSuite
 
         VideoTestSuite() 
         {
-            testLength_ = 10000;
+            testLength_ = 20000;
 #if LOCAL
             TEST_ADD(VideoTestSuite::start_test_video)
             TEST_ADD(VideoTestSuite::stop_test_video)
@@ -52,9 +52,6 @@ class VideoTestSuite
             TEST_ADD(VideoTestSuite::start_v4l_rtp)
             TEST_ADD(VideoTestSuite::stop_v4l_rtp)
             TEST_ADD(VideoTestSuite::start_stop_v4l_rtp)
-            TEST_ADD(VideoTestSuite::start_file_rtp)
-            TEST_ADD(VideoTestSuite::stop_file_rtp)
-            TEST_ADD(VideoTestSuite::start_stop_file_rtp)
             TEST_ADD(VideoTestSuite::start_dv_rtp)
             TEST_ADD(VideoTestSuite::stop_dv_rtp)
             TEST_ADD(VideoTestSuite::start_stop_dv_rtp)
@@ -66,6 +63,9 @@ class VideoTestSuite
             /*  Put newer tests here and set all defs to 0  */
             /*  to test them by themselves.                 */
             /*----------------------------------------------*/
+            TEST_ADD(VideoTestSuite::start_file_rtp)
+            TEST_ADD(VideoTestSuite::stop_file_rtp)
+            TEST_ADD(VideoTestSuite::start_stop_file_rtp)
         }
 
 

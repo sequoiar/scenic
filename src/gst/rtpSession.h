@@ -35,6 +35,7 @@ class RtpSession
         virtual bool init();
         virtual void add(GstElement * elem, const MediaConfig & config);
         virtual void addDerived(GstElement * elem, const MediaConfig & config) = 0;
+        virtual void set_caps(const char *capsStr) = 0;
 
     protected:
         RtpSession();
