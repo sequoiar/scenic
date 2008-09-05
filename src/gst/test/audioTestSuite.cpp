@@ -697,6 +697,95 @@ void AudioTestSuite::start_stop_audio_dv()
 }
 
 
+void AudioTestSuite::start_audio_dv_rtp()
+{
+    int numChannels = 2;
+    if (id_ == 0) {
+        AudioConfig config(numChannels, "vorbisdec", A_PORT);
+        AudioReceiver rx(config);
+        rx.init();
+        TEST_ASSERT(rx.start());
+
+        BLOCK();
+        TEST_ASSERT(rx.isPlaying());
+    }
+    else {
+        AudioConfig config("dv1394src", numChannels, "vorbisenc", get_host_ip(),
+                           A_PORT);
+        AudioSender tx(config);
+        tx.init();
+
+        TEST_ASSERT(tx.start());
+
+        BLOCK();
+        TEST_ASSERT(tx.isPlaying());
+    }
+}
+
+
+void AudioTestSuite::stop_audio_dv_rtp()
+{
+    int numChannels = 2;
+
+    if (id_ == 0) {
+        AudioConfig config(numChannels, "vorbisdec", A_PORT);
+        AudioReceiver rx(config);
+        rx.init();
+
+        BLOCK();
+
+        TEST_ASSERT(rx.stop());
+        TEST_ASSERT(!rx.isPlaying());
+    }
+    else {
+        AudioConfig config("dv1394src", numChannels, "vorbisenc", get_host_ip(),
+                           A_PORT);
+        AudioSender tx(config);
+        tx.init();
+
+        BLOCK();
+
+        TEST_ASSERT(tx.stop());
+        TEST_ASSERT(!tx.isPlaying());
+    }
+}
+
+
+void AudioTestSuite::start_stop_audio_dv_rtp()
+{
+    int numChannels = 2;
+    if (id_ == 0) {
+        AudioConfig config(numChannels, "vorbisdec", A_PORT);
+        AudioReceiver rx(config);
+        rx.init();
+
+        TEST_ASSERT(rx.start());
+
+        BLOCK();
+
+        TEST_ASSERT(rx.isPlaying());
+
+        TEST_ASSERT(rx.stop());
+        TEST_ASSERT(!rx.isPlaying());
+    }
+    else {
+        AudioConfig config("dv1394src", numChannels, "vorbisenc", get_host_ip(),
+                           A_PORT);
+        AudioSender tx(config);
+        tx.init();
+
+        TEST_ASSERT(tx.start());
+
+        BLOCK();
+        TEST_ASSERT(tx.isPlaying());
+
+        TEST_ASSERT(tx.stop());
+        TEST_ASSERT(!tx.isPlaying());
+    }
+}
+
+
+
 int main(int argc, char **argv)
 {
     if (argc != 2) {

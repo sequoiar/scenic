@@ -168,6 +168,8 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
         sinkElement = context->pipeline_.findElement("videosink");
         g_object_set(G_OBJECT(sinkElement), "sync", TRUE, NULL);
     }
+
+    assert(sinkElement);
     
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
 

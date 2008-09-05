@@ -116,9 +116,9 @@ void AudioReceiver::init_sink()
 bool AudioReceiver::start()
 {
     // FIXME: caps are only sent if sender is started after receiver
-#ifdef USE_OSC
+//#ifdef USE_OSC
     wait_for_caps();
-#endif
+//#endif
     std::cout << "Receiving audio on port " << config_.port() << std::endl;
     MediaBase::start();
     return true;
