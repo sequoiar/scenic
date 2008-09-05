@@ -34,7 +34,7 @@ class VideoTestSuite
 
         VideoTestSuite() 
         {
-            testLength_ = 5000;
+            testLength_ = 10000;
 #if LOCAL
             TEST_ADD(VideoTestSuite::start_test_video)
             TEST_ADD(VideoTestSuite::stop_test_video)

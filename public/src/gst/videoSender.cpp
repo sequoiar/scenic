@@ -89,9 +89,8 @@ void VideoSender::init_sink()
         g_object_set(G_OBJECT(sink_), "force-aspect-ratio", FALSE, NULL);
         pipeline_.add(sink_);
 #endif
-        //source_->link_element(sink_);
         sink_.init();
-        GstLinkable::link(*source_, sink_);   // this shouldn't happen for VideoFileSource
+        GstLinkable::link(*source_, sink_);   // FIXME: this shouldn't happen for VideoFileSource
     }
 }
 
