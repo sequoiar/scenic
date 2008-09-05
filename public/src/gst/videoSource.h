@@ -30,7 +30,7 @@ class VideoSource
 {
     public:
         ~VideoSource();
-        void init();
+        virtual void init();
         GstElement *srcElement() { return source_; }
         virtual void sub_init() = 0;
         //virtual void link_element(GstElement *sinkElement);

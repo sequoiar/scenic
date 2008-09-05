@@ -57,18 +57,12 @@ Pipeline::~Pipeline()
 
 gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/)
 {
-    //    GMainLoop *loop = data;
-    //gboolean *done = static_cast<gboolean*>(data);
-
     switch(GST_MESSAGE_TYPE(msg)) 
     {
         case GST_MESSAGE_UNKNOWN:
             break;
         case GST_MESSAGE_EOS:
             g_print("End-of-stream\n");
-            //*done = TRUE;
-
-            //g_main_loop_quit(loop);
             break;
         case GST_MESSAGE_ERROR: 
             {
@@ -84,9 +78,6 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
                     g_print("Debug details: %s\n", debug);
                     g_free(debug);
                 }
-
-                //*done = TRUE;
-                //g_main_loop_quit(loop);
                 break;
             }
         case GST_MESSAGE_WARNING:
@@ -96,7 +87,6 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
 
                 gst_message_parse_warning(msg, &err, &debug);
 
-                //g_print("Warning: %s\n", err->message);
                 LOG(err->message, WARNING);
                 g_error_free(err);
 
@@ -168,7 +158,7 @@ void Pipeline::init()
         startTime_ = gst_clock_get_time(clock());
 
         /* watch for messages on the pipeline's bus (note that this will only
-         *      * work like this when a GLib main loop is running) */
+         *      work like this when a GLib main loop is running) */
         GstBus *bus;
         bus = getBus();
         gst_bus_add_watch(bus, GstBusFunc(bus_call), static_cast<gpointer>(NULL));
@@ -177,7 +167,7 @@ void Pipeline::init()
 }
 
 
-// FIXME: check if this is safe, we're destroying and recreating the pipeline
+// TODO: check if this is safe, we're destroying and recreating the pipeline
 void Pipeline::reset()
 {
     if (pipeline_)
