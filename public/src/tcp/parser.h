@@ -18,13 +18,11 @@
  */
 
 /** \file 
- *      Just the License LGPL 3+ 
- *
- *      Detailed description here.
- *      Continues here.
- *      And more.
- *      And more.
+ *      
+ *      Command parser functions used in ipcp protocol
+ *      
  */
+
 #ifndef __PARSER_H__
 #define __PARSER_H__
 
@@ -32,12 +30,26 @@
 #include <map>
 #include "gutil/strIntFloat.h"
 
+/// TODO place in namespace?
+
+/// returns a string with " and \ escaped
 std::string strEsq(const std::string& str);
+
+/// returns a string with chars " and \ with escape removed 
 std::string strUnEsq(const std::string& str);
+
+/// returns the position of the trailing quote in a string
+/// ignores escaped version
 int get_end_of_quoted_string(const std::string& str);
 
+/// builds a string of command: key=value pairs
+/// TODO make map const
 bool stringify(std::map<std::string,StrIntFloat>& cmd_map, std::string& str);
-bool tokenize(const std::string& str, std::map<std::string,StrIntFloat>& cmd_map) ;
+
+/// fills a map of key=value pairs with a special key "command" from a string
+/// of type specified above
+/// TODO handle extraneous white space
+bool tokenize(const std::string& str, std::map<std::string,StrIntFloat>& cmd_map);
 
 #endif
 
