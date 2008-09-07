@@ -1,5 +1,5 @@
-/* 
- * Copyright 2008 Koya Charles & Tristan Matthews 
+/*
+ * Copyright 2008 Koya Charles & Tristan Matthews
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,10 +17,11 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/** \file 
- *      
+/** \file
+ *
  *      Command parser functions used in ipcp protocol
- *      
+ *
+ *  TODO place in namespace?
  */
 
 #ifndef __PARSER_H__
@@ -30,12 +31,11 @@
 #include <map>
 #include "gutil/strIntFloat.h"
 
-/// TODO place in namespace?
 
 /// returns a string with " and \ escaped
 std::string strEsq(const std::string& str);
 
-/// returns a string with chars " and \ with escape removed 
+/// returns a string that undoes escaped  " and \
 std::string strUnEsq(const std::string& str);
 
 /// returns the position of the trailing quote in a string
@@ -44,12 +44,12 @@ int get_end_of_quoted_string(const std::string& str);
 
 /// builds a string of command: key=value pairs
 /// TODO make map const
-bool stringify(std::map<std::string,StrIntFloat>& cmd_map, std::string& str);
+bool stringify(std::map<std::string, StrIntFloat>& cmd_map, std::string& str);
 
 /// fills a map of key=value pairs with a special key "command" from a string
 /// of type specified above
 /// TODO handle extraneous white space
-bool tokenize(const std::string& str, std::map<std::string,StrIntFloat>& cmd_map);
+bool tokenize(const std::string& str, std::map<std::string, StrIntFloat>& cmd_map);
 
 #endif
 
