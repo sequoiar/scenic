@@ -55,7 +55,8 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", "test_signal8.wav", numChannels, "vorbisenc", get_host_ip(), aPort);
+        AudioConfig aConfig("filesrc", "test_signal8.wav", numChannels, "vorbisenc",
+                            get_host_ip(), aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
@@ -97,7 +98,8 @@ void SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", "test_signal8.wav", numChannels, "vorbisenc", get_host_ip(), aPort);
+        AudioConfig aConfig("filesrc", "test_signal8.wav", numChannels, "vorbisenc",
+                            get_host_ip(), aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
@@ -147,7 +149,8 @@ void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", "test_signal8.wav", numChannels, "vorbisenc", get_host_ip(), aPort);
+        AudioConfig aConfig("filesrc", "test_signal8.wav", numChannels, "vorbisenc",
+                            get_host_ip(), aPort);
         AudioSender aTx(aConfig);
         aTx.init();
 
@@ -176,9 +179,8 @@ void SyncTestSuite::start_dv_audio_dv_video()
 {
     int numChannels = 2;
 
-    if (id_ == 1) 
+    if (id_ == 1)
         return;
-    
     AudioConfig aConfig("dv1394src", numChannels);
     AudioSender aTx(aConfig);
     aTx.init();
@@ -199,10 +201,9 @@ void SyncTestSuite::start_dv_audio_dv_video()
 void SyncTestSuite::stop_dv_audio_dv_video()
 {
     int numChannels = 2;
-    
-    if (id_ == 1)
-    return; 
 
+    if (id_ == 1)
+        return;
     AudioConfig aConfig("dv1394src", numChannels);
     AudioSender aTx(aConfig);
     aTx.init();
@@ -224,32 +225,32 @@ void SyncTestSuite::stop_dv_audio_dv_video()
 void SyncTestSuite::start_stop_dv_audio_dv_video()
 {
     int numChannels = 2;
-    
-    if (id_ == 1) 
+
+    if (id_ == 1)
         return;
-    
-        AudioConfig aConfig("dv1394src", numChannels);
-        AudioSender aTx(aConfig);
-        aTx.init();
+    AudioConfig aConfig("dv1394src", numChannels);
+    AudioSender aTx(aConfig);
+    aTx.init();
 
-        VideoConfig vConfig("dv1394src", "h264");
-        VideoSender vTx(vConfig);
-        vTx.init();
+    VideoConfig vConfig("dv1394src", "h264");
+    VideoSender vTx(vConfig);
+    vTx.init();
 
-        TEST_ASSERT(aTx.start());
-        TEST_ASSERT(vTx.start());
+    TEST_ASSERT(aTx.start());
+    TEST_ASSERT(vTx.start());
 
-        BLOCK();
+    BLOCK();
 
-        TEST_ASSERT(aTx.isPlaying());
-        TEST_ASSERT(vTx.isPlaying());
+    TEST_ASSERT(aTx.isPlaying());
+    TEST_ASSERT(vTx.isPlaying());
 
-        TEST_ASSERT(aTx.stop());
-        TEST_ASSERT(vTx.stop());
+    TEST_ASSERT(aTx.stop());
+    TEST_ASSERT(vTx.stop());
 
-        TEST_ASSERT(!aTx.isPlaying());
-        TEST_ASSERT(!vTx.isPlaying());
+    TEST_ASSERT(!aTx.isPlaying());
+    TEST_ASSERT(!vTx.isPlaying());
 }
+
 
 void SyncTestSuite::start_dv_audio_dv_video_rtp()
 {

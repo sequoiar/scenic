@@ -30,14 +30,16 @@ class VideoSink
     : public GstLinkableSink
 {
     public:
-        VideoSink() : sink_(0), window_(0) {};
+        VideoSink()
+            : sink_(0), window_(0) {};
         ~VideoSink();
         void init();
         void showWindow();
 
     private:
-        GstElement *sinkElement() { return sink_; } 
-        static gboolean key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event, gpointer data);
+        GstElement *sinkElement() { return sink_; }
+        static gboolean key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
+                                           gpointer data);
         static gboolean expose_cb(_GtkWidget *widget, _GdkEventExpose *event, gpointer data);
         void makeWindowBlack();
 

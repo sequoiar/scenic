@@ -5,7 +5,7 @@
 #include <list>
 #include <vector>
 
-int main(int , char **)
+int main(int, char **)
 {
     OscThread t;
 

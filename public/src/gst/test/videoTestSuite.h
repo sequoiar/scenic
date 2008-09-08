@@ -32,7 +32,7 @@ class VideoTestSuite
 {
     public:
 
-        VideoTestSuite() 
+        VideoTestSuite()
         {
             testLength_ = 20000;
 #if LOCAL

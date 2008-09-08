@@ -133,7 +133,7 @@ class AudioTestSuite
         void start_audio_dv();
         void stop_audio_dv();
         void start_stop_audio_dv();
-        
+
         void start_audio_dv_rtp();
         void stop_audio_dv_rtp();
         void start_stop_audio_dv_rtp();

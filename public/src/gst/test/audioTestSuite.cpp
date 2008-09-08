@@ -785,7 +785,6 @@ void AudioTestSuite::start_stop_audio_dv_rtp()
 }
 
 
-
 int main(int argc, char **argv)
 {
     if (argc != 2) {

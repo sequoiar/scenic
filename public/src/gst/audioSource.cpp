@@ -64,15 +64,14 @@ void AudioSource::link_elements()
 }
 
 
-gboolean AudioSource::base_callback(GstClock *, GstClockTime, GstClockID,
-        gpointer user_data)
+gboolean AudioSource::base_callback(GstClock *, GstClockTime, GstClockID, gpointer user_data)
 {
     return (static_cast<AudioSource*>(user_data)->callback());     // deferred to subclass
 }
 
-    
+
 InterleavedAudioSource::InterleavedAudioSource(const AudioConfig &config)
-: AudioSource(config), interleave_(config_)
+    : AudioSource(config), interleave_(config_)
 {}
 
 
@@ -118,7 +117,7 @@ void AudioTestSource::toggle_frequency()
 {
     static const double FREQUENCY[2][8] =
     {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
-        {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
+     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
 
     int i = 0;
 
@@ -166,19 +165,19 @@ void AudioFileSource::sub_init()
     for (; aconv != aconvs_.end(), dec != decoders_.end(); ++dec, ++aconv)
     {
         g_signal_connect(*dec, "new-decoded-pad",
-                G_CALLBACK(AudioFileSource::cb_new_src_pad),
-                static_cast<void *>(*aconv));
+                         G_CALLBACK(AudioFileSource::cb_new_src_pad),
+                         static_cast<void *>(*aconv));
     }
 }
 
 
-void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean  /*last*/,
-        gpointer data)
+void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/,
+                                     gpointer data)
 {
     if (gst_pad_is_linked(srcPad))
     {
         LOG("Pad is already linked.", DEBUG)
-            return;
+        return;
     }
     else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
     {
@@ -234,8 +233,9 @@ void AudioJackSource::sub_init()
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
 }
 
-    AudioDvSource::AudioDvSource(const AudioConfig &config)
-: AudioSource(config), demux_(0), queue_(0), dvIsNew_(true)
+
+AudioDvSource::AudioDvSource(const AudioConfig &config)
+    : AudioSource(config), demux_(0), queue_(0), dvIsNew_(true)
 {}
 
 
@@ -243,14 +243,13 @@ void AudioDvSource::init_source()
 {
     sources_.push_back(pipeline_.findElement(config_.source()));  // see if it already exists from VideoDvSource
     dvIsNew_ = sources_[0] == NULL;
-    
+
     if (dvIsNew_)
     {
         sources_[0] = gst_element_factory_make(config_.source(), config_.source());
         assert(sources_[0]);
         pipeline_.add(sources_);
     }
-
     aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
     assert(aconvs_[0]);
 
@@ -266,7 +265,6 @@ void AudioDvSource::sub_init()
         assert(demux_ = gst_element_factory_make("dvdemux", "dvdemux"));
     else
         assert(demux_);
-
     assert(queue_ = gst_element_factory_make("queue", NULL));
 
     // demux has dynamic pads
@@ -276,9 +274,8 @@ void AudioDvSource::sub_init()
 
     // demux srcpad must be linked to queue sink pad at runtime
     g_signal_connect(demux_, "pad-added",
-            G_CALLBACK(AudioDvSource::cb_new_src_pad),
-            static_cast<void *>(queue_));
-
+                     G_CALLBACK(AudioDvSource::cb_new_src_pad),
+                     static_cast<void *>(queue_));
 }
 
 
@@ -293,12 +290,10 @@ void AudioDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
     {
         LOG("Got audio stream from DV", DEBUG);
     }
-    else
-    {
+    else{
         LOG("Ignoring unknown stream from DV", DEBUG);
         return;
     }
-
     GstElement *sinkElement = static_cast<GstElement *>(data);
     GstPad *sinkPad;
 
@@ -320,6 +315,7 @@ void AudioDvSource::link_elements()
     if (dvIsNew_)
         GstLinkable::link(sources_[0], demux_);
     GstLinkable::link(queue_, aconvs_[0]);
-  //  GstLinkable::link(aconvs_, interleave_);
+    //  GstLinkable::link(aconvs_, interleave_);
 }
+
 

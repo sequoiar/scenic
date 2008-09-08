@@ -91,6 +91,7 @@ bool VideoReceiver::stop()
     return true;
 }
 
+
 #if 0
 void VideoReceiver::stop_sender() const
 {
@@ -105,6 +106,8 @@ void VideoReceiver::stop_sender() const
         exit(EXIT_FAILURE);
     }
 }
+
+
 #endif
 
 

@@ -60,7 +60,7 @@ class GstTestSuite
         const static int A_PORT;
         const static int V_PORT;
         const static int NUM_CHANNELS;
-        static gboolean killMainLoop(gpointer data); 
+        static gboolean killMainLoop(gpointer data);
 };
 
 #endif // _GST_TEST_SUITE_H_

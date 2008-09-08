@@ -18,7 +18,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 // NOTES:
-// Change verbose_ to true if you want Gstreamer to tell you everything that's going on 
+// Change verbose_ to true if you want Gstreamer to tell you everything that's going on
 // in the pipeline
 
 #include <gst/gst.h>
@@ -57,54 +57,54 @@ Pipeline::~Pipeline()
 
 gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/)
 {
-    switch(GST_MESSAGE_TYPE(msg)) 
+    switch(GST_MESSAGE_TYPE(msg))
     {
         case GST_MESSAGE_UNKNOWN:
             break;
         case GST_MESSAGE_EOS:
             g_print("End-of-stream\n");
             break;
-        case GST_MESSAGE_ERROR: 
-            {
-                gchar *debug = NULL;
-                GError *err = NULL;
+        case GST_MESSAGE_ERROR:
+        {
+            gchar *debug = NULL;
+            GError *err = NULL;
 
-                gst_message_parse_error(msg, &err, &debug);
+            gst_message_parse_error(msg, &err, &debug);
 
-                g_print("Error: %s\n", err->message);
-                g_error_free(err);
+            g_print("Error: %s\n", err->message);
+            g_error_free(err);
 
-                if (debug) {
-                    g_print("Debug details: %s\n", debug);
-                    g_free(debug);
-                }
-                break;
+            if (debug) {
+                g_print("Debug details: %s\n", debug);
+                g_free(debug);
             }
+            break;
+        }
         case GST_MESSAGE_WARNING:
-            {
-                gchar *debug = NULL;
-                GError *err = NULL;
+        {
+            gchar *debug = NULL;
+            GError *err = NULL;
 
-                gst_message_parse_warning(msg, &err, &debug);
+            gst_message_parse_warning(msg, &err, &debug);
 
-                LOG(err->message, WARNING);
-                g_error_free(err);
+            LOG(err->message, WARNING);
+            g_error_free(err);
 
-                if (debug) {
-                    g_print("Debug details: %s\n", debug);
-                    g_free(debug);
-                }
-                break;
+            if (debug) {
+                g_print("Debug details: %s\n", debug);
+                g_free(debug);
             }
+            break;
+        }
         case GST_MESSAGE_INFO:
             break;
         case GST_MESSAGE_TAG:
             break;
-        case GST_MESSAGE_BUFFERING:         
+        case GST_MESSAGE_BUFFERING:
             break;
-        case GST_MESSAGE_STATE_CHANGED:     
+        case GST_MESSAGE_STATE_CHANGED:
             break;
-        case GST_MESSAGE_STATE_DIRTY: 
+        case GST_MESSAGE_STATE_DIRTY:
             break;
         case GST_MESSAGE_STEP_DONE:
             break;
@@ -118,7 +118,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
             break;
         case GST_MESSAGE_STREAM_STATUS:
             break;
-        case GST_MESSAGE_APPLICATION:   
+        case GST_MESSAGE_APPLICATION:
             break;
         case GST_MESSAGE_ELEMENT:
             break;
@@ -130,9 +130,9 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
             break;
         case GST_MESSAGE_LATENCY:
             break;
-        case GST_MESSAGE_ASYNC_START:       
+        case GST_MESSAGE_ASYNC_START:
             break;
-        case GST_MESSAGE_ASYNC_DONE:      
+        case GST_MESSAGE_ASYNC_DONE:
             break;
         case GST_MESSAGE_ANY:
             break;
@@ -187,7 +187,7 @@ void Pipeline::make_verbose()
         gchar *exclude_args = NULL;     // set args to be excluded from output
         gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
         g_signal_connect(pipeline_, "deep_notify",
-                G_CALLBACK(gst_object_default_deep_notify), exclude_list);
+                         G_CALLBACK(gst_object_default_deep_notify), exclude_list);
     }
 }
 
@@ -232,7 +232,6 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret)
             g_error_free(err);
             gst_message_unref(msg);
         }
-
         gst_object_unref(bus);
         return false;
     }
@@ -240,9 +239,10 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret)
         return true;
 }
 
+
 bool Pipeline::start()
 {
-    checkStateChange(gst_element_set_state(pipeline_, GST_STATE_PAUSED)); // set it to paused 
+    checkStateChange(gst_element_set_state(pipeline_, GST_STATE_PAUSED)); // set it to paused
     assert(checkStateChange(gst_element_set_state(pipeline_, GST_STATE_PLAYING))); // set it to playing
     return isPlaying();
 }

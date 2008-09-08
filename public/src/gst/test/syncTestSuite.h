@@ -32,7 +32,7 @@ class SyncTestSuite
 {
     public:
 
-        SyncTestSuite() 
+        SyncTestSuite()
         {
             testLength_ = 10000;
 
@@ -45,7 +45,7 @@ class SyncTestSuite
             TEST_ADD(SyncTestSuite::start_dv_audio_dv_video)
             TEST_ADD(SyncTestSuite::stop_dv_audio_dv_video)
             TEST_ADD(SyncTestSuite::start_stop_dv_audio_dv_video)
-            
+
             TEST_ADD(SyncTestSuite::start_dv_audio_dv_video_rtp)
             TEST_ADD(SyncTestSuite::stop_dv_audio_dv_video_rtp)
             TEST_ADD(SyncTestSuite::start_stop_dv_audio_dv_video_rtp)
@@ -66,7 +66,7 @@ class SyncTestSuite
         void start_dv_audio_dv_video();
         void stop_dv_audio_dv_video();
         void start_stop_dv_audio_dv_video();
-        
+
         void start_dv_audio_dv_video_rtp();
         void stop_dv_audio_dv_video_rtp();
         void start_stop_dv_audio_dv_video_rtp();

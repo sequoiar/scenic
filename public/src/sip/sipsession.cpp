@@ -55,9 +55,11 @@ int SIPSession::shutdown( void ){
     return _app_ua->pjsip_shutdown();
 }
 
+
 int SIPSession::init( void ) {
     return _app_ua->init_pjsip_modules();
 }
+
 
 int SIPSession::reinvite( void ){
     return _app_ua->inv_session_reinvite();
@@ -85,9 +87,11 @@ void SIPSession::setMedia( std::string type, std::string codecs, int port, std::
     _app_ua->setSessionMedia( type, codecs, port, dir );
 }
 
+
 std::string SIPSession::getConnectionState( void ){
     return _app_ua->getConnectionStateStr( _app_ua->getConnectionState() );
 }
+
 
 std::string SIPSession::getErrorReason( void ){
     return _app_ua->getErrorReason( _app_ua->getErrorCode() );
@@ -103,10 +107,14 @@ bool SIPSession::incomingInvite( void ){
     return _app_ua->hasIncomingCall();
 }
 
+
 void SIPSession::setAnswerMode( int mode ){
     _app_ua->setAnswerMode( mode );
 }
-        
+
+
 std::string SIPSession::getAnswerMode( void ){
     return _app_ua->getAnswerMode();
 }
+
+

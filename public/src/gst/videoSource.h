@@ -31,8 +31,10 @@ class VideoSource
     public:
         ~VideoSource();
         virtual void init();
+
         GstElement *srcElement() { return source_; }
         virtual void sub_init() = 0;
+
         //virtual void link_element(GstElement *sinkElement);
 
     protected:
@@ -78,6 +80,7 @@ class VideoFileSource
         ~VideoFileSource();
         GstElement *srcElement() { return 0; }      // FIXME: HACK
         void sub_init();
+
         //void link_element(GstElement *sinkElement);
 
     private:

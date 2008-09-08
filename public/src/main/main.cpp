@@ -44,10 +44,7 @@ class MainModule
     private:
         GstThread gstThread_;
         TcpThread tcpThread_;
-
 };
-
-
 
 
 int main (int argc, char** argv)
@@ -58,12 +55,11 @@ int main (int argc, char** argv)
         LOG_INFO("Must provide a port");
         return -1;
     }
-    if(sscanf(argv[1],"%d",&port) != 1 || port < 0 || port > 65000)
+    if(sscanf(argv[1], "%d", &port) != 1 || port < 0 || port > 65000)
     {
         LOG_INFO("Port must be in the range of 1-65000");
         return -1;
     }
-
     MainModule m(port);
     m.run();
     return 0;
@@ -77,10 +73,8 @@ bool MainModule::run()
 
     if(!gstThread_.run())
         return 0;
-
     if(!tcpThread_.run())
         return 0;
-
     while(true)
     {
         MapMsg tmsg = tcp_queue.timed_pop(10000);
@@ -103,11 +97,9 @@ bool MainModule::run()
         }
         if (tmsg["command"].type() == 'n')
             continue;
-        
         std::string command;
         if(!tmsg["command"].get(command))
             continue;
-
         if (!command.compare("quit"))
         {
             gst_queue.push(tmsg);

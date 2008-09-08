@@ -103,21 +103,21 @@ class UserAgent
          */
         int inv_session_create( std::string uri );
 
-	/*
+        /*
          * Terminate an invite session. Send a bye to connected peer.
          *
          * @return int	0 on success
-	 *              1 otherwise
+         *              1 otherwise
          */
         int inv_session_end();
 
         /*
          * Send a invite inside an existing invite session.
-         * Used for updating or modifying the media offer for instance. 
+         * Used for updating or modifying the media offer for instance.
          * A new SDP negociation is done before validating the reinvite
          *
          * @return int	0 on success
-	 *              1 otherwise
+         *              1 otherwise
          */
         int inv_session_reinvite();
 
@@ -125,15 +125,15 @@ class UserAgent
          * Accept an incoming call. Called when INVITE_AUTO_ANSWER = false
          *
          * @return int	0 on success
-	 *              1 otherwise
+         *              1 otherwise
          */
         int inv_session_accept();
-        
+
         /*
          * Refuse an incoming call. Called when INVITE_AUTO_ANSWER = false
          *
          * @return int	0 on success
-	 *              1 otherwise
+         *              1 otherwise
          */
         int inv_session_refuse();
 
@@ -142,7 +142,7 @@ class UserAgent
          *
          * @param type	The media type. For instance: "audio"
          * @param codecs  The list of the codec to use for the session. The codecs must
-	 *                be separated with / and the last character must be / 
+         *                be separated with / and the last character must be /
          * @param port The port to transport the media
          */
         void setSessionMedia( std::string type, std::string codecs, int port, std::string dir );
@@ -159,7 +159,7 @@ class UserAgent
          * @param message	The text message to send. //TODO be able to send message with spaces in it
          * @return int	0 on success
          *               1 otherwise
-         */ 
+         */
         int sendInstantMessage( std::string message );
 
         /*
@@ -181,23 +181,23 @@ class UserAgent
         std::string getConnectionStateStr( connectionState state );
 
         /*
-         * Return the connection state 
+         * Return the connection state
          */
         connectionState getConnectionState( void );
 
         /*
          * Return the error string reason
          */
-        std::string getErrorReason( errorCode code ); 
+        std::string getErrorReason( errorCode code );
 
         /*
-         * Return the error code 
+         * Return the error code
          */
         errorCode getErrorCode( void );
 
 
         /*
-         * Change the invite answer mode. In AUTO mode, any new invite session is automatically accepted 
+         * Change the invite answer mode. In AUTO mode, any new invite session is automatically accepted
          * In manual mode, the user agent server can accept or refuse the incoming call
          */
         void setAnswerMode( int mode );
@@ -205,7 +205,7 @@ class UserAgent
         std::string getAnswerMode( void );
 
         /*
-         * Test if the user has an incoming call  
+         * Test if the user has an incoming call
          *
          * @return bool	true if a call is incoming
          *               false otherwise

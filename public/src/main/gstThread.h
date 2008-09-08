@@ -29,7 +29,6 @@
 #include "gst/audioConfig.h"
 
 
-
 typedef QueuePair_<MapMsg> QueuePair;
 class GstThread
     : public BaseThread<MapMsg>

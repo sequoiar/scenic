@@ -35,15 +35,19 @@ MediaConfig::MediaConfig(const std::string &codec_param, int port_param)   // re
 
 MediaConfig::MediaConfig(const std::string &source_param, const std::string &codec_param,
     const std::string &remoteHost_param, int port_param)
-    : source_(source_param), location_(""), codec_(codec_param), remoteHost_(remoteHost_param), port_(port_param) // remote sender
+    : source_(source_param), location_(""), codec_(codec_param), remoteHost_(remoteHost_param),
+    port_(port_param)                                                                                            // remote sender
 {
     // empty
 }
 
 
-MediaConfig::MediaConfig(const std::string &source_param, const std::string &location_param, const std::string &codec_param,
-    const std::string &remoteHost_param, int port_param)
-    : source_(source_param), location_(location_param), codec_(codec_param), remoteHost_(remoteHost_param), port_(port_param) // remote sender
+MediaConfig::MediaConfig(const std::string &source_param, const std::string &location_param,
+    const std::string &codec_param,
+    const std::string &remoteHost_param,
+    int port_param)
+    : source_(source_param), location_(location_param), codec_(codec_param),
+    remoteHost_(remoteHost_param), port_(port_param)                                                                          // remote sender
 {
     // empty
 }
@@ -68,7 +72,6 @@ bool MediaConfig::fileExists() const
 {
     if (location_.empty())
         return false;
-
     FILE *file;
     file = fopen(location(), "r");
     if (file != NULL)

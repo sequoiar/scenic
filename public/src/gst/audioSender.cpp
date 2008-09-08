@@ -24,7 +24,7 @@
 #include <cassert>
 #include <gst/gst.h>
 
-//#define USE_OSC 
+//#define USE_OSC
 //#ifdef USE_OSC
 #include "lo/lo.h"
 #include "logWriter.h"
@@ -94,7 +94,7 @@ void AudioSender::send_caps() const
 {
 //#ifdef USE_OSC
     //CapsSender::send(session_.caps_str());
-    
+
     // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
     LOG("Sending caps...", DEBUG);
 

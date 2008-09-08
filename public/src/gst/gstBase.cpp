@@ -57,4 +57,3 @@ bool GstBase::stop()
 }
 
 
-

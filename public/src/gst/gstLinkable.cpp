@@ -43,7 +43,7 @@ void GstLinkable::link(GstElement *src, GstElement *sink)
 void GstLinkable::link(GstLinkableSource &src, GstElement *sink)
 {
     GstElement *srcElement = src.srcElement();
-    //FIXME: this is a hack to deal with leaf classes that don't implement srcElement 
+    //FIXME: this is a hack to deal with leaf classes that don't implement srcElement
     //and/or sinkElement
     if (srcElement)
         assert(gst_element_link(srcElement, sink));
@@ -57,11 +57,11 @@ void GstLinkable::link(GstElement *src, GstLinkableSink &sink)
 
 
 void GstLinkable::link(GstLinkableSource &src, GstLinkableSink &sink)
-{      
+{
     GstElement *srcElement = src.srcElement();
     GstElement *sinkElement = sink.sinkElement();
 
-    //FIXME: this is a hack to deal with leaf classes that don't implement srcElement 
+    //FIXME: this is a hack to deal with leaf classes that don't implement srcElement
     //and/or sinkElement
     if (srcElement && sinkElement)
         assert(gst_element_link(srcElement, sinkElement));
@@ -82,6 +82,7 @@ void GstLinkable::link(GstLinkableSource &src, std::vector<GstElement*> &sinks)
     for (sink = sinks.begin(); sink != sinks.end(); ++sink)
         assert(gst_element_link(src.srcElement(), *sink));
 }
+
 
 // with this method, we can find out why pads don't link
 // if they fail
@@ -126,4 +127,5 @@ bool GstLinkable::link_pads(GstPad *srcPad, GstPad *sinkPad)
 
     return linkOk;
 }
+
 

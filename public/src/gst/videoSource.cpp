@@ -46,6 +46,8 @@ void VideoSource::link_element(GstElement *sinkElement)
 {
     GstLinkable::link(source_, sinkElement);
 }
+
+
 #endif
 
 
@@ -57,7 +59,7 @@ VideoSource::~VideoSource()
 
 
 // defers to subclassses callback
-gboolean VideoSource::base_callback(GstClock * /*clock*/, GstClockTime  /*time*/, GstClockID  /*id*/,
+gboolean VideoSource::base_callback(GstClock * /*clock*/, GstClockTime /*time*/, GstClockID /*id*/,
                                     gpointer user_data)
 {
     VideoSource* context = static_cast<VideoSource*>(user_data);
@@ -117,8 +119,7 @@ void VideoFileSource::sub_init()
 #if 0
     if (config_.isNetworked())
         assert(sinkElement_ = pipeline_.findElement("colorspc"));
-    else
-    {
+    else{
         assert(sinkElement_ = pipeline_.findElement("videosink"));
         g_object_set(G_OBJECT(sinkElement_), "sync", TRUE, NULL);
     }
@@ -141,10 +142,12 @@ void VideoFileSource::link_element(GstElement *sinkElement)
     if (!strncmp(gst_element_get_name(sinkElement_), "xvimagesink", strlen("xvimagesink")))
         g_object_set(G_OBJECT(sinkElement_), "sync", TRUE, NULL);
 }
+
+
 #endif
 
 
-void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean  /*last*/,
+void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/,
                                      void *data)
 {
     if (gst_pad_is_linked(srcPad))
@@ -152,7 +155,6 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
         LOG("Pad is already linked.", DEBUG)
         return;
     }
-
     VideoFileSource *context = static_cast<VideoFileSource*>(data);
     GstStructure *str;
     GstPad *sinkPad;
@@ -163,14 +165,12 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
     // FIXME: HACK!!!!
     if (context->config_.isNetworked())
         sinkElement = context->pipeline_.findElement("colorspc");
-    else
-    {
+    else{
         sinkElement = context->pipeline_.findElement("videosink");
         g_object_set(G_OBJECT(sinkElement), "sync", TRUE, NULL);
     }
-
     assert(sinkElement);
-    
+
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
 
     if (GST_PAD_IS_LINKED(sinkPad))
@@ -232,7 +232,6 @@ void VideoDvSource::sub_init()
     }
     else
         assert(demux_);
-
     assert(queue_ = gst_element_factory_make("queue", NULL));
     assert(dvdec_ = gst_element_factory_make("dvdec", NULL));
 
@@ -261,12 +260,10 @@ void VideoDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
     {
         LOG("Got video stream from DV", DEBUG);
     }
-    else
-    {
+    else{
         LOG("Ignoring unknown stream from DV", DEBUG);
         return;
     }
-
     GstElement *sinkElement = static_cast<GstElement *>(data);
     GstPad *sinkPad;
 
