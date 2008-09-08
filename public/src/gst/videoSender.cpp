@@ -40,10 +40,9 @@ VideoSender::VideoSender(const VideoConfig & config)
 VideoSender::~VideoSender()
 {
     assert(stop());
-    //pipeline_.remove(sink_);
-    pipeline_.remove(payloader_);
-    pipeline_.remove(encoder_);
-    pipeline_.remove(colorspc_);
+    pipeline_.remove(&payloader_);
+    pipeline_.remove(&encoder_);
+    pipeline_.remove(&colorspc_);
     delete source_;
 }
 

@@ -295,10 +295,13 @@ void Pipeline::add(std::vector<GstElement*> &elementVec)
 }
 
 
-void Pipeline::remove(GstElement *element)
+void Pipeline::remove(GstElement **element)
 {
-    if (element)
-        assert(gst_bin_remove(GST_BIN(pipeline_), element));
+    if (*element)
+    {
+        assert(gst_bin_remove(GST_BIN(pipeline_), *element));
+        *element = NULL;
+    }
 }
 
 
@@ -306,7 +309,13 @@ void Pipeline::remove(std::vector<GstElement*> &elementVec)
 {
     std::vector<GstElement *>::iterator iter;
     for (iter = elementVec.begin(); iter != elementVec.end(); ++iter)
-        remove(*iter);
+    {
+        if (*iter)
+        {
+            assert(gst_bin_remove(GST_BIN(pipeline_), *iter));
+            *iter = NULL;
+        }
+    }
 }
 
 

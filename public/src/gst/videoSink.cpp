@@ -98,7 +98,7 @@ void VideoSink::showWindow()
 VideoSink::~VideoSink()
 {
     assert(stop());
-    pipeline_.remove(sink_);
+    pipeline_.remove(&sink_);
     if (window_)
     {
         LOG("Widget destroyed", DEBUG);

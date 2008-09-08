@@ -44,9 +44,9 @@ AudioSender::AudioSender(const AudioConfig & config)
 AudioSender::~AudioSender()
 {
     assert(stop());
-    pipeline_.remove(sink_);
-    pipeline_.remove(payloader_);
-    pipeline_.remove(encoder_);
+    pipeline_.remove(&sink_);
+    pipeline_.remove(&payloader_);
+    pipeline_.remove(&encoder_);
     delete source_;
 }
 

@@ -45,9 +45,9 @@ AudioReceiver::AudioReceiver(const AudioConfig & config)
 AudioReceiver::~AudioReceiver()
 {
     assert(stop());
-    pipeline_.remove(sink_);
-    pipeline_.remove(decoder_);
-    pipeline_.remove(depayloader_);
+    pipeline_.remove(&sink_);
+    pipeline_.remove(&decoder_);
+    pipeline_.remove(&depayloader_);
 }
 
 

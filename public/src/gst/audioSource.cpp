@@ -239,6 +239,14 @@ AudioDvSource::AudioDvSource(const AudioConfig &config)
 {}
 
 
+AudioDvSource::~AudioDvSource()
+{
+    assert(stop());
+    if (pipeline_.findElement(config_.source()) != NULL)
+        pipeline_.remove(sources_);
+    sources_[0] = NULL;
+}
+
 void AudioDvSource::init_source()
 {
     sources_.push_back(pipeline_.findElement(config_.source()));  // see if it already exists from VideoDvSource

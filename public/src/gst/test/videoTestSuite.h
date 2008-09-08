@@ -33,8 +33,9 @@ class VideoTestSuite
     public:
 
         VideoTestSuite()
+            : fileLocation_("ubuntu.ogg")
         {
-            testLength_ = 20000;
+            testLength_ = 1000;
 #if LOCAL
             TEST_ADD(VideoTestSuite::start_test_video)
             TEST_ADD(VideoTestSuite::stop_test_video)
@@ -72,6 +73,7 @@ class VideoTestSuite
         // some tests
 
     private:
+        std::string fileLocation_;
 
         void start_test_video();
         void stop_test_video();
