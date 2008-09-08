@@ -97,6 +97,7 @@ class VideoDvSource
 {
     public:
         explicit VideoDvSource(const VideoConfig &config);
+        ~VideoDvSource();
         //void link_element(GstElement *sinkElement);
         GstElement *srcElement() { return dvdec_; }
         void init();

@@ -82,14 +82,14 @@ const char *RtpSession::padStr(const char *padName)
 RtpSession::~RtpSession()
 {
     assert(stop());
-    pipeline_.remove(rtcp_sender_);
-    pipeline_.remove(rtcp_receiver_);
+    pipeline_.remove(&rtcp_sender_);
+    pipeline_.remove(&rtcp_receiver_);
 
     --refCount_;
     if (refCount_ <= 0) // destroy if no streams are present
     {
         assert(refCount_ == 0);
-        pipeline_.remove(rtpbin_);
+        pipeline_.remove(&rtpbin_);
         rtpbin_ = 0;
     }
 }

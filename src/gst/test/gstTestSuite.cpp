@@ -51,4 +51,10 @@ void GstTestSuite::block(const char * filename, const char *function, long lineN
     //std::cin.get()
 }
 
+bool GstTestSuite::areValidArgs(int argc, char **argv)
+{
+    int pid = atoi(argv[1]);
+    bool isValid = (argc == 2) && (strlen(argv[1]) == 1) && ((pid == 0) || (pid == 1));
+    return isValid;
+}
 

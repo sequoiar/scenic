@@ -42,7 +42,7 @@ RtpReceiver::RtpReceiver()
 RtpReceiver::~RtpReceiver()
 {
     assert(stop());
-    pipeline_.remove(rtp_receiver_);
+    pipeline_.remove(&rtp_receiver_);
 
     // find this->depayloader in the static list of depayloaders
     std::list<GstElement *>::iterator iter;

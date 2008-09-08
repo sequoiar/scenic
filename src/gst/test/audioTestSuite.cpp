@@ -787,10 +787,11 @@ void AudioTestSuite::start_stop_audio_dv_rtp()
 
 int main(int argc, char **argv)
 {
-    if (argc != 2) {
+    if (!GstTestSuite::areValidArgs(argc, argv)) {
         std::cerr << "Usage: " << "audioTester <0/1>" << std::endl;
         exit(1);
     }
+
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
     AudioTestSuite tester;
     tester.set_id(atoi(argv[1]));

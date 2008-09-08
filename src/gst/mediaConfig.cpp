@@ -71,7 +71,10 @@ MediaConfig::MediaConfig(const std::string &source_param, const std::string &loc
 bool MediaConfig::fileExists() const
 {
     if (location_.empty())
+    {
+        LOG("No file location given", ERROR);
         return false;
+    }
     FILE *file;
     file = fopen(location(), "r");
     if (file != NULL)
@@ -80,7 +83,10 @@ bool MediaConfig::fileExists() const
         return true;
     }
     else
+    {
+        LOG("File does not exist", ERROR);
         return false;
+    }
 }
 
 

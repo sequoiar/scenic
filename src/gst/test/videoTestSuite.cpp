@@ -340,7 +340,7 @@ void VideoTestSuite::start_file()
 {
     if (id_ == 1)
         return;
-    VideoConfig config("filesrc", "ubuntu.ogg");
+    VideoConfig config("filesrc", fileLocation_);
     VideoSender tx(config);
     tx.init();
 
@@ -355,7 +355,7 @@ void VideoTestSuite::stop_file()
 {
     if (id_ == 1)
         return;
-    VideoConfig config("filesrc", "ubuntu.ogg");
+    VideoConfig config("filesrc", fileLocation_);
     VideoSender tx(config);
     tx.init();
 
@@ -370,7 +370,7 @@ void VideoTestSuite::start_stop_file()
 {
     if (id_ == 1)
         return;
-    VideoConfig config("filesrc", "ubuntu.ogg");
+    VideoConfig config("filesrc", fileLocation_);
     VideoSender tx(config);
     tx.init();
 
@@ -398,7 +398,7 @@ void VideoTestSuite::start_file_rtp()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        VideoConfig config("filesrc", "ubuntu.ogg", "h264", get_host_ip(), V_PORT);
+        VideoConfig config("filesrc", fileLocation_, "h264", get_host_ip(), V_PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -423,7 +423,7 @@ void VideoTestSuite::stop_file_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("filesrc", "ubuntu.ogg", "h264", get_host_ip(), V_PORT);
+        VideoConfig config("filesrc", fileLocation_, "h264", get_host_ip(), V_PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -451,7 +451,7 @@ void VideoTestSuite::start_stop_file_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("filesrc", "ubuntu.ogg", "h264", get_host_ip(), V_PORT);
+        VideoConfig config("filesrc", fileLocation_, "h264", get_host_ip(), V_PORT);
         VideoSender tx(config);
         tx.init();
 
@@ -468,10 +468,11 @@ void VideoTestSuite::start_stop_file_rtp()
 
 int main(int argc, char **argv)
 {
-    if (argc != 2) {
+    if (!GstTestSuite::areValidArgs(argc, argv)) {
         std::cerr << "Usage: " << "videoTester <0/1>" << std::endl;
         exit(1);
     }
+    
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
     VideoTestSuite tester;
     tester.set_id(atoi(argv[1]));

@@ -34,7 +34,7 @@ class SyncTestSuite
 
         SyncTestSuite()
         {
-            testLength_ = 10000;
+            testLength_ = 1000;
 
 #if DV
 #if 0

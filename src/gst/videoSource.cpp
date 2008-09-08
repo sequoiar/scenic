@@ -41,20 +41,10 @@ void VideoSource::init()
 }
 
 
-#if 0
-void VideoSource::link_element(GstElement *sinkElement)
-{
-    GstLinkable::link(source_, sinkElement);
-}
-
-
-#endif
-
-
 VideoSource::~VideoSource()
 {
     assert(stop());
-    pipeline_.remove(source_);
+    pipeline_.remove(&source_);
 }
 
 
@@ -115,36 +105,12 @@ void VideoFileSource::sub_init()
     assert(config_.fileExists());
     g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
     GstLinkable::link(source_, decoder_);
-
-#if 0
-    if (config_.isNetworked())
-        assert(sinkElement_ = pipeline_.findElement("colorspc"));
-    else{
-        assert(sinkElement_ = pipeline_.findElement("videosink"));
-        g_object_set(G_OBJECT(sinkElement_), "sync", TRUE, NULL);
-    }
-#endif
-
+    
     // bind callback
     g_signal_connect(decoder_, "new-decoded-pad",
                      G_CALLBACK(VideoFileSource::cb_new_src_pad),
                      static_cast<void *>(this));
 }
-
-
-#if 0
-void VideoFileSource::link_element(GstElement *sinkElement)
-{
-    // defer linking of decoder to this element to callback
-    sinkElement_ = sinkElement;
-
-    // set xvimagesink sync equal to true for filesrc to work properly
-    if (!strncmp(gst_element_get_name(sinkElement_), "xvimagesink", strlen("xvimagesink")))
-        g_object_set(G_OBJECT(sinkElement_), "sync", TRUE, NULL);
-}
-
-
-#endif
 
 
 void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/,
@@ -165,7 +131,7 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
     // FIXME: HACK!!!!
     if (context->config_.isNetworked())
         sinkElement = context->pipeline_.findElement("colorspc");
-    else{
+    else {
         sinkElement = context->pipeline_.findElement("videosink");
         g_object_set(G_OBJECT(sinkElement), "sync", TRUE, NULL);
     }
@@ -198,13 +164,22 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
 VideoFileSource::~VideoFileSource()
 {
     assert(stop());
-    pipeline_.remove(decoder_);
+    pipeline_.remove(&decoder_);
 }
 
 
 VideoDvSource::VideoDvSource(const VideoConfig &config)
     : VideoSource(config), demux_(0), queue_(0), dvdec_(0), dvIsNew_(true)
 {}
+
+
+VideoDvSource::~VideoDvSource()
+{
+    assert(stop());
+    if (pipeline_.findElement(config_.source()) != NULL)
+        pipeline_.remove(&source_);
+    source_ = NULL;
+}
 
 
 void VideoDvSource::init()

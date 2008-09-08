@@ -31,7 +31,7 @@ class AudioSource
     : public GstLinkableSource
 {
     public:
-        virtual ~AudioSource();
+        ~AudioSource();
         virtual void init();
 
     protected:
@@ -138,7 +138,7 @@ class AudioDvSource
 {
     public:
         explicit AudioDvSource(const AudioConfig &config);
-
+        ~AudioDvSource();
         void init_source();
         void sub_init();
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data);

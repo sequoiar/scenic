@@ -49,6 +49,7 @@ class GstTestSuite
         {}
 
         void set_id(int id);
+        static bool areValidArgs(int argc, char **argv);
 
     protected:
         void block(const char *filename, const char *function, long lineNumber);
