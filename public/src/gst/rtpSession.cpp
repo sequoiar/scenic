@@ -24,7 +24,6 @@
 
 #include "rtpSession.h"
 #include "mediaConfig.h"
-//#include "logWriter.h"
 
 
 GstElement *RtpSession::rtpbin_ = 0;

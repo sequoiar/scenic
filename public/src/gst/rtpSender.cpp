@@ -82,8 +82,7 @@ void RtpSender::addDerived(GstElement * newSrc, const MediaConfig & config)
     GstPad *rtcpReceiverSrc;
 
     assert(rtp_sender_ = gst_element_factory_make("udpsink", NULL));
-    g_object_set(rtp_sender_, "host", config.remoteHost(), "port", config.port(), "sync",
-                 FALSE, "async", FALSE, NULL);
+    g_object_set(rtp_sender_, "host", config.remoteHost(), "port", config.port(), NULL);
     pipeline_.add(rtp_sender_);
 
     assert(send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_")));

@@ -38,7 +38,9 @@ class Pipeline
         void remove(std::vector < GstElement * >&elementVec);
         void reset();
         bool isPlaying() const;
+        bool isPaused() const;
         void wait_until_playing() const;
+        void wait_until_paused() const;
         void wait_until_stopped() const;
         bool start();
         bool stop();
