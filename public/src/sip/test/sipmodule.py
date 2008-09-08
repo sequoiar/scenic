@@ -30,6 +30,13 @@ class Connection:
         res = self.userAgent.disconnect()
         return res
 
+    def addMedia(self, type, codecs, port, direction):
+        res = self.userAgent.setMedia(type, codecs, port, direction)
+        return res
+
+    def listMedia(self):
+        print self.userAgent.mediaToString()
+
     def state(self):
         print self.userAgent.getConnectionState()
 

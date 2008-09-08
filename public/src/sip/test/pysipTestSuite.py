@@ -1,7 +1,6 @@
 import sipmodule
 
-conn = sipmodule.Connection(5060)
-
+conn = sipmodule.Connection(50060)
 conn.connect()
 #print 'connect return value:', res
 #conn.state()
