@@ -39,11 +39,12 @@ GstThread::~GstThread()
     delete vconf_;
 }
 
+
 int GstThread::main()
 {
-    bool done = false;    
+    bool done = false;
     AudioConfig config("audiotestsrc", 2, "vorbisenc", get_host_ip(), A_PORT);
-    
+
     asender_ = new AudioSender(config);
 
     while(!done)
@@ -58,38 +59,35 @@ int GstThread::main()
             {
                 queue_.push(f);
                 done = true;
-            } else 
+            } else
             if(!s.compare("start"))
             {
                 asender_->start();
                 std::string caps_str;
                 MapMsg caps;
-                caps.insert( std::make_pair("command","caps"));
-                caps.insert( std::make_pair("caps_str",asender_->getCaps()));
+                caps.insert( std::make_pair("command", "caps"));
+                caps.insert( std::make_pair("caps_str", asender_->getCaps()));
                 queue_.push(caps);
-            } else 
+            } else
             if(!s.compare("init"))
             {
                 asender_->init();
-            } else 
+            } else
             if(!s.compare("stop"))
             {
                 asender_->stop();
             }
-            else
-            {
+            else{
                 LOG_WARNING("Unknown Command.")
             }
         }
-
-
     }
 
     return 0;
-
 }
 
-#if 0 
+
+#if 0
 int GstThread::main()
 {
     bool done = false;
@@ -137,12 +135,11 @@ int GstThread::main()
             default:
                 break;
         }
-
-
     }
 
     return 0;
 }
+
 
 #endif
 

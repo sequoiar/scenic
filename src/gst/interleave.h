@@ -38,7 +38,7 @@ class Interleave
         GstElement *sinkElement() { return interleave_; }
 
     private:
-        friend class InterleavedAudioSource; 
+        friend class InterleavedAudioSource;
         GstElement *interleave_;
         const AudioConfig &config_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];

@@ -50,6 +50,7 @@ AudioReceiver::~AudioReceiver()
     pipeline_.remove(depayloader_);
 }
 
+
 //#ifdef USE_OSC
 void AudioReceiver::wait_for_caps()
 {
@@ -66,6 +67,8 @@ void AudioReceiver::wait_for_caps()
 
     lo_server_thread_free(st);
 }
+
+
 //#endif
 
 
@@ -76,8 +79,8 @@ void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
 }
 
 
-int AudioReceiver::caps_handler(const char * /*path*/, const char * /*types*/, lo_arg ** argv, int  /*argc*/,
-                                void * /*data*/,
+int AudioReceiver::caps_handler(const char * /*path*/, const char * /*types*/, lo_arg ** argv,
+                                int /*argc*/, void * /*data*/,
                                 void *user_data)
 {
     AudioReceiver *context = static_cast < AudioReceiver * >(user_data);

@@ -46,16 +46,15 @@ gboolean VideoSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gp
         LOG("user didn't hit f", DEBUG);
         return TRUE;
     }
-    else 
+    else
         LOG("you hit f", DEBUG);
+    gboolean isFullscreen =
+        (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
 
-    gboolean isFullscreen = (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
-
-    if (isFullscreen) 
+    if (isFullscreen)
         gtk_window_unfullscreen(GTK_WINDOW(widget));
     else
         gtk_window_fullscreen(GTK_WINDOW(widget));
-
     return TRUE;
 }
 
@@ -66,17 +65,17 @@ void VideoSink::init()
     static bool gtk_initialized = false;
     if (!gtk_initialized)
         gtk_init(0, NULL);
-
     assert(sink_ = gst_element_factory_make("xvimagesink", "videosink"));
     pipeline_.add(sink_);
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(VideoSink::expose_cb), static_cast<void*>(sink_));
+    g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
+                         VideoSink::expose_cb), static_cast<void*>(sink_));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
-    g_signal_connect(G_OBJECT(window_), "key-press-event", G_CALLBACK(VideoSink::key_press_event_cb), NULL);
-
+    g_signal_connect(G_OBJECT(window_), "key-press-event",
+                     G_CALLBACK(VideoSink::key_press_event_cb), NULL);
 }
 
 

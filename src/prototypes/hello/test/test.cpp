@@ -49,7 +49,7 @@ bool DModule::run()
 }
 
 
-int main (int , char** )
+int main (int, char** )
 {
     DModule m;
 

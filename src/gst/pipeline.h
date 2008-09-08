@@ -48,15 +48,18 @@ class Pipeline
             return gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
         }
 
-        GstClock* clock() const 
-        { 
-            return gst_pipeline_get_clock(GST_PIPELINE(pipeline_)); 
+
+        GstClock* clock() const
+        {
+            return gst_pipeline_get_clock(GST_PIPELINE(pipeline_));
         }
 
-        GstElement *findElement(const char *name) 
-        { 
-            return gst_bin_get_by_name(GST_BIN(pipeline_), name); 
+
+        GstElement *findElement(const char *name)
+        {
+            return gst_bin_get_by_name(GST_BIN(pipeline_), name);
         }
+
 
     private:
         void init();

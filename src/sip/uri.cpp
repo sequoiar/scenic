@@ -86,4 +86,5 @@ void URI::toString(){
     cout << "<sip:" << getHostName() << "@" << getHostIP() << ":" << getPort() << ">" << endl;
 }
 
+
 /**************************** PRIVATE MEMBERS **************************************/

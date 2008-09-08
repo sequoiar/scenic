@@ -22,7 +22,7 @@
 #include <sstream>
 #include <iostream>
 
-static const char* streamDirectionStr[] = 
+static const char* streamDirectionStr[] =
 {
     "sendrecv",
     "sendonly",
@@ -41,13 +41,12 @@ static const char* mediaTypeStr[] =
 };
 
 sdpMedia::sdpMedia( int type )
-    : _mediaType( (mediaType)type ), _codecList(0), _port( 0 ), _streamType( SEND_RECEIVE ){
-    
-}
+    : _mediaType( (mediaType)type ), _codecList(0), _port( 0 ), _streamType( SEND_RECEIVE ){}
+
 
 sdpMedia::sdpMedia( std::string type, int port, std::string dir)
-    : _mediaType( (mediaType)-1), _codecList(0), _port(port), _streamType((streamDirection)-1){
-    
+    : _mediaType( (mediaType)-1), _codecList(0), _port(port),
+    _streamType((streamDirection)-1){
     unsigned int i;
     const char* tmp;
 
@@ -61,7 +60,6 @@ sdpMedia::sdpMedia( std::string type, int port, std::string dir)
 
     if( strcmp( dir.c_str(), "default") == 0 )
         dir = DEFAULT_STREAM_DIRECTION;
-
     for( i=0; i<DIR_COUNT; i++ ){
         tmp = streamDirectionStr[i];
         std::cout << "debug: " << tmp << std::endl;
@@ -72,6 +70,7 @@ sdpMedia::sdpMedia( std::string type, int port, std::string dir)
     }
 }
 
+
 sdpMedia::~sdpMedia()
 {
     int i;
@@ -79,8 +78,8 @@ sdpMedia::~sdpMedia()
         delete _codecList[i];
 }
 
-std::string sdpMedia::getMediaTypeStr( void ){
 
+std::string sdpMedia::getMediaTypeStr( void ){
     std::string value;
 
     // Test the range to be sure we know the media
@@ -88,9 +87,9 @@ std::string sdpMedia::getMediaTypeStr( void ){
         value = mediaTypeStr[ _mediaType ];
     else
         value = "unknown";
-    
     return value;
 }
+
 
 void sdpMedia::addCodec( sdpCodec *codec ){
     _codecList.push_back(codec);
@@ -134,8 +133,8 @@ void sdpMedia::clearCodecList( void ) {
     _codecList.clear();
 }
 
-std::string sdpMedia::getStreamDirectionStr( void ) {
 
+std::string sdpMedia::getStreamDirectionStr( void ) {
     std::string value;
 
     // Test the range of the value
@@ -143,10 +142,9 @@ std::string sdpMedia::getStreamDirectionStr( void ) {
         value = streamDirectionStr[ _streamType ];
     else
         value = "unknown";
-    
     return value;
-
 }
+
 
 std::string sdpMedia::toString( void ){
     std::ostringstream display;
@@ -160,6 +158,7 @@ std::string sdpMedia::toString( void ){
     for(i=0; i<size; i++){
         display << _codecList[i]->_name << " ";
     }
+
     display << std::endl;
     display << "DIRECTION = " << getStreamDirectionStr() << std::endl;
 

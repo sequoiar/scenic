@@ -31,8 +31,7 @@
 
 
 VideoSender::VideoSender(const VideoConfig & config)
-    : config_(config), session_(), source_(0), colorspc_(0), encoder_(0), payloader_(0), 
-    sink_()
+    : config_(config), session_(), source_(0), colorspc_(0), encoder_(0), payloader_(0), sink_()
 {
     // empty
 }
@@ -100,11 +99,12 @@ bool VideoSender::start()
     MediaBase::start();
     pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
     //if (config_.isNetworked())
-     //   wait_for_stop();
+    //   wait_for_stop();
     if (!config_.isNetworked())
         sink_.showWindow();
     return true;
 }
+
 
 #if 0
 void VideoSender::wait_for_stop()
@@ -125,7 +125,6 @@ void VideoSender::wait_for_stop()
 }
 
 
-
 void VideoSender::liblo_error(int num, const char *msg, const char *path)
 {
     printf("liblo server error %d in path %s: %s\n", num, path, msg);
@@ -133,8 +132,8 @@ void VideoSender::liblo_error(int num, const char *msg, const char *path)
 }
 
 
-int VideoSender::stop_handler(const char * /*path*/, const char * /*types*/, lo_arg ** /*argv*/, int /*argc*/,
-                              void * /*data*/,
+int VideoSender::stop_handler(const char * /*path*/, const char * /*types*/, lo_arg ** /*argv*/,
+                              int /*argc*/, void * /*data*/,
                               void *user_data)
 {
     LOG("Being stopped by receiver.", DEBUG);
@@ -143,5 +142,7 @@ int VideoSender::stop_handler(const char * /*path*/, const char * /*types*/, lo_
 
     return 0;
 }
+
+
 #endif
 

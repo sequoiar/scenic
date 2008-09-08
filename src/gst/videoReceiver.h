@@ -45,7 +45,7 @@ class VideoReceiver
 
         const VideoConfig &config_;
         RtpReceiver session_;
-        GstElement *depayloader_, *decoder_;// *sink_;
+        GstElement *depayloader_, *decoder_; // *sink_;
         VideoSink sink_;
 
         VideoReceiver(const VideoReceiver&); //No Copy Constructor

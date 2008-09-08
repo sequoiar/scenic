@@ -42,7 +42,7 @@ class URI
 
         std::string getAddress();
 
-        std::string buildDefaultLocalUri( void ); 
+        std::string buildDefaultLocalUri( void );
         void toString();
 
     private:

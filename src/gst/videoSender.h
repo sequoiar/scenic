@@ -37,6 +37,7 @@ class VideoSender
     public:
         explicit VideoSender(const VideoConfig & config);
         bool start();
+
         //void wait_for_stop();
 
         ~VideoSender();
@@ -53,10 +54,11 @@ class VideoSender
         static void liblo_error(int num, const char *msg, const char *path);
 #endif
 
+
         const VideoConfig &config_;
         RtpSender session_;
         VideoSource *source_;
-        GstElement *colorspc_, *encoder_, *payloader_;//, *sink_;
+        GstElement *colorspc_, *encoder_, *payloader_; //, *sink_;
         VideoSink sink_;
 
         // hidden

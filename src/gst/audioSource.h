@@ -42,7 +42,7 @@ class AudioSource
 
         const AudioConfig &config_;
 
-        
+
         std::vector<GstElement *>sources_, aconvs_;
         static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                       gpointer user_data);
@@ -55,10 +55,11 @@ class AudioSource
 };
 
 class InterleavedAudioSource
-: public AudioSource
+    : public AudioSource
 {
     public:
         void init();
+
         ~InterleavedAudioSource() {};
 
     protected:
@@ -68,7 +69,6 @@ class InterleavedAudioSource
 
         Interleave interleave_;
         GstElement *srcElement() { return interleave_.srcElement(); }
-
 };
 
 
@@ -134,7 +134,7 @@ class AudioJackSource
 
 
 class AudioDvSource
-    : public AudioSource 
+    : public AudioSource
 {
     public:
         explicit AudioDvSource(const AudioConfig &config);
