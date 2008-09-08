@@ -32,16 +32,6 @@
 #include "gutil/strIntFloat.h"
 
 
-/// returns a string with " and \ escaped
-std::string strEsq(const std::string& str);
-
-/// returns a string that undoes escaped  " and \
-std::string strUnEsq(const std::string& str);
-
-/// returns the position of the trailing quote in a string
-/// ignores escaped version
-int get_end_of_quoted_string(const std::string& str);
-
 /// builds a string of command: key=value pairs
 /// TODO make map const
 bool stringify(std::map<std::string, StrIntFloat>& cmd_map, std::string& str);
