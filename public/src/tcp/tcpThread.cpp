@@ -45,10 +45,10 @@ int TcpThread::main()
                 if(serv_.recv(msg))
                 {
                     MapMsg mapMsg;
-                    if(tokenize(msg,mapMsg))
+                    if(tokenize(msg, mapMsg))
                         queue_.push(mapMsg);
                     else
-                        LOG_ERROR("Bad Msg Received.")
+                        LOG_ERROR("Bad Msg Received.");
                 }
                 else
                     usleep(10000);
@@ -73,11 +73,13 @@ bool TcpThread::gotQuit()
     return false;
 }
 
+
 bool TcpThread::send(MapMsg& msg)
 {
     std::string msg_str;
-    stringify(msg,msg_str);
-    
+    stringify(msg, msg_str);
+
     return serv_.send(msg_str);
 }
+
 
