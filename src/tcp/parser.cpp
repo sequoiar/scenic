@@ -24,17 +24,17 @@
 #include "gutil/strIntFloat.h"
 
 
-std::string strEsq(const std::string& str)
+static std::string strEsq(const std::string& str)
 {
     std::string out;
 
     for(unsigned int pos=0; pos < str.size(); ++pos)    //for each char in string
     {
         char c = str[pos];                              //copy current character
-        if(c == '\\')                                   //if backslash found
-            out.append("\\\\");                         //escape it with backslash
-        else if(c == '\"')                              //if quotation mark
-            out.append("\\\"");                         //escape it with backslash
+        if(c == '\\')                                 //if backslash found
+            out.append("\\\\");                      //escape it with backslash
+        else if(c == '\"')                            //if quotation mark
+            out.append("\\\"");                      //escape it with backslash
         else
             out.append(1, c);                           //otherwise pass it through
     }
@@ -43,7 +43,7 @@ std::string strEsq(const std::string& str)
 }
 
 
-std::string strUnEsq(const std::string& str)
+static std::string strUnEsq(const std::string& str)
 {
     std::string out;
 
@@ -68,7 +68,9 @@ std::string strUnEsq(const std::string& str)
 }
 
 
-int get_end_of_quoted_string(const std::string& str)
+/// returns the position of the trailing quote in a string
+/// ignores escaped version
+static int get_end_of_quoted_string(const std::string& str)
 {
     //return error if string doesn't start with "
     if(str[0] != '\"'){
@@ -78,8 +80,8 @@ int get_end_of_quoted_string(const std::string& str)
     //for each char in string
     for(unsigned int pos=1; pos < str.size(); ++pos)
     {
-        if(str[pos] == '\"')                            //if char is " and if
-            if(str[pos-1] != '\\')                      //previous char is not escape char
+        if(str[pos] == '\"')                          //if char is " and if
+            if(str[pos-1] != '\\')                    //previous char is not escape char
                 return pos+1;                           //return position following "
     }
 
@@ -155,8 +157,8 @@ bool stringify(std::map<std::string, StrIntFloat>& cmd_map, std::string& str)
         }
     }
 
-    str.append("\r\\\n");                               //Append \r\n to conform to
-                                                        //telnet specification
+    str.append("\r\\\n");                                   //Append \r\n to conform to
+    //telnet specification
 
     return true;
 }
@@ -208,7 +210,7 @@ bool tokenize(const std::string& str, std::map<std::string, StrIntFloat> &cmd_ma
         else{
             pos = strcspn(cstr+i+1, " ");                   //find end of key=value pair
 
-            std::stringstream stream(lstr.substr(i+1, pos));//string of value
+            std::stringstream stream(lstr.substr(i+1, pos)); //string of value
             if(strcspn(stream.str().c_str(), ".")           //if value does not
                == stream.str().size())                      //contain . it is an int
             {
@@ -216,16 +218,15 @@ bool tokenize(const std::string& str, std::map<std::string, StrIntFloat> &cmd_ma
                 stream >> temp_i;                           //convert str to int
                 StrIntFloat temp(temp_i);                   //make int
                 cmd_map.insert(                             //insert key,valu
-                    make_pair(lstr.substr(0, i), temp)); 
+                    make_pair(lstr.substr(0, i), temp));
             }
-            else
-            {                                               //value contains .
+            else{                                           //value contains .
                                                             //thus it is a float
                 float temp_f;
                 stream >> temp_f;                           //convert str to float
                 StrIntFloat temp(temp_f);                   //make float
                 cmd_map.insert(                             //insert key,value
-                    make_pair(lstr.substr(0, i), temp)); 
+                    make_pair(lstr.substr(0, i), temp));
             }
         }
         if(lstr.size() > i+2+pos)                           //more characters to process
