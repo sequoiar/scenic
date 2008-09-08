@@ -34,7 +34,7 @@
 
 /// builds a string of command: key=value pairs
 /// TODO make map const
-bool stringify(std::map<std::string, StrIntFloat>& cmd_map, std::string& str);
+bool stringify(const std::map<std::string, StrIntFloat>& cmd_map, std::string& str);
 
 /// fills a map of key=value pairs with a special key "command" from a string
 /// of type specified above

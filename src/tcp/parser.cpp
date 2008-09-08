@@ -30,10 +30,10 @@ static std::string strEsq(const std::string& str)
 
     for(unsigned int pos=0; pos < str.size(); ++pos)    //for each char in string
     {
-   char c = str[pos];                              //copy current character
-        if(c == '\\')       //if backslash found
+        char c = str[pos];                         //copy current character
+        if(c == '\\') //if backslash found
             out.append("\\\\"); //escape it with backslash
-        else if(c == '\"')  //if quotation mark
+        else if(c == '\"') //if quotation mark
             out.append("\\\""); //escape it with backslash
         else
             out.append(1, c);                           //otherwise pass it through
@@ -90,9 +90,9 @@ static int get_end_of_quoted_string(const std::string& str)
 }
 
 
-bool stringify(std::map<std::string, StrIntFloat>& cmd_map, std::string& str)
+bool stringify(const std::map<std::string, StrIntFloat>& cmd_map, std::string& str)
 {
-    typedef std::map<std::string, StrIntFloat>::iterator iter;
+    typedef std::map<std::string, StrIntFloat>::const_iterator iter;
     str.clear();
 
     //locate "command" and output value to str
