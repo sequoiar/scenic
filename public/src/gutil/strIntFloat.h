@@ -26,8 +26,8 @@ class StrIntFloat
         StrIntFloat()
             : type_('n'), s_(), i_(0), f_(0.0){}
 
-        char type(){ return type_;}
-        bool get(std::string& s)
+        char type() const { return type_;}
+        bool get(std::string& s) const
         {
             if(type_ != 's')
                 return false;
@@ -36,7 +36,7 @@ class StrIntFloat
         }
 
 
-        bool get(int& i)
+        bool get(int& i) const
         {
             if(type_ != 'i')
                 return false;
@@ -45,7 +45,7 @@ class StrIntFloat
         }
 
 
-        bool get(float& f)
+        bool get(float& f) const
         {
             if(type_ != 'f')
                 return false;
