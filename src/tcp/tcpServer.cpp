@@ -106,17 +106,14 @@ bool TcpServer::recv(std::string& out)
         {
             if (n != 0 && errno == EWOULDBLOCK)
                 break;
-            
             connected_ = false;
             return false; //error("ERROR reading from socket");
         }
-        out.append(buffer_,n);
-
+        out.append(buffer_, n);
     } while(1);
 
     if(out.empty())
         return false;
-
     return true;
 }
 

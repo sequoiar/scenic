@@ -29,6 +29,7 @@ class TcpThread
             : serv_(inport){}
         ~TcpThread(){}
         bool send(MapMsg& msg);
+
     private:
         int main();
         bool gotQuit();
