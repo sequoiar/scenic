@@ -17,13 +17,10 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+
 /** \file 
- *      Just the License GPL 3+ 
+ *      Class that can countain a string, int or float
  *
- *      Detailed description here.
- *      Continues here.
- *      And more.
- *      And more.
  */
 
 
