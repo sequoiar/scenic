@@ -47,11 +47,11 @@ VideoSource * VideoConfig::createSource() const
 
 bool VideoConfig::sanityCheck() const
 {
-    bool result = true;
+    bool validCodec = true;
     if (!codec_.empty())
-        result = (codec_ == "h264");
+        validCodec = (codec_ == "h264");
 
-    assert(result);
-    return result;
+    assert(validCodec);
+    return validCodec;
 }
 
