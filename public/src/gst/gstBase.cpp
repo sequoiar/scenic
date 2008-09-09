@@ -25,14 +25,6 @@
 
 int GstBase::refCount_ = 0;
 
-// this initializes pipeline only once/process
-GstBase::GstBase()
-    : pipeline_(Pipeline::Instance())
-{
-    ++refCount_;
-}
-
-
 GstBase::~GstBase()
 {
     assert(stop());

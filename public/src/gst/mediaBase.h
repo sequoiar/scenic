@@ -21,7 +21,6 @@
 #ifndef _MEDIA_BASE_H_
 #define _MEDIA_BASE_H_
 
-#include <cassert>
 #include "gstBase.h"
 
 class MediaBase

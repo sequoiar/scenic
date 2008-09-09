@@ -28,13 +28,16 @@ class GstBase
     public:
         virtual bool start();
         virtual bool stop();
+        virtual bool init() = 0;
 
         bool isPlaying() { return pipeline_.isPlaying(); }
 
     protected:
         typedef std::vector<GstElement *>::iterator GstIter;
 
-        GstBase();
+        // this initializes pipeline only once/process
+        GstBase() : pipeline_(Pipeline::Instance()) { ++refCount_; }
+
         virtual ~GstBase();
 
         Pipeline & pipeline_;

@@ -32,10 +32,12 @@ class AudioSource
 {
     public:
         ~AudioSource();
-        virtual void init();
+        bool init();
 
     protected:
-        explicit AudioSource(const AudioConfig &config);
+        explicit AudioSource(const AudioConfig &config)
+            : config_(config), sources_(0), aconvs_(0) {}
+
         virtual void init_source();
         virtual void sub_init() = 0;
         virtual void link_elements();
@@ -58,14 +60,16 @@ class InterleavedAudioSource
     : public AudioSource
 {
     public:
-        void init();
+        bool init();
 
         ~InterleavedAudioSource() {};
 
     protected:
-        explicit InterleavedAudioSource(const AudioConfig &config);
-        virtual void init_source();
-        virtual void link_elements();
+        explicit InterleavedAudioSource(const AudioConfig &config)
+            : AudioSource(config), interleave_(config_) {}
+
+        void init_source();
+        void link_elements();
 
         Interleave interleave_;
         GstElement *srcElement() { return interleave_.srcElement(); }
@@ -103,13 +107,15 @@ class AudioFileSource
         ~AudioFileSource();
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
                                    void *data);
-
     protected:
         void sub_init();
         void link_elements();
 
     private:
         std::vector<GstElement*> decoders_;
+        AudioFileSource(const AudioFileSource&);     //No Copy Constructor
+        AudioFileSource& operator=(const AudioFileSource&);     //No Assignment Operator
+
 };
 
 
@@ -120,6 +126,9 @@ class AudioAlsaSource
         explicit AudioAlsaSource(const AudioConfig &config)
             : InterleavedAudioSource(config) {}
         void sub_init(){};
+    private:
+        AudioAlsaSource(const AudioAlsaSource&);     //No Copy Constructor
+        AudioAlsaSource& operator=(const AudioAlsaSource&);     //No Assignment Operator
 };
 
 
@@ -130,6 +139,9 @@ class AudioJackSource
         explicit AudioJackSource(const AudioConfig &config)
             : InterleavedAudioSource(config) {}
         void sub_init();
+    private:
+        AudioJackSource(const AudioJackSource&);     //No Copy Constructor
+        AudioJackSource& operator=(const AudioJackSource&);     //No Assignment Operator
 };
 
 
@@ -137,15 +149,16 @@ class AudioDvSource
     : public AudioSource
 {
     public:
-        explicit AudioDvSource(const AudioConfig &config);
+        explicit AudioDvSource(const AudioConfig &config)
+        : AudioSource(config), demux_(0), queue_(0), dvIsNew_(true) {}
+
         ~AudioDvSource();
         void init_source();
         void sub_init();
+
+    private:
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data);
-
-    protected:
         void link_elements();
-
         GstElement *demux_, *queue_;
         bool dvIsNew_;
         AudioDvSource(const AudioDvSource&);     //No Copy Constructor

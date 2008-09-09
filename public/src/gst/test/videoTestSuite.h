@@ -35,7 +35,7 @@ class VideoTestSuite
         VideoTestSuite()
             : fileLocation_("ubuntu.ogg")
         {
-            testLength_ = 1000;
+            testLength_ = 5000;
 #if LOCAL
             TEST_ADD(VideoTestSuite::start_test_video)
             TEST_ADD(VideoTestSuite::stop_test_video)

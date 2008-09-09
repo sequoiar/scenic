@@ -30,13 +30,6 @@ GstElement *RtpSession::rtpbin_ = 0;
 int RtpSession::refCount_ = 0;
 
 
-RtpSession::RtpSession()
-    : rtcp_sender_(0), rtcp_receiver_(0)
-{
-    ++refCount_;
-}
-
-
 bool RtpSession::init()
 {
     // only initialize rtpbin once per process

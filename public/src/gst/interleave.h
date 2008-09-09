@@ -29,9 +29,11 @@ class Interleave
     : public GstLinkableFilter
 {
     public:
-        explicit Interleave(const AudioConfig &config);
+        explicit Interleave(const AudioConfig &config)
+            : interleave_(0), config_(config) {}
+
         ~Interleave();
-        void init();
+        bool init();
 
     protected:
         GstElement *srcElement() { return interleave_; }

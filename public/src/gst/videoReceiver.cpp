@@ -22,24 +22,13 @@
 #include <cassert>
 #include <gst/gst.h>
 
-//#include "lo/lo.h"
-
 #include "mediaBase.h"
 #include "gstLinkable.h"
 #include "videoReceiver.h"
-//#include "logWriter.h"
-
-VideoReceiver::VideoReceiver(const VideoConfig & config)
-    : config_(config), session_(), depayloader_(0), decoder_(0), sink_()
-{
-    // empty
-}
-
 
 VideoReceiver::~VideoReceiver()
 {
     assert(stop());
-    //pipeline_.remove(sink_);
     pipeline_.remove(&decoder_);
     pipeline_.remove(&depayloader_);
 }
@@ -64,13 +53,6 @@ void VideoReceiver::init_codec()
 void VideoReceiver::init_sink()
 {
     sink_.init();
-#if 0
-    assert(sink_ = gst_element_factory_make("xvimagesink", "videosink"));
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-    g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
-
-    pipeline_.add(sink_);
-#endif
     GstLinkable::link(decoder_, sink_);
 }
 
@@ -87,27 +69,6 @@ bool VideoReceiver::start()
 bool VideoReceiver::stop()
 {
     MediaBase::stop();
-    //stop_sender();
     return true;
 }
-
-
-#if 0
-void VideoReceiver::stop_sender() const
-{
-    LOG("Telling sender to stop...", DEBUG);
-
-    lo_address t = lo_address_new(NULL, "8880");
-    if (lo_send(t, "/video/tx/stop", NULL) == -1)
-    {
-        std::cerr << "OSC error " << lo_address_errno(t) << ": " <<
-        lo_address_errstr(t) <<
-        std::endl;
-        exit(EXIT_FAILURE);
-    }
-}
-
-
-#endif
-
 

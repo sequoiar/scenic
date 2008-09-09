@@ -31,18 +31,35 @@ class MediaConfig
 {
     public:
         // remote sender
-        MediaConfig(const std::string & source,
-        const std::string & codec,
-        const std::string & remoteHost,
-        int port);
-        MediaConfig(const std::string & source,
-        const std::string &location,
-        const std::string & codec,
-        const std::string & remoteHost,
-        int port);
-        MediaConfig(const std::string &codec, int port); // receiver
-        explicit MediaConfig(const std::string &source); // local sender
-        explicit MediaConfig(const std::string &source, const std::string &location); // local sender
+        MediaConfig(const std::string & source__,
+        const std::string & codec__,
+        const std::string & remoteHost__,
+        int port__)
+            : source_(source__), location_(""), codec_(codec__), 
+            remoteHost_(remoteHost__), port_(port__) {}
+
+        // remote sender (with location)
+        MediaConfig(const std::string & source__,
+        const std::string & location__,
+        const std::string & codec__,
+        const std::string & remoteHost__,
+        int port__)
+            : source_(source__), location_(location__), codec_(codec__),
+            remoteHost_(remoteHost__), port_(port__) {}
+
+        // receiver
+        MediaConfig(const std::string &codec__, int port__)
+            : source_(""), location_(""), codec_(codec__), 
+            remoteHost_(""), port_(port__) {}
+
+        // local sender
+        explicit MediaConfig(const std::string &source__)
+            : source_(source__), location_(""), codec_(""), 
+            remoteHost_(""), port_(0) {}
+
+        // local sender (w/ location)
+        explicit MediaConfig(const std::string &source__, const std::string &location__) 
+            : source_(source__), location_(location__), codec_(""), remoteHost_(""), port_(0) {}
 
         const char *source() const { return source_.c_str(); }
         const char *location() const;

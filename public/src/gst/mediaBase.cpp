@@ -18,9 +18,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <gst/gst.h>
 #include <cassert>
-
 #include "mediaBase.h"
 
 MediaBase::~MediaBase()

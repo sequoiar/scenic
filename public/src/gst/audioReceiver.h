@@ -22,6 +22,7 @@
 #define _AUDIO_RECEIVER_H_
 
 #include <string>
+#include <cassert>
 
 #include "lo/lo.h"
 #include "mediaBase.h"
@@ -32,8 +33,19 @@ class AudioReceiver
     : public MediaBase
 {
     public:
-        explicit AudioReceiver(const AudioConfig & config);
-        ~AudioReceiver();
+        explicit AudioReceiver(const AudioConfig & config)
+            : config_(config), session_(), gotCaps_(false), 
+            depayloader_(0), decoder_(0), sink_(0)
+        {}
+
+        ~AudioReceiver()
+        {
+            assert(stop());
+            pipeline_.remove(&sink_);
+            pipeline_.remove(&decoder_);
+            pipeline_.remove(&depayloader_);
+        }
+
         bool start();
 
     private:
@@ -43,8 +55,8 @@ class AudioReceiver
         void init_sink();
 
         static int caps_handler(const char *path, const char *types, lo_arg ** argv, int argc,
-                                void *data,
-                                void *user_data);
+                void *data,
+                void *user_data);
 
         void set_caps(const char *caps);
         static void liblo_error(int num, const char *msg, const char *path);

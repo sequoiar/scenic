@@ -21,45 +21,34 @@
 #ifndef _VIDEO_SENDER_H_
 #define _VIDEO_SENDER_H_
 
-#include <string>
-//#include "lo/lo.h"
-
 #include "mediaBase.h"
-#include "videoConfig.h"
 #include "videoSink.h"
 #include "rtpSender.h"
 
 class VideoSource;
+class VideoConfig;
 
 class VideoSender
     : public MediaBase
 {
     public:
-        explicit VideoSender(const VideoConfig & config);
-        bool start();
-
-        //void wait_for_stop();
+        explicit VideoSender(const VideoConfig & config) 
+            : config_(config), session_(), source_(0), colorspc_(0), 
+            encoder_(0), payloader_(0), sink_() {}
 
         ~VideoSender();
+
+        bool start();
 
     private:
         void init_source();
         void init_codec();
         void init_sink();
 
-#if 0
-        static int stop_handler(const char *path, const char *types, lo_arg ** argv, int argc,
-                                void *data,
-                                void *user_data);
-        static void liblo_error(int num, const char *msg, const char *path);
-#endif
-
-
-
         const VideoConfig &config_;
         RtpSender session_;
         VideoSource *source_;
-        GstElement *colorspc_, *encoder_, *payloader_; //, *sink_;
+        GstElement *colorspc_, *encoder_, *payloader_; 
         VideoSink sink_;
 
         // hidden

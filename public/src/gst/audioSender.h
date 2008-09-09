@@ -25,16 +25,20 @@
 #include "audioConfig.h"
 #include "rtpSender.h"
 
-//class AudioSource;
+class AudioSource;
 
 class AudioSender
     : public MediaBase
 {
     public:
-        explicit AudioSender(const AudioConfig & config);
-        std::string getCaps() { return session_.getCaps(); }
-        AudioSender();
+        explicit AudioSender(const AudioConfig & config) 
+            : config_(config), session_(), source_(0), 
+            encoder_(0), payloader_(0), sink_(0)
+        {}
+
         ~AudioSender();
+
+        std::string getCaps() { return session_.getCaps(); }
         bool start();
 
     private:

@@ -64,14 +64,14 @@ class Pipeline
 
 
     private:
-        void init();
+        bool init();
         static gboolean bus_call(GstBus *bus, GstMessage *msg, gpointer data);
         bool checkStateChange(GstStateChangeReturn ret);
 
         Pipeline(const Pipeline&);
         Pipeline& operator=(const Pipeline&);
 
-        Pipeline();
+        Pipeline() : pipeline_(0), startTime_(0), verbose_(false) {}
         ~Pipeline();
         static Pipeline *instance_;
 

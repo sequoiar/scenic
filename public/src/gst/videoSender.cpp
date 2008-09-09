@@ -19,22 +19,13 @@
 //
 
 #include <gst/gst.h>
-#include <iostream>
-#include <string>
 #include <cassert>
 
 #include "gstLinkable.h"
 #include "videoSender.h"
 #include "videoSource.h"
+#include "videoConfig.h"
 #include "videoSink.h"
-//#include "logWriter.h"
-
-
-VideoSender::VideoSender(const VideoConfig & config)
-    : config_(config), session_(), source_(0), colorspc_(0), encoder_(0), payloader_(0), sink_()
-{
-    // empty
-}
 
 
 VideoSender::~VideoSender()
@@ -65,7 +56,6 @@ void VideoSender::init_codec()
                      NULL);
         pipeline_.add(encoder_);
 
-        //source_->link_element(colorspc_);
         GstLinkable::link(*source_, colorspc_);
         GstLinkable::link(colorspc_, encoder_);
     }
@@ -81,12 +71,6 @@ void VideoSender::init_sink()
         session_.add(payloader_, config_);
     }
     else {                 // local test only, no encoding
-#if 0
-        assert(sink_ = gst_element_factory_make("xvimagesink", "videosink"));
-        g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-        g_object_set(G_OBJECT(sink_), "force-aspect-ratio", FALSE, NULL);
-        pipeline_.add(sink_);
-#endif
         sink_.init();
         GstLinkable::link(*source_, sink_);   // FIXME: this shouldn't happen for VideoFileSource
     }
@@ -97,51 +81,9 @@ bool VideoSender::start()
 {
     GstBase::start();
     pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
-    //if (config_.isNetworked())
-    //   wait_for_stop();
     if (!config_.isNetworked())
         sink_.showWindow();
     return true;
 }
 
-
-#if 0
-void VideoSender::wait_for_stop()
-{
-    LOG("Waiting for stop message...", DEBUG);
-
-    lo_server_thread st = lo_server_thread_new("8880", liblo_error);
-
-    lo_server_thread_add_method(st, "/video/tx/stop", "", stop_handler,
-                                static_cast<void *>(this));
-
-    lo_server_thread_start(st);
-
-    while (isPlaying())
-        usleep(10000);
-
-    lo_server_thread_free(st);
-}
-
-
-void VideoSender::liblo_error(int num, const char *msg, const char *path)
-{
-    printf("liblo server error %d in path %s: %s\n", num, path, msg);
-    fflush(stdout);
-}
-
-
-int VideoSender::stop_handler(const char * /*path*/, const char * /*types*/, lo_arg ** /*argv*/,
-                              int /*argc*/, void * /*data*/,
-                              void *user_data)
-{
-    LOG("Being stopped by receiver.", DEBUG);
-    VideoSender *context = static_cast<VideoSender*>(user_data);
-    context->stop();
-
-    return 0;
-}
-
-
-#endif
 

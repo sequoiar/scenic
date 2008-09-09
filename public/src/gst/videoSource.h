@@ -30,7 +30,7 @@ class VideoSource
 {
     public:
         ~VideoSource();
-        virtual void init();
+        bool init();
 
         GstElement *srcElement() { return source_; }
         virtual void sub_init() = 0;
@@ -38,7 +38,9 @@ class VideoSource
         //virtual void link_element(GstElement *sinkElement);
 
     protected:
-        explicit VideoSource(const VideoConfig &config);
+        explicit VideoSource(const VideoConfig &config)
+            : config_(config), source_(0) {}
+
         const VideoConfig &config_;
         GstElement *source_;
         static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id,
@@ -96,11 +98,13 @@ class VideoDvSource
     : public VideoSource
 {
     public:
-        explicit VideoDvSource(const VideoConfig &config);
+        explicit VideoDvSource(const VideoConfig &config) 
+            : VideoSource(config), demux_(0), queue_(0), dvdec_(0), dvIsNew_(true) {}
+
         ~VideoDvSource();
-        //void link_element(GstElement *sinkElement);
+        
         GstElement *srcElement() { return dvdec_; }
-        void init();
+        bool init();
         void sub_init();
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data);
 

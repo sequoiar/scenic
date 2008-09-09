@@ -33,7 +33,7 @@ class VideoSink
         VideoSink()
             : sink_(0), window_(0) {};
         ~VideoSink();
-        void init();
+        bool init();
         void showWindow();
 
     private:

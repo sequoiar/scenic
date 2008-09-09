@@ -35,22 +35,46 @@ class AudioConfig
     : public MediaConfig
 {
     public:
-        AudioConfig(const std::string & source,
-        int numChannels,
-        const std::string & codec,
-        const std::string & remoteHost,
-        int port);                                                          // sender
+        // rtp sender
+        AudioConfig(const std::string &source__,
+                int numChannels__,
+                const std::string &codec__,
+                const std::string &remoteHost__,
+                int port__)
+            : MediaConfig(source__, codec__, remoteHost__, port__), numChannels_(numChannels__)
+        {}
 
-        AudioConfig(const std::string & source,
-        const std::string & location,
-        int numChannels,
-        const std::string & codec,
-        const std::string & remoteHost,
-        int port);                                                          // sender
 
-        AudioConfig(int numChannels, const std::string & codec, int port);  // receiver
-        AudioConfig(const std::string & source, int numChannels);   // local sender
-        AudioConfig(const std::string & source, const std::string & location, int numChannels);   // local sender
+        // rtp file sender
+        AudioConfig(const std::string &source__,
+                const std::string &location__,
+                int numChannels__,
+                const std::string &codec__,
+                const std::string &remoteHost__,
+                int port__)
+            : MediaConfig(source__, location__, codec__, remoteHost__,
+                    port__), numChannels_(numChannels__)
+        {}
+
+
+        // local sender
+        AudioConfig(const std::string & source__, int numChannels__)
+            : MediaConfig(source__), numChannels_(numChannels__)
+        {}
+
+
+        // local file sender
+        AudioConfig(const std::string & source__, const std::string & location__,
+                int numChannels__)
+            : MediaConfig(source__, location__), numChannels_(numChannels__)
+        {}
+
+
+        // receiver
+        AudioConfig(int numChannels__, const std::string &codec__, int port__)
+            : MediaConfig(codec__, port__), numChannels_(numChannels__)
+        {}
+
 
         const char *source() const;
 
