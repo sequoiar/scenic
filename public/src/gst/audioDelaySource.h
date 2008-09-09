@@ -42,6 +42,8 @@ class AudioDelaySource
         gboolean callback(GstClock *clock, GstClockTime time, GstClockID id);
 
     private:
+        AudioDelaySource(const AudioDelaySource&);     //No Copy Constructor
+        AudioDelaySource& operator=(const AudioDelaySource&); //No Assignment Operator
         std::vector<GstElement *> filters_;
 };
 

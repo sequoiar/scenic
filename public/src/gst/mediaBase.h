@@ -36,6 +36,9 @@ class MediaBase
         virtual void init_source() = 0;
         virtual void init_codec() = 0;
         virtual void init_sink() = 0;
+    private:
+        MediaBase(const MediaBase&);     //No Copy Constructor
+        MediaBase& operator=(const MediaBase&);     //No Assignment Operator
 };
 
 #endif // _MEDIA_BASE_H_

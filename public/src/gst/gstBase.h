@@ -43,6 +43,8 @@ class GstBase
         Pipeline & pipeline_;
 
     private:
+        GstBase(const GstBase&);     //No Copy Constructor
+        GstBase& operator=(const GstBase&);     //No Assignment Operator
         static int refCount_;
 };
 
