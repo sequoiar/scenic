@@ -38,8 +38,8 @@ else:
     print step+failure
 
 step = " \nConnection to a UAS runnning on the local host on the port 5060 in AUTO answer mode  ..........................  "
-while( uac.getConnectionState() != 'CONNECTION_STATE_CONNECTED' ):
-    if( uac.getConnectionState() == 'CONNECTION_STATE_TIMEOUT' ):
+while( uac.state() != 'CONNECTION_STATE_CONNECTED' ):
+    if( uac.state() == 'CONNECTION_STATE_TIMEOUT' ):
         print step+failure;
         sys.exit(0)
     pass
@@ -64,7 +64,7 @@ else:
     print step+failure
 
 step = " \nChat test. Envoi du message 'SALUT' .............................................................................. "
-uac.sendInstantMessage("SALUT")
+uac.message("SALUT")
 print step+success
 
 step = " \nDeconnection from the UAS. Send BYE message .....................................................................  "
