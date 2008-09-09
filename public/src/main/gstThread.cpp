@@ -88,7 +88,7 @@ int GstThread::main()
             {
                 audio_start(f);
             } else
-            if(!s.compare("stop"))
+            if(!s.compare("audio_stop"))
             {
                 asender_->stop();
             }
