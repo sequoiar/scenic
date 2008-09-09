@@ -27,6 +27,7 @@
 #include "lo/lo.h"
 #include "mediaBase.h"
 #include "audioConfig.h"
+#include "audioSink.h"
 #include "rtpReceiver.h"
 
 class AudioReceiver
@@ -35,13 +36,12 @@ class AudioReceiver
     public:
         explicit AudioReceiver(const AudioConfig config)
             : config_(config), session_(), gotCaps_(false), 
-            depayloader_(0), decoder_(0), sink_(0)
+            depayloader_(0), decoder_(0), sink_()
         {}
 
         ~AudioReceiver()
         {
             assert(stop());
-            pipeline_.remove(&sink_);
             pipeline_.remove(&decoder_);
             pipeline_.remove(&depayloader_);
         }
@@ -66,7 +66,8 @@ class AudioReceiver
         const AudioConfig config_;
         RtpReceiver session_;
         bool gotCaps_;
-        GstElement *depayloader_, *decoder_, *sink_;
+        GstElement *depayloader_, *decoder_;
+        AudioSink sink_;
 
         AudioReceiver(const AudioReceiver&); //No Copy Constructor
         AudioReceiver& operator=(const AudioReceiver&); //No Assignment Operator

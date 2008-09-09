@@ -19,14 +19,16 @@
 
 #include <cassert>
 #include "audioSink.h"
+#include "jackUtils.h"
 
 
 // parts of sub_init that are common to all VideoSource classes
 bool AudioSink::init()
 {
+    assert(jack_is_running());
     assert(sink_ = gst_element_factory_make("jackaudiosink", NULL));
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     g_object_set(G_OBJECT(sink_), "connect", 1, NULL);
+    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     pipeline_.add(sink_);
 
     return true;

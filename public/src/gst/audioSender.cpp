@@ -32,12 +32,10 @@
 
 #include "audioSender.h"
 #include "audioSource.h"
-#include "jackUtils.h"
 
 AudioSender::~AudioSender()
 {
     assert(stop());
-    pipeline_.remove(&sink_);
     pipeline_.remove(&payloader_);
     pipeline_.remove(&encoder_);
     delete source_;
@@ -76,11 +74,15 @@ void AudioSender::init_sink()
         // assert(sink_ = config_.createSink());
         //sink_->init();
         //GstLinkable::link(*source_, *sink_);   
+        
+    #if 0           // moved to audiosink.cpp
         assert(jack_is_running());
         assert(sink_ = gst_element_factory_make("jackaudiosink", NULL));
         g_object_set(G_OBJECT(sink_), "connect", 1, NULL); // turn on autoconnect
         g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL); // important for latency
         pipeline_.add(sink_);
+#endif
+        sink_.init();
 
         GstLinkable::link(*source_, sink_);
     }
