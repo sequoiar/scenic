@@ -212,6 +212,8 @@ class UserAgent
          */
         bool hasIncomingCall( void );
 
+        static void py_connection_made( void );
+
     private:
         /*
          * The SIP module name

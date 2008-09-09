@@ -22,7 +22,7 @@ using namespace boost::python;
 
 
 
-BOOST_PYTHON_MODULE(hello)
+BOOST_PYTHON_MODULE(embed)
 {
     class_<hello>("hello")
     .def("greet", &hello::greet)
@@ -31,13 +31,13 @@ BOOST_PYTHON_MODULE(hello)
     .def("printTest2", &hello::printTest2);
 }
 
-
+/*
 int main(int argc, char *argv[])
 {
     object imp;
     
     // This line is needed for python to see the module hello
-    PyImport_AppendInittab((char*)"hello",&inithello);
+    PyImport_AppendInittab((char*)"hello",&initembed);
     Py_Initialize();
 
     object main_module = import("__main__");
@@ -63,5 +63,5 @@ int main(int argc, char *argv[])
 
     }
 }
-
+*/
 // c++ -I /usr/include/python2.5 -I /usr/include/boost/python/ embed.cpp  /usr/lib/libboost_python-gcc42-1_34_1.a  /usr/lib/libpython2.5.so.1.0

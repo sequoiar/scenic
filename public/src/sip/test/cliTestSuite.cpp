@@ -56,7 +56,6 @@ int main(int argc, char** argv){
                 default:
                     sip->accept();
                     break;
-
             }
         }
         cout << "<<<< ";
@@ -114,7 +113,7 @@ int main(int argc, char** argv){
             case 'x':
                 cout << "Actual mode: " << sip->getAnswerMode() << endl;
                 cout << "auto (0) or manual (1): ";
-                cin >> msg; 
+                cin >> msg;
                 cout << "Actual mode: " << sip->getAnswerMode() << endl;
                 sip->setAnswerMode( atoi(msg.c_str()) );
                 break;
