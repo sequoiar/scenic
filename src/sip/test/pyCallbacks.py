@@ -13,6 +13,9 @@ def connection_incoming_cb():
 def connection_message_cb( msg ):
     print 'Python: <IM>' , msg
 
+def connection_failed_cb( reason ):
+    print 'Python: Connection failed:', reason
+
 # End of callbacks implementation
 
 
