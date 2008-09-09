@@ -97,9 +97,11 @@ bool MainModule::run()
         }
         if (tmsg["command"].type() == 'n')
             continue;
+
         std::string command;
         if(!tmsg["command"].get(command))
             continue;
+
         if (!command.compare("quit"))
         {
             gst_queue.push(tmsg);
@@ -107,17 +109,8 @@ bool MainModule::run()
             tcp_queue.push(tmsg);
             break;
         }
-        else if (!command.compare("init")) {
-            gst_queue.push(tmsg);
-        }
-        else if (!command.compare("start")) {
-            gst_queue.push(tmsg);
-        }
-        else if (!command.compare("stop")) {
-            gst_queue.push(tmsg);
-        }
         else
-            LOG_DEBUG("Unknown command");
+            gst_queue.push(tmsg);
     }
 
     std::cout << "Done!" << std::endl;
