@@ -16,8 +16,9 @@ class One(pb.Root):
         if not self.remote:
             print "received a called for", obj
             self.remote = obj
-            obj.callRemote('init', self).addCallback(self.set_robjs)
-            return self.objs
+            obj.callRemote('init', self)
+#            obj.callRemote('init', self).addCallback(self.set_robjs)
+#            return self.objs
         
     def set_robjs(self, robjs):
         self.robjs = robjs
@@ -27,25 +28,26 @@ class One(pb.Root):
         
     def callRemote(self, *args):
         if self.remote:
-            self.remote.callRemote(*args)
+            self.remote.callRemote('test', *args)
                 
 class GST(pb.Referenceable):        
     def remote_test(self, arg):
         print "GST:", arg
 
-class PBList(object):
+class PBList(pb.Copyable):
     def __init__(self):
-        self.objs = {}
+        self.objs = []
         
     def add(self, obj):
-        self.objs[obj.__name__] = obj
+        self.objs.append(obj)
 
 def send(root):
-    root.callRemote('test')
+    root.callRemote()
     
 def send2(root):
-    print root.robjs
-    root.robjs.callRemote('test', 22)
+    root.callRemote('gst', 4545)
+#    print root.robjs
+#    root.robjs[0].callRemote('test', 22)
     
 if __name__ == '__main__':
 

@@ -7,34 +7,43 @@ from twisted.internet import reactor
 
 
 class One(pb.Root):
-    def __init__(self, objs):
+    def __init__(self):
         self.remote = None
         self.robjs = None
-        self.objs = GST()
+        self.objs = {}
         
     def remote_init(self, obj):
         if not self.remote:
             print "received a called for", obj
             self.remote = obj
-            obj.callRemote('init', self).addCallback(self.set_robjs)
-            return self.objs
+            obj.callRemote('init', self)
+#            obj.callRemote('init', self).addCallback(self.set_robjs)
+#            return self.objs
         
     def set_robjs(self, robjs):
         self.robjs = robjs
 
             
-    def remote_test(self):
-        print 'Test'
+    def remote_test(self, *args):
+        if len(args) == 0:
+            print 'Test'
+        else:
+            cmd = args[0]
+            self.objs[cmd](*args[1:])
         
     def callRemote(self, *args):
         if self.remote:
-            self.remote.callRemote(*args)
+            self.remote.callRemote('test', *args)
+            
+    def add_meth(self, meth):
+        self.objs[meth.__name__] = meth
+        print self.objs
                 
-class GST(pb.Referenceable):        
-    def remote_test(self, arg):
+class GST(object):        
+    def gst(self, arg):
         print "GST:", arg
 
-class PBList(object):
+class PBList(pb.Copyable):
     def __init__(self):
         self.objs = []
         
@@ -42,17 +51,18 @@ class PBList(object):
         self.objs.append(obj)
 
 def send(root):
-    root.callRemote('test')
+    root.callRemote()
     
     
 if __name__ == '__main__':
     
-    pbl = PBList()
+#    pbl = PBList()
     gst = GST()
-    pbl.add(gst)
+#    pbl.add(gst)
     
     # Do this when connecting (SIP)
-    one = One(pbl)
+    one = One()
+    one.add_meth(gst.gst)
     reactor.listenTCP(8800, pb.PBServerFactory(one))
     
     # simulate a call to a root method
