@@ -1,4 +1,4 @@
-// videoSource.cpp
+// videoSink.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -66,9 +66,9 @@ bool VideoSink::init()
     if (!gtk_initialized)
         gtk_init(0, NULL);
     assert(sink_ = gst_element_factory_make("xvimagesink", "videosink"));
-    pipeline_.add(sink_);
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
+    pipeline_.add(sink_);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
