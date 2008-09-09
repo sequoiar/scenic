@@ -23,16 +23,16 @@
 
 #include "mediaBase.h"
 #include "videoSink.h"
+#include "videoConfig.h"
 #include "rtpSender.h"
 
 class VideoSource;
-class VideoConfig;
 
 class VideoSender
     : public MediaBase
 {
     public:
-        explicit VideoSender(const VideoConfig & config) 
+        explicit VideoSender(const VideoConfig config) 
             : config_(config), session_(), source_(0), colorspc_(0), 
             encoder_(0), payloader_(0), sink_() {}
 
@@ -45,7 +45,7 @@ class VideoSender
         void init_codec();
         void init_sink();
 
-        const VideoConfig &config_;
+        const VideoConfig config_;
         RtpSender session_;
         VideoSource *source_;
         GstElement *colorspc_, *encoder_, *payloader_; 

@@ -62,6 +62,10 @@ class VideoConfig
         VideoConfig(const std::string &source__, const std::string &location__)
             : MediaConfig(source__, location__) {}
 
+        // copy constructor
+        VideoConfig(const VideoConfig& m)
+            : MediaConfig(m) {}
+
         VideoSource* createSource() const;  // factory method
 
         bool has_h264() const { return codec_ == "h264"; }

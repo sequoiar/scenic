@@ -38,7 +38,8 @@ VideoSource * VideoConfig::createSource() const
     else if (source_ == "filesrc")
         return new VideoFileSource(*this);
     else {
-        LOG("Invalid source!", ERROR);
+        LOG(source_, ERROR);
+        LOG("is an invalid source!", ERROR);
         return 0;
     }
 }

@@ -27,6 +27,7 @@
 #include <iostream>
 #include "audioConfig.h"
 #include "audioSource.h"
+#include "logWriter.h"
 
 // strips .delay from source name
 const char *AudioConfig::source() const
@@ -62,7 +63,8 @@ AudioSource* AudioConfig::createSource() const
     else if (source_ == "dv1394src")
         return new AudioDvSource(*this);
     else {
-        std::cerr << "Invalid source!" << std::endl;
+        LOG(source_, ERROR);
+        LOG("is an invalid source", ERROR);
         return 0;
     }
 }

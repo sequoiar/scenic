@@ -47,6 +47,9 @@ void VideoSender::init_source()
 
 void VideoSender::init_codec()
 {
+    // TODO:
+    // assert(codec_ = config_.createCodec());
+    // codec_->init();
     if (config_.has_h264()) {
         assert(colorspc_ = gst_element_factory_make("ffmpegcolorspace", "colorspc"));
         pipeline_.add(colorspc_);
@@ -65,6 +68,9 @@ void VideoSender::init_codec()
 void VideoSender::init_sink()
 {
     if (config_.isNetworked()) {
+        // TODO:
+        // assert(payloader_ = codec_.createPayloader());
+        // payloader_->init();
         assert(payloader_ = gst_element_factory_make("rtph264pay", NULL));
         pipeline_.add(payloader_);
         GstLinkable::link(encoder_, payloader_);

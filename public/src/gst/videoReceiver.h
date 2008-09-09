@@ -30,7 +30,7 @@ class VideoReceiver
     : public MediaBase
 {
     public:
-        explicit VideoReceiver(const VideoConfig & config)
+        explicit VideoReceiver(const VideoConfig config)
             : config_(config), session_(), depayloader_(0), 
             decoder_(0), sink_() {}
 
@@ -45,7 +45,7 @@ class VideoReceiver
         void init_codec();
         void init_sink();
 
-        const VideoConfig &config_;
+        const VideoConfig config_;
         RtpReceiver session_;
         GstElement *depayloader_, *decoder_; 
         VideoSink sink_;
