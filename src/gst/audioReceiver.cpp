@@ -31,7 +31,6 @@
 #include "gstLinkable.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
-#include "jackUtils.h"
 
 
 //#ifdef USE_OSC
@@ -89,11 +88,14 @@ void AudioReceiver::init_codec()
 
 void AudioReceiver::init_sink()
 {
+    sink_.init();
+#if 0
     assert(jack_is_running());
     assert(sink_ = gst_element_factory_make("jackaudiosink", NULL));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     pipeline_.add(sink_);
+#endif
 
     GstLinkable::link(decoder_, sink_);
 }
