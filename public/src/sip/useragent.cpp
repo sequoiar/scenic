@@ -219,8 +219,7 @@ static PyThreadState* mainThreadState;
 
 static void py_connection_made( void );
 static void py_connection_end( void );
-
-//static void py_connection_failed( void );
+static void py_connection_failed( std::string reason );
 static void py_connection_incoming( void );
 static void py_connection_message( std::string msg );
 
@@ -861,6 +860,35 @@ static void py_connection_message( std::string msg ){
 }
 
 
+static void py_connection_failed( std::string reason ){
+    std::ostringstream inst;
+    PyThreadState* myThreadState;
+
+    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
+    try {
+        getLock(&myThreadState);
+        cout << "C++ wrote: connection failed" << endl;
+        PyObject *pyMsg = PyString_FromString(reason.c_str());
+        if(pyMsg){
+            PyObject *rep = PyObject_Repr(pyMsg);
+            if(rep){
+                inst << "sip.connection_failed_cb(" << PyString_AsString(rep) << ")\n" <<
+                endl;
+                Py_DECREF(rep);
+            }
+            Py_DECREF(pyMsg);
+        }
+
+        PyRun_SimpleString(inst.str().c_str());
+        releaseLock(myThreadState);
+    }
+    catch(boost::python::error_already_set const &)
+    {
+        PyErr_Print();
+    }
+}
+
+
 /********************** Callbacks Implementation **********************************/
 
 static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
@@ -875,6 +903,8 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
                 // The host was probably unreachable: bad address, bad port, ...
                 _state = CONNECTION_STATE_TIMEOUT;
                 _error = ERROR_HOST_UNREACHABLE;
+                if( CORE_NOTIFICATION == 1 )
+                    py_connection_failed( errorReason[_error] );
                 break;
             case PJSIP_SC_NOT_ACCEPTABLE_HERE:
                 _state = CONNECTION_STATE_NOT_ACCEPTABLE;
