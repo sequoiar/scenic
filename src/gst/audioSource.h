@@ -53,6 +53,8 @@ class AudioSource
         GstElement *srcElement() { return aconvs_[0]; }
 
     private:
+        AudioSource(const AudioSource&);     //No Copy Constructor
+        AudioSource& operator=(const AudioSource&);     //No Assignment Operator
         friend class AudioSender;
 };
 
@@ -73,6 +75,10 @@ class InterleavedAudioSource
 
         Interleave interleave_;
         GstElement *srcElement() { return interleave_.srcElement(); }
+
+    private:
+        InterleavedAudioSource(const InterleavedAudioSource&);     //No Copy Constructor
+        InterleavedAudioSource& operator=(const InterleavedAudioSource&);     //No Assignment Operator
 };
 
 

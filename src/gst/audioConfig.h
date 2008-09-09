@@ -75,6 +75,7 @@ class AudioConfig
             : MediaConfig(codec__, port__), numChannels_(numChannels__)
         {}
 
+        // copy constructor
         AudioConfig(const AudioConfig& m)
             : MediaConfig(m), numChannels_(m.numChannels_) {}
 
@@ -83,7 +84,8 @@ class AudioConfig
         int numChannels() const { return numChannels_; };
         AudioSource* createSource() const;
 
-    protected:
+    private:
+        AudioConfig& operator=(const AudioConfig&); //No Assignment Operator
         const int numChannels_;
 };
 
