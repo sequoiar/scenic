@@ -10,6 +10,9 @@ def connection_end_cb():
 def connection_incoming_cb():
     print 'Python: Connection incoming'
 
+def connection_message_cb( msg ):
+    print 'Python: <IM>' , msg
+
 # End of callbacks implementation
 
 

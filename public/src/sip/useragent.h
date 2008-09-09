@@ -213,7 +213,9 @@ class UserAgent
          */
         bool hasIncomingCall( void );
 
-        static void initPython();
+        void initPython();
+
+        void python_shutdown();
 
         static void getLock( PyThreadState** myThreadState );
 

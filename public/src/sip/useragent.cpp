@@ -219,8 +219,10 @@ static PyThreadState* mainThreadState;
 
 static void py_connection_made( void );
 static void py_connection_end( void );
+
 //static void py_connection_failed( void );
 static void py_connection_incoming( void );
+static void py_connection_message( std::string msg );
 
 
 /*************************************************************************************************/
@@ -246,7 +248,6 @@ UserAgent::UserAgent( std::string name, int port )
     // To generate a different random number at each time
     // Useful for the random port selection if the default one is used
     srand(time(NULL));
-
 }
 
 
@@ -259,8 +260,8 @@ UserAgent::~UserAgent(){
     pjsip_shutdown();
 }
 
-void UserAgent::initPython(){
 
+void UserAgent::initPython(){
     // Initialize python
     Py_Initialize();
     // Initialize thread support
@@ -270,6 +271,18 @@ void UserAgent::initPython(){
     // Release the lock
     PyEval_ReleaseLock();
 }
+
+
+void UserAgent::python_shutdown(){
+    // Shut down the interpreter
+    PyInterpreterState * mainInterpreterState = mainThreadState->interp;
+    // create a thread state object for this thread
+    PyThreadState * myThreadState = PyThreadState_New(mainInterpreterState);
+    PyThreadState_Swap(myThreadState);
+    PyEval_AcquireLock();
+    Py_Finalize();
+}
+
 
 int UserAgent::pjsip_shutdown(){
     if( _state == CONNECTION_STATE_NULL ) {
@@ -296,6 +309,7 @@ int UserAgent::pjsip_shutdown(){
         pj_caching_pool_destroy(&c_pool);
     }
     pj_shutdown();
+    //python_shutdown();
     _state = CONNECTION_STATE_NULL;
     _error = NO_ERROR;
 
@@ -605,9 +619,7 @@ int UserAgent::inv_session_accept( void ) {
 }
 
 
-
 static void getLock( PyThreadState** myThreadState ){
-
     // Get the global lock
     PyEval_AcquireLock();
 
@@ -618,14 +630,13 @@ static void getLock( PyThreadState** myThreadState ){
 
 
 static void releaseLock(PyThreadState* myThreadState){
-
     // Swap my thread state out of the interpreter
     PyThreadState_Swap(NULL);
     PyThreadState_Clear(myThreadState);
     PyThreadState_Delete(myThreadState);
     PyEval_ReleaseLock();
-
 }
+
 
 static int inv_session_answer(){
     pj_status_t status;
@@ -763,11 +774,10 @@ static void pjsipLogWriter( int level, const char *data, int len ){
 
 
 static void py_connection_made( void ){
-    
     std::ostringstream inst;
     PyThreadState* myThreadState;
 
-    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl; 
+    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
     try {
         getLock(&myThreadState);
         cout << "C++ wrote: connection made" << endl;
@@ -783,11 +793,10 @@ static void py_connection_made( void ){
 
 
 static void py_connection_end( void ){
-
     std::ostringstream inst;
     PyThreadState* myThreadState;
 
-    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl; 
+    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
     try {
         getLock(&myThreadState);
         cout << "C++ wrote: connection end" << endl;
@@ -801,12 +810,12 @@ static void py_connection_end( void ){
     }
 }
 
-static void py_connection_incoming( void ){
 
+static void py_connection_incoming( void ){
     std::ostringstream inst;
     PyThreadState* myThreadState;
 
-    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl; 
+    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
     try {
         getLock(&myThreadState);
         cout << "C++ wrote: connection incoming" << endl;
@@ -819,7 +828,39 @@ static void py_connection_incoming( void ){
         PyErr_Print();
     }
 }
- 
+
+
+static void py_connection_message( std::string msg ){
+    std::ostringstream inst;
+    PyThreadState* myThreadState;
+
+    PJ_UNUSED_ARG(msg);
+
+    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
+    try {
+        getLock(&myThreadState);
+        cout << "C++ wrote: message waiting" << endl;
+        PyRun_SimpleString(inst.str().c_str());
+        PyObject *pyMsg = PyString_FromString(msg.c_str());
+        if(pyMsg){
+            PyObject *rep = PyObject_Repr(pyMsg);
+            if(rep){
+                inst << "sip.connection_message_cb(" << PyString_AsString(rep) << ")\n" <<
+                endl;
+                Py_DECREF(rep);
+            }
+            Py_DECREF(pyMsg);
+        }
+        PyRun_SimpleString(inst.str().c_str());
+        releaseLock(myThreadState);
+    }
+    catch(boost::python::error_already_set const &)
+    {
+        PyErr_Print();
+    }
+}
+
+
 /********************** Callbacks Implementation **********************************/
 
 static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
@@ -842,7 +883,8 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
             default:
                 _state = CONNECTION_STATE_DISCONNECTED;
                 _error = NO_ERROR;
-                if( CORE_NOTIFICATION == 1 )  py_connection_end( );
+                if( CORE_NOTIFICATION == 1 )
+                    py_connection_end( );
                 break;
         }
     }
@@ -852,16 +894,15 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
         _state = CONNECTION_STATE_CONNECTED;
         _error = NO_ERROR;
         // Notify the core
-        //Py_BEGIN_ALLOW_THREADS
         if( CORE_NOTIFICATION == 1 )
             py_connection_made();
-        //Py_END_ALLOW_THREADS
     }
 
     else if( inv->state == PJSIP_INV_STATE_INCOMING ){
         // Incoming invite session
         _state = CONNECTION_STATE_INCOMING;
-        py_connection_incoming();
+        if( CORE_NOTIFICATION == 1 )
+            py_connection_incoming();
     }
 
     else{
@@ -877,7 +918,6 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     pjsip_dialog* dialog;
     pjsip_tx_data *tdata;
     pjmedia_sdp_session *r_sdp;
-
 
 
     PJ_UNUSED_ARG( rdata );
@@ -966,9 +1006,12 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
 
         // Respond with OK message
         status = pjsip_dlg_respond( inv->dlg, rdata, PJSIP_SC_OK, NULL, NULL, NULL );
-
-        // Display the message
         text = (char*)msg->body->data;
+
+        // Notify the core of an incoming message
+        if(CORE_NOTIFICATION == 1)
+            py_connection_message( text );
+        // Display the message
         _imModule->setResponse( text );
         _imModule->displayResponse();
     }
