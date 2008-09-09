@@ -20,13 +20,12 @@
 #include "hostIP.h"
 #include "logWriter.h"
 
-//BaseModule args get deleted in ~BaseModule
 // FIXME: sender and receiver should be in different processes, need to think about how
-// we initiliaze VideoConfig, also should have AudioConfig. Are we ditching args_?
 //
 
 
 #define A_PORT 10010
+#define V_PORT 10110
 
 
 GstThread::~GstThread()
@@ -35,35 +34,6 @@ GstThread::~GstThread()
         delete (asender_);
     if(vsender_)
         delete vsender_;
-}
-
-
-bool GstThread::audio_start(MapMsg& msg)
-{
-    if(asender_){
-        delete (asender_);
-        asender_ = 0;
-    }
-    if(msg["address"].type() == 's')
-    {
-        std::string addr;
-        msg["address"].get(addr);
-        AudioConfig config("audiotestsrc", 2, "vorbisenc", addr, A_PORT);
-        asender_ = new AudioSender(config);
-    }
-    else{
-        AudioConfig config("audiotestsrc", 2, "vorbisenc", get_host_ip(), A_PORT);
-        asender_ = new AudioSender(config);
-    }
-    asender_->init();
-    asender_->start();
-    std::string caps_str;
-    MapMsg caps;
-    caps.insert( std::make_pair("command", "caps"));
-    caps.insert( std::make_pair("caps_str", asender_->getCaps()));
-    queue_.push(caps);
-
-    return true;
 }
 
 
@@ -83,17 +53,27 @@ int GstThread::main()
             {
                 queue_.push(f);
                 done = true;
-            } else
-            if(!s.compare("audio_start"))
+            }
+            else if(!s.compare("audio_start"))
             {
                 audio_start(f);
-            } else
-            if(!s.compare("audio_stop"))
+            }
+            else if(!s.compare("audio_stop"))
             {
-                asender_->stop();
+                if(asender_)
+                    asender_->stop();
+            }
+            else if(!s.compare("video_start"))
+            {
+                video_start(f);
+            }
+            else if(!s.compare("video_stop"))
+            {
+                if(vsender_)
+                    vsender_->stop();
             }
             else{
-                LOG_WARNING("Unknown Command.")
+                LOG_WARNING("Unknown Command.");
             }
         }
     }
@@ -102,59 +82,56 @@ int GstThread::main()
 }
 
 
-#if 0
-int GstThread::main()
+bool GstThread::video_start(MapMsg& msg)
 {
-    bool done = false;
-
-    if(!conf_str_.empty())
-    {
-        conf_ = new VideoConfig(conf_str_);
-        if(conf_)
-            sender_ = new VideoSender(*conf_);
-        if(!sender_)
-        {
-            GstMsg m(GstMsg::QUIT);
-            queue_.push(m);
-            done = true;
-        }
+    if(vsender_){
+        delete (vsender_);
+        vsender_ = 0;
     }
-    while(!done)
+    std::string addr;
+    if(msg["address"].type() == 's')
+        msg["address"].get(addr);
+    else
+        addr = get_host_ip();
+    VideoConfig config("videotestsrc", "h264", addr, V_PORT);
+    vsender_ = new VideoSender(config);
+    if(vsender_)
     {
-        GstMsg f = queue_.timed_pop(10000);
-        switch(f.get_type())
-        {
-            case GstMsg::QUIT:
-            {
-                GstMsg ff(GstMsg::QUIT);
-                queue_.push(ff);
-                done = true;
-                break;
-            }
-            case GstMsg::START:
-            {
-                sender_->start();
-                break;
-            }
-            case GstMsg::INIT:
-            {
-                sender_->init();
-                break;
-            }
-            case GstMsg::STOP:
-            {
-                sender_->stop();
-                break;
-            }
-
-            default:
-                break;
-        }
+        vsender_->init();
+        vsender_->start();
+        return true;
     }
-
-    return 0;
+    else
+        return false;
 }
 
 
-#endif
+bool GstThread::audio_start(MapMsg& msg)
+{
+    if(asender_){
+        delete (asender_);
+        asender_ = 0;
+    }
+    std::string addr;
+    if(msg["address"].type() == 's')
+        msg["address"].get(addr);
+    else
+        addr = get_host_ip();
+    AudioConfig config("audiotestsrc", 2, "vorbisenc", addr, A_PORT);
+    asender_ = new AudioSender(config);
+    if(asender_)
+    {
+    asender_->init();
+    asender_->start();
+    std::string caps_str;
+    MapMsg caps;
+    caps.insert( std::make_pair("command", "caps"));
+    caps.insert( std::make_pair("caps_str", asender_->getCaps()));
+    queue_.push(caps);
+        return true;
+    }
+    else
+        return false;
+}
+
 
