@@ -213,7 +213,7 @@ static InstantMessaging *_imModule;
  */
 static answerMode _answerMode;
 
-static void py_connection_made( void );
+//void py_connection_made( void );
 
 //static void py_connection_end( void );
 //static void py_connection_failed( void );
@@ -244,7 +244,8 @@ UserAgent::UserAgent( std::string name, int port )
     // Useful for the random port selection if the default one is used
     srand(time(NULL));
 
-    Py_Initialize();
+    //Py_Initialize();
+    //PyRun_SimpleString("print 'oBject created'\n");
 }
 
 
@@ -475,6 +476,7 @@ int UserAgent::init_pjsip_modules(  ){
 
     PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
 
+    //PyRun_SimpleString("print 'iNit done'\n");
     return PJ_SUCCESS;
 }
 
@@ -537,6 +539,8 @@ int UserAgent::inv_session_create( std::string uri ){
            else
            return !PJ_SUCCESS;
          */
+
+        //PyRun_SimpleString("print 'Invite created and sent'\n");
         return PJ_SUCCESS;
     }
     else {
@@ -731,26 +735,30 @@ static void pjsipLogWriter( int level, const char *data, int len ){
 }
 
 
-static void py_connection_made( void ){
+void UserAgent::py_connection_made( void ){
     cout << "connection made callback" << endl;
     //if(!Py_IsInitialized()) Py_Initialize();
-    if(Py_IsInitialized())
-        cout << "Interpreter initialisation done " << endl;
+    //if(Py_IsInitialized())
+    //cout << "Interpreter initialisation done " << endl;
     //PyObject* main_module = PyImport_AddModule("__main__");
 
     //boost::python::object main_module = boost::python::import("__main__");
     //boost::python::object main_namespace = main_module.attr("__dict__");
 
     try {
+        //exec("import readline",main_namespace,main_namespace);
+        //exec("print 'scasfsdfsf'", main_namespace,main_namespace);
         //PyRun_SimpleString("import sipmodule as sip\n");
         //PyRun_SimpleString("sip.connection_made_cb()\n");
         cout << "try to write something" << endl;
-        PyRun_SimpleString("print 'connection made'\n");
+        //PyRun_SimpleString("print 'connection made'\n");
+        //PyRun_SimpleString("import sys\n");
     }
     catch(boost::python::error_already_set const &)
     {
         PyErr_Print();
     }
+    //Py_Finalize();
 }
 
 
@@ -817,7 +825,7 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
         _error = NO_ERROR;
         // Notify the core
         if( CORE_NOTIFICATION == 1 )
-            py_connection_made();
+            UserAgent::py_connection_made();
     }
 
     else if( inv->state == PJSIP_INV_STATE_INCOMING ){
@@ -881,11 +889,11 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     // Send a 180/Ringing response
-    status = pjsip_inv_initial_answer( inv_session, rdata, 180, NULL, NULL, &tdata );
+    status = pjsip_inv_initial_answer( inv_session, rdata, PJSIP_SC_RINGING, NULL, NULL,
+                                       &tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
     status = pjsip_inv_send_msg( inv_session, tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
 
     // Auto answer to the invite session or not
     if( _answerMode == ANSWER_MODE_AUTO ){
