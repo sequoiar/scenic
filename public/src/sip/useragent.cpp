@@ -222,7 +222,7 @@ static void py_connection_end( void );
 static void py_connection_failed( std::string reason );
 static void py_connection_incoming( void );
 static void py_connection_message( std::string msg );
-
+static void py_connection_media_choice( std::string codec );
 
 /*************************************************************************************************/
 
@@ -878,7 +878,35 @@ static void py_connection_failed( std::string reason ){
             }
             Py_DECREF(pyMsg);
         }
+        PyRun_SimpleString(inst.str().c_str());
+        releaseLock(myThreadState);
+    }
+    catch(boost::python::error_already_set const &)
+    {
+        PyErr_Print();
+    }
+}
 
+
+static void py_connection_media_choice( std::string codec ){
+    std::ostringstream inst;
+    PyThreadState* myThreadState;
+
+    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
+    try {
+        getLock(&myThreadState);
+        cout << "C++ wrote: media choice done" << endl;
+        PyObject *pyMsg = PyString_FromString(codec.c_str());
+        if(pyMsg){
+            PyObject *rep = PyObject_Repr(pyMsg);
+            if(rep){
+                inst << "sip.connection_media_choice_cb(" << PyString_AsString(rep) <<
+                ")\n" <<
+                endl;
+                Py_DECREF(rep);
+            }
+            Py_DECREF(pyMsg);
+        }
         PyRun_SimpleString(inst.str().c_str());
         releaseLock(myThreadState);
     }
@@ -909,6 +937,8 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
             case PJSIP_SC_NOT_ACCEPTABLE_HERE:
                 _state = CONNECTION_STATE_NOT_ACCEPTABLE;
                 _error = ERROR_NO_COMPATIBLE_MEDIA;
+                if( CORE_NOTIFICATION == 1 )
+                    py_connection_failed( errorReason[_error] );
                 break;
             default:
                 _state = CONNECTION_STATE_DISCONNECTED;
@@ -1060,33 +1090,35 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     PJ_UNUSED_ARG( inv );
     PJ_UNUSED_ARG( status );
 
-    /*
-       int nbMedia;
-       int nbCodecs;
-       int i, j;
-       const pjmedia_sdp_session *r_sdp;
-       pjmedia_sdp_media *media;
+    int nbMedia;
+    int nbCodecs;
+    std::string codec;
+    int i, j;
+    const pjmedia_sdp_session *r_sdp;
+    pjmedia_sdp_media *media;
 
-       if( status != PJ_SUCCESS )
-       return;
-       // Get local and remote SDP
-       pjmedia_sdp_neg_get_active_local( inv->neg, &r_sdp );
+    if( status != PJ_SUCCESS )
+        return;
+    // Get local and remote SDP
+    pjmedia_sdp_neg_get_active_local( inv->neg, &r_sdp );
 
-       // Retrieve the media
-       nbMedia = r_sdp->media_count;
-       for( i=0; i<nbMedia ; i++ ){
-       printf("Media %i: ", i);
-       media = r_sdp->media[i];
-       nbCodecs = media->desc.fmt_count;
-       printf("Codec count: %i\n", nbCodecs);
-       for( j=0 ; j<nbCodecs ; j++ ){
-       printf("Codec payload: %s\n", media->desc.fmt[j].ptr);
-       }
-       }
+    // Retrieve the media
+    nbMedia = r_sdp->media_count;
+    for( i=0; i<nbMedia ; i++ ){
+        printf("Media %i: ", i);
+        media = r_sdp->media[i];
+        nbCodecs = media->desc.fmt_count;
+        printf("Codec count: %i\n", nbCodecs);
+        for( j=0 ; j<nbCodecs ; j++ ){
+            codec = media->desc.fmt[j].ptr;
+            //printf("Codec payload: %s\n", media->desc.fmt[j].ptr);
+            if( CORE_NOTIFICATION == 1 )
+                py_connection_media_choice(codec);
+        }
+    }
 
-       //TODO Call to the core to update the selected codecs
-       // libboost
-     */
+    //TODO Call to the core to update the selected codecs
+    // libboost
 }
 
 
