@@ -23,13 +23,6 @@
 #include "interleave.h"
 #include "audioConfig.h"
 
-Interleave::Interleave(const AudioConfig &config)
-    : interleave_(0), config_(config)
-{
-    // empty
-}
-
-
 Interleave::~Interleave()
 {
     assert(stop());
@@ -63,11 +56,12 @@ void Interleave::set_channel_layout()
 }
 
 
-void Interleave::init()
+bool Interleave::init()
 {
     assert(interleave_ = gst_element_factory_make("interleave", NULL));
     pipeline_.add(interleave_);
     set_channel_layout();
+    return true;
 }
 
 

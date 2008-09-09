@@ -27,10 +27,6 @@
 //#include "logWriter.h"
 
 
-RtpSender::RtpSender()
-    : rtp_sender_(0)
-{}
-
 RtpSender::~RtpSender()
 {
     assert(stop());

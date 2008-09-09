@@ -18,9 +18,8 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <iostream>
-#include <string>
-#include <stdlib.h>
+#include <sstream>
+#include <cstdlib>
 #include <cassert>
 #include <gst/gst.h>
 
@@ -30,25 +29,9 @@
 //#endif
 
 #include "gstLinkable.h"
-#include "mediaBase.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
 #include "jackUtils.h"
-
-AudioReceiver::AudioReceiver(const AudioConfig & config)
-    : config_(config), session_(), gotCaps_(false), depayloader_(0), decoder_(0), sink_(0)
-{
-    // empty
-}
-
-
-AudioReceiver::~AudioReceiver()
-{
-    assert(stop());
-    pipeline_.remove(&sink_);
-    pipeline_.remove(&decoder_);
-    pipeline_.remove(&depayloader_);
-}
 
 
 //#ifdef USE_OSC
@@ -122,7 +105,10 @@ bool AudioReceiver::start()
 //#ifdef USE_OSC
     wait_for_caps();
 //#endif
-    std::cout << "Receiving audio on port " << config_.port() << std::endl;
+    std::stringstream logstr;       // FIXME: need a better printf style 
+                                    //logwriter, shouldn't need stringstream
+    logstr << "Receiving audio on port " << config_.port();
+    LOG(logstr.str(), DEBUG); 
     MediaBase::start();
     return true;
 }

@@ -26,15 +26,13 @@
 #include "audioConfig.h"
 #include "jackUtils.h"
 
-AudioSource::AudioSource(const AudioConfig &config)
-    : config_(config), sources_(0), aconvs_(0)
-{}
 
-void AudioSource::init()
+bool AudioSource::init()
 {
     init_source();
     sub_init();
     link_elements();
+    return true;
 }
 
 
@@ -70,17 +68,13 @@ gboolean AudioSource::base_callback(GstClock *, GstClockTime, GstClockID, gpoint
 }
 
 
-InterleavedAudioSource::InterleavedAudioSource(const AudioConfig &config)
-    : AudioSource(config), interleave_(config_)
-{}
-
-
-void InterleavedAudioSource::init()
+bool InterleavedAudioSource::init()
 {
     interleave_.init();
     init_source();
     sub_init();
     link_elements();
+    return true;
 }
 
 
@@ -232,11 +226,6 @@ void AudioJackSource::sub_init()
     for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
 }
-
-
-AudioDvSource::AudioDvSource(const AudioConfig &config)
-    : AudioSource(config), demux_(0), queue_(0), dvIsNew_(true)
-{}
 
 
 AudioDvSource::~AudioDvSource()

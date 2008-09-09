@@ -22,56 +22,9 @@
  *
  */
 
-#include <string>
-#include <iostream>
 #include "logWriter.h"
 #include "videoConfig.h"
 #include "videoSource.h"
-
-
-// for sender (remote)
-VideoConfig::VideoConfig(const std::string &source__, const std::string &codec__,
-    const std::string &remoteHost__, int port__)
-    : MediaConfig(source__, codec__, remoteHost__, port__)
-{
-    // empty
-}
-
-
-// for sender (remote)
-VideoConfig::VideoConfig(const std::string &source__,
-    const std::string &location__,
-    const std::string &codec__,
-    const std::string &remoteHost__,
-    int port__)
-    : MediaConfig(source__, location__, codec__, remoteHost__, port__)
-{
-    // empty
-}
-
-
-// for sender (local)
-VideoConfig::VideoConfig(const std::string &source__)
-    : MediaConfig(source__)
-{
-    // empty
-}
-
-
-// for sender (local)
-VideoConfig::VideoConfig(const std::string &source__, const std::string &location__)
-    : MediaConfig(source__, location__)
-{
-    // empty
-}
-
-
-// for receiver
-VideoConfig::VideoConfig(const std::string &codec__, int port__)
-    : MediaConfig(codec__, port__)
-{
-    // empty
-}
 
 
 VideoSource * VideoConfig::createSource() const

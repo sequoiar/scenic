@@ -31,14 +31,14 @@ class RtpSession
     : public GstBase
 {
     public:
-        virtual ~RtpSession();
-        virtual bool init();
+        ~RtpSession();
+        bool init();
         virtual void add(GstElement * elem, const MediaConfig & config);
         virtual void addDerived(GstElement * elem, const MediaConfig & config) = 0;
         virtual void set_caps(const char *capsStr) = 0;
 
     protected:
-        RtpSession();
+        RtpSession() : rtcp_sender_(0), rtcp_receiver_(0) { ++refCount_; }
         static const char *padStr(const char *padName);
 
         static GstElement *rtpbin_;

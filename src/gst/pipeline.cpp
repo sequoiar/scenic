@@ -24,18 +24,10 @@
 #include <gst/gst.h>
 
 #include <cassert>
-#include <unistd.h>
-#include <cstdio>
 #include "pipeline.h"
 #include "logWriter.h"
 
 Pipeline *Pipeline::instance_ = 0;
-
-Pipeline::Pipeline()
-    : pipeline_(0), startTime_(0), verbose_(false)
-{
-    // empty
-}
 
 
 Pipeline & Pipeline::Instance()
@@ -144,7 +136,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
 }
 
 
-void Pipeline::init()
+bool Pipeline::init()
 {
     if (!pipeline_)
     {
@@ -164,6 +156,7 @@ void Pipeline::init()
         gst_bus_add_watch(bus, GstBusFunc(bus_call), static_cast<gpointer>(NULL));
         gst_object_unref(bus);
     }
+    return true;
 }
 
 
@@ -295,8 +288,8 @@ void Pipeline::add(std::vector<GstElement*> &elementVec)
 }
 
 
-void Pipeline::remove(GstElement **element)
-{
+void Pipeline::remove(GstElement **element) // guarantees that original pointer will be zeroed
+{                                           // and not reusable
     if (*element)
     {
         assert(gst_bin_remove(GST_BIN(pipeline_), *element));

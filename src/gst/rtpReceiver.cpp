@@ -29,14 +29,7 @@
 #include "rtpReceiver.h"
 #include "mediaConfig.h"
 
-std::list<GstElement *> RtpReceiver::depayloaders_;
-
-
-RtpReceiver::RtpReceiver()
-    : rtp_receiver_(0), depayloader_(0)
-{
-    // empty
-}
+std::list<GstElement *> RtpReceiver::usedDepayloaders_;
 
 
 RtpReceiver::~RtpReceiver()
@@ -46,11 +39,11 @@ RtpReceiver::~RtpReceiver()
 
     // find this->depayloader in the static list of depayloaders
     std::list<GstElement *>::iterator iter;
-    iter = std::find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
+    iter = std::find(usedDepayloaders_.begin(), usedDepayloaders_.end(), depayloader_);
 
     // make sure we found it and remove it
-    assert(iter != depayloaders_.end());
-    depayloaders_.erase(iter);
+    assert(iter != usedDepayloaders_.end());
+    usedDepayloaders_.erase(iter);
 }
 
 
@@ -102,17 +95,17 @@ GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
 {
     GstPad *sinkPad;
 
-    sinkPad = gst_element_get_static_pad(depayloaders_.front(), "sink");
+    sinkPad = gst_element_get_static_pad(usedDepayloaders_.front(), "sink");
 
     // look for caps whose first 37 characters match (this includes the parameter that describes media type)
     // FIXME: could just check the depayloader types/names
 
     const int CAPS_LEN = 37;
-    std::list<GstElement *>::iterator iter = depayloaders_.begin();
+    std::list<GstElement *>::iterator iter = usedDepayloaders_.begin();
     std::string srcCaps(gst_caps_to_string(gst_pad_get_caps(srcPad)));
 
     while (strncmp(gst_caps_to_string(gst_pad_get_caps(sinkPad)), srcCaps.c_str(), CAPS_LEN)
-           && iter != depayloaders_.end())
+           && iter != usedDepayloaders_.end())
     {
         gst_object_unref(sinkPad);
         sinkPad = gst_element_get_static_pad(*iter, "sink");
@@ -161,7 +154,7 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig & confi
     assert(GstLinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink));
     assert(GstLinkable::link_pads(send_rtcp_src, rtcpSenderSink));
 
-    depayloaders_.push_back(depayloader);
+    usedDepayloaders_.push_back(depayloader);
     // when pad is created, it must be linked to new sink
     g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), NULL);
 

@@ -27,17 +27,14 @@
 #include "logWriter.h"
 
 
-VideoSource::VideoSource(const VideoConfig &config)
-    : config_(config), source_(0)
-{}
-
 // parts of sub_init that are common to all VideoSource classes
-void VideoSource::init()
+bool VideoSource::init()
 {
     assert(source_ = gst_element_factory_make(config_.source(), NULL));
     pipeline_.add(source_);
 
     sub_init();
+    return true;
 }
 
 
@@ -168,11 +165,6 @@ VideoFileSource::~VideoFileSource()
 }
 
 
-VideoDvSource::VideoDvSource(const VideoConfig &config)
-    : VideoSource(config), demux_(0), queue_(0), dvdec_(0), dvIsNew_(true)
-{}
-
-
 VideoDvSource::~VideoDvSource()
 {
     assert(stop());
@@ -182,7 +174,7 @@ VideoDvSource::~VideoDvSource()
 }
 
 
-void VideoDvSource::init()
+bool VideoDvSource::init()
 {
     source_ = pipeline_.findElement(config_.source());
     dvIsNew_ = source_ == NULL;
@@ -192,6 +184,7 @@ void VideoDvSource::init()
         pipeline_.add(source_);
     }
     sub_init();
+    return true;
 }
 
 

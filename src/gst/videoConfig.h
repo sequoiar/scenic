@@ -35,21 +35,32 @@ class VideoConfig
     : public MediaConfig
 {
     public:
+        // for sender (remote)
+        VideoConfig(const std::string &source__, 
+                const std::string &codec__,
+                const std::string &remoteHost__, 
+                int port__)
+            : MediaConfig(source__, codec__, remoteHost__, port__) {}
 
-        VideoConfig(const std::string & source,
-        const std::string & codec,
-        const std::string & remoteHost,
-        int port);             // used by sender
+        // for sender (remote) w/ location
+        VideoConfig(const std::string &source__,
+                const std::string &location__,
+                const std::string &codec__,
+                const std::string &remoteHost__,
+                int port__)
+            : MediaConfig(source__, location__, codec__, remoteHost__, port__) {}
 
-        VideoConfig(const std::string & source,
-        const std::string & location,
-        const std::string & codec,
-        const std::string & remoteHost,
-        int port);             // used by sender
+        // for receiver
+        VideoConfig(const std::string &codec__, int port__)
+            : MediaConfig(codec__, port__) {}
 
-        VideoConfig(const std::string & codec, int port); // used by receiver
-        explicit VideoConfig(const std::string & source); // used by local sender
-        explicit VideoConfig(const std::string & source, const std::string & location); // used by local sender
+        // used by local sender
+        explicit VideoConfig(const std::string &source__)
+            : MediaConfig(source__) {}
+
+        // used by local sender w/ file
+        VideoConfig(const std::string &source__, const std::string &location__)
+            : MediaConfig(source__, location__) {}
 
         VideoSource* createSource() const;  // factory method
 

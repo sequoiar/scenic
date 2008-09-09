@@ -31,7 +31,7 @@ class RtpReceiver
     : public RtpSession
 {
     public:
-        RtpReceiver();
+        RtpReceiver() : rtp_receiver_(0), depayloader_(0) {}
         ~RtpReceiver();
         void set_caps(const char* capsStr);
 
@@ -44,7 +44,7 @@ class RtpReceiver
 
         GstElement *rtp_receiver_;
         GstElement *depayloader_;
-        static std::list<GstElement *> depayloaders_;
+        static std::list<GstElement *> usedDepayloaders_;
 
         RtpReceiver(const RtpReceiver&); //No Copy Constructor
         RtpReceiver& operator=(const RtpReceiver&); //No Assignment Operator

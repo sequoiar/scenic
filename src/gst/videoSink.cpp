@@ -60,7 +60,7 @@ gboolean VideoSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gp
 
 
 // parts of sub_init that are common to all VideoSource classes
-void VideoSink::init()
+bool VideoSink::init()
 {
     static bool gtk_initialized = false;
     if (!gtk_initialized)
@@ -76,6 +76,7 @@ void VideoSink::init()
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event",
                      G_CALLBACK(VideoSink::key_press_event_cb), NULL);
+    return true;
 }
 
 
