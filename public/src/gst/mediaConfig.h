@@ -77,9 +77,9 @@ class MediaConfig
         bool fileExists() const;
 
         virtual ~MediaConfig() {};
+        virtual bool sanityCheck() const = 0;
 
     protected:
-        virtual bool sanityCheck() const = 0;
 
         const std::string source_;
         const std::string location_;
