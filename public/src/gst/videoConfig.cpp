@@ -22,6 +22,7 @@
  *
  */
 
+#include <cassert>
 #include "logWriter.h"
 #include "videoConfig.h"
 #include "videoSource.h"
@@ -44,4 +45,13 @@ VideoSource * VideoConfig::createSource() const
     }
 }
 
+bool VideoConfig::sanityCheck() const
+{
+    bool result = true;
+    if (!codec_.empty())
+        result = (codec_ == "h264");
+
+    assert(result);
+    return result;
+}
 

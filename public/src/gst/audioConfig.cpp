@@ -70,3 +70,12 @@ AudioSource* AudioConfig::createSource() const
 }
 
 
+bool AudioConfig::sanityCheck() const
+{
+    bool result = true;
+    if (!codec_.empty())
+        result = (codec_ == "vorbisenc") || (codec_ == "vorbisdec");
+
+    assert(result);
+    return result;
+}

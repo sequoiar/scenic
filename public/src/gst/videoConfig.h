@@ -40,7 +40,7 @@ class VideoConfig
                 const std::string &codec__,
                 const std::string &remoteHost__, 
                 int port__)
-            : MediaConfig(source__, codec__, remoteHost__, port__) {}
+            : MediaConfig(source__, codec__, remoteHost__, port__) { sanityCheck(); }
 
         // for sender (remote) w/ location i.e. filename or url
         VideoConfig(const std::string &source__,
@@ -48,29 +48,30 @@ class VideoConfig
                 const std::string &codec__,
                 const std::string &remoteHost__,
                 int port__)
-            : MediaConfig(source__, location__, codec__, remoteHost__, port__) {}
+            : MediaConfig(source__, location__, codec__, remoteHost__, port__) { sanityCheck(); }
 
         // for receiver
         VideoConfig(const std::string &codec__, int port__)
-            : MediaConfig(codec__, port__) {}
+            : MediaConfig(codec__, port__) { sanityCheck(); }
 
         // used by local sender
         explicit VideoConfig(const std::string &source__)
-            : MediaConfig(source__) {}
+            : MediaConfig(source__) { sanityCheck(); }
 
         // used by local sender w/ file
         VideoConfig(const std::string &source__, const std::string &location__)
-            : MediaConfig(source__, location__) {}
+            : MediaConfig(source__, location__) { sanityCheck(); }
 
         // copy constructor
         VideoConfig(const VideoConfig& m)
-            : MediaConfig(m) {}
+            : MediaConfig(m) { sanityCheck(); }
 
         VideoSource* createSource() const;  // factory method
 
         bool has_h264() const { return codec_ == "h264"; }
 
     private:
+        bool sanityCheck() const;
         VideoConfig& operator=(const VideoConfig&);     //No Assignment Operator
 };
 

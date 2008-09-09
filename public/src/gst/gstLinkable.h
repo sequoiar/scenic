@@ -44,7 +44,7 @@ class GstLinkableSource
 : virtual public GstBase
 {
     public:
-        GstLinkableSource() {}
+        GstLinkableSource() {} 
         virtual GstElement *srcElement() = 0;
     private:
         GstLinkableSource(const GstLinkableSource&);     //No Copy Constructor
@@ -68,8 +68,7 @@ class GstLinkableFilter
 : public GstLinkableSource, public GstLinkableSink
 {
     public:
-        GstLinkableFilter() {}
-
+        GstLinkableFilter() {} 
     private:
         GstLinkableFilter(const GstLinkableFilter&);     //No Copy Constructor
         GstLinkableFilter& operator=(const GstLinkableFilter&);     //No Assignment Operator

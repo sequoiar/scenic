@@ -79,6 +79,8 @@ class MediaConfig
         virtual ~MediaConfig() {};
 
     protected:
+        virtual bool sanityCheck() const = 0;
+
         const std::string source_;
         const std::string location_;
         const std::string codec_;
