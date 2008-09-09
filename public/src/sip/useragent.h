@@ -35,6 +35,7 @@
 #include <pjsip_ua.h>
 #include <pjlib-util.h>
 #include <string>
+#include <boost/python.hpp>
 
 #include "sdp.h"
 #include "uri.h"
@@ -212,7 +213,11 @@ class UserAgent
          */
         bool hasIncomingCall( void );
 
-        static void py_connection_made( void );
+        static void initPython();
+
+        static void getLock( PyThreadState** myThreadState );
+
+        static void releaseLock(PyThreadState* myThreadState);
 
     private:
         /*
@@ -231,8 +236,6 @@ class UserAgent
         void init_sip_module( void );
 
         void connection_prepare( void );
-
-        void init_python_module( void );
 
         UserAgent(const UserAgent&); //No Copy Constructor
         UserAgent& operator=(const UserAgent&); //No Assignment Operator
