@@ -28,24 +28,48 @@
 
 #define A_PORT 10010
 
-GstThread::GstThread()
-    : vconf_(0), vsender_(0), conf_str_("dv1394src"), aconf_(0), asender_(0)
-{}
-
 
 GstThread::~GstThread()
 {
-    delete vsender_;
-    delete vconf_;
+    if(asender_)
+        delete (asender_);
+    if(vsender_)
+        delete vsender_;
+}
+
+
+bool GstThread::audio_start(MapMsg& msg)
+{
+    if(asender_){
+        delete (asender_);
+        asender_ = 0;
+    }
+    if(msg["address"].type() == 's')
+    {
+        std::string addr;
+        msg["address"].get(addr);
+        AudioConfig config("audiotestsrc", 2, "vorbisenc", addr, A_PORT);
+        asender_ = new AudioSender(config);
+    }
+    else{
+        AudioConfig config("audiotestsrc", 2, "vorbisenc", get_host_ip(), A_PORT);
+        asender_ = new AudioSender(config);
+    }
+    asender_->init();
+    asender_->start();
+    std::string caps_str;
+    MapMsg caps;
+    caps.insert( std::make_pair("command", "caps"));
+    caps.insert( std::make_pair("caps_str", asender_->getCaps()));
+    queue_.push(caps);
+
+    return true;
 }
 
 
 int GstThread::main()
 {
     bool done = false;
-    AudioConfig config("audiotestsrc", 2, "vorbisenc", get_host_ip(), A_PORT);
-
-    asender_ = new AudioSender(config);
 
     while(!done)
     {
@@ -60,18 +84,9 @@ int GstThread::main()
                 queue_.push(f);
                 done = true;
             } else
-            if(!s.compare("start"))
+            if(!s.compare("audio_start"))
             {
-                asender_->start();
-                std::string caps_str;
-                MapMsg caps;
-                caps.insert( std::make_pair("command", "caps"));
-                caps.insert( std::make_pair("caps_str", asender_->getCaps()));
-                queue_.push(caps);
-            } else
-            if(!s.compare("init"))
-            {
-                asender_->init();
+                audio_start(f);
             } else
             if(!s.compare("stop"))
             {

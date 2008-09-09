@@ -34,16 +34,15 @@ class GstThread
     : public BaseThread<MapMsg>
 {
     public:
-        GstThread();
+        GstThread()
+            : vsender_(0), asender_(0){}
         ~GstThread();
     private:
-        VideoConfig* vconf_;
         VideoSender* vsender_;
-        std::string conf_str_;
-        AudioConfig* aconf_;
         AudioSender* asender_;
 
         int main();
+        bool audio_start(MapMsg& msg);
 
         GstThread(const GstThread&); //No Copy Constructor
         GstThread& operator=(const GstThread&); //No Assignment Operator
