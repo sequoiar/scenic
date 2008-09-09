@@ -22,9 +22,9 @@
  *
  */
 
-#include <cassert>
 #include "logWriter.h"
 #include "videoConfig.h"
+#include "logWriter.h"
 #include "videoSource.h"
 
 
@@ -50,8 +50,9 @@ bool VideoConfig::sanityCheck() const
     bool validCodec = true;
     if (!codec_.empty())
         validCodec = (codec_ == "h264");
+    if (!validCodec)
+        LOG("Bad codec", ERROR);
 
-    assert(validCodec);
     return validCodec;
 }
 
