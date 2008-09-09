@@ -31,7 +31,7 @@
 GstThread::~GstThread()
 {
     if(asender_)
-        delete (asender_);
+        delete asender_;
     if(vsender_)
         delete vsender_;
 }
@@ -94,6 +94,8 @@ bool GstThread::video_start(MapMsg& msg)
     else
         addr = get_host_ip();
     VideoConfig config("videotestsrc", "h264", addr, V_PORT);
+    if(!config.sanityCheck())
+        return false;
     vsender_ = new VideoSender(config);
     if(vsender_)
     {
@@ -117,7 +119,10 @@ bool GstThread::audio_start(MapMsg& msg)
         msg["address"].get(addr);
     else
         addr = get_host_ip();
+
     AudioConfig config("audiotestsrc", 2, "vorbisenc", addr, A_PORT);
+    if(!config.sanityCheck())
+        return false;
     asender_ = new AudioSender(config);
     if(asender_)
     {
