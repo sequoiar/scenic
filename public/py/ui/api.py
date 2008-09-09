@@ -84,6 +84,15 @@ class ControllerApi():
         
     def list_stream(self, caller, kind):
         self.notify(caller, self.streams.list(kind), kind + '_list')
+        
+    
+    ### Connect ###
+    
+    def start_connection(self, caller):
+        self.notify(caller, 2)
+        
+    def stop_connection(self, caller):
+        self.notify(caller, 2)
 
 
 

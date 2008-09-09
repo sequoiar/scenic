@@ -86,6 +86,7 @@ class CliController(TelnetServer):
     def __init__(self):
         TelnetServer.__init__(self)
         self.core = None
+        self.block = False
         # build a dict of all semi-private methods
         self.callbacks = find_callbacks(self)
         self.shortcuts = {'c': 'contacts',
@@ -95,17 +96,21 @@ class CliController(TelnetServer):
                           }
         
     def parse(self, data):
-        self.core = self.factory.subject.api
+        if not self.core:
+            self.core = self.factory.subject.api
         data = to_utf(data)
         data = data.split()
         cmd = data[0]
-        if len(cmd) == 1 and self.shortcuts.has_key(cmd):
-            cmd = self.shortcuts[cmd]
-        if cmd in self.callbacks:
-            self.callbacks[cmd](data)
+        if self.block:
+            self.block = False
         else:
-            self.write("command not found")
-            self.write_prompt()
+            if len(cmd) == 1 and self.shortcuts.has_key(cmd):
+                cmd = self.shortcuts[cmd]
+            if cmd in self.callbacks:
+                self.callbacks[cmd](data)
+            else:
+                self.write("command not found")
+                self.write_prompt()
             
     def connectionLost(self, reason=protocol.connectionDone):
         del self.view.callbacks # delete this first to remove the reference to self
@@ -273,6 +278,19 @@ class CliController(TelnetServer):
         else:
             cp.print_help()
         
+    def _join(self, data):
+        cp = CliParser(self, prog=data[0], description="Start and stop a connection.")
+        cp.add_option("-s", "--start", type="string", help="Start a connection with the default contact")
+        cp.add_option("-i", "--stop", "--interrupt", action='store_true', help="Stop the connection")
+
+        (options, args) = cp.parse_args(data)
+                
+        if options.start:
+            self.core.start_connection(self)
+        elif options.stop:
+            self.core.stop_connection(self)
+        else:
+            cp.print_help()
         
 
 
@@ -433,9 +451,10 @@ class CliView(Observer):
         if key in self.callbacks:
             self.callbacks[key](origin, data)
         
-    def write(self, msg):
+    def write(self, msg, prompt=True):
         self.controller.write(msg)
-        self.controller.write_prompt()
+        if prompt:
+            self.controller.write_prompt()
 
     def _get_contacts(self, origin, data):
         if origin is self.controller:
@@ -683,7 +702,10 @@ class CliView(Observer):
         
     def _stop_streams(self, origin, data):
         self.write(data)
-        
+    
+    def _ask(self, origin, data):
+        self.write('%s is inviting you. Do you accept?\n[Y/n]: ' % data, False)
+        self.controller.block = True    
             
 
 def bold(msg):

@@ -29,6 +29,7 @@ import streams
 from utils import log, Subject
 import addressbook
 import settings
+from connections import basic
 
 
 class Core(Subject):
@@ -45,6 +46,7 @@ class Core(Subject):
         self.settings = settings.Settings()
         self.curr_setting = self.settings.select()
         self.api = ui.ControllerApi(self)
+        basic.start(2222, self)
         
         
         
