@@ -42,7 +42,7 @@ class VideoConfig
                 int port__)
             : MediaConfig(source__, codec__, remoteHost__, port__) {}
 
-        // for sender (remote) w/ location
+        // for sender (remote) w/ location i.e. filename or url
         VideoConfig(const std::string &source__,
                 const std::string &location__,
                 const std::string &codec__,
