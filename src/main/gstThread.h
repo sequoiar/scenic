@@ -43,6 +43,7 @@ class GstThread
 
         int main();
         bool audio_start(MapMsg& msg);
+        bool video_start(MapMsg& msg);
 
         GstThread(const GstThread&); //No Copy Constructor
         GstThread& operator=(const GstThread&); //No Assignment Operator
