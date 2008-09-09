@@ -75,6 +75,8 @@ class AudioConfig
             : MediaConfig(codec__, port__), numChannels_(numChannels__)
         {}
 
+        AudioConfig(const AudioConfig& m)
+            : MediaConfig(m), numChannels_(m.numChannels_) {}
 
         const char *source() const;
 

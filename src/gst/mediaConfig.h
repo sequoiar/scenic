@@ -61,6 +61,11 @@ class MediaConfig
         explicit MediaConfig(const std::string &source__, const std::string &location__) 
             : source_(source__), location_(location__), codec_(""), remoteHost_(""), port_(0) {}
 
+        // copy constructor
+        MediaConfig(const MediaConfig &m) : 
+            source_(m.source_), location_(m.location_), codec_(m.codec_),
+            remoteHost_(m.remoteHost_), port_(m.port_) {}
+
         const char *source() const { return source_.c_str(); }
         const char *location() const;
 

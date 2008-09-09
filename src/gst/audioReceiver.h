@@ -33,7 +33,7 @@ class AudioReceiver
     : public MediaBase
 {
     public:
-        explicit AudioReceiver(const AudioConfig & config)
+        explicit AudioReceiver(const AudioConfig config)
             : config_(config), session_(), gotCaps_(false), 
             depayloader_(0), decoder_(0), sink_(0)
         {}
@@ -63,7 +63,7 @@ class AudioReceiver
 
         void wait_for_caps();
 
-        const AudioConfig &config_;
+        const AudioConfig config_;
         RtpReceiver session_;
         bool gotCaps_;
         GstElement *depayloader_, *decoder_, *sink_;

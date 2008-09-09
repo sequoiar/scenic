@@ -72,6 +72,10 @@ void AudioSender::init_sink()
         session_.add(payloader_, config_);
     }
     else {                       // local version
+        // TODO
+        // assert(sink_ = config_.createSink());
+        //sink_->init();
+        //GstLinkable::link(*source_, *sink_);   
         assert(jack_is_running());
         assert(sink_ = gst_element_factory_make("jackaudiosink", NULL));
         g_object_set(G_OBJECT(sink_), "connect", 1, NULL); // turn on autoconnect
