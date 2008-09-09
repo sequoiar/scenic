@@ -85,6 +85,7 @@ class AudioConfig
         AudioSource* createSource() const;
 
     private:
+        bool sanityCheck() const;
         AudioConfig& operator=(const AudioConfig&); //No Assignment Operator
         const int numChannels_;
 };

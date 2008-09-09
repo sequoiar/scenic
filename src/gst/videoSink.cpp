@@ -48,6 +48,7 @@ gboolean VideoSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gp
     }
     else
         LOG("you hit f", DEBUG);
+
     gboolean isFullscreen =
         (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
 
@@ -55,11 +56,11 @@ gboolean VideoSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gp
         gtk_window_unfullscreen(GTK_WINDOW(widget));
     else
         gtk_window_fullscreen(GTK_WINDOW(widget));
+
     return TRUE;
 }
 
 
-// parts of sub_init that are common to all VideoSource classes
 bool VideoSink::init()
 {
     static bool gtk_initialized = false;
