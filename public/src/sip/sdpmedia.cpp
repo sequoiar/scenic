@@ -62,7 +62,6 @@ sdpMedia::sdpMedia( std::string type, int port, std::string dir)
         dir = DEFAULT_STREAM_DIRECTION;
     for( i=0; i<DIR_COUNT; i++ ){
         tmp = streamDirectionStr[i];
-        std::cout << "debug: " << tmp << std::endl;
         if( strcmp(dir.c_str(), tmp) == 0){
             _streamType = (streamDirection)i;
             break;
@@ -152,15 +151,14 @@ std::string sdpMedia::toString( void ){
 
     size = _codecList.size();
 
-    display << "TYPE = " << getMediaTypeStr() << std::endl;
-    display << "PORT = " << getPort() << std::endl;
-    display << "CODECS = ";
+    display << getMediaTypeStr();
+    display << ":" << getPort();
+    display << ":";
     for(i=0; i<size; i++){
-        display << _codecList[i]->_name << " ";
+        display << _codecList[i]->_name << "/";
     }
 
-    display << std::endl;
-    display << "DIRECTION = " << getStreamDirectionStr() << std::endl;
+    display << ":" << getStreamDirectionStr() << std::endl;
 
     return display.str();
 }

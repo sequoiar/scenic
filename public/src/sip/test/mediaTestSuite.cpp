@@ -6,7 +6,7 @@
 using std::cout;
 using std::endl;
 
-void codecHandlingTest(){
+void codecHandlingAtMediaLevelTest(){
     std::string res;
 
     cout << " Add GSM and PCMU in a new audio media " << endl;

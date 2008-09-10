@@ -23,7 +23,7 @@
 #define THIS_FILE       "useragent"
 #define _LOCAL_IP_ADDRESS   "127.0.0.1"
 #define DEFAULT_SIP_PORT   5060
-#define PJ_LOG_LEVEL        5
+#define PJ_LOG_LEVEL        0
 
 /* @file	useragent.h
  * @brief	A SIP useragent. Implements the SIP stacks from the transaction layer to the transport layer as described in

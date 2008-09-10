@@ -1105,20 +1105,19 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     // Retrieve the media
     nbMedia = r_sdp->media_count;
     for( i=0; i<nbMedia ; i++ ){
-        printf("Media %i: ", i);
+        // Retrieve the media 
         media = r_sdp->media[i];
-        nbCodecs = media->desc.fmt_count;
+        // Retrieve the payload
+        nbCodecs = media->desc.fmt_count;  // Must be one
         printf("Codec count: %i\n", nbCodecs);
         for( j=0 ; j<nbCodecs ; j++ ){
             codec = media->desc.fmt[j].ptr;
-            //printf("Codec payload: %s\n", media->desc.fmt[j].ptr);
             if( CORE_NOTIFICATION == 1 )
                 py_connection_media_choice(codec);
         }
-    }
+        // TODO Retrieve the rtpmap attribute to get the encoding name
 
-    //TODO Call to the core to update the selected codecs
-    // libboost
+    }
 }
 
 
