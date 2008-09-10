@@ -24,7 +24,7 @@
 #include <cpptest.h>
 #include "gstTestSuite.h"
 
-#define LOCAL 0
+#define LOCAL 1
 #define RTP 0
 
 class VideoTestSuite
@@ -50,6 +50,12 @@ class VideoTestSuite
             TEST_ADD(VideoTestSuite::start_stop_file)
 #endif  // LOCAL
 #if RTP
+            TEST_ADD(VideoTestSuite::start_test_video_rtp)
+            TEST_ADD(VideoTestSuite::stop_test_video_rtp)
+            TEST_ADD(VideoTestSuite::start_stop_test_video_rtp)
+            TEST_ADD(VideoTestSuite::start_file_rtp)
+            TEST_ADD(VideoTestSuite::stop_file_rtp)
+            TEST_ADD(VideoTestSuite::start_stop_file_rtp)
             TEST_ADD(VideoTestSuite::start_v4l_rtp)
             TEST_ADD(VideoTestSuite::stop_v4l_rtp)
             TEST_ADD(VideoTestSuite::start_stop_v4l_rtp)
@@ -57,16 +63,12 @@ class VideoTestSuite
             TEST_ADD(VideoTestSuite::stop_dv_rtp)
             TEST_ADD(VideoTestSuite::start_stop_dv_rtp)
 #endif  // RTP
-
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
             /*                                              */
             /*  Put newer tests here and set all defs to 0  */
             /*  to test them by themselves.                 */
             /*----------------------------------------------*/
-            TEST_ADD(VideoTestSuite::start_file_rtp)
-            TEST_ADD(VideoTestSuite::stop_file_rtp)
-            TEST_ADD(VideoTestSuite::start_stop_file_rtp)
         }
 
 
@@ -78,6 +80,10 @@ class VideoTestSuite
         void start_test_video();
         void stop_test_video();
         void start_stop_test_video();
+        
+        void start_test_video_rtp();
+        void stop_test_video_rtp();
+        void start_stop_test_video_rtp();
 
         void start_v4l();
         void stop_v4l();

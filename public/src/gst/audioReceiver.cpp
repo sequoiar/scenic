@@ -31,6 +31,16 @@
 #include "gstLinkable.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
+#include "audioSink.h"
+
+
+AudioReceiver::~AudioReceiver()
+{
+    assert(stop());
+    delete sink_;
+    pipeline_.remove(&decoder_);
+    pipeline_.remove(&depayloader_);
+}
 
 
 //#ifdef USE_OSC
@@ -40,7 +50,7 @@ void AudioReceiver::wait_for_caps()
     lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
     lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler,
-                                static_cast<void *>(this));
+            static_cast<void *>(this));
 
     lo_server_thread_start(st);
 
@@ -62,8 +72,8 @@ void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
 
 
 int AudioReceiver::caps_handler(const char * /*path*/, const char * /*types*/, lo_arg ** argv,
-                                int /*argc*/, void * /*data*/,
-                                void *user_data)
+        int /*argc*/, void * /*data*/,
+        void *user_data)
 {
     AudioReceiver *context = static_cast < AudioReceiver * >(user_data);
     context->session_.set_caps(&argv[0]->s);
@@ -88,27 +98,24 @@ void AudioReceiver::init_codec()
 
 void AudioReceiver::init_sink()
 {
-    sink_.init();
-#if 0
-    assert(jack_is_running());
-    assert(sink_ = gst_element_factory_make("jackaudiosink", NULL));
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    assert(sink_ = config_.createSink());
+    sink_->init();
+    GstLinkable::link(decoder_, *sink_);   
 
-    pipeline_.add(sink_);
-#endif
+    //sink_.init();
 
-    GstLinkable::link(decoder_, sink_);
+    //GstLinkable::link(decoder_, sink_);
 }
 
 
 bool AudioReceiver::start()
 {
     // FIXME: caps are only sent if sender is started after receiver
-//#ifdef USE_OSC
+    //#ifdef USE_OSC
     wait_for_caps();
-//#endif
+    //#endif
     std::stringstream logstr;       // FIXME: need a better printf style 
-                                    //logwriter, shouldn't need stringstream
+    //logwriter, shouldn't need stringstream
     logstr << "Receiving audio on port " << config_.port();
     LOG(logstr.str(), DEBUG); 
     MediaBase::start();

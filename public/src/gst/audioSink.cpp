@@ -19,15 +19,23 @@
 
 #include <cassert>
 #include "audioSink.h"
+#include "logWriter.h"
 #include "jackUtils.h"
 
 
-// parts of sub_init that are common to all VideoSource classes
-bool AudioSink::init()
+AudioSink::~AudioSink()
 {
-    assert(jack_is_running());
-    assert(sink_ = gst_element_factory_make("jackaudiosink", NULL));
-    g_object_set(G_OBJECT(sink_), "connect", 1, NULL);
+    assert(stop());
+    pipeline_.remove(&sink_);
+}
+
+
+bool AudioAlsaSink::init()
+{
+    if (Jack::is_running())
+        LOG("Jack is running, Alsa unavailable", ERROR);
+
+    assert(sink_ = gst_element_factory_make("alsasink", NULL));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     pipeline_.add(sink_);
 
@@ -35,10 +43,18 @@ bool AudioSink::init()
 }
 
 
-AudioSink::~AudioSink()
+// parts of sub_init that are common to all VideoSource classes
+bool AudioJackSink::init()
 {
-    assert(stop());
-    pipeline_.remove(&sink_);
+    if (!Jack::is_running())
+        LOG("Jack is not running", ERROR);
+
+    assert(sink_ = gst_element_factory_make("jackaudiosink", NULL));
+    g_object_set(G_OBJECT(sink_), "connect", 1, NULL);
+    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    pipeline_.add(sink_);
+
+    return true;
 }
 
 

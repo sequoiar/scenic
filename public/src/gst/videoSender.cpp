@@ -26,6 +26,7 @@
 #include "videoSource.h"
 #include "videoConfig.h"
 #include "videoSink.h"
+#include "logWriter.h"
 
 
 VideoSender::~VideoSender()
@@ -89,6 +90,8 @@ bool VideoSender::start()
     pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
     if (!config_.isNetworked())
         sink_.showWindow();
+    else
+        LOG("Sending video to remote receiver", DEBUG);
     return true;
 }
 

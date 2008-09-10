@@ -32,9 +32,10 @@ class AudioTestSuite
     public:
 
         AudioTestSuite()
+            : fileLocation_("test_signal8.wav")
         {
+            testLength_ = 5000;
 #if LOCAL
-#if 0
             TEST_ADD(AudioTestSuite::start_1ch_audiotest)
             TEST_ADD(AudioTestSuite::stop_1ch_audiotest)
             TEST_ADD(AudioTestSuite::start_stop_1ch_audiotest)
@@ -56,13 +57,11 @@ class AudioTestSuite
             TEST_ADD(AudioTestSuite::start_8ch_jack)
             TEST_ADD(AudioTestSuite::stop_8ch_jack)
             TEST_ADD(AudioTestSuite::start_stop_8ch_jack)
-#endif
             TEST_ADD(AudioTestSuite::start_audio_dv)
             TEST_ADD(AudioTestSuite::stop_audio_dv)
             TEST_ADD(AudioTestSuite::start_stop_audio_dv)
 #endif                          //  LOCAL
 #if RTP
-#if 0
             TEST_ADD(AudioTestSuite::start_2ch_comp_rtp_audiotest)
             TEST_ADD(AudioTestSuite::stop_2ch_comp_rtp_audiotest)
             TEST_ADD(AudioTestSuite::start_stop_2ch_comp_rtp_audiotest)
@@ -72,7 +71,6 @@ class AudioTestSuite
             TEST_ADD(AudioTestSuite::start_8ch_comp_rtp_audiofile)
             TEST_ADD(AudioTestSuite::stop_8ch_comp_rtp_audiofile)
             TEST_ADD(AudioTestSuite::start_stop_8ch_comp_rtp_audiofile)
-#endif
             TEST_ADD(AudioTestSuite::start_audio_dv_rtp)
             TEST_ADD(AudioTestSuite::stop_audio_dv_rtp)
             TEST_ADD(AudioTestSuite::start_stop_audio_dv_rtp)
@@ -90,6 +88,8 @@ class AudioTestSuite
 // some tests
 
     private:
+        std::string fileLocation_;
+
         void start_1ch_audiotest();
         void stop_1ch_audiotest();
         void start_stop_1ch_audiotest();

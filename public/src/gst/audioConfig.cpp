@@ -27,6 +27,7 @@
 #include <iostream>
 #include "audioConfig.h"
 #include "audioSource.h"
+#include "audioSink.h"
 #include "logWriter.h"
 
 // strips .delay from source name
@@ -66,6 +67,20 @@ AudioSource* AudioConfig::createSource() const
         LOG(source_, ERROR);
         LOG("is an invalid source", ERROR);
         return 0;
+    }
+}
+
+
+AudioSink* AudioConfig::createSink() const
+{
+    if (source_ == "alsasrc")
+        return new AudioAlsaSink();
+    else if (source_ == "jackaudiosrc")
+        return new AudioJackSink();
+    else {
+        LOG(source_, ERROR);
+        LOG("is an invalid sink, using default jackaudiosink", ERROR);
+        return new AudioJackSink();
     }
 }
 

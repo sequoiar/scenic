@@ -217,9 +217,17 @@ AudioFileSource::~AudioFileSource()
 }
 
 
+void AudioAlsaSource::sub_init()
+{
+    if (Jack::is_running())
+        LOG("Jack is running, ALSA unavailable", ERROR);
+}
+
+
 void AudioJackSource::sub_init()
 {
-    assert(jack_is_running());
+    if (!Jack::is_running())
+        LOG("Jack is not running", ERROR);
 
     // turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
     // jackOut -> jackIn -> jackOut ->jackIn.....

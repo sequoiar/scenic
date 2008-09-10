@@ -110,7 +110,7 @@ bool GstLinkable::link_pads(GstPad *srcPad, GstPad *sinkPad)
             break;
 
         case GST_PAD_LINK_NOFORMAT:
-            LOG("pads do not have common format", ERROR);
+            LOG("pads do not have common format. Check if sample rates match.", ERROR);
             break;
 
         case GST_PAD_LINK_NOSCHED:
