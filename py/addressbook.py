@@ -83,6 +83,13 @@ class AddressBook(object):
             self.write()
             return True
         return False
+    
+    def get_current(self):
+        name = self.contacts['_selected']
+        if name in self.contacts:
+            return self.contacts[name]
+        else:
+            return None
 
     def read(self):
         try:
