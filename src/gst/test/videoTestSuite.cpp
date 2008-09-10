@@ -77,6 +77,90 @@ void VideoTestSuite::start_stop_test_video()
 }
 
 
+
+void VideoTestSuite::start_test_video_rtp()
+{
+    if (id_ == 0) {
+        VideoConfig config("h264", V_PORT);
+        VideoReceiver rx(config);
+        rx.init();
+
+        TEST_ASSERT(rx.start());
+
+        BLOCK();
+        TEST_ASSERT(rx.isPlaying());
+    }
+    else {
+        VideoConfig config("videotestsrc", "h264", get_host_ip(), V_PORT);
+        VideoSender tx(config);
+        tx.init();
+
+        TEST_ASSERT(tx.start());
+
+        BLOCK();
+        TEST_ASSERT(tx.isPlaying());
+    }
+}
+
+
+void VideoTestSuite::stop_test_video_rtp()
+{
+    if (id_ == 0) {
+        VideoConfig config("h264", V_PORT);
+        VideoReceiver rx(config);
+        rx.init();
+
+        BLOCK();
+
+        TEST_ASSERT(rx.stop());
+        TEST_ASSERT(!rx.isPlaying());
+    }
+    else {
+        VideoConfig config("videotestsrc", "h264", get_host_ip(), V_PORT);
+        VideoSender tx(config);
+        tx.init();
+
+        BLOCK();
+
+        TEST_ASSERT(tx.stop());
+        TEST_ASSERT(!tx.isPlaying());
+    }
+}
+
+
+void VideoTestSuite::start_stop_test_video_rtp()
+{
+    if (id_ == 0) {
+        VideoConfig config("h264", V_PORT);
+        VideoReceiver rx(config);
+        rx.init();
+
+        TEST_ASSERT(rx.start());
+
+        BLOCK();
+        TEST_ASSERT(rx.isPlaying());
+
+        TEST_ASSERT(rx.stop());
+        TEST_ASSERT(!rx.isPlaying());
+    }
+    else {
+        VideoConfig config("videotestsrc", "h264", get_host_ip(), V_PORT);
+        VideoSender tx(config);
+        tx.init();
+
+        TEST_ASSERT(tx.start());
+
+        BLOCK();
+        TEST_ASSERT(tx.isPlaying());
+
+        TEST_ASSERT(tx.stop());
+        TEST_ASSERT(!tx.isPlaying());
+    }
+}
+
+
+
+
 void VideoTestSuite::start_v4l()
 {
     if (id_ == 1)

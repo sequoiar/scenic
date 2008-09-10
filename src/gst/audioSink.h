@@ -29,15 +29,42 @@ class AudioSink
         AudioSink()
             : sink_(0) {};
         ~AudioSink();
-        bool init();
+        virtual bool init() = 0;
+
+    protected:
+        GstElement *sinkElement() { return sink_; }
+        GstElement *sink_;
 
     private:
-        GstElement *sinkElement() { return sink_; }
-
-        GstElement *sink_;
         AudioSink(const AudioSink&);     //No Copy Constructor
         AudioSink& operator=(const AudioSink&);     //No Assignment Operator
 };
+
+class AudioAlsaSink
+: public AudioSink
+{
+    public:
+        AudioAlsaSink() {};
+        ~AudioAlsaSink() {};
+        bool init();
+    private:
+        AudioAlsaSink(const AudioAlsaSink&);     //No Copy Constructor
+        AudioAlsaSink& operator=(const AudioAlsaSink&);     //No Assignment Operator
+};
+
+
+class AudioJackSink
+: public AudioSink
+{
+    public:
+        AudioJackSink() {};
+        ~AudioJackSink() {};
+        bool init();
+    private:
+        AudioJackSink(const AudioJackSink&);     //No Copy Constructor
+        AudioJackSink& operator=(const AudioJackSink&);     //No Assignment Operator
+};
+          
 
 #endif //_AUDIO_SINK_H_
 

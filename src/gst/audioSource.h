@@ -131,7 +131,7 @@ class AudioAlsaSource
     public:
         explicit AudioAlsaSource(const AudioConfig &config)
             : InterleavedAudioSource(config) {}
-        void sub_init(){};
+        void sub_init();
     private:
         AudioAlsaSource(const AudioAlsaSource&);     //No Copy Constructor
         AudioAlsaSource& operator=(const AudioAlsaSource&);     //No Assignment Operator

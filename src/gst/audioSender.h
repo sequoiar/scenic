@@ -58,7 +58,7 @@ class AudioSender
 
         GstElement *encoder_;
         GstElement *payloader_;
-        AudioSink sink_;
+        AudioSink *sink_;
 
         AudioSender(const AudioSender&); //No Copy Constructor
         AudioSender& operator=(const AudioSender&); //No Assignment Operator

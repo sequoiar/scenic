@@ -30,6 +30,7 @@
 #include "mediaConfig.h"
 
 class AudioSource;
+class AudioSink;
 
 class AudioConfig
     : public MediaConfig
@@ -83,6 +84,7 @@ class AudioConfig
 
         int numChannels() const { return numChannels_; };
         AudioSource* createSource() const;
+        AudioSink* createSink() const;
         
         bool sanityCheck() const;
 

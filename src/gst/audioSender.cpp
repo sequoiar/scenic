@@ -36,6 +36,7 @@
 AudioSender::~AudioSender()
 {
     assert(stop());
+    delete sink_;
     pipeline_.remove(&payloader_);
     pipeline_.remove(&encoder_);
     delete source_;
@@ -70,21 +71,19 @@ void AudioSender::init_sink()
         session_.add(payloader_, config_);
     }
     else {                       // local version
-        // TODO
-        // assert(sink_ = config_.createSink());
-        //sink_->init();
-        //GstLinkable::link(*source_, *sink_);   
-        
-        sink_.init();
+        assert(sink_ = config_.createSink());
+        sink_->init();
+        GstLinkable::link(*source_, *sink_);   
 
-        GstLinkable::link(*source_, sink_);
+        //sink_.init();
+        //GstLinkable::link(*source_, sink_);
     }
 }
 
 
 void AudioSender::send_caps() const
 {
-//#ifdef USE_OSC
+    //#ifdef USE_OSC
     //CapsSender::send(session_.caps_str());
 
     // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
@@ -93,8 +92,8 @@ void AudioSender::send_caps() const
     lo_address t = lo_address_new(NULL, "7770");
     if (lo_send(t, "/audio/rx/caps", "s", session_.getCaps().c_str()) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t)
-                  << std::endl;
-//#endif
+            << std::endl;
+    //#endif
 }
 
 
@@ -105,7 +104,7 @@ bool AudioSender::start()
     if (config_.isNetworked())
     {
         std::cout << "Sending audio to host " << config_.remoteHost() << " on port "
-                  << config_.port() << std::endl;
+            << config_.port() << std::endl;
 
         pipeline_.wait_until_playing();
         send_caps();
