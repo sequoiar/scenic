@@ -28,6 +28,7 @@
 
 
 #include "gstThread.h"
+#include "gstSenderThread.h"
 #include "tcp/tcpThread.h"
 #include "tcp/parser.h"
 #include <sstream>
@@ -39,28 +40,31 @@ class MainModule
     public:
         bool run();
 
-        MainModule(int port)
-            : BaseModule(), gstThread_(), tcpThread_(port){}
+        MainModule(int port,int send)
+            : BaseModule(), gstThread_(send?*(new GstSenderThread):*(new GstSenderThread)),
+            tcpThread_(port){}
     private:
-        GstThread gstThread_;
+        GstThread& gstThread_;
         TcpThread tcpThread_;
+
+    MainModule(MainModule&);        //No Copy Constructor
+    MainModule& operator=(const MainModule&);
 };
 
 
 int main (int argc, char** argv)
 {
-    int port;
-    if(argc != 2)
-    {
-        LOG_INFO("Must provide a port");
-        return -1;
-    }
+    int port,send;
+    if(argc != 3)
+        LOG_CRITICAL("Must provide a port and 0/1 for receive/send");
+
     if(sscanf(argv[1], "%d", &port) != 1 || port < 0 || port > 65000)
-    {
-        LOG_INFO("Port must be in the range of 1-65000");
-        return -1;
-    }
-    MainModule m(port);
+        LOG_CRITICAL("Port must be in the range of 1-65000");
+    
+    if(sscanf(argv[2], "%d", &send) != 1 || send < 0 || send > 1)
+        LOG_CRITICAL("Send flag must 0 or 1");
+
+    MainModule m(port,send);
     m.run();
     return 0;
 }
@@ -69,7 +73,7 @@ int main (int argc, char** argv)
 bool MainModule::run()
 {
     QueuePair &gst_queue = gstThread_.getQueue();
-    TcpQueue &tcp_queue = tcpThread_.getQueue();
+    QueuePair &tcp_queue = tcpThread_.getQueue();
 
     if(!gstThread_.run())
         return 0;
@@ -97,11 +101,9 @@ bool MainModule::run()
         }
         if (tmsg["command"].type() == 'n')
             continue;
-
         std::string command;
         if(!tmsg["command"].get(command))
             continue;
-
         if (!command.compare("quit"))
         {
             gst_queue.push(tmsg);
