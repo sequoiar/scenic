@@ -29,6 +29,7 @@
 
 #include "gstThread.h"
 #include "gstSenderThread.h"
+#include "gstReceiverThread.h"
 #include "tcp/tcpThread.h"
 #include "tcp/parser.h"
 #include <sstream>
@@ -40,11 +41,17 @@ class MainModule
     public:
         bool run();
 
-        MainModule(int port,int send)
-            : BaseModule(), gstThread_(send?*(new GstSenderThread):*(new GstSenderThread)),
-            tcpThread_(port){}
+        MainModule(int send,int port)
+            : BaseModule(), gstThread_(0),
+            tcpThread_(port)
+    {   if(send == 1)
+            gstThread_ = new GstSenderThread();
+        else
+            gstThread_ = new GstReceiverThread();
+    }
+        ~MainModule(){ if(gstThread_){delete gstThread_;gstThread_=0;}}
     private:
-        GstThread& gstThread_;
+        GstThread* gstThread_;
         TcpThread tcpThread_;
 
     MainModule(MainModule&);        //No Copy Constructor
@@ -56,15 +63,16 @@ int main (int argc, char** argv)
 {
     int port,send;
     if(argc != 3)
-        LOG_CRITICAL("Must provide a port and 0/1 for receive/send");
+        LOG_CRITICAL("0/1 for receive/send and a port"); 
 
-    if(sscanf(argv[1], "%d", &port) != 1 || port < 0 || port > 65000)
+    if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
+        LOG_CRITICAL("Send flag must 0 or 1");
+    
+    if(sscanf(argv[2], "%d", &port) != 1 || port < 0 || port > 65000)
         LOG_CRITICAL("Port must be in the range of 1-65000");
     
-    if(sscanf(argv[2], "%d", &send) != 1 || send < 0 || send > 1)
-        LOG_CRITICAL("Send flag must 0 or 1");
 
-    MainModule m(port,send);
+    MainModule m(send,port);
     m.run();
     return 0;
 }
@@ -72,10 +80,10 @@ int main (int argc, char** argv)
 
 bool MainModule::run()
 {
-    QueuePair &gst_queue = gstThread_.getQueue();
+    QueuePair &gst_queue = gstThread_->getQueue();
     QueuePair &tcp_queue = tcpThread_.getQueue();
 
-    if(!gstThread_.run())
+    if(gstThread_ == 0 || !gstThread_->run())
         return 0;
     if(!tcpThread_.run())
         return 0;
