@@ -13,15 +13,15 @@ int main(int, char**)
 {
     std::map<std::string, StrIntFloat> mymap;
     if(tokenize(str, mymap))
-        LOG_DEBUG("Success")
+        LOG_DEBUG("Success");
         else
-            LOG_DEBUG("Fail")
+            LOG_DEBUG("Fail");
 
             std::string out;
     if(stringify(mymap, out))
-        LOG_DEBUG(out)
+        LOG_DEBUG(out);
         else
-            LOG_DEBUG("Fail stringify")
+            LOG_DEBUG("Fail stringify");
 
 
             return 0;

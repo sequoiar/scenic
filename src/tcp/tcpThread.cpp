@@ -53,7 +53,8 @@ int TcpThread::main()
                 else
                     usleep(10000);
             }
-            LOG_WARNING("Disconnected from Core.")
+            if(!quit)
+                LOG_WARNING("Disconnected from Core.");
         }
         serv_.close();
     }

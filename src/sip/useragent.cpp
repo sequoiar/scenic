@@ -766,7 +766,7 @@ static void pjsipLogWriter( int level, const char *data, int len ){
             break;
         case 5:
         case 6:
-            LOG_DEBUG(data)
+            LOG_DEBUG(data);
             break;
     }
 }

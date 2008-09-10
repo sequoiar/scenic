@@ -62,7 +62,7 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
     // is added (regardless of whether or not it's a dynamic pad) to rtpbin.
     if (gst_pad_is_linked(srcPad))
     {
-        LOG("Pad is already linked", DEBUG)
+        LOG("Pad is already linked", DEBUG);
         return;
     }
     else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
