@@ -4,7 +4,9 @@
 def connection_made_cb():
     """ Callback when an invite session has been successfully established 
     """
-    print 'Python: Connection successful'
+    result = 'Python: Connection successful'
+    print result
+    return result
 
 def connection_end_cb():
     """ Callback when an invite session has been successfully terminated 
