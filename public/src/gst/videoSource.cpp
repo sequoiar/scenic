@@ -115,7 +115,7 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
 {
     if (gst_pad_is_linked(srcPad))
     {
-        LOG("Pad is already linked.", DEBUG)
+        LOG("Pad is already linked.", DEBUG);
         return;
     }
     VideoFileSource *context = static_cast<VideoFileSource*>(data);

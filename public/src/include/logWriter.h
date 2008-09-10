@@ -41,14 +41,9 @@
 #if !ENABLE_LOG
 #define LOG(msg, level)
 #else
-    #if ENABLE_GLOG
-    #include <glib.h>
-        #define LOG(msg, level)         \
-            glog(log_(msg, level, __FILE__, __FUNCTION__, __LINE__),level);
-        #else
-        #define LOG(msg, level)         \
-            {std::cerr << log_(msg, level, __FILE__, __FUNCTION__, __LINE__);if(level == CRITICAL) abort(); }
-    #endif
+
+#define LOG(msg, level)         \
+            cerr_log_(msg, level, __FILE__, __FUNCTION__, __LINE__)
 
 enum LogLevel {
     DEBUG = 10,
@@ -69,6 +64,8 @@ static const LogLevel LOG_LEVEL = DEBUG;
 #else
 static const LogLevel LOG_LEVEL = INFO;
 #endif
+
+
 
 static bool logLevelIsValid(LogLevel level)
 {
@@ -138,37 +135,16 @@ static const std::string log_(const std::string &msg, LogLevel level, const std:
     return logMsg.str();
 }
 
-#if ENABLE_GLOG
-static void glog(const std::string& str, LogLevel level)
+static void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileName,
+                const std::string &functionName, const int lineNum)
 {
-    if(str.empty())
-        return;
-
-    switch(level)
-    {
-        case DEBUG: 
-            g_debug(str.c_str()); break;
-
-        case WARNING: 
-            g_warning(str.c_str()); break;
-
-        case INFO: 
-            g_message(str.c_str()); break;
-
-        case ERROR: 
-            g_critical(str.c_str()); break;
-
-        case CRITICAL: 
-            g_error(str.c_str()); break;
-                    
-        default:
-            break;
-
-
-    }
+    std::cerr << log_(msg,level,fileName,functionName,lineNum);
+    if(level == CRITICAL)
+        abort();
 
 }
-#endif
-#endif
+
+#endif // !ENABLE_LOG
 
 #endif //  _LOG_WRITER_H_
+
