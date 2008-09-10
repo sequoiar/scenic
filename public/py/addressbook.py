@@ -147,11 +147,10 @@ class AddressBook(object):
 class Contact(object):
     """Class representing a contact in the address book"""
     
-    def __init__(self, name, address):
+    def __init__(self, name, address, port=None):
         self.name = name
-        self.address = address
-        
-        self.port = None
+        self.address = address.encode('utf-8')
+        self.port = port
     
     def type(self):
         address = self.address
