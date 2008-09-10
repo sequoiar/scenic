@@ -16,29 +16,35 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-#ifndef __GST_THREAD__
-#define __GST_THREAD__
+
+#include <glib.h>
+#include <iostream>
 #include "gutil/baseThread.h"
 #include "gutil/strIntFloat.h"
+#include "gstThread.h"
+
+class VideoSender;
+class AudioSender;
 
 typedef QueuePair_<MapMsg> QueuePair;
-class GstThread
-    : public BaseThread<MapMsg>
+class GstSenderThread
+    : public GstThread
 {
-public:
-    GstThread(){}
-    protected:
-        virtual bool audio_start(MapMsg& msg) = 0;
-        virtual bool audio_stop(MapMsg& msg) = 0;
-        virtual bool video_start(MapMsg& msg) = 0;
-        virtual bool video_stop(MapMsg& msg) = 0;
-
+    public:
+        GstSenderThread()
+            :vsender_(0), asender_(0){}
+        ~GstSenderThread();
     private:
+        VideoSender* vsender_;
+        AudioSender* asender_;
 
-        int main();
+        bool audio_start(MapMsg& msg);
+        bool audio_stop(MapMsg& msg);
+        bool video_start(MapMsg& msg);
+        bool video_stop(MapMsg& msg);
 
-        GstThread(const GstThread&); //No Copy Constructor
-        GstThread& operator=(const GstThread&); //No Assignment Operator
+        GstSenderThread(const GstSenderThread&); //No Copy Constructor
+        GstSenderThread& operator=(const GstSenderThread&); //No Assignment Operator
 };
 
-#endif
+

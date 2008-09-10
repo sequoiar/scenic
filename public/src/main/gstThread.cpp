@@ -17,25 +17,7 @@
  * Boston, MA 02111-1307, USA.
  */
 #include "gstThread.h"
-#include "hostIP.h"
 #include "logWriter.h"
-
-// FIXME: sender and receiver should be in different processes, need to think about how
-//
-
-
-#define A_PORT 10010
-#define V_PORT 10110
-
-
-GstThread::~GstThread()
-{
-    if(asender_)
-        delete asender_;
-    if(vsender_)
-        delete vsender_;
-}
-
 
 int GstThread::main()
 {
@@ -60,8 +42,7 @@ int GstThread::main()
             }
             else if(!s.compare("audio_stop"))
             {
-                if(asender_)
-                    asender_->stop();
+                audio_stop(f);
             }
             else if(!s.compare("video_start"))
             {
@@ -69,12 +50,11 @@ int GstThread::main()
             }
             else if(!s.compare("video_stop"))
             {
-                if(vsender_)
-                    vsender_->stop();
+                video_stop(f);
             }
-            else{
+            else
                 LOG_WARNING("Unknown Command.");
-            }
+            
         }
     }
 
@@ -82,61 +62,5 @@ int GstThread::main()
 }
 
 
-bool GstThread::video_start(MapMsg& msg)
-{
-    if(vsender_){
-        delete (vsender_);
-        vsender_ = 0;
-    }
-    std::string addr;
-    if(msg["address"].type() == 's')
-        msg["address"].get(addr);
-    else
-        addr = get_host_ip();
-    VideoConfig config("videotestsrc", "h264", addr, V_PORT);
-    if(!config.sanityCheck())
-        return false;
-    vsender_ = new VideoSender(config);
-    if(vsender_)
-    {
-        vsender_->init();
-        vsender_->start();
-        return true;
-    }
-    else
-        return false;
-}
-
-
-bool GstThread::audio_start(MapMsg& msg)
-{
-    if(asender_){
-        delete (asender_);
-        asender_ = 0;
-    }
-    std::string addr;
-    if(msg["address"].type() == 's')
-        msg["address"].get(addr);
-    else
-        addr = get_host_ip();
-
-    AudioConfig config("audiotestsrc", 2, "vorbisenc", addr, A_PORT);
-    if(!config.sanityCheck())
-        return false;
-    asender_ = new AudioSender(config);
-    if(asender_)
-    {
-    asender_->init();
-    asender_->start();
-    std::string caps_str;
-    MapMsg caps;
-    caps.insert( std::make_pair("command", "caps"));
-    caps.insert( std::make_pair("caps_str", asender_->getCaps()));
-    queue_.push(caps);
-        return true;
-    }
-    else
-        return false;
-}
 
 
