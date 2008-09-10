@@ -320,7 +320,6 @@ void AudioDvSource::link_elements()
     if (dvIsNew_)
         GstLinkable::link(sources_[0], demux_);
     GstLinkable::link(queue_, aconvs_[0]);
-    //  GstLinkable::link(aconvs_, interleave_);
 }
 
 

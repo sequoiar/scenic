@@ -34,7 +34,6 @@
 gboolean VideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
 {
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(data), GDK_WINDOW_XWINDOW(widget->window));
-    gtk_widget_show_all(widget);
     return TRUE;
 }
 
@@ -103,8 +102,8 @@ VideoSink::~VideoSink()
     pipeline_.remove(&sink_);
     if (window_)
     {
-        LOG("Widget destroyed", DEBUG);
         gtk_widget_destroy(window_);
+        LOG("Widget destroyed", DEBUG);
     }
 }
 
