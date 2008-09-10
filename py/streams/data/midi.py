@@ -18,44 +18,139 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
-
 # App imports
 from protocols import osc_protocols
 from streams import stream
 
+#Midi Import
+import pypm
+from midiIn import MidiIn
+from RTPServer import RTPServer
+from twisted.internet import reactor
+
+#Log import
+from utils import log
+
+#log = log.start('info', 1, 0, 'midiStream')
 
 class MidiStream(stream.DataStream):
     """Class MIDI
     """
-    
-    def start_sending(self, address):
-        """function start_sending
-        
-        address: string
-        
-        returns 
+    def __init__(self, address='127.0.0.1'):
+        #initialisation du midi
+        pypm.Initialize()
+	
+        #Configuring RTP Server
+        #witness for receiving data is self.server.receivingMidiData
+        #latency is self.server.midiOut.latency
+        #midi output device list is in self.midiOut.midiDeviceList
+        self.server = RTPServer()
+
+        #listenUDP(port sur lequel on lit les donnees midi, server)
+        reactor.listenUDP(44000,self.server)
+
+        #MidiIn ( "adresse sur lequel envoyer les donnees midi" , port sur lequel envoyer les midi data)
+        #midi input device list is in self.midiIn.midiDeviceList
+        #witness for sending data is in self.midiIn.sendingMidiData
+        self.midiIn = MidiIn(address,44000)
+
+        reactor.run()
+
+#INPUT	
+    def start_sending(self):
+        """function start_sending        
+        returns 0 if can start sending else -1
         """
-        return None # should raise NotImplementedError()
-    
-    def stop_sending(self):
-        """function stop_sending
-        
-        returns 
-        """
-        return None # should raise NotImplementedError()
-    
-    def start_receving(self):
-        """function start_receving
-        
-        returns 
-        """
-        return None # should raise NotImplementedError()
-    
-    def stop_receving(self):
-        """function stop_receving
-        
-        returns 
-        """
-        return None # should raise NotImplementedError()
+        res = self.midiIn.start_sending()
+        return res
     
 
+    def stop_sending(self):
+        """function stop_sending
+        """
+        res = self.midiIn.stop_sending()
+
+
+    def set_input_device(self, device):
+        """function set_input_device, setting midi input device
+        """
+        self.midiIn.set_device(device)
+
+		
+    def get_input_devices(self):
+        """function get_input_device , return list of midi devices
+        """
+        self.midiIn.get_devices()
+        return getattr(self.midiIn, "midiDeviceList")
+
+
+    def get_sending_witness(self):
+        return getattr(self.midiIn.client, "sendingMidiData")
+
+
+    def get_client_sync_witness(self):
+        return getattr(self.midiIn.client, "sync")
+		
+
+#OUTPUT		
+    def start_receving(self):
+        """function start_receving
+        returns 0 if started else -1
+        """
+        res = self.server.start_receiving()
+        return res
+
+    
+    def stop_receiving(self):
+        """function stop_receving
+        returns 
+        """
+        self.server.stop_receiving()
+
+
+    def set_output_device(self, device):
+        """function set_input_device
+        """
+        self.server.midiOut.set_device(device)
+ 
+   
+    def get_output_devices(self):
+        """function get_input_device, return list of midi device
+        """
+        self.server.midiOut.get_devices()
+        return getattr(self.server.midiOut, "midiDeviceList")
+
+		
+    def set_latency(self, latency):
+        """function set output latency
+        """
+        if ( latency >= 0 ):
+            setattr(self.server.midiOut, "latency", latency)
+
+
+    def get_receiving_witness(self):
+        """ return 1 if receiving data 0 if not
+        """
+        return getattr(self.server, "receivingMidiData")
+
+
+    def get_server_sync_witness(self):
+        """return the sync witness, 1 if sync , 0 if not
+        """
+        return gettattr(self.server, "sync")
+
+
+    def __del__(self):
+
+        del self.server
+        del self.midiIn
+		
+        #Ending pyport midi
+        pypm.Terminate()	
+
+
+
+
+  
+
+    
