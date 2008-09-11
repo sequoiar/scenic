@@ -27,10 +27,8 @@
 
 GstReceiverThread::~GstReceiverThread()
 {
-    if(areceiver_)
-        delete areceiver_;
-    if(vreceiver_)
-        delete vreceiver_;
+    delete areceiver_;
+    delete vreceiver_;
 }
 
 bool GstReceiverThread::video_stop(MapMsg& /*msg*/)
@@ -56,10 +54,9 @@ bool GstReceiverThread::audio_stop(MapMsg& /*msg*/)
 
 bool GstReceiverThread::video_start(MapMsg& /*msg*/)
 {
-    if(vreceiver_){
-        delete (vreceiver_);
-        vreceiver_ = 0;
-    }
+    delete (vreceiver_);
+    vreceiver_ = 0;
+    
     VideoConfig config("h264", V_PORT);
     if(!config.sanityCheck())
         return false;
@@ -77,10 +74,8 @@ bool GstReceiverThread::video_start(MapMsg& /*msg*/)
 
 bool GstReceiverThread::audio_start(MapMsg& /*msg*/)
 {
-    if(areceiver_){
-        delete (areceiver_);
-        areceiver_ = 0;
-    }
+    delete (areceiver_);
+    areceiver_ = 0;
 
     AudioConfig config(2, "vorbisenc", A_PORT);
     if(!config.sanityCheck())
