@@ -26,6 +26,7 @@
 #include "videoConfig.h"
 #include "logWriter.h"
 #include "videoSource.h"
+#include "videoSink.h"
 
 
 VideoSource * VideoConfig::createSource() const
@@ -44,6 +45,13 @@ VideoSource * VideoConfig::createSource() const
         return 0;
     }
 }
+
+
+VideoSink * VideoConfig::createSink() const
+{
+    return new VideoSink();
+}
+
 
 bool VideoConfig::sanityCheck() const
 {

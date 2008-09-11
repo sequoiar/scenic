@@ -22,11 +22,11 @@
 #define _VIDEO_SENDER_H_
 
 #include "mediaBase.h"
-#include "videoSink.h"
 #include "videoConfig.h"
 #include "rtpSender.h"
 
 class VideoSource;
+class VideoSink;
 
 class VideoSender
     : public MediaBase
@@ -34,7 +34,7 @@ class VideoSender
     public:
         explicit VideoSender(const VideoConfig config) 
             : config_(config), session_(), source_(0), colorspc_(0), 
-            encoder_(0), payloader_(0), sink_() {}
+            encoder_(0), payloader_(0), sink_(0) {}
 
         ~VideoSender();
 
@@ -49,7 +49,7 @@ class VideoSender
         RtpSender session_;
         VideoSource *source_;
         GstElement *colorspc_, *encoder_, *payloader_; 
-        VideoSink sink_;
+        VideoSink *sink_;
 
         // hidden
 
