@@ -70,7 +70,7 @@ class MediaConfig
         const char *source() const { return source_.c_str(); }
         const char *location() const;
 
-        const char *codec() const { return codec_.c_str(); }
+//        const char *codec() const { return codec_.c_str(); }
         const char *remoteHost() const { return remoteHost_.c_str(); }
         int port() const { return port_; }
         bool isNetworked() const { return port_ != 0; }

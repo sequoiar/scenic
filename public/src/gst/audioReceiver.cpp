@@ -30,6 +30,7 @@
 #include "gstLinkable.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
+#include "codec.h"
 #include "audioSink.h"
 
 
@@ -37,7 +38,7 @@ AudioReceiver::~AudioReceiver()
 {
     assert(stop());
     delete sink_;
-    pipeline_.remove(&decoder_);
+    delete decoder_;
     pipeline_.remove(&depayloader_);
 }
 
@@ -87,10 +88,10 @@ void AudioReceiver::init_codec()
     assert(depayloader_ = gst_element_factory_make("rtpvorbisdepay", NULL));
     pipeline_.add(depayloader_);
 
-    assert(decoder_ = gst_element_factory_make(config_.codec(), NULL));
-    pipeline_.add(decoder_);
+    assert(decoder_ = config_.createDecoder());
+    decoder_->init();
 
-    GstLinkable::link(depayloader_, decoder_);
+    GstLinkable::link(depayloader_, *decoder_);
     session_.add(depayloader_, config_);
 }
 
@@ -99,11 +100,7 @@ void AudioReceiver::init_sink()
 {
     assert(sink_ = config_.createSink());
     sink_->init();
-    GstLinkable::link(decoder_, *sink_);   
-
-    //sink_.init();
-
-    //GstLinkable::link(decoder_, sink_);
+    GstLinkable::link(*decoder_, *sink_);   
 }
 
 

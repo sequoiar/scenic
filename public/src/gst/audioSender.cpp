@@ -32,6 +32,7 @@
 
 #include "audioSender.h"
 #include "audioSource.h"
+#include "codec.h"
 #include "audioSink.h"
 
 AudioSender::~AudioSender()
@@ -39,7 +40,8 @@ AudioSender::~AudioSender()
     assert(stop());
     delete sink_;
     pipeline_.remove(&payloader_);
-    pipeline_.remove(&encoder_);
+    //pipeline_.remove(&encoder_);
+    delete encoder_;
     delete source_;
 }
 
@@ -54,8 +56,12 @@ void AudioSender::init_source()
 void AudioSender::init_codec()
 {
     if (config_.hasCodec()) {
+#if 0
         assert(encoder_ = gst_element_factory_make(config_.codec(), NULL));
         pipeline_.add(encoder_);
+#endif
+        assert(encoder_ = config_.createEncoder());
+        encoder_->init();
     }
 }
 
@@ -66,8 +72,8 @@ void AudioSender::init_sink()
         assert(payloader_ = gst_element_factory_make("rtpvorbispay", NULL));
         pipeline_.add(payloader_);
 
-        GstLinkable::link(*source_, encoder_);
-        GstLinkable::link(encoder_, payloader_);
+        GstLinkable::link(*source_, *encoder_);
+        GstLinkable::link(*encoder_, payloader_);
 
         session_.add(payloader_, config_);
     }
@@ -75,9 +81,6 @@ void AudioSender::init_sink()
         assert(sink_ = config_.createSink());
         sink_->init();
         GstLinkable::link(*source_, *sink_);   
-
-        //sink_.init();
-        //GstLinkable::link(*source_, sink_);
     }
 }
 
