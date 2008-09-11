@@ -24,6 +24,7 @@
 #include "gstLinkable.h"
 #include "videoSender.h"
 #include "videoSource.h"
+#include "videoSink.h"
 #include "videoConfig.h"
 #include "logWriter.h"
 
@@ -31,6 +32,7 @@
 VideoSender::~VideoSender()
 {
     assert(stop());
+    delete sink_;
     pipeline_.remove(&payloader_);
     pipeline_.remove(&encoder_);
     pipeline_.remove(&colorspc_);
@@ -77,8 +79,9 @@ void VideoSender::init_sink()
         session_.add(payloader_, config_);
     }
     else {                 // local test only, no encoding
-        sink_.init();
-        GstLinkable::link(*source_, sink_);   // FIXME: this shouldn't happen for VideoFileSource
+        assert(sink_ = config_.createSink());
+        sink_->init();
+        GstLinkable::link(*source_, *sink_);   // FIXME: this shouldn't happen for VideoFileSource
     }
 }
 
@@ -88,7 +91,7 @@ bool VideoSender::start()
     GstBase::start();
     pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
     if (!config_.isNetworked())
-        sink_.showWindow();
+        sink_->showWindow();
     else
         LOG("Sending video to remote receiver", DEBUG);
     return true;

@@ -94,3 +94,4 @@ bool AudioConfig::sanityCheck() const
 
     return validCodec;
 }
+
