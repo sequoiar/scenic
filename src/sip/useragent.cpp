@@ -76,7 +76,7 @@ static void pjsipLogWriter( int level, const char *data, int len );
  * @param	inv	A pointer on a pjsip_inv_session structure
  * @param	e	A pointer on a pjsip_event structure
  */
-static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e );
+void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e );
 
 /*
  * Called when the invote usage module has created a new dialog and invite
@@ -85,7 +85,7 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e );
  * @param	inv	A pointer on a pjsip_inv_session structure
  * @param	e	A pointer on a pjsip_event structure
  */
-static void call_on_forked( pjsip_inv_session *inv, pjsip_event *e );
+void call_on_forked( pjsip_inv_session *inv, pjsip_event *e );
 
 /*
  * Session callback
@@ -94,7 +94,7 @@ static void call_on_forked( pjsip_inv_session *inv, pjsip_event *e );
  * @param	inv	A pointer on a pjsip_inv_session structure
  * @param	status	A pj_status_t structure
  */
-static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status );
+void call_on_media_update( pjsip_inv_session *inv, pj_status_t status );
 
 /*
  * Session callback
@@ -105,7 +105,7 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status );
  * @param	tsx	A pointer on a pjsip_transaction structure
  * @param	e	A pointer on a pjsip_event structure
  */
-static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
+void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
                                        pjsip_event *e );
 
 /*
@@ -113,14 +113,14 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
  * @param   rdata
  * @return  pj_bool_t
  */
-static pj_bool_t on_rx_request( pjsip_rx_data *rdata );
+pj_bool_t on_rx_request( pjsip_rx_data *rdata );
 
 /*
  * Called to handle incoming response
  * @param	rdata
  * @return	pj_bool_t
  */
-static pj_bool_t on_rx_response( pjsip_rx_data *rdata );
+pj_bool_t on_rx_response( pjsip_rx_data *rdata );
 
 /*
  * Session callback
@@ -130,7 +130,7 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata );
  * @param	inv	A pointer on a pjsip_inv_session structure
  * @param	offer	A constant pointer on a pjmedia_sdp_session structure
  */
-static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer );
+void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer );
 
 /*
  *	The SIP endpoint
@@ -217,12 +217,12 @@ static answerMode _answerMode;
 
 static PyThreadState* mainThreadState;
 
-static void py_connection_made( void );
-static void py_connection_end( void );
-static void py_connection_failed( std::string reason );
-static void py_connection_incoming( void );
-static void py_connection_message( std::string msg );
-static void py_connection_media_choice( std::string codec );
+void py_connection_made( void );
+void py_connection_end( void );
+void py_connection_failed( std::string reason );
+void py_connection_incoming( void );
+void py_connection_message( std::string msg );
+void py_connection_media_choice( std::string codec );
 
 /*************************************************************************************************/
 
@@ -772,7 +772,7 @@ static void pjsipLogWriter( int level, const char *data, int len ){
 }
 
 
-static void py_connection_made( void ){
+void py_connection_made( void ){
     std::ostringstream inst;
     PyThreadState* myThreadState;
 
@@ -791,7 +791,7 @@ static void py_connection_made( void ){
 }
 
 
-static void py_connection_end( void ){
+void py_connection_end( void ){
     std::ostringstream inst;
     PyThreadState* myThreadState;
 
@@ -810,7 +810,7 @@ static void py_connection_end( void ){
 }
 
 
-static void py_connection_incoming( void ){
+void py_connection_incoming( void ){
     std::ostringstream inst;
     PyThreadState* myThreadState;
 
@@ -829,7 +829,7 @@ static void py_connection_incoming( void ){
 }
 
 
-static void py_connection_message( std::string msg ){
+void py_connection_message( std::string msg ){
     std::ostringstream inst;
     PyThreadState* myThreadState;
 
@@ -860,7 +860,7 @@ static void py_connection_message( std::string msg ){
 }
 
 
-static void py_connection_failed( std::string reason ){
+void py_connection_failed( std::string reason ){
     std::ostringstream inst;
     PyThreadState* myThreadState;
 
@@ -888,7 +888,7 @@ static void py_connection_failed( std::string reason ){
 }
 
 
-static void py_connection_media_choice( std::string codec ){
+void py_connection_media_choice( std::string codec ){
     std::ostringstream inst;
     PyThreadState* myThreadState;
 
@@ -919,7 +919,7 @@ static void py_connection_media_choice( std::string codec ){
 
 /********************** Callbacks Implementation **********************************/
 
-static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
+void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
     // To avoid unused arguments compilation warnings
     PJ_UNUSED_ARG(e);
 
@@ -971,7 +971,7 @@ static void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
 }
 
 
-static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
+pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     pj_status_t status;
     pj_str_t reason;
     unsigned options = 0;
@@ -1036,7 +1036,7 @@ static pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
 }
 
 
-static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
+pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
     /* Respond statelessly any non-INVITE requests with 500 */
     //if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
     PJ_UNUSED_ARG( rdata );
@@ -1044,7 +1044,7 @@ static pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
 }
 
 
-static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
+void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
                                        pjsip_event *e ){
     PJ_UNUSED_ARG(inv);
 
@@ -1083,7 +1083,7 @@ static void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction
 }
 
 
-static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
+void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     // We need to get the final media choice and send it to the core
     // Maybe we want to start the data streaming now...
 
@@ -1121,7 +1121,7 @@ static void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
 }
 
 
-static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
+void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
     PJ_UNUSED_ARG( inv );
     //pjmedia_sdp_session *sdp;
     pj_status_t status;
@@ -1132,7 +1132,7 @@ static void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offe
 }
 
 
-static void call_on_forked( pjsip_inv_session *inv, pjsip_event *e ){
+void call_on_forked( pjsip_inv_session *inv, pjsip_event *e ){
     PJ_UNUSED_ARG( inv );
     PJ_UNUSED_ARG( e );
     printf(

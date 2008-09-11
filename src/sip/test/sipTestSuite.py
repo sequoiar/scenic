@@ -6,24 +6,29 @@ import pyCallbacks
 # app import
 import libsip_export as sip
 
+    
+
 class TestConnection(unittest.TestCase):
         
+    def connect(self):
+        result = self.uas.connect("<sip:bloup@127.0.0.1:5060>")
+        self.assertEqual( result, 0 )
+        d = defer.Deferred()
+        return d
+    
     def setUp(self):
-        self.uas = sip.SIPSession(50060)
-        #self.uac = sip.SIPSession(50060)
-        #self.callback_result = None
+        self.uas = sip.SIPSession(5060)
+        self.callback_result = 'CONNECTION_STATE_NULL' 
 
-    #def _callback(self, *args, **kw):
-     #   self.callback_result = pyCallbacks.connection_made_cb()
-      #  return self.callback_result 
+    def _callback(self, *args, **kw):
+        state = self.uas.state()
+        #self.assertEqual(state, 'CONNECTION_STATE_DISCONNECTED')
+        self.callback_result = state
 
-    #def test_connectionDefaultPeer(self):
-     #   result = self.uas.connect()
-     #  self.assertEqual( result, 0 )
-     #   deferred = defer.Deferred()
-     #   deferred.addCallback( self._callback )
-        #deferred.callback( )
-     #   self.failUnlessEqual(self.callback_result, ('Done', {}))
+    #def test_connectionDefaultPeer(self, *args, **kw):
+        #defer = self.connect()
+        #defer.addCallback( self._callback )
+        #self.failUnlessEqual(self.callback_result, ('CONNECTION_STATE_CONNECTED'))
 
     #def test_callbackWithArgs(self):
       #  deferred = defer.Deferred()
@@ -34,8 +39,7 @@ class TestConnection(unittest.TestCase):
     def tearDown(self):
         result = self.uas.shutdown()
         self.assertEqual( result, 0 )
-        #result = self.uac.shutdown()
-        #self.assertEqual( result, 0 )
+        #self.port.stopListening()
 
 class TestInitialisation(unittest.TestCase):
 
