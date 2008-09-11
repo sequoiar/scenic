@@ -1,5 +1,4 @@
-
-// mediaBase.h
+// codec.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -18,31 +17,44 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _MEDIA_BASE_H_
-#define _MEDIA_BASE_H_
 
-#include "gstBase.h"
+#include <cassert>
+#include "codec.h"
 
-class MediaBase
-    : public GstBase
+
+Codec::~Codec()
 {
-    public:
-        virtual bool init();
+    assert(stop());
+    pipeline_.remove(&codec_);
+}
 
-    protected:
 
-        MediaBase(){};
-        virtual ~MediaBase();
-        virtual void init_source() = 0;
-        virtual void init_codec() = 0;
-        virtual void init_sink() = 0;
-        static const char *OSC_PORT;
+H264Encoder::~H264Encoder()
+{
+    assert(stop());
+    pipeline_.remove(&colorspc_);
+}
 
-    private:
 
-        MediaBase(const MediaBase&);     //No Copy Constructor
-        MediaBase& operator=(const MediaBase&);     //No Assignment Operator
-};
+bool H264Encoder::init()
+{
+    assert(colorspc_ = gst_element_factory_make("ffmpegcolorspace", "colorspc"));
+    pipeline_.add(colorspc_);
 
-#endif // _MEDIA_BASE_H_
+    assert(codec_ = gst_element_factory_make("x264enc", NULL));
+    g_object_set(G_OBJECT(codec_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4,
+                     NULL);
+    pipeline_.add(codec_);
+
+    GstLinkable::link(colorspc_, codec_);
+    return true;
+}
+
+
+bool H264Decoder::init()
+{
+    assert(codec_ = gst_element_factory_make("ffdec_h264", NULL));
+    pipeline_.add(codec_);
+    return true;
+}
 

@@ -27,13 +27,14 @@
 
 class VideoSource;
 class VideoSink;
+class Codec;
 
 class VideoSender
     : public MediaBase
 {
     public:
         explicit VideoSender(const VideoConfig config) 
-            : config_(config), session_(), source_(0), colorspc_(0), 
+            : config_(config), session_(), source_(0), 
             encoder_(0), payloader_(0), sink_(0) {}
 
         ~VideoSender();
@@ -48,7 +49,8 @@ class VideoSender
         const VideoConfig config_;
         RtpSender session_;
         VideoSource *source_;
-        GstElement *colorspc_, *encoder_, *payloader_; 
+        Codec *encoder_;
+        GstElement /**colorspc_, *encoder_, */ *payloader_; 
         VideoSink *sink_;
 
         // hidden

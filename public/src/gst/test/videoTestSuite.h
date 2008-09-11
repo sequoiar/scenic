@@ -24,8 +24,8 @@
 #include <cpptest.h>
 #include "gstTestSuite.h"
 
-#define LOCAL 1
-#define RTP 0
+#define LOCAL 0
+#define RTP 1
 
 class VideoTestSuite
     : public GstTestSuite
@@ -35,7 +35,7 @@ class VideoTestSuite
         VideoTestSuite()
             : fileLocation_("ubuntu.ogg")
         {
-            testLength_ = 5000;
+            testLength_ = 10000;
 #if LOCAL
             TEST_ADD(VideoTestSuite::start_test_video)
             TEST_ADD(VideoTestSuite::stop_test_video)

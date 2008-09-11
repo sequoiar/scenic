@@ -89,6 +89,7 @@ class AudioConfig
         bool sanityCheck() const;
 
     private:
+
         AudioConfig& operator=(const AudioConfig&); //No Assignment Operator
         const int numChannels_;
 };

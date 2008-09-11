@@ -30,6 +30,7 @@
 
 class VideoSource;
 class VideoSink;
+class Codec;
 
 class VideoConfig
     : public MediaConfig
@@ -68,6 +69,9 @@ class VideoConfig
 
         VideoSource* createSource() const;  // factory method
         VideoSink* createSink() const;  // factory method
+
+        Codec* createEncoder() const;
+        Codec* createDecoder() const;
 
         bool has_h264() const { return codec_ == "h264"; }
         bool sanityCheck() const;
