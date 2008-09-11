@@ -26,7 +26,6 @@
 #ifndef _VIDEO_CONFIG_H_
 #define _VIDEO_CONFIG_H_
 
-#include <string>
 #include "mediaConfig.h"
 
 class VideoSource;

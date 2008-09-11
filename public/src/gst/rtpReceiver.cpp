@@ -19,10 +19,8 @@
 //
 
 #include <cassert>
-#include <iostream>
 #include <list>
 #include <algorithm>
-#include <string.h>
 #include <gst/gst.h>
 #include "logWriter.h"
 #include "gstLinkable.h"

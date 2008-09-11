@@ -23,12 +23,11 @@
  *
  */
 
-#include <string>
-#include <iostream>
 #include "audioConfig.h"
 #include "audioSource.h"
 #include "audioSink.h"
 #include "logWriter.h"
+#include "audioDelaySource.h"
 
 // strips .delay from source name
 const char *AudioConfig::source() const

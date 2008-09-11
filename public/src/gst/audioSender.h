@@ -24,9 +24,9 @@
 #include "mediaBase.h"
 #include "audioConfig.h"
 #include "rtpSender.h"
-#include "audioSink.h"
 
 class AudioSource;
+class AudioSink;
 
 class AudioSender
     : public MediaBase
@@ -34,7 +34,7 @@ class AudioSender
     public:
         explicit AudioSender(const AudioConfig config) 
             : config_(config), session_(), source_(0), 
-            encoder_(0), payloader_(0), sink_()
+            encoder_(0), payloader_(0), sink_(0)
         {}
 
         ~AudioSender();

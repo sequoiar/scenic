@@ -17,8 +17,6 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <iostream>
-#include <string>
 #include <cassert>
 
 #include <gtk/gtk.h>

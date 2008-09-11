@@ -23,8 +23,6 @@
 #include "gstLinkable.h"
 #include "interleave.h"
 
-#include "audioDelaySource.h"
-
 class AudioConfig;
 
 class AudioSource

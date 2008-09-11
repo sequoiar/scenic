@@ -19,7 +19,6 @@
 //
 
 #include <sstream>
-#include <cstdlib>
 #include <cassert>
 #include <gst/gst.h>
 

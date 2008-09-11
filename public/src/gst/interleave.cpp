@@ -18,7 +18,7 @@
 //
 
 #include <cassert>
-#include <string.h>
+#include <cstring>      // for memset
 #include <gst/audio/multichannel.h>
 #include "interleave.h"
 #include "audioConfig.h"

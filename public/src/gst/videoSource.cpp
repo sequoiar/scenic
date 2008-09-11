@@ -17,9 +17,7 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <iostream>
 #include <string>
-#include <string.h>
 #include <cassert>
 #include "gstLinkable.h"
 #include "videoSource.h"

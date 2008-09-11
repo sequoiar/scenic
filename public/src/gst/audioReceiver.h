@@ -21,9 +21,6 @@
 #ifndef _AUDIO_RECEIVER_H_
 #define _AUDIO_RECEIVER_H_
 
-#include <string>
-#include <cassert>
-
 #include "lo/lo.h"
 #include "mediaBase.h"
 #include "audioConfig.h"
