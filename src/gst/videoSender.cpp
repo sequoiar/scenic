@@ -26,6 +26,7 @@
 #include "videoSource.h"
 #include "videoSink.h"
 #include "videoConfig.h"
+#include "codec.h"
 #include "logWriter.h"
 
 
@@ -34,8 +35,7 @@ VideoSender::~VideoSender()
     assert(stop());
     delete sink_;
     pipeline_.remove(&payloader_);
-    pipeline_.remove(&encoder_);
-    pipeline_.remove(&colorspc_);
+    delete encoder_;
     delete source_;
 }
 
@@ -50,19 +50,10 @@ void VideoSender::init_source()
 void VideoSender::init_codec()
 {
     // TODO:
-    // assert(codec_ = config_.createCodec());
-    // codec_->init();
-    if (config_.has_h264()) {
-        assert(colorspc_ = gst_element_factory_make("ffmpegcolorspace", "colorspc"));
-        pipeline_.add(colorspc_);
-
-        assert(encoder_ = gst_element_factory_make("x264enc", NULL));
-        g_object_set(G_OBJECT(encoder_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4,
-                     NULL);
-        pipeline_.add(encoder_);
-
-        GstLinkable::link(*source_, colorspc_);
-        GstLinkable::link(colorspc_, encoder_);
+    if (config_.isNetworked()) {
+        assert(encoder_ = config_.createEncoder());
+        encoder_->init();
+        GstLinkable::link(*source_, *encoder_);
     }
 }
 
@@ -75,7 +66,7 @@ void VideoSender::init_sink()
         // payloader_->init();
         assert(payloader_ = gst_element_factory_make("rtph264pay", NULL));
         pipeline_.add(payloader_);
-        GstLinkable::link(encoder_, payloader_);
+        GstLinkable::link(*encoder_, payloader_);
         session_.add(payloader_, config_);
     }
     else {                 // local test only, no encoding

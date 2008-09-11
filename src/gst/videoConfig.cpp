@@ -27,6 +27,7 @@
 #include "logWriter.h"
 #include "videoSource.h"
 #include "videoSink.h"
+#include "codec.h"
 
 
 VideoSource * VideoConfig::createSource() const
@@ -50,6 +51,32 @@ VideoSource * VideoConfig::createSource() const
 VideoSink * VideoConfig::createSink() const
 {
     return new VideoSink();
+}
+
+
+Codec * VideoConfig::createEncoder() const
+{
+    if (codec_ == "h264")
+        return new H264Encoder();
+    else
+    {
+        LOG(codec_, ERROR);
+        LOG("is an invalid codec!", ERROR);
+        return 0;
+    }
+}
+
+
+Codec * VideoConfig::createDecoder() const
+{
+    if (codec_ == "h264")
+        return new H264Decoder();
+    else
+    {
+        LOG(codec_, ERROR);
+        LOG("is an invalid codec!", ERROR);
+        return 0;
+    }
 }
 
 

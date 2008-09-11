@@ -27,6 +27,7 @@
 
 #include <string>
 
+
 class MediaConfig
 {
     public:
@@ -86,7 +87,9 @@ class MediaConfig
         const std::string codec_;
         const std::string remoteHost_;
         const int port_;
+
     private:
+
         MediaConfig& operator=(const MediaConfig&);     //No Assignment Operator
 };
 

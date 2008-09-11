@@ -25,37 +25,45 @@
 #include "mediaBase.h"
 #include "gstLinkable.h"
 #include "videoReceiver.h"
+#include "videoSink.h"
+#include "codec.h"
 #include "logWriter.h"
 
 VideoReceiver::~VideoReceiver()
 {
     assert(stop());
-    pipeline_.remove(&decoder_);
+    delete sink_;
+    //pipeline_.remove(&decoder_);
+    delete decoder_;
     pipeline_.remove(&depayloader_);
 }
 
 
 void VideoReceiver::init_codec()
 {
-    if (config_.has_h264()) {
-        assert(depayloader_ = gst_element_factory_make("rtph264depay", NULL));
-        assert(decoder_ = gst_element_factory_make("ffdec_h264", NULL));
-    }
+    //if (config_.has_h264()) {
+    assert(depayloader_ = gst_element_factory_make("rtph264depay", NULL));
+    assert(decoder_ = config_.createDecoder());
+    // TODO: assert(depayloader_ = codec_.createDepayloader());
+    // depayloader_->init();
+    decoder_->init();
+    //}
 
     pipeline_.add(depayloader_);
-    pipeline_.add(decoder_);
-    GstLinkable::link(depayloader_, decoder_);
+    //GstLinkable::link(*depayloader_, *decoder_);
+    GstLinkable::link(depayloader_, *decoder_);
 
     session_.add(depayloader_, config_);
     session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,"
-                      "encoding-name=(string)H264");
+            "encoding-name=(string)H264");
 }
 
 
 void VideoReceiver::init_sink()
 {
-    sink_.init();
-    GstLinkable::link(decoder_, sink_);
+    assert(sink_ = config_.createSink());
+    sink_->init();
+    GstLinkable::link(*decoder_, *sink_);
 }
 
 
@@ -63,7 +71,7 @@ bool VideoReceiver::start()
 {
     LOG("Receiving video", DEBUG);
     MediaBase::start();
-    sink_.showWindow();
+    sink_->showWindow();
     return true;
 }
 

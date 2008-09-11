@@ -21,6 +21,8 @@
 #include <cassert>
 #include "mediaBase.h"
 
+const char *MediaBase::OSC_PORT = "7770";
+
 MediaBase::~MediaBase()
 {
     assert(stop());
