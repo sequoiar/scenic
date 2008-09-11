@@ -20,7 +20,6 @@
 #ifndef _VIDEO_SOURCE_H_
 #define _VIDEO_SOURCE_H_
 
-#include <cassert>
 #include "gstLinkable.h"
 
 class VideoConfig;

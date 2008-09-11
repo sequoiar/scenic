@@ -25,6 +25,7 @@
 #include "mediaBase.h"
 #include "gstLinkable.h"
 #include "videoReceiver.h"
+#include "logWriter.h"
 
 VideoReceiver::~VideoReceiver()
 {
@@ -40,6 +41,7 @@ void VideoReceiver::init_codec()
         assert(depayloader_ = gst_element_factory_make("rtph264depay", NULL));
         assert(decoder_ = gst_element_factory_make("ffdec_h264", NULL));
     }
+
     pipeline_.add(depayloader_);
     pipeline_.add(decoder_);
     GstLinkable::link(depayloader_, decoder_);
@@ -59,7 +61,7 @@ void VideoReceiver::init_sink()
 
 bool VideoReceiver::start()
 {
-    std::cout << "Receiving video on port " << config_.port() << std::endl;
+    LOG("Receiving video", DEBUG);
     MediaBase::start();
     sink_.showWindow();
     return true;

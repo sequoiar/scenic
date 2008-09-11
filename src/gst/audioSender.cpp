@@ -32,6 +32,7 @@
 
 #include "audioSender.h"
 #include "audioSource.h"
+#include "audioSink.h"
 
 AudioSender::~AudioSender()
 {

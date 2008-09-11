@@ -25,7 +25,6 @@
 #include "videoSender.h"
 #include "videoSource.h"
 #include "videoConfig.h"
-#include "videoSink.h"
 #include "logWriter.h"
 
 

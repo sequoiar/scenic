@@ -43,7 +43,7 @@ bool AudioAlsaSink::init()
 }
 
 
-// parts of sub_init that are common to all VideoSource classes
+
 bool AudioJackSink::init()
 {
     if (!Jack::is_running())

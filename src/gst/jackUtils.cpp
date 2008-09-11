@@ -19,8 +19,6 @@
 //
 
 #include <jack/jack.h>
-#include <jack/transport.h>
-#include <iostream>
 #include <cassert>
 #include "jackUtils.h"
 #include "logWriter.h"

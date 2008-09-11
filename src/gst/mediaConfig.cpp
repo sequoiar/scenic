@@ -22,7 +22,6 @@
  *
  */
 
-#include <string>
 #include "mediaConfig.h"
 #include "logWriter.h"
 
