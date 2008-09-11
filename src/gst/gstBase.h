@@ -23,6 +23,8 @@
 
 #include "pipeline.h"
 
+class _GstElement;
+
 class GstBase
 {
     public:
@@ -33,7 +35,7 @@ class GstBase
         bool isPlaying() { return pipeline_.isPlaying(); }
 
     protected:
-        typedef std::vector<GstElement *>::iterator GstIter;
+        typedef std::vector<_GstElement *>::iterator GstIter;
 
         // this initializes pipeline only once/process
         GstBase() : pipeline_(Pipeline::Instance()) { ++refCount_; }

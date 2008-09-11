@@ -25,6 +25,7 @@
 class _GtkWidget;
 class _GdkEventExpose;
 class _GdkEventKey;
+class _GstElement;
 
 class VideoSink
     : public GstLinkableSink
@@ -37,13 +38,13 @@ class VideoSink
         void showWindow();
 
     private:
-        GstElement *sinkElement() { return sink_; }
+        _GstElement *sinkElement() { return sink_; }
         static gboolean key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                                            gpointer data);
         static gboolean expose_cb(_GtkWidget *widget, _GdkEventExpose *event, gpointer data);
         void makeWindowBlack();
 
-        GstElement *sink_;
+        _GstElement *sink_;
         _GtkWidget *window_;
         VideoSink(const VideoSink&);     //No Copy Constructor
         VideoSink& operator=(const VideoSink&);     //No Assignment Operator

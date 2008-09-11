@@ -25,19 +25,21 @@
 
 class GstLinkableSource;
 class GstLinkableSink;
+class _GstElement;
+class _GstPad;
 
 namespace GstLinkable
 {
-    typedef std::vector<GstElement *>::iterator GstIter;
+    typedef std::vector<_GstElement *>::iterator GstIter;
 
-    bool link_pads(GstPad *srcPad, GstPad *sinkPad);
-    void link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks);
-    void link(GstElement *src, GstElement *sink);
-    void link(GstLinkableSource &src, GstElement *sink);
-    void link(GstElement *src, GstLinkableSink &sink);
+    bool link_pads(_GstPad *srcPad, _GstPad *sinkPad);
+    void link(std::vector<_GstElement*> &sources, std::vector<_GstElement*> &sinks);
+    void link(_GstElement *src, _GstElement *sink);
+    void link(GstLinkableSource &src, _GstElement *sink);
+    void link(_GstElement *src, GstLinkableSink &sink);
     void link(GstLinkableSource &src, GstLinkableSink &sink);
-    void link(std::vector<GstElement*> &sources, GstLinkableSink &sink);
-    void link(GstLinkableSource &source, std::vector<GstElement*> &sinks);
+    void link(std::vector<_GstElement*> &sources, GstLinkableSink &sink);
+    void link(GstLinkableSource &source, std::vector<_GstElement*> &sinks);
 }
 
 class GstLinkableSource
@@ -45,7 +47,7 @@ class GstLinkableSource
 {
     public:
         GstLinkableSource() {} 
-        virtual GstElement *srcElement() = 0;
+        virtual _GstElement *srcElement() = 0;
     private:
         GstLinkableSource(const GstLinkableSource&);     //No Copy Constructor
         GstLinkableSource& operator=(const GstLinkableSource&);     //No Assignment Operator
@@ -57,7 +59,7 @@ class GstLinkableSink
 {
     public:
         GstLinkableSink() {}
-        virtual GstElement *sinkElement() = 0;
+        virtual _GstElement *sinkElement() = 0;
     private:
         GstLinkableSink(const GstLinkableSink&);     //No Copy Constructor
         GstLinkableSink& operator=(const GstLinkableSink&);     //No Assignment Operator

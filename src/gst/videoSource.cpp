@@ -19,6 +19,7 @@
 
 #include <string>
 #include <cassert>
+#include <gst/gst.h>
 #include "gstLinkable.h"
 #include "videoSource.h"
 #include "videoConfig.h"
@@ -108,8 +109,7 @@ void VideoFileSource::sub_init()
 }
 
 
-void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/,
-                                     void *data)
+void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/, void *data)
 {
     if (gst_pad_is_linked(srcPad))
     {

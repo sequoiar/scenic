@@ -22,6 +22,8 @@
 
 #include "gstLinkable.h"
 
+class _GstElement;
+
 class AudioSink 
     : public GstLinkableSink
 {
@@ -32,8 +34,8 @@ class AudioSink
         virtual bool init() = 0;
 
     protected:
-        GstElement *sinkElement() { return sink_; }
-        GstElement *sink_;
+        _GstElement *sinkElement() { return sink_; }
+        _GstElement *sink_;
 
     private:
         AudioSink(const AudioSink&);     //No Copy Constructor

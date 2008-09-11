@@ -124,7 +124,7 @@ bool AudioConfig::sanityCheck() const
 {
     bool validCodec = true;
     if (!codec_.empty())
-        validCodec = (codec_ == "vorbisenc") || (codec_ == "vorbisdec");
+        validCodec = (codec_ == "vorbis"); 
     if (!validCodec)
         LOG("Bad codec", ERROR);
 

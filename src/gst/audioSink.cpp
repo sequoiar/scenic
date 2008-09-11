@@ -18,6 +18,7 @@
 //
 
 #include <cassert>
+#include <gst/gst.h>
 #include "audioSink.h"
 #include "logWriter.h"
 #include "jackUtils.h"
