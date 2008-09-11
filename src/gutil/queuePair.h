@@ -26,10 +26,7 @@
 #define __QUEUE_PAIR_H__
 
 #include <glib.h>
-#include <list>
-
-typedef GAsyncQueue GAsyncQueue;
-
+#include "logWriter.h"
 
 class BaseQueuePair
 {
@@ -42,68 +39,51 @@ class BaseQueuePair
         GAsyncQueue *first_, *second_;
 
     private:
+        //No copying of class allowed
         BaseQueuePair(const BaseQueuePair& in);
-        BaseQueuePair& operator=(const BaseQueuePair&); //No Assignment Operator
+        BaseQueuePair& operator=(const BaseQueuePair&);
 };
 
-
+/// QueuePair_ < T >
+//  object of type T must be copyable
 template < class T >
 class QueuePair_
     : public BaseQueuePair
 {
     public:
         QueuePair_ < T > ()
-            : BaseQueuePair(0, 0), destroyQueues_(false)
-        {}
-
+            : BaseQueuePair(0, 0), destroyQueues_(false) {}
         ~QueuePair_ < T > ();
-
-        T timed_pop(int ms);
+        
+        ///pop element or return T() if timeout
+        T timed_pop(int microsec);
         void push(T pt);
         void flip(QueuePair_& in);
-
         void init();
 
-    protected:
-        T* pop_();
-        void push_(T* t);
-
     private:
-        QueuePair_(const QueuePair_& in);
-        QueuePair_& operator=(const QueuePair_&); //No Assignment Operator
+        T* pop_() { return (static_cast < T* > (g_async_queue_pop(first_))); }
+        void push_(T* t) { g_async_queue_push(second_, t); }
+
         T *timed_pop_(int ms);
 
         bool destroyQueues_;
 
-        static GMutex *mutex_;
+        //No copying of class allowed 
+        QueuePair_(const QueuePair_& in);
+        QueuePair_& operator=(const QueuePair_&);
 };
-
-
-template < class T >
-T* QueuePair_< T >::pop_()
-{
-    return (static_cast < T* > (g_async_queue_pop(first_)));
-}
-
-
-template < class T >
-void QueuePair_< T >::push_(T* t)
-{
-    g_async_queue_push(second_, t);
-}
 
 
 template < class T >
 void QueuePair_< T >::flip(QueuePair_< T > &in)
 {
+    if(destroyQueues_)
+        LOG_CRITICAL("QueuePair::flip called on QueuePair that owns queues i.e. init/flip mutually exclusive.");
+
     second_ = in.first_;
     first_ = in.second_;
 }
-
-
-template < class T >
-GMutex * QueuePair_ < T >::mutex_ = NULL;
-
 
 template < class T >
 T * QueuePair_ < T >::timed_pop_(int ms)
@@ -115,75 +95,63 @@ T * QueuePair_ < T >::timed_pop_(int ms)
     return (static_cast < T* > (g_async_queue_timed_pop(first_, &t)));
 }
 
-
 template < class T >
-T QueuePair_ < T >::timed_pop(int ms)
+T QueuePair_ < T >::timed_pop(int microsec)
 {
     T n;
-    T *s = timed_pop_(ms);
+    T *s = timed_pop_(microsec);
 
     if (s) {
         n = *s;
         delete s;
     }
-    else
-        n = T();
     return n;
 }
-
 
 template < class T >
 void QueuePair_ < T >::push(T pt)
 {
-    g_mutex_lock(mutex_);
     T *t = new T(pt);
 
     push_(t);
-    g_mutex_unlock(mutex_);
 }
-
 
 template < class T >
 QueuePair_ < T >::~QueuePair_()
 {
-    g_mutex_lock(mutex_);
     if (destroyQueues_)
     {
         T *t;
         do
         {
             t = static_cast<T*>(g_async_queue_try_pop(first_));
-            if(t)
-                delete t;
+            delete t;
         }
         while(t);
 
         do
         {
             t = static_cast<T*>(g_async_queue_try_pop(second_));
-            if(t)
-                delete t;
+            delete t;
         }
         while(t);
 
         g_async_queue_unref(first_);
         g_async_queue_unref(second_);
     }
-    g_mutex_unlock(mutex_);
 }
 
 
+//Called in threadBase class for true QueuePair not for a flipped copy
 template < class T >
 void QueuePair_ < T >::init()
 {
-    if (!mutex_)
-        mutex_ = g_mutex_new();
-    if (first_ == 0 && second_ == 0)
-    {
-        first_ = g_async_queue_new();
-        second_ = g_async_queue_new();
-        destroyQueues_ = true;
-    }
+    if (first_ != 0 || second_ != 0)
+        LOG_CRITICAL("CALLED QueuePair::init() on non empty QueuePair. QueuePair::flip was probably called.");
+
+    first_ = g_async_queue_new();
+    second_ = g_async_queue_new();
+    destroyQueues_ = true;
 }
 
 
