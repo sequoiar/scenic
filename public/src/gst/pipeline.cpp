@@ -223,15 +223,15 @@ void Pipeline::wait_until_stopped() const
         usleep(10000);
 }
 
-
-bool Pipeline::checkStateChange(GstStateChangeReturn ret)
+#if 0
+bool Pipeline::checkStateChange(GstStateChangeReturn *ret)
 {
-    if (ret == GST_STATE_CHANGE_NO_PREROLL)
+    if (*ret == GST_STATE_CHANGE_NO_PREROLL)
     {
         LOG("Element is live, no preroll", DEBUG);
         return true;
     }
-    else if (ret == GST_STATE_CHANGE_FAILURE) {
+    else if (*ret == GST_STATE_CHANGE_FAILURE) {
         g_print ("Failed to start pipeline!\n");
         GstBus *bus;
         bus = getBus();
@@ -252,15 +252,18 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret)
     else
         return true;
 }
+#endif
 
 
 bool Pipeline::start()
 {
-    assert(checkStateChange(gst_element_set_state(pipeline_, GST_STATE_PAUSED))); // set it to paused
+    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
+//    assert(checkStateChange(&ret)); // set it to paused
     wait_until_paused();
     LOG("Now paused", DEBUG);
 
-    assert(checkStateChange(gst_element_set_state(pipeline_, GST_STATE_PLAYING))); // set it to playing
+    ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
+ //   assert(checkStateChange(&ret)); // set it to playing
     wait_until_playing();
     LOG("Now playing", DEBUG);
     return isPlaying();
@@ -324,6 +327,24 @@ void Pipeline::remove_clock_callback(GstClockID clockId)
 {
     gst_clock_id_unschedule(clockId);
     gst_clock_id_unref(clockId);
+}
+
+
+GstBus* Pipeline::getBus() const
+{
+    return gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
+}
+
+
+GstClock* Pipeline::clock() const
+{
+    return gst_pipeline_get_clock(GST_PIPELINE(pipeline_));
+}
+
+
+GstElement *Pipeline::findElement(const char *name) const
+{
+    return gst_bin_get_by_name(GST_BIN(pipeline_), name);
 }
 
 

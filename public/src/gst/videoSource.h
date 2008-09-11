@@ -23,6 +23,8 @@
 #include "gstLinkable.h"
 
 class VideoConfig;
+class _GstElement;
+class _GstPad;
 
 class VideoSource
     : public GstLinkableSource
@@ -31,17 +33,17 @@ class VideoSource
         ~VideoSource();
         bool init();
 
-        GstElement *srcElement() { return source_; }
+        _GstElement *srcElement() { return source_; }
         virtual void sub_init() = 0;
 
-        //virtual void link_element(GstElement *sinkElement);
+        //virtual void link_element(_GstElement *sinkElement);
 
     protected:
         explicit VideoSource(const VideoConfig &config)
             : config_(config), source_(0) {}
 
         const VideoConfig &config_;
-        GstElement *source_;
+        _GstElement *source_;
         static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                       gpointer user_data);
 
@@ -79,14 +81,14 @@ class VideoFileSource
         explicit VideoFileSource(const VideoConfig &config)
             : VideoSource(config), decoder_(0) {}
         ~VideoFileSource();
-        GstElement *srcElement() { return 0; }      // FIXME: HACK
+        _GstElement *srcElement() { return 0; }      // FIXME: HACK
         void sub_init();
 
-        //void link_element(GstElement *sinkElement);
+        //void link_element(_GstElement *sinkElement);
 
     private:
-        GstElement *decoder_;
-        static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
+        _GstElement *decoder_;
+        static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, gboolean last,
                                    void *data);
 
         VideoFileSource(const VideoFileSource&);     //No Copy Constructor
@@ -102,13 +104,13 @@ class VideoDvSource
 
         ~VideoDvSource();
         
-        GstElement *srcElement() { return dvdec_; }
+        _GstElement *srcElement() { return dvdec_; }
         bool init();
         void sub_init();
-        static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data);
+        static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, void *data);
 
     private:
-        GstElement *demux_, *queue_, *dvdec_;
+        _GstElement *demux_, *queue_, *dvdec_;
         bool dvIsNew_;
         VideoDvSource(const VideoDvSource&);     //No Copy Constructor
         VideoDvSource& operator=(const VideoDvSource&);     //No Assignment Operator

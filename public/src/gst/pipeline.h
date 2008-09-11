@@ -22,20 +22,32 @@
 #define _PIPELINE_H_
 
 #include <vector>
-#include <gst/gst.h>
+#include <gst/gstclock.h>
+class _GstElement;
+class _GstBus;
+class _GstMessage;
+class _GstStateChangeReturn;
+#if 0
+class GstClock;
+class GstClockTime;
+class GstClockID;
+class GstClockCallback;
+#endif
+
+typedef void * gpointer;
 
 class Pipeline
 {
     public:
         static Pipeline & Instance();
-        void add(GstElement * element);
-        void add(std::vector< GstElement * >&elementVec);
+        void add(_GstElement * element);
+        void add(std::vector< _GstElement * >&elementVec);
 
         GstClockID add_clock_callback(GstClockCallback callback, gpointer user_data);
         void remove_clock_callback(GstClockID clockId);
 
-        void remove(GstElement ** element);
-        void remove(std::vector < GstElement * >&elementVec);
+        void remove(_GstElement ** element);
+        void remove(std::vector < _GstElement * >&elementVec);
         void reset();
         bool isPlaying() const;
         bool isPaused() const;
@@ -45,28 +57,16 @@ class Pipeline
         bool start();
         bool stop();
 
-        GstBus* getBus() const
-        {
-            return gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
-        }
+        _GstBus* getBus() const;
 
+        GstClock* clock() const;
 
-        GstClock* clock() const
-        {
-            return gst_pipeline_get_clock(GST_PIPELINE(pipeline_));
-        }
-
-
-        GstElement *findElement(const char *name)
-        {
-            return gst_bin_get_by_name(GST_BIN(pipeline_), name);
-        }
-
+        _GstElement *findElement(const char *name) const;
 
     private:
         bool init();
-        static gboolean bus_call(GstBus *bus, GstMessage *msg, gpointer data);
-        bool checkStateChange(GstStateChangeReturn ret);
+        static gboolean bus_call(_GstBus *bus, _GstMessage *msg, gpointer data);
+        //bool checkStateChange(_GstStateChangeReturn *ret);
 
         Pipeline(const Pipeline&);
         Pipeline& operator=(const Pipeline&);
@@ -77,7 +77,7 @@ class Pipeline
 
         void make_verbose();
 
-        GstElement *pipeline_;
+        _GstElement *pipeline_;
         GstClockTime startTime_;
         bool verbose_;
 };
