@@ -58,3 +58,20 @@ bool H264Decoder::init()
     return true;
 }
 
+
+bool VorbisEncoder::init()
+{
+    assert(codec_ = gst_element_factory_make("vorbisenc", NULL));
+    pipeline_.add(codec_);
+    return true;
+}
+
+
+bool VorbisDecoder::init()
+{
+    assert(codec_ = gst_element_factory_make("vorbisdec", NULL));
+    pipeline_.add(codec_);
+    return true;
+}
+
+

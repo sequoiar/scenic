@@ -31,7 +31,6 @@ class Codec : public GstLinkableFilter
         Codec()
             : codec_(0) {};
         ~Codec();
-        bool init() = 0;
 
     protected:
 
@@ -65,6 +64,22 @@ class H264Encoder : public Codec
 
 
 class H264Decoder : public Codec
+{
+    public: 
+
+        bool init();
+};
+
+
+class VorbisEncoder : public Codec
+{
+    public: 
+
+        bool init();
+};
+
+
+class VorbisDecoder : public Codec
 {
     public: 
 

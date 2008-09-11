@@ -27,6 +27,7 @@
 #include "rtpReceiver.h"
 
 class AudioSink;
+class Codec;
 
 class AudioReceiver
     : public MediaBase
@@ -59,7 +60,8 @@ class AudioReceiver
         const AudioConfig config_;
         RtpReceiver session_;
         bool gotCaps_;
-        GstElement *depayloader_, *decoder_;
+        GstElement *depayloader_;//, *decoder_;
+        Codec *decoder_;
         AudioSink *sink_;
 
         AudioReceiver(const AudioReceiver&); //No Copy Constructor

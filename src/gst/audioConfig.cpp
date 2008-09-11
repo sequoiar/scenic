@@ -26,6 +26,7 @@
 #include "audioConfig.h"
 #include "audioSource.h"
 #include "audioSink.h"
+#include "codec.h"
 #include "logWriter.h"
 #include "audioDelaySource.h"
 
@@ -69,17 +70,52 @@ AudioSource* AudioConfig::createSource() const
     }
 }
 
-
+// FIXME: should be paramaterized by sink, not src
 AudioSink* AudioConfig::createSink() const
 {
     if (source_ == "alsasrc")
         return new AudioAlsaSink();
     else if (source_ == "jackaudiosrc")
         return new AudioJackSink();
-    else {
+    else if (source_ == "dv1394src")
+        return new AudioJackSink();
+    else if (source_ == "audiotestsrc")
+        return new AudioJackSink();
+    else if (source_ == "filesrc")
+        return new AudioJackSink();
+    else if (source_.empty()) 
+        return new AudioJackSink();
+    else
+    {
         LOG(source_, ERROR);
         LOG("is an invalid sink, using default jackaudiosink", ERROR);
         return new AudioJackSink();
+    }
+}
+
+
+Codec * AudioConfig::createEncoder() const
+{
+    if (codec_ == "vorbis")
+        return new VorbisEncoder();
+    else
+    {
+        LOG(codec_, ERROR);
+        LOG("is an invalid codec!", ERROR);
+        return 0;
+    }
+}
+
+
+Codec * AudioConfig::createDecoder() const
+{
+    if (codec_ == "vorbis")
+        return new VorbisDecoder();
+    else
+    {
+        LOG(codec_, ERROR);
+        LOG("is an invalid codec!", ERROR);
+        return 0;
     }
 }
 

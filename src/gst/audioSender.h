@@ -26,6 +26,7 @@
 #include "rtpSender.h"
 
 class AudioSource;
+class Codec;
 class AudioSink;
 
 class AudioSender
@@ -56,7 +57,8 @@ class AudioSender
         RtpSender session_;
         AudioSource *source_;
 
-        GstElement *encoder_;
+        //GstElement *encoder_;
+        Codec *encoder_;
         GstElement *payloader_;
         AudioSink *sink_;
 
