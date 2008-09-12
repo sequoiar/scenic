@@ -74,7 +74,6 @@ class VideoConfig
         Encoder* createEncoder() const;
         Decoder* createDecoder() const;
 
-        bool has_h264() const { return codec_ == "h264"; }
         bool sanityCheck() const;
 
     private:

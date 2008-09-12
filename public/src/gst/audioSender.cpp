@@ -41,7 +41,6 @@ AudioSender::~AudioSender()
     assert(stop());
     delete sink_;
     delete payloader_;
-    //pipeline_.remove(&payloader_);
     delete encoder_;
     delete source_;
 }
@@ -84,8 +83,7 @@ void AudioSender::init_sink()
 void AudioSender::send_caps() const
 {
     //#ifdef USE_OSC
-    //CapsSender::send(session_.caps_str());
-
+    
     // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
     LOG("Sending caps...", DEBUG);
 
