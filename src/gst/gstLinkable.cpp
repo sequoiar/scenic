@@ -93,7 +93,6 @@ bool GstLinkable::link_pads(GstPad *srcPad, GstPad *sinkPad)
     switch(gst_pad_link(srcPad, sinkPad))
     {
         case GST_PAD_LINK_OK:
-            LOG("link succeeded", DEBUG);
             linkOk = true;
             break;
 
