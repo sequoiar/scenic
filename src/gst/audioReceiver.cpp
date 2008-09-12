@@ -90,6 +90,12 @@ void AudioReceiver::init_codec()
 
     assert(decoder_ = config_.createDecoder());
     decoder_->init();
+    
+    // TODO
+    // assert(depayloader_ = decoder_->createDepayloader());
+    // depayloader_->init();
+    // GstLinkable::link(*depayloader_, *decoder_);
+    // session_.add(depayloader_, config_);
 
     GstLinkable::link(depayloader_, *decoder_);
     session_.add(depayloader_, config_);
