@@ -21,7 +21,6 @@
 #ifndef _RTP_SENDER_H_
 #define _RTP_SENDER_H_
 
-#include <vector>
 #include <string>
 #include "rtpSession.h"
 

@@ -98,6 +98,11 @@ Encoder * AudioConfig::createEncoder() const
 {
     if (codec_ == "vorbis")
         return new VorbisEncoder();
+    else if (codec_.empty())
+    {
+        LOG("Can't make encoder without codec being specified.", ERROR);
+        return 0;
+    }
     else
     {
         LOG(codec_, ERROR);
@@ -111,6 +116,11 @@ Decoder * AudioConfig::createDecoder() const
 {
     if (codec_ == "vorbis")
         return new VorbisDecoder();
+    else if (codec_.empty())
+    {
+        LOG("Can't make decoder without codec being specified.", ERROR);
+        return 0;
+    }
     else
     {
         LOG(codec_, ERROR);

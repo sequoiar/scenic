@@ -59,7 +59,6 @@ class AudioSender
         AudioSource *source_;
 
         Encoder *encoder_;
-        //GstElement *payloader_;
         RtpPay *payloader_;
         AudioSink *sink_;
 

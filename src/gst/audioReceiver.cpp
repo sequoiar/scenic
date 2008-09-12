@@ -43,6 +43,7 @@ AudioReceiver::~AudioReceiver()
 }
 
 
+// FIXME: get rid of this!!!!
 //#ifdef USE_OSC
 void AudioReceiver::wait_for_caps()
 {
@@ -64,6 +65,7 @@ void AudioReceiver::wait_for_caps()
 //#endif
 
 
+// FIXME: get rid of this!!!!
 void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
 {
     printf("liblo server error %d in path %s: %s\n", num, path, msg);
@@ -71,6 +73,7 @@ void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
 }
 
 
+// FIXME: get rid of this!!!!
 int AudioReceiver::caps_handler(const char * /*path*/, const char * /*types*/, lo_arg ** argv,
         int /*argc*/, void * /*data*/,
         void *user_data)
@@ -109,12 +112,11 @@ bool AudioReceiver::start()
     //#ifdef USE_OSC
     wait_for_caps();
     //#endif
-    std::stringstream logstr;       // FIXME: need a better printf style 
-    //logwriter, shouldn't need stringstream
+    std::stringstream logstr;       // FIXME: need a better printf style logwriter, 
+                                    // shouldn't need stringstream
     logstr << "Receiving audio on port " << config_.port();
     LOG(logstr.str(), DEBUG); 
     MediaBase::start();
     return true;
 }
-
 
