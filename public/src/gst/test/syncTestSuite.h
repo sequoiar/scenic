@@ -37,11 +37,9 @@ class SyncTestSuite
             testLength_ = 1000;
 
 #if DV
-#if 0
             TEST_ADD(SyncTestSuite::start_8ch_comp_rtp_audiofile_dv)
             TEST_ADD(SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv)
             TEST_ADD(SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv)
-#endif
             TEST_ADD(SyncTestSuite::start_dv_audio_dv_video)
             TEST_ADD(SyncTestSuite::stop_dv_audio_dv_video)
             TEST_ADD(SyncTestSuite::start_stop_dv_audio_dv_video)

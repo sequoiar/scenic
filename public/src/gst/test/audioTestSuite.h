@@ -23,7 +23,7 @@
 #include <cpptest.h>
 #include "gstTestSuite.h"
 
-#define LOCAL 0
+#define LOCAL 1
 #define RTP 1
 
 class AudioTestSuite
@@ -51,9 +51,6 @@ class AudioTestSuite
             TEST_ADD(AudioTestSuite::start_8ch_comp_audiofile)
             TEST_ADD(AudioTestSuite::stop_8ch_comp_audiofile)
             TEST_ADD(AudioTestSuite::start_stop_8ch_comp_audiofile)
-            TEST_ADD(AudioTestSuite::start_8ch_alsa)
-            TEST_ADD(AudioTestSuite::stop_8ch_alsa)
-            TEST_ADD(AudioTestSuite::start_stop_8ch_alsa)
             TEST_ADD(AudioTestSuite::start_8ch_jack)
             TEST_ADD(AudioTestSuite::stop_8ch_jack)
             TEST_ADD(AudioTestSuite::start_stop_8ch_jack)
