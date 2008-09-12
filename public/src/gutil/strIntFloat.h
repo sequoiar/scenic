@@ -31,21 +31,25 @@
 #include <string>
 #include <map>
 
-#define MSG(key,val)                                            \
-    if(msg[key].type() == 'n')                                  \
-    {                                                           \
-        std::ostringstream err;                                 \
-        err << "key:" << key << " does not exist.";             \
-        LOG_ERROR(err.str());                                         \
-        return false;                                           \
-    }                                                           \
-    if(!msg[key].get(val))                                      \
-    {                                                           \
-        std::ostringstream err;                                 \
-        err << "value not proper type " << msg[key].type();     \
-        LOG_ERROR(err.str());                                         \
-        return false;                                           \
-    }                                                           \
+#define GET_OR_RETURN(msg,key,val_type,val)                                 \
+    val_type val;                                                           \
+    if(msg[key].type() == 'n')                                              \
+    {                                                                       \
+        std::ostringstream err;                                             \
+        err << "key:" << key << " missing.";                                \
+        LOG_ERROR(err.str());                                               \
+        return false;                                                       \
+    }                                                                       \
+    if(!msg[key].get(val))                                                  \
+    {                                                                       \
+        std::ostringstream err;                                             \
+        char t = msg[key].type();                                           \
+        err << "Expected type " << #val_type << " does not match " <<       \
+        (t == 'i'?"integer":t == 'f'?"float":"string")                      \
+        << " provided by user.";                                            \
+        LOG_ERROR(err.str());                                               \
+        return false;                                                       \
+    }                                                                       \
 
 class StrIntFloat;
 typedef std::map<std::string, StrIntFloat> MapMsg;
