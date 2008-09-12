@@ -94,7 +94,7 @@ AudioSink* AudioConfig::createSink() const
 }
 
 
-Codec * AudioConfig::createEncoder() const
+Encoder * AudioConfig::createEncoder() const
 {
     if (codec_ == "vorbis")
         return new VorbisEncoder();
@@ -107,7 +107,7 @@ Codec * AudioConfig::createEncoder() const
 }
 
 
-Codec * AudioConfig::createDecoder() const
+Decoder * AudioConfig::createDecoder() const
 {
     if (codec_ == "vorbis")
         return new VorbisDecoder();

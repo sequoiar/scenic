@@ -30,15 +30,17 @@ class RtpPay : public GstLinkableFilter
 
         RtpPay() : rtpPay_(0) {}
         ~RtpPay();
+        bool init() = 0;
+        
+        // FIXME: this is bad news
+        _GstElement *srcElement() { return rtpPay_; }
+        _GstElement *sinkElement() { return rtpPay_; }
 
     protected:
 
         _GstElement *rtpPay_;
 
     private:
-
-        _GstElement *srcElement() { return rtpPay_; }
-        _GstElement *sinkElement() { return rtpPay_; }
 
         RtpPay(const RtpPay&);     //No Copy Constructor
         RtpPay& operator=(const RtpPay&);     //No Assignment Operator

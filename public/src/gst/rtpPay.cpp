@@ -20,7 +20,14 @@
 #include <gst/gst.h>
 #include <cassert>
 #include "rtpPay.h"
+#include "pipeline.h"
 
+bool RtpPay::init()
+{
+    assert(rtpPay_);
+    pipeline_.add(rtpPay_);
+    return true;
+}
 
 RtpPay::~RtpPay()
 {
@@ -32,8 +39,7 @@ RtpPay::~RtpPay()
 bool H264Payloader::init()
 {
     assert(rtpPay_ = gst_element_factory_make("rtph264pay", NULL));
-    pipeline_.add(rtpPay_);
-
+    RtpPay::init();
     return true;
 }
 
@@ -41,7 +47,7 @@ bool H264Payloader::init()
 bool H264Depayloader::init()
 {
     assert(rtpPay_ = gst_element_factory_make("rtph264depay", NULL));
-    pipeline_.add(rtpPay_);
+    RtpPay::init();
     return true;
 }
 
@@ -49,7 +55,7 @@ bool H264Depayloader::init()
 bool VorbisPayloader::init()
 {
     assert(rtpPay_ = gst_element_factory_make("rtpvorbispay", NULL));
-    pipeline_.add(rtpPay_);
+    RtpPay::init();
     return true;
 }
 
@@ -57,7 +63,7 @@ bool VorbisPayloader::init()
 bool VorbisDepayloader::init()
 {
     assert(rtpPay_ = gst_element_factory_make("rtpvorbisdepay", NULL));
-    pipeline_.add(rtpPay_);
+    RtpPay::init();
     return true;
 }
 

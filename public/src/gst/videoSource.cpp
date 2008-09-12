@@ -22,6 +22,7 @@
 #include <gst/gst.h>
 #include "gstLinkable.h"
 #include "videoSource.h"
+#include "pipeline.h"
 #include "videoConfig.h"
 #include "logWriter.h"
 

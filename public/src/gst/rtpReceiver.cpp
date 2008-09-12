@@ -24,6 +24,8 @@
 #include <gst/gst.h>
 #include "logWriter.h"
 #include "gstLinkable.h"
+#include "pipeline.h"
+#include "rtpPay.h"
 #include "rtpReceiver.h"
 #include "mediaConfig.h"
 
@@ -114,7 +116,7 @@ GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
 }
 
 
-void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig & config)
+void RtpReceiver::addDerived(RtpPay * depayloader, const MediaConfig & config)
 {
     GstPad *recv_rtp_sink;
     GstPad *send_rtcp_src;
@@ -124,7 +126,7 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig & confi
     GstPad *rtcpSenderSink;
 
     // store copy so that destructor knows which depayloader to remove from its list
-    depayloader_ = depayloader;
+    depayloader_ = depayloader->sinkElement();
 
     assert(rtp_receiver_ = gst_element_factory_make("udpsrc", NULL));
     g_object_set(rtp_receiver_, "port", config.port(), NULL);
@@ -152,7 +154,7 @@ void RtpReceiver::addDerived(GstElement * depayloader, const MediaConfig & confi
     assert(GstLinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink));
     assert(GstLinkable::link_pads(send_rtcp_src, rtcpSenderSink));
 
-    usedDepayloaders_.push_back(depayloader);
+    usedDepayloaders_.push_back(depayloader_);
     // when pad is created, it must be linked to new sink
     g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), NULL);
 

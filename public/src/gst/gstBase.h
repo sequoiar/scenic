@@ -21,9 +21,12 @@
 #ifndef _GST_BASE_H_
 #define _GST_BASE_H_
 
-#include "pipeline.h"
+#include <vector>
 
 class _GstElement;
+class Pipeline;
+
+typedef std::vector<_GstElement *>::iterator GstIter;
 
 class GstBase
 {
@@ -32,13 +35,12 @@ class GstBase
         virtual bool stop();
         virtual bool init() = 0;
 
-        bool isPlaying() { return pipeline_.isPlaying(); }
+        bool isPlaying();
 
     protected:
-        typedef std::vector<_GstElement *>::iterator GstIter;
 
         // this initializes pipeline only once/process
-        GstBase() : pipeline_(Pipeline::Instance()) { ++refCount_; }
+        GstBase();
 
         virtual ~GstBase();
 

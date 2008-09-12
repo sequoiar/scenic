@@ -22,6 +22,8 @@
 
 #include "gstLinkable.h"
 
+#include <gst/gstclock.h>
+
 class VideoConfig;
 class _GstElement;
 class _GstPad;
@@ -36,18 +38,16 @@ class VideoSource
         _GstElement *srcElement() { return source_; }
         virtual void sub_init() = 0;
 
-        //virtual void link_element(_GstElement *sinkElement);
-
     protected:
         explicit VideoSource(const VideoConfig &config)
             : config_(config), source_(0) {}
 
         const VideoConfig &config_;
         _GstElement *source_;
-        static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id,
-                                      gpointer user_data);
+        static int base_callback(GstClock *clock, GstClockTime time, GstClockID id,
+                                      void *user_data);
 
-        virtual gboolean callback() { return FALSE; }
+        virtual int callback() { return FALSE; }
     private:
         VideoSource(const VideoSource&);     //No Copy Constructor
         VideoSource& operator=(const VideoSource&);     //No Assignment Operator
@@ -61,7 +61,7 @@ class VideoTestSource
             : VideoSource(config), clockId_(0) {}
         ~VideoTestSource();
         void sub_init();
-        gboolean callback();
+        int callback();
 
     private:
         void toggle_colour();
@@ -88,7 +88,7 @@ class VideoFileSource
 
     private:
         _GstElement *decoder_;
-        static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, gboolean last,
+        static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, int last,
                                    void *data);
 
         VideoFileSource(const VideoFileSource&);     //No Copy Constructor

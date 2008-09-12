@@ -30,8 +30,6 @@ class _GstPad;
 
 namespace GstLinkable
 {
-    typedef std::vector<_GstElement *>::iterator GstIter;
-
     bool link_pads(_GstPad *srcPad, _GstPad *sinkPad);
     void link(std::vector<_GstElement*> &sources, std::vector<_GstElement*> &sinks);
     void link(_GstElement *src, _GstElement *sink);

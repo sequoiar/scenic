@@ -31,7 +31,6 @@
 #define BLOCKING 1
 
 #if BLOCKING
-#include <gst/gst.h>
 #define BLOCK() GstTestSuite::block(__FILE__, __FUNCTION__, __LINE__)
 #else
 #define BLOCK()
@@ -61,7 +60,7 @@ class GstTestSuite
         const static int A_PORT;
         const static int V_PORT;
         const static int NUM_CHANNELS;
-        static gboolean killMainLoop(gpointer data);
+        static int killMainLoop(void *data);
 };
 
 #endif // _GST_TEST_SUITE_H_

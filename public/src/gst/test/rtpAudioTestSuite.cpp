@@ -42,8 +42,7 @@ void RtpAudioTestSuite::start_2ch_rtp_audiotest()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbis", get_host_ip(),
-                           A_PORT);
+        AudioConfig config("audiotestsrc", numChannels, "vorbis", get_host_ip(), A_PORT);
         AudioSender tx(config);
         tx.init();
 

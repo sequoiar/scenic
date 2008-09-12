@@ -23,10 +23,11 @@
 
 #include <vector>
 #include <string>
-#include <gst/gst.h>
 #include "rtpSession.h"
 
 class MediaConfig;
+class _GstElement;
+class RtpPay;
 
 class RtpSender
     : public RtpSession
@@ -40,10 +41,10 @@ class RtpSender
         ~RtpSender();
 
     protected:
-        void addDerived(GstElement * src, const MediaConfig & config);
+        void addDerived(RtpPay * src, const MediaConfig & config);
 
     private:
-        GstElement *rtp_sender_;
+        _GstElement *rtp_sender_;
         RtpSender(const RtpSender&); //No Copy Constructor
         RtpSender& operator=(const RtpSender&); //No Assignment Operator
 };

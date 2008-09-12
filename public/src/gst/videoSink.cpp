@@ -27,6 +27,7 @@
 #include "gstLinkable.h"
 #include "videoSink.h"
 #include "logWriter.h"
+#include "pipeline.h"
 
 
 gboolean VideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)

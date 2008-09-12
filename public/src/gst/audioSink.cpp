@@ -22,6 +22,7 @@
 #include "audioSink.h"
 #include "logWriter.h"
 #include "jackUtils.h"
+#include "pipeline.h"
 
 
 AudioSink::~AudioSink()

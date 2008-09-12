@@ -21,6 +21,7 @@
 #include <cassert>
 #include "codec.h"
 #include "rtpPay.h"
+#include "pipeline.h"
 
 
 Codec::~Codec()
@@ -90,11 +91,11 @@ bool VorbisDecoder::init()
 
 RtpPay* VorbisEncoder::createPayloader() const
 {
-    return new H264Payloader();
+    return new VorbisPayloader();
 }
 
 
 RtpPay* VorbisDecoder::createDepayloader() const
 {
-    return new H264Depayloader();
+    return new VorbisDepayloader();
 }

@@ -46,7 +46,22 @@ class Codec : public GstLinkableFilter
         Codec& operator=(const Codec&);     //No Assignment Operator
 };
 
-class H264Encoder : public Codec
+
+class Encoder : public Codec
+{
+    public:
+        virtual RtpPay* createPayloader() const = 0;
+};
+
+
+class Decoder : public Codec
+{
+    public:
+        virtual RtpPay* createDepayloader() const = 0;
+};
+
+
+class H264Encoder : public Encoder
 {
     public: 
 
@@ -65,7 +80,7 @@ class H264Encoder : public Codec
 };
 
 
-class H264Decoder : public Codec
+class H264Decoder : public Decoder
 {
     public: 
 
@@ -74,7 +89,7 @@ class H264Decoder : public Codec
 };
 
 
-class VorbisEncoder : public Codec
+class VorbisEncoder : public Encoder 
 {
     public: 
 
@@ -83,7 +98,7 @@ class VorbisEncoder : public Codec
 };
 
 
-class VorbisDecoder : public Codec
+class VorbisDecoder : public Decoder
 {
     public: 
 

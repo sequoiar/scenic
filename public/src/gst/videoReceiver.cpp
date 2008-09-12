@@ -20,38 +20,32 @@
 
 #include <iostream>
 #include <cassert>
-#include <gst/gst.h>
 
 #include "mediaBase.h"
 #include "gstLinkable.h"
 #include "videoReceiver.h"
 #include "videoSink.h"
 #include "codec.h"
+#include "rtpPay.h"
 #include "logWriter.h"
 
 VideoReceiver::~VideoReceiver()
 {
     assert(stop());
     delete sink_;
-    //pipeline_.remove(&decoder_);
+    delete depayloader_;
     delete decoder_;
-    pipeline_.remove(&depayloader_);
 }
 
 
 void VideoReceiver::init_codec()
 {
-    //if (config_.has_h264()) {
-    assert(depayloader_ = gst_element_factory_make("rtph264depay", NULL));
     assert(decoder_ = config_.createDecoder());
-    // TODO: assert(depayloader_ = codec_.createDepayloader());
-    // depayloader_->init();
     decoder_->init();
-    //}
+    assert(depayloader_ = decoder_->createDepayloader());
+    depayloader_->init();
 
-    pipeline_.add(depayloader_);
-    //GstLinkable::link(*depayloader_, *decoder_);
-    GstLinkable::link(depayloader_, *decoder_);
+    GstLinkable::link(*depayloader_, *decoder_);
 
     session_.add(depayloader_, config_);
     session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,"
