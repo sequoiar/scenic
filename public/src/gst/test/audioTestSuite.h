@@ -23,8 +23,6 @@
 #include <cpptest.h>
 #include "gstTestSuite.h"
 
-#define LOCAL 1
-
 class AudioTestSuite
     : public GstTestSuite
 {
@@ -94,15 +92,10 @@ class AudioTestSuite
         void stop_8ch_jack();
         void start_stop_8ch_jack();
 
-#if 0
-        void start_8ch_alsa();
-        void stop_8ch_alsa();
-        void start_stop_8ch_alsa();
-#endif
-
         void start_audio_dv();
         void stop_audio_dv();
         void start_stop_audio_dv();
 };
 
 #endif // _AUDIO_TEST_SUITE_H_
+
