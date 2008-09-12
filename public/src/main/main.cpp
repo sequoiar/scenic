@@ -1,4 +1,4 @@
-// headerGPL.c
+// Main.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -18,12 +18,7 @@
 //
 
 /** \file
- *      Just the License GPL 3+
- *
- *      Detailed description here.
- *      Continues here.
- *      And more.
- *      And more.
+ *      Main Module 
  */
 
 
@@ -41,40 +36,48 @@ class MainModule
     public:
         bool run();
 
-        MainModule(int send,int port)
-            : BaseModule(), gstThread_(0),
-            tcpThread_(port)
-    {   if(send == 1)
-            gstThread_ = new GstSenderThread();
-        else
-            gstThread_ = new GstReceiverThread();
-    }
-        ~MainModule(){ if(gstThread_){delete gstThread_;gstThread_=0;}}
+        MainModule(int send, int port);
+
+        ~MainModule(){delete gstThread_;}
     private:
         GstThread* gstThread_;
         TcpThread tcpThread_;
 
-    MainModule(MainModule&);        //No Copy Constructor
-    MainModule& operator=(const MainModule&);
+        MainModule(MainModule&);    //No Copy Constructor
+        MainModule& operator=(const MainModule&);
 };
+
+MainModule::MainModule(int send, int port)
+        : gstThread_(0), tcpThread_(port)
+{
+    if(send)
+        gstThread_ = new GstSenderThread();
+    else
+        gstThread_ = new GstReceiverThread();
+}
 
 
 int main (int argc, char** argv)
 {
-    int port,send;
-    if(argc != 3)
-        LOG_CRITICAL("0/1 for receive/send and a port"); 
+    int port, send;
+    try
+    {
+        if(argc != 3)
+            LOG_CRITICAL("Invalid command line arguments -- 0/1 for receive/send and a port");
+        if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
+            LOG_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
+        if(sscanf(argv[2], "%d", &port) != 1 || port < 0 || port > 65000)
+            LOG_CRITICAL("Invalid command line arguments -- Port must be in the range of 1-65000");
 
-    if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
-        LOG_CRITICAL("Send flag must 0 or 1");
-    
-    if(sscanf(argv[2], "%d", &port) != 1 || port < 0 || port > 65000)
-        LOG_CRITICAL("Port must be in the range of 1-65000");
-    
+        MainModule m(send, port);
 
-    MainModule m(send,port);
-    m.run();
-    return 0;
+        return m.run();
+    }
+    catch(std::string err)
+    {
+        std::cerr << "GOING DOWN " << err;
+
+    }
 }
 
 
@@ -87,31 +90,22 @@ bool MainModule::run()
         return 0;
     if(!tcpThread_.run())
         return 0;
+
     while(true)
     {
-        MapMsg tmsg = tcp_queue.timed_pop(10000);
-        MapMsg gmsg = gst_queue.timed_pop(1000);
+        MapMsg tmsg = tcp_queue.timed_pop(1000);
+        MapMsg gmsg = gst_queue.timed_pop(1);
 
         if (gmsg["command"].type() != 'n')
-        {
-            std::string tstr;
-            gmsg["command"].get(tstr);
-            LOG_DEBUG(tstr);
-            if(!tstr.compare("caps"))
-            {
-                std::string caps_str;
-                if(gmsg["caps_str"].get(caps_str))
-                {
-                    LOG_DEBUG(caps_str);
-                    tcpThread_.send(gmsg);
-                }
-            }
-        }
+            tcpThread_.send(gmsg);
+
         if (tmsg["command"].type() == 'n')
             continue;
+
         std::string command;
         if(!tmsg["command"].get(command))
             continue;
+
         if (!command.compare("quit"))
         {
             gst_queue.push(tmsg);

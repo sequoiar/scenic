@@ -34,15 +34,16 @@ GstSenderThread::~GstSenderThread()
         delete vsender_;
 }
 
+
 bool GstSenderThread::video_stop(MapMsg& /*msg*/)
 {
     if(vsender_)
         vsender_->stop();
     else
         return false;
-
     return true;
 }
+
 
 bool GstSenderThread::audio_stop(MapMsg& /*msg*/)
 {
@@ -50,7 +51,6 @@ bool GstSenderThread::audio_stop(MapMsg& /*msg*/)
         asender_->stop();
     else
         return false;
-
     return true;
 }
 
@@ -92,20 +92,19 @@ bool GstSenderThread::audio_start(MapMsg& msg)
         msg["address"].get(addr);
     else
         addr = get_host_ip();
-
-    AudioConfig config("audiotestsrc", 2, "vorbisenc", addr, A_PORT);
+    AudioConfig config("audiotestsrc", 2, "vorbis", addr, A_PORT);
     if(!config.sanityCheck())
         return false;
     asender_ = new AudioSender(config);
     if(asender_)
     {
-    asender_->init();
-    asender_->start();
-    std::string caps_str;
-    MapMsg caps;
-    caps.insert( std::make_pair("command", "caps"));
-    caps.insert( std::make_pair("caps_str", asender_->getCaps()));
-    queue_.push(caps);
+        asender_->init();
+        asender_->start();
+        std::string caps_str;
+        MapMsg caps;
+        caps.insert( std::make_pair("command", "caps"));
+        caps.insert( std::make_pair("caps_str", asender_->getCaps()));
+        queue_.push(caps);
         return true;
     }
     else

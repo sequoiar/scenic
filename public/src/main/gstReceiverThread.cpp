@@ -72,23 +72,25 @@ bool GstReceiverThread::video_start(MapMsg& /*msg*/)
 }
 
 
-bool GstReceiverThread::audio_start(MapMsg& /*msg*/)
+bool GstReceiverThread::audio_start(MapMsg& msg)
 {
     delete (areceiver_);
     areceiver_ = 0;
+    
+    std::string codec_str;
+    int port;
 
-    AudioConfig config(2, "vorbisenc", A_PORT);
+    MSG("codec",codec_str);
+    MSG("port",port);
+
+    
+    AudioConfig config(2, codec_str, port);
     if(!config.sanityCheck())
         return false;
     areceiver_ = new AudioReceiver(config);
-    if(areceiver_)
-    {
-        areceiver_->init();
-        areceiver_->start();
-        return true;
-    }
-    else
-        return false;
+    areceiver_->init();
+    areceiver_->start();
+    return true;
 }
 
 
