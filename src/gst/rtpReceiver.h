@@ -22,10 +22,12 @@
 #define _RTP_RECEIVER_H_
 
 #include <list>
-#include <gst/gst.h>
 #include "rtpSession.h"
 
 class MediaConfig;
+class _GstElement;
+class _GstPad;
+class RtpPay;
 
 class RtpReceiver
     : public RtpSession
@@ -36,15 +38,15 @@ class RtpReceiver
         void set_caps(const char* capsStr);
 
     protected:
-        void addDerived(GstElement * depayloader, const MediaConfig & config);
+        void addDerived(RtpPay * depayloader, const MediaConfig & config);
 
     private:
-        static GstPad *get_matching_sink_pad(GstPad *srcPad);
-        static void cb_new_src_pad(GstElement * element, GstPad * srcPad, void *data);
+        static _GstPad *get_matching_sink_pad(_GstPad *srcPad);
+        static void cb_new_src_pad(_GstElement * element, _GstPad * srcPad, void *data);
 
-        GstElement *rtp_receiver_;
-        GstElement *depayloader_;
-        static std::list<GstElement *> usedDepayloaders_;
+        _GstElement *rtp_receiver_;
+        _GstElement *depayloader_;
+        static std::list<_GstElement *> usedDepayloaders_;
 
         RtpReceiver(const RtpReceiver&); //No Copy Constructor
         RtpReceiver& operator=(const RtpReceiver&); //No Assignment Operator

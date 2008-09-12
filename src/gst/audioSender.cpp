@@ -22,7 +22,6 @@
 // specifies number of channels, how to compress it (if at all), and host and port info.
 
 #include <cassert>
-#include <gst/gst.h>
 
 //#define USE_OSC
 //#ifdef USE_OSC
@@ -32,15 +31,17 @@
 
 #include "audioSender.h"
 #include "audioSource.h"
+#include "pipeline.h"
 #include "codec.h"
+#include "rtpPay.h"
 #include "audioSink.h"
 
 AudioSender::~AudioSender()
 {
     assert(stop());
     delete sink_;
-    pipeline_.remove(&payloader_);
-    //pipeline_.remove(&encoder_);
+    delete payloader_;
+    //pipeline_.remove(&payloader_);
     delete encoder_;
     delete source_;
 }
@@ -56,10 +57,6 @@ void AudioSender::init_source()
 void AudioSender::init_codec()
 {
     if (config_.hasCodec()) {
-#if 0
-        assert(encoder_ = gst_element_factory_make(config_.codec(), NULL));
-        pipeline_.add(encoder_);
-#endif
         assert(encoder_ = config_.createEncoder());
         encoder_->init();
     }
@@ -69,19 +66,12 @@ void AudioSender::init_codec()
 void AudioSender::init_sink()
 {
     if (config_.isNetworked()) {     // remote version
-    // TODO
-    // assert(payloader_ = encoder_->createPayloader());
-    // payloader_->init();
-    // GstLinkable::link(*encoder_, *payloader_);
-    // session_.add(payloader_, config_);
-
-        assert(payloader_ = gst_element_factory_make("rtpvorbispay", NULL));
-        pipeline_.add(payloader_);
-
-        GstLinkable::link(*source_, *encoder_);
-        GstLinkable::link(*encoder_, payloader_);
-
-        session_.add(payloader_, config_);
+     assert(payloader_ = encoder_->createPayloader());
+     payloader_->init();
+     GstLinkable::link(*source_, *encoder_);
+     
+     GstLinkable::link(*encoder_, *payloader_);
+     session_.add(payloader_, config_);   // FIXME: session should take RtpPay pointer
     }
     else {                       // local version
         assert(sink_ = config_.createSink());

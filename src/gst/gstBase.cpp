@@ -20,8 +20,15 @@
 
 #include <cassert>
 #include "gstBase.h"
+#include "pipeline.h"
 
 int GstBase::refCount_ = 0;
+        
+// this initializes pipeline only once/process
+GstBase::GstBase() : pipeline_(Pipeline::Instance()) 
+{ 
+    ++refCount_; 
+}
 
 GstBase::~GstBase()
 {
@@ -47,3 +54,7 @@ bool GstBase::stop()
 }
 
 
+bool GstBase::isPlaying() 
+{ 
+    return pipeline_.isPlaying(); 
+}

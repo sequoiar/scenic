@@ -23,6 +23,7 @@
 
 #include <cassert>
 #include "gstBase.h"
+#include "pipeline.h"
 
 // FIXME:  requires a specialization for AudioFileSrc that deinterleaves and interleaves the signal?
 
@@ -30,7 +31,6 @@ template <typename T>
 class AudioDelaySource
     : public T
 {
-    typedef typename GstBase::GstIter GstIter;
     public:
         void sub_init();
         void link_elements();

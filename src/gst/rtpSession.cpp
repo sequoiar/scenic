@@ -23,7 +23,9 @@
 #include <sstream>
 
 #include "rtpSession.h"
+#include "rtpPay.h"
 #include "mediaConfig.h"
+#include "pipeline.h"
 
 
 GstElement *RtpSession::rtpbin_ = 0;
@@ -43,7 +45,7 @@ bool RtpSession::init()
 }
 
 
-void RtpSession::add(GstElement * elem, const MediaConfig & config)
+void RtpSession::add(RtpPay *pay, const MediaConfig & config)
 {
     RtpSession::init();
 
@@ -57,7 +59,7 @@ void RtpSession::add(GstElement * elem, const MediaConfig & config)
     pipeline_.add(rtcp_sender_);
     pipeline_.add(rtcp_receiver_);
 
-    addDerived(elem, config);
+    addDerived(pay, config);
 }
 
 

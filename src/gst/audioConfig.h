@@ -31,7 +31,8 @@
 
 class AudioSource;
 class AudioSink;
-class Codec;
+class Encoder;
+class Decoder;
 
 class AudioConfig
     : public MediaConfig
@@ -86,8 +87,8 @@ class AudioConfig
         int numChannels() const { return numChannels_; };
         AudioSource* createSource() const;
         AudioSink* createSink() const;
-        Codec* createEncoder() const;
-        Codec* createDecoder() const;
+        Encoder* createEncoder() const;
+        Decoder* createDecoder() const;
         
         bool sanityCheck() const;
 

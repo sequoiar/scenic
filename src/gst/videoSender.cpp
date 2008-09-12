@@ -18,12 +18,13 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <gst/gst.h>
 #include <cassert>
 
+#include "pipeline.h"
 #include "gstLinkable.h"
 #include "videoSender.h"
 #include "videoSource.h"
+#include "rtpPay.h"
 #include "videoSink.h"
 #include "videoConfig.h"
 #include "codec.h"
@@ -34,7 +35,7 @@ VideoSender::~VideoSender()
 {
     assert(stop());
     delete sink_;
-    pipeline_.remove(&payloader_);
+    delete payloader_;
     delete encoder_;
     delete source_;
 }
@@ -49,7 +50,6 @@ void VideoSender::init_source()
 
 void VideoSender::init_codec()
 {
-    // TODO:
     if (config_.isNetworked()) {
         assert(encoder_ = config_.createEncoder());
         encoder_->init();
@@ -61,12 +61,9 @@ void VideoSender::init_codec()
 void VideoSender::init_sink()
 {
     if (config_.isNetworked()) {
-        // TODO:
-        // assert(payloader_ = codec_.createPayloader());
-        // payloader_->init();
-        assert(payloader_ = gst_element_factory_make("rtph264pay", NULL));
-        pipeline_.add(payloader_);
-        GstLinkable::link(*encoder_, payloader_);
+        assert(payloader_ = encoder_->createPayloader());
+        payloader_->init();
+        GstLinkable::link(*encoder_, *payloader_);
         session_.add(payloader_, config_);
     }
     else {                 // local test only, no encoding

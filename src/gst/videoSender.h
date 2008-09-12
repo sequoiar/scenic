@@ -27,7 +27,8 @@
 
 class VideoSource;
 class VideoSink;
-class Codec;
+class Encoder;
+class RtpPay;
 
 class VideoSender
     : public MediaBase
@@ -49,8 +50,8 @@ class VideoSender
         const VideoConfig config_;
         RtpSender session_;
         VideoSource *source_;
-        Codec *encoder_;
-        GstElement /**colorspc_, *encoder_, */ *payloader_; 
+        Encoder *encoder_;
+        RtpPay *payloader_; 
         VideoSink *sink_;
 
         // hidden

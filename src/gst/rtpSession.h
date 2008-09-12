@@ -22,10 +22,11 @@
 #ifndef _RTP_SESSION_H_
 #define _RTP_SESSION_H_
 
-#include <gst/gst.h>
 #include "gstBase.h"
 
 class MediaConfig;
+class _GstElement;
+class RtpPay;
 
 class RtpSession
     : public GstBase
@@ -33,17 +34,17 @@ class RtpSession
     public:
         ~RtpSession();
         bool init();
-        virtual void add(GstElement * elem, const MediaConfig & config);
-        virtual void addDerived(GstElement * elem, const MediaConfig & config) = 0;
+        virtual void add(RtpPay * pay, const MediaConfig & config);
+        virtual void addDerived(RtpPay * pay, const MediaConfig & config) = 0;
         virtual void set_caps(const char *capsStr) = 0;
 
     protected:
         RtpSession() : rtcp_sender_(0), rtcp_receiver_(0) { ++refCount_; }
         static const char *padStr(const char *padName);
 
-        static GstElement *rtpbin_;
+        static _GstElement *rtpbin_;
         static int refCount_;
-        GstElement *rtcp_sender_, *rtcp_receiver_;
+        _GstElement *rtcp_sender_, *rtcp_receiver_;
 
     private:
         RtpSession(const RtpSession&); //No Copy Constructor

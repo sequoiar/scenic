@@ -24,6 +24,7 @@
 #include "audioSource.h"
 #include "audioConfig.h"
 #include "jackUtils.h"
+#include "pipeline.h"
 
 
 bool AudioSource::init()

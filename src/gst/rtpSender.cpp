@@ -21,10 +21,11 @@
 #include <gst/gst.h>
 #include <cassert>
 
+#include "pipeline.h"
 #include "gstLinkable.h"
 #include "rtpSender.h"
+#include "rtpPay.h"
 #include "mediaConfig.h"
-//#include "logWriter.h"
 
 
 RtpSender::~RtpSender()
@@ -66,7 +67,7 @@ void RtpSender::set_caps(const char *capsStr)
 }
 
 
-void RtpSender::addDerived(GstElement * newSrc, const MediaConfig & config)
+void RtpSender::addDerived(RtpPay * newSrc, const MediaConfig & config)
 {
     GstPad *send_rtp_sink;
     GstPad *send_rtp_src;
@@ -88,7 +89,7 @@ void RtpSender::addDerived(GstElement * newSrc, const MediaConfig & config)
 
     assert(recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
 
-    assert(payloadSrc = gst_element_get_static_pad(newSrc, "src"));
+    assert(payloadSrc = gst_element_get_static_pad(newSrc->srcElement(), "src"));
     assert(rtpSenderSink = gst_element_get_static_pad(rtp_sender_, "sink"));
     assert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
     assert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));

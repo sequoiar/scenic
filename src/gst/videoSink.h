@@ -39,9 +39,9 @@ class VideoSink
 
     private:
         _GstElement *sinkElement() { return sink_; }
-        static gboolean key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
-                                           gpointer data);
-        static gboolean expose_cb(_GtkWidget *widget, _GdkEventExpose *event, gpointer data);
+        static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
+                                           void *data);
+        static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
         void makeWindowBlack();
 
         _GstElement *sink_;

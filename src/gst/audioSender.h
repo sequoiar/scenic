@@ -26,7 +26,8 @@
 #include "rtpSender.h"
 
 class AudioSource;
-class Codec;
+class Encoder;
+class RtpPay;
 class AudioSink;
 
 class AudioSender
@@ -57,9 +58,9 @@ class AudioSender
         RtpSender session_;
         AudioSource *source_;
 
-        //GstElement *encoder_;
-        Codec *encoder_;
-        GstElement *payloader_;
+        Encoder *encoder_;
+        //GstElement *payloader_;
+        RtpPay *payloader_;
         AudioSink *sink_;
 
         static const char* OSC_PORT;

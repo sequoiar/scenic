@@ -21,6 +21,7 @@
 #include <cstring>      // for memset
 #include <gst/audio/multichannel.h>
 #include "interleave.h"
+#include "pipeline.h"
 #include "audioConfig.h"
 
 Interleave::~Interleave()

@@ -54,7 +54,7 @@ VideoSink * VideoConfig::createSink() const
 }
 
 
-Codec * VideoConfig::createEncoder() const
+Encoder * VideoConfig::createEncoder() const
 {
     if (codec_ == "h264")
         return new H264Encoder();
@@ -67,7 +67,7 @@ Codec * VideoConfig::createEncoder() const
 }
 
 
-Codec * VideoConfig::createDecoder() const
+Decoder * VideoConfig::createDecoder() const
 {
     if (codec_ == "h264")
         return new H264Decoder();

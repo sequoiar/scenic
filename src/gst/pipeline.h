@@ -23,18 +23,11 @@
 
 #include <vector>
 #include <gst/gstclock.h>
+#include <gst/gstelement.h>
+
 class _GstElement;
 class _GstBus;
 class _GstMessage;
-class _GstStateChangeReturn;
-#if 0
-class GstClock;
-class GstClockTime;
-class GstClockID;
-class GstClockCallback;
-#endif
-
-typedef void * gpointer;
 
 class Pipeline
 {
@@ -43,7 +36,7 @@ class Pipeline
         void add(_GstElement * element);
         void add(std::vector< _GstElement * >&elementVec);
 
-        GstClockID add_clock_callback(GstClockCallback callback, gpointer user_data);
+        GstClockID add_clock_callback(GstClockCallback callback, void *user_data);
         void remove_clock_callback(GstClockID clockId);
 
         void remove(_GstElement ** element);
@@ -65,8 +58,8 @@ class Pipeline
 
     private:
         bool init();
-        static gboolean bus_call(_GstBus *bus, _GstMessage *msg, gpointer data);
-        //bool checkStateChange(_GstStateChangeReturn *ret);
+        static gboolean bus_call(_GstBus *bus, _GstMessage *msg, void *data);
+        bool checkStateChange(GstStateChangeReturn ret) const;
 
         Pipeline(const Pipeline&);
         Pipeline& operator=(const Pipeline&);

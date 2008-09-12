@@ -25,9 +25,9 @@
 #include "videoConfig.h"
 #include "rtpReceiver.h"
 
-class Codec;
+class RtpPay;
+class Decoder;
 class VideoSink;
-class _GstElement;
 
 class VideoReceiver
     : public MediaBase
@@ -50,9 +50,9 @@ class VideoReceiver
 
         const VideoConfig config_;
         RtpReceiver session_;
-        _GstElement *depayloader_; //, *decoder_; 
+        RtpPay *depayloader_; 
         
-        Codec *decoder_;
+        Decoder *decoder_;
         VideoSink *sink_;
 
         VideoReceiver(const VideoReceiver&); //No Copy Constructor

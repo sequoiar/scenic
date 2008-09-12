@@ -20,7 +20,6 @@
 
 #include <sstream>
 #include <cassert>
-#include <gst/gst.h>
 
 //#ifdef USE_OSC
 #include "lo/lo.h"
@@ -30,6 +29,7 @@
 #include "gstLinkable.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
+#include "rtpPay.h"
 #include "codec.h"
 #include "audioSink.h"
 
@@ -39,7 +39,7 @@ AudioReceiver::~AudioReceiver()
     assert(stop());
     delete sink_;
     delete decoder_;
-    pipeline_.remove(&depayloader_);
+    delete depayloader_;
 }
 
 
@@ -85,19 +85,12 @@ int AudioReceiver::caps_handler(const char * /*path*/, const char * /*types*/, l
 
 void AudioReceiver::init_codec()
 {
-    assert(depayloader_ = gst_element_factory_make("rtpvorbisdepay", NULL));
-    pipeline_.add(depayloader_);
-
     assert(decoder_ = config_.createDecoder());
     decoder_->init();
     
-    // TODO
-    // assert(depayloader_ = decoder_->createDepayloader());
-    // depayloader_->init();
-    // GstLinkable::link(*depayloader_, *decoder_);
-    // session_.add(depayloader_, config_);
-
-    GstLinkable::link(depayloader_, *decoder_);
+    assert(depayloader_ = decoder_->createDepayloader());
+    depayloader_->init();
+    GstLinkable::link(*depayloader_, *decoder_);
     session_.add(depayloader_, config_);
 }
 

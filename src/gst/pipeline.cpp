@@ -223,15 +223,14 @@ void Pipeline::wait_until_stopped() const
         usleep(10000);
 }
 
-#if 0
-bool Pipeline::checkStateChange(GstStateChangeReturn *ret)
+bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 {
-    if (*ret == GST_STATE_CHANGE_NO_PREROLL)
+    if (ret == GST_STATE_CHANGE_NO_PREROLL)
     {
         LOG("Element is live, no preroll", DEBUG);
         return true;
     }
-    else if (*ret == GST_STATE_CHANGE_FAILURE) {
+    else if (ret == GST_STATE_CHANGE_FAILURE) {
         g_print ("Failed to start pipeline!\n");
         GstBus *bus;
         bus = getBus();
@@ -252,19 +251,20 @@ bool Pipeline::checkStateChange(GstStateChangeReturn *ret)
     else
         return true;
 }
-#endif
 
 
 bool Pipeline::start()
 {
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
-//    assert(checkStateChange(&ret)); // set it to paused
+    assert(checkStateChange(ret)); // set it to paused
     wait_until_paused();
     LOG("Now paused", DEBUG);
 
     ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
- //   assert(checkStateChange(&ret)); // set it to playing
+    assert(checkStateChange(ret)); // set it to playing
+
     wait_until_playing();
+
     LOG("Now playing", DEBUG);
     return isPlaying();
 }
