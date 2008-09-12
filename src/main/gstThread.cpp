@@ -31,36 +31,33 @@ int GstThread::main()
             std::string s;
             f["command"].get(s);
 
-            if(!s.compare("quit"))
+            if(s == "quit")
             {
                 queue_.push(f);
                 done = true;
             }
-            else if(!s.compare("audio_start"))
+            else if(s == "audio_start")
             {
                 audio_start(f);
             }
-            else if(!s.compare("audio_stop"))
+            else if(s == "audio_stop")
             {
                 audio_stop(f);
             }
-            else if(!s.compare("video_start"))
+            else if(s == "video_start")
             {
                 video_start(f);
             }
-            else if(!s.compare("video_stop"))
+            else if(s == "video_stop")
             {
                 video_stop(f);
             }
             else
                 LOG_WARNING("Unknown Command.");
-            
         }
     }
 
     return 0;
 }
-
-
 
 
