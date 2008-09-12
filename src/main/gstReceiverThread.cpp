@@ -21,10 +21,6 @@
 #include "gst/audioReceiver.h"
 #include "gst/videoReceiver.h"
 
-#define A_PORT 10010
-#define V_PORT 10110
-
-
 GstReceiverThread::~GstReceiverThread()
 {
     delete areceiver_;
@@ -52,23 +48,22 @@ bool GstReceiverThread::audio_stop(MapMsg& /*msg*/)
 }
 
 
-bool GstReceiverThread::video_start(MapMsg& /*msg*/)
+bool GstReceiverThread::video_start(MapMsg& msg)
 {
     delete (vreceiver_);
     vreceiver_ = 0;
     
-    VideoConfig config("h264", V_PORT);
+    //Get the parameter variables or return false
+    GET_OR_RETURN(msg,"codec",std::string, codec_str);
+    GET_OR_RETURN(msg,"port",int,port);
+
+    VideoConfig config(codec_str, port);
     if(!config.sanityCheck())
         return false;
     vreceiver_ = new VideoReceiver(config);
-    if(vreceiver_)
-    {
-        vreceiver_->init();
-        vreceiver_->start();
-        return true;
-    }
-    else
-        return false;
+    vreceiver_->init();
+    vreceiver_->start();
+    return true;
 }
 
 
@@ -76,15 +71,13 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
 {
     delete (areceiver_);
     areceiver_ = 0;
-    
-    std::string codec_str;
-    int port;
+   
+    //Get the parameter variables or return false
+    GET_OR_RETURN(msg,"codec",std::string,codec_str);
+    GET_OR_RETURN(msg,"port",int,port);
+    GET_OR_RETURN(msg,"channels",int,chan);
 
-    MSG("codec",codec_str);
-    MSG("port",port);
-
-    
-    AudioConfig config(2, codec_str, port);
+    AudioConfig config(chan, codec_str, port);
     if(!config.sanityCheck())
         return false;
     areceiver_ = new AudioReceiver(config);
