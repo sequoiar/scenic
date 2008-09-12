@@ -126,8 +126,7 @@ static const std::string log_(const std::string &msg, LogLevel level, const std:
 
         time( &rawtime );
         timeinfo = localtime(&rawtime);
-        logMsg << logLevelStr(level) << fileName << ":" << functionName << ":" << lineNum << ": " <<
-            msg << " " << asctime(timeinfo) << std::endl;
+        logMsg << logLevelStr(level) << msg << " --" << functionName <<  "() in " << fileName << ":" << " line " << lineNum << "-- " <<asctime(timeinfo); 
 
         // FIXME: send message to Core
     }
