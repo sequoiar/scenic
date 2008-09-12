@@ -384,7 +384,7 @@ void RtpAudioTestSuite::start_stop_audio_dv_rtp()
 int main(int argc, char **argv)
 {
     if (!GstTestSuite::areValidArgs(argc, argv)) {
-        std::cerr << "Usage: " << "audioTester <0/1>" << std::endl;
+        std::cerr << "Usage: " << "rtpAudioTester <0/1>" << std::endl;
         exit(1);
     }
 
