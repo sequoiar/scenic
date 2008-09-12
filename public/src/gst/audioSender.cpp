@@ -69,6 +69,12 @@ void AudioSender::init_codec()
 void AudioSender::init_sink()
 {
     if (config_.isNetworked()) {     // remote version
+    // TODO
+    // assert(payloader_ = encoder_->createPayloader());
+    // payloader_->init();
+    // GstLinkable::link(*encoder_, *payloader_);
+    // session_.add(payloader_, config_);
+
         assert(payloader_ = gst_element_factory_make("rtpvorbispay", NULL));
         pipeline_.add(payloader_);
 

@@ -1,4 +1,4 @@
-// codec.h
+// payloader.h
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -17,53 +17,48 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _CODEC_H_
-#define _CODEC_H_
+#ifndef _PAYLOADER_H_
+#define _PAYLOADER_H_
 
 #include "gstLinkable.h"
 
 class _GstElement;
 
-class Codec : public GstLinkableFilter
+class RtpPay : public GstLinkableFilter
 {
     public:
 
-        Codec()
-            : codec_(0) {};
-        ~Codec();
+        RtpPay() : rtpPay_(0) {};
+        ~RtpPay();
 
     protected:
 
-        _GstElement *codec_;
+        _GstElement *rtpPay_;
 
     private:
 
-        _GstElement *srcElement() { return codec_; }
-        _GstElement *sinkElement() { return codec_; }
+        _GstElement *srcElement() { return rtpPay_; }
+        _GstElement *sinkElement() { return rtpPay_; }
 
-        Codec(const Codec&);     //No Copy Constructor
-        Codec& operator=(const Codec&);     //No Assignment Operator
+        RtpPay(const RtpPay&);     //No Copy Constructor
+        RtpPay& operator=(const RtpPay&);     //No Assignment Operator
 };
 
-class H264Encoder : public Codec
+
+class H264Payloader : public RtpPay
 {
     public: 
 
-        H264Encoder() : colorspc_(0) {};
-        ~H264Encoder();
         bool init();
 
     private:
 
-        _GstElement *sinkElement() { return colorspc_; }
-        _GstElement *colorspc_;
-        
-        H264Encoder(const H264Encoder&);     //No Copy Constructor
-        H264Encoder& operator=(const H264Encoder&);     //No Assignment Operator
+        H264Payloader(const H264Payloader&);     //No Copy Constructor
+        H264Payloader& operator=(const H264Payloader&);     //No Assignment Operator
 };
 
 
-class H264Decoder : public Codec
+class H264Depayloader : public RtpPay
 {
     public: 
 
@@ -71,7 +66,7 @@ class H264Decoder : public Codec
 };
 
 
-class VorbisEncoder : public Codec
+class VorbisPayloader : public RtpPay
 {
     public: 
 
@@ -79,7 +74,7 @@ class VorbisEncoder : public Codec
 };
 
 
-class VorbisDecoder : public Codec
+class VorbisDepayloader : public RtpPay
 {
     public: 
 
@@ -87,5 +82,5 @@ class VorbisDecoder : public Codec
 };
 
 
-#endif //_CODEC_H_
+#endif //_PAYLOADER_H_
 
