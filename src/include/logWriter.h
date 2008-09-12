@@ -126,7 +126,7 @@ static const std::string log_(const std::string &msg, LogLevel level, const std:
 
         time( &rawtime );
         timeinfo = localtime(&rawtime);
-        logMsg << std::endl << logLevelStr(level) << fileName << ":" << functionName << ":" << lineNum << ": " <<
+        logMsg << logLevelStr(level) << fileName << ":" << functionName << ":" << lineNum << ": " <<
             msg << " " << asctime(timeinfo) << std::endl;
 
         // FIXME: send message to Core
@@ -138,9 +138,11 @@ static const std::string log_(const std::string &msg, LogLevel level, const std:
 static void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, const int lineNum)
 {
-    std::cerr << log_(msg,level,fileName,functionName,lineNum);
+    std::string err =  log_(msg,level,fileName,functionName,lineNum);
+
+    std::cerr << err;
     if(level == CRITICAL)
-        abort();
+        throw(err);
 
 }
 
