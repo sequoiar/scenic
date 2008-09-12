@@ -27,8 +27,25 @@
 #ifndef __STR_INT_FLOAT_H__
 #define __STR_INT_FLOAT_H__
 
+#include "logWriter.h"
 #include <string>
 #include <map>
+
+#define MSG(key,val)                                            \
+    if(msg[key].type() == 'n')                                  \
+    {                                                           \
+        std::ostringstream err;                                 \
+        err << "key:" << key << " does not exist.";             \
+        LOG_ERROR(err.str());                                         \
+        return false;                                           \
+    }                                                           \
+    if(!msg[key].get(val))                                      \
+    {                                                           \
+        std::ostringstream err;                                 \
+        err << "value not proper type " << msg[key].type();     \
+        LOG_ERROR(err.str());                                         \
+        return false;                                           \
+    }                                                           \
 
 class StrIntFloat;
 typedef std::map<std::string, StrIntFloat> MapMsg;
