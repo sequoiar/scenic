@@ -24,7 +24,6 @@
 #include "gstTestSuite.h"
 
 #define LOCAL 1
-#define RTP 1
 
 class AudioTestSuite
     : public GstTestSuite
@@ -35,7 +34,6 @@ class AudioTestSuite
             : fileLocation_("test_signal8.wav")
         {
             testLength_ = 5000;
-#if LOCAL
             TEST_ADD(AudioTestSuite::start_1ch_audiotest)
             TEST_ADD(AudioTestSuite::stop_1ch_audiotest)
             TEST_ADD(AudioTestSuite::start_stop_1ch_audiotest)
@@ -57,21 +55,6 @@ class AudioTestSuite
             TEST_ADD(AudioTestSuite::start_audio_dv)
             TEST_ADD(AudioTestSuite::stop_audio_dv)
             TEST_ADD(AudioTestSuite::start_stop_audio_dv)
-#endif                          //  LOCAL
-#if RTP
-            TEST_ADD(AudioTestSuite::start_2ch_comp_rtp_audiotest)
-            TEST_ADD(AudioTestSuite::stop_2ch_comp_rtp_audiotest)
-            TEST_ADD(AudioTestSuite::start_stop_2ch_comp_rtp_audiotest)
-            TEST_ADD(AudioTestSuite::start_8ch_comp_rtp_audiotest)
-            TEST_ADD(AudioTestSuite::stop_8ch_comp_rtp_audiotest)
-            TEST_ADD(AudioTestSuite::start_stop_8ch_comp_rtp_audiotest)
-            TEST_ADD(AudioTestSuite::start_8ch_comp_rtp_audiofile)
-            TEST_ADD(AudioTestSuite::stop_8ch_comp_rtp_audiofile)
-            TEST_ADD(AudioTestSuite::start_stop_8ch_comp_rtp_audiofile)
-            TEST_ADD(AudioTestSuite::start_audio_dv_rtp)
-            TEST_ADD(AudioTestSuite::stop_audio_dv_rtp)
-            TEST_ADD(AudioTestSuite::start_stop_audio_dv_rtp)
-#endif                          // RTP
 
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
@@ -103,38 +86,23 @@ class AudioTestSuite
         void stop_8ch_audiotest();
         void start_stop_8ch_audiotest();
 
-        void start_2ch_comp_rtp_audiotest();
-        void stop_2ch_comp_rtp_audiotest();
-        void start_stop_2ch_comp_rtp_audiotest();
-
-        void start_8ch_comp_rtp_audiotest();
-        void stop_8ch_comp_rtp_audiotest();
-        void start_stop_8ch_comp_rtp_audiotest();
-
         void start_8ch_comp_audiofile();
         void stop_8ch_comp_audiofile();
         void start_stop_8ch_comp_audiofile();
-
-        void start_8ch_comp_rtp_audiofile();
-        void stop_8ch_comp_rtp_audiofile();
-        void start_stop_8ch_comp_rtp_audiofile();
 
         void start_8ch_jack();
         void stop_8ch_jack();
         void start_stop_8ch_jack();
 
+#if 0
         void start_8ch_alsa();
         void stop_8ch_alsa();
         void start_stop_8ch_alsa();
+#endif
 
         void start_audio_dv();
         void stop_audio_dv();
         void start_stop_audio_dv();
-
-        void start_audio_dv_rtp();
-        void stop_audio_dv_rtp();
-        void start_stop_audio_dv_rtp();
 };
-
 
 #endif // _AUDIO_TEST_SUITE_H_
