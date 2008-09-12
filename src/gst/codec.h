@@ -23,6 +23,7 @@
 #include "gstLinkable.h"
 
 class _GstElement;
+class RtpPay;
 
 class Codec : public GstLinkableFilter
 {
@@ -52,6 +53,7 @@ class H264Encoder : public Codec
         H264Encoder() : colorspc_(0) {};
         ~H264Encoder();
         bool init();
+        RtpPay* createPayloader() const;
 
     private:
 
@@ -68,6 +70,7 @@ class H264Decoder : public Codec
     public: 
 
         bool init();
+        RtpPay* createDepayloader() const;
 };
 
 
@@ -76,6 +79,7 @@ class VorbisEncoder : public Codec
     public: 
 
         bool init();
+        RtpPay* createPayloader() const;
 };
 
 
@@ -84,6 +88,7 @@ class VorbisDecoder : public Codec
     public: 
 
         bool init();
+        RtpPay* createDepayloader() const;
 };
 
 

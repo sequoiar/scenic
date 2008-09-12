@@ -23,12 +23,12 @@
 #include <cpptest.h>
 #include "gstTestSuite.h"
 
-class RtpRtpAudioTestSuite
+class RtpAudioTestSuite
     : public GstTestSuite
 {
     public:
 
-        RtpRtpAudioTestSuite()
+        RtpAudioTestSuite()
             : fileLocation_("test_signal8.wav")
         {
             testLength_ = 5000;
@@ -63,8 +63,8 @@ class RtpRtpAudioTestSuite
         void stop_2ch_rtp_audiotest();
         void start_stop_2ch_rtp_audiotest();
 
-        void start_8ch__rtp_audiotest();
-        void stop_8ch__rtp_audiotest();
+        void start_8ch_rtp_audiotest();
+        void stop_8ch_rtp_audiotest();
         void start_stop_8ch_rtp_audiotest();
 
         void start_8ch_rtp_audiofile();

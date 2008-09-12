@@ -20,6 +20,7 @@
 #include <gst/gst.h>
 #include <cassert>
 #include "codec.h"
+#include "rtpPay.h"
 
 
 Codec::~Codec()
@@ -51,11 +52,23 @@ bool H264Encoder::init()
 }
 
 
+RtpPay* H264Encoder::createPayloader() const
+{
+    return new H264Payloader();
+}
+
+
 bool H264Decoder::init()
 {
     assert(codec_ = gst_element_factory_make("ffdec_h264", NULL));
     pipeline_.add(codec_);
     return true;
+}
+
+
+RtpPay* H264Decoder::createDepayloader() const
+{
+    return new H264Depayloader();
 }
 
 
@@ -75,3 +88,13 @@ bool VorbisDecoder::init()
 }
 
 
+RtpPay* VorbisEncoder::createPayloader() const
+{
+    return new H264Payloader();
+}
+
+
+RtpPay* VorbisDecoder::createDepayloader() const
+{
+    return new H264Depayloader();
+}

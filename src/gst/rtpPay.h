@@ -1,4 +1,4 @@
-// payloader.h
+// rtpPay.h
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -28,7 +28,7 @@ class RtpPay : public GstLinkableFilter
 {
     public:
 
-        RtpPay() : rtpPay_(0) {};
+        RtpPay() : rtpPay_(0) {}
         ~RtpPay();
 
     protected:
@@ -49,6 +49,7 @@ class H264Payloader : public RtpPay
 {
     public: 
 
+        H264Payloader() {}
         bool init();
 
     private:

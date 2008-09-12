@@ -1,4 +1,4 @@
-// payloader.cpp
+// rtpPay.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -19,7 +19,7 @@
 
 #include <gst/gst.h>
 #include <cassert>
-#include "payloader.h"
+#include "rtpPay.h"
 
 
 RtpPay::~RtpPay()
