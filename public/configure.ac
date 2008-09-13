@@ -116,21 +116,23 @@ AX_BOOST_PYTHON
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
-                 src/gst/Makefile
-                 src/gst/test/Makefile
-                 src/gutil/Makefile
-                 src/gutil/test/Makefile
+                 src/util/Makefile
+                 src/util/test/Makefile
                  src/tcp/Makefile
                  src/tcp/test/Makefile
-                 src/prototypes/Makefile
-                 src/prototypes/hello/Makefile
-                 src/prototypes/hello/test/Makefile
-                 src/prototypes/python/Makefile
                  src/osc/Makefile
-                 src/osc/test/Makefile
+                 src/gst/Makefile
+                 src/gst/test/Makefile
                  src/main/Makefile
                  src/sip/Makefile
                  src/sip/test/Makefile
                  ])
 AC_OUTPUT
 
+#                 src/osc/test/Makefile
+#                 src/gutil/Makefile
+#                 src/gutil/test/Makefile
+#                 src/prototypes/Makefile
+#                 src/prototypes/hello/Makefile
+#                 src/prototypes/hello/test/Makefile
+#                 src/prototypes/python/Makefile
