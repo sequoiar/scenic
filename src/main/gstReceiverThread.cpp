@@ -57,13 +57,20 @@ bool GstReceiverThread::video_start(MapMsg& msg)
     GET_OR_RETURN(msg,"codec",std::string, codec_str);
     GET_OR_RETURN(msg,"port",int,port);
 
-    VideoConfig config(codec_str, port);
-    if(!config.sanityCheck())
+    try
+    {
+        VideoConfig config(codec_str, port);
+        if(!config.sanityCheck())
+            return false;
+        vreceiver_ = new VideoReceiver(config);
+        vreceiver_->init();
+        vreceiver_->start();
+        return true;
+    }
+    catch(except e)
+    {
         return false;
-    vreceiver_ = new VideoReceiver(config);
-    vreceiver_->init();
-    vreceiver_->start();
-    return true;
+    }
 }
 
 
@@ -76,14 +83,21 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
     GET_OR_RETURN(msg,"codec",std::string,codec_str);
     GET_OR_RETURN(msg,"port",int,port);
     GET_OR_RETURN(msg,"channels",int,chan);
+    try 
+    {
+        AudioConfig config(chan, codec_str, port);
+        if(!config.sanityCheck())
+            return false;
+        areceiver_ = new AudioReceiver(config);
+        areceiver_->init();
+        areceiver_->start();
+        return true;
 
-    AudioConfig config(chan, codec_str, port);
-    if(!config.sanityCheck())
+    }
+    catch(except e)
+    {
         return false;
-    areceiver_ = new AudioReceiver(config);
-    areceiver_->init();
-    areceiver_->start();
-    return true;
+    }
 }
 
 
