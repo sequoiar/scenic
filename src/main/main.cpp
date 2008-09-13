@@ -18,7 +18,7 @@
 //
 
 /** \file
- *      Main Module 
+ *      Main Module
  */
 
 
@@ -29,6 +29,7 @@
 #include "tcp/parser.h"
 #include <sstream>
 #include "logWriter.h"
+#include "lassert.h"
 
 class MainModule
     : public BaseModule
@@ -48,7 +49,7 @@ class MainModule
 };
 
 MainModule::MainModule(int send, int port)
-        : gstThread_(0), tcpThread_(port)
+    : gstThread_(0), tcpThread_(port)
 {
     if(send)
         gstThread_ = new GstSenderThread();
@@ -62,13 +63,14 @@ int main (int argc, char** argv)
     int port, send;
     try
     {
+        assert(argc == 3);
         if(argc != 3)
             LOG_CRITICAL("Invalid command line arguments -- 0/1 for receive/send and a port");
         if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
             LOG_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
         if(sscanf(argv[2], "%d", &port) != 1 || port < 0 || port > 65000)
-            LOG_CRITICAL("Invalid command line arguments -- Port must be in the range of 1-65000");
-
+            LOG_CRITICAL(
+                "Invalid command line arguments -- Port must be in the range of 1-65000");
         MainModule m(send, port);
 
         return m.run();
@@ -76,7 +78,10 @@ int main (int argc, char** argv)
     catch(std::string err)
     {
         std::cerr << "GOING DOWN " << err;
-
+    }
+    catch(except e)
+    {
+        std::cerr << "EXCEPT";
     }
 }
 
@@ -90,7 +95,6 @@ bool MainModule::run()
         return 0;
     if(!tcpThread_.run())
         return 0;
-
     while(true)
     {
         MapMsg tmsg = tcp_queue.timed_pop(1000);
@@ -98,14 +102,11 @@ bool MainModule::run()
 
         if (gmsg["command"].type() != 'n')
             tcpThread_.send(gmsg);
-
         if (tmsg["command"].type() == 'n')
             continue;
-
         std::string command;
         if(!tmsg["command"].get(command))
             continue;
-
         if (!command.compare("quit"))
         {
             gst_queue.push(tmsg);

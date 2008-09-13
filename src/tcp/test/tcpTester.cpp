@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "tcp/tcpThread.h"
 #include "tcp/parser.h"
+#include "logWriter.h"
 
 int main(int argc, char** argv)
 {
@@ -11,7 +12,7 @@ int main(int argc, char** argv)
     int port = atoi(argv[1]);
     TcpThread tcp(port);
     TcpQueue& queue = tcp.getQueue();
-
+    LOG("helo",DEBUG);
     tcp.run();
 
     while(1)
