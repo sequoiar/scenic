@@ -30,6 +30,7 @@
 #include "logWriter.h"
 #include <string>
 #include <map>
+#include <sstream>
 
 #define GET_OR_RETURN(msg,key,val_type,val)                                 \
     val_type val;                                                           \

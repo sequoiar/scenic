@@ -28,10 +28,7 @@
 #ifndef _LOG_WRITER_H_
 #define _LOG_WRITER_H_
 
-#include <iostream>
-#include <time.h>
-#include <sstream>
-#include <stdlib.h>
+#include <string>
 #include "config.h"
 
 #define ENABLE_LOG 1
@@ -50,14 +47,28 @@ enum LogLevel {
     INFO = 20,
     WARNING = 30,
     ERROR = 40,
-    CRITICAL = 50
+    CRITICAL = 50,
+    ASSERT_FAIL = 60
 };
+
+class except
+{
+public:
+    LogLevel log_;
+    std::string log_msg_;
+
+    except(LogLevel log,std::string log_msg):log_(log),log_msg_(log_msg){}
+};
+
+
+
 
 #define LOG_ERROR(msg)      LOG(msg, ERROR)
 #define LOG_CRITICAL(msg)   LOG(msg, CRITICAL)
 #define LOG_INFO(msg)       LOG(msg, INFO)
 #define LOG_WARNING(msg)    LOG(msg, WARNING)
 #define LOG_DEBUG(msg)      LOG(msg, DEBUG)
+
 
 #ifdef CONFIG_DEBUG
 static const LogLevel LOG_LEVEL = DEBUG;
@@ -66,84 +77,21 @@ static const LogLevel LOG_LEVEL = INFO;
 #endif
 
 
-
-static bool logLevelIsValid(LogLevel level)
-{
-    switch (level)
-    {
-        case DEBUG:
-        case INFO:
-        case WARNING:
-        case ERROR:
-        case CRITICAL:
-            return true;
-            break;
-        default:
-            return false;
-            break;
-    }
-}
+bool logLevelIsValid(LogLevel level);
 
 
-static const std::string logLevelStr(LogLevel level)
-{
-    switch (level)
-    {
-        case DEBUG:
-            return "DEBUG: ";
-        case INFO:
-            return "INFO: ";
-        case WARNING:
-            return "WARNING: ";
-        case ERROR:
-            return "ERROR: ";
-        case CRITICAL:
-            return "CRITICAL: ";
-        default:
-            return "INVALID LOG LEVEL: ";
-    }
-}
+const std::string logLevelStr(LogLevel level);
 
 
 
-static bool logLevelMatch(LogLevel level)
-{
-    if (level >= LOG_LEVEL && logLevelIsValid(level))
-        return true;
-    else
-        return false;
-}
+bool logLevelMatch(LogLevel level);
 
 
-static const std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
-                const std::string &functionName, const int lineNum)
-{
-    std::ostringstream logMsg;
-    if (logLevelMatch(level))
-    {
-        time_t rawtime;
-        struct tm * timeinfo;
+const std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
+                const std::string &functionName, const int lineNum);
 
-        time( &rawtime );
-        timeinfo = localtime(&rawtime);
-        logMsg << logLevelStr(level) << msg << " --" << functionName <<  "() in " << fileName << ":" << " line " << lineNum << "-- " <<asctime(timeinfo); 
-
-        // FIXME: send message to Core
-    }
-
-    return logMsg.str();
-}
-
-static void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileName,
-                const std::string &functionName, const int lineNum)
-{
-    std::string err =  log_(msg,level,fileName,functionName,lineNum);
-
-    std::cerr << err;
-    if(level == CRITICAL)
-        throw(err);
-
-}
+void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileName,
+                const std::string &functionName, const int lineNum);
 
 #endif // !ENABLE_LOG
 
