@@ -22,7 +22,7 @@
 // specifies number of channels, how to compress it (if at all), and host and port info.
 
 #include <cassert>
-
+#include <iostream>
 //#define USE_OSC
 //#ifdef USE_OSC
 #include "lo/lo.h"

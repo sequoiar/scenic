@@ -22,7 +22,7 @@
  *      Class for audio parameter objects.
  *
  */
-
+#include <iostream>
 #include "audioConfig.h"
 #include "audioSource.h"
 #include "audioSink.h"
