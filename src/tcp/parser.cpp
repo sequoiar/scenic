@@ -19,6 +19,7 @@
 
 
 #include <sstream>
+#include <string.h>
 #include "parser.h"
 #include "logWriter.h"
 #include "gutil/strIntFloat.h"

@@ -20,7 +20,7 @@
 
 #include <cpptest.h>
 #include <iostream>
-
+#include <cstdlib>
 #include "rtpVideoTestSuite.h"
 #include "videoSender.h"
 #include "videoConfig.h"
@@ -360,7 +360,7 @@ int main(int argc, char **argv)
 {
     if (!GstTestSuite::areValidArgs(argc, argv)) {
         std::cerr << "Usage: " << "rtpVideoTester <0/1>" << std::endl;
-        exit(1);
+        return 1;
     }
     
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
