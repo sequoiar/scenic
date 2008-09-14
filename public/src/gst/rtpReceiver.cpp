@@ -21,6 +21,7 @@
 #include <cassert>
 #include <list>
 #include <algorithm>
+#include <cstring>
 #include <gst/gst.h>
 #include "logWriter.h"
 #include "gstLinkable.h"

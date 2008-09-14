@@ -1,4 +1,5 @@
-#include <stdlib.h>
+#include <cstdlib>
+#include <cstring>
 #include <glib.h>
 #include "gstTestSuite.h"
 
