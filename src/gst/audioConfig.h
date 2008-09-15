@@ -27,7 +27,6 @@
 #define _AUDIO_CONFIG_H_
 
 #include <string>
-#include <cassert>
 #include "mediaConfig.h"
 
 class AudioSource;
