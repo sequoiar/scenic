@@ -26,6 +26,7 @@ BOOST_PYTHON_MODULE( libsip_export )
     .def("errorReason", &SIPSession::getErrorReason)
     .def("getAnswerMode", &SIPSession::getAnswerMode)
     .def("setAnswerMode", &SIPSession::setAnswerMode)
+    .def("getFinalCodec", &SIPSession::getFinalCodec)
     ;
 }
 

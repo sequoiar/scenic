@@ -23,6 +23,9 @@
 #include <sstream>
 #include <iostream>
 
+using std::cout;
+using std::endl;
+
 static const pj_str_t STR_AUDIO = { (char*)"audio", 5};
 static const pj_str_t STR_VIDEO = { (char*)"video", 5};
 static const pj_str_t STR_IN = { (char*)"IN", 2 };
@@ -32,24 +35,21 @@ static const pj_str_t STR_RTP_AVP = { (char*)"RTP/AVP", 7 };
 static const pj_str_t STR_SDP_NAME = { (char*)"miville", 7 };
 static const pj_str_t STR_SENDRECV = { (char*)"sendrecv", 8 };
 
-Sdp::Sdp( std::string ip_addr )
-    : _sdpMediaList(0), _ip_addr( ip_addr ), _local_offer( NULL ), negociator(NULL)
+Sdp::Sdp(pj_pool_t *pool)
+    : _sdpMediaList(0), _ip_addr( "" ), _local_offer( NULL ), negociator(NULL), _pool(NULL)
 {
-    //setCodecsList();
+    _pool = pool;
 }
 
 
 Sdp::~Sdp(){
     unsigned int k;
 
-    delete _local_offer; _local_offer = 0;
-
     for( k=0; k<_sdpMediaList.size(); k++ ){
         delete _sdpMediaList[k];
         _sdpMediaList[k] = 0;
     }
 }
-
 
 void Sdp::setSDPMedia( std::string type, std::string codecs, int port, std::string dir ){
     sdpMedia *media;
@@ -84,13 +84,17 @@ void Sdp::setSDPMedia( std::string type, std::string codecs, int port, std::stri
         media->addCodec(tmp);
     }
 
+    // Add the last codec if it exists
+    if( strcmp(codecs.c_str(), "") != 0 )
+        media->addCodec(codecs);
+
     // Add the media in the list
     if(!retrieved)
         _sdpMediaList.push_back( media );
 }
 
 
-void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
+void Sdp::getMediaDescriptorLine( sdpMedia *media, 
                                   pjmedia_sdp_media** p_med ) {
     pjmedia_sdp_media* med;
     pjmedia_sdp_rtpmap rtpmap;
@@ -98,14 +102,14 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
     sdpCodec *codec;
     int count, i;
 
-    med = PJ_POOL_ZALLOC_T( pool, pjmedia_sdp_media );
+    med = PJ_POOL_ZALLOC_T( _pool, pjmedia_sdp_media );
 
     // Get the right media format
-    pj_strdup(pool, &med->desc.media,
+    pj_strdup(_pool, &med->desc.media,
               ( media->getMediaType() == MIME_TYPE_AUDIO ) ? &STR_AUDIO : &STR_VIDEO );
     med->desc.port_count = 1;
     med->desc.port = media->getPort();
-    pj_strdup (pool, &med->desc.transport, &STR_RTP_AVP);
+    pj_strdup (_pool, &med->desc.transport, &STR_RTP_AVP);
 
     // Media format ( RTP payload )
     count = media->getMediaCodecList().size();
@@ -114,7 +118,7 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
     // add the payload list
     for(i=0; i<count; i++){
         codec = media->getMediaCodecList()[i];
-        pj_strdup2( pool, &med->desc.fmt[i], codec->getPayloadStr().c_str());
+        pj_strdup2( _pool, &med->desc.fmt[i], codec->getPayloadStr().c_str());
 
         // Add a rtpmap field for each codec
         // We could add one only for dynamic payloads because the codecs with static RTP payloads
@@ -128,27 +132,27 @@ void Sdp::getMediaDescriptorLine( sdpMedia *media, pj_pool_t *pool,
             rtpmap.param = pj_str( (char*) codec->getChannelsStr().c_str() );
         else
             rtpmap.param.slen = 0;
-        pjmedia_sdp_rtpmap_to_attr( pool, &rtpmap, &attr );
+        pjmedia_sdp_rtpmap_to_attr( _pool, &rtpmap, &attr );
         med->attr[ med->attr_count++] = attr;
     }
 
     // Add the direction stream
-    attr = (pjmedia_sdp_attr*)pj_pool_zalloc( pool, sizeof(pjmedia_sdp_attr) );
-    pj_strdup2( pool, &attr->name, media->getStreamDirectionStr().c_str());
+    attr = (pjmedia_sdp_attr*)pj_pool_zalloc( _pool, sizeof(pjmedia_sdp_attr) );
+    pj_strdup2( _pool, &attr->name, media->getStreamDirectionStr().c_str());
     med->attr[ med->attr_count++] = attr;
 
     *p_med = med;
 }
 
 
-int Sdp::createLocalOffer( pj_pool_t *pool ){
+int Sdp::createLocalOffer(  ){
     pj_status_t status;
 
     // Reference: RFC 4566 [5]
 
     /* Create and initialize basic SDP session */
-    this->_local_offer = PJ_POOL_ZALLOC_T(pool, pjmedia_sdp_session);
-    this->_local_offer->conn = PJ_POOL_ZALLOC_T(pool, pjmedia_sdp_conn);
+    this->_local_offer = PJ_POOL_ZALLOC_T(_pool, pjmedia_sdp_session);
+    this->_local_offer->conn = PJ_POOL_ZALLOC_T(_pool, pjmedia_sdp_conn);
 
     /* Initialize the fields of the struct */
     sdp_addProtocol();
@@ -156,8 +160,8 @@ int Sdp::createLocalOffer( pj_pool_t *pool ){
     sdp_addSessionName();
     sdp_addConnectionInfo();
     sdp_addTiming();
-    //sdp_addAttributes( pool );
-    sdp_addMediaDescription( pool );
+    //sdp_addAttributes( _pool );
+    sdp_addMediaDescription( );
 
     // Validate the sdp session
     status = pjmedia_sdp_validate( this->_local_offer );
@@ -167,15 +171,15 @@ int Sdp::createLocalOffer( pj_pool_t *pool ){
 }
 
 
-int Sdp::createInitialOffer( pj_pool_t* pool ){
+int Sdp::createInitialOffer(  ){
     pj_status_t status;
     pjmedia_sdp_neg_state state;
 
     // Build the SDP session descriptor
-    createLocalOffer( pool );
+    createLocalOffer( );
 
     // Create the SDP negociator instance with local offer
-    status = pjmedia_sdp_neg_create_w_local_offer( pool, getLocalSDPSession(), &negociator);
+    status = pjmedia_sdp_neg_create_w_local_offer( _pool, getLocalSDPSession(), &negociator);
     state = pjmedia_sdp_neg_get_state( negociator );
 
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
@@ -184,7 +188,7 @@ int Sdp::createInitialOffer( pj_pool_t* pool ){
 }
 
 
-int Sdp::receivingInitialOffer( pj_pool_t* pool, pjmedia_sdp_session* remote ){
+int Sdp::receivingInitialOffer( pjmedia_sdp_session* remote ){
     // Create the SDP negociator instance by calling
     // pjmedia_sdp_neg_create_w_remote_offer with the remote offer, and by providing the local offer ( optional )
 
@@ -195,9 +199,9 @@ int Sdp::receivingInitialOffer( pj_pool_t* pool, pjmedia_sdp_session* remote ){
     // pjmedia_sdp_neg_create_w_remote_offer with the remote offer, and by providing the local offer ( optional )
 
     // Build the local offer to respond
-    createLocalOffer( pool );
+    createLocalOffer(  );
 
-    status = pjmedia_sdp_neg_create_w_remote_offer( pool,
+    status = pjmedia_sdp_neg_create_w_remote_offer( _pool,
                                                     getLocalSDPSession(), remote, &negociator );
     state = pjmedia_sdp_neg_get_state( negociator );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
@@ -248,25 +252,25 @@ void Sdp::sdp_addTiming( void ){
 }
 
 
-void Sdp::sdp_addAttributes( pj_pool_t *pool ){
+void Sdp::sdp_addAttributes( ){
     pjmedia_sdp_attr *a;
     this->_local_offer->attr_count = 1;
-    a =  PJ_POOL_ZALLOC_T(pool, pjmedia_sdp_attr);
+    a =  PJ_POOL_ZALLOC_T(_pool, pjmedia_sdp_attr);
     a->name=STR_SENDRECV;
     _local_offer->attr[0] = a;
 }
 
 
-void Sdp::sdp_addMediaDescription( pj_pool_t* pool ){
+void Sdp::sdp_addMediaDescription( ){
     pjmedia_sdp_media* med;
     int nbMedia, i;
 
-    med = PJ_POOL_ZALLOC_T(pool, pjmedia_sdp_media);
+    med = PJ_POOL_ZALLOC_T(_pool, pjmedia_sdp_media);
     nbMedia = getSDPMediaList().size();
     this->_local_offer->media_count = nbMedia;
 
     for( i=0; i<nbMedia; i++ ){
-        getMediaDescriptorLine( getSDPMediaList()[i], pool, &med );
+        getMediaDescriptorLine( getSDPMediaList()[i], &med );
         this->_local_offer->media[i] = med;
     }
 }

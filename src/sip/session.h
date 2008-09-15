@@ -82,7 +82,7 @@ class Session
 
         virtual int refuse( void ) = 0;
 
-        virtual void build_sdp() = 0;
+        virtual int getFinalCodec() = 0;
 
         virtual std::string mediaToString() = 0;
 
@@ -105,6 +105,8 @@ class Session
 
         virtual std::string getAnswerMode( void ) = 0;
 
+        int getSessionPort() { return _port; }
+        void setSessionPort(int port){ _port = port; }
     private:
         /* The communication protocol */
         int _protocol;

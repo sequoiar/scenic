@@ -22,47 +22,63 @@
 
 SIPSession::SIPSession( int port )
     : Session( PROTOCOL_SIP, port ), _app_ua(NULL) {
-    pj_status_t status;
-
+    setSessionPort(port);
     _app_ua = new UserAgent( APP_NAME, port );
+    init( );
     // Init the pjsip library modules
-    status = _app_ua->init_pjsip_modules( );
+    //status = _app_ua->init_pjsip_modules( );
 }
 
 
 SIPSession::SIPSession( SIPSession const& )
     : Session( PROTOCOL_SIP,
                DEFAULT_SIP_PORT ), _app_ua( NULL ){
+    setSessionPort( DEFAULT_SIP_PORT );
     _app_ua = new UserAgent( APP_NAME, DEFAULT_SIP_PORT );
-    // Init the pjsip library modules
-    _app_ua->init_pjsip_modules( );
+    init();
 }
 
 
-SIPSession::~SIPSession(){}
+SIPSession::~SIPSession(){
+    delete _app_ua; _app_ua = 0;
+}
+
 
 int SIPSession::connect( std::string r_uri ){
-    return _app_ua->inv_session_create( r_uri );
+    int state = _app_ua->inv_session_create( r_uri );
+    //displayConnStatus();
+    if( state == 0 && _app_ua->getConnectionState() == CONNECTION_STATE_CONNECTED )
+        return 0;
+    else
+        return state;
 }
 
 
 int SIPSession::disconnect( void ){
-    return _app_ua->inv_session_end();
+    int state = _app_ua->inv_session_end();
+    //displayConnStatus();
+    return state;
 }
 
 
 int SIPSession::shutdown( void ){
-    return _app_ua->pjsip_shutdown();
+    int state = _app_ua->pjsip_shutdown();
+    //displayConnStatus();
+    return state;
 }
 
 
 int SIPSession::init( void ) {
-    return _app_ua->init_pjsip_modules();
+    int state = _app_ua->init_pjsip_modules();
+    //displayConnStatus();
+    return state;
 }
 
 
 int SIPSession::reinvite( void ){
-    return _app_ua->inv_session_reinvite();
+    int state = _app_ua->inv_session_reinvite();
+    //displayConnStatus();
+    return state;
 }
 
 
@@ -81,7 +97,10 @@ int SIPSession::refuse( void ){
 }
 
 
-void SIPSession::build_sdp( void ){}
+int SIPSession::getFinalCodec( void ){
+    return _app_ua->getFinalCodec();
+}
+
 
 void SIPSession::setMedia( std::string type, std::string codecs, int port, std::string dir ){
     _app_ua->setSessionMedia( type, codecs, port, dir );
@@ -115,6 +134,12 @@ void SIPSession::setAnswerMode( int mode ){
 
 std::string SIPSession::getAnswerMode( void ){
     return _app_ua->getAnswerMode();
+}
+
+
+void SIPSession::displayConnStatus( void ){
+    std::cout << "Connection State : " << getConnectionState() << std::endl;
+    std::cout << "Error reason : " << getErrorReason() << std::endl;
 }
 
 

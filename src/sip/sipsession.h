@@ -76,7 +76,7 @@ class SIPSession
 
         int refuse( void );
 
-        void build_sdp( void );
+        int getFinalCodec( void );
 
         std::string mediaToString( void );
 
@@ -106,6 +106,8 @@ class SIPSession
 
         /* The application SIP User Agent */
         UserAgent* _app_ua;
+
+        void displayConnStatus( void );
 };
 
 #endif // _SIP_SESSION_H

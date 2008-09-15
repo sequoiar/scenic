@@ -32,8 +32,8 @@ using std::endl;
 
 #define PY_CALLBACK_MODULE    "pyCallbacks"
 
-#define CORE_NOTIFICATION   1
-
+#define CORE_NOTIFICATION   0
+    
 /**************** STATIC VARIABLES AND FUNCTIONS (callbacks) **************************/
 
 /*
@@ -135,22 +135,22 @@ void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer );
 /*
  *	The SIP endpoint
  */
-static pjsip_endpoint *endpt;
+pjsip_endpoint *endpt;
 
 /*
  *  The global pool factory
  */
-static pj_caching_pool c_pool;
+pj_caching_pool c_pool;
 
 /*
  * The pool to allocate memory
  */
-static pj_pool_t *app_pool;
+pj_pool_t *app_pool;
 
 /*
  *	The SIP module
  */
-static pjsip_module mod_ua;
+pjsip_module mod_ua;
 
 /*
  *  The invite session
@@ -193,39 +193,33 @@ static const char *errorReason[] =
 /*
  * A bool to indicate whether or not the main thread is running
  */
-static pj_bool_t thread_quit = 0;
+pj_bool_t thread_quit = 0;
 
 /*
  * The main thread
  */
-static pj_thread_t *sipThread;
+pj_thread_t *sipThread;
 
 /*
  *  The local Session Description Protocol body
  */
-static Sdp *local_sdp;
+Sdp *_local_sdp;
 
 /*
  * The instant messaging module
  */
-static InstantMessaging *_imModule;
+InstantMessaging *_imModule;
 
 /*
  * Should auto answer on a new invite request or wait for the user accept
  */
-static answerMode _answerMode;
+answerMode _answerMode;
 
-static PyThreadState* mainThreadState;
+PyThreadState* mainThreadState;
 
-void py_connection_made( void );
-void py_connection_end( void );
-void py_connection_failed( std::string reason );
-void py_connection_incoming( void );
-void py_connection_message( std::string msg );
-void py_connection_media_choice( std::string codec );
+static int _finalCodec;
 
 /*************************************************************************************************/
-
 
 UserAgent::UserAgent( std::string name, int port )
     : _name(name), _localURI(0)
@@ -247,14 +241,15 @@ UserAgent::UserAgent( std::string name, int port )
     // To generate a different random number at each time
     // Useful for the random port selection if the default one is used
     srand(time(NULL));
+
 }
 
 
 UserAgent::~UserAgent(){
     // Return some memory to the heap
-    delete local_sdp; local_sdp = 0;
+    delete _local_sdp; _local_sdp = 0;
     delete _imModule; _imModule = 0;
-
+    
     // Shutdown the pjsip library
     pjsip_shutdown();
 }
@@ -279,22 +274,26 @@ void UserAgent::python_shutdown(){
     PyThreadState * myThreadState = PyThreadState_New(mainInterpreterState);
     PyThreadState_Swap(myThreadState);
     PyEval_AcquireLock();
-    Py_Finalize();
+    //Py_Finalize();
 }
 
 
 int UserAgent::pjsip_shutdown(){
+
     if( _state == CONNECTION_STATE_NULL ) {
         _error = ERROR_SHUTDOWN_ALREADY_DONE;
         return 0;
     }
     if( _state == CONNECTION_STATE_CONNECTED )
         inv_session_end();
+
     // Delete SIP thread
-    thread_quit = 1;
+    thread_quit = 1;  // to stop the loop
     pj_thread_join( sipThread );
     pj_thread_destroy( sipThread );
     sipThread = NULL;
+
+    PJ_ASSERT_RETURN(mod_ua.id != -1, PJ_EINVALIDOP);
 
     // Delete SIP endpoint
     if(endpt) {
@@ -309,6 +308,7 @@ int UserAgent::pjsip_shutdown(){
     }
     pj_shutdown();
     //python_shutdown();
+
     _state = CONNECTION_STATE_NULL;
     _error = NO_ERROR;
 
@@ -323,6 +323,10 @@ connectionState UserAgent::getConnectionState( void ){
 
 errorCode UserAgent::getErrorCode( void ){
     return _error;
+}
+
+int UserAgent::getFinalCodec( void ){
+    return _finalCodec;
 }
 
 
@@ -489,11 +493,15 @@ int UserAgent::init_pjsip_modules(  ){
     status = pjsip_endpt_register_module( endpt, &mod_ua );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-    /* Initialize the SDP class instance */
-    local_sdp = new Sdp( my_uri->_hostIP );
-
-    /* Start working threads */
     app_pool = pj_pool_create( &c_pool.factory, "pool", 4000, 4000, NULL );
+    /* Initialize the SDP class instance */
+    _local_sdp = new Sdp(app_pool);
+    _local_sdp -> setIPAddress(my_uri->_hostIP);
+
+    // Start working threads
+    // Thread_quit must be equal to 0 so that this thread could listen to sip events
+    // It is obvious if you look at the thread entry point startThread 
+    thread_quit = 0;
     pj_thread_create( app_pool, "app", &startThread, NULL, PJ_THREAD_DEFAULT_STACK_SIZE, 0,
                       &sipThread );
 
@@ -545,10 +553,10 @@ int UserAgent::inv_session_create( std::string uri ){
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         // Building the local SDP offer
-        local_sdp->createInitialOffer( dialog->pool );
+        _local_sdp->createInitialOffer();
 
         status = pjsip_inv_create_uac( dialog,
-                                       local_sdp->getLocalSDPSession(), 0, &inv_session );
+                                       _local_sdp->getLocalSDPSession(), 0, &inv_session );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         status = pjsip_inv_invite( inv_session, &tdata );
@@ -559,7 +567,11 @@ int UserAgent::inv_session_create( std::string uri ){
 
         // Update the connection status. The invite session has been created and sent.
         _state = CONNECTION_STATE_CONNECTING;
-        return PJ_SUCCESS;
+
+        // In synchronous words
+        wait_for_response( _state );
+
+        return getErrorCode();
     }
     else {
         _error = ERROR_CONNECTION_NOT_READY;
@@ -567,19 +579,33 @@ int UserAgent::inv_session_create( std::string uri ){
     }
 }
 
+void UserAgent::wait_for_response( connectionState state ) {
+
+    // Loop until the connection state has been updated
+    while( getConnectionState() == state ){
+        // nothing
+    }
+}
+
 
 int UserAgent::inv_session_end( void ){
+    
     pj_status_t status;
     pjsip_tx_data *tdata;
+    connectionState state;
 
-    if( _state == CONNECTION_STATE_CONNECTED ){
+    state = getConnectionState();
+    if( state == CONNECTION_STATE_CONNECTED ){
         status = pjsip_inv_end_session( inv_session, 404, NULL, &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-        return PJ_SUCCESS;
+        wait_for_response( state );
+
+        return getErrorCode();
+        //return PJ_SUCCESS;
     }
     else {
         _error = ERROR_NOT_CONNECTED;
@@ -593,11 +619,11 @@ int UserAgent::inv_session_reinvite( void ){
     pjsip_tx_data *tdata;
 
     if( _state == CONNECTION_STATE_CONNECTED ) {
-        status = local_sdp->createInitialOffer( inv_session->dlg->pool );
+        status = _local_sdp->createInitialOffer( );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         status = pjsip_inv_reinvite( inv_session, NULL,
-                                     local_sdp->getLocalSDPSession(), &tdata );
+                                     _local_sdp->getLocalSDPSession(), &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         status = pjsip_inv_send_msg( inv_session, tdata );
@@ -612,37 +638,16 @@ int UserAgent::inv_session_reinvite( void ){
     }
 }
 
-
 int UserAgent::inv_session_accept( void ) {
     return inv_session_answer();
 }
-
-
-static void getLock( PyThreadState** myThreadState ){
-    // Get the global lock
-    PyEval_AcquireLock();
-
-    // Create a thread state object for this thread
-    *myThreadState = PyThreadState_New( mainThreadState->interp);
-    PyThreadState_Swap(*myThreadState);
-}
-
-
-static void releaseLock(PyThreadState* myThreadState){
-    // Swap my thread state out of the interpreter
-    PyThreadState_Swap(NULL);
-    PyThreadState_Clear(myThreadState);
-    PyThreadState_Delete(myThreadState);
-    PyEval_ReleaseLock();
-}
-
 
 static int inv_session_answer(){
     pj_status_t status;
     pjsip_tx_data *tdata;
 
     // Check if the SDP negociation has been succesfully done
-    status = local_sdp->startNegociation( app_pool );
+    status = _local_sdp->startNegociation( );
 
     if( status == PJ_SUCCESS ){
         // Create and send a 200(OK) response
@@ -709,17 +714,18 @@ int UserAgent::sendInstantMessage( std::string msg ){
 
 void UserAgent::setSessionMedia( std::string type, std::string codecs, int port,
                                  std::string dir ){
-    local_sdp->setSDPMedia( type, codecs, port, dir );
+    _local_sdp->setSDPMedia( type, codecs, port, dir );
 }
 
 
 std::string UserAgent::mediaToString( void ){
-    return local_sdp->mediaToString();
+    return _local_sdp->mediaToString();
 }
 
 
 static int startThread( void *arg ){
     PJ_UNUSED_ARG(arg);
+
     while( !thread_quit )
     {
         pj_time_val timeout = {0, 10};
@@ -772,156 +778,12 @@ static void pjsipLogWriter( int level, const char *data, int len ){
 }
 
 
-void py_connection_made( void ){
-    std::ostringstream inst;
-    PyThreadState* myThreadState;
-
-    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
-    try {
-        getLock(&myThreadState);
-        cout << "C++ wrote: connection made" << endl;
-        PyRun_SimpleString(inst.str().c_str());
-        PyRun_SimpleString("sip.connection_made_cb()\n");
-        releaseLock(myThreadState);
-    }
-    catch(boost::python::error_already_set const &)
-    {
-        PyErr_Print();
-    }
-}
-
-
-void py_connection_end( void ){
-    std::ostringstream inst;
-    PyThreadState* myThreadState;
-
-    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
-    try {
-        getLock(&myThreadState);
-        cout << "C++ wrote: connection end" << endl;
-        PyRun_SimpleString(inst.str().c_str());
-        PyRun_SimpleString("sip.connection_end_cb()\n");
-        releaseLock(myThreadState);
-    }
-    catch(boost::python::error_already_set const &)
-    {
-        PyErr_Print();
-    }
-}
-
-
-void py_connection_incoming( void ){
-    std::ostringstream inst;
-    PyThreadState* myThreadState;
-
-    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
-    try {
-        getLock(&myThreadState);
-        cout << "C++ wrote: connection incoming" << endl;
-        PyRun_SimpleString(inst.str().c_str());
-        PyRun_SimpleString("sip.connection_incoming_cb()\n");
-        releaseLock(myThreadState);
-    }
-    catch(boost::python::error_already_set const &)
-    {
-        PyErr_Print();
-    }
-}
-
-
-void py_connection_message( std::string msg ){
-    std::ostringstream inst;
-    PyThreadState* myThreadState;
-
-    PJ_UNUSED_ARG(msg);
-
-    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
-    try {
-        getLock(&myThreadState);
-        cout << "C++ wrote: message waiting" << endl;
-        PyRun_SimpleString(inst.str().c_str());
-        PyObject *pyMsg = PyString_FromString(msg.c_str());
-        if(pyMsg){
-            PyObject *rep = PyObject_Repr(pyMsg);
-            if(rep){
-                inst << "sip.connection_message_cb(" << PyString_AsString(rep) << ")\n" <<
-                endl;
-                Py_DECREF(rep);
-            }
-            Py_DECREF(pyMsg);
-        }
-        PyRun_SimpleString(inst.str().c_str());
-        releaseLock(myThreadState);
-    }
-    catch(boost::python::error_already_set const &)
-    {
-        PyErr_Print();
-    }
-}
-
-
-void py_connection_failed( std::string reason ){
-    std::ostringstream inst;
-    PyThreadState* myThreadState;
-
-    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
-    try {
-        getLock(&myThreadState);
-        cout << "C++ wrote: connection failed" << endl;
-        PyObject *pyMsg = PyString_FromString(reason.c_str());
-        if(pyMsg){
-            PyObject *rep = PyObject_Repr(pyMsg);
-            if(rep){
-                inst << "sip.connection_failed_cb(" << PyString_AsString(rep) << ")\n" <<
-                endl;
-                Py_DECREF(rep);
-            }
-            Py_DECREF(pyMsg);
-        }
-        PyRun_SimpleString(inst.str().c_str());
-        releaseLock(myThreadState);
-    }
-    catch(boost::python::error_already_set const &)
-    {
-        PyErr_Print();
-    }
-}
-
-
-void py_connection_media_choice( std::string codec ){
-    std::ostringstream inst;
-    PyThreadState* myThreadState;
-
-    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
-    try {
-        getLock(&myThreadState);
-        cout << "C++ wrote: media choice done" << endl;
-        PyObject *pyMsg = PyString_FromString(codec.c_str());
-        if(pyMsg){
-            PyObject *rep = PyObject_Repr(pyMsg);
-            if(rep){
-                inst << "sip.connection_media_choice_cb(" << PyString_AsString(rep) <<
-                ")\n" <<
-                endl;
-                Py_DECREF(rep);
-            }
-            Py_DECREF(pyMsg);
-        }
-        PyRun_SimpleString(inst.str().c_str());
-        releaseLock(myThreadState);
-    }
-    catch(boost::python::error_already_set const &)
-    {
-        PyErr_Print();
-    }
-}
-
-
 /********************** Callbacks Implementation **********************************/
 
 void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
     // To avoid unused arguments compilation warnings
     PJ_UNUSED_ARG(e);
+
 
     // The call is terminated
     if( inv->state == PJSIP_INV_STATE_DISCONNECTED ){
@@ -931,20 +793,14 @@ void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
                 // The host was probably unreachable: bad address, bad port, ...
                 _state = CONNECTION_STATE_TIMEOUT;
                 _error = ERROR_HOST_UNREACHABLE;
-                if( CORE_NOTIFICATION == 1 )
-                    py_connection_failed( errorReason[_error] );
                 break;
             case PJSIP_SC_NOT_ACCEPTABLE_HERE:
                 _state = CONNECTION_STATE_NOT_ACCEPTABLE;
                 _error = ERROR_NO_COMPATIBLE_MEDIA;
-                if( CORE_NOTIFICATION == 1 )
-                    py_connection_failed( errorReason[_error] );
                 break;
             default:
                 _state = CONNECTION_STATE_DISCONNECTED;
                 _error = NO_ERROR;
-                if( CORE_NOTIFICATION == 1 )
-                    py_connection_end( );
                 break;
         }
     }
@@ -953,16 +809,11 @@ void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
         // The connection is established
         _state = CONNECTION_STATE_CONNECTED;
         _error = NO_ERROR;
-        // Notify the core
-        if( CORE_NOTIFICATION == 1 )
-            py_connection_made();
     }
 
     else if( inv->state == PJSIP_INV_STATE_INCOMING ){
         // Incoming invite session
         _state = CONNECTION_STATE_INCOMING;
-        if( CORE_NOTIFICATION == 1 )
-            py_connection_incoming();
     }
 
     else{
@@ -1004,7 +855,7 @@ pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     // Have to do some stuff here with the SDP
     // We retrieve the remote sdp offer in the rdata struct to begin the negociation
     getRemoteSDPFromOffer( rdata, &r_sdp );
-    local_sdp->receivingInitialOffer( rdata->tp_info.pool, r_sdp );
+    _local_sdp->receivingInitialOffer( r_sdp );
 
     // Create the local dialog (UAS)
     status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL, &dialog );
@@ -1016,7 +867,7 @@ pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     }
     // Specify media capability during invite session creation
     status = pjsip_inv_create_uas( dialog, rdata,
-                                   local_sdp->getLocalSDPSession(), 0, &inv_session );
+                                   _local_sdp->getLocalSDPSession(), 0, &inv_session );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     // Send a 180/Ringing response
@@ -1040,6 +891,7 @@ pj_bool_t on_rx_response( pjsip_rx_data *rdata ){
     /* Respond statelessly any non-INVITE requests with 500 */
     //if( rdata->msg_info.msg->line.req.method.id != PJSIP_INVITE_METHOD ) {
     PJ_UNUSED_ARG( rdata );
+
     return PJ_SUCCESS;
 }
 
@@ -1068,9 +920,6 @@ void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
         status = pjsip_dlg_respond( inv->dlg, rdata, PJSIP_SC_OK, NULL, NULL, NULL );
         text = (char*)msg->body->data;
 
-        // Notify the core of an incoming message
-        if(CORE_NOTIFICATION == 1)
-            py_connection_message( text );
         // Display the message
         _imModule->setResponse( text );
         _imModule->displayResponse();
@@ -1090,6 +939,7 @@ void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     PJ_UNUSED_ARG( inv );
     PJ_UNUSED_ARG( status );
 
+
     int nbMedia;
     int nbCodecs;
     std::string codec;
@@ -1101,7 +951,7 @@ void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
         return;
     // Get local and remote SDP
     pjmedia_sdp_neg_get_active_local( inv->neg, &r_sdp );
-
+    
     // Retrieve the media
     nbMedia = r_sdp->media_count;
     for( i=0; i<nbMedia ; i++ ){
@@ -1109,14 +959,11 @@ void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
         media = r_sdp->media[i];
         // Retrieve the payload
         nbCodecs = media->desc.fmt_count;  // Must be one
-        printf("Codec count: %i\n", nbCodecs);
         for( j=0 ; j<nbCodecs ; j++ ){
-            codec = media->desc.fmt[j].ptr;
-            if( CORE_NOTIFICATION == 1 )
-                py_connection_media_choice(codec);
+            _finalCodec = atoi(media->desc.fmt[j].ptr);
+            
         }
         // TODO Retrieve the rtpmap attribute to get the encoding name
-
     }
 }
 
@@ -1126,8 +973,8 @@ void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
     //pjmedia_sdp_session *sdp;
     pj_status_t status;
 
-    local_sdp->receivingInitialOffer(app_pool, (pjmedia_sdp_session*)offer);
-    status = pjsip_inv_set_sdp_answer( inv_session, local_sdp->getLocalSDPSession() );
+    _local_sdp->receivingInitialOffer( (pjmedia_sdp_session*)offer);
+    status = pjsip_inv_set_sdp_answer( inv_session, _local_sdp->getLocalSDPSession() );
     //PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 }
 

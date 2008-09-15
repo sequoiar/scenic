@@ -44,7 +44,7 @@ class Sdp
          *
          * @param ip_addr
          */
-        Sdp( std::string ip_addr );
+        Sdp(pj_pool_t *pool );
 
         /* Class destructor */
         ~Sdp();
@@ -63,12 +63,15 @@ class Sdp
          */
         pjmedia_sdp_session* getLocalSDPSession( void ) { return _local_offer; }
 
+        void setIPAddress( std::string ip_addr ) { _ip_addr = ip_addr; }
+        std::string getIPAddress( void ) { return _ip_addr; }
+
         /*
          * Build the local SDP offer
          *
          * @param pool  The pool to allocate memory
          */
-        int createLocalOffer( pj_pool_t *pool );
+        int createLocalOffer( );
 
         /*
          * Build the sdp media section
@@ -78,8 +81,7 @@ class Sdp
          * @param pool  The pool to allocate memory
          * @param med   The structure to receive the media section
          */
-        void getMediaDescriptorLine( sdpMedia* media, pj_pool_t* pool,
-                                     pjmedia_sdp_media** p_med );
+        void getMediaDescriptorLine( sdpMedia* media, pjmedia_sdp_media** p_med );
 
         /*
          * On building an invite outside a dialog, build the local offer and create the
@@ -87,7 +89,7 @@ class Sdp
          *
          * @param pool  The pool to allocate memory
          */
-        int createInitialOffer( pj_pool_t* pool );
+        int createInitialOffer( );
 
         /*
          * On receiving an invite outside a dialog, build the local offer and create the
@@ -97,7 +99,7 @@ class Sdp
          * @param remote    The remote offer
          */
 
-        int receivingInitialOffer( pj_pool_t* pool, pjmedia_sdp_session* remote );
+        int receivingInitialOffer( pjmedia_sdp_session* remote );
 
         /*
          * Parse a list of formatted encoding codecs name and add it to the session media
@@ -107,9 +109,9 @@ class Sdp
          */
         void setSDPMedia( std::string type, std::string codecs, int port, std::string dir );
 
-        pj_status_t startNegociation( pj_pool_t *pool ){
+        pj_status_t startNegociation(  ){
             return pjmedia_sdp_neg_negotiate(
-                       pool, negociator, 0);
+                       _pool, negociator, 0);
         }
 
 
@@ -128,6 +130,8 @@ class Sdp
 
         /* The sdp negociator instance */
         pjmedia_sdp_neg *negociator;
+
+        pj_pool_t *_pool;
 
         Sdp(const Sdp&); //No Copy Constructor
         Sdp& operator=(const Sdp&); //No Assignment Operator
@@ -200,12 +204,12 @@ class Sdp
         /*
          * Optional field: Attributes ("a=")
          */
-        void sdp_addAttributes( pj_pool_t *pool );
+        void sdp_addAttributes( );
 
         /*
          * Mandatory field: Media descriptions ("m=")
          */
-        void sdp_addMediaDescription( pj_pool_t *pool );
+        void sdp_addMediaDescription(  );
 };
 
 #endif // _SDP_H
