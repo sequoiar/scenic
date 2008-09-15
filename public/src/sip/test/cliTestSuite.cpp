@@ -114,8 +114,8 @@ int main(int argc, char** argv){
                 cout << "Actual mode: " << sip->getAnswerMode() << endl;
                 cout << "auto (0) or manual (1): ";
                 cin >> msg;
-                cout << "Actual mode: " << sip->getAnswerMode() << endl;
                 sip->setAnswerMode( atoi(msg.c_str()) );
+                cout << "Actual mode: " << sip->getAnswerMode() << endl;
                 break;
             case 'h':
                 cout << MENU << endl;
@@ -127,6 +127,7 @@ int main(int argc, char** argv){
                 sip->init();
                 msg = sip->getErrorReason();
                 cout << msg << endl;
+                sip->setMedia("audio", "vorbis/PCMA/", 12345);
                 break;
             case 'q':
                 sip->shutdown();

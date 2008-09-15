@@ -23,7 +23,7 @@
 #define THIS_FILE       "useragent"
 #define _LOCAL_IP_ADDRESS   "127.0.0.1"
 #define DEFAULT_SIP_PORT   5060
-#define PJ_LOG_LEVEL        2
+#define PJ_LOG_LEVEL        1
 
 /* @file	useragent.h
  * @brief	A SIP useragent. Implements the SIP stacks from the transaction layer to the transport layer as described in
@@ -217,9 +217,7 @@ class UserAgent
 
         void python_shutdown();
 
-        static void getLock( PyThreadState** myThreadState );
-
-        static void releaseLock(PyThreadState* myThreadState);
+        int getFinalCodec( void );
 
     private:
         /*
@@ -238,6 +236,9 @@ class UserAgent
         void init_sip_module( void );
 
         void connection_prepare( void );
+
+        void wait_for_response( connectionState state );
+
 
         UserAgent(const UserAgent&); //No Copy Constructor
         UserAgent& operator=(const UserAgent&); //No Assignment Operator
