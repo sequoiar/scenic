@@ -27,6 +27,7 @@
 #define _AUDIO_CONFIG_H_
 
 #include <string>
+#include <cassert>
 #include "mediaConfig.h"
 
 class AudioSource;
@@ -75,8 +76,8 @@ class AudioConfig
 
         // receiver
         AudioConfig(int numChannels__, const std::string &codec__, int port__)
-            : MediaConfig(codec__, port__), numChannels_(numChannels__)
-        {}
+            : MediaConfig(codec__.empty()?"none":codec__, (port__?port__:-1)), numChannels_(numChannels__)
+        {assert(numChannels_);}
 
         // copy constructor
         AudioConfig(const AudioConfig& m)
