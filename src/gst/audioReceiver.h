@@ -21,6 +21,7 @@
 #ifndef _AUDIO_RECEIVER_H_
 #define _AUDIO_RECEIVER_H_
 
+#include <cassert>
 #include "lo/lo.h"
 #include "mediaBase.h"
 #include "audioConfig.h"
@@ -37,7 +38,7 @@ class AudioReceiver
         explicit AudioReceiver(const AudioConfig config)
             : config_(config), session_(), gotCaps_(false), 
             depayloader_(0), decoder_(0), sink_(0)
-        {}
+        {assert(config_.hasCodec());}
 
         ~AudioReceiver();
 
