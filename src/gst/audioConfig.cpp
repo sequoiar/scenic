@@ -136,9 +136,10 @@ bool AudioConfig::sanityCheck() const
     if (!codec_.empty())
         validCodec = (codec_ == "vorbis"); 
     if (!validCodec)
-        LOG("Bad codec", ERROR);
+       LOG("Bad codec", ERROR);
 //    if (port == -1)
-
+    if(!numChannels_)
+        LOG("No channels provided",ERROR);
     return validCodec;
 }
 
