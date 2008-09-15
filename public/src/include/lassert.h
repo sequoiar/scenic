@@ -26,7 +26,7 @@
 #ifndef __LASSERT_H__
 #define __LASSERT_H__
 
-//#define ASSERT_THROWS   
+#define ASSERT_THROWS   
 
 #ifndef ASSERT_THROWS
 #include <assert.h>
