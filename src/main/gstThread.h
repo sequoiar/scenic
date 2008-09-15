@@ -25,8 +25,8 @@ typedef QueuePair_<MapMsg> QueuePair;
 class GstThread
     : public BaseThread<MapMsg>
 {
-public:
-    GstThread(){}
+    public:
+        GstThread(){}
     protected:
         virtual bool audio_start(MapMsg& msg) = 0;
         virtual bool audio_stop(MapMsg& msg) = 0;

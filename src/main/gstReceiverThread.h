@@ -32,7 +32,7 @@ class GstReceiverThread
 {
     public:
         GstReceiverThread()
-            :vreceiver_(0), areceiver_(0){}
+            : vreceiver_(0), areceiver_(0){}
         ~GstReceiverThread();
     private:
         VideoReceiver* vreceiver_;
