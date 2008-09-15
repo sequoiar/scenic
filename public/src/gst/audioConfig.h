@@ -75,7 +75,7 @@ class AudioConfig
 
         // receiver
         AudioConfig(int numChannels__, const std::string &codec__, int port__)
-            : MediaConfig(codec__.empty()?"none":codec__, (port__?port__:-1)), numChannels_(numChannels__)
+            : MediaConfig(codec__, port__), numChannels_(numChannels__)
         {}
 
         // copy constructor
