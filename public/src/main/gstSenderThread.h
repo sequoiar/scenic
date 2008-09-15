@@ -32,7 +32,7 @@ class GstSenderThread
 {
     public:
         GstSenderThread()
-            :vsender_(0), asender_(0){}
+            : vsender_(0), asender_(0){}
         ~GstSenderThread();
     private:
         VideoSender* vsender_;
