@@ -61,40 +61,41 @@ MainModule::MainModule(int send, int port)
 int main (int argc, char** argv)
 {
     int port, send;
+
+    try
     {
-        try
-        {
-            assert(argc == 3);
-            if(argc != 3)
-                LOG_CRITICAL(
-                    "Invalid command line arguments -- 0/1 for receive/send and a port");
-            if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
-                LOG_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
-            if(sscanf(argv[2], "%d", &port) != 1 || port < 0 || port > 65000)
-                LOG_CRITICAL(
-                    "Invalid command line arguments -- Port must be in the range of 1-65000");
-        }
-            catch(std::string err)
-            {
-                std::cerr << "GOING DOWN " << err;
-            }
-        
-        do {
-        try{
-
-
-                MainModule m(send, port);
-                m.run();
-
-        }
-        catch(except e) {}
-        } 
-        while(1) ;
+        assert(argc == 3);
+        if(argc != 3)
+            LOG_CRITICAL(
+                "Invalid command line arguments -- 0/1 for receive/send and a port");
+        if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
+            LOG_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
+        if(sscanf(argv[2], "%d", &port) != 1 || port < 0 || port > 65000)
+            LOG_CRITICAL(
+                "Invalid command line arguments -- Port must be in the range of 1-65000");
     }
+    catch(std::string err)
+    {
+            std::cerr << "GOING DOWN " << err;
+    }
+    
+    do {
+        try{
+            MainModule m(send, port);
+
+            try
+            {
+                m.run();
+            }catch(except e) {if (e.log_ == ASSERT_FAIL) throw e;}
+        }
+        catch(except e) { if (e.log_ == ASSERT_FAIL) std::cerr << "2ND E:" <<e.log_msg_ <<std::endl;}
+    } 
+    while(1) ;
+
 }
 
-    bool MainModule::run()
-    {
+bool MainModule::run()
+{
         QueuePair &gst_queue = gstThread_->getQueue();
 
         QueuePair &tcp_queue = tcpThread_.getQueue();
@@ -128,6 +129,6 @@ int main (int argc, char** argv)
 
         std::cout << "Done!" << std::endl;
         return 0;
-    }
+}
 
 
