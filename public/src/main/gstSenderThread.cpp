@@ -22,8 +22,6 @@
 #include "gst/audioSender.h"
 #include "gst/videoSender.h"
 
-#define A_PORT 10010
-#define V_PORT 10110
 
 
 GstSenderThread::~GstSenderThread()
@@ -66,7 +64,8 @@ bool GstSenderThread::video_start(MapMsg& msg)
         msg["address"].get(addr);
     else
         addr = get_host_ip();
-    VideoConfig config("videotestsrc", "h264", addr, V_PORT);
+    GET_OR_RETURN(msg, "port", int, port);
+    VideoConfig config("videotestsrc", "h264", addr, port);
     if(!config.sanityCheck())
         return false;
     vsender_ = new VideoSender(config);
@@ -92,7 +91,8 @@ bool GstSenderThread::audio_start(MapMsg& msg)
         msg["address"].get(addr);
     else
         addr = get_host_ip();
-    AudioConfig config("audiotestsrc", 2, "vorbis", addr, A_PORT);
+    GET_OR_RETURN(msg, "port", int, port);
+    AudioConfig config("audiotestsrc", 2, "vorbis", addr, port);
     if(!config.sanityCheck())
         return false;
     asender_ = new AudioSender(config);
