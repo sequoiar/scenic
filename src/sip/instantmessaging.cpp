@@ -73,4 +73,3 @@ void InstantMessaging::displayResponse( void ){
     std::cout << "<IM> " << _response.ptr << std::endl;
 }
 
-

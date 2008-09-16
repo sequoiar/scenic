@@ -32,19 +32,66 @@
 class InstantMessaging
 {
     public:
+        /*
+         * Class constructor
+         */
         InstantMessaging();
+        
+        /*
+         * Class destructor
+         */
         ~InstantMessaging();
 
+        /*
+         * Attach the instant messaging module to an existing SIP dialog
+         *
+         * @param dlg   A pointer on the current pjsip_dialog structure
+         */
         void setDialog( pjsip_dialog *dlg ) { _current_dlg = dlg; }
+        
+        /*
+         * Prepare a string to be sent. This method have to be called
+         * before sending each message
+         *
+         * @param message   The text message
+         */
         void setText( std::string message );
+        
+        /*
+         * Send the message, previously set with the setText method, to the connected peer
+         *
+         * @return pj_status_t  0 on success
+         *                      1 otherwise
+         */
         pj_status_t sendMessage( void );
+            
+        /*
+         * Set the response.
+         *
+         * @param resp    The last string message received
+         */ 
         void setResponse( std::string resp );
+        
+        /*
+         * Display the response
+         */
         void displayResponse( void );
 
     private:
 
+        /*
+         * The pjsip_dialog instance through which the instant messaging module exists
+         */
         pjsip_dialog *_current_dlg;
+        
+        /*
+         * The message to be sent
+         */
         pj_str_t _message;
+        
+        /*
+         * The last response
+         */
         pj_str_t _response;
 
         InstantMessaging(const InstantMessaging&); //No Copy Constructor
