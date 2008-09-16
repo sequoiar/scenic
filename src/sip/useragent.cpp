@@ -577,6 +577,7 @@ int UserAgent::inv_session_create( std::string uri ){
     }
     else if( _state == CONNECTION_STATE_CONNECTED){
         // does nothing. We let the error status in NO_ERROR state
+        return PJ_SUCCESS;
     }
     else{   
         _error = ERROR_CONNECTION_NOT_READY;
