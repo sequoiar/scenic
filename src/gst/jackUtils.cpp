@@ -19,7 +19,6 @@
 //
 
 #include <jack/jack.h>
-#include <cassert>
 #include "jackUtils.h"
 #include "logWriter.h"
 
