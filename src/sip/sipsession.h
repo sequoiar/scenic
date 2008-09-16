@@ -42,7 +42,7 @@ class SIPSession
          *
          * @param port	The local protocol listening port.
          */
-        SIPSession( int port = DEFAULT_SIP_PORT );
+        SIPSession( int pyID, int port = DEFAULT_SIP_PORT );
 
         /*
          * Class destructor
@@ -54,7 +54,7 @@ class SIPSession
          *
          * @param   r_uri	The remote SIP address
          */
-        int connect( std::string r_uri );
+        int connect(  std::string r_uri );
 
         /*
          * Terminate a current SIP remote connection

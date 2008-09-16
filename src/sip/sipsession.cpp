@@ -20,10 +20,10 @@
 #include "sipsession.h"
 #include <iostream>
 
-SIPSession::SIPSession( int port )
+SIPSession::SIPSession( int pyID, int port )
     : Session( PROTOCOL_SIP, port ), _app_ua(NULL) {
     setSessionPort(port);
-    _app_ua = new UserAgent( APP_NAME, port );
+    _app_ua = new UserAgent( APP_NAME, port, pyID );
     init( );
     // Init the pjsip library modules
     //status = _app_ua->init_pjsip_modules( );
@@ -34,7 +34,7 @@ SIPSession::SIPSession( SIPSession const& )
     : Session( PROTOCOL_SIP,
                DEFAULT_SIP_PORT ), _app_ua( NULL ){
     setSessionPort( DEFAULT_SIP_PORT );
-    _app_ua = new UserAgent( APP_NAME, DEFAULT_SIP_PORT );
+    _app_ua = new UserAgent( APP_NAME, DEFAULT_SIP_PORT, 2222 );
     init();
 }
 

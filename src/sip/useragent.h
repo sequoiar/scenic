@@ -41,32 +41,62 @@
 #include "uri.h"
 #include "instantmessaging.h"
 
+/*
+ * Enumerate the different connection states
+ */
 enum connectionState {
+    // The user agent is not initialized
     CONNECTION_STATE_NULL,
+    // After the initialization, the user agent is ready to accept incoming connections
+    // and to make calls
     CONNECTION_STATE_READY,
+    // Transitory state. A connection try is pending
     CONNECTION_STATE_CONNECTING,
+    // An incoming invite request has been received
     CONNECTION_STATE_INCOMING,
+    // The connection is established between the two peers
     CONNECTION_STATE_CONNECTED,
+    // The connection has been properly terminated
     CONNECTION_STATE_DISCONNECTED,
+    // The connection failed because of a time out error. The host was probably unreachable
     CONNECTION_STATE_TIMEOUT,
+    // The connection failed because no compatible media could have been found between the two peers
     CONNECTION_STATE_NOT_ACCEPTABLE
 };
 
+/*
+ * Enumerate the two answer modes, ie the behaviour of the user agent when receiving an 
+ * invite request
+ */
 enum answerMode {
+    // The user agent will automatically handle the request as if it was accepted
     ANSWER_MODE_AUTO,
+    // The user is notified of an incoming invite request and he has to be choose 
+    // betwwen accepting or refusing the call
     ANSWER_MODE_MANUAL
 };
 
+/*
+ * Enumerate the different error cases
+ */
 enum errorCode {
+    // Everything went fine
     NO_ERROR,
+    // Try to initialize the session as it was already done
     ERROR_INIT_ALREADY_DONE,
+    // Try to shutdown the session as it was already done
     ERROR_SHUTDOWN_ALREADY_DONE,
+    // Connection timeout error because of an unreachable host
     ERROR_HOST_UNREACHABLE,
+    // SDP negociation error; no compatible media have been found during the negociation
     ERROR_NO_COMPATIBLE_MEDIA,
+    // Try to build an invite request as the user agent was not in the right state
     ERROR_CONNECTION_NOT_READY,
+    // Not connected as it had to be 
     ERROR_NOT_CONNECTED
 };
 
+// Some typedef to easy the code writing
 typedef enum connectionState connectionState;
 typedef enum answerMode amswerMode;
 typedef enum errorCode errorCode;
@@ -77,8 +107,9 @@ class UserAgent
         /*
          * Create a new UserAgent object
          * @param	name	The application name
+         * @param   port    The SIP listening port
          */
-        UserAgent( std::string name, int port );
+        UserAgent( std::string name, int port, int pyID );
 
         /*
          * Class destructor
@@ -87,8 +118,6 @@ class UserAgent
 
         /*
          * Initialize all the mandatory data structures from the PJSIP library
-         *
-         * @param port	The port on which the user agent will listen
          *
          * @return int	PJ_SUCCESS on success
          */
@@ -145,6 +174,7 @@ class UserAgent
          * @param codecs  The list of the codec to use for the session. The codecs must
          *                be separated with / and the last character must be /
          * @param port The port to transport the media
+         * @param dir   The stream direction. Default value: sendrecv (bidirectional)
          */
         void setSessionMedia( std::string type, std::string codecs, int port, std::string dir );
 
@@ -200,9 +230,14 @@ class UserAgent
         /*
          * Change the invite answer mode. In AUTO mode, any new invite session is automatically accepted
          * In manual mode, the user agent server can accept or refuse the incoming call
+         * 
+         * @param mode  The answer mode. Default value: 'auto'
          */
         void setAnswerMode( int mode );
 
+        /*
+         * Read acccessor. Get the answer mode
+         */
         std::string getAnswerMode( void );
 
         /*
@@ -214,6 +249,8 @@ class UserAgent
         bool hasIncomingCall( void );
 
         void initPython();
+        static void getLock( PyThreadState** myThreadState );
+        static void releaseLock( PyThreadState* myThreadState );
 
         void python_shutdown();
 

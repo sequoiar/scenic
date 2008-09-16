@@ -10,8 +10,8 @@ using namespace boost::python;
  */
 BOOST_PYTHON_MODULE( libsip_export )
 {
-    class_<SIPSession>("SIPSession", init<int>())
-    .def(init<>())
+    class_<SIPSession>("SIPSession", init<int, int>())
+    .def(init<int>())
     .def("connect", &SIPSession::connect, (arg("r_uri") = DEFAULT_PARAMETER))
     .def("accept", &SIPSession::accept)
     .def("refuse", &SIPSession::refuse)
