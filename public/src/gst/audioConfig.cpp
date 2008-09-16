@@ -130,17 +130,27 @@ Decoder * AudioConfig::createDecoder() const
 }
 
 
-bool AudioConfig::sanityCheck() const
+bool AudioConfig::sanityCheck() const   // FIXME: this should become more or less redundant
 {
     bool validCodec = true;
+    bool validPort = true;
+    bool validNumChannels = true;
+
     if (!codec_.empty())
+    {
         validCodec = (codec_ == "vorbis"); 
-    if (!validCodec)
-       LOG("Bad codec", CRITICAL);
+        LOG("Bad codec", CRITICAL);
+    }
     if (port_ == -1)
+    {
         LOG("No Port, one needed", CRITICAL);  
-    if(!numChannels_)
-        LOG("No channels provided",CRITICAL);
-    return validCodec;
+        validPort = false;
+    }
+    if(numChannels_ < 1 || numChannels_ > 8)
+    {
+        LOG("Invalid number of channels",CRITICAL);
+        validNumChannels = false;
+    }
+    return validCodec && validNumChannels && validPort;
 }
 
