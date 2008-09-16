@@ -27,6 +27,7 @@ try:
 except ImportError:
     import pickle
 import re
+from types import UnicodeType
 
 # Twisted imports
 from twisted.spread.jelly import jelly, unjelly
@@ -50,11 +51,11 @@ class AddressBook(object):
         self.filename = os.environ['HOME'] + '/.' + filename + '/' + filename + '.adb'
         self.read()
         
-    def add(self, name, address):
+    def add(self, name, address, port=None):
         name = to_utf(name)
         if name in self.contacts:
             return False
-        self.contacts[name] = Contact(name, address)
+        self.contacts[name] = Contact(name, address, port)
         self.write()
         return True
         
@@ -63,15 +64,19 @@ class AddressBook(object):
         if name not in self.contacts:
             return False
         del self.contacts[name]
+        if self.contacts['_selected'] == name:
+            self.contacts['_selected'] = None
         self.write()
         return True
     
-    def modify(self, name, new_name, address):
+    def modify(self, name, new_name, address, port=None):
         name = to_utf(name)
         new_name = to_utf(new_name)
         if name in self.contacts:
             del self.contacts[name]
-            self.contacts[new_name] = Contact(new_name, address)
+            self.contacts[new_name] = Contact(new_name, address, port)
+            if self.contacts['_selected'] == name:
+                self.contacts['_selected'] = new_name
             self.write()
             return True
         return False       
@@ -150,6 +155,15 @@ class Contact(object):
     def __init__(self, name, address, port=None):
         self.name = name
         self.address = address.encode('utf-8')
+        if port:
+            if isinstance(port, str) or isinstance(port, UnicodeType):
+                if port.isdigit():
+                    port = int(port)
+                else:
+                    log.info('Invalid port format.')
+            elif not isinstance(port, int):
+                port = None
+                log.info('Invalid port format.')
         self.port = port
     
     def type(self):
