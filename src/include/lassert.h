@@ -33,7 +33,6 @@
 #else //ASSERT_THROWS
 
 #include <assert.h>
-#include "logWriter.h"
 
 #ifdef assert
 #undef assert
