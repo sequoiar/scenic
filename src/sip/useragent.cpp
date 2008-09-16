@@ -217,6 +217,8 @@ answerMode _answerMode;
 
 PyThreadState* mainThreadState;
 
+void py_connection_made( void );
+
 static int _finalCodec;
 
 /*************************************************************************************************/
@@ -433,7 +435,7 @@ int UserAgent::init_pjsip_modules(  ){
     // Init SIP module
     init_sip_module();
 
-    initPython();
+    // initPython();
 
     // Init the pj library. Must be called before using the library
     status = pj_init();
@@ -725,7 +727,7 @@ std::string UserAgent::mediaToString( void ){
     if( _state != CONNECTION_STATE_NULL )
         return _local_sdp->mediaToString();
     else
-        return ""
+        return "";
 }
 
 
