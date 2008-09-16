@@ -126,13 +126,14 @@ AC_CONFIG_FILES([Makefile
                  src/main/Makefile
                  src/sip/Makefile
                  src/sip/test/Makefile
+                 src/prototypes/Makefile
+                 src/prototypes/hello/Makefile
+                 src/prototypes/hello/test/Makefile
+                 src/prototypes/python/Makefile
                  ])
 AC_OUTPUT
 
 #                 src/osc/test/Makefile
 #                 src/gutil/Makefile
 #                 src/gutil/test/Makefile
-#                 src/prototypes/Makefile
-#                 src/prototypes/hello/Makefile
 #                 src/prototypes/hello/test/Makefile
-#                 src/prototypes/python/Makefile
