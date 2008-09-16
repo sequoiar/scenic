@@ -19,6 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
+import sys
 
 # Twisted imports
 from twisted.internet import reactor, task
@@ -45,19 +46,27 @@ class Core(Subject):
         self.adb = addressbook.AddressBook('sropulpof')
         self.settings = settings.Settings()
         self.curr_setting = self.settings.select()
+        self.load_connections()
         self.api = ui.ControllerApi(self)
-        basic.start(2222, self)
-        
-        
         
     def load_uis(self):
         self.uis = ui.load(ui.find_all())
         for mod in self.uis:
             try:
-                mod.start(self)
+                if len(sys.argv) > 1:
+                    mod.start(self, int(sys.argv[1]))
+                else:
+                    mod.start(self)
             except:
                 log.error('Unable to start UI module %s.' % mod.__name__)
 
+    def load_connections(self):
+        self.connectors = {'ip':basic}  # TODO
+        for conn in self.connectors.values():
+            if len(sys.argv) > 1:
+                conn.start(self.notify, (int(sys.argv[1]) - 9999)/2)
+            else:
+                conn.start(self.notify)
 
 
 def chk_ob(core):

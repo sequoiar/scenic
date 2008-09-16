@@ -27,31 +27,69 @@ from twisted.protocols.basic import LineReceiver
 # App imports
 from utils import log
 
-log = log.start('debug', 1, 0, 'basic')
+log = log.start('info', 1, 0, 'basic')
 
 
 
-class Basic(LineReceiver):
+class BasicServer(LineReceiver):
     def __init__(self):
-        self.core = None
+        self.notify = None
 
     def lineReceived(self, line):
-        if not self.core:
-            self.core = self.factory.subject
+        print line
         if line == "ASK":
-            self.core.notify(None, self.addr, 'ask')
-            print "ask"
+            self.notify(self, (self.addr, self), 'ask')
 #        elif line == "STOP":
 #        elif line == "ACCEPT":
 #        elif line == "REFUSE":
         else:
+            log.info('Bad command receive from %s:%s.' % self.transport.client)
+            
+    def connectionMade(self):
+        if not self.notify:
+            self.notify = self.factory.notify
+        log.info('Client connected from %s:%s.' % self.transport.client)
+    
+    def connectionLost(self, reason=protocol.connectionDone):
+        log.info('Client %s:%s disconnected. Reason: %s' % (self.transport.client[0], self.transport.client[1], reason.value))
+
+    def refuse(self):
+        self.sendLine('REFUSE')
+        self.transport.loseConnection()
+        
+    def accept(self):
+        self.sendLine('ACCEPT')
+#        self.transport.loseConnection()
+
+
+class BasicClient(LineReceiver):
+    def __init__(self):
+        self.notify = None
+        self.api = None
+        
+    def lineReceived(self, line):
+        print line
+        if line == "ASK":
+            self.notify(self, self.addr, 'ask')
+        #        elif line == "STOP":
+        elif line == "ACCEPT":
+            self.notify(self, '\nThe invitation to %s:%s was accepted.' % (self.addr.host, self.addr.port), 'info')
+            self.api.start_streams(self, self.addr.host)
+        elif line == "REFUSE":
+            self.notify(self, '\nThe invitation to %s:%s was refuse.' % (self.addr.host, self.addr.port), 'info')
+        else:
             log.info('Bad command receive from remote')
             
     def connectionMade(self):
-        log.info('Connection made to the server.')
+        if not self.api:
+            self.api = self.factory.api
+            self.notify = self.factory.notify
+        log.info('Connection made to %s:%s.' % self.transport.addr)
+        self.sendLine('ASK')
+        self.notify(self, ('Connection made to %s:%s.' % self.transport.addr, self.transport.addr))
     
     def connectionLost(self, reason=protocol.connectionDone):
-        log.info('Lost the server connection.')
+        log.debug('Lost the server connection. Reason: %s' % reason.value)
 
 
     def connect(self, address, port):
@@ -88,9 +126,13 @@ class Basic(LineReceiver):
         return None # should raise NotImplementedError()
 
 
-class BasicFactory(protocol.ServerFactory):
+
+
+
+class BasicServerFactory(protocol.ServerFactory):
     
-    subject = None
+    notify = None
+    protocol = BasicServer
     
     def buildProtocol(self, addr):
         """Create an instance of a subclass of Protocol.
@@ -104,13 +146,59 @@ class BasicFactory(protocol.ServerFactory):
         p = self.protocol()
         p.factory = self
         p.addr = addr
-        p.subject = self.subject
+        p.notify = self.notify
+        return p
+
+
+class BasicClientFactory(protocol.ClientFactory):
+
+    api = None
+    notify = None
+    protocol = BasicClient
+
+    def startedConnecting(self, connector):
+        log.info('Started to connect.')
+    
+    def buildProtocol(self, addr):
+        log.debug('Connected to %s.' % addr)
+        p = self.protocol()
+        p.factory = self
+        p.addr = addr
+        p.api = self.api
+        p.notify = self.notify
         return p
     
-def start(port, subject):
-    factory = BasicFactory()
-    factory.protocol = Basic
-    factory.subject = subject
+    def clientConnectionLost(self, connector, reason):
+        log.info('Lost the server connection. Reason: %s' % reason.value)
+        self.notify(self, '\nLost the connection. Reason: %s' % reason.value, 'connection_msg')
+    
+    def clientConnectionFailed(self, connector, reason):
+        log.info('Connection failed. Reason: %s' % reason.value)
+        self.notify(self, 'Connection failed. Reason: %s' % reason.value, 'connection_msg')
+        
+
+
+def connect(api, host, port):
+    factory = BasicClientFactory()
+    factory.api = api
+    factory.notify = api.notify
+    conn = reactor.connectTCP(host, port, factory, timeout=2)
+    return conn
+    
+def start(notify, port=2222):
+    factory = BasicServerFactory()
+    factory.notify = notify
     reactor.listenTCP(port, factory)
 
+
+if __name__ == '__main__':
+    import sys
+    
+    if len(sys.argv) > 1:
+        transport = connect(sys.argv[1], 2222)
+        reactor.callLater(1, transport.write, 'Allo\r\n')
+    else:
+        start(None, 2223)
+        
+    reactor.run()
     

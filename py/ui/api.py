@@ -22,12 +22,13 @@ import sys
 
 # App imports
 
-class ControllerApi():
+class ControllerApi(object):
     
     def __init__(self, core):
         self.adb = core.adb
         self.notify = core.notify
         self.streams = core.curr_setting.streams
+        self.connectors = core.connectors
 
 
     ### Contacts ###
@@ -35,14 +36,14 @@ class ControllerApi():
     def get_contacts(self, caller):
         self.notify(caller, self.adb.contacts)
         
-    def add_contact(self, caller, name, address):
-        self.notify(caller, self.adb.add(name, address))
+    def add_contact(self, caller, name, address, port=None):
+        self.notify(caller, self.adb.add(name, address, port))
         
     def delete_contact(self, caller, name):
         self.notify(caller, self.adb.remove(name))
         
-    def modify_contact(self, caller, name, new_name, address):
-        self.notify(caller, self.adb.modify(name, new_name, address))
+    def modify_contact(self, caller, name, new_name, address, port=None):
+        self.notify(caller, self.adb.modify(name, new_name, address, port))
         
     def select_contact(self, caller, name):
         self.notify(caller, self.adb.select(name))
@@ -89,10 +90,22 @@ class ControllerApi():
     ### Connect ###
     
     def start_connection(self, caller):
-        self.notify(caller, 2)
+        contact = self.adb.get_current()
+        connector = self.connectors[contact.type()]
+        client = connector.connect(self, contact.address, contact.port)
+        self.notify(caller, ('Trying to connect with %s (%s)...' % (contact.name, contact.address), client))
         
     def stop_connection(self, caller):
         self.notify(caller, 2)
+
+    def accept_connection(self, caller, client):
+        client.accept()
+        self.start_streams(caller, None)
+        self.notify(caller, 'Begining to receive...', 'info')
+
+    def refuse_connection(self, caller, client):
+        client.refuse()
+        self.notify(caller, 'You refuse de connection.', 'info')
 
 
 

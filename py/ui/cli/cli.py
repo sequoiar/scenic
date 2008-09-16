@@ -69,7 +69,8 @@ class TelnetServer(protocol.Protocol):
             else:
                 self.parse(data)
         else:
-            self.write_prompt()
+            self.parse(data)
+#            self.write_prompt()
             
     def parse(self, data):
         """Method to be overidden when subclassing."""
@@ -87,23 +88,25 @@ class CliController(TelnetServer):
         TelnetServer.__init__(self)
         self.core = None
         self.block = False
+        self.remote = None
         # build a dict of all semi-private methods
         self.callbacks = find_callbacks(self)
         self.shortcuts = {'c': 'contacts',
                           'a': 'audio',
                           'v': 'video',
-                          's': 'streams'
+                          's': 'streams',
+                          'j': 'join'
                           }
         
     def parse(self, data):
         if not self.core:
             self.core = self.factory.subject.api
         data = to_utf(data)
-        data = data.split()
-        cmd = data[0]
         if self.block:
-            self.block = False
-        else:
+            self.block(data)
+        elif data:
+            data = data.split()
+            cmd = data[0]
             if len(cmd) == 1 and self.shortcuts.has_key(cmd):
                 cmd = self.shortcuts[cmd]
             if cmd in self.callbacks:
@@ -111,10 +114,23 @@ class CliController(TelnetServer):
             else:
                 self.write("command not found")
                 self.write_prompt()
+        else:
+            self.write_prompt()
             
     def connectionLost(self, reason=protocol.connectionDone):
         del self.view.callbacks # delete this first to remove the reference to self
         del self.view
+
+    def _ask(self, data=None):
+        if not data or data.lower() == "y":
+            self.core.accept_connection(self, self.remote)
+            self.block = False
+        elif data.lower() == "n":
+            self.core.refuse_connection(self, self.remote)
+            self.block = False
+            self.remote = None
+        else:
+            self.write('This is not a valid answer.\n[Y/n]:')
 
     def _contacts(self, data):
         cp = CliParser(self, prog=data[0], description="Manage the address book.")
@@ -129,15 +145,22 @@ class CliController(TelnetServer):
         if options.list:
             self.core.get_contacts(self)
         elif options.add:
-            if len(args) > 1:
+            if len(args) == 2:
                 self.core.add_contact(self, options.add, args[1])
+            elif len(args) > 2:
+                if args[2].isdigit():
+                    self.core.add_contact(self, options.add, args[1], args[2])
+                else:
+                    self.write('The port is not valid.', True)
             else:
                 self.write('You need to give an address.', True)
         elif options.erase:
             self.core.delete_contact(self, options.erase)
         elif options.modify:
-            if len(args) > 2:
+            if len(args) == 3:
                 self.core.modify_contact(self, options.modify, args[1], args[2])
+            elif len(args) > 3:
+                self.core.modify_contact(self, options.modify, args[1], args[2], args[3])
             else:
                 self.write('You need to give the current name, the new name and the address.', True)
         elif options.select:
@@ -280,7 +303,7 @@ class CliController(TelnetServer):
         
     def _join(self, data):
         cp = CliParser(self, prog=data[0], description="Start and stop a connection.")
-        cp.add_option("-s", "--start", type="string", help="Start a connection with the default contact")
+        cp.add_option("-s", "--start", action='store_true', help="Start a connection with the default contact")
         cp.add_option("-i", "--stop", "--interrupt", action='store_true', help="Stop the connection")
 
         (options, args) = cp.parse_args(data)
@@ -467,6 +490,8 @@ class CliView(Observer):
                     else:  
                         msg.append(contact.name + ":")  
                     msg.append("\t" + contact.address)
+                    if contact.port:
+                        msg.append("\t%s" % contact.port)
             msg_out = "\n".join(msg)  
             self.write(msg_out)
             
@@ -571,7 +596,6 @@ class CliView(Observer):
                 
     def _audio_list(self, origin, data):
         if origin is self.controller:
-            print data
             if data:
                 names = [stream[0] for stream in data]
                 self.write("\n".join(names))
@@ -651,7 +675,6 @@ class CliView(Observer):
                 
     def _video_list(self, origin, data):
         if origin is self.controller:
-            print data
             if data:
                 names = [stream[0] for stream in data]
                 self.write("\n".join(names))
@@ -704,9 +727,18 @@ class CliView(Observer):
         self.write(data)
     
     def _ask(self, origin, data):
-        self.write('%s is inviting you. Do you accept?\n[Y/n]: ' % data, False)
-        self.controller.block = True    
+        self.write('\n%s is inviting you. Do you accept?\n[Y/n]: ' % data[0].host, False)
+        self.controller.block = self.controller._ask
+        self.controller.remote = data[1]
+        
+    def _start_connection(self, origin, data):
+        self.write(data[0], False)
             
+    def _info(self, origin, data):
+        self.write(data)
+ 
+    def _connectionMade(self, origin, data):
+        self.write(data[0])
 
 def bold(msg):
     return "%s[1m%s%s[0m" % (ESC, msg, ESC)
@@ -819,13 +851,13 @@ class CliFactory(protocol.ServerFactory):
         return p
 
 
-def start(subject):
+def start(subject, port=14444):
     """This runs the protocol on port 14444"""
     factory = CliFactory()
     factory.protocol = CliController
     factory.subject = subject
     factory.view = CliView
-    reactor.listenTCP(14444, factory)
+    reactor.listenTCP(port, factory)
 
 
 # this only runs if the module was *not* imported
