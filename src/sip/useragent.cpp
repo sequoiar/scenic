@@ -573,7 +573,10 @@ int UserAgent::inv_session_create( std::string uri ){
 
         return getErrorCode();
     }
-    else {
+    else if( _state == CONNECTION_STATE_CONNECTED){
+        // does nothing. We let the error status in NO_ERROR state
+    }
+    else{   
         _error = ERROR_CONNECTION_NOT_READY;
         return !PJ_SUCCESS;
     }
@@ -719,7 +722,10 @@ void UserAgent::setSessionMedia( std::string type, std::string codecs, int port,
 
 
 std::string UserAgent::mediaToString( void ){
-    return _local_sdp->mediaToString();
+    if( _state != CONNECTION_STATE_NULL )
+        return _local_sdp->mediaToString();
+    else
+        return ""
 }
 
 
