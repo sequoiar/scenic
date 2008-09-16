@@ -12,6 +12,9 @@ pool = {}
 class Sip(object):
     def __init__(self, id, port):
         self.session = sip.SIPSession(id, port)
+        
+    def connect(self):
+        self.session.connect()
     
     def connection_made(arg):
         print arg
@@ -39,7 +42,8 @@ class SipFactory(object):
 
 def main():
     factory = SipFactory()
-    factory.get()
+    session = factory.get(50600)
+    session.connect()
 
 def connection_made_cb(id, arg):
     session = SipFactory.pool[id]
