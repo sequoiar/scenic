@@ -32,7 +32,9 @@ using std::endl;
 
 #define PY_CALLBACK_MODULE    "pyCallbacks"
 
-#define CORE_NOTIFICATION   0
+#define CORE_NOTIFICATION   1
+
+#define SYSTEM_MODE         0  
     
 /**************** STATIC VARIABLES AND FUNCTIONS (callbacks) **************************/
 
@@ -217,13 +219,16 @@ answerMode _answerMode;
 
 PyThreadState* mainThreadState;
 
-void py_connection_made( void );
+static void py_connection_made( void );
+static void py_connection_incoming( void );
 
 static int _finalCodec;
 
+int _PY_ID;
+
 /*************************************************************************************************/
 
-UserAgent::UserAgent( std::string name, int port )
+UserAgent::UserAgent( std::string name, int port, int pyID )
     : _name(name), _localURI(0)
 {
     // The state of the connection
@@ -239,6 +244,8 @@ UserAgent::UserAgent( std::string name, int port )
 
     // Instantiate the instant messaging module
     _imModule = new InstantMessaging();
+
+    _PY_ID = pyID;
 
     // To generate a different random number at each time
     // Useful for the random port selection if the default one is used
@@ -407,6 +414,22 @@ bool UserAgent::hasIncomingCall( void ){
     return ( getConnectionState() == CONNECTION_STATE_INCOMING );
 }
 
+static void getLock( PyThreadState** myThreadState ){
+    // Get the global lock
+    PyEval_AcquireLock();
+
+    // Create a thread state object for this thread
+    *myThreadState = PyThreadState_New( mainThreadState->interp);
+    PyThreadState_Swap(*myThreadState);
+}
+
+static void releaseLock(PyThreadState* myThreadState){
+    // Swap my thread state out of the interpreter
+    PyThreadState_Swap(NULL);
+    PyThreadState_Clear(myThreadState);
+    PyThreadState_Delete(myThreadState);
+    PyEval_ReleaseLock();
+}
 
 void UserAgent::init_sip_module( void ){
     mod_ua.name = pj_str((char*)this->_name.c_str());
@@ -415,7 +438,6 @@ void UserAgent::init_sip_module( void ){
     mod_ua.on_rx_request = &on_rx_request;
     mod_ua.on_rx_response = &on_rx_response;
 }
-
 
 int UserAgent::init_pjsip_modules(  ){
     pj_status_t status;
@@ -435,7 +457,7 @@ int UserAgent::init_pjsip_modules(  ){
     // Init SIP module
     init_sip_module();
 
-    // initPython();
+    initPython();
 
     // Init the pj library. Must be called before using the library
     status = pj_init();
@@ -518,7 +540,7 @@ int UserAgent::init_pjsip_modules(  ){
 }
 
 
-int UserAgent::inv_session_create( std::string uri ){
+int UserAgent::inv_session_create( std::string uri){
     pjsip_dialog *dialog;
     pjsip_tx_data *tdata;
     pj_status_t status;
@@ -571,7 +593,7 @@ int UserAgent::inv_session_create( std::string uri ){
         _state = CONNECTION_STATE_CONNECTING;
 
         // In synchronous words
-        wait_for_response( _state );
+        if( SYSTEM_MODE == 1 )  wait_for_response( _state );
 
         return getErrorCode();
     }
@@ -608,7 +630,7 @@ int UserAgent::inv_session_end( void ){
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-        wait_for_response( state );
+        if(SYSTEM_MODE == 1)    wait_for_response( state );
 
         return getErrorCode();
         //return PJ_SUCCESS;
@@ -763,7 +785,7 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
 }
 
 
-static void pjsipLogWriter( int level, const char *data, int len ){
+void pjsipLogWriter( int level, const char *data, int len ){
     PJ_UNUSED_ARG(len);
 
     // Map the pjsip log level to the log level we use
@@ -786,6 +808,42 @@ static void pjsipLogWriter( int level, const char *data, int len ){
     }
 }
 
+static void py_connection_made( void ){
+    std::ostringstream inst;
+    PyThreadState* myThreadState;
+
+    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
+    try {
+        getLock(&myThreadState);
+        cout << "C++ wrote: connection made" << endl;
+        PyRun_SimpleString(inst.str().c_str());
+        inst << "sip.connection_made_cb(" << _PY_ID << ")\n" << endl;
+        PyRun_SimpleString(inst.str().c_str());
+        releaseLock(myThreadState);
+    }
+    catch(boost::python::error_already_set const &)
+    {
+        PyErr_Print();
+    }
+}
+
+static void py_connection_incoming( void ){
+    std::ostringstream inst;
+    PyThreadState* myThreadState;
+
+    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
+    try {
+        getLock(&myThreadState);
+        cout << "C++ wrote: connection incoming" << endl;
+        PyRun_SimpleString(inst.str().c_str());
+        PyRun_SimpleString("sip.connection_incoming_cb()\n");
+        releaseLock(myThreadState);
+    }
+    catch(boost::python::error_already_set const &)
+    {
+        PyErr_Print();
+    }
+}
 
 /********************** Callbacks Implementation **********************************/
 
@@ -818,11 +876,15 @@ void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
         // The connection is established
         _state = CONNECTION_STATE_CONNECTED;
         _error = NO_ERROR;
+        if(CORE_NOTIFICATION == 1 )
+            py_connection_made();
     }
 
     else if( inv->state == PJSIP_INV_STATE_INCOMING ){
         // Incoming invite session
         _state = CONNECTION_STATE_INCOMING;
+        if(CORE_NOTIFICATION == 1 )
+            py_connection_incoming();
     }
 
     else{

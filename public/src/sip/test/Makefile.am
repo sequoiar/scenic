@@ -9,8 +9,8 @@ bin_PROGRAMS = cliTester mediaTester
 cliTester_SOURCES = cliTestSuite.cpp
 mediaTester_SOURCES = mediaTestSuite.cpp
 
-cliTester_LDADD = $(PJSIP_LIBS) -lpthread ../libsip.la  $(CPPTEST_LIBS) $(WRAPPER_LIBS)
+cliTester_LDADD = $(PJSIP_LIBS) $(LIBUTIL) -lpthread ../libsip.la  $(CPPTEST_LIBS) $(WRAPPER_LIBS)
 cliTester_CPPFLAGS= $(AM_CPPFLAGS) $(PJ_CFLAGS) $(CPPTEST_CFLAGS) $(GST_CFLAGS) -I$(PYTHON_INCLUDE_DIR)
 
-mediaTester_LDADD = $(PJSIP_LIBS) -lpthread ../libsip.la  $(CPPTEST_LIBS) $(WRAPPER_LIBS)
+mediaTester_LDADD = $(PJSIP_LIBS) $(LIBUTIL) -lpthread ../libsip.la  $(CPPTEST_LIBS) $(WRAPPER_LIBS)
 mediaTester_CPPFLAGS= $(AM_CPPFLAGS) $(PJ_CFLAGS) $(CPPTEST_CFLAGS) $(GST_CFLAGS) -I$(PYTHON_INCLUDE_DIR)
