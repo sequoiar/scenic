@@ -1,1 +1,1 @@
-SUBDIRS = util util/test tcp tcp/test osc gst gst/test main sip
+SUBDIRS = util util/test tcp tcp/test osc gst gst/test main sip prototypes
