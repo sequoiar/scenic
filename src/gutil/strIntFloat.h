@@ -1,4 +1,4 @@
-// headerGPL.c
+// MapMsg.h
 // Copyright 2008 Koya Charles & Tristan Matthews 
 //     
 // This file is part of [propulse]ART.
@@ -19,7 +19,7 @@
 
 
 /** \file 
- *      Class that can countain a string, int or float
+ *      typedef of key/value map whose value is a string, int or float
  *
  */
 
@@ -52,8 +52,6 @@
         return false;                                                       \
     }                                                                       \
 
-class StrIntFloat;
-typedef std::map<std::string, StrIntFloat> MapMsg;
 
 class StrIntFloat
 {
@@ -112,4 +110,7 @@ class StrIntFloat
         }
 };
 
+typedef std::map<std::string, StrIntFloat> MapMsg;
+typedef QueuePair_<MapMsg> QueuePair;
 #endif
+
