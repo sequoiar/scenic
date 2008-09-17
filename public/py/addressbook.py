@@ -52,12 +52,15 @@ class AddressBook(object):
         self.read()
         
     def add(self, name, address, port=None):
-        name = to_utf(name)
-        if name in self.contacts:
+        if (type(address.encode('utf-8'))):
+            name = to_utf(name)
+            if name in self.contacts:
+                return False
+            self.contacts[name] = Contact(name, address, port)
+            self.write()
+            return True
+        else:
             return False
-        self.contacts[name] = Contact(name, address, port)
-        self.write()
-        return True
         
     def remove(self, name):
         name = to_utf(name)
@@ -70,16 +73,19 @@ class AddressBook(object):
         return True
     
     def modify(self, name, new_name, address, port=None):
-        name = to_utf(name)
-        new_name = to_utf(new_name)
-        if name in self.contacts:
-            del self.contacts[name]
-            self.contacts[new_name] = Contact(new_name, address, port)
-            if self.contacts['_selected'] == name:
-                self.contacts['_selected'] = new_name
-            self.write()
-            return True
-        return False       
+        if (type(address.encode('utf-8'))):
+            name = to_utf(name)
+            new_name = to_utf(new_name)
+            if name in self.contacts:
+                del self.contacts[name]
+                self.contacts[new_name] = Contact(new_name, address, port)
+                if self.contacts['_selected'] == name:
+                    self.contacts['_selected'] = new_name
+                self.write()
+                return True
+            return False       
+        else:
+            return False
 
     def select(self, name):
         name = to_utf(name)
@@ -165,38 +171,41 @@ class Contact(object):
                 port = None
                 log.info('Invalid port format.')
         self.port = port
-    
-    def type(self):
-        address = self.address
-        if isinstance(address, list):
-            return 'group'
-        if isinstance(address, str):
-            # could be a SIP type address
-            if '@' in address:
-                if re.match('^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$', address, re.I):
-                    return 'sip_name'
-                if re.match('^[A-Z0-9._%+-]+@\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address, re.I):
-                    adr = address.split('@')
-                    values = [int(i) for i in adr[1].split('.')]
-                    if self._ip_range(values):
-                        return 'sip_ip'
-                return None
-            # could be an IP type address
-            elif re.match('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address):
-                # verify the range of each number
-                values = [int(i) for i in address.split('.')]
-                if self._ip_range(values):
-                    # verify if the first number is in the multicast range
-                    if values[0] >= 224 and values[0] <= 239:
-                        return 'multicast'
-                    return 'ip'
-        return None
         
-    def _ip_range(self, nums):
-        for num in nums:
-            if num < 0 or num > 255:
-                return False
-            return True
+    def type(self):
+        return type(self.address)
+
+    
+def type(address):
+    if isinstance(address, list):
+        return 'group'
+    if isinstance(address, str):
+        # could be a SIP type address
+        if '@' in address:
+            if re.match('^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$', address, re.I):
+                return 'sip_name'
+            if re.match('^[A-Z0-9._%+-]+@\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address, re.I):
+                adr = address.split('@')
+                values = [int(i) for i in adr[1].split('.')]
+                if _ip_range(values):
+                    return 'sip_ip'
+            return None
+        # could be an IP type address
+        elif re.match('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address):
+            # verify the range of each number
+            values = [int(i) for i in address.split('.')]
+            if _ip_range(values):
+                # verify if the first number is in the multicast range
+                if values[0] >= 224 and values[0] <= 239:
+                    return 'multicast'
+                return 'ip'
+    return None
+    
+def _ip_range(nums):
+    for num in nums:
+        if num < 0 or num > 255:
+            return False
+        return True
         
                 
                 
