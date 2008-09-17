@@ -4,7 +4,7 @@
 #include <string>
 #include "tcp/parser.h"
 #include "logWriter.h"
-#include "gutil/strIntFloat.h"
+#include "mapMsg.h"
 
 std::string str = "init: it=103945 mystring=\"\\\"bar you\\\"\" Hellotab=1.1";
 

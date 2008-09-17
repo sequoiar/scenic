@@ -18,10 +18,9 @@
  */
 #ifndef __GST_THREAD__
 #define __GST_THREAD__
-#include "gutil/baseThread.h"
-#include "gutil/strIntFloat.h"
+#include "baseThread.h"
+#include "mapMsg.h"
 
-typedef QueuePair_<MapMsg> QueuePair;
 class GstThread
     : public BaseThread<MapMsg>
 {

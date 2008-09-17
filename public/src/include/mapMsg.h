@@ -111,6 +111,5 @@ class StrIntFloat
 };
 
 typedef std::map<std::string, StrIntFloat> MapMsg;
-typedef QueuePair_<MapMsg> QueuePair;
 #endif
 

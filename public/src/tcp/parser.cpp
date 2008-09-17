@@ -22,7 +22,7 @@
 #include <string.h>
 #include "parser.h"
 #include "logWriter.h"
-#include "gutil/strIntFloat.h"
+#include "mapMsg.h"
 
 
 static std::string strEsq(const std::string& str)
@@ -91,7 +91,7 @@ static int get_end_of_quoted_string(const std::string& str)
 }
 
 
-bool stringify(const std::map<std::string, StrIntFloat>& cmd_map, std::string& str)
+bool stringify(const MapMsg& cmd_map, std::string& str)
 {
     typedef std::map<std::string, StrIntFloat>::const_iterator iter;
     str.clear();
@@ -165,7 +165,7 @@ bool stringify(const std::map<std::string, StrIntFloat>& cmd_map, std::string& s
 }
 
 
-bool tokenize(const std::string& str, std::map<std::string, StrIntFloat> &cmd_map)
+bool tokenize(const std::string& str, MapMsg &cmd_map)
 {
     unsigned int i;
     const char *cstr = str.c_str();

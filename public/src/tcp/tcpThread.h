@@ -17,10 +17,11 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include "gutil/baseThread.h"
-#include "gutil/strIntFloat.h"
+#include "baseThread.h"
+#include "mapMsg.h"
 #include "tcpServer.h"
-typedef QueuePair_<MapMsg> TcpQueue;
+
+typedef QueuePair_<MapMsg> QueuePair;
 class TcpThread
     : public BaseThread<MapMsg>
 {

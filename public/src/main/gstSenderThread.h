@@ -19,14 +19,11 @@
 
 #include <glib.h>
 #include <iostream>
-#include "gutil/baseThread.h"
-#include "gutil/strIntFloat.h"
 #include "gstThread.h"
 
 class VideoSender;
 class AudioSender;
 
-typedef QueuePair_<MapMsg> QueuePair;
 class GstSenderThread
     : public GstThread
 {

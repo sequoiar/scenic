@@ -29,17 +29,17 @@
 
 #include <string>
 #include <map>
-#include "gutil/strIntFloat.h"
+#include "mapMsg.h"
 
 
 /// builds a string of command: key=value pairs
 /// TODO make map const
-bool stringify(const std::map<std::string, StrIntFloat>& cmd_map, std::string& str);
+bool stringify(const MapMsg& cmd_map, std::string& str);
 
 /// fills a map of key=value pairs with a special key "command" from a string
 /// of type specified above
 /// TODO handle extraneous white space
-bool tokenize(const std::string& str, std::map<std::string, StrIntFloat>& cmd_map);
+bool tokenize(const std::string& str, MapMsg& cmd_map);
 
 #endif
 

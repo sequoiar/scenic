@@ -30,7 +30,7 @@
 #ifndef __OSC_MESSAGE_H__
 #define __OSC_MESSAGE_H__
 
-#include "gutil/baseThread.h"
+#include "baseThread.h"
 #include <lo/lo.h>
 #include <string>
 #include <vector>
