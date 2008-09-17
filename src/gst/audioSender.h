@@ -1,5 +1,5 @@
 
-// audioSender.h
+// audioLocal.h
 // Copyright 2008 Tristan Matthews
 //
 // This file is part of [propulse]ART.

@@ -1,5 +1,5 @@
 
-// audioSender.h
+// audioLocal.h
 // Copyright 2008 Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -18,8 +18,8 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _AUDIO_SENDER_H_
-#define _AUDIO_SENDER_H_
+#ifndef _AUDIO_LOCAL_H_
+#define _AUDIO_LOCAL_H_
 
 #include "mediaBase.h"
 #include "audioConfig.h"
@@ -35,16 +35,15 @@ class AudioLocal
             : config_(config), source_(0), sink_(0)
         {}
 
-        ~AudioSender();
+        ~AudioLocal();
 
-        std::string getCaps() { return sink_.getCaps(); }
-        bool start();
+        std::string getCaps();
 
     private:
         // helper methods
 
         void init_source();
-        void init_codec();
+        void init_codec() {};
         void init_sink();
 
         // data
@@ -53,9 +52,9 @@ class AudioLocal
 
         AudioSink *sink_;
 
-        AudioSender(const AudioSender&); //No Copy Constructor
-        AudioSender& operator=(const AudioSender&); //No Assignment Operator
+        AudioLocal(const AudioLocal&); //No Copy Constructor
+        AudioLocal& operator=(const AudioLocal&); //No Assignment Operator
 };
 
-#endif // _AUDIO_SENDER_H_
+#endif // _AUDIO_LOCAL_H_
 
