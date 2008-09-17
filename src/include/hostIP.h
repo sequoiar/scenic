@@ -1,4 +1,3 @@
-
 // hostIP.h
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
@@ -19,50 +18,17 @@
 //
 
 /** \file
- *      Just the License GPL 3+
+ *      Linux external interface dotted ip address.
  *
- *      Detailed description here.
- *      Continues here.
- *      And more.
- *      And more.
+ *      
  */
 
 #ifndef _HOST_IP_H_
 #define _HOST_IP_H_
 
 
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <stdio.h>
 
-static
-const char *get_host_ip()
-{
-    int i;
-    char *ip;
-    int s = socket (PF_INET, SOCK_STREAM, 0);
-
-    for (i = 1;; i++)
-    {
-        struct ifreq ifr;
-        struct sockaddr_in *sin = (struct sockaddr_in *) &ifr.ifr_addr;
-
-        ifr.ifr_ifindex = i;
-        if (ioctl (s, SIOCGIFNAME, &ifr) < 0)
-            break;
-        /* now ifr.ifr_name is set */
-        if (ioctl (s, SIOCGIFADDR, &ifr) < 0)
-            continue;
-        ip = inet_ntoa (sin->sin_addr);         // seems to be thread safe
-                                                // but not reentrant
-                                                // under libc6 2+
-    }
-
-    close (s);
-    return ip;
-}
+const char *get_host_ip();
 
 
 #endif // _HOST_IP_H_

@@ -19,13 +19,13 @@
 
 
 /** \file 
- *      typedef of key/value map whose value is a string, int or float
+ *      MapMsg typedef of key/value map where value is a string, a float or an int
  *
  */
 
 
-#ifndef __STR_INT_FLOAT_H__
-#define __STR_INT_FLOAT_H__
+#ifndef __MAP_MSG_H__
+#define __MAP_MSG_H__
 
 #include "logWriter.h"
 #include <string>
@@ -111,5 +111,6 @@ class StrIntFloat
 };
 
 typedef std::map<std::string, StrIntFloat> MapMsg;
+
 #endif
 

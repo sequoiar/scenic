@@ -18,9 +18,9 @@
  */
 
 /** \file
- *		Threads and mutexed message passing system
+ *		Thread base class.
  *
- *
+ *      Thread/AsyncQueue Routines using glib
  */
 #ifndef __BASE_THREAD_H__
 #define __BASE_THREAD_H__
