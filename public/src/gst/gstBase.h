@@ -35,12 +35,13 @@ class GstBase
         virtual bool stop();
         virtual bool init() = 0;
 
-        bool isPlaying();
+        bool isPlaying() const;
 
     protected:
 
         // this initializes pipeline only once/process
         GstBase();
+        const char* getElementPadCaps(_GstElement *element, const char * padName) const;
 
         virtual ~GstBase();
 

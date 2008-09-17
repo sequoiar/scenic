@@ -31,6 +31,7 @@ class AudioSink
         AudioSink()
             : sink_(0) {};
         ~AudioSink();
+        std::string getCaps();
         virtual bool init() = 0;
 
     protected:

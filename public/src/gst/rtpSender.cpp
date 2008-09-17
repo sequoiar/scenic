@@ -22,6 +22,7 @@
 #include <cassert>
 
 #include "pipeline.h"
+#include "gstBase.h"
 #include "gstLinkable.h"
 #include "rtpSender.h"
 #include "rtpPay.h"
@@ -37,24 +38,7 @@ RtpSender::~RtpSender()
 
 std::string RtpSender::getCaps() const
 {
-    assert(pipeline_.isPlaying());
-
-    GstPad *pad;
-    GstCaps *caps;
-
-    assert(pad = gst_element_get_pad(GST_ELEMENT(rtp_sender_), "sink"));
-
-    do
-        caps = gst_pad_get_negotiated_caps(pad);
-    while (caps == NULL);
-
-    // goes until caps are initialized
-
-    gst_object_unref(pad);
-
-    std::string result(gst_caps_to_string(caps));
-    gst_caps_unref(caps);
-    return result;
+    return GstBase::getElementPadCaps(rtp_sender_, "sink");
 }
 
 
