@@ -29,7 +29,8 @@ libsip_la_SOURCES = \
 					sdp.h \
 					useragent.h \
 					session.h \
-					sipsession.h 
+					sipsession.h \
+					../util/util.cpp
 
 libsip_la_CPPFLAGS =  $(AM_CPPFLAGS) $(PJ_CFLAGS) -I$(PYTHON_INCLUDE_DIR) 
 libsip_la_LDFLAGS = $(PJSIP_LIBS) -lpthread  

@@ -30,7 +30,7 @@ using std::endl;
 
 #define RANDOM_SIP_PORT   rand() % 64000 + 1024
 
-#define PY_CALLBACK_MODULE    "pyCallbacks"
+#define PY_CALLBACK_MODULE    "sip_test"
 
 #define CORE_NOTIFICATION   1
 
@@ -219,8 +219,10 @@ answerMode _answerMode;
 
 PyThreadState* mainThreadState;
 
+//PyGILState_STATE _pystate;
+ 
 static void py_connection_made( void );
-static void py_connection_incoming( void );
+//static void py_connection_incoming( void );
 
 static int _finalCodec;
 
@@ -265,14 +267,18 @@ UserAgent::~UserAgent(){
 
 
 void UserAgent::initPython(){
-    // Initialize python
-    Py_Initialize();
-    // Initialize thread support
-    PyEval_InitThreads();
-    // Save a pointer to the main PyThreadState object
-    mainThreadState = PyThreadState_Get();
-    // Release the lock
-    PyEval_ReleaseLock();
+
+        // Initialize python
+        Py_Initialize();
+        // Initialize thread support
+        PyEval_InitThreads();
+        // Save a pointer to the main PyThreadState object
+        mainThreadState = PyThreadState_Get();
+        // Release the lock
+        PyEval_ReleaseLock();
+
+
+    //_pystate = PyGILState_Ensure();
 }
 
 
@@ -592,6 +598,8 @@ int UserAgent::inv_session_create( std::string uri){
         // Update the connection status. The invite session has been created and sent.
         _state = CONNECTION_STATE_CONNECTING;
 
+        //py_connection_made(); 
+    
         // In synchronous words
         if( SYSTEM_MODE == 1 )  wait_for_response( _state );
 
@@ -756,7 +764,7 @@ std::string UserAgent::mediaToString( void ){
 
 static int startThread( void *arg ){
     PJ_UNUSED_ARG(arg);
-
+ 
     while( !thread_quit )
     {
         pj_time_val timeout = {0, 10};
@@ -811,10 +819,24 @@ void pjsipLogWriter( int level, const char *data, int len ){
 static void py_connection_made( void ){
     std::ostringstream inst;
     PyThreadState* myThreadState;
+    PyObject*    main_module, * global_dict, * mod;
 
+    cout << "unlock" << endl;
+    getLock(&myThreadState);
+    cout << "pyImport module" << endl;
+    main_module = PyImport_AddModule("__main__");
+    cout << "pyImport dict" << endl;
+    global_dict = PyModule_GetDict(main_module);
+
+    cout << "getitem string" << endl;
+    mod = PyDict_GetItemString(global_dict, "connection_made_cb");
+
+    cout << "call object" << endl;
+    PyObject_CallFunction(mod, (char*)_PY_ID);
+    releaseLock(myThreadState);
+/*
     inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
     try {
-        getLock(&myThreadState);
         cout << "C++ wrote: connection made" << endl;
         PyRun_SimpleString(inst.str().c_str());
         inst << "sip.connection_made_cb(" << _PY_ID << ")\n" << endl;
@@ -824,9 +846,11 @@ static void py_connection_made( void ){
     catch(boost::python::error_already_set const &)
     {
         PyErr_Print();
-    }
+        releaseLock(myThreadState);
+    }*/
 }
 
+/*
 static void py_connection_incoming( void ){
     std::ostringstream inst;
     PyThreadState* myThreadState;
@@ -843,7 +867,7 @@ static void py_connection_incoming( void ){
     {
         PyErr_Print();
     }
-}
+}*/
 
 /********************** Callbacks Implementation **********************************/
 
@@ -883,8 +907,8 @@ void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
     else if( inv->state == PJSIP_INV_STATE_INCOMING ){
         // Incoming invite session
         _state = CONNECTION_STATE_INCOMING;
-        if(CORE_NOTIFICATION == 1 )
-            py_connection_incoming();
+        //if(CORE_NOTIFICATION == 1 )
+            //py_connection_incoming();
     }
 
     else{
