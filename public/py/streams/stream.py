@@ -32,9 +32,9 @@ class Streams(object):
 
     def get_kind(self, stream):
         if isinstance(stream, AudioStream):
-            return 'a'
+            return 'audio'
         elif isinstance(stream, VideoStream):
-            return 'v'
+            return 'video'
         else:
             return None
 
@@ -51,7 +51,7 @@ class Streams(object):
             return -1
 
     def delete(self, name, kind):
-        dict_name = "_".join([kind[0], name])
+        dict_name = "_".join([kind, name])
         if dict_name in self.streams:
             del self.streams[dict_name]
             return 1
@@ -59,9 +59,9 @@ class Streams(object):
             return 0
     
     def rename(self, name, new_name, kind):
-        dict_name = "_".join([kind[0], name])
+        dict_name = "_".join([kind, name])
         if dict_name in self.streams:
-            self.streams["_".join([kind[0], new_name])] = self.streams[dict_name]
+            self.streams["_".join([kind, new_name])] = self.streams[dict_name]
             del self.streams[dict_name]
             return 1
         else:
@@ -69,16 +69,16 @@ class Streams(object):
     
     def list(self, kind):
         if kind == 'streams':
-            streams = [(name[2:], stream) for name, stream in self.streams.items()]
+            streams = [(name.separator('_')[2], stream) for name, stream in self.streams.items()]
             streams.sort() 
             return streams, self.__dict__
         else:
-            streams = [(name[2:], stream) for name, stream in self.streams.items() if name[0:2] == kind[0] + '_']
+            streams = [(name.separator('_')[2], stream) for name, stream in self.streams.items() if name[0:2] == kind[0] + '_']
             streams.sort() 
             return streams
 
     def get(self, name, kind):
-        dict_name = "_".join([kind[0], name])
+        dict_name = "_".join([kind, name])
         if dict_name in self.streams:
             return self.streams[dict_name]
         return None
