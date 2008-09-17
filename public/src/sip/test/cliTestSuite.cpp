@@ -31,9 +31,9 @@ int main(int argc, char** argv){
 
     // Session creation
     if( argc == 2 )
-        sip = new SIPSession( atoi(argv[1]));
+        sip = new SIPSession(1111,  atoi(argv[1]));
     else
-        sip = new SIPSession( );
+        sip = new SIPSession(11111 );
     sip->setMedia("audio", "vorbis/PCMA/", 12345);
 
     // Console main

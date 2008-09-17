@@ -48,7 +48,7 @@ void codecHandlingAtMediaLevelTest(){
 void codecHandlingAtSessionLevelTest( void ){
     std::string res;
     // Use the default SIP port
-    SIPSession *session = new SIPSession();
+    SIPSession *session = new SIPSession(11111);
 
     cout << " Add an audio and a video media with 2 codecs each" << endl;
     session->setMedia( "audio", "GSM/PCMU/", 12354 );
