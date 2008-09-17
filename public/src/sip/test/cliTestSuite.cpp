@@ -31,16 +31,16 @@ int main(int argc, char** argv){
 
     // Session creation
     if( argc == 2 )
-        sip = new SIPSession(1111,  atoi(argv[1]));
+        sip = new SIPSession(atoi(argv[1]));
     else
-        sip = new SIPSession(11111 );
-    sip->setMedia("audio", "vorbis/PCMA/", 12345);
+        sip = new SIPSession( );
+    sip->set_media("audio", "vorbis/PCMA/", 12345);
 
     // Console main
     cout << MENU << endl;
 
     for(;;) {
-        if( sip->incomingInvite() ){
+        /*if( sip->incomingInvite() ){
             cout << "Incoming call: ";
             cout << "accept(a) or refuse (r) ";
             cin >> input;
@@ -57,20 +57,20 @@ int main(int argc, char** argv){
                     sip->accept();
                     break;
             }
-        }
+        }*/
         cout << "<<<< ";
         cin >> input;
         switch(input[0])
         {
             case 'c':
                 if (sip->connect() == 1 ){
-                    msg = sip->getConnectionState();
+                    msg = sip->get_connection_state();
                     cout << msg << endl;
                 }
                 break;
             case 'd':
                 if( sip->disconnect() == 1 ){
-                    msg = sip->getConnectionState();
+                    msg = sip->get_connection_state();
                     cout << msg << endl;
                 }
                 break;
@@ -83,39 +83,39 @@ int main(int argc, char** argv){
                 cin >> port;
                 cout << " <<< direction : ";
                 cin >> dir;
-                sip->setMedia( type, codecs, atoi(port.c_str()), dir );
+                sip->set_media( type, codecs, atoi(port.c_str()), dir );
                 break;
             case 'l':
-                cout << sip->mediaToString() << endl;
+                cout << sip->media_to_string() << endl;
                 break;
             case 'r':
                 if( sip->reinvite() == 1 ){
-                    msg = sip->getErrorReason();
+                    msg = sip->get_error_reason();
                     cout << msg << endl;
                 }
                 break;
             case 'm':
                 cout << "Enter message <<<< ";
                 cin >> msg;
-                if( sip->sendInstantMessage(msg) == 1 ){
-                    msg = sip->getErrorReason();
+                if( sip->send_instant_message(msg) == 1 ){
+                    msg = sip->get_error_reason();
                     cout << msg << endl;
                 }
                 break;
             case 'i':
-                msg = sip->getConnectionState();
+                msg = sip->get_connection_state();
                 cout << msg << endl;
                 break;
             case 'e':
-                msg = sip->getErrorReason();
+                msg = sip->get_error_reason();
                 cout << msg << endl;
                 break;
             case 'x':
-                cout << "Actual mode: " << sip->getAnswerMode() << endl;
+                cout << "Actual mode: " << sip->get_answer_mode() << endl;
                 cout << "auto (0) or manual (1): ";
                 cin >> msg;
-                sip->setAnswerMode( atoi(msg.c_str()) );
-                cout << "Actual mode: " << sip->getAnswerMode() << endl;
+                sip->set_answer_mode( atoi(msg.c_str()) );
+                cout << "Actual mode: " << sip->get_answer_mode() << endl;
                 break;
             case 'h':
                 cout << MENU << endl;
@@ -125,9 +125,9 @@ int main(int argc, char** argv){
                 break;
             case 't':
                 sip->init();
-                msg = sip->getErrorReason();
+                msg = sip->get_error_reason();
                 cout << msg << endl;
-                sip->setMedia("audio", "vorbis/PCMA/", 12345);
+                sip->set_media("audio", "vorbis/PCMA/", 12345);
                 break;
             case 'q':
                 sip->shutdown();

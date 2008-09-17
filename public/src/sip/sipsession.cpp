@@ -20,126 +20,113 @@
 #include "sipsession.h"
 #include <iostream>
 
-SIPSession::SIPSession( int pyID, int port )
+SIPSession::SIPSession( int port )
     : Session( PROTOCOL_SIP, port ), _app_ua(NULL) {
-    setSessionPort(port);
-    _app_ua = new UserAgent( APP_NAME, port, pyID );
+    // Set the session port
+    set_session_port(port);
+    // Create the user agent module
+    _app_ua = new UserAgent( APP_NAME, port );
+    // Initialize the user agent module
     init( );
-    // Init the pjsip library modules
-    //status = _app_ua->init_pjsip_modules( );
 }
 
 
 SIPSession::SIPSession( SIPSession const& )
     : Session( PROTOCOL_SIP,
                DEFAULT_SIP_PORT ), _app_ua( NULL ){
-    setSessionPort( DEFAULT_SIP_PORT );
-    _app_ua = new UserAgent( APP_NAME, DEFAULT_SIP_PORT, 2222 );
+    // Set the session port
+    set_session_port( DEFAULT_SIP_PORT );
+    // Create the user agent module
+    _app_ua = new UserAgent( APP_NAME, DEFAULT_SIP_PORT );
+    // Initialize the user agent module
     init();
 }
 
 
 SIPSession::~SIPSession(){
+    // Delete the pointer reference on the user agent module
     delete _app_ua; _app_ua = 0;
 }
 
 
 int SIPSession::connect( std::string r_uri ){
-    int state = _app_ua->inv_session_create( r_uri );
-    //displayConnStatus();
-    if( state == 0 && _app_ua->getConnectionState() == CONNECTION_STATE_CONNECTED )
-        return 0;
-    else
-        return state;
+    // tells the user agent module to create a connection 
+    return _app_ua->inv_session_create( r_uri );
 }
 
 
 int SIPSession::disconnect( void ){
-    int state = _app_ua->inv_session_end();
-    //displayConnStatus();
-    return state;
+    // tells the user agent module to end the current connection 
+    return _app_ua->inv_session_end();
 }
 
 
 int SIPSession::shutdown( void ){
-    int state = _app_ua->pjsip_shutdown();
-    //displayConnStatus();
-    return state;
+    // tells the user agent module to free the allocated memory and to shutdown pjsip 
+    return _app_ua->pjsip_shutdown();
 }
 
 
 int SIPSession::init( void ) {
-    int state = _app_ua->init_pjsip_modules();
-    //displayConnStatus();
-    return state;
+    // tells the user agent module to initialize its components
+    return _app_ua->init_pjsip_modules();
 }
 
 
 int SIPSession::reinvite( void ){
-    int state = _app_ua->inv_session_reinvite();
-    //displayConnStatus();
-    return state;
+    // tells the user agent module to update the current connection 
+    return _app_ua->inv_session_reinvite();
 }
 
 
-int SIPSession::sendInstantMessage( std::string msg ){
-    return _app_ua->sendInstantMessage( msg );
+int SIPSession::send_instant_message( std::string msg ){
+    // tells the user agent module to send the text message 
+    return _app_ua->send_instant_message( msg );
 }
 
 
 int SIPSession::accept( void ){
+    // tells the user agent module to accept the incoming connection 
     return _app_ua->inv_session_accept();
 }
 
 
 int SIPSession::refuse( void ){
+    // tells the user agent module to refuse the incoming connection 
     return _app_ua->inv_session_refuse();
 }
 
-
-int SIPSession::getFinalCodec( void ){
-    return _app_ua->getFinalCodec();
-}
-
-
-void SIPSession::setMedia( std::string type, std::string codecs, int port, std::string dir ){
+void SIPSession::set_media( std::string type, std::string codecs, int port, std::string dir ){
     _app_ua->setSessionMedia( type, codecs, port, dir );
 }
 
 
-std::string SIPSession::getConnectionState( void ){
+std::string SIPSession::get_connection_state( void ){
+    // Return the equivalent string form of the current connection state
     return _app_ua->getConnectionStateStr( _app_ua->getConnectionState() );
 }
 
 
-std::string SIPSession::getErrorReason( void ){
+std::string SIPSession::get_error_reason( void ){
+    // Return the equivalent string form of the current error status 
     return _app_ua->getErrorReason( _app_ua->getErrorCode() );
 }
 
 
-std::string SIPSession::mediaToString( void ){
+std::string SIPSession::media_to_string( void ){
     return _app_ua->mediaToString();
 }
 
 
-bool SIPSession::incomingInvite( void ){
-    return _app_ua->hasIncomingCall();
-}
-
-
-void SIPSession::setAnswerMode( int mode ){
+void SIPSession::set_answer_mode( int mode ){
     _app_ua->setAnswerMode( mode );
 }
 
 
-std::string SIPSession::getAnswerMode( void ){
+std::string SIPSession::get_answer_mode( void ){
     return _app_ua->getAnswerMode();
 }
 
-
-void SIPSession::displayConnStatus( void ){
-    std::cout << "Connection State : " << getConnectionState() << std::endl;
-    std::cout << "Error reason : " << getErrorReason() << std::endl;
+void SIPSession::set_python_instance(PyObject *p ){
+    _app_ua->set_python_instance(p);
 }
-
-

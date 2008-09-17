@@ -20,14 +20,14 @@
 #ifndef _USER_AGENT_H
 #define _USER_AGENT_H
 
-#define THIS_FILE       "useragent"
-#define _LOCAL_IP_ADDRESS   "127.0.0.1"
-#define DEFAULT_SIP_PORT   5060
-#define PJ_LOG_LEVEL        1
+#define THIS_FILE               "useragent"
+#define _LOCAL_IP_ADDRESS       "127.0.0.1"
+#define DEFAULT_SIP_PORT        5060
+#define PJ_LOG_LEVEL            1
 
 /* @file	useragent.h
- * @brief	A SIP useragent. Implements the SIP stacks from the transaction layer to the transport layer as described in
- *      RFC 3261.
+ * @brief	A SIP useragent. 
+ * Implements the SIP stacks from the transaction layer to the transport layer as described in RFC 3261.
  */
 
 #include <pjsip.h>
@@ -96,10 +96,25 @@ enum errorCode {
     ERROR_NOT_CONNECTED
 };
 
-// Some typedef to easy the code writing
+// Some typedef to lighten the code writing
 typedef enum connectionState connectionState;
 typedef enum answerMode amswerMode;
 typedef enum errorCode errorCode;
+
+/*
+ * Second thread entry point.
+ * This thread will take care of listen to sip events and process to incoming messages 
+ * through the pjsip callbacks
+ */
+
+extern int startThread( void *arg);
+
+/*
+ * Callback from C++ to python when the connection state changes
+ *
+ * @param state The new state of the connection
+ */
+extern void py_connection_callback( std::string conn_state );
 
 class UserAgent
 {
@@ -109,7 +124,7 @@ class UserAgent
          * @param	name	The application name
          * @param   port    The SIP listening port
          */
-        UserAgent( std::string name, int port, int pyID );
+        UserAgent( std::string name, int port );
 
         /*
          * Class destructor
@@ -191,7 +206,7 @@ class UserAgent
          * @return int	0 on success
          *               1 otherwise
          */
-        int sendInstantMessage( std::string message );
+        int send_instant_message( std::string message );
 
         /*
          * Free memory allocated by the pjsip library
@@ -248,13 +263,23 @@ class UserAgent
          */
         bool hasIncomingCall( void );
 
+        /*
+         * Set the python runnning instance as an PyObject.
+         * As the C++ module is asynchronous, we need the C++ to call back the python module.
+         * To callback on the right instance, we need that python gives us a memory reference
+         * of its instance
+         * basically, the python calls the C++ module, which will call later (when the result is available) 
+         * the same python.
+         *
+         * @param p The python instance as a transparent PyObject 
+         */
+        void set_python_instance(PyObject *p);
+
+        /*
+         * Initialize and acquire the python global interpreter lock. Should be called in the main thread 
+         * before any operation engaging in any thread operation.
+         */
         void initPython();
-        static void getLock( PyThreadState** myThreadState );
-        static void releaseLock( PyThreadState* myThreadState );
-
-        void python_shutdown();
-
-        int getFinalCodec( void );
 
     private:
         /*
@@ -271,14 +296,22 @@ class UserAgent
          * Initialize the pjsip_module structure
          */
         void init_sip_module( void );
-
+        
+        /*
+         * Restore the connection state to the CONNECTION_STATE_READY
+         */
         void connection_prepare( void );
 
+        /*
+         * If we need to switch to a synchronous behaviour
+         *
+         * @param state The current state. The function returns when the current state changed
+         */
         void wait_for_response( connectionState state );
-
 
         UserAgent(const UserAgent&); //No Copy Constructor
         UserAgent& operator=(const UserAgent&); //No Assignment Operator
 };
+
 
 #endif // _USER_AGENT_H
