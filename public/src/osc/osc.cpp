@@ -35,7 +35,7 @@
 OscThread::OscThread()
     : local_port_("7770"), remote_port_(), remote_host_(), arg_local_port_(0), running_(false)
 {
-    args_.clear();
+    //args_.clear();
     //    local_port_ = remote_port_ = remote_host_ = 0;
     //args_.push_back(new StringArg(arg_local_port_, "oscLocal", 'p', "local osc port",
     //                            "port num"));

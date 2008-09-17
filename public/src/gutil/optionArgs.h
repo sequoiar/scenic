@@ -32,10 +32,66 @@
 #define __OPTION_ARGS_H__
 
 
-#include "config.h"
-#include <vector>
 #include <glib.h>
-#include "baseModule.h"
+
+/// Base class of Arguments used in command line parsing
+class BaseArg
+{
+    public:
+        BaseArg(char t, std::string l, char s, std::string d, std::string a)
+            : type(t), l_arg(l), desc(d), arg_desc(a), s_arg(s){}
+
+        virtual ~BaseArg() {}
+
+    protected:
+        friend class OptionArgs;
+        char type;
+        std::string l_arg, desc, arg_desc;
+        char s_arg;
+};
+
+///Integer argument
+class IntArg
+    : public BaseArg
+{
+    public:
+        int* arg;
+        IntArg(int* i, std::string l, char s, std::string d, std::string a)
+            : BaseArg('i', l, s, d, a), arg(i){}
+
+    private:
+        IntArg(const IntArg&); //No Copy Constructor
+        IntArg& operator=(const IntArg&); //No Assignment Operator
+};
+
+///Boolean argument
+class BoolArg
+    : public BaseArg
+{
+    public:
+        bool* arg;
+        BoolArg(bool* b, std::string l, char s, std::string d)
+            : BaseArg('b', l, s, d, std::string()), arg(b){}
+
+    private:
+        BoolArg(const BoolArg&); //No Copy Constructor
+        BoolArg& operator=(const BoolArg&); //No Assignment Operator
+};
+
+///String argument
+class StringArg
+    : public BaseArg
+{
+    public:
+        char** arg ;
+        StringArg(char** ppc, std::string l, char s, std::string d, std::string a)
+            : BaseArg('s', l, s, d, a), arg(ppc){}
+
+    private:
+        StringArg(const StringArg&); //No Copy Constructor
+        StringArg& operator=(const StringArg&); //No Assignment Operator
+};
+
 
 class OptionArgs
 {
