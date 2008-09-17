@@ -23,11 +23,9 @@
 
 #include <cassert>
 #include <iostream>
-//#define USE_OSC
-//#ifdef USE_OSC
 #include "lo/lo.h"
+#include <sstream>
 #include "logWriter.h"
-//#endif
 
 #include "audioSender.h"
 #include "audioSource.h"
@@ -55,35 +53,26 @@ void AudioSender::init_source()
 
 void AudioSender::init_codec()
 {
-    if (config_.hasCodec()) {
         assert(encoder_ = config_.createEncoder());
         encoder_->init();
-    }
 }
 
 
 void AudioSender::init_sink()
 {
-    if (config_.isNetworked()) {     // remote version
      assert(payloader_ = encoder_->createPayloader());
      payloader_->init();
      GstLinkable::link(*source_, *encoder_);
      
      GstLinkable::link(*encoder_, *payloader_);
      session_.add(payloader_, config_);   // FIXME: session should take RtpPay pointer
-    }
-    else {                       // local version
-        assert(sink_ = config_.createSink());
-        sink_->init();
-        GstLinkable::link(*source_, *sink_);   
-    }
 }
+
 
 
 void AudioSender::send_caps() const
 {
     //#ifdef USE_OSC
-    
     // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
     LOG("Sending caps...", DEBUG);
 
@@ -99,14 +88,13 @@ bool AudioSender::start()
 {
     MediaBase::start();
 
-    if (config_.isNetworked())
-    {
-        std::cout << "Sending audio to host " << config_.remoteHost() << " on port "
-            << config_.port() << std::endl;
+    std::stringstream logstr;
+    logstr << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port() << std::endl;
+    LOG_DEBUG(logstr.str());
 
-        pipeline_.wait_until_playing();
-        send_caps();
-    }
+    pipeline_.wait_until_playing();
+    send_caps();
+
     return true;
 }
 
