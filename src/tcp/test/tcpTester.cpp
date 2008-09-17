@@ -11,7 +11,7 @@ int main(int argc, char** argv)
         return 0;
     int port = atoi(argv[1]);
     TcpThread tcp(port);
-    TcpQueue& queue = tcp.getQueue();
+    QueuePair& queue = tcp.getQueue();
     LOG("helo",DEBUG);
     tcp.run();
 

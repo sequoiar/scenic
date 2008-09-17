@@ -58,6 +58,7 @@ public:
     std::string log_msg_;
 
     except(LogLevel log,std::string log_msg):log_(log),log_msg_(log_msg){}
+    except(std::string log_msg):log_(ERROR),log_msg_(log_msg){}
 };
 
 

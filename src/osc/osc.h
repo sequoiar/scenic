@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include "gutil/baseThread.h"
+#include "baseThread.h"
 #include "oscMessage.h"
 
 
