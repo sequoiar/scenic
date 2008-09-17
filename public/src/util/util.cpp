@@ -39,8 +39,10 @@
 const char *get_host_ip()
 {
     int i;
-    char *ip;
+    char *ip = 0;
     int s = socket (PF_INET, SOCK_STREAM, 0);
+    if(s == -1)
+        return ip;
 
     for (i = 1;; i++)
     {
