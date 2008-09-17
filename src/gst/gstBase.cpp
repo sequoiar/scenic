@@ -54,7 +54,31 @@ bool GstBase::stop()
 }
 
 
-bool GstBase::isPlaying() 
+bool GstBase::isPlaying() const
 { 
     return pipeline_.isPlaying(); 
 }
+
+
+const char* GstBase::getElementPadCaps(GstElement *element, const char * padName) const
+{
+    assert(isPlaying());
+
+    GstPad *pad;
+    GstCaps *caps;
+
+    assert(pad = gst_element_get_pad(GST_ELEMENT(element), padName));
+
+    do
+        caps = gst_pad_get_negotiated_caps(pad);
+    while (caps == NULL);
+
+    // goes until caps are initialized
+
+    gst_object_unref(pad);
+
+    const char *result = gst_caps_to_string(caps);
+    gst_caps_unref(caps);
+    return result;
+}
+

@@ -20,6 +20,7 @@
 #include <cassert>
 #include <gst/gst.h>
 #include "audioSink.h"
+#include "gstBase.h"
 #include "logWriter.h"
 #include "jackUtils.h"
 #include "pipeline.h"
@@ -32,16 +33,9 @@ AudioSink::~AudioSink()
 }
 
 
-bool AudioAlsaSink::init()
+std::string AudioSink::getCaps()
 {
-    if (Jack::is_running())
-        LOG("Jack is running, Alsa unavailable", ERROR);
-
-    assert(sink_ = gst_element_factory_make("alsasink", NULL));
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-    pipeline_.add(sink_);
-
-    return true;
+    return getElementPadCaps(sink_, "sink");
 }
 
 
@@ -53,6 +47,19 @@ bool AudioJackSink::init()
 
     assert(sink_ = gst_element_factory_make("jackaudiosink", NULL));
     g_object_set(G_OBJECT(sink_), "connect", 1, NULL);
+    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    pipeline_.add(sink_);
+
+    return true;
+}
+
+
+bool AudioAlsaSink::init()
+{
+    if (Jack::is_running())
+        LOG("Jack is running, stop jack server", ERROR);
+
+    assert(sink_ = gst_element_factory_make("alsasink", NULL));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     pipeline_.add(sink_);
 
