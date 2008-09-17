@@ -30,13 +30,9 @@ using std::endl;
 
 #define RANDOM_SIP_PORT   rand() % 64000 + 1024
 
-#define PY_CALLBACK_MODULE    "sip_test"
+#define CORE_NOTIFICATION   1 
 
-#define CORE_NOTIFICATION   1
-
-#define SYSTEM_MODE         0  
-    
-/**************** STATIC VARIABLES AND FUNCTIONS (callbacks) **************************/
+/**************** EXTERN VARIABLES AND FUNCTIONS (callbacks) **************************/
 
 /*
  * Retrieve the SDP of the peer contained in the offer
@@ -44,7 +40,7 @@ using std::endl;
  * @param rdata	The request data
  * @param r_sdp	The pjmedia_sdp_media to stock the remote SDP
  */
-static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp );
+void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp );
 
 /*
  * Process an invite request and send the response.
@@ -53,12 +49,7 @@ static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r
  * @return int	PJ_SUCCESS on success
  *      1 otherwise
  */
-static int inv_session_answer();
-
-/*
- * Thread entry point
- */
-static int startThread( void *arg );
+int inv_session_answer();
 
 /*
  * Callback function to redirect pjsip log output to our own log system
@@ -67,7 +58,7 @@ static int startThread( void *arg );
  * @param data  The log message
  * @param len	The log message length
  */
-static void pjsipLogWriter( int level, const char *data, int len );
+void pjsipLogWriter( int level, const char *data, int len );
 
 // Documentated from the PJSIP Developer's Guide, available on the pjsip website
 
@@ -162,12 +153,12 @@ pjsip_inv_session* inv_session;
 /*
  * The connection state
  */
-static connectionState _state;
+connectionState _state;
 
 /*
  * The connection state string
  */
-static const char *stateStr[] =
+const char *stateStr[] =
 {
     "CONNECTION_STATE_NULL",
     "CONNECTION_STATE_READY",
@@ -179,9 +170,15 @@ static const char *stateStr[] =
     "CONNECTION_STATE_NOT_ACCEPTABLE"
 };
 
-static errorCode _error;
+/*
+ * The connection error status
+ */
+errorCode _error;
 
-static const char *errorReason[] =
+/*
+ * The connection error status string description
+ */
+const char *errorReason[] =
 {
     "NO_ERROR",
     "ERROR_INIT_ALREADY_DONE",
@@ -217,20 +214,14 @@ InstantMessaging *_imModule;
  */
 answerMode _answerMode;
 
-PyThreadState* mainThreadState;
-
-//PyGILState_STATE _pystate;
+/*
+ * The python instance
+ */
+PyObject *_python_instance;
  
-static void py_connection_made( void );
-//static void py_connection_incoming( void );
-
-static int _finalCodec;
-
-int _PY_ID;
-
 /*************************************************************************************************/
 
-UserAgent::UserAgent( std::string name, int port, int pyID )
+UserAgent::UserAgent( std::string name, int port )
     : _name(name), _localURI(0)
 {
     // The state of the connection
@@ -246,8 +237,6 @@ UserAgent::UserAgent( std::string name, int port, int pyID )
 
     // Instantiate the instant messaging module
     _imModule = new InstantMessaging();
-
-    _PY_ID = pyID;
 
     // To generate a different random number at each time
     // Useful for the random port selection if the default one is used
@@ -268,37 +257,19 @@ UserAgent::~UserAgent(){
 
 void UserAgent::initPython(){
 
-        // Initialize python
-        Py_Initialize();
-        // Initialize thread support
-        PyEval_InitThreads();
-        // Save a pointer to the main PyThreadState object
-        mainThreadState = PyThreadState_Get();
-        // Release the lock
-        PyEval_ReleaseLock();
-
-
-    //_pystate = PyGILState_Ensure();
+    // Mandatory call to access to python global lock interpretor through different threads
+    PyEval_InitThreads();
 }
-
-
-void UserAgent::python_shutdown(){
-    // Shut down the interpreter
-    PyInterpreterState * mainInterpreterState = mainThreadState->interp;
-    // create a thread state object for this thread
-    PyThreadState * myThreadState = PyThreadState_New(mainInterpreterState);
-    PyThreadState_Swap(myThreadState);
-    PyEval_AcquireLock();
-    //Py_Finalize();
-}
-
 
 int UserAgent::pjsip_shutdown(){
 
+    // If the connection is not initialized, no need to shutdown it
     if( _state == CONNECTION_STATE_NULL ) {
         _error = ERROR_SHUTDOWN_ALREADY_DONE;
-        return 0;
+        return PJ_SUCCESS;
     }
+
+    // If we try to shutdown as the connection is established, we first disconnect it
     if( _state == CONNECTION_STATE_CONNECTED )
         inv_session_end();
 
@@ -322,12 +293,12 @@ int UserAgent::pjsip_shutdown(){
         pj_caching_pool_destroy(&c_pool);
     }
     pj_shutdown();
-    //python_shutdown();
 
+    // Update the status
     _state = CONNECTION_STATE_NULL;
     _error = NO_ERROR;
 
-    return 0;
+    return PJ_SUCCESS;
 }
 
 
@@ -339,11 +310,6 @@ connectionState UserAgent::getConnectionState( void ){
 errorCode UserAgent::getErrorCode( void ){
     return _error;
 }
-
-int UserAgent::getFinalCodec( void ){
-    return _finalCodec;
-}
-
 
 std::string UserAgent::getConnectionStateStr( connectionState state ){
     std::string res;
@@ -415,29 +381,13 @@ std::string UserAgent::getAnswerMode( void ){
     return res;
 }
 
-
-bool UserAgent::hasIncomingCall( void ){
-    return ( getConnectionState() == CONNECTION_STATE_INCOMING );
-}
-
-static void getLock( PyThreadState** myThreadState ){
-    // Get the global lock
-    PyEval_AcquireLock();
-
-    // Create a thread state object for this thread
-    *myThreadState = PyThreadState_New( mainThreadState->interp);
-    PyThreadState_Swap(*myThreadState);
-}
-
-static void releaseLock(PyThreadState* myThreadState){
-    // Swap my thread state out of the interpreter
-    PyThreadState_Swap(NULL);
-    PyThreadState_Clear(myThreadState);
-    PyThreadState_Delete(myThreadState);
-    PyEval_ReleaseLock();
-}
+void UserAgent::set_python_instance(PyObject *p){
+   cout << "set callback " << p << endl;
+   _python_instance = p;
+} 
 
 void UserAgent::init_sip_module( void ){
+    // Init the pjsip module
     mod_ua.name = pj_str((char*)this->_name.c_str());
     mod_ua.id = -1;
     mod_ua.priority = PJSIP_MOD_PRIORITY_APPLICATION;
@@ -452,8 +402,10 @@ int UserAgent::init_pjsip_modules(  ){
     URI *my_uri;
     pjsip_inv_callback inv_cb;
 
+    // If the library has already been initialized, its state is not NULL
     if( _state != CONNECTION_STATE_NULL ){
         _error = ERROR_INIT_ALREADY_DONE;
+        // We don't do t again
         return !PJ_SUCCESS;
     }
     // Redirect the library log output to our log system
@@ -463,6 +415,7 @@ int UserAgent::init_pjsip_modules(  ){
     // Init SIP module
     init_sip_module();
 
+    // Init the python part
     initPython();
 
     // Init the pj library. Must be called before using the library
@@ -539,9 +492,6 @@ int UserAgent::init_pjsip_modules(  ){
     _state = CONNECTION_STATE_READY;
     _error = NO_ERROR;
 
-    PJ_LOG(3, (THIS_FILE, "Ready to accept incoming calls..."));
-
-    //PyRun_SimpleString("print 'iNit done'\n");
     return PJ_SUCCESS;
 }
 
@@ -563,18 +513,21 @@ int UserAgent::inv_session_create( std::string uri){
         // Use for local tests
         remote = new URI(DEFAULT_SIP_PORT);
     }
-
     else
         remote = new URI( uri );
+    
     local = getLocalURI();
 
+    // Build the local contact
     pj_ansi_sprintf( tmp, local->getAddress().c_str() );
     from = pj_str(tmp);
 
+    // Build the remote contact
     pj_ansi_sprintf( tmp1, remote->getAddress().c_str() );
     to = pj_str(tmp1);
 
     if( _state == CONNECTION_STATE_READY ) {
+        // Use a high level invite session management provided by pjsip
         status = pjsip_dlg_create_uac( pjsip_ua_instance(), &from,
                                        NULL,
                                        &to,
@@ -585,44 +538,37 @@ int UserAgent::inv_session_create( std::string uri){
         // Building the local SDP offer
         _local_sdp->createInitialOffer();
 
+        // Create the user agent client instance
         status = pjsip_inv_create_uac( dialog,
                                        _local_sdp->getLocalSDPSession(), 0, &inv_session );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
+        // Create the invite session
         status = pjsip_inv_invite( inv_session, &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
+        // Send the invite request
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         // Update the connection status. The invite session has been created and sent.
         _state = CONNECTION_STATE_CONNECTING;
 
-        //py_connection_made(); 
-    
-        // In synchronous words
-        if( SYSTEM_MODE == 1 )  wait_for_response( _state );
-
-        return getErrorCode();
-    }
-    else if( _state == CONNECTION_STATE_CONNECTED){
-        // does nothing. We let the error status in NO_ERROR state
         return PJ_SUCCESS;
     }
-    else{   
+
+    // if already connected, does nothing
+    else if( _state == CONNECTION_STATE_CONNECTED){
+        // Stay in NO_ERROR state
+        return PJ_SUCCESS;
+    }
+    
+    else{
+        // Connection not ready   
         _error = ERROR_CONNECTION_NOT_READY;
         return !PJ_SUCCESS;
     }
 }
-
-void UserAgent::wait_for_response( connectionState state ) {
-
-    // Loop until the connection state has been updated
-    while( getConnectionState() == state ){
-        // nothing
-    }
-}
-
 
 int UserAgent::inv_session_end( void ){
     
@@ -631,19 +577,20 @@ int UserAgent::inv_session_end( void ){
     connectionState state;
 
     state = getConnectionState();
+    // Disconnect only if already connected...
     if( state == CONNECTION_STATE_CONNECTED ){
+        // build the BYE request
         status = pjsip_inv_end_session( inv_session, 404, NULL, &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
+        // Send it
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
-        if(SYSTEM_MODE == 1)    wait_for_response( state );
-
-        return getErrorCode();
-        //return PJ_SUCCESS;
+        return PJ_SUCCESS;
     }
     else {
+        // Update the error status
         _error = ERROR_NOT_CONNECTED;
         return !PJ_SUCCESS;
     }
@@ -654,14 +601,18 @@ int UserAgent::inv_session_reinvite( void ){
     pj_status_t status;
     pjsip_tx_data *tdata;
 
+    // reinvite only if connected
     if( _state == CONNECTION_STATE_CONNECTED ) {
+        // Build the local SDP offer
         status = _local_sdp->createInitialOffer( );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
-
+        
+        // Build the reinvite request
         status = pjsip_inv_reinvite( inv_session, NULL,
                                      _local_sdp->getLocalSDPSession(), &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
+        // Send it
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
@@ -669,6 +620,7 @@ int UserAgent::inv_session_reinvite( void ){
     }
 
     else{
+        // Update the error status
         _error = ERROR_NOT_CONNECTED;
         return !PJ_SUCCESS;
     }
@@ -678,7 +630,7 @@ int UserAgent::inv_session_accept( void ) {
     return inv_session_answer();
 }
 
-static int inv_session_answer(){
+int inv_session_answer(){
     pj_status_t status;
     pjsip_tx_data *tdata;
 
@@ -692,6 +644,7 @@ static int inv_session_answer(){
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
+        // Update the connection status
         _state = CONNECTION_STATE_CONNECTED;
         _error = NO_ERROR;
     }
@@ -704,6 +657,7 @@ static int inv_session_answer(){
         status = pjsip_inv_send_msg( inv_session, tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
+        // Update the connection status
         _state = CONNECTION_STATE_NOT_ACCEPTABLE;
         _error = ERROR_NO_COMPATIBLE_MEDIA;
     }
@@ -715,11 +669,14 @@ int UserAgent::inv_session_refuse( void ) {
     pj_status_t status;
     pjsip_tx_data *tdata;
 
+    // Build a decline offer
     status = pjsip_inv_answer( inv_session, PJSIP_SC_DECLINE, NULL, NULL, &tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
+    // Send it
     status = pjsip_inv_send_msg( inv_session, tdata );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
+    // Update the connection status
     _state = CONNECTION_STATE_DISCONNECTED;
     _error = NO_ERROR;
 
@@ -727,14 +684,16 @@ int UserAgent::inv_session_refuse( void ) {
 }
 
 
-int UserAgent::sendInstantMessage( std::string msg ){
+int UserAgent::send_instant_message( std::string msg ){
     pj_status_t status;
 
+    // The connection must exist 
     if( inv_session ){
         // Set the current dialog for the instant messaging module
         _imModule->setDialog( inv_session->dlg );
         _imModule->setText( msg );
     }
+    // And be established
     if( _state == CONNECTION_STATE_CONNECTED ) {
         // Send the message through the IM module
         status = _imModule->sendMessage();
@@ -762,9 +721,10 @@ std::string UserAgent::mediaToString( void ){
 }
 
 
-static int startThread( void *arg ){
+int startThread( void *arg ){
     PJ_UNUSED_ARG(arg);
  
+    // Entry point the secondary thread. It will process the sip events by polling through the callbacks
     while( !thread_quit )
     {
         pj_time_val timeout = {0, 10};
@@ -776,7 +736,7 @@ static int startThread( void *arg ){
 }
 
 
-static void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
+void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
     pjmedia_sdp_session *sdp;
     pjsip_msg *msg;
     pjsip_msg_body *body;
@@ -816,58 +776,22 @@ void pjsipLogWriter( int level, const char *data, int len ){
     }
 }
 
-static void py_connection_made( void ){
-    std::ostringstream inst;
-    PyThreadState* myThreadState;
-    PyObject*    main_module, * global_dict, * mod;
 
-    cout << "unlock" << endl;
-    getLock(&myThreadState);
-    cout << "pyImport module" << endl;
-    main_module = PyImport_AddModule("__main__");
-    cout << "pyImport dict" << endl;
-    global_dict = PyModule_GetDict(main_module);
-
-    cout << "getitem string" << endl;
-    mod = PyDict_GetItemString(global_dict, "connection_made_cb");
-
-    cout << "call object" << endl;
-    PyObject_CallFunction(mod, (char*)_PY_ID);
-    releaseLock(myThreadState);
-/*
-    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
+void py_connection_callback( int conn_state ){
+        
     try {
-        cout << "C++ wrote: connection made" << endl;
-        PyRun_SimpleString(inst.str().c_str());
-        inst << "sip.connection_made_cb(" << _PY_ID << ")\n" << endl;
-        PyRun_SimpleString(inst.str().c_str());
-        releaseLock(myThreadState);
+        // We must acquire the global lock interpreter to be able to execute python code
+        PyGILState_STATE gil_state = PyGILState_Ensure();
+        //TODO Test if the python instance exists
+        boost::python::call_method<void>(_python_instance, "connection_callback", conn_state );
+        // The release it
+        PyGILState_Release(gil_state);
     }
     catch(boost::python::error_already_set const &)
     {
         PyErr_Print();
-        releaseLock(myThreadState);
-    }*/
+    }
 }
-
-/*
-static void py_connection_incoming( void ){
-    std::ostringstream inst;
-    PyThreadState* myThreadState;
-
-    inst << "import " << PY_CALLBACK_MODULE << " as sip\n" << endl;
-    try {
-        getLock(&myThreadState);
-        cout << "C++ wrote: connection incoming" << endl;
-        PyRun_SimpleString(inst.str().c_str());
-        PyRun_SimpleString("sip.connection_incoming_cb()\n");
-        releaseLock(myThreadState);
-    }
-    catch(boost::python::error_already_set const &)
-    {
-        PyErr_Print();
-    }
-}*/
 
 /********************** Callbacks Implementation **********************************/
 
@@ -886,12 +810,17 @@ void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
                 _error = ERROR_HOST_UNREACHABLE;
                 break;
             case PJSIP_SC_NOT_ACCEPTABLE_HERE:
+                // The SDP negociation failed
                 _state = CONNECTION_STATE_NOT_ACCEPTABLE;
                 _error = ERROR_NO_COMPATIBLE_MEDIA;
                 break;
             default:
+                // The call terminated successfully; normal behaviour
                 _state = CONNECTION_STATE_DISCONNECTED;
                 _error = NO_ERROR;
+                // Core notification
+                if(CORE_NOTIFICATION == 1 )
+                    py_connection_callback(_state);
                 break;
         }
     }
@@ -900,15 +829,17 @@ void call_on_state_changed( pjsip_inv_session *inv, pjsip_event *e ){
         // The connection is established
         _state = CONNECTION_STATE_CONNECTED;
         _error = NO_ERROR;
+        // Core notification
         if(CORE_NOTIFICATION == 1 )
-            py_connection_made();
+            py_connection_callback(_state);
     }
 
     else if( inv->state == PJSIP_INV_STATE_INCOMING ){
         // Incoming invite session
         _state = CONNECTION_STATE_INCOMING;
-        //if(CORE_NOTIFICATION == 1 )
-            //py_connection_incoming();
+        // Core notification
+        if(CORE_NOTIFICATION == 1 )
+            py_connection_callback(_state);
     }
 
     else{
@@ -1055,7 +986,6 @@ void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
         // Retrieve the payload
         nbCodecs = media->desc.fmt_count;  // Must be one
         for( j=0 ; j<nbCodecs ; j++ ){
-            _finalCodec = atoi(media->desc.fmt[j].ptr);
             
         }
         // TODO Retrieve the rtpmap attribute to get the encoding name

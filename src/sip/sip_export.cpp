@@ -10,8 +10,8 @@ using namespace boost::python;
  */
 BOOST_PYTHON_MODULE( libsip_export )
 {
-    class_<SIPSession>("SIPSession", init<int, int>())
-    .def(init<int>())
+    class_<SIPSession>("SIPSession", init<int>())
+    .def(init<>())
     .def("connect", &SIPSession::connect, (arg("r_uri") = DEFAULT_PARAMETER))
     .def("accept", &SIPSession::accept)
     .def("refuse", &SIPSession::refuse)
@@ -19,14 +19,14 @@ BOOST_PYTHON_MODULE( libsip_export )
     .def("reinvite", &SIPSession::reinvite)
     .def("shutdown", &SIPSession::shutdown)
     .def("init", &SIPSession::init)
-    .def("message", &SIPSession::sendInstantMessage)
-    .def("setMedia", &SIPSession::setMedia, (arg("dir") = DEFAULT_PARAMETER))
-    .def("mediaToString", &SIPSession::mediaToString)
-    .def("state", &SIPSession::getConnectionState)
-    .def("errorReason", &SIPSession::getErrorReason)
-    .def("getAnswerMode", &SIPSession::getAnswerMode)
-    .def("setAnswerMode", &SIPSession::setAnswerMode)
-    .def("getFinalCodec", &SIPSession::getFinalCodec)
+    .def("message", &SIPSession::send_instant_message)
+    .def("set_media", &SIPSession::set_media, (arg("dir") = DEFAULT_PARAMETER))
+    .def("media_to_string", &SIPSession::media_to_string)
+    .def("state", &SIPSession::get_connection_state)
+    .def("error_reason", &SIPSession::get_error_reason)
+    .def("get_answer_mode", &SIPSession::get_answer_mode)
+    .def("set_answer_mode", &SIPSession::set_answer_mode)
+    .def("set_python_instance", &SIPSession::set_python_instance)
     ;
 }
 
