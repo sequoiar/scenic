@@ -100,7 +100,7 @@ class AddressBook(object):
         try:
             adb_file = open(self.filename, 'r')
         except:
-            log.warning('Address Book file %s not found.' % self.filename)
+            log.info('Address Book file %s not found.' % self.filename)
         else:
             version = re.findall('v(\d+)\.(\d+)', adb_file.readline())
             if version:
