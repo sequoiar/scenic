@@ -1,4 +1,4 @@
-/* baseThread - Thread/AsyncQueue Routines using GLIB
+/* QueuePair_ 
  * Copyright (C) 2008	Koya Charles, Tristan Matthews
  *
  * This library is free software; you can redistribute it and/or
@@ -18,9 +18,8 @@
  */
 
 /** \file
- *		Threads and mutexed message passing system
- *
- *
+ *		QueuePair_ asbstracts a pair of glib GAsyncQueues
+ *      
  */
 #ifndef __QUEUE_PAIR_H__
 #define __QUEUE_PAIR_H__

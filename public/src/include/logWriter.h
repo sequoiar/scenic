@@ -21,7 +21,7 @@
  *      Log writer macro, usage:
  *
  *      LOG("This is a log");
- *      To enable logging, set the macro LOGGING (in this file) to 1.
+ *      To disable logging, define the macro ENABLE_LOG (in this file) to 1.
  *
  */
 
@@ -31,8 +31,13 @@
 #include <string>
 #include "config.h"
 
+#ifdef CONFIG_DEBUG
+#define LOG_LEVEL DEBUG
+#else
+#define LOG_LEVEL INFO
+#endif
+
 #define ENABLE_LOG 1
-#define ENABLE_GLOG 0
 
 
 #if !ENABLE_LOG
@@ -63,7 +68,6 @@ public:
 
 
 
-
 #define LOG_ERROR(msg)      LOG(msg, ERROR)
 #define LOG_CRITICAL(msg)   LOG(msg, CRITICAL)
 #define LOG_INFO(msg)       LOG(msg, INFO)
@@ -71,11 +75,6 @@ public:
 #define LOG_DEBUG(msg)      LOG(msg, DEBUG)
 
 
-#ifdef CONFIG_DEBUG
-static const LogLevel LOG_LEVEL = DEBUG;
-#else
-static const LogLevel LOG_LEVEL = INFO;
-#endif
 
 
 bool logLevelIsValid(LogLevel level);
