@@ -22,7 +22,7 @@
 #include <gst/audio/multichannel.h>
 #include "interleave.h"
 #include "pipeline.h"
-#include "audioLocalConfig.h"
+#include "audioConfig.h"
 
 Interleave::~Interleave()
 {

@@ -23,7 +23,7 @@
 #include <cstdlib>
 #include "audioTestSuite.h"
 #include "audioLocal.h"
-#include "audioLocalConfig.h"
+#include "audioConfig.h"
 
 void AudioTestSuite::start_1ch_audiotest()
 {

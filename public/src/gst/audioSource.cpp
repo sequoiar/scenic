@@ -22,7 +22,7 @@
 #include "gstLinkable.h"
 #include "logWriter.h"
 #include "audioSource.h"
-#include "audioLocalConfig.h"
+#include "audioConfig.h"
 #include "jackUtils.h"
 #include "pipeline.h"
 

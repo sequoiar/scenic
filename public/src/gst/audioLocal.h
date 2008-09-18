@@ -22,7 +22,7 @@
 #define _AUDIO_LOCAL_H_
 
 #include "mediaBase.h"
-#include "audioLocalConfig.h"
+#include "audioConfig.h"
 
 class AudioSource;
 class AudioSink;

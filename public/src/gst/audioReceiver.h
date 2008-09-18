@@ -24,7 +24,7 @@
 #include <cassert>
 #include "lo/lo.h"
 #include "mediaBase.h"
-#include "audioLocalConfig.h"
+#include "audioConfig.h"
 #include "remoteConfig.h"
 #include "rtpReceiver.h"
 
