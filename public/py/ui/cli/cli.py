@@ -214,7 +214,7 @@ class CliController(TelnetServer):
         elif options.list:
             self.core.list_stream(self, kind)
         elif options.add:
-            self.core.add_stream(self, options.add, audio.gst.AudioGst(10000, '127.0.0.1', self.factory.subject), kind)
+            self.core.add_stream(self, options.add, kind, 'gst')
         elif options.erase:
             self.core.delete_stream(self, options.erase, kind)
         else:
@@ -270,32 +270,46 @@ class CliController(TelnetServer):
             cp.print_help()
             
     def _streams(self, data):
-        cp = CliParser(self, prog=data[0], description="Manage the global stream.")
+        cp = CliParser(self, prog=data[0], description="Manage the wrapper stream.")
         cp.add_option("-l", "--list", action='store_true', help="List all the streams included")
 
 #        cp.add_option("-a", "--add", type="string", help="Add a stream")
 #        cp.add_option("-e", "--erase", type="string", help="Erase a stream")
 #        cp.add_option("-m", "--modify", type="string", help="Modify the name of a stream")
+
+        cp.add_option("-c", "--select", "--choose", type="string", help="Select the current stream")
         
         cp.add_option("-s", "--start", type="string", help="Start a stream of playing")
         cp.add_option("-i", "--stop", "--interrupt", action='store_true', help="Stop a stream of playing")
 
         cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
         cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
+        cp.add_option("-o", "--send", "--out", action='store_true', dest="mode", help="Set the mode to 'send'")
+        cp.add_option("-r", "--receive", "--in", action='store_false', dest="mode", help="Set the mode to 'receive'")
 
         (options, args) = cp.parse_args(data)
         
         kind = 'streams'
-        
+
         if options.list:
-            self.core.list_stream(self, kind)
+            if len(args) > 1:
+                self.core.list_streams(self)
+            else:
+                self.core.list_stream(self, kind)
         elif options.stop:
             self.core.stop_streams(self)
-        elif [opt for opt in options.__dict__.values() if opt]:
+        elif options.select:
+            self.core.select_streams(self, options.select)
+        elif [opt for opt in options.__dict__.values() if opt != None]:
+            print 'Allo', options.mode
             if options.container:
                 self.core.set_streams(self, 'container', options.container)
             if options.port:
                 self.core.set_streams(self, 'port', options.port)
+            if options.mode == True:
+                self.core.set_streams(self, 'mode', 'send')
+            elif options.mode == False:
+                self.core.set_streams(self, 'mode', 'receive')
             if options.start:
                 self.core.start_streams(self, options.start)
         else:
@@ -698,7 +712,7 @@ class CliView(Observer):
         if origin is self.controller:
             names = []
             for attr, value in data.items():
-                if attr != "streams":
+                if attr != "streams" and attr[0] != '_':
                     names.append(attr + ': ' + str(value))
             if names:
                 names.append('------------')
@@ -720,12 +734,31 @@ class CliView(Observer):
         elif origin is self.controller:
             self.write('Unable to set the %s of the master stream' % attr)
             
+    def _select_streams(self, origin, (name, value)):
+        if value:
+            self.write('The selected master stream is now  %s' % name)
+        elif origin is self.controller:
+            self.write('Unable to select %s as the master stream, it does\'nt exist.' % name)
+            
     def _start_streams(self, origin, data):
         self.write(data)
         
     def _stop_streams(self, origin, data):
         self.write(data)
     
+    def _list_streams(self, origin, (data, curr)):
+        if origin is self.controller:
+            msg = []
+            for name, streams in data.items():
+                if name == curr:
+                    msg.append(bold(name + ": <---"))
+                else:  
+                    msg.append(name + ":")
+                for attr, value in streams.__dict__.items():
+                    if attr[0] != '_':
+                        msg.append("\t%s: %s" % (attr, value))
+            self.write("\n".join(msg))
+            
     def _ask(self, origin, data):
         self.write('\n%s is inviting you. Do you accept?\n[Y/n]: ' % data[0].host, False)
         self.controller.block = self.controller._ask

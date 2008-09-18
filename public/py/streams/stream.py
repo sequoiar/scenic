@@ -24,11 +24,12 @@ class Streams(object):
     """Class representing a group of media streams, a master stream.
     """
 
-    def __init__(self):
+    def __init__(self, mode='send'):
         self.streams = {} 
-        self.mode = 'send'
+        self.mode = mode
         self.container = None
         self.port = None
+        self._kinds = ('audio', 'video')
 
     def get_kind(self, stream):
         if isinstance(stream, AudioStream):
@@ -38,7 +39,22 @@ class Streams(object):
         else:
             return None
 
-    def add(self, name, stream):
+    def add(self, name, kind, engine, core):
+        if kind in self._kinds:
+            dict_name = "_".join([kind, name])
+            if dict_name in self.streams:
+                return 0
+            else:
+#                try:
+                mod = core.engines['streams.%s.%s' % (kind, engine)].load()
+                self.streams[dict_name] = mod.start(core)
+                return 1
+#                except:
+#                    return -1
+        else:
+            return -1
+
+    def add_prev(self, name, stream):
         kind = self.get_kind(stream)
         if kind:
             dict_name = "_".join([kind, name])
@@ -69,11 +85,11 @@ class Streams(object):
     
     def list(self, kind):
         if kind == 'streams':
-            streams = [(name.separator('_')[2], stream) for name, stream in self.streams.items()]
+            streams = [(name.partition('_')[2], stream) for name, stream in self.streams.items()]
             streams.sort() 
             return streams, self.__dict__
         else:
-            streams = [(name.separator('_')[2], stream) for name, stream in self.streams.items() if name[0:2] == kind[0] + '_']
+            streams = [(name.partition('_')[2], stream) for name, stream in self.streams.items() if name.partition('_')[0] == kind]
             streams.sort() 
             return streams
 

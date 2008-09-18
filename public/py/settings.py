@@ -51,9 +51,22 @@ class Settings(object):
 
 class Setting(object):
     def __init__(self, name):
-        self.name = name
-        self.streams = Streams()
-        self.contact = None
+        if name == 'Custom':
+            self.name = name
+            self.streams = {'send':Streams(),
+                            'receive':Streams('receive')}
+            self.contact = None
+            self.others = {'gst':
+                                {'port_s':10000,
+                                 'port_r':10010,
+                                 'addr_s':'127.0.0.1',
+                                 'addr_r':'127.0.0.1'}
+                            }
+        else:
+            self.name = name
+            self.streams = Streams()
+            self.contact = None
+            self.others = {}
         
 
 

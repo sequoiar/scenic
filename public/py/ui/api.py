@@ -24,10 +24,15 @@ import sys
 
 class ControllerApi(object):
     
-    def __init__(self, core):
+    def __init__(self, notify):
+        self.notify = notify
+    
+    def _start(self, core):
+        self.core = core
         self.adb = core.adb
-        self.notify = core.notify
-        self.streams = core.curr_setting.streams
+        self.all_streams = core.curr_setting.streams
+        self.curr_streams = 'send'
+        self.streams = self.all_streams[self.curr_streams]
         self.connectors = core.connectors
 
 
@@ -59,7 +64,17 @@ class ControllerApi(object):
 
     def set_streams(self, caller, attr, value):
         self.notify(caller, self.streams.set_attr(attr, value))
+        
+    def select_streams(self, caller, name):
+        if name in self.all_streams:
+            self.streams = self.all_streams[name]
+            self.curr_streams = name
+            self.notify(caller, (name, True))
+        else:
+            self.notify(caller, (name, False))
 
+    def list_streams(self, caller):
+        self.notify(caller, (self.all_streams, self.curr_streams))
 
 
     ### Stream ###
@@ -74,8 +89,8 @@ class ControllerApi(object):
     def settings_stream(self, caller, name, kind):
         self.notify(caller, (self.streams.get(name, kind), name), kind + '_settings')
         
-    def add_stream(self, caller, name, stream, kind):
-        self.notify(caller, (self.streams.add(name, stream), name), kind + '_add')
+    def add_stream(self, caller, name, kind, engine):
+        self.notify(caller, (self.streams.add(name, kind, engine, self.core), name), kind + '_add')
         
     def delete_stream(self, caller, name, kind):
         self.notify(caller, (self.streams.delete(name, kind), name), kind + '_delete')

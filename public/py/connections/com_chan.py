@@ -23,6 +23,7 @@
 from types import FunctionType
 
 # Twisted imports
+from twisted.internet import reactor
 from twisted.spread import pb
 
 # App imports
@@ -72,6 +73,23 @@ class ComChannel(pb.Root):
             del self.methods[name]
         else:
             log.debug('Could not delete the method %s because is not registered.' % name)
+
+
+def listen(port):
+    channel = ComChannel()
+    reactor.listenTCP(port, pb.PBServerFactory(channel))
+    return channel
+
+
+factory = pb.PBClientFactory()
+
+def connect(address, port):
+    reactor.connectTCP(address, port, factory)
+    channel = ComChannel()
+    deferred = factory.getRootObject()
+    deferred.addCallback(channel.remote_init)
+    return channel
+    
 
 
 if __name__ == '__main__':
