@@ -32,8 +32,16 @@ class AudioGst(AudioStream, GstClient):
     """Class streams->audio->gst.AudioGst
     """
     
-    def __init__(self, port, address='127.0.0.1', core=None):
+    def __init__(self, core):
         AudioStream.__init__(self, core)
+        setting = core.curr_setting.others['gst']
+        mode = core.curr_setting.streams[core.api.curr_streams].mode
+        if mode == 'send':
+            port = setting['port_s']
+            address = setting['addr_s']
+        else:
+            port = setting['port_r']
+            address = setting['addr_r']
         GstClient.__init__(self, port, address)
             
     def get_attr(self, name):
@@ -90,5 +98,7 @@ class AudioGst(AudioStream, GstClient):
         returns 
         """
         return None # should raise NotImplementedError()
-    
 
+    
+def start(core):
+    return AudioGst(core)

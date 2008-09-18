@@ -91,4 +91,5 @@ class VideoGst(VideoStream, GstClient):
         """
         return None # should raise NotImplementedError()
     
-
+def start(core):
+    return VideoGst(core)

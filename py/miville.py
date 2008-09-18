@@ -23,6 +23,7 @@ import sys
 
 # Twisted imports
 from twisted.internet import reactor, task
+from twisted.python.modules import getModule
 
 # App imports
 import ui
@@ -39,15 +40,18 @@ class Core(Subject):
     def __init__(self):
         Subject.__init__(self)
         self.uis = None
+        self.api = None
         self.startup()
-    
+
     def startup(self):
+        self.api = ui.ControllerApi(self.notify)
         self.load_uis()
         self.adb = addressbook.AddressBook('sropulpof')
+        self.engines = self.find_engines()
         self.settings = settings.Settings()
         self.curr_setting = self.settings.select()
         self.load_connections()
-        self.api = ui.ControllerApi(self)
+        self.api._start(self)
         
     def load_uis(self):
         self.uis = ui.load(ui.find_all())
@@ -64,9 +68,21 @@ class Core(Subject):
         self.connectors = {'ip':basic}  # TODO
         for conn in self.connectors.values():
             if len(sys.argv) > 1:
-                conn.start(self.notify, (int(sys.argv[1]) - 9999)/2)
+                conn.start(self.api, (int(sys.argv[1]) - 9999)/2)
             else:
-                conn.start(self.notify)
+                conn.start(self.api)
+
+    def find_engines(self):
+        """
+        Find all the different audio/video/data engines
+        """
+        engines = {}
+        for kind in ('audio', 'video'):
+            mods = getModule('streams.' + kind).iterModules()
+            for engine in mods:
+                engines[engine.name] = engine
+        return engines
+
 
 
 def chk_ob(core):
