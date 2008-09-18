@@ -35,7 +35,7 @@ class AudioSender
     : public MediaBase
 {
     public:
-        AudioSender(const AudioLocalConfig aConfig, const RemoteSenderConfig rConfig) 
+        AudioSender(const AudioConfig aConfig, const SenderConfig rConfig) 
             : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), source_(0), 
             encoder_(0), payloader_(0), sink_(0)
         {}
@@ -55,8 +55,8 @@ class AudioSender
         void send_caps() const;
 
         // data
-        const AudioLocalConfig audioConfig_;
-        const RemoteSenderConfig remoteConfig_;
+        const AudioConfig audioConfig_;
+        const SenderConfig remoteConfig_;
         RtpSender session_;
         AudioSource *source_;
 

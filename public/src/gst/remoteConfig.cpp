@@ -27,7 +27,7 @@
 #include "logWriter.h"
 
 
-Encoder * RemoteSenderConfig::createEncoder() const
+Encoder * SenderConfig::createEncoder() const
 {
     if (codec_ == "vorbis")
         return new VorbisEncoder();
@@ -47,7 +47,7 @@ Encoder * RemoteSenderConfig::createEncoder() const
 }
 
 
-Decoder * RemoteReceiverConfig::createDecoder() const
+Decoder * ReceiverConfig::createDecoder() const
 {
     if (codec_ == "vorbis")
         return new VorbisDecoder();

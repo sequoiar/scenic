@@ -30,7 +30,7 @@
 //#include "audioDelaySource.h"
 
 // strips .delay from source name
-const char *AudioLocalConfig::source() const
+const char *AudioConfig::source() const
 {
     // find last period
     unsigned int pos = source_.rfind(".");
@@ -42,7 +42,7 @@ const char *AudioLocalConfig::source() const
 }
 
 
-AudioSource* AudioLocalConfig::createSource() const
+AudioSource* AudioConfig::createSource() const
 {
 #if 0
     if (source_ == "audiotestsrc.delay")
@@ -72,7 +72,7 @@ AudioSource* AudioLocalConfig::createSource() const
 }
 
 // FIXME: should be paramaterized by sink, not src
-AudioSink* AudioLocalConfig::createSink() const
+AudioSink* AudioConfig::createSink() const
 {
     if (source_ == "alsasrc")
         return new AudioAlsaSink();
@@ -95,7 +95,7 @@ AudioSink* AudioLocalConfig::createSink() const
 }
 
 
-bool AudioLocalConfig::sanityCheck() const   // FIXME: this should become more or less redundant
+bool AudioConfig::sanityCheck() const   // FIXME: this should become more or less redundant
 {
     bool validNumChannels = true;
 
@@ -109,7 +109,7 @@ bool AudioLocalConfig::sanityCheck() const   // FIXME: this should become more o
 }
 
 
-const char* AudioLocalConfig::location() const
+const char* AudioConfig::location() const
 {
     if (!location_.empty())
         return location_.c_str();
@@ -119,7 +119,7 @@ const char* AudioLocalConfig::location() const
     }
 }
 
-bool AudioLocalConfig::fileExists() const
+bool AudioConfig::fileExists() const
 {
     if (location_.empty())
     {

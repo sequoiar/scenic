@@ -34,7 +34,7 @@ class VideoSender
     : public MediaBase
 {
     public:
-         VideoSender(const VideoConfig vConfig, const RemoteSenderConfig rConfig) 
+         VideoSender(const VideoConfig vConfig, const SenderConfig rConfig) 
             : videoConfig_(vConfig), remoteConfig_(rConfig), session_(), source_(0), 
             encoder_(0), payloader_(0) {}
 
@@ -48,7 +48,7 @@ class VideoSender
         void init_sink();
 
         const VideoConfig videoConfig_;
-        const RemoteSenderConfig remoteConfig_;
+        const SenderConfig remoteConfig_;
         RtpSender session_;
         VideoSource *source_;
         Encoder *encoder_;
