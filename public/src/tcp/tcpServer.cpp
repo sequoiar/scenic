@@ -83,11 +83,7 @@ bool TcpServer::accept()
         if(newsockfd == -1 && errno == EWOULDBLOCK)
             return false;
         else
-        {
-            std::ostringstream os;
-            os << "Error on listen: errno msg: " << sys_errlist[errno]; 
-            LOG_ERROR(os.str());
-        }
+            LOG_ERROR("Error on listen: errno msg: " << sys_errlist[errno]);
     }
     connected_ = true;
     set_non_blocking(newsockfd);
@@ -101,7 +97,9 @@ bool TcpServer::recv(std::string& out)
 {
     int n=0;
     out.clear();
-    do
+
+    //while more data to receive
+    do 
     {
         bzero(buffer_, BUFFSIZE);
         n = ::recv(newsockfd, buffer_, BUFFSIZE, 0);
@@ -109,10 +107,13 @@ bool TcpServer::recv(std::string& out)
         {
             if (n != 0 && errno == EWOULDBLOCK)
                 break;
+
+            LOG_ERROR("Error reading from socket.");
             connected_ = false;
-            return false; //error("ERROR reading from socket");
+            return false; 
         }
         out.append(buffer_, n);
+
     } while(1);
 
     if(out.empty())
@@ -125,8 +126,10 @@ bool TcpServer::send(const std::string& in)
 {
     int n=0;
     n = ::write(newsockfd, in.c_str(), in.size());
-    if (n <= 0)
-        return false; //error("ERROR writing to socket");
+    if (n <= 0){
+        LOG_ERROR("Writing to socket failed.");
+        return false; 
+    }
     return true;
 }
 
