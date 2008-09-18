@@ -23,10 +23,10 @@
 
 #include "mediaBase.h"
 #include "videoConfig.h"
+#include "remoteConfig.h"
 #include "rtpSender.h"
 
 class VideoSource;
-class VideoSink;
 class Encoder;
 class RtpPay;
 
@@ -34,9 +34,9 @@ class VideoSender
     : public MediaBase
 {
     public:
-        explicit VideoSender(const VideoConfig config) 
-            : config_(config), session_(), source_(0), 
-            encoder_(0), payloader_(0), sink_(0) {}
+         VideoSender(const VideoConfig vConfig, const RemoteSenderConfig rConfig) 
+            : videoConfig_(vConfig), remoteConfig_(rConfig), session_(), source_(0), 
+            encoder_(0), payloader_(0) {}
 
         ~VideoSender();
 
@@ -47,12 +47,12 @@ class VideoSender
         void init_codec();
         void init_sink();
 
-        const VideoConfig config_;
+        const VideoConfig videoConfig_;
+        const RemoteSenderConfig remoteConfig_;
         RtpSender session_;
         VideoSource *source_;
         Encoder *encoder_;
         RtpPay *payloader_; 
-        VideoSink *sink_;
 
         // hidden
 

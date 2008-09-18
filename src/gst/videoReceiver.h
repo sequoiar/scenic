@@ -23,6 +23,7 @@
 
 #include "mediaBase.h"
 #include "videoConfig.h"
+#include "remoteConfig.h"
 #include "rtpReceiver.h"
 
 class RtpPay;
@@ -33,8 +34,8 @@ class VideoReceiver
     : public MediaBase
 {
     public:
-        explicit VideoReceiver(const VideoConfig config)
-            : config_(config), session_(), depayloader_(0), 
+        VideoReceiver(const VideoReceiverConfig vConfig, const RemoteReceiverConfig rConfig)
+            : videoConfig_(vConfig), remoteConfig_(rConfig), session_(), depayloader_(0), 
             decoder_(0), sink_(0) {}
 
         bool start();
@@ -44,11 +45,12 @@ class VideoReceiver
 
     private:
 
-        void init_source(){};
+        void init_source(){};       // FIXME: shouldn't exist
         void init_codec();
         void init_sink();
 
-        const VideoConfig config_;
+        const VideoReceiverConfig videoConfig_;
+        const RemoteReceiverConfig remoteConfig_;
         RtpReceiver session_;
         RtpPay *depayloader_; 
         

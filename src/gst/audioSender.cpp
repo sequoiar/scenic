@@ -46,26 +46,26 @@ AudioSender::~AudioSender()
 
 void AudioSender::init_source()
 {
-    assert(source_ = config_.createSource());
+    assert(source_ = audioConfig_.createSource());
     source_->init();
 }
 
 
 void AudioSender::init_codec()
 {
-        assert(encoder_ = config_.createEncoder());
+        assert(encoder_ = remoteConfig_.createEncoder());
         encoder_->init();
 }
 
 
-void AudioSender::init_sink()
+void AudioSender::init_sink()   // FIXME: this should be init_payloader
 {
      assert(payloader_ = encoder_->createPayloader());
      payloader_->init();
      GstLinkable::link(*source_, *encoder_);
      
      GstLinkable::link(*encoder_, *payloader_);
-     session_.add(payloader_, config_);   // FIXME: session should take RtpPay pointer
+     session_.add(payloader_, remoteConfig_);   // FIXME: session should take RtpPay pointer
 }
 
 
@@ -89,7 +89,7 @@ bool AudioSender::start()
     MediaBase::start();
 
     std::stringstream logstr;
-    logstr << "Sending audio to host " << config_.remoteHost() << " on port " << config_.port() << std::endl;
+    logstr << "Sending audio to host " << remoteConfig_.remoteHost() << " on port " << remoteConfig_.port() << std::endl;
     LOG_DEBUG(logstr.str());
 
     pipeline_.wait_until_playing();

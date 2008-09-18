@@ -1,6 +1,6 @@
 include $(top_srcdir)/src/globals.mak
 
-bin_PROGRAMS = audioTester videoTester syncTester rtpAudioTester rtpVideoTester
+bin_PROGRAMS = audioTester rtpAudioTester videoTester syncTester rtpVideoTester
 
 audioTester_SOURCES = audioTestSuite.cpp gstTestSuite.cpp
 rtpAudioTester_SOURCES = rtpAudioTestSuite.cpp gstTestSuite.cpp

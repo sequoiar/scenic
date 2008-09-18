@@ -26,25 +26,28 @@
 #include "videoSender.h"
 #include "videoConfig.h"
 #include "videoReceiver.h"
+#include "videoLocal.h"
 #include "audioSender.h"
+#include "audioLocal.h"
 #include "audioReceiver.h"
-#include "audioConfig.h"
+#include "audioLocalConfig.h"
+#include "remoteConfig.h"
 #include "hostIP.h"
 
 
 void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
 {
     int numChannels = 8;
-    int vPort = 10010;
-    int aPort = vPort + 1000;
 
     if (id_ == 0) {
-        AudioConfig aConfig(numChannels, "vorbisdec", aPort);
-        AudioReceiver aRx(aConfig);
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rAConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver aRx(aConfig, rAConfig);
         aRx.init();
 
-        VideoConfig vConfig("h264", vPort);
-        VideoReceiver vRx(vConfig);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rVConfig("h264", get_host_ip(), V_PORT); 
+        VideoReceiver vRx(vConfig, rVConfig);
         vRx.init();
 
 
@@ -56,13 +59,14 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", "test_signal8.wav", numChannels, "vorbisenc",
-                            get_host_ip(), aPort);
-        AudioSender aTx(aConfig);
+        AudioLocalConfig aConfig("filesrc", fileLocation_, numChannels);
+        RemoteSenderConfig rAConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender aTx(aConfig, rAConfig);
         aTx.init();
 
-        VideoConfig vConfig("dv1394src", "h264", get_host_ip(), vPort);
-        VideoSender vTx(vConfig);
+        VideoConfig vConfig("dv1394src"); 
+        RemoteSenderConfig rVConfig("h264", get_host_ip(), V_PORT);
+        VideoSender vTx(vConfig, rVConfig);
         vTx.init();
 
         TEST_ASSERT(aTx.start());
@@ -78,16 +82,16 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
 void SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv()
 {
     int numChannels = 8;
-    int vPort = 10010;
-    int aPort = vPort + 1000;
 
     if (id_ == 0) {
-        AudioConfig aConfig(numChannels, "vorbisdec", aPort);
-        AudioReceiver aRx(aConfig);
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig raConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver aRx(aConfig, raConfig);
         aRx.init();
 
-        VideoConfig vConfig("h264", vPort);
-        VideoReceiver vRx(vConfig);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rvConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver vRx(vConfig, rvConfig);
         vRx.init();
 
         BLOCK();
@@ -99,13 +103,14 @@ void SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", "test_signal8.wav", numChannels, "vorbisenc",
-                            get_host_ip(), aPort);
-        AudioSender aTx(aConfig);
+        AudioLocalConfig aConfig("filesrc", fileLocation_, numChannels);
+        RemoteSenderConfig raConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender aTx(aConfig, raConfig);
         aTx.init();
 
-        VideoConfig vConfig("dv1394src", "h264", get_host_ip(), vPort);
-        VideoSender vTx(vConfig);
+        VideoConfig vConfig("dv1394src");
+        RemoteSenderConfig rvConfig("h264", get_host_ip(), V_PORT);
+        VideoSender vTx(vConfig, rvConfig);
         vTx.init();
 
 
@@ -123,16 +128,16 @@ void SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv()
 void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
 {
     int numChannels = 8;
-    int vPort = 10010;
-    int aPort = vPort + 1000;
 
     if (id_ == 0) {
-        AudioConfig aConfig(numChannels, "vorbisdec", aPort);
-        AudioReceiver aRx(aConfig);
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig raConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver aRx(aConfig, raConfig);
         aRx.init();
 
-        VideoConfig vConfig("h264", vPort);
-        VideoReceiver vRx(vConfig);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rvConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver vRx(vConfig, rvConfig);
         vRx.init();
 
         TEST_ASSERT(aRx.start());
@@ -150,13 +155,14 @@ void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", "test_signal8.wav", numChannels, "vorbisenc",
-                            get_host_ip(), aPort);
-        AudioSender aTx(aConfig);
+        AudioLocalConfig aConfig("filesrc", fileLocation_, numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender aTx(aConfig, rConfig);
         aTx.init();
 
-        VideoConfig vConfig("dv1394src", "h264", get_host_ip(), vPort);
-        VideoSender vTx(vConfig);
+        VideoConfig vConfig("dv1394src");
+        RemoteSenderConfig rvConfig("h264", get_host_ip(), V_PORT);
+        VideoSender vTx(vConfig, rvConfig);
         vTx.init();
 
         TEST_ASSERT(aTx.start());
@@ -182,13 +188,15 @@ void SyncTestSuite::start_dv_audio_dv_video()
 
     if (id_ == 1)
         return;
-    AudioConfig aConfig("dv1394src", numChannels);
-    AudioSender aTx(aConfig);
+
+    AudioLocalConfig aConfig("dv1394src", numChannels);
+    AudioLocal aTx(aConfig);
     aTx.init();
 
-    VideoConfig vConfig("dv1394src", "h264");
-    VideoSender vTx(vConfig);
+    VideoConfig vConfig("dv1394src");
+    VideoLocal vTx(vConfig);
     vTx.init();
+
 
     TEST_ASSERT(aTx.start());
     TEST_ASSERT(vTx.start());
@@ -205,12 +213,13 @@ void SyncTestSuite::stop_dv_audio_dv_video()
 
     if (id_ == 1)
         return;
-    AudioConfig aConfig("dv1394src", numChannels);
-    AudioSender aTx(aConfig);
+
+    AudioLocalConfig aConfig("dv1394src", numChannels);
+    AudioLocal aTx(aConfig);
     aTx.init();
 
-    VideoConfig vConfig("dv1394src", "h264");
-    VideoSender vTx(vConfig);
+    VideoConfig vConfig("dv1394src");
+    VideoLocal vTx(vConfig);
     vTx.init();
 
     BLOCK();
@@ -229,12 +238,13 @@ void SyncTestSuite::start_stop_dv_audio_dv_video()
 
     if (id_ == 1)
         return;
-    AudioConfig aConfig("dv1394src", numChannels);
-    AudioSender aTx(aConfig);
+
+    AudioLocalConfig aConfig("dv1394src", numChannels);
+    AudioLocal aTx(aConfig);
     aTx.init();
 
-    VideoConfig vConfig("dv1394src", "h264");
-    VideoSender vTx(vConfig);
+    VideoConfig vConfig("dv1394src");
+    VideoLocal vTx(vConfig);
     vTx.init();
 
     TEST_ASSERT(aTx.start());
@@ -256,16 +266,16 @@ void SyncTestSuite::start_stop_dv_audio_dv_video()
 void SyncTestSuite::start_dv_audio_dv_video_rtp()
 {
     int numChannels = 2;
-    int vPort = 10010;
-    int aPort = vPort + 1000;
 
     if (id_ == 0) {
-        AudioConfig aConfig(numChannels, "vorbisdec", aPort);
-        AudioReceiver aRx(aConfig);
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver aRx(aConfig, rConfig);
         aRx.init();
 
-        VideoConfig vConfig("h264", vPort);
-        VideoReceiver vRx(vConfig);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rvConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver vRx(vConfig, rvConfig);
         vRx.init();
 
 
@@ -277,12 +287,14 @@ void SyncTestSuite::start_dv_audio_dv_video_rtp()
         TEST_ASSERT(vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("dv1394src", numChannels, "vorbisenc", get_host_ip(), aPort);
-        AudioSender aTx(aConfig);
+        AudioLocalConfig aConfig("dv1394src", numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender aTx(aConfig, rConfig);
         aTx.init();
 
-        VideoConfig vConfig("dv1394src", "h264", get_host_ip(), vPort);
-        VideoSender vTx(vConfig);
+        VideoConfig vConfig("dv1394src");
+        RemoteSenderConfig rvConfig("h264", get_host_ip(), V_PORT);
+        VideoSender vTx(vConfig, rvConfig);
         vTx.init();
 
         TEST_ASSERT(aTx.start());
@@ -298,16 +310,16 @@ void SyncTestSuite::start_dv_audio_dv_video_rtp()
 void SyncTestSuite::stop_dv_audio_dv_video_rtp()
 {
     int numChannels = 2;
-    int vPort = 10010;
-    int aPort = vPort + 1000;
 
     if (id_ == 0) {
-        AudioConfig aConfig(numChannels, "vorbisdec", aPort);
-        AudioReceiver aRx(aConfig);
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver aRx(aConfig, rConfig);
         aRx.init();
 
-        VideoConfig vConfig("h264", vPort);
-        VideoReceiver vRx(vConfig);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rvConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver vRx(vConfig, rvConfig);
         vRx.init();
 
         BLOCK();
@@ -319,14 +331,15 @@ void SyncTestSuite::stop_dv_audio_dv_video_rtp()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("dv1394src", numChannels, "vorbisenc", get_host_ip(), aPort);
-        AudioSender aTx(aConfig);
+        AudioLocalConfig aConfig("dv1394src", numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender aTx(aConfig, rConfig);
         aTx.init();
 
-        VideoConfig vConfig("dv1394src", "h264", get_host_ip(), vPort);
-        VideoSender vTx(vConfig);
+        VideoConfig vConfig("dv1394src");
+        RemoteSenderConfig rvConfig("h264", get_host_ip(), V_PORT);
+        VideoSender vTx(vConfig, rvConfig);
         vTx.init();
-
 
         BLOCK();
 
@@ -342,16 +355,16 @@ void SyncTestSuite::stop_dv_audio_dv_video_rtp()
 void SyncTestSuite::start_stop_dv_audio_dv_video_rtp()
 {
     int numChannels = 2;
-    int vPort = 10010;
-    int aPort = vPort + 1000;
 
     if (id_ == 0) {
-        AudioConfig aConfig(numChannels, "vorbisdec", aPort);
-        AudioReceiver aRx(aConfig);
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver aRx(aConfig, rConfig);
         aRx.init();
 
-        VideoConfig vConfig("h264", vPort);
-        VideoReceiver vRx(vConfig);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rvConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver vRx(vConfig, rvConfig);
         vRx.init();
 
         TEST_ASSERT(aRx.start());
@@ -369,12 +382,14 @@ void SyncTestSuite::start_stop_dv_audio_dv_video_rtp()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("dv1394src", numChannels, "vorbisenc", get_host_ip(), aPort);
-        AudioSender aTx(aConfig);
+        AudioLocalConfig aConfig("dv1394src", numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender aTx(aConfig, rConfig);
         aTx.init();
 
-        VideoConfig vConfig("dv1394src", "h264", get_host_ip(), vPort);
-        VideoSender vTx(vConfig);
+        VideoConfig vConfig("dv1394src");
+        RemoteSenderConfig rvConfig("h264", get_host_ip(), V_PORT);
+        VideoSender vTx(vConfig, rvConfig);
         vTx.init();
 
         TEST_ASSERT(aTx.start());
@@ -398,12 +413,14 @@ void SyncTestSuite::sync()
 {
     if (id_ == 0)
     {
-        AudioConfig aConfig(NUM_CHANNELS, "vorbisdec", A_PORT);
-        AudioReceiver aRx(aConfig);
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver aRx(aConfig, rConfig);
         aRx.init();
-
-        VideoConfig vConfig("h264", V_PORT);
-        VideoReceiver vRx(vConfig);
+        
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rvConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver vRx(vConfig, rvConfig);
         vRx.init();
 
         TEST_ASSERT(aRx.start());
@@ -421,13 +438,14 @@ void SyncTestSuite::sync()
         TEST_ASSERT(!vRx.isPlaying());
     }
     else {
-        AudioConfig aConfig("audiotestsrc", NUM_CHANNELS, "vorbisenc", get_host_ip(),
-                            A_PORT);
-        AudioSender aTx(aConfig);
+        AudioLocalConfig aConfig("audiotestsrc", NUM_CHANNELS);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender aTx(aConfig, rConfig);
         aTx.init();
 
-        VideoConfig vConfig("videotestsrc", "h264", get_host_ip(), V_PORT);
-        VideoSender vTx(vConfig);
+        VideoConfig vConfig("dv1394src");
+        RemoteSenderConfig rvConfig("h264", get_host_ip(), V_PORT);
+        VideoSender vTx(vConfig, rvConfig);
         vTx.init();
 
         TEST_ASSERT(aTx.start());

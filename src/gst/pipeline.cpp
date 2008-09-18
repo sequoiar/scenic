@@ -348,3 +348,8 @@ GstElement *Pipeline::findElement(const char *name) const
 }
 
 
+GstPad *Pipeline::findUnconnectedSinkpad() const
+{
+    return gst_bin_find_unconnected_pad(GST_BIN(pipeline_), GST_PAD_SINK);
+}
+

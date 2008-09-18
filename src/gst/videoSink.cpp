@@ -107,3 +107,9 @@ VideoSink::~VideoSink()
 }
 
 
+void VideoSink::makeSyncTrue()
+{
+    g_object_set(G_OBJECT(sink_), "sync", TRUE, NULL);
+}
+
+

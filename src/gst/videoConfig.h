@@ -26,58 +26,60 @@
 #ifndef _VIDEO_CONFIG_H_
 #define _VIDEO_CONFIG_H_
 
-#include "mediaConfig.h"
+#include <string>
 
 class VideoSource;
 class VideoSink;
-class Encoder;
-class Decoder;
 
 class VideoConfig
-    : public MediaConfig
 {
     public:
-        // for sender (remote)
-        VideoConfig(const std::string &source__, 
-                const std::string &codec__,
-                const std::string &remoteHost__, 
-                int port__)
-            : MediaConfig(source__, codec__, remoteHost__, port__) {}
+        VideoConfig(const std::string &source__) : source_(source__), location_("") {}
 
         // for sender (remote) w/ location i.e. filename or url
-        VideoConfig(const std::string &source__,
-                const std::string &location__,
-                const std::string &codec__,
-                const std::string &remoteHost__,
-                int port__)
-            : MediaConfig(source__, location__, codec__, remoteHost__, port__) {}
-
-        // for receiver
-        VideoConfig(const std::string &codec__, int port__)
-            : MediaConfig(codec__, port__) {}
-
-        // used by local sender
-        explicit VideoConfig(const std::string &source__)
-            : MediaConfig(source__) {}
-
-        // used by local sender w/ file
         VideoConfig(const std::string &source__, const std::string &location__)
-            : MediaConfig(source__, location__) {}
+            : source_(source__), location_(location__)  {}
 
         // copy constructor
         VideoConfig(const VideoConfig& m)
-            : MediaConfig(m) {}
+            : source_(m.source_), location_(m.location_) {}
 
         VideoSource* createSource() const;  // factory method
         VideoSink* createSink() const;  // factory method
 
-        Encoder* createEncoder() const;
-        Decoder* createDecoder() const;
+        const char *source() const { return source_.c_str(); }
 
+        bool fileExists() const;
         bool sanityCheck() const;
+        const char *location() const;
 
     private:
+        
+        const std::string source_;
+        const std::string location_;
+
         VideoConfig& operator=(const VideoConfig&);     //No Assignment Operator
+};
+
+
+class VideoReceiverConfig 
+{
+    public:
+
+        VideoReceiverConfig(const std::string & sink__)
+            : sink_(sink__)
+        {}
+
+        // copy constructor
+        VideoReceiverConfig(const VideoReceiverConfig & m) 
+            : sink_(m.sink_) 
+        {}
+
+        VideoSink* createSink() const;
+
+    private:
+
+        const std::string sink_;
 };
 
 #endif // _VIDEO_CONFIG_H_

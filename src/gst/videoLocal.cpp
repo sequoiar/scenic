@@ -1,5 +1,5 @@
 
-// videoSender.cpp
+// videoLocal.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -22,54 +22,44 @@
 
 #include "pipeline.h"
 #include "gstLinkable.h"
-#include "videoSender.h"
+#include "videoLocal.h"
 #include "videoSource.h"
-#include "rtpPay.h"
+#include "videoSink.h"
 #include "videoConfig.h"
-#include "remoteConfig.h"
-#include "codec.h"
 #include "logWriter.h"
 
 
-VideoSender::~VideoSender()
+VideoLocal::~VideoLocal()
 {
     assert(stop());
-    delete payloader_;
-    delete encoder_;
+    delete sink_;
     delete source_;
 }
 
 
-void VideoSender::init_source()
+void VideoLocal::init_source()
 {
-    assert(source_ = videoConfig_.createSource());
+    assert(source_ = config_.createSource());
     source_->init();
 }
 
 
-void VideoSender::init_codec()
+void VideoLocal::init_sink()
 {
-        assert(encoder_ = remoteConfig_.createEncoder());
-        encoder_->init();
-        GstLinkable::link(*source_, *encoder_);// FIXME: this shouldn't happen for VideoFileSource
+        assert(sink_ = config_.createSink());
+        sink_->init();
+        if (config_.fileExists())       // bad design
+            sink_->makeSyncTrue();
+        else
+            GstLinkable::link(*source_, *sink_);   // FIXME: this shouldn't happen for VideoFileSource
 }
 
 
-void VideoSender::init_sink()       // FIXME: this should be init payloader
-{
-        assert(payloader_ = encoder_->createPayloader());
-        payloader_->init();
-        GstLinkable::link(*encoder_, *payloader_);
-        session_.add(payloader_, remoteConfig_);
-}
-
-
-bool VideoSender::start()
+bool VideoLocal::start()
 {
     GstBase::start();
     pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
-    LOG("Sending video to remote receiver", DEBUG);
+    sink_->showWindow();
     return true;
 }
-
 

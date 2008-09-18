@@ -23,7 +23,7 @@
 #include "gstLinkable.h"
 #include "interleave.h"
 
-class AudioConfig;
+class AudioLocalConfig;
 
 class AudioSource
     : public GstLinkableSource
@@ -33,14 +33,14 @@ class AudioSource
         bool init();
 
     protected:
-        explicit AudioSource(const AudioConfig &config)
+        explicit AudioSource(const AudioLocalConfig &config)
             : config_(config), sources_(0), aconvs_(0) {}
 
         virtual void init_source();
         virtual void sub_init() = 0;
         virtual void link_elements();
 
-        const AudioConfig &config_;
+        const AudioLocalConfig &config_;
 
 
         std::vector<GstElement *>sources_, aconvs_;
@@ -65,7 +65,7 @@ class InterleavedAudioSource
         ~InterleavedAudioSource() {};
 
     protected:
-        explicit InterleavedAudioSource(const AudioConfig &config)
+        explicit InterleavedAudioSource(const AudioLocalConfig &config)
             : AudioSource(config), interleave_(config_) {}
 
         void init_source();
@@ -84,7 +84,7 @@ class AudioTestSource
     : public InterleavedAudioSource
 {
     public:
-        explicit AudioTestSource(const AudioConfig &config)
+        explicit AudioTestSource(const AudioLocalConfig &config)
             : InterleavedAudioSource(config), clockId_(0), offset_(0) {}
         ~AudioTestSource();
         void sub_init();
@@ -106,7 +106,7 @@ class AudioFileSource
     : public AudioSource
 {
     public:
-        explicit AudioFileSource(const AudioConfig &config)
+        explicit AudioFileSource(const AudioLocalConfig &config)
             : AudioSource(config), decoders_() {}
         ~AudioFileSource();
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
@@ -127,7 +127,7 @@ class AudioAlsaSource
     : public InterleavedAudioSource
 {
     public:
-        explicit AudioAlsaSource(const AudioConfig &config)
+        explicit AudioAlsaSource(const AudioLocalConfig &config)
             : InterleavedAudioSource(config) {}
         void sub_init();
     private:
@@ -140,7 +140,7 @@ class AudioJackSource
     : public InterleavedAudioSource
 {
     public:
-        explicit AudioJackSource(const AudioConfig &config)
+        explicit AudioJackSource(const AudioLocalConfig &config)
             : InterleavedAudioSource(config) {}
         void sub_init();
     private:
@@ -153,7 +153,7 @@ class AudioDvSource
     : public AudioSource
 {
     public:
-        explicit AudioDvSource(const AudioConfig &config)
+        explicit AudioDvSource(const AudioLocalConfig &config)
         : AudioSource(config), demux_(0), queue_(0), dvIsNew_(true) {}
 
         ~AudioDvSource();

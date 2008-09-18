@@ -26,7 +26,7 @@
 #include "gstLinkable.h"
 #include "rtpSender.h"
 #include "rtpPay.h"
-#include "mediaConfig.h"
+#include "remoteConfig.h"
 
 
 RtpSender::~RtpSender()
@@ -51,8 +51,11 @@ void RtpSender::set_caps(const char *capsStr)
 }
 
 
-void RtpSender::addDerived(RtpPay * newSrc, const MediaConfig & config)
+void RtpSender::add(RtpPay * newSrc, const RemoteSenderConfig & config)
 {
+    RtpSession::init();
+    //RtpSession::add(config);
+
     GstPad *send_rtp_sink;
     GstPad *send_rtp_src;
     GstPad *send_rtcp_src;
@@ -65,6 +68,17 @@ void RtpSender::addDerived(RtpPay * newSrc, const MediaConfig & config)
     assert(rtp_sender_ = gst_element_factory_make("udpsink", NULL));
     g_object_set(rtp_sender_, "host", config.remoteHost(), "port", config.port(), NULL);
     pipeline_.add(rtp_sender_);
+    
+    assert(rtcp_sender_ = gst_element_factory_make("udpsink", NULL));
+    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.port() + 1,
+                 "sync", FALSE, "async", FALSE, NULL);
+
+    assert(rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL));
+    g_object_set(rtcp_receiver_, "port", config.port() + 5, NULL);
+    
+    pipeline_.add(rtcp_sender_);
+    pipeline_.add(rtcp_receiver_);
+
 
     assert(send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_")));
     assert(send_rtp_src = gst_element_get_static_pad(rtpbin_, padStr("send_rtp_src_")));

@@ -29,7 +29,6 @@ class AudioTestSuite
     public:
 
         AudioTestSuite()
-            : fileLocation_("test_signal8.wav")
         {
             testLength_ = 5000;
             TEST_ADD(AudioTestSuite::start_1ch_audiotest)
@@ -66,7 +65,6 @@ class AudioTestSuite
 // some tests
 
     private:
-        std::string fileLocation_;
 
         void start_1ch_audiotest();
         void stop_1ch_audiotest();

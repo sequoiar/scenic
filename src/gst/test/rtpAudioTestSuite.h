@@ -31,7 +31,7 @@ class RtpAudioTestSuite
         RtpAudioTestSuite()
             : fileLocation_("test_signal8.wav")
         {
-            testLength_ = 5000;
+            testLength_ = 10000;
             TEST_ADD(RtpAudioTestSuite::start_2ch_rtp_audiotest)
             TEST_ADD(RtpAudioTestSuite::stop_2ch_rtp_audiotest)
             TEST_ADD(RtpAudioTestSuite::start_stop_2ch_rtp_audiotest)

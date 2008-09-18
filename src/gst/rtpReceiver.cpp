@@ -28,7 +28,7 @@
 #include "pipeline.h"
 #include "rtpPay.h"
 #include "rtpReceiver.h"
-#include "mediaConfig.h"
+#include "remoteConfig.h"
 
 std::list<GstElement *> RtpReceiver::usedDepayloaders_;
 
@@ -117,8 +117,11 @@ GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
 }
 
 
-void RtpReceiver::addDerived(RtpPay * depayloader, const MediaConfig & config)
+void RtpReceiver::add(RtpPay * depayloader, const RemoteReceiverConfig & config)
 {
+    RtpSession::init();
+    //RtpSession::add(config);
+
     GstPad *recv_rtp_sink;
     GstPad *send_rtcp_src;
     GstPad *recv_rtcp_sink;

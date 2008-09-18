@@ -24,7 +24,7 @@
 
 #include "gstBase.h"
 
-class MediaConfig;
+class RemoteConfig;
 class _GstElement;
 class RtpPay;
 
@@ -34,8 +34,8 @@ class RtpSession
     public:
         ~RtpSession();
         bool init();
-        virtual void add(RtpPay * pay, const MediaConfig & config);
-        virtual void addDerived(RtpPay * pay, const MediaConfig & config) = 0;
+        //virtual void add(const RemoteConfig &config);
+        //virtual void addDerived(RtpPay * pay, const RemoteConfig & config) = 0;
         virtual void set_caps(const char *capsStr) = 0;
 
     protected:

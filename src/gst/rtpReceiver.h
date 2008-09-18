@@ -24,7 +24,7 @@
 #include <list>
 #include "rtpSession.h"
 
-class MediaConfig;
+class RemoteReceiverConfig;
 class _GstElement;
 class _GstPad;
 class RtpPay;
@@ -37,8 +37,8 @@ class RtpReceiver
         ~RtpReceiver();
         void set_caps(const char* capsStr);
 
-    protected:
-        void addDerived(RtpPay * depayloader, const MediaConfig & config);
+        //void addDerived(RtpPay * depayloader, const RemoteConfig & config);
+        void add(RtpPay * depayloader, const RemoteReceiverConfig & config);
 
     private:
         static _GstPad *get_matching_sink_pad(_GstPad *srcPad);

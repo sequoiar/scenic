@@ -31,8 +31,9 @@
 void RtpVideoTestSuite::start_test_video_rtp()
 {
     if (id_ == 0) {
-        VideoConfig config("h264", V_PORT);
-        VideoReceiver rx(config);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver rx(vConfig, rConfig);
         rx.init();
 
         TEST_ASSERT(rx.start());
@@ -41,8 +42,9 @@ void RtpVideoTestSuite::start_test_video_rtp()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        VideoConfig config("videotestsrc", "h264", get_host_ip(), V_PORT);
-        VideoSender tx(config);
+        VideoConfig vConfig("videotestsrc");
+        RemoteSenderConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoSender tx(vConfig, rConfig);
         tx.init();
 
         TEST_ASSERT(tx.start());
@@ -56,8 +58,9 @@ void RtpVideoTestSuite::start_test_video_rtp()
 void RtpVideoTestSuite::stop_test_video_rtp()
 {
     if (id_ == 0) {
-        VideoConfig config("h264", V_PORT);
-        VideoReceiver rx(config);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver rx(vConfig, rConfig);
         rx.init();
 
         BLOCK();
@@ -66,8 +69,9 @@ void RtpVideoTestSuite::stop_test_video_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("videotestsrc", "h264", get_host_ip(), V_PORT);
-        VideoSender tx(config);
+        VideoConfig vConfig("videotestsrc");
+        RemoteSenderConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoSender tx(vConfig, rConfig);
         tx.init();
 
         BLOCK();
@@ -81,8 +85,9 @@ void RtpVideoTestSuite::stop_test_video_rtp()
 void RtpVideoTestSuite::start_stop_test_video_rtp()
 {
     if (id_ == 0) {
-        VideoConfig config("h264", V_PORT);
-        VideoReceiver rx(config);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver rx(vConfig, rConfig);
         rx.init();
 
         TEST_ASSERT(rx.start());
@@ -94,8 +99,9 @@ void RtpVideoTestSuite::start_stop_test_video_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("videotestsrc", "h264", get_host_ip(), V_PORT);
-        VideoSender tx(config);
+        VideoConfig vConfig("videotestsrc");
+        RemoteSenderConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoSender tx(vConfig, rConfig);
         tx.init();
 
         TEST_ASSERT(tx.start());
@@ -112,8 +118,9 @@ void RtpVideoTestSuite::start_stop_test_video_rtp()
 void RtpVideoTestSuite::start_v4l_rtp()
 {
     if (id_ == 0) {
-        VideoConfig config("h264", V_PORT);
-        VideoReceiver rx(config);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver rx(vConfig, rConfig);
         rx.init();
 
         TEST_ASSERT(rx.start());
@@ -122,8 +129,9 @@ void RtpVideoTestSuite::start_v4l_rtp()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        VideoConfig config("v4l2src", "h264", get_host_ip(), V_PORT);
-        VideoSender tx(config);
+        VideoConfig vConfig("v4l2src");
+        RemoteSenderConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoSender tx(vConfig, rConfig);
         tx.init();
 
         TEST_ASSERT(tx.start());
@@ -137,8 +145,9 @@ void RtpVideoTestSuite::start_v4l_rtp()
 void RtpVideoTestSuite::stop_v4l_rtp()
 {
     if (id_ == 0) {
-        VideoConfig config("h264", V_PORT);
-        VideoReceiver rx(config);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver rx(vConfig, rConfig);
         rx.init();
 
         BLOCK();
@@ -147,8 +156,9 @@ void RtpVideoTestSuite::stop_v4l_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("v4l2src", "h264", get_host_ip(), V_PORT);
-        VideoSender tx(config);
+        VideoConfig vConfig("v4l2src");
+        RemoteSenderConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoSender tx(vConfig, rConfig);
         tx.init();
 
         BLOCK();
@@ -162,8 +172,9 @@ void RtpVideoTestSuite::stop_v4l_rtp()
 void RtpVideoTestSuite::start_stop_v4l_rtp()
 {
     if (id_ == 0) {
-        VideoConfig config("h264", V_PORT);
-        VideoReceiver rx(config);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver rx(vConfig, rConfig);
         rx.init();
 
         TEST_ASSERT(rx.start());
@@ -175,8 +186,9 @@ void RtpVideoTestSuite::start_stop_v4l_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("v4l2src", "h264", get_host_ip(), V_PORT);
-        VideoSender tx(config);
+        VideoConfig vConfig("v4l2src");
+        RemoteSenderConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoSender tx(vConfig, rConfig);
         tx.init();
 
         TEST_ASSERT(tx.start());
@@ -195,8 +207,9 @@ void RtpVideoTestSuite::start_dv_rtp()
 {
     // receiver should be started first, of course there's no guarantee that it will at this point
     if (id_ == 0) {
-        VideoConfig config("h264", V_PORT);
-        VideoReceiver rx(config);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver rx(vConfig, rConfig);
         rx.init();
 
         TEST_ASSERT(rx.start());
@@ -205,8 +218,9 @@ void RtpVideoTestSuite::start_dv_rtp()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        VideoConfig config("dv1394src", "h264", get_host_ip(), V_PORT);
-        VideoSender tx(config);
+        VideoConfig vConfig("dv1394src");
+        RemoteSenderConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoSender tx(vConfig, rConfig);
         tx.init();
 
         TEST_ASSERT(tx.start());
@@ -220,8 +234,9 @@ void RtpVideoTestSuite::start_dv_rtp()
 void RtpVideoTestSuite::stop_dv_rtp()
 {
     if (id_ == 0) {
-        VideoConfig config("h264", V_PORT);
-        VideoReceiver rx(config);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver rx(vConfig, rConfig);
         rx.init();
 
         BLOCK();
@@ -230,8 +245,9 @@ void RtpVideoTestSuite::stop_dv_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("dv1394src", "h264", get_host_ip(), V_PORT);
-        VideoSender tx(config);
+        VideoConfig vConfig("dv1394src");
+        RemoteSenderConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoSender tx(vConfig, rConfig);
         tx.init();
 
         BLOCK();
@@ -245,8 +261,9 @@ void RtpVideoTestSuite::stop_dv_rtp()
 void RtpVideoTestSuite::start_stop_dv_rtp()
 {
     if (id_ == 0) {
-        VideoConfig config("h264", V_PORT);
-        VideoReceiver rx(config);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver rx(vConfig, rConfig);
         rx.init();
 
         TEST_ASSERT(rx.start());
@@ -258,8 +275,9 @@ void RtpVideoTestSuite::start_stop_dv_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("dv1394src", "h264", get_host_ip(), V_PORT);
-        VideoSender tx(config);
+        VideoConfig vConfig("dv1394src");
+        RemoteSenderConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoSender tx(vConfig, rConfig);
         tx.init();
 
         TEST_ASSERT(tx.start());
@@ -278,8 +296,9 @@ void RtpVideoTestSuite::start_file_rtp()
 {
     // receiver should be started first, of course there's no guarantee that it will at this point
     if (id_ == 0) {
-        VideoConfig config("h264", V_PORT);
-        VideoReceiver rx(config);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver rx(vConfig, rConfig);
         rx.init();
 
         TEST_ASSERT(rx.start());
@@ -288,8 +307,9 @@ void RtpVideoTestSuite::start_file_rtp()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        VideoConfig config("filesrc", fileLocation_, "h264", get_host_ip(), V_PORT);
-        VideoSender tx(config);
+        VideoConfig vConfig("filesrc", fileLocation_);
+        RemoteSenderConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoSender tx(vConfig, rConfig);
         tx.init();
 
         TEST_ASSERT(tx.start());
@@ -303,8 +323,9 @@ void RtpVideoTestSuite::start_file_rtp()
 void RtpVideoTestSuite::stop_file_rtp()
 {
     if (id_ == 0) {
-        VideoConfig config("h264", V_PORT);
-        VideoReceiver rx(config);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver rx(vConfig, rConfig);
         rx.init();
 
         BLOCK();
@@ -313,8 +334,9 @@ void RtpVideoTestSuite::stop_file_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("filesrc", fileLocation_, "h264", get_host_ip(), V_PORT);
-        VideoSender tx(config);
+        VideoConfig vConfig("filesrc", fileLocation_);
+        RemoteSenderConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoSender tx(vConfig, rConfig);
         tx.init();
 
         BLOCK();
@@ -328,8 +350,9 @@ void RtpVideoTestSuite::stop_file_rtp()
 void RtpVideoTestSuite::start_stop_file_rtp()
 {
     if (id_ == 0) {
-        VideoConfig config("h264", V_PORT);
-        VideoReceiver rx(config);
+        VideoReceiverConfig vConfig("xvimagesink");
+        RemoteReceiverConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoReceiver rx(vConfig, rConfig);
         rx.init();
 
         TEST_ASSERT(rx.start());
@@ -341,8 +364,9 @@ void RtpVideoTestSuite::start_stop_file_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        VideoConfig config("filesrc", fileLocation_, "h264", get_host_ip(), V_PORT);
-        VideoSender tx(config);
+        VideoConfig vConfig("filesrc", fileLocation_);
+        RemoteSenderConfig rConfig("h264", get_host_ip(), V_PORT);
+        VideoSender tx(vConfig, rConfig);
         tx.init();
 
         TEST_ASSERT(tx.start());

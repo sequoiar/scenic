@@ -26,6 +26,7 @@
 #include <gst/gstelement.h>
 
 class _GstElement;
+class _GstPad;
 class _GstBus;
 class _GstMessage;
 
@@ -55,6 +56,8 @@ class Pipeline
         GstClock* clock() const;
 
         _GstElement *findElement(const char *name) const;
+        _GstPad *findUnconnectedSrcpad() const;
+        _GstPad *findUnconnectedSinkpad() const;
 
     private:
         bool init();

@@ -24,7 +24,7 @@
 
 #include "rtpSession.h"
 #include "rtpPay.h"
-#include "mediaConfig.h"
+#include "remoteConfig.h"
 #include "pipeline.h"
 
 
@@ -45,10 +45,11 @@ bool RtpSession::init()
 }
 
 
-void RtpSession::add(RtpPay *pay, const MediaConfig & config)
+#if 0
+void RtpSession::add()
 {
     RtpSession::init();
-
+// FIXME: this is really messed up
     assert(rtcp_sender_ = gst_element_factory_make("udpsink", NULL));
     g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.port() + 1,
                  "sync", FALSE, "async", FALSE, NULL);
@@ -58,9 +59,8 @@ void RtpSession::add(RtpPay *pay, const MediaConfig & config)
 
     pipeline_.add(rtcp_sender_);
     pipeline_.add(rtcp_receiver_);
-
-    addDerived(pay, config);
 }
+#endif
 
 
 const char *RtpSession::padStr(const char *padName)
