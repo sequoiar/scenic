@@ -26,25 +26,29 @@
 //#define USE_OSC
 #include "audioSender.h"
 #include "audioReceiver.h"
-#include "audioConfig.h"
+#include "audioLocalConfig.h"
+#include "remoteConfig.h"
 
 
 void RtpAudioTestSuite::start_2ch_rtp_audiotest()
 {
     int numChannels = 2;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbis", A_PORT);
-        AudioReceiver rx(config);
-        rx.init();
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+
+        AudioReceiver rx(aConfig, rConfig);
+        TEST_ASSERT(rx.init());
         TEST_ASSERT(rx.start());
 
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbis", get_host_ip(), A_PORT);
-        AudioSender tx(config);
-        tx.init();
+        AudioLocalConfig aConfig("audiotestsrc", numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender tx(aConfig, rConfig);
+        TEST_ASSERT(tx.init());
 
         TEST_ASSERT(tx.start());
 
@@ -59,9 +63,10 @@ void RtpAudioTestSuite::stop_2ch_rtp_audiotest()
     int numChannels = 2;
 
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbis", A_PORT);
-        AudioReceiver rx(config);
-        rx.init();
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver rx(aConfig, rConfig);
+        TEST_ASSERT(rx.init());
 
         BLOCK();
 
@@ -69,10 +74,10 @@ void RtpAudioTestSuite::stop_2ch_rtp_audiotest()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbis", get_host_ip(),
-                           A_PORT);
-        AudioSender tx(config);
-        tx.init();
+        AudioLocalConfig aConfig("audiotestsrc", numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender tx(aConfig, rConfig);
+        TEST_ASSERT(tx.init());
 
         BLOCK();
 
@@ -86,9 +91,10 @@ void RtpAudioTestSuite::start_stop_2ch_rtp_audiotest()
 {
     int numChannels = 2;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbis", A_PORT);
-        AudioReceiver rx(config);
-        rx.init();
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver rx(aConfig, rConfig);
+        TEST_ASSERT(rx.init());
 
         TEST_ASSERT(rx.start());
 
@@ -100,10 +106,10 @@ void RtpAudioTestSuite::start_stop_2ch_rtp_audiotest()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbis", get_host_ip(),
-                           A_PORT);
-        AudioSender tx(config);
-        tx.init();
+        AudioLocalConfig aConfig("audiotestsrc", numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender tx(aConfig, rConfig);
+        TEST_ASSERT(tx.init());
 
         TEST_ASSERT(tx.start());
 
@@ -121,9 +127,10 @@ void RtpAudioTestSuite::start_8ch_rtp_audiotest()
     const int numChannels = 8;
 
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbis", A_PORT);
-        AudioReceiver rx(config);
-        rx.init();
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver rx(aConfig, rConfig);
+        TEST_ASSERT(rx.init());
 
         TEST_ASSERT(rx.start());
 
@@ -131,10 +138,10 @@ void RtpAudioTestSuite::start_8ch_rtp_audiotest()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbis", get_host_ip(),
-                           A_PORT);
-        AudioSender tx(config);
-        tx.init();
+        AudioLocalConfig aConfig("audiotestsrc", numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender tx(aConfig, rConfig);
+        TEST_ASSERT(tx.init());
 
         TEST_ASSERT(tx.start());
 
@@ -148,9 +155,10 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiotest()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbis", A_PORT);
-        AudioReceiver rx(config);
-        rx.init();
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver rx(aConfig, rConfig);
+        TEST_ASSERT(rx.init());
 
         BLOCK();
 
@@ -158,10 +166,10 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiotest()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbis", get_host_ip(),
-                           A_PORT);
-        AudioSender tx(config);
-        tx.init();
+        AudioLocalConfig aConfig("audiotestsrc", numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender tx(aConfig, rConfig);
+        TEST_ASSERT(tx.init());
 
         BLOCK();
 
@@ -175,9 +183,10 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiotest()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbis", A_PORT);
-        AudioReceiver rx(config);
-        rx.init();
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver rx(aConfig, rConfig);
+        TEST_ASSERT(rx.init());
 
         TEST_ASSERT(rx.start());
 
@@ -188,9 +197,9 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiotest()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("audiotestsrc", numChannels, "vorbis", get_host_ip(),
-                           A_PORT);
-        AudioSender tx(config);
+        AudioLocalConfig aConfig("audiotestsrc", numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender tx(aConfig, rConfig);
         TEST_ASSERT(tx.init());
 
         TEST_ASSERT(tx.start());
@@ -209,9 +218,10 @@ void RtpAudioTestSuite::start_8ch_rtp_audiofile()
     int numChannels = 8;
 
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbis", A_PORT);
-        AudioReceiver rx(config);
-        rx.init();
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver rx(aConfig, rConfig);
+        TEST_ASSERT(rx.init());
 
         TEST_ASSERT(rx.start());
 
@@ -219,10 +229,11 @@ void RtpAudioTestSuite::start_8ch_rtp_audiofile()
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        AudioConfig config("filesrc", fileLocation_, numChannels, "vorbis",
-                           get_host_ip(), A_PORT);
-        AudioSender tx(config);
-        tx.init();
+        AudioLocalConfig aConfig("filesrc", fileLocation_, numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender tx(aConfig, rConfig);
+        TEST_ASSERT(tx.init());
+
 
         TEST_ASSERT(tx.start());
 
@@ -236,9 +247,11 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiofile()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbis", A_PORT);
-        AudioReceiver rx(config);
-        rx.init();
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver rx(aConfig, rConfig);
+        TEST_ASSERT(rx.init());
+
 
         BLOCK();
 
@@ -246,10 +259,10 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiofile()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("filesrc", fileLocation_, numChannels, "vorbis",
-                           get_host_ip(), A_PORT);
-        AudioSender tx(config);
-        tx.init();
+        AudioLocalConfig aConfig("filesrc", fileLocation_, numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender tx(aConfig, rConfig);
+        TEST_ASSERT(tx.init());
 
         BLOCK();
 
@@ -263,9 +276,12 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiofile()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbis", A_PORT);
-        AudioReceiver rx(config);
-        rx.init();
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver rx(aConfig, rConfig);
+        TEST_ASSERT(rx.init());
+
+
 
         TEST_ASSERT(rx.start());
 
@@ -276,10 +292,11 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiofile()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("filesrc", fileLocation_, numChannels, "vorbis",
-                           get_host_ip(), A_PORT);
-        AudioSender tx(config);
+        AudioLocalConfig aConfig("filesrc", fileLocation_, numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender tx(aConfig, rConfig);
         TEST_ASSERT(tx.init());
+
 
         TEST_ASSERT(tx.start());
 
@@ -296,19 +313,21 @@ void RtpAudioTestSuite::start_audio_dv_rtp()
 {
     int numChannels = 2;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbis", A_PORT);
-        AudioReceiver rx(config);
-        rx.init();
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver rx(aConfig, rConfig);
+        TEST_ASSERT(rx.init());
+
         TEST_ASSERT(rx.start());
 
         BLOCK();
         TEST_ASSERT(rx.isPlaying());
     }
     else {
-        AudioConfig config("dv1394src", numChannels, "vorbis", get_host_ip(),
-                           A_PORT);
-        AudioSender tx(config);
-        tx.init();
+        AudioLocalConfig aConfig("dv1394src", numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender tx(aConfig, rConfig);
+        TEST_ASSERT(tx.init());
 
         TEST_ASSERT(tx.start());
 
@@ -323,9 +342,10 @@ void RtpAudioTestSuite::stop_audio_dv_rtp()
     int numChannels = 2;
 
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbis", A_PORT);
-        AudioReceiver rx(config);
-        rx.init();
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver rx(aConfig, rConfig);
+        TEST_ASSERT(rx.init());
 
         BLOCK();
 
@@ -333,10 +353,10 @@ void RtpAudioTestSuite::stop_audio_dv_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("dv1394src", numChannels, "vorbis", get_host_ip(),
-                           A_PORT);
-        AudioSender tx(config);
-        tx.init();
+        AudioLocalConfig aConfig("dv1394src", numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender tx(aConfig, rConfig);
+        TEST_ASSERT(tx.init());
 
         BLOCK();
 
@@ -350,9 +370,10 @@ void RtpAudioTestSuite::start_stop_audio_dv_rtp()
 {
     int numChannels = 2;
     if (id_ == 0) {
-        AudioConfig config(numChannels, "vorbis", A_PORT);
-        AudioReceiver rx(config);
-        rx.init();
+        AudioReceiverConfig aConfig("jackaudiosink");
+        RemoteReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
+        AudioReceiver rx(aConfig, rConfig);
+        TEST_ASSERT(rx.init());
 
         TEST_ASSERT(rx.start());
 
@@ -364,10 +385,11 @@ void RtpAudioTestSuite::start_stop_audio_dv_rtp()
         TEST_ASSERT(!rx.isPlaying());
     }
     else {
-        AudioConfig config("dv1394src", numChannels, "vorbis", get_host_ip(),
-                           A_PORT);
-        AudioSender tx(config);
-        tx.init();
+        AudioLocalConfig aConfig("dv1394src", numChannels);
+        RemoteSenderConfig rConfig("vorbis", get_host_ip(), A_PORT);
+        AudioSender tx(aConfig, rConfig);
+        TEST_ASSERT(tx.init());
+
 
         TEST_ASSERT(tx.start());
 

@@ -24,7 +24,8 @@
 #include <cassert>
 #include "lo/lo.h"
 #include "mediaBase.h"
-#include "audioConfig.h"
+#include "audioLocalConfig.h"
+#include "remoteConfig.h"
 #include "rtpReceiver.h"
 
 class RtpPay;
@@ -35,10 +36,10 @@ class AudioReceiver
     : public MediaBase
 {
     public:
-        explicit AudioReceiver(const AudioConfig config)
-            : config_(config), session_(), gotCaps_(false), 
+        AudioReceiver(const AudioReceiverConfig aConfig, const RemoteReceiverConfig rConfig)
+            : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), gotCaps_(false), 
             depayloader_(0), decoder_(0), sink_(0)
-        { assert(config_.hasCodec()); }
+        { assert(remoteConfig_.hasCodec()); }
 
         ~AudioReceiver();
 
@@ -59,7 +60,9 @@ class AudioReceiver
 
         void wait_for_caps();
 
-        const AudioConfig config_;
+        const AudioReceiverConfig audioConfig_;
+        const RemoteReceiverConfig remoteConfig_;
+
         RtpReceiver session_;
         bool gotCaps_;
         RtpPay *depayloader_;

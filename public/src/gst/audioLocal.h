@@ -22,7 +22,7 @@
 #define _AUDIO_LOCAL_H_
 
 #include "mediaBase.h"
-#include "audioConfig.h"
+#include "audioLocalConfig.h"
 
 class AudioSource;
 class AudioSink;
@@ -31,7 +31,7 @@ class AudioLocal
     : public MediaBase
 {
     public:
-        explicit AudioLocal(const AudioConfig config) 
+        explicit AudioLocal(const AudioLocalConfig config) 
             : config_(config), source_(0), sink_(0)
         {}
 
@@ -47,7 +47,7 @@ class AudioLocal
         void init_sink();
 
         // data
-        const AudioConfig config_;
+        const AudioLocalConfig config_;
         AudioSource *source_;
 
         AudioSink *sink_;

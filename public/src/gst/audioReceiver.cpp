@@ -28,7 +28,8 @@
 
 #include "gstLinkable.h"
 #include "audioReceiver.h"
-#include "audioConfig.h"
+#include "audioLocalConfig.h"
+#include "remoteConfig.h"
 #include "rtpPay.h"
 #include "codec.h"
 #include "audioSink.h"
@@ -88,19 +89,19 @@ int AudioReceiver::caps_handler(const char * /*path*/, const char * /*types*/, l
 
 void AudioReceiver::init_codec()
 {
-    assert(decoder_ = config_.createDecoder());
+    assert(decoder_ = remoteConfig_.createDecoder());
     decoder_->init();
     
     assert(depayloader_ = decoder_->createDepayloader());
     depayloader_->init();
     GstLinkable::link(*depayloader_, *decoder_);
-    session_.add(depayloader_, config_);
+    session_.add(depayloader_, remoteConfig_);
 }
 
 
 void AudioReceiver::init_sink()
 {
-    assert(sink_ = config_.createSink());
+    assert(sink_ = audioConfig_.createSink());
     sink_->init();
     GstLinkable::link(*decoder_, *sink_);   
 }
@@ -114,7 +115,7 @@ bool AudioReceiver::start()
     //#endif
     std::stringstream logstr;       // FIXME: need a better printf style logwriter, 
                                     // shouldn't need stringstream
-    logstr << "Receiving audio on port " << config_.port();
+    logstr << "Receiving audio on port " << remoteConfig_.port() << " from host " << remoteConfig_.remoteHost();
     LOG(logstr.str(), DEBUG); 
     MediaBase::start();
     return true;

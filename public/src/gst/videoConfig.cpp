@@ -1,3 +1,4 @@
+
 //
 // videoConfig.cpp // // Copyright 2008 Koya Charles & Tristan Matthews
 //
@@ -27,7 +28,6 @@
 #include "logWriter.h"
 #include "videoSource.h"
 #include "videoSink.h"
-#include "codec.h"
 
 
 VideoSource * VideoConfig::createSource() const
@@ -47,47 +47,54 @@ VideoSource * VideoConfig::createSource() const
     }
 }
 
-
+// FIXME: merge
 VideoSink * VideoConfig::createSink() const
 {
     return new VideoSink();
 }
 
 
-Encoder * VideoConfig::createEncoder() const
+VideoSink * VideoReceiverConfig::createSink() const
 {
-    if (codec_ == "h264")
-        return new H264Encoder();
-    else
-    {
-        LOG(codec_, ERROR);
-        LOG("is an invalid codec!", ERROR);
-        return 0;
-    }
-}
-
-
-Decoder * VideoConfig::createDecoder() const
-{
-    if (codec_ == "h264")
-        return new H264Decoder();
-    else
-    {
-        LOG(codec_, ERROR);
-        LOG("is an invalid codec!", ERROR);
-        return 0;
-    }
+    return new VideoSink();
 }
 
 
 bool VideoConfig::sanityCheck() const
 {
-    bool validCodec = true;
-    if (!codec_.empty())
-        validCodec = (codec_ == "h264");
-    if (!validCodec)
-        LOG("Bad codec", ERROR);
-
-    return validCodec;
+    // FIXME: useless
+    return true;
 }
 
+
+bool VideoConfig::fileExists() const
+{
+    if (location_.empty())
+    {
+        LOG("No file location given", ERROR);
+        return false;
+    }
+    FILE *file;
+    file = fopen(location(), "r");
+    if (file != NULL)
+    {
+        fclose(file);
+        return true;
+    }
+    else
+    {
+        LOG("File does not exist", ERROR);
+        return false;
+    }
+}
+
+
+const char* VideoConfig::location() const
+{
+    if (!location_.empty())
+        return location_.c_str();
+    else {
+        LOG("No location specified", ERROR);
+        return NULL;
+    }
+}

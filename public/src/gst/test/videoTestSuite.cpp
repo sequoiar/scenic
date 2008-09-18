@@ -22,7 +22,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "videoTestSuite.h"
-#include "videoSender.h"
+#include "videoLocal.h"
 #include "videoConfig.h"
 
 
@@ -31,7 +31,7 @@ void VideoTestSuite::start_test_video()
     if (id_ == 1)
         return;
     VideoConfig config("videotestsrc");
-    VideoSender tx(config);
+    VideoLocal tx(config);
     tx.init();
 
     TEST_ASSERT(tx.start());
@@ -47,7 +47,7 @@ void VideoTestSuite::stop_test_video()
     if (id_ == 1)
         return;
     VideoConfig config("videotestsrc");
-    VideoSender tx(config);
+    VideoLocal tx(config);
     tx.init();
 
     BLOCK();
@@ -62,7 +62,7 @@ void VideoTestSuite::start_stop_test_video()
     if (id_ == 1)
         return;
     VideoConfig config("videotestsrc");
-    VideoSender tx(config);
+    VideoLocal tx(config);
     tx.init();
 
     TEST_ASSERT(tx.start());
@@ -81,7 +81,7 @@ void VideoTestSuite::start_v4l()
     if (id_ == 1)
         return;
     VideoConfig config("v4l2src");
-    VideoSender tx(config);
+    VideoLocal tx(config);
     tx.init();
 
     TEST_ASSERT(tx.start());
@@ -96,7 +96,7 @@ void VideoTestSuite::stop_v4l()
     if (id_ == 1)
         return;
     VideoConfig config("v4l2src");
-    VideoSender tx(config);
+    VideoLocal tx(config);
     tx.init();
 
     BLOCK();
@@ -111,7 +111,7 @@ void VideoTestSuite::start_stop_v4l()
     if (id_ == 1)
         return;
     VideoConfig config("v4l2src");
-    VideoSender tx(config);
+    VideoLocal tx(config);
     tx.init();
 
     TEST_ASSERT(tx.start());
@@ -129,7 +129,7 @@ void VideoTestSuite::start_dv()
     if (id_ == 1)
         return;
     VideoConfig config("dv1394src");
-    VideoSender tx(config);
+    VideoLocal tx(config);
     tx.init();
 
     TEST_ASSERT(tx.start());
@@ -144,7 +144,7 @@ void VideoTestSuite::stop_dv()
     if (id_ == 1)
         return;
     VideoConfig config("dv1394src");
-    VideoSender tx(config);
+    VideoLocal tx(config);
     tx.init();
 
     BLOCK();
@@ -159,7 +159,7 @@ void VideoTestSuite::start_stop_dv()
     if (id_ == 1)
         return;
     VideoConfig config("dv1394src");
-    VideoSender tx(config);
+    VideoLocal tx(config);
     tx.init();
 
     TEST_ASSERT(tx.start());
@@ -177,7 +177,7 @@ void VideoTestSuite::start_file()
     if (id_ == 1)
         return;
     VideoConfig config("filesrc", fileLocation_);
-    VideoSender tx(config);
+    VideoLocal tx(config);
     tx.init();
 
     TEST_ASSERT(tx.start());
@@ -192,7 +192,7 @@ void VideoTestSuite::stop_file()
     if (id_ == 1)
         return;
     VideoConfig config("filesrc", fileLocation_);
-    VideoSender tx(config);
+    VideoLocal tx(config);
     tx.init();
 
     BLOCK();
@@ -207,7 +207,7 @@ void VideoTestSuite::start_stop_file()
     if (id_ == 1)
         return;
     VideoConfig config("filesrc", fileLocation_);
-    VideoSender tx(config);
+    VideoLocal tx(config);
     tx.init();
 
     TEST_ASSERT(tx.start());

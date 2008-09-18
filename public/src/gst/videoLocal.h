@@ -1,5 +1,5 @@
 
-// rtpSender.h
+// videoLocal.h
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -18,35 +18,40 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _RTP_SENDER_H_
-#define _RTP_SENDER_H_
+#ifndef _VIDEO_LOCAL_H_
+#define _VIDEO_LOCAL_H_
 
-#include <string>
-#include "rtpSession.h"
+#include "mediaBase.h"
+#include "videoConfig.h"
 
-class RemoteSenderConfig;
-class _GstElement;
-class RtpPay;
+class VideoSource;
+class VideoSink;
 
-class RtpSender
-    : public RtpSession
+class VideoLocal
+    : public MediaBase
 {
     public:
-        RtpSender() : rtp_sender_(0) {}
+        explicit VideoLocal(const VideoConfig config) 
+            : config_(config), source_(0), sink_(0) {}
 
-        std::string getCaps() const;
-        void set_caps(const char *capsStr);
+        ~VideoLocal();
 
-        ~RtpSender();
-
-        //void addDerived(RtpPay * src, const RemoteConfig & config);
-        void add(RtpPay * payloader, const RemoteSenderConfig & config);
+        bool start();
 
     private:
-        _GstElement *rtp_sender_;
-        RtpSender(const RtpSender&); //No Copy Constructor
-        RtpSender& operator=(const RtpSender&); //No Assignment Operator
+        void init_source();
+        void init_codec() {};       // FIXME shouldn't be here
+        void init_sink();
+
+        const VideoConfig config_;
+        VideoSource *source_;
+        VideoSink *sink_;
+
+        // hidden
+
+        VideoLocal(const VideoLocal&); //No Copy Constructor
+        VideoLocal& operator=(const VideoLocal&); //No Assignment Operator
 };
 
-#endif // _RTP_SENDER_H_
+#endif // _VIDEO_LOCAL_H_
 

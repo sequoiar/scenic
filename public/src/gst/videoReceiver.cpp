@@ -40,14 +40,14 @@ VideoReceiver::~VideoReceiver()
 
 void VideoReceiver::init_codec()
 {
-    assert(decoder_ = config_.createDecoder());
+    assert(decoder_ = remoteConfig_.createDecoder());
     decoder_->init();
     assert(depayloader_ = decoder_->createDepayloader());
     depayloader_->init();
 
     GstLinkable::link(*depayloader_, *decoder_);
 
-    session_.add(depayloader_, config_);
+    session_.add(depayloader_, remoteConfig_);
     session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,"
             "encoding-name=(string)H264");
 }
@@ -55,7 +55,7 @@ void VideoReceiver::init_codec()
 
 void VideoReceiver::init_sink()
 {
-    assert(sink_ = config_.createSink());
+    assert(sink_ = videoConfig_.createSink());
     sink_->init();
     GstLinkable::link(*decoder_, *sink_);
 }

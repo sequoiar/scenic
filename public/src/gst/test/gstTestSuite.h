@@ -44,7 +44,7 @@ class GstTestSuite
     public:
 
         GstTestSuite()
-            : id_(0), testLength_(3000)
+            : id_(0), testLength_(5000), fileLocation_("test_signal8.wav")
         {}
 
         void set_id(int id);
@@ -61,6 +61,8 @@ class GstTestSuite
         const static int V_PORT;
         const static int NUM_CHANNELS;
         static int killMainLoop(void *data);
+        
+        std::string fileLocation_;
 };
 
 #endif // _GST_TEST_SUITE_H_

@@ -23,13 +23,13 @@
 #include <gst/audio/multichannel.h>
 #include "gstLinkable.h"
 
-class AudioConfig;
+class AudioLocalConfig;
 
 class Interleave
     : public GstLinkableFilter
 {
     public:
-        explicit Interleave(const AudioConfig &config)
+        explicit Interleave(const AudioLocalConfig &config)
             : interleave_(0), config_(config) {}
 
         ~Interleave();
@@ -42,7 +42,7 @@ class Interleave
     private:
         friend class InterleavedAudioSource;
         GstElement *interleave_;
-        const AudioConfig &config_;
+        const AudioLocalConfig &config_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
         void set_channel_layout();
 

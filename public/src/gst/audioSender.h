@@ -22,7 +22,8 @@
 #define _AUDIO_SENDER_H_
 
 #include "mediaBase.h"
-#include "audioConfig.h"
+#include "audioLocalConfig.h"
+#include "remoteConfig.h"
 #include "rtpSender.h"
 
 class AudioSource;
@@ -34,8 +35,8 @@ class AudioSender
     : public MediaBase
 {
     public:
-        explicit AudioSender(const AudioConfig config) 
-            : config_(config), session_(), source_(0), 
+        AudioSender(const AudioLocalConfig aConfig, const RemoteSenderConfig rConfig) 
+            : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), source_(0), 
             encoder_(0), payloader_(0), sink_(0)
         {}
 
@@ -54,7 +55,8 @@ class AudioSender
         void send_caps() const;
 
         // data
-        const AudioConfig config_;
+        const AudioLocalConfig audioConfig_;
+        const RemoteSenderConfig remoteConfig_;
         RtpSender session_;
         AudioSource *source_;
 
