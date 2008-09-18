@@ -29,6 +29,7 @@
 #define _LOG_WRITER_H_
 
 #include <string>
+#include <sstream>
 #include "config.h"
 
 #ifdef CONFIG_DEBUG
@@ -44,8 +45,18 @@
 #define LOG(msg, level)
 #else
 
-#define LOG(msg, level)         \
-            cerr_log_(msg, level, __FILE__, __FUNCTION__, __LINE__)
+
+//Note mangle84579568749576948 varible name so that hiding existing var is unlikely
+//
+//Do{} while(0)  construct to preserve one statement syntax  
+
+#define LOG(msg, level)                 \
+            do{                         \
+            std::ostringstream mangle84579568749576948;      \
+            mangle84579568749576948 << msg;                  \
+            cerr_log_(mangle84579568749576948.str(), level, __FILE__, __FUNCTION__, __LINE__);    \
+            }                           \
+            while(0)
 
 enum LogLevel {
     DEBUG = 10,
