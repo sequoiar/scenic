@@ -72,7 +72,7 @@ class BasicServer(LineReceiver):
         print data
         self.api.select_streams(self, 'receive')
         for kind, stream in data.items():
-            name = stream.pop('name')
+            name = stream.pop('name') + '.rem'
             engine = stream.pop('engine')
             self.api.add_stream(self, name, kind, engine)
             for attr, value in stream.items():
@@ -113,7 +113,7 @@ class BasicClient(LineReceiver):
                     continue
                 
                 engine = stream.__module__.rpartition('.')[2]
-                params = {'name':name, 'engine':engine}
+                params = {'name':name.partition('_')[2], 'engine':engine}
                 for key, value in stream.__dict__.items():
                     if (key[0] != '_' and value):
                         params[key] = value
