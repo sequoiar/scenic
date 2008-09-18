@@ -1,4 +1,4 @@
-/*
+/* parser.h
  * Copyright 2008 Koya Charles & Tristan Matthews
  *
  * This library is free software; you can redistribute it and/or
@@ -21,14 +21,12 @@
  *
  *      Command parser functions used in ipcp protocol
  *
- *  TODO place in namespace?
+ *      TODO place in namespace?
  */
 
 #ifndef __PARSER_H__
 #define __PARSER_H__
 
-#include <string>
-#include <map>
 #include "mapMsg.h"
 
 
