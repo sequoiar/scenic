@@ -38,6 +38,13 @@ void InstantMessaging::setResponse( std::string resp ){
 }
 
 
+std::string InstantMessaging::getTextMessage( void ){
+    std::string text;
+
+    text = _response.ptr;
+    return text;
+}
+
 pj_status_t InstantMessaging::sendMessage(){
     pjsip_method msg_method;
     const pj_str_t type =  STR_TEXT;

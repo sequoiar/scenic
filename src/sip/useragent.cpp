@@ -167,7 +167,8 @@ const char *stateStr[] =
     "CONNECTION_STATE_CONNECTED",
     "CONNECTION_STATE_DISCONNECTED",
     "CONNECTION_STATE_TIMEOUT",
-    "CONNECTION_STATE_NOT_ACCEPTABLE"
+    "CONNECTION_STATE_NOT_ACCEPTABLE",
+    "CONNECTION_STATE_INCOMING_MESSAGE"
 };
 
 /*
@@ -217,7 +218,7 @@ answerMode _answerMode;
 /*
  * The python instance
  */
-PyObject *_python_instance;
+static PyObject *_python_instance = NULL;
  
 /*************************************************************************************************/
 
@@ -382,7 +383,7 @@ std::string UserAgent::getAnswerMode( void ){
 }
 
 void UserAgent::set_python_instance(PyObject *p){
-   cout << "set callback " << p << endl;
+    cout << "set callback " << p << endl;
    _python_instance = p;
 } 
 
@@ -706,6 +707,10 @@ int UserAgent::send_instant_message( std::string msg ){
     }
 }
 
+std::string UserAgent::get_message( void ){
+    _state = CONNECTION_STATE_CONNECTED;
+    return _imModule->getTextMessage();
+}
 
 void UserAgent::setSessionMedia( std::string type, std::string codecs, int port,
                                  std::string dir ){
@@ -779,6 +784,10 @@ void pjsipLogWriter( int level, const char *data, int len ){
 
 void py_connection_callback( int conn_state ){
         
+    // For the C++ module could run as a standalone module
+    // we disable the callback if no python instance exists
+    if( _python_instance == NULL)
+        return;
     try {
         // We must acquire the global lock interpreter to be able to execute python code
         PyGILState_STATE gil_state = PyGILState_Ensure();
@@ -946,9 +955,13 @@ void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
         status = pjsip_dlg_respond( inv->dlg, rdata, PJSIP_SC_OK, NULL, NULL, NULL );
         text = (char*)msg->body->data;
 
-        // Display the message
+        // Stock the message
         _imModule->setResponse( text );
-        _imModule->displayResponse();
+        //_imModule->displayResponse();
+    
+        // Notify the core of a waiting message
+        py_connection_callback(CONNECTION_STATE_INCOMING_MESSAGE);
+    
     }
 
     else {

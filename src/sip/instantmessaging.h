@@ -57,6 +57,8 @@ class InstantMessaging
          */
         void setText( std::string message );
         
+        std::string getTextMessage(void) ; 
+
         /*
          * Send the message, previously set with the setText method, to the connected peer
          *

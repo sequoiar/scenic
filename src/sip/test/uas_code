@@ -1,4 +1,5 @@
 import libsip_export as sip
-uas=sip.SIPSession(11111, 5060)
-uas.setMedia("audio", "GSM/vorbis/PCMA/",12345,"sendrecv")
+uas=sip.SIPSession( 5060)
+uas.set_python_instance(uas)
+uas.set_media("audio", "GSM/vorbis/PCMA/",12345,"sendrecv")
 

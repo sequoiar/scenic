@@ -101,6 +101,8 @@ class SIPSession
          */
         int send_instant_message( std::string msg );
 
+        std::string get_message( void );
+
         /*
          * Accept an incoming request. Equivalent to the pickup operation
          *
