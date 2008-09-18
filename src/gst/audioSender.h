@@ -22,7 +22,7 @@
 #define _AUDIO_SENDER_H_
 
 #include "mediaBase.h"
-#include "audioLocalConfig.h"
+#include "audioConfig.h"
 #include "remoteConfig.h"
 #include "rtpSender.h"
 

@@ -23,7 +23,7 @@
  *
  */
 #include <iostream>
-#include "audioLocalConfig.h"
+#include "audioConfig.h"
 #include "audioSource.h"
 #include "audioSink.h"
 #include "logWriter.h"

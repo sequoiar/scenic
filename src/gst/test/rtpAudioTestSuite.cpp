@@ -26,7 +26,7 @@
 //#define USE_OSC
 #include "audioSender.h"
 #include "audioReceiver.h"
-#include "audioLocalConfig.h"
+#include "audioConfig.h"
 #include "remoteConfig.h"
 
 

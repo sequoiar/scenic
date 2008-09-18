@@ -30,7 +30,7 @@
 #include "audioSender.h"
 #include "audioLocal.h"
 #include "audioReceiver.h"
-#include "audioLocalConfig.h"
+#include "audioConfig.h"
 #include "remoteConfig.h"
 #include "hostIP.h"
 

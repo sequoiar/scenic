@@ -28,7 +28,7 @@
 
 #include "gstLinkable.h"
 #include "audioReceiver.h"
-#include "audioLocalConfig.h"
+#include "audioConfig.h"
 #include "remoteConfig.h"
 #include "rtpPay.h"
 #include "codec.h"
