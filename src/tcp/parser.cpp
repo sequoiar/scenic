@@ -1,4 +1,4 @@
-/*
+/* parser.cpp
  * Copyright 2008 Koya Charles & Tristan Matthews
  *
  * This library is free software; you can redistribute it and/or
@@ -17,6 +17,11 @@
  * Boston, MA 02111-1307, USA.
  */
 
+/** \file
+ *
+ *      Command parser functions used in ipcp protocol
+ *
+ */
 
 #include <sstream>
 #include <string.h>
@@ -31,11 +36,11 @@ static std::string strEsq(const std::string& str)
 
     for(unsigned int pos=0; pos < str.size(); ++pos)    //for each char in string
     {
-        char c = str[pos];                         //copy current character
-        if(c == '\\') //if backslash found
-            out.append("\\\\"); //escape it with backslash
-        else if(c == '\"') //if quotation mark
-            out.append("\\\""); //escape it with backslash
+        char c = str[pos];                              //copy current character
+        if(c == '\\')                                   //if backslash found
+            out.append("\\\\");                         //escape it with backslash
+        else if(c == '\"')                              //if quotation mark
+            out.append("\\\"");                         //escape it with backslash
         else
             out.append(1, c);                           //otherwise pass it through
     }
@@ -81,8 +86,8 @@ static int get_end_of_quoted_string(const std::string& str)
     //for each char in string
     for(unsigned int pos=1; pos < str.size(); ++pos)
     {
-        if(str[pos] == '\"') //if char is " and if
-            if(str[pos-1] != '\\') //previous char is not escape char
+        if(str[pos] == '\"')                            //if char is " and if
+            if(str[pos-1] != '\\')                      //previous char is not escape char
                 return pos+1;                           //return position following "
     }
 

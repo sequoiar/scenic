@@ -21,7 +21,6 @@
  *
  *      Command parser functions used in ipcp protocol
  *
- *      TODO place in namespace?
  */
 
 #ifndef __PARSER_H__
