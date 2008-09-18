@@ -13,8 +13,9 @@
 #include <errno.h>
 
 #include <string>
-//#include "logWriter.h"
+#include "logWriter.h"
 #include "tcpServer.h"
+#include <sstream>
 
 #ifdef ALLOW_ANY_ADDR
 #define INADDR   INADDR_ANY
@@ -23,11 +24,6 @@
 #endif
 
 
-void error(const char *msg)
-{
-    perror(msg);
-    exit(1);
-}
 
 
 bool TcpServer::set_non_blocking(int sockfd_param)
@@ -55,7 +51,8 @@ bool TcpServer::socket_bind_listen()
     sockfd = 0;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd <= 0)
-        error("ERROR opening socket");
+        LOG_ERROR("Error opening socket: errno msg: " << sys_errlist[errno]);
+
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
 
     set_non_blocking(sockfd);
@@ -67,8 +64,10 @@ bool TcpServer::socket_bind_listen()
     serv_addr.sin_port = htons(port_);
 
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-        error("ERROR on binding");
-    listen(sockfd, 5);
+        LOG_ERROR("Error at bind: errno msg: " << sys_errlist[errno]);
+
+    if(listen(sockfd, 5) <= 0)
+        LOG_ERROR("Error on listen: errno msg: " << sys_errlist[errno]); 
 
     return true;
 }
@@ -84,7 +83,11 @@ bool TcpServer::accept()
         if(newsockfd == -1 && errno == EWOULDBLOCK)
             return false;
         else
-            error("ERROR on accept");
+        {
+            std::ostringstream os;
+            os << "Error on listen: errno msg: " << sys_errlist[errno]; 
+            LOG_ERROR(os.str());
+        }
     }
     connected_ = true;
     set_non_blocking(newsockfd);
