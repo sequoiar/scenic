@@ -20,6 +20,7 @@
 
 #include "gst/audioReceiver.h"
 #include "gst/videoReceiver.h"
+#include "hostIP.h"
 
 GstReceiverThread::~GstReceiverThread()
 {
@@ -59,10 +60,11 @@ bool GstReceiverThread::video_start(MapMsg& msg)
 
     try
     {
-        VideoConfig config(codec_str, port);
+        VideoReceiverConfig config("xvimagesink");
+        ReceiverConfig rConfig(codec_str, get_host_ip(), port);
         if(!config.sanityCheck())
             return false;
-        vreceiver_ = new VideoReceiver(config);
+        vreceiver_ = new VideoReceiver(config, rConfig);
         vreceiver_->init();
         vreceiver_->start();
         return true;
@@ -85,10 +87,11 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
     GET_OR_RETURN(msg, "channels", int, chan);
     try
     {
-        AudioConfig config(chan, codec_str, port);
+        AudioReceiverConfig config("jackaudiosink");
+        ReceiverConfig rConfig(codec_str, get_host_ip(), port);
         if(!config.sanityCheck())
             return false;
-        areceiver_ = new AudioReceiver(config);
+        areceiver_ = new AudioReceiver(config, rConfig);
         areceiver_->init();
         areceiver_->start();
         return true;

@@ -27,7 +27,6 @@
 #include "videoReceiver.h"
 #include "audioSender.h"
 #include "audioReceiver.h"
-#include "audioConfig.h"
 
 #include "hostIP.h"
 

@@ -51,7 +51,7 @@ void RtpSender::set_caps(const char *capsStr)
 }
 
 
-void RtpSender::add(RtpPay * newSrc, const RemoteSenderConfig & config)
+void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
 {
     RtpSession::init();
     //RtpSession::add(config);

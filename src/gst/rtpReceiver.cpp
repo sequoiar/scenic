@@ -117,7 +117,7 @@ GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
 }
 
 
-void RtpReceiver::add(RtpPay * depayloader, const RemoteReceiverConfig & config)
+void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 {
     RtpSession::init();
     //RtpSession::add(config);

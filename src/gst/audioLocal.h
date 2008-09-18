@@ -31,7 +31,7 @@ class AudioLocal
     : public MediaBase
 {
     public:
-        explicit AudioLocal(const AudioLocalConfig config) 
+        explicit AudioLocal(const AudioConfig config) 
             : config_(config), source_(0), sink_(0)
         {}
 
@@ -47,7 +47,7 @@ class AudioLocal
         void init_sink();
 
         // data
-        const AudioLocalConfig config_;
+        const AudioConfig config_;
         AudioSource *source_;
 
         AudioSink *sink_;

@@ -65,10 +65,11 @@ bool GstSenderThread::video_start(MapMsg& msg)
     else
         addr = get_host_ip();
     GET_OR_RETURN(msg, "port", int, port);
-    VideoConfig config("videotestsrc", "h264", addr, port);
+    VideoConfig config("videotestsrc");
+    SenderConfig rConfig("h264", addr, port);
     if(!config.sanityCheck())
         return false;
-    vsender_ = new VideoSender(config);
+    vsender_ = new VideoSender(config, rConfig);
     if(vsender_)
     {
         vsender_->init();
@@ -92,10 +93,11 @@ bool GstSenderThread::audio_start(MapMsg& msg)
     else
         addr = get_host_ip();
     GET_OR_RETURN(msg, "port", int, port);
-    AudioConfig config("audiotestsrc", 2, "vorbis", addr, port);
+    AudioConfig config("audiotestsrc", 2);
+    SenderConfig rConfig("vorbis", addr, port);
     if(!config.sanityCheck())
         return false;
-    asender_ = new AudioSender(config);
+    asender_ = new AudioSender(config, rConfig);
     if(asender_)
     {
         asender_->init();

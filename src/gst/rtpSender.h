@@ -24,7 +24,7 @@
 #include <string>
 #include "rtpSession.h"
 
-class RemoteSenderConfig;
+class SenderConfig;
 class _GstElement;
 class RtpPay;
 
@@ -40,7 +40,7 @@ class RtpSender
         ~RtpSender();
 
         //void addDerived(RtpPay * src, const RemoteConfig & config);
-        void add(RtpPay * payloader, const RemoteSenderConfig & config);
+        void add(RtpPay * payloader, const SenderConfig & config);
 
     private:
         _GstElement *rtp_sender_;

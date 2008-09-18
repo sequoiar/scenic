@@ -75,6 +75,8 @@ class VideoReceiverConfig
             : sink_(m.sink_) 
         {}
 
+        bool sanityCheck() { return true; }
+
         VideoSink* createSink() const;
 
     private:

@@ -1,5 +1,5 @@
 
-// audioLocalConfig.h
+// audioConfig.h
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -27,29 +27,28 @@
 #define _AUDIO_LOCAL_CONFIG_H_
 
 #include <string>
-#include "mediaConfig.h"
 
 class AudioSource;
 class AudioSink;
 
-class AudioLocalConfig
+class AudioConfig
 {
     public:
 
         // local 
-        AudioLocalConfig(const std::string & source__, int numChannels__)
+        AudioConfig(const std::string & source__, int numChannels__)
             : source_(source__), location_(""), numChannels_(numChannels__)
         {}
 
 
         // local file sender
-        AudioLocalConfig(const std::string & source__, const std::string & location__,
+        AudioConfig(const std::string & source__, const std::string & location__,
                 int numChannels__)
             : source_(source__), location_(location__), numChannels_(numChannels__)
         {}
 
         // copy constructor
-        AudioLocalConfig(const AudioLocalConfig& m)
+        AudioConfig(const AudioConfig& m)
             : source_(m.source_), location_(m.location_), numChannels_(m.numChannels_) {}
 
         const char *source() const;
@@ -64,7 +63,7 @@ class AudioLocalConfig
 
     private:
 
-        AudioLocalConfig& operator=(const AudioLocalConfig&); //No Assignment Operator
+        AudioConfig& operator=(const AudioConfig&); //No Assignment Operator
         const std::string source_;
         const std::string location_;
         const int numChannels_;
@@ -82,6 +81,8 @@ class AudioReceiverConfig
         {}
 
         AudioSink* createSink() const;
+
+        bool sanityCheck() { return true; }
 
     private:
 

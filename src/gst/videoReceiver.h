@@ -34,7 +34,7 @@ class VideoReceiver
     : public MediaBase
 {
     public:
-        VideoReceiver(const VideoReceiverConfig vConfig, const RemoteReceiverConfig rConfig)
+        VideoReceiver(const VideoReceiverConfig vConfig, const ReceiverConfig rConfig)
             : videoConfig_(vConfig), remoteConfig_(rConfig), session_(), depayloader_(0), 
             decoder_(0), sink_(0) {}
 
@@ -50,7 +50,7 @@ class VideoReceiver
         void init_sink();
 
         const VideoReceiverConfig videoConfig_;
-        const RemoteReceiverConfig remoteConfig_;
+        const ReceiverConfig remoteConfig_;
         RtpReceiver session_;
         RtpPay *depayloader_; 
         

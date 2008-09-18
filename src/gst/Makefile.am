@@ -3,7 +3,7 @@ include $(top_srcdir)/src/globals.mak
 noinst_LIBRARIES = libgst.a
 
 libgst_a_SOURCES = mediaBase.cpp \
-				   audioSender.cpp audioReceiver.cpp mediaConfig.cpp \
+				   audioSender.cpp audioReceiver.cpp \
 				   videoConfig.cpp rtpSession.cpp pipeline.cpp \
 				   gstBase.cpp rtpSender.cpp rtpReceiver.cpp audioSource.cpp \
 				   interleave.cpp gstLinkable.cpp videoSink.cpp audioSink.cpp jackUtils.cpp \

@@ -36,7 +36,7 @@ class AudioReceiver
     : public MediaBase
 {
     public:
-        AudioReceiver(const AudioReceiverConfig aConfig, const RemoteReceiverConfig rConfig)
+        AudioReceiver(const AudioReceiverConfig aConfig, const ReceiverConfig rConfig)
             : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), gotCaps_(false), 
             depayloader_(0), decoder_(0), sink_(0)
         { assert(remoteConfig_.hasCodec()); }
@@ -61,7 +61,7 @@ class AudioReceiver
         void wait_for_caps();
 
         const AudioReceiverConfig audioConfig_;
-        const RemoteReceiverConfig remoteConfig_;
+        const ReceiverConfig remoteConfig_;
 
         RtpReceiver session_;
         bool gotCaps_;

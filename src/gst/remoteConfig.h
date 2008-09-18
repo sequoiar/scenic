@@ -59,15 +59,15 @@ class RemoteConfig
         const int port_;
 };
 
-class RemoteSenderConfig : public RemoteConfig
+class SenderConfig : public RemoteConfig
 {
     public:
-        RemoteSenderConfig(const std::string &codec__,
+        SenderConfig(const std::string &codec__,
                 const std::string &remoteHost__,    
                 int port__) : RemoteConfig(codec__, remoteHost__, port__)
         {}
 
-        RemoteSenderConfig(const RemoteSenderConfig & m) 
+        SenderConfig(const SenderConfig & m) 
             : RemoteConfig(m)
         {}
 
@@ -75,15 +75,15 @@ class RemoteSenderConfig : public RemoteConfig
 };
 
 
-class RemoteReceiverConfig : public RemoteConfig
+class ReceiverConfig : public RemoteConfig
 {
     public:
-        RemoteReceiverConfig(const std::string &codec__,
+        ReceiverConfig(const std::string &codec__,
                 const std::string &remoteHost__,    
                 int port__) : RemoteConfig(codec__, remoteHost__, port__)
         {}
         
-        RemoteReceiverConfig(const RemoteReceiverConfig & m) 
+        ReceiverConfig(const ReceiverConfig & m) 
             : RemoteConfig(m)
         {}
 
