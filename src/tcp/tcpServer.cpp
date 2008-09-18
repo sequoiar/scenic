@@ -51,7 +51,7 @@ bool TcpServer::socket_bind_listen()
     sockfd = 0;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd <= 0)
-        LOG_ERROR("Error opening socket: errno msg: " << sys_errlist[errno]);
+        LOG_ERROR("Error opening socket: errno msg: " << strerror(errno));
 
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
 
@@ -64,10 +64,10 @@ bool TcpServer::socket_bind_listen()
     serv_addr.sin_port = htons(port_);
 
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-        LOG_ERROR("Error at bind: errno msg: " << sys_errlist[errno]);
+        LOG_ERROR("Error at bind: errno msg: " << strerror(errno));
 
     if(listen(sockfd, 5) <= 0)
-        LOG_ERROR("Error on listen: errno msg: " << sys_errlist[errno]); 
+        LOG_ERROR("Error on listen: errno msg: " << strerror(errno)); 
 
     return true;
 }
@@ -83,7 +83,7 @@ bool TcpServer::accept()
         if(newsockfd == -1 && errno == EWOULDBLOCK)
             return false;
         else
-            LOG_ERROR("Error on listen: errno msg: " << sys_errlist[errno]);
+            LOG_ERROR("Error on listen: errno msg: " << strerror(errno));
     }
     connected_ = true;
     set_non_blocking(newsockfd);
