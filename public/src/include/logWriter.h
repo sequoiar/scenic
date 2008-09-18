@@ -21,7 +21,9 @@
  *      Log writer macro, usage:
  *
  *      LOG("This is a log");
- *      To disable logging, define the macro ENABLE_LOG (in this file) to 1.
+ *      or
+ *      LOG("Got Error errno: " << 100);
+ *      To disable logging, define the macro ENABLE_LOG (in this file) to 0.
  *
  */
 
@@ -46,9 +48,9 @@
 #else
 
 
-//Note mangle84579568749576948 varible name so that hiding existing var is unlikely
+//Note mangle84579568749576948 varible name so that hiding an existing variable is unlikely
 //
-//Do{} while(0)  construct to preserve one statement syntax  
+//Do{} while(0) construct to preserve one statement syntax of LOG()
 
 #define LOG(msg, level)                 \
             do{                         \
