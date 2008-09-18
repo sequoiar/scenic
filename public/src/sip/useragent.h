@@ -23,7 +23,7 @@
 #define THIS_FILE               "useragent"
 #define _LOCAL_IP_ADDRESS       "127.0.0.1"
 #define DEFAULT_SIP_PORT        5060
-#define PJ_LOG_LEVEL            1
+#define PJ_LOG_LEVEL            2
 
 /* @file	useragent.h
  * @brief	A SIP useragent. 
@@ -61,7 +61,9 @@ enum connectionState {
     // The connection failed because of a time out error. The host was probably unreachable
     CONNECTION_STATE_TIMEOUT,
     // The connection failed because no compatible media could have been found between the two peers
-    CONNECTION_STATE_NOT_ACCEPTABLE
+    CONNECTION_STATE_NOT_ACCEPTABLE,
+    // An incoming text message
+    CONNECTION_STATE_INCOMING_MESSAGE
 };
 
 /*
@@ -208,6 +210,8 @@ class UserAgent
          */
         int send_instant_message( std::string message );
 
+        std::string get_message( void );
+
         /*
          * Free memory allocated by the pjsip library
          *
@@ -274,6 +278,7 @@ class UserAgent
          * @param p The python instance as a transparent PyObject 
          */
         void set_python_instance(PyObject *p);
+
 
         /*
          * Initialize and acquire the python global interpreter lock. Should be called in the main thread 

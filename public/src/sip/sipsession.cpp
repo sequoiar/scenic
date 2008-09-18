@@ -84,6 +84,9 @@ int SIPSession::send_instant_message( std::string msg ){
     return _app_ua->send_instant_message( msg );
 }
 
+std::string SIPSession::get_message(void){
+    return _app_ua->get_message();
+}
 
 int SIPSession::accept( void ){
     // tells the user agent module to accept the incoming connection 

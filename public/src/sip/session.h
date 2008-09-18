@@ -103,6 +103,8 @@ class Session
          *          1 if a problem occured 
          */
         virtual int send_instant_message( std::string msg ) = 0;
+    
+        virtual std::string get_message() = 0;
 
         /*
          * Accept an incoming request. Equivalent to the pickup operation
