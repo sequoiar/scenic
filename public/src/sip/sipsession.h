@@ -103,6 +103,8 @@ class SIPSession
 
         std::string get_message( void );
 
+        int get_connection_port(void);
+
         /*
          * Accept an incoming request. Equivalent to the pickup operation
          *

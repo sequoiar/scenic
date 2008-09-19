@@ -197,7 +197,7 @@ class TestInitialisation(unittest.TestCase):
         Code factorisation
         Creation of the SIP session, user agent initialization
             """
-        self.session = sip.SIPSession(5060)
+        self.session = sip.SIPSession(50060)
         self.assertEqual(self.session.state() , 'CONNECTION_STATE_READY')
         self.assertEqual( self.session.error_reason(), 'NO_ERROR')
 
@@ -250,6 +250,12 @@ class TestInitialisation(unittest.TestCase):
         result = self.session.reinvite()
         # Should fail because reinvite is allowed only inside an existing dialog
         self.assertEqual( result, 1 )
+
+    def test_checkConnectionPort(self):
+        """ Check if the connection port has been succesfully assigned to our client
+            """
+        port = self.session.get_connection_port()
+        self.assertEqual( port, 50060 )
 
     def tearDown(self):
         """

@@ -88,6 +88,10 @@ std::string SIPSession::get_message(void){
     return _app_ua->get_message();
 }
 
+int SIPSession::get_connection_port(void){
+    return get_session_port();
+}
+
 int SIPSession::accept( void ){
     // tells the user agent module to accept the incoming connection 
     return _app_ua->inv_session_accept();

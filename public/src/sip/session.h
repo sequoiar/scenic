@@ -106,6 +106,8 @@ class Session
     
         virtual std::string get_message() = 0;
 
+        virtual int get_connection_port() = 0;
+
         /*
          * Accept an incoming request. Equivalent to the pickup operation
          *
