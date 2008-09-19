@@ -46,7 +46,12 @@ bool tcpGetCaps(int port,AudioReceiver &rx)
 
             GET_OR_RETURN(f,"command",std::string,command);
             GET_OR_RETURN(f,"caps_str",std::string,caps_str);
+            LOG_DEBUG("_________________________________________________");
             rx.set_caps(caps_str.c_str());
+
+            MapMsg q;
+            q["command"] = StrIntFloat("quit");
+            queue.push(q);
             break;
 
         }
