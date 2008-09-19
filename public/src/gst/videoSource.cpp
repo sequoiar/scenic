@@ -125,21 +125,21 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
 
     //sinkPad = gst_element_get_static_pad(context->sinkElement_, "sink");
     // FIXME: HACK!!!!
-     #if 0
-    if (context->config_.isNetworked())
-        sinkElement = context->pipeline_.findElement("colorspc");
-    else {
+    //if (context->config_.isNetworked())
+    sinkElement = context->pipeline_.findElement("colorspc");
+    
+    if (!sinkElement)       // we're local!
+    {
         sinkElement = context->pipeline_.findElement("videosink");
         g_object_set(G_OBJECT(sinkElement), "sync", TRUE, NULL);
     }
-#endif
+    //#endif
     //FIXME: this assumes that the first pad it finds is indeed the one filesource
     // should connect to...maybe should just have its own ghost pad?
-    sinkPad = context->pipeline_.findUnconnectedSinkpad();
+    //   sinkPad = context->pipeline_.findUnconnectedSinkpad();
     assert(sinkElement);
-#if 0
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
-#endif
+
     if (GST_PAD_IS_LINKED(sinkPad))
     {
         g_object_unref(sinkPad);        // don't link more than once
@@ -212,8 +212,8 @@ void VideoDvSource::sub_init()
 
     // demux srcpad must be linked to queue sink pad at runtime
     g_signal_connect(demux_, "pad-added",
-                     G_CALLBACK(VideoDvSource::cb_new_src_pad),
-                     static_cast<void *>(queue_));
+            G_CALLBACK(VideoDvSource::cb_new_src_pad),
+            static_cast<void *>(queue_));
 
     if (dvIsNew_)
         GstLinkable::link(source_, demux_);
