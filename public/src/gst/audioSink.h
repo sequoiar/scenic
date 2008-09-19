@@ -19,7 +19,7 @@
 
 #ifndef _AUDIO_SINK_H_
 #define _AUDIO_SINK_H_
-
+#include <string>
 #include "gstLinkable.h"
 
 class _GstElement;
