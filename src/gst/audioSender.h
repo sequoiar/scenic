@@ -29,7 +29,6 @@
 class AudioSource;
 class Encoder;
 class RtpPay;
-class AudioSink;
 
 class AudioSender
     : public MediaBase
@@ -37,7 +36,7 @@ class AudioSender
     public:
         AudioSender(const AudioConfig aConfig, const SenderConfig rConfig) 
             : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), source_(0), 
-            encoder_(0), payloader_(0), sink_(0)
+            encoder_(0), payloader_(0)
         {}
 
         ~AudioSender();
@@ -62,7 +61,6 @@ class AudioSender
 
         Encoder *encoder_;
         RtpPay *payloader_;
-        AudioSink *sink_;
 
         static const char* OSC_PORT;
 
