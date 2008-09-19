@@ -36,7 +36,7 @@ class VideoSink
         ~VideoSink();
         bool init();
         void showWindow();
-        void makeSyncTrue();
+        //void makeSyncTrue();
 
     private:
         _GstElement *sinkElement() { return sink_; }
