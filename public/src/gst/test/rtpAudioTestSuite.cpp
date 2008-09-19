@@ -28,17 +28,47 @@
 #include "audioReceiver.h"
 #include "audioConfig.h"
 #include "remoteConfig.h"
+#include "tcp/tcpThread.h"
+#include "tcp/parser.h"
 
+#include <sstream>
+
+bool tcpGetCaps(int port,AudioReceiver &rx)
+{
+    TcpThread tcp(port);
+        tcp.run();
+        QueuePair& queue = tcp.getQueue();
+        while(1)
+        {
+            MapMsg f = queue.timed_pop(100000);
+            if(f["command"].type() == 'n')
+                continue;
+
+            GET_OR_RETURN(f,"command",std::string,command);
+            GET_OR_RETURN(f,"caps_str",std::string,caps_str);
+            rx.set_caps(caps_str.c_str());
+            break;
+
+        }
+
+
+    return true;
+
+}
 
 void RtpAudioTestSuite::start_2ch_rtp_audiotest()
 {
     int numChannels = 2;
+
     if (id_ == 0) {
         AudioReceiverConfig aConfig("jackaudiosink");
         ReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
-
+        
         AudioReceiver rx(aConfig, rConfig);
         TEST_ASSERT(rx.init());
+        
+        TEST_ASSERT(tcpGetCaps(A_PORT+100,rx));
+
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -51,6 +81,17 @@ void RtpAudioTestSuite::start_2ch_rtp_audiotest()
         TEST_ASSERT(tx.init());
 
         TEST_ASSERT(tx.start());
+
+        MapMsg msg;
+
+        std::ostringstream s;
+
+        s  << "caps: caps_str=\"" << strEsq(tx.getCaps()) <<"\"" << std::endl;
+        tokenize(s.str(),msg);
+
+        TcpThread tcp(A_PORT+100);
+        tcp.socket_connect_send("127.0.0.1",msg);
+
 
         BLOCK();
         TEST_ASSERT(tx.isPlaying());

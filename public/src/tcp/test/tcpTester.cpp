@@ -8,9 +8,12 @@
 int main(int argc, char** argv)
 {
     if(argc < 2)
-        return 0;
+        LOG_CRITICAL("2 or 3 args: port [addr]");
     int port = atoi(argv[1]);
     TcpThread tcp(port);
+
+    return 0;
+
     QueuePair& queue = tcp.getQueue();
     LOG("helo",DEBUG);
     tcp.run();

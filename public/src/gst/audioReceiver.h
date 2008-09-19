@@ -44,6 +44,8 @@ class AudioReceiver
         ~AudioReceiver();
 
         bool start();
+        void set_caps(const char *caps)
+        { session_.set_caps(caps);}
 
     private:
         AudioReceiver();
@@ -55,7 +57,7 @@ class AudioReceiver
                 void *data,
                 void *user_data);
 
-        void set_caps(const char *caps);
+//        void set_caps(const char *caps);
         static void liblo_error(int num, const char *msg, const char *path);
 
         void wait_for_caps();

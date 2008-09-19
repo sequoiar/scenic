@@ -44,6 +44,7 @@ int TcpThread::main()
                 }
                 if(serv_.recv(msg))
                 {
+                    LOG_DEBUG(msg);
                     MapMsg mapMsg;
                     if(tokenize(msg, mapMsg))
                         queue_.push(mapMsg);
@@ -83,4 +84,12 @@ bool TcpThread::send(MapMsg& msg)
     return serv_.send(msg_str);
 }
 
+bool TcpThread::socket_connect_send(const std::string& addr, const MapMsg& msg)
+{
+    std::string msg_str;
+    stringify(msg, msg_str);
+    LOG_DEBUG(msg_str);
+    return serv_.socket_connect_send(addr,msg_str);
+
+}
 

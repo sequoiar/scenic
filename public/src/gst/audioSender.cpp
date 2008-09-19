@@ -90,7 +90,7 @@ bool AudioSender::start()
     LOG_DEBUG(logstr.str());
 
     pipeline_.wait_until_playing();
-    send_caps();
+//    send_caps();
 
     return true;
 }

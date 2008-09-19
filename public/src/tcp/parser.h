@@ -28,6 +28,7 @@
 
 #include "mapMsg.h"
 
+std::string strEsq(const std::string& str);
 
 /// builds a string of command: key=value pairs
 bool stringify(const MapMsg& cmd_map, std::string& str);

@@ -1,5 +1,29 @@
-/* A simple server in the internet domain using TCP
-   The port number is passed as an argument */
+// tcpServer.cpp
+// Copyright 2008 Koya Charles & Tristan Matthews 
+//     
+// This file is part of [propulse]ART.
+//
+// [propulse]ART is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// [propulse]ART is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+/** \file 
+ *  A simple server in the internet domain using TCP
+ *
+ *  The port number is passed as an argument 
+ */
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -43,6 +67,43 @@ bool TcpServer::set_non_blocking(int sockfd_param)
     return true;
 }
 
+bool TcpServer::socket_connect_send(const std::string& addr,const std::string& msg)
+{
+    struct sockaddr_in serv_addr;
+    bool ret = false;
+    //int optval = 1;
+    int ssockfd = 0;
+    ssockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (ssockfd <= 0)
+        LOG_ERROR("Error opening socket: errno msg: " << strerror(errno));
+
+    bzero((char *) &serv_addr, sizeof(serv_addr));
+    
+     
+    if(!inet_aton(addr.c_str(),&(serv_addr.sin_addr)))
+        LOG_DEBUG("Address bad." << addr);
+
+    serv_addr.sin_family = AF_INET;
+   // serv_addr.sin_addr.s_addr = INADDR;
+    serv_addr.sin_port = htons(port_);
+
+
+    if (connect(ssockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+        LOG_ERROR("Cannot Connect to peer." << strerror(errno));
+
+    int n=0;
+    n = ::write(ssockfd, msg.c_str(), msg.size());
+    if (n <= 0){
+        LOG_ERROR("Writing to socket failed.");
+        ret = false; 
+    }
+    ret = true;
+
+    usleep(1000000);
+    ::close(ssockfd);    
+    return ret;
+
+}
 
 bool TcpServer::socket_bind_listen()
 {
@@ -66,7 +127,7 @@ bool TcpServer::socket_bind_listen()
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
         LOG_ERROR("Error at bind: errno msg: " << strerror(errno));
 
-    if(listen(sockfd, 5) <= 0)
+    if(!listen(sockfd, 5) <= 0)
         LOG_ERROR("Error on listen: errno msg: " << strerror(errno)); 
 
     return true;
@@ -108,7 +169,6 @@ bool TcpServer::recv(std::string& out)
             if (n != 0 && errno == EWOULDBLOCK)
                 break;
 
-            LOG_ERROR("Error reading from socket.");
             connected_ = false;
             return false; 
         }

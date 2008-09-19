@@ -115,7 +115,7 @@ bool AudioReceiver::start()
 {
     // FIXME: caps are only sent if sender is started after receiver
     //#ifdef USE_OSC
-    wait_for_caps();
+//    wait_for_caps();
     //#endif
     std::stringstream logstr;       // FIXME: need a better printf style logwriter, 
                                     // shouldn't need stringstream
