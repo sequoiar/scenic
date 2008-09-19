@@ -25,16 +25,16 @@
 #include <iostream>
 
 URI::URI( int port )
-    : _hostName(""), _hostIP(""), _port(0) {
+    : _host_name(""), _host_ip(""), _port(0) {
     // Guess the local parameters
-    _hostIP = get_host_ip();
-    _hostName = pj_gethostname()->ptr;
+    _host_ip = get_host_ip();
+    _host_name = pj_gethostname()->ptr;
     _port = port;
 }
 
 
 URI::URI( std::string uri )
-    : _hostName(""), _hostIP(""), _port(0) {
+    : _host_name(""), _host_ip(""), _port(0) {
     using std::cout;
     using std::endl;
     size_t pos;
@@ -51,12 +51,12 @@ URI::URI( std::string uri )
 
     // Retrieve the username
     pos = tmp.find("@", 0);
-    _hostName = tmp.substr(0, pos);
+    _host_name = tmp.substr(0, pos);
     tmp.erase(0, pos+1);
 
     // Retrieve the host IP
     pos = tmp.find(":", 0);
-    _hostIP = tmp.substr(0, pos);
+    _host_ip = tmp.substr(0, pos);
     tmp.erase(0, pos+1);
 
     // Finally the port number
@@ -65,25 +65,25 @@ URI::URI( std::string uri )
 
 
 URI::URI( std::string hostname, std::string hostip, int port )
-    : _hostName(hostname), _hostIP(hostip), _port(port) {}
+    : _host_name(hostname), _host_ip(hostip), _port(port) {}
 
-std::string URI::getAddress(){
+std::string URI::get_address(){
     std::ostringstream addr;
 
-    addr << "<sip:" << getHostName() << "@" << getHostIP() << ":" << getPort() << ">";
+    addr << "<sip:" << get_host_name() << "@" << get_hostip() << ":" << get_port() << ">";
 
     return addr.str();
 }
 
 
-void URI::toString(){
+void URI::to_string(){
     using std::cout;
     using std::endl;
 
-    cout << "Host name = " << getHostName() << endl;
-    cout << "Host IP = " << getHostIP() << endl;
-    cout << "Port = " << getPort() << endl;
-    cout << "<sip:" << getHostName() << "@" << getHostIP() << ":" << getPort() << ">" << endl;
+    cout << "Host name = " << get_host_name() << endl;
+    cout << "Host IP = " << get_hostip() << endl;
+    cout << "Port = " << get_port() << endl;
+    cout << "<sip:" << get_host_name() << "@" << get_hostip() << ":" << get_port() << ">" << endl;
 }
 
 

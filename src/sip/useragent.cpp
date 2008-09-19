@@ -40,7 +40,8 @@ using std::endl;
  * @param rdata	The request data
  * @param r_sdp	The pjmedia_sdp_media to stock the remote SDP
  */
-void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp );
+void get_remote_sdp_from_offer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp );
+
 
 /*
  * Process an invite request and send the response.
@@ -58,7 +59,7 @@ int inv_session_answer();
  * @param data  The log message
  * @param len	The log message length
  */
-void pjsipLogWriter( int level, const char *data, int len );
+void pjsip_log_writer( int level, const char *data, int len );
 
 // Documentated from the PJSIP Developer's Guide, available on the pjsip website
 
@@ -198,7 +199,7 @@ pj_bool_t thread_quit = 0;
 /*
  * The main thread
  */
-pj_thread_t *sipThread;
+pj_thread_t *sip_thread;
 
 /*
  *  The local Session Description Protocol body
@@ -208,12 +209,12 @@ Sdp *_local_sdp;
 /*
  * The instant messaging module
  */
-InstantMessaging *_imModule;
+InstantMessaging *_im_module;
 
 /*
  * Should auto answer on a new invite request or wait for the user accept
  */
-answerMode _answerMode;
+answerMode _answer_mode;
 
 /*
  * The python instance
@@ -223,7 +224,7 @@ static PyObject *_python_instance = NULL;
 /*************************************************************************************************/
 
 UserAgent::UserAgent( std::string name, int port )
-    : _name(name), _localURI(0)
+    : _name(name), _local_uri(0)
 {
     // The state of the connection
     _state = CONNECTION_STATE_NULL;
@@ -232,12 +233,12 @@ UserAgent::UserAgent( std::string name, int port )
     _error = NO_ERROR;
 
     // Default behaviour on new incoming invite request
-    _answerMode = ANSWER_MODE_AUTO;
+    _answer_mode = ANSWER_MODE_AUTO;
 
-    _localURI = new URI( port );
+    _local_uri = new URI( port );
 
     // Instantiate the instant messaging module
-    _imModule = new InstantMessaging();
+    _im_module = new InstantMessaging();
 
     // To generate a different random number at each time
     // Useful for the random port selection if the default one is used
@@ -249,14 +250,14 @@ UserAgent::UserAgent( std::string name, int port )
 UserAgent::~UserAgent(){
     // Return some memory to the heap
     delete _local_sdp; _local_sdp = 0;
-    delete _imModule; _imModule = 0;
+    delete _im_module; _im_module = 0;
     
     // Shutdown the pjsip library
     pjsip_shutdown();
 }
 
 
-void UserAgent::initPython(){
+void UserAgent::init_python(){
 
     // Mandatory call to access to python global lock interpretor through different threads
     PyEval_InitThreads();
@@ -276,9 +277,9 @@ int UserAgent::pjsip_shutdown(){
 
     // Delete SIP thread
     thread_quit = 1;  // to stop the loop
-    pj_thread_join( sipThread );
-    pj_thread_destroy( sipThread );
-    sipThread = NULL;
+    pj_thread_join( sip_thread );
+    pj_thread_destroy( sip_thread );
+    sip_thread = NULL;
 
     PJ_ASSERT_RETURN(mod_ua.id != -1, PJ_EINVALIDOP);
 
@@ -303,16 +304,16 @@ int UserAgent::pjsip_shutdown(){
 }
 
 
-connectionState UserAgent::getConnectionState( void ){
+connectionState UserAgent::get_connection_state( void ){
     return _state;
 }
 
 
-errorCode UserAgent::getErrorCode( void ){
+errorCode UserAgent::get_error_code( void ){
     return _error;
 }
 
-std::string UserAgent::getConnectionStateStr( connectionState state ){
+std::string UserAgent::get_connection_state_str( connectionState state ){
     std::string res;
 
     // Look for the connection state equivalent string form
@@ -328,7 +329,7 @@ std::string UserAgent::getConnectionStateStr( connectionState state ){
 }
 
 
-std::string UserAgent::getErrorReason( errorCode code ){
+std::string UserAgent::get_error_reason( errorCode code ){
     std::string res;
 
     // Check first if the index is acceptable
@@ -343,12 +344,12 @@ std::string UserAgent::getErrorReason( errorCode code ){
 }
 
 
-void UserAgent::setAnswerMode( int mode ){
+void UserAgent::set_answer_mode( int mode ){
     // Validate the parameter
     if( mode == 0 || mode == 1 ){
         // 0 for auto mode
         // 1 for manual mode
-        _answerMode = (answerMode)mode;
+        _answer_mode = (answerMode)mode;
     }
 }
 
@@ -363,10 +364,10 @@ void UserAgent::connection_prepare( void ){
 }
 
 
-std::string UserAgent::getAnswerMode( void ){
+std::string UserAgent::get_answer_mode( void ){
     std::string res;
 
-    switch( _answerMode )
+    switch( _answer_mode )
     {
         case ANSWER_MODE_AUTO:
             res = "auto";
@@ -399,7 +400,7 @@ void UserAgent::init_sip_module( void ){
 int UserAgent::init_pjsip_modules(  ){
     pj_status_t status;
     pj_sockaddr local;
-    pj_uint16_t listeningPort;
+    pj_uint16_t listening_port;
     URI *my_uri;
     pjsip_inv_callback inv_cb;
 
@@ -411,13 +412,13 @@ int UserAgent::init_pjsip_modules(  ){
     }
     // Redirect the library log output to our log system
     pj_log_set_level( PJ_LOG_LEVEL );
-    pj_log_set_log_func( &pjsipLogWriter );
+    pj_log_set_log_func( &pjsip_log_writer );
 
     // Init SIP module
     init_sip_module();
 
     // Init the python part
-    initPython();
+    init_python();
 
     // Init the pj library. Must be called before using the library
     status = pj_init();
@@ -435,17 +436,17 @@ int UserAgent::init_pjsip_modules(  ){
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     /* Add UDP Transport */
-    my_uri = getLocalURI();
-    listeningPort = (pj_uint16_t) my_uri->_port;
-    pj_sockaddr_init( pj_AF_INET(), &local, NULL, listeningPort );
+    my_uri = get_local_uri();
+    listening_port = (pj_uint16_t) my_uri->_port;
+    pj_sockaddr_init( pj_AF_INET(), &local, NULL, listening_port );
     status = pjsip_udp_transport_start( endpt, &local.ipv4, NULL, 1, NULL );
     if( status != PJ_SUCCESS ){
         // Maybe the port is already in use
         // Try a random one
-        listeningPort = RANDOM_SIP_PORT;
-        pj_sockaddr_init( pj_AF_INET(), &local, NULL, listeningPort );
+        listening_port = RANDOM_SIP_PORT;
+        pj_sockaddr_init( pj_AF_INET(), &local, NULL, listening_port );
         status = pjsip_udp_transport_start( endpt, &local.ipv4, NULL, 1, NULL );
-        my_uri->_port = listeningPort;
+        my_uri->_port = listening_port;
     }
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
@@ -480,14 +481,14 @@ int UserAgent::init_pjsip_modules(  ){
     app_pool = pj_pool_create( &c_pool.factory, "pool", 4000, 4000, NULL );
     /* Initialize the SDP class instance */
     _local_sdp = new Sdp(app_pool);
-    _local_sdp -> setIPAddress(my_uri->_hostIP);
+    _local_sdp -> set_ip_address(my_uri->_host_ip);
 
     // Start working threads
     // Thread_quit must be equal to 0 so that this thread could listen to sip events
     // It is obvious if you look at the thread entry point startThread 
     thread_quit = 0;
-    pj_thread_create( app_pool, "app", &startThread, NULL, PJ_THREAD_DEFAULT_STACK_SIZE, 0,
-                      &sipThread );
+    pj_thread_create( app_pool, "app", &start_thread, NULL, PJ_THREAD_DEFAULT_STACK_SIZE, 0,
+                      &sip_thread );
 
     // Update the connection state. The user agent is ready to receive or sent requests
     _state = CONNECTION_STATE_READY;
@@ -517,15 +518,19 @@ int UserAgent::inv_session_create( std::string uri){
     else
         remote = new URI( uri );
     
-    local = getLocalURI();
+    local = get_local_uri();
 
     // Build the local contact
-    pj_ansi_sprintf( tmp, local->getAddress().c_str() );
+    pj_ansi_sprintf( tmp, local->get_address().c_str() );
     from = pj_str(tmp);
 
+    //cout << "from: " << from.ptr << endl;
+
     // Build the remote contact
-    pj_ansi_sprintf( tmp1, remote->getAddress().c_str() );
+    pj_ansi_sprintf( tmp1, remote->get_address().c_str() );
     to = pj_str(tmp1);
+
+    //cout << "To: " << to.ptr << endl;
 
     if( _state == CONNECTION_STATE_READY ) {
         // Use a high level invite session management provided by pjsip
@@ -537,11 +542,11 @@ int UserAgent::inv_session_create( std::string uri){
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         // Building the local SDP offer
-        _local_sdp->createInitialOffer();
+        _local_sdp->create_initial_offer();
 
         // Create the user agent client instance
         status = pjsip_inv_create_uac( dialog,
-                                       _local_sdp->getLocalSDPSession(), 0, &inv_session );
+                                       _local_sdp->get_local_sdp_session(), 0, &inv_session );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         // Create the invite session
@@ -577,7 +582,7 @@ int UserAgent::inv_session_end( void ){
     pjsip_tx_data *tdata;
     connectionState state;
 
-    state = getConnectionState();
+    state = get_connection_state();
     // Disconnect only if already connected...
     if( state == CONNECTION_STATE_CONNECTED ){
         // build the BYE request
@@ -605,12 +610,12 @@ int UserAgent::inv_session_reinvite( void ){
     // reinvite only if connected
     if( _state == CONNECTION_STATE_CONNECTED ) {
         // Build the local SDP offer
-        status = _local_sdp->createInitialOffer( );
+        status = _local_sdp->create_initial_offer( );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
         
         // Build the reinvite request
         status = pjsip_inv_reinvite( inv_session, NULL,
-                                     _local_sdp->getLocalSDPSession(), &tdata );
+                                     _local_sdp->get_local_sdp_session(), &tdata );
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
         // Send it
@@ -636,7 +641,7 @@ int inv_session_answer(){
     pjsip_tx_data *tdata;
 
     // Check if the SDP negociation has been succesfully done
-    status = _local_sdp->startNegociation( );
+    status = _local_sdp->start_negociation( );
 
     if( status == PJ_SUCCESS ){
         // Create and send a 200(OK) response
@@ -691,13 +696,13 @@ int UserAgent::send_instant_message( std::string msg ){
     // The connection must exist 
     if( inv_session ){
         // Set the current dialog for the instant messaging module
-        _imModule->setDialog( inv_session->dlg );
-        _imModule->setText( msg );
+        _im_module->set_dialog( inv_session->dlg );
+        _im_module->set_text( msg );
     }
     // And be established
     if( _state == CONNECTION_STATE_CONNECTED ) {
         // Send the message through the IM module
-        status = _imModule->sendMessage();
+        status = _im_module->send_message();
         PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
         return PJ_SUCCESS;
     }
@@ -709,24 +714,22 @@ int UserAgent::send_instant_message( std::string msg ){
 
 std::string UserAgent::get_message( void ){
     _state = CONNECTION_STATE_CONNECTED;
-    return _imModule->getTextMessage();
+    return _im_module->get_text_message();
 }
 
-void UserAgent::setSessionMedia( std::string type, std::string codecs, int port,
+void UserAgent::set_local_media( std::string type, std::string codecs, int port,
                                  std::string dir ){
-    _local_sdp->setSDPMedia( type, codecs, port, dir );
+    _local_sdp->set_local_media_cap( type, codecs, port, dir );
 }
 
-
-std::string UserAgent::mediaToString( void ){
+std::string UserAgent::media_to_string( void ){
     if( _state != CONNECTION_STATE_NULL )
-        return _local_sdp->mediaToString();
+        return _local_sdp->media_to_string();
     else
         return "";
 }
 
-
-int startThread( void *arg ){
+int start_thread( void *arg ){
     PJ_UNUSED_ARG(arg);
  
     // Entry point the secondary thread. It will process the sip events by polling through the callbacks
@@ -741,7 +744,7 @@ int startThread( void *arg ){
 }
 
 
-void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
+void get_remote_sdp_from_offer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
     pjmedia_sdp_session *sdp;
     pjsip_msg *msg;
     pjsip_msg_body *body;
@@ -757,8 +760,12 @@ void getRemoteSDPFromOffer( pjsip_rx_data *rdata, pjmedia_sdp_session** r_sdp ){
     *r_sdp = sdp;
 }
 
+std::string UserAgent::get_session_media( void ){
+    return _local_sdp->get_session_media();
+}
 
-void pjsipLogWriter( int level, const char *data, int len ){
+
+void pjsip_log_writer( int level, const char *data, int len ){
     PJ_UNUSED_ARG(len);
 
     // Map the pjsip log level to the log level we use
@@ -889,8 +896,8 @@ pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     }
     // Have to do some stuff here with the SDP
     // We retrieve the remote sdp offer in the rdata struct to begin the negociation
-    getRemoteSDPFromOffer( rdata, &r_sdp );
-    _local_sdp->receivingInitialOffer( r_sdp );
+    get_remote_sdp_from_offer( rdata, &r_sdp );
+    _local_sdp->receiving_initial_offer( r_sdp );
 
     // Create the local dialog (UAS)
     status = pjsip_dlg_create_uas( pjsip_ua_instance(), rdata, NULL, &dialog );
@@ -902,7 +909,7 @@ pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     }
     // Specify media capability during invite session creation
     status = pjsip_inv_create_uas( dialog, rdata,
-                                   _local_sdp->getLocalSDPSession(), 0, &inv_session );
+                                   _local_sdp->get_local_sdp_session(), 0, &inv_session );
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     // Send a 180/Ringing response
@@ -913,7 +920,7 @@ pj_bool_t on_rx_request( pjsip_rx_data *rdata ){
     PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 
     // Auto answer to the invite session or not
-    if( _answerMode == ANSWER_MODE_AUTO ){
+    if( _answer_mode == ANSWER_MODE_AUTO ){
         inv_session_answer();
     }
     /* Done */
@@ -956,8 +963,8 @@ void call_on_tsx_state_changed( pjsip_inv_session *inv, pjsip_transaction *tsx,
         text = (char*)msg->body->data;
 
         // Stock the message
-        _imModule->setResponse( text );
-        //_imModule->displayResponse();
+        _im_module->set_response( text );
+        //_im_module->displayResponse();
     
         // Notify the core of a waiting message
         py_connection_callback(CONNECTION_STATE_INCOMING_MESSAGE);
@@ -979,30 +986,18 @@ void call_on_media_update( pjsip_inv_session *inv, pj_status_t status ){
     PJ_UNUSED_ARG( status );
 
 
-    int nbMedia;
-    int nbCodecs;
-    std::string codec;
-    int i, j;
     const pjmedia_sdp_session *r_sdp;
-    pjmedia_sdp_media *media;
 
     if( status != PJ_SUCCESS )
         return;
-    // Get local and remote SDP
+    // Get the new sdp, result of the negociation
     pjmedia_sdp_neg_get_active_local( inv->neg, &r_sdp );
     
-    // Retrieve the media
-    nbMedia = r_sdp->media_count;
-    for( i=0; i<nbMedia ; i++ ){
-        // Retrieve the media 
-        media = r_sdp->media[i];
-        // Retrieve the payload
-        nbCodecs = media->desc.fmt_count;  // Must be one
-        for( j=0 ; j<nbCodecs ; j++ ){
-            
-        }
-        // TODO Retrieve the rtpmap attribute to get the encoding name
-    }
+    // Clean the resulting sdp offer to create a new one (in case of a reinvite)
+    _local_sdp->clean_session_media();
+    // Set the fresh negociated one
+    _local_sdp->set_negociated_offer( r_sdp );
+
 }
 
 
@@ -1011,8 +1006,8 @@ void on_rx_offer( pjsip_inv_session *inv, const pjmedia_sdp_session *offer ){
     //pjmedia_sdp_session *sdp;
     pj_status_t status;
 
-    _local_sdp->receivingInitialOffer( (pjmedia_sdp_session*)offer);
-    status = pjsip_inv_set_sdp_answer( inv_session, _local_sdp->getLocalSDPSession() );
+    _local_sdp->receiving_initial_offer( (pjmedia_sdp_session*)offer);
+    status = pjsip_inv_set_sdp_answer( inv_session, _local_sdp->get_local_sdp_session() );
     //PJ_ASSERT_RETURN( status == PJ_SUCCESS, 1 );
 }
 

@@ -136,8 +136,10 @@ class SIPSession
          * @param port  The port to transport this media
          * @param dir   The stream direction ( ex: sendrecv, sendonly, ...)
          */
-        void set_media( std::string type, std::string codecs, int port,
+        void set_local_media( std::string type, std::string codecs, int port,
                        std::string dir = DEFAULT_PARAMETER );
+
+        std::string get_session_media( void );
 
         
         /*

@@ -139,8 +139,13 @@ class Session
          * @param port  The port to transport this media
          * @param dir   The stream direction ( ex: sendrecv, sendonly, ...)
          */
-        virtual void set_media( std::string type, std::string codecs, int port,
+        virtual void set_local_media( std::string type, std::string codecs, int port,
                                std::string dir = DEFAULT_PARAMETER ) = 0;
+
+        /*
+         *
+         */
+        virtual std::string get_session_media( void ) = 0;
 
         /*
          * Monitor the current connection state

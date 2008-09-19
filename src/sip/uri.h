@@ -30,24 +30,61 @@
 class URI
 {
     public:
+        /*
+         * Class constructor.
+         * Build an uri with the specified port and with the local address
+         */
         URI( int port );
+        
+        /*
+         * Class constructor.
+         * Retrieve every fields from the string description and build the object 
+         */
         URI( std::string uri );
+
+        /*
+         * Build an uri 
+         */
         URI( std::string hostname, std::string hostip, int port );
 
+        /*
+         * Class destructor
+         */
         ~URI();
 
-        std::string getHostName(){ return _hostName; }
-        std::string getHostIP(){ return _hostIP; }
-        int getPort(){ return _port; }
+        /*
+         * Read accessor. Return the host name
+         */
+        std::string get_host_name(){ return _host_name; }
+        
+        /*
+         * Read accessor. Return the host ip address
+         */
+        std::string get_hostip(){ return _host_ip; }
+        
+        /*
+         * Read accessor. Return the port
+         */
+        int get_port(){ return _port; }
 
-        std::string getAddress();
+        /*
+         * Read accessor. Return the string description of the built uri 
+         */
+        std::string get_address();
 
-        std::string buildDefaultLocalUri( void );
-        void toString();
+        /*
+         * Read accessor. Return the string description of the default uri 
+         */
+        std::string build_default_local_uri( void );
+        
+        void to_string();
 
     private:
-        std::string _hostName;
-        std::string _hostIP;
+        // The host name
+        std::string _host_name;
+        // the host address IP
+        std::string _host_ip;
+        // The port
         int _port;
 
         friend class UserAgent;

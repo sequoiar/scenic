@@ -10,7 +10,7 @@ import libsip_export as sip
 class Sip(object):
     def __init__(self, port):
         self.session = sip.SIPSession(port)
-        self.set_media("audio", "GSM/vorbis/PCMA/",12345,"sendrecv")
+        self.set_local_media("audio", "GSM/vorbis/PCMA/",12345,"sendrecv")
         
     def connect(self):
         return self.session.connect()
@@ -27,8 +27,8 @@ class Sip(object):
     def error_reason(self):
         return self.session.error_reason()
 
-    def set_media(self, type, codecs, port, dir):
-        self.session.set_media(type, codecs, port, dir)
+    def set_local_media(self, type, codecs, port, dir):
+        self.session.set_local_media(type, codecs, port, dir)
 
     def reinvite(self):
         return self.session.reinvite()

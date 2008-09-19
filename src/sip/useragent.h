@@ -23,6 +23,7 @@
 #define THIS_FILE               "useragent"
 #define _LOCAL_IP_ADDRESS       "127.0.0.1"
 #define DEFAULT_SIP_PORT        5060
+// To set the verbosity. From 0 (min) to 6 (max)
 #define PJ_LOG_LEVEL            2
 
 /* @file	useragent.h
@@ -109,7 +110,7 @@ typedef enum errorCode errorCode;
  * through the pjsip callbacks
  */
 
-extern int startThread( void *arg);
+extern int start_thread( void *arg);
 
 /*
  * Callback from C++ to python when the connection state changes
@@ -185,7 +186,9 @@ class UserAgent
         int inv_session_refuse();
 
         /*
-         * Set the media offer for the session
+         * Set the local media capabilities for the session
+         * Must be called before sending an invite request. The sdp negociation
+         * will use these media parameters
          *
          * @param type	The media type. For instance: "audio"
          * @param codecs  The list of the codec to use for the session. The codecs must
@@ -193,12 +196,21 @@ class UserAgent
          * @param port The port to transport the media
          * @param dir   The stream direction. Default value: sendrecv (bidirectional)
          */
-        void setSessionMedia( std::string type, std::string codecs, int port, std::string dir );
+        void set_local_media( std::string type, std::string codecs, int port, std::string dir );
+
+        /*
+         * Get the result of the SDP negociation. 
+         * 
+         * @return std::string  The codec encoding name of the first media
+         *                      TODO Be able to return the codec encoding name of all the media used
+         *                      in the session
+         */
+        std::string get_session_media( void );
 
         /*
          * Return the local sip address
          */
-        URI* getLocalURI() { return _localURI; }
+        URI* get_local_uri() { return _local_uri; }
 
         /*
          * Method the send an instant text message to the connected peer
@@ -210,6 +222,12 @@ class UserAgent
          */
         int send_instant_message( std::string message );
 
+        /*
+         * Get the latest text message received.
+         * Call this method on receiving the callback INCOMING_MESSAGE
+         *
+         * @return std:;string  The text message
+         */
         std::string get_message( void );
 
         /*
@@ -223,28 +241,27 @@ class UserAgent
         /*
          * Return a string form of the session media
          */
-        std::string mediaToString( void );
+        std::string media_to_string( void );
 
         /*
          * Return the connection state string value
          */
-        std::string getConnectionStateStr( connectionState state );
+        std::string get_connection_state_str( connectionState state );
 
         /*
          * Return the connection state
          */
-        connectionState getConnectionState( void );
+        connectionState get_connection_state( void );
 
         /*
          * Return the error string reason
          */
-        std::string getErrorReason( errorCode code );
+        std::string get_error_reason( errorCode code );
 
         /*
          * Return the error code
          */
-        errorCode getErrorCode( void );
-
+        errorCode get_error_code( void );
 
         /*
          * Change the invite answer mode. In AUTO mode, any new invite session is automatically accepted
@@ -252,20 +269,12 @@ class UserAgent
          * 
          * @param mode  The answer mode. Default value: 'auto'
          */
-        void setAnswerMode( int mode );
+        void set_answer_mode( int mode );
 
         /*
          * Read acccessor. Get the answer mode
          */
-        std::string getAnswerMode( void );
-
-        /*
-         * Test if the user has an incoming call
-         *
-         * @return bool	true if a call is incoming
-         *               false otherwise
-         */
-        bool hasIncomingCall( void );
+        std::string get_answer_mode( void );
 
         /*
          * Set the python runnning instance as an PyObject.
@@ -279,12 +288,11 @@ class UserAgent
          */
         void set_python_instance(PyObject *p);
 
-
         /*
          * Initialize and acquire the python global interpreter lock. Should be called in the main thread 
          * before any operation engaging in any thread operation.
          */
-        void initPython();
+        void init_python();
 
     private:
         /*
@@ -295,7 +303,7 @@ class UserAgent
         /*
          * The local SIP address
          */
-        URI * _localURI;
+        URI * _local_uri;
 
         /*
          * Initialize the pjsip_module structure
@@ -306,13 +314,6 @@ class UserAgent
          * Restore the connection state to the CONNECTION_STATE_READY
          */
         void connection_prepare( void );
-
-        /*
-         * If we need to switch to a synchronous behaviour
-         *
-         * @param state The current state. The function returns when the current state changed
-         */
-        void wait_for_response( connectionState state );
 
         UserAgent(const UserAgent&); //No Copy Constructor
         UserAgent& operator=(const UserAgent&); //No Assignment Operator

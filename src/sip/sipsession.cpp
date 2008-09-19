@@ -103,35 +103,38 @@ int SIPSession::refuse( void ){
     return _app_ua->inv_session_refuse();
 }
 
-void SIPSession::set_media( std::string type, std::string codecs, int port, std::string dir ){
-    _app_ua->setSessionMedia( type, codecs, port, dir );
+void SIPSession::set_local_media( std::string type, std::string codecs, int port, std::string dir ){
+    _app_ua->set_local_media( type, codecs, port, dir );
 }
 
+std::string SIPSession::get_session_media(void){
+    return _app_ua->get_session_media();
+}
 
 std::string SIPSession::get_connection_state( void ){
     // Return the equivalent string form of the current connection state
-    return _app_ua->getConnectionStateStr( _app_ua->getConnectionState() );
+    return _app_ua->get_connection_state_str( _app_ua->get_connection_state() );
 }
 
 
 std::string SIPSession::get_error_reason( void ){
     // Return the equivalent string form of the current error status 
-    return _app_ua->getErrorReason( _app_ua->getErrorCode() );
+    return _app_ua->get_error_reason( _app_ua->get_error_code() );
 }
 
 
 std::string SIPSession::media_to_string( void ){
-    return _app_ua->mediaToString();
+    return _app_ua->media_to_string();
 }
 
 
 void SIPSession::set_answer_mode( int mode ){
-    _app_ua->setAnswerMode( mode );
+    _app_ua->set_answer_mode( mode );
 }
 
 
 std::string SIPSession::get_answer_mode( void ){
-    return _app_ua->getAnswerMode();
+    return _app_ua->get_answer_mode();
 }
 
 void SIPSession::set_python_instance(PyObject *p ){

@@ -18,6 +18,66 @@
  */
 
 #include "sdpcodec.h"
+#include <iostream>
+
+using std::cout;
+sdpCodec::sdpCodec( int payload )
+    : _name(""), _m_type(-1), _payload(-1), _clockrate(8000), _channels(1)
+{
+    _payload = payload;
+    switch(_payload)
+    {
+        case RTP_PAYLOAD_ULAW:
+            _name = CODEC_STR_ULAW;
+            _m_type = MIME_TYPE_AUDIO;
+            _clockrate = 8000;
+            _channels = 1;
+            break;
+        case RTP_PAYLOAD_ALAW:
+            _name = CODEC_STR_ALAW;
+            _m_type = MIME_TYPE_AUDIO;
+            _clockrate = 8000;
+            _channels = 1;
+            break;
+        case RTP_PAYLOAD_GSM:
+            _name = CODEC_STR_GSM;
+            _m_type = MIME_TYPE_AUDIO;
+            _clockrate = 8000;
+            _channels = 1;
+            break;
+        case RTP_PAYLOAD_ILBC:
+            _name = CODEC_STR_ILBC;
+            _m_type = MIME_TYPE_AUDIO;
+            _clockrate = 8000;
+            _channels = 1;
+            break;
+        case RTP_PAYLOAD_SPEEX:
+            _name = CODEC_STR_SPEEX;
+            _m_type = MIME_TYPE_AUDIO;
+            _clockrate = 8000;
+            _channels = 1;
+            break;
+        case RTP_PAYLOAD_VORBIS:
+            _name = CODEC_STR_VORBIS;
+            _m_type = MIME_TYPE_AUDIO;
+            _clockrate = 48000;
+            _channels = 8;
+            break;
+        case RTP_PAYLOAD_H263:
+            _name = CODEC_STR_H263;
+            _m_type = MIME_TYPE_VIDEO;
+            _clockrate = 90000;
+            _channels = 1;
+            break;
+        case RTP_PAYLOAD_H264:
+            _name = CODEC_STR_H264;
+            _m_type = MIME_TYPE_VIDEO;
+            _clockrate = 90000;
+            _channels = 1;
+            break;
+    }
+
+}
 
 
 sdpCodec::sdpCodec( int type, std::string name )
@@ -82,16 +142,16 @@ sdpCodec::sdpCodec( int type, std::string name, int payload, int ch, int clockra
 
 sdpCodec::~sdpCodec(){}
 
-std::string sdpCodec::getPayloadStr() {
+std::string sdpCodec::get_payload_str() {
     std::ostringstream ret;
-    ret << getPayload();
+    ret << get_payload();
     return ret.str();
 }
 
 
-std::string sdpCodec::getChannelsStr() {
+std::string sdpCodec::get_channels_str() {
     std::ostringstream ret;
-    ret << getChannels();
+    ret << get_channels();
     return ret.str();
 }
 
