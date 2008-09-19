@@ -28,6 +28,7 @@ BOOST_PYTHON_MODULE( libsip_export )
     .def("set_answer_mode", &SIPSession::set_answer_mode)
     .def("set_python_instance", &SIPSession::set_python_instance)
     .def("get_message", &SIPSession::get_message)
+    .def("get_connection_port", &SIPSession::get_connection_port)
     ;
 }
 
