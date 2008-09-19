@@ -28,24 +28,24 @@ InstantMessaging::~InstantMessaging(){
 }
 
 
-void InstantMessaging::setText( std::string message ){
+void InstantMessaging::set_text( std::string message ){
     _message = pj_str((char*)message.c_str());
 }
 
 
-void InstantMessaging::setResponse( std::string resp ){
+void InstantMessaging::set_response( std::string resp ){
     _response = pj_str((char*)resp.c_str());
 }
 
 
-std::string InstantMessaging::getTextMessage( void ){
+std::string InstantMessaging::get_text_message( void ){
     std::string text;
 
     text = _response.ptr;
     return text;
 }
 
-pj_status_t InstantMessaging::sendMessage(){
+pj_status_t InstantMessaging::send_message(){
     pjsip_method msg_method;
     const pj_str_t type =  STR_TEXT;
     const pj_str_t subtype = STR_PLAIN;
@@ -76,7 +76,7 @@ pj_status_t InstantMessaging::sendMessage(){
 }
 
 
-void InstantMessaging::displayResponse( void ){
+void InstantMessaging::display_response( void ){
     std::cout << "<IM> " << _response.ptr << std::endl;
 }
 

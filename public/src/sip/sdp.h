@@ -50,77 +50,115 @@ class Sdp
         ~Sdp();
 
         /*
-         * Read accessor. Get the list of media
+         * Read accessor. Get the list of the local media capabilities. 
          *
-         * @return std::vector<sdpCodec*>   the vector containing the audio codecs
+         * @return std::vector<sdpMedia*>   the vector containing the different media
          */
-        std::vector<sdpMedia*> getSDPMediaList( void ) { return _sdpMediaList; }
+        std::vector<sdpMedia*> get_local_media_cap( void ) { return _local_media_cap; }
 
         /*
          *  Read accessor. Get the sdp session information
          *
          *  @return pjmedia_sdp_session   The structure that describes a SDP session
          */
-        pjmedia_sdp_session* getLocalSDPSession( void ) { return _local_offer; }
+        pjmedia_sdp_session* get_local_sdp_session( void ) { return _local_offer; }
 
-        void setIPAddress( std::string ip_addr ) { _ip_addr = ip_addr; }
-        std::string getIPAddress( void ) { return _ip_addr; }
+        /*
+         * Write accessor. Set the local IP address that will be used in the sdp session
+         */
+        void set_ip_address( std::string ip_addr ) { _ip_addr = ip_addr; }
+        
+        /*
+         * Read accessor. Get the local IP address
+         */
+        std::string get_ip_address( void ) { return _ip_addr; }
 
         /*
          * Build the local SDP offer
-         *
-         * @param pool  The pool to allocate memory
          */
-        int createLocalOffer( );
+        int create_local_offer( );
 
         /*
          * Build the sdp media section
          * Add rtpmap field if necessary
          *
          * @param media     The media to add to SDP
-         * @param pool  The pool to allocate memory
          * @param med   The structure to receive the media section
          */
-        void getMediaDescriptorLine( sdpMedia* media, pjmedia_sdp_media** p_med );
+        void set_media_descriptor_line( sdpMedia* media, pjmedia_sdp_media** p_med );
 
         /*
          * On building an invite outside a dialog, build the local offer and create the
          * SDP negociator instance with it.
-         *
-         * @param pool  The pool to allocate memory
          */
-        int createInitialOffer( );
+        int create_initial_offer( );
 
         /*
          * On receiving an invite outside a dialog, build the local offer and create the
          * SDP negociator instance with the remote offer.
          *
-         * @param pool  The pool to allocate memory
          * @param remote    The remote offer
          */
-
-        int receivingInitialOffer( pjmedia_sdp_session* remote );
+        int receiving_initial_offer( pjmedia_sdp_session* remote );
 
         /*
-         * Parse a list of formatted encoding codecs name and add it to the session media
+         * Set the local media capablities. Add a media in the session 
          *
          * @param mime_type The type of media
          * @param codecs    The formatted list of codecs name (separator: '/')
          */
-        void setSDPMedia( std::string type, std::string codecs, int port, std::string dir );
+        void set_local_media_cap( std::string type, std::string codecs, int port, std::string dir );
 
-        pj_status_t startNegociation(  ){
+        /*
+         * Start the sdp negociation.
+         *
+         * @return pj_status_t  0 on success
+         *                      1 otherwise
+         */
+        pj_status_t start_negociation( void ){
             return pjmedia_sdp_neg_negotiate(
                        _pool, negociator, 0);
         }
 
+        /*
+         * Retrieve the negociated sdp offer from the sip payload.
+         *
+         * @param sdp   the negociated offer
+         */
+        void set_negociated_offer( const pjmedia_sdp_session *sdp );
 
-        std::string mediaToString( void );
+        /*
+         * Remove all media in the session media vector.
+         */
+        void clean_session_media();
+
+        /*
+         * read accessor. Return the negociated offer
+         *
+         * @return pjmedia_sdp_session  The negociated offer
+         */
+        pjmedia_sdp_session* get_negociated_offer( void ){
+            return _negociated_offer;
+        }
+
+        /*
+         * Return a string description of the media added to the session,
+         * ie the local media capabilities
+         */
+        std::string media_to_string( void );
+
+        /*
+         * Return the codec of the first media after negociation
+         */
+        std::string get_session_media( void );
 
     private:
 
-        /* The media list */
-        std::vector<sdpMedia*> _sdpMediaList;
+        // The local media capabilities 
+        std::vector<sdpMedia*> _local_media_cap;
+    
+        // The media that will be used by the session (after the SDP negociation)
+        std::vector<sdpMedia*> _session_media;
 
         /* The local IP address */
         std::string _ip_addr;
@@ -128,9 +166,15 @@ class Sdp
         /* The local SDP offer */
         pjmedia_sdp_session *_local_offer;
 
+        /* The negociated SDP offer */
+        // Explanation: each endpoint's offer is negociated, and a new sdp offer results from this
+        // negociation, with the compatible media from each part 
+        pjmedia_sdp_session *_negociated_offer;
+
         /* The sdp negociator instance */
         pjmedia_sdp_neg *negociator;
-
+    
+        // The pool to allocate memory
         pj_pool_t *_pool;
 
         Sdp(const Sdp&); //No Copy Constructor
@@ -140,76 +184,76 @@ class Sdp
          *  Mandatory field: Protocol version ("v=")
          *  Add the protocol version in the SDP session description
          */
-        void sdp_addProtocol( void );
+        void sdp_add_protocol( void );
 
         /*
          *  Mandatory field: Origin ("o=")
          *  Gives the originator of the session.
          *  Serves as a globally unique identifier for this version of this session description.
          */
-        void sdp_addOrigin( void );
+        void sdp_add_origin( void );
 
         /*
          *  Mandatory field: Session name ("s=")
          *  Add a textual session name.
          */
-        void sdp_addSessionName( void );
+        void sdp_add_session_name( void );
 
         /*
          *  Optional field: Session information ("s=")
          *  Provides textual information about the session.
          */
-        void sdp_addSessionInfo( void ){}
+        void sdp_add_session_info( void ){}
 
         /*
          *  Optional field: Uri ("u=")
          *  Add a pointer to additional information about the session.
          */
-        void sdp_addUri( void ) {}
+        void sdp_add_uri( void ) {}
 
         /*
          *  Optional fields: Email address and phone number ("e=" and "p=")
          *  Add contact information for the person responsible for the conference.
          */
-        void sdp_addEmail( void ) {}
+        void sdp_add_email( void ) {}
 
         /*
          *  Optional field: Connection data ("c=")
          *  Contains connection data.
          */
-        void sdp_addConnectionInfo( void );
+        void sdp_add_connection_info( void );
 
         /*
          *  Optional field: Bandwidth ("b=")
          *  Denotes the proposed bandwidth to be used by the session or the media .
          */
-        void sdp_addBandwidth( void ) {}
+        void sdp_add_bandwidth( void ) {}
 
         /*
          *  Mandatory field: Timing ("t=")
          *  Specify the start and the stop time for a session.
          */
-        void sdp_addTiming( void );
+        void sdp_add_timing( void );
 
         /*
          * Optional field: Time zones ("z=")
          */
-        void sdp_addTimeZone( void ) {}
+        void sdp_add_time_zone( void ) {}
 
         /*
          * Optional field: Encryption keys ("k=")
          */
-        void sdp_addEncryptionKey( void ) {}
+        void sdp_add_encryption_key( void ) {}
 
         /*
          * Optional field: Attributes ("a=")
          */
-        void sdp_addAttributes( );
+        void sdp_add_attributes( );
 
         /*
          * Mandatory field: Media descriptions ("m=")
          */
-        void sdp_addMediaDescription(  );
+        void sdp_add_media_description(  );
 };
 
 #endif // _SDP_H

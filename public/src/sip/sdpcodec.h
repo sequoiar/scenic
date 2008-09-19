@@ -32,7 +32,7 @@
  * Codecs RTP payload as defined in
  * RFC 3551 - RTP Profile for Audio and Video Conferences with Minimal Control
  */
-typedef enum {
+enum codec_rtp_payload{
     // media type = audio - clock rate = 8000 - channels = 1
     RTP_PAYLOAD_ULAW = 0,
     RTP_PAYLOAD_ALAW = 8,
@@ -44,7 +44,9 @@ typedef enum {
     // media type = video - clock rate = 90000
     RTP_PAYLOAD_H263 = 34,
     RTP_PAYLOAD_H264 = 98
-} CodecRTPPayload;
+};
+
+typedef enum codec_rtp_payload codec_rtp_payload;
 
 /*
  * Codecs encoding names
@@ -77,6 +79,8 @@ class sdpCodec
          */
         sdpCodec( int type, std::string name );
 
+        sdpCodec( int payload );
+
         /*
          * Class constructor
          * @param type  The type of media : AUDIO - VIDEO
@@ -92,37 +96,37 @@ class sdpCodec
          * Read accessor. Return the type of the media
          * audio / video
          */
-        int getType( void ){ return _m_type; }
+        int get_type( void ){ return _m_type; }
 
         /*
          * Read accessor. Return the name of the codec
          */
-        std::string getName( void ){ return _name; }
+        std::string get_name( void ){ return _name; }
 
         /*
          * Read accessor. Return the RTP payload
          */
-        int getPayload( void ){ return _payload; }
+        int get_payload( void ){ return _payload; }
 
         /*
          * Return the RTP payload as a string
          */
-        std::string getPayloadStr( void );
+        std::string get_payload_str( void );
 
         /*
          * Read accessor. Return the codec's clock rate
          */
-        int getClockrate( void ){ return _clockrate; }
+        int get_clockrate( void ){ return _clockrate; }
 
         /*
          * Read accessor. Return the codec's channel number
          */
-        int getChannels( void ){ return _channels; }
+        int get_channels( void ){ return _channels; }
 
         /*
          * Read accessor. Return the codec's channel numbera as a string
          */
-        std::string getChannelsStr( void );
+        std::string get_channels_str( void );
 
         /*
          * Tells whether or not the RTp payload is static.
@@ -130,8 +134,10 @@ class sdpCodec
          * @return bool     True if the payload is inferior to 96
          *                  False otherwise
          */
-        bool isPayloadStatic( void ) { return _payload < 96; }
+        bool is_payload_static( void ) { return _payload < 96; }
 
+        // As we often access the sdpmedia private attributes, we allow this class
+        // to access them directly
         friend class sdpMedia;
 
     private:

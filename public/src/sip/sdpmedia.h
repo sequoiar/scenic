@@ -45,8 +45,6 @@ enum streamDirection {
     DIR_COUNT
 };
 
-typedef enum streamDirection streamDirection;
-
 /*
  * This enum contains the different media types.
  * To be added in the SDP attributes
@@ -62,6 +60,7 @@ enum mediaType {
     MEDIA_COUNT
 };
 
+typedef enum streamDirection streamDirection;
 typedef enum mediaType mediaType;
 
 class sdpMedia
@@ -74,63 +73,101 @@ class sdpMedia
         /*
          * Read accessor. Return the list of codecs
          */
-        std::vector<sdpCodec*> getMediaCodecList() { return _codecList; }
+        std::vector<sdpCodec*> get_media_codec_list() { return _codec_list; }
 
         /*
          * Read accessor. Return the type of media
          */
-        mediaType getMediaType() { return _mediaType; }
+        mediaType get_media_type() { return _media_type; }
 
         /*
          * Read accessor. Return the type of media
          */
-        std::string getMediaTypeStr();
+        std::string get_media_type_str();
 
-        void setMediaType( int type ) { _mediaType = (mediaType)type; }
+        /*
+         * Set the media type
+         */
+        void set_media_type( int type ) { _media_type = (mediaType)type; }
 
         /*
          * Read accessor. Return the transport port
          */
-        int getPort() { return _port; }
+        int get_port() { return _port; }
 
         /*
          * Write accessor. Set the transport port
          */
-        void setPort( int port ) { _port = port; }
+        void set_port( int port ) { _port = port; }
 
         /*
          * Add a codec in the current media codecs vector
          *
          * @param codec     A pointer on the codec to add
          */
-        void addCodec( sdpCodec *codec );
+        void add_codec( sdpCodec *codec );
 
-        void addCodec( std::string codecName );
+        /*
+         * Add a codec in the current media codecs vector
+         *
+         * @param codec_name     The codec encoding name
+         */
+        void add_codec( std::string codec_name );
 
-        void removeCodec( std::string codecName );
+        /*
+         * Add a codec in the current media codecs vector
+         *
+         * @param payload     The payload type
+         */
+        void add_codec( int payload );
 
-        void clearCodecList( void );
+        /*
+         * Remove a codec from the current media codecs vector
+         *
+         * @param codec_name    The codec encoding name
+         */
+        void remove_codec( std::string codec_name );
 
-        std::string toString( void );
+        /*
+         * Remove all the codecs from the list
+         */
+        void clear_codec_list( void );
 
-        void setStreamDirection( int direction ) { _streamType = (streamDirection)direction; }
+        /*
+         * Return a string description of the current media
+         */ 
+        std::string to_string( void );
 
-        streamDirection getStreamDirection( void ) { return _streamType; }
+        /*
+         * Set the stream direction of the current media
+         * ie: sendrecv, sendonly,...
+         */
+        void set_stream_direction( int direction ) { _stream_type = (streamDirection)direction; }
 
-        std::string getStreamDirectionStr( void );
+        /*
+         * Get the stream direction of the current media
+         * ie: sendrecv, sendonly,...
+         */
+        streamDirection get_stream_direction( void ) { return _stream_type; }
+
+        /*
+         * Get the stream direction string description of the current media
+         * ie: sendrecv, sendonly,...
+         */
+        std::string get_stream_direction_str( void );
 
     private:
         /* The type of media */
-        mediaType _mediaType;
+        mediaType _media_type;
 
         /* The media codec vector */
-        std::vector< sdpCodec* > _codecList;
+        std::vector< sdpCodec* > _codec_list;
 
         /* the transport port */
         int _port;
 
         /* The stream direction */
-        streamDirection _streamType;
+        streamDirection _stream_type;
 };
 
 #endif // _SDP_MEDIA

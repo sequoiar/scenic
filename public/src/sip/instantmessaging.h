@@ -47,7 +47,7 @@ class InstantMessaging
          *
          * @param dlg   A pointer on the current pjsip_dialog structure
          */
-        void setDialog( pjsip_dialog *dlg ) { _current_dlg = dlg; }
+        void set_dialog( pjsip_dialog *dlg ) { _current_dlg = dlg; }
         
         /*
          * Prepare a string to be sent. This method have to be called
@@ -55,9 +55,9 @@ class InstantMessaging
          *
          * @param message   The text message
          */
-        void setText( std::string message );
+        void set_text( std::string message );
         
-        std::string getTextMessage(void) ; 
+        std::string get_text_message(void) ; 
 
         /*
          * Send the message, previously set with the setText method, to the connected peer
@@ -65,19 +65,19 @@ class InstantMessaging
          * @return pj_status_t  0 on success
          *                      1 otherwise
          */
-        pj_status_t sendMessage( void );
+        pj_status_t send_message( void );
             
         /*
          * Set the response.
          *
          * @param resp    The last string message received
          */ 
-        void setResponse( std::string resp );
+        void set_response( std::string resp );
         
         /*
          * Display the response
          */
-        void displayResponse( void );
+        void display_response( void );
 
     private:
 

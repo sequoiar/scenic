@@ -34,7 +34,7 @@ int main(int argc, char** argv){
         sip = new SIPSession(atoi(argv[1]));
     else
         sip = new SIPSession( );
-    sip->set_media("audio", "vorbis/PCMA/", 12345);
+    sip->set_local_media("audio", "vorbis/PCMA/", 12345);
 
     // Console main
     cout << MENU << endl;
@@ -83,7 +83,7 @@ int main(int argc, char** argv){
                 cin >> port;
                 cout << " <<< direction : ";
                 cin >> dir;
-                sip->set_media( type, codecs, atoi(port.c_str()), dir );
+                sip->set_local_media( type, codecs, atoi(port.c_str()), dir );
                 break;
             case 'l':
                 cout << sip->media_to_string() << endl;
@@ -127,7 +127,7 @@ int main(int argc, char** argv){
                 sip->init();
                 msg = sip->get_error_reason();
                 cout << msg << endl;
-                sip->set_media("audio", "vorbis/PCMA/", 12345);
+                sip->set_local_media("audio", "vorbis/PCMA/", 12345);
                 break;
             case 'q':
                 sip->shutdown();
