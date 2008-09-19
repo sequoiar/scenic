@@ -33,33 +33,47 @@
 
 #include <sstream>
 
-bool tcpGetCaps(int port,AudioReceiver &rx)
+bool tcpGetCaps(int port, AudioReceiver &rx)
 {
     TcpThread tcp(port);
-        tcp.run();
-        QueuePair& queue = tcp.getQueue();
-        while(1)
-        {
-            MapMsg f = queue.timed_pop(100000);
-            if(f["command"].type() == 'n')
-                continue;
+    tcp.run();
+    QueuePair& queue = tcp.getQueue();
+    bool gotCaps = false;
+    while(!gotCaps)
+    {
+        MapMsg f = queue.timed_pop(100000);
+        if(f["command"].type() == 'n')
+            continue;
 
-            GET_OR_RETURN(f,"command",std::string,command);
-            GET_OR_RETURN(f,"caps_str",std::string,caps_str);
-            LOG_DEBUG("_________________________________________________");
-            rx.set_caps(caps_str.c_str());
+        GET_OR_RETURN(f, "command", std::string, command);
+        GET_OR_RETURN(f, "caps_str", std::string, caps_str);
 
-            MapMsg q;
-            q["command"] = StrIntFloat("quit");
-            queue.push(q);
-            break;
+        rx.set_caps(caps_str.c_str());
 
-        }
-
+        // send quit command to Receiver TcpThread to make 
+        // threads join on function exit (i.e. TcpThread's destructor)
+        MapMsg q;
+        q["command"] = StrIntFloat("quit");
+        queue.push(q);
+        gotCaps = true;
+    }
 
     return true;
-
 }
+
+
+bool tcpSendCaps(int port, const std::string &caps)
+{
+    MapMsg msg;
+    std::ostringstream s;
+
+    TcpThread tcp(port);
+    s  << "caps: caps_str=\"" << strEsq(caps) <<"\"" << std::endl;
+    tokenize(s.str(),msg);
+
+    return tcp.socket_connect_send("127.0.0.1", msg);
+}
+
 
 void RtpAudioTestSuite::start_2ch_rtp_audiotest()
 {
@@ -68,11 +82,11 @@ void RtpAudioTestSuite::start_2ch_rtp_audiotest()
     if (id_ == 0) {
         AudioReceiverConfig aConfig("jackaudiosink");
         ReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
-        
+
         AudioReceiver rx(aConfig, rConfig);
         TEST_ASSERT(rx.init());
-        
-        TEST_ASSERT(tcpGetCaps(A_PORT+100,rx));
+
+        TEST_ASSERT(tcpGetCaps(A_PORT + 100, rx));
 
         TEST_ASSERT(rx.start());
 
@@ -87,16 +101,7 @@ void RtpAudioTestSuite::start_2ch_rtp_audiotest()
 
         TEST_ASSERT(tx.start());
 
-        MapMsg msg;
-
-        std::ostringstream s;
-
-        s  << "caps: caps_str=\"" << strEsq(tx.getCaps()) <<"\"" << std::endl;
-        tokenize(s.str(),msg);
-
-        TcpThread tcp(A_PORT+100);
-        tcp.socket_connect_send("127.0.0.1",msg);
-
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, tx.getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx.isPlaying());
@@ -142,6 +147,8 @@ void RtpAudioTestSuite::start_stop_2ch_rtp_audiotest()
         AudioReceiver rx(aConfig, rConfig);
         TEST_ASSERT(rx.init());
 
+        TEST_ASSERT(tcpGetCaps(A_PORT + 100, rx));
+
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -159,6 +166,7 @@ void RtpAudioTestSuite::start_stop_2ch_rtp_audiotest()
 
         TEST_ASSERT(tx.start());
 
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, tx.getCaps()));
         BLOCK();
         TEST_ASSERT(tx.isPlaying());
 
@@ -178,6 +186,8 @@ void RtpAudioTestSuite::start_8ch_rtp_audiotest()
         AudioReceiver rx(aConfig, rConfig);
         TEST_ASSERT(rx.init());
 
+        TEST_ASSERT(tcpGetCaps(A_PORT + 100, rx));
+
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -190,6 +200,8 @@ void RtpAudioTestSuite::start_8ch_rtp_audiotest()
         TEST_ASSERT(tx.init());
 
         TEST_ASSERT(tx.start());
+
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, tx.getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx.isPlaying());
@@ -234,6 +246,8 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiotest()
         AudioReceiver rx(aConfig, rConfig);
         TEST_ASSERT(rx.init());
 
+        TEST_ASSERT(tcpGetCaps(A_PORT + 100, rx));
+
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -249,6 +263,8 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiotest()
         TEST_ASSERT(tx.init());
 
         TEST_ASSERT(tx.start());
+
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, tx.getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx.isPlaying());
@@ -268,6 +284,8 @@ void RtpAudioTestSuite::start_8ch_rtp_audiofile()
         ReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
         AudioReceiver rx(aConfig, rConfig);
         TEST_ASSERT(rx.init());
+        
+        TEST_ASSERT(tcpGetCaps(A_PORT + 100, rx));
 
         TEST_ASSERT(rx.start());
 
@@ -280,8 +298,9 @@ void RtpAudioTestSuite::start_8ch_rtp_audiofile()
         AudioSender tx(aConfig, rConfig);
         TEST_ASSERT(tx.init());
 
-
         TEST_ASSERT(tx.start());
+
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, tx.getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx.isPlaying());
@@ -297,7 +316,6 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiofile()
         ReceiverConfig rConfig("vorbis", get_host_ip(), A_PORT); 
         AudioReceiver rx(aConfig, rConfig);
         TEST_ASSERT(rx.init());
-
 
         BLOCK();
 
@@ -327,7 +345,7 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiofile()
         AudioReceiver rx(aConfig, rConfig);
         TEST_ASSERT(rx.init());
 
-
+        TEST_ASSERT(tcpGetCaps(A_PORT + 100, rx));
 
         TEST_ASSERT(rx.start());
 
@@ -345,6 +363,8 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiofile()
 
 
         TEST_ASSERT(tx.start());
+
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, tx.getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx.isPlaying());
@@ -364,6 +384,8 @@ void RtpAudioTestSuite::start_audio_dv_rtp()
         AudioReceiver rx(aConfig, rConfig);
         TEST_ASSERT(rx.init());
 
+        TEST_ASSERT(tcpGetCaps(A_PORT + 100, rx));
+
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -376,6 +398,8 @@ void RtpAudioTestSuite::start_audio_dv_rtp()
         TEST_ASSERT(tx.init());
 
         TEST_ASSERT(tx.start());
+        
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, tx.getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx.isPlaying());
@@ -421,6 +445,8 @@ void RtpAudioTestSuite::start_stop_audio_dv_rtp()
         AudioReceiver rx(aConfig, rConfig);
         TEST_ASSERT(rx.init());
 
+        TEST_ASSERT(tcpGetCaps(A_PORT + 100, rx));
+
         TEST_ASSERT(rx.start());
 
         BLOCK();
@@ -438,6 +464,8 @@ void RtpAudioTestSuite::start_stop_audio_dv_rtp()
 
 
         TEST_ASSERT(tx.start());
+        
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, tx.getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx.isPlaying());

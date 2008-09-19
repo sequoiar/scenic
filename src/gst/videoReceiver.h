@@ -52,8 +52,8 @@ class VideoReceiver
         const VideoReceiverConfig videoConfig_;
         const ReceiverConfig remoteConfig_;
         RtpReceiver session_;
+
         RtpPay *depayloader_; 
-        
         Decoder *decoder_;
         VideoSink *sink_;
 
