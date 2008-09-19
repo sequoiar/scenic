@@ -31,7 +31,7 @@ class Decoder;
 class VideoSink;
 
 class VideoReceiver
-    : public MediaBase
+    : public ReceiverBase
 {
     public:
         VideoReceiver(const VideoReceiverConfig vConfig, const ReceiverConfig rConfig)
@@ -45,8 +45,8 @@ class VideoReceiver
 
     private:
 
-        void init_source(){};       // FIXME: shouldn't exist
         void init_codec();
+        void init_depayloader();
         void init_sink();
 
         const VideoReceiverConfig videoConfig_;

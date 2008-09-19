@@ -21,8 +21,6 @@
 #include <cassert>
 #include "mediaBase.h"
 
-const char *MediaBase::OSC_PORT = "7770";
-
 MediaBase::~MediaBase()
 {
     assert(stop());
@@ -33,9 +31,43 @@ bool MediaBase::init()  // template method
 {
     // these methods are defined in subclasses
     init_source();
-    init_codec();
     init_sink();
     return true;
 }
 
+// FIXME: say no to OSC
+const char *SenderBase::OSC_PORT = "7770";
+
+SenderBase::~SenderBase()
+{
+    assert(stop());
+}
+
+
+bool SenderBase::init()  // template method
+{
+    // these methods are defined in subclasses
+    init_source();
+    init_codec();
+    init_payloader();
+    return true;
+}
+
+// FIXME: OSC BAD
+const char *ReceiverBase::OSC_PORT = "7770";
+
+ReceiverBase::~ReceiverBase()
+{
+    assert(stop());
+}
+
+
+bool ReceiverBase::init()  // template method
+{
+    // these methods are defined in subclasses
+    init_codec();
+    init_depayloader();
+    init_sink();
+    return true;
+}
 

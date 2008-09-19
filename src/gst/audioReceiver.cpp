@@ -91,7 +91,11 @@ void AudioReceiver::init_codec()
 {
     assert(decoder_ = remoteConfig_.createDecoder());
     decoder_->init();
-    
+}
+
+
+void AudioReceiver::init_depayloader()
+{
     assert(depayloader_ = decoder_->createDepayloader());
     depayloader_->init();
     GstLinkable::link(*depayloader_, *decoder_);
@@ -117,7 +121,7 @@ bool AudioReceiver::start()
                                     // shouldn't need stringstream
     logstr << "Receiving audio on port " << remoteConfig_.port() << " from host " << remoteConfig_.remoteHost();
     LOG(logstr.str(), DEBUG); 
-    MediaBase::start();
+    GstBase::start();
     return true;
 }
 

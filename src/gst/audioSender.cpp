@@ -56,7 +56,7 @@ void AudioSender::init_codec()
 }
 
 
-void AudioSender::init_sink()   // FIXME: this should be init_payloader
+void AudioSender::init_payloader()   
 {
      assert(payloader_ = encoder_->createPayloader());
      payloader_->init();
@@ -67,14 +67,13 @@ void AudioSender::init_sink()   // FIXME: this should be init_payloader
 }
 
 
-
 void AudioSender::send_caps() const
 {
     //#ifdef USE_OSC
     // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
     LOG("Sending caps...", DEBUG);
 
-    lo_address t = lo_address_new(NULL, MediaBase::OSC_PORT);
+    lo_address t = lo_address_new(NULL, SenderBase::OSC_PORT);
     if (lo_send(t, "/audio/rx/caps", "s", session_.getCaps().c_str()) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t)
             << std::endl;
@@ -84,7 +83,7 @@ void AudioSender::send_caps() const
 
 bool AudioSender::start()
 {
-    MediaBase::start();
+    GstBase::start();
 
     std::stringstream logstr;
     logstr << "Sending audio to host " << remoteConfig_.remoteHost() << " on port " << remoteConfig_.port() << std::endl;

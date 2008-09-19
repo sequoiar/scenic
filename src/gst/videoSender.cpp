@@ -55,7 +55,7 @@ void VideoSender::init_codec()
 }
 
 
-void VideoSender::init_sink()       // FIXME: this should be init payloader
+void VideoSender::init_payloader()       
 {
         assert(payloader_ = encoder_->createPayloader());
         payloader_->init();

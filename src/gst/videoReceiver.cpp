@@ -42,6 +42,11 @@ void VideoReceiver::init_codec()
 {
     assert(decoder_ = remoteConfig_.createDecoder());
     decoder_->init();
+}
+
+
+void VideoReceiver::init_depayloader()
+{
     assert(depayloader_ = decoder_->createDepayloader());
     depayloader_->init();
 
@@ -64,7 +69,7 @@ void VideoReceiver::init_sink()
 bool VideoReceiver::start()
 {
     LOG("Receiving video", DEBUG);
-    MediaBase::start();
+    GstBase::start();
     sink_->showWindow();
     return true;
 }
@@ -72,7 +77,7 @@ bool VideoReceiver::start()
 
 bool VideoReceiver::stop()
 {
-    MediaBase::stop();
+    GstBase::stop();
     return true;
 }
 

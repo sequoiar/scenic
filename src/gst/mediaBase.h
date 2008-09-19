@@ -32,16 +32,57 @@ class MediaBase
     protected:
 
         MediaBase(){};
-        virtual ~MediaBase();
+        ~MediaBase();
         virtual void init_source() = 0;
-        virtual void init_codec() = 0;
+        //virtual void init_codec() = 0;
         virtual void init_sink() = 0;
-        static const char *OSC_PORT;
 
     private:
 
         MediaBase(const MediaBase&);     //No Copy Constructor
         MediaBase& operator=(const MediaBase&);     //No Assignment Operator
+};
+
+class SenderBase
+    : public GstBase
+{
+    public: 
+        virtual bool init();
+
+    protected:
+
+        SenderBase(){};
+        ~SenderBase();
+        virtual void init_source() = 0;
+        virtual void init_codec() = 0;
+        virtual void init_payloader() = 0;
+        static const char *OSC_PORT;
+    
+    private:
+
+        SenderBase(const SenderBase&);     //No Copy Constructor
+        SenderBase& operator=(const SenderBase&);     //No Assignment Operator
+};
+
+class ReceiverBase
+    : public GstBase
+{
+    public: 
+        virtual bool init();
+
+    protected:
+
+        ReceiverBase(){};
+        ~ReceiverBase();
+        virtual void init_codec() = 0;
+        virtual void init_depayloader() = 0;
+        virtual void init_sink() = 0;
+        static const char *OSC_PORT;
+    
+    private:
+
+        ReceiverBase(const ReceiverBase&);     //No Copy Constructor
+        ReceiverBase& operator=(const ReceiverBase&);     //No Assignment Operator
 };
 
 #endif // _MEDIA_BASE_H_
