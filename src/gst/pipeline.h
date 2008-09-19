@@ -56,8 +56,6 @@ class Pipeline
         GstClock* clock() const;
 
         _GstElement *findElement(const char *name) const;
-        _GstPad *findUnconnectedSrcpad() const;
-        _GstPad *findUnconnectedSinkpad() const;
 
     private:
         bool init();
