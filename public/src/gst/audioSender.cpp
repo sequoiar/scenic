@@ -32,12 +32,10 @@
 #include "pipeline.h"
 #include "codec.h"
 #include "rtpPay.h"
-#include "audioSink.h"
 
 AudioSender::~AudioSender()
 {
     assert(stop());
-    delete sink_;
     delete payloader_;
     delete encoder_;
     delete source_;

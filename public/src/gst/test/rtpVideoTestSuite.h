@@ -30,7 +30,7 @@ class RtpVideoTestSuite
     public:
 
         RtpVideoTestSuite()
-            : fileLocation_("ubuntu.ogg")
+            : fileLocation_("/usr/share/example-content/Experience ubuntu.ogg")
         {
             testLength_ = 10000;
 
