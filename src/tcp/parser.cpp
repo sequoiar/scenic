@@ -30,7 +30,7 @@
 #include "mapMsg.h"
 
 
-static std::string strEsq(const std::string& str)
+std::string strEsq(const std::string& str)
 {
     std::string out;
 

@@ -33,7 +33,10 @@ void ParserTester::tokenize_test()
     TEST_ASSERT(1);
 }
 
-void ParserTester::stringify_test(){}
+void ParserTester::stringify_test()
+{
+
+}
 
 void ParserTester::roundtrip_test()
 {
@@ -59,3 +62,4 @@ int main(int, char**)
     Test::TextOutput output(Test::TextOutput::Verbose);
     return pt.run(output,false);
 }
+
