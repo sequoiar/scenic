@@ -31,7 +31,7 @@ class Encoder;
 class RtpPay;
 
 class AudioSender
-    : public MediaBase
+    : public SenderBase 
 {
     public:
         AudioSender(const AudioConfig aConfig, const SenderConfig rConfig) 
@@ -49,7 +49,7 @@ class AudioSender
 
         void init_source();
         void init_codec();
-        void init_sink();
+        void init_payloader();
 
         void send_caps() const;
 

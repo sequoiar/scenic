@@ -31,7 +31,7 @@ class Encoder;
 class RtpPay;
 
 class VideoSender
-    : public MediaBase
+    : public SenderBase 
 {
     public:
          VideoSender(const VideoConfig vConfig, const SenderConfig rConfig) 
@@ -45,7 +45,7 @@ class VideoSender
     private:
         void init_source();
         void init_codec();
-        void init_sink();
+        void init_payloader();
 
         const VideoConfig videoConfig_;
         const SenderConfig remoteConfig_;

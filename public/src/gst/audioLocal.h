@@ -43,7 +43,6 @@ class AudioLocal
         // helper methods
 
         void init_source();
-        void init_codec() {}; // FIXME: shouldn't be here
         void init_sink();
 
         // data

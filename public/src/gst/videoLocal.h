@@ -40,7 +40,6 @@ class VideoLocal
 
     private:
         void init_source();
-        void init_codec() {};       // FIXME shouldn't be here
         void init_sink();
 
         const VideoConfig config_;

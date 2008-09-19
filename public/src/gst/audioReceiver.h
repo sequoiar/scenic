@@ -33,7 +33,7 @@ class Decoder;
 class AudioSink;
 
 class AudioReceiver
-    : public MediaBase
+    : public ReceiverBase
 {
     public:
         AudioReceiver(const AudioReceiverConfig aConfig, const ReceiverConfig rConfig)
@@ -47,8 +47,8 @@ class AudioReceiver
 
     private:
         AudioReceiver();
-        void init_source(){};
         void init_codec();
+        void init_depayloader();
         void init_sink();
 
         static int caps_handler(const char *path, const char *types, lo_arg ** argv, int argc,
