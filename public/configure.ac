@@ -96,10 +96,10 @@ if test "x${have_libpj}" = "xfalse" ; then
 fi
 
 #Trying to set LIBLO using pkg-config
-PKG_CHECK_MODULES(LIBLO, liblo >= 0.25, have_liblo=true, have_liblo=false)
-if test "x${have_liblo}" = "xfalse" ; then
-    AC_MSG_ERROR([LIBLO missing. pkg - liblo0,liblo0-dev ])
-fi
+#PKG_CHECK_MODULES(LIBLO, liblo >= 0.25, have_liblo=true, have_liblo=false)
+#if test "x${have_liblo}" = "xfalse" ; then
+#    AC_MSG_ERROR([LIBLO missing. pkg - liblo0,liblo0-dev ])
+#fi
 
 #PYTHON_CFLAGS="-I/usr/include/boost/python "
 #PYTHON_CFLAGS+=`python-config --includes` 
@@ -120,19 +120,19 @@ AC_CONFIG_FILES([Makefile
                  src/util/test/Makefile
                  src/tcp/Makefile
                  src/tcp/test/Makefile
-                 src/osc/Makefile
                  src/gst/Makefile
                  src/gst/test/Makefile
                  src/main/Makefile
                  src/sip/Makefile
                  src/sip/test/Makefile
-                 src/prototypes/Makefile
-                 src/prototypes/hello/Makefile
-                 src/prototypes/hello/test/Makefile
-                 src/prototypes/python/Makefile
                  ])
 AC_OUTPUT
 
+#                 src/prototypes/Makefile
+#                 src/prototypes/hello/Makefile
+#                 src/prototypes/hello/test/Makefile
+#                 src/prototypes/python/Makefile
+#                 src/osc/Makefile
 #                 src/osc/test/Makefile
 #                 src/gutil/Makefile
 #                 src/gutil/test/Makefile
