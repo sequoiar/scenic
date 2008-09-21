@@ -5,6 +5,7 @@ AC_PREREQ(2.61)
 AC_INIT(PROPULSE_ART, 0.01 )
 AC_CONFIG_SRCDIR([src/gst/mediaBase.h])
 AC_CONFIG_HEADER([src/config.h])
+AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
 
 AM_INIT_AUTOMAKE()
@@ -27,18 +28,15 @@ PKG_PROG_PKG_CONFIG
 
 AC_MSG_CHECKING(whether to enable debugging)
 AC_ARG_ENABLE(debug, [  --enable-debug=(yes/no) turn on debug symbols and extra warnings ],, 
-        enable_debug=yes)
-
-if test "x${enable_debug}" == "xyes" ; then
-    AC_DEFINE(CONFIG_DEBUG,[],[Debug define from configure])
-    CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
-#-Wno-unused-parameter -Wno-unused-variable"  
-fi
-
+        enable_debug=no)
 
 # Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
 AC_CHECK_FUNCS([inet_ntoa memset socket])
+
+if test "x${enable_debug}" == "xyes" ; then
+    AC_DEFINE(CONFIG_DEBUG,[],[Debug define from configure])
+    CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
 
 #Trying to set CPPTEST_LIBS using pkg-config
 PKG_CHECK_MODULES(CPPTEST, libcpptest, have_cpptest=true, have_cpptest=false)
@@ -46,24 +44,25 @@ if test "x${have_cpptest}" = "xfalse" ; then
     AC_MSG_ERROR([libcpptest not found.-- ubuntu: sudo apt-get install libcpptest-dev])
 fi
 
+fi
 
 #Trying to set GLIB using pkg-config
 PKG_CHECK_MODULES(GLIB, [glib-2.0 gthread-2.0], have_glib=true, have_glib=false)
 if test "x${have_glib}" = "xfalse" ; then
-    AC_MSG_ERROR([glib not found.])
+    AC_MSG_ERROR([Missing libglib2.0-dev])
 fi
 
 
 #Trying to set GTK+-2.0 using pkg-config
 PKG_CHECK_MODULES(GTK, [gtk+-2.0], have_gtk=true, have_gtk=false)
 if test "x${have_gtk}" = "xfalse" ; then
-    AC_MSG_ERROR([gtk not found.])
+    AC_MSG_ERROR([Missing libgtk2.0-dev])
 fi
 
 #Trying to set GST_CFLAGS GST_LIBS using pkg-config
 PKG_CHECK_MODULES(GST, gstreamer-0.10, have_gstreamer=true, have_gstreamer=false)
 if test "x${have_gstreamer}" = "xfalse" ; then
-    AC_MSG_ERROR([GStreamer not found.])
+    AC_MSG_ERROR([Missing libgstreamer0.10-dev GStreamer not found.])
 fi
 
 
@@ -112,20 +111,27 @@ fi
 AX_PYTHON
 AX_BOOST_PYTHON
 
-
-
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/util/Makefile
-                 src/util/test/Makefile
                  src/tcp/Makefile
-                 src/tcp/test/Makefile
                  src/gst/Makefile
-                 src/gst/test/Makefile
                  src/main/Makefile
                  src/sip/Makefile
+                 ])
+
+
+if test "x${enable_debug}" == "xyes" ; then
+
+AC_CONFIG_FILES([
+                 src/util/test/Makefile
+                 src/tcp/test/Makefile
+                 src/gst/test/Makefile
                  src/sip/test/Makefile
                  ])
+
+
+fi
 AC_OUTPUT
 
 #                 src/prototypes/Makefile
