@@ -22,7 +22,6 @@
 #define _AUDIO_RECEIVER_H_
 
 #include <cassert>
-#include "lo/lo.h"
 #include "mediaBase.h"
 #include "audioConfig.h"
 #include "remoteConfig.h"
@@ -53,9 +52,7 @@ class AudioReceiver
         void init_depayloader();
         void init_sink();
 
-        static int caps_handler(const char *path, const char *types, lo_arg ** argv, int argc,
-                void *data,
-                void *user_data);
+        //static int caps_handler(const char *path, const char *types, lo_arg ** argv, int argc, void *data, void *user_data);
 
 //        void set_caps(const char *caps);
         static void liblo_error(int num, const char *msg, const char *path);
