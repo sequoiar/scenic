@@ -23,7 +23,6 @@
 
 #include <cassert>
 #include <iostream>
-#include "lo/lo.h"
 #include "logWriter.h"
 
 #include "audioLocal.h"

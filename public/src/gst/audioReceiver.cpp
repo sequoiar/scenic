@@ -21,10 +21,7 @@
 #include <sstream>
 #include <cassert>
 
-//#ifdef USE_OSC
-#include "lo/lo.h"
 #include "logWriter.h"
-//#endif
 
 #include "gstLinkable.h"
 #include "audioReceiver.h"
@@ -66,7 +63,7 @@ void AudioReceiver::wait_for_caps()
 
 //#endif
 
-
+#if 0
 // FIXME: get rid of this!!!!
 void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
 {
@@ -76,9 +73,7 @@ void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
 
 
 // FIXME: get rid of this!!!!
-int AudioReceiver::caps_handler(const char * /*path*/, const char * /*types*/, lo_arg ** argv,
-        int /*argc*/, void * /*data*/,
-        void *user_data)
+int AudioReceiver::caps_handler(const char * /*path*/, const char * /*types*/, lo_arg ** argv, int /*argc*/, void * /*data*/, void *user_data)
 {
     AudioReceiver *context = static_cast < AudioReceiver * >(user_data);
     context->session_.set_caps(&argv[0]->s);
@@ -86,7 +81,7 @@ int AudioReceiver::caps_handler(const char * /*path*/, const char * /*types*/, l
 
     return 0;
 }
-
+#endif
 
 void AudioReceiver::init_codec()
 {
