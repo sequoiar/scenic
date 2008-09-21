@@ -135,11 +135,11 @@ fi
 AC_OUTPUT
 
 #                 src/prototypes/Makefile
-#                 src/prototypes/hello/Makefile
-#                 src/prototypes/hello/test/Makefile
 #                 src/prototypes/python/Makefile
+#                 src/prototypes/hello/Makefile
 #                 src/osc/Makefile
 #                 src/osc/test/Makefile
 #                 src/gutil/Makefile
 #                 src/gutil/test/Makefile
+#                 src/prototypes/hello/test/Makefile
 #                 src/prototypes/hello/test/Makefile
