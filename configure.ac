@@ -27,7 +27,7 @@ AC_C_CONST
 PKG_PROG_PKG_CONFIG
 
 AC_MSG_CHECKING(whether to enable debugging)
-AC_ARG_ENABLE(debug, [  --enable-debug=(yes/no) turn on debug symbols and extra warnings ],, 
+AC_ARG_ENABLE([debug], [  --enable-debug=(yes/no) turn on debug symbols and extra warnings ],, 
         enable_debug=no)
 
 # Checks for library functions.
@@ -120,14 +120,18 @@ AC_CONFIG_FILES([Makefile
                  src/sip/Makefile
                  ])
 
+AM_CONDITIONAL([DEBUG],test "x${enable_debug}" == "xyes" )
 
 if test "x${enable_debug}" == "xyes" ; then
-
 AC_CONFIG_FILES([
                  src/util/test/Makefile
                  src/tcp/test/Makefile
                  src/gst/test/Makefile
                  src/sip/test/Makefile
+                 src/prototypes/Makefile
+                 src/prototypes/hello/Makefile
+                 src/prototypes/python/Makefile
+                 src/prototypes/hello/test/Makefile
                  ])
 
 
@@ -141,5 +145,4 @@ AC_OUTPUT
 #                 src/osc/test/Makefile
 #                 src/gutil/Makefile
 #                 src/gutil/test/Makefile
-#                 src/prototypes/hello/test/Makefile
 #                 src/prototypes/hello/test/Makefile
