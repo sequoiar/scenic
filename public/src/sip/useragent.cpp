@@ -521,13 +521,13 @@ int UserAgent::inv_session_create( std::string uri){
     local = get_local_uri();
 
     // Build the local contact
-    pj_ansi_sprintf( tmp, local->get_address().c_str() );
+    pj_ansi_sprintf( tmp, "%s",local->get_address().c_str() );
     from = pj_str(tmp);
 
     //cout << "from: " << from.ptr << endl;
 
     // Build the remote contact
-    pj_ansi_sprintf( tmp1, remote->get_address().c_str() );
+    pj_ansi_sprintf( tmp1, "%s", remote->get_address().c_str() );
     to = pj_str(tmp1);
 
     //cout << "To: " << to.ptr << endl;
