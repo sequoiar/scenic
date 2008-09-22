@@ -19,7 +19,7 @@
 
 #include <glib.h>
 #include <iostream>
-#include "gutil/baseModule.h"
+#include "baseModule.h"
 #include "logWriter.h"
 #include "gutil/optionArgs.h"
 
@@ -38,7 +38,7 @@ class DModule
 
 void DModule::init()
 {
-    args_.push_back(new BoolArg(&pass_, "pass", 'p', "bypass this module"));
+//    args_.push_back(new BoolArg(&pass_, "pass", 'p', "bypass this module"));
 }
 
 
@@ -56,7 +56,6 @@ int my_main(int argc, char** argv)
     DModule m;
     OptionArgs opts;
     m.init();
-    opts.add(m.get_args());
     if(!opts.parse(argc, argv))
         return 1;
     m.run();

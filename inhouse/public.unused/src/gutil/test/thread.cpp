@@ -70,7 +70,6 @@ int my_main (int argc, char** argv)
 
     if(!t.init())
         return 1;
-    opts.add(t.get_args());
     if(!opts.parse(argc, argv))
         return 1;
     QueuePair &tempQueue = t.getQueue();

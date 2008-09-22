@@ -35,7 +35,7 @@
 
 
 #if LOGGING
-#define LOG(x)                                                              \
+#define LOG(x,e)                                                              \
     {                                                                           \
         time_t rawtime;                                                         \
         struct tm * timeinfo;                                                   \
@@ -48,5 +48,11 @@
 #else
 #define LOG(x)
 #endif
+
+#define LOG_ERROR(msg)      LOG(msg, ERROR)
+#define LOG_CRITICAL(msg)   LOG(msg, CRITICAL)
+#define LOG_INFO(msg)       LOG(msg, INFO)
+#define LOG_WARNING(msg)    LOG(msg, WARNING)
+#define LOG_DEBUG(msg)      LOG(msg, DEBUG)
 
 #endif //  _LOG_WRITER_H_
