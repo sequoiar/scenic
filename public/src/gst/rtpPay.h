@@ -32,7 +32,6 @@ class RtpPay : public GstLinkableFilter
         ~RtpPay();
         bool init() = 0;
         
-        // FIXME: this is bad news
         _GstElement *srcElement() { return rtpPay_; }
         _GstElement *sinkElement() { return rtpPay_; }
 

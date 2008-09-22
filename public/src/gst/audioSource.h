@@ -98,6 +98,7 @@ class AudioTestSource
         GstClockID clockId_;
         int offset_;
 
+        static const double FREQUENCY[2][8];
         AudioTestSource(const AudioTestSource&);     //No Copy Constructor
         AudioTestSource& operator=(const AudioTestSource&);     //No Assignment Operator
 };
