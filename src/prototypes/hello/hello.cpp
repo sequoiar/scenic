@@ -1,4 +1,4 @@
-#include <glib.h>
+include <glib.h>
 #include <cstring>
 #include <cstdlib>
 #include "Python.h"
@@ -34,6 +34,7 @@ gpointer gMain(gpointer )
 
 }
 
+//set an int that will be sent to python Async
 
 void Hello::set_name(char const *n)
 {
