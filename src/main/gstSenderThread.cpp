@@ -26,10 +26,8 @@
 
 GstSenderThread::~GstSenderThread()
 {
-    if(asender_)
-        delete asender_;
-    if(vsender_)
-        delete vsender_;
+    delete asender_;
+    delete vsender_;
 }
 
 
@@ -55,62 +53,70 @@ bool GstSenderThread::audio_stop(MapMsg& /*msg*/)
 
 bool GstSenderThread::video_start(MapMsg& msg)
 {
-    if(vsender_){
-        delete (vsender_);
-        vsender_ = 0;
-    }
-    std::string addr;
-    if(msg["address"].type() == 's')
-        msg["address"].get(addr);
-    else
-        addr = get_host_ip();
+    delete (vsender_);
+    vsender_ = 0;
+    
+    GET_OR_RETURN(msg, "address", std::string, addr);
     GET_OR_RETURN(msg, "port", int, port);
-    VideoConfig config("videotestsrc");
-    SenderConfig rConfig("h264", addr, port);
-    if(!config.sanityCheck())
-        return false;
-    vsender_ = new VideoSender(config, rConfig);
-    if(vsender_)
+    try
     {
+        VideoConfig config("videotestsrc");
+        SenderConfig rConfig("h264", addr, port);
+        if(!config.sanityCheck())
+            return false;
+
+        vsender_ = new VideoSender(config, rConfig);
+
         vsender_->init();
         vsender_->start();
+
         return true;
     }
-    else
+    catch(except e)
+    {
+        delete(vsender_);
+        vsender_ = 0;
         return false;
+    }
 }
 
 
 bool GstSenderThread::audio_start(MapMsg& msg)
 {
-    if(asender_){
-        delete (asender_);
-        asender_ = 0;
-    }
-    std::string addr;
-    if(msg["address"].type() == 's')
-        msg["address"].get(addr);
-    else
-        addr = get_host_ip();
+    delete (asender_);
+    asender_ = 0;
+
+    GET_OR_RETURN(msg, "address", std::string, addr);
     GET_OR_RETURN(msg, "port", int, port);
-    AudioConfig config("audiotestsrc", 2);
-    SenderConfig rConfig("vorbis", addr, port);
-    if(!config.sanityCheck())
-        return false;
-    asender_ = new AudioSender(config, rConfig);
-    if(asender_)
+
+    try
     {
+        AudioConfig config("audiotestsrc", 2);
+        SenderConfig rConfig("vorbis", addr, port);
+        if(!config.sanityCheck())
+            return false;
+            
+        asender_ = new AudioSender(config, rConfig);
+
         asender_->init();
         asender_->start();
-        std::string caps_str;
+
+        //Build Caps Msg 
         MapMsg caps;
         caps.insert( std::make_pair("command", "caps"));
         caps.insert( std::make_pair("caps_str", asender_->getCaps()));
+
+        //Forward to tcp
         queue_.push(caps);
+
         return true;
     }
-    else
+    catch(except e)
+    {
+        delete(asender_);
+        asender_ = 0;
         return false;
+    }
 }
 
 

@@ -19,7 +19,6 @@
 
 #include <glib.h>
 #include <iostream>
-#include "baseThread.h"
 #include "gstThread.h"
 
 class VideoReceiver;
