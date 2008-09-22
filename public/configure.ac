@@ -27,7 +27,9 @@ AC_C_CONST
 PKG_PROG_PKG_CONFIG
 
 AC_MSG_CHECKING(whether to enable debugging)
-AC_ARG_ENABLE([debug], [  --enable-debug=(yes/no) turn on debug symbols and extra warnings ],, 
+AC_ARG_ENABLE([debug], [
+**************** 
+  --enable-debug  debug symbols, build test programs, stricter compile ],, 
         enable_debug=no)
 
 # Checks for library functions.
