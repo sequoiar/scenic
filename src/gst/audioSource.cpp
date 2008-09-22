@@ -100,6 +100,11 @@ void InterleavedAudioSource::link_elements()
 }
 
 
+const double AudioTestSource::FREQUENCY[2][8] = 
+    {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
+     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
+
+
 gboolean AudioTestSource::callback()
 {
     toggle_frequency();
@@ -109,10 +114,6 @@ gboolean AudioTestSource::callback()
 
 void AudioTestSource::toggle_frequency()
 {
-    static const double FREQUENCY[2][8] =
-    {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
-     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
-
     int i = 0;
 
     for (GstIter iter = sources_.begin(); iter != sources_.end(); ++iter)
@@ -127,11 +128,12 @@ void AudioTestSource::sub_init()
     GstIter src;
 
     const double GAIN = 1.0 / config_.numChannels();        // so sum of tones' amplitude equals 1.0
-    double frequency = 100.0;
+    int channelIdx = 0;
 
     // is-live must be true for clocked callback to work properly
-    for (src = sources_.begin(); src != sources_.end(); ++src, frequency += 100.0)
-        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", frequency, "is-live", TRUE, NULL);
+    for (src = sources_.begin(); src != sources_.end() && channelIdx != config_.numChannels(); ++src, ++channelIdx)
+        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", FREQUENCY[0][channelIdx], "is-live", TRUE, NULL);
+
 
     clockId_ = pipeline_.add_clock_callback(base_callback, this);
 }
@@ -159,14 +161,14 @@ void AudioFileSource::sub_init()
     for (; aconv != aconvs_.end(), dec != decoders_.end(); ++dec, ++aconv)
     {
         g_signal_connect(*dec, "new-decoded-pad",
-                         G_CALLBACK(AudioFileSource::cb_new_src_pad),
-                         static_cast<void *>(*aconv));
+                G_CALLBACK(AudioFileSource::cb_new_src_pad),
+                static_cast<void *>(*aconv));
     }
 }
 
 
 void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/,
-                                     gpointer data)
+        gpointer data)
 {
     if (gst_pad_is_linked(srcPad))
     {
@@ -279,8 +281,8 @@ void AudioDvSource::sub_init()
 
     // demux srcpad must be linked to queue sink pad at runtime
     g_signal_connect(demux_, "pad-added",
-                     G_CALLBACK(AudioDvSource::cb_new_src_pad),
-                     static_cast<void *>(queue_));
+            G_CALLBACK(AudioDvSource::cb_new_src_pad),
+            static_cast<void *>(queue_));
 }
 
 
