@@ -31,15 +31,23 @@ from twisted.internet import reactor
 #Log import
 from utils import log
 
+#redexp
+import re
+
 #log = log.start('info', 1, 0, 'midiStream')
 
 class MidiStream(stream.DataStream):
     """Class MIDI
     """
+    
     def __init__(self, address='127.0.0.1'):
+        
+        #init var
+        self.address = address
+                
         #initialisation du midi
         pypm.Initialize()
-	
+	   
         #Configuring RTP Server
         #witness for receiving data is self.server.receivingMidiData
         #latency is self.server.midiOut.latency
@@ -52,10 +60,44 @@ class MidiStream(stream.DataStream):
         #MidiIn ( "adresse sur lequel envoyer les donnees midi" , port sur lequel envoyer les midi data)
         #midi input device list is in self.midiIn.midiDeviceList
         #witness for sending data is in self.midiIn.sendingMidiData
-        self.midiIn = MidiIn(address,44000)
+        self.midiIn = MidiIn(self.address,44000)
 
         reactor.run()
 
+
+    def set_ip(self,address):
+        """Set ip address of the midi stream server
+        """
+        if self.check_ip(address):
+            self.address = address
+            self.midiIn.address.client.peerAddress = address
+            log.info("IP address of the server has been set")
+        else:
+            self.address = '127.0.0.1'
+            log.warning("A loopback address has been assign")
+
+            
+    def check_ip(self,address):
+        if re.match('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address):
+            values = [int(i) for i in address.split('.')]
+            if self.ip_range(values):
+                return 1
+            else:
+                log.error("Wrong ip address format")
+                return 0
+                
+        else:
+            log.error("Wrong ip address format")
+            return 0
+            
+
+    def ip_range(self, nums):
+        for num in nums:
+            if num < 0 or num > 255:
+                return False
+            return True
+ 
+    
 #INPUT	
     def start_sending(self):
         """function start_sending        
