@@ -130,10 +130,6 @@ AC_CONFIG_FILES([
                  src/tcp/test/Makefile
                  src/gst/test/Makefile
                  src/sip/test/Makefile
-                 src/prototypes/Makefile
-                 src/prototypes/hello/Makefile
-                 src/prototypes/python/Makefile
-                 src/prototypes/hello/test/Makefile
                  ])
 
 
