@@ -33,6 +33,8 @@
 
 
 #include <glib.h>
+#include <string>
+#include <vector>
 
 /// Base class of Arguments used in command line parsing
 class BaseArg
@@ -97,7 +99,7 @@ class OptionArgs
 {
 //	std::vector<char **> str_dump;
     public:
-        void add(BaseModule::ArgList);
+//        void add(BaseModule::ArgList);
         void add(BaseArg*);
 
 //	void add(bool *,const char*,char, const char*);

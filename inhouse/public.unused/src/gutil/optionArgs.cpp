@@ -36,13 +36,13 @@ OptionArgs::~OptionArgs()
         delete[] pA_;
 }
 
-
+#if 0
 void OptionArgs::add(BaseModule::ArgList args)
 {
     for(BaseModule::iterator it = args.begin(); it != args.end(); ++it)
         add(*it);
 }
-
+#endif
 
 void OptionArgs::add(BaseArg *ba)
 {
