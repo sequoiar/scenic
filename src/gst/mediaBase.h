@@ -23,7 +23,7 @@
 
 #include "gstBase.h"
 
-class MediaBase
+class MediaBase     // local bins
     : public GstBase
 {
     public:
@@ -34,7 +34,6 @@ class MediaBase
         MediaBase(){};
         ~MediaBase();
         virtual void init_source() = 0;
-        //virtual void init_codec() = 0;
         virtual void init_sink() = 0;
 
     private:
@@ -43,7 +42,7 @@ class MediaBase
         MediaBase& operator=(const MediaBase&);     //No Assignment Operator
 };
 
-class SenderBase
+class SenderBase    
     : public GstBase
 {
     public: 
@@ -56,7 +55,6 @@ class SenderBase
         virtual void init_source() = 0;
         virtual void init_codec() = 0;
         virtual void init_payloader() = 0;
-        static const char *OSC_PORT;
     
     private:
 
@@ -77,7 +75,6 @@ class ReceiverBase
         virtual void init_codec() = 0;
         virtual void init_depayloader() = 0;
         virtual void init_sink() = 0;
-        static const char *OSC_PORT;
     
     private:
 

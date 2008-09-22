@@ -63,8 +63,6 @@ class AudioSender
         Encoder *encoder_;
         RtpPay *payloader_;
 
-        static const char* OSC_PORT;
-
         AudioSender(const AudioSender&); //No Copy Constructor
         AudioSender& operator=(const AudioSender&); //No Assignment Operator
 };

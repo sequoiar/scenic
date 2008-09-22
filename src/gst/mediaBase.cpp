@@ -35,9 +35,6 @@ bool MediaBase::init()  // template method
     return true;
 }
 
-// FIXME: say no to OSC
-const char *SenderBase::OSC_PORT = "7770";
-
 SenderBase::~SenderBase()
 {
     assert(stop());
@@ -52,9 +49,6 @@ bool SenderBase::init()  // template method
     init_payloader();
     return true;
 }
-
-// FIXME: OSC BAD
-const char *ReceiverBase::OSC_PORT = "7770";
 
 ReceiverBase::~ReceiverBase()
 {
