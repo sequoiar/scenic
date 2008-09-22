@@ -116,6 +116,7 @@ void RtpAudioTestSuite::start_2ch_rtp_audiotest()
 
         BLOCK();
         TEST_ASSERT(rx->isPlaying());
+        delete rx;
     }
     else {
         AudioConfig aConfig("audiotestsrc", numChannels);
@@ -127,6 +128,7 @@ void RtpAudioTestSuite::start_2ch_rtp_audiotest()
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
+        delete tx;
     }
 }
 
@@ -142,6 +144,7 @@ void RtpAudioTestSuite::stop_2ch_rtp_audiotest()
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
+        delete rx;
     }
     else {
         AudioConfig aConfig("audiotestsrc", numChannels);
@@ -151,6 +154,7 @@ void RtpAudioTestSuite::stop_2ch_rtp_audiotest()
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
+        delete tx;
     }
 }
 
@@ -171,6 +175,7 @@ void RtpAudioTestSuite::start_stop_2ch_rtp_audiotest()
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
+        delete rx;
     }
     else {
         AudioConfig aConfig("audiotestsrc", numChannels);
@@ -184,6 +189,7 @@ void RtpAudioTestSuite::start_stop_2ch_rtp_audiotest()
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
+        delete tx;
     }
 }
 
@@ -201,6 +207,7 @@ void RtpAudioTestSuite::start_8ch_rtp_audiotest()
 
         BLOCK();
         TEST_ASSERT(rx->isPlaying());
+        delete rx;
     }
     else {
         AudioConfig aConfig("audiotestsrc", numChannels);
@@ -212,6 +219,7 @@ void RtpAudioTestSuite::start_8ch_rtp_audiotest()
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
+        delete tx;
     }
 }
 
@@ -226,6 +234,7 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiotest()
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
+        delete rx;
     }
     else {
         AudioConfig aConfig("audiotestsrc", numChannels);
@@ -235,6 +244,7 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiotest()
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
+        delete tx;
     }
 }
 
@@ -254,6 +264,7 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiotest()
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
+        delete rx;
     }
     else {
         AudioConfig aConfig("audiotestsrc", numChannels);
@@ -268,6 +279,7 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiotest()
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
+        delete tx;
     }
 }
 
@@ -285,6 +297,7 @@ void RtpAudioTestSuite::start_8ch_rtp_audiofile()
 
         BLOCK();
         TEST_ASSERT(rx->isPlaying());
+        delete rx;
     }
     else {
         AudioConfig aConfig("filesrc", fileLocation_, numChannels);
@@ -296,6 +309,7 @@ void RtpAudioTestSuite::start_8ch_rtp_audiofile()
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
+        delete tx;
     }
 }
 
@@ -310,6 +324,7 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiofile()
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
+        delete rx;
     }
     else {
         AudioConfig aConfig("filesrc", fileLocation_, numChannels);
@@ -319,6 +334,7 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiofile()
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
+        delete tx;
     }
 }
 
@@ -338,6 +354,7 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiofile()
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
+        delete rx;
     }
     else {
         AudioConfig aConfig("filesrc", fileLocation_, numChannels);
@@ -352,6 +369,7 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiofile()
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
+        delete tx;
     }
 }
 
@@ -368,6 +386,7 @@ void RtpAudioTestSuite::start_audio_dv_rtp()
 
         BLOCK();
         TEST_ASSERT(rx->isPlaying());
+        delete rx;
     }
     else {
         AudioConfig aConfig("dv1394src", numChannels);
@@ -379,6 +398,7 @@ void RtpAudioTestSuite::start_audio_dv_rtp()
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
+        delete tx;
     }
 }
 
@@ -394,6 +414,7 @@ void RtpAudioTestSuite::stop_audio_dv_rtp()
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
+        delete rx;
     }
     else {
         AudioConfig aConfig("dv1394src", numChannels);
@@ -403,6 +424,7 @@ void RtpAudioTestSuite::stop_audio_dv_rtp()
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
+        delete tx;
     }
 }
 
@@ -423,6 +445,7 @@ void RtpAudioTestSuite::start_stop_audio_dv_rtp()
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
+        delete rx;
     }
     else {
         AudioConfig aConfig("dv1394src", numChannels);
@@ -437,6 +460,7 @@ void RtpAudioTestSuite::start_stop_audio_dv_rtp()
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
+        delete tx;
     }
 }
 
