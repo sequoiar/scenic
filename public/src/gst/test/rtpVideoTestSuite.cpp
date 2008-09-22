@@ -28,20 +28,20 @@
 #include "hostIP.h"
 
 
-VideoReceiver *buildVideoReceiver()
+std::auto_ptr<VideoReceiver> buildVideoReceiver()
 {
         VideoReceiverConfig vConfig("xvimagesink");
         ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
-        VideoReceiver *rx = new VideoReceiver(vConfig, rConfig);
+        std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
         rx->init();
         return rx;
 }
 
 
-VideoSender *buildVideoSender(const VideoConfig vConfig)
+std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
 {
         SenderConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
-        VideoSender *tx = new VideoSender(vConfig, rConfig);
+        std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
         tx->init();
         return tx;
 }
@@ -50,23 +50,21 @@ VideoSender *buildVideoSender(const VideoConfig vConfig)
 void RtpVideoTestSuite::start_test_video_rtp()
 {
     if (id_ == 0) {
-        VideoReceiver *rx = buildVideoReceiver();
+        std::auto_ptr<VideoReceiver >rx(buildVideoReceiver());
 
         TEST_ASSERT(rx->start());
 
         BLOCK();
         TEST_ASSERT(rx->isPlaying());
-        delete rx;
     }
     else {
         VideoConfig vConfig("videotestsrc");
-        VideoSender *tx = buildVideoSender(vConfig);
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         TEST_ASSERT(tx->start());
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
-        delete tx;
     }
 }
 
@@ -74,23 +72,21 @@ void RtpVideoTestSuite::start_test_video_rtp()
 void RtpVideoTestSuite::stop_test_video_rtp()
 {
     if (id_ == 0) {
-        VideoReceiver *rx = buildVideoReceiver();
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         BLOCK();
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
-        delete rx;
     }
     else {
         VideoConfig vConfig("videotestsrc");
-        VideoSender *tx = buildVideoSender(vConfig);
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         BLOCK();
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
-        delete tx;
     }
 }
 
@@ -98,7 +94,7 @@ void RtpVideoTestSuite::stop_test_video_rtp()
 void RtpVideoTestSuite::start_stop_test_video_rtp()
 {
     if (id_ == 0) {
-        VideoReceiver *rx = buildVideoReceiver();
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         TEST_ASSERT(rx->start());
 
@@ -107,11 +103,10 @@ void RtpVideoTestSuite::start_stop_test_video_rtp()
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
-        delete rx;
     }
     else {
         VideoConfig vConfig("videotestsrc");
-        VideoSender *tx = buildVideoSender(vConfig);
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         TEST_ASSERT(tx->start());
 
@@ -120,7 +115,6 @@ void RtpVideoTestSuite::start_stop_test_video_rtp()
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
-        delete tx;
     }
 }
 
@@ -128,23 +122,21 @@ void RtpVideoTestSuite::start_stop_test_video_rtp()
 void RtpVideoTestSuite::start_v4l_rtp()
 {
     if (id_ == 0) {
-        VideoReceiver *rx = buildVideoReceiver();
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         TEST_ASSERT(rx->start());
 
         BLOCK();
         TEST_ASSERT(rx->isPlaying());
-        delete rx;
     }
     else {
         VideoConfig vConfig("v4l2src");
-        VideoSender *tx = buildVideoSender(vConfig);
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         TEST_ASSERT(tx->start());
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
-        delete tx;
     }
 }
 
@@ -152,23 +144,21 @@ void RtpVideoTestSuite::start_v4l_rtp()
 void RtpVideoTestSuite::stop_v4l_rtp()
 {
     if (id_ == 0) {
-        VideoReceiver *rx = buildVideoReceiver();
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         BLOCK();
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
-        delete rx;
     }
     else {
         VideoConfig vConfig("v4l2src");
-        VideoSender *tx = buildVideoSender(vConfig);
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         BLOCK();
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
-        delete tx;
     }
 }
 
@@ -176,7 +166,7 @@ void RtpVideoTestSuite::stop_v4l_rtp()
 void RtpVideoTestSuite::start_stop_v4l_rtp()
 {
     if (id_ == 0) {
-        VideoReceiver *rx = buildVideoReceiver();
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         TEST_ASSERT(rx->start());
 
@@ -185,11 +175,10 @@ void RtpVideoTestSuite::start_stop_v4l_rtp()
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
-        delete rx;
     }
     else {
         VideoConfig vConfig("v4l2src");
-        VideoSender *tx = buildVideoSender(vConfig);
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         TEST_ASSERT(tx->start());
 
@@ -198,7 +187,6 @@ void RtpVideoTestSuite::start_stop_v4l_rtp()
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
-        delete tx;
     }
 }
 
@@ -208,23 +196,21 @@ void RtpVideoTestSuite::start_dv_rtp()
 {
     // receiver should be started first, of course there's no guarantee that it will at this point
     if (id_ == 0) {
-        VideoReceiver *rx = buildVideoReceiver();
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         TEST_ASSERT(rx->start());
 
         BLOCK();
         TEST_ASSERT(rx->isPlaying());
-        delete rx;
     }
     else {
         VideoConfig vConfig("dv1394src");
-        VideoSender *tx = buildVideoSender(vConfig);
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         TEST_ASSERT(tx->start());
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
-        delete tx;
     }
 }
 
@@ -232,23 +218,21 @@ void RtpVideoTestSuite::start_dv_rtp()
 void RtpVideoTestSuite::stop_dv_rtp()
 {
     if (id_ == 0) {
-        VideoReceiver *rx = buildVideoReceiver();
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         BLOCK();
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
-        delete rx;
     }
     else {
         VideoConfig vConfig("dv1394src");
-        VideoSender *tx = buildVideoSender(vConfig);
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         BLOCK();
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
-        delete tx;
     }
 }
 
@@ -256,7 +240,7 @@ void RtpVideoTestSuite::stop_dv_rtp()
 void RtpVideoTestSuite::start_stop_dv_rtp()
 {
     if (id_ == 0) {
-        VideoReceiver *rx = buildVideoReceiver();
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         TEST_ASSERT(rx->start());
 
@@ -265,11 +249,10 @@ void RtpVideoTestSuite::start_stop_dv_rtp()
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
-        delete rx;
     }
     else {
         VideoConfig vConfig("dv1394src");
-        VideoSender *tx = buildVideoSender(vConfig);
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         TEST_ASSERT(tx->start());
 
@@ -278,7 +261,6 @@ void RtpVideoTestSuite::start_stop_dv_rtp()
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
-        delete tx;
     }
 }
 
@@ -288,23 +270,21 @@ void RtpVideoTestSuite::start_file_rtp()
 {
     // receiver should be started first, of course there's no guarantee that it will at this point
     if (id_ == 0) {
-        VideoReceiver *rx = buildVideoReceiver();
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         TEST_ASSERT(rx->start());
 
         BLOCK();
         TEST_ASSERT(rx->isPlaying());
-        delete rx;
     }
     else {
         VideoConfig vConfig("filesrc", fileLocation_);
-        VideoSender *tx = buildVideoSender(vConfig);
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         TEST_ASSERT(tx->start());
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
-        delete tx;
     }
 }
 
@@ -312,23 +292,21 @@ void RtpVideoTestSuite::start_file_rtp()
 void RtpVideoTestSuite::stop_file_rtp()
 {
     if (id_ == 0) {
-        VideoReceiver *rx = buildVideoReceiver();
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         BLOCK();
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
-        delete rx;
     }
     else {
         VideoConfig vConfig("filesrc", fileLocation_);
-        VideoSender *tx = buildVideoSender(vConfig);
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         BLOCK();
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
-        delete tx;
     }
 }
 
@@ -337,7 +315,7 @@ void RtpVideoTestSuite::start_stop_file_rtp()
 {
     if (id_ == 0) {
         VideoReceiverConfig vConfig("xvimagesink");
-        VideoReceiver *rx = buildVideoReceiver();
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         TEST_ASSERT(rx->start());
 
@@ -346,13 +324,11 @@ void RtpVideoTestSuite::start_stop_file_rtp()
 
         TEST_ASSERT(rx->stop());
         TEST_ASSERT(!rx->isPlaying());
-
-        delete rx;
     }
     else {
         VideoConfig vConfig("filesrc", fileLocation_);
         
-        VideoSender *tx = buildVideoSender(vConfig);
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         TEST_ASSERT(tx->start());
 
@@ -361,7 +337,6 @@ void RtpVideoTestSuite::start_stop_file_rtp()
 
         TEST_ASSERT(tx->stop());
         TEST_ASSERT(!tx->isPlaying());
-        delete tx;
     }
 }
 
