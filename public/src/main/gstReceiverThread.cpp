@@ -71,6 +71,8 @@ bool GstReceiverThread::video_start(MapMsg& msg)
     }
     catch(except e)
     {
+        delete(vreceiver_);
+        vreceiver_ = 0;
         return false;
     }
 }
@@ -98,6 +100,8 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
     }
     catch(except e)
     {
+        delete(areceiver_);
+        areceiver_ = 0;
         return false;
     }
 }

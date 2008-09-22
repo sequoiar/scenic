@@ -79,18 +79,28 @@ int main (int argc, char** argv)
             std::cerr << "GOING DOWN " << err;
     }
     
-    do {
-        try{
+    try
+    {
+        do 
+        {
             MainModule m(send, port);
 
-            try
-            {
+            try{
                 m.run();
-            }catch(except e) {if (e.log_ == ASSERT_FAIL) throw e;}
-        }
-        catch(except e) { if (e.log_ == ASSERT_FAIL) std::cerr << "2ND E:" <<e.log_msg_ <<std::endl;}
-    } 
-    while(1) ;
+            }
+            catch(except e) 
+            {
+                if (e.log_ == CRITICAL) 
+                    throw e;
+            }
+        } while(1);
+    }
+    catch(except e) 
+    { 
+        if (e.log_ == ASSERT_FAIL) 
+            std::cerr << "2ND E:" <<e.log_msg_ <<std::endl;
+    }
+
 
 }
 
