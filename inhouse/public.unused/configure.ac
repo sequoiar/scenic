@@ -95,11 +95,11 @@ if test "x${have_libpj}" = "xfalse" ; then
     AC_MSG_ERROR([PJSIP not found. http://www.pjsip.org/download.htm])
 fi
 
-#Trying to set LIBLO using pkg-config
-#PKG_CHECK_MODULES(LIBLO, liblo >= 0.25, have_liblo=true, have_liblo=false)
-#if test "x${have_liblo}" = "xfalse" ; then
-#    AC_MSG_ERROR([LIBLO missing. pkg - liblo0,liblo0-dev ])
-#fi
+Trying to set LIBLO using pkg-config
+PKG_CHECK_MODULES(LIBLO, liblo >= 0.25, have_liblo=true, have_liblo=false)
+if test "x${have_liblo}" = "xfalse" ; then
+    AC_MSG_ERROR([LIBLO missing. pkg - liblo0,liblo0-dev ])
+fi
 
 #PYTHON_CFLAGS="-I/usr/include/boost/python "
 #PYTHON_CFLAGS+=`python-config --includes` 
@@ -124,6 +124,9 @@ if test "x${enable_debug}" == "xyes" ; then
 AC_CONFIG_FILES([
                  src/osc/test/Makefile
                  src/gutil/test/Makefile
+                 src/prototypes/Makefile
+                 src/prototypes/hello/Makefile
+                 src/prototypes/python/Makefile
 
                  ])
 
