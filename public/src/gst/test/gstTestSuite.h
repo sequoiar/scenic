@@ -49,16 +49,17 @@ class GstTestSuite
 
         void set_id(int id);
         static bool areValidArgs(int argc, char **argv);
-
+        const static int A_PORT;
+        const static int V_PORT;
+        
     protected:
+
         void block(const char *filename, const char *function, long lineNumber);
         virtual void setup();       // setup resources common to all tests
         virtual void tear_down();   // destroy common resources
 
         int id_;
         int testLength_;
-        const static int A_PORT;
-        const static int V_PORT;
         const static int NUM_CHANNELS;
         static int killMainLoop(void *data);
         

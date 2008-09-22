@@ -51,7 +51,8 @@ class AudioSender
         void init_codec();
         void init_payloader();
 
-        void send_caps() const;
+        // performed outside of gst
+        //void send_caps() const;
 
         // data
         const AudioConfig audioConfig_;

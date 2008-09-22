@@ -31,6 +31,7 @@
 #include "pipeline.h"
 #include "codec.h"
 #include "rtpPay.h"
+#include "hostIP.h"
 
 AudioSender::~AudioSender()
 {
@@ -66,9 +67,9 @@ void AudioSender::init_payloader()
 }
 
 
+    #ifdef USE_OSC
 void AudioSender::send_caps() const
 {
-    #ifdef USE_OSC
     // returns caps for last sink, needs to be sent to receiver for rtpvorbisdepay
     LOG("Sending caps...", DEBUG);
 
@@ -76,8 +77,8 @@ void AudioSender::send_caps() const
     if (lo_send(t, "/audio/rx/caps", "s", session_.getCaps().c_str()) == -1)
         std::cerr << "OSC error " << lo_address_errno(t) << ": " << lo_address_errstr(t)
             << std::endl;
-    #endif
 }
+    #endif
 
 
 bool AudioSender::start()
