@@ -96,7 +96,7 @@ class MidiIn():
             log.error("INPUT: incorrect device selected")
         
 
-    def get_input( self):
+    def get_input(self):
 	"""Get input from selected device 
 	"""
         self.intervalTimeUpdate += 1
