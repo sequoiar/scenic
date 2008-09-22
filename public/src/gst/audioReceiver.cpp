@@ -31,6 +31,7 @@
 #include "codec.h"
 #include "audioSink.h"
 #include "hostIP.h"
+#include <cassert>
 
 
 AudioReceiver::~AudioReceiver()
@@ -41,48 +42,6 @@ AudioReceiver::~AudioReceiver()
     delete depayloader_;
 }
 
-
-// FIXME: get rid of this!!!!
-#ifdef USE_OSC
-void AudioReceiver::wait_for_caps()
-{
-    LOG("Waiting for caps...", DEBUG);
-    lo_server_thread st = lo_server_thread_new("7770", liblo_error);
-
-    lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler,
-            static_cast<void *>(this));
-
-    lo_server_thread_start(st);
-
-    while (!gotCaps_)
-        usleep(10000);
-
-    lo_server_thread_free(st);
-}
-#endif
-
-
-//#endif
-
-#if 0
-// FIXME: get rid of this!!!!
-void AudioReceiver::liblo_error(int num, const char *msg, const char *path)
-{
-    printf("liblo server error %d in path %s: %s\n", num, path, msg);
-    fflush(stdout);
-}
-
-
-// FIXME: get rid of this!!!!
-int AudioReceiver::caps_handler(const char * /*path*/, const char * /*types*/, lo_arg ** argv, int /*argc*/, void * /*data*/, void *user_data)
-{
-    AudioReceiver *context = static_cast < AudioReceiver * >(user_data);
-    context->session_.set_caps(&argv[0]->s);
-    context->gotCaps_ = true;
-
-    return 0;
-}
-#endif
 
 void AudioReceiver::init_codec()
 {
@@ -108,16 +67,11 @@ void AudioReceiver::init_sink()
 }
 
 
+// CAPS MUST be set first
 bool AudioReceiver::start()
 {
-    // FIXME: caps are only sent if sender is started after receiver
-    //#ifdef USE_OSC
-//    wait_for_caps();
-    //#endif
-    std::stringstream logstr;       // FIXME: need a better printf style logwriter, 
-                                    // shouldn't need stringstream
-    logstr << "Receiving audio on port " << remoteConfig_.port() << " from host " << remoteConfig_.remoteHost();
-    LOG(logstr.str(), DEBUG); 
+    assert(gotCaps_);
+    LOG_DEBUG("Receiving audio on port " << remoteConfig_.port() << " from host " << remoteConfig_.remoteHost());
     GstBase::start();
     return true;
 }

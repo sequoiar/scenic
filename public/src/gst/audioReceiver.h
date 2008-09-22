@@ -43,21 +43,17 @@ class AudioReceiver
         ~AudioReceiver();
 
         bool start();
-        void set_caps(const char *caps)
-        { session_.set_caps(caps); }
+        void set_caps(const char *caps) 
+        { 
+            session_.set_caps(caps); 
+            gotCaps_ = true;
+        }
 
     private:
         AudioReceiver();
         void init_codec();
         void init_depayloader();
         void init_sink();
-
-        //static int caps_handler(const char *path, const char *types, lo_arg ** argv, int argc, void *data, void *user_data);
-
-//        void set_caps(const char *caps);
-        static void liblo_error(int num, const char *msg, const char *path);
-
-        //void wait_for_caps();
 
         const AudioReceiverConfig audioConfig_;
         const ReceiverConfig remoteConfig_;
