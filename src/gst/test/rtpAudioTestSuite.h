@@ -23,6 +23,10 @@
 #include <cpptest.h>
 #include "gstTestSuite.h"
 
+#include "audioSender.h"
+#include "audioReceiver.h"
+#include "audioConfig.h"
+
 class RtpAudioTestSuite
     : public GstTestSuite
 {

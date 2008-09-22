@@ -30,6 +30,7 @@
 #include "rtpPay.h"
 #include "codec.h"
 #include "audioSink.h"
+#include "hostIP.h"
 
 
 AudioReceiver::~AudioReceiver()
@@ -42,10 +43,10 @@ AudioReceiver::~AudioReceiver()
 
 
 // FIXME: get rid of this!!!!
+#ifdef USE_OSC
 void AudioReceiver::wait_for_caps()
 {
     LOG("Waiting for caps...", DEBUG);
-#ifdef USE_OSC
     lo_server_thread st = lo_server_thread_new("7770", liblo_error);
 
     lo_server_thread_add_method(st, "/audio/rx/caps", "s", caps_handler,
@@ -57,8 +58,8 @@ void AudioReceiver::wait_for_caps()
         usleep(10000);
 
     lo_server_thread_free(st);
-#endif
 }
+#endif
 
 
 //#endif
@@ -120,4 +121,5 @@ bool AudioReceiver::start()
     GstBase::start();
     return true;
 }
+
 
