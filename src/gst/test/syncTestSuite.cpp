@@ -155,6 +155,7 @@ void SyncTestSuite::start_8ch_comp_rtp_audiofile_dv()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         TEST_ASSERT(aTx->start());
+        usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         TEST_ASSERT(vTx->start());
@@ -232,6 +233,7 @@ void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         TEST_ASSERT(aTx->start());
+        usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         TEST_ASSERT(vTx->start());
@@ -357,6 +359,7 @@ void SyncTestSuite::start_dv_audio_dv_video_rtp()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         TEST_ASSERT(aTx->start());
+        usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         TEST_ASSERT(vTx->start());
@@ -435,6 +438,7 @@ void SyncTestSuite::start_stop_dv_audio_dv_video_rtp()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         TEST_ASSERT(aTx->start());
+        usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         TEST_ASSERT(vTx->start());
