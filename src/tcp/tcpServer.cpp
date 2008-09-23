@@ -67,10 +67,9 @@ bool TcpServer::set_non_blocking(int sockfd_param)
     return true;
 }
 
-bool TcpServer::socket_connect_send(const std::string& addr,const std::string& msg)
+bool TcpServer::socket_connect_send(const std::string& addr,const std::string& msg) const
 {
     struct sockaddr_in serv_addr;
-    bool ret = false;
     //int optval = 1;
     int ssockfd = 0;
     ssockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -81,7 +80,10 @@ bool TcpServer::socket_connect_send(const std::string& addr,const std::string& m
     
      
     if(!inet_aton(addr.c_str(),&(serv_addr.sin_addr)))
-        LOG_DEBUG("Address bad." << addr);
+    {
+        ::close(ssockfd);
+        LOG_ERROR("Address bad." << addr);
+    }
 
     serv_addr.sin_family = AF_INET;
    // serv_addr.sin_addr.s_addr = INADDR;
@@ -89,27 +91,26 @@ bool TcpServer::socket_connect_send(const std::string& addr,const std::string& m
 
 
     if (connect(ssockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+    {
+        ::close(ssockfd);
         LOG_ERROR("Cannot Connect to peer." << strerror(errno));
-
+    }
     int n=0;
     n = ::write(ssockfd, msg.c_str(), msg.size());
     if (n <= 0){
+        ::close(ssockfd);
         LOG_ERROR("Writing to socket failed.");
-        ret = false; 
     }
-    ret = true;
 
     usleep(1000000);
-    ::close(ssockfd);    
-    return ret;
-
+    ::close(ssockfd);
+    return true;
 }
 
 bool TcpServer::socket_bind_listen()
 {
     struct sockaddr_in serv_addr;
     int optval = 1;
-    sockfd = 0;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd <= 0)
         LOG_ERROR("Error opening socket: errno msg: " << strerror(errno));
@@ -148,7 +149,9 @@ bool TcpServer::accept()
     }
     connected_ = true;
     set_non_blocking(newsockfd);
-
+    
+    ::close(sockfd);
+    sockfd = 0;
 
     return true;
 }
@@ -186,6 +189,7 @@ bool TcpServer::send(const std::string& in)
 {
     int n=0;
     n = ::write(newsockfd, in.c_str(), in.size());
+    n = ::write(newsockfd, "\r\n",2);                       //Telnet standard line end
     if (n <= 0){
         LOG_ERROR("Writing to socket failed.");
         return false; 
