@@ -32,6 +32,27 @@
 #include <map>
 #include <sstream>
 
+
+
+#define GET(msg,key,val_type,val)                                           \
+    val_type val;                                                           \
+    if(msg[key].type() == 'n')                                              \
+    {                                                                       \
+        std::ostringstream err;                                             \
+        err << "key:" << key << " missing.";                                \
+        LOG_ERROR(err.str());                                               \
+    }                                                                       \
+    if(!msg[key].get(val))                                                  \
+    {                                                                       \
+        std::ostringstream err;                                             \
+        char t = msg[key].type();                                           \
+        err << "Expected type " << #val_type << " does not match " <<       \
+        (t == 'i'?"integer":t == 'f'?"float":"string")                      \
+        << " provided by user.";                                            \
+        LOG_ERROR(err.str());                                               \
+    }                                                                       
+
+#if 0
 #define GET_OR_RETURN(msg,key,val_type,val)                                 \
     val_type val;                                                           \
     if(msg[key].type() == 'n')                                              \
@@ -50,8 +71,8 @@
         << " provided by user.";                                            \
         LOG_ERROR(err.str());                                               \
         return false;                                                       \
-    }                                                                       \
-
+    }                                                                       
+#endif
 
 class StrIntFloat
 {

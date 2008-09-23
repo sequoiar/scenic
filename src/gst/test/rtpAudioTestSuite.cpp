@@ -48,18 +48,23 @@ bool tcpGetCaps(int port, AudioReceiver &rx)
         MapMsg f = queue.timed_pop(100000);
         if(f["command"].type() == 'n')
             continue;
+        try
+        {
+            GET(f, "command", std::string, command);
+            GET(f, "caps_str", std::string, caps_str);
+            rx.set_caps(caps_str.c_str());
 
-        GET_OR_RETURN(f, "command", std::string, command);
-        GET_OR_RETURN(f, "caps_str", std::string, caps_str);
-
-        rx.set_caps(caps_str.c_str());
-
-        // send quit command to Receiver TcpThread to make 
-        // threads join on function exit (i.e. TcpThread's destructor)
-        MapMsg q;
-        q["command"] = StrIntFloat("quit");
-        queue.push(q);
-        gotCaps = true;
+            // send quit command to Receiver TcpThread to make 
+            // threads join on function exit (i.e. TcpThread's destructor)
+            MapMsg q;
+            q["command"] = StrIntFloat("quit");
+            queue.push(q);
+            gotCaps = true;
+        }
+        catch(ErrorExcept)
+        {
+            return false;
+        }
     }
 
     return true;

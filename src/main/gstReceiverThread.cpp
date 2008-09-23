@@ -54,12 +54,12 @@ bool GstReceiverThread::video_start(MapMsg& msg)
     delete (vreceiver_);
     vreceiver_ = 0;
 
-    //Get the parameter variables or return false
-    GET_OR_RETURN(msg, "codec", std::string, codec_str);
-    GET_OR_RETURN(msg, "port", int, port);
 
     try
     {
+        //Get the parameter variables or return false
+        GET(msg, "codec", std::string, codec_str);
+        GET(msg, "port", int, port);
         VideoReceiverConfig config("xvimagesink");
         ReceiverConfig rConfig(codec_str, get_host_ip(), port);
         if(!config.sanityCheck())
@@ -69,7 +69,7 @@ bool GstReceiverThread::video_start(MapMsg& msg)
         vreceiver_->start();
         return true;
     }
-    catch(except e)
+    catch(ErrorExcept e)
     {
         delete(vreceiver_);
         vreceiver_ = 0;
@@ -83,12 +83,12 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
     delete (areceiver_);
     areceiver_ = 0;
 
-    //Get the parameter variables or return false
-    GET_OR_RETURN(msg, "codec", std::string, codec_str);
-    GET_OR_RETURN(msg, "port", int, port);
-    GET_OR_RETURN(msg, "channels", int, chan);
     try
     {
+        //Get the parameter variables or return false
+        GET(msg, "codec", std::string, codec_str);
+        GET(msg, "port", int, port);
+        GET(msg, "channels", int, chan);
         AudioReceiverConfig config("jackaudiosink");
         ReceiverConfig rConfig(codec_str, get_host_ip(), port);
         if(!config.sanityCheck())
@@ -98,7 +98,7 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
         areceiver_->start();
         return true;
     }
-    catch(except e)
+    catch(ErrorExcept e)
     {
         delete(areceiver_);
         areceiver_ = 0;

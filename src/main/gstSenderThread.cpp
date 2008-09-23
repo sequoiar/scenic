@@ -56,10 +56,10 @@ bool GstSenderThread::video_start(MapMsg& msg)
     delete (vsender_);
     vsender_ = 0;
     
-    GET_OR_RETURN(msg, "address", std::string, addr);
-    GET_OR_RETURN(msg, "port", int, port);
     try
     {
+        GET(msg, "address", std::string, addr);
+        GET(msg, "port", int, port);
         VideoConfig config("videotestsrc");
         SenderConfig rConfig("h264", addr, port);
         if(!config.sanityCheck())
@@ -72,7 +72,7 @@ bool GstSenderThread::video_start(MapMsg& msg)
 
         return true;
     }
-    catch(except e)
+    catch(ErrorExcept e)
     {
         delete(vsender_);
         vsender_ = 0;
@@ -86,11 +86,11 @@ bool GstSenderThread::audio_start(MapMsg& msg)
     delete (asender_);
     asender_ = 0;
 
-    GET_OR_RETURN(msg, "address", std::string, addr);
-    GET_OR_RETURN(msg, "port", int, port);
 
     try
     {
+        GET(msg, "address", std::string, addr);
+        GET(msg, "port", int, port);
         AudioConfig config("audiotestsrc", 2);
         SenderConfig rConfig("vorbis", addr, port);
         if(!config.sanityCheck())
@@ -111,7 +111,8 @@ bool GstSenderThread::audio_start(MapMsg& msg)
 
         return true;
     }
-    catch(except e)
+    catch(ErrorExcept e)
+
     {
         delete(asender_);
         asender_ = 0;
