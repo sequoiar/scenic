@@ -30,7 +30,6 @@ class RtpVideoTestSuite
     public:
 
         RtpVideoTestSuite()
-            : fileLocation_("/usr/share/example-content/Experience ubuntu.ogg")
         {
             testLength_ = 10000;
 
@@ -58,8 +57,6 @@ class RtpVideoTestSuite
         // some tests
 
     private:
-        std::string fileLocation_;
-
         void start_test_video_rtp();
         void stop_test_video_rtp();
         void start_stop_test_video_rtp();

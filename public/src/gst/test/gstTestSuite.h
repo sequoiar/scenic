@@ -44,7 +44,7 @@ class GstTestSuite
     public:
 
         GstTestSuite()
-            : id_(0), testLength_(5000), fileLocation_("test_signal8.wav")
+            : id_(0), testLength_(10000), audioFilename_("test_signal8.wav"), videoFilename_("/usr/share/example-content/Experience ubuntu.ogg")
         {}
 
         void set_id(int id);
@@ -63,7 +63,8 @@ class GstTestSuite
         const static int NUM_CHANNELS;
         static int killMainLoop(void *data);
         
-        std::string fileLocation_;
+        std::string audioFilename_;
+        std::string videoFilename_;
 };
 
 #endif // _GST_TEST_SUITE_H_

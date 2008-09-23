@@ -334,7 +334,7 @@ void AudioTestSuite::start_8ch_comp_audiofile()
 
     if (id_ == 1)
         return;
-    AudioConfig config("filesrc", fileLocation_, numChannels);
+    AudioConfig config("filesrc", audioFilename_, numChannels);
     AudioLocal tx(config);
     tx.init();
 
@@ -350,7 +350,7 @@ void AudioTestSuite::stop_8ch_comp_audiofile()
     int numChannels = 8;
     if (id_ == 1)
         return;
-    AudioConfig config("filesrc", fileLocation_, numChannels);
+    AudioConfig config("filesrc", audioFilename_, numChannels);
     AudioLocal tx(config);
     tx.init();
 
@@ -366,7 +366,7 @@ void AudioTestSuite::start_stop_8ch_comp_audiofile()
     int numChannels = 8;
     if (id_ == 1)
         return;
-    AudioConfig config("filesrc", fileLocation_, numChannels);
+    AudioConfig config("filesrc", audioFilename_, numChannels);
     AudioLocal tx(config);
     TEST_ASSERT(tx.init());
 

@@ -121,7 +121,7 @@ class VideoV4lSource
     public:
         explicit VideoV4lSource(const VideoConfig &config)
             : VideoSource(config) {}
-        void sub_init(){};
+        void sub_init();
     private:
         VideoV4lSource(const VideoV4lSource&);     //No Copy Constructor
         VideoV4lSource& operator=(const VideoV4lSource&);     //No Assignment Operator

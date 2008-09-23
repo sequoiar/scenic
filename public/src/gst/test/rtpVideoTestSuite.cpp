@@ -19,6 +19,7 @@
 //
 
 #include <cpptest.h>
+#include <cassert>
 #include <iostream>
 #include <cstdlib>
 #include "rtpVideoTestSuite.h"
@@ -26,6 +27,8 @@
 #include "videoConfig.h"
 #include "videoReceiver.h"
 #include "hostIP.h"
+#include "tcp/tcpThread.h"
+#include "tcp/parser.h"
 
 
 std::auto_ptr<VideoReceiver> buildVideoReceiver()
@@ -33,7 +36,7 @@ std::auto_ptr<VideoReceiver> buildVideoReceiver()
         VideoReceiverConfig vConfig("xvimagesink");
         ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
         std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
-        rx->init();
+        assert(rx->init());
         return rx;
 }
 
@@ -42,7 +45,7 @@ std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
 {
         SenderConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
         std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
-        tx->init();
+        assert(tx->init());
         return tx;
 }
 
@@ -50,7 +53,7 @@ std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
 void RtpVideoTestSuite::start_test_video_rtp()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver >rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         TEST_ASSERT(rx->start());
 
@@ -278,7 +281,7 @@ void RtpVideoTestSuite::start_file_rtp()
         TEST_ASSERT(rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("filesrc", fileLocation_);
+        VideoConfig vConfig("filesrc", videoFilename_);
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         TEST_ASSERT(tx->start());
@@ -300,7 +303,7 @@ void RtpVideoTestSuite::stop_file_rtp()
         TEST_ASSERT(!rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("filesrc", fileLocation_);
+        VideoConfig vConfig("filesrc", videoFilename_);
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         BLOCK();
@@ -326,7 +329,7 @@ void RtpVideoTestSuite::start_stop_file_rtp()
         TEST_ASSERT(!rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("filesrc", fileLocation_);
+        VideoConfig vConfig("filesrc", videoFilename_);
         
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
@@ -353,7 +356,14 @@ int main(int argc, char **argv)
     tester.set_id(atoi(argv[1]));
 
     Test::TextOutput output(Test::TextOutput::Verbose);
-    return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
+    try {
+        return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
+    }
+    catch (Except e)
+    {
+        std::cerr << e.msg_;
+        return 1;
+    }
 }
 
 

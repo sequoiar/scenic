@@ -23,6 +23,7 @@
  *
  */
 #include <iostream>
+#include <fstream>
 #include "audioConfig.h"
 #include "audioSource.h"
 #include "audioSink.h"
@@ -126,18 +127,18 @@ bool AudioConfig::fileExists() const
         LOG("No file location given", ERROR);
         return false;
     }
-    FILE *file;
-    file = fopen(location(), "r");
-    if (file != NULL)
+
+    std::fstream in;
+    in.open(location(), std::fstream::in);
+
+    if (in.fail())
     {
-        fclose(file);
-        return true;
-    }
-    else
-    {
-        LOG("File does not exist", ERROR);
+        LOG_ERROR("File does not exist and/or is not readable.");
         return false;
     }
+
+    in.close();
+    return true;
 }
 
 
