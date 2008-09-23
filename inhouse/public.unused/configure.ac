@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(PROPULSE_ART_DEPRECATED, 0.01 )
+AC_INIT(PROPULSE_ART, 0.01 )
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
@@ -31,6 +31,7 @@ AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
         enable_debug=no)
 
+
 # Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
 AC_CHECK_FUNCS([inet_ntoa memset socket])
@@ -42,7 +43,10 @@ if test "x${enable_debug}" == "xyes" ; then
 #Trying to set CPPTEST_LIBS using pkg-config
 PKG_CHECK_MODULES(CPPTEST, libcpptest, have_cpptest=true, have_cpptest=false)
 if test "x${have_cpptest}" = "xfalse" ; then
-    AC_MSG_ERROR([libcpptest not found.-- ubuntu: sudo apt-get install libcpptest-dev])
+    AC_MSG_WARN([libcpptest not found.-- ubuntu: sudo apt-get install libcpptest-dev])
+AM_CONDITIONAL([DEBUG],test "xyes" == "xyes" )
+else
+AM_CONDITIONAL([DEBUG],test "x${have_cpptest}" == "xyes" )
 fi
 
 fi
@@ -95,11 +99,12 @@ if test "x${have_libpj}" = "xfalse" ; then
     AC_MSG_ERROR([PJSIP not found. http://www.pjsip.org/download.htm])
 fi
 
-Trying to set LIBLO using pkg-config
+#Trying to set LIBLO using pkg-config
 PKG_CHECK_MODULES(LIBLO, liblo >= 0.25, have_liblo=true, have_liblo=false)
 if test "x${have_liblo}" = "xfalse" ; then
-    AC_MSG_ERROR([LIBLO missing. pkg - liblo0,liblo0-dev ])
+    AC_MSG_WARN([LIBLO missing. pkg - liblo0,liblo0-dev ])
 fi
+AM_CONDITIONAL([OSC],test "x${have_liblo}" == "xyes" )
 
 #PYTHON_CFLAGS="-I/usr/include/boost/python "
 #PYTHON_CFLAGS+=`python-config --includes` 
@@ -111,6 +116,7 @@ fi
 
 AX_PYTHON
 AX_BOOST_PYTHON
+
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
@@ -133,12 +139,3 @@ AC_CONFIG_FILES([
 
 fi
 AC_OUTPUT
-
-#                 src/prototypes/Makefile
-#                 src/prototypes/python/Makefile
-#                 src/prototypes/hello/Makefile
-#                 src/osc/Makefile
-#                 src/osc/test/Makefile
-#                 src/gutil/Makefile
-#                 src/gutil/test/Makefile
-#                 src/prototypes/hello/test/Makefile
