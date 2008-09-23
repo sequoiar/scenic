@@ -30,7 +30,6 @@ class VideoTestSuite
     public:
 
         VideoTestSuite()
-            : fileLocation_("/usr/share/example-content/Experience ubuntu.ogg")
         {
             testLength_ = 10000;
             TEST_ADD(VideoTestSuite::start_file)
@@ -58,7 +57,6 @@ class VideoTestSuite
         // some tests
 
     private:
-        std::string fileLocation_;
 
         void start_test_video();
         void stop_test_video();

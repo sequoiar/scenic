@@ -23,7 +23,6 @@
 #include <cstdlib>
 #include "hostIP.h"
 #include "rtpAudioTestSuite.h"
-//#define USE_OSC
 #include "audioSender.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
@@ -88,7 +87,7 @@ std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
 {
     SenderConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT);
     std::auto_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
-    assert(tx->init());
+    tx->init();
     return tx;
 }
 
@@ -98,8 +97,7 @@ std::auto_ptr<AudioReceiver> buildAudioReceiver()
     AudioReceiverConfig aConfig("jackaudiosink");
     ReceiverConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT); 
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
-    assert(rx->init());
-
+    rx->init();
     return rx;
 }
 
@@ -292,7 +290,7 @@ void RtpAudioTestSuite::start_8ch_rtp_audiofile()
         TEST_ASSERT(rx->isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", fileLocation_, numChannels);
+        AudioConfig aConfig("filesrc", audioFilename_, numChannels);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
         TEST_ASSERT(tx->start());
@@ -317,7 +315,7 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiofile()
         TEST_ASSERT(!rx->isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", fileLocation_, numChannels);
+        AudioConfig aConfig("filesrc", audioFilename_, numChannels);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
         BLOCK();
@@ -345,7 +343,7 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiofile()
         TEST_ASSERT(!rx->isPlaying());
     }
     else {
-        AudioConfig aConfig("filesrc", fileLocation_, numChannels);
+        AudioConfig aConfig("filesrc", audioFilename_, numChannels);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
         TEST_ASSERT(tx->start());
@@ -458,7 +456,14 @@ int main(int argc, char **argv)
     tester.set_id(atoi(argv[1]));
 
     Test::TextOutput output(Test::TextOutput::Verbose);
-    return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
-}
 
+    try {
+        return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
+    }
+    catch (Except e)
+    {
+        std::cerr << e.msg_;
+        return 1;
+    }
+}
 

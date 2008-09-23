@@ -19,6 +19,7 @@
 
 #include <string>
 #include <cassert>
+#include <fstream>
 #include <gst/gst.h>
 #include "gstLinkable.h"
 #include "videoSource.h"
@@ -251,4 +252,12 @@ void VideoDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
     gst_object_unref(sinkPad);
 }
 
+void VideoV4lSource::sub_init()
+{
+    std::fstream in;
+    in.open("/dev/video0", std::fstream::in);
+    if (in.fail())
+        LOG_ERROR("Video4Linux device /dev/video0 not found");
+    in.close();
+}
 

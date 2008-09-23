@@ -176,7 +176,7 @@ void VideoTestSuite::start_file()
 {
     if (id_ == 1)
         return;
-    VideoConfig config("filesrc", fileLocation_);
+    VideoConfig config("filesrc", videoFilename_);
     VideoLocal tx(config);
     tx.init();
 
@@ -191,7 +191,7 @@ void VideoTestSuite::stop_file()
 {
     if (id_ == 1)
         return;
-    VideoConfig config("filesrc", fileLocation_);
+    VideoConfig config("filesrc", videoFilename_);
     VideoLocal tx(config);
     tx.init();
 
@@ -206,7 +206,7 @@ void VideoTestSuite::start_stop_file()
 {
     if (id_ == 1)
         return;
-    VideoConfig config("filesrc", fileLocation_);
+    VideoConfig config("filesrc", videoFilename_);
     VideoLocal tx(config);
     tx.init();
 
