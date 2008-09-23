@@ -163,8 +163,6 @@ bool stringify(const MapMsg& cmd_map, std::string& str)
         }
     }
 
-    str.append("\r\n");                                     //Append \r\n to conform to
-                                                            //telnet specification
 
     return true;
 }
@@ -183,8 +181,10 @@ bool tokenize(const std::string& str, MapMsg &cmd_map)
     StrIntFloat c(lstr.substr(0, i));                       //make a string for command
     cmd_map.insert( std::make_pair( "command", c) );        //insert command into map
 
-
-    lstr = lstr.substr(i+2);                                //set lstring beyond command
+    if(lstr.size() > i+2)
+        lstr = lstr.substr(i+2);                                //set lstring beyond command
+    else
+        return true;
 
     //loop until break or return
     for(;;)

@@ -16,6 +16,7 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+#include <iostream>
 #include "tcpThread.h"
 #include "logWriter.h"
 #include "parser.h"
@@ -24,17 +25,16 @@ int TcpThread::main()
 {
     bool quit = false;
     std::string msg;
-
-    if(!serv_.socket_bind_listen())
-        return -1;
-    while(!quit)
+    try
     {
         while(!quit)
         {
-            usleep(10000);
-            if(!serv_.accept() || ( quit = gotQuit() ) ){
-                continue;
-            }
+            if(!serv_.socket_bind_listen())
+                return -1;
+
+            while(!serv_.accept())
+                usleep(10000);
+
             LOG_INFO("Got Connection.");
             while(serv_.connected())
             {
@@ -55,8 +55,13 @@ int TcpThread::main()
             }
             if(!quit)
                 LOG_WARNING("Disconnected from Core.");
+
+            serv_.close();
         }
-        serv_.close();
+    }
+    catch(Except e)
+    {
+        std::cerr << e.msg_;
     }
     return 0;
 }

@@ -11,26 +11,27 @@
 class ParserTester : public Test::Suite
 {
     public:
-        ParserTester()
+        ParserTester(char** argv):arg(argv[1])
         {
-            TEST_ADD(ParserTester::tokenize_test)
-            TEST_ADD(ParserTester::stringify_test)
+
+//            TEST_ADD(ParserTester::tokenize_test)
+//            TEST_ADD(ParserTester::stringify_test)
             TEST_ADD(ParserTester::roundtrip_test)
 
         }
 
-private:
+    private:
         void tokenize_test();
         void stringify_test();
         void roundtrip_test();
 
+    std::string arg;
 };
 
 void ParserTester::tokenize_test()
 { 
     TEST_ASSERT(1);
-    LOG_ERROR("Here");
-    TEST_ASSERT(1);
+    TEST_THROWS(LOG_DEBUG("here"),Except);
 }
 
 void ParserTester::stringify_test()
@@ -40,25 +41,24 @@ void ParserTester::stringify_test()
 
 void ParserTester::roundtrip_test()
 {
-    std::string str = "init: it=103945 mystring=\"\\\"bar you\\\"\" Hellotab=1.1";
-    std::map<std::string, StrIntFloat> mymap;
-    if(tokenize(str, mymap))
-        LOG_DEBUG("Success");
-        else
-    LOG_DEBUG("Fail");
+//    std::string str = "init: it=103945 mystring=\"\\\"bar you\\\"\" Hellotab=1.1";
 
-            std::string out;
-    if(stringify(mymap, out))
-        LOG_DEBUG(out);
-    else
-        LOG_DEBUG("Fail stringify");
+    std::map<std::string, StrIntFloat> mymap;
+    TEST_ASSERT(tokenize(arg, mymap));
+
+    std::string out;
+    TEST_ASSERT(stringify(mymap, out));
+    LOG_DEBUG(out);
 
 
 }
 
-int main(int, char**)
+int main(int argc, char** argv)
 {
-    ParserTester pt;
+    if (argc < 2)
+        return -1;
+
+    ParserTester pt(argv);
     Test::TextOutput output(Test::TextOutput::Verbose);
     return pt.run(output,false);
 }

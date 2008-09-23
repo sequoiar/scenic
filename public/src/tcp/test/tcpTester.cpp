@@ -26,13 +26,17 @@ int main(int argc, char** argv)
                 std::string command;
                 if(f["command"].get(command))
                 {
-                    if(!command.compare("quit"))
+                    if(command == "quit")
                     {
                         queue.push(f);
                         break;
                     }
-                    else{
-                        tcp.send(f);
+                    else
+                    {
+                        if(command == "test")
+                            LOG_DEBUG(tcp.socket_connect_send("127.0.0.1",f));
+                        else
+                            tcp.send(f);
                     }
                 }
             }

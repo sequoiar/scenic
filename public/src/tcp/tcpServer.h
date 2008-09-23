@@ -38,7 +38,7 @@ class TcpServer
         bool recv(std::string& out);
         bool send(const std::string& in);
         bool socket_bind_listen();
-        bool socket_connect_send(const std::string& addr,const std::string& in);
+        bool socket_connect_send(const std::string& addr,const std::string& in) const;
         bool accept();
         bool close();
 
