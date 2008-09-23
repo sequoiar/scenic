@@ -50,7 +50,6 @@ void GstTestSuite::block(const char * filename, const char *function, long lineN
                   static_cast<void*>(loop));
     g_main_loop_run(loop);
     g_main_loop_unref(loop);
-    //std::cin.get()
 }
 
 bool GstTestSuite::areValidArgs(int argc, char **argv)
