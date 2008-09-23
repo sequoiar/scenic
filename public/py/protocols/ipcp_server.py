@@ -41,8 +41,8 @@ if __name__ == "__main__":
     import sys
     
     port = 10000
-    if len(sys.argv) > 1:
-        port = sys.argv[1]
+    if len(sys.argv) > 1 and sys.argv[1].isdigit():
+        port = int(sys.argv[1])
         
     factory = protocol.ServerFactory()
     factory.protocol = IPCP
