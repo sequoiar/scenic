@@ -69,14 +69,33 @@ enum LogLevel {
     ASSERT_FAIL = 60
 };
 
-class except
+class Except
 {
 public:
     LogLevel log_;
-    std::string log_msg_;
+    std::string msg_;
 
-    except(LogLevel log,std::string log_msg):log_(log),log_msg_(log_msg){}
-    except(std::string log_msg):log_(ERROR),log_msg_(log_msg){}
+    Except(std::string log_msg):log_(WARNING),msg_(log_msg){}
+    virtual ~Except(){}
+};
+
+class ErrorExcept : public Except
+{
+public:
+    ErrorExcept(std::string log_msg):Except(log_msg){log_ = ERROR;}
+
+};
+
+class CriticalExcept : public ErrorExcept
+{
+public:
+    CriticalExcept(std::string log_msg):ErrorExcept(log_msg){ log_ = CRITICAL;}
+};
+
+class AssertExcept : public CriticalExcept
+{
+public:
+    AssertExcept(std::string log_msg):CriticalExcept(log_msg){log_ = ASSERT_FAIL;}
 };
 
 
@@ -93,14 +112,14 @@ public:
 bool logLevelIsValid(LogLevel level);
 
 
-const std::string logLevelStr(LogLevel level);
+std::string logLevelStr(LogLevel level);
 
 
 
 bool logLevelMatch(LogLevel level);
 
 
-const std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
+std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, const int lineNum);
 
 void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileName,

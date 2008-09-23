@@ -7,34 +7,41 @@
 
 int main(int argc, char** argv)
 {
-    if(argc < 2)
-        LOG_CRITICAL("2 or 3 args: port [addr]");
-    int port = atoi(argv[1]);
-    TcpThread tcp(port);
-
-    return 0;
-
-    QueuePair& queue = tcp.getQueue();
-    LOG("helo",DEBUG);
-    tcp.run();
-
-    while(1)
+    try
     {
-        MapMsg f = queue.timed_pop(1000000);
-        std::string command;
-        std::cout << f["command"].type() << std::endl;
-        if(f["command"].get(command))
+        if(argc < 2)
+            LOG_CRITICAL("2 or 3 args: port [addr]");
+        int port = atoi(argv[1]);
+        TcpThread tcp(port);
+
+
+        QueuePair& queue = tcp.getQueue();
+        tcp.run();
+
+        while(1)
         {
-            std::cout << command << std::endl;
-            if(!command.compare("quit"))
+            try
             {
-                queue.push(f);
-                break;
+                MapMsg f = queue.timed_pop(1000000);
+                std::string command;
+                if(f["command"].get(command))
+                {
+                    if(!command.compare("quit"))
+                    {
+                        queue.push(f);
+                        break;
+                    }
+                    else{
+                        tcp.send(f);
+                    }
+                }
             }
-            else{
-                tcp.send(f);
-            }
+            catch(ErrorExcept) { }
         }
+    }
+    catch(Except e)
+    {
+            std::cerr << e.msg_;
     }
 }
 

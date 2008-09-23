@@ -68,7 +68,6 @@ void assert_throw(__const char *__assertion, __const char *__file,
                            unsigned int __line, __const char *__function)
 {
     cerr_log_( __assertion, ASSERT_FAIL, __file, __function, __line);
-
 }
 
 bool logLevelIsValid(LogLevel level)
@@ -90,7 +89,7 @@ bool logLevelIsValid(LogLevel level)
 }
 
 
-const std::string logLevelStr(LogLevel level)
+std::string logLevelStr(LogLevel level)
 {
     switch (level)
     {
@@ -122,7 +121,7 @@ bool logLevelMatch(LogLevel level)
 }
 
 
-const std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
+std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, const int lineNum)
 {
     std::ostringstream logMsg;
@@ -134,7 +133,6 @@ const std::string log_(const std::string &msg, LogLevel level, const std::string
         time( &rawtime );
         timeinfo = localtime(&rawtime);
         logMsg << logLevelStr(level) << msg << " --" << functionName <<  "() in " << fileName << ":" << " line " << lineNum << "-- " <<asctime(timeinfo); 
-
         // FIXME: send message to Core
     }
 
@@ -144,11 +142,18 @@ const std::string log_(const std::string &msg, LogLevel level, const std::string
 void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, const int lineNum)
 {
-    std::string err =  log_(msg,level,fileName,functionName,lineNum);
+    std::string err = log_(msg,level,fileName,functionName,lineNum);
+    
+    if(level < ERROR){
+        std::cerr << err;
+        return;
+    }
 
-    std::cerr << err;
-    if(level >= CRITICAL)
-        throw(except(level,err));
+    if(level < CRITICAL)
+        throw(ErrorExcept(err));
+    if(level < ASSERT_FAIL)
+        throw(CriticalExcept(err));
+    throw(AssertExcept(err));
 
 }
 

@@ -88,17 +88,13 @@ int main (int argc, char** argv)
             try{
                 m.run();
             }
-            catch(except e) 
-            {
-                if (e.log_ == CRITICAL) 
-                    throw e;
-            }
+            catch(ErrorExcept) { }
         } while(1);
     }
-    catch(except e) 
+    catch(CriticalExcept e) 
     { 
         if (e.log_ == ASSERT_FAIL) 
-            std::cerr << "2ND E:" <<e.log_msg_ <<std::endl;
+            std::cerr << "2ND E:" <<e.msg_ <<std::endl;
     }
 
 
