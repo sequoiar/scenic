@@ -54,7 +54,8 @@ int TcpThread::main()
                 usleep(10000);
 
             LOG_INFO("Got Connection.");
-            register_cb(&lf_);
+            if(logFlag_)
+                register_cb(&lf_);
             while(serv_.connected())
             {
                 if((quit = gotQuit()))
@@ -72,7 +73,8 @@ int TcpThread::main()
                 else
                     usleep(10000);
             }
-            release_cb();
+            if(logFlag_)
+                unregister_cb();
             if(!quit)
                 LOG_WARNING("Disconnected from Core.");
 
@@ -103,8 +105,11 @@ bool TcpThread::gotQuit()
 bool TcpThread::send(MapMsg& msg)
 {
     std::string msg_str;
+    hold_cb(); // to insure no recursive calls due to log message calling send 
     stringify(msg, msg_str);
-    return serv_.send(msg_str);
+    bool ret = serv_.send(msg_str);
+    release_cb();
+    return ret;
 }
 
 bool TcpThread::socket_connect_send(const std::string& addr, const MapMsg& msg)

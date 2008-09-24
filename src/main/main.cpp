@@ -49,7 +49,7 @@ class MainModule
 };
 
 MainModule::MainModule(int send, int port)
-    : gstThread_(0), tcpThread_(port)
+    : gstThread_(0), tcpThread_(port,true)
 {
     if(send)
         gstThread_ = new GstSenderThread();

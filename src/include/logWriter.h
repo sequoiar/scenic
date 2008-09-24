@@ -111,8 +111,9 @@ class LogFunctor
 };
 
 void register_cb(LogFunctor*);
+void unregister_cb();
 void release_cb();
-
+void hold_cb();
 
 
 bool logLevelIsValid(LogLevel level);
