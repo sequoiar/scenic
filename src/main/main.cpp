@@ -31,6 +31,7 @@
 #include "logWriter.h"
 #include "lassert.h"
 
+
 class MainModule
     : public BaseModule
 {
@@ -43,7 +44,6 @@ class MainModule
     private:
         GstThread* gstThread_;
         TcpThread tcpThread_;
-
         MainModule(MainModule&);    //No Copy Constructor
         MainModule& operator=(const MainModule&);
 };

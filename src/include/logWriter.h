@@ -68,6 +68,11 @@ enum LogLevel {
     CRITICAL = 50,
     ASSERT_FAIL = 60
 };
+#define LOG_ERROR(msg)      LOG(msg, ERROR)
+#define LOG_CRITICAL(msg)   LOG(msg, CRITICAL)
+#define LOG_INFO(msg)       LOG(msg, INFO)
+#define LOG_WARNING(msg)    LOG(msg, WARNING)
+#define LOG_DEBUG(msg)      LOG(msg, DEBUG)
 
 class Except
 {
@@ -98,14 +103,15 @@ public:
     AssertExcept(std::string log_msg):CriticalExcept(log_msg){log_ = ASSERT_FAIL;}
 };
 
+class LogFunctor
+{
+    public:
+        virtual void cb(LogLevel&, std::string &){}
+        virtual ~LogFunctor(){}
+};
 
-
-#define LOG_ERROR(msg)      LOG(msg, ERROR)
-#define LOG_CRITICAL(msg)   LOG(msg, CRITICAL)
-#define LOG_INFO(msg)       LOG(msg, INFO)
-#define LOG_WARNING(msg)    LOG(msg, WARNING)
-#define LOG_DEBUG(msg)      LOG(msg, DEBUG)
-
+void register_cb(LogFunctor*);
+void release_cb();
 
 
 

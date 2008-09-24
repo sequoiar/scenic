@@ -21,10 +21,28 @@
 #include "logWriter.h"
 #include "parser.h"
 
+class TcpLogFunctor : public LogFunctor
+{
+public:
+    TcpLogFunctor(TcpThread& tcp):tcp_(tcp){}
+    TcpThread& tcp_;
+    void cb(LogLevel&,std::string& msg);
+};
+
+void TcpLogFunctor::cb(LogLevel& level,std::string& msg)
+{
+    MapMsg m;
+    m["command"] = StrIntFloat("log");
+    m["level"] = StrIntFloat(level);
+    m["msg"] = StrIntFloat(msg);
+    tcp_.send(m);
+}
+
 int TcpThread::main()
 {
     bool quit = false;
     std::string msg;
+    TcpLogFunctor lf_(*this);
     try
     {
         while(!quit)
@@ -36,6 +54,7 @@ int TcpThread::main()
                 usleep(10000);
 
             LOG_INFO("Got Connection.");
+            register_cb(&lf_);
             while(serv_.connected())
             {
                 if((quit = gotQuit()))
@@ -53,6 +72,7 @@ int TcpThread::main()
                 else
                     usleep(10000);
             }
+            release_cb();
             if(!quit)
                 LOG_WARNING("Disconnected from Core.");
 
@@ -84,7 +104,6 @@ bool TcpThread::send(MapMsg& msg)
 {
     std::string msg_str;
     stringify(msg, msg_str);
-    LOG_DEBUG("SENDING: " << msg_str); 
     return serv_.send(msg_str);
 }
 
