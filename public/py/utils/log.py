@@ -23,6 +23,7 @@
 # System imports
 import logging
 import sys
+import types
 
 # Twisted imports
 import twisted.python.log as tw_log
@@ -32,6 +33,19 @@ if version < 8:
     from utils.twisted_old import PythonLoggingObserver
     tw_log.PythonLoggingObserver = PythonLoggingObserver
 
+# App imports
+from utils import get_def_name
+
+
+LoggerClass = logging.getLoggerClass()
+
+class CoreLogger(LoggerClass):
+    def debug(self, msg=None, *args):
+        if not msg:
+            msg = "def: %s" % get_def_name()
+        LoggerClass.debug(self, msg, *args)
+
+logging.setLoggerClass(CoreLogger)
 
 def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
     log_file = 'miville.log'
@@ -83,6 +97,7 @@ def info(msg):
 
 def debug(msg):
     tw_log.msg(msg, logLevel=logging.DEBUG)
+        
 
 
        
