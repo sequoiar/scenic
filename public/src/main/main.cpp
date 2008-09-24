@@ -38,25 +38,61 @@ class MainModule
     public:
         bool run();
 
-        MainModule(int send, int port);
+        MainModule(bool send, int port);
 
         ~MainModule(){delete gstThread_;}
     private:
-        GstThread* gstThread_;
         TcpThread tcpThread_;
+        GstThread* gstThread_;
         MainModule(MainModule&);    //No Copy Constructor
         MainModule& operator=(const MainModule&);
 };
 
-MainModule::MainModule(int send, int port)
-    : gstThread_(0), tcpThread_(port,true)
+MainModule::MainModule(bool send, int port)
+        : tcpThread_(port,true), gstThread_(0) 
 {
     if(send)
         gstThread_ = new GstSenderThread();
     else
         gstThread_ = new GstReceiverThread();
+
 }
 
+bool MainModule::run()
+{
+    QueuePair &gst_queue = gstThread_->getQueue();
+    QueuePair &tcp_queue = tcpThread_.getQueue();
+
+    if(gstThread_ == 0 || !gstThread_->run())
+        LOG_ERROR("GstThread not running");
+    if(!tcpThread_.run())
+        LOG_ERROR("TcpThread not running");
+
+    while(true)
+    {
+        MapMsg tmsg = tcp_queue.timed_pop(1000);
+        MapMsg gmsg = gst_queue.timed_pop(1);
+
+        if (gmsg["command"].type() != 'n')
+            tcpThread_.send(gmsg);
+        if (tmsg["command"].type() == 'n')
+            continue;
+        std::string command;
+        if(!tmsg["command"].get(command))
+            continue;
+        if (command == "quit")
+        {
+            gst_queue.push(tmsg);
+            tcp_queue.push(tmsg);
+            break;
+        }
+        else
+            gst_queue.push(tmsg);
+    }
+
+    LOG_INFO("Normal Program Termination in Progress");
+    return 0;
+}
 
 int main (int argc, char** argv)
 {
@@ -64,19 +100,17 @@ int main (int argc, char** argv)
 
     try
     {
-        assert(argc == 3);
         if(argc != 3)
-            LOG_CRITICAL(
-                "Invalid command line arguments -- 0/1 for receive/send and a port");
+            LOG_CRITICAL( "Invalid command line arguments -- 0/1 for receive/send and a port");
         if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
             LOG_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
-        if(sscanf(argv[2], "%d", &port) != 1 || port < 0 || port > 65000)
+        if(sscanf(argv[2], "%d", &port) != 1 || port < 1024 || port > 65000)
             LOG_CRITICAL(
-                "Invalid command line arguments -- Port must be in the range of 1-65000");
+                "Invalid command line arguments -- Port must be in the range of 1024-65000");
     }
     catch(std::string err)
     {
-            std::cerr << "GOING DOWN " << err;
+        std::cerr << "GOING DOWN " << err;
     }
     
     try
@@ -86,9 +120,10 @@ int main (int argc, char** argv)
             MainModule m(send, port);
 
             try{
-                m.run();
+                if(!m.run())
+                    break;
             }
-            catch(ErrorExcept) { }
+            catch(ErrorExcept e) { std::cerr << e.msg_;}
         } while(1);
     }
     catch(CriticalExcept e) 
@@ -99,42 +134,4 @@ int main (int argc, char** argv)
 
 
 }
-
-bool MainModule::run()
-{
-        QueuePair &gst_queue = gstThread_->getQueue();
-
-        QueuePair &tcp_queue = tcpThread_.getQueue();
-
-        if(gstThread_ == 0 || !gstThread_->run())
-            return 0;
-        if(!tcpThread_.run())
-            return 0;
-        while(true)
-        {
-            MapMsg tmsg = tcp_queue.timed_pop(1000);
-            MapMsg gmsg = gst_queue.timed_pop(1);
-
-            if (gmsg["command"].type() != 'n')
-                tcpThread_.send(gmsg);
-            if (tmsg["command"].type() == 'n')
-                continue;
-            std::string command;
-            if(!tmsg["command"].get(command))
-                continue;
-            if (!command.compare("quit"))
-            {
-                gst_queue.push(tmsg);
-                LOG("in quit!", DEBUG);
-                tcp_queue.push(tmsg);
-                break;
-            }
-            else
-                gst_queue.push(tmsg);
-        }
-
-        std::cout << "Done!" << std::endl;
-        return 0;
-}
-
 
