@@ -12,7 +12,7 @@ int main(int argc, char** argv)
         if(argc < 2)
             LOG_CRITICAL("2 or 3 args: port [addr]");
         int port = atoi(argv[1]);
-        TcpThread tcp(port);
+        TcpThread tcp(port,true);
 
 
         QueuePair& queue = tcp.getQueue();

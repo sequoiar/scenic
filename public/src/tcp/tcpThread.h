@@ -26,8 +26,8 @@ class TcpThread
     : public BaseThread<MapMsg>
 {
     public:
-        TcpThread(int inport)
-            : serv_(inport){}
+        TcpThread(int inport,bool logF=false)
+            : serv_(inport),logFlag_(logF){}
         ~TcpThread(){}
         bool send(MapMsg& msg);
 
@@ -38,6 +38,7 @@ class TcpThread
         bool gotQuit();
 
         TcpServer serv_;
+        bool logFlag_;
 
         TcpThread(const TcpThread&); //No Copy Constructor
         TcpThread& operator=(const TcpThread&); //No Assignment Operator
