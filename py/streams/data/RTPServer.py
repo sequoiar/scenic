@@ -15,7 +15,7 @@ class RTPServer(DatagramProtocol):
         log.info( "OUTPUT: Initializing RTP receiver" )
         
         #Init var
-        self.actualSeqNo = 30000
+        self.actualSeqNo = 32767
         self.peerAddress = streamerAddress		
         self.peerPort = streamerPort
         self.lastLocalTime = 0				#use to calculate the delay ( packet trip time)
@@ -34,7 +34,12 @@ class RTPServer(DatagramProtocol):
         #looping call check sync
         self.releaser = task.LoopingCall(self.check_sync)
         self.sendTime = task.LoopingCall(self.send_local_time)
-        
+        self.nbNotes = 0
+
+        #tmp
+        self.lastMidiNoteTime = 0
+
+    #self.start_receiving()
 
     def launch(self):
         self.releaser.start(1)
@@ -115,13 +120,14 @@ class RTPServer(DatagramProtocol):
     def datagramReceived(self, data, (host, port)):
         """Receiving datagram
 	"""
-
+        
         #si c est la premiere connection ( a changer )
         if ( not self.clientConnect ):
             self.clientConnect = 1
             self.launch()
+            
 
-	if self.actualSeqNo == 30000:
+	if self.actualSeqNo == 32767:
             self.actualSeqNo = 1
 
             #on set les address du serveur afin de renvoyer certain packet
@@ -157,10 +163,11 @@ class RTPServer(DatagramProtocol):
 
             else:
                 #if listening
-                if ( self.midiOut.publy.running ):
+                if ( not self.midiOut.MidiOut is None):
                     #enable witness
+                    
                     self.receivingMidiData = 1
-
+                    self.nbNotes += 1
                     #unpickle list midi note in the packet               
                     midiNote = cPickle.loads(midiChunk)
                     
@@ -170,6 +177,7 @@ class RTPServer(DatagramProtocol):
 
                     #disable witness
                     self.receivingMidiData = 0
+                    self.midiOut.publy_midi_note()
     
 
     def ask_packet(self,seqNo):
@@ -245,7 +253,6 @@ class RTPServer(DatagramProtocol):
             #check if there is no loose of packet last one receive
             if (int(self.actualSeqNo) != int(no[0])):
                 #on redemande les paquets perdu
-                print str(self.actualSeqNo) + " cmpm to " + str(no[0])
                 self.actualSeqNo = no[0]
                 self.ask_packet(no[0])
                 

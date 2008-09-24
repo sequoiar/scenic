@@ -17,7 +17,7 @@ class RTPClient(DatagramProtocol):
         
         #Init var
         self.sock = None
-        self.seqNo = 0
+        self.seqNo = 32767
         self.peerAddress = peerAddress
         self.port = port
         self.startChrono = []
@@ -71,7 +71,7 @@ class RTPClient(DatagramProtocol):
             	if ( not self.sync ):
                     log.info( "INPUT: client sync" )
                     self.sync = 1
-                    self.start_streaming()
+                    #self.start_streaming()
 
             else:
             	#Sinon cest une demande de paquet perdu
@@ -92,60 +92,58 @@ class RTPClient(DatagramProtocol):
         if ( not self.releaser.running ):
 			#check sync to start streaminglog
 			if (self.sync):
-				self.releaser.start(0.001)
+				self.releaser.start(0.2)
 				return 0
 			else:
 				log.error("INPUT: can't start streaming if not sync with the server")
 				return -1			
+
+    def send_midi_data(self):
+        #Enable witness
+        self.sendingMidiData = 1
+
+        #getting new notes to send
+        c = self.midiInCmdList.get()
+        #time = c[0].time
+
+        #marshalling
+        chunk = cPickle.dumps(c,1)
+                
+        #Creating header
+        header = self.generateRTPHeader(0)
+
+        #saving packet
+        pack = packetTime(self.seqNo, chunk)
+        self.packetsSentList.to_list(pack)
+                
+        #Writting it to the socket
+        chunk = header + chunk
+            
+        if ( self.sync ):
+            self.transport.write(chunk,(self.peerAddress, self.port))
+
+        #disable witness
+        self.sendingMidiData = 0
+
 
 
     def continue_streaming(self):
         """startStreaming launch streaming of midi notes to client
         """
 
-        #si il y a des notes a envoyer on envoie
-        if (self.midiInCmdList.avail_for_get() > 0):
-            
-            #Enable witness
-            self.sendingMidiData = 1
-
-            #getting new notes to send
-            c = self.midiInCmdList.get()
-            #time = c[0].time
-
-            #marshalling
-            chunk = cPickle.dumps(c,1)
-                
-            #Creating header
-            header = self.generateRTPHeader(0)
-
-            #saving packet
-            pack = packetTime(self.seqNo, chunk)
-            self.packetsSentList.to_list(pack)
-                
-            #Writting it to the socket
-            chunk = header + chunk
-            
-            if ( self.sync ):
-                    self.transport.write(chunk,(self.peerAddress, self.port))
-
-            #disable witness
-            self.sendingMidiData = 0
-    
-        else:
-
-            #sinon on envoie un packet vide
-            header = self.generateRTPHeader(0)
-            chunk = "000"
-            pack = packetTime(self.seqNo, chunk)
-            self.packetsSentList.to_list(pack)
-            chunk = header + chunk
-            self.transport.write(chunk,(self.peerAddress, self.port))
+        #sinon on envoie un packet vide
+        header = self.generateRTPHeader(0)
+        chunk = "000"
+        pack = packetTime(self.seqNo, chunk)
+        self.packetsSentList.to_list(pack)
+        chunk = header + chunk
+        self.transport.write(chunk,(self.peerAddress, self.port))
 
 
     def send_midi_time(self, time):
         """Send midi time to remote peer
         """
+        
         header = self.generateRTPHeader(0)
         chunk = "m " + str(time)
         chunk = header + chunk
@@ -172,7 +170,7 @@ class RTPClient(DatagramProtocol):
             # No mark bit set for subsequent packets
             header = '\x80\x0E'
 
-        if self.seqNo == 30000:
+        if self.seqNo == 32767:
             self.seqNo = 1
         else:  
             self.seqNo += 1 # First packet is #1
