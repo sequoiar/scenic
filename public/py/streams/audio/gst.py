@@ -26,7 +26,7 @@ from streams.stream import AudioStream, Stream
 from streams.gst_client import GstClient
 from utils import log
 
-log = log.start('info', 1, 0, 'audioGst')
+log = log.start('debug', 1, 0, 'audioGst')
 
 class AudioGst(AudioStream, GstClient):
     """Class streams->audio->gst.AudioGst
@@ -43,12 +43,16 @@ class AudioGst(AudioStream, GstClient):
             port = setting['port_r']
             address = setting['addr_r']
         GstClient.__init__(self, port, address)
+        self._chan = None
             
     def get_attr(self, name):
         """        
         name: string
         """
         return getattr(self, name)
+    
+    def get_attrs(self):
+        return [(attr, value) for attr, value in self.__dict__.items() if attr[0] != "_"]
     
     def set_attr(self, name, value):
         """
@@ -60,11 +64,12 @@ class AudioGst(AudioStream, GstClient):
             return True, name, value
         return False, name, value
     
-    def start_sending(self, address):
+    def start_sending(self, address, channel):
         """function start_sending
         address: string
         """
-        attrs = [(attr, value) for attr, value in self.__dict__.items() if attr[0] != "_"]
+        self._chan = channel
+        attrs = self.get_attrs()
         self._send_cmd('start_audio', self.sending_started, ('address', address), *attrs)
         
     def sending_started(self, caps):
@@ -73,9 +78,9 @@ class AudioGst(AudioStream, GstClient):
             self._core.notify(None, caps, 'audio_sending_started')
         else:
             self._core.notify(None, 1, 'audio_sending_started')
-            log.info('SHOULD SEND CAPS VIA TCP HERE!')
-#            self._core.connections.send_msg('audio_caps', caps)
-   
+            log.debug('SHOULD SEND CAPS VIA TCP HERE!')
+            self._chan.callRemote('AudioGst.caps', caps)
+            
     def stop_sending(self):
         """function stop_sending
         """
@@ -85,13 +90,23 @@ class AudioGst(AudioStream, GstClient):
         self._del_callback()
         self._core.notify(None, state, 'audio_sending_stopped')
    
-    def start_receving(self):
+    def start_receving(self, channel):
         """function start_receving
-        
-        returns 
         """
-        return None # should raise NotImplementedError()
+        self._chan = channel
+        self._chan.add(self.caps)
     
+    def caps(self, caps):
+        self._chan.delete(self.caps)
+        attrs = self.get_attrs()
+        self._send_cmd('start_audio', None, ('caps', caps), *attrs)
+   
+    def receiving_started(self, answer):
+        log.info('Return value after sending caps: %s.' % answer)
+        self._del_callback()
+        if answer:
+            self._core.notify(None, 1, 'audio_receiving_started')
+            
     def stop_receving(self):
         """function stop_receving
         

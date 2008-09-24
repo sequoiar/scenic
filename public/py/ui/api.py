@@ -56,8 +56,8 @@ class ControllerApi(object):
         
     ### Streams ###
     
-    def start_streams(self, caller, address):
-        self.notify(caller, self.streams.start(address))
+    def start_streams(self, caller, address, channel=None):
+        self.notify(caller, self.streams.start(address, channel))
 
     def stop_streams(self, caller):
         self.notify(caller, self.streams.stop())

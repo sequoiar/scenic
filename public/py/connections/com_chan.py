@@ -20,7 +20,8 @@
 
 
 # System imports
-from types import FunctionType
+#from types import FunctionType
+from inspect import ismethod, isfunction
 
 # Twisted imports
 from twisted.internet import reactor
@@ -57,6 +58,8 @@ class ComChannel(pb.Root):
     def callRemote(self, *args):
         if self.remote:
             self.remote.callRemote('main', *args)
+        else:
+            log.debug('No remote')
             
     def add(self, cmd, name=None):
         if not name:
@@ -67,8 +70,8 @@ class ComChannel(pb.Root):
             log.debug('A method with this name %s is already registered.' % name)
         
     def delete(self, name):
-        if isinstance(name, FunctionType):
-            name = cmd.im_class.__name__ + '.' + cmd.__name__
+        if ismethod(name):
+            name = name.im_class.__name__ + '.' + name.__name__
         if name in self.methods:
             del self.methods[name]
         else:

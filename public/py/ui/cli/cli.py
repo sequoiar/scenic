@@ -301,7 +301,6 @@ class CliController(TelnetServer):
         elif options.select:
             self.core.select_streams(self, options.select)
         elif [opt for opt in options.__dict__.values() if opt != None]:
-            print 'Allo', options.mode
             if options.container:
                 self.core.set_streams(self, 'container', options.container)
             if options.port:
