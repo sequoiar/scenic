@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 # Sropulpof
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -19,14 +18,19 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 # App imports
-from protocols import osc_protocols
-from streams import stream
+#from protocols import osc_protocols
+#from streams import stream
 
 #Midi Import
+
+#from twisted.internet import cfreactor
+#cfreactor.install()
+
+from twisted.internet import reactor
 import pypm
 from midiIn import MidiIn
 from RTPServer import RTPServer
-from twisted.internet import reactor
+#epollreactor.install()
 
 #Log import
 from utils import log
@@ -36,7 +40,8 @@ import re
 
 #log = log.start('info', 1, 0, 'midiStream')
 
-class MidiStream(stream.DataStream):
+#class MidiStream(stream.DataStream):
+class MidiStream():
     """Class MIDI
     """
     
@@ -62,7 +67,7 @@ class MidiStream(stream.DataStream):
         #witness for sending data is in self.midiIn.sendingMidiData
         self.midiIn = MidiIn(self.address,44000)
 
-        reactor.run()
+        #reactor.run()
 
 
     def set_ip(self,address):
@@ -104,6 +109,7 @@ class MidiStream(stream.DataStream):
         returns 0 if can start sending else -1
         """
         res = self.midiIn.start_sending()
+        log.info('Sending notes has been started')
         return res
     
 
@@ -140,6 +146,7 @@ class MidiStream(stream.DataStream):
         returns 0 if started else -1
         """
         res = self.server.start_receiving()
+        log.info('Receiving notes has been started')
         return res
 
     
@@ -186,13 +193,31 @@ class MidiStream(stream.DataStream):
 
         del self.server
         del self.midiIn
-		
+        del self.address
+	print 'pypm terminate'	
         #Ending pyport midi
         pypm.Terminate()	
 
 
 
+if __name__ == "__main__":
+    midi = MidiStream()
 
+    #launching task 
+    #midi.midiIn.sendTime.start(0.5)
+    #midi.midiIn.client.checker.start(1)
+
+    print midi.get_input_devices()
+    midi.set_input_device(1)
+    print midi.get_output_devices()
+    midi.set_output_device(8)
+
+    #while(midi.get_client_sync_witness() != 1): pass
+
+    reactor.callLater(2,midi.start_receving)
+
+    reactor.callLater(2,midi.start_sending)
   
 
     
+    reactor.run()

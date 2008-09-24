@@ -1,6 +1,5 @@
 import pypm
 from twisted.internet import protocol, reactor, task
-
 from utils import log
 import time
 from midiObject import MidiNote
@@ -50,7 +49,7 @@ class MidiIn():
     def start_sending(self):
         if (not self.releaser.running):
             if ( not (self.MidiIn is None) ):
-                self.releaser.start(0.001)
+                self.releaser.start(0.003)
                 res = self.client.start_streaming()
                 return res
             else:
@@ -61,6 +60,7 @@ class MidiIn():
     def get_devices(self):
 	"""Print midi input device list
 	"""
+        print str(pypm.GetDefaultInputDeviceID())
         self.midiDeviceList = []
         for loop in range(pypm.CountDevices()):
             interf, name, inp, outp, opened = pypm.GetDeviceInfo(loop)
@@ -87,6 +87,7 @@ class MidiIn():
                 self.MidiIn = pypm.Input(self.midiDevice)
             else:
                 #delete old midi device
+                pypm.Close(self.MidiIn)
                 del self.MidiIn
                 #Initializing new midi input stream
                 self.MidiIn = pypm.Input(self.midiDevice)
@@ -102,6 +103,7 @@ class MidiIn():
         self.intervalTimeUpdate += 1
         
         if self.MidiIn.Poll():
+            
             currentTime = pypm.Time()
             self.client.startChrono.append(time.time())
             #Reading Midi Input
@@ -111,13 +113,15 @@ class MidiIn():
                 note = MidiNote(currentTime,MidiData[i][0][0], MidiData[i][0][1], MidiData[i][0][2], MidiData[i][0][3])
                 #Adding the note to the buffer
                 self.client.midiInCmdList.put(note)
-                    
+            
+            self.client.send_midi_data()         
 
 
     def send_midi_time(self):
         """send midi time to the remote peer in order to syncronise midi event
 		"""
         self.client.send_midi_time(pypm.Time())
+        
                     
 
     def __del__(self):
