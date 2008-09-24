@@ -29,7 +29,7 @@ from twisted.protocols.basic import LineReceiver
 # App imports
 from utils import log
 
-log = log.start('debug', 1, 0, 'icpc')
+log = log.start('info', 1, 0, 'icpc')
 
 
 class IPCP(LineReceiver):
@@ -83,7 +83,7 @@ class IPCP(LineReceiver):
     
     def send_cmd(self, cmd, *args):
         line = []
-        line.append(cmd)
+        line.append(cmd + ":")
         for arg in args:
             if isinstance(arg, tuple):
                 parg = self._process_arg(arg[1])

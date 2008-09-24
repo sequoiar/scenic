@@ -45,12 +45,12 @@ class Streams(object):
             if dict_name in self.streams:
                 return 0
             else:
-#                try:
-                mod = core.engines['streams.%s.%s' % (kind, engine)].load()
-                self.streams[dict_name] = mod.start(core)
-                return 1
-#                except:
-#                    return -1
+                try:
+                    mod = core.engines['streams.%s.%s' % (kind, engine)].load()
+                    self.streams[dict_name] = mod.start(core)
+                    return 1
+                except:
+                    return -1
         else:
             return -1
 
@@ -112,7 +112,7 @@ class Streams(object):
     
     
     
-    def start(self, address='127.0.0.1'):
+    def start(self, address='127.0.0.1', channel=None):
         """
         Start all the sub-streams.
                 
@@ -121,12 +121,12 @@ class Streams(object):
         if address:
             self.mode = 'send'
             for stream in self.streams.values():
-                stream.start_sending(address)
+                stream.start_sending(address, channel)
             return 'Starting sending...'
         else:
             self.mode = 'receive'
             for stream in self.streams.values():
-                stream.start_receving()
+                stream.start_receving(channel)
             return 'Starting receving...'
         
     

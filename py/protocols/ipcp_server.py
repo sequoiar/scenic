@@ -23,17 +23,27 @@
 from twisted.internet import reactor, protocol
 from twisted.protocols.basic import LineReceiver
 
+from random import randint
+
 
 class IPCP(LineReceiver):
     
     def lineReceived(self, line):
         print "Client: " + line
-#        self.sendLine('sending_started "ogg"')
+        args = line.split()
+        cmd = args[0][:-1]
+        if cmd == 'start_audio':
+            self.sendLine('AudioGst/sending_started "%s"' % self.get_caps().replace('\\', '\\\\') \
+                                         .replace("'", "\\'") \
+                                         .replace('"', '\\"'))
 
     def connectionMade(self):
         print "A client is connecting!"
 #        self.sendLine(r'You "are conn\"ected!" 56 45.33')
         
+    def get_caps(self):
+        caps = [chr(randint(1,127)) for i in range(512)]
+        return ''.join(caps)
         
 if __name__ == "__main__":
 

@@ -63,21 +63,21 @@ class BasicServer(LineReceiver):
         self.transport.loseConnection()
         
     def accept(self):
-        self.chan = com_chan.listen(78347)
+        self.chan = com_chan.listen(37054)
         self.chan.add(self.settings)
         self.sendLine('ACCEPT')
         self.transport.loseConnection()
         
     def settings(self, data):
-        print data
         self.api.select_streams(self, 'receive')
         for kind, stream in data.items():
             name = stream.pop('name') + '.rem'
             engine = stream.pop('engine')
             self.api.add_stream(self, name, kind, engine)
             for attr, value in stream.items():
-                print attr, value
                 self.api.set_stream(self, name, kind, attr, value)
+                
+        self.api.start_streams(self, None, self.chan)
         
 
 
@@ -89,16 +89,20 @@ class BasicClient(LineReceiver):
         
     def lineReceived(self, line):
         log.debug('Line received from %s:%s: %s' % (self.addr.host, self.addr.port, line))
+
         if line == "ASK":
             self.notify(self, self.addr, 'ask')
         #        elif line == "STOP":
+        
         elif line == "ACCEPT":
             self.notify(self, '\nThe invitation to %s:%s was accepted.' % (self.addr.host, self.addr.port), 'info')
-            self.chan = com_chan.connect(self.addr.host, 78347)
+            self.chan = com_chan.connect(self.addr.host, 37054)
             self.send_settings()
+#            self.api.start_streams(self, self.addr.host, self.chan)
             
         elif line == "REFUSE":
             self.notify(self, '\nThe invitation to %s:%s was refuse.' % (self.addr.host, self.addr.port), 'info')
+
         else:
             log.info('Bad command receive from remote')
 
@@ -121,6 +125,7 @@ class BasicClient(LineReceiver):
                 settings[kind] = params
                     
             self.chan.callRemote('BasicServer.settings', settings)
+            self.api.start_streams(self, self.addr.host, self.chan)
             
     def connectionMade(self):
         if not self.api:

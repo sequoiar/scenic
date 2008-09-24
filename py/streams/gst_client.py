@@ -26,7 +26,7 @@ from protocols import ipcp
 from streams.stream import AudioStream, Stream
 from utils import log, get_def_name
 
-log = log.start('info', 1, 0, 'gstClient')
+log = log.start('debug', 1, 0, 'gstClient')
 
 
 class GstClient(object):    
@@ -61,11 +61,12 @@ class GstClient(object):
 #        self.connect()
 
     def _send_cmd(self, cmd, callback=None, *args):
-        if not Stream.gst_state:
+        if not hasattr(Stream, 'gst_state') or not Stream.gst_state:
             self.connect()  # Should add verification if the GST process is running
             reactor.callLater(0.5, self._send_cmd, cmd, *args)
         else:
             if callback:
+                log.debug('Callback: %s' % callback)
                 Stream.gst.add_callback(callback)
             Stream.gst.send_cmd(cmd, *args)
 
