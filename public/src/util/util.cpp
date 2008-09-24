@@ -110,7 +110,17 @@ std::string logLevelStr(LogLevel level)
     }
 }
 
+static LogFunctor emptyLogFunctor;
+static LogFunctor* lf = &emptyLogFunctor;
 
+void register_cb(LogFunctor* f)
+{
+    lf = f;
+}
+void release_cb()
+{
+    lf = &emptyLogFunctor;
+}
 
 bool logLevelMatch(LogLevel level)
 {
@@ -143,6 +153,8 @@ void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileN
                 const std::string &functionName, const int lineNum)
 {
     std::string err = log_(msg,level,fileName,functionName,lineNum);
+
+    lf->cb(level,err);
     
     if(level < ERROR){
         std::cerr << err;
