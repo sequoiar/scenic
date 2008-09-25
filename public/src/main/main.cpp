@@ -132,6 +132,6 @@ int main (int argc, char** argv)
             std::cerr << "2ND E:" <<e.msg_ <<std::endl;
     }
 
-
+    return 0;
 }
 
