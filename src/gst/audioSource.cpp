@@ -24,6 +24,7 @@
 #include "audioSource.h"
 #include "audioConfig.h"
 #include "jackUtils.h"
+#include "raw1394Util.h"
 #include "pipeline.h"
 
 
@@ -248,6 +249,9 @@ AudioDvSource::~AudioDvSource()
 
 void AudioDvSource::init_source()
 {
+    if (!Raw1394::cameraIsReady())
+        LOG_ERROR("Camera is not ready.");
+
     sources_.push_back(pipeline_.findElement(config_.source()));  // see if it already exists from VideoDvSource
     dvIsNew_ = sources_[0] == NULL;
 
