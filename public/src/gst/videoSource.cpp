@@ -20,8 +20,8 @@
 #include <string>
 #include <cassert>
 #include <fstream>
-#include <libraw1394/raw1394.h>
 #include <gst/gst.h>
+#include "raw1394Util.h"
 #include "gstLinkable.h"
 #include "videoSource.h"
 #include "pipeline.h"
@@ -182,12 +182,9 @@ VideoDvSource::~VideoDvSource()
 
 bool VideoDvSource::init()
 {
-    raw1394handle_t handle;
-    if (!(handle = raw1394_new_handle()))
-        LOG_ERROR("Could not get raw1394 handle, check camera.");
-    raw1394_destroy_handle(handle);
+    if (!Raw1394::cameraIsReady())
+        LOG_ERROR("Camera is not ready");
 
-    
     source_ = pipeline_.findElement(config_.source());
     dvIsNew_ = source_ == NULL;
     if (dvIsNew_)
