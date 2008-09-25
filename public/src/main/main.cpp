@@ -110,7 +110,7 @@ int main (int argc, char** argv)
     }
     catch(std::string err)
     {
-        std::cerr << "GOING DOWN " << err;
+        std::cerr << "Does it change? " << err;
     }
     
     try
