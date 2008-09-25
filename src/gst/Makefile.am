@@ -11,4 +11,4 @@ libgst_a_SOURCES = mediaBase.cpp \
 				   videoReceiver.cpp videoSender.cpp videoSource.cpp videoLocal.cpp
 
 
-libgst_a_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS)
+libgst_a_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) 

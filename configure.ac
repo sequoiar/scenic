@@ -84,6 +84,12 @@ if test "x${have_jack}" = "xfalse" ; then
     AC_MSG_ERROR([missing pkg -  libjack0 and/or libjack-dev])
 fi
 
+#Trying to set LIBAVC1394 using pkg-config
+PKG_CHECK_MODULES(LIBAVC1394, [libavc1394], have_libavc1394=true, have_libavc1394=false)
+if test "x${have_libavc1394}" = "xfalse" ; then
+	AC_MSG_ERROR([missing pkg - libavc1394 ])
+fi
+
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
 #AC_SUBST(ALL_GST_LIBS)
 
