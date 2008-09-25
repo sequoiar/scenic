@@ -89,12 +89,15 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
         GET(msg, "codec", std::string, codec_str);
         GET(msg, "port", int, port);
         GET(msg, "channels", int, chan);
+        GET(msg, "caps", std::string, caps_str);
+
         AudioReceiverConfig config("jackaudiosink");
         ReceiverConfig rConfig(codec_str, get_host_ip(), port);
         if(!config.sanityCheck())
             return false;
         areceiver_ = new AudioReceiver(config, rConfig);
         areceiver_->init();
+        areceiver_->set_caps(caps_str.c_str());
         areceiver_->start();
         return true;
     }
