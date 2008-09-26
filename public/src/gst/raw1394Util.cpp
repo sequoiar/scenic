@@ -30,8 +30,7 @@
 
 /** Open the raw1394 device and get a handle.
  *  
- * \param port A 0-based number indicating which host adapter to use.
- * \return a raw1394 handle.
+ * \return number of ports found
  */
 
 int Raw1394::raw1394_get_num_ports()
