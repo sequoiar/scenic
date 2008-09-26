@@ -31,10 +31,13 @@ GstReceiverThread::~GstReceiverThread()
 
 bool GstReceiverThread::video_stop(MapMsg& /*msg*/)
 {
-    if(vreceiver_)
-        vreceiver_->stop();
-    else
+    if(!vreceiver_)
         return false;
+
+    vreceiver_->stop();
+    delete (vreceiver_);
+    vreceiver_ = 0;
+
     return true;
 }
 
