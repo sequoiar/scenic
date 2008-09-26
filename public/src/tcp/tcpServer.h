@@ -30,6 +30,10 @@
 
 #define BUFFSIZE     16
 
+/**
+ * The tcp server class 
+ *
+ */
 class TcpServer
 {
     public:
