@@ -44,14 +44,12 @@ int Raw1394::raw1394_get_num_ports()
 	if (!(handle = raw1394_new_handle()))
 	{
 		LOG_ERROR("raw1394 - failed to get handle: " << strerror(errno) << "." << std::endl);
-        return -1;
 	}
 
 	if ((n_ports = raw1394_get_port_info(handle, pinf, 16)) < 0)
 	{
-		LOG_ERROR("raw1394 - failed to get port info: " << strerror(errno) << "." << std::endl);
 		raw1394_destroy_handle(handle);
-		return -1;
+		LOG_ERROR("raw1394 - failed to get port info: " << strerror(errno) << "." << std::endl);
 	}
 	raw1394_destroy_handle(handle);
 
@@ -82,30 +80,24 @@ raw1394handle_t Raw1394::raw1394_open(int port)
 	if (!handle)
 	{
 		LOG_ERROR("raw1394 - failed to get handle: " << strerror(errno) << "." << std::endl);
-        return handle;
 	}
 
 	if (( n_ports = raw1394_get_port_info( handle, pinf, 16 )) < 0 )
 	{
-		LOG_ERROR("raw1394 - failed to get port info: " <<  strerror(errno) << "." << std::endl);
 		raw1394_destroy_handle(handle);
-        return handle;
+		LOG_ERROR("raw1394 - failed to get port info: " <<  strerror(errno) << "." << std::endl);
 	}
 
 	/* tell raw1394 which host adapter to use */
 	if (raw1394_set_port(handle, port) < 0)
 	{
+		raw1394_destroy_handle(handle);
 		LOG_ERROR("raw1394 - failed to set set port: " <<  strerror(errno) << "." << std::endl);
-        return handle;
 	}
 
 	return handle;
 }
 
-void Raw1394::raw1394_close(raw1394handle_t handle)
-{
-	raw1394_destroy_handle(handle);
-}
 
 int Raw1394::discoverAVC(int* port, octlet_t* guid)
 {
@@ -162,7 +154,7 @@ int Raw1394::discoverAVC(int* port, octlet_t* guid)
 				rom1394_free_directory(&rom_dir);
 			}
 		}
-		raw1394_close(handle);
+	    raw1394_destroy_handle(handle);
 	}
 
 	return device;

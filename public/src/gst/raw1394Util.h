@@ -28,7 +28,6 @@ namespace Raw1394
 
 	int raw1394_get_num_ports();
 	raw1394handle_t raw1394_open( int port );
-	void raw1394_close( raw1394handle_t handle );
 	int discoverAVC( int * port, octlet_t* guid );
     bool cameraIsReady();
 }
