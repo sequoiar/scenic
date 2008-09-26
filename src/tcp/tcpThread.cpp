@@ -65,7 +65,7 @@ int TcpThread::main()
                 if(serv_.recv(msg))
                 {
                     MapMsg mapMsg;
-                    if(tokenize(msg, mapMsg))
+                    if(Parser::tokenize(msg, mapMsg))
                         queue_.push(mapMsg);
                     else
                         LOG_WARNING("Bad Msg Received.");
@@ -106,7 +106,7 @@ bool TcpThread::send(MapMsg& msg)
 {
     std::string msg_str;
     hold_cb(); // to insure no recursive calls due to log message calling send 
-    stringify(msg, msg_str);
+    Parser::stringify(msg, msg_str);
     bool ret = serv_.send(msg_str);
     release_cb();
     return ret;
@@ -115,7 +115,7 @@ bool TcpThread::send(MapMsg& msg)
 bool TcpThread::socket_connect_send(const std::string& addr, const MapMsg& msg)
 {
     std::string msg_str;
-    stringify(msg, msg_str);
+    Parser::stringify(msg, msg_str);
     LOG_DEBUG(msg_str);
     return serv_.socket_connect_send(addr,msg_str);
 

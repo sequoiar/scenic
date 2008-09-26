@@ -29,8 +29,10 @@
 #include "logWriter.h"
 #include "mapMsg.h"
 
+using namespace Parser;
 
-std::string strEsq(const std::string& str)
+
+std::string Parser::strEsq(const std::string& str)
 {
     std::string out;
 
@@ -96,7 +98,7 @@ static int get_end_of_quoted_string(const std::string& str)
 }
 
 
-bool stringify(const MapMsg& cmd_map, std::string& str)
+bool Parser::stringify(const MapMsg& cmd_map, std::string& str)
 {
     typedef std::map<std::string, StrIntFloat>::const_iterator iter;
     str.clear();
@@ -168,7 +170,7 @@ bool stringify(const MapMsg& cmd_map, std::string& str)
 }
 
 
-bool tokenize(const std::string& str, MapMsg &cmd_map)
+bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
 {
     unsigned int i;
     const char *cstr = str.c_str();

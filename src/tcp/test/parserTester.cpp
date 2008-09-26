@@ -44,10 +44,10 @@ void ParserTester::roundtrip_test()
 //    std::string str = "init: it=103945 mystring=\"\\\"bar you\\\"\" Hellotab=1.1";
 
     std::map<std::string, StrIntFloat> mymap;
-    TEST_ASSERT(tokenize(arg, mymap));
+    TEST_ASSERT(Parser::tokenize(arg, mymap));
 
     std::string out;
-    TEST_ASSERT(stringify(mymap, out));
+    TEST_ASSERT(Parser::stringify(mymap, out));
     LOG_DEBUG(out);
 
 
