@@ -64,9 +64,9 @@ bool MainModule::run()
     QueuePair &tcp_queue = tcpThread_.getQueue();
 
     if(gstThread_ == 0 || !gstThread_->run())
-        LOG_ERROR("GstThread not running");
+        THROW_ERROR("GstThread not running");
     if(!tcpThread_.run())
-        LOG_ERROR("TcpThread not running");
+        THROW_ERROR("TcpThread not running");
 
     while(true)
     {
@@ -101,12 +101,11 @@ int main (int argc, char** argv)
     try
     {
         if(argc != 3)
-            LOG_CRITICAL( "Invalid command line arguments -- 0/1 for receive/send and a port");
+            THROW_CRITICAL("Invalid command line arguments -- 0/1 for receive/send and a port");
         if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
-            LOG_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
+            THROW_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
         if(sscanf(argv[2], "%d", &port) != 1 || port < 1024 || port > 65000)
-            LOG_CRITICAL(
-                "Invalid command line arguments -- Port must be in the range of 1024-65000");
+            THROW_CRITICAL("Invalid command line arguments -- Port must be in the range of 1024-65000");
     }
     catch(std::string err)
     {

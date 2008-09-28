@@ -78,7 +78,7 @@ template < class T >
 void QueuePair_< T >::flip(QueuePair_< T > &in)
 {
     if(destroyQueues_)
-        LOG_CRITICAL("QueuePair::flip called on QueuePair that owns queues i.e. init/flip mutually exclusive.");
+        THROW_CRITICAL("QueuePair::flip called on QueuePair that owns queues i.e. init/flip mutually exclusive.");
 
     second_ = in.first_;
     first_ = in.second_;
@@ -146,7 +146,7 @@ template < class T >
 void QueuePair_ < T >::init()
 {
     if (first_ != 0 || second_ != 0)
-        LOG_CRITICAL("CALLED QueuePair::init() on non empty QueuePair. QueuePair::flip was probably called.");
+        THROW_CRITICAL("CALLED QueuePair::init() on non empty QueuePair. QueuePair::flip was probably called.");
 
     first_ = g_async_queue_new();
     second_ = g_async_queue_new();

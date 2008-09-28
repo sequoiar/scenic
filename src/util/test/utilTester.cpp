@@ -3,7 +3,7 @@
 
 int main(int, char**)
 {
-    LOG("hello",ERROR);
+    THROW_ERROR("hello");
     assert(1);
     assert(0);
 

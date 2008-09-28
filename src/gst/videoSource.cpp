@@ -116,7 +116,7 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
 {
     if (gst_pad_is_linked(srcPad))
     {
-        LOG("Pad is already linked.", DEBUG);
+        LOG_DEBUG("Pad is already linked.");
         return;
     }
     VideoFileSource *context = static_cast<VideoFileSource*>(data);
@@ -158,7 +158,7 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
     }
     gst_caps_unref(caps);
 
-    LOG("VideoFileSource: linking new srcpad and sinkpad.", DEBUG);
+    LOG_DEBUG("VideoFileSource: linking new srcpad and sinkpad.");
     assert(GstLinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
@@ -183,7 +183,7 @@ VideoDvSource::~VideoDvSource()
 bool VideoDvSource::init()
 {
     if (!Raw1394::cameraIsReady())
-        LOG_ERROR("Camera is not ready");
+        THROW_ERROR("Camera is not ready");
 
     source_ = pipeline_.findElement(config_.source());
     dvIsNew_ = source_ == NULL;
@@ -230,15 +230,15 @@ void VideoDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
 {
     if (std::string("audio") == gst_pad_get_name(srcPad))
     {
-        LOG("Ignoring audio stream from DV", DEBUG);
+        LOG_DEBUG("Ignoring audio stream from DV");
         return;
     }
     else if (std::string("video") == gst_pad_get_name(srcPad))
     {
-        LOG("Got video stream from DV", DEBUG);
+        LOG_DEBUG("Got video stream from DV");
     }
     else{
-        LOG("Ignoring unknown stream from DV", DEBUG);
+        LOG_DEBUG("Ignoring unknown stream from DV");
         return;
     }
     GstElement *sinkElement = static_cast<GstElement *>(data);
@@ -251,7 +251,7 @@ void VideoDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
         g_object_unref(sinkPad);        // don't link more than once
         return;
     }
-    LOG("VideoDvSource: linking new srcpad to sinkpad.", DEBUG);
+    LOG_DEBUG("VideoDvSource: linking new srcpad to sinkpad.");
     assert(GstLinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
@@ -261,7 +261,7 @@ void VideoV4lSource::sub_init()
     std::fstream in;
     in.open("/dev/video0", std::fstream::in);
     if (in.fail())
-        LOG_ERROR("Video4Linux device /dev/video0 not found");
+        THROW_ERROR("Video4Linux device /dev/video0 not found");
     in.close();
 }
 

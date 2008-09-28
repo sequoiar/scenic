@@ -68,7 +68,7 @@ bool VideoSender::start()
 {
     GstBase::start();
     pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
-    LOG("Sending video to remote receiver", DEBUG);
+    LOG_INFO("Sending video to remote receiver.");
     return true;
 }
 

@@ -43,7 +43,7 @@ std::string AudioSink::getCaps()
 bool AudioJackSink::init()
 {
     if (!Jack::is_running())
-        LOG("Jack is not running", CRITICAL);
+        THROW_CRITICAL("Jack is not running");
 
     assert(sink_ = gst_element_factory_make("jackaudiosink", NULL));
     g_object_set(G_OBJECT(sink_), "connect", 1, NULL);
@@ -57,7 +57,7 @@ bool AudioJackSink::init()
 bool AudioAlsaSink::init()
 {
     if (Jack::is_running())
-        LOG("Jack is running, stop jack server", CRITICAL);
+        THROW_CRITICAL("Jack is running, stop jack server");
 
     assert(sink_ = gst_element_factory_make("alsasink", NULL));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);

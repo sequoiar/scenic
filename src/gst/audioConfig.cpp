@@ -65,11 +65,9 @@ AudioSource* AudioConfig::createSource() const
         return new AudioJackSource(*this);
     else if (source_ == "dv1394src")
         return new AudioDvSource(*this);
-    else {
-        LOG(source_, ERROR);
-        LOG("is an invalid source", ERROR);
-        return 0;
-    }
+    else 
+        THROW_ERROR(source_ << " is an invalid source");
+    return 0;
 }
 
 // FIXME: should be paramaterized by sink, not src
@@ -77,65 +75,43 @@ AudioSink* AudioConfig::createSink() const
 {
     if (source_ == "alsasrc")
         return new AudioAlsaSink();
-    else if (source_ == "jackaudiosrc")
-        return new AudioJackSink();
-    else if (source_ == "dv1394src")
-        return new AudioJackSink();
-    else if (source_ == "audiotestsrc")
-        return new AudioJackSink();
-    else if (source_ == "filesrc")
-        return new AudioJackSink();
-    else if (source_.empty()) 
-        return new AudioJackSink();
-    else
-    {
-        LOG(source_, ERROR);
-        LOG("is an invalid sink, using default jackaudiosink", ERROR);
-        return new AudioJackSink();
-    }
+    if ((!source_.empty()) && 
+            (source_ != "jackaudiosrc") && 
+            (source_ != "dv1394src") && 
+            (source_ != "audiotestsrc") && 
+            (source_ != "filesrc"))
+        LOG_WARNING(source_ << " is an invalid sink, using default jackaudiosink");
+    return new AudioJackSink();
 }
 
 
 bool AudioConfig::sanityCheck() const   // FIXME: this should become more or less redundant
 {
-    bool validNumChannels = true;
-
     if(numChannels_ < 1 || numChannels_ > 8)
-    {
-        LOG("Invalid number of channels",CRITICAL);
-        validNumChannels = false;
-    }
+        THROW_CRITICAL("Invalid number of channels");
 
-    return validNumChannels;
+    return true;
 }
 
 
 const char* AudioConfig::location() const
 {
-    if (!location_.empty())
-        return location_.c_str();
-    else {
-        LOG("No location specified", ERROR);
-        return NULL;
-    }
+    if (location_.empty())
+        THROW_ERROR("No location specified");
+        
+    return location_.c_str();
 }
 
 bool AudioConfig::fileExists() const
 {
     if (location_.empty())
-    {
-        LOG("No file location given", ERROR);
-        return false;
-    }
+        THROW_ERROR("No file location given");
 
     std::fstream in;
     in.open(location(), std::fstream::in);
 
     if (in.fail())
-    {
-        LOG_ERROR("File does not exist and/or is not readable.");
-        return false;
-    }
+        THROW_ERROR("File does not exist and/or is not readable.");
 
     in.close();
     return true;
@@ -150,13 +126,12 @@ AudioSink* AudioReceiverConfig::createSink() const
         return new AudioAlsaSink();
     else if (sink_.empty()) 
     {
-        std::cout << "No sink specified, using default jackaudiosink";
+        LOG_WARNING("No sink specified, using default jackaudiosink");
         return new AudioJackSink();
     }
     else
     {
-        LOG(sink_, ERROR);
-        LOG("is an invalid sink, using default jackaudiosink", ERROR);
+        LOG_WARNING(sink_ << " is an invalid sink, using default jackaudiosink");
         return new AudioJackSink();
     }
 }

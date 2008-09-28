@@ -109,7 +109,8 @@ bool BaseThread < T >::run()
 
     if (th_)  //BaseThread running
     {
-        usleep(1); // Insure thread started or g_thread_join returns before thread starts
+        usleep(1); // Insure thread started or g_thread_join 
+                    //returns before this thread starts
         return true;
     }
     return false;
@@ -119,7 +120,9 @@ bool BaseThread < T >::run()
 template < class T >
 void *BaseThread < T >::thread_main(void *pThreadObj)
 {
-    return reinterpret_cast<void *>(static_cast < BaseThread * >(pThreadObj)->main());
+    return reinterpret_cast<void *>(
+            static_cast < BaseThread * >(pThreadObj)->main()
+            );
 }
 
 

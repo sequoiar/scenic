@@ -74,7 +74,7 @@ bool TcpServer::socket_connect_send(const std::string& addr,const std::string& m
     int ssockfd = 0;
     ssockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (ssockfd <= 0)
-        LOG_ERROR("Error opening socket: errno msg: " << strerror(errno));
+        THROW_ERROR("Error opening socket: errno msg: " << strerror(errno));
 
     bzero((char *) &serv_addr, sizeof(serv_addr));
     
@@ -82,7 +82,7 @@ bool TcpServer::socket_connect_send(const std::string& addr,const std::string& m
     if(!inet_aton(addr.c_str(),&(serv_addr.sin_addr)))
     {
         ::close(ssockfd);
-        LOG_ERROR("Address bad." << addr);
+        THROW_ERROR("Address bad." << addr);
     }
 
     serv_addr.sin_family = AF_INET;
@@ -93,13 +93,13 @@ bool TcpServer::socket_connect_send(const std::string& addr,const std::string& m
     if (connect(ssockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
     {
         ::close(ssockfd);
-        LOG_ERROR("Cannot Connect to peer." << strerror(errno));
+        THROW_ERROR("Cannot Connect to peer." << strerror(errno));
     }
     int n=0;
     n = ::write(ssockfd, msg.c_str(), msg.size());
     if (n <= 0){
         ::close(ssockfd);
-        LOG_ERROR("Writing to socket failed.");
+        THROW_ERROR("Writing to socket failed.");
     }
 
     usleep(1000000);
@@ -113,7 +113,7 @@ bool TcpServer::socket_bind_listen()
     int optval = 1;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd <= 0)
-        LOG_ERROR("Error opening socket: errno msg: " << strerror(errno));
+        THROW_ERROR("Error opening socket: errno msg: " << strerror(errno));
 
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
 
@@ -126,10 +126,10 @@ bool TcpServer::socket_bind_listen()
     serv_addr.sin_port = htons(port_);
 
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-        LOG_ERROR("Error at bind: errno msg: " << strerror(errno));
+        THROW_ERROR("Error at bind: errno msg: " << strerror(errno));
 
     if(!listen(sockfd, 5) <= 0)
-        LOG_ERROR("Error on listen: errno msg: " << strerror(errno)); 
+        THROW_ERROR("Error on listen: errno msg: " << strerror(errno)); 
 
     return true;
 }
@@ -145,7 +145,7 @@ bool TcpServer::accept()
         if(newsockfd == -1 && errno == EWOULDBLOCK)
             return false;
         else
-            LOG_ERROR("Error on listen: errno msg: " << strerror(errno));
+            THROW_ERROR("Error on listen: errno msg: " << strerror(errno));
     }
     connected_ = true;
     set_non_blocking(newsockfd);
@@ -190,10 +190,8 @@ bool TcpServer::send(const std::string& in)
     int n=0;
     n = ::write(newsockfd, in.c_str(), in.size());
     n = ::write(newsockfd, "\r\n",2);                       //Telnet standard line end
-    if (n <= 0){
-        LOG_ERROR("Writing to socket failed.");
-        return false; 
-    }
+    if (n <= 0)
+        THROW_ERROR("Writing to socket failed.");
     return true;
 }
 

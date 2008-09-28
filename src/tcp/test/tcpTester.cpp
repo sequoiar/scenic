@@ -10,7 +10,8 @@ int main(int argc, char** argv)
     try
     {
         if(argc < 2)
-            LOG_CRITICAL("2 or 3 args: port [addr]");
+            THROW_CRITICAL("2 or 3 args: port [addr]");
+
         int port = atoi(argv[1]);
         TcpThread tcp(port,true);
 

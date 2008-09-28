@@ -41,11 +41,11 @@ gboolean VideoSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gp
 {
     if (event->keyval != 'f')
     {
-        LOG("user didn't hit f", DEBUG);
+        LOG_DEBUG("user didn't hit f");
         return TRUE;
     }
     else
-        LOG("you hit f", DEBUG);
+        LOG_DEBUG("you hit f");
 
     gboolean isFullscreen =
         (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
@@ -102,7 +102,7 @@ VideoSink::~VideoSink()
     if (window_)
     {
         gtk_widget_destroy(window_);
-        LOG("Widget destroyed", DEBUG);
+        LOG_DEBUG("Widget destroyed");
     }
 }
 

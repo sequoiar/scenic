@@ -46,13 +46,15 @@
 #if !ENABLE_LOG
 #define LOG(msg, level)
 #else
+#define LOG(msg, level)     LOG_(msg,level)
+#endif
 
-
+#define THROW_(msg, level)     LOG_(msg,level)
 //Note mangle84579568749576948 varible name so that hiding an existing variable is unlikely
 //
 //Do{} while(0) construct to preserve one statement syntax of LOG()
 
-#define LOG(msg, level)                 \
+#define LOG_(msg, level)                 \
             do{                         \
             std::ostringstream mangle84579568749576948;      \
             mangle84579568749576948 << msg;                  \
@@ -68,8 +70,8 @@ enum LogLevel {
     CRITICAL = 50,
     ASSERT_FAIL = 60
 };
-#define LOG_ERROR(msg)      LOG(msg, ERROR)
-#define LOG_CRITICAL(msg)   LOG(msg, CRITICAL)
+#define THROW_ERROR(msg)      THROW_(msg, ERROR)
+#define THROW_CRITICAL(msg)   THROW_(msg, CRITICAL)
 #define LOG_INFO(msg)       LOG(msg, INFO)
 #define LOG_WARNING(msg)    LOG(msg, WARNING)
 #define LOG_DEBUG(msg)      LOG(msg, DEBUG)
@@ -132,7 +134,6 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
 void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, const int lineNum);
 
-#endif // !ENABLE_LOG
 
 #endif //  _LOG_WRITER_H_
 

@@ -79,7 +79,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
 
             gst_message_parse_warning(msg, &err, &debug);
 
-            LOG(err->message, WARNING);
+            LOG_WARNING(err->message);
             g_error_free(err);
 
             if (debug) {
@@ -165,7 +165,7 @@ void Pipeline::reset()
 {
     if (pipeline_)
     {
-        LOG("Pipeline is being reset.", DEBUG);
+        LOG_DEBUG("Pipeline is being reset.");
         assert(stop());
         delete instance_;
         instance_ = 0;
@@ -227,7 +227,7 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 {
     if (ret == GST_STATE_CHANGE_NO_PREROLL)
     {
-        LOG("Element is live, no preroll", DEBUG);
+        LOG_DEBUG("Element is live, no preroll");
         return true;
     }
     else if (ret == GST_STATE_CHANGE_FAILURE) {
@@ -258,14 +258,14 @@ bool Pipeline::start()
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
     assert(checkStateChange(ret)); // set it to paused
     wait_until_paused();
-    LOG("Now paused", DEBUG);
+    LOG_DEBUG("Now paused");
 
     ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
     assert(checkStateChange(ret)); // set it to playing
 
     wait_until_playing();
 
-    LOG("Now playing", DEBUG);
+    LOG_DEBUG("Now playing");
     return isPlaying();
 }
 

@@ -17,13 +17,11 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include "baseThread.h"
-#include "mapMsg.h"
+#include "msgThread.h"
 #include "tcpServer.h"
 
-typedef QueuePair_<MapMsg> QueuePair;
 class TcpThread
-    : public BaseThread<MapMsg>
+    : public MsgThread
 {
     public:
         TcpThread(int inport,bool logF=false)
@@ -43,5 +41,3 @@ class TcpThread
         TcpThread(const TcpThread&); //No Copy Constructor
         TcpThread& operator=(const TcpThread&); //No Assignment Operator
 };
-
-
