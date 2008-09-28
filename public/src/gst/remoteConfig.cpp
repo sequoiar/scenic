@@ -29,60 +29,45 @@
 
 Encoder * SenderConfig::createEncoder() const
 {
+    if (codec_.empty())
+        THROW_ERROR("Can't make encoder without codec being specified.");
+
     if (codec_ == "vorbis")
         return new VorbisEncoder();
-    else if (codec_ == "h264")
+    if (codec_ == "h264")
         return new H264Encoder();
-    else if (codec_.empty())
-    {
-        LOG("Can't make encoder without codec being specified.", ERROR);
-        return 0;
-    }
-    else
-    {
-        LOG(codec_, ERROR);
-        LOG("is an invalid codec!", ERROR);
-        return 0;
-    }
+    
+    THROW_ERROR(codec_ << " is an invalid codec!");
+    return 0;
 }
 
 
 Decoder * ReceiverConfig::createDecoder() const
 {
+    if (codec_.empty())
+        THROW_ERROR("Can't make decoder without codec being specified.");
+
     if (codec_ == "vorbis")
         return new VorbisDecoder();
-    else if (codec_ == "h264")
+    if (codec_ == "h264")
         return new H264Decoder();
-    else if (codec_.empty())
-    {
-        LOG("Can't make decoder without codec being specified.", ERROR);
-        return 0;
-    }
-    else
-    {
-        LOG(codec_, ERROR);
-        LOG("is an invalid codec!", ERROR);
-        return 0;
-    }
+    
+    THROW_ERROR(codec_ << " is an invalid codec!");
+    return 0;
 }
 
 
 bool RemoteConfig::sanityCheck() const   // FIXME: this should become more or less redundant
 {
-    bool validCodec = true;
-    bool validPort = true;
+    bool validCodec = (codec_ == "vorbis") || (codec_ == "h264"); 
 
-    if (!codec_.empty())
-    {
-        validCodec = (codec_ == "vorbis") || (codec_ == "h264"); 
-        LOG("Bad codec", CRITICAL);
-    }
+    if(codec_.empty())
+        THROW_ERROR("No Codec specified.");
+    if(!validCodec)
+        THROW_ERROR("Bad codec:" << codec_);
     if (port_ == -1)
-    {
-        LOG("No Port, one needed", CRITICAL);  
-        validPort = false;
-    }
+        THROW_ERROR("No Port, one needed");  
     
-    return validCodec && validPort;
+    return validCodec;
 }
 

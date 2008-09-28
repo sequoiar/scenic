@@ -33,17 +33,13 @@ bool Jack::is_running()
 
     client = jack_client_open ("AudioJackSource", JackNoStartServer, &status);
 
-    if (client == NULL) {
-        if (status & JackServerFailed)
-            LOG("JACK server not running", ERROR);
-        else
-            LOG("jack_client_open() failed, check status", ERROR); 
+    if (client == NULL && (status & JackServerFailed))
+        THROW_ERROR("JACK server not running");
+    if (client == NULL) 
+        THROW_ERROR("jack_client_open() failed, check status"); 
+    
 
-        jack_client_close(client);
-        return false;
-    }
-    else
-        return true;
+    return true;
 #if 0
 
     jack_transport_state_t ts = jack_transport_query(client, NULL);
@@ -55,7 +51,7 @@ bool Jack::is_running()
         return false;
     else 
     {
-        LOG("Unknown jack server state", ERROR);
+        LOG("Unknown jack server state");
         return false;
     }
 #endif

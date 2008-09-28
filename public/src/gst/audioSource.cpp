@@ -173,12 +173,12 @@ void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
 {
     if (gst_pad_is_linked(srcPad))
     {
-        LOG("Pad is already linked.", DEBUG);
+        LOG_DEBUG("Pad is already linked.");
         return;
     }
     else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
     {
-        LOG("Pad is not a source", DEBUG);
+        LOG_DEBUG("Pad is not a source");
         return;
     }
     GstElement *sinkElement = static_cast<GstElement*>(data);
@@ -223,14 +223,14 @@ AudioFileSource::~AudioFileSource()
 void AudioAlsaSource::sub_init()
 {
     if (Jack::is_running())
-        LOG("Jack is running, ALSA unavailable", ERROR);
+        THROW_ERROR("Jack is running, ALSA unavailable");
 }
 
 
 void AudioJackSource::sub_init()
 {
     if (!Jack::is_running())
-        LOG("Jack is not running", ERROR);
+        THROW_ERROR("Jack is not running");
 
     // turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
     // jackOut -> jackIn -> jackOut ->jackIn.....
@@ -250,7 +250,7 @@ AudioDvSource::~AudioDvSource()
 void AudioDvSource::init_source()
 {
     if (!Raw1394::cameraIsReady())
-        LOG_ERROR("Camera is not ready.");
+        THROW_ERROR("Camera is not ready.");
 
     sources_.push_back(pipeline_.findElement(config_.source()));  // see if it already exists from VideoDvSource
     dvIsNew_ = sources_[0] == NULL;
@@ -294,15 +294,15 @@ void AudioDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
 {
     if (std::string("video") == gst_pad_get_name(srcPad))
     {
-        LOG("Ignoring video stream from DV", DEBUG);
+        LOG_DEBUG("Ignoring video stream from DV");
         return;
     }
     else if (std::string("audio") == gst_pad_get_name(srcPad))
     {
-        LOG("Got audio stream from DV", DEBUG);
+        LOG_DEBUG("Got audio stream from DV");
     }
     else{
-        LOG("Ignoring unknown stream from DV", DEBUG);
+        LOG_DEBUG("Ignoring unknown stream from DV");
         return;
     }
     GstElement *sinkElement = static_cast<GstElement *>(data);
@@ -315,7 +315,7 @@ void AudioDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
         g_object_unref(sinkPad);        // don't link more than once
         return;
     }
-    LOG("AudioDvSource: linking new srcpad to sinkpad.", DEBUG);
+    LOG_DEBUG("AudioDvSource: linking new srcpad to sinkpad.");
     assert(GstLinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }

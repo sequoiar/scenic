@@ -40,7 +40,7 @@
     {                                                                       \
         std::ostringstream err;                                             \
         err << "key:" << key << " missing.";                                \
-        LOG_ERROR(err.str());                                               \
+        THROW_ERROR(err.str());                                               \
     }                                                                       \
     if(!msg[key].get(val))                                                  \
     {                                                                       \
@@ -49,7 +49,7 @@
         err << "Expected type " << #val_type << " does not match " <<       \
         (t == 'i'?"integer":t == 'f'?"float":"string")                      \
         << " provided by user.";                                            \
-        LOG_ERROR(err.str());                                               \
+        THROW_ERROR(err.str());                                               \
     }                                                                       
 
 #if 0

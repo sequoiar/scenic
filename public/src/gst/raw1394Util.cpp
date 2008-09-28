@@ -18,7 +18,8 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <errno.h>
+#include <cerrno>
+#include <cstring>
 #include <libavc1394/avc1394.h>
 #include <libavc1394/rom1394.h>
 
@@ -41,16 +42,13 @@ int Raw1394::raw1394_get_num_ports()
 
 	/* get a raw1394 handle */
 	if (!(handle = raw1394_new_handle()))
-	{
-		LOG_ERROR("raw1394 - failed to get handle: " << strerror(errno) << "." << std::endl);
-	}
+		THROW_ERROR("raw1394 - failed to get handle: " << strerror(errno));
 
-	if ((n_ports = raw1394_get_port_info(handle, pinf, 16)) < 0)
-	{
-		raw1394_destroy_handle(handle);
-		LOG_ERROR("raw1394 - failed to get port info: " << strerror(errno) << "." << std::endl);
-	}
+	n_ports = raw1394_get_port_info(handle, pinf, 16);
 	raw1394_destroy_handle(handle);
+
+	if (n_ports  < 0)
+		THROW_ERROR("raw1394 - failed to get port info: " << strerror(errno));
 
 	return n_ports;
 }
@@ -61,37 +59,33 @@ int Raw1394::raw1394_get_num_ports()
  * \return a raw1394 handle.
  */
 
-raw1394handle_t Raw1394::raw1394_open(int port)
-{
-	int n_ports;
-	struct raw1394_portinfo pinf[ 16 ];
-	raw1394handle_t handle;
-
-	/* get a raw1394 handle */
 #ifdef RAW1394_V_0_8
-
-	handle = raw1394_get_handle();
+	raw1394handle_t (* const rawHandle)(void) = raw1394_get_handle;
 #else
-
-	handle = raw1394_new_handle();
+	raw1394handle_t (* const rawHandle)(void) = raw1394_new_handle;
 #endif
 
-	if (!handle)
-	{
-		LOG_ERROR("raw1394 - failed to get handle: " << strerror(errno) << "." << std::endl);
-	}
+raw1394handle_t Raw1394::raw1394_open(int port)
+{
+	struct raw1394_portinfo pinf[ 16 ];
+	/* get a raw1394 handle */
+	raw1394handle_t handle = rawHandle();
 
-	if (( n_ports = raw1394_get_port_info( handle, pinf, 16 )) < 0 )
+
+	if (!handle)
+		THROW_ERROR("raw1394 - failed to get handle: " << strerror(errno) );
+
+	if (raw1394_get_port_info( handle, pinf, 16 ) < 0 )
 	{
 		raw1394_destroy_handle(handle);
-		LOG_ERROR("raw1394 - failed to get port info: " <<  strerror(errno) << "." << std::endl);
+		THROW_ERROR("raw1394 - failed to get port info: " <<  strerror(errno));
 	}
 
 	/* tell raw1394 which host adapter to use */
 	if (raw1394_set_port(handle, port) < 0)
 	{
 		raw1394_destroy_handle(handle);
-		LOG_ERROR("raw1394 - failed to set set port: " <<  strerror(errno) << "." << std::endl);
+		THROW_ERROR("raw1394 - failed to set set port: " <<  strerror(errno) );
 	}
 
 	return handle;
@@ -134,7 +128,8 @@ int Raw1394::discoverAVC(int* port, octlet_t* guid)
 				if (rom1394_get_directory(handle, i, &rom_dir) < 0)
 				{
 					rom1394_free_directory(&rom_dir);
-					LOG_ERROR("error reading config rom directory for node " << i << std::endl);
+					THROW_ERROR("error reading config rom directory for node " << i);
+                    //TODO: note: never gets to continue
 					continue;
 				}
 				if (((rom1394_get_node_type(&rom_dir) == ROM1394_NODE_TYPE_AVC) &&
@@ -168,18 +163,13 @@ bool Raw1394::cameraIsReady()
     port = device = -1;
 
     if (!(handle = raw1394_new_handle()))
-    {
-        LOG_ERROR("raw1394 cannot get handle" << std::endl);
-        return false;
-    }
+        THROW_ERROR("raw1394 cannot get handle");
 
     raw1394_destroy_handle(handle);
 
     if (discoverAVC(&port, &guid) == -1)
-    {
-        LOG_ERROR("Dv source is not ready" << std::endl);
-        return false;
-    }
+        THROW_ERROR("Dv source is not ready");
 
     return true;
 }
+

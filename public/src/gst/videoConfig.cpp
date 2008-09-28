@@ -40,11 +40,9 @@ VideoSource * VideoConfig::createSource() const
         return new VideoDvSource(*this);
     else if (source_ == "filesrc")
         return new VideoFileSource(*this);
-    else {
-        LOG(source_, ERROR);
-        LOG("is an invalid source!", ERROR);
-        return 0;
-    }
+    else 
+        THROW_ERROR(source_ << " is an invalid source!");
+    return 0;
 }
 
 // FIXME: merge
@@ -70,31 +68,21 @@ bool VideoConfig::sanityCheck() const
 bool VideoConfig::fileExists() const
 {
     if (location_.empty())
-    {
-        LOG("No file location given", ERROR);
-        return false;
-    }
+        THROW_ERROR("No file location given");
+    
     FILE *file;
     file = fopen(location(), "r");
-    if (file != NULL)
-    {
-        fclose(file);
-        return true;
-    }
-    else
-    {
-        LOG("File does not exist", ERROR);
-        return false;
-    }
+    if (file == NULL)
+        THROW_ERROR("File does not exist");
+   
+    fclose(file);
+    return true;
 }
 
 
 const char* VideoConfig::location() const
 {
-    if (!location_.empty())
-        return location_.c_str();
-    else {
-        LOG("No location specified", ERROR);
-        return NULL;
-    }
+    if (location_.empty())
+        THROW_ERROR("No location specified");
+    return location_.c_str();
 }

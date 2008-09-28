@@ -772,10 +772,12 @@ void pjsip_log_writer( int level, const char *data, int len ){
     switch(level)
     {
         case 1:
-            LOG_ERROR(data);
+            //ERROR(data); //this throws
+            LOG_WARNING("ERROR " << data);
             break;
         case 2:
-            LOG_CRITICAL(data);
+            //CRITICAL(data); //this throws
+            LOG_WARNING("CRITICAL " << data);
         case 3:
             break;
         case 4:
