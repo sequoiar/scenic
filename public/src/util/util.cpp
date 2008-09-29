@@ -114,20 +114,20 @@ static LogFunctor emptyLogFunctor;
 static LogFunctor* lf = &emptyLogFunctor;
 static bool hold = false;
 
-void register_cb(LogFunctor* f)
+void LOG::register_cb(LogFunctor* f)
 {
     lf = f;
 }
-void unregister_cb()
+void LOG::unregister_cb()
 {
     lf = &emptyLogFunctor;
 }
-void hold_cb()
+void LOG::hold_cb()
 {
     hold = true;
 }
 
-void release_cb()
+void LOG::release_cb()
 {
     hold = false;
 }
@@ -165,7 +165,7 @@ void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileN
     std::string err = log_(msg,level,fileName,functionName,lineNum);
 
     if(!hold)
-        lf->cb(level,err);
+        (*lf)(level,err);
     
     std::cerr << err;
     if(level < ERROR)

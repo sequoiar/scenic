@@ -26,10 +26,10 @@ class TcpLogFunctor : public LogFunctor
 public:
     TcpLogFunctor(TcpThread& tcp):tcp_(tcp){}
     TcpThread& tcp_;
-    void cb(LogLevel&,std::string& msg);
+    void operator()(LogLevel&,std::string& msg);
 };
 
-void TcpLogFunctor::cb(LogLevel& level,std::string& msg)
+void TcpLogFunctor::operator()(LogLevel& level,std::string& msg)
 {
     MapMsg m;
     m["command"] = StrIntFloat("log");
@@ -57,7 +57,7 @@ int TcpThread::main()
 
             LOG_INFO("Got Connection.");
             if(logFlag_)
-                register_cb(&lf_);
+                LOG::register_cb(&lf_);
             while(serv_.connected())
             {
                 if((quit = gotQuit()))
@@ -76,7 +76,7 @@ int TcpThread::main()
                     usleep(1000);
             }
             if(logFlag_)
-                unregister_cb();
+                LOG::unregister_cb();
             if(!quit)
                 LOG_WARNING("Disconnected from Core.");
             usleep(1000);
@@ -121,10 +121,10 @@ bool TcpThread::gotQuit()
 bool TcpThread::send(MapMsg& msg)
 {
     std::string msg_str;
-    hold_cb(); // to insure no recursive calls due to log message calling send 
+    LOG::hold_cb(); // to insure no recursive calls due to log message calling send 
     Parser::stringify(msg, msg_str);
     bool ret = serv_.send(msg_str);
-    release_cb();
+    LOG::release_cb();
     return ret;
 }
 
