@@ -37,7 +37,7 @@ namespace Parser
 
     /** builds a string of command: key=value pairs
      */
-    bool stringify(const MapMsg& cmd_map, std::string& str);
+    bool stringify(MapMsg& cmd_map, std::string& str);
 
     /* fills a map of key=value pairs with a special key "command" from a string
      * of type specified above

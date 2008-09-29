@@ -128,7 +128,7 @@ bool TcpThread::send(MapMsg& msg)
     return ret;
 }
 
-bool TcpThread::socket_connect_send(const std::string& addr, const MapMsg& msg)
+bool TcpThread::socket_connect_send(const std::string& addr, MapMsg& msg)
 {
     std::string msg_str;
     Parser::stringify(msg, msg_str);

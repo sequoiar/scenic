@@ -29,7 +29,7 @@ class TcpThread
         ~TcpThread(){}
         bool send(MapMsg& msg);
 
-        bool socket_connect_send(const std::string& addr, const MapMsg& msg);
+        bool socket_connect_send(const std::string& addr, MapMsg& msg);
 
     private:
         int main();
