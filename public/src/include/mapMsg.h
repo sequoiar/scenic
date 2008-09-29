@@ -19,7 +19,7 @@
 
 
 /** \file 
- *      MapMsg typedef of key/value map where value is a string, a float or an int
+ *      MapMsg typedef of key/value map where value is a string, a float, an int or exception
  *
  */
 
@@ -55,11 +55,16 @@ class StrIntFloat
             : type_('f'), s_(), i_(0), f_(f), e_(){}
         StrIntFloat(Except e)
             : type_('e'), s_(), i_(0), f_(0.0),e_(e){}
-
         StrIntFloat()
             : type_('n'), s_(), i_(0), f_(0.0),e_(){}
 
         char type() const { return type_;}
+        std::string c_str()const
+        {       
+            if(type_ != 's')
+            THROW_ERROR("Type is" << (type_ == 'i'?"integer":type_ == 'f'?"float":"string") << " not string");                     
+            return s_;
+        }
         bool get(std::string& s) const
         {
             if(type_ != 's')
@@ -94,6 +99,20 @@ class StrIntFloat
             return true;
         }
 
+        StrIntFloat& operator=(const std::string& in){
+            type_ = 's'; s_ = in; 
+            return *this;
+        }
+
+        StrIntFloat& operator=(int in){
+            type_ = 'i'; i_ = in; 
+            return *this;
+        }
+
+        StrIntFloat& operator=(float in){
+            type_ = 'f'; f_ = in; 
+            return *this;
+        }
 
         StrIntFloat(const StrIntFloat& sif_)
             : type_(sif_.type_), s_(sif_.s_), i_(sif_.i_), f_(sif_.f_),e_(sif_.e_){}
@@ -106,8 +125,37 @@ class StrIntFloat
         }
 };
 
-typedef std::map<std::string, StrIntFloat> MapMsg;
+//    typedef std::map<std::string, StrIntFloat> MapMsg;
+class MapMsg
+{
+    typedef std::map<std::string, StrIntFloat> MapMsg_;
+    MapMsg_ map_;
+public:
+    MapMsg():map_(),it_(){}
+    MapMsg(std::string cmd):map_(),it_(){ map_["command"] = cmd;}
+    //addPair(std::string key, std::string val){ map_[key] = val;}
 
+    StrIntFloat& operator[](const std::string& str){ return map_[str]; }
+    void clear(){map_.clear();}
+    MapMsg_::const_iterator it_;
+    const std::pair<const std::string,StrIntFloat>* begin(){it_ =map_.begin(); return &(*it_);}
+    const std::pair<const std::string,StrIntFloat>* next()
+    { 
+        if (++it_ != map_.end())
+            return &(*it_);
+        else 
+            return 0;
+    }
+#if 0
+    std::string find( std::string str)const 
+    { 
+        MapMsg_::const_iterator it = map_.find(str);
+        if(it != map_.end())
+           return it->second.c_str();
+        return std::string();
+    }
+#endif
+};
 
 template< class T >
 void msg_get_(MapMsg& msg,const std::string& key, const std::string& val_type, T& t)

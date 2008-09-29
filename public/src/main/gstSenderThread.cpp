@@ -103,8 +103,8 @@ bool GstSenderThread::audio_start(MapMsg& msg)
 
         //Build Caps Msg 
         MapMsg caps;
-        caps.insert( std::make_pair("command", "caps"));
-        caps.insert( std::make_pair("caps_str", asender_->getCaps()));
+        caps["command"] = "caps";
+        caps["caps_str"] =  asender_->getCaps();
 
         //Forward to tcp
         queue_.push(caps);

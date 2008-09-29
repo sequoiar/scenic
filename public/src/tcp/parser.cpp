@@ -98,13 +98,14 @@ static int get_end_of_quoted_string(const std::string& str)
 }
 
 
-bool Parser::stringify(const MapMsg& cmd_map, std::string& str)
+bool Parser::stringify(MapMsg& cmd_map, std::string& str)
 {
     typedef std::map<std::string, StrIntFloat>::const_iterator iter;
     str.clear();
 
     //locate "command" and output value to str
-    iter it = cmd_map.find(std::string("command"));
+    str.append(cmd_map["command"].c_str());
+#if 0
     if(it != cmd_map.end())
     {
         std::string temp;
@@ -115,11 +116,12 @@ bool Parser::stringify(const MapMsg& cmd_map, std::string& str)
     else{
         return false;
     }
+#endif
     str.append(":");
-
+    const std::pair<const std::string,StrIntFloat>* it;
     //for each pair in the map
     for(it = cmd_map.begin();
-        it != cmd_map.end(); ++it)
+        it != 0; it = cmd_map.next())
     {
         if(it->first.compare("command"))                //Insure it's not the command
         {
@@ -181,7 +183,7 @@ bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
     if(i == str.size())                                     //if : not found return error
         return false;
     StrIntFloat c(lstr.substr(0, i));                       //make a string for command
-    cmd_map.insert( std::make_pair( "command", c) );        //insert command into map
+    cmd_map["command"] = c ;        //insert command into map
 
     if(lstr.size() > i+2)
         lstr = lstr.substr(i+2);                                //set lstring beyond command
@@ -210,7 +212,7 @@ bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
             std::string quote = lstr.substr(i+2, pos-2);    //strip begin and end quotes
             quote = strUnEsq(quote);                        //clean any escape backslashes
             StrIntFloat q(quote);                           //make string for value
-            cmd_map.insert( make_pair(tstr, q));            //insert key,value into map
+            cmd_map["tstr"] =  q ;            //insert key,value into map
         }
         else{
             pos = strcspn(cstr+i+1, " ");                   //find end of key=value pair
@@ -222,16 +224,15 @@ bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
                 int temp_i;
                 stream >> temp_i;                           //convert str to int
                 StrIntFloat temp(temp_i);                   //make int
-                cmd_map.insert(                             //insert key,valu
-                    make_pair(lstr.substr(0, i), temp));
+                cmd_map[lstr.substr(0, i)] =  temp;
             }
             else{                                           //value contains .
                                                             //thus it is a float
                 float temp_f;
                 stream >> temp_f;                           //convert str to float
                 StrIntFloat temp(temp_f);                   //make float
-                cmd_map.insert(                             //insert key,value
-                    make_pair(lstr.substr(0, i), temp));
+                                           //insert key,value
+                cmd_map[lstr.substr(0, i)] =  temp;
             }
         }
         if(lstr.size() > i+2+pos)                           //more characters to process
