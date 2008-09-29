@@ -70,16 +70,16 @@ class AudioGst(AudioStream, GstClient):
         """
         self._chan = channel
         attrs = self.get_attrs()
-        self._send_cmd('start_audio', self.sending_started, ('address', address), *attrs)
+        self._send_cmd('audio_start', (self.sending_started, 'caps'), ('address', address), *attrs)
         
-    def sending_started(self, caps):
-        self._del_callback()
-        if caps.isdigit():
-            self._core.notify(None, caps, 'audio_sending_started')
+    def sending_started(self, caps_str):
+        self._del_callback('caps')
+        if caps_str.isdigit():
+            self._core.notify(None, caps_str, 'audio_sending_started')
         else:
             self._core.notify(None, 1, 'audio_sending_started')
             log.debug('SHOULD SEND CAPS VIA TCP HERE!')
-            self._chan.callRemote('AudioGst.caps', caps)
+            self._chan.callRemote('AudioGst.caps', caps_str)
             
     def stop_sending(self):
         """function stop_sending
@@ -99,7 +99,7 @@ class AudioGst(AudioStream, GstClient):
     def caps(self, caps):
         self._chan.delete(self.caps)
         attrs = self.get_attrs()
-        self._send_cmd('start_audio', None, ('caps', caps), *attrs)
+        self._send_cmd('audio_start', None, ('caps', caps), *attrs)
    
     def receiving_started(self, answer):
         log.info('Return value after sending caps: %s.' % answer)

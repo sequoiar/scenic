@@ -68,7 +68,7 @@ class Core(Subject):
         self.connectors = {'ip':basic}  # TODO
         for conn in self.connectors.values():
             if len(sys.argv) > 1:
-                conn.start(self.api, (int(sys.argv[1]) - 9999)/2)
+                conn.start(self.api, (int(sys.argv[1]) - 9999) / 2)
             else:
                 conn.start(self.api)
 
