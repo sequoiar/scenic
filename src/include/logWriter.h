@@ -63,6 +63,7 @@
             while(0)
 
 enum LogLevel {
+    NONE = 0,
     DEBUG = 10,
     INFO = 20,
     WARNING = 30,
@@ -83,6 +84,7 @@ public:
     std::string msg_;
 
     Except(std::string log_msg):log_(WARNING),msg_(log_msg){}
+    Except():log_(NONE),msg_(){}
     virtual ~Except(){}
 };
 
