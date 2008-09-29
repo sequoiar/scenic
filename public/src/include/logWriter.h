@@ -101,7 +101,6 @@ public:
 class LogFunctor
 {
     public:
-        virtual void cb(LogLevel&, std::string &){}
         virtual void operator()(LogLevel&, std::string &){}
         virtual ~LogFunctor(){}
 };

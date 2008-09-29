@@ -34,8 +34,8 @@
 
 
 
-#define GET(msg,key,val_type,val)                                           \
-    val_type val;                                                           \
+#define GET(msg,key,val_type,val)                                     \
+    val_type val;                                                   \
     msg_get_(msg,key,#val_type,val)
 
 
@@ -112,21 +112,37 @@ typedef std::map<std::string, StrIntFloat> MapMsg;
 template< class T >
 void msg_get_(MapMsg& msg,const std::string& key, const std::string& val_type, T& t)
 {
-    if(msg[key].type() == 'n')                                              
-    {                                                                       
-        std::ostringstream err;                                             
-        err << "key:" << key << " missing.";                                
-        THROW_ERROR(err.str());                                               
-    }                                                                       
-    if(!msg[key].get(t))                                                 
-    {                                                                       
-        std::ostringstream err;                                             
-        char t_ = msg[key].type();                                           
-        err << "Expected type " << val_type << " does not match " 
-            << (t_ == 'i'?"integer":t_ == 'f'?"float":"string")                      
-            << " provided by user.";                                            
-        THROW_ERROR(err.str());                                               
-    }                                                                       
+    if(msg[key].type() == 'n')                                          
+    { 
+        std::ostringstream err; 
+        err << "key:" << key << " missing."; 
+        THROW_ERROR(err.str()); 
+    }
+    if(!msg[key].get(t)) 
+    { 
+        std::ostringstream err; 
+        char t_ = msg[key].type(); 
+        err << "Expected type " << val_type << " does not match "
+            << (t_ == 'i'?"integer":t_ == 'f'?"float":"string") 
+            << " provided by user."; 
+        THROW_ERROR(err.str()); 
+    } 
 }
 
+class MsgFunctor
+{
+    public:
+        virtual void operator()(MapMsg&){}
+        virtual ~MsgFunctor(){}
+};
+
+namespace MSG
+{
+bool post(MapMsg& msg);
+void register_cb(MsgFunctor* f);
+void unregister_cb();
+}
+
+
 #endif
+
