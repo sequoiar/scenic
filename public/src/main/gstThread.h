@@ -18,11 +18,10 @@
  */
 #ifndef __GST_THREAD__
 #define __GST_THREAD__
-#include "baseThread.h"
-#include "mapMsg.h"
+#include "msgThread.h"
 
 class GstThread
-    : public BaseThread<MapMsg>
+    : public MsgThread
 {
     public:
         GstThread(){}
