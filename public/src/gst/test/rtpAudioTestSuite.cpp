@@ -88,12 +88,12 @@ bool tcpSendCaps(int port, const std::string &caps)
         }
         catch(ErrorExcept e)
         {
-           if(atoi(e.msg_.substr(6,10).c_str())==ECONNREFUSED ) 
+           if(e.errno_ == ECONNREFUSED ) 
                LOG_DEBUG("GOT ECONNREFUSED");
            else
                return false;
         }
-        usleep(1000);
+        usleep(100000);
     }
     return false;
 }
