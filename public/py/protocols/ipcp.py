@@ -29,7 +29,7 @@ from twisted.protocols.basic import LineReceiver
 # App imports
 from utils import log
 
-log = log.start('info', 1, 0, 'icpc')
+log = log.start('debug', 1, 0, 'icpc')
 
 
 class IPCP(LineReceiver):
@@ -44,7 +44,7 @@ class IPCP(LineReceiver):
             self.callbacks[name] = cmd
         else:
             log.debug('A callback with this name %s is already registered.' % name)
-#        log.debug('Callback list: ' + repr(self.callbacks))
+        log.debug('Callback list: ' + repr(self.callbacks))
             
     def del_callback(self, name):
         if isinstance(name, FunctionType):
@@ -52,34 +52,85 @@ class IPCP(LineReceiver):
         if name in self.callbacks:
             del self.callbacks[name]
         else:
-            log.debug('This callback %s is not registered.' % name)
-#        log.debug('Callback list: ' + repr(self.callbacks))
+            log.debug('Cannot delete the callback %s because is not registered.' % name)
+        log.debug('Callback list: ' + repr(self.callbacks))
               
     def connectionMade(self):
         log.info('Connection made to the server.')
     
     def lineReceived(self, line):
-        args = self.r.findall(line)
-        cmd = args[0][0]
+        log.debug("Line received: %s" % line)
+        cmd, sep, args = line.partition(':')
+#        tokens = self.r.findall(line)
+#        cmd = tokens[0][0][:-1]
         if cmd not in self.callbacks:
-            log.debug('Command %s not in callback list.' % cmd)
+            log.info('Command %s not in callback list.' % cmd)
         else:
-            del args[0]
-            for pos, arg in enumerate(args):
-                arg = arg[0]
-                if arg[0] == '"':
-                    args[pos] = arg[1:-1].replace('\\\\', '\\') \
-                                         .replace("\\'", "'") \
-                                         .replace('\\"', '"')
-                elif arg.isdigit():
-                    args[pos] = int(arg)
+            data = args.strip() + " "
+            args = {}
+            attr_s = 0
+            start = 0
+            while True:
+                end = data.find('=', start)
+                if end == -1:
+                    break
+                attr = data[start:end]
+                start = end + 1
+                is_string = False
+                if data[start] == '"':
+                    is_string = True
+                    start += 1
+                    temp_s = start
+                    out = False
+                    while True:
+                        temp_e = data.find('"', temp_s)
+                        if temp_e == -1:
+                            out = True
+                            break
+                        if data[temp_e - 1] != "\\":
+                            end = temp_e
+                            break
+                        temp_s = temp_e + 1
+                    if out:
+                        break
+                    
                 else:
-                    try:
-                        args[pos] = float(arg)
-                    except:
-                        log.debug('Invalid type for received argument %s.' % arg)
+                    end = data.find(' ', start)
+                    if end == -1:
+                        break
+                value = data[start:end]
+                if is_string:
+                    value = value.replace('\\\\', '\\') \
+                                 .replace('\\=', '=') \
+                                 .replace('\\"', '"')
+
+                else:
+                    if value.isdigit():
+                        value = int(value)
+                    else:
+                        try:
+                            value = float(value)
+                        except:
+                            log.info('Invalid type for received argument %s=%s.' % (attr, value))
+                args[attr] = value
+                start = end + 1
+#            tokens = 
+#            args = find_equal(args)
+#            for pos, arg in enumerate(tokens[1:]):
+#                attr, sep, value = arg[0].partition('=')
+#                if value[0] == '"':
+#                    args[attr] = value[1:-1].replace('\\\\', '\\') \
+#                                         .replace("\\'", "'") \
+#                                         .replace('\\"', '"')
+#                elif value.isdigit():
+#                    args[attr] = int(value)
+#                else:
+#                    try:
+#                        args[attr] = float(value)
+#                    except:
+#                        log.info('Invalid type for received argument %s=%s.' % (attr, value))
             log.debug("Received: " + cmd + repr(args))
-            self.callbacks[cmd](*args)
+            self.callbacks[cmd](**args)
     
     def send_cmd(self, cmd, *args):
         line = []
@@ -93,8 +144,10 @@ class IPCP(LineReceiver):
                 parg = self._process_arg(arg)
                 if parg:
                     line.append(parg)
-        self.sendLine(' '.join(line))
-        log.debug('Sending: ' + ' '.join(line))
+        line = ' '.join(line)
+#        line = line.replace('\\\\\\', '\\')
+        self.sendLine(line)
+        log.debug('Sending: ' + line)
 
     def _process_arg(self, arg):
         if isinstance(arg, int) or isinstance(arg, float):
@@ -114,6 +167,41 @@ class IPCP(LineReceiver):
 
     def connectionLost(self, reason=protocol.connectionDone):
         log.info('Lost the server connection.')
+
+
+def find_equal(data):
+    data = data.strip() + " "
+    args = {}
+    attr_s = 0
+    start = 0
+    while True:
+        try:
+            end = data.index('=', start)
+        except:
+            break
+        attr = data[start:end]
+        start = end + 1
+        if data[start] == '"':
+            try:
+                temp_s = start + 1
+                while True:
+                    temp_e = data.index('"', temp_s)
+                    if data[temp_e - 1] != "\\":
+                        end = temp_e + 1
+                        break
+                    else:
+                        temp_s = temp_e + 1
+            except:
+                break
+            
+        else:
+            try:
+                end = data.index(' ', start)
+            except:
+                break
+        args[attr] = data[start:end]
+        start = end + 1
+    return args
         
       
 def connect(addr, port, timeout=2, bindAddress=None):

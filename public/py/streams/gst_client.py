@@ -66,8 +66,8 @@ class GstClient(object):
             reactor.callLater(0.5, self._send_cmd, cmd, *args)
         else:
             if callback:
-                log.debug('Callback: %s' % callback)
-                Stream.gst.add_callback(callback)
+                log.debug('Callback: %s' % repr(callback))
+                Stream.gst.add_callback(*callback)
             Stream.gst.send_cmd(cmd, *args)
 
     def _del_callback(self, callback=None):
