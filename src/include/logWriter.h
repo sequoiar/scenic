@@ -20,9 +20,12 @@
 /** \file
  *      Log writer macro, usage:
  *
- *      LOG("This is a log");
- *      or
- *      LOG("Got Error errno: " << 100);
+ *      LOG_DEBUG("This is a log");
+ *      
+ *      LOG_INFO("Got Error errno: " << 100);
+ *      
+ *      THROW_ERROR(99);
+ *
  *      To disable logging, define the macro ENABLE_LOG (in this file) to 0.
  *
  */
@@ -49,18 +52,6 @@
 #define LOG(msg, level)     LOG_(msg,level)
 #endif
 
-#define THROW_(msg, level)     LOG_(msg,level)
-//Note mangle84579568749576948 varible name so that hiding an existing variable is unlikely
-//
-//Do{} while(0) construct to preserve one statement syntax of LOG()
-
-#define LOG_(msg, level)                 \
-            do{                         \
-            std::ostringstream mangle84579568749576948;      \
-            mangle84579568749576948 << msg;                  \
-            cerr_log_(mangle84579568749576948.str(), level, __FILE__, __FUNCTION__, __LINE__);    \
-            }                           \
-            while(0)
 
 enum LogLevel {
     NONE = 0,
@@ -111,23 +102,38 @@ class LogFunctor
 {
     public:
         virtual void cb(LogLevel&, std::string &){}
+        virtual void operator()(LogLevel&, std::string &){}
         virtual ~LogFunctor(){}
 };
 
+namespace LOG
+{
 void register_cb(LogFunctor*);
 void unregister_cb();
 void release_cb();
 void hold_cb();
+}
+
+#define THROW_(msg, level)     LOG_(msg,level)
+//Note mangle84579568749576948 varible name so that hiding an existing variable is unlikely
+//
+//Do{} while(0) construct to preserve one statement syntax of LOG()
+
+#define LOG_(msg, level)                 \
+            do{                         \
+            std::ostringstream mangle84579568749576948;      \
+            mangle84579568749576948 << msg;                  \
+            cerr_log_(mangle84579568749576948.str(), level, __FILE__, __FUNCTION__, __LINE__);    \
+            }                           \
+            while(0)
+//bool logLevelIsValid(LogLevel level);
 
 
-bool logLevelIsValid(LogLevel level);
-
-
-std::string logLevelStr(LogLevel level);
+//std::string logLevelStr(LogLevel level);
 
 
 
-bool logLevelMatch(LogLevel level);
+//bool logLevelMatch(LogLevel level);
 
 
 std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
