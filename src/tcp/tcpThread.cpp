@@ -43,13 +43,15 @@ int TcpThread::main()
     bool quit = false;
     std::string msg;
     TcpLogFunctor lf_(*this);
+
     try
     {
-        while(!quit)
+    while(!quit)
+    {
+        serv_.socket_bind_listen();
+        try
         {
-            if(!serv_.socket_bind_listen())
-                return -1;
-
+            
             while(!serv_.accept())
                 usleep(10000);
 
@@ -71,19 +73,28 @@ int TcpThread::main()
                         LOG_WARNING("Bad Msg Received.");
                 }
                 else
-                    usleep(10000);
+                    usleep(1000);
             }
             if(logFlag_)
                 unregister_cb();
             if(!quit)
                 LOG_WARNING("Disconnected from Core.");
-
+            usleep(1000);
             serv_.close();
         }
+        catch(Except e)
+        {
+            LOG_DEBUG( "CAUGHT " << e.msg_);
+        }
+    }
     }
     catch(Except e)
     {
-        std::cerr << e.msg_;
+        LOG_DEBUG( "CAUGHT" << e.msg_);
+        MapMsg mapMsg;
+        mapMsg["command"] = StrIntFloat("exception");
+        mapMsg["exception"] = StrIntFloat(e);
+        queue_.push(mapMsg);
     }
     return 0;
 }
@@ -93,11 +104,16 @@ bool TcpThread::gotQuit()
 {
     MapMsg f = queue_.timed_pop(1);
     std::string command;
-    if(f["command"].get(command)&& !command.compare("quit"))
+    if(f["command"].type() == 'n')
+        return false;
+
+    if(f["command"].get(command)&& command == "quit")
     {
         queue_.push(f);
         return true;
     }
+    else
+        send(f);
     return false;
 }
 
