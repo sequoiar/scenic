@@ -21,15 +21,8 @@
  *      Main Module
  */
 
-
-#include "gstThread.h"
-#include "gstSenderThread.h"
-#include "gstReceiverThread.h"
-#include "tcp/tcpThread.h"
-#include "tcp/parser.h"
-#include <sstream>
+#include "builder.h"
 #include "logWriter.h"
-#include "lassert.h"
 
 
 class MainModule
@@ -38,97 +31,95 @@ class MainModule
     public:
         bool run();
 
-        MainModule(bool send, int port);
+        MainModule(bool send, int port)
+            : tcpThread_(Builder::TcpBuilder(port,true)), 
+              gstThread_(Builder::GstBuilder(send)) {}
 
-        ~MainModule(){delete gstThread_;}
+        ~MainModule(){delete gstThread_; delete tcpThread_;}
     private:
-        TcpThread tcpThread_;
-        GstThread* gstThread_;
+        MsgThread* tcpThread_;
+        MsgThread* gstThread_;
         MainModule(MainModule&);    //No Copy Constructor
         MainModule& operator=(const MainModule&);
 };
 
-MainModule::MainModule(bool send, int port)
-        : tcpThread_(port,true), gstThread_(0) 
-{
-    if(send)
-        gstThread_ = new GstSenderThread();
-    else
-        gstThread_ = new GstReceiverThread();
-
-}
 
 bool MainModule::run()
 {
-    QueuePair &gst_queue = gstThread_->getQueue();
-    QueuePair &tcp_queue = tcpThread_.getQueue();
 
-    if(gstThread_ == 0 || !gstThread_->run())
-        THROW_ERROR("GstThread not running");
-    if(!tcpThread_.run())
-        THROW_ERROR("TcpThread not running");
-
-    while(true)
+    try
     {
-        MapMsg tmsg = tcp_queue.timed_pop(1000);
-        MapMsg gmsg = gst_queue.timed_pop(1);
-
-        if (gmsg["command"].type() != 'n')
-            tcpThread_.send(gmsg);
-        if (tmsg["command"].type() == 'n')
-            continue;
-        std::string command;
-        if(!tmsg["command"].get(command))
-            continue;
-        if (command == "quit")
+        if(gstThread_ == 0 || !gstThread_->run())
+            THROW_ERROR("GstThread not running");
+        if(tcpThread_ == 0 || !tcpThread_->run())
+            THROW_ERROR("TcpThread not running");
+        QueuePair &gst_queue = gstThread_->getQueue();
+        QueuePair &tcp_queue = tcpThread_->getQueue();
+        while(true)
         {
-            gst_queue.push(tmsg);
-            tcp_queue.push(tmsg);
-            break;
-        }
-        else
-            gst_queue.push(tmsg);
-    }
+            MapMsg tmsg = tcp_queue.timed_pop(1);
+            MapMsg gmsg = gst_queue.timed_pop(1000);
 
+            if (gmsg["command"].type() != 'n')
+                tcp_queue.push(gmsg);
+            if (tmsg["command"].type() == 'n')
+                continue;
+            std::string command;
+            if(!tmsg["command"].get(command))
+                continue;
+            if (command == "quit")
+            {
+                gst_queue.push(tmsg);
+                tcp_queue.push(tmsg);
+                break;
+            }
+            if (command == "exception")
+            {       
+                Except e;
+                tmsg["exception"].get(e);
+                throw e;
+            }
+            else
+                gst_queue.push(tmsg);
+        }
+    }
+    catch(Except e)
+    {
+        static int count = 0; 
+        LOG_INFO("Abnormal Main Exception:" << e.msg_);
+        if (++count > 100)
+            throw Except(e);
+        return -1;
+    }
     LOG_INFO("Normal Program Termination in Progress");
     return 0;
 }
 
+static int port, send;
+void parseArgs(int argc,char** argv)
+{
+    if(argc != 3)
+        THROW_CRITICAL("Invalid command line arguments -- 0/1 for receive/send and a port");
+    if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
+        THROW_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
+    if(sscanf(argv[2], "%d", &port) != 1 || port < 1024 || port > 65000)
+{}//        THROW_CRITICAL("Invalid command line arguments -- Port must be in the range of 1024-65000");
+}
+
 int main (int argc, char** argv)
 {
-    int port, send;
 
     try
     {
-        if(argc != 3)
-            THROW_CRITICAL("Invalid command line arguments -- 0/1 for receive/send and a port");
-        if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
-            THROW_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
-        if(sscanf(argv[2], "%d", &port) != 1 || port < 1024 || port > 65000)
-            THROW_CRITICAL("Invalid command line arguments -- Port must be in the range of 1024-65000");
-    }
-    catch(std::string err)
-    {
-        std::cerr << "Does it change? " << err;
-    }
-    
-    try
-    {
-        do 
-        {
-            MainModule m(send, port);
+        parseArgs(argc,argv);    
+        MainModule m(send, port);
 
-            try{
-                if(!m.run())
-                    break;
-            }
-            catch(ErrorExcept e) { std::cerr << e.msg_;}
-        } while(1);
+        while(m.run()){}
     }
-    catch(CriticalExcept e) 
+    catch(Except e) 
     { 
         if (e.log_ == ASSERT_FAIL) 
-            std::cerr << "2ND E:" <<e.msg_ <<std::endl;
+            return 1;
     }
 
     return 0;
