@@ -86,7 +86,7 @@ bool MainModule::run()
     catch(Except e)
     {
         static int count = 0; 
-        LOG_INFO("Abnormal Main Exception:" << e.msg_);
+        LOG_WARNING("Abnormal Main Exception:" << e.msg_);
         if (++count > 100)
             throw Except(e);
         return -1;
