@@ -78,8 +78,21 @@ bool tcpSendCaps(int port, const std::string &caps)
     TcpThread tcp(port);
     s  << "caps: caps_str=\"" << Parser::strEsq(caps) <<"\"" << std::endl;
     Parser::tokenize(s.str(),msg);
-
-    return tcp.socket_connect_send("127.0.0.1", msg);
+    for(int i=0;i<100;i++)
+    {
+        try
+        {
+            bool ret = tcp.socket_connect_send("127.0.0.1", msg);
+            if(ret)
+                return true;
+        }
+        catch(ErrorExcept e)
+        {
+            
+        }
+        usleep(1000);
+    }
+    return false;
 }
 
 
