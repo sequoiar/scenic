@@ -36,43 +36,8 @@
 
 #define GET(msg,key,val_type,val)                                           \
     val_type val;                                                           \
-    if(msg[key].type() == 'n')                                              \
-    {                                                                       \
-        std::ostringstream err;                                             \
-        err << "key:" << key << " missing.";                                \
-        THROW_ERROR(err.str());                                               \
-    }                                                                       \
-    if(!msg[key].get(val))                                                  \
-    {                                                                       \
-        std::ostringstream err;                                             \
-        char t = msg[key].type();                                           \
-        err << "Expected type " << #val_type << " does not match " <<       \
-        (t == 'i'?"integer":t == 'f'?"float":"string")                      \
-        << " provided by user.";                                            \
-        THROW_ERROR(err.str());                                               \
-    }                                                                       
+    msg_get_(msg,key,#val_type,val)
 
-#if 0
-#define GET_OR_RETURN(msg,key,val_type,val)                                 \
-    val_type val;                                                           \
-    if(msg[key].type() == 'n')                                              \
-    {                                                                       \
-        std::ostringstream err;                                             \
-        err << "key:" << key << " missing.";                                \
-        LOG_ERROR(err.str());                                               \
-        return false;                                                       \
-    }                                                                       \
-    if(!msg[key].get(val))                                                  \
-    {                                                                       \
-        std::ostringstream err;                                             \
-        char t = msg[key].type();                                           \
-        err << "Expected type " << #val_type << " does not match " <<       \
-        (t == 'i'?"integer":t == 'f'?"float":"string")                      \
-        << " provided by user.";                                            \
-        LOG_ERROR(err.str());                                               \
-        return false;                                                       \
-    }                                                                       
-#endif
 
 class StrIntFloat
 {
@@ -80,17 +45,19 @@ class StrIntFloat
     std::string s_;
     int i_;
     float f_;
-
+    Except e_;
     public:
         StrIntFloat(std::string s)
-            : type_('s'), s_(s), i_(0), f_(0.0){}
+            : type_('s'), s_(s), i_(0), f_(0.0), e_(){}
         StrIntFloat(int i)
-            : type_('i'), s_(), i_(i), f_(0.0){}
+            : type_('i'), s_(), i_(i), f_(0.0), e_(){}
         StrIntFloat(float f)
-            : type_('f'), s_(), i_(0), f_(f){}
+            : type_('f'), s_(), i_(0), f_(f), e_(){}
+        StrIntFloat(Except e)
+            : type_('e'), s_(), i_(0), f_(0.0),e_(e){}
 
         StrIntFloat()
-            : type_('n'), s_(), i_(0), f_(0.0){}
+            : type_('n'), s_(), i_(0), f_(0.0),e_(){}
 
         char type() const { return type_;}
         bool get(std::string& s) const
@@ -119,19 +86,47 @@ class StrIntFloat
             return true;
         }
 
+        bool get(Except& e) const
+        {
+            if(type_ != 'e')
+                return false;
+            e = e_;
+            return true;
+        }
+
 
         StrIntFloat(const StrIntFloat& sif_)
-            : type_(sif_.type_), s_(sif_.s_), i_(sif_.i_), f_(sif_.f_){}
+            : type_(sif_.type_), s_(sif_.s_), i_(sif_.i_), f_(sif_.f_),e_(sif_.e_){}
         StrIntFloat& operator=(const StrIntFloat& in)
         {
             if(this == &in)
                 return *this;
-            type_ = in.type_; s_ = in.s_; i_ = in.i_; f_ = in.f_;
+            type_ = in.type_; s_ = in.s_; i_ = in.i_; f_ = in.f_; e_ = in.e_;
             return *this;
         }
 };
 
 typedef std::map<std::string, StrIntFloat> MapMsg;
 
-#endif
 
+template< class T >
+void msg_get_(MapMsg& msg,const std::string& key, const std::string& val_type, T& t)
+{
+    if(msg[key].type() == 'n')                                              
+    {                                                                       
+        std::ostringstream err;                                             
+        err << "key:" << key << " missing.";                                
+        THROW_ERROR(err.str());                                               
+    }                                                                       
+    if(!msg[key].get(t))                                                 
+    {                                                                       
+        std::ostringstream err;                                             
+        char t_ = msg[key].type();                                           
+        err << "Expected type " << val_type << " does not match " 
+            << (t_ == 'i'?"integer":t_ == 'f'?"float":"string")                      
+            << " provided by user.";                                            
+        THROW_ERROR(err.str());                                               
+    }                                                                       
+}
+
+#endif
