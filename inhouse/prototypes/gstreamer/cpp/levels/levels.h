@@ -5,12 +5,15 @@
 
 class VuMeter {
     public:
-    VuMeter() : rms_(0.0) {};
-    void print() { std::cout << "normalized rms value: " << rms_ << std::endl; }
-    void updateRms(double newRms) { rms_ = newRms; }
+        VuMeter() : rms_(0.0) {};
+        void print() { std::cout << "normalized rms value: " << rms_ << std::endl; }
+        void updateRms(double newRms) { 
+            rms_ = newRms; 
+            print(); 
+        }
 
     private:
-    double rms_;
+        double rms_;
 };
 
 #endif // _LEVELS_H_

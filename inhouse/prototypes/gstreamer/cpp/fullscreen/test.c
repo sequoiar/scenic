@@ -43,7 +43,6 @@ gint main (gint argc, gchar *argv[])
     GstStateChangeReturn ret;
     GstElement *pipeline, *src, *sink;
     GMainLoop *loop;
-    //GstBus *bus;
     GtkWidget *window;
 
     /* initialization */
@@ -71,9 +70,12 @@ gint main (gint argc, gchar *argv[])
         g_print ("Failed to link one or more elements!\n");
         return -1;
     }
+
+    // build window and attach expose event to expose callback
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(G_OBJECT(window), "expose-event", G_CALLBACK(expose_cb), sink);
 
+    // attach key press signal to key press callback
     gtk_widget_set_events(window, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window), "key-press-event", G_CALLBACK(key_press_event_cb), sink);
 
