@@ -88,7 +88,10 @@ bool tcpSendCaps(int port, const std::string &caps)
         }
         catch(ErrorExcept e)
         {
-            
+           if(atoi(e.msg_.substr(6,10).c_str())== 111) 
+               LOG_DEBUG("GOT 111");
+           else
+               return false;
         }
         usleep(1000);
     }

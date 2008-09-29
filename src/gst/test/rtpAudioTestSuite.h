@@ -32,8 +32,6 @@ class RtpAudioTestSuite
         {
             testLength_ = 10000;
 #if 0
-            TEST_ADD(RtpAudioTestSuite::start_2ch_rtp_audiotest)
-            TEST_ADD(RtpAudioTestSuite::stop_2ch_rtp_audiotest)
             TEST_ADD(RtpAudioTestSuite::start_stop_2ch_rtp_audiotest)
             TEST_ADD(RtpAudioTestSuite::start_8ch_rtp_audiotest)
             TEST_ADD(RtpAudioTestSuite::stop_8ch_rtp_audiotest)
@@ -41,10 +39,13 @@ class RtpAudioTestSuite
             TEST_ADD(RtpAudioTestSuite::start_8ch_rtp_audiofile)
             TEST_ADD(RtpAudioTestSuite::stop_8ch_rtp_audiofile)
             TEST_ADD(RtpAudioTestSuite::start_stop_8ch_rtp_audiofile)
-#endif
+            
             TEST_ADD(RtpAudioTestSuite::start_audio_dv_rtp)
             TEST_ADD(RtpAudioTestSuite::stop_audio_dv_rtp)
             TEST_ADD(RtpAudioTestSuite::start_stop_audio_dv_rtp)
+#endif
+            TEST_ADD(RtpAudioTestSuite::start_2ch_rtp_audiotest)
+            TEST_ADD(RtpAudioTestSuite::stop_2ch_rtp_audiotest)
 
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
