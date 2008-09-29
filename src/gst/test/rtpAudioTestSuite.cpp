@@ -68,7 +68,7 @@ bool tcpGetCaps(int port, AudioReceiver &rx)
 
     return true;
 }
-
+#include <errno.h>
 
 bool tcpSendCaps(int port, const std::string &caps)
 {
@@ -88,8 +88,8 @@ bool tcpSendCaps(int port, const std::string &caps)
         }
         catch(ErrorExcept e)
         {
-           if(atoi(e.msg_.substr(6,10).c_str())== 111) 
-               LOG_DEBUG("GOT 111");
+           if(atoi(e.msg_.substr(6,10).c_str())==ECONNREFUSED ) 
+               LOG_DEBUG("GOT ECONNREFUSED");
            else
                return false;
         }
