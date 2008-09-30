@@ -21,29 +21,34 @@
 #define _AUDIO_LEVEL_H_
 
 #include "gstLinkable.h"
+#include "busMsgHandler.h"
+#include <climits>
 
 class _GstElement;
+class _GstMessage;
 
 class AudioLevel 
-    : public GstLinkableFilter
+    : public GstLinkableFilter, public BusMsgHandler
 {
     public:
-        AudioLevel() : level_(0), rms_(0.0) {}
+        AudioLevel() : level_(0), rmsValues_(0), interval_(ULONG_MAX * 0.25) {}
 
         ~AudioLevel();
         bool init();
-        bool updateRms();
+        bool handleBusMsg(_GstMessage *msg);
 
     protected:
         _GstElement *srcElement() { return level_; }
         _GstElement *sinkElement() { return level_; }
 
     private:
-        void updateRms(double rmsDb);
+        void updateRms(double rmsDb, size_t channelIdx);
         double dbToLinear(double db);
+        void print();
 
         _GstElement *level_;
-        double rms_;
+        std::vector<double> rmsValues_;
+        unsigned long long interval_;
 
         AudioLevel(const AudioLevel&);     //No Copy Constructor
         AudioLevel& operator=(const AudioLevel&);     //No Assignment Operator

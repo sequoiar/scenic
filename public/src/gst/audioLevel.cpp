@@ -19,9 +19,14 @@
 
 #include <cassert>
 #include <cmath>
+#include <gst/gst.h>
 
 #include "audioLevel.h"
 #include "pipeline.h"
+#include "logWriter.h"
+#include <sstream>
+#include <iostream>
+#include <iterator>
 
 AudioLevel::~AudioLevel()
 {
@@ -33,17 +38,63 @@ bool AudioLevel::init()
 {
     assert(level_ = gst_element_factory_make("level", NULL));
     pipeline_.add(level_);
-    // TODO register callback to handle level msg
+    g_object_set (G_OBJECT(level_), "interval", interval_, NULL);
+
+    // register this level to handle level msg
+    pipeline_.subscribe(this);
     return true;
 }
 
-void AudioLevel::updateRms(double rmsDb)
+void AudioLevel::updateRms(double rmsDb, size_t channelIdx)
 {
-    rms_ = dbToLinear(rmsDb);
+    if (channelIdx == rmsValues_.size())
+        rmsValues_.push_back(dbToLinear(rmsDb));    // new channel
+    else if (channelIdx > rmsValues_.size())
+        LOG_WARNING("Invalid channel index, discarding rms value");
+    else
+        rmsValues_[channelIdx] = dbToLinear(rmsDb);
 }
 
 double AudioLevel::dbToLinear(double db)
 {
     return pow(10, db * 0.05);
+}
+
+bool AudioLevel::handleBusMsg(GstMessage *msg)
+{
+    const GstStructure *s = gst_message_get_structure(msg);
+    const gchar *name = gst_structure_get_name(s);
+
+    if (strncmp(name, "level", strlen("level")) == 0) {   // this is level's msg
+        guint channels;
+        double rmsDb;
+        const GValue *list;
+        const GValue *value;
+
+        // we can get the number of channels as the length of the value list
+        list = gst_structure_get_value (s, "rms");
+        channels = gst_value_list_get_size (list);
+
+        for (size_t channelIdx = 0; channelIdx < channels; ++channelIdx) {
+            list = gst_structure_get_value(s, "rms");
+            value = gst_value_list_get_value(list, channelIdx);
+            rmsDb = g_value_get_double(value);
+            updateRms(rmsDb, channelIdx);
+        }
+        // TODO: post to static function with mapmsg
+        print();
+
+        return true;
+    }
+
+    return false;           // this wasn't our msg, someone else should handle it
+}
+
+
+void AudioLevel::print()
+{
+    std::stringstream os;
+    std::copy(rmsValues_.begin(), rmsValues_.end(), std::ostream_iterator<double>(os, " "));
+    LOG_DEBUG("rms values: " << os.str());
 }
 

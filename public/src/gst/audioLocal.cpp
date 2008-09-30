@@ -48,6 +48,15 @@ void AudioLocal::init_source()
 {
     assert(source_ = config_.createSource());
     source_->init();
+
+    init_level();
+}
+
+
+void AudioLocal::init_level()
+{
+    level_.init();
+    GstLinkable::link(*source_, level_);
 }
 
 
@@ -55,6 +64,7 @@ void AudioLocal::init_sink()
 {
     assert(sink_ = config_.createSink());
     sink_->init();
-    GstLinkable::link(*source_, *sink_);   
+//    GstLinkable::link(*source_, *sink_);   
+    GstLinkable::link(level_, *sink_);   
 }
 

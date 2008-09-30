@@ -23,6 +23,7 @@
 
 #include "mediaBase.h"
 #include "audioConfig.h"
+#include "audioLevel.h"
 
 class AudioSource;
 class AudioSink;
@@ -32,7 +33,7 @@ class AudioLocal
 {
     public:
         explicit AudioLocal(const AudioConfig config) 
-            : config_(config), source_(0), sink_(0)
+            : config_(config), source_(0), level_(), sink_(0)
         {}
 
         ~AudioLocal();
@@ -43,12 +44,13 @@ class AudioLocal
         // helper methods
 
         void init_source();
+        void init_level();
         void init_sink();
 
         // data
         const AudioConfig config_;
         AudioSource *source_;
-
+        AudioLevel level_;
         AudioSink *sink_;
 
         AudioLocal(const AudioLocal&); //No Copy Constructor
