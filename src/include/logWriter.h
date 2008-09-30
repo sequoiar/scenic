@@ -138,10 +138,10 @@ void hold_cb();
 
 
 std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
-                const std::string &functionName, int lineNum,int err=0);
+                const std::string &functionName, int lineNum);
 
 void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileName,
-                const std::string &functionName, int lineNum,int err=0);
+                const std::string &functionName, int lineNum,int err);
 
 
 #endif //  _LOG_WRITER_H_

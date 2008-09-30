@@ -58,10 +58,8 @@ bool GstSenderThread::video_start(MapMsg& msg)
     
     try
     {
-        GET(msg, "address", std::string, addr);
-        GET(msg, "port", int, port);
         VideoConfig config("videotestsrc");
-        SenderConfig rConfig("h264", addr, port);
+        SenderConfig rConfig(msg["codec"], msg["address"] , msg["port"]);
         if(!config.sanityCheck())
             return false;
 
@@ -102,9 +100,8 @@ bool GstSenderThread::audio_start(MapMsg& msg)
         asender_->start();
 
         //Build Caps Msg 
-        MapMsg caps;
-        caps["command"] = "caps";
-        caps["caps_str"] =  asender_->getCaps();
+        MapMsg caps("caps");
+        caps["caps_str"] = asender_->getCaps();
 
         //Forward to tcp
         queue_.push(caps);
