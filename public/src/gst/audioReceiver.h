@@ -26,6 +26,7 @@
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "rtpReceiver.h"
+#include "audioLevel.h"
 
 class RtpPay;
 class Decoder;
@@ -37,7 +38,7 @@ class AudioReceiver
     public:
         AudioReceiver(const AudioReceiverConfig aConfig, const ReceiverConfig rConfig)
             : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), gotCaps_(false), 
-            depayloader_(0), decoder_(0), sink_(0)
+            depayloader_(0), decoder_(0), level_(), sink_(0)
         { assert(remoteConfig_.hasCodec()); }
 
         ~AudioReceiver();
@@ -53,6 +54,7 @@ class AudioReceiver
         AudioReceiver();
         void init_codec();
         void init_depayloader();
+        void init_level();
         void init_sink();
 
         const AudioReceiverConfig audioConfig_;
@@ -62,6 +64,7 @@ class AudioReceiver
         bool gotCaps_;
         RtpPay *depayloader_;
         Decoder *decoder_;
+        AudioLevel level_;
         AudioSink *sink_;
 
         AudioReceiver(const AudioReceiver&); //No Copy Constructor

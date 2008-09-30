@@ -25,6 +25,7 @@
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "rtpSender.h"
+#include "audioLevel.h"
 
 class AudioSource;
 class Encoder;
@@ -36,7 +37,7 @@ class AudioSender
     public:
         AudioSender(const AudioConfig aConfig, const SenderConfig rConfig) 
             : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), source_(0), 
-            encoder_(0), payloader_(0)
+            level_(), encoder_(0), payloader_(0)
         {}
 
         ~AudioSender();
@@ -48,6 +49,7 @@ class AudioSender
         // helper methods
 
         void init_source();
+        void init_level();
         void init_codec();
         void init_payloader();
 
@@ -59,6 +61,7 @@ class AudioSender
         const SenderConfig remoteConfig_;
         RtpSender session_;
         AudioSource *source_;
+        AudioLevel level_;
 
         Encoder *encoder_;
         RtpPay *payloader_;

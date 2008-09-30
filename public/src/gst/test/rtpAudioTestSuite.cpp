@@ -52,6 +52,7 @@ bool tcpGetCaps(int port, AudioReceiver &rx)
             GET(f, "command", std::string, command);
             GET(f, "caps_str", std::string, caps_str);
             rx.set_caps(caps_str.c_str());
+            LOG_DEBUG(caps_str);
 
             // send quit command to Receiver TcpThread to make 
             // threads join on function exit (i.e. TcpThread's destructor)
@@ -78,7 +79,10 @@ bool tcpSendCaps(int port, const std::string &caps)
     TcpThread tcp(port);
     s  << "caps: caps_str=\"" << Parser::strEsq(caps) <<"\"" << std::endl;
     Parser::tokenize(s.str(),msg);
-    for(int i=0;i<100;i++)
+
+    const int MAX_TRIES = 100;
+
+    for(int i = 0; i < MAX_TRIES; ++i)
     {
         try
         {

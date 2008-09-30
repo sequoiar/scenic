@@ -56,6 +56,15 @@ void AudioReceiver::init_depayloader()
     depayloader_->init();
     GstLinkable::link(*depayloader_, *decoder_);
     session_.add(depayloader_, remoteConfig_);
+
+    init_level();
+}
+
+
+void AudioReceiver::init_level()
+{
+    assert(level_.init());
+    GstLinkable::link(*decoder_, level_);
 }
 
 
@@ -63,7 +72,7 @@ void AudioReceiver::init_sink()
 {
     assert(sink_ = audioConfig_.createSink());
     sink_->init();
-    GstLinkable::link(*decoder_, *sink_);   
+    GstLinkable::link(level_, *sink_);   
 }
 
 
