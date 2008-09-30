@@ -30,6 +30,7 @@
 #include "logWriter.h"
 #include <string>
 #include <map>
+#include <vector>
 #include <sstream>
 
 
@@ -46,23 +47,26 @@ class StrIntFloat
     int i_;
     double f_;
     Except e_;
+    std::vector<double> F_;
     public:
         StrIntFloat(std::string s)
-            : type_('s'), s_(s), i_(0), f_(0.0), e_(){}
+            : type_('s'), s_(s), i_(0), f_(0.0), e_(),F_(){}
         StrIntFloat(int i)
-            : type_('i'), s_(), i_(i), f_(0.0), e_(){}
+            : type_('i'), s_(), i_(i), f_(0.0), e_(),F_(){}
         StrIntFloat(double f)
-            : type_('f'), s_(), i_(0), f_(f), e_(){}
+            : type_('f'), s_(), i_(0), f_(f), e_(),F_(){}
         StrIntFloat(Except e)
-            : type_('e'), s_(), i_(0), f_(0.0),e_(e){}
+            : type_('e'), s_(), i_(0), f_(0.0),e_(e),F_(){}
         StrIntFloat()
-            : type_('n'), s_(), i_(0), f_(0.0),e_(){}
+            : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(){}
+        StrIntFloat(std::vector<double> F)
+            : type_('F'), s_(), i_(0), f_(0.0),e_(),F_(F){}
 
         char type() const { return type_;}
         std::string c_str()const
         {       
             if(type_ != 's')
-                THROW_ERROR("Type is" << (type_ == 'i'?"integer":type_ == 'f'?"float":"string") << " not string");                     
+                THROW_ERROR("Type is " << type_  << " not string");                     
             return s_;
         }
 
@@ -77,12 +81,16 @@ class StrIntFloat
             s = s_;
             return true;
         }
-
+        
+        operator std::vector<double> () const
+        {
+            return F_;
+        }
         
         operator int ()const
         {
             if(type_ != 'i')
-                THROW_ERROR("Type is" << (type_ == 'i'?"integer":type_ == 'f'?"float":"string") << " not integer");                     
+                THROW_ERROR("Type is " << type_  << " not integer");                     
             return i_;
         }
         bool get(int& i) const
@@ -96,7 +104,7 @@ class StrIntFloat
         operator double ()const
         {
             if(type_ != 'f')
-                THROW_ERROR("Type is" << (type_ == 'i'?"integer":type_ == 'f'?"float":"string") << " not float");                     
+                THROW_ERROR("Type is " << type_  << " not float");                     
             return f_;
         }
         
@@ -132,12 +140,12 @@ class StrIntFloat
         }
 
         StrIntFloat(const StrIntFloat& sif_)
-            : type_(sif_.type_), s_(sif_.s_), i_(sif_.i_), f_(sif_.f_),e_(sif_.e_){}
+            : type_(sif_.type_), s_(sif_.s_), i_(sif_.i_), f_(sif_.f_),e_(sif_.e_),F_(sif_.F_){}
         StrIntFloat& operator=(const StrIntFloat& in)
         {
             if(this == &in)
                 return *this;
-            type_ = in.type_; s_ = in.s_; i_ = in.i_; f_ = in.f_; e_ = in.e_;
+            type_ = in.type_; s_ = in.s_; i_ = in.i_; f_ = in.f_; e_ = in.e_; F_ = in.F_;
             return *this;
         }
 };
