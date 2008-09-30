@@ -212,7 +212,7 @@ bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
             std::string quote = lstr.substr(i+2, pos-2);    //strip begin and end quotes
             quote = strUnEsq(quote);                        //clean any escape backslashes
             StrIntFloat q(quote);                           //make string for value
-            cmd_map["tstr"] =  q ;            //insert key,value into map
+            cmd_map[tstr] =  q ;            //insert key,value into map
         }
         else{
             pos = strcspn(cstr+i+1, " ");                   //find end of key=value pair
