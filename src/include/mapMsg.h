@@ -49,120 +49,45 @@ class StrIntFloat
     Except e_;
     std::vector<double> F_;
     public:
-        StrIntFloat(std::string s)
-            : type_('s'), s_(s), i_(0), f_(0.0), e_(),F_(){}
-        StrIntFloat(int i)
-            : type_('i'), s_(), i_(i), f_(0.0), e_(),F_(){}
-        StrIntFloat(double f)
-            : type_('f'), s_(), i_(0), f_(f), e_(),F_(){}
-        StrIntFloat(Except e)
-            : type_('e'), s_(), i_(0), f_(0.0),e_(e),F_(){}
-        StrIntFloat()
-            : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(){}
-        StrIntFloat(std::vector<double> F)
-            : type_('F'), s_(), i_(0), f_(0.0),e_(),F_(F){}
+        StrIntFloat(std::string s);
+        StrIntFloat(int i);
+        StrIntFloat(double f);
+        StrIntFloat(Except e);
+        StrIntFloat();
+        StrIntFloat(std::vector<double> F);
 
-        char type() const { return type_;}
-        std::string c_str()const
-        {       
-            if(type_ != 's')
-                THROW_ERROR("Type is " << type_  << " not string");                     
-            return s_;
-        }
+        char type() const; 
+        std::string c_str()const;
 
-        operator std::string ()const
-        {   
-            return c_str();
-        }
-        bool get(std::string& s) const
-        {
-            if(type_ != 's')
-                return false;
-            s = s_;
-            return true;
-        }
-        
-        operator std::vector<double> () const
-        {
-            return F_;
-        }
-        
-        operator int ()const
-        {
-            if(type_ != 'i')
-                THROW_ERROR("Type is " << type_  << " not integer");                     
-            return i_;
-        }
-        bool get(int& i) const
-        {
-            if(type_ != 'i')
-                return false;
-            i = i_;
-            return true;
-        }
+        operator std::string ()const;
+        operator std::vector<double> () const;
+        operator int ()const;
+        operator double ()const;
 
-        operator double ()const
-        {
-            if(type_ != 'f')
-                THROW_ERROR("Type is " << type_  << " not float");                     
-            return f_;
-        }
-        
-        bool get(double& f) const
-        {
-            if(type_ != 'f')
-                return false;
-            f = f_;
-            return true;
-        }
+        bool get(std::string& s) const;
+        bool get(int& i) const;
+        bool get(double& f) const;
+        bool get(Except& e) const;
 
-        bool get(Except& e) const
-        {
-            if(type_ != 'e')
-                return false;
-            e = e_;
-            return true;
-        }
+        StrIntFloat& operator=(const std::string& in);
+        StrIntFloat& operator=(int in);
+        StrIntFloat& operator=(double in);
 
-        StrIntFloat& operator=(const std::string& in){
-            type_ = 's'; s_ = in; 
-            return *this;
-        }
-
-        StrIntFloat& operator=(int in){
-            type_ = 'i'; i_ = in; 
-            return *this;
-        }
-
-        StrIntFloat& operator=(double in){
-            type_ = 'f'; f_ = in; 
-            return *this;
-        }
-
-        StrIntFloat(const StrIntFloat& sif_)
-            : type_(sif_.type_), s_(sif_.s_), i_(sif_.i_), f_(sif_.f_),e_(sif_.e_),F_(sif_.F_){}
-        StrIntFloat& operator=(const StrIntFloat& in)
-        {
-            if(this == &in)
-                return *this;
-            type_ = in.type_; s_ = in.s_; i_ = in.i_; f_ = in.f_; e_ = in.e_; F_ = in.F_;
-            return *this;
-        }
+        StrIntFloat(const StrIntFloat& sif_);
+        StrIntFloat& operator=(const StrIntFloat& in);
 };
 
-//    typedef std::map<std::string, StrIntFloat> MapMsg;
 class MapMsg
 {
     typedef std::map<std::string, StrIntFloat> MapMsg_;
     MapMsg_ map_;
+    MapMsg_::const_iterator it_;
 public:
     MapMsg():map_(),it_(){}
     MapMsg(std::string cmd):map_(),it_(){ map_["command"] = cmd;}
-    //addPair(std::string key, std::string val){ map_[key] = val;}
 
     StrIntFloat& operator[](const std::string& str){ return map_[str]; }
     void clear(){map_.clear();}
-    MapMsg_::const_iterator it_;
     const std::pair<const std::string,StrIntFloat>* begin(){it_ =map_.begin(); return &(*it_);}
     const std::pair<const std::string,StrIntFloat>* next()
     { 
@@ -171,15 +96,6 @@ public:
         else 
             return 0;
     }
-#if 0
-    std::string find( std::string str)const 
-    { 
-        MapMsg_::const_iterator it = map_.find(str);
-        if(it != map_.end())
-           return it->second.c_str();
-        return std::string();
-    }
-#endif
 };
 
 template< class T >
@@ -194,10 +110,8 @@ void msg_get_(MapMsg& msg,const std::string& key, const std::string& val_type, T
     if(!msg[key].get(t)) 
     { 
         std::ostringstream err; 
-        char t_ = msg[key].type(); 
         err << "Expected type " << val_type << " does not match "
-            << (t_ == 'i'?"integer":t_ == 'f'?"float":"string") 
-            << " provided by user."; 
+            << msg[key].type() << " provided by user."; 
         THROW_ERROR(err.str()); 
     } 
 }
