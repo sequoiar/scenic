@@ -44,7 +44,7 @@ class StrIntFloat
     char type_;
     std::string s_;
     int i_;
-    float f_;
+    double f_;
     Except e_;
     public:
         StrIntFloat(std::string s)
