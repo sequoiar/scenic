@@ -51,7 +51,7 @@ class StrIntFloat
             : type_('s'), s_(s), i_(0), f_(0.0), e_(){}
         StrIntFloat(int i)
             : type_('i'), s_(), i_(i), f_(0.0), e_(){}
-        StrIntFloat(float f)
+        StrIntFloat(double f)
             : type_('f'), s_(), i_(0), f_(f), e_(){}
         StrIntFloat(Except e)
             : type_('e'), s_(), i_(0), f_(0.0),e_(e){}
@@ -93,14 +93,14 @@ class StrIntFloat
             return true;
         }
 
-        operator float ()const
+        operator double ()const
         {
             if(type_ != 'f')
                 THROW_ERROR("Type is" << (type_ == 'i'?"integer":type_ == 'f'?"float":"string") << " not float");                     
             return f_;
         }
         
-        bool get(float& f) const
+        bool get(double& f) const
         {
             if(type_ != 'f')
                 return false;
