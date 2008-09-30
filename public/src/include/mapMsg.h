@@ -62,8 +62,13 @@ class StrIntFloat
         std::string c_str()const
         {       
             if(type_ != 's')
-            THROW_ERROR("Type is" << (type_ == 'i'?"integer":type_ == 'f'?"float":"string") << " not string");                     
+                THROW_ERROR("Type is" << (type_ == 'i'?"integer":type_ == 'f'?"float":"string") << " not string");                     
             return s_;
+        }
+
+        operator std::string ()const
+        {   
+            return c_str();
         }
         bool get(std::string& s) const
         {
@@ -73,7 +78,13 @@ class StrIntFloat
             return true;
         }
 
-
+        
+        operator int ()const
+        {
+            if(type_ != 'i')
+                THROW_ERROR("Type is" << (type_ == 'i'?"integer":type_ == 'f'?"float":"string") << " not integer");                     
+            return i_;
+        }
         bool get(int& i) const
         {
             if(type_ != 'i')
@@ -82,7 +93,13 @@ class StrIntFloat
             return true;
         }
 
-
+        operator float ()const
+        {
+            if(type_ != 'f')
+                THROW_ERROR("Type is" << (type_ == 'i'?"integer":type_ == 'f'?"float":"string") << " not float");                     
+            return f_;
+        }
+        
         bool get(float& f) const
         {
             if(type_ != 'f')
