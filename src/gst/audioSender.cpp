@@ -28,6 +28,7 @@
 
 #include "audioSender.h"
 #include "audioSource.h"
+#include "audioLevel.h"
 #include "pipeline.h"
 #include "codec.h"
 #include "rtpPay.h"
@@ -46,6 +47,14 @@ void AudioSender::init_source()
 {
     assert(source_ = audioConfig_.createSource());
     source_->init();
+    init_level();
+}
+
+
+void AudioSender::init_level()
+{
+    level_.init();
+    GstLinkable::link(*source_, level_);
 }
 
 
@@ -53,6 +62,8 @@ void AudioSender::init_codec()
 {
         assert(encoder_ = remoteConfig_.createEncoder());
         encoder_->init();
+
+        GstLinkable::link(level_, *encoder_);
 }
 
 
@@ -60,7 +71,7 @@ void AudioSender::init_payloader()
 {
      assert(payloader_ = encoder_->createPayloader());
      payloader_->init();
-     GstLinkable::link(*source_, *encoder_);
+     //GstLinkable::link(*source_, *encoder_);
      
      GstLinkable::link(*encoder_, *payloader_);
      session_.add(payloader_, remoteConfig_);   // FIXME: session should take RtpPay pointer
