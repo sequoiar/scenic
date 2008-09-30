@@ -24,6 +24,8 @@
 #include "audioLevel.h"
 #include "pipeline.h"
 #include "logWriter.h"
+#include "mapMsg.h"
+
 #include <sstream>
 #include <iostream>
 #include <iterator>
@@ -83,6 +85,7 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
         }
         // TODO: post to static function with mapmsg
         //print();
+        post();
 
         return true;
     }
@@ -91,10 +94,26 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
 }
 
 
-void AudioLevel::print()
+void AudioLevel::print() const
 {
-    std::stringstream os;
+    std::ostringstream os;
     std::copy(rmsValues_.begin(), rmsValues_.end(), std::ostream_iterator<double>(os, " "));
+
     LOG_DEBUG("rms values: " << os.str());
+}
+
+void AudioLevel::post() const
+{
+    MapMsg mapMsg("level");
+    int channelIdx = 1;
+
+    for (std::vector<double>::const_iterator iter = rmsValues_.begin(); iter != rmsValues_.end(); ++iter)
+    {
+        std::stringstream key;
+        key << "channel" << channelIdx;
+        mapMsg[key.str()] = *iter;
+        ++channelIdx;
+        MSG::post(mapMsg);
+    }
 }
 

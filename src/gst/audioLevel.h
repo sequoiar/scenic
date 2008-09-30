@@ -43,8 +43,9 @@ class AudioLevel
 
     private:
         void updateRms(double rmsDb, size_t channelIdx);
-        double dbToLinear(double db);
-        void print();
+        static double dbToLinear(double db);
+        void print() const;
+        void post() const;
 
         _GstElement *level_;
         std::vector<double> rmsValues_;
