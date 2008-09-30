@@ -153,7 +153,7 @@ bool Parser::stringify(MapMsg& cmd_map, std::string& str)
                 }
                 case 'f':                               //If the value is a float
                 {                                       //generate string from float
-                    float temp;
+                    double temp;
                     if(!it->second.get(temp))
                         return false;
                     std::stringstream sstream;
