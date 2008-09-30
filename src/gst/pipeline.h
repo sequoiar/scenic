@@ -29,6 +29,7 @@ class _GstElement;
 class _GstPad;
 class _GstBus;
 class _GstMessage;
+class BusMsgHandler;
 
 class Pipeline
 {
@@ -36,6 +37,7 @@ class Pipeline
         static Pipeline & Instance();
         void add(_GstElement * element);
         void add(std::vector< _GstElement * >&elementVec);
+        void subscribe(BusMsgHandler *obj);
 
         GstClockID add_clock_callback(GstClockCallback callback, void *user_data);
         void remove_clock_callback(GstClockID clockId);
@@ -65,15 +67,17 @@ class Pipeline
         Pipeline(const Pipeline&);
         Pipeline& operator=(const Pipeline&);
 
-        Pipeline() : pipeline_(0), startTime_(0), verbose_(false) {}
+        Pipeline() : pipeline_(0), startTime_(0), verbose_(false), handlers_() {}
         ~Pipeline();
         static Pipeline *instance_;
 
         void make_verbose();
+        void handleElementMsg(GstMessage *msg);
 
         _GstElement *pipeline_;
         GstClockTime startTime_;
         bool verbose_;
+        std::vector<BusMsgHandler*> handlers_;
 };
 
 #endif // _PIPELINE_H_

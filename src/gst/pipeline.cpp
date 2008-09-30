@@ -26,6 +26,7 @@
 #include <cassert>
 #include "pipeline.h"
 #include "logWriter.h"
+#include "busMsgHandler.h"
 
 Pipeline *Pipeline::instance_ = 0;
 
@@ -47,7 +48,7 @@ Pipeline::~Pipeline()
 }
 
 
-gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/)
+gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
 {
     switch(GST_MESSAGE_TYPE(msg))
     {
@@ -113,7 +114,11 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
         case GST_MESSAGE_APPLICATION:
             break;
         case GST_MESSAGE_ELEMENT:
-            break;
+            {
+                Pipeline *context = static_cast<Pipeline*>(data);
+                context->handleElementMsg(msg);
+                break;
+            }
         case GST_MESSAGE_SEGMENT_START:
             break;
         case GST_MESSAGE_SEGMENT_DONE:
@@ -153,7 +158,7 @@ bool Pipeline::init()
          *      work like this when a GLib main loop is running) */
         GstBus *bus;
         bus = getBus();
-        gst_bus_add_watch(bus, GstBusFunc(bus_call), static_cast<gpointer>(NULL));
+        gst_bus_add_watch(bus, GstBusFunc(bus_call), static_cast<gpointer>(this));
         gst_object_unref(bus);
     }
     return true;
@@ -180,7 +185,7 @@ void Pipeline::make_verbose()
         gchar *exclude_args = NULL;     // set args to be excluded from output
         gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
         g_signal_connect(pipeline_, "deep_notify",
-                         G_CALLBACK(gst_object_default_deep_notify), exclude_list);
+                G_CALLBACK(gst_object_default_deep_notify), exclude_list);
     }
 }
 
@@ -345,5 +350,20 @@ GstClock* Pipeline::clock() const
 GstElement *Pipeline::findElement(const char *name) const
 {
     return gst_bin_get_by_name(GST_BIN(pipeline_), name);
+}
+
+
+void Pipeline::subscribe(BusMsgHandler *obj)
+{
+    handlers_.push_back(obj);
+}
+
+
+void Pipeline::handleElementMsg(GstMessage *msg)
+{
+    for (std::vector<BusMsgHandler*>::iterator iter = handlers_.begin(); 
+            iter != handlers_.end(); ++iter)
+        if ((*iter)->handleBusMsg(msg))
+            break;
 }
 
