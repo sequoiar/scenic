@@ -126,7 +126,7 @@ class StrIntFloat
             return *this;
         }
 
-        StrIntFloat& operator=(float in){
+        StrIntFloat& operator=(double in){
             type_ = 'f'; f_ = in; 
             return *this;
         }
