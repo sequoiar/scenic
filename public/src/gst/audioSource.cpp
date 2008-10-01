@@ -133,7 +133,7 @@ void AudioTestSource::sub_init()
 
     GstCaps *caps = gst_caps_new_simple("audio/x-raw-int", "endianness", G_TYPE_INT, 1234, "signed", 
             G_TYPE_BOOLEAN, TRUE, "width", G_TYPE_INT, 32, "depth", G_TYPE_INT, 32, "rate", G_TYPE_INT, 
-            GstBase::SAMPLE_RATE, "channels", G_TYPE_INT, 1, NULL);
+            GstBase::sampleRate(), "channels", G_TYPE_INT, 1, NULL);
 
     // is-live must be true for clocked callback to work properly
     for (src = sources_.begin(); src != sources_.end() && channelIdx != config_.numChannels(); ++src, ++channelIdx)

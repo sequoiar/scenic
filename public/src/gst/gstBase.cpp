@@ -21,12 +21,15 @@
 #include <cassert>
 #include "gstBase.h"
 #include "pipeline.h"
+#include "logWriter.h"
 
-int GstBase::refCount_ = 0;
-const int GstBase::SAMPLE_RATE = 48000;
-        
+int GstBase::refCount_ = 0; 
+const int GstBase::MAX_SAMPLE_RATE = 96000;
+const int GstBase::DEF_SAMPLE_RATE = 48000;
+int GstBase::sampleRate_ = DEF_SAMPLE_RATE;
+
 // this initializes pipeline only once/process
-GstBase::GstBase() : pipeline_(Pipeline::Instance()) 
+GstBase::GstBase() : pipeline_(Pipeline::Instance())
 { 
     ++refCount_; 
 }
@@ -58,6 +61,15 @@ bool GstBase::stop()
 bool GstBase::isPlaying() const
 { 
     return pipeline_.isPlaying(); 
+}
+
+
+void GstBase::setSampleRate(int newSr)
+{
+    if (newSr > 0 && newSr <= MAX_SAMPLE_RATE)
+        sampleRate_ = newSr;
+    else
+        LOG_WARNING("Invalid sample rate " << newSr << ", must be in range [0, " << MAX_SAMPLE_RATE);
 }
 
 
