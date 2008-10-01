@@ -23,6 +23,7 @@
 #include "pipeline.h"
 
 int GstBase::refCount_ = 0;
+const int GstBase::SAMPLE_RATE = 48000;
         
 // this initializes pipeline only once/process
 GstBase::GstBase() : pipeline_(Pipeline::Instance()) 

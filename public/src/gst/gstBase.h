@@ -46,6 +46,7 @@ class GstBase
         virtual ~GstBase();
 
         Pipeline & pipeline_;
+        static const int SAMPLE_RATE; 
 
     private:
         GstBase(const GstBase&);     //No Copy Constructor
