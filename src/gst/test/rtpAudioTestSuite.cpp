@@ -27,80 +27,15 @@
 #include "audioReceiver.h"
 #include "audioConfig.h"
 #include "remoteConfig.h"
-#include "tcp/tcpThread.h"
-#include "tcp/parser.h"
 
 #include <sstream>
+
+
+#include "capsHelper.h"
 
 /*----------------------------------------------*/ 
 /* Helper functions                             */
 /*----------------------------------------------*/ 
-
-bool tcpGetCaps(int port, AudioReceiver &rx)
-{
-    TcpThread tcp(port);
-    tcp.run();
-    QueuePair& queue = tcp.getQueue();
-    bool gotCaps = false;
-    while(!gotCaps)
-    {
-        MapMsg f = queue.timed_pop(100000);
-        if(f["command"].type() == 'n')
-            continue;
-        try
-        {
-            GET(f, "command", std::string, command);
-            GET(f, "caps_str", std::string, caps_str);
-            rx.set_caps(caps_str.c_str());
-            LOG_DEBUG(caps_str);
-
-            // send quit command to Receiver TcpThread to make 
-            // threads join on function exit (i.e. TcpThread's destructor)
-            MapMsg q;
-            q["command"] = StrIntFloat("quit");
-            queue.push(q);
-            gotCaps = true;
-        }
-        catch(ErrorExcept)
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-#include <errno.h>
-
-bool tcpSendCaps(int port, const std::string &caps)
-{
-    MapMsg msg;
-    std::ostringstream s;
-
-    TcpThread tcp(port);
-    s  << "caps: caps_str=\"" << Parser::strEsq(caps) <<"\"" << std::endl;
-    Parser::tokenize(s.str(),msg);
-
-    const int MAX_TRIES = 100;
-
-    for(int i = 0; i < MAX_TRIES; ++i)
-    {
-        try
-        {
-            bool ret = tcp.socket_connect_send("127.0.0.1", msg);
-            if(ret)
-                return true;
-        }
-        catch(ErrorExcept e)
-        {
-           if(e.errno_ == ECONNREFUSED ) 
-               LOG_DEBUG("GOT ECONNREFUSED");
-           else
-               return false;
-        }
-        usleep(100000);
-    }
-    return false;
-}
 
 
 std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
