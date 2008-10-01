@@ -98,7 +98,6 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
 
 GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
 {
-    LOG_DEBUG("THIS MANY DEPAYLOADERS " << usedDepayloaders_.size());
     GstPad *sinkPad;
 
     sinkPad = gst_element_get_static_pad(usedDepayloaders_.front(), "sink");
