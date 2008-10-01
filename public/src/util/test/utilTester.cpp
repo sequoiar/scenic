@@ -10,7 +10,7 @@ int main(int, char**)
     v[3] = 31.12;
     v[4] = 41.12;
     MapMsg msg("try");
-    msg["vector"] = StrIntFloat(v);
+    msg["vector"] = v;
     v2 = msg["vector"];
     assert(v == v2);
     return 0;

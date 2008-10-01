@@ -87,10 +87,8 @@ bool GstSenderThread::audio_start(MapMsg& msg)
 
     try
     {
-        GET(msg, "address", std::string, addr);
-        GET(msg, "port", int, port);
         AudioConfig config("audiotestsrc", 2);
-        SenderConfig rConfig("vorbis", addr, port);
+        SenderConfig rConfig("vorbis", msg["address"], msg["port"]);
         if(!config.sanityCheck())
             return false;
             

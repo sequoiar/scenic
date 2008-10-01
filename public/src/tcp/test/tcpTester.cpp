@@ -28,25 +28,28 @@ int main(int argc, char** argv)
                 if(f["command"].get(command))
                 {
                     if(command == "quit")
-                    {
-                        queue.push(f);
                         break;
-                    }
+                        
+                    if (command == "exception")
+                        throw(f["exception"].except());
+    
+                    
+                    if(command == "test")
+                        LOG_DEBUG(tcp.socket_connect_send("127.0.0.1",f));
                     else
-                    {
-                        if(command == "test")
-                            LOG_DEBUG(tcp.socket_connect_send("127.0.0.1",f));
-                        else
-                            tcp.send(f);
-                    }
+                        tcp.send(f);
+                    
                 }
             }
-            catch(ErrorExcept) { }
+            catch(ErrorExcept e) 
+            { 
+               LOG_DEBUG("In while Except. " << e.msg_); 
+            }
         }
     }
     catch(Except e)
     {
-            std::cerr << e.msg_;
+            LOG_DEBUG(e.msg_);
     }
 }
 

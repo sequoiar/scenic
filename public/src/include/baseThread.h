@@ -85,6 +85,8 @@ template < class T >
 BaseThread < T >::~BaseThread()
 {
     if (th_){
+        T t("quit");
+        flippedQueue_.push(t);
         g_thread_join(th_);
     }
 }

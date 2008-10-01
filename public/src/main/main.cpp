@@ -75,9 +75,7 @@ bool MainModule::run()
             }
             if (command == "exception")
             {       
-                Except e;
-                tmsg["exception"].get(e);
-                throw e;
+                throw tmsg["exception"].except();
             }
             else
                 gst_queue.push(tmsg);
