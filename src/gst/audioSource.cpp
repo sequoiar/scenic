@@ -131,10 +131,22 @@ void AudioTestSource::sub_init()
     const double GAIN = 1.0 / config_.numChannels();        // so sum of tones' amplitude equals 1.0
     int channelIdx = 0;
 
+    GstCaps *caps = gst_caps_new_simple("audio/x-raw-int", "endianness", G_TYPE_INT, 1234, "signed", 
+            G_TYPE_BOOLEAN, TRUE, "width", G_TYPE_INT, 32, "depth", G_TYPE_INT, 32, "rate", G_TYPE_INT, 
+            GstBase::SAMPLE_RATE, "channels", G_TYPE_INT, 1, NULL);
+
     // is-live must be true for clocked callback to work properly
     for (src = sources_.begin(); src != sources_.end() && channelIdx != config_.numChannels(); ++src, ++channelIdx)
+    {
+        GstPad *pad;
         g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", FREQUENCY[0][channelIdx], "is-live", TRUE, NULL);
+        assert(pad = gst_element_get_static_pad(*src, "src"));
+        assert(gst_pad_set_caps(pad, caps));
+        g_object_unref(pad);
+        
+    }
 
+    gst_caps_unref(caps);
 
     clockId_ = pipeline_.add_clock_callback(base_callback, this);
 }
