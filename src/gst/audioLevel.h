@@ -31,11 +31,12 @@ class AudioLevel
     : public GstLinkableFilter, public BusMsgHandler
 {
     public:
-        AudioLevel() : level_(0), rmsValues_(0), interval_(ULONG_MAX * 0.25) {}
+        AudioLevel() : level_(0), emitMessages_(true), rmsValues_(0), interval_(ULONG_MAX * 0.25) {}
 
         ~AudioLevel();
         bool init();
         bool handleBusMsg(_GstMessage *msg);
+        void emitMessages(bool doEmit);
 
     protected:
         _GstElement *srcElement() { return level_; }
@@ -48,6 +49,7 @@ class AudioLevel
         void post() const;
 
         _GstElement *level_;
+        bool emitMessages_;
         std::vector<double> rmsValues_;
         unsigned long long interval_;
 

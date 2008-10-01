@@ -75,12 +75,13 @@ AudioSink* AudioConfig::createSink() const
 {
     if (source_ == "alsasrc")
         return new AudioAlsaSink();
-    if ((!source_.empty()) && 
+    else if ((!source_.empty()) && 
             (source_ != "jackaudiosrc") && 
             (source_ != "dv1394src") && 
             (source_ != "audiotestsrc") && 
             (source_ != "filesrc"))
         LOG_WARNING(source_ << " is an invalid sink, using default jackaudiosink");
+
     return new AudioJackSink();
 }
 

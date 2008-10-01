@@ -40,12 +40,20 @@ bool AudioLevel::init()
 {
     assert(level_ = gst_element_factory_make("level", NULL));
     pipeline_.add(level_);
-    g_object_set (G_OBJECT(level_), "interval", interval_, NULL);
+    g_object_set (G_OBJECT(level_), "interval", interval_, "message", emitMessages_, NULL);
 
     // register this level to handle level msg
     pipeline_.subscribe(this);
     return true;
 }
+
+
+void AudioLevel::emitMessages(bool doEmit)
+{
+    emitMessages_ = doEmit;
+    g_object_set(G_OBJECT(level_), "message", emitMessages_, NULL);
+}
+
 
 void AudioLevel::updateRms(double rmsDb, size_t channelIdx)
 {
@@ -84,8 +92,8 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
             updateRms(rmsDb, channelIdx);
         }
         // TODO: post to static function with mapmsg
-        print();
-        //post();
+        //print();
+        post();
 
         return true;
     }
