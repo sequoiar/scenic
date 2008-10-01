@@ -88,10 +88,10 @@ public:
 
 };
 
-class CriticalExcept : public ErrorExcept
+class CriticalExcept : public Except
 {
 public:
-    CriticalExcept(std::string log_msg, int err=0):ErrorExcept(log_msg,err){ log_ = CRITICAL;}
+    CriticalExcept(std::string log_msg, int err=0):Except(log_msg,err){ log_ = CRITICAL;}
 };
 
 class AssertExcept : public CriticalExcept
