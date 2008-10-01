@@ -31,10 +31,9 @@ public:
 
 void TcpLogFunctor::operator()(LogLevel& level,std::string& msg)
 {
-    MapMsg m;
-    m["command"] = StrIntFloat("log");
-    m["level"] = StrIntFloat(level);
-    m["msg"] = StrIntFloat(msg);
+    MapMsg m("log");
+    m["level"] = level;
+    m["msg"] = msg;
     tcp_.send(m);
 }
 
@@ -90,10 +89,10 @@ int TcpThread::main()
     }
     catch(Except e)
     {
-        LOG_DEBUG( "CAUGHT" << e.msg_);
-        MapMsg mapMsg;
-        mapMsg["command"] = StrIntFloat("exception");
-        mapMsg["exception"] = StrIntFloat(e);
+        LOG_DEBUG("Passing exception to other Thread" << e.msg_);
+
+        MapMsg mapMsg("exception");
+        mapMsg["exception"] = CriticalExcept(e.msg_,e.errno_);
         queue_.push(mapMsg);
     }
     return 0;
@@ -109,7 +108,7 @@ bool TcpThread::gotQuit()
 
     if(f["command"].get(command)&& command == "quit")
     {
-        queue_.push(f);
+    //    queue_.push(f);
         return true;
     }
     else

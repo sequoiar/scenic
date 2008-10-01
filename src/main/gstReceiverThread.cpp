@@ -61,10 +61,8 @@ bool GstReceiverThread::video_start(MapMsg& msg)
     try
     {
         //Get the parameter variables or return false
-        GET(msg, "codec", std::string, codec_str);
-        GET(msg, "port", int, port);
         VideoReceiverConfig config("xvimagesink");
-        ReceiverConfig rConfig(codec_str, get_host_ip(), port);
+        ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"]);
         if(!config.sanityCheck())
             return false;
         vreceiver_ = new VideoReceiver(config, rConfig);
@@ -89,18 +87,14 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
     try
     {
         //Get the parameter variables or return false
-        GET(msg, "codec", std::string, codec_str);
-        GET(msg, "port", int, port);
-        GET(msg, "channels", int, chan);
-        GET(msg, "caps", std::string, caps_str);
 
         AudioReceiverConfig config("jackaudiosink");
-        ReceiverConfig rConfig(codec_str, get_host_ip(), port);
+        ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"]);
         if(!config.sanityCheck())
             return false;
         areceiver_ = new AudioReceiver(config, rConfig);
         areceiver_->init();
-        areceiver_->set_caps(caps_str.c_str());
+        areceiver_->set_caps(msg["caps"]);
         areceiver_->start();
         return true;
     }

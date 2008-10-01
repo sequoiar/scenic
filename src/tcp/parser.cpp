@@ -98,13 +98,12 @@ static int get_end_of_quoted_string(const std::string& str)
 }
 
 
-bool Parser::stringify(MapMsg& cmd_map, std::string& str)
+bool Parser::stringify(MapMsg& cmd_map, std::string& rstr)
 {
-    typedef std::map<std::string, StrIntFloat>::const_iterator iter;
-    str.clear();
-
+    std::stringstream sstr;
+    rstr.clear(); 
     //locate "command" and output value to str
-    str.append(cmd_map["command"].c_str());
+    sstr << std::string(cmd_map["command"]);
 #if 0
     if(it != cmd_map.end())
     {
@@ -117,57 +116,39 @@ bool Parser::stringify(MapMsg& cmd_map, std::string& str)
         return false;
     }
 #endif
-    str.append(":");
+    sstr << ":";
     const std::pair<const std::string,StrIntFloat>* it;
     //for each pair in the map
     for(it = cmd_map.begin();
         it != 0; it = cmd_map.next())
     {
-        if(it->first.compare("command"))                //Insure it's not the command
+        if(it->first != "command")                //Insure it's not the command
         {
-            str.append(" ");
-            str.append(it->first);                      //Output the key to the str
-            str.append("=");
+            sstr << " " << it->first << "=";                      //Output the key to the str
             switch(it->second.type())                   //Output the value to the str
             {
                 case 's':                               //If the value is a string
-                {                                       //delimit with "
-                    std::string temp;
-                    if(!it->second.get(temp))
-                        return false;
-                    str.append("\"");
-                    temp = strEsq(temp);                //Escape the string contents
-                    str.append(temp);
-                    str.append("\"");
+                                                        //delimit with "
+                    sstr << "\"" << strEsq(it->second) << "\"";                //Escape the string contents
                     break;
-                }
+                
                 case 'i':                               //If the value is integer
-                {                                       //generate string from int
-                    int temp;
-                    if(!it->second.get(temp))
-                        return false;
-                    std::stringstream sstream;
-                    sstream << temp;
-                    str.append(sstream.str());
+                                                        //generate string from int
+                    sstr << int(it->second);
                     break;
-                }
+                 
                 case 'f':                               //If the value is a float
-                {                                       //generate string from float
-                    double temp;
-                    if(!it->second.get(temp))
-                        return false;
-                    std::stringstream sstream;
-                    sstream << temp;
-                    str.append(sstream.str());
+                                                        //generate string from float
+                    sstr << double(it->second);
                     break;
-                }
+                 
                 default:
                     return false;
             }
         }
     }
-
-
+    LOG_DEBUG(sstr);
+    rstr = sstr.str();
     return true;
 }
 
@@ -182,7 +163,8 @@ bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
     i = strcspn(cstr, ":");                                 //search for ":"
     if(i == str.size())                                     //if : not found return error
         return false;
-    StrIntFloat c(lstr.substr(0, i));                       //make a string for command
+    StrIntFloat c; 
+    c = lstr.substr(0, i);                       //make a string for command
     cmd_map["command"] = c ;        //insert command into map
 
     if(lstr.size() > i+2)
@@ -211,8 +193,7 @@ bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
 
             std::string quote = lstr.substr(i+2, pos-2);    //strip begin and end quotes
             quote = strUnEsq(quote);                        //clean any escape backslashes
-            StrIntFloat q(quote);                           //make string for value
-            cmd_map[tstr] =  q ;            //insert key,value into map
+            cmd_map[tstr] =  quote ;            //insert key,value into map
         }
         else{
             pos = strcspn(cstr+i+1, " ");                   //find end of key=value pair
@@ -223,16 +204,14 @@ bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
             {
                 int temp_i;
                 stream >> temp_i;                           //convert str to int
-                StrIntFloat temp(temp_i);                   //make int
-                cmd_map[lstr.substr(0, i)] =  temp;
+                cmd_map[lstr.substr(0, i)] =  temp_i;
             }
             else{                                           //value contains .
                                                             //thus it is a float
                 float temp_f;
                 stream >> temp_f;                           //convert str to float
-                StrIntFloat temp(temp_f);                   //make float
                                            //insert key,value
-                cmd_map[lstr.substr(0, i)] =  temp;
+                cmd_map[lstr.substr(0, i)] =  temp_f;
             }
         }
         if(lstr.size() > i+2+pos)                           //more characters to process

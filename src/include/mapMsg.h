@@ -34,12 +34,11 @@
 #include <sstream>
 
 
-
+#if 0
 #define GET(msg,key,val_type,val)                                     \
     val_type val;                                                   \
     msg_get_(msg,key,#val_type,val)
-
-
+#endif
 class StrIntFloat
 {
     char type_;
@@ -49,15 +48,11 @@ class StrIntFloat
     Except e_;
     std::vector<double> F_;
     public:
-        StrIntFloat(std::string s);
-        StrIntFloat(int i);
-        StrIntFloat(double f);
-        StrIntFloat(Except e);
         StrIntFloat();
-        StrIntFloat(std::vector<double> F);
 
         char type() const; 
         std::string c_str()const;
+        Except except()const { return e_;}
 
         operator std::string ()const;
         operator std::vector<double> () const;
@@ -70,8 +65,10 @@ class StrIntFloat
         bool get(Except& e) const;
 
         StrIntFloat& operator=(const std::string& in);
-        StrIntFloat& operator=(int in);
-        StrIntFloat& operator=(double in);
+        StrIntFloat& operator=(const int& in);
+        StrIntFloat& operator=(const double& in);
+        StrIntFloat& operator=(const Except& in);
+        StrIntFloat& operator=(const std::vector<double>& in);
 
         StrIntFloat(const StrIntFloat& sif_);
         StrIntFloat& operator=(const StrIntFloat& in);
@@ -97,7 +94,7 @@ public:
             return 0;
     }
 };
-
+#if 0 
 template< class T >
 void msg_get_(MapMsg& msg,const std::string& key, const std::string& val_type, T& t)
 {
@@ -115,7 +112,7 @@ void msg_get_(MapMsg& msg,const std::string& key, const std::string& val_type, T
         THROW_ERROR(err.str()); 
     } 
 }
-
+#endif
 class MsgFunctor
 {
     public:

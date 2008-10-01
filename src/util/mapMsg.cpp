@@ -47,19 +47,8 @@ void MSG::unregister_cb()
     pf = 0;
 }
 
-
-StrIntFloat::StrIntFloat(std::string s)
-    : type_('s'), s_(s), i_(0), f_(0.0), e_(),F_(){}
-StrIntFloat::StrIntFloat(int i)
-    : type_('i'), s_(), i_(i), f_(0.0), e_(),F_(){}
-StrIntFloat::StrIntFloat(double f)
-    : type_('f'), s_(), i_(0), f_(f), e_(),F_(){}
-StrIntFloat::StrIntFloat(Except e)
-    : type_('e'), s_(), i_(0), f_(0.0),e_(e),F_(){}
 StrIntFloat::StrIntFloat()
     : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(){}
-StrIntFloat::StrIntFloat(std::vector<double> F)
-    : type_('F'), s_(), i_(0), f_(0.0),e_(),F_(F){}
 
 char StrIntFloat::type() const { return type_;}
 std::string StrIntFloat::c_str()const
@@ -71,7 +60,9 @@ std::string StrIntFloat::c_str()const
 
 StrIntFloat::operator std::string ()const
 {   
-    return c_str();
+    if(type_ != 's')
+        THROW_ERROR("Type is " << type_  << " not string");                     
+    return s_;
 }
 bool StrIntFloat::get(std::string& s) const
 {
@@ -92,13 +83,6 @@ StrIntFloat::operator int ()const
         THROW_ERROR("Type is " << type_  << " not integer");                     
     return i_;
 }
-bool StrIntFloat::get(int& i) const
-{
-    if(type_ != 'i')
-        return false;
-    i = i_;
-    return true;
-}
 
 StrIntFloat::operator double ()const
 {
@@ -106,7 +90,7 @@ StrIntFloat::operator double ()const
         THROW_ERROR("Type is " << type_  << " not float");                     
     return f_;
 }
-
+#if 0
 bool StrIntFloat::get(double& f) const
 {
     if(type_ != 'f')
@@ -123,18 +107,37 @@ bool StrIntFloat::get(Except& e) const
     return true;
 }
 
+bool StrIntFloat::get(int& i) const
+{
+    if(type_ != 'i')
+        return false;
+    i = i_;
+    return true;
+}
+#endif
+
 StrIntFloat& StrIntFloat::operator=(const std::string& in){
     type_ = 's'; s_ = in; 
     return *this;
 }
 
-StrIntFloat& StrIntFloat::operator=(int in){
+StrIntFloat& StrIntFloat::operator=(const int& in){
     type_ = 'i'; i_ = in; 
     return *this;
 }
 
-StrIntFloat& StrIntFloat::operator=(double in){
+StrIntFloat& StrIntFloat::operator=(const Except& in){
+    type_ = 'e'; e_ = in; 
+    return *this;
+}
+
+StrIntFloat& StrIntFloat::operator=(const double& in){
     type_ = 'f'; f_ = in; 
+    return *this;
+}
+
+StrIntFloat& StrIntFloat::operator=(const std::vector<double>& in){
+    type_ = 'F'; F_ = in;
     return *this;
 }
 

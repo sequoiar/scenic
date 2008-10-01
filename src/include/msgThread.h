@@ -33,15 +33,6 @@ class MsgThread
     : public BaseThread<MapMsg>
 {
 
-public:
-    ~MsgThread()
-    {
-        if(th_){
-        MapMsg msg;
-        msg["command"] = StrIntFloat("quit");
-        flippedQueue_.push(msg);
-        }
-    }
 };
 
 #endif

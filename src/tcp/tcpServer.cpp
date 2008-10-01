@@ -113,7 +113,7 @@ bool TcpServer::socket_bind_listen()
     int optval = 1;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd <= 0)
-        THROW_ERROR("Error opening socket: errno msg: " << strerror(errno));
+        THROW_ERRNO("Error opening socket: errno msg: " << strerror(errno), errno);
 
     setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
 
@@ -126,10 +126,10 @@ bool TcpServer::socket_bind_listen()
     serv_addr.sin_port = htons(port_);
 
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-        THROW_ERROR("Error at bind: errno msg: " << strerror(errno));
+        THROW_ERRNO("Error at bind: errno msg: " << strerror(errno), errno);
 
     if(!listen(sockfd, 5) <= 0)
-        THROW_ERROR("Error on listen: errno msg: " << strerror(errno)); 
+        THROW_ERRNO("Error on listen: errno msg: " << strerror(errno), errno); 
 
     return true;
 }
