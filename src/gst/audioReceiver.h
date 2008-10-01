@@ -44,9 +44,9 @@ class AudioReceiver
         ~AudioReceiver();
 
         bool start();
-        void set_caps(const char *caps) 
+        void set_caps(const std::string &caps) 
         { 
-            session_.set_caps(caps); 
+            session_.set_caps(caps.c_str()); 
             gotCaps_ = true;
         }
 
