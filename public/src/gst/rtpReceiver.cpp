@@ -48,6 +48,24 @@ RtpReceiver::~RtpReceiver()
 }
 
 
+bool RtpReceiver::ratesMatch()
+{
+    bool result = false;
+    const guint SRATE_IDX = 1;
+    GstPad *srcPad = gst_element_get_static_pad(rtp_receiver_, "src");
+    GstCaps *caps = gst_pad_get_caps(srcPad);
+    GstStructure *structure = gst_caps_get_structure(caps, SRATE_IDX);
+    const GValue *value  = gst_structure_get_value(structure, "clock-rate");
+
+    if (GstBase::sampleRate() == g_value_get_int(value))
+        result = true;
+
+    gst_caps_unref(caps);
+    gst_object_unref(srcPad);
+    return result;
+}
+
+
 void RtpReceiver::set_caps(const char *capsStr)
 {
     GstCaps *caps;

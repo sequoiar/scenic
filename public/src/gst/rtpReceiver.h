@@ -36,6 +36,7 @@ class RtpReceiver
         RtpReceiver() : rtp_receiver_(0), depayloader_(0) {}
         ~RtpReceiver();
         void set_caps(const char* capsStr);
+        bool ratesMatch();
 
         //void addDerived(RtpPay * depayloader, const RemoteConfig & config);
         void add(RtpPay * depayloader, const ReceiverConfig & config);

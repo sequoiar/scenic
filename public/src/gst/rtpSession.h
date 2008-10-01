@@ -34,8 +34,6 @@ class RtpSession
     public:
         ~RtpSession();
         bool init();
-        //virtual void add(const RemoteConfig &config);
-        //virtual void addDerived(RtpPay * pay, const RemoteConfig & config) = 0;
         virtual void set_caps(const char *capsStr) = 0;
 
     protected:
