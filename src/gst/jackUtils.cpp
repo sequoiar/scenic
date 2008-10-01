@@ -38,22 +38,21 @@ bool Jack::is_running()
     if (client == NULL) 
         THROW_ERROR("jack_client_open() failed, check status"); 
     
-
-    return true;
-#if 0
-
-    jack_transport_state_t ts = jack_transport_query(client, NULL);
     jack_client_close(client);
 
-    if (ts == JackTransportRolling)
-        return true;
-    else if (ts == JackTransportStopped)
-        return false;
-    else 
-    {
-        LOG("Unknown jack server state");
-        return false;
-    }
-#endif
+    return true;
 }
 
+unsigned int Jack::samplerate()
+{
+    if (!is_running())
+        THROW_ERROR("JACK server not running, cannot compare sample rates.");
+    
+        jack_client_t *client;
+        jack_status_t status;
+        client = jack_client_open ("AudioJackSource", JackNoStartServer, &status);
+        jack_nframes_t jackRate = jack_get_sample_rate(client);
+        jack_client_close(client);
+    
+        return jackRate;
+}

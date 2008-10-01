@@ -27,6 +27,7 @@
 #include "remoteConfig.h"
 #include "rtpReceiver.h"
 #include "audioLevel.h"
+#include "logWriter.h"
 
 class RtpPay;
 class Decoder;
@@ -47,6 +48,9 @@ class AudioReceiver
         void set_caps(const std::string &caps) 
         { 
             session_.set_caps(caps.c_str()); 
+            // FIXME: actually check caps
+        //    if (!session_.ratesMatch())
+         //       THROW_CRITICAL("Samplerates of receiver pipeline and incoming caps do not match");
             gotCaps_ = true;
         }
 
