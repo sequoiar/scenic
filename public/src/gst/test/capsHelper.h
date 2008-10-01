@@ -19,7 +19,23 @@
 
 #include "tcp/tcpThread.h"
 #include "tcp/parser.h"
+//template<class T>
+StrIntFloat p(MapMsg& in,std::string key,std::string file, std::string line)
+{
+    try
+    {
+        return in[key];
+    }
+    catch(Except e)
+    {
+        e.msg_.append(file);
+        e.msg_.append(line);
+        throw(e);
+    }
+    return StrIntFloat();
+}
 
+#define F(f,x) p(f,x,__FILE__,"__LINE__")
 /*----------------------------------------------*/ 
 /* Helper functions                             */
 /*----------------------------------------------*/ 
@@ -29,27 +45,21 @@ static bool tcpGetCaps(int port, AudioReceiver &rx)
     TcpThread tcp(port);
     tcp.run();
     QueuePair& queue = tcp.getQueue();
-    bool gotCaps = false;
-    while(!gotCaps)
+    for(;;)
     {
         MapMsg f = queue.timed_pop(100000);
         if(f["command"].type() == 'n')
             continue;
-        LOG_DEBUG(std::string(f["caps_str"]));
         try
         {
-            rx.set_caps(f["caps_str"]);
-
-            // send quit command to Receiver TcpThread to make 
-            // threads join on function exit (i.e. TcpThread's destructor)
-            gotCaps = true;
+            rx.set_caps(F(f,"caps_str"));
+            break;
         }
         catch(ErrorExcept)
         {
             return false;
         }
     }
-
     return true;
 }
 #include <errno.h>
