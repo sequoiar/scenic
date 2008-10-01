@@ -45,24 +45,6 @@ bool RtpSession::init()
 }
 
 
-#if 0
-void RtpSession::add()
-{
-    RtpSession::init();
-// FIXME: this is really messed up
-    assert(rtcp_sender_ = gst_element_factory_make("udpsink", NULL));
-    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.port() + 1,
-                 "sync", FALSE, "async", FALSE, NULL);
-
-    assert(rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL));
-    g_object_set(rtcp_receiver_, "port", config.port() + 5, NULL);
-
-    pipeline_.add(rtcp_sender_);
-    pipeline_.add(rtcp_receiver_);
-}
-#endif
-
-
 const char *RtpSession::padStr(const char *padName)
 {
     std::string result(padName);

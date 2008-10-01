@@ -32,61 +32,13 @@
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "hostIP.h"
-#include "tcp/tcpThread.h"
-#include "tcp/parser.h"
 #include <sstream>
+
+#include "capsHelper.h"
 
 /*----------------------------------------------*/ 
 /* Helper functions                             */
 /*----------------------------------------------*/ 
-
-bool tcpGetCaps(int port, AudioReceiver &rx)
-{
-    LOG_DEBUG("Waiting for caps");
-    TcpThread tcp(port);
-    tcp.run();
-    QueuePair& queue = tcp.getQueue();
-    bool gotCaps = false;
-    while(!gotCaps)
-    {
-        MapMsg f = queue.timed_pop(100000);
-        if(f["command"].type() == 'n')
-            continue;
-        try
-        {
-            GET(f, "command", std::string, command);
-            GET(f, "caps_str", std::string, caps_str);
-            rx.set_caps(caps_str.c_str());
-
-            // send quit command to Receiver TcpThread to make 
-            // threads join on function exit (i.e. TcpThread's destructor)
-            MapMsg q;
-            q["command"] = StrIntFloat("quit");
-            queue.push(q);
-            gotCaps = true;
-        }
-        catch(ErrorExcept)
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-
-bool tcpSendCaps(int port, const std::string &caps)
-{
-    MapMsg msg;
-    std::ostringstream s;
-
-    TcpThread tcp(port);
-    s  << "caps: caps_str=\"" << Parser::strEsq(caps) <<"\"" << std::endl;
-    Parser::tokenize(s.str(),msg);
-
-    return tcp.socket_connect_send("127.0.0.1", msg);
-}
-
 
 std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
 {
