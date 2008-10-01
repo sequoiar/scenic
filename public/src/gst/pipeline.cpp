@@ -55,7 +55,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
         case GST_MESSAGE_UNKNOWN:
             break;
         case GST_MESSAGE_EOS:
-            g_print("End-of-stream\n");
+            LOG_DEBUG("End-of-stream");
             break;
         case GST_MESSAGE_ERROR:
         {
@@ -64,11 +64,11 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
 
             gst_message_parse_error(msg, &err, &debug);
 
-            g_print("Error: %s\n", err->message);
+            LOG_WARNING(err->message);
             g_error_free(err);
 
             if (debug) {
-                g_print("Debug details: %s\n", debug);
+                LOG_DEBUG("Debug details: " << debug);
                 g_free(debug);
             }
             break;
@@ -84,7 +84,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
             g_error_free(err);
 
             if (debug) {
-                g_print("Debug details: %s\n", debug);
+                LOG_DEBUG("Debug details: " << debug);
                 g_free(debug);
             }
             break;

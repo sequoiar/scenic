@@ -57,10 +57,12 @@ void RtpReceiver::set_caps(const char *capsStr)
 }
 
 
-void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, void * /*data*/)
+void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, void * /* data*/)
 {
     // FIXME: Once this callback is attached to the pad-added signal, it gets called like crazy, any time any pad
     // is added (regardless of whether or not it's a dynamic pad) to rtpbin.
+    //GstElement *depayloader = static_cast<GstElement*>(data);
+
     if (gst_pad_is_linked(srcPad))
     {
         LOG_DEBUG("Pad is already linked");
@@ -79,6 +81,7 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
     // FIXME: We only have this really stupid method of comparing the caps strings of all
     // the sinks that have been attached to our RtpReceiver so far (stored in a list) against those of the new pad.
     GstPad *sinkPad = get_matching_sink_pad(srcPad);
+    //GstPad *sinkPad = gst_element_get_static_pad(depayloader, "sink");
 
     if (gst_pad_is_linked(sinkPad)) // only link once
     {
@@ -86,6 +89,7 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
         gst_object_unref(sinkPad);
         return;
     }
+
     assert(GstLinkable::link_pads(srcPad, sinkPad));
 
     gst_object_unref(sinkPad);
@@ -94,6 +98,7 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
 
 GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
 {
+    LOG_DEBUG("THIS MANY DEPAYLOADERS " << usedDepayloaders_.size());
     GstPad *sinkPad;
 
     sinkPad = gst_element_get_static_pad(usedDepayloaders_.front(), "sink");
@@ -120,7 +125,6 @@ GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
 void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 {
     RtpSession::init();
-    //RtpSession::add(config);
 
     GstPad *recv_rtp_sink;
     GstPad *send_rtcp_src;
@@ -160,7 +164,8 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 
     usedDepayloaders_.push_back(depayloader_);
     // when pad is created, it must be linked to new sink
-    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), NULL);
+    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), 
+            static_cast<void*>(depayloader_));
 
     // release request pads (in reverse order)
     gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);
