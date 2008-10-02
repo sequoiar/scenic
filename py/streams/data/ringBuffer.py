@@ -27,13 +27,13 @@ class myRingBuffer(object):
     #Write Data in the ring buffer
     def put(self, newNote):
         #if there is enought place to insert new elements
-        if ( self.avail_for_put > 0):
+        if ( self.avail_for_put() > 0):
             #if the last midi time note is inferiror to the new note
             if ( self.buffer[self.end - 1].time <= newNote.time ):
                 self.buffer[self.end] = newNote
                 self.end = (self.end + 1) % self.bufferSize
             else:
-                #else looking into the buffer to see where to insert it
+                #sinon on regarde ou il faut l inserer
                 self.find_place(newNote)
         else:
             log.error("Buffer full")
@@ -54,10 +54,9 @@ class myRingBuffer(object):
 
 
     def find_place(self,note):
-        """Find the correct place (time scheduled ) for the new note
-        """
-
+        #on cherche sa place
         g = -1
+
         #if its the first place
         if (note.time <= self.buffer[self.start].time):
             g = self.start
@@ -88,26 +87,26 @@ class myRingBuffer(object):
             
         if ( g == -1):
             log.error("Can't find the correct place for the new note")
-        else:
-            
+        else:            
             #si end > start 
             #On decal les notes suivante de 1
             if ( self.end >= self.start ):
                 for j in range(self.end, g, -1):
-                    self.buffer[j] = self.buffer[j-1]                
+                    self.buffer[j] = self.buffer[j-1]               
             else:
-                #end < start               
+                #end < start
                 for j in range(self.end, 0, -1):
                     self.buffer[j] = self.buffer[j-1]
 
+                #premier et derniere notes
                 self.buffer[0] = self.buffer[self.bufferSize-1]
 
                 for j in range(self.bufferSize-1, g, -1):
-                    self.buffer[j] = self.buffer[j-1]                
-                                
+                    self.buffer[j] = self.buffer[j-1]
+                                                
             #on insert la nouvelle note
             self.buffer[g] = note
-            self.end = (self.end + 1 ) % self.bufferSize
+            self.end = (self.end + 1 ) % self.bufferSize                
 
 
 if __name__ == "__main__":
