@@ -43,7 +43,7 @@ bool Jack::is_running()
     return true;
 }
 
-unsigned int Jack::samplerate()
+unsigned int Jack::samplerate() 
 {
     if (!is_running())
         THROW_ERROR("JACK server not running, cannot compare sample rates.");
@@ -56,3 +56,4 @@ unsigned int Jack::samplerate()
     
         return jackRate;
 }
+

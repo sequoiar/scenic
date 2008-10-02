@@ -133,7 +133,7 @@ void AudioTestSource::sub_init()
 
     GstCaps *caps = gst_caps_new_simple("audio/x-raw-int", "endianness", G_TYPE_INT, 1234, "signed", 
             G_TYPE_BOOLEAN, TRUE, "width", G_TYPE_INT, 32, "depth", G_TYPE_INT, 32, "rate", G_TYPE_INT, 
-            GstBase::sampleRate(), "channels", G_TYPE_INT, 1, NULL);
+            GstBase::SAMPLE_RATE, "channels", G_TYPE_INT, 1, NULL);
 
     // is-live must be true for clocked callback to work properly
     for (src = sources_.begin(); src != sources_.end() && channelIdx != config_.numChannels(); ++src, ++channelIdx)
@@ -248,6 +248,10 @@ void AudioJackSource::sub_init()
     // jackOut -> jackIn -> jackOut ->jackIn.....
     for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
+    
+    if (GstBase::SAMPLE_RATE != Jack::samplerate())
+        THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
+                << " does not match default sample rate " << GstBase::SAMPLE_RATE);
 }
 
 
