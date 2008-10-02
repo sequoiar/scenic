@@ -116,8 +116,8 @@ void hold_cb();
 }
 
 #define THROW_(msg, level,err)     LOG_(msg,level,err)
-//Note mangle84579568749576948 varible name so that hiding an existing variable is unlikely
-//
+//Note mangle84579568749576948 varible name so that hiding an existing 
+//variable is unlikely
 //Do{} while(0) construct to preserve one statement syntax of LOG()
 
 #define LOG_(msg, level, err)                 \
@@ -127,15 +127,6 @@ void hold_cb();
             cerr_log_(mangle84579568749576948.str(), level, __FILE__, __FUNCTION__, __LINE__,err);    \
             }                           \
             while(0)
-//bool logLevelIsValid(LogLevel level);
-
-
-//std::string logLevelStr(LogLevel level);
-
-
-
-//bool logLevelMatch(LogLevel level);
-
 
 std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, int lineNum);

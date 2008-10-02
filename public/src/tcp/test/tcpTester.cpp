@@ -49,8 +49,9 @@ int main(int argc, char** argv)
     }
     catch(Except e)
     {
-            LOG_DEBUG(e.msg_);
+
     }
+    return -1;
 }
 
 
