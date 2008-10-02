@@ -33,6 +33,7 @@ class RtpSender
 {
     public:
         RtpSender() : rtp_sender_(0) {}
+        void checkSampleRate();
 
         std::string getCaps() const;
 

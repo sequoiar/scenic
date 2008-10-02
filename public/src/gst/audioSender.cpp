@@ -71,7 +71,6 @@ void AudioSender::init_payloader()
 {
      assert(payloader_ = encoder_->createPayloader());
      payloader_->init();
-     //GstLinkable::link(*source_, *encoder_);
      
      GstLinkable::link(*encoder_, *payloader_);
      session_.add(payloader_, remoteConfig_);   // FIXME: session should take RtpPay pointer
@@ -87,6 +86,7 @@ bool AudioSender::start()
     LOG_DEBUG(logstr.str());
 
     pipeline_.wait_until_playing();
+    session_.checkSampleRate();
 
     return true;
 }
