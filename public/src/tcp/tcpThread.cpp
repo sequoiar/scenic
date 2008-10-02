@@ -50,10 +50,12 @@ int TcpThread::main()
         serv_.socket_bind_listen();
         try
         {
-            
             while(!serv_.accept())
+            {
+                if((quit = gotQuit()))
+                    return 0;
                 usleep(10000);
-
+            }
             LOG_INFO("Got Connection.");
             if(logFlag_)
                 LOG::register_cb(&lf_);
@@ -107,12 +109,10 @@ bool TcpThread::gotQuit()
         return false;
 
     if(f["command"].get(command)&& command == "quit")
-    {
-    //    queue_.push(f);
         return true;
-    }
     else
         send(f);
+
     return false;
 }
 
@@ -133,6 +133,5 @@ bool TcpThread::socket_connect_send(const std::string& addr, MapMsg& msg)
     Parser::stringify(msg, msg_str);
     LOG_DEBUG(msg_str);
     return serv_.socket_connect_send(addr,msg_str);
-
 }
 
