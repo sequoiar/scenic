@@ -42,20 +42,43 @@ class MainModule
         MainModule(MainModule&);    //No Copy Constructor
         MainModule& operator=(const MainModule&);
 };
+#include <signal.h>
+static bool signal_flag = false;
+static void handler(int /*sig*/, siginfo_t* /* si*/, void* /* unused*/)
+{
+    LOG_INFO("Got SIGINT going down!");
+    signal_flag = true;
 
+    struct sigaction sa;
+    sa.sa_flags = SA_SIGINFO;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_sigaction = NULL;
+    if (sigaction(SIGINT, &sa, NULL) == -1)
+        THROW_ERROR("Cannot register SIGINT handler");
+}
+
+static void set_handler()
+{
+    struct sigaction sa;
+    sa.sa_flags = SA_SIGINFO;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_sigaction = handler;
+    if (sigaction(SIGINT, &sa, NULL) == -1)
+        THROW_ERROR("Cannot register SIGINT handler");
+}
 
 bool MainModule::run()
 {
-
     try
     {
+        set_handler();
         if(gstThread_ == 0 || !gstThread_->run())
             THROW_ERROR("GstThread not running");
         if(tcpThread_ == 0 || !tcpThread_->run())
             THROW_ERROR("TcpThread not running");
-        QueuePair &gst_queue = gstThread_->getQueue();
+        QueuePair &gst_queue = gstThread_->getQueue(); 
         QueuePair &tcp_queue = tcpThread_->getQueue();
-        while(true)
+        while(!signal_flag)
         {
             MapMsg tmsg = tcp_queue.timed_pop(1);
             MapMsg gmsg = gst_queue.timed_pop(1000);
