@@ -131,6 +131,7 @@ bool TcpServer::socket_bind_listen()
     if(!listen(sockfd, 5) <= 0)
         THROW_ERRNO("Error on listen: errno msg: " << strerror(errno), errno); 
 
+    LOG_INFO("Listening for connection on port: " << port_);
     return true;
 }
 

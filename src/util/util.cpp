@@ -133,11 +133,15 @@ void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileN
 
     if(!hold)
         (*lf)(level,strerr);
-    
+     
+    if(level == INFO)
+    {
+        std::cout << strerr;
+        return;
+    }
     std::cerr << strerr;
     if(level < ERROR)
         return;
-    
 
     if(level < CRITICAL)
         throw(ErrorExcept(strerr,err));
