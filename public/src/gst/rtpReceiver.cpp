@@ -51,14 +51,17 @@ RtpReceiver::~RtpReceiver()
 bool RtpReceiver::ratesMatch()
 {
     bool result = false;
-    const guint SRATE_IDX = 1;
     GstPad *srcPad = gst_element_get_static_pad(rtp_receiver_, "src");
     GstCaps *caps = gst_pad_get_caps(srcPad);
-    GstStructure *structure = gst_caps_get_structure(caps, SRATE_IDX);
+    GstStructure *structure = gst_caps_get_structure(caps, 0);
     const GValue *value  = gst_structure_get_value(structure, "clock-rate");
 
-    if (GstBase::sampleRate() == g_value_get_int(value))
+    if (GstBase::SAMPLE_RATE == static_cast<unsigned>(g_value_get_int(value)))
         result = true;
+    else
+        LOG_DEBUG("Sample rate " << g_value_get_int(value) << 
+                " of incoming caps does not match sample rate " << 
+                GstBase::SAMPLE_RATE << " of receiver pipeline.");
 
     gst_caps_unref(caps);
     gst_object_unref(srcPad);

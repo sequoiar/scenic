@@ -49,8 +49,8 @@ class AudioReceiver
         { 
             session_.set_caps(caps.c_str()); 
             // FIXME: actually check caps
-        //    if (!session_.ratesMatch())
-         //       THROW_CRITICAL("Samplerates of receiver pipeline and incoming caps do not match");
+            if (!session_.ratesMatch())
+                THROW_CRITICAL("Samplerates of receiver pipeline and incoming caps do not match");
             gotCaps_ = true;
         }
 

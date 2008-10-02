@@ -36,8 +36,7 @@ class GstBase
         virtual bool init() = 0;
 
         bool isPlaying() const;
-        static void setSampleRate(int newSr);
-        static int sampleRate() { return sampleRate_; }
+        static const unsigned int SAMPLE_RATE; 
 
     protected:
 
@@ -48,8 +47,6 @@ class GstBase
         virtual ~GstBase();
 
         Pipeline & pipeline_;
-        static const int MAX_SAMPLE_RATE; 
-        static const int DEF_SAMPLE_RATE; 
 
     private:
         GstBase(const GstBase&);     //No Copy Constructor

@@ -50,6 +50,10 @@ bool AudioJackSink::init()
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     pipeline_.add(sink_);
 
+    if (GstBase::SAMPLE_RATE != Jack::samplerate())
+        THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
+                << " does not match default sample rate " << GstBase::SAMPLE_RATE);
+
     return true;
 }
 
