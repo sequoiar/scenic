@@ -31,7 +31,7 @@
 #include "tcp/parser.h"
 
 
-std::auto_ptr<VideoReceiver> buildVideoReceiver()
+static std::auto_ptr<VideoReceiver> buildVideoReceiver()
 {
         VideoReceiverConfig vConfig("xvimagesink");
         ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
@@ -41,7 +41,7 @@ std::auto_ptr<VideoReceiver> buildVideoReceiver()
 }
 
 
-std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
+static std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
 {
         SenderConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
         std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
@@ -344,7 +344,7 @@ void RtpVideoTestSuite::start_stop_file_rtp()
 }
 
 
-int main(int argc, char **argv)
+int mainRtpVideoTestSuite(int argc, char **argv)
 {
     if (!GstTestSuite::areValidArgs(argc, argv)) {
         std::cerr << "Usage: " << "rtpVideoTester <0/1>" << std::endl;

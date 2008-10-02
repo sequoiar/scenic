@@ -431,7 +431,7 @@ void AudioTestSuite::start_stop_audio_dv()
 }
 
 
-int main(int argc, char **argv)
+int mainAudioTestSuite(int argc, char **argv)
 {
     if (!GstTestSuite::areValidArgs(argc, argv)) {
         std::cerr << "Usage: " << "audioTester <0/1>" << std::endl;

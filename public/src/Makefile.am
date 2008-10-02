@@ -1,5 +1,11 @@
 if DEBUG
-SUBDIRS = util util/test tcp tcp/test gst gst/test main sip sip/test
+if SIP
+	SIPDIR = sip sip/test
+endif
+SUBDIRS = util util/test tcp tcp/test gst gst/test main $(SIPDIR)
 else
-SUBDIRS = util tcp gst main sip 
+if SIP
+	SIPDIR = sip 
+endif
+SUBDIRS = util tcp gst main $(SIPDIR) 
 endif

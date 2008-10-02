@@ -29,6 +29,7 @@
 namespace Jack {
 
     bool is_running();
+    unsigned int samplerate();
 
 }
 
