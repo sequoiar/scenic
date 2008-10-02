@@ -26,11 +26,9 @@
 #define __BASE_THREAD_H__
 
 #include <glib.h>
-#include <list>
 #include <string>
 #include "baseModule.h"
 #include "queuePair.h"
-
 
 template < class T >
 class BaseThread
@@ -41,22 +39,16 @@ class BaseThread
         virtual ~BaseThread < T > ();
 
         QueuePair_ < T > &getQueue();
-
         bool run();
 
     protected:
-        virtual int main() {
-            return 0;
-        }
-
-
+        virtual int main() { return 0; }
+        static void *thread_main(void *pThreadObj);
         virtual bool ready() { return true; }
 
         GThread *th_;
-
         QueuePair_ < T > queue_;
         QueuePair_ < T > flippedQueue_;
-        static void *thread_main(void *pThreadObj);
 
     private:
         BaseThread(const BaseThread&); //No Copy Constructor
@@ -69,7 +61,6 @@ QueuePair_ < T > &BaseThread < T >::getQueue()
     return flippedQueue_;
 }
 
-
 template < class T >
 BaseThread < T >::BaseThread()
     : th_(0), queue_(), flippedQueue_()
@@ -79,7 +70,6 @@ BaseThread < T >::BaseThread()
     queue_.init();
     flippedQueue_.flip(queue_);
 }
-
 
 template < class T >
 BaseThread < T >::~BaseThread()
@@ -91,31 +81,35 @@ BaseThread < T >::~BaseThread()
     }
 }
 
-
 template < class T >
 GThread * thread_create(void *(thread) (void *), T t, GError ** err)
 {
     return (g_thread_create(thread, static_cast < void *>(t), TRUE, err));
 }
 
-
 template < class T >
 bool BaseThread < T >::run()
 {
     GError *err = 0;
-
-    //No thread yet
-    if (th_ || !ready())
-        return false;
-    th_ = thread_create(BaseThread::thread_main, this, &err);
-
-    if (th_)  //BaseThread running
+    if (th_)
     {
-        usleep(1); // Insure thread started or g_thread_join 
-                    //returns before this thread starts
+        LOG_WARNING("Thread already Running.");
         return true;
     }
-    return false;
+    //No thread yet
+    if(!ready())
+        return false;
+
+    th_ = thread_create(BaseThread::thread_main, this, &err);
+
+    if (!th_)       //BaseThread failed
+    {
+        THROW_CRITICAL("thread_create failed!");
+        return false;
+    }
+    usleep(1);      // Insure thread started or g_thread_join 
+                    //returns before this thread starts
+    return true;
 }
 
 

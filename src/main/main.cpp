@@ -39,9 +39,11 @@ class MainModule
     private:
         MsgThread* tcpThread_;
         MsgThread* gstThread_;
+
         MainModule(MainModule&);    //No Copy Constructor
         MainModule& operator=(const MainModule&);
 };
+
 #include <signal.h>
 static bool signal_flag = false;
 static void handler(int /*sig*/, siginfo_t* /* si*/, void* /* unused*/)
@@ -78,6 +80,7 @@ bool MainModule::run()
             THROW_ERROR("TcpThread not running");
         QueuePair &gst_queue = gstThread_->getQueue(); 
         QueuePair &tcp_queue = tcpThread_->getQueue();
+
         while(!signal_flag)
         {
             MapMsg tmsg = tcp_queue.timed_pop(1);
@@ -91,15 +94,9 @@ bool MainModule::run()
             if(!tmsg["command"].get(command))
                 continue;
             if (command == "quit")
-            {
-                gst_queue.push(tmsg);
-                tcp_queue.push(tmsg);
                 break;
-            }
             if (command == "exception")
-            {       
                 throw tmsg["exception"].except();
-            }
             else
                 gst_queue.push(tmsg);
         }
@@ -124,7 +121,7 @@ void parseArgs(int argc,char** argv)
     if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
         THROW_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
     if(sscanf(argv[2], "%d", &port) != 1 || port < 1024 || port > 65000)
-{}//        THROW_CRITICAL("Invalid command line arguments -- Port must be in the range of 1024-65000");
+        THROW_CRITICAL("Invalid command line arguments -- Port must be in the range of 1024-65000");
 }
 
 int main (int argc, char** argv)
