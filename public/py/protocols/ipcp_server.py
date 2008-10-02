@@ -44,17 +44,21 @@ class IPCP(LineReceiver):
     def get_caps(self):
         caps = [chr(randint(1,127)) for i in range(512)]
         return ''.join(caps)
+
+def ready():
+    print 'READY'
         
 if __name__ == "__main__":
 
     # Server example
-    import sys
-    
-    port = 10000
-    if len(sys.argv) > 1 and sys.argv[1].isdigit():
-        port = int(sys.argv[1])
-        
-    factory = protocol.ServerFactory()
-    factory.protocol = IPCP
-    reactor.listenTCP(port, factory)
+#    import sys
+    print 'START'
+#    port = 10000
+#    if len(sys.argv) > 2 and sys.argv[2].isdigit():
+#        port = int(sys.argv[2])
+#        
+#    factory = protocol.ServerFactory()
+#    factory.protocol = IPCP
+#    reactor.listenTCP(port, factory)
+#    reactor.callLater(1, ready)
     reactor.run()
