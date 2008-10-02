@@ -27,6 +27,7 @@ AC_C_CONST
 PKG_PROG_PKG_CONFIG
 
 AC_MSG_CHECKING(whether to enable debugging)
+AC_ARG_ENABLE([sip], [  --enable-sip build sip],,enable_sip=yes)
 AC_ARG_ENABLE([debug], [
 **************** 
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
@@ -93,6 +94,7 @@ fi
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
 #AC_SUBST(ALL_GST_LIBS)
 
+if test "x${enable_sip}" = "xyes" ; then
 
 #Trying to set PJSIP using pkg-config
 PKG_CHECK_MODULES(UUID, uuid, have_uuid=true, have_uuid=false)
@@ -105,6 +107,8 @@ PKG_CHECK_MODULES(PJSIP, libpj, have_libpj=true, have_libpj=false)
 if test "x${have_libpj}" = "xfalse" ; then
     AC_MSG_ERROR([PJSIP not found. http://www.pjsip.org/download.htm])
 fi
+fi
+AM_CONDITIONAL([SIP],test "x${enable_sip}" == "xyes" )
 
 #Trying to set LIBLO using pkg-config
 PKG_CHECK_MODULES(LIBLO, liblo >= 0.25, have_liblo=true, have_liblo=false)
@@ -134,9 +138,9 @@ AC_CONFIG_FILES([Makefile
                  src/sip/Makefile
                  ])
 
-AM_CONDITIONAL([DEBUG],test "x${enable_debug}" == "xyes" )
+AM_CONDITIONAL([DEBUG],test "x${enable_debug}" = "xyes" )
 
-if test "x${enable_debug}" == "xyes" ; then
+if test "x${enable_debug}" = "xyes" ; then
 AC_CONFIG_FILES([
                  src/util/test/Makefile
                  src/tcp/test/Makefile

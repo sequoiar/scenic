@@ -19,6 +19,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <cstring>
 #include <gst/gst.h>
 
 #include "audioLevel.h"

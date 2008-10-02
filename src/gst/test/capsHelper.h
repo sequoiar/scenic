@@ -19,6 +19,7 @@
 
 #include "tcp/tcpThread.h"
 #include "tcp/parser.h"
+#if 0
 //template<class T>
 StrIntFloat p(MapMsg& in,std::string key,std::string file, std::string line)
 {
@@ -36,6 +37,7 @@ StrIntFloat p(MapMsg& in,std::string key,std::string file, std::string line)
 }
 
 #define F(f,x) p(f,x,__FILE__,"__LINE__")
+#endif
 /*----------------------------------------------*/ 
 /* Helper functions                             */
 /*----------------------------------------------*/ 
@@ -52,7 +54,7 @@ static bool tcpGetCaps(int port, AudioReceiver &rx)
             continue;
         try
         {
-            rx.set_caps(F(f,"caps_str"));
+            rx.set_caps(f["caps_str"]);
             break;
         }
         catch(ErrorExcept)

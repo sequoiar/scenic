@@ -40,7 +40,7 @@
 /* Helper functions                             */
 /*----------------------------------------------*/ 
 
-std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
+static std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
 {
     SenderConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT);
     std::auto_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
@@ -49,7 +49,7 @@ std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
 }
 
 
-std::auto_ptr<AudioReceiver> buildAudioReceiver()
+static std::auto_ptr<AudioReceiver> buildAudioReceiver()
 {
     AudioReceiverConfig aConfig("jackaudiosink");
     ReceiverConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT); 
@@ -59,7 +59,7 @@ std::auto_ptr<AudioReceiver> buildAudioReceiver()
 }
 
 
-std::auto_ptr<VideoReceiver> buildVideoReceiver()
+static std::auto_ptr<VideoReceiver> buildVideoReceiver()
 {
         VideoReceiverConfig vConfig("xvimagesink");
         ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
@@ -69,7 +69,7 @@ std::auto_ptr<VideoReceiver> buildVideoReceiver()
 }
 
 
-std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
+static std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
 {
         SenderConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
         std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
@@ -409,10 +409,10 @@ void SyncTestSuite::start_stop_dv_audio_dv_video_rtp()
 }
 
 
-int main(int argc, char **argv)
+int mainSyncTestSuite(int argc, char **argv)
 {
     if (!GstTestSuite::areValidArgs(argc, argv)) {
-        std::cerr << "Usage: " << "audioTester <0/1>" << std::endl;
+        std::cerr << "Usage: " << "syncTester <0/1>" << std::endl;
         return 1;
     }
 
