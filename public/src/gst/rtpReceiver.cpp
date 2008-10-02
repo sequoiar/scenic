@@ -48,33 +48,22 @@ RtpReceiver::~RtpReceiver()
 }
 
 
-bool RtpReceiver::ratesMatch()
-{
-    bool result = false;
-    GstPad *srcPad = gst_element_get_static_pad(rtp_receiver_, "src");
-    GstCaps *caps = gst_pad_get_caps(srcPad);
-    GstStructure *structure = gst_caps_get_structure(caps, 0);
-    const GValue *value  = gst_structure_get_value(structure, "clock-rate");
-
-    if (GstBase::SAMPLE_RATE == static_cast<unsigned>(g_value_get_int(value)))
-        result = true;
-    else
-        LOG_DEBUG("Sample rate " << g_value_get_int(value) << 
-                " of incoming caps does not match sample rate " << 
-                GstBase::SAMPLE_RATE << " of receiver pipeline.");
-
-    gst_caps_unref(caps);
-    gst_object_unref(srcPad);
-    return result;
-}
-
-
 void RtpReceiver::set_caps(const char *capsStr)
 {
     GstCaps *caps;
     assert(caps = gst_caps_from_string(capsStr));
     g_object_set(G_OBJECT(rtp_receiver_), "caps", caps, NULL);
     gst_caps_unref(caps);
+}
+
+
+void RtpReceiver::checkSampleRate()
+{
+    GstPad *srcPad = gst_element_get_pad(rtp_receiver_, "src");
+    GstCaps *srcCaps = gst_pad_get_negotiated_caps(srcPad);
+    GstBase::checkCapsSampleRate(srcCaps);
+    gst_caps_unref(srcCaps);
+    gst_object_unref(srcPad);
 }
 
 
@@ -122,6 +111,34 @@ GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
     GstPad *sinkPad;
 
     sinkPad = gst_element_get_static_pad(usedDepayloaders_.front(), "sink");
+#if 0
+    // Compare media type of caps
+    GstCaps *srcCaps = gst_pad_get_caps(srcPad);
+    GstCaps *sinkCaps = gst_pad_get_caps(sinkPad);
+    GstStructure *srcCapsStruct = gst_caps_get_structure(srcCaps, 0);
+    GstStructure *sinkCapsStruct = gst_caps_get_structure(sinkCaps, 0);
+    const GValue *srcMediaType = gst_structure_get_value(srcCapsStruct, "media");
+    const GValue *sinkMediaType = gst_structure_get_value(sinkCapsStruct, "media");
+
+    std::list<GstElement *>::iterator iter = usedDepayloaders_.begin();
+    while ((g_value_get_string(srcMediaType) != g_value_get_string(sinkMediaType)) 
+            && iter != usedDepayloaders_.end()) 
+    {
+        gst_object_unref(sinkPad);
+        gst_caps_unref(sinkCaps);
+        sinkCapsStruct = 0;
+        sinkMediaType = 0;
+
+        sinkPad = gst_element_get_static_pad(*iter, "sink");
+        sinkCaps = gst_pad_get_caps(sinkPad);
+        sinkCapsStruct = gst_caps_get_structure(sinkCaps, 0);
+        sinkMediaType = gst_structure_get_value(sinkCapsStruct, "media");
+        ++iter;
+    }
+
+    gst_caps_unref(sinkCaps);
+    gst_caps_unref(srcCaps);
+#endif
 
     // look for caps whose first 37 characters match (this includes the parameter that describes media type)
     // FIXME: could just check the depayloader types/names

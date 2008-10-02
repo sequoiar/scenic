@@ -84,3 +84,15 @@ const char* GstBase::getElementPadCaps(GstElement *element, const char * padName
     return result;
 }
 
+
+void GstBase::checkCapsSampleRate(GstCaps *caps)
+{
+    GstStructure *structure = gst_caps_get_structure(caps, 0);
+    const GValue *value  = gst_structure_get_value(structure, "clock-rate");
+
+    if (GstBase::SAMPLE_RATE != static_cast<unsigned>(g_value_get_int(value)))
+        THROW_CRITICAL("Sample rate " << g_value_get_int(value) << 
+                " of caps does not match sample rate " << 
+                GstBase::SAMPLE_RATE << " of pipeline.");
+}
+

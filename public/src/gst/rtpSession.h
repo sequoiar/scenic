@@ -26,7 +26,6 @@
 
 class RemoteConfig;
 class _GstElement;
-class RtpPay;
 
 class RtpSession
     : public GstBase
@@ -34,7 +33,6 @@ class RtpSession
     public:
         ~RtpSession();
         bool init();
-        virtual void set_caps(const char *capsStr) = 0;
 
     protected:
         RtpSession() : rtcp_sender_(0), rtcp_receiver_(0) { ++refCount_; }

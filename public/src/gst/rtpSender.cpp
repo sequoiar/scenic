@@ -42,15 +42,6 @@ std::string RtpSender::getCaps() const
 }
 
 
-void RtpSender::set_caps(const char *capsStr)
-{
-    GstCaps *caps;
-    assert(caps = gst_caps_from_string(capsStr));
-    g_object_set(G_OBJECT(rtp_sender_), "caps", caps, NULL);
-    gst_caps_unref(caps);
-}
-
-
 void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
 {
     RtpSession::init();
