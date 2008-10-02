@@ -1,4 +1,4 @@
-from twisted.internet import protocol, reactor, task
+from twisted.internet import protocol, reactor, task, defer
 
 from midiObject import MidiNote
 
@@ -12,7 +12,7 @@ import time
 INPUT = 0
 OUTPUT = 1
 
-class MidiOut():
+class MidiOut(object):
 	
 	def __init__(self, permisif):
 		
@@ -21,7 +21,7 @@ class MidiOut():
 		self.midiDeviceList = []
 		self.MidiOut = None
 		self.midiDevice = None
-		self.latency = 1
+		self.latency = 20
 		
 		#midiTimeDiff => difference between the midi time 
 		#of the server and the midi time of the client
@@ -43,20 +43,21 @@ class MidiOut():
 		
 		#flag
 		self.isListening = 0
-
+		self.publy_flag = False
+		self.start_time = 0
 		#tmp
 		self.lastTime = 0
+		
 
 
 	def start_publy(self):
 		"""Start publying notes
 		"""
-		#if ( not self.publy.running):
-		if (not self.MidiOut is None):
-			self.send_note_off()
-				#self.publy.start(0.001)
-		else:
-			log.info("can't publy note if no midi device is set")
+		
+		self.send_note_off()
+		self.publy_flag = True
+		reactor.callInThread(self.publy_midi_notes)
+
 
 
 	def stop_publy(self):
@@ -64,6 +65,7 @@ class MidiOut():
 		"""
 		#if ( self.publy.running):
 			#self.publy.stop()
+		self.publy_flag = False
 		self.send_note_off()
 		#reinitialize midi time difference average
 		self.lastMidiTimeDiff.flush()
@@ -73,14 +75,14 @@ class MidiOut():
 		"""Sync set the difference between local midi time and
 	    remote midi time in order to apply it to the notes
 		"""
-		if (pypm.Time() >= int(time)):
+		if pypm.Time() >= int(time) :
 			self.lastMidiTimeDiff.to_list(pypm.Time() - int(time))
 		else:
 			self.lastMidiTimeDiff.to_list(-(int(time) - pypm.Time()))
 		
 		#midiTime diff recoit la moyenne des dernier tps calculer
 		self.midiTimeDiff = self.lastMidiTimeDiff.average()
-
+		
 		#Checking if the delay between the two machine is highter than the current latency
 		if ( self.latency <= self.delay ):
 			l = "OUTPUT: Can't play on time = delay between hosts is higher than the latency !"
@@ -108,10 +110,10 @@ class MidiOut():
 
 		#check if device exist
 		devList = [self.midiDeviceList[i][0] for i in range(len(self.midiDeviceList))]	
-		if (dev in devList):
+		if dev in devList :
 			self.midiDevice = dev
 
-			if (self.MidiOut is None):
+			if self.MidiOut is None :
 				#Initializing midi input stream
 				self.MidiOut = pypm.Output(self.midiDevice, 0)
 			else:
@@ -150,44 +152,48 @@ class MidiOut():
 		"""PlayMidi Note
 	   	Separate midi infos to choose the good function for the good action
 		"""
-		
+		#Creating a list with midi notes late
+		new_list = [midiNotes[i][1] for i in range(len(midiNotes)) if (pypm.Time() >  midiNotes[i][1]) ]
+
 		#Playing note on the midi device
 		self.MidiOut.Write(midiNotes)
 
-		new_list = [midiNotes[i][1] for i in range(len(midiNotes)) if (pypm.Time() >  midiNotes[i][1]) ]
-
-		for i in range(len(new_list)):
+		#for i in range(len(new_list)):
+		if len(new_list) > 0 :		
 			self.nbXRun += 1
-			print "OUTPUT: " + str(pypm.Time()) + " xrun no. " + str(self.nbXRun) + " can't play in time , " + str(len(midiNotes)) + " notes - late of " + str(pypm.Time() - new_list[i]) + " ms"
+			print "OUTPUT: " + str(pypm.Time()) + " xrun no. " + str(self.nbXRun) + " can't play in time , " + str(len(midiNotes)) + " notes - late of " + str(pypm.Time() - new_list[0]) + " ms"		
 
-		
-	def publy_midi_note(self):
-		midiNotes = []
-		#if there are notes to play 
-		if ( self.midiOutCmdList.avail_for_get() > 0 ):
-			
-			note = self.midiOutCmdList.buffer[self.midiOutCmdList.start]
-			
-#if they are in time ( 2 is for processing time )
-			if (note.time + self.midiTimeDiff - int(self.delay) + self.latency <= pypm.Time() + 3):
-				
-				#get notes from the buffer
-				noteList = self.midiOutCmdList.get()
-				if ( self.lastTime > noteList[0].time):
-					print "______________________ERROR____________ERROR___________"
-				
-				self.lastTime = noteList[0].time
-				for i in range(len(noteList)):
-					currentNote = noteList[i]
-					midiNotes.append( [[currentNote.event,currentNote.note,currentNote.velocity], currentNote.time + self.midiTimeDiff + self.latency - int(self.delay)])
 
-		#if (len(midiNotes)>0):
+	def publy_midi_notes(self):
+		d = defer.Deferred()
+		while self.publy_flag :
+			midiNotes = []
+		        #if there are notes to play 
+			if ( self.midiOutCmdList.avail_for_get() > 0 ):
+				note = self.midiOutCmdList.buffer[self.midiOutCmdList.start]
+
+				#if they are in time ( 2 is for processing time )
+				if (note.time <= pypm.Time() + 2):
+			                #get notes from the buffer
+					noteList = self.midiOutCmdList.get()
+
+				    #checking order ( a enlever, test fait au niveau ringbuffer)
+					if ( self.lastTime > noteList[0].time):
+						print "______________________ERROR____________ERROR___________"
+					self.lastTime = noteList[0].time
+
+			                #formating notes
+					midiNotes = [ [[noteList[i].event, noteList[i].note, noteList[i].velocity], noteList[i].time] for i in range(len(noteList)) ] 
+
+			
+			if (len(midiNotes)>0):
 				self.play_midi_note(midiNotes)
-			else:
-				pass
-				#print 'to early'
-				#print str(note.time + self.midiTimeDiff - int(self.delay)+ self.latency) + ' <= cmp to ' + str (pypm.Time() + 2)
+
+			time.sleep(0.001)
+		
+		return d
+
+
 			
-	
 	def __del__(self):
 		self.terminate = 1
