@@ -24,6 +24,7 @@
 #include <vector>
 
 class _GstElement;
+class _GstCaps;
 class Pipeline;
 
 typedef std::vector<_GstElement *>::iterator GstIter;
@@ -43,6 +44,7 @@ class GstBase
         // this initializes pipeline only once/process
         GstBase();
         const char* getElementPadCaps(_GstElement *element, const char * padName) const;
+        static void checkCapsSampleRate(_GstCaps *caps);
 
         virtual ~GstBase();
 

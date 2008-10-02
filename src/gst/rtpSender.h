@@ -35,7 +35,6 @@ class RtpSender
         RtpSender() : rtp_sender_(0) {}
 
         std::string getCaps() const;
-        void set_caps(const char *capsStr);
 
         ~RtpSender();
 
