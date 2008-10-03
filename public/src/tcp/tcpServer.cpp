@@ -126,7 +126,7 @@ bool TcpServer::socket_bind_listen()
     serv_addr.sin_port = htons(port_);
 
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-        THROW_ERRNO("Error at bind: errno msg: " << strerror(errno), errno);
+        THROW_CRITICAL("Error at bind: errno msg: " << strerror(errno));
 
     if(!listen(sockfd, 5) <= 0)
         THROW_ERRNO("Error on listen: errno msg: " << strerror(errno), errno); 

@@ -147,7 +147,6 @@ bool Parser::stringify(MapMsg& cmd_map, std::string& rstr)
             }
         }
     }
-    LOG_DEBUG(sstr);
     rstr = sstr.str();
     return true;
 }

@@ -34,11 +34,6 @@
 #include <sstream>
 
 
-#if 0
-#define GET(msg,key,val_type,val)                                     \
-    val_type val;                                                   \
-    msg_get_(msg,key,#val_type,val)
-#endif
 class StrIntFloat
 {
     char type_;
@@ -49,7 +44,7 @@ class StrIntFloat
     std::vector<double> F_;
     public:
         StrIntFloat();
-
+        std::string k_;
         char type() const; 
         std::string c_str()const;
         Except except()const { return e_;}
@@ -83,7 +78,12 @@ public:
     MapMsg():map_(),it_(){}
     MapMsg(std::string cmd):map_(),it_(){ map_["command"] = cmd;}
 
-    StrIntFloat& operator[](const std::string& str){ return map_[str]; }
+    StrIntFloat& operator[](const std::string& str)
+    {    
+        StrIntFloat& sif = map_[str];
+        sif.k_ = str; 
+        return sif;
+    }
     void clear(){map_.clear();}
     const std::pair<const std::string,StrIntFloat>* begin(){it_ =map_.begin(); return &(*it_);}
     const std::pair<const std::string,StrIntFloat>* next()

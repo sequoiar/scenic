@@ -101,7 +101,7 @@ bool MainModule::run()
                 gst_queue.push(tmsg);
         }
     }
-    catch(Except e)
+    catch(ErrorExcept e)
     {
         static int count = 0; 
         LOG_WARNING("Abnormal Main Exception:" << e.msg_);

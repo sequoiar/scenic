@@ -70,14 +70,14 @@ bool GstSenderThread::video_start(MapMsg& msg)
 
         return true;
     }
-    catch(ErrorExcept e)
+    catch(Except e)
     {
+        LOG_WARNING(e.msg_);
         delete(vsender_);
         vsender_ = 0;
         return false;
     }
 }
-
 
 bool GstSenderThread::audio_start(MapMsg& msg)
 {
@@ -106,9 +106,9 @@ bool GstSenderThread::audio_start(MapMsg& msg)
 
         return true;
     }
-    catch(ErrorExcept e)
-
+    catch(Except e)
     {
+        LOG_WARNING(e.msg_);
         delete(asender_);
         asender_ = 0;
         return false;

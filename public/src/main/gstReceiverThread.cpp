@@ -70,8 +70,9 @@ bool GstReceiverThread::video_start(MapMsg& msg)
         vreceiver_->start();
         return true;
     }
-    catch(ErrorExcept e)
+    catch(Except e)
     {
+        LOG_WARNING(e.msg_);
         delete(vreceiver_);
         vreceiver_ = 0;
         return false;
@@ -98,8 +99,9 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
         areceiver_->start();
         return true;
     }
-    catch(ErrorExcept e)
+    catch(Except e)
     {
+        LOG_WARNING(e.msg_);
         delete(areceiver_);
         areceiver_ = 0;
         return false;

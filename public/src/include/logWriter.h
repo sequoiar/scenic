@@ -114,7 +114,7 @@ void unregister_cb();
 void release_cb();
 void hold_cb();
 }
-
+#define QUIET_THROW(msg)           LOG_(msg,NONE,-1)
 #define THROW_(msg, level,err)     LOG_(msg,level,err)
 //Note mangle84579568749576948 varible name so that hiding an existing 
 //variable is unlikely

@@ -48,22 +48,19 @@ void MSG::unregister_cb()
 }
 
 StrIntFloat::StrIntFloat()
-    : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(){}
+    : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(),k_(){}
 
-char StrIntFloat::type() const { return type_;}
-std::string StrIntFloat::c_str()const
-{       
-    if(type_ != 's')
-        THROW_ERROR("Type is " << type_  << " not string");                     
-    return s_;
-}
+#define T_EXPAND(x) (x == 'f'?"double":x == 's'?"string":x == 'i'?"interger":x == 'F'?"vector<double>":"unknown")
 
-StrIntFloat::operator std::string ()const
-{   
-    if(type_ != 's')
-        THROW_ERROR("Type is " << type_  << " not string");                     
-    return s_;
-}
+#define TYPE_CHECKMSG(gtype,xtype) \
+    const char* t = #gtype; \
+    char tt = t[0];\
+    if(type_ == 'n') QUIET_THROW("Parameter \"" << k_ << "\" missing."); \
+    else \
+        if(type_ != tt) \
+        QUIET_THROW("Parameter \"" << k_ << "\" should be " << #xtype << " not " << T_EXPAND(type_) << "." );\
+    return gtype   
+
 bool StrIntFloat::get(std::string& s) const
 {
     if(type_ != 's')
@@ -72,49 +69,31 @@ bool StrIntFloat::get(std::string& s) const
     return true;
 }
 
+char StrIntFloat::type() const { return type_;}
+std::string StrIntFloat::c_str()const
+{ 
+    TYPE_CHECKMSG(s_,string);
+}
+
+StrIntFloat::operator std::string ()const
+{   
+    TYPE_CHECKMSG(s_,string);
+}
+
 StrIntFloat::operator std::vector<double> () const
 {
-    return F_;
+    TYPE_CHECKMSG(F_,vector<double>);
 }
 
 StrIntFloat::operator int ()const
 {
-    if(type_ != 'i')
-        THROW_ERROR("Type is " << type_  << " not integer");                     
-    return i_;
+    TYPE_CHECKMSG(i_,integer);
 }
 
 StrIntFloat::operator double ()const
 {
-    if(type_ != 'f')
-        THROW_ERROR("Type is " << type_  << " not float");                     
-    return f_;
+    TYPE_CHECKMSG(f_,float);
 }
-#if 0
-bool StrIntFloat::get(double& f) const
-{
-    if(type_ != 'f')
-        return false;
-    f = f_;
-    return true;
-}
-
-bool StrIntFloat::get(Except& e) const
-{
-    if(type_ != 'e')
-        return false;
-    e = e_;
-    return true;
-}
-
-bool StrIntFloat::get(int& i) const
-{
-    if(type_ != 'i')
-        return false;
-    i = i_;
-    return true;
-}
-#endif
 
 StrIntFloat& StrIntFloat::operator=(const std::string& in){
     type_ = 's'; s_ = in; 
@@ -142,12 +121,12 @@ StrIntFloat& StrIntFloat::operator=(const std::vector<double>& in){
 }
 
 StrIntFloat::StrIntFloat(const StrIntFloat& sif_)
-    : type_(sif_.type_), s_(sif_.s_), i_(sif_.i_), f_(sif_.f_),e_(sif_.e_),F_(sif_.F_){}
+    : type_(sif_.type_), s_(sif_.s_), i_(sif_.i_), f_(sif_.f_),e_(sif_.e_),F_(sif_.F_),k_(sif_.k_){}
 StrIntFloat& StrIntFloat::operator=(const StrIntFloat& in)
 {
     if(this == &in)
         return *this;
-    type_ = in.type_; s_ = in.s_; i_ = in.i_; f_ = in.f_; e_ = in.e_; F_ = in.F_;
+    type_ = in.type_; s_ = in.s_; i_ = in.i_; f_ = in.f_; e_ = in.e_; F_ = in.F_; k_ = in.k_;
     return *this;
 }
 

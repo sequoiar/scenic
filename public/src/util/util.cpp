@@ -131,6 +131,8 @@ void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileN
 {
     std::string strerr = log_(msg,level,fileName,functionName,lineNum);
 
+    if(err == -1)
+        throw(Except(msg,0));
     if(!hold)
         (*lf)(level,strerr);
      
