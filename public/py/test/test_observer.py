@@ -51,8 +51,8 @@ class GoodObserver(Observer):
     
 #Observer without update implemented to verify raise NotImplemented    
 class BadObserver(Observer):
-    def __init__(self):
-        pass
+    def __init__(self, subject , controller):
+        Observer.__init__(self, subject)
     
 
 #####################################################    
@@ -73,11 +73,12 @@ class TestObserver(unittest.TestCase):
     def test_function_notify(self):
         self.gs.a_test_function()
         
-        assert(self.obs.callbacks['a_test_function'] == 1), self.fail('Problem lake of notify for function')
+        assert(self.obs.callbacks['a_test_function'] == 1), self.fail('Problem, lake of notify for function')
 
     def test_var_notify(self):
         self.gs.change_silly_var()
         assert(self.obs.callbacks['silly_var'] == 42), self.fail('Problem lake of notify for var change')
+
         
 #test 1 observer and 2 subjects
 class TestObserver2(unittest.TestCase):
@@ -100,17 +101,17 @@ class TestObserver2(unittest.TestCase):
     
     def test_function_notify(self):
         self.gs.a_test_function()
-        assert(self.obs.callbacks['a_test_function'] == 1), self.fail('Problem lake of notify for function')
+        assert(self.obs.callbacks['a_test_function'] == 1), self.fail('Problem, lake of notify for function')
 
         self.gs2.a_test_function()
-        assert(self.obs.callbacks['a_test_function'] == 3), self.fail('Problem lake of notify for function')
+        assert(self.obs.callbacks['a_test_function'] == 3), self.fail('Problem, lake of notify for function')
         
     def test_var_notify(self):
         self.gs.change_silly_var()
-        assert(self.obs.callbacks['silly_var'] == 42), self.fail('Problem lake of notify for var change')
+        assert(self.obs.callbacks['silly_var'] == 42), self.fail('Problem, lake of notify for var change')
 
         self.gs2.change_silly_var()
-        assert(self.obs.callbacks['silly_var'] == 44), self.fail('Problem lake of notify for var change')        
+        assert(self.obs.callbacks['silly_var'] == 44), self.fail('Problem, lake of notify for var change')        
   
          
 #test 2 observer and 2 subjects
@@ -138,23 +139,36 @@ class TestObserver3(unittest.TestCase):
     
     def test_function_notify(self):
         self.gs.a_test_function()
-        assert(self.obs.callbacks['a_test_function'] == 1), self.fail('Problem lake of notify for function')
-        assert(self.obs2.callbacks['a_test_function'] == 1), self.fail('Problem lake of notify for function')
+        assert(self.obs.callbacks['a_test_function'] == 1), self.fail('Problem, lake of notify for function')
+        assert(self.obs2.callbacks['a_test_function'] == 1), self.fail('Problem, lake of notify for function')
 
         self.gs2.a_test_function()
-        assert(self.obs.callbacks['a_test_function'] == 3), self.fail('Problem lake of notify for function')
-        assert(self.obs2.callbacks['a_test_function'] == 3), self.fail('Problem lake of notify for function')
+        assert(self.obs.callbacks['a_test_function'] == 3), self.fail('Problem, lake of notify for function')
+        assert(self.obs2.callbacks['a_test_function'] == 3), self.fail('Problem, lake of notify for function')
         
     def test_var_notify(self):
         self.gs.change_silly_var()
-        assert(self.obs.callbacks['silly_var'] == 42), self.fail('Problem lake of notify for var change')
-        assert(self.obs2.callbacks['silly_var'] == 42), self.fail('Problem lake of notify for var change')
+        assert(self.obs.callbacks['silly_var'] == 42), self.fail('Problem, lake of notify for function')
+        assert(self.obs2.callbacks['silly_var'] == 42), self.fail('Problem, lake of notify for function')
         
         self.gs2.change_silly_var()
-        assert(self.obs.callbacks['silly_var'] == 44), self.fail('Problem lake of notify for var change') 
-        assert(self.obs2.callbacks['silly_var'] == 44), self.fail('Problem lake of notify for var change') 
+        assert(self.obs.callbacks['silly_var'] == 44), self.fail('Problem, lake of notify for function') 
+        assert(self.obs2.callbacks['silly_var'] == 44), self.fail('Problem, lake of notify for function') 
 
 
+
+#test if not implemented is raised
+class TestObserver4(unittest.TestCase):
+    def test_bad_observer(self):
+        self.gs = GoodSubject(42, 1)
+        controler = lillController()
+        self.obs = BadObserver(self.gs, controler)
+        
+        #test if NotImplementedError is called
+        self.failUnlessRaises(NotImplementedError,self.gs.change_silly_var)
+        
+        #ne dois pas fonctionner !!! problem de raise NotImplementedError
+        
 ############# for test Subject ################
 class GoodSubject(Subject):
     def __init__(self, var, fun):
