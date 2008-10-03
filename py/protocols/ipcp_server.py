@@ -20,7 +20,7 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 # twisted imports
-from twisted.internet import reactor, protocol
+from twisted.internet import reactor, protocol, task
 from twisted.protocols.basic import LineReceiver
 
 from random import randint
@@ -45,8 +45,9 @@ class IPCP(LineReceiver):
         caps = [chr(randint(1,127)) for i in range(512)]
         return ''.join(caps)
 
-def ready():
-    print 'READY'
+def ready(num=0):
+    print 'READY:', num
+    reactor.callLater(1, ready, num + 1)
         
 if __name__ == "__main__":
 
@@ -60,5 +61,7 @@ if __name__ == "__main__":
 #    factory = protocol.ServerFactory()
 #    factory.protocol = IPCP
 #    reactor.listenTCP(port, factory)
-#    reactor.callLater(1, ready)
+    reactor.callLater(0, ready)
+#    l = task.LoopingCall(ready)
+#    l.start(1)
     reactor.run()
