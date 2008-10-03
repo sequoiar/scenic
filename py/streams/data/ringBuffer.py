@@ -2,7 +2,7 @@ import logging
 from midiObject import MidiNote
 
 class myRingBuffer(object):
-    def __init__(self, bufferSize=2048):
+    def __init__(self, bufferSize=25):
         self.bufferSize = bufferSize
         self.start = 0
         self.end = 0
@@ -27,9 +27,11 @@ class myRingBuffer(object):
     #Write Data in the ring buffer
     def put(self, newNote):
         #if there is enought place to insert new elements
-        if ( self.avail_for_put() > 0):
+        if ( self.avail_for_put > 0):
             #if the last midi time note is inferiror to the new note
             if ( self.buffer[self.end - 1].time <= newNote.time ):
+                #print str(self.buffer[self.end - 1]) + ' cmp to ' + str(newNote.time
+                #print 'put'
                 self.buffer[self.end] = newNote
                 self.end = (self.end + 1) % self.bufferSize
             else:
@@ -70,40 +72,41 @@ class myRingBuffer(object):
                         break
             else:
                 #si end < start
-                for i in range(self.end - 1, 0, -1):
-                    print i 
+                for i in range(self.end - 1, -1, -1):
                     if ( self.buffer[i-1].time <= note.time and self.buffer[i].time >= note.time):
                         g = i
                         break
             
                 if g == -1 :
-                    #print g
                     for i in range(self.bufferSize - 1, self.start-1, -1):
-                        print i
                         if ( self.buffer[i-1].time <= note.time and self.buffer[i].time >= note.time):
                             g = i
                             break
-            
-            
+                        
         if ( g == -1):
             log.error("Can't find the correct place for the new note")
-        else:            
+        else:
+            
             #si end > start 
             #On decal les notes suivante de 1
             if ( self.end >= self.start ):
-                for j in range(self.end, g, -1):
-                    self.buffer[j] = self.buffer[j-1]               
+                for j in range(self.end, g-1, -1):
+                    self.buffer[j] = self.buffer[j-1]
+                
             else:
                 #end < start
-                for j in range(self.end, 0, -1):
+                
+                for j in range(self.end, -1, -1):
                     self.buffer[j] = self.buffer[j-1]
 
-                #premier et derniere notes
-                self.buffer[0] = self.buffer[self.bufferSize-1]
+                #si g == 0 on ne va pas plus loin pour le deplacement des notes
+                if g != 0 :
+                    self.buffer[0] = self.buffer[self.bufferSize-1]
 
-                for j in range(self.bufferSize-1, g, -1):
-                    self.buffer[j] = self.buffer[j-1]
-                                                
+                    for j in range(self.bufferSize-1, g, -1):
+                        self.buffer[j] = self.buffer[j-1]
+                
+                                
             #on insert la nouvelle note
             self.buffer[g] = note
             self.end = (self.end + 1 ) % self.bufferSize                
@@ -111,32 +114,33 @@ class myRingBuffer(object):
 
 if __name__ == "__main__":
     rb = myRingBuffer(10)
+    rb.put(MidiNote(1,0,0,0))
+    rb.put(MidiNote(2,0,0,0))
+    rb.put(MidiNote(3,0,0,0))
+    rb.put(MidiNote(4,0,0,0))
+    rb.put(MidiNote(5,0,0,0))
+    rb.put(MidiNote(6,0,0,0))
+    rb.put(MidiNote(7,0,0,0))
+    #rb.put(MidiNote(8,0,0,0))
+    #rb.put(MidiNote(9,0,0,0))
+    #rb.get()
+
     rb.put(MidiNote(10,0,0,0))
-    rb.put(MidiNote(12,0,0,0))
-    rb.put(MidiNote(13,0,0,0))
-    rb.put(MidiNote(14,0,0,0))
-    rb.put(MidiNote(14,0,0,0))
-    rb.put(MidiNote(14,0,0,0))
-    rb.get()
-
-    rb.put(MidiNote(15,0,0,0))
-    rb.put(MidiNote(16,0,0,0))
-    rb.put(MidiNote(18,0,0,0))
-    rb.put(MidiNote(19,0,0,0))
-    rb.put(MidiNote(20,0,0,0))
-    rb.put(MidiNote(21,0,0,0))
-
-    for i in range(0, rb.bufferSize):
-        print rb.buffer[i].time
-
-    rb.put(MidiNote(17,0,0,0))
-
+    
+    #rb.put(MidiNote(2,0,0,0))
+    
+    print '----------------------------'
     for i in range(0, rb.bufferSize):
         print rb.buffer[i].time
 
     print '----------------------------'
-    for i in range(rb.start, rb.bufferSize-1):
+
+    rb.put(MidiNote(2,0,0,0))
+    
+
+    print '----------------------------'
+    for i in range(0, rb.bufferSize):
         print rb.buffer[i].time
 
-    for i in range(0, rb.end):
-        print rb.buffer[i].time
+    print '----------------------------'
+    
