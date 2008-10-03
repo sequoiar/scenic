@@ -56,7 +56,7 @@ class Observer(object):
         @param value:     value of the attribute after being set
         @type value:      any
         """
-        pass
+        raise NotImplementedError
        
        
 class Subject(object):
