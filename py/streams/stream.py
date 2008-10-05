@@ -54,18 +54,6 @@ class Streams(object):
         else:
             return -1
 
-    def add_prev(self, name, stream):
-        kind = self.get_kind(stream)
-        if kind:
-            dict_name = "_".join([kind, name])
-            if dict_name in self.streams:
-                return 0
-            else:
-                self.streams[dict_name] = stream
-                return 1
-        else:
-            return -1
-
     def delete(self, name, kind):
         dict_name = "_".join([kind, name])
         if dict_name in self.streams:
@@ -212,7 +200,8 @@ class VideoStream(Stream):
         self.codec = None  # () 
         self.codec_settings = None  # () 
         self.width = 640  # (int) 
-        self.height = 480  # (int) 
+        self.height = 480  # (int)
+        self.source = None
 
     
 class DataStream(Stream):

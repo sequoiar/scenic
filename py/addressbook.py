@@ -141,14 +141,14 @@ class AddressBook(object):
                     dump = repr(jelly(self.contacts))
                     level = 0
                     nice_dump = ['v1.0\n']
-                    for c in dump:
-                        if c == '[':
+                    for char in dump:
+                        if char == '[':
                             if level > 0:
                                 nice_dump.append('\n' + '\t'*level)
                             level += 1
-                        elif c == ']':
+                        elif char == ']':
                             level -= 1
-                        nice_dump.append(c)
+                        nice_dump.append(char)
                     adb_file.write(''.join(nice_dump))
                 else:
                     pickle.dump(self.contacts, adb_file, 1)
