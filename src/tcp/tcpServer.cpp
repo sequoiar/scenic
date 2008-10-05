@@ -1,6 +1,6 @@
 // tcpServer.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -17,10 +17,10 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file 
+/** \file
  *  A simple server in the internet domain using TCP
  *
- *  The port number is passed as an argument 
+ *  The port number is passed as an argument
  */
 
 
@@ -77,8 +77,8 @@ bool TcpServer::socket_connect_send(const std::string& addr,const std::string& m
         THROW_ERROR("Error opening socket: errno msg: " << strerror(errno));
 
     bzero((char *) &serv_addr, sizeof(serv_addr));
-    
-     
+
+
     if(!inet_aton(addr.c_str(),&(serv_addr.sin_addr)))
     {
         ::close(ssockfd);
@@ -129,9 +129,10 @@ bool TcpServer::socket_bind_listen()
         THROW_CRITICAL("Error at bind: errno msg: " << strerror(errno));
 
     if(!listen(sockfd, 5) <= 0)
-        THROW_ERRNO("Error on listen: errno msg: " << strerror(errno), errno); 
+        THROW_ERRNO("Error on listen: errno msg: " << strerror(errno), errno);
 
     LOG_INFO("Listening for connection on port: " << port_);
+    puts("READY");
     return true;
 }
 
@@ -150,7 +151,7 @@ bool TcpServer::accept()
     }
     connected_ = true;
     set_non_blocking(newsockfd);
-    
+
     ::close(sockfd);
     sockfd = 0;
 
@@ -164,7 +165,7 @@ bool TcpServer::recv(std::string& out)
     out.clear();
 
     //while more data to receive
-    do 
+    do
     {
         bzero(buffer_, BUFFSIZE);
         n = ::recv(newsockfd, buffer_, BUFFSIZE, 0);
@@ -174,7 +175,7 @@ bool TcpServer::recv(std::string& out)
                 break;
 
             connected_ = false;
-            return false; 
+            return false;
         }
         out.append(buffer_, n);
 
