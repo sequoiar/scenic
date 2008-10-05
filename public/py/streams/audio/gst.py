@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
+
 # Twisted imports
 from twisted.internet import reactor, protocol, defer
 
@@ -42,9 +43,9 @@ class AudioGst(AudioStream, GstClient):
         else:
             port = setting['port_r']
             address = setting['addr_r']
-        GstClient.__init__(self, port, address)
+        GstClient.__init__(self, mode, port, address)
         self._chan = None
-            
+        
     def get_attr(self, name):
         """        
         name: string
@@ -70,7 +71,8 @@ class AudioGst(AudioStream, GstClient):
         """
         self._chan = channel
         attrs = self.get_attrs()
-        self._send_cmd('audio_start', (self.sending_started, 'caps'), ('address', address), *attrs)
+        attrs.append(('address', address))
+        self._send_cmd('audio_start', attrs, (self.sending_started, 'caps'))
         
     def sending_started(self, caps_str):
         self._del_callback('caps')
@@ -84,7 +86,7 @@ class AudioGst(AudioStream, GstClient):
     def stop_sending(self):
         """function stop_sending
         """
-        self._send_cmd('stop_audio', self.sending_stopped)
+        self._send_cmd('stop_audio', None, self.sending_stopped)
     
     def sending_stopped(self, state):
         self._del_callback()
@@ -99,7 +101,8 @@ class AudioGst(AudioStream, GstClient):
     def caps(self, caps):
         self._chan.delete(self.caps)
         attrs = self.get_attrs()
-        self._send_cmd('audio_start', None, ('caps', caps), *attrs)
+        attrs.append(('caps', caps))
+        self._send_cmd('audio_start', attrs)
    
     def receiving_started(self, answer):
         log.info('Return value after sending caps: %s.' % answer)

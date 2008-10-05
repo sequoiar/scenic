@@ -29,7 +29,7 @@ from twisted.protocols.basic import LineReceiver
 # App imports
 from utils import log
 
-log = log.start('debug', 1, 0, 'icpc')
+log = log.start('debug', 1, 0, 'ipcp')
 
 
 class IPCP(LineReceiver):
@@ -114,21 +114,6 @@ class IPCP(LineReceiver):
                             log.info('Invalid type for received argument %s=%s.' % (attr, value))
                 args[attr] = value
                 start = end + 1
-#            tokens = 
-#            args = find_equal(args)
-#            for pos, arg in enumerate(tokens[1:]):
-#                attr, sep, value = arg[0].partition('=')
-#                if value[0] == '"':
-#                    args[attr] = value[1:-1].replace('\\\\', '\\') \
-#                                         .replace("\\'", "'") \
-#                                         .replace('\\"', '"')
-#                elif value.isdigit():
-#                    args[attr] = int(value)
-#                else:
-#                    try:
-#                        args[attr] = float(value)
-#                    except:
-#                        log.info('Invalid type for received argument %s=%s.' % (attr, value))
             log.debug("Received: " + cmd + repr(args))
             self.callbacks[cmd](**args)
     
@@ -145,7 +130,6 @@ class IPCP(LineReceiver):
                 if parg:
                     line.append(parg)
         line = ' '.join(line)
-#        line = line.replace('\\\\\\', '\\')
         self.sendLine(line)
         log.debug('Sending: ' + line)
 

@@ -236,6 +236,7 @@ class CliController(TelnetServer):
         cp.add_option("-r", "--height", "--rise", type="int", help="Set the height of the video in pixels (default: 480 px")
         cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
         cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
+        cp.add_option("-i", "--input", "--source", type="string", help="Set the video source (input).")
 
         (options, args) = cp.parse_args(data)
                 
@@ -260,6 +261,8 @@ class CliController(TelnetServer):
                     self.core.set_stream(self, name, kind, 'port', options.port)
                 if options.buffer:
                     self.core.set_stream(self, name, kind, 'buffer', options.buffer)
+                if options.input:
+                    self.core.set_stream(self, name, kind, 'input', options.input)
         elif options.list:
             self.core.list_stream(self, kind)
         elif options.add:

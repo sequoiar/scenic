@@ -62,6 +62,9 @@ class Setting(object):
                                  'addr_s':'127.0.0.1',
                                  'addr_r':'127.0.0.1'}
                             }
+            
+#            self.streams['send'].add('test', 'audio', 'gst', )
+            
         else:
             self.name = name
             self.streams = Streams()
