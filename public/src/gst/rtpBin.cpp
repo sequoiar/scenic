@@ -26,6 +26,7 @@
 #include "rtpPay.h"
 #include "remoteConfig.h"
 #include "pipeline.h"
+#include "logWriter.h"
 
 
 GstElement *RtpBin::rtpbin_ = 0;
@@ -74,5 +75,16 @@ RtpBin::~RtpBin()
 
 double RtpBin::bandwidth() const
 {
-    return 0.0;
+    double result = 0.0;
+#if 0
+    GValue value;
+    memset(&value, 0, sizeof(value));
+
+    gst_child_proxy_get_property(GST_OBJECT(rtpbin_), "gstrtpsession::bandwidth", &value); 
+    
+    result = g_value_get_double(&value);
+    g_value_unset(&value);
+#endif
+    return result;
 }
+

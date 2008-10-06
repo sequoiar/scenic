@@ -43,6 +43,7 @@ class AudioSender
         ~AudioSender();
 
         std::string getCaps() { return session_.getCaps(); }
+        double bandwidth() const { return session_.bandwidth(); }
         bool start();
 
     private:
