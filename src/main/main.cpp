@@ -24,14 +24,22 @@
 #include "builder.h"
 #include "logWriter.h"
 
-    class MsgThreadFunctor : public MsgFunctor
-    {
-        public:
-        MsgThread &t_;
-        MsgThreadFunctor(MsgThread* pt):MsgFunctor(),t_(*pt){ MSG::register_cb(this);}
-        void operator()(MapMsg& msg){t_.getQueue().push(msg);}
+class MsgThreadFunctor : public MsgFunctor
+{
+    MsgThread &t_;
+    public:
+    MsgThreadFunctor(MsgThread* pt)
+        :MsgFunctor(),t_(*pt)
+    {   
+        MSG::register_cb(this);
+    }
 
-    };
+    void operator()(MapMsg& msg)
+    {
+        LOG_DEBUG("got a MapMsg from MsgFunctor " << std::string(msg["command"]));
+        t_.getQueue().push(msg);
+    }
+};
 
 class MainModule
     : public BaseModule
