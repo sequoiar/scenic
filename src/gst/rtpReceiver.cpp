@@ -111,34 +111,6 @@ GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
     GstPad *sinkPad;
 
     sinkPad = gst_element_get_static_pad(usedDepayloaders_.front(), "sink");
-#if 0
-    // Compare media type of caps
-    GstCaps *srcCaps = gst_pad_get_caps(srcPad);
-    GstCaps *sinkCaps = gst_pad_get_caps(sinkPad);
-    GstStructure *srcCapsStruct = gst_caps_get_structure(srcCaps, 0);
-    GstStructure *sinkCapsStruct = gst_caps_get_structure(sinkCaps, 0);
-    const GValue *srcMediaType = gst_structure_get_value(srcCapsStruct, "media");
-    const GValue *sinkMediaType = gst_structure_get_value(sinkCapsStruct, "media");
-
-    std::list<GstElement *>::iterator iter = usedDepayloaders_.begin();
-    while ((g_value_get_string(srcMediaType) != g_value_get_string(sinkMediaType)) 
-            && iter != usedDepayloaders_.end()) 
-    {
-        gst_object_unref(sinkPad);
-        gst_caps_unref(sinkCaps);
-        sinkCapsStruct = 0;
-        sinkMediaType = 0;
-
-        sinkPad = gst_element_get_static_pad(*iter, "sink");
-        sinkCaps = gst_pad_get_caps(sinkPad);
-        sinkCapsStruct = gst_caps_get_structure(sinkCaps, 0);
-        sinkMediaType = gst_structure_get_value(sinkCapsStruct, "media");
-        ++iter;
-    }
-
-    gst_caps_unref(sinkCaps);
-    gst_caps_unref(srcCaps);
-#endif
 
     // look for caps whose first 37 characters match (this includes the parameter that describes media type)
     // FIXME: could just check the depayloader types/names

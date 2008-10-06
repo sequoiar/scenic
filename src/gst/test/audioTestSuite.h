@@ -31,12 +31,12 @@ class AudioTestSuite
         AudioTestSuite()
         {
             testLength_ = 5000;
-            TEST_ADD(AudioTestSuite::start_audio_dv)
-            TEST_ADD(AudioTestSuite::stop_audio_dv)
-            TEST_ADD(AudioTestSuite::start_stop_audio_dv)
             TEST_ADD(AudioTestSuite::start_1ch_audiotest)
             TEST_ADD(AudioTestSuite::stop_1ch_audiotest)
             TEST_ADD(AudioTestSuite::start_stop_1ch_audiotest)
+            TEST_ADD(AudioTestSuite::start_audio_dv)
+            TEST_ADD(AudioTestSuite::stop_audio_dv)
+            TEST_ADD(AudioTestSuite::start_stop_audio_dv)
             TEST_ADD(AudioTestSuite::start_2ch_audiotest)
             TEST_ADD(AudioTestSuite::stop_2ch_audiotest)
             TEST_ADD(AudioTestSuite::start_stop_2ch_audiotest)
