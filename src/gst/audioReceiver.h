@@ -52,6 +52,8 @@ class AudioReceiver
             gotCaps_ = true;
         }
 
+        double bandwidth() const { return session_.bandwidth(); }
+
     private:
         AudioReceiver();
         void init_codec();

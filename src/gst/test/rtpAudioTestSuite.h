@@ -30,7 +30,11 @@ class RtpAudioTestSuite
 
         RtpAudioTestSuite()
         {
-            testLength_ = 10000;
+            testLength_ = 3000;
+            
+            TEST_ADD(RtpAudioTestSuite::start_2ch_rtp_audiotest)
+            TEST_ADD(RtpAudioTestSuite::stop_2ch_rtp_audiotest)
+            TEST_ADD(RtpAudioTestSuite::start_stop_2ch_rtp_audiotest)
 
             TEST_ADD(RtpAudioTestSuite::start_2ch_rtp_audiotest)
             TEST_ADD(RtpAudioTestSuite::stop_2ch_rtp_audiotest)

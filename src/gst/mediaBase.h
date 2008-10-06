@@ -47,6 +47,7 @@ class SenderBase
 {
     public: 
         virtual bool init();
+        virtual double bandwidth() const = 0;
 
     protected:
 
@@ -55,7 +56,6 @@ class SenderBase
         virtual void init_source() = 0;
         virtual void init_codec() = 0;
         virtual void init_payloader() = 0;
-        //virtual double bandwidthUsed() const = 0;
     
     private:
 
@@ -68,6 +68,7 @@ class ReceiverBase
 {
     public: 
         virtual bool init();
+        virtual double bandwidth() const = 0;
 
     protected:
 
@@ -76,7 +77,6 @@ class ReceiverBase
         virtual void init_codec() = 0;
         virtual void init_depayloader() = 0;
         virtual void init_sink() = 0;
-        //virtual double bandwidthUsed() const = 0;
     
     private:
 
