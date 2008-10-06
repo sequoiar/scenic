@@ -28,11 +28,12 @@ class MsgThreadFunctor : public MsgFunctor
 {
     MsgThread &t_;
     public:
-    MsgThreadFunctor(MsgThread* pt)
-        :MsgFunctor(),t_(*pt)
-    {   
-        MSG::register_cb(this);
-    }
+    MsgThreadFunctor(MsgThread* pt) 
+        :MsgFunctor(),t_(*pt) 
+        { MSG::register_cb(this); }
+
+    ~MsgThreadFunctor() 
+        { MSG::unregister_cb();}
 
     void operator()(MapMsg& msg)
     {
