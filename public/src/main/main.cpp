@@ -24,6 +24,14 @@
 #include "builder.h"
 #include "logWriter.h"
 
+    class MsgThreadFunctor : public MsgFunctor
+    {
+        public:
+        MsgThread &t_;
+        MsgThreadFunctor(MsgThread* pt):MsgFunctor(),t_(*pt){ MSG::register_cb(this);}
+        void operator()(MapMsg& msg){t_.getQueue().push(msg);}
+
+    };
 
 class MainModule
     : public BaseModule
@@ -33,12 +41,14 @@ class MainModule
 
         MainModule(bool send, int port)
             : tcpThread_(Builder::TcpBuilder(port,true)), 
-              gstThread_(Builder::GstBuilder(send)) {}
+              gstThread_(Builder::GstBuilder(send)),
+              func(gstThread_){}
 
         ~MainModule(){delete gstThread_; delete tcpThread_;}
     private:
         MsgThread* tcpThread_;
         MsgThread* gstThread_;
+        MsgThreadFunctor func;
 
         MainModule(MainModule&);    //No Copy Constructor
         MainModule& operator=(const MainModule&);
