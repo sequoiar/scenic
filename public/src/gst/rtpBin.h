@@ -34,6 +34,7 @@ class RtpBin
         ~RtpBin();
         bool init();
         virtual void checkSampleRate() = 0;
+        double bandwidth() const;
 
     protected:
         RtpBin() : rtcp_sender_(0), rtcp_receiver_(0) { ++refCount_; }
