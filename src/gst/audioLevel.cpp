@@ -94,7 +94,7 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
         }
         // TODO: post to static function with mapmsg
         print();
-       // post();
+        post();
 
         return true;
     }

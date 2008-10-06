@@ -24,6 +24,17 @@
 #include "audioTestSuite.h"
 #include "audioLocal.h"
 #include "audioConfig.h"
+#include "mapMsg.h"
+class TestMsgFunctor : public MsgFunctor
+{
+    public:
+    TestMsgFunctor() { MSG::register_cb(this); }
+    ~TestMsgFunctor() { MSG::unregister_cb();}
+    void operator()(MapMsg& msg) 
+    { 
+        LOG_DEBUG("got a MapMsg from MsgFunctor " << std::string(msg["command"])); 
+    } 
+};
 
 void AudioTestSuite::start_1ch_audiotest()
 {
@@ -32,6 +43,7 @@ void AudioTestSuite::start_1ch_audiotest()
     int numChannels = 1;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
+    TestMsgFunctor f;  // Grabs the MSG::post callback 
     tx.init();
 
     TEST_ASSERT(tx.start());
