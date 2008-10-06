@@ -230,6 +230,90 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiotest()
 }
 
 
+void RtpAudioTestSuite::start_8ch_rtp_jack()
+{
+    const int numChannels = 8;
+
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
+
+        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
+
+        TEST_ASSERT(rx->start());
+
+        BLOCK();
+        TEST_ASSERT(rx->isPlaying());
+    }
+    else {
+        AudioConfig aConfig("jackaudiosrc", numChannels);
+        std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
+
+        TEST_ASSERT(tx->start());
+
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, tx->getCaps()));
+
+        BLOCK();
+        TEST_ASSERT(tx->isPlaying());
+    }
+}
+
+
+void RtpAudioTestSuite::stop_8ch_rtp_jack()
+{
+    int numChannels = 8;
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
+
+        BLOCK();
+
+        TEST_ASSERT(rx->stop());
+        TEST_ASSERT(!rx->isPlaying());
+    }
+    else {
+        AudioConfig aConfig("jackaudiosrc", numChannels);
+        std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
+
+        BLOCK();
+
+        TEST_ASSERT(tx->stop());
+        TEST_ASSERT(!tx->isPlaying());
+    }
+}
+
+
+void RtpAudioTestSuite::start_stop_8ch_rtp_jack()
+{
+    int numChannels = 8;
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
+
+        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
+
+        TEST_ASSERT(rx->start());
+
+        BLOCK();
+        TEST_ASSERT(rx->isPlaying());
+
+        TEST_ASSERT(rx->stop());
+        TEST_ASSERT(!rx->isPlaying());
+    }
+    else {
+        AudioConfig aConfig("jackaudiosrc", numChannels);
+        std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
+
+        TEST_ASSERT(tx->start());
+
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, tx->getCaps()));
+
+        BLOCK();
+        TEST_ASSERT(tx->isPlaying());
+
+        TEST_ASSERT(tx->stop());
+        TEST_ASSERT(!tx->isPlaying());
+    }
+}
+
+
 void RtpAudioTestSuite::start_8ch_rtp_audiofile()
 {
     int numChannels = 8;

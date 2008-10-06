@@ -31,14 +31,23 @@ class RtpAudioTestSuite
         RtpAudioTestSuite()
         {
             testLength_ = 10000;
+
+            TEST_ADD(RtpAudioTestSuite::start_8ch_rtp_jack)
+            TEST_ADD(RtpAudioTestSuite::stop_8ch_rtp_jack)
+            TEST_ADD(RtpAudioTestSuite::start_stop_8ch_rtp_jack)
+
+            TEST_ADD(RtpAudioTestSuite::start_2ch_rtp_audiotest)
+            TEST_ADD(RtpAudioTestSuite::stop_2ch_rtp_audiotest)
+            TEST_ADD(RtpAudioTestSuite::start_stop_2ch_rtp_audiotest)
+
+            TEST_ADD(RtpAudioTestSuite::start_8ch_rtp_audiotest)
+            TEST_ADD(RtpAudioTestSuite::stop_8ch_rtp_audiotest)
+            TEST_ADD(RtpAudioTestSuite::start_stop_8ch_rtp_audiotest)
+
             TEST_ADD(RtpAudioTestSuite::start_audio_dv_rtp)
             TEST_ADD(RtpAudioTestSuite::stop_audio_dv_rtp)
             TEST_ADD(RtpAudioTestSuite::start_stop_audio_dv_rtp)
 
-            TEST_ADD(RtpAudioTestSuite::start_stop_2ch_rtp_audiotest)
-            TEST_ADD(RtpAudioTestSuite::start_8ch_rtp_audiotest)
-            TEST_ADD(RtpAudioTestSuite::stop_8ch_rtp_audiotest)
-            TEST_ADD(RtpAudioTestSuite::start_stop_8ch_rtp_audiotest)
             TEST_ADD(RtpAudioTestSuite::start_8ch_rtp_audiofile)
             TEST_ADD(RtpAudioTestSuite::stop_8ch_rtp_audiofile)
             TEST_ADD(RtpAudioTestSuite::start_stop_8ch_rtp_audiofile)
@@ -68,6 +77,10 @@ class RtpAudioTestSuite
         void start_8ch_rtp_audiofile();
         void stop_8ch_rtp_audiofile();
         void start_stop_8ch_rtp_audiofile();
+
+        void start_8ch_rtp_jack();
+        void stop_8ch_rtp_jack();
+        void start_stop_8ch_rtp_jack();
 
         void start_audio_dv_rtp();
         void stop_audio_dv_rtp();
