@@ -1,5 +1,5 @@
 
-// rtpSession.cpp
+// rtpBin.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -22,17 +22,17 @@
 #include <cassert>
 #include <sstream>
 
-#include "rtpSession.h"
+#include "rtpBin.h"
 #include "rtpPay.h"
 #include "remoteConfig.h"
 #include "pipeline.h"
 
 
-GstElement *RtpSession::rtpbin_ = 0;
-int RtpSession::refCount_ = 0;
+GstElement *RtpBin::rtpbin_ = 0;
+int RtpBin::refCount_ = 0;
 
 
-bool RtpSession::init()
+bool RtpBin::init()
 {
     // only initialize rtpbin once per process
     if (!rtpbin_) {
@@ -45,7 +45,7 @@ bool RtpSession::init()
 }
 
 
-const char *RtpSession::padStr(const char *padName)
+const char *RtpBin::padStr(const char *padName)
 {
     std::string result(padName);
     std::stringstream istream;
@@ -56,7 +56,7 @@ const char *RtpSession::padStr(const char *padName)
 }
 
 
-RtpSession::~RtpSession()
+RtpBin::~RtpBin()
 {
     assert(stop());
     pipeline_.remove(&rtcp_sender_);
