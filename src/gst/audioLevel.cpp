@@ -126,3 +126,10 @@ void AudioLevel::post() const
     }
 }
 
+
+void AudioLevel::interval(unsigned long long newInterval)
+{
+    interval_ = newInterval;
+    g_object_set (G_OBJECT(level_), "interval", interval_, "message", emitMessages_, NULL);
+}
+

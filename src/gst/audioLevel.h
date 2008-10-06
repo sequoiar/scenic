@@ -35,6 +35,7 @@ class AudioLevel
 
         ~AudioLevel();
         bool init();
+        void interval(unsigned long long newInterval);
         bool handleBusMsg(_GstMessage *msg);
         void emitMessages(bool doEmit);
 

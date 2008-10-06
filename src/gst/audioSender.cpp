@@ -91,8 +91,3 @@ bool AudioSender::start()
     return true;
 }
 
-
-double AudioSender::bandwidth() const
-{
-    return 0.0; 
-}

@@ -72,3 +72,7 @@ RtpBin::~RtpBin()
 }
 
 
+double RtpBin::bandwidth() const
+{
+    return 0.0;
+}
