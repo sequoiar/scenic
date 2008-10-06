@@ -133,7 +133,7 @@ GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
 
 void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 {
-    RtpSession::init();
+    RtpBin::init();
 
     GstPad *recv_rtp_sink;
     GstPad *send_rtcp_src;

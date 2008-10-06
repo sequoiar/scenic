@@ -22,7 +22,7 @@
 #define _RTP_RECEIVER_H_
 
 #include <list>
-#include "rtpSession.h"
+#include "rtpBin.h"
 
 class ReceiverConfig;
 class _GstElement;
@@ -30,7 +30,7 @@ class _GstPad;
 class RtpPay;
 
 class RtpReceiver
-    : public RtpSession
+    : public RtpBin
 {
     public:
         RtpReceiver() : rtp_receiver_(0), depayloader_(0) {}

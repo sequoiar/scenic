@@ -1,5 +1,5 @@
 
-// rtpSession.cpp
+// rtpSender.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -44,8 +44,7 @@ std::string RtpSender::getCaps() const
 
 void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
 {
-    RtpSession::init();
-    //RtpSession::add(config);
+    RtpBin::init();
 
     GstPad *send_rtp_sink;
     GstPad *send_rtp_src;

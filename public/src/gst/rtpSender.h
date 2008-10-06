@@ -22,14 +22,14 @@
 #define _RTP_SENDER_H_
 
 #include <string>
-#include "rtpSession.h"
+#include "rtpBin.h"
 
 class SenderConfig;
 class _GstElement;
 class RtpPay;
 
 class RtpSender
-    : public RtpSession
+    : public RtpBin
 {
     public:
         RtpSender() : rtp_sender_(0) {}
