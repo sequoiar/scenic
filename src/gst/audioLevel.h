@@ -31,7 +31,7 @@ class AudioLevel
     : public GstLinkableFilter, public BusMsgHandler
 {
     public:
-        AudioLevel() : level_(0), emitMessages_(true), rmsValues_(0), interval_(ULONG_MAX * 0.25) {}
+        AudioLevel() : level_(0), emitMessages_(true), rmsValues_(0), interval_(1000000000LL) {}
 
         ~AudioLevel();
         bool init();
