@@ -92,3 +92,7 @@ bool AudioSender::start()
 }
 
 
+double AudioSender::bandwidth() const
+{
+    return 0.0; 
+}
