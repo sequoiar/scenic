@@ -21,7 +21,7 @@
 #include <cpptest.h>
 #include <iostream>
 #include <cstdlib>
-#include "syncTestSuiteRtp.h"
+#include "rtpSyncTestSuite.h"
 #include "videoSender.h"
 #include "videoConfig.h"
 #include "videoReceiver.h"
@@ -452,7 +452,7 @@ void SyncTestSuiteRtp::start_stop_audiotest_videotest_rtp()
 }
 
 
-int mainSyncTestSuiteRtp(int argc, char **argv)
+int mainRtpSyncTestSuite(int argc, char **argv)
 {
     if (!GstTestSuite::areValidArgs(argc, argv)) {
         std::cerr << "Usage: " << "syncTesterRtp <0/1>" << std::endl;

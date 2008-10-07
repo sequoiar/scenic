@@ -2,7 +2,7 @@ include $(top_srcdir)/src/globals.mak
 
 #bin_PROGRAMS = audioTester rtpAudioTester videoTester syncTester rtpVideoTester
 bin_PROGRAMS = allTester
-allTester_SOURCES =   syncTestSuite.cpp syncTestSuiteRtp.cpp videoTestSuite.cpp rtpVideoTestSuite.cpp \ 
+allTester_SOURCES =   syncTestSuite.cpp rtpSyncTestSuite.cpp videoTestSuite.cpp rtpVideoTestSuite.cpp \ 
 				rtpAudioTestSuite.cpp audioTestSuite.cpp gstTestSuite.cpp main.cpp
 #audioTester_SOURCES = audioTestSuite.cpp gstTestSuite.cpp
 #rtpAudioTester_SOURCES = rtpAudioTestSuite.cpp gstTestSuite.cpp

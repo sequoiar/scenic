@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 int mainSyncTestSuite(int argc, char **argv);
-int mainRtpSyncTestSuiteRtp(int argc, char **argv);
+int mainRtpSyncTestSuite(int argc, char **argv);
 
 int mainVideoTestSuite(int argc, char **argv);
 int mainRtpVideoTestSuite(int argc, char **argv);
