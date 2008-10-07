@@ -54,7 +54,11 @@ VideoSink * VideoConfig::createSink() const
 
 VideoSink * VideoReceiverConfig::createSink() const
 {
-    return new VideoSink();
+    if (sink_ == "xvimagesink")
+        return new VideoSink();
+    else
+        THROW_ERROR(sink_ << " is an invalid sink");
+    return 0;
 }
 
 
