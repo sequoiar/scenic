@@ -32,104 +32,143 @@ from protocols import ipcp
 from streams.stream import AudioStream, Stream
 from utils import log, get_def_name
 
-log = log.start('debug', 1, 0, 'gstClient')
+log = log.start('debug', 1, 0, 'gst')
 
 
 INIT = 0
-PROC = 1
-CONN = 2
+START = 1
+PROC = 2
+CONN = 3
 
-class GstClient(object):    
+class BaseGst(object):            
+    def get_attr(self, name):
+        """        
+        name: string
+        """
+        return getattr(self, name)
+    
+    def get_attrs(self):
+        return [(attr, value) for attr, value in self.__dict__.items() if attr[0] != "_"]
+    
+    def set_attr(self, name, value):
+        """
+        name: string
+        value: 
+        """
+        if hasattr(self, name):
+            setattr(self, name, value)
+            return True, name, value
+        return False, name, value
+    
+
+class GstServer(object):
     def __init__(self, mode, port, address='127.0.0.1'):
-        if not hasattr(Stream, 'gst_' + mode):
-            self._gst_port = port
-            self._gst_address = address
-            self._mode = mode
-            setattr(Stream, 'gst_' + mode, True)
-            self.gst = None
-            self.state(INIT)
-            
+        self.mode = mode
+        self.port = port
+        self.address = address
+        self.process = None
+        self.conn = None
+        self.state = INIT
+
     def connect(self):
-        deferred = ipcp.connect(self._gst_address, self._gst_port)
+        deferred = ipcp.connect(self.address, self.port)
         deferred.addCallback(self.connection_ready)
         deferred.addErrback(self.connection_failed)
             
-    def connection_ready(self, gst):
-        setattr(Stream, 'gst_' + self._mode, gst)
-        setattr(Stream, 'gst_' + self._mode + '.connectionLost', self.connection_lost)
-        self.gst = getattr(Stream, 'gst_' + self._mode)
-        self.gst.add_callback(self.gst_log, 'log')
-        self.state(CONN)
+    def connection_ready(self, conn):
+        self.conn = conn
+        self.conn.connectionLost = self.connection_lost
+        self.conn.add_callback(self.gst_log, 'log')
+        self.state = CONN
         log.info('GST inter-process link created')
         
-    def connection_failed(self, gst):
-        ipcp.connection_failed(gst)
-        self._process.kill()
-        log.debug('Address: %s | Port: %s' % self._gst_address, self._gst_port)
+    def connection_failed(self, conn):
+        ipcp.connection_failed(conn)
+        self.kill()
+        log.debug('Address: %s | Port: %s' % self.address, self.port)
 #        Stream.gst_state = 0
 #        log.info('Trying to reconnect...')
 #        self.connect()
 
     def connection_lost(self, reason=protocol.connectionDone):
-        self._process.kill()
-        self.gst.del_callback('log')
+        self.kill()
+        self.conn.del_callback('log')
         log.info('Lost the server connection. Reason:\n%s' % reason)
 #        log.info('Trying to reconnect...')
 #        self.connect()
 
-    def _send_cmd(self, cmd, args, callback=None, timer=None, timeout=3):
-        if self.state() < 2:
+    def start_process(self):
+#        self.state = 1    # Uncomment this line to start the GST process "by hand"
+        if self.state < 1:
+            self.state = START
+            gst_app = 'mainTester'
+            path = procutils.which(gst_app)
+#            path = ['/home/etienne/workspace/miville/trunk/public/py/protocols/ipcp_server.py']
+            if path:
+                if self.mode == 'send':
+                    mode_arg = "1"
+                else:
+                    mode_arg = "0"
+                try:
+                    print 'STARTING PROCESS'
+                    self.process = reactor.spawnProcess(GstProcessProtocol(self), path[0], [path[0], mode_arg, str(self.port)], usePTY=True)
+                except:
+                    log.critical('Cannot start the GST application: %s' % gst_app)
+            else:
+                log.critical('Cannot find the GST application: %s' % gst_app)
+        elif self.state == 2:
+            self.connect()
+
+    def kill(self):
+        self.state = INIT
+#        os.kill(self._process.pid, signal.SIGTERM)
+        reactor.callLater(0.5, self.verify_kill)
+        try:
+            self.process.loseConnection()
+        except:
+            log.debug('Process %s or connection seem already dead.' % self.process.pid)
+#        self.process = None
+
+    def verify_kill(self):
+        try:
+            status = os.waitpid(self.process.pid, 0)            
+        except:
+            log.debug('Process %s already kill' % self.process.pid)
+        else:
+            if status[1] != 0:
+                os.kill(self.process.pid, signal.SIGKILL)
+
+    def send_cmd(self, cmd, args=None, callback=None, timer=None, timeout=3):
+        if self.state < 3:
             curr_time = time.time()
             if not timer:
                 timer = curr_time
-                self._process = self.start_process()
+                self.start_process()
             if curr_time - timer < timeout:
-                reactor.callLater(0.001, self._send_cmd, cmd, args, callback, timer)
+                reactor.callLater(0.001, self.send_cmd, cmd, args, callback, timer)
             else:
                 log.critical('The GST process cannot be ready to connect (from send).')
         else:
             if callback:
                 log.debug('Callback: %s' % repr(callback))
-                self.gst.add_callback(*callback)
-            self.gst.send_cmd(cmd, *args)
+                self.conn.add_callback(*callback)
+            if args:
+                self.conn.send_cmd(cmd, *args)
+            else:
+                self.conn.send_cmd(cmd)
 
-    def _del_callback(self, callback=None):
-        if self.gst:
+    def del_callback(self, callback=None):
+        if self.state == CONN:
             if callback:
-                self.gst.del_callback(callback)
+                self.conn.del_callback(callback)
             else:
                 try:
-                    self.gst.del_callback(get_def_name())
+                    self.conn.del_callback(get_def_name())
                 except:
                     log.debug("No callback to delete. (coming from: %s)." % get_def_name())
-                    
-    def start_process(self):
-        if self.state() < 1:
-            gst_app = 'mainTester'
-            path = procutils.which(gst_app)
-#            path = ['/home/etienne/workspace/miville/trunk/public/py/protocols/ipcp_server.py']
-            if path:
-                if self._mode == 'send':
-                    mode_arg = "1"
-                else:
-                    mode_arg = "0"
-                try:
-                    self._process = reactor.spawnProcess(GSTProcessProtocol(self), path[0], [path[0], mode_arg, str(self._gst_port)], usePTY=True)
-                except:
-                    log.critical('Cannot start the GST application: %s' % gst_app)
-            else:
-                log.critical('Cannot find the GST application: %s' % gst_app)
-        else:
-            self.connect()
-                        
-    def state(self, new_state=None):
-        if new_state is None:
-            return getattr(Stream, 'gst_state_' + self._mode)
-        else:
-            setattr(Stream, 'gst_state_' + self._mode, new_state)
-            
+
     def gst_log(self, level, msg):
-        msg = 'From GST: %s' % msg
+        msg = 'From GST: %s' % msg.partition(': ')[2].strip()
         if level == 10:
             log.debug(msg)
         elif level == 30:
@@ -141,51 +180,57 @@ class GstClient(object):
         else:
             log.info(msg)
             
+        
+
+
+class GstClient(BaseGst):    
+    def __init__(self, mode, port, address='127.0.0.1'):
+        self._mode = mode
+        if not hasattr(Stream, 'gst_' + mode):
+            setattr(Stream, 'gst_' + mode, GstServer(mode, port, address))
+        self._gst = getattr(Stream, 'gst_' + mode)
+
+    def _send_cmd(self, cmd, args=None, callback=None):
+        self._gst.send_cmd(cmd, args, callback)
+
+    def _del_callback(self, callback=None):
+        self._gst.del_callback(callback)
+                    
+    def stop_process(self):
+        if self._gst.state > 0:
+            self._gst.kill()
+                        
+
             
-class GSTProcessProtocol(protocol.ProcessProtocol):
-    def __init__(self, client):
-        self.timer = 0
-        self.client = client
+            
+class GstProcessProtocol(protocol.ProcessProtocol):
+    def __init__(self, server):
+        self.server = server
         
     def connectionMade(self):
-        self.timer = time.time()
         log.info('GST process started.')
         reactor.callLater(2, self.check_process)
 
     def check_process(self):
-        if self.client.state() < 1:
+        if self.server.state < 2:
             log.critical('The GST process cannot be ready to connect.')
-            self.kill()
+            self.server.kill()
 
     def outReceived(self, data):
-        if self.client.state() < 1:
+        if self.server.state < 2:
             lines = data.split('\n')
             log.debug('DATA FROM CHILD: %s' % lines)
             for line in lines:
                 if line.strip() == 'READY':
-                    self.client.state(PROC)
-                    self.client.connect()
+                    self.server.state = PROC
+                    self.server.connect()
                     break
-#        self.transport.loseConnection()
            
     def processEnded(self, status):
+        self.server.state = INIT
         log.info('GST process ended. Message: %s' % status)            
             
-    def kill(self):
-        self.client.state(INIT)
-#        os.kill(self.transport.pid, signal.SIGTERM)
-        pid = self.transport.pid
-        reactor.callLater(0.5, self.verify_kill, pid)
-        self.transport.loseConnection()
-
-    def verify_kill(self, pid):            
-        try:
-            if os.waitpid(pid, 0)[1] != 0:
-                os.kill(self.transport.pid, signal.SIGKILL)
-        except:
-            log.debug('Process %s already kill' % pid)
            
-            
             
             
             

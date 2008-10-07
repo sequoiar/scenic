@@ -60,7 +60,10 @@ class Setting(object):
                                 {'port_s':10000,
                                  'port_r':10010,
                                  'addr_s':'127.0.0.1',
-                                 'addr_r':'127.0.0.1'}
+                                 'addr_r':'127.0.0.1',
+                                 'acodec':'vorbis',
+                                 'vcodec':'h264',
+                                 'port':1244}
                             }
             
 #            self.streams['send'].add('test', 'audio', 'gst', )

@@ -34,6 +34,7 @@ class ControllerApi(object):
         self.curr_streams = 'send'
         self.streams = self.all_streams[self.curr_streams]
         self.connectors = core.connectors
+        self.connection = None
 
 
     ### Contacts ###
@@ -111,16 +112,26 @@ class ControllerApi(object):
         self.notify(caller, ('Trying to connect with %s (%s)...' % (contact.name, contact.address), client))
         
     def stop_connection(self, caller):
-        self.notify(caller, 2)
+        self.stop_streams(caller)
+        if self.curr_streams == 'send':
+            contact = self.adb.get_current()
+            connector = self.connectors[contact.type()]
+            client = connector.disconnect(self, contact.address, contact.port)
+        else:
+            connector = self.connectors[self.connection[2]]
+            client = connector.disconnect(self, self.connection[0], self.connection[1])
+        self.notify(caller, 'Communication was stopped.', 'info')
 
     def accept_connection(self, caller, client):
         client.accept()
-        self.start_streams(caller, None)
         self.notify(caller, 'Begining to receive...', 'info')
 
     def refuse_connection(self, caller, client):
         client.refuse()
-        self.notify(caller, 'You refuse de connection.', 'info')
+        self.notify(caller, 'You refuse the connection.', 'info')
+    
+    def set_connection(self, address, port, connector):
+        self.connection = (address, port, connector)
 
 
 

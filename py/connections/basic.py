@@ -30,21 +30,29 @@ from utils import log
 from connections import com_chan
 import streams.stream
 
-log = log.start('info', 1, 0, 'basic')
+log = log.start('debug', 1, 0, 'basic')
 
 
+PORT = 2222
 
 class BasicServer(LineReceiver):
     def __init__(self):
         self.notify = None
         self.api = None
         self.chan = None
+        self.state = 'idle'
 
     def lineReceived(self, line):
         log.debug('Line received from %s:%s: %s' % (self.addr.host, self.addr.port, line))
         if line == "ASK":
             self.notify(self, (self.addr, self), 'ask')
-#        elif line == "STOP":
+            self.state = 'waiting'
+        elif line == "STOP":
+            self.state = 'idle'
+            com_chan.disconnect()
+#            self.transport.loseConnection()
+            self.api.stop_streams(self)
+            self.notify(self, 'Connection was stop by the other side (%s:%s)' % self.transport.client, 'info')
 #        elif line == "ACCEPT":
 #        elif line == "REFUSE":
         else:
@@ -56,18 +64,28 @@ class BasicServer(LineReceiver):
         log.info('Client connected from %s:%s.' % self.transport.client)
     
     def connectionLost(self, reason=protocol.connectionDone):
+        if self.state == 'waiting':
+            self.notify(self, 'You didn\'t answer soon enough. Connection close.', 'ask_timeout')
+            self.state = 'idle'
         log.info('Client %s:%s disconnected. Reason: %s' % (self.transport.client[0], self.transport.client[1], reason.value))
 
     def refuse(self):
+        self.state = 'idle'
         self.sendLine('REFUSE')
         self.transport.loseConnection()
         
     def accept(self):
-        self.chan = com_chan.listen(37054)
+        self.state = 'idle'
+        self.chan = com_chan.listen(37054) #TODO: Set a port by connection
+        self.chan.add(self.remote_info)
         self.chan.add(self.settings)
         self.sendLine('ACCEPT')
         self.transport.loseConnection()
         
+    def remote_info(self, address, port, connector):
+        self.api.set_connection(address, port, connector)
+        
+    
     def settings(self, data):
         self.api.select_streams(self, 'receive')
         for kind, stream in data.items():
@@ -86,6 +104,7 @@ class BasicClient(LineReceiver):
         self.notify = None
         self.api = None
         self.chan = None
+        self.mode = None
         
     def lineReceived(self, line):
         log.debug('Line received from %s:%s: %s' % (self.addr.host, self.addr.port, line))
@@ -95,13 +114,18 @@ class BasicClient(LineReceiver):
         #        elif line == "STOP":
         
         elif line == "ACCEPT":
+            self.host = self.transport.getHost()
+            self.timeout.cancel()
             self.notify(self, '\nThe invitation to %s:%s was accepted.' % (self.addr.host, self.addr.port), 'info')
-            self.chan = com_chan.connect(self.addr.host, 37054)
+            self.chan = com_chan.connect(self.addr.host, 37054) #TODO: Set a port by connection
             self.send_settings()
 #            self.api.start_streams(self, self.addr.host, self.chan)
             
         elif line == "REFUSE":
             self.notify(self, '\nThe invitation to %s:%s was refuse.' % (self.addr.host, self.addr.port), 'info')
+
+        elif line == "STOP":
+            self.notify(self, '\n%s:%s stop the connection.' % (self.addr.host, self.addr.port), 'info')
 
         else:
             log.info('Bad command receive from remote')
@@ -110,6 +134,8 @@ class BasicClient(LineReceiver):
         if not self.chan.remote:
             reactor.callLater(0.000001, self.send_settings)
         else:
+            print self.host.host
+            self.chan.callRemote('BasicServer.remote_info', self.host.host, PORT, 'ip')
             settings = {}
             for name, stream in self.api.streams.streams.items():
                 kind = self.api.streams.get_kind(stream)
@@ -131,9 +157,22 @@ class BasicClient(LineReceiver):
         if not self.api:
             self.api = self.factory.api
             self.notify = self.factory.notify
+            self.mode = self.factory.mode
         log.info('Connection made to %s:%s.' % self.transport.addr)
-        self.sendLine('ASK')
-        self.notify(self, ('Connection made to %s:%s.' % self.transport.addr, self.transport.addr))
+        if self.mode == 'connect':
+            self.sendLine('ASK')
+            self.timeout = reactor.callLater(10, self.ask_timeout)
+            self.notify(self, ('Connection made to %s:%s.' % self.transport.addr, self.transport.addr))
+        elif self.mode == 'disconnect':
+            self.sendLine('STOP')
+            com_chan.disconnect()
+            self.transport.loseConnection()
+#            self.api.stop_streams(self)
+            self.notify(self, ('Stop info sended to %s:%s.' % self.transport.addr, self.transport.addr))
+
+    def ask_timeout(self):
+        self.transport.loseConnection()
+        self.notify(self, 'Timeout, the other side didn\'t respond.', 'info')
     
     def connectionLost(self, reason=protocol.connectionDone):
         log.debug('Lost the server connection. Reason: %s' % reason.value)
@@ -149,12 +188,12 @@ class BasicClient(LineReceiver):
         """
         return None # should raise NotImplementedError()
     
-    def disconnect(self):
+    def stop(self):
         """function disconnect
-        
-        returns 
         """
-        return None # should raise NotImplementedError()
+        self.sendLine('STOP')
+        com_chan.disconnect()
+        self.api.stop_streams(self)
     
     def accept(self):
         """function accept
@@ -202,6 +241,7 @@ class BasicClientFactory(protocol.ClientFactory):
 
     api = None
     notify = None
+    mode = None
     protocol = BasicClient
 
     def startedConnecting(self, connector):
@@ -214,6 +254,7 @@ class BasicClientFactory(protocol.ClientFactory):
         p.addr = addr
         p.api = self.api
         p.notify = self.notify
+        p.mode = self.mode
         return p
     
     def clientConnectionLost(self, connector, reason):
@@ -227,17 +268,25 @@ class BasicClientFactory(protocol.ClientFactory):
 
 
 def connect(api, host, port):
+    return send_cmd(api, host, port, 'connect')
+
+def disconnect(api, host, port):
+    return send_cmd(api, host, port, 'disconnect')
+
+def send_cmd(api, host, port, mode):
     factory = BasicClientFactory()
+    factory.mode = mode
     factory.api = api
     factory.notify = api.notify
     conn = reactor.connectTCP(host, port, factory, timeout=2)
     return conn
     
-def start(api, port=2222):
+def start(api, port=0):
+#    port += PORT
     factory = BasicServerFactory()
     factory.api = api
     factory.notify = api.notify
-    reactor.listenTCP(port, factory)
+    reactor.listenTCP(PORT, factory)
 
 
 if __name__ == '__main__':

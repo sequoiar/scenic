@@ -27,7 +27,7 @@ from streams.stream import AudioStream, Stream
 from streams.gst_client import GstClient
 from utils import log
 
-log = log.start('debug', 1, 0, 'audioGst')
+log = log.start('info', 1, 0, 'audioGst')
 
 class AudioGst(AudioStream, GstClient):
     """Class streams->audio->gst.AudioGst
@@ -36,6 +36,8 @@ class AudioGst(AudioStream, GstClient):
     def __init__(self, core):
         AudioStream.__init__(self, core)
         setting = core.curr_setting.others['gst']
+        self.port = setting['port']
+        self.codec = setting['acodec']
         mode = core.curr_setting.streams[core.api.curr_streams].mode
         if mode == 'send':
             port = setting['port_s']
@@ -46,25 +48,6 @@ class AudioGst(AudioStream, GstClient):
         GstClient.__init__(self, mode, port, address)
         self._chan = None
         
-    def get_attr(self, name):
-        """        
-        name: string
-        """
-        return getattr(self, name)
-    
-    def get_attrs(self):
-        return [(attr, value) for attr, value in self.__dict__.items() if attr[0] != "_"]
-    
-    def set_attr(self, name, value):
-        """
-        name: string
-        value: 
-        """
-        if hasattr(self, name):
-            setattr(self, name, value)
-            return True, name, value
-        return False, name, value
-    
     def start_sending(self, address, channel):
         """function start_sending
         address: string
@@ -86,7 +69,8 @@ class AudioGst(AudioStream, GstClient):
     def stop_sending(self):
         """function stop_sending
         """
-        self._send_cmd('stop_audio', None, self.sending_stopped)
+        self._send_cmd('audio_stop')
+        self.stop_process()
     
     def sending_stopped(self, state):
         self._del_callback()
@@ -112,10 +96,13 @@ class AudioGst(AudioStream, GstClient):
             
     def stop_receving(self):
         """function stop_receving
-        
-        returns 
         """
-        return None # should raise NotImplementedError()
+        self._send_cmd('audio_stop', None, self.receving_stopped)
+
+    def receving_stopped(self, state):
+        self._del_callback()
+        self._core.notify(None, state, 'audio_receving_stopped')
+   
 
     
 def start(core):

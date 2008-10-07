@@ -27,69 +27,66 @@ from streams.stream import VideoStream, Stream
 from streams.gst_client import GstClient
 from utils import log
 
-log = log.start('info', 1, 0, 'videoGst')
+log = log.start('debug', 1, 0, 'videoGst')
 
 class VideoGst(VideoStream, GstClient):
     """Class streams->video->gst.VideoGst
     """
     
-    def __init__(self, port, address='127.0.0.1', core=None):
+    def __init__(self, core=None):
         VideoStream.__init__(self, core)
-        GstClient.__init__(self, port, address)
+        setting = core.curr_setting.others['gst']
+        self.port = setting['port'] + 10
+        self.codec = setting['vcodec']
+        mode = core.curr_setting.streams[core.api.curr_streams].mode
+        if mode == 'send':
+            port = setting['port_s']
+            address = setting['addr_s']
+        else:
+            port = setting['port_r']
+            address = setting['addr_r']
+        GstClient.__init__(self, mode, port, address)
+#        self._chan = None
             
-    def get_attr(self, name):
-        """        
-        name: string
-        """
-        return getattr(self, name)
-    
-    def set_attr(self, name, value):
-        """
-        name: string
-        value: 
-        """
-        if hasattr(self, name):
-            setattr(self, name, value)
-            return True, name, value
-        return False, name, value
-    
-    def start_sending(self, address):
+    def start_sending(self, address, channel):
         """function start_sending
         address: string
         """
-        attrs = [(attr, value) for attr, value in self.__dict__.items() if attr[0] != "_"]
-        self._send_cmd('start_video', self.sending_started, ('address', address), *attrs)
+#        self._chan = channel
+        attrs = self.get_attrs()
+        attrs.append(('address', address))
+        self._send_cmd('video_start', attrs)
         
-    def sending_started(self, caps):
+    def sending_started(self):
         self._del_callback()
-        if caps.isdigit():
-            self._core.notify(None, caps, 'video_sending_started')
-        else:
-            self._core.notify(None, 1, 'video_sending_started')
+#        if caps.isdigit():
+#            self._core.notify(None, caps, 'video_sending_started')
+#        else:
+#            self._core.notify(None, 1, 'video_sending_started')
 #            log.info('SHOULD SEND CAPS VIA TCP HERE!')
    
     def stop_sending(self):
         """function stop_sending
         """
-        self._send_cmd('stop_video', self.sending_stopped)
+        self._send_cmd('video_stop')
+        self.stop_process()
     
     def sending_stopped(self, state):
         self._del_callback()
         self._core.notify(None, state, 'video_sending_stopped')
    
-    def start_receving(self):
-        """function start_receving
-        
-        returns 
-        """
-        return None # should raise NotImplementedError()
+    def start_receving(self, channel):
+        """function start_receving"""
+        attrs = self.get_attrs()
+        self._send_cmd('video_start', attrs)
     
-    def stop_receving(self):
+    def stop_receving(self, state):
         """function stop_receving
         
         returns 
         """
-        return None # should raise NotImplementedError()
+        self._del_callback()
+        self._core.notify(self, state, 'video_receving_stopped')
     
 def start(core):
     return VideoGst(core)
