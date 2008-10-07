@@ -34,7 +34,6 @@
 static std::auto_ptr<VideoReceiver> buildVideoReceiver()
 {
         VideoReceiverConfig vConfig("ximagesink");
-        //ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
         ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT, "");
         std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
         assert(rx->init());
