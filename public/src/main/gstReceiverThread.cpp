@@ -62,7 +62,7 @@ bool GstReceiverThread::video_start(MapMsg& msg)
     {
         //Get the parameter variables or return false
         VideoReceiverConfig config("xvimagesink");
-        ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"]);
+        ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"],"");
         if(!config.sanityCheck())
             return false;
         vreceiver_ = new VideoReceiver(config, rConfig);
@@ -90,12 +90,11 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
         //Get the parameter variables or return false
 
         AudioReceiverConfig config("jackaudiosink");
-        ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"]);
+        ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"], msg["caps"]);
         if(!config.sanityCheck())
             return false;
         areceiver_ = new AudioReceiver(config, rConfig);
         areceiver_->init();
-        areceiver_->set_caps(msg["caps"]);
         areceiver_->start();
         return true;
     }

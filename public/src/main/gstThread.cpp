@@ -26,7 +26,8 @@ int GstThread::main()
     while(!done)
     {
         if(g_main_context_iteration(NULL,FALSE))
-            LOG_DEBUG("Events Dispatched g_main.");
+        {}
+        //    LOG_DEBUG("Events Dispatched g_main.");
 
         MapMsg f = queue_.timed_pop(10000);
         if(f["command"].type() == 's')

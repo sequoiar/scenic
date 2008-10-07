@@ -114,8 +114,11 @@ void AudioLevel::print() const
 void AudioLevel::post() const
 {
     MapMsg mapMsg("level");
-    int channelIdx = 1;
+    //int channelIdx = 1;
 
+    mapMsg["values"] = rmsValues_;
+    MSG::post(mapMsg);
+#if 0
     for (std::vector<double>::const_iterator iter = rmsValues_.begin(); iter != rmsValues_.end(); ++iter)
     {
         std::stringstream key;
@@ -124,6 +127,7 @@ void AudioLevel::post() const
         ++channelIdx;
         MSG::post(mapMsg);
     }
+#endif
 }
 
 
