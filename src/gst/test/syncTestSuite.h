@@ -25,63 +25,34 @@
 
 #include <cpptest.h>
 
-#define DV 1
 
 class SyncTestSuite
-    : public GstTestSuite
+: public GstTestSuite
 {
     public:
 
         SyncTestSuite()
         {
-        TEST_ADD(SyncTestSuite::start_audiotest_videotest_rtp);
-        TEST_ADD(SyncTestSuite::stop_audiotest_videotest_rtp);
-        TEST_ADD(SyncTestSuite::start_stop_audiotest_videotest_rtp);
-
-            TEST_ADD(SyncTestSuite::start_8ch_comp_rtp_audiofile_dv)
-            TEST_ADD(SyncTestSuite::stop_8ch_comp_rtp_audiofile_dv)
-            TEST_ADD(SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv)
-#if 0
             TEST_ADD(SyncTestSuite::start_dv_audio_dv_video)
-            TEST_ADD(SyncTestSuite::stop_dv_audio_dv_video)
-            TEST_ADD(SyncTestSuite::start_stop_dv_audio_dv_video)
-#endif
+                TEST_ADD(SyncTestSuite::stop_dv_audio_dv_video)
+                TEST_ADD(SyncTestSuite::start_stop_dv_audio_dv_video)
 
-#if DV
-            TEST_ADD(SyncTestSuite::start_dv_audio_dv_video_rtp)
-            TEST_ADD(SyncTestSuite::stop_dv_audio_dv_video_rtp)
-            TEST_ADD(SyncTestSuite::start_stop_dv_audio_dv_video_rtp)
-#endif  // DV
-        TEST_ADD(SyncTestSuite::start_audiotest_videotest);
-        TEST_ADD(SyncTestSuite::stop_audiotest_videotest);
-        TEST_ADD(SyncTestSuite::start_stop_audiotest_videotest);
-
+                TEST_ADD(SyncTestSuite::start_audiotest_videotest);
+            TEST_ADD(SyncTestSuite::stop_audiotest_videotest);
+            TEST_ADD(SyncTestSuite::start_stop_audiotest_videotest);
         }
 
-
-// some tests
+        // some tests
 
     private:
-
-        void start_8ch_comp_rtp_audiofile_dv();
-        void stop_8ch_comp_rtp_audiofile_dv();
-        void start_stop_8ch_comp_rtp_audiofile_dv();
 
         void start_dv_audio_dv_video();
         void stop_dv_audio_dv_video();
         void start_stop_dv_audio_dv_video();
 
-        void start_dv_audio_dv_video_rtp();
-        void stop_dv_audio_dv_video_rtp();
-        void start_stop_dv_audio_dv_video_rtp();
-        
         void start_audiotest_videotest();
         void stop_audiotest_videotest();
         void start_stop_audiotest_videotest();
-
-        void start_audiotest_videotest_rtp();
-        void stop_audiotest_videotest_rtp();
-        void start_stop_audiotest_videotest_rtp();
 };
 
 #endif // _SYNC_TEST_SUITE_H_
