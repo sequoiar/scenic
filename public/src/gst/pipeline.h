@@ -48,19 +48,17 @@ class Pipeline
         bool isPlaying() const;
         bool isPaused() const;
         void wait_until_playing() const;
-        void wait_until_paused() const;
-        void wait_until_stopped() const;
         bool start();
         bool stop();
-
-        _GstBus* getBus() const;
-
-        GstClock* clock() const;
 
         _GstElement *findElement(const char *name) const;
 
     private:
         bool init();
+        _GstBus* getBus() const;
+        GstClock* clock() const;
+        void wait_until_paused() const;
+
         static gboolean bus_call(_GstBus *bus, _GstMessage *msg, void *data);
         bool checkStateChange(GstStateChangeReturn ret) const;
 
