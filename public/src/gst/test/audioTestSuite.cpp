@@ -32,9 +32,15 @@ class TestMsgFunctor : public MsgFunctor
     TestMsgFunctor(std::string s):s_(s+"*"+__FUNCTION__) { MSG::register_cb(this); }
     ~TestMsgFunctor() { MSG::unregister_cb();}
     void operator()(MapMsg& msg) 
-    { 
-        LOG_DEBUG("Msg: " << msg["command"].c_str() << " received by " << s_ 
-        << " channel1 rms:" << double(msg["channel1"]) );
+    {
+        std::vector<double> v_ = msg["values"];
+        std::vector<double>::const_iterator it;
+        std::stringstream st;
+        st << "Msg: " << msg["command"].c_str() << " received by " << s_; 
+        for(it = v_.begin();it != v_.end();++it)
+            st << " " << *it;
+
+        LOG_DEBUG(st.str()) ;
     } 
 };
 
@@ -45,8 +51,7 @@ void AudioTestSuite::start_1ch_audiotest()
     int numChannels = 1;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    TestMsgFunctor f(__FUNCTION__);  // Grabs the MSG::post callback 
-    tx.init();
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
 
     TEST_ASSERT(tx.start());
 
@@ -62,7 +67,7 @@ void AudioTestSuite::stop_1ch_audiotest()
     int numChannels = 1;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
     TEST_ASSERT(tx.stop());
 
     BLOCK();
@@ -77,7 +82,9 @@ void AudioTestSuite::start_stop_1ch_audiotest()
     int numChannels = 1;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TestMsgFunctor f(__FUNCTION__);  // Grabs the MSG::post callback 
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
+    
 
     TEST_ASSERT(tx.start());
 
@@ -97,7 +104,8 @@ void AudioTestSuite::start_2ch_audiotest()
     int numChannels = 2;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
+    
 
     TEST_ASSERT(tx.start());
 
@@ -113,7 +121,8 @@ void AudioTestSuite::stop_2ch_audiotest()
     int numChannels = 2;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
+    
 
     BLOCK();
 
@@ -129,7 +138,9 @@ void AudioTestSuite::start_stop_2ch_audiotest()
     int numChannels = 2;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TestMsgFunctor f(__FUNCTION__);  // Grabs the MSG::post callback 
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
+    
 
     TEST_ASSERT(tx.start());
 
@@ -148,7 +159,8 @@ void AudioTestSuite::start_6ch_audiotest()
     int numChannels = 6;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
+    
 
     TEST_ASSERT(tx.start());
 
@@ -164,7 +176,8 @@ void AudioTestSuite::stop_6ch_audiotest()
     int numChannels = 6;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
+    
 
     BLOCK();
 
@@ -180,7 +193,9 @@ void AudioTestSuite::start_stop_6ch_audiotest()
     int numChannels = 6;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TestMsgFunctor f(__FUNCTION__);  // Grabs the MSG::post callback 
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
+    
 
     TEST_ASSERT(tx.start());
 
@@ -200,7 +215,8 @@ void AudioTestSuite::start_8ch_audiotest()
     int numChannels = 8;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
+    
 
     TEST_ASSERT(tx.start());
 
@@ -216,7 +232,8 @@ void AudioTestSuite::stop_8ch_audiotest()
     int numChannels = 8;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
+    
 
     BLOCK();
     TEST_ASSERT(tx.stop());
@@ -231,7 +248,8 @@ void AudioTestSuite::start_stop_8ch_audiotest()
     int numChannels = 8;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
+    
 
     TEST_ASSERT(tx.start());
 
@@ -300,7 +318,7 @@ void AudioTestSuite::start_8ch_jack()
     int numChannels = 8;
     AudioConfig config("jackaudiosrc", numChannels);
     AudioLocal tx(config);
-    TEST_ASSERT(tx.init());
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
 
     TEST_ASSERT(tx.start());
 
@@ -316,7 +334,7 @@ void AudioTestSuite::stop_8ch_jack()
     int numChannels = 8;
     AudioConfig config("jackaudiosrc", numChannels);
     AudioLocal tx(config);
-    TEST_ASSERT(tx.init());
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
 
     BLOCK();
     TEST_ASSERT(tx.stop());
@@ -331,7 +349,7 @@ void AudioTestSuite::start_stop_8ch_jack()
     int numChannels = 8;
     AudioConfig config("jackaudiosrc", numChannels);
     AudioLocal tx(config);
-    TEST_ASSERT(tx.init());
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
     TEST_ASSERT(tx.start());
 
     BLOCK();
@@ -350,9 +368,9 @@ void AudioTestSuite::start_8ch_comp_audiofile()
         return;
     AudioConfig config("filesrc", audioFilename_, numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
 
-    TEST_ASSERT(tx.start());
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.start()));
 
     BLOCK();
     TEST_ASSERT(tx.isPlaying());
@@ -366,11 +384,11 @@ void AudioTestSuite::stop_8ch_comp_audiofile()
         return;
     AudioConfig config("filesrc", audioFilename_, numChannels);
     AudioLocal tx(config);
-    tx.init();
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
 
     BLOCK();
 
-    TEST_ASSERT(tx.stop());
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.stop()));
     TEST_ASSERT(!tx.isPlaying());
 }
 
@@ -382,14 +400,14 @@ void AudioTestSuite::start_stop_8ch_comp_audiofile()
         return;
     AudioConfig config("filesrc", audioFilename_, numChannels);
     AudioLocal tx(config);
-    TEST_ASSERT(tx.init());
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
 
-    TEST_ASSERT(tx.start());
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.start()));
 
     BLOCK();
     TEST_ASSERT(tx.isPlaying());
 
-    TEST_ASSERT(tx.stop());
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.stop()));
     TEST_ASSERT(!tx.isPlaying());
 }
 
@@ -401,7 +419,7 @@ void AudioTestSuite::start_audio_dv()
         return;
     AudioConfig config("dv1394src", numChannels);
     AudioLocal tx(config);
-    TEST_ASSERT(tx.init());
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
 
     TEST_ASSERT(tx.start());
 
@@ -417,7 +435,7 @@ void AudioTestSuite::stop_audio_dv()
         return;
     AudioConfig config("dv1394src", numChannels);
     AudioLocal tx(config);
-    TEST_ASSERT(tx.init());
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
     TEST_ASSERT(!tx.isPlaying());
 
     BLOCK();
@@ -433,7 +451,7 @@ void AudioTestSuite::start_stop_audio_dv()
         return;
     AudioConfig config("dv1394src", numChannels);
     AudioLocal tx(config);
-    TEST_ASSERT(tx.init());
+    TEST_THROWS_NOTHING(TEST_ASSERT(tx.init()));
 
     TEST_ASSERT(tx.start());
 
