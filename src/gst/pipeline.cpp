@@ -52,8 +52,6 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
 {
     switch(GST_MESSAGE_TYPE(msg))
     {
-        case GST_MESSAGE_UNKNOWN:
-            break;
         case GST_MESSAGE_EOS:
             LOG_DEBUG("End-of-stream");
             break;
@@ -89,50 +87,12 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
             }
             break;
         }
-        case GST_MESSAGE_INFO:
-            break;
-        case GST_MESSAGE_TAG:
-            break;
-        case GST_MESSAGE_BUFFERING:
-            break;
-        case GST_MESSAGE_STATE_CHANGED:
-            break;
-        case GST_MESSAGE_STATE_DIRTY:
-            break;
-        case GST_MESSAGE_STEP_DONE:
-            break;
-        case GST_MESSAGE_CLOCK_PROVIDE:
-            break;
-        case GST_MESSAGE_CLOCK_LOST:
-            break;
-        case GST_MESSAGE_NEW_CLOCK:
-            break;
-        case GST_MESSAGE_STRUCTURE_CHANGE:
-            break;
-        case GST_MESSAGE_STREAM_STATUS:
-            break;
-        case GST_MESSAGE_APPLICATION:
-            break;
         case GST_MESSAGE_ELEMENT:
             {
                 Pipeline *context = static_cast<Pipeline*>(data);
                 context->handleElementMsg(msg);
                 break;
             }
-        case GST_MESSAGE_SEGMENT_START:
-            break;
-        case GST_MESSAGE_SEGMENT_DONE:
-            break;
-        case GST_MESSAGE_DURATION:
-            break;
-        case GST_MESSAGE_LATENCY:
-            break;
-        case GST_MESSAGE_ASYNC_START:
-            break;
-        case GST_MESSAGE_ASYNC_DONE:
-            break;
-        case GST_MESSAGE_ANY:
-            break;
         default:
             break;
     }
@@ -221,12 +181,6 @@ void Pipeline::wait_until_paused() const
         usleep(10000);
 }
 
-
-void Pipeline::wait_until_stopped() const
-{
-    while (isPlaying())
-        usleep(10000);
-}
 
 bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 {
