@@ -36,6 +36,7 @@ if version < 8:
 # App imports
 from utils import get_def_name
 
+#TODO: Specified the level by output
 
 LoggerClass = logging.getLoggerClass()
 

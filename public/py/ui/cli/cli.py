@@ -99,6 +99,7 @@ class CliController(TelnetServer):
                           }
         
     def parse(self, data):
+        print self.block
         if not self.core:
             self.core = self.factory.subject.api
         data = to_utf(data)
@@ -129,7 +130,7 @@ class CliController(TelnetServer):
             self.core.refuse_connection(self, self.remote)
             self.block = False
             self.remote = None
-        else:
+        elif self.block:
             self.write('This is not a valid answer.\n[Y/n]:')
 
     def _contacts(self, data):
@@ -266,7 +267,7 @@ class CliController(TelnetServer):
         elif options.list:
             self.core.list_stream(self, kind)
         elif options.add:
-            self.core.add_stream(self, options.add, video.gst.VideoGst(10000, '127.0.0.1', self.factory.subject), kind)
+            self.core.add_stream(self, options.add, kind, 'gst')
         elif options.erase:
             self.core.delete_stream(self, options.erase, kind)
         else:
@@ -765,6 +766,11 @@ class CliView(Observer):
         self.write('\n%s is inviting you. Do you accept?\n[Y/n]: ' % data[0].host, False)
         self.controller.block = self.controller._ask
         self.controller.remote = data[1]
+        
+    def _ask_timeout(self, origin, data):
+        self.write(data)
+        self.controller.block = False
+        self.controller.remote = None
         
     def _start_connection(self, origin, data):
         self.write(data[0], False)

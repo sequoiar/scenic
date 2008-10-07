@@ -65,10 +65,12 @@ class Core(Subject):
                 log.error('Unable to start UI module %s.' % mod.__name__)
 
     def load_connections(self):
-        self.connectors = {'ip':basic}  # TODO
+        self.connectors = {'ip':basic}  #TODO: add automatic searching of all connectors
         for conn in self.connectors.values():
             if len(sys.argv) > 1:
-                conn.start(self.api, (int(sys.argv[1]) - 9999) / 2)
+                port = int(sys.argv[1]) - 14442
+                conn.PORT += port
+                conn.start(self.api)
             else:
                 conn.start(self.api)
 

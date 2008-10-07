@@ -40,6 +40,7 @@ class Streams(object):
             return None
 
     def add(self, name, kind, engine, core):
+        print 'CORE:', core
         if kind in self._kinds:
             dict_name = "_".join([kind, name])
             if dict_name in self.streams:
@@ -122,7 +123,7 @@ class Streams(object):
         """
         Stop all the sub-streams.
         """
-        self.mode = mode
+#        self.mode = mode
         if mode == 'send':
             for stream in self.streams.values():
                 stream.stop_sending()

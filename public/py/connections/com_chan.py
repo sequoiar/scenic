@@ -30,7 +30,7 @@ from twisted.spread import pb
 # App imports
 from utils import log
 
-log = log.start('debug', 1, 0, 'com_chan')
+log = log.start('info', 1, 0, 'com_chan')
 
 
 class ComChannel(pb.Root):
@@ -77,22 +77,28 @@ class ComChannel(pb.Root):
         else:
             log.debug('Could not delete the method %s because is not registered.' % name)
 
+server = None
 
 def listen(port):
+    global server
     channel = ComChannel()
-    reactor.listenTCP(port, pb.PBServerFactory(channel))
+    server = reactor.listenTCP(port, pb.PBServerFactory(channel))
     return channel
 
 
-factory = pb.PBClientFactory()
+client_factory = pb.PBClientFactory()  #TODO: Have probably to change this to deal with many connections.
 
 def connect(address, port):
-    reactor.connectTCP(address, port, factory)
+    reactor.connectTCP(address, port, client_factory)
     channel = ComChannel()
-    deferred = factory.getRootObject()
+    deferred = client_factory.getRootObject()
     deferred.addCallback(channel.remote_init)
     return channel
-    
+
+def disconnect():
+    client_factory.disconnect()
+    if server:
+        server.loseConnection()
 
 
 if __name__ == '__main__':
