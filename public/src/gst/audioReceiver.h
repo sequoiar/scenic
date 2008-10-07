@@ -45,13 +45,6 @@ class AudioReceiver
         ~AudioReceiver();
 
         bool start();
-        void set_caps(const std::string &caps) 
-        { 
-            session_.set_caps(caps.c_str()); 
-            session_.checkSampleRate();
-            gotCaps_ = true;
-        }
-
         double bandwidth() const { return session_.bandwidth(); }
 
     private:
@@ -60,6 +53,8 @@ class AudioReceiver
         void init_depayloader();
         void init_level();
         void init_sink();
+        
+        void set_caps(const char *caps); 
 
         const AudioReceiverConfig audioConfig_;
         const ReceiverConfig remoteConfig_;

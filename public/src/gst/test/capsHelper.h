@@ -42,6 +42,7 @@ StrIntFloat p(MapMsg& in,std::string key,std::string file, std::string line)
 /* Helper functions                             */
 /*----------------------------------------------*/ 
 
+#if 0
 static bool tcpGetCaps(int port, AudioReceiver &rx)
 {
     TcpThread tcp(port);
@@ -64,6 +65,30 @@ static bool tcpGetCaps(int port, AudioReceiver &rx)
     }
     return true;
 }
+#endif
+
+
+static std::string tcpGetCaps(int port)
+{
+    TcpThread tcp(port);
+    tcp.run();
+    QueuePair& queue = tcp.getQueue();
+    for(;;)
+    {
+        MapMsg f = queue.timed_pop(100000);
+        if(f["command"].type() == 'n')
+            continue;
+        try
+        {
+            return (std::string(f["caps_str"]));
+        }
+        catch(ErrorExcept)
+        {
+        }
+    }
+    return "";
+}
+
 #include <errno.h>
 
 static bool tcpSendCaps(int port, const std::string &caps)
