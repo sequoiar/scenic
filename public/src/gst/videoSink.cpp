@@ -30,14 +30,21 @@
 #include "pipeline.h"
 
 
-gboolean VideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
+VideoSink::~VideoSink()
+{
+    assert(stop());
+    pipeline_.remove(&sink_);
+}
+
+
+gboolean XvImageSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
 {
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(data), GDK_WINDOW_XWINDOW(widget->window));
     return TRUE;
 }
 
 
-gboolean VideoSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
+gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
     if (event->keyval != 'f')
     {
@@ -59,7 +66,7 @@ gboolean VideoSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gp
 }
 
 
-bool VideoSink::init()
+bool XvImageSink::init()
 {
     static bool gtk_initialized = false;
     if (!gtk_initialized)
@@ -71,15 +78,15 @@ bool VideoSink::init()
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
-                         VideoSink::expose_cb), static_cast<void*>(sink_));
+                         XvImageSink::expose_cb), static_cast<void*>(sink_));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event",
-                     G_CALLBACK(VideoSink::key_press_event_cb), NULL);
+                     G_CALLBACK(XvImageSink::key_press_event_cb), NULL);
     return true;
 }
 
 
-void VideoSink::makeWindowBlack()
+void XvImageSink::makeWindowBlack()
 {
     GdkColor color;
     gdk_color_parse ("black", &color);
@@ -87,7 +94,7 @@ void VideoSink::makeWindowBlack()
 }
 
 
-void VideoSink::showWindow()
+void XvImageSink::showWindow()
 {
     makeWindowBlack();
     gtk_window_set_title(GTK_WINDOW(window_), "Sropulpof");
@@ -95,15 +102,24 @@ void VideoSink::showWindow()
 }
 
 
-VideoSink::~VideoSink()
+XvImageSink::~XvImageSink()
 {
-    assert(stop());
-    pipeline_.remove(&sink_);
     if (window_)
     {
         gtk_widget_destroy(window_);
         LOG_DEBUG("Widget destroyed");
     }
+}
+
+
+bool XImageSink::init()
+{
+    assert(sink_ = gst_element_factory_make("ximagesink", "videosink"));
+    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
+    pipeline_.add(sink_);
+
+    return true;
 }
 
 
