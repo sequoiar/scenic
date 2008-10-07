@@ -33,7 +33,7 @@
 
 static std::auto_ptr<VideoReceiver> buildVideoReceiver()
 {
-        VideoReceiverConfig vConfig("xvimagesink");
+        VideoReceiverConfig vConfig("ximagesink");
         ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
         std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
         assert(rx->init());
@@ -317,7 +317,7 @@ void RtpVideoTestSuite::stop_file_rtp()
 void RtpVideoTestSuite::start_stop_file_rtp()
 {
     if (id_ == 0) {
-        VideoReceiverConfig vConfig("xvimagesink");
+        VideoReceiverConfig vConfig("ximagesink");
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         TEST_ASSERT(rx->start());

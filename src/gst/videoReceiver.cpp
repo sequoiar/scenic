@@ -68,7 +68,7 @@ void VideoReceiver::init_sink()
 
 bool VideoReceiver::start()
 {
-    LOG_INFO("Starting Receive video.");
+    LOG_INFO("Starting to receive video.");
     GstBase::start();
     sink_->showWindow();
     return true;

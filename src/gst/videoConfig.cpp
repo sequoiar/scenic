@@ -48,14 +48,16 @@ VideoSource * VideoConfig::createSource() const
 // FIXME: merge
 VideoSink * VideoConfig::createSink() const
 {
-    return new VideoSink();
+    return new XvImageSink();
 }
 
 
 VideoSink * VideoReceiverConfig::createSink() const
 {
     if (sink_ == "xvimagesink")
-        return new VideoSink();
+        return new XvImageSink();
+    else if (sink_ == "ximagesink")
+        return new XImageSink();
     else
         THROW_ERROR(sink_ << " is an invalid sink");
     return 0;
@@ -71,9 +73,6 @@ bool VideoConfig::sanityCheck() const
 
 bool VideoConfig::fileExists() const
 {
-    if (location_.empty())
-        THROW_ERROR("No file location given");
-    
     FILE *file;
     file = fopen(location(), "r");
     if (file == NULL)
@@ -90,3 +89,4 @@ const char* VideoConfig::location() const
         THROW_ERROR("No location specified");
     return location_.c_str();
 }
+

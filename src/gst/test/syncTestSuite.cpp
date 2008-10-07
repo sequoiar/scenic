@@ -185,7 +185,7 @@ void SyncTestSuite::start_stop_8ch_comp_rtp_audiofile_dv()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         TEST_ASSERT(aTx->start());
-        usleep(100000); // GIVE receiver chance to start waiting
+        //usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         TEST_ASSERT(vTx->start());
@@ -311,7 +311,7 @@ void SyncTestSuite::start_dv_audio_dv_video_rtp()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         TEST_ASSERT(aTx->start());
-        usleep(100000); // GIVE receiver chance to start waiting
+        //usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         TEST_ASSERT(vTx->start());
@@ -390,7 +390,7 @@ void SyncTestSuite::start_stop_dv_audio_dv_video_rtp()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         TEST_ASSERT(aTx->start());
-        usleep(100000); // GIVE receiver chance to start waiting
+        //usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         TEST_ASSERT(vTx->start());
@@ -407,6 +407,213 @@ void SyncTestSuite::start_stop_dv_audio_dv_video_rtp()
         TEST_ASSERT(!vTx->isPlaying());
     }
 }
+
+
+void SyncTestSuite::start_audiotest_videotest_rtp()
+{
+    int numChannels = 8;
+
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
+        
+        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *aRx));
+
+        TEST_ASSERT(aRx->start());
+        TEST_ASSERT(vRx->start());
+        
+        BLOCK();
+
+        TEST_ASSERT(aRx->isPlaying());
+        TEST_ASSERT(vRx->isPlaying());
+    }
+    else {
+        AudioConfig aConfig("audiotestsrc", numChannels);
+        std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig));
+
+        VideoConfig vConfig("videotestsrc"); 
+        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
+
+        TEST_ASSERT(aTx->start());
+        //usleep(100000); // FIXME: this is all kinds of bad, GIVE receiver chance to start waiting
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
+
+        TEST_ASSERT(vTx->start());
+
+        BLOCK();
+
+        TEST_ASSERT(aTx->isPlaying());
+        TEST_ASSERT(vTx->isPlaying());
+    }
+}
+
+
+void SyncTestSuite::stop_audiotest_videotest_rtp()
+{
+    int numChannels = 8;
+
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
+
+        BLOCK();
+
+        TEST_ASSERT(aRx->stop());
+        TEST_ASSERT(vRx->stop());
+
+        TEST_ASSERT(!aRx->isPlaying());
+        TEST_ASSERT(!vRx->isPlaying());
+    }
+    else {
+        AudioConfig aConfig("audiotestsrc", numChannels);
+        std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig));
+
+        VideoConfig vConfig("videotestsrc"); 
+        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
+
+        BLOCK();
+
+        TEST_ASSERT(aTx->stop());
+        TEST_ASSERT(vTx->stop());
+
+        TEST_ASSERT(!aTx->isPlaying());
+        TEST_ASSERT(!vTx->isPlaying());
+    }
+}
+
+
+void SyncTestSuite::start_stop_audiotest_videotest_rtp()
+{
+    int numChannels = 2;
+
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
+        
+        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *aRx));
+
+        TEST_ASSERT(aRx->start());
+        TEST_ASSERT(vRx->start());
+
+        BLOCK();
+
+        TEST_ASSERT(aRx->isPlaying());
+        TEST_ASSERT(vRx->isPlaying());
+
+        TEST_ASSERT(aRx->stop());
+        TEST_ASSERT(vRx->stop());
+
+        TEST_ASSERT(!aRx->isPlaying());
+        TEST_ASSERT(!vRx->isPlaying());
+    }
+    else {
+        AudioConfig aConfig("audiotestsrc", numChannels);
+        std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig));
+
+        VideoConfig vConfig("videotestsrc"); 
+        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
+
+        TEST_ASSERT(aTx->start());
+        //usleep(100000); // GIVE receiver chance to start waiting
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
+
+        TEST_ASSERT(vTx->start());
+
+        BLOCK();
+
+        TEST_ASSERT(aTx->isPlaying());
+        TEST_ASSERT(vTx->isPlaying());
+
+        TEST_ASSERT(aTx->stop());
+        TEST_ASSERT(vTx->stop());
+
+        TEST_ASSERT(!aTx->isPlaying());
+        TEST_ASSERT(!vTx->isPlaying());
+    }
+}
+
+
+void SyncTestSuite::start_audiotest_videotest()
+{
+    int numChannels = 8;
+
+    if (id_ == 1)
+        return;
+
+    AudioConfig aConfig("audiotestsrc", numChannels);
+    AudioLocal aTx(aConfig);
+    aTx.init();
+
+    VideoConfig vConfig("videotestsrc");
+    VideoLocal vTx(vConfig);
+    vTx.init();
+
+
+    TEST_ASSERT(aTx.start());
+    TEST_ASSERT(vTx.start());
+
+    BLOCK();
+    TEST_ASSERT(aTx.isPlaying());
+    TEST_ASSERT(vTx.isPlaying());
+}
+
+
+void SyncTestSuite::stop_audiotest_videotest()
+{
+    int numChannels = 8;
+
+    if (id_ == 1)
+        return;
+
+    AudioConfig aConfig("audiotestsrc", numChannels);
+    AudioLocal aTx(aConfig);
+    aTx.init();
+
+    VideoConfig vConfig("videotestsrc");
+    VideoLocal vTx(vConfig);
+    vTx.init();
+
+    BLOCK();
+
+    TEST_ASSERT(aTx.stop());
+    TEST_ASSERT(vTx.stop());
+
+    TEST_ASSERT(!aTx.isPlaying());
+    TEST_ASSERT(!vTx.isPlaying());
+}
+
+
+void SyncTestSuite::start_stop_audiotest_videotest()
+{
+    int numChannels = 8;
+
+    if (id_ == 1)
+        return;
+
+    AudioConfig aConfig("dv1394src", numChannels);
+    AudioLocal aTx(aConfig);
+    aTx.init();
+
+    VideoConfig vConfig("dv1394src");
+    VideoLocal vTx(vConfig);
+    vTx.init();
+
+    TEST_ASSERT(aTx.start());
+    TEST_ASSERT(vTx.start());
+
+    BLOCK();
+
+    TEST_ASSERT(aTx.isPlaying());
+    TEST_ASSERT(vTx.isPlaying());
+
+    TEST_ASSERT(aTx.stop());
+    TEST_ASSERT(vTx.stop());
+
+    TEST_ASSERT(!aTx.isPlaying());
+    TEST_ASSERT(!vTx.isPlaying());
+}
+
+
 
 
 int mainSyncTestSuite(int argc, char **argv)

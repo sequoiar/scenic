@@ -32,22 +32,48 @@ class VideoSink
 {
     public:
         VideoSink()
-            : sink_(0), window_(0) {};
+            : sink_(0) {};
         ~VideoSink();
+        virtual void showWindow() {};   // FIXME: not useful for ximagesink
+
+        _GstElement *sinkElement() { return sink_; }
+        
+    protected:
+        _GstElement *sink_;
+
+    private:
+        VideoSink(const VideoSink&);     //No Copy Constructor
+        VideoSink& operator=(const VideoSink&);     //No Assignment Operator
+};
+
+
+class XvImageSink
+    : public VideoSink
+{
+    public:
+        XvImageSink()
+            : window_(0) {};
+        ~XvImageSink();
         bool init();
         void showWindow();
 
-    private:
-        _GstElement *sinkElement() { return sink_; }
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                                            void *data);
         static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
         void makeWindowBlack();
 
-        _GstElement *sink_;
         _GtkWidget *window_;
-        VideoSink(const VideoSink&);     //No Copy Constructor
-        VideoSink& operator=(const VideoSink&);     //No Assignment Operator
+        XvImageSink(const XvImageSink&);     //No Copy Constructor
+        XvImageSink& operator=(const XvImageSink&);     //No Assignment Operator
+};
+
+class XImageSink
+    : public VideoSink
+{
+    public: 
+        XImageSink() {};
+        ~XImageSink(){};
+        bool init();
 };
 
 #endif //_VIDEO_SINK_H_
