@@ -55,10 +55,10 @@ StrIntFloat::StrIntFloat()
 #define TYPE_CHECKMSG(gtype,xtype) \
     const char* t = #gtype; \
     char tt = t[0];\
-    if(type_ == 'n') QUIET_THROW("Parameter \"" << k_ << "\" missing."); \
+    if(type_ == 'n') QUIET_THROW("Parameter " << k_ << " missing."); \
     else \
         if(type_ != tt) \
-        QUIET_THROW("Parameter \"" << k_ << "\" should be " << #xtype << " not " << T_EXPAND(type_) << "." );\
+        QUIET_THROW("Parameter " << k_ << " should be " << #xtype << " not " << T_EXPAND(type_) << "." );\
     return gtype   
 
 bool StrIntFloat::get(std::string& s) const
