@@ -27,12 +27,14 @@
 #include "mapMsg.h"
 class TestMsgFunctor : public MsgFunctor
 {
+    std::string s_;
     public:
-    TestMsgFunctor() { MSG::register_cb(this); }
+    TestMsgFunctor(std::string s):s_(s+"*"+__FUNCTION__) { MSG::register_cb(this); }
     ~TestMsgFunctor() { MSG::unregister_cb();}
     void operator()(MapMsg& msg) 
     { 
-        LOG_DEBUG("got a MapMsg from MsgFunctor " << std::string(msg["command"])); 
+        LOG_DEBUG("Msg: " << msg["command"].c_str() << " received by " << s_ 
+        << " channel1 rms:" << double(msg["channel1"]) );
     } 
 };
 
@@ -43,7 +45,7 @@ void AudioTestSuite::start_1ch_audiotest()
     int numChannels = 1;
     AudioConfig config("audiotestsrc", numChannels);
     AudioLocal tx(config);
-    TestMsgFunctor f;  // Grabs the MSG::post callback 
+    TestMsgFunctor f(__FUNCTION__);  // Grabs the MSG::post callback 
     tx.init();
 
     TEST_ASSERT(tx.start());
