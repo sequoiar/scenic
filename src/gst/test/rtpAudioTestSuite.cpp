@@ -50,7 +50,8 @@ std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
 std::auto_ptr<AudioReceiver> buildAudioReceiver()
 {
     AudioReceiverConfig aConfig("jackaudiosink");
-    ReceiverConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT); 
+    //ReceiverConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT); 
+    ReceiverConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT, tcpGetCaps(GstTestSuite::A_PORT + 100));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
     return rx;
@@ -68,7 +69,7 @@ void RtpAudioTestSuite::start_2ch_rtp_audiotest()
 
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
-        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
+        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
 
         TEST_ASSERT(rx->start());
 
@@ -122,7 +123,7 @@ void RtpAudioTestSuite::start_stop_2ch_rtp_audiotest()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
+        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
 
         TEST_ASSERT(rx->start());
 
@@ -156,7 +157,7 @@ void RtpAudioTestSuite::start_8ch_rtp_audiotest()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
+        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
 
         TEST_ASSERT(rx->start());
 
@@ -206,7 +207,7 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiotest()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
+        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
 
         TEST_ASSERT(rx->start());
 
@@ -240,7 +241,7 @@ void RtpAudioTestSuite::start_8ch_rtp_jack()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
+        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
 
         TEST_ASSERT(rx->start());
 
@@ -290,7 +291,7 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_jack()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
+        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
 
         TEST_ASSERT(rx->start());
 
@@ -324,7 +325,7 @@ void RtpAudioTestSuite::start_8ch_rtp_audiofile()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
+        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
 
         TEST_ASSERT(rx->start());
 
@@ -374,7 +375,7 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiofile()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
+        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
 
         TEST_ASSERT(rx->start());
 
@@ -407,7 +408,7 @@ void RtpAudioTestSuite::start_audio_dv_rtp()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
+        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
 
         TEST_ASSERT(rx->start());
 
@@ -458,7 +459,7 @@ void RtpAudioTestSuite::start_stop_audio_dv_rtp()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
+        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *rx));
 
         TEST_ASSERT(rx->start());
 

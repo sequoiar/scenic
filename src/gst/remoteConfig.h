@@ -80,14 +80,19 @@ class ReceiverConfig : public RemoteConfig
     public:
         ReceiverConfig(const std::string &codec__,
                 const std::string &remoteHost__,    
-                int port__) : RemoteConfig(codec__, remoteHost__, port__)
+                int port__, const std::string &caps__) : RemoteConfig(codec__, remoteHost__, port__), caps_(caps__)
         {}
         
         ReceiverConfig(const ReceiverConfig & m) 
-            : RemoteConfig(m)
+            : RemoteConfig(m), caps_(m.caps_)
         {}
 
         Decoder* createDecoder() const;
+
+        const char *caps() const { return caps_.c_str(); }
+
+    private:
+        const std::string caps_;
 };
 
 #endif // _REMOTE_CONFIG_H_
