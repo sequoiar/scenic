@@ -93,7 +93,7 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
             updateRms(rmsDb, channelIdx);
         }
         // TODO: post to static function with mapmsg
-        print();
+        //print();
         post();
 
         return true;
