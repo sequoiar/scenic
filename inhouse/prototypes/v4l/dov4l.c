@@ -337,7 +337,7 @@ int main(int argc, char *argv[])
     char *device = "/dev/video0";
     int c, fd;
     char runmode = M_S;
-    int ichannel = -1, tuner = 0, mode = VIDEO_MODE_PAL;
+    int ichannel = -1, tuner = 0, mode = VIDEO_MODE_NTSC;
     unsigned long frequency = 0;
     int bri = -1, hue = -1, col = -1, con = -1, whi =-1, pal = -1;
     int width = -1, height = -1;
@@ -514,14 +514,18 @@ ssize:
         {
             struct video_window vwin;
             struct v4l2_window v2win;
-            /*			if (ioctl(fd,VIDIOC_G_FMT , &v2win ) == -1)
-                        {
-                        myperror("VIDIOCGWIN");
-                        }
-                        */			if (ioctl(fd, VIDIOCGWIN, &vwin ) == -1)
+            
+            if (ioctl(fd,VIDIOC_G_FMT , &v2win ) == -1)
             {
                 myperror("VIDIOCGWIN");
             }
+
+#if 0 
+            if (ioctl(fd, VIDIOCGWIN, &vwin ) == -1)
+            {
+                myperror("VIDIOCGWIN");
+            }
+#endif
 
             vwin.width = width;
             vwin.height = height;

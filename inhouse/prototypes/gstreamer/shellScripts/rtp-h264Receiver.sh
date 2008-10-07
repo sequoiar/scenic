@@ -1,10 +1,6 @@
 #!/bin/sh
 
-MVEC=true
+MVEC=false
+CAPS="application/x-rtp,media=video,clock-rate=90000, encoding-name=H264, payload=96";
 
-if [ $# = 1 ]; then
-    gst-launch-0.10 -v udpsrc port=$1 caps="application/x-rtp" ! rtph264depay ! ffdec_h264 debug-mv=$MVEC ! xvimagesink sync=false
-else
-    gst-launch-0.10 -v udpsrc port=5060 caps="application/x-rtp" ! rtph264depay ! ffdec_h264 debug-mv=$MVEC ! xvimagesink sync=false
-fi
-
+gst-launch-0.10 -v udpsrc port=5060 caps="application/x-rtp" ! $CAPS ! rtph264depay ! ffdec_h264 debug-mv=$MVEC ! ffmpegcolorspace ! ximagesink sync=false
