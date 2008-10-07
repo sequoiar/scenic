@@ -76,9 +76,9 @@ void AudioReceiver::init_sink()
 }
 
 
-// CAPS MUST be set first
 bool AudioReceiver::start()
 {
+    // CAPS MUST be set first
     set_caps(remoteConfig_.caps());
     assert(gotCaps_);
     LOG_DEBUG("Receiving audio on port " << remoteConfig_.port() << " from host " << remoteConfig_.remoteHost());

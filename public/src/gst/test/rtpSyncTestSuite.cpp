@@ -23,13 +23,9 @@
 #include <cstdlib>
 #include "rtpSyncTestSuite.h"
 #include "videoSender.h"
-#include "videoConfig.h"
 #include "videoReceiver.h"
-#include "videoLocal.h"
 #include "audioSender.h"
-#include "audioLocal.h"
 #include "audioReceiver.h"
-#include "audioConfig.h"
 #include "remoteConfig.h"
 #include "hostIP.h"
 #include <sstream>
@@ -52,7 +48,6 @@ static std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
 static std::auto_ptr<AudioReceiver> buildAudioReceiver()
 {
     AudioReceiverConfig aConfig("jackaudiosink");
-    //ReceiverConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT); 
     ReceiverConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT, tcpGetCaps(GstTestSuite::A_PORT + 100));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     assert(rx->init());
@@ -62,20 +57,20 @@ static std::auto_ptr<AudioReceiver> buildAudioReceiver()
 
 static std::auto_ptr<VideoReceiver> buildVideoReceiver()
 {
-        VideoReceiverConfig vConfig("xvimagesink");
-        ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT, "");
-        std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
-        assert(rx->init());
-        return rx;
+    VideoReceiverConfig vConfig("xvimagesink");
+    ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT, "");
+    std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
+    assert(rx->init());
+    return rx;
 }
 
 
 static std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
 {
-        SenderConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
-        std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
-        assert(tx->init());
-        return tx;
+    SenderConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
+    std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
+    assert(tx->init());
+    return tx;
 }
 
 /*----------------------------------------------*/ 
@@ -90,8 +85,6 @@ void SyncTestSuiteRtp::start_8ch_comp_rtp_audiofile_dv()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
-        
-        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *aRx));
 
         TEST_ASSERT(aRx->start());
         TEST_ASSERT(vRx->start());
@@ -161,8 +154,6 @@ void SyncTestSuiteRtp::start_stop_8ch_comp_rtp_audiofile_dv()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
-        
-        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *aRx));
 
         TEST_ASSERT(aRx->start());
         TEST_ASSERT(vRx->start());
@@ -212,12 +203,10 @@ void SyncTestSuiteRtp::start_dv_audio_dv_video_rtp()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
-        
-        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *aRx));
 
         TEST_ASSERT(aRx->start());
         TEST_ASSERT(vRx->start());
-        
+
         BLOCK();
 
         TEST_ASSERT(aRx->isPlaying());
@@ -285,8 +274,6 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video_rtp()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
-        
-        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *aRx));
 
         TEST_ASSERT(aRx->start());
         TEST_ASSERT(vRx->start());
@@ -337,11 +324,9 @@ void SyncTestSuiteRtp::start_audiotest_videotest_rtp()
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
         
-        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *aRx));
-
         TEST_ASSERT(aRx->start());
         TEST_ASSERT(vRx->start());
-        
+
         BLOCK();
 
         TEST_ASSERT(aRx->isPlaying());
@@ -409,8 +394,6 @@ void SyncTestSuiteRtp::start_stop_audiotest_videotest_rtp()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
-        
-        //TEST_ASSERT(tcpGetCaps(A_PORT + 100, *aRx));
 
         TEST_ASSERT(aRx->start());
         TEST_ASSERT(vRx->start());
@@ -466,7 +449,7 @@ int mainRtpSyncTestSuite(int argc, char **argv)
 
     Test::TextOutput output(Test::TextOutput::Verbose);
     try {
-    return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;
     }
     catch (Except e)
     {
