@@ -141,10 +141,18 @@ bool Parser::stringify(MapMsg& cmd_map, std::string& rstr)
                                                         //generate string from float
                     sstr << double(it->second);
                     break;
-                 
+
+                case 'F':
+                    {
+                    const std::vector<double> &v = it->second;
+                    sstr << v[0];
+                    LOG_WARNING("mapMsg vector passing only first element");
+                    }
+                    break;
+
                 default:
-                    return false;
-            }
+                    THROW_ERROR("Command " << it->first << " has unknown type " << it->second.type());
+            }       
         }
     }
     rstr = sstr.str();
