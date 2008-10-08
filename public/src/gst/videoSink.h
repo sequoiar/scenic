@@ -67,13 +67,21 @@ class XvImageSink
         XvImageSink& operator=(const XvImageSink&);     //No Assignment Operator
 };
 
+
+// FIXME: doesn't work with h264
 class XImageSink
     : public VideoSink
 {
     public: 
-        XImageSink() {};
-        ~XImageSink(){};
+        XImageSink() : colorspc_(0) {};
+        ~XImageSink();
         bool init();
+
+        _GstElement *sinkElement() { return colorspc_; }
+    private:
+        _GstElement *colorspc_;
+        XImageSink(const XImageSink&);     //No Copy Constructor
+        XImageSink& operator=(const XImageSink&);     //No Assignment Operator
 };
 
 #endif //_VIDEO_SINK_H_

@@ -114,12 +114,23 @@ XvImageSink::~XvImageSink()
 
 bool XImageSink::init()
 {
+    // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
+    assert(colorspc_ = gst_element_factory_make("ffmpegcolorspace", "colorspc"));
+    pipeline_.add(colorspc_);
+
     assert(sink_ = gst_element_factory_make("ximagesink", "videosink"));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
     pipeline_.add(sink_);
 
+    GstLinkable::link(colorspc_, sink_);
     return true;
 }
 
+
+XImageSink::~XImageSink()
+{
+    assert(stop());
+    pipeline_.remove(&colorspc_);
+}
 
