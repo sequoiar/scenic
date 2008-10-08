@@ -75,7 +75,6 @@ RtpBin::~RtpBin()
 double RtpBin::bandwidth() const
 {
     double result = 0.0;
-#if 0
 
     GstIteratorResult iterResult;
     GstElement *elem;
@@ -97,7 +96,6 @@ double RtpBin::bandwidth() const
         iterResult = gst_iterator_next(iter, (void **) &elem);
     }
     LOG_DEBUG("BANDWITH USED = " << result);
-#endif
 
     return result;
 }
