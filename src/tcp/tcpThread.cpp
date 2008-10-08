@@ -20,6 +20,7 @@
 #include "tcpThread.h"
 #include "logWriter.h"
 #include "parser.h"
+#include <errno.h>
 
 class TcpLogFunctor : public LogFunctor
 {
@@ -48,14 +49,14 @@ int TcpThread::main()
     while(!quit)
     {
         serv_.socket_bind_listen();
+        while(!serv_.accept())
+        {
+            if((quit = gotQuit()))
+                return 0;
+            usleep(10000);
+        }
         try
         {
-            while(!serv_.accept())
-            {
-                if((quit = gotQuit()))
-                    return 0;
-                usleep(10000);
-            }
             LOG_INFO("Got Connection.");
             if(logFlag_)
                 LOG::register_cb(&lf_);
@@ -76,17 +77,18 @@ int TcpThread::main()
                 else
                     usleep(1000);
             }
-            if(logFlag_)
-                LOG::unregister_cb();
-            if(!quit)
-                LOG_WARNING("Disconnected from Core.");
-            usleep(1000);
-            serv_.close();
         }
         catch(Except e)
         {
             LOG_DEBUG( "CAUGHT " << e.msg_);
         }
+        if(logFlag_)
+            LOG::unregister_cb();
+        if(!quit)
+            LOG_WARNING("Disconnected from Core.");
+        usleep(1000);
+        serv_.close();
+    
     }
     }
     catch(Except e)
@@ -120,10 +122,23 @@ bool TcpThread::gotQuit()
 bool TcpThread::send(MapMsg& msg)
 {
     std::string msg_str;
+    bool ret;
     LOG::hold_cb(); // to insure no recursive calls due to log message calling send 
-    Parser::stringify(msg, msg_str);
-    bool ret = serv_.send(msg_str);
-    LOG::release_cb();
+    try
+    {
+        Parser::stringify(msg, msg_str);
+        ret = serv_.send(msg_str);
+        LOG::release_cb();
+    }
+    catch(ErrorExcept e)
+    {
+        LOG_DEBUG(std::string(msg["command"]) << " Error at Send. Cancelled. " << strerror(e.errno_));
+        LOG::release_cb();
+        if(e.errno_ == EBADF) //Bad File Descriptor
+            throw(e);
+    }
+    
+
     return ret;
 }
 
