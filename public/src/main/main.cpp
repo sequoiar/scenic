@@ -37,7 +37,6 @@ class MsgThreadFunctor : public MsgFunctor
 
     void operator()(MapMsg& msg)
     {
-        LOG_DEBUG("got a MapMsg from MsgFunctor " << std::string(msg["command"]));
         t_.getQueue().push(msg);
     }
 };

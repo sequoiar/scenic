@@ -56,6 +56,10 @@ int GstThread::main()
             {
                 video_stop(f);
             }
+            else if(s == "levels")
+            {
+                queue_.push(f);
+            }
             else
                 LOG_WARNING("Unknown Command.");
         }

@@ -189,11 +189,13 @@ bool TcpServer::recv(std::string& out)
 
 bool TcpServer::send(const std::string& in)
 {
+    if(!connected())
+        return false;
     int n=0;
     n = ::write(newsockfd, in.c_str(), in.size());
     n = ::write(newsockfd, "\r\n",2);                       //Telnet standard line end
     if (n <= 0)
-        THROW_ERROR("Writing to socket failed.");
+        THROW_ERRNO("Writing to socket failed.",errno);
     return true;
 }
 
