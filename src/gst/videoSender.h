@@ -41,7 +41,6 @@ class VideoSender
         ~VideoSender();
 
         void start();
-        double bandwidth() const { return session_.bandwidth(); }
 
     private:
         void init_source();
