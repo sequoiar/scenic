@@ -30,7 +30,7 @@
 #include "pipeline.h"
 
 
-VideoSink::~VideoSink()
+void VideoSink::destroySink()
 {
     stop();
     pipeline_.remove(&sink_);
@@ -103,6 +103,7 @@ void XvImageSink::showWindow()
 
 XvImageSink::~XvImageSink()
 {
+    VideoSink::destroySink();
     if (window_)
     {
         gtk_widget_destroy(window_);
@@ -128,7 +129,7 @@ void XImageSink::init()
 
 XImageSink::~XImageSink()
 {
-    stop();
+    VideoSink::destroySink();
     pipeline_.remove(&colorspc_);
 }
 
