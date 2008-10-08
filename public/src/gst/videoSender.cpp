@@ -68,7 +68,6 @@ void VideoSender::start()
 {
     GstBase::start();
     pipeline_.wait_until_playing();
-    LOG_INFO("Sending video to remote receiver.");
     LOG_DEBUG("HERE'S THE BANDWIDTH: " << session_.bandwidth());
 }
 

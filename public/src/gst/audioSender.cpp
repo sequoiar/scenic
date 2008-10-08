@@ -86,6 +86,5 @@ void AudioSender::start()
     LOG_DEBUG(logstr.str());
 
     session_.checkSampleRate();
-    LOG_DEBUG("HERE'S THE BANDWIDTH: " << session_.bandwidth());
 }
 
