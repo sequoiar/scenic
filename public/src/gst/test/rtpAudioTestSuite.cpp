@@ -73,7 +73,6 @@ void RtpAudioTestSuite::start_2ch_rtp_audiotest()
 
         BLOCK();
         TEST_ASSERT(rx->isPlaying());
-        std::cout << "Bandwidth used by rx: " << rx->bandwidth();
     }
     else {
         AudioConfig aConfig("audiotestsrc", numChannels);
@@ -86,7 +85,6 @@ void RtpAudioTestSuite::start_2ch_rtp_audiotest()
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
-        std::cout << "Bandwidth used by tx: " << tx->bandwidth();
     }
 }
 

@@ -40,7 +40,6 @@ class VideoReceiver
 
         void start();
         void stop();
-        double bandwidth() const { return session_.bandwidth(); }
 
         ~VideoReceiver();
 

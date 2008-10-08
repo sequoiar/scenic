@@ -47,7 +47,6 @@ class SenderBase
 {
     public: 
         virtual void init();
-        virtual double bandwidth() const = 0;
 
     protected:
 
@@ -68,7 +67,6 @@ class ReceiverBase
 {
     public: 
         virtual void init();
-        virtual double bandwidth() const = 0;
 
     protected:
 
