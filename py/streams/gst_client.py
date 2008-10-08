@@ -79,6 +79,7 @@ class GstServer(object):
         self.conn = conn
         self.conn.connectionLost = self.connection_lost
         self.conn.add_callback(self.gst_log, 'log')
+        self.conn.add_callback(self.gst_levels, 'levels')
         self.state = CONN
         log.info('GST inter-process link created')
         
@@ -98,7 +99,7 @@ class GstServer(object):
 #        self.connect()
 
     def start_process(self):
-#        self.state = 1    # Uncomment this line to start the GST process "by hand"
+        self.state = 2    # Uncomment this line to start the GST process "by hand"
         if self.state < 1:
             self.state = START
             gst_app = 'mainTester'
@@ -166,6 +167,9 @@ class GstServer(object):
                     self.conn.del_callback(get_def_name())
                 except:
                     log.debug("No callback to delete. (coming from: %s)." % get_def_name())
+
+    def gst_levels(self, values):
+        log.info(values)
 
     def gst_log(self, level, msg):
         msg = 'From GST: %s' % msg.partition(': ')[2].strip()
