@@ -41,7 +41,7 @@ void AudioLevel::init()
 {
     assert(level_ = gst_element_factory_make("level", NULL));
     pipeline_.add(level_);
-    g_object_set (G_OBJECT(level_), "interval", interval_, "message", emitMessages_, NULL);
+    g_object_set(G_OBJECT(level_), "interval", interval_, "message", emitMessages_, NULL);
 
     // register this level to handle level msg
     pipeline_.subscribe(this);
