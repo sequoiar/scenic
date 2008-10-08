@@ -33,13 +33,14 @@ class VideoSink
     public:
         VideoSink()
             : sink_(0) {};
-        ~VideoSink();
+        ~VideoSink(){};
         virtual void showWindow() {};   // FIXME: not useful for ximagesink
 
         _GstElement *sinkElement() { return sink_; }
         
     protected:
         _GstElement *sink_;
+        void destroySink();
 
     private:
         VideoSink(const VideoSink&);     //No Copy Constructor
@@ -68,7 +69,6 @@ class XvImageSink
 };
 
 
-// FIXME: doesn't work with h264
 class XImageSink
     : public VideoSink
 {

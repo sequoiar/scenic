@@ -57,6 +57,16 @@ std::auto_ptr<AudioReceiver> buildAudioReceiver()
 }
 
 
+std::auto_ptr<AudioReceiver> buildDeadAudioReceiver()
+{
+    AudioReceiverConfig aConfig("jackaudiosink");
+    ReceiverConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT, "");
+    std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
+    rx->init();
+    return rx;
+}
+
+
 /*----------------------------------------------*/ 
 /* Unit tests.                                  */
 /*----------------------------------------------*/ 
@@ -94,7 +104,7 @@ void RtpAudioTestSuite::stop_2ch_rtp_audiotest()
     int numChannels = 2;
 
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
+        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
 
         BLOCK();
 
@@ -174,7 +184,7 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiotest()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
+        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
 
         BLOCK();
 
@@ -254,7 +264,7 @@ void RtpAudioTestSuite::stop_8ch_rtp_jack()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
+        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
 
         BLOCK();
 
@@ -334,7 +344,7 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiofile()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
+        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
 
         BLOCK();
 
@@ -414,7 +424,7 @@ void RtpAudioTestSuite::stop_audio_dv_rtp()
     int numChannels = 2;
 
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
+        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
 
         BLOCK();
 
