@@ -76,15 +76,29 @@ double RtpBin::bandwidth() const
 {
     double result = 0.0;
 #if 0
-    GValue value;
-    memset(&value, 0, sizeof(value));
-    g_value_init(&value, G_TYPE_DOUBLE);
 
-    gst_child_proxy_get_property(GST_OBJECT(rtpbin_), "gstrtpsession::bandwidth", &value); 
-    
-    result = g_value_get_double(&value);
-    g_value_unset(&value);
+    GstIteratorResult iterResult;
+    GstElement *elem;
+    GstIterator *iter;
+    iter = gst_bin_iterate_recurse(GST_BIN(rtpbin_));
+    iterResult = gst_iterator_next(iter, (void**) &elem);
+    const static char *CHILD_NAME = "rtpsession";
+    const static short NAME_LENGTH = strlen(CHILD_NAME);
+
+    while (iterResult != GST_ITERATOR_DONE)
+    {
+        if (strncmp(CHILD_NAME, gst_element_get_name(elem), NAME_LENGTH) == 0)
+        {
+            g_object_get(G_OBJECT(elem), "bandwidth", &result, NULL);
+            gst_object_unref(elem);
+            break;
+        }
+        gst_object_unref(elem);
+        iterResult = gst_iterator_next(iter, (void **) &elem);
+    }
+    LOG_DEBUG("BANDWITH USED = " << result);
 #endif
+
     return result;
 }
 

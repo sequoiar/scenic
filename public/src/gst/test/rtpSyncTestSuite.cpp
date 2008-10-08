@@ -102,7 +102,7 @@ void SyncTestSuiteRtp::start_8ch_comp_rtp_audiofile_dv()
 
         vTx->start();
         aTx->start();
-        //usleep(100000); // GIVE receiver chance to start waiting
+        usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
 
@@ -177,7 +177,7 @@ void SyncTestSuiteRtp::start_stop_8ch_comp_rtp_audiofile_dv()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         aTx->start();
-        //usleep(100000); // GIVE receiver chance to start waiting
+        usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         vTx->start();
@@ -220,7 +220,7 @@ void SyncTestSuiteRtp::start_dv_audio_dv_video_rtp()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         aTx->start();
-        //usleep(100000); // GIVE receiver chance to start waiting
+        usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         vTx->start();
@@ -297,7 +297,7 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video_rtp()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         aTx->start();
-        //usleep(100000); // GIVE receiver chance to start waiting
+        usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         vTx->start();
@@ -342,9 +342,7 @@ void SyncTestSuiteRtp::start_audiotest_videotest_rtp()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
         vTx->start();
 
-
-        //usleep(100000); // FIXME: this is all kinds of bad, GIVE receiver chance to start waiting
-
+        usleep(100000); // FIXME: this is all kinds of bad, GIVE receiver chance to start waiting
 
         BLOCK();
 
@@ -418,7 +416,7 @@ void SyncTestSuiteRtp::start_stop_audiotest_videotest_rtp()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         aTx->start();
-        //usleep(100000); // GIVE receiver chance to start waiting
+        usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         vTx->start();
