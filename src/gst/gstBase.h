@@ -32,9 +32,9 @@ typedef std::vector<_GstElement *>::iterator GstIter;
 class GstBase
 {
     public:
-        virtual bool start();
-        virtual bool stop();
-        virtual bool init() = 0;
+        virtual void start();
+        virtual void stop();
+        virtual void init() = 0;
 
         bool isPlaying() const;
         static const unsigned int SAMPLE_RATE; 

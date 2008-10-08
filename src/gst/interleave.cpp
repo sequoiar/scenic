@@ -26,7 +26,7 @@
 
 Interleave::~Interleave()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&interleave_);
 }
 
@@ -57,12 +57,11 @@ void Interleave::set_channel_layout()
 }
 
 
-bool Interleave::init()
+void Interleave::init()
 {
     assert(interleave_ = gst_element_factory_make("interleave", NULL));
     pipeline_.add(interleave_);
     set_channel_layout();
-    return true;
 }
 
 

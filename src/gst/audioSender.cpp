@@ -36,7 +36,7 @@
 
 AudioSender::~AudioSender()
 {
-    assert(stop());
+    stop();
     delete payloader_;
     delete encoder_;
     delete source_;
@@ -77,7 +77,7 @@ void AudioSender::init_payloader()
 }
 
 // CAPS can only be sent after this is started
-bool AudioSender::start()
+void AudioSender::start()
 {
     GstBase::start();
 
@@ -85,9 +85,7 @@ bool AudioSender::start()
     logstr << "Sending audio to host " << remoteConfig_.remoteHost() << " on port " << remoteConfig_.port() << std::endl;
     LOG_DEBUG(logstr.str());
 
-    pipeline_.wait_until_playing();
     session_.checkSampleRate();
-
-    return true;
+//    LOG_DEBUG("HERE'S THE BANDWIDTH: " << session_.bandwidth());
 }
 

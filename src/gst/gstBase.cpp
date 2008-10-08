@@ -34,7 +34,7 @@ GstBase::GstBase() : pipeline_(Pipeline::Instance())
 
 GstBase::~GstBase()
 {
-    assert(stop());
+    stop();
     --refCount_;
     if (refCount_ <= 0)
     {
@@ -44,15 +44,15 @@ GstBase::~GstBase()
 }
 
 
-bool GstBase::start()
+void GstBase::start()
 {
-    return pipeline_.start();
+    pipeline_.start();
 }
 
 
-bool GstBase::stop()
+void GstBase::stop()
 {
-    return pipeline_.stop();
+    pipeline_.stop();
 }
 
 

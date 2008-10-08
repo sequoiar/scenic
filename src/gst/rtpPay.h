@@ -29,8 +29,8 @@ class RtpPay : public GstLinkableFilter
     public:
 
         RtpPay() : rtpPay_(0) {}
+        void init() = 0;
         ~RtpPay();
-        bool init() = 0;
         
         _GstElement *srcElement() { return rtpPay_; }
         _GstElement *sinkElement() { return rtpPay_; }
@@ -51,7 +51,7 @@ class H264Payloader : public RtpPay
     public: 
 
         H264Payloader() {}
-        bool init();
+        void init();
 
     private:
 
@@ -64,7 +64,7 @@ class H264Depayloader : public RtpPay
 {
     public: 
 
-        bool init();
+        void init();
 };
 
 
@@ -72,7 +72,7 @@ class VorbisPayloader : public RtpPay
 {
     public: 
 
-        bool init();
+        void init();
 };
 
 
@@ -80,7 +80,7 @@ class VorbisDepayloader : public RtpPay
 {
     public: 
 
-        bool init();
+        void init();
 };
 
 

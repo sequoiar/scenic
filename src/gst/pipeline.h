@@ -48,13 +48,13 @@ class Pipeline
         bool isPlaying() const;
         bool isPaused() const;
         void wait_until_playing() const;
-        bool start();
-        bool stop();
+        void start();
+        void stop();
 
         _GstElement *findElement(const char *name) const;
 
     private:
-        bool init();
+        void init();
         _GstBus* getBus() const;
         GstClock* clock() const;
         void wait_until_paused() const;

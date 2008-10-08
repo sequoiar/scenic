@@ -22,49 +22,44 @@
 #include "rtpPay.h"
 #include "pipeline.h"
 
-bool RtpPay::init()
+void RtpPay::init()
 {
     assert(rtpPay_);
     pipeline_.add(rtpPay_);
-    return true;
 }
 
 RtpPay::~RtpPay()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&rtpPay_);
 }
 
 
-bool H264Payloader::init()
+void H264Payloader::init()
 {
     assert(rtpPay_ = gst_element_factory_make("rtph264pay", NULL));
     RtpPay::init();
-    return true;
 }
 
 
-bool H264Depayloader::init()
+void H264Depayloader::init()
 {
     assert(rtpPay_ = gst_element_factory_make("rtph264depay", NULL));
     RtpPay::init();
-    return true;
 }
 
 
-bool VorbisPayloader::init()
+void VorbisPayloader::init()
 {
     assert(rtpPay_ = gst_element_factory_make("rtpvorbispay", NULL));
     RtpPay::init();
-    return true;
 }
 
 
-bool VorbisDepayloader::init()
+void VorbisDepayloader::init()
 {
     assert(rtpPay_ = gst_element_factory_make("rtpvorbisdepay", NULL));
     RtpPay::init();
-    return true;
 }
 
 

@@ -31,7 +31,7 @@
 
 VideoLocal::~VideoLocal()
 {
-    assert(stop());
+    stop();
     delete sink_;
     delete source_;
 }
@@ -52,11 +52,10 @@ void VideoLocal::init_sink()
 }
 
 
-bool VideoLocal::start()
+void VideoLocal::start()
 {
     GstBase::start();
     pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
     sink_->showWindow();
-    return true;
 }
 

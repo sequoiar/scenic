@@ -28,7 +28,7 @@
 
 AudioSink::~AudioSink()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&sink_);
 }
 
@@ -39,8 +39,7 @@ std::string AudioSink::getCaps()
 }
 
 
-
-bool AudioJackSink::init()
+void AudioJackSink::init()
 {
     if (!Jack::is_running())
         THROW_CRITICAL("Jack is not running");
@@ -53,12 +52,10 @@ bool AudioJackSink::init()
     if (GstBase::SAMPLE_RATE != Jack::samplerate())
         THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
                 << " does not match default sample rate " << GstBase::SAMPLE_RATE);
-
-    return true;
 }
 
 
-bool AudioAlsaSink::init()
+void AudioAlsaSink::init()
 {
     if (Jack::is_running())
         THROW_CRITICAL("Jack is running, stop jack server");
@@ -66,8 +63,6 @@ bool AudioAlsaSink::init()
     assert(sink_ = gst_element_factory_make("alsasink", NULL));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     pipeline_.add(sink_);
-
-    return true;
 }
 
 

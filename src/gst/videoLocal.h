@@ -36,7 +36,7 @@ class VideoLocal
 
         ~VideoLocal();
 
-        bool start();
+        void start();
 
     private:
         void init_source();

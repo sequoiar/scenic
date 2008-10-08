@@ -32,7 +32,6 @@ class AudioSink
             : sink_(0) {};
         ~AudioSink();
         std::string getCaps();
-        virtual bool init() = 0;
 
     protected:
         _GstElement *sinkElement() { return sink_; }
@@ -49,7 +48,7 @@ class AudioAlsaSink
     public:
         AudioAlsaSink() {};
         ~AudioAlsaSink() {};
-        bool init();
+        void init();
     private:
         AudioAlsaSink(const AudioAlsaSink&);     //No Copy Constructor
         AudioAlsaSink& operator=(const AudioAlsaSink&);     //No Assignment Operator
@@ -62,7 +61,7 @@ class AudioJackSink
     public:
         AudioJackSink() {};
         ~AudioJackSink() {};
-        bool init();
+        void init();
     private:
         AudioJackSink(const AudioJackSink&);     //No Copy Constructor
         AudioJackSink& operator=(const AudioJackSink&);     //No Assignment Operator

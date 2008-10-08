@@ -38,7 +38,6 @@ class RtpReceiver
         void set_caps(const char* capsStr);
         void checkSampleRate();
 
-        //void addDerived(RtpPay * depayloader, const RemoteConfig & config);
         void add(RtpPay * depayloader, const ReceiverConfig & config);
 
     private:

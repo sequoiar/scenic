@@ -54,7 +54,7 @@ class XvImageSink
         XvImageSink()
             : window_(0) {};
         ~XvImageSink();
-        bool init();
+        void init();
         void showWindow();
 
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
@@ -75,7 +75,7 @@ class XImageSink
     public: 
         XImageSink() : colorspc_(0) {};
         ~XImageSink();
-        bool init();
+        void init();
 
         _GstElement *sinkElement() { return colorspc_; }
     private:

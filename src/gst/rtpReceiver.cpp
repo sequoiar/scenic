@@ -35,7 +35,7 @@ std::list<GstElement *> RtpReceiver::usedDepayloaders_;
 
 RtpReceiver::~RtpReceiver()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&rtp_receiver_);
 
     // find this->depayloader in the static list of depayloaders

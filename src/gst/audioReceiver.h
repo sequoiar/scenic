@@ -44,7 +44,7 @@ class AudioReceiver
 
         ~AudioReceiver();
 
-        bool start();
+        void start();
         double bandwidth() const { return session_.bandwidth(); }
 
     private:

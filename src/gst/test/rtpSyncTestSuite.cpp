@@ -40,7 +40,7 @@ static std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
 {
     SenderConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT);
     std::auto_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
-    assert(tx->init());
+    tx->init();
     return tx;
 }
 
@@ -50,7 +50,7 @@ static std::auto_ptr<AudioReceiver> buildAudioReceiver()
     AudioReceiverConfig aConfig("jackaudiosink");
     ReceiverConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT, tcpGetCaps(GstTestSuite::A_PORT + 100));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
-    assert(rx->init());
+    rx->init();
     return rx;
 }
 
@@ -60,7 +60,7 @@ static std::auto_ptr<VideoReceiver> buildVideoReceiver()
     VideoReceiverConfig vConfig("xvimagesink");
     ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT, "");
     std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
-    assert(rx->init());
+    rx->init();
     return rx;
 }
 
@@ -69,7 +69,7 @@ static std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
 {
     SenderConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
     std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
-    assert(tx->init());
+    tx->init();
     return tx;
 }
 
@@ -86,8 +86,8 @@ void SyncTestSuiteRtp::start_8ch_comp_rtp_audiofile_dv()
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
 
-        TEST_ASSERT(aRx->start());
-        TEST_ASSERT(vRx->start());
+        vRx->start();
+        aRx->start();
 
         BLOCK();
         TEST_ASSERT(aRx->isPlaying());
@@ -100,11 +100,11 @@ void SyncTestSuiteRtp::start_8ch_comp_rtp_audiofile_dv()
         VideoConfig vConfig("dv1394src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
-        TEST_ASSERT(aTx->start());
+        vTx->start();
+        aTx->start();
         //usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
-        TEST_ASSERT(vTx->start());
 
         BLOCK();
         TEST_ASSERT(aTx->isPlaying());
@@ -123,8 +123,8 @@ void SyncTestSuiteRtp::stop_8ch_comp_rtp_audiofile_dv()
 
         BLOCK();
 
-        TEST_ASSERT(aRx->stop());
-        TEST_ASSERT(vRx->stop());
+        aRx->stop();
+        vRx->stop();
 
         TEST_ASSERT(!aRx->isPlaying());
         TEST_ASSERT(!vRx->isPlaying());
@@ -138,8 +138,8 @@ void SyncTestSuiteRtp::stop_8ch_comp_rtp_audiofile_dv()
 
         BLOCK();
 
-        TEST_ASSERT(aTx->stop());
-        TEST_ASSERT(vTx->stop());
+        aTx->stop();
+        vTx->stop();
 
         TEST_ASSERT(!aTx->isPlaying());
         TEST_ASSERT(!vTx->isPlaying());
@@ -155,16 +155,16 @@ void SyncTestSuiteRtp::start_stop_8ch_comp_rtp_audiofile_dv()
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
 
-        TEST_ASSERT(aRx->start());
-        TEST_ASSERT(vRx->start());
+        aRx->start();
+        vRx->start();
 
         BLOCK();
 
         TEST_ASSERT(aRx->isPlaying());
         TEST_ASSERT(vRx->isPlaying());
 
-        TEST_ASSERT(aRx->stop());
-        TEST_ASSERT(vRx->stop());
+        aRx->stop();
+        vRx->stop();
 
         TEST_ASSERT(!aRx->isPlaying());
         TEST_ASSERT(!vRx->isPlaying());
@@ -176,19 +176,19 @@ void SyncTestSuiteRtp::start_stop_8ch_comp_rtp_audiofile_dv()
         VideoConfig vConfig("dv1394src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
-        TEST_ASSERT(aTx->start());
+        aTx->start();
         //usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
-        TEST_ASSERT(vTx->start());
+        vTx->start();
 
         BLOCK();
 
         TEST_ASSERT(aTx->isPlaying());
         TEST_ASSERT(vTx->isPlaying());
 
-        TEST_ASSERT(aTx->stop());
-        TEST_ASSERT(vTx->stop());
+        aTx->stop();
+        vTx->stop();
 
         TEST_ASSERT(!aTx->isPlaying());
         TEST_ASSERT(!vTx->isPlaying());
@@ -204,8 +204,8 @@ void SyncTestSuiteRtp::start_dv_audio_dv_video_rtp()
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
 
-        TEST_ASSERT(aRx->start());
-        TEST_ASSERT(vRx->start());
+        aRx->start();
+        vRx->start();
 
         BLOCK();
 
@@ -219,11 +219,11 @@ void SyncTestSuiteRtp::start_dv_audio_dv_video_rtp()
         VideoConfig vConfig("dv1394src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
-        TEST_ASSERT(aTx->start());
+        aTx->start();
         //usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
-        TEST_ASSERT(vTx->start());
+        vTx->start();
 
         BLOCK();
 
@@ -243,8 +243,8 @@ void SyncTestSuiteRtp::stop_dv_audio_dv_video_rtp()
 
         BLOCK();
 
-        TEST_ASSERT(aRx->stop());
-        TEST_ASSERT(vRx->stop());
+        aRx->stop();
+        vRx->stop();
 
         TEST_ASSERT(!aRx->isPlaying());
         TEST_ASSERT(!vRx->isPlaying());
@@ -258,8 +258,8 @@ void SyncTestSuiteRtp::stop_dv_audio_dv_video_rtp()
 
         BLOCK();
 
-        TEST_ASSERT(aTx->stop());
-        TEST_ASSERT(vTx->stop());
+        aTx->stop();
+        vTx->stop();
 
         TEST_ASSERT(!aTx->isPlaying());
         TEST_ASSERT(!vTx->isPlaying());
@@ -275,16 +275,16 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video_rtp()
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
 
-        TEST_ASSERT(aRx->start());
-        TEST_ASSERT(vRx->start());
+        aRx->start();
+        vRx->start();
 
         BLOCK();
 
         TEST_ASSERT(aRx->isPlaying());
         TEST_ASSERT(vRx->isPlaying());
 
-        TEST_ASSERT(aRx->stop());
-        TEST_ASSERT(vRx->stop());
+        aRx->stop();
+        vRx->stop();
 
         TEST_ASSERT(!aRx->isPlaying());
         TEST_ASSERT(!vRx->isPlaying());
@@ -296,19 +296,19 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video_rtp()
         VideoConfig vConfig("dv1394src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
-        TEST_ASSERT(aTx->start());
+        aTx->start();
         //usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
-        TEST_ASSERT(vTx->start());
+        vTx->start();
 
         BLOCK();
 
         TEST_ASSERT(aTx->isPlaying());
         TEST_ASSERT(vTx->isPlaying());
 
-        TEST_ASSERT(aTx->stop());
-        TEST_ASSERT(vTx->stop());
+        aTx->stop();
+        vTx->stop();
 
         TEST_ASSERT(!aTx->isPlaying());
         TEST_ASSERT(!vTx->isPlaying());
@@ -322,10 +322,10 @@ void SyncTestSuiteRtp::start_audiotest_videotest_rtp()
 
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
-        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
+        aRx->start();
         
-        TEST_ASSERT(aRx->start());
-        TEST_ASSERT(vRx->start());
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
+        vRx->start();
 
         BLOCK();
 
@@ -335,15 +335,16 @@ void SyncTestSuiteRtp::start_audiotest_videotest_rtp()
     else {
         AudioConfig aConfig("audiotestsrc", numChannels);
         std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig));
+        aTx->start();
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         VideoConfig vConfig("videotestsrc"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
+        vTx->start();
 
-        TEST_ASSERT(aTx->start());
+
         //usleep(100000); // FIXME: this is all kinds of bad, GIVE receiver chance to start waiting
-        TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
-        TEST_ASSERT(vTx->start());
 
         BLOCK();
 
@@ -363,8 +364,8 @@ void SyncTestSuiteRtp::stop_audiotest_videotest_rtp()
 
         BLOCK();
 
-        TEST_ASSERT(aRx->stop());
-        TEST_ASSERT(vRx->stop());
+        aRx->stop();
+        vRx->stop();
 
         TEST_ASSERT(!aRx->isPlaying());
         TEST_ASSERT(!vRx->isPlaying());
@@ -378,8 +379,8 @@ void SyncTestSuiteRtp::stop_audiotest_videotest_rtp()
 
         BLOCK();
 
-        TEST_ASSERT(aTx->stop());
-        TEST_ASSERT(vTx->stop());
+        aTx->stop();
+        vTx->stop();
 
         TEST_ASSERT(!aTx->isPlaying());
         TEST_ASSERT(!vTx->isPlaying());
@@ -395,16 +396,16 @@ void SyncTestSuiteRtp::start_stop_audiotest_videotest_rtp()
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
 
-        TEST_ASSERT(aRx->start());
-        TEST_ASSERT(vRx->start());
+        aRx->start();
+        vRx->start();
 
         BLOCK();
 
         TEST_ASSERT(aRx->isPlaying());
         TEST_ASSERT(vRx->isPlaying());
 
-        TEST_ASSERT(aRx->stop());
-        TEST_ASSERT(vRx->stop());
+        aRx->stop();
+        vRx->stop();
 
         TEST_ASSERT(!aRx->isPlaying());
         TEST_ASSERT(!vRx->isPlaying());
@@ -416,19 +417,19 @@ void SyncTestSuiteRtp::start_stop_audiotest_videotest_rtp()
         VideoConfig vConfig("videotestsrc"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
-        TEST_ASSERT(aTx->start());
+        aTx->start();
         //usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
-        TEST_ASSERT(vTx->start());
+        vTx->start();
 
         BLOCK();
 
         TEST_ASSERT(aTx->isPlaying());
         TEST_ASSERT(vTx->isPlaying());
 
-        TEST_ASSERT(aTx->stop());
-        TEST_ASSERT(vTx->stop());
+        aTx->stop();
+        vTx->stop();
 
         TEST_ASSERT(!aTx->isPlaying());
         TEST_ASSERT(!vTx->isPlaying());

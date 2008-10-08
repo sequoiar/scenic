@@ -30,7 +30,7 @@ class AudioSource
 {
     public:
         ~AudioSource();
-        bool init();
+        void init();
 
     protected:
         explicit AudioSource(const AudioConfig &config)
@@ -60,7 +60,7 @@ class InterleavedAudioSource
     : public AudioSource
 {
     public:
-        bool init();
+        void init();
 
         ~InterleavedAudioSource() {};
 
