@@ -35,10 +35,10 @@ from utils import log, get_def_name
 log = log.start('debug', 1, 0, 'gst')
 
 
-INIT = 0
-START = 1
-PROC = 2
-CONN = 3
+INIT = 0	# Not running
+START = 1	# Starting
+PROC = 2	# Started
+CONN = 3	# Connected to gst process
 
 class BaseGst(object):            
     def get_attr(self, name):
