@@ -112,7 +112,7 @@ void AudioLevel::print() const
 
 void AudioLevel::post() const
 {
-    MapMsg mapMsg("level");
+    MapMsg mapMsg("levels");
     //int channelIdx = 1;
 
     mapMsg["values"] = rmsValues_;
