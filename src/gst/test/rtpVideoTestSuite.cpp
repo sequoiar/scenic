@@ -317,7 +317,6 @@ void RtpVideoTestSuite::stop_file_rtp()
 void RtpVideoTestSuite::start_stop_file_rtp()
 {
     if (id_ == 0) {
-        VideoReceiverConfig vConfig("ximagesink");
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
         TEST_ASSERT(rx->start());
