@@ -67,7 +67,7 @@ class H264Encoder : public Encoder
 
         H264Encoder() : colorspc_(0) {};
         ~H264Encoder();
-        bool init();
+        void init();
         RtpPay* createPayloader() const;
 
     private:
@@ -84,7 +84,7 @@ class H264Decoder : public Decoder
 {
     public: 
 
-        bool init();
+        void init();
         RtpPay* createDepayloader() const;
 };
 
@@ -93,7 +93,7 @@ class VorbisEncoder : public Encoder
 {
     public: 
 
-        bool init();
+        void init();
         RtpPay* createPayloader() const;
 };
 
@@ -102,7 +102,7 @@ class VorbisDecoder : public Decoder
 {
     public: 
 
-        bool init();
+        void init();
         RtpPay* createDepayloader() const;
 };
 

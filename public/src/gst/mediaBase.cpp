@@ -23,45 +23,42 @@
 
 MediaBase::~MediaBase()
 {
-    assert(stop());
+    stop();
 }
 
 
-bool MediaBase::init()  // template method
+void MediaBase::init()  // template method
 {
     // these methods are defined in subclasses
     init_source();
     init_sink();
-    return true;
 }
 
 SenderBase::~SenderBase()
 {
-    assert(stop());
+    stop();
 }
 
 
-bool SenderBase::init()  // template method
+void SenderBase::init()  // template method
 {
     // these methods are defined in subclasses
     init_source();
     init_codec();
     init_payloader();
-    return true;
 }
 
 ReceiverBase::~ReceiverBase()
 {
-    assert(stop());
+    stop();
 }
 
 
-bool ReceiverBase::init()  // template method
+void ReceiverBase::init()  // template method
 {
     // these methods are defined in subclasses
     init_codec();
     init_depayloader();
     init_sink();
-    return true;
 }
 

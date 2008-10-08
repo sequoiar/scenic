@@ -30,19 +30,18 @@
 
 
 // parts of sub_init that are common to all VideoSource classes
-bool VideoSource::init()
+void VideoSource::init()
 {
     assert(source_ = gst_element_factory_make(config_.source(), NULL));
     pipeline_.add(source_);
 
     sub_init();
-    return true;
 }
 
 
 VideoSource::~VideoSource()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&source_);
 }
 
@@ -90,7 +89,7 @@ void VideoTestSource::sub_init()
 
 VideoTestSource::~VideoTestSource()
 {
-    assert(stop());
+    stop();
     pipeline_.remove_clock_callback(clockId_);
 }
 
@@ -166,21 +165,21 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
 
 VideoFileSource::~VideoFileSource()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&decoder_);
 }
 
 
 VideoDvSource::~VideoDvSource()
 {
-    assert(stop());
+    stop();
     if (pipeline_.findElement(config_.source()) != NULL)
         pipeline_.remove(&source_);
     source_ = NULL;
 }
 
 
-bool VideoDvSource::init()
+void VideoDvSource::init()
 {
     if (!Raw1394::cameraIsReady())
         THROW_ERROR("Camera is not ready");
@@ -193,7 +192,6 @@ bool VideoDvSource::init()
         pipeline_.add(source_);
     }
     sub_init();
-    return true;
 }
 
 

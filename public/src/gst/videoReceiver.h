@@ -38,8 +38,8 @@ class VideoReceiver
             : videoConfig_(vConfig), remoteConfig_(rConfig), session_(), depayloader_(0), 
             decoder_(0), sink_(0) {}
 
-        bool start();
-        bool stop();
+        void start();
+        void stop();
         double bandwidth() const { return session_.bandwidth(); }
 
         ~VideoReceiver();

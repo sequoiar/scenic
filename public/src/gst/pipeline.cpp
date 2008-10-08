@@ -43,7 +43,7 @@ Pipeline & Pipeline::Instance()
 
 Pipeline::~Pipeline()
 {
-    assert(stop());
+    stop();
     gst_object_unref(GST_OBJECT(pipeline_));
 }
 
@@ -101,7 +101,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
 }
 
 
-bool Pipeline::init()
+void Pipeline::init()
 {
     if (!pipeline_)
     {
@@ -121,7 +121,6 @@ bool Pipeline::init()
         gst_bus_add_watch(bus, GstBusFunc(bus_call), static_cast<gpointer>(this));
         gst_object_unref(bus);
     }
-    return true;
 }
 
 
@@ -131,7 +130,7 @@ void Pipeline::reset()
     if (pipeline_)
     {
         LOG_DEBUG("Pipeline is being reset.");
-        assert(stop());
+        stop();
         delete instance_;
         instance_ = 0;
     }
@@ -212,7 +211,7 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 }
 
 
-bool Pipeline::start()
+void Pipeline::start()
 {
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
     assert(checkStateChange(ret)); // set it to paused
@@ -225,14 +224,12 @@ bool Pipeline::start()
     wait_until_playing();
 
     LOG_DEBUG("Now playing");
-    return isPlaying();
 }
 
 
-bool Pipeline::stop()
+void Pipeline::stop()
 {
     gst_element_set_state(pipeline_, GST_STATE_NULL);
-    return !isPlaying();
 }
 
 

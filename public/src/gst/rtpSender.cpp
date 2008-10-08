@@ -31,7 +31,7 @@
 
 RtpSender::~RtpSender()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&rtp_sender_);
 }
 

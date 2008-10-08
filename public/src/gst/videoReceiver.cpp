@@ -31,7 +31,7 @@
 
 VideoReceiver::~VideoReceiver()
 {
-    assert(stop());
+    stop();
     delete sink_;
     delete depayloader_;
     delete decoder_;
@@ -66,18 +66,16 @@ void VideoReceiver::init_sink()
 }
 
 
-bool VideoReceiver::start()
+void VideoReceiver::start()
 {
     LOG_INFO("Starting to receive video.");
     GstBase::start();
     sink_->showWindow();
-    return true;
 }
 
 
-bool VideoReceiver::stop()
+void VideoReceiver::stop()
 {
     GstBase::stop();
-    return true;
 }
 

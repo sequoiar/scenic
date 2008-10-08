@@ -32,7 +32,7 @@ class VideoSource
 {
     public:
         ~VideoSource();
-        bool init();
+        void init();
 
         _GstElement *srcElement() { return source_; }
         virtual void sub_init() = 0;
@@ -104,7 +104,7 @@ class VideoDvSource
         ~VideoDvSource();
         
         _GstElement *srcElement() { return dvdec_; }
-        bool init();
+        void init();
         void sub_init();
         static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, void *data);
 

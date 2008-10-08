@@ -36,7 +36,7 @@
 
 AudioReceiver::~AudioReceiver()
 {
-    assert(stop());
+    stop();
     delete sink_;
     delete decoder_;
     delete depayloader_;
@@ -63,7 +63,7 @@ void AudioReceiver::init_depayloader()
 
 void AudioReceiver::init_level()
 {
-    assert(level_.init());
+    level_.init();
     GstLinkable::link(*decoder_, level_);
 }
 
@@ -76,14 +76,13 @@ void AudioReceiver::init_sink()
 }
 
 
-bool AudioReceiver::start()
+void AudioReceiver::start()
 {
     // CAPS MUST be set first
     set_caps(remoteConfig_.caps());
     assert(gotCaps_);
     LOG_DEBUG("Receiving audio on port " << remoteConfig_.port() << " from host " << remoteConfig_.remoteHost());
     GstBase::start();
-    return true;
 }
 
         

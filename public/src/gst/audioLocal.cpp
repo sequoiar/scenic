@@ -32,7 +32,7 @@
 
 AudioLocal::~AudioLocal()
 {
-    assert(stop());
+    stop();
     delete sink_;
     delete source_;
 }

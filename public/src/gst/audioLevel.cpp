@@ -33,11 +33,11 @@
 
 AudioLevel::~AudioLevel()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&level_);
 }
 
-bool AudioLevel::init()
+void AudioLevel::init()
 {
     assert(level_ = gst_element_factory_make("level", NULL));
     pipeline_.add(level_);
@@ -45,7 +45,6 @@ bool AudioLevel::init()
 
     // register this level to handle level msg
     pipeline_.subscribe(this);
-    return true;
 }
 
 

@@ -27,7 +27,7 @@ class MediaBase     // local bins
     : public GstBase
 {
     public:
-        virtual bool init();
+        virtual void init();
 
     protected:
 
@@ -46,7 +46,7 @@ class SenderBase
     : public GstBase
 {
     public: 
-        virtual bool init();
+        virtual void init();
         virtual double bandwidth() const = 0;
 
     protected:
@@ -67,7 +67,7 @@ class ReceiverBase
     : public GstBase
 {
     public: 
-        virtual bool init();
+        virtual void init();
         virtual double bandwidth() const = 0;
 
     protected:

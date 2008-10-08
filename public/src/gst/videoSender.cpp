@@ -33,7 +33,7 @@
 
 VideoSender::~VideoSender()
 {
-    assert(stop());
+    stop();
     delete payloader_;
     delete encoder_;
     delete source_;
@@ -64,12 +64,10 @@ void VideoSender::init_payloader()
 }
 
 
-bool VideoSender::start()
+void VideoSender::start()
 {
     GstBase::start();
-    pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
     LOG_INFO("Sending video to remote receiver.");
-    return true;
 }
 
 

@@ -33,7 +33,7 @@ GstElement *RtpBin::rtpbin_ = 0;
 int RtpBin::refCount_ = 0;
 
 
-bool RtpBin::init()
+void RtpBin::init()
 {
     // only initialize rtpbin once per process
     if (!rtpbin_) {
@@ -42,7 +42,6 @@ bool RtpBin::init()
 
         pipeline_.add(rtpbin_);
     }
-    return true;
 }
 
 
@@ -59,7 +58,7 @@ const char *RtpBin::padStr(const char *padName)
 
 RtpBin::~RtpBin()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&rtcp_sender_);
     pipeline_.remove(&rtcp_receiver_);
 
@@ -79,6 +78,7 @@ double RtpBin::bandwidth() const
 #if 0
     GValue value;
     memset(&value, 0, sizeof(value));
+    g_value_init(&value, G_TYPE_DOUBLE);
 
     gst_child_proxy_get_property(GST_OBJECT(rtpbin_), "gstrtpsession::bandwidth", &value); 
     

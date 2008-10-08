@@ -26,19 +26,19 @@
 
 Codec::~Codec()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&codec_);
 }
 
 
 H264Encoder::~H264Encoder()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&colorspc_);
 }
 
 
-bool H264Encoder::init()
+void H264Encoder::init()
 {
     assert(colorspc_ = gst_element_factory_make("ffmpegcolorspace", "colorspc"));
     pipeline_.add(colorspc_);
@@ -49,7 +49,6 @@ bool H264Encoder::init()
     pipeline_.add(codec_);
 
     GstLinkable::link(colorspc_, codec_);
-    return true;
 }
 
 
@@ -59,11 +58,10 @@ RtpPay* H264Encoder::createPayloader() const
 }
 
 
-bool H264Decoder::init()
+void H264Decoder::init()
 {
     assert(codec_ = gst_element_factory_make("ffdec_h264", NULL));
     pipeline_.add(codec_);
-    return true;
 }
 
 
@@ -73,19 +71,17 @@ RtpPay* H264Decoder::createDepayloader() const
 }
 
 
-bool VorbisEncoder::init()
+void VorbisEncoder::init()
 {
     assert(codec_ = gst_element_factory_make("vorbisenc", NULL));
     pipeline_.add(codec_);
-    return true;
 }
 
 
-bool VorbisDecoder::init()
+void VorbisDecoder::init()
 {
     assert(codec_ = gst_element_factory_make("vorbisdec", NULL));
     pipeline_.add(codec_);
-    return true;
 }
 
 

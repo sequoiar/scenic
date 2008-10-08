@@ -32,7 +32,7 @@ class RtpBin
 {
     public:
         ~RtpBin();
-        bool init();
+        void init();
         virtual void checkSampleRate() = 0;
         double bandwidth() const;
 

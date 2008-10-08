@@ -33,7 +33,7 @@ class Interleave
             : interleave_(0), config_(config) {}
 
         ~Interleave();
-        bool init();
+        void init();
 
     protected:
         GstElement *srcElement() { return interleave_; }

@@ -28,12 +28,11 @@
 #include "pipeline.h"
 
 
-bool AudioSource::init()
+void AudioSource::init()
 {
     init_source();
     sub_init();
     link_elements();
-    return true;
 }
 
 
@@ -51,7 +50,7 @@ void AudioSource::init_source()
 
 AudioSource::~AudioSource()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(aconvs_);
     pipeline_.remove(sources_);
 }
@@ -69,13 +68,12 @@ gboolean AudioSource::base_callback(GstClock *, GstClockTime, GstClockID, gpoint
 }
 
 
-bool InterleavedAudioSource::init()
+void InterleavedAudioSource::init()
 {
     interleave_.init();
     init_source();
     sub_init();
     link_elements();
-    return true;
 }
 
 
@@ -154,7 +152,7 @@ void AudioTestSource::sub_init()
 
 AudioTestSource::~AudioTestSource()
 {
-    assert(stop());
+    stop();
     pipeline_.remove_clock_callback(clockId_);
 }
 
@@ -227,7 +225,7 @@ void AudioFileSource::link_elements()
 
 AudioFileSource::~AudioFileSource()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(decoders_);
 }
 
@@ -257,7 +255,7 @@ void AudioJackSource::sub_init()
 
 AudioDvSource::~AudioDvSource()
 {
-    assert(stop());
+    stop();
     if (pipeline_.findElement(config_.source()) != NULL)
         pipeline_.remove(sources_);
     sources_[0] = NULL;

@@ -32,7 +32,7 @@
 
 VideoSink::~VideoSink()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&sink_);
 }
 
@@ -66,7 +66,7 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
 }
 
 
-bool XvImageSink::init()
+void XvImageSink::init()
 {
     static bool gtk_initialized = false;
     if (!gtk_initialized)
@@ -82,7 +82,6 @@ bool XvImageSink::init()
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event",
                      G_CALLBACK(XvImageSink::key_press_event_cb), NULL);
-    return true;
 }
 
 
@@ -112,7 +111,7 @@ XvImageSink::~XvImageSink()
 }
 
 
-bool XImageSink::init()
+void XImageSink::init()
 {
     // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
     assert(colorspc_ = gst_element_factory_make("ffmpegcolorspace", "colorspc"));
@@ -124,13 +123,12 @@ bool XImageSink::init()
     pipeline_.add(sink_);
 
     GstLinkable::link(colorspc_, sink_);
-    return true;
 }
 
 
 XImageSink::~XImageSink()
 {
-    assert(stop());
+    stop();
     pipeline_.remove(&colorspc_);
 }
 
