@@ -21,13 +21,13 @@
 #include <cassert>
 #include "mediaBase.h"
 
-MediaBase::~MediaBase()
+LocalBase::~LocalBase()
 {
     stop();
 }
 
 
-void MediaBase::init()  // template method
+void LocalBase::init()  // template method
 {
     // these methods are defined in subclasses
     init_source();
