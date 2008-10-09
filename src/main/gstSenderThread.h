@@ -21,24 +21,16 @@
 #include <iostream>
 #include "gstThread.h"
 
-class VideoSender;
-class AudioSender;
 
 class GstSenderThread
     : public GstThread
 {
     public:
-        GstSenderThread()
-            : vsender_(0), asender_(0){}
-        ~GstSenderThread();
+        GstSenderThread(){}
     private:
-        VideoSender* vsender_;
-        AudioSender* asender_;
 
         bool audio_start(MapMsg& msg);
-        bool audio_stop(MapMsg& msg);
         bool video_start(MapMsg& msg);
-        bool video_stop(MapMsg& msg);
 
         GstSenderThread(const GstSenderThread&); //No Copy Constructor
         GstSenderThread& operator=(const GstSenderThread&); //No Assignment Operator

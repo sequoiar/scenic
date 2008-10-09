@@ -19,19 +19,20 @@
 #include "gstThread.h"
 #include "logWriter.h"
 #include <iostream>
-#include <unistd.h>
 int GstThread::main()
 {
     bool done = false;
-
+    bool flipflop = false;
     while(!done)
     {
         if(g_main_context_iteration(NULL,FALSE))
         {}
         //    LOG_DEBUG("Events Dispatched g_main.");
-
+        updateState();
         MapMsg f = queue_.timed_pop(100000);
-        std::cerr << ".";
+        
+        std::cout << (flipflop? '\b': '.');
+        flipflop = !flipflop;
         if(f["command"].type() == 's')
         {
             std::string s;
@@ -71,4 +72,33 @@ int GstThread::main()
     return 0;
 }
 
+
+void GstThread::updateState()
+{
+
+}
+
+GstThread::~GstThread()
+{
+    delete audio_;
+    delete video_;
+}
+
+
+bool GstThread::video_stop(MapMsg& /*msg*/)
+{
+    if(!video_)
+        return false;
+    video_->stop();
+    return true;
+}
+
+
+bool GstThread::audio_stop(MapMsg& /*msg*/)
+{
+    if(!video_)
+        return false;
+    video_->stop();
+    return true;
+}
 

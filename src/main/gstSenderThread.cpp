@@ -22,91 +22,56 @@
 #include "gst/videoSender.h"
 
 
-GstSenderThread::~GstSenderThread()
-{
-    delete asender_;
-    delete vsender_;
-}
-
-
-bool GstSenderThread::video_stop(MapMsg& /*msg*/)
-{
-    if(vsender_)
-        vsender_->stop();
-    else
-        return false;
-    return true;
-}
-
-
-bool GstSenderThread::audio_stop(MapMsg& /*msg*/)
-{
-    if(asender_)
-        asender_->stop();
-    else
-        return false;
-    return true;
-}
-
 
 bool GstSenderThread::video_start(MapMsg& msg)
 {
-    delete vsender_;
-    vsender_ = 0;
+    delete video_;
+    video_ = 0;
     
     try
     {
         VideoConfig config("videotestsrc");
         SenderConfig rConfig(msg["codec"], msg["address"] , msg["port"]);
-        if(!config.sanityCheck())
-            return false;
-
-        vsender_ = new VideoSender(config, rConfig);
-
-        vsender_->init();
-        vsender_->start();
-
+        video_ =  new VideoSender(config, rConfig);
+        video_->init();
+        video_->start();
         return true;
     }
     catch(Except e)
     {
         LOG_WARNING(e.msg_);
-        delete vsender_;
-        vsender_ = 0;
+        delete video_;
+        video_ = 0;
         return false;
     }
 }
 
+
 bool GstSenderThread::audio_start(MapMsg& msg)
 {
-    delete asender_;
-    asender_ = 0;
-
-    sleep(5);
+    delete audio_;
+    audio_ = 0;
     try
     {
         AudioConfig config("audiotestsrc", 2);
         SenderConfig rConfig("vorbis", msg["address"], msg["port"]);
-            
-        asender_ = new AudioSender(config, rConfig);
-
-        asender_->init();
-        asender_->start();
+        AudioSender* asender;
+        audio_ = asender = new AudioSender(config, rConfig);
+        audio_->init();
+        audio_->start();
 
         //Build Caps Msg 
         MapMsg caps("caps");
-        caps["caps_str"] = asender_->getCaps();
-
+        caps["caps_str"] = asender->getCaps();
         //Forward to tcp
         queue_.push(caps);
-
         return true;
     }
     catch(Except e)
     {
         LOG_WARNING(e.msg_);
-        delete asender_;
-        asender_ = 0;
+        delete audio_;
+        audio_ = 0;
         return false;
     }
 }
