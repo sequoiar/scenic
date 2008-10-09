@@ -68,6 +68,7 @@ bool GstReceiverThread::video_start(MapMsg& msg)
         vreceiver_ = new VideoReceiver(config, rConfig);
         vreceiver_->init();
         vreceiver_->start();
+        queue_.push(MapMsg("video_started"));
         return true;
     }
     catch(Except e)
@@ -96,6 +97,7 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
         areceiver_ = new AudioReceiver(config, rConfig);
         areceiver_->init();
         areceiver_->start();
+        queue_.push(MapMsg("audio_started"));
         return true;
     }
     catch(Except e)
