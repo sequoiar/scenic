@@ -213,17 +213,23 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 
 void Pipeline::start()
 {
-    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
-    assert(checkStateChange(ret)); // set it to paused
-    wait_until_paused();
+   // GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
+    //assert(checkStateChange(ret)); // set it to paused
+   // wait_until_paused();
     //LOG_DEBUG("Now paused");
 
-    ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
+   GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
     assert(checkStateChange(ret)); // set it to playing
 
-    wait_until_playing();
+    //wait_until_playing();
 
     LOG_DEBUG("Now playing");
+}
+
+
+void Pipeline::pause()
+{
+    gst_element_set_state(pipeline_, GST_STATE_PAUSED);
 }
 
 

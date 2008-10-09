@@ -34,10 +34,12 @@ class GstBase
     public:
         virtual ~GstBase();
         virtual void start();
+        virtual void pause();
         virtual void stop();
         virtual void init() = 0;
 
         bool isPlaying() const;
+        bool isPaused() const;
         static const unsigned int SAMPLE_RATE; 
 
     protected:

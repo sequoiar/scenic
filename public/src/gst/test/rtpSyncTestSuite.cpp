@@ -210,10 +210,11 @@ void SyncTestSuiteRtp::start_8ch_audiofile_dv()
 
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
-        aRx->start();
+        aRx->pause();
         
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
         vRx->start();
+        aRx->start();
 
         BLOCK();
         TEST_ASSERT(aRx->isPlaying());
@@ -222,12 +223,13 @@ void SyncTestSuiteRtp::start_8ch_audiofile_dv()
     else {
         AudioConfig aConfig("filesrc", audioFilename_, numChannels);
         std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig));
-        aTx->start();
+        aTx->pause();
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
 
         VideoConfig vConfig("dv1394src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
         vTx->start();
+        aTx->start();
         //usleep(100000); // GIVE receiver chance to start waiting
 
 

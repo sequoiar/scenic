@@ -85,6 +85,6 @@ void AudioSender::start()
     logstr << "Sending audio to host " << remoteConfig_.remoteHost() << " on port " << remoteConfig_.port() << std::endl;
     LOG_DEBUG(logstr.str());
 
-    session_.checkSampleRate();
+    //session_.checkSampleRate();
 }
 
