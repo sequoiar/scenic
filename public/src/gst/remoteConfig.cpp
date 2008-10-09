@@ -56,7 +56,7 @@ Decoder * ReceiverConfig::createDecoder() const
     return 0;
 }
 
-
+#if 0
 bool RemoteConfig::sanityCheck() const   // FIXME: this should become more or less redundant
 {
     bool validCodec = (codec_ == "vorbis") || (codec_ == "h264"); 
@@ -70,4 +70,4 @@ bool RemoteConfig::sanityCheck() const   // FIXME: this should become more or le
     
     return validCodec;
 }
-
+#endif

@@ -18,7 +18,8 @@
  */
 #include "gstThread.h"
 #include "logWriter.h"
-
+#include <iostream>
+#include <unistd.h>
 int GstThread::main()
 {
     bool done = false;
@@ -29,12 +30,14 @@ int GstThread::main()
         {}
         //    LOG_DEBUG("Events Dispatched g_main.");
 
-        MapMsg f = queue_.timed_pop(10000);
+        MapMsg f = queue_.timed_pop(100000);
+        std::cerr << ".";
         if(f["command"].type() == 's')
         {
             std::string s;
             f["command"].get(s);
-
+            LOG_DEBUG(s);
+            
             if(s == "quit")
             {
                 queue_.push(f);

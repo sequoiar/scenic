@@ -22,7 +22,7 @@
 #include "gst/audioSender.h"
 #include "gst/videoSender.h"
 
-
+#include <unistd.h>
 
 GstSenderThread::~GstSenderThread()
 {
@@ -84,13 +84,11 @@ bool GstSenderThread::audio_start(MapMsg& msg)
     delete (asender_);
     asender_ = 0;
 
-
+    sleep(5);
     try
     {
         AudioConfig config("audiotestsrc", 2);
         SenderConfig rConfig("vorbis", msg["address"], msg["port"]);
-        if(!config.sanityCheck())
-            return false;
             
         asender_ = new AudioSender(config, rConfig);
 

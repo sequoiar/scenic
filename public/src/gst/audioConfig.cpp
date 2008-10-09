@@ -85,7 +85,7 @@ AudioSink* AudioConfig::createSink() const
     return new AudioJackSink();
 }
 
-
+#if 0
 bool AudioConfig::sanityCheck() const   // FIXME: this should become more or less redundant
 {
     if(numChannels_ < 1 || numChannels_ > 8)
@@ -93,7 +93,7 @@ bool AudioConfig::sanityCheck() const   // FIXME: this should become more or les
 
     return true;
 }
-
+#endif
 
 const char* AudioConfig::location() const
 {
