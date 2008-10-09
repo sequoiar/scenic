@@ -21,7 +21,6 @@
 #include <jack/jack.h>
 #include "jackUtils.h"
 #include "logWriter.h"
-#include <iomanip>
 
 bool Jack::is_running()
 {
@@ -40,9 +39,6 @@ bool Jack::is_running()
     {
         switch (status)
         {
-            case JackFailure:   
-                THROW_ERROR("Overall operation failed.");
-                break;
            case JackInvalidOption:   
                 THROW_ERROR("The operation contained an invalid or unsupported option.");
                 break;
@@ -78,6 +74,9 @@ bool Jack::is_running()
                 break;
             case JackVersionError:   
                 THROW_ERROR("Client's protocol version does not match");
+                break;
+            case JackFailure:   
+                THROW_ERROR("Overall operation failed.");
                 break;
             default:
                 THROW_ERROR("Overall operation mysteriously failed.");
