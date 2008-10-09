@@ -111,6 +111,7 @@ bool MainModule::run()
             std::string command;
             if(!tmsg["command"].get(command))
                 continue;
+            LOG_DEBUG(std::string(tmsg["command"]));
             if (command == "quit")
                 break;
             if (command == "exception")

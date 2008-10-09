@@ -59,7 +59,6 @@ class AudioConfig
         AudioSource* createSource() const;
         AudioSink* createSink() const;
         
-        bool sanityCheck() const;
 
     private:
 
@@ -82,7 +81,6 @@ class AudioReceiverConfig
 
         AudioSink* createSink() const;
 
-        bool sanityCheck() { return true; }
 
     private:
 

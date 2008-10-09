@@ -92,8 +92,6 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
 
         AudioReceiverConfig config("jackaudiosink");
         ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"], msg["caps"]);
-        if(!config.sanityCheck())
-            return false;
         areceiver_ = new AudioReceiver(config, rConfig);
         areceiver_->init();
         areceiver_->start();

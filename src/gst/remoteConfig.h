@@ -49,7 +49,6 @@ class RemoteConfig
         const char *remoteHost() const { return remoteHost_.c_str(); }
         bool hasCodec() const { return !codec_.empty(); }
         
-        bool sanityCheck() const;
 
     protected:
 
