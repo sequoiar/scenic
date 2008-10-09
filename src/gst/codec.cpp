@@ -44,7 +44,7 @@ void H264Encoder::init()
     pipeline_.add(colorspc_);
 
     assert(codec_ = gst_element_factory_make("x264enc", NULL));
-    g_object_set(G_OBJECT(codec_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4,
+    g_object_set(G_OBJECT(codec_), "bitrate", 2048, "byte-stream", TRUE, "threads", 3,
                      NULL);
     pipeline_.add(codec_);
 
