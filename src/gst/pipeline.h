@@ -49,6 +49,7 @@ class Pipeline
         bool isPaused() const;
         void wait_until_playing() const;
         void start();
+        void pause();
         void stop();
 
         _GstElement *findElement(const char *name) const;

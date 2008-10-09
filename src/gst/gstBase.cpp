@@ -50,9 +50,21 @@ void GstBase::start()
 }
 
 
+void GstBase::pause()
+{
+    pipeline_.pause();
+}
+
+
 void GstBase::stop()
 {
     pipeline_.stop();
+}
+
+
+bool GstBase::isPaused() const
+{ 
+    return pipeline_.isPaused(); 
 }
 
 
@@ -64,7 +76,7 @@ bool GstBase::isPlaying() const
 
 const char* GstBase::getElementPadCaps(GstElement *element, const char * padName) const
 {
-    assert(isPlaying());
+    assert(isPlaying() || isPaused());
 
     GstPad *pad;
     GstCaps *caps;
