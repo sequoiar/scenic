@@ -216,7 +216,7 @@ void Pipeline::start()
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
     assert(checkStateChange(ret)); // set it to paused
     wait_until_paused();
-    LOG_DEBUG("Now paused");
+    //LOG_DEBUG("Now paused");
 
     ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
     assert(checkStateChange(ret)); // set it to playing

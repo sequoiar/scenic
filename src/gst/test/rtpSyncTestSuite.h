@@ -32,11 +32,9 @@ class SyncTestSuiteRtp
 
         SyncTestSuiteRtp()
         {
-
-            TEST_ADD(SyncTestSuiteRtp::start_dv_audio_dv_video_rtp)
-            TEST_ADD(SyncTestSuiteRtp::stop_dv_audio_dv_video_rtp)
-            TEST_ADD(SyncTestSuiteRtp::start_stop_dv_audio_dv_video_rtp)
-
+            // DANGER: if this is too short you're likely to have synchronization issues
+            testLength_ = 60000;
+            
             TEST_ADD(SyncTestSuiteRtp::start_8ch_comp_rtp_audiofile_dv)
             TEST_ADD(SyncTestSuiteRtp::stop_8ch_comp_rtp_audiofile_dv)
             TEST_ADD(SyncTestSuiteRtp::start_stop_8ch_comp_rtp_audiofile_dv)
@@ -44,6 +42,11 @@ class SyncTestSuiteRtp
         TEST_ADD(SyncTestSuiteRtp::start_audiotest_videotest_rtp);
         TEST_ADD(SyncTestSuiteRtp::stop_audiotest_videotest_rtp);
         TEST_ADD(SyncTestSuiteRtp::start_stop_audiotest_videotest_rtp);
+
+            TEST_ADD(SyncTestSuiteRtp::start_dv_audio_dv_video_rtp)
+            TEST_ADD(SyncTestSuiteRtp::stop_dv_audio_dv_video_rtp)
+            TEST_ADD(SyncTestSuiteRtp::start_stop_dv_audio_dv_video_rtp)
+
         }
 
 // some tests
