@@ -32,6 +32,7 @@ typedef std::vector<_GstElement *>::iterator GstIter;
 class GstBase
 {
     public:
+        virtual ~GstBase();
         virtual void start();
         virtual void stop();
         virtual void init() = 0;
@@ -45,8 +46,6 @@ class GstBase
         GstBase();
         const char* getElementPadCaps(_GstElement *element, const char * padName) const;
         static void checkCapsSampleRate(_GstCaps *caps);
-
-        virtual ~GstBase();
 
         Pipeline & pipeline_;
 
