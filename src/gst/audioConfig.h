@@ -27,6 +27,7 @@
 #define _AUDIO_LOCAL_CONFIG_H_
 
 #include <string>
+#include "logWriter.h"
 
 class AudioSource;
 class AudioSink;
@@ -38,7 +39,12 @@ class AudioConfig
         // local 
         AudioConfig(const std::string & source__, int numChannels__)
             : source_(source__), location_(""), numChannels_(numChannels__)
-        {}
+        {
+            if (source_.empty())
+                THROW_ERROR("No source specified");
+            if(numChannels_ < 1 || numChannels_ > 8)
+                THROW_ERROR("Invalid number of channels");
+        }
 
 
         // local file sender
@@ -59,7 +65,6 @@ class AudioConfig
         AudioSource* createSource() const;
         AudioSink* createSink() const;
         
-
     private:
 
         AudioConfig& operator=(const AudioConfig&); //No Assignment Operator
@@ -80,7 +85,6 @@ class AudioReceiverConfig
         {}
 
         AudioSink* createSink() const;
-
 
     private:
 

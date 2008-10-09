@@ -64,13 +64,6 @@ VideoSink * VideoReceiverConfig::createSink() const
 }
 
 
-bool VideoConfig::sanityCheck() const
-{
-    // FIXME: useless
-    return true;
-}
-
-
 bool VideoConfig::fileExists() const
 {
     FILE *file;

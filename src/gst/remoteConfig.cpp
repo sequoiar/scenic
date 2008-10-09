@@ -25,6 +25,29 @@
 #include "remoteConfig.h"
 #include "codec.h"
 #include "logWriter.h"
+#include <string>
+
+const int RemoteConfig::PORT_MIN = 1024;
+const int RemoteConfig::PORT_MAX = 65000;
+
+const std::string RemoteConfig::VALID_CODECS[NUM_CODECS] = {"h264", "vorbis"};
+        
+RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remoteHost__,
+        int port__) : codec_(codec__), remoteHost_(remoteHost__), port_(port__)
+{
+    if(codec_.empty())
+        THROW_ERROR("No Codec specified.");
+    //bool validCodec = (codec_ == "vorbis") || (codec_ == "h264"); 
+    bool validCodec = std::find(VALID_CODECS, VALID_CODECS + NUM_CODECS*sizeof(std::string), codec_);
+    //bool validCodec = iter != VALID_CODECS.end();
+
+    if(!validCodec)
+        THROW_ERROR("Bad codec:" << codec_);
+    if (port_ < PORT_MIN || port_ > PORT_MAX)
+        THROW_ERROR("Invalid port " << port_ << ", must be in range [" 
+                << PORT_MIN << "," << PORT_MAX << "]");  
+
+}
 
 
 Encoder * SenderConfig::createEncoder() const
@@ -36,7 +59,7 @@ Encoder * SenderConfig::createEncoder() const
         return new VorbisEncoder();
     if (codec_ == "h264")
         return new H264Encoder();
-    
+
     THROW_ERROR(codec_ << " is an invalid codec!");
     return 0;
 }
@@ -51,23 +74,9 @@ Decoder * ReceiverConfig::createDecoder() const
         return new VorbisDecoder();
     if (codec_ == "h264")
         return new H264Decoder();
-    
+
     THROW_ERROR(codec_ << " is an invalid codec!");
     return 0;
 }
 
-#if 0
-bool RemoteConfig::sanityCheck() const   // FIXME: this should become more or less redundant
-{
-    bool validCodec = (codec_ == "vorbis") || (codec_ == "h264"); 
 
-    if(codec_.empty())
-        THROW_ERROR("No Codec specified.");
-    if(!validCodec)
-        THROW_ERROR("Bad codec:" << codec_);
-    if (port_ == -1)
-        THROW_ERROR("No Port, one needed");  
-    
-    return validCodec;
-}
-#endif

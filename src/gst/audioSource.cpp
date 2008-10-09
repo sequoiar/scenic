@@ -100,8 +100,8 @@ void InterleavedAudioSource::link_elements()
 
 
 const double AudioTestSource::FREQUENCY[2][8] = 
-    {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
-     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
+{{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
+    {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
 
 
 gboolean AudioTestSource::callback()
@@ -141,7 +141,7 @@ void AudioTestSource::sub_init()
         assert(pad = gst_element_get_static_pad(*src, "src"));
         assert(gst_pad_set_caps(pad, caps));
         g_object_unref(pad);
-        
+
     }
 
     gst_caps_unref(caps);
@@ -246,7 +246,7 @@ void AudioJackSource::sub_init()
     // jackOut -> jackIn -> jackOut ->jackIn.....
     for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
-    
+
     if (GstBase::SAMPLE_RATE != Jack::samplerate())
         THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
                 << " does not match default sample rate " << GstBase::SAMPLE_RATE);
