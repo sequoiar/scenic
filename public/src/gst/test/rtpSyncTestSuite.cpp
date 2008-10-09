@@ -89,6 +89,121 @@ static std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
 /*----------------------------------------------*/ 
 
 
+void SyncTestSuiteRtp::start_jack_v4l()
+{
+    int numChannels = 8;
+
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
+        aRx->start();
+        
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
+        vRx->start();
+
+        BLOCK();
+        TEST_ASSERT(aRx->isPlaying());
+        TEST_ASSERT(vRx->isPlaying());
+    }
+    else {
+        AudioConfig aConfig("jackaudiosrc", numChannels);
+        std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig));
+        aTx->start();
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
+
+        VideoConfig vConfig("v4l2src"); 
+        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
+        vTx->start();
+        //usleep(100000); // GIVE receiver chance to start waiting
+
+
+        BLOCK();
+        TEST_ASSERT(aTx->isPlaying());
+        TEST_ASSERT(vTx->isPlaying());
+    }
+}
+
+
+void SyncTestSuiteRtp::stop_jack_v4l()
+{
+    int numChannels = 8;
+
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> aRx(buildDeadAudioReceiver());
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
+
+        BLOCK();
+
+        aRx->stop();
+        vRx->stop();
+
+        TEST_ASSERT(!aRx->isPlaying());
+        TEST_ASSERT(!vRx->isPlaying());
+    }
+    else {
+        AudioConfig aConfig("jackaudiosrc", numChannels);
+        std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig));
+
+        VideoConfig vConfig("v4l2src");
+        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
+
+        BLOCK();
+
+        aTx->stop();
+        vTx->stop();
+
+        TEST_ASSERT(!aTx->isPlaying());
+        TEST_ASSERT(!vTx->isPlaying());
+    }
+}
+
+
+void SyncTestSuiteRtp::start_stop_jack_v4l()
+{
+    int numChannels = 8;
+
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
+        aRx->start();
+        
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
+        vRx->start();
+
+        BLOCK();
+
+        TEST_ASSERT(aRx->isPlaying());
+        TEST_ASSERT(vRx->isPlaying());
+
+        aRx->stop();
+        vRx->stop();
+
+        TEST_ASSERT(!aRx->isPlaying());
+        TEST_ASSERT(!vRx->isPlaying());
+    }
+    else {
+        AudioConfig aConfig("jackaudiosrc", audioFilename_, numChannels);
+        std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig));
+        aTx->start();
+        //usleep(100000); // GIVE receiver chance to start waiting
+        TEST_ASSERT(tcpSendCaps(A_PORT + 100, aTx->getCaps()));
+
+        VideoConfig vConfig("v4l2src"); 
+        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
+
+        vTx->start();
+
+        BLOCK();
+
+        TEST_ASSERT(aTx->isPlaying());
+        TEST_ASSERT(vTx->isPlaying());
+
+        aTx->stop();
+        vTx->stop();
+
+        TEST_ASSERT(!aTx->isPlaying());
+        TEST_ASSERT(!vTx->isPlaying());
+    }
+}
+
 void SyncTestSuiteRtp::start_8ch_audiofile_dv()
 {
     int numChannels = 8;

@@ -21,6 +21,7 @@
 #include <jack/jack.h>
 #include "jackUtils.h"
 #include "logWriter.h"
+#include <iomanip>
 
 bool Jack::is_running()
 {
@@ -36,8 +37,54 @@ bool Jack::is_running()
     if (client == NULL && (status & JackServerFailed))
         THROW_ERROR("JACK server not running");
     if (client == NULL) 
-        THROW_ERROR("jack_client_open() failed, check status"); 
-    
+    {
+        switch (status)
+        {
+            case JackFailure:   
+                THROW_ERROR("Overall operation failed.");
+                break;
+           case JackInvalidOption:   
+                THROW_ERROR("The operation contained an invalid or unsupported option.");
+                break;
+           case JackNameNotUnique:  
+                THROW_ERROR("The desired client name was not unique. With the JackUseExactName option "
+                            "this situation is fatal. Otherwise, the name was modified by appending a "
+                            "dash and a two-digit number in the range -01 to -99. The jack_get_client_name()" 
+                            "function will return the exact string that was used. If the specified client_name "
+                            "plus these extra characters would be too long, the open fails instead.");
+                break;
+           case JackServerStarted:
+                THROW_ERROR("The JACK server was started as a result of this operation. Otherwise, it was "
+                        "running already. In either case the caller is now connected to jackd, so there is no race condition."
+                        " When the server shuts down, the client will find out.");
+                break;
+           case JackServerFailed:   
+                THROW_ERROR("Unable to connect to the JACK server.");
+                break;
+           case JackServerError:     
+                THROW_ERROR("Communication error with the JACK server.");
+                break;
+            case JackNoSuchClient:    
+                THROW_ERROR("Requested client does not exist."); 
+                break;
+            case JackLoadFailure:     
+                THROW_ERROR("Unable to load internal client");
+                break;
+            case JackInitFailure:     
+                THROW_ERROR("Unable to initialize client");
+                break;
+            case JackShmFailure:  
+                THROW_ERROR("Unable to access shared memory");
+                break;
+            case JackVersionError:   
+                THROW_ERROR("Client's protocol version does not match");
+                break;
+            default:
+                THROW_ERROR("Overall operation mysteriously failed.");
+                break;
+        }
+    }
+
     jack_client_close(client);
 
     return true;
@@ -47,13 +94,13 @@ unsigned int Jack::samplerate()
 {
     if (!is_running())
         THROW_ERROR("JACK server not running, cannot compare sample rates.");
-    
-        jack_client_t *client;
-        jack_status_t status;
-        client = jack_client_open ("AudioJackSource", JackNoStartServer, &status);
-        jack_nframes_t jackRate = jack_get_sample_rate(client);
-        jack_client_close(client);
-    
-        return jackRate;
+
+    jack_client_t *client;
+    jack_status_t status;
+    client = jack_client_open ("AudioJackSource", JackNoStartServer, &status);
+    jack_nframes_t jackRate = jack_get_sample_rate(client);
+    jack_client_close(client);
+
+    return jackRate;
 }
 
