@@ -17,12 +17,10 @@
  * Boston, MA 02111-1307, USA.
  */
 #include "gstSenderThread.h"
-#include "hostIP.h"
 
 #include "gst/audioSender.h"
 #include "gst/videoSender.h"
 
-#include <unistd.h>
 
 GstSenderThread::~GstSenderThread()
 {
@@ -53,7 +51,7 @@ bool GstSenderThread::audio_stop(MapMsg& /*msg*/)
 
 bool GstSenderThread::video_start(MapMsg& msg)
 {
-    delete (vsender_);
+    delete vsender_;
     vsender_ = 0;
     
     try
@@ -73,7 +71,7 @@ bool GstSenderThread::video_start(MapMsg& msg)
     catch(Except e)
     {
         LOG_WARNING(e.msg_);
-        delete(vsender_);
+        delete vsender_;
         vsender_ = 0;
         return false;
     }
@@ -81,7 +79,7 @@ bool GstSenderThread::video_start(MapMsg& msg)
 
 bool GstSenderThread::audio_start(MapMsg& msg)
 {
-    delete (asender_);
+    delete asender_;
     asender_ = 0;
 
     sleep(5);
@@ -107,7 +105,7 @@ bool GstSenderThread::audio_start(MapMsg& msg)
     catch(Except e)
     {
         LOG_WARNING(e.msg_);
-        delete(asender_);
+        delete asender_;
         asender_ = 0;
         return false;
     }
