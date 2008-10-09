@@ -50,7 +50,6 @@ class VideoConfig
         const char *source() const { return source_.c_str(); }
 
         bool fileExists() const;
-        bool sanityCheck() const;
         const char *location() const;
 
     private:
@@ -74,8 +73,6 @@ class VideoReceiverConfig
         VideoReceiverConfig(const VideoReceiverConfig & m) 
             : sink_(m.sink_) 
         {}
-
-        bool sanityCheck() { return true; }
 
         VideoSink* createSink() const;
 

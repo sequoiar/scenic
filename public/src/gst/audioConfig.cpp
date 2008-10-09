@@ -85,15 +85,6 @@ AudioSink* AudioConfig::createSink() const
     return new AudioJackSink();
 }
 
-#if 0
-bool AudioConfig::sanityCheck() const   // FIXME: this should become more or less redundant
-{
-    if(numChannels_ < 1 || numChannels_ > 8)
-        THROW_CRITICAL("Invalid number of channels");
-
-    return true;
-}
-#endif
 
 const char* AudioConfig::location() const
 {
@@ -102,6 +93,7 @@ const char* AudioConfig::location() const
         
     return location_.c_str();
 }
+
 
 bool AudioConfig::fileExists() const
 {

@@ -30,14 +30,14 @@
 
 class Encoder;
 class Decoder;
+const int NUM_CODECS = 2;
 
 class RemoteConfig 
 {
     public:
         RemoteConfig(const std::string &codec__, 
                 const std::string &remoteHost__,
-                int port__) : codec_(codec__), remoteHost_(remoteHost__), port_(port__)
-        {}
+                int port__); 
 
         // copy constructor
         RemoteConfig(const RemoteConfig& m)
@@ -48,7 +48,6 @@ class RemoteConfig
         int port() const { return port_; }
         const char *remoteHost() const { return remoteHost_.c_str(); }
         bool hasCodec() const { return !codec_.empty(); }
-        
 
     protected:
 
@@ -56,6 +55,9 @@ class RemoteConfig
         const std::string codec_;
         const std::string remoteHost_;
         const int port_;
+        static const int PORT_MIN;
+        static const int PORT_MAX;
+        static const std::string VALID_CODECS[NUM_CODECS];
 };
 
 class SenderConfig : public RemoteConfig
@@ -64,7 +66,7 @@ class SenderConfig : public RemoteConfig
         SenderConfig(const std::string &codec__,
                 const std::string &remoteHost__,    
                 int port__) : RemoteConfig(codec__, remoteHost__, port__)
-        {}
+    {}
 
         SenderConfig(const SenderConfig & m) 
             : RemoteConfig(m)
@@ -80,8 +82,8 @@ class ReceiverConfig : public RemoteConfig
         ReceiverConfig(const std::string &codec__,
                 const std::string &remoteHost__,    
                 int port__, const std::string &caps__) : RemoteConfig(codec__, remoteHost__, port__), caps_(caps__)
-        {}
-        
+    {}
+
         ReceiverConfig(const ReceiverConfig & m) 
             : RemoteConfig(m), caps_(m.caps_)
         {}
