@@ -21,7 +21,7 @@
 #include "logWriter.h"
 #include "parser.h"
 #include <errno.h>
-
+#include <string.h>
 class TcpLogFunctor : public LogFunctor
 {
 public:

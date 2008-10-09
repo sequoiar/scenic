@@ -20,6 +20,7 @@
 
 #include <gst/gst.h>
 #include <cassert>
+#include <cstring>
 #include <sstream>
 
 #include "rtpBin.h"
