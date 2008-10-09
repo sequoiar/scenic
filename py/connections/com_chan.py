@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Sropulpof
@@ -17,6 +18,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+
 
 
 # System imports
@@ -127,7 +129,7 @@ if __name__ == '__main__':
     port = 8800
     
     if len(sys.argv) > 1:
-        # it's a server
+        # it's a server    
         # Do this when connecting (SIP)
         channel = ComChannel()
         dummy = Dummy()
@@ -135,19 +137,20 @@ if __name__ == '__main__':
         channel.add(dummy.close)
         channel.delete('test')
         print channel.methods
-        reactor.listenTCP(port, pb.PBServerFactory(channel))
+        server_factory = pb.PBServerFactory(channel)
+        se = reactor.listenTCP(port, server_factory)
         
         # simulate a call to a root method
         reactor.callLater(3, send, channel)
 
         # simulate a call to a method of another class 
         reactor.callLater(8, send2, channel)
-
+        
     else:
         # it's client
         # Do this when after a connection (SIP) is establish
         factory = pb.PBClientFactory()
-        reactor.connectTCP("localhost", port, factory)
+        cl = reactor.connectTCP("localhost", port, factory)
         channel = ComChannel()
         deferred = factory.getRootObject()
         deferred.addCallback(channel.remote_init)
