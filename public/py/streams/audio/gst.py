@@ -56,6 +56,7 @@ class AudioGst(AudioStream, GstClient):
         attrs = self.get_attrs()
         attrs.append(('address', address))
         self._send_cmd('audio_start', attrs, (self.sending_started, 'caps'))
+        self._add_callback(self.gst_levels, 'levels')
         
     def sending_started(self, caps_str):
         self._del_callback('caps')
@@ -102,6 +103,10 @@ class AudioGst(AudioStream, GstClient):
     def receving_stopped(self, state):
         self._del_callback()
         self._core.notify(None, state, 'audio_receving_stopped')
+
+    def gst_levels(self, values):
+        log.info('Audio levels: %s' % values)
+
    
 
     
