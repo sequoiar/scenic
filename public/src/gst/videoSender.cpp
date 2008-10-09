@@ -67,7 +67,7 @@ void VideoSender::init_payloader()
 void VideoSender::start()
 {
     GstBase::start();
-    pipeline_.wait_until_playing();
+    //pipeline_.wait_until_playing();
 }
 
 
