@@ -29,7 +29,7 @@ class AudioSource;
 class AudioSink;
 
 class AudioLocal
-    : public MediaBase
+    : public LocalBase 
 {
     public:
         explicit AudioLocal(const AudioConfig config) 

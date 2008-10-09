@@ -28,7 +28,7 @@ class VideoSource;
 class VideoSink;
 
 class VideoLocal
-    : public MediaBase
+    : public LocalBase
 {
     public:
         explicit VideoLocal(const VideoConfig config) 

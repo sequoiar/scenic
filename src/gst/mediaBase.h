@@ -23,7 +23,7 @@
 
 #include "gstBase.h"
 
-class MediaBase     // local bins
+class LocalBase     // local bins
     : public GstBase
 {
     public:
@@ -31,15 +31,15 @@ class MediaBase     // local bins
 
     protected:
 
-        MediaBase(){};
-        ~MediaBase();
+        LocalBase(){};
+        ~LocalBase();
         virtual void init_source() = 0;
         virtual void init_sink() = 0;
 
     private:
 
-        MediaBase(const MediaBase&);     //No Copy Constructor
-        MediaBase& operator=(const MediaBase&);     //No Assignment Operator
+        LocalBase(const LocalBase&);     //No Copy Constructor
+        LocalBase& operator=(const LocalBase&);     //No Assignment Operator
 };
 
 class SenderBase    
