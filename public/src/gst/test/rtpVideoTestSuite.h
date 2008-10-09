@@ -18,8 +18,8 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _RTP_VIDEO_TEST_SUITE_H_
-#define _RTP_VIDEO_TEST_SUITE_H_
+#ifndef _VIDEO_TEST_SUITE_H_
+#define _VIDEO_TEST_SUITE_H_
 
 #include <cpptest.h>
 #include "gstTestSuite.h"
@@ -33,18 +33,18 @@ class RtpVideoTestSuite
         {
             testLength_ = 60000;
 
-            TEST_ADD(RtpVideoTestSuite::start_test_video_rtp)
-            TEST_ADD(RtpVideoTestSuite::stop_test_video_rtp)
-            TEST_ADD(RtpVideoTestSuite::start_stop_test_video_rtp)
-            TEST_ADD(RtpVideoTestSuite::start_v4l_rtp)
-            TEST_ADD(RtpVideoTestSuite::stop_v4l_rtp)
-            TEST_ADD(RtpVideoTestSuite::start_stop_v4l_rtp)
-            TEST_ADD(RtpVideoTestSuite::start_file_rtp)
-            TEST_ADD(RtpVideoTestSuite::stop_file_rtp)
-            TEST_ADD(RtpVideoTestSuite::start_stop_file_rtp)
-            TEST_ADD(RtpVideoTestSuite::start_dv_rtp)
-            TEST_ADD(RtpVideoTestSuite::stop_dv_rtp)
-            TEST_ADD(RtpVideoTestSuite::start_stop_dv_rtp)
+            TEST_ADD(RtpVideoTestSuite::start_test_video)
+            TEST_ADD(RtpVideoTestSuite::stop_test_video)
+            TEST_ADD(RtpVideoTestSuite::start_stop_test_video)
+            TEST_ADD(RtpVideoTestSuite::start_v4l)
+            TEST_ADD(RtpVideoTestSuite::stop_v4l)
+            TEST_ADD(RtpVideoTestSuite::start_stop_v4l)
+            TEST_ADD(RtpVideoTestSuite::start_file)
+            TEST_ADD(RtpVideoTestSuite::stop_file)
+            TEST_ADD(RtpVideoTestSuite::start_stop_file)
+            TEST_ADD(RtpVideoTestSuite::start_dv)
+            TEST_ADD(RtpVideoTestSuite::stop_dv)
+            TEST_ADD(RtpVideoTestSuite::start_stop_dv)
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
             /*                                              */
@@ -57,22 +57,22 @@ class RtpVideoTestSuite
         // some tests
 
     private:
-        void start_test_video_rtp();
-        void stop_test_video_rtp();
-        void start_stop_test_video_rtp();
+        void start_test_video();
+        void stop_test_video();
+        void start_stop_test_video();
 
-        void start_v4l_rtp();
-        void stop_v4l_rtp();
-        void start_stop_v4l_rtp();
+        void start_v4l();
+        void stop_v4l();
+        void start_stop_v4l();
 
-        void start_dv_rtp();
-        void stop_dv_rtp();
-        void start_stop_dv_rtp();
+        void start_dv();
+        void stop_dv();
+        void start_stop_dv();
 
-        void start_file_rtp();
-        void stop_file_rtp();
-        void start_stop_file_rtp();
+        void start_file();
+        void stop_file();
+        void start_stop_file();
 };
 
-#endif // _RTP_VIDEO_TEST_SUITE_H_
+#endif // _VIDEO_TEST_SUITE_H_
 

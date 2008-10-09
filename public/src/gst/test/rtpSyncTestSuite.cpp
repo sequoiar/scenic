@@ -89,7 +89,7 @@ static std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
 /*----------------------------------------------*/ 
 
 
-void SyncTestSuiteRtp::start_8ch_comp_rtp_audiofile_dv()
+void SyncTestSuiteRtp::start_8ch_audiofile_dv()
 {
     int numChannels = 8;
 
@@ -123,7 +123,7 @@ void SyncTestSuiteRtp::start_8ch_comp_rtp_audiofile_dv()
 }
 
 
-void SyncTestSuiteRtp::stop_8ch_comp_rtp_audiofile_dv()
+void SyncTestSuiteRtp::stop_8ch_audiofile_dv()
 {
     int numChannels = 8;
 
@@ -157,7 +157,7 @@ void SyncTestSuiteRtp::stop_8ch_comp_rtp_audiofile_dv()
 }
 
 
-void SyncTestSuiteRtp::start_stop_8ch_comp_rtp_audiofile_dv()
+void SyncTestSuiteRtp::start_stop_8ch_audiofile_dv()
 {
     int numChannels = 8;
 
@@ -205,7 +205,7 @@ void SyncTestSuiteRtp::start_stop_8ch_comp_rtp_audiofile_dv()
 }
 
 
-void SyncTestSuiteRtp::start_dv_audio_dv_video_rtp()
+void SyncTestSuiteRtp::start_dv_audio_dv_video()
 {
     int numChannels = 2;
 
@@ -242,7 +242,7 @@ void SyncTestSuiteRtp::start_dv_audio_dv_video_rtp()
 }
 
 
-void SyncTestSuiteRtp::stop_dv_audio_dv_video_rtp()
+void SyncTestSuiteRtp::stop_dv_audio_dv_video()
 {
     int numChannels = 2;
 
@@ -276,7 +276,7 @@ void SyncTestSuiteRtp::stop_dv_audio_dv_video_rtp()
 }
 
 
-void SyncTestSuiteRtp::start_stop_dv_audio_dv_video_rtp()
+void SyncTestSuiteRtp::start_stop_dv_audio_dv_video()
 {
     int numChannels = 2;
 
@@ -324,7 +324,7 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video_rtp()
 }
 
 
-void SyncTestSuiteRtp::start_audiotest_videotest_rtp()
+void SyncTestSuiteRtp::start_audiotest_videotest()
 {
     int numChannels = 8;
 
@@ -360,7 +360,7 @@ void SyncTestSuiteRtp::start_audiotest_videotest_rtp()
 }
 
 
-void SyncTestSuiteRtp::stop_audiotest_videotest_rtp()
+void SyncTestSuiteRtp::stop_audiotest_videotest()
 {
     int numChannels = 8;
 
@@ -394,7 +394,7 @@ void SyncTestSuiteRtp::stop_audiotest_videotest_rtp()
 }
 
 
-void SyncTestSuiteRtp::start_stop_audiotest_videotest_rtp()
+void SyncTestSuiteRtp::start_stop_audiotest_videotest()
 {
     int numChannels = 2;
 

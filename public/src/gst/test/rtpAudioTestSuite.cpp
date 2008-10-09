@@ -72,7 +72,7 @@ std::auto_ptr<AudioReceiver> buildDeadAudioReceiver()
 /*----------------------------------------------*/ 
 
 
-void RtpAudioTestSuite::start_2ch_rtp_audiotest()
+void RtpAudioTestSuite::start_2ch_audiotest()
 {
     int numChannels = 2;
 
@@ -99,7 +99,7 @@ void RtpAudioTestSuite::start_2ch_rtp_audiotest()
 }
 
 
-void RtpAudioTestSuite::stop_2ch_rtp_audiotest()
+void RtpAudioTestSuite::stop_2ch_audiotest()
 {
     int numChannels = 2;
 
@@ -123,7 +123,7 @@ void RtpAudioTestSuite::stop_2ch_rtp_audiotest()
 }
 
 
-void RtpAudioTestSuite::start_stop_2ch_rtp_audiotest()
+void RtpAudioTestSuite::start_stop_2ch_audiotest()
 {
     int numChannels = 2;
     if (id_ == 0) {
@@ -154,7 +154,7 @@ void RtpAudioTestSuite::start_stop_2ch_rtp_audiotest()
 }
 
 
-void RtpAudioTestSuite::start_8ch_rtp_audiotest()
+void RtpAudioTestSuite::start_8ch_audiotest()
 {
     const int numChannels = 8;
 
@@ -180,7 +180,7 @@ void RtpAudioTestSuite::start_8ch_rtp_audiotest()
 }
 
 
-void RtpAudioTestSuite::stop_8ch_rtp_audiotest()
+void RtpAudioTestSuite::stop_8ch_audiotest()
 {
     int numChannels = 8;
     if (id_ == 0) {
@@ -203,7 +203,7 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiotest()
 }
 
 
-void RtpAudioTestSuite::start_stop_8ch_rtp_audiotest()
+void RtpAudioTestSuite::start_stop_8ch_audiotest()
 {
     int numChannels = 8;
     if (id_ == 0) {
@@ -234,7 +234,7 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiotest()
 }
 
 
-void RtpAudioTestSuite::start_8ch_rtp_jack()
+void RtpAudioTestSuite::start_8ch_jack()
 {
     const int numChannels = 8;
 
@@ -260,7 +260,7 @@ void RtpAudioTestSuite::start_8ch_rtp_jack()
 }
 
 
-void RtpAudioTestSuite::stop_8ch_rtp_jack()
+void RtpAudioTestSuite::stop_8ch_jack()
 {
     int numChannels = 8;
     if (id_ == 0) {
@@ -283,7 +283,7 @@ void RtpAudioTestSuite::stop_8ch_rtp_jack()
 }
 
 
-void RtpAudioTestSuite::start_stop_8ch_rtp_jack()
+void RtpAudioTestSuite::start_stop_8ch_jack()
 {
     int numChannels = 8;
     if (id_ == 0) {
@@ -314,7 +314,7 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_jack()
 }
 
 
-void RtpAudioTestSuite::start_8ch_rtp_audiofile()
+void RtpAudioTestSuite::start_8ch_audiofile()
 {
     int numChannels = 8;
 
@@ -340,7 +340,7 @@ void RtpAudioTestSuite::start_8ch_rtp_audiofile()
 }
 
 
-void RtpAudioTestSuite::stop_8ch_rtp_audiofile()
+void RtpAudioTestSuite::stop_8ch_audiofile()
 {
     int numChannels = 8;
     if (id_ == 0) {
@@ -363,7 +363,7 @@ void RtpAudioTestSuite::stop_8ch_rtp_audiofile()
 }
 
 
-void RtpAudioTestSuite::start_stop_8ch_rtp_audiofile()
+void RtpAudioTestSuite::start_stop_8ch_audiofile()
 {
     int numChannels = 8;
     if (id_ == 0) {
@@ -394,7 +394,7 @@ void RtpAudioTestSuite::start_stop_8ch_rtp_audiofile()
 }
 
 
-void RtpAudioTestSuite::start_audio_dv_rtp()
+void RtpAudioTestSuite::start_audio_dv()
 {
     int numChannels = 2;
     if (id_ == 0) {
@@ -419,7 +419,7 @@ void RtpAudioTestSuite::start_audio_dv_rtp()
 }
 
 
-void RtpAudioTestSuite::stop_audio_dv_rtp()
+void RtpAudioTestSuite::stop_audio_dv()
 {
     int numChannels = 2;
 
@@ -443,7 +443,7 @@ void RtpAudioTestSuite::stop_audio_dv_rtp()
 }
 
 
-void RtpAudioTestSuite::start_stop_audio_dv_rtp()
+void RtpAudioTestSuite::start_stop_audio_dv()
 {
     int numChannels = 2;
     if (id_ == 0) {

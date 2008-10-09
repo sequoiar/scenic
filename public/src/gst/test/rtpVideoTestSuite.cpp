@@ -50,7 +50,7 @@ static std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
 }
 
 
-void RtpVideoTestSuite::start_test_video_rtp()
+void RtpVideoTestSuite::start_test_video()
 {
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
@@ -72,7 +72,7 @@ void RtpVideoTestSuite::start_test_video_rtp()
 }
 
 
-void RtpVideoTestSuite::stop_test_video_rtp()
+void RtpVideoTestSuite::stop_test_video()
 {
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
@@ -94,7 +94,7 @@ void RtpVideoTestSuite::stop_test_video_rtp()
 }
 
 
-void RtpVideoTestSuite::start_stop_test_video_rtp()
+void RtpVideoTestSuite::start_stop_test_video()
 {
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
@@ -122,7 +122,7 @@ void RtpVideoTestSuite::start_stop_test_video_rtp()
 }
 
 
-void RtpVideoTestSuite::start_v4l_rtp()
+void RtpVideoTestSuite::start_v4l()
 {
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
@@ -144,7 +144,7 @@ void RtpVideoTestSuite::start_v4l_rtp()
 }
 
 
-void RtpVideoTestSuite::stop_v4l_rtp()
+void RtpVideoTestSuite::stop_v4l()
 {
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
@@ -166,7 +166,7 @@ void RtpVideoTestSuite::stop_v4l_rtp()
 }
 
 
-void RtpVideoTestSuite::start_stop_v4l_rtp()
+void RtpVideoTestSuite::start_stop_v4l()
 {
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
@@ -195,7 +195,7 @@ void RtpVideoTestSuite::start_stop_v4l_rtp()
 
 
 
-void RtpVideoTestSuite::start_dv_rtp()
+void RtpVideoTestSuite::start_dv()
 {
     // receiver should be started first, of course there's no guarantee that it will at this point
     if (id_ == 0) {
@@ -218,7 +218,7 @@ void RtpVideoTestSuite::start_dv_rtp()
 }
 
 
-void RtpVideoTestSuite::stop_dv_rtp()
+void RtpVideoTestSuite::stop_dv()
 {
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
@@ -240,7 +240,7 @@ void RtpVideoTestSuite::stop_dv_rtp()
 }
 
 
-void RtpVideoTestSuite::start_stop_dv_rtp()
+void RtpVideoTestSuite::start_stop_dv()
 {
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
@@ -269,7 +269,7 @@ void RtpVideoTestSuite::start_stop_dv_rtp()
 
 
 
-void RtpVideoTestSuite::start_file_rtp()
+void RtpVideoTestSuite::start_file()
 {
     // receiver should be started first, of course there's no guarantee that it will at this point
     if (id_ == 0) {
@@ -292,7 +292,7 @@ void RtpVideoTestSuite::start_file_rtp()
 }
 
 
-void RtpVideoTestSuite::stop_file_rtp()
+void RtpVideoTestSuite::stop_file()
 {
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
@@ -314,7 +314,7 @@ void RtpVideoTestSuite::stop_file_rtp()
 }
 
 
-void RtpVideoTestSuite::start_stop_file_rtp()
+void RtpVideoTestSuite::start_stop_file()
 {
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());

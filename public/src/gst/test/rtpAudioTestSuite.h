@@ -17,8 +17,8 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _RTP_AUDIO_TEST_SUITE_H_
-#define _RTP_AUDIO_TEST_SUITE_H_
+#ifndef _AUDIO_TEST_SUITE_H_
+#define _AUDIO_TEST_SUITE_H_
 
 #include <cpptest.h>
 #include "gstTestSuite.h"
@@ -32,29 +32,29 @@ class RtpAudioTestSuite
         {
             testLength_ = 3000;
             
-            TEST_ADD(RtpAudioTestSuite::start_2ch_rtp_audiotest)
-            TEST_ADD(RtpAudioTestSuite::stop_2ch_rtp_audiotest)
-            TEST_ADD(RtpAudioTestSuite::start_stop_2ch_rtp_audiotest)
+            TEST_ADD(RtpAudioTestSuite::start_2ch_audiotest)
+            TEST_ADD(RtpAudioTestSuite::stop_2ch_audiotest)
+            TEST_ADD(RtpAudioTestSuite::start_stop_2ch_audiotest)
 
-            TEST_ADD(RtpAudioTestSuite::start_2ch_rtp_audiotest)
-            TEST_ADD(RtpAudioTestSuite::stop_2ch_rtp_audiotest)
-            TEST_ADD(RtpAudioTestSuite::start_stop_2ch_rtp_audiotest)
+            TEST_ADD(RtpAudioTestSuite::start_2ch_audiotest)
+            TEST_ADD(RtpAudioTestSuite::stop_2ch_audiotest)
+            TEST_ADD(RtpAudioTestSuite::start_stop_2ch_audiotest)
 
-            TEST_ADD(RtpAudioTestSuite::start_8ch_rtp_jack)
-            TEST_ADD(RtpAudioTestSuite::stop_8ch_rtp_jack)
-            TEST_ADD(RtpAudioTestSuite::start_stop_8ch_rtp_jack)
+            TEST_ADD(RtpAudioTestSuite::start_8ch_jack)
+            TEST_ADD(RtpAudioTestSuite::stop_8ch_jack)
+            TEST_ADD(RtpAudioTestSuite::start_stop_8ch_jack)
 
-            TEST_ADD(RtpAudioTestSuite::start_8ch_rtp_audiotest)
-            TEST_ADD(RtpAudioTestSuite::stop_8ch_rtp_audiotest)
-            TEST_ADD(RtpAudioTestSuite::start_stop_8ch_rtp_audiotest)
+            TEST_ADD(RtpAudioTestSuite::start_8ch_audiotest)
+            TEST_ADD(RtpAudioTestSuite::stop_8ch_audiotest)
+            TEST_ADD(RtpAudioTestSuite::start_stop_8ch_audiotest)
 
-            TEST_ADD(RtpAudioTestSuite::start_audio_dv_rtp)
-            TEST_ADD(RtpAudioTestSuite::stop_audio_dv_rtp)
-            TEST_ADD(RtpAudioTestSuite::start_stop_audio_dv_rtp)
+            TEST_ADD(RtpAudioTestSuite::start_audio_dv)
+            TEST_ADD(RtpAudioTestSuite::stop_audio_dv)
+            TEST_ADD(RtpAudioTestSuite::start_stop_audio_dv)
 
-            TEST_ADD(RtpAudioTestSuite::start_8ch_rtp_audiofile)
-            TEST_ADD(RtpAudioTestSuite::stop_8ch_rtp_audiofile)
-            TEST_ADD(RtpAudioTestSuite::start_stop_8ch_rtp_audiofile)
+            TEST_ADD(RtpAudioTestSuite::start_8ch_audiofile)
+            TEST_ADD(RtpAudioTestSuite::stop_8ch_audiofile)
+            TEST_ADD(RtpAudioTestSuite::start_stop_8ch_audiofile)
             
 
             /*----------------------------------------------*/
@@ -70,25 +70,25 @@ class RtpAudioTestSuite
 
     private:
 
-        void start_2ch_rtp_audiotest();
-        void stop_2ch_rtp_audiotest();
-        void start_stop_2ch_rtp_audiotest();
+        void start_2ch_audiotest();
+        void stop_2ch_audiotest();
+        void start_stop_2ch_audiotest();
 
-        void start_8ch_rtp_audiotest();
-        void stop_8ch_rtp_audiotest();
-        void start_stop_8ch_rtp_audiotest();
+        void start_8ch_audiotest();
+        void stop_8ch_audiotest();
+        void start_stop_8ch_audiotest();
 
-        void start_8ch_rtp_audiofile();
-        void stop_8ch_rtp_audiofile();
-        void start_stop_8ch_rtp_audiofile();
+        void start_8ch_audiofile();
+        void stop_8ch_audiofile();
+        void start_stop_8ch_audiofile();
 
-        void start_8ch_rtp_jack();
-        void stop_8ch_rtp_jack();
-        void start_stop_8ch_rtp_jack();
+        void start_8ch_jack();
+        void stop_8ch_jack();
+        void start_stop_8ch_jack();
 
-        void start_audio_dv_rtp();
-        void stop_audio_dv_rtp();
-        void start_stop_audio_dv_rtp();
+        void start_audio_dv();
+        void stop_audio_dv();
+        void start_stop_audio_dv();
 };
 
 

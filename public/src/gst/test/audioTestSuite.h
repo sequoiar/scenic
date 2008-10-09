@@ -50,9 +50,9 @@ class AudioTestSuite
             TEST_ADD(AudioTestSuite::start_8ch_audiotest)
             TEST_ADD(AudioTestSuite::stop_8ch_audiotest)
             TEST_ADD(AudioTestSuite::start_stop_8ch_audiotest)
-            TEST_ADD(AudioTestSuite::start_8ch_comp_audiofile)
-            TEST_ADD(AudioTestSuite::stop_8ch_comp_audiofile)
-            TEST_ADD(AudioTestSuite::start_stop_8ch_comp_audiofile)
+            TEST_ADD(AudioTestSuite::start_8ch_audiofile)
+            TEST_ADD(AudioTestSuite::stop_8ch_audiofile)
+            TEST_ADD(AudioTestSuite::start_stop_8ch_audiofile)
 
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
@@ -83,9 +83,9 @@ class AudioTestSuite
         void stop_8ch_audiotest();
         void start_stop_8ch_audiotest();
 
-        void start_8ch_comp_audiofile();
-        void stop_8ch_comp_audiofile();
-        void start_stop_8ch_comp_audiofile();
+        void start_8ch_audiofile();
+        void stop_8ch_audiofile();
+        void start_stop_8ch_audiofile();
 
         void start_8ch_jack();
         void stop_8ch_jack();
