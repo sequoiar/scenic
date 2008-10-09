@@ -28,8 +28,6 @@
 
 void VideoTestSuite::start_test_video()
 {
-    if (id_ == 1)
-        return;
     VideoConfig config("videotestsrc");
     VideoLocal tx(config);
     tx.init();
@@ -44,8 +42,6 @@ void VideoTestSuite::start_test_video()
 
 void VideoTestSuite::stop_test_video()
 {
-    if (id_ == 1)
-        return;
     VideoConfig config("videotestsrc");
     VideoLocal tx(config);
     tx.init();
@@ -59,8 +55,6 @@ void VideoTestSuite::stop_test_video()
 
 void VideoTestSuite::start_stop_test_video()
 {
-    if (id_ == 1)
-        return;
     VideoConfig config("videotestsrc");
     VideoLocal tx(config);
     tx.init();
@@ -78,8 +72,6 @@ void VideoTestSuite::start_stop_test_video()
 
 void VideoTestSuite::start_v4l()
 {
-    if (id_ == 1)
-        return;
     VideoConfig config("v4l2src");
     VideoLocal tx(config);
     tx.init();
@@ -93,8 +85,6 @@ void VideoTestSuite::start_v4l()
 
 void VideoTestSuite::stop_v4l()
 {
-    if (id_ == 1)
-        return;
     VideoConfig config("v4l2src");
     VideoLocal tx(config);
     tx.init();
@@ -108,8 +98,6 @@ void VideoTestSuite::stop_v4l()
 
 void VideoTestSuite::start_stop_v4l()
 {
-    if (id_ == 1)
-        return;
     VideoConfig config("v4l2src");
     VideoLocal tx(config);
     tx.init();
@@ -126,8 +114,6 @@ void VideoTestSuite::start_stop_v4l()
 
 void VideoTestSuite::start_dv()
 {
-    if (id_ == 1)
-        return;
     VideoConfig config("dv1394src");
     VideoLocal tx(config);
     tx.init();
@@ -141,8 +127,6 @@ void VideoTestSuite::start_dv()
 
 void VideoTestSuite::stop_dv()
 {
-    if (id_ == 1)
-        return;
     VideoConfig config("dv1394src");
     VideoLocal tx(config);
     tx.init();
@@ -156,8 +140,6 @@ void VideoTestSuite::stop_dv()
 
 void VideoTestSuite::start_stop_dv()
 {
-    if (id_ == 1)
-        return;
     VideoConfig config("dv1394src");
     VideoLocal tx(config);
     tx.init();
@@ -174,8 +156,6 @@ void VideoTestSuite::start_stop_dv()
 
 void VideoTestSuite::start_file()
 {
-    if (id_ == 1)
-        return;
     VideoConfig config("filesrc", videoFilename_);
     VideoLocal tx(config);
     tx.init();
@@ -189,8 +169,6 @@ void VideoTestSuite::start_file()
 
 void VideoTestSuite::stop_file()
 {
-    if (id_ == 1)
-        return;
     VideoConfig config("filesrc", videoFilename_);
     VideoLocal tx(config);
     tx.init();
@@ -204,8 +182,6 @@ void VideoTestSuite::stop_file()
 
 void VideoTestSuite::start_stop_file()
 {
-    if (id_ == 1)
-        return;
     VideoConfig config("filesrc", videoFilename_);
     VideoLocal tx(config);
     tx.init();
@@ -220,16 +196,10 @@ void VideoTestSuite::start_stop_file()
 }
 
 
-int mainVideoTestSuite(int argc, char **argv)
+int mainVideoTestSuite(int /*argc*/, char ** /*argv*/)
 {
-    if (!GstTestSuite::areValidArgs(argc, argv)) {
-        std::cerr << "Usage: " << "videoTester <0/1>" << std::endl;
-        return 1;
-    }
-    
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
     VideoTestSuite tester;
-    tester.set_id(atoi(argv[1]));
 
     Test::TextOutput output(Test::TextOutput::Verbose);
     return tester.run(output) ? EXIT_SUCCESS : EXIT_FAILURE;

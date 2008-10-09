@@ -18,8 +18,8 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _SYNC_TEST_SUITE_RTP_H_
-#define _SYNC_TEST_SUITE_RTP_H_
+#ifndef _SYNC_TEST_SUITE_H_
+#define _SYNC_TEST_SUITE_H_
 
 #include "gstTestSuite.h"
 
@@ -34,37 +34,37 @@ class SyncTestSuiteRtp
         {
             // DANGER: if this is too short you're likely to have synchronization issues
             testLength_ = 60000;
-            
-            TEST_ADD(SyncTestSuiteRtp::start_8ch_comp_rtp_audiofile_dv)
-            TEST_ADD(SyncTestSuiteRtp::stop_8ch_comp_rtp_audiofile_dv)
-            TEST_ADD(SyncTestSuiteRtp::start_stop_8ch_comp_rtp_audiofile_dv)
 
-        TEST_ADD(SyncTestSuiteRtp::start_audiotest_videotest_rtp);
-        TEST_ADD(SyncTestSuiteRtp::stop_audiotest_videotest_rtp);
-        TEST_ADD(SyncTestSuiteRtp::start_stop_audiotest_videotest_rtp);
+            TEST_ADD(SyncTestSuiteRtp::start_8ch_audiofile_dv)
+                TEST_ADD(SyncTestSuiteRtp::stop_8ch_audiofile_dv)
+                TEST_ADD(SyncTestSuiteRtp::start_stop_8ch_audiofile_dv)
 
-            TEST_ADD(SyncTestSuiteRtp::start_dv_audio_dv_video_rtp)
-            TEST_ADD(SyncTestSuiteRtp::stop_dv_audio_dv_video_rtp)
-            TEST_ADD(SyncTestSuiteRtp::start_stop_dv_audio_dv_video_rtp)
+                TEST_ADD(SyncTestSuiteRtp::start_audiotest_videotest);
+            TEST_ADD(SyncTestSuiteRtp::stop_audiotest_videotest);
+            TEST_ADD(SyncTestSuiteRtp::start_stop_audiotest_videotest);
+
+            TEST_ADD(SyncTestSuiteRtp::start_dv_audio_dv_video)
+                TEST_ADD(SyncTestSuiteRtp::stop_dv_audio_dv_video)
+                TEST_ADD(SyncTestSuiteRtp::start_stop_dv_audio_dv_video)
 
         }
 
-// some tests
+        // some tests
 
     private:
 
-        void start_8ch_comp_rtp_audiofile_dv();
-        void stop_8ch_comp_rtp_audiofile_dv();
-        void start_stop_8ch_comp_rtp_audiofile_dv();
+        void start_8ch_audiofile_dv();
+        void stop_8ch_audiofile_dv();
+        void start_stop_8ch_audiofile_dv();
 
-        void start_dv_audio_dv_video_rtp();
-        void stop_dv_audio_dv_video_rtp();
-        void start_stop_dv_audio_dv_video_rtp();
-        
-        void start_audiotest_videotest_rtp();
-        void stop_audiotest_videotest_rtp();
-        void start_stop_audiotest_videotest_rtp();
+        void start_dv_audio_dv_video();
+        void stop_dv_audio_dv_video();
+        void start_stop_dv_audio_dv_video();
+
+        void start_audiotest_videotest();
+        void stop_audiotest_videotest();
+        void start_stop_audiotest_videotest();
 };
 
-#endif // _SYNC_TEST_SUITE_RTP_H_
+#endif // _SYNC_TEST_SUITE_H_
 
