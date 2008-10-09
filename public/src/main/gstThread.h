@@ -19,18 +19,24 @@
 #ifndef __GST_THREAD__
 #define __GST_THREAD__
 #include "msgThread.h"
+#include "gst/gstBase.h"
 
 class GstThread
     : public MsgThread
 {
     public:
-        GstThread(){}
+        GstThread():video_(0),audio_(0){}
+        virtual ~GstThread();
     protected:
         virtual bool audio_start(MapMsg& msg) = 0;
-        virtual bool audio_stop(MapMsg& msg) = 0;
+        virtual bool audio_stop(MapMsg& msg);
         virtual bool video_start(MapMsg& msg) = 0;
-        virtual bool video_stop(MapMsg& msg) = 0;
+        virtual bool video_stop(MapMsg& msg);
+        void updateState();
 
+        GstBase* video_;
+        GstBase* audio_;
+        
     private:
 
         int main();
