@@ -25,14 +25,15 @@ int GstThread::main()
     bool flipflop = false;
     while(!done)
     {
-        if(g_main_context_iteration(NULL,FALSE))
-        {}
-        //    LOG_DEBUG("Events Dispatched g_main.");
+        if(g_main_context_iteration(NULL,FALSE)) 
+            continue;
+
+        std::cout << (flipflop ? "-\r" : " \r");
+        flipflop = !flipflop;
+        std::cout.flush();
         updateState();
         MapMsg f = queue_.timed_pop(100000);
         
-        std::cout << (flipflop? '\b': '.');
-        flipflop = !flipflop;
         if(f["command"].type() == 's')
         {
             std::string s;
