@@ -23,33 +23,37 @@
 
 #Midi Import
 
-#from twisted.internet import cfreactor
-#cfreactor.install()
+from twisted.internet import glib2reactor
+glib2reactor.install()
 
 from twisted.internet import reactor
 import pypm
 from midiIn import MidiIn
 from RTPServer import RTPServer
-#epollreactor.install()
 
 #Log import
 from utils import log
-
+import sys
 #redexp
 import re
-
+import signal
 #log = log.start('info', 1, 0, 'midiStream')
 
 #class MidiStream(stream.DataStream):
-class MidiStream():
+class MidiStream(object):
     """Class MIDI
     """
     
-    def __init__(self, address='127.0.0.1'):
+    def __init__(self, address):
+        
         
         #init var
-        self.address = address
-                
+        if self.check_ip(address):
+            self.address = address
+        else:
+            print "Please enter a correct formated address "
+            sys.exit(1)
+
         #initialisation du midi
         pypm.Initialize()
 	   
@@ -57,29 +61,43 @@ class MidiStream():
         #witness for receiving data is self.server.receivingMidiData
         #latency is self.server.midiOut.latency
         #midi output device list is in self.midiOut.midiDeviceList
-        self.server = RTPServer()
+        self.server = RTPServer('127.0.0.1')
 
         #listenUDP(port sur lequel on lit les donnees midi, server)
-        reactor.listenUDP(44000,self.server)
+        self.listen_s = reactor.listenUDP(44000,self.server)
 
         #MidiIn ( "adresse sur lequel envoyer les donnees midi" , port sur lequel envoyer les midi data)
         #midi input device list is in self.midiIn.midiDeviceList
         #witness for sending data is in self.midiIn.sendingMidiData
         self.midiIn = MidiIn(self.address,44000)
+        signal.signal(signal.SIGINT, self.handler)
 
-        #reactor.run()
 
+    def handler(self, signum, frame):
+        #stopping threads and reactor
+        log.info("SIGINT caught! Shutting down midi module.")
+        self.stop_sending()
+        self.stop_receiving()
 
+        #a enlever dans final version
+        reactor.stop()
+        #A mettre
+        #self.listen_s.stopListenning()
+        #self.midiIn.listen_c.stopListenning()
+        
     def set_ip(self,address):
         """Set ip address of the midi stream server
         """
         if self.check_ip(address):
             self.address = address
-            self.midiIn.address.client.peerAddress = address
+            self.midiIn.client.peerAddress = address
             log.info("IP address of the server has been set")
+            return 0
         else:
             self.address = '127.0.0.1'
-            log.warning("A loopback address has been assign")
+            print "Please enter a correct formated address "
+            log.error("User attemp to assign a bad formated ip")
+            return -1
 
             
     def check_ip(self,address):
@@ -109,7 +127,7 @@ class MidiStream():
         returns 0 if can start sending else -1
         """
         res = self.midiIn.start_sending()
-        log.info('Sending notes has been started')
+        #log.info('Sending notes has been started')
         return res
     
 
@@ -117,13 +135,13 @@ class MidiStream():
         """function stop_sending
         """
         res = self.midiIn.stop_sending()
-
+        return res
 
     def set_input_device(self, device):
         """function set_input_device, setting midi input device
         """
-        self.midiIn.set_device(device)
-
+        res = self.midiIn.set_device(device)
+        return res
 		
     def get_input_devices(self):
         """function get_input_device , return list of midi devices
@@ -141,12 +159,12 @@ class MidiStream():
 		
 
 #OUTPUT		
-    def start_receving(self):
+    def start_receiving(self):
         """function start_receving
         returns 0 if started else -1
         """
         res = self.server.start_receiving()
-        log.info('Receiving notes has been started')
+        #log.info('Receiving notes has been started')
         return res
 
     
@@ -160,8 +178,8 @@ class MidiStream():
     def set_output_device(self, device):
         """function set_input_device
         """
-        self.server.midiOut.set_device(device)
- 
+        res = self.server.midiOut.set_device(device)
+        return res
    
     def get_output_devices(self):
         """function get_input_device, return list of midi device
@@ -175,6 +193,8 @@ class MidiStream():
         """
         if ( latency >= 0 ):
             setattr(self.server.midiOut, "latency", latency)
+        else:
+            print 'You got to enter a positive latency' #print ou log?
 
 
     def get_receiving_witness(self):
@@ -186,38 +206,41 @@ class MidiStream():
     def get_server_sync_witness(self):
         """return the sync witness, 1 if sync , 0 if not
         """
-        return gettattr(self.server, "sync")
+        return getattr(self.server, "sync")
 
 
     def __del__(self):
 
+        #log.info("pyPortMidi terminate")
         del self.server
         del self.midiIn
         del self.address
-	print 'pypm terminate'	
         #Ending pyport midi
         pypm.Terminate()	
 
 
 
 if __name__ == "__main__":
-    midi = MidiStream()
 
-    #launching task 
-    #midi.midiIn.sendTime.start(0.5)
-    #midi.midiIn.client.checker.start(1)
+    midi = MidiStream('127.0.0.1')
 
     print midi.get_input_devices()
+    midi.set_input_device(3)
     midi.set_input_device(1)
+    midi.set_input_device(1)
+
     print midi.get_output_devices()
     midi.set_output_device(8)
+    midi.set_output_device(5)
+    midi.set_output_device(8)
+    
+    
+    #reactor.callLater(20, midi.stop_sending)
+    #reactor.callLater(20, midi.stop_receiving)
+    
 
-    #while(midi.get_client_sync_witness() != 1): pass
-
-    reactor.callLater(2,midi.start_receving)
+    reactor.callLater(2,midi.start_receiving)
 
     reactor.callLater(2,midi.start_sending)
-  
-
     
     reactor.run()

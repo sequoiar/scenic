@@ -14,7 +14,7 @@ OUTPUT = 1
 
 class MidiOut(object):
 	
-	def __init__(self, permisif):
+	def __init__(self, permissif):
 		
 		log.info ("OUTPUT: Initialize midi output")
 		
@@ -45,6 +45,8 @@ class MidiOut(object):
 		self.isListening = 0
 		self.publy_flag = False
 		self.start_time = 0
+		self.permissif = permissif
+		
 		#tmp
 		self.lastTime = 0
 		
@@ -52,8 +54,7 @@ class MidiOut(object):
 
 	def start_publy(self):
 		"""Start publying notes
-		"""
-		
+		"""		
 		self.send_note_off()
 		self.publy_flag = True
 		reactor.callInThread(self.publy_midi_notes)
@@ -92,7 +93,6 @@ class MidiOut(object):
 	def get_devices(self):
 		"""list and set midi device
 		"""
-		print str(pypm.GetDefaultOutputDeviceID())
 		self.midiDeviceList = []
 		for loop in range(pypm.CountDevices()):
 			interf, name, inp, outp, opened = pypm.GetDeviceInfo(loop)
@@ -103,6 +103,8 @@ class MidiOut(object):
 	def set_device(self, device):
 		"""set output midi device
 		"""
+
+		self.get_devices()
 		try:
 			dev = int(device)
 		except ValueError:
@@ -116,14 +118,17 @@ class MidiOut(object):
 			if self.MidiOut is None :
 				#Initializing midi input stream
 				self.MidiOut = pypm.Output(self.midiDevice, 0)
+				return 0
 			else:
 				#delete old midi device
 				del self.MidiOut
 				#Initializing new midi input stream
 				self.MidiOut = pypm.Output(self.midiDevice, 0)
 				log.info( "OUTPUT: Input device is set up")
+				return 0
 		else:
 			log.error("OUTPUT: Incorrect device selected, can't setting up")
+			return -1
 
 		
 	def get_device_info(self):
@@ -152,17 +157,27 @@ class MidiOut(object):
 		"""PlayMidi Note
 	   	Separate midi infos to choose the good function for the good action
 		"""
-		#Creating a list with midi notes late
-		new_list = [midiNotes[i][1] for i in range(len(midiNotes)) if (pypm.Time() >  midiNotes[i][1]) ]
+		
+		if self.permissif :
+			#on fait une liste des notes en retard pour le signaler
+			new_list = [midiNotes[i][1] for i in range(len(midiNotes)) if (pypm.Time() >  midiNotes[i][1]) ]
 
-		#Playing note on the midi device
-		self.MidiOut.Write(midiNotes)
+			if ( len(new_list) > 0 ) :
+				self.nbXRun += 1
+				l = "OUTPUT: time=" + str(pypm.Time()) + "ms  can't play in time , " + str(len(midiNotes)) + " notes - late of " + str(pypm.Time() - new_list[0]) + " ms"
+				log.error(l)
+			note_filtred = midiNotes
+		else:
+		#filtre note off program change pour note en retard
+		#si mode non permissif on skip les note enn retard sauf note off et program change
+			note_filtred = [midiNotes[i] for i in range(len(midiNotes)) if (midiNotes[i][1] >= pypm.Time() or midiNotes[i][0][0] == int(0xc0) or midiNotes[i][0][2] == 0) ]
 
-		#for i in range(len(new_list)):
-		if len(new_list) > 0 :		
-			self.nbXRun += 1
-			print "OUTPUT: " + str(pypm.Time()) + " xrun no. " + str(self.nbXRun) + " can't play in time , " + str(len(midiNotes)) + " notes - late of " + str(pypm.Time() - new_list[0]) + " ms"		
-
+			if ( len(note_filtred) < len(midiNotes)):
+				l = "OUTPUT: time=" + str(pypm.Time()) + "ms can't play in time,  " + str(len(midiNotes)-len(note_filtred)) + " note(s) skipped"
+				log.error(l)
+				
+        #Playing note on the midi device
+		self.MidiOut.Write(note_filtred)	
 
 	def publy_midi_notes(self):
 		d = defer.Deferred()
@@ -172,22 +187,18 @@ class MidiOut(object):
 			if ( self.midiOutCmdList.avail_for_get() > 0 ):
 				note = self.midiOutCmdList.buffer[self.midiOutCmdList.start]
 
-				#if they are in time ( 2 is for processing time )
-				if (note.time <= pypm.Time() + 2):
+				#if they are in time ( 4 is for processing time )
+				if (note.time <= pypm.Time() + 4):
 			                #get notes from the buffer
 					noteList = self.midiOutCmdList.get()
 
-				    #checking order ( a enlever, test fait au niveau ringbuffer)
-					if ( self.lastTime > noteList[0].time):
-						print "______________________ERROR____________ERROR___________"
-					self.lastTime = noteList[0].time
-
-			                #formating notes
+			        #formating notes
 					midiNotes = [ [[noteList[i].event, noteList[i].note, noteList[i].velocity], noteList[i].time] for i in range(len(noteList)) ] 
-
+					#a garder pour faire control du nb notes
+					self.nbNote += len(midiNotes)
 			
 			if (len(midiNotes)>0):
-				self.play_midi_note(midiNotes)
+				reactor.callFromThread(self.play_midi_note,midiNotes)
 
 			time.sleep(0.001)
 		

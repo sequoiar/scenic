@@ -8,10 +8,10 @@ from midiObject import packetTime
 from listCirc import  PacketCirc
 from ringBuffer import myRingBuffer
 from twisted.internet.protocol import DatagramProtocol
-from twisted.internet import udp, task
+from twisted.internet import udp, task, defer, reactor
 class RTPClient(DatagramProtocol):
 
-    def __init__(self, peerAddress="127.0.0.1", port=44000):
+    def __init__(self, peerAddress, port=44000):
     
         log.info("INPUT: Initialize RTP streamer")
         
@@ -21,24 +21,25 @@ class RTPClient(DatagramProtocol):
         self.peerAddress = peerAddress
         self.port = port
         self.startChrono = []
-
+        
         #buffer de midi data
         self.midiInCmdList = myRingBuffer()
 
         #buffer of midi notes sent in order to resend in case of losy packet network 
         self.packetsSentList = PacketCirc(512)
-        
-        self.releaser = task.LoopingCall(self.continue_streaming)   
 
         self.lastSync = 0
 
         #flag
         self.sync = 0
         self.sendingMidiData = 0
+        self.streaming_flag = False
 
         #launching sync checker
         self.checker = task.LoopingCall(self.check_sync)
         self.checker.start(1)
+
+        self.continueS = task.LoopingCall(self.continue_streaming)
 
 
     def check_sync(self):
@@ -50,7 +51,7 @@ class RTPClient(DatagramProtocol):
 
 
     def startProtocol(self):
-        """needed by twisted super class
+        """needed by twisted super class??? peut etre
         """
         pass
 
@@ -74,6 +75,7 @@ class RTPClient(DatagramProtocol):
                     #self.start_streaming()
 
             else:
+                tt = time.time()
             	#Sinon cest une demande de paquet perdu
             	retransmitPacket = self.packetsSentList.find_packet(int(data))
             	#si on la dans le buffer de sauvegarde on revoie sinon rien
@@ -83,20 +85,23 @@ class RTPClient(DatagramProtocol):
                     chunk = header + ch
                     log.warning("INPUT: Resending lost packet to the server")
                     self.transport.write(chunk,(self.peerAddress, self.port))
+                
         else:
             log.warning("INPUT: Bad packet format")
 
 
     def start_streaming(self):
 
-        if ( not self.releaser.running ):
-			#check sync to start streaminglog
-			if (self.sync):
-				self.releaser.start(0.2)
-				return 0
-			else:
-				log.error("INPUT: can't start streaming if not sync with the server")
-				return -1			
+        if ( not self.continueS.running ):
+            #check sync to start streaminglog
+            if (self.sync):
+                self.continueS.start(0.2)
+                log.info("INPUT: RTPClient start streaming")
+                return 0
+            else:
+                log.error("INPUT: can't start streaming if not sync with the server")
+                return -1			
+
 
     def send_midi_data(self):
         #Enable witness
@@ -104,7 +109,6 @@ class RTPClient(DatagramProtocol):
 
         #getting new notes to send
         c = self.midiInCmdList.get()
-        #time = c[0].time
 
         #marshalling
         chunk = cPickle.dumps(c,1)
@@ -117,33 +121,35 @@ class RTPClient(DatagramProtocol):
         self.packetsSentList.to_list(pack)
                 
         #Writting it to the socket
-        chunk = header + chunk
-            
+        chunk = header + chunk   
         if ( self.sync ):
             self.transport.write(chunk,(self.peerAddress, self.port))
 
         #disable witness
         self.sendingMidiData = 0
-
-
+        
 
     def continue_streaming(self):
         """startStreaming launch streaming of midi notes to client
         """
+        #d = defer.Deferred()
 
-        #sinon on envoie un packet vide
+        #while ( self.streaming_flag ):
+            #sinon on envoie un packet vide
         header = self.generateRTPHeader(0)
         chunk = "000"
         pack = packetTime(self.seqNo, chunk)
         self.packetsSentList.to_list(pack)
         chunk = header + chunk
         self.transport.write(chunk,(self.peerAddress, self.port))
+        #time.sleep(0.2)
+        
+        #return d
 
 
     def send_midi_time(self, time):
         """Send midi time to remote peer
-        """
-        
+        """       
         header = self.generateRTPHeader(0)
         chunk = "m " + str(time)
         chunk = header + chunk
@@ -153,10 +159,8 @@ class RTPClient(DatagramProtocol):
     def stop_streaming(self):
         """Stop RTP streaming 
         """
-        log.info ("INPUT: Stoping streaming midi notes" )
-        if self.releaser is not None:
-            if self.releaser.running:
-                self.releaser.stop()
+        log.info ("INPUT: RTPClient stop streaming midi notes" )
+        self.streaming_flag = False
 
 
     def generateRTPHeader(self, timestamp):
@@ -225,5 +229,5 @@ class RTPClient(DatagramProtocol):
 
     
     def __del__(self):
-		del self.packetsSentList
-		del self.midiInCmdLists
+        del self.packetsSentList
+        del self.midiInCmdLists

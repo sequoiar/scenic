@@ -1,4 +1,4 @@
-class MidiNote():
+class MidiNote(object):
 
 	def __init__(self, time, event, note, velocity, what=0):
 		self.time = time
@@ -7,7 +7,7 @@ class MidiNote():
 		self.velocity = velocity
 
 
-class packetTime():
+class packetTime(object):
 	
     def __init__(self, seqNo, packet, time=0):
         self.seqNo = seqNo

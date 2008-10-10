@@ -2,7 +2,7 @@ import logging
 from midiObject import MidiNote
 
 class myRingBuffer(object):
-    def __init__(self, bufferSize=25):
+    def __init__(self, bufferSize=2048):
         self.bufferSize = bufferSize
         self.start = 0
         self.end = 0
@@ -30,15 +30,14 @@ class myRingBuffer(object):
         if ( self.avail_for_put > 0):
             #if the last midi time note is inferiror to the new note
             if ( self.buffer[self.end - 1].time <= newNote.time ):
-                #print str(self.buffer[self.end - 1]) + ' cmp to ' + str(newNote.time
-                #print 'put'
                 self.buffer[self.end] = newNote
                 self.end = (self.end + 1) % self.bufferSize
             else:
                 #sinon on regarde ou il faut l inserer
                 self.find_place(newNote)
         else:
-            log.error("Buffer full")
+            #arreter application??? risque de perte de note
+            log.error("Buffer full, can forget some data!!!")
       
     #return nb of data available to get  
     def avail_for_get(self):
@@ -65,8 +64,7 @@ class myRingBuffer(object):
         else:
             #si end > start
             if self.end >= self.start :
-                for i in range(self.end - 1, self.start-1, -1):
-                
+                for i in range(self.end - 1, self.start-1, -1):              
                     if ( self.buffer[i-1].time <= note.time and self.buffer[i].time >= note.time):
                         g = i                       
                         break
@@ -82,7 +80,8 @@ class myRingBuffer(object):
                         if ( self.buffer[i-1].time <= note.time and self.buffer[i].time >= note.time):
                             g = i
                             break
-                        
+            
+            
         if ( g == -1):
             log.error("Can't find the correct place for the new note")
         else:
@@ -99,7 +98,6 @@ class myRingBuffer(object):
                 for j in range(self.end, -1, -1):
                     self.buffer[j] = self.buffer[j-1]
 
-                #si g == 0 on ne va pas plus loin pour le deplacement des notes
                 if g != 0 :
                     self.buffer[0] = self.buffer[self.bufferSize-1]
 
@@ -110,6 +108,10 @@ class myRingBuffer(object):
             #on insert la nouvelle note
             self.buffer[g] = note
             self.end = (self.end + 1 ) % self.bufferSize                
+
+            #si end < start 
+            #on decal de start a 0 puis de 0 a end
+            #enfin on insert
 
 
 if __name__ == "__main__":
