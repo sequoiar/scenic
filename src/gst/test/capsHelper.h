@@ -91,7 +91,7 @@ static std::string tcpGetCaps(int port)
 
 #include <errno.h>
 
-static bool tcpSendCaps(int port, const std::string &caps)
+static bool tcpSendCaps(const char *ip, int port, const std::string &caps)
 {
     MapMsg msg;
     std::ostringstream s;
@@ -106,7 +106,7 @@ static bool tcpSendCaps(int port, const std::string &caps)
     {
         try
         {
-            bool ret = tcp.socket_connect_send("127.0.0.1", msg);
+            bool ret = tcp.socket_connect_send(ip, msg);
             if(ret)
                 return true;
         }
