@@ -38,7 +38,6 @@ int GstThread::main()
         {
             std::string s;
             f["command"].get(s);
-            LOG_DEBUG(s);
             
             if(s == "quit")
             {

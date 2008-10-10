@@ -146,7 +146,7 @@ bool Parser::stringify(MapMsg& cmd_map, std::string& rstr)
                     {
                     const std::vector<double> &v = it->second;
                     sstr << v[0];
-                    LOG_WARNING("mapMsg vector passing only first element");
+                    //TODO: parse and tokenize vectors
                     }
                     break;
 
