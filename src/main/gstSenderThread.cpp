@@ -30,6 +30,7 @@ bool GstSenderThread::video_start(MapMsg& msg)
     
     try
     {
+        //VideoConfig config("dv1394src");
         VideoConfig config("videotestsrc");
         SenderConfig rConfig(msg["codec"], msg["address"] , msg["port"]);
         video_ =  new VideoSender(config, rConfig);
