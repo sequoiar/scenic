@@ -41,7 +41,7 @@ short Sropulpof::run()
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, POF_1_IP));
         vTx->start();
 
-        std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver(POF_1_IP));
+        std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver(POF_0_IP));
         aRx->pause();
         aRx->start();
         
@@ -59,7 +59,7 @@ short Sropulpof::run()
         aTx->start();
         assert(tcpSendCaps(Ports::CAPS_PORT, aTx->getCaps()));
         
-        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(POF_0_IP));
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(POF_1_IP));
         usleep(100000);
         vRx->start();
 
