@@ -87,11 +87,9 @@ void RtpAudioTestSuite::start_2ch_audiotest()
     else {
         AudioConfig aConfig("audiotestsrc", numChannels);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
-
         tx->start();
 
         TEST_ASSERT(tcpSendCaps(A_PORT + 100, tx->getCaps()));
-        
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
