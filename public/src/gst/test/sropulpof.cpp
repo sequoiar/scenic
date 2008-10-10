@@ -23,6 +23,9 @@
 #include "eventLoop.h"
 #include <cassert>
 
+const char *POF_0_IP = "10.10.10.189";
+const char *POF_1_IP = "10.10.10.238";
+
 const short Sropulpof::NUM_CHANNELS = 4;
 
 Sropulpof::Sropulpof(short pid) : pid_(pid)
@@ -35,10 +38,10 @@ short Sropulpof::run()
 {
     if (pid_ == 0) {
         VideoConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, "10.10.10.189"));
+        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, POF_1_IP));
         vTx->start();
 
-        std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver());
+        std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver(POF_1_IP));
         aRx->pause();
         aRx->start();
         
@@ -52,11 +55,11 @@ short Sropulpof::run()
     }
     else {
         AudioConfig aConfig("jackaudiosrc", Sropulpof::NUM_CHANNELS);
-        std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig, "10.10.10.238"));
+        std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig, POF_0_IP));
         aTx->start();
         assert(tcpSendCaps(Ports::CAPS_PORT, aTx->getCaps()));
         
-        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(POF_0_IP));
         usleep(100000);
         vRx->start();
 
