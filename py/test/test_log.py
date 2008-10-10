@@ -23,12 +23,7 @@ import os
 import sys
 from twisted.trial import unittest
 
-#import address_book
-d = os.path.abspath('../utils/')
-sys.path.append(d)
-__import__('log')
-
-import log
+from utils import log
 #test to_utf and open
 
 def generateString(sauf = ''):

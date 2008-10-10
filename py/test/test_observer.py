@@ -22,14 +22,8 @@
 import os
 import sys
 from twisted.trial import unittest
-
-#import observer
-d = os.path.abspath('../utils/')
-sys.path.append(d)
-__import__('observer')
-
-from observer import Observer
-from observer import Subject
+from utils.observer import Observer
+from utils.observer import Subject
 
 
 class lillController():
@@ -166,8 +160,6 @@ class TestObserver4(unittest.TestCase):
         
         #test if NotImplementedError is called
         self.failUnlessRaises(NotImplementedError,self.gs.change_silly_var)
-        
-        #ne dois pas fonctionner !!! problem de raise NotImplementedError
         
 ############# for test Subject ################
 class GoodSubject(Subject):

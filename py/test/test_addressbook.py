@@ -24,10 +24,6 @@ import sys
 import random
 import os
 
-#import address_book
-d = os.path.abspath('../')
-sys.path.append(d)
-__import__('addressbook')
 from addressbook import AddressBook
 
 

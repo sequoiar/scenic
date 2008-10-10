@@ -23,11 +23,7 @@ import os
 import sys
 from twisted.trial import unittest
 
-#import address_book
-d = os.path.abspath('../utils/')
-sys.path.append(d)
-__import__('i18n')
-import i18n
+from utils import i18n
 
 
 def generateString(sauf = ''):
