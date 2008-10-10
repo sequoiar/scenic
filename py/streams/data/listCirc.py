@@ -1,7 +1,7 @@
 import time
 
 #motherclass
-class ListCirc():
+class ListCirc(object):
 	
 	def __init__(self, listeSize):
 		self.index = 0

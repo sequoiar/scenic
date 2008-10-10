@@ -11,7 +11,8 @@ from midiOut import MidiOut
 
 class RTPServer(DatagramProtocol):
 
-    def __init__(self, streamerAddress="127.0.0.1", streamerPort=44010, permisif=1 ):
+    def __init__(self, streamerAddress, streamerPort=44010, permissif=True ):
+        
         log.info( "OUTPUT: Initializing RTP receiver" )
         
         #Init var
@@ -29,13 +30,13 @@ class RTPServer(DatagramProtocol):
         self.clientConnect = 0
 
         #Launching midi Out writter
-        self.midiOut = MidiOut(permisif)
+        self.midiOut = MidiOut(permissif)
         
         #looping call check sync
         self.releaser = task.LoopingCall(self.check_sync)
         self.sendTime = task.LoopingCall(self.send_local_time)
         self.nbNotes = 0
-
+        self.start_time = 0
         #tmp
         self.lastMidiNoteTime = 0
 
@@ -44,7 +45,7 @@ class RTPServer(DatagramProtocol):
     def launch(self):
         self.releaser.start(1)
         self.sendTime.start(0.5)
-
+        log.info( "OUTPUT: RTP receiver launched" )
 		
     def start_receiving(self):
         """start midi output and get notes from the socket
@@ -52,6 +53,7 @@ class RTPServer(DatagramProtocol):
         if ( self.sync ):
             if ( not self.midiOut.MidiOut is None):
                 self.midiOut.start_publy()
+                log.info("OUTPUT: RTPServer start to receive midi data")
                 return 0
             else:
                 log.error("OUTPUT: Can't start receiving without output device set")
@@ -66,10 +68,12 @@ class RTPServer(DatagramProtocol):
         """
         #on arrete la publicatiom des notes
         self.midiOut.stop_publy()
+        
         #on vide les buffers
         self.midiOut.midiOutCmdList.flush()
         self.midiOut.lastMidiTimeDiff.flush()
 
+        log.info("OUTPUT: RTPServer stop receiving midi data")
 
     def check_sync(self):
         """Checking Synchronisation
@@ -89,7 +93,7 @@ class RTPServer(DatagramProtocol):
                 self.sync = 1
                 self.lastDelays.flush()
                 #uniquement pour test ( le start receiving ne sera autoriser uniquement s il est synchro
-                self.start_receiving()
+                #self.start_receiving()
 
             #sending synchro packet
             header = self.generateRTPHeader()
@@ -136,6 +140,7 @@ class RTPServer(DatagramProtocol):
         else:
             self.actualSeqNo += 1
 
+        
       	#Parsing packet header
         midiChunk = self.parseRTPHeader(data)
 
@@ -162,27 +167,28 @@ class RTPServer(DatagramProtocol):
                     self.midiTimeSync = 1
 
             else:
-                #if listening
-                if ( not self.midiOut.MidiOut is None):
+                
+                if ( self.midiOut.publy_flag ):
                     #enable witness
-                    
+                    self.midiOut.start_time = time.time()
                     self.receivingMidiData = 1
                     self.nbNotes += 1
                     #unpickle list midi note in the packet               
                     midiNote = cPickle.loads(midiChunk)
-                    
+                    #profiter du parcours pour appliquer les timestamps
                     for i in range(len(midiNote)):
+                        midiNote[i].time = midiNote[i].time + self.midiOut.midiTimeDiff + self.midiOut.latency - int(self.midiOut.delay) 
                         #Adding the note to the playing buffer
                     	self.midiOut.midiOutCmdList.put(midiNote[i])
 
                     #disable witness
                     self.receivingMidiData = 0
-                    self.midiOut.publy_midi_note()
     
 
     def ask_packet(self,seqNo):
         """send a demand of lost packet
         """
+        self.tmp = time.time()
         seqNo -= 1
         log.warning("OUTPUT: Asking lost packet to client")
 		
