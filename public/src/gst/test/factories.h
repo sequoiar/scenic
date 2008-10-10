@@ -12,9 +12,9 @@
 #include "hostIP.h"
 #include "ports.h"
 
-static std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
+static std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig, const char* ip)
 {
-    SenderConfig rConfig("vorbis", get_host_ip(), Ports::A_PORT);
+    SenderConfig rConfig("vorbis", ip, Ports::A_PORT);
     std::auto_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
     tx->init();
     return tx;
@@ -41,9 +41,9 @@ static std::auto_ptr<VideoReceiver> buildVideoReceiver()
 }
 
 
-static std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
+static std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig, const char *ip)
 {
-    SenderConfig rConfig("h264", get_host_ip(), Ports::V_PORT);
+    SenderConfig rConfig("h264", ip, Ports::V_PORT);
     std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
     tx->init();
     return tx;
