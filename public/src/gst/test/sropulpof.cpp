@@ -36,6 +36,7 @@ Sropulpof::Sropulpof(short pid) : pid_(pid)
 
 short Sropulpof::run()
 {
+	// VIDEO_SENDER_ROOM
     if (pid_ == 0) {
         VideoConfig vConfig("v4l2src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, POF_1_IP));
@@ -54,10 +55,11 @@ short Sropulpof::run()
         vTx->stop();
     }
     else {
+	    // AUDIO_SENDER_ROOM
         AudioConfig aConfig("jackaudiosrc", Sropulpof::NUM_CHANNELS);
         std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig, POF_0_IP));
         aTx->start();
-        assert(tcpSendCaps(Ports::CAPS_PORT, aTx->getCaps()));
+        assert(tcpSendCaps(POF_0_IP, Ports::CAPS_PORT, aTx->getCaps()));
         
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(POF_1_IP));
         usleep(100000);
