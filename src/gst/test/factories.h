@@ -21,20 +21,20 @@ static std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig, co
 }
 
 
-static std::auto_ptr<AudioReceiver> buildAudioReceiver()
+static std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *ip)
 {
     AudioReceiverConfig aConfig("jackaudiosink");
-    ReceiverConfig rConfig("vorbis", get_host_ip(), Ports::A_PORT, tcpGetCaps(Ports::CAPS_PORT));
+    ReceiverConfig rConfig("vorbis", ip, Ports::A_PORT, tcpGetCaps(Ports::CAPS_PORT));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
     return rx;
 }
 
 
-static std::auto_ptr<VideoReceiver> buildVideoReceiver()
+static std::auto_ptr<VideoReceiver> buildVideoReceiver(const char *ip)
 {
     VideoReceiverConfig vConfig("xvimagesink");
-    ReceiverConfig rConfig("h264", get_host_ip(), Ports::V_PORT, "");
+    ReceiverConfig rConfig("h264", ip, Ports::V_PORT, "");
     std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
     rx->init();
     return rx;
