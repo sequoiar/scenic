@@ -41,6 +41,7 @@
 #include "tcpServer.h"
 #include <sstream>
 
+#define ALLOW_ANY_ADDR
 #ifdef ALLOW_ANY_ADDR
 #define INADDR   INADDR_ANY
 #else
