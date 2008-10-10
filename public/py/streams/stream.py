@@ -19,7 +19,8 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 # App imports
-
+import time
+from twisted.internet import reactor
 class Streams(object):
     """Class representing a group of media streams, a master stream.
     """
@@ -43,6 +44,7 @@ class Streams(object):
         print 'CORE:', core
         if kind in self._kinds:
             dict_name = "_".join([kind, name])
+            print dict_name
             if dict_name in self.streams:
                 return 0
             else:
@@ -109,11 +111,17 @@ class Streams(object):
         """
         if address:
             self.mode = 'send'
+            #TODO: make sure video is first
+#            self.streams["video_a"].start_sending(address,channel) 
+#            reactor.callLater(3, self.streams["audio_a"].start_sending, address, channel) 
             for stream in self.streams.values():
                 stream.start_sending(address, channel)
             return 'Starting sending...'
         else:
             self.mode = 'receive'
+            #TODO: make sure video is first
+#            self.streams["video_a.rem"].start_receving(channel) 
+#            self.streams["audio_a.rem"].start_receving(channel) 
             for stream in self.streams.values():
                 stream.start_receving(channel)
             return 'Starting receving...'
