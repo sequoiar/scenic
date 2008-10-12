@@ -26,6 +26,7 @@
 #include "codec.h"
 #include "logWriter.h"
 #include <string>
+#include <algorithm>
 
 const int RemoteConfig::PORT_MIN = 1024;
 const int RemoteConfig::PORT_MAX = 65000;
