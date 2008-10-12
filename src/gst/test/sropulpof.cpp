@@ -22,6 +22,7 @@
 #include "factories.h"
 #include "eventLoop.h"
 #include <cassert>
+#include <cstdlib>
 
 const char *POF_0_IP = "10.10.10.238";
 const char *POF_1_IP = "10.10.10.189";

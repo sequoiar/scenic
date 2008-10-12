@@ -11,6 +11,7 @@
 #include "capsHelper.h"
 #include "hostIP.h"
 #include "ports.h"
+#include <memory>
 
 static std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig, const char* ip)
 {
