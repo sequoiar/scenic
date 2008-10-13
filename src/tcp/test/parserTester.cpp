@@ -14,9 +14,9 @@ class ParserTester : public Test::Suite
         ParserTester(char** argv):arg(argv[1])
         {
 
-//            TEST_ADD(ParserTester::tokenize_test)
+            TEST_ADD(ParserTester::tokenize_test)
 //            TEST_ADD(ParserTester::stringify_test)
-            TEST_ADD(ParserTester::roundtrip_test)
+//            TEST_ADD(ParserTester::roundtrip_test)
 
         }
 
@@ -30,8 +30,9 @@ class ParserTester : public Test::Suite
 
 void ParserTester::tokenize_test()
 { 
-    TEST_ASSERT(1);
-    TEST_THROWS(LOG_DEBUG("here"),Except);
+    std::string str = "init: it=103945 mystring=\"\\\"bar you\\\"\" Hellotab=1.1 2.2 ";
+    MapMsg mymap;
+    TEST_ASSERT(Parser::tokenize(str, mymap));
 }
 
 void ParserTester::stringify_test()
