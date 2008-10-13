@@ -190,7 +190,6 @@ bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
 
             std::string quote = lstr.substr(1, end_quote-1);    //strip begin and end quotes
             quote = strUnEsq(quote);                            //clean any escape backslashes
-            LOG_DEBUG("KEY:" << key_str << "VAL:" << quote );
 
             cmd_map[key_str] = quote;                           //insert key,value into map
             lstr.erase(0,end_quote);
