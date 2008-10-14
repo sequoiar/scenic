@@ -24,6 +24,7 @@ class Sropulpof
 {
     public:
         Sropulpof(short pid);
+        void fake();
         short run();
         static const char *usage() { return "Usage: pof <0/1>"; }
 

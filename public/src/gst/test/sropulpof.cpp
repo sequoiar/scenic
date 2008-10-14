@@ -35,13 +35,22 @@ Sropulpof::Sropulpof(short pid) : pid_(pid)
         THROW_ERROR(Sropulpof::usage());
 }
 
+void Sropulpof::fake()
+{
+        VideoConfig vConfig("v4l2src"); 
+        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, POF_1_IP));
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(POF_1_IP));
+}
+
 short Sropulpof::run()
 {
 	// VIDEO_SENDER_ROOM
     if (pid_ == 0) {
+#if 0       // temporarily remove video
         VideoConfig vConfig("v4l2src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, POF_1_IP));
         vTx->start();
+#endif
 
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver(POF_0_IP));
         aRx->pause();
@@ -50,10 +59,10 @@ short Sropulpof::run()
 
         BLOCK();
         assert(aRx->isPlaying());
-        assert(vTx->isPlaying());
+     //   assert(vTx->isPlaying());
 
         aRx->stop();
-        vTx->stop();
+      //  vTx->stop();
     }
     else {
 	    // AUDIO_SENDER_ROOM
@@ -62,16 +71,18 @@ short Sropulpof::run()
         aTx->start();
         assert(tcpSendCaps(POF_0_IP, Ports::CAPS_PORT, aTx->getCaps()));
         
+#if 0
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(POF_1_IP));
         usleep(100000);
         vRx->start();
+#endif
 
         BLOCK();
         assert(aTx->isPlaying());
-        assert(vRx->isPlaying());
+     //   assert(vRx->isPlaying());
 
         aTx->stop();
-        vRx->stop();
+      //  vRx->stop();
     }
     return 0;
 }
