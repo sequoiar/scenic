@@ -21,7 +21,8 @@
 #include "logWriter.h"
 #include "parser.h"
 #include <errno.h>
-#include <string.h>
+
+
 class TcpLogFunctor : public LogFunctor
 {
 public:
@@ -29,6 +30,7 @@ public:
     TcpThread& tcp_;
     void operator()(LogLevel&,std::string& msg);
 };
+
 
 void TcpLogFunctor::operator()(LogLevel& level,std::string& msg)
 {
@@ -38,6 +40,17 @@ void TcpLogFunctor::operator()(LogLevel& level,std::string& msg)
     tcp_.send(m);
 }
 
+
+static std::string get_line(std::string& msg)
+{
+    std::string ret;
+    std::string::size_type pos = msg.find_first_of("\n\r");
+    ret = msg.substr(0,pos+2);
+    msg.erase(0,pos+2);
+    return ret;
+}
+
+
 int TcpThread::main()
 {
     bool quit = false;
@@ -46,50 +59,56 @@ int TcpThread::main()
 
     try
     {
-    while(!quit)
-    {
-        serv_.socket_bind_listen();
-        while(!serv_.accept())
+        while(!quit)
         {
-            if((quit = gotQuit()))
-                return 0;
-            usleep(10000);
-        }
-        try
-        {
-            LOG_INFO("Got Connection.");
-            if(logFlag_)
-                LOG::register_cb(&lf_);
-            while(serv_.connected())
+            serv_.socket_bind_listen();
+            while(!serv_.accept())
             {
                 if((quit = gotQuit()))
-                {
-                    break;
-                }
-                if(serv_.recv(msg))
-                {
-                    MapMsg mapMsg;
-                    if(Parser::tokenize(msg, mapMsg))
-                        queue_.push(mapMsg);
-                    else
-                        LOG_WARNING("Bad Msg Received.");
-                }
-                else
-                    usleep(1000);
+                    return 0;
+                usleep(10000);
             }
+            try
+            {
+                LOG_INFO("Got Connection.");
+                if(logFlag_)
+                    LOG::register_cb(&lf_);
+                while(serv_.connected())
+                {
+                    if((quit = gotQuit()))
+                    {
+                        break;
+                    }
+                    if(serv_.recv(msg))
+                    {
+                        std::string line = get_line(msg);
+                        do
+                        {
+                            MapMsg mapMsg;
+                            if(Parser::tokenize(line, mapMsg))
+                                queue_.push(mapMsg);
+                            else
+                                LOG_WARNING("Bad Msg Received.");
+                            line = get_line(msg);
+                        }
+                        while(!line.empty());
+                    }
+                    else
+                        usleep(1000);
+                }
+            }
+            catch(Except e)
+            {
+                LOG_DEBUG( "CAUGHT " << e.msg_);
+            }
+            if(logFlag_)
+                LOG::unregister_cb();
+            if(!quit)
+                LOG_WARNING("Disconnected from Core.");
+            usleep(1000);
+            serv_.close();
+        
         }
-        catch(Except e)
-        {
-            LOG_DEBUG( "CAUGHT " << e.msg_);
-        }
-        if(logFlag_)
-            LOG::unregister_cb();
-        if(!quit)
-            LOG_WARNING("Disconnected from Core.");
-        usleep(1000);
-        serv_.close();
-    
-    }
     }
     catch(Except e)
     {
