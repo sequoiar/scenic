@@ -81,9 +81,7 @@ void AudioSender::start()
 {
     GstBase::start();
 
-    std::stringstream logstr;
-    logstr << "Sending audio to host " << remoteConfig_.remoteHost() << " on port " << remoteConfig_.port() << std::endl;
-    LOG_DEBUG(logstr.str());
+    LOG_DEBUG("Sending audio to host " << remoteConfig_.remoteHost() << " on port " << remoteConfig_.port());
 
     //session_.checkSampleRate();
 }
