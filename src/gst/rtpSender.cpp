@@ -69,13 +69,15 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     pipeline_.add(rtcp_sender_);
     pipeline_.add(rtcp_receiver_);
 
-
-    assert(send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_")));
-    assert(send_rtp_src = gst_element_get_static_pad(rtpbin_, padStr("send_rtp_src_")));
-
-    assert(send_rtcp_src = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_")));
-
-    assert(recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
+    // FIXME: are the padStr calls necessary for request pads, or will the send_rtp_sink_%d pattern suffice?
+    send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_"));
+    assert(send_rtp_sink);
+    send_rtp_src = gst_element_get_static_pad(rtpbin_, padStr("send_rtp_src_"));
+    assert(send_rtp_src);
+    send_rtcp_src = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_"));
+    assert(send_rtcp_src);
+    recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_"));
+    assert(recv_rtcp_sink);
 
     assert(payloadSrc = gst_element_get_static_pad(newSrc->srcElement(), "src"));
     assert(rtpSenderSink = gst_element_get_static_pad(rtp_sender_, "sink"));
@@ -87,6 +89,12 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     assert(GstLinkable::link_pads(send_rtp_src, rtpSenderSink));
     assert(GstLinkable::link_pads(send_rtcp_src, rtcpSenderSink));
     assert(GstLinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink));
+    
+    // release request and static pads (in reverse order)
+    gst_object_unref(GST_OBJECT(send_rtp_src)); // static pad
+    gst_object_unref(GST_OBJECT(send_rtp_sink));
+    gst_object_unref(GST_OBJECT(send_rtcp_src));
+    gst_object_unref(GST_OBJECT(recv_rtcp_sink));
 
     // release static pads (in reverse order)
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
@@ -94,11 +102,6 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     gst_object_unref(GST_OBJECT(rtpSenderSink));
     gst_object_unref(GST_OBJECT(payloadSrc));
 
-    // release request and static pads (in reverse order)
-    gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);
-    gst_element_release_request_pad(rtpbin_, send_rtcp_src);
-    gst_object_unref(GST_OBJECT(send_rtp_src));
-    gst_element_release_request_pad(rtpbin_, send_rtp_sink);
 }
 
 
