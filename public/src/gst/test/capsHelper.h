@@ -97,8 +97,8 @@ static bool tcpSendCaps(const char *ip, int port, const std::string &caps)
     std::ostringstream s;
 
     TcpThread tcp(port);
-    s  << "caps: caps_str=\"" << Parser::strEsq(caps) <<"\"" << std::endl;
-    Parser::tokenize(s.str(),msg);
+    s  << "caps: caps_str=\"" << Parser::strEsq(caps) << "\"" << 0x10 << 0x13;
+    Parser::tokenize(s.str(), msg);
 
     const int MAX_TRIES = 100;
 
