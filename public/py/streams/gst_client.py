@@ -19,13 +19,12 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 # System imports
-import os
-import signal
-import time
+import os, resource, signal, time, sys, select
 
 # Twisted imports
-from twisted.internet import reactor, protocol, defer
+from twisted.internet import reactor, protocol, defer, abstract
 from twisted.python import procutils
+
 
 # App imports
 from protocols import ipcp
@@ -35,10 +34,13 @@ from utils import log, get_def_name
 log = log.start('debug', 1, 0, 'gst')
 
 
-INIT = 0	# Not running
-START = 1	# Starting
-PROC = 2	# Started
-CONN = 3	# Connected to gst process
+
+STOPPED = 0
+STARTING = 1
+RUNNING = 2
+CONNECTING = 3
+CONNECTED = 4
+
 
 class BaseGst(object):            
     def get_attr(self, name):
@@ -59,8 +61,8 @@ class BaseGst(object):
             setattr(self, name, value)
             return True, name, value
         return False, name, value
-    
 
+    
 class GstServer(object):
     def __init__(self, mode, port, address='127.0.0.1'):
         self.mode = mode
@@ -68,18 +70,20 @@ class GstServer(object):
         self.address = address
         self.process = None
         self.conn = None
-        self.state = INIT
-
+        self.state = STOPPED
+        
     def connect(self):
-        deferred = ipcp.connect(self.address, self.port)
-        deferred.addCallback(self.connection_ready)
-        deferred.addErrback(self.connection_failed)
+        if self.state == RUNNING:
+            self.state = CONNECTING
+            deferred = ipcp.connect(self.address, self.port)
+            deferred.addCallback(self.connection_ready)
+            deferred.addErrback(self.connection_failed)
             
     def connection_ready(self, conn):
         self.conn = conn
         self.conn.connectionLost = self.connection_lost
         self.conn.add_callback(self.gst_log, 'log')
-        self.state = CONN
+        self.state = CONNECTED
         log.info('GST inter-process link created')
         
     def connection_failed(self, conn):
@@ -98,29 +102,28 @@ class GstServer(object):
 #        self.connect()
 
     def start_process(self):
-#        self.state = 2    # Uncomment this line to start the GST process "by hand"
-        if self.state < 1:
-            self.state = START
+#        if self.state < RUNNING:
+#            self.state = RUNNING    # Uncomment this line to start the GST process "by hand"
+        if self.state < STARTING:
+            self.state = STARTING
             gst_app = 'mainTester'
             path = procutils.which(gst_app)
-#            path = ['/home/etienne/workspace/miville/trunk/public/py/protocols/ipcp_server.py']
             if path:
                 if self.mode == 'send':
                     mode_arg = "1"
                 else:
                     mode_arg = "0"
                 try:
-                    print 'STARTING PROCESS'
-                    self.process = reactor.spawnProcess(GstProcessProtocol(self), path[0], [path[0], mode_arg, str(self.port)], usePTY=True)
+                    self.process = reactor.spawnProcess(GstProcessProtocol(self), path[0], [path[0], mode_arg, str(self.port)], os.environ, usePTY=True)
                 except:
                     log.critical('Cannot start the GST application: %s' % gst_app)
             else:
                 log.critical('Cannot find the GST application: %s' % gst_app)
-        elif self.state == 2:
+        elif self.state == RUNNING:
             self.connect()
 
     def kill(self):
-        self.state = INIT
+        self.state = STOPPED
 #        os.kill(self._process.pid, signal.SIGTERM)
         reactor.callLater(0.5, self.verify_kill)
         try:
@@ -139,7 +142,7 @@ class GstServer(object):
                 os.kill(self.process.pid, signal.SIGKILL)
 
     def send_cmd(self, cmd, args=None, callback=None, timer=None, timeout=3):
-        if self.state < 3:
+        if self.state < CONNECTED:
             curr_time = time.time()
             if not timer:
                 timer = curr_time
@@ -151,6 +154,7 @@ class GstServer(object):
         else:
             if callback:
                 log.debug('Callback: %s' % repr(callback))
+                print self.state
                 self.conn.add_callback(*callback)
             if args:
                 self.conn.send_cmd(cmd, *args)
@@ -158,7 +162,7 @@ class GstServer(object):
                 self.conn.send_cmd(cmd)
 
     def del_callback(self, callback=None):
-        if self.state == CONN:
+        if self.state == CONNECTED:
             if callback:
                 self.conn.del_callback(callback)
             else:
@@ -227,22 +231,22 @@ class GstProcessProtocol(protocol.ProcessProtocol):
         reactor.callLater(2, self.check_process)
 
     def check_process(self):
-        if self.server.state < 2:
+        if self.server.state < RUNNING:
             log.critical('The GST process cannot be ready to connect.')
             self.server.kill()
 
     def outReceived(self, data):
-        if self.server.state < 2:
+        if self.server.state < RUNNING:
             lines = data.split('\n')
             log.debug('DATA FROM CHILD: %s' % lines)
             for line in lines:
                 if line.strip() == 'READY':
-                    self.server.state = PROC
+                    self.server.state = RUNNING
                     self.server.connect()
                     break
            
     def processEnded(self, status):
-        self.server.state = INIT
+        self.server.state = STOPPED
         log.info('GST process ended. Message: %s' % status)            
             
            

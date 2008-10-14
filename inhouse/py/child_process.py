@@ -22,6 +22,7 @@
 # Twisted imports
 from twisted.internet import reactor
 from twisted.internet import protocol
+import os, pty, resource, signal, time, select
 
 class GSTProcessProtocol(protocol.ProcessProtocol):
     def connectionMade(self):
@@ -33,14 +34,41 @@ class GSTProcessProtocol(protocol.ProcessProtocol):
         print 'DATA:', data
 #        self.transport.loseConnection()
     
+def start_process(exe):
+        pid, fd = pty.fork()
+        if pid == 0:
+            max_fd = resource.getrlimit(resource.RLIMIT_NOFILE)[0]
+            for i in range(3, max_fd):
+                try:
+                    os.close(i)
+                except OSError:
+                    pass
+            signal.signal(signal.SIGHUP, signal.SIG_IGN)
+    
+    #            if self.env is None:
+            os.execv(exe, [])
+#        reactor.callLater(0,001, do_read, fd)
+        do_read(fd)
+#        while 1:
+
+def do_read(fd):
+#    time.sleep(0.1)
+    if select.select([fd], [], [], 0)[0]:
+        print os.read(fd, 1000)
+    else:
+        print 'allo'
+#    do_read(fd)   
+    reactor.callLater(0.001, do_read, fd)
     
     
     
 if __name__ == "__main__":
-    exe = '/Users/etienne/Documents/propulesart/miville/trunk/public/py/protocols/ipcp_server.py'
-    p = GSTProcessProtocol()
-    reactor.spawnProcess(p, exe, [exe], usePTY=True)
+    exe = '/home/etienne/workspace/miville/trunk/public/py/protocols/ipcp_server.py'
+    reactor.callLater(0, start_process, exe)
+
+#    p = GSTProcessProtocol()
+#    reactor.spawnProcess(p, exe, [exe], usePTY=True)
     reactor.run()   
-    
+
     
     
