@@ -29,7 +29,8 @@ const char *DEMO_1_IP = "10.10.10.189";
 
 const short Demo::NUM_CHANNELS = 4;
 
-Sro::Sro(short pid) : Demo(pid)
+Sro::Sro(short pid, long txPort, long rxPort, const char *localIp, const char *remoteIp) 
+    : Demo(pid), txPort_(txPort), rxPort_(rxPort), localIp_(localIp), remoteIp_(remoteIp)
 {
     if (pid_ != 0 && pid_ != 1)
         THROW_ERROR(usage());
@@ -51,18 +52,18 @@ Pof::Pof(short pid) : Demo(pid)
 short Sro::run()
 {
     if (pid_ == 0) {
-        std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(DEMO_0_IP));
+        std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(localIp_, rxPort_));
         aRx->start();
         
-
         BLOCK();
         assert(aRx->isPlaying());
 
         aRx->stop();
-    }
-    else {
+    } 
+    else 
+    {
         AudioConfig aConfig("jackaudiosrc", Demo::NUM_CHANNELS);
-        std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, DEMO_0_IP));
+        std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, remoteIp_, txPort_));
         aTx->start();
         assert(tcpSendCaps(DEMO_0_IP, Ports::CAPS_PORT, aTx->getCaps()));
         
@@ -71,7 +72,6 @@ short Sro::run()
 
         aTx->stop();
     }
-    return 0;
     return 0;
 }
 
@@ -105,7 +105,6 @@ short Pof::run()
         std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(DEMO_0_IP));
         aRx->start();
         
-
         BLOCK();
         assert(aRx->isPlaying());
 
@@ -125,15 +124,25 @@ short Pof::run()
     return 0;
 }
 
+
 int mainSro(int argc, char **argv)
 {
     int pid;
-    if (argc > 1)
+    long rxPort, txPort;
+    std::string localIp, remoteIp;
+
+    if (argc == 6)
+    {
         pid = atoi(argv[1]);
+        txPort = atoi(argv[2]);
+        rxPort = atoi(argv[3]);
+        localIp = argv[4];
+        remoteIp = argv[5];
+    }
     else
         THROW_ERROR(Sro::usage());
 
-    Sro sro(pid);
+    Sro sro(pid, txPort, rxPort, localIp.c_str(), remoteIp.c_str());
 
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
 

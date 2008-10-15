@@ -33,10 +33,17 @@ class Demo {
 class Sro : public Demo
 {
     public:
-        Sro(short pid);
+        Sro(short pid, long txPort, long rxPort, const char *localIp, const char *remoteIp);
         ~Sro(){};
         short run();
-        static const char *usage() { return "Usage: sro <0/1>"; }
+        static const char *usage() { return "Usage: sro <0/1> txPort rxPort localIp remoteIp"; }
+    private:
+        long txPort_;
+        long rxPort_;
+        const char *localIp_;
+        const char *remoteIp_;
+        Sro(const Sro&);     //No Copy Constructor
+        Sro& operator=(const Sro&);     //No Assignment Operator
 };
 
 class Pul : public Demo
