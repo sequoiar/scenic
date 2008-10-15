@@ -25,20 +25,19 @@ int GstThread::main()
     bool flipflop = false;
     while(!done)
     {
-        if(g_main_context_iteration(NULL,FALSE)) 
+        if(g_main_context_iteration(NULL, FALSE))
             continue;
-
         std::cout << (flipflop ? "-\r" : " \r");
         flipflop = !flipflop;
         std::cout.flush();
         updateState();
         MapMsg f = queue_.timed_pop(100000);
-        
+
         if(f["command"].type() == 's')
         {
             std::string s;
             f["command"].get(s);
-            
+
             if(s == "quit")
             {
                 queue_.push(f);
@@ -74,9 +73,8 @@ int GstThread::main()
 
 
 void GstThread::updateState()
-{
+{}
 
-}
 
 GstThread::~GstThread()
 {
@@ -101,4 +99,5 @@ bool GstThread::audio_stop(MapMsg& /*msg*/)
     video_->stop();
     return true;
 }
+
 

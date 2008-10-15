@@ -25,7 +25,8 @@ class GstThread
     : public MsgThread
 {
     public:
-        GstThread():video_(0),audio_(0){}
+        GstThread()
+            : video_(0), audio_(0){}
         virtual ~GstThread();
     protected:
         virtual bool audio_start(MapMsg& msg) = 0;
@@ -36,7 +37,7 @@ class GstThread
 
         GstBase* video_;
         GstBase* audio_;
-        
+
     private:
 
         int main();

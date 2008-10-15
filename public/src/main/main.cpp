@@ -24,21 +24,22 @@
 #include "builder.h"
 #include "logWriter.h"
 
-class MsgThreadFunctor : public MsgFunctor
+class MsgThreadFunctor
+    : public MsgFunctor
 {
     MsgThread &t_;
     public:
-    MsgThreadFunctor(MsgThread* pt) 
-        :MsgFunctor(),t_(*pt) 
+        MsgThreadFunctor(MsgThread* pt)
+            : MsgFunctor(), t_(*pt)
         { MSG::register_cb(this); }
 
-    ~MsgThreadFunctor() 
+        ~MsgThreadFunctor()
         { MSG::unregister_cb();}
 
-    void operator()(MapMsg& msg)
-    {
-        t_.getQueue().push(msg);
-    }
+        void operator()(MapMsg& msg)
+        {
+            t_.getQueue().push(msg);
+        }
 };
 
 class MainModule
@@ -48,7 +49,7 @@ class MainModule
         bool run();
 
         MainModule(bool send, int port)
-            : tcpThread_(Builder::TcpBuilder(port,true)), 
+            : tcpThread_(Builder::TcpBuilder(port, true)),
               gstThread_(Builder::GstBuilder(send)),
               func(gstThread_){}
 
@@ -77,6 +78,7 @@ static void handler(int /*sig*/, siginfo_t* /* si*/, void* /* unused*/)
         THROW_ERROR("Cannot register SIGINT handler");
 }
 
+
 static void set_handler()
 {
     struct sigaction sa;
@@ -87,6 +89,7 @@ static void set_handler()
         THROW_ERROR("Cannot register SIGINT handler");
 }
 
+
 bool MainModule::run()
 {
     try
@@ -96,7 +99,7 @@ bool MainModule::run()
             THROW_ERROR("GstThread not running");
         if(tcpThread_ == 0 || !tcpThread_->run())
             THROW_ERROR("TcpThread not running");
-        QueuePair &gst_queue = gstThread_->getQueue(); 
+        QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
 
         while(!signal_flag)
@@ -122,7 +125,7 @@ bool MainModule::run()
     }
     catch(ErrorExcept e)
     {
-        static int count = 0; 
+        static int count = 0;
         LOG_WARNING("Abnormal Main Exception:" << e.msg_);
         if (++count > 100)
             throw Except(e);
@@ -132,33 +135,37 @@ bool MainModule::run()
     return 0;
 }
 
+
 static int port, send;
-void parseArgs(int argc,char** argv)
+void parseArgs(int argc, char** argv)
 {
     if(argc != 3)
         THROW_CRITICAL("Invalid command line arguments -- 0/1 for receive/send and a port");
     if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
         THROW_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
     if(sscanf(argv[2], "%d", &port) != 1 || port < 1024 || port > 65000)
-        THROW_CRITICAL("Invalid command line arguments -- Port must be in the range of 1024-65000");
+        THROW_CRITICAL(
+            "Invalid command line arguments -- Port must be in the range of 1024-65000");
 }
+
 
 int main (int argc, char** argv)
 {
-
     try
     {
-        parseArgs(argc,argv);    
+        parseArgs(argc, argv);
         MainModule m(send, port);
 
-        while(m.run()){}
+        while(m.run())
+        {}
     }
-    catch(Except e) 
-    { 
-        if (e.log_ == ASSERT_FAIL) 
+    catch(Except e)
+    {
+        if (e.log_ == ASSERT_FAIL)
             return 1;
     }
 
     return 0;
 }
+
 
