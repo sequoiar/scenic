@@ -38,6 +38,6 @@ class TcpThread
         TcpServer serv_;
         bool logFlag_;
 
-        TcpThread(const TcpThread&); //No Copy Constructor
+        TcpThread(const TcpThread&);            //No Copy Constructor
         TcpThread& operator=(const TcpThread&); //No Assignment Operator
 };

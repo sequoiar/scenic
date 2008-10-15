@@ -31,17 +31,12 @@
  */
 namespace Parser
 {
-    /** escape quotes and backslashes
-     */
-    std::string strEsq(const std::string& str);
-
     /** builds a string of command: key=value pairs
      */
     bool stringify(MapMsg& cmd_map, std::string& str);
 
-    /* fills a map of key=value pairs with a special key "command" from a string
+    /** fills a map of key=value pairs with a special key "command" from a string
      * of type specified above
-     * TODO handle extraneous white space
      */
     bool tokenize(const std::string& str, MapMsg& cmd_map);
 }
