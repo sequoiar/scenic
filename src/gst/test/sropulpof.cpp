@@ -24,7 +24,7 @@
 #include <cassert>
 #include <cstdlib>
 
-const char *POF_0_IP = "10.10.10.238";
+const char *POF_0_IP = "10.10.10.188";
 const char *POF_1_IP = "10.10.10.189";
 
 const short Sropulpof::NUM_CHANNELS = 4;
