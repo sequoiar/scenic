@@ -234,7 +234,7 @@ void RtpAudioTestSuite::start_stop_8ch_audiotest()
 
 void RtpAudioTestSuite::start_8ch_jack()
 {
-    const int numChannels = 8;
+    const int numChannels = 2;
 
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());

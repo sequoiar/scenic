@@ -20,17 +20,43 @@
 #ifndef _SROPULPOF_H_
 #define _SROPULPOF_H_
 
-class Sropulpof
+class Demo {
+    public:
+        Demo(short pid) : pid_(pid) {}
+        virtual short run() = 0;
+        virtual ~Demo(){};
+    protected:
+        short pid_;
+        const static short NUM_CHANNELS;
+};
+
+class Sro : public Demo
 {
     public:
-        Sropulpof(short pid);
+        Sro(short pid);
+        ~Sro(){};
+        short run();
+        static const char *usage() { return "Usage: sro <0/1>"; }
+};
+
+class Pul : public Demo
+{
+    public:
+        Pul(short pid);
+        ~Pul(){};
+        short run();
+        static const char *usage() { return "Usage: pul <0/1>"; }
+};
+
+
+class Pof : public Demo
+{
+    public:
+        Pof(short pid);
+        ~Pof(){};
         void fake();
         short run();
         static const char *usage() { return "Usage: pof <0/1>"; }
-
-    private: 
-        short pid_;
-        const static short NUM_CHANNELS;
 };
 
 #endif // _SROPULPOF_H_

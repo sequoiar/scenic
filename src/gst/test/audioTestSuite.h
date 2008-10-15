@@ -30,7 +30,7 @@ class AudioTestSuite
 
         AudioTestSuite()
         {
-            testLength_ = 5000;
+            testLength_ = 500000;
             TEST_ADD(AudioTestSuite::start_8ch_jack)
             TEST_ADD(AudioTestSuite::stop_8ch_jack)
             TEST_ADD(AudioTestSuite::start_stop_8ch_jack)
