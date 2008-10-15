@@ -42,3 +42,4 @@ MsgThread* Builder::GstBuilder(bool send)
     else
         return new GstReceiverThread();
 }
+
