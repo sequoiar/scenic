@@ -38,14 +38,14 @@ std::string Parser::strEsq(const std::string& str)
 {
     std::string out;
 
-    for(unsigned int pos=0; 
+    for(unsigned int pos=0;
         pos < str.size(); ++pos)                //for each char in string
     {
         char c = str[pos];                      //copy current character
-        if(c == '\\')                           //if backslash found
-            out.append("\\\\");                 //escape it with backslash
-        else if(c == '\"')                      //if quotation mark
-            out.append("\\\"");                 //escape it with backslash
+        if(c == '\\')                         //if backslash found
+            out.append("\\\\");              //escape it with backslash
+        else if(c == '\"')                    //if quotation mark
+            out.append("\\\"");              //escape it with backslash
         else
             out.append(1, c);                   //otherwise pass it through
     }
@@ -91,8 +91,8 @@ static POS get_end_of_quoted_string(const std::string& str)
     //for each char in string
     for(unsigned int pos=1; pos < str.size(); ++pos)
     {
-        if(str[pos] == '\"')                       //if char is " and if
-            if(str[pos-1] != '\\')                 //previous char is not escape char
+        if(str[pos] == '\"')                     //if char is " and if
+            if(str[pos-1] != '\\')               //previous char is not escape char
                 return pos;                        //return position following "
     }
 
@@ -104,65 +104,67 @@ static POS get_end_of_quoted_string(const std::string& str)
 bool Parser::stringify(MapMsg& cmd_map, std::string& rstr)
 {
     std::stringstream sstr;
-    rstr.clear(); 
+    rstr.clear();
     //locate "command" and output value to str
     sstr << std::string(cmd_map["command"]) << ":";
-    const std::pair<const std::string,StrIntFloat>* it;
+    const std::pair<const std::string, StrIntFloat>* it;
 
     //for each pair in the map
     for(it = cmd_map.begin(); it != 0; it = cmd_map.next())
-    {   
+    {
         //Insure it's not the command
-        if(it->first != "command")    
+        if(it->first != "command")
         {
             //Output the key to the str
             sstr << " " << it->first << "=";
             //Output the value to the str
-            switch(it->second.type()) 
+            switch(it->second.type())
             {
                 //the value is a string, delimit with "
                 case 's':
-                    //Escape the string contents 
-                    sstr << "\"" << strEsq(it->second) << "\""; 
+                    //Escape the string contents
+                    sstr << "\"" << strEsq(it->second) << "\"";
                     break;
-                
+
                 //the value is integer, generate string from int
-                case 'i': 
+                case 'i':
                     sstr << int(it->second);
                     break;
-                    
+
                 //the value is a float generate string from float
-                case 'f': 
+                case 'f':
                     sstr << double(it->second);
                     break;
 
                 case 'F':
-                    {
-                        const std::vector<double> &v = it->second;
-                        sstr << v[0];
-                        //TODO: parse and tokenize vectors
-                    }
-                    break;
+                {
+                    const std::vector<double> &v = it->second;
+                    sstr << v[0];
+                    //TODO: parse and tokenize vectors
+                }
+                break;
 
                 default:
-                    THROW_ERROR("Command " << it->first 
-                        << " has unknown type " << it->second.type());
-            }       
+                    THROW_ERROR("Command " << it->first
+                                           << " has unknown type " << it->second.type());
+            }
         }
     }
+
     rstr = sstr.str();
     return true;
 }
 
 
-static void erase_to_end_of_whitespace(std::string &in)          
+static void erase_to_end_of_whitespace(std::string &in)
 {
     POS pos = in.find_first_of(' ');
-    in.erase(0,pos);
+    in.erase(0, pos);
     pos = in.find_first_not_of(' ');
     if(pos != std::string::npos)
-        in.erase(0,pos);
+        in.erase(0, pos);
 }
+
 
 static bool contains_only(const std::string& in, char c)
 {
@@ -185,32 +187,29 @@ bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
     tok_end = lstr.find_first_of(':');                          //search for ":"
     if(tok_end == lstr.size())                                  //if : not found return error
         THROW_ERROR("No command found.");
-
     cmd_map["command"] = lstr.substr(0, tok_end);               //insert command into map
     erase_to_end_of_whitespace(lstr);                           //set lstring beyond command
     if(lstr.empty())
         return true;
-
     //loop until break or return
     for(;;)
     {
         tok_end = lstr.find_first_of('=');                      //search of "="
         if(tok_end == std::string::npos)                        //if not found no more
             break;                                              //key=value pairs so break loop
-        std::string key_str = lstr.substr(0,tok_end);
+        std::string key_str = lstr.substr(0, tok_end);
         ++tok_end;
-        lstr.erase(0,tok_end);                                  //lstr points to value
+        lstr.erase(0, tok_end);                                  //lstr points to value
         if(lstr[0] == '\"')                                     //if value looks like a string
         {
             POS end_quote = get_end_of_quoted_string(lstr);     //find end of "
             if(end_quote == 0)                                  //if value not string
                 THROW_ERROR("No end of quote found.");
-
             std::string quote = lstr.substr(1, end_quote-1);        //strip begin and end quotes
             quote = strUnEsq(quote);                                //clean any escape backslashes
 
             cmd_map[key_str] = quote;                               //insert key,value into map
-            lstr.erase(0,end_quote);
+            lstr.erase(0, end_quote);
             erase_to_end_of_whitespace(lstr);                       //set lstring beyond command
         }
         else{
@@ -221,47 +220,44 @@ bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
                 POS pos = lstr.find_first_of(" =");
                 if(lstr[pos] == '=')
                     break;
-                std::stringstream stream(lstr.substr(0,pos));       //string of value
-                lstr.erase(0,pos);
+                std::stringstream stream(lstr.substr(0, pos));       //string of value
+                lstr.erase(0, pos);
                 erase_to_end_of_whitespace(lstr);                   //set lstring beyond command
-                if(contains(stream.str(),'='))
+                if(contains(stream.str(), '='))
                     break;
-                    
                 //if value does not contain . it is an int
-                if(!contains(stream.str(),'.'))
+                if(!contains(stream.str(), '.'))
                 {
                     int temp_i;
                     stream >> temp_i;                               //convert str to int
                     vi.push_back(temp_i);                           //stor val
                     LOG_DEBUG(key_str << " " << temp_i);
                 }
-                else    //value contains . thus it is a float
-                {                                                   
+                else{   //value contains . thus it is a float
                     float temp_f;
                     stream >> temp_f;                               //convert str to float
                     vd.push_back(temp_f);                           //stor val
                 }
-                if(contains_only(lstr,' '))                         //Only whitespace remains
+                if(contains_only(lstr, ' '))                       //Only whitespace remains
                     break;
             }
+
             if(vd.size() > 0 && vi.size() > 0)
                 THROW_ERROR("Cannot mix types in arrays");
-
             if(vd.size() == 1)
                 cmd_map[key_str] = vd[0];
             else if (vd.size() > 1)
                 cmd_map[key_str] = vd[0];
-                //TODO replace above with ->  cmd_map[key_str] = vd;
+            //TODO replace above with ->  cmd_map[key_str] = vd;
 
             if(vi.size() == 1)
                 cmd_map[key_str] = vi[0];
             else if (vi.size() > 1)
                 cmd_map[key_str] = vi[0];
-                //TODO replace above with ->  cmd_map[key_str] = vi;
+            //TODO replace above with ->  cmd_map[key_str] = vi;
         }
-        if(contains_only(lstr,' '))                         //Only whitespace remains
-            break;                                              
-            
+        if(contains_only(lstr, ' '))                       //Only whitespace remains
+            break;
     }
 
     return true;
