@@ -45,8 +45,16 @@ static std::string get_line(std::string& msg)
 {
     std::string ret;
     std::string::size_type pos = msg.find_first_of("\n\r");
-    ret = msg.substr(0,pos+2);
-    msg.erase(0,pos+2);
+    if(pos != std::string::npos)
+    {
+        ret = msg.substr(0,pos+2);
+        msg.erase(0,pos+2);
+    }
+    else
+    {
+        ret = msg;
+        msg.clear();
+    }
     return ret;
 }
 
@@ -165,7 +173,6 @@ bool TcpThread::socket_connect_send(const std::string& addr, MapMsg& msg)
 {
     std::string msg_str;
     Parser::stringify(msg, msg_str);
-    LOG_DEBUG(msg_str);
     return serv_.socket_connect_send(addr,msg_str);
 }
 
