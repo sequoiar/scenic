@@ -54,7 +54,6 @@ class Pof : public Demo
     public:
         Pof(short pid);
         ~Pof(){};
-        void fake();
         short run();
         static const char *usage() { return "Usage: pof <0/1>"; }
 };

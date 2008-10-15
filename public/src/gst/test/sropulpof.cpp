@@ -29,7 +29,6 @@ const char *DEMO_1_IP = "10.10.10.189";
 
 const short Demo::NUM_CHANNELS = 4;
 
-
 Sro::Sro(short pid) : Demo(pid)
 {
     if (pid_ != 0 && pid_ != 1)
@@ -48,16 +47,31 @@ Pof::Pof(short pid) : Demo(pid)
         THROW_ERROR(usage());
 }
 
-void Pof::fake()
-{
-        VideoConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, DEMO_1_IP));
-        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(DEMO_1_IP));
-}
-
 // 2 way audio
 short Sro::run()
 {
+    if (pid_ == 0) {
+        std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(DEMO_0_IP));
+        aRx->start();
+        
+
+        BLOCK();
+        assert(aRx->isPlaying());
+
+        aRx->stop();
+    }
+    else {
+        AudioConfig aConfig("jackaudiosrc", Demo::NUM_CHANNELS);
+        std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, DEMO_0_IP));
+        aTx->start();
+        assert(tcpSendCaps(DEMO_0_IP, Ports::CAPS_PORT, aTx->getCaps()));
+        
+        BLOCK();
+        assert(aTx->isPlaying());
+
+        aTx->stop();
+    }
+    return 0;
     return 0;
 }
 
@@ -65,7 +79,7 @@ short Sro::run()
 short Pul::run()
 {
     if (pid_ == 0) {
-        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(DEMO_1_IP));
+        std::auto_ptr<VideoReceiver> vRx(Factories::buildVideoReceiver(DEMO_1_IP));
         vRx->start();
         BLOCK();
         assert(vRx->isPlaying());
@@ -73,7 +87,7 @@ short Pul::run()
     }
     else {
         VideoConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, DEMO_1_IP));
+        std::auto_ptr<VideoSender> vTx(Factories::buildVideoSender(vConfig, DEMO_1_IP));
         vTx->start();
         
         BLOCK();
@@ -88,9 +102,7 @@ short Pul::run()
 short Pof::run()
 {
     if (pid_ == 0) {
-
-        std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver(DEMO_0_IP));
-      //  aRx->pause();
+        std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(DEMO_0_IP));
         aRx->start();
         
 
@@ -101,7 +113,7 @@ short Pof::run()
     }
     else {
         AudioConfig aConfig("jackaudiosrc", Demo::NUM_CHANNELS);
-        std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig, DEMO_0_IP));
+        std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, DEMO_0_IP));
         aTx->start();
         assert(tcpSendCaps(DEMO_0_IP, Ports::CAPS_PORT, aTx->getCaps()));
         

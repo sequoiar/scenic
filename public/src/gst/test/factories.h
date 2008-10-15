@@ -13,7 +13,16 @@
 #include "ports.h"
 #include <memory>
 
-static std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig, const char* ip)
+namespace Factories {
+    std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig, 
+            const char* ip);
+    std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *ip);
+    std::auto_ptr<VideoReceiver> buildVideoReceiver(const char *ip);
+    std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig, 
+            const char *ip);
+}
+
+std::auto_ptr<AudioSender> Factories::buildAudioSender(const AudioConfig aConfig, const char* ip)
 {
     SenderConfig rConfig("vorbis", ip, Ports::A_PORT);
     std::auto_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
@@ -21,8 +30,7 @@ static std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig, co
     return tx;
 }
 
-
-static std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *ip)
+std::auto_ptr<AudioReceiver> Factories::buildAudioReceiver(const char *ip)
 {
     AudioReceiverConfig aConfig("jackaudiosink");
     ReceiverConfig rConfig("vorbis", ip, Ports::A_PORT, tcpGetCaps(Ports::CAPS_PORT));
@@ -31,23 +39,21 @@ static std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *ip)
     return rx;
 }
 
+std::auto_ptr<VideoSender> Factories::buildVideoSender(const VideoConfig vConfig, const char *ip)
+{
+    SenderConfig rConfig("h264", ip, Ports::V_PORT);
+    std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
+    tx->init();
+    return tx;
+}
 
-static std::auto_ptr<VideoReceiver> buildVideoReceiver(const char *ip)
+std::auto_ptr<VideoReceiver> Factories::buildVideoReceiver(const char *ip)
 {
     VideoReceiverConfig vConfig("xvimagesink");
     ReceiverConfig rConfig("h264", ip, Ports::V_PORT, "");
     std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
     rx->init();
     return rx;
-}
-
-
-static std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig, const char *ip)
-{
-    SenderConfig rConfig("h264", ip, Ports::V_PORT);
-    std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
-    tx->init();
-    return tx;
 }
 
 #endif // _FACTORIES_H_
