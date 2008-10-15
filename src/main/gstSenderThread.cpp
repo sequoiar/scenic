@@ -22,17 +22,16 @@
 #include "gst/videoSender.h"
 
 
-
 bool GstSenderThread::video_start(MapMsg& msg)
 {
     delete video_;
     video_ = 0;
-    
+
     try
     {
         //VideoConfig config("dv1394src");
         VideoConfig config("videotestsrc");
-        SenderConfig rConfig(msg["codec"], msg["address"] , msg["port"]);
+        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
         video_ =  new VideoSender(config, rConfig);
         video_->init();
         video_->start();
@@ -61,7 +60,7 @@ bool GstSenderThread::audio_start(MapMsg& msg)
         audio_->init();
         audio_->start();
 
-        //Build Caps Msg 
+        //Build Caps Msg
         MapMsg caps("caps");
         caps["caps_str"] = asender->getCaps();
         //Forward to tcp

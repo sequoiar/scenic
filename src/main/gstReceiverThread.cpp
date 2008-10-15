@@ -23,7 +23,6 @@
 #include "hostIP.h"
 
 
-
 bool GstReceiverThread::video_start(MapMsg& msg)
 {
     delete video_;
@@ -32,7 +31,7 @@ bool GstReceiverThread::video_start(MapMsg& msg)
     try
     {
         VideoReceiverConfig config("xvimagesink");
-        ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"],"");
+        ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"], "");
         video_ = new VideoReceiver(config, rConfig);
         video_->init();
         video_->start();
