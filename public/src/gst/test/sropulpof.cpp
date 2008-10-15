@@ -90,7 +90,7 @@ short Pof::run()
     if (pid_ == 0) {
 
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver(DEMO_0_IP));
-        aRx->pause();
+      //  aRx->pause();
         aRx->start();
         
 
