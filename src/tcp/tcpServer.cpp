@@ -98,6 +98,7 @@ bool TcpServer::socket_connect_send(const std::string& addr,const std::string& m
     }
     int n=0;
     n = ::write(ssockfd, msg.c_str(), msg.size());
+    n = ::write(newsockfd, "\r\n",2);                       //Telnet standard line end
     if (n <= 0){
         ::close(ssockfd);
         THROW_ERROR("Writing to socket failed.");
@@ -181,7 +182,6 @@ bool TcpServer::recv(std::string& out)
         out.append(buffer_, n);
 
     } while(1);
-
     if(out.empty())
         return false;
     return true;
