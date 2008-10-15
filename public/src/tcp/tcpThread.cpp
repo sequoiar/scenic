@@ -23,16 +23,18 @@
 #include <errno.h>
 
 
-class TcpLogFunctor : public LogFunctor
+class TcpLogFunctor
+    : public LogFunctor
 {
-public:
-    TcpLogFunctor(TcpThread& tcp):tcp_(tcp){}
-    TcpThread& tcp_;
-    void operator()(LogLevel&,std::string& msg);
+    public:
+        TcpLogFunctor(TcpThread& tcp)
+            : tcp_(tcp){}
+        TcpThread& tcp_;
+        void operator()(LogLevel&, std::string& msg);
 };
 
 
-void TcpLogFunctor::operator()(LogLevel& level,std::string& msg)
+void TcpLogFunctor::operator()(LogLevel& level, std::string& msg)
 {
     MapMsg m("log");
     m["level"] = level;
@@ -47,11 +49,10 @@ static std::string get_line(std::string& msg)
     std::string::size_type pos = msg.find_first_of("\n\r");
     if(pos != std::string::npos)
     {
-        ret = msg.substr(0,pos+2);
-        msg.erase(0,pos+2);
+        ret = msg.substr(0, pos+2);
+        msg.erase(0, pos+2);
     }
-    else
-    {
+    else{
         ret = msg;
         msg.clear();
     }
@@ -115,7 +116,6 @@ int TcpThread::main()
                 LOG_WARNING("Disconnected from Core.");
             usleep(1000);
             serv_.close();
-        
         }
     }
     catch(Except e)
@@ -123,7 +123,7 @@ int TcpThread::main()
         LOG_DEBUG("Passing exception to other Thread" << e.msg_);
 
         MapMsg mapMsg("exception");
-        mapMsg["exception"] = CriticalExcept(e.msg_,e.errno_);
+        mapMsg["exception"] = CriticalExcept(e.msg_, e.errno_);
         queue_.push(mapMsg);
     }
     return 0;
@@ -136,12 +136,10 @@ bool TcpThread::gotQuit()
     std::string command;
     if(f["command"].type() == 'n')
         return false;
-
     if(f["command"].get(command)&& command == "quit")
         return true;
     else
         send(f);
-
     return false;
 }
 
@@ -150,7 +148,7 @@ bool TcpThread::send(MapMsg& msg)
 {
     std::string msg_str;
     bool ret;
-    LOG::hold_cb(); // to insure no recursive calls due to log message calling send 
+    LOG::hold_cb(); // to insure no recursive calls due to log message calling send
     try
     {
         Parser::stringify(msg, msg_str);
@@ -159,20 +157,23 @@ bool TcpThread::send(MapMsg& msg)
     }
     catch(ErrorExcept e)
     {
-        LOG_DEBUG(std::string(msg["command"]) << " Error at Send. Cancelled. " << strerror(e.errno_));
+        LOG_DEBUG(std::string(msg["command"]) << " Error at Send. Cancelled. " <<
+                  strerror(e.errno_));
         LOG::release_cb();
         if(e.errno_ == EBADF) //Bad File Descriptor
-            throw(e);
+            throw (e);
     }
-    
+
 
     return ret;
 }
+
 
 bool TcpThread::socket_connect_send(const std::string& addr, MapMsg& msg)
 {
     std::string msg_str;
     Parser::stringify(msg, msg_str);
-    return serv_.socket_connect_send(addr,msg_str);
+    return serv_.socket_connect_send(addr, msg_str);
 }
+
 

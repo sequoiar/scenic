@@ -24,8 +24,8 @@ class TcpThread
     : public MsgThread
 {
     public:
-        TcpThread(int inport,bool logF=false)
-            : serv_(inport),logFlag_(logF){}
+        TcpThread(int inport, bool logF=false)
+            : serv_(inport), logFlag_(logF){}
         ~TcpThread(){}
         bool send(MapMsg& msg);
 

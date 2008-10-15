@@ -11,9 +11,8 @@ int main(int argc, char** argv)
     {
         if(argc < 2)
             THROW_CRITICAL("2 or 3 args: port [addr]");
-
         int port = atoi(argv[1]);
-        TcpThread tcp(port,true);
+        TcpThread tcp(port, true);
 
 
         QueuePair& queue = tcp.getQueue();
@@ -29,28 +28,22 @@ int main(int argc, char** argv)
                 {
                     if(command == "quit")
                         break;
-                        
                     if (command == "exception")
-                        throw(f["exception"].except());
-    
-                    
+                        throw (f["exception"].except());
                     if(command == "test")
-                        LOG_DEBUG(tcp.socket_connect_send("127.0.0.1",f));
+                        LOG_DEBUG(tcp.socket_connect_send("127.0.0.1", f));
                     else
                         tcp.send(f);
-                    
                 }
             }
-            catch(ErrorExcept e) 
-            { 
-               LOG_DEBUG("In while Except. " << e.msg_); 
+            catch(ErrorExcept e)
+            {
+                LOG_DEBUG("In while Except. " << e.msg_);
             }
         }
     }
     catch(Except e)
-    {
-
-    }
+    {}
     return -1;
 }
 

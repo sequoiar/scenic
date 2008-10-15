@@ -1,6 +1,6 @@
 // tcpServer.h
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
+// Copyright 2008 Koya Charles & Tristan Matthews
+//
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -17,8 +17,8 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file 
- *      TcpServer class  
+/** \file
+ *      TcpServer class
  *
  */
 
@@ -31,7 +31,7 @@
 #define BUFFSIZE     16
 
 /**
- * The tcp server class 
+ * The tcp server class
  *
  */
 class TcpServer
@@ -42,7 +42,7 @@ class TcpServer
         bool recv(std::string& out);
         bool send(const std::string& in);
         bool socket_bind_listen();
-        bool socket_connect_send(const std::string& addr,const std::string& in) const;
+        bool socket_connect_send(const std::string& addr, const std::string& in) const;
         bool accept();
         bool close();
 
@@ -55,7 +55,6 @@ class TcpServer
         char buffer_[BUFFSIZE];
         int port_;
         bool connected_;
-     
 };
 
 
