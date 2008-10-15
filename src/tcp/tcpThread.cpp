@@ -148,7 +148,7 @@ bool TcpThread::send(MapMsg& msg)
 {
     std::string msg_str;
     bool ret;
-    LOG::hold_cb(); // to insure no recursive calls due to log message calling send
+    LOG::hold_cb();           // to insure no recursive calls due to log message calling send
     try
     {
         Parser::stringify(msg, msg_str);
