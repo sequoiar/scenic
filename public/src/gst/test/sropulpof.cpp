@@ -55,28 +55,39 @@ void Pof::fake()
         std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(DEMO_1_IP));
 }
 
-
+// 2 way audio
 short Sro::run()
 {
     return 0;
 }
 
-
+// One way video
 short Pul::run()
 {
+    if (pid_ == 0) {
+        VideoConfig vConfig("v4l2src"); 
+        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, DEMO_1_IP));
+        vTx->start();
+        
+        BLOCK();
+        assert(vTx->isPlaying());
+        vTx->stop();
+    }
+    else {
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(DEMO_1_IP));
+        vRx->start();
+        BLOCK();
+        assert(vRx->isPlaying());
+        vRx->stop();
+    }
     return 0;
 }
 
 
+// One Way audio
 short Pof::run()
 {
-	// VIDEO_SENDER_ROOM
     if (pid_ == 0) {
-#if 0       // temporarily remove video
-        VideoConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, DEMO_1_IP));
-        vTx->start();
-#endif
 
         std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver(DEMO_0_IP));
         aRx->pause();
@@ -85,38 +96,70 @@ short Pof::run()
 
         BLOCK();
         assert(aRx->isPlaying());
-     //   assert(vTx->isPlaying());
 
         aRx->stop();
-      //  vTx->stop();
     }
     else {
-	    // AUDIO_SENDER_ROOM
         AudioConfig aConfig("jackaudiosrc", Demo::NUM_CHANNELS);
         std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig, DEMO_0_IP));
         aTx->start();
         assert(tcpSendCaps(DEMO_0_IP, Ports::CAPS_PORT, aTx->getCaps()));
         
-#if 0
-        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(DEMO_1_IP));
-        usleep(100000);
-        vRx->start();
-#endif
-
         BLOCK();
         assert(aTx->isPlaying());
-     //   assert(vRx->isPlaying());
 
         aTx->stop();
-      //  vRx->stop();
     }
     return 0;
 }
 
+int mainSro(int argc, char **argv)
+{
+    int pid;
+    if (argc > 1)
+        pid = atoi(argv[1]);
+    else
+        THROW_ERROR(Sro::usage());
+
+    Sro sro(pid);
+
+    std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
+
+    try {
+        return sro.run();
+    }
+    catch (Except e)
+    {
+        std::cerr << e.msg_;
+        return 1;
+    }
+}
 
 
+int mainPul(int argc, char **argv)
+{
+    int pid;
+    if (argc > 1)
+        pid = atoi(argv[1]);
+    else
+        THROW_ERROR(Pul::usage());
 
-int mainSropulpof(int argc, char **argv)
+    Pul pul(pid);
+
+    std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
+
+    try {
+        return pul.run();
+    }
+    catch (Except e)
+    {
+        std::cerr << e.msg_;
+        return 1;
+    }
+}
+
+
+int mainPof(int argc, char **argv)
 {
     int pid;
     if (argc > 1)
