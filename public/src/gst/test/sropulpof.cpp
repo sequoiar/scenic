@@ -24,35 +24,61 @@
 #include <cassert>
 #include <cstdlib>
 
-const char *POF_0_IP = "10.10.10.188";
-const char *POF_1_IP = "10.10.10.189";
+const char *DEMO_0_IP = "10.10.10.188";
+const char *DEMO_1_IP = "10.10.10.189";
 
-const short Sropulpof::NUM_CHANNELS = 4;
+const short Demo::NUM_CHANNELS = 4;
 
-Sropulpof::Sropulpof(short pid) : pid_(pid)
+
+Sro::Sro(short pid) : Demo(pid)
 {
     if (pid_ != 0 && pid_ != 1)
-        THROW_ERROR(Sropulpof::usage());
+        THROW_ERROR(usage());
 }
 
-void Sropulpof::fake()
+Pul::Pul(short pid) : Demo(pid)
+{
+    if (pid_ != 0 && pid_ != 1)
+        THROW_ERROR(usage());
+}
+
+Pof::Pof(short pid) : Demo(pid)
+{
+    if (pid_ != 0 && pid_ != 1)
+        THROW_ERROR(usage());
+}
+
+void Pof::fake()
 {
         VideoConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, POF_1_IP));
-        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(POF_1_IP));
+        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, DEMO_1_IP));
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(DEMO_1_IP));
 }
 
-short Sropulpof::run()
+
+short Sro::run()
+{
+    return 0;
+}
+
+
+short Pul::run()
+{
+    return 0;
+}
+
+
+short Pof::run()
 {
 	// VIDEO_SENDER_ROOM
     if (pid_ == 0) {
 #if 0       // temporarily remove video
         VideoConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, POF_1_IP));
+        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, DEMO_1_IP));
         vTx->start();
 #endif
 
-        std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver(POF_0_IP));
+        std::auto_ptr<AudioReceiver> aRx(buildAudioReceiver(DEMO_0_IP));
         aRx->pause();
         aRx->start();
         
@@ -66,13 +92,13 @@ short Sropulpof::run()
     }
     else {
 	    // AUDIO_SENDER_ROOM
-        AudioConfig aConfig("jackaudiosrc", Sropulpof::NUM_CHANNELS);
-        std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig, POF_0_IP));
+        AudioConfig aConfig("jackaudiosrc", Demo::NUM_CHANNELS);
+        std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig, DEMO_0_IP));
         aTx->start();
-        assert(tcpSendCaps(POF_0_IP, Ports::CAPS_PORT, aTx->getCaps()));
+        assert(tcpSendCaps(DEMO_0_IP, Ports::CAPS_PORT, aTx->getCaps()));
         
 #if 0
-        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(POF_1_IP));
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(DEMO_1_IP));
         usleep(100000);
         vRx->start();
 #endif
@@ -96,9 +122,9 @@ int mainSropulpof(int argc, char **argv)
     if (argc > 1)
         pid = atoi(argv[1]);
     else
-        THROW_ERROR(Sropulpof::usage());
+        THROW_ERROR(Pof::usage());
 
-    Sropulpof pof(pid);
+    Pof pof(pid);
 
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
 

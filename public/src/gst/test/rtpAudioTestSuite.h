@@ -30,19 +30,19 @@ class RtpAudioTestSuite
 
         RtpAudioTestSuite()
         {
-            testLength_ = 3000;
+            testLength_ = 300000;
             
-            TEST_ADD(RtpAudioTestSuite::start_2ch_audiotest)
-            TEST_ADD(RtpAudioTestSuite::stop_2ch_audiotest)
-            TEST_ADD(RtpAudioTestSuite::start_stop_2ch_audiotest)
-
-            TEST_ADD(RtpAudioTestSuite::start_2ch_audiotest)
-            TEST_ADD(RtpAudioTestSuite::stop_2ch_audiotest)
-            TEST_ADD(RtpAudioTestSuite::start_stop_2ch_audiotest)
-
             TEST_ADD(RtpAudioTestSuite::start_8ch_jack)
             TEST_ADD(RtpAudioTestSuite::stop_8ch_jack)
             TEST_ADD(RtpAudioTestSuite::start_stop_8ch_jack)
+
+            TEST_ADD(RtpAudioTestSuite::start_2ch_audiotest)
+            TEST_ADD(RtpAudioTestSuite::stop_2ch_audiotest)
+            TEST_ADD(RtpAudioTestSuite::start_stop_2ch_audiotest)
+
+            TEST_ADD(RtpAudioTestSuite::start_2ch_audiotest)
+            TEST_ADD(RtpAudioTestSuite::stop_2ch_audiotest)
+            TEST_ADD(RtpAudioTestSuite::start_stop_2ch_audiotest)
 
             TEST_ADD(RtpAudioTestSuite::start_8ch_audiotest)
             TEST_ADD(RtpAudioTestSuite::stop_8ch_audiotest)
