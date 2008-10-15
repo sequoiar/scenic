@@ -65,20 +65,20 @@ short Sro::run()
 short Pul::run()
 {
     if (pid_ == 0) {
+        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(DEMO_0_IP));
+        vRx->start();
+        BLOCK();
+        assert(vRx->isPlaying());
+        vRx->stop();
+    }
+    else {
         VideoConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, DEMO_1_IP));
+        std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig, DEMO_0_IP));
         vTx->start();
         
         BLOCK();
         assert(vTx->isPlaying());
         vTx->stop();
-    }
-    else {
-        std::auto_ptr<VideoReceiver> vRx(buildVideoReceiver(DEMO_1_IP));
-        vRx->start();
-        BLOCK();
-        assert(vRx->isPlaying());
-        vRx->stop();
     }
     return 0;
 }
