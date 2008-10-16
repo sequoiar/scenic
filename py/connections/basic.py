@@ -132,7 +132,7 @@ class BasicClient(LineReceiver):
 
     def send_settings(self):
         if not self.chan.remote:
-            reactor.callLater(0.000001, self.send_settings)
+            reactor.callLater(0.001, self.send_settings)
         else:
             print self.host.host
             self.chan.callRemote('BasicServer.remote_info', self.host.host, PORT, 'ip')
