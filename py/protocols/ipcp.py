@@ -20,7 +20,7 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 import re
-from types import NoneType, FunctionType
+from types import NoneType, FunctionType, InstanceType
 
 # twisted imports
 from twisted.internet import reactor, protocol, defer
@@ -47,7 +47,7 @@ class IPCP(LineReceiver):
         log.debug('Callback list: ' + repr(self.callbacks))
             
     def del_callback(self, name):
-        if isinstance(name, FunctionType):
+        if isinstance(name, InstanceType):
             name = cmd.im_class.__name__ + '/' + cmd.__name__
         if name in self.callbacks:
             del self.callbacks[name]

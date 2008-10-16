@@ -30,7 +30,7 @@ class Streams(object):
         self.mode = mode
         self.container = None
         self.port = None
-        self._kinds = ('audio', 'video')
+        self._kinds = ('audio', 'video')    #TODO: autopopulate from stream subdirectory
 
     def get_kind(self, stream):
         if isinstance(stream, AudioStream):
