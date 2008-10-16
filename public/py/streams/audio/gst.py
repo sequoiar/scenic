@@ -77,8 +77,8 @@ class AudioGst(AudioStream, GstClient):
         self._del_callback()
         self._core.notify(None, state, 'audio_sending_stopped')
    
-    def start_receving(self, channel):
-        """function start_receving
+    def start_receiving(self, channel):
+        """function start_receiving
         """
         self._chan = channel
         self._chan.add(self.caps)
@@ -95,14 +95,14 @@ class AudioGst(AudioStream, GstClient):
         if answer:
             self._core.notify(None, 1, 'audio_receiving_started')
             
-    def stop_receving(self):
-        """function stop_receving
+    def stop_receiving(self):
+        """function stop_receiving
         """
-        self._send_cmd('audio_stop', None, self.receving_stopped)
+        self._send_cmd('audio_stop', None, self.receiving_stopped)
 
-    def receving_stopped(self, state):
+    def receiving_stopped(self, state):
         self._del_callback()
-        self._core.notify(None, state, 'audio_receving_stopped')
+        self._core.notify(None, state, 'audio_receiving_stopped')
 
     def gst_levels(self, values):
         log.info('Audio levels: %s' % values)

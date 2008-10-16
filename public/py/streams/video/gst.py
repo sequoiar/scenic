@@ -75,18 +75,18 @@ class VideoGst(VideoStream, GstClient):
         self._del_callback()
         self._core.notify(None, state, 'video_sending_stopped')
    
-    def start_receving(self, channel):
-        """function start_receving"""
+    def start_receiving(self, channel):
+        """function start_receiving"""
         attrs = self.get_attrs()
         self._send_cmd('video_start', attrs)
     
-    def stop_receving(self, state):
-        """function stop_receving
+    def stop_receiving(self, state):
+        """function stop_receiving
         
         returns 
         """
         self._del_callback()
-        self._core.notify(self, state, 'video_receving_stopped')
+        self._core.notify(self, state, 'video_receiving_stopped')
     
 def start(core):
     return VideoGst(core)

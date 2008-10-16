@@ -120,8 +120,8 @@ class Streams(object):
         else:
             self.mode = 'receive'
             for key in keys:
-                self.streams[key].start_receving(channel)
-            return 'Starting receving...'
+                self.streams[key].start_receiving(channel)
+            return 'Starting receiving...'
         
     
     def stop(self, mode='send'):
@@ -135,8 +135,8 @@ class Streams(object):
             return 'Stopping sending...'
         else:
             for stream in self.streams.values():
-                stream.stop_receving()
-            return 'Stopping receving...'
+                stream.stop_receiving()
+            return 'Stopping receiving...'
     
     
     
@@ -169,13 +169,13 @@ class Stream(object):
         """
         raise NotImplementedError()
 
-    def start_receving(self):
+    def start_receiving(self):
         """ 
         To be overridden by the sub-subclass
         """
         raise NotImplementedError()
     
-    def stop_receving(self):
+    def stop_receiving(self):
         """
         To be overridden by the sub-subclass
         """
