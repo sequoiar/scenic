@@ -63,3 +63,16 @@ void VorbisDepayloader::init()
 }
 
 
+void L16Payloader::init()
+{
+    assert(rtpPay_ = gst_element_factory_make("rtpL16pay", NULL));
+    RtpPay::init();
+}
+
+
+void L16Depayloader::init()
+{
+    assert(rtpPay_ = gst_element_factory_make("rtpL16depay", NULL));
+    RtpPay::init();
+}
+

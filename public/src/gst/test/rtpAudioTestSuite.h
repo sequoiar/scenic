@@ -30,7 +30,7 @@ class RtpAudioTestSuite
 
         RtpAudioTestSuite()
         {
-            testLength_ = 300000;
+            testLength_ = 3000000;
             
             TEST_ADD(RtpAudioTestSuite::start_8ch_jack)
             TEST_ADD(RtpAudioTestSuite::stop_8ch_jack)

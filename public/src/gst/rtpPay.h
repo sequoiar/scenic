@@ -50,13 +50,7 @@ class H264Payloader : public RtpPay
 {
     public: 
 
-        H264Payloader() {}
         void init();
-
-    private:
-
-        H264Payloader(const H264Payloader&);     //No Copy Constructor
-        H264Payloader& operator=(const H264Payloader&);     //No Assignment Operator
 };
 
 
@@ -83,6 +77,20 @@ class VorbisDepayloader : public RtpPay
         void init();
 };
 
+
+class L16Payloader : public RtpPay
+{
+    public: 
+
+        void init();
+};
+
+class L16Depayloader : public RtpPay
+{
+    public: 
+
+        void init();
+};
 
 #endif //_PAYLOADER_H_
 
