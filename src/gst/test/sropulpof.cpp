@@ -114,7 +114,7 @@ short Pof::run()
         AudioConfig aConfig("jackaudiosrc", Demo::NUM_CHANNELS);
         std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, ROOM_B_IP));
         aTx->start();
-        assert(tcpSendCaps(ROOM_A_IP, Ports::CAPS_PORT, aTx->getCaps()));
+        assert(tcpSendCaps(ROOM_B_IP, Ports::CAPS_PORT, aTx->getCaps()));
         
         BLOCK();
         assert(aTx->isPlaying());
