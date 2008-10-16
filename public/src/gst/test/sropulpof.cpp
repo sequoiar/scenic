@@ -79,7 +79,7 @@ short Sro::run()
 short Pul::run()
 {
     if (pid_ == 0) {
-        std::auto_ptr<VideoReceiver> vRx(Factories::buildVideoReceiver(ROOM_B_IP));
+        std::auto_ptr<VideoReceiver> vRx(Factories::buildVideoReceiver(ROOM_A_IP));
         vRx->start();
         BLOCK();
         assert(vRx->isPlaying());
@@ -87,7 +87,7 @@ short Pul::run()
     }
     else {
         VideoConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(Factories::buildVideoSender(vConfig, ROOM_B_IP));
+        std::auto_ptr<VideoSender> vTx(Factories::buildVideoSender(vConfig, ROOM_A_IP));
         vTx->start();
         
         BLOCK();
@@ -102,7 +102,7 @@ short Pul::run()
 short Pof::run()
 {
     if (pid_ == 0) {
-        std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(ROOM_A_IP));
+        std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(ROOM_B_IP));
         aRx->start();
         
         BLOCK();
@@ -112,7 +112,7 @@ short Pof::run()
     }
     else {
         AudioConfig aConfig("jackaudiosrc", Demo::NUM_CHANNELS);
-        std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, ROOM_A_IP));
+        std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, ROOM_B_IP));
         aTx->start();
         assert(tcpSendCaps(ROOM_A_IP, Ports::CAPS_PORT, aTx->getCaps()));
         
