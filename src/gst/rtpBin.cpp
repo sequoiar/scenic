@@ -40,7 +40,7 @@ void RtpBin::init()
     if (!rtpbin_) {
         rtpbin_ = gst_element_factory_make("gstrtpbin", NULL);
         assert(rtpbin_);
-
+        g_object_set(G_OBJECT(rtpbin_), "latency", 10, NULL); // has no visible impact
         pipeline_.add(rtpbin_);
     }
 }
@@ -77,6 +77,7 @@ double RtpBin::bandwidth() const
 {
     double result = 0.0;
 
+    // FIXME: use gstrtpbin's get internal rtpsession method
     GstIteratorResult iterResult;
     GstElement *elem;
     GstIterator *iter;

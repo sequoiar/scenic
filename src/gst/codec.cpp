@@ -44,7 +44,7 @@ void H264Encoder::init()
     pipeline_.add(colorspc_);
 
     assert(codec_ = gst_element_factory_make("x264enc", NULL));
-    g_object_set(G_OBJECT(codec_), "bitrate", 2048, "byte-stream", TRUE, "threads", 3,
+    g_object_set(G_OBJECT(codec_), "bitrate", 2048, "byte-stream", TRUE, "threads", 4,
                      NULL);
     pipeline_.add(codec_);
 
@@ -95,3 +95,43 @@ RtpPay* VorbisDecoder::createDepayloader() const
 {
     return new VorbisDepayloader();
 }
+
+
+void RawEncoder::init()
+{
+    assert(aconv_ = gst_element_factory_make("audioconvert", NULL));
+    pipeline_.add(aconv_);
+}
+
+
+void RawDecoder::init()
+{
+    assert(aconv_ = gst_element_factory_make("audioconvert", NULL));
+    pipeline_.add(aconv_);
+}
+
+
+RtpPay* RawEncoder::createPayloader() const
+{
+    return new L16Payloader();
+}
+
+
+RtpPay* RawDecoder::createDepayloader() const
+{
+    return new L16Depayloader();
+}
+
+RawEncoder::~RawEncoder()
+{
+    stop();
+    pipeline_.remove(&aconv_);
+}
+
+
+RawDecoder::~RawDecoder()
+{
+    stop();
+    pipeline_.remove(&aconv_);
+}
+

@@ -21,6 +21,7 @@
 #define _CODEC_H_
 
 #include "gstLinkable.h"
+#include "logWriter.h"
 
 class _GstElement;
 class RtpPay;
@@ -106,6 +107,45 @@ class VorbisDecoder : public Decoder
         RtpPay* createDepayloader() const;
 };
 
+
+// FIXME: make Raw base class
+class RawEncoder : public Encoder 
+{
+    public: 
+        RawEncoder() : aconv_(0) {};
+        ~RawEncoder();
+        void init();
+        RtpPay* createPayloader() const;
+    
+    private:
+
+        _GstElement *srcElement() { return aconv_; }
+        _GstElement *sinkElement() { return aconv_; }
+        _GstElement *aconv_;
+        
+        RawEncoder(const RawEncoder&);     //No Copy Constructor
+        RawEncoder& operator=(const RawEncoder&);     //No Assignment Operator
+};
+
+
+class RawDecoder : public Decoder
+{
+    public: 
+
+        RawDecoder() : aconv_(0) {};
+        ~RawDecoder();
+        void init();
+        RtpPay* createDepayloader() const;
+
+    private:
+
+        _GstElement *srcElement() { return aconv_; }
+        _GstElement *sinkElement() { return aconv_; }
+        _GstElement *aconv_;
+        
+        RawDecoder(const RawDecoder&);     //No Copy Constructor
+        RawDecoder& operator=(const RawDecoder&);     //No Assignment Operator
+};
 
 #endif //_CODEC_H_
 

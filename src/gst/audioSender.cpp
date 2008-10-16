@@ -60,20 +60,20 @@ void AudioSender::init_level()
 
 void AudioSender::init_codec()
 {
-        assert(encoder_ = remoteConfig_.createEncoder());
-        encoder_->init();
+    assert(encoder_ = remoteConfig_.createEncoder());
+    encoder_->init();
 
-        GstLinkable::link(level_, *encoder_);
+    GstLinkable::link(level_, *encoder_);
 }
 
 
 void AudioSender::init_payloader()   
 {
-     assert(payloader_ = encoder_->createPayloader());
-     payloader_->init();
-     
-     GstLinkable::link(*encoder_, *payloader_);
-     session_.add(payloader_, remoteConfig_);   // FIXME: session should take RtpPay pointer
+    assert(payloader_ = encoder_->createPayloader());
+    payloader_->init();
+
+    GstLinkable::link(*encoder_, *payloader_);
+    session_.add(payloader_, remoteConfig_);   // FIXME: session should take RtpPay pointer
 }
 
 // CAPS can only be sent after this is started
