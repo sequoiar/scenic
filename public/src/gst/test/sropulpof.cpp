@@ -18,166 +18,58 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "sropulpof.h"
 #include "factories.h"
 #include "eventLoop.h"
 #include <cassert>
 #include <cstdlib>
+#include "sropulpof.h"
 
-const char *ROOM_A_IP = "10.10.10.188"; // Room A
-const char *ROOM_B_IP = "10.10.10.190";	// Room B
+const short Pof::NUM_CHANNELS = 2;
 
-const short Demo::NUM_CHANNELS = 4;
-
-Sro::Sro(short pid, long txPort, long rxPort, const char *localIp, const char *remoteIp) 
-    : Demo(pid), txPort_(txPort), rxPort_(rxPort), localIp_(localIp), remoteIp_(remoteIp)
+Pof::Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort)
+: pid_(pid), ip_(ip), videoCodec_(videoCodec), audioCodec_(audioCodec), videoPort_(videoPort), audioPort_(audioPort)
 {
-    if (pid_ != 0 && pid_ != 1)
-        THROW_ERROR(usage());
+    if (pid_ != 'r' && pid_ != 's')
+        THROW_ERROR("Invalid pid");
 }
 
-Pul::Pul(short pid) : Demo(pid)
+// 2way audio and video
+short Pof::run()
 {
-    if (pid_ != 0 && pid_ != 1)
-        THROW_ERROR(usage());
-}
-
-Pof::Pof(short pid) : Demo(pid)
-{
-    if (pid_ != 0 && pid_ != 1)
-        THROW_ERROR(usage());
-}
-
-// 2 way audio and video
-short Sro::run()
-{
-    if (pid_ == 0) {
-        std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(localIp_, "mp3", rxPort_));
+    if (pid_ == 'r') {
+        std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(ip_, audioCodec_, audioPort_));
+        aRx->start();
+        
+        std::auto_ptr<VideoReceiver> vRx(Factories::buildVideoReceiver(ip_, videoCodec_, videoPort_));
         aRx->start();
         
         BLOCK();
         assert(aRx->isPlaying());
+        assert(vRx->isPlaying());
 
         aRx->stop();
-    } 
-    else 
-    {
-        AudioConfig aConfig("jackaudiosrc", Demo::NUM_CHANNELS);
-        std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, remoteIp_, "mp3", txPort_));
-        aTx->start();
-        assert(tcpSendCaps(ROOM_A_IP, Ports::CAPS_PORT, aTx->getCaps()));
-        
-        BLOCK();
-        assert(aTx->isPlaying());
-
-        aTx->stop();
-    }
-    return 0;
-}
-
-// One way video
-short Pul::run()
-{
-    if (pid_ == 0) {
-        std::auto_ptr<VideoReceiver> vRx(Factories::buildVideoReceiver(ROOM_A_IP, "h264"));
-        vRx->start();
-        BLOCK();
-        assert(vRx->isPlaying());
         vRx->stop();
     }
     else {
-        VideoConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(Factories::buildVideoSender(vConfig, ROOM_A_IP, "h264"));
+        AudioConfig aConfig("jackaudiosrc", Pof::NUM_CHANNELS);
+        std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, ip_, audioCodec_, audioPort_));
+        aTx->start();
+        assert(tcpSendCaps(ip_, Ports::CAPS_PORT, aTx->getCaps()));
+
+        VideoConfig vConfig("v4l2src");
+        std::auto_ptr<VideoSender> vTx(Factories::buildVideoSender(vConfig, ip_, videoCodec_, videoPort_));
         vTx->start();
         
         BLOCK();
+        assert(aTx->isPlaying());
         assert(vTx->isPlaying());
+
+        aTx->stop();
         vTx->stop();
     }
     return 0;
 }
 
-
-// One Way audio
-short Pof::run()
-{
-    if (pid_ == 0) {
-        std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(ROOM_B_IP, "mp3"));
-        aRx->start();
-        
-        BLOCK();
-        assert(aRx->isPlaying());
-
-        aRx->stop();
-    }
-    else {
-        AudioConfig aConfig("jackaudiosrc", Demo::NUM_CHANNELS);
-        std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, ROOM_B_IP, "mp3"));
-        aTx->start();
-        assert(tcpSendCaps(ROOM_B_IP, Ports::CAPS_PORT, aTx->getCaps()));
-        
-        BLOCK();
-        assert(aTx->isPlaying());
-
-        aTx->stop();
-    }
-    return 0;
-}
-
-
-int mainSro(int argc, char **argv)
-{
-    int pid;
-    long rxPort, txPort;
-    std::string localIp, remoteIp;
-
-    if (argc == 6)
-    {
-        pid = atoi(argv[1]);
-        txPort = atoi(argv[2]);
-        rxPort = atoi(argv[3]);
-        localIp = argv[4];
-        remoteIp = argv[5];
-    }
-    else
-        THROW_ERROR(Sro::usage());
-
-    Sro sro(pid, txPort, rxPort, localIp.c_str(), remoteIp.c_str());
-
-    std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
-
-    try {
-        return sro.run();
-    }
-    catch (Except e)
-    {
-        std::cerr << e.msg_;
-        return 1;
-    }
-}
-
-
-int mainPul(int argc, char **argv)
-{
-    int pid;
-    if (argc > 1)
-        pid = atoi(argv[1]);
-    else
-        THROW_ERROR(Pul::usage());
-
-    Pul pul(pid);
-
-    std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
-
-    try {
-        return pul.run();
-    }
-    catch (Except e)
-    {
-        std::cerr << e.msg_;
-        return 1;
-    }
-}
 
 #include "gutil/optionArgs.h"
 int mainPof(int argc, char **argv)
@@ -186,24 +78,28 @@ int mainPof(int argc, char **argv)
     bool send = false;
     bool recv = false;
     OptionArgs options;
-    char *addr =0;
-    char *codec = 0;
+    char *ip =0;
+    char *videoCodec = 0;
+    char *audioCodec = 0;
+    int audioPort = 0;
+    int videoPort = 0;
 
-    options.add(new StringArg(&addr,"address", 'a', "addresss", "provide ip address"));
-    options.add(new StringArg(&codec,"codec", 'c', "codec", "h264 vorbis mp3 raw"));
+    options.add(new StringArg(&ip, "address", 'a', "address", "provide ip address"));
+    options.add(new StringArg(&videoCodec, "videocodec", 'v', "videocodec", "h264"));
+    options.add(new StringArg(&audioCodec, "audiocodec", 'a', "audiocodec", "vorbis raw mp3"));
+    options.add(new IntArg(&audioPort, "audioport", 't', "audioport", ""));
+    options.add(new IntArg(&videoPort, "videoport", 'p', "videoport", ""));
     options.add(new BoolArg(&send,"sender", 's', "sender"));
-    options.add(new BoolArg(&recv,"receive", 'r', "receiver"));
+    options.add(new BoolArg(&recv,"receiver", 'r', "receiver"));
 
     options.parse(argc, argv);
 
-    LOG_DEBUG("GOT: addr:" << addr <<" codec:" << codec << " send:" << send << " recv:" << recv);
-
-    if (addr != 0 && (send || recv) )
-        pid = send;
+    if (ip != 0 && (send || recv) )
+        pid = send ? 's' : 'r';
     else
-        THROW_ERROR(Pof::usage());
+        THROW_ERROR("Check yourself before you wreck yourself");
 
-    Pof pof(pid);
+    Pof pof(pid, ip, videoCodec, audioCodec, videoPort, audioPort);
 
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
 
@@ -215,5 +111,6 @@ int mainPof(int argc, char **argv)
         std::cerr << e.msg_;
         return 1;
     }
+
 }
 

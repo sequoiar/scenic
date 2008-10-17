@@ -16,8 +16,11 @@
 namespace Factories {
     std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig, 
             const char* ip, const char *codec, const long port = Ports::A_PORT);
+
     std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *ip, const char * codec, const long port = Ports::A_PORT);
+
     std::auto_ptr<VideoReceiver> buildVideoReceiver(const char *ip, const char * codec, const long port = Ports::V_PORT);
+    
     std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig, 
             const char *ip, const char *codec, const long port = Ports::V_PORT);
 }

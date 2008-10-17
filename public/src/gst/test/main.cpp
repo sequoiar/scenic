@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+
 int mainSyncTestSuite(int argc, char **argv);
 int mainRtpSyncTestSuite(int argc, char **argv);
 
@@ -9,8 +10,6 @@ int mainRtpVideoTestSuite(int argc, char **argv);
 int mainRtpAudioTestSuite(int argc, char **argv);
 int mainAudioTestSuite(int argc, char **argv);
 
-int mainSro(int argc, char **argv);
-int mainPul(int argc, char **argv);
 int mainPof(int argc, char **argv);
 
 int main(int argc, char **argv)
@@ -29,10 +28,6 @@ int main(int argc, char **argv)
        return mainAudioTestSuite(argc,argv);
    else if(filename.find("rtpSyncTester") != std::string::npos)
        return mainRtpSyncTestSuite(argc,argv);
-   else if (filename.find("sro") != std::string::npos)
-       return mainSro(argc, argv);
-   else if (filename.find("pul") != std::string::npos)
-       return mainPul(argc, argv);
    else if (filename.find("pof") != std::string::npos)
        return mainPof(argc, argv);
    else
