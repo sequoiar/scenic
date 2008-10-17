@@ -179,12 +179,23 @@ int mainPul(int argc, char **argv)
     }
 }
 
+#include "gutil/optionArgs.h"
 
 int mainPof(int argc, char **argv)
 {
     char pid;
-    if (argc > 1)
-        pid = atoi(argv[1]);
+    bool send = false;
+    bool recv = false;
+    OptionArgs options;
+    char *str =0;
+    options.add(new StringArg(&str,"address", 'a', "addresss", "provide ip address"));
+    options.add(new BoolArg(&send,"sender", 's', "sender"));
+    options.add(new BoolArg(&recv,"receive", 'r', "receiver"));
+
+    options.parse(argc, argv);
+
+    if (str != 0 && (send || recv) )
+        pid = send;
     else
         THROW_ERROR(Pof::usage());
 
