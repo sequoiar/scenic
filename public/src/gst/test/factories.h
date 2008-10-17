@@ -9,7 +9,6 @@
 #include "videoConfig.h"
 #include "remoteConfig.h"
 #include "capsHelper.h"
-#include "hostIP.h"
 #include "ports.h"
 #include <memory>   // for std::auto_ptr
 
