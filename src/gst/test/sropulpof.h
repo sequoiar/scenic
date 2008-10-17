@@ -20,49 +20,23 @@
 #ifndef _SROPULPOF_H_
 #define _SROPULPOF_H_
 
-class Demo {
-    public:
-        Demo(short pid) : pid_(pid) {}
-        virtual short run() = 0;
-        virtual ~Demo(){};
-    protected:
-        short pid_;
-        const static short NUM_CHANNELS;
-};
-
-class Sro : public Demo
+class Pof 
 {
     public:
-        Sro(short pid, long txPort, long rxPort, const char *localIp, const char *remoteIp);
-        ~Sro(){};
-        short run();
-        static const char *usage() { return "Usage: sro <0/1> txPort rxPort localIp remoteIp"; }
-    private:
-        long txPort_;
-        long rxPort_;
-        const char *localIp_;
-        const char *remoteIp_;
-        Sro(const Sro&);     //No Copy Constructor
-        Sro& operator=(const Sro&);     //No Assignment Operator
-};
-
-class Pul : public Demo
-{
-    public:
-        Pul(short pid);
-        ~Pul(){};
-        short run();
-        static const char *usage() { return "Usage: pul <0/1>"; }
-};
-
-
-class Pof : public Demo
-{
-    public:
-        Pof(short pid);
+        Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort);
         ~Pof(){};
         short run();
-        static const char *usage() { return "Usage: pof <0/1>"; }
+        static const short NUM_CHANNELS;
+
+    private:
+        char pid_;
+        const char *ip_;
+        const char *videoCodec_;
+        const char *audioCodec_;
+        const long videoPort_;
+        const long audioPort_;
+        Pof(const Pof&);     //No Copy Constructor
+        Pof& operator=(const Pof&);     //No Assignment Operator
 };
 
 #endif // _SROPULPOF_H_
