@@ -74,7 +74,7 @@ void OptionArgs::add(BaseArg *ba)
 
 GOptionEntry* OptionArgs::getArray()
 {
-    GOptionEntry n; // = { NULL };
+    GOptionEntry n = { NULL, 0, 0, G_OPTION_ARG_NONE, 0, 0, 0 };
     unsigned int count = 0;
     if(options_.empty())
         return 0;
