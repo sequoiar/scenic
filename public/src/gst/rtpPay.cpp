@@ -76,3 +76,17 @@ void L16Depayloader::init()
     RtpPay::init();
 }
 
+
+void MpaPayloader::init()
+{
+    assert(rtpPay_ = gst_element_factory_make("rtpmpapay", NULL));
+    RtpPay::init();
+}
+
+
+void MpaDepayloader::init()
+{
+    assert(rtpPay_ = gst_element_factory_make("rtpmpadepay", NULL));
+    RtpPay::init();
+}
+

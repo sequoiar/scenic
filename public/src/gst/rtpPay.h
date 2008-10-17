@@ -92,5 +92,20 @@ class L16Depayloader : public RtpPay
         void init();
 };
 
+
+class MpaPayloader : public RtpPay
+{
+    public: 
+
+        void init();
+};
+
+class MpaDepayloader : public RtpPay
+{
+    public: 
+
+        void init();
+};
+
 #endif //_PAYLOADER_H_
 

@@ -30,7 +30,7 @@
 
 class Encoder;
 class Decoder;
-const int NUM_CODECS = 3;
+const int NUM_CODECS = 4;
 
 class RemoteConfig 
 {

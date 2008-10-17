@@ -135,3 +135,50 @@ RawDecoder::~RawDecoder()
     pipeline_.remove(&aconv_);
 }
 
+
+void LameEncoder::init()
+{
+    assert(aconv_ = gst_element_factory_make("audioconvert", NULL));
+    pipeline_.add(aconv_);
+    assert(codec_ = gst_element_factory_make("lame", NULL));
+    pipeline_.add(codec_);
+
+    GstLinkable::link(aconv_, codec_);
+}
+
+
+void MadDecoder::init()
+{
+    assert(codec_ = gst_element_factory_make("mad", NULL));
+    pipeline_.add(codec_);
+    assert(aconv_ = gst_element_factory_make("audioconvert", NULL));
+    pipeline_.add(aconv_);
+
+    GstLinkable::link(codec_, aconv_);
+}
+
+
+RtpPay* LameEncoder::createPayloader() const
+{
+    return new MpaPayloader();
+}
+
+
+RtpPay* MadDecoder::createDepayloader() const
+{
+    return new MpaDepayloader();
+}
+
+LameEncoder::~LameEncoder()
+{
+    stop();
+    pipeline_.remove(&aconv_);
+}
+
+
+MadDecoder::~MadDecoder()
+{
+    stop();
+    pipeline_.remove(&aconv_);
+}
+
