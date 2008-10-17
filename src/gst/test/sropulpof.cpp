@@ -180,21 +180,25 @@ int mainPul(int argc, char **argv)
 }
 
 #include "gutil/optionArgs.h"
-
 int mainPof(int argc, char **argv)
 {
     char pid;
     bool send = false;
     bool recv = false;
     OptionArgs options;
-    char *str =0;
-    options.add(new StringArg(&str,"address", 'a', "addresss", "provide ip address"));
+    char *addr =0;
+    char *codec = 0;
+
+    options.add(new StringArg(&addr,"address", 'a', "addresss", "provide ip address"));
+    options.add(new StringArg(&codec,"codec", 'c', "codec", "h264 vorbis mp3 raw"));
     options.add(new BoolArg(&send,"sender", 's', "sender"));
     options.add(new BoolArg(&recv,"receive", 'r', "receiver"));
 
     options.parse(argc, argv);
 
-    if (str != 0 && (send || recv) )
+    LOG_DEBUG("GOT: addr:" << addr <<" codec:" << codec << " send:" << send << " recv:" << recv);
+
+    if (addr != 0 && (send || recv) )
         pid = send;
     else
         THROW_ERROR(Pof::usage());
