@@ -108,7 +108,7 @@ class VorbisDecoder : public Decoder
 };
 
 
-// FIXME: make Raw base class
+// FIXME: DRY!!!!
 class RawEncoder : public Encoder 
 {
     public: 
@@ -145,6 +145,43 @@ class RawDecoder : public Decoder
         
         RawDecoder(const RawDecoder&);     //No Copy Constructor
         RawDecoder& operator=(const RawDecoder&);     //No Assignment Operator
+};
+
+
+class LameEncoder : public Encoder 
+{
+    public: 
+        LameEncoder() : aconv_(0) {};
+        ~LameEncoder();
+        void init();
+        RtpPay* createPayloader() const;
+    
+    private:
+
+        _GstElement *sinkElement() { return aconv_; }
+        _GstElement *aconv_;
+        
+        LameEncoder(const LameEncoder&);     //No Copy Constructor
+        LameEncoder& operator=(const LameEncoder&);     //No Assignment Operator
+};
+
+
+class MadDecoder : public Decoder
+{
+    public: 
+
+        MadDecoder() : aconv_(0) {};
+        ~MadDecoder();
+        void init();
+        RtpPay* createDepayloader() const;
+
+    private:
+
+        _GstElement *srcElement() { return aconv_; }
+        _GstElement *aconv_;
+        
+        MadDecoder(const MadDecoder&);     //No Copy Constructor
+        MadDecoder& operator=(const MadDecoder&);     //No Assignment Operator
 };
 
 #endif //_CODEC_H_

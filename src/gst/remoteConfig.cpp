@@ -31,7 +31,7 @@
 const int RemoteConfig::PORT_MIN = 1024;
 const int RemoteConfig::PORT_MAX = 65000;
 
-const std::string RemoteConfig::VALID_CODECS[NUM_CODECS] = {"h264", "raw", "vorbis"};
+const std::string RemoteConfig::VALID_CODECS[NUM_CODECS] = {"h264", "raw", "vorbis", "mp3"};
         
 RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remoteHost__,
         int port__) : codec_(codec__), remoteHost_(remoteHost__), port_(port__)
@@ -61,6 +61,8 @@ Encoder * SenderConfig::createEncoder() const
         return new H264Encoder();
     else if (codec_ == "raw")
         return new RawEncoder();
+    else if (codec_ == "mp3")
+        return new LameEncoder();
 
     THROW_ERROR(codec_ << " is an invalid codec!");
     return 0;
@@ -78,6 +80,8 @@ Decoder * ReceiverConfig::createDecoder() const
         return new H264Decoder();
     else if (codec_ == "raw")
         return new RawDecoder();
+    else if (codec_ == "mp3")
+        return new MadDecoder();
 
     THROW_ERROR(codec_ << " is an invalid codec!");
     return 0;

@@ -89,7 +89,7 @@ void AudioReceiver::start()
 void AudioReceiver::set_caps(const char *caps) 
 { 
     session_.set_caps(caps); 
-    session_.checkSampleRate();
+    //session_.checkSampleRate();
     gotCaps_ = true;
 }
 

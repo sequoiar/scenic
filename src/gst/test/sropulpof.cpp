@@ -182,7 +182,7 @@ int mainPul(int argc, char **argv)
 
 int mainPof(int argc, char **argv)
 {
-    int pid;
+    char pid;
     if (argc > 1)
         pid = atoi(argv[1]);
     else
