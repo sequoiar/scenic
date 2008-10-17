@@ -103,7 +103,7 @@ class GstServer(object):
 
     def start_process(self):
 #        if self.state < RUNNING:
-#            self.state = RUNNING    # Uncomment this line to start the GST process "by hand"
+        self.state = RUNNING    # Uncomment this line to start the GST process "by hand"
         if self.state < STARTING:
             self.state = STARTING
             gst_app = 'mainTester'

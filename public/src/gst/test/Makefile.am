@@ -2,15 +2,14 @@ include $(top_srcdir)/src/globals.mak
 
 #bin_PROGRAMS = audioTester rtpAudioTester videoTester syncTester rtpVideoTester
 bin_PROGRAMS = allTester
-allTester_SOURCES =   syncTestSuite.cpp rtpSyncTestSuite.cpp videoTestSuite.cpp rtpVideoTestSuite.cpp \ 
-				rtpAudioTestSuite.cpp audioTestSuite.cpp gstTestSuite.cpp sropulpof.cpp main.cpp 
+allTester_SOURCES =   syncTestSuite.cpp rtpSyncTestSuite.cpp videoTestSuite.cpp rtpVideoTestSuite.cpp rtpAudioTestSuite.cpp audioTestSuite.cpp gstTestSuite.cpp sropulpof.cpp main.cpp 
 #audioTester_SOURCES = audioTestSuite.cpp gstTestSuite.cpp
 #rtpAudioTester_SOURCES = rtpAudioTestSuite.cpp gstTestSuite.cpp
 #videoTester_SOURCES = videoTestSuite.cpp gstTestSuite.cpp
 #rtpVideoTester_SOURCES = rtpVideoTestSuite.cpp gstTestSuite.cpp
 #syncTester_SOURCES = syncTestSuite.cpp gstTestSuite.cpp
 
-LDADD = $(ALL_GST_LIBS) $(CPPTEST_LIBS) $(JACK_LIBS) $(GTK_LIBS) ../libgst.a $(src)/tcp/libtcp.a $(LIBUTIL) $(LIBAVC1394_LIBS)
+LDADD = $(ALL_GST_LIBS) $(CPPTEST_LIBS) $(JACK_LIBS) $(GTK_LIBS) ../libgst.a $(src)/gutil/libGUtil.a $(src)/tcp/libtcp.a $(LIBUTIL) $(LIBAVC1394_LIBS)
 allTester_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS)
 #audioTester_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) 
 #rtpAudioTester_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS)
