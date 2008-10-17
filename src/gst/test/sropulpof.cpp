@@ -84,7 +84,7 @@ int mainPof(int argc, char **argv)
     int audioPort = 0;
     int videoPort = 0;
 
-    options.add(new StringArg(&ip, "address", 'a', "address", "provide ip address"));
+    options.add(new StringArg(&ip, "address", 'i', "address", "provide ip address"));
     options.add(new StringArg(&videoCodec, "videocodec", 'v', "videocodec", "h264"));
     options.add(new StringArg(&audioCodec, "audiocodec", 'a', "audiocodec", "vorbis raw mp3"));
     options.add(new IntArg(&audioPort, "audioport", 't', "audioport", ""));
@@ -94,10 +94,13 @@ int mainPof(int argc, char **argv)
 
     options.parse(argc, argv);
 
+        pid = send ? 's' : 'r';
+/*
     if (ip != 0 && (send || recv) )
         pid = send ? 's' : 'r';
     else
         THROW_ERROR("Check yourself before you wreck yourself");
+*/
 
     Pof pof(pid, ip, videoCodec, audioCodec, videoPort, audioPort);
 
