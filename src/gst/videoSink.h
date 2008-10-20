@@ -35,6 +35,8 @@ class VideoSink
             : sink_(0) {};
         ~VideoSink(){};
         virtual void showWindow() {};   // FIXME: not useful for ximagesink
+        virtual void makeFullscreen() = 0;
+        virtual void makeUnfullscreen() = 0;
 
         _GstElement *sinkElement() { return sink_; }
         
@@ -57,9 +59,15 @@ class XvImageSink
         ~XvImageSink();
         void init();
         void showWindow();
+        void makeFullscreen() { makeFullscreen(window_); }
+        void makeUnfullscreen() { makeUnfullscreen(window_); }
+
+    private:
+        static void makeFullscreen(_GtkWidget *widget);
+        static void makeUnfullscreen(_GtkWidget *widget);
 
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
-                                           void *data);
+                void *data);
         static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
         void makeWindowBlack();
 
@@ -70,12 +78,15 @@ class XvImageSink
 
 
 class XImageSink
-    : public VideoSink
+: public VideoSink
 {
     public: 
         XImageSink() : colorspc_(0) {};
         ~XImageSink();
         void init();
+        // FIXME: need to implement this support in ximagesink
+        void makeFullscreen() {}
+        void makeUnfullscreen() {}
 
         _GstElement *sinkElement() { return colorspc_; }
     private:
