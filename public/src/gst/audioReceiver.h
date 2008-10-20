@@ -45,6 +45,7 @@ class AudioReceiver
         ~AudioReceiver();
 
         void start();
+        Decoder *getDecoder() { return decoder_; }
 
     private:
         AudioReceiver();

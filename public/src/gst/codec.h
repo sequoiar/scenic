@@ -59,6 +59,7 @@ class Decoder : public Codec
 {
     public:
         virtual RtpPay* createDepayloader() const = 0;
+        virtual void setSrcCaps(){ LOG_DEBUG("BASE DECODER");};
 };
 
 
@@ -104,6 +105,7 @@ class VorbisDecoder : public Decoder
     public: 
 
         void init();
+        void setSrcCaps();
         RtpPay* createDepayloader() const;
 };
 

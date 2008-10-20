@@ -85,6 +85,25 @@ void VorbisDecoder::init()
 }
 
 
+void VorbisDecoder::setSrcCaps()
+{
+    LOG_DEBUG("SETTING CAPS");
+    GstPad *srcPad = gst_element_get_static_pad(codec_, "src");
+    assert(srcPad);
+    GstCaps *caps = gst_caps_from_string("audio/x-raw-float, endianness=(int)1234, width=(int)32, "
+            "rate=(int)48000, channels=(int)8, channel-positions=(GstAudioChannelPosition)< "
+            "GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT, GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT, "
+            "GST_AUDIO_CHANNEL_POSITION_REAR_LEFT, GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT, "
+            "GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER, GST_AUDIO_CHANNEL_POSITION_LFE, "
+            "GST_AUDIO_CHANNEL_POSITION_SIDE_LEFT, GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT >");
+    assert(caps);
+    assert(gst_pad_set_caps(srcPad, caps));
+
+    gst_caps_unref(caps);
+    gst_object_unref(srcPad);
+}
+
+
 RtpPay* VorbisEncoder::createPayloader() const
 {
     return new VorbisPayloader();

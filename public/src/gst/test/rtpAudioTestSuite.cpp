@@ -28,6 +28,7 @@
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "ports.h"
+#include "codec.h"
 
 #include <sstream>
 
@@ -241,6 +242,11 @@ void RtpAudioTestSuite::start_8ch_jack()
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
         rx->start();
+        //FIXME: figure out how to set layout
+#if 0
+        rx->getDecoder()->setSrcCaps();
+        LOG_DEBUG("CAPS SET?");
+#endif
 
         BLOCK();
         TEST_ASSERT(rx->isPlaying());

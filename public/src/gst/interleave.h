@@ -34,6 +34,8 @@ class Interleave
 
         ~Interleave();
         void init();
+        // caps must be unreffed by caller
+        //GstCaps *getSrcCaps();
 
     protected:
         GstElement *srcElement() { return interleave_; }
