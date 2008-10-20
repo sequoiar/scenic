@@ -38,7 +38,8 @@ RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remote
 {
     if(codec_.empty())
         THROW_ERROR("No Codec specified.");
-    bool validCodec = std::find(VALID_CODECS, VALID_CODECS + NUM_CODECS*sizeof(std::string), codec_);
+    const std::string *VALID_CODECS_END = VALID_CODECS + (NUM_CODECS * sizeof(std::string));
+    bool validCodec = std::find(VALID_CODECS, VALID_CODECS_END, codec_) != VALID_CODECS_END;
     //bool validCodec = iter != VALID_CODECS.end();
 
     if(!validCodec)

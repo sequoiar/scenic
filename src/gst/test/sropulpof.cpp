@@ -41,7 +41,7 @@ short Pof::run()
         aRx->start();
         
         std::auto_ptr<VideoReceiver> vRx(Factories::buildVideoReceiver(ip_, videoCodec_, videoPort_));
-        aRx->start();
+        vRx->start();
         
         BLOCK();
         assert(aRx->isPlaying());
