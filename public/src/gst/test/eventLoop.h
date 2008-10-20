@@ -33,7 +33,6 @@
 #include <iostream>
 
 namespace EventLoop {
-
         void block(const char *filename, const char *function, long lineNumber);
         int killMainLoop(void *data);
         const unsigned long long RUNNING_TIME = 60000;
@@ -53,6 +52,8 @@ void EventLoop::block(const char * filename, const char *function, long lineNumb
     std::cout << filename << ":" << function << ":" << lineNumber;
     GMainLoop *loop;                                             
     loop = g_main_loop_new (NULL, FALSE);                       
+
+    // UNComment if you want this event loop to end after RUNNING_TIME ms
 #if 0
     g_timeout_add(RUNNING_TIME, 
             static_cast<GSourceFunc>(EventLoop::killMainLoop), 

@@ -57,10 +57,8 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
     gboolean isFullscreen =
         (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
 
-    if (isFullscreen)
-        gtk_window_unfullscreen(GTK_WINDOW(widget));
-    else
-        gtk_window_fullscreen(GTK_WINDOW(widget));
+    // toggle fullscreen state
+    isFullscreen ? gtk_window_unfullscreen(GTK_WINDOW(widget)) : gtk_window_fullscreen(GTK_WINDOW(widget));
 
     return TRUE;
 }
@@ -77,6 +75,7 @@ void XvImageSink::init()
     pipeline_.add(sink_);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    assert(window_);
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
                          XvImageSink::expose_cb), static_cast<void*>(sink_));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
