@@ -26,7 +26,7 @@
 
 const short Pof::NUM_CHANNELS = 2;
 
-Pof::Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort)
+Pof::Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort, bool /*full*/)
 : pid_(pid), ip_(ip), videoCodec_(videoCodec), audioCodec_(audioCodec), videoPort_(videoPort), audioPort_(audioPort)
 {
     if (pid_ != 'r' && pid_ != 's')
@@ -77,6 +77,7 @@ int mainPof(int argc, char **argv)
     char pid;
     bool send = false;
     bool recv = false;
+    bool full = false;
     OptionArgs options;
     char *ip =0;
     char *videoCodec = 0;
@@ -91,6 +92,7 @@ int mainPof(int argc, char **argv)
     options.add(new IntArg(&videoPort, "videoport", 'p', "videoport", ""));
     options.add(new BoolArg(&send,"sender", 's', "sender"));
     options.add(new BoolArg(&recv,"receiver", 'r', "receiver"));
+    options.add(new BoolArg(&full,"fullscreen", 'f', "default to fullscreen"));
 
     options.parse(argc, argv);
 
@@ -102,7 +104,7 @@ int mainPof(int argc, char **argv)
         THROW_ERROR("Check yourself before you wreck yourself");
 */
 
-    Pof pof(pid, ip, videoCodec, audioCodec, videoPort, audioPort);
+    Pof pof(pid, ip, videoCodec, audioCodec, videoPort, audioPort, full);
 
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
 

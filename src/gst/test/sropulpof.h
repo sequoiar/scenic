@@ -23,7 +23,7 @@
 class Pof 
 {
     public:
-        Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort);
+        Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort, bool full);
         ~Pof(){};
         short run();
         static const short NUM_CHANNELS;
