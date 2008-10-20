@@ -40,6 +40,7 @@ class VideoReceiver
 
         void start();
         void stop();
+        VideoSink *getVideoSink() { return sink_; }
 
         ~VideoReceiver();
 

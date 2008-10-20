@@ -58,7 +58,7 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
         (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
 
     // toggle fullscreen state
-    isFullscreen ? gtk_window_unfullscreen(GTK_WINDOW(widget)) : gtk_window_fullscreen(GTK_WINDOW(widget));
+    isFullscreen ? XvImageSink::makeUnfullscreen(widget) : XvImageSink::makeFullscreen(widget);
 
     return TRUE;
 }
@@ -97,6 +97,18 @@ void XvImageSink::showWindow()
     makeWindowBlack();
     gtk_window_set_title(GTK_WINDOW(window_), "Sropulpof");
     gtk_widget_show_all(window_);
+}
+
+
+void XvImageSink::makeFullscreen(GtkWidget *widget)
+{
+    gtk_window_fullscreen(GTK_WINDOW(widget));
+}
+
+
+void XvImageSink::makeUnfullscreen(GtkWidget *widget)
+{
+    gtk_window_unfullscreen(GTK_WINDOW(widget));
 }
 
 

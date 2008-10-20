@@ -20,14 +20,16 @@
 
 #include "factories.h"
 #include "eventLoop.h"
+#include "videoSink.h"
 #include <cassert>
 #include <cstdlib>
 #include "sropulpof.h"
 
 const short Pof::NUM_CHANNELS = 2;
 
-Pof::Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort, bool /*full*/)
-: pid_(pid), ip_(ip), videoCodec_(videoCodec), audioCodec_(audioCodec), videoPort_(videoPort), audioPort_(audioPort)
+Pof::Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort, bool isFullscreen)
+: pid_(pid), ip_(ip), videoCodec_(videoCodec), audioCodec_(audioCodec), videoPort_(videoPort), audioPort_(audioPort), 
+    isFullscreen_(isFullscreen)
 {
     if (pid_ != 'r' && pid_ != 's')
         THROW_ERROR("Invalid pid");
@@ -42,6 +44,8 @@ short Pof::run()
         
         std::auto_ptr<VideoReceiver> vRx(Factories::buildVideoReceiver(ip_, videoCodec_, videoPort_));
         vRx->start();
+        if(isFullscreen_)
+            vRx->getVideoSink()->makeFullscreen();
         
         BLOCK();
         assert(aRx->isPlaying());
