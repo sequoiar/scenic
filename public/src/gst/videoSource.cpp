@@ -80,7 +80,7 @@ void VideoTestSource::toggle_colour()
 
 void VideoTestSource::sub_init()
 {
-    g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
+    g_object_set(G_OBJECT(source_), "is-live", FALSE, NULL); // necessary for clocked callback to work
     g_object_set(G_OBJECT(source_), "pattern", WHITE, NULL);
 
     clockId_ = pipeline_.add_clock_callback(base_callback, this);
