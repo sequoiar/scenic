@@ -23,7 +23,7 @@
 class Pof 
 {
     public:
-        Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort, bool isFullscreen);
+        Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort, bool isFullscreen, const char *videoDevice);
         ~Pof(){};
         short run();
         static const short NUM_CHANNELS;
@@ -36,6 +36,7 @@ class Pof
         const long videoPort_;
         const long audioPort_;
         bool isFullscreen_;
+        const char *videoDevice_;
         Pof(const Pof&);     //No Copy Constructor
         Pof& operator=(const Pof&);     //No Assignment Operator
 };

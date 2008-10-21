@@ -256,12 +256,7 @@ void VideoDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
 
 void VideoV4lSource::sub_init()
 {
-    std::fstream in;
-    const char *DEVICE = "/dev/video0";
-    in.open(DEVICE, std::fstream::in);
-    if (in.fail())
-        THROW_ERROR("Video4Linux device " << DEVICE << " not found");
-    in.close();
-    g_object_set(G_OBJECT(source_), "device", DEVICE, NULL);
+    if (config_.fileExists())
+        g_object_set(G_OBJECT(source_), "device", config_.location(), NULL);
 }
 
