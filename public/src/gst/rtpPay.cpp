@@ -48,10 +48,12 @@ void H264Depayloader::init()
     RtpPay::init();
 }
 
+const int VorbisPayloader::MAX_PTIME = 200000;
 
 void VorbisPayloader::init()
 {
     assert(rtpPay_ = gst_element_factory_make("rtpvorbispay", NULL));
+    g_object_set(G_OBJECT(rtpPay_), "max-ptime", VorbisPayloader::MAX_PTIME, NULL);
     RtpPay::init();
 }
 

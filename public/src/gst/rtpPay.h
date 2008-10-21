@@ -67,6 +67,9 @@ class VorbisPayloader : public RtpPay
     public: 
 
         void init();
+        // amount of time to let Use max-ptime to limit the amount of 
+        // vorbis packets in an RTP packet. Reduces latency
+        static const int MAX_PTIME;
 };
 
 

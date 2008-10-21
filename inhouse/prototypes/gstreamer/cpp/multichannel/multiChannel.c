@@ -164,6 +164,8 @@ gint main(gint argc, gchar *argv[])
 
     /* create elements */
     pipeline = gst_pipeline_new("audioPipeline");
+    g_signal_connect(pipeline, "deep_notify",
+                G_CALLBACK(gst_object_default_deep_notify), NULL);
 
     /* watch for messages on the pipeline's bus (note that this will only
      * work like this when a GLib main loop is running) */
@@ -209,9 +211,9 @@ gint main(gint argc, gchar *argv[])
     g_object_set(G_OBJECT(sink), "connect", 1, NULL);   // autoconnect jack ports
     g_object_set(G_OBJECT(sink), "sync", FALSE, NULL);
         
-    gst_bin_add_many(GST_BIN (pipeline), audioconverts[NUM_CHANNELS], audioresample, queues[NUM_CHANNELS], sink);
+    gst_bin_add_many(GST_BIN (pipeline), audioconverts[NUM_CHANNELS], audioresample, queues[NUM_CHANNELS], sink, NULL);
 
-    if (!(gst_element_link_many(interleave, audioconverts[NUM_CHANNELS], audioresample, queues[NUM_CHANNELS], sink)))
+    if (!(gst_element_link_many(interleave, audioconverts[NUM_CHANNELS], audioresample, queues[NUM_CHANNELS], sink, NULL)))
     {
         g_print("Failed to link. Quitting.\n");
         return -1;
@@ -219,8 +221,20 @@ gint main(gint argc, gchar *argv[])
 
     /* run */
     ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
+#if 0
+    GstPad* interleaveSrcPad = gst_element_get_static_pad(interleave, "src");
+    GstPad* audioconvertSinkPad = gst_element_get_static_pad(sink, "sink");
+    GstCaps *interleaveSrcPadCaps =  gst_pad_get_negotiated_caps(interleaveSrcPad);
+    gst_pad_set_caps(audioconvertSinkPad, interleaveSrcPadCaps);
+
+    gst_caps_unref(interleaveSrcPadCaps);
+    gst_object_unref(GST_OBJECT(interleaveSrcPad));
+    gst_object_unref(GST_OBJECT(audioconvertSinkPad));
+#endif
+
     ret = gst_element_set_state (pipeline, GST_STATE_PAUSED);
     ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
+
     if (ret == GST_STATE_CHANGE_FAILURE) {
         g_print ("Failed to start up pipeline!\n");
 
