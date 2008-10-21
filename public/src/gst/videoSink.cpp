@@ -29,7 +29,7 @@
 #include "logWriter.h"
 #include "pipeline.h"
 
-#define TRY_GL_VIDEOSINK
+//#define TRY_GL_VIDEOSINK
 
 #ifdef TRY_GL_VIDEOSINK
 #include "glVideoSink.cpp"
