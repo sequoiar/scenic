@@ -23,66 +23,16 @@
 #include "videoSink.h"
 #include <cassert>
 #include <cstdlib>
-#include "sropulpof.h"
+#include "gutil/optionArgs.h"
 
-const short Pof::NUM_CHANNELS = 2;
-
-Pof::Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort, bool isFullscreen, const char *videoDevice)
-: pid_(pid), ip_(ip), videoCodec_(videoCodec), audioCodec_(audioCodec), videoPort_(videoPort), audioPort_(audioPort), 
-    isFullscreen_(isFullscreen), videoDevice_(videoDevice)
+namespace Pof 
 {
-    if (pid_ != 'r' && pid_ != 's')
-        THROW_ERROR("Invalid pid");
+    short run(int argc, char **argv);
+    const short NUM_CHANNELS = 2;
 }
 
 // 2way audio and video
-short Pof::run()
-{
-    if (pid_ == 'r') {
-        std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(ip_, audioCodec_, audioPort_));
-        aRx->start();
-        
-        std::auto_ptr<VideoReceiver> vRx(Factories::buildVideoReceiver(ip_, videoCodec_, videoPort_));
-        vRx->start();
-        if(isFullscreen_)
-            vRx->getVideoSink()->makeFullscreen();
-        
-        BLOCK();
-        assert(aRx->isPlaying());
-        assert(vRx->isPlaying());
-
-        aRx->stop();
-        vRx->stop();
-    }
-    else {
-        AudioConfig aConfig("jackaudiosrc", Pof::NUM_CHANNELS);
-        std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, ip_, audioCodec_, audioPort_));
-        aTx->start();
-        assert(tcpSendCaps(ip_, Ports::CAPS_PORT, aTx->getCaps()));
-        VideoConfig *vConfig; 
-
-        if (videoDevice_)
-            vConfig = new VideoConfig("v4l2src", videoDevice_);
-        else
-            vConfig = new VideoConfig("v4l2src");
-
-        std::auto_ptr<VideoSender> vTx(Factories::buildVideoSender(*vConfig, ip_, videoCodec_, videoPort_));
-        delete vConfig;
-        vTx->start();
-        
-        BLOCK();
-        assert(aTx->isPlaying());
-        assert(vTx->isPlaying());
-
-        aTx->stop();
-        vTx->stop();
-    }
-    return 0;
-}
-
-
-#include "gutil/optionArgs.h"
-int mainPof(int argc, char **argv)
+short Pof::run(int argc, char **argv)
 {
     char pid;
     bool send = false;
@@ -109,25 +59,61 @@ int mainPof(int argc, char **argv)
     options.parse(argc, argv);
 
     pid = send ? 's' : 'r';
-/*
-    if (ip != 0 && (send || recv) )
-        pid = send ? 's' : 'r';
-    else
-        THROW_ERROR("Check yourself before you wreck yourself");
-*/
-
-    Pof pof(pid, ip, videoCodec, audioCodec, videoPort, audioPort, full, videoDevice);
 
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
+    if (pid == 'r') {
+        std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(ip, audioCodec, audioPort));
+        aRx->start();
 
+        std::auto_ptr<VideoReceiver> vRx(Factories::buildVideoReceiver(ip, videoCodec, videoPort));
+        vRx->start();
+        if(full)
+            vRx->getVideoSink()->makeFullscreen();
+
+        BLOCK();
+        assert(aRx->isPlaying());
+        assert(vRx->isPlaying());
+
+        aRx->stop();
+        vRx->stop();
+    }
+    else {
+        AudioConfig aConfig("jackaudiosrc", Pof::NUM_CHANNELS);
+        std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, ip, audioCodec, audioPort));
+        aTx->start();
+        assert(tcpSendCaps(ip, Ports::CAPS_PORT, aTx->getCaps()));
+        VideoConfig *vConfig; 
+
+        if (videoDevice)
+            vConfig = new VideoConfig("v4l2src", videoDevice);
+        else
+            vConfig = new VideoConfig("v4l2src");
+
+        std::auto_ptr<VideoSender> vTx(Factories::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
+        delete vConfig;
+        vTx->start();
+
+        BLOCK();
+        assert(aTx->isPlaying());
+        assert(vTx->isPlaying());
+
+        aTx->stop();
+        vTx->stop();
+    }
+    return 0;
+}
+
+
+int mainPof(int argc, char **argv)
+{
+    std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
     try {
-        return pof.run();
+        return Pof::run(argc, argv);
     }
     catch (Except e)
     {
         std::cerr << e.msg_;
         return 1;
     }
-
 }
 
