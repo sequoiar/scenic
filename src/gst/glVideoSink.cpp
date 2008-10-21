@@ -29,11 +29,6 @@
 #include "logWriter.h"
 #include "pipeline.h"
 
-#define TRY_GL_VIDEOSINK
-
-#ifdef TRY_GL_VIDEOSINK
-#include "glVideoSink.cpp"
-#else
 
 void VideoSink::destroySink()
 {
@@ -41,18 +36,22 @@ void VideoSink::destroySink()
     pipeline_.remove(&sink_);
 }
 
+Window         window;
 
 gboolean XvImageSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
 {
+
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(data), GDK_WINDOW_XWINDOW(widget->window));
     return TRUE;
 }
 
-
+void Redraw();
 gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
     if (event->keyval != 'f')
     {
+    ::window =GDK_WINDOW_XWINDOW(widget->window);
+        Redraw();
         LOG_DEBUG("user didn't hit f");
         return TRUE;
     }
@@ -67,13 +66,102 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
 
     return TRUE;
 }
+#include<GL/gl.h>
+#include<GL/glx.h>
+#include<GL/glu.h>
 
+Display                 *dpy;
+Window                  root;
+GLint                   att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
+XVisualInfo             *vi;
+XSetWindowAttributes    swa;
+Window                  win;
+GLXContext              glc;
+Pixmap			pixmap;
+int			pixmap_width = 128, pixmap_height = 128;
+GC			gc;
+XImage			*xim;
+GLuint			texture_id;
+Pixmap pix()
+{
+
+
+ dpy = XOpenDisplay(NULL);
+ 
+ if(dpy == NULL) {
+        exit(0); }
+        
+ root = DefaultRootWindow(dpy);
+ 
+ vi = glXChooseVisual(dpy, 0, att);
+
+ if(vi == NULL) {
+        exit(0); }
+        
+ swa.event_mask = ExposureMask | KeyPressMask;
+ swa.colormap   = XCreateColormap(dpy, root, vi->visual, AllocNone);
+
+ win = XCreateWindow(dpy, root, 0, 0, 600, 600, 0, vi->depth, InputOutput, vi->visual, CWEventMask  | CWColormap, &swa);
+ XMapWindow(dpy, win);
+ XStoreName(dpy, win, "PIXMAP TO TEXTURE");
+
+ glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
+ if(glc == NULL) {
+	exit(0); }
+
+ glXMakeCurrent(dpy, win, glc);
+ glEnable(GL_DEPTH_TEST);
+ 
+
+
+ glEnable(GL_TEXTURE_2D);
+ glGenTextures(1, &texture_id);
+ glBindTexture(GL_TEXTURE_2D, texture_id);
+ glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+ glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+ glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+
+ return pixmap;
+}
+void Redraw() {
+ XWindowAttributes	gwa;
+xim = XGetImage(dpy, window, 0, 0, pixmap_width, pixmap_height, AllPlanes, ZPixmap);
+
+
+ glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, pixmap_height, pixmap_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)(&(xim->data[0])));
+
+ XGetWindowAttributes(dpy, win, &gwa);
+ glViewport(0, 0, gwa.width, gwa.height);
+ glClearColor(0.3, 0.3, 0.3, 1.0);
+ glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+ glMatrixMode(GL_PROJECTION);
+ glLoadIdentity();
+ glOrtho(-1.25, 1.25, -1.25, 1.25, 1., 20.);
+
+ glMatrixMode(GL_MODELVIEW);
+ glLoadIdentity();
+ gluLookAt(0., 0., 10., 0., 0., 0., 0., 1., 0.);
+
+ glColor3f(1.0, 1.0, 1.0);
+
+ glBegin(GL_QUADS);
+  glTexCoord2f(0.0, 0.0); glVertex3f(-1.0,  1.0, 0.0);
+  glTexCoord2f(1.0, 0.0); glVertex3f( 1.0,  1.0, 0.0);
+  glTexCoord2f(1.0, 1.0); glVertex3f( 1.0, -1.0, 0.0);
+  glTexCoord2f(0.0, 1.0); glVertex3f(-1.0, -1.0, 0.0);
+ glEnd(); 
+
+ glXSwapBuffers(dpy, win); 
+}
 
 void XvImageSink::init()
 {
     static bool gtk_initialized = false;
     if (!gtk_initialized)
         gtk_init(0, NULL);
+pix();
     assert(sink_ = gst_element_factory_make("xvimagesink", "videosink"));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
@@ -149,4 +237,3 @@ XImageSink::~XImageSink()
     pipeline_.remove(&colorspc_);
 }
 
-#endif
