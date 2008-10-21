@@ -28,6 +28,7 @@
 #include "logWriter.h"
 #include "videoSource.h"
 #include "videoSink.h"
+#include <fstream>
 
 
 VideoSource * VideoConfig::createSource() const
@@ -66,12 +67,12 @@ VideoSink * VideoReceiverConfig::createSink() const
 
 bool VideoConfig::fileExists() const
 {
-    FILE *file;
-    file = fopen(location(), "r");
-    if (file == NULL)
-        THROW_ERROR("File does not exist");
-   
-    fclose(file);
+    std::fstream in;
+    in.open(location_.c_str(), std::fstream::in);
+    if (in.fail())
+        THROW_ERROR("File " << location_ << " does not exist");
+
+    in.close();
     return true;
 }
 

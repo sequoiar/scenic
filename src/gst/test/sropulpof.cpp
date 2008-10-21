@@ -27,9 +27,9 @@
 
 const short Pof::NUM_CHANNELS = 2;
 
-Pof::Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort, bool isFullscreen)
+Pof::Pof(char pid, const char *ip, const char *videoCodec, const char *audioCodec, long videoPort, long audioPort, bool isFullscreen, const char *videoDevice)
 : pid_(pid), ip_(ip), videoCodec_(videoCodec), audioCodec_(audioCodec), videoPort_(videoPort), audioPort_(audioPort), 
-    isFullscreen_(isFullscreen)
+    isFullscreen_(isFullscreen), videoDevice_(videoDevice)
 {
     if (pid_ != 'r' && pid_ != 's')
         THROW_ERROR("Invalid pid");
@@ -59,9 +59,15 @@ short Pof::run()
         std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, ip_, audioCodec_, audioPort_));
         aTx->start();
         assert(tcpSendCaps(ip_, Ports::CAPS_PORT, aTx->getCaps()));
+        VideoConfig *vConfig; 
 
-        VideoConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> vTx(Factories::buildVideoSender(vConfig, ip_, videoCodec_, videoPort_));
+        if (videoDevice_)
+            vConfig = new VideoConfig("v4l2src", videoDevice_);
+        else
+            vConfig = new VideoConfig("v4l2src");
+
+        std::auto_ptr<VideoSender> vTx(Factories::buildVideoSender(*vConfig, ip_, videoCodec_, videoPort_));
+        delete vConfig;
         vTx->start();
         
         BLOCK();
@@ -83,11 +89,12 @@ int mainPof(int argc, char **argv)
     bool recv = false;
     bool full = false;
     OptionArgs options;
-    char *ip =0;
+    char *ip = 0;
     char *videoCodec = 0;
     char *audioCodec = 0;
     int audioPort = 0;
     int videoPort = 0;
+    char *videoDevice = 0;
 
     options.add(new StringArg(&ip, "address", 'i', "address", "provide ip address"));
     options.add(new StringArg(&videoCodec, "videocodec", 'v', "videocodec", "h264"));
@@ -97,10 +104,11 @@ int mainPof(int argc, char **argv)
     options.add(new BoolArg(&send,"sender", 's', "sender"));
     options.add(new BoolArg(&recv,"receiver", 'r', "receiver"));
     options.add(new BoolArg(&full,"fullscreen", 'f', "default to fullscreen"));
+    options.add(new StringArg(&videoDevice, "videoDevice", 'd', "device", "/dev/video0 /dev/video1"));
 
     options.parse(argc, argv);
 
-        pid = send ? 's' : 'r';
+    pid = send ? 's' : 'r';
 /*
     if (ip != 0 && (send || recv) )
         pid = send ? 's' : 'r';
@@ -108,7 +116,7 @@ int mainPof(int argc, char **argv)
         THROW_ERROR("Check yourself before you wreck yourself");
 */
 
-    Pof pof(pid, ip, videoCodec, audioCodec, videoPort, audioPort, full);
+    Pof pof(pid, ip, videoCodec, audioCodec, videoPort, audioPort, full, videoDevice);
 
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
 
