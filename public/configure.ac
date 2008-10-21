@@ -91,6 +91,12 @@ if test "x${have_libavc1394}" = "xfalse" ; then
 	AC_MSG_ERROR([missing pkg - libavc1394 ])
 fi
 
+#Trying to set LIBAVC1394 using pkg-config
+PKG_CHECK_MODULES(LIBRAW1394, [libraw1394], have_libraw1394=true, have_libraw1394=false)
+if test "x${have_libraw1394}" = "xfalse" ; then
+	AC_MSG_ERROR([missing pkg - libraw1394 ])
+fi
+
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
 #AC_SUBST(ALL_GST_LIBS)
 
@@ -127,7 +133,7 @@ AM_CONDITIONAL([OSC],test "x${have_liblo}" == "xyes" )
 
 AX_PYTHON
 AX_BOOST_PYTHON
-
+MDL_HAVE_OPENGL  
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
