@@ -109,7 +109,7 @@ void RtpSender::checkSampleRate()
 {
     GstPad *sinkPad = gst_element_get_pad(rtp_sender_, "sink");
     GstCaps *sinkCaps = gst_pad_get_negotiated_caps(sinkPad);
-    GstBase::checkCapsSampleRate(sinkCaps);
+    //GstBase::checkCapsSampleRate(sinkCaps);
 
     gst_caps_unref(sinkCaps);
     gst_object_unref(sinkPad);
