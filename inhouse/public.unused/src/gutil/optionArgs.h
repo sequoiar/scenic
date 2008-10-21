@@ -102,9 +102,9 @@ class OptionArgs
 //        void add(BaseModule::ArgList);
         void add(BaseArg*);
 
-//	void add(bool *,const char*,char, const char*);
-//	void add(int *,const char*,char, const char*,const char*);
-//	void add(char **,const char*,char,const char*,const char*);
+	void add(bool *,const char*,char, const char*);
+	void add(int *,const char*,char, const char*,const char*);
+	void add(char **,const char*,char,const char*,const char*);
 
         GOptionEntry* getArray();
 

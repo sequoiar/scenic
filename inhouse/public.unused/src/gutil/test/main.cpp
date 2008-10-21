@@ -36,9 +36,9 @@ int main (int argc, char **argv)
     bool b = false;
     OptionArgs options;
 
-    options.add(&b, "flag", 'f', "Set f") ;
-    options.add(&result, "try", 't', "try it out", "pass an int") ;
-    options.add( &str, "str", 's', "try it out", "pass a string") ;
+    options.add(new BoolArg(&b, "flag", 'f', "Set f")) ;
+    options.add(new IntArg(&result, "try", 't', "try it out", "pass an int")) ;
+    options.add(new StrArg( &str, "str", 's', "try it out", "pass a string")) ;
     options.parse(argc, argv);
 
     LOG(b);
