@@ -135,6 +135,13 @@ AX_PYTHON
 AX_BOOST_PYTHON
 MDL_HAVE_OPENGL  
 
+#
+#
+#
+#
+#libgl1-mesa-swx11-dev, xorg-driver-fglrx-dev
+#nvidia-glx-new-dev libraw1394-dev
+
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/util/Makefile
