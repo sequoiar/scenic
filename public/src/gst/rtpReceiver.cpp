@@ -61,7 +61,7 @@ void RtpReceiver::checkSampleRate()
 {
     GstPad *srcPad = gst_element_get_pad(rtp_receiver_, "src");
     GstCaps *srcCaps = gst_pad_get_negotiated_caps(srcPad);
-    GstBase::checkCapsSampleRate(srcCaps);
+    //GstBase::checkCapsSampleRate(srcCaps);
     gst_caps_unref(srcCaps);
     gst_object_unref(srcPad);
 }
