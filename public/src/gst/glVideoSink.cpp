@@ -36,22 +36,20 @@ void VideoSink::destroySink()
     pipeline_.remove(&sink_);
 }
 
-Window         window;
+Window         window = 0;
 
 gboolean XvImageSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
 {
 
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(data), GDK_WINDOW_XWINDOW(widget->window));
+    ::window =GDK_WINDOW_XWINDOW(widget->window);
     return TRUE;
 }
 
-void Redraw();
 gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
     if (event->keyval != 'f')
     {
-    ::window =GDK_WINDOW_XWINDOW(widget->window);
-        Redraw();
         LOG_DEBUG("user didn't hit f");
         return TRUE;
     }
@@ -82,6 +80,8 @@ int			pixmap_width = 128, pixmap_height = 128;
 GC			gc;
 XImage			*xim;
 GLuint			texture_id;
+GLfloat     r_angle = 0.0;   
+bool        glDone = false;
 Pixmap pix()
 {
 
@@ -124,8 +124,14 @@ Pixmap pix()
 
  return pixmap;
 }
-void Redraw() {
+gboolean Redraw(gpointer) {
  XWindowAttributes	gwa;
+ if(glDone)
+     return FALSE;
+ if(!window)
+     return TRUE;
+
+
 xim = XGetImage(dpy, window, 0, 0, pixmap_width, pixmap_height, AllPlanes, ZPixmap);
 
 
@@ -145,6 +151,9 @@ xim = XGetImage(dpy, window, 0, 0, pixmap_width, pixmap_height, AllPlanes, ZPixm
  gluLookAt(0., 0., 10., 0., 0., 0., 0., 1., 0.);
 
  glColor3f(1.0, 1.0, 1.0);
+ r_angle+=2;
+ r_angle = r_angle > 360.0? r_angle-360.0: r_angle;
+ glRotatef(r_angle,0.1f,0.6f,0.3f);    
 
  glBegin(GL_QUADS);
   glTexCoord2f(0.0, 0.0); glVertex3f(-1.0,  1.0, 0.0);
@@ -154,6 +163,8 @@ xim = XGetImage(dpy, window, 0, 0, pixmap_width, pixmap_height, AllPlanes, ZPixm
  glEnd(); 
 
  glXSwapBuffers(dpy, win); 
+ 
+ return TRUE;
 }
 
 void XvImageSink::init()
@@ -174,6 +185,7 @@ pix();
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event",
                      G_CALLBACK(XvImageSink::key_press_event_cb), NULL);
+    g_timeout_add(20,Redraw,NULL);
 }
 
 
@@ -207,6 +219,7 @@ void XvImageSink::makeUnfullscreen(GtkWidget *widget)
 
 XvImageSink::~XvImageSink()
 {
+    glDone = true;
     VideoSink::destroySink();
     if (window_)
     {
