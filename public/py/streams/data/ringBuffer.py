@@ -7,9 +7,11 @@ class myRingBuffer(object):
         self.start = 0
         self.end = 0
         self.buffer = []
-        for i in range (0, bufferSize):
-            
-            self.buffer.append(MidiNote(0,0,0,0))
+#        for i in range (0, bufferSize):
+#            
+#            self.buffer.append(MidiNote(0,0,0,0))
+
+#        self.buffer = [MidiNote(0, 0, 0, 0) for i in range(bufferSize)] # faster like this
 
     #reset counter to 0   
     def flush(self):
@@ -18,7 +20,8 @@ class myRingBuffer(object):
     
     #get the total len of the ring    
     def len(self):
-        return ( self.end + self.bufferSize - self.start) % self.bufferSize
+#        return (self.end + self.bufferSize - self.start) % self.bufferSize
+        return len(self.buffer)
 
     #get how much space we can use in the buffer
     def avail_for_put(self):
@@ -27,17 +30,19 @@ class myRingBuffer(object):
     #Write Data in the ring buffer
     def put(self, newNote):
         #if there is enought place to insert new elements
-        if ( self.avail_for_put > 0):
+#        if ( self.avail_for_put > 0):
             #if the last midi time note is inferiror to the new note
-            if ( self.buffer[self.end - 1].time <= newNote.time ):
-                self.buffer[self.end] = newNote
-                self.end = (self.end + 1) % self.bufferSize
+            if self.buffer[-1].time <= newNote.time:
+                self.buffer.append(newNote)
+#                self.end = (self.end + 1) % self.bufferSize
             else:
                 #sinon on regarde ou il faut l inserer
-                self.find_place(newNote)
-        else:
-            #arreter application??? risque de perte de note
-            log.error("Buffer full, can forget some data!!!")
+                place = [ind for ind, obj in enumerate(self.buffer) if obj.time < newNote.time][-1]
+                self.buffer.insert(place + 1, newNote)
+#                self.find_place(newNote)
+#        else:
+#            #arreter application??? risque de perte de note
+#            log.error("Buffer full, can forget some data!!!")
       
     #return nb of data available to get  
     def avail_for_get(self):
@@ -46,10 +51,13 @@ class myRingBuffer(object):
 
     #getting data from the buffer
     def get(self):
-        copied = []       
-        while(self.avail_for_get() > 0):
-            copied.append(self.buffer[self.start])
-            self.start = (self.start + 1 ) % self.bufferSize                
+#        copied = []       
+#        while(self.avail_for_get() > 0):
+#            copied.append(self.buffer[self.start])
+#            self.start = (self.start + 1 ) % self.bufferSize
+            
+        copied = self.buffer
+        self.buffer = []                
         
         return copied
 

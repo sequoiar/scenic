@@ -45,7 +45,7 @@ class RTPClient(DatagramProtocol):
     def check_sync(self):
         """checking if client is sync with the server
         """
-        if ( ((time.time() - self.lastSync) > 2) and self.sync ):
+        if (time.time() - self.lastSync) > 2 and self.sync:
             log.info( "INPUT: client not sync" )
             self.sync = 0
 
@@ -92,9 +92,9 @@ class RTPClient(DatagramProtocol):
 
     def start_streaming(self):
 
-        if ( not self.continueS.running ):
+        if not self.continueS.running:
             #check sync to start streaminglog
-            if (self.sync):
+            if self.sync:
                 self.continueS.start(0.2)
                 log.info("INPUT: RTPClient start streaming")
                 return 0
@@ -197,14 +197,14 @@ class RTPClient(DatagramProtocol):
         """
         #header of the rtp header packet
     
-        if ( len (data) >= 16):
+        if len(data) >= 16:
     
             #Only checking the identifier of the source SSRC identifier
-            sync = data[8]
-            sync += data[9]
-            sync += data[10]
-            sync += data[11]
-            sync = unpack("!L", sync)
+#            sync = data[8]
+#            sync += data[9]
+#            sync += data[10]
+#            sync += data[11]
+            sync = unpack("!L", data[8:4])
     
             #If the identifier of the source is wrong
             if (sync[0] != 12345679):

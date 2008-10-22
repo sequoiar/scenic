@@ -50,7 +50,7 @@ class RTPServer(DatagramProtocol):
     def start_receiving(self):
         """start midi output and get notes from the socket
         """
-        if ( self.sync ):
+        if self.sync:
             if ( not self.midiOut.MidiOut is None):
                 self.midiOut.start_publy()
                 log.info("OUTPUT: RTPServer start to receive midi data")
@@ -58,7 +58,7 @@ class RTPServer(DatagramProtocol):
             else:
                 log.error("OUTPUT: Can't start receiving without output device set")
                 return -1
-	else:
+    	else:
             log.error("OUTPUT: Can't start receiving if not syncronize with client")
             return -1
 
@@ -85,7 +85,7 @@ class RTPServer(DatagramProtocol):
         if ( (time.time() - self.midiOut.lastMidiTimeDiff.lastSync) > 1 ):
             self.midiTimeSync = 0
 
-        if ( self.delaySync and self.midiTimeSync):
+        if (self.delaySync and self.midiTimeSync):
             
             if ( not self.sync ):
                 log.info( "OUTPUT: server sync" )
@@ -234,6 +234,8 @@ class RTPServer(DatagramProtocol):
         header += '\x00\x00\x00\x00' 
     
         return header
+    
+        #TODO: for optimisation purpose generateRTPHeader could be replace by a constant.
 	
 
     def parseRTPHeader(self, data):

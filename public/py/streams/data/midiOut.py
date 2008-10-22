@@ -72,20 +72,20 @@ class MidiOut(object):
 		self.lastMidiTimeDiff.flush()
 
 		
-	def sync_midi_time(self,time):
+	def sync_midi_time(self, time):
 		"""Sync set the difference between local midi time and
 	    remote midi time in order to apply it to the notes
 		"""
 		if pypm.Time() >= int(time) :
 			self.lastMidiTimeDiff.to_list(pypm.Time() - int(time))
 		else:
-			self.lastMidiTimeDiff.to_list(-(int(time) - pypm.Time()))
+			self.lastMidiTimeDiff.to_list(- (int(time) - pypm.Time()))
 		
 		#midiTime diff recoit la moyenne des dernier tps calculer
 		self.midiTimeDiff = self.lastMidiTimeDiff.average()
 		
 		#Checking if the delay between the two machine is highter than the current latency
-		if ( self.latency <= self.delay ):
+		if (self.latency <= self.delay):
 			l = "OUTPUT: Can't play on time = delay between hosts is higher than the latency !"
 			log.error(l)
 
@@ -124,11 +124,11 @@ class MidiOut(object):
 				del self.MidiOut
 				#Initializing new midi input stream
 				self.MidiOut = pypm.Output(self.midiDevice, 0)
-				log.info( "OUTPUT: Input device is set up")
+				log.info("OUTPUT: Input device is set up")
 				return 0
 		else:
 			log.error("OUTPUT: Incorrect device selected, can't setting up")
-			return -1
+			return - 1
 
 		
 	def get_device_info(self):
@@ -140,11 +140,13 @@ class MidiOut(object):
 	def send_note_off(self):
 		"""send Note Off in case of broken connection
 		"""	
-		midiNotes = []
-		for i in range(0,127):
-			midiNotes.append([[0x80,i,100], pypm.Time()])
+#		midiNotes = []
+#		for i in range(0,127):
+#			midiNotes.append([[0x80,i,100], pypm.Time()])
+		midi_time = pypm.Time()	
+		midiNotes = [((0x80, i, 100), midi_time) for i in range(128)]   # faster like this
 
-		self.MidiOut.Write( midiNotes) 
+		self.MidiOut.Write(midiNotes) 
 
 		
 	def midi_time(self):
@@ -153,27 +155,27 @@ class MidiOut(object):
 #Permisive Mode => joue toutes les notes meme si en retard de qq milisecond en affichant un erreur style xrun dans le fichier de log
 
 		
-	def play_midi_note(self,midiNotes):
+	def play_midi_note(self, midiNotes):
 		"""PlayMidi Note
 	   	Separate midi infos to choose the good function for the good action
 		"""
-		
+		midi_time = pypm.Time()
 		if self.permissif :
 			#on fait une liste des notes en retard pour le signaler
-			new_list = [midiNotes[i][1] for i in range(len(midiNotes)) if (pypm.Time() >  midiNotes[i][1]) ]
+			new_list = [midiNotes[i][1] for i in range(len(midiNotes)) if (midi_time > midiNotes[i][1]) ]
 
-			if ( len(new_list) > 0 ) :
+			if (len(new_list) > 0) :
 				self.nbXRun += 1
-				l = "OUTPUT: time=" + str(pypm.Time()) + "ms  can't play in time , " + str(len(midiNotes)) + " notes - late of " + str(pypm.Time() - new_list[0]) + " ms"
+				l = "OUTPUT: time=" + str(midi_time) + "ms  can't play in time , " + str(len(midiNotes)) + " notes - late of " + str(midi_time - new_list[0]) + " ms"
 				log.error(l)
 			note_filtred = midiNotes
 		else:
 		#filtre note off program change pour note en retard
 		#si mode non permissif on skip les note enn retard sauf note off et program change
-			note_filtred = [midiNotes[i] for i in range(len(midiNotes)) if (midiNotes[i][1] >= pypm.Time() or midiNotes[i][0][0] == int(0xc0) or midiNotes[i][0][2] == 0) ]
+			note_filtred = [midiNotes[i] for i in range(len(midiNotes)) if (midiNotes[i][1] >= midi_time or midiNotes[i][0][0] == int(0xc0) or midiNotes[i][0][2] == 0) ]
 
-			if ( len(note_filtred) < len(midiNotes)):
-				l = "OUTPUT: time=" + str(pypm.Time()) + "ms can't play in time,  " + str(len(midiNotes)-len(note_filtred)) + " note(s) skipped"
+			if (len(note_filtred) < len(midiNotes)):
+				l = "OUTPUT: time=" + str(pypm.Time()) + "ms can't play in time,  " + str(len(midiNotes) - len(note_filtred)) + " note(s) skipped"
 				log.error(l)
 				
         #Playing note on the midi device
@@ -181,26 +183,29 @@ class MidiOut(object):
 
 	def publy_midi_notes(self):
 		d = defer.Deferred()
+		midiOutCmdList = self.midiOutCmdList # put in local scope to improve performance
+		play_midi_note = self.play_midi_note
 		while self.publy_flag :
-			midiNotes = []
+		#			midiNotes = []	# not necessary with a list comprehension
 		        #if there are notes to play 
-			if ( self.midiOutCmdList.avail_for_get() > 0 ):
-				note = self.midiOutCmdList.buffer[self.midiOutCmdList.start]
-
+		    list_lenght = midiOutCmdList.len()
+		    if list_lenght > 0:
+				note = midiOutCmdList.buffer[midiOutCmdList.start]
+				
 				#if they are in time ( 4 is for processing time )
 				if (note.time <= pypm.Time() + 4):
-			                #get notes from the buffer
-					noteList = self.midiOutCmdList.get()
-
-			        #formating notes
-					midiNotes = [ [[noteList[i].event, noteList[i].note, noteList[i].velocity], noteList[i].time] for i in range(len(noteList)) ] 
+				            #get notes from the buffer
+					noteList = midiOutCmdList.get()
+					
+					#formating notes
+					midiNotes = [[[noteList[i].event, noteList[i].note, noteList[i].velocity], noteList[i].time] for i in range(list_lenght)] 
 					#a garder pour faire control du nb notes
-					self.nbNote += len(midiNotes)
-			
-			if (len(midiNotes)>0):
-				reactor.callFromThread(self.play_midi_note,midiNotes)
-
-			time.sleep(0.001)
+					self.nbNote += list_lenght
+					
+					#				if list_lenght > 0:
+					reactor.callFromThread(self.play_midi_note, midiNotes)
+		
+		    time.sleep(0.001)
 		
 		return d
 

@@ -43,7 +43,7 @@ class MidiIn(object):
 
         
     def stop_sending(self):
-        if ( not self.end_flag):
+        if not self.end_flag:
             self.end_flag = True
         
             self.client.stop_streaming()
@@ -53,8 +53,8 @@ class MidiIn(object):
         #need by twisted to stop properly the thread
         d = defer.Deferred()
 
-        while(not self.end_flag):
-            if ( self.MidiIn.Poll()):
+        while not self.end_flag:
+            if self.MidiIn.Poll():
                 reactor.callFromThread(self._get_input)
                 
             time.sleep(0.001)

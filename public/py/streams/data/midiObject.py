@@ -1,4 +1,4 @@
-class MidiNote(object):
+class MidiNote(object): #TODO: Maybe we could convert this object to a tuple to improve the performance
 
 	def __init__(self, time, event, note, velocity, what=0):
 		self.time = time
