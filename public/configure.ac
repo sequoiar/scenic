@@ -88,13 +88,13 @@ fi
 #Trying to set LIBAVC1394 using pkg-config
 PKG_CHECK_MODULES(LIBAVC1394, [libavc1394], have_libavc1394=true, have_libavc1394=false)
 if test "x${have_libavc1394}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libavc1394 ])
+	AC_MSG_ERROR([missing pkg - libavc1394-dev ])
 fi
 
 #Trying to set LIBAVC1394 using pkg-config
 PKG_CHECK_MODULES(LIBRAW1394, [libraw1394], have_libraw1394=true, have_libraw1394=false)
 if test "x${have_libraw1394}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libraw1394 ])
+	AC_MSG_ERROR([missing pkg - libraw1394-dev ])
 fi
 
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
@@ -133,14 +133,21 @@ AM_CONDITIONAL([OSC],test "x${have_liblo}" == "xyes" )
 
 AX_PYTHON
 AX_BOOST_PYTHON
-MDL_HAVE_OPENGL  
+AX_CHECK_GL
+
+if test "x${no_gl}" = "xyes" ; then
+    AC_MSG_ERROR([Missing OpenGL try some of mesa-common-dev libgl1-mesa-swx11-dev, xorg-driver-fglrx-dev nvidia-glx-new-dev.])
+fi
+
+AX_CHECK_GLU
+if test "x${no_glu}" = "xyes" ; then
+    AC_MSG_ERROR([Missing GLU install libglu1-mesa-dev])
+fi
 
 #
 #
 #
 #
-#libgl1-mesa-swx11-dev, xorg-driver-fglrx-dev
-#nvidia-glx-new-dev libraw1394-dev
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
