@@ -26,17 +26,20 @@ AC_HEADER_STDBOOL
 AC_C_CONST
 PKG_PROG_PKG_CONFIG
 
+AC_PROG_GCC_TRADITIONAL
+AC_CHECK_FUNCS([inet_ntoa memset socket])
+
 AC_MSG_CHECKING(whether to enable debugging)
-AC_ARG_ENABLE([sip], [  --enable-sip build sip],,enable_sip=yes)
+AC_ARG_ENABLE([sip], [ **************** 
+  --enable-sip build sip],,enable_sip=yes)
 AC_ARG_ENABLE([debug], [
-**************** 
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
         enable_debug=no)
 
+AM_CONDITIONAL([SIP],test "x${enable_sip}" == "xyes" )
+AM_CONDITIONAL([DEBUG],test "x${enable_debug}" = "xyes" )
 
 # Checks for library functions.
-AC_PROG_GCC_TRADITIONAL
-AC_CHECK_FUNCS([inet_ntoa memset socket])
 
 if test "x${enable_debug}" == "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG,[],[Debug define from configure])
@@ -114,7 +117,6 @@ if test "x${have_libpj}" = "xfalse" ; then
     AC_MSG_ERROR([PJSIP not found. http://www.pjsip.org/download.htm])
 fi
 fi
-AM_CONDITIONAL([SIP],test "x${enable_sip}" == "xyes" )
 
 #Trying to set LIBLO using pkg-config
 PKG_CHECK_MODULES(LIBLO, liblo >= 0.25, have_liblo=true, have_liblo=false)
@@ -159,7 +161,6 @@ AC_CONFIG_FILES([Makefile
                  src/sip/Makefile
                  ])
 
-AM_CONDITIONAL([DEBUG],test "x${enable_debug}" = "xyes" )
 
 if test "x${enable_debug}" = "xyes" ; then
 AC_CONFIG_FILES([
