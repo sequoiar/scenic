@@ -269,23 +269,23 @@ class TestContact(unittest.TestCase):
         Contact(generateString(), ad[0])      
         
 
-    def test_type(self):
+    def test_kind(self):
         ad = generateAddress()
         
         self.contact.address = ad[0]
-        res = self.contact.type()
+        res = self.contact.kind()
         assert(res == 'ip'), self.fail('problem detecting good format ip address')
         
         self.contact.address = ad[1]
-        res = self.contact.type()
+        res = self.contact.kind()
         assert(res == 'sip_name'), self.fail('problem detecting good format sip name')
         
         self.contact.address = ad[2]
-        res = self.contact.type()
+        res = self.contact.kind()
         assert(res == 'sip_ip'), self.fail('problem detecting good format sip ip')
         
         self.contact.address = ad[3]
-        res = self.contact.type()
+        res = self.contact.kind()
         assert(res == 'multicast'), self.fail('problem detecting good format multicast ip')
                                                 
     #rapport :

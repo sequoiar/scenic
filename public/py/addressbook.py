@@ -52,7 +52,7 @@ class AddressBook(object):
         self.read()
         
     def add(self, name, address, port=None):
-        if (type(address.encode('utf-8'))):
+        if (kind(address.encode('utf-8'))):
             name = to_utf(name)
             if name in self.contacts:
                 return False
@@ -73,7 +73,7 @@ class AddressBook(object):
         return True
     
     def modify(self, name, new_name, address, port=None):
-        if (type(address.encode('utf-8'))):
+        if (kind(address.encode('utf-8'))):
             name = to_utf(name)
             new_name = to_utf(new_name)
             if name in self.contacts:
@@ -172,11 +172,11 @@ class Contact(object):
                 log.info('Invalid port format.')
         self.port = port
         
-    def type(self):
-        return type(self.address)
+    def kind(self):
+        return kind(self.address)
 
     
-def type(address):
+def kind(address):
     if isinstance(address, list):
         return 'group'
     if isinstance(address, str):
