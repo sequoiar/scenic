@@ -22,6 +22,9 @@
 #include "rtpPay.h"
 #include "pipeline.h"
 
+
+const long long Payloader::MAX_PTIME = 200000;
+
 void RtpPay::init()
 {
     assert(rtpPay_);
@@ -34,11 +37,16 @@ RtpPay::~RtpPay()
     pipeline_.remove(&rtpPay_);
 }
 
+void Payloader::init()
+{
+    g_object_set(G_OBJECT(rtpPay_), "max-ptime", Payloader::MAX_PTIME, NULL);
+    RtpPay::init();
+}
 
 void H264Payloader::init()
 {
     assert(rtpPay_ = gst_element_factory_make("rtph264pay", NULL));
-    RtpPay::init();
+    Payloader::init();
 }
 
 
@@ -47,8 +55,6 @@ void H264Depayloader::init()
     assert(rtpPay_ = gst_element_factory_make("rtph264depay", NULL));
     RtpPay::init();
 }
-
-const int VorbisPayloader::MAX_PTIME = 200000;
 
 void VorbisPayloader::init()
 {
@@ -68,7 +74,7 @@ void VorbisDepayloader::init()
 void L16Payloader::init()
 {
     assert(rtpPay_ = gst_element_factory_make("rtpL16pay", NULL));
-    RtpPay::init();
+    Payloader::init();
 }
 
 
@@ -82,7 +88,7 @@ void L16Depayloader::init()
 void MpaPayloader::init()
 {
     assert(rtpPay_ = gst_element_factory_make("rtpmpapay", NULL));
-    RtpPay::init();
+    Payloader::init();
 }
 
 
