@@ -19,9 +19,11 @@
 
 #include <gst/gst.h>
 #include <cassert>
+#include <gst/audio/multichannel.h>
 #include "codec.h"
 #include "rtpPay.h"
 #include "pipeline.h"
+#include "logWriter.h"
 
 
 Codec::~Codec()
@@ -85,24 +87,46 @@ void VorbisDecoder::init()
 }
 
 
+#if 0
 void VorbisDecoder::setSrcCaps()
 {
+    GstCaps *caps = 0;
+    static const int HACKED_NUM_CHANNELS = 8;
+    // courtesy of vorbisenc.c
+    const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[HACKED_NUM_CHANNELS] = {
+        /* Not defined by spec, GStreamer default */
+        GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT,
+        GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT,
+        GST_AUDIO_CHANNEL_POSITION_REAR_LEFT,
+        GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT,
+        GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER,
+        GST_AUDIO_CHANNEL_POSITION_LFE,
+        GST_AUDIO_CHANNEL_POSITION_SIDE_LEFT,
+        GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT
+    };
+    assert(gst_audio_check_channel_positions(VORBIS_CHANNEL_POSITIONS, HACKED_NUM_CHANNELS));
+
     LOG_DEBUG("SETTING CAPS");
     GstPad *srcPad = gst_element_get_static_pad(codec_, "src");
     assert(srcPad);
-    GstCaps *caps = gst_caps_from_string("audio/x-raw-float, endianness=(int)1234, width=(int)32, "
-            "rate=(int)48000, channels=(int)8, channel-positions=(GstAudioChannelPosition)< "
-            "GST_AUDIO_CHANNEL_POSITION_FRONT_LEFT, GST_AUDIO_CHANNEL_POSITION_FRONT_RIGHT, "
-            "GST_AUDIO_CHANNEL_POSITION_REAR_LEFT, GST_AUDIO_CHANNEL_POSITION_REAR_RIGHT, "
-            "GST_AUDIO_CHANNEL_POSITION_FRONT_CENTER, GST_AUDIO_CHANNEL_POSITION_LFE, "
-            "GST_AUDIO_CHANNEL_POSITION_SIDE_LEFT, GST_AUDIO_CHANNEL_POSITION_SIDE_RIGHT >");
+    while (!caps)
+        caps = gst_pad_get_negotiated_caps(srcPad);
+
     assert(caps);
+    caps = gst_caps_make_writable(caps);
+    
+
+    GstCaps *newCaps = gst_caps_new_empty();
+    gst_audio_set_caps_channel_positions_list(newCaps, VORBIS_CHANNEL_POSITIONS, HACKED_NUM_CHANNELS);
+    gst_caps_merge(caps, newCaps);
+
     assert(gst_pad_set_caps(srcPad, caps));
 
     gst_caps_unref(caps);
+    gst_caps_unref(newCaps);
     gst_object_unref(srcPad);
 }
-
+#endif
 
 RtpPay* VorbisEncoder::createPayloader() const
 {

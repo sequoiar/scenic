@@ -105,7 +105,7 @@ class VorbisDecoder : public Decoder
     public: 
 
         void init();
-        void setSrcCaps();
+//        void setSrcCaps();
         RtpPay* createDepayloader() const;
 };
 

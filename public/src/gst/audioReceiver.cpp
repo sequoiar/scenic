@@ -79,16 +79,16 @@ void AudioReceiver::init_sink()
 void AudioReceiver::start()
 {
     // CAPS MUST be set first
-    set_caps(remoteConfig_.caps());
+    set_caps();
     assert(gotCaps_);
     LOG_DEBUG("Receiving audio on port " << remoteConfig_.port() << " from host " << remoteConfig_.remoteHost());
     GstBase::start();
 }
 
         
-void AudioReceiver::set_caps(const char *caps) 
+void AudioReceiver::set_caps() 
 { 
-    session_.set_caps(caps); 
+    session_.set_caps(remoteConfig_.caps()); 
     //session_.checkSampleRate();
     gotCaps_ = true;
 }

@@ -54,7 +54,7 @@ class AudioReceiver
         void init_level();
         void init_sink();
         
-        void set_caps(const char *caps); 
+        void set_caps(); 
 
         const AudioReceiverConfig audioConfig_;
         const ReceiverConfig remoteConfig_;
