@@ -37,10 +37,9 @@ def send2(remote):
     remote.callRemote('Dummy.test', 'allo', 22)
 
 def send3(remote):
-    global g
     print 'send3'
     remote.callRemote('Dummy.close')
-    g = True
+
     
 ############# Loop Until ################
 def loopUntil(predicate, interval=0):
@@ -140,5 +139,8 @@ class TestComChan(unittest.TestCase):
         reactor.callLater(0.9, send3, self.channel2)
 
         d = defer.gatherResults([loopUntil(lambda: g == True)])
+        
+        #ne fonctionne pas ...
+        d.addCallback(lambda _: self.factory.disconnect())
         return d
         
