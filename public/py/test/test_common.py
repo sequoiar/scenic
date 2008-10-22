@@ -71,10 +71,12 @@ class TestCommon(unittest.TestCase):
     def test_find_callbacks(self):
         r = ToTestCallback()       
         res = common.find_callbacks(r)
-        print res
-        for k, v in res.iteritems():
-            if v[0]=='_' and v[1]=='_' :
-                self.fail("problem detecting good call bascks")
+
+        for k, v in res.iteritems():            
+            vv = str(v)
+            if len(vv) >= 2 : 
+                if vv[0]=='_' and vv[1]=='_' :
+                    self.fail("problem detecting good callbacks")
 
         #compare res with function list of r
         
