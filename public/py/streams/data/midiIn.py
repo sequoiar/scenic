@@ -47,19 +47,19 @@ class MidiIn(object):
             self.end_flag = True
         
             self.client.stop_streaming()
-            self.client.midiInCmdList.flush()
+            #self.client.midiInCmdList.flush()
 	
     def _polling(self):
         #need by twisted to stop properly the thread
-#        d = defer.Deferred()
-
-        while not self.end_flag:
+        d = defer.Deferred()
+        end_flag = self.end_flag
+        while not end_flag:
             if self.MidiIn.Poll():
                 reactor.callFromThread(self._get_input)
                 
             time.sleep(0.001)
 
-#        return d
+        return d
 
 
     def start_sending(self):
@@ -130,13 +130,9 @@ class MidiIn(object):
         #Reading Midi Input
         MidiData = self.MidiIn.Read(1024)
 
-        for i in range(len(MidiData)):  
-            self.nbNote += 1
-            note = MidiNote(currentTime,MidiData[i][0][0], MidiData[i][0][1], MidiData[i][0][2], MidiData[i][0][3])
-            #Adding the note to the buffer
-            self.client.midiInCmdList.put(note)
-             
-        self.client.send_midi_data()   
+        if len(MidiData) > 0:
+            [self.client.midiInCmdList.put([MidiData[i][0],currentTime]) for i in range(len(MidiData))]
+            self.client.send_midi_data()   
 
 
     def _send_midi_time(self):

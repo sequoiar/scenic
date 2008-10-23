@@ -59,23 +59,23 @@ class RTPClient(DatagramProtocol):
     def datagramReceived(self, data, (host, port)):
 
         data = self.parseRTPHeader(data)
-        if data != -1:
-            if data[0]== 'd':
+        if (data != -1):
+            if (data[0]== 'd'):
                 #resending for delay calcul
             	packet = self.generateRTPHeader(0)
             	chunk = packet + "d "
-            	self.transport.write(chunk, (self.peerAddress, self.port))
+            	self.transport.write(chunk,(self.peerAddress, self.port))
 
-            elif data[0] == 's':
+            elif ( data[0] == 's'):
             	self.lastSync = time.time()
             	#setting flag to sync
-            	if not self.sync:
+            	if ( not self.sync ):
                     log.info( "INPUT: client sync" )
                     self.sync = 1
                     #self.start_streaming()
 
             else:
-                tt = time.time()
+                print "resending plost paquet to server " + str(time.time())
             	#Sinon cest une demande de paquet perdu
             	retransmitPacket = self.packetsSentList.find_packet(int(data))
             	#si on la dans le buffer de sauvegarde on revoie sinon rien
@@ -122,8 +122,10 @@ class RTPClient(DatagramProtocol):
                 
         #Writting it to the socket
         chunk = header + chunk   
-        if ( self.sync ):
-            self.transport.write(chunk, (self.peerAddress, self.port))
+        if ( self.sync and self.seqNo % 10 != 0 ):
+            self.transport.write(chunk,(self.peerAddress, self.port))
+        else:
+            print "perte volontaire du packet : " + str(c) + " a " + str(time.time())
 
         #disable witness
         self.sendingMidiData = 0

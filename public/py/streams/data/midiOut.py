@@ -57,7 +57,7 @@ class MidiOut(object):
 		"""		
 		self.send_note_off()
 		self.publy_flag = True
-		reactor.callInThread(self.publy_midi_notes)
+		reactor.callInThread(self.publish_midi_notes)
 
 
 
@@ -76,17 +76,16 @@ class MidiOut(object):
 		"""Sync set the difference between local midi time and
 	    remote midi time in order to apply it to the notes
 		"""
-		midi_time = pypm.Time()
-		if midi_time >= int(time):
-			self.lastMidiTimeDiff.to_list(midi_time - int(time))
+		if pypm.Time() >= int(time) :
+			self.lastMidiTimeDiff.to_list(pypm.Time() - int(time))
 		else:
-			self.lastMidiTimeDiff.to_list(- (int(time) - midi_time()))   #TODO: je pense que les 2 sont equivalent??
+			self.lastMidiTimeDiff.to_list(- (int(time) - pypm.Time()))
 		
 		#midiTime diff recoit la moyenne des dernier tps calculer
 		self.midiTimeDiff = self.lastMidiTimeDiff.average()
 		
 		#Checking if the delay between the two machine is highter than the current latency
-		if self.latency <= self.delay:
+		if (self.latency <= self.delay):
 			l = "OUTPUT: Can't play on time = delay between hosts is higher than the latency !"
 			log.error(l)
 
@@ -182,31 +181,23 @@ class MidiOut(object):
         #Playing note on the midi device
 		self.MidiOut.Write(note_filtred)	
 
-	def publy_midi_notes(self):
+	def publish_midi_notes(self):
 		d = defer.Deferred()
-		midiOutCmdList = self.midiOutCmdList # put in local scope to improve performance
+		# put in local scope to improve performance
+		midiOutCmdList = self.midiOutCmdList 
 		play_midi_note = self.play_midi_note
-		while self.publy_flag :
-		#			midiNotes = []	# not necessary with a list comprehension
-		        #if there are notes to play 
-		    list_lenght = midiOutCmdList.len()
-		    if list_lenght > 0:
-				note = midiOutCmdList.buffer[midiOutCmdList.start]
-				
-				#if they are in time ( 4 is for processing time )
-				if (note.time <= pypm.Time() + 4):
-				            #get notes from the buffer
-					noteList = midiOutCmdList.get()
+		publy_flag = self.publy_flag
+
+		while publy_flag :
+			midiNotes = []
+                        #if there are notes to play  
+			if midiOutCmdList.len() > 0:
+				midiNotes = midiOutCmdList.get_data(pypm.Time())
 					
-					#formating notes
-					midiNotes = [[[noteList[i].event, noteList[i].note, noteList[i].velocity], noteList[i].time] for i in range(list_lenght)] 
-					#a garder pour faire control du nb notes
-					self.nbNote += list_lenght
-					
-					#				if list_lenght > 0:
-					reactor.callFromThread(self.play_midi_note, midiNotes)
+			if len(midiNotes) > 0:
+				reactor.callFromThread(self.play_midi_note, midiNotes)
 		
-		    time.sleep(0.001)
+			time.sleep(0.001)
 		
 		return d
 

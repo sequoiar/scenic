@@ -176,8 +176,9 @@ class RTPServer(DatagramProtocol):
                     #unpickle list midi note in the packet               
                     midiNote = cPickle.loads(midiChunk)
                     #profiter du parcours pour appliquer les timestamps
+                    print "note time in server " + str(midiNote[0][1]) + " a " + str(time.time())
                     for i in range(len(midiNote)):
-                        midiNote[i].time = midiNote[i].time + self.midiOut.midiTimeDiff + self.midiOut.latency - int(self.midiOut.delay) 
+                        midiNote[i][1] = midiNote[i][1] + self.midiOut.midiTimeDiff + self.midiOut.latency - int(self.midiOut.delay) 
                         #Adding the note to the playing buffer
                     	self.midiOut.midiOutCmdList.put(midiNote[i])
 
@@ -194,7 +195,8 @@ class RTPServer(DatagramProtocol):
 		
         header = self.generateRTPHeader()
         chunk = str(seqNo)
-        chunk = header + chunk	
+        chunk = header + chunk
+	print "emvoie de la demande de paquet " + str(time.time())
         self.transport.write(chunk , (self.peerAddress,self.peerPort) )
 
 
@@ -261,6 +263,7 @@ class RTPServer(DatagramProtocol):
             #check if there is no loose of packet last one receive
             if (int(self.actualSeqNo) != int(no[0])):
                 #on redemande les paquets perdu
+                print "detection de la perte du paquet " + str(time.time())
                 self.actualSeqNo = no[0]
                 self.ask_packet(no[0])
                 
