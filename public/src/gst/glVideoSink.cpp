@@ -66,7 +66,7 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
 }
 #include<GL/gl.h>
 #include<GL/glx.h>
-#include<GL/glu.h>
+//#include<GL/glu.h>
 
 Display                 *dpy;
 Window                  root;
@@ -76,7 +76,7 @@ XSetWindowAttributes    swa;
 Window                  win;
 GLXContext              glc;
 Pixmap			pixmap;
-int			pixmap_width = 128, pixmap_height = 128;
+int			pixmap_width = 200, pixmap_height = 200;
 GC			gc;
 XImage			*xim;
 GLuint			texture_id;
@@ -132,7 +132,7 @@ gboolean Redraw(gpointer) {
      return TRUE;
 
 
-xim = XGetImage(dpy, window, 0, 0, pixmap_width, pixmap_height, AllPlanes, ZPixmap);
+ xim = XGetImage(dpy, window, 0, 0, pixmap_width, pixmap_height, AllPlanes, ZPixmap);
 
 
  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, pixmap_height, pixmap_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)(&(xim->data[0])));
@@ -144,22 +144,74 @@ xim = XGetImage(dpy, window, 0, 0, pixmap_width, pixmap_height, AllPlanes, ZPixm
 
  glMatrixMode(GL_PROJECTION);
  glLoadIdentity();
- glOrtho(-1.25, 1.25, -1.25, 1.25, 1., 20.);
+// glOrtho(-1.25, 1.25, -1.25, 1.25, 1., 20.);
 
  glMatrixMode(GL_MODELVIEW);
  glLoadIdentity();
- gluLookAt(0., 0., 10., 0., 0., 0., 0., 1., 0.);
+ glTranslatef(0.0f,0.0f,-1.0f);  
+//gluLookAt(0., 0., 10., 0., 0., 0., 0., 1., 0.);
 
  glColor3f(1.0, 1.0, 1.0);
  r_angle+=2;
  r_angle = r_angle > 360.0? r_angle-360.0: r_angle;
- glRotatef(r_angle,0.1f,0.6f,0.3f);    
+ glRotatef(r_angle,0.0f,1.0f,1.0f);    
 
  glBegin(GL_QUADS);
-  glTexCoord2f(0.0, 0.0); glVertex3f(-1.0,  1.0, 0.0);
-  glTexCoord2f(1.0, 0.0); glVertex3f( 1.0,  1.0, 0.0);
-  glTexCoord2f(1.0, 1.0); glVertex3f( 1.0, -1.0, 0.0);
-  glTexCoord2f(0.0, 1.0); glVertex3f(-1.0, -1.0, 0.0);
+        /* front face */
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-1.0f, -1.0f, 1.0f); 
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(1.0f, -1.0f, 1.0f);
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(1.0f, 1.0f, 1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(-1.0f, 1.0f, 1.0f);
+        /* back face */
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(-1.0f, -1.0f, -1.0f); 
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(-1.0f, 1.0f, -1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(1.0f, 1.0f, -1.0f);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(1.0f, -1.0f, -1.0f);
+        /* right face */
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(1.0f, -1.0f, -1.0f); 
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(1.0f, 1.0f, -1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(1.0f, 1.0f, 1.0f);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(1.0f, -1.0f, 1.0f);
+        /* left face */
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(-1.0f, -1.0f, 1.0f); 
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(-1.0f, 1.0f, 1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(-1.0f, 1.0f, -1.0f);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-1.0f, -1.0f, -1.0f);
+        /* top face */
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(1.0f, 1.0f, 1.0f); 
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(1.0f, 1.0f, -1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(-1.0f, 1.0f, -1.0f);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-1.0f, 1.0f, 1.0f);
+        /* bottom face */
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(1.0f, -1.0f, -1.0f); 
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(1.0f, -1.0f, 1.0f);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(-1.0f, -1.0f, 1.0f);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(-1.0f, -1.0f, -1.0f);
+
  glEnd(); 
 
  glXSwapBuffers(dpy, win); 
