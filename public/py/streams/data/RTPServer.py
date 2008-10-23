@@ -8,6 +8,7 @@ from utils import log
 from listCirc import DelayCirc
 from ringBuffer import myRingBuffer
 from midiOut import MidiOut
+log = log.start('debug', 1, 0, 'RTPServer')
 
 class RTPServer(DatagramProtocol):
 
@@ -131,7 +132,7 @@ class RTPServer(DatagramProtocol):
             self.launch()
             
 
-	if self.actualSeqNo == 32767:
+    	if self.actualSeqNo == 32767:
             self.actualSeqNo = 1
 
             #on set les address du serveur afin de renvoyer certain packet
@@ -140,7 +141,6 @@ class RTPServer(DatagramProtocol):
         else:
             self.actualSeqNo += 1
 
-        
       	#Parsing packet header
         midiChunk = self.parseRTPHeader(data)
 
@@ -191,12 +191,12 @@ class RTPServer(DatagramProtocol):
         """
         self.tmp = time.time()
         seqNo -= 1
-        log.warning("OUTPUT: Asking lost packet to client")
+        log.warning("OUTPUT: Asking lost packet to client: %s" % seqNo)
 		
         header = self.generateRTPHeader()
         chunk = str(seqNo)
         chunk = header + chunk
-	print "emvoie de la demande de paquet " + str(time.time())
+        print 'emvoie de la demande de paquet', time.time()	
         self.transport.write(chunk , (self.peerAddress,self.peerPort) )
 
 
@@ -263,7 +263,7 @@ class RTPServer(DatagramProtocol):
             #check if there is no loose of packet last one receive
             if (int(self.actualSeqNo) != int(no[0])):
                 #on redemande les paquets perdu
-                print "detection de la perte du paquet " + str(time.time())
+                print 'detection de la perte du paquet', time.time()    
                 self.actualSeqNo = no[0]
                 self.ask_packet(no[0])
                 

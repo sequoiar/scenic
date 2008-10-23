@@ -8,6 +8,7 @@ import pypm
 from utils import log
 import time
 
+log = log.start('debug', 1, 0, 'MidiOut')
 
 INPUT = 0
 OUTPUT = 1
@@ -162,11 +163,12 @@ class MidiOut(object):
 		midi_time = pypm.Time()
 		if self.permissif :
 			#on fait une liste des notes en retard pour le signaler
-			new_list = [midiNotes[i][1] for i in range(len(midiNotes)) if (midi_time > midiNotes[i][1]) ]
+			new_list = [midiNotes[i] for i in range(len(midiNotes)) if (midi_time > midiNotes[i][1]) ]
 
-			if (len(new_list) > 0) :
+			if len(new_list) > 0:
 				self.nbXRun += 1
-				l = "OUTPUT: time=" + str(midi_time) + "ms  can't play in time , " + str(len(midiNotes)) + " notes - late of " + str(midi_time - new_list[0]) + " ms"
+				print "FINAL:", time.time(), new_list
+				l = "OUTPUT: time=" + str(midi_time) + "ms  can't play in time , " + str(len(midiNotes)) + " notes - late of " + str(midi_time - new_list[0][1]) + " ms"
 				log.error(l)
 			note_filtred = midiNotes
 		else:
@@ -175,7 +177,7 @@ class MidiOut(object):
 			note_filtred = [midiNotes[i] for i in range(len(midiNotes)) if (midiNotes[i][1] >= midi_time or midiNotes[i][0][0] == int(0xc0) or midiNotes[i][0][2] == 0) ]
 
 			if (len(note_filtred) < len(midiNotes)):
-				l = "OUTPUT: time=" + str(pypm.Time()) + "ms can't play in time,  " + str(len(midiNotes) - len(note_filtred)) + " note(s) skipped"
+				l = "OUTPUT: time=" + str(midi_time) + "ms can't play in time, " + str(len(midiNotes) - len(note_filtred)) + " note(s) skipped"
 				log.error(l)
 				
         #Playing note on the midi device

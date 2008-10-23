@@ -9,6 +9,10 @@ from listCirc import  PacketCirc
 from ringBuffer import myRingBuffer
 from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import udp, task, defer, reactor
+
+log = log.start('debug', 1, 0, 'RTPClient')
+
+
 class RTPClient(DatagramProtocol):
 
     def __init__(self, peerAddress, port=44000):
@@ -59,17 +63,17 @@ class RTPClient(DatagramProtocol):
     def datagramReceived(self, data, (host, port)):
 
         data = self.parseRTPHeader(data)
-        if (data != -1):
-            if (data[0]== 'd'):
+        if data != -1:
+            if data[0]== 'd':
                 #resending for delay calcul
             	packet = self.generateRTPHeader(0)
             	chunk = packet + "d "
-            	self.transport.write(chunk,(self.peerAddress, self.port))
+            	self.transport.write(chunk, (self.peerAddress, self.port))
 
-            elif ( data[0] == 's'):
+            elif data[0] == 's':
             	self.lastSync = time.time()
             	#setting flag to sync
-            	if ( not self.sync ):
+            	if not self.sync:
                     log.info( "INPUT: client sync" )
                     self.sync = 1
                     #self.start_streaming()

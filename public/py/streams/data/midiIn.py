@@ -6,6 +6,7 @@ from midiObject import MidiNote
 from RTPClient import RTPClient
 
 from twisted.internet import threads
+log = log.start('debug', 1, 0, 'MidiIn')
 
 INPUT = 0
 OUTPUT = 1
