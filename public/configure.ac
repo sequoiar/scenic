@@ -34,7 +34,7 @@ AC_ARG_ENABLE([sip], [ ****************
   --enable-sip build sip],,enable_sip=yes)
 AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
-        enable_debug=no)
+        enable_debug=yes)
 
 AM_CONDITIONAL([SIP],test "x${enable_sip}" == "xyes" )
 AM_CONDITIONAL([DEBUG],test "x${enable_debug}" = "xyes" )

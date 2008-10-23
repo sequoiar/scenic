@@ -1,11 +1,16 @@
 if DEBUG
 if SIP
-	SIPDIR = sip sip/test
+SUBDIRS = util util/test gutil tcp tcp/test gst gst/test main sip sip/test
 endif
-SUBDIRS = util util/test gutil tcp tcp/test gst gst/test main $(SIPDIR)
+if !SIP
+SUBDIRS = util util/test gutil tcp tcp/test gst gst/test main 
+endif
+
 else
 if SIP
-	SIPDIR = sip 
+SUBDIRS = util gutil tcp gst main sip
 endif
-SUBDIRS = util gutil tcp gst main $(SIPDIR) 
+if !SIP
+SUBDIRS = util gutil tcp gst main  
+endif
 endif
