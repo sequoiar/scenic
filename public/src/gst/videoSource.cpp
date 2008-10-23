@@ -256,7 +256,8 @@ void VideoDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
 
 void VideoV4lSource::sub_init()
 {
-    if (config_.fileExists())
+    // set a v4l2src if given to config as an arg, otherwise use default
+    if (config_.hasLocation() && config_.fileExists())
         g_object_set(G_OBJECT(source_), "device", config_.location(), NULL);
 }
 

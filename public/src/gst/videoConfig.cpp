@@ -70,7 +70,10 @@ bool VideoConfig::fileExists() const
     std::fstream in;
     in.open(location_.c_str(), std::fstream::in);
     if (in.fail())
-        THROW_ERROR("File " << location_ << " does not exist");
+    {
+        LOG_DEBUG("File " << location_ << " does not exist");
+        return false;
+    }
 
     in.close();
     return true;
@@ -79,8 +82,8 @@ bool VideoConfig::fileExists() const
 
 const char* VideoConfig::location() const
 {
-    if (location_.empty())
-        THROW_ERROR("No location specified");
+    //if (location_.empty())
+    //   THROW_ERROR("No location specified");
     return location_.c_str();
 }
 

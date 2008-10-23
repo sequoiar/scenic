@@ -19,6 +19,20 @@
 
 #define NUM_CHANNELS 8
 
+#if 0
+static const GstAudioChannelPosition NONE_POSITIONS[NUM_CHANNELS] = {
+      GST_AUDIO_CHANNEL_POSITION_NONE, 
+      GST_AUDIO_CHANNEL_POSITION_NONE, 
+      GST_AUDIO_CHANNEL_POSITION_NONE,
+      GST_AUDIO_CHANNEL_POSITION_NONE, 
+      GST_AUDIO_CHANNEL_POSITION_NONE, 
+      GST_AUDIO_CHANNEL_POSITION_NONE, 
+      GST_AUDIO_CHANNEL_POSITION_NONE, 
+      GST_AUDIO_CHANNEL_POSITION_NONE
+};
+#endif
+
+
 static const GstAudioChannelPosition CHANNEL_POSITIONS[][NUM_CHANNELS] = {
     {                           /* Mono */
         GST_AUDIO_CHANNEL_POSITION_FRONT_MONO
@@ -127,7 +141,7 @@ static gboolean bus_call(GstBus *bus, GstMessage *msg, gpointer data)
                 g_error_free(err);
 
                 if (debug) {
-                    g_print("Debug deails: %s\n", debug);
+                    g_print("Debug details: %s\n", debug);
                     g_free(debug);
                 }
 
@@ -136,7 +150,7 @@ static gboolean bus_call(GstBus *bus, GstMessage *msg, gpointer data)
                 break;
             }
         case GST_MESSAGE_STATE_CHANGED:
-            g_print("state changed \n");
+            //g_print("state changed \n");
             break;
         default:
             break;
@@ -144,6 +158,25 @@ static gboolean bus_call(GstBus *bus, GstMessage *msg, gpointer data)
 
     return TRUE;
 }
+
+
+#if 0
+static GstCaps *
+generate_multichannel_src_caps()
+{
+  GstCaps *caps = gst_caps_new_simple ("audio/x-raw-int",
+          "endianness", G_TYPE_INT, G_BIG_ENDIAN,
+          "signed", G_TYPE_BOOLEAN, TRUE,
+          "width", G_TYPE_INT, 16,
+          "depth", G_TYPE_INT, 16,
+          "rate", G_TYPE_INT, 44100, "channels", G_TYPE_INT, NUM_CHANNELS, NULL);
+
+  gst_audio_set_caps_channel_positions_list(caps, NONE_POSITIONS, NUM_CHANNELS);
+  g_assert(caps);
+  g_print("Here are your caps %s\n", gst_caps_to_string(caps));
+  return caps;
+}
+#endif
 
 
 gint main(gint argc, gchar *argv[])
@@ -154,6 +187,7 @@ gint main(gint argc, gchar *argv[])
     GstElement *sources[NUM_CHANNELS];
     GstElement *audioconverts[NUM_CHANNELS + 1];
     GstElement *queues[NUM_CHANNELS + 1];
+    //GstElement *payAconv, *depayAconv, *rtpL16pay, *rtpL16depay, *capsSetter;
     gboolean done = FALSE;
     GMainLoop *loop;
     GstBus *bus;
@@ -165,7 +199,7 @@ gint main(gint argc, gchar *argv[])
     /* create elements */
     pipeline = gst_pipeline_new("audioPipeline");
     g_signal_connect(pipeline, "deep_notify",
-                G_CALLBACK(gst_object_default_deep_notify), NULL);
+            G_CALLBACK(gst_object_default_deep_notify), NULL);
 
     /* watch for messages on the pipeline's bus (note that this will only
      * work like this when a GLib main loop is running) */
@@ -179,7 +213,7 @@ gint main(gint argc, gchar *argv[])
     set_channel_layout(interleave);
 
     gst_bin_add(GST_BIN(pipeline), interleave);
-            
+
     const double GAIN = 1.0 / NUM_CHANNELS;
     const double FUNDAMENTAL = 200.0;
 
@@ -192,28 +226,48 @@ gint main(gint argc, gchar *argv[])
             g_print("audioconvert%s", err_str);
         if (!(queues[channel] = gst_element_factory_make("queue", NULL)))
             g_print("queue%s", err_str);
-    
+
         gst_bin_add_many(GST_BIN(pipeline), sources[channel], audioconverts[channel], queues[channel], NULL);
         gst_element_link_many(sources[channel], audioconverts[channel], queues[channel], interleave, NULL);
-            
+
         g_object_set(G_OBJECT(sources[channel]), "freq", (channel + 1.0) * FUNDAMENTAL, "volume", GAIN, NULL);
     }
-    
+
     if (!(audioconverts[NUM_CHANNELS] = gst_element_factory_make("audioconvert", NULL)))
-            g_print("audioconvert%s", err_str);
+        g_print("audioconvert%s", err_str);
     if (!(queues[NUM_CHANNELS] = gst_element_factory_make("queue", NULL)))
-            g_print("queue%s", err_str);
+        g_print("queue%s", err_str);
     if (!(audioresample = gst_element_factory_make("audioresample", NULL)))
-            g_print("audioresample%s", err_str);
+        g_print("audioresample%s", err_str);
+#if 0
+    if (!(payAconv = gst_element_factory_make("audioconvert", NULL)))
+        g_print("payAconv%s", err_str);
+    if (!(rtpL16pay = gst_element_factory_make("rtpL16pay", NULL)))
+        g_print("rtpL16pay%s", err_str);
+    if (!(rtpL16depay = gst_element_factory_make("rtpL16depay", NULL)))
+        g_print("rtpL16depay%s", err_str);
+    if (!(capsSetter = gst_element_factory_make("capssetter", NULL)))
+        g_print("capsSetter%s", err_str);
+    if (!(depayAconv = gst_element_factory_make("audioconvert", NULL)))
+        g_print("depayaconv%s", err_str);
+#endif
     if (!(sink = gst_element_factory_make("jackaudiosink", NULL)))
         g_print("sink%s", err_str);
 
     g_object_set(G_OBJECT(sink), "connect", 1, NULL);   // autoconnect jack ports
     g_object_set(G_OBJECT(sink), "sync", FALSE, NULL);
-        
-    gst_bin_add_many(GST_BIN (pipeline), audioconverts[NUM_CHANNELS], audioresample, queues[NUM_CHANNELS], sink, NULL);
 
-    if (!(gst_element_link_many(interleave, audioconverts[NUM_CHANNELS], audioresample, queues[NUM_CHANNELS], sink, NULL)))
+#if 0
+    GstCaps *depaySrcCaps = generate_multichannel_src_caps();
+    g_assert(depaySrcCaps);
+    g_object_set(G_OBJECT(capsSetter), "caps", depaySrcCaps, NULL); // add multichannel caps
+#endif
+
+    gst_bin_add_many(GST_BIN (pipeline), audioconverts[NUM_CHANNELS], audioresample, queues[NUM_CHANNELS], /*payAconv,
+            rtpL16pay, rtpL16depay, capsSetter, depayAconv, */sink, NULL);
+
+    if (!(gst_element_link_many(interleave, audioconverts[NUM_CHANNELS], audioresample, queues[NUM_CHANNELS], /*payAconv, 
+                    rtpL16pay, rtpL16depay, capsSetter, depayAconv, */sink, NULL)))
     {
         g_print("Failed to link. Quitting.\n");
         return -1;
@@ -221,17 +275,6 @@ gint main(gint argc, gchar *argv[])
 
     /* run */
     ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
-#if 0
-    GstPad* interleaveSrcPad = gst_element_get_static_pad(interleave, "src");
-    GstPad* audioconvertSinkPad = gst_element_get_static_pad(sink, "sink");
-    GstCaps *interleaveSrcPadCaps =  gst_pad_get_negotiated_caps(interleaveSrcPad);
-    gst_pad_set_caps(audioconvertSinkPad, interleaveSrcPadCaps);
-
-    gst_caps_unref(interleaveSrcPadCaps);
-    gst_object_unref(GST_OBJECT(interleaveSrcPad));
-    gst_object_unref(GST_OBJECT(audioconvertSinkPad));
-#endif
-
     ret = gst_element_set_state (pipeline, GST_STATE_PAUSED);
     ret = gst_element_set_state (pipeline, GST_STATE_PLAYING);
 
@@ -251,13 +294,13 @@ gint main(gint argc, gchar *argv[])
         return -1;
     }
 
-    //while(done == FALSE)
-     //   usleep(10000);
     g_main_loop_run(loop);
 
     /* clean up */
     gst_element_set_state(pipeline, GST_STATE_NULL);
     gst_object_unref(pipeline);
+
+    //gst_caps_unref(depaySrcCaps);
 
     return 0;
 }

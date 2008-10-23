@@ -23,7 +23,7 @@
 #include "pipeline.h"
 
 
-const long long Payloader::MAX_PTIME = 200000;
+const long long Payloader::MAX_PTIME = 2000000;
 
 void RtpPay::init()
 {

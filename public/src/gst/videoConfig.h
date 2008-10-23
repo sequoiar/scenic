@@ -49,6 +49,7 @@ class VideoConfig
 
         const char *source() const { return source_.c_str(); }
 
+        bool hasLocation() const { return location_.empty(); }
         bool fileExists() const;
         const char *location() const;
 
