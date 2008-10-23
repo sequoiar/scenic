@@ -200,11 +200,11 @@ class RTPClient(DatagramProtocol):
         if len(data) >= 16:
     
             #Only checking the identifier of the source SSRC identifier
-#            sync = data[8]
-#            sync += data[9]
-#            sync += data[10]
-#            sync += data[11]
-            sync = unpack("!L", data[8:4])
+            sync = data[8]
+            sync += data[9]
+            sync += data[10]
+            sync += data[11]
+            sync = unpack("!L", sync)
     
             #If the identifier of the source is wrong
             if (sync[0] != 12345679):
