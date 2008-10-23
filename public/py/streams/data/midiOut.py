@@ -76,16 +76,17 @@ class MidiOut(object):
 		"""Sync set the difference between local midi time and
 	    remote midi time in order to apply it to the notes
 		"""
-		if pypm.Time() >= int(time) :
-			self.lastMidiTimeDiff.to_list(pypm.Time() - int(time))
+		midi_time = pypm.Time()
+		if midi_time >= int(time):
+			self.lastMidiTimeDiff.to_list(midi_time - int(time))
 		else:
-			self.lastMidiTimeDiff.to_list(- (int(time) - pypm.Time()))
+			self.lastMidiTimeDiff.to_list(- (int(time) - midi_time()))   #TODO: je pense que les 2 sont equivalent??
 		
 		#midiTime diff recoit la moyenne des dernier tps calculer
 		self.midiTimeDiff = self.lastMidiTimeDiff.average()
 		
 		#Checking if the delay between the two machine is highter than the current latency
-		if (self.latency <= self.delay):
+		if self.latency <= self.delay:
 			l = "OUTPUT: Can't play on time = delay between hosts is higher than the latency !"
 			log.error(l)
 

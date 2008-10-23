@@ -25,11 +25,11 @@ class ListCirc(object):
 
 	def replace_note(self, note):
 		self.index += 1
-		if (self.index == self.listeSize - 1):
+		if self.index == self.listeSize - 1:
 			self.index = 0
-			self.list[self.index] = note
-		else:
-			self.list[self.index] = note
+#			self.list[self.index] = note
+#		else:
+		self.list[self.index] = note
 			
 
 	def flush(self):
@@ -52,7 +52,7 @@ class PacketCirc(ListCirc):
 		
 		packet = [i for i in range(len(self.list)) if (self.list[i].seqNo == seqNo)] 
 		
-		if ( len(packet) > 0 ):
+		if len(packet) > 0:
 			return packet[0]
 		else:
 			return -1
@@ -70,15 +70,15 @@ class DelayCirc(ListCirc):
 		self.lastSync = time.time()
 	
 	def average(self):
-		if (len(self.list)>0):
-			average = float(sum(self.list)/len(self.list))
+		if len(self.list) > 0:
+			average = float(sum(self.list) / len(self.list))
 			return average
 
 #list to stock last miditime difference
 class MidiTimeCirc(DelayCirc):
 	
 	def split(self):
-		if ( len(self.list)>0):
+		if len(self.list) > 0:
 			split =  max(self.list) - min(self.list)
       			return abs(split)
 		else:

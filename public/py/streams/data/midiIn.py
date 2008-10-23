@@ -51,7 +51,7 @@ class MidiIn(object):
 	
     def _polling(self):
         #need by twisted to stop properly the thread
-        d = defer.Deferred()
+#        d = defer.Deferred()
 
         while not self.end_flag:
             if self.MidiIn.Poll():
@@ -59,7 +59,7 @@ class MidiIn(object):
                 
             time.sleep(0.001)
 
-        return d
+#        return d
 
 
     def start_sending(self):

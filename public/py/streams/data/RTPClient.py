@@ -59,17 +59,17 @@ class RTPClient(DatagramProtocol):
     def datagramReceived(self, data, (host, port)):
 
         data = self.parseRTPHeader(data)
-        if (data != -1):
-            if (data[0]== 'd'):
+        if data != -1:
+            if data[0]== 'd':
                 #resending for delay calcul
             	packet = self.generateRTPHeader(0)
             	chunk = packet + "d "
-            	self.transport.write(chunk,(self.peerAddress, self.port))
+            	self.transport.write(chunk, (self.peerAddress, self.port))
 
-            elif ( data[0] == 's'):
+            elif data[0] == 's':
             	self.lastSync = time.time()
             	#setting flag to sync
-            	if ( not self.sync ):
+            	if not self.sync:
                     log.info( "INPUT: client sync" )
                     self.sync = 1
                     #self.start_streaming()
@@ -123,7 +123,7 @@ class RTPClient(DatagramProtocol):
         #Writting it to the socket
         chunk = header + chunk   
         if ( self.sync ):
-            self.transport.write(chunk,(self.peerAddress, self.port))
+            self.transport.write(chunk, (self.peerAddress, self.port))
 
         #disable witness
         self.sendingMidiData = 0
