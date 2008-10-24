@@ -8,7 +8,6 @@ from utils import log
 from listCirc import DelayCirc
 from ringBuffer import myRingBuffer
 from midiOut import MidiOut
-log = log.start('debug', 1, 0, 'RTPServer')
 
 class RTPServer(DatagramProtocol):
 
@@ -71,7 +70,7 @@ class RTPServer(DatagramProtocol):
         self.midiOut.stop_publy()
         
         #on vide les buffers
-        self.midiOut.midiOutCmdList.flush()
+        #self.midiOut.midiOutCmdList.flush()
         self.midiOut.lastMidiTimeDiff.flush()
 
         log.info("OUTPUT: RTPServer stop receiving midi data")
@@ -132,7 +131,7 @@ class RTPServer(DatagramProtocol):
             self.launch()
             
 
-    	if self.actualSeqNo == 32767:
+	if self.actualSeqNo == 32767:
             self.actualSeqNo = 1
 
             #on set les address du serveur afin de renvoyer certain packet
@@ -141,6 +140,7 @@ class RTPServer(DatagramProtocol):
         else:
             self.actualSeqNo += 1
 
+        
       	#Parsing packet header
         midiChunk = self.parseRTPHeader(data)
 
@@ -176,7 +176,6 @@ class RTPServer(DatagramProtocol):
                     #unpickle list midi note in the packet               
                     midiNote = cPickle.loads(midiChunk)
                     #profiter du parcours pour appliquer les timestamps
-                    print "note time in server " + str(midiNote[0][1]) + " a " + str(time.time())
                     for i in range(len(midiNote)):
                         midiNote[i][1] = midiNote[i][1] + self.midiOut.midiTimeDiff + self.midiOut.latency - int(self.midiOut.delay) 
                         #Adding the note to the playing buffer
@@ -189,14 +188,12 @@ class RTPServer(DatagramProtocol):
     def ask_packet(self,seqNo):
         """send a demand of lost packet
         """
-        self.tmp = time.time()
         seqNo -= 1
-        log.warning("OUTPUT: Asking lost packet to client: %s" % seqNo)
+        log.warning("OUTPUT: Asking lost packet to client")
 		
         header = self.generateRTPHeader()
         chunk = str(seqNo)
         chunk = header + chunk
-        print 'emvoie de la demande de paquet', time.time()	
         self.transport.write(chunk , (self.peerAddress,self.peerPort) )
 
 
@@ -263,7 +260,6 @@ class RTPServer(DatagramProtocol):
             #check if there is no loose of packet last one receive
             if (int(self.actualSeqNo) != int(no[0])):
                 #on redemande les paquets perdu
-                print 'detection de la perte du paquet', time.time()    
                 self.actualSeqNo = no[0]
                 self.ask_packet(no[0])
                 

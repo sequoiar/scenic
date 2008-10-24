@@ -8,8 +8,6 @@ import pypm
 from utils import log
 import time
 
-log = log.start('debug', 1, 0, 'MidiOut')
-
 INPUT = 0
 OUTPUT = 1
 
@@ -37,7 +35,7 @@ class MidiOut(object):
 		self.lastMidiTimeDiff = MidiTimeCirc(25)
 
 		#stat
-		self.nbNote = 0
+		self.nbNotes = 0
 		self.nbXRun = 0
 		self.startChrono = 0
 		self.midiOutCmdList = myRingBuffer()
@@ -69,8 +67,9 @@ class MidiOut(object):
 			#self.publy.stop()
 		self.publy_flag = False
 		self.send_note_off()
+		
 		#reinitialize midi time difference average
-		self.lastMidiTimeDiff.flush()
+		#self.lastMidiTimeDiff.flush()
 
 		
 	def sync_midi_time(self, time):
@@ -119,13 +118,16 @@ class MidiOut(object):
 			if self.MidiOut is None :
 				#Initializing midi input stream
 				self.MidiOut = pypm.Output(self.midiDevice, 0)
+				l = "OUTPUT: " + str(self.get_device_info()[1]) + " has been set as output device"
+				log.info(l)
 				return 0
 			else:
 				#delete old midi device
 				del self.MidiOut
 				#Initializing new midi input stream
 				self.MidiOut = pypm.Output(self.midiDevice, 0)
-				log.info("OUTPUT: Input device is set up")
+				l = "OUTPUT: " + str(self.get_device_info()[1]) + " has been set as output device"
+				log.info(l)
 				return 0
 		else:
 			log.error("OUTPUT: Incorrect device selected, can't setting up")
@@ -135,18 +137,14 @@ class MidiOut(object):
 	def get_device_info(self):
 		"""print info of the current device
 		"""
-		return pypm.GetDeviceInfo(self.device)
+		return pypm.GetDeviceInfo(self.midiDevice)
 
 	
 	def send_note_off(self):
 		"""send Note Off in case of broken connection
 		"""	
-#		midiNotes = []
-#		for i in range(0,127):
-#			midiNotes.append([[0x80,i,100], pypm.Time()])
 		midi_time = pypm.Time()	
-		midiNotes = [((0x80, i, 100), midi_time) for i in range(128)]   # faster like this
-
+		midiNotes = [((0x80, i, 100), midi_time) for i in range(128)]
 		self.MidiOut.Write(midiNotes) 
 
 		
@@ -163,12 +161,11 @@ class MidiOut(object):
 		midi_time = pypm.Time()
 		if self.permissif :
 			#on fait une liste des notes en retard pour le signaler
-			new_list = [midiNotes[i] for i in range(len(midiNotes)) if (midi_time > midiNotes[i][1]) ]
+			new_list = [midiNotes[i][1] for i in range(len(midiNotes)) if (midi_time > midiNotes[i][1]) ]
 
-			if len(new_list) > 0:
+			if (len(new_list) > 0) :
 				self.nbXRun += 1
-				print "FINAL:", time.time(), new_list
-				l = "OUTPUT: time=" + str(midi_time) + "ms  can't play in time , " + str(len(midiNotes)) + " notes - late of " + str(midi_time - new_list[0][1]) + " ms"
+				l = "OUTPUT: time=" + str(midi_time) + "ms  can't play in time , " + str(len(midiNotes)) + " notes - late of " + str(midi_time - new_list[0]) + " ms"
 				log.error(l)
 			note_filtred = midiNotes
 		else:
@@ -177,7 +174,7 @@ class MidiOut(object):
 			note_filtred = [midiNotes[i] for i in range(len(midiNotes)) if (midiNotes[i][1] >= midi_time or midiNotes[i][0][0] == int(0xc0) or midiNotes[i][0][2] == 0) ]
 
 			if (len(note_filtred) < len(midiNotes)):
-				l = "OUTPUT: time=" + str(midi_time) + "ms can't play in time, " + str(len(midiNotes) - len(note_filtred)) + " note(s) skipped"
+				l = "OUTPUT: time=" + str(pypm.Time()) + "ms can't play in time,  " + str(len(midiNotes) - len(note_filtred)) + " note(s) skipped"
 				log.error(l)
 				
         #Playing note on the midi device
@@ -190,14 +187,15 @@ class MidiOut(object):
 		play_midi_note = self.play_midi_note
 		publy_flag = self.publy_flag
 
-		while publy_flag :
+		while self.publy_flag :
 			midiNotes = []
                         #if there are notes to play  
 			if midiOutCmdList.len() > 0:
 				midiNotes = midiOutCmdList.get_data(pypm.Time())
 					
 			if len(midiNotes) > 0:
-				reactor.callFromThread(self.play_midi_note, midiNotes)
+				self.nbNotes += len(midiNotes)
+				reactor.callFromThread(play_midi_note, midiNotes)
 		
 			time.sleep(0.001)
 		

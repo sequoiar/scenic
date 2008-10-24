@@ -6,7 +6,6 @@ from midiObject import MidiNote
 from RTPClient import RTPClient
 
 from twisted.internet import threads
-log = log.start('debug', 1, 0, 'MidiIn')
 
 INPUT = 0
 OUTPUT = 1
@@ -32,12 +31,16 @@ class MidiIn(object):
        	log.info("INPUT: Launching midi input listener")
 
         #stats
-        self.nbNote = 0
+        self.nbNotes = 0
         self.fps_note = 0
         
         #flag ( 1 == syncronyse with remote peer )
         self.sync = 0
         self.end_flag = True
+
+        #check activity
+        self.last_activity = 0
+        self.in_activity = False
 
         #starting looping task
         self.sendTime.start(0.5)
@@ -48,15 +51,30 @@ class MidiIn(object):
             self.end_flag = True
         
             self.client.stop_streaming()
+            
             #self.client.midiInCmdList.flush()
 	
     def _polling(self):
         #need by twisted to stop properly the thread
         d = defer.Deferred()
-        end_flag = self.end_flag
-        while not end_flag:
-            if self.MidiIn.Poll():
+
+        #setting new scopes
+        last_poll = self.last_activity
+        MidiIn = self.MidiIn
+        in_activity = self.in_activity
+
+        while not self.end_flag:
+            if MidiIn.Poll():
+                last_poll = time.time()*1000
                 reactor.callFromThread(self._get_input)
+                in_activity = True
+
+            if in_activity and ((time.time() * 1000) - last_poll >= 10):
+                #send two empty packet
+                self.client.send_empty_packet() 
+                self.client.send_empty_packet() 
+                in_activity = False
+            
                 
             time.sleep(0.001)
 
@@ -89,6 +107,10 @@ class MidiIn(object):
             if inp == 1:
                 self.midiDeviceList.append([loop,name, opened])
 
+    def get_device_info(self):
+		"""print info of the current device
+		"""
+		return pypm.GetDeviceInfo(self.midiDevice)
 
     def set_device(self, device):
 	"""select midi device
@@ -100,23 +122,25 @@ class MidiIn(object):
         except ValueError:
             log.error("INPUT: Enter a number for midi input device")
 
+    
         #check if device exist
         devList = [self.midiDeviceList[i][0] for i in range(len(self.midiDeviceList))]	
         if dev in devList :
             self.midiDevice = dev
-            log.info( "INPUT: Midi Input selected")
 
             if self.MidiIn is None:
                 #Initializing midi input stream
                 self.MidiIn = pypm.Input(self.midiDevice)
+                l = "INPUT: " + str(self.get_device_info()[1]) + " has been set as input device"
+                log.info(l)
                 return 0
             else:
                 #delete old midi device
                 del self.MidiIn
                 #Initializing new midi input stream
                 self.MidiIn = pypm.Input(self.midiDevice)
-                
-                log.info( "INPUT: Input device is set up")
+                l = "INPUT: " + str(self.get_device_info()[1]) + " has been set as input device"
+                log.info(l)
                 return 0
         else:
             log.error("INPUT: incorrect device selected")
@@ -130,7 +154,7 @@ class MidiIn(object):
         self.client.startChrono.append(time.time())
         #Reading Midi Input
         MidiData = self.MidiIn.Read(1024)
-
+        
         if len(MidiData) > 0:
             [self.client.midiInCmdList.put([MidiData[i][0],currentTime]) for i in range(len(MidiData))]
             self.client.send_midi_data()   
@@ -140,7 +164,6 @@ class MidiIn(object):
         """send midi time to the remote peer in order to syncronise midi event
 		"""
         self.client.send_midi_time(pypm.Time())
-        
                     
 
     def __del__(self):

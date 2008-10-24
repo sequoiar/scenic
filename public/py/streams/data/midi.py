@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # Sropulpof
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -37,16 +38,16 @@ import sys
 #redexp
 import re
 import signal
-log = log.start('debug', 1, 0, 'midiStream')
+#log = log.start('info', 1, 0, 'midiStream')
 
 #class MidiStream(stream.DataStream):
 class MidiStream(object):
     """Class MIDI
     """
-
+    
     def __init__(self, address):
-
-
+        
+        
         #init var
         if self.check_ip(address):
             self.address = address
@@ -56,18 +57,17 @@ class MidiStream(object):
 
         #initialisation du midi
         pypm.Initialize()
-
+	   
         #Configuring RTP Server
         #witness for receiving data is self.server.receivingMidiData
         #latency is self.server.midiOut.latency
         #midi output device list is in self.midiOut.midiDeviceList
         self.server = RTPServer('127.0.0.1')
 
-        #listenUDP(port sur lequel on lit les donnees midi, server)
+        #listenUDP(port, server)
         self.listen_s = reactor.listenUDP(44000,self.server)
 
-        #MidiIn ( "adresse sur lequel envoyer les donnees midi" , port sur lequel envoyer les midi data)
-        #midi input device list is in self.midiIn.midiDeviceList
+        #MidiIn ( "address where data will be sent" , port)
         #witness for sending data is in self.midiIn.sendingMidiData
         self.midiIn = MidiIn(self.address,44000)
         signal.signal(signal.SIGINT, self.handler)
@@ -81,10 +81,10 @@ class MidiStream(object):
 
         #a enlever dans final version
         reactor.stop()
-        #A mettre
+        #to put for integration
         #self.listen_s.stopListenning()
         #self.midiIn.listen_c.stopListenning()
-
+        
     def set_ip(self,address):
         """Set ip address of the midi stream server
         """
@@ -99,7 +99,7 @@ class MidiStream(object):
             log.error("User attemp to assign a bad formated ip")
             return -1
 
-
+            
     def check_ip(self,address):
         if re.match('^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address):
             values = [int(i) for i in address.split('.')]
@@ -108,28 +108,27 @@ class MidiStream(object):
             else:
                 log.error("Wrong ip address format")
                 return 0
-
+                
         else:
             log.error("Wrong ip address format")
             return 0
-
+            
 
     def ip_range(self, nums):
         for num in nums:
             if num < 0 or num > 255:
                 return False
             return True
-
-
-#INPUT
+ 
+    
+#INPUT	
     def start_sending(self):
-        """function start_sending
+        """function start_sending        
         returns 0 if can start sending else -1
         """
         res = self.midiIn.start_sending()
-        #log.info('Sending notes has been started')
         return res
-
+    
 
     def stop_sending(self):
         """function stop_sending
@@ -142,7 +141,7 @@ class MidiStream(object):
         """
         res = self.midiIn.set_device(device)
         return res
-
+		
     def get_input_devices(self):
         """function get_input_device , return list of midi devices
         """
@@ -156,9 +155,9 @@ class MidiStream(object):
 
     def get_client_sync_witness(self):
         return getattr(self.midiIn.client, "sync")
+		
 
-
-#OUTPUT
+#OUTPUT		
     def start_receiving(self):
         """function start_receving
         returns 0 if started else -1
@@ -167,10 +166,10 @@ class MidiStream(object):
         #log.info('Receiving notes has been started')
         return res
 
-
+    
     def stop_receiving(self):
         """function stop_receving
-        returns
+        returns 
         """
         self.server.stop_receiving()
 
@@ -180,14 +179,14 @@ class MidiStream(object):
         """
         res = self.server.midiOut.set_device(device)
         return res
-
+   
     def get_output_devices(self):
         """function get_input_device, return list of midi device
         """
         self.server.midiOut.get_devices()
         return getattr(self.server.midiOut, "midiDeviceList")
 
-
+		
     def set_latency(self, latency):
         """function set output latency
         """
@@ -211,32 +210,24 @@ class MidiStream(object):
 
     def __del__(self):
 
-        #log.info("pyPortMidi terminate")
         del self.server
         del self.midiIn
         del self.address
+
         #Ending pyport midi
-        pypm.Terminate()
+        pypm.Terminate()	
 
 
 
 if __name__ == "__main__":
 
     midi = MidiStream('127.0.0.1')
-
-    print midi.get_input_devices()
-    midi.set_input_device(2)
-
-    print midi.get_output_devices()
-    midi.set_output_device(3)
-
-
-    #reactor.callLater(20, midi.stop_sending)
-    #reactor.callLater(20, midi.stop_receiving)
-
+    
+    
+    midi.set_input_device(1)
+    midi.set_output_device(6)
 
     reactor.callLater(2,midi.start_receiving)
-
     reactor.callLater(2,midi.start_sending)
-
+    
     reactor.run()
