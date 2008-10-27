@@ -6,4 +6,4 @@ libtoolize --force
 autoheader
 autoconf -f
 automake -a
-./configure --enable-debug
+./configure

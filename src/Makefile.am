@@ -1,4 +1,4 @@
-if DEBUG
+if PROJ_DEBUG
 if SIP
 SUBDIRS = util util/test gutil tcp tcp/test gst gst/test main sip sip/test
 endif

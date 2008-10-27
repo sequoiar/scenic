@@ -36,12 +36,11 @@ AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
         enable_debug=yes)
 
-AM_CONDITIONAL([SIP],test "x${enable_sip}" == "xyes" )
-AM_CONDITIONAL([DEBUG],test "x${enable_debug}" = "xyes" )
+#AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" == "xyes" )
 
 # Checks for library functions.
 
-if test "x${enable_debug}" == "xyes" ; then
+if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG,[],[Debug define from configure])
     CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
 
@@ -49,9 +48,6 @@ if test "x${enable_debug}" == "xyes" ; then
 PKG_CHECK_MODULES(CPPTEST, libcpptest, have_cpptest=true, have_cpptest=false)
 if test "x${have_cpptest}" = "xfalse" ; then
     AC_MSG_WARN([libcpptest not found.-- ubuntu: sudo apt-get install libcpptest-dev])
-AM_CONDITIONAL([DEBUG],test "xyes" == "xyes" )
-else
-AM_CONDITIONAL([DEBUG],test "x${have_cpptest}" == "xyes" )
 fi
 
 fi
@@ -108,13 +104,13 @@ if test "x${enable_sip}" = "xyes" ; then
 #Trying to set PJSIP using pkg-config
 PKG_CHECK_MODULES(UUID, uuid, have_uuid=true, have_uuid=false)
 if test "x${have_libuuid}" = "xfalse" ; then
-    AC_MSG_ERROR([UUID not found. pkg libuuid1])
+    AC_MSG_WARN([UUID not found. pkg libuuid1])
 fi
 
 #Trying to set PJSIP using pkg-config
 PKG_CHECK_MODULES(PJSIP, libpj, have_libpj=true, have_libpj=false)
 if test "x${have_libpj}" = "xfalse" ; then
-    AC_MSG_ERROR([PJSIP not found. http://www.pjsip.org/download.htm])
+    AC_MSG_WARN([PJSIP not found. http://www.pjsip.org/download.htm])
 fi
 fi
 
@@ -150,6 +146,9 @@ fi
 #
 #
 #
+AM_CONDITIONAL([SIP],test "x${enable_sip}" = "xyes" -a "x{have_libpj}" = "xyes" )
+AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes" -a "x{have_cpptest}" = "xyes" )
+
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile
@@ -162,7 +161,7 @@ AC_CONFIG_FILES([Makefile
                  ])
 
 
-if test "x${enable_debug}" = "xyes" ; then
+if test  "x${enable_debug}" = "xyes"  -a  "x${have_cpptest}" = "xtrue"  ; then
 AC_CONFIG_FILES([
                  src/util/test/Makefile
                  src/tcp/test/Makefile
@@ -173,4 +172,14 @@ AC_CONFIG_FILES([
 
 fi
 AC_OUTPUT
+echo
+
+if test  "x${enable_debug}" = "xyes" -a "x${have_cpptest}" = "xfalse"  ; then
+AC_MSG_NOTICE([Not building test directories -- no cpptest found])
+fi
+
+if test  "x${enable_sip}" = "xyes" -a "x${have_libpj}" = "xno"  ; then
+AC_MSG_NOTICE([Not building sip directory -- libpj missing])
+fi
+
 
