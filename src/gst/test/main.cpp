@@ -16,19 +16,19 @@ int main(int argc, char **argv)
 {
    std::string filename = argv[0];
    
-   if(filename.find("syncTester") != std::string::npos)
+   if(filename.find("syncTester\0") != std::string::npos)
        return mainSyncTestSuite(argc,argv);
-   else if(filename.find("videoTester") != std::string::npos)
+   else if(filename.find("videoTester\0") != std::string::npos)
        return mainVideoTestSuite(argc,argv);
-   else if(filename.find("rtpVideoTester") != std::string::npos)
+   else if(filename.find("rtpVideoTester\0") != std::string::npos)
        return mainRtpVideoTestSuite(argc,argv);
-   else if(filename.find("rtpAudioTester") != std::string::npos)
+   else if(filename.find("rtpAudioTester\0") != std::string::npos)
        return mainRtpAudioTestSuite(argc,argv);
-   else if(filename.find("audioTester") != std::string::npos)
+   else if(filename.find("audioTester\0") != std::string::npos)
        return mainAudioTestSuite(argc,argv);
-   else if(filename.find("rtpSyncTester") != std::string::npos)
+   else if(filename.find("rtpSyncTester\0") != std::string::npos)
        return mainRtpSyncTestSuite(argc,argv);
-   else if (filename.find("pof") != std::string::npos)
+   else if (filename.find("pof\0") != std::string::npos)
        return mainPof(argc, argv);
    else
    {
