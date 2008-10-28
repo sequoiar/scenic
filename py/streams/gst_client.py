@@ -153,7 +153,6 @@ class GstServer(object):
         else:
             if callback:
                 log.debug('Callback: %s' % repr(callback))
-                print self.state
                 self.conn.add_callback(*callback)
             if args:
                 self.conn.send_cmd(cmd, *args)

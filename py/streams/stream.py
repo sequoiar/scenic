@@ -43,7 +43,6 @@ class Streams(object):
     def add(self, name, kind, engine, core):
         if kind in self._kinds:
             dict_name = "_".join([kind, name])
-            print dict_name
             if dict_name in self.streams:
                 return 0
             else:

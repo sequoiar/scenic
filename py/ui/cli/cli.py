@@ -99,7 +99,6 @@ class CliController(TelnetServer):
                           }
         
     def parse(self, data):
-        print self.block
         if not self.core:
             self.core = self.factory.subject.api
         data = to_utf(data)
@@ -214,7 +213,7 @@ class CliController(TelnetServer):
                 if options.buffer:
                     self.core.set_stream(self, name, kind, 'buffer', options.buffer)
                 if options.input:
-                    self.core.set_stream(self, name, kind, 'input', options.input)
+                    self.core.set_stream(self, name, kind, 'source', options.input)
         elif options.list:
             self.core.list_stream(self, kind)
         elif options.add:
@@ -266,7 +265,7 @@ class CliController(TelnetServer):
                 if options.buffer:
                     self.core.set_stream(self, name, kind, 'buffer', options.buffer)
                 if options.input:
-                    self.core.set_stream(self, name, kind, 'input', options.input)
+                    self.core.set_stream(self, name, kind, 'source', options.input)
         elif options.list:
             self.core.list_stream(self, kind)
         elif options.add:
@@ -705,6 +704,13 @@ class CliView(Observer):
             else:
                 self.write('There is no video stream.')
                     
+    def _video_set(self, origin, ((state, attr, value), name)):
+        if origin is self.controller:
+            if state:
+                self.write('%s of video stream %s is set to %s.' % (attr, name, value))
+            else:
+                self.write('Unable to set %s of video stream %s.' % (attr, name))
+                
     def _video_sending_started(self, origin, data):
         if data:
             self.write('\nVideo sending started.')
