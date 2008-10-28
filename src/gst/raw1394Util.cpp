@@ -20,9 +20,10 @@
 
 #include <cerrno>
 #include <cstring>
+#ifdef CONFIG_IEEE1394
 #include <libavc1394/avc1394.h>
 #include <libavc1394/rom1394.h>
-
+#endif
 #include "raw1394Util.h"
 #include "logWriter.h"
 
@@ -33,8 +34,8 @@
  *  
  * \return number of ports found
  */
-
-int Raw1394::raw1394_get_num_ports()
+#ifdef CONFIG_IEEE1394
+int raw1394_get_num_ports()
 {
 	int n_ports;
 	struct raw1394_portinfo pinf[ 16 ];
@@ -53,6 +54,7 @@ int Raw1394::raw1394_get_num_ports()
 	return n_ports;
 }
 
+
 /** Open the raw1394 device and get a handle.
  *  
  * \param port A 0-based number indicating which host adapter to use.
@@ -65,7 +67,7 @@ int Raw1394::raw1394_get_num_ports()
 	raw1394handle_t (* const rawHandle)(void) = raw1394_new_handle;
 #endif
 
-raw1394handle_t Raw1394::raw1394_open(int port)
+raw1394handle_t raw1394_open(int port)
 {
 	struct raw1394_portinfo pinf[ 16 ];
 	/* get a raw1394 handle */
@@ -92,7 +94,7 @@ raw1394handle_t Raw1394::raw1394_open(int port)
 }
 
 
-int Raw1394::discoverAVC(int* port, octlet_t* guid)
+int discoverAVC(int* port, octlet_t* guid)
 {
 	rom1394_directory rom_dir;
 	raw1394handle_t handle;
@@ -154,6 +156,9 @@ int Raw1394::discoverAVC(int* port, octlet_t* guid)
 	return device;
 }
 
+	static int raw1394_get_num_ports();
+	static raw1394handle_t raw1394_open( int port );
+	static int discoverAVC( int * port, octlet_t* guid );
 
 bool Raw1394::cameraIsReady() 
 {
@@ -172,4 +177,4 @@ bool Raw1394::cameraIsReady()
 
     return true;
 }
-
+#endif

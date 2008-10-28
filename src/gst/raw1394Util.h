@@ -20,16 +20,19 @@
 
 #ifndef _RAW1394UTIL_H_
 #define _RAW1394UTIL_H_ 
-
+#ifdef CONFIG_IEEE1394
 #include <libraw1394/raw1394.h>
+#endif
 
-namespace Raw1394 
+class Raw1394 
 {
+public:
 
-	int raw1394_get_num_ports();
-	raw1394handle_t raw1394_open( int port );
-	int discoverAVC( int * port, octlet_t* guid );
-    bool cameraIsReady();
-}
+#ifdef CONFIG_IEEE1394
+    static bool cameraIsReady();
+#else
+    static bool cameraIsReady(){return false;}
+#endif
+};
 
 #endif // RAW1394UTIL_H 
