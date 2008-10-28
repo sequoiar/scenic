@@ -91,8 +91,6 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
             rmsDb = g_value_get_double(value);
             updateRms(rmsDb, channelIdx);
         }
-        // TODO: post to static function with mapmsg
-        //print();
         post();
 
         return true;
@@ -113,20 +111,9 @@ void AudioLevel::print() const
 void AudioLevel::post() const
 {
     MapMsg mapMsg("levels");
-    //int channelIdx = 1;
 
     mapMsg["values"] = rmsValues_;
     MSG::post(mapMsg);
-#if 0
-    for (std::vector<double>::const_iterator iter = rmsValues_.begin(); iter != rmsValues_.end(); ++iter)
-    {
-        std::stringstream key;
-        key << "channel" << channelIdx;
-        mapMsg[key.str()] = *iter;
-        ++channelIdx;
-        MSG::post(mapMsg);
-    }
-#endif
 }
 
 

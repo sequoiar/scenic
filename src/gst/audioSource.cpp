@@ -242,10 +242,9 @@ void AudioJackSource::sub_init()
     if (!Jack::is_running())
         THROW_ERROR("Jack is not running");
 
+#if 0
     // turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
     // jackOut -> jackIn -> jackOut ->jackIn.....
-    
-#if 0
     for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
 #endif
