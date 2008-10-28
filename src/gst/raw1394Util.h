@@ -20,7 +20,9 @@
 
 #ifndef _RAW1394UTIL_H_
 #define _RAW1394UTIL_H_ 
+
 #include "config.h"
+
 #ifdef CONFIG_IEEE1394
 #include <libraw1394/raw1394.h>
 #endif
@@ -32,7 +34,7 @@ public:
 #ifdef CONFIG_IEEE1394
     static bool cameraIsReady();
 #else
-    static bool cameraIsReady(){return false;}
+    static bool cameraIsReady() { return false; }
 #endif
 };
 
