@@ -87,13 +87,13 @@ fi
 #Trying to set LIBAVC1394 using pkg-config
 PKG_CHECK_MODULES(LIBAVC1394, [libavc1394], have_libavc1394=true, have_libavc1394=false)
 if test "x${have_libavc1394}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libavc1394-dev ])
+	AC_MSG_WARN([missing pkg - libavc1394-dev ])
 fi
 
 #Trying to set LIBAVC1394 using pkg-config
 PKG_CHECK_MODULES(LIBRAW1394, [libraw1394], have_libraw1394=true, have_libraw1394=false)
 if test "x${have_libraw1394}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libraw1394-dev ])
+	AC_MSG_WARN([missing pkg - libraw1394-dev ])
 fi
 
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
@@ -147,9 +147,12 @@ fi
 #
 #
 AM_CONDITIONAL([SIP],test "x${enable_sip}" = "xyes" -a "x{have_libpj}" = "xyes" )
+AM_CONDITIONAL([IEEE1394],test "x{have_libavc1394}" = "xtrue" -a "x{have_libraw1394}" = "xtrue" )
 AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes" -a "x{have_cpptest}" = "xyes" )
 
-
+if test "x{have_libavc1394}" = "xtrue" -a "x{have_libraw1394}" = "xtrue" ; then
+    AC_DEFINE(CONFIG_IEEE1394,[],[IEEE1934 define from configure])
+fi
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  src/util/Makefile
@@ -182,4 +185,7 @@ if test  "x${enable_sip}" = "xyes" -a "x${have_libpj}" = "xno"  ; then
 AC_MSG_NOTICE([Not building sip directory -- libpj missing])
 fi
 
+if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
+AC_MSG_NOTICE([Not building 1394 support])
+fi
 
