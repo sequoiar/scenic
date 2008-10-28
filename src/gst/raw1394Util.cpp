@@ -157,9 +157,6 @@ int discoverAVC(int* port, octlet_t* guid)
 	return device;
 }
 
-	//static int raw1394_get_num_ports();
-	//static raw1394handle_t raw1394_open( int port );
-	//static int discoverAVC( int * port, octlet_t* guid );
 
 bool Raw1394::cameraIsReady() 
 {
