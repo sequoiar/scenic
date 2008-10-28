@@ -1,0 +1,54 @@
+
+Click Connect:
+	- get selected contact
+	- get address, port and connector from contact
+	- create connection object from connector with address, port
+	- set SDP or similar with settings taken from the stream obj. from the streams obj. from the setting obj. from the contact obj.
+	- send the request to connect.
+	
+	On a positive answer:
+		- connect the com_chan client to the recv com_chan server
+		- if not SIP send settings (taken from each contact->setting->streams->stream)
+		- start sending each stream (stream can use the com_chan at this moment)
+
+
+
+
+
+
+States
+======
+
+Here are the states that have to be keep and their context.
+
+- active contact
+- connection state:
+	- disconnected
+	- asking ?
+	- connecting ?
+	- connected
+	- close at the other end ?
+- channel state:
+	- disconnected
+	- connecting
+	- connected
+	- close at the other end
+- receiver info:
+	- address
+	- port
+	- connector type
+- gst:
+	- stopped
+	- starting
+	- running
+	- connecting
+	- connected
+- stream:
+	- stopped
+	- starting to receive
+	- receiving
+	- starting to send
+	- sending
+	- waiting for caps ?
+
+	
