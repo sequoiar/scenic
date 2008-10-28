@@ -107,7 +107,7 @@ class ControllerApi(object):
     
     def start_connection(self, caller):
         contact = self.adb.get_current()
-        connector = self.connectors[contact.type()]
+        connector = self.connectors[contact.kind()]
         client = connector.connect(self, contact.address, contact.port)
         self.notify(caller, ('Trying to connect with %s (%s)...' % (contact.name, contact.address), client))
         
@@ -115,7 +115,7 @@ class ControllerApi(object):
         self.stop_streams(caller)
         if self.curr_streams == 'send':
             contact = self.adb.get_current()
-            connector = self.connectors[contact.type()]
+            connector = self.connectors[contact.kind()]
             client = connector.disconnect(self, contact.address, contact.port)
         else:
             connector = self.connectors[self.connection[2]]
