@@ -30,9 +30,18 @@ bool GstSenderThread::video_start(MapMsg& msg)
     try
     {
         //VideoConfig config("dv1394src");
-        VideoConfig config("videotestsrc");
         SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
-        video_ =  new VideoSender(config, rConfig);
+
+        if(msg["location"].type() == 'n')
+        {
+            VideoConfig config(msg["source"]);
+            video_ =  new VideoSender(config, rConfig);
+        }
+        else
+        {
+            VideoConfig config(msg["source"], msg["location"]);
+            video_ =  new VideoSender(config, rConfig);
+        }
         video_->init();
         video_->start();
         return true;
@@ -53,10 +62,21 @@ bool GstSenderThread::audio_start(MapMsg& msg)
     audio_ = 0;
     try
     {
-        AudioConfig config("audiotestsrc", 2);
-        SenderConfig rConfig("vorbis", msg["address"], msg["port"]);
         AudioSender* asender;
-        audio_ = asender = new AudioSender(config, rConfig);
+        if(msg["loop"].type() != 'n')
+            LOG_WARNING("loop not implemented");
+
+        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
+        if(msg["location"].type() == 'n')
+        {
+            AudioConfig config(msg["source"], msg["channels"]);
+            audio_ = asender = new AudioSender(config, rConfig);
+        }
+        else
+        {
+            AudioConfig config(msg["source"], msg["location"], msg["channels"]);
+            audio_ = asender = new AudioSender(config, rConfig);
+        }
         audio_->init();
         audio_->start();
 
