@@ -26,6 +26,7 @@ from twisted.internet import reactor, protocol, defer
 from streams.stream import AudioStream, Stream
 from streams.gst_client import GstClient
 from utils import log
+from protocols.ipcp import parse 
 
 log = log.start('info', 1, 0, 'audioGst')
 
@@ -53,7 +54,17 @@ class AudioGst(AudioStream, GstClient):
         address: string
         """
         self._chan = channel
+
+        # parse source args and add them to the message
+        if self.source:
+            source = self.source
+            self.source, sep, args = line.partition(' ')
+            args = parse(args)
         attrs = self.get_attrs()
+        if source:
+            self.source = source
+            attrs.extend(args.items()) 
+
         attrs.append(('address', address))
         self._send_cmd('audio_start', attrs, (self.sending_started, 'caps'))
         self._add_callback(self.gst_levels, 'levels')

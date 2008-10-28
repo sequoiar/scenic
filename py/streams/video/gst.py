@@ -26,6 +26,7 @@ from twisted.internet import reactor, protocol, defer
 from streams.stream import VideoStream, Stream
 from streams.gst_client import GstClient
 from utils import log
+from protocols.ipcp import parse 
 
 log = log.start('debug', 1, 0, 'videoGst')
 
@@ -53,8 +54,17 @@ class VideoGst(VideoStream, GstClient):
         address: string
         """
 #        self._chan = channel
+        # parse source args and add them to the message
+        if self.source:
+            source = self.source
+            self.source, sep, args = line.partition(' ')
+            args = parse(args)
         attrs = self.get_attrs()
+        if source:
+            self.source = source
+            attrs.extend(args.items()) 
         attrs.append(('address', address))
+        
         self._send_cmd('video_start', attrs)
         
     def sending_started(self):

@@ -66,7 +66,7 @@ class IPCP(LineReceiver):
         if cmd not in self.callbacks:
             log.info('Command %s not in callback list.' % cmd)
         else:
-            data = args.strip() + " "
+            data = args.strip() + " "   #TODO: use the parse function instead
             args = {}
             attr_s = 0
             start = 0
@@ -152,6 +152,57 @@ class IPCP(LineReceiver):
     def connectionLost(self, reason=protocol.connectionDone):
         log.info('Lost the server connection.')
 
+
+def parse(args):
+    data = args.strip() + " "
+    args = {}
+    attr_s = 0
+    start = 0
+    while True:
+        end = data.find('=', start)
+        if end == -1:
+            break
+        attr = data[start:end]
+        start = end + 1
+        is_string = False
+        if data[start] == '"':
+            is_string = True
+            start += 1
+            temp_s = start
+            out = False
+            while True:
+                temp_e = data.find('"', temp_s)
+                if temp_e == -1:
+                    out = True
+                    break
+                if data[temp_e - 1] != "\\":
+                    end = temp_e
+                    break
+                temp_s = temp_e + 1
+            if out:
+                break
+            
+        else:
+            end = data.find(' ', start)
+            if end == -1:
+                break
+        value = data[start:end]
+        if is_string:
+            value = value.replace('\\\\', '\\') \
+                         .replace('\\=', '=') \
+                         .replace('\\"', '"')
+
+        else:
+            if value.isdigit():
+                value = int(value)
+            else:
+                try:
+                    value = float(value)
+                except:
+                    log.info('Invalid type for received argument %s=%s.' % (attr, value))
+        args[attr] = value
+        start = end + 1
+    return args
 
 def find_equal(data):
     data = data.strip() + " "

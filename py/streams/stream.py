@@ -194,6 +194,7 @@ class AudioStream(Stream):
         self.bitdepth = 16
         self.sample_rate = 48000
         self.channels = 2
+        self.source = None
 
        
 class VideoStream(Stream):
