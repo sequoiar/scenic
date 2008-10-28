@@ -20,6 +20,7 @@
 
 #include <cerrno>
 #include <cstring>
+#include "config.h"
 #ifdef CONFIG_IEEE1394
 #include <libavc1394/avc1394.h>
 #include <libavc1394/rom1394.h>
@@ -156,9 +157,9 @@ int discoverAVC(int* port, octlet_t* guid)
 	return device;
 }
 
-	static int raw1394_get_num_ports();
-	static raw1394handle_t raw1394_open( int port );
-	static int discoverAVC( int * port, octlet_t* guid );
+	//static int raw1394_get_num_ports();
+	//static raw1394handle_t raw1394_open( int port );
+	//static int discoverAVC( int * port, octlet_t* guid );
 
 bool Raw1394::cameraIsReady() 
 {
