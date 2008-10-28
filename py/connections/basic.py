@@ -278,6 +278,8 @@ def send_cmd(api, host, port, mode):
     factory.mode = mode
     factory.api = api
     factory.notify = api.notify
+    if port == None:
+        port = PORT
     conn = reactor.connectTCP(host, port, factory, timeout=2)
     return conn
     

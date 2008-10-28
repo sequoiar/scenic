@@ -55,6 +55,7 @@ class VideoGst(VideoStream, GstClient):
         """
 #        self._chan = channel
         # parse source args and add them to the message
+        source = None
         if self.source:
             source = self.source
             self.source, sep, args = line.partition(' ')
