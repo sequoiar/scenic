@@ -58,7 +58,7 @@ class VideoGst(VideoStream, GstClient):
         source = None
         if self.source:
             source = self.source
-            self.source, sep, args = source.partition(' ')
+            self.source, sep, args = source.partition(':')
             args = parse(args)
         attrs = self.get_attrs()
         if source:
