@@ -130,8 +130,8 @@ class IPCP(LineReceiver):
                 if parg:
                     line.append(parg)
         line = ' '.join(line)
-        self.sendLine(line)
         log.debug('Sending: ' + line)
+        self.sendLine(line)
 
     def _process_arg(self, arg):
         if isinstance(arg, int) or isinstance(arg, float):
@@ -162,7 +162,7 @@ def parse(args):
         end = data.find('=', start)
         if end == -1:
             break
-        attr = data[start:end]
+        attr = data[start:end].encode('ascii', 'backslashreplace')
         start = end + 1
         is_string = False
         if data[start] == '"':
