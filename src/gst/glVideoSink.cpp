@@ -76,7 +76,7 @@ XSetWindowAttributes    swa;
 Window                  win;
 GLXContext              glc;
 Pixmap			pixmap;
-int			pixmap_width = 200, pixmap_height = 200;
+int			pixmap_width = 512, pixmap_height = 512;
 GC			gc;
 XImage			*xim;
 GLuint			texture_id;
@@ -261,6 +261,10 @@ pix();
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     assert(window_);
+    const gint WIDTH = 740;
+    const gint HEIGHT = 512;
+
+    gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
                          XvImageSink::expose_cb), static_cast<void*>(sink_));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
