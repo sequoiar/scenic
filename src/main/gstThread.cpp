@@ -33,7 +33,7 @@ int GstThread::main()
         updateState();
         MapMsg f = queue_.timed_pop(100000);
 
-        if(f["command"].type() == 's')
+        if(!f["command"].empty())
         {
             std::string s;
             f["command"].get(s);

@@ -45,7 +45,8 @@ class StrIntFloat
     public:
         StrIntFloat();
         std::string k_;
-        char type() const; 
+        char get_type() const; 
+        bool empty() const;
         std::string c_str()const;
         Except except()const { return e_;}
 

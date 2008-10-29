@@ -32,7 +32,7 @@ bool GstSenderThread::video_start(MapMsg& msg)
         //VideoConfig config("dv1394src");
         SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
 
-        if(msg["location"].type() == 'n')
+        if(msg["location"].empty())
         {
             VideoConfig config(msg["source"]);
             video_ =  new VideoSender(config, rConfig);
@@ -63,7 +63,7 @@ bool GstSenderThread::audio_start(MapMsg& msg)
     try
     {
         AudioSender* asender;
-        if(msg["loop"].type() != 'n')
+        if(!msg["loop"].empty())
             LOG_WARNING("loop requested");
         else
             msg["loop"] = 0; //FIXME MapMsg should be const -- MapMsg default values?
@@ -71,7 +71,7 @@ bool GstSenderThread::audio_start(MapMsg& msg)
     
 
         SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
-        if(msg["location"].type() == 'n')
+        if(msg["location"].empty())
         {
             AudioConfig config(msg["source"], msg["channels"]);
             audio_ = asender = new AudioSender(config, rConfig);

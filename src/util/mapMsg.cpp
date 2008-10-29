@@ -69,7 +69,11 @@ bool StrIntFloat::get(std::string& s) const
     return true;
 }
 
-char StrIntFloat::type() const { return type_;}
+bool StrIntFloat::empty() const
+{
+    return type_ == 'n';
+}
+char StrIntFloat::get_type() const { return type_;}
 std::string StrIntFloat::c_str()const
 { 
     TYPE_CHECKMSG(s_,string);

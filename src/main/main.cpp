@@ -107,9 +107,9 @@ bool MainModule::run()
             MapMsg tmsg = tcp_queue.timed_pop(1);
             MapMsg gmsg = gst_queue.timed_pop(1000);
 
-            if (gmsg["command"].type() != 'n')
+            if (!gmsg["command"].empty())
                 tcp_queue.push(gmsg);
-            if (tmsg["command"].type() == 'n')
+            if (tmsg["command"].empty())
                 continue;
             std::string command;
             if(!tmsg["command"].get(command))

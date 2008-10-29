@@ -226,7 +226,7 @@ bool Parser::stringify(MapMsg& cmd_map, std::string& rstr)
             //Output the key to the str
             sstr << " " << it->first << "=";
             //Output the value to the str
-            switch(it->second.type())
+            switch(it->second.get_type())
             {
                 //the value is a string, delimit with "
                 case 's':
@@ -253,7 +253,7 @@ bool Parser::stringify(MapMsg& cmd_map, std::string& rstr)
 
                 default:
                     THROW_ERROR("Command " << it->first
-                                           << " has unknown type " << it->second.type());
+                                           << " has unknown type " << it->second.get_type());
             }
         }
     }

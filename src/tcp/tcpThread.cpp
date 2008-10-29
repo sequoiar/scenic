@@ -134,7 +134,7 @@ bool TcpThread::gotQuit()
 {
     MapMsg f = queue_.timed_pop(1);
     std::string command;
-    if(f["command"].type() == 'n')
+    if(f["command"].empty())
         return false;
     if(f["command"].get(command)&& command == "quit")
         return true;
