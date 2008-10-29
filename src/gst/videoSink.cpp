@@ -81,6 +81,12 @@ void XvImageSink::init()
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     assert(window_);
+    const gint WIDTH = 640;
+    const gint HEIGHT = 480;
+
+    gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
+    gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
+
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
                          XvImageSink::expose_cb), static_cast<void*>(sink_));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
