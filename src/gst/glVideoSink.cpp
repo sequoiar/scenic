@@ -5,7 +5,7 @@
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+/// the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // [propulse]ART is distributed in the hope that it will be useful,
@@ -113,7 +113,6 @@ Pixmap pix()
  glEnable(GL_DEPTH_TEST);
  
 
-
  glEnable(GL_TEXTURE_2D);
  glGenTextures(1, &texture_id);
  glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -132,10 +131,40 @@ gboolean Redraw(gpointer) {
      return TRUE;
 
 
- xim = XGetImage(dpy, window, 0, 0, pixmap_width, pixmap_height, AllPlanes, ZPixmap);
+// xim = XGetImage(dpy, window, 0, 0, pixmap_width, pixmap_height, AllPlanes, ZPixmap);
+ /* CREATE A PIXMAP AND DRAW SOMETHING */
+
+ pixmap	= XCreatePixmap(dpy, root, pixmap_width, pixmap_height, vi->depth);
+ gc = DefaultGC(dpy, 0);
+
+ XSetForeground(dpy, gc, 0x00c0c0);
+ XFillRectangle(dpy, pixmap, gc, 0, 0, pixmap_width, pixmap_height);
+
+ XSetForeground(dpy, gc, 0x000000);
+ XFillArc(dpy, pixmap, gc, 15, 25, 50, 50, 0, 360*64);
+
+ XSetForeground(dpy, gc, 0x0000ff);
+ XDrawString(dpy, pixmap, gc, 10, 15, "PIXMAP TO TEXTURE", strlen("PIXMAP TO TEXTURE"));
+
+ XSetForeground(dpy, gc, 0xff0000);
+ XFillRectangle(dpy, pixmap, gc, 75, 75, 45, 35);
+
+ XFlush(dpy);
+ xim = XGetImage(dpy, pixmap, 0, 0, pixmap_width, pixmap_height, AllPlanes, ZPixmap);
+
+ if(xim == NULL) {
+ 	printf("\n\tximage could not be created.\n\n"); }
+
+LOG_DEBUG("Byte order:" << xim->byte_order);
+        glPixelStorei (GL_UNPACK_SWAP_BYTES, GL_FALSE);
+        glPixelStorei (GL_UNPACK_LSB_FIRST, GL_FALSE);
+        glPixelStorei (GL_UNPACK_ROW_LENGTH, 0);
+        glPixelStorei (GL_UNPACK_SKIP_ROWS, 0);
+        glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);
+        glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 
 
- glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, pixmap_height, pixmap_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)(&(xim->data[0])));
+ glTexImage2D(GL_TEXTURE_2D, 0, BYTES_PP, pixmap_height, pixmap_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)(&(xim->data[0])));
 
  XGetWindowAttributes(dpy, win, &gwa);
  glViewport(0, 0, gwa.width, gwa.height);
