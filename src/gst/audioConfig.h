@@ -49,9 +49,10 @@ class AudioConfig
 
         // local file sender
         AudioConfig(const std::string & source__, const std::string & location__,
-                int numChannels__, int /*loop*/)
+                int numChannels__, int loop = 0)
             : source_(source__), location_(location__), numChannels_(numChannels__)
-        {}
+        {loop++;//doing some(no)thing with loop
+        }
 
         // copy constructor
         AudioConfig(const AudioConfig& m)
