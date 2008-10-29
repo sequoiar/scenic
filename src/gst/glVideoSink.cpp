@@ -131,9 +131,9 @@ gboolean Redraw(gpointer) {
      return TRUE;
 
 
-// xim = XGetImage(dpy, window, 0, 0, pixmap_width, pixmap_height, AllPlanes, ZPixmap);
+ xim = XGetImage(dpy, window, 0, 0, pixmap_width, pixmap_height, AllPlanes, ZPixmap);
  /* CREATE A PIXMAP AND DRAW SOMETHING */
-
+#if 0
  pixmap	= XCreatePixmap(dpy, root, pixmap_width, pixmap_height, vi->depth);
  gc = DefaultGC(dpy, 0);
 
@@ -162,9 +162,9 @@ LOG_DEBUG("Byte order:" << xim->byte_order);
         glPixelStorei (GL_UNPACK_SKIP_ROWS, 0);
         glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);
         glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+#endif
 
-
- glTexImage2D(GL_TEXTURE_2D, 0, BYTES_PP, pixmap_height, pixmap_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)(&(xim->data[0])));
+ glTexImage2D(GL_TEXTURE_2D, 0, 3, pixmap_height, pixmap_height, 0, GL_BGRA, GL_UNSIGNED_BYTE, (void*)(&(xim->data[0])));
 
  XGetWindowAttributes(dpy, win, &gwa);
  glViewport(0, 0, gwa.width, gwa.height);
