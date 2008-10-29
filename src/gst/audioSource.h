@@ -109,7 +109,7 @@ class AudioFileSource
 {
     public:
         explicit AudioFileSource(const AudioConfig &config)
-            : AudioSource(config), decoders_() {}
+            : AudioSource(config), decoders_(), loopCount_(0) {}
         ~AudioFileSource();
         bool handleBusMsg(_GstMessage *msg);
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
@@ -122,6 +122,7 @@ class AudioFileSource
         std::vector<GstElement*> decoders_;
         AudioFileSource(const AudioFileSource&);     //No Copy Constructor
         AudioFileSource& operator=(const AudioFileSource&);     //No Assignment Operator
+        int loopCount_;
 
 };
 

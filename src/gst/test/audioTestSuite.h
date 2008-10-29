@@ -31,6 +31,10 @@ class AudioTestSuite
         AudioTestSuite()
         {
             testLength_ = 500000;
+            TEST_ADD(AudioTestSuite::start_8ch_audiofile)
+            TEST_ADD(AudioTestSuite::stop_8ch_audiofile)
+            TEST_ADD(AudioTestSuite::start_stop_8ch_audiofile)
+
             TEST_ADD(AudioTestSuite::start_8ch_jack)
             TEST_ADD(AudioTestSuite::stop_8ch_jack)
             TEST_ADD(AudioTestSuite::start_stop_8ch_jack)
@@ -50,10 +54,6 @@ class AudioTestSuite
             TEST_ADD(AudioTestSuite::start_8ch_audiotest)
             TEST_ADD(AudioTestSuite::stop_8ch_audiotest)
             TEST_ADD(AudioTestSuite::start_stop_8ch_audiotest)
-            TEST_ADD(AudioTestSuite::start_8ch_audiofile)
-            TEST_ADD(AudioTestSuite::stop_8ch_audiofile)
-            TEST_ADD(AudioTestSuite::start_stop_8ch_audiofile)
-
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
             /*                                              */

@@ -175,8 +175,21 @@ void AudioFileSource::sub_init()
                 G_CALLBACK(AudioFileSource::cb_new_src_pad),
                 static_cast<void *>(*aconv));
     }
+    // register this filesrc to handle EOS msg and loop if specified
+    pipeline_.subscribe(this);
 }
 
+
+
+bool AudioFileSource::handleBusMsg(_GstMessage *msg)
+{
+    if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS)
+    {
+        LOG_DEBUG("Got end of stream, here's where i should playback if needed");
+        return true;
+    }
+    return false;
+}
 
 void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/,
         gpointer data)
@@ -220,13 +233,6 @@ void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
 void AudioFileSource::link_elements()
 {
     GstLinkable::link(sources_, decoders_);
-}
-
-
-bool AudioFileSource::handleBusMsg(GstMessage * /*msg*/)
-{
-    LOG_DEBUG("not implemented yet");
-    return false;
 }
 
 

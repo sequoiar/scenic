@@ -32,7 +32,7 @@ class VideoTestSuite
         VideoTestSuite()
         {
             testLength_ = 10000;
-        
+            
             TEST_ADD(VideoTestSuite::start_test_video)
             TEST_ADD(VideoTestSuite::stop_test_video)
             TEST_ADD(VideoTestSuite::start_stop_test_video)
@@ -40,7 +40,7 @@ class VideoTestSuite
             TEST_ADD(VideoTestSuite::start_v4l)
             TEST_ADD(VideoTestSuite::stop_v4l)
             TEST_ADD(VideoTestSuite::start_stop_v4l)
-
+        
             TEST_ADD(VideoTestSuite::start_file)
             TEST_ADD(VideoTestSuite::stop_file)
             TEST_ADD(VideoTestSuite::start_stop_file)
