@@ -3,6 +3,8 @@ from utils import log
 import time
 
 import pypm
+import md5, random, os
+
 from struct import pack, unpack
 from midiObject import packetTime
 from listCirc import  PacketCirc
@@ -17,16 +19,19 @@ class RTPClient(DatagramProtocol):
         
         #Init var
         self.sock = None
-        self.seqNo = 32767
         self.peerAddress = peerAddress
         self.port = port
-        self.startChrono = []
         
+        #header RTP
+        self.seqNo = 65535
+        self.ssrc = 12345679 
+        self.packets = 0
+
         #buffer de midi data
         self.midiInCmdList = myRingBuffer()
 
         #buffer of midi notes sent in order to resend in case of losy packet network 
-        self.packetsSentList = PacketCirc(512)
+        self.packetsSentList = PacketCirc(2048)
 
         self.lastSync = 0
 
@@ -37,7 +42,7 @@ class RTPClient(DatagramProtocol):
 
         #launching sync checker
         self.checker = task.LoopingCall(self.check_sync)
-        self.checker.start(1)
+        self.checker.start(2)
 
 
     def check_sync(self):
@@ -51,14 +56,14 @@ class RTPClient(DatagramProtocol):
     def datagramReceived(self, data, (host, port)):
 
         data = self.parseRTPHeader(data)
-        if (data != -1):
-            if (data[0]== 'd'):
-                #resending for delay calcul
-            	packet = self.generateRTPHeader(0)
-            	chunk = packet + "d "
+        if (data[0] != -1):
+            if (data[1][0]== 'd'):
+                #resending for delay calcul only once by session
+            	packet = self.generateRTPHeader(0,1)
+            	chunk = packet + 'd'
             	self.transport.write(chunk,(self.peerAddress, self.port))
 
-            elif ( data[0] == 's'):
+            elif ( data[1][0] == 's'):
             	self.lastSync = time.time()
             	#setting flag to sync
             	if ( not self.sync ):
@@ -68,14 +73,17 @@ class RTPClient(DatagramProtocol):
 
             else:
             	#Else it's a packet request
-            	retransmitPacket = self.packetsSentList.find_packet(int(data))
+            	retransmitPacket = self.packetsSentList.find_packet(int(data[1]))
+                
             	#If we had it resending else a little log
             	if ( int(retransmitPacket) != -1 ):
-                    header = self.generateRTPHeader(0)
                     ch = self.packetsSentList[int(retransmitPacket)].packet
-                    chunk = header + ch
+                    
+                    [self.midiInCmdList.put(ch[i]) for i in range(len(ch))]
+                    
                     log.warning("INPUT: Resending lost packet to the server")
-                    self.transport.write(chunk,(self.peerAddress, self.port))
+                    self.send_midi_data()
+                    
                 else:
                     log.error("INPUT: Can't found packet to resend")
                 
@@ -96,33 +104,33 @@ class RTPClient(DatagramProtocol):
     def send_midi_data(self):
         #Enable witness
         self.sendingMidiData = 1
-
+        
         #getting new notes to send
         c = self.midiInCmdList.get()
-
-        #marshalling
-        chunk = cPickle.dumps(c,1)
-                
+        
         #Creating header
         header = self.generateRTPHeader(0)
 
         #saving packet
-        pack = packetTime(self.seqNo, chunk)
+
+        pack = packetTime(self.seqNo, c)
         self.packetsSentList.to_list(pack)
-                
+
+        #marshalling
+        chunk = cPickle.dumps(c,1)
+                                
         #Writting it to the socket
         chunk = header + chunk   
-        if ( self.sync and self.seqNo % 3 != 0):
+        if ( self.sync ):
             self.transport.write(chunk,(self.peerAddress, self.port))
-            
-
+        
         #disable witness
         self.sendingMidiData = 0
         
 
     def send_empty_packet(self):
-        header = self.generateRTPHeader(100000)
-        chunk = "000"
+        header = self.generateRTPHeader(0,1)
+        chunk = "0"
         pack = packetTime(self.seqNo, chunk)
         self.packetsSentList.to_list(pack)
         chunk = header + chunk
@@ -131,8 +139,8 @@ class RTPClient(DatagramProtocol):
         
     def send_midi_time(self, time):
         """Send midi time to remote peer
-        """       
-        header = self.generateRTPHeader(0)
+        """
+        header = self.generateRTPHeader(0, 1)
         chunk = "m " + str(time)
         chunk = header + chunk
         self.transport.write(chunk,(self.peerAddress, self.port))
@@ -145,70 +153,67 @@ class RTPClient(DatagramProtocol):
         
 
 
-    def generateRTPHeader(self, timestamp):
+    def generateRTPHeader(self, timestamp, mark=0):
         """ generateRTPHeader needed for each packet sent to the server
         """
-        if self.seqNo == 0:
+        if mark == 0:
             # If sequence number is zero apply Mark bit to RTP header
-            header = '\x80\x8E'
+            mbit = 0x00
         else:
             # No mark bit set for subsequent packets
-            header = '\x80\x0E'
+            mbit = 0x01
 
-        if self.seqNo == 32767:
+        if self.seqNo == 65535:
             self.seqNo = 1
         else:  
             self.seqNo += 1 # First packet is #1
         
-        header += pack("!h", self.seqNo)
-        header += pack("!L", timestamp)
-        header += pack("!L", 12345679) # Synchronization Source Identifier
+        hr = pack("!BBHII", mbit, 96, self.seqNo, timestamp, self.ssrc)
 
-        # Technically this is apart of the 
-        # RFC2250 3.5 MPEG Audio-specific header and not RTP but include
-        # it here
-        header += '\x00\x00\x00\x00' 
-
-        return header
+        return hr
 
 
     def parseRTPHeader(self, data):
         """parse RTPHeader
-        return -1 if a problem occured
+           return -1 if a problem occured
         """
-        #header of the rtp header packet
-    
-        if len(data) >= 16:
-    
-            #Only checking the identifier of the source SSRC identifier
-            sync = data[8]
-            sync += data[9]
-            sync += data[10]
-            sync += data[11]
-            sync = unpack("!L", sync)
-    
-            #If the identifier of the source is wrong
-            if (sync[0] != 12345679):
-                log.error( "OUTPUT: Wrong SSRC identifier : bad source of streaming")
-                return -1
-    
-            #Getting midi data
-            chunk = data[16]
-    
-            if chunk[0] =='0':
-                return -1
-    
-            i = 17
-            while(i<len(data)):
-                chunk += data[i]
-                i += 1
-    
-            return chunk
-    
-        else:
-            return -1
+        
 
-    
+        #header of the rtp header packet 
+        if len(data) > 12 :
+
+            hdr = unpack('!BBHII', data[:12])
+            
+            M = hdr[0]&127
+            PT = hdr[1]&127
+            seq = hdr[2]
+            times = hdr[3]
+            ssrc = hdr[4]
+            data = data[12:]
+                    
+            #check s il n y a pa eu de deconnectio
+            #if ( self.actualSeqNo > seq):
+            #    log.warning("OUTPUT: The connection has been drop off then retreive")
+            #    self.actualSeqNo = seq
+                
+            #check if there is no loose of packet last one receive
+            #if (self.actualSeqNo < seq):
+            #    #on redemande les paquets perdu
+            #    self.actualSeqNo = seq
+            #    self.ask_packet(seq)
+                
+					
+            #If the identifier of the source is wrong
+            if (ssrc != 12345679):
+                log.error( "OUTPUT: Wrong SSRC identifier : bad source of streaming")
+                return -1, 0
+            
+            return M, data
+
+        else:
+            return -1, 0
+
+
     def __del__(self):
         del self.packetsSentList
         del self.midiInCmdLists

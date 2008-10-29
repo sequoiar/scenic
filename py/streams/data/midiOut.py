@@ -170,8 +170,8 @@ class MidiOut(object):
 			note_filtred = midiNotes
 		else:
 		#filtre note off program change pour note en retard
-		#si mode non permissif on skip les note enn retard sauf note off et program change
-			note_filtred = [midiNotes[i] for i in range(len(midiNotes)) if (midiNotes[i][1] >= midi_time or midiNotes[i][0][0] == int(0xc0) or midiNotes[i][0][2] == 0) ]
+		#si mode non permissif on skip les note enn retard sauf note off, note avec velocitiy 0 or  program change
+			note_filtred = [midiNotes[i] for i in range(len(midiNotes)) if (midiNotes[i][1] >= midi_time or midiNotes[i][0][0] == int(0xc0) or midiNotes[i][0][2] == 0 or midiNotes[i][0][0] == int(0x80)) ]
 
 			if (len(note_filtred) < len(midiNotes)):
 				l = "OUTPUT: time=" + str(pypm.Time()) + "ms can't play in time,  " + str(len(midiNotes) - len(note_filtred)) + " note(s) skipped"

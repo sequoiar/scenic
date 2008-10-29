@@ -49,3 +49,10 @@ class myRingBuffer(object):
             self.buffer.pop(0)
         
         return data
+
+if __name__ == "__main__":
+    r = myRingBuffer()
+    r.put([['ob',1,1],10])
+    r.put([['ob',1,1],14])
+    r.put([['ob',1,1],12])
+    print r.buffer

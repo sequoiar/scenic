@@ -43,7 +43,7 @@ class MidiIn(object):
         self.in_activity = False
 
         #starting looping task
-        self.sendTime.start(0.5)
+        self.sendTime.start(1)
 
         
     def stop_sending(self):
@@ -69,7 +69,7 @@ class MidiIn(object):
                 reactor.callFromThread(self._get_input)
                 in_activity = True
 
-            if in_activity and ((time.time() * 1000) - last_poll >= 10):
+            if in_activity and ((time.time() * 1000) - last_poll >= 5):
                 #send two empty packet
                 self.client.send_empty_packet() 
                 self.client.send_empty_packet() 
@@ -151,7 +151,7 @@ class MidiIn(object):
 	"""Get input from selected device 
 	""" 
         currentTime = pypm.Time()
-        self.client.startChrono.append(time.time())
+
         #Reading Midi Input
         MidiData = self.MidiIn.Read(1024)
         

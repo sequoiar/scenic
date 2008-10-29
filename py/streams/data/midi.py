@@ -223,11 +223,12 @@ if __name__ == "__main__":
 
     midi = MidiStream('127.0.0.1')
     
-    
+    #print midi.get_input_devices()
+    #print midi.get_output_devices()
     midi.set_input_device(1)
     midi.set_output_device(6)
 
-    reactor.callLater(2,midi.start_receiving)
-    reactor.callLater(2,midi.start_sending)
+    reactor.callLater(4,midi.start_receiving)
+    reactor.callLater(4,midi.start_sending)
     
     reactor.run()
