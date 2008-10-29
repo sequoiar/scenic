@@ -71,7 +71,7 @@ class Pipeline
         static Pipeline *instance_;
 
         void make_verbose();
-        void handleElementMsg(GstMessage *msg);
+        void updateListeners(GstMessage *msg);
 
         _GstElement *pipeline_;
         GstClockTime startTime_;

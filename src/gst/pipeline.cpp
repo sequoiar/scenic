@@ -53,44 +53,48 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
     switch(GST_MESSAGE_TYPE(msg))
     {
         case GST_MESSAGE_EOS:
-            LOG_DEBUG("End-of-stream");
-            break;
+            {
+                LOG_DEBUG("End-of-stream");
+                Pipeline *context = static_cast<Pipeline*>(data);
+                context->updateListeners(msg);
+                break;
+            }
         case GST_MESSAGE_ERROR:
-        {
-            gchar *debug = NULL;
-            GError *err = NULL;
+            {
+                gchar *debug = NULL;
+                GError *err = NULL;
 
-            gst_message_parse_error(msg, &err, &debug);
+                gst_message_parse_error(msg, &err, &debug);
 
-            LOG_WARNING(err->message);
-            g_error_free(err);
+                LOG_WARNING(err->message);
+                g_error_free(err);
 
-            if (debug) {
-                LOG_DEBUG("Debug details: " << debug);
-                g_free(debug);
+                if (debug) {
+                    LOG_DEBUG("Debug details: " << debug);
+                    g_free(debug);
+                }
+                break;
             }
-            break;
-        }
         case GST_MESSAGE_WARNING:
-        {
-            gchar *debug = NULL;
-            GError *err = NULL;
+            {
+                gchar *debug = NULL;
+                GError *err = NULL;
 
-            gst_message_parse_warning(msg, &err, &debug);
+                gst_message_parse_warning(msg, &err, &debug);
 
-            LOG_WARNING(err->message);
-            g_error_free(err);
+                LOG_WARNING(err->message);
+                g_error_free(err);
 
-            if (debug) {
-                LOG_DEBUG("Debug details: " << debug);
-                g_free(debug);
+                if (debug) {
+                    LOG_DEBUG("Debug details: " << debug);
+                    g_free(debug);
+                }
+                break;
             }
-            break;
-        }
         case GST_MESSAGE_ELEMENT:
             {
                 Pipeline *context = static_cast<Pipeline*>(data);
-                context->handleElementMsg(msg);
+                context->updateListeners(msg);
                 break;
             }
         default:
@@ -213,12 +217,12 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 
 void Pipeline::start()
 {
-   // GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
+    // GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
     //assert(checkStateChange(ret)); // set it to paused
-   // wait_until_paused();
+    // wait_until_paused();
     //LOG_DEBUG("Now paused");
 
-   GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
+    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
     assert(checkStateChange(ret)); // set it to playing
 
     //wait_until_playing();
@@ -316,7 +320,7 @@ void Pipeline::subscribe(BusMsgHandler *obj)
 }
 
 
-void Pipeline::handleElementMsg(GstMessage *msg)
+void Pipeline::updateListeners(GstMessage *msg)
 {
     for (std::vector<BusMsgHandler*>::iterator iter = handlers_.begin(); 
             iter != handlers_.end(); ++iter)

@@ -223,6 +223,13 @@ void AudioFileSource::link_elements()
 }
 
 
+bool AudioFileSource::handleBusMsg(GstMessage * /*msg*/)
+{
+    LOG_DEBUG("not implemented yet");
+    return false;
+}
+
+
 AudioFileSource::~AudioFileSource()
 {
     stop();

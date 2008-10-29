@@ -22,6 +22,7 @@
 
 #include "gstLinkable.h"
 #include "interleave.h"
+#include "busMsgHandler.h"
 
 class AudioConfig;
 
@@ -104,12 +105,13 @@ class AudioTestSource
 };
 
 class AudioFileSource
-    : public AudioSource
+    : public AudioSource, public BusMsgHandler
 {
     public:
         explicit AudioFileSource(const AudioConfig &config)
             : AudioSource(config), decoders_() {}
         ~AudioFileSource();
+        bool handleBusMsg(_GstMessage *msg);
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
                                    void *data);
     protected:
