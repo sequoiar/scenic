@@ -76,7 +76,7 @@ static std::string tcpGetCaps(int port)
     for(;;)
     {
         MapMsg f = queue.timed_pop(100000);
-        if(f["command"].type() == 'n')
+        if(f["command"].empty())
             continue;
         try
         {
