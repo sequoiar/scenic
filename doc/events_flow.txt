@@ -3,7 +3,11 @@ Click Connect:
 	- get selected contact
 	- get address, port and connector from contact
 	- create connection object from connector with address, port
-	- set SDP or similar with settings taken from the stream obj. from the streams obj. from the setting obj. from the contact obj.
+	- set SDP or similar with settings taken:
+		 from the stream obj.
+		 from the streams obj.
+		 from the setting obj.
+		 from the contact obj.
 	- send the request to connect.
 	
 	On a positive answer:
