@@ -108,8 +108,7 @@ class AudioFileSource
     : public AudioSource, public BusMsgHandler
 {
     public:
-        explicit AudioFileSource(const AudioConfig &config)
-            : AudioSource(config), decoders_(), loopCount_(0) {}
+        explicit AudioFileSource(const AudioConfig &config);
         ~AudioFileSource();
         bool handleBusMsg(_GstMessage *msg);
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
@@ -119,6 +118,7 @@ class AudioFileSource
         void link_elements();
 
     private:
+        void restartPlayback();
         std::vector<GstElement*> decoders_;
         AudioFileSource(const AudioFileSource&);     //No Copy Constructor
         AudioFileSource& operator=(const AudioFileSource&);     //No Assignment Operator

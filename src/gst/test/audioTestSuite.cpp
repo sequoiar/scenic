@@ -25,6 +25,7 @@
 #include "audioLocal.h"
 #include "audioConfig.h"
 #include "mapMsg.h"
+
 class TestMsgFunctor : public MsgFunctor
 {
     std::string s_;
@@ -283,8 +284,9 @@ void AudioTestSuite::start_stop_8ch_jack()
 void AudioTestSuite::start_8ch_audiofile()
 {
     int numChannels = 8;
+    const int LOOP_COUNT = 4;
 
-    AudioConfig config("filesrc", audioFilename_, numChannels);
+    AudioConfig config("filesrc", audioFilename_, numChannels, LOOP_COUNT);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 

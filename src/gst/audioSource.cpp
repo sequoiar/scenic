@@ -157,6 +157,11 @@ AudioTestSource::~AudioTestSource()
 }
 
 
+AudioFileSource::AudioFileSource(const AudioConfig &config) : AudioSource(config), decoders_(), loopCount_(0) 
+{
+    loopCount_ = config_.loop();
+}
+
 void AudioFileSource::sub_init()
 {
     assert(config_.fileExists());
@@ -185,10 +190,24 @@ bool AudioFileSource::handleBusMsg(_GstMessage *msg)
 {
     if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS)
     {
-        LOG_DEBUG("Got end of stream, here's where i should playback if needed");
+        LOG_DEBUG("Got end of stream, here's where we should playback if needed");
+        if (loopCount_ != 0)
+        {
+            LOG_DEBUG("playback about to restart, " << loopCount_ << " times to go");
+            restartPlayback();
+        }
         return true;
     }
     return false;
+}
+
+
+void AudioFileSource::restartPlayback()
+{
+    const gint64 BEGIN_TIME_NS = 0;
+    pipeline_.seekTo(BEGIN_TIME_NS);
+    if (loopCount_ > 0)  // avoids endless decrements
+        loopCount_--;
 }
 
 void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/,

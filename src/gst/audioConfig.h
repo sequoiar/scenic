@@ -37,8 +37,8 @@ class AudioConfig
     public:
 
         // local 
-        AudioConfig(const std::string & source__, int numChannels__)
-            : source_(source__), location_(""), numChannels_(numChannels__)
+        AudioConfig(const std::string & source__, int numChannels__, int loop__ = LOOP_NONE)
+            : source_(source__), location_(""), numChannels_(numChannels__), loop_(loop__)
         {
             if (source_.empty())
                 THROW_ERROR("No source specified");
@@ -49,18 +49,18 @@ class AudioConfig
 
         // local file sender
         AudioConfig(const std::string & source__, const std::string & location__,
-                int numChannels__, int loop = LOOP_NONE)
-            : source_(source__), location_(location__), numChannels_(numChannels__)
+                int numChannels__, int loop__ = LOOP_NONE)
+            : source_(source__), location_(location__), numChannels_(numChannels__), loop_(loop__)
         {
-            loop++;//doing some(no)thing with loop
         }
 
         // copy constructor
         AudioConfig(const AudioConfig& m)
-            : source_(m.source_), location_(m.location_), numChannels_(m.numChannels_) {}
+            : source_(m.source_), location_(m.location_), numChannels_(m.numChannels_), loop_(m.loop_) {}
 
         const char *source() const;
-        int numChannels() const { return numChannels_; };
+        int numChannels() const { return numChannels_; }
+        int loop() const { return loop_; }
         const char *location() const;
         bool fileExists() const;
 
@@ -79,6 +79,7 @@ class AudioConfig
         const std::string source_;
         const std::string location_;
         const int numChannels_;
+        const int loop_;
 };
 
 class AudioReceiverConfig 

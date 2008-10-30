@@ -48,6 +48,7 @@ class Pipeline
         bool isPlaying() const;
         bool isPaused() const;
         void wait_until_playing() const;
+        void seekTo(gint64 pos);
         void start();
         void pause();
         void stop();
