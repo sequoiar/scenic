@@ -49,7 +49,7 @@ VideoSource * VideoConfig::createSource() const
 // FIXME: options?
 VideoSink * VideoConfig::createSink() const
 {
-    return new XvImageSink();
+    return new GLImageSink();
 }
 
 
@@ -59,6 +59,8 @@ VideoSink * VideoReceiverConfig::createSink() const
         return new XvImageSink();
     else if (sink_ == "ximagesink")
         return new XImageSink();
+    else if (sink_ == "glimagesink")
+        return new GLImageSink();
     else
         THROW_ERROR(sink_ << " is an invalid sink");
     return 0;
