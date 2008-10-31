@@ -1,5 +1,5 @@
-/* baseThread - Thread/AsyncQueue Routines using GLIB
- * Copyright (C) 2008	Koya Charles, Tristan Matthews
+/* baseThread.h
+ * Copyright (C) 2008 Koya Charles, Tristan Matthews
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@
  *
  *      Thread/AsyncQueue Routines using glib
  */
+
 #ifndef __BASE_THREAD_H__
 #define __BASE_THREAD_H__
 
