@@ -32,7 +32,11 @@ class VideoTestSuite
         VideoTestSuite()
         {
             testLength_ = 10000;
-            
+ 
+            TEST_ADD(VideoTestSuite::start_test_video_gl)
+            TEST_ADD(VideoTestSuite::stop_test_video_gl)
+            TEST_ADD(VideoTestSuite::start_stop_test_video_gl)
+           
             TEST_ADD(VideoTestSuite::start_test_video)
             TEST_ADD(VideoTestSuite::stop_test_video)
             TEST_ADD(VideoTestSuite::start_stop_test_video)
@@ -60,6 +64,10 @@ class VideoTestSuite
         // some tests
 
     private:
+        
+        void start_test_video_gl();
+        void stop_test_video_gl();
+        void start_stop_test_video_gl();
 
         void start_test_video();
         void stop_test_video();

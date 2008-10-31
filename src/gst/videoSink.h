@@ -21,6 +21,7 @@
 #define _VIDEO_SINK_H_
 
 #include "gstLinkable.h"
+#include <GL/glew.h>
 
 class _GtkWidget;
 class _GdkEventExpose;
@@ -93,6 +94,39 @@ class XImageSink
         _GstElement *colorspc_;
         XImageSink(const XImageSink&);     //No Copy Constructor
         XImageSink& operator=(const XImageSink&);     //No Assignment Operator
+};
+
+
+class GLImageSink
+: public VideoSink
+{
+    public:
+        GLImageSink() : window_(0), glUpload_(0){};
+        ~GLImageSink();
+        void init();
+        void showWindow();
+        void makeFullscreen() { makeFullscreen(window_); }
+        void makeUnfullscreen() { makeUnfullscreen(window_); }
+        _GstElement *sinkElement() { return glUpload_; }
+    private:
+        static int reshapeCallback(GLuint width, GLuint height);
+        static int drawCallback(GLuint texture, GLuint width, GLuint height);
+        static void makeFullscreen(_GtkWidget *widget);
+        static void makeUnfullscreen(_GtkWidget *widget);
+
+        static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
+                void *data);
+        static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
+        void makeWindowBlack();
+
+        _GtkWidget *window_;
+        _GstElement *glUpload_;
+        static GLfloat x_;     // FIXME: separate out gl stuff into separate class
+        static GLfloat y_;
+        static GLfloat z_;
+
+        GLImageSink(const GLImageSink&);     //No Copy Constructor
+        GLImageSink& operator=(const GLImageSink&);     //No Assignment Operator
 };
 
 #endif //_VIDEO_SINK_H_

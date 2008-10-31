@@ -55,7 +55,7 @@ void VideoLocal::init_sink()
 void VideoLocal::start()
 {
     GstBase::start();
-    pipeline_.wait_until_playing(); // otherwise it doesn't know it's playing
+    //pipeline_.wait_until_playing(); // FIXME: why is this here?
     sink_->showWindow();
 }
 

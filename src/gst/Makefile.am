@@ -12,4 +12,4 @@ libgst_a_SOURCES = mediaBase.cpp \
 				   audioLevel.cpp
 
 
-libgst_a_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) 
+libgst_a_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS)

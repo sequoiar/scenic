@@ -46,7 +46,7 @@ VideoSource * VideoConfig::createSource() const
     return 0;
 }
 
-// FIXME: merge
+// FIXME: options?
 VideoSink * VideoConfig::createSink() const
 {
     return new XvImageSink();

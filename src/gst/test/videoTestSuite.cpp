@@ -26,6 +26,49 @@
 #include "videoConfig.h"
 
 
+void VideoTestSuite::start_test_video_gl()
+{
+    VideoConfig config("videotestsrc");
+    VideoLocal tx(config);
+    tx.init();
+
+    tx.start();
+
+    BLOCK();
+
+    TEST_ASSERT(tx.isPlaying());
+}
+
+
+void VideoTestSuite::stop_test_video_gl()
+{
+    VideoConfig config("videotestsrc");
+    VideoLocal tx(config);
+    tx.init();
+
+    BLOCK();
+
+    tx.stop();
+    TEST_ASSERT(!tx.isPlaying());
+}
+
+
+void VideoTestSuite::start_stop_test_video_gl()
+{
+    VideoConfig config("videotestsrc");
+    VideoLocal tx(config);
+    tx.init();
+
+    tx.start();
+
+    BLOCK();
+    TEST_ASSERT(tx.isPlaying());
+
+    tx.stop();
+    TEST_ASSERT(!tx.isPlaying());
+}
+
+
 void VideoTestSuite::start_test_video()
 {
     VideoConfig config("videotestsrc");
