@@ -49,7 +49,7 @@ class MidiIn(object):
     def stop_sending(self):
         if not self.end_flag:
             self.end_flag = True
-        
+            
             self.client.stop_streaming()
             
             #self.client.midiInCmdList.flush()
@@ -84,7 +84,6 @@ class MidiIn(object):
     def start_sending(self):
         if self.end_flag :
             if not (self.MidiIn is None) :
-                
                 res = self.client.start_streaming()
                 if res != -1:
                     self.end_flag = False
@@ -157,7 +156,7 @@ class MidiIn(object):
         
         if len(MidiData) > 0:
             [self.client.midiInCmdList.put([MidiData[i][0],currentTime]) for i in range(len(MidiData))]
-            self.client.send_midi_data()   
+            #self.client.send_midi_data()   
 
 
     def _send_midi_time(self):

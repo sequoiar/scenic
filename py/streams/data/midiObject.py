@@ -9,9 +9,9 @@ class MidiNote(object): #TODO: Maybe we could convert this object to a tuple to 
 
 class packetTime(object):
 	
-    def __init__(self, seqNo, packet, time=0):
+    def __init__(self, seqNo, packet, marker=0):
         self.seqNo = seqNo
         self.packet = packet
-        self.time = time
+        self.marker = marker
 	
 	

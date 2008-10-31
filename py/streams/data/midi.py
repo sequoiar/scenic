@@ -48,6 +48,9 @@ class MidiStream(object):
     def __init__(self, address):
         
         
+        #Decommenter pour version de production
+        #stream.DataStream.__init__(self)
+
         #init var
         if self.check_ip(address):
             self.address = address

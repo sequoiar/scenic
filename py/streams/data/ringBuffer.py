@@ -31,9 +31,14 @@ class myRingBuffer(object):
       
 
     #getting data from the buffer
-    def get(self):            
-        copied = self.buffer
-        self.buffer = []                
+    def get(self):
+        if len(self.buffer) > 100 :
+            copied = self.buffer[:100]
+            [self.buffer.pop(0) for i in range(0,100)]
+        else:
+            copied = self.buffer
+            self.buffer = []
+                
         return copied
 
 

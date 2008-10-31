@@ -154,10 +154,14 @@ class MidiOut(object):
 #Permisive Mode => joue toutes les notes meme si en retard de qq milisecond en affichant un erreur style xrun dans le fichier de log
 
 		
-	def play_midi_note(self, midiNotes):
+	def play_midi_note(self):
 		"""PlayMidi Note
 	   	Separate midi infos to choose the good function for the good action
 		"""
+		#getting notes
+		midiNotes = self.midiOutCmdList.get_data(pypm.Time())
+
+		#getting time
 		midi_time = pypm.Time()
 		if self.permissif :
 			#on fait une liste des notes en retard pour le signaler
@@ -191,11 +195,9 @@ class MidiOut(object):
 			midiNotes = []
                         #if there are notes to play  
 			if midiOutCmdList.len() > 0:
-				midiNotes = midiOutCmdList.get_data(pypm.Time())
-					
-			if len(midiNotes) > 0:
-				self.nbNotes += len(midiNotes)
-				reactor.callFromThread(play_midi_note, midiNotes)
+				#if the first is in time
+				if midiOutCmdList.buffer[0][1] <= pypm.Time() + 4:
+					reactor.callFromThread(play_midi_note)	
 		
 			time.sleep(0.001)
 		

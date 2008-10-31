@@ -11,7 +11,7 @@ from midiOut import MidiOut
 
 class RTPServer(DatagramProtocol):
 
-    def __init__(self, streamerAddress, streamerPort=44010, permissif=True ):
+    def __init__(self, streamerAddress, streamerPort=44010, permissif=False ):
         
         log.info( "OUTPUT: Initializing RTP receiver" )
         
@@ -47,7 +47,7 @@ class RTPServer(DatagramProtocol):
     def launch(self):
         self.releaser.start(2)
         self.sendTime.start(1)
-        log.info( "OUTPUT: RTP receiver launched" )
+        log.info( "OUTPUT: Server started" )
 		
     def start_receiving(self):
         """start midi output and get notes from the socket
@@ -55,7 +55,7 @@ class RTPServer(DatagramProtocol):
         if self.sync:
             if ( not self.midiOut.MidiOut is None):
                 self.midiOut.start_publy()
-                log.info("OUTPUT: RTPServer start to receive midi data")
+                log.info("OUTPUT: Server start to receive midi data")
                 return 0
             else:
                 log.error("OUTPUT: Can't start receiving without output device set")
@@ -68,6 +68,11 @@ class RTPServer(DatagramProtocol):
     def stop_receiving(self):
         """stop midi output and stop to watch notes from the socket
         """
+        #reinitialize delay between host
+        self.lastDelays.flush()
+            
+        log.error( "OUTPUT: stopping receiving because syncronisation failed")
+
         #on arrete la publicatiom des notes
         self.midiOut.stop_publy()
         
@@ -75,16 +80,18 @@ class RTPServer(DatagramProtocol):
         #self.midiOut.midiOutCmdList.flush()
         self.midiOut.lastMidiTimeDiff.flush()
 
-        log.info("OUTPUT: RTPServer stop receiving midi data")
+        #sending note off to midi device
+        self.midiOut.send_note_off()
+        log.info("OUTPUT: Server stop receiving midi data")
 
     def check_sync(self):
         """Checking Synchronisation
         """
-        #S il n y  a pas eu de sync du delay depuis 1 second 
-        if ( (time.time() - self.lastDelays.lastSync) > 2 ):
+        #S il n y  a pas eu de sync du delay depuis 4 second 
+        if ( (time.time() - self.lastDelays.lastSync) > 4 ):
             self.delaySync = 0
 
-        if ( (time.time() - self.midiOut.lastMidiTimeDiff.lastSync) > 2 ):
+        if ( (time.time() - self.midiOut.lastMidiTimeDiff.lastSync) > 4 ):
             self.midiTimeSync = 0
 
         if (self.delaySync and self.midiTimeSync):
@@ -98,7 +105,7 @@ class RTPServer(DatagramProtocol):
                 #self.start_receiving()
 
             #sending synchro packet
-            header = self.generateRTPHeader()
+            header = self.generateRTPHeader(0,1)
             chunk = 's'
             chunk = header + chunk
             self.transport.write(chunk, (self.peerAddress,self.peerPort) )
@@ -110,10 +117,6 @@ class RTPServer(DatagramProtocol):
                 #Both side aren't sync
                 self.sync = 0
 
-                #reinitialize delay between host
-                self.lastDelays.flush()
-            
-                log.error( "OUTPUT: stopping receiving because syncronisation failed")
                 self.stop_receiving()
         
 
@@ -141,7 +144,6 @@ class RTPServer(DatagramProtocol):
         else:
             self.seqNo += 1
 
-        
       	#Parsing packet header
         midiChunk = self.parseRTPHeader(data)
         
@@ -246,11 +248,6 @@ class RTPServer(DatagramProtocol):
         else:
             # No mark bit set for subsequent packets
             mbit = 0x01
-
-        #if self.seqNo == 65535:
-        #    self.seqNo = 1
-        #else:  
-        #    self.seqNo += 1 # First packet is #1
         
         hr = pack("!BBHII", mbit, 96, 0, timestamp, self.ssrc)
 
@@ -275,7 +272,8 @@ class RTPServer(DatagramProtocol):
                     
             #check s il n y a pa eu de deconnectio
             if ( self.seqNo > seq):
-                log.warning("OUTPUT: The connection has been drop off then retreive")
+                l = "OUTPUT: Problem in packet order expect=" + str(self.seqNo) + " / receive=" + str(seq)  + " , This problem can be cause by packet reodering process"
+                log.error(l)
                 self.seqNo = seq
                 
             #check if there is no loose of packet last one receive
