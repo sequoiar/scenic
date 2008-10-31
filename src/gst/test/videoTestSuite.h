@@ -31,7 +31,7 @@ class VideoTestSuite
 
         VideoTestSuite()
         {
-            testLength_ = 10000;
+            testLength_ = 100000;
  
             TEST_ADD(VideoTestSuite::start_test_video_gl)
             TEST_ADD(VideoTestSuite::stop_test_video_gl)

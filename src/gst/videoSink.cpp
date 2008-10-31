@@ -22,6 +22,7 @@
 #include <gtk/gtk.h>
 #include <gst/interfaces/xoverlay.h>
 #include <gdk/gdk.h>
+#include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
 
 #include "gstLinkable.h"
@@ -158,6 +159,10 @@ XImageSink::~XImageSink()
 GLfloat GLImageSink::x_ = 0.0f;
 GLfloat GLImageSink::y_ = 0.0f;
 GLfloat GLImageSink::z_ = -5.0f;
+GLuint GLImageSink::leftCrop_ = 0;
+GLuint GLImageSink::rightCrop_ = 0;
+GLuint GLImageSink::topCrop_ = 0;
+GLuint GLImageSink::bottomCrop_ = 0;
 
 //client reshape callback
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
@@ -165,7 +170,7 @@ gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45, (gfloat)width/(gfloat)height, 0.1, 100);  
+    gluPerspective(45, (gfloat) width / (gfloat) height, 0.1, 100);  
     glMatrixMode(GL_MODELVIEW);	
     return TRUE;
 }
@@ -204,13 +209,13 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glLoadIdentity();
 
     glTranslatef(GLImageSink::x_, GLImageSink::y_, GLImageSink::z_);
+    gfloat aspectRatio = (gfloat) width / (gfloat) height;
 
     glBegin(GL_QUADS);
-    gfloat aspectRatio = (gfloat) width / height;
     glTexCoord2f(0.0f, 0.0f);  glVertex3f(-1.0f, 1.0f, 0.0f);
     glTexCoord2f((gfloat)width, 0.0f);  glVertex3f(aspectRatio,  1.0f, 0.0f);
     glTexCoord2f((gfloat) width, (gfloat) height); glVertex3f(aspectRatio,  -1.0f, 0.0f);
-    glTexCoord2f(0.0f, (gfloat) height); glVertex3f(-1.0f, -1.0f, 0.0f);
+    glTexCoord2f(0.0f, height); glVertex3f(-1.0f, -1.0f, 0.0f);
     glEnd();
 
     //return TRUE causes a postRedisplay
@@ -235,25 +240,37 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             isFullscreen ? GLImageSink::makeUnfullscreen(widget) : GLImageSink::makeFullscreen(widget);
             break;
         case 'x':
-            GLImageSink::x_ += 0.01;
+        case GDK_Right:
+            GLImageSink::x_ += 0.1;
             break;
         case 'X':
-            GLImageSink::x_ -= 0.01;
+        case GDK_Left:
+            GLImageSink::x_ -= 0.1;
             break;
         case 'y':
-            GLImageSink::y_ += 0.01;
+        case GDK_Down:
+            GLImageSink::y_ += 0.1;
             break;
         case 'Y':
-            GLImageSink::y_ -= 0.01;
+        case GDK_Up:
+            GLImageSink::y_ -= 0.1;
             break;
         case 'z':
-            GLImageSink::z_ += 0.01;
+            GLImageSink::z_ += 0.1;
             break;
         case 'Z':
-            GLImageSink::z_ -= 0.01;
+            GLImageSink::z_ -= 0.1;
+            break;
+        case 'l':
+            if (leftCrop_ < 320)
+                GLImageSink::leftCrop_ += 10;
+            break;
+        case 'L':
+            if (leftCrop_ > 0)
+                GLImageSink::leftCrop_ -= 10;
             break;
         default:
-            g_print("unknown keypress");
+            g_print("unknown keypress %d", event->keyval);
             break;
     }
 
@@ -288,8 +305,23 @@ void GLImageSink::makeUnfullscreen(GtkWidget *widget)
 }
 
 
+void GLImageSink::resetGLparams()
+{
+    // reset persistent static params to their initial values
+    x_ = 0.0f;
+    y_ = 0.0f;
+    z_ = -5.0f;
+    leftCrop_ = 0.0f;
+    rightCrop_ = 0.0f;
+    bottomCrop_ = 0.0f;
+    topCrop_ = 0.0f;
+}
+
+
 GLImageSink::~GLImageSink()
 {
+    resetGLparams();
+
     pipeline_.remove(&glUpload_);
     VideoSink::destroySink();
     if (window_)

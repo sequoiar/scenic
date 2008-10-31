@@ -109,6 +109,7 @@ class GLImageSink
         void makeUnfullscreen() { makeUnfullscreen(window_); }
         _GstElement *sinkElement() { return glUpload_; }
     private:
+        static void resetGLparams();
         static int reshapeCallback(GLuint width, GLuint height);
         static int drawCallback(GLuint texture, GLuint width, GLuint height);
         static void makeFullscreen(_GtkWidget *widget);
@@ -124,6 +125,10 @@ class GLImageSink
         static GLfloat x_;     // FIXME: separate out gl stuff into separate class
         static GLfloat y_;
         static GLfloat z_;
+        static GLuint leftCrop_;
+        static GLuint rightCrop_;
+        static GLuint bottomCrop_;
+        static GLuint topCrop_;
 
         GLImageSink(const GLImageSink&);     //No Copy Constructor
         GLImageSink& operator=(const GLImageSink&);     //No Assignment Operator
