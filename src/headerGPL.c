@@ -18,10 +18,3 @@
  *
  */
 
-/** \file 
- *      Just the License GPL 3+ 
- *
- *      Detailed description
- */
-
-
