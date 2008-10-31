@@ -132,6 +132,7 @@ AM_CONDITIONAL([OSC],test "x${have_liblo}" == "xyes" )
 AX_PYTHON
 AX_BOOST_PYTHON
 AX_CHECK_GL
+AX_CHECK_GLU
 
 if test "x${no_gl}" = "xyes" ; then
     AC_MSG_ERROR([Missing OpenGL try some of mesa-common-dev libgl1-mesa-swx11-dev, xorg-driver-fglrx-dev nvidia-glx-new-dev.])
