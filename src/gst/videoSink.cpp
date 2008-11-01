@@ -159,10 +159,10 @@ XImageSink::~XImageSink()
 GLfloat GLImageSink::x_ = 0.0f;
 GLfloat GLImageSink::y_ = 0.0f;
 GLfloat GLImageSink::z_ = -5.0f;
-GLuint GLImageSink::leftCrop_ = 0;
-GLuint GLImageSink::rightCrop_ = 0;
-GLuint GLImageSink::topCrop_ = 0;
-GLuint GLImageSink::bottomCrop_ = 0;
+GLfloat GLImageSink::leftCrop_ = 0.0;
+GLfloat GLImageSink::rightCrop_ = 0.0;
+GLfloat GLImageSink::topCrop_ = 0.0;
+GLfloat GLImageSink::bottomCrop_ = 0.0;
 
 //client reshape callback
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
@@ -218,9 +218,12 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glTexCoord2f(0.0f, height); glVertex3f(0.0f, 0.0f, 0.0f);
     glEnd();
     
+    glLoadIdentity();
     glColor3f(0.0f,1.0f,0.0f);
-    
-    glBegin(GL_POLYGON);
+    glTranslatef(GLImageSink::x_, GLImageSink::y_, GLImageSink::z_);
+    glTranslatef(GLImageSink::leftCrop_, GLImageSink::topCrop_,  0.01f);
+
+    glBegin(GL_TRIANGLE_FAN);
     glVertex3f(0.0f, 1.0f, 0.0f);
     glVertex3f(aspectRatio,  1.0f, 0.0f);
     glVertex3f(aspectRatio,  2.0f, 0.0f);
@@ -228,16 +231,21 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glVertex3f(-aspectRatio,0.0f,0.0f);
     glVertex3f(0.0f,0.0f,0.0f);
     glEnd();
-    
 
-    glBegin(GL_POLYGON);
-    glVertex3f(0.0f, -1.0f, 0.0f);
-    glVertex3f(2*aspectRatio,  -1.0f, 0.0f);
+    glLoadIdentity();
+    glColor3f(0.0f,1.0f,0.0f);
+    glTranslatef(GLImageSink::x_, GLImageSink::y_, GLImageSink::z_);
+    glTranslatef(GLImageSink::rightCrop_, GLImageSink::bottomCrop_,  0.01f);
+    glBegin(GL_TRIANGLE_FAN);
+    
+    glVertex3f(aspectRatio,0.0f,0.0f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f,  -1.0f, 0.0f);
+    glVertex3f(2*aspectRatio,  -1.0f, 0.0f); 
     glVertex3f(2*aspectRatio,  1.0f, 0.0f);
     glVertex3f(aspectRatio,  1.0f, 0.0f);
-    glVertex3f(aspectRatio,  0.0f, 0.0f);
-    glVertex3f(0.0f,0.0f,0.0f);
     glEnd();
+
     //return TRUE causes a postRedisplay
     return TRUE;
 }
@@ -249,6 +257,7 @@ gboolean GLImageSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, 
     return TRUE;
 }
 
+const GLfloat step = 0.01;
 
 gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
@@ -261,33 +270,49 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             break;
         case 'x':
         case GDK_Right:
-            GLImageSink::x_ += 0.1;
+            GLImageSink::x_ += step;
             break;
         case 'X':
         case GDK_Left:
-            GLImageSink::x_ -= 0.1;
+            GLImageSink::x_ -= step;
             break;
         case 'y':
         case GDK_Down:
-            GLImageSink::y_ += 0.1;
+            GLImageSink::y_ += step;
             break;
         case 'Y':
         case GDK_Up:
-            GLImageSink::y_ -= 0.1;
+            GLImageSink::y_ -= step;
             break;
         case 'z':
-            GLImageSink::z_ += 0.1;
+            GLImageSink::z_ += step;
             break;
         case 'Z':
-            GLImageSink::z_ -= 0.1;
+            GLImageSink::z_ -= step;
+            break;
+        case 'u':
+                GLImageSink::bottomCrop_ += step;
+            break;
+        case 'U':
+                GLImageSink::bottomCrop_ -= step;
+            break;
+        case 'd':
+                GLImageSink::topCrop_ -= step;
+            break;
+        case 'D':
+                GLImageSink::topCrop_ += step;
+            break;
+        case 'r':
+                GLImageSink::rightCrop_ -= step;
+            break;
+        case 'R':
+                GLImageSink::rightCrop_ += step;
             break;
         case 'l':
-            if (leftCrop_ < 320)
-                GLImageSink::leftCrop_ += 10;
+                GLImageSink::leftCrop_ += step;
             break;
         case 'L':
-            if (leftCrop_ > 0)
-                GLImageSink::leftCrop_ -= 10;
+                GLImageSink::leftCrop_ -= step;
             break;
         default:
             g_print("unknown keypress %d", event->keyval);

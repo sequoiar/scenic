@@ -125,10 +125,10 @@ class GLImageSink
         static GLfloat x_;     // FIXME: separate out gl stuff into separate class
         static GLfloat y_;
         static GLfloat z_;
-        static GLuint leftCrop_;
-        static GLuint rightCrop_;
-        static GLuint bottomCrop_;
-        static GLuint topCrop_;
+        static GLfloat leftCrop_;
+        static GLfloat rightCrop_;
+        static GLfloat bottomCrop_;
+        static GLfloat topCrop_;
 
         GLImageSink(const GLImageSink&);     //No Copy Constructor
         GLImageSink& operator=(const GLImageSink&);     //No Assignment Operator
