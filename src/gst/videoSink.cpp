@@ -212,10 +212,10 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     gfloat aspectRatio = (gfloat) width / (gfloat) height;
 
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);  glVertex3f(-1.0f, 1.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0f, 0.0f);
     glTexCoord2f((gfloat)width, 0.0f);  glVertex3f(aspectRatio,  1.0f, 0.0f);
-    glTexCoord2f((gfloat) width, (gfloat) height); glVertex3f(aspectRatio,  -1.0f, 0.0f);
-    glTexCoord2f(0.0f, height); glVertex3f(-1.0f, -1.0f, 0.0f);
+    glTexCoord2f((gfloat) width, (gfloat) height); glVertex3f(aspectRatio,  0.0f, 0.0f);
+    glTexCoord2f(0.0f, height); glVertex3f(0.0f, 0.0f, 0.0f);
     glEnd();
 
     //return TRUE causes a postRedisplay
