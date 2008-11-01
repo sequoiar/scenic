@@ -219,7 +219,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glEnd();
     
     glLoadIdentity();
-    glColor3f(0.0f,1.0f,0.0f);
+    glColor3f(0.0f,0.0f,0.0f);
     glTranslatef(GLImageSink::x_, GLImageSink::y_, GLImageSink::z_);
     glTranslatef(GLImageSink::leftCrop_, GLImageSink::topCrop_,  0.01f);
 
@@ -233,7 +233,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glEnd();
 
     glLoadIdentity();
-    glColor3f(0.0f,1.0f,0.0f);
+    glColor3f(0.0f,0.0f,0.0f);
     glTranslatef(GLImageSink::x_, GLImageSink::y_, GLImageSink::z_);
     glTranslatef(GLImageSink::rightCrop_, GLImageSink::bottomCrop_,  0.01f);
     glBegin(GL_TRIANGLE_FAN);
