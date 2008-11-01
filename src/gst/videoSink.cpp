@@ -156,9 +156,9 @@ XImageSink::~XImageSink()
     pipeline_.remove(&colorspc_);
 }
 
-GLfloat GLImageSink::x_ = 0.0f;
-GLfloat GLImageSink::y_ = 0.0f;
-GLfloat GLImageSink::z_ = -5.0f;
+GLfloat GLImageSink::x_ = -0.67f;
+GLfloat GLImageSink::y_ = -0.5f;
+GLfloat GLImageSink::z_ = -1.2f;
 GLfloat GLImageSink::leftCrop_ = 0.0;
 GLfloat GLImageSink::rightCrop_ = 0.0;
 GLfloat GLImageSink::topCrop_ = 0.0;
@@ -195,28 +195,10 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     }
 
     glEnable(GL_DEPTH_TEST);
-
-    glEnable (GL_TEXTURE_RECTANGLE_ARB);
-    glBindTexture (GL_TEXTURE_RECTANGLE_ARB, texture);
-    glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glTranslatef(GLImageSink::x_, GLImageSink::y_, GLImageSink::z_);
     gfloat aspectRatio = (gfloat) width / (gfloat) height;
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0f, 0.0f);
-    glTexCoord2f((gfloat)width, 0.0f);  glVertex3f(aspectRatio,  1.0f, 0.0f);
-    glTexCoord2f((gfloat) width, (gfloat) height); glVertex3f(aspectRatio,  0.0f, 0.0f);
-    glTexCoord2f(0.0f, height); glVertex3f(0.0f, 0.0f, 0.0f);
-    glEnd();
     
     glLoadIdentity();
     glColor3f(0.0f,0.0f,0.0f);
@@ -244,6 +226,25 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glVertex3f(2*aspectRatio,  -1.0f, 0.0f); 
     glVertex3f(2*aspectRatio,  1.0f, 0.0f);
     glVertex3f(aspectRatio,  1.0f, 0.0f);
+    glEnd();
+
+    glEnable (GL_TEXTURE_RECTANGLE_ARB);
+    glBindTexture (GL_TEXTURE_RECTANGLE_ARB, texture);
+    glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+    glLoadIdentity();
+
+    glTranslatef(GLImageSink::x_, GLImageSink::y_, GLImageSink::z_);
+
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0f, 0.0f);
+    glTexCoord2f((gfloat)width-1, 0.0f);  glVertex3f(aspectRatio,  1.0f, 0.0f);
+    glTexCoord2f((gfloat) width-1, (gfloat) height); glVertex3f(aspectRatio,  0.0f, 0.0f);
+    glTexCoord2f(0.0f, height); glVertex3f(0.0f, 0.0f, 0.0f);
     glEnd();
 
     //return TRUE causes a postRedisplay
@@ -290,16 +291,16 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
         case 'Z':
             GLImageSink::z_ -= step;
             break;
-        case 'u':
+        case 'b':
                 GLImageSink::bottomCrop_ += step;
             break;
-        case 'U':
+        case 'B':
                 GLImageSink::bottomCrop_ -= step;
             break;
-        case 'd':
+        case 't':
                 GLImageSink::topCrop_ -= step;
             break;
-        case 'D':
+        case 'T':
                 GLImageSink::topCrop_ += step;
             break;
         case 'r':
@@ -318,10 +319,17 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             g_print("unknown keypress %d", event->keyval);
             break;
     }
+LOG_INFO("x:" << GLImageSink::x_  <<
+" y:" << GLImageSink::y_ <<
+" z:" << GLImageSink::z_ <<
+" l:" << GLImageSink::leftCrop_ <<
+" r:" << GLImageSink::rightCrop_ <<
+" t:" <<  GLImageSink::topCrop_ <<
+" b:" << GLImageSink::bottomCrop_);
+
 
     return TRUE;
 }
-
 void GLImageSink::makeWindowBlack()
 {
     GdkColor color;
