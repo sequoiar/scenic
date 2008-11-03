@@ -24,6 +24,7 @@
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
+#include <GL/glu.h>
 
 #include "gstLinkable.h"
 #include "videoSink.h"

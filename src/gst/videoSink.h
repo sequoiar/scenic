@@ -21,7 +21,8 @@
 #define _VIDEO_SINK_H_
 
 #include "gstLinkable.h"
-#include <GL/glew.h>
+//#include <GL/glew.h>
+#include <GL/gl.h>
 
 class _GtkWidget;
 class _GdkEventExpose;
