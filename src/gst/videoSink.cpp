@@ -66,6 +66,16 @@ void VideoSink::showWindow()
 }
 
 
+void VideoSink::toggleFullscreen(GtkWidget *widget)
+{
+    gboolean isFullscreen =
+        (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
+
+    // toggle fullscreen state
+    isFullscreen ? makeUnfullscreen(widget) : makeFullscreen(widget);
+}
+
+
 void VideoSink::makeFullscreen(GtkWidget *widget)
 {
     gtk_window_fullscreen(GTK_WINDOW(widget));
@@ -88,12 +98,7 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
     else
         LOG_DEBUG("you hit f");
 
-    gboolean isFullscreen =
-        (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
-
-    // toggle fullscreen state
-    isFullscreen ? makeUnfullscreen(widget) : makeFullscreen(widget);
-
+    toggleFullscreen(widget);
     return TRUE;
 }
 
@@ -189,7 +194,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     if ((current_time.tv_sec - last_sec) >= 1)
     {
-        LOG_DEBUG("GRPHIC FPS = " << nbFrames << std::endl);
+        LOG_DEBUG("GRAPHIC FPS = " << nbFrames << std::endl);
 
         nbFrames = 0;
         last_sec = current_time.tv_sec;
@@ -200,33 +205,32 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     gfloat aspectRatio = (gfloat) width / (gfloat) height;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    
     glLoadIdentity();
     glColor3f(0.0f,0.0f,0.0f);
     glTranslatef(x_, y_, z_);
     glTranslatef(leftCrop_, topCrop_,  0.01f);
 
     glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(0.0f, 1.0f, 0.0f);
-    glVertex3f(aspectRatio,  1.0f, 0.0f);
-    glVertex3f(aspectRatio,  2.0f, 0.0f);
-    glVertex3f(-aspectRatio, 2.0f, 0.0f);
-    glVertex3f(-aspectRatio,0.0f,0.0f);
-    glVertex3f(0.0f,0.0f,0.0f);
+        glVertex3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(aspectRatio,  1.0f, 0.0f);
+        glVertex3f(aspectRatio,  2.0f, 0.0f);
+        glVertex3f(-aspectRatio, 2.0f, 0.0f);
+        glVertex3f(-aspectRatio,0.0f,0.0f);
+        glVertex3f(0.0f,0.0f,0.0f);
     glEnd();
 
     glLoadIdentity();
     glColor3f(0.0f,0.0f,0.0f);
     glTranslatef(x_, y_, z_);
     glTranslatef(rightCrop_, bottomCrop_,  0.01f);
+
     glBegin(GL_TRIANGLE_FAN);
-    
-    glVertex3f(aspectRatio,0.0f,0.0f);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f,  -1.0f, 0.0f);
-    glVertex3f(2*aspectRatio,  -1.0f, 0.0f); 
-    glVertex3f(2*aspectRatio,  1.0f, 0.0f);
-    glVertex3f(aspectRatio,  1.0f, 0.0f);
+        glVertex3f(aspectRatio,0.0f,0.0f);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f,  -1.0f, 0.0f);
+        glVertex3f(2*aspectRatio,  -1.0f, 0.0f); 
+        glVertex3f(2*aspectRatio,  1.0f, 0.0f);
+        glVertex3f(aspectRatio,  1.0f, 0.0f);
     glEnd();
 
     glEnable (GL_TEXTURE_RECTANGLE_ARB);
@@ -242,10 +246,10 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glTranslatef(x_, y_, z_);
 
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0f, 0.0f);
-    glTexCoord2f((gfloat)width-1, 0.0f);  glVertex3f(aspectRatio,  1.0f, 0.0f);
-    glTexCoord2f((gfloat) width-1, (gfloat) height); glVertex3f(aspectRatio,  0.0f, 0.0f);
-    glTexCoord2f(0.0f, height); glVertex3f(0.0f, 0.0f, 0.0f);
+        glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0f, 0.0f);
+        glTexCoord2f((gfloat)width-1, 0.0f);  glVertex3f(aspectRatio,  1.0f, 0.0f);
+        glTexCoord2f((gfloat) width-1, (gfloat) height); glVertex3f(aspectRatio,  0.0f, 0.0f);
+        glTexCoord2f(0.0f, height); glVertex3f(0.0f, 0.0f, 0.0f);
     glEnd();
 
     //return TRUE causes a postRedisplay
@@ -255,12 +259,9 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
 gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
-    gboolean isFullscreen;
     switch (event->keyval) {
         case 'f':
-            isFullscreen = (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
-            // toggle fullscreen state
-            isFullscreen ? makeUnfullscreen(widget) : makeFullscreen(widget);
+            toggleFullscreen(widget);
             break;
         case 'x':
         case GDK_Right:
