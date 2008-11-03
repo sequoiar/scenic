@@ -43,10 +43,38 @@ void VideoSink::destroySink()
 }
 
 
-gboolean XvImageSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
+gboolean VideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
 {
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(data), GDK_WINDOW_XWINDOW(widget->window));
     return TRUE;
+}
+
+
+void VideoSink::makeWindowBlack()
+{
+    GdkColor color;
+    gdk_color_parse ("black", &color);
+    gtk_widget_modify_bg(window_, GTK_STATE_NORMAL, &color);    // needed to ensure black background
+}
+
+
+void VideoSink::showWindow()
+{
+    makeWindowBlack();
+    gtk_window_set_title(GTK_WINDOW(window_), "Sropulpof");
+    gtk_widget_show_all(window_);
+}
+
+
+void VideoSink::makeFullscreen(GtkWidget *widget)
+{
+    gtk_window_fullscreen(GTK_WINDOW(widget));
+}
+
+
+void VideoSink::makeUnfullscreen(GtkWidget *widget)
+{
+    gtk_window_unfullscreen(GTK_WINDOW(widget));
 }
 
 
@@ -64,7 +92,7 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
         (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
 
     // toggle fullscreen state
-    isFullscreen ? XvImageSink::makeUnfullscreen(widget) : XvImageSink::makeFullscreen(widget);
+    isFullscreen ? makeUnfullscreen(widget) : makeFullscreen(widget);
 
     return TRUE;
 }
@@ -94,35 +122,6 @@ void XvImageSink::init()
     g_signal_connect(G_OBJECT(window_), "key-press-event",
                      G_CALLBACK(XvImageSink::key_press_event_cb), NULL);
 }
-
-
-void XvImageSink::makeWindowBlack()
-{
-    GdkColor color;
-    gdk_color_parse ("black", &color);
-    gtk_widget_modify_bg(window_, GTK_STATE_NORMAL, &color);    // needed to ensure black background
-}
-
-
-void XvImageSink::showWindow()
-{
-    makeWindowBlack();
-    gtk_window_set_title(GTK_WINDOW(window_), "Sropulpof");
-    gtk_widget_show_all(window_);
-}
-
-
-void XvImageSink::makeFullscreen(GtkWidget *widget)
-{
-    gtk_window_fullscreen(GTK_WINDOW(widget));
-}
-
-
-void XvImageSink::makeUnfullscreen(GtkWidget *widget)
-{
-    gtk_window_unfullscreen(GTK_WINDOW(widget));
-}
-
 
 XvImageSink::~XvImageSink()
 {
@@ -254,12 +253,6 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 }
 
 
-gboolean GLImageSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
-{
-    gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(data), GDK_WINDOW_XWINDOW(widget->window));
-    return TRUE;
-}
-
 gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
     gboolean isFullscreen;
@@ -347,34 +340,6 @@ gboolean GLImageSink::mouse_wheel_cb(GtkWidget * /*widget*/, GdkEventScroll *eve
             break;
     }
     return TRUE;
-}
-
-
-void GLImageSink::makeWindowBlack()
-{
-    GdkColor color;
-    gdk_color_parse ("black", &color);
-    gtk_widget_modify_bg(window_, GTK_STATE_NORMAL, &color);    // needed to ensure black background
-}
-
-
-void GLImageSink::showWindow()
-{
-    makeWindowBlack();
-    gtk_window_set_title(GTK_WINDOW(window_), "Sropulpof");
-    gtk_widget_show_all(window_);
-}
-
-
-void GLImageSink::makeFullscreen(GtkWidget *widget)
-{
-    gtk_window_fullscreen(GTK_WINDOW(widget));
-}
-
-
-void GLImageSink::makeUnfullscreen(GtkWidget *widget)
-{
-    gtk_window_unfullscreen(GTK_WINDOW(widget));
 }
 
 

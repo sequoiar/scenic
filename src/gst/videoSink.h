@@ -34,19 +34,25 @@ class VideoSink
 {
     public:
         VideoSink()
-            : sink_(0) {};
+            : sink_(0), window_(0) {};
         ~VideoSink(){};
-        virtual void showWindow() {};   // FIXME: not useful for ximagesink
-        virtual void makeFullscreen() = 0;
-        virtual void makeUnfullscreen() = 0;
+        void showWindow();
+        void makeFullscreen() { makeFullscreen(window_); }
+        void makeUnfullscreen() { makeUnfullscreen(window_); }
 
         _GstElement *sinkElement() { return sink_; }
         
     protected:
         _GstElement *sink_;
+        _GtkWidget *window_;
         void destroySink();
+        static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
+        void makeWindowBlack();
+        static void makeFullscreen(_GtkWidget *widget);
+        static void makeUnfullscreen(_GtkWidget *widget);
 
     private:
+
         VideoSink(const VideoSink&);     //No Copy Constructor
         VideoSink& operator=(const VideoSink&);     //No Assignment Operator
 };
@@ -56,24 +62,14 @@ class XvImageSink
     : public VideoSink
 {
     public:
-        XvImageSink()
-            : window_(0) {};
+        XvImageSink() {};
         ~XvImageSink();
         void init();
-        void showWindow();
-        void makeFullscreen() { makeFullscreen(window_); }
-        void makeUnfullscreen() { makeUnfullscreen(window_); }
 
     private:
-        static void makeFullscreen(_GtkWidget *widget);
-        static void makeUnfullscreen(_GtkWidget *widget);
-
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
-        static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
-        void makeWindowBlack();
 
-        _GtkWidget *window_;
         XvImageSink(const XvImageSink&);     //No Copy Constructor
         XvImageSink& operator=(const XvImageSink&);     //No Assignment Operator
 };
@@ -102,27 +98,19 @@ class GLImageSink
 : public VideoSink
 {
     public:
-        GLImageSink() : window_(0), glUpload_(0){};
+        GLImageSink() : glUpload_(0){};
         ~GLImageSink();
         void init();
-        void showWindow();
-        void makeFullscreen() { makeFullscreen(window_); }
-        void makeUnfullscreen() { makeUnfullscreen(window_); }
         _GstElement *sinkElement() { return glUpload_; }
     private:
         static void resetGLparams();
         static int reshapeCallback(GLuint width, GLuint height);
         static int drawCallback(GLuint texture, GLuint width, GLuint height);
-        static void makeFullscreen(_GtkWidget *widget);
-        static void makeUnfullscreen(_GtkWidget *widget);
 
         static int mouse_wheel_cb(_GtkWidget *widget, _GdkEventScroll *event, void *data);
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
-        static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
-        void makeWindowBlack();
 
-        _GtkWidget *window_;
         _GstElement *glUpload_;
         static const GLfloat STEP;
         static GLfloat x_;     // FIXME: separate out gl stuff into separate class
