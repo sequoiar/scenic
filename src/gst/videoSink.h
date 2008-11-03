@@ -26,6 +26,7 @@
 class _GtkWidget;
 class _GdkEventExpose;
 class _GdkEventKey;
+class _GdkEventScroll;
 class _GstElement;
 
 class VideoSink
@@ -115,6 +116,7 @@ class GLImageSink
         static void makeFullscreen(_GtkWidget *widget);
         static void makeUnfullscreen(_GtkWidget *widget);
 
+        static int mouse_wheel_cb(_GtkWidget *widget, _GdkEventScroll *event, void *data);
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
         static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
@@ -122,6 +124,7 @@ class GLImageSink
 
         _GtkWidget *window_;
         _GstElement *glUpload_;
+        static const GLfloat STEP;
         static GLfloat x_;     // FIXME: separate out gl stuff into separate class
         static GLfloat y_;
         static GLfloat z_;

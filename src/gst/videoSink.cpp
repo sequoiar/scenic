@@ -156,6 +156,8 @@ XImageSink::~XImageSink()
     pipeline_.remove(&colorspc_);
 }
 
+
+const GLfloat GLImageSink::STEP = 0.01;
 GLfloat GLImageSink::x_ = -0.67f;
 GLfloat GLImageSink::y_ = -0.5f;
 GLfloat GLImageSink::z_ = -1.2f;
@@ -202,8 +204,8 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     
     glLoadIdentity();
     glColor3f(0.0f,0.0f,0.0f);
-    glTranslatef(GLImageSink::x_, GLImageSink::y_, GLImageSink::z_);
-    glTranslatef(GLImageSink::leftCrop_, GLImageSink::topCrop_,  0.01f);
+    glTranslatef(x_, y_, z_);
+    glTranslatef(leftCrop_, topCrop_,  0.01f);
 
     glBegin(GL_TRIANGLE_FAN);
     glVertex3f(0.0f, 1.0f, 0.0f);
@@ -216,8 +218,8 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     glLoadIdentity();
     glColor3f(0.0f,0.0f,0.0f);
-    glTranslatef(GLImageSink::x_, GLImageSink::y_, GLImageSink::z_);
-    glTranslatef(GLImageSink::rightCrop_, GLImageSink::bottomCrop_,  0.01f);
+    glTranslatef(x_, y_, z_);
+    glTranslatef(rightCrop_, bottomCrop_,  0.01f);
     glBegin(GL_TRIANGLE_FAN);
     
     glVertex3f(aspectRatio,0.0f,0.0f);
@@ -238,7 +240,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     glLoadIdentity();
 
-    glTranslatef(GLImageSink::x_, GLImageSink::y_, GLImageSink::z_);
+    glTranslatef(x_, y_, z_);
 
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0f, 0.0f);
@@ -258,8 +260,6 @@ gboolean GLImageSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, 
     return TRUE;
 }
 
-const GLfloat step = 0.01;
-
 gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
     gboolean isFullscreen;
@@ -267,69 +267,89 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
         case 'f':
             isFullscreen = (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
             // toggle fullscreen state
-            isFullscreen ? GLImageSink::makeUnfullscreen(widget) : GLImageSink::makeFullscreen(widget);
+            isFullscreen ? makeUnfullscreen(widget) : makeFullscreen(widget);
             break;
         case 'x':
         case GDK_Right:
-            GLImageSink::x_ += step;
+            x_ += STEP;
             break;
         case 'X':
         case GDK_Left:
-            GLImageSink::x_ -= step;
+            x_ -= STEP;
             break;
         case 'y':
         case GDK_Down:
-            GLImageSink::y_ += step;
+            y_ += STEP;
             break;
         case 'Y':
         case GDK_Up:
-            GLImageSink::y_ -= step;
+            y_ -= STEP;
             break;
         case 'z':
-            GLImageSink::z_ += step;
+            z_ += STEP;
             break;
         case 'Z':
-            GLImageSink::z_ -= step;
+            z_ -= STEP;
             break;
         case 'b':
-                GLImageSink::bottomCrop_ += step;
+                bottomCrop_ += STEP;
             break;
         case 'B':
-                GLImageSink::bottomCrop_ -= step;
+                bottomCrop_ -= STEP;
             break;
         case 't':
-                GLImageSink::topCrop_ -= step;
+                topCrop_ -= STEP;
             break;
         case 'T':
-                GLImageSink::topCrop_ += step;
+                topCrop_ += STEP;
             break;
         case 'r':
-                GLImageSink::rightCrop_ -= step;
+                rightCrop_ -= STEP;
             break;
         case 'R':
-                GLImageSink::rightCrop_ += step;
+                rightCrop_ += STEP;
             break;
         case 'l':
-                GLImageSink::leftCrop_ += step;
+                leftCrop_ += STEP;
             break;
         case 'L':
-                GLImageSink::leftCrop_ -= step;
+                leftCrop_ -= STEP;
             break;
         default:
             g_print("unknown keypress %d", event->keyval);
             break;
     }
-LOG_INFO("x:" << GLImageSink::x_  <<
-" y:" << GLImageSink::y_ <<
-" z:" << GLImageSink::z_ <<
-" l:" << GLImageSink::leftCrop_ <<
-" r:" << GLImageSink::rightCrop_ <<
-" t:" <<  GLImageSink::topCrop_ <<
-" b:" << GLImageSink::bottomCrop_);
+LOG_INFO("x:" << x_  <<
+" y:" << y_ <<
+" z:" << z_ <<
+" l:" << leftCrop_ <<
+" r:" << rightCrop_ <<
+" t:" <<  topCrop_ <<
+" b:" << bottomCrop_);
 
 
     return TRUE;
 }
+
+
+gboolean GLImageSink::mouse_wheel_cb(GtkWidget * /*widget*/, GdkEventScroll *event, gpointer /*data*/)
+{
+    switch (event->direction)
+    {
+        case GDK_SCROLL_UP:
+            z_ += STEP;
+            break;
+        case GDK_SCROLL_DOWN:
+            z_ -= STEP;
+            break;
+        default:
+            g_print("Unhandled mouse wheel event");
+            break;
+    }
+    return TRUE;
+}
+
+
 void GLImageSink::makeWindowBlack()
 {
     GdkColor color;
@@ -408,14 +428,17 @@ void GLImageSink::init()
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
 
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
-                GLImageSink::expose_cb), static_cast<void*>(sink_));
-    gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
+                expose_cb), static_cast<void*>(sink_));
     g_signal_connect(G_OBJECT(window_), "key-press-event",
-            G_CALLBACK(GLImageSink::key_press_event_cb), NULL);
+            G_CALLBACK(key_press_event_cb), NULL);
+    g_signal_connect(G_OBJECT(window_), "scroll-event",
+                     G_CALLBACK(mouse_wheel_cb), NULL);
+    gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
+    gtk_widget_set_events(window_, GDK_SCROLL_MASK);
 
     /* configure elements */
-    g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(GLImageSink::reshapeCallback), NULL);
-    g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(GLImageSink::drawCallback), NULL);  
+    g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
+    g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
 }
 
 #endif
