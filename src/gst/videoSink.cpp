@@ -347,9 +347,10 @@ gboolean GLImageSink::mouse_wheel_cb(GtkWidget * /*widget*/, GdkEventScroll *eve
 void GLImageSink::resetGLparams()
 {
     // reset persistent static params to their initial values
-    x_ = 0.0f;
-    y_ = 0.0f;
-    z_ = -5.0f;
+
+    x_ = -0.67f;
+    y_ = -0.5f;
+    z_ = -1.2f;
     leftCrop_ = 0.0f;
     rightCrop_ = 0.0f;
     bottomCrop_ = 0.0f;
