@@ -149,9 +149,9 @@ fi
 #
 AM_CONDITIONAL([SIP],test "x${enable_sip}" = "xyes" -a "x{have_libpj}" != "xfalse" )
 #AM_CONDITIONAL([IEEE1394],test "x{have_libavc1394}" = "xtrue" -a "x{have_libraw1394}" = "xtrue" )
-AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes" -a "x{have_cpptest}" != "xfalse" )
+AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes" -a "x{have_cpptest}" = "xtrue" )
 
-if test "x{have_libavc1394}" = "xfalse" -o "x{have_libraw1394}" = "xfalse" ; then
+if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
 AC_MSG_NOTICE([undef CONFIG_IEEE1394])
 else
 AC_DEFINE(CONFIG_IEEE1394,[],[IEEE1934 define from configure])
