@@ -373,6 +373,49 @@ void AudioTestSuite::start_stop_audio_dv()
 }
 
 
+void AudioTestSuite::start_8ch_alsa()
+{
+    int numChannels = 8;
+    AudioConfig config("alsasrc", numChannels);
+    AudioLocal tx(config);
+    TEST_THROWS_NOTHING(tx.init());
+
+    tx.start();
+
+    BLOCK();
+    TEST_ASSERT(tx.isPlaying());
+}
+
+
+void AudioTestSuite::stop_8ch_alsa()
+{
+    int numChannels = 8;
+    AudioConfig config("alsasrc", numChannels);
+    AudioLocal tx(config);
+    TEST_THROWS_NOTHING(tx.init());
+
+    BLOCK();
+    tx.stop();
+    TEST_ASSERT(!tx.isPlaying());
+}
+
+
+void AudioTestSuite::start_stop_8ch_alsa()
+{
+    int numChannels = 8;
+    AudioConfig config("alsasrc", numChannels);
+    AudioLocal tx(config);
+    TEST_THROWS_NOTHING(tx.init());
+    tx.start();
+
+    BLOCK();
+    TEST_ASSERT(tx.isPlaying());
+
+    tx.stop();
+    TEST_ASSERT(!tx.isPlaying());
+}
+
+
 int mainAudioTestSuite(int /*argc*/, char ** /*argv*/)
 {
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;

@@ -54,15 +54,27 @@ void AudioJackSink::init()
                 << " does not match default sample rate " << GstBase::SAMPLE_RATE);
 }
 
+        
+AudioAlsaSink::~AudioAlsaSink()
+{
+    stop();
+    pipeline_.remove(&audioconvert_);
+}
+
 
 void AudioAlsaSink::init()
 {
     if (Jack::is_running())
-        THROW_CRITICAL("Jack is running, stop jack server");
+        THROW_CRITICAL("Jack is running, you must stop jack server before using alsasink");
+
+    assert(audioconvert_ = gst_element_factory_make("audioconvert", NULL));
+    pipeline_.add(audioconvert_);
 
     assert(sink_ = gst_element_factory_make("alsasink", NULL));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     pipeline_.add(sink_);
+
+    GstLinkable::link(audioconvert_, sink_);
 }
 
 

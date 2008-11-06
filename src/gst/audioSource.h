@@ -128,11 +128,11 @@ class AudioFileSource
 
 
 class AudioAlsaSource
-    : public InterleavedAudioSource
+    : public AudioSource
 {
     public:
         explicit AudioAlsaSource(const AudioConfig &config)
-            : InterleavedAudioSource(config) {}
+            : AudioSource(config) {}
         void sub_init();
     private:
         AudioAlsaSource(const AudioAlsaSource&);     //No Copy Constructor

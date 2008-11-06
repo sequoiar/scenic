@@ -30,16 +30,6 @@ Interleave::~Interleave()
     pipeline_.remove(&interleave_);
 }
 
-#if 0
-GstCaps *Interleave::getSrcCaps()
-{
-    GstPad *srcPad = gst_element_get_static_pad(interleave_, "src");
-    GstCaps *srcCaps = gst_pad_get_negotiated_caps(srcPad);
-    gst_object_unref(srcPad);
-    return srcCaps;
-}
-#endif
-
 
 void Interleave::set_channel_layout()
 {

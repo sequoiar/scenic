@@ -38,7 +38,7 @@ class AudioLocal
 
         ~AudioLocal();
 
-        std::string getCaps();
+        //std::string getCaps();
 
     private:
         // helper methods

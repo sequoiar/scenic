@@ -46,10 +46,12 @@ class AudioAlsaSink
 : public AudioSink
 {
     public:
-        AudioAlsaSink() {};
-        ~AudioAlsaSink() {};
+        AudioAlsaSink() : audioconvert_(0) {};
+        ~AudioAlsaSink();
         void init();
     private:
+        _GstElement *sinkElement() { return audioconvert_; }
+        _GstElement *audioconvert_;
         AudioAlsaSink(const AudioAlsaSink&);     //No Copy Constructor
         AudioAlsaSink& operator=(const AudioAlsaSink&);     //No Assignment Operator
 };

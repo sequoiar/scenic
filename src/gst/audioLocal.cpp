@@ -38,10 +38,12 @@ AudioLocal::~AudioLocal()
 }
 
 
+#if 0
 std::string AudioLocal::getCaps() 
 { 
     return sink_->getCaps(); 
 }
+#endif
 
 
 void AudioLocal::init_source()
@@ -64,7 +66,6 @@ void AudioLocal::init_sink()
 {
     assert(sink_ = config_.createSink());
     sink_->init();
-//    GstLinkable::link(*source_, *sink_);   
     GstLinkable::link(level_, *sink_);   
 }
 

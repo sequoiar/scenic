@@ -266,6 +266,8 @@ void AudioAlsaSource::sub_init()
 {
     if (Jack::is_running())
         THROW_ERROR("Jack is running, ALSA unavailable");
+    
+    g_object_set(G_OBJECT(sources_[0]), "device", "hw:0", NULL);
 }
 
 
