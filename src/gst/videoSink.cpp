@@ -188,11 +188,17 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 {
     static GTimeVal current_time;
     static glong last_sec = current_time.tv_sec;
+    static glong last_usec = current_time.tv_usec;
     static gint nbFrames = 0;  
 
     g_get_current_time (&current_time);
+    if((current_time.tv_sec - last_sec < 1) && (current_time.tv_usec - last_usec < 5000))
+    {	
+        usleep((current_time.tv_usec - last_usec) >> 1);
+        return FALSE;
+    }
     nbFrames++ ;
-
+    last_usec = current_time.tv_usec ;	
     if ((current_time.tv_sec - last_sec) >= 1)
     {
         LOG_DEBUG("GRAPHIC FPS = " << nbFrames << std::endl);
@@ -254,7 +260,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glEnd();
 
     //return TRUE causes a postRedisplay
-    return TRUE;
+    return FALSE;
 }
 
 
