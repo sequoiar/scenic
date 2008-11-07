@@ -126,15 +126,17 @@ class AudioFileSource
 
 };
 
-
 class AudioAlsaSource
     : public AudioSource
 {
     public:
         explicit AudioAlsaSource(const AudioConfig &config)
-            : AudioSource(config) {}
+            : AudioSource(config), capsFilter_(0) {}
         void sub_init();
+        GstElement *srcElement() { return capsFilter_; }
     private:
+        void link_elements();
+        GstElement *capsFilter_;
         AudioAlsaSource(const AudioAlsaSource&);     //No Copy Constructor
         AudioAlsaSource& operator=(const AudioAlsaSource&);     //No Assignment Operator
 };

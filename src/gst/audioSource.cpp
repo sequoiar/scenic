@@ -18,6 +18,7 @@
 //
 
 #include <string>
+#include <sstream>
 #include <cassert>
 #include "gstLinkable.h"
 #include "logWriter.h"
@@ -26,6 +27,8 @@
 #include "jackUtils.h"
 #include "raw1394Util.h"
 #include "pipeline.h"
+#include "alsa.h"
+
 
 
 void AudioSource::init()
@@ -261,13 +264,31 @@ AudioFileSource::~AudioFileSource()
     pipeline_.remove(decoders_);
 }
 
-
 void AudioAlsaSource::sub_init()
 {
     if (Jack::is_running())
         THROW_ERROR("Jack is running, ALSA unavailable");
+    g_object_set(G_OBJECT(sources_[0]), "device", Alsa::DEVICE_NAME, NULL);
     
-    g_object_set(G_OBJECT(sources_[0]), "device", "hw:0", NULL);
+    // otherwise alsasrc defaults to 2 channels when using plughw
+    std::ostringstream capsStr;
+    capsStr << "audio/x-raw-int, channels=" << config_.numChannels();
+         
+    GstCaps *alsaCaps = gst_caps_from_string(capsStr.str().c_str());
+    capsFilter_ = gst_element_factory_make("capsfilter", NULL);
+    LOG_DEBUG("CAPS STRING: " << capsStr);
+    LOG_DEBUG("CAPS TO STRING: " << gst_caps_to_string(alsaCaps));
+    assert(capsFilter_);
+    g_object_set(G_OBJECT(capsFilter_), "caps", alsaCaps, NULL);
+    pipeline_.add(capsFilter_);
+    gst_caps_unref(alsaCaps);
+}
+
+
+void AudioAlsaSource::link_elements()
+{
+    GstLinkable::link(sources_, aconvs_);
+    GstLinkable::link(aconvs_[0], capsFilter_);
 }
 
 

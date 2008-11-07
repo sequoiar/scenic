@@ -24,6 +24,8 @@
 #include "logWriter.h"
 #include "jackUtils.h"
 #include "pipeline.h"
+#include "alsa.h"
+
 
 
 AudioSink::~AudioSink()
@@ -61,7 +63,6 @@ AudioAlsaSink::~AudioAlsaSink()
     pipeline_.remove(&audioconvert_);
 }
 
-
 void AudioAlsaSink::init()
 {
     if (Jack::is_running())
@@ -72,6 +73,7 @@ void AudioAlsaSink::init()
 
     assert(sink_ = gst_element_factory_make("alsasink", NULL));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    g_object_set(G_OBJECT(sink_), "device", Alsa::DEVICE_NAME, NULL);
     pipeline_.add(sink_);
 
     GstLinkable::link(audioconvert_, sink_);
