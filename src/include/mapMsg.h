@@ -121,6 +121,12 @@ class MsgFunctor
         virtual ~MsgFunctor(){}
 };
 
+/**
+ * Used by classes that are not coupled to a thread class
+ * MapMsg will go to thread that is registered or nowhere if no thread
+ * eg. gst/audioLevel.cpp
+ */
+
 namespace MSG
 {
 bool post(MapMsg& msg);
