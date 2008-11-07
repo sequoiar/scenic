@@ -51,7 +51,7 @@ std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
 
 std::auto_ptr<AudioReceiver> buildAudioReceiver()
 {
-    AudioReceiverConfig aConfig("jackaudiosink");
+    AudioReceiverConfig aConfig("alsasink");
     ReceiverConfig rConfig("raw", get_host_ip(), Ports::A_PORT, tcpGetCaps(Ports::CAPS_PORT));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
@@ -61,7 +61,7 @@ std::auto_ptr<AudioReceiver> buildAudioReceiver()
 
 std::auto_ptr<AudioReceiver> buildDeadAudioReceiver()
 {
-    AudioReceiverConfig aConfig("jackaudiosink");
+    AudioReceiverConfig aConfig("alsasink");
     ReceiverConfig rConfig("raw", get_host_ip(), Ports::A_PORT, "");
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
@@ -219,6 +219,86 @@ void RtpAudioTestSuite::start_stop_8ch_audiotest()
     }
     else {
         AudioConfig aConfig("audiotestsrc", numChannels);
+        std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
+
+        tx->start();
+
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+
+        BLOCK();
+        TEST_ASSERT(tx->isPlaying());
+
+        tx->stop();
+        TEST_ASSERT(!tx->isPlaying());
+    }
+}
+
+
+void RtpAudioTestSuite::start_8ch_alsa()
+{
+    const int numChannels = 8;
+
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
+
+        rx->start();
+
+        BLOCK();
+        TEST_ASSERT(rx->isPlaying());
+    }
+    else {
+        AudioConfig aConfig("alsasrc", numChannels);
+        std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
+
+        tx->start();
+
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+
+        BLOCK();
+        TEST_ASSERT(tx->isPlaying());
+    }
+}
+
+
+void RtpAudioTestSuite::stop_8ch_alsa()
+{
+    int numChannels = 8;
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
+
+        BLOCK();
+
+        rx->stop();
+        TEST_ASSERT(!rx->isPlaying());
+    }
+    else {
+        AudioConfig aConfig("alsasrc", numChannels);
+        std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
+
+        BLOCK();
+
+        tx->stop();
+        TEST_ASSERT(!tx->isPlaying());
+    }
+}
+
+
+void RtpAudioTestSuite::start_stop_8ch_alsa()
+{
+    int numChannels = 8;
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
+
+        rx->start();
+
+        BLOCK();
+        TEST_ASSERT(rx->isPlaying());
+
+        rx->stop();
+        TEST_ASSERT(!rx->isPlaying());
+    }
+    else {
+        AudioConfig aConfig("alsasrc", numChannels);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
         tx->start();
