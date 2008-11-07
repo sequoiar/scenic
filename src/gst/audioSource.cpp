@@ -276,8 +276,6 @@ void AudioAlsaSource::sub_init()
          
     GstCaps *alsaCaps = gst_caps_from_string(capsStr.str().c_str());
     capsFilter_ = gst_element_factory_make("capsfilter", NULL);
-    LOG_DEBUG("CAPS STRING: " << capsStr);
-    LOG_DEBUG("CAPS TO STRING: " << gst_caps_to_string(alsaCaps));
     assert(capsFilter_);
     g_object_set(G_OBJECT(capsFilter_), "caps", alsaCaps, NULL);
     pipeline_.add(capsFilter_);

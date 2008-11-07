@@ -49,9 +49,9 @@ std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
 }
 
 
-std::auto_ptr<AudioReceiver> buildAudioReceiver()
+std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *audioSinkName = "jackaudiosink")
 {
-    AudioReceiverConfig aConfig("alsasink");
+    AudioReceiverConfig aConfig(audioSinkName);
     ReceiverConfig rConfig("raw", get_host_ip(), Ports::A_PORT, tcpGetCaps(Ports::CAPS_PORT));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
@@ -59,9 +59,9 @@ std::auto_ptr<AudioReceiver> buildAudioReceiver()
 }
 
 
-std::auto_ptr<AudioReceiver> buildDeadAudioReceiver()
+std::auto_ptr<AudioReceiver> buildDeadAudioReceiver(const char *audioSinkName = "jackaudiosink")
 {
-    AudioReceiverConfig aConfig("alsasink");
+    AudioReceiverConfig aConfig(audioSinkName);
     ReceiverConfig rConfig("raw", get_host_ip(), Ports::A_PORT, "");
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
@@ -239,7 +239,7 @@ void RtpAudioTestSuite::start_8ch_alsa()
     const int numChannels = 8;
 
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
+        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver("alsasink"));
 
         rx->start();
 
@@ -264,7 +264,7 @@ void RtpAudioTestSuite::stop_8ch_alsa()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
+        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver("alsasink"));
 
         BLOCK();
 
@@ -287,7 +287,7 @@ void RtpAudioTestSuite::start_stop_8ch_alsa()
 {
     int numChannels = 8;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
+        std::auto_ptr<AudioReceiver> rx(buildAudioReceiver("alsasink"));
 
         rx->start();
 
