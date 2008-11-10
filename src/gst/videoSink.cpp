@@ -24,18 +24,12 @@
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
-#include <GL/glu.h>
 
 #include "gstLinkable.h"
 #include "videoSink.h"
 #include "logWriter.h"
 #include "pipeline.h"
 
-//#define TRY_GL_VIDEOSINK
-
-#ifdef TRY_GL_VIDEOSINK
-#include "glVideoSink.cpp"
-#else
 
 void VideoSink::destroySink()
 {
