@@ -95,8 +95,16 @@ class VorbisEncoder : public Encoder
 {
     public: 
 
+        VorbisEncoder() : aconv_(0){};
+        ~VorbisEncoder();
         void init();
         RtpPay* createPayloader() const;
+
+    private:
+        _GstElement *sinkElement() { return aconv_; }
+        _GstElement *aconv_;
+        VorbisEncoder(const VorbisEncoder&);     //No Copy Constructor
+        VorbisEncoder& operator=(const VorbisEncoder&);     //No Assignment Operator
 };
 
 

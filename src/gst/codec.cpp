@@ -77,6 +77,17 @@ void VorbisEncoder::init()
 {
     assert(codec_ = gst_element_factory_make("vorbisenc", NULL));
     pipeline_.add(codec_);
+    assert(aconv_ = gst_element_factory_make("audioconvert", NULL));
+    pipeline_.add(aconv_);
+
+    GstLinkable::link(aconv_, codec_);
+}
+
+
+VorbisEncoder::~VorbisEncoder()
+{
+    stop();
+    pipeline_.remove(&aconv_);
 }
 
 
