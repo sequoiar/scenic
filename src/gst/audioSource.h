@@ -126,12 +126,15 @@ class AudioFileSource
 
 };
 
+// FIXME: create ABC FilteredAudioSource for alsa and pulse
+
 class AudioAlsaSource
     : public AudioSource
 {
     public:
         explicit AudioAlsaSource(const AudioConfig &config)
             : AudioSource(config), capsFilter_(0) {}
+        ~AudioAlsaSource();
         void sub_init();
         GstElement *srcElement() { return capsFilter_; }
     private:
@@ -139,6 +142,23 @@ class AudioAlsaSource
         GstElement *capsFilter_;
         AudioAlsaSource(const AudioAlsaSource&);     //No Copy Constructor
         AudioAlsaSource& operator=(const AudioAlsaSource&);     //No Assignment Operator
+};
+
+
+class AudioPulseSource
+    : public AudioSource
+{
+    public:
+        explicit AudioPulseSource(const AudioConfig &config)
+            : AudioSource(config), capsFilter_(0) {}
+        ~AudioPulseSource();
+        void sub_init();
+        GstElement *srcElement() { return capsFilter_; }
+    private:
+        void link_elements();
+        GstElement *capsFilter_;
+        AudioPulseSource(const AudioPulseSource&);     //No Copy Constructor
+        AudioPulseSource& operator=(const AudioPulseSource&);     //No Assignment Operator
 };
 
 

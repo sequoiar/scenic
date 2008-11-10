@@ -264,6 +264,14 @@ AudioFileSource::~AudioFileSource()
     pipeline_.remove(decoders_);
 }
 
+
+AudioAlsaSource::~AudioAlsaSource()
+{
+    stop();
+    pipeline_.remove(&capsFilter_);
+}
+
+
 void AudioAlsaSource::sub_init()
 {
     if (Jack::is_running())
@@ -288,6 +296,35 @@ void AudioAlsaSource::link_elements()
     GstLinkable::link(sources_, aconvs_);
     GstLinkable::link(aconvs_[0], capsFilter_);
 }
+
+
+AudioPulseSource::~AudioPulseSource()
+{
+    stop();
+    pipeline_.remove(&capsFilter_);
+}
+
+
+void AudioPulseSource::sub_init()
+{
+    std::ostringstream capsStr;
+    capsStr << "audio/x-raw-int, channels=" << config_.numChannels();
+         
+    GstCaps *pulseCaps = gst_caps_from_string(capsStr.str().c_str());
+    capsFilter_ = gst_element_factory_make("capsfilter", NULL);
+    assert(capsFilter_);
+    g_object_set(G_OBJECT(capsFilter_), "caps", pulseCaps, NULL);
+    pipeline_.add(capsFilter_);
+    gst_caps_unref(pulseCaps);
+}
+
+
+void AudioPulseSource::link_elements()
+{
+    GstLinkable::link(sources_, aconvs_);
+    GstLinkable::link(aconvs_[0], capsFilter_);
+}
+
 
 
 void AudioJackSource::sub_init()
