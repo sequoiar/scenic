@@ -32,9 +32,9 @@ class RtpAudioTestSuite
         {
             testLength_ = 3000000;
             
-            TEST_ADD(RtpAudioTestSuite::start_8ch_alsa)
-            TEST_ADD(RtpAudioTestSuite::stop_8ch_alsa)
-            TEST_ADD(RtpAudioTestSuite::start_stop_8ch_alsa)
+            TEST_ADD(RtpAudioTestSuite::start_6ch_alsa)
+            TEST_ADD(RtpAudioTestSuite::stop_6ch_alsa)
+            TEST_ADD(RtpAudioTestSuite::start_stop_6ch_alsa)
             
             TEST_ADD(RtpAudioTestSuite::start_8ch_jack)
             TEST_ADD(RtpAudioTestSuite::stop_8ch_jack)
@@ -90,9 +90,9 @@ class RtpAudioTestSuite
         void stop_8ch_jack();
         void start_stop_8ch_jack();
         
-        void start_8ch_alsa();
-        void stop_8ch_alsa();
-        void start_stop_8ch_alsa();
+        void start_6ch_alsa();
+        void stop_6ch_alsa();
+        void start_stop_6ch_alsa();
 
         void start_audio_dv();
         void stop_audio_dv();

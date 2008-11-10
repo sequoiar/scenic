@@ -234,9 +234,9 @@ void RtpAudioTestSuite::start_stop_8ch_audiotest()
 }
 
 
-void RtpAudioTestSuite::start_8ch_alsa()
+void RtpAudioTestSuite::start_6ch_alsa()
 {
-    const int NUM_CHANNELS_ = 8;
+    const int NUM_CHANNELS_ = 6;
 
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver("alsasink"));
@@ -260,9 +260,9 @@ void RtpAudioTestSuite::start_8ch_alsa()
 }
 
 
-void RtpAudioTestSuite::stop_8ch_alsa()
+void RtpAudioTestSuite::stop_6ch_alsa()
 {
-    const int NUM_CHANNELS_ = 8;
+    const int NUM_CHANNELS_ = 6;
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver("alsasink"));
 
@@ -283,9 +283,9 @@ void RtpAudioTestSuite::stop_8ch_alsa()
 }
 
 
-void RtpAudioTestSuite::start_stop_8ch_alsa()
+void RtpAudioTestSuite::start_stop_6ch_alsa()
 {
-    const int NUM_CHANNELS_ = 8;
+    const int NUM_CHANNELS_ = 6;
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver("alsasink"));
 
