@@ -24,6 +24,7 @@
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
+#include <GL/glu.h>
 
 #include "gstLinkable.h"
 #include "videoSink.h"
@@ -408,6 +409,4 @@ void GLImageSink::init()
     g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
     g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
 }
-
-#endif
 
