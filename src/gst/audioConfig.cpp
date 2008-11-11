@@ -65,6 +65,8 @@ AudioSource* AudioConfig::createSource() const
         return new AudioJackSource(*this);
     else if (source_ == "dv1394src")
         return new AudioDvSource(*this);
+    else if (source_ == "pulsesrc")
+        return new AudioPulseSource(*this);
     else 
         THROW_ERROR(source_ << " is an invalid source");
     return 0;
@@ -75,6 +77,8 @@ AudioSink* AudioConfig::createSink() const
 {
     if (source_ == "alsasrc")
         return new AudioAlsaSink();
+    else if (source_ == "pulsesrc")
+        return new AudioPulseSink();
     else if ((!source_.empty()) && 
             (source_ != "jackaudiosrc") && 
             (source_ != "dv1394src") && 
@@ -117,6 +121,8 @@ AudioSink* AudioReceiverConfig::createSink() const
         return new AudioJackSink();
     else if (sink_ == "alsasink")
         return new AudioAlsaSink();
+    else if (sink_ == "pulsesink")
+        return new AudioPulseSink();
     else if (sink_.empty()) 
     {
         LOG_WARNING("No sink specified, using default jackaudiosink");

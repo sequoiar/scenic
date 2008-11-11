@@ -57,6 +57,21 @@ class AudioAlsaSink
 };
 
 
+class AudioPulseSink
+: public AudioSink
+{
+    public:
+        AudioPulseSink() : audioconvert_(0) {};
+        ~AudioPulseSink();
+        void init();
+    private:
+        _GstElement *sinkElement() { return audioconvert_; }
+        _GstElement *audioconvert_;
+        AudioPulseSink(const AudioPulseSink&);     //No Copy Constructor
+        AudioPulseSink& operator=(const AudioPulseSink&);     //No Assignment Operator
+};
+
+
 class AudioJackSink
 : public AudioSink
 {

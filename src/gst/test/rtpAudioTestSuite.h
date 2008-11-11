@@ -31,6 +31,10 @@ class RtpAudioTestSuite
         RtpAudioTestSuite()
         {
             testLength_ = 3000000;
+
+            TEST_ADD(RtpAudioTestSuite::start_6ch_pulse)
+            TEST_ADD(RtpAudioTestSuite::stop_6ch_pulse)
+            TEST_ADD(RtpAudioTestSuite::start_stop_6ch_pulse)
             
             TEST_ADD(RtpAudioTestSuite::start_6ch_alsa)
             TEST_ADD(RtpAudioTestSuite::stop_6ch_alsa)
@@ -93,6 +97,10 @@ class RtpAudioTestSuite
         void start_6ch_alsa();
         void stop_6ch_alsa();
         void start_stop_6ch_alsa();
+
+        void start_6ch_pulse();
+        void stop_6ch_pulse();
+        void start_stop_6ch_pulse();
 
         void start_audio_dv();
         void stop_audio_dv();

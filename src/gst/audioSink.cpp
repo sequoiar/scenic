@@ -80,3 +80,21 @@ void AudioAlsaSink::init()
 }
 
 
+AudioPulseSink::~AudioPulseSink()
+{
+    stop();
+    pipeline_.remove(&audioconvert_);
+}
+
+void AudioPulseSink::init()
+{
+    assert(audioconvert_ = gst_element_factory_make("audioconvert", NULL));
+    pipeline_.add(audioconvert_);
+
+    assert(sink_ = gst_element_factory_make("pulsesink", NULL));
+    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    pipeline_.add(sink_);
+
+    GstLinkable::link(audioconvert_, sink_);
+}
+
