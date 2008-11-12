@@ -20,276 +20,332 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 from twisted.trial import unittest
-import sys
-import random
 import os
+import shutil
+import copy
 
-from addressbook import AddressBook
+import addressbook
+from addressbook import AddressBook, Contact, ip_range
+from errors import AddressBookError
+from utils.i18n import to_utf
+import utils.log
 
+ALPHABET = 'abcdefghijklmnopqrstuvwxyz_@ ABCDEFÙ1234\'2345-678"9."0!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ~'
+UALPHABET = u'2abcdefghijklmnopqrstuvwxyz_@ ABCDEFÙ1234\'2345-678"9."0!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ~'
 
-def generateString(sauf = ''):
-    alphabet = 'abcdefghijklmnopqrstuvwxyz_@12345-6789.0!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ~'
-    pbchar = '/"\'`¬µ‹≈©◊≠÷'
-    problem_with_those_char = '&â†°'
-    string=''
-    for x in range(len(alphabet)):
-        if ( not alphabet[x] in sauf):
-            string+=alphabet[x]
-    return string
+del addressbook.log
+addressbook.log = utils.log.start('error', 1, 0, 'adb')
 
-
-def generateEncoding(string):
-    stringEncoded = []
-    stringEncoded.append(string)
-    encodingType = ['latin-1', 'ascii', 'utf8']
-    #encType = random.choice(encodingType)
-    a = unicode(string,'iso-8859-1')
-    for i in range(len(encodingType)):
-        string = a.encode(encodingType[i], 'replace' )
-        stringEncoded.append(string)
-    return stringEncoded
-
-
-def generateAddress():
-    addressList = []
-    #ip address
-    ip = ''
-    for i in range(3):
-        ip += '255.'
-    ip += '255'
-    addressList.append(ip)
-    
-    #sip name
-    domain = generateString('@_-!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ°~')
-    domain += '@'
-    domain += generateString('@_-!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ°~')
-    domain += '.com'
-    addressList.append(domain)
-    
-    #SIP ip
-    sip = 'sip:'
-    sip = generateString('@_.-!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ°~')
-    sip += '@'
-    sip += '255.255.255.255'
-    addressList.append(sip)   
-
-    #multicast 
-    multicast = '224.255.255.255'
-    addressList.append(multicast)
-    
-    return addressList
-
-def generateBadFormatAddress():
-    addressList = []
-    #ip address
-    ip = ''
-    for i in range(3):
-        ip += '300.'
-    ip += '2555'
-    addressList.append(ip)
-    #domain address
-    domain = 'http://'
-    domain += generateString('€£éèêëà§çπ‡Ò∂ƒﬁ~')
-    addressList.append(domain)
-    #SIP Address
-    sip = generateString('€£éèêëà§çπ‡Ò∂ƒﬁ~')
-    addressList.append(sip)  
-    return addressList
 
             
-class TestAddressBook(unittest.TestCase):
+class Test_1_Ip_range(unittest.TestCase):
     
-    def setUp(self):
-        self.contactList = []
-        #entre parenthèse les char interdit pour adb name
-        name = generateString('€£éèêëà§çπ‡Ò∂ƒﬁ~')
-        encodedName = generateEncoding(name)
-        self.name = name
-        #test des diff type d'encodage
-        for i in range(len(encodedName)):
-            self.adb = AddressBook(encodedName[i])
-               
-    def tearDown(self):
-        del self.adb
-        del self.contactList
-        #delete test files
-        os.remove(os.environ['HOME'] + '/.' + str(self.name) + '/' + str(self.name) + '.adb')
-        os.rmdir(os.environ['HOME'] + '/.' +str(self.name))
+    def test_ip_range(self):
+        addresses = {'123.123.123.123':True,
+                     u'123.123.123.123':True,
+                     '423.123.123.123':False,
+                     '123.123.0.123':True,
+                     '123.-1.123.123':False
+                     }
+    
+        for address, result in addresses.items():
+            try:
+                test_result = ip_range(address)
+            except AddressBookError:
+                test_result = False
+            self.assertEqual(test_result, result,
+                             'Problem testing IP range for this address: %s. (%s, %s)' % (address, result, test_result))
         
-    def test_add(self):
-        #generate contact name
-        ncontact = generateString('%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ°~-_')
-        contact = generateEncoding(ncontact)     
-         
-        #testing bad address format
-        addressList = generateBadFormatAddress()
-        for i in range(len(contact)):        
-            for j in range(len(addressList)):
-                res = self.adb.add(contact[i], addressList[j])
-                assert ( res == False ) , self.fail(str(j) + " " + str(contact[i]) + " "+ str(addressList[j])+ 'Problem , can add bad address format contact')
+  
+class Test_2_Contact(unittest.TestCase):
+    
+    def test_1_name(self):
+        names = {'':False,
+                 'a':True,
+                 ' ':True,
+                 'Etienne':True,
+                 ALPHABET:True,
+                 u'Etienne':True,
+                 UALPHABET:True
+                 }
         
-
-        print "test good address"
-        #testing good address format
-        del addressList
-        addressList = generateAddress()
-        for i in range(len(contact)):
-            self.contactList.append(contact[i])
-            for j in range(len(addressList)):
-                
-                res = self.adb.add(contact[i], addressList[j])
-                assert(res == True), self.fail('problem adding good formating contact') 
-                
-                res = self.adb.remove(contact[i])
-                assert(res == True), self.fail('problem removing existing contact') 
-
-    def test_modify(self):
-        #on ajoute les contact a modifier
-        name = generateString('€£éèêëà§çπ‡Ò∂ƒﬁ~')
-        ad = generateAddress()
-        res = self.adb.add(name, ad[0])
-        assert(res == True), self.fail('problem adding good formating contact') 
-
-        #nouveau contact
-        ncontact = generateString('€£éèêëà§çπ‡Ò∂ƒﬁ~')
-        ncontactEncoded = generateEncoding(ncontact)
-        actContact = name
-        adList = generateAddress()
-        #on test la modif sur tout les types d'encodages
-        for j in range(len(adList)):
-            #testing select over modify
-            res = self.adb.select(actContact)
-            assert(res == True), self.fail('Problem selecting a contact')
-            
-            #testing get current over modify
-            curr = self.adb.get_current()
-            assert(curr != None), self.fail('Problem getting current contact')
-                       
-            res = self.adb.modify(actContact, actContact, adList[j])
-            assert ( res == True), self.fail('Problem modifying a contact')
-            
-            curr2 = self.adb.get_current()
-            assert ( res != None), self.fail('Problem getting current contact')
-            
-            #on test que le pointeur select ne soit pas modifier par la modif du contact
-            assert (curr != curr2), self.fail('probleme get current is on the oldest instance of the contact')
-
- 
-    def test_select(self):
-        #on ajoute les contact a select
-        name = generateString('£éèêëà§çπ‡Ò∂ƒﬁ~')
-        ad = generateAddress()
-        self.contactList.append(name)
-        res = self.adb.add(name, ad[0])
-        assert(res == True), self.fail('problem adding good formating contact') 
-                
-        for i in range(len(self.contactList)+1):
-            if i < len(self.contactList) :
-                a = self.adb.select(self.contactList[i])
-                assert(a == True), self.fail('problem select , can\'t found element with select .')
+        for name, result in names.items():
+            try:
+                contact = Contact(name, []) # put a list as address to be sure to validate in set_kind
+                if contact:
+                    test_result = True
+            except AddressBookError:
+                test_result = False
             else:
-                name = generateString()
-                nameEncoded = generateEncoding(name)
-                for i in range(len(nameEncoded)):
-                    a = self.adb.select(nameEncoded[i])
-                    assert(a == False), self.fail('problem de select , find a non existing element .')   
-   
-   
-    def test_remove(self):
-        #on ajoute les contact a modifier
-        name = generateString()
-        ad = generateAddress()
-        self.contactList.append(name)
-        res = self.adb.add(name, ad[0])
-        assert(res == True), self.fail('problem adding good formating contact') 
-        
-        for i in range(len(self.contactList) + 1):
-            if i < len(self.contactList) :
-                a = self.adb.remove(self.contactList[i])
-                assert(a == True), self.fail('can\'t locate the element in order to delete it.')
-            else:
-                name = generateString()
-                nameEncoded = generateEncoding(name)
-                for i in range(len(nameEncoded)):
-                    res = self.adb.remove(nameEncoded[i])
-                    assert(res == False), self.fail('removing non existing element') 
-  
-    def test_get_current(self):
-        #on ajoute les contact a getter
-        name = generateString()
-        ad = generateAddress()
-        self.contactList.append(name)
-        res = self.adb.add(name, ad[0])
-        assert(res == True), self.fail('problem adding good formating contact') 
-        
-        for i in range(len(self.contactList)):
-            actContact = self.contactList[i]
-            
-            res = self.adb.select(actContact)
-            assert(res == True), self.fail('Problem selecting contact')
-            
-            res = self.adb.get_current()
-            assert(res != None), self.fail('Problem getting current contact')
-    
-    def test_read(self):
-        #on ajoute un contact au moins 
-        name = generateString()
-        ad = generateAddress()
-        self.contactList.append(name)
-        res = self.adb.add(name, ad[0])
-        assert(res == True), self.fail('problem adding good formating contact') 
-        
-        self.adb.read()
-        
-    def test_write(self):
-        #on ajoute un contact au moins 
-        name = generateString()
-        ad = generateAddress()
-        self.contactList.append(name)
-        res = self.adb.add(name, ad[0])
-        assert(res == True), self.fail('problem adding good formating contact') 
-        
-        self.adb.write()
-  
-from addressbook import Contact
-  
-class TestContact(unittest.TestCase):
-    
-    def setUp(self):
-        ad = generateAddress()
-        self.contact = Contact(generateString(), ad[0])
-   
-        
-    def tearDown(self):
-        del self.contact 
-   
-   
-    def test_contact(self):
-        ad = generateAddress()
-        Contact(generateString(), ad[0])      
-        
+                self.assertEqual(contact.name, name, 'In and out name doesn\'t match: %s -> %s.' % (name, contact.name))
+                del contact
 
-    def test_kind(self):
-        ad = generateAddress()
+            self.assertEqual(test_result, result, 'Problem validating name: %s. (%s, %s)' % (name, test_result, result))
+            
+    def test_2_kind_address(self):
+        addresses = (('', False),
+                     ('240.123.123.123', True, 'ip'),
+                     ('23.123.45.222', True, 'ip'),
+                     ('23.423.45.222', False),
+                     ('233.123.45.222', True, 'multicast'),
+                     ([], True, 'group'),
+                     ('345@23.123.45.222', True, 'sip_ip'),
+                     ('gros toto@23.123.45.222', False),
+                     ('etienne@23.123.45.222', True, 'sip_ip'),
+                     ('George@amuse.toi.com', True, 'sip_name'),
+                     ('Éloi@23.123.45.222', False),
+                     (u'Étienne@23.123.45.222', False),
+                     (u'23.123.45.222', True, 'ip'),
+                     (u'Jean@23.123.45.222', True, 'sip_ip')
+                     )
         
-        self.contact.address = ad[0]
-        res = self.contact.kind()
-        assert(res == 'ip'), self.fail('problem detecting good format ip address')
+        for address in addresses:
+            try:
+                contact = Contact('a', address[0])
+                if contact:
+                    test_result = True
+            except AddressBookError:
+                test_result = False
+            else:
+                self.assertEqual(contact.kind, address[2], 'Bad kind for this address: %s. (%s, %s)' % (address[0], contact.kind, address[2]))
+                self.assertEqual(contact.address, address[0], 'In and out not matching for this address: %s -> %s.' % (address[0], contact.kind))
+                del contact
+                
+            self.assertEqual(test_result, address[1], 'Problem validating address: %s. (%s, %s)' % (address[0], test_result, address[1]))
+                    
+    def test_3_port(self):
+        ports = (('', True),
+                 (0, True),
+                 ('0', True),
+                 (u'0', True),
+                 ('2000', True),
+                 (u'3466', True),
+                 (44575, True),
+                 ('1000', False),
+                 (u'1', False),
+                 (- 3, False),
+                 ('200000', False),
+                 (u'65536', False),
+                 (445750, False),
+                 ([23532], False),
+                 ('2test5', False),
+                 (u'34ten5', False)
+                 )
         
-        self.contact.address = ad[1]
-        res = self.contact.kind()
-        assert(res == 'sip_name'), self.fail('problem detecting good format sip name')
+        for port in ports:
+            try:
+                contact = Contact('ab', [], port[0]) # put a list as address to be sure to validate in set_kind
+                if contact:
+                    test_result = True
+            except AddressBookError:
+                test_result = False
+            else:
+                if port[0] in ('', 0, '0'):
+                    self.assertEqual(contact.port, None, 'contact.port should be None. Get: %s.' % contact.port)
+                else:
+                    self.assertEqual(contact.port, int(port[0]), 'In and out port doesn\'t match: %s -> %s.' % (port[0], contact.port))
+                del contact
+
+            self.assertEqual(test_result, port[1], 'Problem validating port: %s. (%s, %s)' % (port[0], test_result, port[1]))
+   
+    def test_4_connector(self):
+        # with contact.connector set to None
+        connectors = (('test', [], 'test'),
+                     (None, [], None),
+                     (None, '123.123.123.13', 'basic'),
+                     (None, 'john@123.123.123.123', 'sip'),
+                     (None, 'best@vroumm.org', 'sip'),
+                     (None, '230.23.23.23', 'basic')
+                     )
         
-        self.contact.address = ad[2]
-        res = self.contact.kind()
-        assert(res == 'sip_ip'), self.fail('problem detecting good format sip ip')
+        for connector in connectors:
+            contact = Contact('ab', connector[1], connector=connector[0]) # put a list as address to be sure to validate in set_kind
+            self.assertEqual(contact.connector, connector[2], 'In and out connector doesn\'t match: %s should give %s.' % (contact.connector, connector[2]))
+            del contact
+
+        # with contact.connector set to 'other'
+        connectors = (('test', [], 'test'),
+                     (None, [], 'other'),
+                     (None, '123.123.123.13', 'other'),
+                     (None, 'john@123.123.123.123', 'other'),
+                     (None, 'best@vroumm.org', 'other'),
+                     (None, '230.23.23.23', 'other')
+                     )
         
-        self.contact.address = ad[3]
-        res = self.contact.kind()
-        assert(res == 'multicast'), self.fail('problem detecting good format multicast ip')
-                                                
-    #rapport :
-    #problem d'encodage utf8 pour le char 0xFF => levé l'erreur UnicodeDecodeError pour AdressBook.add
-    #problem d'encodage utf8 pour le char 0xFF => levé l'erreur UnicodeDecodeError pour AdressBook.__init__()
-    #Attention avec les différent type d'encodage
-    #list des char qui ne pass pas (0xXX or \xXX) : 88 ae 93 a9 82 ba 8f 8a a0 80 8c b9 94 92 a8 b4 a7 94
+        for connector in connectors:
+            contact = Contact('ab', connector[1], connector='other') # put a list as address to be sure to validate in set_kind
+            contact.assign_connector(connector[0])
+            self.assertEqual(contact.connector, connector[2], 'In and out connector doesn\'t match: %s should give %s.' % (contact.connector, connector[2]))
+            del contact
+
+    def test_5_setting(self):
+        settings = {0:True,
+                   1:True,
+                   122:True,
+                   '123.123.0.123':False
+                   }
+    
+        for setting, result in settings.items():
+            try:
+                contact = Contact('ab', [], setting=setting) # put a list as address to be sure to validate in set_kind
+                if contact:
+                    test_result = True
+            except AddressBookError:
+                test_result = False
+            else:
+                self.assertEqual(contact.setting, setting, 'In and out not matching for this address: %s -> %s.' % (setting, contact.setting))
+                del contact
+                
+            self.assertEqual(test_result, result, 'Problem validating address: %s. (%s, %s)' % (setting, test_result, result))
+            
+
+class Test_3_AddressBook(unittest.TestCase):
+    
+    filenames = {'':False,
+                  u'':False,
+                  'a':True,
+                  u'b':True,
+                  ' c':True,
+                  u' d':True,
+                  ALPHABET:True,
+                  UALPHABET:True
+                  }
+    
+    base_file = 'test'
+
+    def setUp(self):
+        self.orig_home = os.environ['HOME']
+        os.environ['HOME'] = '/var/tmp'
+
+    def tearDown(self):
+        for filename in self.filenames:
+            strip_filename = filename.lstrip()
+            if strip_filename:
+                shutil.rmtree(os.environ['HOME'] + '/.' + strip_filename, True)
+        shutil.rmtree(os.environ['HOME'] + '/.' + self.base_file, True)
+        os.environ['HOME'] = self.orig_home        
+        
+    def test_1_init(self):
+        for filename, result in self.filenames.items():
+            strip_filename = filename.lstrip()
+            try:
+                adb = AddressBook(filename)
+                if adb:
+                    test_result = True
+            except AddressBookError:
+                test_result = False
+            else:
+                adb_filename = to_utf(os.environ['HOME'] + '/.' + strip_filename + '/' + strip_filename + '.adb')
+                self.assertEqual(adb.filename, adb_filename, 'In and out filename not matching: %s -> %s' % (adb_filename, adb.filename))
+                del adb
+            
+            self.assertEqual(result, test_result, 'Problem validating AddressBook creation. <%s> %s:%s' % (filename, result, test_result))
+
+    def test_2_read_write_add(self):
+        for filename, result in self.filenames.items():
+            try:
+                adb = AddressBook(filename)
+            except AddressBookError:
+                pass
+            else:
+                result = adb.add('Jean', []) # Should add at least one contact to write the file. Very simple contact.
+                if result:
+                    in_adb = copy.copy(adb.contacts)
+                    adb.read()
+                    self.assertEqual(in_adb.keys(), adb.contacts.keys(), 'In and out contacts list not matching: %s -> %s' % (in_adb.keys(), adb.contacts.keys()))
+                    for contact in adb.contacts.keys():
+                        if isinstance(in_adb[contact], Contact):
+                            self.assertEqual(in_adb[contact].__dict__, adb.contacts[contact].__dict__, 'In and out contacts list not matching: %s -> %s' % (in_adb, adb.contacts))
+                    
+                    self.assertRaises(AddressBookError, adb.add, 'Jean', [])
+                del adb
+                        
+    def test_3_select(self):
+        try:
+            adb = AddressBook(self.base_file)
+            adb.add('Jules', [])
+        except AddressBookError:
+            pass
+        else:
+            self.assertRaises(AddressBookError, adb.select, 'Marion')
+            adb.select('Jules')
+            self.assertEqual(adb.contacts['_selected'], 'Jules', 'Selection of contact did not work: selected \'Jules\' got %s' % adb.contacts['_selected'])
+            
+    def test_4_get_current(self):
+        try:
+            adb = AddressBook(self.base_file)
+            adb.add('Jules', [])
+        except AddressBookError:
+            pass
+        else:
+            self.assertEqual(adb.get_current(), None, 'Selected contact should be None, got %s' % adb.get_current())
+            adb.select('Jules')
+            self.assertEqual(adb.get_current(), adb.contacts['Jules'], 'Selected contact should be \'Jules\', got %s' % adb.get_current())
+            
+    def test_5_delete(self):
+        try:
+            adb = AddressBook(self.base_file)
+            adb.add('Jules', [])
+            adb.select('Jules')
+            adb.add('Guenièvre Temps-Dur', [])
+        except AddressBookError:
+            pass
+        else:
+            self.assertRaises(AddressBookError, adb.delete, 'Vlimeux')
+            adb.delete('Jules')
+            self.assertNotIn('Jules', adb.contacts)
+            self.assertEqual(adb.contacts['_selected'], None, 'After removing the selected contact, selected should be None, got %s' % adb.contacts['_selected'])
+            self.assertRaises(AddressBookError, adb.delete)
+            adb.select('Guenièvre Temps-Dur')
+            adb.delete()          
+            self.assertNotIn('Guenièvre Temps-Dur', adb.contacts)
+            self.assertEqual(adb.contacts['_selected'], None, 'After removing the selected contact, selected should be None, got %s' % adb.contacts['_selected'])
+            
+    def test_6_duplicate(self):
+        try:
+            adb = AddressBook(self.base_file)
+            adb.add('Jules', [])
+            adb.add('Guenièvre Temps-Dur', [])
+        except AddressBookError:
+            pass
+        else:
+            self.assertRaises(AddressBookError, adb.duplicate)
+            adb.select('Jules')
+            adb.duplicate()
+            self.assertIn('Jules' + adb.dup_suffix, adb.contacts)
+            self.assertRaises(AddressBookError, adb.duplicate, 'Vlimeux')
+            adb.duplicate('Guenièvre Temps-Dur')
+            self.assertIn(to_utf('Guenièvre Temps-Dur') + adb.dup_suffix, adb.contacts)
+            
+            adb.duplicate(new_name='dup_test')
+            self.assertIn('dup_test', adb.contacts)
+            self.assertRaises(AddressBookError, adb.duplicate, new_name='Jules')
+        
+    def test_7_modify(self):
+        try:
+            adb = AddressBook(self.base_file)
+            adb.add('Jules', [])
+            adb.add('Guenièvre Temps-Dur', [])
+        except AddressBookError:
+            pass
+        else:
+            self.assertRaises(AddressBookError, adb.modify)
+            adb.select('Jules')
+            orig_contact = copy.copy(adb.get_current())
+            adb.modify()
+            self.assertEqual(orig_contact.__dict__, adb.get_current().__dict__, 'The contact is not supposed to be modify but it is.')
+            adb.modify('Jules')
+            self.assertEqual(orig_contact.__dict__, adb.get_current().__dict__, 'The contact is not supposed to be modify but it is.')
+            self.assertRaises(AddressBookError, adb.modify, 'Guenièvre Temps-Dur', 'Jules')
+            orig_contact = adb.contacts[u'Guenièvre Temps-Dur']
+            adb.modify('Guenièvre Temps-Dur', 'Blouarp Mégadef')
+            self.assertIdentical(orig_contact, adb.contacts[u'Blouarp Mégadef'], 'The contact object is supposed to be same before and after a modify. It is not.')
+            adb.modify('Blouarp Mégadef', address='123.123.123.123', port=1234)
+            contact = adb.contacts[u'Blouarp Mégadef']
+            self.assertEqual(contact.address, '123.123.123.123', 'Address was not change properly in the contact. %s -> %s' % ('123.123.123.123', contact.address))
+            self.assertEqual(contact.port, 1234, 'Port was not change properly in the contact. %s -> %s' % (1234, contact.port))
+            adb.modify('Blouarp Mégadef', 'Mulfist', address='simon@atom.zong.org', port='1234')
+            contact = adb.contacts['Mulfist']
+            self.assertEqual(contact.address, 'simon@atom.zong.org', 'Address was not change properly in the contact. %s -> %s' % ('simon@atom.zong.org', contact.address))
+            self.assertEqual(contact.port, 1234, 'Port was not change properly in the contact. %s -> %s' % (1234, contact.port))
+       

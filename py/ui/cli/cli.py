@@ -136,8 +136,9 @@ class CliController(TelnetServer):
         cp = CliParser(self, prog=data[0], description="Manage the address book.")
         cp.add_option("-l", "--list", action='store_true', help="List all the contacts")
         cp.add_option("-a", "--add", type="string", help="Add a contact")
-        cp.add_option("-e", "--erase", "-d", "--delete", type="string", help="Erase a contact")
-        cp.add_option("-m", "--modify", type="string", help="Modify a contact")
+        cp.add_option("-e", "--erase", "--remove", "--delete", action='store_true', help="Erase a contact")
+        cp.add_option("-m", "--modify", action="store_true", help="Modify a contact")
+        cp.add_option("-d", "--duplicate", action="store_true", help="Duplicate a contact")
         cp.add_option("-s", "--select", help="Select a contact")
         
         (options, args) = cp.parse_args(data)
@@ -153,16 +154,60 @@ class CliController(TelnetServer):
                 else:
                     self.write('The port is not valid.', True)
             else:
-                self.write('You need to give an address.', True)
+                self.write('You need to give at least a name and an address.', True)
         elif options.erase:
-            self.core.delete_contact(self, options.erase)
-        elif options.modify:
-            if len(args) == 3:
-                self.core.modify_contact(self, options.modify, args[1], args[2])
-            elif len(args) > 3:
-                self.core.modify_contact(self, options.modify, args[1], args[2], args[3])
+            if len(args) > 1:
+                self.core.delete_contact(self, args[1])
             else:
-                self.write('You need to give the current name, the new name and the address.', True)
+                self.core.delete_contact(self)
+        elif options.modify:
+            if len(args) > 1:
+                name = None
+                new_name = None
+                address = None
+                port = None
+                for i, arg in enumerate(args):
+                    if i > 0:
+                        if '=' in arg:
+                            key, sep, value = arg.partition('=')
+                            if key == 'name':
+                                name = value
+                            elif key == 'new_name':
+                                new_name = value
+                            elif key == 'address':
+                                address = value
+                            elif key == 'port':
+                                port = value
+                        elif new_name == None:
+                            new_name = arg
+                        elif address == None:
+                            address = arg
+                        elif port == None:
+                            port = arg
+                        elif name == None:
+                            name = arg
+                            
+                self.core.modify_contact(self, name, new_name ,address, port)
+            else:
+                self.write('You need to give at least one argument.', True)
+        elif options.duplicate:
+            name = None
+            new_name = None
+            for i, arg in enumerate(args):
+                if i > 0:
+                    if '=' in arg:
+                        key, sep, value = arg.partition('=')
+                        if key == 'name':
+                            name = value
+                        elif key == 'new_name':
+                            new_name = value
+                    elif new_name == None:
+                        new_name = arg
+                    elif name == None:
+                        name = arg
+                        
+            self.core.duplicate_contact(self, name, new_name)
+            
         elif options.select:
             self.core.select_contact(self, options.select)
         else:
@@ -501,10 +546,11 @@ class CliView(Observer):
     def _get_contacts(self, origin, data):
         if origin is self.controller:
             msg = []
-            for contact in data:
-                if contact != '_selected':
-                    contact = data[contact]
-                    if contact.name == data['_selected']:
+            contacts = data.items()
+            contacts.sort()
+            for name, contact in contacts:
+                if name != '_selected':
+                    if name == data['_selected']:
                         msg.append(bold(contact.name + ": <---"))
                     else:  
                         msg.append(contact.name + ":")  
@@ -516,31 +562,38 @@ class CliView(Observer):
             
     def _add_contact(self, origin, data):
         if origin is self.controller:
-            if data:
-                self.write('Contact added')
+            if isinstance(data, Exception):
+                self.write('Could not add contact.\nReason: %s.' % data)
             else:
-                self.write('Could not add contact because this name is already taken.')
+                self.write('Contact added')
 
     def _delete_contact(self, origin, data):
         if origin is self.controller:
-            if data:
-                self.write('Contact deleted')
+            if isinstance(data, Exception):
+                self.write('Could not delete contact.\nReason: %s' % data)
             else:
-                self.write('Could not delete contact because this name doesn\'t exist.')
+                self.write('Contact deleted')
 
     def _modify_contact(self, origin, data):
         if origin is self.controller:
-            if data:
-                self.write('Contact modified')
+            if isinstance(data, Exception):
+                self.write('Could not modify this contact.\nReason: %s' % data)
             else:
-                self.write('Could not modify this contact because this name doesn\'t exist.')
+                self.write('Contact modified')
+
+    def _duplicate_contact(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not duplicate contact.\nReason: %s' % data)
+            else:
+                self.write('Contact duplicated')
 
     def _select_contact(self, origin, data):
         if origin is self.controller:
-            if data:
-                self.write('Contact selected')
+            if isinstance(data, Exception):
+                self.write('Could not select this contact.\nReason: %s' % data)
             else:
-                self.write('Could not select this contact because this name doesn\'t exist.')
+                self.write('Contact selected')
 
     def _audio_set(self, origin, ((state, attr, value), name)):
         if origin is self.controller:

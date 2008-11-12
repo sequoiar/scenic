@@ -21,6 +21,8 @@
 import sys
 
 # App imports
+from errors import * 
+
 
 class ControllerApi(object):
     
@@ -43,16 +45,39 @@ class ControllerApi(object):
         self.notify(caller, self.adb.contacts)
         
     def add_contact(self, caller, name, address, port=None):
-        self.notify(caller, self.adb.add(name, address, port))
+        try:
+            result = self.adb.add(name, address, port)
+        except AddressBookError, err:
+            result = err
+        self.notify(caller, result)
         
-    def delete_contact(self, caller, name):
-        self.notify(caller, self.adb.remove(name))
+    def delete_contact(self, caller, name=None):
+        try:
+            result = self.adb.delete(name)
+        except AddressBookError, err:
+            result = err
+        self.notify(caller, result)
         
-    def modify_contact(self, caller, name, new_name, address, port=None):
-        self.notify(caller, self.adb.modify(name, new_name, address, port))
+    def modify_contact(self, caller, name=None, new_name=None, address=None, port=None):
+        try:
+            result = self.adb.modify(name, new_name, address, port)
+        except AddressBookError, err:
+            result = err
+        self.notify(caller, result)
+        
+    def duplicate_contact(self, caller, name=None, new_name=None):
+        try:
+            result = self.adb.duplicate(name, new_name)
+        except AddressBookError, err:
+            result = err
+        self.notify(caller, result)
         
     def select_contact(self, caller, name):
-        self.notify(caller, self.adb.select(name))
+        try:
+            result = self.adb.select(name)
+        except AddressBookError, err:
+            result = err
+        self.notify(caller, result)
         
         
     ### Streams ###
