@@ -28,33 +28,15 @@
 #include "audioSource.h"
 #include "audioSink.h"
 #include "logWriter.h"
-//#include "audioDelaySource.h"
 
-// strips .delay from source name
 const char *AudioConfig::source() const
 {
-    // find last period
-    unsigned int pos = source_.rfind(".");
-
-    if (pos < source_.size())
-        return source_.substr(0, pos).c_str();
-    else
         return source_.c_str();
 }
 
 
 AudioSource* AudioConfig::createSource() const
 {
-#if 0
-    if (source_ == "audiotestsrc.delay")
-        return new AudioDelaySource<AudioTestSource>(*this);
-    else if (source_ == "filesrc.delay")
-        return new AudioDelaySource<AudioFileSource>(*this);
-    else if (source_ == "alsasrc.delay")
-        return new AudioDelaySource<AudioAlsaSource>(*this);
-    else if (source_ == "jackaudiosrc.delay")
-        return new AudioDelaySource<AudioJackSource>(*this);
-#endif
     if (source_ == "audiotestsrc")
         return new AudioTestSource(*this);
     else if (source_ == "filesrc")
