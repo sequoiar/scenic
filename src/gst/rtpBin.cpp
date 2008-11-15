@@ -31,7 +31,7 @@
 
 
 GstElement *RtpBin::rtpbin_ = 0;
-int RtpBin::refCount_ = 0;
+unsigned int RtpBin::refCount_ = 0;
 
 
 void RtpBin::init()
@@ -40,13 +40,17 @@ void RtpBin::init()
     if (!rtpbin_) {
         rtpbin_ = gst_element_factory_make("gstrtpbin", NULL);
         assert(rtpbin_);
-        g_object_set(G_OBJECT(rtpbin_), "latency", 10, NULL); // has no visible impact
+        // g_object_set(G_OBJECT(rtpbin_), "latency", 10, NULL); // has no visible impact
+        // FIXME
+#if 0  
+        this is probably not useful
         // will send an event downstraem when a packet is lost
         GValue doLost;
         memset(&doLost, 0, sizeof(doLost));
         g_value_init(&doLost, G_TYPE_BOOLEAN);
         g_value_set_boolean(&doLost, TRUE);
         gst_child_proxy_set_property(GST_OBJECT(rtpbin_), "do-lost", &doLost);
+#endif
         pipeline_.add(rtpbin_);
     }
 }

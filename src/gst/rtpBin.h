@@ -41,7 +41,7 @@ class RtpBin
         static const char *padStr(const char *padName);
 
         static _GstElement *rtpbin_;
-        static int refCount_;
+        static unsigned int refCount_;
         _GstElement *rtcp_sender_, *rtcp_receiver_;
 
     private:
