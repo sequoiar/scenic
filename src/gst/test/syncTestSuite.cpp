@@ -33,6 +33,85 @@
 /* Unit tests                                   */
 /*----------------------------------------------*/ 
 
+void SyncTestSuite::start_jack_audio_dv_video()
+{
+    int numChannels = 2;
+
+    if (id_ == 1)
+        return;
+
+    AudioConfig aConfig("jackaudiosrc", numChannels);
+    AudioLocal aTx(aConfig);
+    aTx.init();
+
+    VideoConfig vConfig("dv1394src");
+    VideoLocal vTx(vConfig);
+    vTx.init();
+
+
+    aTx.start();
+    vTx.start();
+
+    BLOCK();
+    TEST_ASSERT(aTx.isPlaying());
+    TEST_ASSERT(vTx.isPlaying());
+}
+
+
+void SyncTestSuite::stop_jack_audio_dv_video()
+{
+    int numChannels = 2;
+
+    if (id_ == 1)
+        return;
+
+    AudioConfig aConfig("jackaudiosrc", numChannels);
+    AudioLocal aTx(aConfig);
+    aTx.init();
+
+    VideoConfig vConfig("dv1394src");
+    VideoLocal vTx(vConfig);
+    vTx.init();
+
+    BLOCK();
+
+    aTx.stop();
+    vTx.stop();
+
+    TEST_ASSERT(!aTx.isPlaying());
+    TEST_ASSERT(!vTx.isPlaying());
+}
+
+
+void SyncTestSuite::start_stop_jack_audio_dv_video()
+{
+    int numChannels = 2;
+
+    if (id_ == 1)
+        return;
+
+    AudioConfig aConfig("jackaudiosrc", numChannels);
+    AudioLocal aTx(aConfig);
+    aTx.init();
+
+    VideoConfig vConfig("dv1394src");
+    VideoLocal vTx(vConfig);
+    vTx.init();
+
+    aTx.start();
+    vTx.start();
+
+    BLOCK();
+
+    TEST_ASSERT(aTx.isPlaying());
+    TEST_ASSERT(vTx.isPlaying());
+
+    aTx.stop();
+    vTx.stop();
+
+    TEST_ASSERT(!aTx.isPlaying());
+    TEST_ASSERT(!vTx.isPlaying());
+}
 
 void SyncTestSuite::start_dv_audio_dv_video()
 {

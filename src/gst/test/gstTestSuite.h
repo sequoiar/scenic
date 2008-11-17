@@ -44,7 +44,7 @@ class GstTestSuite
     public:
 
         GstTestSuite()
-            : id_(0), testLength_(10000), audioFilename_("test_signal8.wav"), videoFilename_("/usr/share/example-content/Experience ubuntu.ogg")
+            : id_(0), testLength_(10000000), audioFilename_("test_signal8.wav"), videoFilename_("/usr/share/example-content/Experience ubuntu.ogg")
         {}
 
         void set_id(int id);
