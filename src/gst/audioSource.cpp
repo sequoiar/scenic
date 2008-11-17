@@ -61,7 +61,7 @@ AudioSource::~AudioSource()
 
 void AudioSource::link_elements()
 {
-    GstLinkable::link(sources_, aconvs_);
+    gstlinkable::link(sources_, aconvs_);
 }
 
 
@@ -97,8 +97,8 @@ void InterleavedAudioSource::init_source()
 
 void InterleavedAudioSource::link_elements()
 {
-    GstLinkable::link(sources_, aconvs_);
-    GstLinkable::link(aconvs_, interleave_);
+    gstlinkable::link(sources_, aconvs_);
+    gstlinkable::link(aconvs_, interleave_);
 }
 
 
@@ -247,14 +247,14 @@ void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
     }
     gst_caps_unref(caps);
 
-    assert(GstLinkable::link_pads(srcPad, sinkPad));
+    assert(gstlinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 
 
 void AudioFileSource::link_elements()
 {
-    GstLinkable::link(sources_, decoders_);
+    gstlinkable::link(sources_, decoders_);
 }
 
 
@@ -293,8 +293,8 @@ void AudioAlsaSource::sub_init()
 
 void AudioAlsaSource::link_elements()
 {
-    GstLinkable::link(sources_, aconvs_);
-    GstLinkable::link(aconvs_[0], capsFilter_);
+    gstlinkable::link(sources_, aconvs_);
+    gstlinkable::link(aconvs_[0], capsFilter_);
 }
 
 
@@ -321,8 +321,8 @@ void AudioPulseSource::sub_init()
 
 void AudioPulseSource::link_elements()
 {
-    GstLinkable::link(sources_, aconvs_);
-    GstLinkable::link(aconvs_[0], capsFilter_);
+    gstlinkable::link(sources_, aconvs_);
+    gstlinkable::link(aconvs_[0], capsFilter_);
 }
 
 
@@ -422,7 +422,7 @@ void AudioDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
         return;
     }
     LOG_DEBUG("AudioDvSource: linking new srcpad to sinkpad.");
-    assert(GstLinkable::link_pads(srcPad, sinkPad));
+    assert(gstlinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 
@@ -430,8 +430,8 @@ void AudioDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
 void AudioDvSource::link_elements()
 {
     if (dvIsNew_)
-        GstLinkable::link(sources_[0], demux_);
-    GstLinkable::link(queue_, aconvs_[0]);
+        gstlinkable::link(sources_[0], demux_);
+    gstlinkable::link(queue_, aconvs_[0]);
 }
 
 

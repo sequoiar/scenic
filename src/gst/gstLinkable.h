@@ -28,7 +28,7 @@ class GstLinkableSink;
 class _GstElement;
 class _GstPad;
 
-namespace GstLinkable
+namespace gstlinkable
 {
     bool link_pads(_GstPad *srcPad, _GstPad *sinkPad);
     void link(std::vector<_GstElement*> &sources, std::vector<_GstElement*> &sinks);

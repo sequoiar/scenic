@@ -54,7 +54,7 @@ void AudioSender::init_source()
 void AudioSender::init_level()
 {
     level_.init();
-    GstLinkable::link(*source_, level_);
+    gstlinkable::link(*source_, level_);
 }
 
 
@@ -63,7 +63,7 @@ void AudioSender::init_codec()
     assert(encoder_ = remoteConfig_.createEncoder());
     encoder_->init();
 
-    GstLinkable::link(level_, *encoder_);
+    gstlinkable::link(level_, *encoder_);
 }
 
 
@@ -72,7 +72,7 @@ void AudioSender::init_payloader()
     assert(payloader_ = encoder_->createPayloader());
     payloader_->init();
 
-    GstLinkable::link(*encoder_, *payloader_);
+    gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_, remoteConfig_);   // FIXME: session should take RtpPay pointer
 }
 

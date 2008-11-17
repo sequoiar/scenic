@@ -51,7 +51,7 @@ void VideoSender::init_codec()
 {
         assert(encoder_ = remoteConfig_.createEncoder());
         encoder_->init();
-        GstLinkable::link(*source_, *encoder_);// FIXME: this shouldn't happen for VideoFileSource
+        gstlinkable::link(*source_, *encoder_);// FIXME: this shouldn't happen for VideoFileSource
 }
 
 
@@ -59,7 +59,7 @@ void VideoSender::init_payloader()
 {
         assert(payloader_ = encoder_->createPayloader());
         payloader_->init();
-        GstLinkable::link(*encoder_, *payloader_);
+        gstlinkable::link(*encoder_, *payloader_);
         session_.add(payloader_, remoteConfig_);
 }
 

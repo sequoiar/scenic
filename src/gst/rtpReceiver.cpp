@@ -100,7 +100,7 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
         return;
     }
 
-    assert(GstLinkable::link_pads(srcPad, sinkPad));
+    assert(gstlinkable::link_pads(srcPad, sinkPad));
 
     gst_object_unref(sinkPad);
 }
@@ -167,9 +167,9 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     assert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
     assert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
 
-    assert(GstLinkable::link_pads(rtpReceiverSrc, recv_rtp_sink));
-    assert(GstLinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink));
-    assert(GstLinkable::link_pads(send_rtcp_src, rtcpSenderSink));
+    assert(gstlinkable::link_pads(rtpReceiverSrc, recv_rtp_sink));
+    assert(gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink));
+    assert(gstlinkable::link_pads(send_rtcp_src, rtcpSenderSink));
 
     usedDepayloaders_.push_back(depayloader_);
     // when pad is created, it must be linked to new sink

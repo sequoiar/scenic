@@ -144,7 +144,7 @@ void XImageSink::init()
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
     pipeline_.add(sink_);
 
-    GstLinkable::link(colorspc_, sink_);
+    gstlinkable::link(colorspc_, sink_);
 }
 
 

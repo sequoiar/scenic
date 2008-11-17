@@ -263,7 +263,7 @@ void GLImageSink::init()
     assert(sink_ = gst_element_factory_make("glimagesink", "videosink"));
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     pipeline_.add(sink_);
-    GstLinkable::link(glUpload_, sink_);
+    gstlinkable::link(glUpload_, sink_);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     assert(window_);

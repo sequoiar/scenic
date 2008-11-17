@@ -50,7 +50,7 @@ void VideoReceiver::init_depayloader()
     assert(depayloader_ = decoder_->createDepayloader());
     depayloader_->init();
 
-    GstLinkable::link(*depayloader_, *decoder_);
+    gstlinkable::link(*depayloader_, *decoder_);
 
     session_.add(depayloader_, remoteConfig_);
     session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,"
@@ -62,7 +62,7 @@ void VideoReceiver::init_sink()
 {
     assert(sink_ = videoConfig_.createSink());
     sink_->init();
-    GstLinkable::link(*decoder_, *sink_);
+    gstlinkable::link(*decoder_, *sink_);
 }
 
 

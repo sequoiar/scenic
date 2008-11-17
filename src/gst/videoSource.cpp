@@ -102,7 +102,7 @@ void VideoFileSource::sub_init()
 
     assert(config_.fileExists());
     g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
-    GstLinkable::link(source_, decoder_);
+    gstlinkable::link(source_, decoder_);
     
     // bind callback
     g_signal_connect(decoder_, "new-decoded-pad",
@@ -158,7 +158,7 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
     gst_caps_unref(caps);
 
     LOG_DEBUG("VideoFileSource: linking new srcpad and sinkpad.");
-    assert(GstLinkable::link_pads(srcPad, sinkPad));
+    assert(gstlinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 
@@ -219,8 +219,8 @@ void VideoDvSource::sub_init()
             static_cast<void *>(queue_));
 
     if (dvIsNew_)
-        GstLinkable::link(source_, demux_);
-    GstLinkable::link(queue_, dvdec_);
+        gstlinkable::link(source_, demux_);
+    gstlinkable::link(queue_, dvdec_);
 }
 
 
@@ -250,7 +250,7 @@ void VideoDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
         return;
     }
     LOG_DEBUG("VideoDvSource: linking new srcpad to sinkpad.");
-    assert(GstLinkable::link_pads(srcPad, sinkPad));
+    assert(gstlinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 

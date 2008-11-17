@@ -50,7 +50,7 @@ void H264Encoder::init()
                      NULL);
     pipeline_.add(codec_);
 
-    GstLinkable::link(colorspc_, codec_);
+    gstlinkable::link(colorspc_, codec_);
 }
 
 
@@ -80,7 +80,7 @@ void VorbisEncoder::init()
     assert(aconv_ = gst_element_factory_make("audioconvert", NULL));
     pipeline_.add(aconv_);
 
-    GstLinkable::link(aconv_, codec_);
+    gstlinkable::link(aconv_, codec_);
 }
 
 
@@ -156,7 +156,7 @@ void LameEncoder::init()
     assert(codec_ = gst_element_factory_make("lame", NULL));
     pipeline_.add(codec_);
 
-    GstLinkable::link(aconv_, codec_);
+    gstlinkable::link(aconv_, codec_);
 }
 
 
@@ -167,7 +167,7 @@ void MadDecoder::init()
     assert(aconv_ = gst_element_factory_make("audioconvert", NULL));
     pipeline_.add(aconv_);
 
-    GstLinkable::link(codec_, aconv_);
+    gstlinkable::link(codec_, aconv_);
 }
 
 

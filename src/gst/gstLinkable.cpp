@@ -24,7 +24,7 @@
 #include "gstLinkable.h"
 #include "logWriter.h"
 
-void GstLinkable::link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks)
+void gstlinkable::link(std::vector<GstElement*> &sources, std::vector<GstElement*> &sinks)
 {
     GstIter src;
     GstIter sink;
@@ -34,13 +34,13 @@ void GstLinkable::link(std::vector<GstElement*> &sources, std::vector<GstElement
 }
 
 
-void GstLinkable::link(GstElement *src, GstElement *sink)
+void gstlinkable::link(GstElement *src, GstElement *sink)
 {
     assert(gst_element_link(src, sink));
 }
 
 
-void GstLinkable::link(GstLinkableSource &src, GstElement *sink)
+void gstlinkable::link(GstLinkableSource &src, GstElement *sink)
 {
     GstElement *srcElement = src.srcElement();
     //FIXME: this is a hack to deal with leaf classes that don't implement srcElement
@@ -50,13 +50,13 @@ void GstLinkable::link(GstLinkableSource &src, GstElement *sink)
 }
 
 
-void GstLinkable::link(GstElement *src, GstLinkableSink &sink)
+void gstlinkable::link(GstElement *src, GstLinkableSink &sink)
 {
     assert(gst_element_link(src, sink.sinkElement()));
 }
 
 
-void GstLinkable::link(GstLinkableSource &src, GstLinkableSink &sink)
+void gstlinkable::link(GstLinkableSource &src, GstLinkableSink &sink)
 {
     GstElement *srcElement = src.srcElement();
     GstElement *sinkElement = sink.sinkElement();
@@ -68,7 +68,7 @@ void GstLinkable::link(GstLinkableSource &src, GstLinkableSink &sink)
 }
 
 
-void GstLinkable::link(std::vector<GstElement*> &sources, GstLinkableSink &sink)
+void gstlinkable::link(std::vector<GstElement*> &sources, GstLinkableSink &sink)
 {
     GstIter src;
     for (src = sources.begin(); src != sources.end(); ++src)
@@ -76,7 +76,7 @@ void GstLinkable::link(std::vector<GstElement*> &sources, GstLinkableSink &sink)
 }
 
 
-void GstLinkable::link(GstLinkableSource &src, std::vector<GstElement*> &sinks)
+void gstlinkable::link(GstLinkableSource &src, std::vector<GstElement*> &sinks)
 {
     GstIter sink;
     for (sink = sinks.begin(); sink != sinks.end(); ++sink)
@@ -86,7 +86,7 @@ void GstLinkable::link(GstLinkableSource &src, std::vector<GstElement*> &sinks)
 
 // with this method, we can find out why pads don't link
 // if they fail
-bool GstLinkable::link_pads(GstPad *srcPad, GstPad *sinkPad)
+bool gstlinkable::link_pads(GstPad *srcPad, GstPad *sinkPad)
 {
     bool linkOk = false;
 

@@ -48,7 +48,7 @@ void VideoLocal::init_sink()
 {
     assert(sink_ = config_.createSink());
     sink_->init();
-    GstLinkable::link(*source_, *sink_);   // FIXME: this shouldn't happen for VideoFileSource
+    gstlinkable::link(*source_, *sink_);   // FIXME: this shouldn't happen for VideoFileSource
 }
 
 

@@ -76,7 +76,7 @@ void AudioAlsaSink::init()
     g_object_set(G_OBJECT(sink_), "device", Alsa::DEVICE_NAME, NULL);
     pipeline_.add(sink_);
 
-    GstLinkable::link(audioconvert_, sink_);
+    gstlinkable::link(audioconvert_, sink_);
 }
 
 
@@ -95,6 +95,6 @@ void AudioPulseSink::init()
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     pipeline_.add(sink_);
 
-    GstLinkable::link(audioconvert_, sink_);
+    gstlinkable::link(audioconvert_, sink_);
 }
 
