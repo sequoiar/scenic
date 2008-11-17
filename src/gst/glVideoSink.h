@@ -23,9 +23,10 @@
 #include "gstLinkable.h"
 #include <GL/gl.h>
 #include "videoSink.h"
+#include "busMsgHandler.h"
 
 class GLImageSink
-: public VideoSink
+: public VideoSink, public BusMsgHandler
 {
     public:
         GLImageSink() : glUpload_(0){};
@@ -40,6 +41,8 @@ class GLImageSink
         static int mouse_wheel_cb(_GtkWidget *widget, _GdkEventScroll *event, void *data);
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
+
+        bool handleBusMsg(_GstMessage *msg);
 
         _GstElement *glUpload_;
         static const GLfloat STEP;

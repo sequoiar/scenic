@@ -36,6 +36,11 @@ void VideoSink::destroySink()
     pipeline_.remove(&sink_);
 }
 
+Window VideoSink::getXWindow()
+{ 
+    return GDK_WINDOW_XWINDOW(window_->window);
+}
+
 
 gboolean VideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
 {

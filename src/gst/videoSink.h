@@ -20,8 +20,8 @@
 #ifndef _VIDEO_SINK_H_
 #define _VIDEO_SINK_H_
 
+#include <X11/Xlib.h>
 #include "gstLinkable.h"
-
 class _GtkWidget;
 class _GdkEventExpose;
 class _GdkEventKey;
@@ -44,6 +44,7 @@ class VideoSink
     protected:
         _GstElement *sink_;
         _GtkWidget *window_;
+        Window getXWindow();
         void destroySink();
         static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
         void makeWindowBlack();
