@@ -21,8 +21,6 @@
 #define _VIDEO_SINK_H_
 
 #include "gstLinkable.h"
-//#include <GL/glew.h>
-#include <GL/gl.h>
 
 class _GtkWidget;
 class _GdkEventExpose;
@@ -96,36 +94,6 @@ class XImageSink
 };
 
 
-class GLImageSink
-: public VideoSink
-{
-    public:
-        GLImageSink() : glUpload_(0){};
-        ~GLImageSink();
-        void init();
-        _GstElement *sinkElement() { return glUpload_; }
-    private:
-        static void resetGLparams();
-        static int reshapeCallback(GLuint width, GLuint height);
-        static int drawCallback(GLuint texture, GLuint width, GLuint height);
-
-        static int mouse_wheel_cb(_GtkWidget *widget, _GdkEventScroll *event, void *data);
-        static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
-                void *data);
-
-        _GstElement *glUpload_;
-        static const GLfloat STEP;
-        static GLfloat x_;     // FIXME: separate out gl stuff into separate class
-        static GLfloat y_;
-        static GLfloat z_;
-        static GLfloat leftCrop_;
-        static GLfloat rightCrop_;
-        static GLfloat bottomCrop_;
-        static GLfloat topCrop_;
-
-        GLImageSink(const GLImageSink&);     //No Copy Constructor
-        GLImageSink& operator=(const GLImageSink&);     //No Assignment Operator
-};
 
 #endif //_VIDEO_SINK_H_
 

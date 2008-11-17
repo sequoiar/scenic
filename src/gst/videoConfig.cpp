@@ -28,6 +28,7 @@
 #include "logWriter.h"
 #include "videoSource.h"
 #include "videoSink.h"
+#include "glVideoSink.h"
 #include <fstream>
 
 

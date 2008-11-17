@@ -9,7 +9,7 @@ libgst_a_SOURCES = mediaBase.cpp \
 				   interleave.cpp gstLinkable.cpp videoSink.cpp audioSink.cpp jackUtils.cpp \
 				   codec.cpp rtpPay.cpp audioLocal.cpp audioConfig.cpp remoteConfig.cpp \
 				   videoReceiver.cpp videoSender.cpp videoSource.cpp videoLocal.cpp raw1394Util.cpp \
-				   audioLevel.cpp
+				   audioLevel.cpp glVideoSink.cpp
 
 
 libgst_a_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS)
