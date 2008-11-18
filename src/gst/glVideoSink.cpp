@@ -279,6 +279,19 @@ void GLImageSink::init()
     gstlinkable::link(glUpload_, sink_);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+//Overlay fails on separate screen
+#if 0
+    GdkDisplay* display = gdk_display_get_default();
+    assert(display);
+    int n = gdk_display_get_n_screens (display);
+    if(n>1)
+    {
+        LOG_INFO("Found " << n << " screens.");
+        GdkScreen* screen = gdk_display_get_screen (display,n-1); 
+//        gdk_display_manager_set_default_display(gdk_display_manager_get(),screen); 
+        gtk_window_set_screen (GTK_WINDOW(window_),screen);
+    }
+#endif
     assert(window_);
     const gint WIDTH = 640;
     const gint HEIGHT = 480;
