@@ -19,7 +19,7 @@
  */
 
 /** \file
- *      Immutable class that is used to setup AudioSender/AudioReceiver objects.
+ *      Immutable class that is used to parametrize AudioLocal/AudioSender/AudioReceiver objects.
  *
  */
 
@@ -29,6 +29,7 @@
 #include <string>
 #include "logWriter.h"
 
+// forward declarations
 class AudioSource;
 class AudioSink;
 
@@ -36,7 +37,7 @@ class AudioConfig
 {
     public:
 
-        // local 
+        //! Constructor
         AudioConfig(const std::string & source__, int numChannels__, int loop__ = LOOP_NONE)
             : source_(source__), location_(""), numChannels_(numChannels__), loop_(loop__)
         {
@@ -46,27 +47,39 @@ class AudioConfig
                 THROW_ERROR("Invalid number of channels");
         }
 
-
-        // local file sender
+        //! Constuctor with file location specified
         AudioConfig(const std::string & source__, const std::string & location__,
                 int numChannels__, int loop__ = LOOP_NONE)
             : source_(source__), location_(location__), numChannels_(numChannels__), loop_(loop__)
         {
         }
 
-        // copy constructor
+        //! Copy constructor
         AudioConfig(const AudioConfig& m)
             : source_(m.source_), location_(m.location_), numChannels_(m.numChannels_), loop_(m.loop_) {}
 
+        //! Returns c-style string specifying the source
         const char *source() const;
+
+        //! Returns number of channels
         int numChannels() const { return numChannels_; }
+
+        //! Returns number of times file will be played
         int loop() const { return loop_; }
+
+        //! Returns c-style string specifying the location (either filename or device descriptor)
         const char *location() const;
+
+        //! Returns true if location indicates an existing, readable file.
         bool fileExists() const;
 
+        //! Factory method that creates an AudioSource based on this object's source_ string
         AudioSource* createSource() const;
+
+        //! Factory method that creates an AudioSink based on this object's source_ string
         AudioSink* createSink() const;
 
+        //! Enum representing two possible loop settings, any other will correspond to the finite number of times to playback.
         enum LOOP_SETTING 
         { 
             LOOP_INFINITE = -1,

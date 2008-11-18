@@ -194,11 +194,14 @@ bool AudioFileSource::handleBusMsg(_GstMessage *msg)
     if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS)
     {
         LOG_DEBUG("Got end of stream, here's where we should playback if needed");
-        if (loopCount_ != 0)
+        if (loopCount_ > 0 || loopCount_ == AudioConfig::LOOP_INFINITE)
         {
             LOG_DEBUG("playback about to restart, " << loopCount_ << " times to go");
             restartPlayback();
         }
+        else if (loopCount_ != 0)
+            THROW_ERROR("Invalid loop count");
+
         return true;
     }
     return false;

@@ -17,6 +17,10 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+/** \file audioSource.h
+ *      A family of classes representing different types/sources of audio input.
+ */
+
 #ifndef _AUDIO_SOURCE_H_
 #define _AUDIO_SOURCE_H_
 
@@ -24,54 +28,82 @@
 #include "interleave.h"
 #include "busMsgHandler.h"
 
+// forward declarations
 class AudioConfig;
+
+/*! 
+ *  \class AudioSource
+ *  \brief Abstract base class from which our audio sources are derived.
+ *
+ *  Uses template method to define the initialization process that subclasses will have to
+ *  implement (in part) and/or override. Any direct descendant of this class will already
+ *  have its channels interleaved.
+ */
 
 class AudioSource
     : public GstLinkableSource
 {
     public:
+        //! Class destructor
         ~AudioSource();
+        //! Object initializer
         void init();
 
     protected:
+        //! Class constructor
         explicit AudioSource(const AudioConfig &config)
             : config_(config), sources_(0), aconvs_(0) {}
 
+        //! Initialize source_/sources_
         virtual void init_source();
+        //! Implemented by subclasses to perform other initialization
         virtual void sub_init() = 0;
+        //! Link pads of all our component GstElements
         virtual void link_elements();
-
+        //! Audio parameter object
         const AudioConfig &config_;
-
-
+        //! GstElements representing each source and audioconvert
         std::vector<GstElement *>sources_, aconvs_;
+        //! Asynchronous callback that when triggered will call the appropriate callback in derived classes.
         static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                       gpointer user_data);
-
+        //! Derived classes asynchronous callback.  
         virtual gboolean callback() { return FALSE; }
         GstElement *srcElement() { return aconvs_[0]; }
 
     private:
-        AudioSource(const AudioSource&);     //No Copy Constructor
-        AudioSource& operator=(const AudioSource&);     //No Assignment Operator
+        //!No Copy Constructor
+        AudioSource(const AudioSource&);     
+        //!No Assignment Operator
+        AudioSource& operator=(const AudioSource&);     
         friend class AudioSender;
 };
+
+/*! 
+ *  \class InterleavedAudioSource
+ *  \brief Abstract child of AudioSource which must be interleaved before pushing audio
+ *
+ */
 
 class InterleavedAudioSource
     : public AudioSource
 {
     public:
-        void init();
-
+        //! Class destructor
         ~InterleavedAudioSource() {};
 
+        //! Object initializer
+        void init();
+
     protected:
+        //! Class constructor
         explicit InterleavedAudioSource(const AudioConfig &config)
             : AudioSource(config), interleave_(config_) {}
 
         void init_source();
         void link_elements();
 
+        //! Object which performs the interleaving of this source's channels
         Interleave interleave_;
         GstElement *srcElement() { return interleave_.srcElement(); }
 
@@ -80,6 +112,13 @@ class InterleavedAudioSource
         InterleavedAudioSource& operator=(const InterleavedAudioSource&);     //No Assignment Operator
 };
 
+/*! 
+ *  \class AudioTestSource
+ *  \brief Concrete InterleavedAudioSource which gives us an array of sine-wave generating sources.
+ *
+ *  AudioTestSource generates sine-tones, each of which alternate between two hard-coded frequencies. Their
+ *  combined output is then interleaved.
+ */
 
 class AudioTestSource
     : public InterleavedAudioSource
@@ -104,6 +143,17 @@ class AudioTestSource
         AudioTestSource& operator=(const AudioTestSource&);     //No Assignment Operator
 };
 
+/*! 
+ *  \class AudioFileSource
+ *  \brief Concrete AudioSource which provides playback of files. 
+ *
+ *  AudioFileSource playsback a file (determined by its AudioConfig object). Depending
+ *  on its AudioConfig object, it may loop the file. It implements the BusMsgHandler interface
+ *  so that it knows when an End-of-Signal event occurs, in which case it may
+ *  play the file again if it has been set to continue to play the file (either infinitely or for a finite
+ *  number of plays).
+ */
+
 class AudioFileSource
     : public AudioSource, public BusMsgHandler
 {
@@ -123,10 +173,16 @@ class AudioFileSource
         AudioFileSource(const AudioFileSource&);     //No Copy Constructor
         AudioFileSource& operator=(const AudioFileSource&);     //No Assignment Operator
         int loopCount_;
-
 };
 
 // FIXME: create ABC FilteredAudioSource for alsa and pulse
+
+/*! 
+ *  \class AudioAlsaSource
+ *  \brief Concrete AudioSource which captures audio from ALSA
+ *
+ *  Has caps filter to allow number of channels to be variable.
+ */
 
 class AudioAlsaSource
     : public AudioSource
@@ -144,6 +200,12 @@ class AudioAlsaSource
         AudioAlsaSource& operator=(const AudioAlsaSource&);     //No Assignment Operator
 };
 
+/*! 
+ *  \class AudioPulseSource
+ *  \brief Concrete AudioSource which captures audio from PulseAudio.
+ *
+ *  Has caps filter to allow number of channels to be variable.
+ */
 
 class AudioPulseSource
     : public AudioSource
@@ -161,6 +223,13 @@ class AudioPulseSource
         AudioPulseSource& operator=(const AudioPulseSource&);     //No Assignment Operator
 };
 
+/*! 
+ *  \class AudioJackSource
+ *  \brief Concrete InterleavedAudioSource which captures audio from JACK.
+ *
+ *  Interleaves incoming jack buffers into one multichannel stream.
+ */
+
 
 class AudioJackSource
     : public InterleavedAudioSource
@@ -174,6 +243,15 @@ class AudioJackSource
         AudioJackSource& operator=(const AudioJackSource&);     //No Assignment Operator
 };
 
+/*! 
+ *  \class AudioDvSource
+ *  \brief Concrete AudioSource which captures audio from dv device.
+ *
+ *  This object is tightly coupled with VideoDvSource, as both (if present) will share one source_ GstElement, 
+ *  and one dvdemux GstElement. It will look for both of these in the pipeline before trying to instantiate them. 
+ *  If these GstElement are already present, AudioDvSource will simply store their addresses and link to them, if not
+ *  it will create them.
+ */
 
 class AudioDvSource
     : public AudioSource

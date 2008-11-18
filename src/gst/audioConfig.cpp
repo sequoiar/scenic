@@ -18,10 +18,10 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file
- *      Class for audio parameter objects.
- *
+/** \file audioConfig.cpp
+ *      Immutable class for audio parameter objects.
  */
+
 #include <iostream>
 #include <fstream>
 #include "audioConfig.h"
@@ -31,9 +31,8 @@
 
 const char *AudioConfig::source() const
 {
-        return source_.c_str();
+    return source_.c_str();
 }
-
 
 AudioSource* AudioConfig::createSource() const
 {
@@ -76,7 +75,7 @@ const char* AudioConfig::location() const
 {
     if (location_.empty())
         THROW_ERROR("No location specified");
-        
+
     return location_.c_str();
 }
 
