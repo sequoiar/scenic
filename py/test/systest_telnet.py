@@ -21,6 +21,8 @@
 
 """
 System test for the telnet UI.
+
+Usage: trial test/systest_telnet.py
 """
 import unittest
 import pexpect
@@ -32,6 +34,7 @@ import sys
 server_exec = os.path.expanduser("~/src/miville/trunk/py/miville.py")
 client_command = "telnet localhost 14444"
 waiting_delay = 1.0 # seconds
+BE_VERBOSE = False # False
 # ---------------------------------------------------------------------
 # functions
 def println(s,endl=True):
@@ -43,39 +46,61 @@ def println(s,endl=True):
     else:
         print ">>>>",s, # note the comma (",") at end of line
 
+def kill_server():
+    """
+    Is this needed ?
+    Is the KILL signal number correct ?
+    """
+    global server
+    try:
+        server.kill(9)
+    except Exception,e:
+        print "Error killing server process",e
+        
 def die():
     """
     Ends the programs with error flag.
     """
     println("EXITING")
+    kill_server()
     sys.exit(1)
 
 # ---------------------------------------------------------------------
 # startup poutine
+# global variables for the telnet client and server child process
+client = None
+server = None
+
+try:
+    #delete ~/.sropulpof/sropulpof.adb
+    #orig_home = os.environ['HOME']
+    os.environ['HOME'] = '/var/tmp'
+    os.remove('/var/tmp/.sropulpof/sropulpof.adb')
+except Exception,e:
+    println("Error removing old sropulpof.adb or setting HOME to /var/tmp."+str(e))
+
 # starting the server
 try:
     println("Starting server")
     server = pexpect.spawn(server_exec)
-    #server.logfile = sys.stdout
+    if BE_VERBOSE:
+        server.logfile = sys.stdout
     println("Waiting %f seconds..." % (waiting_delay))
     time.sleep(waiting_delay) # seconds
 except pexpect.ExceptionPexpect,e:
     println("Error starting server:"+e)
     die()
 
-# global variable for the telnet client child process
-client = None
-
 # starting the client
 try:
     println("Starting client")
     client = pexpect.spawn(client_command)
+    if BE_VERBOSE:
+        client.logfile = sys.stdout
 except pexpect.ExceptionPexpect,e:
     println("Error starting client:"+e)
     die()
-    
-#client.logfile = sys.stdout
-#s = client.sendline
+
 # ---------------------------------------------------------------------
 # classes
 class TelnetBaseTest(unittest.TestCase):
@@ -94,12 +119,18 @@ class TelnetBaseTest(unittest.TestCase):
         global client
         self.client = client
         #self.timeout = 1000
+        self.sleep()
+        
         
     def tearDown(self):
         """
         Destructor for each test. Nothing to do.
         """
         pass
+        
+    def sleep(sleep):
+        """Waits a bit between each command."""
+        time.sleep(0.050)
 # ---------------------------------------------------------------------
 # test classes
 class Test_1_AddressBook(TelnetBaseTest):
@@ -112,12 +143,42 @@ class Test_1_AddressBook(TelnetBaseTest):
     def test_2_add_contact(self):
         # adding a contact
         # c -a name ip [port]
+
         self.client.sendline("c -a Juliette 154.123.2.3")
-        index = self.client.expect(['pof: ', pexpect.EOF, pexpect.TIMEOUT])
-        self.assertEqual(index, 0, 'The default prompt is not appearing.')
+        self.sleep()
+        index = self.client.expect(['Contact added', pexpect.EOF, pexpect.TIMEOUT])
+        self.assertEqual(index, 0, 'Contact not added')
+        self.failIfEqual(index, 1, 'Problem : Unexpected EOF')
+        self.failIfEqual(index, 2, 'Problem : Time out.')
+        #index = self.client.expect(['pof: ', pexpect.EOF, pexpect.TIMEOUT])
+        #self.assertEqual(index, 0, 'The default prompt is not appearing.')
+    
+    def test_3_list(self):
+
         self.client.sendline("c -l") 
-        index = self.client.expect(['Juliette'])
+        self.sleep()
+        index = self.client.expect(['Juliette:', pexpect.EOF, pexpect.TIMEOUT])
         self.assertEqual(index, 0, 'The contact that has just been added is not appearing.')
+        self.failIfEqual(index, 1, 'Problem : Unexpected EOF')
+        self.failIfEqual(index, 2, 'Problem : Time out.')
         
+    def test_4_erase_contact(self):
+
+        self.client.sendline("c -e Juliette")
+        self.sleep()
+        index = self.client.expect(['Contact deleted', pexpect.EOF, pexpect.TIMEOUT])
+        self.assertEqual(index, 0, 'Error while trying to erase contact')
+        self.failIfEqual(index, 1, 'Problem : Unexpected EOF')
+        self.failIfEqual(index, 2, 'Problem : Time out.')
+        #self.client.sendline("c -l") 
+        #index = self.client.expect(['Juliette'])
+        #self.failIfEqual(index, 0, 'The contact has not been successfully deleted.')
         
-        
+    def test_5_delete_invalid_contact(self):
+        self.sleep()
+        self.client.sendline("c -e some_invalid_name")
+        self.sleep()
+        index = self.client.expect(['Could not delete', pexpect.EOF, pexpect.TIMEOUT])
+        self.assertEqual(index, 0, 'There should be no contact with that name.')
+        self.failIfEqual(index, 1, 'Problem : Unexpected EOF')
+        self.failIfEqual(index, 2, 'Problem : Time out.')
