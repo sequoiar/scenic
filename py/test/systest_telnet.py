@@ -22,24 +22,18 @@
 """
 System test for the telnet UI.
 """
+import unittest
 import pexpect
 import os
 import time
 import sys
-# not used yet
-from unittest import TextTestRunner
-# see  /usr/lib/python2.5/unittest.py
-
-class SysTest:
-    """
-    Pretty print of tests.
-    
-    TODO
-    """
-    pass
-#    def assertTest(cmd,exp):
-#        pass
-
+# ---------------------------------------------------------------------
+# config 
+server_exec = os.path.expanduser("~/src/miville/trunk/py/miville.py")
+client_command = "telnet localhost 14444"
+waiting_delay = 1.0 # seconds
+# ---------------------------------------------------------------------
+# functions
 def println(s,endl=True):
     """
     Prints a line to standard output
@@ -55,55 +49,75 @@ def die():
     """
     println("EXITING")
     sys.exit(1)
+
+# ---------------------------------------------------------------------
+# startup poutine
+# starting the server
+try:
+    println("Starting server")
+    server = pexpect.spawn(server_exec)
+    #server.logfile = sys.stdout
+    println("Waiting %f seconds..." % (waiting_delay))
+    time.sleep(waiting_delay) # seconds
+except pexpect.ExceptionPexpect,e:
+    println("Error starting server:"+e)
+    die()
+
+# global variable for the telnet client child process
+client = None
+
+# starting the client
+try:
+    println("Starting client")
+    client = pexpect.spawn(client_command)
+except pexpect.ExceptionPexpect,e:
+    println("Error starting client:"+e)
+    die()
     
-if __name__ == '__main__':
-    # config 
-    server_exec = os.path.expanduser("~/src/miville/trunk/py/miville.py")
-    client_exec = "telnet localhost 14444"
-    
-    # start server
-    try:
-        println("Starting server")
-        server = pexpect.spawn(server_exec)
-        server.logfile = sys.stdout
-        println("Waiting 500 ms...")
-        time.sleep(0.5) # seconds
-    except pexpect.ExceptionPexpect,e:
-        println("Error starting server:"+e)
-        die()
-    
-    #start client
-    try:
-        println("Starting client")
-        child = pexpect.spawn(client_exec)
-    except pexpect.ExceptionPexpect,e:
-        println("Error starting client:"+e)
-        die()
-    
-    child.logfile = sys.stdout
-    s = child.sendline
-    
-    try:
-        #child.expect("Trying 127.0.0.1...")
-        #child.expect("Connected to localhost.")
-        #child.expect("Escape character is '^]'.")
-        #child.expect("Welcome to Sropulpof!")
-        #child.expect("*")
-        #child.expect("pof: ")
-        index = child.expect(['pof: ', pexpect.EOF, pexpect.TIMEOUT])
-        if index == 0:
-            println("got the prompt as expected")
-            pass
-        elif index == 1:
-            println("Unexpected EOF")
-        elif index == 2:
-            println("TIMEOUT")
-            die()
-    except Exception,e:
-        println("Error:"+str(e))
-        #p("debug information:")
-        #p(str(child))
-    
-    # get list of contacts from the address book
-    s("c -l")
-    
+#client.logfile = sys.stdout
+#s = client.sendline
+# ---------------------------------------------------------------------
+# classes
+class TelnetBaseTest(unittest.TestCase):
+    """
+    Telnet test case parent class
+    """
+    messages = {
+        'prompt':"pof: ",
+        'greeting':"Welcome to Sropulpof!",
+        'not found':"command not found"
+    }
+    def setUp(self):
+        """
+        Starts a Telnet client for tests.
+        """
+        global client
+        self.client = client
+        #self.timeout = 1000
+        
+    def tearDown(self):
+        """
+        Destructor for each test. Nothing to do.
+        """
+        pass
+# ---------------------------------------------------------------------
+# test classes
+class Test_1_AddressBook(TelnetBaseTest):
+    def test_1_default_prompt(self):
+        index = self.client.expect(['pof: ', pexpect.EOF, pexpect.TIMEOUT])
+        self.assertEqual(index, 0, 'The default prompt is not appearing.')
+        self.failIfEqual(index, 1, 'Problem : Unexpected EOF')
+        self.failIfEqual(index, 2, 'Problem : Time out.')
+        
+    def test_2_add_contact(self):
+        # adding a contact
+        # c -a name ip [port]
+        self.client.sendline("c -a Juliette 154.123.2.3")
+        index = self.client.expect(['pof: ', pexpect.EOF, pexpect.TIMEOUT])
+        self.assertEqual(index, 0, 'The default prompt is not appearing.')
+        self.client.sendline("c -l") 
+        index = self.client.expect(['Juliette'])
+        self.assertEqual(index, 0, 'The contact that has just been added is not appearing.')
+        
+        
+        
