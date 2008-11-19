@@ -18,11 +18,6 @@
  *
  */
 
-/** \file
- *      Immutable class that is used to parametrize AudioLocal/AudioSender/AudioReceiver objects.
- *
- */
-
 #ifndef _AUDIO_LOCAL_CONFIG_H_
 #define _AUDIO_LOCAL_CONFIG_H_
 
@@ -32,6 +27,10 @@
 // forward declarations
 class AudioSource;
 class AudioSink;
+
+/** \class AudioConfig
+ *  \brief Immutable class that is used to parameterize AudioLocal and AudioSender objects.
+ */
 
 class AudioConfig
 {
@@ -95,7 +94,10 @@ class AudioConfig
         const int loop_;
 };
 
-//! \class Immutable parameter object class that configures AudioReceiver objects
+/** \class AudioReceiverConfig
+ *  \brief Immutable class that is used to parametrize AudioReceiver objects.
+ */
+
 class AudioReceiverConfig 
 {
     public:
