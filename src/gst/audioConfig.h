@@ -54,14 +54,18 @@ class AudioConfig
 
         /** Returns c-style string specifying the source */
         const char *source() const;
-        /** Returns number of channels */
+        /** 
+         * Returns number of channels */
         int numChannels() const { return numChannels_; }
-        /** Returns number of times file will be played */
+        /** 
+         * Returns number of times file will be played */
         int loop() const { return loop_; }
-        /** Returns c-style string specifying the location 
+        /** 
+         * Returns c-style string specifying the location 
          * (either filename or device descriptor) */
         const char *location() const;
-        /** Returns true if location indicates an existing, readable file. */
+        /** 
+         * Returns true if location indicates an existing, readable file. */
         bool fileExists() const;
          
         /** Factory method that creates an AudioSource based on this object's source_ string */
