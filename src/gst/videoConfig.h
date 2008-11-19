@@ -67,13 +67,13 @@ class VideoReceiverConfig
 {
     public:
 
-        VideoReceiverConfig(const std::string & sink__)
-            : sink_(sink__)
+        VideoReceiverConfig(const std::string & sink__, int screen_num = 0)
+            : sink_(sink__), screen_num_(screen_num)
         {}
 
         // copy constructor
         VideoReceiverConfig(const VideoReceiverConfig & m) 
-            : sink_(m.sink_) 
+            : sink_(m.sink_) , screen_num_(m.screen_num_)
         {}
 
         VideoSink* createSink() const;
@@ -81,6 +81,7 @@ class VideoReceiverConfig
     private:
 
         const std::string sink_;
+        const int screen_num_;
 };
 
 #endif // _VIDEO_CONFIG_H_

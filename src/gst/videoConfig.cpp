@@ -61,7 +61,7 @@ VideoSink * VideoReceiverConfig::createSink() const
     else if (sink_ == "ximagesink")
         return new XImageSink();
     else if (sink_ == "glimagesink")
-        return new GLImageSink();
+        return new GLImageSink(screen_num_);
     else
         THROW_ERROR(sink_ << " is an invalid sink");
     return 0;
