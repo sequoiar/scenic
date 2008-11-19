@@ -29,6 +29,7 @@ class _GstMessage;
 
 /*! \class AudioLevel
     \brief A filter that calculates and periodically reports the rms value of each audio channel passing through it.
+
 */
 
 class AudioLevel 
