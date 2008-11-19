@@ -17,7 +17,6 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
 #ifndef _AUDIO_LOCAL_CONFIG_H_
 #define _AUDIO_LOCAL_CONFIG_H_
 
@@ -28,16 +27,11 @@
 class AudioSource;
 class AudioSink;
 
-/** \class AudioConfig
- *  Immutable class that is used to parameterize AudioLocal and AudioSender objects.
- */
-
+/** Immutable class that is used to parameterize AudioLocal and AudioSender objects. */
 class AudioConfig
 {
     public:
-
-        /** Constructor sets by default location to an empty string and loop to LOOP_NONE
-         */
+        /** Constructor sets by default location to an empty string and loop to LOOP_NONE */
         AudioConfig(const std::string & source__, int numChannels__, int loop__ = LOOP_NONE)
             : source_(source__), location_(""), numChannels_(numChannels__), loop_(loop__)
         {
@@ -46,40 +40,38 @@ class AudioConfig
             if(numChannels_ < 1 || numChannels_ > 8)
                 THROW_ERROR("Invalid number of channels");
         }
-
-        /** Constuctor sets by default loop to LOOP_NONE, but has file location specified */
+        /** 
+         * Constuctor sets by default loop to LOOP_NONE, but has file location specified */
         AudioConfig(const std::string & source__, const std::string & location__,
                 int numChannels__, int loop__ = LOOP_NONE)
-            : source_(source__), location_(location__), numChannels_(numChannels__), loop_(loop__)
-        {
-        }
-
-        /** Copy constructor */
+            : source_(source__), location_(location__), numChannels_(numChannels__) , loop_(loop__)
+        {}
+        /** 
+         * Copy constructor */
         AudioConfig(const AudioConfig& m)
-            : source_(m.source_), location_(m.location_), numChannels_(m.numChannels_), loop_(m.loop_) {}
+            : source_(m.source_), location_(m.location_), numChannels_(m.numChannels_) , loop_(m.loop_) 
+        {}
 
         /** Returns c-style string specifying the source */
         const char *source() const;
-
         /** Returns number of channels */
         int numChannels() const { return numChannels_; }
-
         /** Returns number of times file will be played */
         int loop() const { return loop_; }
-
-        /** Returns c-style string specifying the location (either filename or device descriptor) */
+        /** Returns c-style string specifying the location 
+         * (either filename or device descriptor) */
         const char *location() const;
-
         /** Returns true if location indicates an existing, readable file. */
         bool fileExists() const;
-
+         
         /** Factory method that creates an AudioSource based on this object's source_ string */
         AudioSource* createSource() const;
-
-        /** Factory method that creates an AudioSink based on this object's source_ string */
+        /** 
+         * Factory method that creates an AudioSink based on this object's source_ string */
         AudioSink* createSink() const;
 
-        /** Enum representing two possible loop settings, any other will correspond to the finite number of times to playback. */
+        /** Enum representing two possible loop settings, any other will correspond 
+         * to the finite number of times to playback. */
         enum LOOP_SETTING 
         { 
             LOOP_INFINITE = -1,
@@ -95,10 +87,7 @@ class AudioConfig
         const int loop_;
 };
 
-/** \class AudioReceiverConfig
- *  Immutable class that is used to parametrize AudioReceiver objects.
- */
-
+/*  Immutable class that is used to parametrize AudioReceiver objects.  */
 class AudioReceiverConfig 
 {
     public:
@@ -106,8 +95,8 @@ class AudioReceiverConfig
         AudioReceiverConfig(const std::string & sink__)
             : sink_(sink__)
         {}
-
-        /** Copy constructor */
+        /** 
+         * Copy constructor */
         AudioReceiverConfig(const AudioReceiverConfig & m) : sink_(m.sink_) 
         {}
 
@@ -115,7 +104,6 @@ class AudioReceiverConfig
         AudioSink* createSink() const;
 
     private:
-
         const std::string sink_;
 };
 

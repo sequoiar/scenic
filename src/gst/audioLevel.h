@@ -50,7 +50,7 @@ class AudioLevel
         void interval(unsigned long long newInterval);
         /** 
          * The level message is posted on the bus by the level element, 
-         * received by this AudioLevel, and dispatched. */
+         * - received by this AudioLevel, and dispatched. */
         bool handleBusMsg(_GstMessage *msg);
         /**
          * Toggles whether or not this AudioLevel will post messages on the bus. */
