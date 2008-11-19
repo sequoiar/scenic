@@ -87,25 +87,28 @@ class AudioConfig
         };
         
     private:
-
-        AudioConfig& operator=(const AudioConfig&); //No Assignment Operator
+        //! No Assignment Operator
+        AudioConfig& operator=(const AudioConfig&); 
         const std::string source_;
         const std::string location_;
         const int numChannels_;
         const int loop_;
 };
 
+//! \class Immutable parameter object class that configures AudioReceiver objects
 class AudioReceiverConfig 
 {
     public:
+        //! Constructor
         AudioReceiverConfig(const std::string & sink__)
             : sink_(sink__)
         {}
 
-        // copy constructor
+        //! Copy constructor
         AudioReceiverConfig(const AudioReceiverConfig & m) : sink_(m.sink_) 
         {}
 
+        //! Factory method that creates an AudioSink based on this object's sink_ string
         AudioSink* createSink() const;
 
     private:
