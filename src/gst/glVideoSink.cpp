@@ -263,7 +263,7 @@ bool GLImageSink::handleBusMsg(GstMessage* msg)
     return true;
 }
 
-
+#include <X11/extensions/Xinerama.h>
 void GLImageSink::init()
 {
     static bool gtk_initialized = false;
@@ -278,26 +278,31 @@ void GLImageSink::init()
     pipeline_.add(sink_);
     gstlinkable::link(glUpload_, sink_);
 
-    window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-//Overlay fails on separate screen
-#if 0
+    window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    
+    assert(window_);
+
+
     GdkDisplay* display = gdk_display_get_default();
     assert(display);
-    int n = gdk_display_get_n_screens (display);
-    if(n>1)
+    int n;
+    XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display),&n);
+    assert(xine);
+    for(int j=0;j<n;j++)
     {
-        LOG_INFO("Found " << n << " screens.");
-        GdkScreen* screen = gdk_display_get_screen (display,n-1); 
-//        gdk_display_manager_set_default_display(gdk_display_manager_get(),screen); 
-        gtk_window_set_screen (GTK_WINDOW(window_),screen);
+        LOG_INFO(   "N:" << n << 
+                " screen:" << xine[j].screen_number << 
+                " x:" << xine[j].x_org << 
+                " y:" << xine[j].y_org << 
+                " width:" << xine[j].width << 
+                " height:" << xine[j].height);
+        if (j == 0) //TODO: how to choose screen??
+            gtk_window_move(GTK_WINDOW(window_),xine[j].x_org,xine[j].y_org);
     }
-#endif
-    assert(window_);
     const gint WIDTH = 640;
     const gint HEIGHT = 480;
 
     gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
-    //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
+    gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
     pipeline_.subscribe(this);
 #if 0
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
