@@ -33,27 +33,34 @@ class RtpPay;
 class Decoder;
 class AudioSink;
 
+/*! \class AudioReceiver
+    \brief An audio pipeline derived from ReceiverBase that receives audio over rtp, decodes/converts it as needed and pushes it to its sink.
+
+*/
+
 class AudioReceiver
     : public ReceiverBase
 {
     public:
+        //! Constructor parameterized by an AudioReceiverConfig and a ReceiverConfig 
         AudioReceiver(const AudioReceiverConfig aConfig, const ReceiverConfig rConfig)
             : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), gotCaps_(false), 
             depayloader_(0), decoder_(0), level_(), sink_(0)
         { assert(remoteConfig_.hasCodec()); }
 
+        //! Destructor
         ~AudioReceiver();
 
+        //! Sets the pipeline state to playing
         void start();
-        Decoder *getDecoder() { return decoder_; }
 
     private:
-        AudioReceiver();
         void init_codec();
         void init_depayloader();
         void init_level();
         void init_sink();
         
+        //! Used to set this AudioReceiver's RtpReceiver's caps
         void set_caps(); 
 
         const AudioReceiverConfig audioConfig_;
@@ -66,8 +73,11 @@ class AudioReceiver
         AudioLevel level_;
         AudioSink *sink_;
 
-        AudioReceiver(const AudioReceiver&); //No Copy Constructor
-        AudioReceiver& operator=(const AudioReceiver&); //No Assignment Operator
+        //! No Copy Constructor
+        AudioReceiver(const AudioReceiver&); 
+
+        //! No Assignment Operator
+        AudioReceiver& operator=(const AudioReceiver&); 
 };
 
 #endif // _AUDIO_RECEIVER_H_
