@@ -22,31 +22,55 @@
 
 #include "gstLinkable.h"
 #include "busMsgHandler.h"
-#include <climits>
 
+// forward declarations
 class _GstElement;
 class _GstMessage;
+
+/*! \class AudioLevel
+    \brief A filter that calculates and periodically reports the rms value of each audio channel passing through it.
+*/
 
 class AudioLevel 
     : public GstLinkableFilter, public BusMsgHandler
 {
     public:
+        //! Constructor
         AudioLevel() : level_(0), emitMessages_(true), rmsValues_(0), interval_(1000000000LL) {}
 
+        //! Destructor
         ~AudioLevel();
+
+        //! Class initializer
         void init();
+
+        //! Sets the reporting interval in nanoseconds.
         void interval(unsigned long long newInterval);
+
+        //! The level message is posted on the bus by the level element, received by this AudioLevel, and dispatched.
         bool handleBusMsg(_GstMessage *msg);
+
+        //! Toggles whether or not this AudioLevel will post messages on the bus.
         void emitMessages(bool doEmit);
 
     protected:
+        //! Returns src of this AudioLevel
         _GstElement *srcElement() { return level_; }
+
+        //! Returns sink of this AudioLevel
         _GstElement *sinkElement() { return level_; }
 
     private:
+        //! Updates most recent rms value of the specified channel.
         void updateRms(double rmsDb, size_t channelIdx);
+        
+        //! Converts from decibel to linear (0.0 to 1.0) scale
         static double dbToLinear(double db);
+
+        //! Prints current rms values through the LogWriter
         void print() const;
+
+        //! Posts the rms values to be handled at a higher level by the MapMsg system
         void post() const;
 
         _GstElement *level_;
