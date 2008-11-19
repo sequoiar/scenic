@@ -39,7 +39,7 @@ bool GstSenderThread::video_start(MapMsg& msg)
         }
         else
         {
-            VideoConfig config(msg["source"], msg["location"]);
+            VideoConfig config(msg["source"], std::string(msg["location"]));
             video_ =  new VideoSender(config, rConfig);
         }
         video_->init();
