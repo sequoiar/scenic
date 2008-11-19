@@ -50,7 +50,7 @@ VideoSource * VideoConfig::createSource() const
 // FIXME: options?
 VideoSink * VideoConfig::createSink() const
 {
-    return new GLImageSink();
+    return new GLImageSink(screen_num_);
 }
 
 

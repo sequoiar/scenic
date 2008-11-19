@@ -33,7 +33,7 @@ class VideoSink
 {
     public:
         VideoSink()
-            : sink_(0), window_(0) {};
+            : sink_(0), window_(0), screen_num_(0) {};
         ~VideoSink(){};
         void showWindow();
         void makeFullscreen() { makeFullscreen(window_); }
@@ -44,6 +44,8 @@ class VideoSink
     protected:
         _GstElement *sink_;
         _GtkWidget *window_;
+        int screen_num_;
+
         Window getXWindow();
         void destroySink();
         static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);

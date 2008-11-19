@@ -29,7 +29,7 @@ class GLImageSink
 : public VideoSink, public BusMsgHandler
 {
     public:
-        GLImageSink() : glUpload_(0){};
+        GLImageSink(int screen_num = 0) : glUpload_(0){screen_num_ = screen_num;}
         ~GLImageSink();
         void init();
         _GstElement *sinkElement() { return glUpload_; }

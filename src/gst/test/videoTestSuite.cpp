@@ -28,7 +28,7 @@
 
 void VideoTestSuite::start_test_video_gl()
 {
-    VideoConfig config("videotestsrc");
+    VideoConfig config("videotestsrc",1);
     VideoLocal tx(config);
     tx.init();
 

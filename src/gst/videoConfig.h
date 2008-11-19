@@ -34,15 +34,16 @@ class VideoSink;
 class VideoConfig
 {
     public:
-        VideoConfig(const std::string &source__) : source_(source__), location_("") {}
+        VideoConfig(const std::string &source__) : source_(source__), screen_num_(0), location_("") {}
+        VideoConfig(const std::string &source__, int screen_num) : source_(source__), screen_num_(screen_num), location_("") {}
 
         // for sender (remote) w/ location i.e. filename or url
         VideoConfig(const std::string &source__, const std::string &location__)
-            : source_(source__), location_(location__)  {}
+            : source_(source__), screen_num_(0), location_(location__)  {}
 
         // copy constructor
         VideoConfig(const VideoConfig& m)
-            : source_(m.source_), location_(m.location_) {}
+            : source_(m.source_), screen_num_(m.screen_num_), location_(m.location_) {}
 
         VideoSource* createSource() const;  // factory method
         VideoSink* createSink() const;  // factory method
@@ -54,8 +55,8 @@ class VideoConfig
         const char *location() const;
 
     private:
-        
         const std::string source_;
+        const int screen_num_;
         const std::string location_;
 
         VideoConfig& operator=(const VideoConfig&);     //No Assignment Operator

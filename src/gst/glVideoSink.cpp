@@ -289,13 +289,13 @@ void GLImageSink::init()
     assert(xine);
     for(int j=0;j<n;j++)
     {
-        LOG_INFO(   "N:" << n << 
+        LOG_INFO(   "req:" << screen_num_ << 
                 " screen:" << xine[j].screen_number << 
                 " x:" << xine[j].x_org << 
                 " y:" << xine[j].y_org << 
                 " width:" << xine[j].width << 
                 " height:" << xine[j].height);
-        if (j == 0) //TODO: how to choose screen??
+        if (j == screen_num_) //TODO: how to choose screen??
             gtk_window_move(GTK_WINDOW(window_),xine[j].x_org,xine[j].y_org);
     }
     const gint WIDTH = 640;
