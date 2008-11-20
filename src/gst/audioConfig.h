@@ -91,7 +91,7 @@ class AudioConfig
         const int loop_;
 };
 
-/*  Immutable class that is used to parametrize AudioReceiver objects.  */
+/**  Immutable class that is used to parametrize AudioReceiver objects.  */
 class AudioReceiverConfig 
 {
     public:
