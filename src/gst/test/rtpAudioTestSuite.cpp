@@ -42,7 +42,7 @@
 
 std::auto_ptr<AudioSender> buildAudioSender(const AudioSourceConfig aConfig)
 {
-    SenderConfig rConfig("vorbis", get_host_ip(), Ports::A_PORT);
+    SenderConfig rConfig("vorbis", get_host_ip(), ports::A_PORT);
     std::auto_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
     tx->init();
     return tx;
@@ -52,7 +52,7 @@ std::auto_ptr<AudioSender> buildAudioSender(const AudioSourceConfig aConfig)
 std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *audioSinkName = "jackaudiosink")
 {
     AudioSinkConfig aConfig(audioSinkName);
-    ReceiverConfig rConfig("vorbis", get_host_ip(), Ports::A_PORT, tcpGetCaps(Ports::CAPS_PORT));
+    ReceiverConfig rConfig("vorbis", get_host_ip(), ports::A_PORT, tcpGetCaps(ports::CAPS_PORT));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
     return rx;
@@ -62,7 +62,7 @@ std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *audioSinkName = "jac
 std::auto_ptr<AudioReceiver> buildDeadAudioReceiver(const char *audioSinkName = "jackaudiosink")
 {
     AudioSinkConfig aConfig(audioSinkName);
-    ReceiverConfig rConfig("vorbis", get_host_ip(), Ports::A_PORT, "");
+    ReceiverConfig rConfig("vorbis", get_host_ip(), ports::A_PORT, "");
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
     return rx;
@@ -91,7 +91,7 @@ void RtpAudioTestSuite::start_2ch_audiotest()
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
@@ -144,7 +144,7 @@ void RtpAudioTestSuite::start_stop_2ch_audiotest()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
 
@@ -172,7 +172,7 @@ void RtpAudioTestSuite::start_8ch_audiotest()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
@@ -223,7 +223,7 @@ void RtpAudioTestSuite::start_stop_8ch_audiotest()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
@@ -252,7 +252,7 @@ void RtpAudioTestSuite::start_6ch_alsa()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
@@ -303,7 +303,7 @@ void RtpAudioTestSuite::start_stop_6ch_alsa()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
@@ -332,7 +332,7 @@ void RtpAudioTestSuite::start_6ch_pulse()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
@@ -383,7 +383,7 @@ void RtpAudioTestSuite::start_stop_6ch_pulse()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
@@ -417,7 +417,7 @@ void RtpAudioTestSuite::start_8ch_jack()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
@@ -468,7 +468,7 @@ void RtpAudioTestSuite::start_stop_8ch_jack()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
@@ -497,7 +497,7 @@ void RtpAudioTestSuite::start_8ch_audiofile()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
@@ -548,7 +548,7 @@ void RtpAudioTestSuite::start_stop_8ch_audiofile()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
@@ -576,7 +576,7 @@ void RtpAudioTestSuite::start_audio_dv()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());
@@ -629,7 +629,7 @@ void RtpAudioTestSuite::start_stop_audio_dv()
 
         tx->start();
 
-        TEST_ASSERT(tcpSendCaps("127.0.0.1", Ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(tx->isPlaying());

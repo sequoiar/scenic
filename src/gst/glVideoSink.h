@@ -25,11 +25,18 @@
 #include "videoSink.h"
 #include "busMsgHandler.h"
 
+/** GLImageSink
+ *  A videosink that can handle raw video, as well as GLBuffers of video.
+ */
+
 class GLImageSink
 : public VideoSink, public BusMsgHandler
 {
     public:
+        /** Constructor */
         GLImageSink(int screen_num = 0) : glUpload_(0){screen_num_ = screen_num;}
+        /** 
+         * Destructor */
         ~GLImageSink();
         void init();
         _GstElement *sinkElement() { return glUpload_; }

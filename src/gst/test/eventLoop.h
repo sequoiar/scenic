@@ -24,7 +24,7 @@
 #define BLOCKING 1
 
 #if BLOCKING
-#define BLOCK() EventLoop::block(__FILE__, __FUNCTION__, __LINE__)
+#define BLOCK() eventloop::block(__FILE__, __FUNCTION__, __LINE__)
 #else
 #define BLOCK()
 #endif
@@ -32,13 +32,14 @@
 #include <glib.h>
 #include <iostream>
 
-namespace EventLoop {
+namespace eventloop 
+{
         void block(const char *filename, const char *function, long lineNumber);
         int killMainLoop(void *data);
         const unsigned long long RUNNING_TIME = 60000;
 }
 
-int EventLoop::killMainLoop(gpointer data)
+int eventloop::killMainLoop(gpointer data)
 {
     GMainLoop *loop = static_cast<GMainLoop *>(data);
     g_main_loop_quit(loop);
@@ -46,7 +47,7 @@ int EventLoop::killMainLoop(gpointer data)
 }
 
 
-void EventLoop::block(const char * filename, const char *function, long lineNumber)
+void eventloop::block(const char * filename, const char *function, long lineNumber)
 {
     std::cout.flush();
     std::cout << filename << ":" << function << ":" << lineNumber;
@@ -56,7 +57,7 @@ void EventLoop::block(const char * filename, const char *function, long lineNumb
     // UNComment if you want this event loop to end after RUNNING_TIME ms
 #if 0
     g_timeout_add(RUNNING_TIME, 
-            static_cast<GSourceFunc>(EventLoop::killMainLoop), 
+            static_cast<GSourceFunc>(eventloop::killMainLoop), 
             static_cast<void*>(loop));
 #endif
     g_main_loop_run(loop);

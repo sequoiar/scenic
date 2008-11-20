@@ -25,14 +25,14 @@
 #include <cstdlib>
 #include "gutil/optionArgs.h"
 
-namespace Pof 
+namespace pof 
 {
     short run(int argc, char **argv);
     const short NUM_CHANNELS = 2;
 }
 
 // 2way audio and video
-short Pof::run(int argc, char **argv)
+short pof::run(int argc, char **argv)
 {
     char pid;
     bool send = false;
@@ -66,10 +66,10 @@ short Pof::run(int argc, char **argv)
 
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
     if (pid == 'r') {
-        std::auto_ptr<AudioReceiver> aRx(Factories::buildAudioReceiver(ip, audioCodec, audioPort));
+        std::auto_ptr<AudioReceiver> aRx(factories::buildAudioReceiver(ip, audioCodec, audioPort));
         aRx->start();
 
-        std::auto_ptr<VideoReceiver> vRx(Factories::buildVideoReceiver(ip, videoCodec, videoPort, screenNum));
+        std::auto_ptr<VideoReceiver> vRx(factories::buildVideoReceiver(ip, videoCodec, videoPort, screenNum));
         vRx->start();
         if(full)
             vRx->getVideoSink()->makeFullscreen();
@@ -82,10 +82,10 @@ short Pof::run(int argc, char **argv)
         vRx->stop();
     }
     else {
-        AudioSourceConfig aConfig("jackaudiosrc", Pof::NUM_CHANNELS);
-        std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, ip, audioCodec, audioPort));
+        AudioSourceConfig aConfig("jackaudiosrc", pof::NUM_CHANNELS);
+        std::auto_ptr<AudioSender> aTx(factories::buildAudioSender(aConfig, ip, audioCodec, audioPort));
         aTx->start();
-        assert(tcpSendCaps(ip, Ports::CAPS_PORT, aTx->getCaps()));
+        assert(tcpSendCaps(ip, ports::CAPS_PORT, aTx->getCaps()));
         VideoSourceConfig *vConfig; 
 
         if (videoDevice)
@@ -93,7 +93,7 @@ short Pof::run(int argc, char **argv)
         else
             vConfig = new VideoSourceConfig("v4l2src");
 
-        std::auto_ptr<VideoSender> vTx(Factories::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
+        std::auto_ptr<VideoSender> vTx(factories::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
         delete vConfig;
         vTx->start();
 
@@ -112,7 +112,7 @@ int mainPof(int argc, char **argv)
 {
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
     try {
-        return Pof::run(argc, argv);
+        return pof::run(argc, argv);
     }
     catch (Except e)
     {

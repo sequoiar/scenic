@@ -12,20 +12,21 @@
 #include "ports.h"
 #include <memory>   // for std::auto_ptr
 
-namespace Factories {
+namespace factories 
+{
     std::auto_ptr<AudioSender> buildAudioSender(const AudioSourceConfig aConfig, 
-            const char* ip, const char *codec, const long port = Ports::A_PORT);
+            const char* ip, const char *codec, const long port = ports::A_PORT);
 
-    std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *ip, const char * codec, const long port = Ports::A_PORT);
+    std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *ip, const char * codec, const long port = ports::A_PORT);
 
-    std::auto_ptr<VideoReceiver> buildVideoReceiver(const char *ip, const char * codec, const long port = Ports::V_PORT, int screen_num = 0);
+    std::auto_ptr<VideoReceiver> buildVideoReceiver(const char *ip, const char * codec, const long port = ports::V_PORT, int screen_num = 0);
     
     std::auto_ptr<VideoSender> buildVideoSender(const VideoSourceConfig vConfig, 
-            const char *ip, const char *codec, const long port = Ports::V_PORT);
+            const char *ip, const char *codec, const long port = ports::V_PORT);
 }
 
 std::auto_ptr<AudioSender> 
-Factories::buildAudioSender(const AudioSourceConfig aConfig, const char* ip, const char *codec, const long port)
+factories::buildAudioSender(const AudioSourceConfig aConfig, const char* ip, const char *codec, const long port)
 {
     SenderConfig rConfig(codec, ip, port);
     std::auto_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
@@ -34,16 +35,16 @@ Factories::buildAudioSender(const AudioSourceConfig aConfig, const char* ip, con
 }
 
 std::auto_ptr<AudioReceiver> 
-Factories::buildAudioReceiver(const char *ip, const char *codec, const long port)
+factories::buildAudioReceiver(const char *ip, const char *codec, const long port)
 {
     AudioSinkConfig aConfig("jackaudiosink");
-    ReceiverConfig rConfig(codec, ip, port, tcpGetCaps(Ports::CAPS_PORT));
+    ReceiverConfig rConfig(codec, ip, port, tcpGetCaps(ports::CAPS_PORT));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
     return rx;
 }
 
-std::auto_ptr<VideoSender> Factories::buildVideoSender(const VideoSourceConfig vConfig, const char *ip, const char *codec, const long port)
+std::auto_ptr<VideoSender> factories::buildVideoSender(const VideoSourceConfig vConfig, const char *ip, const char *codec, const long port)
 {
     SenderConfig rConfig(codec, ip, port);
     std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
@@ -51,7 +52,7 @@ std::auto_ptr<VideoSender> Factories::buildVideoSender(const VideoSourceConfig v
     return tx;
 }
 
-std::auto_ptr<VideoReceiver> Factories::buildVideoReceiver(const char *ip, const char *codec, const long port, const int screen_num)
+std::auto_ptr<VideoReceiver> factories::buildVideoReceiver(const char *ip, const char *codec, const long port, const int screen_num)
 {
     VideoSinkConfig vConfig("glimagesink",screen_num);
     ReceiverConfig rConfig(codec, ip, port, "");
