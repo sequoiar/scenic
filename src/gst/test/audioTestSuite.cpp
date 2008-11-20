@@ -48,7 +48,7 @@ class TestMsgFunctor : public MsgFunctor
 void AudioTestSuite::start_1ch_audiotest()
 {
     const int NUM_CHANNELS = 1;
-    AudioConfig config("audiotestsrc", NUM_CHANNELS);
+    AudioSourceConfig config("audiotestsrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 
@@ -62,7 +62,7 @@ void AudioTestSuite::start_1ch_audiotest()
 void AudioTestSuite::stop_1ch_audiotest()
 {
     const int NUM_CHANNELS = 1;
-    AudioConfig config("audiotestsrc", NUM_CHANNELS);
+    AudioSourceConfig config("audiotestsrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
     tx.stop();
@@ -75,7 +75,7 @@ void AudioTestSuite::stop_1ch_audiotest()
 void AudioTestSuite::start_stop_1ch_audiotest()
 {
     const int NUM_CHANNELS = 1;
-    AudioConfig config("audiotestsrc", NUM_CHANNELS);
+    AudioSourceConfig config("audiotestsrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TestMsgFunctor f(__FUNCTION__);  // Grabs the MSG::post callback 
     TEST_THROWS_NOTHING(tx.init());
@@ -95,7 +95,7 @@ void AudioTestSuite::start_stop_1ch_audiotest()
 void AudioTestSuite::start_2ch_audiotest()
 {
     const int NUM_CHANNELS = 2;
-    AudioConfig config("audiotestsrc", NUM_CHANNELS);
+    AudioSourceConfig config("audiotestsrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
     
@@ -110,7 +110,7 @@ void AudioTestSuite::start_2ch_audiotest()
 void AudioTestSuite::stop_2ch_audiotest()
 {
     const int NUM_CHANNELS = 2;
-    AudioConfig config("audiotestsrc", NUM_CHANNELS);
+    AudioSourceConfig config("audiotestsrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
     
@@ -125,7 +125,7 @@ void AudioTestSuite::stop_2ch_audiotest()
 void AudioTestSuite::start_stop_2ch_audiotest()
 {
     const int NUM_CHANNELS = 2;
-    AudioConfig config("audiotestsrc", NUM_CHANNELS);
+    AudioSourceConfig config("audiotestsrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TestMsgFunctor f(__FUNCTION__);  // Grabs the MSG::post callback 
     TEST_THROWS_NOTHING(tx.init());
@@ -144,7 +144,7 @@ void AudioTestSuite::start_stop_2ch_audiotest()
 void AudioTestSuite::start_6ch_audiotest()
 {
     const int NUM_CHANNELS = 6;
-    AudioConfig config("audiotestsrc", NUM_CHANNELS);
+    AudioSourceConfig config("audiotestsrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
     
@@ -159,7 +159,7 @@ void AudioTestSuite::start_6ch_audiotest()
 void AudioTestSuite::stop_6ch_audiotest()
 {
     const int NUM_CHANNELS = 6;
-    AudioConfig config("audiotestsrc", NUM_CHANNELS);
+    AudioSourceConfig config("audiotestsrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
     
@@ -174,7 +174,7 @@ void AudioTestSuite::stop_6ch_audiotest()
 void AudioTestSuite::start_stop_6ch_audiotest()
 {
     const int NUM_CHANNELS = 6;
-    AudioConfig config("audiotestsrc", NUM_CHANNELS);
+    AudioSourceConfig config("audiotestsrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TestMsgFunctor f(__FUNCTION__);  // Grabs the MSG::post callback 
     TEST_THROWS_NOTHING(tx.init());
@@ -194,7 +194,7 @@ void AudioTestSuite::start_stop_6ch_audiotest()
 void AudioTestSuite::start_8ch_audiotest()
 {
     const int NUM_CHANNELS = 8;
-    AudioConfig config("audiotestsrc", NUM_CHANNELS);
+    AudioSourceConfig config("audiotestsrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
     
@@ -209,7 +209,7 @@ void AudioTestSuite::start_8ch_audiotest()
 void AudioTestSuite::stop_8ch_audiotest()
 {
     const int NUM_CHANNELS = 8;
-    AudioConfig config("audiotestsrc", NUM_CHANNELS);
+    AudioSourceConfig config("audiotestsrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
     
@@ -223,7 +223,7 @@ void AudioTestSuite::stop_8ch_audiotest()
 void AudioTestSuite::start_stop_8ch_audiotest()
 {
     const int NUM_CHANNELS = 8;
-    AudioConfig config("audiotestsrc", NUM_CHANNELS);
+    AudioSourceConfig config("audiotestsrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
     
@@ -241,7 +241,7 @@ void AudioTestSuite::start_stop_8ch_audiotest()
 void AudioTestSuite::start_8ch_jack()
 {
     const int NUM_CHANNELS = 8;
-    AudioConfig config("jackaudiosrc", NUM_CHANNELS);
+    AudioSourceConfig config("jackaudiosrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 
@@ -255,7 +255,7 @@ void AudioTestSuite::start_8ch_jack()
 void AudioTestSuite::stop_8ch_jack()
 {
     const int NUM_CHANNELS = 8;
-    AudioConfig config("jackaudiosrc", NUM_CHANNELS);
+    AudioSourceConfig config("jackaudiosrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 
@@ -268,7 +268,7 @@ void AudioTestSuite::stop_8ch_jack()
 void AudioTestSuite::start_stop_8ch_jack()
 {
     const int NUM_CHANNELS = 8;
-    AudioConfig config("jackaudiosrc", NUM_CHANNELS);
+    AudioSourceConfig config("jackaudiosrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
     tx.start();
@@ -286,7 +286,7 @@ void AudioTestSuite::start_8ch_audiofile()
     const int NUM_CHANNELS = 8;
     const int LOOP_COUNT = 4;
 
-    AudioConfig config("filesrc", audioFilename_, NUM_CHANNELS, LOOP_COUNT);
+    AudioSourceConfig config("filesrc", audioFilename_, NUM_CHANNELS, LOOP_COUNT);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 
@@ -300,7 +300,7 @@ void AudioTestSuite::start_8ch_audiofile()
 void AudioTestSuite::stop_8ch_audiofile()
 {
     const int NUM_CHANNELS = 8;
-    AudioConfig config("filesrc", audioFilename_, NUM_CHANNELS);
+    AudioSourceConfig config("filesrc", audioFilename_, NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 
@@ -314,7 +314,7 @@ void AudioTestSuite::stop_8ch_audiofile()
 void AudioTestSuite::start_stop_8ch_audiofile()
 {
     const int NUM_CHANNELS = 8;
-    AudioConfig config("filesrc", audioFilename_, NUM_CHANNELS);
+    AudioSourceConfig config("filesrc", audioFilename_, NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 
@@ -331,7 +331,7 @@ void AudioTestSuite::start_stop_8ch_audiofile()
 void AudioTestSuite::start_audio_dv()
 {
     const int NUM_CHANNELS = 2;
-    AudioConfig config("dv1394src", NUM_CHANNELS);
+    AudioSourceConfig config("dv1394src", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 
@@ -345,7 +345,7 @@ void AudioTestSuite::start_audio_dv()
 void AudioTestSuite::stop_audio_dv()
 {
     const int NUM_CHANNELS = 2;
-    AudioConfig config("dv1394src", NUM_CHANNELS);
+    AudioSourceConfig config("dv1394src", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
     TEST_ASSERT(!tx.isPlaying());
@@ -359,7 +359,7 @@ void AudioTestSuite::stop_audio_dv()
 void AudioTestSuite::start_stop_audio_dv()
 {
     const int NUM_CHANNELS = 2;
-    AudioConfig config("dv1394src", NUM_CHANNELS);
+    AudioSourceConfig config("dv1394src", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 
@@ -376,7 +376,7 @@ void AudioTestSuite::start_stop_audio_dv()
 void AudioTestSuite::start_8ch_alsa()
 {
     const int NUM_CHANNELS = 8;
-    AudioConfig config("alsasrc", NUM_CHANNELS);
+    AudioSourceConfig config("alsasrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 
@@ -390,7 +390,7 @@ void AudioTestSuite::start_8ch_alsa()
 void AudioTestSuite::stop_8ch_alsa()
 {
     const int NUM_CHANNELS = 8;
-    AudioConfig config("alsasrc", NUM_CHANNELS);
+    AudioSourceConfig config("alsasrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 
@@ -403,7 +403,7 @@ void AudioTestSuite::stop_8ch_alsa()
 void AudioTestSuite::start_stop_8ch_alsa()
 {
     const int NUM_CHANNELS = 8;
-    AudioConfig config("alsasrc", NUM_CHANNELS);
+    AudioSourceConfig config("alsasrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
     tx.start();
@@ -419,7 +419,7 @@ void AudioTestSuite::start_stop_8ch_alsa()
 void AudioTestSuite::start_6ch_pulse()
 {
     const int NUM_CHANNELS = 6;
-    AudioConfig config("pulsesrc", NUM_CHANNELS);
+    AudioSourceConfig config("pulsesrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 
@@ -433,7 +433,7 @@ void AudioTestSuite::start_6ch_pulse()
 void AudioTestSuite::stop_6ch_pulse()
 {
     const int NUM_CHANNELS = 6;
-    AudioConfig config("pulsesrc", NUM_CHANNELS);
+    AudioSourceConfig config("pulsesrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
 
@@ -446,7 +446,7 @@ void AudioTestSuite::stop_6ch_pulse()
 void AudioTestSuite::start_stop_6ch_pulse()
 {
     const int NUM_CHANNELS = 6;
-    AudioConfig config("pulsesrc", NUM_CHANNELS);
+    AudioSourceConfig config("pulsesrc", NUM_CHANNELS);
     AudioLocal tx(config);
     TEST_THROWS_NOTHING(tx.init());
     tx.start();

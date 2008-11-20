@@ -28,11 +28,11 @@ class AudioSource;
 class AudioSink;
 
 /** Immutable class that is used to parameterize AudioLocal and AudioSender objects. */
-class AudioConfig
+class AudioSourceConfig
 {
     public:
         /** Constructor sets by default location to an empty string and loop to LOOP_NONE */
-        AudioConfig(const std::string & source__, int numChannels__, int loop__ = LOOP_NONE)
+        AudioSourceConfig(const std::string & source__, int numChannels__, int loop__ = LOOP_NONE)
             : source_(source__), location_(""), numChannels_(numChannels__), loop_(loop__)
         {
             if (source_.empty())
@@ -42,13 +42,13 @@ class AudioConfig
         }
         /** 
          * Constuctor sets by default loop to LOOP_NONE, but has file location specified */
-        AudioConfig(const std::string & source__, const std::string & location__,
+        AudioSourceConfig(const std::string & source__, const std::string & location__,
                 int numChannels__, int loop__ = LOOP_NONE)
             : source_(source__), location_(location__), numChannels_(numChannels__) , loop_(loop__)
         {}
         /** 
          * Copy constructor */
-        AudioConfig(const AudioConfig& m)
+        AudioSourceConfig(const AudioSourceConfig& m)
             : source_(m.source_), location_(m.location_), numChannels_(m.numChannels_) , loop_(m.loop_) 
         {}
 
@@ -84,7 +84,7 @@ class AudioConfig
         
     private:
         /** No Assignment Operator */
-        AudioConfig& operator=(const AudioConfig&); 
+        AudioSourceConfig& operator=(const AudioSourceConfig&); 
         const std::string source_;
         const std::string location_;
         const int numChannels_;

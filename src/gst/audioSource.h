@@ -29,7 +29,7 @@
 #include "busMsgHandler.h"
 
 // forward declarations
-class AudioConfig;
+class AudioSourceConfig;
 
 /** 
  *  \class AudioSource
@@ -50,7 +50,7 @@ class AudioSource
 
     protected:
         /** Constructor */
-        explicit AudioSource(const AudioConfig &config)
+        explicit AudioSource(const AudioSourceConfig &config)
             : config_(config), sources_(0), aconvs_(0) {}
         /** 
          * Initialize source_/sources_ */
@@ -63,7 +63,7 @@ class AudioSource
         virtual void link_elements();
         /** 
          * Audio parameter object */
-        const AudioConfig &config_;
+        const AudioSourceConfig &config_;
         /** 
          * GstElements representing each source and audioconvert */
         std::vector<GstElement *>sources_, aconvs_;
@@ -105,7 +105,7 @@ class InterleavedAudioSource
 
     protected:
         /** Constructor */
-        explicit InterleavedAudioSource(const AudioConfig &config)
+        explicit InterleavedAudioSource(const AudioSourceConfig &config)
             : AudioSource(config), interleave_(config_) {}
 
         /** Overridden source initializer, which must initialize this object's Interleave object */
@@ -136,7 +136,7 @@ class AudioTestSource
 {
     public:
         /** Constructor */
-        explicit AudioTestSource(const AudioConfig &config)
+        explicit AudioTestSource(const AudioSourceConfig &config)
             : InterleavedAudioSource(config), clockId_(0), offset_(0) {}
         /** 
          * Destructor */
@@ -165,8 +165,8 @@ class AudioTestSource
  *  \class AudioFileSource
  *  Concrete AudioSource which provides playback of files. 
  *
- *  AudioFileSource plays back a file (determined by its AudioConfig object). Depending
- *  on its AudioConfig object, it may loop the file. It implements the BusMsgHandler interface
+ *  AudioFileSource plays back a file (determined by its AudioSourceConfig object). Depending
+ *  on its AudioSourceConfig object, it may loop the file. It implements the BusMsgHandler interface
  *  so that it knows when an End-of-Signal event occurs, in which case it may
  *  play the file again if it has been set to continue to play the file (either infinitely or for a finite
  *  number of plays).
@@ -177,7 +177,7 @@ class AudioFileSource
 {
     public:
         /** Constructor */
-        explicit AudioFileSource(const AudioConfig &config);
+        explicit AudioFileSource(const AudioSourceConfig &config);
         /** 
          * Destructor */
         ~AudioFileSource();
@@ -216,7 +216,7 @@ class AudioAlsaSource
 {
     public:
         /** Constructor */
-        explicit AudioAlsaSource(const AudioConfig &config)
+        explicit AudioAlsaSource(const AudioSourceConfig &config)
             : AudioSource(config), capsFilter_(0) {}
         /** 
          * Destructor */
@@ -245,7 +245,7 @@ class AudioPulseSource
 {
     public:
         /** Constructor */
-        explicit AudioPulseSource(const AudioConfig &config)
+        explicit AudioPulseSource(const AudioSourceConfig &config)
             : AudioSource(config), capsFilter_(0) {}
         /** 
          * Destructor */
@@ -275,7 +275,7 @@ class AudioJackSource
 {
     public:
         /** Constructor */
-        explicit AudioJackSource(const AudioConfig &config)
+        explicit AudioJackSource(const AudioSourceConfig &config)
             : InterleavedAudioSource(config) {}
         void sub_init();
     private:
@@ -298,7 +298,7 @@ class AudioDvSource
 {
     public:
         /** Constructor */
-        explicit AudioDvSource(const AudioConfig &config)
+        explicit AudioDvSource(const AudioSourceConfig &config)
         : AudioSource(config), demux_(0), queue_(0), dvIsNew_(true) {}
         /** 
          * Destructor */

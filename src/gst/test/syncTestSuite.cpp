@@ -40,7 +40,7 @@ void SyncTestSuite::start_jack_audio_dv_video()
     if (id_ == 1)
         return;
 
-    AudioConfig aConfig("jackaudiosrc", numChannels);
+    AudioSourceConfig aConfig("jackaudiosrc", numChannels);
     AudioLocal aTx(aConfig);
     aTx.init();
 
@@ -66,7 +66,7 @@ void SyncTestSuite::stop_jack_audio_dv_video()
     if (id_ == 1)
         return;
 
-    AudioConfig aConfig("jackaudiosrc", numChannels);
+    AudioSourceConfig aConfig("jackaudiosrc", numChannels);
     AudioLocal aTx(aConfig);
     aTx.init();
 
@@ -92,7 +92,7 @@ void SyncTestSuite::start_stop_jack_audio_dv_video()
     if (id_ == 1)
         return;
 
-    AudioConfig aConfig("jackaudiosrc", numChannels);
+    AudioSourceConfig aConfig("jackaudiosrc", numChannels);
     AudioLocal aTx(aConfig);
     aTx.init();
 
@@ -123,7 +123,7 @@ void SyncTestSuite::start_dv_audio_dv_video()
     if (id_ == 1)
         return;
 
-    AudioConfig aConfig("dv1394src", numChannels);
+    AudioSourceConfig aConfig("dv1394src", numChannels);
     AudioLocal aTx(aConfig);
     aTx.init();
 
@@ -149,7 +149,7 @@ void SyncTestSuite::stop_dv_audio_dv_video()
     if (id_ == 1)
         return;
 
-    AudioConfig aConfig("dv1394src", numChannels);
+    AudioSourceConfig aConfig("dv1394src", numChannels);
     AudioLocal aTx(aConfig);
     aTx.init();
 
@@ -175,7 +175,7 @@ void SyncTestSuite::start_stop_dv_audio_dv_video()
     if (id_ == 1)
         return;
 
-    AudioConfig aConfig("dv1394src", numChannels);
+    AudioSourceConfig aConfig("dv1394src", numChannels);
     AudioLocal aTx(aConfig);
     aTx.init();
 
@@ -207,7 +207,7 @@ void SyncTestSuite::start_audiotest_videotest()
     if (id_ == 1)
         return;
 
-    AudioConfig aConfig("audiotestsrc", numChannels);
+    AudioSourceConfig aConfig("audiotestsrc", numChannels);
     AudioLocal aTx(aConfig);
     aTx.init();
 
@@ -233,7 +233,7 @@ void SyncTestSuite::stop_audiotest_videotest()
     if (id_ == 1)
         return;
 
-    AudioConfig aConfig("audiotestsrc", numChannels);
+    AudioSourceConfig aConfig("audiotestsrc", numChannels);
     AudioLocal aTx(aConfig);
     aTx.init();
 
@@ -259,7 +259,7 @@ void SyncTestSuite::start_stop_audiotest_videotest()
     if (id_ == 1)
         return;
 
-    AudioConfig aConfig("dv1394src", numChannels);
+    AudioSourceConfig aConfig("dv1394src", numChannels);
     AudioLocal aTx(aConfig);
     aTx.init();
 

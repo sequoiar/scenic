@@ -13,7 +13,7 @@
 #include <memory>   // for std::auto_ptr
 
 namespace Factories {
-    std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig, 
+    std::auto_ptr<AudioSender> buildAudioSender(const AudioSourceConfig aConfig, 
             const char* ip, const char *codec, const long port = Ports::A_PORT);
 
     std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *ip, const char * codec, const long port = Ports::A_PORT);
@@ -25,7 +25,7 @@ namespace Factories {
 }
 
 std::auto_ptr<AudioSender> 
-Factories::buildAudioSender(const AudioConfig aConfig, const char* ip, const char *codec, const long port)
+Factories::buildAudioSender(const AudioSourceConfig aConfig, const char* ip, const char *codec, const long port)
 {
     SenderConfig rConfig(codec, ip, port);
     std::auto_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));

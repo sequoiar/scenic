@@ -29,12 +29,12 @@
 #include "audioSink.h"
 #include "logWriter.h"
 
-const char *AudioConfig::source() const
+const char *AudioSourceConfig::source() const
 {
     return source_.c_str();
 }
 
-AudioSource* AudioConfig::createSource() const
+AudioSource* AudioSourceConfig::createSource() const
 {
     if (source_ == "audiotestsrc")
         return new AudioTestSource(*this);
@@ -54,7 +54,7 @@ AudioSource* AudioConfig::createSource() const
 }
 
 // FIXME: should be paramaterized by sink, not src
-AudioSink* AudioConfig::createSink() const
+AudioSink* AudioSourceConfig::createSink() const
 {
     if (source_ == "alsasrc")
         return new AudioAlsaSink();
@@ -71,7 +71,7 @@ AudioSink* AudioConfig::createSink() const
 }
 
 
-const char* AudioConfig::location() const
+const char* AudioSourceConfig::location() const
 {
     if (location_.empty())
         THROW_ERROR("No location specified");
@@ -80,7 +80,7 @@ const char* AudioConfig::location() const
 }
 
 
-bool AudioConfig::fileExists() const
+bool AudioSourceConfig::fileExists() const
 {
     if (location_.empty())
         THROW_ERROR("No file location given");

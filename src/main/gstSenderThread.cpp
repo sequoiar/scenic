@@ -73,12 +73,12 @@ bool GstSenderThread::audio_start(MapMsg& msg)
         SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
         if(msg["location"].empty())
         {
-            AudioConfig config(msg["source"], msg["channels"]);
+            AudioSourceConfig config(msg["source"], msg["channels"]);
             audio_ = asender = new AudioSender(config, rConfig);
         }
         else
         {
-            AudioConfig config(msg["source"], msg["location"], msg["channels"], msg["loop"]);
+            AudioSourceConfig config(msg["source"], msg["location"], msg["channels"], msg["loop"]);
             audio_ = asender = new AudioSender(config, rConfig);
         }
         audio_->init();

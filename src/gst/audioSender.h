@@ -36,7 +36,7 @@ class AudioSender
 {
     public:
         /** Constructor */
-        AudioSender(const AudioConfig aConfig, const SenderConfig rConfig) 
+        AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig) 
             : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), source_(0), 
             level_(), encoder_(0), payloader_(0)
         {}
@@ -63,7 +63,7 @@ class AudioSender
         //void send_caps() const;
 
         // data
-        const AudioConfig audioConfig_;
+        const AudioSourceConfig audioConfig_;
         const SenderConfig remoteConfig_;
         RtpSender session_;
         AudioSource *source_;

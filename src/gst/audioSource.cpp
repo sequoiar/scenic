@@ -160,7 +160,7 @@ AudioTestSource::~AudioTestSource()
 }
 
 
-AudioFileSource::AudioFileSource(const AudioConfig &config) : AudioSource(config), decoders_(), loopCount_(0) 
+AudioFileSource::AudioFileSource(const AudioSourceConfig &config) : AudioSource(config), decoders_(), loopCount_(0) 
 {
     loopCount_ = config_.loop();
 }
@@ -194,7 +194,7 @@ bool AudioFileSource::handleBusMsg(_GstMessage *msg)
     if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS)
     {
         LOG_DEBUG("Got end of stream, here's where we should playback if needed");
-        if (loopCount_ > 0 || loopCount_ == AudioConfig::LOOP_INFINITE)
+        if (loopCount_ > 0 || loopCount_ == AudioSourceConfig::LOOP_INFINITE)
         {
             LOG_DEBUG("playback about to restart, " << loopCount_ << " times to go");
             restartPlayback();

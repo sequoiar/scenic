@@ -82,7 +82,7 @@ short Pof::run(int argc, char **argv)
         vRx->stop();
     }
     else {
-        AudioConfig aConfig("jackaudiosrc", Pof::NUM_CHANNELS);
+        AudioSourceConfig aConfig("jackaudiosrc", Pof::NUM_CHANNELS);
         std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, ip, audioCodec, audioPort));
         aTx->start();
         assert(tcpSendCaps(ip, Ports::CAPS_PORT, aTx->getCaps()));
