@@ -36,7 +36,8 @@ server_exec = os.path.expanduser("./miville.py")
 #server_exec = os.path.expanduser("nc -l -p server_port")
 client_command = 'telnet localhost %s' % server_port
 waiting_delay = 1.0 # seconds
-BE_VERBOSE = False # False
+#BE_VERBOSE = True 
+BE_VERBOSE = False
 # ---------------------------------------------------------------------
 # functions
 def println(s,endl=True):
@@ -208,13 +209,47 @@ class Test_1_AddressBook(TelnetBaseTest):
         self.sleep()
 	self.expectTest('Contact modified', 'Selected contact name cannot be modified')
 
-    def test_10_erase_contact(self):
+    def test_98_erase_contact(self):
         self.client.sendline("c -e Juliette")
         self.sleep()
 	self.expectTest('Contact deleted','Error while trying to erase contact')
         
-    def test_11_delete_invalid_contact(self):
-        #self.sleep()
+    def test_99_delete_invalid_contact(self):
         self.client.sendline("c -e some_invalid_name")
         self.sleep()
         self.expectTest('Could not delete', 'There should be no contact with that name.')
+
+class Test_2_Audiostream(TelnetBaseTest):
+    def test_00_default_prompt(self):
+	self.expectTest('pof: ', 'The default prompt is not appearing.')
+        
+    def test_01_add_audiostream(self):
+        self.sleep()
+        self.client.sendline("a -a audiostream")
+        self.sleep()
+	self.expectTest('Audio stream audiostream created.', 'Audio stream audio cannot be created.')
+        
+    def test_02_rename_audiostream(self):
+        self.client.sendline("a -m audio audiostream")
+        self.sleep()
+	self.expectTest('Audio stream audiostream rename to audio.', 'Audio stream audiostream cannot be renamed to audio.')
+    
+    def test_03_change_container(self):
+        self.client.sendline("a -t audio mpegts")
+        self.sleep()
+	self.expectTest('Audio stream audiostream rename to audio.', 'Audio stream audiostream cannot be renamed to audio.')
+    
+    def test_50_list_audiostreams(self):
+        self.client.sendline("a -l")
+        self.sleep()
+	self.expectTest('audio', 'The list of audio streams cannot be obained.')
+    
+    def test_98_delete_audiostream(self):
+        self.client.sendline("a -e audio")
+        self.sleep()
+	self.expectTest('Audio stream audio deleted.', 'Audio stream audio cannot be deleted.')
+
+    def test_99_delete_invalid_audiostream(self):
+        self.client.sendline("a -e audiostream")
+        self.sleep()
+	self.expectTest('There\'s no audio stream with the name audiostream', 'There should be no audio stream with that name.')
