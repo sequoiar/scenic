@@ -70,7 +70,7 @@ class AudioLevel
          * Converts from decibel to linear (0.0 to 1.0) scale. */
         static double dbToLinear(double db);
         /** 
-         * Prints current rms values through the LogWriter. */
+         * Prints current rms values through the LogWriter system. */
         void print() const;
         /** 
          * Posts the rms values to be handled at a higher level by the MapMsg system. */

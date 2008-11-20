@@ -24,10 +24,19 @@
 
 class _GstMessage;
 
+/** \class BusMsgHandler
+* Abstract interface which requires its implementors to provide 
+* functionality to handle messages posted on the bus. Variation of
+* the Observer and Chain of Responsibility patterns.
+*/
+
 class BusMsgHandler
 {
     public:
+    /** This method is called by the GstBus listener when it has a new msg. */
     virtual bool handleBusMsg(_GstMessage *msg) = 0;
+    /** 
+     * Destructor */
     virtual ~BusMsgHandler() {};
 };
 

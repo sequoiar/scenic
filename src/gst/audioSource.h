@@ -36,7 +36,7 @@ class AudioConfig;
  *  Abstract base class from which our audio sources are derived.
  *  Uses template method to define the initialization process that subclasses will have to
  *  implement (in part) and/or override. Any direct, concrete descendant of this class will not
- *  need to have its channels interleaved.
+ *  need to have its audio frames interleaved.
  */
 
 class AudioSource
@@ -87,9 +87,9 @@ class AudioSource
         AudioSource& operator=(const AudioSource&);     
 };
 
-/*! 
+/** 
  *  \class InterleavedAudioSource
- *  \brief Abstract child of AudioSource which must be interleaved before pushing audio
+ *  brief Abstract child of AudioSource whose audio frames must be interleaved before pushing audio further down pipeline.
  *
  */
 
@@ -97,22 +97,25 @@ class InterleavedAudioSource
     : public AudioSource
 {
     public:
-        //! Class destructor
+        /** Destructor */
         ~InterleavedAudioSource() {};
 
-        //! Object initializer
+        /** Object initializer */
         void init();
 
     protected:
-        //! Class constructor
+        /** Constructor */
         explicit InterleavedAudioSource(const AudioConfig &config)
             : AudioSource(config), interleave_(config_) {}
 
+        /** Overridden source initializer, which must initialize this object's Interleave object */
         void init_source();
+        /** Links the pads of this InterleavedAudioSource's constituent elements */
         void link_elements();
 
-        //! Object which performs the interleaving of this source's channels
+        /** Object which performs the interleaving of this source's channels */
         Interleave interleave_;
+        /** Exposes this InterleavedAudioSource's source, which is its Interleave's source */
         GstElement *srcElement() { return interleave_.srcElement(); }
 
     private:
@@ -120,9 +123,9 @@ class InterleavedAudioSource
         InterleavedAudioSource& operator=(const InterleavedAudioSource&);     //No Assignment Operator
 };
 
-/*! 
+/** 
  *  \class AudioTestSource
- *  \brief Concrete InterleavedAudioSource which gives us an array of sine-wave generating sources.
+ *  Concrete InterleavedAudioSource which gives us an array of sine-wave generating sources.
  *
  *  AudioTestSource generates sine-tones, each of which alternate between two hard-coded frequencies. Their
  *  combined output is then interleaved.
@@ -132,12 +135,19 @@ class AudioTestSource
     : public InterleavedAudioSource
 {
     public:
+        /** Constructor */
         explicit AudioTestSource(const AudioConfig &config)
             : InterleavedAudioSource(config), clockId_(0), offset_(0) {}
+        /** 
+         * Destructor */
         ~AudioTestSource();
+        
         void sub_init();
 
     protected:
+        /** 
+         * Asynchronous timed callback which will periodically toggle the 
+         * frequency output by each channel */
         gboolean callback();
 
     private:
@@ -151,11 +161,11 @@ class AudioTestSource
         AudioTestSource& operator=(const AudioTestSource&);     //No Assignment Operator
 };
 
-/*! 
+/** 
  *  \class AudioFileSource
- *  \brief Concrete AudioSource which provides playback of files. 
+ *  Concrete AudioSource which provides playback of files. 
  *
- *  AudioFileSource playsback a file (determined by its AudioConfig object). Depending
+ *  AudioFileSource plays back a file (determined by its AudioConfig object). Depending
  *  on its AudioConfig object, it may loop the file. It implements the BusMsgHandler interface
  *  so that it knows when an End-of-Signal event occurs, in which case it may
  *  play the file again if it has been set to continue to play the file (either infinitely or for a finite
@@ -166,13 +176,22 @@ class AudioFileSource
     : public AudioSource, public BusMsgHandler
 {
     public:
+        /** Constructor */
         explicit AudioFileSource(const AudioConfig &config);
+        /** 
+         * Destructor */
         ~AudioFileSource();
+        /** 
+         * Handles EOS signal from bus, which may mean repeating playback of the file */
         bool handleBusMsg(_GstMessage *msg);
+        /** 
+         * Handles decoders' dynamically created pad(s) by linking them to the rest of the pipeline */
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean last,
                                    void *data);
-    protected:
+        
         void sub_init();
+        /** 
+         * AudioFileSource specific element linking method */
         void link_elements();
 
     private:
@@ -185,9 +204,9 @@ class AudioFileSource
 
 // FIXME: create ABC FilteredAudioSource for alsa and pulse
 
-/*! 
+/** 
  *  \class AudioAlsaSource
- *  \brief Concrete AudioSource which captures audio from ALSA
+ *  Concrete AudioSource which captures audio from ALSA
  *
  *  Has caps filter to allow number of channels to be variable.
  */
@@ -196,10 +215,16 @@ class AudioAlsaSource
     : public AudioSource
 {
     public:
+        /** Constructor */
         explicit AudioAlsaSource(const AudioConfig &config)
             : AudioSource(config), capsFilter_(0) {}
+        /** 
+         * Destructor */
         ~AudioAlsaSource();
+
         void sub_init();
+        /** Exposes this AudioAlsaSource's source, which is a capsfilter, as 
+         * the number of channels must be explicitly set filtering the caps. */
         GstElement *srcElement() { return capsFilter_; }
     private:
         void link_elements();
@@ -210,7 +235,7 @@ class AudioAlsaSource
 
 /*! 
  *  \class AudioPulseSource
- *  \brief Concrete AudioSource which captures audio from PulseAudio.
+ *  Concrete AudioSource which captures audio from PulseAudio.
  *
  *  Has caps filter to allow number of channels to be variable.
  */
@@ -219,10 +244,17 @@ class AudioPulseSource
     : public AudioSource
 {
     public:
+        /** Constructor */
         explicit AudioPulseSource(const AudioConfig &config)
             : AudioSource(config), capsFilter_(0) {}
+        /** 
+         * Destructor */
         ~AudioPulseSource();
+    
         void sub_init();
+        /** 
+         * Exposes this AudioAlsaSource's source, which is a capsfilter, as 
+         * the number of channels must be explicitly set filtering the caps. */
         GstElement *srcElement() { return capsFilter_; }
     private:
         void link_elements();
@@ -233,8 +265,7 @@ class AudioPulseSource
 
 /*! 
  *  \class AudioJackSource
- *  \brief Concrete InterleavedAudioSource which captures audio from JACK.
- *
+ *  Concrete InterleavedAudioSource which captures audio from JACK.
  *  Interleaves incoming jack buffers into one multichannel stream.
  */
 
@@ -243,6 +274,7 @@ class AudioJackSource
     : public InterleavedAudioSource
 {
     public:
+        /** Constructor */
         explicit AudioJackSource(const AudioConfig &config)
             : InterleavedAudioSource(config) {}
         void sub_init();
@@ -253,21 +285,23 @@ class AudioJackSource
 
 /*! 
  *  \class AudioDvSource
- *  \brief Concrete AudioSource which captures audio from dv device.
+ *  Concrete AudioSource which captures audio from dv device.
  *
  *  This object is tightly coupled with VideoDvSource, as both (if present) will share one source_ GstElement, 
  *  and one dvdemux GstElement. It will look for both of these in the pipeline before trying to instantiate them. 
  *  If these GstElement are already present, AudioDvSource will simply store their addresses and link to them, if not
- *  it will create them.
+ *  it will create them. Audio can only be stereo or 4 channels according to gstreamer.
  */
 
 class AudioDvSource
     : public AudioSource
 {
     public:
+        /** Constructor */
         explicit AudioDvSource(const AudioConfig &config)
         : AudioSource(config), demux_(0), queue_(0), dvIsNew_(true) {}
-
+        /** 
+         * Destructor */
         ~AudioDvSource();
         void init_source();
         void sub_init();
