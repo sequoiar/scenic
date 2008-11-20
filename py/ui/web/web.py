@@ -18,8 +18,30 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
+from twisted.internet import reactor
+from nevow import rend, loaders, appserver
+
+#App imports
+from utils import Observer, log
+from utils.i18n import to_utf
+import ui
+from ui.common import find_callbacks
+from streams import audio, video, data
+from streams.stream import AudioStream, VideoStream, DataStream
 
 
+log = log.start('info', 1, 0, 'web')
 
-def start():
-    pass
+class HelloWorld(rend.Page):
+    addSlash = True
+    docFactory = loaders.xmlstr("""
+    <html><head><title>Nested Maps Sequence Rendering</title></head>
+        <body>Allo
+        </body>
+    </html>
+    """)
+
+
+def start(subject, port=8080):
+    site = appserver.NevowSite(HelloWorld())
+    reactor.listenTCP(port, site, 5, '127.0.0.1')
