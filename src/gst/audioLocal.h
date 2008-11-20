@@ -39,8 +39,8 @@ class AudioLocal
 {
     public:
         /** Constructor */
-        explicit AudioLocal(const AudioSourceConfig config) 
-            : config_(config), source_(0), level_(), sink_(0) {}
+        explicit AudioLocal(const AudioSourceConfig srcConfig, const AudioSinkConfig sinkConfig) 
+            : srcConfig_(srcConfig), sinkConfig_(sinkConfig), source_(0), level_(), sink_(0) {}
         /** 
          * Destructor */
         ~AudioLocal();
@@ -56,7 +56,8 @@ class AudioLocal
         void init_sink();
 
         // data
-        const AudioSourceConfig config_;
+        const AudioSourceConfig srcConfig_;
+        const AudioSinkConfig sinkConfig_;
         AudioSource *source_;
         AudioLevel level_;
         AudioSink *sink_;

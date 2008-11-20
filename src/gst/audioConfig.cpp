@@ -53,23 +53,6 @@ AudioSource* AudioSourceConfig::createSource() const
     return 0;
 }
 
-// FIXME: should be paramaterized by sink, not src
-AudioSink* AudioSourceConfig::createSink() const
-{
-    if (source_ == "alsasrc")
-        return new AudioAlsaSink();
-    else if (source_ == "pulsesrc")
-        return new AudioPulseSink();
-    else if ((!source_.empty()) && 
-            (source_ != "jackaudiosrc") && 
-            (source_ != "dv1394src") && 
-            (source_ != "audiotestsrc") && 
-            (source_ != "filesrc"))
-        LOG_WARNING(source_ << " is an invalid sink, using default jackaudiosink");
-
-    return new AudioJackSink();
-}
-
 
 const char* AudioSourceConfig::location() const
 {

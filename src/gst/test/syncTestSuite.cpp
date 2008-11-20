@@ -35,18 +35,19 @@
 
 void SyncTestSuite::start_jack_audio_dv_video()
 {
-    int numChannels = 2;
+    const int NUM_CHANNELS = 2;
 
     if (id_ == 1)
         return;
 
-    AudioSourceConfig aConfig("jackaudiosrc", numChannels);
-    AudioLocal aTx(aConfig);
+    AudioSourceConfig audioSrcConfig("jackaudiosrc", NUM_CHANNELS);
+    AudioSinkConfig audioSinkConfig("jackaudiosink");
+    AudioLocal aTx(audioSrcConfig, audioSinkConfig);
     aTx.init();
 
-    VideoSourceConfig srcConfig("dv1394src");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal vTx(srcConfig, sinkConfig);
+    VideoSourceConfig videoSrcConfig("dv1394src");
+    VideoSinkConfig videoSinkConfig("xvimagesink");
+    VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
 
@@ -61,18 +62,19 @@ void SyncTestSuite::start_jack_audio_dv_video()
 
 void SyncTestSuite::stop_jack_audio_dv_video()
 {
-    int numChannels = 2;
+    const int NUM_CHANNELS = 2;
 
     if (id_ == 1)
         return;
 
-    AudioSourceConfig aConfig("jackaudiosrc", numChannels);
-    AudioLocal aTx(aConfig);
+    AudioSourceConfig audioSrcConfig("jackaudiosrc", NUM_CHANNELS);
+    AudioSinkConfig audioSinkConfig("jackaudiosink");
+    AudioLocal aTx(audioSrcConfig, audioSinkConfig);
     aTx.init();
 
-    VideoSourceConfig srcConfig("dv1394src");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal vTx(srcConfig, sinkConfig);
+    VideoSourceConfig videoSrcConfig("dv1394src");
+    VideoSinkConfig videoSinkConfig("xvimagesink");
+    VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
     BLOCK();
@@ -87,18 +89,19 @@ void SyncTestSuite::stop_jack_audio_dv_video()
 
 void SyncTestSuite::start_stop_jack_audio_dv_video()
 {
-    int numChannels = 2;
+    const int NUM_CHANNELS = 2;
 
     if (id_ == 1)
         return;
 
-    AudioSourceConfig aConfig("jackaudiosrc", numChannels);
-    AudioLocal aTx(aConfig);
+    AudioSourceConfig audioSrcConfig("jackaudiosrc", NUM_CHANNELS);
+    AudioSinkConfig audioSinkConfig("jackaudiosink");
+    AudioLocal aTx(audioSrcConfig, audioSinkConfig);
     aTx.init();
 
-    VideoSourceConfig srcConfig("dv1394src");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal vTx(srcConfig, sinkConfig);
+    VideoSourceConfig videoSrcConfig("dv1394src");
+    VideoSinkConfig videoSinkConfig("xvimagesink");
+    VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
     aTx.start();
@@ -118,18 +121,19 @@ void SyncTestSuite::start_stop_jack_audio_dv_video()
 
 void SyncTestSuite::start_dv_audio_dv_video()
 {
-    int numChannels = 2;
+    const int NUM_CHANNELS = 2;
 
     if (id_ == 1)
         return;
 
-    AudioSourceConfig aConfig("dv1394src", numChannels);
-    AudioLocal aTx(aConfig);
+    AudioSourceConfig audioSrcConfig("dv1394src", NUM_CHANNELS);
+    AudioSinkConfig audioSinkConfig("jackaudiosink");
+    AudioLocal aTx(audioSrcConfig, audioSinkConfig);
     aTx.init();
 
-    VideoSourceConfig srcConfig("dv1394src");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal vTx(srcConfig, sinkConfig);
+    VideoSourceConfig videoSrcConfig("dv1394src");
+    VideoSinkConfig videoSinkConfig("xvimagesink");
+    VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
 
@@ -144,18 +148,19 @@ void SyncTestSuite::start_dv_audio_dv_video()
 
 void SyncTestSuite::stop_dv_audio_dv_video()
 {
-    int numChannels = 2;
+    const int NUM_CHANNELS = 2;
 
     if (id_ == 1)
         return;
 
-    AudioSourceConfig aConfig("dv1394src", numChannels);
-    AudioLocal aTx(aConfig);
+    AudioSourceConfig audioSrcConfig("dv1394src", NUM_CHANNELS);
+    AudioSinkConfig audioSinkConfig("jackaudiosink");
+    AudioLocal aTx(audioSrcConfig, audioSinkConfig);
     aTx.init();
 
-    VideoSourceConfig srcConfig("dv1394src");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal vTx(srcConfig, sinkConfig);
+    VideoSourceConfig videoSrcConfig("dv1394src");
+    VideoSinkConfig videoSinkConfig("xvimagesink");
+    VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
     BLOCK();
@@ -170,18 +175,19 @@ void SyncTestSuite::stop_dv_audio_dv_video()
 
 void SyncTestSuite::start_stop_dv_audio_dv_video()
 {
-    int numChannels = 2;
+    const int NUM_CHANNELS = 2;
 
     if (id_ == 1)
         return;
 
-    AudioSourceConfig aConfig("dv1394src", numChannels);
-    AudioLocal aTx(aConfig);
+    AudioSourceConfig audioSrcConfig("dv1394src", NUM_CHANNELS);
+    AudioSinkConfig audioSinkConfig("jackaudiosink");
+    AudioLocal aTx(audioSrcConfig, audioSinkConfig);
     aTx.init();
 
-    VideoSourceConfig srcConfig("dv1394src");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal vTx(srcConfig, sinkConfig);
+    VideoSourceConfig videoSrcConfig("dv1394src");
+    VideoSinkConfig videoSinkConfig("xvimagesink");
+    VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
     aTx.start();
@@ -202,18 +208,19 @@ void SyncTestSuite::start_stop_dv_audio_dv_video()
 
 void SyncTestSuite::start_audiotest_videotest()
 {
-    int numChannels = 8;
+    const int NUM_CHANNELS = 8;
 
     if (id_ == 1)
         return;
 
-    AudioSourceConfig aConfig("audiotestsrc", numChannels);
-    AudioLocal aTx(aConfig);
+    AudioSourceConfig audioSrcConfig("audiotestsrc", NUM_CHANNELS);
+    AudioSinkConfig audioSinkConfig("jackaudiosink");
+    AudioLocal aTx(audioSrcConfig, audioSinkConfig);
     aTx.init();
 
-    VideoSourceConfig srcConfig("videotestsrc");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal vTx(srcConfig, sinkConfig);
+    VideoSourceConfig videoSrcConfig("videotestsrc");
+    VideoSinkConfig videoSinkConfig("xvimagesink");
+    VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
 
@@ -228,18 +235,19 @@ void SyncTestSuite::start_audiotest_videotest()
 
 void SyncTestSuite::stop_audiotest_videotest()
 {
-    int numChannels = 8;
+    const int NUM_CHANNELS = 8;
 
     if (id_ == 1)
         return;
 
-    AudioSourceConfig aConfig("audiotestsrc", numChannels);
-    AudioLocal aTx(aConfig);
+    AudioSourceConfig audioSrcConfig("audiotestsrc", NUM_CHANNELS);
+    AudioSinkConfig audioSinkConfig("jackaudiosink");
+    AudioLocal aTx(audioSrcConfig, audioSinkConfig);
     aTx.init();
 
-    VideoSourceConfig srcConfig("videotestsrc");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal vTx(srcConfig, sinkConfig);
+    VideoSourceConfig videoSrcConfig("videotestsrc");
+    VideoSinkConfig videoSinkConfig("xvimagesink");
+    VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
     BLOCK();
@@ -254,18 +262,19 @@ void SyncTestSuite::stop_audiotest_videotest()
 
 void SyncTestSuite::start_stop_audiotest_videotest()
 {
-    int numChannels = 8;
+    const int NUM_CHANNELS = 8;
 
     if (id_ == 1)
         return;
 
-    AudioSourceConfig aConfig("dv1394src", numChannels);
-    AudioLocal aTx(aConfig);
+    AudioSourceConfig audioSrcConfig("audiotestsrc", NUM_CHANNELS);
+    AudioSinkConfig audioSinkConfig("jackaudiosink");
+    AudioLocal aTx(audioSrcConfig, audioSinkConfig);
     aTx.init();
 
-    VideoSourceConfig srcConfig("dv1394src");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal vTx(srcConfig, sinkConfig);
+    VideoSourceConfig videoSrcConfig("dv1394src");
+    VideoSinkConfig videoSinkConfig("xvimagesink");
+    VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
     aTx.start();

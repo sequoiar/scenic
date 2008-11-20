@@ -70,9 +70,6 @@ class AudioSourceConfig
          
         /** Factory method that creates an AudioSource based on this object's source_ string */
         AudioSource* createSource() const;
-        /** 
-         * Factory method that creates an AudioSink based on this object's source_ string */
-        AudioSink* createSink() const;
 
         /** Enum representing two possible loop settings, any other will correspond 
          * to the finite number of times to playback. */
