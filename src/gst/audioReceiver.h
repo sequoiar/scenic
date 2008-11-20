@@ -32,7 +32,7 @@ class RtpPay;
 class Decoder;
 class AudioSink;
 
-/** 
+/** \class AudioReceiver
  * An audio pipeline derived from ReceiverBase that receives audio over rtp,
  * decodes/converts it as needed and pushes it to its sink.
  */
@@ -51,10 +51,11 @@ class AudioReceiver
         /** Destructor */
         ~AudioReceiver();
 
-        /** Sets the pipeline state to playing */
+        /** Sets the global pipeline state to playing */
         void start();
 
     private:
+        /** Implementation of ReceiverBase's template method initialization */
         void init_codec();
         void init_depayloader();
         void init_level();

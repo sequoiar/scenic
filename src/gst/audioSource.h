@@ -31,52 +31,60 @@
 // forward declarations
 class AudioConfig;
 
-/*! 
+/** 
  *  \class AudioSource
- *  \brief Abstract base class from which our audio sources are derived.
- *
+ *  Abstract base class from which our audio sources are derived.
  *  Uses template method to define the initialization process that subclasses will have to
- *  implement (in part) and/or override. Any direct descendant of this class will already
- *  have its channels interleaved.
+ *  implement (in part) and/or override. Any direct, concrete descendant of this class will not
+ *  need to have its channels interleaved.
  */
 
 class AudioSource
     : public GstLinkableSource
 {
     public:
-        //! Class destructor
+        /** Destructor */
         ~AudioSource();
-        //! Object initializer
+        /** Object initializer */
         void init();
 
     protected:
-        //! Class constructor
+        /** Constructor */
         explicit AudioSource(const AudioConfig &config)
             : config_(config), sources_(0), aconvs_(0) {}
-
-        //! Initialize source_/sources_
+        /** 
+         * Initialize source_/sources_ */
         virtual void init_source();
-        //! Implemented by subclasses to perform other initialization
+        /** 
+         * Implemented by subclasses to perform other specific initialization */
         virtual void sub_init() = 0;
-        //! Link pads of all our component GstElements
+        /** 
+        * Link pads of all our component GstElements */
         virtual void link_elements();
-        //! Audio parameter object
+        /** 
+         * Audio parameter object */
         const AudioConfig &config_;
-        //! GstElements representing each source and audioconvert
+        /** 
+         * GstElements representing each source and audioconvert */
         std::vector<GstElement *>sources_, aconvs_;
-        //! Asynchronous callback that when triggered will call the appropriate callback in derived classes.
+        /** 
+         * Asynchronous callback that when triggered will call the appropriate callback in derived classes. */
         static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                       gpointer user_data);
-        //! Derived classes asynchronous callback.  
+        /** 
+         * Derived classes asynchronous callback. */
         virtual gboolean callback() { return FALSE; }
+        /**
+         * Returns this AudioSource's source, which is an audioconverter. */
         GstElement *srcElement() { return aconvs_[0]; }
 
     private:
-        //!No Copy Constructor
+        /**
+         * No Copy Constructor */
         AudioSource(const AudioSource&);     
-        //!No Assignment Operator
+        /**
+         * No Assignment Operator */
         AudioSource& operator=(const AudioSource&);     
-        friend class AudioSender;
 };
 
 /*! 
