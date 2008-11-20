@@ -29,17 +29,17 @@ bool GstSenderThread::video_start(MapMsg& msg)
 
     try
     {
-        //VideoConfig config("dv1394src");
+        //VideoSourceConfig config("dv1394src");
         SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
 
         if(msg["location"].empty())
         {
-            VideoConfig config(msg["source"]);
+            VideoSourceConfig config(msg["source"]);
             video_ =  new VideoSender(config, rConfig);
         }
         else
         {
-            VideoConfig config(msg["source"], std::string(msg["location"]));
+            VideoSourceConfig config(msg["source"], std::string(msg["location"]));
             video_ =  new VideoSender(config, rConfig);
         }
         video_->init();

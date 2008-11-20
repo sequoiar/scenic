@@ -92,16 +92,16 @@ class AudioConfig
 };
 
 /**  Immutable class that is used to parametrize AudioReceiver objects.  */
-class AudioReceiverConfig 
+class AudioSinkConfig 
 {
     public:
         /** Constructor */
-        AudioReceiverConfig(const std::string & sink__)
+        AudioSinkConfig(const std::string & sink__)
             : sink_(sink__)
         {}
         /** 
          * Copy constructor */
-        AudioReceiverConfig(const AudioReceiverConfig & m) : sink_(m.sink_) 
+        AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_) 
         {}
 
         /** Factory method that creates an AudioSink based on this object's sink_ string */

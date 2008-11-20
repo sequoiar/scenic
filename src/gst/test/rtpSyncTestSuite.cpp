@@ -47,7 +47,7 @@ static std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
 
 static std::auto_ptr<AudioReceiver> buildAudioReceiver()
 {
-    AudioReceiverConfig aConfig("jackaudiosink");
+    AudioSinkConfig aConfig("jackaudiosink");
     ReceiverConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT, tcpGetCaps(GstTestSuite::A_PORT + 100));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
@@ -58,7 +58,7 @@ static std::auto_ptr<AudioReceiver> buildAudioReceiver()
 // for testing dead pipelines
 static std::auto_ptr<AudioReceiver> buildDeadAudioReceiver()
 {
-    AudioReceiverConfig aConfig("jackaudiosink");
+    AudioSinkConfig aConfig("jackaudiosink");
     ReceiverConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT, "");
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();

@@ -96,7 +96,7 @@ bool AudioConfig::fileExists() const
 }
 
 
-AudioSink* AudioReceiverConfig::createSink() const
+AudioSink* AudioSinkConfig::createSink() const
 {
     if (sink_ == "jackaudiosink")
         return new AudioJackSink();

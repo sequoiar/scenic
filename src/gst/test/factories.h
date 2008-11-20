@@ -36,7 +36,7 @@ Factories::buildAudioSender(const AudioConfig aConfig, const char* ip, const cha
 std::auto_ptr<AudioReceiver> 
 Factories::buildAudioReceiver(const char *ip, const char *codec, const long port)
 {
-    AudioReceiverConfig aConfig("jackaudiosink");
+    AudioSinkConfig aConfig("jackaudiosink");
     ReceiverConfig rConfig(codec, ip, port, tcpGetCaps(Ports::CAPS_PORT));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();

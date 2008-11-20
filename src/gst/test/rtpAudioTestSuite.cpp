@@ -51,7 +51,7 @@ std::auto_ptr<AudioSender> buildAudioSender(const AudioConfig aConfig)
 
 std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *audioSinkName = "jackaudiosink")
 {
-    AudioReceiverConfig aConfig(audioSinkName);
+    AudioSinkConfig aConfig(audioSinkName);
     ReceiverConfig rConfig("vorbis", get_host_ip(), Ports::A_PORT, tcpGetCaps(Ports::CAPS_PORT));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
@@ -61,7 +61,7 @@ std::auto_ptr<AudioReceiver> buildAudioReceiver(const char *audioSinkName = "jac
 
 std::auto_ptr<AudioReceiver> buildDeadAudioReceiver(const char *audioSinkName = "jackaudiosink")
 {
-    AudioReceiverConfig aConfig(audioSinkName);
+    AudioSinkConfig aConfig(audioSinkName);
     ReceiverConfig rConfig("vorbis", get_host_ip(), Ports::A_PORT, "");
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();

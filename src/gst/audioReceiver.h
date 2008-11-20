@@ -40,9 +40,9 @@ class AudioReceiver
     : public ReceiverBase
 {
     public:
-        /** Constructor parameterized by an AudioReceiverConfig 
+        /** Constructor parameterized by an AudioSinkConfig 
          * and a ReceiverConfig */
-        AudioReceiver(const AudioReceiverConfig aConfig, 
+        AudioReceiver(const AudioSinkConfig aConfig, 
                       const ReceiverConfig rConfig)
             : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), 
               gotCaps_(false),depayloader_(0), decoder_(0), level_(), sink_(0)
@@ -64,7 +64,7 @@ class AudioReceiver
         /** Used to set this AudioReceiver's RtpReceiver's caps */
         void set_caps(); 
 
-        const AudioReceiverConfig audioConfig_;
+        const AudioSinkConfig audioConfig_;
         const ReceiverConfig remoteConfig_;
 
         RtpReceiver session_;

@@ -30,7 +30,7 @@ bool GstReceiverThread::video_start(MapMsg& msg)
 
     try
     {
-        VideoReceiverConfig config("xvimagesink");
+        VideoSinkConfig config("xvimagesink");
         ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"], "");
         video_ = new VideoReceiver(config, rConfig);
         video_->init();
@@ -55,7 +55,7 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
 
     try
     {
-        AudioReceiverConfig config("jackaudiosink");
+        AudioSinkConfig config("jackaudiosink");
         ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"], msg["caps"]);
         audio_ = new AudioReceiver(config, rConfig);
         audio_->init();
