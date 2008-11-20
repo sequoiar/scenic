@@ -23,15 +23,22 @@
 #include "gstLinkable.h"
 #include "logWriter.h"
 
+// forward declarations
 class _GstElement;
 class RtpPay;
+
+/** \class Codec
+ *  Abstract base class that wraps a single GstElement, and which exposes both a source and sink.
+ */
 
 class Codec : public GstLinkableFilter
 {
     public:
-
+        /** Constructor */
         Codec()
             : codec_(0) {};
+        /** 
+         * Destructor */
         ~Codec();
 
     protected:
@@ -47,66 +54,101 @@ class Codec : public GstLinkableFilter
         Codec& operator=(const Codec&);     //No Assignment Operator
 };
 
+/** \class Encoder
+ *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
+ *  and whose concrete subclasses will provide specifc encoding of raw media streams.
+ */
 
 class Encoder : public Codec
 {
     public:
+        /** Abstract Factory method that will create payloaders corresponding to this Encoder's codec type */
         virtual RtpPay* createPayloader() const = 0;
 };
 
+/** \class Decoder
+ *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
+ *  and whose concrete subclasses will provide specifc decoding of encoded media streams.
+ */
 
 class Decoder : public Codec
 {
     public:
+        /** Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type */
         virtual RtpPay* createDepayloader() const = 0;
-        virtual void setSrcCaps(){ LOG_DEBUG("BASE DECODER");};
+        //virtual void setSrcCaps(){ LOG_DEBUG("BASE DECODER");};
 };
 
+/** \class H264Encoder
+ *  Concrete child of Encoder that encodes raw video into H.264 using the x264 encoder
+ */
 
 class H264Encoder : public Encoder
 {
     public: 
 
+        /** Constructor */
         H264Encoder() : colorspc_(0) {};
+        /** 
+         * Destructor */
         ~H264Encoder();
+
         void init();
+        /** 
+         * Creates an h.264 rtp payloader */
         RtpPay* createPayloader() const;
 
-    private:
-
+        /** Exposes the sink of this encoder, which is a colorspace converter */
         _GstElement *sinkElement() { return colorspc_; }
+    private:
         _GstElement *colorspc_;
         
         H264Encoder(const H264Encoder&);     //No Copy Constructor
         H264Encoder& operator=(const H264Encoder&);     //No Assignment Operator
 };
 
+/** \class H264Decoder
+ *  Concrete child of Decoder that decodes H.264 into raw video using the ffdec_h264 decoder.
+ */
 
 class H264Decoder : public Decoder
 {
     public: 
 
         void init();
+        /** Creates an h.264 RtpDepayloader */
         RtpPay* createDepayloader() const;
 };
 
+/** \class VorbisEncoder
+ *  Concrete child of Encoder that encodes raw audio using the vorbis encoder.
+ */
 
 class VorbisEncoder : public Encoder 
 {
     public: 
-
+        /** Constructor */
         VorbisEncoder() : aconv_(0){};
+
+        /** Destructor */
         ~VorbisEncoder();
         void init();
+        /** Creates an RtpVorbisPayloader */
         RtpPay* createPayloader() const;
 
-    private:
         _GstElement *sinkElement() { return aconv_; }
+
+    private:
         _GstElement *aconv_;
-        VorbisEncoder(const VorbisEncoder&);     //No Copy Constructor
-        VorbisEncoder& operator=(const VorbisEncoder&);     //No Assignment Operator
+        /** No Copy Constructor */
+        VorbisEncoder(const VorbisEncoder&);     
+        /**No Assignment Operator*/
+        VorbisEncoder& operator=(const VorbisEncoder&);     
 };
 
+/** \class VorbisDecoder
+ *  Concrete child of Decoder that decodes vorbis into raw audio using the vorbis decoder.
+ */
 
 class VorbisDecoder : public Decoder
 {
