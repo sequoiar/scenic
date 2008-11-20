@@ -25,23 +25,22 @@
 class VideoSource;
 class VideoSink;
 
-class VideoConfig
+class VideoSourceConfig
 {
     public:
         //* for a simple source */
-        VideoConfig(const std::string &source__, int screen_num=0) 
-            : source_(source__), screen_num_(screen_num), location_("") {}
+        explicit VideoSourceConfig(const std::string &source__) 
+            : source_(source__), location_("") {}
 
         //* for source (remote) w/ location i.e. filename or url */
-        VideoConfig(const std::string &source__, const std::string &location__)
-            : source_(source__), screen_num_(0), location_(location__)  {}
+        VideoSourceConfig(const std::string &source__, const std::string &location__)
+            : source_(source__), location_(location__)  {}
 
         //* copy constructor */
-        VideoConfig(const VideoConfig& m)
-            : source_(m.source_), screen_num_(m.screen_num_), location_(m.location_) {}
+        VideoSourceConfig(const VideoSourceConfig& m)
+            : source_(m.source_), location_(m.location_) {}
 
         VideoSource* createSource() const;  // factory method
-        VideoSink* createSink() const;  // factory method
 
         const char *source() const { return source_.c_str(); }
 
@@ -51,24 +50,23 @@ class VideoConfig
 
     private:
         const std::string source_;
-        const int screen_num_;
         const std::string location_;
         /** No Assignment Operator */
-        VideoConfig& operator=(const VideoConfig&);     
+        VideoSourceConfig& operator=(const VideoSourceConfig&);     
 };
 
 
-class VideoReceiverConfig 
+class VideoSinkConfig 
 {
     public:
 
-        VideoReceiverConfig(const std::string & sink__, int screen_num = 0)
-            : sink_(sink__), screen_num_(screen_num)
+        explicit VideoSinkConfig(const std::string & sink__, int screenNum = 0)
+            : sink_(sink__), screenNum_(screenNum)
         {}
 
         // copy constructor
-        VideoReceiverConfig(const VideoReceiverConfig & m) 
-            : sink_(m.sink_) , screen_num_(m.screen_num_)
+        VideoSinkConfig(const VideoSinkConfig & m) 
+            : sink_(m.sink_) , screenNum_(m.screenNum_)
         {}
 
         VideoSink* createSink() const;
@@ -76,7 +74,7 @@ class VideoReceiverConfig
     private:
 
         const std::string sink_;
-        const int screen_num_;
+        const int screenNum_;
 };
 
 #endif // _VIDEO_CONFIG_H_

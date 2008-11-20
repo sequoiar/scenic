@@ -23,7 +23,7 @@
 
 #include <gst/gstclock.h>
 
-class VideoConfig;
+class VideoSourceConfig;
 class _GstElement;
 class _GstPad;
 
@@ -38,10 +38,10 @@ class VideoSource
         virtual void sub_init() = 0;
 
     protected:
-        explicit VideoSource(const VideoConfig &config)
+        explicit VideoSource(const VideoSourceConfig &config)
             : config_(config), source_(0) {}
 
-        const VideoConfig &config_;
+        const VideoSourceConfig &config_;
         _GstElement *source_;
         static int base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                       void *user_data);
@@ -56,7 +56,7 @@ class VideoTestSource
     : public VideoSource
 {
     public:
-        explicit VideoTestSource(const VideoConfig &config)
+        explicit VideoTestSource(const VideoSourceConfig &config)
             : VideoSource(config), clockId_(0) {}
         ~VideoTestSource();
         void sub_init();
@@ -77,7 +77,7 @@ class VideoFileSource
     : public VideoSource
 {
     public:
-        explicit VideoFileSource(const VideoConfig &config)
+        explicit VideoFileSource(const VideoSourceConfig &config)
             : VideoSource(config), decoder_(0) {}
         ~VideoFileSource();
         _GstElement *srcElement() { return 0; }      // FIXME: HACK
@@ -98,7 +98,7 @@ class VideoDvSource
     : public VideoSource
 {
     public:
-        explicit VideoDvSource(const VideoConfig &config) 
+        explicit VideoDvSource(const VideoSourceConfig &config) 
             : VideoSource(config), demux_(0), queue_(0), dvdec_(0), dvIsNew_(true) {}
 
         ~VideoDvSource();
@@ -119,7 +119,7 @@ class VideoV4lSource
     : public VideoSource
 {
     public:
-        explicit VideoV4lSource(const VideoConfig &config)
+        explicit VideoV4lSource(const VideoSourceConfig &config)
             : VideoSource(config) {}
         void sub_init();
     private:

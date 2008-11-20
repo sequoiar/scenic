@@ -39,14 +39,14 @@ VideoLocal::~VideoLocal()
 
 void VideoLocal::init_source()
 {
-    assert(source_ = config_.createSource());
+    assert(source_ = srcConfig_.createSource());
     source_->init();
 }
 
 
 void VideoLocal::init_sink()
 {
-    assert(sink_ = config_.createSink());
+    assert(sink_ = sinkConfig_.createSink());
     sink_->init();
     gstlinkable::link(*source_, *sink_);   // FIXME: this shouldn't happen for VideoFileSource
 }

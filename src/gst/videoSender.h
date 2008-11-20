@@ -34,7 +34,7 @@ class VideoSender
     : public SenderBase 
 {
     public:
-         VideoSender(const VideoConfig vConfig, const SenderConfig rConfig) 
+         VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig) 
             : videoConfig_(vConfig), remoteConfig_(rConfig), session_(), source_(0), 
             encoder_(0), payloader_(0) {}
 
@@ -47,7 +47,7 @@ class VideoSender
         void init_codec();
         void init_payloader();
 
-        const VideoConfig videoConfig_;
+        const VideoSourceConfig videoConfig_;
         const SenderConfig remoteConfig_;
         RtpSender session_;
         VideoSource *source_;

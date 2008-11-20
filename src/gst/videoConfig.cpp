@@ -32,7 +32,7 @@
 #include <fstream>
 
 
-VideoSource * VideoConfig::createSource() const
+VideoSource * VideoSourceConfig::createSource() const
 {
     if (source_ == "videotestsrc")
         return new VideoTestSource(*this);
@@ -47,28 +47,8 @@ VideoSource * VideoConfig::createSource() const
     return 0;
 }
 
-// FIXME: options?
-VideoSink * VideoConfig::createSink() const
-{
-    return new GLImageSink(screen_num_);
-}
 
-
-VideoSink * VideoReceiverConfig::createSink() const
-{
-    if (sink_ == "xvimagesink")
-        return new XvImageSink();
-    else if (sink_ == "ximagesink")
-        return new XImageSink();
-    else if (sink_ == "glimagesink")
-        return new GLImageSink(screen_num_);
-    else
-        THROW_ERROR(sink_ << " is an invalid sink");
-    return 0;
-}
-
-
-bool VideoConfig::fileExists() const
+bool VideoSourceConfig::fileExists() const
 {
     std::fstream in;
     in.open(location_.c_str(), std::fstream::in);
@@ -83,10 +63,22 @@ bool VideoConfig::fileExists() const
 }
 
 
-const char* VideoConfig::location() const
+const char* VideoSourceConfig::location() const
 {
-    //if (location_.empty())
-    //   THROW_ERROR("No location specified");
     return location_.c_str();
+}
+
+
+VideoSink * VideoSinkConfig::createSink() const
+{
+    if (sink_ == "xvimagesink")
+        return new XvImageSink();
+    else if (sink_ == "ximagesink")
+        return new XImageSink();
+    else if (sink_ == "glimagesink")
+        return new GLImageSink(screenNum_);
+    else
+        THROW_ERROR(sink_ << " is an invalid sink");
+    return 0;
 }
 

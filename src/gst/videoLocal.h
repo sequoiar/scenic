@@ -31,9 +31,11 @@ class VideoLocal
     : public LocalBase
 {
     public:
-        explicit VideoLocal(const VideoConfig config) 
-            : config_(config), source_(0), sink_(0) {}
+        /** Constructor */
+        explicit VideoLocal(const VideoSourceConfig srcConfig, const VideoSinkConfig sinkConfig) 
+            : srcConfig_(srcConfig), sinkConfig_(sinkConfig), source_(0), sink_(0) {}
 
+        /** Destructor */
         ~VideoLocal();
 
         void start();
@@ -42,7 +44,8 @@ class VideoLocal
         void init_source();
         void init_sink();
 
-        const VideoConfig config_;
+        const VideoSourceConfig srcConfig_;
+        const VideoSinkConfig sinkConfig_;
         VideoSource *source_;
         VideoSink *sink_;
 
