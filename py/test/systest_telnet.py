@@ -36,7 +36,7 @@ server_exec = os.path.expanduser("./miville.py")
 #server_exec = os.path.expanduser("nc -l -p server_port")
 client_command = 'telnet localhost %s' % server_port
 waiting_delay = 1.0 # seconds
-BE_VERBOSE = True # False
+BE_VERBOSE = False # False
 # ---------------------------------------------------------------------
 # functions
 def println(s,endl=True):
@@ -156,32 +156,64 @@ class TelnetBaseTest(unittest.TestCase):
 # ---------------------------------------------------------------------
 # test classes
 class Test_1_AddressBook(TelnetBaseTest):
-    def test_1_default_prompt(self):
+    def test_01_default_prompt(self):
 	self.expectTest('pof: ', 'The default prompt is not appearing.')
         
-    def test_2_add_contact(self):
+    def test_02_add_contact(self):
         # adding a contact
         # c -a name ip [port]
         self.client.sendline("c -a Juliette 154.123.2.3")
         self.sleep()
 	self.expectTest('Contact added', 'Contact not added')
     
-    def test_3_list(self):
+    def test_03_list(self):
         self.client.sendline("c -l") 
         self.sleep()
 	self.expectTest('Juliette:', 'The contact that has just been added is not appearing.')
 
-    def test_4_add_duplicate(self):
+    def test_04_add_duplicate(self):
 	self.client.sendline("c -a Juliette 192.168.20.20")
         self.sleep()
 	self.expectTest('Could not add contact.', 'Double entry shouldn\'t have been made.')
-        
-    def test_5_erase_contact(self):
+       
+    def test_05_select(self):
+	self.client.sendline("c -s Juliette")
+        self.sleep()
+	self.expectTest('Contact selected', 'Contact couln\'t be selected')
+
+    def test_06_duplicate_selected(self):
+	self.client.sendline("c -d Henriette")
+        self.sleep()
+	self.expectTest('Contact duplicated', 'Selected contact cannot be duplicated')
+
+    def test_07_duplicate_named(self):
+	self.client.sendline("c -d Mariette Juliette")
+        self.sleep()
+	self.expectTest('Contact duplicated', 'Specified contact cannot be duplicated')
+
+    def test_08_modify_selected_name(self):
+	self.client.sendline("c -s Mariette")
+        self.sleep()
+	self.client.sendline("c -m Luciette")
+        self.sleep()
+	self.expectTest('Contact modified', 'Selected contact name cannot be modified')
+
+    def test_08_modify_selected_ip(self):
+	self.client.sendline("c -m address=172.16.20.30")
+        self.sleep()
+	self.expectTest('Contact modified', 'Selected contact name cannot be modified')
+
+    def test_09_modify_selected_name_and_ip(self):
+	self.client.sendline("c -m Annette 192.168.30.30")
+        self.sleep()
+	self.expectTest('Contact modified', 'Selected contact name cannot be modified')
+
+    def test_10_erase_contact(self):
         self.client.sendline("c -e Juliette")
         self.sleep()
 	self.expectTest('Contact deleted','Error while trying to erase contact')
         
-    def test_6_delete_invalid_contact(self):
+    def test_11_delete_invalid_contact(self):
         #self.sleep()
         self.client.sendline("c -e some_invalid_name")
         self.sleep()
