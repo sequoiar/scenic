@@ -25,11 +25,13 @@
 #include "videoLocal.h"
 #include "videoConfig.h"
 
+const int VideoTestSuite::GL_SCREEN = 1;
 
 void VideoTestSuite::start_test_video_gl()
 {
-    VideoConfig config("videotestsrc",1);
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("videotestsrc");
+    VideoSinkConfig sinkConfig("glimagesink", GL_SCREEN);
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     tx.start();
@@ -42,8 +44,9 @@ void VideoTestSuite::start_test_video_gl()
 
 void VideoTestSuite::stop_test_video_gl()
 {
-    VideoConfig config("videotestsrc");
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("videotestsrc");
+    VideoSinkConfig sinkConfig("glimagesink", GL_SCREEN);
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     BLOCK();
@@ -55,8 +58,9 @@ void VideoTestSuite::stop_test_video_gl()
 
 void VideoTestSuite::start_stop_test_video_gl()
 {
-    VideoConfig config("videotestsrc");
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("videotestsrc");
+    VideoSinkConfig sinkConfig("glimagesink", GL_SCREEN);
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     tx.start();
@@ -71,8 +75,9 @@ void VideoTestSuite::start_stop_test_video_gl()
 
 void VideoTestSuite::start_test_video()
 {
-    VideoConfig config("videotestsrc");
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("videotestsrc");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     tx.start();
@@ -85,8 +90,9 @@ void VideoTestSuite::start_test_video()
 
 void VideoTestSuite::stop_test_video()
 {
-    VideoConfig config("videotestsrc");
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("videotestsrc");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     BLOCK();
@@ -98,8 +104,9 @@ void VideoTestSuite::stop_test_video()
 
 void VideoTestSuite::start_stop_test_video()
 {
-    VideoConfig config("videotestsrc");
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("videotestsrc");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     tx.start();
@@ -115,8 +122,9 @@ void VideoTestSuite::start_stop_test_video()
 
 void VideoTestSuite::start_v4l()
 {
-    VideoConfig config("v4l2src");
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("v4l2src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     tx.start();
@@ -128,8 +136,9 @@ void VideoTestSuite::start_v4l()
 
 void VideoTestSuite::stop_v4l()
 {
-    VideoConfig config("v4l2src");
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("v4l2src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     BLOCK();
@@ -141,8 +150,9 @@ void VideoTestSuite::stop_v4l()
 
 void VideoTestSuite::start_stop_v4l()
 {
-    VideoConfig config("v4l2src");
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("v4l2src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     tx.start();
@@ -157,8 +167,9 @@ void VideoTestSuite::start_stop_v4l()
 
 void VideoTestSuite::start_dv()
 {
-    VideoConfig config("dv1394src");
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("dv1394src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     tx.start();
@@ -170,8 +181,9 @@ void VideoTestSuite::start_dv()
 
 void VideoTestSuite::stop_dv()
 {
-    VideoConfig config("dv1394src");
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("dv1394src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     BLOCK();
@@ -183,8 +195,9 @@ void VideoTestSuite::stop_dv()
 
 void VideoTestSuite::start_stop_dv()
 {
-    VideoConfig config("dv1394src");
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("dv1394src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     tx.start();
@@ -199,8 +212,9 @@ void VideoTestSuite::start_stop_dv()
 
 void VideoTestSuite::start_file()
 {
-    VideoConfig config("filesrc", videoFilename_);
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("filesrc", videoFilename_);
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     tx.start();
@@ -212,8 +226,9 @@ void VideoTestSuite::start_file()
 
 void VideoTestSuite::stop_file()
 {
-    VideoConfig config("filesrc", videoFilename_);
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("filesrc", videoFilename_);
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     BLOCK();
@@ -225,8 +240,9 @@ void VideoTestSuite::stop_file()
 
 void VideoTestSuite::start_stop_file()
 {
-    VideoConfig config("filesrc", videoFilename_);
-    VideoLocal tx(config);
+    VideoSourceConfig srcConfig("filesrc", videoFilename_);
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
 
     tx.start();

@@ -33,7 +33,7 @@
 
 static std::auto_ptr<VideoReceiver> buildVideoReceiver()
 {
-        VideoReceiverConfig vConfig("xvimagesink");
+        VideoSinkConfig vConfig("xvimagesink");
         ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT, "");
         std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
         rx->init();
@@ -41,7 +41,7 @@ static std::auto_ptr<VideoReceiver> buildVideoReceiver()
 }
 
 
-static std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
+static std::auto_ptr<VideoSender> buildVideoSender(const VideoSourceConfig vConfig)
 {
         SenderConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
         std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
@@ -61,7 +61,7 @@ void RtpVideoTestSuite::start_test_video()
         TEST_ASSERT(rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("videotestsrc");
+        VideoSourceConfig vConfig("videotestsrc");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         tx->start();
@@ -83,7 +83,7 @@ void RtpVideoTestSuite::stop_test_video()
         TEST_ASSERT(!rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("videotestsrc");
+        VideoSourceConfig vConfig("videotestsrc");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         BLOCK();
@@ -108,7 +108,7 @@ void RtpVideoTestSuite::start_stop_test_video()
         TEST_ASSERT(!rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("videotestsrc");
+        VideoSourceConfig vConfig("videotestsrc");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         tx->start();
@@ -133,7 +133,7 @@ void RtpVideoTestSuite::start_v4l()
         TEST_ASSERT(rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("v4l2src");
+        VideoSourceConfig vConfig("v4l2src");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         tx->start();
@@ -155,7 +155,7 @@ void RtpVideoTestSuite::stop_v4l()
         TEST_ASSERT(!rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("v4l2src");
+        VideoSourceConfig vConfig("v4l2src");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         BLOCK();
@@ -180,7 +180,7 @@ void RtpVideoTestSuite::start_stop_v4l()
         TEST_ASSERT(!rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("v4l2src");
+        VideoSourceConfig vConfig("v4l2src");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         tx->start();
@@ -207,7 +207,7 @@ void RtpVideoTestSuite::start_dv()
         TEST_ASSERT(rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("dv1394src");
+        VideoSourceConfig vConfig("dv1394src");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         tx->start();
@@ -229,7 +229,7 @@ void RtpVideoTestSuite::stop_dv()
         TEST_ASSERT(!rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("dv1394src");
+        VideoSourceConfig vConfig("dv1394src");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         BLOCK();
@@ -254,7 +254,7 @@ void RtpVideoTestSuite::start_stop_dv()
         TEST_ASSERT(!rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("dv1394src");
+        VideoSourceConfig vConfig("dv1394src");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         tx->start();
@@ -281,7 +281,7 @@ void RtpVideoTestSuite::start_file()
         TEST_ASSERT(rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("filesrc", videoFilename_);
+        VideoSourceConfig vConfig("filesrc", videoFilename_);
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         tx->start();
@@ -303,7 +303,7 @@ void RtpVideoTestSuite::stop_file()
         TEST_ASSERT(!rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("filesrc", videoFilename_);
+        VideoSourceConfig vConfig("filesrc", videoFilename_);
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
         BLOCK();
@@ -328,7 +328,7 @@ void RtpVideoTestSuite::start_stop_file()
         TEST_ASSERT(!rx->isPlaying());
     }
     else {
-        VideoConfig vConfig("filesrc", videoFilename_);
+        VideoSourceConfig vConfig("filesrc", videoFilename_);
         
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 

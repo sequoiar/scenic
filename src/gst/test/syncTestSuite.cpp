@@ -44,8 +44,9 @@ void SyncTestSuite::start_jack_audio_dv_video()
     AudioLocal aTx(aConfig);
     aTx.init();
 
-    VideoConfig vConfig("dv1394src");
-    VideoLocal vTx(vConfig);
+    VideoSourceConfig srcConfig("dv1394src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal vTx(srcConfig, sinkConfig);
     vTx.init();
 
 
@@ -69,8 +70,9 @@ void SyncTestSuite::stop_jack_audio_dv_video()
     AudioLocal aTx(aConfig);
     aTx.init();
 
-    VideoConfig vConfig("dv1394src");
-    VideoLocal vTx(vConfig);
+    VideoSourceConfig srcConfig("dv1394src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal vTx(srcConfig, sinkConfig);
     vTx.init();
 
     BLOCK();
@@ -94,8 +96,9 @@ void SyncTestSuite::start_stop_jack_audio_dv_video()
     AudioLocal aTx(aConfig);
     aTx.init();
 
-    VideoConfig vConfig("dv1394src");
-    VideoLocal vTx(vConfig);
+    VideoSourceConfig srcConfig("dv1394src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal vTx(srcConfig, sinkConfig);
     vTx.init();
 
     aTx.start();
@@ -124,8 +127,9 @@ void SyncTestSuite::start_dv_audio_dv_video()
     AudioLocal aTx(aConfig);
     aTx.init();
 
-    VideoConfig vConfig("dv1394src");
-    VideoLocal vTx(vConfig);
+    VideoSourceConfig srcConfig("dv1394src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal vTx(srcConfig, sinkConfig);
     vTx.init();
 
 
@@ -149,8 +153,9 @@ void SyncTestSuite::stop_dv_audio_dv_video()
     AudioLocal aTx(aConfig);
     aTx.init();
 
-    VideoConfig vConfig("dv1394src");
-    VideoLocal vTx(vConfig);
+    VideoSourceConfig srcConfig("dv1394src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal vTx(srcConfig, sinkConfig);
     vTx.init();
 
     BLOCK();
@@ -174,8 +179,9 @@ void SyncTestSuite::start_stop_dv_audio_dv_video()
     AudioLocal aTx(aConfig);
     aTx.init();
 
-    VideoConfig vConfig("dv1394src");
-    VideoLocal vTx(vConfig);
+    VideoSourceConfig srcConfig("dv1394src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal vTx(srcConfig, sinkConfig);
     vTx.init();
 
     aTx.start();
@@ -205,8 +211,9 @@ void SyncTestSuite::start_audiotest_videotest()
     AudioLocal aTx(aConfig);
     aTx.init();
 
-    VideoConfig vConfig("videotestsrc");
-    VideoLocal vTx(vConfig);
+    VideoSourceConfig srcConfig("videotestsrc");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal vTx(srcConfig, sinkConfig);
     vTx.init();
 
 
@@ -230,8 +237,9 @@ void SyncTestSuite::stop_audiotest_videotest()
     AudioLocal aTx(aConfig);
     aTx.init();
 
-    VideoConfig vConfig("videotestsrc");
-    VideoLocal vTx(vConfig);
+    VideoSourceConfig srcConfig("videotestsrc");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal vTx(srcConfig, sinkConfig);
     vTx.init();
 
     BLOCK();
@@ -255,8 +263,9 @@ void SyncTestSuite::start_stop_audiotest_videotest()
     AudioLocal aTx(aConfig);
     aTx.init();
 
-    VideoConfig vConfig("dv1394src");
-    VideoLocal vTx(vConfig);
+    VideoSourceConfig srcConfig("dv1394src");
+    VideoSinkConfig sinkConfig("xvimagesink");
+    VideoLocal vTx(srcConfig, sinkConfig);
     vTx.init();
 
     aTx.start();

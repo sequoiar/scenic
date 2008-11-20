@@ -84,6 +84,8 @@ class VideoTestSuite
         void start_file();
         void stop_file();
         void start_stop_file();
+    
+        static const int GL_SCREEN;
 };
 
 #endif // _VIDEO_TEST_SUITE_H_

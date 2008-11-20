@@ -20,7 +20,7 @@ namespace Factories {
 
     std::auto_ptr<VideoReceiver> buildVideoReceiver(const char *ip, const char * codec, const long port = Ports::V_PORT, int screen_num = 0);
     
-    std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig, 
+    std::auto_ptr<VideoSender> buildVideoSender(const VideoSourceConfig vConfig, 
             const char *ip, const char *codec, const long port = Ports::V_PORT);
 }
 
@@ -43,7 +43,7 @@ Factories::buildAudioReceiver(const char *ip, const char *codec, const long port
     return rx;
 }
 
-std::auto_ptr<VideoSender> Factories::buildVideoSender(const VideoConfig vConfig, const char *ip, const char *codec, const long port)
+std::auto_ptr<VideoSender> Factories::buildVideoSender(const VideoSourceConfig vConfig, const char *ip, const char *codec, const long port)
 {
     SenderConfig rConfig(codec, ip, port);
     std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
@@ -53,7 +53,7 @@ std::auto_ptr<VideoSender> Factories::buildVideoSender(const VideoConfig vConfig
 
 std::auto_ptr<VideoReceiver> Factories::buildVideoReceiver(const char *ip, const char *codec, const long port, const int screen_num)
 {
-    VideoReceiverConfig vConfig("glimagesink",screen_num);
+    VideoSinkConfig vConfig("glimagesink",screen_num);
     ReceiverConfig rConfig(codec, ip, port, "");
     std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
     rx->init();

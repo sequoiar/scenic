@@ -86,12 +86,12 @@ short Pof::run(int argc, char **argv)
         std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, ip, audioCodec, audioPort));
         aTx->start();
         assert(tcpSendCaps(ip, Ports::CAPS_PORT, aTx->getCaps()));
-        VideoConfig *vConfig; 
+        VideoSourceConfig *vConfig; 
 
         if (videoDevice)
-            vConfig = new VideoConfig("v4l2src", videoDevice);
+            vConfig = new VideoSourceConfig("v4l2src", videoDevice);
         else
-            vConfig = new VideoConfig("v4l2src");
+            vConfig = new VideoSourceConfig("v4l2src");
 
         std::auto_ptr<VideoSender> vTx(Factories::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
         delete vConfig;

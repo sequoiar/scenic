@@ -68,7 +68,7 @@ static std::auto_ptr<AudioReceiver> buildDeadAudioReceiver()
 
 static std::auto_ptr<VideoReceiver> buildVideoReceiver()
 {
-    VideoReceiverConfig vConfig("xvimagesink");
+    VideoSinkConfig vConfig("xvimagesink");
     ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT, "");
     std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
     rx->init();
@@ -76,7 +76,7 @@ static std::auto_ptr<VideoReceiver> buildVideoReceiver()
 }
 
 
-static std::auto_ptr<VideoSender> buildVideoSender(const VideoConfig vConfig)
+static std::auto_ptr<VideoSender> buildVideoSender(const VideoSourceConfig vConfig)
 {
     SenderConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
     std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
@@ -110,7 +110,7 @@ void SyncTestSuiteRtp::start_jack_v4l()
         aTx->start();
         TEST_ASSERT(tcpSendCaps("127.0.0.1", A_PORT + 100, aTx->getCaps()));
 
-        VideoConfig vConfig("v4l2src"); 
+        VideoSourceConfig vConfig("v4l2src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
         vTx->start();
         //usleep(100000); // GIVE receiver chance to start waiting
@@ -143,7 +143,7 @@ void SyncTestSuiteRtp::stop_jack_v4l()
         AudioConfig aConfig("jackaudiosrc", numChannels);
         std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig));
 
-        VideoConfig vConfig("v4l2src");
+        VideoSourceConfig vConfig("v4l2src");
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         BLOCK();
@@ -186,7 +186,7 @@ void SyncTestSuiteRtp::start_stop_jack_v4l()
         //usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps("127.0.0.1", A_PORT + 100, aTx->getCaps()));
 
-        VideoConfig vConfig("v4l2src"); 
+        VideoSourceConfig vConfig("v4l2src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         vTx->start();
@@ -226,7 +226,7 @@ void SyncTestSuiteRtp::start_8ch_audiofile_dv()
         aTx->pause();
         TEST_ASSERT(tcpSendCaps("127.0.0.1", A_PORT + 100, aTx->getCaps()));
 
-        VideoConfig vConfig("dv1394src"); 
+        VideoSourceConfig vConfig("dv1394src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
         vTx->start();
         aTx->start();
@@ -260,7 +260,7 @@ void SyncTestSuiteRtp::stop_8ch_audiofile_dv()
         AudioConfig aConfig("filesrc", audioFilename_, numChannels);
         std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig));
 
-        VideoConfig vConfig("dv1394src");
+        VideoSourceConfig vConfig("dv1394src");
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         BLOCK();
@@ -303,7 +303,7 @@ void SyncTestSuiteRtp::start_stop_8ch_audiofile_dv()
         //usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendCaps("127.0.0.1", A_PORT + 100, aTx->getCaps()));
 
-        VideoConfig vConfig("dv1394src"); 
+        VideoSourceConfig vConfig("dv1394src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         vTx->start();
@@ -344,7 +344,7 @@ void SyncTestSuiteRtp::start_dv_audio_dv_video()
         aTx->start();
         TEST_ASSERT(tcpSendCaps("127.0.0.1", A_PORT + 100, aTx->getCaps()));
 
-        VideoConfig vConfig("dv1394src"); 
+        VideoSourceConfig vConfig("dv1394src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
         vTx->start();
 
@@ -379,7 +379,7 @@ void SyncTestSuiteRtp::stop_dv_audio_dv_video()
         AudioConfig aConfig("dv1394src", numChannels);
         std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig));
 
-        VideoConfig vConfig("dv1394src"); 
+        VideoSourceConfig vConfig("dv1394src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         BLOCK();
@@ -421,7 +421,7 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video()
         aTx->start();
         TEST_ASSERT(tcpSendCaps("127.0.0.1", A_PORT + 100, aTx->getCaps()));
 
-        VideoConfig vConfig("dv1394src"); 
+        VideoSourceConfig vConfig("dv1394src"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
         vTx->start();
 
@@ -463,7 +463,7 @@ void SyncTestSuiteRtp::start_audiotest_videotest()
         aTx->start();
         TEST_ASSERT(tcpSendCaps("127.0.0.1", A_PORT + 100, aTx->getCaps()));
 
-        VideoConfig vConfig("videotestsrc"); 
+        VideoSourceConfig vConfig("videotestsrc"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
         vTx->start();
 
@@ -497,7 +497,7 @@ void SyncTestSuiteRtp::stop_audiotest_videotest()
         AudioConfig aConfig("audiotestsrc", numChannels);
         std::auto_ptr<AudioSender> aTx(buildAudioSender(aConfig));
 
-        VideoConfig vConfig("videotestsrc"); 
+        VideoSourceConfig vConfig("videotestsrc"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
 
         BLOCK();
@@ -539,7 +539,7 @@ void SyncTestSuiteRtp::start_stop_audiotest_videotest()
         aTx->start();
         TEST_ASSERT(tcpSendCaps("127.0.0.1", A_PORT + 100, aTx->getCaps()));
 
-        VideoConfig vConfig("videotestsrc"); 
+        VideoSourceConfig vConfig("videotestsrc"); 
         std::auto_ptr<VideoSender> vTx(buildVideoSender(vConfig));
         vTx->start();
 
