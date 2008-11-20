@@ -1,22 +1,22 @@
-// videoSink.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews
-//
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
-
+/* videoSink.cpp
+ * Copyright 2008 Koya Charles & Tristan Matthews 
+ *
+ * This file is part of [propulse]ART.
+ *
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 #include <cassert>
 
 #include <gst/interfaces/xoverlay.h>
@@ -29,6 +29,7 @@
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
+#include <X11/extensions/Xinerama.h>
 
 #include <GL/glu.h>
 
@@ -43,7 +44,6 @@ GLfloat GLImageSink::rightCrop_ = 0.0;
 GLfloat GLImageSink::topCrop_ = 0.0;
 GLfloat GLImageSink::bottomCrop_ = 0.0;
 
-//client reshape callback
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
     glViewport(0, 0, width, height);
@@ -55,7 +55,6 @@ gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 }
 
 
-//client draw callback
 gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 {
     static GTimeVal current_time;
@@ -263,7 +262,7 @@ bool GLImageSink::handleBusMsg(GstMessage* msg)
     return true;
 }
 
-#include <X11/extensions/Xinerama.h>
+
 void GLImageSink::init()
 {
     static bool gtk_initialized = false;
@@ -295,7 +294,7 @@ void GLImageSink::init()
                 " y:" << xine[j].y_org << 
                 " width:" << xine[j].width << 
                 " height:" << xine[j].height);
-        if (j == screen_num_) //TODO: how to choose screen??
+        if (j == screen_num_) 
             gtk_window_move(GTK_WINDOW(window_),xine[j].x_org,xine[j].y_org);
     }
     const gint WIDTH = 640;
@@ -304,10 +303,8 @@ void GLImageSink::init()
     gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
     gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
     pipeline_.subscribe(this);
-#if 0
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
                 expose_cb), static_cast<void*>(sink_));
-#endif
     g_signal_connect(G_OBJECT(window_), "key-press-event",
             G_CALLBACK(key_press_event_cb), NULL);
     g_signal_connect(G_OBJECT(window_), "scroll-event",
