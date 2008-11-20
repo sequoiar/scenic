@@ -25,26 +25,26 @@
  */
 
 #include "mapMsg.h"
-static MsgFunctor* pf = 0;
+static msg::Subscriber* pf = 0;
 
-bool MSG::post(MapMsg& msg)
+msg::Subscriber::Subscriber()
+{
+    pf = this;
+}
+
+msg::Subscriber::~Subscriber()
+{
+    pf = 0;
+}
+
+bool msg::post(MapMsg& msg)
 {
     if(pf)
     {
-        MsgFunctor& func(*pf);
-        func(msg);
+        (*pf)(msg);
         return true;
     }
     return false;
-}
-
-void MSG::register_cb(MsgFunctor* f)
-{
-    pf = f;
-}
-void MSG::unregister_cb()
-{
-    pf = 0;
 }
 
 StrIntFloat::StrIntFloat()

@@ -113,7 +113,7 @@ void AudioLevel::post() const
     MapMsg mapMsg("levels");
 
     mapMsg["values"] = rmsValues_;
-    MSG::post(mapMsg);
+    msg::post(mapMsg);
 }
 
 

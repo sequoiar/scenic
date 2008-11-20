@@ -24,17 +24,14 @@
 #include "builder.h"
 #include "logWriter.h"
 
-class MsgThreadFunctor
-    : public MsgFunctor
+class MainSubscriber
+    : public msg::Subscriber
 {
     MsgThread &t_;
     public:
-        MsgThreadFunctor(MsgThread* pt)
-            : MsgFunctor(), t_(*pt)
-        { MSG::register_cb(this); }
-
-        ~MsgThreadFunctor()
-        { MSG::unregister_cb();}
+        MainSubscriber(MsgThread* pt)
+            : t_(*pt)
+        {}
 
         void operator()(MapMsg& msg)
         {
@@ -57,7 +54,7 @@ class MainModule
     private:
         MsgThread* tcpThread_;
         MsgThread* gstThread_;
-        MsgThreadFunctor func;
+        MainSubscriber func;
 
         MainModule(MainModule&);    //No Copy Constructor
         MainModule& operator=(const MainModule&);

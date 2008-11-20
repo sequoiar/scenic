@@ -1,29 +1,22 @@
-// MapMsg.h
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
-
-
-/** \file 
- *      MapMsg typedef of key/value map where value is a string, a float, an int or exception
+/* MapMsg.h
+ * Copyright 2008 Koya Charles & Tristan Matthews 
+ *
+ * This file is part of [propulse]ART.
+ *
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
-
 #ifndef __MAP_MSG_H__
 #define __MAP_MSG_H__
 
@@ -33,7 +26,8 @@
 #include <vector>
 #include <sstream>
 
-
+/** container class for variable types used by MapMsg 
+ */
 class StrIntFloat
 {
     char type_;
@@ -70,6 +64,8 @@ class StrIntFloat
         StrIntFloat& operator=(const StrIntFloat& in);
 };
 
+
+/** provides a key/value pair map where value is a StrIntFloat */
 class MapMsg
 {
     typedef std::map<std::string, StrIntFloat> MapMsg_;
@@ -95,43 +91,21 @@ public:
             return 0;
     }
 };
-#if 0 
-template< class T >
-void msg_get_(MapMsg& msg,const std::string& key, const std::string& val_type, T& t)
-{
-    if(msg[key].type() == 'n')                                          
-    { 
-        std::ostringstream err; 
-        err << "key:" << key << " missing."; 
-        THROW_ERROR(err.str()); 
-    }
-    if(!msg[key].get(t)) 
-    { 
-        std::ostringstream err; 
-        err << "Expected type " << val_type << " does not match "
-            << msg[key].type() << " provided by user."; 
-        THROW_ERROR(err.str()); 
-    } 
-}
-#endif
-class MsgFunctor
-{
-    public:
-        virtual void operator()(MapMsg&){}
-        virtual ~MsgFunctor(){}
-};
 
-/**
- * Used by classes that are not coupled to a thread class
+
+/** Used by classes that are not coupled to a thread class
  * MapMsg will go to thread that is registered or nowhere if no thread
- * eg. gst/audioLevel.cpp
- */
-
-namespace MSG
+ * eg. gst/audioLevel.cpp */
+namespace msg
 {
-bool post(MapMsg& msg);
-void register_cb(MsgFunctor* f);
-void unregister_cb();
+    class Subscriber
+    {
+        public:
+            Subscriber();
+            virtual void operator()(MapMsg&){}
+            virtual ~Subscriber();
+    };
+    bool post(MapMsg& msg);
 }
 
 

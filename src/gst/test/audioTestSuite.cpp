@@ -1,22 +1,22 @@
-
-// audioTestSuite.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews
-//
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
+/* audioTestSuite.cpp
+ * Copyright 2008 Koya Charles & Tristan Matthews 
+ *
+ * This file is part of [propulse]ART.
+ *
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
 #include <cpptest.h>
 #include <iostream>
@@ -26,12 +26,11 @@
 #include "audioConfig.h"
 #include "mapMsg.h"
 
-class TestMsgFunctor : public MsgFunctor
+class TestSubscriber : public msg::Subscriber
 {
     std::string s_;
     public:
-    TestMsgFunctor(std::string s):s_(s+"*"+__FUNCTION__) { MSG::register_cb(this); }
-    ~TestMsgFunctor() { MSG::unregister_cb();}
+    TestSubscriber(std::string s):s_(s+"*"+__FUNCTION__) {}
     void operator()(MapMsg& msg) 
     {
         std::vector<double> v_ = msg["values"];
@@ -80,7 +79,7 @@ void AudioTestSuite::start_stop_1ch_audiotest()
     AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
     AudioSinkConfig sinkConfig("jackaudiosink");
     AudioLocal tx(srcConfig, sinkConfig);
-    TestMsgFunctor f(__FUNCTION__);  // Grabs the MSG::post callback, used by AudioLevel
+    TestSubscriber f(__FUNCTION__);  // Grabs the MSG::post callback, used by AudioLevel
     TEST_THROWS_NOTHING(tx.init());
     
 
@@ -133,7 +132,7 @@ void AudioTestSuite::start_stop_2ch_audiotest()
     AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
     AudioSinkConfig sinkConfig("jackaudiosink");
     AudioLocal tx(srcConfig, sinkConfig);
-    TestMsgFunctor f(__FUNCTION__);  // Grabs the MSG::post callback 
+    TestSubscriber f(__FUNCTION__);  // Grabs the MSG::post callback 
     TEST_THROWS_NOTHING(tx.init());
     
 
@@ -185,7 +184,7 @@ void AudioTestSuite::start_stop_6ch_audiotest()
     AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
     AudioSinkConfig sinkConfig("jackaudiosink");
     AudioLocal tx(srcConfig, sinkConfig);
-    TestMsgFunctor f(__FUNCTION__);  // Grabs the MSG::post callback 
+    TestSubscriber f(__FUNCTION__);  // Grabs the MSG::post callback 
     TEST_THROWS_NOTHING(tx.init());
     
 
