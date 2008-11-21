@@ -33,7 +33,7 @@ class RtpBin
     public:
         ~RtpBin();
         void init();
-        virtual void checkSampleRate() = 0;
+        //virtual void checkSampleRate() = 0;
         double bandwidth() const;
 
     protected:

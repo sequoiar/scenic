@@ -49,70 +49,62 @@ class RtpPay : public GstLinkableFilter
 class Payloader : public RtpPay
 {
     protected: 
-        void init() = 0;
         // amount of time to let Use max-ptime to limit the amount of 
         // vorbis packets in an RTP packet. Reduces latency
         static const long long MAX_PTIME;
+        void init() = 0;
 };
 
 class H264Payloader : public Payloader
 {
-    public: 
-
+    private: 
         void init();
 };
 
 
 class H264Depayloader : public RtpPay
 {
-    public: 
-
+    private: 
         void init();
 };
 
 
 class VorbisPayloader : public Payloader
 {
-    public: 
-
+    private: 
         void init();
 };
 
 
 class VorbisDepayloader : public RtpPay
 {
-    public: 
-
+    private: 
         void init();
 };
 
 
 class L16Payloader : public Payloader
 {
-    public: 
-
+    private: 
         void init();
 };
 
 class L16Depayloader : public RtpPay
 {
-    public: 
-
+    private: 
         void init();
 };
 
 
 class MpaPayloader : public Payloader
 {
-    public: 
-
+    private: 
         void init();
 };
 
 class MpaDepayloader : public RtpPay
 {
-    public: 
-
+    private: 
         void init();
 };
 

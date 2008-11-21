@@ -89,6 +89,8 @@ class H264Encoder : public Encoder
 
         /** Constructor */
         H264Encoder() : colorspc_(0) {};
+
+    private:
         /** 
          * Destructor */
         ~H264Encoder();
@@ -100,7 +102,7 @@ class H264Encoder : public Encoder
 
         /** Exposes the sink of this encoder, which is a colorspace converter */
         _GstElement *sinkElement() { return colorspc_; }
-    private:
+        
         _GstElement *colorspc_;
         
         H264Encoder(const H264Encoder&);     //No Copy Constructor
@@ -113,7 +115,7 @@ class H264Encoder : public Encoder
 
 class H264Decoder : public Decoder
 {
-    public: 
+    private: 
 
         void init();
         /** Creates an h.264 RtpDepayloader */
@@ -130,6 +132,7 @@ class VorbisEncoder : public Encoder
         /** Constructor */
         VorbisEncoder() : aconv_(0){};
 
+    private:
         /** Destructor */
         ~VorbisEncoder();
         void init();
@@ -138,7 +141,6 @@ class VorbisEncoder : public Encoder
 
         _GstElement *sinkElement() { return aconv_; }
 
-    private:
         _GstElement *aconv_;
         /** No Copy Constructor */
         VorbisEncoder(const VorbisEncoder&);     
@@ -152,7 +154,7 @@ class VorbisEncoder : public Encoder
 
 class VorbisDecoder : public Decoder
 {
-    public: 
+    private: 
 
         void init();
 //        void setSrcCaps();
@@ -170,6 +172,8 @@ class RawEncoder : public Encoder
     public: 
         /** Constructor */
         RawEncoder() : aconv_(0) {};
+    
+    private:
         /** 
          * Destructor */
         ~RawEncoder();
@@ -177,8 +181,6 @@ class RawEncoder : public Encoder
         /** Creates an RtpL16Payloader */
         RtpPay* createPayloader() const;
     
-    private:
-
         _GstElement *srcElement() { return aconv_; }
         _GstElement *sinkElement() { return aconv_; }
         _GstElement *aconv_;
@@ -196,9 +198,10 @@ class RawEncoder : public Encoder
 class RawDecoder : public Decoder
 {
     public: 
-
         /** Constructor */
         RawDecoder() : aconv_(0) {};
+
+    private:
         /** 
          * Destructor */
         ~RawDecoder();
@@ -206,8 +209,6 @@ class RawDecoder : public Decoder
         /** 
          * Creates an RtpL16Depayloader */
         RtpPay* createDepayloader() const;
-
-    private:
 
         _GstElement *srcElement() { return aconv_; }
         _GstElement *sinkElement() { return aconv_; }
@@ -228,6 +229,7 @@ class LameEncoder : public Encoder
     public:
         /** Constructor */
         LameEncoder() : aconv_(0) {};
+    private:
         /** 
          * Destructor */
         ~LameEncoder();
@@ -237,7 +239,6 @@ class LameEncoder : public Encoder
         RtpPay* createPayloader() const;
     
         _GstElement *sinkElement() { return aconv_; }
-    private:
 
         _GstElement *aconv_;
         /** No Copy Constructor */
@@ -255,14 +256,13 @@ class MadDecoder : public Decoder
     public: 
         /** Constructor */  
         MadDecoder() : aconv_(0) {};
+    private:
         /** Destructor */  
         ~MadDecoder();
         void init();
         /** 
          * Creates an RtpMpaDepayloader */
         RtpPay* createDepayloader() const;
-
-    private:
 
         _GstElement *srcElement() { return aconv_; }
         _GstElement *aconv_;

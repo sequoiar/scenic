@@ -51,13 +51,15 @@ class RemoteConfig
 
     protected:
 
-        RemoteConfig& operator=(const RemoteConfig&); //No Assignment Operator
         const std::string codec_;
         const std::string remoteHost_;
         const int port_;
         static const int PORT_MIN;
         static const int PORT_MAX;
         static const std::string VALID_CODECS[NUM_CODECS];
+
+    private:
+        RemoteConfig& operator=(const RemoteConfig&); //No Assignment Operator
 };
 
 class SenderConfig : public RemoteConfig

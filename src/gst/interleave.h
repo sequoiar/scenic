@@ -28,21 +28,21 @@ class AudioSourceConfig;
 class Interleave
     : public GstLinkableFilter
 {
-    public:
+    private:
+        /** The interleave functionality used to be part of the same class
+        * as InterleavedAudioSource. When subdividing one class into two
+        * separate classes, it make sense for them to be friends. Also
+        * InterleavedAudioSource's internals are safe
+        * as InterleavedAudioSource's children will not have access here. */
+        friend class InterleavedAudioSource;
         explicit Interleave(const AudioSourceConfig &config)
             : interleave_(0), config_(config) {}
-
         ~Interleave();
         void init();
-        // caps must be unreffed by caller
-        //GstCaps *getSrcCaps();
 
-    protected:
         GstElement *srcElement() { return interleave_; }
         GstElement *sinkElement() { return interleave_; }
 
-    private:
-        friend class InterleavedAudioSource;
         GstElement *interleave_;
         const AudioSourceConfig &config_;
         static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];

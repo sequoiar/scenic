@@ -39,7 +39,6 @@ class RtpSender
 
         ~RtpSender();
 
-        //void addDerived(RtpPay * src, const RemoteConfig & config);
         void add(RtpPay * payloader, const SenderConfig & config);
 
     private:

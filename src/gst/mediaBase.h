@@ -33,10 +33,10 @@ class LocalBase     // local bins
 
         LocalBase(){};
         ~LocalBase();
-        virtual void init_source() = 0;
-        virtual void init_sink() = 0;
 
     private:
+        virtual void init_source() = 0;
+        virtual void init_sink() = 0;
 
         LocalBase(const LocalBase&);     //No Copy Constructor
         LocalBase& operator=(const LocalBase&);     //No Assignment Operator
@@ -52,11 +52,11 @@ class SenderBase
 
         SenderBase(){};
         ~SenderBase();
+    
+    private:
         virtual void init_source() = 0;
         virtual void init_codec() = 0;
         virtual void init_payloader() = 0;
-    
-    private:
 
         SenderBase(const SenderBase&);     //No Copy Constructor
         SenderBase& operator=(const SenderBase&);     //No Assignment Operator
@@ -72,11 +72,11 @@ class ReceiverBase
 
         ReceiverBase(){};
         ~ReceiverBase();
+    
+    private:
         virtual void init_codec() = 0;
         virtual void init_depayloader() = 0;
         virtual void init_sink() = 0;
-    
-    private:
 
         ReceiverBase(const ReceiverBase&);     //No Copy Constructor
         ReceiverBase& operator=(const ReceiverBase&);     //No Assignment Operator

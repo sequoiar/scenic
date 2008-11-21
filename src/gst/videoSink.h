@@ -34,12 +34,10 @@ class VideoSink
     public:
         VideoSink()
             : sink_(0), window_(0), screen_num_(0) {};
-        ~VideoSink(){};
         void showWindow();
         void makeFullscreen() { makeFullscreen(window_); }
         void makeUnfullscreen() { makeUnfullscreen(window_); }
 
-        _GstElement *sinkElement() { return sink_; }
         
     protected:
         _GstElement *sink_;
@@ -55,6 +53,7 @@ class VideoSink
         static void toggleFullscreen(_GtkWidget *widget);
 
     private:
+        _GstElement *sinkElement() { return sink_; }
 
         VideoSink(const VideoSink&);     //No Copy Constructor
         VideoSink& operator=(const VideoSink&);     //No Assignment Operator
@@ -66,10 +65,10 @@ class XvImageSink
 {
     public:
         XvImageSink() {};
-        ~XvImageSink();
-        void init();
 
     private:
+        void init();
+        ~XvImageSink();
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
 
@@ -83,6 +82,8 @@ class XImageSink
 {
     public: 
         XImageSink() : colorspc_(0) {};
+
+    private:
         ~XImageSink();
         void init();
         // FIXME: need to implement this support in ximagesink
@@ -90,7 +91,6 @@ class XImageSink
         void makeUnfullscreen() {}
 
         _GstElement *sinkElement() { return colorspc_; }
-    private:
         _GstElement *colorspc_;
         XImageSink(const XImageSink&);     //No Copy Constructor
         XImageSink& operator=(const XImageSink&);     //No Assignment Operator

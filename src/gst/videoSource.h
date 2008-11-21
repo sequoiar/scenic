@@ -34,20 +34,19 @@ class VideoSource
         ~VideoSource();
         void init();
 
-        _GstElement *srcElement() { return source_; }
-        virtual void sub_init() = 0;
-
     protected:
         explicit VideoSource(const VideoSourceConfig &config)
             : config_(config), source_(0) {}
 
         const VideoSourceConfig &config_;
         _GstElement *source_;
+
+    private:
         static int base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                       void *user_data);
-
+        virtual void sub_init() = 0;
         virtual int callback() { return FALSE; }
-    private:
+        _GstElement *srcElement() { return source_; }
         VideoSource(const VideoSource&);     //No Copy Constructor
         VideoSource& operator=(const VideoSource&);     //No Assignment Operator
 };
@@ -58,11 +57,11 @@ class VideoTestSource
     public:
         explicit VideoTestSource(const VideoSourceConfig &config)
             : VideoSource(config), clockId_(0) {}
+
+    private:
         ~VideoTestSource();
         void sub_init();
         int callback();
-
-    private:
         void toggle_colour();
 
         GstClockID clockId_;
@@ -79,13 +78,11 @@ class VideoFileSource
     public:
         explicit VideoFileSource(const VideoSourceConfig &config)
             : VideoSource(config), decoder_(0) {}
+    private:
         ~VideoFileSource();
         _GstElement *srcElement() { return 0; }      // FIXME: HACK
         void sub_init();
 
-        //void link_element(_GstElement *sinkElement);
-
-    private:
         _GstElement *decoder_;
         static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, int last,
                                    void *data);
@@ -101,6 +98,7 @@ class VideoDvSource
         explicit VideoDvSource(const VideoSourceConfig &config) 
             : VideoSource(config), demux_(0), queue_(0), dvdec_(0), dvIsNew_(true) {}
 
+    private:
         ~VideoDvSource();
         
         _GstElement *srcElement() { return dvdec_; }
@@ -108,7 +106,6 @@ class VideoDvSource
         void sub_init();
         static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, void *data);
 
-    private:
         _GstElement *demux_, *queue_, *dvdec_;
         bool dvIsNew_;
         VideoDvSource(const VideoDvSource&);     //No Copy Constructor
@@ -121,8 +118,8 @@ class VideoV4lSource
     public:
         explicit VideoV4lSource(const VideoSourceConfig &config)
             : VideoSource(config) {}
-        void sub_init();
     private:
+        void sub_init();
         VideoV4lSource(const VideoV4lSource&);     //No Copy Constructor
         VideoV4lSource& operator=(const VideoV4lSource&);     //No Assignment Operator
 };

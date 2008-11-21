@@ -35,12 +35,13 @@ class GLImageSink
     public:
         /** Constructor */
         GLImageSink(int screen_num = 0) : glUpload_(0){screen_num_ = screen_num;}
+
+    private:
         /** 
          * Destructor */
         ~GLImageSink();
         void init();
 
-    private:
         _GstElement *sinkElement() { return glUpload_; }
 
         /** 
