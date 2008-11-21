@@ -85,6 +85,7 @@ except Exception,e:
 # starting the server
 # TODO: Properly scan the output of the server
 # TODO: Fix the server.logfile not getting to sys.stdout
+# TODO: If the test fails, check if client and server are still running.
 try:
     println("Starting server")
     server = pexpect.spawn(server_exec)
@@ -235,9 +236,59 @@ class Test_2_Audiostream(TelnetBaseTest):
 	self.expectTest('Audio stream audiostream rename to audio.', 'Audio stream audiostream cannot be renamed to audio.')
     
     def test_03_change_container(self):
-        self.client.sendline("a -t audio mpegts")
+        self.client.sendline("a -t mpegts audio")
         self.sleep()
-	self.expectTest('Audio stream audiostream rename to audio.', 'Audio stream audiostream cannot be renamed to audio.')
+	self.expectTest('container of audio stream audio is set to mpegts.', 'Container of audio stream audio was not set to mpegts.')
+    
+    def test_04_change_codec(self):
+        self.client.sendline("a -c vorbis audio")
+        self.sleep()
+	self.expectTest('codec of audio stream audio is set to vorbis.', 'Codec of audio stream audio was not set to vorbis.')
+    
+    def test_05_change_settings(self):
+        self.client.sendline("a -s value1:key1,value2:key2 audio")
+        self.sleep()
+	self.expectTest('codec_settings of audio stream audio is set to value1:key1,value2:key2.', 'Codec settings of audio stream audio was not set to new values.')
+    
+    def test_06_change_bitdepth(self):
+        self.client.sendline("a -d 24 audio")
+        self.sleep()
+	self.expectTest('bitdepth of audio stream audio is set to 24.', 'Bitdepth of audio stream audio was not set to 24.')
+    
+    def test_07_change_samplerate(self):
+        self.client.sendline("a -r 44100 audio")
+        self.sleep()
+	self.expectTest('sample_rate of audio stream audio is set to 44100.', 'Sample rate of audio stream audio was not set to 44100.')
+    
+    def test_08_change_channels(self):
+        self.client.sendline("a -v 8 audio")
+        self.sleep()
+	self.expectTest('channels of audio stream audio is set to 8.', 'Number of channels of audio stream audio was not set.')
+    
+    def test_09_change_port(self):
+        self.client.sendline("a -p 5050 audio")
+        self.sleep()
+	self.expectTest('port of audio stream audio is set to 5050.', 'IP Port of audio stream audio was not set.')
+    
+    def test_10_change_buffer(self):
+        self.client.sendline("a -b 100 audio")
+        self.sleep()
+	self.expectTest('buffer of audio stream audio is set to 100.', 'Buffer time of audio stream audio was not set to 44100.')
+    
+    def test_11_change_input(self):
+        self.client.sendline("a -i jackaudiosrc audio")
+        self.sleep()
+	self.expectTest('source of audio stream audio is set to jackaudiosrc.', 'Unable to specify audio input.')
+    
+#    def test_12_change_codec_of_invalid_stream(self):
+#        self.client.sendline("a -c vorbis audiostream")
+#        self.sleep()
+#	self.expectTest('There\'s no audio stream with the name audiostream', 'IP Port of audio stream audio was not set.')
+#
+    def test_13_set_samplerate_to_invalid_value(self):
+	self.client.sendline("a -r Juliette audio")
+	self.sleep()
+	self.expectTest('Invalid value for sample rate. Sample rate should be integers.', 'Invalid value accepted as sample rate')
     
     def test_50_list_audiostreams(self):
         self.client.sendline("a -l")
