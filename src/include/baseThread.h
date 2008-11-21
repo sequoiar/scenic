@@ -15,12 +15,7 @@
  * License along with this library; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
- */
-
-/** \file
- *		Thread base class.
  *
- *      Thread/AsyncQueue Routines using glib
  */
 
 #ifndef __BASE_THREAD_H__
@@ -31,6 +26,7 @@
 #include "baseModule.h"
 #include "queuePair.h"
 
+/** glib thread construct with async queues */
 template < class T >
 class BaseThread
     : public BaseModule
@@ -56,6 +52,7 @@ class BaseThread
         BaseThread& operator=(const BaseThread&); //No Assignment Operator
 };
 
+/** client access to async QueuePair */
 template < class T >
 QueuePair_ < T > &BaseThread < T >::getQueue()
 {
@@ -82,12 +79,16 @@ BaseThread < T >::~BaseThread()
     }
 }
 
+
+/** thread creation */
 template < class T >
 GThread * thread_create(void *(thread) (void *), T t, GError ** err)
 {
     return (g_thread_create(thread, static_cast < void *>(t), TRUE, err));
 }
 
+
+/** entry point calls thread_create */
 template < class T >
 bool BaseThread < T >::run()
 {
@@ -113,7 +114,7 @@ bool BaseThread < T >::run()
     return true;
 }
 
-
+/** thread entry point */
 template < class T >
 void *BaseThread < T >::thread_main(void *pThreadObj)
 {

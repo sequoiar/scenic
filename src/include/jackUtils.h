@@ -1,9 +1,5 @@
-/** \file 
- *
- * Utility functions for jack related issues.
- *
- */
-/* Copyright 2008 Koya Charles & Tristan Matthews 
+/* jackUtils.h
+ * Copyright 2008 Koya Charles & Tristan Matthews 
  * This file is part of [propulse]ART.
  *
  * [propulse]ART is free software: you can redistribute it and/or modify
@@ -24,6 +20,7 @@
 #ifndef _JACK_UTILS_H_
 #define _JACK_UTILS_H_
 
+/** Utility functions for jack related issues. */
 namespace Jack {
 
     bool is_running();
@@ -32,3 +29,4 @@ namespace Jack {
 }
 
 #endif //  _JACK_UTILS_H_
+

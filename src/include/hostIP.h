@@ -18,15 +18,10 @@
  *
  */
 
-/** \file
- *      Linux external interface dotted ip address.
- *
- *      
- */
-
 #ifndef _HOST_IP_H_
 #define _HOST_IP_H_
 
+/** Linux external interface dotted ip address. */
 const char *get_host_ip();
 
 #endif // _HOST_IP_H_

@@ -18,20 +18,14 @@
  *
  */
 
-/** \file
- *      The base class for all Modules and Threads
- *
- */
-
 #ifndef __BASE_MODULE_H__
 #define __BASE_MODULE_H__
 
-///BaseModule
+/** The base class for all Modules and Threads */
 class BaseModule
 {
     public:
-
-        //run is the module's main
+        /** run is the module's main */
         virtual bool run(){
             return 1;
         }
