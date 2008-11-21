@@ -20,7 +20,7 @@
 
 #include "gstThread.h"
 
-/** MsgMap handlers that call audioSender and videoSender media functionality*/
+/** MapMsg handlers that call GST media functionality*/
 class GstSenderThread
     : public GstThread
 {
