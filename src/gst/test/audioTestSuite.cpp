@@ -26,11 +26,11 @@
 #include "audioConfig.h"
 #include "mapMsg.h"
 
-class GstTestSubscriber : public msg::Subscriber
+class GstAudioTestSubscriber : public msg::Subscriber
 {
     std::string s_;
     public:
-    GstTestSubscriber(std::string s):s_(s+"*"+__FUNCTION__) {}
+    GstAudioTestSubscriber(std::string s):s_(s+"*"+__FUNCTION__) {}
     void operator()(MapMsg& msg) 
     {
         std::vector<double> v_ = msg["values"];
@@ -79,7 +79,7 @@ void AudioTestSuite::start_stop_1ch_audiotest()
     AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
     AudioSinkConfig sinkConfig("jackaudiosink");
     AudioLocal tx(srcConfig, sinkConfig);
-    GstTestSubscriber f(__FUNCTION__);  // Grabs the MSG::post callback, used by AudioLevel
+    GstAudioTestSubscriber f(__FUNCTION__);  // Grabs the MSG::post callback, used by AudioLevel
     TEST_THROWS_NOTHING(tx.init());
     
 
@@ -132,7 +132,7 @@ void AudioTestSuite::start_stop_2ch_audiotest()
     AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
     AudioSinkConfig sinkConfig("jackaudiosink");
     AudioLocal tx(srcConfig, sinkConfig);
-    GstTestSubscriber f(__FUNCTION__);  // Grabs the MSG::post callback 
+    GstAudioTestSubscriber f(__FUNCTION__);  // Grabs the MSG::post callback 
     TEST_THROWS_NOTHING(tx.init());
     
 
@@ -184,7 +184,7 @@ void AudioTestSuite::start_stop_6ch_audiotest()
     AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
     AudioSinkConfig sinkConfig("jackaudiosink");
     AudioLocal tx(srcConfig, sinkConfig);
-    GstTestSubscriber f(__FUNCTION__);  // Grabs the MSG::post callback 
+    GstAudioTestSubscriber f(__FUNCTION__);  // Grabs the MSG::post callback 
     TEST_THROWS_NOTHING(tx.init());
     
 
