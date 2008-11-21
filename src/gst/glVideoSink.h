@@ -30,7 +30,7 @@
  */
 
 class GLImageSink
-: public VideoSink, public BusMsgHandler
+: public VideoSink
 {
     public:
         /** Constructor */
@@ -39,17 +39,30 @@ class GLImageSink
          * Destructor */
         ~GLImageSink();
         void init();
-        _GstElement *sinkElement() { return glUpload_; }
+
     private:
+        _GstElement *sinkElement() { return glUpload_; }
+
+        /** 
+         * This method resets all of our static variables used for positioning our texture, 
+         * and is called when this GLImageSink is destroyed. */
         static void resetGLparams();
+        /** 
+         * This method is invoked by the sink when it is reshaped */
         static int reshapeCallback(GLuint width, GLuint height);
+        /** 
+         * This method allows us to treat incoming buffers in an OpenGL context */
         static int drawCallback(GLuint texture, GLuint width, GLuint height);
 
+        /** 
+         * Mouse-wheel scroll event-handler which is used to move this GLImageSink's textures along the
+         * Z-axis */
         static int mouse_wheel_cb(_GtkWidget *widget, _GdkEventScroll *event, void *data);
+        /** 
+         * Keypress event-handler which is used to map specific keys to parameters for translation and cropping 
+         * applied to this GLImageSink's textures */
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
-
-        bool handleBusMsg(_GstMessage *msg);
 
         _GstElement *glUpload_;
         static const GLfloat STEP;
@@ -60,9 +73,11 @@ class GLImageSink
         static GLfloat rightCrop_;
         static GLfloat bottomCrop_;
         static GLfloat topCrop_;
-
-        GLImageSink(const GLImageSink&);     //No Copy Constructor
-        GLImageSink& operator=(const GLImageSink&);     //No Assignment Operator
+        
+        /** No Copy Constructor */
+        GLImageSink(const GLImageSink&);     
+        /** No Assignment Operator */
+        GLImageSink& operator=(const GLImageSink&);     
 };
 
 #endif //_GL_VIDEO_SINK_H_

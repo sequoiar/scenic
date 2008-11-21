@@ -250,6 +250,7 @@ GLImageSink::~GLImageSink()
 }
 
 
+#if 0
 bool GLImageSink::handleBusMsg(GstMessage* msg)
 {
     if(GST_MESSAGE_TYPE(msg) != GST_MESSAGE_ELEMENT)
@@ -261,6 +262,7 @@ bool GLImageSink::handleBusMsg(GstMessage* msg)
     gst_x_overlay_set_xwindow_id (GST_X_OVERLAY(GST_MESSAGE_SRC(msg)), getXWindow());
     return true;
 }
+#endif
 
 
 void GLImageSink::init()
@@ -303,7 +305,7 @@ void GLImageSink::init()
 
     gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
     gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
-    pipeline_.subscribe(this);
+    //pipeline_.subscribe(this);
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
                 expose_cb), static_cast<void*>(sink_));
     g_signal_connect(G_OBJECT(window_), "key-press-event",

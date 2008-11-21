@@ -39,11 +39,12 @@ class AudioSink
         std::string getCaps();
 
     protected:
-        /** Returns this AudioSink's sink */
-        _GstElement *sinkElement() { return sink_; }
         _GstElement *sink_;
 
     private:
+        /** Returns this AudioSink's sink */
+        _GstElement *sinkElement() { return sink_; }
+
         /** No Copy Constructor */
         AudioSink(const AudioSink&);     
         /**

@@ -56,14 +56,13 @@ class AudioLevel
          * Toggles whether or not this AudioLevel will post messages on the bus. */
         void emitMessages(bool doEmit);
 
-    protected:
+    private:
         /** Returns src of this AudioLevel. */
         _GstElement *srcElement() { return level_; }
         /**
          * Returns sink of this AudioLevel. */
         _GstElement *sinkElement() { return level_; }
 
-    private:
         /** Updates most recent rms value of the specified channel. */
         void updateRms(double rmsDb, size_t channelIdx);
         /**

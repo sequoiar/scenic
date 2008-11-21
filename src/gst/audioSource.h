@@ -53,14 +53,8 @@ class AudioSource
         explicit AudioSource(const AudioSourceConfig &config)
             : config_(config), sources_(0), aconvs_(0) {}
         /** 
-         * Initialize source_/sources_ */
-        virtual void init_source();
-        /** 
          * Implemented by subclasses to perform other specific initialization */
         virtual void sub_init() = 0;
-        /** 
-        * Link pads of all our component GstElements */
-        virtual void link_elements();
         /** 
          * Audio parameter object */
         const AudioSourceConfig &config_;
@@ -71,14 +65,20 @@ class AudioSource
          * Asynchronous callback that when triggered will call the appropriate callback in derived classes. */
         static gboolean base_callback(GstClock *clock, GstClockTime time, GstClockID id,
                                       gpointer user_data);
+    private:
         /** 
-         * Derived classes asynchronous callback. */
+         * Asynchronous callback placehold that optionally can be implemented in derived classes. */
         virtual gboolean callback() { return FALSE; }
+        /** 
+         * Initialize source_/sources_ */
+        virtual void init_source();
+        /** 
+        * Link pads of all our component GstElements */
+        virtual void link_elements();
         /**
          * Returns this AudioSource's source, which is an audioconverter. */
         GstElement *srcElement() { return aconvs_[0]; }
 
-    private:
         /**
          * No Copy Constructor */
         AudioSource(const AudioSource&);     
@@ -96,29 +96,31 @@ class AudioSource
 class InterleavedAudioSource
     : public AudioSource
 {
-    public:
-        /** Destructor */
-        ~InterleavedAudioSource() {};
-
+    protected:
         /** Object initializer */
         void init();
 
-    protected:
         /** Constructor */
         explicit InterleavedAudioSource(const AudioSourceConfig &config)
             : AudioSource(config), interleave_(config_) {}
-
-        /** Overridden source initializer, which must initialize this object's Interleave object */
-        void init_source();
-        /** Links the pads of this InterleavedAudioSource's constituent elements */
-        void link_elements();
+        
+        /** Destructor */
+        ~InterleavedAudioSource() {};
 
         /** Object which performs the interleaving of this source's channels */
         Interleave interleave_;
-        /** Exposes this InterleavedAudioSource's source, which is its Interleave's source */
-        GstElement *srcElement() { return interleave_.srcElement(); }
 
     private:
+        /** 
+         * Overridden source initializer, which must initialize this object's Interleave object */
+        void init_source();
+        /** 
+         * Links the pads of this InterleavedAudioSource's constituent elements */
+        void link_elements();
+        /** 
+         * Exposes this InterleavedAudioSource's source, which is its Interleave's source */
+        GstElement *srcElement() { return interleave_.srcElement(); }
+
         InterleavedAudioSource(const InterleavedAudioSource&);     //No Copy Constructor
         InterleavedAudioSource& operator=(const InterleavedAudioSource&);     //No Assignment Operator
 };
@@ -138,19 +140,19 @@ class AudioTestSource
         /** Constructor */
         explicit AudioTestSource(const AudioSourceConfig &config)
             : InterleavedAudioSource(config), clockId_(0), offset_(0) {}
+        
+    private:
+        void sub_init();
+
         /** 
          * Destructor */
         ~AudioTestSource();
-        
-        void sub_init();
 
-    protected:
         /** 
          * Asynchronous timed callback which will periodically toggle the 
          * frequency output by each channel */
         gboolean callback();
 
-    private:
         void toggle_frequency();
 
         GstClockID clockId_;
@@ -178,6 +180,8 @@ class AudioFileSource
     public:
         /** Constructor */
         explicit AudioFileSource(const AudioSourceConfig &config);
+
+    private:
         /** 
          * Destructor */
         ~AudioFileSource();
@@ -194,7 +198,6 @@ class AudioFileSource
          * AudioFileSource specific element linking method */
         void link_elements();
 
-    private:
         void restartPlayback();
         std::vector<GstElement*> decoders_;
         AudioFileSource(const AudioFileSource&);     //No Copy Constructor
@@ -218,6 +221,7 @@ class AudioAlsaSource
         /** Constructor */
         explicit AudioAlsaSource(const AudioSourceConfig &config)
             : AudioSource(config), capsFilter_(0) {}
+    private:
         /** 
          * Destructor */
         ~AudioAlsaSource();
@@ -226,8 +230,8 @@ class AudioAlsaSource
         /** Exposes this AudioAlsaSource's source, which is a capsfilter, as 
          * the number of channels must be explicitly set filtering the caps. */
         GstElement *srcElement() { return capsFilter_; }
-    private:
         void link_elements();
+
         GstElement *capsFilter_;
         AudioAlsaSource(const AudioAlsaSource&);     //No Copy Constructor
         AudioAlsaSource& operator=(const AudioAlsaSource&);     //No Assignment Operator
@@ -247,6 +251,7 @@ class AudioPulseSource
         /** Constructor */
         explicit AudioPulseSource(const AudioSourceConfig &config)
             : AudioSource(config), capsFilter_(0) {}
+    private:
         /** 
          * Destructor */
         ~AudioPulseSource();
@@ -256,7 +261,7 @@ class AudioPulseSource
          * Exposes this AudioAlsaSource's source, which is a capsfilter, as 
          * the number of channels must be explicitly set filtering the caps. */
         GstElement *srcElement() { return capsFilter_; }
-    private:
+    
         void link_elements();
         GstElement *capsFilter_;
         AudioPulseSource(const AudioPulseSource&);     //No Copy Constructor
@@ -277,10 +282,8 @@ class AudioJackSource
         /** Constructor */
         explicit AudioJackSource(const AudioSourceConfig &config)
             : InterleavedAudioSource(config) {}
-        void sub_init();
     private:
-        AudioJackSource(const AudioJackSource&);     //No Copy Constructor
-        AudioJackSource& operator=(const AudioJackSource&);     //No Assignment Operator
+        void sub_init();
 };
 
 /*! 
@@ -300,13 +303,14 @@ class AudioDvSource
         /** Constructor */
         explicit AudioDvSource(const AudioSourceConfig &config)
         : AudioSource(config), demux_(0), queue_(0), dvIsNew_(true) {}
+    
+    private:
         /** 
          * Destructor */
         ~AudioDvSource();
         void init_source();
         void sub_init();
 
-    private:
         static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data);
         void link_elements();
         GstElement *demux_, *queue_;
