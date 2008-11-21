@@ -65,7 +65,7 @@ class StrIntFloat
 };
 
 
-/** provides a key/value pair map where value is a StrIntFloat */
+ /** key/value map where value is a string, a float, an int, a vector StrIntFloat */
 class MapMsg
 {
     typedef std::map<std::string, StrIntFloat> MapMsg_;
@@ -93,11 +93,13 @@ public:
 };
 
 
-/** Used by classes that are not coupled to a thread class
- * MapMsg will go to thread that is registered or nowhere if no thread
- * eg. gst/audioLevel.cpp */
+/** Used by code that need msg posting but are not coupled 
+ * to a thread class eg. gst/audioLevel.cpp */
 namespace msg
 {
+    /** to send a @param MapMsg& */
+    bool post(MapMsg& msg);
+    /** MapMsg will go to most recent registered  */
     class Subscriber
     {
         public:
@@ -105,7 +107,6 @@ namespace msg
             virtual void operator()(MapMsg&){}
             virtual ~Subscriber();
     };
-    bool post(MapMsg& msg);
 }
 
 

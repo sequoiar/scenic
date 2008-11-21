@@ -19,19 +19,17 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/** \file 
- *      Builder functions to hide derived Thread classes
- *
- */
-#ifndef __BUILDER_H__
-#define __BUILDER_H__
+#ifndef __MSG_THREAD_FACTORY_H__
+#define __MSG_THREAD_FACTORY_H__
 
 #include "msgThread.h"
 
-namespace Builder
+/**  Factory functions for decoupling derived Thread classes */
+namespace MsgThreadFactory
 {
-    MsgThread* TcpBuilder(int port, bool log);
-    MsgThread* GstBuilder(bool send);
+    MsgThread* Tcp(int port, bool log);
+    MsgThread* Gst(bool send);
 }
+
 #endif
 

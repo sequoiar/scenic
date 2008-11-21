@@ -24,18 +24,18 @@
  *
  */
 
-#include "builder.h"
+#include "msgThreadFactory.h"
 #include "tcp/tcpThread.h"
 #include "gstSenderThread.h"
 #include "gstReceiverThread.h"
 
-MsgThread* Builder::TcpBuilder(int port, bool log)
+MsgThread* MsgThreadFactory::Tcp(int port, bool log)
 {
     return ( new TcpThread(port, log) );
 }
 
 
-MsgThread* Builder::GstBuilder(bool send)
+MsgThread* MsgThreadFactory::Gst(bool send)
 {
     if(send)
         return new GstSenderThread();
