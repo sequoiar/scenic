@@ -1,24 +1,27 @@
-/* GTHREAD-QUEUE-PAIR - Library of GstThread Queue Routines for GLIB
- * Copyright 2008  Koya Charles & Tristan Matthews
+/* gstThread.cpp
+ * Copyright 2008 Koya Charles & Tristan Matthews 
  *
- * This library is free software; you can redisttribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * This file is part of [propulse]ART.
  *
- * This library is distributed in the hope that it will be useful,
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
+
 #include "gstThread.h"
 #include "logWriter.h"
 #include <iostream>
+
 int GstThread::main()
 {
     bool done = false;
@@ -30,7 +33,6 @@ int GstThread::main()
         std::cout << (flipflop ? "-\r" : " \r");
         flipflop = !flipflop;
         std::cout.flush();
-        updateState();
         MapMsg f = queue_.timed_pop(100000);
 
         if(!f["command"].empty())
@@ -70,10 +72,6 @@ int GstThread::main()
 
     return 0;
 }
-
-
-void GstThread::updateState()
-{}
 
 
 GstThread::~GstThread()

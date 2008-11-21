@@ -20,7 +20,7 @@
 
 #include "gstThread.h"
 
-/** MapMsg handlers that call GST media functionality*/
+/** MapMsg handler thread that calls GST media functionality*/
 class GstSenderThread
     : public GstThread
 {
@@ -32,8 +32,10 @@ class GstSenderThread
         /** incomming video_start request */
         bool video_start(MapMsg& msg);
 
-        GstSenderThread(const GstSenderThread&); //No Copy Constructor
-        GstSenderThread& operator=(const GstSenderThread&); //No Assignment Operator
+        /** No Copy Constructor */
+        GstSenderThread(const GstSenderThread&); 
+        /** No Assignment Operator */
+        GstSenderThread& operator=(const GstSenderThread&); 
 };
 
 

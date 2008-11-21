@@ -1,4 +1,4 @@
-/* GTHREAD-QUEUE-PAIR - Library of GstThread Queue Routines for GLIB
+/* GstThread.h
  * Copyright 2008  Koya Charles & Tristan Matthews
  *
  * This library is free software; you can redistribute it and/or
@@ -15,12 +15,15 @@
  * License along with this library; if not, write to the
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
+ *
  */
+
 #ifndef __GST_THREAD__
 #define __GST_THREAD__
 #include "msgThread.h"
 #include "gst/gstBase.h"
 
+/** MapMsg handler thread base class that calls GST media functionality*/
 class GstThread
     : public MsgThread
 {
@@ -29,21 +32,25 @@ class GstThread
             : video_(0), audio_(0){}
         virtual ~GstThread();
     protected:
+        /** incomming audio_start request */
         virtual bool audio_start(MapMsg& msg) = 0;
+        /** incomming audio_stop request */
         virtual bool audio_stop(MapMsg& msg);
+        /** incomming video_start request */
         virtual bool video_start(MapMsg& msg) = 0;
+        /** incomming video_stop request */
         virtual bool video_stop(MapMsg& msg);
-        void updateState();
 
         GstBase* video_;
         GstBase* audio_;
 
     private:
-
         int main();
 
-        GstThread(const GstThread&); //No Copy Constructor
-        GstThread& operator=(const GstThread&); //No Assignment Operator
+        /** No Copy Constructor */
+        GstThread(const GstThread&); 
+        /** No Assignment Operator */
+        GstThread& operator=(const GstThread&); 
 };
 
 #endif
