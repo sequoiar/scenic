@@ -29,6 +29,13 @@
 class BaseArg
 {
     public:
+        /** 
+         * @param t char type one of 'i' 'b' 's'
+         * @param l long option i.e. --option
+         * @param s short option i.e. -o
+         * @param d description
+         * @param a argument description        
+         * */
         BaseArg(char t, std::string l, char s, std::string d, std::string a)
             : type(t), l_arg(l), desc(d), arg_desc(a), s_arg(s){}
 
@@ -36,9 +43,11 @@ class BaseArg
 
     protected:
         friend class OptionArgs;
-        char type;
-        std::string l_arg, desc, arg_desc;
-        char s_arg;
+        const char type;
+        const std::string l_arg;
+        const std::string desc;
+        const std::string arg_desc;
+        const char s_arg;
 };
 
 /// Integer argument
@@ -46,7 +55,13 @@ class IntArg
     : public BaseArg
 {
     public:
-        int* arg;
+        int* const arg;
+        /** @param i pointer to integer to fill
+         * @param l long option i.e. --option
+         * @param s short option i.e. -o
+         * @param d description
+         * @param a argument description        
+         * */
         IntArg(int* i, std::string l, char s, std::string d, std::string a)
             : BaseArg('i', l, s, d, a), arg(i){}
 
@@ -63,7 +78,13 @@ class BoolArg
     : public BaseArg
 {
     public:
-        bool* arg;
+        bool* const arg;
+        /** @param b pointer to bool to fill
+         * @param l long option i.e. --option
+         * @param s short option i.e. -o
+         * @param d description
+         * @param a argument description        
+         * */
         BoolArg(bool* b, std::string l, char s, std::string d)
             : BaseArg('b', l, s, d, std::string()), arg(b){}
 
@@ -80,7 +101,13 @@ class StringArg
     : public BaseArg
 {
     public:
-        char** arg ;
+        char** const arg ;
+        /** @param ppc pointer to char array to fill
+         * @param l long option i.e. --option
+         * @param s short option i.e. -o
+         * @param d description
+         * @param a argument description        
+         * */
         StringArg(char** ppc, std::string l, char s, std::string d, std::string a)
             : BaseArg('s', l, s, d, a), arg(ppc){}
 
@@ -92,7 +119,7 @@ class StringArg
 };
 
 
-/// command line handler
+/// command line handler parses main(argc,argv) and provides --help
 class OptionArgs
 {
     public:
@@ -102,7 +129,7 @@ class OptionArgs
         int parse(int argc, char **argv);
 
         OptionArgs()
-            : options_(), pA_(0){ options_.clear();}
+            : options_(), pA_(0){}
         ~OptionArgs();
 
     private:
