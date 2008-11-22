@@ -17,27 +17,19 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/** \file
- *
- *      Command parser functions used in ipcp protocol
- *
- */
-
 #ifndef __PARSER_H__
 #define __PARSER_H__
 
 #include "mapMsg.h"
 /** Parser builds MapMsg from string and stringify from MsgMap
- */
+ *  - Command parser functions used in ipcp protocol */
 namespace Parser
 {
-    /** builds a string of command: key=value pairs
-     */
+    /// builds a string of command: key=value pairs 
     bool stringify(MapMsg& cmd_map, std::string& str);
 
     /** fills a map of key=value pairs with a special key "command" from a string
-     * of type specified above
-     */
+     * of type specified above */
     bool tokenize(const std::string& str, MapMsg& cmd_map);
 }
 #endif
