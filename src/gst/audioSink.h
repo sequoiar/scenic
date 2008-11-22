@@ -30,22 +30,22 @@ class AudioSink
     : public GstLinkableSink
 {
     public:
-        /** Constructor */
+        /// Constructor 
         AudioSink()
             : sink_(0) {};
-        /** Destructor */
+        /// Destructor 
         ~AudioSink();
-        /**  Returns this AudioSink's caps */
+        ///  Returns this AudioSink's caps 
         std::string getCaps();
 
     protected:
         _GstElement *sink_;
 
     private:
-        /** Returns this AudioSink's sink */
+        /// Returns this AudioSink's sink 
         _GstElement *sinkElement() { return sink_; }
 
-        /** No Copy Constructor */
+        /// No Copy Constructor 
         AudioSink(const AudioSink&);     
         /**
          * No Assignment Constructor */
@@ -60,7 +60,7 @@ class AudioAlsaSink
 : public AudioSink
 {
     public:
-        /** Constructor */
+        /// Constructor 
         AudioAlsaSink() : audioconvert_(0) {};
         /** 
          * Destructor */
@@ -84,7 +84,7 @@ class AudioPulseSink
 : public AudioSink
 {
     public:
-        /** Constructor */
+        /// Constructor 
         AudioPulseSink() : audioconvert_(0) {};
         /**
          * Destructor */
@@ -106,7 +106,7 @@ class AudioJackSink
 : public AudioSink
 {
     public:
-        /** Constructor */
+        /// Constructor 
         AudioJackSink() {};
         /** 
          * Destructor */
@@ -115,7 +115,7 @@ class AudioJackSink
          * Object initialization method */
         void init();
     private:
-        /** No Copy Constructor */
+        /// No Copy Constructor 
         AudioJackSink(const AudioJackSink&);     
         /** 
          * No Assignment Operator */

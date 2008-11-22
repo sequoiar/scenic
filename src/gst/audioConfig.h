@@ -27,11 +27,11 @@
 class AudioSource;
 class AudioSink;
 
-/** Immutable class that is used to parameterize AudioLocal and AudioSender objects. */
+/// Immutable class that is used to parameterize AudioLocal and AudioSender objects. 
 class AudioSourceConfig
 {
     public:
-        /** Constructor sets by default location to an empty string and loop to LOOP_NONE */
+        /// Constructor sets by default location to an empty string and loop to LOOP_NONE 
         AudioSourceConfig(const std::string & source__, int numChannels__, int loop__ = LOOP_NONE)
             : source_(source__), location_(""), numChannels_(numChannels__), loop_(loop__)
         {
@@ -52,7 +52,7 @@ class AudioSourceConfig
             : source_(m.source_), location_(m.location_), numChannels_(m.numChannels_) , loop_(m.loop_) 
         {}
 
-        /** Returns c-style string specifying the source */
+        /// Returns c-style string specifying the source 
         const char *source() const;
         /** 
          * Returns number of channels */
@@ -68,7 +68,7 @@ class AudioSourceConfig
          * Returns true if location indicates an existing, readable file. */
         bool fileExists() const;
          
-        /** Factory method that creates an AudioSource based on this object's source_ string */
+        /// Factory method that creates an AudioSource based on this object's source_ string 
         AudioSource* createSource() const;
 
         /** Enum representing two possible loop settings, any other will correspond 
@@ -80,7 +80,7 @@ class AudioSourceConfig
         };
         
     private:
-        /** No Assignment Operator */
+        /// No Assignment Operator 
         AudioSourceConfig& operator=(const AudioSourceConfig&); 
         const std::string source_;
         const std::string location_;
@@ -88,11 +88,11 @@ class AudioSourceConfig
         const int loop_;
 };
 
-/**  Immutable class that is used to parametrize AudioReceiver objects.  */
+///  Immutable class that is used to parametrize AudioReceiver objects.  
 class AudioSinkConfig 
 {
     public:
-        /** Constructor */
+        /// Constructor 
         AudioSinkConfig(const std::string & sink__)
             : sink_(sink__)
         {}
@@ -101,7 +101,7 @@ class AudioSinkConfig
         AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_) 
         {}
 
-        /** Factory method that creates an AudioSink based on this object's sink_ string */
+        /// Factory method that creates an AudioSink based on this object's sink_ string 
         AudioSink* createSink() const;
 
     private:

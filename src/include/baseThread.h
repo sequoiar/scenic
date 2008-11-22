@@ -26,7 +26,7 @@
 #include "baseModule.h"
 #include "queuePair.h"
 
-/** glib thread construct with async queues */
+/// glib thread construct with async queues 
 template < class T >
 class BaseThread
     : public BaseModule
@@ -52,7 +52,7 @@ class BaseThread
         BaseThread& operator=(const BaseThread&); //No Assignment Operator
 };
 
-/** client access to async QueuePair */
+/// client access to async QueuePair 
 template < class T >
 QueuePair_ < T > &BaseThread < T >::getQueue()
 {
@@ -80,7 +80,7 @@ BaseThread < T >::~BaseThread()
 }
 
 
-/** thread creation */
+/// thread creation 
 template < class T >
 GThread * thread_create(void *(thread) (void *), T t, GError ** err)
 {
@@ -88,7 +88,7 @@ GThread * thread_create(void *(thread) (void *), T t, GError ** err)
 }
 
 
-/** entry point calls thread_create */
+/// entry point calls thread_create 
 template < class T >
 bool BaseThread < T >::run()
 {
@@ -114,7 +114,7 @@ bool BaseThread < T >::run()
     return true;
 }
 
-/** thread entry point */
+/// thread entry point 
 template < class T >
 void *BaseThread < T >::thread_main(void *pThreadObj)
 {

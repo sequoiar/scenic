@@ -57,13 +57,13 @@ class AudioLevel
         void emitMessages(bool doEmit);
 
     private:
-        /** Returns src of this AudioLevel. */
+        /// Returns src of this AudioLevel. 
         _GstElement *srcElement() { return level_; }
         /**
          * Returns sink of this AudioLevel. */
         _GstElement *sinkElement() { return level_; }
 
-        /** Updates most recent rms value of the specified channel. */
+        /// Updates most recent rms value of the specified channel. 
         void updateRms(double rmsDb, size_t channelIdx);
         /**
          * Converts from decibel to linear (0.0 to 1.0) scale. */

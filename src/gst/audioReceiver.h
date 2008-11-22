@@ -48,20 +48,20 @@ class AudioReceiver
               gotCaps_(false),depayloader_(0), decoder_(0), level_(), sink_(0)
         { assert(remoteConfig_.hasCodec()); }
 
-        /** Destructor */
+        /// Destructor 
         ~AudioReceiver();
 
-        /** Sets the global pipeline state to playing */
+        /// Sets the global pipeline state to playing 
         void start();
 
     private:
-        /** Implementation of ReceiverBase's template method initialization */
+        /// Implementation of ReceiverBase's template method initialization 
         void init_codec();
         void init_depayloader();
         void init_level();
         void init_sink();
         
-        /** Used to set this AudioReceiver's RtpReceiver's caps */
+        /// Used to set this AudioReceiver's RtpReceiver's caps 
         void set_caps(); 
 
         const AudioSinkConfig audioConfig_;
@@ -74,9 +74,9 @@ class AudioReceiver
         AudioLevel level_;
         AudioSink *sink_;
 
-        /** No Copy Constructor */
+        /// No Copy Constructor 
         AudioReceiver(const AudioReceiver&); 
-        /** No Assignment Operator */
+        /// No Assignment Operator 
         AudioReceiver& operator=(const AudioReceiver&); 
 };
 

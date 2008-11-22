@@ -1,36 +1,25 @@
-// headerGPL.c
-// Copyright 2008 Koya Charles & Tristan Matthews
-//
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
-
-/** \file
- *      Just the License GPL 3+
+/* optionArgs.c
+ * Copyright 2008 Koya Charles & Tristan Matthews 
  *
- *      Detailed description here.
- *      Continues here.
- *      And more.
- *      And more.#ifndef __BASE_THREAD_H__
- #define __BASE_THREAD_H__
-
-
+ * This file is part of [propulse]ART.
+ *
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
+
 #ifndef __OPTION_ARGS_H__
 #define __OPTION_ARGS_H__
-
 
 #include <glib.h>
 #include <string>
@@ -52,7 +41,7 @@ class BaseArg
         char s_arg;
 };
 
-///Integer argument
+/// Integer argument
 class IntArg
     : public BaseArg
 {
@@ -62,11 +51,14 @@ class IntArg
             : BaseArg('i', l, s, d, a), arg(i){}
 
     private:
+        /// No Copy Constructor
         IntArg(const IntArg&); //No Copy Constructor
+        /// No Assignment Operator
         IntArg& operator=(const IntArg&); //No Assignment Operator
 };
 
-///Boolean argument
+
+/// Boolean argument
 class BoolArg
     : public BaseArg
 {
@@ -76,11 +68,14 @@ class BoolArg
             : BaseArg('b', l, s, d, std::string()), arg(b){}
 
     private:
+        /// No Copy Constructor
         BoolArg(const BoolArg&); //No Copy Constructor
+        /// No Assignment Operator
         BoolArg& operator=(const BoolArg&); //No Assignment Operator
 };
 
-///String argument
+
+/// String argument
 class StringArg
     : public BaseArg
 {
@@ -90,24 +85,20 @@ class StringArg
             : BaseArg('s', l, s, d, a), arg(ppc){}
 
     private:
+        /// No Copy Constructor
         StringArg(const StringArg&); //No Copy Constructor
+        /// No Assignment Operator
         StringArg& operator=(const StringArg&); //No Assignment Operator
 };
 
 
+/// command line handler
 class OptionArgs
 {
-//	std::vector<char **> str_dump;
     public:
-//        void add(BaseModule::ArgList);
+        /// Add a BaseArg derived option 
         void add(BaseArg*);
-
-//	void add(bool *,const char*,char, const char*);
-//	void add(int *,const char*,char, const char*,const char*);
-//	void add(char **,const char*,char,const char*,const char*);
-
-        GOptionEntry* getArray();
-
+        /// input command line arguments
         int parse(int argc, char **argv);
 
         OptionArgs()
@@ -116,13 +107,16 @@ class OptionArgs
 
     private:
         typedef std::vector<GOptionEntry> Options;
+        GOptionEntry* getArray();
 
-        OptionArgs(const OptionArgs&); //No Copy Constructor
-        OptionArgs& operator=(const OptionArgs&); //No Assignment Operator
+        /// No Copy Constructor
+        OptionArgs(const OptionArgs&); 
+        /// No Assignment Operator
+        OptionArgs& operator=(const OptionArgs&); 
 
         Options options_;
         GOptionEntry* pA_;
 };
 
-
 #endif
+

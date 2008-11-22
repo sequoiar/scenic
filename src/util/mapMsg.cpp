@@ -42,17 +42,17 @@ bool msg::post(MapMsg& msg)
 }
 
 StrIntFloat::StrIntFloat()
-    : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(),k_(){}
+    : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(),key_(){}
 
 #define T_EXPAND(x) (x == 'f'?"double":x == 's'?"string":x == 'i'?"interger":x == 'F'?"vector<double>":"unknown")
 
 #define TYPE_CHECKMSG(gtype,xtype) \
     const char* t = #gtype; \
     char tt = t[0];\
-    if(type_ == 'n') QUIET_THROW("Parameter " << k_ << " missing."); \
+    if(type_ == 'n') QUIET_THROW("Parameter " << key_ << " missing."); \
     else \
         if(type_ != tt) \
-        QUIET_THROW("Parameter " << k_ << " should be " << #xtype << " not " << T_EXPAND(type_) << "." );\
+        QUIET_THROW("Parameter " << key_ << " should be " << #xtype << " not " << T_EXPAND(type_) << "." );\
     return gtype   
 
 bool StrIntFloat::get(std::string& s) const
@@ -119,12 +119,12 @@ StrIntFloat& StrIntFloat::operator=(const std::vector<double>& in){
 }
 
 StrIntFloat::StrIntFloat(const StrIntFloat& sif_)
-    : type_(sif_.type_), s_(sif_.s_), i_(sif_.i_), f_(sif_.f_),e_(sif_.e_),F_(sif_.F_),k_(sif_.k_){}
+    : type_(sif_.type_), s_(sif_.s_), i_(sif_.i_), f_(sif_.f_),e_(sif_.e_),F_(sif_.F_),key_(sif_.key_){}
 StrIntFloat& StrIntFloat::operator=(const StrIntFloat& in)
 {
     if(this == &in)
         return *this;
-    type_ = in.type_; s_ = in.s_; i_ = in.i_; f_ = in.f_; e_ = in.e_; F_ = in.F_; k_ = in.k_;
+    type_ = in.type_; s_ = in.s_; i_ = in.i_; f_ = in.f_; e_ = in.e_; F_ = in.F_; key_ = in.key_;
     return *this;
 }
 

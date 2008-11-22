@@ -17,6 +17,7 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #ifndef __MAP_MSG_H__
 #define __MAP_MSG_H__
 
@@ -26,19 +27,11 @@
 #include <vector>
 #include <sstream>
 
-/** container class for variable types used by MapMsg 
- */
+/// container class for variable types used by MapMsg 
 class StrIntFloat
 {
-    char type_;
-    std::string s_;
-    int i_;
-    double f_;
-    Except e_;
-    std::vector<double> F_;
     public:
         StrIntFloat();
-        std::string k_;
         char get_type() const; 
         bool empty() const;
         std::string c_str()const;
@@ -62,10 +55,19 @@ class StrIntFloat
 
         StrIntFloat(const StrIntFloat& sif_);
         StrIntFloat& operator=(const StrIntFloat& in);
+    private:
+        char type_;
+        std::string s_;
+        int i_;
+        double f_;
+        Except e_;
+        std::vector<double> F_;
+    public: //HACK
+        std::string key_;
 };
 
 
- /** key/value map where value is a string, a float, an int, a vector StrIntFloat */
+/// key/value map where value is a string, a float, an int, a vector StrIntFloat
 class MapMsg
 {
     typedef std::map<std::string, StrIntFloat> MapMsg_;
@@ -78,7 +80,7 @@ public:
     StrIntFloat& operator[](const std::string& str)
     {    
         StrIntFloat& sif = map_[str];
-        sif.k_ = str; 
+        sif.key_ = str; 
         return sif;
     }
     void clear(){map_.clear();}
@@ -97,9 +99,9 @@ public:
  * a MsgThread class eg. gst/audioLevel.cpp */
 namespace msg
 {
-    /** to send a MapMsg to Subscriber */
+    /// to send a MapMsg to Subscriber 
     bool post(MapMsg& msg);
-    /** MapMsg will go to most recent registered  */
+    /// MapMsg will go to most recent registered  
     class Subscriber
     {
         public:

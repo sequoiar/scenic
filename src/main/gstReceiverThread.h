@@ -22,21 +22,21 @@
 #include <iostream>
 #include "gstThread.h"
 
-/** MapMsg handler thread that calls GST media functionality*/
+/// MapMsg handler thread that calls GST media functionality
 class GstReceiverThread
     : public GstThread
 {
     public:
         GstReceiverThread(){}
     private:
-        /** incomming audio_start request */
+        /// incomming audio_start request 
         bool audio_start(MapMsg& msg);
-        /** incomming video_start request */
+        /// incomming video_start request 
         bool video_start(MapMsg& msg);
 
-        /** No Copy Constructor */
+        /// No Copy Constructor 
         GstReceiverThread(const GstReceiverThread&); 
-        /** No Assignment Operator */
+        /// No Assignment Operator 
         GstReceiverThread& operator=(const GstReceiverThread&); 
 };
 

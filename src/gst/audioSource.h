@@ -43,13 +43,13 @@ class AudioSource
     : public GstLinkableSource
 {
     public:
-        /** Destructor */
+        /// Destructor 
         ~AudioSource();
-        /** Object initializer */
+        /// Object initializer 
         void init();
 
     protected:
-        /** Constructor */
+        /// Constructor 
         explicit AudioSource(const AudioSourceConfig &config)
             : config_(config), sources_(0), aconvs_(0) {}
         /** 
@@ -97,17 +97,17 @@ class InterleavedAudioSource
     : public AudioSource
 {
     protected:
-        /** Object initializer */
+        /// Object initializer 
         void init();
 
-        /** Constructor */
+        /// Constructor 
         explicit InterleavedAudioSource(const AudioSourceConfig &config)
             : AudioSource(config), interleave_(config_) {}
         
-        /** Destructor */
+        /// Destructor 
         ~InterleavedAudioSource() {};
 
-        /** Object which performs the interleaving of this source's channels */
+        /// Object which performs the interleaving of this source's channels 
         Interleave interleave_;
 
     private:
@@ -137,7 +137,7 @@ class AudioTestSource
     : public InterleavedAudioSource
 {
     public:
-        /** Constructor */
+        /// Constructor 
         explicit AudioTestSource(const AudioSourceConfig &config)
             : InterleavedAudioSource(config), clockId_(0), offset_(0) {}
         
@@ -178,7 +178,7 @@ class AudioFileSource
     : public AudioSource, public BusMsgHandler
 {
     public:
-        /** Constructor */
+        /// Constructor 
         explicit AudioFileSource(const AudioSourceConfig &config);
 
     private:
@@ -218,7 +218,7 @@ class AudioAlsaSource
     : public AudioSource
 {
     public:
-        /** Constructor */
+        /// Constructor 
         explicit AudioAlsaSource(const AudioSourceConfig &config)
             : AudioSource(config), capsFilter_(0) {}
     private:
@@ -248,7 +248,7 @@ class AudioPulseSource
     : public AudioSource
 {
     public:
-        /** Constructor */
+        /// Constructor 
         explicit AudioPulseSource(const AudioSourceConfig &config)
             : AudioSource(config), capsFilter_(0) {}
     private:
@@ -279,7 +279,7 @@ class AudioJackSource
     : public InterleavedAudioSource
 {
     public:
-        /** Constructor */
+        /// Constructor 
         explicit AudioJackSource(const AudioSourceConfig &config)
             : InterleavedAudioSource(config) {}
     private:
@@ -300,7 +300,7 @@ class AudioDvSource
     : public AudioSource
 {
     public:
-        /** Constructor */
+        /// Constructor 
         explicit AudioDvSource(const AudioSourceConfig &config)
         : AudioSource(config), demux_(0), queue_(0), dvIsNew_(true) {}
     

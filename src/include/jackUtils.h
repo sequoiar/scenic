@@ -20,7 +20,7 @@
 #ifndef _JACK_UTILS_H_
 #define _JACK_UTILS_H_
 
-/** Utility functions for jack related issues. */
+/// Utility functions for jack related issues. 
 namespace Jack {
 
     bool is_running();

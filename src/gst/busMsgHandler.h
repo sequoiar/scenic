@@ -33,7 +33,7 @@ class _GstMessage;
 class BusMsgHandler
 {
     public:
-    /** This method is called by the GstBus listener when it has a new msg. */
+    /// This method is called by the GstBus listener when it has a new msg. 
     virtual bool handleBusMsg(_GstMessage *msg) = 0;
     /** 
      * Destructor */

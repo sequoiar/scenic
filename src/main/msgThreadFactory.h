@@ -24,7 +24,7 @@
 
 #include "msgThread.h"
 
-/**  Factory functions for decoupling derived Thread classes */
+///  Factory functions for decoupling derived Thread classes 
 namespace MsgThreadFactory
 {
     MsgThread* Tcp(int port, bool log);

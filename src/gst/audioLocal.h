@@ -38,7 +38,7 @@ class AudioLocal
     : public LocalBase 
 {
     public:
-        /** Constructor */
+        /// Constructor 
         explicit AudioLocal(const AudioSourceConfig srcConfig, const AudioSinkConfig sinkConfig) 
             : srcConfig_(srcConfig), sinkConfig_(sinkConfig), source_(0), level_(), sink_(0) {}
         /** 

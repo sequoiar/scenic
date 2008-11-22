@@ -23,7 +23,7 @@
 #include "msgThread.h"
 #include "gst/gstBase.h"
 
-/** MapMsg handler thread base class that calls GST media functionality*/
+/// MapMsg handler thread base class that calls GST media functionality
 class GstThread
     : public MsgThread
 {
@@ -32,13 +32,13 @@ class GstThread
             : video_(0), audio_(0){}
         virtual ~GstThread();
     protected:
-        /** incomming audio_start request */
+        /// incomming audio_start request 
         virtual bool audio_start(MapMsg& msg) = 0;
-        /** incomming audio_stop request */
+        /// incomming audio_stop request 
         virtual bool audio_stop(MapMsg& msg);
-        /** incomming video_start request */
+        /// incomming video_start request 
         virtual bool video_start(MapMsg& msg) = 0;
-        /** incomming video_stop request */
+        /// incomming video_stop request 
         virtual bool video_stop(MapMsg& msg);
 
         GstBase* video_;
@@ -47,9 +47,9 @@ class GstThread
     private:
         int main();
 
-        /** No Copy Constructor */
+        /// No Copy Constructor 
         GstThread(const GstThread&); 
-        /** No Assignment Operator */
+        /// No Assignment Operator 
         GstThread& operator=(const GstThread&); 
 };
 

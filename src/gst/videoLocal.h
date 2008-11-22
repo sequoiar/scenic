@@ -31,11 +31,11 @@ class VideoLocal
     : public LocalBase
 {
     public:
-        /** Constructor */
+        /// Constructor 
         explicit VideoLocal(const VideoSourceConfig srcConfig, const VideoSinkConfig sinkConfig) 
             : srcConfig_(srcConfig), sinkConfig_(sinkConfig), source_(0), sink_(0) {}
 
-        /** Destructor */
+        /// Destructor 
         ~VideoLocal();
 
         void start();

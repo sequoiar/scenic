@@ -21,7 +21,7 @@
 #ifndef _ALSA_H_
 #define _ALSA_H_
 
-/** alsa device name constant */
+/// alsa device name constant 
 namespace Alsa {
     static const char *DEVICE_NAME = "plughw:0";
 }

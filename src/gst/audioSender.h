@@ -35,25 +35,25 @@ class AudioSender
     : public SenderBase 
 {
     public:
-        /** Constructor */
+        /// Constructor 
         AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig) 
             : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), source_(0), 
             level_(), encoder_(0), payloader_(0)
         {}
 
-        /** Destructor */
+        /// Destructor 
         ~AudioSender();
 
-        /** Returns the capabilities of this AudioSender's RtpSession */
+        /// Returns the capabilities of this AudioSender's RtpSession 
         std::string getCaps() { return session_.getCaps(); }
         
-        /** Sets the sending pipeline, of which this AudioSender is part, to playing. */
+        /// Sets the sending pipeline, of which this AudioSender is part, to playing. 
         void start();
 
     private:
         // helper methods
 
-        /** Implementation of SenderBase's template method initialization */
+        /// Implementation of SenderBase's template method initialization 
         void init_source();
         void init_level();
         void init_codec();

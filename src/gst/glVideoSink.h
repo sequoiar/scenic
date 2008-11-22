@@ -33,7 +33,7 @@ class GLImageSink
 : public VideoSink
 {
     public:
-        /** Constructor */
+        /// Constructor 
         GLImageSink(int screen_num = 0) : glUpload_(0){screen_num_ = screen_num;}
 
     private:
@@ -75,9 +75,9 @@ class GLImageSink
         static GLfloat bottomCrop_;
         static GLfloat topCrop_;
         
-        /** No Copy Constructor */
+        /// No Copy Constructor 
         GLImageSink(const GLImageSink&);     
-        /** No Assignment Operator */
+        /// No Assignment Operator 
         GLImageSink& operator=(const GLImageSink&);     
 };
 

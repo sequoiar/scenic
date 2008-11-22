@@ -51,7 +51,7 @@ class VideoSourceConfig
     private:
         const std::string source_;
         const std::string location_;
-        /** No Assignment Operator */
+        /// No Assignment Operator 
         VideoSourceConfig& operator=(const VideoSourceConfig&);     
 };
 

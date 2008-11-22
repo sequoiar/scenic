@@ -28,7 +28,7 @@
 #include <glib.h>
 #include "logWriter.h"
 
-/** holds pointers to GAsyncQueues */
+/// holds pointers to GAsyncQueues 
 class BaseQueuePair
 {
     public:
@@ -45,7 +45,7 @@ class BaseQueuePair
         BaseQueuePair& operator=(const BaseQueuePair&);
 };
 
-/** object of type T must be copyable */
+/// object of type T must be copyable 
 template < class T >
 class QueuePair_
     : public BaseQueuePair
@@ -142,7 +142,7 @@ QueuePair_ < T >::~QueuePair_()
 }
 
 
-/** Called in threadBase class for internal QueuePair not for a flipped copy */
+/// Called in threadBase class for internal QueuePair not for a flipped copy 
 template < class T >
 void QueuePair_ < T >::init()
 {

@@ -34,7 +34,7 @@ class RtpPay;
 class Codec : public GstLinkableFilter
 {
     public:
-        /** Constructor */
+        /// Constructor 
         Codec()
             : codec_(0) {};
         /** 
@@ -62,7 +62,7 @@ class Codec : public GstLinkableFilter
 class Encoder : public Codec
 {
     public:
-        /** Abstract Factory method that will create payloaders corresponding to this Encoder's codec type */
+        /// Abstract Factory method that will create payloaders corresponding to this Encoder's codec type 
         virtual RtpPay* createPayloader() const = 0;
 };
 
@@ -74,7 +74,7 @@ class Encoder : public Codec
 class Decoder : public Codec
 {
     public:
-        /** Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type */
+        /// Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type 
         virtual RtpPay* createDepayloader() const = 0;
         //virtual void setSrcCaps(){ LOG_DEBUG("BASE DECODER");};
 };
@@ -87,7 +87,7 @@ class H264Encoder : public Encoder
 {
     public: 
 
-        /** Constructor */
+        /// Constructor 
         H264Encoder() : colorspc_(0) {};
 
     private:
@@ -100,7 +100,7 @@ class H264Encoder : public Encoder
          * Creates an h.264 rtp payloader */
         RtpPay* createPayloader() const;
 
-        /** Exposes the sink of this encoder, which is a colorspace converter */
+        /// Exposes the sink of this encoder, which is a colorspace converter 
         _GstElement *sinkElement() { return colorspc_; }
         
         _GstElement *colorspc_;
@@ -118,7 +118,7 @@ class H264Decoder : public Decoder
     private: 
 
         void init();
-        /** Creates an h.264 RtpDepayloader */
+        /// Creates an h.264 RtpDepayloader 
         RtpPay* createDepayloader() const;
 };
 
@@ -129,22 +129,22 @@ class H264Decoder : public Decoder
 class VorbisEncoder : public Encoder 
 {
     public: 
-        /** Constructor */
+        /// Constructor 
         VorbisEncoder() : aconv_(0){};
 
     private:
-        /** Destructor */
+        /// Destructor 
         ~VorbisEncoder();
         void init();
-        /** Creates an RtpVorbisPayloader */
+        /// Creates an RtpVorbisPayloader 
         RtpPay* createPayloader() const;
 
         _GstElement *sinkElement() { return aconv_; }
 
         _GstElement *aconv_;
-        /** No Copy Constructor */
+        /// No Copy Constructor 
         VorbisEncoder(const VorbisEncoder&);     
-        /**No Assignment Operator*/
+        ///No Assignment Operator
         VorbisEncoder& operator=(const VorbisEncoder&);     
 };
 
@@ -158,7 +158,7 @@ class VorbisDecoder : public Decoder
 
         void init();
 //        void setSrcCaps();
-        /** Creates an RtpVorbisDepayloader */
+        /// Creates an RtpVorbisDepayloader 
         RtpPay* createDepayloader() const;
 };
 
@@ -170,7 +170,7 @@ class VorbisDecoder : public Decoder
 class RawEncoder : public Encoder 
 {
     public: 
-        /** Constructor */
+        /// Constructor 
         RawEncoder() : aconv_(0) {};
     
     private:
@@ -178,16 +178,16 @@ class RawEncoder : public Encoder
          * Destructor */
         ~RawEncoder();
         void init();
-        /** Creates an RtpL16Payloader */
+        /// Creates an RtpL16Payloader 
         RtpPay* createPayloader() const;
     
         _GstElement *srcElement() { return aconv_; }
         _GstElement *sinkElement() { return aconv_; }
         _GstElement *aconv_;
         
-        /** No Copy Constructor */
+        /// No Copy Constructor 
         RawEncoder(const RawEncoder&);     
-        /**No Assignment Operator*/
+        ///No Assignment Operator
         RawEncoder& operator=(const RawEncoder&);     
 };
 
@@ -198,7 +198,7 @@ class RawEncoder : public Encoder
 class RawDecoder : public Decoder
 {
     public: 
-        /** Constructor */
+        /// Constructor 
         RawDecoder() : aconv_(0) {};
 
     private:
@@ -214,9 +214,9 @@ class RawDecoder : public Decoder
         _GstElement *sinkElement() { return aconv_; }
         _GstElement *aconv_;
         
-        /**No Copy Constructor*/
+        ///No Copy Constructor
         RawDecoder(const RawDecoder&);     
-        /**No Assignment Operator*/
+        ///No Assignment Operator
         RawDecoder& operator=(const RawDecoder&);     
 };
 
@@ -227,7 +227,7 @@ class RawDecoder : public Decoder
 class LameEncoder : public Encoder 
 {
     public:
-        /** Constructor */
+        /// Constructor 
         LameEncoder() : aconv_(0) {};
     private:
         /** 
@@ -241,9 +241,9 @@ class LameEncoder : public Encoder
         _GstElement *sinkElement() { return aconv_; }
 
         _GstElement *aconv_;
-        /** No Copy Constructor */
+        /// No Copy Constructor 
         LameEncoder(const LameEncoder&);     
-        /** No Assignment Operator */
+        /// No Assignment Operator 
         LameEncoder& operator=(const LameEncoder&);     
 };
 
@@ -254,10 +254,10 @@ class LameEncoder : public Encoder
 class MadDecoder : public Decoder
 {
     public: 
-        /** Constructor */  
+        /// Constructor   
         MadDecoder() : aconv_(0) {};
     private:
-        /** Destructor */  
+        /// Destructor   
         ~MadDecoder();
         void init();
         /** 
@@ -266,9 +266,9 @@ class MadDecoder : public Decoder
 
         _GstElement *srcElement() { return aconv_; }
         _GstElement *aconv_;
-        /** No Copy Constructor */
+        /// No Copy Constructor 
         MadDecoder(const MadDecoder&);     
-        /**No Assignment Operator*/
+        ///No Assignment Operator
         MadDecoder& operator=(const MadDecoder&);     
 };
 
