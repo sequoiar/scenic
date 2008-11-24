@@ -18,13 +18,12 @@
 //
 
 #include <cassert>
-#include <cmath>
 #include <cstring>
+#include <cmath>
 #include <gst/gst.h>
-
+#include "logWriter.h"
 #include "audioLevel.h"
 #include "pipeline.h"
-#include "logWriter.h"
 #include "mapMsg.h"
 
 #include <sstream>

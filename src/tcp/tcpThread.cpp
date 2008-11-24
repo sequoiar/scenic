@@ -1,4 +1,4 @@
-/* GTHREAD-QUEUE-PAIR - Library of TcpThread Queue Routines for GLIB
+/* TcpThread.cpp
  * Copyright 2008  Koya Charles & Tristan Matthews
  *
  * This library is free software; you can redisttribute it and/or
@@ -16,6 +16,7 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
+
 #include <iostream>
 #include "tcpThread.h"
 #include "logWriter.h"
@@ -23,18 +24,18 @@
 #include <errno.h>
 #include <string.h>
 
-class TcpLogFunctor
-    : public LogFunctor
+class TcpLogger
+    : public logger::Subscriber
 {
     public:
-        TcpLogFunctor(TcpThread& tcp)
+        TcpLogger(TcpThread& tcp)
             : tcp_(tcp){}
         TcpThread& tcp_;
         void operator()(LogLevel&, std::string& msg);
 };
 
 
-void TcpLogFunctor::operator()(LogLevel& level, std::string& msg)
+void TcpLogger::operator()(LogLevel& level, std::string& msg)
 {
     MapMsg m("log");
     m["level"] = level;
@@ -42,6 +43,10 @@ void TcpLogFunctor::operator()(LogLevel& level, std::string& msg)
     tcp_.send(m);
 }
 
+TcpThread::TcpThread(int inport, bool logF)            
+: serv_(inport), logFlag_(logF), lf_(new TcpLogger(*this))
+{
+}
 
 static std::string get_line(std::string& msg)
 {
@@ -64,7 +69,6 @@ int TcpThread::main()
 {
     bool quit = false;
     std::string msg;
-    TcpLogFunctor lf_(*this);
 
     try
     {
@@ -81,13 +85,11 @@ int TcpThread::main()
             {
                 LOG_INFO("Got Connection.");
                 if(logFlag_)
-                    LOG::register_cb(&lf_);
+                    lf_->enable();
                 while(serv_.connected())
                 {
                     if((quit = gotQuit()))
-                    {
                         break;
-                    }
                     if(serv_.recv(msg))
                     {
                         std::string line = get_line(msg);
@@ -111,7 +113,7 @@ int TcpThread::main()
                 LOG_DEBUG( "CAUGHT " << e.msg_);
             }
             if(logFlag_)
-                LOG::unregister_cb();
+                lf_->hold();
             if(!quit)
                 LOG_WARNING("Disconnected from Core.");
             usleep(1000);
@@ -148,22 +150,22 @@ bool TcpThread::send(MapMsg& msg)
 {
     std::string msg_str;
     bool ret;
-    LOG::hold_cb();           // to insure no recursive calls due to log message calling send
+    lf_->hold(); // to insure no recursive calls due to log message calling send
     try
     {
         Parser::stringify(msg, msg_str);
         ret = serv_.send(msg_str);
-        LOG::release_cb();
+        lf_->enable();
+
     }
     catch(ErrorExcept e)
     {
         LOG_DEBUG(std::string(msg["command"]) << " Error at Send. Cancelled. " <<
                   strerror(e.errno_));
-        LOG::release_cb();
+        lf_->enable();
         if(e.errno_ == EBADF) //Bad File Descriptor
             throw (e);
     }
-
 
     return ret;
 }

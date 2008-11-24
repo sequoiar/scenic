@@ -77,26 +77,31 @@ std::string logLevelStr(LogLevel level)
     }
 }
 
-static LogFunctor emptyLogFunctor;
-static LogFunctor* lf = &emptyLogFunctor;
-static bool hold = false;
+static logger::Subscriber emptyLogSubscriber;
+static logger::Subscriber* lf = &emptyLogSubscriber;
+static bool hold_flag = false;
 
-void LOG::register_cb(LogFunctor* f)
+
+logger::Subscriber::~Subscriber()
 {
-    lf = f;
-}
-void LOG::unregister_cb()
-{
-    lf = &emptyLogFunctor;
-}
-void LOG::hold_cb()
-{
-    hold = true;
+    lf = &emptyLogSubscriber;
 }
 
-void LOG::release_cb()
+
+void logger::Subscriber::hold()
 {
-    hold = false;
+    hold_flag = true;
+}
+
+
+void logger::Subscriber::enable()
+{
+    hold_flag = false;
+}
+
+logger::Subscriber::Subscriber()
+{
+    lf = this;
 }
 
 bool logLevelMatch(LogLevel level)
@@ -133,7 +138,7 @@ void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileN
 
     if(err == -1)
         throw(Except(msg,0));
-    if(!hold)
+    if(!hold_flag)
         (*lf)(level,strerr);
      
     if(level == INFO)

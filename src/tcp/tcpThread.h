@@ -18,6 +18,8 @@
  *
  */
 
+#include <memory>
+#include "logWriter.h"
 #include "msgThread.h"
 #include "tcpServer.h"
 
@@ -26,8 +28,7 @@ class TcpThread
     : public MsgThread
 {
     public:
-        TcpThread(int inport, bool logF=false)
-            : serv_(inport), logFlag_(logF){}
+        TcpThread(int inport, bool logF=false);
         ~TcpThread(){}
         bool send(MapMsg& msg);
 
@@ -39,6 +40,7 @@ class TcpThread
 
         TcpServer serv_;
         bool logFlag_;
+        std::auto_ptr<logger::Subscriber> lf_;
 
         TcpThread(const TcpThread&);            //No Copy Constructor
         TcpThread& operator=(const TcpThread&); //No Assignment Operator
