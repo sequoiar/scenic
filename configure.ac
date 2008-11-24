@@ -173,6 +173,7 @@ AC_CONFIG_FILES([Makefile
 if test  "x${enable_debug}" = "xyes"  -a  "x${have_cpptest}" = "xtrue"  ; then
 AC_CONFIG_FILES([
                  src/util/test/Makefile
+                 src/gutil/test/Makefile
                  src/tcp/test/Makefile
                  src/gst/test/Makefile
                  src/sip/test/Makefile
