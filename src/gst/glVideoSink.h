@@ -37,6 +37,7 @@ class GLImageSink
         GLImageSink(int screen_num = 0) : glUpload_(0){screen_num_ = screen_num;}
 
     private:
+
         /** 
          * Destructor */
         ~GLImageSink();
@@ -74,6 +75,14 @@ class GLImageSink
         static GLfloat rightCrop_;
         static GLfloat bottomCrop_;
         static GLfloat topCrop_;
+
+        static const GLfloat INIT_X;     
+        static const GLfloat INIT_Y;
+        static const GLfloat INIT_Z;
+        static const GLfloat INIT_LEFT_CROP;
+        static const GLfloat INIT_RIGHT_CROP;
+        static const GLfloat INIT_BOTTOM_CROP;
+        static const GLfloat INIT_TOP_CROP;
         
         /// No Copy Constructor 
         GLImageSink(const GLImageSink&);     

@@ -37,7 +37,7 @@ void VideoTestSuite::start_test_video_gl()
     tx.init();
 
     playback::start();
-    tx.getVideoSink()->showWindow();
+    
 
     BLOCK();
 
@@ -67,7 +67,7 @@ void VideoTestSuite::start_stop_test_video_gl()
     tx.init();
 
     playback::start();
-    tx.getVideoSink()->showWindow();
+    
 
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
@@ -85,7 +85,7 @@ void VideoTestSuite::start_test_video()
     tx.init();
 
     playback::start();
-    tx.getVideoSink()->showWindow();
+    
 
     BLOCK();
 
@@ -115,7 +115,7 @@ void VideoTestSuite::start_stop_test_video()
     tx.init();
 
     playback::start();
-    tx.getVideoSink()->showWindow();
+    
 
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
@@ -134,7 +134,7 @@ void VideoTestSuite::start_v4l()
     tx.init();
 
     playback::start();
-    tx.getVideoSink()->showWindow();
+    
 
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
@@ -163,7 +163,7 @@ void VideoTestSuite::start_stop_v4l()
     tx.init();
 
     playback::start();
-    tx.getVideoSink()->showWindow();
+    
 
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
@@ -181,7 +181,7 @@ void VideoTestSuite::start_dv()
     tx.init();
 
     playback::start();
-    tx.getVideoSink()->showWindow();
+    
 
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
@@ -210,7 +210,7 @@ void VideoTestSuite::start_stop_dv()
     tx.init();
 
     playback::start();
-    tx.getVideoSink()->showWindow();
+    
 
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
@@ -228,7 +228,7 @@ void VideoTestSuite::start_file()
     tx.init();
 
     playback::start();
-    tx.getVideoSink()->showWindow();
+    
 
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
@@ -257,8 +257,7 @@ void VideoTestSuite::start_stop_file()
     tx.init();
 
     playback::start();
-    tx.getVideoSink()->showWindow();
-
+    
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
 

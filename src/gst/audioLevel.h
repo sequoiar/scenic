@@ -59,20 +59,20 @@ class AudioLevel
     private:
         /// Returns src of this AudioLevel. 
         _GstElement *srcElement() { return level_; }
-        /**
-         * Returns sink of this AudioLevel. */
+        
+        /// Returns sink of this AudioLevel. 
         _GstElement *sinkElement() { return level_; }
 
         /// Updates most recent rms value of the specified channel. 
         void updateRms(double rmsDb, size_t channelIdx);
-        /**
-         * Converts from decibel to linear (0.0 to 1.0) scale. */
+        
+        /// Converts from decibel to linear (0.0 to 1.0) scale. 
         static double dbToLinear(double db);
-        /** 
-         * Prints current rms values through the LogWriter system. */
+        
+        /// Prints current rms values through the LogWriter system. 
         void print() const;
-        /** 
-         * Posts the rms values to be handled at a higher level by the MapMsg system. */
+        
+        /// Posts the rms values to be handled at a higher level by the MapMsg system. 
         void post() const;
 
         _GstElement *level_;

@@ -72,8 +72,6 @@ short pof::run(int argc, char **argv)
 
         std::auto_ptr<VideoReceiver> vRx(factories::buildVideoReceiver(ip, videoCodec, videoPort, screenNum));
     
-        vRx->getVideoSink()->showWindow();
-
         if(full)
             vRx->getVideoSink()->makeFullscreen();
 

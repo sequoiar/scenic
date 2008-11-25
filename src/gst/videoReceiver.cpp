@@ -63,6 +63,6 @@ void VideoReceiver::init_sink()
     assert(sink_ = videoConfig_.createSink());
     sink_->init();
     gstlinkable::link(*decoder_, *sink_);
-    sink_->showWindow();
+    //sink_->showWindow();
 }
 

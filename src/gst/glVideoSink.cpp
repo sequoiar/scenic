@@ -1,4 +1,5 @@
-/* videoSink.cpp
+
+/** glVideoSink.cpp
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
  * This file is part of [propulse]ART.
@@ -17,6 +18,7 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #include <cassert>
 
 #include <gst/interfaces/xoverlay.h>
@@ -34,18 +36,34 @@
 #include <GL/glu.h>
 
 #include "glVideoSink.h"
+        
+const GLfloat GLImageSink::INIT_X = -0.67f;     
+const GLfloat GLImageSink::INIT_Y = -0.5f;
+const GLfloat GLImageSink::INIT_Z = -1.2;
+#if 0
+const GLfloat GLImageSink::INIT_X = -1.25625f;     
+const GLfloat GLImageSink::INIT_Y = -0.93750f;
+const GLfloat GLImageSink::INIT_Z = -1.2f;
+#endif
 
+const GLfloat GLImageSink::INIT_LEFT_CROP = 0.0;
+const GLfloat GLImageSink::INIT_RIGHT_CROP = 0.0;
+const GLfloat GLImageSink::INIT_BOTTOM_CROP = 0.0;
+const GLfloat GLImageSink::INIT_TOP_CROP = 0.0;
 const GLfloat GLImageSink::STEP = 0.01;
-GLfloat GLImageSink::x_ = -0.67f;
-GLfloat GLImageSink::y_ = -0.5f;
-GLfloat GLImageSink::z_ = -1.2f;
-GLfloat GLImageSink::leftCrop_ = 0.0;
-GLfloat GLImageSink::rightCrop_ = 0.0;
-GLfloat GLImageSink::topCrop_ = 0.0;
-GLfloat GLImageSink::bottomCrop_ = 0.0;
+
+GLfloat GLImageSink::x_ = INIT_X;
+GLfloat GLImageSink::y_ = INIT_Y;
+GLfloat GLImageSink::z_ = INIT_Z;
+GLfloat GLImageSink::leftCrop_ = INIT_LEFT_CROP;
+GLfloat GLImageSink::rightCrop_ = INIT_RIGHT_CROP;
+GLfloat GLImageSink::topCrop_ = INIT_TOP_CROP;
+GLfloat GLImageSink::bottomCrop_ = INIT_BOTTOM_CROP;
 
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
+    //z_ = width == 640 ? -1.4240 : INIT_Z;
+    g_print("WIDTH: %u, HEIGHT: %u", width, height);
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -86,29 +104,15 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glLoadIdentity();
     glColor3f(0.0f,0.0f,0.0f);
     glTranslatef(x_, y_, z_);
-    glTranslatef(leftCrop_, topCrop_,  0.01f);
-
-    glBegin(GL_TRIANGLE_FAN);
-        glVertex3f(0.0f, 1.0f, 0.0f);
-        glVertex3f(aspectRatio,  1.0f, 0.0f);
-        glVertex3f(aspectRatio,  2.0f, 0.0f);
-        glVertex3f(-aspectRatio, 2.0f, 0.0f);
-        glVertex3f(-aspectRatio,0.0f,0.0f);
-        glVertex3f(0.0f,0.0f,0.0f);
-    glEnd();
-
-    glLoadIdentity();
-    glColor3f(0.0f,0.0f,0.0f);
-    glTranslatef(x_, y_, z_);
     glTranslatef(rightCrop_, bottomCrop_,  0.01f);
 
     glBegin(GL_TRIANGLE_FAN);
-        glVertex3f(aspectRatio,0.0f,0.0f);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f,  -1.0f, 0.0f);
-        glVertex3f(2*aspectRatio,  -1.0f, 0.0f); 
-        glVertex3f(2*aspectRatio,  1.0f, 0.0f);
-        glVertex3f(aspectRatio,  1.0f, 0.0f);
+    glVertex3f(aspectRatio,0.0f,0.0f);
+    glVertex3f(0.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f,  -1.0f, 0.0f);
+    glVertex3f(2*aspectRatio,  -1.0f, 0.0f); 
+    glVertex3f(2*aspectRatio,  1.0f, 0.0f);
+    glVertex3f(aspectRatio,  1.0f, 0.0f);
     glEnd();
 
     glEnable (GL_TEXTURE_RECTANGLE_ARB);
@@ -124,10 +128,10 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glTranslatef(x_, y_, z_);
 
     glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0f, 0.0f);
-        glTexCoord2f((gfloat)width-1, 0.0f);  glVertex3f(aspectRatio,  1.0f, 0.0f);
-        glTexCoord2f((gfloat) width-1, (gfloat) height); glVertex3f(aspectRatio,  0.0f, 0.0f);
-        glTexCoord2f(0.0f, height); glVertex3f(0.0f, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0f, 0.0f);
+    glTexCoord2f((gfloat)width-1, 0.0f);  glVertex3f(aspectRatio,  1.0f, 0.0f);
+    glTexCoord2f((gfloat) width-1, (gfloat) height); glVertex3f(aspectRatio,  0.0f, 0.0f);
+    glTexCoord2f(0.0f, height); glVertex3f(0.0f, 0.0f, 0.0f);
     glEnd();
 
     //return TRUE causes a postRedisplay
@@ -164,40 +168,40 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             z_ -= STEP;
             break;
         case 'b':
-                bottomCrop_ += STEP;
+            bottomCrop_ += STEP;
             break;
         case 'B':
-                bottomCrop_ -= STEP;
+            bottomCrop_ -= STEP;
             break;
         case 't':
-                topCrop_ -= STEP;
+            topCrop_ -= STEP;
             break;
         case 'T':
-                topCrop_ += STEP;
+            topCrop_ += STEP;
             break;
         case 'r':
-                rightCrop_ -= STEP;
+            rightCrop_ -= STEP;
             break;
         case 'R':
-                rightCrop_ += STEP;
+            rightCrop_ += STEP;
             break;
         case 'l':
-                leftCrop_ += STEP;
+            leftCrop_ += STEP;
             break;
         case 'L':
-                leftCrop_ -= STEP;
+            leftCrop_ -= STEP;
             break;
         default:
             g_print("unknown keypress %d", event->keyval);
             break;
     }
-LOG_INFO("x:" << x_  <<
-" y:" << y_ <<
-" z:" << z_ <<
-" l:" << leftCrop_ <<
-" r:" << rightCrop_ <<
-" t:" <<  topCrop_ <<
-" b:" << bottomCrop_);
+    LOG_INFO("x:" << x_  <<
+            " y:" << y_ <<
+            " z:" << z_ <<
+            " l:" << leftCrop_ <<
+            " r:" << rightCrop_ <<
+            " t:" <<  topCrop_ <<
+            " b:" << bottomCrop_);
 
 
     return TRUE;
@@ -226,13 +230,13 @@ void GLImageSink::resetGLparams()
 {
     // reset persistent static params to their initial values
 
-    x_ = -0.67f;
-    y_ = -0.5f;
-    z_ = -1.2f;
-    leftCrop_ = 0.0f;
-    rightCrop_ = 0.0f;
-    bottomCrop_ = 0.0f;
-    topCrop_ = 0.0f;
+    x_ = INIT_X;
+    y_ = INIT_Y;
+    z_ = INIT_Z; 
+    leftCrop_ = INIT_LEFT_CROP;
+    rightCrop_ = INIT_RIGHT_CROP;
+    bottomCrop_ = INIT_BOTTOM_CROP;
+    topCrop_ = INIT_TOP_CROP;
 }
 
 
@@ -283,13 +287,11 @@ void GLImageSink::init()
         if (j == screen_num_) 
             gtk_window_move(GTK_WINDOW(window_),xine[j].x_org,xine[j].y_org);
     }
-    const gint WIDTH = 640;
-    const gint HEIGHT = 480;
 
     gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
     gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
-                expose_cb), static_cast<void*>(sink_));
+                expose_cb), static_cast<void*>(this));
     g_signal_connect(G_OBJECT(window_), "key-press-event",
             G_CALLBACK(key_press_event_cb), NULL);
     g_signal_connect(G_OBJECT(window_), "scroll-event",
@@ -300,5 +302,6 @@ void GLImageSink::init()
     /* configure elements */
     g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
     g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
+    showWindow();
 }
 

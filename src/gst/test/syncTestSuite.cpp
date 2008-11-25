@@ -53,8 +53,7 @@ void SyncTestSuite::start_jack_audio_dv_video()
     vTx.init();
 
     playback::start();
-    vTx.getVideoSink()->showWindow();
-
+    
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
 }
@@ -103,8 +102,7 @@ void SyncTestSuite::start_stop_jack_audio_dv_video()
     vTx.init();
 
     playback::start();
-    vTx.getVideoSink()->showWindow();
-
+    
     BLOCK();
 
     TEST_ASSERT(playback::isPlaying());
@@ -132,8 +130,7 @@ void SyncTestSuite::start_dv_audio_dv_video()
     vTx.init();
 
     playback::start();
-    vTx.getVideoSink()->showWindow();
-
+    
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
 }
@@ -182,8 +179,7 @@ void SyncTestSuite::start_stop_dv_audio_dv_video()
     vTx.init();
 
     playback::start();
-    vTx.getVideoSink()->showWindow();
-
+    
     BLOCK();
 
     TEST_ASSERT(playback::isPlaying());
@@ -212,8 +208,7 @@ void SyncTestSuite::start_audiotest_videotest()
     vTx.init();
 
     playback::start();
-    vTx.getVideoSink()->showWindow();
-
+    
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
 }
@@ -262,8 +257,7 @@ void SyncTestSuite::start_stop_audiotest_videotest()
     vTx.init();
 
     playback::start();
-    vTx.getVideoSink()->showWindow();
-
+    
     BLOCK();
 
     TEST_ASSERT(playback::isPlaying());

@@ -30,6 +30,9 @@
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
 
+const int VideoSink::WIDTH = 720;
+const int VideoSink::HEIGHT = 528;
+
 void VideoSink::destroySink()
 {
     Pipeline::Instance()->remove(&sink_);
@@ -43,7 +46,8 @@ Window VideoSink::getXWindow()
 
 gboolean VideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
 {
-    gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(data), GDK_WINDOW_XWINDOW(widget->window));
+    VideoSink *context = static_cast<VideoSink*>(data);
+    gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(context->sink_), GDK_WINDOW_XWINDOW(widget->window));
     return TRUE;
 }
 
@@ -112,17 +116,16 @@ void XvImageSink::init()
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     assert(window_);
-    const gint WIDTH = 640;
-    const gint HEIGHT = 480;
 
-    gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
+    gtk_window_set_default_size(GTK_WINDOW(window_), VideoSink::WIDTH, VideoSink::HEIGHT);
     gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
 
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
-                         XvImageSink::expose_cb), static_cast<void*>(sink_));
+                         expose_cb), static_cast<void*>(this));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event",
                      G_CALLBACK(XvImageSink::key_press_event_cb), NULL);
+    showWindow();
 }
 
 
