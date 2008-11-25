@@ -26,7 +26,7 @@
 
 typedef QueuePair_<MapMsg> QueuePair;
 
-/// Specializes BaseThread with MapMsg
+/** template specialization of BaseThread with MapMsg */
 class MsgThread
     : public BaseThread<MapMsg>
 {

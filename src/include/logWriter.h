@@ -53,7 +53,7 @@
 #define LOG(msg, level)     LOG_(msg,level,0)
 #endif
 
-
+/** higher values are more critical */
 enum LogLevel {
     NONE = 0,
     DEBUG = 10,
@@ -70,6 +70,7 @@ enum LogLevel {
 #define LOG_WARNING(msg)    LOG(msg, WARNING)
 #define LOG_DEBUG(msg)      LOG(msg, DEBUG)
 
+/** base exception class */
 class Except
 {
 public:
@@ -82,6 +83,7 @@ public:
     virtual ~Except(){}
 };
 
+/** Recovery is possible */
 class ErrorExcept : public Except
 {
 public:
@@ -89,12 +91,14 @@ public:
 
 };
 
+/** Tries to cleanup before exit */
 class CriticalExcept : public Except
 {
 public:
     CriticalExcept(std::string log_msg, int err=0):Except(log_msg,err){ log_ = CRITICAL;}
 };
 
+/** Assertion failed */
 class AssertExcept : public CriticalExcept
 {
 public:

@@ -1,4 +1,4 @@
-/* QueuePair_ 
+/* QueuePair.h
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
  * This file is part of [propulse]ART.
@@ -19,7 +19,7 @@
  */
 
 /** \file
- *		QueuePair_ asbstracts a pair of glib GAsyncQueues
+ *		QueuePair_ abstracts a pair of glib GAsyncQueues
  *      
  */
 #ifndef __QUEUE_PAIR_H__
@@ -40,12 +40,15 @@ class BaseQueuePair
         GAsyncQueue *first_, *second_;
 
     private:
-        //No copying of class allowed
+        /** No Copy Constructor */
         BaseQueuePair(const BaseQueuePair& in);
+        /** No Assignment Operator */
         BaseQueuePair& operator=(const BaseQueuePair&);
 };
 
-/// object of type T must be copyable 
+/** wraps pair of glib GAsyncQueue 
+ * * provides cast void* to T* 
+ * * note:object of type T must be copyable */
 template < class T >
 class QueuePair_
     : public BaseQueuePair
@@ -69,8 +72,9 @@ class QueuePair_
 
         bool destroyQueues_;
 
-        //No copying of class allowed 
+        /** No Copy Constructor */
         QueuePair_(const QueuePair_& in);
+        /** No Assignment Operator */
         QueuePair_& operator=(const QueuePair_&);
 };
 

@@ -27,7 +27,7 @@
 #include "videoSink.h"
 #include "playback.h"
 
-const int VideoTestSuite::GL_SCREEN = 1;
+const int VideoTestSuite::GL_SCREEN = 0;
 
 void VideoTestSuite::start_test_video_gl()
 {

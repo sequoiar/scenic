@@ -48,8 +48,10 @@ class BaseThread
         QueuePair_ < T > flippedQueue_;
 
     private:
-        BaseThread(const BaseThread&); //No Copy Constructor
-        BaseThread& operator=(const BaseThread&); //No Assignment Operator
+        /** No Copy Constructor */
+        BaseThread(const BaseThread&); 
+        /** No Assignment Operator */
+        BaseThread& operator=(const BaseThread&); 
 };
 
 /// client access to async QueuePair 
