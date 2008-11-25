@@ -20,7 +20,13 @@
 #include "gstSenderThread.h"
 #include "gst/audioSender.h"
 #include "gst/videoSender.h"
+#include "gst/playback.h"
 
+GstSenderThread::~GstSenderThread()
+{
+    delete video_;
+    delete audio_;
+}
 
 bool GstSenderThread::video_start(MapMsg& msg)
 {
@@ -43,7 +49,7 @@ bool GstSenderThread::video_start(MapMsg& msg)
             video_ =  new VideoSender(config, rConfig);
         }
         video_->init();
-        video_->start();
+        playback::start();
         return true;
     }
     catch(Except e)
@@ -82,7 +88,7 @@ bool GstSenderThread::audio_start(MapMsg& msg)
             audio_ = asender = new AudioSender(config, rConfig);
         }
         audio_->init();
-        audio_->start();
+        playback::start();
 
         //Build Caps Msg
         MapMsg caps("caps");

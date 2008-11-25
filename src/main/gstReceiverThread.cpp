@@ -20,8 +20,14 @@
 
 #include "gst/audioReceiver.h"
 #include "gst/videoReceiver.h"
+#include "gst/playback.h"
 #include "hostIP.h"
 
+GstReceiverThread::~GstReceiverThread()
+{
+    delete video_;
+    delete audio_;
+}
 
 bool GstReceiverThread::video_start(MapMsg& msg)
 {
@@ -34,7 +40,7 @@ bool GstReceiverThread::video_start(MapMsg& msg)
         ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"], "");
         video_ = new VideoReceiver(config, rConfig);
         video_->init();
-        video_->start();
+        playback::start();
 //        queue_.push(MapMsg("video_started"));
         return true;
     }
@@ -59,7 +65,7 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
         ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"], msg["caps"]);
         audio_ = new AudioReceiver(config, rConfig);
         audio_->init();
-        audio_->start();
+        playback::start();
 //        queue_.push(MapMsg("audio_started"));
         return true;
     }

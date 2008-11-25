@@ -27,12 +27,17 @@ class GstReceiverThread
     : public GstThread
 {
     public:
-        GstReceiverThread(){}
+        GstReceiverThread()
+            : video_(0), audio_(0) {}
+        ~GstReceiverThread();
     private:
         /// incomming audio_start request 
         bool audio_start(MapMsg& msg);
         /// incomming video_start request 
         bool video_start(MapMsg& msg);
+        
+        ReceiverBase* video_;
+        ReceiverBase* audio_;
 
         /// No Copy Constructor 
         GstReceiverThread(const GstReceiverThread&); 

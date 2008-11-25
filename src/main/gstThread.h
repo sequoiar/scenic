@@ -21,28 +21,25 @@
 #ifndef __GST_THREAD__
 #define __GST_THREAD__
 #include "msgThread.h"
-#include "gst/gstBase.h"
+#include "gst/mediaBase.h"
+#include "gst/playback.h"
 
 /// MapMsg handler thread base class that calls GST media functionality
 class GstThread
     : public MsgThread
 {
-    public:
-        GstThread()
-            : video_(0), audio_(0){}
-        virtual ~GstThread();
     protected:
+        GstThread(){}
         /// incomming audio_start request 
         virtual bool audio_start(MapMsg& msg) = 0;
-        /// incomming audio_stop request 
-        virtual bool audio_stop(MapMsg& msg);
         /// incomming video_start request 
         virtual bool video_start(MapMsg& msg) = 0;
+        /// incomming audio_stop request 
+        void audio_stop(MapMsg& ){ playback::stop();} 
         /// incomming video_stop request 
-        virtual bool video_stop(MapMsg& msg);
+        void video_stop(MapMsg& ){ playback::stop();}
 
-        GstBase* video_;
-        GstBase* audio_;
+
 
     private:
         int main();

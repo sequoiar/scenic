@@ -20,6 +20,7 @@
 
 #include "gstThread.h"
 #include "logWriter.h"
+#include "gst/playback.h"
 #include <iostream>
 
 int GstThread::main()
@@ -72,30 +73,4 @@ int GstThread::main()
 
     return 0;
 }
-
-
-GstThread::~GstThread()
-{
-    delete audio_;
-    delete video_;
-}
-
-
-bool GstThread::video_stop(MapMsg& /*msg*/)
-{
-    if(!video_)
-        return false;
-    video_->stop();
-    return true;
-}
-
-
-bool GstThread::audio_stop(MapMsg& /*msg*/)
-{
-    if(!video_)
-        return false;
-    video_->stop();
-    return true;
-}
-
 

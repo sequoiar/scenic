@@ -25,12 +25,17 @@ class GstSenderThread
     : public GstThread
 {
     public:
-        GstSenderThread(){}
+        GstSenderThread()
+            : video_(0), audio_(0) {}
+        ~GstSenderThread();
     private:
         /// incomming audio_start request 
         bool audio_start(MapMsg& msg);
         /// incomming video_start request 
         bool video_start(MapMsg& msg);
+
+        SenderBase* video_;
+        SenderBase* audio_;
 
         /// No Copy Constructor 
         GstSenderThread(const GstSenderThread&); 
