@@ -37,8 +37,8 @@ class VideoLocal
 
         /// Destructor 
         ~VideoLocal();
-
-        void start();
+    
+        VideoSink *getVideoSink() { return sink_; }
 
     private:
         void init_source();

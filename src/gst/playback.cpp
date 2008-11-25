@@ -1,5 +1,5 @@
 
-// videoLocal.cpp
+// mediaBase.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -19,35 +19,28 @@
 //
 
 #include <cassert>
-
-#include "pipeline.h"
-#include "gstLinkable.h"
-#include "videoLocal.h"
-#include "videoSource.h"
-#include "videoSink.h"
-#include "videoConfig.h"
-#include "logWriter.h"
 #include "playback.h"
+#include "pipeline.h"
 
 
-VideoLocal::~VideoLocal()
+void playback::start()
 {
-    delete sink_;
-    delete source_;
+    Pipeline::Instance()->start();
 }
 
 
-void VideoLocal::init_source()
+void playback::stop()
 {
-    assert(source_ = srcConfig_.createSource());
-    source_->init();
+    Pipeline::Instance()->stop();
 }
 
-
-void VideoLocal::init_sink()
+void playback::pause()
 {
-    assert(sink_ = sinkConfig_.createSink());
-    sink_->init();
-    gstlinkable::link(*source_, *sink_);   // FIXME: this shouldn't happen for VideoFileSource
+    Pipeline::Instance()->pause();
+}
+
+bool playback::isPlaying()
+{ 
+    return Pipeline::Instance()->isPlaying(); 
 }
 

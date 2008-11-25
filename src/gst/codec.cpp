@@ -28,27 +28,23 @@
 
 Codec::~Codec()
 {
-    stop();
-    pipeline_.remove(&codec_);
+    Pipeline::Instance()->remove(&codec_);
 }
 
 
 H264Encoder::~H264Encoder()
 {
-    stop();
-    pipeline_.remove(&colorspc_);
+    Pipeline::Instance()->remove(&colorspc_);
 }
 
 
 void H264Encoder::init()
 {
-    assert(colorspc_ = gst_element_factory_make("ffmpegcolorspace", "colorspc"));
-    pipeline_.add(colorspc_);
+    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
-    assert(codec_ = gst_element_factory_make("x264enc", NULL));
+    codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
     g_object_set(G_OBJECT(codec_), "bitrate", 4096, "byte-stream", TRUE, "threads", 4,
                      NULL);
-    pipeline_.add(codec_);
 
     gstlinkable::link(colorspc_, codec_);
 }
@@ -62,8 +58,7 @@ RtpPay* H264Encoder::createPayloader() const
 
 void H264Decoder::init()
 {
-    assert(codec_ = gst_element_factory_make("ffdec_h264", NULL));
-    pipeline_.add(codec_);
+    codec_ = Pipeline::Instance()->makeElement("ffdec_h264", NULL);
 }
 
 
@@ -75,10 +70,8 @@ RtpPay* H264Decoder::createDepayloader() const
 
 void VorbisEncoder::init()
 {
-    assert(codec_ = gst_element_factory_make("vorbisenc", NULL));
-    pipeline_.add(codec_);
-    assert(aconv_ = gst_element_factory_make("audioconvert", NULL));
-    pipeline_.add(aconv_);
+    codec_ = Pipeline::Instance()->makeElement("vorbisenc", NULL);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     gstlinkable::link(aconv_, codec_);
 }
@@ -86,15 +79,13 @@ void VorbisEncoder::init()
 
 VorbisEncoder::~VorbisEncoder()
 {
-    stop();
-    pipeline_.remove(&aconv_);
+    Pipeline::Instance()->remove(&aconv_);
 }
 
 
 void VorbisDecoder::init()
 {
-    assert(codec_ = gst_element_factory_make("vorbisdec", NULL));
-    pipeline_.add(codec_);
+    codec_ = Pipeline::Instance()->makeElement("vorbisdec", NULL);
 }
 
 
@@ -112,15 +103,13 @@ RtpPay* VorbisDecoder::createDepayloader() const
 
 void RawEncoder::init()
 {
-    assert(aconv_ = gst_element_factory_make("audioconvert", NULL));
-    pipeline_.add(aconv_);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 }
 
 
 void RawDecoder::init()
 {
-    assert(aconv_ = gst_element_factory_make("audioconvert", NULL));
-    pipeline_.add(aconv_);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 }
 
 
@@ -137,24 +126,20 @@ RtpPay* RawDecoder::createDepayloader() const
 
 RawEncoder::~RawEncoder()
 {
-    stop();
-    pipeline_.remove(&aconv_);
+    Pipeline::Instance()->remove(&aconv_);
 }
 
 
 RawDecoder::~RawDecoder()
 {
-    stop();
-    pipeline_.remove(&aconv_);
+    Pipeline::Instance()->remove(&aconv_);
 }
 
 
 void LameEncoder::init()
 {
-    assert(aconv_ = gst_element_factory_make("audioconvert", NULL));
-    pipeline_.add(aconv_);
-    assert(codec_ = gst_element_factory_make("lame", NULL));
-    pipeline_.add(codec_);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
+    codec_ = Pipeline::Instance()->makeElement("lame", NULL);
 
     gstlinkable::link(aconv_, codec_);
 }
@@ -162,10 +147,8 @@ void LameEncoder::init()
 
 void MadDecoder::init()
 {
-    assert(codec_ = gst_element_factory_make("mad", NULL));
-    pipeline_.add(codec_);
-    assert(aconv_ = gst_element_factory_make("audioconvert", NULL));
-    pipeline_.add(aconv_);
+    codec_ = Pipeline::Instance()->makeElement("mad", NULL);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     gstlinkable::link(codec_, aconv_);
 }
@@ -184,14 +167,12 @@ RtpPay* MadDecoder::createDepayloader() const
 
 LameEncoder::~LameEncoder()
 {
-    stop();
-    pipeline_.remove(&aconv_);
+    Pipeline::Instance()->remove(&aconv_);
 }
 
 
 MadDecoder::~MadDecoder()
 {
-    stop();
-    pipeline_.remove(&aconv_);
+    Pipeline::Instance()->remove(&aconv_);
 }
 

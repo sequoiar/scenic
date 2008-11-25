@@ -32,8 +32,7 @@
 
 void VideoSink::destroySink()
 {
-    stop();
-    pipeline_.remove(&sink_);
+    Pipeline::Instance()->remove(&sink_);
 }
 
 Window VideoSink::getXWindow()
@@ -107,10 +106,9 @@ void XvImageSink::init()
     static bool gtk_initialized = false;
     if (!gtk_initialized)
         gtk_init(0, NULL);
-    assert(sink_ = gst_element_factory_make("xvimagesink", "videosink"));
+    sink_ = Pipeline::Instance()->makeElement("xvimagesink", "videosink");
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
-    pipeline_.add(sink_);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     assert(window_);
@@ -142,13 +140,11 @@ XvImageSink::~XvImageSink()
 void XImageSink::init()
 {
     // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
-    assert(colorspc_ = gst_element_factory_make("ffmpegcolorspace", "colorspc"));
-    pipeline_.add(colorspc_);
+    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
-    assert(sink_ = gst_element_factory_make("ximagesink", "videosink"));
+    sink_ = Pipeline::Instance()->makeElement("ximagesink", "videosink");
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
-    pipeline_.add(sink_);
 
     gstlinkable::link(colorspc_, sink_);
 }
@@ -157,7 +153,7 @@ void XImageSink::init()
 XImageSink::~XImageSink()
 {
     VideoSink::destroySink();
-    pipeline_.remove(&colorspc_);
+    Pipeline::Instance()->remove(&colorspc_);
 }
 
 

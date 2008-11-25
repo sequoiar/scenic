@@ -46,7 +46,7 @@ class AudioSource
         /// Destructor 
         ~AudioSource();
         /// Object initializer 
-        void init();
+        virtual void init();
 
     protected:
         /// Constructor 

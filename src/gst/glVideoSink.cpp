@@ -240,7 +240,7 @@ GLImageSink::~GLImageSink()
 {
     resetGLparams();
 
-    pipeline_.remove(&glUpload_);
+    Pipeline::Instance()->remove(&glUpload_);
     VideoSink::destroySink();
     if (window_)
     {
@@ -249,34 +249,17 @@ GLImageSink::~GLImageSink()
     }
 }
 
-
-#if 0
-bool GLImageSink::handleBusMsg(GstMessage* msg)
-{
-    if(GST_MESSAGE_TYPE(msg) != GST_MESSAGE_ELEMENT)
-        return false;
-
-    if (!gst_structure_has_name (msg->structure, "prepare-xwindow-id"))
-        return false;
-
-    gst_x_overlay_set_xwindow_id (GST_X_OVERLAY(GST_MESSAGE_SRC(msg)), getXWindow());
-    return true;
-}
-#endif
-
-
 void GLImageSink::init()
 {
     static bool gtk_initialized = false;
     if (!gtk_initialized)
         gtk_init(0, NULL);
 
-    assert(glUpload_ = gst_element_factory_make("glupload", "colorspace"));
-    pipeline_.add(glUpload_);
+    glUpload_ = Pipeline::Instance()->makeElement("glupload", "colorspace");
 
-    assert(sink_ = gst_element_factory_make("glimagesink", "videosink"));
+    sink_ = Pipeline::Instance()->makeElement("glimagesink", "videosink");
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-    pipeline_.add(sink_);
+
     gstlinkable::link(glUpload_, sink_);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    
@@ -305,13 +288,12 @@ void GLImageSink::init()
 
     gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
     gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
-    //pipeline_.subscribe(this);
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
                 expose_cb), static_cast<void*>(sink_));
     g_signal_connect(G_OBJECT(window_), "key-press-event",
             G_CALLBACK(key_press_event_cb), NULL);
     g_signal_connect(G_OBJECT(window_), "scroll-event",
-                     G_CALLBACK(mouse_wheel_cb), NULL);
+            G_CALLBACK(mouse_wheel_cb), NULL);
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     gtk_widget_set_events(window_, GDK_SCROLL_MASK);
 

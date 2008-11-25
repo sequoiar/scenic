@@ -36,7 +36,6 @@
 
 AudioSender::~AudioSender()
 {
-    stop();
     delete payloader_;
     delete encoder_;
     delete source_;
@@ -74,15 +73,5 @@ void AudioSender::init_payloader()
 
     gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_, remoteConfig_);   // FIXME: session should take RtpPay pointer
-}
-
-// CAPS can only be sent after this is started
-void AudioSender::start()
-{
-    GstBase::start();
-
-    LOG_DEBUG("Sending audio to host " << remoteConfig_.remoteHost() << " on port " << remoteConfig_.port());
-
-    //session_.checkSampleRate();
 }
 

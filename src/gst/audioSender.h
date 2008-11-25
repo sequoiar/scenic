@@ -47,8 +47,6 @@ class AudioSender
         /// Returns the capabilities of this AudioSender's RtpSession 
         std::string getCaps() { return session_.getCaps(); }
         
-        /// Sets the sending pipeline, of which this AudioSender is part, to playing. 
-        void start();
 
     private:
         // helper methods

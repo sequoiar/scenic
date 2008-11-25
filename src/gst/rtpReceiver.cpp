@@ -35,8 +35,7 @@ std::list<GstElement *> RtpReceiver::usedDepayloaders_;
 
 RtpReceiver::~RtpReceiver()
 {
-    stop();
-    pipeline_.remove(&rtp_receiver_);
+    Pipeline::Instance()->remove(&rtp_receiver_);
 
     // find this->depayloader in the static list of depayloaders
     std::list<GstElement *>::iterator iter;
@@ -145,19 +144,15 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     // store copy so that destructor knows which depayloader to remove from its list
     depayloader_ = depayloader->sinkElement();
 
-    assert(rtp_receiver_ = gst_element_factory_make("udpsrc", NULL));
+    rtp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
     g_object_set(rtp_receiver_, "port", config.port(), NULL);
 
-    assert(rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL));
+    rtcp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
     g_object_set(rtcp_receiver_, "port", config.port() + 1, NULL);
 
-    assert(rtcp_sender_ = gst_element_factory_make("udpsink", NULL));
+    rtcp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
     g_object_set(rtcp_sender_, "host", config.remoteHost(), "port",
                  config.port() + 5, "sync", FALSE, "async", FALSE, NULL);
-
-    pipeline_.add(rtp_receiver_);
-    pipeline_.add(rtcp_receiver_);
-    pipeline_.add(rtcp_sender_);
 
     assert(recv_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_")));
     assert(send_rtcp_src = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_")));

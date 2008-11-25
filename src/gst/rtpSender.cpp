@@ -22,7 +22,6 @@
 #include <cassert>
 
 #include "pipeline.h"
-#include "gstBase.h"
 #include "gstLinkable.h"
 #include "rtpSender.h"
 #include "rtpPay.h"
@@ -31,14 +30,13 @@
 
 RtpSender::~RtpSender()
 {
-    stop();
-    pipeline_.remove(&rtp_sender_);
+    Pipeline::Instance()->remove(&rtp_sender_);
 }
 
 
 std::string RtpSender::getCaps() const
 {
-    return GstBase::getElementPadCaps(rtp_sender_, "sink");
+    return Pipeline::Instance()->getElementPadCaps(rtp_sender_, "sink");
 }
 
 
@@ -55,19 +53,16 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     GstPad *rtcpSenderSink;
     GstPad *rtcpReceiverSrc;
 
-    assert(rtp_sender_ = gst_element_factory_make("udpsink", NULL));
+    rtp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
     g_object_set(rtp_sender_, "host", config.remoteHost(), "port", config.port(), NULL);
-    pipeline_.add(rtp_sender_);
     
-    assert(rtcp_sender_ = gst_element_factory_make("udpsink", NULL));
+    rtcp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
     g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.port() + 1,
                  "sync", FALSE, "async", FALSE, NULL);
 
-    assert(rtcp_receiver_ = gst_element_factory_make("udpsrc", NULL));
+    rtcp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
     g_object_set(rtcp_receiver_, "port", config.port() + 5, NULL);
     
-    pipeline_.add(rtcp_sender_);
-    pipeline_.add(rtcp_receiver_);
 
     // FIXME: are the padStr calls necessary for request pads, or will the send_rtp_sink_%d pattern suffice?
     send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_"));

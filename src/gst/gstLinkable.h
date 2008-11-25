@@ -21,12 +21,14 @@
 #ifndef _GST_LINKABLE_H_
 #define _GST_LINKABLE_H_
 
-#include "gstBase.h"
+#include <vector> 
 
 class GstLinkableSource;
 class GstLinkableSink;
 class _GstElement;
 class _GstPad;
+
+typedef std::vector<_GstElement *>::iterator GstIter;
 
 namespace gstlinkable
 {
@@ -40,24 +42,26 @@ namespace gstlinkable
     void link(GstLinkableSource &source, std::vector<_GstElement*> &sinks);
 }
 
-class GstLinkableSource
-: virtual public GstBase
+class GstLinkableSource 
 {
     public:
         GstLinkableSource() {} 
+        virtual ~GstLinkableSource() {} 
         virtual _GstElement *srcElement() = 0;
+
     private:
         GstLinkableSource(const GstLinkableSource&);     //No Copy Constructor
         GstLinkableSource& operator=(const GstLinkableSource&);     //No Assignment Operator
 };
 
 
-class GstLinkableSink
-: virtual public GstBase
+class GstLinkableSink 
 {
     public:
         GstLinkableSink() {}
+        virtual ~GstLinkableSink() {} 
         virtual _GstElement *sinkElement() = 0;
+
     private:
         GstLinkableSink(const GstLinkableSink&);     //No Copy Constructor
         GstLinkableSink& operator=(const GstLinkableSink&);     //No Assignment Operator
@@ -69,6 +73,7 @@ class GstLinkableFilter
 {
     public:
         GstLinkableFilter() {} 
+
     private:
         GstLinkableFilter(const GstLinkableFilter&);     //No Copy Constructor
         GstLinkableFilter& operator=(const GstLinkableFilter&);     //No Assignment Operator

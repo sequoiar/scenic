@@ -37,6 +37,7 @@ class VideoSink
         void showWindow();
         void makeFullscreen() { makeFullscreen(window_); }
         void makeUnfullscreen() { makeUnfullscreen(window_); }
+        virtual void init() = 0;
 
         
     protected:

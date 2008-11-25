@@ -26,8 +26,7 @@
 
 Interleave::~Interleave()
 {
-    stop();
-    pipeline_.remove(&interleave_);
+    Pipeline::Instance()->remove(&interleave_);
 }
 
 
@@ -59,8 +58,7 @@ void Interleave::set_channel_layout()
 
 void Interleave::init()
 {
-    assert(interleave_ = gst_element_factory_make("interleave", NULL));
-    pipeline_.add(interleave_);
+    interleave_ = Pipeline::Instance()->makeElement("interleave", NULL);
     set_channel_layout();
 }
 

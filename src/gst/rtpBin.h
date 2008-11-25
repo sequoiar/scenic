@@ -17,21 +17,17 @@
 // You should have received a copy of the GNU General Public License
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Singleton class that multiple streams can connect to
 
 #ifndef _RTP_BIN_H_
 #define _RTP_BIN_H_
-
-#include "gstBase.h"
 
 class RemoteConfig;
 class _GstElement;
 
 class RtpBin
-    : public GstBase
 {
     public:
-        ~RtpBin();
+        virtual ~RtpBin();
         void init();
         //virtual void checkSampleRate() = 0;
         double bandwidth() const;

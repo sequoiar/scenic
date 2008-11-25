@@ -40,8 +40,6 @@ class VideoSender
 
         ~VideoSender();
 
-        void start();
-
     private:
         void init_source();
         void init_codec();

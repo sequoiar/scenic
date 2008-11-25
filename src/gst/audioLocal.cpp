@@ -32,7 +32,6 @@
 
 AudioLocal::~AudioLocal()
 {
-    stop();
     delete sink_;
     delete source_;
 }

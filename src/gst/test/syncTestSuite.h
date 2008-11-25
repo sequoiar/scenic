@@ -33,13 +33,14 @@ class SyncTestSuite
 
         SyncTestSuite()
         {
-            TEST_ADD(SyncTestSuite::start_jack_audio_dv_video)
-            TEST_ADD(SyncTestSuite::stop_jack_audio_dv_video)
-            TEST_ADD(SyncTestSuite::start_stop_jack_audio_dv_video)
-
+            testLength_ = 5000;
             TEST_ADD(SyncTestSuite::start_dv_audio_dv_video)
             TEST_ADD(SyncTestSuite::stop_dv_audio_dv_video)
             TEST_ADD(SyncTestSuite::start_stop_dv_audio_dv_video)
+
+            TEST_ADD(SyncTestSuite::start_jack_audio_dv_video)
+            TEST_ADD(SyncTestSuite::stop_jack_audio_dv_video)
+            TEST_ADD(SyncTestSuite::start_stop_jack_audio_dv_video)
 
             TEST_ADD(SyncTestSuite::start_audiotest_videotest);
             TEST_ADD(SyncTestSuite::stop_audiotest_videotest);

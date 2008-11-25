@@ -20,24 +20,20 @@
 #include <cassert>
 #include <gst/gst.h>
 #include "audioSink.h"
-#include "gstBase.h"
 #include "logWriter.h"
 #include "jackUtils.h"
 #include "pipeline.h"
 #include "alsa.h"
 
-
-
 AudioSink::~AudioSink()
 {
-    stop();
-    pipeline_.remove(&sink_);
+    Pipeline::Instance()->remove(&sink_);
 }
 
 
 std::string AudioSink::getCaps()
 {
-    return getElementPadCaps(sink_, "sink");
+    return Pipeline::Instance()->getElementPadCaps(sink_, "sink");
 }
 
 
@@ -46,21 +42,19 @@ void AudioJackSink::init()
     if (!Jack::is_running())
         THROW_CRITICAL("Jack is not running");
 
-    assert(sink_ = gst_element_factory_make("jackaudiosink", NULL));
+    sink_ = Pipeline::Instance()->makeElement("jackaudiosink", NULL);
     g_object_set(G_OBJECT(sink_), "connect", 1, NULL);
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-    pipeline_.add(sink_);
 
-    if (GstBase::SAMPLE_RATE != Jack::samplerate())
+    if (Pipeline::SAMPLE_RATE != Jack::samplerate())
         THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
-                << " does not match default sample rate " << GstBase::SAMPLE_RATE);
+                << " does not match default sample rate " << Pipeline::SAMPLE_RATE);
 }
 
         
 AudioAlsaSink::~AudioAlsaSink()
 {
-    stop();
-    pipeline_.remove(&audioconvert_);
+    Pipeline::Instance()->remove(&audioconvert_);
 }
 
 void AudioAlsaSink::init()
@@ -68,13 +62,11 @@ void AudioAlsaSink::init()
     if (Jack::is_running())
         THROW_CRITICAL("Jack is running, you must stop jack server before using alsasink");
 
-    assert(audioconvert_ = gst_element_factory_make("audioconvert", NULL));
-    pipeline_.add(audioconvert_);
+    audioconvert_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
-    assert(sink_ = gst_element_factory_make("alsasink", NULL));
+    sink_ = Pipeline::Instance()->makeElement("alsasink", NULL);
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     g_object_set(G_OBJECT(sink_), "device", Alsa::DEVICE_NAME, NULL);
-    pipeline_.add(sink_);
 
     gstlinkable::link(audioconvert_, sink_);
 }
@@ -82,18 +74,15 @@ void AudioAlsaSink::init()
 
 AudioPulseSink::~AudioPulseSink()
 {
-    stop();
-    pipeline_.remove(&audioconvert_);
+    Pipeline::Instance()->remove(&audioconvert_);
 }
 
 void AudioPulseSink::init()
 {
-    assert(audioconvert_ = gst_element_factory_make("audioconvert", NULL));
-    pipeline_.add(audioconvert_);
+    audioconvert_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
-    assert(sink_ = gst_element_factory_make("pulsesink", NULL));
+    sink_ = Pipeline::Instance()->makeElement("pulsesink", NULL);
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-    pipeline_.add(sink_);
 
     gstlinkable::link(audioconvert_, sink_);
 }

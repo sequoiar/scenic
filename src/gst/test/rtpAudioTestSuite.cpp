@@ -29,6 +29,7 @@
 #include "remoteConfig.h"
 #include "ports.h"
 #include "codec.h"
+#include "playback.h"
 
 #include <sstream>
 
@@ -81,20 +82,20 @@ void RtpAudioTestSuite::start_2ch_audiotest()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("audiotestsrc", NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
 }
 
@@ -108,8 +109,8 @@ void RtpAudioTestSuite::stop_2ch_audiotest()
 
         BLOCK();
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("audiotestsrc", NUM_CHANNELS);
@@ -117,8 +118,8 @@ void RtpAudioTestSuite::stop_2ch_audiotest()
 
         BLOCK();
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -129,27 +130,27 @@ void RtpAudioTestSuite::start_stop_2ch_audiotest()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
 
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("audiotestsrc", NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -161,21 +162,21 @@ void RtpAudioTestSuite::start_8ch_audiotest()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("audiotestsrc", NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
 }
 
@@ -188,8 +189,8 @@ void RtpAudioTestSuite::stop_8ch_audiotest()
 
         BLOCK();
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("audiotestsrc", NUM_CHANNELS);
@@ -197,8 +198,8 @@ void RtpAudioTestSuite::stop_8ch_audiotest()
 
         BLOCK();
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -209,27 +210,27 @@ void RtpAudioTestSuite::start_stop_8ch_audiotest()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("audiotestsrc", NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -241,21 +242,21 @@ void RtpAudioTestSuite::start_6ch_alsa()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver("alsasink"));
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("alsasrc", NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
 }
 
@@ -268,8 +269,8 @@ void RtpAudioTestSuite::stop_6ch_alsa()
 
         BLOCK();
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("alsasrc", NUM_CHANNELS);
@@ -277,8 +278,8 @@ void RtpAudioTestSuite::stop_6ch_alsa()
 
         BLOCK();
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -289,27 +290,27 @@ void RtpAudioTestSuite::start_stop_6ch_alsa()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver("alsasink"));
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("alsasrc", NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -321,21 +322,21 @@ void RtpAudioTestSuite::start_6ch_pulse()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver("pulsesink"));
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("pulsesrc", NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
 }
 
@@ -348,8 +349,8 @@ void RtpAudioTestSuite::stop_6ch_pulse()
 
         BLOCK();
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("pulsesrc", NUM_CHANNELS);
@@ -357,8 +358,8 @@ void RtpAudioTestSuite::stop_6ch_pulse()
 
         BLOCK();
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -369,27 +370,27 @@ void RtpAudioTestSuite::start_stop_6ch_pulse()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver("pulsesink"));
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("pulsesrc", NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -401,7 +402,7 @@ void RtpAudioTestSuite::start_8ch_jack()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        rx->start();
+        playback::start();
         //FIXME: figure out how to set layout
 #if 0
         rx->getDecoder()->setSrcCaps();
@@ -409,18 +410,18 @@ void RtpAudioTestSuite::start_8ch_jack()
 #endif
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("jackaudiosrc", NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
 }
 
@@ -433,8 +434,8 @@ void RtpAudioTestSuite::stop_8ch_jack()
 
         BLOCK();
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("jackaudiosrc", NUM_CHANNELS);
@@ -442,8 +443,8 @@ void RtpAudioTestSuite::stop_8ch_jack()
 
         BLOCK();
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -454,27 +455,27 @@ void RtpAudioTestSuite::start_stop_8ch_jack()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("jackaudiosrc", NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -486,21 +487,21 @@ void RtpAudioTestSuite::start_8ch_audiofile()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("filesrc", audioFilename_, NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
 }
 
@@ -513,8 +514,8 @@ void RtpAudioTestSuite::stop_8ch_audiofile()
 
         BLOCK();
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("filesrc", audioFilename_, NUM_CHANNELS);
@@ -522,8 +523,8 @@ void RtpAudioTestSuite::stop_8ch_audiofile()
 
         BLOCK();
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -534,27 +535,27 @@ void RtpAudioTestSuite::start_stop_8ch_audiofile()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("filesrc", audioFilename_, NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -565,21 +566,21 @@ void RtpAudioTestSuite::start_audio_dv()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("dv1394src", NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
 }
 
@@ -593,8 +594,8 @@ void RtpAudioTestSuite::stop_audio_dv()
 
         BLOCK();
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("dv1394src", NUM_CHANNELS);
@@ -602,8 +603,8 @@ void RtpAudioTestSuite::stop_audio_dv()
 
         BLOCK();
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -614,28 +615,28 @@ void RtpAudioTestSuite::start_stop_audio_dv()
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> rx(buildAudioReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
 
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         AudioSourceConfig aConfig("dv1394src", NUM_CHANNELS);
         std::auto_ptr<AudioSender> tx(buildAudioSender(aConfig));
 
-        tx->start();
+        playback::start();
 
         TEST_ASSERT(tcpSendCaps("127.0.0.1", ports::CAPS_PORT, tx->getCaps()));
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 

@@ -29,7 +29,7 @@ class RtpPay : public GstLinkableFilter
     public:
 
         RtpPay() : rtpPay_(0) {}
-        void init() = 0;
+        virtual void init() = 0;
         ~RtpPay();
         
         _GstElement *srcElement() { return rtpPay_; }

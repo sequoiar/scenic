@@ -23,6 +23,7 @@
 
 #include "logWriter.h"
 
+#include "pipeline.h"
 #include "gstLinkable.h"
 #include "audioReceiver.h"
 #include "audioConfig.h"
@@ -36,7 +37,6 @@
 
 AudioReceiver::~AudioReceiver()
 {
-    stop();
     delete sink_;
     delete decoder_;
     delete depayloader_;
@@ -73,19 +73,10 @@ void AudioReceiver::init_sink()
     assert(sink_ = audioConfig_.createSink());
     sink_->init();
     gstlinkable::link(level_, *sink_);   
-}
-
-
-void AudioReceiver::start()
-{
-    // CAPS MUST be set first
     set_caps();
     assert(gotCaps_);
-    LOG_DEBUG("Receiving audio on port " << remoteConfig_.port() << " from host " << remoteConfig_.remoteHost());
-    GstBase::start();
 }
 
-        
 void AudioReceiver::set_caps() 
 { 
     session_.set_caps(remoteConfig_.caps()); 

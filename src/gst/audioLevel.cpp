@@ -32,18 +32,16 @@
 
 AudioLevel::~AudioLevel()
 {
-    stop();
-    pipeline_.remove(&level_);
+    Pipeline::Instance()->remove(&level_);
 }
 
 void AudioLevel::init()
 {
-    assert(level_ = gst_element_factory_make("level", NULL));
-    pipeline_.add(level_);
+    level_ = Pipeline::Instance()->makeElement("level", NULL);
     g_object_set(G_OBJECT(level_), "interval", interval_, "message", emitMessages_, NULL);
 
     // register this level to handle level msg
-    pipeline_.subscribe(this);
+    Pipeline::Instance()->subscribe(this);
 }
 
 

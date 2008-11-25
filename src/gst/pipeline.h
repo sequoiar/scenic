@@ -34,9 +34,8 @@ class BusMsgHandler;
 class Pipeline
 {
     public:
-        static Pipeline & Instance();
-        void add(_GstElement * element);
-        void add(std::vector< _GstElement * >&elementVec);
+        static Pipeline * Instance();
+        _GstElement *makeElement(const char *factoryName, const char *elementName);
         void subscribe(BusMsgHandler *obj);
 
         GstClockID add_clock_callback(GstClockCallback callback, void *user_data);
@@ -44,22 +43,23 @@ class Pipeline
 
         void remove(_GstElement ** element);
         void remove(std::vector < _GstElement * >&elementVec);
-        void reset();
         bool isPlaying() const;
         bool isPaused() const;
-        void wait_until_playing() const;
         void seekTo(gint64 pos);
         void start();
         void pause();
         void stop();
+        const char *getElementPadCaps(GstElement *element, const char *padName) const;
 
         _GstElement *findElement(const char *name) const;
+        static const unsigned int SAMPLE_RATE;
 
     private:
         void init();
+        void add(_GstElement * element);
+        void reset();
         _GstBus* getBus() const;
         GstClock* clock() const;
-        void wait_until_paused() const;
 
         static gboolean bus_call(_GstBus *bus, _GstMessage *msg, void *data);
         bool checkStateChange(GstStateChangeReturn ret) const;
@@ -67,7 +67,7 @@ class Pipeline
         Pipeline(const Pipeline&);
         Pipeline& operator=(const Pipeline&);
 
-        Pipeline() : pipeline_(0), startTime_(0), verbose_(true), handlers_() {}
+        Pipeline() : pipeline_(0), startTime_(0), verbose_(true), handlers_(), refCount_(0) {}
         ~Pipeline();
         static Pipeline *instance_;
 
@@ -78,6 +78,7 @@ class Pipeline
         GstClockTime startTime_;
         bool verbose_;
         std::vector<BusMsgHandler*> handlers_;
+        int refCount_;
 };
 
 #endif // _PIPELINE_H_

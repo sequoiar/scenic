@@ -26,6 +26,7 @@
 #include "videoSender.h"
 #include "videoConfig.h"
 #include "videoReceiver.h"
+#include "playback.h"
 #include "hostIP.h"
 #include "tcp/tcpThread.h"
 #include "tcp/parser.h"
@@ -55,19 +56,19 @@ void RtpVideoTestSuite::start_test_video()
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
-        tx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
 }
 
@@ -79,8 +80,8 @@ void RtpVideoTestSuite::stop_test_video()
 
         BLOCK();
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
@@ -88,8 +89,8 @@ void RtpVideoTestSuite::stop_test_video()
 
         BLOCK();
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -99,25 +100,25 @@ void RtpVideoTestSuite::start_stop_test_video()
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
-        tx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -127,19 +128,19 @@ void RtpVideoTestSuite::start_v4l()
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
-        tx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
 }
 
@@ -151,8 +152,8 @@ void RtpVideoTestSuite::stop_v4l()
 
         BLOCK();
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
@@ -160,8 +161,8 @@ void RtpVideoTestSuite::stop_v4l()
 
         BLOCK();
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -171,25 +172,25 @@ void RtpVideoTestSuite::start_stop_v4l()
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
-        tx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -201,19 +202,19 @@ void RtpVideoTestSuite::start_dv()
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
     else {
         VideoSourceConfig vConfig("dv1394src");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
-        tx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
 }
 
@@ -225,8 +226,8 @@ void RtpVideoTestSuite::stop_dv()
 
         BLOCK();
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         VideoSourceConfig vConfig("dv1394src");
@@ -234,8 +235,8 @@ void RtpVideoTestSuite::stop_dv()
 
         BLOCK();
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -245,25 +246,25 @@ void RtpVideoTestSuite::start_stop_dv()
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         VideoSourceConfig vConfig("dv1394src");
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
-        tx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -275,19 +276,19 @@ void RtpVideoTestSuite::start_file()
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
     else {
         VideoSourceConfig vConfig("filesrc", videoFilename_);
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
-        tx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
     }
 }
 
@@ -299,8 +300,8 @@ void RtpVideoTestSuite::stop_file()
 
         BLOCK();
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         VideoSourceConfig vConfig("filesrc", videoFilename_);
@@ -308,8 +309,8 @@ void RtpVideoTestSuite::stop_file()
 
         BLOCK();
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 
@@ -319,26 +320,26 @@ void RtpVideoTestSuite::start_stop_file()
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
 
-        rx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(rx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        rx->stop();
-        TEST_ASSERT(!rx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
     else {
         VideoSourceConfig vConfig("filesrc", videoFilename_);
         
         std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
 
-        tx->start();
+        playback::start();
 
         BLOCK();
-        TEST_ASSERT(tx->isPlaying());
+        TEST_ASSERT(playback::isPlaying());
 
-        tx->stop();
-        TEST_ASSERT(!tx->isPlaying());
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
     }
 }
 

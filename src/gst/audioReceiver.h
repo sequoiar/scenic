@@ -51,9 +51,6 @@ class AudioReceiver
         /// Destructor 
         ~AudioReceiver();
 
-        /// Sets the global pipeline state to playing 
-        void start();
-
     private:
         /// Implementation of ReceiverBase's template method initialization 
         void init_codec();

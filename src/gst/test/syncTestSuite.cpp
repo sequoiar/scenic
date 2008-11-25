@@ -26,7 +26,9 @@
 #include "videoLocal.h"
 #include "audioLocal.h"
 #include "audioConfig.h"
+#include "videoSink.h"
 #include "logWriter.h"
+#include "playback.h"
 
 /*----------------------------------------------*/ 
 /*----------------------------------------------*/ 
@@ -50,13 +52,11 @@ void SyncTestSuite::start_jack_audio_dv_video()
     VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
-
-    aTx.start();
-    vTx.start();
+    playback::start();
+    vTx.getVideoSink()->showWindow();
 
     BLOCK();
-    TEST_ASSERT(aTx.isPlaying());
-    TEST_ASSERT(vTx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 }
 
 
@@ -79,11 +79,9 @@ void SyncTestSuite::stop_jack_audio_dv_video()
 
     BLOCK();
 
-    aTx.stop();
-    vTx.stop();
+    playback::stop();
 
-    TEST_ASSERT(!aTx.isPlaying());
-    TEST_ASSERT(!vTx.isPlaying());
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -104,19 +102,16 @@ void SyncTestSuite::start_stop_jack_audio_dv_video()
     VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
-    aTx.start();
-    vTx.start();
+    playback::start();
+    vTx.getVideoSink()->showWindow();
 
     BLOCK();
 
-    TEST_ASSERT(aTx.isPlaying());
-    TEST_ASSERT(vTx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 
-    aTx.stop();
-    vTx.stop();
+    playback::stop();
 
-    TEST_ASSERT(!aTx.isPlaying());
-    TEST_ASSERT(!vTx.isPlaying());
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 void SyncTestSuite::start_dv_audio_dv_video()
@@ -136,13 +131,11 @@ void SyncTestSuite::start_dv_audio_dv_video()
     VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
-
-    aTx.start();
-    vTx.start();
+    playback::start();
+    vTx.getVideoSink()->showWindow();
 
     BLOCK();
-    TEST_ASSERT(aTx.isPlaying());
-    TEST_ASSERT(vTx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 }
 
 
@@ -165,11 +158,9 @@ void SyncTestSuite::stop_dv_audio_dv_video()
 
     BLOCK();
 
-    aTx.stop();
-    vTx.stop();
+    playback::stop();
 
-    TEST_ASSERT(!aTx.isPlaying());
-    TEST_ASSERT(!vTx.isPlaying());
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -190,19 +181,16 @@ void SyncTestSuite::start_stop_dv_audio_dv_video()
     VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
-    aTx.start();
-    vTx.start();
+    playback::start();
+    vTx.getVideoSink()->showWindow();
 
     BLOCK();
 
-    TEST_ASSERT(aTx.isPlaying());
-    TEST_ASSERT(vTx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 
-    aTx.stop();
-    vTx.stop();
+    playback::stop();
 
-    TEST_ASSERT(!aTx.isPlaying());
-    TEST_ASSERT(!vTx.isPlaying());
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -223,13 +211,11 @@ void SyncTestSuite::start_audiotest_videotest()
     VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
-
-    aTx.start();
-    vTx.start();
+    playback::start();
+    vTx.getVideoSink()->showWindow();
 
     BLOCK();
-    TEST_ASSERT(aTx.isPlaying());
-    TEST_ASSERT(vTx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 }
 
 
@@ -252,11 +238,9 @@ void SyncTestSuite::stop_audiotest_videotest()
 
     BLOCK();
 
-    aTx.stop();
-    vTx.stop();
+    playback::stop();
 
-    TEST_ASSERT(!aTx.isPlaying());
-    TEST_ASSERT(!vTx.isPlaying());
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -277,19 +261,16 @@ void SyncTestSuite::start_stop_audiotest_videotest()
     VideoLocal vTx(videoSrcConfig, videoSinkConfig);
     vTx.init();
 
-    aTx.start();
-    vTx.start();
+    playback::start();
+    vTx.getVideoSink()->showWindow();
 
     BLOCK();
 
-    TEST_ASSERT(aTx.isPlaying());
-    TEST_ASSERT(vTx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 
-    aTx.stop();
-    vTx.stop();
+    playback::stop();
 
-    TEST_ASSERT(!aTx.isPlaying());
-    TEST_ASSERT(!vTx.isPlaying());
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 

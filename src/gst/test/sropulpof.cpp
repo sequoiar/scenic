@@ -24,6 +24,7 @@
 #include <cassert>
 #include <cstdlib>
 #include "gutil/optionArgs.h"
+#include "playback.h"
 
 namespace pof 
 {
@@ -67,24 +68,24 @@ short pof::run(int argc, char **argv)
     std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
     if (pid == 'r') {
         std::auto_ptr<AudioReceiver> aRx(factories::buildAudioReceiver(ip, audioCodec, audioPort));
-        aRx->start();
+        playback::start();
 
         std::auto_ptr<VideoReceiver> vRx(factories::buildVideoReceiver(ip, videoCodec, videoPort, screenNum));
-        vRx->start();
+    
+        vRx->getVideoSink()->showWindow();
+
         if(full)
             vRx->getVideoSink()->makeFullscreen();
 
         BLOCK();
-        assert(aRx->isPlaying());
-        assert(vRx->isPlaying());
+        assert(playback::isPlaying());
 
-        aRx->stop();
-        vRx->stop();
+        playback::stop();
     }
     else {
         AudioSourceConfig aConfig("jackaudiosrc", pof::NUM_CHANNELS);
         std::auto_ptr<AudioSender> aTx(factories::buildAudioSender(aConfig, ip, audioCodec, audioPort));
-        aTx->start();
+        playback::start();
         assert(tcpSendCaps(ip, ports::CAPS_PORT, aTx->getCaps()));
         VideoSourceConfig *vConfig; 
 
@@ -95,14 +96,11 @@ short pof::run(int argc, char **argv)
 
         std::auto_ptr<VideoSender> vTx(factories::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
         delete vConfig;
-        vTx->start();
 
         BLOCK();
-        assert(aTx->isPlaying());
-        assert(vTx->isPlaying());
+        assert(playback::isPlaying());
 
-        aTx->stop();
-        vTx->stop();
+        playback::stop();
     }
     return 0;
 }

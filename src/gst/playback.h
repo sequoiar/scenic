@@ -1,5 +1,5 @@
 
-// videoLocal.cpp
+// playback.h
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
 // This file is part of [propulse]ART.
@@ -18,36 +18,15 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <cassert>
+#ifndef _PLAYBACK_H_
+#define _PLAYBACK_H_
 
-#include "pipeline.h"
-#include "gstLinkable.h"
-#include "videoLocal.h"
-#include "videoSource.h"
-#include "videoSink.h"
-#include "videoConfig.h"
-#include "logWriter.h"
-#include "playback.h"
-
-
-VideoLocal::~VideoLocal()
-{
-    delete sink_;
-    delete source_;
+namespace playback {
+        void start();
+        void pause();
+        void stop();
+        bool isPlaying();
 }
 
-
-void VideoLocal::init_source()
-{
-    assert(source_ = srcConfig_.createSource());
-    source_->init();
-}
-
-
-void VideoLocal::init_sink()
-{
-    assert(sink_ = sinkConfig_.createSink());
-    sink_->init();
-    gstlinkable::link(*source_, *sink_);   // FIXME: this shouldn't happen for VideoFileSource
-}
+#endif // _PLAYBACK_H_
 

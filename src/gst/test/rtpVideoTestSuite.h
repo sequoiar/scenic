@@ -33,6 +33,9 @@ class RtpVideoTestSuite
         {
             testLength_ = 60000;
 
+            TEST_ADD(RtpVideoTestSuite::start_dv)
+            TEST_ADD(RtpVideoTestSuite::stop_dv)
+            TEST_ADD(RtpVideoTestSuite::start_stop_dv)
             TEST_ADD(RtpVideoTestSuite::start_test_video)
             TEST_ADD(RtpVideoTestSuite::stop_test_video)
             TEST_ADD(RtpVideoTestSuite::start_stop_test_video)
@@ -42,9 +45,6 @@ class RtpVideoTestSuite
             TEST_ADD(RtpVideoTestSuite::start_file)
             TEST_ADD(RtpVideoTestSuite::stop_file)
             TEST_ADD(RtpVideoTestSuite::start_stop_file)
-            TEST_ADD(RtpVideoTestSuite::start_dv)
-            TEST_ADD(RtpVideoTestSuite::stop_dv)
-            TEST_ADD(RtpVideoTestSuite::start_stop_dv)
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
             /*                                              */

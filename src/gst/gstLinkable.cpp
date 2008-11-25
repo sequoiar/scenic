@@ -30,7 +30,9 @@ void gstlinkable::link(std::vector<GstElement*> &sources, std::vector<GstElement
     GstIter sink;
     for (src = sources.begin(), sink = sinks.begin(); src != sources.end(), sink != sinks.end();
          ++src, ++sink)
-        assert(gst_element_link(*src, *sink));
+        gstlinkable::link(*src, *sink);
+
+        //assert(gst_element_link(*src, *sink));
 }
 
 

@@ -41,6 +41,8 @@ class Codec : public GstLinkableFilter
          * Destructor */
         ~Codec();
 
+        virtual void init() = 0;
+
     protected:
 
         _GstElement *codec_;

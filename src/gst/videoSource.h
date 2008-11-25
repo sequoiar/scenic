@@ -32,7 +32,7 @@ class VideoSource
 {
     public:
         ~VideoSource();
-        void init();
+        virtual void init();
 
     protected:
         explicit VideoSource(const VideoSourceConfig &config)

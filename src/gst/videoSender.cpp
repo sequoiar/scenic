@@ -33,7 +33,6 @@
 
 VideoSender::~VideoSender()
 {
-    stop();
     delete payloader_;
     delete encoder_;
     delete source_;
@@ -62,11 +61,4 @@ void VideoSender::init_payloader()
     gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_, remoteConfig_);
 }
-
-
-void VideoSender::start()
-{
-    GstBase::start();
-}
-
 

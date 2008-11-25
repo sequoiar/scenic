@@ -21,6 +21,7 @@
 #include <iostream>
 #include <cassert>
 
+#include "pipeline.h"
 #include "mediaBase.h"
 #include "gstLinkable.h"
 #include "videoReceiver.h"
@@ -31,7 +32,6 @@
 
 VideoReceiver::~VideoReceiver()
 {
-    stop();
     delete sink_;
     delete depayloader_;
     delete decoder_;
@@ -63,19 +63,6 @@ void VideoReceiver::init_sink()
     assert(sink_ = videoConfig_.createSink());
     sink_->init();
     gstlinkable::link(*decoder_, *sink_);
-}
-
-
-void VideoReceiver::start()
-{
-    LOG_INFO("Starting to receive video.");
     sink_->showWindow();
-    GstBase::start();
-}
-
-
-void VideoReceiver::stop()
-{
-    GstBase::stop();
 }
 

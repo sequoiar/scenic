@@ -25,6 +25,7 @@
 #include "audioLocal.h"
 #include "audioConfig.h"
 #include "mapMsg.h"
+#include "playback.h"
 
 class GstAudioTestSubscriber : public msg::Subscriber
 {
@@ -52,10 +53,10 @@ void AudioTestSuite::start_1ch_audiotest()
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
 
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 }
 
 
@@ -66,10 +67,10 @@ void AudioTestSuite::stop_1ch_audiotest()
     AudioSinkConfig sinkConfig("jackaudiosink");
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
-    tx.stop();
+    playback::stop();
 
     BLOCK();
-    TEST_ASSERT(!tx.isPlaying());
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -83,14 +84,14 @@ void AudioTestSuite::start_stop_1ch_audiotest()
     TEST_THROWS_NOTHING(tx.init());
     
 
-    tx.start();
+    playback::start();
 
     BLOCK();
 
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -102,11 +103,10 @@ void AudioTestSuite::start_2ch_audiotest()
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
     
-
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 }
 
 
@@ -121,8 +121,8 @@ void AudioTestSuite::stop_2ch_audiotest()
 
     BLOCK();
 
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -135,14 +135,13 @@ void AudioTestSuite::start_stop_2ch_audiotest()
     GstAudioTestSubscriber f(__FUNCTION__);  // Grabs the MSG::post callback 
     TEST_THROWS_NOTHING(tx.init());
     
-
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -155,10 +154,10 @@ void AudioTestSuite::start_6ch_audiotest()
     TEST_THROWS_NOTHING(tx.init());
     
 
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 }
 
 
@@ -173,8 +172,8 @@ void AudioTestSuite::stop_6ch_audiotest()
 
     BLOCK();
 
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -188,14 +187,14 @@ void AudioTestSuite::start_stop_6ch_audiotest()
     TEST_THROWS_NOTHING(tx.init());
     
 
-    tx.start();
+    playback::start();
 
     BLOCK();
 
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -208,10 +207,10 @@ void AudioTestSuite::start_8ch_audiotest()
     TEST_THROWS_NOTHING(tx.init());
     
 
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 }
 
 
@@ -225,8 +224,8 @@ void AudioTestSuite::stop_8ch_audiotest()
     
 
     BLOCK();
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -239,13 +238,13 @@ void AudioTestSuite::start_stop_8ch_audiotest()
     TEST_THROWS_NOTHING(tx.init());
     
 
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -257,10 +256,10 @@ void AudioTestSuite::start_8ch_jack()
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
 
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 }
 
 
@@ -273,8 +272,8 @@ void AudioTestSuite::stop_8ch_jack()
     TEST_THROWS_NOTHING(tx.init());
 
     BLOCK();
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -285,13 +284,13 @@ void AudioTestSuite::start_stop_8ch_jack()
     AudioSinkConfig sinkConfig("jackaudiosink");
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -305,10 +304,10 @@ void AudioTestSuite::start_8ch_audiofile()
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
 
-    TEST_THROWS_NOTHING(tx.start());
+    TEST_THROWS_NOTHING(playback::start());
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 }
 
 
@@ -323,8 +322,8 @@ void AudioTestSuite::stop_8ch_audiofile()
 
     BLOCK();
 
-    TEST_THROWS_NOTHING(tx.stop());
-    TEST_ASSERT(!tx.isPlaying());
+    TEST_THROWS_NOTHING(playback::stop());
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -338,13 +337,13 @@ void AudioTestSuite::start_stop_8ch_audiofile()
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
 
-    TEST_THROWS_NOTHING(tx.start());
+    TEST_THROWS_NOTHING(playback::start());
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 
-    TEST_THROWS_NOTHING(tx.stop());
-    TEST_ASSERT(!tx.isPlaying());
+    TEST_THROWS_NOTHING(playback::stop());
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -356,10 +355,10 @@ void AudioTestSuite::start_audio_dv()
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
 
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 }
 
 
@@ -370,11 +369,11 @@ void AudioTestSuite::stop_audio_dv()
     AudioSinkConfig sinkConfig("jackaudiosink");
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
-    TEST_ASSERT(!tx.isPlaying());
+    TEST_ASSERT(!playback::isPlaying());
 
     BLOCK();
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -386,13 +385,13 @@ void AudioTestSuite::start_stop_audio_dv()
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
 
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -404,10 +403,10 @@ void AudioTestSuite::start_8ch_alsa()
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
 
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 }
 
 
@@ -420,8 +419,8 @@ void AudioTestSuite::stop_8ch_alsa()
     TEST_THROWS_NOTHING(tx.init());
 
     BLOCK();
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -432,13 +431,13 @@ void AudioTestSuite::start_stop_8ch_alsa()
     AudioSinkConfig sinkConfig("alsasink");
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -450,10 +449,10 @@ void AudioTestSuite::start_6ch_pulse()
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
 
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 }
 
 
@@ -466,8 +465,8 @@ void AudioTestSuite::stop_6ch_pulse()
     TEST_THROWS_NOTHING(tx.init());
 
     BLOCK();
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 
@@ -478,13 +477,13 @@ void AudioTestSuite::start_stop_6ch_pulse()
     AudioSinkConfig sinkConfig("pulsesink");
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());
-    tx.start();
+    playback::start();
 
     BLOCK();
-    TEST_ASSERT(tx.isPlaying());
+    TEST_ASSERT(playback::isPlaying());
 
-    tx.stop();
-    TEST_ASSERT(!tx.isPlaying());
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
 }
 
 

@@ -1,4 +1,3 @@
-
 // mediaBase.h
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
@@ -21,18 +20,13 @@
 #ifndef _MEDIA_BASE_H_
 #define _MEDIA_BASE_H_
 
-#include "gstBase.h"
 
 class LocalBase     // local bins
-    : public GstBase
 {
     public:
         virtual void init();
-
-    protected:
-
         LocalBase(){};
-        ~LocalBase();
+        virtual ~LocalBase(){};
 
     private:
         virtual void init_source() = 0;
@@ -42,17 +36,14 @@ class LocalBase     // local bins
         LocalBase& operator=(const LocalBase&);     //No Assignment Operator
 };
 
-class SenderBase    
-    : public GstBase
+
+class SenderBase 
 {
     public: 
-        virtual void init();
-
-    protected:
-
+        void init();
         SenderBase(){};
-        ~SenderBase();
-    
+        virtual ~SenderBase(){};
+
     private:
         virtual void init_source() = 0;
         virtual void init_codec() = 0;
@@ -62,17 +53,13 @@ class SenderBase
         SenderBase& operator=(const SenderBase&);     //No Assignment Operator
 };
 
-class ReceiverBase
-    : public GstBase
+class ReceiverBase 
 {
     public: 
-        virtual void init();
-
-    protected:
-
+        void init();
         ReceiverBase(){};
-        ~ReceiverBase();
-    
+        virtual ~ReceiverBase(){};
+
     private:
         virtual void init_codec() = 0;
         virtual void init_depayloader() = 0;

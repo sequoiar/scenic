@@ -21,11 +21,6 @@
 #include <cassert>
 #include "mediaBase.h"
 
-LocalBase::~LocalBase()
-{
-    stop();
-}
-
 
 void LocalBase::init()  // template method
 {
@@ -34,12 +29,6 @@ void LocalBase::init()  // template method
     init_sink();
 }
 
-SenderBase::~SenderBase()
-{
-    stop();
-}
-
-
 void SenderBase::init()  // template method
 {
     // these methods are defined in subclasses
@@ -47,12 +36,6 @@ void SenderBase::init()  // template method
     init_codec();
     init_payloader();
 }
-
-ReceiverBase::~ReceiverBase()
-{
-    stop();
-}
-
 
 void ReceiverBase::init()  // template method
 {

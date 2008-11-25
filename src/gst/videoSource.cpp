@@ -28,12 +28,10 @@
 #include "videoConfig.h"
 #include "logWriter.h"
 
-
 // parts of sub_init that are common to all VideoSource classes
 void VideoSource::init()
 {
-    assert(source_ = gst_element_factory_make(config_.source(), NULL));
-    pipeline_.add(source_);
+    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
 
     sub_init();
 }
@@ -41,8 +39,7 @@ void VideoSource::init()
 
 VideoSource::~VideoSource()
 {
-    stop();
-    pipeline_.remove(&source_);
+    Pipeline::Instance()->remove(&source_);
 }
 
 
@@ -83,22 +80,20 @@ void VideoTestSource::sub_init()
     g_object_set(G_OBJECT(source_), "is-live", FALSE, NULL); // necessary for clocked callback to work
     //g_object_set(G_OBJECT(source_), "pattern", WHITE, NULL);
 
-    //clockId_ = pipeline_.add_clock_callback(base_callback, this);
+    //clockId_ = Pipeline::Instance()->add_clock_callback(base_callback, this);
 }
 
 
 VideoTestSource::~VideoTestSource()
 {
-    stop();
-    pipeline_.remove_clock_callback(clockId_);
+    if (clockId_)
+        Pipeline::Instance()->remove_clock_callback(clockId_);
 }
 
 
 void VideoFileSource::sub_init()
 {
-    assert(decoder_ = gst_element_factory_make("decodebin", NULL));
-
-    pipeline_.add(decoder_);
+    decoder_ = Pipeline::Instance()->makeElement("decodebin", NULL);
 
     assert(config_.fileExists());
     g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
@@ -111,14 +106,13 @@ void VideoFileSource::sub_init()
 }
 
 
-void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/, void *data)
+void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/, void * /*data*/)
 {
     if (gst_pad_is_linked(srcPad))
     {
         LOG_DEBUG("Pad is already linked.");
         return;
     }
-    VideoFileSource *context = static_cast<VideoFileSource*>(data);
     GstStructure *str;
     GstPad *sinkPad;
     GstCaps *caps;
@@ -127,17 +121,17 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
     //sinkPad = gst_element_get_static_pad(context->sinkElement_, "sink");
     // FIXME: HACK!!!!
     //if (context->config_.isNetworked())
-    sinkElement = context->pipeline_.findElement("colorspc");
+    sinkElement = Pipeline::Instance()->findElement("colorspc");
     
     if (!sinkElement)       // we're local!
     {
-        sinkElement = context->pipeline_.findElement("videosink");
+        sinkElement = Pipeline::Instance()->findElement("videosink");
         g_object_set(G_OBJECT(sinkElement), "sync", TRUE, NULL);
     }
     //#endif
     //FIXME: this assumes that the first pad it finds is indeed the one filesource
     // should connect to...maybe should just have its own ghost pad?
-    //   sinkPad = context->pipeline_.findUnconnectedSinkpad();
+    //   sinkPad = context->Pipeline::Instance()->findUnconnectedSinkpad();
     assert(sinkElement);
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
 
@@ -165,17 +159,19 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
 
 VideoFileSource::~VideoFileSource()
 {
-    stop();
-    pipeline_.remove(&decoder_);
+    Pipeline::Instance()->remove(&decoder_);
 }
 
 
 VideoDvSource::~VideoDvSource()
 {
-    stop();
-    if (pipeline_.findElement(config_.source()) != NULL)
-        pipeline_.remove(&source_);
+    if (Pipeline::Instance()->findElement(config_.source()) != NULL)
+        Pipeline::Instance()->remove(&source_);
     source_ = NULL;
+    if (Pipeline::Instance()->findElement("dvdemux") != NULL)
+        Pipeline::Instance()->remove(&demux_);
+    Pipeline::Instance()->remove(&queue_);
+    Pipeline::Instance()->remove(&dvdec_);
 }
 
 
@@ -184,34 +180,28 @@ void VideoDvSource::init()
     if (!Raw1394::cameraIsReady())
         THROW_ERROR("Camera is not ready");
 
-    source_ = pipeline_.findElement(config_.source());
+    source_ = Pipeline::Instance()->findElement(config_.source());
     dvIsNew_ = source_ == NULL;
     if (dvIsNew_)
-    {
-        assert(source_ = gst_element_factory_make(config_.source(), config_.source()));
-        pipeline_.add(source_);
-    }
+        source_ = Pipeline::Instance()->makeElement(config_.source(), config_.source());
+
     sub_init();
 }
 
 
 void VideoDvSource::sub_init()
 {
-    demux_ = pipeline_.findElement("dvdemux");
+    demux_ = Pipeline::Instance()->findElement("dvdemux");
     dvIsNew_ = demux_ == NULL;
     if (dvIsNew_)
     {
-        assert(demux_ = gst_element_factory_make("dvdemux", "dvdemux"));
+        demux_ = Pipeline::Instance()->makeElement("dvdemux", "dvdemux");
         // demux has dynamic pads
-        pipeline_.add(demux_);
     }
     else
         assert(demux_);
-    assert(queue_ = gst_element_factory_make("queue", NULL));
-    assert(dvdec_ = gst_element_factory_make("dvdec", NULL));
-
-    pipeline_.add(queue_);
-    pipeline_.add(dvdec_);
+    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    dvdec_ = Pipeline::Instance()->makeElement("dvdec", NULL);
 
     // demux srcpad must be linked to queue sink pad at runtime
     g_signal_connect(demux_, "pad-added",

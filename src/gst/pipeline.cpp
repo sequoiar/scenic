@@ -30,14 +30,15 @@
 
 Pipeline *Pipeline::instance_ = 0;
 
+const unsigned int Pipeline::SAMPLE_RATE = 48000;
 
-Pipeline & Pipeline::Instance()
+Pipeline * Pipeline::Instance()
 {
     if (instance_ == 0) {
         instance_ = new Pipeline();
         instance_->init();
     }
-    return *instance_;
+    return instance_;
 }
 
 
@@ -48,15 +49,15 @@ Pipeline::~Pipeline()
 }
 
 
-gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
+gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/)
 {
     switch(GST_MESSAGE_TYPE(msg))
     {
         case GST_MESSAGE_EOS:
             {
                 LOG_DEBUG("End-of-stream");
-                Pipeline *context = static_cast<Pipeline*>(data);
-                context->updateListeners(msg);
+                //Pipeline *context = static_cast<Pipeline*>(data);
+                Pipeline::Instance()->updateListeners(msg);
                 break;
             }
         case GST_MESSAGE_ERROR:
@@ -93,8 +94,9 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer data)
             }
         case GST_MESSAGE_ELEMENT:
             {
-                Pipeline *context = static_cast<Pipeline*>(data);
-                context->updateListeners(msg);
+                //Pipeline *context = static_cast<Pipeline*>(data);
+                //context->updateListeners(msg);
+                Pipeline::Instance()->updateListeners(msg);
                 break;
             }
         default:
@@ -170,21 +172,6 @@ bool Pipeline::isPaused() const
         return false;
 }
 
-
-void Pipeline::wait_until_playing() const
-{
-    while (!isPlaying())
-        usleep(10000);
-}
-
-
-void Pipeline::wait_until_paused() const
-{
-    while (!isPaused())
-        usleep(10000);
-}
-
-
 bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 {
     if (ret == GST_STATE_CHANGE_NO_PREROLL)
@@ -246,29 +233,30 @@ void Pipeline::stop()
 void Pipeline::add(GstElement *element)
 {
     gst_bin_add(GST_BIN(pipeline_), element);
-}
-
-
-void Pipeline::add(std::vector<GstElement*> &elementVec)
-{
-    std::vector< GstElement * >::iterator iter;
-    for (iter = elementVec.begin(); iter != elementVec.end(); ++iter)
-        add(*iter);
+    ++refCount_;
 }
 
 
 void Pipeline::remove(GstElement **element) // guarantees that original pointer will be zeroed
 {                                           // and not reusable
+    stop();
     if (*element)
     {
         assert(gst_bin_remove(GST_BIN(pipeline_), *element));
         *element = NULL;
+        --refCount_;
+    }
+    if (refCount_ <= 0)
+    {
+        assert(refCount_ == 0);
+        reset();
     }
 }
 
 
 void Pipeline::remove(std::vector<GstElement*> &elementVec)
 {
+    stop();
     std::vector<GstElement *>::iterator iter;
     for (iter = elementVec.begin(); iter != elementVec.end(); ++iter)
     {
@@ -276,7 +264,13 @@ void Pipeline::remove(std::vector<GstElement*> &elementVec)
         {
             assert(gst_bin_remove(GST_BIN(pipeline_), *iter));
             *iter = NULL;
+            --refCount_;
         }
+    }
+    if (refCount_ <= 0)
+    {
+        assert(refCount_ == 0);
+        reset();
     }
 }
 
@@ -291,6 +285,7 @@ GstClockID Pipeline::add_clock_callback(GstClockCallback callback, gpointer user
 
 void Pipeline::remove_clock_callback(GstClockID clockId)
 {
+    stop();
     gst_clock_id_unschedule(clockId);
     gst_clock_id_unref(clockId);
 }
@@ -307,6 +302,13 @@ GstClock* Pipeline::clock() const
     return gst_pipeline_get_clock(GST_PIPELINE(pipeline_));
 }
 
+GstElement *Pipeline::makeElement(const char *factoryName, const char *elementName) 
+{
+    GstElement *element = gst_element_factory_make(factoryName, elementName);
+    assert(element);
+    add(element);
+    return element;
+}
 
 GstElement *Pipeline::findElement(const char *name) const
 {
@@ -336,5 +338,28 @@ void Pipeline::seekTo(gint64 pos)
                 GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
         THROW_ERROR("Seek failed!\n");
     }
+}
+
+
+const char* Pipeline::getElementPadCaps(GstElement *element, const char * padName) const
+{
+    assert(isPlaying() || isPaused());
+
+    GstPad *pad;
+    GstCaps *caps;
+
+    assert(pad = gst_element_get_pad(GST_ELEMENT(element), padName));
+
+    do
+        caps = gst_pad_get_negotiated_caps(pad);
+    while (caps == NULL);
+
+    // goes until caps are initialized
+
+    gst_object_unref(pad);
+
+    const char *result = gst_caps_to_string(caps);
+    gst_caps_unref(caps);
+    return result;
 }
 

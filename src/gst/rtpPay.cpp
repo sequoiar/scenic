@@ -25,76 +25,63 @@
 
 const long long Payloader::MAX_PTIME = 2000000;
 
-void RtpPay::init()
-{
-    assert(rtpPay_);
-    pipeline_.add(rtpPay_);
-}
-
 RtpPay::~RtpPay()
 {
-    stop();
-    pipeline_.remove(&rtpPay_);
+    Pipeline::Instance()->remove(&rtpPay_);
 }
 
 void Payloader::init()
 {
     g_object_set(G_OBJECT(rtpPay_), "max-ptime", Payloader::MAX_PTIME, NULL);
-    RtpPay::init();
 }
 
 void H264Payloader::init()
 {
-    assert(rtpPay_ = gst_element_factory_make("rtph264pay", NULL));
+    rtpPay_ = Pipeline::Instance()->makeElement("rtph264pay", NULL);
     Payloader::init();
 }
 
 
 void H264Depayloader::init()
 {
-    assert(rtpPay_ = gst_element_factory_make("rtph264depay", NULL));
-    RtpPay::init();
+    rtpPay_ = Pipeline::Instance()->makeElement("rtph264depay", NULL);
 }
 
 void VorbisPayloader::init()
 {
-    assert(rtpPay_ = gst_element_factory_make("rtpvorbispay", NULL));
+    rtpPay_ = Pipeline::Instance()->makeElement("rtpvorbispay", NULL);
     g_object_set(G_OBJECT(rtpPay_), "max-ptime", VorbisPayloader::MAX_PTIME, NULL);
-    RtpPay::init();
 }
 
 
 void VorbisDepayloader::init()
 {
-    assert(rtpPay_ = gst_element_factory_make("rtpvorbisdepay", NULL));
-    RtpPay::init();
+    rtpPay_ = Pipeline::Instance()->makeElement("rtpvorbisdepay", NULL);
 }
 
 
 void L16Payloader::init()
 {
-    assert(rtpPay_ = gst_element_factory_make("rtpL16pay", NULL));
+    rtpPay_ = Pipeline::Instance()->makeElement("rtpL16pay", NULL);
     Payloader::init();
 }
 
 
 void L16Depayloader::init()
 {
-    assert(rtpPay_ = gst_element_factory_make("rtpL16depay", NULL));
-    RtpPay::init();
+    rtpPay_ = Pipeline::Instance()->makeElement("rtpL16depay", NULL);
 }
 
 
 void MpaPayloader::init()
 {
-    assert(rtpPay_ = gst_element_factory_make("rtpmpapay", NULL));
+    rtpPay_ = Pipeline::Instance()->makeElement("rtpmpapay", NULL);
     Payloader::init();
 }
 
 
 void MpaDepayloader::init()
 {
-    assert(rtpPay_ = gst_element_factory_make("rtpmpadepay", NULL));
-    RtpPay::init();
+    rtpPay_ = Pipeline::Instance()->makeElement("rtpmpadepay", NULL);
 }
 

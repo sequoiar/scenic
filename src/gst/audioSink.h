@@ -38,6 +38,8 @@ class AudioSink
         ///  Returns this AudioSink's caps 
         std::string getCaps();
 
+        virtual void init() = 0;
+
     protected:
         _GstElement *sink_;
 

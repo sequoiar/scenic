@@ -41,21 +41,15 @@ void AudioSource::init()
 
 void AudioSource::init_source()
 {
-    sources_.push_back(gst_element_factory_make(config_.source(), NULL));
-    assert(sources_[0]);
-    aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
-    assert(aconvs_[0]);
-
-    pipeline_.add(sources_);
-    pipeline_.add(aconvs_);
+    sources_.push_back(Pipeline::Instance()->makeElement(config_.source(), NULL));
+    aconvs_.push_back(Pipeline::Instance()->makeElement("audioconvert", NULL));
 }
 
 
 AudioSource::~AudioSource()
 {
-    stop();
-    pipeline_.remove(aconvs_);
-    pipeline_.remove(sources_);
+    Pipeline::Instance()->remove(aconvs_);
+    Pipeline::Instance()->remove(sources_);
 }
 
 
@@ -84,14 +78,9 @@ void InterleavedAudioSource::init_source()
 {
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
-        sources_.push_back(gst_element_factory_make(config_.source(), NULL));
-        assert(sources_[channelIdx]);
-        aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
-        assert(aconvs_[channelIdx]);
+        sources_.push_back(Pipeline::Instance()->makeElement(config_.source(), NULL));
+        aconvs_.push_back(Pipeline::Instance()->makeElement("audioconvert", NULL));
     }
-
-    pipeline_.add(sources_);
-    pipeline_.add(aconvs_);
 }
 
 
@@ -134,7 +123,7 @@ void AudioTestSource::sub_init()
 
     GstCaps *caps = gst_caps_new_simple("audio/x-raw-int", "endianness", G_TYPE_INT, 1234, "signed", 
             G_TYPE_BOOLEAN, TRUE, "width", G_TYPE_INT, 32, "depth", G_TYPE_INT, 32, "rate", G_TYPE_INT, 
-            GstBase::SAMPLE_RATE, "channels", G_TYPE_INT, 1, NULL);
+            Pipeline::SAMPLE_RATE, "channels", G_TYPE_INT, 1, NULL);
 
     // is-live must be true for clocked callback to work properly
     for (src = sources_.begin(); src != sources_.end() && channelIdx != config_.numChannels(); ++src, ++channelIdx)
@@ -149,14 +138,13 @@ void AudioTestSource::sub_init()
 
     gst_caps_unref(caps);
 
-    clockId_ = pipeline_.add_clock_callback(base_callback, this);
+    clockId_ = Pipeline::Instance()->add_clock_callback(base_callback, this);
 }
 
 
 AudioTestSource::~AudioTestSource()
 {
-    stop();
-    pipeline_.remove_clock_callback(clockId_);
+    Pipeline::Instance()->remove_clock_callback(clockId_);
 }
 
 
@@ -171,9 +159,7 @@ void AudioFileSource::sub_init()
 
     g_object_set(G_OBJECT(sources_[0]), "location", config_.location(), NULL);
 
-    decoders_.push_back(gst_element_factory_make("decodebin", NULL));
-    assert(decoders_[0]);
-    pipeline_.add(decoders_);
+    decoders_.push_back(Pipeline::Instance()->makeElement("decodebin", NULL));
 
     GstIter dec = decoders_.begin();
     GstIter aconv = aconvs_.begin();
@@ -184,7 +170,7 @@ void AudioFileSource::sub_init()
                 static_cast<void *>(*aconv));
     }
     // register this filesrc to handle EOS msg and loop if specified
-    pipeline_.subscribe(this);
+    Pipeline::Instance()->subscribe(this);
 }
 
 
@@ -211,7 +197,7 @@ bool AudioFileSource::handleBusMsg(_GstMessage *msg)
 void AudioFileSource::restartPlayback()
 {
     const gint64 BEGIN_TIME_NS = 0;
-    pipeline_.seekTo(BEGIN_TIME_NS);
+    Pipeline::Instance()->seekTo(BEGIN_TIME_NS);
     if (loopCount_ > 0)  // avoids endless decrements
         loopCount_--;
 }
@@ -263,15 +249,13 @@ void AudioFileSource::link_elements()
 
 AudioFileSource::~AudioFileSource()
 {
-    stop();
-    pipeline_.remove(decoders_);
+    Pipeline::Instance()->remove(decoders_);
 }
 
 
 AudioAlsaSource::~AudioAlsaSource()
 {
-    stop();
-    pipeline_.remove(&capsFilter_);
+    Pipeline::Instance()->remove(&capsFilter_);
 }
 
 
@@ -283,13 +267,13 @@ void AudioAlsaSource::sub_init()
     
     // otherwise alsasrc defaults to 2 channels when using plughw
     std::ostringstream capsStr;
-    capsStr << "audio/x-raw-int, channels=" << config_.numChannels();
+    capsStr << "audio/x-raw-int, channels=" << config_.numChannels() 
+        << ", clock-rate=" << Pipeline::SAMPLE_RATE;
          
     GstCaps *alsaCaps = gst_caps_from_string(capsStr.str().c_str());
-    capsFilter_ = gst_element_factory_make("capsfilter", NULL);
-    assert(capsFilter_);
+    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     g_object_set(G_OBJECT(capsFilter_), "caps", alsaCaps, NULL);
-    pipeline_.add(capsFilter_);
+
     gst_caps_unref(alsaCaps);
 }
 
@@ -303,21 +287,20 @@ void AudioAlsaSource::link_elements()
 
 AudioPulseSource::~AudioPulseSource()
 {
-    stop();
-    pipeline_.remove(&capsFilter_);
+    Pipeline::Instance()->remove(&capsFilter_);
 }
 
 
 void AudioPulseSource::sub_init()
 {
     std::ostringstream capsStr;
-    capsStr << "audio/x-raw-int, channels=" << config_.numChannels();
+    g_object_set(G_OBJECT(sources_[0]), "device", Alsa::DEVICE_NAME, NULL);
+    capsStr << "audio/x-raw-int, channels=" << config_.numChannels()
+        << ", clock-rate=" << Pipeline::SAMPLE_RATE;
          
     GstCaps *pulseCaps = gst_caps_from_string(capsStr.str().c_str());
-    capsFilter_ = gst_element_factory_make("capsfilter", NULL);
-    assert(capsFilter_);
+    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     g_object_set(G_OBJECT(capsFilter_), "caps", pulseCaps, NULL);
-    pipeline_.add(capsFilter_);
     gst_caps_unref(pulseCaps);
 }
 
@@ -342,18 +325,20 @@ void AudioJackSource::sub_init()
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
 #endif
 
-    if (GstBase::SAMPLE_RATE != Jack::samplerate())
+    if (Pipeline::SAMPLE_RATE != Jack::samplerate())
         THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
-                << " does not match default sample rate " << GstBase::SAMPLE_RATE);
+                << " does not match default sample rate " << Pipeline::SAMPLE_RATE);
 }
 
 
 AudioDvSource::~AudioDvSource()
 {
-    stop();
-    if (pipeline_.findElement(config_.source()) != NULL)
-        pipeline_.remove(sources_);
+    if (Pipeline::Instance()->findElement(config_.source()) != NULL)
+        Pipeline::Instance()->remove(sources_);
+    if (Pipeline::Instance()->findElement("dvdemux") != NULL)
+        Pipeline::Instance()->remove(&demux_);
     sources_[0] = NULL;
+    Pipeline::Instance()->remove(&queue_);
 }
 
 void AudioDvSource::init_source()
@@ -361,36 +346,26 @@ void AudioDvSource::init_source()
     if (!Raw1394::cameraIsReady())
         THROW_ERROR("Camera is not ready.");
 
-    sources_.push_back(pipeline_.findElement(config_.source()));  // see if it already exists from VideoDvSource
+    sources_.push_back(Pipeline::Instance()->findElement(config_.source()));  // see if it already exists from VideoDvSource
     dvIsNew_ = sources_[0] == NULL;
 
     if (dvIsNew_)
-    {
-        sources_[0] = gst_element_factory_make(config_.source(), config_.source());
-        assert(sources_[0]);
-        pipeline_.add(sources_);
-    }
-    aconvs_.push_back(gst_element_factory_make("audioconvert", NULL));
-    assert(aconvs_[0]);
+        sources_[0] = Pipeline::Instance()->makeElement(config_.source(), config_.source());
 
-    pipeline_.add(aconvs_);
+    aconvs_.push_back(Pipeline::Instance()->makeElement("audioconvert", NULL));
 }
 
 
 void AudioDvSource::sub_init()
 {
-    demux_ = pipeline_.findElement("dvdemux");
+    demux_ = Pipeline::Instance()->findElement("dvdemux");
     dvIsNew_ = demux_ == NULL;
     if (dvIsNew_)
-        assert(demux_ = gst_element_factory_make("dvdemux", "dvdemux"));
+        demux_ = Pipeline::Instance()->makeElement("dvdemux", "dvdemux");
     else
         assert(demux_);
-    assert(queue_ = gst_element_factory_make("queue", NULL));
-
-    // demux has dynamic pads
-    if (dvIsNew_)
-        pipeline_.add(demux_);
-    pipeline_.add(queue_);
+    
+    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
 
     // demux srcpad must be linked to queue sink pad at runtime
     g_signal_connect(demux_, "pad-added",
