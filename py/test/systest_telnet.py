@@ -37,9 +37,40 @@ server_port = "14444"
 server_command = os.path.expanduser("./miville.py")
 #server_exec = os.path.expanduser("nc -l -p server_port")
 client_command = 'telnet localhost %s' % server_port
-waiting_delay = 1.0 # seconds
-#BE_VERBOSE = True 
-BE_VERBOSE = False
+waiting_delay = 1.0 # seconds before starting client after server start
+
+VERBOSE_CLIENT = False
+VERBOSE_SERVER = False
+#VERBOSE_SERVER = True
+#VERBOSE_CLIENT = True
+# ---------------------------------------------------------------------
+# a class for output redirection
+class ProcessOutputLogger:
+    """
+    Adds a prefix to each line printed by a spawn process.
+    
+    you must assign a reference to an instance of this class to 
+    the logfile attribute of a spawn object
+    """
+    def __init__(self,prefixStr=''):
+        self.prefix = prefixStr
+        self.buffer = []
+    def write(self,s):
+        self.buffer.append(self.prefix+str(s).replace('\n',self.prefix+'\n'))
+    def flush(self):
+        pass
+    def real_flush(self):
+        """
+        Actually flushes the buffer of this output buffer
+        
+        Adds some pretty colors as well.
+        """
+        sys.stdout.write(getColor('BLUE'))
+        for s in self.buffer:
+            sys.stdout.write(s)
+        sys.stdout.write(getColor())
+        sys.stdout.flush()
+        self.buffer = []
 # ---------------------------------------------------------------------
 # functions
 def println(s,endl=True):
@@ -47,11 +78,11 @@ def println(s,endl=True):
     Prints a line to standard output with a prefix.
     """
     if endl:
-        print ">>>>",s
+        print getColor('MAGENTA'),">>>>",s,getColor()
     else:
         print ">>>>",s, # note the comma (",") at end of line
 
-def start_process(command):
+def start_process(command, isVerbose=False, logPrefix=''):
     """
     Command is a string to execute
     
@@ -59,9 +90,11 @@ def start_process(command):
     """
     try:
         println('Starting \"%s\"' % command )
-        process = pexpect.spawn(command)
-        if BE_VERBOSE:
-            process.logfile = sys.stdout
+        
+        if isVerbose:
+            process = pexpect.spawn(command,logfile=ProcessOutputLogger(logPrefix))
+        else:
+            process = pexpect.spawn(command)
         time.sleep(waiting_delay) # seconds
         if ( is_running(process) == False ):
             die()
@@ -82,6 +115,20 @@ def is_running(process):
         return False
     else:
         return process
+
+def getColor(c=None):
+    """
+    Returns ANSI escaped color code.
+    
+    Colors can be either 'BLUE' or 'MAGENTA' or None
+    """
+    if c == 'BLUE':
+        s = '34m'
+    elif c =='MAGENTA':
+        s = '35m'
+    else:
+        s = '0m' # default (black or white)
+    return "\x1b["+s
 
 def kill_process(process):
     """
@@ -120,25 +167,20 @@ try:
     os.environ['HOME'] = '/var/tmp'
     os.remove('/var/tmp/.sropulpof/sropulpof.adb')
 except Exception,e:
-    println("Error removing old sropulpof.adb or setting HOME to /var/tmp."+str(e))
+    println("Warning removing old sropulpof.adb or setting HOME to /var/tmp."+str(e))
 
 # TODO: Fix the process.logfile not getting to sys.stdout
 # TODO: If the test fails, check if client and server are still running.
 
-server = start_process(server_command)
-client = start_process(client_command)
+server = start_process(server_command, VERBOSE_SERVER, "SERVER> ")
+client = start_process(client_command, VERBOSE_CLIENT, "CLIENT> ")
 
 # ---------------------------------------------------------------------
-# classes
+# System test classes
 class TelnetBaseTest(unittest.TestCase):
     """
     Telnet system test case parent class
     """
-    messages = {
-        'prompt':"pof: ",
-        'greeting':"Welcome to Sropulpof!",
-        'not found':"command not found"
-    }
     def setUp(self):
         """
         Starts a Telnet client for tests.
@@ -146,10 +188,14 @@ class TelnetBaseTest(unittest.TestCase):
         global client
         self.client = client
         self.sleep()
-
+        try:
+            client.logfile.real_flush()
+            server.logfile.real_flush()
+        except:
+            pass
     def tearDown(self):
         """
-        Destructor for each test. Nothing to do.
+        Destructor for each test. 
         """
         pass
 
@@ -161,6 +207,9 @@ class TelnetBaseTest(unittest.TestCase):
         """
         Returns tuple of two pexpect.spawn objects
         """
+        #global server
+        #global client
+        
         if ( is_running(server) == False ):
             server = start_process(server_command)
         if ( is_running(client) == False ):
@@ -169,7 +218,8 @@ class TelnetBaseTest(unittest.TestCase):
 
     def evalTest(self, index, message):
         """
-        Fails a test, displaying a message, if the provided index resulting from expect() matches the 
+        Fails a test, displaying a message, if the provided index resulting 
+        from expect() matches some of the indices provided by expectTest()
         """
         self.assertEqual(index, 0, message)
         self.failIfEqual(index, 1, 'Problem : Unexpected EOF')
@@ -177,7 +227,7 @@ class TelnetBaseTest(unittest.TestCase):
 
     def expectTest(self, expected, message):
         """
-        Fails a test if the expected value is not read from the client output.
+        Fails a test if the expected regex value is not read from the client output.
         
         The expected value can be a string that is compiled to a regular expression (re)
         or the name of a Exception class.
@@ -188,8 +238,20 @@ class TelnetBaseTest(unittest.TestCase):
         index = self.client.expect([expected, pexpect.EOF, pexpect.TIMEOUT], timeout=2) # 2 seconds max
         self.evalTest(index, message)
 
+
+
 # ---------------------------------------------------------------------
 # test classes
+class Test_0_cli(TelnetBaseTest):
+    """
+    General tests for the CLI
+    """
+    def test_01_unknown_command(self):
+        self.client.sendline('qwetyqrwetyqwertye')
+        self.sleep()
+        self.expectTest('command not found', 'Unknown command didn\'t give error.')
+        
+
 class Test_1_AddressBook(TelnetBaseTest):
     """
     Systems tests for the Address Book
