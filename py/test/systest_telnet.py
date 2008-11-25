@@ -23,6 +23,8 @@
 System test for the telnet UI.
 
 Usage: trial test/systest_telnet.py
+
+pexpect expected strings are regular expression. See the re module.
 """
 import unittest
 import pexpect
@@ -42,7 +44,7 @@ BE_VERBOSE = False
 # functions
 def println(s,endl=True):
     """
-    Prints a line to standard output
+    Prints a line to standard output with a prefix.
     """
     if endl:
         print ">>>>",s
@@ -51,8 +53,9 @@ def println(s,endl=True):
 
 def start_process(command):
     """
-    command is a string to execute
-    a pexpect object will be returned
+    Command is a string to execute
+    
+    Returns a pexpect.spawn object
     """
     try:
         println('Starting \"%s\"' % command )
@@ -64,14 +67,15 @@ def start_process(command):
             die()
         else:
             return process
-
     except pexpect.ExceptionPexpect,e:
         println("Error starting client: heh"+e)
         die()
 
 def is_running(process):
     """
-    process is a pexpect.spawn object
+    Process is a pexpect.spawn object
+    
+    Returns boolean
     """
     if ( process.isalive() == False ):
         println("Error starting server: %s" % client.status)
@@ -80,6 +84,11 @@ def is_running(process):
         return process
 
 def kill_process(process):
+    """
+    Kills a pexpect.spawn object
+    
+    See kill -l for flags
+    """
     try:
         if (is_running(process) == True ):
             process.kill(15)
@@ -88,7 +97,7 @@ def kill_process(process):
                 process.kill(9)
     except Exception,e:
         print "Error killing process",e
-
+    
 def die():
     """
     Ends the programs with error flag.
@@ -116,7 +125,6 @@ except Exception,e:
 # TODO: Fix the process.logfile not getting to sys.stdout
 # TODO: If the test fails, check if client and server are still running.
 
-
 server = start_process(server_command)
 client = start_process(client_command)
 
@@ -124,7 +132,7 @@ client = start_process(client_command)
 # classes
 class TelnetBaseTest(unittest.TestCase):
     """
-    Telnet test case parent class
+    Telnet system test case parent class
     """
     messages = {
         'prompt':"pof: ",
@@ -139,7 +147,6 @@ class TelnetBaseTest(unittest.TestCase):
         self.client = client
         self.sleep()
 
-
     def tearDown(self):
         """
         Destructor for each test. Nothing to do.
@@ -151,6 +158,9 @@ class TelnetBaseTest(unittest.TestCase):
         time.sleep(0.025)
 
     def prepareTest(self, server, client):
+        """
+        Returns tuple of two pexpect.spawn objects
+        """
         if ( is_running(server) == False ):
             server = start_process(server_command)
         if ( is_running(client) == False ):
@@ -158,17 +168,32 @@ class TelnetBaseTest(unittest.TestCase):
         return(server, client)
 
     def evalTest(self, index, message):
+        """
+        Fails a test, displaying a message, if the provided index resulting from expect() matches the 
+        """
         self.assertEqual(index, 0, message)
         self.failIfEqual(index, 1, 'Problem : Unexpected EOF')
         self.failIfEqual(index, 2, 'Problem : Time out.')
 
     def expectTest(self, expected, message):
-        index = self.client.expect([expected, pexpect.EOF, pexpect.TIMEOUT], timeout=2)
+        """
+        Fails a test if the expected value is not read from the client output.
+        
+        The expected value can be a string that is compiled to a regular expression (re)
+        or the name of a Exception class.
+        
+        Succeeds otherwise.
+        """
+        # other listed expectations are child classes of Exception
+        index = self.client.expect([expected, pexpect.EOF, pexpect.TIMEOUT], timeout=2) # 2 seconds max
         self.evalTest(index, message)
 
 # ---------------------------------------------------------------------
 # test classes
 class Test_1_AddressBook(TelnetBaseTest):
+    """
+    Systems tests for the Address Book
+    """
     def test_01_default_prompt(self):
         self.expectTest('pof: ', 'The default prompt is not appearing.')
 
@@ -178,6 +203,7 @@ class Test_1_AddressBook(TelnetBaseTest):
         self.client.sendline("c -a Juliette 154.123.2.3")
         self.sleep()
         self.expectTest('Contact added', 'Contact not added')
+        
     def test_03_list(self):
         self.client.sendline("c -l") 
         self.sleep()
@@ -231,6 +257,9 @@ class Test_1_AddressBook(TelnetBaseTest):
         self.expectTest('Could not delete', 'There should be no contact with that name.')
 
 class Test_2_Audiostream(TelnetBaseTest):
+    """
+    System Tests for Audiostream
+    """
     def test_00_default_prompt(self):
         self.expectTest('pof: ', 'The default prompt is not appearing.')
 
@@ -279,27 +308,33 @@ class Test_2_Audiostream(TelnetBaseTest):
         self.client.sendline("a -p 5050 audio")
         self.sleep()
         self.expectTest('port of audio stream audio is set to 5050.', 'IP Port of audio stream audio was not set.')
+
     def test_10_change_buffer(self):
         self.client.sendline("a -b 100 audio")
         self.sleep()
         self.expectTest('buffer of audio stream audio is set to 100.', 'Buffer time of audio stream audio was not set to 44100.')
+
     def test_11_change_input(self):
         self.client.sendline("a -i jackaudiosrc audio")
         self.sleep()
         self.expectTest('source of audio stream audio is set to jackaudiosrc.', 'Unable to specify audio input.')
+    
 #    def test_12_change_codec_of_invalid_stream(self):
 #        self.client.sendline("a -c vorbis audiostream")
 #        self.sleep()
 #        self.expectTest('There\'s no audio stream with the name audiostream', 'IP Port of audio stream audio was not set.')
-
+    
     def test_13_set_samplerate_to_invalid_value(self):
         self.client.sendline("a -r Juliette audio")
         self.sleep()
-        self.expectTest('Invalid value for sample rate. Sample rate should be integers.', 'Invalid value accepted as sample rate')
+        self.expectTest('option -r: invalid integer value: u\'Juliette\'', 'Invalid value accepted as sample rate')
+        #self.expectTest(AssertionError,"OK")
+        
     def test_50_list_audiostreams(self):
         self.client.sendline("a -l")
         self.sleep()
         self.expectTest('audio', 'The list of audio streams cannot be obained.')
+    
     def test_98_delete_audiostream(self):
         self.client.sendline("a -e audio")
         self.sleep()
