@@ -36,9 +36,15 @@
 
 #include "glVideoSink.h"
         
+#if 0        
 const GLfloat GLImageSink::INIT_X = -0.8f;     
 const GLfloat GLImageSink::INIT_Y = -0.5f;
 const GLfloat GLImageSink::INIT_Z = -1.2;
+#endif
+
+const GLfloat GLImageSink::INIT_X = 0.0;     
+const GLfloat GLImageSink::INIT_Y = 0.0;
+const GLfloat GLImageSink::INIT_Z = 0.0;
 
 const GLfloat GLImageSink::INIT_LEFT_CROP = 0.0;
 const GLfloat GLImageSink::INIT_RIGHT_CROP = 0.0;
@@ -60,7 +66,8 @@ gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45, (gfloat) width / (gfloat) height, 0.1, 100);  
+//    gluPerspective(45, (gfloat) width / (gfloat) height, 0.1, 100);  
+    gluOrtho2D(0, width, 0, height);
     glMatrixMode(GL_MODELVIEW);	
     return TRUE;
 }
@@ -93,7 +100,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glMatrixMode(GL_MODELVIEW);
     gfloat aspectRatio = (gfloat) width / (gfloat) height;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+#if 0
     glLoadIdentity();
     glColor3f(0.0f,0.0f,0.0f);
     glTranslatef(x_, y_, z_);
@@ -121,7 +128,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
         glVertex3f(2*aspectRatio,  1.0f, 0.0f);
         glVertex3f(aspectRatio,  1.0f, 0.0f);
     glEnd();
-
+#endif
     glEnable (GL_TEXTURE_RECTANGLE_ARB);
     glBindTexture (GL_TEXTURE_RECTANGLE_ARB, texture);
     glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -136,14 +143,19 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 	glPopAttrib();
 
     glLoadIdentity();
+	gluOrtho2D(viewport[0],viewport[2],viewport[1],viewport[3]);
+
+    LOG_DEBUG("v2" << viewport[2] << " v3" << viewport[3] );
+    glTranslatef((viewport[2]- (viewport[3]*aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
 
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0f, 0.0f);
-    glTexCoord2f((gfloat) width - 1, 0.0f);  glVertex3f(aspectRatio, 1.0f, 0.0f);
-    glTexCoord2f((gfloat) width - 1, (gfloat) height); glVertex3f(aspectRatio, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, viewport[3], 0.0f);
+    glTexCoord2f((gfloat) width - 1, 0.0f);  glVertex3f(viewport[3]*aspectRatio, viewport[3], 0.0f);
+    glTexCoord2f((gfloat) width - 1, (gfloat) height); glVertex3f(viewport[3]*aspectRatio, 0.0f, 0.0f);
     glTexCoord2f(0.0f, height); glVertex3f(0.0f, 0.0f, 0.0f);
     glEnd();
+
 
     //return TRUE causes a postRedisplay
     return FALSE;
