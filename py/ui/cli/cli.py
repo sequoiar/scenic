@@ -48,8 +48,13 @@ class TelnetServer(protocol.Protocol):
         self.prompt = "pof: "
         self.history = []
         
-    def write(self, msg, prompt=False):
-        self.transport.write("%s\n" % (msg.encode('utf-8')))
+    
+    def write(self, msg, prompt=False, endl=True):
+        if endl:
+            nl = "\n"
+        else:
+            nl = ""
+        self.transport.write("%s%s" % (msg.encode('utf-8'),nl))
         if prompt:
             self.write_prompt()
         
@@ -75,14 +80,20 @@ class TelnetServer(protocol.Protocol):
     def parse(self, data):
         """Method to be overidden when subclassing."""
         self.write("command not found")
-        self.write_prompt()            
+        self.write_prompt()
             
     def write_prompt(self):
         self.transport.write(self.prompt)
 
 
 class CliController(TelnetServer):
-    """ """
+    """ 
+    Command line parsers for each command
+    
+    TODO: we need to call each method in order to print the infos. 
+    Each one instaciates a CliParser object the is ephemerous. It is 
+    Very hard to retrieve information on each command this way.
+    """
         
     def __init__(self):
         TelnetServer.__init__(self)
@@ -95,7 +106,8 @@ class CliController(TelnetServer):
                           'a': 'audio',
                           'v': 'video',
                           's': 'streams',
-                          'j': 'join'
+                          'j': 'join',
+                          'h': 'help'
                           }
         
     def parse(self, data):
@@ -133,18 +145,21 @@ class CliController(TelnetServer):
             self.write('This is not a valid answer.\n[Y/n]:')
 
     def _contacts(self, data):
-        cp = CliParser(self, prog=data[0], description="Manage the address book.")
+        cp = CliParser(self, prog=data[0], description="Manages the address book.")
         cp.add_option("-l", "--list", action='store_true', help="List all the contacts")
         cp.add_option("-a", "--add", type="string", help="Add a contact")
         cp.add_option("-e", "--erase", "--remove", "--delete", action='store_true', help="Erase a contact")
         cp.add_option("-m", "--modify", action="store_true", help="Modify a contact")
         cp.add_option("-d", "--duplicate", action="store_true", help="Duplicate a contact")
         cp.add_option("-s", "--select", help="Select a contact")
+        cp.add_option("-z", "--description", action='store_true', help="Display description")
         
         (options, args) = cp.parse_args(data)
         
         if options.list:
             self.core.get_contacts(self)
+        elif options.description:
+            cp.print_description()
         elif options.add:
             if len(args) == 2:
                 self.core.add_contact(self, options.add, args[1])
@@ -231,7 +246,9 @@ class CliController(TelnetServer):
         cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
         cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
         cp.add_option("-i", "--input", "--source", type="string", help="Set the audio source (input).")
-
+        cp.add_option("-z", "--description", action='store_true', help="Display description")
+        
+        
         (options, args) = cp.parse_args(data)
                 
         if len(args) > 1:
@@ -261,6 +278,8 @@ class CliController(TelnetServer):
                     self.core.set_stream(self, name, kind, 'source', options.input)
         elif options.list:
             self.core.list_stream(self, kind)
+        elif options.description:
+            cp.print_description()
         elif options.add:
             self.core.add_stream(self, options.add, kind, 'gst')
         elif options.erase:
@@ -285,7 +304,9 @@ class CliController(TelnetServer):
         cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
         cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
         cp.add_option("-i", "--input", "--source", type="string", help="Set the video source (input).")
-
+        cp.add_option("-z", "--description", action='store_true', help="Display description")
+        
+        
         (options, args) = cp.parse_args(data)
                 
         if len(args) > 1:
@@ -313,6 +334,8 @@ class CliController(TelnetServer):
                     self.core.set_stream(self, name, kind, 'source', options.input)
         elif options.list:
             self.core.list_stream(self, kind)
+        elif options.description:
+            cp.print_description()
         elif options.add:
             self.core.add_stream(self, options.add, kind, 'gst')
         elif options.erase:
@@ -337,7 +360,8 @@ class CliController(TelnetServer):
         cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
         cp.add_option("-o", "--send", "--out", action='store_true', dest="mode", help="Set the mode to 'send'")
         cp.add_option("-r", "--receive", "--in", action='store_false', dest="mode", help="Set the mode to 'receive'")
-
+        cp.add_option("-z", "--description", action='store_true', help="Display description")
+        
         (options, args) = cp.parse_args(data)
         
         kind = 'streams'
@@ -349,6 +373,8 @@ class CliController(TelnetServer):
                 self.core.list_stream(self, kind)
         elif options.stop:
             self.core.stop_streams(self)
+        elif options.description:
+            cp.print_description()
         elif options.select:
             self.core.select_streams(self, options.select)
         elif [opt for opt in options.__dict__.values() if opt != None]:
@@ -369,16 +395,49 @@ class CliController(TelnetServer):
         cp = CliParser(self, prog=data[0], description="Start and stop a connection.")
         cp.add_option("-s", "--start", action='store_true', help="Start a connection with the default contact")
         cp.add_option("-i", "--stop", "--interrupt", action='store_true', help="Stop the connection")
-
+        cp.add_option("-z", "--description", action='store_true', help="Display description")
+        
         (options, args) = cp.parse_args(data)
                 
         if options.start:
             self.core.start_connection(self)
+        elif options.description:
+            cp.print_description()
         elif options.stop:
             self.core.stop_connection(self)
         else:
             cp.print_help()
+    
+    def print_all_commands(self):
+        for cmd in self.callbacks.keys():
+            if cmd == 'ask' or cmd == 'help':
+                # crash or infinite recursion...
+                pass
+            else:
+                self.write(cmd + " ", False, False) # no prompt, no endl
+                data = [cmd,'--description']
+                self.callbacks[cmd](data)
+        self.write_prompt()
+        #print_usage
         
+    def _help(self,data):
+        """Displays list of command
+        
+        TODO: Display each command's help"""
+        
+        cp = CliParser(self, prog=data[0], description="Prints descriptions of all commands.")
+        #cp.add_option("-l", "--list", help="List all commands in Sropulpof.")
+        #cp.add_option("-z", "--description", action='store_true', help="Display description")
+        
+        (options, args) = cp.parse_args(data)
+        
+        #if len(args) > 1 or len(options) > 1 :
+        #    if options.list:
+        #        self.print_all_commands()
+        #elif options.usage:
+        #    cp.print_usage()
+        #else:
+        self.print_all_commands()
 
 
 class CliParser(optparse.OptionParser):
@@ -396,6 +455,11 @@ class CliParser(optparse.OptionParser):
                  epilog=None):
         optparse.OptionParser.__init__(self, usage, option_list, option_class, version, conflict_handler, description, formatter, add_help_option, prog, epilog)
         self.output = output
+    
+    def print_description(self):
+        # TODO: Add name of the command
+        self.output.write(self.description)
+        # self.output.write_prompt() ...
     
     def error(self, msg):
         if msg:
@@ -418,8 +482,9 @@ class CliParser(optparse.OptionParser):
         or not defined.
         """
         if self.usage:
-           self.output.write(self.get_usage())
-           self.output.write_prompt() 
+            #self.output.write(self.description)
+            self.output.write(self.get_usage())
+            self.output.write_prompt() 
 
     def print_version(self, file=None):
         """print_version(file : file = stdout)
