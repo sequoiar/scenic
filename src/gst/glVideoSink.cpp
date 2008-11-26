@@ -61,8 +61,9 @@ GLfloat GLImageSink::topCrop_ = INIT_TOP_CROP;
 GLfloat GLImageSink::bottomCrop_ = INIT_BOTTOM_CROP;
 
 //TODO class vars?
-static int window_width_ = 640;
-static int window_height_ = 480;
+int GLImageSink::window_width_ = VideoSink::WIDTH;
+int GLImageSink::window_height_ = VideoSink::HEIGHT;
+
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
     g_print("WIDTH: %u, HEIGHT: %u", width, height);

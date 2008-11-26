@@ -23,6 +23,7 @@
 
 class RemoteConfig;
 class _GstElement;
+class _RTPSession;
 
 class RtpBin
 {
@@ -35,6 +36,7 @@ class RtpBin
     protected:
         RtpBin() : rtcp_sender_(0), rtcp_receiver_(0) { ++refCount_; }
         static const char *padStr(const char *padName);
+//        _RTPSession getInternalSession();
 
         static _GstElement *rtpbin_;
         static unsigned int refCount_;

@@ -83,6 +83,8 @@ class GLImageSink
         static const GLfloat INIT_RIGHT_CROP;
         static const GLfloat INIT_BOTTOM_CROP;
         static const GLfloat INIT_TOP_CROP;
+        static int window_width_;
+        static int window_height_;
         
         /// No Copy Constructor 
         GLImageSink(const GLImageSink&);     

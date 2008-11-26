@@ -96,3 +96,9 @@ double RtpBin::bandwidth() const
     return result;
 }
 
+
+#if 0
+RTPSession getInternalSession()
+{
+}
+#endif
