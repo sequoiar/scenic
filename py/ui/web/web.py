@@ -59,7 +59,7 @@ class Base(LivePage, Observer):
         """
         Replace the tag with a new AddressBook element.
         """
-        adb = AddressBook()
+        adb = AddressBook(self.api)
         adb.setFragmentParent(self)
         return adb
 
@@ -79,9 +79,10 @@ class AddressBook(LiveElement):
     docFactory = loaders.xmlfile('ui/web/addressbook.html')
     jsClass = u"AddressBook.List"
     
-    def __init__(self):
+    def __init__(self, api):
         LiveElement.__init__(self)
         self.callbacks = find_callbacks(self)
+        self.api = api
 
     def _get_contacts(self, origin, data):
         adb = []
@@ -93,6 +94,11 @@ class AddressBook(LiveElement):
         log.info('receive update: %r' % self)
         print adb
         self.callRemote('updateList', adb)
+        
+    def get_list(self):
+        self.api.get_contacts(self)
+        return False
+    expose(get_list)
 
 
 
