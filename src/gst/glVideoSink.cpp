@@ -43,8 +43,8 @@ const GLfloat GLImageSink::INIT_Z = -1.2;
 #endif
 
 const GLfloat GLImageSink::INIT_X = -.5;     
-const GLfloat GLImageSink::INIT_Y = -.5;
-const GLfloat GLImageSink::INIT_Z = -1.218;
+const GLfloat GLImageSink::INIT_Y = -.9;
+const GLfloat GLImageSink::INIT_Z = -2.218;
 
 const GLfloat GLImageSink::INIT_LEFT_CROP = 0.0;
 const GLfloat GLImageSink::INIT_RIGHT_CROP = 0.0;
@@ -67,12 +67,11 @@ int GLImageSink::window_height_ = VideoSink::HEIGHT;
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
     g_print("WIDTH: %u, HEIGHT: %u", width, height);
-    glViewport(0, 0, width, height);
+    
+    glViewport(0, 0, width, (float)width*((float)VideoSink::WIDTH/(float)VideoSink::HEIGHT));
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45, (gfloat) width / (gfloat) height, 0.1, 100);  
-    window_width_ = width;
-    window_height_ = height;
+    gluPerspective(45, (gfloat) width / ((gfloat)width*((gfloat)VideoSink::WIDTH/(gfloat)VideoSink::HEIGHT)), 0.1, 100);  
 
     glMatrixMode(GL_MODELVIEW);	
     return TRUE;
@@ -86,7 +85,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     static glong last_usec = current_time.tv_usec;
     static gint nbFrames = 0;  
 
-    bool high = window_width_ < window_height_;
+    bool high = false; //window_width_ < window_height_;
         
 
     g_get_current_time (&current_time);
