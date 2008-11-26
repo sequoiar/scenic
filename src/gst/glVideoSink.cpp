@@ -42,15 +42,15 @@ const GLfloat GLImageSink::INIT_Y = -0.5f;
 const GLfloat GLImageSink::INIT_Z = -1.2;
 #endif
 
-const GLfloat GLImageSink::INIT_X = 0.0;     
-const GLfloat GLImageSink::INIT_Y = 0.0;
-const GLfloat GLImageSink::INIT_Z = 0.0;
+const GLfloat GLImageSink::INIT_X = -.5;     
+const GLfloat GLImageSink::INIT_Y = -.5;
+const GLfloat GLImageSink::INIT_Z = -1.218;
 
 const GLfloat GLImageSink::INIT_LEFT_CROP = 0.0;
 const GLfloat GLImageSink::INIT_RIGHT_CROP = 0.0;
 const GLfloat GLImageSink::INIT_BOTTOM_CROP = 0.0;
 const GLfloat GLImageSink::INIT_TOP_CROP = 0.0;
-const GLfloat GLImageSink::STEP = 1.0;
+const GLfloat GLImageSink::STEP = 0.001;
 
 GLfloat GLImageSink::x_ = INIT_X;
 GLfloat GLImageSink::y_ = INIT_Y;
@@ -61,18 +61,16 @@ GLfloat GLImageSink::topCrop_ = INIT_TOP_CROP;
 GLfloat GLImageSink::bottomCrop_ = INIT_BOTTOM_CROP;
 
 //TODO class vars?
-static int window_width_ = 0;
-static int window_height_ = 0;
+static int window_width_ = 640;
+static int window_height_ = 480;
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
     g_print("WIDTH: %u, HEIGHT: %u", width, height);
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-//    gluPerspective(45, (gfloat) width / (gfloat) height, 0.1, 100);  
-    gluOrtho2D(0, width, 0, height);
-    window_width_ = width;
-    window_height_ = height;
+    gluPerspective(45, (gfloat) width / (gfloat) height, 0.1, 100);  
+//    gluOrtho2D(0, width, 0, height);
     glMatrixMode(GL_MODELVIEW);	
     return TRUE;
 }
@@ -85,6 +83,8 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     static glong last_usec = current_time.tv_usec;
     static gint nbFrames = 0;  
 
+    window_width_ = width;
+    window_height_ = height;
     g_get_current_time (&current_time);
     if((current_time.tv_sec - last_sec < 1) && (current_time.tv_usec - last_usec < 5000))
     {	
@@ -103,11 +103,20 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     glEnable(GL_DEPTH_TEST);
     glMatrixMode(GL_MODELVIEW);
+    
     gfloat aspectRatio = (gfloat) width / (gfloat) height;
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-#if 0
     glLoadIdentity();
+
+	glPushAttrib(GL_TRANSFORM_BIT);
+    GLint   viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glPopAttrib();
+    float window_vy = (float)viewport[3] / (float)viewport[2];
+
     glColor3f(0.0f,0.0f,0.0f);
+    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
     glTranslatef(leftCrop_, topCrop_,  0.01f);
 
@@ -122,6 +131,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     glLoadIdentity();
     glColor3f(0.0f,0.0f,0.0f);
+    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
     glTranslatef(rightCrop_, bottomCrop_,  0.01f);
 
@@ -133,7 +143,6 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
         glVertex3f(2*aspectRatio,  1.0f, 0.0f);
         glVertex3f(aspectRatio,  1.0f, 0.0f);
     glEnd();
-#endif
     glEnable (GL_TEXTURE_RECTANGLE_ARB);
     glBindTexture (GL_TEXTURE_RECTANGLE_ARB, texture);
     glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -144,16 +153,16 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     glLoadIdentity();
 
+    LOG_DEBUG("!!!!!!!!" << window_vy);
     //TODO: explain below -- ( screen x - ( needed x res)) == extra space
     //move origin to extra space / 2 -- so that quad is in the middle of screen
-    glTranslatef((window_width_ - (window_height_*aspectRatio))/2.0f, 0.0, 0.0); 
+    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
-
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, window_height_-1.0, 0.0f);
-    glTexCoord2f((gfloat) width - 1, 0.0f);  glVertex3f(window_height_*aspectRatio, window_height_-1.0, 0.0f);
-    glTexCoord2f((gfloat) width - 1, (gfloat) height); glVertex3f(window_height_*aspectRatio, 1.0f, 0.0f);
-    glTexCoord2f(0.0f, height); glVertex3f(0.0f, 1.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0f, 0.0f);
+    glTexCoord2f((gfloat) width - 1, 0.0f);  glVertex3f(aspectRatio, 1.0f, 0.0f);
+    glTexCoord2f((gfloat) width - 1, (gfloat) height); glVertex3f(aspectRatio, 0.0f, 0.0f);
+    glTexCoord2f(0.0f, height); glVertex3f(0.0f, 0.0f, 0.0f);
     glEnd();
 
 
