@@ -71,7 +71,9 @@ gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45, (gfloat) width / (gfloat) height, 0.1, 100);  
-//    gluOrtho2D(0, width, 0, height);
+    window_width_ = width;
+    window_height_ = height;
+
     glMatrixMode(GL_MODELVIEW);	
     return TRUE;
 }
@@ -84,8 +86,9 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     static glong last_usec = current_time.tv_usec;
     static gint nbFrames = 0;  
 
-    window_width_ = width;
-    window_height_ = height;
+    bool high = window_width_ < window_height_;
+        
+
     g_get_current_time (&current_time);
     if((current_time.tv_sec - last_sec < 1) && (current_time.tv_usec - last_usec < 5000))
     {	
@@ -110,8 +113,10 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-
-    glColor3f(0.0f,0.0f,0.0f);
+    glColor3f(1.0f,0.0f,0.0f);
+if(high)
+    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, -1.369); 
+else
     glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
     glTranslatef(leftCrop_, topCrop_,  0.01f);
@@ -126,7 +131,10 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glEnd();
 
     glLoadIdentity();
-    glColor3f(0.0f,0.0f,0.0f);
+    glColor3f(0.0f,1.0f,0.0f);
+if(high)
+    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, -1.369); 
+else
     glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
     glTranslatef(rightCrop_, bottomCrop_,  0.01f);
@@ -151,15 +159,18 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     //TODO: explain below -- ( screen x - ( needed x res)) == extra space
     //move origin to extra space / 2 -- so that quad is in the middle of screen
+if(high)
+    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, -1.369); 
+else
     glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
+
     glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0f, 0.0f);
+    glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0, 0.0f);
     glTexCoord2f((gfloat) width - 1, 0.0f);  glVertex3f(aspectRatio, 1.0f, 0.0f);
     glTexCoord2f((gfloat) width - 1, (gfloat) height); glVertex3f(aspectRatio, 0.0f, 0.0f);
     glTexCoord2f(0.0f, height); glVertex3f(0.0f, 0.0f, 0.0f);
     glEnd();
-
 
     //return TRUE causes a postRedisplay
     return FALSE;
