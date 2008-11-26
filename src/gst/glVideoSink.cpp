@@ -1,5 +1,4 @@
-
-/** glVideoSink.cpp
+/* glVideoSink.cpp
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
  * This file is part of [propulse]ART.
@@ -96,17 +95,31 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
-    glColor3f(0.0f, 0.0f, 0.0f);
+    glColor3f(0.0f,0.0f,0.0f);
+    glTranslatef(x_, y_, z_);
+    glTranslatef(leftCrop_, topCrop_,  0.01f);
+
+    glBegin(GL_TRIANGLE_FAN);
+        glVertex3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(aspectRatio,  1.0f, 0.0f);
+        glVertex3f(aspectRatio,  2.0f, 0.0f);
+        glVertex3f(-aspectRatio, 2.0f, 0.0f);
+        glVertex3f(-aspectRatio,0.0f,0.0f);
+        glVertex3f(0.0f,0.0f,0.0f);
+    glEnd();
+
+    glLoadIdentity();
+    glColor3f(0.0f,0.0f,0.0f);
     glTranslatef(x_, y_, z_);
     glTranslatef(rightCrop_, bottomCrop_,  0.01f);
 
     glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(aspectRatio, 0.0f, 0.0f);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f,  -1.0f, 0.0f);
-    glVertex3f(2 * aspectRatio, -1.0f, 0.0f); 
-    glVertex3f(2 * aspectRatio, 1.0f, 0.0f);
-    glVertex3f(aspectRatio, 1.0f, 0.0f);
+        glVertex3f(aspectRatio,0.0f,0.0f);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(0.0f,  -1.0f, 0.0f);
+        glVertex3f(2*aspectRatio,  -1.0f, 0.0f); 
+        glVertex3f(2*aspectRatio,  1.0f, 0.0f);
+        glVertex3f(aspectRatio,  1.0f, 0.0f);
     glEnd();
 
     glEnable (GL_TEXTURE_RECTANGLE_ARB);
@@ -117,8 +130,12 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
-    glLoadIdentity();
+	glPushAttrib(GL_TRANSFORM_BIT);
+    GLint   viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glPopAttrib();
 
+    glLoadIdentity();
     glTranslatef(x_, y_, z_);
 
     glBegin(GL_QUADS);
