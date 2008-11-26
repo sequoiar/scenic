@@ -142,8 +142,8 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	glPopAttrib();
 
-    glLoadIdentity();
 	gluOrtho2D(viewport[0],viewport[2],viewport[1],viewport[3]);
+    glLoadIdentity();
 
     LOG_DEBUG("v2" << viewport[2] << " v3" << viewport[3] );
     glTranslatef((viewport[2]- (viewport[3]*aspectRatio))/2.0f, 0.0, 0.0); 
