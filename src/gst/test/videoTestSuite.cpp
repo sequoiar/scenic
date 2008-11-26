@@ -173,6 +173,53 @@ void VideoTestSuite::start_stop_v4l()
 }
 
 
+void VideoTestSuite::start_v4l_gl()
+{
+    VideoSourceConfig srcConfig("v4l2src");
+    VideoSinkConfig sinkConfig("glimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
+    tx.init();
+
+    playback::start();
+    
+
+    BLOCK();
+    TEST_ASSERT(playback::isPlaying());
+}
+
+
+void VideoTestSuite::stop_v4l_gl()
+{
+    VideoSourceConfig srcConfig("v4l2src");
+    VideoSinkConfig sinkConfig("glimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
+    tx.init();
+
+    BLOCK();
+
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
+}
+
+
+void VideoTestSuite::start_stop_v4l_gl()
+{
+    VideoSourceConfig srcConfig("v4l2src");
+    VideoSinkConfig sinkConfig("glimagesink");
+    VideoLocal tx(srcConfig, sinkConfig);
+    tx.init();
+
+    playback::start();
+    
+
+    BLOCK();
+    TEST_ASSERT(playback::isPlaying());
+
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
+}
+
+
 void VideoTestSuite::start_dv()
 {
     VideoSourceConfig srcConfig("dv1394src");

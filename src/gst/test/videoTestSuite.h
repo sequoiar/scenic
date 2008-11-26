@@ -33,6 +33,10 @@ class VideoTestSuite
         {
             testLength_ = 500000;
             
+            TEST_ADD(VideoTestSuite::start_v4l_gl)
+            TEST_ADD(VideoTestSuite::stop_v4l_gl)
+            TEST_ADD(VideoTestSuite::start_stop_v4l_gl)
+            
             TEST_ADD(VideoTestSuite::start_dv)
             TEST_ADD(VideoTestSuite::stop_dv)
             TEST_ADD(VideoTestSuite::start_stop_dv)
@@ -77,6 +81,10 @@ class VideoTestSuite
         void start_v4l();
         void stop_v4l();
         void start_stop_v4l();
+        
+        void start_v4l_gl();
+        void stop_v4l_gl();
+        void start_stop_v4l_gl();
 
         void start_dv();
         void stop_dv();

@@ -37,14 +37,9 @@
 
 #include "glVideoSink.h"
         
-const GLfloat GLImageSink::INIT_X = -0.67f;     
+const GLfloat GLImageSink::INIT_X = -0.8f;     
 const GLfloat GLImageSink::INIT_Y = -0.5f;
 const GLfloat GLImageSink::INIT_Z = -1.2;
-#if 0
-const GLfloat GLImageSink::INIT_X = -1.25625f;     
-const GLfloat GLImageSink::INIT_Y = -0.93750f;
-const GLfloat GLImageSink::INIT_Z = -1.2f;
-#endif
 
 const GLfloat GLImageSink::INIT_LEFT_CROP = 0.0;
 const GLfloat GLImageSink::INIT_RIGHT_CROP = 0.0;
@@ -62,7 +57,6 @@ GLfloat GLImageSink::bottomCrop_ = INIT_BOTTOM_CROP;
 
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
-    //z_ = width == 640 ? -1.4240 : INIT_Z;
     g_print("WIDTH: %u, HEIGHT: %u", width, height);
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
@@ -102,17 +96,17 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
-    glColor3f(0.0f,0.0f,0.0f);
+    glColor3f(0.0f, 0.0f, 0.0f);
     glTranslatef(x_, y_, z_);
     glTranslatef(rightCrop_, bottomCrop_,  0.01f);
 
     glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(aspectRatio,0.0f,0.0f);
+    glVertex3f(aspectRatio, 0.0f, 0.0f);
     glVertex3f(0.0f, 0.0f, 0.0f);
     glVertex3f(0.0f,  -1.0f, 0.0f);
-    glVertex3f(2*aspectRatio,  -1.0f, 0.0f); 
-    glVertex3f(2*aspectRatio,  1.0f, 0.0f);
-    glVertex3f(aspectRatio,  1.0f, 0.0f);
+    glVertex3f(2 * aspectRatio, -1.0f, 0.0f); 
+    glVertex3f(2 * aspectRatio, 1.0f, 0.0f);
+    glVertex3f(aspectRatio, 1.0f, 0.0f);
     glEnd();
 
     glEnable (GL_TEXTURE_RECTANGLE_ARB);
@@ -129,8 +123,8 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 0.0f);  glVertex3f(0.0f, 1.0f, 0.0f);
-    glTexCoord2f((gfloat)width-1, 0.0f);  glVertex3f(aspectRatio,  1.0f, 0.0f);
-    glTexCoord2f((gfloat) width-1, (gfloat) height); glVertex3f(aspectRatio,  0.0f, 0.0f);
+    glTexCoord2f((gfloat) width - 1, 0.0f);  glVertex3f(aspectRatio, 1.0f, 0.0f);
+    glTexCoord2f((gfloat) width - 1, (gfloat) height); glVertex3f(aspectRatio, 0.0f, 0.0f);
     glTexCoord2f(0.0f, height); glVertex3f(0.0f, 0.0f, 0.0f);
     glEnd();
 
@@ -190,6 +184,11 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             break;
         case 'L':
             leftCrop_ -= STEP;
+            break;
+        case 'c':
+        case 'C':
+            LOG_DEBUG("Resetting GL texture position");
+            resetGLparams();
             break;
         default:
             g_print("unknown keypress %d", event->keyval);

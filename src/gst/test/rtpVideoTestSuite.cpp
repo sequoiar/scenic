@@ -196,6 +196,78 @@ void RtpVideoTestSuite::start_stop_v4l()
 
 
 
+void RtpVideoTestSuite::start_v4l_gl()
+{
+    if (id_ == 0) {
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver("glimagesink"));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+    }
+    else {
+        VideoSourceConfig vConfig("v4l2src");
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+    }
+}
+
+
+void RtpVideoTestSuite::stop_v4l_gl()
+{
+    if (id_ == 0) {
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver("glimagesink"));
+
+        BLOCK();
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+    else {
+        VideoSourceConfig vConfig("v4l2src");
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+
+        BLOCK();
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+}
+
+
+void RtpVideoTestSuite::start_stop_v4l_gl()
+{
+    if (id_ == 0) {
+        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver("glimagesink"));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+    else {
+        VideoSourceConfig vConfig("v4l2src");
+        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+}
+
+
 void RtpVideoTestSuite::start_dv()
 {
     // receiver should be started first, of course there's no guarantee that it will at this point

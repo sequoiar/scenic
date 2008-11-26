@@ -30,8 +30,8 @@
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
 
-const int VideoSink::WIDTH = 720;
-const int VideoSink::HEIGHT = 528;
+const unsigned int VideoSink::WIDTH = 720;
+const unsigned int VideoSink::HEIGHT = 528;
 
 void VideoSink::destroySink()
 {

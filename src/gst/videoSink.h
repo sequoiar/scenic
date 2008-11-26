@@ -34,6 +34,7 @@ class VideoSink
     public:
         VideoSink()
             : sink_(0), window_(0), screen_num_(0) {};
+        virtual ~VideoSink(){};
         void makeFullscreen() { makeFullscreen(window_); }
         void makeUnfullscreen() { makeUnfullscreen(window_); }
         virtual void init() = 0;
@@ -44,8 +45,8 @@ class VideoSink
         _GstElement *sink_;
         _GtkWidget *window_;
         int screen_num_;
-        static const int WIDTH;
-        static const int HEIGHT;
+        static const unsigned int WIDTH;
+        static const unsigned int HEIGHT;
 
         Window getXWindow();
         void destroySink();
