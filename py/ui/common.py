@@ -24,6 +24,7 @@ from twisted.python.modules import getModule
 from twisted.python.filepath import FilePath
 from utils import log
 
+DEBUG = True
     
 def find_all():
     """
@@ -42,13 +43,18 @@ def load(uis):
     """
     loaded_uis = []
     for ui in uis:
-        try:
+        if DEBUG:
             loaded_ui = ui.load()
             log.info('%s module loaded.' % ui.name)
-        except:
-            log.error('Unable to load the module %s' % ui.name)
-        else:
             loaded_uis.append(ui.load())
+        else:
+            try:
+                loaded_ui = ui.load()
+                log.info('%s module loaded.' % ui.name)
+            except:
+                log.error('Unable to load the module %s' % ui.name)
+            else:
+                loaded_uis.append(ui.load())
     return loaded_uis
     
 def find_callbacks(obj):
