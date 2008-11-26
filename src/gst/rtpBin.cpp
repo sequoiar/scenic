@@ -30,6 +30,7 @@
 #include "logWriter.h"
 
 
+//RTPSession RtpBin::sesh_;
 GstElement *RtpBin::rtpbin_ = 0;
 unsigned int RtpBin::refCount_ = 0;
 
@@ -38,6 +39,9 @@ void RtpBin::init()
     // only initialize rtpbin once per process
     if (!rtpbin_) 
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
+
+    //g_signal_connect(G_OBJECT(rtpbin_), "get-internal-session", G_CALLBACK(gotInternalSessionCb), NULL);
+    //g_timeout_add(4000, GSourceFunc(requestSession), NULL);
 }
 
 
@@ -97,8 +101,20 @@ double RtpBin::bandwidth() const
 }
 
 
-#if 0
-RTPSession getInternalSession()
+bool RtpBin::requestSession()
 {
+    const int SESSION_ID = 0;
+    g_signal_emit_by_name(static_cast<gpointer>(rtpbin_), "get-internal-session", SESSION_ID);
+    return false;
+    //TODO: use this
+    //GObject *session; = g_signal_emit_by_name (rtpbin, "get-internal-session", (guint)0, &session);
 }
-#endif
+
+
+GObject *RtpBin::gotInternalSessionCb(GstElement * /*rtpbin*/, guint session, gpointer data)
+{
+
+    LOG_DEBUG("GOT THE SESSION: " << session);
+    return static_cast<GObject*>(data);
+}
+

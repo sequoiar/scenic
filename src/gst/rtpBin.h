@@ -21,9 +21,11 @@
 #ifndef _RTP_BIN_H_
 #define _RTP_BIN_H_
 
+#include "/home/tristan/gst-plugins-bad/gst/rtpmanager/rtpsession.h"
+
 class RemoteConfig;
 class _GstElement;
-class _RTPSession;
+class _GObject;
 
 class RtpBin
 {
@@ -36,13 +38,15 @@ class RtpBin
     protected:
         RtpBin() : rtcp_sender_(0), rtcp_receiver_(0) { ++refCount_; }
         static const char *padStr(const char *padName);
-//        _RTPSession getInternalSession();
 
         static _GstElement *rtpbin_;
         static unsigned int refCount_;
         _GstElement *rtcp_sender_, *rtcp_receiver_;
 
     private:
+        static bool requestSession();
+        static _GObject *gotInternalSessionCb(_GstElement *rtpBin, unsigned int session, void *data);
+
         RtpBin(const RtpBin&); //No Copy Constructor
         RtpBin& operator=(const RtpBin&); //No Assignment Operator
 };
