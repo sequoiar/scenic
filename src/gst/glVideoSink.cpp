@@ -109,11 +109,6 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-	glPushAttrib(GL_TRANSFORM_BIT);
-    GLint   viewport[4];
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	glPopAttrib();
-    float window_vy = (float)viewport[3] / (float)viewport[2];
 
     glColor3f(0.0f,0.0f,0.0f);
     glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
@@ -153,7 +148,6 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     glLoadIdentity();
 
-    LOG_DEBUG("!!!!!!!!" << window_vy);
     //TODO: explain below -- ( screen x - ( needed x res)) == extra space
     //move origin to extra space / 2 -- so that quad is in the middle of screen
     glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
