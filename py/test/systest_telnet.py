@@ -406,3 +406,91 @@ class Test_2_Audiostream(TelnetBaseTest):
         self.client.sendline("a -e audiostream")
         self.sleep()
         self.expectTest('There\'s no audio stream with the name audiostream', 'There should be no audio stream with that name.')
+
+class Test_3_Videostream(TelnetBaseTest):
+    """
+    System Tests for Videostream
+    """
+    def test_00_default_prompt(self):
+        self.expectTest('pof: ', 'The default prompt is not appearing.')
+
+    def test_01_add_videostream(self):
+        self.sleep()
+        self.client.sendline("v -a videostream")
+        self.sleep()
+        self.expectTest('Video stream videostream created.', 'Video stream video cannot be created.')
+
+    def test_02_rename_videostream(self):
+        self.client.sendline("v -m video videostream")
+        self.sleep()
+        self.expectTest('Video stream videostream rename to video.', 'Video stream videostream cannot be renamed to video.')
+
+    def test_03_change_container(self):
+        self.client.sendline("v -t mpegts video")
+        self.sleep()
+        self.expectTest('container of video stream video is set to mpegts.', 'Container of video stream video was not set to mpegts.')
+
+    def test_04_change_codec(self):
+        self.client.sendline("v -c vorbis video")
+        self.sleep()
+        self.expectTest('codec of video stream video is set to vorbis.', 'Codec of video stream video was not set to vorbis.')
+
+    def test_05_change_settings(self):
+        self.client.sendline("v -s value1:key1,value2:key2 video")
+        self.sleep()
+        self.expectTest('codec_settings of video stream video is set to value1:key1,value2:key2.', 'Codec settings of video stream video was not set to new values.')
+
+    def test_06_change_width(self):
+        self.client.sendline("v -w 640 video")
+        self.sleep()
+        self.expectTest('width of video stream video is set to 640.', 'Bitdepth of video stream video was not set to 24.')
+
+    def test_07_change_height(self):
+        self.client.sendline("v -r 480 video")
+        self.sleep()
+        self.expectTest('height of video stream video is set to 480.', 'Sample rate of video stream video was not set to 44100.')
+
+    def test_09_change_port(self):
+        self.client.sendline("v -p 5050 video")
+        self.sleep()
+        self.expectTest('port of video stream video is set to 5050.', 'IP Port of video stream video was not set.')
+
+    def test_10_change_buffer(self):
+        self.client.sendline("v -b 100 video")
+        self.sleep()
+        self.expectTest('buffer of video stream video is set to 100.', 'Buffer time of video stream video was not set to 44100.')
+
+    def test_11_change_input(self):
+        self.client.sendline("v -i v4l2src:/dev/video0 video")
+        self.sleep()
+        self.expectTest('source of video stream video is set to v4l2src:/dev/video0.', 'Unable to specify video input.')
+    
+#    def test_12_change_codec_of_invalid_stream(self):
+#        self.client.sendline("v -c vorbis videostream")
+#        self.sleep()
+#        self.expectTest('There\'s no video stream with the name videostream', 'IP Port of video stream video was not set.')
+
+    def test_13_change_description(self):
+        self.client.sendline("v -z 'A Description' video")
+        self.sleep()
+        self.expectTest('source of video stream video is set to jackvideosrc.', 'Unable to specify video input.')
+    
+    def test_14_set_samplerate_to_invalid_value(self):
+        self.client.sendline("v -r Juliette video")
+        self.sleep()
+        self.expectTest('option -r: invalid integer value: u\'Juliette\'', 'Invalid value accepted as sample rate')
+        
+    def test_50_list_videostreams(self):
+        self.client.sendline("v -l")
+        self.sleep()
+        self.expectTest('video', 'The list of video streams cannot be obained.')
+    
+    def test_98_delete_videostream(self):
+        self.client.sendline("v -e video")
+        self.sleep()
+        self.expectTest('Video stream video deleted.', 'Video stream video cannot be deleted.')
+
+    def test_99_delete_invalid_videostream(self):
+        self.client.sendline("v -e videostream")
+        self.sleep()
+        self.expectTest('There\'s no video stream with the name videostream', 'There should be no video stream with that name.')
