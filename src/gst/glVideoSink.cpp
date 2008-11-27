@@ -36,7 +36,8 @@
 
 #include "glVideoSink.h"
         
-const GLfloat GLImageSink::INIT_X = -.5;     
+const GLfloat NTSC_VIDEO_RATIO = 4.0/3.0;
+const GLfloat GLImageSink::INIT_X = -.5*NTSC_VIDEO_RATIO; 
 const GLfloat GLImageSink::INIT_Y = -.5;
 const GLfloat GLImageSink::INIT_Z = -1.2175;
 
@@ -57,20 +58,20 @@ GLfloat GLImageSink::bottomCrop_ = INIT_BOTTOM_CROP;
 
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
-    GLfloat VideoRatio = 4.0/3.0; // != (gfloat)VideoSink::WIDTH/(gfloat)VideoSink::HEIGHT 
+    GLfloat vwinRatio = (gfloat)VideoSink::WIDTH/(gfloat)VideoSink::HEIGHT ;
     g_print("WIDTH: %u, HEIGHT: %u", width, height);
     //fix the port 
     if (width > height)
-        glViewport(0, 0, height*((float)VideoSink::WIDTH/(float)VideoSink::HEIGHT),height);
+        glViewport((width-height*vwinRatio)/2.0, 0, height*(vwinRatio),height);
     else
-        glViewport(0, 0, width, (float)width*((float)VideoSink::HEIGHT/(float)VideoSink::WIDTH));
+        glViewport(0, (height-(width*(1.0/vwinRatio)))/2.0, width, (float)width*(1.0/vwinRatio));
 
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //TODO: wazza aap
-   // gluPerspective(45, (gfloat)VideoSink::WIDTH/(gfloat)VideoSink::HEIGHT, 0.1, 100);  
-    gluPerspective(45, VideoRatio , 0.1, 100);  
+    //TODO: Why  the disparity between 4/3 and videosink aspect? 
+   // gluPerspective(45, vwinRatio, 0.1, 100);  
+    gluPerspective(45, NTSC_VIDEO_RATIO , 0.1, 100);  
 
 
 
@@ -111,7 +112,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glLoadIdentity();
 
     glColor3f(1.0f,0.0f,0.0f);
-    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
+//    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
     glTranslatef(leftCrop_, topCrop_,  0.01f);
 
@@ -126,7 +127,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     glLoadIdentity();
     glColor3f(0.0f,1.0f,0.0f);
-    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
+//    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
     glTranslatef(rightCrop_, bottomCrop_,  0.01f);
 
@@ -150,7 +151,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     //TODO: explain below -- ( screen x - ( needed x res)) == extra space
     //move origin to extra space / 2 -- so that quad is in the middle of screen
-    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
+//    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
 
     glBegin(GL_QUADS);
