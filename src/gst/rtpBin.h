@@ -21,7 +21,7 @@
 #ifndef _RTP_BIN_H_
 #define _RTP_BIN_H_
 
-#include "/home/tristan/gst-plugins-bad/gst/rtpmanager/rtpsession.h"
+//#include "/home/tristan/gst-plugins-bad/gst/rtpmanager/rtpsession.h"
 
 class RemoteConfig;
 class _GstElement;
