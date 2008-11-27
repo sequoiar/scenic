@@ -55,10 +55,12 @@ class Core(Subject):
         
     def load_uis(self):
         self.uis = ui.load(ui.find_all())
+        count = 0
         for mod in self.uis:
             try:
                 if len(sys.argv) > 1:
-                    mod.start(self, int(sys.argv[1]))
+                    mod.start(self, int(sys.argv[1]) + count)
+                    count += 10
                 else:
                     mod.start(self)
             except:
