@@ -36,15 +36,9 @@
 
 #include "glVideoSink.h"
         
-#if 0        
-const GLfloat GLImageSink::INIT_X = -0.8f;     
-const GLfloat GLImageSink::INIT_Y = -0.5f;
-const GLfloat GLImageSink::INIT_Z = -1.2;
-#endif
-
 const GLfloat GLImageSink::INIT_X = -.5;     
-const GLfloat GLImageSink::INIT_Y = -.9;
-const GLfloat GLImageSink::INIT_Z = -2.218;
+const GLfloat GLImageSink::INIT_Y = -.5;
+const GLfloat GLImageSink::INIT_Z = -1.2175;
 
 const GLfloat GLImageSink::INIT_LEFT_CROP = 0.0;
 const GLfloat GLImageSink::INIT_RIGHT_CROP = 0.0;
@@ -60,18 +54,25 @@ GLfloat GLImageSink::rightCrop_ = INIT_RIGHT_CROP;
 GLfloat GLImageSink::topCrop_ = INIT_TOP_CROP;
 GLfloat GLImageSink::bottomCrop_ = INIT_BOTTOM_CROP;
 
-//TODO class vars?
-int GLImageSink::window_width_ = VideoSink::WIDTH;
-int GLImageSink::window_height_ = VideoSink::HEIGHT;
 
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
+    GLfloat VideoRatio = 4.0/3.0; // != (gfloat)VideoSink::WIDTH/(gfloat)VideoSink::HEIGHT 
     g_print("WIDTH: %u, HEIGHT: %u", width, height);
+    //fix the port 
+    if (width > height)
+        glViewport(0, 0, height*((float)VideoSink::WIDTH/(float)VideoSink::HEIGHT),height);
+    else
+        glViewport(0, 0, width, (float)width*((float)VideoSink::HEIGHT/(float)VideoSink::WIDTH));
+
     
-    glViewport(0, 0, width, (float)width*((float)VideoSink::WIDTH/(float)VideoSink::HEIGHT));
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45, (gfloat) width / ((gfloat)width*((gfloat)VideoSink::WIDTH/(gfloat)VideoSink::HEIGHT)), 0.1, 100);  
+    //TODO: wazza aap
+   // gluPerspective(45, (gfloat)VideoSink::WIDTH/(gfloat)VideoSink::HEIGHT, 0.1, 100);  
+    gluPerspective(45, VideoRatio , 0.1, 100);  
+
+
 
     glMatrixMode(GL_MODELVIEW);	
     return TRUE;
@@ -84,9 +85,6 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     static glong last_sec = current_time.tv_sec;
     static glong last_usec = current_time.tv_usec;
     static gint nbFrames = 0;  
-
-    bool high = false; //window_width_ < window_height_;
-        
 
     g_get_current_time (&current_time);
     if((current_time.tv_sec - last_sec < 1) && (current_time.tv_usec - last_usec < 5000))
@@ -113,9 +111,6 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glLoadIdentity();
 
     glColor3f(1.0f,0.0f,0.0f);
-if(high)
-    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, -1.369); 
-else
     glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
     glTranslatef(leftCrop_, topCrop_,  0.01f);
@@ -131,9 +126,6 @@ else
 
     glLoadIdentity();
     glColor3f(0.0f,1.0f,0.0f);
-if(high)
-    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, -1.369); 
-else
     glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
     glTranslatef(rightCrop_, bottomCrop_,  0.01f);
@@ -158,9 +150,6 @@ else
 
     //TODO: explain below -- ( screen x - ( needed x res)) == extra space
     //move origin to extra space / 2 -- so that quad is in the middle of screen
-if(high)
-    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, -1.369); 
-else
     glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
 
