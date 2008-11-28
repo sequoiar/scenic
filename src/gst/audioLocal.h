@@ -25,17 +25,25 @@
 #include "audioConfig.h"
 #include "audioLevel.h"
 
+// forward declarations
 class AudioSource;
 class AudioSink;
+
+/*! \class AudioLocal
+    \brief An audio pipeline derived from LocalBase whose source and sink are in the same process.
+
+*/
 
 class AudioLocal
     : public LocalBase 
 {
     public:
+        //! Constructor
         explicit AudioLocal(const AudioConfig config) 
             : config_(config), source_(0), level_(), sink_(0)
         {}
 
+        //! Destructor
         ~AudioLocal();
 
         //std::string getCaps();
