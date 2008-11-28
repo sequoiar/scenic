@@ -1,4 +1,4 @@
-/* Main.cpp
+/* main.cpp
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
  * This file is part of [propulse]ART.
@@ -18,9 +18,10 @@
  *
  */
 
-#include "../gst-thread/msgThreadFactory.h"
+#include "gst-thread/msgThreadFactory.h"
 #include "logWriter.h"
 
+///Instance will register a particular MsgThread as a MapMsg handler
 class MainSubscriber
     : public msg::Subscriber
 {
@@ -36,6 +37,10 @@ class MainSubscriber
         }
 };
 
+/** Main command line entry point
+ * launches the threads and dispatches
+ * MapMsg between the threads
+*/
 class MainModule
     : public BaseModule
 {
