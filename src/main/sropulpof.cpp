@@ -1,4 +1,3 @@
-
 // sropulpof.cpp
 // Copyright 2008 Koya Charles & Tristan Matthews
 //
@@ -18,14 +17,16 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "factories.h"
-#include "eventLoop.h"
-#include "videoSink.h"
+#include "gst/engine/test/factories.h"
+//#include "eventLoop.h"
+//#include "videoSink.h"
 #include <cassert>
 #include <cstdlib>
+#include "logWriter.h"
 #include "gutil/optionArgs.h"
-#include "playback.h"
-
+#include "gst/gst.h"
+#include "gst/msgThreadFactory.h"
+#define BLOCK() ;
 namespace pof 
 {
     short run(int argc, char **argv);
@@ -65,7 +66,7 @@ short pof::run(int argc, char **argv)
 
     pid = send ? 's' : 'r';
 
-    std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
+    LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
     if (pid == 'r') {
         std::auto_ptr<AudioReceiver> aRx(factories::buildAudioReceiver(ip, audioCodec, audioPort));
         playback::start();
@@ -84,7 +85,7 @@ short pof::run(int argc, char **argv)
         AudioSourceConfig aConfig("jackaudiosrc", pof::NUM_CHANNELS);
         std::auto_ptr<AudioSender> aTx(factories::buildAudioSender(aConfig, ip, audioCodec, audioPort));
         playback::start();
-        assert(tcpSendCaps(ip, ports::CAPS_PORT, aTx->getCaps()));
+        assert(tcpSendBuffer(ip, ports::CAPS_PORT, aTx->getCaps()));
         VideoSourceConfig *vConfig; 
 
         if (videoDevice)
@@ -106,13 +107,13 @@ short pof::run(int argc, char **argv)
 
 int mainPof(int argc, char **argv)
 {
-    std::cout << "Built on " << __DATE__ << " at " << __TIME__ << std::endl;
+    LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
     try {
         return pof::run(argc, argv);
     }
     catch (Except e)
     {
-        std::cerr << e.msg_;
+        //std::cerr << e.msg_;
         return 1;
     }
 }

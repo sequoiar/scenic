@@ -1,16 +1,16 @@
 #ifndef _FACTORIES_H_
 #define _FACTORIES_H_
 
-#include "audioSender.h"
-#include "audioReceiver.h"
-#include "videoSender.h"
-#include "videoReceiver.h"
-#include "audioConfig.h"
-#include "videoConfig.h"
-#include "remoteConfig.h"
-#include "capsHelper.h"
-#include "ports.h"
+#include "gst/engine.h"
 #include <memory>   // for std::auto_ptr
+#include "tcp/singleBuffer.h"
+
+
+namespace ports {
+        const long A_PORT = 10000;
+        const long V_PORT = 11000;
+        const long CAPS_PORT = 12000;
+}
 
 namespace factories 
 {
@@ -38,7 +38,7 @@ std::auto_ptr<AudioReceiver>
 factories::buildAudioReceiver(const char *ip, const char *codec, const long port)
 {
     AudioSinkConfig aConfig("jackaudiosink");
-    ReceiverConfig rConfig(codec, ip, port, tcpGetCaps(ports::CAPS_PORT));
+    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::CAPS_PORT));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
     return rx;

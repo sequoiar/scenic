@@ -10,7 +10,7 @@ int mainRtpVideoTestSuite(int argc, char **argv);
 int mainRtpAudioTestSuite(int argc, char **argv);
 int mainAudioTestSuite(int argc, char **argv);
 
-int mainPof(int argc, char **argv);
+//int mainPof(int argc, char **argv);
 
 int main(int argc, char **argv)
 {
@@ -28,8 +28,10 @@ int main(int argc, char **argv)
        return mainAudioTestSuite(argc,argv);
    else if(filename.find("rtpSyncTester\0") != std::string::npos)
        return mainRtpSyncTestSuite(argc,argv);
-   else if (filename.find("pof\0") != std::string::npos)
+#if 0   
+    else if (filename.find("pof\0") != std::string::npos)
        return mainPof(argc, argv);
+#endif
    else
    {
        std::cout << "Error: Symbolic link name doesn't match exectuable!" << std::endl;

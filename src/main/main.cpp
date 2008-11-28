@@ -18,7 +18,7 @@
  *
  */
 
-#include "gst/control/msgThreadFactory.h"
+#include "gst/msgThreadFactory.h"
 #include "logWriter.h"
 
 ///Instance will register a particular MsgThread as a MapMsg handler
