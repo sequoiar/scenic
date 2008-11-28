@@ -1,5 +1,7 @@
 if SIP
-SUBDIRS = util gutil tcp gst main sip
-else
-SUBDIRS = util gutil tcp gst main  
+SIPDIR = sip
 endif
+if BOOST_PYTHON
+PYTHONDIR = python
+endif
+SUBDIRS = util gutil tcp gst main $(PYTHONDIR) $(SIPDIR)

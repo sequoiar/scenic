@@ -131,6 +131,8 @@ AM_CONDITIONAL([OSC],test "x${have_liblo}" == "xyes" )
 
 AX_PYTHON
 AX_BOOST_PYTHON
+AM_CONDITIONAL([BOOST_PYTHON], test "x${ac_cv_boost_python}" = "xyes")
+
 AX_CHECK_GL
 AX_CHECK_GLU
 
@@ -147,8 +149,6 @@ fi
 #
 #
 #
-echo "x${enable_sip}"
-echo "x${have_libpj}"
 AM_CONDITIONAL([SIP],test "x${enable_sip}" = "xyes" -a "x{have_libpj}" = "xtrue" )
 #AM_CONDITIONAL([IEEE1394],test "x{have_libavc1394}" = "xtrue" -a "x{have_libraw1394}" = "xtrue" )
 AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes" -a "x${have_cpptest}" = "xtrue" )
@@ -166,6 +166,7 @@ AC_CONFIG_FILES([Makefile
                  src/tcp/Makefile
                  src/gst/Makefile
                  src/main/Makefile
+                 src/python/Makefile
                  src/sip/Makefile
                  ])
 

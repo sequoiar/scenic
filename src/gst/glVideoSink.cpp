@@ -60,7 +60,11 @@ gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
     GLfloat vwinRatio = (gfloat)VideoSink::WIDTH/(gfloat)VideoSink::HEIGHT ;
     g_print("WIDTH: %u, HEIGHT: %u", width, height);
-    //fix the port 
+    
+    //TODO:oldDOCS
+    // explain below -- ( screen x - ( needed x res)) == extra space
+    //move origin to extra space / 2 -- so that quad is in the middle of screen
+    //: Why  the disparity between 4/3 and videosink aspect?   
     if (width > height)
         glViewport((width-height*vwinRatio)/2.0, 0, height*(vwinRatio),height);
     else
@@ -69,8 +73,7 @@ gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //TODO: Why  the disparity between 4/3 and videosink aspect? 
-   // gluPerspective(45, vwinRatio, 0.1, 100);  
+    
     gluPerspective(45, NTSC_VIDEO_RATIO , 0.1, 100);  
 
 
@@ -112,7 +115,6 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     glLoadIdentity();
 
     glColor3f(1.0f,0.0f,0.0f);
-//    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
     glTranslatef(leftCrop_, topCrop_,  0.01f);
 
@@ -127,7 +129,6 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     glLoadIdentity();
     glColor3f(0.0f,1.0f,0.0f);
-//    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
     glTranslatef(rightCrop_, bottomCrop_,  0.01f);
 
@@ -149,9 +150,6 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 
     glLoadIdentity();
 
-    //TODO: explain below -- ( screen x - ( needed x res)) == extra space
-    //move origin to extra space / 2 -- so that quad is in the middle of screen
-//    glTranslatef((1.0 - (aspectRatio))/2.0f, 0.0, 0.0); 
     glTranslatef(x_, y_, z_);
 
     glBegin(GL_QUADS);
@@ -227,6 +225,7 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             g_print("unknown keypress %d", event->keyval);
             break;
     }
+#if LOG_COORD_VARS
     LOG_INFO("x:" << x_  <<
             " y:" << y_ <<
             " z:" << z_ <<
@@ -234,7 +233,7 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             " r:" << rightCrop_ <<
             " t:" <<  topCrop_ <<
             " b:" << bottomCrop_);
-
+#endif
 
     return TRUE;
 }
