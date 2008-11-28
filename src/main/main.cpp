@@ -18,7 +18,7 @@
  *
  */
 
-#include "msgThreadFactory.h"
+#include "../gst-thread/msgThreadFactory.h"
 #include "logWriter.h"
 
 class MainSubscriber

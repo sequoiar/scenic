@@ -165,6 +165,7 @@ AC_CONFIG_FILES([Makefile
                  src/gutil/Makefile
                  src/tcp/Makefile
                  src/gst/Makefile
+                 src/gst-thread/Makefile
                  src/main/Makefile
                  src/python/Makefile
                  src/sip/Makefile
