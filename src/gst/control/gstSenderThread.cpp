@@ -18,9 +18,9 @@
  */
 
 #include "gstSenderThread.h"
-#include "gst/audioSender.h"
-#include "gst/videoSender.h"
-#include "gst/playback.h"
+#include "engine/audioSender.h"
+#include "engine/videoSender.h"
+#include "engine/playback.h"
 
 GstSenderThread::~GstSenderThread()
 {

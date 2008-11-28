@@ -21,6 +21,7 @@
 #include <glib.h>
 #include <iostream>
 #include "gstThread.h"
+class ReceiverBase;
 
 /// MapMsg handler thread that calls GST media functionality
 class GstReceiverThread

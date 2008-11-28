@@ -20,9 +20,11 @@
 
 #include "gstThread.h"
 #include "logWriter.h"
-#include "gst/playback.h"
+#include "engine/playback.h"
 #include <iostream>
 
+        void GstThread::audio_stop(MapMsg& ){ playback::stop();} 
+        void GstThread::video_stop(MapMsg& ){ playback::stop();} 
 int GstThread::main()
 {
     bool done = false;

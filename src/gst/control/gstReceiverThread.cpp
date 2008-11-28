@@ -18,9 +18,9 @@
  */
 #include "gstReceiverThread.h"
 
-#include "gst/audioReceiver.h"
-#include "gst/videoReceiver.h"
-#include "gst/playback.h"
+#include "engine/audioReceiver.h"
+#include "engine/videoReceiver.h"
+#include "engine/playback.h"
 #include "hostIP.h"
 
 GstReceiverThread::~GstReceiverThread()

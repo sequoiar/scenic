@@ -19,7 +19,7 @@
  */
 
 #include "gstThread.h"
-
+class SenderBase;
 /// MapMsg handler thread that calls GST media functionality
 class GstSenderThread
     : public GstThread

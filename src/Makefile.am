@@ -4,4 +4,4 @@ endif
 if BOOST_PYTHON
 PYTHONDIR = python
 endif
-SUBDIRS = util gutil tcp gst gst-thread main $(PYTHONDIR) $(SIPDIR)
+SUBDIRS = util gutil tcp gst main $(PYTHONDIR) $(SIPDIR)
