@@ -3,7 +3,6 @@
 
 AC_PREREQ(2.61)
 AC_INIT(PROPULSE_ART, 0.01 )
-AC_CONFIG_SRCDIR([src/gst/mediaBase.h])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
@@ -165,7 +164,8 @@ AC_CONFIG_FILES([Makefile
                  src/gutil/Makefile
                  src/tcp/Makefile
                  src/gst/Makefile
-                 src/gst-thread/Makefile
+                 src/gst/engine/Makefile
+                 src/gst/control/Makefile
                  src/main/Makefile
                  src/python/Makefile
                  src/sip/Makefile
@@ -177,7 +177,7 @@ AC_CONFIG_FILES([
                  src/util/test/Makefile
                  src/gutil/test/Makefile
                  src/tcp/test/Makefile
-                 src/gst/test/Makefile
+                 src/gst/engine/test/Makefile
                  src/sip/test/Makefile
                  ])
 
