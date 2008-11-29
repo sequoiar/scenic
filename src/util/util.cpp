@@ -58,23 +58,32 @@ bool logLevelIsValid(LogLevel level)
 
 std::string logLevelStr(LogLevel level)
 {
+    std::string lstr;
     switch (level)
     {
         case DEBUG:
-            return "DEBUG: ";
+            lstr = "\x1b[32mDEBUG";
+            break;
         case INFO:
-            return "INFO: ";
+            lstr = "\x1b[34mINFO";
+            break;
         case WARNING:
-            return "WARNING: ";
+            lstr = "\x1b[33mWARNING";
+            break;
         case ERROR:
-            return "ERROR: ";
+            lstr = "\x1b[31mERROR";
+            break;
         case CRITICAL:
-            return "CRITICAL: ";
+            lstr = "\x1b[41mCRITICAL";
+            break;
         case ASSERT_FAIL:
-            return "ASSERT_FAIL: ";
+            lstr = "\x1b[41ASSERT_FAIL";
+            break;
         default:
-            return "INVALID LOG LEVEL: ";
+            lstr = "INVALID LOG LEVEL";
     }
+    lstr += "\x1b[0m: ";
+    return lstr;
 }
 
 static logger::Subscriber emptyLogSubscriber;
@@ -119,17 +128,21 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
     std::ostringstream logMsg;
     if (logLevelMatch(level))
     {
+#ifdef CONFIG_DEBUG_LOCAL
         time_t rawtime;
-        struct tm * timeinfo;
-
         time( &rawtime );
-        timeinfo = localtime(&rawtime);
-        logMsg << logLevelStr(level) << msg << " " << functionName <<  "() in " << fileName << ":" << " line " << lineNum << " " <<asctime(timeinfo); 
-        // FIXME: send message to Core
+        struct tm * timeinfo = localtime(&rawtime);
+        //asctime adds a linefeed
+        logMsg << logLevelStr(level) << msg << " " << functionName <<  "() in " << fileName
+            << ":" << " line " << lineNum << " " <<asctime(timeinfo);
+#else
+        logMsg << logLevelStr(level) << msg << std::endl;
+#endif
     }
 
     return logMsg.str();
 }
+
 
 void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, int lineNum,int err)

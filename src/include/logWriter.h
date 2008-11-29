@@ -39,6 +39,7 @@
 #include "config.h"
 
 #ifdef CONFIG_DEBUG
+#define CONFIG_DEBUG_LOCAL
 #define LOG_LEVEL DEBUG
 #else
 #define LOG_LEVEL INFO
@@ -141,4 +142,3 @@ void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileN
 
 
 #endif //  _LOG_WRITER_H_
-
