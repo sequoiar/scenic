@@ -29,6 +29,7 @@
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
+#include <X11/extensions/Xinerama.h>
 
 const unsigned int VideoSink::WIDTH = 720;
 const unsigned int VideoSink::HEIGHT = 528;
@@ -116,6 +117,24 @@ void XvImageSink::init()
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     assert(window_);
+
+    GdkDisplay* display = gdk_display_get_default();
+    assert(display);
+    int n;
+    XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display),&n);
+    if(!xine)
+        n = 0; // don't query ScreenInfo
+    for(int j=0;j<n;j++)
+    {
+        LOG_INFO(   "req:" << screen_num_ << 
+                " screen:" << xine[j].screen_number << 
+                " x:" << xine[j].x_org << 
+                " y:" << xine[j].y_org << 
+                " width:" << xine[j].width << 
+                " height:" << xine[j].height);
+        if (j == screen_num_) 
+            gtk_window_move(GTK_WINDOW(window_),xine[j].x_org,xine[j].y_org);
+    }
 
     gtk_window_set_default_size(GTK_WINDOW(window_), VideoSink::WIDTH, VideoSink::HEIGHT);
     gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
