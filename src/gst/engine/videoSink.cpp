@@ -71,11 +71,15 @@ void VideoSink::showWindow()
 
 void VideoSink::toggleFullscreen(GtkWidget *widget)
 {
+#if 0
     gboolean isFullscreen =
         (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
+#endif
+    static gboolean isFullscreen = FALSE;
 
     // toggle fullscreen state
     isFullscreen ? makeUnfullscreen(widget) : makeFullscreen(widget);
+    isFullscreen = !isFullscreen;
 }
 
 
@@ -138,12 +142,13 @@ void XvImageSink::init()
 
     gtk_window_set_default_size(GTK_WINDOW(window_), VideoSink::WIDTH, VideoSink::HEIGHT);
     gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
+    gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
 
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
-                         expose_cb), static_cast<void*>(this));
+                expose_cb), static_cast<void*>(this));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event",
-                     G_CALLBACK(XvImageSink::key_press_event_cb), NULL);
+            G_CALLBACK(XvImageSink::key_press_event_cb), NULL);
     showWindow();
 }
 
