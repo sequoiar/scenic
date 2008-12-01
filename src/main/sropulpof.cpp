@@ -24,9 +24,11 @@
 #include <cassert>
 #include <cstdlib>
 #include "logWriter.h"
-#include "gutil/optionArgs.h"
+#include "gutil.h"
 #include "gst/msgThreadFactory.h"
-#define BLOCK() ;
+
+#define BLOCK() gutil::runMainLoop(0);
+
 namespace pof 
 {
     short run(int argc, char **argv);
