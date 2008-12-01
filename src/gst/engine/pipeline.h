@@ -58,7 +58,7 @@ class Pipeline
     private:
         void init();
         void add(_GstElement * element);
-        void reset();
+        static void reset();
         _GstBus* getBus() const;
         GstClock* clock() const;
 

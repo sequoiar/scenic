@@ -38,7 +38,6 @@ void VideoTestSuite::start_test_video_gl()
 
     playback::start();
     
-
     BLOCK();
 
     TEST_ASSERT(playback::isPlaying());

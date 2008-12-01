@@ -131,12 +131,14 @@ void Pipeline::init()
 
 
 // TODO: check if this is safe, we're destroying and recreating the pipeline
+// This can't be a class method or else 
+
 void Pipeline::reset()
 {
-    if (pipeline_)
+    if (instance_)
     {
         LOG_DEBUG("Pipeline is being reset.");
-        stop();
+        instance_->stop();
         delete instance_;
         instance_ = 0;
     }
@@ -245,11 +247,12 @@ void Pipeline::remove(GstElement **element) // guarantees that original pointer 
         assert(gst_bin_remove(GST_BIN(pipeline_), *element));
         *element = NULL;
         --refCount_;
-    }
-    if (refCount_ <= 0)
-    {
-        assert(refCount_ == 0);
-        reset();
+
+        if (refCount_ <= 0)
+        {
+            assert(refCount_ == 0);
+            reset();
+        }
     }
 }
 
@@ -258,19 +261,22 @@ void Pipeline::remove(std::vector<GstElement*> &elementVec)
 {
     stop();
     std::vector<GstElement *>::iterator iter;
-    for (iter = elementVec.begin(); iter != elementVec.end(); ++iter)
+    if (!elementVec.empty())
     {
-        if (*iter)
+        for (iter = elementVec.begin(); iter != elementVec.end(); ++iter)
         {
-            assert(gst_bin_remove(GST_BIN(pipeline_), *iter));
-            *iter = NULL;
-            --refCount_;
+            if (*iter)
+            {
+                assert(gst_bin_remove(GST_BIN(pipeline_), *iter));
+                *iter = NULL;
+                --refCount_;
+            }
         }
-    }
-    if (refCount_ <= 0)
-    {
-        assert(refCount_ == 0);
-        reset();
+        if (refCount_ <= 0)
+        {
+            assert(refCount_ == 0);
+            reset();
+        }
     }
 }
 

@@ -31,7 +31,11 @@ class VideoTestSuite
 
         VideoTestSuite()
         {
-            testLength_ = 500000;
+            testLength_ = 4000;
+            
+            TEST_ADD(VideoTestSuite::start_test_video)
+            TEST_ADD(VideoTestSuite::stop_test_video)
+            TEST_ADD(VideoTestSuite::start_stop_test_video)
             
             TEST_ADD(VideoTestSuite::start_test_video_gl)
             TEST_ADD(VideoTestSuite::stop_test_video_gl)
@@ -53,10 +57,6 @@ class VideoTestSuite
             TEST_ADD(VideoTestSuite::stop_file)
             TEST_ADD(VideoTestSuite::start_stop_file)
             
-            TEST_ADD(VideoTestSuite::start_test_video)
-            TEST_ADD(VideoTestSuite::stop_test_video)
-            TEST_ADD(VideoTestSuite::start_stop_test_video)
-        
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
             /*                                              */
