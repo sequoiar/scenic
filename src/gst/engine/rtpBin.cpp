@@ -40,8 +40,11 @@ void RtpBin::init()
     if (rtpbin_ == 0) 
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
 
+#if 0       
+    // needs more work
     g_signal_connect(G_OBJECT(rtpbin_), "get-internal-session", G_CALLBACK(gotInternalSessionCb), NULL);
     requestSession();
+#endif 
 }
 
 
@@ -106,8 +109,7 @@ bool RtpBin::requestSession()
     const guint SESSION_ID = 0;
     //g_signal_emit_by_name(static_cast<gpointer>(rtpbin_), "get-internal-session", SESSION_ID);
     //TODO: use this
-    GObject *session; 
-    g_signal_emit_by_name (static_cast<gpointer>(rtpbin_), "get-internal-session", SESSION_ID, &session);
+    g_signal_emit_by_name (static_cast<gpointer>(rtpbin_), "get-internal-session", SESSION_ID, &session_);
     return false;
 }
 
