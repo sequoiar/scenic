@@ -1,4 +1,4 @@
-/* builder.h
+/* msgThreadFactory.h
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
  * This file is part of [propulse]ART.
