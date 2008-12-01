@@ -1,4 +1,4 @@
-/* GstThread.h
+/* gstThread.h
  * Copyright 2008  Koya Charles & Tristan Matthews
  *
  * This library is free software; you can redistribute it and/or
@@ -48,5 +48,5 @@ class GstThread
         GstThread& operator=(const GstThread&); 
 };
 
-#endif
+#endif // __GST_THREAD__
 

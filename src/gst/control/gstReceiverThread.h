@@ -1,4 +1,4 @@
-/* GstReceiverThread.h
+/* gstReceiverThread.h
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
  * This file is part of [propulse]ART.
@@ -17,6 +17,9 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+#ifndef _GST_RECEIVER_THREAD_H_
+#define _GST_RECEIVER_THREAD_H_
 
 #include <glib.h>
 #include <iostream>
@@ -46,4 +49,6 @@ class GstReceiverThread
         GstReceiverThread& operator=(const GstReceiverThread&); 
 };
 
+
+#endif // _GST_RECEIVER_THREAD_H_
 

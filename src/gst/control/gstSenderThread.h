@@ -18,6 +18,9 @@
  *
  */
 
+#ifndef _GST_SENDER_THREAD_H_
+#define _GST_SENDER_THREAD_H_
+
 #include "gstThread.h"
 class SenderBase;
 /// MapMsg handler thread that calls GST media functionality
@@ -43,4 +46,5 @@ class GstSenderThread
         GstSenderThread& operator=(const GstSenderThread&); 
 };
 
+#endif // _GST_SENDER_THREAD_H_
 
