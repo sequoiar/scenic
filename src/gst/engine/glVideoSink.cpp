@@ -322,8 +322,8 @@ void GLImageSink::init()
 
     gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
     gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
-    g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
-                expose_cb), static_cast<void*>(this));
+    g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(expose_cb), 
+            static_cast<void*>(this));
     g_signal_connect(G_OBJECT(window_), "key-press-event",
             G_CALLBACK(key_press_event_cb), NULL);
     g_signal_connect(G_OBJECT(window_), "scroll-event",

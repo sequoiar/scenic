@@ -114,11 +114,11 @@ fi
 fi
 
 #Trying to set LIBLO using pkg-config
-PKG_CHECK_MODULES(LIBLO, liblo >= 0.25, have_liblo=true, have_liblo=false)
-if test "x${have_liblo}" = "xfalse" ; then
-    AC_MSG_WARN([LIBLO missing. pkg - liblo0,liblo0-dev ])
-fi
-AM_CONDITIONAL([OSC],test "x${have_liblo}" == "xyes" )
+#PKG_CHECK_MODULES(LIBLO, liblo >= 0.25, have_liblo=true, have_liblo=false)
+#if test "x${have_liblo}" = "xfalse" ; then
+#    AC_MSG_WARN([LIBLO missing. pkg - liblo0,liblo0-dev ])
+#fi
+#AM_CONDITIONAL([OSC],test "x${have_liblo}" == "xyes" )
 
 #PYTHON_CFLAGS="-I/usr/include/boost/python "
 #PYTHON_CFLAGS+=`python-config --includes` 
