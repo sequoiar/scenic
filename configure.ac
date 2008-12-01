@@ -136,12 +136,14 @@ AX_CHECK_GL
 AX_CHECK_GLU
 
 if test "x${no_gl}" = "xyes" ; then
-    AC_MSG_ERROR([Missing OpenGL try some of mesa-common-dev libgl1-mesa-swx11-dev, xorg-driver-fglrx-dev nvidia-glx-new-dev.])
+    AC_MSG_WARN([Missing OpenGL try some of mesa-common-dev libgl1-mesa-swx11-dev, xorg-driver-fglrx-dev nvidia-glx-new-dev.])
 fi
 
 AX_CHECK_GLU
 if test "x${no_glu}" = "xyes" ; then
-    AC_MSG_ERROR([Missing GLU install libglu1-mesa-dev])
+    AC_MSG_WARN([Missing GLU install libglu1-mesa-dev])
+else
+    AC_DEFINE(CONFIG_GL,[],[GL define from configure])
 fi
 
 #
@@ -196,5 +198,9 @@ fi
 
 if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
 AC_MSG_NOTICE([Not building 1394 support])
+fi
+
+if test "x${no_glu}" = "xyes" ; then
+AC_MSG_NOTICE([Not building OpenGL support])
 fi
 

@@ -17,7 +17,8 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
+#include "config.h"
+#ifdef CONFIG_GL
 #include <cassert>
 
 #include <gst/interfaces/xoverlay.h>
@@ -335,4 +336,4 @@ void GLImageSink::init()
     g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
     showWindow();
 }
-
+#endif //CONFIG_GL

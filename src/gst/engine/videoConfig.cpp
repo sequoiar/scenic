@@ -1,36 +1,39 @@
+/* videoConfig.cpp
+ * Copyright 2008 Koya Charles & Tristan Matthews 
+ *
+ * This file is part of [propulse]ART.
+ *
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-//
-// videoConfig.cpp // // Copyright 2008 Koya Charles & Tristan Matthews
-//
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
 
 /** \file
  *      Class for video parameter objects.
  *
  */
 
+#include <fstream>
 #include "logWriter.h"
 #include "videoConfig.h"
 #include "logWriter.h"
 #include "videoSource.h"
 #include "videoSink.h"
+#include "config.h"
+#ifdef CONFIG_GL
 #include "glVideoSink.h"
-#include <fstream>
-
+#endif
 
 VideoSource * VideoSourceConfig::createSource() const
 {
@@ -75,8 +78,10 @@ VideoSink * VideoSinkConfig::createSink() const
         return new XvImageSink();
     else if (sink_ == "ximagesink")
         return new XImageSink();
+#ifdef CONFIG_GL
     else if (sink_ == "glimagesink")
         return new GLImageSink(screenNum_);
+#endif
     else
         THROW_ERROR(sink_ << " is an invalid sink");
     return 0;
