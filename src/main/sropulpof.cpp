@@ -46,6 +46,7 @@ short pof::run(int argc, char **argv)
     char *ip = 0;
     char *videoCodec = 0;
     char *audioCodec = 0;
+    char *videoSink = 0;
     int audioPort = 0;
     int videoPort = 0;
     char *videoDevice = 0;
@@ -56,6 +57,7 @@ short pof::run(int argc, char **argv)
     options.add(new StringArg(&ip, "address", 'i', "address", "provide ip address"));
     options.add(new StringArg(&videoCodec, "videocodec", 'v', "videocodec", "h264"));
     options.add(new StringArg(&audioCodec, "audiocodec", 'a', "audiocodec", "vorbis raw mp3"));
+    options.add(new StringArg(&videoSink, "videosink", 'k', "videosink", "xvimagesink glimagesink"));
     options.add(new IntArg(&audioPort, "audioport", 't', "audioport", ""));
     options.add(new IntArg(&videoPort, "videoport", 'p', "videoport", ""));
     options.add(new BoolArg(&send,"sender", 's', "sender"));
@@ -72,9 +74,7 @@ short pof::run(int argc, char **argv)
     if (pid == 'r') {
         std::auto_ptr<AudioReceiver> aRx(factories::buildAudioReceiver(ip, audioCodec, audioPort));
         playback::start();
-
-        std::auto_ptr<VideoReceiver> vRx(factories::buildVideoReceiver(ip, videoCodec, videoPort, screenNum));
-    
+        std::auto_ptr<VideoReceiver> vRx(factories::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink));
         if(full)
             vRx->getVideoSink()->makeFullscreen();
 

@@ -34,6 +34,8 @@ namespace ports {
         const long CAPS_PORT = 12000;
 }
 
+#define DEFAULT_SINK "xvimagesink"
+
 namespace factories 
 {
     std::auto_ptr<AudioSender> 
@@ -45,7 +47,7 @@ namespace factories
 
     std::auto_ptr<VideoReceiver> 
     buildVideoReceiver(const char *ip, const char * codec, const long port = ports::V_PORT, 
-                       int screen_num = 0, const char *sink = "glimagesink");
+                       int screen_num = 0, const char *sink = DEFAULT_SINK);
     
     std::auto_ptr<VideoSender> buildVideoSender(const VideoSourceConfig vConfig, 
             const char *ip, const char *codec, const long port = ports::V_PORT);
@@ -63,6 +65,8 @@ factories::buildAudioSender(const AudioSourceConfig aConfig, const char* ip, con
 std::auto_ptr<AudioReceiver> 
 factories::buildAudioReceiver(const char *ip, const char *codec, const long port, const char *sink)
 {
+    if(!sink)
+        sink = DEFAULT_SINK;
     AudioSinkConfig aConfig(sink);
     ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::CAPS_PORT));
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
