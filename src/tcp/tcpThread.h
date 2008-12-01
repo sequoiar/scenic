@@ -18,6 +18,9 @@
  *
  */
 
+#ifndef _TCP_THREAD_H_
+#define _TCP_THREAD_H_
+
 #include <memory>
 #include "logWriter.h"
 #include "msgThread.h"
@@ -45,4 +48,6 @@ class TcpThread
         TcpThread(const TcpThread&);            //No Copy Constructor
         TcpThread& operator=(const TcpThread&); //No Assignment Operator
 };
+
+#endif // _TCP_THREAD_H_
 

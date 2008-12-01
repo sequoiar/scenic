@@ -1,3 +1,4 @@
+
 /* msgThreadFactory.h
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
@@ -31,5 +32,5 @@ namespace MsgThreadFactory
     MsgThread* Gst(bool send);
 }
 
-#endif
+#endif // __MSG_THREAD_FACTORY_H__
 
