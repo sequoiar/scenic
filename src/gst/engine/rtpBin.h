@@ -44,6 +44,7 @@ class RtpBin
         _GstElement *rtcp_sender_, *rtcp_receiver_;
 
     private:
+        static _GObject *session_;
         static bool requestSession();
         static _GObject *gotInternalSessionCb(_GstElement *rtpBin, unsigned int session, void *data);
 
