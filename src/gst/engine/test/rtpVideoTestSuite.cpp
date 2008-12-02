@@ -27,22 +27,21 @@
 #include "videoConfig.h"
 #include "videoReceiver.h"
 #include "playback.h"
-#include "hostIP.h"
-#include "tcp/tcpThread.h"
-#include "tcp/parser.h"
+#include "gst/videoFactory.h"
 
+#if 0
 
-static std::auto_ptr<VideoReceiver> buildVideoReceiver(const char *videoSink = "xvimagesink", int screen_num = 0)
+static std::auto_ptr<VideoReceiver> videofactory::buildVideoReceiver(const char *videoSink = "xvimagesink", int screen_num = 0)
 {
         VideoSinkConfig vConfig(videoSink, screen_num);
-        ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT, "");
+        ReceiverConfig rConfig("h264", get_host_ip(), ports::V_PORT, "");
         std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
         rx->init();
         return rx;
 }
 
 
-static std::auto_ptr<VideoSender> buildVideoSender(const VideoSourceConfig vConfig)
+static std::auto_ptr<VideoSender> videofactory::buildVideoSender(const VideoSourceConfig vConfig)
 {
         SenderConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
         std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
@@ -50,11 +49,12 @@ static std::auto_ptr<VideoSender> buildVideoSender(const VideoSourceConfig vConf
         return tx;
 }
 
+#endif
 
 void RtpVideoTestSuite::start_test_video()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         playback::start();
 
@@ -63,7 +63,7 @@ void RtpVideoTestSuite::start_test_video()
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -76,7 +76,7 @@ void RtpVideoTestSuite::start_test_video()
 void RtpVideoTestSuite::stop_test_video()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         BLOCK();
 
@@ -85,7 +85,7 @@ void RtpVideoTestSuite::stop_test_video()
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         BLOCK();
 
@@ -98,7 +98,7 @@ void RtpVideoTestSuite::stop_test_video()
 void RtpVideoTestSuite::start_stop_test_video()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         playback::start();
 
@@ -110,7 +110,7 @@ void RtpVideoTestSuite::start_stop_test_video()
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -126,7 +126,7 @@ void RtpVideoTestSuite::start_stop_test_video()
 void RtpVideoTestSuite::start_v4l()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         playback::start();
 
@@ -135,7 +135,7 @@ void RtpVideoTestSuite::start_v4l()
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -148,7 +148,7 @@ void RtpVideoTestSuite::start_v4l()
 void RtpVideoTestSuite::stop_v4l()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         BLOCK();
 
@@ -157,7 +157,7 @@ void RtpVideoTestSuite::stop_v4l()
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         BLOCK();
 
@@ -170,7 +170,7 @@ void RtpVideoTestSuite::stop_v4l()
 void RtpVideoTestSuite::start_stop_v4l()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         playback::start();
 
@@ -182,7 +182,7 @@ void RtpVideoTestSuite::start_stop_v4l()
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -199,7 +199,7 @@ void RtpVideoTestSuite::start_stop_v4l()
 void RtpVideoTestSuite::start_v4l_gl()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver("glimagesink"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("glimagesink"));
 
         playback::start();
 
@@ -208,7 +208,7 @@ void RtpVideoTestSuite::start_v4l_gl()
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -221,7 +221,7 @@ void RtpVideoTestSuite::start_v4l_gl()
 void RtpVideoTestSuite::stop_v4l_gl()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver("glimagesink"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("glimagesink"));
 
         BLOCK();
 
@@ -230,7 +230,7 @@ void RtpVideoTestSuite::stop_v4l_gl()
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         BLOCK();
 
@@ -243,7 +243,7 @@ void RtpVideoTestSuite::stop_v4l_gl()
 void RtpVideoTestSuite::start_stop_v4l_gl()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver("glimagesink"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("glimagesink"));
 
         playback::start();
 
@@ -255,7 +255,7 @@ void RtpVideoTestSuite::start_stop_v4l_gl()
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -272,7 +272,7 @@ void RtpVideoTestSuite::start_dv()
 {
     // receiver should be started first, of course there's no guarantee that it will at this point
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         playback::start();
 
@@ -281,7 +281,7 @@ void RtpVideoTestSuite::start_dv()
     }
     else {
         VideoSourceConfig vConfig("dv1394src");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -294,7 +294,7 @@ void RtpVideoTestSuite::start_dv()
 void RtpVideoTestSuite::stop_dv()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         BLOCK();
 
@@ -303,7 +303,7 @@ void RtpVideoTestSuite::stop_dv()
     }
     else {
         VideoSourceConfig vConfig("dv1394src");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         BLOCK();
 
@@ -316,7 +316,7 @@ void RtpVideoTestSuite::stop_dv()
 void RtpVideoTestSuite::start_stop_dv()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         playback::start();
 
@@ -328,7 +328,7 @@ void RtpVideoTestSuite::start_stop_dv()
     }
     else {
         VideoSourceConfig vConfig("dv1394src");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -345,7 +345,7 @@ void RtpVideoTestSuite::start_dv_gl()
 {
     // receiver should be started first, of course there's no guarantee that it will at this point
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver("glimagesink"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("glimagesink"));
 
         playback::start();
 
@@ -354,7 +354,7 @@ void RtpVideoTestSuite::start_dv_gl()
     }
     else {
         VideoSourceConfig vConfig("dv1394src");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -367,7 +367,7 @@ void RtpVideoTestSuite::start_dv_gl()
 void RtpVideoTestSuite::stop_dv_gl()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver("glimagesink"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("glimagesink"));
 
         BLOCK();
 
@@ -376,7 +376,7 @@ void RtpVideoTestSuite::stop_dv_gl()
     }
     else {
         VideoSourceConfig vConfig("dv1394src");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         BLOCK();
 
@@ -389,7 +389,7 @@ void RtpVideoTestSuite::stop_dv_gl()
 void RtpVideoTestSuite::start_stop_dv_gl()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver("glimagesink"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("glimagesink"));
 
         playback::start();
 
@@ -401,7 +401,7 @@ void RtpVideoTestSuite::start_stop_dv_gl()
     }
     else {
         VideoSourceConfig vConfig("dv1394src");
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -417,7 +417,7 @@ void RtpVideoTestSuite::start_file()
 {
     // receiver should be started first, of course there's no guarantee that it will at this point
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         playback::start();
 
@@ -426,7 +426,7 @@ void RtpVideoTestSuite::start_file()
     }
     else {
         VideoSourceConfig vConfig("filesrc", videoFilename_);
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -439,7 +439,7 @@ void RtpVideoTestSuite::start_file()
 void RtpVideoTestSuite::stop_file()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         BLOCK();
 
@@ -448,7 +448,7 @@ void RtpVideoTestSuite::stop_file()
     }
     else {
         VideoSourceConfig vConfig("filesrc", videoFilename_);
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         BLOCK();
 
@@ -461,7 +461,7 @@ void RtpVideoTestSuite::stop_file()
 void RtpVideoTestSuite::start_stop_file()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         playback::start();
 
@@ -474,7 +474,7 @@ void RtpVideoTestSuite::start_stop_file()
     else {
         VideoSourceConfig vConfig("filesrc", videoFilename_);
         
-        std::auto_ptr<VideoSender> tx(buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 

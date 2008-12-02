@@ -33,7 +33,7 @@ class SyncTestSuiteRtp
         SyncTestSuiteRtp()
         {
             // DANGER: if this is too short you're likely to have synchronization issues
-            testLength_ = 10000;
+            testLength_ = 100000;
 
                 TEST_ADD(SyncTestSuiteRtp::start_audiotest_videotest)
                 TEST_ADD(SyncTestSuiteRtp::stop_audiotest_videotest)

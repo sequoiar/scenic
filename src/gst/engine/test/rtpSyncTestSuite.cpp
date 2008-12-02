@@ -103,21 +103,20 @@ void SyncTestSuiteRtp::start_jack_v4l()
 
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
-        playback::start();
-        
         std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
+        playback::start();
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
     }
     else {
+        VideoSourceConfig vConfig("v4l2src"); 
+        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
+
         AudioSourceConfig aConfig("jackaudiosrc", numChannels);
         std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, aTx->getCaps()));
-
-        VideoSourceConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
@@ -161,9 +160,8 @@ void SyncTestSuiteRtp::start_stop_jack_v4l()
 
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
-        playback::start();
-        
         std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
+        playback::start();
 
         BLOCK();
 
@@ -174,14 +172,14 @@ void SyncTestSuiteRtp::start_stop_jack_v4l()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
+        VideoSourceConfig vConfig("v4l2src"); 
+        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
+
         AudioSourceConfig aConfig("jackaudiosrc", audioFilename_, numChannels);
         std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
         playback::start();
-        //usleep(100000); // GIVE receiver chance to start waiting
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, aTx->getCaps()));
 
-        VideoSourceConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         BLOCK();
 
@@ -297,24 +295,23 @@ void SyncTestSuiteRtp::start_dv_audio_dv_video()
     int numChannels = 2;
 
     if (id_ == 0) {
+        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
         std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
         playback::start();
         
-        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
 
         BLOCK();
 
         TEST_ASSERT(playback::isPlaying());
     }
     else {
+        VideoSourceConfig vConfig("dv1394src"); 
+        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
+
         AudioSourceConfig aConfig("dv1394src", numChannels);
         std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, aTx->getCaps()));
-
-        VideoSourceConfig vConfig("dv1394src"); 
-        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
-
 
         BLOCK();
 
@@ -359,9 +356,9 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video()
 
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
-        playback::start();
-
         std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
+        
+        playback::start();
 
         BLOCK();
 
@@ -372,14 +369,14 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        AudioSourceConfig aConfig("dv1394src", numChannels);
-        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
-        playback::start();
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, aTx->getCaps()));
 
         VideoSourceConfig vConfig("dv1394src"); 
         std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
+        AudioSourceConfig aConfig("dv1394src", numChannels);
+        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
+        playback::start();
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, aTx->getCaps()));
         //usleep(100000); // GIVE receiver chance to start waiting
 
         BLOCK();
@@ -399,22 +396,22 @@ void SyncTestSuiteRtp::start_audiotest_videotest()
 
     if (id_ == 0) {
         std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
+        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
         playback::start();
         
-        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
-
         BLOCK();
 
         TEST_ASSERT(playback::isPlaying());
     }
     else {
+
+        VideoSourceConfig vConfig("videotestsrc"); 
+        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
+
         AudioSourceConfig aConfig("audiotestsrc", numChannels);
         std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, aTx->getCaps()));
-
-        VideoSourceConfig vConfig("videotestsrc"); 
-        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         //usleep(100000); // FIXME: this is all kinds of bad, GIVE receiver chance to start waiting
 
@@ -460,10 +457,9 @@ void SyncTestSuiteRtp::start_stop_audiotest_videotest()
     int numChannels = 2;
 
     if (id_ == 0) {
+        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
         std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
         playback::start();
-
-        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
 
         BLOCK();
 
@@ -474,14 +470,14 @@ void SyncTestSuiteRtp::start_stop_audiotest_videotest()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        AudioSourceConfig aConfig("audiotestsrc", numChannels);
-        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
-        playback::start();
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, aTx->getCaps()));
 
         VideoSourceConfig vConfig("videotestsrc"); 
         std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
+        AudioSourceConfig aConfig("audiotestsrc", numChannels);
+        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
+        playback::start();
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, aTx->getCaps()));
         //usleep(100000); // GIVE receiver chance to start waiting
 
         BLOCK();

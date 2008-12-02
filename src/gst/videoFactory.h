@@ -26,7 +26,6 @@
 #include "ports.h"
 #include "gst/engine.h"
 #include <memory>   // for std::auto_ptr
-#include "tcp/singleBuffer.h"
 
 namespace videofactory
 {
@@ -35,10 +34,10 @@ namespace videofactory
 
     static std::auto_ptr<VideoReceiver> 
     buildVideoReceiver(const char *ip = ports::IP, const char * codec = V_CODEC, const long port = ports::V_PORT, 
-                       int screen_num = 0, const char *sink = V_SINK);
-    
+            int screen_num = 0, const char *sink = V_SINK);
+
     static std::auto_ptr<VideoSender> 
-        buildVideoSender(const VideoSourceConfig vConfig, 
+    buildVideoSender(const VideoSourceConfig vConfig, 
             const char *ip = ports::IP, const char *codec = V_CODEC, const long port = ports::V_PORT);
 }
 

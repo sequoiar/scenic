@@ -3,17 +3,11 @@
 #include <glib.h>
 #include "gstTestSuite.h"
 
-const int GstTestSuite::V_PORT = 10000;
-const int GstTestSuite::A_PORT = 11000;
-const int GstTestSuite::CAPS_PORT = 12000;
-//const int GstTestSuite::NUM_CHANNELS = 2;
-
 void GstTestSuite::setup()
 {
     std::cout.flush();
     std::cout << std::endl;
 }
-
 
 void GstTestSuite::tear_down()
 {
