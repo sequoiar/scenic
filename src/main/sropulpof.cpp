@@ -18,7 +18,8 @@
  *
  */
 
-#include "gst/factories.h"
+#include "gst/videoFactory.h"
+#include "gst/audioFactory.h"
 //#include "eventLoop.h"
 //#include "videoSink.h"
 #include <cassert>
@@ -72,9 +73,9 @@ short pof::run(int argc, char **argv)
 
     LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
     if (pid == 'r') {
-        std::auto_ptr<AudioReceiver> aRx(factories::buildAudioReceiver(ip, audioCodec, audioPort));
+        std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver(ip, audioCodec, audioPort));
         playback::start();
-        std::auto_ptr<VideoReceiver> vRx(factories::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink));
+        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink));
         if(full)
             vRx->getVideoSink()->makeFullscreen();
 
@@ -85,7 +86,7 @@ short pof::run(int argc, char **argv)
     }
     else {
         AudioSourceConfig aConfig("jackaudiosrc", pof::NUM_CHANNELS);
-        std::auto_ptr<AudioSender> aTx(factories::buildAudioSender(aConfig, ip, audioCodec, audioPort));
+        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort));
         playback::start();
         assert(tcpSendBuffer(ip, ports::CAPS_PORT, aTx->getCaps()));
         VideoSourceConfig *vConfig; 
@@ -95,7 +96,7 @@ short pof::run(int argc, char **argv)
         else
             vConfig = new VideoSourceConfig("v4l2src");
 
-        std::auto_ptr<VideoSender> vTx(factories::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
+        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
         delete vConfig;
 
         BLOCK();

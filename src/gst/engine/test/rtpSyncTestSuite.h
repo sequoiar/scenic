@@ -18,8 +18,8 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _SYNC_TEST_SUITE_H_
-#define _SYNC_TEST_SUITE_H_
+#ifndef _RTP_SYNC_TEST_SUITE_H_
+#define _RTP_SYNC_TEST_SUITE_H_
 
 #include "gstTestSuite.h"
 
@@ -75,5 +75,5 @@ class SyncTestSuiteRtp
 
 };
 
-#endif // _SYNC_TEST_SUITE_H_
+#endif // _RTP_SYNC_TEST_SUITE_H_
 

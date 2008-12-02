@@ -32,9 +32,9 @@
 #include "tcp/parser.h"
 
 
-static std::auto_ptr<VideoReceiver> buildVideoReceiver(const char *videoSink = "xvimagesink")
+static std::auto_ptr<VideoReceiver> buildVideoReceiver(const char *videoSink = "xvimagesink", int screen_num = 0)
 {
-        VideoSinkConfig vConfig(videoSink);
+        VideoSinkConfig vConfig(videoSink, screen_num);
         ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT, "");
         std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
         rx->init();

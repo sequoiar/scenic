@@ -51,6 +51,7 @@ class GstTestSuite
         static bool areValidArgs(int argc, char **argv);
         const static int A_PORT;
         const static int V_PORT;
+        const static int CAPS_PORT;
         
     protected:
 
