@@ -253,6 +253,7 @@ GLImageSink::~GLImageSink()
 
 bool GLImageSink::handleBusMsg(GstMessage* msg)
 {
+    return false;
     if(GST_MESSAGE_TYPE(msg) != GST_MESSAGE_ELEMENT)
         return false;
 
