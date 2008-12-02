@@ -58,13 +58,13 @@ short pof::run(int argc, char **argv)
     options.add(new StringArg(&videoCodec, "videocodec", 'v', "videocodec", "h264"));
     options.add(new StringArg(&audioCodec, "audiocodec", 'a', "audiocodec", "vorbis raw mp3"));
     options.add(new StringArg(&videoSink, "videosink", 'k', "videosink", "xvimagesink glimagesink"));
-    options.add(new IntArg(&audioPort, "audioport", 't', "audioport", ""));
-    options.add(new IntArg(&videoPort, "videoport", 'p', "videoport", ""));
+    options.add(new IntArg(&audioPort, "audioport", 't', "audioport", "portnum"));
+    options.add(new IntArg(&videoPort, "videoport", 'p', "videoport", "portnum"));
     options.add(new BoolArg(&send,"sender", 's', "sender"));
     options.add(new BoolArg(&recv,"receiver", 'r', "receiver"));
     options.add(new BoolArg(&full,"fullscreen", 'f', "default to fullscreen"));
     options.add(new StringArg(&videoDevice, "videoDevice", 'd', "device", "/dev/video0 /dev/video1"));
-    options.add(new IntArg(&screenNum, "screenNum", 'n', "screenNum", ""));
+    options.add(new IntArg(&screenNum, "screenNum", 'n', "screenNum", "xinerama screen num"));
 
     options.parse(argc, argv);
 
