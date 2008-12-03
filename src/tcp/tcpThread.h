@@ -25,7 +25,6 @@
 #include "logWriter.h"
 #include "msgThread.h"
 #include "tcpServer.h"
-
 /// tcp server in a thread - also provides log message dispatching
 class TcpThread
     : public MsgThread
@@ -34,9 +33,10 @@ class TcpThread
         TcpThread(int inport, bool logF=false);
         ~TcpThread(){}
         bool send(MapMsg& msg);
-
         bool socket_connect_send(const std::string& addr, MapMsg& msg);
-
+ 
+        ///No Copy Constructor
+        TcpThread(const TcpThread& ):serv_(1024),logFlag_(false),lf_(0){THROW_ERROR("CopyConstructor was called error!");}           
     private:
         int main();
         bool gotQuit();
@@ -45,9 +45,9 @@ class TcpThread
         bool logFlag_;
         std::auto_ptr<logger::Subscriber> lf_;
 
-        TcpThread(const TcpThread&);            //No Copy Constructor
         TcpThread& operator=(const TcpThread&); //No Assignment Operator
 };
+
 
 #endif // _TCP_THREAD_H_
 

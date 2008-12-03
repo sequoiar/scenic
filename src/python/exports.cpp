@@ -33,12 +33,78 @@
 
 using namespace boost::python;
 
+class Hello
+{
+public:
+    Hello(){}
+    const char* greet(){ return "hello";}
+
+
+};
+
+
+
 #if 0
-BOOST_PYTHON_MODULE(libpyhello)
+BOOST_PYTHON_MODULE(libpyboostskel)
 {
     class_ < Hello > ("Hello")
         .def("greet", &Hello::greet)
-        .def("set_name",&Hello::set_name);
+    ;
 }
 #endif
+#include "tcp/tcpThread.h"
+#include "wrapMsgThread.h"
+
+
+BOOST_PYTHON_MODULE(libpyboostskel)
+{
+    class_ < TcpThread > ("TcpThread",init < int, bool > ())
+    ;
+    class_ < WrapMsgThread > ("WrapMsgThread",init < TcpThread* > ())
+        .def("getMsg", &WrapMsgThread::getMsg)
+        .def("send", &WrapMsgThread::send)
+    ;
+}
+
+
+
+        //.def("getQueue", &TcpThread::getQueue)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#if 0
+class Handler 
+{   
+public:
+    virtual std::string disp(MapMsg& /*msg*/){return "";}
+    Handler(MapMsg& msg) { disp(msg);}
+    virtual ~Handler(){}
+
+};
+
+class ASubscriber : public msg::Subscriber
+{
+    Handler &h_;
+    public:
+        ASubscriber(Handler& h)
+            : h_(h)
+        {}
+void operator()(MapMsg& msg){ h(msg); }
+};
+#endif
+
+
+
 

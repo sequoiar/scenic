@@ -62,22 +62,22 @@ std::string logLevelStr(LogLevel level)
     switch (level)
     {
         case DEBUG:
-            lstr = "\x1b[32mDEBUG";
+            lstr = "\r\x1b[32mDEBUG";
             break;
         case INFO:
-            lstr = "\x1b[34mINFO";
+            lstr = "\r\x1b[34mINFO";
             break;
         case WARNING:
-            lstr = "\x1b[33mWARNING";
+            lstr = "\r\x1b[33mWARNING";
             break;
         case ERROR:
-            lstr = "\x1b[31mERROR";
+            lstr = "\r\x1b[31mERROR";
             break;
         case CRITICAL:
-            lstr = "\x1b[41mCRITICAL";
+            lstr = "\r\x1b[41mCRITICAL";
             break;
         case ASSERT_FAIL:
-            lstr = "\x1b[41ASSERT_FAIL";
+            lstr = "\r\x1b[41ASSERT_FAIL";
             break;
         default:
             lstr = "INVALID LOG LEVEL";

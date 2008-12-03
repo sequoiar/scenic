@@ -51,6 +51,8 @@ fi
 
 fi
 
+CXXFLAGS+=" -fPIC "
+
 #Trying to set GLIB using pkg-config
 PKG_CHECK_MODULES(GLIB, [glib-2.0 gthread-2.0], have_glib=true, have_glib=false)
 if test "x${have_glib}" = "xfalse" ; then
