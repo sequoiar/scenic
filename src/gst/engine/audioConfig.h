@@ -1,3 +1,4 @@
+
 /* audioConfig.h
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
@@ -17,11 +18,11 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #ifndef _AUDIO_LOCAL_CONFIG_H_
 #define _AUDIO_LOCAL_CONFIG_H_
 
 #include <string>
-#include "logWriter.h"
 
 // forward declarations
 class AudioSource;
@@ -31,44 +32,23 @@ class AudioSink;
 class AudioSourceConfig
 {
     public:
-        /// Constructor sets by default location to an empty string and loop to LOOP_NONE 
-        AudioSourceConfig(const std::string & source__, int numChannels__, int loop__ = LOOP_NONE)
-            : source_(source__), location_(""), numChannels_(numChannels__), loop_(loop__)
-        {
-            if (source_.empty())
-                THROW_ERROR("No source specified");
-            if(numChannels_ < 1 || numChannels_ > 8)
-                THROW_ERROR("Invalid number of channels");
-        }
-        /** 
-         * Constuctor sets by default loop to LOOP_NONE, but has file location specified */
+        AudioSourceConfig(const std::string & source__, int numChannels__, int loop__ = LOOP_NONE);
+        
         AudioSourceConfig(const std::string & source__, const std::string & location__,
-                int numChannels__, int loop__ = LOOP_NONE)
-            : source_(source__), location_(location__), numChannels_(numChannels__) , loop_(loop__)
-        {}
-        /** 
-         * Copy constructor */
-        AudioSourceConfig(const AudioSourceConfig& m)
-            : source_(m.source_), location_(m.location_), numChannels_(m.numChannels_) , loop_(m.loop_) 
-        {}
+                int numChannels__, int loop__ = LOOP_NONE);
+        
+        AudioSourceConfig(const AudioSourceConfig& m);
 
-        /// Returns c-style string specifying the source 
         const char *source() const;
-        /** 
-         * Returns number of channels */
-        int numChannels() const { return numChannels_; }
-        /** 
-         * Returns number of times file will be played */
-        int loop() const { return loop_; }
-        /** 
-         * Returns c-style string specifying the location 
-         * (either filename or device descriptor) */
+
+        int numChannels() const;
+
+        int loop() const;
+
         const char *location() const;
-        /** 
-         * Returns true if location indicates an existing, readable file. */
+
         bool fileExists() const;
          
-        /// Factory method that creates an AudioSource based on this object's source_ string 
         AudioSource* createSource() const;
 
         /** Enum representing two possible loop settings, any other will correspond 
@@ -92,16 +72,10 @@ class AudioSourceConfig
 class AudioSinkConfig 
 {
     public:
-        /// Constructor 
-        AudioSinkConfig(const std::string & sink__)
-            : sink_(sink__)
-        {}
-        /** 
-         * Copy constructor */
-        AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_) 
-        {}
+        AudioSinkConfig(const std::string & sink__);
+        
+        AudioSinkConfig(const AudioSinkConfig & m); 
 
-        /// Factory method that creates an AudioSink based on this object's sink_ string 
         AudioSink* createSink() const;
 
     private:

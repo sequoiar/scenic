@@ -51,9 +51,6 @@ RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remote
 }
 
 
-// FIXME: how to make sure right client get right codec?
-// presently, video client could ask for a vorbisencoder for example. 
-
 Encoder * SenderConfig::createVideoEncoder() const
 {
     if (codec_.empty())

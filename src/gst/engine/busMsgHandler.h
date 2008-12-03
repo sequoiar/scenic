@@ -24,9 +24,9 @@
 
 class _GstMessage;
 
-/** \class BusMsgHandler
+/** 
 * Abstract interface which requires its implementors to provide 
-* functionality to handle messages posted on the bus. Variation of
+* functionality to handle messages posted on the bus. Variation on
 * the Observer and Chain of Responsibility patterns.
 */
 

@@ -30,19 +30,18 @@
 #include "pipeline.h"
 #include "audioSink.h"
 
+
+/// Constructor 
+AudioLocal::AudioLocal(const AudioSourceConfig srcConfig, const AudioSinkConfig sinkConfig) 
+    : srcConfig_(srcConfig), sinkConfig_(sinkConfig), source_(0), level_(), sink_(0) 
+{}
+
+/// Destructor 
 AudioLocal::~AudioLocal()
 {
     delete sink_;
     delete source_;
 }
-
-
-#if 0
-std::string AudioLocal::getCaps() 
-{ 
-    return sink_->getCaps(); 
-}
-#endif
 
 
 void AudioLocal::init_source()

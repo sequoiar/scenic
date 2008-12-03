@@ -29,11 +29,53 @@
 #include "audioSink.h"
 #include "logWriter.h"
 
+/// Constructor sets by default location to an empty string and loop to LOOP_NONE 
+AudioSourceConfig::AudioSourceConfig(const std::string & source__, 
+                  int numChannels__, 
+                  int loop__) : 
+    source_(source__), location_(""), numChannels_(numChannels__), loop_(loop__)
+{
+    if (source_.empty())
+        THROW_ERROR("No source specified");
+    if(numChannels_ < 1 || numChannels_ > 8)
+        THROW_ERROR("Invalid number of channels");
+}
+
+
+///  Constuctor sets by default loop to LOOP_NONE, but has file location specified 
+AudioSourceConfig::AudioSourceConfig(const std::string & source__, 
+                  const std::string & location__,
+                  int numChannels__, 
+                  int loop__) : 
+    source_(source__), location_(location__), numChannels_(numChannels__) , loop_(loop__)
+{}
+
+
+/// Copy constructor 
+AudioSourceConfig::AudioSourceConfig(const AudioSourceConfig& m) : 
+    source_(m.source_), location_(m.location_), numChannels_(m.numChannels_) , loop_(m.loop_) 
+{}
+
+
+/// Returns c-style string specifying the source 
 const char *AudioSourceConfig::source() const
 {
     return source_.c_str();
 }
 
+/// Returns number of channels 
+int AudioSourceConfig::numChannels() const 
+{ 
+    return numChannels_; 
+}
+
+/// Returns number of times file will be played 
+int AudioSourceConfig::loop() const 
+{ 
+    return loop_; 
+}
+
+/// Factory method that creates an AudioSource based on this object's source_ string 
 AudioSource* AudioSourceConfig::createSource() const
 {
     if (source_ == "audiotestsrc")
@@ -54,6 +96,7 @@ AudioSource* AudioSourceConfig::createSource() const
 }
 
 
+/// Returns c-style string specifying the location (either filename or device descriptor) 
 const char* AudioSourceConfig::location() const
 {
     if (location_.empty())
@@ -63,6 +106,7 @@ const char* AudioSourceConfig::location() const
 }
 
 
+/// Returns true if location indicates an existing, readable file/device. 
 bool AudioSourceConfig::fileExists() const
 {
     if (location_.empty())
@@ -78,7 +122,16 @@ bool AudioSourceConfig::fileExists() const
     return true;
 }
 
+/// Constructor 
+AudioSinkConfig::AudioSinkConfig(const std::string & sink__) : 
+    sink_(sink__)
+{}
 
+/// Copy constructor 
+AudioSinkConfig::AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_) 
+{}
+
+/// Factory method that creates an AudioSink based on this object's sink_ string 
 AudioSink* AudioSinkConfig::createSink() const
 {
     if (sink_ == "jackaudiosink")

@@ -35,32 +35,18 @@ class AudioSender
     : public SenderBase 
 {
     public:
-        /// Constructor 
-        AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig) 
-            : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), source_(0), 
-            level_(), encoder_(0), payloader_(0)
-        {}
+        AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig);
 
-        /// Destructor 
         ~AudioSender();
 
-        /// Returns the capabilities of this AudioSender's RtpSession 
-        std::string getCaps() { return session_.getCaps(); }
-        
+        std::string getCaps() const;
 
     private:
-        // helper methods
-
-        /// Implementation of SenderBase's template method initialization 
         void init_source();
         void init_level();
         void init_codec();
         void init_payloader();
 
-        // performed outside of gst
-        //void send_caps() const;
-
-        // data
         const AudioSourceConfig audioConfig_;
         const SenderConfig remoteConfig_;
         RtpSender session_;
@@ -70,8 +56,10 @@ class AudioSender
         Encoder *encoder_;
         RtpPay *payloader_;
 
-        AudioSender(const AudioSender&); //No Copy Constructor
-        AudioSender& operator=(const AudioSender&); //No Assignment Operator
+        /// No Copy Constructor
+        AudioSender(const AudioSender&); 
+        /// No Assignment Operator
+        AudioSender& operator=(const AudioSender&); 
 };
 
 #endif // _AUDIO_SENDER_H_

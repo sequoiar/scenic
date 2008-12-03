@@ -30,11 +30,19 @@
 #include <iostream>
 #include <iterator>
 
+
+/** Constructor sets by default emitMessages to true 
+ * and message interval to one second */
+AudioLevel::AudioLevel() : 
+    level_(0), emitMessages_(true), rmsValues_(0), interval_(1000000000LL) {}
+
+/// Destructor 
 AudioLevel::~AudioLevel()
 {
     Pipeline::Instance()->remove(&level_);
 }
 
+/// Class initializer 
 void AudioLevel::init()
 {
     level_ = Pipeline::Instance()->makeElement("level", NULL);
@@ -45,6 +53,8 @@ void AudioLevel::init()
 }
 
 
+/**
+ * Toggles whether or not this AudioLevel will post messages on the bus. */
 void AudioLevel::emitMessages(bool doEmit)
 {
     emitMessages_ = doEmit;
@@ -52,6 +62,7 @@ void AudioLevel::emitMessages(bool doEmit)
 }
 
 
+/// Updates most recent rms value of the specified channel. 
 void AudioLevel::updateRms(double rmsDb, size_t channelIdx)
 {
     if (channelIdx == rmsValues_.size())
@@ -62,11 +73,15 @@ void AudioLevel::updateRms(double rmsDb, size_t channelIdx)
         rmsValues_[channelIdx] = dbToLinear(rmsDb);
 }
 
+/// Converts from decibel to linear (0.0 to 1.0) scale. 
 double AudioLevel::dbToLinear(double db)
 {
     return pow(10, db * 0.05);
 }
 
+/** 
+ * The level message is posted on the bus by the level element, 
+ * received by this AudioLevel, and dispatched. */
 bool AudioLevel::handleBusMsg(GstMessage *msg)
 {
     const GstStructure *s = gst_message_get_structure(msg);
@@ -97,6 +112,7 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
 }
 
 
+/// Prints current rms values through the LogWriter system. 
 void AudioLevel::print() const
 {
     std::ostringstream os;
@@ -105,6 +121,8 @@ void AudioLevel::print() const
     LOG_DEBUG("rms values: " << os.str());
 }
 
+
+/// Posts the rms values to be handled at a higher level by the MapMsg system. 
 void AudioLevel::post() const
 {
     MapMsg mapMsg("levels");
@@ -114,6 +132,7 @@ void AudioLevel::post() const
 }
 
 
+/// Sets the reporting interval in nanoseconds. 
 void AudioLevel::interval(unsigned long long newInterval)
 {
     interval_ = newInterval;

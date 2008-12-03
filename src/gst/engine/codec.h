@@ -27,18 +27,15 @@
 class _GstElement;
 class RtpPay;
 
-/** \class Codec
+/** 
  *  Abstract base class that wraps a single GstElement, and which exposes both a source and sink.
  */
 
 class Codec : public GstLinkableFilter
 {
     public:
-        /// Constructor 
-        Codec()
-            : codec_(0) {};
-        /** 
-         * Destructor */
+        Codec();
+        
         ~Codec();
 
         virtual void init() = 0;
@@ -56,7 +53,7 @@ class Codec : public GstLinkableFilter
         Codec& operator=(const Codec&);     //No Assignment Operator
 };
 
-/** \class Encoder
+/** 
  *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
  *  and whose concrete subclasses will provide specifc encoding of raw media streams.
  */
@@ -68,7 +65,7 @@ class Encoder : public Codec
         virtual RtpPay* createPayloader() const = 0;
 };
 
-/** \class Decoder
+/** 
  *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
  *  and whose concrete subclasses will provide specifc decoding of encoded media streams.
  */
@@ -78,10 +75,9 @@ class Decoder : public Codec
     public:
         /// Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type 
         virtual RtpPay* createDepayloader() const = 0;
-        //virtual void setSrcCaps(){ LOG_DEBUG("BASE DECODER");};
 };
 
-/** \class H264Encoder
+/** 
  *  Encoder that encodes raw video into H.264 using the x264 encoder
  */
 
@@ -89,20 +85,15 @@ class H264Encoder : public Encoder
 {
     public: 
 
-        /// Constructor 
-        H264Encoder() : colorspc_(0) {};
+        H264Encoder();
 
     private:
-        /** 
-         * Destructor */
         ~H264Encoder();
 
         void init();
-        /** 
-         * Creates an h.264 rtp payloader */
+        
         RtpPay* createPayloader() const;
 
-        /// Exposes the sink of this encoder, which is a colorspace converter 
         _GstElement *sinkElement() { return colorspc_; }
         
         _GstElement *colorspc_;

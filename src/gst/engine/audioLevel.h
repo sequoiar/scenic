@@ -1,3 +1,4 @@
+
 /* audioLevel.h
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
@@ -17,6 +18,7 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #ifndef _AUDIO_LEVEL_H_
 #define _AUDIO_LEVEL_H_
 
@@ -27,52 +29,37 @@
 class _GstElement;
 class _GstMessage;
 
-/** AudioLevel
+/** 
  *  A filter that calculates and periodically reports 
  *  the rms value of each audio channel passing through it.
  */
 
-class AudioLevel 
-    : public GstLinkableFilter, public BusMsgHandler
+class AudioLevel : public GstLinkableFilter, public BusMsgHandler
 {
     public:
-        /** Constructor sets by default emitMessages to true 
-         * and message interval to one second */
-        AudioLevel() : level_(0), emitMessages_(true), rmsValues_(0), interval_(1000000000LL) {}
-        /** 
-         * Destructor */
+        AudioLevel();
+
         ~AudioLevel();
-        /** 
-         * Class initializer */
+        
         void init();
-        /**
-         * Sets the reporting interval in nanoseconds. */
+        
         void interval(unsigned long long newInterval);
-        /** 
-         * The level message is posted on the bus by the level element, 
-         * received by this AudioLevel, and dispatched. */
+
         bool handleBusMsg(_GstMessage *msg);
-        /**
-         * Toggles whether or not this AudioLevel will post messages on the bus. */
+
         void emitMessages(bool doEmit);
 
     private:
-        /// Returns src of this AudioLevel. 
         _GstElement *srcElement() { return level_; }
-        
-        /// Returns sink of this AudioLevel. 
+
         _GstElement *sinkElement() { return level_; }
 
-        /// Updates most recent rms value of the specified channel. 
         void updateRms(double rmsDb, size_t channelIdx);
-        
-        /// Converts from decibel to linear (0.0 to 1.0) scale. 
+
         static double dbToLinear(double db);
-        
-        /// Prints current rms values through the LogWriter system. 
+
         void print() const;
-        
-        /// Posts the rms values to be handled at a higher level by the MapMsg system. 
+
         void post() const;
 
         _GstElement *level_;

@@ -29,28 +29,19 @@
 class AudioSource;
 class AudioSink;
 
-/** \class AudioLocal
+/** 
 *   An audio pipeline derived from LocalBase whose source and sink are in the 
-*   same process.
-*/
+*   same process. */
 
 class AudioLocal
     : public LocalBase 
 {
     public:
-        /// Constructor 
-        explicit AudioLocal(const AudioSourceConfig srcConfig, const AudioSinkConfig sinkConfig) 
-            : srcConfig_(srcConfig), sinkConfig_(sinkConfig), source_(0), level_(), sink_(0) {}
-        /** 
-         * Destructor */
+        AudioLocal(const AudioSourceConfig srcConfig, const AudioSinkConfig sinkConfig);
+        
         ~AudioLocal();
 
-        //std::string getCaps();
-
     private:
-        /** 
-         * Implementation of LocalBase's template method which initializes this pipeline. */ 
-
         void init_source();
         void init_level();
         void init_sink();
@@ -62,8 +53,10 @@ class AudioLocal
         AudioLevel level_;
         AudioSink *sink_;
 
-        AudioLocal(const AudioLocal&); //No Copy Constructor
-        AudioLocal& operator=(const AudioLocal&); //No Assignment Operator
+        /// No Copy Constructor
+        AudioLocal(const AudioLocal&); 
+        /// No Assignment Operator
+        AudioLocal& operator=(const AudioLocal&); 
 };
 
 #endif // _AUDIO_LOCAL_H_

@@ -31,10 +31,17 @@
 #include "rtpPay.h"
 #include "codec.h"
 #include "audioSink.h"
-#include "hostIP.h"
-#include <cassert>
 
+/** Constructor parameterized by an AudioSinkConfig 
+ * and a ReceiverConfig */
+AudioReceiver::AudioReceiver(const AudioSinkConfig aConfig, const ReceiverConfig rConfig) : 
+    audioConfig_(aConfig), remoteConfig_(rConfig), session_(), 
+    gotCaps_(false),depayloader_(0), decoder_(0), level_(), sink_(0)
+{ 
+    assert(remoteConfig_.hasCodec()); 
+}
 
+/// Destructor 
 AudioReceiver::~AudioReceiver()
 {
     delete sink_;
@@ -77,10 +84,10 @@ void AudioReceiver::init_sink()
     assert(gotCaps_);
 }
 
+/// Used to set this AudioReceiver's RtpReceiver's caps 
 void AudioReceiver::set_caps() 
 { 
     session_.set_caps(remoteConfig_.caps()); 
-    //session_.checkSampleRate();
     gotCaps_ = true;
 }
 

@@ -25,13 +25,25 @@
 #include "pipeline.h"
 #include "logWriter.h"
 
+/// Constructor 
+Codec::Codec() : 
+    codec_(0) 
+{}
 
+
+/// Destructor 
 Codec::~Codec()
 {
     Pipeline::Instance()->remove(&codec_);
 }
 
+/// Constructor 
+H264Encoder::H264Encoder() : 
+    colorspc_(0) 
+{}
 
+
+/// Destructor 
 H264Encoder::~H264Encoder()
 {
     Pipeline::Instance()->remove(&colorspc_);
@@ -44,12 +56,13 @@ void H264Encoder::init()
 
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
     g_object_set(G_OBJECT(codec_), "bitrate", 4096, "byte-stream", TRUE, "threads", 4,
-                     NULL);
+            NULL);
 
     gstlinkable::link(colorspc_, codec_);
 }
 
 
+/// Creates an h.264 rtp payloader 
 RtpPay* H264Encoder::createPayloader() const
 {
     return new H264Payloader();

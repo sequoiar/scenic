@@ -34,6 +34,18 @@
 #include "rtpPay.h"
 #include "hostIP.h"
 
+/// Constructor 
+AudioSender::AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig) : 
+    audioConfig_(aConfig), 
+    remoteConfig_(rConfig), 
+    session_(), 
+    source_(0), 
+    level_(), 
+    encoder_(0), 
+    payloader_(0)
+{}
+
+/// Destructor 
 AudioSender::~AudioSender()
 {
     delete payloader_;
@@ -41,6 +53,11 @@ AudioSender::~AudioSender()
     delete source_;
 }
 
+/// Returns the capabilities of this AudioSender's RtpSession 
+std::string AudioSender::getCaps() const
+{ 
+    return session_.getCaps(); 
+}
 
 void AudioSender::init_source()
 {

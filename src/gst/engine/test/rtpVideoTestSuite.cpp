@@ -27,6 +27,7 @@
 #include "videoConfig.h"
 #include "videoReceiver.h"
 #include "playback.h"
+#include "logWriter.h" // for Except
 #include "gst/videoFactory.h"
 
 
