@@ -29,27 +29,6 @@
 #include "playback.h"
 #include "gst/videoFactory.h"
 
-#if 0
-
-static std::auto_ptr<VideoReceiver> videofactory::buildVideoReceiver(const char *videoSink = "xvimagesink", int screen_num = 0)
-{
-        VideoSinkConfig vConfig(videoSink, screen_num);
-        ReceiverConfig rConfig("h264", get_host_ip(), ports::V_PORT, "");
-        std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
-        rx->init();
-        return rx;
-}
-
-
-static std::auto_ptr<VideoSender> videofactory::buildVideoSender(const VideoSourceConfig vConfig)
-{
-        SenderConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
-        std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
-        tx->init();
-        return tx;
-}
-
-#endif
 
 void RtpVideoTestSuite::start_test_video()
 {

@@ -61,7 +61,7 @@ class GstTestSuite
 
         int id_;
         int testLength_;
-//        const static int NUM_CHANNELS;
+        
         static int killMainLoop(void *data);
         
         std::string audioFilename_;

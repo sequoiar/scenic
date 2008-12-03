@@ -40,7 +40,7 @@ VideoReceiver::~VideoReceiver()
 
 void VideoReceiver::init_codec()
 {
-    assert(decoder_ = remoteConfig_.createDecoder());
+    assert(decoder_ = remoteConfig_.createVideoDecoder());
     decoder_->init();
 }
 

@@ -74,7 +74,8 @@ class SenderConfig : public RemoteConfig
             : RemoteConfig(m)
         {}
 
-        Encoder* createEncoder() const;
+        Encoder* createVideoEncoder() const;
+        Encoder* createAudioEncoder() const;
 };
 
 
@@ -90,7 +91,8 @@ class ReceiverConfig : public RemoteConfig
             : RemoteConfig(m), caps_(m.caps_)
         {}
 
-        Decoder* createDecoder() const;
+        Decoder* createVideoDecoder() const;
+        Decoder* createAudioDecoder() const;
 
         const char *caps() const { return caps_.c_str(); }
 

@@ -59,7 +59,7 @@ void AudioSender::init_level()
 
 void AudioSender::init_codec()
 {
-    assert(encoder_ = remoteConfig_.createEncoder());
+    assert(encoder_ = remoteConfig_.createAudioEncoder());
     encoder_->init();
 
     gstlinkable::link(level_, *encoder_);

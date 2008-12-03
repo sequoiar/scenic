@@ -48,7 +48,7 @@ void VideoSender::init_source()
 
 void VideoSender::init_codec()
 {
-    assert(encoder_ = remoteConfig_.createEncoder());
+    assert(encoder_ = remoteConfig_.createVideoEncoder());
     encoder_->init();
     gstlinkable::link(*source_, *encoder_);// FIXME: this shouldn't happen for VideoFileSource
 }

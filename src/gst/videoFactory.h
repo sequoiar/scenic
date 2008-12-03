@@ -55,7 +55,8 @@ videofactory::buildVideoReceiver(const char *ip, const char *codec, const long p
     if(!sink)
         sink = V_SINK;
     VideoSinkConfig vConfig(sink, screen_num);
-    ReceiverConfig rConfig(codec, ip, port, "");
+    const char *CAPS_STR = "";
+    ReceiverConfig rConfig(codec, ip, port, CAPS_STR);
     std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
     rx->init();
     return rx;

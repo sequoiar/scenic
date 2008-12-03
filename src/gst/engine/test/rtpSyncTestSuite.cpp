@@ -35,49 +35,9 @@
 #include "gst/audioFactory.h"
 #include "tcp/singleBuffer.h"
 
-#if 0
 /*----------------------------------------------*/ 
 /* Helper functions                             */
 /*----------------------------------------------*/ 
-
-static std::auto_ptr<AudioSender> buildAudioSender(const AudioSourceConfig aConfig)
-{
-    SenderConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT);
-    std::auto_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
-    tx->init();
-    return tx;
-}
-
-
-static std::auto_ptr<AudioReceiver> buildAudioReceiver()
-{
-    AudioSinkConfig aConfig("jackaudiosink");
-    ReceiverConfig rConfig("vorbis", get_host_ip(), GstTestSuite::A_PORT, tcpGetBuffer(GstTestSuite::ports::CAPS_PORT));
-    std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
-    rx->init();
-    return rx;
-}
-
-
-
-static std::auto_ptr<VideoReceiver> buildVideoReceiver()
-{
-    VideoSinkConfig vConfig("xvimagesink");
-    ReceiverConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT, "");
-    std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
-    rx->init();
-    return rx;
-}
-
-
-static std::auto_ptr<VideoSender> buildVideoSender(const VideoSourceConfig vConfig)
-{
-    SenderConfig rConfig("h264", get_host_ip(), GstTestSuite::V_PORT);
-    std::auto_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
-    tx->init();
-    return tx;
-}
-#endif
 
 // for testing stopped pipelines
 static std::auto_ptr<AudioReceiver> 
@@ -404,7 +364,6 @@ void SyncTestSuiteRtp::start_audiotest_videotest()
         TEST_ASSERT(playback::isPlaying());
     }
     else {
-
         VideoSourceConfig vConfig("videotestsrc"); 
         std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 

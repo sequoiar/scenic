@@ -51,41 +51,73 @@ RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remote
 }
 
 
-Encoder * SenderConfig::createEncoder() const
+// FIXME: how to make sure right client get right codec?
+// presently, video client could ask for a vorbisencoder for example. 
+
+Encoder * SenderConfig::createVideoEncoder() const
+{
+    if (codec_.empty())
+        THROW_ERROR("Can't make encoder without codec being specified.");
+
+    if (codec_ == "h264")
+        return new H264Encoder();
+    else
+    {
+        THROW_ERROR(codec_ << " is an invalid codec!");
+        return 0;
+    }
+}
+
+
+Encoder * SenderConfig::createAudioEncoder() const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make encoder without codec being specified.");
 
     if (codec_ == "vorbis")
         return new VorbisEncoder();
-    else if (codec_ == "h264")
-        return new H264Encoder();
     else if (codec_ == "raw")
         return new RawEncoder();
     else if (codec_ == "mp3")
         return new LameEncoder();
-
-    THROW_ERROR(codec_ << " is an invalid codec!");
-    return 0;
+    else
+    {
+        THROW_ERROR(codec_ << " is an invalid codec!");
+        return 0;
+    }
 }
 
 
-Decoder * ReceiverConfig::createDecoder() const
+Decoder * ReceiverConfig::createVideoDecoder() const
+{
+    if (codec_.empty())
+        THROW_ERROR("Can't make decoder without codec being specified.");
+
+    if (codec_ == "h264")
+        return new H264Decoder();
+    else
+    {
+        THROW_ERROR(codec_ << " is an invalid codec!");
+        return 0;
+    }
+}
+
+
+Decoder * ReceiverConfig::createAudioDecoder() const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make decoder without codec being specified.");
 
     if (codec_ == "vorbis")
         return new VorbisDecoder();
-    else if (codec_ == "h264")
-        return new H264Decoder();
     else if (codec_ == "raw")
         return new RawDecoder();
     else if (codec_ == "mp3")
         return new MadDecoder();
-
-    THROW_ERROR(codec_ << " is an invalid codec!");
-    return 0;
+    else
+    {
+        THROW_ERROR(codec_ << " is an invalid codec!");
+        return 0;
+    }
 }
-
 

@@ -56,8 +56,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
         case GST_MESSAGE_EOS:
             {
                 LOG_DEBUG("End-of-stream");
-                //Pipeline *context = static_cast<Pipeline*>(data);
-                Pipeline::Instance()->updateListeners(msg);
+                Instance()->updateListeners(msg);
                 break;
             }
         case GST_MESSAGE_ERROR:
@@ -96,7 +95,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
             {
                 //Pipeline *context = static_cast<Pipeline*>(data);
                 //context->updateListeners(msg);
-                Pipeline::Instance()->updateListeners(msg);
+                Instance()->updateListeners(msg);
                 break;
             }
         default:

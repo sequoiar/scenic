@@ -45,7 +45,7 @@ AudioReceiver::~AudioReceiver()
 
 void AudioReceiver::init_codec()
 {
-    assert(decoder_ = remoteConfig_.createDecoder());
+    assert(decoder_ = remoteConfig_.createAudioDecoder());
     decoder_->init();
 }
 
