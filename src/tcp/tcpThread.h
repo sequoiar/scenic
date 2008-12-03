@@ -36,7 +36,7 @@ class TcpThread
         bool socket_connect_send(const std::string& addr, MapMsg& msg);
  
         ///No Copy Constructor
-        TcpThread(const TcpThread& ):serv_(1024),logFlag_(false),lf_(0){THROW_ERROR("CopyConstructor was called error!");}           
+        TcpThread(const TcpThread& ):MsgThread(),serv_(1024),logFlag_(false),lf_(0){THROW_ERROR("CopyConstructor was called error!");}           
     private:
         int main();
         bool gotQuit();
