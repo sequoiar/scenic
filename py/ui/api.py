@@ -110,7 +110,7 @@ class ControllerApi(object):
         if stream:
             self.notify(caller, (stream.set_attr(attr, value), name), kind + '_set')
         else:
-            self.notify(caller, name, 'not_found')
+            self.notify(caller, (name,kind), 'not_found') # calls self.notify(caller, value, key=None)
 
     def settings_stream(self, caller, name, kind):
         self.notify(caller, (self.streams.get(name, kind), name), kind + '_settings')

@@ -392,6 +392,15 @@ class Test_2_Audiostream(TelnetBaseTest):
         self.expectTest('option -r: invalid integer value: u\'Juliette\'', 'Invalid value accepted as sample rate')
         #self.expectTest(AssertionError,"OK")
         
+    def test_14_invalid_audio_stream_and_codec_order(self):
+        """
+        pof: a -c toto qweqweqwe (set codec to toto, but qweqweqwe is not a valid audio stream)
+        There's no audio stream with the name qweqweqwe
+        """
+        self.client.sendline("a -c audio qweqweqwe")
+        self.sleep()
+        self.expectTest('There\'s no audio stream with the name qweqweqwe', 'There should be no audio stream with that name.')
+        
     def test_50_list_audiostreams(self):
         self.client.sendline("a -l")
         self.sleep()
@@ -406,7 +415,9 @@ class Test_2_Audiostream(TelnetBaseTest):
         self.client.sendline("a -e audiostream")
         self.sleep()
         self.expectTest('There\'s no audio stream with the name audiostream', 'There should be no audio stream with that name.')
-
+    
+    
+        
 class Test_3_Videostream(TelnetBaseTest):
     """
     System Tests for Videostream

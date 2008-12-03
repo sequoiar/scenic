@@ -24,4 +24,7 @@ from observer import Observer, Subject
 import sys
 
 def get_def_name(level=2):
+    """
+    Finds who called the caller of this function
+    """
     return sys._getframe(level).f_code.co_name

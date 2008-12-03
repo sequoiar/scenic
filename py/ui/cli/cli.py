@@ -28,7 +28,8 @@ from twisted.internet import reactor, protocol
 from twisted.conch import telnet
 
 #App imports
-from utils import Observer, log
+from utils import Observer, log # also imports Observer and Subject from utils/observer.py
+
 from utils.i18n import to_utf
 import ui
 from ui.common import find_callbacks
@@ -414,16 +415,16 @@ class CliController(TelnetServer):
                 # crash or infinite recursion...
                 pass
             else:
-                self.write(cmd + " ", False, False) # no prompt, no endl
+                self.write(cmd + ":   ", False, False) # no prompt, no endl
                 data = [cmd,'--description']
                 self.callbacks[cmd](data)
         self.write_prompt()
         #print_usage
         
     def _help(self,data):
-        """Displays list of command
+        """Displays list of commands
         
-        TODO: Display each command's help"""
+        """
         
         cp = CliParser(self, prog=data[0], description="Prints descriptions of all commands.")
         #cp.add_option("-l", "--list", help="List all commands in Sropulpof.")
@@ -592,7 +593,9 @@ class CliParser(optparse.OptionParser):
 
 
 class CliView(Observer):
-    """ """
+    """ 
+    Command-line interface. (Observer: View and controller)
+    """
     
     def __init__(self, subject, controller):
         Observer.__init__(self, subject)
@@ -600,6 +603,14 @@ class CliView(Observer):
         self.callbacks = find_callbacks(self)
                 
     def update(self, origin, key, data):
+        """
+        Called when a attribute of its Subject watched objects change.
+        
+        Will call any of the methods of this class that start with "_".
+        The keys are their name without the "_".
+        For example, calling "get_contacts" will call _get_contacts.
+        All of those methods accept two args: origin and data. (a tuple or so)
+        """
         if key in self.callbacks:
             self.callbacks[key](origin, data)
         
@@ -661,13 +672,21 @@ class CliView(Observer):
                 self.write('Contact selected')
 
     def _audio_set(self, origin, ((state, attr, value), name)):
+        """
+        
+        """
         if origin is self.controller:
             if state:
                 self.write('%s of audio stream %s is set to %s.' % (attr, name, value))
             else:
                 self.write('Unable to set %s of audio stream %s.' % (attr, name))
                 
-    def _not_found(self, origin, name, kind):
+    def _not_found(self, origin, (name, kind)): # _not_found(self, origin, name, kind)
+        """
+        Displays a command not foudn error.
+        
+        Now with tho args like everything else.
+        """
         if origin is self.controller:
             self.write('There\'s no %s stream with the name %s' % (kind, name))
                 
@@ -703,7 +722,8 @@ class CliView(Observer):
                 msg.append(str(data.source))
                 self.write("".join(msg))
             else:
-                self._not_found(origin, name, 'audio')
+                self._not_found(origin, (name, 'audio'))
+                
             
     def _audio_add(self, origin, (data, name)):
         if origin is self.controller:
@@ -719,7 +739,7 @@ class CliView(Observer):
             if data == 1:
                 self.write('Audio stream %s deleted.' % name)
             elif data == 0:
-                self._not_found(origin, name, 'audio')
+                self._not_found(origin, (name, 'audio')) 
             else:
                 self.write('Unable to delete the audio stream %s.' % name)
         
@@ -728,7 +748,7 @@ class CliView(Observer):
             if data == 1:
                 self.write('Audio stream %s rename to %s.' % (name, new_name))
             elif data == 0:
-                self._not_found(origin, name, 'audio')
+                self._not_found(origin, (name, 'audio')) 
             else:
                 self.write('Unable to rename the audio stream %s.' % name)
         
@@ -784,7 +804,7 @@ class CliView(Observer):
                 msg.append(str(data.source))
                 self.write("".join(msg))
             else:
-                self._not_found(origin, name, 'video')
+                self._not_found(origin, (name, 'video'))
             
     def _video_add(self, origin, (data, name)):
         if origin is self.controller:
@@ -800,7 +820,7 @@ class CliView(Observer):
             if data == 1:
                 self.write('Video stream %s deleted.' % name)
             elif data == 0:
-                self._not_found(origin, name, 'video')
+                self._not_found(origin, (name, 'video'))
             else:
                 self.write('Unable to delete the video stream %s.' % name)
         
@@ -809,7 +829,7 @@ class CliView(Observer):
             if data == 1:
                 self.write('Video stream %s rename to %s.' % (name, new_name))
             elif data == 0:
-                self._not_found(origin, name, 'video')
+                self._not_found(origin, (name, 'video'))
             else:
                 self.write('Unable to rename the video stream %s.' % name)
         
@@ -822,7 +842,7 @@ class CliView(Observer):
             else:
                 self.write('There is no video stream.')
                     
-    def _video_set(self, origin, ((state, attr, value), name)):
+    def _video_set(self, origin, ((state, attr, value), name)): 
         if origin is self.controller:
             if state:
                 self.write('%s of video stream %s is set to %s.' % (attr, name, value))

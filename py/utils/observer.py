@@ -61,6 +61,9 @@ class Observer(object):
        
 class Subject(object):
     """
+    Subject watched by an Observer. 
+    
+    This is the "Model" in the Model-View-Controller pattern. (right?)
     """
     
     def __init__(self):
@@ -72,6 +75,9 @@ class Subject(object):
             self.observers[ob_id] = observer
                     
     def notify(self, caller, value, key=None):
+        """
+        Calls all its observers that an attribute has changed.
+        """
         if not key:
             key = get_def_name()
         for observer in self.observers.itervalues():
