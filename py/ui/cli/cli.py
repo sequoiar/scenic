@@ -198,6 +198,7 @@ class CliController(TelnetServer):
             else:
                 self.core.delete_contact(self)
         elif options.modify:
+            # parses key=val arguments:
             if len(args) > 1:
                 name = None
                 new_name = None
@@ -215,7 +216,9 @@ class CliController(TelnetServer):
                                 address = value
                             elif key == 'port':
                                 port = value
-                        elif new_name == None:
+                            else:
+                                self.write("Unable to change %s: unexisting property" % (key) , False)
+                        elif new_name == None: #if no key=value pair, resolution order:
                             new_name = arg
                         elif address == None:
                             address = arg
