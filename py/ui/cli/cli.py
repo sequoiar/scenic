@@ -19,6 +19,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
+"""
+Command line user interface. 
+
+Implements some view and controller of the MVC design pattern.
+
+Each method of the CliController class that begins with "_" has a CLI 
+command parser with some options. It parses what the user types. 
+(the "controller")
+It then calls a method in api.py (the "model")
+This finally answer by calling each of its Observer that listen to it. 
+In this case, the "view" is the CliView class.
+
+For example:
+What happens when the user types "c -l":
+ * CliController._get_contacts() is called with the args from user
+ * it calls ControllerApi.get_contacts() 
+ * which finally CliView._get_contacts() with a dict of contacts as 
+   an argument. (the key are the contact names)
+   It is the contacts attributes of the AddressBook instance.
+"""
+
 
 # System imports
 import optparse
@@ -594,7 +615,8 @@ class CliParser(optparse.OptionParser):
 
 class CliView(Observer):
     """ 
-    Command-line interface. (Observer: View and controller)
+    Command-line interface results printer. 
+    The View (Observer) in the MVC pattern. 
     """
     
     def __init__(self, subject, controller):
@@ -620,6 +642,10 @@ class CliView(Observer):
             self.controller.write_prompt()
 
     def _get_contacts(self, origin, data):
+        """
+        called by api.py:
+        data: dict 'contact':'contact object'.
+        """
         if origin is self.controller:
             msg = []
             contacts = data.items()
@@ -630,9 +656,12 @@ class CliView(Observer):
                         msg.append(bold(contact.name + ": <---"))
                     else:  
                         msg.append(contact.name + ":")  
-                    msg.append("\t" + contact.address)
+                    msg.append("\taddress: %s" % contact.address)
                     if contact.port:
-                        msg.append("\t%s" % contact.port)
+                        msg.append("\tport   : %s" % contact.port)
+                    if contact.kind:
+                        msg.append("\tkind   : %s" % contact.kind)
+                    
             msg_out = "\n".join(msg)  
             self.write(msg_out)
             

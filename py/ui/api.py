@@ -25,11 +25,16 @@ from errors import *
 
 
 class ControllerApi(object):
-    
+    """
+    The API that controlllers must use
+    """
     def __init__(self, notify):
         self.notify = notify
     
     def _start(self, core):
+        """
+        Starts the API once all parts have been loaded.
+        """
         self.core = core
         self.adb = core.adb
         self.all_streams = core.curr_setting.streams
@@ -42,7 +47,7 @@ class ControllerApi(object):
     ### Contacts ###
         
     def get_contacts(self, caller):
-        self.notify(caller, self.adb.contacts)
+        self.notify(caller, self.adb.contacts) #dict of 'contact name':object contact
         
     def add_contact(self, caller, name, address, port=None):
         try:

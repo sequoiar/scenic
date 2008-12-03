@@ -49,9 +49,9 @@ class Observer(object):
         """Called when an attribute of the observed object is changed.
         Should be overridden.
 
-        @param origin:    observed object for which the attribute is changed
+        @param origin:    observed object for which the attribute is changed (caller)
         @type origin:     any
-        @param key:       attribute changed
+        @param key:       attribute changed (default to the function that called it. in api.py)
         @type key:        string
         @param value:     value of the attribute after being set
         @type value:      any
