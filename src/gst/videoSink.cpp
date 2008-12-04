@@ -119,7 +119,7 @@ void XvImageSink::init()
     assert(display);
     int n;
     XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display),&n);
-    assert(xine);
+    if(xine)
     for(int j=0;j<n;j++)
     {
         LOG_INFO(   "req:" << screen_num_ << 
