@@ -67,7 +67,7 @@ void VideoSink::showWindow()
 
 void VideoSink::toggleFullscreen(GtkWidget *widget)
 {
-    gboolean isFullscreen = FALSE;
+    static gboolean isFullscreen = FALSE;
 
     // toggle fullscreen state
     isFullscreen ? makeUnfullscreen(widget) : makeFullscreen(widget);
