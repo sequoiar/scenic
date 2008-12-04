@@ -37,6 +37,42 @@ Codec::~Codec()
     Pipeline::Instance()->remove(&codec_);
 }
 
+
+/// Constructor 
+AudioConvertedEncoder::AudioConvertedEncoder() : 
+    aconv_(0) 
+{}
+
+void AudioConvertedEncoder::init()
+{
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
+}
+
+/// Destructor 
+AudioConvertedEncoder::~AudioConvertedEncoder()
+{
+    Pipeline::Instance()->remove(&aconv_);
+}
+
+
+/// Constructor 
+AudioConvertedDecoder::AudioConvertedDecoder() : 
+    aconv_(0) 
+{}
+
+
+void AudioConvertedDecoder::init()
+{
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
+}
+
+/// Destructor 
+AudioConvertedDecoder::~AudioConvertedDecoder()
+{
+    Pipeline::Instance()->remove(&aconv_);
+}
+
+
 /// Constructor 
 H264Encoder::H264Encoder() : 
     colorspc_(0) 
@@ -75,24 +111,27 @@ void H264Decoder::init()
 }
 
 
+/// Creates an h.264 RtpDepayloader 
 RtpPay* H264Decoder::createDepayloader() const
 {
     return new H264Depayloader();
 }
 
+/// Constructor 
+VorbisEncoder::VorbisEncoder() 
+{}
 
 void VorbisEncoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("vorbisenc", NULL);
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-
     gstlinkable::link(aconv_, codec_);
 }
 
 
-VorbisEncoder::~VorbisEncoder()
+/// Creates an RtpVorbisPayloader 
+RtpPay* VorbisEncoder::createPayloader() const
 {
-    Pipeline::Instance()->remove(&aconv_);
+    return new VorbisPayloader();
 }
 
 
@@ -101,91 +140,64 @@ void VorbisDecoder::init()
     codec_ = Pipeline::Instance()->makeElement("vorbisdec", NULL);
 }
 
-
-RtpPay* VorbisEncoder::createPayloader() const
-{
-    return new VorbisPayloader();
-}
-
-
+/// Creates an RtpVorbisDepayloader 
 RtpPay* VorbisDecoder::createDepayloader() const
 {
     return new VorbisDepayloader();
 }
 
+/// Constructor
+RawEncoder::RawEncoder()
+{}
 
-void RawEncoder::init()
-{
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-}
-
-
-void RawDecoder::init()
-{
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-}
-
-
+/// Creates an RtpL16Payloader 
 RtpPay* RawEncoder::createPayloader() const
 {
     return new L16Payloader();
 }
 
+/// Constructor
+RawDecoder::RawDecoder()
+{}
 
+/// Creates an RtpL16Depayloader 
 RtpPay* RawDecoder::createDepayloader() const
 {
     return new L16Depayloader();
 }
 
-RawEncoder::~RawEncoder()
-{
-    Pipeline::Instance()->remove(&aconv_);
-}
-
-
-RawDecoder::~RawDecoder()
-{
-    Pipeline::Instance()->remove(&aconv_);
-}
-
+/// Constructor
+LameEncoder::LameEncoder()
+{}
 
 void LameEncoder::init()
 {
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
     codec_ = Pipeline::Instance()->makeElement("lame", NULL);
-
     gstlinkable::link(aconv_, codec_);
 }
+
+
+/// Constructor
+MadDecoder::MadDecoder()
+{}
 
 
 void MadDecoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("mad", NULL);
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-
     gstlinkable::link(codec_, aconv_);
 }
 
-
+/** 
+* Creates an RtpMpaPayloader */
 RtpPay* LameEncoder::createPayloader() const
 {
     return new MpaPayloader();
 }
 
-
+/// Creates an RtpMpaDepayloader 
 RtpPay* MadDecoder::createDepayloader() const
 {
     return new MpaDepayloader();
-}
-
-LameEncoder::~LameEncoder()
-{
-    Pipeline::Instance()->remove(&aconv_);
-}
-
-
-MadDecoder::~MadDecoder()
-{
-    Pipeline::Instance()->remove(&aconv_);
 }
 

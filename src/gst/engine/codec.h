@@ -30,34 +30,30 @@ class RtpPay;
 /** 
  *  Abstract base class that wraps a single GstElement, and which exposes both a source and sink.
  */
-
 class Codec : public GstLinkableFilter
 {
     public:
         Codec();
-        
         ~Codec();
-
         virtual void init() = 0;
 
     protected:
-
         _GstElement *codec_;
 
     private:
-
         _GstElement *srcElement() { return codec_; }
         _GstElement *sinkElement() { return codec_; }
 
-        Codec(const Codec&);     //No Copy Constructor
-        Codec& operator=(const Codec&);     //No Assignment Operator
+        /// No Copy Constructor
+        Codec(const Codec&);     
+        /// No Assignment Operator
+        Codec& operator=(const Codec&);     
 };
 
 /** 
  *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
  *  and whose concrete subclasses will provide specifc encoding of raw media streams.
  */
-
 class Encoder : public Codec
 {
     public:
@@ -69,7 +65,6 @@ class Encoder : public Codec
  *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
  *  and whose concrete subclasses will provide specifc decoding of encoded media streams.
  */
-
 class Decoder : public Codec
 {
     public:
@@ -77,10 +72,45 @@ class Decoder : public Codec
         virtual RtpPay* createDepayloader() const = 0;
 };
 
-/** 
- *  Encoder that encodes raw video into H.264 using the x264 encoder
- */
+/// Abstract child of encoder that wraps audioconvert functionality
 
+class AudioConvertedEncoder : public Encoder
+{
+    protected:
+        AudioConvertedEncoder();
+        ~AudioConvertedEncoder();
+        _GstElement *aconv_;
+
+    private:
+        void init();
+        _GstElement *sinkElement() { return aconv_; }
+    
+        /// No Copy Constructor 
+        AudioConvertedEncoder(const AudioConvertedEncoder&);     
+        ///No Assignment Operator
+        AudioConvertedEncoder& operator=(const AudioConvertedEncoder&);     
+};
+
+
+class AudioConvertedDecoder : public Decoder
+{
+    protected: 
+        AudioConvertedDecoder();
+        ~AudioConvertedDecoder();
+        _GstElement *aconv_;
+
+    private:
+        void init();
+        _GstElement *srcElement() { return aconv_; }
+
+        ///No Copy Constructor
+        AudioConvertedDecoder(const AudioConvertedDecoder&);     
+        ///No Assignment Operator
+        AudioConvertedDecoder & operator=(const AudioConvertedDecoder&);     
+};
+
+
+/// Encoder that encodes raw video into H.264 using the x264 encoder
 class H264Encoder : public Encoder
 {
     public: 
@@ -97,86 +127,55 @@ class H264Encoder : public Encoder
         _GstElement *sinkElement() { return colorspc_; }
         
         _GstElement *colorspc_;
-        
-        H264Encoder(const H264Encoder&);     //No Copy Constructor
-        H264Encoder& operator=(const H264Encoder&);     //No Assignment Operator
+
+        /// No Copy Constructor
+        H264Encoder(const H264Encoder&);     
+        /// No Assignment Operator
+        H264Encoder& operator=(const H264Encoder&);     
 };
 
-/** \class H264Decoder
- *  Decoder that decodes H.264 into raw video using the ffdec_h264 decoder.
- */
-
+/// Decoder that decodes H.264 into raw video using the ffdec_h264 decoder.
 class H264Decoder : public Decoder
 {
     private: 
-
         void init();
-        /// Creates an h.264 RtpDepayloader 
         RtpPay* createDepayloader() const;
 };
 
-/** \class VorbisEncoder
- *  Encoder that encodes raw audio using the vorbis encoder.
- */
-
-class VorbisEncoder : public Encoder 
+/// Encoder that encodes raw audio using the vorbis encoder.
+class VorbisEncoder : public AudioConvertedEncoder 
 {
     public: 
-        /// Constructor 
-        VorbisEncoder() : aconv_(0){};
+        VorbisEncoder();
 
     private:
-        /// Destructor 
-        ~VorbisEncoder();
         void init();
-        /// Creates an RtpVorbisPayloader 
         RtpPay* createPayloader() const;
 
-        _GstElement *sinkElement() { return aconv_; }
-
-        _GstElement *aconv_;
         /// No Copy Constructor 
         VorbisEncoder(const VorbisEncoder&);     
         ///No Assignment Operator
         VorbisEncoder& operator=(const VorbisEncoder&);     
 };
 
-/** \class VorbisDecoder
- *  Decoder that decodes vorbis into raw audio using the vorbis decoder.
- */
-
+/// Decoder that decodes vorbis into raw audio using the vorbis decoder.
 class VorbisDecoder : public Decoder
 {
     private: 
-
         void init();
-//        void setSrcCaps();
-        /// Creates an RtpVorbisDepayloader 
         RtpPay* createDepayloader() const;
 };
 
-/** \class RawEncoder
- *  Encoder that simply performs datatype conversion on raw audio.
- */
-
-// FIXME: DRY!!!!
-class RawEncoder : public Encoder 
+/// Encoder that simply performs datatype conversion on raw audio.
+class RawEncoder : public AudioConvertedEncoder 
 {
-    public: 
-        /// Constructor 
-        RawEncoder() : aconv_(0) {};
-    
+    public:
+        RawEncoder();
+
     private:
-        /** 
-         * Destructor */
-        ~RawEncoder();
-        void init();
-        /// Creates an RtpL16Payloader 
         RtpPay* createPayloader() const;
     
         _GstElement *srcElement() { return aconv_; }
-        _GstElement *sinkElement() { return aconv_; }
-        _GstElement *aconv_;
         
         /// No Copy Constructor 
         RawEncoder(const RawEncoder&);     
@@ -184,28 +183,16 @@ class RawEncoder : public Encoder
         RawEncoder& operator=(const RawEncoder&);     
 };
 
-/** \class RawDecoder
- *  Decoder that simply performs datatype conversion on raw audio.
- */
-
-class RawDecoder : public Decoder
+/// Decoder that simply performs datatype conversion on raw audio.
+class RawDecoder : public AudioConvertedDecoder
 {
-    public: 
-        /// Constructor 
-        RawDecoder() : aconv_(0) {};
+    public:
+        RawDecoder();
 
     private:
-        /** 
-         * Destructor */
-        ~RawDecoder();
-        void init();
-        /** 
-         * Creates an RtpL16Depayloader */
         RtpPay* createDepayloader() const;
 
-        _GstElement *srcElement() { return aconv_; }
         _GstElement *sinkElement() { return aconv_; }
-        _GstElement *aconv_;
         
         ///No Copy Constructor
         RawDecoder(const RawDecoder&);     
@@ -213,52 +200,33 @@ class RawDecoder : public Decoder
         RawDecoder& operator=(const RawDecoder&);     
 };
 
-/** \class LameEncoder
- *  Encoder that encodes raw audio to mpeg.
- */
 
-class LameEncoder : public Encoder 
+/// Encoder that encodes raw audio to mpeg.
+class LameEncoder : public AudioConvertedEncoder 
 {
     public:
-        /// Constructor 
-        LameEncoder() : aconv_(0) {};
-    private:
-        /** 
-         * Destructor */
-        ~LameEncoder();
-        void init();
-        /** 
-         * Creates an RtpMpaPayloader */
-        RtpPay* createPayloader() const;
-    
-        _GstElement *sinkElement() { return aconv_; }
+        LameEncoder();
 
-        _GstElement *aconv_;
+    private:
+        void init();
+        RtpPay* createPayloader() const;
+
         /// No Copy Constructor 
         LameEncoder(const LameEncoder&);     
         /// No Assignment Operator 
         LameEncoder& operator=(const LameEncoder&);     
 };
 
-/** \class MadDecoder
- * Decoder that decodes mpeg to raw audio.
- */
+/// Decoder that decodes mpeg to raw audio.
 
-class MadDecoder : public Decoder
+class MadDecoder : public AudioConvertedDecoder
 {
-    public: 
-        /// Constructor   
-        MadDecoder() : aconv_(0) {};
+    public:
+        MadDecoder();
     private:
-        /// Destructor   
-        ~MadDecoder();
         void init();
-        /** 
-         * Creates an RtpMpaDepayloader */
         RtpPay* createDepayloader() const;
 
-        _GstElement *srcElement() { return aconv_; }
-        _GstElement *aconv_;
         /// No Copy Constructor 
         MadDecoder(const MadDecoder&);     
         ///No Assignment Operator

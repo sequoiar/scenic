@@ -77,7 +77,7 @@ std::string logLevelStr(LogLevel level)
             lstr = "\r\x1b[41mCRITICAL";
             break;
         case ASSERT_FAIL:
-            lstr = "\r\x1b[41ASSERT_FAIL";
+            lstr = "\r\x1b[41mASSERT_FAIL";
             break;
         default:
             lstr = "INVALID LOG LEVEL";
