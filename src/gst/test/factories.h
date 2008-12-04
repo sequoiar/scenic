@@ -53,7 +53,7 @@ std::auto_ptr<VideoSender> Factories::buildVideoSender(const VideoConfig vConfig
 
 std::auto_ptr<VideoReceiver> Factories::buildVideoReceiver(const char *ip, const char *codec, const long port, const int screen_num)
 {
-    VideoReceiverConfig vConfig("glimagesink",screen_num);
+    VideoReceiverConfig vConfig("xvimagesink",screen_num);
     ReceiverConfig rConfig(codec, ip, port, "");
     std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
     rx->init();

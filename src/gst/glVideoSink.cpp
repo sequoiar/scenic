@@ -299,10 +299,10 @@ void GLImageSink::init()
         if (j == screen_num_) //TODO: how to choose screen??
             gtk_window_move(GTK_WINDOW(window_),xine[j].x_org,xine[j].y_org);
     }
-    const gint WIDTH = 640;
-    const gint HEIGHT = 480;
+    const gint W = 640;
+    const gint H = 480;
 
-    gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
+    gtk_window_set_default_size(GTK_WINDOW(window_), W, H);
     gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
     gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
     pipeline_.subscribe(this);

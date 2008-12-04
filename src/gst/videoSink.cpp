@@ -101,7 +101,7 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
     return TRUE;
 }
 
-
+#include <X11/extensions/Xinerama.h>
 void XvImageSink::init()
 {
     static bool gtk_initialized = false;
@@ -114,11 +114,29 @@ void XvImageSink::init()
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     assert(window_);
-    const gint WIDTH = 640;
-    const gint HEIGHT = 480;
 
-    gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
+    GdkDisplay* display = gdk_display_get_default();
+    assert(display);
+    int n;
+    XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display),&n);
+    assert(xine);
+    for(int j=0;j<n;j++)
+    {
+        LOG_INFO(   "req:" << screen_num_ << 
+                " screen:" << xine[j].screen_number << 
+                " x:" << xine[j].x_org << 
+                " y:" << xine[j].y_org << 
+                " width:" << xine[j].width << 
+                " height:" << xine[j].height);
+        if (j == screen_num_) //TODO: how to choose screen??
+            gtk_window_move(GTK_WINDOW(window_),xine[j].x_org,xine[j].y_org);
+    }
+    const gint W = 640;
+    const gint H = 480;
+
+    gtk_window_set_default_size(GTK_WINDOW(window_), W, H);
     gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
+    gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
 
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
                          XvImageSink::expose_cb), static_cast<void*>(sink_));
