@@ -301,14 +301,13 @@ void GLImageSink::init()
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    
     assert(window_);
 
-
     GdkDisplay* display = gdk_display_get_default();
     assert(display);
     int n;
     XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display),&n);
     if(!xine)
         n = 0; // don't query ScreenInfo
-    for(int j=0;j<n;j++)
+    for(int j = 0; j < n; ++j)
     {
         LOG_INFO(   "req:" << screen_num_ << 
                 " screen:" << xine[j].screen_number << 
@@ -317,7 +316,7 @@ void GLImageSink::init()
                 " width:" << xine[j].width << 
                 " height:" << xine[j].height);
         if (j == screen_num_) 
-            gtk_window_move(GTK_WINDOW(window_),xine[j].x_org,xine[j].y_org);
+            gtk_window_move(GTK_WINDOW(window_), xine[j].x_org,xine[j].y_org);
     }
 
     gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);

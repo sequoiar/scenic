@@ -49,6 +49,7 @@ class VideoSink
         static const unsigned int HEIGHT;
 
         Window getXWindow();
+        void prepareSink();
         void destroySink();
         static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
         void makeWindowBlack();

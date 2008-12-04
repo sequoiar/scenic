@@ -95,17 +95,20 @@ void VideoSink::makeUnfullscreen(GtkWidget *widget)
 }
 
 
+void VideoSink::prepareSink()
+{
+    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
+}
+
+
 gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
     if (event->keyval != 'f')
-    {
         LOG_DEBUG("user didn't hit f");
-        return TRUE;
-    }
     else
-        LOG_DEBUG("you hit f");
+        toggleFullscreen(widget);
 
-    toggleFullscreen(widget);
     return TRUE;
 }
 
@@ -114,10 +117,13 @@ void XvImageSink::init()
 {
     static bool gtk_initialized = false;
     if (!gtk_initialized)
+    {
         gtk_init(0, NULL);
+        gtk_initialized = true;
+    }
+
     sink_ = Pipeline::Instance()->makeElement("xvimagesink", "videosink");
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-    g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
+    prepareSink();
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     assert(window_);
@@ -125,10 +131,10 @@ void XvImageSink::init()
     GdkDisplay* display = gdk_display_get_default();
     assert(display);
     int n;
-    XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display),&n);
-    if(!xine)
+    XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display), &n);
+    if (!xine)
         n = 0; // don't query ScreenInfo
-    for(int j=0;j<n;j++)
+    for (int j = 0; j < n; ++j)
     {
         LOG_INFO(   "req:" << screen_num_ << 
                 " screen:" << xine[j].screen_number << 
@@ -137,7 +143,7 @@ void XvImageSink::init()
                 " width:" << xine[j].width << 
                 " height:" << xine[j].height);
         if (j == screen_num_) 
-            gtk_window_move(GTK_WINDOW(window_),xine[j].x_org,xine[j].y_org);
+            gtk_window_move(GTK_WINDOW(window_), xine[j].x_org,xine[j].y_org);
     }
 
     gtk_window_set_default_size(GTK_WINDOW(window_), VideoSink::WIDTH, VideoSink::HEIGHT);
@@ -170,8 +176,7 @@ void XImageSink::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     sink_ = Pipeline::Instance()->makeElement("ximagesink", "videosink");
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-    g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
+    prepareSink();
 
     gstlinkable::link(colorspc_, sink_);
 }
@@ -182,5 +187,4 @@ XImageSink::~XImageSink()
     VideoSink::destroySink();
     Pipeline::Instance()->remove(&colorspc_);
 }
-
 
