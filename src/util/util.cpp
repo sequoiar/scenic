@@ -154,7 +154,7 @@ void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileN
     if(!hold_flag)
         (*lf)(level,strerr);
      
-    if(level == INFO)
+    if(level == DEBUG || level == INFO)
     {
         std::cout << strerr;
         return;

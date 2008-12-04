@@ -35,32 +35,25 @@ class VideoSource
         virtual void init();
 
     protected:
-        explicit VideoSource(const VideoSourceConfig &config)
-            : config_(config), source_(0) {}
-
+        explicit VideoSource(const VideoSourceConfig &config);
         const VideoSourceConfig &config_;
         _GstElement *source_;
 
     private:
-        static int base_callback(GstClock *clock, GstClockTime time, GstClockID id,
-                                      void *user_data);
-        virtual void sub_init() = 0;
-        virtual int callback() { return FALSE; }
         _GstElement *srcElement() { return source_; }
-        VideoSource(const VideoSource&);     //No Copy Constructor
-        VideoSource& operator=(const VideoSource&);     //No Assignment Operator
+        VideoSource(const VideoSource&);     ///No Copy Constructor
+        VideoSource& operator=(const VideoSource&);     ///No Assignment Operator
 };
 
 class VideoTestSource
     : public VideoSource
 {
     public:
-        explicit VideoTestSource(const VideoSourceConfig &config)
-            : VideoSource(config), clockId_(0) {}
+        explicit VideoTestSource(const VideoSourceConfig &config);
 
     private:
         ~VideoTestSource();
-        void sub_init();
+        void init();
         int callback();
         void toggle_colour();
 
@@ -81,7 +74,7 @@ class VideoFileSource
     private:
         ~VideoFileSource();
         _GstElement *srcElement() { return 0; }      // FIXME: HACK
-        void sub_init();
+        void init();
 
         _GstElement *decoder_;
         static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, int last,
@@ -103,7 +96,6 @@ class VideoDvSource
         
         _GstElement *srcElement() { return dvdec_; }
         void init();
-        void sub_init();
         static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, void *data);
 
         _GstElement *demux_, *queue_, *dvdec_;
@@ -119,7 +111,7 @@ class VideoV4lSource
         explicit VideoV4lSource(const VideoSourceConfig &config)
             : VideoSource(config) {}
     private:
-        void sub_init();
+        void init();
         VideoV4lSource(const VideoV4lSource&);     //No Copy Constructor
         VideoV4lSource& operator=(const VideoV4lSource&);     //No Assignment Operator
 };

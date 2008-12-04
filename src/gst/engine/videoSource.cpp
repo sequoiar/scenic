@@ -28,35 +28,36 @@
 #include "videoConfig.h"
 #include "logWriter.h"
 
-// parts of sub_init that are common to all VideoSource classes
+/// Constructor
+VideoSource::VideoSource(const VideoSourceConfig &config) : 
+    config_(config), source_(0) 
+{}
+
+
+/// Callable by child classes
 void VideoSource::init()
 {
     source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
-
-    sub_init();
 }
 
 
+/// Destructor
 VideoSource::~VideoSource()
 {
     Pipeline::Instance()->remove(&source_);
 }
 
-
-// defers to subclassses callback
-gboolean VideoSource::base_callback(GstClock * /*clock*/, GstClockTime /*time*/, GstClockID /*id*/,
-                                    gpointer user_data)
-{
-    VideoSource* context = static_cast<VideoSource*>(user_data);
-    return context->callback();
-}
-
-
 // gst-inspect property codes
 const int VideoTestSource::BLACK = 2;
 const int VideoTestSource::WHITE = 3;
 
-// toggle colour
+
+/// Constructor
+VideoTestSource::VideoTestSource(const VideoSourceConfig &config) : 
+    VideoSource(config), clockId_(0) 
+{}
+
+/// Called asynchronously at regular interval, to toggle colour
 gboolean VideoTestSource::callback()
 {
     if (!source_)
@@ -75,12 +76,12 @@ void VideoTestSource::toggle_colour()
 }
 
 
-void VideoTestSource::sub_init()
+void VideoTestSource::init()
 {
+    VideoSource::init();
     g_object_set(G_OBJECT(source_), "is-live", FALSE, NULL); // necessary for clocked callback to work
     //g_object_set(G_OBJECT(source_), "pattern", WHITE, NULL);
-
-    //clockId_ = Pipeline::Instance()->add_clock_callback(base_callback, this);
+    //clockId_ = Pipeline::Instance()->add_clock_callback(callback, this);
 }
 
 
@@ -91,8 +92,9 @@ VideoTestSource::~VideoTestSource()
 }
 
 
-void VideoFileSource::sub_init()
+void VideoFileSource::init()
 {
+    VideoSource::init();
     decoder_ = Pipeline::Instance()->makeElement("decodebin", NULL);
 
     assert(config_.fileExists());
@@ -185,12 +187,6 @@ void VideoDvSource::init()
     if (dvIsNew_)
         source_ = Pipeline::Instance()->makeElement(config_.source(), config_.source());
 
-    sub_init();
-}
-
-
-void VideoDvSource::sub_init()
-{
     demux_ = Pipeline::Instance()->findElement("dvdemux");
     dvIsNew_ = demux_ == NULL;
     if (dvIsNew_)
@@ -244,8 +240,9 @@ void VideoDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad
     gst_object_unref(sinkPad);
 }
 
-void VideoV4lSource::sub_init()
+void VideoV4lSource::init()
 {
+    VideoSource::init();
     // set a v4l2src if given to config as an arg, otherwise use default
     if (config_.hasLocation() && config_.fileExists())
         g_object_set(G_OBJECT(source_), "device", config_.location(), NULL);
