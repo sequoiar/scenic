@@ -65,6 +65,11 @@ VideoTestSource::~VideoTestSource()
 {}
 
 
+/// Constructor
+VideoFileSource::VideoFileSource(const VideoSourceConfig &config) : 
+    VideoSource(config), decoder_(0) 
+{}
+
 void VideoFileSource::init()
 {
     VideoSource::init();
@@ -73,11 +78,11 @@ void VideoFileSource::init()
     assert(config_.fileExists());
     g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
     gstlinkable::link(source_, decoder_);
-    
+
     // bind callback
     g_signal_connect(decoder_, "new-decoded-pad",
-                     G_CALLBACK(VideoFileSource::cb_new_src_pad),
-                     static_cast<void *>(this));
+            G_CALLBACK(VideoFileSource::cb_new_src_pad),
+            static_cast<void *>(this));
 }
 
 
@@ -93,20 +98,18 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
     GstCaps *caps;
     GstElement *sinkElement;
 
-    //sinkPad = gst_element_get_static_pad(context->sinkElement_, "sink");
-    // FIXME: HACK!!!!
-    //if (context->config_.isNetworked())
+    // FIXME: HACK ATTACK!!!!
+    // looks for element named colorspc in pipeline, which 
+    // will be the case for VideoSender. for VideoLocal, 
+    // it will look for videosink. 
     sinkElement = Pipeline::Instance()->findElement("colorspc");
-    
+
     if (!sinkElement)       // we're local!
     {
         sinkElement = Pipeline::Instance()->findElement("videosink");
         g_object_set(G_OBJECT(sinkElement), "sync", TRUE, NULL);
     }
-    //#endif
-    //FIXME: this assumes that the first pad it finds is indeed the one filesource
-    // should connect to...maybe should just have its own ghost pad?
-    //   sinkPad = context->Pipeline::Instance()->findUnconnectedSinkpad();
+    
     assert(sinkElement);
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
 
@@ -139,6 +142,12 @@ VideoFileSource::~VideoFileSource()
 }
 
 
+/// Constructor
+VideoDvSource::VideoDvSource(const VideoSourceConfig &config) : 
+    VideoSource(config), demux_(0), queue_(0), dvdec_(0), dvInPipeline_(true) 
+{}
+
+
 /// Destructor
 VideoDvSource::~VideoDvSource()
 {
@@ -151,26 +160,27 @@ VideoDvSource::~VideoDvSource()
     Pipeline::Instance()->remove(&dvdec_);
 }
 
-
+// FIXME: appaling hack so that videodvsource and audiodvsource share
+// the same dv1394src. each pair should be sharing their own, wrapped dv object, 
+// perhaps in a static list somewhere, rather than these awful quickprobes test 
+// in both videodvsource and audiodvsource
 void VideoDvSource::init()
 {
     if (!Raw1394::cameraIsReady())
         THROW_ERROR("Camera is not ready");
 
     source_ = Pipeline::Instance()->findElement(config_.source());
-    dvIsNew_ = source_ == NULL;
-    if (dvIsNew_)
+    dvInPipeline_ = source_ == NULL;
+    if (dvInPipeline_)
         source_ = Pipeline::Instance()->makeElement(config_.source(), config_.source());
 
     demux_ = Pipeline::Instance()->findElement("dvdemux");
-    dvIsNew_ = demux_ == NULL;
-    if (dvIsNew_)
-    {
+    dvInPipeline_ = demux_ == NULL;
+    if (dvInPipeline_)
         demux_ = Pipeline::Instance()->makeElement("dvdemux", "dvdemux");
-        // demux has dynamic pads
-    }
     else
         assert(demux_);
+
     queue_ = Pipeline::Instance()->makeElement("queue", NULL);
     dvdec_ = Pipeline::Instance()->makeElement("dvdec", NULL);
 
@@ -179,7 +189,7 @@ void VideoDvSource::init()
             G_CALLBACK(VideoDvSource::cb_new_src_pad),
             static_cast<void *>(queue_));
 
-    if (dvIsNew_)
+    if (dvInPipeline_)
         gstlinkable::link(source_, demux_);
     gstlinkable::link(queue_, dvdec_);
 }

@@ -54,17 +54,18 @@ class VideoTestSource
     private:
         ~VideoTestSource();
         void init();
-
-        VideoTestSource(const VideoTestSource&);     //No Copy Constructor
-        VideoTestSource& operator=(const VideoTestSource&);     //No Assignment Operator
+        /// No Copy Constructor
+        VideoTestSource(const VideoTestSource&);     
+        /// No Assignment Operator
+        VideoTestSource& operator=(const VideoTestSource&);     
 };
 
 class VideoFileSource
     : public VideoSource
 {
     public:
-        explicit VideoFileSource(const VideoSourceConfig &config)
-            : VideoSource(config), decoder_(0) {}
+        explicit VideoFileSource(const VideoSourceConfig &config);
+
     private:
         ~VideoFileSource();
         _GstElement *srcElement() { return 0; }      // FIXME: HACK
@@ -74,16 +75,17 @@ class VideoFileSource
         static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, int last,
                                    void *data);
 
-        VideoFileSource(const VideoFileSource&);     //No Copy Constructor
-        VideoFileSource& operator=(const VideoFileSource&);     //No Assignment Operator
+        /// No Copy Constructor
+        VideoFileSource(const VideoFileSource&);     
+        /// No Assignment Operator
+        VideoFileSource& operator=(const VideoFileSource&);     
 };
 
 class VideoDvSource
     : public VideoSource
 {
     public:
-        explicit VideoDvSource(const VideoSourceConfig &config) 
-            : VideoSource(config), demux_(0), queue_(0), dvdec_(0), dvIsNew_(true) {}
+        explicit VideoDvSource(const VideoSourceConfig &config);
 
     private:
         ~VideoDvSource();
@@ -93,7 +95,7 @@ class VideoDvSource
         static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, void *data);
 
         _GstElement *demux_, *queue_, *dvdec_;
-        bool dvIsNew_;
+        bool dvInPipeline_;
         VideoDvSource(const VideoDvSource&);     //No Copy Constructor
         VideoDvSource& operator=(const VideoDvSource&);     //No Assignment Operator
 };
