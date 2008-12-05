@@ -77,12 +77,14 @@ void VideoSink::toggleFullscreen(GtkWidget *widget)
 
 void VideoSink::makeFullscreen(GtkWidget *widget)
 {
+    gtk_window_stick(GTK_WINDOW(widget));           // window is visible on all workspaces
     gtk_window_fullscreen(GTK_WINDOW(widget));
 }
 
 
 void VideoSink::makeUnfullscreen(GtkWidget *widget)
 {
+    gtk_window_unstick(GTK_WINDOW(widget));           // window is not visible on all workspaces
     gtk_window_unfullscreen(GTK_WINDOW(widget));
 }
 
@@ -136,7 +138,6 @@ void XvImageSink::init()
 
     gtk_window_set_default_size(GTK_WINDOW(window_), W, H);
     gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
-    gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
 
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
                          XvImageSink::expose_cb), static_cast<void*>(sink_));
