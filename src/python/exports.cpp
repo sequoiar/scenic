@@ -58,9 +58,7 @@ BOOST_PYTHON_MODULE(libpyboostskel)
 
 BOOST_PYTHON_MODULE(libpyboostskel)
 {
-    class_ < TcpThread > ("TcpThread",init < int, bool > ())
-    ;
-    class_ < WrapMsgThread > ("WrapMsgThread",init < TcpThread* > ())
+    class_ < WrapMsgThread > ("WrapMsgThread",init < unsigned int > ())
         .def("getMsg", &WrapMsgThread::getMsg)
         .def("send", &WrapMsgThread::send)
     ;

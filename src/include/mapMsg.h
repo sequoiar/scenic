@@ -84,7 +84,14 @@ public:
         return sif;
     }
     void clear(){map_.clear();}
-    const std::pair<const std::string,StrIntFloat>* begin(){it_ =map_.begin(); return &(*it_);}
+    const std::pair<const std::string,StrIntFloat>* begin()
+    {
+        it_ = map_.begin(); 
+        if(it_ != map_.end())
+            return &(*it_);
+        else
+            return 0;
+    }
     const std::pair<const std::string,StrIntFloat>* next()
     { 
         if (++it_ != map_.end())
