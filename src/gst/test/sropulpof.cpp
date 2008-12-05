@@ -47,6 +47,7 @@ short Pof::run(int argc, char **argv)
     char *videoDevice = 0;
 
     int screenNum = 0;
+    int numChannels = NUM_CHANNELS;
     
 
     options.add(new StringArg(&ip, "address", 'i', "address", "provide ip address"));
@@ -59,6 +60,7 @@ short Pof::run(int argc, char **argv)
     options.add(new BoolArg(&full,"fullscreen", 'f', "default to fullscreen"));
     options.add(new StringArg(&videoDevice, "videoDevice", 'd', "device", "/dev/video0 /dev/video1"));
     options.add(new IntArg(&screenNum, "screenNum", 'n', "screenNum", ""));
+    options.add(new IntArg(&numChannels, "numChannels", 'c', "numChannels", "2"));
 
     options.parse(argc, argv);
 
@@ -82,7 +84,7 @@ short Pof::run(int argc, char **argv)
         vRx->stop();
     }
     else {
-        AudioConfig aConfig("jackaudiosrc", Pof::NUM_CHANNELS);
+        AudioConfig aConfig("jackaudiosrc", numChannels);
         std::auto_ptr<AudioSender> aTx(Factories::buildAudioSender(aConfig, ip, audioCodec, audioPort));
         aTx->start();
         assert(tcpSendCaps(ip, Ports::CAPS_PORT, aTx->getCaps()));
