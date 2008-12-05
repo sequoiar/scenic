@@ -54,12 +54,6 @@ class VideoTestSource
     private:
         ~VideoTestSource();
         void init();
-        int callback();
-        void toggle_colour();
-
-        GstClockID clockId_;
-        static const int BLACK;
-        static const int WHITE;
 
         VideoTestSource(const VideoTestSource&);     //No Copy Constructor
         VideoTestSource& operator=(const VideoTestSource&);     //No Assignment Operator

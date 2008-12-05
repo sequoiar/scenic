@@ -47,49 +47,22 @@ VideoSource::~VideoSource()
     Pipeline::Instance()->remove(&source_);
 }
 
-// gst-inspect property codes
-const int VideoTestSource::BLACK = 2;
-const int VideoTestSource::WHITE = 3;
-
 
 /// Constructor
 VideoTestSource::VideoTestSource(const VideoSourceConfig &config) : 
-    VideoSource(config), clockId_(0) 
+    VideoSource(config) 
 {}
-
-/// Called asynchronously at regular interval, to toggle colour
-gboolean VideoTestSource::callback()
-{
-    if (!source_)
-        return FALSE;
-    toggle_colour();
-    return TRUE;
-}
-
-
-void VideoTestSource::toggle_colour()
-{
-    static int colour = BLACK;
-
-    g_object_set(G_OBJECT(source_), "pattern", colour, NULL);
-    colour = (colour == BLACK) ? WHITE : BLACK;     // toggle black and white
-}
-
 
 void VideoTestSource::init()
 {
     VideoSource::init();
     g_object_set(G_OBJECT(source_), "is-live", FALSE, NULL); // necessary for clocked callback to work
-    //g_object_set(G_OBJECT(source_), "pattern", WHITE, NULL);
-    //clockId_ = Pipeline::Instance()->add_clock_callback(callback, this);
 }
 
 
+/// Destructor
 VideoTestSource::~VideoTestSource()
-{
-    if (clockId_)
-        Pipeline::Instance()->remove_clock_callback(clockId_);
-}
+{}
 
 
 void VideoFileSource::init()
@@ -159,12 +132,14 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
 }
 
 
+/// Destructor
 VideoFileSource::~VideoFileSource()
 {
     Pipeline::Instance()->remove(&decoder_);
 }
 
 
+/// Destructor
 VideoDvSource::~VideoDvSource()
 {
     if (Pipeline::Instance()->findElement(config_.source()) != NULL)
