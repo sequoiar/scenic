@@ -3,12 +3,12 @@
 #include "msgThread.h"
 
 
-class WrapMsgThread
+class MsgThreadWrap
 {
 TcpThread thread_;
 QueuePair &q_;
 public:
-    WrapMsgThread(int port): 
+    MsgThreadWrap(int port): 
         thread_(port,0),q_(thread_.getQueue())
     {thread_.run();}
    
