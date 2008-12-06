@@ -2,14 +2,30 @@
 #include <boost/python.hpp>
 #include "msgThread.h"
 
-
-class MsgThreadWrap
+class MsgWrapConfig
 {
-TcpThread thread_;
+    public:
+        virtual MsgThread* GetMsgThread(){ return NULL;} ;
+        virtual ~MsgWrapConfig(){}
+};
+
+class TcpWrapConfig : public MsgWrapConfig
+{
+    int port_;
+    int log_;
+
+    public:
+        TcpWrapConfig(int port,bool log):port_(port),log_(log){}
+        MsgThread* GetMsgThread(){ return new TcpThread(port_,log_);}
+};
+
+class ThreadWrap
+{
+MsgThread& thread_;
 QueuePair &q_;
 public:
-    MsgThreadWrap(int port): 
-        thread_(port,0),q_(thread_.getQueue())
+    ThreadWrap(MsgWrapConfig* conf): 
+        thread_(*(conf->GetMsgThread())),q_(thread_.getQueue())
     {thread_.run();}
    
     bool send(boost::python::tuple /*tu*/)

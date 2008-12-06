@@ -53,15 +53,20 @@ BOOST_PYTHON_MODULE(libpyboostskel)
 }
 #endif
 #include "tcp/tcpThread.h"
-#include "wrapMsgThread.h"
-
-
-BOOST_PYTHON_MODULE(libpyboostskel)
+#include "threadWrap.h"
+#if 0
+#endif
+BOOST_PYTHON_MODULE(libmsgthreads)
 {
-    class_ < MsgThreadWrap > ("MsgThreadWrap",init < unsigned int > ())
-        .def("getMsg", &MsgThreadWrap::getMsg)
-        .def("send", &MsgThreadWrap::send)
-    ;
+    
+    class_ < MsgWrapConfig > ("MsgWrapConfig", no_init)
+        ;
+    class_ < TcpWrapConfig, bases<MsgWrapConfig> >("TcpWrapConfig",init <int, bool> ())
+        ;
+    class_ < ThreadWrap > ("ThreadWrap",init < MsgWrapConfig* > ())
+        .def("getMsg", &ThreadWrap::getMsg)
+        .def("send", &ThreadWrap::send)
+        ;
 }
 
 
