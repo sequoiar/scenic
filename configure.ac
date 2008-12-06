@@ -35,8 +35,7 @@ AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
         enable_debug=yes)
 
-#AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" == "xyes" )
-
+AC_MSG_WARN([${ac_prefix}])
 # Checks for library functions.
 
 if test "x${enable_debug}" = "xyes" ; then
@@ -131,8 +130,9 @@ fi
 #AC_SUBST(PYTHON_LIBS)
 
 AX_PYTHON
+AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
 AX_BOOST_PYTHON
-AM_CONDITIONAL([BOOST_PYTHON], test "x${ac_cv_boost_python}" = "xyes")
+AM_CONDITIONAL([BOOST_PYTHON], test "x${have_python}" = "xtrue")
 
 AX_CHECK_GL
 AX_CHECK_GLU
