@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2007-06-21 14:35-0400\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-12-08 17:16-0500\n"
 "PO-Revision-Date: 2007-06-21 14:46-0400\n"
 "Last-Translator:  <tiit@sympatico.ca>\n"
 "Language-Team: French <traduc@traduc.org>\n"
@@ -15,123 +16,123 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: maugis.py:127
+#: maugis.py:125
 msgid ""
 "<b><big>Contact unreacheable.</big></b>\n"
 "\n"
 "Could not connect to the IP address of this contact."
 msgstr ""
 
-#: maugis.py:129
+#: maugis.py:127
 msgid ""
 "<b><big>Connection timeout.</big></b>\n"
 "\n"
 "Could not connect to the port of this contact."
 msgstr ""
 
-#: maugis.py:131
+#: maugis.py:129
 msgid ""
 "<b><big>Contact answer timeout.</big></b>\n"
 "\n"
 "The contact did not answer in an reasonable delay."
 msgstr ""
 
-#: maugis.py:133
-#, c-format
+#: maugis.py:131
+#, python-format
 msgid ""
 "<b><big>Problem sending command.</big></b>\n"
 "\n"
 "Error: %s"
 msgstr ""
 
-#: maugis.py:135
+#: maugis.py:133
 msgid ""
 "<b><big>Connection refuse.</big></b>\n"
 "\n"
 "The contact refuse the connection."
 msgstr ""
 
-#: maugis.py:137
+#: maugis.py:135
 msgid ""
 "<b><big>Invalid answer.</big></b>\n"
 "\n"
 "The answer was not valid."
 msgstr ""
 
-#: maugis.py:153
-#, c-format
+#: maugis.py:151
+#, python-format
 msgid ""
-"<b><big>Could not start dvsend?</big></b>\n"
+"<b><big>Could not start gstsend?</big></b>\n"
 "\n"
 "Error: %s. Quitting."
 msgstr ""
 
-#: maugis.py:167
+#: maugis.py:165
 msgid ""
-"<b><big>Could not start dvsend?</big></b>\n"
+"<b><big>Could not start gstsend?</big></b>\n"
 "\n"
-"Could not start dvsend. Quitting."
+"Could not start gstsend. Quitting."
 msgstr ""
 
-#: maugis.py:193
+#: maugis.py:191
 msgid ""
-"<b><big>Could not start xdvshow?</big></b>\n"
+"<b><big>Could not start gstrecv?</big></b>\n"
 "\n"
-"Could not start xdvshow. Quitting."
+"Could not start gstrecv. Quitting."
 msgstr ""
 
-#: maugis.py:199 maugis.py:210
+#: maugis.py:197 maugis.py:208
 msgid ""
 "<b><big>maugis</big></b>\n"
 "Version: "
 msgstr ""
 
+#: maugis.py:199 maugis.py:210
+msgid ""
+"\n"
+"gstsend: "
+msgstr ""
+
+#: maugis.py:200 maugis.py:211
+msgid ""
+"\n"
+"gstrecv: "
+msgstr ""
+
 #: maugis.py:201 maugis.py:212
-msgid ""
-"\n"
-"dvsend: "
-msgstr ""
-
-#: maugis.py:202 maugis.py:213
-msgid ""
-"\n"
-"xdvshow: "
-msgstr ""
-
-#: maugis.py:203 maugis.py:214
 msgid ""
 "\n"
 "Copyright: SAT"
 msgstr ""
 
-#: maugis.py:204 maugis.py:215
+#: maugis.py:202 maugis.py:213
 msgid ""
 "\n"
 "Authors: Etienne Desautels"
 msgstr ""
 
-#: maugis.py:260
+#: maugis.py:258
 msgid ""
 "<b><big>The port number is not valid</big></b>\n"
 "\n"
 "Enter a valid port number in the range of 1-999999"
 msgstr ""
 
-#: maugis.py:314
+#: maugis.py:312
 msgid ""
 "<b><big>Delete this contact from the list?</big></b>\n"
 "\n"
 "Are you sure you want to delete this contact from the list?"
 msgstr ""
 
-#: maugis.py:343
+#: maugis.py:341
 msgid ""
 "<b><big>The port number is not valid</big></b>\n"
 "\n"
 "Enter a valid port number in the range of 1000-99999"
 msgstr ""
 
-#: maugis.py:350
+#: maugis.py:348
 msgid ""
 "<b><big>The address is not valid</big></b>\n"
 "\n"
@@ -139,21 +140,21 @@ msgid ""
 "Example: 168.123.45.32 or tot.sat.qc.ca"
 msgstr ""
 
-#: maugis.py:375
+#: maugis.py:373
 msgid ""
 "<b><big>Shutdown the computer?</big></b>\n"
 "\n"
 "Are you sure you want to shutdown the computer now?"
 msgstr ""
 
-#: maugis.py:380
+#: maugis.py:378
 msgid ""
 "<b><big>Reboot the computer?</big></b>\n"
 "\n"
 "Are you sure you want to reboot the computer now?"
 msgstr ""
 
-#: maugis.py:388
+#: maugis.py:386
 msgid ""
 "<b><big>Send the settings?</big></b>\n"
 "\n"
@@ -161,200 +162,187 @@ msgid ""
 "maugis?"
 msgstr ""
 
-#: maugis.py:425
+#: maugis.py:423
 msgid ""
 "<b><big>Could not send info.</big></b>\n"
 "\n"
 "Check your internet connection."
 msgstr ""
 
-#: maugis.py:465
-#, c-format
+#: maugis.py:467
+#, python-format
 msgid ""
 "<b><big>%s was contacting you.</big></b>\n"
 "\n"
 "But you did not answer in reasonable delay."
 msgstr ""
 
-#: maugis.py:564
+#: maugis.py:578
+#, python-format
 msgid "# Configuration written by %(app)s %(version)s\n"
 msgstr ""
 
-#: maugis.py:627
+#: maugis.py:641
 msgid "Cannot write Address Book file"
 msgstr ""
 
-#: maugis.py:648
-#, c-format
+#: maugis.py:662
+#, python-format
 msgid ""
 "<b><big>Could not find the Glade file?</big></b>\n"
 "\n"
 "Be sure the file %s is in /usr/share/maugis/. Quitting."
 msgstr ""
 
-#: maugis.py:708 maugis.glade.h:13
+#: maugis.py:722 maugis.glade.h:24
 msgid "Contacts"
 msgstr ""
 
-#: maugis.glade.h:7
-msgid "maugis"
-msgstr ""
-
-#: maugis.glade.h:8
-msgid "Add a new contact"
-msgstr "Ajoutez un nouveau contact"
-
-#: maugis.glade.h:9
-msgid "Delete this contact"
-msgstr ""
-
-#: maugis.glade.h:10
-msgid "Edit this contact"
-msgstr ""
-
-#: maugis.glade.h:11
-msgid "Join this contact"
-msgstr ""
-
-#: maugis.glade.h:12
-msgid "<b>Local Preview</b>"
-msgstr ""
-
-#: maugis.glade.h:14
-msgid "15 Mbps"
-msgstr ""
-
-#: maugis.glade.h:15
-msgid "30 Mbps"
-msgstr ""
-
-#: maugis.glade.h:16
-msgid "Bandwidth:"
-msgstr ""
-
-#: maugis.glade.h:17
-msgid "Settings"
-msgstr ""
-
-#: maugis.glade.h:18
-msgid "Negotiation Port:"
-msgstr ""
-
-#: maugis.glade.h:19
-msgid "<b>Network Configuration</b>"
-msgstr ""
-
-#: maugis.glade.h:20
-msgid "Send the configuration information for troubleshooting"
-msgstr ""
-
-#: maugis.glade.h:21
-msgid "Send Info"
-msgstr ""
-
-#: maugis.glade.h:22
-msgid "Update maugis and related librairies"
-msgstr ""
-
-#: maugis.glade.h:23
-msgid "Update"
-msgstr ""
-
-#: maugis.glade.h:24
-msgid "<b>Maintenance</b>"
-msgstr ""
-
-#: maugis.glade.h:25
-msgid "Reboot the computer"
-msgstr ""
-
-#: maugis.glade.h:26
-msgid "Reboot"
-msgstr ""
-
-#: maugis.glade.h:27
-msgid "Shutdown the computer"
-msgstr ""
-
-#: maugis.glade.h:28
-msgid "Shutdown"
-msgstr ""
-
-#: maugis.glade.h:29
-msgid "<b>System</b>"
-msgstr ""
-
-#: maugis.glade.h:30
-msgid "Configuration"
-msgstr ""
-
-#: maugis.glade.h:31
-msgid ""
-"<b><big>maugis</big></b>\n"
-"Version: 1.1\n"
-"Copyright: SAT\n"
-"Authors: Etienne Desautels, Simon Piette"
-msgstr ""
-
-#: maugis.glade.h:35
+#: maugis.glade.h:1
 msgid ""
 "\n"
-"maugis is a graphical interface whose goal is to use DVTS and xdvshow as "
-"a videoconferencing tool on wide band networks."
+"maugis is the miville advanced user graphical interface system. Catherine "
+"Maugis was also the wife of Pierre Miville"
 msgstr ""
 
-#: maugis.glade.h:37
-msgid "Information"
+#: maugis.glade.h:3
+msgid ""
+"15 Mbps\n"
+"30 Mbps"
 msgstr ""
 
-#: maugis.glade.h:38
-msgid "Confirmation"
-msgstr ""
-
-#: maugis.glade.h:39
-msgid "Client Preview"
-msgstr ""
-
-#: maugis.glade.h:40
-msgid "Fullscreen"
-msgstr ""
-
-#: maugis.glade.h:41
-msgid "Contacting..."
-msgstr ""
-
-#: maugis.glade.h:42
+#: maugis.glade.h:5
 msgid "<b><big>Contacting...</big></b>"
 msgstr ""
 
-#: maugis.glade.h:43
-msgid "Contact Problem"
+#: maugis.glade.h:6
+msgid ""
+"<b><big>maugis</big></b>\n"
+"Version: 1.0\n"
+"Copyright: SAT\n"
+"Authors: Etienne Desautels"
 msgstr ""
 
-#: maugis.glade.h:44
-msgid "Contact Request"
+#: maugis.glade.h:10
+msgid "<b>Local Preview</b>"
 msgstr ""
 
-#: maugis.glade.h:45
-msgid "Refuse"
+#: maugis.glade.h:11
+msgid "<b>Maintenance</b>"
 msgstr ""
 
-#: maugis.glade.h:46
+#: maugis.glade.h:12
+msgid "<b>Name:</b>"
+msgstr ""
+
+#: maugis.glade.h:13
+msgid "<b>Network Configuration</b>"
+msgstr ""
+
+#: maugis.glade.h:14
+msgid "<b>System</b>"
+msgstr ""
+
+#: maugis.glade.h:15
 msgid "Accept"
 msgstr ""
 
-#: maugis.glade.h:47
+#: maugis.glade.h:16
+msgid "Add a new contact"
+msgstr "Ajoutez un nouveau contact"
+
+#: maugis.glade.h:17
+msgid "Bandwidth:"
+msgstr ""
+
+#: maugis.glade.h:18
+msgid "Client Preview"
+msgstr ""
+
+#: maugis.glade.h:19
+msgid "Configuration"
+msgstr ""
+
+#: maugis.glade.h:20
+msgid "Confirmation"
+msgstr ""
+
+#: maugis.glade.h:21
+msgid "Contact Problem"
+msgstr ""
+
+#: maugis.glade.h:22
+msgid "Contact Request"
+msgstr ""
+
+#: maugis.glade.h:23
+msgid "Contacting..."
+msgstr ""
+
+#: maugis.glade.h:25
+msgid "Delete this contact"
+msgstr ""
+
+#: maugis.glade.h:26
 msgid "Edit Contact"
 msgstr ""
 
-#: maugis.glade.h:48
+#: maugis.glade.h:27
+msgid "Edit this contact"
+msgstr ""
+
+#: maugis.glade.h:28
+msgid "Fullscreen"
+msgstr ""
+
+#: maugis.glade.h:29
 msgid "IP Address:"
 msgstr ""
 
-#: maugis.glade.h:49
+#: maugis.glade.h:30
+msgid "Information"
+msgstr ""
+
+#: maugis.glade.h:31
+msgid "Join this contact"
+msgstr ""
+
+#: maugis.glade.h:32
+msgid "Negotiation Port:"
+msgstr ""
+
+#: maugis.glade.h:33
 msgid "Port:"
 msgstr ""
 
-#: maugis.glade.h:50
-msgid "<b>Name:</b>"
+#: maugis.glade.h:34
+msgid "Reboot the computer"
+msgstr ""
+
+#: maugis.glade.h:35
+msgid "Refuse"
+msgstr ""
+
+#: maugis.glade.h:36
+msgid "Send the configuration information for troubleshooting"
+msgstr ""
+
+#: maugis.glade.h:37
+msgid "Shutdown"
+msgstr ""
+
+#: maugis.glade.h:38
+msgid "Shutdown the computer"
+msgstr ""
+
+#: maugis.glade.h:39
+msgid "Update"
+msgstr ""
+
+#: maugis.glade.h:40
+msgid "Update maugis and related librairies"
+msgstr ""
+
+#: maugis.glade.h:41
+msgid "maugis"
 msgstr ""
