@@ -25,6 +25,7 @@
 #include "logWriter.h"
 #include "pipeline.h"
 #include "playback.h"
+#include "gutil.h"
 
 #include "logWriter.h"
 
@@ -118,7 +119,6 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
 
         case 'q':
         case 'Q':
-        case GDK_Escape: // escape character
             // Quit application, this quits the main loop
             // (if there is one)
             playback::quit();
@@ -167,6 +167,8 @@ void XvImageSink::init()
 
     gtk_window_set_default_size(GTK_WINDOW(window_), VideoSink::WIDTH, VideoSink::HEIGHT);
     gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
+
+//g_signal_connect(G_OBJECT(window_), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
 
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
                 expose_cb), static_cast<void*>(this));

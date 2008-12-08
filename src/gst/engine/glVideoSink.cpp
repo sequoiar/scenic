@@ -225,7 +225,6 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             break;
         case 'q':
         case 'Q':
-        case GDK_Escape: // escape character
             // Quit application, this quits the main loop
             // (if there is one)
             playback::quit();
