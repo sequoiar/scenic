@@ -176,3 +176,4 @@ bool Raw1394::cameraIsReady()
     return true;
 }
 #endif
+

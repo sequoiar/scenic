@@ -18,6 +18,7 @@
  *
  */
 
+#include "logWriter.h"
 #include "gutil.h"
     
 // extend namespace gutil
@@ -30,6 +31,8 @@ int gutil::killMainLoop(gpointer /*data*/)
 {
     if (loop_)
         g_main_loop_quit(loop_);
+
+    LOG_DEBUG("Quitting...");
     return FALSE;       // won't be called again
 }
 
