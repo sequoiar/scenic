@@ -26,6 +26,7 @@
 #include "gstLinkable.h"
 #include "logWriter.h"
 #include "pipeline.h"
+#include "playback.h"
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
@@ -221,6 +222,13 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
         case 'C':
             LOG_DEBUG("Resetting GL texture position");
             resetGLparams();
+            break;
+        case 'q':
+        case 'Q':
+        case GDK_Escape: // escape character
+            // Quit application, this quits the main loop
+            // (if there is one)
+            playback::quit();
             break;
         default:
             g_print("unknown keypress %d", event->keyval);

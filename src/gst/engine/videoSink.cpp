@@ -118,7 +118,7 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
 
         case 'q':
         case 'Q':
-        case 27:  // escape character
+        case GDK_Escape: // escape character
             // Quit application, this quits the main loop
             // (if there is one)
             playback::quit();
