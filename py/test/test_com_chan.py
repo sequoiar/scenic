@@ -97,6 +97,7 @@ class TestComChan(unittest.TestCase):
         del self.channel2
         self.connect.disconnect()
         self.ref.broker.transport.loseConnection()
+
         
         del self.channel
         del self.dummy
