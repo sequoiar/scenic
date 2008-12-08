@@ -30,6 +30,7 @@
 
 // forward declarations
 class AudioSourceConfig;
+class _GObject;
 
 /** 
  *  Abstract base class from which our audio sources are derived.
@@ -167,6 +168,13 @@ class AudioAlsaSource : public AudioSource
 {
     public:
         explicit AudioAlsaSource(const AudioSourceConfig &config);
+
+// FIXME: use this
+#if 0
+    protected:
+        static void initCaps(_GObject *capsfilter);
+#endif
+
 
     private:
         ~AudioAlsaSource();

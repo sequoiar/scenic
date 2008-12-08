@@ -18,17 +18,33 @@
  *
  */
 
-#ifndef __GUTIL_H__
-#define __GUTIL_H__
-
-#include <glib.h>
-
-namespace gutil {
-    int killMainLoop(gpointer data = NULL);
+#include "gutil.h"
     
-    /// ms to run - 0 is forever
-    void runMainLoop(unsigned int ms);
+// extend namespace gutil
+namespace gutil {
+    static GMainLoop *loop_ = 0;
 }
 
-#endif // __GUTIL_H__
+
+int gutil::killMainLoop(gpointer /*data*/)
+{
+    if (loop_)
+        g_main_loop_quit(loop_);
+    return FALSE;       // won't be called again
+}
+
+
+/// ms to run - 0 is forever
+void gutil::runMainLoop(unsigned int ms)
+{
+    //   std::cout.flush();
+    //   std::cout << filename << ":" << function << ":" << lineNumber
+    //             << ": in g_main_loop for` " << ms << " milliseconds" << std::endl;
+    loop_ = g_main_loop_new (NULL, FALSE);                       
+    if(ms)
+        g_timeout_add(ms, static_cast<GSourceFunc>(gutil::killMainLoop),
+                NULL);
+    g_main_loop_run(loop_);
+    g_main_loop_unref(loop_);
+}
 

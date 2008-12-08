@@ -21,6 +21,7 @@
 #include <cassert>
 #include "playback.h"
 #include "pipeline.h"
+#include "gutil.h"
 
 
 void playback::start()
@@ -42,5 +43,11 @@ void playback::pause()
 bool playback::isPlaying()
 { 
     return Pipeline::Instance()->isPlaying(); 
+}
+
+void playback::quit()
+{
+    stop();
+    gutil::killMainLoop();
 }
 

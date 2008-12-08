@@ -24,6 +24,9 @@
 #include "videoSink.h"
 #include "logWriter.h"
 #include "pipeline.h"
+#include "playback.h"
+
+#include "logWriter.h"
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
@@ -107,10 +110,23 @@ void VideoSink::prepareSink()
 
 gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
-    if (event->keyval != 'f')
-        LOG_DEBUG("user didn't hit f");
-    else
-        toggleFullscreen(widget);
+    switch (event->keyval)
+    {
+        case 'f':
+            toggleFullscreen(widget);
+            break;
+
+        case 'q':
+        case 'Q':
+        case 27:  // escape character
+            // Quit application, this quits the main loop
+            // (if there is one)
+            playback::quit();
+            break;
+
+        default:
+            break;
+    }
 
     return TRUE;
 }

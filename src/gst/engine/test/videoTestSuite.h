@@ -33,13 +33,13 @@ class VideoTestSuite
         {
             testLength_ = 400000;
             
-            TEST_ADD(VideoTestSuite::start_test_video_gl)
-            TEST_ADD(VideoTestSuite::stop_test_video_gl)
-            TEST_ADD(VideoTestSuite::start_stop_test_video_gl)
-           
             TEST_ADD(VideoTestSuite::start_test_video)
             TEST_ADD(VideoTestSuite::stop_test_video)
             TEST_ADD(VideoTestSuite::start_stop_test_video)
+            
+            TEST_ADD(VideoTestSuite::start_test_video_gl)
+            TEST_ADD(VideoTestSuite::stop_test_video_gl)
+            TEST_ADD(VideoTestSuite::start_stop_test_video_gl)
             
             TEST_ADD(VideoTestSuite::start_v4l_gl)
             TEST_ADD(VideoTestSuite::stop_v4l_gl)

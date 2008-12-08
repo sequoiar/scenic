@@ -30,22 +30,28 @@ class AudioTestSuite
 
         AudioTestSuite()
         {
-            testLength_ = 500000;
-            TEST_ADD(AudioTestSuite::start_8ch_alsa)
-            TEST_ADD(AudioTestSuite::stop_8ch_alsa)
-            TEST_ADD(AudioTestSuite::start_stop_8ch_alsa)
-
+            testLength_ = 10000;
+            
             TEST_ADD(AudioTestSuite::start_6ch_pulse)
             TEST_ADD(AudioTestSuite::stop_6ch_pulse)
             TEST_ADD(AudioTestSuite::start_stop_6ch_pulse)
 
-            TEST_ADD(AudioTestSuite::start_8ch_audiofile)
-            TEST_ADD(AudioTestSuite::stop_8ch_audiofile)
-            TEST_ADD(AudioTestSuite::start_stop_8ch_audiofile)
+            TEST_ADD(AudioTestSuite::start_8ch_pulse)
+            TEST_ADD(AudioTestSuite::stop_8ch_pulse)
+            TEST_ADD(AudioTestSuite::start_stop_8ch_pulse)
+
+            TEST_ADD(AudioTestSuite::start_8ch_alsa)
+            TEST_ADD(AudioTestSuite::stop_8ch_alsa)
+            TEST_ADD(AudioTestSuite::start_stop_8ch_alsa)
 
             TEST_ADD(AudioTestSuite::start_8ch_jack)
             TEST_ADD(AudioTestSuite::stop_8ch_jack)
             TEST_ADD(AudioTestSuite::start_stop_8ch_jack)
+
+
+            TEST_ADD(AudioTestSuite::start_8ch_audiofile)
+            TEST_ADD(AudioTestSuite::stop_8ch_audiofile)
+            TEST_ADD(AudioTestSuite::start_stop_8ch_audiofile)
 
             TEST_ADD(AudioTestSuite::start_1ch_audiotest)
             TEST_ADD(AudioTestSuite::stop_1ch_audiotest)
@@ -106,6 +112,10 @@ class AudioTestSuite
         void start_6ch_pulse();
         void stop_6ch_pulse();
         void start_stop_6ch_pulse();
+
+        void start_8ch_pulse();
+        void stop_8ch_pulse();
+        void start_stop_8ch_pulse();
 
         void start_audio_dv();
         void stop_audio_dv();

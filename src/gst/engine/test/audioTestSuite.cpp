@@ -488,6 +488,51 @@ void AudioTestSuite::start_stop_6ch_pulse()
 
 
 
+void AudioTestSuite::start_8ch_pulse()
+{
+    const int NUM_CHANNELS = 8;
+    AudioSourceConfig srcConfig("pulsesrc", NUM_CHANNELS);
+    AudioSinkConfig sinkConfig("pulsesink");
+    AudioLocal tx(srcConfig, sinkConfig);
+    TEST_THROWS_NOTHING(tx.init());
+
+    playback::start();
+
+    BLOCK();
+    TEST_ASSERT(playback::isPlaying());
+}
+
+
+void AudioTestSuite::stop_8ch_pulse()
+{
+    const int NUM_CHANNELS = 8;
+    AudioSourceConfig srcConfig("pulsesrc", NUM_CHANNELS);
+    AudioSinkConfig sinkConfig("pulsesink");
+    AudioLocal tx(srcConfig, sinkConfig);
+    TEST_THROWS_NOTHING(tx.init());
+
+    BLOCK();
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
+}
+
+
+void AudioTestSuite::start_stop_8ch_pulse()
+{
+    const int NUM_CHANNELS = 8;
+    AudioSourceConfig srcConfig("pulsesrc", NUM_CHANNELS);
+    AudioSinkConfig sinkConfig("pulsesink");
+    AudioLocal tx(srcConfig, sinkConfig);
+    TEST_THROWS_NOTHING(tx.init());
+    playback::start();
+
+    BLOCK();
+    TEST_ASSERT(playback::isPlaying());
+
+    playback::stop();
+    TEST_ASSERT(!playback::isPlaying());
+}
+
 
 int mainAudioTestSuite(int /*argc*/, char ** /*argv*/)
 {

@@ -64,8 +64,8 @@ short pof::run(int argc, char **argv)
     options.add(new BoolArg(&send,"sender", 's', "sender"));
     options.add(new BoolArg(&recv,"receiver", 'r', "receiver"));
     options.add(new BoolArg(&full,"fullscreen", 'f', "default to fullscreen"));
-    options.add(new StringArg(&videoDevice, "videoDevice", 'd', "device", "/dev/video0 /dev/video1"));
-    options.add(new IntArg(&screenNum, "screenNum", 'n', "screenNum", "xinerama screen num"));
+    options.add(new StringArg(&videoDevice, "videodevice", 'd', "device", "/dev/video0 /dev/video1"));
+    options.add(new IntArg(&screenNum, "screen", 'n', "screen", "xinerama screen num"));
 
     options.parse(argc, argv);
 

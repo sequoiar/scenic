@@ -2,6 +2,7 @@
 #include <cstring>
 #include <glib.h>
 #include "gstTestSuite.h"
+#include "gutil.h"
 
 void GstTestSuite::setup()
 {
@@ -39,12 +40,7 @@ void GstTestSuite::block(const char * filename, const char *function, long lineN
     std::cout.flush();
     std::cout << filename << ":" << function << ":" << lineNumber
               << ": blocking for " << testLength_ << " milliseconds" << std::endl;
-    GMainLoop *loop;                                             
-    loop = g_main_loop_new (NULL, FALSE);                       
-    g_timeout_add(testLength_, static_cast<GSourceFunc>(GstTestSuite::killMainLoop),
-                  static_cast<void*>(loop));
-    g_main_loop_run(loop);
-    g_main_loop_unref(loop);
+    gutil::runMainLoop(testLength_);
 }
 
 bool GstTestSuite::areValidArgs(int argc, char **argv)
