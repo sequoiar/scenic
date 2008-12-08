@@ -1,0 +1,16 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Exec=maugis
+TryExec=
+Icon=gnome-talk.png
+X-GNOME-DocPath=
+Terminal=false
+Name[en]=maugis
+GenericName[en]=maugis
+Comment[en]=maugis
+Name=maugis
+GenericName=maugis
+Comment=maugis
+Categories=Application;AudioVideo;Audio;
