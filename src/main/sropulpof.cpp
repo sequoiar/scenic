@@ -69,10 +69,21 @@ short pof::run(int argc, char **argv)
 
     options.parse(argc, argv);
 
+
+
     pid = send ? 's' : 'r';
 
     LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
+
+    if(ip == 0) 
+        THROW_ERROR("argument error: missing ip. see --help");
+    if(videoCodec == 0)
+        THROW_ERROR("argument error: missing videoCodec. see --help");
+
     if (pid == 'r') {
+        if(videoSink == 0)
+            THROW_ERROR("argument error: missing videoSink. see --help");
+
         std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink));
         std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver(ip, audioCodec, audioPort));
         playback::start();
