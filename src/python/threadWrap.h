@@ -30,14 +30,26 @@ public:
    
     bool send(boost::python::dict dt)
     {     
+        MapMsg m;
         boost::python::list l = dt.items();
         int n = boost::python::extract<int>(l.attr("__len__")());
-
+        LOG_DEBUG(n);
             
         for ( int i = 0; i < n; i++ )
         {
+            std::string skey,sval;
             tuple val = (boost::python::extract<boost::python::tuple>(l[i]));
-            LOG_DEBUG("%s:%s" % val);
+            skey = boost::python::extract<std::string>(val[0]);
+            if(boost::python::extract<std::string>(val[1]).check()){
+                m[skey] = boost::python::extract<std::string>(val[1]); 
+            }else
+            if(boost::python::extract<int>(val[1]).check()){
+                m[skey] = boost::python::extract<int>(val[1]); 
+            }
+            q_.push(m);
+            //sval = boost::python::extract<std::string>(val[1]);
+            //m[skey] = sval;
+            LOG_DEBUG(skey << ">>" << sval);
         }
         return true; 
     }
