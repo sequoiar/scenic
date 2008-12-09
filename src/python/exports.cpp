@@ -33,29 +33,9 @@
 
 using namespace boost::python;
 
-class Hello
-{
-public:
-    Hello(){}
-    const char* greet(){ return "hello";}
-
-
-};
-
-
-
-#if 0
-BOOST_PYTHON_MODULE(libpyboostskel)
-{
-    class_ < Hello > ("Hello")
-        .def("greet", &Hello::greet)
-    ;
-}
-#endif
 #include "tcp/tcpThread.h"
 #include "threadWrap.h"
-#if 0
-#endif
+
 BOOST_PYTHON_MODULE(libmsgthreads)
 {
     

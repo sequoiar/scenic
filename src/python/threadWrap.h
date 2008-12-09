@@ -28,8 +28,19 @@ public:
         thread_(*(conf->GetMsgThread())),q_(thread_.getQueue())
     {thread_.run();}
    
-    bool send(boost::python::tuple /*tu*/)
-    { return true; }
+    bool send(boost::python::dict dt)
+    {     
+        boost::python::list l = dt.items();
+        int n = boost::python::extract<int>(l.attr("__len__")());
+
+            
+        for ( int i = 0; i < n; i++ )
+        {
+            tuple val = (boost::python::extract<boost::python::tuple>(l[i]));
+            LOG_DEBUG("%s:%s" % val);
+        }
+        return true; 
+    }
  
     boost::python::dict
     getMsg(int ms)
