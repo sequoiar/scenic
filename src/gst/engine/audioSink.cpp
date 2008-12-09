@@ -84,7 +84,6 @@ void AudioPulseSink::init()
 
     sink_ = Pipeline::Instance()->makeElement("pulsesink", NULL);
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-    g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
 
     gstlinkable::link(audioconvert_, sink_);
 }

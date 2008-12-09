@@ -31,15 +31,15 @@ class AudioTestSuite
         AudioTestSuite()
         {
             testLength_ = 10000;
-
-            TEST_ADD(AudioTestSuite::start_8ch_alsa)
-            TEST_ADD(AudioTestSuite::stop_8ch_alsa)
-            TEST_ADD(AudioTestSuite::start_stop_8ch_alsa)
             
             TEST_ADD(AudioTestSuite::start_6ch_pulse)
             TEST_ADD(AudioTestSuite::stop_6ch_pulse)
             TEST_ADD(AudioTestSuite::start_stop_6ch_pulse)
 
+            TEST_ADD(AudioTestSuite::start_8ch_alsa)
+            TEST_ADD(AudioTestSuite::stop_8ch_alsa)
+            TEST_ADD(AudioTestSuite::start_stop_8ch_alsa)
+            
             TEST_ADD(AudioTestSuite::start_8ch_jack)
             TEST_ADD(AudioTestSuite::stop_8ch_jack)
             TEST_ADD(AudioTestSuite::start_stop_8ch_jack)

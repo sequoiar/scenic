@@ -331,7 +331,7 @@ AudioPulseSource::~AudioPulseSource()
 void AudioPulseSource::sub_init()
 {
     std::ostringstream capsStr;
-    g_object_set(G_OBJECT(sources_[0]), "device", alsa::DEVICE_NAME, NULL);
+    //g_object_set(G_OBJECT(sources_[0]), "device", alsa::DEVICE_NAME, NULL);
     capsStr << "audio/x-raw-int, channels=" << config_.numChannels()
         << ", clock-rate=" << Pipeline::SAMPLE_RATE;
 
