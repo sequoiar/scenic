@@ -26,7 +26,7 @@
 #include <cstdlib>
 #include "logWriter.h"
 #include "gutil.h"
-#include "gst/msgThreadFactory.h"
+#include "msgThreadFactory.h"
 
 #define BLOCK() gutil::runMainLoop(0);
 

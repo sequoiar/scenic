@@ -1,6 +1,6 @@
 #include <Python.h>
 #include <boost/python.hpp>
-#include "msgThread.h"
+#include "msgThreadFactory.h"
 
 class MsgWrapConfig
 {
@@ -16,17 +16,23 @@ class TcpWrapConfig : public MsgWrapConfig
 
     public:
         TcpWrapConfig(int port,bool log):port_(port),log_(log){}
-        MsgThread* GetMsgThread(){ return new TcpThread(port_,log_);}
+        MsgThread* GetMsgThread(){ return MsgThreadFactory::Tcp(port_,log_);}
+};
+class GstWrapConfig : public MsgWrapConfig
+{
+    public:
+        GstWrapConfig(){}
+        MsgThread* GetMsgThread(){ return MsgThreadFactory::Gst(false);}
 };
 
 class ThreadWrap
 {
-MsgThread& thread_;
+    std::auto_ptr<MsgThread> thread_;
 QueuePair &q_;
 public:
     ThreadWrap(MsgWrapConfig* conf): 
-        thread_(*(conf->GetMsgThread())),q_(thread_.getQueue())
-    {thread_.run();}
+        thread_(conf->GetMsgThread()),q_(thread_->getQueue())
+    {thread_->run();}
    
     bool send(boost::python::dict dt)
     {     

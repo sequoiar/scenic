@@ -6,7 +6,11 @@ libmsgthreads_la_SOURCES = exports.cpp
 libmsgthreads_la_LDFLAGS = -version-info 1:1:1
 
 # add your libs i.e. ../hello/libhello.la  
-libmsgthreads_la_LIBADD =  $(src)/tcp/libtcp.a $(LIBUTIL) -l$(BOOST_PYTHON_LIB) $(GLIB_LIBS) 
+libmsgthreads_la_LIBADD =  -l$(BOOST_PYTHON_LIB) $(GLIB_LIBS) \
+						   $(src)/gst/control/libgstthread.a \
+						   $(ALL_GST_LIBS) $(JACK_LIBS) $(src)/tcp/libtcp.a \
+						   $(src)/gst/engine/libgst.a $(GTK_LIBS) \
+						   $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(src)/util/libUtil.a $(src)/gutil/libGUtil.a 
 
 libmsgthreads_la_CPPFLAGS = -I$(PYTHON_INCLUDE_DIR) $(AM_CPPFLAGS)
 

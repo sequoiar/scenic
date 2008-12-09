@@ -43,7 +43,9 @@ BOOST_PYTHON_MODULE(libmsgthreads)
         ;
     class_ < TcpWrapConfig, bases<MsgWrapConfig> >("TcpWrapConfig",init <int, bool> ())
         ;
-    class_ < ThreadWrap > ("ThreadWrap",init < MsgWrapConfig* > ())
+    class_ < GstWrapConfig, bases<MsgWrapConfig> >("GstWrapConfig")
+        ;
+    class_ < ThreadWrap, boost::noncopyable > ("ThreadWrap",init < MsgWrapConfig* > ())
         .def("getMsg", &ThreadWrap::getMsg)
         .def("send", &ThreadWrap::send)
         ;
