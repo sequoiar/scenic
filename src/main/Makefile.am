@@ -9,4 +9,4 @@ LDADD = $(src)/gutil/libGUtil.a $(src)/gst/control/libgstthread.a $(src)/gst/eng
 pof_CPPFLAGS= $(AM_CPPFLAGS)  $(GST_CFLAGS) $(GTK_CFLAGS) $(GL_CFLAGS) $(GLU_CFLAGS)
 
 install-exec-local:
-	ln -s $(prefix)/bin/pof $(prefix)/bin/mainTester
+	ln -sf $(prefix)/bin/pof $(prefix)/bin/mainTester
