@@ -47,10 +47,24 @@ void H264Depayloader::init()
     rtpPay_ = Pipeline::Instance()->makeElement("rtph264depay", NULL);
 }
 
+
+void Mpeg4Payloader::init()
+{
+    rtpPay_ = Pipeline::Instance()->makeElement("rtpmp4vpay", NULL);
+    Payloader::init();
+}
+
+
+void Mpeg4Depayloader::init()
+{
+    rtpPay_ = Pipeline::Instance()->makeElement("rtpmp4vdepay", NULL);
+}
+
+
 void VorbisPayloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpvorbispay", NULL);
-    g_object_set(G_OBJECT(rtpPay_), "max-ptime", VorbisPayloader::MAX_PTIME, NULL);
+    Payloader::init();
 }
 
 

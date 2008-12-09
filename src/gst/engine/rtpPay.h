@@ -55,6 +55,11 @@ class Payloader : public RtpPay
         void init() = 0;
 };
 
+class Depayloader : public RtpPay
+{
+};
+
+
 class H264Payloader : public Payloader
 {
     private: 
@@ -62,7 +67,21 @@ class H264Payloader : public Payloader
 };
 
 
-class H264Depayloader : public RtpPay
+class H264Depayloader : public Depayloader
+{
+    private: 
+        void init();
+};
+
+
+class Mpeg4Payloader : public Payloader
+{
+    private: 
+        void init();
+};
+
+
+class Mpeg4Depayloader : public Depayloader
 {
     private: 
         void init();
@@ -76,7 +95,7 @@ class VorbisPayloader : public Payloader
 };
 
 
-class VorbisDepayloader : public RtpPay
+class VorbisDepayloader : public Depayloader 
 {
     private: 
         void init();
@@ -89,7 +108,7 @@ class L16Payloader : public Payloader
         void init();
 };
 
-class L16Depayloader : public RtpPay
+class L16Depayloader : public Depayloader 
 {
     private: 
         void init();
@@ -102,7 +121,7 @@ class MpaPayloader : public Payloader
         void init();
 };
 
-class MpaDepayloader : public RtpPay
+class MpaDepayloader : public Depayloader
 {
     private: 
         void init();

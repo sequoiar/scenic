@@ -142,6 +142,25 @@ class H264Decoder : public Decoder
         RtpPay* createDepayloader() const;
 };
 
+
+/// Encoder that encodes raw video into mpeg4 using the ffmpeg mpeg4 encoder
+class Mpeg4Encoder : public Encoder
+{
+    private:
+        void init();
+        RtpPay* createPayloader() const;
+};
+
+
+/// Decoder that decodes mpeg4 into raw video using the ffmpeg mpeg4 decoder.
+class Mpeg4Decoder: public Decoder
+{
+    private: 
+        void init();
+        RtpPay* createDepayloader() const;
+};
+
+
 /// Encoder that encodes raw audio using the vorbis encoder.
 class VorbisEncoder : public AudioConvertedEncoder 
 {

@@ -31,16 +31,17 @@
 const int RemoteConfig::PORT_MIN = 1024;
 const int RemoteConfig::PORT_MAX = 65000;
 
-const std::string RemoteConfig::VALID_CODECS[NUM_CODECS] = {"h264", "raw", "vorbis", "mp3"};
         
 RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remoteHost__,
         int port__) : codec_(codec__), remoteHost_(remoteHost__), port_(port__)
 {
     if(codec_.empty())
         THROW_ERROR("No Codec specified.");
+
+    static const int NUM_CODECS = 5; 
+    static const std::string VALID_CODECS[NUM_CODECS] = {"h264", "raw", "vorbis", "mp3", "mpeg4"};
     const std::string *VALID_CODECS_END = VALID_CODECS + (NUM_CODECS * sizeof(std::string));
     bool validCodec = std::find(VALID_CODECS, VALID_CODECS_END, codec_) != VALID_CODECS_END;
-    //bool validCodec = iter != VALID_CODECS.end();
 
     if(!validCodec)
         THROW_ERROR("Bad codec:" << codec_);
@@ -58,6 +59,8 @@ Encoder * SenderConfig::createVideoEncoder() const
 
     if (codec_ == "h264")
         return new H264Encoder();
+    if (codec_ == "mpeg4")
+        return new Mpeg4Encoder();
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");
@@ -92,6 +95,8 @@ Decoder * ReceiverConfig::createVideoDecoder() const
 
     if (codec_ == "h264")
         return new H264Decoder();
+    if (codec_ == "mpeg4")
+        return new Mpeg4Decoder();
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");

@@ -117,6 +117,33 @@ RtpPay* H264Decoder::createDepayloader() const
     return new H264Depayloader();
 }
 
+
+void Mpeg4Encoder::init()
+{
+    codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
+}
+
+
+/// Creates an h.264 rtp payloader 
+RtpPay* Mpeg4Encoder::createPayloader() const
+{
+    return new Mpeg4Payloader();
+}
+
+
+void Mpeg4Decoder::init()
+{
+    codec_ = Pipeline::Instance()->makeElement("ffdec_mpeg4", NULL);
+}
+
+
+/// Creates an mpeg4 RtpDepayloader 
+RtpPay* Mpeg4Decoder::createDepayloader() const
+{
+    return new Mpeg4Depayloader();
+}
+
+
 /// Constructor 
 VorbisEncoder::VorbisEncoder() 
 {}

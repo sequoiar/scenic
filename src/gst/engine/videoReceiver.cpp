@@ -53,8 +53,18 @@ void VideoReceiver::init_depayloader()
     gstlinkable::link(*depayloader_, *decoder_);
 
     session_.add(depayloader_, remoteConfig_);
-    session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,"
-            "encoding-name=(string)H264");
+    
+    // FIXME: THIS IS UGLY
+    if (remoteConfig_.codec() == "h264")
+    {
+        session_.set_caps("application/x-rtp,media=(string)video,clock-rate=(int)90000,"
+                "encoding-name=(string)H264, payload=(int)96");
+    }
+    else if (remoteConfig_.codec() == "mpeg4")
+    {
+        // mpeg settings
+        session_.set_caps("application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)MP4V-ES, profile-level-id=(string)1, config=(string)000001b001000001b58913000001000000012000c48d8800f50a041e1463000001b24c61766335322e362e30");
+    }
 }
 
 

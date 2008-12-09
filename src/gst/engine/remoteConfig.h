@@ -30,7 +30,6 @@
 
 class Encoder;
 class Decoder;
-const int NUM_CODECS = 4;
 
 class RemoteConfig 
 {
@@ -48,6 +47,7 @@ class RemoteConfig
         int port() const { return port_; }
         const char *remoteHost() const { return remoteHost_.c_str(); }
         bool hasCodec() const { return !codec_.empty(); }
+        std::string codec() const { return codec_; }
 
     protected:
 
@@ -56,7 +56,6 @@ class RemoteConfig
         const int port_;
         static const int PORT_MIN;
         static const int PORT_MAX;
-        static const std::string VALID_CODECS[NUM_CODECS];
 
     private:
         RemoteConfig& operator=(const RemoteConfig&); //No Assignment Operator
