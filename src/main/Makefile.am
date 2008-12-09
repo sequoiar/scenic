@@ -10,3 +10,5 @@ pof_CPPFLAGS= $(AM_CPPFLAGS)  $(GST_CFLAGS) $(GTK_CFLAGS) $(GL_CFLAGS) $(GLU_CFL
 
 install-exec-local:
 	ln -sf $(prefix)/bin/pof $(prefix)/bin/mainTester
+uninstall-local:
+	rm -f $(prefix)/bin/mainTester
