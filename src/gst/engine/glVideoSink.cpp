@@ -169,62 +169,63 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
     switch (event->keyval) {
-        case 'f':
+        case GDK_f:
+        case GDK_F:
             toggleFullscreen(widget);
             break;
-        case 'x':
+        case GDK_x:
         case GDK_Right:
             x_ += STEP;
             break;
-        case 'X':
+        case GDK_X:
         case GDK_Left:
             x_ -= STEP;
             break;
-        case 'y':
+        case GDK_y:
         case GDK_Down:
             y_ += STEP;
             break;
-        case 'Y':
+        case GDK_Y:
         case GDK_Up:
             y_ -= STEP;
             break;
-        case 'z':
+        case GDK_z:
             z_ += STEP;
             break;
-        case 'Z':
+        case GDK_Z:
             z_ -= STEP;
             break;
-        case 'b':
+        case GDK_b:
             bottomCrop_ += STEP;
             break;
-        case 'B':
+        case GDK_B:
             bottomCrop_ -= STEP;
             break;
-        case 't':
+        case GDK_t:
             topCrop_ -= STEP;
             break;
-        case 'T':
+        case GDK_T:
             topCrop_ += STEP;
             break;
-        case 'r':
+        case GDK_r:
             rightCrop_ -= STEP;
             break;
-        case 'R':
+        case GDK_R:
             rightCrop_ += STEP;
             break;
-        case 'l':
+        case GDK_l:
             leftCrop_ += STEP;
             break;
-        case 'L':
+        case GDK_L:
             leftCrop_ -= STEP;
             break;
-        case 'c':
-        case 'C':
+        case GDK_c:
+        case GDK_C:
             LOG_DEBUG("Resetting GL texture position");
             resetGLparams();
             break;
-        case 'q':
-        case 'Q':
+        case GDK_q:
+        case GDK_Q:
             // Quit application, this quits the main loop
             // (if there is one)
             playback::quit();
