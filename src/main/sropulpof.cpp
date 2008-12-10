@@ -48,6 +48,7 @@ short pof::run(int argc, char **argv)
     char *videoDevice = 0;
 
     int screenNum = 0;
+    int numChannels = NUM_CHANNELS;
     
     bool version = false;
 
@@ -63,6 +64,7 @@ short pof::run(int argc, char **argv)
     options.add(new StringArg(&videoDevice, "videodevice", 'd', "device", "/dev/video0 /dev/video1"));
     options.add(new IntArg(&screenNum, "screen", 'n', "screen", "xinerama screen num"));
     options.add(new BoolArg(&version, "version", '\0', "version number"));
+    options.add(new IntArg(&numChannels, "numChannels", 'c', "numChannels", "2"));
 
     options.parse(argc, argv);
 
@@ -105,7 +107,7 @@ short pof::run(int argc, char **argv)
 
         std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
         delete vConfig;
-        AudioSourceConfig aConfig("jackaudiosrc", pof::NUM_CHANNELS);
+        AudioSourceConfig aConfig("jackaudiosrc", numChannels);
         std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort));
         playback::start();
         assert(tcpSendBuffer(ip, ports::CAPS_PORT, aTx->getCaps()));
