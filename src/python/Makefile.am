@@ -10,7 +10,8 @@ libmsgthreads_la_LIBADD =  -l$(BOOST_PYTHON_LIB) $(GLIB_LIBS) \
 						   $(src)/gst/control/libgstthread.a \
 						   $(ALL_GST_LIBS) $(JACK_LIBS) $(src)/tcp/libtcp.a \
 						   $(src)/gst/engine/libgst.a $(GTK_LIBS) \
-						   $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(src)/util/libUtil.a $(src)/gutil/libGUtil.a 
+						   $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(src)/util/libutil.a \
+						   $(src)/gutil/libgutil.a 
 
 libmsgthreads_la_CPPFLAGS = -I$(PYTHON_INCLUDE_DIR) $(AM_CPPFLAGS)
 

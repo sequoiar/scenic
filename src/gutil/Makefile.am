@@ -3,7 +3,7 @@ if PROJ_DEBUG
 SUBDIRS = . test
 endif
 
-noinst_LIBRARIES= libGUtil.a
+noinst_LIBRARIES= libgutil.a
 
-libGUtil_a_SOURCES = optionArgs.cpp gutil.cpp
+libgutil_a_SOURCES = optionArgs.cpp gutil.cpp
 

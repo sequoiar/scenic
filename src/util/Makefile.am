@@ -3,6 +3,6 @@ if PROJ_DEBUG
 SUBDIRS = . test
 endif
 
-noinst_LIBRARIES= libUtil.a
+noinst_LIBRARIES= libutil.a
 
-libUtil_a_SOURCES = util.cpp hostIP.cpp mapMsg.cpp
+libutil_a_SOURCES = logWriter.cpp hostIP.cpp mapMsg.cpp

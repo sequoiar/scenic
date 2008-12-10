@@ -23,13 +23,9 @@
 
 
 #include <iostream>
-#include <time.h>
+#include <ctime>
 #include <sstream>
-#include <stdlib.h>
-#include "config.h"
-#include "logWriter.h"
-#include "lassert.h"
-
+#include "general.h"
 
 void assert_throw(__const char *__assertion, __const char *__file,
                            unsigned int __line, __const char *__function)
