@@ -115,7 +115,6 @@ class AudioConvertedDecoder : public Decoder
 class H264Encoder : public Encoder
 {
     public: 
-
         H264Encoder();
 
     private:
@@ -143,6 +142,41 @@ class H264Decoder : public Decoder
         RtpPay* createDepayloader() const;
         const char *getCaps() const;
 };
+
+
+
+/// Encoder that encodes raw video into H.263 using the ffmpeg h263 encoder
+class H263Encoder : public Encoder
+{
+    public: 
+        H263Encoder();
+
+    private:
+        ~H263Encoder();
+
+        void init();
+        
+        RtpPay* createPayloader() const;
+
+        _GstElement *colorspc_;
+        unsigned long long bitrate_;
+        _GstElement *sinkElement() { return colorspc_; }
+
+        /// No Copy Constructor
+        H263Encoder(const H263Encoder&);     
+        /// No Assignment Operator
+        H263Encoder& operator=(const H263Encoder&);     
+};
+
+/// Decoder that decodes H.263 into raw video using the ffmpeg hq263 decoder.
+class H263Decoder : public Decoder
+{
+    private: 
+        void init();
+        RtpPay* createDepayloader() const;
+        const char *getCaps() const;
+};
+
 
 
 /// Encoder that encodes raw video into mpeg4 using the ffmpeg mpeg4 encoder

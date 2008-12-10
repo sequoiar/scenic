@@ -38,8 +38,8 @@ RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remote
     if(codec_.empty())
         THROW_ERROR("No Codec specified.");
 
-    static const int NUM_CODECS = 5; 
-    static const std::string VALID_CODECS[NUM_CODECS] = {"h264", "raw", "vorbis", "mp3", "mpeg4"};
+    static const int NUM_CODECS = 6; 
+    static const std::string VALID_CODECS[NUM_CODECS] = {"h264", "raw", "vorbis", "mp3", "mpeg4", "h263"};
     const std::string *VALID_CODECS_END = VALID_CODECS + (NUM_CODECS * sizeof(std::string));
     bool validCodec = std::find(VALID_CODECS, VALID_CODECS_END, codec_) != VALID_CODECS_END;
 
@@ -59,7 +59,9 @@ Encoder * SenderConfig::createVideoEncoder() const
 
     if (codec_ == "h264")
         return new H264Encoder();
-    if (codec_ == "mpeg4")
+    else if (codec_ == "h263")
+        return new H263Encoder();
+    else if (codec_ == "mpeg4")
         return new Mpeg4Encoder();
     else
     {
@@ -95,7 +97,9 @@ Decoder * ReceiverConfig::createVideoDecoder() const
 
     if (codec_ == "h264")
         return new H264Decoder();
-    if (codec_ == "mpeg4")
+    else if (codec_ == "h263")
+        return new H263Decoder();
+    else if (codec_ == "mpeg4")
         return new Mpeg4Decoder();
     else
     {

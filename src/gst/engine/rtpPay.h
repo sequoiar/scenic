@@ -74,6 +74,20 @@ class H264Depayloader : public Depayloader
 };
 
 
+class H263Payloader : public Payloader
+{
+    private: 
+        void init();
+};
+
+
+class H263Depayloader : public Depayloader
+{
+    private: 
+        void init();
+};
+
+
 class Mpeg4Payloader : public Payloader
 {
     private: 

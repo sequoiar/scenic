@@ -124,6 +124,56 @@ const char *H264Decoder::getCaps() const
         "encoding-name=(string)H264, payload=(int)96";
 }
 
+/// Constructor 
+H263Encoder::H263Encoder() : 
+    colorspc_(0), bitrate_(400000)
+{}
+
+
+/// Destructor 
+H263Encoder::~H263Encoder()
+{
+    Pipeline::Instance()->remove(&colorspc_);
+}
+
+
+void H263Encoder::init()
+{
+    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
+
+    codec_ = Pipeline::Instance()->makeElement("ffenc_h263", NULL);
+    g_object_set(G_OBJECT(codec_), "bitrate", bitrate_, NULL);
+
+    gstlinkable::link(colorspc_, codec_);
+}
+
+
+/// Creates an h.263 rtp payloader 
+RtpPay* H263Encoder::createPayloader() const
+{
+    return new H263Payloader();
+}
+
+
+void H263Decoder::init()
+{
+    codec_ = Pipeline::Instance()->makeElement("ffdec_h263", NULL);
+}
+
+
+/// Creates an h.263 RtpDepayloader 
+RtpPay* H263Decoder::createDepayloader() const
+{
+    return new H263Depayloader();
+}
+
+
+const char *H263Decoder::getCaps() const
+{
+    return "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
+        "encoding-name=(string)H263, payload=(int)96";
+}
+
 
 /// Constructor 
 Mpeg4Encoder::Mpeg4Encoder() : 

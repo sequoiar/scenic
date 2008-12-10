@@ -151,7 +151,7 @@ void RtpVideoTestSuite::stop_mpeg4()
 void RtpVideoTestSuite::start_stop_mpeg4()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "mpeg4"));
 
         playback::start();
 
@@ -163,7 +163,7 @@ void RtpVideoTestSuite::start_stop_mpeg4()
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "mpeg4"));
 
         playback::start();
 
@@ -175,6 +175,150 @@ void RtpVideoTestSuite::start_stop_mpeg4()
     }
 }
 
+
+void RtpVideoTestSuite::start_h263()
+{
+    if (id_ == 0) {
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "h263"));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+    }
+    else {
+        VideoSourceConfig vConfig("videotestsrc");
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "h263"));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+    }
+}
+
+
+void RtpVideoTestSuite::stop_h263()
+{
+    if (id_ == 0) {
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
+
+        BLOCK();
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+    else {
+        VideoSourceConfig vConfig("videotestsrc");
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
+
+        BLOCK();
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+}
+
+
+void RtpVideoTestSuite::start_stop_h263()
+{
+    if (id_ == 0) {
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "h263"));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+    else {
+        VideoSourceConfig vConfig("videotestsrc");
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "h263"));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+}
+
+
+
+void RtpVideoTestSuite::start_h263_v4l()
+{
+    if (id_ == 0) {
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "h263"));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+    }
+    else {
+        VideoSourceConfig vConfig("v4l2src");
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "h263"));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+    }
+}
+
+
+void RtpVideoTestSuite::stop_h263_v4l()
+{
+    if (id_ == 0) {
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
+
+        BLOCK();
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+    else {
+        VideoSourceConfig vConfig("v4l2src");
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
+
+        BLOCK();
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+}
+
+
+void RtpVideoTestSuite::start_stop_h263_v4l()
+{
+    if (id_ == 0) {
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "h263"));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+    else {
+        VideoSourceConfig vConfig("v4l2src");
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "h263"));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+}
 
 void RtpVideoTestSuite::start_mpeg4_v4l()
 {

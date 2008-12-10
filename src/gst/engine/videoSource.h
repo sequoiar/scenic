@@ -50,6 +50,7 @@ class VideoTestSource
 {
     public:
         explicit VideoTestSource(const VideoSourceConfig &config);
+        void filterCaps();
 
     private:
         ~VideoTestSource();
