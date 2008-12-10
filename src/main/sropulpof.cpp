@@ -18,18 +18,13 @@
  *
  */
 
+#include "general.h"
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
-//#include "eventLoop.h"
-//#include "videoSink.h"
-#include <cassert>
-#include <cstdlib>
-#include "logWriter.h"
-#include "gutil.h"
 #include "msgThreadFactory.h"
 
 #define BLOCK() gutil::runMainLoop(0);
-//#define RELEASE_CANDIDATE "-rc3"
+
 namespace pof 
 {
     short run(int argc, char **argv);
@@ -73,7 +68,7 @@ short pof::run(int argc, char **argv)
 
     if(version)
     {
-        LOG_INFO("version " << PACKAGE_VERSION << "\b-"<< RELEASE_CANDIDATE);
+        LOG_INFO("version " << PACKAGE_VERSION << '\b' << RELEASE_CANDIDATE);
         return 0;
     }
     pid = send ? 's' : 'r';
