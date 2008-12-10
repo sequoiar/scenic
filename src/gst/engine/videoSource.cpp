@@ -50,19 +50,36 @@ VideoSource::~VideoSource()
 
 /// Constructor
 VideoTestSource::VideoTestSource(const VideoSourceConfig &config) : 
-    VideoSource(config) 
+    VideoSource(config),
+    capsFilter_(0),
+    width_(768),
+    height_(480)
 {}
 
 void VideoTestSource::init()
 {
     VideoSource::init();
     g_object_set(G_OBJECT(source_), "is-live", FALSE, NULL); // necessary for clocked callback to work
+    
+    // otherwise videotestsrc defaults to 320 by 240
+    std::ostringstream capsStr;
+    capsStr << "video/x-raw-yuv, width="<< width_ << ", height=" << height_; 
+
+    GstCaps *videoCaps = gst_caps_from_string(capsStr.str().c_str());
+    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    g_object_set(G_OBJECT(capsFilter_), "caps", videoCaps, NULL);
+
+    gst_caps_unref(videoCaps);
+    
+    gstlinkable::link(source_, capsFilter_);
 }
 
 
 /// Destructor
 VideoTestSource::~VideoTestSource()
-{}
+{
+    Pipeline::Instance()->remove(&capsFilter_);
+}
 
 
 /// Constructor

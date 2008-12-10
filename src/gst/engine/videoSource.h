@@ -53,7 +53,13 @@ class VideoTestSource
 
     private:
         ~VideoTestSource();
+        _GstElement *srcElement() { return capsFilter_; }
+
+        _GstElement *capsFilter_;
+        unsigned long width_;
+        unsigned long height_;
         void init();
+
         /// No Copy Constructor
         VideoTestSource(const VideoTestSource&);     
         /// No Assignment Operator
