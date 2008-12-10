@@ -136,7 +136,7 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
         logMsg << logLevelStr(level) << msg << " " << functionName <<  "() in " << fileName
             << ":" << " line " << lineNum << " " <<asctime(timeinfo);
 #else
-        logMsg << logLevelStr(level) << msg << std::endl;
+        logMsg <<  msg << std::endl;
 #endif
     }
 

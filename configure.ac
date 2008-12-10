@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(PROPULSE_ART, 0.01 )
+AC_INIT(PROPULSE_ART, 0.1.2 )
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
@@ -39,7 +39,7 @@ AC_MSG_WARN([${ac_prefix}])
 # Checks for library functions.
 
 if test "x${enable_debug}" = "xyes" ; then
-    AC_DEFINE(CONFIG_DEBUG,[],[Debug define from configure])
+    AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
     CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
 
 #Trying to set CPPTEST_LIBS using pkg-config

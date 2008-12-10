@@ -29,7 +29,7 @@
 #include "msgThreadFactory.h"
 
 #define BLOCK() gutil::runMainLoop(0);
-
+#define RELEASE_CANDIDATE "-rc3"
 namespace pof 
 {
     short run(int argc, char **argv);
@@ -54,6 +54,7 @@ short pof::run(int argc, char **argv)
 
     int screenNum = 0;
     
+    bool version = false;
 
     options.add(new StringArg(&ip, "address", 'i', "address", "provide ip address"));
     options.add(new StringArg(&videoCodec, "videocodec", 'v', "videocodec", "h264"));
@@ -66,11 +67,15 @@ short pof::run(int argc, char **argv)
     options.add(new BoolArg(&full,"fullscreen", 'f', "default to fullscreen"));
     options.add(new StringArg(&videoDevice, "videodevice", 'd', "device", "/dev/video0 /dev/video1"));
     options.add(new IntArg(&screenNum, "screen", 'n', "screen", "xinerama screen num"));
+    options.add(new BoolArg(&version, "version", '\0', "version number"));
 
     options.parse(argc, argv);
 
-
-
+    if(version)
+    {
+        LOG_INFO("version " << PACKAGE_VERSION << '\b'<< RELEASE_CANDIDATE);
+        return 0;
+    }
     pid = send ? 's' : 'r';
 
     LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);

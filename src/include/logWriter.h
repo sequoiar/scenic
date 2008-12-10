@@ -71,8 +71,9 @@ enum LogLevel {
 #define LOG_WARNING(msg)    LOG(msg, WARNING)
 #define LOG_DEBUG(msg)      LOG(msg, DEBUG)
 
+#define COUT_LOG(msg)       LOG(msg, NONE)
 /** base exception class */
-class Except
+class Except : public std::exception
 {
 public:
     LogLevel log_;
@@ -81,7 +82,7 @@ public:
 
     Except(std::string log_msg,int err):log_(WARNING),msg_(log_msg),errno_(err){}
     Except():log_(NONE),msg_(),errno_(0){}
-    virtual ~Except(){}
+    virtual ~Except() throw(){}
 };
 
 /** Recovery is possible */
