@@ -152,17 +152,9 @@ class Mpeg4Encoder : public Encoder
         Mpeg4Encoder();
 
     private:
-        ~Mpeg4Encoder();
         void init();
         RtpPay* createPayloader() const;
-        _GstElement *colorspc_;
         unsigned long long bitrate_;
-        _GstElement *sinkElement() { return colorspc_; }
-
-        /// No Copy Constructor
-        Mpeg4Encoder(const Mpeg4Encoder&);     
-        /// No Assignment Operator
-        Mpeg4Encoder& operator=(const Mpeg4Encoder&);     
 };
 
 

@@ -127,23 +127,14 @@ const char *H264Decoder::getCaps() const
 
 /// Constructor 
 Mpeg4Encoder::Mpeg4Encoder() : 
-    colorspc_(0), bitrate_(2048000)
+    bitrate_(2048000)
 {}
-
-
-/// Destructor 
-Mpeg4Encoder::~Mpeg4Encoder()
-{
-    Pipeline::Instance()->remove(&colorspc_);
-}
 
 
 void Mpeg4Encoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
     g_object_set(G_OBJECT(codec_), "bitrate", bitrate_, NULL);
-    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL);
-    gstlinkable::link(colorspc_, codec_);
 }
 
 
