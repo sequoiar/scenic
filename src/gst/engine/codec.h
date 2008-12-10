@@ -70,6 +70,7 @@ class Decoder : public Codec
     public:
         /// Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type 
         virtual RtpPay* createDepayloader() const = 0;
+        virtual const char * getCaps() const { return "";}
 };
 
 /// Abstract child of encoder that wraps audioconvert functionality
@@ -124,9 +125,9 @@ class H264Encoder : public Encoder
         
         RtpPay* createPayloader() const;
 
-        _GstElement *sinkElement() { return colorspc_; }
-        
         _GstElement *colorspc_;
+        unsigned long long bitrate_;
+        _GstElement *sinkElement() { return colorspc_; }
 
         /// No Copy Constructor
         H264Encoder(const H264Encoder&);     
@@ -140,15 +141,28 @@ class H264Decoder : public Decoder
     private: 
         void init();
         RtpPay* createDepayloader() const;
+        const char *getCaps() const;
 };
 
 
 /// Encoder that encodes raw video into mpeg4 using the ffmpeg mpeg4 encoder
 class Mpeg4Encoder : public Encoder
 {
+    public:
+        Mpeg4Encoder();
+
     private:
+        ~Mpeg4Encoder();
         void init();
         RtpPay* createPayloader() const;
+        _GstElement *colorspc_;
+        unsigned long long bitrate_;
+        _GstElement *sinkElement() { return colorspc_; }
+
+        /// No Copy Constructor
+        Mpeg4Encoder(const Mpeg4Encoder&);     
+        /// No Assignment Operator
+        Mpeg4Encoder& operator=(const Mpeg4Encoder&);     
 };
 
 
@@ -158,6 +172,7 @@ class Mpeg4Decoder: public Decoder
     private: 
         void init();
         RtpPay* createDepayloader() const;
+        const char *getCaps() const;
 };
 
 

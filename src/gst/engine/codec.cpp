@@ -75,7 +75,7 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
 
 /// Constructor 
 H264Encoder::H264Encoder() : 
-    colorspc_(0) 
+    colorspc_(0), bitrate_(4096)
 {}
 
 
@@ -91,7 +91,7 @@ void H264Encoder::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
-    g_object_set(G_OBJECT(codec_), "bitrate", 4096, "byte-stream", TRUE, "threads", 4,
+    g_object_set(G_OBJECT(codec_), "bitrate", bitrate_, "byte-stream", TRUE, "threads", 4,
             NULL);
 
     gstlinkable::link(colorspc_, codec_);
@@ -118,9 +118,32 @@ RtpPay* H264Decoder::createDepayloader() const
 }
 
 
+const char *H264Decoder::getCaps() const
+{
+    return "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
+        "encoding-name=(string)H264, payload=(int)96";
+}
+
+
+/// Constructor 
+Mpeg4Encoder::Mpeg4Encoder() : 
+    colorspc_(0), bitrate_(2048000)
+{}
+
+
+/// Destructor 
+Mpeg4Encoder::~Mpeg4Encoder()
+{
+    Pipeline::Instance()->remove(&colorspc_);
+}
+
+
 void Mpeg4Encoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
+    g_object_set(G_OBJECT(codec_), "bitrate", bitrate_, NULL);
+    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL);
+    gstlinkable::link(colorspc_, codec_);
 }
 
 
@@ -141,6 +164,15 @@ void Mpeg4Decoder::init()
 RtpPay* Mpeg4Decoder::createDepayloader() const
 {
     return new Mpeg4Depayloader();
+}
+
+
+const char *Mpeg4Decoder::getCaps() const
+{
+    return "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
+        "config=(string)000001b001000001b58913000001000000012000c48d8ba98518043c1463000001b24c61766335322e362e30, "
+        "encoding-name=(string)MP4V-ES, payload=(int)96, "
+        "profile-level-id=(string)1";
 }
 
 
@@ -216,7 +248,7 @@ void MadDecoder::init()
 }
 
 /** 
-* Creates an RtpMpaPayloader */
+ * Creates an RtpMpaPayloader */
 RtpPay* LameEncoder::createPayloader() const
 {
     return new MpaPayloader();

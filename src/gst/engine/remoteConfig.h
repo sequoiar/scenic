@@ -47,7 +47,6 @@ class RemoteConfig
         int port() const { return port_; }
         const char *remoteHost() const { return remoteHost_.c_str(); }
         bool hasCodec() const { return !codec_.empty(); }
-        std::string codec() const { return codec_; }
 
     protected:
 
