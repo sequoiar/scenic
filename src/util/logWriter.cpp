@@ -25,7 +25,7 @@
 #include <iostream>
 #include <ctime>
 #include <sstream>
-#include "general.h"
+#include "util.h"
 
 void assert_throw(__const char *__assertion, __const char *__file,
                            unsigned int __line, __const char *__function)
