@@ -52,11 +52,10 @@ bool Codec::isSupportedCodec(const std::string & codecStr)
         return false;
     }
 
+    // ptr to one past the end of our array of codecs
     const std::string *VALID_CODECS_END = VALID_CODECS + (NUM_CODECS * sizeof(std::string));
     // search for codecStr in Codec's list of supported codecs
-    bool validCodec = std::find(VALID_CODECS, VALID_CODECS_END, codecStr) != VALID_CODECS_END;
-
-    return validCodec;
+    return std::find(VALID_CODECS, VALID_CODECS_END, codecStr) != VALID_CODECS_END;
 }
 
 /// Constructor 
@@ -139,11 +138,13 @@ RtpPay* H264Decoder::createDepayloader() const
 }
 
 
+/// These caps are the same for any h264 stream
 const char *H264Decoder::getCaps() const
 {
     return "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
         "encoding-name=(string)H264, payload=(int)96";
 }
+
 
 /// Constructor 
 H263Encoder::H263Encoder() : 
@@ -189,6 +190,7 @@ RtpPay* H263Decoder::createDepayloader() const
 }
 
 
+/// These caps are the same for any h263 stream
 const char *H263Decoder::getCaps() const
 {
     return "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
@@ -229,9 +231,12 @@ RtpPay* Mpeg4Decoder::createDepayloader() const
 }
 
 
+/** The config string will vary depending on resolution. Not an issue for NTSC only,
+but for other resolutions this will lead to a picture melting, sensory experience.
+*/
 const char *Mpeg4Decoder::getCaps() const
 {
-    // FIXME: This suckS!!!!!!
+    // FIXME: This sucks!!!!!! This should be sent to the receiver from the sender.
     return "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
         "config=(string)000001b001000001b58913000001000000012000c48d8ba98518043c1463000001b24c61766335322e362e30, "
         "encoding-name=(string)MP4V-ES, payload=(int)96, "
