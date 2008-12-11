@@ -26,7 +26,7 @@ from errors import *
 
 class ControllerApi(object):
     """
-    The API that controlllers must use
+    The controller API that all controllers (such as cli.CliController) must use.
     """
     def __init__(self, notify):
         self.notify = notify
@@ -163,7 +163,3 @@ class ControllerApi(object):
     def set_connection(self, address, port, connector):
         self.connection = (address, port, connector)
 
-
-
-
-                

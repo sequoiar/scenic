@@ -40,9 +40,11 @@ client_command = 'telnet localhost %s' % server_port
 waiting_delay = 1.0 # seconds before starting client after server start
 
 VERBOSE_CLIENT = False
+#VERBOSE_CLIENT = True
+
 VERBOSE_SERVER = False
 #VERBOSE_SERVER = True
-#VERBOSE_CLIENT = True
+
 # ---------------------------------------------------------------------
 # a class for output redirection
 class ProcessOutputLogger:
@@ -481,10 +483,11 @@ class Test_3_Videostream(TelnetBaseTest):
 #        self.sleep()
 #        self.expectTest('There\'s no video stream with the name videostream', 'IP Port of video stream video was not set.')
 
-    def test_13_change_description(self):
-        self.client.sendline("v -z 'A Description' video")
-        self.sleep()
-        self.expectTest('source of video stream video is set to jackvideosrc.', 'Unable to specify video input.')
+    # NOTE: -z flag is not for changing description !
+    #def test_13_change_description(self):
+    #    self.client.sendline("v -z 'A Description' video")
+    #    self.sleep()
+    #    self.expectTest('source of video stream video is set to jackvideosrc.', 'Unable to specify video input.')
     
     def test_14_set_samplerate_to_invalid_value(self):
         self.client.sendline("v -r Juliette video")

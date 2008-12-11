@@ -27,16 +27,16 @@ Implements some view and controller of the MVC design pattern.
 Each method of the CliController class that begins with "_" has a CLI 
 command parser with some options. It parses what the user types. 
 (the "controller")
-It then calls a method in api.py (the "model")
+It then calls a method in ui/api.py (the "model")
 This finally answer by calling each of its Observer that listen to it. 
 In this case, the "view" is the CliView class.
 
 For example:
 What happens when the user types "c -l":
  * CliController._get_contacts() is called with the args from user
- * it calls ControllerApi.get_contacts() 
- * which finally CliView._get_contacts() with a dict of contacts as 
-   an argument. (the key are the contact names)
+ * it calls ControllerApi.get_contacts() from ui/api.py
+ * which finally calls CliView._get_contacts() with a dict of contacts 
+   as an argument. (the key are the contact names)
    It is the contacts attributes of the AddressBook instance.
 """
 
@@ -116,7 +116,6 @@ class CliController(TelnetServer):
     Each one instaciates a CliParser object the is ephemerous. It is 
     Very hard to retrieve information on each command this way.
     """
-        
     def __init__(self):
         TelnetServer.__init__(self)
         self.core = None
@@ -133,6 +132,9 @@ class CliController(TelnetServer):
                           }
         
     def parse(self, data):
+        """
+        Parses something entered by the user.
+        """
         if not self.core:
             self.core = self.factory.subject.api
         data = to_utf(data)
@@ -319,7 +321,7 @@ class CliController(TelnetServer):
 
         cp.add_option("-a", "--add", type="string", help="Add an video stream")
         cp.add_option("-e", "--erase", type="string", help="Erase an video stream")
-        cp.add_option("-m", "--modify", type="string", help="Modify the name of an video stream")
+        cp.add_option("-m", "--modify", type="string", help="Modify the name of a video stream")
         
         cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
         cp.add_option("-c", "--codec", type="string", help="Set the codec")
@@ -341,6 +343,7 @@ class CliController(TelnetServer):
             elif options.modify:
                 self.core.rename_stream(self, name, options.modify, kind)
             elif [opt for opt in options.__dict__.values() if opt]:
+                # calls ControllerApi.set_stream(caller, name, 'video', attr, value)
                 if options.container:
                     self.core.set_stream(self, name, kind, 'container', options.container)
                 if options.codec:
@@ -434,20 +437,25 @@ class CliController(TelnetServer):
             cp.print_help()
     
     def print_all_commands(self):
+        """
+        Prints the description of each available command
+        """
         for cmd in self.callbacks.keys():
             if cmd == 'ask' or cmd == 'help':
                 # crash or infinite recursion...
                 pass
             else:
-                self.write(cmd + ":   ", False, False) # no prompt, no endl
+                self.write("%9s:   " % cmd, False, False) # no prompt, no endl
                 data = [cmd,'--description']
                 self.callbacks[cmd](data)
+        self.write("exit:   Quits the client.", False)
+        self.write("quit:   Quits the client.", False)
         self.write_prompt()
         #print_usage
         
     def _help(self,data):
-        """Displays list of commands
-        
+        """
+        Displays list of commands
         """
         
         cp = CliParser(self, prog=data[0], description="Prints descriptions of all commands.")
@@ -466,6 +474,9 @@ class CliController(TelnetServer):
 
 
 class CliParser(optparse.OptionParser):
+    """
+    Base class for each CLI command 
+    """
     def __init__(self,
                  output,
                  usage=None,
@@ -481,10 +492,13 @@ class CliParser(optparse.OptionParser):
         optparse.OptionParser.__init__(self, usage, option_list, option_class, version, conflict_handler, description, formatter, add_help_option, prog, epilog)
         self.output = output
     
-    def print_description(self):
+    def print_description(self,with_prompt=False):
+        # TODO: Should display the prompt if entered by the user
+        #       and not automagically by the help command.
         # TODO: Add name of the command
         self.output.write(self.description)
-        # self.output.write_prompt() ...
+        if with_prompt:
+            self.output.write_prompt()
     
     def error(self, msg):
         if msg:
@@ -527,7 +541,7 @@ class CliParser(optparse.OptionParser):
         """print_help(file : file = stdout)
 
         Print an extended help message, listing all options and any
-        help text provided with them, to 'file' (default stdout).
+        help text provided with them.
         """
         self.output.write(self.format_help(), True)
 
@@ -537,7 +551,7 @@ class CliParser(optparse.OptionParser):
     def _process_short_opts(self, rargs, values):
         arg = rargs.pop(0)
         stop = False
-        i = 1
+        i = 1 # number of chars read ?
         for ch in arg[1:]:
             opt = "-" + ch
             option = self._short_opt.get(opt)

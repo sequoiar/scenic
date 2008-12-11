@@ -35,7 +35,7 @@ from connections import basic
 
 
 class Core(Subject):
-    """Main class of the application and representing the 'Model' in the MVC"""
+    """Main class of the application and containing the 'Model' in the MVC"""
         
     def __init__(self):
         Subject.__init__(self)
@@ -103,5 +103,5 @@ def main():
 
 if __name__ == '__main__':
     log.start()
-    log.info('Starting Miville (or Sropulpof?)...')
+    log.info('Starting Sropulpof...')
     main()
