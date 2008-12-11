@@ -5,5 +5,5 @@ endif
 
 noinst_LIBRARIES= libgutil.a
 
-libgutil_a_SOURCES = optionArgs.cpp gutil.cpp
+libgutil_a_SOURCES = optionArgs.cpp gloop.cpp
 

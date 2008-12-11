@@ -1,4 +1,4 @@
-/* general.h
+/* .h
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
  * This file is part of [propulse]ART.
@@ -22,7 +22,6 @@
 #define __GENERAL_H__
 
 #include "logWriter.h"
-#include "gutil.h"
 #include "lassert.h"
 
 

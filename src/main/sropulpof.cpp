@@ -19,6 +19,7 @@
  */
 
 #include "general.h"
+#include "gutil.h"
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
 #include "msgThreadFactory.h"
