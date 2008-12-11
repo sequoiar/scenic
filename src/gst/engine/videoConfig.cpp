@@ -18,19 +18,12 @@
  *
  */
 
-
-/** \file
- *      Class for video parameter objects.
- *
- */
+#include "util.h"
 
 #include <fstream>
-#include "logWriter.h"
 #include "videoConfig.h"
-#include "logWriter.h"
 #include "videoSource.h"
 #include "videoSink.h"
-#include "config.h"
 #ifdef CONFIG_GL
 #include "glVideoSink.h"
 #endif

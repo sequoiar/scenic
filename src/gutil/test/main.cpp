@@ -25,9 +25,8 @@
  *      And more.
  *      And more.
  */
-#include "config.h"
-#include "optionArgs.h"
-#include "logWriter.h"
+#include "util.h"
+#include "gutil.h"
 
 int main (int argc, char **argv)
 {

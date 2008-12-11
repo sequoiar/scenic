@@ -23,23 +23,21 @@
  *  The port number is passed as an argument
  */
 
+#include "util.h"
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <string.h>
+#include <cstring>
 #include <error.h>
 #include <errno.h>
 
-#include <string>
-#include "logWriter.h"
 #include "tcpServer.h"
-#include <sstream>
 
 #define ALLOW_ANY_ADDR
 #ifdef ALLOW_ANY_ADDR

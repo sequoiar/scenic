@@ -18,13 +18,13 @@
  *
  */
 
-#include "gstThread.h"
-#include "logWriter.h"
-#include "engine/playback.h"
-#include <iostream>
+#include "util.h"
 
-        void GstThread::audio_stop(MapMsg& ){ playback::stop();} 
-        void GstThread::video_stop(MapMsg& ){ playback::stop();} 
+#include "gstThread.h"
+#include "engine/playback.h"
+
+void GstThread::audio_stop(MapMsg& ){ playback::stop();} 
+void GstThread::video_stop(MapMsg& ){ playback::stop();} 
 int GstThread::main()
 {
     bool done = false;
@@ -33,9 +33,9 @@ int GstThread::main()
     {
         if(g_main_context_iteration(NULL, FALSE))
             continue;
-        std::cout << (flipflop ? "-\r" : " \r");
+        //std::cout << (flipflop ? "-\r" : " \r");
         flipflop = !flipflop;
-        std::cout.flush();
+        //std::cout.flush();
         MapMsg f = queue_.timed_pop(100000);
 
         if(!f["command"].empty())

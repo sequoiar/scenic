@@ -18,8 +18,9 @@
  *
  */
 
+#include "util.h"
+
 #include <cpptest.h>
-#include <iostream>
 #include <cstdlib>
 #include "audioTestSuite.h"
 #include "audioLocal.h"

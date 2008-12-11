@@ -18,15 +18,12 @@
  *
  */
 
-/** \file
- *		QueuePair_ abstracts a pair of glib GAsyncQueues
- *      
- */
 #ifndef __QUEUE_PAIR_H__
 #define __QUEUE_PAIR_H__
 
+#include "util.h"
+
 #include <glib.h>
-#include "logWriter.h"
 
 /// holds pointers to GAsyncQueues 
 class BaseQueuePair

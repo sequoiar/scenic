@@ -20,7 +20,7 @@
 #include <glib.h>
 #include <iostream>
 #include <boost/signal.hpp>
-#include "gThreadQueue.h"
+//#include "gThreadQueue.h"
 
 struct foo
 {

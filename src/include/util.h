@@ -1,4 +1,4 @@
-/* .h
+/* util.h
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
  * This file is part of [propulse]ART.
@@ -18,11 +18,12 @@
  *
  */
 
-#ifndef __GENERAL_H__
-#define __GENERAL_H__
+#ifndef __UTIL_H__
+#define __UTIL_H__
 
-#include "logWriter.h"
+#include "util/logWriter.h"
 #include "lassert.h"
+#include "util/hostIP.h"
 
 
 #endif

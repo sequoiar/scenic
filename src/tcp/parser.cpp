@@ -17,16 +17,10 @@
  * Boston, MA 02111-1307, USA.
  */
 
-/** \file
- *
- *      Command parser functions used in ipcp protocol
- *
- */
-
+#include "util.h"
 #include <sstream>
 #include <vector>
 #include "parser.h"
-#include "logWriter.h"
 #include "mapMsg.h"
 
 using namespace Parser;

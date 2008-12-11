@@ -17,9 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <iostream>
+#include "util.h"
 #include "tcpThread.h"
-#include "logWriter.h"
 #include "parser.h"
 #include <errno.h>
 #include <string.h>

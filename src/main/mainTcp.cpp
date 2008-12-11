@@ -18,8 +18,8 @@
  *
  */
 
+#include "util.h"
 #include "msgThreadFactory.h"
-#include "logWriter.h"
 
 ///Instance will register a particular MsgThread as a MapMsg handler
 class MainSubscriber

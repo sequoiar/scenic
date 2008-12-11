@@ -17,17 +17,16 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include <cassert>
+
+#include "util.h"
 
 #include <gst/interfaces/xoverlay.h>
 #include "gstLinkable.h"
 #include "videoSink.h"
-#include "logWriter.h"
 #include "pipeline.h"
 #include "playback.h"
 #include "gutil.h"
 
-#include "logWriter.h"
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>

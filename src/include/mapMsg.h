@@ -21,7 +21,7 @@
 #ifndef __MAP_MSG_H__
 #define __MAP_MSG_H__
 
-#include "logWriter.h"
+#include "util.h"
 #include <string>
 #include <map>
 #include <vector>

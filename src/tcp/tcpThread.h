@@ -22,7 +22,6 @@
 #define _TCP_THREAD_H_
 
 #include <memory>
-#include "logWriter.h"
 #include "msgThread.h"
 #include "tcpServer.h"
 /// tcp server in a thread - also provides log message dispatching

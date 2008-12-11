@@ -1,5 +1,4 @@
-#include <cassert>
-#include "logWriter.h"
+#include "util.h"
 #include "mapMsg.h"
 
 int main(int, char**)

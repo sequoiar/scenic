@@ -1,9 +1,9 @@
+#include "util.h"
 #include <glib.h>
 #include <stdio.h>
 #include <map>
 #include <string>
 #include "tcp/parser.h"
-#include "logWriter.h"
 #include "mapMsg.h"
 
 #include <cpptest.h>

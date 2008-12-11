@@ -1,9 +1,8 @@
-#include <cassert>
+#include "util.h"
 #include <iostream>
 #include <stdlib.h>
 #include "tcp/tcpThread.h"
 #include "tcp/parser.h"
-#include "logWriter.h"
 
 int main(int argc, char** argv)
 {

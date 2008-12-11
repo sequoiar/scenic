@@ -1,32 +1,32 @@
+/* raw1394util.cpp
+ * Copyright 2008 Koya Charles & Tristan Matthews 
+ *
+ * This file is part of [propulse]ART.
+ *
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-// raw1394util.cpp
-// Based on raw1394util.c, part of dvgrab available at <http://www.kinodv.org/>
-// Copyright 2008 Koya Charles & Tristan Matthews //
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
+#include "util.h"
 
 #include <cerrno>
 #include <cstring>
-#include "config.h"
 #ifdef CONFIG_IEEE1394
 #include <libavc1394/avc1394.h>
 #include <libavc1394/rom1394.h>
 #endif
 #include "raw1394Util.h"
-#include "logWriter.h"
 
 #define MOTDCT_SPEC_ID    0x00005068
 

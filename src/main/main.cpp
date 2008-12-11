@@ -1,4 +1,4 @@
-#include "logWriter.h"
+#include "util.h"
 
 int mainTcp(int argc, char **argv);
 int mainPof(int argc, char **argv);

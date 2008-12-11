@@ -18,7 +18,8 @@
  *
  */
 
-#include "logWriter.h"
+#include "util.h"
+
 #include "gutil.h"
     
 // extend namespace gutil

@@ -1,8 +1,7 @@
+#include "gutil.h"
 #include <cstdlib>
 #include <cstring>
-#include <glib.h>
 #include "gstTestSuite.h"
-#include "gutil.h"
 
 void GstTestSuite::setup()
 {

@@ -1,5 +1,4 @@
-#include <string>
-#include <iostream>
+#include "util.h"
 
 int mainSyncTestSuite(int argc, char **argv);
 int mainRtpSyncTestSuite(int argc, char **argv);
@@ -34,8 +33,8 @@ int main(int argc, char **argv)
 #endif
    else
    {
-       std::cout << "Error: Symbolic link name doesn't match exectuable!" << std::endl;
-        return 1;
+       LOG_WARNING("Symbolic link name doesn't match exectuable!");
+       return 1;
    }
 }
 

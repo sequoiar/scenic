@@ -21,7 +21,6 @@
 #define _CODEC_H_
 
 #include "gstLinkable.h"
-#include "logWriter.h"
 
 // forward declarations
 class _GstElement;

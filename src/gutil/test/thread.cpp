@@ -17,12 +17,10 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <glib.h>
-#include <iostream>
+#include "util.h"
 #include "baseThread.h"
 #include "stdMsg.h"
-#include "optionArgs.h"
-#include "logWriter.h"
+#include "gutil.h"
 
 typedef QueuePair_<StdMsg> QueuePair;
 
@@ -86,7 +84,7 @@ int my_main (int argc, char** argv)
             break;
         }
     }
-    std::cout << "Done!" << std::endl;
+    LOG_INFO("Done!");
     return 0;
 }
 

@@ -18,10 +18,9 @@
  *
  */
 
-#include <glib.h>
-#include "config.h"
-#include "optionArgs.h"
-#include "logWriter.h"
+#include "util.h"
+
+#include "gutil.h"
 
 OptionArgs::~OptionArgs()
 {

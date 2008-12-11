@@ -17,14 +17,12 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "config.h"
+
+#include "util.h"
+
 #ifdef CONFIG_GL
-#include <cassert>
-
 #include <gst/interfaces/xoverlay.h>
-
 #include "gstLinkable.h"
-#include "logWriter.h"
 #include "pipeline.h"
 #include "playback.h"
 

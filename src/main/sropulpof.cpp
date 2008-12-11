@@ -19,6 +19,7 @@
  */
 
 #include "util.h"
+
 #include "gutil.h"
 #include "msgThreadFactory.h"
 #include "gst/videoFactory.h"
