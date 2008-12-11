@@ -35,16 +35,8 @@ const int RemoteConfig::PORT_MAX = 65000;
 RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remoteHost__,
         int port__) : codec_(codec__), remoteHost_(remoteHost__), port_(port__)
 {
-    if(codec_.empty())
-        THROW_ERROR("No Codec specified.");
-
-    static const int NUM_CODECS = 6; 
-    static const std::string VALID_CODECS[NUM_CODECS] = {"h264", "raw", "vorbis", "mp3", "mpeg4", "h263"};
-    const std::string *VALID_CODECS_END = VALID_CODECS + (NUM_CODECS * sizeof(std::string));
-    bool validCodec = std::find(VALID_CODECS, VALID_CODECS_END, codec_) != VALID_CODECS_END;
-
-    if(!validCodec)
-        THROW_ERROR("Bad codec:" << codec_);
+    if(!Codec::isSupportedCodec(codec_))
+        THROW_ERROR("Bad codec: " << codec_);
     if (port_ < PORT_MIN || port_ > PORT_MAX)
         THROW_ERROR("Invalid port " << port_ << ", must be in range [" 
                 << PORT_MIN << "," << PORT_MAX << "]");  

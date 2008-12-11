@@ -36,11 +36,14 @@ class Codec : public GstLinkableFilter
         Codec();
         ~Codec();
         virtual void init() = 0;
+        static bool isSupportedCodec(const std::string &codecStr);
 
     protected:
         _GstElement *codec_;
 
     private:
+        static const int NUM_CODECS = 6;
+        static const std::string VALID_CODECS[NUM_CODECS];
         _GstElement *srcElement() { return codec_; }
         _GstElement *sinkElement() { return codec_; }
 

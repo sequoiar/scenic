@@ -19,11 +19,15 @@
 
 #include <gst/gst.h>
 #include <cassert>
+#include <algorithm> // for std::find
 #include <gst/audio/multichannel.h>
 #include "codec.h"
 #include "rtpPay.h"
 #include "pipeline.h"
 #include "logWriter.h"
+
+
+const std::string Codec::VALID_CODECS[NUM_CODECS] = {"h264", "raw", "vorbis", "mp3", "mpeg4", "h263"};
 
 /// Constructor 
 Codec::Codec() : 
@@ -37,6 +41,22 @@ Codec::~Codec()
     Pipeline::Instance()->remove(&codec_);
 }
 
+
+/// Returns true if the specified codec is supported by our architecture
+bool Codec::isSupportedCodec(const std::string & codecStr)
+{
+    if (codecStr.empty())
+    {
+        LOG_WARNING("Empty codec string given");
+        return false;
+    }
+
+    const std::string *VALID_CODECS_END = VALID_CODECS + (NUM_CODECS * sizeof(std::string));
+    // search for codecStr in Codec's list of supported codecs
+    bool validCodec = std::find(VALID_CODECS, VALID_CODECS_END, codecStr) != VALID_CODECS_END;
+
+    return validCodec;
+}
 
 /// Constructor 
 AudioConvertedEncoder::AudioConvertedEncoder() : 
@@ -210,6 +230,7 @@ RtpPay* Mpeg4Decoder::createDepayloader() const
 
 const char *Mpeg4Decoder::getCaps() const
 {
+    // FIXME: This suckS!!!!!!
     return "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
         "config=(string)000001b001000001b58913000001000000012000c48d8ba98518043c1463000001b24c61766335322e362e30, "
         "encoding-name=(string)MP4V-ES, payload=(int)96, "

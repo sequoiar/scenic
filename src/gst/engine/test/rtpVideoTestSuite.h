@@ -32,6 +32,10 @@ class RtpVideoTestSuite
         RtpVideoTestSuite()
         {
             testLength_ = 800000;
+            TEST_ADD(RtpVideoTestSuite::start_mpeg4)
+            TEST_ADD(RtpVideoTestSuite::stop_mpeg4)
+            TEST_ADD(RtpVideoTestSuite::start_stop_mpeg4)
+
             
             TEST_ADD(RtpVideoTestSuite::start_h263_v4l)
             TEST_ADD(RtpVideoTestSuite::stop_h263_v4l)
@@ -41,10 +45,6 @@ class RtpVideoTestSuite
             TEST_ADD(RtpVideoTestSuite::stop_h263)
             TEST_ADD(RtpVideoTestSuite::start_stop_h263)
             
-            TEST_ADD(RtpVideoTestSuite::start_mpeg4)
-            TEST_ADD(RtpVideoTestSuite::stop_mpeg4)
-            TEST_ADD(RtpVideoTestSuite::start_stop_mpeg4)
-
             TEST_ADD(RtpVideoTestSuite::start_test_video)
             TEST_ADD(RtpVideoTestSuite::stop_test_video)
             TEST_ADD(RtpVideoTestSuite::start_stop_test_video)
