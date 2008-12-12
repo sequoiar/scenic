@@ -83,9 +83,9 @@ class AudioConvertedEncoder : public Encoder
         AudioConvertedEncoder();
         ~AudioConvertedEncoder();
         _GstElement *aconv_;
+        void init();
 
     private:
-        void init();
         _GstElement *sinkElement() { return aconv_; }
     
         /// No Copy Constructor 
@@ -101,9 +101,9 @@ class AudioConvertedDecoder : public Decoder
         AudioConvertedDecoder();
         ~AudioConvertedDecoder();
         _GstElement *aconv_;
+        void init();
 
     private:
-        void init();
         _GstElement *srcElement() { return aconv_; }
 
         ///No Copy Constructor
@@ -235,6 +235,7 @@ class RawEncoder : public AudioConvertedEncoder
         RawEncoder();
 
     private:
+        void init();
         RtpPay* createPayloader() const;
     
         _GstElement *srcElement() { return aconv_; }
@@ -252,6 +253,7 @@ class RawDecoder : public AudioConvertedDecoder
         RawDecoder();
 
     private:
+        void init();
         RtpPay* createDepayloader() const;
 
         _GstElement *sinkElement() { return aconv_; }

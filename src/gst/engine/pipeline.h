@@ -68,7 +68,7 @@ class Pipeline
         Pipeline(const Pipeline&);
         Pipeline& operator=(const Pipeline&);
 
-        Pipeline() : pipeline_(0), startTime_(0), verbose_(false), handlers_(), refCount_(0) {}
+        Pipeline() : pipeline_(0), startTime_(0), verbose_(true), handlers_(), refCount_(0) {}
         ~Pipeline();
         static Pipeline *instance_;
 

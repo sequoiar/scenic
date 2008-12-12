@@ -250,6 +250,7 @@ VorbisEncoder::VorbisEncoder()
 
 void VorbisEncoder::init()
 {
+    AudioConvertedEncoder::init();
     codec_ = Pipeline::Instance()->makeElement("vorbisenc", NULL);
     gstlinkable::link(aconv_, codec_);
 }
@@ -277,6 +278,12 @@ RtpPay* VorbisDecoder::createDepayloader() const
 RawEncoder::RawEncoder()
 {}
 
+
+void RawEncoder::init()
+{
+    AudioConvertedEncoder::init();
+}
+
 /// Creates an RtpL16Payloader 
 RtpPay* RawEncoder::createPayloader() const
 {
@@ -286,6 +293,13 @@ RtpPay* RawEncoder::createPayloader() const
 /// Constructor
 RawDecoder::RawDecoder()
 {}
+
+
+void RawDecoder::init()
+{
+    AudioConvertedDecoder::init();
+}
+
 
 /// Creates an RtpL16Depayloader 
 RtpPay* RawDecoder::createDepayloader() const
@@ -299,6 +313,7 @@ LameEncoder::LameEncoder()
 
 void LameEncoder::init()
 {
+    AudioConvertedEncoder::init();
     codec_ = Pipeline::Instance()->makeElement("lame", NULL);
     gstlinkable::link(aconv_, codec_);
 }
@@ -311,6 +326,7 @@ MadDecoder::MadDecoder()
 
 void MadDecoder::init()
 {
+    AudioConvertedDecoder::init();
     codec_ = Pipeline::Instance()->makeElement("mad", NULL);
     gstlinkable::link(codec_, aconv_);
 }

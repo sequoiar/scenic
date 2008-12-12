@@ -109,6 +109,7 @@ short pof::run(int argc, char **argv)
 
         std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
         delete vConfig;
+
         AudioSourceConfig aConfig("jackaudiosrc", numChannels);
         std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort));
         playback::start();
