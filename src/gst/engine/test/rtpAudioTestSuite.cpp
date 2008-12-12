@@ -400,6 +400,61 @@ void RtpAudioTestSuite::start_8ch_jack_vorbis()
 }
 
 
+void RtpAudioTestSuite::stop_8ch_jack_vorbis()
+{
+    const int NUM_CHANNELS = 8;
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
+
+        BLOCK();
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+    else {
+        AudioSourceConfig aConfig("jackaudiosrc", NUM_CHANNELS);
+        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig, ports::IP, "vorbis"));
+
+        BLOCK();
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+}
+
+
+void RtpAudioTestSuite::start_stop_8ch_jack()
+{
+    const int NUM_CHANNELS = 8;
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver(ports::IP, "vorbis"));
+
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+    else {
+        AudioSourceConfig aConfig("jackaudiosrc", NUM_CHANNELS);
+        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig, ports::IP, "vorbis"));
+
+        playback::start();
+
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+
+        playback::stop();
+        TEST_ASSERT(!playback::isPlaying());
+    }
+}
+
+
+
 void RtpAudioTestSuite::start_8ch_jack()
 {
     const int NUM_CHANNELS = 8;
@@ -408,11 +463,6 @@ void RtpAudioTestSuite::start_8ch_jack()
         std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
 
         playback::start();
-        //FIXME: figure out how to set layout
-#if 0
-        rx->getDecoder()->setSrcCaps();
-        LOG_DEBUG("CAPS SET?");
-#endif
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
@@ -454,7 +504,7 @@ void RtpAudioTestSuite::stop_8ch_jack()
 }
 
 
-void RtpAudioTestSuite::start_stop_8ch_jack()
+void RtpAudioTestSuite::start_stop_8ch_jack_vorbis()
 {
     const int NUM_CHANNELS = 8;
     if (id_ == 0) {
