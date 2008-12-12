@@ -50,6 +50,7 @@ class Pipeline
         void start();
         void pause();
         void stop();
+        void makeVerbose();
         const char *getElementPadCaps(GstElement *element, const char *padName) const;
 
         _GstElement *findElement(const char *name) const;
@@ -68,16 +69,14 @@ class Pipeline
         Pipeline(const Pipeline&);
         Pipeline& operator=(const Pipeline&);
 
-        Pipeline() : pipeline_(0), startTime_(0), verbose_(false), handlers_(), refCount_(0) {}
+        Pipeline() : pipeline_(0), startTime_(0), handlers_(), refCount_(0) {}
         ~Pipeline();
         static Pipeline *instance_;
 
-        void make_verbose();
         void updateListeners(GstMessage *msg);
 
         _GstElement *pipeline_;
         GstClockTime startTime_;
-        bool verbose_;
         std::vector<BusMsgHandler*> handlers_;
         int refCount_;
 };

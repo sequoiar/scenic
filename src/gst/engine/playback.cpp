@@ -52,3 +52,8 @@ void playback::quit()
     gutil::killMainLoop();
 }
 
+void playback::makeVerbose()
+{
+    Pipeline::Instance()->makeVerbose();
+}
+

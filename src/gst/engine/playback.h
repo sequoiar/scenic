@@ -26,6 +26,7 @@ namespace playback {
         void pause();
         void stop();
         bool isPlaying();
+        void makeVerbose();
         void quit();
 }
 

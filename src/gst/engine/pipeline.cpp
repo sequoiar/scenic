@@ -113,8 +113,6 @@ void Pipeline::init()
         gst_init(0, NULL);
         assert(pipeline_ = gst_pipeline_new("pipeline"));
 
-        if (verbose_)
-            make_verbose();
         // this will be used as a reference for future
         // pipeline synchronization
         startTime_ = gst_clock_get_time(clock());
@@ -145,15 +143,13 @@ void Pipeline::reset()
 }
 
 
-void Pipeline::make_verbose()
+void Pipeline::makeVerbose()
 {
     // Get verbose output
-    if (verbose_) {
-        gchar *exclude_args = NULL;     // set args to be excluded from output
-        gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
-        g_signal_connect(pipeline_, "deep_notify",
-                G_CALLBACK(gst_object_default_deep_notify), exclude_list);
-    }
+    gchar *exclude_args = NULL;     // set args to be excluded from output
+    gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
+    g_signal_connect(pipeline_, "deep_notify",
+            G_CALLBACK(gst_object_default_deep_notify), exclude_list);
 }
 
 
