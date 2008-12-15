@@ -2,9 +2,11 @@
 #include <cstdlib>
 #include <cstring>
 #include "gstTestSuite.h"
+#include "playback.h"
 
 void GstTestSuite::setup()
 {
+    playback::makeVerbose();
     std::cout.flush();
     std::cout << std::endl;
 }
