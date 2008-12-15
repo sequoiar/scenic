@@ -235,7 +235,6 @@ class RawEncoder : public AudioConvertedEncoder
         RawEncoder();
 
     private:
-        void init();
         RtpPay* createPayloader() const;
     
         _GstElement *srcElement() { return aconv_; }
@@ -253,7 +252,6 @@ class RawDecoder : public AudioConvertedDecoder
         RawDecoder();
 
     private:
-        void init();
         RtpPay* createDepayloader() const;
 
         _GstElement *sinkElement() { return aconv_; }

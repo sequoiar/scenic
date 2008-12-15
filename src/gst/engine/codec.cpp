@@ -279,11 +279,6 @@ RawEncoder::RawEncoder()
 {}
 
 
-void RawEncoder::init()
-{
-    AudioConvertedEncoder::init();
-}
-
 /// Creates an RtpL16Payloader 
 RtpPay* RawEncoder::createPayloader() const
 {
@@ -293,12 +288,6 @@ RtpPay* RawEncoder::createPayloader() const
 /// Constructor
 RawDecoder::RawDecoder()
 {}
-
-
-void RawDecoder::init()
-{
-    AudioConvertedDecoder::init();
-}
 
 
 /// Creates an RtpL16Depayloader 
