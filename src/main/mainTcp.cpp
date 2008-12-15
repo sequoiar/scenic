@@ -147,9 +147,17 @@ void parseArgs(int argc, char** argv)
             "Invalid command line arguments -- Port must be in the range of 1024-65000");
 }
 
+int mainPof(int,char**);
 
-int mainTcp (int argc, char** argv)
+int main(int argc, char** argv)
 {
+    if(argc > 1){
+        int temp;
+        if (sscanf(argv[1], "%d", &temp) != 1 || temp < 0 || temp > 1)
+            return mainPof(argc,argv);
+    }else
+        return mainPof(argc,argv);
+
     try
     {
         parseArgs(argc, argv);
