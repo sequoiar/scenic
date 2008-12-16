@@ -36,16 +36,19 @@ using namespace boost::python;
 #include "tcp/tcpThread.h"
 #include "threadWrap.h"
 
+#include "pythonThread.h"
+
 BOOST_PYTHON_MODULE(libmsgthreads)
 {
-    
+    class_ < dictMessageHandler, boost::noncopyable > ("DictHandler", no_init)
+        ;
     class_ < MsgWrapConfig > ("MsgWrapConfig", no_init)
         ;
     class_ < TcpWrapConfig, bases<MsgWrapConfig> >("TcpWrapConfig",init <int, bool> ())
         ;
     class_ < GstWrapConfig, bases<MsgWrapConfig> >("GstWrapConfig")
         ;
-    class_ < ThreadWrap, boost::noncopyable > ("ThreadWrap",init < MsgWrapConfig* > ())
+    class_ < ThreadWrap, boost::noncopyable > ("ThreadWrap",init < MsgWrapConfig*, dictMessageHandler* > ())
         .def("getMsg", &ThreadWrap::getMsg)
         .def("send", &ThreadWrap::send)
         ;

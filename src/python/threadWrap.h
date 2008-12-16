@@ -1,6 +1,7 @@
 #include <Python.h>
 #include <boost/python.hpp>
 #include "msgThreadFactory.h"
+#include "pythonThread.h"
 
 class MsgWrapConfig
 {
@@ -29,9 +30,10 @@ class ThreadWrap
 {
     std::auto_ptr<MsgThread> thread_;
 QueuePair &q_;
+PythonThread pyThread_;
 public:
-    ThreadWrap(MsgWrapConfig* conf): 
-        thread_(conf->GetMsgThread()),q_(thread_->getQueue())
+    ThreadWrap(MsgWrapConfig* conf,dictMessageHandler* hd): 
+        thread_(conf->GetMsgThread()),q_(thread_->getQueue()),pyThread_(*hd)
     {thread_->run();}
    
     bool send(boost::python::dict dt)
