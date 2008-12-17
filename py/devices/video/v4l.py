@@ -67,8 +67,18 @@ if __name__ == '__main__':
     else:
         print "using ", devices[0]
         dev = video4linux_device(devices[0])
+        
+        print "ATTRIBUTES FOR %s :", devices[0]
         dev.print_attr()
+        print "SETTING NORM TO NTSC"
         dev.set_attr('norm','NTSC')
+        print "ATTRIBUTES FOR %s :", devices[0]
+        dev.print_attr()
+        print "SETTING NORM TO PAL"
+        dev.set_attr('norm','PAL')
+        print "ATTRIBUTES FOR %s :", devices[0]
+        dev.print_attr()
+
         dev.set_attr('input','Composite0') # Composite0 Composite1 Composite2 S-Video
     
 
