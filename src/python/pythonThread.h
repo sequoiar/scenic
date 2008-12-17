@@ -46,5 +46,7 @@ class PythonThread
         }
 };
 
+
+//http://wiki.python.org/moin/boost.python/ExportingClasses
 #endif
 
