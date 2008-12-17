@@ -27,7 +27,6 @@ import os, signal
 import time
 import socket
 import smtplib
-import popen2
 import re
 import subprocess
 import time
@@ -551,6 +550,7 @@ class Config:
     audio_codec = "raw"
     video_input = "v4l2src"
     video_device = "/dev/video0"
+    videosink = "xvimagesink"
     video_codec = "h264"
     video_port = gstsendport
     audio_port = video_port + 10
@@ -817,6 +817,7 @@ class Processes(Colleague):
         self.gstrecv_cmd = [self.config.gstrecv,
                                         '--receiver', 
                                         '--address', host,
+                                        '--videosink', self.config.videosink,
                                         '--videocodec', self.config.video_codec,
                                         '--audiocodec', self.config.audio_codec,
                                         '--videoport', str(self.video_port),
