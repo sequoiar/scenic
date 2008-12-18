@@ -28,6 +28,7 @@
 struct dictMessageHandler 
 {
     virtual boost::python::dict cb(boost::python::dict d)=0; 
+    virtual ~dictMessageHandler(){}
 };
 
 struct HandlerWrapper 
@@ -40,6 +41,11 @@ struct HandlerWrapper
         return boost::python::call_method<boost::python::dict>(self,"cb",d);
     }
     PyObject *self;
+        ///No Copy Constructor
+        HandlerWrapper(const HandlerWrapper& );
+        ///No Assignment Operator
+        HandlerWrapper& operator=(const HandlerWrapper&); 
+
 };
 
 
