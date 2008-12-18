@@ -31,7 +31,7 @@ class Test_1_Driver(unittest.TestCase):
     """
     Tests for the Driver base class.
     """
-    def test_1_basic(self):
+    def test_1_driver(self):
          # simple test
         class TestAudioDriver(devices.Driver):
             def start(self):
@@ -45,4 +45,25 @@ class Test_1_Driver(unittest.TestCase):
         
         # any exception will make the test fail.
         d = TestAudioDriver()
+        
+    def test_2_devices(self):
+        class TestAudioDev(devices.Device):
+            pass
+            
+        d = TestAudioDev()
+        d.addAttribute('sampling rate', devices.IntAttribute(44100,48000, 8000,192000))
+        d.addAttribute('bit depth', devices.IntAttribute(16,16, 8,24))
+        
+        tmp = d.getAttribute('sampling rate').getValue()
+        self.assertEqual(tmp, 44100,'Attribute not matching what we gave it.')
+        
+        tmp = d.getAttribute('bit depth').getValue()
+        self.assertEqual(tmp, 16,'Attribute not matching what we gave it.')
+        
+        tmp = d.getAttribute('bit depth').getDefault()
+        self.assertEqual(tmp, 16,'Default not matching what we gave it.')
+        
+        tmp = d.getAttribute('sampling rate').getRange() # returns two-tuple
+        self.assertEqual(tmp[0], 8000,  'Minimum value not matching what we gave it.')
+        self.assertEqual(tmp[1], 192000,'Maximum value not matching what we gave it.')
         
