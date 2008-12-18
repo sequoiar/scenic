@@ -24,27 +24,30 @@
 #include <boost/python.hpp>
 #include "msgThread.h"
 
-
+///python inheritable callback class
 struct dictMessageHandler 
 {
     virtual boost::python::dict cb(boost::python::dict d)=0; 
     virtual ~dictMessageHandler(){}
 };
 
+///wrapper for python callback handler
 struct HandlerWrapper 
     : dictMessageHandler 
 {
     HandlerWrapper(PyObject *p) : self(p) {}
+
+    /// Call the virtual function in python                         
     boost::python::dict cb(boost::python::dict d)
     {
-        // Call the virtual function in python                         
         return boost::python::call_method<boost::python::dict>(self,"cb",d);
     }
     PyObject *self;
-        ///No Copy Constructor
-        HandlerWrapper(const HandlerWrapper& );
-        ///No Assignment Operator
-        HandlerWrapper& operator=(const HandlerWrapper&); 
+
+    ///No Copy Constructor
+    HandlerWrapper(const HandlerWrapper& );
+    ///No Assignment Operator
+    HandlerWrapper& operator=(const HandlerWrapper&); 
 
 };
 

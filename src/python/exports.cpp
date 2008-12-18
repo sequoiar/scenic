@@ -36,7 +36,7 @@ using namespace boost::python;
 #include "tcp/tcpThread.h"
 #include "pyMsgThread.h"
 
-
+/// BOOST PYTHON MOD
 BOOST_PYTHON_MODULE(libmsgthreads)
 {
     class_ < dictMessageHandler, boost::noncopyable, boost::shared_ptr<HandlerWrapper> > ("DictHandler")
@@ -48,7 +48,6 @@ BOOST_PYTHON_MODULE(libmsgthreads)
     class_ < GstWrapConfig, bases<MsgWrapConfig> >("GstWrapConfig")
         ;
     class_ < ThreadWrap, boost::noncopyable > ("ThreadWrap",init < MsgWrapConfig*, dictMessageHandler* > ())
-        .def("getMsg", &ThreadWrap::getMsg)
         .def("send", &ThreadWrap::send)
         ;
 }

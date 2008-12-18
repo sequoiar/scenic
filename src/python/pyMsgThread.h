@@ -17,6 +17,7 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #ifndef _THREADWRAP_H_
 #define _THREADWRAP_H_
 
@@ -25,7 +26,7 @@
 #include "msgThreadFactory.h"
 #include "pyCallback.h"
 
-
+/// Used my ThreadWrap to poll and post to python
 class PythonThread
     : public MsgThread
 {
@@ -38,7 +39,7 @@ class PythonThread
         
 };
 
-
+/// non msgThread to be derived
 class MsgWrapConfig
 {
     public:
@@ -46,7 +47,7 @@ class MsgWrapConfig
         virtual ~MsgWrapConfig(){}
 };
 
-
+/// TCP
 class TcpWrapConfig : public MsgWrapConfig
 {
     int port_;
@@ -57,7 +58,7 @@ class TcpWrapConfig : public MsgWrapConfig
         MsgThread* GetMsgThread(){ return MsgThreadFactory::Tcp(port_,log_);}
 };
 
-
+/// GST
 class GstWrapConfig : public MsgWrapConfig
 {
     public:
@@ -65,6 +66,9 @@ class GstWrapConfig : public MsgWrapConfig
         MsgThread* GetMsgThread(){ return MsgThreadFactory::Gst(false);}
 };
 
+/// Wraps python thread and msgThread derived class
+/// @param conf is factory for MsgThreads
+/// @param hd should be a python callback
 class ThreadWrap
 {
     std::auto_ptr<MsgThread> thread_;
@@ -72,47 +76,12 @@ class ThreadWrap
     PythonThread pyThread_;
 
     public:
-
-        ThreadWrap(MsgWrapConfig* conf,dictMessageHandler* hd): 
-            thread_(conf->GetMsgThread()),q_(thread_->getQueue()),pyThread_(q_,hd)
-        {   
-            PyEval_InitThreads();
-            pyThread_.run();
-            thread_->run();
-        }
+        ThreadWrap(MsgWrapConfig* conf,dictMessageHandler* hd);
        
-        bool send(boost::python::dict dt)
-        {     
-            MapMsg m;
-            boost::python::list l = dt.items();
-            int n = boost::python::extract<int>(l.attr("__len__")());
-            LOG_DEBUG(n);
-                
-            for ( int i = 0; i < n; i++ )
-            {
-                std::string skey,sval;
-                boost::python::tuple val = (boost::python::extract<boost::python::tuple>(l[i]));
-                skey = boost::python::extract<std::string>(val[0]);
-                if(boost::python::extract<std::string>(val[1]).check()){
-                    m[skey] = boost::python::extract<std::string>(val[1]); 
-                }else
-                if(boost::python::extract<int>(val[1]).check()){
-                    m[skey] = boost::python::extract<int>(val[1]); 
-                }
-                q_.push(m);
-                //sval = boost::python::extract<std::string>(val[1]);
-                //m[skey] = sval;
-                LOG_DEBUG(skey << ">>" << sval);
-            }
-            return true; 
-        }
-     
-        //TODO remove - now implemented pythonThread
-        boost::python::dict
-        getMsg(int ){ return boost::python::dict();}
-        
+        bool send(boost::python::dict dt);
+
 };
 
 
-
 #endif
+

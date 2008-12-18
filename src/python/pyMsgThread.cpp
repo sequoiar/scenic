@@ -1,4 +1,4 @@
-/* pyMsgThread.c
+/* pyMsgThread.cpp
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
  * This file is part of [propulse]ART.
@@ -20,7 +20,8 @@
 
 #include "pyMsgThread.h"
 
-boost::python::dict makeDict(MapMsg& m)
+
+static boost::python::dict makeDict(MapMsg& m)
 { 
     boost::python::dict d;
     const std::pair<const std::string, StrIntFloat>* it;
@@ -49,6 +50,44 @@ boost::python::dict makeDict(MapMsg& m)
     }
     return d;
 }
+
+
+ThreadWrap::ThreadWrap(MsgWrapConfig* conf,dictMessageHandler* hd): 
+    thread_(conf->GetMsgThread()),q_(thread_->getQueue()),pyThread_(q_,hd)
+{   
+    PyEval_InitThreads();
+    pyThread_.run();
+    thread_->run();
+}
+
+
+bool ThreadWrap::send(boost::python::dict dt)
+{     
+    MapMsg m;
+    boost::python::list l = dt.items();
+    int n = boost::python::extract<int>(l.attr("__len__")());
+    LOG_DEBUG(n);
+        
+    for ( int i = 0; i < n; i++ )
+    {
+        std::string skey,sval;
+        boost::python::tuple val = (boost::python::extract<boost::python::tuple>(l[i]));
+        skey = boost::python::extract<std::string>(val[0]);
+        if(boost::python::extract<std::string>(val[1]).check()){
+            m[skey] = boost::python::extract<std::string>(val[1]); 
+        }else
+        if(boost::python::extract<int>(val[1]).check()){
+            m[skey] = boost::python::extract<int>(val[1]); 
+        }
+        q_.push(m);
+        //sval = boost::python::extract<std::string>(val[1]);
+        //m[skey] = sval;
+        LOG_DEBUG(skey << ">>" << sval);
+    }
+    return true; 
+}
+
+
 int PythonThread::main()
 {
     LOG_INFO("Python Thread");
