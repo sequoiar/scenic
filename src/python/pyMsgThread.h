@@ -23,7 +23,20 @@
 #include <Python.h>
 #include <boost/python.hpp>
 #include "msgThreadFactory.h"
-#include "pythonThread.h"
+#include "pyCallback.h"
+
+
+class PythonThread
+    : public MsgThread
+{
+    QueuePair& q_;
+    dictMessageHandler& msgH_;
+
+    public:
+        PythonThread(QueuePair& q,dictMessageHandler* msgH):q_(q),msgH_(*msgH){}
+        int main();
+        
+};
 
 
 class MsgWrapConfig
@@ -78,7 +91,7 @@ class ThreadWrap
             for ( int i = 0; i < n; i++ )
             {
                 std::string skey,sval;
-                tuple val = (boost::python::extract<boost::python::tuple>(l[i]));
+                boost::python::tuple val = (boost::python::extract<boost::python::tuple>(l[i]));
                 skey = boost::python::extract<std::string>(val[0]);
                 if(boost::python::extract<std::string>(val[1]).check()){
                     m[skey] = boost::python::extract<std::string>(val[1]); 

@@ -34,9 +34,8 @@
 using namespace boost::python;
 
 #include "tcp/tcpThread.h"
-#include "threadWrap.h"
+#include "pyMsgThread.h"
 
-#include "pythonThread.h"
 
 BOOST_PYTHON_MODULE(libmsgthreads)
 {
