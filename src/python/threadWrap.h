@@ -33,8 +33,9 @@ QueuePair &q_;
 PythonThread pyThread_;
 public:
     ThreadWrap(MsgWrapConfig* conf,dictMessageHandler* hd): 
-        thread_(conf->GetMsgThread()),q_(thread_->getQueue()),pyThread_(*hd)
-    {thread_->run();}
+        thread_(conf->GetMsgThread()),q_(thread_->getQueue()),pyThread_(q_,hd)
+    {   PyEval_InitThreads();
+        pyThread_.run();thread_->run();}
    
     bool send(boost::python::dict dt)
     {     
@@ -63,8 +64,10 @@ public:
     }
  
     boost::python::dict
-    getMsg(int ms)
-    { 
+    getMsg(int ){ return boost::python::dict();}
+    
+#if 0
+    {
         MapMsg m = q_.timed_pop(ms*1000);
         boost::python::dict d;
         const std::pair<const std::string, StrIntFloat>* it;
@@ -93,6 +96,7 @@ public:
         }
         return d;
     }
+#endif
 };
 
 

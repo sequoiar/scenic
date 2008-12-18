@@ -24,26 +24,91 @@
 #include <boost/python.hpp>
 #include "msgThread.h"
 
-class dictMessageHandler
+
+
+boost::python::dict makeDict(MapMsg& m)
+        { 
+            boost::python::dict d;
+            const std::pair<const std::string, StrIntFloat>* it;
+            for(it = m.begin(); it != 0; it = m.next())
+            {
+                LOG_DEBUG("");
+                switch(it->second.get_type())
+                {
+                    case 's':
+                        d.setdefault(it->first.c_str(),std::string(it->second));
+                        break;
+                    case 'i':
+                        d.setdefault(it->first.c_str(),int(it->second));
+                        break;
+                    case 'f':
+                        d.setdefault(it->first.c_str(),double(it->second));
+                        break;
+                    case 'F':
+                        break;
+                    case 'e':
+                        break;
+    //                default:
+    //                    THROW_ERROR("Command " << it->first
+      //                                         << " has unknown type " << it->second.get_type());
+                }
+            }
+            return d;
+        }
+
+
+class dictMessageHandler 
 {
     public:
         
-        virtual boost::python::dict cb(boost::python::dict d);
+        virtual boost::python::dict cb(boost::python::dict d)=0; //{ return get_override("cb")(d);} //{ return d;}
 
-    virtual ~dictMessageHandler(){}
 };
+
+struct HandlerWrapper 
+    : dictMessageHandler 
+{
+    HandlerWrapper(PyObject *p) : self(p) {}
+    boost::python::dict cb(boost::python::dict d){
+                // Call the virtual function in python                         
+                return call_method<boost::python::dict>(self,"cb",d);
+     }
+    PyObject *self;
+//    ~HandlerWrapper(){}
+};
+
 
 /** template specialization of BaseThread with MapMsg */
 class PythonThread
     : public MsgThread
 {
-    dictMessageHandler msgH_;
+    QueuePair& q_;
+    dictMessageHandler& msgH_;
     public:
-        PythonThread(dictMessageHandler msgH):msgH_(msgH){}
+        PythonThread(QueuePair& q,dictMessageHandler* msgH):q_(q),msgH_(*msgH){}
         int main(){
+            LOG_INFO("Python Thread");
+            for(;;)
+            {
+                MapMsg m = q_.timed_pop(10);
+                if(m["command"].empty())
+                    continue;
+                if(std::string(m["command"]) == "quit")
+                    break;
 
-               return 0; 
+                PyGILState_STATE state = PyGILState_Ensure();
+                LOG_INFO("makeDictionary");
+                msgH_.cb(makeDict(m)); 
+                PyGILState_Release(state);
+
+            }
+            return 0; 
         }
+
+
+
+
+        
 };
 
 

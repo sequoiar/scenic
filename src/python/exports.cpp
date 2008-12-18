@@ -40,7 +40,7 @@ using namespace boost::python;
 
 BOOST_PYTHON_MODULE(libmsgthreads)
 {
-    class_ < dictMessageHandler, boost::noncopyable > ("DictHandler", no_init)
+    class_ < dictMessageHandler, boost::noncopyable, boost::shared_ptr<HandlerWrapper> > ("DictHandler")
         ;
     class_ < MsgWrapConfig > ("MsgWrapConfig", no_init)
         ;
