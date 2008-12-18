@@ -93,7 +93,6 @@ void VorbisDepayloader::init()
 void L16Payloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpL16pay", NULL);
-    Payloader::init();
 }
 
 
