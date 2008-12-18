@@ -2,7 +2,7 @@ include $(top_srcdir)/src/globals.mak
 
 lib_LTLIBRARIES = libmsgthreads.la
 
-libmsgthreads_la_SOURCES = exports.cpp
+libmsgthreads_la_SOURCES = exports.cpp pyMsgThread.cpp
 libmsgthreads_la_LDFLAGS = -version-info 1:1:1
 
 # add your libs i.e. ../hello/libhello.la  
