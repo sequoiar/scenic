@@ -34,7 +34,7 @@ AC_ARG_ENABLE([sip], [ ****************
   --enable-sip build sip],,enable_sip=yes)
 AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
-        enable_debug=yes)
+        enable_debug=no)
 
 AC_MSG_WARN([${ac_prefix}])
 # Checks for library functions.
