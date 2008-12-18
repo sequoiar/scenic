@@ -3,6 +3,12 @@ import sys
 import os
 import glob 
 
+# usage twistd ...
+
+# TODO twisted.internet.reactor.spawnProcess = spawnProcess(self, 
+# processProtocol, executable, args=(), env={}, path=None, uid=None, 
+# gid=None, usePTY=0, childFDs=None) 
+
 def shell_command(*popenargs, **kwargs):
     """Run command with arguments.  Wait for command to complete, then
     return the stdout.
@@ -28,7 +34,13 @@ def list_v4l_devices():
     """
     return glob.glob('/dev/video*')
 
-class video4linux_device:
+class video4linuxDriver(Driver):
+    # TODO !
+    is_started = False
+    def start(self):
+        self.is_started = True
+
+class video4linux_device: #(Device)
     """
     Controls one v4l device (such as /dev/video0)
     """

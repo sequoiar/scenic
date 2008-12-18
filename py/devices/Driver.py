@@ -4,7 +4,13 @@ class Driver:
         Drivers must inherit from this class and implement each method.
     """
     def start(self):
-        """Starts the use of the device"""
+        """
+        Starts the use of the device. 
+        
+        Called only once on system startup.
+        There should be a "started" class variable for each driver in 
+        order to make sure it is started only once.
+        """
         pass
     
     def list(self):
