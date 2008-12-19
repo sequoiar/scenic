@@ -50,10 +50,33 @@ class Video4LinuxDriver(devices.VideoDriver):
         self.notify(caller,ret,key)
     
     def shell_command_result(self,command,results):
-        pass
-    #TODO
+        log.info('v4l driver: command %s returned.',str(command))
+        
+    def v4l_command(self,deviceObj,command):
+        devName = '/dev/video0' # TODO
+        command.insert(0,devName)
+        command.insert(0,'-c')
+        command.insert(0,'v4lctl')
+        self.shell_command_start(command)
 
-
+    def v4l_set_norm(self,deviceObj,norm='NTSC'):
+        """
+        Sets TV norm to PAL, NTSC or SECAM
+        """
+        self.v4l_command(deviceObj,['setnorm',norm])
+    
+    def v4l_input_next(self,deviceObj):
+        """
+        Tries next input. (composite0,composite1,Television...
+        """
+        self.v4l_command(deviceObj,['setinput','next'])
+    
+    def v4l_set_attr(self,deviceObj,attr,value):
+        """
+        Wrapper for setting an attribute using v4lctl
+        """
+        self.v4l_command(deviceObj,['setattr',attr,value])
+    
 if __name__ == '__main__':
     from utils.observer import Observer
     
@@ -73,11 +96,15 @@ if __name__ == '__main__':
     def test():
         print "SIMPLE TEST"
         v4l.listDevices(o,'list_devices')
+        print 'setting NORM to NTSC::::::::'
+        v4l.v4l_set_norm(None,'NTSC')
+        v4l.v4l_input_next(None)
+        
     def stop():
         reactor.stop()
     
     # -----------------------
     reactor.callLater(0,test)
-    reactor.callLater(0.1,stop)
+    reactor.callLater(1,stop)
     reactor.run()
 

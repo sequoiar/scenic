@@ -140,7 +140,7 @@ class ShellProcessProtocol(protocol.ProcessProtocol):
         self.verbose = verbose
         
     def connectionMade(self):
-        log.info('Shell command called: %s' % (self.command[0]))
+        log.info('Shell command called: %s' % (str(self.command)))
     
     def outReceived(self, data):
         if self.verbose:
