@@ -34,7 +34,7 @@ import devices
 
 log = log.start('debug', 1, 0, 'devices')
 
-class Video4LinuxDriver(devices.Driver):
+class Video4LinuxDriver(devices.VideoDriver):
     """
     Video4linux 2 Driver.
     """
@@ -45,5 +45,6 @@ class Video4LinuxDriver(devices.Driver):
     def get(self):
         return None
     def shell_command_result(self,command,results):
-        pass #print "results from command %s are :%s" % (command[0], results)
-    
+        pass
+    def notifyChange(self,device,attr):
+        pass

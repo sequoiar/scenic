@@ -77,6 +77,8 @@ class Subject(object):
     def notify(self, caller, value, key=None):
         """
         Calls all its observers that an attribute has changed.
+
+        Usage: self.notify(self,'brown','color')
         """
         if not key:
             key = get_def_name()

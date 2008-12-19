@@ -27,7 +27,6 @@ $ export PYTHONPATH=$PWD
 $ python devices/devices.py
 """
 
-
 # System imports
 import os,sys #, resource, signal, time, sys, select
 
@@ -39,16 +38,23 @@ from twisted.python import procutils # Utilities for dealing with processes
 
 # App imports
 from utils import log
+from utils import singleton
+from utils.observer import Observer, Subject
 
 log = log.start('debug', 1, 0, 'devices')
 
-class Driver:
+class Driver(singleton.Singleton): # Subject
     """
-    Base class for a driver for a type of Device.
+    Base class for a driver for a type of Device. (ALSA, JACK, v4l, dv1394, etc.)
     
     Drivers must inherit from this class and implement each method.
     """
-        
+    def getName(self):
+        """
+        used by the DriverManager instances to manage Driver instances by their name.
+        """
+        raise NotImplementedError,'Chld classes must implement this.'
+
     def start(self):
         """
         Starts the use of the Driver. 
@@ -59,7 +65,7 @@ class Driver:
         """
         raise NotImplementedError, 'This method must be implemented in child classes.'
     
-    def list(self): #,callback):
+    def listDevices(self): #,callback):
         """
         Lists name of devices of the type that a driver supports on this machine right now.
         """
@@ -75,6 +81,14 @@ class Driver:
         """
         raise NotImplementedError, 'This method must be implemented in child classes.'
     
+    def notifyChange(self,device,attr):
+        """
+        Called by a Device when one of it Attribute instances has changed.
+
+        The Driver whould then actually change the value of that Device attribute using some shell scripts or so.
+        """
+        raise NotImplementedError, 'This method must be implemented in child classes.' 
+
     def shell_command_start(self, command):
         """
         Command is a list of strings.
@@ -97,26 +111,37 @@ class Driver:
         Args are: the command that it the results if from, text data resulting from it.
         """
         raise NotImplementedError, 'This method must be implemented in child classes. (if you need it)'
-        
+
+# Drivers should extend one of these classes: 
+class VideoDriver(Driver):
+    pass
+class AudioDriver(Driver):
+    pass
+class DataDriver(Driver):
+    pass
+
 class ShellProcessProtocol(protocol.ProcessProtocol):
     """
     Protocol for doing asynchronous call to a shell command.
     
     Calls its caller back with the result.
     """
-    def __init__(self, server,command):
+    def __init__(self, server,command,verbose=False):
         self.server = server
         self.command = command
+        self.verbose = verbose
         
     def connectionMade(self):
         log.info('Device polling/configuring command started: %s' % (self.command[0]))
     
     def outReceived(self, data):
-        log.info('Result from command %s : %s' % (self.command[0],data))
+        if self.verbose:
+            log.info('Result from command %s : %s' % (self.command[0],data))
         self.server.shell_command_result(self.command,data)
            
     def processEnded(self, status):
-        log.info('Device poll/config command ended. Message: %s' % status)
+        if self.verbose:
+            log.info('Device poll/config command ended. Message: %s' % status)
 
 class Attribute:
     """
@@ -124,15 +149,23 @@ class Attribute:
     
     TODO: Should we store the name of the attribute as well?
     """
-    def __init__(self,value=None,default=None):
+    def __init__(self,name,value=None,default=None):
+        self.name = name
         self.value = value
         self.default = default
+        self.device = None
         
     def getValue(self):
         return self.value
 
     def setValue(self,val):
+        """
+        Changes the value of the Attribute for device.
+        
+        Calls onChange() once its value is changed.
+        """
         self.value = val
+        self.onChange()
         
     def getDefault(self):
         return self.default
@@ -145,21 +178,37 @@ class Attribute:
         Returns the type() of self.
         """
         return type(self)
+    
+    def setDevice(self,dev):
+        self.device = dev
+    
+    def onChange(self):
+        """
+        Called when the value changed.
+
+        Tells the Device that the value changed.
+        """
+        # TODO ! 
+        if self.device is not None:
+            self.device.notifyChange(self)
+            
+    def getName(self):
+        return self.name
         
 class BooleanAttribute(Attribute):
-    def __init__(self,value=False,default=False):
-        Attribute.__init__(self,value,default)
+    def __init__(self,name,value=False,default=False):
+        Attribute.__init__(self,name,value,default)
 
 class StringAttribute(Attribute):
-    def __init__(self,value='',default=''):
-        Attribute.__init__(self,value,default)
+    def __init__(self,name,value='',default=''):
+        Attribute.__init__(self,name,value,default)
 
 class IntAttribute(Attribute):
     """
     The range is a two-numbers tuple defining minimum and maximum possible value.
     """
-    def __init__(self,value=0,default=0,minVal=0,maxVal=1023):
-        Attribute.__init__(self,value,default)
+    def __init__(self,name,value=0,default=0,minVal=0,maxVal=1023):
+        Attribute.__init__(self,name,value,default)
         self.setRange(minVal,maxVal)
         
     def getRange(self):
@@ -176,8 +225,8 @@ class OptionsAttribute(Attribute):
     The options is a list of possible options. 
     The value is the index.
     """
-    def __init__(self,value=None,default=None,options=[]):
-        Attribute.__init__(self,value,default)
+    def __init__(self,name,value=None,default=None,options=[]):
+        Attribute.__init__(self,name,value,default)
         self.setOptions(options)
     
     def getValueByIndex(self,k):
@@ -239,6 +288,13 @@ class Device:
     """
     Base class for any Device.
     """
+    def __init__(self,driver=None):
+        """
+        Argument: The Driver that is used to control this device.
+        """
+        self.driver = driver
+        self.attributes = dict()
+
     def getAttribute(self,k):
         """
         Gets one Attribute object.
@@ -247,7 +303,7 @@ class Device:
         """
         ret = None
         try:
-            ret = self.__dict__[k]
+            ret = self.attributes[k]
         except KeyError:
             pass
             raise KeyError, 'That Device doesn\'t have that attribute !'
@@ -257,23 +313,83 @@ class Device:
         """
         Gets list of all attributes names
         """
-        return self.__dict__.keys()
+        return self.attributes.keys()
     
     def getAllAttributes(self):
         """
         Returns a dict in the form name = Attribute
         """ 
-        return self.__dict__
+        return self.attributes
     
-    def addAttribute(self,k,val):
-        self.__dict__[k] = val #copy.deepcopy(val)
+    def addAttribute(self,attr):
+        """
+        Adds an attribute to a device.
+        TODO: Also registers that attribute to the driver.
+        """
+        k = attr.getName()
+        self.attributes[k] = attr
+        attr.setDevice(self)
     
     def printAllAttributes(self):
         """
         for debugging purposes
         """
-        for k,attr in self.__dict__.items():
+        for k,attr in self.attributes.items():
             print "%40s = %30s" % (k, str(attr.getValue()))
+
+    def getDriver(self):
+        """
+        Returns its Driver object.
+        """
+        return self.driver
+
+    def notifyChange(self,attr):
+        """
+        Called when an attribute has change. 
+        
+        Calls the Driver notifyChange method.
+        """
+        
+        if self.driver is not None:
+            self.driver.notifyChange(self,attr)
+
+
+
+class DriversManager(singleton.Singleton):
+    """
+    Manages all drivers of its kind.
+    """
+
+    #Its child classes implement the singleton design pattern.
+    #There are currently 3: VideoDriversManager, AudioDriversManager and DataDriversManager
+    #"""
+    #def instance():
+    #    """
+    #    Returns a DriversManagers for the correct type.
+    #
+    #        Singleton design pattern.
+    #        """
+    #        raise NotImplementedError, 'This method must be implemeneted in child classes.' 
+    def __init__(self):
+        self.drivers = dict()
+
+    def addDriver(self,driver):
+        self.driver[driver.getName()] = driver
+
+    def listDrivers(self):
+        """
+        Returns dict of name -> Driver objects
+        """
+        return self.drivers # .values()
+
+class VideoDriversManager(DriversManager):
+    pass
+class AudioDriversManager(DriversManager):
+    pass
+class DataDriversManager(DriversManager):
+    pass
+
+
 
 if __name__ == '__main__':
     # tests
@@ -282,9 +398,9 @@ if __name__ == '__main__':
             
     print "----------------------------"
     print "starting test"
-    d = TestAudioDev()
-    d.addAttribute('sampling rate', IntAttribute(44100,48000, 8000,192000))
-    d.addAttribute('bit depth', IntAttribute(16,16, 8,24))
+    d = TestAudioDev() # TODO: set driver when instanciating
+    d.addAttribute(IntAttribute('sampling rate',44100,48000, 8000,192000))
+    d.addAttribute(IntAttribute('bit depth',16,16, 8,24))
     print "DEVICE INFO:"
     d.printAllAttributes()
     print "DONE testing the Device class."
@@ -293,15 +409,32 @@ if __name__ == '__main__':
     print "NOW TESTING the Driver class:"
     class TestAudioDriver(Driver):
         def start(self):
-            self.shell_command_start(['ls','-la'])
+            print "Calling the ls shell command:"
+            self.shell_command_start(['ls'])
         def list(self):
             return []
         def get(self):
             return None
         def shell_command_result(self,command,results):
-            print "results from command %s are :%s" % (command[0], results)
+            print "SUCCESS: Results from command %s are :%s" % (command[0], results)
     
     print "TEST main()"
     d = TestAudioDriver().start()
     
+    print "DriversManager instances:"
+    audioMan = AudioDriversManager()
+    dataMan  =  DataDriversManager()
+    videoMan = VideoDriversManager()
+    dup =      VideoDriversManager()
+    print audioMan
+    print dataMan
+    print videoMan
+    print "duplicate:",dup
+
+    def stopReactor():
+        print '\nStop reactor\n'
+        reactor.stop()
+    reactor.callLater(2,stopReactor)
+    
     reactor.run()
+

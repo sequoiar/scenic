@@ -63,8 +63,8 @@ class Test_1_Driver(unittest.TestCase):
 class Test_2_Device(unittest.TestCase):
     def test_1_device_attributes(self):
         d = TestAudioDev()
-        d.addAttribute('sampling rate', devices.IntAttribute(44100,48000, 8000,192000))
-        d.addAttribute('bit depth', devices.IntAttribute(16,16, 8,24))
+        d.addAttribute(devices.IntAttribute('sampling rate',44100,48000, 8000,192000))
+        d.addAttribute(devices.IntAttribute('bit depth',16,16, 8,24))
         
         tmp = d.getAttribute('sampling rate').getValue()
         self.assertEqual(tmp, 44100,'Attribute not matching what we gave it.')
@@ -81,7 +81,7 @@ class Test_2_Device(unittest.TestCase):
 
 class Test_3_v4l_Driver(unittest.TestCase):
     def test_1_list(self):
-        d = devices.Video4linuxDriver()
+        d = devices.Video4LinuxDriver()
         l = d.list()
         self.assertEqual(type(l), list,'Driver doesn\'t return a list of devices.')
     
@@ -90,7 +90,7 @@ class Test_3_v4l_Driver(unittest.TestCase):
         l = d.list()
         name = None
         try:
-            name = l[o]
+            name = l[0]
         except IndexError:
             pass
         self.assertEqual(name, '/dev/video0','Computer doesn\'t have a /dev/video0 v4l device. (it is probably correct)')
