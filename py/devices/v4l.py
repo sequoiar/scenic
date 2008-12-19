@@ -38,13 +38,46 @@ class Video4LinuxDriver(devices.VideoDriver):
     """
     Video4linux 2 Driver.
     """
-    def start(self):
+    def prepareDriver(self):
         pass
-    def list(self):
-        return glob.glob('/dev/video*')
-    def get(self):
-        return None
+    def listDevices(self,caller,key):
+        #print 'caller:',caller
+        #print 'key',key
+        all = glob.glob('/dev/video*')
+        ret = dict()
+        for d in all:
+            ret[d] = 'SOME INFO'
+        self.notify(caller,ret,key)
+    
     def shell_command_result(self,command,results):
         pass
-    def notifyChange(self,device,attr):
-        pass
+    #TODO
+
+
+if __name__ == '__main__':
+    from utils.observer import Observer
+    
+    class SomeTestObserver(Observer):
+        def __init__(self):
+            Observer.__init__(self,())
+        def update(self,origin,key,data):
+            print "Received %s: %s" % (str(key),str(data))
+    
+    # ------------------------
+    
+    v4l = Video4LinuxDriver()
+    v4l.prepareDriver()
+    
+    o = SomeTestObserver()
+    o.append(v4l)
+    def test():
+        print "SIMPLE TEST"
+        v4l.listDevices(o,'list_devices')
+    def stop():
+        reactor.stop()
+    
+    # -----------------------
+    reactor.callLater(0,test)
+    reactor.callLater(0.1,stop)
+    reactor.run()
+
