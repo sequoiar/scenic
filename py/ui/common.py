@@ -24,7 +24,7 @@ from twisted.python.modules import getModule
 from twisted.python.filepath import FilePath
 from utils import log
 
-DEBUG = True
+DEBUG = False
     
 def find_all():
     """
