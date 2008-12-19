@@ -103,8 +103,9 @@ class Driver(singleton.Singleton, Subject):
         executable = procutils.which(command[0])[0]
         #args = command[1:]
         if executable:
-            try:
-                log.info('Starting command: %s' % command[0])
+            try:    
+                if False: # not verbose
+                    log.info('Starting command: %s' % command[0])
                 self.process = reactor.spawnProcess(ShellProcessProtocol(self,command), executable, command, os.environ, usePTY=True)
             except:
                 log.critical('Cannot start the device polling/control command: %s' % executable)
@@ -139,7 +140,7 @@ class ShellProcessProtocol(protocol.ProcessProtocol):
         self.verbose = verbose
         
     def connectionMade(self):
-        log.info('Device polling/configuring command started: %s' % (self.command[0]))
+        log.info('Shell command called: %s' % (self.command[0]))
     
     def outReceived(self, data):
         if self.verbose:
