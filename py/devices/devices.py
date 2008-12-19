@@ -43,7 +43,7 @@ from utils.observer import Observer, Subject
 
 log = log.start('debug', 1, 0, 'devices')
 
-class Driver(singleton.Singleton): # Subject
+class Driver(singleton.Singleton, Subject):
     """
     Base class for a driver for a type of Device. (ALSA, JACK, v4l, dv1394, etc.)
     
@@ -51,28 +51,36 @@ class Driver(singleton.Singleton): # Subject
     """
     def getName(self):
         """
-        used by the DriverManager instances to manage Driver instances by their name.
+        Used by the DriverManager instances to manage Driver instances by their name.
         """
         raise NotImplementedError,'Chld classes must implement this.'
 
-    def start(self):
+    def prepareDriver(self):
         """
         Starts the use of the Driver. 
         
         Called only once on system startup.
         There should be a "started" class variable for each driver in 
         order to make sure it is started only once.
+
+        TODO: notify the observer.
         """
         raise NotImplementedError, 'This method must be implemented in child classes.'
     
-    def listDevices(self): #,callback):
+    def listDevices(self, caller, callback_key):
         """
         Lists name of devices of the type that a driver supports on this machine right now.
+
+        Will call the notify method, using Observer pattern. Like this:
+        
+        self.notify(caller, data, callback_key) 
+        
+        Data will be a 'key' => 'long name' dict.
         """
         # TODO: Will call the provided callback with list of Device objects ?
         raise NotImplementedError, 'This method must be implemented in child classes.'
     
-    def get(self,device_name=None):
+    def getDevice(self,device_name=None):
         """
         Returns a device object.
         
@@ -80,11 +88,10 @@ class Driver(singleton.Singleton): # Subject
         Returns None in case of device doesn't exist ?
         """
         raise NotImplementedError, 'This method must be implemented in child classes.'
-    
-    def notifyChange(self,device,attr):
+    def onDeviceAttributeChange(self,device,attributeName):
         """
-        Called by a Device when one of it Attribute instances has changed.
-
+        Called by a device when one of its attribute is changed. (by the core, usually)
+        
         The Driver whould then actually change the value of that Device attribute using some shell scripts or so.
         """
         raise NotImplementedError, 'This method must be implemented in child classes.' 
@@ -187,10 +194,9 @@ class Attribute:
         Called when the value changed.
 
         Tells the Device that the value changed.
-        """
-        # TODO ! 
+        """ 
         if self.device is not None:
-            self.device.notifyChange(self)
+            self.device.onAttributeChange(self)
             
     def getName(self):
         return self.name
@@ -262,6 +268,7 @@ class OptionsAttribute(Attribute):
         Sets current value's index.
         """
         self.value = i
+        self.onChange()
     
     def getValue(self):
         """
@@ -274,6 +281,7 @@ class OptionsAttribute(Attribute):
         Overrides the parent's setValue method.
         """
         self.value = self.getIndexForValue(val)
+        self.onChange()
     
     def getOptions(self):
         return self.options
@@ -286,7 +294,10 @@ class OptionsAttribute(Attribute):
 
 class Device:
     """
-    Base class for any Device.
+    Class for any Device.
+
+    Should not be subclassed, but rather, each object has different attributes using the methods
+    defined here to add and set attributes.
     """
     def __init__(self,driver=None):
         """
@@ -294,7 +305,8 @@ class Device:
         """
         self.driver = driver
         self.attributes = dict()
-
+    def setDriver(self,driver):
+        self.driver = driver
     def getAttribute(self,k):
         """
         Gets one Attribute object.
@@ -343,7 +355,7 @@ class Device:
         """
         return self.driver
 
-    def notifyChange(self,attr):
+    def onAttributeChange(self,attr):
         """
         Called when an attribute has change. 
         
@@ -351,9 +363,7 @@ class Device:
         """
         
         if self.driver is not None:
-            self.driver.notifyChange(self,attr)
-
-
+            self.driver.onDeviceAttributeChange(self,attr)
 
 class DriversManager(singleton.Singleton):
     """
@@ -389,52 +399,60 @@ class AudioDriversManager(DriversManager):
 class DataDriversManager(DriversManager):
     pass
 
-
-
 if __name__ == '__main__':
-    # tests
-    class TestAudioDev(Device):
-        pass
-            
+    # ---------------------- DEVICES
     print "----------------------------"
     print "starting test"
-    d = TestAudioDev() # TODO: set driver when instanciating
-    d.addAttribute(IntAttribute('sampling rate',44100,48000, 8000,192000))
-    d.addAttribute(IntAttribute('bit depth',16,16, 8,24))
+    dev = Device() # TODO: set driver when instanciating
+    dev.addAttribute(IntAttribute('sampling rate',44100,48000, 8000,192000))
+    dev.addAttribute(IntAttribute('bit depth',16,16, 8,24))
     print "DEVICE INFO:"
-    d.printAllAttributes()
+    dev.printAllAttributes()
     print "DONE testing the Device class."
     
+    # ---------------------- DRIVERS
     print "----------------------------"
     print "NOW TESTING the Driver class:"
-    class TestAudioDriver(Driver):
-        def start(self):
+    
+    class TestAudioDriver(AudioDriver):
+        def prepareDriver(self):
             print "Calling the ls shell command:"
-            self.shell_command_start(['ls'])
-        def list(self):
-            return []
-        def get(self):
-            return None
+            self.shell_command_start(['ls']) # inherited from Driver
+        def listDevices(self,caller,callback_key):
+            self.notify(caller,['MOTU 123','RME 777'], callback_key) # inherited from Subject
         def shell_command_result(self,command,results):
             print "SUCCESS: Results from command %s are :%s" % (command[0], results)
     
-    print "TEST main()"
-    d = TestAudioDriver().start()
+    class TestObserver(Observer):
+        def __init__(self):
+            Observer.__init__(self,())
+        def update(self,origin,key,data):
+            print "Received %s from %s: %s" % (str(key),str(origin),str(data))
     
+    print "TEST main()"
+    dr = TestAudioDriver()
+    dr.prepareDriver()
+    o = TestObserver()
+    o.append(dr) # adding Driver Subject to the Observer
+    dr.listDevices(o,'audio_devices')
+    # -------------------------- MANAGERS
     print "DriversManager instances:"
     audioMan = AudioDriversManager()
     dataMan  =  DataDriversManager()
     videoMan = VideoDriversManager()
-    dup =      VideoDriversManager()
-    print audioMan
-    print dataMan
-    print videoMan
-    print "duplicate:",dup
+    #dup =      VideoDriversManager()
+    #print audioMan
+    #print dataMan
+    #print videoMan
+    #print "duplicate:",dup
+    #TODO:
+    #audioMan.addDriver(dr)
+    #print 'Audio drivers : ',audioMan.listDrivers()
 
+    # ---------------------------- REACTOR 
     def stopReactor():
         print '\nStop reactor\n'
         reactor.stop()
     reactor.callLater(2,stopReactor)
-    
     reactor.run()
 
