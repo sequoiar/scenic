@@ -105,7 +105,8 @@ void AudioJackSink::init()
         THROW_CRITICAL("Jack is not running");
 
     sink_ = Pipeline::Instance()->makeElement("jackaudiosink", NULL);
-    g_object_set(G_OBJECT(sink_), "connect", 1, NULL);
+    // uncomment to turn off autoconnect
+    //g_object_set(G_OBJECT(sink_), "connect", 0, NULL);
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     if (Pipeline::SAMPLE_RATE != Jack::samplerate())

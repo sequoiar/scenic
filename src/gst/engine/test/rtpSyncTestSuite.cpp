@@ -58,11 +58,11 @@ buildDeadAudioReceiver(const char * sink = audiofactory::A_SINK)
 
 void SyncTestSuiteRtp::start_jack_v4l()
 {
-    int numChannels = 8;
+    int numChannels = 6;
 
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
-        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
+        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "xvimagesink"));
+        std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver(ports::IP, "raw", ports::A_PORT));
         playback::start();
 
         BLOCK();
@@ -70,10 +70,10 @@ void SyncTestSuiteRtp::start_jack_v4l()
     }
     else {
         VideoSourceConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
+        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig, ports::IP, "h264", ports::V_PORT));
 
         AudioSourceConfig aConfig("jackaudiosrc", numChannels);
-        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
+        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ports::IP, "raw", ports::A_PORT));
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, aTx->getCaps()));
 
@@ -134,8 +134,8 @@ void SyncTestSuiteRtp::start_stop_jack_v4l()
         VideoSourceConfig vConfig("v4l2src"); 
         std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
-        AudioSourceConfig aConfig("jackaudiosrc", audioFilename_, numChannels);
-        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
+        AudioSourceConfig aConfig("jackaudiosrc", numChannels);
+        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ports::IP, "raw", ports::A_PORT));
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, aTx->getCaps()));
 
@@ -149,6 +149,73 @@ void SyncTestSuiteRtp::start_stop_jack_v4l()
         TEST_ASSERT(!playback::isPlaying());
     }
 }
+
+
+void SyncTestSuiteRtp::start_jack_v4l_vorbis()
+{
+    int numChannels = 8;
+
+    if (id_ == 0) {
+        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "xvimagesink"));
+        std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver(ports::IP, "vorbis", ports::A_PORT));
+        playback::start();
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+    }
+    else {
+        VideoSourceConfig vConfig("v4l2src"); 
+        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig, ports::IP, "h264", ports::V_PORT));
+
+        AudioSourceConfig aConfig("jackaudiosrc", numChannels);
+        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ports::IP, "vorbis", ports::A_PORT));
+        playback::start();
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, aTx->getCaps()));
+
+        BLOCK();
+        TEST_ASSERT(playback::isPlaying());
+    }
+}
+
+
+void SyncTestSuiteRtp::start_stop_jack_v4l_vorbis()
+{
+    int numChannels = 8;
+
+    if (id_ == 0) {
+        std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
+        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
+        playback::start();
+
+        BLOCK();
+
+        TEST_ASSERT(playback::isPlaying());
+
+        playback::stop();
+
+        TEST_ASSERT(!playback::isPlaying());
+    }
+    else {
+        VideoSourceConfig vConfig("v4l2src"); 
+        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
+
+        AudioSourceConfig aConfig("jackaudiosrc", numChannels);
+
+        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ports::IP, "vorbis", ports::A_PORT));
+        playback::start();
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, aTx->getCaps()));
+
+
+        BLOCK();
+
+        TEST_ASSERT(playback::isPlaying());
+
+        playback::stop();
+
+        TEST_ASSERT(!playback::isPlaying());
+    }
+}
+
 
 void SyncTestSuiteRtp::start_8ch_audiofile_dv()
 {

@@ -111,8 +111,7 @@ void H264Encoder::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
-    g_object_set(G_OBJECT(codec_), "bitrate", bitrate_, "byte-stream", TRUE, "threads", 4,
-            NULL);
+    g_object_set(G_OBJECT(codec_), "bitrate", bitrate_, "byte-stream", TRUE, "threads", 3, NULL);
 
     gstlinkable::link(colorspc_, codec_);
 }
@@ -141,14 +140,18 @@ RtpPay* H264Decoder::createDepayloader() const
 /// These caps are the same for any h264 stream
 const char *H264Decoder::getCaps() const
 {
+#if 0
     return "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
         "encoding-name=(string)H264, payload=(int)96";
+#endif
+    return "application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264," 
+    "profile-level-id=(string)4d4033, sprop-parameter-sets=(string)\"Z01AM5JUBgHtgIgAAB9IAAdTBHjBlQ\\=\\=\\,aO48gA\\=\\=\", payload=(int)96";
 }
 
 
 /// Constructor 
 H263Encoder::H263Encoder() : 
-    colorspc_(0), bitrate_(400000)
+    colorspc_(0), bitrate_(400000)  // kilobits/s
 {}
 
 

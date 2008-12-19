@@ -38,7 +38,8 @@ void RtpBin::init()
     if (rtpbin_ == 0) 
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
 
-    g_object_set(G_OBJECT(rtpbin_), "latency", 0, NULL);
+//g_object_set(G_OBJECT(rtpbin_), "latency", 20, NULL);
+    
 #if 0       
     // needs more work
     g_signal_connect(G_OBJECT(rtpbin_), "get-internal-session", G_CALLBACK(gotInternalSessionCb), NULL);

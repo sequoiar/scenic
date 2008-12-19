@@ -40,7 +40,6 @@ void Payloader::init()
 void H264Payloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtph264pay", NULL);
-    Payloader::init();
 }
 
 
@@ -54,7 +53,6 @@ void H264Depayloader::init()
 void H263Payloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtph263pay", NULL);
-    Payloader::init();
 }
 
 
@@ -67,7 +65,6 @@ void H263Depayloader::init()
 void Mpeg4Payloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpmp4vpay", NULL);
-    Payloader::init();
 }
 
 
@@ -105,7 +102,6 @@ void L16Depayloader::init()
 void MpaPayloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpmpapay", NULL);
-    Payloader::init();
 }
 
 
