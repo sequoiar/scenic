@@ -384,7 +384,7 @@ class DriversManager(singleton.Singleton):
         self.drivers = dict()
 
     def addDriver(self,driver):
-        self.driver[driver.getName()] = driver
+        self.drivers[driver.getName()] = driver
 
     def listDrivers(self):
         """
@@ -422,6 +422,8 @@ if __name__ == '__main__':
             self.notify(caller,['MOTU 123','RME 777'], callback_key) # inherited from Subject
         def shell_command_result(self,command,results):
             print "SUCCESS: Results from command %s are :%s" % (command[0], results)
+        def getName(self):
+            return 'dummy_audio_driver'
     
     class TestObserver(Observer):
         def __init__(self):
@@ -446,8 +448,8 @@ if __name__ == '__main__':
     #print videoMan
     #print "duplicate:",dup
     #TODO:
-    #audioMan.addDriver(dr)
-    #print 'Audio drivers : ',audioMan.listDrivers()
+    audioMan.addDriver(dr)
+    print 'Audio drivers : ',audioMan.listDrivers()
 
     # ---------------------------- REACTOR 
     def stopReactor():
