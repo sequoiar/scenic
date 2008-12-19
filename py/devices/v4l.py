@@ -23,7 +23,7 @@ Manages v4l2
 """
 
 # System imports
-import os, sys
+import os, sys, glob
 
 # Twisted imports
 from twisted.internet import reactor, protocol
@@ -34,7 +34,7 @@ import devices
 
 log = log.start('debug', 1, 0, 'devices')
 
-class Video4linuxDriver(Driver):
+class Video4LinuxDriver(devices.Driver):
     """
     Video4linux 2 Driver.
     """

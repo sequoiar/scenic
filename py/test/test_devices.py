@@ -19,37 +19,49 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
+import time
+
 from twisted.trial import unittest
 
 import devices
-import utils.log
 
+import utils.log
 del devices.log
 devices.log = utils.log.start('error', 1, 0, 'devices')
+
+
+
+class TestAudioDriver(devices.Driver):
+    def __init__(self,case):
+        self.case = case
+    def start(self):
+        pass
+    def list(self):
+        return []
+    def get(self):
+        return None
+    def shell_command_result(self,command,results):
+        self.case.failUnlessSubstring("toto", results, 'Shell command not giving what is expected.')
+
+class TestAudioDev(devices.Device):
+    pass
 
 class Test_1_Driver(unittest.TestCase):
     """
     Tests for the Driver base class.
     """
     def test_1_driver(self):
-         # simple test
-        class TestAudioDriver(devices.Driver):
-            def start(self):
-                self.shell_command_start(['ls','-la'])
-            def list(self):
-                return []
-            def get(self):
-                return None
-            def shell_command_result(self,command,results):
-                print "results are :\n",results
-        
         # any exception will make the test fail.
-        d = TestAudioDriver()
-        
-    def test_2_devices(self):
-        class TestAudioDev(devices.Device):
-            pass
-            
+        d = TestAudioDriver(self)
+        d.start()
+    
+    def test_2_simple_shell_command(self):
+        d = TestAudioDriver(self)
+        d.shell_command_start(['echo','toto'])
+        time.sleep(0.1)
+
+class Test_2_Device(unittest.TestCase):
+    def test_1_device_attributes(self):
         d = TestAudioDev()
         d.addAttribute('sampling rate', devices.IntAttribute(44100,48000, 8000,192000))
         d.addAttribute('bit depth', devices.IntAttribute(16,16, 8,24))
@@ -63,7 +75,23 @@ class Test_1_Driver(unittest.TestCase):
         tmp = d.getAttribute('bit depth').getDefault()
         self.assertEqual(tmp, 16,'Default not matching what we gave it.')
         
-        tmp = d.getAttribute('sampling rate').getRange() # returns two-tuple
+        tmp = d.getAttribute('sampling rate').getRange() # returns a two int tuple
         self.assertEqual(tmp[0], 8000,  'Minimum value not matching what we gave it.')
         self.assertEqual(tmp[1], 192000,'Maximum value not matching what we gave it.')
-        
+
+class Test_3_v4l_Driver(unittest.TestCase):
+    def test_1_list(self):
+        d = devices.Video4linuxDriver()
+        l = d.list()
+        self.assertEqual(type(l), list,'Driver doesn\'t return a list of devices.')
+    
+    def test_2_computer_has_a_dev_video0(self):
+        d = devices.Video4LinuxDriver()
+        l = d.list()
+        name = None
+        try:
+            name = l[o]
+        except IndexError:
+            pass
+        self.assertEqual(name, '/dev/video0','Computer doesn\'t have a /dev/video0 v4l device. (it is probably correct)')
+    
