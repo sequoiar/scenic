@@ -40,11 +40,14 @@ class Observer(object):
             self.append(subjects)
         
     def append(self, subject):
+        """
+        Adds a subject to be observed by this Observer instance.
+        """
         if isinstance(subject, Subject):
             self.subjects.append(subject)        
             subject._attach(self)   # should we make an excepption/error message
                                     # if subject isn't a Subject instance ?
-
+        
     def update(self, origin, key, value):
         """Called when an attribute of the observed object is changed.
         Should be overridden.
@@ -63,9 +66,8 @@ class Subject(object):
     """
     Subject watched by an Observer. 
     
-    This is the "Model" in the Model-View-Controller pattern. (right?)
+    This can be the "Model" in the Model-View-Controller pattern.
     """
-    
     def __init__(self):
         self.observers = weakref.WeakValueDictionary()
 

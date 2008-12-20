@@ -24,12 +24,10 @@ import time
 from twisted.trial import unittest
 
 import devices
-
+from utils.observer import Subject,Observer
 import utils.log
 del devices.log
 devices.log = utils.log.start('error', 1, 0, 'devices')
-
-
 
 class TestAudioDriver(devices.Driver):
     def __init__(self,case):
@@ -95,3 +93,65 @@ class Test_3_v4l_Driver(unittest.TestCase):
             pass
         self.assertEqual(name, '/dev/video0','Computer doesn\'t have a /dev/video0 v4l device. (it is probably correct)')
     
+
+class DeviceController(Subject):
+    """
+    Let's imagine what we are going to do.
+    """
+    def __init__(self):
+        self.driversManagers = {}
+        self.driversManagers['video'] = devices.VideoDriversManager()
+        self.driversManagers['audio'] = devices.AudioDriversManager()
+        self.driversManagers['data']  = devices.DataDriversManager()
+    
+    def list_drivers(self, caller, kind):
+        self.notify(caller, self.driversManagers[kind].getDrivers(), kind + '_list')
+    
+    def list_devices(self, caller, kind, driver):
+        self.notify(caller, self.driversManagers[kind].getDriver(driver).getDevices(), driver + '_list')
+    
+    def list_attributes(self, caller, kind, driver, device):
+        dev = self.driversManagers[kind].getDriver(driver).getDevice(device)
+        if dev:
+            self.notify(caller, dev.getAttributes(), attributes + '_list')
+        else:
+            self.notify(caller, (name, kind), 'not_found')
+        
+    def device_set_attribute(self, caller, name, kind, value):
+        dev = self.driversManagers[kind].getDriver(driver).getDevice(device)
+        if dev:
+            self.notify(caller, dev.setAttribute(value), attributes + '_set')
+        else:
+            self.notify(caller, (name, kind), 'not_found')
+    
+    def device_get_attribute(self, caller, name, kind):
+        dev = self.driversManagers[kind].getDriver(driver).getDevice(device)
+        if dev:
+            self.notify(caller, dev.getAttribute(value), attribute + '_get')
+        else:
+            self.notify(caller, (name, kind), 'not_found')
+        
+class SomeObserver(Observer):
+    def __init__(self):
+        Observer.__init__(self,())
+        
+    def update(self, origin, key, value):
+        print "Notification %s from %s with value %s" % (str(key),str(origin),str(value))
+        # if key == 'not_found...'
+    
+class Test_4_All(unittest.TestCase):
+    """
+    Tests for the Drivers and Devices.
+    """
+    def test_1_all(self):
+        # any exception will make the test fail.
+        pass
+        ctl = DeviceController()
+        obs = SomeObserver()
+        obs.append(ctl)
+        
+        ctl.list_drivers(obs,'video')
+        ctl.list_devices(obs,'video','v4l')
+        ctl.list_attributes(obs,'video','v4l','video0')
+        ctl.get_attribute(obs,'video','v4l','video0','norm')
+        ctl.set_attribute(obs,'video','v4l','video0','norm','NTSC')
