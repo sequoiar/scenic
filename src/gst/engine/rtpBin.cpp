@@ -38,13 +38,47 @@ void RtpBin::init()
     if (rtpbin_ == 0) 
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
 
-//g_object_set(G_OBJECT(rtpbin_), "latency", 20, NULL);
+    g_object_set(G_OBJECT(rtpbin_), "latency", 1, NULL);
     
-#if 0       
-    // needs more work
+#if 0
+    // uncomment this to see each gstrtpsession's bandwidth printed
+    // connect our action signal handler which requests our internal session, to our got-session handler.
     g_signal_connect(G_OBJECT(rtpbin_), "get-internal-session", G_CALLBACK(gotInternalSessionCb), NULL);
-    requestSession();
-#endif 
+    g_timeout_add(5000 /* ms */, 
+                  static_cast<GSourceFunc>(printBandwidth),
+                  static_cast<void*>(this));
+#endif
+}
+
+
+/// Arbitrarily increase bandwidth, this function is just to show how you 
+/// set the bandwidth on each stream. Currently seems to have no effect.
+
+int RtpBin::increaseBandwidth(gpointer data)
+{
+    RtpBin *context = static_cast<RtpBin*>(data);
+    const static gdouble newBandwidth = 100000.0;
+
+    for (unsigned int sessionId = 0; sessionId < context->refCount_; ++sessionId)
+    {
+        context->bandwidth(sessionId, newBandwidth);
+        LOG_INFO("BANDWIDTH USED: " << context->bandwidth(sessionId));
+    }
+
+    return FALSE;       // only called once
+}
+
+
+int RtpBin::printBandwidth(gpointer data)
+{
+    RtpBin *context = static_cast<RtpBin*>(data);
+    std::string terminator("");
+
+    for (unsigned int sessionId = 0; sessionId < context->refCount_; ++sessionId)
+        LOG_INFO(context->bandwidth(sessionId) << " bits/s" << terminator);
+        terminator = "\n\n";
+
+    return TRUE;
 }
 
 
@@ -73,43 +107,27 @@ RtpBin::~RtpBin()
     }
 }
 
-
-double RtpBin::bandwidth() const
+void RtpBin::bandwidth(guint sessionId, double newBandwidth) 
 {
-    double result = 0.0;
+    requestSession(sessionId);
+    g_object_set(G_OBJECT(session_), "bandwidth", newBandwidth, NULL);
+}
 
-    // FIXME: use gstrtpbin's get internal rtpsession method
-    GstIteratorResult iterResult;
-    GstElement *elem;
-    GstIterator *iter;
-    iter = gst_bin_iterate_recurse(GST_BIN(rtpbin_));
-    iterResult = gst_iterator_next(iter, (void**) &elem);
-    const static char *CHILD_NAME = "rtpsession";
-    const static short NAME_LENGTH = strlen(CHILD_NAME);
 
-    while (iterResult != GST_ITERATOR_DONE)
-    {
-        if (strncmp(CHILD_NAME, gst_element_get_name(elem), NAME_LENGTH) == 0)
-        {
-            g_object_get(G_OBJECT(elem), "bandwidth", &result, NULL);
-            gst_object_unref(elem);
-            break;
-        }
-        gst_object_unref(elem);
-        iterResult = gst_iterator_next(iter, (void **) &elem);
-    }
-    LOG_DEBUG("BANDWITH USED = " << result);
+double RtpBin::bandwidth(guint sessionId) const
+{
+    gdouble result = 0.0;
+
+    requestSession(sessionId);
+    g_object_get(G_OBJECT(session_), "bandwidth", &result, NULL);
 
     return result;
 }
 
 
-bool RtpBin::requestSession()
+bool RtpBin::requestSession(guint sessionId)
 {
-    const guint SESSION_ID = 0;
-    //g_signal_emit_by_name(static_cast<gpointer>(rtpbin_), "get-internal-session", SESSION_ID);
-    //TODO: use this
-    g_signal_emit_by_name (static_cast<gpointer>(rtpbin_), "get-internal-session", SESSION_ID, &session_);
+    g_signal_emit_by_name (static_cast<gpointer>(rtpbin_), "get-internal-session", sessionId, &session_);
     return false;
 }
 

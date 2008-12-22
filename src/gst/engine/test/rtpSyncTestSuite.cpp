@@ -58,7 +58,7 @@ buildDeadAudioReceiver(const char * sink = audiofactory::A_SINK)
 
 void SyncTestSuiteRtp::start_jack_v4l()
 {
-    int numChannels = 6;
+    int numChannels = 8;
 
     if (id_ == 0) {
         std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "xvimagesink"));
@@ -156,8 +156,8 @@ void SyncTestSuiteRtp::start_jack_v4l_vorbis()
     int numChannels = 8;
 
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "xvimagesink"));
         std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver(ports::IP, "vorbis", ports::A_PORT));
+        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "xvimagesink"));
         playback::start();
 
         BLOCK();

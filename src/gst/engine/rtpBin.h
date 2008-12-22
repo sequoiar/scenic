@@ -21,8 +21,6 @@
 #ifndef _RTP_BIN_H_
 #define _RTP_BIN_H_
 
-//#include "/home/tristan/gst-plugins-bad/gst/rtpmanager/rtpsession.h"
-
 class RemoteConfig;
 class _GstElement;
 class _GObject;
@@ -32,8 +30,6 @@ class RtpBin
     public:
         virtual ~RtpBin();
         void init();
-        //virtual void checkSampleRate() = 0;
-        double bandwidth() const;
 
     protected:
         RtpBin() : rtcp_sender_(0), rtcp_receiver_(0) { ++refCount_; }
@@ -44,8 +40,12 @@ class RtpBin
         _GstElement *rtcp_sender_, *rtcp_receiver_;
 
     private:
+        double bandwidth(unsigned int sessionId) const;
+        void bandwidth(unsigned int sessionId, double newBandwidth);
+        static int increaseBandwidth(void * data);
+        static int printBandwidth(void * data);
         static _GObject *session_;
-        static bool requestSession();
+        static bool requestSession(unsigned int sessionId);
         static _GObject *gotInternalSessionCb(_GstElement *rtpBin, unsigned int session, void *data);
 
         RtpBin(const RtpBin&); //No Copy Constructor
