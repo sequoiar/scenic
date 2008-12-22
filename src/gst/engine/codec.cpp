@@ -95,7 +95,7 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
 
 /// Constructor 
 H264Encoder::H264Encoder() : 
-    colorspc_(0), bitrate_(4096) // in kb/s
+    colorspc_(0), bitrate_(3000) // in kb/s
 {}
 
 

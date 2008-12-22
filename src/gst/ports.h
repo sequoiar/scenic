@@ -24,9 +24,9 @@
 #define _PORTS_H_
 
 namespace ports {
-        static const long A_PORT = 10000;
-        static const long V_PORT = 11000;
-        static const long CAPS_PORT = 12000;
+        static const long A_PORT = 12345;
+        static const long V_PORT = 23456;
+        static const long CAPS_PORT = 34567; // quasi random
         static const char *IP = "127.0.0.1";
 }
 
