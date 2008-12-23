@@ -37,7 +37,7 @@ void RtpBin::init()
     // only initialize rtpbin once per process
     if (rtpbin_ == 0) 
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
-
+    
     g_object_set(G_OBJECT(rtpbin_), "latency", 1, NULL);
     
 #if 0
@@ -51,8 +51,45 @@ void RtpBin::init()
 }
 
 
-/// Arbitrarily increase bandwidth, this function is just to show how you 
-/// set the bandwidth on each stream. Currently seems to have no effect.
+/// set drop-on-latency to TRUE, needs to be called upon creation of jitterbuffers, via a signal handler.
+/// No visible effect. 
+
+int RtpBin::dropOnLatency(gpointer data)
+{
+    RtpBin *context = static_cast<RtpBin*>(data);
+    for (unsigned int sessionId = 0; sessionId < context->refCount_; ++sessionId)
+        context->dropOnLatency(sessionId);
+
+    return FALSE; // called once
+}
+
+
+void RtpBin::dropOnLatency(guint sessionID)
+{
+    GValue val;
+    memset(&val, 0, sizeof(val));
+    g_value_init(&val, G_TYPE_BOOLEAN);
+    g_value_set_boolean(&val, TRUE);
+
+    std::stringstream jitterbufferName;
+    jitterbufferName << "rtpjitterbuffer" << sessionID << "::drop-on-latency";
+    gst_child_proxy_set_property(GST_OBJECT(rtpbin_), jitterbufferName.str().c_str(), &val);
+}
+
+
+/// print jitter for each source
+int RtpBin::printJitter(gpointer data)
+{
+    RtpBin *context = static_cast<RtpBin*>(data);
+    for (unsigned int sessionId = 0; sessionId < context->refCount_; ++sessionId)
+        LOG_INFO("Jitter: " << context->jitter(sessionId));
+
+    return FALSE; // called once
+}
+
+
+/// Arbitrarily increase bandwidth, this function exists just to show how one can
+/// set the bandwidth on each session. Currently seems to have no effect.
 
 int RtpBin::increaseBandwidth(gpointer data)
 {
@@ -75,8 +112,10 @@ int RtpBin::printBandwidth(gpointer data)
     std::string terminator("");
 
     for (unsigned int sessionId = 0; sessionId < context->refCount_; ++sessionId)
+    {
         LOG_INFO(context->bandwidth(sessionId) << " bits/s" << terminator);
         terminator = "\n\n";
+    }
 
     return TRUE;
 }
@@ -107,6 +146,9 @@ RtpBin::~RtpBin()
     }
 }
 
+
+/// Sets bandwidth for the RtpSession specified by sessionID.
+
 void RtpBin::bandwidth(guint sessionId, double newBandwidth) 
 {
     requestSession(sessionId);
@@ -114,12 +156,26 @@ void RtpBin::bandwidth(guint sessionId, double newBandwidth)
 }
 
 
+/// Gets bandwidth for the RtpSession specified by sessionID.
+
 double RtpBin::bandwidth(guint sessionId) const
 {
     gdouble result = 0.0;
 
     requestSession(sessionId);
     g_object_get(G_OBJECT(session_), "bandwidth", &result, NULL);
+
+    return result;
+}
+
+
+/// Gets the jitter for the RtpSession specified by sessionID
+double RtpBin::jitter(guint sessionId) const
+{
+    gdouble result = 0.0;
+
+    requestSession(sessionId);
+    //g_object_get(G_OBJECT(session_), "bandwidth", &result, NULL);
 
     return result;
 }
