@@ -38,12 +38,6 @@
 #include <sstream>
 #include "config.h"
 
-#ifdef CONFIG_DEBUG
-#define CONFIG_DEBUG_LOCAL
-#define LOG_LEVEL DEBUG
-#else
-#define LOG_LEVEL INFO
-#endif
 
 #define ENABLE_LOG 1
 

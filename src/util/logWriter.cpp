@@ -28,6 +28,12 @@
 #include <ctime>
 #include <sstream>
 
+#ifdef CONFIG_DEBUG_LOCAL
+#define LOG_LEVEL DEBUG
+#else
+#define LOG_LEVEL INFO
+#endif
+
 void assert_throw(__const char *__assertion, __const char *__file,
                            unsigned int __line, __const char *__function)
 {
