@@ -190,8 +190,8 @@ fi
 AC_OUTPUT
 echo
 
-if test  "x${have_python}" != "xyes"   ; then
-AC_MSG_NOTICE([Not building python directories -- ])
+if test  "$ac_cv_boost_python" != "xyes"   ; then
+AC_MSG_NOTICE([Not building python directories -- python or boost-python not found ])
 fi
 
 if test  "x${enable_debug}" = "xyes" -a "x${have_cpptest}" = "xfalse"  ; then
