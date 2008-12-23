@@ -90,6 +90,11 @@ short pof::run(int argc, char **argv)
 
         std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink));
         std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver(ip, audioCodec, audioPort));
+
+#ifdef CONFIG_DEBUG_LOCAL
+        playback::makeVerbose();
+#endif
+
         playback::start();
         if(full)
             vRx->getVideoSink()->makeFullscreen();
@@ -112,6 +117,11 @@ short pof::run(int argc, char **argv)
 
         AudioSourceConfig aConfig("jackaudiosrc", numChannels);
         std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort));
+
+#ifdef CONFIG_DEBUG_LOCAL
+        playback::makeVerbose();
+#endif
+
         playback::start();
         assert(tcpSendBuffer(ip, ports::CAPS_PORT, aTx->getCaps()));
 

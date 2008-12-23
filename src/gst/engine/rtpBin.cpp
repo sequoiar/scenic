@@ -175,8 +175,8 @@ double RtpBin::jitter(guint sessionId) const
     gdouble result = 0.0;
 
     requestSession(sessionId);
-    //g_object_get(G_OBJECT(session_), "bandwidth", &result, NULL);
-
+    // FIXME: Unimplemented
+    //requestSource();
     return result;
 }
 

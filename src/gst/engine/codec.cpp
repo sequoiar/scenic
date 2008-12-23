@@ -139,18 +139,18 @@ RtpPay* H264Decoder::createDepayloader() const
 }
 
 
-/// These caps are the same for any h264 stream
 const char *H264Decoder::getCaps() const
 {
     return "application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264," 
-    "profile-level-id=(string)4d4033, sprop-parameter-sets=(string)\"Z01AM5JUBgHtgIgAAB9IAAdTBHjBlQ\\=\\=\\,aO48gA\\=\\=\"";
+    "profile-level-id=(string)4d4033, sprop-parameter-sets=(string)\"Z01AM5JUBgHtgIgAAB9IAAdTBHjBlQ\\=\\=\\,aO48gA\\=\\=\","
+    "payload=(int)96";
 }
 
 
 /// Constructor 
 H263Encoder::H263Encoder() : 
     colorspc_(0), 
-    bitrate_(2048000)    // in bits/sec
+    bitrate_(3000000)    // in bits/sec
 {}
 
 
@@ -196,7 +196,8 @@ RtpPay* H263Decoder::createDepayloader() const
 const char *H263Decoder::getCaps() const
 {
     return "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
-        "encoding-name=(string)H263, payload=(int)96";
+        "encoding-name=(string)H263,"
+        "payload=(int)96";
 }
 
 
@@ -240,9 +241,10 @@ const char *Mpeg4Decoder::getCaps() const
 {
     // FIXME: This sucks!!!!!! This should be sent to the receiver from the sender.
     return "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
-        "config=(string)000001b001000001b58913000001000000012000c48d8ba98518043c1463000001b24c61766335322e362e30, "
-        "encoding-name=(string)MP4V-ES, payload=(int)96, "
-        "profile-level-id=(string)1";
+        "config=(string)000001b001000001b58913000001000000012000c48d8ba98518043c1463000001b24c61766335322e362e30,"
+        "encoding-name=(string)MP4V-ES,"
+        "profile-level-id=(string)1,"
+        "payload=(int)96";
 }
 
 
