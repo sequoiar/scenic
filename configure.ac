@@ -44,10 +44,10 @@ if test "x${enable_debug}" = "xyes" ; then
     CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
 
 #Trying to set CPPTEST_LIBS using pkg-config
-PKG_CHECK_MODULES(CPPTEST, libcpptest, have_cpptest=true, have_cpptest=false)
-if test "x${have_cpptest}" = "xfalse" ; then
-    AC_MSG_WARN([libcpptest not found.-- ubuntu: sudo apt-get install libcpptest-dev])
-fi
+#PKG_CHECK_MODULES(CPPTEST, libcpptest, have_cpptest=true, have_cpptest=false)
+#if test "x${have_cpptest}" = "xfalse" ; then
+#    AC_MSG_WARN([libcpptest not found.-- ubuntu: sudo apt-get install libcpptest-dev])
+#fi
 
 fi
 
@@ -155,7 +155,7 @@ fi
 #
 AM_CONDITIONAL([SIP],test "x${enable_sip}" = "xyes" -a "x{have_libpj}" = "xtrue" )
 #AM_CONDITIONAL([IEEE1394],test "x{have_libavc1394}" = "xtrue" -a "x{have_libraw1394}" = "xtrue" )
-AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes" -a "x${have_cpptest}" = "xtrue" )
+AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes" )
 
 if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
 AC_MSG_NOTICE([undef CONFIG_IEEE1394])
@@ -176,17 +176,19 @@ AC_CONFIG_FILES([Makefile
                  src/sip/Makefile
                  ])
 
-if test  "x${enable_debug}" = "xyes"  -a  "x${have_cpptest}" = "xtrue"  ; then
+#if test  "x${enable_debug}" = "xyes"  -a  "x${have_cpptest}" = "xtrue"  ; then
+
+#                 src/util/test/Makefile
+#                 src/gutil/test/Makefile
+#                 src/tcp/test/Makefile
+#                 src/sip/test/Makefile
+
 AC_CONFIG_FILES([
-                 src/util/test/Makefile
-                 src/gutil/test/Makefile
-                 src/tcp/test/Makefile
                  src/gst/engine/test/Makefile
-                 src/sip/test/Makefile
                  ])
 
 
-fi
+#fi
 AC_OUTPUT
 echo
 
@@ -194,9 +196,9 @@ if test  "$ac_cv_boost_python" != "xyes"   ; then
 AC_MSG_NOTICE([Not building python directories -- python or boost-python not found ])
 fi
 
-if test  "x${enable_debug}" = "xyes" -a "x${have_cpptest}" = "xfalse"  ; then
-AC_MSG_NOTICE([Not building test directories -- no cpptest found])
-fi
+#if test  "x${enable_debug}" = "xyes" -a "x${have_cpptest}" = "xfalse"  ; then
+#AC_MSG_NOTICE([Not building test directories -- no cpptest found])
+#fi
 
 if test  "x${enable_sip}" = "xyes" -a "x${have_libpj}" = "xfalse"  ; then
 AC_MSG_NOTICE([Not building sip directory -- libpj missing])
