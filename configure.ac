@@ -133,7 +133,7 @@ fi
 AX_PYTHON
 AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
 AX_BOOST_PYTHON
-AM_CONDITIONAL([BOOST_PYTHON], test "x${have_python}" = "xtrue")
+AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes")
 
 AX_CHECK_GL
 AX_CHECK_GLU
@@ -176,7 +176,6 @@ AC_CONFIG_FILES([Makefile
                  src/sip/Makefile
                  ])
 
-
 if test  "x${enable_debug}" = "xyes"  -a  "x${have_cpptest}" = "xtrue"  ; then
 AC_CONFIG_FILES([
                  src/util/test/Makefile
@@ -190,6 +189,10 @@ AC_CONFIG_FILES([
 fi
 AC_OUTPUT
 echo
+
+if test  "x${have_python}" != "xyes"   ; then
+AC_MSG_NOTICE([Not building python directories -- ])
+fi
 
 if test  "x${enable_debug}" = "xyes" -a "x${have_cpptest}" = "xfalse"  ; then
 AC_MSG_NOTICE([Not building test directories -- no cpptest found])
