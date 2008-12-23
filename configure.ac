@@ -43,11 +43,11 @@ if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
     CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
 
-#Trying to set CPPTEST_LIBS using pkg-config
-#PKG_CHECK_MODULES(CPPTEST, libcpptest, have_cpptest=true, have_cpptest=false)
-#if test "x${have_cpptest}" = "xfalse" ; then
-#    AC_MSG_WARN([libcpptest not found.-- ubuntu: sudo apt-get install libcpptest-dev])
-#fi
+Trying to set CPPUNIT_LIBS using pkg-config
+PKG_CHECK_MODULES(CPPUNIT, cppunit, have_cppunit=true, have_cppunit=false)
+if test "x${have_cppunit}" = "xfalse" ; then
+    AC_MSG_WARN([libcppunit not found.-- ])
+fi
 
 fi
 
