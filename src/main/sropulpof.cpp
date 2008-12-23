@@ -136,7 +136,6 @@ short pof::run(int argc, char **argv)
 
 int mainPof(int argc, char **argv)
 {
-    LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
     try {
         return pof::run(argc, argv);
     }
