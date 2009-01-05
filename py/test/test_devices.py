@@ -20,47 +20,52 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 import time
+import pprint
 
 from twisted.trial import unittest
 
 import devices
-from utils.observer import Subject,Observer
+#from utils.observer import Subject,Observer
 import utils.log
 del devices.log
 devices.log = utils.log.start('error', 1, 0, 'devices')
 
-class TestAudioDriver(devices.Driver):
-    def __init__(self,case):
-        self.case = case
-    def start(self):
-        pass
-    def list(self):
-        return []
-    def get(self):
-        return None
-    def shell_command_result(self,command,results):
-        self.case.failUnlessSubstring("toto", results, 'Shell command not giving what is expected.')
+# ---------------------------- Dummy implementation classes -----------
+class DummyAudioDriver(devices.Driver):
+    """
+    We need to subclass the Driver class in order to test it.
+    """
+    def __init__(self,test_case):
+        self.test_case = test_case
+        devices.Driver.__init__(self,'dummy')
+        
+    def shell_command_result(self,command,results,callback=None):
+        """
+        Our simple test prints "ham"
+        """
+        self.test_case.failUnlessSubstring("ham", results, 'Shell command not giving what is expected.')
 
-class TestAudioDev(devices.Device):
-    pass
-
+# -------------------------- tests ------------------------------------
 class Test_1_Driver(unittest.TestCase):
     """
     Tests for the Driver base class.
     """
-    def test_1_driver(self):
+    def test_1_driver_instanciation(self):
         # any exception will make the test fail.
-        d = TestAudioDriver(self)
-        d.start()
+        d = DummyAudioDriver(self)
+        d.prepareDriver()
     
     def test_2_simple_shell_command(self):
-        d = TestAudioDriver(self)
-        d.shell_command_start(['echo','toto'])
-        time.sleep(0.1)
+        d = DummyAudioDriver(self)
+        d.shell_command_start(['echo','ham'])
+        time.sleep(0.1) # 100 ms
 
-class Test_2_Device(unittest.TestCase):
-    def test_1_device_attributes(self):
-        d = TestAudioDev()
+class Test_2_Device_Attributes(unittest.TestCase):
+    """
+    Test attributes for devices 
+    """
+    def test_1_device_int_attributes(self):
+        d = devices.Device('MOTU')
         d.addAttribute(devices.IntAttribute('sampling rate',44100,48000, 8000,192000))
         d.addAttribute(devices.IntAttribute('bit depth',16,16, 8,24))
         
@@ -76,82 +81,111 @@ class Test_2_Device(unittest.TestCase):
         tmp = d.getAttribute('sampling rate').getRange() # returns a two int tuple
         self.assertEqual(tmp[0], 8000,  'Minimum value not matching what we gave it.')
         self.assertEqual(tmp[1], 192000,'Maximum value not matching what we gave it.')
-
-class Test_3_v4l_Driver(unittest.TestCase):
-    def test_1_list(self):
-        d = devices.Video4LinuxDriver()
-        l = d.list()
-        self.assertEqual(type(l), list,'Driver doesn\'t return a list of devices.')
     
-    def test_2_computer_has_a_dev_video0(self):
-        d = devices.Video4LinuxDriver()
-        l = d.list()
-        name = None
+    def test_2_device_string_attribute(self):
+        d = devices.Device('MOTU')
+        d.addAttribute(devices.StringAttribute('meal','egg','spam'))
+        
+        tmp = d.getAttribute('meal').getValue()
+        self.assertEqual(tmp, 'egg','Attribute not matching what we gave it.')
+        
+        tmp = d.getAttribute('meal').getDefault()
+        self.assertEqual(tmp, 'spam','Attribute default not matching what we gave it.')
+    
+    def test_3_device_options_attribute(self):
+        d = devices.Device('MOTU')
+        d.addAttribute(devices.OptionsAttribute('meal',0, 1,['egg','spam','ham','bacon']))
+        
+        attr = d.getAttribute('meal')
+        
+        # value
+        tmp = attr.getValue()
+        self.assertEqual(tmp, 0,'Attribute not matching what we gave it: '+str(tmp))
+        
+        tmp = attr.getValueForIndex(attr.getValue())
+        self.assertEqual(tmp, 'egg','Attribute not matching what we gave it.')
+        
+        # default 
+        tmp = attr.getDefault()
+        self.assertEqual(tmp, 1,'Attribute default not matching what we gave it.')
+        
+        tmp = attr.getValueForIndex(attr.getDefault())
+        self.assertEqual(tmp, 'spam','Attribute not matching what we gave it.')
+        
+    def test_4_list_attributes(self):
+        d = devices.Device('MOTU')
+        d.addAttribute(devices.StringAttribute('meal','egg', 'spam'))
+        
+        tmp = d.getAttributeNames()
+        self.assertEqual(tmp, ['meal'],'Attribute names not matching what we gave it.')
+        
+        
+
+# --------------------------------- no good ---------------------------
+# no good.
+class Test_3_Drivers_Managers(unittest.TestCase):
+    """
+    Warning: This test suite adds dummy drivers and devices to the 
+    "devices" module "managers" attribute.
+    """ 
+    def setUp(self):
+        # drivers
+        dummyDriver = DummyAudioDriver(self) # passing it the TestCase
+        devices.managers['audio'].addDriver(dummyDriver)
+        
+        # devices
+        dummyDevice = devices.Device('MOTU')
+        spamDevice = devices.Device('SPAM')
+        dummyDriver.addDevice(dummyDevice)
+        dummyDriver.addDevice(spamDevice)
+        
+    def test_1_list_drivers(self):
+        for kind in ('video','audio','data'):
+            tmp = devices.managers[kind].getDrivers()
+            self.assertEqual(type(tmp), dict,'Should be a dict.')
+    
+    def onListDevices(self, devices):
+        self.assertEqual(type(devices), dict,'Should be a dict.')
+        self.assertEqual(devices['MOTU'].getName(), 'MOTU','Wrong device name.')
+        self.assertEqual(devices['SPAM'].getName(), 'SPAM','Wrong device name.')
+        
+    def test_2_list_devices(self):
+        dummyDriver = devices.managers['audio'].getDriver('dummy')
+        dummyDriver.listDevices(self.onListDevices) # passing a callback
+        time.sleep(0.1) # 100 ms
+    
+class Test_4_v4l_Driver(unittest.TestCase):
+    """
+    test Video4LinuxDriver
+    """
+    def test_0_list_drivers(self):
+        drivers = devices.managers['video'].getDrivers()
+        
+        # DEBUG INFO:
+        #print "\nDRIVERS MANAGERS:"
+        #pprint.pprint(devices.managers)
+        #print "VIDEO DRIVERS:"
+        #pprint.pprint(drivers)
+        
+        self.assertEqual(type(drivers), dict, 'Should be a dict.')
+        
+        SHOULD_HAVE = 1 # number of video drivers there should be. (only v4l implemented for now)
+        self.assertEqual(len(drivers), SHOULD_HAVE, 'Dict should have %d driver but has %d.' % (SHOULD_HAVE,len(drivers)))
+    
+    def onListDevices_1(self, devices):
+        self.assertEqual(type(devices), dict,'Should be a dict.')
+    
+    def test_1_list_devices(self):
+        v4l = devices.managers['video'].getDriver('v4l')
+        v4l.listDevices(self.onListDevices_1)
+    
+    def onListDevices_2(self, devices):
         try:
-            name = l[0]
-        except IndexError:
-            pass
-        self.assertEqual(name, '/dev/video0','Computer doesn\'t have a /dev/video0 v4l device. (it is probably correct)')
-    
-
-class DeviceController(Subject):
-    """
-    Let's imagine what we are going to do.
-    """
-    def __init__(self):
-        self.driversManagers = {}
-        self.driversManagers['video'] = devices.VideoDriversManager()
-        self.driversManagers['audio'] = devices.AudioDriversManager()
-        self.driversManagers['data']  = devices.DataDriversManager()
-    
-    def list_drivers(self, caller, kind):
-        self.notify(caller, self.driversManagers[kind].getDrivers(), kind + '_list')
-    
-    def list_devices(self, caller, kind, driver):
-        self.notify(caller, self.driversManagers[kind].getDriver(driver).getDevices(), driver + '_list')
-    
-    def list_attributes(self, caller, kind, driver, device):
-        dev = self.driversManagers[kind].getDriver(driver).getDevice(device)
-        if dev:
-            self.notify(caller, dev.getAttributes(), attributes + '_list')
-        else:
-            self.notify(caller, (name, kind), 'not_found')
+            tmp = devices['/dev/video0']
+        except KeyError:
+            self.fail('There is no /dev/video0. (might be OK)')
         
-    def device_set_attribute(self, caller, name, kind, value):
-        dev = self.driversManagers[kind].getDriver(driver).getDevice(device)
-        if dev:
-            self.notify(caller, dev.setAttribute(value), attributes + '_set')
-        else:
-            self.notify(caller, (name, kind), 'not_found')
+    def test_2_computer_has_a_dev_video0(self):
+        driver = devices.managers['video'].getDriver('v4l')
+        driver.listDevices(self.onListDevices_2)
     
-    def device_get_attribute(self, caller, name, kind):
-        dev = self.driversManagers[kind].getDriver(driver).getDevice(device)
-        if dev:
-            self.notify(caller, dev.getAttribute(value), attribute + '_get')
-        else:
-            self.notify(caller, (name, kind), 'not_found')
-        
-class SomeObserver(Observer):
-    def __init__(self):
-        Observer.__init__(self,())
-        
-    def update(self, origin, key, value):
-        print "Notification %s from %s with value %s" % (str(key),str(origin),str(value))
-        # if key == 'not_found...'
-    
-class Test_4_All(unittest.TestCase):
-    """
-    Tests for the Drivers and Devices.
-    """
-    def test_1_all(self):
-        # any exception will make the test fail.
-        pass
-        ctl = DeviceController()
-        obs = SomeObserver()
-        obs.append(ctl)
-        
-        ctl.list_drivers(obs,'video')
-        ctl.list_devices(obs,'video','v4l')
-        ctl.list_attributes(obs,'video','v4l','video0')
-        ctl.get_attribute(obs,'video','v4l','video0','norm')
-        ctl.set_attribute(obs,'video','v4l','video0','norm','NTSC')

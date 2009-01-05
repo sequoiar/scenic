@@ -16,4 +16,7 @@ if __name__ == '__main__':
     b = Some()
     print a
     print b
-
+    if a is b:
+        print "SUCCESS"
+    else:
+        raise Exception,"a and b are not the same instance."

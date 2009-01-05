@@ -25,6 +25,8 @@ Usage for test purposes:
 $ cd py/
 $ export PYTHONPATH=$PWD
 $ python devices/devices.py
+
+TODO: change attribute camel case for small caps underscores...
 """
 
 # System imports
@@ -34,89 +36,98 @@ import os,sys #, resource, signal, time, sys, select
 
 # Twisted imports
 from twisted.internet import reactor, protocol
-from twisted.python import procutils # Utilities for dealing with processes
+from twisted.python import procutils # Utilities for dealing with (shell) processes
 
 # App imports
 from utils import log
-from utils import singleton
-from utils.observer import Observer, Subject
+#from utils import singleton
+#from utils.observer import Observer, Subject
 
 log = log.start('debug', 1, 0, 'devices')
 
-class Driver(singleton.Singleton, Subject):
+class Driver: #, Subject):
     """
     Base class for a driver for a type of Device. (ALSA, JACK, v4l, dv1394, etc.)
     
     Drivers must inherit from this class and implement each method.
+    Singleton : There should be only one instance of each Driver child classes.
     """
+    def __init__(self,name=None):
+        self.devices = {} # dict
+        self.name = name
+        
+    def __str__(self):
+        return self.name
+        
+    def addDevice(self,device):
+        self.devices[device.getName()] = device
+    
     def getName(self):
         """
         Used by the DriverManager instances to manage Driver instances by their name.
         """
-        raise NotImplementedError,'Chld classes must implement this.'
-
+        return self.name
+        
     def prepareDriver(self):
         """
         Starts the use of the Driver. 
         
         Called only once on system startup.
-        There should be a "started" class variable for each driver in 
-        order to make sure it is started only once.
-
-        TODO: notify the observer.
         """
-        raise NotImplementedError, 'This method must be implemented in child classes.'
-    
-    def listDevices(self, caller, callback_key):
+        pass
+        
+    def listDevices(self, callback):
         """
         Lists name of devices of the type that a driver supports on this machine right now.
 
-        Will call the notify method, using Observer pattern. Like this:
-        
-        self.notify(caller, data, callback_key) 
-        
+        Calls the callback with a dict of devices.
         Data will be a 'key' => 'long name' dict.
+        Can be overriden in child classes.
         """
-        # TODO: Will call the provided callback with list of Device objects ?
-        raise NotImplementedError, 'This method must be implemented in child classes.'
+        callback(self.devices)
     
     def getDevice(self,device_name=None):
         """
         Returns a device object.
         
         device_name must be a ASCII string.
-        Returns None in case of device doesn't exist ?
+        Throws a KeyError if device doesn't exist.
         """
-        raise NotImplementedError, 'This method must be implemented in child classes.'
-    def onDeviceAttributeChange(self,device,attributeName):
+        return self.devices[device_name]
+        
+    def onDeviceAttributeChange(self,attribute):
         """
         Called by a device when one of its attribute is changed. (by the core, usually)
         
-        The Driver whould then actually change the value of that Device attribute using some shell scripts or so.
+        Can be overriden if necessaty to do shell scripts or so
         """
-        raise NotImplementedError, 'This method must be implemented in child classes.' 
-
-    def shell_command_start(self, command):
+        pass
+        
+    def shell_command_start(self, command, callback=None):
         """
-        Command is a list of strings.
+        Starts a shell command.
+        
+        command is a list of strings.
+        callback is a callback to call with the command and the result once done.
         """
-        executable = procutils.which(command[0])[0]
+        executable = procutils.which(command[0])[0] # gets the executable
         #args = command[1:]
         if executable:
             try:    
                 if False: # not verbose
                     log.info('Starting command: %s' % command[0])
-                self.process = reactor.spawnProcess(ShellProcessProtocol(self,command), executable, command, os.environ, usePTY=True)
+                self.process = reactor.spawnProcess(ShellProcessProtocol(self,command,callback), executable, command, os.environ, usePTY=True)
             except:
                 log.critical('Cannot start the device polling/control command: %s' % executable)
         else:
             log.critical('Cannot find the shell command: %s' % command[0])
             
-    def shell_command_result(self, command, text_results):
+    def shell_command_result(self, command, text_results, callback=None):
         """
         Called from child process.
         
-        Args are: the command that it the results if from, text data resulting from it.
+        Args are: the command that it the results if from, text data resulting from it, callback to call once done.
+        callback should be called with the same arguments. command, results, callback (but results can be something else than text)
         """
         raise NotImplementedError, 'This method must be implemented in child classes. (if you need it)'
 
@@ -134,19 +145,27 @@ class ShellProcessProtocol(protocol.ProcessProtocol):
     
     Calls its caller back with the result.
     """
-    def __init__(self, server,command,verbose=False):
-        self.server = server
+    def __init__(self, server,command,callback=None,verbose=False):
+        """
+        * server is a Driver instance.
+        * command is a list of strings.
+        * callback is a callback to call once done.
+        * verbose is a boolean
+        """
+        self.server = server # a Driver instance
         self.command = command
         self.verbose = verbose
+        self.callback = callback
         
     def connectionMade(self):
-        log.info('Shell command called: %s' % (str(self.command)))
+        if self.verbose:
+            log.info('Shell command called: %s' % (str(self.command)))
     
     def outReceived(self, data):
         if self.verbose:
             log.info('Result from command %s : %s' % (self.command[0],data))
-        self.server.shell_command_result(self.command,data)
-           
+        self.server.shell_command_result(self.command, data, self.callback)
+        
     def processEnded(self, status):
         if self.verbose:
             log.info('Device poll/config command ended. Message: %s' % status)
@@ -188,7 +207,15 @@ class Attribute:
         return type(self)
     
     def setDevice(self,dev):
+        """
+        Sets the Driver instance it is attached to.
+        
+        In order to call its onAttributeChange method when the value changes.
+        """
         self.device = dev
+    
+    def getDevice(self):
+        return self.device
     
     def onChange(self):
         """
@@ -217,79 +244,83 @@ class IntAttribute(Attribute):
     def __init__(self,name,value=0,default=0,minVal=0,maxVal=1023):
         Attribute.__init__(self,name,value,default)
         self.setRange(minVal,maxVal)
-        
+    
     def getRange(self):
         """
         Returns min val, max val
         """
         return self.range[0], self.range[1]
-
+    
     def setRange(self,minimum,maximum):
         self.range = (minimum,maximum)
         
 class OptionsAttribute(Attribute):
     """
-    The options is a list of possible options. 
-    The value is the index.
+    The options is a list (or tuple) of possible options. 
+    The value and default are indices. (int)
+    
+    A tuple is better since it is immutable. Indices are integers.
     """
     def __init__(self,name,value=None,default=None,options=[]):
         Attribute.__init__(self,name,value,default)
         self.setOptions(options)
     
-    def getValueByIndex(self,k):
+    def getValueForIndex(self,k):
         """
-        Returns the actual value by its index in the list.
+        Returns the actual value for an index in the list.
         """
-        ret = None
-        try:
-            self.options[i]
-        except IndexError:
-            pass
+        #ret = None
+        #try:
+        ret = self.options[k]
+        #except IndexError:
+        #    pass
         return ret
     
     def getIndexForValue(self,val):
         """
         Returns an index for that value, or None if not found.
         """
-        ret = None
-        try:
-            ret = self.option.index(val)
-        except ValueError:
-            pass
+        #ret = None
+        #try:
+        ret = self.option.index(val)
+        #except ValueError:
+        #    pass
         return ret
     
-    def getIndex(self):
-        """
-        Returns current value's index.
-        """
-        return self.value
+    #def getIndex(self):
+    #    """
+    #    Returns current value's index.
+    #    """
+    #    return self.value
         
-    def setIndex(self,i):
-        """
-        Sets current value's index.
-        """
-        self.value = i
-        self.onChange()
+    #def setIndex(self,i):
+    #    """
+    #    Sets current value's index.
+    #    """
+    #    self.value = i
+    #    self.onChange()
     
-    def getValue(self):
-        """
-        Overrides the parent's getValue method.
-        """
-        return self.getValueByIndex(self.value)
+    
+    
+    #def getValue(self):
+    #    """
+    #    Overrides the parent's getValue method.
+    #    """
+    #    return self.value #self.getValueByIndex(self.value)
         
-    def setValue(self,val):
-        """
-        Overrides the parent's setValue method.
-        """
-        self.value = self.getIndexForValue(val)
-        self.onChange()
+    #def setValue(self,val):
+    #    """
+    #    Overrides the parent's setValue method.
+    #    """
+    #    self.value = self.getIndexForValue(val)
+    #    self.onChange()
     
     def getOptions(self):
         return self.options
     
     def setOptions(self,optsList):
         """
-        Argument must be a list
+        Argument must be a list or tuple.
         """
         self.options = optsList #copy.deepcopy(optsList)
 
@@ -300,14 +331,20 @@ class Device:
     Should not be subclassed, but rather, each object has different attributes using the methods
     defined here to add and set attributes.
     """
-    def __init__(self,driver=None):
+    def __init__(self,name=None):
         """
         Argument: The Driver that is used to control this device.
         """
-        self.driver = driver
+        self.driver = None
         self.attributes = dict()
+        self.name = name
+    
+    def getName(self):
+        return self.name
+        
     def setDriver(self,driver):
         self.driver = driver
+    
     def getAttribute(self,k):
         """
         Gets one Attribute object.
@@ -348,7 +385,7 @@ class Device:
         for debugging purposes
         """
         for k,attr in self.attributes.items():
-            print "%40s = %30s" % (k, str(attr.getValue()))
+            print "%40s = %30s" % (k, str(attr.getValue())) #TODO: if type is option, print actual value.
 
     def getDriver(self):
         """
@@ -362,36 +399,35 @@ class Device:
         
         Calls the Driver notifyChange method.
         """
-        
         if self.driver is not None:
             self.driver.onDeviceAttributeChange(self,attr)
 
-class DriversManager(singleton.Singleton):
+class DriversManager:
     """
     Manages all drivers of its kind.
+    
+    There should be only one instance of this class
     """
-
-    #Its child classes implement the singleton design pattern.
-    #There are currently 3: VideoDriversManager, AudioDriversManager and DataDriversManager
-    #"""
-    #def instance():
-    #    """
-    #    Returns a DriversManagers for the correct type.
-    #
-    #        Singleton design pattern.
-    #        """
-    #        raise NotImplementedError, 'This method must be implemeneted in child classes.' 
     def __init__(self):
         self.drivers = dict()
-
+    
     def addDriver(self,driver):
+        """
+        The key will be the driver's name
+        """
         self.drivers[driver.getName()] = driver
 
-    def listDrivers(self):
+    def getDrivers(self):
         """
         Returns dict of name -> Driver objects
         """
         return self.drivers # .values()
+    
+    def getDriver(self,key):
+        """
+        Might throw KetError
+        """
+        return self.drivers[key]
 
 class VideoDriversManager(DriversManager):
     pass
@@ -399,63 +435,3 @@ class AudioDriversManager(DriversManager):
     pass
 class DataDriversManager(DriversManager):
     pass
-
-if __name__ == '__main__':
-    # ---------------------- DEVICES
-    print "----------------------------"
-    print "starting test"
-    dev = Device() # TODO: set driver when instanciating
-    dev.addAttribute(IntAttribute('sampling rate',44100,48000, 8000,192000))
-    dev.addAttribute(IntAttribute('bit depth',16,16, 8,24))
-    print "DEVICE INFO:"
-    dev.printAllAttributes()
-    print "DONE testing the Device class."
-    
-    # ---------------------- DRIVERS
-    print "----------------------------"
-    print "NOW TESTING the Driver class:"
-    
-    class TestAudioDriver(AudioDriver):
-        def prepareDriver(self):
-            print "Calling the ls shell command:"
-            self.shell_command_start(['ls']) # inherited from Driver
-        def listDevices(self,caller,callback_key):
-            self.notify(caller,['MOTU 123','RME 777'], callback_key) # inherited from Subject
-        def shell_command_result(self,command,results):
-            print "SUCCESS: Results from command %s are :%s" % (command[0], results)
-        def getName(self):
-            return 'dummy_audio_driver'
-    
-    class TestObserver(Observer):
-        def __init__(self):
-            Observer.__init__(self,())
-        def update(self,origin,key,data):
-            print "Received %s from %s: %s" % (str(key),str(origin),str(data))
-    
-    print "TEST main()"
-    dr = TestAudioDriver()
-    dr.prepareDriver()
-    o = TestObserver()
-    o.append(dr) # adding Driver Subject to the Observer
-    dr.listDevices(o,'audio_devices')
-    # -------------------------- MANAGERS
-    print "DriversManager instances:"
-    audioMan = AudioDriversManager()
-    dataMan  =  DataDriversManager()
-    videoMan = VideoDriversManager()
-    #dup =      VideoDriversManager()
-    #print audioMan
-    #print dataMan
-    #print videoMan
-    #print "duplicate:",dup
-    #TODO:
-    audioMan.addDriver(dr)
-    print 'Audio drivers : ',audioMan.listDrivers()
-
-    # ---------------------------- REACTOR 
-    def stopReactor():
-        print '\nStop reactor\n'
-        reactor.stop()
-    reactor.callLater(2,stopReactor)
-    reactor.run()
-

@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import pprint
+
 from devices import *
 #from devices.video import Video4linuxDriver
 
@@ -11,6 +13,21 @@ from devices import *
 from twisted.python.modules import getModule
 from twisted.python.filepath import FilePath
 
-import devices
+#import devices
 
-from  v4l import Video4LinuxDriver
+from v4l import Video4LinuxDriver
+
+# drivers managers
+
+managers = {}
+managers['video'] = devices.VideoDriversManager()
+managers['audio'] = devices.AudioDriversManager()
+managers['data']  = devices.DataDriversManager()
+
+# drivers
+# TODO : load only if module is there and if computer (OS) supports it.
+managers['video'].addDriver(Video4LinuxDriver('v4l'))
+
+# DEBUG INFO
+#print '\nVIDEO DRIVERS:'
+#pprint.pprint(managers['video'].getDrivers())
