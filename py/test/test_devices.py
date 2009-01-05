@@ -188,4 +188,5 @@ class Test_4_v4l_Driver(unittest.TestCase):
     def test_2_computer_has_a_dev_video0(self):
         driver = devices.managers['video'].getDriver('v4l')
         driver.listDevices(self.onListDevices_2)
+        time.sleep(0.1) # 100 ms
     

@@ -99,7 +99,17 @@ class Driver: #, Subject):
         """
         Called by a device when one of its attribute is changed. (by the core, usually)
         
-        Can be overriden if necessaty to do shell scripts or so
+        Can be overriden if necessary to do shell scripts or so
+        """
+        pass
+        
+        
+    def onGetAttributes(self,device):
+        """
+        Called when user queries a device's attributes
+        
+        device is a Device object.
+        To override.
         """
         pass
         
@@ -185,14 +195,15 @@ class Attribute:
     def getValue(self):
         return self.value
 
-    def setValue(self,val):
+    def setValue(self,val,doNotifyDriver=True):
         """
         Changes the value of the Attribute for device.
         
         Calls onChange() once its value is changed.
         """
         self.value = val
-        self.onChange()
+        if doNotifyDriver:
+            self.onChange()
         
     def getDefault(self):
         return self.default
@@ -365,10 +376,12 @@ class Device:
         """
         return self.attributes.keys()
     
-    def getAllAttributes(self):
+    def getAttributes(self):
         """
         Returns a dict in the form name = Attribute
-        """ 
+        """
+        if self.driver is not None:
+            self.driver.onGetAttributes(self)
         return self.attributes
     
     def addAttribute(self,attr):
@@ -434,4 +447,7 @@ class VideoDriversManager(DriversManager):
 class AudioDriversManager(DriversManager):
     pass
 class DataDriversManager(DriversManager):
+    pass
+
+class CommandNotFoundException(Exception):
     pass
