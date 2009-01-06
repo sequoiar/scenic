@@ -178,6 +178,7 @@ class Test_4_v4l_Driver(unittest.TestCase):
     def test_1_list_devices(self):
         v4l = devices.managers['video'].getDriver('v4l')
         v4l.listDevices(self.onListDevices_1)
+        time.sleep(0.1) # 100 ms
     
     def onListDevices_2(self, devices):
         try:
@@ -189,4 +190,23 @@ class Test_4_v4l_Driver(unittest.TestCase):
         driver = devices.managers['video'].getDriver('v4l')
         driver.listDevices(self.onListDevices_2)
         time.sleep(0.1) # 100 ms
+    
+    def onListDevices_3(self, devices):
+        try:
+            device = devices['/dev/video0']
+        except KeyError:
+            self.fail('There is no /dev/video0. (might be OK)')
+            return
+        
+        #print '\n/dev/video0 attributes:'
+        #device.printAllAttributes()
+        #print "\nINPUT:"
+        tmp = device.getAttribute('video standard').getValue()
+        
+    
+    def test_3_video0_attributes(self):
+        driver = devices.managers['video'].getDriver('v4l')
+        driver.listDevices(self.onListDevices_3)
+        time.sleep(0.1) # 100 ms
+        
     

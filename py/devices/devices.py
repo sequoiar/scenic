@@ -293,7 +293,7 @@ class OptionsAttribute(Attribute):
         """
         #ret = None
         #try:
-        ret = self.option.index(val)
+        ret = self.options.index(val)
         #except ValueError:
         #    pass
         return ret
@@ -397,8 +397,13 @@ class Device:
         """
         for debugging purposes
         """
-        for k,attr in self.attributes.items():
-            print "%40s = %30s" % (k, str(attr.getValue())) #TODO: if type is option, print actual value.
+        if len(self.attributes) == 0:
+            print 'no attributes to print'
+        else:
+            for k in self.attributes:
+                print '%s:%s' % (k,self.attributes[k].getValue())
+        #for k,attr in self.attributes.items():
+        #    print "%40s = %30s" % (k, str(attr.getValue())) #TODO: if type is option, print actual value.
 
     def getDriver(self):
         """

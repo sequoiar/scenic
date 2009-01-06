@@ -26,6 +26,7 @@ TODO: use v4l2-ctl from package ivtv-utils
 # ----------------------------------------------------------
 # System imports
 import os, sys, glob
+import pprint
 
 # Twisted imports
 from twisted.internet import reactor, protocol
@@ -98,8 +99,12 @@ class Video4LinuxDriver(devices.VideoDriver):
         if command[0] == 'v4l2-ctl':
             if command[1] == '--all': # reading all attributes
                 # method called was listDevices
-                device = self.getDevice(self.getSelectedDevice())
-                values = parse_v4l2_ctl(results.split())
+                device = self.getDevice(self.getSelectedDevice()) # '/dev/video0'
+                splitted = results.split('\r\n')
+                values = parse_v4l2_ctl(splitted)
+                #print "\nSHELL RESULT:"
+                #pprint.pprint(splitted)
+                #pprint.pprint(values)
                 for key in values:
                     if key in ['driver','card','pixel format']:
                         device.addAttribute(devices.StringAttribute(key,values[key],'no default'))
@@ -113,16 +118,20 @@ class Video4LinuxDriver(devices.VideoDriver):
                         attr = devices.OptionsAttribute(key,values[key],0,['Composite0', 'Composite1', 'Composite2', 'S-Video'])
                         attr.setValue(attr.getIndexForValue(values[key]),False)
                         device.addAttribute(attr)
-                    elif category == "Video Standard":
+                    
+                    elif key == "video standard":
                         # TODO: v4l2-ctl --?? for better norm/standards names
                         attr = devices.OptionsAttribute(key,values[key],0,['ntsc', 'PAL']) 
-                        attr.setValue(attr.getIndexForValue(values[key]),False)
+                        #TODO : attr.setValue(attr.getIndexForValue( values[key] ),False)
                         device.addAttribute(attr)
+                
+                #print device
+                #device.printAllAttributes()
                 if callback is not None:
                     callback(self.devices)
                 
         log.info('v4l driver: command %s returned.',str(command))
-
+        #print results
 
 class delete_me:
     def _v4l_command(self,deviceObj,command):
@@ -176,7 +185,7 @@ def parse_v4l2_ctl(lines):
                 key = splitted[0].strip()
                 value = splitted[1].strip()
                 is_value = True
-                print "key is "+key+" and value is "+ value
+                #print "key is "+key+" and value is "+ value
             except IndexError:
                 pass
             if is_value:
