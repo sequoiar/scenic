@@ -24,7 +24,7 @@ import sys
 from twisted.trial import unittest
 from twisted.python.filepath import FilePath
 from twisted.python.modules import getModule
-from ui import common
+from utils import common
 
 class ToTestCallback():
     def __init__(self):
@@ -40,8 +40,8 @@ class TestCommon(unittest.TestCase):
     def setUp(self):
         pass
     
-    def test_find_all(self):
-        res = common.find_all()
+    def test_find_modules(self):
+        res = common.find_modules('ui')
         #check if all user interface found are correctly formated
         for ui in res:
             if not ui.isPackage() or FilePath(ui.filePath.dirname() + '/off').exists():
@@ -54,14 +54,14 @@ class TestCommon(unittest.TestCase):
             if ui.isPackage() and not FilePath(ui.filePath.dirname() + '/off').exists():
                 uis.append(ui)
                 
-        assert(res == uis ), self.fail("find_all didn't get all ui ")        
+        assert(res == uis ), self.fail("find_modules didn't get all ui ")        
                 
         
-    def test_load(self):
+    def test_load_modules(self):
         """Test if all module find can be loaded
         """
-        uis = common.find_all()
-        loaded = common.load(uis)
+        uis = common.find_modules('ui')
+        loaded = common.load_modules(uis)
         uis_copied = []
         for ui in uis :
             uis_copied.append(ui.load())            

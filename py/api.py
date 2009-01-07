@@ -16,21 +16,25 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+# along with Sropulpof. If not, see <http:#www.gnu.org/licenses/>.
+
+""" Public API of Sropulpof """
 
 import sys
 
 # App imports
-from errors import * 
-
+from errors import *
+import connectors
+from connectors.states import *
 
 class ControllerApi(object):
     """
     The controller API that all controllers (such as cli.CliController) must use.
     """
+
     def __init__(self, notify):
         self.notify = notify
-    
+
     def _start(self, core):
         """
         Starts the API once all parts have been loaded.
@@ -45,48 +49,96 @@ class ControllerApi(object):
 
 
     ### Contacts ###
-        
+
     def get_contacts(self, caller):
-        self.notify(caller, self.adb.contacts) #dict of 'contact name':object contact
-        
-    def add_contact(self, caller, name, address, port=None):
+        """
+        Get the list of all the contacts.
+
+        :rtype: a tuple of 2 items:
+
+            - a dictionnary of Contact instances
+            - the name of the selected Contact
+        """
+        self.notify(caller, (self.adb.contacts, self.adb.selected))
+
+    def get_contact(self, name=None):
+        """
+        Get the named contact instance.
+        """
+        return self.adbself.connectors.get_contact(name)
+
+    def find_contact(self, address, port=None, connector=None):
+#        return self.adb.find_contact(address, port)
+        """
+        Find a contact by its address and port.
+        """
+        for contact in self.adb.contacts.values():
+            if contact.address == address \
+            and (connector == None or connector == contact.connector):
+                if contact.port == None:
+                    if port == None:
+                        return contact
+                    if connector == None and port == self.get_connector_port(contact.connector):
+                        return contact
+                    if connector != None and port == self.get_connector_port(connector):
+                        return contact
+                else:
+                    if contact.port == port or port == None:
+                        return contact
+        return None
+
+    def get_connector_port(self, connector):
+        return self.connectors[connector].PORT
+
+    def client_contact(self, address, port=None):
+        return self.adb.client_contact(address, port)
+
+    def save_client_contact(self, caller, name=None, new_name=None):
         try:
-            result = self.adb.add(name, address, port)
+            result = self.adb.save_client_contact(name, new_name)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)
-        
+
+    def add_contact(self, caller, name, address, port=None, auto_created=False):
+        try:
+            result = self.adb.add(name, address, port, auto_created)
+        except AddressBookError, err:
+            result = err
+        self.notify(caller, result)
+        return result
+
     def delete_contact(self, caller, name=None):
         try:
             result = self.adb.delete(name)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)
-        
+
     def modify_contact(self, caller, name=None, new_name=None, address=None, port=None):
         try:
             result = self.adb.modify(name, new_name, address, port)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)
-        
+
     def duplicate_contact(self, caller, name=None, new_name=None):
         try:
             result = self.adb.duplicate(name, new_name)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)
-        
+
     def select_contact(self, caller, name):
         try:
             result = self.adb.select(name)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)
-        
-        
+
+
     ### Streams ###
-    
+
     def start_streams(self, caller, address, channel=None):
         self.notify(caller, self.streams.start(address, channel))
 
@@ -95,7 +147,7 @@ class ControllerApi(object):
 
     def set_streams(self, caller, attr, value):
         self.notify(caller, self.streams.set_attr(attr, value))
-        
+
     def select_streams(self, caller, name):
         if name in self.all_streams:
             self.streams = self.all_streams[name]
@@ -109,7 +161,7 @@ class ControllerApi(object):
 
 
     ### Stream ###
-    
+
     def set_stream(self, caller, name, kind, attr, value):
         stream = self.streams.get(name, kind)
         if stream:
@@ -119,47 +171,67 @@ class ControllerApi(object):
 
     def settings_stream(self, caller, name, kind):
         self.notify(caller, (self.streams.get(name, kind), name), kind + '_settings')
-        
+
     def add_stream(self, caller, name, kind, engine):
         self.notify(caller, (self.streams.add(name, kind, engine, self.core), name), kind + '_add')
-        
+
     def delete_stream(self, caller, name, kind):
         self.notify(caller, (self.streams.delete(name, kind), name), kind + '_delete')
-        
+
     def rename_stream(self, caller, name, new_name, kind):
         self.notify(caller, (self.streams.rename(name, new_name, kind), name, new_name), kind + '_rename')
-        
+
     def list_stream(self, caller, kind):
         self.notify(caller, self.streams.list(kind), kind + '_list')
-        
-    
-    ### Connect ###
-    
-    def start_connection(self, caller):
-        contact = self.adb.get_current()
-        connector = self.connectors[contact.kind()]
-        client = connector.connect(self, contact.address, contact.port)
-        self.notify(caller, ('Trying to connect with %s (%s)...' % (contact.name, contact.address), client))
-        
-    def stop_connection(self, caller):
-        self.stop_streams(caller)
-        if self.curr_streams == 'send':
-            contact = self.adb.get_current()
-            connector = self.connectors[contact.kind()]
-            client = connector.disconnect(self, contact.address, contact.port)
-        else:
-            connector = self.connectors[self.connection[2]]
-            client = connector.disconnect(self, self.connection[0], self.connection[1])
-        self.notify(caller, 'Communication was stopped.', 'info')
 
-    def accept_connection(self, caller, client):
-        client.accept()
+
+    ### Connect ###
+
+    def start_connection(self, caller, contact=None):
+        if contact == None:
+            contact = self.adb.get_current()
+        if contact and contact.name in self.adb.contacts:
+            try:
+                connection = connectors.create_connection(contact, self)
+                connection.start()
+                result = 'Trying to connect with %s (%s)...' % (contact.name, contact.address)
+            except ConnectionError, err:
+                result = err
+            self.notify(caller, result)
+        else:
+            self.notify(caller, 'Cannot start connection. No valid contact selected.')
+
+    def stop_connection(self, caller, contact=None):
+        if contact == None:
+            contact = self.adb.get_current()
+        if contact and contact.name in self.adb.contacts:
+            result = connectors.stop_connection(contact)
+            self.notify(caller, result, 'info')
+        else:
+            self.notify(caller, 'Cannot stop connection. No valid contact selected.', 'info')
+
+#        self.stop_streams(caller)
+#        if self.curr_streams == 'send':
+#            contact = self.adb.get_current()
+#            connector = self.connectors[contact.kind()]
+#            client = connector.disconnect(self, contact.address, contact.port)
+#        else:
+#            connector = self.connectors[self.connection[2]]
+#            client = connector.disconnect(self, self.connection[0], self.connection[1])
+#        self.notify(caller, 'Communication was stopped.', 'info')
+
+    def accept_connection(self, caller, connection):
+        connection.accept()
         self.notify(caller, 'Begining to receive...', 'info')
 
-    def refuse_connection(self, caller, client):
-        client.refuse()
+    def refuse_connection(self, caller, connection):
+        connection.refuse()
         self.notify(caller, 'You refuse the connection.', 'info')
-    
+
     def set_connection(self, address, port, connector):
         self.connection = (address, port, connector)
+
+
+    def get_default_port(self, connector):
+        return self.connectors[connector].PORT
 

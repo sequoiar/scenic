@@ -19,10 +19,8 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 
-import weakref, sys
-
-def get_def_name(level=2):
-    return sys._getframe(level).f_code.co_name
+import weakref
+from utils import common
 
 
 class Observer(object):
@@ -83,7 +81,7 @@ class Subject(object):
         Usage: self.notify(self,'brown','color')
         """
         if not key:
-            key = get_def_name()
+            key = common.get_def_name()
         for observer in self.observers.itervalues():
             observer.update(caller, key, value)
             

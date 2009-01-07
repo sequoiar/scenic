@@ -39,11 +39,11 @@ server_command = os.path.expanduser("./miville.py")
 client_command = 'telnet localhost %s' % server_port
 waiting_delay = 1.0 # seconds before starting client after server start
 
-VERBOSE_CLIENT = False
-#VERBOSE_CLIENT = True
+#VERBOSE_CLIENT = False
+VERBOSE_CLIENT = True
 
-VERBOSE_SERVER = False
-#VERBOSE_SERVER = True
+#VERBOSE_SERVER = False
+VERBOSE_SERVER = True
 
 # ---------------------------------------------------------------------
 # a class for output redirection
@@ -54,35 +54,39 @@ class ProcessOutputLogger:
     you must assign a reference to an instance of this class to 
     the logfile attribute of a spawn object
     """
-    def __init__(self,prefixStr=''):
+    def __init__(self, prefixStr=''):
         self.prefix = prefixStr
         self.buffer = []
-    def write(self,s):
-        self.buffer.append(self.prefix+str(s).replace('\n',self.prefix+'\n'))
+
+    def write(self, s):
+        self.buffer.append(self.prefix + str(s).replace('\n', '\n' + self.prefix))
+
     def flush(self):
         pass
+
     def real_flush(self):
         """
         Actually flushes the buffer of this output buffer
         
         Adds some pretty colors as well.
         """
-        sys.stdout.write(getColor('BLUE'))
+        sys.stdout.write(getColor('CYAN'))
         for s in self.buffer:
             sys.stdout.write(s)
         sys.stdout.write(getColor())
         sys.stdout.flush()
         self.buffer = []
+
 # ---------------------------------------------------------------------
 # functions
-def println(s,endl=True):
+def println(s, endl=True):
     """
     Prints a line to standard output with a prefix.
     """
     if endl:
-        print getColor('MAGENTA'),">>>>",s,getColor()
+        print getColor('MAGENTA'), ">>>>", s, getColor()
     else:
-        print ">>>>",s, # note the comma (",") at end of line
+        print ">>>>", s, # note the comma (",") at end of line
 
 def start_process(command, isVerbose=False, logPrefix=''):
     """
@@ -91,19 +95,19 @@ def start_process(command, isVerbose=False, logPrefix=''):
     Returns a pexpect.spawn object
     """
     try:
-        println('Starting \"%s\"' % command )
+        println('Starting \"%s\"' % command)
         
         if isVerbose:
-            process = pexpect.spawn(command,logfile=ProcessOutputLogger(logPrefix))
+            process = pexpect.spawn(command, logfile=ProcessOutputLogger(logPrefix))
         else:
             process = pexpect.spawn(command)
         time.sleep(waiting_delay) # seconds
-        if ( is_running(process) == False ):
+        if (is_running(process) == False):
             die()
         else:
             return process
-    except pexpect.ExceptionPexpect,e:
-        println("Error starting client: heh"+e)
+    except pexpect.ExceptionPexpect, e:
+        println("Error starting client: heh" + e)
         die()
 
 def is_running(process):
@@ -112,7 +116,7 @@ def is_running(process):
     
     Returns boolean
     """
-    if ( process.isalive() == False ):
+    if (process.isalive() == False):
         println("Error starting server: %s" % client.status)
         return False
     else:
@@ -125,12 +129,14 @@ def getColor(c=None):
     Colors can be either 'BLUE' or 'MAGENTA' or None
     """
     if c == 'BLUE':
-        s = '34m'
-    elif c =='MAGENTA':
+        s = '31m'
+    elif c == 'CYAN':
+        s = '36m'
+    elif c == 'MAGENTA':
         s = '35m'
     else:
         s = '0m' # default (black or white)
-    return "\x1b["+s
+    return "\x1b[" + s
 
 def kill_process(process):
     """
@@ -139,13 +145,13 @@ def kill_process(process):
     See kill -l for flags
     """
     try:
-        if (is_running(process) == True ):
+        if (is_running(process) == True):
             process.kill(15)
             sleep(2)
-            if (is_running(process) == True ):
+            if (is_running(process) == True):
                 process.kill(9)
-    except Exception,e:
-        print "Error killing process",e
+    except Exception, e:
+        print "Error killing process", e
     
 def die():
     """
@@ -168,13 +174,14 @@ try:
     #orig_home = os.environ['HOME']
     os.environ['HOME'] = '/var/tmp'
     os.remove('/var/tmp/.sropulpof/sropulpof.adb')
-except Exception,e:
-    println("Warning removing old sropulpof.adb or setting HOME to /var/tmp."+str(e))
+except Exception, e:
+    println("Warning removing old sropulpof.adb or setting HOME to /var/tmp." + str(e))
 
 # TODO: Fix the process.logfile not getting to sys.stdout
 # TODO: If the test fails, check if client and server are still running.
 
 server = start_process(server_command, VERBOSE_SERVER, "SERVER> ")
+time.sleep(2)
 client = start_process(client_command, VERBOSE_CLIENT, "CLIENT> ")
 
 # ---------------------------------------------------------------------
@@ -212,9 +219,9 @@ class TelnetBaseTest(unittest.TestCase):
         #global server
         #global client
         
-        if ( is_running(server) == False ):
+        if (is_running(server) == False):
             server = start_process(server_command)
-        if ( is_running(client) == False ):
+        if (is_running(client) == False):
             client = start_process(client_command)
         return(server, client)
 
@@ -249,6 +256,7 @@ class Test_0_cli(TelnetBaseTest):
     General tests for the CLI
     """
     def test_01_unknown_command(self):
+        self.sleep()
         self.client.sendline('qwetyqrwetyqwertye')
         self.sleep()
         self.expectTest('command not found', 'Unknown command didn\'t give error.')
@@ -313,7 +321,7 @@ class Test_1_AddressBook(TelnetBaseTest):
     def test_98_erase_contact(self):
         self.client.sendline("c -e Juliette")
         self.sleep()
-        self.expectTest('Contact deleted','Error while trying to erase contact')
+        self.expectTest('Contact deleted', 'Error while trying to erase contact')
 
     def test_99_delete_invalid_contact(self):
         self.client.sendline("c -e some_invalid_name")
@@ -378,11 +386,11 @@ class Test_2_Audiostream(TelnetBaseTest):
         self.sleep()
         self.expectTest('buffer of audio stream audio is set to 100.', 'Buffer time of audio stream audio was not set to 44100.')
 
-    def test_11_change_input(self):
-        self.client.sendline("a -i jackaudiosrc audio")
-        self.sleep()
-        self.expectTest('source of audio stream audio is set to jackaudiosrc.', 'Unable to specify audio input.')
-    
+#    def test_11_change_input(self):
+#        self.client.sendline("a -i jackaudiosrc audio")
+#        self.sleep()
+#        self.expectTest('source of audio stream audio is set to jackaudiosrc.', 'Unable to specify audio input.')
+#    
 #    def test_12_change_codec_of_invalid_stream(self):
 #        self.client.sendline("a -c vorbis audiostream")
 #        self.sleep()
@@ -474,9 +482,9 @@ class Test_3_Videostream(TelnetBaseTest):
         self.expectTest('buffer of video stream video is set to 100.', 'Buffer time of video stream video was not set to 44100.')
 
     def test_11_change_input(self):
-        self.client.sendline("v -i v4l2src:/dev/video0 video")
+        self.client.sendline("v -i v4l2src:location=/dev/video0 video")
         self.sleep()
-        self.expectTest('source of video stream video is set to v4l2src:/dev/video0.', 'Unable to specify video input.')
+        self.expectTest('source of video stream video is set to v4l2src:location="/dev/video0".', 'Unable to specify video input.')
     
 #    def test_12_change_codec_of_invalid_stream(self):
 #        self.client.sendline("v -c vorbis videostream")

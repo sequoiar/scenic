@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Sropulpof
-# Copyright (C) 2008 Société des arts technologiques (SAT)
+# # # # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -29,7 +29,8 @@ from twisted.python import procutils
 # App imports
 from protocols import ipcp
 from streams.stream import AudioStream, Stream
-from utils import log, get_def_name
+from utils import log
+from utils.common import get_def_name
 
 log = log.start('debug', 1, 0, 'gst')
 
@@ -42,50 +43,51 @@ CONNECTING = 3
 CONNECTED = 4
 
 
-class BaseGst(object):            
+class BaseGst(object):
     def get_attr(self, name):
-        """        
+        """
         name: string
         """
         return getattr(self, name)
-    
+
     def get_attrs(self):
         return [(attr, value) for attr, value in self.__dict__.items() if attr[0] != "_"]
-    
+
     def set_attr(self, name, value):
         """
         name: string
-        value: 
+        value:
         """
         if hasattr(self, name):
             setattr(self, name, value)
             return True, name, value
         return False, name, value
 
-    
+
 class GstServer(object):
-    def __init__(self, mode, port, address='127.0.0.1'):
+    def __init__(self, api, mode, port, address='127.0.0.1'):
+        self.api = api
         self.mode = mode
         self.port = port
         self.address = address
         self.process = None
         self.conn = None
         self.state = STOPPED
-        
+
     def connect(self):
         if self.state == RUNNING:
             self.state = CONNECTING
             deferred = ipcp.connect(self.address, self.port)
             deferred.addCallback(self.connection_ready)
             deferred.addErrback(self.connection_failed)
-            
+
     def connection_ready(self, conn):
         self.conn = conn
         self.conn.connectionLost = self.connection_lost
         self.conn.add_callback(self.gst_log, 'log')
         self.state = CONNECTED
         log.info('GST inter-process link created')
-        
+
     def connection_failed(self, conn):
         ipcp.connection_failed(conn)
         self.kill()
@@ -133,7 +135,7 @@ class GstServer(object):
 
     def verify_kill(self):
         try:
-            status = os.waitpid(self.process.pid, 0)            
+            status = os.waitpid(self.process.pid, 0)
         except:
             log.debug('Process %s already kill' % self.process.pid)
         else:
@@ -193,15 +195,15 @@ class GstServer(object):
             log.critical(msg)
         else:
             log.info(msg)
-            
-        
 
 
-class GstClient(BaseGst):    
-    def __init__(self, mode, port, address='127.0.0.1'):
+
+
+class GstClient(BaseGst):
+    def __init__(self, api, mode, port, address='127.0.0.1'):
         self._mode = mode
         if not hasattr(Stream, 'gst_' + mode):
-            setattr(Stream, 'gst_' + mode, GstServer(mode, port, address))
+            setattr(Stream, 'gst_' + mode, GstServer(api, mode, port, address))
         self._gst = getattr(Stream, 'gst_' + mode)
 
     def _send_cmd(self, cmd, args=None, callback=None):
@@ -209,21 +211,21 @@ class GstClient(BaseGst):
 
     def _add_callback(self, cmd, name=None):
         self._gst.add_callback(cmd, name)
-                    
+
     def _del_callback(self, callback=None):
         self._gst.del_callback(callback)
-                    
+
     def stop_process(self):
         if self._gst.state > 0:
             self._gst.kill()
-                        
 
-            
-            
+
+
+
 class GstProcessProtocol(protocol.ProcessProtocol):
     def __init__(self, server):
         self.server = server
-        
+
     def connectionMade(self):
         log.info('GST process started.')
         reactor.callLater(2, self.check_process)
@@ -242,14 +244,15 @@ class GstProcessProtocol(protocol.ProcessProtocol):
                     self.server.state = RUNNING
                     self.server.connect()
                     break
-           
+
     def processEnded(self, status):
         self.server.state = STOPPED
-        log.info('GST process ended. Message: %s' % status)            
-            
-           
-            
-            
-            
-            
-            
+#        self.server.api.stop_connection(self)
+        log.info('GST process ended. Message: %s' % status)
+
+
+
+
+
+
+

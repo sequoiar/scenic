@@ -43,18 +43,21 @@ What happens when the user types "c -l":
 
 # System imports
 import optparse
+import re
+import os
 
 # Twisted imports
 from twisted.internet import reactor, protocol
-from twisted.conch import telnet
+#from twisted.conch import telnet
+from twisted.conch import recvline
+from twisted.conch.insults import insults
+from twisted.conch.telnet import TelnetTransport, TelnetBootstrapProtocol
 
 #App imports
 from utils import Observer, log # also imports Observer and Subject from utils/observer.py
 
 from utils.i18n import to_utf
-import ui
-from ui.common import find_callbacks
-from streams import audio, video, data
+from utils.common import find_callbacks
 from streams.stream import AudioStream, VideoStream, DataStream
 
 
@@ -63,49 +66,109 @@ log = log.start('info', 1, 0, 'cli')
 ESC = chr(27)
 
 
-class TelnetServer(protocol.Protocol):
+class TelnetServer(recvline.HistoricRecvLine):
     """A Telnet server to control the application from a command line interface."""
 
     def __init__(self):
         self.prompt = "pof: "
-        self.history = []
-        
-    
+        self.ps = (self.prompt,)
+        self.shortcuts = None
+
     def write(self, msg, prompt=False, endl=True):
+        self.terminal.write("%s" % (msg.encode('utf-8')))
         if endl:
-            nl = "\n"
-        else:
-            nl = ""
-        self.transport.write("%s%s" % (msg.encode('utf-8'),nl))
+            self.terminal.nextLine()
         if prompt:
             self.write_prompt()
-        
+
     def connectionMade(self):
+        self.addr = self.terminal.transport.getPeer() 
+        recvline.HistoricRecvLine.connectionMade(self)
+        try:
+            self.history_file = open('%s/.sropulpof/.cli_history_%s-%s' %
+                                    (os.environ['HOME'],
+                                     self.addr.host,
+                                     self.terminal.transport.getHost().port),
+                                     'r')
+        except IOError:
+            #self.history_file = None
+            log.info('Could not read .cli_history file.')
+        else:
+#            self.history_file.seek(0)
+            self.historyLines = [line.strip() for line in self.history_file]
+            self.history_file.close()
+            self.historyPosition = len(self.historyLines)
+        t = self.terminal
+        self.keyHandlers.update({'\x01': self.handle_HOME,
+                                 '\x05': self.handle_END,
+                                 t.TAB: self.completion})
+
         log.info("%s is connecting in Telnet on port %s" % (self.addr.host, self.addr.port))
         self.write("Welcome to Sropulpof!")
         self.write_prompt()
 
-    def dataReceived(self, data):
-        data = data.strip()
-        if data:
-            self.history.append(data)
-            if data.lower() in ("exit", "quit"):
+    def handle_RETURN(self):
+        if self.lineBuffer:
+            line = ''.join(self.lineBuffer)
+            if line in self.historyLines:
+                self.historyLines.remove(line)
+            self.historyLines.append(line)
+            try:
+                self.history_file = open('%s/.sropulpof/.cli_history_%s-%s' %
+                            (os.environ['HOME'],
+                             self.addr.host,
+                             self.terminal.transport.getHost().port),
+                             'w')
+            except IOError:
+                log.info('Could not write .cli_history file.')
+            else:
+                if len(self.historyLines) > 50:
+                    self.history_file.write('\n'.join(self.historyLines[-50:]))
+                else:
+                    self.history_file.write('\n'.join(self.historyLines))
+                self.history_file.close()
+        self.historyPosition = len(self.historyLines)
+        return recvline.RecvLine.handle_RETURN(self)
+    
+    def completion(self):
+        # rudimentary command completion
+        begin = "".join(self.lineBuffer)
+        lenght = len(begin)
+        words = self.shortcuts.values()
+        self.matches = [word for word in words if word[:lenght] == begin]
+        if self.matches:
+            if len(self.matches) == 1:
+                end = self.matches[0][lenght:]
+                self.lineBuffer.extend(list(end))
+                self.lineBufferIndex = len(self.lineBuffer)
+                self.terminal.write(end)
+                self.matches = None
+        else:
+            # ring the bell
+            self.terminal.write('\x07')
+
+    def lineReceived(self, line):
+        line = line.strip()
+        if line:
+            if line.lower() in ("exit", "quit"):
+                if self.history_file:
+                    self.history_file.close()
                 log.info("Telnet client at %s:%s has disconnected" % (self.addr.host, self.addr.port))
                 self.write("Good Bye")
-                self.transport.loseConnection()
+                self.terminal.loseConnection()
             else:
-                self.parse(data)
+                self.parse(line)
         else:
-            self.parse(data)
+            self.parse(line)
 #            self.write_prompt()
-            
-    def parse(self, data):
+
+    def parse(self, line):
         """Method to be overidden when subclassing."""
         self.write("command not found")
         self.write_prompt()
-            
+
     def write_prompt(self):
-        self.transport.write(self.prompt)
+        self.terminal.write(self.prompt)
 
 
 class CliController(TelnetServer):
@@ -116,9 +179,10 @@ class CliController(TelnetServer):
     Each one instaciates a CliParser object the is ephemerous. It is 
     Very hard to retrieve information on each command this way.
     """
-    def __init__(self):
+    def __init__(self, subject):
         TelnetServer.__init__(self)
-        self.core = None
+        self.view = CliView(subject, self)
+        self.core = subject.api
         self.block = False
         self.remote = None
         # build a dict of all semi-private methods
@@ -130,56 +194,55 @@ class CliController(TelnetServer):
                           'j': 'join',
                           'h': 'help'
                           }
-        
-    def parse(self, data):
+
+    def parse(self, line):
         """
         Parses something entered by the user.
         """
-        if not self.core:
-            self.core = self.factory.subject.api
-        data = to_utf(data)
-        if self.block:
-            self.block(data)
-        elif data:
-            data = data.split()
-            cmd = data[0]
+        line = to_utf(line)
+        if callable(self.block):
+            self.block(line)
+        elif line:
+            line = line.split()
+            cmd = line[0]
             if len(cmd) == 1 and self.shortcuts.has_key(cmd):
                 cmd = self.shortcuts[cmd]
             if cmd in self.callbacks:
-                self.callbacks[cmd](data)
+                self.callbacks[cmd](line)
             else:
                 self.write("command not found")
                 self.write_prompt()
         else:
             self.write_prompt()
-            
+
     def connectionLost(self, reason=protocol.connectionDone):
         del self.view.callbacks # delete this first to remove the reference to self
         del self.view
 
-    def _ask(self, data=None):
-        if not data or data.lower() == "y":
+    def _ask(self, line=None):
+        if not line or line.lower() == "y":
             self.core.accept_connection(self, self.remote)
             self.block = False
-        elif data.lower() == "n":
+        elif line.lower() == "n":
             self.core.refuse_connection(self, self.remote)
             self.block = False
             self.remote = None
         elif self.block:
             self.write('This is not a valid answer.\n[Y/n]:')
 
-    def _contacts(self, data):
-        cp = CliParser(self, prog=data[0], description="Manages the address book.")
+    def _contacts(self, line):
+        cp = CliParser(self, prog=line[0], description="Manages the address book.")
         cp.add_option("-l", "--list", action='store_true', help="List all the contacts")
         cp.add_option("-a", "--add", type="string", help="Add a contact")
         cp.add_option("-e", "--erase", "--remove", "--delete", action='store_true', help="Erase a contact")
         cp.add_option("-m", "--modify", action="store_true", help="Modify a contact")
         cp.add_option("-d", "--duplicate", action="store_true", help="Duplicate a contact")
         cp.add_option("-s", "--select", help="Select a contact")
+        cp.add_option("-k", "--keep", "--save", action="store_true", help="Keep (save) an auto-created contact (a caller)")
         cp.add_option("-z", "--description", action='store_true', help="Display description")
         
-        (options, args) = cp.parse_args(data)
-        
+        (options, args) = cp.parse_args(line)
+
         if options.list:
             self.core.get_contacts(self)
         elif options.description:
@@ -228,8 +291,8 @@ class CliController(TelnetServer):
                             port = arg
                         elif name == None:
                             name = arg
-                            
-                self.core.modify_contact(self, name, new_name ,address, port)
+
+                self.core.modify_contact(self, name, new_name, address, port)
             else:
                 self.write('You need to give at least one argument.', True)
         elif options.duplicate:
@@ -247,23 +310,31 @@ class CliController(TelnetServer):
                         new_name = arg
                     elif name == None:
                         name = arg
-                        
+
             self.core.duplicate_contact(self, name, new_name)
-            
+
         elif options.select:
             self.core.select_contact(self, options.select)
+        elif options.keep:
+            print args
+            if len(args) == 1:
+                self.core.save_client_contact(self)
+            elif len(args) == 2:
+                self.core.save_client_contact(self, args[1])
+            elif len(args) > 2:
+                self.core.save_client_contact(self, args[1], args[2])
         else:
             cp.print_help()
-            
-    def _audio(self, data):
+
+    def _audio(self, line):
         kind = 'audio'
-        cp = CliParser(self, prog=data[0], description="Manage the audio streams.")
+        cp = CliParser(self, prog=line[0], description="Manage the audio streams.")
         cp.add_option("-l", "--list", action='store_true', help="List all the audio streams or settings if stream is specified")
 
         cp.add_option("-a", "--add", type="string", help="Add an audio stream")
         cp.add_option("-e", "--erase", type="string", help="Erase an audio stream")
         cp.add_option("-m", "--modify", type="string", help="Modify the name of an audio stream")
-        
+
         cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
         cp.add_option("-c", "--codec", type="string", help="Set the codec")
         cp.add_option("-s", "--settings", type="string", help="Set the codec settings (set1:val,set2:val)")
@@ -276,8 +347,8 @@ class CliController(TelnetServer):
         cp.add_option("-z", "--description", action='store_true', help="Display description")
         
         
-        (options, args) = cp.parse_args(data)
-                
+        (options, args) = cp.parse_args(line)
+
         if len(args) > 1:
             name = args[1]
             if options.list:
@@ -302,7 +373,8 @@ class CliController(TelnetServer):
                 if options.buffer:
                     self.core.set_stream(self, name, kind, 'buffer', options.buffer)
                 if options.input:
-                    self.core.set_stream(self, name, kind, 'source', options.input)
+                    input = add_quotes(options.input)
+                    self.core.set_stream(self, name, kind, 'source', input)
         elif options.list:
             self.core.list_stream(self, kind)
         elif options.description:
@@ -313,16 +385,16 @@ class CliController(TelnetServer):
             self.core.delete_stream(self, options.erase, kind)
         else:
             cp.print_help()
-            
-    def _video(self, data):
+
+    def _video(self, line):
         kind = 'video'
-        cp = CliParser(self, prog=data[0], description="Manage the video streams.")
+        cp = CliParser(self, prog=line[0], description="Manage the video streams.")
         cp.add_option("-l", "--list", action='store_true', help="List all the video streams or settings if stream is specified")
 
         cp.add_option("-a", "--add", type="string", help="Add an video stream")
         cp.add_option("-e", "--erase", type="string", help="Erase an video stream")
-        cp.add_option("-m", "--modify", type="string", help="Modify the name of a video stream")
-        
+        cp.add_option("-m", "--modify", type="string", help="Modify the name of an video stream")
+
         cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
         cp.add_option("-c", "--codec", type="string", help="Set the codec")
         cp.add_option("-s", "--settings", type="string", help="Set the codec settings (set1:val,set2:val)")
@@ -334,8 +406,8 @@ class CliController(TelnetServer):
         cp.add_option("-z", "--description", action='store_true', help="Display description")
         
         
-        (options, args) = cp.parse_args(data)
-                
+        (options, args) = cp.parse_args(line)
+
         if len(args) > 1:
             name = args[1]
             if options.list:
@@ -359,7 +431,8 @@ class CliController(TelnetServer):
                 if options.buffer:
                     self.core.set_stream(self, name, kind, 'buffer', options.buffer)
                 if options.input:
-                    self.core.set_stream(self, name, kind, 'source', options.input)
+                    input = add_quotes(options.input)
+                    self.core.set_stream(self, name, kind, 'source', input)
         elif options.list:
             self.core.list_stream(self, kind)
         elif options.description:
@@ -370,9 +443,9 @@ class CliController(TelnetServer):
             self.core.delete_stream(self, options.erase, kind)
         else:
             cp.print_help()
-            
-    def _streams(self, data):
-        cp = CliParser(self, prog=data[0], description="Manage the wrapper stream.")
+
+    def _streams(self, line):
+        cp = CliParser(self, prog=line[0], description="Manage the wrapper stream.")
         cp.add_option("-l", "--list", action='store_true', help="List all the streams included")
 
 #        cp.add_option("-a", "--add", type="string", help="Add a stream")
@@ -380,7 +453,7 @@ class CliController(TelnetServer):
 #        cp.add_option("-m", "--modify", type="string", help="Modify the name of a stream")
 
         cp.add_option("-c", "--select", "--choose", type="string", help="Select the current stream")
-        
+
         cp.add_option("-s", "--start", type="string", help="Start a stream of playing")
         cp.add_option("-i", "--stop", "--interrupt", action='store_true', help="Stop a stream of playing")
 
@@ -390,8 +463,8 @@ class CliController(TelnetServer):
         cp.add_option("-r", "--receive", "--in", action='store_false', dest="mode", help="Set the mode to 'receive'")
         cp.add_option("-z", "--description", action='store_true', help="Display description")
         
-        (options, args) = cp.parse_args(data)
-        
+        (options, args) = cp.parse_args(line)
+
         kind = 'streams'
 
         if options.list:
@@ -418,15 +491,15 @@ class CliController(TelnetServer):
                 self.core.start_streams(self, options.start)
         else:
             cp.print_help()
-        
-    def _join(self, data):
-        cp = CliParser(self, prog=data[0], description="Start and stop a connection.")
+
+    def _join(self, line):
+        cp = CliParser(self, prog=line[0], description="Start and stop a connection.")
         cp.add_option("-s", "--start", action='store_true', help="Start a connection with the default contact")
         cp.add_option("-i", "--stop", "--interrupt", action='store_true', help="Stop the connection")
         cp.add_option("-z", "--description", action='store_true', help="Display description")
         
-        (options, args) = cp.parse_args(data)
-                
+        (options, args) = cp.parse_args(line)
+
         if options.start:
             self.core.start_connection(self)
         elif options.description:
@@ -446,23 +519,23 @@ class CliController(TelnetServer):
                 pass
             else:
                 self.write("%9s:   " % cmd, False, False) # no prompt, no endl
-                data = [cmd,'--description']
+                data = [cmd, '--description']
                 self.callbacks[cmd](data)
         self.write("exit:   Quits the client.", False)
         self.write("quit:   Quits the client.", False)
         self.write_prompt()
         #print_usage
         
-    def _help(self,data):
+    def _help(self, line):
         """
         Displays list of commands
         """
         
-        cp = CliParser(self, prog=data[0], description="Prints descriptions of all commands.")
+        cp = CliParser(self, prog=line[0], description="Prints descriptions of all commands.")
         #cp.add_option("-l", "--list", help="List all commands in Sropulpof.")
         #cp.add_option("-z", "--description", action='store_true', help="Display description")
         
-        (options, args) = cp.parse_args(data)
+        (options, args) = cp.parse_args(line)
         
         #if len(args) > 1 or len(options) > 1 :
         #    if options.list:
@@ -471,6 +544,7 @@ class CliController(TelnetServer):
         #    cp.print_usage()
         #else:
         self.print_all_commands()
+
 
 
 class CliParser(optparse.OptionParser):
@@ -491,8 +565,8 @@ class CliParser(optparse.OptionParser):
                  epilog=None):
         optparse.OptionParser.__init__(self, usage, option_list, option_class, version, conflict_handler, description, formatter, add_help_option, prog, epilog)
         self.output = output
-    
-    def print_description(self,with_prompt=False):
+
+    def print_description(self, with_prompt=False):
         # TODO: Should display the prompt if entered by the user
         #       and not automagically by the help command.
         # TODO: Add name of the command
@@ -502,14 +576,14 @@ class CliParser(optparse.OptionParser):
     
     def error(self, msg):
         if msg:
-           self.output.write(msg, True)
+            self.output.write(msg, True)
         else:
             self.print_usage()
-        
+
     def exit(self, status=0, msg=None):
         if msg:
-           self.output.write(msg)
-           self.output.write_prompt() 
+            self.output.write(msg)
+            self.output.write_prompt()
 
     def print_usage(self, file=None):
         """print_usage(file : file = stdout)
@@ -521,9 +595,8 @@ class CliParser(optparse.OptionParser):
         or not defined.
         """
         if self.usage:
-            #self.output.write(self.description)
             self.output.write(self.get_usage())
-            self.output.write_prompt() 
+            self.output.write_prompt()
 
     def print_version(self, file=None):
         """print_version(file : file = stdout)
@@ -534,8 +607,8 @@ class CliParser(optparse.OptionParser):
         name.  Does nothing if self.version is empty or undefined.
         """
         if self.version:
-           self.output.write(self.get_version())
-           self.output.write_prompt() 
+            self.output.write(self.get_version())
+            self.output.write_prompt()
 
     def print_help(self, file=None):
         """print_help(file : file = stdout)
@@ -570,11 +643,11 @@ class CliParser(optparse.OptionParser):
                 if len(rargs) < nargs:
                     if nargs == 1:
                         self.error(optparse._("%s option requires an argument") % opt)
-                        return 
+                        return
                     else:
                         self.error(optparse._("%s option requires %d arguments")
                                    % (opt, nargs))
-                        return 
+                        return
 
                 elif nargs == 1:
                     value = rargs.pop(0)
@@ -610,11 +683,11 @@ class CliParser(optparse.OptionParser):
             if len(rargs) < nargs:
                 if nargs == 1:
                     self.error(optparse._("%s option requires an argument") % opt)
-                    return 
+                    return
                 else:
                     self.error(optparse._("%s option requires %d arguments")
                                % (opt, nargs))
-                    return 
+                    return
             elif nargs == 1:
                 value = rargs.pop(0)
             else:
@@ -640,7 +713,7 @@ class CliView(Observer):
         Observer.__init__(self, subject)
         self.controller = controller
         self.callbacks = find_callbacks(self)
-                
+
     def update(self, origin, key, data):
         """
         Called when a attribute of its Subject watched objects change.
@@ -652,7 +725,7 @@ class CliView(Observer):
         """
         if key in self.callbacks:
             self.callbacks[key](origin, data)
-        
+
     def write(self, msg, prompt=True):
         self.controller.write(msg)
         if prompt:
@@ -665,23 +738,24 @@ class CliView(Observer):
         """
         if origin is self.controller:
             msg = []
-            contacts = data.items()
+            contacts = data[0].items()
             contacts.sort()
+            selected = data[1]
             for name, contact in contacts:
-                if name != '_selected':
-                    if name == data['_selected']:
-                        msg.append(bold(contact.name + ": <---"))
-                    else:  
-                        msg.append(contact.name + ":")  
-                    msg.append("\taddress: %s" % contact.address)
-                    if contact.port:
-                        msg.append("\tport   : %s" % contact.port)
-                    if contact.kind:
-                        msg.append("\tkind   : %s" % contact.kind)
-                    
-            msg_out = "\n".join(msg)  
+                if name == selected:
+                    msg.append(bold(contact.name + ": <---"))
+                elif contact.auto_created:
+                    msg.append(italic(bold(contact.name + ":")))
+                else:
+                    msg.append(contact.name + ":")
+                msg.append("\taddress: %s" % contact.address)
+                if contact.port:
+                    msg.append("\tport   : %s" % contact.port)
+                if contact.kind:
+                    msg.append("\tkind   : %s" % contact.kind)
+            msg_out = "\n".join(msg)
             self.write(msg_out)
-            
+
     def _add_contact(self, origin, data):
         if origin is self.controller:
             if isinstance(data, Exception):
@@ -710,6 +784,13 @@ class CliView(Observer):
             else:
                 self.write('Contact duplicated')
 
+    def _save_client_contact(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not keep this contact.\nReason: %s' % data)
+            else:
+                self.write('Contact saved')
+
     def _select_contact(self, origin, data):
         if origin is self.controller:
             if isinstance(data, Exception):
@@ -729,13 +810,13 @@ class CliView(Observer):
                 
     def _not_found(self, origin, (name, kind)): # _not_found(self, origin, name, kind)
         """
-        Displays a command not foudn error.
+        Displays a command not found error.
         
-        Now with tho args like everything else.
+        Now with two args like everything else.
         """
         if origin is self.controller:
             self.write('There\'s no %s stream with the name %s' % (kind, name))
-                
+
     def _audio_settings(self, origin, (data, name)):
         if origin is self.controller:
             if data:
@@ -779,7 +860,7 @@ class CliView(Observer):
                 self.write("Cannot create audio stream. Name '%s' already use." % name)
             else:
                 self.write('Unable to create the audio stream %s.' % name)
-                
+
     def _audio_delete(self, origin, (data, name)):
         if origin is self.controller:
             if data == 1:
@@ -788,7 +869,7 @@ class CliView(Observer):
                 self._not_found(origin, (name, 'audio')) 
             else:
                 self.write('Unable to delete the audio stream %s.' % name)
-        
+
     def _audio_rename(self, origin, (data, name, new_name)):
         if origin is self.controller:
             if data == 1:
@@ -797,8 +878,8 @@ class CliView(Observer):
                 self._not_found(origin, (name, 'audio')) 
             else:
                 self.write('Unable to rename the audio stream %s.' % name)
-        
-                
+
+
     def _audio_list(self, origin, data):
         if origin is self.controller:
             if data:
@@ -806,19 +887,19 @@ class CliView(Observer):
                 self.write("\n".join(names))
             else:
                 self.write('There is no audio stream.')
-                    
+
     def _audio_sending_started(self, origin, data):
         if data:
             self.write('\nAudio sending started.')
         else:
             self.write('\nUnable to start audio sending.')
-            
+
     def _audio_sending_stopped(self, origin, data):
         if data:
             self.write('\nAudio sending stopped.')
         else:
             self.write('\nUnable to stop audio sending.')
-            
+
 
     def _video_settings(self, origin, (data, name)):
         if origin is self.controller:
@@ -860,7 +941,7 @@ class CliView(Observer):
                 self.write("Cannot create video stream. Name '%s' already use." % name)
             else:
                 self.write('Unable to create the video stream %s.' % name)
-                
+
     def _video_delete(self, origin, (data, name)):
         if origin is self.controller:
             if data == 1:
@@ -869,7 +950,7 @@ class CliView(Observer):
                 self._not_found(origin, (name, 'video'))
             else:
                 self.write('Unable to delete the video stream %s.' % name)
-        
+
     def _video_rename(self, origin, (data, name, new_name)):
         if origin is self.controller:
             if data == 1:
@@ -878,8 +959,8 @@ class CliView(Observer):
                 self._not_found(origin, (name, 'video'))
             else:
                 self.write('Unable to rename the video stream %s.' % name)
-        
-                
+
+
     def _video_list(self, origin, data):
         if origin is self.controller:
             if data:
@@ -887,26 +968,26 @@ class CliView(Observer):
                 self.write("\n".join(names))
             else:
                 self.write('There is no video stream.')
-                    
-    def _video_set(self, origin, ((state, attr, value), name)): 
+
+    def _video_set(self, origin, ((state, attr, value), name)):
         if origin is self.controller:
             if state:
                 self.write('%s of video stream %s is set to %s.' % (attr, name, value))
             else:
                 self.write('Unable to set %s of video stream %s.' % (attr, name))
-                
+
     def _video_sending_started(self, origin, data):
         if data:
             self.write('\nVideo sending started.')
         else:
             self.write('\nUnable to start video sending.')
-            
+
     def _video_sending_stopped(self, origin, data):
         if data:
             self.write('\nVideo sending stopped.')
         else:
             self.write('\nUnable to stop video sending.')
-            
+
 
     def _streams_list(self, origin, (streams, data)):
         if origin is self.controller:
@@ -927,174 +1008,86 @@ class CliView(Observer):
             else:
                 names.append('There is no stream.')
             self.write("\n".join(names))
-            
+
     def _set_streams(self, origin, (state, attr, value)):
         if state:
             self.write('The %s of the master stream is now set to %s' % (attr, value))
         elif origin is self.controller:
             self.write('Unable to set the %s of the master stream' % attr)
-            
+
     def _select_streams(self, origin, (name, value)):
         if value:
             self.write('The selected master stream is now  %s' % name)
         elif origin is self.controller:
             self.write('Unable to select %s as the master stream, it does\'nt exist.' % name)
-            
+
     def _start_streams(self, origin, data):
         self.write(data)
-        
+
     def _stop_streams(self, origin, data):
         self.write(data)
-    
+
     def _list_streams(self, origin, (data, curr)):
         if origin is self.controller:
             msg = []
             for name, streams in data.items():
                 if name == curr:
                     msg.append(bold(name + ": <---"))
-                else:  
+                else:
                     msg.append(name + ":")
                 for attr, value in streams.__dict__.items():
                     if attr[0] != '_':
                         msg.append("\t%s: %s" % (attr, value))
             self.write("\n".join(msg))
-            
+
     def _ask(self, origin, data):
-        self.write('\n%s is inviting you. Do you accept?\n[Y/n]: ' % data[0].host, False)
+        self.write('\n%s is inviting you. Do you accept? [Y/n]: ' % data[0], False)
         self.controller.block = self.controller._ask
         self.controller.remote = data[1]
-        
+
     def _ask_timeout(self, origin, data):
         self.write(data)
         self.controller.block = False
         self.controller.remote = None
-        
+
     def _start_connection(self, origin, data):
-        self.write(data[0], False)
-            
+        self.write('%s' % data)
+
     def _info(self, origin, data):
         self.write(data)
- 
+
+    def _answer(self, origin, data):
+        self.write('\n' + data)
+
     def _connectionMade(self, origin, data):
         self.write(data[0])
 
 def bold(msg):
     return "%s[1m%s%s[0m" % (ESC, msg, ESC)
-        
 
-class Test(telnet.Telnet):
-    
-    def __init__(self):
-        telnet.Telnet.__init__(self)
-        self.prompt = "pof: "
-        self.history = []
-        self.accept_options = (telnet.LINEMODE,
-                               telnet.ECHO,
-                               telnet.EC)
-        self.buffer = []
-        self.pos = 0
-        self.max_history = 10
-        
-    def write(self, msg, prompt=False):
-        self.transport.write(msg)
-        if prompt:
-            self.write_prompt()
-        
-    def applicationDataReceived(self, data):
-        print repr(data)
-        if data == "\r":
-            cmd = ''.join(self.buffer)
-            self.buffer = []
-            self.upd_history(cmd)
-            self.pos = 0
-            if cmd.lower() in ("exit", "quit"):
-                log.info("Telnet client at %s:%s has disconnected" % (self.addr.host, self.addr.port))
-                self.write("\r\nGood Bye\r\n")
-                self.transport.loseConnection()
-            else:
-                self.write_prompt()
-        elif data == ESC + '[A':
-            self.pos -= 1
-            if self.pos < len(self.history) * -1:
-                self.pos += 1
-                self.write(telnet.BEL)
-            else:
-                cmd = self.history[self.pos]
-                self.buffer = [cmd]
-                self.write('\r' + self.prompt + cmd)
-        elif data == ESC + '[B':
-            self.pos += 1
-            if self.pos == 0:
-                self.buffer = []
-                self.write('\r' + self.prompt)
-            elif self.pos > 0:
-                self.pos -= 1
-                self.write(telnet.BEL)
-            else:
-                cmd = self.history[self.pos]
-                self.buffer = [cmd]
-                self.write('\r' + self.prompt + cmd)
-        elif data == chr(127):
-            self.will(telnet.EL)
-#            self.write('\x08')
-            print "BACKSPACE"
-        else:
-            self.buffer.append(data)
-            self.write(data)
-    
-    def upd_history(self, cmd):
-        self.history.append(cmd)
-        if len(self.history) > self.max_history:
-            del self.history[0]
-        
-            
-    def parse(self, data):
-        """Method to be overidden when subclassing."""
-        self.write("command not found")
-        self.write_prompt()            
-            
-    def write_prompt(self):
-        self.transport.write("\r\n" + self.prompt)
-    
-    def connectionMade(self):
-        log.info("%s is connecting in Telnet on port %s" % (self.addr.host, self.addr.port))
-        self.write("Welcome to Sropulpof!", True)
-        self.do(telnet.LINEMODE)
-        self.will(telnet.ECHO)
-        
-    def enableRemote(self, option):
-        if option in self.accept_options:
-            return True
-        return False
+def italic(msg):
+    return "%s[33m%s%s[0m" % (ESC, msg, ESC)
 
-
-class CliFactory(protocol.ServerFactory):
-    
-    view = None
-    subject = None
-    
-    def buildProtocol(self, addr):
-        """Create an instance of a subclass of Protocol.
-
-        The returned instance will handle input on an incoming server
-        connection, and an attribute \"factory\" pointing to the creating
-        factory.
-
-        @param addr: an object implementing L{twisted.internet.interfaces.IAddress}
-        """
-        p = self.protocol()
-        p.factory = self
-        p.addr = addr
-        p.view = self.view(self.subject, p)
-        return p
+def add_quotes(input):
+    if ':' in input:
+        input, sep, args = input.partition(':')
+        args = args.split(',')
+        new_args = []
+        for arg in args:
+            key, sep, value = arg.partition('=')
+            if not value.isdigit() and not re.match('^\d+\.\d*$', value) and not (value[0] == '"' and value[-1] == '"'):
+                value = '"%s"' % value
+            new_args.append(key + sep + value)
+        input += ':' + ','.join(new_args)
+    return input
 
 
 def start(subject, port=14444):
     """This runs the protocol on port 14444"""
-    factory = CliFactory()
-    factory.protocol = CliController
-    factory.subject = subject
-    factory.view = CliView
+    factory = protocol.ServerFactory()
+    factory.protocol = lambda: TelnetTransport(TelnetBootstrapProtocol,
+                                               insults.ServerProtocol,
+                                               CliController, subject)
     reactor.listenTCP(port, factory)
 
 

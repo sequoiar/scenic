@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Sropulpof
-# Copyright (C) 2008 Soci�t� des arts technologiques (SAT)
+# Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #

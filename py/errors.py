@@ -27,8 +27,25 @@ class AddressBookError(Exception):
     """
     pass
 
-class IPAddressError(AddressBookError):
+class AddressBookNameError(AddressBookError):
     """
-    Validate an IP Address.
+    Sub Exception Class for the address book.
+    Name already in address book.
     """
-    
+    pass
+
+
+### Connection ###
+
+class ConnectionError(Exception):
+    """
+    Master Exception Class for the Connection module.
+    """
+    pass
+
+class ConnectorError(ConnectionError):
+    """
+    Sub Exception Class for the Connector module.
+    """
+    pass
+

@@ -1,0 +1,11 @@
+Modules Documentation
+=====================
+
+This page contains some basic documentation about the Sropulpof modules.
+
+The :mod:`addressbook` Module
+-----------------------------
+
+.. automodule:: addressbook
+   :members:
+   :inherited-members:

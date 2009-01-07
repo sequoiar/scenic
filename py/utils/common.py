@@ -19,43 +19,49 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 
+# System imports
+import sys
+
 # Twisted imports
 from twisted.python.modules import getModule
 from twisted.python.filepath import FilePath
+
+# App import
 from utils import log
 
-DEBUG = False
-    
-def find_all():
-    """
-    Find all the different user interfaces available
-    """
-    uis = []
-    mods = getModule('ui').iterModules()
-    for ui in mods:
-        if ui.isPackage() and not FilePath(ui.filePath.dirname() + '/off').exists():
-            uis.append(ui)
-    return uis
 
-def load(uis):
+def get_def_name(level=2):
+    """
+    Finds who called the caller of this function
+    """
+    return sys._getframe(level).f_code.co_name
+
+    
+def find_modules(kind):
+    """
+    Find all the different modules of this kind available
+    """
+    mods = []
+    all_mods = getModule(kind).iterModules()
+    for mod in all_mods:
+        if mod.isPackage() and not FilePath(mod.filePath.dirname() + '/off').exists():
+            mods.append(mod)
+    return mods
+
+def load_modules(mods):
     """
     Load/import all the different user interfaces available
-    """
-    loaded_uis = []
-    for ui in uis:
-        if DEBUG:
-            loaded_ui = ui.load()
-            log.info('%s module loaded.' % ui.name)
-            loaded_uis.append(ui.load())
+    """    
+    loaded_mods = []
+    for mod in mods:
+        try:
+            loaded_mod = mod.load()
+            log.info('%s module loaded.' % mod.name)
+        except:
+            log.error('Unable to load the module %s' % mod.name)
         else:
-            try:
-                loaded_ui = ui.load()
-                log.info('%s module loaded.' % ui.name)
-            except:
-                log.error('Unable to load the module %s' % ui.name)
-            else:
-                loaded_uis.append(ui.load())
-    return loaded_uis
+            loaded_mods.append(loaded_mod)
+    return loaded_mods
     
 def find_callbacks(obj):
     callbacks = {}

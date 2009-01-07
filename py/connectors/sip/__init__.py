@@ -18,17 +18,5 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
-
-# App imports
-
-class ConnectionFactory(object):
-    """Class that create an instance of a connection with the specified protocol.
-    """
-    def __init__(self, protocol):
-        self.protocol = protocol
-    
-    # Operations
-    def get_connection(self):
-        connection = self.protocol()
-        return connection
-
+# Connector imports
+from sip import *

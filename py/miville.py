@@ -27,11 +27,13 @@ from twisted.python.modules import getModule
 
 # App imports
 import ui
+import api
 import streams
-from utils import log, Subject
+from utils import log, Subject, common
 import addressbook
 import settings
-from connections import basic
+from protocols import com_chan
+import connectors
 
 
 class Core(Subject):
@@ -44,17 +46,21 @@ class Core(Subject):
         self.startup()
 
     def startup(self):
-        self.api = ui.ControllerApi(self.notify)
+        self.api = api.ControllerApi(self.notify)
         self.load_uis()
-        self.adb = addressbook.AddressBook('sropulpof')
+        self.adb = addressbook.AddressBook('sropulpof', self.api)
         self.engines = self.find_engines()
         self.settings = settings.Settings()
         self.curr_setting = self.settings.select()
-        self.load_connections()
+        self.connectors = connectors.load_connectors(self.api)
+        port = 37054
+        if len(sys.argv) > 1:
+            port += 1
+        com_chan.start(connectors.connections, port)
         self.api._start(self)
         
     def load_uis(self):
-        self.uis = ui.load(ui.find_all())
+        self.uis = common.load_modules(common.find_modules('ui'))
         count = 0
         for mod in self.uis:
             try:
@@ -65,16 +71,6 @@ class Core(Subject):
                     mod.start(self)
             except:
                 log.error('Unable to start UI module %s.' % mod.__name__)
-
-    def load_connections(self):
-        self.connectors = {'ip':basic}  #TODO: add automatic searching of all connectors
-        for conn in self.connectors.values():
-            if len(sys.argv) > 1:
-                port = int(sys.argv[1]) - 14442
-                conn.PORT += port
-                conn.start(self.api)
-            else:
-                conn.start(self.api)
 
     def find_engines(self):
         """
@@ -90,15 +86,18 @@ class Core(Subject):
 
 
 def chk_ob(core):
-    print "Obs: %r" % core.observers.valuerefs()
+    print "Contacts: %r" % core.adb.contacts.keys()
 #    print dir(ui.cli)
                     
 
 def main():    
     core = Core()
 #    l = task.LoopingCall(chk_ob, core)
-#    l.start(1.0, False)
+#    l.start(2.0, False)
     reactor.run()
+    
+    # on exit
+    core.adb.write(False)
 
 
 if __name__ == '__main__':

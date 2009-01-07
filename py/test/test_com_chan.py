@@ -25,7 +25,7 @@ from twisted.trial import unittest
 from twisted.internet import reactor, defer, task
 from twisted.spread import pb
 
-from connections.com_chan import ComChannel
+from protocols.com_chan import ComChannel
 g = False
 #class for test
 def send(remote):

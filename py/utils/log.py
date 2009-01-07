@@ -33,8 +33,6 @@ if version < 8:
     from utils.twisted_old import PythonLoggingObserver
     tw_log.PythonLoggingObserver = PythonLoggingObserver
 
-# App imports
-from utils import get_def_name
 
 #TODO: Specified the level by output
 
@@ -42,11 +40,13 @@ LoggerClass = logging.getLoggerClass()
 
 class CoreLogger(LoggerClass):
     def debug(self, msg=None, *args):
+        # if there is no msg get the name of method/function
         if not msg:
-            msg = "def: %s" % get_def_name()
+            msg = "def: %s" % sys._getframe(2).f_code.co_name
         LoggerClass.debug(self, msg, *args)
 
 logging.setLoggerClass(CoreLogger)
+
 
 def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
     log_file = 'miville.log'

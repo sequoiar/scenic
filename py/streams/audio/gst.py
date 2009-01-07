@@ -46,7 +46,7 @@ class AudioGst(AudioStream, GstClient):
         else:
             port = setting['port_r']
             address = setting['addr_r']
-        GstClient.__init__(self, mode, port, address)
+        GstClient.__init__(self, core.api, mode, port, address)
         self._chan = None
         
     def start_sending(self, address, channel):

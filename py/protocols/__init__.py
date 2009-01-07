@@ -22,3 +22,4 @@
 # App imports
 
 import ipcp
+import com_chan

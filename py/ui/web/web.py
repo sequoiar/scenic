@@ -27,7 +27,7 @@ from nevow.athena import LivePage, LiveElement, expose
 from utils import Observer, log
 from utils.i18n import to_utf
 import ui
-from ui.common import find_callbacks
+from utils.common import find_callbacks
 from streams import audio, video, data
 from streams.stream import AudioStream, VideoStream, DataStream
 
