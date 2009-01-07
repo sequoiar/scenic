@@ -193,7 +193,7 @@ AC_CONFIG_FILES([
 AC_OUTPUT
 echo
 
-if test  "$ac_cv_boost_python" != "xyes"   ; then
+if test  "$ac_cv_boost_python" != "yes"   ; then
 AC_MSG_NOTICE([Not building python directories -- python or boost-python not found ])
 fi
 
