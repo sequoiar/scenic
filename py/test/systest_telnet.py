@@ -25,7 +25,7 @@ System test for the telnet UI.
 Usage: trial test/systest_telnet.py
 
 pexpect expected strings are regular expression. See the re module.
-"""
+""" 
 import unittest
 import pexpect
 import os
@@ -117,7 +117,7 @@ def is_running(process):
     Returns boolean
     """
     if (process.isalive() == False):
-        println("Error starting server: %s" % client.status)
+        println("Error starting server: %s" % client.status or "client status = None")
         return False
     else:
         return process
@@ -147,7 +147,7 @@ def kill_process(process):
     try:
         if (is_running(process) == True):
             process.kill(15)
-            sleep(2)
+            time.sleep(2)
             if (is_running(process) == True):
                 process.kill(9)
     except Exception, e:
@@ -208,7 +208,7 @@ class TelnetBaseTest(unittest.TestCase):
         """
         pass
 
-    def sleep(sleep):
+    def sleep(self):
         """Waits a bit between each command."""
         time.sleep(0.025)
 
@@ -516,3 +516,32 @@ class Test_3_Videostream(TelnetBaseTest):
         self.client.sendline("v -e videostream")
         self.sleep()
         self.expectTest('There\'s no video stream with the name videostream', 'There should be no video stream with that name.')
+        
+class Test_004_Settings(TelnetBaseTest):
+    
+    def tst(self, command, expected, errorMsg = None):
+        self.client.sendline(command)
+        self.sleep()
+        err = errorMsg or 'The command did not return: "%s" as excpected' % expected
+        self.expectTest(expected, err)
+        
+    """
+    System Tests for presets
+    """
+    def test_00_yes(self):
+        self.expectTest('pof: ', 'The default prompt is not appearing.')
+        
+    def test_01_addSettings(self):
+        self.tst('v -e videostream', 'There\'s no video stream with the name videostream', 'There should be no video stream with that name.')
+        
+ 
+#
+#class Test_5_SettingsTodo(TelnetBaseTest):
+#    """
+#    System Tests for Videostream
+#    """
+#    def test_00_yes(self):
+#        self.expectTest('pof: ', 'The default prompt is not appearing.')
+
+
+    
