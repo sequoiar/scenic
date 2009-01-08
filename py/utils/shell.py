@@ -20,6 +20,8 @@
 
 """
 Classes for handling shell process.
+
+TODO: Improve errors, exceptions and failures handling. 
 """
 
 import os
@@ -38,7 +40,22 @@ log = log.start('debug', 1, 0, 'shell')
 class ShellCommander(object):
     """
     Handles one or many shell processes asynchronously.
+    
+    Classes that need to start many shell commands need to extend this one.
     """
+    def find_command(self,command_name):
+        """
+        used to check if command is available on this system.
+        
+        Throws an exception if not.
+        """
+        executable = None
+        try:
+            executable = procutils.which(command_name)[0] # gets the executable
+        except IndexError:
+            raise Exception, 'Could not find command %s' % (command_name)
+        return executable
+
     def _command_start(self,command):
         """
         Starts only one command.
@@ -47,16 +64,17 @@ class ShellCommander(object):
         deferred = None
         executable = False
         try:
-            executable = procutils.which(command[0])[0] # gets the executable
-        except IndexError:
-            pass
+            executable = self.find_command(command[0]) # gets the executable
+        except Exception:
+            pass # TODO: handle better 
+
         if executable is False:
-            log.critical('Cannot find the shell command: %s' % (command[0])) # log.critical
-        
-        if True: #executable is not False:
-            try:    
-                if True: # not verbose
-                    log.info('Starting command: %s' % (command[0]))
+            log.critical('Cannot find the shell command: %s' % (command[0]))
+            #TODO: better error handling
+            deferred = defer.fail(failure.Failure(failure.DefaultException('Could not find command %s'% (command[0]))))
+        else:
+            try:
+                log.info('Starting command: %s' % (command[0]))
                 #getProcessOutputAndValue(executable, args=(), env={}, path='.', reactor=None)
                 #
                 #Spawn a process and returns a Deferred that will be called back with
@@ -69,11 +87,8 @@ class ShellCommander(object):
                 deferred = utils.getProcessOutputAndValue(executable, args, os.environ)
             except Exception,e:
                 #print "ERROR:",sys.exc_info()
-                log.critical('Cannot start the command: %s' % (executable))
-        else:
-            print 'Cannot find the shell command: %s' % (command[0])
-        if deferred == None:
-            deferred = defer.fail(failure.Failure(failure.DefaultException('Could not find command %s'% (command[0]))))
+                log.critical('Cannot start the command %s. Reason: %s' % (executable,str(e.message)))
+        
         return deferred
         
     def commands_start(self, commands, callback=None):
