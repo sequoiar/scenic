@@ -45,10 +45,19 @@ class Video4LinuxDriver(devices.VideoDriver):
     def __init__(self, name):
         devices.Driver.__init__(self, name)
         self.selected_device = None # there can be only one device used
-    
-    def prepareDriver(self):
+        
+        self._populate_info = {} # dict 
+        # where keys are callbacks pointers
+        # and values are a dict 
+        #   where keys are str(commands list) 
+        #   and values with boolean
+        #   saying if it has returned or not.
+        # (ouch!)
+        
+    def prepareDriver(self, callback=None):
         # inherited
         self._populateDevices()
+        # we shoult wait a bit here...
         try:
             tmp = self.devices['/dev/video0']
             self.selected_device = '/dev/video0'
@@ -61,6 +70,11 @@ class Video4LinuxDriver(devices.VideoDriver):
             raise devices.CommandNotFoundException, "v4l2-ctl command not found. Please sudo apt-get install ivtv-utils"
         
     def _populateDevices(self,callback=None):
+        """
+        Get all infos for all devices
+        """
+        self._populate_info[callback] = {}
+        
         all = glob.glob('/dev/video*')
         self.devices = dict()
         if len(all) == 0:
@@ -70,15 +84,49 @@ class Video4LinuxDriver(devices.VideoDriver):
             for devName in all:
                 self.devices[devName] = devices.Device(devName)
                 self.devices[devName].setDriver(self)
-            self.setSelectedDevice(all[0]) # TODO : better default device
+            self.setSelectedDevice(all[0]) # /dev/video0 TODO : better default device
             self.shell_command_start(['v4l2-ctl','--all'],callback)
+        
+        # TODO: call the callback only when all the shell
+        # calls are done
+
+        #cmd = ['v4l2-ctl','--list-inputs']
+        #cmd = ['v4l2-ctl','--get-fmt-video']
+        #cmd = ['v4l2-ctl','--get-input']
+        #cmd = ['v4l2-ctl','--list-ctrls'] (brightness and contrast)
     
-    def onGetAttributes(self,device):
-        # inherited
-        pass
+    def _onPopulateDevicesDone(self,callback=None):
+        # TODO
+        
+        self._populate_info[callback] = {} # free shell processes info
+        
     
-    def onDeviceAttributeChange(self,attribute):
-        pass
+    #def onGetAttributes(self,device):
+    #    # inherited
+    #    pass
+        
+    def onDeviceAttributeChange(self,attr,callback=None):
+        name = attr.getName()
+        command = None
+        if name == 'video standard':
+            #--set-standard=<num
+            #pal-X (X = B/G/H/N/Nc/I/D/K/M/60) or just 'pal'
+            #ntsc-X (X = M/J/K) or just 'ntsc'
+            #secam-X (X = B/G/H/D/K/L/Lc) or just 'secam'
+            standard = attr.getValue() # TODO: get actual value
+            command = ['v4l2-ctl','--set-standard='+standard]
+        elif name == 'width' or name == 'height':
+            # TODO
+            # --set-fmt-video=width=<w>,height=<h>
+            pass
+        elif name == 'input':
+            #--set-input=0
+            pass
+        if command is not None:
+            pass
+    
+    def refreshDeviceAttributes(self,device,callback=None):
+        self._populateDevices(callback)
         
     def setSelectedDevice(self,device_name):
         """
@@ -93,7 +141,6 @@ class Video4LinuxDriver(devices.VideoDriver):
         # inherited
         self._populateDevices(callback)
         
-    
     def shell_command_result(self,command,results,callback=None):
         # inherited
         if command[0] == 'v4l2-ctl':
@@ -101,7 +148,7 @@ class Video4LinuxDriver(devices.VideoDriver):
                 # method called was listDevices
                 device = self.getDevice(self.getSelectedDevice()) # '/dev/video0'
                 splitted = results.split('\r\n')
-                values = parse_v4l2_ctl(splitted)
+                values = _parse_v4l2_ctl_all(splitted)
                 #print "\nSHELL RESULT:"
                 #pprint.pprint(splitted)
                 #pprint.pprint(values)
@@ -133,37 +180,7 @@ class Video4LinuxDriver(devices.VideoDriver):
         log.info('v4l driver: command %s returned.',str(command))
         #print results
 
-class delete_me:
-    def _v4l_command(self,deviceObj,command):
-        """
-        v4lctl -c /dev/videoN [command]
-        """
-        devName = '/dev/video0' # TODO
-        command.insert(0,devName)
-        command.insert(0,'-c')
-        command.insert(0,'v4lctl')
-        self.shell_command_start(command)
-    
-    def v4l_set_norm(self,deviceObj,norm='NTSC'):
-        """
-        Sets TV norm to PAL, NTSC or SECAM
-        """
-        self._v4l_command(deviceObj,['setnorm',norm])
-    
-    def v4l_input_next(self,deviceObj):
-        """
-        Tries next input. (composite0,composite1,Television...
-        """
-        self._v4l_command(deviceObj,['setinput','next'])
-    
-    def v4l_set_attr(self,deviceObj,attr,value):
-        """
-        Wrapper for setting an attribute using v4lctl
-        """
-        self._v4l_command(deviceObj,['setattr',attr,value])
-
-
-def parse_v4l2_ctl(lines):
+def _parse_v4l2_ctl_all(lines):
     """
     Parses the output of the "v4l2-ctl --all" shell command
     

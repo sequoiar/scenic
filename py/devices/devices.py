@@ -30,9 +30,7 @@ TODO: change attribute camel case for small caps underscores...
 """
 
 # System imports
-import os,sys #, resource, signal, time, sys, select
-
-#print sys.path
+import os, sys 
 
 # Twisted imports
 from twisted.internet import reactor, protocol
@@ -40,12 +38,11 @@ from twisted.python import procutils # Utilities for dealing with (shell) proces
 
 # App imports
 from utils import log
-#from utils import singleton
-#from utils.observer import Observer, Subject
 
 log = log.start('debug', 1, 0, 'devices')
 
-class Driver: #, Subject):
+class Driver:
+    #, Subject):
     """
     Base class for a driver for a type of Device. (ALSA, JACK, v4l, dv1394, etc.)
     
@@ -95,23 +92,31 @@ class Driver: #, Subject):
         """
         return self.devices[device_name]
         
-    def onDeviceAttributeChange(self,attribute):
+    def onDeviceAttributeChange(self,attribute,callback=None):
         """
         Called by a device when one of its attribute is changed. (by the core, usually)
         
         Can be overriden if necessary to do shell scripts or so
         """
         pass
-        
-        
-    def onGetAttributes(self,device):
+    
+    def refreshDeviceAttributes(self,device,callback=None):
         """
-        Called when user queries a device's attributes
+        Called when the programmer wants to refresh 
+        the attributes for a device.
         
-        device is a Device object.
-        To override.
+        Shoud be overriden.
         """
         pass
+        
+    #def onGetAttributes(self,device):
+    #    """
+    #    Called when user queries a device's attributes
+    #    
+    #    device is a Device object.
+    #    To override.
+    #    """
+    #    pass
         
     def shell_command_start(self, command, callback=None):
         """
@@ -193,17 +198,22 @@ class Attribute:
         self.device = None
         
     def getValue(self):
+        """
+        TODO: asynchronous. 
+        arg: callback, called with the whole 
+        attribute as argument.
+        """
         return self.value
 
-    def setValue(self,val,doNotifyDriver=True):
+    def setValue(self,val,do_notify_driver=True,callback=None):
         """
         Changes the value of the Attribute for device.
         
         Calls onChange() once its value is changed.
         """
         self.value = val
-        if doNotifyDriver:
-            self.onChange()
+        if do_notify_driver:
+            self._on_change(callback)
         
     def getDefault(self):
         return self.default
@@ -228,14 +238,14 @@ class Attribute:
     def getDevice(self):
         return self.device
     
-    def onChange(self):
+    def _on_change(self,callback=None):
         """
         Called when the value changed.
 
         Tells the Device that the value changed.
         """ 
         if self.device is not None:
-            self.device.onAttributeChange(self)
+            self.device.onAttributeChange(self,callback)
             
     def getName(self):
         return self.name
@@ -272,6 +282,20 @@ class OptionsAttribute(Attribute):
     
     A tuple is better since it is immutable. Indices are integers.
     """
+    #TODO:
+    # def getValue() # string (asynchronous)
+    # def setValue() # string
+    # def getDefault() # string
+    # def setDefault() # string
+    
+    # def getValueIndex() # int  (asynchronous)
+    # def setValueindex() # int
+    # def getDefaultIndex() # int
+    # def setDefaultindex() # int
+    
+    # def getValueForIndex()
+    # def getIndexForValue()
+    
     def __init__(self,name,value=None,default=None,options=[]):
         Attribute.__init__(self,name,value,default)
         self.setOptions(options)
@@ -329,11 +353,11 @@ class OptionsAttribute(Attribute):
     def getOptions(self):
         return self.options
     
-    def setOptions(self,optsList):
+    def setOptions(self,opts_list):
         """
         Argument must be a list or tuple.
         """
-        self.options = optsList #copy.deepcopy(optsList)
+        self.options = opts_list
 
 class Device:
     """
@@ -370,18 +394,18 @@ class Device:
             raise KeyError, 'That Device doesn\'t have that attribute !'
         return ret
     
-    def getAttributeNames(self):
-        """
-        Gets list of all attributes names
-        """
-        return self.attributes.keys()
+    #def getAttributeNames(self):
+    #    """
+    #    Gets list of all attributes names
+    #    """
+    #    return self.attributes.keys()
     
     def getAttributes(self):
         """
         Returns a dict in the form name = Attribute
         """
-        if self.driver is not None:
-            self.driver.onGetAttributes(self)
+        #if self.driver is not None:
+        #    self.driver.onGetAttributes(self)
         return self.attributes
     
     def addAttribute(self,attr):
@@ -411,14 +435,19 @@ class Device:
         """
         return self.driver
 
-    def onAttributeChange(self,attr):
+    def onAttributeChange(self,attr,callback=None):
         """
         Called when an attribute has change. 
         
         Calls the Driver notifyChange method.
         """
         if self.driver is not None:
-            self.driver.onDeviceAttributeChange(self,attr)
+            self.driver.onDeviceAttributeChange(self,attr,callback)
+    
+    def refreshAttributes(self,callback=None):
+        if self.driver is not None:
+            self.driver.refreshDeviceAttributes(self,callback)
+    
 
 class DriversManager:
     """

@@ -116,7 +116,7 @@ class Test_2_Device_Attributes(unittest.TestCase):
         d = devices.Device('MOTU')
         d.addAttribute(devices.StringAttribute('meal','egg', 'spam'))
         
-        tmp = d.getAttributeNames()
+        tmp = d.getAttributes().keys()
         self.assertEqual(tmp, ['meal'],'Attribute names not matching what we gave it.')
         
         
