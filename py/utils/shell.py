@@ -62,17 +62,15 @@ class ShellCommander(object):
         Returns a Deferred object
         """
         deferred = None
-        executable = False
+        executable = None
         try:
             executable = self.find_command(command[0]) # gets the executable
         except Exception:
-            pass # TODO: handle better 
-
-        if executable is False:
             log.critical('Cannot find the shell command: %s' % (command[0]))
             #TODO: better error handling
             deferred = defer.fail(failure.Failure(failure.DefaultException('Could not find command %s'% (command[0]))))
-        else:
+        
+        if executable is not None:
             try:
                 log.info('Starting command: %s' % (command[0]))
                 #getProcessOutputAndValue(executable, args=(), env={}, path='.', reactor=None)
@@ -87,6 +85,7 @@ class ShellCommander(object):
                 deferred = utils.getProcessOutputAndValue(executable, args, os.environ)
             except Exception,e:
                 #print "ERROR:",sys.exc_info()
+                # TODO: handle better
                 log.critical('Cannot start the command %s. Reason: %s' % (executable,str(e.message)))
         
         return deferred
@@ -116,7 +115,7 @@ class ShellCommander(object):
         Args are: the command that it the results if from, text data resulting from it, callback to call once done.
         callback should be called with the same arguments. command, results, callback (but results can be something else than text)
         
-        You must extend this class and override this method.
+        You must extend this class and override this method. Copy-paste this one to make your life easier.
         """
         #pprint.pprint(results) # (out, err, code)
         for i in range(len(results)):
@@ -126,6 +125,7 @@ class ShellCommander(object):
             
             if isinstance(results_infos,failure.Failure):
                 print "failure ::: ",results_infos.getErrorMessage()  # if there is an error, the programmer should fix it.
+                # TODO : handle failure better
             else:
                 pprint.pprint(result)
                 command = commands[i]
@@ -141,7 +141,7 @@ class ShellCommander(object):
                     print "stderr: %s" % (stdout)
                     print "signal is ", signal_or_code
         if callback is not None:
-            callback() # the programmer can add arguments. 
+            callback() # the programmer can add arguments or use that variable in a creative way.
         raise NotImplementedError, 'This method must be implemented in child classes. (if you need it)'
         
     def single_command_start(self, command, callback=None):
