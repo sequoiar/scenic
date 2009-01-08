@@ -72,7 +72,7 @@ class Test_0_Shell(unittest.TestCase):
     """
     tests for utils.shell
     """
-    def test_0_find_commands(self):
+    def test_1_find_commands(self):
         x = TestShellCommander()
         aconnect = x.find_command('aconnect')
         try:
@@ -81,7 +81,7 @@ class Test_0_Shell(unittest.TestCase):
         except:
             pass
     
-    def test_1_ls_and_echo(self):
+    def test_2_ls_and_echo(self):
         x = TestShellCommander()
         commands = [
                 ['echo','toto'],
@@ -92,4 +92,9 @@ class Test_0_Shell(unittest.TestCase):
             ]
         x.commands_start(commands, self) # HACK : for the test, we pass the unittest instance instead of a callback
         time.sleep(0.1)
-        
+    
+    def test_3_handle_errors(self):
+        #TODO: do we handle errors properly? (if a process returns an error code. Not sure.
+        self.fail('we should handle processes errors properly')
+        # TODO: example : ['aconnect','asd'] should generate an error
+
