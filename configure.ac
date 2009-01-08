@@ -43,7 +43,7 @@ if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
     CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
 
-Trying to set CPPUNIT_LIBS using pkg-config
+#Trying to set CPPUNIT_LIBS using pkg-config
 PKG_CHECK_MODULES(CPPUNIT, cppunit, have_cppunit=true, have_cppunit=false)
 if test "x${have_cppunit}" = "xfalse" ; then
     AC_MSG_WARN([libcppunit not found.-- ])
@@ -155,7 +155,7 @@ fi
 #
 AM_CONDITIONAL([SIP],test "x${enable_sip}" = "xyes" -a "x{have_libpj}" = "xtrue" )
 #AM_CONDITIONAL([IEEE1394],test "x{have_libavc1394}" = "xtrue" -a "x{have_libraw1394}" = "xtrue" )
-AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes" )
+AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes" -a "x${have_cppunit}" = "xtrue" )
 
 if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
 AC_MSG_NOTICE([undef CONFIG_IEEE1394])
@@ -197,9 +197,9 @@ if test  "$ac_cv_boost_python" != "yes"   ; then
 AC_MSG_NOTICE([Not building python directories -- python or boost-python not found ])
 fi
 
-#if test  "x${enable_debug}" = "xyes" -a "x${have_cpptest}" = "xfalse"  ; then
-#AC_MSG_NOTICE([Not building test directories -- no cpptest found])
-#fi
+if test  "x${enable_debug}" = "xyes" -a "x${have_cppunit}" = "xfalse"  ; then
+AC_MSG_NOTICE([Not building test directories -- no cppunit found])
+fi
 
 if test  "x${enable_sip}" = "xyes" -a "x${have_libpj}" = "xfalse"  ; then
 AC_MSG_NOTICE([Not building sip directory -- libpj missing])
