@@ -73,6 +73,18 @@ class TelnetServer(recvline.HistoricRecvLine):
         self.prompt = "pof: "
         self.ps = (self.prompt,)
         self.shortcuts = None
+        self.history_file = None
+
+    def next_line(self):
+        """
+        This method overwrite the Twisted one because there'S was a bug
+        (Gnome-terminal was not scrolling at the bottom of the page).
+        Write a '\n' instead of an ESC character.
+        """
+        self.terminal.cursorPos.x = 0
+        self.terminal.cursorPos.y = min(self.terminal.cursorPos.y + 1, self.terminal.termSize.y - 1)
+        self.terminal.write('\n')
+        
 
     def write(self, msg, prompt=False, endl=True):
         self.terminal.write("%s" % (msg.encode('utf-8')))
@@ -82,10 +94,12 @@ class TelnetServer(recvline.HistoricRecvLine):
             self.write_prompt()
 
     def connectionMade(self):
-        self.addr = self.terminal.transport.getPeer() 
+        self.addr = self.terminal.transport.getPeer()
+        # overwrite terminal.nextLine method of twisted with our self to fix a bug 
+        self.terminal.nextLine = self.next_line
         recvline.HistoricRecvLine.connectionMade(self)
         try:
-            self.history_file = open('%s/.sropulpof/.cli_history_%s-%s' %
+            self.history_file = open('%s/.sropulpof/.cli_history_%s-%s' % 
                                     (os.environ['HOME'],
                                      self.addr.host,
                                      self.terminal.transport.getHost().port),
@@ -114,7 +128,7 @@ class TelnetServer(recvline.HistoricRecvLine):
                 self.historyLines.remove(line)
             self.historyLines.append(line)
             try:
-                self.history_file = open('%s/.sropulpof/.cli_history_%s-%s' %
+                self.history_file = open('%s/.sropulpof/.cli_history_%s-%s' % 
                             (os.environ['HOME'],
                              self.addr.host,
                              self.terminal.transport.getHost().port),
@@ -128,7 +142,8 @@ class TelnetServer(recvline.HistoricRecvLine):
                     self.history_file.write('\n'.join(self.historyLines))
                 self.history_file.close()
         self.historyPosition = len(self.historyLines)
-        return recvline.RecvLine.handle_RETURN(self)
+        
+        recvline.RecvLine.handle_RETURN(self)
     
     def completion(self):
         # rudimentary command completion
@@ -151,7 +166,7 @@ class TelnetServer(recvline.HistoricRecvLine):
         line = line.strip()
         if line:
             if line.lower() in ("exit", "quit"):
-                if self.history_file:
+                if isinstance(self.history_file, file):
                     self.history_file.close()
                 log.info("Telnet client at %s:%s has disconnected" % (self.addr.host, self.addr.port))
                 self.write("Good Bye")
