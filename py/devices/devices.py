@@ -26,54 +26,124 @@ $ cd py/
 $ export PYTHONPATH=$PWD
 $ python devices/devices.py
 
-TODO: change attribute camel case for small caps underscores...
+To run unit tests: 
+$ trial test/test_devices.py
+
+TODO: retrieve former implementation of the shelprocessprotocol and put it in utils/shell
+
+TODO: you want to test that a failing condition occurs? use self.assertFailure
 """
 
 # System imports
 import os, sys 
 
 # Twisted imports
-from twisted.internet import reactor, protocol
-from twisted.python import procutils # Utilities for dealing with (shell) processes
+from twisted.internet import reactor #, protocol
 
 # App imports
-from utils import log
+from utils import log, shell
 
 log = log.start('debug', 1, 0, 'devices')
 
-class Driver:
-    #, Subject):
+class Driver(shell.ShellCommander):
     """
     Base class for a driver for a type of Device. (ALSA, JACK, v4l, dv1394, etc.)
     
     Drivers must inherit from this class and implement each method.
     Singleton : There should be only one instance of each Driver child classes.
+    
+    Methods and attributes that must be overriden in child classes are:
+    - name : A class attribute string for the name of the driver (example: 'v4l2')
+    - on_attribute_change : method called when the programmer changes the value of a device attribute
+    - on_devices_polling : method called when the Driver wants to poll its devices.
+    - on_commands_results : method called once commands started from on_devices_polling or on_attribute_change are done.
+    - on_commands_error : method similar to the method above.
+    
+    The programmer can also override:
+    - prepare : method called once at startup
+    
+    Also, the few direct subclasses (such as VideoDriver) of Driver must override:
+    - kind : A class attribute string for the type of the driver (example: 'video')
     """
-    def __init__(self,name=None):
+    kind = 'default_kind'
+    name = 'default_name'
+    
+    def __init__(self, polling_interval=10.0, polling_enabled=True):
+        """
+        child classes __init__ methods must call this one if defined.
+        
+        Example : Driver.__init__(self)
+        """
         self.devices = {} # dict
-        self.name = name
+        self.selected_device = None
+        self.polling_interval = polling_interval
+        self.state_poll_enabled = polling_enabled
+        self._delayed_id = None
+        
+        # callbacks
+        self.callbacks = {
+            'on_device_removed':   None,
+            'on_device_added':     None,
+            'on_attribute_changed': None
+        }
+        
+        if self.state_poll_enabled:
+            self._poll_devices()
         
     def __str__(self):
         return self.name
         
-    def addDevice(self,device):
-        self.devices[device.getName()] = device
+    def add_device(self, device):
+        self.devices[device.get_name()] = device
+        device.set_driver(self)
     
-    def getName(self):
+    def get_kind(self):
+        """
+        Returns the driver kind 
+        Strings such as 'audio','video', 'data'
+        """
+        return self.kind
+    
+    def register_event_listener(self, event, callback):
+        """
+        Sets the callback for an event.
+        
+        events names are:
+            'on_device_removed'     arg: Device instance
+            'on_device_added'       arg: Device instance
+            'on_attribute_changed'  arg: Attribute instance
+            
+        Set it to None to turn off the callback.
+        """
+        self.callbacks[key] = callback
+        
+    def _call_event_listener(self, event, argument):
+        """
+        Calls an event listener (with one argument)
+        
+        See register_event_listener
+        Might throw KeyError if event name doesn't exist.
+        """
+        callback = self.callbacks[event]
+        if callback is not None:
+            callback(argument)
+        
+    def get_name(self):
         """
         Used by the DriverManager instances to manage Driver instances by their name.
         """
         return self.name
         
-    def prepareDriver(self):
+    def prepare(self):
         """
         Starts the use of the Driver. 
         
         Called only once on system startup.
+        Should be implemented in child classes.
         """
         pass
         
-    def listDevices(self, callback):
+    def get_devices(self):
         """
         Lists name of devices of the type that a driver supports on this machine right now.
 
@@ -81,123 +151,100 @@ class Driver:
         Data will be a 'key' => 'long name' dict.
         Can be overriden in child classes.
         """
-        callback(self.devices)
+        return self.devices
     
-    def getDevice(self,device_name=None):
+    def get_device(self, name):
         """
         Returns a device object.
         
         device_name must be a ASCII string.
-        Throws a KeyError if device doesn't exist.
+        Might throw a KeyError if device doesn't exist anymore.
         """
-        return self.devices[device_name]
+        return  self.devices[name]
         
-    def onDeviceAttributeChange(self,attribute,callback=None):
+    def on_attribute_change(self, attribute):
         """
         Called by a device when one of its attribute is changed. (by the core, usually)
         
         Can be overriden if necessary to do shell scripts or so
         """
-        pass
+        self.poll_now()
     
-    def refreshDeviceAttributes(self,device,callback=None):
+    def set_polling_interval(self, ms):
+        """
+        Interval between polling devices.
+        
+        :param ms: milliseconds.
+        """
+        self.polling_interval = ms
+        if self.state_poll_enabled:
+            self.poll_now()
+    
+    def get_polling_interval(self):
+        return self.polling_interval
+    
+    def start_polling(self):
+        self.state_poll_enabled = True
+        self.poll_now()
+        
+    def stop_polling(self):
+        self._cancel_delayed_polling()
+        self.state_poll_enabled = False
+        
+    def get_polling_is_enabled(self):
+        return self.state_poll_enabled
+    
+    def _cancel_delayed_polling(self):
+        if self._delayed_id is not None:
+            self._delayed_id.cancel()
+        
+    def poll_now(self):
         """
         Called when the programmer wants to refresh 
-        the attributes for a device.
+        the attributes for a device right now.
+        """
+        if self.state_poll_enabled:
+            self._cancel_delayed_polling()
+        self._poll_devices()
         
-        Shoud be overriden.
+    def _poll_devices(self):
+        """
+        Devices polling routine.
+        """
+        if self.state_poll_enabled:
+            self._delayed_id = reactor.callLater(self.polling_interval, self._poll_devices)
+        self.on_devices_polling()
+    
+    def on_devices_polling(self):
+        """
+        This is where the Driver actually polls all the devices
+        in order to populate their attributes.
+        
+        Must be overriden in child classes.
         """
         pass
-        
-    #def onGetAttributes(self,device):
-    #    """
-    #    Called when user queries a device's attributes
-    #    
-    #    device is a Device object.
-    #    To override.
-    #    """
-    #    pass
-        
-    def shell_command_start(self, command, callback=None):
-        """
-        Starts a shell command.
-        
-        command is a list of strings.
-        callback is a callback to call with the command and the result once done.
-        """
-        executable = procutils.which(command[0])[0] # gets the executable
-        #args = command[1:]
-        if executable:
-            try:    
-                if False: # not verbose
-                    log.info('Starting command: %s' % command[0])
-                self.process = reactor.spawnProcess(ShellProcessProtocol(self,command,callback), executable, command, os.environ, usePTY=True)
-            except:
-                log.critical('Cannot start the device polling/control command: %s' % executable)
-        else:
-            log.critical('Cannot find the shell command: %s' % command[0])
-            
-    def shell_command_result(self, command, text_results, callback=None):
-        """
-        Called from child process.
-        
-        Args are: the command that it the results if from, text data resulting from it, callback to call once done.
-        callback should be called with the same arguments. command, results, callback (but results can be something else than text)
-        """
-        raise NotImplementedError, 'This method must be implemented in child classes. (if you need it)'
-
+    
 # Drivers should extend one of these classes: 
 class VideoDriver(Driver):
-    pass
+    kind = 'video'
 class AudioDriver(Driver):
-    pass
+    kind = 'audio'
 class DataDriver(Driver):
-    pass
-
-class ShellProcessProtocol(protocol.ProcessProtocol):
-    """
-    Protocol for doing asynchronous call to a shell command.
+    kind = 'data'
     
-    Calls its caller back with the result.
-    """
-    def __init__(self, server,command,callback=None,verbose=False):
-        """
-        * server is a Driver instance.
-        * command is a list of strings.
-        * callback is a callback to call once done.
-        * verbose is a boolean
-        """
-        self.server = server # a Driver instance
-        self.command = command
-        self.verbose = verbose
-        self.callback = callback
-        
-    def connectionMade(self):
-        if self.verbose:
-            log.info('Shell command called: %s' % (str(self.command)))
-    
-    def outReceived(self, data):
-        if self.verbose:
-            log.info('Result from command %s : %s' % (self.command[0],data))
-        self.server.shell_command_result(self.command, data, self.callback)
-        
-    def processEnded(self, status):
-        if self.verbose:
-            log.info('Device poll/config command ended. Message: %s' % status)
-
-class Attribute:
+class Attribute(object):
     """
     Base class for an attribute of a device.
-    
-    TODO: Should we store the name of the attribute as well?
     """
-    def __init__(self,name,value=None,default=None):
+    kind = 'default'
+    
+    def __init__(self, name, value=None, default=None):
+        self.device = None
         self.name = name
         self.value = value
         self.default = default
-        self.device = None
         
-    def getValue(self):
+    def get_value(self):
         """
         TODO: asynchronous. 
         arg: callback, called with the whole 
@@ -205,75 +252,78 @@ class Attribute:
         """
         return self.value
 
-    def setValue(self,val,do_notify_driver=True,callback=None):
+    def set_value(self, value, do_notify_driver=True):
         """
-        Changes the value of the Attribute for device.
+        Changes the value of the Attribute for a device.
         
-        Calls onChange() once its value is changed.
+        Notifies the Driver if do_notify_driver is not False.
         """
-        self.value = val
+        self.value = value
         if do_notify_driver:
-            self._on_change(callback)
+            self._on_change()
         
-    def getDefault(self):
+    def get_default(self):
         return self.default
 
-    def setDefault(self,val):
-        self.default = val
+    def set_default(self, default_value):
+        self.default = default_value
         
-    def getType():
+    def get_kind():
         """
-        Returns the type() of self.
-        """
-        return type(self)
-    
-    def setDevice(self,dev):
-        """
-        Sets the Driver instance it is attached to.
+        Returns the kind of attribute it is of self.
         
-        In order to call its onAttributeChange method when the value changes.
+        A string such as 'int', 'boolean', 'string' or 'options'
         """
-        self.device = dev
+        return self.kind
     
-    def getDevice(self):
+    def get_device(self):
         return self.device
     
-    def _on_change(self,callback=None):
+    def set_device(self, device):
+        """
+        Called by the Device instance when the programmer adds this attribute to it.
+        """
+        self.device = device
+    
+    def _on_change(self):
         """
         Called when the value changed.
 
         Tells the Device that the value changed.
         """ 
-        if self.device is not None:
-            self.device.onAttributeChange(self,callback)
-            
-    def getName(self):
+        self.device.getDriver().on_attribute_change(self)
+        
+    def get_name(self):
         return self.name
         
 class BooleanAttribute(Attribute):
-    def __init__(self,name,value=False,default=False):
-        Attribute.__init__(self,name,value,default)
+    kind = 'boolean'
+    def __init__(self, name, value=False, default=False):
+        Attribute.__init__(self, name, value, default)
 
 class StringAttribute(Attribute):
-    def __init__(self,name,value='',default=''):
-        Attribute.__init__(self,name,value,default)
+    kind = 'string'
+    def __init__(self, name, value='', default=''):
+        Attribute.__init__(self, name, value, default)
 
 class IntAttribute(Attribute):
     """
     The range is a two-numbers tuple defining minimum and maximum possible value.
     """
-    def __init__(self,name,value=0,default=0,minVal=0,maxVal=1023):
-        Attribute.__init__(self,name,value,default)
-        self.setRange(minVal,maxVal)
+    kind = 'int'
     
-    def getRange(self):
+    def __init__(self, name, value=0, default=0, minimum=0, maximum=1023):
+        Attribute.__init__(self, name, value, default)
+        self.range = (minimum, maximum)
+    
+    def get_range(self):
         """
         Returns min val, max val
         """
         return self.range[0], self.range[1]
     
-    def setRange(self,minimum,maximum):
-        self.range = (minimum,maximum)
+    def set_range(self, minimum, maximum):
+        self.range = (minimum, maximum)
         
 class OptionsAttribute(Attribute):
     """
@@ -282,174 +332,118 @@ class OptionsAttribute(Attribute):
     
     A tuple is better since it is immutable. Indices are integers.
     """
-    #TODO:
-    # def getValue() # string (asynchronous)
-    # def setValue() # string
-    # def getDefault() # string
-    # def setDefault() # string
+    kind = 'options'
     
-    # def getValueIndex() # int  (asynchronous)
-    # def setValueindex() # int
-    # def getDefaultIndex() # int
-    # def setDefaultindex() # int
-    
-    # def getValueForIndex()
-    # def getIndexForValue()
-    
-    def __init__(self,name,value=None,default=None,options=[]):
-        Attribute.__init__(self,name,value,default)
-        self.setOptions(options)
-    
-    def getValueForIndex(self,k):
+    def __init__(self, name, value=None, default=None, options=[]):
         """
-        Returns the actual value for an index in the list.
-        """
-        #ret = None
-        #try:
-        ret = self.options[k]
-        #except IndexError:
-        #    pass
-        return ret
-    
-    def getIndexForValue(self,val):
-        """
-        Returns an index for that value, or None if not found.
-        """
-        #ret = None
-        #try:
-        ret = self.options.index(val)
-        #except ValueError:
-        #    pass
-        return ret
-    
-    #def getIndex(self):
-    #    """
-    #    Returns current value's index.
-    #    """
-    #    return self.value
+        In this case, value is stored as a string.
         
-    #def setIndex(self,i):
-    #    """
-    #    Sets current value's index.
-    #    """
-    #    self.value = i
-    #    self.onChange()
+        Options is a list of strings. Indices are integers, of course.
+        """
+        Attribute.__init__(self, name, value, default)
+        self.options = options
     
-    
-    
-    #def getValue(self):
-    #    """
-    #    Overrides the parent's getValue method.
-    #    """
-    #    return self.value #self.getValueByIndex(self.value)
-        
-    #def setValue(self,val):
-    #    """
-    #    Overrides the parent's setValue method.
-    #    """
-    #    self.value = self.getIndexForValue(val)
-    #    self.onChange()
-    
-    def getOptions(self):
+    def get_options(self):
         return self.options
     
-    def setOptions(self,opts_list):
+    def set_options(self, options_list):
         """
         Argument must be a list or tuple.
         """
-        self.options = opts_list
-
-class Device:
+        self.options = options_list
+        # TODO : check if value is in new options list.
+        # self.set_value(self.value) 
+    
+    def index_of(self, value):
+        """
+        Returns an index for that value.
+        Useful for: 
+        {{{
+        for i in  attr.get_options():
+            if i == attr.index_of(attr.get_value()):
+                ...
+        }}}
+        
+        Throws ValueError if not in options list.
+        """
+        return self.options.index(value)
+    
+    def set_value(self, value):
+        """
+        Throws KeyError if not in options list.
+        """
+        if value not in self.options:
+            raise KeyError, 'Option %s is not in list' % (value)
+        self.value = value
+    
+class Device(object):
     """
     Class for any Device.
 
     Should not be subclassed, but rather, each object has different attributes using the methods
     defined here to add and set attributes.
     """
-    def __init__(self,name=None):
+    def __init__(self, name):
         """
         Argument: The Driver that is used to control this device.
         """
         self.driver = None
-        self.attributes = dict()
         self.name = name
-    
-    def getName(self):
+        self.attributes = dict()
+        self.state_in_use = False
+        
+    def get_name(self):
         return self.name
         
-    def setDriver(self,driver):
+    def set_driver(self, driver):
         self.driver = driver
     
-    def getAttribute(self,k):
+    def get_attribute(self, name):
         """
         Gets one Attribute object.
         
-        Returns None if attribute doesn't exist.
+        Throws a KeyError if Device doesn't have that attribute.
         """
-        ret = None
-        try:
-            ret = self.attributes[k]
-        except KeyError:
-            pass
-            raise KeyError, 'That Device doesn\'t have that attribute !'
-        return ret
-    
-    #def getAttributeNames(self):
-    #    """
-    #    Gets list of all attributes names
-    #    """
-    #    return self.attributes.keys()
-    
-    def getAttributes(self):
+        return self.attributes[name]
+        
+    def get_attributes(self):
         """
-        Returns a dict in the form name = Attribute
+        Returns a dict in the form : string name => Attribute
         """
-        #if self.driver is not None:
-        #    self.driver.onGetAttributes(self)
         return self.attributes
     
-    def addAttribute(self,attr):
+    def add_attribute(self, attribute):
         """
         Adds an attribute to a device.
-        TODO: Also registers that attribute to the driver.
+        
+        Calls Attribute.set_device()
         """
-        k = attr.getName()
-        self.attributes[k] = attr
-        attr.setDevice(self)
+        self.attributes[attribute.get_name()] = attribute
+        attribute.set_device(self)
     
-    def printAllAttributes(self):
-        """
-        for debugging purposes
-        """
+    def __str__(self):
+        s = ""
+        s += "name:"+self.name+"\n"
         if len(self.attributes) == 0:
-            print 'no attributes to print'
+            s += 'no attributes'
         else:
             for k in self.attributes:
-                print '%s:%s' % (k,self.attributes[k].getValue())
-        #for k,attr in self.attributes.items():
-        #    print "%40s = %30s" % (k, str(attr.getValue())) #TODO: if type is option, print actual value.
-
-    def getDriver(self):
+                s += '%s:%s' % (k, self.attributes[k].get_value())
+        return s
+    
+    def set_in_use(self, state=True):
+        self.state_in_use = state
+    
+    def get_in_use(self):
+        return self.state_in_use
+    
+    def get_driver(self):
         """
         Returns its Driver object.
         """
         return self.driver
 
-    def onAttributeChange(self,attr,callback=None):
-        """
-        Called when an attribute has change. 
-        
-        Calls the Driver notifyChange method.
-        """
-        if self.driver is not None:
-            self.driver.onDeviceAttributeChange(self,attr,callback)
-    
-    def refreshAttributes(self,callback=None):
-        if self.driver is not None:
-            self.driver.refreshDeviceAttributes(self,callback)
-    
-
-class DriversManager:
+class DriversManager(object):
     """
     Manages all drivers of its kind.
     
@@ -458,30 +452,27 @@ class DriversManager:
     def __init__(self):
         self.drivers = dict()
     
-    def addDriver(self,driver):
+    def add_driver(self, driver):
         """
         The key will be the driver's name
         """
-        self.drivers[driver.getName()] = driver
+        self.drivers[driver.get_name()] = driver
 
-    def getDrivers(self):
+    def get_drivers(self):
         """
         Returns dict of name -> Driver objects
         """
-        return self.drivers # .values()
+        return self.drivers
     
-    def getDriver(self,key):
+    def get_driver(self, name):
         """
-        Might throw KetError
+        Might throw KeyError
         """
-        return self.drivers[key]
+        return self.drivers[name]
 
 class VideoDriversManager(DriversManager):
     pass
 class AudioDriversManager(DriversManager):
     pass
 class DataDriversManager(DriversManager):
-    pass
-
-class CommandNotFoundException(Exception):
     pass

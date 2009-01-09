@@ -20,13 +20,13 @@ from v4l import Video4LinuxDriver
 # drivers managers
 
 managers = {}
-managers['video'] = devices.VideoDriversManager()
-managers['audio'] = devices.AudioDriversManager()
-managers['data']  = devices.DataDriversManager()
+managers['video'] = VideoDriversManager()
+managers['audio'] = AudioDriversManager()
+managers['data']  = DataDriversManager()
 
 # drivers
 # TODO : load only if module is there and if computer (OS) supports it.
-managers['video'].addDriver(Video4LinuxDriver('v4l'))
+#managers['video'].add_driver(Video4LinuxDriver())
 
 # DEBUG INFO
 #print '\nVIDEO DRIVERS:'
