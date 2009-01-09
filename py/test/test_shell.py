@@ -32,9 +32,11 @@ del shell.log
 shell.log = utils.log.start('error', 1, 0, 'shell')
 
 class TestShellCommander(shell.ShellCommander):
-    def on_commands_results(self, results, commands, callback=None):                
+    def __init__(self, unit_test):
+        self.test = unit_test
+        
+    def on_commands_results(self, results, commands, extra_arg=None):
         # overriden
-        test = callback
         for i in range(len(results)):
             result = results[i]
             success, results_infos = result
@@ -47,54 +49,62 @@ class TestShellCommander(shell.ShellCommander):
                 if success:
                     #print stdout
                     if command[0] == 'echo':
-                        if stdout != 'toto\n':
-                            test.fail("result not matching what is expected. Should be toto but is %s" % (stdout))
+                        expected = extra_arg['echo']
+                        if stdout.find(expected) == -1:
+                            self.test.fail("echo result not matching what is expected. Should be %s but is %s" % (expected, stdout))
                     elif command[0] == 'ls':
-                        fname = 'test.log'    
-                        if stdout.find('test.log') == -1:
-                            test.fail("result not matching what is expected. Should contain file %s name but is: '%s'" % (fname,stdout))
+                        expected = extra_arg['echo'] 
+                        if stdout.find(expected) == -1:
+                            self.test.fail("result not matching what is expected. Should contain file %s name but is: '%s'" % (expected, stdout))
                     elif command[0] == 'aconnect':
-                        pass    
-                        #print 'aconnect error : ',stderr
-                        #test.fail('aconnect succeded')
+                        self.test.fail('aconnect %s should have generated a failure.' % (command[1]))
                 else:
                     test.fail('command output is not successful')
-    def on_commands_error(self,results,commands,callback=None):
+                    
+    def on_commands_error(self, command_failure, commands, extra_arg=None):
         # overriden
-        test = callback
-        test.fail('this never seems to be called')
-        print "SHELL ERROR:"
-        print results
-        print commands
-        print callback
+        if extra_arg != 'should generate an error' and not isinstance(command_failure.value,unittest.FailTest):
+            #print "@@@@@@@@@"
+            #print ">>>> ERROR:"
+            pprint.pprint({'failure':command_failure, 'commands':commands, 'extra_arg':extra_arg})
+            #print "@@@@@@@@@"
+            self.test.fail('on_commands_error() with error: %s' % (command_failure.value.message))
         
 class Test_0_Shell(unittest.TestCase):
     """
     tests for utils.shell
     """
     def test_1_find_commands(self):
-        x = TestShellCommander()
+        x = TestShellCommander(self)
         aconnect = x.find_command('aconnect')
         try:
             x.find_command('spam_egg_bacon_ham')
-            self.fail('Found successfully an unexisting command.')
+            self.fail('Did not realize that we are trying to find an unexisting command.')
         except:
             pass
     
     def test_2_ls_and_echo(self):
-        x = TestShellCommander()
+        x = TestShellCommander(self)
         commands = [
-                ['echo','toto'],
-                ['ls','-a'],
-                ['aconnect', 'asd'] # should generate an error
+                ['echo','spam'],
+                ['ls','-l']
                 # TODO: create error returned
                 # TODO: ['not_existing'] not found command triggers a very bad error so far
             ]
-        x.commands_start(commands, self) # HACK : for the test, we pass the unittest instance instead of a callback
+        extra_arg = {
+            'echo':'spam', 
+            'ls':'test.log'
+            }
+        x.commands_start(commands, extra_arg)
         time.sleep(0.1)
     
     def test_3_handle_errors(self):
-        #TODO: do we handle errors properly? (if a process returns an error code. Not sure.
-        self.fail('we should handle processes errors properly')
-        # TODO: example : ['aconnect','asd'] should generate an error
-
+        x = TestShellCommander(self)
+        
+        commands = ['aconnect', 'egg']
+        extra_arg = 'should generate an error'
+        try:
+            x.commands_start(commands, extra_arg)
+        except shell.CommandNotFoundException:
+            pass
+        time.sleep(0.1)
