@@ -21,7 +21,7 @@
 """
 Manages v4l2. 
 
-TODO: use v4l2-ctl from package ivtv-utils
+Uses v4l2-ctl from Debian/Ubuntu package ivtv-utils
 """
 # ----------------------------------------------------------
 # System imports
@@ -31,6 +31,7 @@ import pprint
 # Twisted imports
 from twisted.internet import reactor, protocol
 from twisted.python import procutils
+
 # App imports
 from utils import log
 import devices
@@ -42,42 +43,38 @@ class Video4LinuxDriver(devices.VideoDriver):
     """
     Video4linux 2 Driver.
     """
-    def __init__(self, name):
-        devices.Driver.__init__(self, name)
+    name = 'v4l2'
+    
+    def __init__(self, polling_interval=10.0):
+        devices.Driver.__init__(self, polling_interval)
         self.selected_device = None # there can be only one device used
         
-        self._populate_info = {} # dict 
-        # where keys are callbacks pointers
-        # and values are a dict 
-        #   where keys are str(commands list) 
-        #   and values with boolean
-        #   saying if it has returned or not.
-        # (ouch!)
-        
-    def prepareDriver(self, callback=None):
+    def prepare(self):
         # inherited
         self._populateDevices()
-        # we shoult wait a bit here...
+        # we should wait a bit here...
         try:
             tmp = self.devices['/dev/video0']
             self.selected_device = '/dev/video0'
         except KeyError:
             pass
-        
         try:
-            executable = procutils.which('v4l2-ctl')[0]
-        except IndexError:
-            raise devices.CommandNotFoundException, "v4l2-ctl command not found. Please sudo apt-get install ivtv-utils"
+            tmp = self.find_command('v4l2-ctl') # will fail if not found
+        except:
+            raise Exception, "v4l2-ctl command not found. Please sudo apt-get install ivtv-utils"
+    
+    
         
-    def _populateDevices(self,callback=None):
+    def on_devices_polling(self):
         """
         Get all infos for all devices
         """
-        self._populate_info[callback] = {}
+        # backup
+        old_devices = self.devices
         
-        all = glob.glob('/dev/video*')
-        self.devices = dict()
-        if len(all) == 0:
+        device_names = glob.glob('/dev/video*')
+        self.devices = {}
+        if len(device_names) == 0:
             if callback is not None:
                 callback(self.devices)
         else:
@@ -94,6 +91,8 @@ class Video4LinuxDriver(devices.VideoDriver):
         #cmd = ['v4l2-ctl','--get-fmt-video']
         #cmd = ['v4l2-ctl','--get-input']
         #cmd = ['v4l2-ctl','--list-ctrls'] (brightness and contrast)
+        
+        self.compare_devices()
     
     def _onPopulateDevicesDone(self,callback=None):
         # TODO
@@ -109,40 +108,52 @@ class Video4LinuxDriver(devices.VideoDriver):
         name = attr.getName()
         command = None
         if name == 'video standard':
+            #TODO
             #--set-standard=<num
             #pal-X (X = B/G/H/N/Nc/I/D/K/M/60) or just 'pal'
             #ntsc-X (X = M/J/K) or just 'ntsc'
             #secam-X (X = B/G/H/D/K/L/Lc) or just 'secam'
             standard = attr.getValue() # TODO: get actual value
             command = ['v4l2-ctl','--set-standard='+standard]
+            
         elif name == 'width' or name == 'height':
             # TODO
             # --set-fmt-video=width=<w>,height=<h>
             pass
         elif name == 'input':
+            # TODO
             #--set-input=0
             pass
         if command is not None:
+            #TODO
             pass
     
-    def refreshDeviceAttributes(self,device,callback=None):
-        self._populateDevices(callback)
-        
     def setSelectedDevice(self,device_name):
         """
         Selects the current device name
         """
         self.selected_device = device_name
+        #TODO: call shell command
     
-    def getSelectedDevice(self):
-        return self.selected_device
-    
-    def listDevices(self,callback):
-        # inherited
-        self._populateDevices(callback)
+    def on_commands_results(self, results, commands, extra_arg=None): 
+        for i in range(len(results)):
+            result = results[i]
+            success, results_infos = result
+            if isinstance(results_infos,failure.Failure):
+                print "failure ::: ",results_infos.getErrorMessage()  # if there is an error, the programmer should fix it.
+            else:
+                command = commands[i]
+                stdout, stderr, signal_or_code = results_infos
+                if success:
+                    self._handle_shell_infos_results(command,stdout,callback)
+                else:
+                    print "failure for command %s" % (command[0])
+                    print "stderr: %s" % (stderr)
+                    print "signal is ", signal_or_code
+        if callback is not None:
+            callback(self.getSelectedDevice()) # arg: this driver.
         
-    def shell_command_result(self,command,results,callback=None):
-        # inherited
+    def _handle_shell_infos_results(self,command,results,callback=None):
         if command[0] == 'v4l2-ctl':
             if command[1] == '--all': # reading all attributes
                 # method called was listDevices
@@ -171,15 +182,10 @@ class Video4LinuxDriver(devices.VideoDriver):
                         attr = devices.OptionsAttribute(key,values[key],0,['ntsc', 'PAL']) 
                         #TODO : attr.setValue(attr.getIndexForValue( values[key] ),False)
                         device.addAttribute(attr)
-                
-                #print device
-                #device.printAllAttributes()
-                if callback is not None:
-                    callback(self.devices)
-                
+        
         log.info('v4l driver: command %s returned.',str(command))
         #print results
-
+    
 def _parse_v4l2_ctl_all(lines):
     """
     Parses the output of the "v4l2-ctl --all" shell command

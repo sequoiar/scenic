@@ -66,7 +66,7 @@ class TestShellCommander(shell.ShellCommander):
         if extra_arg != 'should generate an error' and not isinstance(command_failure.value,unittest.FailTest):
             #print "@@@@@@@@@"
             #print ">>>> ERROR:"
-            pprint.pprint({'failure':command_failure, 'commands':commands, 'extra_arg':extra_arg})
+            #pprint.pprint({'failure':command_failure, 'commands':commands, 'extra_arg':extra_arg})
             #print "@@@@@@@@@"
             self.test.fail('on_commands_error() with error: %s' % (command_failure.value.message))
         

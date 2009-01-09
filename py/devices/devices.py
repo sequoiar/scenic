@@ -104,6 +104,48 @@ class Driver(shell.ShellCommander):
         """
         return self.kind
     
+    def compare_devices(self, old_devices):
+        """
+        Compares former dict of devices with the new one
+        and notifies the listeners if changes occurred.
+        
+        old_devices is the former dict of self.devices
+        """
+        # check for deleted
+        deleted = {}
+        for name in old_devices:
+            if name not in self.devices():
+                deleted[name] = old[name]
+                
+        # check for added devices
+        added = {}
+        for name in self.devices:
+            if name not in old_devices:
+                added[name] = self.devices[name]
+        
+        # check for attribute changes
+        attr_changed = []
+        for dev_name in self.devices:
+            # if devices is in both new and former dict:
+            if dev_name not in added and dev_name not in deleted:
+                dev = self.devices[dev_name]
+                for attr_name in dev.get_attributes():
+                    attr = dev.get_attribute(attr_name)
+                    old_attr = old_devices[attr_name]
+                    if attr.get_value() != old_attr.get_value():
+                        attr_changed.append(attr)
+        
+        # calls:
+        #    'on_devices_removed'     arg: list of Device instances
+        #    'on_devices_added'       arg: list of Device instances
+        #    'on_attributes_changed'  arg: list of Attribute instances
+        if len(added) > 0:
+            self._call_event_listener('on_devices_added', added.values())
+        if len(demoved) > 0:
+            self._call_event_listener('on_devices_removed', removed.values())
+        if len(attr_changed) > 0:
+            self._call_event_listener('on_attributes_changed', attr_changed)
+    
     def register_event_listener(self, event, callback):
         """
         Sets the callback for an event.
