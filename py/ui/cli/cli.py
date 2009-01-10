@@ -77,7 +77,7 @@ class TelnetServer(recvline.HistoricRecvLine):
 
     def next_line(self):
         """
-        This method overwrite the Twisted one because there'S was a bug
+        This method overwrite the Twisted one because there's was a bug
         (Gnome-terminal was not scrolling at the bottom of the page).
         Write a '\n' instead of an ESC character.
         """
@@ -95,7 +95,7 @@ class TelnetServer(recvline.HistoricRecvLine):
 
     def connectionMade(self):
         self.addr = self.terminal.transport.getPeer()
-        # overwrite terminal.nextLine method of twisted with our self to fix a bug 
+        # overwrite twisted terminal.nextLine method with our own to fix a bug 
         self.terminal.nextLine = self.next_line
         recvline.HistoricRecvLine.connectionMade(self)
         try:
@@ -128,6 +128,7 @@ class TelnetServer(recvline.HistoricRecvLine):
                 self.historyLines.remove(line)
             self.historyLines.append(line)
             try:
+                #TODO: create a general manager for managing the verification/creation of the prefs directory
                 self.history_file = open('%s/.sropulpof/.cli_history_%s-%s' % 
                             (os.environ['HOME'],
                              self.addr.host,
@@ -148,16 +149,19 @@ class TelnetServer(recvline.HistoricRecvLine):
     def completion(self):
         # rudimentary command completion
         begin = "".join(self.lineBuffer)
-        lenght = len(begin)
+        length = len(begin)
         words = self.shortcuts.values()
-        self.matches = [word for word in words if word[:lenght] == begin]
+        self.matches = [word for word in words if word[:length] == begin]
         if self.matches:
             if len(self.matches) == 1:
-                end = self.matches[0][lenght:]
+                end = self.matches[0][length:]
                 self.lineBuffer.extend(list(end))
                 self.lineBufferIndex = len(self.lineBuffer)
                 self.terminal.write(end)
                 self.matches = None
+            else:
+                # TODO: implement when there's more then one match
+                pass
         else:
             # ring the bell
             self.terminal.write('\x07')
@@ -207,6 +211,8 @@ class CliController(TelnetServer):
                           'v': 'video',
                           's': 'streams',
                           'j': 'join',
+                          'e': 'exit',
+                          'q': 'quit',
                           'h': 'help'
                           }
 

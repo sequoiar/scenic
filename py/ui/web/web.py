@@ -86,11 +86,10 @@ class AddressBook(LiveElement):
 
     def _get_contacts(self, origin, data):
         adb = []
-        contacts = data.items()
+        contacts = data[0].items()
         contacts.sort()
         for name, contact in contacts:
-            if name != '_selected':
-                adb.append((contact.name, to_utf(contact.address), contact.port))
+            adb.append((contact.name, to_utf(contact.address), contact.port))
         log.info('receive update: %r' % self)
         print adb
         self.callRemote('updateList', adb)
