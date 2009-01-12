@@ -27,6 +27,7 @@ TODO: Improve errors, exceptions and failures handling.
 import os
 import pprint
 import sys
+import traceback
 
 from twisted.internet import reactor, defer # protocol,
 from twisted.python import procutils, failure
@@ -112,7 +113,8 @@ class ShellCommander(object):
     def on_commands_error(self, command_failure, commands, extra_arg=None):
         print "@@@@@@@@@"
         print ">>>> ERROR:"
-        pprint.pprint({'failure':command_failure, 'commands':commands, 'extra_arg':extra_arg})
+        pprint.pprint({'failure':command_failure, 'exception':sys.exc_info(), 'commands':commands, 'extra_arg':extra_arg})
+        traceback.print_tb(sys.exc_info()[2])
         print '>>>> Exception message : %s' % (command_failure.value.message)
         print "@@@@@@@@@"
         #raise NotImplementedError, 'This method must be implemented in child classes. (if you need it)'

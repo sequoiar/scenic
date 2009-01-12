@@ -48,7 +48,7 @@ def _parse_v4l2_ctl_all(lines):
     category = None
     sub_category = None
     pixel_format_is_done = False
-    
+    #print lines
     for line in lines:
         is_value = False
         if line.startswith('\t\t'):
@@ -88,6 +88,7 @@ def _parse_v4l2_ctl_all(lines):
                 pass
         elif line.find("Video Standard") == 0:
             category  = "Video Standard"
+    #pprint.pprint(results)
     return results
 # ---------------------------------------------------------
 
@@ -168,6 +169,7 @@ class Video4LinuxDriver(devices.VideoDriver):
         
     
     def _handle_shell_infos_results(self, command, results, callback=None):
+    	#print 'v4l','_handle_shell_infos_results'
         if command[0] == 'v4l2-ctl':
             if command[1] == '--all': # reading all attributes
                 try:
@@ -175,18 +177,19 @@ class Video4LinuxDriver(devices.VideoDriver):
                 except KeyError:
                     log.info('no device /dev/video0')
                 else:
-                    splitted = results.split('\r\n')
+               	    splitted = results.splitlines()
                     dic = _parse_v4l2_ctl_all(splitted)
                     #print "\nSHELL RESULT:"
                     #pprint.pprint(splitted)
                     #pprint.pprint(values)
+                    #print dic
                     for key in dic:
                         if key in ['driver','card','pixel format']:
                             device.add_attribute(devices.StringAttribute(key, dic[key], 'no default'))
                         elif key == 'width':
                             device.add_attribute(devices.IntAttribute(key, int(dic[key]), 640, 320, 9999)) # TODO better min/max
                         elif key == 'height':
-                            device.addAttribute(devices.IntAttribute(key, int(dic[key]), 480, 240, 9999)) # TODO better min/max 
+                            device.add_attribute(devices.IntAttribute(key, int(dic[key]), 480, 240, 9999)) # TODO better min/max 
                         elif key == 'input':
                             # Composite0, Composite1,  Composite2, S-Video
                             # TODO: v4l2-ctl --list-inputs

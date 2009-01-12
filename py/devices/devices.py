@@ -131,7 +131,7 @@ class Driver(shell.ShellCommander):
         # check for deleted
         removed = {}
         for name in old_devices:
-            if name not in self.devices():
+            if name not in self.devices:
                 removed[name] = old[name]
                 
         # check for added devices
@@ -144,13 +144,17 @@ class Driver(shell.ShellCommander):
         attr_changed = {}
         for dev_name in self.devices:
             # if devices is in both new and former dict:
-            if dev_name not in added and dev_name not in deleted:
+            if dev_name not in added and dev_name not in removed:
                 dev = self.devices[dev_name]
                 for attr_name in dev.get_attributes():
                     attr = dev.get_attribute(attr_name)
-                    old_attr = old_devices[attr_name]
-                    if attr.get_value() != old_attr.get_value():
-                        attr_changed[attr.get_name()] = attr
+                    try:
+                        old_attr = old_devices[attr_name]
+                    except KeyError:
+                        pass
+                    else:
+                        if attr.get_value() != old_attr.get_value():
+                            attr_changed[attr.get_name()] = attr
         # let us call the callbacks
         if len(added) > 0:
             self._call_event_listener('on_devices_added', added) #dict
@@ -160,10 +164,11 @@ class Driver(shell.ShellCommander):
             self._call_event_listener('on_attributes_changed', attr_changed) # dict
         # print "calling on_devices_list"
         #print "calling", self._call_event_listener, 'on_devices_list'
+        #print "DONE"
         self._call_event_listener('on_devices_list', self.devices) # dict
         #TODO: maybe not call it every time.
         
-    def register_event_listener(self, event_name, callback):
+    def register(self, event_name, callback):
         """
         Sets the callback for an event.
         
@@ -187,8 +192,9 @@ class Driver(shell.ShellCommander):
         callback = self.callbacks[event_name]
         if callback is not None:
             callback(argument)
+            #print "calling", callback
         else:
-            print "No callback for %s event" % (event_name)
+            log.error("No callback for %s event" % (event_name))
         
     def get_name(self):
         """

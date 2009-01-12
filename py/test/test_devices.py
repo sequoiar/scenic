@@ -250,7 +250,32 @@ class DummyAPI(object):
                 #print "List %s : device %s" % (driver.get_name(), device.get_name())
         self.has_been_called = True
         #print "SET has_been_called to ", self.has_been_called
-    
+    	#print "\nOK DONE "
+    def on_devices_list_check(self, devices):
+    	#print "\nv4l2 devices and their attributes : "
+    	for device in devices.values():
+    		driver_name = device.get_driver().get_name()
+    		device_name = device.get_name()
+    		#print ">> device %s:%s" % (driver_name, device_name) 
+    		for attr in device.get_attributes().values():
+    			name = attr.get_name()
+    			value = attr.get_value()
+    			default = attr.get_default()
+    			#print "%s:%s:%s = %s (%s)" % (driver_name, device_name, name, value, default)
+    			if name in ['width','height']:
+    			    if not isinstance(value, int):
+    			        print "Attribute %s should be %s but is %s" % (name, 'int', value)
+                if name in ['driver', 'norm', 'driver']:
+                    if not isinstance(value, str):
+    			        print "Attribute %s should be %s but is %s" % (name, 'str', value)
+        #-------------------------------------
+        #v4l2:/dev/video0:width = 320 (640)
+        #v4l2:/dev/video0:driver = bttv (no default)
+        #v4l2:/dev/video0:pixel format = YU12 (no default)
+        #v4l2:/dev/video0:norm = NTSC-M/M-KR (NTSC)
+        #v4l2:/dev/video0:height = 240 (480)
+    	#print "\nOK DONE "
+    	
 class Test_4_v4l_Driver(unittest.TestCase):
     """
     test Video4LinuxDriver
@@ -268,13 +293,28 @@ class Test_4_v4l_Driver(unittest.TestCase):
         driver = devices.get_manager('video').get_driver('v4l2')
         # register the callbacks
         api = DummyAPI(self)
-        driver.register_event_listener('on_devices_list', api.on_devices_list)
-        driver.register_event_listener('on_devices_removed', api.on_devices_removed)
-        driver.register_event_listener('on_attributes_changed', api.on_attributes_changed)
-        driver.register_event_listener('on_devices_added', api.on_devices_added)
+        driver.register('on_devices_list', api.on_devices_list)
+        driver.register('on_devices_removed', api.on_devices_removed)
+        driver.register('on_attributes_changed', api.on_attributes_changed)
+        driver.register('on_devices_added', api.on_devices_added)
         
         driver.prepare() # which calls Driver._poll_devices()
         time.sleep(0.1)
         driver.stop_polling()
+        time.sleep(0.2)
         
-    
+    def test_3_devices_attributes(self):
+        driver = devices.get_manager('video').get_driver('v4l2')
+        # register the callbacks
+        api = DummyAPI(self)
+        driver.register('on_devices_list', api.on_devices_list_check)
+        driver.register('on_devices_removed', api.on_devices_removed)
+        driver.register('on_attributes_changed', api.on_attributes_changed)
+        driver.register('on_devices_added', api.on_devices_added)
+        #print "callbacks:"
+        #pprint.pprint(driver.callbacks)
+        
+        driver.poll_now() # which calls Driver._poll_devices()
+        time.sleep(0.4)
+        driver.stop_polling()
+        
