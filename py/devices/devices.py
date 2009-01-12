@@ -65,7 +65,6 @@ class Driver(shell.ShellCommander):
     Also, the few direct subclasses (such as VideoDriver) of Driver must override:
     - kind : A class attribute string for the type of the driver (example: 'video')
     """
-    kind = 'default_kind'
     name = 'default_name'
     
     def __init__(self, polling_interval=10.0, polling_enabled=True):
@@ -75,26 +74,35 @@ class Driver(shell.ShellCommander):
         Example : Driver.__init__(self)
         """
         self.devices = {} # dict
-        self.selected_device = None
+        self.new_devices = {} # used to populate the list of devices.
         self.polling_interval = polling_interval
         self.state_poll_enabled = polling_enabled
         self._delayed_id = None
+        self.kind = 'default_kind'
         
-        # callbacks
         self.callbacks = {
-            'on_device_removed':   None,
-            'on_device_added':     None,
-            'on_attribute_changed': None
+            'on_devices_removed' : None,
+            'on_devices_added' : None,
+            'on_attributes_changed' : None,
+            'on_devices_list' : None
         }
         
-        if self.state_poll_enabled:
-            self._poll_devices()
-        
+    def __del__(self):
+        self.stop_polling()
+    
     def __str__(self):
         return self.name
         
-    def add_device(self, device):
-        self.devices[device.get_name()] = device
+    def add_device(self, device, in_new_devices=False):
+        """
+        Add a Device to this Driver.
+        Also sets the Device Driver to this one.
+        """
+        if in_new_devices:
+            devices = self.new_devices
+        else:
+            devices = self.devices
+        devices[device.get_name()] = device
         device.set_driver(self)
     
     def get_kind(self):
@@ -103,19 +111,28 @@ class Driver(shell.ShellCommander):
         Strings such as 'audio','video', 'data'
         """
         return self.kind
-    
-    def compare_devices(self, old_devices):
+        
+    def _on_done_devices_polling(self):
         """
         Compares former dict of devices with the new one
-        and notifies the listeners if changes occurred.
+        and notifies the listener if changes occurred.
+        Also sends it the whole list of devices for this driver.
         
-        old_devices is the former dict of self.devices
+        old_devices is the former dict of self.devices. 
+        
+        calls the API/Core callbacks:
+           'on_devices_removed'     arg: dict of Device instances
+           'on_devices_added'       arg: dict of Device instances
+           'on_attributes_changed'  arg: dict of Attribute instances
+           'on_devices_list'        arg: dict of Device instances
         """
+        old_devices = self.devices
+        self.devices = self.new_devices
         # check for deleted
-        deleted = {}
+        removed = {}
         for name in old_devices:
             if name not in self.devices():
-                deleted[name] = old[name]
+                removed[name] = old[name]
                 
         # check for added devices
         added = {}
@@ -124,7 +141,7 @@ class Driver(shell.ShellCommander):
                 added[name] = self.devices[name]
         
         # check for attribute changes
-        attr_changed = []
+        attr_changed = {}
         for dev_name in self.devices:
             # if devices is in both new and former dict:
             if dev_name not in added and dev_name not in deleted:
@@ -133,42 +150,45 @@ class Driver(shell.ShellCommander):
                     attr = dev.get_attribute(attr_name)
                     old_attr = old_devices[attr_name]
                     if attr.get_value() != old_attr.get_value():
-                        attr_changed.append(attr)
-        
-        # calls:
-        #    'on_devices_removed'     arg: list of Device instances
-        #    'on_devices_added'       arg: list of Device instances
-        #    'on_attributes_changed'  arg: list of Attribute instances
+                        attr_changed[attr.get_name()] = attr
+        # let us call the callbacks
         if len(added) > 0:
-            self._call_event_listener('on_devices_added', added.values())
-        if len(demoved) > 0:
-            self._call_event_listener('on_devices_removed', removed.values())
+            self._call_event_listener('on_devices_added', added) #dict
+        if len(removed) > 0:
+            self._call_event_listener('on_devices_removed', removed) # dict
         if len(attr_changed) > 0:
-            self._call_event_listener('on_attributes_changed', attr_changed)
-    
-    def register_event_listener(self, event, callback):
+            self._call_event_listener('on_attributes_changed', attr_changed) # dict
+        # print "calling on_devices_list"
+        #print "calling", self._call_event_listener, 'on_devices_list'
+        self._call_event_listener('on_devices_list', self.devices) # dict
+        #TODO: maybe not call it every time.
+        
+    def register_event_listener(self, event_name, callback):
         """
         Sets the callback for an event.
         
         events names are:
-            'on_device_removed'     arg: Device instance
-            'on_device_added'       arg: Device instance
-            'on_attribute_changed'  arg: Attribute instance
+            'on_devices_removed'     arg: list of Device instances
+            'on_devices_added'       arg: list of Device instances
+            'on_attributes_changed'  arg: list of Attribute instances
+            'on_devices_list'        arg: list of Device instances
             
         Set it to None to turn off the callback.
         """
-        self.callbacks[key] = callback
+        self.callbacks[event_name] = callback
         
-    def _call_event_listener(self, event, argument):
+    def _call_event_listener(self, event_name, argument):
         """
         Calls an event listener (with one argument)
         
         See register_event_listener
         Might throw KeyError if event name doesn't exist.
         """
-        callback = self.callbacks[event]
+        callback = self.callbacks[event_name]
         if callback is not None:
             callback(argument)
+        else:
+            print "No callback for %s event" % (event_name)
         
     def get_name(self):
         """
@@ -181,9 +201,13 @@ class Driver(shell.ShellCommander):
         Starts the use of the Driver. 
         
         Called only once on system startup.
-        Should be implemented in child classes.
+        Should be implemented in child classes. The prepare mothod in 
+        child classes should then call this one. Like this:
+        Device.prepare(self)
         """
-        pass
+        if self.state_poll_enabled:
+            self._poll_devices()
+    
         
     def get_devices(self):
         """
@@ -237,16 +261,22 @@ class Driver(shell.ShellCommander):
         return self.state_poll_enabled
     
     def _cancel_delayed_polling(self):
-        if self._delayed_id is not None:
-            self._delayed_id.cancel()
-        
+        if self._delayed_id is not None: 
+            # TODO : seems to cause an AttributeError
+            # we should fix this instead of silently catching it
+            try:
+                self._delayed_id.cancel()
+            except AttributeError:
+                pass
+            self._delayed_id = None
+            
     def poll_now(self):
         """
         Called when the programmer wants to refresh 
         the attributes for a device right now.
+        
+        Will call all the callbacks with the correct values.
         """
-        if self.state_poll_enabled:
-            self._cancel_delayed_polling()
         self._poll_devices()
         
     def _poll_devices(self):
@@ -254,25 +284,31 @@ class Driver(shell.ShellCommander):
         Devices polling routine.
         """
         if self.state_poll_enabled:
+            self._cancel_delayed_polling()
             self._delayed_id = reactor.callLater(self.polling_interval, self._poll_devices)
-        self.on_devices_polling()
+        self.new_devices = {}
+        self._on_devices_polling()
     
-    def on_devices_polling(self):
+    def _on_devices_polling(self):
         """
-        This is where the Driver actually polls all the devices
-        in order to populate their attributes.
+        This is where the Driver actually calls many commands 
+        in order to populate its Device list and their attributes.
         
         Must be overriden in child classes.
+        Should call self._on_done_devices_polling(old_devices) with the 
+        former list of devices the new dict is populated.
         """
         pass
+        # default behaviour :
+        self._on_done_devices_polling({})
     
 # Drivers should extend one of these classes: 
 class VideoDriver(Driver):
-    kind = 'video'
+    pass
 class AudioDriver(Driver):
-    kind = 'audio'
+    pass
 class DataDriver(Driver):
-    kind = 'data'
+    pass
     
 class Attribute(object):
     """
@@ -436,9 +472,6 @@ class Device(object):
         
     def get_name(self):
         return self.name
-        
-    def set_driver(self, driver):
-        self.driver = driver
     
     def get_attribute(self, name):
         """
@@ -484,13 +517,19 @@ class Device(object):
         Returns its Driver object.
         """
         return self.driver
-
+    def set_driver(self, driver):
+        """
+        Sets its Driver object.
+        """
+        self.driver = driver
 class DriversManager(object):
     """
     Manages all drivers of its kind.
     
     There should be only one instance of this class
     """
+    kind = 'default_kind'
+    
     def __init__(self):
         self.drivers = dict()
     
@@ -498,6 +537,7 @@ class DriversManager(object):
         """
         The key will be the driver's name
         """
+        driver.kind = self.kind
         self.drivers[driver.get_name()] = driver
 
     def get_drivers(self):
@@ -513,8 +553,25 @@ class DriversManager(object):
         return self.drivers[name]
 
 class VideoDriversManager(DriversManager):
-    pass
+    kind = 'video'
 class AudioDriversManager(DriversManager):
-    pass
+    kind = 'audio'
 class DataDriversManager(DriversManager):
-    pass
+    kind = 'data'
+# drivers managers
+managers = {}
+managers['video'] = VideoDriversManager()
+managers['audio'] = AudioDriversManager()
+managers['data']  = DataDriversManager()
+
+def get_manager(manager_kind):
+    """
+    Returns a manager for a kind of driver.
+    
+    Might throws a KeyError
+    """
+    global managers
+    return managers[manager_kind]
+
+# each Driver module should do something like this: 
+# devices.get_manager('video').add_driver(Video4LinuxDriver())

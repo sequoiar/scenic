@@ -24,6 +24,7 @@ import pprint
 
 from twisted.trial import unittest
 from twisted.python import failure
+from twisted.internet import reactor
 
 import devices
 import utils.log
@@ -62,11 +63,15 @@ class DummyAudioDriver(devices.AudioDriver):
         pass
     
     def prepare(self):
-        pass
+        devices.Driver.prepare(self)
     
-    def on_devices_polling(self):
-        pass # TODO: test this
-        
+    def _on_devices_polling(self):
+        self.devices = {}
+        dev = devices.Device('M-Audio Delta 1010 LT')
+        self.add_device(dev)
+        for name in ['egg','spam']:
+            dev.add_attribute(devices.StringAttribute(name, 'bacon', 'bacon'))
+    
     def on_commands_error(self, commands):
         raise NotImplementedError, 'This method must be implemented in child classes. (if you need it)'
         
@@ -93,12 +98,14 @@ class Test_1_Driver(unittest.TestCase):
         # any exception will make the test fail.
         d = DummyAudioDriver(0.1, self)
         d.prepare()
-        time.sleep(0.2)
         d.stop_polling()
     
-    def test_2_stop(self):
+    def test_2_driver_polling(self):
         d = DummyAudioDriver(0.1, self)
         d.prepare()
+        name = 'M-Audio Delta 1010 LT'
+        if name not in d.get_devices():
+            self.fail('Driver should contain the device named %s.' & (name))
         d.stop_polling()
     
     def test_3_simple_shell_command(self):
@@ -171,12 +178,12 @@ class Test_2_Device_Attributes(unittest.TestCase):
 
 # --------------------------------- no good ---------------------------
 # no good.
-class disabled_Test_3_Drivers_Managers(unittest.TestCase):
+class Test_3_Drivers_Managers(unittest.TestCase):
     """
     Warning: This test suite adds dummy drivers and devices to the 
     "devices" module "managers" attribute.
     """ 
-    def setUp(self):
+    def xx_setUp(self):
         # drivers
         dummyDriver = DummyAudioDriver(self) # passing it the TestCase
         devices.managers['audio'].addDriver(dummyDriver)
@@ -187,10 +194,23 @@ class disabled_Test_3_Drivers_Managers(unittest.TestCase):
         dummyDriver.addDevice(dummyDevice)
         dummyDriver.addDevice(spamDevice)
         
-    def xxtest_1_list_drivers(self):
+    
+    def test_1_get_manager(self):
+        # test for the get_manager() function.
         for kind in ('video','audio','data'):
-            tmp = devices.managers[kind].getDrivers()
-            self.assertEqual(type(tmp), dict,'Should be a dict.')
+            tmp = devices.get_manager(kind).get_drivers()
+            self.assertEqual(type(tmp), dict, 'Should be a dict.')
+        try:
+            devices.get_manager('spam')
+            self.fail('there should be no drivers manager with that name.')
+        except KeyError:
+            pass
+    
+    def test_2_list_drivers(self):
+        for kind in ('video','audio','data'):
+            tmp = devices.get_manager(kind).get_drivers()
+            self.assertEqual(type(tmp), dict, 'Should be a dict.')
+        
     
     def xxonListDevices(self, devices):
         self.assertEqual(type(devices), dict,'Should be a dict.')
@@ -201,61 +221,60 @@ class disabled_Test_3_Drivers_Managers(unittest.TestCase):
         dummyDriver = devices.managers['audio'].getDriver('dummy')
         dummyDriver.listDevices(self.onListDevices) # passing a callback
         time.sleep(0.1) # 100 ms
+
+class DummyAPI(object):
+    """
+    Similar to the way the Driver objects are used in the core API.
+    """
+    def __init__(self, test):
+        self.test = test
+        self.has_been_called = False
     
-class disabled_Test_4_v4l_Driver(unittest.TestCase):
+    def on_devices_added(self, devices):
+        pass
+        
+    def on_devices_removed(self, devices):
+        pass
+        
+    def on_attributes_changed(self, attributes):
+        pass
+    
+    def on_devices_list(self, devices):
+        if len(devices) == 0:
+            #print "NO V4L2 DEVICE."
+            pass
+        else:
+            for name in devices:
+                #print "V4L2 device : ", name
+                device = devices[name]
+                #print "List %s : device %s" % (driver.get_name(), device.get_name())
+        self.has_been_called = True
+        #print "SET has_been_called to ", self.has_been_called
+    
+class Test_4_v4l_Driver(unittest.TestCase):
     """
     test Video4LinuxDriver
     """
-    def xxtest_0_list_drivers(self):
-        drivers = devices.managers['video'].getDrivers()
-        
-        # DEBUG INFO:
-        #print "\nDRIVERS MANAGERS:"
-        #pprint.pprint(devices.managers)
-        #print "VIDEO DRIVERS:"
-        #pprint.pprint(drivers)
-        
-        self.assertEqual(type(drivers), dict, 'Should be a dict.')
-        
-        SHOULD_HAVE = 1 # number of video drivers there should be. (only v4l implemented for now)
-        self.assertEqual(len(drivers), SHOULD_HAVE, 'Dict should have %d driver but has %d.' % (SHOULD_HAVE,len(drivers)))
+    def test_1_get_driver(self):
+        video_drivers = devices.get_manager('video').get_drivers()
+        #pprint.pprint(video_drivers)
+        if 'v4l2' not in video_drivers:
+            self.fail('v4l2 should be in video drivers.')
+        driver = devices.get_manager('video').get_driver('v4l2')
+        if not isinstance(driver, devices.VideoDriver):
+            self.fail('%s should be a VideoDriver instance.' % (driver))
     
-    def onListDevices_1(self, devices):
-        self.assertEqual(type(devices), dict,'Should be a dict.')
+    def test_2_list_devices(self):
+        driver = devices.get_manager('video').get_driver('v4l2')
+        # register the callbacks
+        api = DummyAPI(self)
+        driver.register_event_listener('on_devices_list', api.on_devices_list)
+        driver.register_event_listener('on_devices_removed', api.on_devices_removed)
+        driver.register_event_listener('on_attributes_changed', api.on_attributes_changed)
+        driver.register_event_listener('on_devices_added', api.on_devices_added)
+        
+        driver.prepare() # which calls Driver._poll_devices()
+        time.sleep(0.1)
+        driver.stop_polling()
+        
     
-    def xxtest_1_list_devices(self):
-        v4l = devices.managers['video'].getDriver('v4l')
-        v4l.listDevices(self.onListDevices_1)
-        time.sleep(0.1) # 100 ms
-    
-    def onListDevices_2(self, devices):
-        try:
-            tmp = devices['/dev/video0']
-        except KeyError,e:
-            self.fail('There is no /dev/video0. (might be OK) '+str(e.message))
-        
-    def xxtest_2_computer_has_a_dev_video0(self):
-        driver = devices.managers['video'].getDriver('v4l')
-        driver.listDevices(self.onListDevices_2)
-        time.sleep(0.1) # 100 ms
-    
-    def onListDevices_3(self, devices):
-        try:
-            device = devices['/dev/video0']
-        except KeyError,e:
-            self.fail('There is no /dev/video0. (might be OK) '+str(e.message))
-            return
-        #print '\n/dev/video0 attributes:'
-        #device.printAllAttributes()
-        #print "\nINPUT:"
-        tmp = device.get_attribute('video standard').getValue()
-        
-    def xxtest_3_video0_attributes(self):
-        driver = devices.managers['video'].getDriver('v4l')
-        driver.listDevices(self.onListDevices_3)
-        time.sleep(0.1) # 100 ms
-        
-    def xxtest_4_prepare_driver(self):
-        driver = devices.managers['video'].get_driver('v4l')
-        driver.prepareDriver()
-        
