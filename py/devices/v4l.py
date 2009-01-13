@@ -40,7 +40,7 @@ log = log.start('debug', 1, 0, 'devices')
 # ---------------------------------------------------------
 def _parse_v4l2_ctl_all(lines):
     """
-    Parses the output of the "v4l2-ctl --all" shell command
+    Parses the output of the "v4l2-ctl --all" command
     
     Returns a dict.
     """
@@ -90,6 +90,27 @@ def _parse_v4l2_ctl_all(lines):
             category  = "Video Standard"
     #pprint.pprint(results)
     return results
+
+def _parse_v4l2_ctl_list_inputs(lines):
+    """
+    Parses the output of v4l2-ctl --list-inputs
+    
+    Returns a list with all input names.
+    Their index is their number.
+    """
+    inputs = []
+    for line in lines:
+        if line.startswith('\t'):
+            splitted = line.strip('\t').split(':')
+            try:
+                key = splitted[0].strip()
+                value = splitted[1].strip()
+            except IndexError:
+                pass
+            else:
+                if key == 'Name':
+                    inputs.append(value)
+    return inputs
 # ---------------------------------------------------------
 
 class Video4LinuxDriver(devices.VideoDriver):
@@ -119,10 +140,17 @@ class Video4LinuxDriver(devices.VideoDriver):
         device_names = glob.glob('/dev/video*')
         for name in device_names:
             device = devices.Device(name)
-            self.add_device(device, True)
+            self.add_device(device, True) # in_new_devices # TODO : make add_device cleaner.
+            
+            # add its attributes with default values.
+            attr = devices.OptionsAttribute('input', 'Composite0', 'Composite0', ['Composite0', 'Composite1', 'S-Video']) # 'Composite2'
+            device.add_attribute(attr)
+            
         # now, the commands (TODO)
         commands = [
-                ['v4l2-ctl','--all']]
+                ['v4l2-ctl', '--all'],
+                ['v4l2-ctl', '--list-inputs']
+                ]
         self.commands_start(commands)
         #cmd = ['v4l2-ctl','--list-inputs']
         #cmd = ['v4l2-ctl','--get-fmt-video']
@@ -130,28 +158,53 @@ class Video4LinuxDriver(devices.VideoDriver):
         #cmd = ['v4l2-ctl','--list-ctrls'] (brightness and contrast)
         
     def on_attribute_change(self, attr):
-        name = attr.getName()
-        command = None
-        if name == 'video standard':
-            # TODO: --set-standard=<num
-            #pal-X (X = B/G/H/N/Nc/I/D/K/M/60) or just 'pal'
-            #ntsc-X (X = M/J/K) or just 'ntsc'
-            #secam-X (X = B/G/H/D/K/L/Lc) or just 'secam'
-            standard = attr.getValue() # TODO: get actual value
-            command = ['v4l2-ctl', '--set-standard=' + standard]
-            pass
-        elif name == 'width' or name == 'height':
-            # TODO: --set-fmt-video=width=<w>,height=<h>
-            pass
-        elif name == 'input':
-            # TODO: --set-input=0
-            pass
+        name = attr.name
+        val = attr.get_value()
+        #print ">>>>>>>>>>val", val, type(val)
+        if name == 'norm': # 'ntsc', 'secam' or 'pal'
+            # --set-standard=<num
+            # pal-X (X = B/G/H/N/Nc/I/D/K/M/60) or just 'pal'
+            # ntsc-X (X = M/J/K) or just 'ntsc'
+            # secam-X (X = B/G/H/D/K/L/Lc) or just 'secam'
+            norm = 'ntsc' # default
+            
+            if val.lower().startswith('pal'):
+                norm = 'pal'
+            elif val.lower().startswith('secam'):
+                norm = 'secam'
+            command = ['v4l2-ctl', '--set-standard=' + norm]
+            self.single_command_start(command)
+            
+        elif name == 'width' or name == 'height': 
+            # --set-fmt-video=width=<w>,height=<h>
+            # TODO: check if within range. fix if not
+            if name == 'width':
+                width = val
+                height = attr.device.attributes['height'].get_value()
+            else:
+                height = val
+                width = attr.device.attributes['width'].get_value()
+            command = ['v4l2-ctl', '--set-fmt-video=width=%d,height=%d' % (width, height)]
+            self.single_command_start(command)
+        
+        elif name == 'input': # --set-input=<num>
+            # TODO parse data to get possible values
+            # in order to puts them in an OptionsAttribute
+            #inputs =  # list
+            #inputs = ['Composite0', 'Composite1', 'S-Video'] # 'Composite2', 
+            if val in attr.options:
+                index = attr.options.index(val)
+                command = ['v4l2-ctl', '--set-input=' + index]
+                self.single_command_start(command)
+                
         if command is not None:
             #TODO
             pass
-        self.single_command_start(command)
     
     def on_commands_results(self, results, commands, extra_arg=None): 
+        """
+        Parses commands results
+        """
         for i in range(len(results)):
             result = results[i]
             success, results_infos = result
@@ -184,6 +237,7 @@ class Video4LinuxDriver(devices.VideoDriver):
                     #pprint.pprint(values)
                     #print dic
                     for key in dic:
+                        value = dic[key]
                         if key in ['driver','card','pixel format']:
                             device.add_attribute(devices.StringAttribute(key, dic[key], 'no default'))
                         elif key == 'width':
@@ -193,14 +247,25 @@ class Video4LinuxDriver(devices.VideoDriver):
                         elif key == 'input':
                             # Composite0, Composite1,  Composite2, S-Video
                             # TODO: v4l2-ctl --list-inputs
-                            attr = devices.OptionsAttribute(key, dic[key], 0, ['Composite0', 'Composite1', 'Composite2', 'S-Video'])
-                            device.add_attribute(attr)
-                    
+                            #attr = devices.OptionsAttribute(key, , 0, ['Composite0', 'Composite1', 'S-Video']) # 'Composite2'
+                            #device.add_attribute(attr)
+                            device.attributes[key].set_value(value, False)
                         elif key == "norm":
                             # TODO: v4l2-ctl --?? for better norm/standards names
                             attr = devices.OptionsAttribute(key, dic[key], 'NTSC', ['NTSC', 'PAL']) 
                             #TODO : attr.setValue(attr.getIndexForValue( values[key] ),False)
                             device.add_attribute(attr)
+            elif command[1] == '--list-inputs':
+                try:
+                    device = self.new_devices['/dev/video0'] # TODO FIXME
+                    # TODO: check if there are many devices, how the v4l2-ctl command works.
+                except KeyError:
+                    log.info('no device /dev/video0')
+                else:
+                    lines = results.splitlines()
+                    inputs = _parse_v4l2_ctl_list_inputs(lines)
+                    device.attributes['input'].options = lines
+                    
         log.info('v4l driver: command %s returned.', str(command))
         #print results
         self._on_done_devices_polling()
@@ -208,3 +273,8 @@ class Video4LinuxDriver(devices.VideoDriver):
 
 devices.get_manager('video').add_driver(Video4LinuxDriver()) # only one instance.
 # TODO : load only if module is there and if computer (OS) supports it.
+
+def start(api):
+    """TODO"""
+    pass
+    

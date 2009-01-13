@@ -251,6 +251,7 @@ class DummyAPI(object):
         self.has_been_called = True
         #print "SET has_been_called to ", self.has_been_called
     	#print "\nOK DONE "
+    	
     def on_devices_list_check(self, devices):
     	#print "\nv4l2 devices and their attributes : "
     	for device in devices.values():
@@ -280,41 +281,78 @@ class Test_4_v4l_Driver(unittest.TestCase):
     """
     test Video4LinuxDriver
     """
+    def setUp(self):
+        self.driver = devices.get_manager('video').get_driver('v4l2')
+        if not isinstance(self.driver, devices.VideoDriver):
+            self.fail('%s should be a VideoDriver instance.' % (self.driver))
+        # register the callbacks
+        self.api = DummyAPI(self)
+        self.driver.register('on_devices_list', self.api.on_devices_list)
+        self.driver.register('on_devices_removed', self.api.on_devices_removed)
+        self.driver.register('on_attributes_changed', self.api.on_attributes_changed)
+        self.driver.register('on_devices_added', self.api.on_devices_added)
+        #print "callbacks:"
+        #pprint.pprint(driver.callbacks)
+        
+        
     def test_1_get_driver(self):
         video_drivers = devices.get_manager('video').get_drivers()
         #pprint.pprint(video_drivers)
         if 'v4l2' not in video_drivers:
             self.fail('v4l2 should be in video drivers.')
-        driver = devices.get_manager('video').get_driver('v4l2')
-        if not isinstance(driver, devices.VideoDriver):
-            self.fail('%s should be a VideoDriver instance.' % (driver))
-    
-    def test_2_list_devices(self):
-        driver = devices.get_manager('video').get_driver('v4l2')
-        # register the callbacks
-        api = DummyAPI(self)
-        driver.register('on_devices_list', api.on_devices_list)
-        driver.register('on_devices_removed', api.on_devices_removed)
-        driver.register('on_attributes_changed', api.on_attributes_changed)
-        driver.register('on_devices_added', api.on_devices_added)
         
-        driver.prepare() # which calls Driver._poll_devices()
+    def test_2_list_devices(self):
+        self.driver.prepare() # which calls Driver._poll_devices()
         time.sleep(0.1)
-        driver.stop_polling()
-        time.sleep(0.2)
+        self.driver.stop_polling()
+        time.sleep(0.1)
         
     def test_3_devices_attributes(self):
-        driver = devices.get_manager('video').get_driver('v4l2')
-        # register the callbacks
-        api = DummyAPI(self)
-        driver.register('on_devices_list', api.on_devices_list_check)
-        driver.register('on_devices_removed', api.on_devices_removed)
-        driver.register('on_attributes_changed', api.on_attributes_changed)
-        driver.register('on_devices_added', api.on_devices_added)
-        #print "callbacks:"
-        #pprint.pprint(driver.callbacks)
+        # override one callback
+        self.driver.register('on_devices_list', self.api.on_devices_list_check)
+        self.driver.poll_now() # which calls Driver._poll_devices()
+        time.sleep(0.1)
+        self.driver.stop_polling()
         
-        driver.poll_now() # which calls Driver._poll_devices()
-        time.sleep(0.4)
-        driver.stop_polling()
+        
+    def test_4_set_norm(self):
+        self.driver.poll_now() # which calls Driver._poll_devices()
+        time.sleep(0.01)
+        attr = self.driver.devices['/dev/video0'].attributes['norm']
+        
+        for expected in ['Composite0', 'Composite1', 'S-Video']:
+            attr.set_value(expected)
+            time.sleep(0.01)
+            self.driver.poll_now()
+            time.sleep(0.01)
+            value = attr.get_value()
+            if value != expected:
+                self.fail('norm attributes should be changed to %s but is %s.' % (expected, value))
+        self.driver.stop_polling()
+        time.sleep(0.1)
+        
+        
+    def test_5_width_height(self):
+        self.driver.poll_now() # which calls Driver._poll_devices()
+        time.sleep(0.01)
+        attr_w = self.driver.devices['/dev/video0'].attributes['width']
+        attr_h = self.driver.devices['/dev/video0'].attributes['height']
+        
+        for w, h in ((320, 240), (1024, 768), (640, 480)):
+            
+            attr_w.set_value(w)
+            attr_h.set_value(h)
+            time.sleep(0.01)
+            self.driver.poll_now()
+            time.sleep(0.01)
+            val_w, val_h = attr_w.get_value(), attr_h.get_value()
+            if val_w != w:
+                self.fail('Width should has been changed to %d but is %d.' % (w, val_w))
+            elif val_h != h:
+                self.fail('Height should has been changed to %d but is %d.' % (h, val_h))
+            else:
+                pass
+                #print 'Success ! Width is %d and height is %d.' % (w, h)
+        self.driver.stop_polling()
+        time.sleep(0.1)
         

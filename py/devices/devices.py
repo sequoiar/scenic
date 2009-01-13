@@ -21,6 +21,8 @@
 """
 Devices handling and Driver base classes.
 
+------------
+
 Usage for test purposes:
 $ cd py/
 $ export PYTHONPATH=$PWD
@@ -29,7 +31,11 @@ $ python devices/devices.py
 To run unit tests: 
 $ trial test/test_devices.py
 
-TODO: retrieve former implementation of the shelprocessprotocol and put it in utils/shell
+------------
+
+TODO: retrieve former implementation of the shellprocessprotocol and put it in utils/shell
+
+-----------
 
 TODO: you want to test that a failing condition occurs? use self.assertFailure
 """
@@ -54,16 +60,37 @@ class Driver(shell.ShellCommander):
     
     Methods and attributes that must be overriden in child classes are:
     - name : A class attribute string for the name of the driver (example: 'v4l2')
-    - on_attribute_change : method called when the programmer changes the value of a device attribute
-    - on_devices_polling : method called when the Driver wants to poll its devices.
-    - on_commands_results : method called once commands started from on_devices_polling or on_attribute_change are done.
-    - on_commands_error : method similar to the method above.
+    - on_attribute_change(...) : method called when the programmer changes the value of a device attribute
+    - on_devices_polling(...) : method called when the Driver wants to poll its devices.
+    - on_commands_results(...) : method called once commands started from on_devices_polling or on_attribute_change are done.
+    - on_commands_error(...) : method similar to the method above.
     
     The programmer can also override:
-    - prepare : method called once at startup
+    - prepare(...) : method called once at startup
     
     Also, the few direct subclasses (such as VideoDriver) of Driver must override:
     - kind : A class attribute string for the type of the driver (example: 'video')
+    
+    --------------
+    
+    TODO: implement the MVC pattern. 
+    
+    The driver objects will eventually call the notify method if the ControllerApi instance.
+    This will be used instead of the current callbacks.
+    That means there should be a start function in each Driver module. 
+        argument : the api object.
+    This would return the Driver instance for each of those Driver modules.
+    
+    ------------------
+    
+    TODO: separate Driver and ShellCommander classes
+    
+    ----------------
+    
+    TODO: remove all getters and setters that are not necessary.
+    
+    If a getter/setter is necessary, the corresponding attribute should be private.
+    i.e. begin with an underscore.
     """
     name = 'default_name'
     
@@ -325,7 +352,7 @@ class Attribute(object):
     def __init__(self, name, value=None, default=None):
         self.device = None
         self.name = name
-        self.value = value
+        self._value = value # TODO: make private. 
         self.default = default
         
     def get_value(self):
@@ -334,7 +361,7 @@ class Attribute(object):
         arg: callback, called with the whole 
         attribute as argument.
         """
-        return self.value
+        return self._value
 
     def set_value(self, value, do_notify_driver=True):
         """
@@ -342,14 +369,16 @@ class Attribute(object):
         
         Notifies the Driver if do_notify_driver is not False.
         """
-        self.value = value
+        self._value = value
         if do_notify_driver:
             self._on_change()
         
     def get_default(self):
+        # deprecated
         return self.default
 
     def set_default(self, default_value):
+        # deprecated
         self.default = default_value
         
     def get_kind():
@@ -357,15 +386,18 @@ class Attribute(object):
         Returns the kind of attribute it is of self.
         
         A string such as 'int', 'boolean', 'string' or 'options'
+        deprecated
         """
         return self.kind
     
     def get_device(self):
+        # deprecated
         return self.device
     
     def set_device(self, device):
         """
         Called by the Device instance when the programmer adds this attribute to it.
+        deprecated
         """
         self.device = device
     
@@ -375,7 +407,7 @@ class Attribute(object):
 
         Tells the Device that the value changed.
         """ 
-        self.device.getDriver().on_attribute_change(self)
+        self.device.driver.on_attribute_change(self)
         
     def get_name(self):
         return self.name
@@ -411,7 +443,7 @@ class IntAttribute(Attribute):
         
 class OptionsAttribute(Attribute):
     """
-    The options is a list (or tuple) of possible options. 
+    The options is a list (not a tuple) of possible options. 
     The value and default are indices. (int)
     
     A tuple is better since it is immutable. Indices are integers.
@@ -428,11 +460,13 @@ class OptionsAttribute(Attribute):
         self.options = options
     
     def get_options(self):
+        # deprecated
         return self.options
     
     def set_options(self, options_list):
         """
         Argument must be a list or tuple.
+        deprecated
         """
         self.options = options_list
         # TODO : check if value is in new options list.
@@ -452,13 +486,14 @@ class OptionsAttribute(Attribute):
         """
         return self.options.index(value)
     
-    def set_value(self, value):
-        """
-        Throws KeyError if not in options list.
-        """
-        if value not in self.options:
-            raise KeyError, 'Option %s is not in list' % (value)
-        self.value = value
+    #def set_value(self, value, do_notify_driver=True):
+    #    """
+    #    Throws KeyError if not in options list.
+    #    deprecated
+    #    """
+    #    if value not in self.options:
+    #        raise KeyError, 'Option %s is not in list' % (value)
+    #    self.set_value(value, do_notify_driver)
     
 class Device(object):
     """
@@ -477,10 +512,12 @@ class Device(object):
         self.state_in_use = False
         
     def get_name(self):
+        """deprecated"""
         return self.name
     
     def get_attribute(self, name):
         """
+        deprecated
         Gets one Attribute object.
         
         Throws a KeyError if Device doesn't have that attribute.
@@ -489,6 +526,8 @@ class Device(object):
         
     def get_attributes(self):
         """
+        deprecated: should use attributes[name] instead
+        
         Returns a dict in the form : string name => Attribute
         """
         return self.attributes
@@ -498,6 +537,8 @@ class Device(object):
         Adds an attribute to a device.
         
         Calls Attribute.set_device()
+        
+        TODO: should we use a direct acces to the dict instead?
         """
         self.attributes[attribute.get_name()] = attribute
         attribute.set_device(self)
@@ -513,21 +554,26 @@ class Device(object):
         return s
     
     def set_in_use(self, state=True):
+        # deprecated
         self.state_in_use = state
     
     def get_in_use(self):
+        # deprecated
         return self.state_in_use
     
     def get_driver(self):
         """
         Returns its Driver object.
+        deprecated
         """
         return self.driver
     def set_driver(self, driver):
         """
         Sets its Driver object.
+        deprecated
         """
         self.driver = driver
+        
 class DriversManager(object):
     """
     Manages all drivers of its kind.
@@ -549,12 +595,14 @@ class DriversManager(object):
     def get_drivers(self):
         """
         Returns dict of name -> Driver objects
+        deprecated
         """
         return self.drivers
     
     def get_driver(self, name):
         """
         Might throw KeyError
+        deprecated
         """
         return self.drivers[name]
 
@@ -564,6 +612,7 @@ class AudioDriversManager(DriversManager):
     kind = 'audio'
 class DataDriversManager(DriversManager):
     kind = 'data'
+
 # drivers managers
 managers = {}
 managers['video'] = VideoDriversManager()

@@ -38,7 +38,7 @@ from utils import log
 
 log = log.start('debug', 1, 0, 'shell')
 
-class CommandNotFoundException(Exception):
+class CommandNotFoundError(Exception):
     """
     raised when a shell command is not found
     """
@@ -54,14 +54,14 @@ class ShellCommander(object):
         """
         used to check if command is available on this system.
         
-        Throws a CommandNotFoundException if not.
+        Throws a CommandNotFoundError if not.
         """
         try:
             executable = procutils.which(command_name)[0] # gets the executable
         except IndexError:
             if error_msg is None:
                 error_msg = 'Could not find command %s' % (command_name)
-            raise CommandNotFoundException, error_msg
+            raise CommandNotFoundError, error_msg
         return executable
 
     def _command_start(self, executable, command):
@@ -102,8 +102,8 @@ class ShellCommander(object):
         for command in commands:
             try:
                 executable = self.find_command(command[0]) # gets the executable
-            except CommandNotFoundException, e:
-                raise CommandNotFoundException,'Cannot find the shell command: %s. Reason: %s' % (command[0], e.message)
+            except CommandNotFoundError, e:
+                raise CommandNotFoundError,'Cannot find the shell command: %s. Reason: %s' % (command[0], e.message)
                 break
         if ok:
             for command in commands:
@@ -176,7 +176,7 @@ if __name__ == '__main__':
     d = ShellCommander()
     try:
         d.find_command('asdasd')
-    except CommandNotFoundException:
+    except CommandNotFoundError:
         print "1) Successfully found that command does not exist."
     commands = [
             ['ls','-l'],

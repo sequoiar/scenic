@@ -105,6 +105,6 @@ class Test_0_Shell(unittest.TestCase):
         extra_arg = 'should generate an error'
         try:
             x.commands_start(commands, extra_arg)
-        except shell.CommandNotFoundException:
+        except shell.CommandNotFoundError:
             pass
         time.sleep(0.1)
