@@ -77,9 +77,7 @@ InterleavedAudioSource::~InterleavedAudioSource()
 void InterleavedAudioSource::init()
 {
     interleave_.init();
-    init_source();
-    sub_init();
-    link_elements();
+    AudioSource::init();
 }
 
 
@@ -350,8 +348,16 @@ void AudioPulseSource::link_elements()
 
 /// Constructor 
 AudioJackSource::AudioJackSource(const AudioSourceConfig &config) : 
-    InterleavedAudioSource(config) 
+    AudioSource(config), capsFilter_(0) 
 {}
+
+
+/// Destructor 
+AudioJackSource::~AudioJackSource()
+{
+    Pipeline::Instance()->remove(&capsFilter_);
+}
+
 
 void AudioJackSource::sub_init()
 {
@@ -364,10 +370,26 @@ void AudioJackSource::sub_init()
     for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
 #endif
+    // otherwise jackaudiosrc defaults to 2 channels
+    std::ostringstream capsStr;
+    capsStr << "audio/x-raw-int, channels=" << config_.numChannels() 
+        << ", clock-rate=" << Pipeline::SAMPLE_RATE;
+
+    GstCaps *jackCaps = gst_caps_from_string(capsStr.str().c_str());
+    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    g_object_set(G_OBJECT(capsFilter_), "caps", jackCaps, NULL);
+
+    gst_caps_unref(jackCaps);
 
     if (Pipeline::SAMPLE_RATE != Jack::samplerate())
         THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
                 << " does not match default sample rate " << Pipeline::SAMPLE_RATE);
+}
+
+void AudioJackSource::link_elements()
+{
+    gstlinkable::link(sources_, aconvs_);
+    gstlinkable::link(aconvs_[0], capsFilter_);
 }
 
 

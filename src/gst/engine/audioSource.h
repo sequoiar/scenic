@@ -218,14 +218,25 @@ class AudioPulseSource : public AudioSource
  *  and interleaves incoming jack buffers into one multichannel stream.
  */
 
-class AudioJackSource : public InterleavedAudioSource
+class AudioJackSource : public AudioSource
 {
     public:
         explicit AudioJackSource(const AudioSourceConfig &config);
     
     private:
+        ~AudioJackSource();
+
+        GstElement *srcElement() { return capsFilter_; }
+        void link_elements();
         void sub_init();
+
+        GstElement *capsFilter_;
+        /// No Copy Constructor
+        AudioJackSource(const AudioJackSource&);     
+        /// No Assignment Operator
+        AudioJackSource& operator=(const AudioJackSource&);     
 };
+
 
 /** 
  *  Concrete AudioSource which captures audio from dv device.

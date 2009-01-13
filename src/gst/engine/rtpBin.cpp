@@ -123,6 +123,7 @@ int RtpBin::printBandwidth(gpointer data)
 
 const char *RtpBin::padStr(const char *padName)
 {
+    assert(refCount_ > 0);
     std::string result(padName);
     std::stringstream istream;
 
