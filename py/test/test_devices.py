@@ -253,8 +253,8 @@ class DummyAPI(object):
     	#print "\nOK DONE "
     	
     def on_devices_list_check(self, devices):
-    	VERBOSE = True
-    	
+    	#VERBOSE = True
+    	VERBOSE = False
     	if VERBOSE:
     	    print "\nv4l2 devices and their attributes : "
     	for device in devices.values():
