@@ -253,7 +253,10 @@ class DummyAPI(object):
     	#print "\nOK DONE "
     	
     def on_devices_list_check(self, devices):
-    	#print "\nv4l2 devices and their attributes : "
+    	VERBOSE = True
+    	
+    	if VERBOSE:
+    	    print "\nv4l2 devices and their attributes : "
     	for device in devices.values():
     		driver_name = device.get_driver().get_name()
     		device_name = device.get_name()
@@ -262,13 +265,15 @@ class DummyAPI(object):
     			name = attr.get_name()
     			value = attr.get_value()
     			default = attr.get_default()
-    			#print "%s:%s:%s = %s (%s)" % (driver_name, device_name, name, value, default)
+    			if VERBOSE:
+    			    print "%s:%s:%s = %s (%s)" % (driver_name, device_name, name, value, default)
     			if name in ['width','height']:
     			    if not isinstance(value, int):
     			        print "Attribute %s should be %s but is %s" % (name, 'int', value)
-                if name in ['driver', 'norm', 'driver']:
+                if name in ['driver', 'norm', 'input']:
                     if not isinstance(value, str):
     			        print "Attribute %s should be %s but is %s" % (name, 'str', value)
+                
         #-------------------------------------
         #v4l2:/dev/video0:width = 320 (640)
         #v4l2:/dev/video0:driver = bttv (no default)
