@@ -285,6 +285,7 @@ AudioAlsaSource::~AudioAlsaSource()
     Pipeline::Instance()->remove(&capsFilter_);
 }
 
+// FIXME : encapsulate capsfilter stuff into one class
 
 void AudioAlsaSource::sub_init()
 {
