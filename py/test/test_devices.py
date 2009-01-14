@@ -104,7 +104,7 @@ class Test_1_Driver(unittest.TestCase):
         d = DummyAudioDriver(0.1, self)
         d.prepare()
         name = 'M-Audio Delta 1010 LT'
-        if name not in d.get_devices():
+        if name not in d.devices:
             self.fail('Driver should contain the device named %s.' & (name))
         d.stop_polling()
     
@@ -124,7 +124,7 @@ class Test_2_Device_Attributes(unittest.TestCase):
         d.add_attribute(devices.IntAttribute('sampling rate', 44100, 48000, 8000, 192000))
         d.add_attribute(devices.IntAttribute('bit depth', 16, 16, 8, 24))
         
-        tmp = d.get_attribute('sampling rate').get_value()
+        tmp = d.attributes['sampling rate'].get_value()
         self.assertEqual(tmp, 44100, 'Attribute not matching what we gave it.')
         
         tmp = d.get_attribute('bit depth').get_value()
@@ -273,14 +273,7 @@ class DummyAPI(object):
                 if name in ['driver', 'norm', 'input']:
                     if not isinstance(value, str):
     			        print "Attribute %s should be %s but is %s" % (name, 'str', value)
-                
-        #-------------------------------------
-        #v4l2:/dev/video0:width = 320 (640)
-        #v4l2:/dev/video0:driver = bttv (no default)
-        #v4l2:/dev/video0:pixel format = YU12 (no default)
-        #v4l2:/dev/video0:norm = NTSC-M/M-KR (NTSC)
-        #v4l2:/dev/video0:height = 240 (480)
-    	#print "\nOK DONE "
+        
     	
 class Test_4_v4l_Driver(unittest.TestCase):
     """
