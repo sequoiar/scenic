@@ -99,9 +99,10 @@ class Driver(shell.ShellCommander):
         child classes __init__ methods must call this one if defined.
         
         Example : Driver.__init__(self)
+        TODO: remove 2 attributes.
         """
         self.devices = {} # dict
-        self.new_devices = {} # used to populate the list of devices.
+        self._new_devices = {} # used to populate the list of devices.
         self.polling_interval = polling_interval
         self.state_poll_enabled = polling_enabled
         self._delayed_id = None
@@ -126,18 +127,19 @@ class Driver(shell.ShellCommander):
         Also sets the Device Driver to this one.
         """
         if in_new_devices:
-            devices = self.new_devices
+            devices = self._new_devices
         else:
             devices = self.devices
-        devices[device.get_name()] = device
-        device.set_driver(self)
+        devices[device.name] = device
+        device.driver = self
     
-    def get_kind(self):
-        """
-        Returns the driver kind 
-        Strings such as 'audio','video', 'data'
-        """
-        return self.kind
+    #def get_kind(self):
+    #    """
+    #    Returns the driver kind 
+    #    Strings such as 'audio','video', 'data'
+    #    deprecated
+    #    """
+    #    return self.kind
         
     def _on_done_devices_polling(self):
         """
@@ -154,7 +156,7 @@ class Driver(shell.ShellCommander):
            'on_devices_list'        arg: dict of Device instances
         """
         old_devices = self.devices
-        self.devices = self.new_devices
+        self.devices = self._new_devices
         # check for deleted
         removed = {}
         for name in old_devices:
@@ -173,15 +175,15 @@ class Driver(shell.ShellCommander):
             # if devices is in both new and former dict:
             if dev_name not in added and dev_name not in removed:
                 dev = self.devices[dev_name]
-                for attr_name in dev.get_attributes():
-                    attr = dev.get_attribute(attr_name)
+                for attr_name in dev.attributes:
+                    attr = dev.attributes[attr_name]
                     try:
                         old_attr = old_devices[attr_name]
                     except KeyError:
                         pass
                     else:
                         if attr.get_value() != old_attr.get_value():
-                            attr_changed[attr.get_name()] = attr
+                            attr_changed[attr.name] = attr
         # let us call the callbacks
         if len(added) > 0:
             self._call_event_listener('on_devices_added', added) #dict
@@ -215,6 +217,7 @@ class Driver(shell.ShellCommander):
         
         See register_event_listener
         Might throw KeyError if event name doesn't exist.
+        TODO: change for the api
         """
         callback = self.callbacks[event_name]
         if callback is not None:
@@ -223,10 +226,11 @@ class Driver(shell.ShellCommander):
         else:
             log.error("No callback for %s event" % (event_name))
         
-    def get_name(self):
-        """
-        Used by the DriverManager instances to manage Driver instances by their name.
-        """
+    #def get_name(self):
+    #    """
+    #    Used by the DriverManager instances to manage Driver instances by their name.
+    #    deprecated
+    #    """
         return self.name
         
     def prepare(self):
@@ -242,24 +246,24 @@ class Driver(shell.ShellCommander):
             self._poll_devices()
     
         
-    def get_devices(self):
-        """
-        Lists name of devices of the type that a driver supports on this machine right now.
-
-        Calls the callback with a dict of devices.
-        Data will be a 'key' => 'long name' dict.
-        Can be overriden in child classes.
-        """
-        return self.devices
+    #def get_devices(self):
+    #    """
+    #    Lists name of devices of the type that a driver supports on this machine right now.
+#
+#        Calls the callback with a dict of devices.
+#        Data will be a 'key' => 'long name' dict.
+#        Can be overriden in child classes.
+#        """
+#        return self.devices
     
-    def get_device(self, name):
-        """
-        Returns a device object.
-        
-        device_name must be a ASCII string.
-        Might throw a KeyError if device doesn't exist anymore.
-        """
-        return  self.devices[name]
+    #def get_device(self, name):
+    #    """
+    #    Returns a device object.
+    #    
+    #    device_name must be a ASCII string.
+    #    Might throw a KeyError if device doesn't exist anymore.
+    #    """
+    #    return  self.devices[name]
         
     def on_attribute_change(self, attribute):
         """
@@ -290,8 +294,8 @@ class Driver(shell.ShellCommander):
         self._cancel_delayed_polling()
         self.state_poll_enabled = False
         
-    def get_polling_is_enabled(self):
-        return self.state_poll_enabled
+    #def get_polling_is_enabled(self):
+    #    return self.state_poll_enabled
     
     def _cancel_delayed_polling(self):
         if self._delayed_id is not None: 
@@ -319,7 +323,7 @@ class Driver(shell.ShellCommander):
         if self.state_poll_enabled:
             self._cancel_delayed_polling()
             self._delayed_id = reactor.callLater(self.polling_interval, self._poll_devices)
-        self.new_devices = {}
+        self._new_devices = {}
         self._on_devices_polling()
     
     def _on_devices_polling(self):
@@ -347,7 +351,7 @@ class Attribute(object):
     """
     Base class for an attribute of a device.
     """
-    kind = 'default'
+    kind = 'default kind of attribute'
     
     def __init__(self, name, value=None, default=None):
         self.device = None
@@ -372,34 +376,6 @@ class Attribute(object):
         self._value = value
         if do_notify_driver:
             self._on_change()
-        
-    def get_default(self):
-        # deprecated
-        return self.default
-
-    def set_default(self, default_value):
-        # deprecated
-        self.default = default_value
-        
-    def get_kind():
-        """
-        Returns the kind of attribute it is of self.
-        
-        A string such as 'int', 'boolean', 'string' or 'options'
-        deprecated
-        """
-        return self.kind
-    
-    def get_device(self):
-        # deprecated
-        return self.device
-    
-    def set_device(self, device):
-        """
-        Called by the Device instance when the programmer adds this attribute to it.
-        deprecated
-        """
-        self.device = device
     
     def _on_change(self):
         """
@@ -408,9 +384,6 @@ class Attribute(object):
         Tells the Device that the value changed.
         """ 
         self.device.driver.on_attribute_change(self)
-        
-    def get_name(self):
-        return self.name
         
 class BooleanAttribute(Attribute):
     kind = 'boolean'
@@ -431,22 +404,15 @@ class IntAttribute(Attribute):
     def __init__(self, name, value=0, default=0, minimum=0, maximum=1023):
         Attribute.__init__(self, name, value, default)
         self.range = (minimum, maximum)
-    
-    def get_range(self):
-        """
-        Returns min val, max val
-        """
-        return self.range[0], self.range[1]
-    
-    def set_range(self, minimum, maximum):
-        self.range = (minimum, maximum)
-        
+       
 class OptionsAttribute(Attribute):
     """
     The options is a list (not a tuple) of possible options. 
     The value and default are indices. (int)
     
     A tuple is better since it is immutable. Indices are integers.
+    
+    If you want to get the index of a value, use attr.options.index(value)
     """
     kind = 'options'
     
@@ -458,43 +424,7 @@ class OptionsAttribute(Attribute):
         """
         Attribute.__init__(self, name, value, default)
         self.options = options
-    
-    def get_options(self):
-        # deprecated
-        return self.options
-    
-    def set_options(self, options_list):
-        """
-        Argument must be a list or tuple.
-        deprecated
-        """
-        self.options = options_list
-        # TODO : check if value is in new options list.
-        # self.set_value(self.value) 
-    
-    def index_of(self, value):
-        """
-        Returns an index for that value.
-        Useful for: 
-        {{{
-        for i in  attr.get_options():
-            if i == attr.index_of(attr.get_value()):
-                ...
-        }}}
         
-        Throws ValueError if not in options list.
-        """
-        return self.options.index(value)
-    
-    #def set_value(self, value, do_notify_driver=True):
-    #    """
-    #    Throws KeyError if not in options list.
-    #    deprecated
-    #    """
-    #    if value not in self.options:
-    #        raise KeyError, 'Option %s is not in list' % (value)
-    #    self.set_value(value, do_notify_driver)
-    
 class Device(object):
     """
     Class for any Device.
@@ -511,27 +441,6 @@ class Device(object):
         self.attributes = dict()
         self.state_in_use = False
         
-    def get_name(self):
-        """deprecated"""
-        return self.name
-    
-    def get_attribute(self, name):
-        """
-        deprecated
-        Gets one Attribute object.
-        
-        Throws a KeyError if Device doesn't have that attribute.
-        """
-        return self.attributes[name]
-        
-    def get_attributes(self):
-        """
-        deprecated: should use attributes[name] instead
-        
-        Returns a dict in the form : string name => Attribute
-        """
-        return self.attributes
-    
     def add_attribute(self, attribute):
         """
         Adds an attribute to a device.
@@ -540,8 +449,8 @@ class Device(object):
         
         TODO: should we use a direct acces to the dict instead?
         """
-        self.attributes[attribute.get_name()] = attribute
-        attribute.set_device(self)
+        self.attributes[attribute.name] = attribute
+        attribute.device = self
     
     def __str__(self):
         s = ""
@@ -552,28 +461,7 @@ class Device(object):
             for k in self.attributes:
                 s += '%s:%s' % (k, self.attributes[k].get_value())
         return s
-    
-    def set_in_use(self, state=True):
-        # deprecated
-        self.state_in_use = state
-    
-    def get_in_use(self):
-        # deprecated
-        return self.state_in_use
-    
-    def get_driver(self):
-        """
-        Returns its Driver object.
-        deprecated
-        """
-        return self.driver
-    def set_driver(self, driver):
-        """
-        Sets its Driver object.
-        deprecated
-        """
-        self.driver = driver
-        
+      
 class DriversManager(object):
     """
     Manages all drivers of its kind.
@@ -590,21 +478,7 @@ class DriversManager(object):
         The key will be the driver's name
         """
         driver.kind = self.kind
-        self.drivers[driver.get_name()] = driver
-
-    def get_drivers(self):
-        """
-        Returns dict of name -> Driver objects
-        deprecated
-        """
-        return self.drivers
-    
-    def get_driver(self, name):
-        """
-        Might throw KeyError
-        deprecated
-        """
-        return self.drivers[name]
+        self.drivers[driver.name] = driver
 
 class VideoDriversManager(DriversManager):
     kind = 'video'

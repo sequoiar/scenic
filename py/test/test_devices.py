@@ -127,13 +127,13 @@ class Test_2_Device_Attributes(unittest.TestCase):
         tmp = d.attributes['sampling rate'].get_value()
         self.assertEqual(tmp, 44100, 'Attribute not matching what we gave it.')
         
-        tmp = d.get_attribute('bit depth').get_value()
+        tmp = d.attributes['bit depth'].get_value()
         self.assertEqual(tmp, 16, 'Attribute not matching what we gave it.')
         
-        tmp = d.get_attribute('bit depth').get_default()
+        tmp = d.attributes['bit depth'].default
         self.assertEqual(tmp, 16,'Default not matching what we gave it.')
         
-        tmp = d.get_attribute('sampling rate').get_range() # returns a two int tuple
+        tmp = d.attributes['sampling rate'].range # a two int tuple
         self.assertEqual(tmp[0], 8000,  'Minimum value not matching what we gave it.')
         self.assertEqual(tmp[1], 192000,'Maximum value not matching what we gave it.')
     
@@ -141,31 +141,31 @@ class Test_2_Device_Attributes(unittest.TestCase):
         d = devices.Device('MOTU')
         d.add_attribute(devices.StringAttribute('meal', 'egg', 'spam'))
         
-        tmp = d.get_attribute('meal').get_value()
+        tmp = d.attributes['meal'].get_value()
         self.assertEqual(tmp, 'egg','Attribute not matching what we gave it.')
         
-        tmp = d.get_attribute('meal').get_default()
+        tmp = d.attributes['meal'].default
         self.assertEqual(tmp, 'spam','Attribute default not matching what we gave it.')
     
     def test_3_device_options_attribute(self):
         d = devices.Device('MOTU')
         d.add_attribute(devices.OptionsAttribute('meal','egg', 'spam', ['egg','spam','ham','bacon']))
         
-        attr = d.get_attribute('meal')
+        attr = d.attributes['meal']
         #self.assertEqual(tmp, 'egg','Attribute not matching what we gave it: '+attr)
         
         # value
         value = attr.get_value()
         self.assertEqual(value, 'egg','Attribute value not matching what we gave it: '+str(value))
         
-        i = attr.index_of(attr.get_value())
+        i = attr.options.index(attr.get_value())
         self.assertEqual(i, 0,'Attribute value index incorrect.')
         
         # default 
-        tmp = attr.get_default()
+        tmp = attr.default
         self.assertEqual(tmp, 'spam','Attribute default not matching what we gave it.'+tmp)
         
-        tmp = attr.index_of(attr.get_default())
+        tmp = attr.options.index(attr.default)
         self.assertEqual(tmp, 1,'Attribute default index incorrect.')
         
     def test_4_list_attributes(self):
@@ -173,7 +173,7 @@ class Test_2_Device_Attributes(unittest.TestCase):
         d.add_attribute(devices.StringAttribute('meal','egg', 'spam'))
         d.add_attribute(devices.IntAttribute('ham', 0, 0))
         
-        tmp = d.get_attributes().keys()
+        tmp = d.attributes.keys()
         self.assertEqual(tmp, ['meal','ham'],'Attribute names not matching what we gave it.')
 
 # --------------------------------- no good ---------------------------
@@ -186,40 +186,41 @@ class Test_3_Drivers_Managers(unittest.TestCase):
     def xx_setUp(self):
         # drivers
         dummyDriver = DummyAudioDriver(self) # passing it the TestCase
-        devices.managers['audio'].addDriver(dummyDriver)
+        devices.managers['audio'].add_driver(dummyDriver)
         
         # devices
-        dummyDevice = devices.Device('MOTU')
-        spamDevice = devices.Device('SPAM')
-        dummyDriver.addDevice(dummyDevice)
-        dummyDriver.addDevice(spamDevice)
+        dummy_device = devices.Device('MOTU')
+        spam_device = devices.Device('SPAM')
+        dummyDriver.add_device(dummy_device)
+        dummyDriver.add_device(spam_device)
         
     
     def test_1_get_manager(self):
         # test for the get_manager() function.
         for kind in ('video','audio','data'):
-            tmp = devices.get_manager(kind).get_drivers()
+            tmp = devices.managers[kind].drivers
             self.assertEqual(type(tmp), dict, 'Should be a dict.')
         try:
-            devices.get_manager('spam')
+            devices.managers['spam']
             self.fail('there should be no drivers manager with that name.')
         except KeyError:
             pass
     
     def test_2_list_drivers(self):
         for kind in ('video','audio','data'):
-            tmp = devices.get_manager(kind).get_drivers()
+            tmp = devices.managers[kind].drivers
             self.assertEqual(type(tmp), dict, 'Should be a dict.')
         
     
     def xxonListDevices(self, devices):
-        self.assertEqual(type(devices), dict,'Should be a dict.')
-        self.assertEqual(devices['MOTU'].get_name(), 'MOTU','Wrong device name.')
-        self.assertEqual(devices['SPAM'].get_name(), 'SPAM','Wrong device name.')
+        self.assertEqual(type(devices), dict, 'Should be a dict.')
+        self.assertEqual(devices['MOTU'].name, 'MOTU', 'Wrong device name.')
+        self.assertEqual(devices['SPAM'].name, 'SPAM', 'Wrong device name.')
         
     def xxtest_2_list_devices(self):
-        dummyDriver = devices.managers['audio'].getDriver('dummy')
-        dummyDriver.listDevices(self.onListDevices) # passing a callback
+        # TODO: implement again this test
+        dummyDriver = devices.managers['audio'].driver['dummy']
+        dummyDriver.list_devices(self.onListDevices) # passing a callback
         time.sleep(0.1) # 100 ms
 
 class DummyAPI(object):
@@ -258,13 +259,13 @@ class DummyAPI(object):
     	if VERBOSE:
     	    print "\nv4l2 devices and their attributes : "
     	for device in devices.values():
-    		driver_name = device.get_driver().get_name()
-    		device_name = device.get_name()
+    		driver_name = device.driver.name
+    		device_name = device.name
     		#print ">> device %s:%s" % (driver_name, device_name) 
-    		for attr in device.get_attributes().values():
-    			name = attr.get_name()
+    		for attr in device.attributes.values():
+    			name = attr.name
     			value = attr.get_value()
-    			default = attr.get_default()
+    			default = attr.default
     			if VERBOSE:
     			    print "%s:%s:%s = %s (%s)" % (driver_name, device_name, name, value, default)
     			if name in ['width','height']:
@@ -280,7 +281,7 @@ class Test_4_v4l_Driver(unittest.TestCase):
     test Video4LinuxDriver
     """
     def setUp(self):
-        self.driver = devices.get_manager('video').get_driver('v4l2')
+        self.driver = devices.managers['video'].drivers['v4l2']
         if not isinstance(self.driver, devices.VideoDriver):
             self.fail('%s should be a VideoDriver instance.' % (self.driver))
         # register the callbacks
@@ -294,7 +295,7 @@ class Test_4_v4l_Driver(unittest.TestCase):
         
         
     def test_1_get_driver(self):
-        video_drivers = devices.get_manager('video').get_drivers()
+        video_drivers = devices.managers['video'].drivers
         #pprint.pprint(video_drivers)
         if 'v4l2' not in video_drivers:
             self.fail('v4l2 should be in video drivers.')

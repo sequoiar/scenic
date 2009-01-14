@@ -40,7 +40,7 @@ log = log.start('debug', 1, 0, 'devices')
 # ---------------------------------------------------------
 def _parse_v4l2_ctl_all(lines):
     """
-    Parses the output of the "v4l2-ctl --all" command
+    Parses the output of the `v4l2-ctl --all -d /dev/video0` command
     
     Returns a dict.
     """
@@ -93,7 +93,7 @@ def _parse_v4l2_ctl_all(lines):
 
 def _parse_v4l2_ctl_list_inputs(lines):
     """
-    Parses the output of v4l2-ctl --list-inputs
+    Parses the output of `v4l2-ctl --list-inputs -d /dev/video0`
     
     Returns a list with all input names.
     Their index is their number.
@@ -116,11 +116,14 @@ def _parse_v4l2_ctl_list_inputs(lines):
 class Video4LinuxDriver(devices.VideoDriver):
     """
     Video4linux 2 Driver.
+    
+    self.selected_device = "/dev/video0"
     """
     name = 'v4l2'
     
     def __init__(self, polling_interval=15.0):
         devices.Driver.__init__(self, polling_interval)
+        self.selected_device = '/dev/video0' # Use this to set the video card we use.
         
     def prepare(self):
         try:
@@ -181,6 +184,10 @@ class Video4LinuxDriver(devices.VideoDriver):
         elif name == 'width' or name == 'height': 
             # --set-fmt-video=width=<w>,height=<h>
             # TODO: check if within range. fix if not
+            # if both attributes are changes at the same time before the next poll, 
+            # the second one is going to set the first back back to its prev value.
+            # NO ! it's ok, since we retrieve the value from what the programmer had set,
+            # and not the actual value of the device.
             if name == 'width':
                 width = val
                 height = attr.device.attributes['height'].get_value()
@@ -231,7 +238,7 @@ class Video4LinuxDriver(devices.VideoDriver):
         if command[0] == 'v4l2-ctl':
             if command[1] == '--all': # reading all attributes
                 try:
-                    device = self.new_devices[extra_arg] # '/dev/video0'
+                    device = self._new_devices[extra_arg] # '/dev/video0'
                 except KeyError:
                     log.info('no device '+str(extra_arg))
                 else:
@@ -262,7 +269,7 @@ class Video4LinuxDriver(devices.VideoDriver):
                             device.add_attribute(attr)
             elif command[1] == '--list-inputs':
                 try:
-                    device = self.new_devices[extra_arg] #'/dev/video0']
+                    device = self._new_devices[extra_arg] #'/dev/video0']
                     # TODO: check if there are many devices, how the v4l2-ctl command works.
                 except KeyError:
                     log.info('no device '+str(extra_arg)) #/dev/video0
@@ -276,7 +283,7 @@ class Video4LinuxDriver(devices.VideoDriver):
         self._on_done_devices_polling()
         
 
-devices.get_manager('video').add_driver(Video4LinuxDriver()) # only one instance.
+devices.managers['video'].add_driver(Video4LinuxDriver()) # only one instance.
 # TODO : load only if module is there and if computer (OS) supports it.
 
 def start(api):
