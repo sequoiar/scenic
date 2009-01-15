@@ -234,4 +234,28 @@ class ControllerApi(object):
 
     def get_default_port(self, connector):
         return self.connectors[connector].PORT
+    
+    def devices_list_attributes(self, caller, driver_name, device_name):
+        pass
+        # TODO: if IndexError, 
+        self.notify(caller, 'No such device or driver: %s %s' % (driver_name, device_name), 'info')
+        # devices.get_driver(driver_name).devices[device_name].list_attributes()
+        self.notify(caller, 'you called devices_list_attributes', 'devices_list_attributes')
+
+    def devices_modify_attribute(self, caller, driver_name, device_name, attribute_name, value):
+        pass
+        # TODO
+        self.notify(caller, 'No such attributes for driver/device: %s %s %s:%s' % (driver_name, device_name, attribute_name, str(value)), 'info')
+        self.notify(caller, 'you called devices_modify_attributes', 'devices_modify_attribute')
+        
+        # devices.get_driver(driver_name).devices[device_name].attributes[attribute_name].set_value(value)
+
+    def devices_list(self, caller, driver_name=None):
+        pass
+        if driver_name is None:
+            self.notify(caller, 'No drivers to list.', 'info')
+        else:
+            self.notify(caller, 'No such driver: %s' % (driver_name), 'info')
+        # devices.get_driver(driver_name).list_devices()
+        self.notify(caller, 'you called devices_list', 'devices_list')
 

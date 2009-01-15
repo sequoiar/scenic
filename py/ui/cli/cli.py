@@ -464,6 +464,7 @@ class CliController(TelnetServer):
             self.core.delete_stream(self, options.erase, kind)
         else:
             cp.print_help()
+    
 
     def _streams(self, line):
         cp = CliParser(self, prog=line[0], description="Manage the wrapper stream.")
@@ -567,6 +568,46 @@ class CliController(TelnetServer):
         self.print_all_commands()
 
 
+    def _devices(self, line):
+        """
+        Manages v4l2 and ALSA devices.
+        
+        Usage:
+        devices -l : list drivers and devices of each type
+        devices -t v4l2 -d /dev/video0 -a : list attributes for a device
+        devices -t v4l2 -d /dev/video0 -m norm ntsc  : modifies an attribute for a device
+        """
+        cp = CliParser(self, prog=line[0], description="Manages the audio/video/data devices.")
+        
+        cp.add_option("-t", "--driver", type="string", help="Specifies a driver.")
+        cp.add_option("-d", "--device", type="string", help="Specifies a device.")
+        
+        cp.add_option("-l", "--list", action='store_true', help="Lists all the drivers and devices: devices -l")
+        cp.add_option("-a", "--attributes", action='store_true', help="Lists attributes for a device: devices -t v4l2 -d /dev/video0 -a")
+        cp.add_option("-m", "--modify", type="string", help="Modifies the value of an attribute: devices -t v4l2 -d /dev/video0 -m norm ntsc")
+        cp.add_option("-z", "--description", action='store_true', help="Displays description")
+        
+        (options, args) = cp.parse_args(line)
+        
+        if options.list:
+            self.core.devices_list(self, None) # caller, driver
+            if options.driver:
+                self.core.devices_list(self, options.driver) # caller, driver
+        elif options.attributes:
+            if options.driver and options.device:
+                self.core.devices_list_attributes(self, options.driver, options.device) # caller, driver, device
+            else:
+                cp.print_help()
+        elif options.modify:
+            if options.driver and options.device and len(args) == 2:
+                value = args[1]
+                self.core.devices_modify_attribute(self, options.driver, options.device, options.modify, value) # caller, driver, device, attributes, value
+            else:
+                cp.print_help()
+        elif options.description:
+            cp.print_description()
+        else:
+            cp.print_help()
 
 class CliParser(optparse.OptionParser):
     """
@@ -1082,6 +1123,18 @@ class CliView(Observer):
 
     def _connectionMade(self, origin, data):
         self.write(data[0])
+
+    def _devices_list(self, origin, data):
+        # TODO
+        self.write(str(data))
+    
+    def _devices_list_attributes(self, origin, data):
+        # TODO
+        self.write(str(data))
+    def _devices_modify_attribute(self, origin, data):
+        # TODO
+        self.write(str(data))
+
 
 def bold(msg):
     return "%s[1m%s%s[0m" % (ESC, msg, ESC)
