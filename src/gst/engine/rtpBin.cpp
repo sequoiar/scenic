@@ -41,6 +41,13 @@ void RtpBin::init()
     g_object_set(G_OBJECT(rtpbin_), "latency", 1, NULL);
     
 #if 0
+    // uncomment this to print jitter
+    g_signal_connect(G_OBJECT(rtpbin_), "get-internal-session", G_CALLBACK(gotInternalSessionCb), NULL);
+    g_timeout_add(5000 /* ms */, 
+                  static_cast<GSourceFunc>(printJitter),
+                  static_cast<void*>(this));
+#endif 
+#if 0
     // uncomment this to see each gstrtpsession's bandwidth printed
     // connect our action signal handler which requests our internal session, to our got-session handler.
     g_signal_connect(G_OBJECT(rtpbin_), "get-internal-session", G_CALLBACK(gotInternalSessionCb), NULL);
@@ -52,7 +59,7 @@ void RtpBin::init()
 
 
 /// set drop-on-latency to TRUE, needs to be called upon creation of jitterbuffers, via a signal handler.
-/// No visible effect. 
+/// No visible effect, so not used. 
 
 int RtpBin::dropOnLatency(gpointer data)
 {
@@ -82,9 +89,10 @@ int RtpBin::printJitter(gpointer data)
 {
     RtpBin *context = static_cast<RtpBin*>(data);
     for (unsigned int sessionId = 0; sessionId < context->refCount_; ++sessionId)
-        LOG_INFO("Jitter: " << context->jitter(sessionId));
+        printJitter(sessionId);
+        //LOG_INFO("Jitter: " << context->jitter(sessionId));
 
-    return FALSE; // called once
+    return TRUE; // called once
 }
 
 
@@ -176,25 +184,54 @@ double RtpBin::jitter(guint sessionId) const
     gdouble result = 0.0;
 
     requestSession(sessionId);
-    // FIXME: Unimplemented
-    //requestSource();
+    // FIXME: Unimplemented, how do we get ssrc?
+    //requestSource(ssrc);
     return result;
 }
 
 
 bool RtpBin::requestSession(guint sessionId)
 {
-    g_signal_emit_by_name (static_cast<gpointer>(rtpbin_), "get-internal-session", sessionId, &session_);
+    g_signal_emit_by_name(static_cast<gpointer>(rtpbin_), "get-internal-session", sessionId, &session_);
+    return false;
+}
+
+
+bool RtpBin::printJitter(guint sessionId)
+{
+#if 0
+#include "/home/tristan/gst-plugins-bad/gst/rtpmanager/rtpstats.h"
+    GValueArray *arr;
+    GValue *val;
+    guint i;
+#endif
+
+    requestSession(sessionId);
+#if 0
+    g_object_get (session_, "sources", &arr, NULL);
+
+    for (i = 0; i < arr->n_values; i++) {
+        GObject *source;
+        RTPSourceStats *stats;
+        //GObject *jitter;
+
+        val = g_value_array_get_nth (arr, i);
+        source = static_cast<GObject*>(g_value_get_object (val));
+        g_object_get(source, "stats", &stats, NULL);
+        LOG_DEBUG("JITTER IS " << stats->jitter);
+    }
+    g_value_array_free(arr);
+#endif
     return false;
 }
 
 
 GObject *RtpBin::gotInternalSessionCb(GstElement * /*rtpbin*/, guint session, gpointer data)
 {
-
     LOG_DEBUG("GOT THE SESSION: " << session);
     session_ = static_cast<GObject*>(data);
-
+    
     return session_;
 }
+
 

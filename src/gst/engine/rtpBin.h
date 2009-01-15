@@ -47,10 +47,11 @@ class RtpBin
         static int increaseBandwidth(void * data);
         static int printBandwidth(void * data);
         static int printJitter(void * data);
+        static bool printJitter(unsigned int sessionID);
         static int dropOnLatency(void * data);
         static _GObject *session_;
         static bool requestSession(unsigned int sessionId);
-        static _GObject *gotInternalSessionCb(_GstElement *rtpBin, unsigned int session, void *data);
+        static _GObject *gotInternalSessionCb(_GstElement * /*rtpBin*/, unsigned int session, void *data);
 
         RtpBin(const RtpBin&); //No Copy Constructor
         RtpBin& operator=(const RtpBin&); //No Assignment Operator

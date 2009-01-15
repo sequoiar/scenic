@@ -30,7 +30,6 @@
 
 // forward declarations
 class AudioSourceConfig;
-class _GObject;
 
 /** 
  *  Abstract base class from which our audio sources are derived.
@@ -59,7 +58,6 @@ class AudioSource : public GstLinkableSource
 
     private:
         virtual void init_source();
-        
         virtual void link_elements();
         
         GstElement *srcElement() { return aconvs_[0]; }
@@ -157,8 +155,6 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
         int loopCount_;
 };
 
-// FIXME: create ABC FilteredAudioSource for alsa and pulse
-
 /** 
  *  Concrete AudioSource which captures audio from ALSA
  *  Has caps filter to allow number of channels to be variable.
@@ -168,13 +164,6 @@ class AudioAlsaSource : public AudioSource
 {
     public:
         explicit AudioAlsaSource(const AudioSourceConfig &config);
-
-// FIXME: use this
-#if 0
-    protected:
-        static void initCaps(_GObject *capsfilter);
-#endif
-
 
     private:
         ~AudioAlsaSource();
@@ -214,7 +203,7 @@ class AudioPulseSource : public AudioSource
 };
 
 /** 
- *  Concrete InterleavedAudioSource which captures audio from JACK, 
+ *  Concrete AudioSource which captures audio from JACK, 
  *  and interleaves incoming jack buffers into one multichannel stream.
  */
 
