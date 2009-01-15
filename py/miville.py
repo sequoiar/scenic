@@ -88,14 +88,15 @@ class Core(Subject):
 def chk_ob(core):
     print "Contacts: %r" % core.adb.contacts.keys()
 #    print dir(ui.cli)
-                    
+
+core = None
 
 def main():    
+    global core
     core = Core()
 #    l = task.LoopingCall(chk_ob, core)
 #    l.start(2.0, False)
-    reactor.run()
-    
+def exit():
     # on exit
     core.adb.write(False)
 
@@ -104,3 +105,9 @@ if __name__ == '__main__':
     log.start()
     log.info('Starting Sropulpof...')
     main()
+    
+    reactor.run()
+    exit()
+
+
+
