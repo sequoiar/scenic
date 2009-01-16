@@ -29,10 +29,14 @@ from twisted.internet import reactor
 import devices
 import utils.log
 
+from utils import commands
+
 del devices.log
 devices.log = utils.log.start('error', 1, 0, 'devices')
-del devices.shell.log
-devices.shell.log = utils.log.start('error', 1, 0, 'shell')
+
+#del devices..log
+#devices.shell.log = utils.log.start('error', 1, 0, 'commands')
+
 
 # TODO: was simpler
     #def shell_command_result(self,command,results,callback=None):
@@ -68,12 +72,13 @@ class DummyAudioDriver(devices.AudioDriver):
     def _on_devices_polling(self):
         self.devices = {}
         dev = devices.Device('M-Audio Delta 1010 LT')
-        self.add_device(dev)
+        self._add_new_device(dev)
         for name in ['egg','spam']:
             dev.add_attribute(devices.StringAttribute(name, 'bacon', 'bacon'))
-    
+        self.devices = self._new_devices 
+
     def on_commands_error(self, commands):
-        raise NotImplementedError, 'This method must be implemented in child classes. (if you need it)'
+        raise NotImplementedError('This method must be implemented in child classes. (if you need it)')
         
     def on_commands_results(self, results, commands):
         """
@@ -99,22 +104,7 @@ class Test_1_Driver(unittest.TestCase):
         d = DummyAudioDriver(0.1, self)
         d.prepare()
         d.stop_polling()
-    
-    def test_2_driver_polling(self):
-        d = DummyAudioDriver(0.1, self)
-        d.prepare()
-        name = 'M-Audio Delta 1010 LT'
-        if name not in d.devices:
-            self.fail('Driver should contain the device named %s.' & (name))
-        d.stop_polling()
-    
-    def test_3_simple_shell_command(self):
-        d = DummyAudioDriver(0.1, self)
-        d.single_command_start(['echo','ham'])
-        time.sleep(0.2) # 100 ms
-        d.stop_polling()
-    # TODO : test if polling works.
-    
+   
 class Test_2_Device_Attributes(unittest.TestCase):
     """
     Test attributes for devices 
@@ -131,50 +121,50 @@ class Test_2_Device_Attributes(unittest.TestCase):
         self.assertEqual(tmp, 16, 'Attribute not matching what we gave it.')
         
         tmp = d.attributes['bit depth'].default
-        self.assertEqual(tmp, 16,'Default not matching what we gave it.')
+        self.assertEqual(tmp, 16, 'Default not matching what we gave it.')
         
         tmp = d.attributes['sampling rate'].range # a two int tuple
         self.assertEqual(tmp[0], 8000,  'Minimum value not matching what we gave it.')
-        self.assertEqual(tmp[1], 192000,'Maximum value not matching what we gave it.')
+        self.assertEqual(tmp[1], 192000, 'Maximum value not matching what we gave it.')
     
     def test_2_device_string_attribute(self):
         d = devices.Device('MOTU')
         d.add_attribute(devices.StringAttribute('meal', 'egg', 'spam'))
         
         tmp = d.attributes['meal'].get_value()
-        self.assertEqual(tmp, 'egg','Attribute not matching what we gave it.')
+        self.assertEqual(tmp, 'egg', 'Attribute not matching what we gave it.')
         
         tmp = d.attributes['meal'].default
-        self.assertEqual(tmp, 'spam','Attribute default not matching what we gave it.')
+        self.assertEqual(tmp, 'spam', 'Attribute default not matching what we gave it.')
     
     def test_3_device_options_attribute(self):
         d = devices.Device('MOTU')
-        d.add_attribute(devices.OptionsAttribute('meal','egg', 'spam', ['egg','spam','ham','bacon']))
+        d.add_attribute(devices.OptionsAttribute('meal', 'egg', 'spam', ['egg', 'spam', 'ham', 'bacon']))
         
         attr = d.attributes['meal']
         #self.assertEqual(tmp, 'egg','Attribute not matching what we gave it: '+attr)
         
         # value
         value = attr.get_value()
-        self.assertEqual(value, 'egg','Attribute value not matching what we gave it: '+str(value))
+        self.assertEqual(value, 'egg', 'Attribute value not matching what we gave it: '+str(value))
         
         i = attr.options.index(attr.get_value())
-        self.assertEqual(i, 0,'Attribute value index incorrect.')
+        self.assertEqual(i, 0, 'Attribute value index incorrect.')
         
         # default 
         tmp = attr.default
         self.assertEqual(tmp, 'spam','Attribute default not matching what we gave it.'+tmp)
         
         tmp = attr.options.index(attr.default)
-        self.assertEqual(tmp, 1,'Attribute default index incorrect.')
+        self.assertEqual(tmp, 1, 'Attribute default index incorrect.')
         
     def test_4_list_attributes(self):
         d = devices.Device('MOTU')
-        d.add_attribute(devices.StringAttribute('meal','egg', 'spam'))
+        d.add_attribute(devices.StringAttribute('meal', 'egg', 'spam'))
         d.add_attribute(devices.IntAttribute('ham', 0, 0))
         
         tmp = d.attributes.keys()
-        self.assertEqual(tmp, ['meal','ham'],'Attribute names not matching what we gave it.')
+        self.assertEqual(tmp, ['meal', 'ham'], 'Attribute names not matching what we gave it.')
 
 # --------------------------------- no good ---------------------------
 # no good.
@@ -183,18 +173,6 @@ class Test_3_Drivers_Managers(unittest.TestCase):
     Warning: This test suite adds dummy drivers and devices to the 
     "devices" module "managers" attribute.
     """ 
-    def xx_setUp(self):
-        # drivers
-        dummyDriver = DummyAudioDriver(self) # passing it the TestCase
-        devices.managers['audio'].add_driver(dummyDriver)
-        
-        # devices
-        dummy_device = devices.Device('MOTU')
-        spam_device = devices.Device('SPAM')
-        dummyDriver.add_device(dummy_device)
-        dummyDriver.add_device(spam_device)
-        
-    
     def test_1_get_manager(self):
         # test for the get_manager() function.
         for kind in ('video','audio','data'):
@@ -211,19 +189,7 @@ class Test_3_Drivers_Managers(unittest.TestCase):
             tmp = devices.managers[kind].drivers
             self.assertEqual(type(tmp), dict, 'Should be a dict.')
         
-    
-    def xxonListDevices(self, devices):
-        self.assertEqual(type(devices), dict, 'Should be a dict.')
-        self.assertEqual(devices['MOTU'].name, 'MOTU', 'Wrong device name.')
-        self.assertEqual(devices['SPAM'].name, 'SPAM', 'Wrong device name.')
-        
-    def xxtest_2_list_devices(self):
-        # TODO: implement again this test
-        dummyDriver = devices.managers['audio'].driver['dummy']
-        dummyDriver.list_devices(self.onListDevices) # passing a callback
-        time.sleep(0.1) # 100 ms
-
-class DummyAPI(object):
+class DummyListener(object):
     """
     Similar to the way the Driver objects are used in the core API.
     """
@@ -241,12 +207,16 @@ class DummyAPI(object):
         pass
     
     def on_devices_list(self, devices):
+        VERBOSE = False
+        if VERBOSE:    
+            print "\nv4l: REFRESHED DEVICES"
         if len(devices) == 0:
-            #print "NO V4L2 DEVICE."
+            print "\non_devices_list(): NO V4L2 DEVICE."
             pass
         else:
             for name in devices:
-                #print "V4L2 device : ", name
+                if VERBOSE:
+                    print "V4L2 device : ", name
                 device = devices[name]
                 #print "List %s : device %s" % (driver.get_name(), device.get_name())
         self.has_been_called = True
@@ -254,10 +224,11 @@ class DummyAPI(object):
     	#print "\nOK DONE "
     	
     def on_devices_list_check(self, devices):
-    	#VERBOSE = True
     	VERBOSE = False
+    	#VERBOSE = False
     	if VERBOSE:
-    	    print "\nv4l2 devices and their attributes : "
+    	    pass
+            #print "\non_devices_list_check(): v4l2 devices and their attributes : "
     	for device in devices.values():
     		driver_name = device.driver.name
     		device_name = device.name
@@ -266,33 +237,73 @@ class DummyAPI(object):
     			name = attr.name
     			value = attr.get_value()
     			default = attr.default
-    			if VERBOSE:
-    			    print "%s:%s:%s = %s (%s)" % (driver_name, device_name, name, value, default)
-    			if name in ['width','height']:
-    			    if not isinstance(value, int):
-    			        print "Attribute %s should be %s but is %s" % (name, 'int', value)
-                if name in ['driver', 'norm', 'input']:
-                    if not isinstance(value, str):
-    			        print "Attribute %s should be %s but is %s" % (name, 'str', value)
+                #if VERBOSE:
+                #    print "%s:%s: %s = %s (%s)" % (driver_name, device_name, name, value, default)
+                #    if name in ['width','height']:
+                #        if not isinstance(value, int):
+                #            print "Attribute %s should be %s but is %s" % (name, 'int', value)
+                #    if name in ['driver', 'norm', 'input']:
+                #        if not isinstance(value, str):
+                #            print "Attribute %s should be %s but is %s" % (name, 'str', value)
         
-    	
+class DummyWrapperAPI(object):
+    """
+    fakely implements the MVC pattern
+    mimics the Subject class
+    """
+    def __init__(self, test):
+        self.listener = DummyListener(test)
+        self.callbacks = {
+            'on_devices_added':self.listener.on_devices_added,
+            'on_devices_removed':self.listener.on_devices_removed,
+            'on_attributes_changed':self.listener.on_attributes_changed,
+            'on_devices_list':self.listener.on_devices_list
+        }
+    def notify(self, caller, value, key=None):
+        #print "notify(%s,%s,%s)" % (str(caller), str(value), str(key))
+        self.callbacks[key](value)
+    
+    def use_tester_check(self):
+        """Enables using on_devices_list_check instead of on_devices_list"""
+        self.callbacks['on_devices_list'] = self.listener.on_devices_list_check
+
+
+def v4l_change_norm_1(results, test):
+    driver = test.driver
+    
+    try:
+        video0 = test.driver.devices['/dev/video0']
+    except KeyError, e:
+            test.fail('no device /dev/video0: '+str(e.message))
+    else:
+        
+        attr = test.driver.devices['/dev/video0'].attributes['norm']
+        
+        #attr.set_value('Composite0')
+        #for expected in ['Composite0', 'Composite1', 'S-Video']:
+        #    attr.set_value(expected)
+        #    time.sleep(0.1)
+        #    self.driver.poll_now()
+        #    time.sleep(0.1)
+        #    value = attr.get_value()
+        #    if value != expected:
+        #        self.fail('norm attributes should be changed to %s but is %s.' % (expected, value))
+    
+
+
 class Test_4_v4l_Driver(unittest.TestCase):
     """
     test Video4LinuxDriver
+    
+    The golden rule is: If your tests call a function which returns a Deferred, your test should return a Deferred.
     """
     def setUp(self):
+        self.api = DummyWrapperAPI(self)
+        devices.v4l.start(self.api)
+        
         self.driver = devices.managers['video'].drivers['v4l2']
         if not isinstance(self.driver, devices.VideoDriver):
             self.fail('%s should be a VideoDriver instance.' % (self.driver))
-        # register the callbacks
-        self.api = DummyAPI(self)
-        self.driver.register('on_devices_list', self.api.on_devices_list)
-        self.driver.register('on_devices_removed', self.api.on_devices_removed)
-        self.driver.register('on_attributes_changed', self.api.on_attributes_changed)
-        self.driver.register('on_devices_added', self.api.on_devices_added)
-        #print "callbacks:"
-        #pprint.pprint(driver.callbacks)
-        
         
     def test_1_get_driver(self):
         video_drivers = devices.managers['video'].drivers
@@ -301,57 +312,46 @@ class Test_4_v4l_Driver(unittest.TestCase):
             self.fail('v4l2 should be in video drivers.')
         
     def test_2_list_devices(self):
-        self.driver.prepare() # which calls Driver._poll_devices()
-        time.sleep(0.1)
-        self.driver.stop_polling()
-        time.sleep(0.1)
+        self.driver.prepare() # _poll_devices()  
+        time.sleep(0.1)        
         
     def test_3_devices_attributes(self):
         # override one callback
-        self.driver.register('on_devices_list', self.api.on_devices_list_check)
+        self.api.use_tester_check()
         self.driver.poll_now() # which calls Driver._poll_devices()
         time.sleep(0.1)
-        self.driver.stop_polling()
-        
         
     def test_4_set_norm(self):
+        return self.driver.poll_now().addCallback(v4l_change_norm_1, self)
+    
+    def xxtest_5_width_height(self):
         self.driver.poll_now() # which calls Driver._poll_devices()
-        time.sleep(0.01)
-        attr = self.driver.devices['/dev/video0'].attributes['norm']
-        
-        for expected in ['Composite0', 'Composite1', 'S-Video']:
-            attr.set_value(expected)
-            time.sleep(0.01)
-            self.driver.poll_now()
-            time.sleep(0.01)
-            value = attr.get_value()
-            if value != expected:
-                self.fail('norm attributes should be changed to %s but is %s.' % (expected, value))
-        self.driver.stop_polling()
         time.sleep(0.1)
-        
-        
-    def test_5_width_height(self):
-        self.driver.poll_now() # which calls Driver._poll_devices()
-        time.sleep(0.01)
-        attr_w = self.driver.devices['/dev/video0'].attributes['width']
-        attr_h = self.driver.devices['/dev/video0'].attributes['height']
-        
-        for w, h in ((320, 240), (1024, 768), (640, 480)):
+        try:
+            video0 = self.driver.devices['/dev/video0']
+        except KeyError, e:
+            #self.driver.stop_polling()
+            print "ERROR",e
+            self.fail('no device /dev/video0')
+        else:
+            attr_w = self.driver.devices['/dev/video0'].attributes['width']
+            attr_h = self.driver.devices['/dev/video0'].attributes['height']
             
-            attr_w.set_value(w)
-            attr_h.set_value(h)
-            time.sleep(0.01)
-            self.driver.poll_now()
-            time.sleep(0.01)
-            val_w, val_h = attr_w.get_value(), attr_h.get_value()
-            if val_w != w:
-                self.fail('Width should has been changed to %d but is %d.' % (w, val_w))
-            elif val_h != h:
-                self.fail('Height should has been changed to %d but is %d.' % (h, val_h))
-            else:
-                pass
-                #print 'Success ! Width is %d and height is %d.' % (w, h)
-        self.driver.stop_polling()
-        time.sleep(0.1)
+            for w, h in ((320, 240), (1024, 768), (640, 480)):
+                
+                attr_w.set_value(w)
+                attr_h.set_value(h)
+                time.sleep(0.1)
+                self.driver.poll_now()
+                val_w, val_h = attr_w.get_value(), attr_h.get_value()
+                if val_w != w:
+                    self.fail('Width should has been changed to %d but is %d.' % (w, val_w))
+                elif val_h != h:
+                    self.fail('Height should has been changed to %d but is %d.' % (h, val_h))
+                else:
+                    pass
+                    #print 'Success ! Width is %d and height is %d.' % (w, h)
         
+    def tearDown(self):
+        self.driver.stop_polling()
+

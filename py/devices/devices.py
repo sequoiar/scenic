@@ -47,11 +47,11 @@ import os, sys
 from twisted.internet import reactor #, protocol
 
 # App imports
-from utils import log, shell
+from utils import log, commands
 
 log = log.start('debug', 1, 0, 'devices')
 
-class Driver(shell.ShellCommander):
+class Driver(object): #shell.ShellCommander):
     """
     Base class for a driver for a type of Device. (ALSA, JACK, v4l, dv1394, etc.)
     
@@ -82,14 +82,13 @@ class Driver(shell.ShellCommander):
         
     TODO: separate Driver and ShellCommander classes
         
-    TODO: remove all getters and setters that are not necessary.
     
     If a getter/setter is necessary, the corresponding attribute should be private.
     i.e. begin with an underscore.
     """
     name = 'default_name'
     
-    def __init__(self, polling_interval=10.0, polling_enabled=True):
+    def __init__(self, polling_interval=10.0, polling_enabled=False):
         """
         child classes __init__ methods must call this one if defined.
         
@@ -102,40 +101,22 @@ class Driver(shell.ShellCommander):
         self.state_poll_enabled = polling_enabled
         self._delayed_id = None
         self.kind = 'default_kind'
-        
-        self.callbacks = {
-            'on_devices_removed' : None,
-            'on_devices_added' : None,
-            'on_attributes_changed' : None,
-            'on_devices_list' : None
-        }
-        
+        self.api = None
+       
     def __del__(self):
         self.stop_polling()
     
     def __str__(self):
         return self.name
         
-    def add_device(self, device, in_new_devices=False):
+    def _add_new_device(self, device):#, in_new_devices=False):
         """
-        Add a Device to this Driver.
+        Add a Device to this _new_devices.
         Also sets the Device Driver to this one.
         """
-        if in_new_devices:
-            devices = self._new_devices
-        else:
-            devices = self.devices
-        devices[device.name] = device
+        self._new_devices[device.name] = device
         device.driver = self
-    
-    #def get_kind(self):
-    #    """
-    #    Returns the driver kind 
-    #    Strings such as 'audio','video', 'data'
-    #    deprecated
-    #    """
-    #    return self.kind
-        
+     
     def _on_done_devices_polling(self):
         """
         Compares former dict of devices with the new one
@@ -150,8 +131,11 @@ class Driver(shell.ShellCommander):
            'on_attributes_changed'  arg: dict of Attribute instances
            'on_devices_list'        arg: dict of Device instances
         """
+        # Copying self._new_devices self.to devices
         old_devices = self.devices
         self.devices = self._new_devices
+        #print "self.devices: %s" % (str(self.devices))
+        
         # check for deleted
         removed = {}
         for name in old_devices:
@@ -191,21 +175,7 @@ class Driver(shell.ShellCommander):
         #print "DONE"
         self._call_event_listener('on_devices_list', self.devices) # dict
         #TODO: maybe not call it every time.
-        
-    def register(self, event_name, callback):
-        """
-        Sets the callback for an event.
-        
-        events names are:
-            'on_devices_removed'     arg: list of Device instances
-            'on_devices_added'       arg: list of Device instances
-            'on_attributes_changed'  arg: list of Attribute instances
-            'on_devices_list'        arg: list of Device instances
-            
-        Set it to None to turn off the callback.
-        """
-        self.callbacks[event_name] = callback
-        
+      
     def _call_event_listener(self, event_name, argument):
         """
         Calls an event listener (with one argument)
@@ -213,20 +183,16 @@ class Driver(shell.ShellCommander):
         See register_event_listener
         Might throw KeyError if event name doesn't exist.
         TODO: change for the api
-        """
-        callback = self.callbacks[event_name]
-        if callback is not None:
-            callback(argument)
-            #print "calling", callback
-        else:
-            log.error("No callback for %s event" % (event_name))
         
-    #def get_name(self):
-    #    """
-    #    Used by the DriverManager instances to manage Driver instances by their name.
-    #    deprecated
-    #    """
-        return self.name
+        events names are:
+            'on_devices_removed'     arg: list of Device instances
+            'on_devices_added'       arg: list of Device instances
+            'on_attributes_changed'  arg: list of Attribute instances
+            'on_devices_list'        arg: list of Device instances
+        
+        Will call observer.<Subject>.notify(caller, value, key=None) with args caller=self, value=a tuple, key='some string'
+        """
+        self.api.notify(self, argument, event_name) # driver instance, dict, event key name
         
     def prepare(self):
         """
@@ -236,37 +202,19 @@ class Driver(shell.ShellCommander):
         Should be implemented in child classes. The prepare mothod in 
         child classes should then call this one. Like this:
         Device.prepare(self)
+        
+        returns a Deferred
         """
         if self.state_poll_enabled:
-            self._poll_devices()
+            return self._poll_devices()
     
-        
-    #def get_devices(self):
-    #    """
-    #    Lists name of devices of the type that a driver supports on this machine right now.
-#
-#        Calls the callback with a dict of devices.
-#        Data will be a 'key' => 'long name' dict.
-#        Can be overriden in child classes.
-#        """
-#        return self.devices
-    
-    #def get_device(self, name):
-    #    """
-    #    Returns a device object.
-    #    
-    #    device_name must be a ASCII string.
-    #    Might throw a KeyError if device doesn't exist anymore.
-    #    """
-    #    return  self.devices[name]
-        
     def on_attribute_change(self, attribute):
         """
         Called by a device when one of its attribute is changed. (by the core, usually)
         
         Can be overriden if necessary to do shell scripts or so
         """
-        self.poll_now()
+        return self.poll_now()
     
     def set_polling_interval(self, ms):
         """
@@ -275,15 +223,18 @@ class Driver(shell.ShellCommander):
         :param ms: milliseconds.
         """
         self.polling_interval = ms
-        if self.state_poll_enabled:
-            self.poll_now()
+        #if self.state_poll_enabled:
+        #    self.poll_now()
     
     def get_polling_interval(self):
         return self.polling_interval
     
     def start_polling(self):
+        """
+        Returns a Deferred
+        """
         self.state_poll_enabled = True
-        self.poll_now()
+        return self.poll_now()
         
     def stop_polling(self):
         self._cancel_delayed_polling()
@@ -309,7 +260,7 @@ class Driver(shell.ShellCommander):
         
         Will call all the callbacks with the correct values.
         """
-        self._poll_devices()
+        return self._poll_devices()
         
     def _poll_devices(self):
         """
@@ -319,7 +270,7 @@ class Driver(shell.ShellCommander):
             self._cancel_delayed_polling()
             self._delayed_id = reactor.callLater(self.polling_interval, self._poll_devices)
         self._new_devices = {}
-        self._on_devices_polling()
+        return self._on_devices_polling()
     
     def _on_devices_polling(self):
         """
@@ -327,12 +278,15 @@ class Driver(shell.ShellCommander):
         in order to populate its Device list and their attributes.
         
         Must be overriden in child classes.
-        Should call self._on_done_devices_polling(old_devices) with the 
+        Once it is done, should call self._on_done_devices_polling(old_devices) with the 
         former list of devices the new dict is populated.
+        
+        IMPORTANT: Should return a Deffered instance.
         """
-        pass
+        raise NotImplementedError('this method must be overriden in child classes.')
+        #pass
         # default behaviour :
-        self._on_done_devices_polling({})
+        #self._on_done_devices_polling({})
     
 # Drivers should extend one of these classes: 
 class VideoDriver(Driver):
@@ -376,10 +330,14 @@ class Attribute(object):
         Changes the value of the Attribute for a device.
         
         Notifies the Driver if do_notify_driver is not False.
+        TODO: Should return a Deferred object
         """
+        # TODO: return a Deferred object.
         self._value = value
         if do_notify_driver:
-            self._on_change()
+            return self._on_change()
+        else:
+            return None
     
     def _on_change(self):
         """
@@ -387,7 +345,7 @@ class Attribute(object):
 
         Tells the Device that the value changed.
         """ 
-        self.device.driver.on_attribute_change(self)
+        return self.device.driver.on_attribute_change(self)
         
 class BooleanAttribute(Attribute):
     kind = 'boolean'
@@ -404,7 +362,7 @@ class IntAttribute(Attribute):
     The range is a two-numbers tuple defining minimum and maximum possible value.
     """
     kind = 'int'
-    
+    # TODO: range should be a tuple
     def __init__(self, name, value=0, default=0, minimum=0, maximum=1023):
         Attribute.__init__(self, name, value, default)
         self.range = (minimum, maximum)

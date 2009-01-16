@@ -19,7 +19,7 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 """
-VideoDriver (instance) that manages v4l2 devices.
+VideoDriver that manages v4l2 devices.
 
 Uses v4l2-ctl from Debian/Ubuntu package ivtv-utils
 """
@@ -32,11 +32,14 @@ import pprint
 from twisted.internet import reactor, protocol
 from twisted.python import procutils
 from twisted.python import failure
+
 # App imports
 from utils import log
-import devices
+from utils.commands import *
+from devices import *
 
-log = log.start('debug', 1, 0, 'devices')
+#log = log.start('debug', 1, 0, 'devices')
+
 # ---------------------------------------------------------
 def _parse_v4l2_ctl_all(lines):
     """
@@ -113,7 +116,7 @@ def _parse_v4l2_ctl_list_inputs(lines):
     return inputs
 # ---------------------------------------------------------
 
-class Video4LinuxDriver(devices.VideoDriver):
+class Video4LinuxDriver(VideoDriver):
     """
     Video4linux 2 Driver.
     
@@ -122,49 +125,60 @@ class Video4LinuxDriver(devices.VideoDriver):
     name = 'v4l2'
     
     def __init__(self, polling_interval=15.0):
-        devices.Driver.__init__(self, polling_interval)
+        Driver.__init__(self, polling_interval)
         self.selected_device = '/dev/video0' # Use this to set the video card we use.
         
     def prepare(self):
+        """
+        Returns a Deferred instance? no
+        """
         try:
-            tmp = self.find_command('v4l2-ctl') # will fail if not found
+            tmp = find_command('v4l2-ctl') # will fail if not found
         except:
-            raise Exception("v4l2-ctl command not found. Please sudo apt-get install ivtv-utils")
-        devices.Driver.prepare(self)
+            raise CommandNotFoundError("v4l2-ctl command not found. Please sudo apt-get install ivtv-utils")
+        return Driver.prepare(self)
     
     def _on_devices_polling(self):
         """
         Get all infos for all devices.
         Starts the commands.
+        
+        Must return a Deferred instance.
         """
         # TODO: we must populate an other dict 
         # so that we can still access the data while populating.
         # since it is asynchronous
         device_names = glob.glob('/dev/video*')
+        commands = []
+        extra_arg = []
+
         for name in device_names:
-            device = devices.Device(name)
-            self.add_device(device, True) # in_new_devices # TODO : make add_device cleaner.
+            device = Device(name)
+            self._add_new_device(device) # in_new_devices # TODO : make add_device cleaner.
             # TODO: does it notify the api ?
             
             # add its attributes with default values.
-            attr = devices.OptionsAttribute('input', 'Composite0', 'Composite0', ['Composite0', 'Composite1', 'S-Video']) # 'Composite2'
+            attr = OptionsAttribute('input', 'Composite0', 'Composite0', ['Composite0', 'Composite1', 'S-Video']) # 'Composite2'
             device.add_attribute(attr)
             
             # now, the commands (TODO)
-            commands = [
-                ['v4l2-ctl', '--all', '-d', name],
-                ['v4l2-ctl', '--list-inputs', '-d', name]
-                ]
-            self.commands_start(commands, name)
-        #cmd = ['v4l2-ctl','--list-inputs']
-        #cmd = ['v4l2-ctl','--get-fmt-video']
-        #cmd = ['v4l2-ctl','--get-input']
-        #cmd = ['v4l2-ctl','--list-ctrls'] (brightness and contrast)
-        
+            commands.append(['v4l2-ctl', '--all', '-d', name])
+            commands.append(['v4l2-ctl', '--list-inputs', '-d', name])
+            for i in range(2):
+                extra_arg.append(name) # twice
+            # TODO:
+            #cmd = ['v4l2-ctl','--list-inputs']
+            #cmd = ['v4l2-ctl','--get-fmt-video']
+            #cmd = ['v4l2-ctl','--get-input']
+            #cmd = ['v4l2-ctl','--list-ctrls'] (brightness and contrast)
+        #print "commands_start(%s, %s, %s)" % (str(commands), str(self.on_commands_results), extra_arg)
+        return commands_start(commands, self.on_commands_results, extra_arg) # returns a Deferred
+    
     def on_attribute_change(self, attr):
         name = attr.name
         val = attr.get_value()
         dev_name = attr.device.name
+        ret = None
         
         #print ">>>>>>>>>>val", val, type(val)
         if name == 'norm': # 'ntsc', 'secam' or 'pal'
@@ -179,7 +193,7 @@ class Video4LinuxDriver(devices.VideoDriver):
             elif val.lower().startswith('secam'):
                 norm = 'secam'
             command = ['v4l2-ctl', '--set-standard=' + norm, '-d', dev_name]
-            self.single_command_start(command)
+            ret = single_command_start(command, self.on_commands_results)
             
         elif name == 'width' or name == 'height': 
             # --set-fmt-video=width=<w>,height=<h>
@@ -195,7 +209,7 @@ class Video4LinuxDriver(devices.VideoDriver):
                 height = val
                 width = attr.device.attributes['width'].get_value()
             command = ['v4l2-ctl', '--set-fmt-video=width=%d,height=%d' % (width, height), '-d', dev_name]
-            self.single_command_start(command)
+            ret = single_command_start(command, self.on_commands_results)
         
         elif name == 'input': # --set-input=<num>
             # TODO parse data to get possible values
@@ -205,11 +219,12 @@ class Video4LinuxDriver(devices.VideoDriver):
             if val in attr.options:
                 index = attr.options.index(val)
                 command = ['v4l2-ctl', '--set-input=' + index, '-d', dev_name]
-                self.single_command_start(command)
+                ret = single_command_start(command, self.on_commands_results)
                 
         if command is not None:
             #TODO
             pass
+        return ret # Deferred
     
     def on_commands_results(self, results, commands, extra_arg=None): 
         """
@@ -226,7 +241,10 @@ class Video4LinuxDriver(devices.VideoDriver):
                 command = commands[i]
                 stdout, stderr, signal_or_code = results_infos
                 if success:
-                    self._handle_shell_infos_results(command, stdout, extra_arg)
+                    arg = None
+                    if isinstance(extra_arg, list):
+                        arg = extra_arg[i]
+                    self._handle_shell_infos_results(command, stdout, arg)
                 else:
                     print "failure for command %s" % (command[0])
                     print "stderr: %s" % (stderr)
@@ -234,13 +252,19 @@ class Video4LinuxDriver(devices.VideoDriver):
         
     
     def _handle_shell_infos_results(self, command, results, extra_arg=None):
-    	#print 'v4l','_handle_shell_infos_results'
+    	"""
+        Handles results for only one command received by on_commands_results
+        
+        See on_command_results() 
+        """
+        device_name = extra_arg
+        #print 'v4l','_handle_shell_infos_results'
         if command[0] == 'v4l2-ctl':
             if command[1] == '--all': # reading all attributes
                 try:
-                    device = self._new_devices[extra_arg] # '/dev/video0'
+                    device = self._new_devices[device_name] # '/dev/video0'
                 except KeyError:
-                    log.info('no device '+str(extra_arg))
+                    log.info('no device ' + str(extra_arg))
                 else:
                	    splitted = results.splitlines()
                     dic = _parse_v4l2_ctl_all(splitted)
@@ -251,11 +275,11 @@ class Video4LinuxDriver(devices.VideoDriver):
                     for key in dic:
                         value = dic[key]
                         if key in ['driver','card','pixel format']:
-                            device.add_attribute(devices.StringAttribute(key, dic[key], 'no default'))
+                            device.add_attribute(StringAttribute(key, dic[key], 'no default'))
                         elif key == 'width':
-                            device.add_attribute(devices.IntAttribute(key, int(dic[key]), 640, 320, 9999)) # TODO better min/max
+                            device.add_attribute(IntAttribute(key, int(dic[key]), 640, 320, 9999)) # TODO better min/max
                         elif key == 'height':
-                            device.add_attribute(devices.IntAttribute(key, int(dic[key]), 480, 240, 9999)) # TODO better min/max 
+                            device.add_attribute(IntAttribute(key, int(dic[key]), 480, 240, 9999)) # TODO better min/max 
                         elif key == 'input':
                             # Composite0, Composite1,  Composite2, S-Video
                             # TODO: v4l2-ctl --list-inputs
@@ -264,7 +288,7 @@ class Video4LinuxDriver(devices.VideoDriver):
                             device.attributes[key].set_value(value, False)
                         elif key == "norm":
                             # TODO: v4l2-ctl --?? for better norm/standards names
-                            attr = devices.OptionsAttribute(key, dic[key], 'NTSC', ['NTSC', 'PAL']) 
+                            attr = OptionsAttribute(key, dic[key], 'ntsc', ['ntsc', 'pal', 'secam'])
                             #TODO : attr.setValue(attr.getIndexForValue( values[key] ),False)
                             device.add_attribute(attr)
             elif command[1] == '--list-inputs':
@@ -272,7 +296,7 @@ class Video4LinuxDriver(devices.VideoDriver):
                     device = self._new_devices[extra_arg] #'/dev/video0']
                     # TODO: check if there are many devices, how the v4l2-ctl command works.
                 except KeyError:
-                    log.info('no device '+str(extra_arg)) #/dev/video0
+                    log.info('no device ' + str(extra_arg)) #/dev/video0
                 else:
                     lines = results.splitlines()
                     inputs = _parse_v4l2_ctl_list_inputs(lines)
@@ -281,12 +305,16 @@ class Video4LinuxDriver(devices.VideoDriver):
         log.info('v4l driver: command %s returned.', str(command))
         #print results
         self._on_done_devices_polling()
-        
+        # TODO: notify the api
 
-devices.managers['video'].add_driver(Video4LinuxDriver()) # only one instance.
+#devices.managers['video'].add_driver(Video4LinuxDriver()) # only one instance.
 # TODO : load only if module is there and if computer (OS) supports it.
 
 def start(api):
     """TODO"""
-    pass
+    driver = Video4LinuxDriver()
+    driver.api = api
+    managers['video'].add_driver(driver)
+
+    
     

@@ -36,7 +36,7 @@ from twisted.internet import utils
 # App imports
 from utils import log
 
-log = log.start('debug', 1, 0, 'shell')
+log = log.start('debug', 1, 0, 'commands')
 
 class CommandNotFoundError(Exception):
     """
@@ -50,6 +50,7 @@ def find_command(command_name, error_msg=None):
     
     Throws a CommandNotFoundError if not.
     """
+    # TODO: remove error_msg
     try:
         executable = procutils.which(command_name)[0] # gets the executable
     except IndexError:
@@ -66,7 +67,7 @@ def _command_start(executable, command):
     #deferred = defer.fail(failure.Failure(failure.DefaultError('Could not find command %s'% (command[0]))))
     # if try was successful
     try:
-        log.info('Starting command: %s' % (command[0]))
+        #log.info('Starting command: %s' % (command[0]))
         #getProcessOutputAndValue(executable, args=(), env={}, path='.', reactor=None)
         #
         #Spawn a process and returns a Deferred that will be called back with
@@ -87,30 +88,26 @@ def commands_start(commands, callback=None, extra_arg=None):
     """
     Starts a shell command.
     
-    commands is a tuple of tuple of strings.
+    commands is a tuple/list of tuple/list of strings.
     callback is a callback to call once done.
-    calls on_commands_results which calls the callback when done.
+    (defaults: calls on_commands_results which calls the callback when done.)
     
     Returns a DefferedList instance.
     """
     deferreds = []
-    ok = True
     defer_list = None
     for command in commands:
         try:
             executable = find_command(command[0]) # gets the executable
         except CommandNotFoundError, e:
             raise CommandNotFoundError,'Cannot find the shell command: %s. Reason: %s' % (command[0], e.message)
-            break
-    if ok:
-        for command in commands:
-            executable = find_command(command[0])
-            deferreds.append(_command_start(executable, command))
-        # TODO: consumeErrors=True
-        defer_list = defer.DeferredList(deferreds, consumeErrors=True).addErrback(on_commands_error, commands, extra_arg)
-        if callback is None:
-            callback = on_commands_results
-        defer_list.addCallback(callback, commands, extra_arg)
+    for command in commands:
+        executable = find_command(command[0])
+        deferreds.append(_command_start(executable, command))
+    defer_list = defer.DeferredList(deferreds, consumeErrors=True).addErrback(on_commands_error, commands, extra_arg)
+    if callback is None:
+        callback = on_commands_results
+    defer_list.addCallback(callback, commands, extra_arg)
     return defer_list
 
 def on_commands_error(command_failure, commands):
@@ -120,7 +117,6 @@ def on_commands_error(command_failure, commands):
     traceback.print_tb(sys.exc_info()[2])
     print '>>>> Exception message : %s' % (command_failure.value.message)
     print "@@@@@@@@@"
-    #raise NotImplementedError, 'This method must be implemented in child classes. (if you need it)'
     
 def on_commands_results(results, commands, extra_arg=None):
     """

@@ -7,6 +7,7 @@ from devices import *
 from v4l import Video4LinuxDriver
 
 def load_drivers(api):
+    # TODO !!!
     """
     api is the ControllerApi object. 
     
@@ -15,7 +16,6 @@ def load_drivers(api):
     TODO: fully implement this function.
     (should throw an error in this current state.)
     """
-    # TODO !!!
     driver_managers = {}
     for driver_kind in ('video', 'audio', 'data'):
         #driver_managers['driver_kind'] = DriversManager()
