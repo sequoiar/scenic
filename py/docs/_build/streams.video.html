@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Video Documentation &mdash; Miville v0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Miville v0.1.1 documentation" href="index.html" />
+    <link rel="up" title="Streams Documentation" href="streams.html" />
+    <link rel="next" title="Ui Documentation" href="ui.html" />
+    <link rel="prev" title="Data Documentation" href="streams.data.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="ui.html" title="Ui Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="streams.data.html" title="Data Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">Miville Modules Documentation</a> &raquo;</li>
+          <li><a href="streams.html" accesskey="U">Streams Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="video-documentation">
+<h1>Video Documentation<a class="headerlink" href="#video-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This page contains the Video Package documentation.</p>
+<div class="section" id="module-streams.video.gst">
+<h2>The <tt class="xref docutils literal"><span class="pre">streams.video.gst</span></tt> Modules<a class="headerlink" href="#module-streams.video.gst" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="streams.video.gst.VideoGst">
+<!--[streams.video.gst.VideoGst]-->class <tt class="descname">VideoGst</tt><big>(</big><em>core=None</em><big>)</big><a class="headerlink" href="#streams.video.gst.VideoGst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="streams.stream.VideoStream" class="reference external" href="streams.html#streams.stream.VideoStream"><tt class="xref docutils literal"><span class="pre">streams.stream.VideoStream</span></tt></a>, <a title="streams.gst_client.GstClient" class="reference external" href="streams.html#streams.gst_client.GstClient"><tt class="xref docutils literal"><span class="pre">streams.gst_client.GstClient</span></tt></a></p>
+<p>Class streams-&gt;video-&gt;gst.VideoGst</p>
+<dl class="method">
+<dt id="streams.video.gst.VideoGst.sending_started">
+<!--[streams.video.gst.VideoGst.sending_started]--><tt class="descname">sending_started</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.video.gst.VideoGst.sending_started" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.video.gst.VideoGst.sending_stopped">
+<!--[streams.video.gst.VideoGst.sending_stopped]--><tt class="descname">sending_stopped</tt><big>(</big><em>state</em><big>)</big><a class="headerlink" href="#streams.video.gst.VideoGst.sending_stopped" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.video.gst.VideoGst.start_receiving">
+<!--[streams.video.gst.VideoGst.start_receiving]--><tt class="descname">start_receiving</tt><big>(</big><em>channel</em><big>)</big><a class="headerlink" href="#streams.video.gst.VideoGst.start_receiving" title="Permalink to this definition">¶</a></dt>
+<dd>function start_receiving</dd></dl>
+
+<dl class="method">
+<dt id="streams.video.gst.VideoGst.start_sending">
+<!--[streams.video.gst.VideoGst.start_sending]--><tt class="descname">start_sending</tt><big>(</big><em>address</em>, <em>channel</em><big>)</big><a class="headerlink" href="#streams.video.gst.VideoGst.start_sending" title="Permalink to this definition">¶</a></dt>
+<dd>function start_sending
+address: string</dd></dl>
+
+<dl class="method">
+<dt id="streams.video.gst.VideoGst.stop_receiving">
+<!--[streams.video.gst.VideoGst.stop_receiving]--><tt class="descname">stop_receiving</tt><big>(</big><em>state</em><big>)</big><a class="headerlink" href="#streams.video.gst.VideoGst.stop_receiving" title="Permalink to this definition">¶</a></dt>
+<dd><p>function stop_receiving</p>
+<p>returns</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="streams.video.gst.VideoGst.stop_sending">
+<!--[streams.video.gst.VideoGst.stop_sending]--><tt class="descname">stop_sending</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.video.gst.VideoGst.stop_sending" title="Permalink to this definition">¶</a></dt>
+<dd>function stop_sending</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="streams.video.gst.start">
+<!--[streams.video.gst.start]--><tt class="descname">start</tt><big>(</big><em>core</em><big>)</big><a class="headerlink" href="#streams.video.gst.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Video Documentation</a><ul>
+<li><a class="reference external" href="#module-streams.video.gst">The <tt class="docutils literal"><span class="pre">streams.video.gst</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="streams.data.html" title="previous chapter">Data Documentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="ui.html" title="next chapter">Ui Documentation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/streams.video.txt">Show Source</a></li>
+            </ul>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="ui.html" title="Ui Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="streams.data.html" title="Data Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">Miville Modules Documentation</a> &raquo;</li>
+          <li><a href="streams.html" accesskey="U">Streams Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Etienne Desautels.
+      Last updated on Jan 16, 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.1.
+    </div>
+  </body>
+</html>

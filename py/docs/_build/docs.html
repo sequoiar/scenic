@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>How to build the Documentation &mdash; Miville v0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Miville v0.1.1 documentation" href="index.html" />
+    <link rel="next" title="Test Coverage" href="test_coverage.html" />
+    <link rel="prev" title="Utils Documentation" href="utils.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="test_coverage.html" title="Test Coverage"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="Utils Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="how-to-build-the-documentation">
+<h1>How to build the Documentation<a class="headerlink" href="#how-to-build-the-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><a class="reference external" href="http://www.python.org">Python 2.4+</a></p>
+</li>
+<li><dl class="first docutils">
+<dt><a class="reference external" href="http://sphinx.pocoo.org/">Sphinx Python Documentation Generator</a></dt>
+<dd><p class="first">It&#8217;s easy to install it with the command:</p>
+<div class="last highlight-python"><pre>sudo easy_install sphinx</pre>
+</div>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="build-process">
+<h2>Build Process<a class="headerlink" href="#build-process" title="Permalink to this headline">¶</a></h2>
+<p>To build the current documentation you only have to run this command on the
+command line:</p>
+<div class="highlight-python"><pre>sphinx-build path/to/docs/directory/ path/where/you/want/the/html/files/</pre>
+</div>
+<p>For example, if you&#8217;re in the .../trunk/py/ directory you should write:</p>
+<div class="highlight-python"><pre>sphinx-build docs/ docs/_build/</pre>
+</div>
+<p>_build is the default directory for the output HTML files.</p>
+<p>If you want to force sphinx to rebuild everything add the -E flag to the command.</p>
+</div>
+<div class="section" id="how-to-add-a-module-or-package-to-the-documentation-it-s-not-automatic">
+<h2>How to add a module or package to the documentation (it&#8217;s not automatic)<a class="headerlink" href="#how-to-add-a-module-or-package-to-the-documentation-it-s-not-automatic" title="Permalink to this headline">¶</a></h2>
+<p>If you think that your module or package need is own page, you have now two options:</p>
+<ol class="arabic">
+<li><p class="first">Use the generate_modules.py script:</p>
+<div class="highlight-python"><pre>./generate_modules.py path_to_root_of_modules excluded_path1 excluded_path2</pre>
+</div>
+<p>So if you run the script from its directory (docs/) the command line should look:</p>
+<div class="highlight-python"><pre>./generate_modules.py .. ../maugis/ ../docs/ ../test/</pre>
+</div>
+<p>Usually you want to exclude at least <em>../docs/</em> and <em>../test/</em>.</p>
+<p>This script will generate a ReST file in the <em>docs</em> directory for each module/package
+with the appropriate directives. But it will NOT generate the file if the file
+already exist. If you want to recreate it, delete it before running the script.</p>
+<p>The script will also (re)generate the modules index (<em>docs/modules.txt</em>).</p>
+<p>After running the script run the sphinx-build command to update the docs.</p>
+<p><strong>Notice:</strong> I write this script so, right now, it&#8217;s not bulletproof.
+Use it with caution.</p>
+</li>
+<li><p class="first">Do all manually (old style)</p>
+<blockquote>
+<ul>
+<li><p class="first">add a text file in the <em>docs</em> directory named module_name.txt</p>
+</li>
+<li><p class="first">in this file add the text you want (in ReST format)</p>
+</li>
+<li><p class="first">add the this directive to auto-generate the documention from the docstring in the code:</p>
+<div class="highlight-python"><pre>.. automodule:: name_of_module
+        :members:
+        :undoc-members:
+        :show-inheritance:</pre>
+</div>
+</li>
+<li><p class="first">add your page in the modules page <em>modules.txt</em> by adding the name of your module under the <em>toctree</em>.</p>
+</li>
+<li><p class="first">run the sphinx-build command to update the docs.</p>
+</li>
+</ul>
+<p>You can put more then one module in the same page.</p>
+<p>The lines under <em>.. automodule::</em> are options (see <em>Include documentation from docstrings</em> in <a class="reference internal" href="#references"><em>References</em></a> for detail).</p>
+</blockquote>
+</li>
+</ol>
+</div>
+<div class="section" id="how-to-add-argument-definitions-and-return-type-in-your-docstrings">
+<h2>How to add argument definitions and return type in your docstrings<a class="headerlink" href="#how-to-add-argument-definitions-and-return-type-in-your-docstrings" title="Permalink to this headline">¶</a></h2>
+<p>To define argument definitions you have to add to your docstring for each argument (each line is optional):</p>
+<div class="highlight-python"><pre>:param argument_name: Description of a parameter
+:type argument_name: Type of a parameter</pre>
+</div>
+<p>To define the return type of the method/function you have to add (each line is optional):</p>
+<div class="highlight-python"><pre>:return: Description of the return value
+:rtype: Return type</pre>
+</div>
+<p>See <em>Info field lists</em> in <a class="reference internal" href="#references"><em>References</em></a> for more fields and details.</p>
+</div>
+<div class="section" id="id1">
+<span id="references"></span><h2>References<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line"><a class="reference external" href="http://sphinx.pocoo.org/intro.html#running-a-build">Running a build</a></div>
+<div class="line"><a class="reference external" href="http://sphinx.pocoo.org/rest.html">reStructuredText Primer</a></div>
+<div class="line"><a class="reference external" href="http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html">reStructuredText Markup Specification</a></div>
+<div class="line"><a class="reference external" href="http://sphinx.pocoo.org/ext/autodoc.html">Include documentation from docstrings</a></div>
+<div class="line"><a class="reference external" href="http://sphinx.pocoo.org/markup/desc.html#info-field-lists">Info field lists</a></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">How to build the Documentation</a><ul>
+<li><a class="reference external" href="#requirements">Requirements</a></li>
+<li><a class="reference external" href="#build-process">Build Process</a></li>
+<li><a class="reference external" href="#how-to-add-a-module-or-package-to-the-documentation-it-s-not-automatic">How to add a module or package to the documentation (it&#8217;s not automatic)</a></li>
+<li><a class="reference external" href="#how-to-add-argument-definitions-and-return-type-in-your-docstrings">How to add argument definitions and return type in your docstrings</a></li>
+<li><a class="reference external" href="#id1">References</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="utils.html" title="previous chapter">Utils Documentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="test_coverage.html" title="next chapter">Test Coverage</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/docs.txt">Show Source</a></li>
+            </ul>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="test_coverage.html" title="Test Coverage"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="Utils Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Etienne Desautels.
+      Last updated on Jan 16, 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.1.
+    </div>
+  </body>
+</html>

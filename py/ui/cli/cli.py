@@ -32,12 +32,15 @@ This finally answer by calling each of its Observer that listen to it.
 In this case, the "view" is the CliView class.
 
 For example:
+
 What happens when the user types "c -l":
+
  * CliController._get_contacts() is called with the args from user
  * it calls ControllerApi.get_contacts() from ui/api.py
  * which finally calls CliView._get_contacts() with a dict of contacts 
    as an argument. (the key are the contact names)
    It is the contacts attributes of the AddressBook instance.
+   
 """
 
 
@@ -79,8 +82,9 @@ class TelnetServer(recvline.HistoricRecvLine):
         """
         This method overwrite the Twisted one because there's was a bug
         (Gnome-terminal was not scrolling at the bottom of the page).
-        Write a '\n' instead of an ESC character.
+        Write a '\\\\n' instead of an ESC character.
         """
+        # It's really should be a '\n' in the docstring above but sphinx barf on it.
         self.terminal.cursorPos.x = 0
         self.terminal.cursorPos.y = min(self.terminal.cursorPos.y + 1, self.terminal.termSize.y - 1)
         self.terminal.write('\n')

@@ -2,24 +2,26 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Modules Documentation &mdash; Sropulpof v0.1.1 documentation</title>
+    
+    <title>Miville Modules Documentation &mdash; Miville v0.1.1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-          URL_ROOT:    '',
-          VERSION:     '0.1.1',
-          COLLAPSE_MODINDEX: false,
-          FILE_SUFFIX: '.html'
+        URL_ROOT:    '',
+        VERSION:     '0.1.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="contents" title="Global table of contents" href="contents.html" />
-    <link rel="index" title="Global index" href="genindex.html" />
+    <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="top" title="Sropulpof v0.1.1 documentation" href="index.html" />
-    <link rel="prev" title="API Documentation" href="api.html" />
+    <link rel="top" title="Miville v0.1.1 documentation" href="index.html" />
+    <link rel="next" title="Addressbook Documentation" href="addressbook.html" />
+    <link rel="prev" title="Api Documentation" href="api.html" /> 
   </head>
   <body>
     <div class="related">
@@ -32,161 +34,154 @@
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
         <li class="right" >
-          <a href="api.html" title="API Documentation"
+          <a href="addressbook.html" title="Addressbook Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="Api Documentation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Sropulpof v0.1.1 documentation</a> &raquo;</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li> 
       </ul>
-    </div>
+    </div>  
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body">
             
   
-  <div class="section" id="modules-documentation">
-<h1>Modules Documentation<a class="headerlink" href="#modules-documentation" title="Permalink to this headline">¶</a></h1>
-<p>This page contains some basic documentation about the Sropulpof modules.</p>
-<div class="section" id="module-addressbook">
-<h2>The <tt class="xref docutils literal"><span class="pre">addressbook</span></tt> Module<a class="headerlink" href="#module-addressbook" title="Permalink to this headline">¶</a></h2>
-<p>This module deal with the Address Book and its contacts.</p>
-<dl class="class">
-<dt id="addressbook.AddressBook">
-<!--[addressbook.AddressBook]-->class <tt class="descname">AddressBook</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#addressbook.AddressBook" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class representing the Address Book of the application.
-The Address Book is written to disk an read back.
-The Address Book is mostly a dictionnary of Contact instances.</p>
-<p>Filename must be given. The Address Book is save in file named
-&#8216;filename.adb&#8217; in the directory &#8216;~/.filename/&#8217;.</p>
-<dl class="method">
-<dt id="addressbook.AddressBook.add">
-<!--[addressbook.AddressBook.add]--><tt class="descname">add</tt><big>(</big><em>name</em>, <em>address</em>, <em>port=None</em>, <em>connector=None</em>, <em>setting=0</em><big>)</big><a class="headerlink" href="#addressbook.AddressBook.add" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a contact to the Address Book.
-Name and address are mandatory, port is optional and if connector is
-None, it will be deduce from the address type. Setting is set to 0
-(base setting) by default.</p>
-<p>Address, port and setting are validated and exception are raise
-on problems.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="addressbook.AddressBook.delete">
-<!--[addressbook.AddressBook.delete]--><tt class="descname">delete</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#addressbook.AddressBook.delete" title="Permalink to this definition">¶</a></dt>
-<dd>Delete the named contact from the Address Book or the selected
-if no name is given.</dd></dl>
-
-<dl class="method">
-<dt id="addressbook.AddressBook.duplicate">
-<!--[addressbook.AddressBook.duplicate]--><tt class="descname">duplicate</tt><big>(</big><em>name=None</em>, <em>new_name=None</em><big>)</big><a class="headerlink" href="#addressbook.AddressBook.duplicate" title="Permalink to this definition">¶</a></dt>
-<dd>Add a copy of the named contact in the Address Book and add the string
-&#8216; (copy)&#8217; to is name if no new name is given, else give the new name.
-If no name is given, copy the selected contact.</dd></dl>
-
-<dl class="method">
-<dt id="addressbook.AddressBook.get_current">
-<!--[addressbook.AddressBook.get_current]--><tt class="descname">get_current</tt><big>(</big><big>)</big><a class="headerlink" href="#addressbook.AddressBook.get_current" title="Permalink to this definition">¶</a></dt>
-<dd>Return the selected contact or return None if none is selected.</dd></dl>
-
-<dl class="method">
-<dt id="addressbook.AddressBook.modify">
-<!--[addressbook.AddressBook.modify]--><tt class="descname">modify</tt><big>(</big><em>name=None</em>, <em>new_name=None</em>, <em>address=None</em>, <em>port=None</em><big>)</big><a class="headerlink" href="#addressbook.AddressBook.modify" title="Permalink to this definition">¶</a></dt>
-<dd>Change one or more attributes of a contact.
-If no name is given, modify the selected contact.</dd></dl>
-
-<dl class="method">
-<dt id="addressbook.AddressBook.read">
-<!--[addressbook.AddressBook.read]--><tt class="descname">read</tt><big>(</big><big>)</big><a class="headerlink" href="#addressbook.AddressBook.read" title="Permalink to this definition">¶</a></dt>
-<dd>Read the Address Book file (.adb) from the disk.</dd></dl>
-
-<dl class="method">
-<dt id="addressbook.AddressBook.select">
-<!--[addressbook.AddressBook.select]--><tt class="descname">select</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#addressbook.AddressBook.select" title="Permalink to this definition">¶</a></dt>
-<dd>Select one contact in the Address Book (by name). It become the &#8216;active&#8217;
-contact.</dd></dl>
-
-<dl class="method">
-<dt id="addressbook.AddressBook.write">
-<!--[addressbook.AddressBook.write]--><tt class="descname">write</tt><big>(</big><big>)</big><a class="headerlink" href="#addressbook.AddressBook.write" title="Permalink to this definition">¶</a></dt>
-<dd>Write back to disk the Address Book. Raise error on problems.</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="addressbook.Contact">
-<!--[addressbook.Contact]-->class <tt class="descname">Contact</tt><big>(</big><em>name</em>, <em>address</em>, <em>port=None</em>, <em>connector=None</em>, <em>setting=0</em><big>)</big><a class="headerlink" href="#addressbook.Contact" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class representing a contact in the address book</p>
-<p>Name and address are mandatory, port is optional and if connector is
-None, it will be deduce from the address type. Setting is set to 0
-(base setting) by default.</p>
-<p>Name, address, port and setting are validated and exception are raise
-on problems.</p>
-<dl class="method">
-<dt id="addressbook.Contact.assign_connector">
-<!--[addressbook.Contact.assign_connector]--><tt class="descname">assign_connector</tt><big>(</big><em>connector=None</em><big>)</big><a class="headerlink" href="#addressbook.Contact.assign_connector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the connector use by this contact. Connector should be a string.
-If none is given, one is deduce from the address kind.
-Matching rules can be change in the future.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><em>connector</em> (string or None) &#8211; Should be a valid connector</li>
+  <div class="section" id="miville-modules-documentation">
+<h1>Miville Modules Documentation<a class="headerlink" href="#miville-modules-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This page contains the Miville Modules  documentation.</p>
+<div class="section" id="modules">
+<h2>Modules:<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="addressbook.html">Addressbook Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="addressbook.html#module-addressbook">The <tt class="docutils literal"><span class="pre">addressbook</span></tt> Module</a></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="addressbook.Contact.set_address">
-<!--[addressbook.Contact.set_address]--><tt class="descname">set_address</tt><big>(</big><em>address</em><big>)</big><a class="headerlink" href="#addressbook.Contact.set_address" title="Permalink to this definition">¶</a></dt>
-<dd>Set the address attribute of the contact in function of is kind
-(group or others).</dd></dl>
-
-<dl class="method">
-<dt id="addressbook.Contact.set_kind">
-<!--[addressbook.Contact.set_kind]--><tt class="descname">set_kind</tt><big>(</big><em>address</em><big>)</big><a class="headerlink" href="#addressbook.Contact.set_kind" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validate the given address, find is kind then set it.</p>
-<dl class="docutils">
-<dt>Kinds:</dt>
-<dd><table class="first last docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field"><th class="field-name">group:</th><td class="field-body">a list of contact names</td>
-</tr>
-<tr class="field"><th class="field-name">sip_name:</th><td class="field-body"><a class="reference external" href="mailto:name&#37;&#52;&#48;www&#46;domain&#46;org">name<span>&#64;</span>www<span>&#46;</span>domain<span>&#46;</span>org</a></td>
-</tr>
-<tr class="field"><th class="field-name">sip_ip:</th><td class="field-body"><a class="reference external" href="mailto:name&#37;&#52;&#48;123&#46;123&#46;123&#46;123">name<span>&#64;</span>123<span>&#46;</span>123<span>&#46;</span>123<span>&#46;</span>123</a></td>
-</tr>
-<tr class="field"><th class="field-name">ip:</th><td class="field-body">123.123.123.123</td>
-</tr>
-<tr class="field"><th class="field-name">multicast:</th><td class="field-body">[224-239].123.123.123</td>
-</tr>
-</tbody>
-</table>
-</dd>
-</dl>
-<p>If the address did not validate an exception is raise.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="addressbook.Contact.set_port">
-<!--[addressbook.Contact.set_port]--><tt class="descname">set_port</tt><big>(</big><em>port</em><big>)</big><a class="headerlink" href="#addressbook.Contact.set_port" title="Permalink to this definition">¶</a></dt>
-<dd>Validate and set the port of the contact. If the port did not validate,
-an exception is raised. Port should be in between 1024 and 65535.
-The port given could be an integer, a string or a unicode string.
-If the port given is an empty string or the int 0, the port is set to None.</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="addressbook.ip_range">
-<!--[addressbook.ip_range]--><tt class="descname">ip_range</tt><big>(</big><em>address</em><big>)</big><a class="headerlink" href="#addressbook.ip_range" title="Permalink to this definition">¶</a></dt>
-<dd>Validate that each number of an IP address is between 0 and 255.
-The address should be a string of the format &#8216;123.123.123.123&#8217;.</dd></dl>
-
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="api.html">Api Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="api.html#module-api">The <tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="connectors.html">Connectors Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="connectors.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference external" href="connectors.basic.html">Basic Documentation</a><ul>
+<li class="toctree-l4"><a class="reference external" href="connectors.basic.html#module-connectors.basic.basic">The <tt class="docutils literal"><span class="pre">connectors.basic.basic</span></tt> Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference external" href="connectors.sip.html">Sip Documentation</a><ul>
+<li class="toctree-l4"><a class="reference external" href="connectors.sip.html#module-connectors.sip.sip">The <tt class="docutils literal"><span class="pre">connectors.sip.sip</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="connectors.html#module-connectors">The <tt class="docutils literal"><span class="pre">connectors</span></tt> Package</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="devices.html">Devices Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="devices.html#module-devices">The <tt class="docutils literal"><span class="pre">devices</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference external" href="devices.html#module-devices.devices">The <tt class="docutils literal"><span class="pre">devices.devices</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="devices.html#module-devices.v4l">The <tt class="docutils literal"><span class="pre">devices.v4l</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="errors.html">Errors Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="errors.html#module-errors">The <tt class="docutils literal"><span class="pre">errors</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="imiville.html">Imiville Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="imiville.html#module-imiville">The <tt class="docutils literal"><span class="pre">imiville</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="miville.html">Miville Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="miville.html#module-miville">The <tt class="docutils literal"><span class="pre">miville</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="protocols.html">Protocols Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="protocols.html#module-protocols.com_chan">The <tt class="docutils literal"><span class="pre">protocols.com_chan</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="protocols.html#module-protocols.ipcp">The <tt class="docutils literal"><span class="pre">protocols.ipcp</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="protocols.html#module-protocols.ipcp_server">The <tt class="docutils literal"><span class="pre">protocols.ipcp_server</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="settings.html">Settings Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="settings.html#module-settings">The <tt class="docutils literal"><span class="pre">settings</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="streams.html">Streams Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="streams.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference external" href="streams.audio.html">Audio Documentation</a><ul>
+<li class="toctree-l4"><a class="reference external" href="streams.audio.html#module-streams.audio.gst">The <tt class="docutils literal"><span class="pre">streams.audio.gst</span></tt> Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference external" href="streams.data.html">Data Documentation</a><ul>
+<li class="toctree-l4"><a class="reference external" href="streams.data.html#module-streams.data.listCirc">The <tt class="docutils literal"><span class="pre">streams.data.listCirc</span></tt> Modules</a></li>
+<li class="toctree-l4"><a class="reference external" href="streams.data.html#the-streams-data-midi-modules">The <tt class="docutils literal"><span class="pre">streams.data.midi</span></tt> Modules</a></li>
+<li class="toctree-l4"><a class="reference external" href="streams.data.html#the-streams-data-midiin-modules">The <tt class="docutils literal"><span class="pre">streams.data.midiIn</span></tt> Modules</a></li>
+<li class="toctree-l4"><a class="reference external" href="streams.data.html#module-streams.data.midiObject">The <tt class="docutils literal"><span class="pre">streams.data.midiObject</span></tt> Modules</a></li>
+<li class="toctree-l4"><a class="reference external" href="streams.data.html#the-streams-data-midiout-modules">The <tt class="docutils literal"><span class="pre">streams.data.midiOut</span></tt> Modules</a></li>
+<li class="toctree-l4"><a class="reference external" href="streams.data.html#module-streams.data.ringBuffer">The <tt class="docutils literal"><span class="pre">streams.data.ringBuffer</span></tt> Modules</a></li>
+<li class="toctree-l4"><a class="reference external" href="streams.data.html#the-streams-data-rtpclient-modules">The <tt class="docutils literal"><span class="pre">streams.data.RTPClient</span></tt> Modules</a></li>
+<li class="toctree-l4"><a class="reference external" href="streams.data.html#the-streams-data-rtpserver-modules">The <tt class="docutils literal"><span class="pre">streams.data.RTPServer</span></tt> Modules</a></li>
+<li class="toctree-l4"><a class="reference external" href="streams.data.html#the-streams-data-test-midi-f-modules">The <tt class="docutils literal"><span class="pre">streams.data.test_midi_f</span></tt> Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference external" href="streams.video.html">Video Documentation</a><ul>
+<li class="toctree-l4"><a class="reference external" href="streams.video.html#module-streams.video.gst">The <tt class="docutils literal"><span class="pre">streams.video.gst</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference external" href="streams.html#module-streams.gst_client">The <tt class="docutils literal"><span class="pre">streams.gst_client</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="streams.html#module-streams.stream">The <tt class="docutils literal"><span class="pre">streams.stream</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="ui.html">Ui Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="ui.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference external" href="ui.cli.html">Cli Documentation</a><ul>
+<li class="toctree-l4"><a class="reference external" href="ui.cli.html#module-ui.cli.cli">The <tt class="docutils literal"><span class="pre">ui.cli.cli</span></tt> Modules</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference external" href="ui.web.html">Web Documentation</a><ul>
+<li class="toctree-l4"><a class="reference external" href="ui.web.html#module-ui.web.web">The <tt class="docutils literal"><span class="pre">ui.web.web</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="utils.html">Utils Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="utils.html#module-utils.common">The <tt class="docutils literal"><span class="pre">utils.common</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="utils.html#module-utils.coverage_report">The <tt class="docutils literal"><span class="pre">utils.coverage_report</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="utils.html#module-utils.i18n">The <tt class="docutils literal"><span class="pre">utils.i18n</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="utils.html#module-utils.log">The <tt class="docutils literal"><span class="pre">utils.log</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="utils.html#module-utils.mediator">The <tt class="docutils literal"><span class="pre">utils.mediator</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="utils.html#module-utils.observer">The <tt class="docutils literal"><span class="pre">utils.observer</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="utils.html#module-utils.shell">The <tt class="docutils literal"><span class="pre">utils.shell</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="utils.html#module-utils.singleton">The <tt class="docutils literal"><span class="pre">utils.singleton</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="utils.html#module-utils.twisted_old">The <tt class="docutils literal"><span class="pre">utils.twisted_old</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
 </div>
 </div>
 
@@ -196,21 +191,25 @@ The address should be a string of the format &#8216;123.123.123.123&#8217;.</dd>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-            <h3>Table Of Contents</h3>
+            <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">Modules Documentation</a><ul>
-<li><a class="reference external" href="#module-addressbook">The <tt class="docutils literal"><span class="pre">addressbook</span></tt> Module</a></li>
+<li><a class="reference external" href="">Miville Modules Documentation</a><ul>
+<li><a class="reference external" href="#modules">Modules:</a><ul>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 
             <h4>Previous topic</h4>
-            <p class="topless"><a href="api.html" title="previous chapter">API Documentation</a></p>
+            <p class="topless"><a href="api.html" title="previous chapter">Api Documentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="addressbook.html" title="next chapter">Addressbook Documentation</a></p>
             <h3>This Page</h3>
             <ul class="this-page-menu">
               <li><a href="_sources/modules.txt">Show Source</a></li>
             </ul>
-            <h3>Quick search</h3>
+          <h3>Quick search</h3>
             <form class="search" action="search.html" method="get">
               <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
               <input type="hidden" name="check_keywords" value="yes" />
@@ -230,15 +229,18 @@ The address should be a string of the format &#8216;123.123.123.123&#8217;.</dd>
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
         <li class="right" >
-          <a href="api.html" title="API Documentation"
+          <a href="addressbook.html" title="Addressbook Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="Api Documentation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Sropulpof v0.1.1 documentation</a> &raquo;</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Etienne Desautels.
-      Last updated on Nov 13, 2008.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+      Last updated on Jan 16, 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.1.
     </div>
   </body>
 </html>

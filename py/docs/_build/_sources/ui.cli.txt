@@ -1,0 +1,13 @@
+Cli Documentation
+=================
+
+This page contains the Cli Package documentation.
+
+The :mod:`ui.cli.cli` Modules
+-----------------------------
+
+.. automodule:: ui.cli.cli
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

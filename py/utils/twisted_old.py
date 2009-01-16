@@ -69,6 +69,7 @@ def textFromEventDict(eventDict):
      - C{format}: string format used in place of C{message} to customize
        the event. It uses all keys present in C{eventDict} to format
        the text.
+       
     Other keys will be used when applying the C{format}, or ignored.
     """
     edm = eventDict['message']

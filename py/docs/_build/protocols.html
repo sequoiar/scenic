@@ -1,0 +1,325 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Protocols Documentation &mdash; Miville v0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Miville v0.1.1 documentation" href="index.html" />
+    <link rel="up" title="Miville Modules Documentation" href="modules.html" />
+    <link rel="next" title="Settings Documentation" href="settings.html" />
+    <link rel="prev" title="Miville Documentation" href="miville.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="Settings Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="miville.html" title="Miville Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">Miville Modules Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="protocols-documentation">
+<h1>Protocols Documentation<a class="headerlink" href="#protocols-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This page contains the Protocols Package documentation.</p>
+<div class="section" id="module-protocols.com_chan">
+<h2>The <tt class="xref docutils literal"><span class="pre">protocols.com_chan</span></tt> Modules<a class="headerlink" href="#module-protocols.com_chan" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="protocols.com_chan.ComChanCheck">
+<!--[protocols.com_chan.ComChanCheck]-->class <tt class="descname">ComChanCheck</tt><a class="headerlink" href="#protocols.com_chan.ComChanCheck" title="Permalink to this definition">¶</a></dt>
+<dd><p>An extremely simple credentials checker.
+It check if the client is already in the connections pool
+and that the password is the good universal one
+(stupid password check but better then nothing).</p>
+<dl class="method">
+<dt id="protocols.com_chan.ComChanCheck.requestAvatarId">
+<!--[protocols.com_chan.ComChanCheck.requestAvatarId]--><tt class="descname">requestAvatarId</tt><big>(</big><em>credentials</em><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChanCheck.requestAvatarId" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="protocols.com_chan.ComChanClient">
+<!--[protocols.com_chan.ComChanClient]-->class <tt class="descname">ComChanClient</tt><a class="headerlink" href="#protocols.com_chan.ComChanClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">twisted.spread.flavors.Referenceable</span></tt>, <a title="protocols.com_chan.ComChannel" class="reference internal" href="#protocols.com_chan.ComChannel"><tt class="xref docutils literal"><span class="pre">protocols.com_chan.ComChannel</span></tt></a></p>
+<dl class="method">
+<dt id="protocols.com_chan.ComChanClient.connect">
+<!--[protocols.com_chan.ComChanClient.connect]--><tt class="descname">connect</tt><big>(</big><em>name</em>, <em>address</em>, <em>port=37054</em><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChanClient.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.com_chan.ComChanClient.disconnect">
+<!--[protocols.com_chan.ComChanClient.disconnect]--><tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChanClient.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.com_chan.ComChanClient.remote_main">
+<!--[protocols.com_chan.ComChanClient.remote_main]--><tt class="descname">remote_main</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChanClient.remote_main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="protocols.com_chan.ComChanContact">
+<!--[protocols.com_chan.ComChanContact]-->class <tt class="descname">ComChanContact</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChanContact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">twisted.spread.pb.Avatar</span></tt>, <a title="protocols.com_chan.ComChannel" class="reference internal" href="#protocols.com_chan.ComChannel"><tt class="xref docutils literal"><span class="pre">protocols.com_chan.ComChannel</span></tt></a></p>
+<dl class="method">
+<dt id="protocols.com_chan.ComChanContact.detached">
+<!--[protocols.com_chan.ComChanContact.detached]--><tt class="descname">detached</tt><big>(</big><em>remote</em><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChanContact.detached" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.com_chan.ComChanContact.perspective_main">
+<!--[protocols.com_chan.ComChanContact.perspective_main]--><tt class="descname">perspective_main</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChanContact.perspective_main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="protocols.com_chan.ComChanRealm">
+<!--[protocols.com_chan.ComChanRealm]-->class <tt class="descname">ComChanRealm</tt><a class="headerlink" href="#protocols.com_chan.ComChanRealm" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="protocols.com_chan.ComChanRealm.requestAvatar">
+<!--[protocols.com_chan.ComChanRealm.requestAvatar]--><tt class="descname">requestAvatar</tt><big>(</big><em>name</em>, <em>remote</em>, <em>*interfaces</em><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChanRealm.requestAvatar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="protocols.com_chan.ComChannel">
+<!--[protocols.com_chan.ComChannel]-->class <tt class="descname">ComChannel</tt><a class="headerlink" href="#protocols.com_chan.ComChannel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="protocols.com_chan.ComChannel.add">
+<!--[protocols.com_chan.ComChannel.add]--><tt class="descname">add</tt><big>(</big><em>cmd</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChannel.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.com_chan.ComChannel.attached">
+<!--[protocols.com_chan.ComChannel.attached]--><tt class="descname">attached</tt><big>(</big><em>remote</em><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChannel.attached" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.com_chan.ComChannel.callRemote">
+<!--[protocols.com_chan.ComChannel.callRemote]--><tt class="descname">callRemote</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChannel.callRemote" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.com_chan.ComChannel.delete">
+<!--[protocols.com_chan.ComChannel.delete]--><tt class="descname">delete</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChannel.delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.com_chan.ComChannel.main">
+<!--[protocols.com_chan.ComChannel.main]--><tt class="descname">main</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#protocols.com_chan.ComChannel.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="protocols.com_chan.connect">
+<!--[protocols.com_chan.connect]--><tt class="descname">connect</tt><big>(</big><em>name</em>, <em>address</em>, <em>port=37054</em><big>)</big><a class="headerlink" href="#protocols.com_chan.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="protocols.com_chan.start">
+<!--[protocols.com_chan.start]--><tt class="descname">start</tt><big>(</big><em>conns</em>, <em>port=37054</em><big>)</big><a class="headerlink" href="#protocols.com_chan.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-protocols.ipcp">
+<h2>The <tt class="xref docutils literal"><span class="pre">protocols.ipcp</span></tt> Modules<a class="headerlink" href="#module-protocols.ipcp" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="protocols.ipcp.IPCP">
+<!--[protocols.ipcp.IPCP]-->class <tt class="descname">IPCP</tt><a class="headerlink" href="#protocols.ipcp.IPCP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">twisted.protocols.basic.LineReceiver</span></tt></p>
+<dl class="method">
+<dt id="protocols.ipcp.IPCP.add_callback">
+<!--[protocols.ipcp.IPCP.add_callback]--><tt class="descname">add_callback</tt><big>(</big><em>cmd</em>, <em>name=None</em><big>)</big><a class="headerlink" href="#protocols.ipcp.IPCP.add_callback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.ipcp.IPCP.connectionLost">
+<!--[protocols.ipcp.IPCP.connectionLost]--><tt class="descname">connectionLost</tt><big>(</big><em>reason=&lt;twisted.python.failure.Failure &lt;class 'twisted.internet.error.ConnectionDone'&gt;&gt;</em><big>)</big><a class="headerlink" href="#protocols.ipcp.IPCP.connectionLost" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.ipcp.IPCP.connectionMade">
+<!--[protocols.ipcp.IPCP.connectionMade]--><tt class="descname">connectionMade</tt><big>(</big><big>)</big><a class="headerlink" href="#protocols.ipcp.IPCP.connectionMade" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.ipcp.IPCP.del_callback">
+<!--[protocols.ipcp.IPCP.del_callback]--><tt class="descname">del_callback</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#protocols.ipcp.IPCP.del_callback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.ipcp.IPCP.lineReceived">
+<!--[protocols.ipcp.IPCP.lineReceived]--><tt class="descname">lineReceived</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#protocols.ipcp.IPCP.lineReceived" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.ipcp.IPCP.send_cmd">
+<!--[protocols.ipcp.IPCP.send_cmd]--><tt class="descname">send_cmd</tt><big>(</big><em>cmd</em>, <em>*args</em><big>)</big><a class="headerlink" href="#protocols.ipcp.IPCP.send_cmd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="protocols.ipcp.connect">
+<!--[protocols.ipcp.connect]--><tt class="descname">connect</tt><big>(</big><em>addr</em>, <em>port</em>, <em>timeout=2</em>, <em>bindAddress=None</em><big>)</big><a class="headerlink" href="#protocols.ipcp.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="protocols.ipcp.connectionReady">
+<!--[protocols.ipcp.connectionReady]--><tt class="descname">connectionReady</tt><big>(</big><em>protocol</em><big>)</big><a class="headerlink" href="#protocols.ipcp.connectionReady" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="protocols.ipcp.connection_failed">
+<!--[protocols.ipcp.connection_failed]--><tt class="descname">connection_failed</tt><big>(</big><em>protocol</em><big>)</big><a class="headerlink" href="#protocols.ipcp.connection_failed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="protocols.ipcp.find_equal">
+<!--[protocols.ipcp.find_equal]--><tt class="descname">find_equal</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#protocols.ipcp.find_equal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="protocols.ipcp.grrr">
+<!--[protocols.ipcp.grrr]--><tt class="descname">grrr</tt><big>(</big><em>test</em><big>)</big><a class="headerlink" href="#protocols.ipcp.grrr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="protocols.ipcp.parse">
+<!--[protocols.ipcp.parse]--><tt class="descname">parse</tt><big>(</big><em>args</em><big>)</big><a class="headerlink" href="#protocols.ipcp.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="protocols.ipcp.test">
+<!--[protocols.ipcp.test]--><tt class="descname">test</tt><big>(</big><em>arg1</em>, <em>arg2</em>, <em>arg3</em><big>)</big><a class="headerlink" href="#protocols.ipcp.test" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-protocols.ipcp_server">
+<h2>The <tt class="xref docutils literal"><span class="pre">protocols.ipcp_server</span></tt> Modules<a class="headerlink" href="#module-protocols.ipcp_server" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="protocols.ipcp_server.IPCP">
+<!--[protocols.ipcp_server.IPCP]-->class <tt class="descname">IPCP</tt><a class="headerlink" href="#protocols.ipcp_server.IPCP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">twisted.protocols.basic.LineReceiver</span></tt></p>
+<dl class="method">
+<dt id="protocols.ipcp_server.IPCP.connectionMade">
+<!--[protocols.ipcp_server.IPCP.connectionMade]--><tt class="descname">connectionMade</tt><big>(</big><big>)</big><a class="headerlink" href="#protocols.ipcp_server.IPCP.connectionMade" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.ipcp_server.IPCP.get_caps">
+<!--[protocols.ipcp_server.IPCP.get_caps]--><tt class="descname">get_caps</tt><big>(</big><big>)</big><a class="headerlink" href="#protocols.ipcp_server.IPCP.get_caps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="protocols.ipcp_server.IPCP.lineReceived">
+<!--[protocols.ipcp_server.IPCP.lineReceived]--><tt class="descname">lineReceived</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#protocols.ipcp_server.IPCP.lineReceived" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="protocols.ipcp_server.ready">
+<!--[protocols.ipcp_server.ready]--><tt class="descname">ready</tt><big>(</big><em>num=0</em><big>)</big><a class="headerlink" href="#protocols.ipcp_server.ready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Protocols Documentation</a><ul>
+<li><a class="reference external" href="#module-protocols.com_chan">The <tt class="docutils literal"><span class="pre">protocols.com_chan</span></tt> Modules</a></li>
+<li><a class="reference external" href="#module-protocols.ipcp">The <tt class="docutils literal"><span class="pre">protocols.ipcp</span></tt> Modules</a></li>
+<li><a class="reference external" href="#module-protocols.ipcp_server">The <tt class="docutils literal"><span class="pre">protocols.ipcp_server</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="miville.html" title="previous chapter">Miville Documentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="settings.html" title="next chapter">Settings Documentation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/protocols.txt">Show Source</a></li>
+            </ul>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="Settings Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="miville.html" title="Miville Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">Miville Modules Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Etienne Desautels.
+      Last updated on Jan 16, 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.1.
+    </div>
+  </body>
+</html>

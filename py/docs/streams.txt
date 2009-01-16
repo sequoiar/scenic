@@ -1,0 +1,30 @@
+Streams Documentation
+=====================
+
+This page contains the Streams Package documentation.
+
+Subpackages
+-----------
+
+.. toctree::
+
+    streams.audio
+    streams.data
+    streams.video
+
+The :mod:`streams.gst_client` Modules
+-------------------------------------
+
+.. automodule:: streams.gst_client
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`streams.stream` Modules
+---------------------------------
+
+.. automodule:: streams.stream
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

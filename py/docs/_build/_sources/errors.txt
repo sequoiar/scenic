@@ -1,0 +1,12 @@
+Errors Documentation
+====================
+
+This page contains the Errors Module documentation.
+
+The :mod:`errors` Module
+------------------------
+
+.. automodule:: errors
+    :members:
+    :undoc-members:
+    :show-inheritance:

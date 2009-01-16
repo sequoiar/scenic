@@ -1,0 +1,29 @@
+Devices Documentation
+=====================
+
+This page contains the Devices Package documentation.
+
+The :mod:`devices` Package
+--------------------------
+
+.. automodule:: devices
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`devices.devices` Modules
+----------------------------------
+
+.. automodule:: devices.devices
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`devices.v4l` Modules
+------------------------------
+
+.. automodule:: devices.v4l
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

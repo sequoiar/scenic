@@ -107,13 +107,14 @@ class BasicServerFactory(protocol.ServerFactory):
     protocol = BasicServer
 
     def buildProtocol(self, addr):
-        """Create an instance of a subclass of Protocol.
+        """
+        Create an instance of a subclass of Protocol.
 
         The returned instance will handle input on an incoming server
         connection, and an attribute \"factory\" pointing to the creating
         factory.
 
-        @param addr: an object implementing L{twisted.internet.interfaces.IAddress}
+        :param addr: an object implementing twisted.internet.interfaces.IAddress
         """
         p = self.protocol()
         p.factory = self

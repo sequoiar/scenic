@@ -23,22 +23,22 @@ Devices handling and Driver base classes.
 
 ------------
 
-Usage for test purposes:
-$ cd py/
-$ export PYTHONPATH=$PWD
-$ python devices/devices.py
+Usage for test purposes::
 
-To run unit tests: 
-$ trial test/test_devices.py
+    $ cd py/
+    $ export PYTHONPATH=$PWD
+    $ python devices/devices.py
 
-------------
+To run unit tests:: 
 
-TODO: retrieve former implementation of the shellprocessprotocol and put it in utils/shell
-
------------
-
-TODO: you want to test that a failing condition occurs? use self.assertFailure
+    $ trial test/test_devices.py
+    
 """
+
+
+#TODO: retrieve former implementation of the shellprocessprotocol and put it in utils/shell
+
+#TODO: you want to test that a failing condition occurs? use self.assertFailure
 
 # System imports
 import os, sys 
@@ -59,34 +59,29 @@ class Driver(shell.ShellCommander):
     Singleton : There should be only one instance of each Driver child classes.
     
     Methods and attributes that must be overriden in child classes are:
-    - name : A class attribute string for the name of the driver (example: 'v4l2')
-    - on_attribute_change(...) : method called when the programmer changes the value of a device attribute
-    - on_devices_polling(...) : method called when the Driver wants to poll its devices.
-    - on_commands_results(...) : method called once commands started from on_devices_polling or on_attribute_change are done.
-    - on_commands_error(...) : method similar to the method above.
+        - name : A class attribute string for the name of the driver (example: 'v4l2')
+        - on_attribute_change(...) : method called when the programmer changes the value of a device attribute
+        - on_devices_polling(...) : method called when the Driver wants to poll its devices.
+        - on_commands_results(...) : method called once commands started from on_devices_polling or on_attribute_change are done.
+        - on_commands_error(...) : method similar to the method above.
     
     The programmer can also override:
-    - prepare(...) : method called once at startup
+        - prepare(...) : method called once at startup
     
     Also, the few direct subclasses (such as VideoDriver) of Driver must override:
-    - kind : A class attribute string for the type of the driver (example: 'video')
-    
-    --------------
-    
+        - kind : A class attribute string for the type of the driver (example: 'video')
+        
     TODO: implement the MVC pattern. 
     
     The driver objects will eventually call the notify method if the ControllerApi instance.
     This will be used instead of the current callbacks.
     That means there should be a start function in each Driver module. 
         argument : the api object.
+        
     This would return the Driver instance for each of those Driver modules.
-    
-    ------------------
-    
+        
     TODO: separate Driver and ShellCommander classes
-    
-    ----------------
-    
+        
     TODO: remove all getters and setters that are not necessary.
     
     If a getter/setter is necessary, the corresponding attribute should be private.
@@ -341,12 +336,21 @@ class Driver(shell.ShellCommander):
     
 # Drivers should extend one of these classes: 
 class VideoDriver(Driver):
+    """
+    """
     pass
+
 class AudioDriver(Driver):
+    """
+    """
     pass
+
 class DataDriver(Driver):
+    """
+    """
     pass
     
+
 class Attribute(object):
     """
     Base class for an attribute of a device.
@@ -482,8 +486,10 @@ class DriversManager(object):
 
 class VideoDriversManager(DriversManager):
     kind = 'video'
+    
 class AudioDriversManager(DriversManager):
     kind = 'audio'
+    
 class DataDriversManager(DriversManager):
     kind = 'data'
 

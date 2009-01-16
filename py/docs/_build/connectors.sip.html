@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sip Documentation &mdash; Miville v0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Miville v0.1.1 documentation" href="index.html" />
+    <link rel="up" title="Connectors Documentation" href="connectors.html" />
+    <link rel="next" title="Devices Documentation" href="devices.html" />
+    <link rel="prev" title="Basic Documentation" href="connectors.basic.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="devices.html" title="Devices Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="connectors.basic.html" title="Basic Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">Miville Modules Documentation</a> &raquo;</li>
+          <li><a href="connectors.html" accesskey="U">Connectors Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="sip-documentation">
+<h1>Sip Documentation<a class="headerlink" href="#sip-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This page contains the Sip Package documentation.</p>
+<div class="section" id="module-connectors.sip.sip">
+<h2>The <tt class="xref docutils literal"><span class="pre">connectors.sip.sip</span></tt> Modules<a class="headerlink" href="#module-connectors.sip.sip" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="connectors.sip.sip.ConnectionFactory">
+<!--[connectors.sip.sip.ConnectionFactory]-->class <tt class="descname">ConnectionFactory</tt><big>(</big><em>protocol</em><big>)</big><a class="headerlink" href="#connectors.sip.sip.ConnectionFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>Class that create an instance of a connection with the specified protocol.</p>
+<dl class="method">
+<dt id="connectors.sip.sip.ConnectionFactory.get_connection">
+<!--[connectors.sip.sip.ConnectionFactory.get_connection]--><tt class="descname">get_connection</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.sip.sip.ConnectionFactory.get_connection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="connectors.sip.sip.Sip">
+<!--[connectors.sip.sip.Sip]-->class <tt class="descname">Sip</tt><a class="headerlink" href="#connectors.sip.sip.Sip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>Sip connection protocol</p>
+<dl class="method">
+<dt id="connectors.sip.sip.Sip.accept">
+<!--[connectors.sip.sip.Sip.accept]--><tt class="descname">accept</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.sip.sip.Sip.accept" title="Permalink to this definition">¶</a></dt>
+<dd><p>function accept</p>
+<p>returns</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="connectors.sip.sip.Sip.build_sdp">
+<!--[connectors.sip.sip.Sip.build_sdp]--><tt class="descname">build_sdp</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.sip.sip.Sip.build_sdp" title="Permalink to this definition">¶</a></dt>
+<dd><p>function build_sdp</p>
+<p>returns</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="connectors.sip.sip.Sip.connect">
+<!--[connectors.sip.sip.Sip.connect]--><tt class="descname">connect</tt><big>(</big><em>address</em>, <em>port</em><big>)</big><a class="headerlink" href="#connectors.sip.sip.Sip.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>function connect</p>
+<p>address: string
+port: int</p>
+<p>returns</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="connectors.sip.sip.Sip.disconnect">
+<!--[connectors.sip.sip.Sip.disconnect]--><tt class="descname">disconnect</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.sip.sip.Sip.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>function disconnect</p>
+<p>returns</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="connectors.sip.sip.Sip.refuse">
+<!--[connectors.sip.sip.Sip.refuse]--><tt class="descname">refuse</tt><big>(</big><em>reason</em><big>)</big><a class="headerlink" href="#connectors.sip.sip.Sip.refuse" title="Permalink to this definition">¶</a></dt>
+<dd><p>function refuse</p>
+<p>reason:</p>
+<p>returns</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Sip Documentation</a><ul>
+<li><a class="reference external" href="#module-connectors.sip.sip">The <tt class="docutils literal"><span class="pre">connectors.sip.sip</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="connectors.basic.html" title="previous chapter">Basic Documentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="devices.html" title="next chapter">Devices Documentation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/connectors.sip.txt">Show Source</a></li>
+            </ul>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="devices.html" title="Devices Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="connectors.basic.html" title="Basic Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">Miville Modules Documentation</a> &raquo;</li>
+          <li><a href="connectors.html" accesskey="U">Connectors Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Etienne Desautels.
+      Last updated on Jan 16, 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.1.
+    </div>
+  </body>
+</html>

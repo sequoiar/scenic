@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Connectors Documentation &mdash; Miville v0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Miville v0.1.1 documentation" href="index.html" />
+    <link rel="up" title="Miville Modules Documentation" href="modules.html" />
+    <link rel="next" title="Basic Documentation" href="connectors.basic.html" />
+    <link rel="prev" title="Api Documentation" href="api.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="connectors.basic.html" title="Basic Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="Api Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">Miville Modules Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="connectors-documentation">
+<h1>Connectors Documentation<a class="headerlink" href="#connectors-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This page contains the Connectors Package documentation.</p>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="connectors.basic.html">Basic Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="connectors.basic.html#module-connectors.basic.basic">The <tt class="docutils literal"><span class="pre">connectors.basic.basic</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="connectors.sip.html">Sip Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="connectors.sip.html#module-connectors.sip.sip">The <tt class="docutils literal"><span class="pre">connectors.sip.sip</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="module-connectors">
+<h2>The <tt class="xref docutils literal"><span class="pre">connectors</span></tt> Package<a class="headerlink" href="#module-connectors" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="connectors.Connection">
+<!--[connectors.Connection]-->class <tt class="descname">Connection</tt><big>(</big><em>contact</em>, <em>api</em><big>)</big><a class="headerlink" href="#connectors.Connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>Base Class representing one connection between two clients.</p>
+<dl class="method">
+<dt id="connectors.Connection.accepted">
+<!--[connectors.Connection.accepted]--><tt class="descname">accepted</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.Connection.accepted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="connectors.Connection.attached">
+<!--[connectors.Connection.attached]--><tt class="descname">attached</tt><big>(</big><em>client</em>, <em>channel</em><big>)</big><a class="headerlink" href="#connectors.Connection.attached" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="connectors.Connection.cleanup">
+<!--[connectors.Connection.cleanup]--><tt class="descname">cleanup</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.Connection.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="connectors.Connection.com_chan_started_client">
+<!--[connectors.Connection.com_chan_started_client]--><tt class="descname">com_chan_started_client</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.Connection.com_chan_started_client" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="connectors.Connection.com_chan_started_server">
+<!--[connectors.Connection.com_chan_started_server]--><tt class="descname">com_chan_started_server</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.Connection.com_chan_started_server" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="connectors.Connection.connection_failed">
+<!--[connectors.Connection.connection_failed]--><tt class="descname">connection_failed</tt><big>(</big><em>err=None</em><big>)</big><a class="headerlink" href="#connectors.Connection.connection_failed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="connectors.Connection.not_attached">
+<!--[connectors.Connection.not_attached]--><tt class="descname">not_attached</tt><big>(</big><em>client</em><big>)</big><a class="headerlink" href="#connectors.Connection.not_attached" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="connectors.Connection.refused">
+<!--[connectors.Connection.refused]--><tt class="descname">refused</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.Connection.refused" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="connectors.Connection.setup">
+<!--[connectors.Connection.setup]--><tt class="descname">setup</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.Connection.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="connectors.Connection.start">
+<!--[connectors.Connection.start]--><tt class="descname">start</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.Connection.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="connectors.Connection.stop">
+<!--[connectors.Connection.stop]--><tt class="descname">stop</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.Connection.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="connectors.Connection.timeout">
+<!--[connectors.Connection.timeout]--><tt class="descname">timeout</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.Connection.timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="connectors.chk_ob">
+<!--[connectors.chk_ob]--><tt class="descname">chk_ob</tt><big>(</big><big>)</big><a class="headerlink" href="#connectors.chk_ob" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="connectors.create_connection">
+<!--[connectors.create_connection]--><tt class="descname">create_connection</tt><big>(</big><em>contact</em>, <em>api</em><big>)</big><a class="headerlink" href="#connectors.create_connection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="connectors.load_connectors">
+<!--[connectors.load_connectors]--><tt class="descname">load_connectors</tt><big>(</big><em>api</em><big>)</big><a class="headerlink" href="#connectors.load_connectors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="connectors.receive_connection">
+<!--[connectors.receive_connection]--><tt class="descname">receive_connection</tt><big>(</big><em>address</em>, <em>port=None</em><big>)</big><a class="headerlink" href="#connectors.receive_connection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="connectors.stop_connection">
+<!--[connectors.stop_connection]--><tt class="descname">stop_connection</tt><big>(</big><em>contact</em><big>)</big><a class="headerlink" href="#connectors.stop_connection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Connectors Documentation</a><ul>
+<li><a class="reference external" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+<li><a class="reference external" href="#module-connectors">The <tt class="docutils literal"><span class="pre">connectors</span></tt> Package</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="api.html" title="previous chapter">Api Documentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="connectors.basic.html" title="next chapter">Basic Documentation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/connectors.txt">Show Source</a></li>
+            </ul>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="connectors.basic.html" title="Basic Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="Api Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">Miville Modules Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Etienne Desautels.
+      Last updated on Jan 16, 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.1.
+    </div>
+  </body>
+</html>

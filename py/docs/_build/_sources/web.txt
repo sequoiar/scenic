@@ -1,0 +1,13 @@
+Web Documentation
+=================
+
+This page contains the Web Package documentation.
+
+The :mod:`ui.web.web` Modules
+-----------------------------
+
+.. automodule:: ui.web.web
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

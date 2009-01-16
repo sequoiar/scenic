@@ -1,0 +1,12 @@
+Miville Documentation
+=====================
+
+This page contains the Miville Module documentation.
+
+The :mod:`miville` Module
+-------------------------
+
+.. automodule:: miville
+    :members:
+    :undoc-members:
+    :show-inheritance:

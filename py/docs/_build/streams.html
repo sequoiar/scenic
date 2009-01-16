@@ -1,0 +1,379 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Streams Documentation &mdash; Miville v0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Miville v0.1.1 documentation" href="index.html" />
+    <link rel="up" title="Miville Modules Documentation" href="modules.html" />
+    <link rel="next" title="Audio Documentation" href="streams.audio.html" />
+    <link rel="prev" title="Settings Documentation" href="settings.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="streams.audio.html" title="Audio Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="Settings Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">Miville Modules Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="streams-documentation">
+<h1>Streams Documentation<a class="headerlink" href="#streams-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This page contains the Streams Package documentation.</p>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="streams.audio.html">Audio Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="streams.audio.html#module-streams.audio.gst">The <tt class="docutils literal"><span class="pre">streams.audio.gst</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="streams.data.html">Data Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="streams.data.html#module-streams.data.listCirc">The <tt class="docutils literal"><span class="pre">streams.data.listCirc</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="streams.data.html#the-streams-data-midi-modules">The <tt class="docutils literal"><span class="pre">streams.data.midi</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="streams.data.html#the-streams-data-midiin-modules">The <tt class="docutils literal"><span class="pre">streams.data.midiIn</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="streams.data.html#module-streams.data.midiObject">The <tt class="docutils literal"><span class="pre">streams.data.midiObject</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="streams.data.html#the-streams-data-midiout-modules">The <tt class="docutils literal"><span class="pre">streams.data.midiOut</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="streams.data.html#module-streams.data.ringBuffer">The <tt class="docutils literal"><span class="pre">streams.data.ringBuffer</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="streams.data.html#the-streams-data-rtpclient-modules">The <tt class="docutils literal"><span class="pre">streams.data.RTPClient</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="streams.data.html#the-streams-data-rtpserver-modules">The <tt class="docutils literal"><span class="pre">streams.data.RTPServer</span></tt> Modules</a></li>
+<li class="toctree-l2"><a class="reference external" href="streams.data.html#the-streams-data-test-midi-f-modules">The <tt class="docutils literal"><span class="pre">streams.data.test_midi_f</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="streams.video.html">Video Documentation</a><ul>
+<li class="toctree-l2"><a class="reference external" href="streams.video.html#module-streams.video.gst">The <tt class="docutils literal"><span class="pre">streams.video.gst</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="module-streams.gst_client">
+<h2>The <tt class="xref docutils literal"><span class="pre">streams.gst_client</span></tt> Modules<a class="headerlink" href="#module-streams.gst_client" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="streams.gst_client.BaseGst">
+<!--[streams.gst_client.BaseGst]-->class <tt class="descname">BaseGst</tt><a class="headerlink" href="#streams.gst_client.BaseGst" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="streams.gst_client.BaseGst.get_attr">
+<!--[streams.gst_client.BaseGst.get_attr]--><tt class="descname">get_attr</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#streams.gst_client.BaseGst.get_attr" title="Permalink to this definition">¶</a></dt>
+<dd>name: string</dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.BaseGst.get_attrs">
+<!--[streams.gst_client.BaseGst.get_attrs]--><tt class="descname">get_attrs</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.gst_client.BaseGst.get_attrs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.BaseGst.set_attr">
+<!--[streams.gst_client.BaseGst.set_attr]--><tt class="descname">set_attr</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#streams.gst_client.BaseGst.set_attr" title="Permalink to this definition">¶</a></dt>
+<dd>name: string
+value:</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="streams.gst_client.GstClient">
+<!--[streams.gst_client.GstClient]-->class <tt class="descname">GstClient</tt><big>(</big><em>api</em>, <em>mode</em>, <em>port</em>, <em>address='127.0.0.1'</em><big>)</big><a class="headerlink" href="#streams.gst_client.GstClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="streams.gst_client.BaseGst" class="reference internal" href="#streams.gst_client.BaseGst"><tt class="xref docutils literal"><span class="pre">streams.gst_client.BaseGst</span></tt></a></p>
+<dl class="method">
+<dt id="streams.gst_client.GstClient.stop_process">
+<!--[streams.gst_client.GstClient.stop_process]--><tt class="descname">stop_process</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.gst_client.GstClient.stop_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="streams.gst_client.GstProcessProtocol">
+<!--[streams.gst_client.GstProcessProtocol]-->class <tt class="descname">GstProcessProtocol</tt><big>(</big><em>server</em><big>)</big><a class="headerlink" href="#streams.gst_client.GstProcessProtocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">twisted.internet.protocol.ProcessProtocol</span></tt></p>
+<dl class="method">
+<dt id="streams.gst_client.GstProcessProtocol.check_process">
+<!--[streams.gst_client.GstProcessProtocol.check_process]--><tt class="descname">check_process</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.gst_client.GstProcessProtocol.check_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstProcessProtocol.connectionMade">
+<!--[streams.gst_client.GstProcessProtocol.connectionMade]--><tt class="descname">connectionMade</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.gst_client.GstProcessProtocol.connectionMade" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstProcessProtocol.outReceived">
+<!--[streams.gst_client.GstProcessProtocol.outReceived]--><tt class="descname">outReceived</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#streams.gst_client.GstProcessProtocol.outReceived" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstProcessProtocol.processEnded">
+<!--[streams.gst_client.GstProcessProtocol.processEnded]--><tt class="descname">processEnded</tt><big>(</big><em>status</em><big>)</big><a class="headerlink" href="#streams.gst_client.GstProcessProtocol.processEnded" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="streams.gst_client.GstServer">
+<!--[streams.gst_client.GstServer]-->class <tt class="descname">GstServer</tt><big>(</big><em>api</em>, <em>mode</em>, <em>port</em>, <em>address='127.0.0.1'</em><big>)</big><a class="headerlink" href="#streams.gst_client.GstServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="streams.gst_client.GstServer.add_callback">
+<!--[streams.gst_client.GstServer.add_callback]--><tt class="descname">add_callback</tt><big>(</big><em>cmd</em>, <em>name=None</em>, <em>timer=None</em><big>)</big><a class="headerlink" href="#streams.gst_client.GstServer.add_callback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstServer.connect">
+<!--[streams.gst_client.GstServer.connect]--><tt class="descname">connect</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.gst_client.GstServer.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstServer.connection_failed">
+<!--[streams.gst_client.GstServer.connection_failed]--><tt class="descname">connection_failed</tt><big>(</big><em>conn</em><big>)</big><a class="headerlink" href="#streams.gst_client.GstServer.connection_failed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstServer.connection_lost">
+<!--[streams.gst_client.GstServer.connection_lost]--><tt class="descname">connection_lost</tt><big>(</big><em>reason=&lt;twisted.python.failure.Failure &lt;class 'twisted.internet.error.ConnectionDone'&gt;&gt;</em><big>)</big><a class="headerlink" href="#streams.gst_client.GstServer.connection_lost" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstServer.connection_ready">
+<!--[streams.gst_client.GstServer.connection_ready]--><tt class="descname">connection_ready</tt><big>(</big><em>conn</em><big>)</big><a class="headerlink" href="#streams.gst_client.GstServer.connection_ready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstServer.del_callback">
+<!--[streams.gst_client.GstServer.del_callback]--><tt class="descname">del_callback</tt><big>(</big><em>callback=None</em><big>)</big><a class="headerlink" href="#streams.gst_client.GstServer.del_callback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstServer.gst_log">
+<!--[streams.gst_client.GstServer.gst_log]--><tt class="descname">gst_log</tt><big>(</big><em>level</em>, <em>msg</em><big>)</big><a class="headerlink" href="#streams.gst_client.GstServer.gst_log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstServer.kill">
+<!--[streams.gst_client.GstServer.kill]--><tt class="descname">kill</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.gst_client.GstServer.kill" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstServer.send_cmd">
+<!--[streams.gst_client.GstServer.send_cmd]--><tt class="descname">send_cmd</tt><big>(</big><em>cmd</em>, <em>args=None</em>, <em>callback=None</em>, <em>timer=None</em>, <em>timeout=3</em><big>)</big><a class="headerlink" href="#streams.gst_client.GstServer.send_cmd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstServer.start_process">
+<!--[streams.gst_client.GstServer.start_process]--><tt class="descname">start_process</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.gst_client.GstServer.start_process" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.gst_client.GstServer.verify_kill">
+<!--[streams.gst_client.GstServer.verify_kill]--><tt class="descname">verify_kill</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.gst_client.GstServer.verify_kill" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-streams.stream">
+<h2>The <tt class="xref docutils literal"><span class="pre">streams.stream</span></tt> Modules<a class="headerlink" href="#module-streams.stream" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="streams.stream.AudioStream">
+<!--[streams.stream.AudioStream]-->class <tt class="descname">AudioStream</tt><big>(</big><em>core=None</em><big>)</big><a class="headerlink" href="#streams.stream.AudioStream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="streams.stream.Stream" class="reference internal" href="#streams.stream.Stream"><tt class="xref docutils literal"><span class="pre">streams.stream.Stream</span></tt></a></p>
+<p>Class representing an audio stream</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="streams.stream.DataStream">
+<!--[streams.stream.DataStream]-->class <tt class="descname">DataStream</tt><big>(</big><em>kind</em>, <em>core=None</em><big>)</big><a class="headerlink" href="#streams.stream.DataStream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="streams.stream.Stream" class="reference internal" href="#streams.stream.Stream"><tt class="xref docutils literal"><span class="pre">streams.stream.Stream</span></tt></a></p>
+<p>Class representing a data stream</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="streams.stream.Stream">
+<!--[streams.stream.Stream]-->class <tt class="descname">Stream</tt><big>(</big><em>core=None</em><big>)</big><a class="headerlink" href="#streams.stream.Stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>Class representing one media stream.</p>
+<dl class="method">
+<dt id="streams.stream.Stream.start_receiving">
+<!--[streams.stream.Stream.start_receiving]--><tt class="descname">start_receiving</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.stream.Stream.start_receiving" title="Permalink to this definition">¶</a></dt>
+<dd>To be overridden by the sub-subclass</dd></dl>
+
+<dl class="method">
+<dt id="streams.stream.Stream.start_sending">
+<!--[streams.stream.Stream.start_sending]--><tt class="descname">start_sending</tt><big>(</big><em>address=None</em><big>)</big><a class="headerlink" href="#streams.stream.Stream.start_sending" title="Permalink to this definition">¶</a></dt>
+<dd><p>To be overridden by the sub-subclass</p>
+<p>address: string</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="streams.stream.Stream.stop_receiving">
+<!--[streams.stream.Stream.stop_receiving]--><tt class="descname">stop_receiving</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.stream.Stream.stop_receiving" title="Permalink to this definition">¶</a></dt>
+<dd>To be overridden by the sub-subclass</dd></dl>
+
+<dl class="method">
+<dt id="streams.stream.Stream.stop_sending">
+<!--[streams.stream.Stream.stop_sending]--><tt class="descname">stop_sending</tt><big>(</big><big>)</big><a class="headerlink" href="#streams.stream.Stream.stop_sending" title="Permalink to this definition">¶</a></dt>
+<dd>To be overridden by the sub-subclass</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="streams.stream.Streams">
+<!--[streams.stream.Streams]-->class <tt class="descname">Streams</tt><big>(</big><em>mode='send'</em><big>)</big><a class="headerlink" href="#streams.stream.Streams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>Class representing a group of media streams, a master stream.</p>
+<dl class="method">
+<dt id="streams.stream.Streams.add">
+<!--[streams.stream.Streams.add]--><tt class="descname">add</tt><big>(</big><em>name</em>, <em>kind</em>, <em>engine</em>, <em>core</em><big>)</big><a class="headerlink" href="#streams.stream.Streams.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.stream.Streams.delete">
+<!--[streams.stream.Streams.delete]--><tt class="descname">delete</tt><big>(</big><em>name</em>, <em>kind</em><big>)</big><a class="headerlink" href="#streams.stream.Streams.delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.stream.Streams.get">
+<!--[streams.stream.Streams.get]--><tt class="descname">get</tt><big>(</big><em>name</em>, <em>kind</em><big>)</big><a class="headerlink" href="#streams.stream.Streams.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.stream.Streams.get_kind">
+<!--[streams.stream.Streams.get_kind]--><tt class="descname">get_kind</tt><big>(</big><em>stream</em><big>)</big><a class="headerlink" href="#streams.stream.Streams.get_kind" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.stream.Streams.list">
+<!--[streams.stream.Streams.list]--><tt class="descname">list</tt><big>(</big><em>kind</em><big>)</big><a class="headerlink" href="#streams.stream.Streams.list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.stream.Streams.rename">
+<!--[streams.stream.Streams.rename]--><tt class="descname">rename</tt><big>(</big><em>name</em>, <em>new_name</em>, <em>kind</em><big>)</big><a class="headerlink" href="#streams.stream.Streams.rename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="streams.stream.Streams.set_attr">
+<!--[streams.stream.Streams.set_attr]--><tt class="descname">set_attr</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#streams.stream.Streams.set_attr" title="Permalink to this definition">¶</a></dt>
+<dd>name: string
+value:</dd></dl>
+
+<dl class="method">
+<dt id="streams.stream.Streams.start">
+<!--[streams.stream.Streams.start]--><tt class="descname">start</tt><big>(</big><em>address='127.0.0.1'</em>, <em>channel=None</em><big>)</big><a class="headerlink" href="#streams.stream.Streams.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start all the sub-streams.</p>
+<p>address: string or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="streams.stream.Streams.stop">
+<!--[streams.stream.Streams.stop]--><tt class="descname">stop</tt><big>(</big><em>mode='send'</em><big>)</big><a class="headerlink" href="#streams.stream.Streams.stop" title="Permalink to this definition">¶</a></dt>
+<dd>Stop all the sub-streams.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="streams.stream.VideoStream">
+<!--[streams.stream.VideoStream]-->class <tt class="descname">VideoStream</tt><big>(</big><em>core=None</em><big>)</big><a class="headerlink" href="#streams.stream.VideoStream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="streams.stream.Stream" class="reference internal" href="#streams.stream.Stream"><tt class="xref docutils literal"><span class="pre">streams.stream.Stream</span></tt></a></p>
+<p>Class representing a video stream</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Streams Documentation</a><ul>
+<li><a class="reference external" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+<li><a class="reference external" href="#module-streams.gst_client">The <tt class="docutils literal"><span class="pre">streams.gst_client</span></tt> Modules</a></li>
+<li><a class="reference external" href="#module-streams.stream">The <tt class="docutils literal"><span class="pre">streams.stream</span></tt> Modules</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="settings.html" title="previous chapter">Settings Documentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="streams.audio.html" title="next chapter">Audio Documentation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/streams.txt">Show Source</a></li>
+            </ul>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="streams.audio.html" title="Audio Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="Settings Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Miville v0.1.1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">Miville Modules Documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Etienne Desautels.
+      Last updated on Jan 16, 2009.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.1.
+    </div>
+  </body>
+</html>

@@ -16,7 +16,7 @@ import sys, os
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
-#sys.path.append(os.path.abspath('some/directory'))
+sys.path.append(os.path.abspath('..'))
 
 # General configuration
 # ---------------------
@@ -35,7 +35,7 @@ source_suffix = '.txt'
 master_doc = 'index'
 
 # General substitutions.
-project = u'Sropulpof'
+project = u'Miville'
 copyright = u'2008, Etienne Desautels'
 
 # The default replacements for |version| and |release|, also used in various
@@ -142,7 +142,7 @@ html_last_updated_fmt = '%b %d, %Y'
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Sropulpofdoc'
+htmlhelp_basename = 'MivilleDoc'
 
 autoclass_content = 'both'
 
@@ -158,7 +158,7 @@ autoclass_content = 'both'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'Sropulpof.tex', u'Sropulpof Documentation',
+  ('index', 'Miville.tex', u'Miville Documentation',
    u'Etienne Desautels', 'manual'),
 ]
 
