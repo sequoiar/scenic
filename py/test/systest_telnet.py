@@ -107,7 +107,7 @@ def start_process(command, isVerbose=False, logPrefix=''):
         else:
             return process
     except pexpect.ExceptionPexpect, e:
-        println("Error starting client: heh" + e)
+        println("Error starting client: heh" + str(e))
         die()
 
 def is_running(process):
@@ -518,6 +518,10 @@ class Test_3_Videostream(TelnetBaseTest):
         self.expectTest('There\'s no video stream with the name videostream', 'There should be no video stream with that name.')
         
 class Test_004_Settings(TelnetBaseTest):
+    """
+    System Tests for presets
+    """
+    
     
     def tst(self, command, expected, errorMsg = None):
         self.client.sendline(command)
@@ -525,23 +529,40 @@ class Test_004_Settings(TelnetBaseTest):
         err = errorMsg or 'The command did not return: "%s" as excpected' % expected
         self.expectTest(expected, err)
         
-    """
-    System Tests for presets
-    """
     def test_00_yes(self):
         self.expectTest('pof: ', 'The default prompt is not appearing.')
+    
+    
+    
+    def test_01_GlobalPresets(self):
+        """
+        test that preset file exist.
+        look for a known preset
+        check that you can't delete a preset
         
-    def test_01_addSettings(self):
-        self.tst('v -e videostream', 'There\'s no video stream with the name videostream', 'There should be no video stream with that name.')
+        Assign a preset to a contact
+        """
         
+        # os.path.expanduser("~")+"/.sropulpof/sropulpof.preset"
+        path = "/usr/share/sropulpof/globalSettings.presets"
+        self.assertTrue(os.path.exists(path), 'Global Preset file "%s" is missing' % path)
+
+        
+        
+        
+    def test_02_MediaPresets(self):    
+        """
+        test that preset file exist.
+        look for a known preset
+        check that you can't delete a preset
+        """
+
+        path = "/usr/share/sropulpof/mediaSettings.presets"
+        self.assertTrue(os.path.exists(path), 'Global Preset file "%s" is missing' % path)
+        
+        
+    def test_02_addSettings(self):
+        
+        self.tst('list settings', 'There are 5 preset settings', 'The preset files are missing.')
  
-#
-#class Test_5_SettingsTodo(TelnetBaseTest):
-#    """
-#    System Tests for Videostream
-#    """
-#    def test_00_yes(self):
-#        self.expectTest('pof: ', 'The default prompt is not appearing.')
-
-
     

@@ -26,6 +26,9 @@ from utils.i18n import to_utf
 
 log = log.start('info', 1, 0, 'settings')
 
+
+
+
 class Settings(object):
     def __init__(self, current=None):
         self.settings = {}
