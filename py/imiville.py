@@ -28,12 +28,23 @@ for i in miville.core.observers.itervalues(): pprint(i)
 
 #TODO: override notify in order to add reactor.iterate() there.
 
-def go(num=999):
-    for i in range(num):
-        reactor.iterate()
+def go(duration=0.1): # num=999
+    """
+    Runs the reactor for n seconds
+    """
+    reactor.callLater(duration, reactor.stop)
+    reactor.run()
+    #for i in range(num):
+    #    reactor.iterate()
 
 class IPythonController(object):
     pass
+
+class Update(object):
+    def __init__(self, origin, key, value):
+        self.value = value
+        self.origin = origin
+        self.key = key
 
 class IPythonView(Observer):
     """  
@@ -45,21 +56,25 @@ class IPythonView(Observer):
         self.controller = controller
         
     def update(self, origin, key, value):
-        global ret
+        global updates, last
         #if origin is self.controller:
-        ret = {'value':value, 'key':key, 'origin':origin}
-        pprint({'value':value, 'key':key, 'origin':origin})
+        last = Update(origin, key, value)
+        updates.append(last) # always appends new notifications
+        print "\nKEY: %s" % (str(key))
+        print "VALUE: "
+        pprint(value)
 
 # ------------------- main: --------------------
-ret = None
+updates = []
+last = None
 
 miville.main()
-go()
+go(0.25)
 
 core = miville.core
 api = miville.core.api
 me = IPythonController()
-view = IPythonView(miville.core, me)
+view = IPythonView(core, me)
 
+print "iMiville is ready for anything."
 
-   
