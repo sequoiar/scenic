@@ -236,8 +236,12 @@ class ControllerApi(object):
     def get_default_port(self, connector):
         return self.connectors[connector].PORT
     
-    def devices_list_attributes(self, driver_kind, caller, driver_name, device_name): # TODO: add driver_kind in cli
-        pass
+    def devices_list_attributes(self, caller, driver_kind, driver_name, device_name): # TODO: add driver_kind in cli
+        """
+        :driver_kind: 'video', 'audio' or 'data'
+        :driver_name: 'alsa', 'v4l2'
+        :device_name: '/dev/video0', 'hw:1'
+        """
         # TODO: if IndexError, 
         try: 
             manager = devices.managers[driver_kind]
@@ -259,7 +263,7 @@ class ControllerApi(object):
         # devices.get_driver(driver_name).devices[device_name].list_attributes()
         #self.notify(caller, 'you called devices_list_attributes', 'devices_list_attributes')
 
-    def devices_modify_attribute(self, caller, driver_name, device_name, attribute_name, value):
+    def devices_modify_attribute(self, caller, driver_kind, driver_name, device_name, attribute_name, value):
         pass
         # TODO
         self.notify(caller, 'No such attributes for driver/device: %s %s %s:%s' % (driver_name, device_name, attribute_name, str(value)), 'info')
@@ -267,7 +271,7 @@ class ControllerApi(object):
         
         # devices.get_driver(driver_name).devices[device_name].attributes[attribute_name].set_value(value)
 
-    def devices_list(self, caller, driver_name=None):
+    def devices_list(self, caller, driver_kind=None, driver_name=None):
         pass
         if driver_name is None:
             self.notify(caller, 'No drivers to list.', 'info')
