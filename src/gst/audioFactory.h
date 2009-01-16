@@ -56,7 +56,9 @@ std::auto_ptr<AudioReceiver>
 audiofactory::buildAudioReceiver(const char *ip, const char *codec, const long port, const char *sink)
 {
     AudioSinkConfig aConfig(sink);
-    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::CAPS_PORT)); // get caps from remote sender
+    int id;
+    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::CAPS_PORT,id)); // get caps from remote sender
+    assert(id == 1);
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
     return rx;

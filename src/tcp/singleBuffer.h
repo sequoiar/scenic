@@ -24,7 +24,7 @@
 #include "tcp/tcpThread.h"
 #include "tcp/parser.h"
 
-static std::string tcpGetBuffer(int port)
+static std::string tcpGetBuffer(int port, int &id)
 {
     TcpThread tcp(port);
     tcp.run();
@@ -41,6 +41,7 @@ static std::string tcpGetBuffer(int port)
                 LOG_INFO("Unknown msg.");
                 continue;
             }
+            id = f["id"];
             return f["str"];
         }
         catch(ErrorExcept)
@@ -52,13 +53,14 @@ static std::string tcpGetBuffer(int port)
 
 #include <errno.h>
 
-static bool tcpSendBuffer(const char *ip, int port, const std::string &caps)
+static bool tcpSendBuffer(const char *ip, int port, int id, const std::string &caps)
 {
     MapMsg msg("buffer");
 
     TcpThread tcp(port);
 
     msg["str"] = caps;
+    msg["id"] = id;
 
     const int MAX_TRIES = 100;
 

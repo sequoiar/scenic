@@ -123,7 +123,7 @@ short pof::run(int argc, char **argv)
 #endif
 
         playback::start();
-        assert(tcpSendBuffer(ip, ports::CAPS_PORT, aTx->getCaps()));
+        assert(tcpSendBuffer(ip, ports::CAPS_PORT, 1,aTx->getCaps()));
 
         BLOCK();
         assert(playback::isPlaying());
