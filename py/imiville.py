@@ -72,16 +72,20 @@ class IPythonView(Observer):
         pprint(value)
 
 # ------------------- main: --------------------
+
 updates = []
 last = None
+core = None
+api = None
+me = None
+view = None
 
-miville.main()
-go(0.25)
-
-core = miville.core
-api = miville.core.api
-me = IPythonController()
-view = IPythonView(core, me)
-
-print "iMiville is ready for anything."
+if __name__ == '__main__':
+    miville.main()
+    go(0.25)
+    core = miville.core
+    api = miville.core.api
+    me = IPythonController()
+    view = IPythonView(core, me)
+    print "iMiville is ready for anything."
 
