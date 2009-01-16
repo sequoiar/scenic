@@ -1,5 +1,5 @@
 from twisted.internet import reactor 
-from pprint import pprint
+from pprint import pprint, pformat
 import miville
 from utils.observer import Observer
 import time
@@ -67,9 +67,10 @@ class IPythonView(Observer):
         #if origin is self.controller:
         last = Update(origin, key, value)
         updates.append(last) # always appends new notifications
-        print "\nKEY: %s" % (str(key))
-        print "VALUE: "
-        pprint(value)
+        print "-------------------------------------  update:  ------------------------------"
+        print "KEY:   %s" % (str(key))
+        print "VALUE: %s" % (pformat(value))
+        print "------------------------------------------------------------------------------"
 
 
 updates = []
