@@ -71,7 +71,6 @@ class IPythonView(Observer):
         print "VALUE: "
         pprint(value)
 
-# ------------------- main: --------------------
 
 updates = []
 last = None
@@ -80,7 +79,8 @@ api = None
 me = None
 view = None
 
-if __name__ == '__main__':
+def main():
+    global core, api, me, view
     miville.main()
     go(0.25)
     core = miville.core
@@ -88,4 +88,7 @@ if __name__ == '__main__':
     me = IPythonController()
     view = IPythonView(core, me)
     print "iMiville is ready for anything."
+
+if __name__ == '__main__':
+    main()
 
