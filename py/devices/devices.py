@@ -117,7 +117,7 @@ class Driver(object): #shell.ShellCommander):
         self._new_devices[device.name] = device
         device.driver = self
      
-    def _on_done_devices_polling(self):
+    def _on_done_devices_polling(self, caller=None):
         """
         Compares former dict of devices with the new one
         and notifies the listener if changes occurred.
@@ -165,18 +165,18 @@ class Driver(object): #shell.ShellCommander):
                             attr_changed[attr.name] = attr
         # let us call the callbacks
         if len(added) > 0:
-            self._call_event_listener('on_devices_added', added) #dict
+            self._call_event_listener('on_devices_added', added, caller) #dict
         if len(removed) > 0:
-            self._call_event_listener('on_devices_removed', removed) # dict
+            self._call_event_listener('on_devices_removed', removed, caller) # dict
         if len(attr_changed) > 0:
-            self._call_event_listener('on_attributes_changed', attr_changed) # dict
+            self._call_event_listener('on_attributes_changed', attr_changed, caller) # dict
         # print "calling on_devices_list"
         #print "calling", self._call_event_listener, 'on_devices_list'
         #print "DONE"
         self._call_event_listener('on_devices_list', self.devices) # dict
         #TODO: maybe not call it every time.
       
-    def _call_event_listener(self, event_name, argument):
+    def _call_event_listener(self, event_name, argument, caller=None):
         """
         Calls an event listener (with one argument)
         
@@ -192,7 +192,7 @@ class Driver(object): #shell.ShellCommander):
         
         Will call observer.<Subject>.notify(caller, value, key=None) with args caller=self, value=a tuple, key='some string'
         """
-        self.api.notify(self, argument, event_name) # driver instance, dict, event key name
+        self.api.notify(caller, argument, event_name) # driver instance, dict, event key name
         
     def prepare(self):
         """
@@ -208,13 +208,13 @@ class Driver(object): #shell.ShellCommander):
         if self.state_poll_enabled:
             return self._poll_devices()
     
-    def on_attribute_change(self, attribute):
+    def on_attribute_change(self, attribute, caller=None):
         """
         Called by a device when one of its attribute is changed. (by the core, usually)
         
         Can be overriden if necessary to do shell scripts or so
         """
-        return self.poll_now()
+        return self.poll_now(caller)
     
     def set_polling_interval(self, ms):
         """
@@ -229,12 +229,12 @@ class Driver(object): #shell.ShellCommander):
     def get_polling_interval(self):
         return self.polling_interval
     
-    def start_polling(self):
+    def start_polling(self, caller=None):
         """
         Returns a Deferred
         """
         self.state_poll_enabled = True
-        return self.poll_now()
+        return self.poll_now(caller)
         
     def stop_polling(self):
         self._cancel_delayed_polling()
@@ -253,16 +253,16 @@ class Driver(object): #shell.ShellCommander):
                 pass
             self._delayed_id = None
             
-    def poll_now(self):
+    def poll_now(self, caller=None):
         """
         Called when the programmer wants to refresh 
         the attributes for a device right now.
         
         Will call all the callbacks with the correct values.
         """
-        return self._poll_devices()
+        return self._poll_devices(caller)
         
-    def _poll_devices(self):
+    def _poll_devices(self, caller=None):
         """
         Devices polling routine.
         """
@@ -270,9 +270,9 @@ class Driver(object): #shell.ShellCommander):
             self._cancel_delayed_polling()
             self._delayed_id = reactor.callLater(self.polling_interval, self._poll_devices)
         self._new_devices = {}
-        return self._on_devices_polling()
+        return self._on_devices_polling(caller)
     
-    def _on_devices_polling(self):
+    def _on_devices_polling(self, caller=None):
         """
         This is where the Driver actually calls many commands 
         in order to populate its Device list and their attributes.
@@ -316,7 +316,10 @@ class Attribute(object):
         self.name = name
         self._value = value # TODO: make private. 
         self.default = default
-        
+    
+    def __str__(self):
+        return "%s (%s)" % (str(self._value), str(type(self)))
+
     def get_value(self):
         """
         TODO: asynchronous. 
@@ -456,6 +459,39 @@ managers = {}
 managers['video'] = VideoDriversManager()
 managers['audio'] = AudioDriversManager()
 managers['data']  = DataDriversManager()
+
+def get_all_drivers(driver_kind=None):
+    """
+    Returns a list of drivers.
+
+    Might throw a KeyError. (if driver_kind does nbot exist)
+
+    If driver_kind is None, will return all drivers.
+    """
+    global managers
+    if driver_kind is not None:
+        return managers[driver_kind].drivers.values()
+    else:
+        ret = []
+        for manager in managers.values():
+            for driver in manager.drivers.values():
+                ret.append(driver)
+        return ret
+
+def get_all_devices(driver_kind=None, driver_name=None):
+    """
+    Returns a list.
+    
+    """
+    drivers = get_all_drivers(driver_kind)
+    ret = []
+    for driver in drivers:
+        if driver_name is not None:
+            if driver.name == driver_name:
+                ret.append(driver)
+        else:
+            ret.append(driver)
+    return ret
 
 def get_manager(manager_kind):
     """

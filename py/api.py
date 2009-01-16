@@ -26,6 +26,7 @@ import sys
 from errors import *
 import connectors
 from connectors.states import *
+import devices
 
 class ControllerApi(object):
     """
@@ -46,7 +47,7 @@ class ControllerApi(object):
         self.streams = self.all_streams[self.curr_streams]
         self.connectors = core.connectors
         self.connection = None
-
+        devices.start(self) # api as an argument
 
     ### Contacts ###
 
@@ -235,12 +236,28 @@ class ControllerApi(object):
     def get_default_port(self, connector):
         return self.connectors[connector].PORT
     
-    def devices_list_attributes(self, caller, driver_name, device_name):
+    def devices_list_attributes(self, driver_kind, caller, driver_name, device_name): # TODO: add driver_kind in cli
         pass
         # TODO: if IndexError, 
-        self.notify(caller, 'No such device or driver: %s %s' % (driver_name, device_name), 'info')
+        try: 
+            manager = devices.managers[driver_kind]
+        except:
+            self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
+            return 
+        try:
+            driver = manager.drivers[driver_name]
+        except:
+            self.notify(caller, 'No such driver name: %s' % (driver_name), 'info')
+            return 
+        try:
+            device = driver.devices[device_name]
+        except:
+            self.notify(caller, 'No such device: %s' % (device_name), 'info')
+            return 
+        self.notify(caller, device.attributes, 'on_devices_list_attributes') # TODO
+        #self.notify(caller, 'No such device or driver: %s %s' % (driver_name, device_name), 'info')
         # devices.get_driver(driver_name).devices[device_name].list_attributes()
-        self.notify(caller, 'you called devices_list_attributes', 'devices_list_attributes')
+        #self.notify(caller, 'you called devices_list_attributes', 'devices_list_attributes')
 
     def devices_modify_attribute(self, caller, driver_name, device_name, attribute_name, value):
         pass

@@ -4,7 +4,12 @@ from devices import *
 # TODO: from utils import find_modules, load_modules
 
 # drivers
-from v4l import Video4LinuxDriver
+import v4l
+
+
+def start(api):
+    v4l.start(api)
+
 
 def load_drivers(api):
     # TODO !!!
@@ -29,4 +34,7 @@ def load_drivers(api):
             else:
                 drivers[name] = module
                 log.info('Connector \'%s\' started.' % name)
-    return connectors
+    return connector
+
+
+

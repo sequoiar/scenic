@@ -84,7 +84,7 @@ def _command_start(executable, command):
         log.critical('Cannot start the command %s. Reason: %s' % (executable, str(e.message)))
     return deferred
     
-def commands_start(commands, callback=None, extra_arg=None):
+def commands_start(commands, callback=None, extra_arg=None, caller=None):
     """
     Starts a shell command.
     
@@ -104,21 +104,22 @@ def commands_start(commands, callback=None, extra_arg=None):
     for command in commands:
         executable = find_command(command[0])
         deferreds.append(_command_start(executable, command))
-    defer_list = defer.DeferredList(deferreds, consumeErrors=True).addErrback(on_commands_error, commands, extra_arg)
+    defer_list = defer.DeferredList(deferreds, consumeErrors=True).addErrback(on_commands_error, commands, extra_arg, caller)
     if callback is None:
         callback = on_commands_results
-    defer_list.addCallback(callback, commands, extra_arg)
+    defer_list.addCallback(callback, commands, extra_arg, caller)
     return defer_list
 
-def on_commands_error(command_failure, commands):
+def on_commands_error(command_failure, commands, caller=None):
     print "@@@@@@@@@"
     print ">>>> ERROR:"
     pprint.pprint({'failure':command_failure, 'exception':sys.exc_info(), 'commands':commands})
     traceback.print_tb(sys.exc_info()[2])
     print '>>>> Exception message : %s' % (command_failure.value.message)
     print "@@@@@@@@@"
+    # TODO: notify api with caller as argument
     
-def on_commands_results(results, commands, extra_arg=None):
+def on_commands_results(results, commands, extra_arg=None, caller=None):
     """
     Called once a bunch of child processes are done.
     
@@ -156,7 +157,7 @@ def on_commands_results(results, commands, extra_arg=None):
                 print ">>>> Failure !"
                 print ">>>> signal is ", signal_or_code
     
-def single_command_start(command, callback=None, extra_arg=None):
+def single_command_start(command, callback=None, extra_arg=None, caller=None): # TODO: on_single_command_result
     """
     Starts a single shell command.
     
@@ -168,10 +169,10 @@ def single_command_start(command, callback=None, extra_arg=None):
     except Exception:
         raise Exception, 'Cannot find the shell command: %s' % (command[0])
     deferreds = [_command_start(executable, command)] # list with a single deferred
-    defer_list = defer.DeferredList(deferreds, consumeErrors=True).addErrback(on_commands_error, [command], extra_arg)
+    defer_list = defer.DeferredList(deferreds, consumeErrors=True).addErrback(on_commands_error, [command], extra_arg, caller)
     if callback is None:
         callback = on_commands_results
-    defer_list.addCallback(callback, [command], extra_arg)
+    defer_list.addCallback(callback, [command], extra_arg, caller)
     return defer_list
 
 if __name__ == '__main__':
@@ -191,7 +192,7 @@ if __name__ == '__main__':
             ['ls','-a']
         ]
     try:
-        commands_start(commands).addCallback(stop)
+        commands_start(commands).addCallback(stop) # does it work?
     except CommandNotFoundError,e:
         print 'Raised error while it should not : %s', e.message
     #reactor.callLater(0.1, reactor.stop)

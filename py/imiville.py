@@ -68,8 +68,9 @@ class IPythonView(Observer):
         last = Update(origin, key, value)
         updates.append(last) # always appends new notifications
         print "-------------------------------------  update:  ------------------------------"
-        print "KEY:   %s" % (str(key))
-        print "VALUE: %s" % (pformat(value))
+        print "KEY:    %s" % (str(key))
+        print "ORIGIN: %s" % (str(origin))
+        print "VALUE:  %s" % (pformat(value))
         print "------------------------------------------------------------------------------"
 
 
