@@ -2,6 +2,7 @@ from twisted.internet import reactor
 from pprint import pprint
 import miville
 from utils.observer import Observer
+import time
 """
 Miville for ipython.
 
@@ -32,8 +33,11 @@ def go(duration=0.1): # num=999
     """
     Runs the reactor for n seconds
     """
-    reactor.callLater(duration, reactor.stop)
-    reactor.run()
+    end = time.time() + duration
+    while time.time() < end:
+        reactor.iterate()
+    #reactor.callLater(duration, reactor.stop)
+    #reactor.run()
     #for i in range(num):
     #    reactor.iterate()
 
@@ -41,6 +45,9 @@ class IPythonController(object):
     pass
 
 class Update(object):
+    """
+    Represents a notification from miville's core api.
+    """
     def __init__(self, origin, key, value):
         self.value = value
         self.origin = origin
