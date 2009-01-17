@@ -46,34 +46,6 @@ class GstAudioTestSubscriber : public msg::Subscriber
     } 
 };
 
-void AudioTestSuite::start_1ch_audiotest()
-{
-    const int NUM_CHANNELS = 1;
-    AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-
-    playback::start();
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void AudioTestSuite::stop_1ch_audiotest()
-{
-    const int NUM_CHANNELS = 1;
-    AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-    playback::stop();
-
-    BLOCK();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
 
 void AudioTestSuite::start_stop_1ch_audiotest()
 {
@@ -90,37 +62,6 @@ void AudioTestSuite::start_stop_1ch_audiotest()
     BLOCK();
 
     TEST_ASSERT(playback::isPlaying());
-
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
-
-void AudioTestSuite::start_2ch_audiotest()
-{
-    const int NUM_CHANNELS = 2;
-    AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-    
-    playback::start();
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void AudioTestSuite::stop_2ch_audiotest()
-{
-    const int NUM_CHANNELS = 2;
-    AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-    
-
-    BLOCK();
 
     playback::stop();
     TEST_ASSERT(!playback::isPlaying());
@@ -146,37 +87,6 @@ void AudioTestSuite::start_stop_2ch_audiotest()
 }
 
 
-void AudioTestSuite::start_6ch_audiotest()
-{
-    const int NUM_CHANNELS = 6;
-    AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-    
-
-    playback::start();
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void AudioTestSuite::stop_6ch_audiotest()
-{
-    const int NUM_CHANNELS = 6;
-    AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-    
-
-    BLOCK();
-
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
 
 void AudioTestSuite::start_stop_6ch_audiotest()
 {
@@ -199,36 +109,6 @@ void AudioTestSuite::start_stop_6ch_audiotest()
 }
 
 
-void AudioTestSuite::start_8ch_audiotest()
-{
-    const int NUM_CHANNELS = 8;
-    AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-    
-
-    playback::start();
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void AudioTestSuite::stop_8ch_audiotest()
-{
-    const int NUM_CHANNELS = 8;
-    AudioSourceConfig srcConfig("audiotestsrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-    
-
-    BLOCK();
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
 
 void AudioTestSuite::start_stop_8ch_audiotest()
 {
@@ -249,34 +129,6 @@ void AudioTestSuite::start_stop_8ch_audiotest()
 }
 
 
-void AudioTestSuite::start_8ch_jack()
-{
-    const int NUM_CHANNELS = 8;
-    AudioSourceConfig srcConfig("jackaudiosrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-
-    playback::start();
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void AudioTestSuite::stop_8ch_jack()
-{
-    const int NUM_CHANNELS = 8;
-    AudioSourceConfig srcConfig("jackaudiosrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-
-    BLOCK();
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
 
 void AudioTestSuite::start_stop_8ch_jack()
 {
@@ -294,38 +146,6 @@ void AudioTestSuite::start_stop_8ch_jack()
     TEST_ASSERT(!playback::isPlaying());
 }
 
-
-void AudioTestSuite::start_8ch_audiofile()
-{
-    const int NUM_CHANNELS = 8;
-    const int LOOP_COUNT = 4;
-
-    AudioSourceConfig srcConfig("filesrc", audioFilename_, NUM_CHANNELS, LOOP_COUNT);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-
-    TEST_THROWS_NOTHING(playback::start());
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void AudioTestSuite::stop_8ch_audiofile()
-{
-    const int NUM_CHANNELS = 8;
-
-    AudioSourceConfig srcConfig("filesrc", audioFilename_, NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-
-    BLOCK();
-
-    TEST_THROWS_NOTHING(playback::stop());
-    TEST_ASSERT(!playback::isPlaying());
-}
 
 
 void AudioTestSuite::start_stop_8ch_audiofile()
@@ -348,35 +168,6 @@ void AudioTestSuite::start_stop_8ch_audiofile()
 }
 
 
-void AudioTestSuite::start_audio_dv()
-{
-    const int NUM_CHANNELS = 2;
-    AudioSourceConfig srcConfig("dv1394src", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-
-    playback::start();
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void AudioTestSuite::stop_audio_dv()
-{
-    const int NUM_CHANNELS = 2;
-    AudioSourceConfig srcConfig("dv1394src", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("jackaudiosink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-    TEST_ASSERT(!playback::isPlaying());
-
-    BLOCK();
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
 
 void AudioTestSuite::start_stop_audio_dv()
 {
@@ -396,34 +187,6 @@ void AudioTestSuite::start_stop_audio_dv()
 }
 
 
-void AudioTestSuite::start_8ch_alsa()
-{
-    const int NUM_CHANNELS = 8;
-    AudioSourceConfig srcConfig("alsasrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("alsasink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-
-    playback::start();
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void AudioTestSuite::stop_8ch_alsa()
-{
-    const int NUM_CHANNELS = 8;
-    AudioSourceConfig srcConfig("alsasrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("alsasink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-
-    BLOCK();
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
 
 void AudioTestSuite::start_stop_8ch_alsa()
 {
@@ -442,34 +205,6 @@ void AudioTestSuite::start_stop_8ch_alsa()
 }
 
 
-void AudioTestSuite::start_6ch_pulse()
-{
-    const int NUM_CHANNELS = 6;
-    AudioSourceConfig srcConfig("pulsesrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("pulsesink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-
-    playback::start();
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void AudioTestSuite::stop_6ch_pulse()
-{
-    const int NUM_CHANNELS = 6;
-    AudioSourceConfig srcConfig("pulsesrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("pulsesink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-
-    BLOCK();
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
 
 void AudioTestSuite::start_stop_6ch_pulse()
 {
@@ -487,35 +222,6 @@ void AudioTestSuite::start_stop_6ch_pulse()
     TEST_ASSERT(!playback::isPlaying());
 }
 
-
-
-void AudioTestSuite::start_8ch_pulse()
-{
-    const int NUM_CHANNELS = 8;
-    AudioSourceConfig srcConfig("pulsesrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("pulsesink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-
-    playback::start();
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void AudioTestSuite::stop_8ch_pulse()
-{
-    const int NUM_CHANNELS = 8;
-    AudioSourceConfig srcConfig("pulsesrc", NUM_CHANNELS);
-    AudioSinkConfig sinkConfig("pulsesink");
-    AudioLocal tx(srcConfig, sinkConfig);
-    TEST_THROWS_NOTHING(tx.init());
-
-    BLOCK();
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
 
 
 void AudioTestSuite::start_stop_8ch_pulse()

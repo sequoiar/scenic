@@ -35,7 +35,7 @@ class RtpReceiver
     public:
         RtpReceiver() : rtp_receiver_(0), depayloader_(0) {}
         ~RtpReceiver();
-        void set_caps(const char* capsStr);
+        void setCaps(const char* capsStr);
         void checkSampleRate();
 
         void add(RtpPay * depayloader, const ReceiverConfig & config);

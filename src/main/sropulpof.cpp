@@ -123,7 +123,9 @@ short pof::run(int argc, char **argv)
 #endif
 
         playback::start();
-        assert(tcpSendBuffer(ip, ports::CAPS_PORT, 1,aTx->getCaps()));
+
+        assert(tcpSendBuffer(ip, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
+        assert(tcpSendBuffer(ip, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
 
         BLOCK();
         assert(playback::isPlaying());

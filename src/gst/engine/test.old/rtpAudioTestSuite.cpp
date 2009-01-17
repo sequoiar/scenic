@@ -38,70 +38,9 @@
 /* Helper functions                             */
 /*----------------------------------------------*/ 
 
-// for testing stopped pipelines
-static std::auto_ptr<AudioReceiver> 
-buildDeadAudioReceiver(const char * sink = audiofactory::A_SINK)
-{
-    AudioSinkConfig aConfig(sink);
-    ReceiverConfig rConfig(audiofactory::A_CODEC, ports::IP, ports::A_PORT, "");
-    std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
-    rx->init();
-    return rx;
-}
-
-
 /*----------------------------------------------*/ 
 /* Unit tests.                                  */
 /*----------------------------------------------*/ 
-
-
-void RtpAudioTestSuite::start_2ch_audiotest()
-{
-    const int NUM_CHANNELS = 8;
-
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("audiotestsrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-        playback::start();
-
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpAudioTestSuite::stop_2ch_audiotest()
-{
-    const int NUM_CHANNELS = 2;
-
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("audiotestsrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
 
 
 void RtpAudioTestSuite::start_stop_2ch_audiotest()
@@ -125,7 +64,7 @@ void RtpAudioTestSuite::start_stop_2ch_audiotest()
 
         playback::start();
 
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, tx->getCaps()));
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
 
@@ -134,54 +73,6 @@ void RtpAudioTestSuite::start_stop_2ch_audiotest()
     }
 }
 
-
-void RtpAudioTestSuite::start_8ch_audiotest()
-{
-    const int NUM_CHANNELS = 8;
-
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("audiotestsrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        playback::start();
-
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpAudioTestSuite::stop_8ch_audiotest()
-{
-    const int NUM_CHANNELS = 8;
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("audiotestsrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
 
 
 void RtpAudioTestSuite::start_stop_8ch_audiotest()
@@ -204,7 +95,7 @@ void RtpAudioTestSuite::start_stop_8ch_audiotest()
 
         playback::start();
 
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
@@ -214,54 +105,6 @@ void RtpAudioTestSuite::start_stop_8ch_audiotest()
     }
 }
 
-
-void RtpAudioTestSuite::start_6ch_alsa()
-{
-    const int NUM_CHANNELS = 6;
-
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver("alsasink"));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("alsasrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        playback::start();
-
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpAudioTestSuite::stop_6ch_alsa()
-{
-    const int NUM_CHANNELS = 6;
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver("alsasink"));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("alsasrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
 
 
 void RtpAudioTestSuite::start_stop_6ch_alsa()
@@ -284,7 +127,7 @@ void RtpAudioTestSuite::start_stop_6ch_alsa()
 
         playback::start();
 
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
@@ -294,54 +137,6 @@ void RtpAudioTestSuite::start_stop_6ch_alsa()
     }
 }
 
-
-void RtpAudioTestSuite::start_6ch_pulse()
-{
-    const int NUM_CHANNELS = 6;
-
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver("pulsesink"));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("pulsesrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        playback::start();
-
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpAudioTestSuite::stop_6ch_pulse()
-{
-    const int NUM_CHANNELS = 6;
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver("pulsesink"));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("pulsesrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
 
 
 void RtpAudioTestSuite::start_stop_6ch_pulse()
@@ -364,7 +159,7 @@ void RtpAudioTestSuite::start_stop_6ch_pulse()
 
         playback::start();
 
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
@@ -374,53 +169,7 @@ void RtpAudioTestSuite::start_stop_6ch_pulse()
     }
 }
 
-void RtpAudioTestSuite::start_8ch_jack_vorbis()
-{
-    const int NUM_CHANNELS = 8;
 
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver(ports::IP, "vorbis"));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("jackaudiosrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig, ports::IP, "vorbis"));
-
-        playback::start();
-
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpAudioTestSuite::stop_8ch_jack_vorbis()
-{
-    const int NUM_CHANNELS = 8;
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("jackaudiosrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig, ports::IP, "vorbis"));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
 
 
 void RtpAudioTestSuite::start_stop_8ch_jack()
@@ -443,7 +192,7 @@ void RtpAudioTestSuite::start_stop_8ch_jack()
 
         playback::start();
 
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
@@ -453,55 +202,6 @@ void RtpAudioTestSuite::start_stop_8ch_jack()
     }
 }
 
-
-
-void RtpAudioTestSuite::start_8ch_jack()
-{
-    const int NUM_CHANNELS = 8;
-
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("jackaudiosrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        playback::start();
-
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpAudioTestSuite::stop_8ch_jack()
-{
-    const int NUM_CHANNELS = 8;
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("jackaudiosrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
 
 
 void RtpAudioTestSuite::start_stop_8ch_jack_vorbis()
@@ -524,7 +224,7 @@ void RtpAudioTestSuite::start_stop_8ch_jack_vorbis()
 
         playback::start();
 
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
@@ -534,54 +234,6 @@ void RtpAudioTestSuite::start_stop_8ch_jack_vorbis()
     }
 }
 
-
-void RtpAudioTestSuite::start_8ch_audiofile()
-{
-    const int NUM_CHANNELS = 8;
-
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("filesrc", audioFilename_, NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        playback::start();
-
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpAudioTestSuite::stop_8ch_audiofile()
-{
-    const int NUM_CHANNELS = 8;
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("filesrc", audioFilename_, NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
 
 
 void RtpAudioTestSuite::start_stop_8ch_audiofile()
@@ -604,59 +256,10 @@ void RtpAudioTestSuite::start_stop_8ch_audiofile()
 
         playback::start();
 
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
-
-
-void RtpAudioTestSuite::start_audio_dv()
-{
-    const int NUM_CHANNELS = 2;
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("dv1394src", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        playback::start();
-
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpAudioTestSuite::stop_audio_dv()
-{
-    const int NUM_CHANNELS = 2;
-
-    if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(buildDeadAudioReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        AudioSourceConfig aConfig("dv1394src", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
-
-        BLOCK();
 
         playback::stop();
         TEST_ASSERT(!playback::isPlaying());
@@ -685,7 +288,7 @@ void RtpAudioTestSuite::start_stop_audio_dv()
 
         playback::start();
 
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::CAPS_PORT, tx->getCaps()));
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());

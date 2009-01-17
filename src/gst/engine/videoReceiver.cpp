@@ -52,7 +52,7 @@ void VideoReceiver::init_depayloader()
 
     session_.add(depayloader_, remoteConfig_);
     
-    session_.set_caps(decoder_->getCaps());
+    session_.setCaps(decoder_->getCaps());
 }
 
 
@@ -61,5 +61,14 @@ void VideoReceiver::init_sink()
     assert(sink_ = videoConfig_.createSink());
     sink_->init();
     gstlinkable::link(*decoder_, *sink_);
+    setCaps();
+    assert(gotCaps_);
+}
+
+/// Used to set this VideoReceiver's RtpReceiver's caps 
+void VideoReceiver::setCaps() 
+{ 
+    session_.setCaps(remoteConfig_.caps()); 
+    gotCaps_ = true;
 }
 

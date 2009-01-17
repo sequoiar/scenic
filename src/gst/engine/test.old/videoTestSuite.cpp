@@ -30,34 +30,6 @@
 
 const int VideoTestSuite::GL_SCREEN = 0;
 
-void VideoTestSuite::start_test_video_gl()
-{
-    VideoSourceConfig srcConfig("videotestsrc");
-    VideoSinkConfig sinkConfig("glimagesink", GL_SCREEN);
-    VideoLocal tx(srcConfig, sinkConfig);
-    tx.init();
-
-    playback::start();
-    
-    BLOCK();
-
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void VideoTestSuite::stop_test_video_gl()
-{
-    VideoSourceConfig srcConfig("videotestsrc");
-    VideoSinkConfig sinkConfig("glimagesink", GL_SCREEN);
-    VideoLocal tx(srcConfig, sinkConfig);
-    tx.init();
-
-    BLOCK();
-
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
 
 void VideoTestSuite::start_stop_test_video_gl()
 {
@@ -71,36 +43,6 @@ void VideoTestSuite::start_stop_test_video_gl()
 
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
-
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
-
-void VideoTestSuite::start_test_video()
-{
-    VideoSourceConfig srcConfig("videotestsrc");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal tx(srcConfig, sinkConfig);
-    tx.init();
-
-    playback::start();
-    
-
-    BLOCK();
-
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void VideoTestSuite::stop_test_video()
-{
-    VideoSourceConfig srcConfig("videotestsrc");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal tx(srcConfig, sinkConfig);
-    tx.init();
-
-    BLOCK();
 
     playback::stop();
     TEST_ASSERT(!playback::isPlaying());
@@ -126,35 +68,6 @@ void VideoTestSuite::start_stop_test_video()
 
 
 
-void VideoTestSuite::start_v4l()
-{
-    VideoSourceConfig srcConfig("v4l2src");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal tx(srcConfig, sinkConfig);
-    tx.init();
-
-    playback::start();
-    
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void VideoTestSuite::stop_v4l()
-{
-    VideoSourceConfig srcConfig("v4l2src");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal tx(srcConfig, sinkConfig);
-    tx.init();
-
-    BLOCK();
-
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
-
 void VideoTestSuite::start_stop_v4l()
 {
     VideoSourceConfig srcConfig("v4l2src");
@@ -173,34 +86,6 @@ void VideoTestSuite::start_stop_v4l()
 }
 
 
-void VideoTestSuite::start_v4l_gl()
-{
-    VideoSourceConfig srcConfig("v4l2src");
-    VideoSinkConfig sinkConfig("glimagesink");
-    VideoLocal tx(srcConfig, sinkConfig);
-    tx.init();
-
-    playback::start();
-    
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void VideoTestSuite::stop_v4l_gl()
-{
-    VideoSourceConfig srcConfig("v4l2src");
-    VideoSinkConfig sinkConfig("glimagesink");
-    VideoLocal tx(srcConfig, sinkConfig);
-    tx.init();
-
-    BLOCK();
-
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
 
 void VideoTestSuite::start_stop_v4l_gl()
 {
@@ -214,35 +99,6 @@ void VideoTestSuite::start_stop_v4l_gl()
 
     BLOCK();
     TEST_ASSERT(playback::isPlaying());
-
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
-
-
-void VideoTestSuite::start_dv()
-{
-    VideoSourceConfig srcConfig("dv1394src");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal tx(srcConfig, sinkConfig);
-    tx.init();
-
-    playback::start();
-    
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void VideoTestSuite::stop_dv()
-{
-    VideoSourceConfig srcConfig("dv1394src");
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal tx(srcConfig, sinkConfig);
-    tx.init();
-
-    BLOCK();
 
     playback::stop();
     TEST_ASSERT(!playback::isPlaying());
@@ -266,34 +122,6 @@ void VideoTestSuite::start_stop_dv()
     TEST_ASSERT(!playback::isPlaying());
 }
 
-
-void VideoTestSuite::start_file()
-{
-    VideoSourceConfig srcConfig("filesrc", videoFilename_);
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal tx(srcConfig, sinkConfig);
-    tx.init();
-
-    playback::start();
-    
-
-    BLOCK();
-    TEST_ASSERT(playback::isPlaying());
-}
-
-
-void VideoTestSuite::stop_file()
-{
-    VideoSourceConfig srcConfig("filesrc", videoFilename_);
-    VideoSinkConfig sinkConfig("xvimagesink");
-    VideoLocal tx(srcConfig, sinkConfig);
-    tx.init();
-
-    BLOCK();
-
-    playback::stop();
-    TEST_ASSERT(!playback::isPlaying());
-}
 
 
 void VideoTestSuite::start_stop_file()

@@ -31,46 +31,32 @@ class RtpVideoTestSuite
 
         RtpVideoTestSuite()
         {
-            testLength_ = 800000;
-            TEST_ADD(RtpVideoTestSuite::start_h263_v4l)
-            TEST_ADD(RtpVideoTestSuite::stop_h263_v4l)
+            testLength_ = 8000;
+            
+            TEST_ADD(RtpVideoTestSuite::start_stop_test_video)
+           
             TEST_ADD(RtpVideoTestSuite::start_stop_h263_v4l)
             
-            TEST_ADD(RtpVideoTestSuite::start_mpeg4)
-            TEST_ADD(RtpVideoTestSuite::stop_mpeg4)
             TEST_ADD(RtpVideoTestSuite::start_stop_mpeg4)
             
-            TEST_ADD(RtpVideoTestSuite::start_v4l)
-            TEST_ADD(RtpVideoTestSuite::stop_v4l)
             TEST_ADD(RtpVideoTestSuite::start_stop_v4l)
             
-            TEST_ADD(RtpVideoTestSuite::start_h263)
-            TEST_ADD(RtpVideoTestSuite::stop_h263)
             TEST_ADD(RtpVideoTestSuite::start_stop_h263)
             
-            TEST_ADD(RtpVideoTestSuite::start_test_video)
-            TEST_ADD(RtpVideoTestSuite::stop_test_video)
-            TEST_ADD(RtpVideoTestSuite::start_stop_test_video)
-            
-            TEST_ADD(RtpVideoTestSuite::start_mpeg4_v4l)
-            TEST_ADD(RtpVideoTestSuite::stop_mpeg4_v4l)
             TEST_ADD(RtpVideoTestSuite::start_stop_mpeg4_v4l)
-            
-            TEST_ADD(RtpVideoTestSuite::start_v4l_gl)
-            TEST_ADD(RtpVideoTestSuite::stop_v4l_gl)
-            TEST_ADD(RtpVideoTestSuite::start_stop_v4l_gl)
-            
-            TEST_ADD(RtpVideoTestSuite::start_dv_gl)
-            TEST_ADD(RtpVideoTestSuite::stop_dv_gl)
-            TEST_ADD(RtpVideoTestSuite::start_stop_dv_gl)
 
-            TEST_ADD(RtpVideoTestSuite::start_dv)
-            TEST_ADD(RtpVideoTestSuite::stop_dv)
+            TEST_ADD(RtpVideoTestSuite::start_stop_file)
+
+#ifdef CONFIG_GL
+            TEST_ADD(RtpVideoTestSuite::start_stop_test_video_gl)
+
+            TEST_ADD(RtpVideoTestSuite::start_stop_v4l_gl)
+
+            TEST_ADD(RtpVideoTestSuite::start_stop_dv_gl)
+#endif
+            
             TEST_ADD(RtpVideoTestSuite::start_stop_dv)
 
-            TEST_ADD(RtpVideoTestSuite::start_file)
-            TEST_ADD(RtpVideoTestSuite::stop_file)
-            TEST_ADD(RtpVideoTestSuite::start_stop_file)
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
             /*                                              */
@@ -83,44 +69,26 @@ class RtpVideoTestSuite
         // some tests
 
     private:
-        void start_h263();
-        void stop_h263();
         void start_stop_h263();
         
-        void start_h263_v4l();
-        void stop_h263_v4l();
         void start_stop_h263_v4l();
 
-        void start_mpeg4_v4l();
-        void stop_mpeg4_v4l();
         void start_stop_mpeg4_v4l();
 
-        void start_mpeg4();
-        void stop_mpeg4();
         void start_stop_mpeg4();
 
-        void start_test_video();
-        void stop_test_video();
         void start_stop_test_video();
+        
+        void start_stop_test_video_gl();
 
-        void start_v4l();
-        void stop_v4l();
         void start_stop_v4l();
 
-        void start_v4l_gl();
-        void stop_v4l_gl();
         void start_stop_v4l_gl();
 
-        void start_dv();
-        void stop_dv();
         void start_stop_dv();
 
-        void start_dv_gl();
-        void stop_dv_gl();
         void start_stop_dv_gl();
     
-        void start_file();
-        void stop_file();
         void start_stop_file();
 };
 

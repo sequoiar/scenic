@@ -30,6 +30,12 @@
 #include "codec.h"
 
 
+/// Returns the capabilities of this VideoSender's RtpSession 
+std::string VideoSender::getCaps() const
+{ 
+    return session_.getCaps(); 
+}
+
 VideoSender::~VideoSender()
 {
     delete payloader_;

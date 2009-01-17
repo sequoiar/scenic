@@ -49,7 +49,7 @@ class AudioReceiver
         void init_level();
         void init_sink();
         
-        void set_caps(); 
+        void setCaps(); 
 
         const AudioSinkConfig audioConfig_;
         const ReceiverConfig remoteConfig_;

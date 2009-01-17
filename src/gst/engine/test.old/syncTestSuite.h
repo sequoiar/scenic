@@ -34,16 +34,10 @@ class SyncTestSuite
         SyncTestSuite()
         {
             testLength_ = 5000;
-            TEST_ADD(SyncTestSuite::start_audiotest_videotest);
-            TEST_ADD(SyncTestSuite::stop_audiotest_videotest);
             TEST_ADD(SyncTestSuite::start_stop_audiotest_videotest);
 
-            TEST_ADD(SyncTestSuite::start_dv_audio_dv_video)
-            TEST_ADD(SyncTestSuite::stop_dv_audio_dv_video)
             TEST_ADD(SyncTestSuite::start_stop_dv_audio_dv_video)
 
-            TEST_ADD(SyncTestSuite::start_jack_audio_dv_video)
-            TEST_ADD(SyncTestSuite::stop_jack_audio_dv_video)
             TEST_ADD(SyncTestSuite::start_stop_jack_audio_dv_video)
 
         }
@@ -52,16 +46,10 @@ class SyncTestSuite
 
     private:
         
-        void start_jack_audio_dv_video();
-        void stop_jack_audio_dv_video();
         void start_stop_jack_audio_dv_video();
 
-        void start_dv_audio_dv_video();
-        void stop_dv_audio_dv_video();
         void start_stop_dv_audio_dv_video();
 
-        void start_audiotest_videotest();
-        void stop_audiotest_videotest();
         void start_stop_audiotest_videotest();
 };
 

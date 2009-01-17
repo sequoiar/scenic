@@ -47,7 +47,7 @@ RtpReceiver::~RtpReceiver()
 }
 
 
-void RtpReceiver::set_caps(const char *capsStr)
+void RtpReceiver::setCaps(const char *capsStr)
 {
     GstCaps *caps;
     assert(caps = gst_caps_from_string(capsStr));

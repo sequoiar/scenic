@@ -26,11 +26,13 @@
 #include "ports.h"
 #include "gst/engine.h"
 #include <memory>   // for std::auto_ptr
+#include "tcp/singleBuffer.h"
 
 namespace videofactory
 {
     static const char *V_SINK = "xvimagesink";
     static const char *V_CODEC = "h264";
+    static const int MSG_ID = 2;
 
     static std::auto_ptr<VideoReceiver> 
     buildVideoReceiver(const char *ip = ports::IP, const char * codec = V_CODEC, const long port = ports::V_PORT, 
@@ -55,8 +57,9 @@ videofactory::buildVideoReceiver(const char *ip, const char *codec, const long p
     if(!sink)
         sink = V_SINK;
     VideoSinkConfig vConfig(sink, screen_num);
-    const char *CAPS_STR = "";
-    ReceiverConfig rConfig(codec, ip, port, CAPS_STR);
+    int id;
+    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::VIDEO_CAPS_PORT, id)); // get caps from remote sender
+    assert(id == MSG_ID);
     std::auto_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
     rx->init();
     return rx;

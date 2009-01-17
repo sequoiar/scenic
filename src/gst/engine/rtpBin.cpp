@@ -38,7 +38,8 @@ void RtpBin::init()
     if (rtpbin_ == 0) 
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
     
-    g_object_set(G_OBJECT(rtpbin_), "latency", 1, NULL);
+    // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
+    g_object_set(G_OBJECT(rtpbin_), "latency", 10, NULL);
     
 #if 0
     // uncomment this to print jitter

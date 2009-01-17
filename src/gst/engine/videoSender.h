@@ -40,6 +40,8 @@ class VideoSender
 
         ~VideoSender();
 
+        std::string getCaps() const;
+
     private:
         void init_source();
         void init_codec();

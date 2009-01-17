@@ -77,14 +77,14 @@ void AudioReceiver::init_sink()
     assert(sink_ = audioConfig_.createSink());
     sink_->init();
     gstlinkable::link(level_, *sink_);   
-    set_caps();
+    setCaps();
     assert(gotCaps_);
 }
 
 /// Used to set this AudioReceiver's RtpReceiver's caps 
-void AudioReceiver::set_caps() 
+void AudioReceiver::setCaps() 
 { 
-    session_.set_caps(remoteConfig_.caps()); 
+    session_.setCaps(remoteConfig_.caps()); 
     gotCaps_ = true;
 }
 

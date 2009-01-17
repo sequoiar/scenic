@@ -36,7 +36,7 @@ class VideoReceiver
     public:
         VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig rConfig)
             : videoConfig_(vConfig), remoteConfig_(rConfig), session_(), depayloader_(0), 
-            decoder_(0), sink_(0) {}
+            decoder_(0), sink_(0), gotCaps_(false) {}
 
         VideoSink *getVideoSink() { return sink_; }
 
@@ -47,6 +47,7 @@ class VideoReceiver
         void init_codec();
         void init_depayloader();
         void init_sink();
+        void setCaps();
 
         const VideoSinkConfig videoConfig_;
         const ReceiverConfig remoteConfig_;
@@ -55,6 +56,7 @@ class VideoReceiver
         RtpPay *depayloader_; 
         Decoder *decoder_;
         VideoSink *sink_;
+        bool gotCaps_;
 
         VideoReceiver(const VideoReceiver&); //No Copy Constructor
         VideoReceiver& operator=(const VideoReceiver&); //No Assignment Operator

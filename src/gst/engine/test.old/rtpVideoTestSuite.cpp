@@ -29,50 +29,7 @@
 #include "playback.h"
 #include "gst/videoFactory.h"
 
-
-void RtpVideoTestSuite::start_test_video()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::stop_test_video()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
-
+#include "tcp/singleBuffer.h"
 
 void RtpVideoTestSuite::start_stop_test_video()
 {
@@ -93,6 +50,8 @@ void RtpVideoTestSuite::start_stop_test_video()
 
         playback::start();
 
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
+
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
 
@@ -101,36 +60,15 @@ void RtpVideoTestSuite::start_stop_test_video()
     }
 }
 
-
-
-void RtpVideoTestSuite::start_mpeg4()
+void RtpVideoTestSuite::start_stop_test_video_gl()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "mpeg4"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "glimagesink"));
 
         playback::start();
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "mpeg4"));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::stop_mpeg4()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
-
-        BLOCK();
 
         playback::stop();
         TEST_ASSERT(!playback::isPlaying());
@@ -139,7 +77,12 @@ void RtpVideoTestSuite::stop_mpeg4()
         VideoSourceConfig vConfig("videotestsrc");
         std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
+        playback::start();
+
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
+
         BLOCK();
+        TEST_ASSERT(playback::isPlaying());
 
         playback::stop();
         TEST_ASSERT(!playback::isPlaying());
@@ -150,7 +93,7 @@ void RtpVideoTestSuite::stop_mpeg4()
 void RtpVideoTestSuite::start_stop_mpeg4()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "mpeg4"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "mpeg4"));
 
         playback::start();
 
@@ -162,56 +105,14 @@ void RtpVideoTestSuite::start_stop_mpeg4()
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "mpeg4"));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "mpeg4"));
 
         playback::start();
+        
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::start_h263()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "h263"));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "h263"));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::stop_h263()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        BLOCK();
 
         playback::stop();
         TEST_ASSERT(!playback::isPlaying());
@@ -222,7 +123,7 @@ void RtpVideoTestSuite::stop_h263()
 void RtpVideoTestSuite::start_stop_h263()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "h263"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h263"));
 
         playback::start();
 
@@ -234,57 +135,14 @@ void RtpVideoTestSuite::start_stop_h263()
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "h263"));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "h263"));
 
         playback::start();
+        
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
-
-
-
-void RtpVideoTestSuite::start_h263_v4l()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "h263"));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "h263"));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::stop_h263_v4l()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        BLOCK();
 
         playback::stop();
         TEST_ASSERT(!playback::isPlaying());
@@ -295,7 +153,7 @@ void RtpVideoTestSuite::stop_h263_v4l()
 void RtpVideoTestSuite::start_stop_h263_v4l()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "h263"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h263"));
 
         playback::start();
 
@@ -307,55 +165,14 @@ void RtpVideoTestSuite::start_stop_h263_v4l()
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "h263"));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "h263"));
 
         playback::start();
 
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
-
-void RtpVideoTestSuite::start_mpeg4_v4l()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "mpeg4"));
-
-        playback::start();
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "mpeg4"));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::stop_mpeg4_v4l()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        BLOCK();
 
         playback::stop();
         TEST_ASSERT(!playback::isPlaying());
@@ -366,7 +183,7 @@ void RtpVideoTestSuite::stop_mpeg4_v4l()
 void RtpVideoTestSuite::start_stop_mpeg4_v4l()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("127.0.0.1", "mpeg4"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "mpeg4"));
 
         playback::start();
 
@@ -378,9 +195,11 @@ void RtpVideoTestSuite::start_stop_mpeg4_v4l()
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, "127.0.0.1", "mpeg4"));
+        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "mpeg4"));
 
         playback::start();
+
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
@@ -390,49 +209,6 @@ void RtpVideoTestSuite::start_stop_mpeg4_v4l()
     }
 }
 
-
-void RtpVideoTestSuite::start_v4l()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::stop_v4l()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
 
 
 void RtpVideoTestSuite::start_stop_v4l()
@@ -454,53 +230,10 @@ void RtpVideoTestSuite::start_stop_v4l()
 
         playback::start();
 
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
-
-
-
-void RtpVideoTestSuite::start_v4l_gl()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("glimagesink"));
-
-        playback::start();
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::stop_v4l_gl()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("glimagesink"));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        BLOCK();
 
         playback::stop();
         TEST_ASSERT(!playback::isPlaying());
@@ -511,7 +244,7 @@ void RtpVideoTestSuite::stop_v4l_gl()
 void RtpVideoTestSuite::start_stop_v4l_gl()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("glimagesink"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "glimagesink"));
 
         playback::start();
 
@@ -526,54 +259,10 @@ void RtpVideoTestSuite::start_stop_v4l_gl()
         std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::start_dv()
-{
-    // receiver should be started first, of course there's no guarantee that it will at this point
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("dv1394src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::stop_dv()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("dv1394src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        BLOCK();
 
         playback::stop();
         TEST_ASSERT(!playback::isPlaying());
@@ -599,54 +288,10 @@ void RtpVideoTestSuite::start_stop_dv()
         std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::start_dv_gl()
-{
-    // receiver should be started first, of course there's no guarantee that it will at this point
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("glimagesink"));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("dv1394src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::stop_dv_gl()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("glimagesink"));
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("dv1394src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        BLOCK();
 
         playback::stop();
         TEST_ASSERT(!playback::isPlaying());
@@ -657,7 +302,7 @@ void RtpVideoTestSuite::stop_dv_gl()
 void RtpVideoTestSuite::start_stop_dv_gl()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver("glimagesink"));
+        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "glimagesink"));
 
         playback::start();
 
@@ -672,53 +317,10 @@ void RtpVideoTestSuite::start_stop_dv_gl()
         std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-}
-
-void RtpVideoTestSuite::start_file()
-{
-    // receiver should be started first, of course there's no guarantee that it will at this point
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("filesrc", videoFilename_);
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        playback::start();
-
-        BLOCK();
-        TEST_ASSERT(playback::isPlaying());
-    }
-}
-
-
-void RtpVideoTestSuite::stop_file()
-{
-    if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
-
-        BLOCK();
-
-        playback::stop();
-        TEST_ASSERT(!playback::isPlaying());
-    }
-    else {
-        VideoSourceConfig vConfig("filesrc", videoFilename_);
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
-
-        BLOCK();
 
         playback::stop();
         TEST_ASSERT(!playback::isPlaying());
@@ -745,6 +347,7 @@ void RtpVideoTestSuite::start_stop_file()
         std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
 
         BLOCK();
         TEST_ASSERT(playback::isPlaying());

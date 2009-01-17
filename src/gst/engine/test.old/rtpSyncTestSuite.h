@@ -35,23 +35,14 @@ class SyncTestSuiteRtp
             // DANGER: if this is too short you're likely to have race cond's.
             testLength_ = 10000000;
             
-            TEST_ADD(SyncTestSuiteRtp::start_jack_v4l)
-                TEST_ADD(SyncTestSuiteRtp::stop_jack_v4l)
                 TEST_ADD(SyncTestSuiteRtp::start_stop_jack_v4l)
 
-            TEST_ADD(SyncTestSuiteRtp::start_jack_v4l_vorbis)
                 TEST_ADD(SyncTestSuiteRtp::start_stop_jack_v4l_vorbis)
                 
-                TEST_ADD(SyncTestSuiteRtp::start_audiotest_videotest)
-                TEST_ADD(SyncTestSuiteRtp::stop_audiotest_videotest)
                 TEST_ADD(SyncTestSuiteRtp::start_stop_audiotest_videotest)
 
-                TEST_ADD(SyncTestSuiteRtp::start_8ch_audiofile_dv)
-                TEST_ADD(SyncTestSuiteRtp::stop_8ch_audiofile_dv)
                 TEST_ADD(SyncTestSuiteRtp::start_stop_8ch_audiofile_dv)
-            
-                TEST_ADD(SyncTestSuiteRtp::start_dv_audio_dv_video)
-                TEST_ADD(SyncTestSuiteRtp::stop_dv_audio_dv_video)
+
                 TEST_ADD(SyncTestSuiteRtp::start_stop_dv_audio_dv_video)
 
         }
@@ -59,25 +50,15 @@ class SyncTestSuiteRtp
         // some tests
 
     private:
-
-        void start_8ch_audiofile_dv();
-        void stop_8ch_audiofile_dv();
+        
         void start_stop_8ch_audiofile_dv();
 
-        void start_dv_audio_dv_video();
-        void stop_dv_audio_dv_video();
         void start_stop_dv_audio_dv_video();
 
-        void start_audiotest_videotest();
-        void stop_audiotest_videotest();
         void start_stop_audiotest_videotest();
 
-        void start_jack_v4l();
-        void stop_jack_v4l();
         void start_stop_jack_v4l();
 
-        void start_jack_v4l_vorbis();
-        void stop_jack_v4l_vorbis();
         void start_stop_jack_v4l_vorbis();
 };
 

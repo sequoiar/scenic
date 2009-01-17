@@ -32,43 +32,23 @@ class RtpAudioTestSuite
         {
             testLength_ = 3000000;
             
-            TEST_ADD(RtpAudioTestSuite::start_8ch_jack)
-            TEST_ADD(RtpAudioTestSuite::stop_8ch_jack)
             TEST_ADD(RtpAudioTestSuite::start_stop_8ch_jack)
 
-            TEST_ADD(RtpAudioTestSuite::start_8ch_jack_vorbis)
-            TEST_ADD(RtpAudioTestSuite::stop_8ch_jack_vorbis)
             TEST_ADD(RtpAudioTestSuite::start_stop_8ch_jack_vorbis)
             
-            TEST_ADD(RtpAudioTestSuite::start_6ch_alsa)
-            TEST_ADD(RtpAudioTestSuite::stop_6ch_alsa)
             TEST_ADD(RtpAudioTestSuite::start_stop_6ch_alsa)
             
-            
-            TEST_ADD(RtpAudioTestSuite::start_6ch_pulse)
-            TEST_ADD(RtpAudioTestSuite::stop_6ch_pulse)
             TEST_ADD(RtpAudioTestSuite::start_stop_6ch_pulse)
             
-            TEST_ADD(RtpAudioTestSuite::start_2ch_audiotest)
-            TEST_ADD(RtpAudioTestSuite::stop_2ch_audiotest)
             TEST_ADD(RtpAudioTestSuite::start_stop_2ch_audiotest)
 
-            TEST_ADD(RtpAudioTestSuite::start_2ch_audiotest)
-            TEST_ADD(RtpAudioTestSuite::stop_2ch_audiotest)
             TEST_ADD(RtpAudioTestSuite::start_stop_2ch_audiotest)
 
-            TEST_ADD(RtpAudioTestSuite::start_8ch_audiotest)
-            TEST_ADD(RtpAudioTestSuite::stop_8ch_audiotest)
             TEST_ADD(RtpAudioTestSuite::start_stop_8ch_audiotest)
 
-            TEST_ADD(RtpAudioTestSuite::start_audio_dv)
-            TEST_ADD(RtpAudioTestSuite::stop_audio_dv)
             TEST_ADD(RtpAudioTestSuite::start_stop_audio_dv)
 
-            TEST_ADD(RtpAudioTestSuite::start_8ch_audiofile)
-            TEST_ADD(RtpAudioTestSuite::stop_8ch_audiofile)
             TEST_ADD(RtpAudioTestSuite::start_stop_8ch_audiofile)
-            
 
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
@@ -83,36 +63,20 @@ class RtpAudioTestSuite
 
     private:
 
-        void start_2ch_audiotest();
-        void stop_2ch_audiotest();
         void start_stop_2ch_audiotest();
 
-        void start_8ch_audiotest();
-        void stop_8ch_audiotest();
         void start_stop_8ch_audiotest();
 
-        void start_8ch_audiofile();
-        void stop_8ch_audiofile();
         void start_stop_8ch_audiofile();
 
-        void start_8ch_jack();
-        void stop_8ch_jack();
         void start_stop_8ch_jack();
             
-        void start_8ch_jack_vorbis();
-        void stop_8ch_jack_vorbis();
         void start_stop_8ch_jack_vorbis();
         
-        void start_6ch_alsa();
-        void stop_6ch_alsa();
         void start_stop_6ch_alsa();
 
-        void start_6ch_pulse();
-        void stop_6ch_pulse();
         void start_stop_6ch_pulse();
-
-        void start_audio_dv();
-        void stop_audio_dv();
+        
         void start_stop_audio_dv();
 };
 

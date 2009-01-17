@@ -33,29 +33,17 @@ class VideoTestSuite
         {
             testLength_ = 400000;
             
-            TEST_ADD(VideoTestSuite::start_test_video)
-            TEST_ADD(VideoTestSuite::stop_test_video)
-            TEST_ADD(VideoTestSuite::start_stop_test_video)
-            
-            TEST_ADD(VideoTestSuite::start_test_video_gl)
-            TEST_ADD(VideoTestSuite::stop_test_video_gl)
             TEST_ADD(VideoTestSuite::start_stop_test_video_gl)
             
-            TEST_ADD(VideoTestSuite::start_v4l_gl)
-            TEST_ADD(VideoTestSuite::stop_v4l_gl)
-            TEST_ADD(VideoTestSuite::start_stop_v4l_gl)
+            TEST_ADD(VideoTestSuite::start_stop_test_video)
             
-            TEST_ADD(VideoTestSuite::start_dv)
-            TEST_ADD(VideoTestSuite::stop_dv)
-            TEST_ADD(VideoTestSuite::start_stop_dv)
+            TEST_ADD(VideoTestSuite::start_stop_v4l_gl)
 
-            TEST_ADD(VideoTestSuite::start_v4l)
-            TEST_ADD(VideoTestSuite::stop_v4l)
             TEST_ADD(VideoTestSuite::start_stop_v4l)
 
-            TEST_ADD(VideoTestSuite::start_file)
-            TEST_ADD(VideoTestSuite::stop_file)
             TEST_ADD(VideoTestSuite::start_stop_file)
+            
+            TEST_ADD(VideoTestSuite::start_stop_dv)
             
             /*----------------------------------------------*/
             /*      SANDBOX                                 */
@@ -70,28 +58,16 @@ class VideoTestSuite
 
     private:
         
-        void start_test_video_gl();
-        void stop_test_video_gl();
         void start_stop_test_video_gl();
 
-        void start_test_video();
-        void stop_test_video();
         void start_stop_test_video();
         
-        void start_v4l();
-        void stop_v4l();
         void start_stop_v4l();
         
-        void start_v4l_gl();
-        void stop_v4l_gl();
         void start_stop_v4l_gl();
 
-        void start_dv();
-        void stop_dv();
         void start_stop_dv();
 
-        void start_file();
-        void stop_file();
         void start_stop_file();
     
         static const int GL_SCREEN;

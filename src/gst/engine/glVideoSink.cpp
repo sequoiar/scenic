@@ -36,9 +36,9 @@
 
 #include "glVideoSink.h"
         
-const GLfloat NTSC_VIDEO_RATIO = 4.0/3.0;
-const GLfloat GLImageSink::INIT_X = -.5*NTSC_VIDEO_RATIO; 
-const GLfloat GLImageSink::INIT_Y = -.5;
+const GLfloat NTSC_VIDEO_RATIO = 4.0 / 3.0;
+const GLfloat GLImageSink::INIT_X = -0.5 * NTSC_VIDEO_RATIO; 
+const GLfloat GLImageSink::INIT_Y = -0.5;
 const GLfloat GLImageSink::INIT_Z = -1.2175;
 
 const GLfloat GLImageSink::INIT_LEFT_CROP = 0.0;

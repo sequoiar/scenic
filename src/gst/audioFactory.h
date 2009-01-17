@@ -33,6 +33,7 @@ namespace audiofactory
 {
     static const char* A_SINK = "jackaudiosink";
     static const char* A_CODEC = "raw";
+    static const int MSG_ID = 1;
 
     static std::auto_ptr<AudioSender> 
     buildAudioSender(const AudioSourceConfig aConfig, const char* ip = ports::IP, const char *codec = A_CODEC, 
@@ -57,8 +58,8 @@ audiofactory::buildAudioReceiver(const char *ip, const char *codec, const long p
 {
     AudioSinkConfig aConfig(sink);
     int id;
-    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::CAPS_PORT,id)); // get caps from remote sender
-    assert(id == 1);
+    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::AUDIO_CAPS_PORT, id)); // get caps from remote sender
+    assert(id == MSG_ID);
     std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
     return rx;
