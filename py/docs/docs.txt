@@ -13,23 +13,23 @@ Requirements
 
         sudo apt-get install python-pygments python-jinja
 
-	It's easy to install it with the command::
+    It's easy to install it with the command::
 
-		sudo easy_install --prefix /usr/prefix sphinx
+        sudo easy_install --prefix /usr/prefix sphinx
 
-		
+        
 Build Process
 -------------
 
 To build the current documentation you only have to run this command on the
 command line::
 
-	sphinx-build path/to/docs/directory/ path/where/you/want/the/html/files/
+    sphinx-build path/to/docs/directory/ path/where/you/want/the/html/files/
 
 For example, if you're in the .../trunk/py/ directory you should write::
 
-	sphinx-build docs/ docs/_build/
-	
+    sphinx-build docs/ docs/_build/
+    
 _build is the default directory for the output HTML files.
 
 If you want to force sphinx to rebuild everything add the -E flag to the command.
@@ -42,12 +42,12 @@ If you think that your module or package need is own page, you have now two opti
 
 1. Use the generate_modules.py script::
 
-	./generate_modules.py path_to_root_of_modules excluded_path1 excluded_path2
-	
+    ./generate_modules.py path_to_root_of_modules excluded_path1 excluded_path2
+    
    So if you run the script from its directory (docs/) the command line should look::
-	
-	./generate_modules.py .. ../maugis/ ../docs/ ../test/
-	
+    
+    ./generate_modules.py .. ../maugis/ ../docs/ ../test/
+    
    Usually you want to exclude at least *../docs/* and *../test/*.
 
    This script will generate a ReST file in the *docs* directory for each module/package
@@ -60,25 +60,25 @@ If you think that your module or package need is own page, you have now two opti
    
    **Notice:** I write this script so, right now, it's not bulletproof.
    Use it with caution.
-	
+    
 
 2. Do all manually (old style)
 
-	- add a text file in the *docs* directory named module_name.txt
-	- in this file add the text you want (in ReST format)
-	- add the this directive to auto-generate the documention from the docstring in the code::
+    - add a text file in the *docs* directory named module_name.txt
+    - in this file add the text you want (in ReST format)
+    - add the this directive to auto-generate the documention from the docstring in the code::
 
-		.. automodule:: name_of_module
-			:members:
-			:undoc-members:
-			:show-inheritance:
+        .. automodule:: name_of_module
+            :members:
+            :undoc-members:
+            :show-inheritance:
 
-	- add your page in the modules page *modules.txt* by adding the name of your module under the *toctree*.
-	- run the sphinx-build command to update the docs.
+    - add your page in the modules page *modules.txt* by adding the name of your module under the *toctree*.
+    - run the sphinx-build command to update the docs.
 
-	You can put more then one module in the same page.
+    You can put more then one module in the same page.
 
-	The lines under *.. automodule::* are options (see *Include documentation from docstrings* in :ref:`references` for detail).
+    The lines under *.. automodule::* are options (see *Include documentation from docstrings* in :ref:`references` for detail).
 
 
 
@@ -92,9 +92,9 @@ To define argument definitions you have to add to your docstring for each argume
 
 To define the return type of the method/function you have to add (each line is optional)::
 
-	:return: Description of the return value
-	:rtype: Return type
-	
+    :return: Description of the return value
+    :rtype: Return type
+    
 See *Info field lists* in :ref:`references` for more fields and details.
 
 
