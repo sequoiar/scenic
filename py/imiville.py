@@ -2,29 +2,12 @@ from twisted.internet import reactor
 from pprint import pprint, pformat
 import miville
 from utils.observer import Observer
+from ui.cli import CliView
 import time
 """
 Miville for ipython.
 
-
-SYNOPSIS:
-from imiville import *
-start()
-    
-api.add_contact(me, 'alex', '10.10.10.99')
-go()
-api.get_contacts(me)
-go()
-    
-print ret['value']
-    
-from utils import commands
-commands.single_command_start(['ls'])
-go()
-api.notify(me, 'value', 'key')
-go()
-    
-for i in miville.core.observers.itervalues(): pprint(i)
+See https://svn.sat.qc.ca/trac/miville/wiki/IPython    
 """
 
 #TODO: override notify in order to add reactor.iterate() there.
@@ -36,14 +19,7 @@ def go(duration=0.1): # num=999
     end = time.time() + duration
     while time.time() < end:
         reactor.iterate()
-    #reactor.callLater(duration, reactor.stop)
-    #reactor.run()
-    #for i in range(num):
-    #    reactor.iterate()
-
-class IPythonController(object):
-    pass
-
+    
 class Update(object):
     """
     Represents a notification from miville's core api.
@@ -52,15 +28,23 @@ class Update(object):
         self.value = value
         self.origin = origin
         self.key = key
+    
+class IPythonController(object):
+    def write (self, msg, prompt=False, endl=True):
+        print "%s" % (msg.encode('utf-8'))
+        
+    def write_prompt(self):
+        pass
 
-class IPythonView(Observer):
+class IPythonView(CliView):
     """  
     ipython results printer. 
     The View (Observer) in the MVC pattern. 
     """
     def __init__(self, subject, controller):
-        Observer.__init__(self, subject)
-        self.controller = controller
+        #Observer.__init__(self, subject)
+        #self.controller = controller
+        CliView.__init__(self, subject, controller)
         
     def update(self, origin, key, value):
         global updates, last
@@ -72,7 +56,7 @@ class IPythonView(Observer):
         print "ORIGIN: %s" % (str(origin))
         print "VALUE:  %s" % (pformat(value))
         print "------------------------------------------------------------------------------"
-
+        CliView.update(self, origin, key, value)
 
 updates = []
 last = None
