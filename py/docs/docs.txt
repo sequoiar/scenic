@@ -7,6 +7,7 @@ Requirements
 - `Python 2.4+ <http://www.python.org>`_
 - `Pygments <http://pygments.org/>`_
 - `Jinja <http://jinja.pocoo.org/>`_
+- `Docutils <http://docutils.sourceforge.net/>`_
 - `Sphinx Python Documentation Generator <http://sphinx.pocoo.org/>`_
 
     In Debian-based GNU/Linux distributions, you can install the requirements with::
@@ -15,7 +16,7 @@ Requirements
 
     It's easy to install it with the command::
 
-        sudo easy_install --prefix /usr/prefix sphinx
+        sudo easy_install --prefix /usr/local sphinx
 
         
 Build Process
