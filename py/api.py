@@ -236,7 +236,10 @@ class ControllerApi(object):
     def get_default_port(self, connector):
         return self.connectors[connector].PORT
     
-    def devices_list_attributes(self, caller, driver_kind, driver_name, device_name): # TODO: add driver_kind in cli
+    def device_list_attributes(self, caller, driver_kind, driver_name, device_name): 
+        # TODO: add driver_kind in cli
+        # TODO: updatre CLI to correct method name.
+        # TODO: move try/catch inner stuff to the devices module.
         """
         :driver_kind: 'video', 'audio' or 'data'
         :driver_name: 'alsa', 'v4l2'
@@ -245,38 +248,78 @@ class ControllerApi(object):
         # TODO: if IndexError, 
         try: 
             manager = devices.managers[driver_kind]
-        except:
-            self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
+        except IndexError:
+            self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info') # TODO: there should be a 'user_error' key.
             return 
+        
         try:
             driver = manager.drivers[driver_name]
-        except:
+        except IndexError:
             self.notify(caller, 'No such driver name: %s' % (driver_name), 'info')
             return 
+        
         try:
             device = driver.devices[device_name]
-        except:
+        except IndexError:
             self.notify(caller, 'No such device: %s' % (device_name), 'info')
             return 
-        self.notify(caller, device.attributes, 'on_devices_list_attributes') # TODO
+        
+        # TODO: make asynchronous
+        self.notify(caller, device.attributes.values(), 'device_list_attributes') # dict
         #self.notify(caller, 'No such device or driver: %s %s' % (driver_name, device_name), 'info')
         # devices.get_driver(driver_name).devices[device_name].list_attributes()
         #self.notify(caller, 'you called devices_list_attributes', 'devices_list_attributes')
 
-    def devices_modify_attribute(self, caller, driver_kind, driver_name, device_name, attribute_name, value):
+    def device_modify_attribute(self, caller, driver_kind, driver_name, device_name, attribute_name, value):
         pass
+        # TODO: modify method name in CLI
         # TODO
-        self.notify(caller, 'No such attributes for driver/device: %s %s %s:%s' % (driver_name, device_name, attribute_name, str(value)), 'info')
-        self.notify(caller, 'you called devices_modify_attributes', 'devices_modify_attribute')
+        try: 
+            manager = devices.managers[driver_kind]
+        except IndexError:
+            self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
+            return 
         
+        try:
+            driver = manager.drivers[driver_name]
+        except IndexError:
+            self.notify(caller, 'No such driver name: %s' % (driver_name), 'info')
+            return 
+        
+        try:
+            device = driver.devices[device_name]
+        except IndexError:
+            self.notify(caller, 'No such device: %s' % (device_name), 'info')
+            return 
+        
+        try:
+            attribute = device.attributes[attribute_name]
+        except IndexError:
+            self.notify(caller, 'No such attribute: %s' % (attribute_name), 'info')
+            return 
+        
+        attribute.set_value(value, caller, 'attribute_changed') # TODO : I think that key is not correct.
+        self.notify(caller, attribute, 'attribute_changed') # TODO: make asynchronous
+        driver.poll_now() # TODO: make cleaner
+        # TODO: attribute_changed should be triggered
+        
+        #self.notify(caller, 'No such attributes for driver/device: %s %s %s:%s' % (driver_name, device_name, attribute_name, str(value)), 'info')
+        #self.notify(caller, 'you called devices_modify_attributes', 'devices_modify_attribute')
+        #self.notify(caller, 
         # devices.get_driver(driver_name).devices[device_name].attributes[attribute_name].set_value(value)
 
-    def devices_list(self, caller, driver_kind=None, driver_name=None):
-        pass
-        if driver_name is None:
-            self.notify(caller, 'No drivers to list.', 'info')
-        else:
-            self.notify(caller, 'No such driver: %s' % (driver_name), 'info')
-        # devices.get_driver(driver_name).list_devices()
-        self.notify(caller, 'you called devices_list', 'devices_list')
+    def devices_list(self, caller, driver_kind):
+        try: 
+            manager = devices.managers[driver_kind]
+        except IndexError:
+            self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
+            return
+
+        #self.notify(caller, 'you called devices_list', 'devices_list')
+        # TODO: make asynchronous
+        devices_list = []
+        for driver in manager.drivers.values():
+            for device in driver.devices.values():
+                devices_list.append(device)
+        self.notify(caller, devices_list, 'devices_list')
 

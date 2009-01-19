@@ -117,7 +117,7 @@ class Driver(object): #shell.ShellCommander):
         self._new_devices[device.name] = device
         device.driver = self
      
-    def _on_done_devices_polling(self, caller=None):
+    def _on_done_devices_polling(self, caller=None, event_key=None):
         """
         Compares former dict of devices with the new one
         and notifies the listener if changes occurred.
@@ -165,15 +165,16 @@ class Driver(object): #shell.ShellCommander):
                             attr_changed[attr.name] = attr
         # let us call the callbacks
         if len(added) > 0:
-            self._call_event_listener('on_devices_added', added, caller) #dict
+            self._call_event_listener('devices_added', added, caller) #dict
         if len(removed) > 0:
-            self._call_event_listener('on_devices_removed', removed, caller) # dict
+            self._call_event_listener('devices_removed', removed, caller) # dict
         if len(attr_changed) > 0:
-            self._call_event_listener('on_attributes_changed', attr_changed, caller) # dict
+            self._call_event_listener('device_attributes_changed', attr_changed, caller) # dict
         # print "calling on_devices_list"
         #print "calling", self._call_event_listener, 'on_devices_list'
         #print "DONE"
-        self._call_event_listener('on_devices_list', self.devices) # dict
+        if event_key == 'devices_list':
+            self._call_event_listener('devices_list', self.devices, caller) # dict
         #TODO: maybe not call it every time.
       
     def _call_event_listener(self, event_key, argument, caller=None):
@@ -185,10 +186,10 @@ class Driver(object): #shell.ShellCommander):
         TODO: change for the api
         
         events names are:
-            'on_devices_removed'     arg: list of Device instances
-            'on_devices_added'       arg: list of Device instances
-            'on_attributes_changed'  arg: list of Attribute instances
-            'on_devices_list'        arg: list of Device instances
+            'devices_removed'     arg: list of Device instances
+            'devices_added'       arg: list of Device instances
+            'device_attributes_changed'  arg: list of Attribute instances
+            'devices_list'        arg: list of Device instances
         
         Will call observer.<Subject>.notify(caller, value, key=None) with args caller=self, value=a tuple, key='some string'
         """

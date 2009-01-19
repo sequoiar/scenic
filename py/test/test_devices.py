@@ -254,10 +254,10 @@ class DummyWrapperAPI(object):
     def __init__(self, test):
         self.listener = DummyListener(test)
         self.callbacks = {
-            'on_devices_added':self.listener.on_devices_added,
-            'on_devices_removed':self.listener.on_devices_removed,
-            'on_attributes_changed':self.listener.on_attributes_changed,
-            'on_devices_list':self.listener.on_devices_list
+            'devices_added':self.listener.on_devices_added,
+            'devices_removed':self.listener.on_devices_removed,
+            'device_attributes_changed':self.listener.on_attributes_changed,
+            'devices_list':self.listener.on_devices_list
         }
     def notify(self, caller, value, key=None):
         #print "notify(%s,%s,%s)" % (str(caller), str(value), str(key))
@@ -265,7 +265,7 @@ class DummyWrapperAPI(object):
     
     def use_tester_check(self):
         """Enables using on_devices_list_check instead of on_devices_list"""
-        self.callbacks['on_devices_list'] = self.listener.on_devices_list_check
+        self.callbacks['devices_list'] = self.listener.on_devices_list_check
 
 
 def v4l_change_norm_1(results, test):
