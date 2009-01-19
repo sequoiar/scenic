@@ -33,6 +33,8 @@ class RtpVideoTestSuite
         {
             testLength_ = 8000;
             
+            TEST_ADD(RtpVideoTestSuite::start_stop_mpeg4_v4l)
+
             TEST_ADD(RtpVideoTestSuite::start_stop_test_video)
            
             TEST_ADD(RtpVideoTestSuite::start_stop_h263_v4l)
@@ -43,7 +45,6 @@ class RtpVideoTestSuite
             
             TEST_ADD(RtpVideoTestSuite::start_stop_h263)
             
-            TEST_ADD(RtpVideoTestSuite::start_stop_mpeg4_v4l)
 
             TEST_ADD(RtpVideoTestSuite::start_stop_file)
 

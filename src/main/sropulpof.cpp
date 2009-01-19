@@ -88,8 +88,8 @@ short pof::run(int argc, char **argv)
         if(videoSink == 0)
             THROW_ERROR("argument error: missing videoSink. see --help");
 
-        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink));
-        std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver(ip, audioCodec, audioPort));
+        std::tr1::shared_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink));
+        std::tr1::shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver(ip, audioCodec, audioPort));
 
 #ifdef CONFIG_DEBUG_LOCAL
         playback::makeVerbose();
@@ -112,11 +112,11 @@ short pof::run(int argc, char **argv)
         else
             vConfig = new VideoSourceConfig("v4l2src");
 
-        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
+        std::tr1::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
         delete vConfig;
 
         AudioSourceConfig aConfig("jackaudiosrc", numChannels);
-        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort));
+        std::tr1::shared_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort));
 
 #ifdef CONFIG_DEBUG_LOCAL
         playback::makeVerbose();

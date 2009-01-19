@@ -24,7 +24,7 @@
 #define _AUDIO_FACTORY_H_
 
 #include "gst/engine.h"
-#include <memory>   // for std::auto_ptr
+#include <tr1/memory>   // for std::tr1::shared_ptr
 #include "tcp/singleBuffer.h"
 
 #include "ports.h"
@@ -35,32 +35,32 @@ namespace audiofactory
     static const char* A_CODEC = "raw";
     static const int MSG_ID = 1;
 
-    static std::auto_ptr<AudioSender> 
+    static std::tr1::shared_ptr<AudioSender> 
     buildAudioSender(const AudioSourceConfig aConfig, const char* ip = ports::IP, const char *codec = A_CODEC, 
             const long port = ports::A_PORT);
 
-    static std::auto_ptr<AudioReceiver> 
+    static std::tr1::shared_ptr<AudioReceiver> 
     buildAudioReceiver(const char *ip = ports::IP, const char * codec = A_CODEC, const long port = ports::A_PORT, 
                        const char *sink = A_SINK);
 }
 
-std::auto_ptr<AudioSender> 
+std::tr1::shared_ptr<AudioSender> 
 audiofactory::buildAudioSender(const AudioSourceConfig aConfig, const char* ip, const char *codec, const long port)
 {
     SenderConfig rConfig(codec, ip, port);
-    std::auto_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
+    std::tr1::shared_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
     tx->init();
     return tx;
 }
 
-std::auto_ptr<AudioReceiver> 
+std::tr1::shared_ptr<AudioReceiver> 
 audiofactory::buildAudioReceiver(const char *ip, const char *codec, const long port, const char *sink)
 {
     AudioSinkConfig aConfig(sink);
     int id;
     ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::AUDIO_CAPS_PORT, id)); // get caps from remote sender
     assert(id == MSG_ID);
-    std::auto_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
+    std::tr1::shared_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
     rx->init();
     return rx;
 }
