@@ -24,8 +24,8 @@
 
 #Midi Import
 
-from twisted.internet import glib2reactor
-glib2reactor.install()
+#from twisted.internet import glib2reactor
+#glib2reactor.install()
 
 from twisted.internet import reactor
 import pypm
