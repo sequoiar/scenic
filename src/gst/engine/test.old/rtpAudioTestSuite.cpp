@@ -47,7 +47,7 @@ void RtpAudioTestSuite::start_stop_2ch_audiotest()
 {
     const int NUM_CHANNELS = 2;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
+        boost::shared_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
 
         playback::start();
 
@@ -60,7 +60,7 @@ void RtpAudioTestSuite::start_stop_2ch_audiotest()
     }
     else {
         AudioSourceConfig aConfig("audiotestsrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
+        boost::shared_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
 
         playback::start();
 
@@ -79,7 +79,7 @@ void RtpAudioTestSuite::start_stop_8ch_audiotest()
 {
     const int NUM_CHANNELS = 8;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
+        boost::shared_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
 
         playback::start();
 
@@ -91,7 +91,7 @@ void RtpAudioTestSuite::start_stop_8ch_audiotest()
     }
     else {
         AudioSourceConfig aConfig("audiotestsrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
+        boost::shared_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
 
         playback::start();
 
@@ -111,7 +111,7 @@ void RtpAudioTestSuite::start_stop_6ch_alsa()
 {
     const int NUM_CHANNELS = 6;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver("alsasink"));
+        boost::shared_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver("alsasink"));
 
         playback::start();
 
@@ -123,7 +123,7 @@ void RtpAudioTestSuite::start_stop_6ch_alsa()
     }
     else {
         AudioSourceConfig aConfig("alsasrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
+        boost::shared_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
 
         playback::start();
 
@@ -143,7 +143,7 @@ void RtpAudioTestSuite::start_stop_6ch_pulse()
 {
     const int NUM_CHANNELS = 6;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver("pulsesink"));
+        boost::shared_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver("pulsesink"));
 
         playback::start();
 
@@ -155,7 +155,7 @@ void RtpAudioTestSuite::start_stop_6ch_pulse()
     }
     else {
         AudioSourceConfig aConfig("pulsesrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
+        boost::shared_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
 
         playback::start();
 
@@ -176,7 +176,7 @@ void RtpAudioTestSuite::start_stop_8ch_jack()
 {
     const int NUM_CHANNELS = 8;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver(ports::IP, "vorbis"));
+        boost::shared_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver(ports::IP, "vorbis"));
 
         playback::start();
 
@@ -188,7 +188,7 @@ void RtpAudioTestSuite::start_stop_8ch_jack()
     }
     else {
         AudioSourceConfig aConfig("jackaudiosrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig, ports::IP, "vorbis"));
+        boost::shared_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig, ports::IP, "vorbis"));
 
         playback::start();
 
@@ -208,7 +208,7 @@ void RtpAudioTestSuite::start_stop_8ch_jack_vorbis()
 {
     const int NUM_CHANNELS = 8;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
+        boost::shared_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
 
         playback::start();
 
@@ -220,7 +220,7 @@ void RtpAudioTestSuite::start_stop_8ch_jack_vorbis()
     }
     else {
         AudioSourceConfig aConfig("jackaudiosrc", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
+        boost::shared_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
 
         playback::start();
 
@@ -240,7 +240,7 @@ void RtpAudioTestSuite::start_stop_8ch_audiofile()
 {
     const int NUM_CHANNELS = 8;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
+        boost::shared_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
 
         playback::start();
 
@@ -252,7 +252,7 @@ void RtpAudioTestSuite::start_stop_8ch_audiofile()
     }
     else {
         AudioSourceConfig aConfig("filesrc", audioFilename_, NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
+        boost::shared_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
 
         playback::start();
 
@@ -271,7 +271,7 @@ void RtpAudioTestSuite::start_stop_audio_dv()
 {
     const int NUM_CHANNELS = 2;
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
+        boost::shared_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver());
 
         playback::start();
 
@@ -284,7 +284,7 @@ void RtpAudioTestSuite::start_stop_audio_dv()
     }
     else {
         AudioSourceConfig aConfig("dv1394src", NUM_CHANNELS);
-        std::auto_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
+        boost::shared_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig));
 
         playback::start();
 

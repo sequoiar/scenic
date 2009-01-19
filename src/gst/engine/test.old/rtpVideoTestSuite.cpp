@@ -34,7 +34,7 @@
 void RtpVideoTestSuite::start_stop_test_video()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
+        boost::shared_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         playback::start();
 
@@ -46,7 +46,7 @@ void RtpVideoTestSuite::start_stop_test_video()
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
+        boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -63,7 +63,7 @@ void RtpVideoTestSuite::start_stop_test_video()
 void RtpVideoTestSuite::start_stop_test_video_gl()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "glimagesink"));
+        boost::shared_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "glimagesink"));
 
         playback::start();
 
@@ -75,7 +75,7 @@ void RtpVideoTestSuite::start_stop_test_video_gl()
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
+        boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -93,7 +93,7 @@ void RtpVideoTestSuite::start_stop_test_video_gl()
 void RtpVideoTestSuite::start_stop_mpeg4()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "mpeg4"));
+        boost::shared_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "mpeg4"));
 
         playback::start();
 
@@ -105,7 +105,7 @@ void RtpVideoTestSuite::start_stop_mpeg4()
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "mpeg4"));
+        boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "mpeg4"));
 
         playback::start();
         
@@ -123,7 +123,7 @@ void RtpVideoTestSuite::start_stop_mpeg4()
 void RtpVideoTestSuite::start_stop_h263()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h263"));
+        boost::shared_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h263"));
 
         playback::start();
 
@@ -135,7 +135,7 @@ void RtpVideoTestSuite::start_stop_h263()
     }
     else {
         VideoSourceConfig vConfig("videotestsrc");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "h263"));
+        boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "h263"));
 
         playback::start();
         
@@ -153,7 +153,7 @@ void RtpVideoTestSuite::start_stop_h263()
 void RtpVideoTestSuite::start_stop_h263_v4l()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h263"));
+        boost::shared_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h263"));
 
         playback::start();
 
@@ -165,7 +165,7 @@ void RtpVideoTestSuite::start_stop_h263_v4l()
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "h263"));
+        boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "h263"));
 
         playback::start();
 
@@ -183,7 +183,7 @@ void RtpVideoTestSuite::start_stop_h263_v4l()
 void RtpVideoTestSuite::start_stop_mpeg4_v4l()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "mpeg4"));
+        boost::shared_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "mpeg4"));
 
         playback::start();
 
@@ -195,7 +195,7 @@ void RtpVideoTestSuite::start_stop_mpeg4_v4l()
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "mpeg4"));
+        boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "mpeg4"));
 
         playback::start();
 
@@ -214,7 +214,7 @@ void RtpVideoTestSuite::start_stop_mpeg4_v4l()
 void RtpVideoTestSuite::start_stop_v4l()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
+        boost::shared_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         playback::start();
 
@@ -226,7 +226,7 @@ void RtpVideoTestSuite::start_stop_v4l()
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
+        boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
 
@@ -244,7 +244,7 @@ void RtpVideoTestSuite::start_stop_v4l()
 void RtpVideoTestSuite::start_stop_v4l_gl()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "glimagesink"));
+        boost::shared_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "glimagesink"));
 
         playback::start();
 
@@ -256,7 +256,7 @@ void RtpVideoTestSuite::start_stop_v4l_gl()
     }
     else {
         VideoSourceConfig vConfig("v4l2src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
+        boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
@@ -273,7 +273,7 @@ void RtpVideoTestSuite::start_stop_v4l_gl()
 void RtpVideoTestSuite::start_stop_dv()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
+        boost::shared_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         playback::start();
 
@@ -285,7 +285,7 @@ void RtpVideoTestSuite::start_stop_dv()
     }
     else {
         VideoSourceConfig vConfig("dv1394src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
+        boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
@@ -302,7 +302,7 @@ void RtpVideoTestSuite::start_stop_dv()
 void RtpVideoTestSuite::start_stop_dv_gl()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "glimagesink"));
+        boost::shared_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver(ports::IP, "h264", ports::V_PORT, 0, "glimagesink"));
 
         playback::start();
 
@@ -314,7 +314,7 @@ void RtpVideoTestSuite::start_stop_dv_gl()
     }
     else {
         VideoSourceConfig vConfig("dv1394src");
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
+        boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));
@@ -331,7 +331,7 @@ void RtpVideoTestSuite::start_stop_dv_gl()
 void RtpVideoTestSuite::start_stop_file()
 {
     if (id_ == 0) {
-        std::auto_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
+        boost::shared_ptr<VideoReceiver> rx(videofactory::buildVideoReceiver());
 
         playback::start();
 
@@ -344,7 +344,7 @@ void RtpVideoTestSuite::start_stop_file()
     else {
         VideoSourceConfig vConfig("filesrc", videoFilename_);
         
-        std::auto_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
+        boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, tx->getCaps()));

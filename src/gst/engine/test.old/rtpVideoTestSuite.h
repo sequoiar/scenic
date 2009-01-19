@@ -31,7 +31,7 @@ class RtpVideoTestSuite
 
         RtpVideoTestSuite()
         {
-            testLength_ = 8000;
+            testLength_ = 80000;
             
             TEST_ADD(RtpVideoTestSuite::start_stop_mpeg4_v4l)
 
@@ -55,8 +55,8 @@ class RtpVideoTestSuite
 
             TEST_ADD(RtpVideoTestSuite::start_stop_dv_gl)
 #endif
-            
             TEST_ADD(RtpVideoTestSuite::start_stop_dv)
+            
 
             /*----------------------------------------------*/
             /*      SANDBOX                                 */

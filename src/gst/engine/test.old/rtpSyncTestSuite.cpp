@@ -48,8 +48,8 @@ void SyncTestSuiteRtp::start_stop_jack_v4l()
     int numChannels = 8;
 
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
-        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
+        boost::shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
+        boost::shared_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
         playback::start();
 
         BLOCK();
@@ -62,10 +62,10 @@ void SyncTestSuiteRtp::start_stop_jack_v4l()
     }
     else {
         VideoSourceConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
+        boost::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         AudioSourceConfig aConfig("jackaudiosrc", numChannels);
-        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ports::IP, "raw", ports::A_PORT));
+        boost::shared_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ports::IP, "raw", ports::A_PORT));
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
@@ -88,8 +88,8 @@ void SyncTestSuiteRtp::start_stop_jack_v4l_vorbis()
     int numChannels = 8;
 
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
-        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
+        boost::shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
+        boost::shared_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
         playback::start();
 
         BLOCK();
@@ -102,11 +102,11 @@ void SyncTestSuiteRtp::start_stop_jack_v4l_vorbis()
     }
     else {
         VideoSourceConfig vConfig("v4l2src"); 
-        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
+        boost::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         AudioSourceConfig aConfig("jackaudiosrc", numChannels);
 
-        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ports::IP, "vorbis", ports::A_PORT));
+        boost::shared_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ports::IP, "vorbis", ports::A_PORT));
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
@@ -129,9 +129,9 @@ void SyncTestSuiteRtp::start_stop_8ch_audiofile_dv()
     int numChannels = 8;
 
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
+        boost::shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
         
-        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
+        boost::shared_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
         
         playback::start();
 
@@ -145,12 +145,12 @@ void SyncTestSuiteRtp::start_stop_8ch_audiofile_dv()
     }
     else {
         AudioSourceConfig aConfig("filesrc", audioFilename_, numChannels);
-        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
+        boost::shared_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
         playback::start();
     
 
         VideoSourceConfig vConfig("dv1394src"); 
-        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
+        boost::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
@@ -171,8 +171,8 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video()
     int numChannels = 2;
 
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
-        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
+        boost::shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
+        boost::shared_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
         
         playback::start();
 
@@ -187,10 +187,10 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video()
     else {
 
         VideoSourceConfig vConfig("dv1394src"); 
-        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
+        boost::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         AudioSourceConfig aConfig("dv1394src", numChannels);
-        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
+        boost::shared_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
@@ -213,8 +213,8 @@ void SyncTestSuiteRtp::start_stop_audiotest_videotest()
     int numChannels = 2;
 
     if (id_ == 0) {
-        std::auto_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
-        std::auto_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
+        boost::shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
+        boost::shared_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
         playback::start();
 
         BLOCK();
@@ -228,10 +228,10 @@ void SyncTestSuiteRtp::start_stop_audiotest_videotest()
     else {
 
         VideoSourceConfig vConfig("videotestsrc"); 
-        std::auto_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
+        boost::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         AudioSourceConfig aConfig("audiotestsrc", numChannels);
-        std::auto_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
+        boost::shared_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
         playback::start();
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
