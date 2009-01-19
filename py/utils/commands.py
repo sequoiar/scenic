@@ -110,7 +110,7 @@ def commands_start(commands, callback=None, extra_arg=None, caller=None):
     defer_list.addCallback(callback, commands, extra_arg, caller)
     return defer_list
 
-def on_commands_error(command_failure, commands, caller=None):
+def on_commands_error(command_failure, commands, extra_arg=None, caller=None):
     print "@@@@@@@@@"
     print ">>>> ERROR:"
     pprint.pprint({'failure':command_failure, 'exception':sys.exc_info(), 'commands':commands})

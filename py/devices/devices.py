@@ -176,7 +176,7 @@ class Driver(object): #shell.ShellCommander):
         self._call_event_listener('on_devices_list', self.devices) # dict
         #TODO: maybe not call it every time.
       
-    def _call_event_listener(self, event_name, argument, caller=None):
+    def _call_event_listener(self, event_key, argument, caller=None):
         """
         Calls an event listener (with one argument)
         
@@ -192,7 +192,7 @@ class Driver(object): #shell.ShellCommander):
         
         Will call observer.<Subject>.notify(caller, value, key=None) with args caller=self, value=a tuple, key='some string'
         """
-        self.api.notify(caller, argument, event_name) # driver instance, dict, event key name
+        self.api.notify(caller, argument, event_key) # driver instance, dict, event key name
         
     def prepare(self):
         """
@@ -208,15 +208,15 @@ class Driver(object): #shell.ShellCommander):
         if self.state_poll_enabled:
             return self._poll_devices()
     
-    def on_attribute_change(self, attribute, caller=None):
+    def on_attribute_change(self, attribute, caller=None, event_key=None):
         """
         Called by a device when one of its attribute is changed. (by the core, usually)
         
         Can be overriden if necessary to do shell scripts or so
         """
-        return self.poll_now(caller)
+        return self.poll_now(caller, event_key) # TODO
     
-    def set_polling_interval(self, ms):
+    def set_polling_interval(self, ms): # TODO: remove
         """
         Interval between polling devices.
         
@@ -226,15 +226,15 @@ class Driver(object): #shell.ShellCommander):
         #if self.state_poll_enabled:
         #    self.poll_now()
     
-    def get_polling_interval(self):
+    def get_polling_interval(self): # TODO: remove
         return self.polling_interval
     
-    def start_polling(self, caller=None):
+    def start_polling(self, caller=None, event_key=None):
         """
         Returns a Deferred
         """
         self.state_poll_enabled = True
-        return self.poll_now(caller)
+        return self.poll_now(caller, event_key)
         
     def stop_polling(self):
         self._cancel_delayed_polling()
@@ -253,26 +253,26 @@ class Driver(object): #shell.ShellCommander):
                 pass
             self._delayed_id = None
             
-    def poll_now(self, caller=None):
+    def poll_now(self, caller=None, event_key=None): 
         """
         Called when the programmer wants to refresh 
         the attributes for a device right now.
         
         Will call all the callbacks with the correct values.
         """
-        return self._poll_devices(caller)
+        return self._poll_devices(caller, event_key)
         
-    def _poll_devices(self, caller=None):
+    def _poll_devices(self, caller=None, event_key=None): 
         """
         Devices polling routine.
         """
         if self.state_poll_enabled:
             self._cancel_delayed_polling()
-            self._delayed_id = reactor.callLater(self.polling_interval, self._poll_devices)
+            self._delayed_id = reactor.callLater(self.polling_interval, self._poll_devices) # no caller, no event_key
         self._new_devices = {}
-        return self._on_devices_polling(caller)
+        return self._on_devices_polling(caller, event_key)
     
-    def _on_devices_polling(self, caller=None):
+    def _on_devices_polling(self, caller=None, event_key=None): 
         """
         This is where the Driver actually calls many commands 
         in order to populate its Device list and their attributes.
@@ -328,8 +328,8 @@ class Attribute(object):
         """
         return self._value
 
-    def set_value(self, value, do_notify_driver=True):
-        """
+    def set_value(self, value, caller=None, event_key=None):#do_notify_driver=True):
+        """ 
         Changes the value of the Attribute for a device.
         
         Notifies the Driver if do_notify_driver is not False.
@@ -337,18 +337,18 @@ class Attribute(object):
         """
         # TODO: return a Deferred object.
         self._value = value
-        if do_notify_driver:
-            return self._on_change()
-        else:
-            return None
+        #if do_notify_driver:
+        return self._on_change(caller, event_key)
+        #else:
+        #    return None
     
-    def _on_change(self):
+    def _on_change(self, caller=None, event_key=None):
         """
         Called when the value changed.
 
         Tells the Device that the value changed.
         """ 
-        return self.device.driver.on_attribute_change(self)
+        return self.device.driver.on_attribute_change(self, caller, event_key)
         
 class BooleanAttribute(Attribute):
     kind = 'boolean'
@@ -405,6 +405,7 @@ class Device(object):
         self.name = name
         self.attributes = dict()
         self.state_in_use = False
+        self.human_readable_name = name  # can be overriden by the driver.
         
     def add_attribute(self, attribute):
         """

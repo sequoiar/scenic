@@ -139,7 +139,7 @@ class Video4LinuxDriver(VideoDriver):
             raise CommandNotFoundError("v4l2-ctl command not found. Please sudo apt-get install ivtv-utils")
         return Driver.prepare(self)
     
-    def _on_devices_polling(self, caller=None):
+    def _on_devices_polling(self, caller=None, event_key=None):
         """
         Get all infos for all devices.
         Starts the commands.
@@ -177,7 +177,7 @@ class Video4LinuxDriver(VideoDriver):
         return commands_start(commands, self.on_commands_results, extra_arg, caller) # returns a Deferred
         # TODO: adds an other arg to commands_start for the caller object
     
-    def on_attribute_change(self, attr, caller=None):
+    def on_attribute_change(self, attr, caller=None, event_key=None):
         name = attr.name
         val = attr.get_value() # new value
         dev_name = attr.device.name
