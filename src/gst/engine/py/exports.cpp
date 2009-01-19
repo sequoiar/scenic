@@ -21,7 +21,7 @@
 /** \file
  * This file exposes class to python 
  *
- * Exposes object modules to python interpreter.
+ * Exposes object modules to python interpreter, available by calling "from libmilhouse import *".
  *
  */
 
@@ -54,7 +54,7 @@ BOOST_PYTHON_MODULE(libmilhouse)
     class_< VideoSourceConfig >("VideoSourceConfig", init<std::string>()) 
         .def(init<std::string, std::string>()); // overloaded constructor
 
-    def("tcpSendBuffer", tcpSendBuffer);        // FIXME: hack to avoid complaint about unused static function.
+    def("tcpSendBuffer", tcpSendBuffer);        
 
     def("start", playback::start);
     def("stop", playback::stop);

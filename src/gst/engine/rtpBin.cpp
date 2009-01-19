@@ -27,6 +27,8 @@
 #include "remoteConfig.h"
 #include "pipeline.h"
 
+#define JITTER 0
+
 
 GstElement *RtpBin::rtpbin_ = 0;
 GObject *RtpBin::session_ = 0;
@@ -41,7 +43,7 @@ void RtpBin::init()
     // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
     g_object_set(G_OBJECT(rtpbin_), "latency", 10, NULL);
     
-#if 0
+#if JITTER
     // uncomment this to print jitter
     g_signal_connect(G_OBJECT(rtpbin_), "get-internal-session", G_CALLBACK(gotInternalSessionCb), NULL);
     g_timeout_add(5000 /* ms */, 
@@ -197,18 +199,85 @@ bool RtpBin::requestSession(guint sessionId)
     return false;
 }
 
+#if JITTER
+// FIXME taken from rtpstats.h
+
+/**
+ * RTPSenderReport:
+ *
+ * A sender report structure.
+ */
+typedef struct {
+  gboolean is_valid;
+  guint64 ntptime;
+  guint32 rtptime;
+  guint32 packet_count;
+  guint32 octet_count;
+  GstClockTime time;
+} RTPSenderReport;
+
+/**
+ * RTPReceiverReport:
+ *
+ * A receiver report structure.
+ */
+typedef struct {
+  gboolean is_valid;
+  guint32 ssrc; /* who the report is from */
+  guint8  fractionlost;
+  guint32 packetslost;
+  guint32 exthighestseq;
+  guint32 jitter;
+  guint32 lsr;
+  guint32 dlsr;
+  guint32 round_trip;
+} RTPReceiverReport;
+
+
+
+typedef struct {
+  guint64      packets_received;
+  guint64      octets_received;
+  guint64      bytes_received;
+
+  guint32      prev_expected;
+  guint32      prev_received;
+
+  guint16      max_seq;
+  guint64      cycles;
+  guint32      base_seq;
+  guint32      bad_seq;
+  guint32      transit;
+  guint32      jitter;
+
+  guint64      packets_sent;
+  guint64      octets_sent;
+
+  /* when we received stuff */
+  GstClockTime prev_rtptime;
+  GstClockTime prev_rtcptime;
+  GstClockTime last_rtptime;
+  GstClockTime last_rtcptime;
+
+  /* sender and receiver reports */
+  gint              curr_rr;
+  RTPReceiverReport rr[2];
+  gint              curr_sr;
+  RTPSenderReport   sr[2];
+} RTPSourceStats;
+#endif
 
 bool RtpBin::printJitter(guint sessionId)
 {
-#if 0
-#include "/home/tristan/gst-plugins-bad/gst/rtpmanager/rtpstats.h"
+#if JITTER
+//#include "/home/tristan/gst-plugins-bad/gst/rtpmanager/rtpstats.h"
     GValueArray *arr;
     GValue *val;
     guint i;
 #endif
 
     requestSession(sessionId);
-#if 0
+#if JITTER 
     g_object_get (session_, "sources", &arr, NULL);
 
     for (i = 0; i < arr->n_values; i++) {
@@ -220,6 +289,7 @@ bool RtpBin::printJitter(guint sessionId)
         source = static_cast<GObject*>(g_value_get_object (val));
         g_object_get(source, "stats", &stats, NULL);
         LOG_DEBUG("JITTER IS " << stats->jitter);
+        LOG_DEBUG("packets_count IS " << stats->packets_sent);
     }
     g_value_array_free(arr);
 #endif

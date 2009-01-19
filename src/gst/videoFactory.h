@@ -25,7 +25,7 @@
 
 #include "ports.h"
 #include "gst/engine.h"
-#include <tr1/memory>   // for tr1::shared_ptr
+#include <boost/shared_ptr.hpp>   // for boost::shared_ptr
 #include "tcp/singleBuffer.h"
 
 namespace videofactory
@@ -34,24 +34,25 @@ namespace videofactory
     static const char *V_CODEC = "h264";
     static const int MSG_ID = 2;
 
-    static std::tr1::shared_ptr<VideoReceiver> 
+    static boost::shared_ptr<VideoReceiver> 
     buildVideoReceiver(const char *ip = ports::IP, const char * codec = V_CODEC, const long port = ports::V_PORT, 
             int screen_num = 0, const char *sink = V_SINK);
 
-    static std::tr1::shared_ptr<VideoSender> 
+    static boost::shared_ptr<VideoSender> 
     buildVideoSender(const VideoSourceConfig vConfig, 
             const char *ip = ports::IP, const char *codec = V_CODEC, const long port = ports::V_PORT);
 }
 
-std::tr1::shared_ptr<VideoSender> 
+boost::shared_ptr<VideoSender> 
 videofactory::buildVideoSender(const VideoSourceConfig vConfig, const char *ip, const char *codec, const long port)
 {
     SenderConfig rConfig(codec, ip, port);
-    std::tr1::shared_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
-    tx->init(); return tx;
+    boost::shared_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
+    tx->init(); 
+    return tx;
 }
 
-std::tr1::shared_ptr<VideoReceiver> 
+boost::shared_ptr<VideoReceiver> 
 videofactory::buildVideoReceiver(const char *ip, const char *codec, const long port, const int screen_num, const char *sink)
 {
     if(!sink)
@@ -60,7 +61,7 @@ videofactory::buildVideoReceiver(const char *ip, const char *codec, const long p
     int id;
     ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::VIDEO_CAPS_PORT, id)); // get caps from remote sender
     assert(id == MSG_ID);
-    std::tr1::shared_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
+    boost::shared_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
     rx->init();
     return rx;
 }
