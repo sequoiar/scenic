@@ -45,7 +45,7 @@ import os, sys
 
 # Twisted imports
 from twisted.internet import reactor #, protocol
-
+from twisted.internet.error import AlreadyCalled # for when we cancel twice an event.
 # App imports
 from utils import log, commands
 
@@ -88,7 +88,7 @@ class Driver(object): #shell.ShellCommander):
     """
     name = 'default_name'
     
-    def __init__(self, polling_interval=10.0, polling_enabled=False):
+    def __init__(self, polling_interval=15.0, polling_enabled=True):
         """
         child classes __init__ methods must call this one if defined.
         
@@ -251,6 +251,8 @@ class Driver(object): #shell.ShellCommander):
             try:
                 self._delayed_id.cancel()
             except AttributeError:
+                pass
+            except AlreadyCalled:
                 pass
             self._delayed_id = None
             

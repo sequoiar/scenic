@@ -1193,7 +1193,7 @@ class CliView(Observer):
             if len(data) == 0:
                 msg.append("No devices to list.")
             else:    
-                msg.append("Devices for driver %s :", (bold(data[0].driver.name)))
+                msg.append("Devices for driver %s :" % (bold(data[0].driver.name)))
                 for device in data:
                     msg.append("\t%s" % (device.name))
         self.write("\n".join(msg))
