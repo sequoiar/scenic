@@ -24,9 +24,9 @@ from optparse import OptionParser
 
 import libmilhouse
 
-versionNum=libmilhouse.PACKAGE_VERSION
+versionNum=str(libmilhouse.PACKAGE_VERSION) + '\b' + str(libmilhouse.RELEASE_CANDIDATE)
 
-parser = OptionParser(version="%prog " + str(versionNum))
+parser = OptionParser(version="%prog " + versionNum)
 parser.add_option("-i", "--address", 
         dest="ip", default="127.0.0.1", help="provide ip address")
 parser.add_option("-v", "--videocodec", 

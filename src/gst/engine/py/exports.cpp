@@ -62,5 +62,6 @@ BOOST_PYTHON_MODULE(libmilhouse)
 
     // expose macro to python
     boost::python::scope().attr("PACKAGE_VERSION") = PACKAGE_VERSION;
+    boost::python::scope().attr("RELEASE_CANDIDATE") = RELEASE_CANDIDATE;
 }
 
