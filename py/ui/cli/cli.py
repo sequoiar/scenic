@@ -1127,17 +1127,77 @@ class CliView(Observer):
 
     def _connectionMade(self, origin, data):
         self.write(data[0])
+   
+    def _device_attributes_changed(self, origin, data):
+        """
+        :data: list of attributes
+        They can be for different devices, but will be for the same driver.
+        """
+        msg = []
+        if origin is self.controller: # and len(data) >= 1:
+            msg .append(bold('Warning : some attributes changed.')) #TODO: imporoved message
+        else:
+            msg .append(bold('Some attributes changed.'))
+        for attribute in data:
+            name = attribute.name
+            value = attribute.value
+            msg.append("\t%s : %s" % (name, value))
+            device_name = attribute.device.name
+            driver_name = attribute.device.driver.name
+            msg.append("Attribute %s of device %s (driver %s) changed to %s." % (name, bold(device_name), driver_name, value))
+        self.write("\n".join(msg))
+    
+    def _device_list_attributes(self, origin, data):
+        """
+        :data: list of attributes
+        They are all for the same device and driver.
+        """
+        if origin is self.controller and len(data) >= 1:
+            msg = []
+            device_name = data[0].device.name
+            driver_name = data[0].device.driver.name
+            msg.append("Attributes of device %s using driver %s :" % (bold(device_name), driver_name))
+            for attribute in data:
+                name = attribute.name
+                value = attribute.value
+                msg.append("\t%s : %s" % (name, value))
+            self.write("\n".join(msg))
+
+    def _devices_removed(self, origin, data):
+        """
+        :data: list of devices.
+        All from the same driver.
+        """
+        msg = []
+        for device in data:
+            msg.append("Device %s:%s has been removed." % (device.driver.name, device.name))
+        self.write("\n".join(msg))
+    
+    def _devices_added(self, origin, data):
+        """
+        :data: list of devices
+        all from the same driver.
+        """
+        msg = []
+        for device in data:
+            msg.append("New device : %s:%s." % (device.driver.name, device.name))
+        self.write("\n".join(msg))
 
     def _devices_list(self, origin, data):
-        # TODO
-        self.write(str(data))
-    
-    def _devices_list_attributes(self, origin, data):
-        # TODO
-        self.write(str(data))
-    def _devices_modify_attribute(self, origin, data):
-        # TODO
-        self.write(str(data))
+        """
+        :data: list of devices
+        they all belong to the same driver.
+        """
+        msg = []
+        if origin is self.controller:
+            if len(data) == 0:
+                msg.append("No devices to list.")
+            else:    
+                msg.append("Devices for driver %s :", (bold(data[0].driver.name)))
+                for device in data:
+                    msg.append("\t%s" % (device.name))
+        self.write("\n".join(msg))
+
 
 
 def bold(msg):
@@ -1176,3 +1236,4 @@ if __name__ == '__main__':
     logging.start()
     start(Subject())
     reactor.run()
+

@@ -300,7 +300,7 @@ class ControllerApi(object):
         
         attribute.set_value(value, caller, 'attribute_changed') # TODO : I think that key is not correct.
         self.notify(caller, attribute, 'attribute_changed') # TODO: make asynchronous
-        driver.poll_now() # TODO: make cleaner
+        driver.poll_now(caller, 'attribute_changed') # TODO: make cleaner
         # TODO: attribute_changed should be triggered
         
         #self.notify(caller, 'No such attributes for driver/device: %s %s %s:%s' % (driver_name, device_name, attribute_name, str(value)), 'info')
