@@ -1140,7 +1140,7 @@ class CliView(Observer):
             msg .append(bold('Some attributes changed.'))
         for attribute in data:
             name = attribute.name
-            value = attribute.value
+            value = attribute.get_value()
             msg.append("\t%s : %s" % (name, value))
             device_name = attribute.device.name
             driver_name = attribute.device.driver.name
@@ -1159,7 +1159,7 @@ class CliView(Observer):
             msg.append("Attributes of device %s using driver %s :" % (bold(device_name), driver_name))
             for attribute in data:
                 name = attribute.name
-                value = attribute.value
+                value = attribute.get_value()
                 msg.append("\t%s : %s" % (name, value))
             self.write("\n".join(msg))
 

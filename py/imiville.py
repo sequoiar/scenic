@@ -4,6 +4,8 @@ import miville
 from utils.observer import Observer
 from ui.cli import CliView
 import time
+import sys
+
 """
 Miville for ipython.
 
@@ -51,12 +53,31 @@ class IPythonView(CliView):
         #if origin is self.controller:
         last = Update(origin, key, value)
         updates.append(last) # always appends new notifications
+        sys.stdout.write(get_color('CYAN'))
         print "-------------------------------------  update:  ------------------------------"
         print "KEY:    %s" % (str(key))
         print "ORIGIN: %s" % (str(origin))
         print "VALUE:  %s" % (pformat(value))
         print "------------------------------------------------------------------------------"
+        sys.stdout.write(get_color('BLACK'))
         CliView.update(self, origin, key, value)
+
+def get_color(c=None):
+    """
+    Returns ANSI escaped color code.
+    
+    Colors can be either 'BLUE' or 'MAGENTA' or None
+    """
+    # TODO: make this generically includable from both test/systest_telnet.py and here.
+    if c == 'BLUE':
+        s = '31m'
+    elif c == 'CYAN':
+        s = '36m'
+    elif c == 'MAGENTA':
+        s = '35m'
+    else:
+        s = '0m' # default (black or white)
+    return "\x1b[" + s
 
 updates = []
 last = None

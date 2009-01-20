@@ -213,7 +213,7 @@ class Driver(object): #shell.ShellCommander):
         """
         Called by a device when one of its attribute is changed. (by the core, usually)
         
-        Can be overriden if necessary to do shell scripts or so
+        Must be overriden if necessary to do shell scripts or so
         """
         return self.poll_now(caller, event_key) # TODO
     

@@ -246,7 +246,9 @@ class Video4LinuxDriver(VideoDriver):
                     arg = None
                     if isinstance(extra_arg, list):
                         arg = extra_arg[i]
-                    self._handle_shell_infos_results(command, stdout, arg)
+                    else:
+                        arg = extra_arg
+                    self._handle_shell_infos_results(command, stdout, arg, caller) # this is where all the poutine happens
                 else:
                     print "failure for command %s" % (command[0])
                     print "stderr: %s" % (stderr)
@@ -255,7 +257,7 @@ class Video4LinuxDriver(VideoDriver):
             event_name = 'attr'
         self._on_done_devices_polling(caller) # attr_change, 
     
-    def _handle_shell_infos_results(self, command, results, extra_arg=None):
+    def _handle_shell_infos_results(self, command, results, extra_arg=None, caller=None):
     	"""
         Handles results for only one command received by on_commands_results
         
@@ -289,19 +291,16 @@ class Video4LinuxDriver(VideoDriver):
                             device.add_attribute(IntAttribute(key, int(dic[key]), 480, 240, 9999)) # TODO better min/max 
                         elif key == 'input':
                             # Composite0, Composite1,  Composite2, S-Video
-                            # TODO: v4l2-ctl --list-inputs
                             #attr = devices.OptionsAttribute(key, , 0, ['Composite0', 'Composite1', 'S-Video']) # 'Composite2'
                             #device.add_attribute(attr)
                             device.attributes[key].set_value(value, False)
                         elif key == "norm":
                             # TODO: v4l2-ctl --?? for better norm/standards names
                             attr = OptionsAttribute(key, dic[key], 'ntsc', ['ntsc', 'pal', 'secam'])
-                            #TODO : attr.setValue(attr.getIndexForValue( values[key] ),False)
-                            device.add_attribute(attr)
+                            device.add_attribute(attr) # we could check if value is valid
             elif command[1] == '--list-inputs':
                 try:
                     device = self._new_devices[extra_arg] #'/dev/video0']
-                    # TODO: check if there are many devices, how the v4l2-ctl command works.
                 except KeyError:
                     log.info('no device ' + str(extra_arg)) #/dev/video0
                 else:
@@ -311,8 +310,12 @@ class Video4LinuxDriver(VideoDriver):
                     
         #log.info('v4l driver: command %s returned.', str(command))
         #print results
-        # TODO: notify the api
-
+        
+        if event_type == 'attr_change':
+            self.poll_now(caller, 'device_modify_attributes')
+            argument = True # TODO: check if change is successful
+            self._call_event_listener('device_modify_attribute', argument, caller)
+            
 #devices.managers['video'].add_driver(Video4LinuxDriver()) # only one instance.
 # TODO : load only if module is there and if computer (OS) supports it.
 

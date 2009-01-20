@@ -298,9 +298,9 @@ class ControllerApi(object):
             self.notify(caller, 'No such attribute: %s' % (attribute_name), 'info')
             return 
         
-        attribute.set_value(value, caller, 'attribute_changed') # TODO : I think that key is not correct.
-        self.notify(caller, attribute, 'attribute_changed') # TODO: make asynchronous
-        driver.poll_now(caller, 'attribute_changed') # TODO: make cleaner
+        attribute.set_value(value, caller, 'device_modify_attribute')#'device_attributes_changed') # TODO : I think that key is not correct.
+        #self.notify(caller, attribute, 'device_attributes_changed') # TODO: make asynchronous
+        driver.poll_now(caller, 'device_modify_attribute')
         # TODO: attribute_changed should be triggered
         
         #self.notify(caller, 'No such attributes for driver/device: %s %s %s:%s' % (driver_name, device_name, attribute_name, str(value)), 'info')
