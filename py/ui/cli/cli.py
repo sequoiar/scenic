@@ -583,31 +583,46 @@ class CliController(TelnetServer):
         """
         cp = CliParser(self, prog=line[0], description="Manages the audio/video/data devices.")
         
+        # booleans (action)
+        cp.add_option("-l", "--list", action='store_true', help="Lists all the drivers and devices: devices -l")
+        cp.add_option("-a", "--attributes", action='store_true', help="Lists attributes for a device: devices -t v4l2 -d /dev/video0 -a")
+        cp.add_option("-z", "--description", action='store_true', help="Displays description")
+       
+        # strings options
+        cp.add_option("-k", "--kind", type='string', help="Specifies a kind of devices, such as 'video', 'audio' or 'data'")
         cp.add_option("-t", "--driver", type="string", help="Specifies a driver.")
         cp.add_option("-d", "--device", type="string", help="Specifies a device.")
         
-        cp.add_option("-l", "--list", action='store_true', help="Lists all the drivers and devices: devices -l")
-        cp.add_option("-a", "--attributes", action='store_true', help="Lists attributes for a device: devices -t v4l2 -d /dev/video0 -a")
+        # modifiers
         cp.add_option("-m", "--modify", type="string", help="Modifies the value of an attribute: devices -t v4l2 -d /dev/video0 -m norm ntsc")
-        cp.add_option("-z", "--description", action='store_true', help="Displays description")
         
         (options, args) = cp.parse_args(line)
-        
+        # USE CASES:
+        # 1) devices_list
         if options.list:
-            self.core.devices_list(self, None) # caller, driver
-            if options.driver:
-                self.core.devices_list(self, options.driver) # caller, driver
+            if options.kind:
+                # devices_list(self, caller, driver_kind)
+                self.core.devices_list(self, options.kind)
+
+        # 2) device_list_attributes
         elif options.attributes:
-            if options.driver and options.device:
-                self.core.devices_list_attributes(self, options.driver, options.device) # caller, driver, device
+            if options.driver and options.device and options.kind:
+                # device_list_attributes(self, caller, driver_kind, driver_name, device_name)
+                self.core.device_list_attributes(self, options.kind, options.driver, options.device)
             else:
                 cp.print_help()
+
+        # 3) device_modify_attribute
         elif options.modify:
-            if options.driver and options.device and len(args) == 2:
+            if options.driver and options.device and options.kind and len(args) == 2:
                 value = args[1]
-                self.core.devices_modify_attribute(self, options.driver, options.device, options.modify, value) # caller, driver, device, attributes, value
+                # device_modify_attribute(self, caller, driver_kind, driver_name, device_name, attribute_name, value)
+                self.core.device_modify_attribute(self, options.kind, options.driver, options.device, options.modify, value) 
+                # TODO: should return success.
             else:
                 cp.print_help()
+        
+        # HELP:
         elif options.description:
             cp.print_description()
         else:
@@ -1145,7 +1160,7 @@ class CliView(Observer):
             device_name = attribute.device.name
             driver_name = attribute.device.driver.name
             msg.append("Attribute %s of device %s (driver %s) changed to %s." % (name, bold(device_name), driver_name, value))
-        self.write("\n".join(msg))
+        self.write("\n".join(msg), True)
     
     def _device_list_attributes(self, origin, data):
         """
@@ -1161,7 +1176,7 @@ class CliView(Observer):
                 name = attribute.name
                 value = attribute.get_value()
                 msg.append("\t%s : %s" % (name, value))
-            self.write("\n".join(msg))
+            self.write("\n".join(msg), True)
 
     def _devices_removed(self, origin, data):
         """
@@ -1171,7 +1186,7 @@ class CliView(Observer):
         msg = []
         for device in data:
             msg.append("Device %s:%s has been removed." % (device.driver.name, device.name))
-        self.write("\n".join(msg))
+        self.write("\n".join(msg), True)
     
     def _devices_added(self, origin, data):
         """
@@ -1181,7 +1196,7 @@ class CliView(Observer):
         msg = []
         for device in data:
             msg.append("New device : %s:%s." % (device.driver.name, device.name))
-        self.write("\n".join(msg))
+        self.write("\n".join(msg), true)
 
     def _devices_list(self, origin, data):
         """
@@ -1196,7 +1211,7 @@ class CliView(Observer):
                 msg.append("Devices for driver %s :" % (bold(data[0].driver.name)))
                 for device in data:
                     msg.append("\t%s" % (device.name))
-        self.write("\n".join(msg))
+        self.write("\n".join(msg), True)
 
 
 
