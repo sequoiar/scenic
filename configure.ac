@@ -186,6 +186,7 @@ AC_CONFIG_FILES([Makefile
 AC_CONFIG_FILES([
                  src/gst/engine/test/Makefile
                  src/gst/engine/test.old/Makefile
+                 src/gst/engine/py/Makefile
                  ])
 
 
