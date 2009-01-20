@@ -39,11 +39,11 @@ server_command = os.path.expanduser("./miville.py")
 client_command = 'telnet localhost %s' % server_port
 waiting_delay = 1.0 # seconds before starting client after server start
 
-#VERBOSE_CLIENT = False
-VERBOSE_CLIENT = True
+VERBOSE_CLIENT = False
+#VERBOSE_CLIENT = True
 
-#VERBOSE_SERVER = False
-VERBOSE_SERVER = True
+VERBOSE_SERVER = False
+#VERBOSE_SERVER = True
 
 # ---------------------------------------------------------------------
 # a class for output redirection

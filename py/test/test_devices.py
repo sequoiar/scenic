@@ -312,8 +312,8 @@ class Test_4_v4l_Driver(unittest.TestCase):
             self.fail('v4l2 should be in video drivers.')
         
     def test_2_list_devices(self):
-        self.driver.prepare() # _poll_devices()  
-        time.sleep(0.1)        
+        return self.driver.prepare() # _poll_devices()  
+        #time.sleep(0.1)        
         
     def test_3_devices_attributes(self):
         # override one callback
@@ -326,6 +326,7 @@ class Test_4_v4l_Driver(unittest.TestCase):
     
     def xxtest_5_width_height(self):
         self.driver.poll_now() # which calls Driver._poll_devices()
+        
         time.sleep(0.1)
         try:
             video0 = self.driver.devices['/dev/video0']
