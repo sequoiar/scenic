@@ -565,4 +565,39 @@ class Test_004_Settings(TelnetBaseTest):
         
         self.tst('list settings', 'There are 5 preset settings', 'The preset files are missing.')
  
-    
+class Test_5_Devices(TelnetBaseTest):
+    """
+    System Tests for devices.
+
+    devices -k video -l
+    devices -k video -t v4l2 -d /dev/video0 -a
+    devices -k video -t v4l2 -d /dev/video0 -m norm pal
+    devices -k video -t v4l2 -d /dev/video0 -a
+    devices -k video -t v4l2 -d /dev/video0 -m norm ntsc
+    devices -k video -t v4l2 -d /dev/video0 -a
+    """
+    def test_01_list_v4l2_devices(self):
+        self.sleep()
+        self.client.sendline("devices -k video -l")
+        self.sleep()
+        self.expectTest('/dev/video0.', 'Warning: no v4l2 device appearing in the CLI.')
+
+    def test_02_modify_v4l2_attribute(self):
+        self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -a")
+        self.sleep()
+        self.expectTest('norm', 'v4l2 device doesn\'t have a norm attribute.')
+       
+        self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -m norm pal")
+        self.sleep()
+        self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -a")
+        self.sleep()
+        self.expectTest('PAL', 'Could not modify device attribute.')
+       
+        self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -m norm ntsc")
+        self.sleep()
+        self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -a")
+        self.sleep()
+        self.expectTest('NTSC', 'Could not modify device attribute.')
+
+
+   
