@@ -22,7 +22,11 @@
 
 from optparse import OptionParser
 
-parser = OptionParser()
+import libmilhouse
+
+versionNum=libmilhouse.PACKAGE_VERSION
+
+parser = OptionParser(version="%prog " + str(versionNum))
 parser.add_option("-i", "--address", 
         dest="ip", default="127.0.0.1", help="provide ip address")
 parser.add_option("-v", "--videocodec", 
@@ -45,11 +49,9 @@ parser.add_option("-d", "--videodevice",
         dest="videoDevice", help="video4linux device to use: /dev/video0, /dev/video1")
 parser.add_option("-n", "--screen", 
         type="int", dest="screenNum", help="xinerama screen number")
-parser.add_option("--version", 
-        action="store_true", dest="printVersion", help="print version number")
 parser.add_option("-c", "--numChannels", 
         type="int", dest="numChannels", default=2, help="number of channels (sender side only)")
 
 (options, args) = parser.parse_args()
 
-print args
+

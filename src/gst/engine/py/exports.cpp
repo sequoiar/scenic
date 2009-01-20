@@ -59,5 +59,8 @@ BOOST_PYTHON_MODULE(libmilhouse)
     def("start", playback::start);
     def("stop", playback::stop);
     def("isPlaying", playback::isPlaying);
+
+    // expose macro to python
+    boost::python::scope().attr("PACKAGE_VERSION") = PACKAGE_VERSION;
 }
 
