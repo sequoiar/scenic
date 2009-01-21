@@ -69,12 +69,6 @@ bool GstSenderThread::audio_start(MapMsg& msg)
     try
     {
         AudioSender* asender;
-        if(!msg["loop"].empty())
-            LOG_WARNING("loop requested");
-        else
-            msg["loop"] = 0; //FIXME MapMsg should be const -- MapMsg default values?
-    
-    
 
         SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
         if(msg["location"].empty())
@@ -84,7 +78,7 @@ bool GstSenderThread::audio_start(MapMsg& msg)
         }
         else
         {
-            AudioSourceConfig config(msg["source"], msg["location"], msg["channels"], msg["loop"]);
+            AudioSourceConfig config(msg["source"], msg["location"], msg["channels"]);
             audio_ = asender = new AudioSender(config, rConfig);
         }
         audio_->init();

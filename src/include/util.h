@@ -24,6 +24,7 @@
 #include "util/logWriter.h"
 #include "lassert.h"
 #include "util/hostIP.h"
+#include "util/sigint.h"
 
 
 #endif

@@ -165,10 +165,18 @@ AudioTestSource::~AudioTestSource()
 }
 
 
+const int AudioFileSource::LOOP_INFINITE = -1;
+
 /// Constructor 
 AudioFileSource::AudioFileSource(const AudioSourceConfig &config) : AudioSource(config), decoders_(), loopCount_(0) 
+{}
+
+void AudioFileSource::loop(int nTimes)
 {
-    loopCount_ = config_.loop();
+    if (nTimes < -1)
+        THROW_ERROR("Loop setting must be either >= 0 , or -1 for infinite looping");
+
+    loopCount_ = nTimes;
 }
 
 void AudioFileSource::sub_init()
@@ -198,7 +206,7 @@ bool AudioFileSource::handleBusMsg(_GstMessage *msg)
     if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS)
     {
         LOG_DEBUG("Got end of stream, here's where we should playback if needed");
-        if (loopCount_ > 0 || loopCount_ == AudioSourceConfig::LOOP_INFINITE)
+        if (loopCount_ > 0 || loopCount_ == AudioFileSource::LOOP_INFINITE)
         {
             LOG_DEBUG("playback about to restart, " << loopCount_ << " times to go");
             restartPlayback();

@@ -27,9 +27,8 @@
 
 /// Constructor sets by default location to an empty string and loop to LOOP_NONE 
 AudioSourceConfig::AudioSourceConfig(const std::string & source__, 
-                  int numChannels__, 
-                  int loop__) : 
-    source_(source__), location_(""), numChannels_(numChannels__), loop_(loop__)
+                  int numChannels__) : 
+    source_(source__), location_(""), numChannels_(numChannels__)
 {
     if (source_.empty())
         THROW_ERROR("No source specified");
@@ -41,15 +40,14 @@ AudioSourceConfig::AudioSourceConfig(const std::string & source__,
 ///  Constuctor sets by default loop to LOOP_NONE, but has file location specified 
 AudioSourceConfig::AudioSourceConfig(const std::string & source__, 
                   const std::string & location__,
-                  int numChannels__, 
-                  int loop__) : 
-    source_(source__), location_(location__), numChannels_(numChannels__) , loop_(loop__)
+                  int numChannels__) : 
+    source_(source__), location_(location__), numChannels_(numChannels__)
 {}
 
 
 /// Copy constructor 
 AudioSourceConfig::AudioSourceConfig(const AudioSourceConfig& m) : 
-    source_(m.source_), location_(m.location_), numChannels_(m.numChannels_) , loop_(m.loop_) 
+    source_(m.source_), location_(m.location_), numChannels_(m.numChannels_)
 {}
 
 
@@ -63,12 +61,6 @@ const char *AudioSourceConfig::source() const
 int AudioSourceConfig::numChannels() const 
 { 
     return numChannels_; 
-}
-
-/// Returns number of times file will be played 
-int AudioSourceConfig::loop() const 
-{ 
-    return loop_; 
 }
 
 /// Factory method that creates an AudioSource based on this object's source_ string 

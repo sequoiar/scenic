@@ -62,32 +62,6 @@ class MainModule
         MainModule& operator=(const MainModule&);
 };
 
-#include <signal.h>
-static bool signal_flag = false;
-static void handler(int /*sig*/, siginfo_t* /* si*/, void* /* unused*/)
-{
-    LOG_INFO("Got SIGINT going down!");
-    signal_flag = true;
-
-    struct sigaction sa;
-    sa.sa_flags = SA_SIGINFO;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_sigaction = NULL;
-    if (sigaction(SIGINT, &sa, NULL) == -1)
-        THROW_ERROR("Cannot register SIGINT handler");
-}
-
-
-static void set_handler()
-{
-    struct sigaction sa;
-    sa.sa_flags = SA_SIGINFO;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_sigaction = handler;
-    if (sigaction(SIGINT, &sa, NULL) == -1)
-        THROW_ERROR("Cannot register SIGINT handler");
-}
-
 
 bool MainModule::run()
 {
@@ -101,7 +75,7 @@ bool MainModule::run()
         QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
 
-        while(!signal_flag)
+        while(!signalFlag())
         {
             MapMsg tmsg = tcp_queue.timed_pop(1);
             MapMsg gmsg = gst_queue.timed_pop(1000);

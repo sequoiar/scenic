@@ -32,10 +32,10 @@ class AudioSink;
 class AudioSourceConfig
 {
     public:
-        AudioSourceConfig(const std::string & source__, int numChannels__, int loop__ = LOOP_NONE);
+        AudioSourceConfig(const std::string & source__, int numChannels__);
         
         AudioSourceConfig(const std::string & source__, const std::string & location__,
-                int numChannels__, int loop__ = LOOP_NONE);
+                int numChannels__);
         
         AudioSourceConfig(const AudioSourceConfig& m);
 
@@ -43,29 +43,18 @@ class AudioSourceConfig
 
         int numChannels() const;
 
-        int loop() const;
-
         const char *location() const;
 
         bool fileExists() const;
          
         AudioSource* createSource() const;
 
-        /** Enum representing two possible loop settings, any other will correspond 
-         * to the finite number of times to playback. */
-        enum LOOP_SETTING 
-        { 
-            LOOP_INFINITE = -1,
-            LOOP_NONE = 0
-        };
-        
     private:
         /// No Assignment Operator 
         AudioSourceConfig& operator=(const AudioSourceConfig&); 
         const std::string source_;
         const std::string location_;
         const int numChannels_;
-        const int loop_;
 };
 
 ///  Immutable class that is used to parametrize AudioReceiver objects.  

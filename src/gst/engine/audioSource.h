@@ -147,12 +147,14 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
                                    GstPad * srcPad, 
                                    gboolean last,
                                    void *data);
+        void loop(int nTimes);
         void sub_init();
         void link_elements();
 
         void restartPlayback();
         std::vector<GstElement*> decoders_;
         int loopCount_;
+        static const int LOOP_INFINITE;
 };
 
 /** 

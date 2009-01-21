@@ -30,6 +30,8 @@
 #include <boost/python.hpp>
 #include <gst/videoFactory.h>
 #include <gst/audioFactory.h>
+#include "util.h"
+#include "gutil.h"
 
 
 using namespace boost::python;
@@ -46,7 +48,9 @@ BOOST_PYTHON_MODULE(libmilhouse)
     def("buildVideoSender", videofactory::buildVideoSender);
 
     class_< AudioReceiver, boost::noncopyable, boost::shared_ptr<AudioReceiver> >("AudioReceiver", no_init);
-    class_< AudioSender, boost::noncopyable, boost::shared_ptr<AudioSender> >("AudioSender", no_init);
+    class_< AudioSender, boost::noncopyable, boost::shared_ptr<AudioSender> >("AudioSender", no_init)
+        .def("getCaps", &AudioSender::getCaps);     // methods
+        
 
     def("buildAudioReceiver", audiofactory::buildAudioReceiver);
     def("buildAudioSender", audiofactory::buildAudioSender);
@@ -54,11 +58,23 @@ BOOST_PYTHON_MODULE(libmilhouse)
     class_< VideoSourceConfig >("VideoSourceConfig", init<std::string>()) 
         .def(init<std::string, std::string>()); // overloaded constructor
 
+    class_< AudioSourceConfig >("AudioSourceConfig", init<std::string, int>()) 
+        .def(init<std::string, std::string, int>()); // overloaded constructor
+
     def("tcpSendBuffer", tcpSendBuffer);        
 
     def("start", playback::start);
     def("stop", playback::stop);
     def("isPlaying", playback::isPlaying);
+
+    def("eventLoop", gutil::runMainLoop);
+    def("setHandler", set_handler);
+
+    boost::python::scope().attr("VIDEO_CAPS_PORT") = ports::VIDEO_CAPS_PORT;
+    boost::python::scope().attr("AUDIO_CAPS_PORT") = ports::AUDIO_CAPS_PORT;
+
+    boost::python::scope().attr("VIDEO_MSG_ID") = videofactory::MSG_ID;
+    boost::python::scope().attr("AUDIO_MSG_ID") = audiofactory::MSG_ID;
 
     // expose macro to python
     boost::python::scope().attr("PACKAGE_VERSION") = PACKAGE_VERSION;

@@ -22,7 +22,7 @@
 
 from optparse import OptionParser
 
-from libmilhouse import *
+from libmilhouse import * # python bindings to our gst module
 
 class PofExcept(Exception): pass
 
@@ -36,15 +36,15 @@ def getArgs():
     parser.add_option("-i", "--address", 
             dest="ip", default="127.0.0.1", help="provide ip address")
     parser.add_option("-v", "--videocodec", 
-            dest="videocodec", default="h264", help="video codec: h264, h263 or mpeg4")
+            dest="videoCodec", default="h264", help="video codec: h264, h263 or mpeg4")
     parser.add_option("-a", "--audiocodec", 
-            dest="audiocodec", default="raw", help="audio codec: vorbis, raw or mp3")
+            dest="audioCodec", default="raw", help="audio codec: vorbis, raw or mp3")
     parser.add_option("-k", "--videosink", 
-            dest="videosink", default="xvimagesink", help="videosink: xvimagesink or glimagesink")
+            dest="videoSink", default="xvimagesink", help="videosink: xvimagesink or glimagesink")
     parser.add_option("-t", "--audioport", 
-            type="int", dest="audioport", help="audioport: 1024-60000")
+            type="int", dest="audioPort", help="audioport: 1024-60000")
     parser.add_option("-p", "--videoport", 
-            type="int", dest="videoport", help="videoport: 1024-60000")
+            type="int", dest="videoPort", help="videoport: 1024-60000")
     parser.add_option("-s", "--sender", 
             action="store_true", dest="isSender", help="designate this process as sender")
     parser.add_option("-r", "--receiver", 
@@ -54,7 +54,7 @@ def getArgs():
     parser.add_option("-d", "--videodevice", 
             dest="videoDevice", help="video4linux device to use: /dev/video0, /dev/video1")
     parser.add_option("-n", "--screen", 
-            type="int", dest="screenNum", help="xinerama screen number")
+            type="int", dest="screenNum", default=0, help="xinerama screen number")
     parser.add_option("-c", "--numChannels", 
             type="int", dest="numChannels", default=2, help="number of channels (sender side only)")
 
@@ -66,7 +66,7 @@ def runAsSender(options):
     vConfig = None
     if options.videoDevice is None:
         vConfig = VideoSourceConfig("v4l2src")
-    else
+    else:
         vConfig = VideoSourceConfig("v4l2src", options.videoDevice)
     
     vTx = buildVideoSender(vConfig, options.ip, options.videoCodec, options.videoPort)
@@ -76,20 +76,45 @@ def runAsSender(options):
 
     start() 
     
+    assert(tcpSendBuffer(options.ip, VIDEO_CAPS_PORT, VIDEO_MSG_ID, vTx.getCaps()))
+    assert(tcpSendBuffer(options.ip, AUDIO_CAPS_PORT, AUDIO_MSG_ID, aTx.getCaps()))
+
+    eventLoop(0)
+    assert(isPlaying())
+    stop()
     # continue from here
 
 def runAsReceiver(options):
     """ Receives media from a remote sender """
-    pass
+    if options.videoPort is None:
+        raise PofExcept("Must specify videoport")
+    if options.audioPort is None:
+        raise PofExcept("Must specify audioport")
+
+    vRx = buildVideoReceiver(options.ip, options.videoCodec, options.videoPort, options.screenNum, options.videoSink)
+    aRx = buildAudioReceiver(options.ip, options.audioCodec, options.audioPort, "jackaudiosink")
+
+    start()
+    if options.fullscreen:
+        vRx.getVideoSink().makeFullscreen()
+
+    eventLoop(0)
+    assert(isPlaying())
+    stop()
 
 
 def main():
     (options, args) = getArgs()
 
     if options.isSender:
+        print "running as sender"
         runAsSender(options)
-    else if not options.isSender:
+    elif not options.isSender:
+        print "running as receiver"
         runAsReceiver(options)
     else:
         raise PofExcept("Must specify if this process is a sender or receiver")
 
+
+setHandler() # to catch interrupts
+main()
