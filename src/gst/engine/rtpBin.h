@@ -46,9 +46,10 @@ class RtpBin
         void dropOnLatency(unsigned int sessionId);
         static int increaseBandwidth(void * data);
         static int printBandwidth(void * data);
-        static int printJitter(void * data);
-        static bool printJitter(unsigned int sessionID);
+        static int printStatsCallback(void * rtpbin);
+        static void printSourceStats(_GObject *source);
         static int dropOnLatency(void * data);
+
         static _GObject *session_;
         static bool requestSession(unsigned int sessionId);
         static _GObject *gotInternalSessionCb(_GstElement * /*rtpBin*/, unsigned int session, void *data);
