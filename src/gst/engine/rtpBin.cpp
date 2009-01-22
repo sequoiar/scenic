@@ -27,11 +27,10 @@
 #include "remoteConfig.h"
 #include "pipeline.h"
 
-#define RTP_REPORTING 0
+#define RTP_REPORTING 1
 
 GstElement *RtpBin::rtpbin_ = 0;
-GObject *RtpBin::session_ = 0;
-unsigned int RtpBin::refCount_ = 0;
+unsigned int RtpBin::sessionCount_ = 0;
 
 void RtpBin::init()
 {
@@ -49,15 +48,6 @@ void RtpBin::init()
                   static_cast<gpointer>(rtpbin_));
 #endif
     
-#if 0 
-FIXME: MAKE THIS LIKE THE RTP REPORTING
-    // uncomment this to see each gstrtpsession's bandwidth printed
-    // connect our action signal handler which requests our internal session, to our got-session handler.
-    g_signal_connect(G_OBJECT(rtpbin_), "get-internal-session", G_CALLBACK(gotInternalSessionCb), NULL);
-    g_timeout_add(5000 /* ms */, 
-                  static_cast<GSourceFunc>(printBandwidth),
-                  static_cast<void*>(this));
-#endif
 }
 
 
@@ -90,7 +80,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
 
     g_print("/*----------------------------------------------*/\n");  
     // get sessions
-    for (unsigned int sessionId = 0; sessionId < refCount_; ++sessionId)
+    for (unsigned int sessionId = 0; sessionId < sessionCount_; ++sessionId)
     {
         g_print("SESSION %d:\n", sessionId);
         g_signal_emit_by_name(rtpbin, "get-internal-session", sessionId, &session);
@@ -122,7 +112,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
 int RtpBin::dropOnLatency(gpointer data)
 {
     RtpBin *context = static_cast<RtpBin*>(data);
-    for (unsigned int sessionId = 0; sessionId < refCount_; ++sessionId)
+    for (unsigned int sessionId = 0; sessionId < sessionCount_; ++sessionId)
         context->dropOnLatency(sessionId);
 
     return FALSE; // called once
@@ -142,47 +132,13 @@ void RtpBin::dropOnLatency(guint sessionID)
 }
 
 
-
-/// Arbitrarily increase bandwidth, this function exists just to show how one can
-/// set the bandwidth on each session. Currently seems to have no effect.
-
-int RtpBin::increaseBandwidth(gpointer data)
-{
-    RtpBin *context = static_cast<RtpBin*>(data);
-    const static gdouble newBandwidth = 100000.0;
-
-    for (unsigned int sessionId = 0; sessionId < refCount_; ++sessionId)
-    {
-        context->bandwidth(sessionId, newBandwidth);
-        LOG_INFO("BANDWIDTH USED: " << context->bandwidth(sessionId));
-    }
-
-    return FALSE;       // only called once
-}
-
-
-int RtpBin::printBandwidth(gpointer data)
-{
-    RtpBin *context = static_cast<RtpBin*>(data);
-    std::string terminator("");
-
-    for (unsigned int sessionId = 0; sessionId < refCount_; ++sessionId)
-    {
-        LOG_INFO(context->bandwidth(sessionId) << " bits/s" << terminator);
-        terminator = "\n\n";
-    }
-
-    return TRUE;
-}
-
-
 const char *RtpBin::padStr(const char *padName)
 {
-    assert(refCount_ > 0);
+    assert(sessionCount_ > 0);
     std::string result(padName);
     std::stringstream istream;
 
-    istream << refCount_ - 1;        // 0-based
+    istream << sessionCount_ - 1;        // 0-based
     result = result + istream.str();
     return result.c_str();
 }
@@ -193,51 +149,12 @@ RtpBin::~RtpBin()
     Pipeline::Instance()->remove(&rtcp_sender_);
     Pipeline::Instance()->remove(&rtcp_receiver_);
 
-    --refCount_;
-    if (refCount_ <= 0) // destroy if no streams are present
+    --sessionCount_;
+    if (sessionCount_ <= 0) // destroy if no streams are present
     {
-        assert(refCount_ == 0);
+        assert(sessionCount_ == 0);
         Pipeline::Instance()->remove(&rtpbin_);
         rtpbin_ = 0;
     }
 }
-
-
-/// Sets bandwidth for the RtpSession specified by sessionID.
-
-void RtpBin::bandwidth(guint sessionId, double newBandwidth) 
-{
-    requestSession(sessionId);
-    g_object_set(G_OBJECT(session_), "bandwidth", newBandwidth, NULL);
-}
-
-
-/// Gets bandwidth for the RtpSession specified by sessionID.
-
-double RtpBin::bandwidth(guint sessionId) const
-{
-    gdouble result = 0.0;
-
-    requestSession(sessionId);
-    g_object_get(G_OBJECT(session_), "bandwidth", &result, NULL);
-
-    return result;
-}
-
-
-bool RtpBin::requestSession(guint sessionId)
-{
-    g_signal_emit_by_name(static_cast<gpointer>(rtpbin_), "get-internal-session", sessionId, &session_);
-    return false;
-}
-
-
-GObject *RtpBin::gotInternalSessionCb(GstElement * /*rtpbin*/, guint session, gpointer data)
-{
-    LOG_DEBUG("GOT THE SESSION: " << session);
-    session_ = static_cast<GObject*>(data);
-
-    return session_;
-}
-
 

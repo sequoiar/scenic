@@ -32,27 +32,18 @@ class RtpBin
         void init();
 
     protected:
-        RtpBin() : rtcp_sender_(0), rtcp_receiver_(0) { ++refCount_; }
+        RtpBin() : rtcp_sender_(0), rtcp_receiver_(0) { ++sessionCount_; }
         static const char *padStr(const char *padName);
 
         static _GstElement *rtpbin_;
-        static unsigned int refCount_;
+        static unsigned int sessionCount_;
         _GstElement *rtcp_sender_, *rtcp_receiver_;
 
     private:
-        double bandwidth(unsigned int sessionId) const;
-        double jitter(unsigned int sessionId) const;
-        void bandwidth(unsigned int sessionId, double newBandwidth);
         void dropOnLatency(unsigned int sessionId);
-        static int increaseBandwidth(void * data);
-        static int printBandwidth(void * data);
         static int printStatsCallback(void * rtpbin);
         static void printSourceStats(_GObject *source);
         static int dropOnLatency(void * data);
-
-        static _GObject *session_;
-        static bool requestSession(unsigned int sessionId);
-        static _GObject *gotInternalSessionCb(_GstElement * /*rtpBin*/, unsigned int session, void *data);
 
         RtpBin(const RtpBin&); //No Copy Constructor
         RtpBin& operator=(const RtpBin&); //No Assignment Operator
