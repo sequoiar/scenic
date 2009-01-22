@@ -6,6 +6,8 @@ from ui.cli import CliView
 import time
 import sys
 
+import devices
+
 """
 Miville for ipython.
 
@@ -32,8 +34,11 @@ class Update(object):
         self.key = key
     
 class IPythonController(object):
+    def __init__(self):
+        self.verbose = True
     def write (self, msg, prompt=False, endl=True):
-        print "%s" % (msg.encode('utf-8'))
+        if self.verbose:
+            print "%s" % (msg.encode('utf-8'))
         
     def write_prompt(self):
         pass
@@ -47,20 +52,22 @@ class IPythonView(CliView):
         #Observer.__init__(self, subject)
         #self.controller = controller
         CliView.__init__(self, subject, controller)
+        self.verbose = True
         
     def update(self, origin, key, value):
         global updates, last
         #if origin is self.controller:
         last = Update(origin, key, value)
         updates.append(last) # always appends new notifications
-        sys.stdout.write(get_color('CYAN'))
-        print "-------------------------------------  update:  ------------------------------"
-        print "KEY:    %s" % (str(key))
-        print "ORIGIN: %s" % (str(origin))
-        print "VALUE:  %s" % (pformat(value))
-        print "------------------------------------------------------------------------------"
-        sys.stdout.write(get_color('BLACK'))
-        CliView.update(self, origin, key, value)
+        if self.verbose:
+            sys.stdout.write(get_color('CYAN'))
+            print "-------------------------------------  update:  ------------------------------"
+            print "KEY:    %s" % (str(key))
+            print "ORIGIN: %s" % (str(origin))
+            print "VALUE:  %s" % (pformat(value))
+            print "------------------------------------------------------------------------------"
+            sys.stdout.write(get_color('BLACK'))
+            CliView.update(self, origin, key, value)
 
 def get_color(c=None):
     """
