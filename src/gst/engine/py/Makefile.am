@@ -1,18 +1,18 @@
 include $(top_srcdir)/src/globals.mak
 
-lib_LTLIBRARIES = libmilhouse.la
+lib_LTLIBRARIES = milhouse.la
 
-libmilhouse_la_SOURCES = exports.cpp 
-libmilhouse_la_LDFLAGS = -version-info 1:1:1
+milhouse_la_SOURCES = exports.cpp 
+milhouse_la_LDFLAGS = -version-info 1:1:1 -module
 
 # add your libs i.e. ../hello/libhello.la  
-libmilhouse_la_LIBADD =  -l$(BOOST_PYTHON_LIB) $(GLIB_LIBS) \
+milhouse_la_LIBADD =  -l$(BOOST_PYTHON_LIB) $(GLIB_LIBS) \
 						   $(ALL_GST_LIBS) $(JACK_LIBS) $(src)/tcp/libtcp.a \
 						   $(src)/gst/engine/libgst.a $(GTK_LIBS) \
 						   $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(src)/util/libutil.a \
 						   $(src)/gutil/libgutil.a 
 
-libmilhouse_la_CPPFLAGS = -I$(PYTHON_INCLUDE_DIR) $(AM_CPPFLAGS)
+milhouse_la_CPPFLAGS = -I$(PYTHON_INCLUDE_DIR) $(AM_CPPFLAGS)
 
 #Oinstall-libLTLIBRARIES: $(lib_LTLIBRARIES)
 #   	@$(NORMAL_INSTALL)

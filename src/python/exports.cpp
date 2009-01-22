@@ -37,7 +37,7 @@ using namespace boost::python;
 #include "pyMsgThread.h"
 
 /// BOOST PYTHON MOD
-BOOST_PYTHON_MODULE(libmsgthreads)
+BOOST_PYTHON_MODULE(msgthreads)
 {
     class_ < dictMessageHandler, boost::noncopyable, boost::shared_ptr<HandlerWrapper> > ("DictHandler")
         ;

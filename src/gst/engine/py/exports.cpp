@@ -38,7 +38,7 @@ using namespace boost::python;
 
 
 /// BOOST PYTHON MOD
-BOOST_PYTHON_MODULE(libmilhouse)
+BOOST_PYTHON_MODULE(milhouse)
 {
     class_< VideoReceiver, boost::noncopyable, boost::shared_ptr<VideoReceiver> >("VideoReceiver", no_init);
     class_< VideoSender, boost::noncopyable, boost::shared_ptr<VideoSender> >("VideoSender", no_init)
