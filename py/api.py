@@ -248,19 +248,19 @@ class ControllerApi(object):
         # TODO: if IndexError, 
         try: 
             manager = devices.managers[driver_kind]
-        except IndexError:
+        except KeyError:
             self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info') # TODO: there should be a 'user_error' key.
             return 
         
         try:
             driver = manager.drivers[driver_name]
-        except IndexError:
+        except KeyError:
             self.notify(caller, 'No such driver name: %s' % (driver_name), 'info')
             return 
         
         try:
             device = driver.devices[device_name]
-        except IndexError:
+        except KeyError:
             self.notify(caller, 'No such device: %s' % (device_name), 'info')
             return 
         
@@ -276,25 +276,25 @@ class ControllerApi(object):
         # TODO
         try: 
             manager = devices.managers[driver_kind]
-        except IndexError:
+        except KeyError:
             self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
             return 
         
         try:
             driver = manager.drivers[driver_name]
-        except IndexError:
+        except KeyError:
             self.notify(caller, 'No such driver name: %s' % (driver_name), 'info')
             return 
         
         try:
             device = driver.devices[device_name]
-        except IndexError:
+        except KeyError:
             self.notify(caller, 'No such device: %s' % (device_name), 'info')
             return 
         
         try:
             attribute = device.attributes[attribute_name]
-        except IndexError:
+        except KeyError:
             self.notify(caller, 'No such attribute: %s' % (attribute_name), 'info')
             return 
         
@@ -311,7 +311,7 @@ class ControllerApi(object):
     def devices_list(self, caller, driver_kind):
         try: 
             manager = devices.managers[driver_kind]
-        except IndexError:
+        except KeyError:
             self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
             return
 

@@ -47,7 +47,9 @@ class Test_devices_v4l2(unittest.TestCase):
         value = app.last.value
         if not isinstance(value, list):
             self.fail('Last notify should give a list.')
-        if not isinstance(value[0], devices.Device):
+        elif len(value) == 0:
+            self.fail("There are no v4l2 devices on this computer.")
+        elif not isinstance(value[0], devices.Device):
             self.fail('Last notify should give a Device instance.')
     
     def test_02_attributes(self):
@@ -57,6 +59,8 @@ class Test_devices_v4l2(unittest.TestCase):
         app.api.device_list_attributes(app.me, 'video', 'v4l2', '/dev/video0')
         value = app.last.value
         has_norm = False
+        if not isinstance(value, list):
+            self.fail("Error trying to list device attribute. There might be no v4l2 device.")
         # TODO: will change for dict !!
         for attribute in value: # list of Attribute instances
             if attribute.name == 'norm':
@@ -65,6 +69,7 @@ class Test_devices_v4l2(unittest.TestCase):
                     self.fail("Attr value has not been changed.")
         if not has_norm:
             self.fail("Attr not found.")
+        # TODO
         app.api.device_modify_attribute(app.me, 'video', 'v4l2', '/dev/video0', 'norm', 'ntsc')
         app.go()
         
