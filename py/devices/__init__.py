@@ -4,11 +4,11 @@ from devices import *
 # TODO: from utils import find_modules, load_modules
 
 # drivers
-import v4l
+import v4l2
 
 
 def start(api):
-    v4l.start(api)
+    v4l2.start(api)
 
 
 def load_drivers(api):
