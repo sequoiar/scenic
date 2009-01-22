@@ -41,6 +41,8 @@ def getArgs():
             dest="audioCodec", default="raw", help="audio codec: vorbis, raw or mp3")
     parser.add_option("-k", "--videosink", 
             dest="videoSink", default="xvimagesink", help="videosink: xvimagesink or glimagesink")
+    parser.add_option("-l", "--audiosink", 
+            dest="audioSink", default="jackaudiosink", help="audiosink: jackaudiosink, alsasink or pulsesink")
     parser.add_option("-t", "--audioport", 
             type="int", dest="audioPort", help="audioport: 1024-60000")
     parser.add_option("-p", "--videoport", 
@@ -57,7 +59,12 @@ def getArgs():
             type="int", dest="screenNum", default=0, help="xinerama screen number")
     parser.add_option("-c", "--numChannels", 
             type="int", dest="numChannels", default=2, help="number of channels (sender side only)")
-
+    parser.add_option("-x", "--videosource",
+            dest="videoSource", default="v4l2src", 
+            help="gstreamer video source: v4l2src, dv1394src, videotestsrc, filesrc (sender side only)")
+    parser.add_option("-y", "--audiosource",
+            dest="audioSource", default="jackaudiosrc", 
+            help="gstreamer audio source: jackaudiosrc, dv1394src, alsasrc, pulsesrc, filesrc (sender side only)")
     return parser.parse_args()
 
 
@@ -65,13 +72,13 @@ def runAsSender(options):
     """ Sends media to a remote receiver """
     vConfig = None
     if options.videoDevice is None:
-        vConfig = VideoSourceConfig("v4l2src")
+        vConfig = VideoSourceConfig(options.videoSource)
     else:
-        vConfig = VideoSourceConfig("v4l2src", options.videoDevice)
+        vConfig = VideoSourceConfig(options.videoSource, options.videoDevice)
     
     vTx = buildVideoSender(vConfig, options.ip, options.videoCodec, options.videoPort)
 
-    aConfig = AudioSourceConfig("jackaudiosrc", options.numChannels)
+    aConfig = AudioSourceConfig(options.audioSource, options.numChannels)
     aTx = buildAudioSender(aConfig, options.ip, options.audioCodec, options.audioPort)
 
     start() 
@@ -92,7 +99,7 @@ def runAsReceiver(options):
         raise PofExcept("Must specify audioport")
 
     vRx = buildVideoReceiver(options.ip, options.videoCodec, options.videoPort, options.screenNum, options.videoSink)
-    aRx = buildAudioReceiver(options.ip, options.audioCodec, options.audioPort, "jackaudiosink")
+    aRx = buildAudioReceiver(options.ip, options.audioCodec, options.audioPort, options.audioSink)
 
     start()
     if options.fullscreen:
