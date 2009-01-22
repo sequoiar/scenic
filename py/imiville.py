@@ -101,7 +101,7 @@ def main():
     api = miville.core.api
     me = IPythonController()
     view = IPythonView(core, me)
-    print "iMiville is ready for anything."
+    #print "iMiville is ready for anything."
 
 if __name__ == '__main__':
     main()

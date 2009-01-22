@@ -265,7 +265,7 @@ class ControllerApi(object):
             return 
         
         # TODO: make asynchronous
-        self.notify(caller, device.attributes.values(), 'device_list_attributes') # dict
+        self.notify(caller, device.attributes, 'device_list_attributes') # dict
         #self.notify(caller, 'No such device or driver: %s %s' % (driver_name, device_name), 'info')
         # devices.get_driver(driver_name).devices[device_name].list_attributes()
         #self.notify(caller, 'you called devices_list_attributes', 'devices_list_attributes')
@@ -321,5 +321,6 @@ class ControllerApi(object):
         for driver in manager.drivers.values():
             for device in driver.devices.values():
                 devices_list.append(device)
-        self.notify(caller, devices_list, 'devices_list')
+        self.notify(caller, devices_list, 'devices_list') # with a dict
+
 

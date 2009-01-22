@@ -84,7 +84,14 @@ def _parse_v4l2_ctl_all(lines):
                     # TODO : possibilities are Composite0, Composite1, 
                 # norm
             elif category == "Video Standard":
-                results['norm'] = line.strip('\t').strip('\n')
+                norm = line.strip('\t').strip('\n')
+                if norm.startswith('NTSC-'):
+                    norm = 'ntsc'
+                elif norm.startswith('PAL-'):
+                    norm = 'pal'
+                elif norm.startswith('SECAM-'):
+                    norm = 'secam'
+                results['norm'] = norm
         elif line.find(":") > 0:
             try:
                 category = line.split(':')[0]
@@ -295,7 +302,6 @@ class Video4LinuxDriver(VideoDriver):
                             #device.add_attribute(attr)
                             device.attributes[key].set_value(value, False)
                         elif key == "norm":
-                            # TODO: v4l2-ctl --?? for better norm/standards names
                             attr = OptionsAttribute(key, dic[key], 'ntsc', ['ntsc', 'pal', 'secam'])
                             device.add_attribute(attr) # we could check if value is valid
             elif command[1] == '--list-inputs':
@@ -312,7 +318,7 @@ class Video4LinuxDriver(VideoDriver):
         #print results
         
         if event_type == 'attr_change':
-            self.poll_now(caller, 'device_modify_attributes')
+            self.poll_now(caller, 'device_modify_attribute')
             argument = True # TODO: check if change is successful
             self._call_event_listener('device_modify_attribute', argument, caller)
             

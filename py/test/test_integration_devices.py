@@ -59,16 +59,14 @@ class Test_devices_v4l2(unittest.TestCase):
         app.api.device_list_attributes(app.me, 'video', 'v4l2', '/dev/video0')
         value = app.last.value
         has_norm = False
-        if not isinstance(value, list):
+        if not isinstance(value, dict):
             self.fail("Error trying to list device attribute. There might be no v4l2 device.")
         # TODO: will change for dict !!
-        for attribute in value: # list of Attribute instances
-            if attribute.name == 'norm':
-                has_norm = True
-                if attribute.get_value().index("PAL") == -1: # if "PAL" not found
-                    self.fail("Attr value has not been changed.")
-        if not has_norm:
-            self.fail("Attr not found.")
+        try:
+            if not value['norm'].get_value() == "pal":
+                self.fail("Failed to change attribute's value.")
+        except IndexError:
+            self.fail("Device has no norm value.")
         # TODO
         app.api.device_modify_attribute(app.me, 'video', 'v4l2', '/dev/video0', 'norm', 'ntsc')
         app.go()

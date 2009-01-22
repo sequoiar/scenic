@@ -1169,10 +1169,10 @@ class CliView(Observer):
         """
         if origin is self.controller and len(data) >= 1:
             msg = []
-            device_name = data[0].device.name
-            driver_name = data[0].device.driver.name
+            device_name = data.values()[0].device.name
+            driver_name = data.values()[0].device.driver.name
             msg.append("Attributes of device %s using driver %s :" % (bold(device_name), driver_name))
-            for attribute in data:
+            for attribute in data.values():
                 name = attribute.name
                 value = attribute.get_value()
                 msg.append("\t%s : %s" % (name, value))

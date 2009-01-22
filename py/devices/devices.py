@@ -169,13 +169,14 @@ class Driver(object): #shell.ShellCommander):
         if len(removed) > 0:
             self._call_event_listener('devices_removed', removed, caller) # dict
         if len(attr_changed) > 0:
-            self._call_event_listener('device_attributes_changed', attr_changed, caller) # dict
+            self._call_event_listener('device_attributes_changed', attr_changed.values(), caller) # dict
         # print "calling on_devices_list"
         #print "calling", self._call_event_listener, 'on_devices_list'
         #print "DONE"
         if event_key == 'devices_list':
-            self._call_event_listener('devices_list', self.devices, caller) # dict
-        #TODO: maybe not call it every time.
+            self._call_event_listener('devices_list', self.devices, caller) # dict !!!!
+        #TODO: maybe not call it every time.:wq
+        
       
     def _call_event_listener(self, event_key, argument, caller=None):
         """
