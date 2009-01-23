@@ -27,7 +27,9 @@
 #include "remoteConfig.h"
 #include "pipeline.h"
 
-#define RTP_REPORTING ENABLE_LOG
+#ifdef CONFIG_DEBUG_LOCAL
+#define RTP_REPORTING 1
+#endif
 
 GstElement *RtpBin::rtpbin_ = 0;
 unsigned int RtpBin::sessionCount_ = 0;

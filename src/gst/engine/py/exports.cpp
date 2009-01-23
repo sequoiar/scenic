@@ -69,6 +69,9 @@ BOOST_PYTHON_MODULE(milhouse)
 
     def("eventLoop", gutil::runMainLoop);
     def("setHandler", set_handler);
+    
+    boost::python::scope().attr("VIDEO_PORT") = ports::V_PORT;
+    boost::python::scope().attr("AUDIO_PORT") = ports::A_PORT;
 
     boost::python::scope().attr("VIDEO_CAPS_PORT") = ports::VIDEO_CAPS_PORT;
     boost::python::scope().attr("AUDIO_CAPS_PORT") = ports::AUDIO_CAPS_PORT;

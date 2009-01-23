@@ -44,9 +44,9 @@ def getArgs():
     parser.add_option("-l", "--audiosink", 
             dest="audioSink", default="jackaudiosink", help="audiosink: jackaudiosink, alsasink or pulsesink")
     parser.add_option("-t", "--audioport", 
-            type="int", dest="audioPort", help="audioport: 1024-60000")
+            type="int", dest="audioPort", default=AUDIO_PORT, help="audioport: 1024-60000")
     parser.add_option("-p", "--videoport", 
-            type="int", dest="videoPort", help="videoport: 1024-60000")
+            type="int", dest="videoPort", default=VIDEO_PORT, help="videoport: 1024-60000")
     parser.add_option("-s", "--sender", 
             action="store_true", dest="isSender", help="designate this process as sender")
     parser.add_option("-r", "--receiver", 
@@ -54,7 +54,7 @@ def getArgs():
     parser.add_option("-f", "--fullscreen", 
             action="store_true", dest="fullscreen", help="set videowindow to fullsceen (receiver side only)")
     parser.add_option("-d", "--videodevice", 
-            dest="videoDevice", help="video4linux device to use: /dev/video0, /dev/video1")
+            dest="videoDevice", help="video4linux device to use: /dev/video0, /dev/video1 (sender side only)")
     parser.add_option("-n", "--screen", 
             type="int", dest="screenNum", default=0, help="xinerama screen number")
     parser.add_option("-c", "--numChannels", 
@@ -64,7 +64,11 @@ def getArgs():
             help="gstreamer video source: v4l2src, dv1394src, videotestsrc, filesrc (sender side only)")
     parser.add_option("-y", "--audiosource",
             dest="audioSource", default="jackaudiosrc", 
-            help="gstreamer audio source: jackaudiosrc, dv1394src, alsasrc, pulsesrc, filesrc (sender side only)")
+            help="gstreamer audio source: jackaudiosrc, dv1394src, alsasrc, pulsesrc, audiotestsrc, filesrc (sender side only)")
+    parser.add_option("-o", "--timeout",
+            type="int", dest="timeout", default=0, 
+            help="time in ms before stopping, 0 means play forever")
+
     return parser.parse_args()
 
 
@@ -86,18 +90,13 @@ def runAsSender(options):
     assert(tcpSendBuffer(options.ip, VIDEO_CAPS_PORT, VIDEO_MSG_ID, vTx.getCaps()))
     assert(tcpSendBuffer(options.ip, AUDIO_CAPS_PORT, AUDIO_MSG_ID, aTx.getCaps()))
 
-    eventLoop(0)
-    assert(isPlaying())
+    eventLoop(options.timeout)
+    wasPlaying = isPlaying()
     stop()
-    # continue from here
+    return wasPlaying
 
 def runAsReceiver(options):
     """ Receives media from a remote sender """
-    if options.videoPort is None:
-        raise PofExcept("Must specify videoport")
-    if options.audioPort is None:
-        raise PofExcept("Must specify audioport")
-
     vRx = buildVideoReceiver(options.ip, options.videoCodec, options.videoPort, options.screenNum, options.videoSink)
     aRx = buildAudioReceiver(options.ip, options.audioCodec, options.audioPort, options.audioSink)
 
@@ -105,14 +104,15 @@ def runAsReceiver(options):
     if options.fullscreen:
         vRx.getVideoSink().makeFullscreen()
 
-    eventLoop(0)
-    assert(isPlaying())
+    eventLoop(options.timeout)
+    wasPlaying = isPlaying()
     stop()
+    return wasPlaying
 
 
 def main():
     (options, args) = getArgs()
-
+    
     if options.isSender:
         print "running as sender"
         runAsSender(options)
@@ -123,5 +123,5 @@ def main():
         raise PofExcept("Must specify if this process is a sender or receiver")
 
 
-setHandler() # to catch interrupts
+#setHandler() # to catch interrupts
 main()
