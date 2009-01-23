@@ -231,7 +231,7 @@ class JackDriver(AudioDriver):
         #print "will start commands:"
         #pprint.pprint(commands_to_start)  # TODO: add a timeout !!!
         deferred = commands_start(commands_to_start, self.on_commands_results, extra_args, caller)
-        deferred.setTimeout(1.0, self._on_timeout, commands_to_start, extra_args) # 1 second is plenty
+        deferred.setTimeout(2.0, self._on_timeout, commands_to_start, extra_args) # 1 second is plenty
         # TODO: setTimeout is deprecated !!!!!
         return deferred 
     
