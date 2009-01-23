@@ -36,6 +36,11 @@ VideoLocal::~VideoLocal()
 }
 
 
+void VideoLocal::makeFullscreen()
+{
+    sink_->makeFullscreen();
+}
+
 void VideoLocal::init_source()
 {
     assert(source_ = srcConfig_.createSource());

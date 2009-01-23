@@ -22,11 +22,13 @@
 
 from optparse import OptionParser
 
-from libmilhouse import * # python bindings to our gst module
+import sys
+
+from milhouse import * # python bindings to our gst module
 
 class PofExcept(Exception): pass
 
-def getArgs():
+def parseArgs(args):
     """ Parse command line arguments """
 
     versionNum=str(PACKAGE_VERSION) + '\b' + str(RELEASE_CANDIDATE)
@@ -69,7 +71,7 @@ def getArgs():
             type="int", dest="timeout", default=0, 
             help="time in ms before stopping, 0 means play forever")
 
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def runAsSender(options):
@@ -102,7 +104,7 @@ def runAsReceiver(options):
 
     start()
     if options.fullscreen:
-        vRx.getVideoSink().makeFullscreen()
+        vRx.makeFullscreen()
 
     eventLoop(options.timeout)
     wasPlaying = isPlaying()
@@ -110,8 +112,9 @@ def runAsReceiver(options):
     return wasPlaying
 
 
-def main():
-    (options, args) = getArgs()
+def run(myArgs):
+    setHandler() # to catch interrupts
+    options = parseArgs(myArgs)[0]
     
     if options.isSender:
         print "running as sender"
@@ -123,5 +126,5 @@ def main():
         raise PofExcept("Must specify if this process is a sender or receiver")
 
 
-#setHandler() # to catch interrupts
-main()
+if __name__ == '__main__':
+    run(sys.argv[1:])

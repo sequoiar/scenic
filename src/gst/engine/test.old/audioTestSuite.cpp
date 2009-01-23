@@ -151,9 +151,8 @@ void AudioTestSuite::start_stop_8ch_jack()
 void AudioTestSuite::start_stop_8ch_audiofile()
 {
     const int NUM_CHANNELS = 8;
-    const int LOOP_COUNT = 4;
 
-    AudioSourceConfig srcConfig("filesrc", audioFilename_, NUM_CHANNELS, LOOP_COUNT);
+    AudioSourceConfig srcConfig("filesrc", audioFilename_, NUM_CHANNELS);
     AudioSinkConfig sinkConfig("jackaudiosink");
     AudioLocal tx(srcConfig, sinkConfig);
     TEST_THROWS_NOTHING(tx.init());

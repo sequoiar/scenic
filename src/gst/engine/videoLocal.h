@@ -34,12 +34,12 @@ class VideoLocal
         /// Constructor 
         explicit VideoLocal(const VideoSourceConfig srcConfig, const VideoSinkConfig sinkConfig) 
             : srcConfig_(srcConfig), sinkConfig_(sinkConfig), source_(0), sink_(0) {}
+        
+        void makeFullscreen();
 
         /// Destructor 
         ~VideoLocal();
     
-        VideoSink *getVideoSink() { return sink_; }
-
     private:
         void init_source();
         void init_sink();

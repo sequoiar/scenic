@@ -28,20 +28,16 @@ Usage: trial test/rx.py
 # system imports
 import twisted.trial.unittest
 
-# helper method
-from timeout import *
-
-
+import sropulpof
 
 class Test_milhouse_rx(twisted.trial.unittest.TestCase):
     """
     Integration tests for milhouse receiver.
     """
 
-    def test_01_defaults(self):
+    def test_01_default(self):
         TIMEOUT_S = 1
         TIMEOUT_MS = 1000 * TIMEOUT_S
-        args = '-r -o ' + str(TIMEOUT_MS)
-        cmd = '../sropulpof.py ' + args
-        if not timeoutCommand(cmd, TIMEOUT_S + 2):
-            print 'took too long'
+        args = ['-r', '-o', str(TIMEOUT_MS)]
+        sropulpof.run(args)
+

@@ -35,6 +35,10 @@ VideoReceiver::~VideoReceiver()
     delete decoder_;
 }
 
+void VideoReceiver::makeFullscreen()
+{
+    sink_->makeFullscreen();
+}
 
 void VideoReceiver::init_codec()
 {

@@ -40,7 +40,8 @@ using namespace boost::python;
 /// BOOST PYTHON MOD
 BOOST_PYTHON_MODULE(milhouse)
 {
-    class_< VideoReceiver, boost::noncopyable, boost::shared_ptr<VideoReceiver> >("VideoReceiver", no_init);
+    class_< VideoReceiver, boost::noncopyable, boost::shared_ptr<VideoReceiver> >("VideoReceiver", no_init)
+        .def("makeFullscreen", &VideoReceiver::makeFullscreen);
     class_< VideoSender, boost::noncopyable, boost::shared_ptr<VideoSender> >("VideoSender", no_init)
         .def("getCaps", &VideoSender::getCaps);     // methods
         

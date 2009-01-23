@@ -97,7 +97,7 @@ short pof::run(int argc, char **argv)
 
         playback::start();
         if(full)
-            vRx->getVideoSink()->makeFullscreen();
+            vRx->makeFullscreen();
 
         BLOCK();
         assert(playback::isPlaying());

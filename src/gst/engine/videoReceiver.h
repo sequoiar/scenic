@@ -38,7 +38,7 @@ class VideoReceiver
             : videoConfig_(vConfig), remoteConfig_(rConfig), session_(), depayloader_(0), 
             decoder_(0), sink_(0), gotCaps_(false) {}
 
-        VideoSink *getVideoSink() { return sink_; }
+        void makeFullscreen();
 
         ~VideoReceiver();
 
