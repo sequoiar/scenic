@@ -262,7 +262,8 @@ class Video4LinuxDriver(VideoDriver):
                     print "signal is ", signal_or_code
         if extra_arg == 'attr_change':
             event_name = 'attr'
-        self._on_done_devices_polling(caller) # attr_change, 
+        else:
+            self._on_done_devices_polling(caller) # attr_change, 
     
     def _handle_shell_infos_results(self, command, results, extra_arg=None, caller=None):
     	"""

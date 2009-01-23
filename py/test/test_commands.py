@@ -33,7 +33,7 @@ commands.log = utils.log.start('error', 1, 0, 'commands')
 
 global test
 
-def on_commands_results(results, commands, extra_arg=None):
+def on_commands_results(results, commands, extra_arg=None, caller=None):
     global test
     
     VERBOSE = False
