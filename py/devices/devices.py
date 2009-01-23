@@ -140,7 +140,7 @@ class Driver(object): #shell.ShellCommander):
         removed = {}
         for name in old_devices:
             if name not in self.devices:
-                removed[name] = old[name]
+                removed[name] = old_devices[name]
                 
         # check for added devices
         added = {}

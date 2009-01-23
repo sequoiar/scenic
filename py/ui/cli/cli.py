@@ -1180,11 +1180,11 @@ class CliView(Observer):
 
     def _devices_removed(self, origin, data):
         """
-        :data: list of devices.
+        :data: dict of devices.
         All from the same driver.
         """
         msg = []
-        for device in data:
+        for device in data.values():
             msg.append("Device %s:%s has been removed." % (device.driver.name, device.name))
         self.write("\n".join(msg), True)
     
