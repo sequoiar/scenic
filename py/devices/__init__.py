@@ -5,11 +5,11 @@ from devices import *
 
 # drivers
 import v4l2
-
+import jackd
 
 def start(api):
     v4l2.start(api)
-
+    jackd.start(api)
 
 def load_drivers(api):
     # TODO !!!

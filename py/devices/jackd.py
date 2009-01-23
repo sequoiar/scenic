@@ -44,7 +44,7 @@ from twisted.python import failure
 
 # App imports
 #from utils import log
-#from utils.commands import *
+from utils.commands import *
 from devices import *
 
 def _parse_jack_lsp(lines):
@@ -85,8 +85,15 @@ class DeviceError(Exception):
 def jackd_get_infos():
     """
     Looks in the file system for informations on running jackd servers. 
-
-    Returns a list of dict
+    
+    Returns a list of dict : 
+    [{'backend': 'alsa',
+    'device': 'hw:0',
+    'name': 'default',
+    'nperiods': 2,
+    'period': 1024,
+    'pid': 7471,
+    'rate': 44100}]
     """
     # /dev/shm/jack-$UID for jackd name 
     # g = glob.glob('/dev/shm/jack-1002/*/*-0')
@@ -176,13 +183,12 @@ def jackd_get_infos():
 
 class JackDriver(AudioDriver):
     """
-    Video4linux 2 Driver.
+    JACK audio server.
     
-    self.selected_device = "/dev/video0"
+    /usr/bin/jackd -dalsa -dhw:0 -r48000 -p1024 -n2 2>&1 > /dev/null
     """
-    name = 'JACK'
-    _jack_server_name = 'default'
-        
+    name = 'jackd'
+    
     def prepare(self):
         """
         Returns a Deferred instance? no
@@ -190,11 +196,10 @@ class JackDriver(AudioDriver):
         try:
             tmp = find_command('jack_lsp')
         except:
-            raise CommandNotFoundError("jacklsp command not found. Please sudo apt-get install jack")
-        name = os.getenv("JACK_DEFAULT_SERVER")
-        if isinstance(name, str):
-            self._jack_server_name = name
-
+            raise CommandNotFoundError("jacklsp command not found. Please sudo apt-get install jackd")
+        #name = os.getenv("JACK_DEFAULT_SERVER")
+        #if isinstance(name, str):
+        #    self._jack_server_name = name
         return Driver.prepare(self)
     
     def _on_devices_polling(self, caller=None, event_key=None):
@@ -204,12 +209,45 @@ class JackDriver(AudioDriver):
 
         Must return a Deferred instance.
         """
+        jacks = jackd_get_infos()
+        #[{'backend': 'alsa',
+        #'device': 'hw:0',
+        #'name': 'default',
+        #'nperiods': 2,
+        #'period': 1024,
+        #'pid': 7471,
+        #'rate': 44100}]
+        commands_to_start = []
+        extra_args = []
+        
+        for jack in jacks:
+            d = Device(jack['name']) # name is the jackd name
+            self._add_new_device(d)
+            d.add_attribute(StringAttribute('backend', jack['backend'], 'no default'))
+            d.add_attribute(StringAttribute('device', jack['device'], 'no default'))
+            
+            d.add_attribute(IntAttribute('nperiods', jack['nperiods'], 2, 0, 1024)) # in seconds min, max
+            d.add_attribute(IntAttribute('period', jack['period'], 1024, 2, 16777216)) # must be a power of two
+            d.add_attribute(IntAttribute('pid', jack['pid']))  # no default, min or max
+            d.add_attribute(IntAttribute('rate', jack['rate'], 48000, 44100, 192000))
+            commands_to_start.append(['jack_lsp']) # TODO: can we specify the server name??
+            extra_args.append(jack['name'])
+        print "will start commands:"
+        pprint.pprint(commands_to_start)  # TODO: add a timeout !!!
+        deferred = commands_start(commands_to_start, self.on_commands_results, extra_args, caller)
+        deferred.setTimeout(1.0, self._on_timeout, commands_to_start) # 1 second is plenty
+        return deferred 
+    
+    def _on_timeout(self, commands, *args):
+        print "jackd seems to be frozen !!"
+ 
     def on_attribute_change(self, attr, caller=None, event_key=None):
-        name = attr.name
-        val = attr.get_value() # new value
-        dev_name = attr.device.name
-        ret = None
-        #ret = single_command_start(command, self.on_commands_results, 'attr_change', caller) 
+        raise DeviceError("It is not possible to change jackd devices attributes.")
+        # name = attr.name
+        #  val = attr.get_value() # new value
+        #  dev_name = attr.device.name
+        #  ret = None
+        #  #ret = single_command_start(command, self.on_commands_results, 'attr_change', caller) 
         
     def on_commands_results(self, results, commands, extra_arg=None, caller=None): 
         """
@@ -229,25 +267,34 @@ class JackDriver(AudioDriver):
                     arg = None
                     if isinstance(extra_arg, list):
                         arg = extra_arg[i]
-                    else:
-                        arg = extra_arg
                     self._handle_shell_infos_results(command, stdout, arg, caller) # this is where all the poutine happens
                 else:
                     print "failure for command %s" % (command[0])
                     print "stderr: %s" % (stderr)
                     print "signal is ", signal_or_code
-        if extra_arg == 'attr_change':
-            event_name = 'attr'
-        else:
-            self._on_done_devices_polling(caller) # attr_change, 
+        self._on_done_devices_polling(caller) 
     
     def _handle_shell_infos_results(self, command, results, extra_arg=None, caller=None):
     	"""
         Handles results for only one command received by on_commands_results
         
         See on_command_results() 
+        extra_arg should be the jackd name.
         """
-        pass
+        if command[0] == 'jack_lsp':
+            try:
+                device = self._new_devices[extra_arg]
+            except IndexError:
+                pass # TODO: notify with exception
+            else:
+                splitted = results.splitlines()
+                dic = _parse_jack_lsp(splitted)
+                if not dic['running']:
+                    pass # TODO: notify with exception
+                else:
+                    device.add_attribute(IntAttribute('nb_sys_sinks', dic['nb_sys_sinks'], 2, 0, 64))
+                    device.add_attribute(IntAttribute('nb_sys_sources', dic['nb_sys_sources'], 2, 0, 64)) 
+
 
 def start(api):
     """
@@ -258,7 +305,9 @@ def start(api):
     managers['audio'].add_driver(driver)
     driver.prepare()
 
-
+if __name__ == '__name__':
+    print "JACK infos:"
+    pprint.pprint(jackd_get_infos())
 
 """
 #!/bin/bash
@@ -331,8 +380,4 @@ done
 jack_connect ${system_out}1 ${pof_in}4_1
 """
 
-
-if __name__ == '__name__':
-    print "JACK infos:"
-    pprint.pprint(jackd_get_infos())
 
