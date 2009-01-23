@@ -92,4 +92,28 @@ class Test_devices_v4l2(unittest.TestCase):
                     self.fail('Height should has been changed to %d but is %d.' % (h, val_h))
                 else:
                     pass
+class Test_devices_jackd(unittest.TestCase):
+    """
+    Integration tests for jackd devices.
+    """
+    def test_01_devices(self):
+        app.api.devices_list(app.me, 'audio')
+        value = app.last.value
+        if not isinstance(value, list):
+            self.fail('Last notify should give a list.')
+        elif len(value) == 0:
+            self.fail("There are no jackd running on this computer.")
+        elif not isinstance(value[0], devices.Device):
+            self.fail('Last notify should give a Device instance.')
+    
+    def test_02_attributes(self):
+        app.api.device_list_attributes(app.me, 'audio', 'jackd', 'default')
+        value = app.last.value
+        has_attr = False
+        if not isinstance(value, dict):
+            self.fail("Error trying to list device attribute. There might be no jackd running.")
+        try:
+            x = value['rate'].get_value()
+        except IndexError:
+            self.fail("Device has no rate attribute.")
 

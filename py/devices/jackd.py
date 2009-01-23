@@ -234,16 +234,23 @@ class JackDriver(AudioDriver):
             d.add_attribute(IntAttribute('rate', jack['rate'], 48000, 44100, 192000))
             commands_to_start.append(['jack_lsp']) # TODO: can we specify the server name??
             extra_args.append(jack['name'])
-        print "will start commands:"
-        pprint.pprint(commands_to_start)  # TODO: add a timeout !!!
+        #print "will start commands:"
+        #pprint.pprint(commands_to_start)  # TODO: add a timeout !!!
         deferred = commands_start(commands_to_start, self.on_commands_results, extra_args, caller)
-        deferred.setTimeout(1.0, self._on_timeout, commands_to_start) # 1 second is plenty
+        deferred.setTimeout(1.0, self._on_timeout, commands_to_start, extra_args) # 1 second is plenty
+        # TODO: setTimeout is deprecated !!!!!
         return deferred 
     
-    def _on_timeout(self, commands, *args):
+    def _on_timeout(self, commands, devices_names):
         print "jackd seems to be frozen !!"
+        #for d in devices_names
+        self._new_devices.clear()
+        self._on_done_devices_polling() 
  
     def on_attribute_change(self, attr, caller=None, event_key=None):
+        #if attr.name == 'running':
+        #    pass
+        #else:
         raise DeviceError("It is not possible to change jackd devices attributes.")
         # name = attr.name
         #  val = attr.get_value() # new value
@@ -274,7 +281,7 @@ class JackDriver(AudioDriver):
                     print "failure for command %s" % (command[0])
                     print "stderr: %s" % (stderr)
                     print "signal is ", signal_or_code
-        self._on_done_devices_polling(caller) 
+        self._on_done_devices_polling() #TODO add caller argument 
     
     def _handle_shell_infos_results(self, command, results, extra_arg=None, caller=None):
     	"""
@@ -291,11 +298,12 @@ class JackDriver(AudioDriver):
             else:
                 splitted = results.splitlines()
                 dic = _parse_jack_lsp(splitted)
-                if not dic['running']:
-                    pass # TODO: notify with exception
-                else:
-                    device.add_attribute(IntAttribute('nb_sys_sinks', dic['nb_sys_sinks'], 2, 0, 64))
-                    device.add_attribute(IntAttribute('nb_sys_sources', dic['nb_sys_sources'], 2, 0, 64)) 
+                #if not dic['running']:
+                    #device.attributes['running'].set_value(False)
+                #else:
+                device.add_attribute(IntAttribute('nb_sys_sinks', dic['nb_sys_sinks'], 2, 0, 64))
+                device.add_attribute(IntAttribute('nb_sys_sources', dic['nb_sys_sources'], 2, 0, 64)) 
+                #device.attributes['running'].set_value(True)
 
 
 def start(api):
