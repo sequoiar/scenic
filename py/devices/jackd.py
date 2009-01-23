@@ -28,6 +28,8 @@ Attributes of its (jackd) devices:
 * process id
 * command line string that started it.
 * buffer size
+
+"quand jackd est faché, lui toujours faire ainsi"
 """
 #TODO: 
 # ----------------------------------------------------------
