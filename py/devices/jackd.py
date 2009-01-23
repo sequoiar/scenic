@@ -133,7 +133,9 @@ def _parse_jack_lsp(lines):
         #ret['sample_rate'] = 48000 # TODO
         #ret['server_name'] = "SPAM" # TODO
     return ret    
-
+# /dev/shm/jack-$UID for jackd name 
+# g = glob.glob('/dev/shm/jack-1002/*/*-0')
+#file("/proc/28923/cmdline").read()
 class JackDriver(AudioDriver):
     """
     Video4linux 2 Driver.
