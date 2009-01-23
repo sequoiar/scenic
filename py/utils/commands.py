@@ -35,14 +35,9 @@ from twisted.internet import utils
 
 # App imports
 from utils import log
+from errors import CommandNotFoundError
 
 log = log.start('debug', 1, 0, 'commands')
-
-class CommandNotFoundError(Exception):
-    """
-    raised when a shell command is not found
-    """
-    pass
 
 def find_command(command_name, error_msg=None):
     """

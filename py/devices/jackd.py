@@ -48,6 +48,7 @@ from twisted.python import failure
 #from utils import log
 from utils.commands import *
 from devices import *
+from errors import DeviceError
 
 def _parse_jack_lsp(lines):
     """
@@ -76,13 +77,6 @@ def _parse_jack_lsp(lines):
         #ret['sample_rate'] = 48000 # TODO
         #ret['server_name'] = "SPAM" # TODO
     return ret
-
-#TODO: add to general errors.
-class DeviceError(Exception):
-    """
-    Can be raised at Device.prepare() or when polling.
-    """
-    pass
 
 def jackd_get_infos():
     """

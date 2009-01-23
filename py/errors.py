@@ -49,3 +49,17 @@ class ConnectorError(ConnectionError):
     """
     pass
 
+
+class CommandNotFoundError(Exception):
+    """
+    raised when a shell command is not found
+    """
+    pass
+
+class DeviceError(Exception):
+    """
+    Can be raised at Device.prepare() or when polling.
+    """
+    pass
+
+
