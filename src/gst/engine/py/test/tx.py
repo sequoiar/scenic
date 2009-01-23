@@ -28,21 +28,18 @@ Usage: trial test/tx.py
 # system imports
 import twisted.trial.unittest
 
-# to call sropulpof as if from shell
-import subprocess
+# helper method
+from timeout import *
+
 
 class Test_milhouse_tx(twisted.trial.unittest.TestCase):
     """
     Integration tests for milhouse sender.
     """
-    def setup(self):
-        self.timeout = 0.1
 
     def test_01_defaults(self):
         TIMEOUT_MS = 1000
         args = '-s -o ' + str(TIMEOUT_MS)
-        proc = subprocess.Popen('../sropulpof.py ' + args, shell=True) 
-        proc.wait()
-        #while proc.poll():
-        #    if time > timeout:
-        #        proc.kill()
+        cmd = '../sropulpof.py ' + args
+        if not timeoutCommand(cmd, 0.2):
+            print 'took too long'
