@@ -19,14 +19,15 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 """
-VideoDriver that manages v4l2 devices.
-
-Uses v4l2-ctl from Debian/Ubuntu package ivtv-utils
+JACK driver
 """
 #TODO: 
 # ----------------------------------------------------------
 # System imports
 import os, sys
+sys.path.append("devices/lib/python2.5/site-packages")
+import jack
+
 import pprint
 
 # Twisted imports
@@ -35,8 +36,8 @@ from twisted.python import procutils
 from twisted.python import failure
 
 # App imports
-from utils import log
-from utils.commands import *
+#from utils import log
+#from utils.commands import *
 from devices import *
 
 """
