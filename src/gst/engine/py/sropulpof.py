@@ -52,7 +52,7 @@ def parseArgs(args):
     parser.add_option("-s", "--sender", 
             action="store_true", dest="isSender", help="designate this process as sender")
     parser.add_option("-r", "--receiver", 
-            action="store_false", dest="isSender", help="designate this process as receiver")
+            action="store_true", dest="isReceiver", help="designate this process as receiver")
     parser.add_option("-f", "--fullscreen", 
             action="store_true", dest="fullscreen", help="set videowindow to fullsceen (receiver side only)")
     parser.add_option("-d", "--videodevice", 
@@ -72,6 +72,21 @@ def parseArgs(args):
             help="time in ms before stopping, 0 means play forever")
 
     return parser.parse_args(args)
+
+
+def runAsReceiver(options):
+    """ Receives media from a remote sender """
+    vRx = buildVideoReceiver(options.ip, options.videoCodec, options.videoPort, options.screenNum, options.videoSink)
+    aRx = buildAudioReceiver(options.ip, options.audioCodec, options.audioPort, options.audioSink)
+
+    start()
+    if options.fullscreen:
+        vRx.makeFullscreen()
+
+    eventLoop(options.timeout)
+    wasPlaying = isPlaying()
+    stop()
+    return wasPlaying
 
 
 def runAsSender(options):
@@ -97,19 +112,6 @@ def runAsSender(options):
     stop()
     return wasPlaying
 
-def runAsReceiver(options):
-    """ Receives media from a remote sender """
-    vRx = buildVideoReceiver(options.ip, options.videoCodec, options.videoPort, options.screenNum, options.videoSink)
-    aRx = buildAudioReceiver(options.ip, options.audioCodec, options.audioPort, options.audioSink)
-
-    start()
-    if options.fullscreen:
-        vRx.makeFullscreen()
-
-    eventLoop(options.timeout)
-    wasPlaying = isPlaying()
-    stop()
-    return wasPlaying
 
 
 def run(myArgs):
@@ -119,7 +121,7 @@ def run(myArgs):
     if options.isSender:
         print "running as sender"
         runAsSender(options)
-    elif not options.isSender:
+    elif options.isReceiver:
         print "running as receiver"
         runAsReceiver(options)
     else:
@@ -128,3 +130,4 @@ def run(myArgs):
 
 if __name__ == '__main__':
     run(sys.argv[1:])
+
