@@ -120,10 +120,10 @@ def run(myArgs):
     
     if options.isSender:
         print "running as sender"
-        runAsSender(options)
+        return runAsSender(options)
     elif options.isReceiver:
         print "running as receiver"
-        runAsReceiver(options)
+        return runAsReceiver(options)
     else:
         raise PofExcept("Must specify if this process is a sender or receiver")
 
