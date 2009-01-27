@@ -247,6 +247,14 @@ table.graph td {
 	margin-top: 30px;
 }
  
+input, select, textarea {
+	border: 1px solid #999;
+}
+
+input.but {
+	border: 2px #F0F0F0 outset;
+}
+
 #modules_tab { 
 	background-color: #afc4c4;
 	height: 30px;

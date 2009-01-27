@@ -62,7 +62,7 @@
 				</div>
 			</div>
 			<h3>&nbsp;</h3>
-			<input type="button" value="Connect"/>
+			<input type="button" value="Connect" class="but"/>
 			<h3></h3>
 			<input type="checkbox"/> Test&nbsp; &nbsp;<input type="checkbox"/> Loop
 			<h3></h3>
@@ -194,23 +194,26 @@
 							<div class="triangle"></div>
 							Audio
 							<select>
-								<option>MP3 Stereo</option>
+								<option>MP3 Stereo (modified)</option>
 								<option>PCM 8 Channels</option>
 								<option>Edit...</option>
 							</select>
+							<input type="button" value="Save" class="but" style="font-size:10px;position:relative;left:210px;" />
+							<input type="button" value="Save As..." class="but" style="font-size:10px;position:relative;left:210px;" />
 							<div class="close"></div>
 						</div>
 						<div class="controls">
-								<table>
-									<tr align="center">
-										<td><img src="img/vumeter.png" width="15" height="60" alt="vumeter" /></td>
-										<td><img src="img/vumeter.png" width="15" height="60" alt="vumeter" /></td>
-									</tr>
-									<tr align="center">
-										<td><input type="text" value="Track 1" /></td>
-										<td><input type="text" value="Track 2" /></td>
-									</tr>
-								</table>
+							<table>
+								<tr align="center">
+									<td><img src="img/vumeter.png" width="15" height="60" alt="vumeter" /></td>
+									<td><img src="img/vumeter.png" width="15" height="60" alt="vumeter" /></td>
+								</tr>
+								<tr align="center">
+									<td><input type="text" value="Track 1" /></td>
+									<td><input type="text" value="Track 2" /></td>
+								</tr>
+							</table>
+							<div style="color:#FFF;font-size:12px;background-color:#FF9999;margin:10px;padding:5px;text-decoration:blink;"><b>Warning:</b> JACK Audio is not available</div>
 							<div id="asf" class="sett">
 								<div>
 								&nbsp;&nbsp;&nbsp;&nbsp;Settings
@@ -272,7 +275,7 @@
 							<div class="close"></div>
 						</div>
 						<div class="controls">
-							<img src="img/video_prev.png" width="320" height="240"/>
+							<img src="img/video_prev.png" width="320" height="240" style="border: 1px solid #333;" />
 							<div id="ashh" class="sett">
 								<div>
 								&nbsp;&nbsp;&nbsp;&nbsp;Settings
@@ -498,7 +501,7 @@
 									<td>
 									</td>
 									<td>
-										<input type="button" value="Change User"/>
+										<input type="button" value="Change User" class="but"/>
 									</td>
 								</tr>
 								<tr>
@@ -537,7 +540,7 @@
 							<td></td>
 							<td></td>
 							<td></td>
-							<td align="right"><br /><input type="button" name="test_start" value="Start" /></td>
+							<td align="right"><br /><input type="button" name="test_start" value="Start" class="but" /></td>
 						</tr>
 					</table>
 					<b>Results</b>

@@ -211,12 +211,18 @@ class ConnectionBasic(Connection):
 #        Connection.accepted(self)
 #        self.send_settings()
 
-    def com_chan_started_client(self):
-        self.send_settings()
+    def com_chan_started_client(self, action="media"):
+        if action == "media":
+            self.send_settings()
+        elif action == "network_test":
+            self.api.network_test.client_started(self) 
 
-    def com_chan_started_server(self):
-        self.com_chan.add(self.settings)
-
+    def com_chan_started_server(self, action="media"):
+        if action == "media":
+            self.com_chan.add(self.settings)
+        elif action == "network_test":
+            self.api.network_test.server_started(self) 
+    
     def settings(self, settings):
         self.com_chan.delete(self.settings)
         self.api.select_streams(self, 'receive')
