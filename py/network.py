@@ -38,100 +38,6 @@ from utils import commands
 
 log = log.start('debug', 1, 0, 'network')
 
-# constants
-STOPPED = 0
-SERVER_RUNNING = 1
-CLIENT_RUNNING = 2 
-
-# globals
-iperf_server = None
-iperf_client = None
-api = None
-executable = None
-state = STOPPED
-
-# functions ---------------------------------------------
-def start(subject):
-    """
-    Initial setup of the whole module.
-    """
-    global api, executable
-
-    api = subject
-    executable = commands.find_command("iperf", 
-            "`iperf` command not found. Please see See https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting for installation instructions.")
-
-class IperfServerProcessProtocol(protocol.ProcessProtocol):
-    def __init__(self):
-        pass
-
-    def connectionMade(self):
-        pass # print "connectionMade"
-
-    def outReceived(self, data):
-        print data
-
-    def errReceived(self, data):
-        pass # print "errReceived! with %d bytes!" % len(data)
-
-    def inConnectionLost(self):
-        pass # print "inConnectionLost! stdin is closed! (we probably did it)"
-
-    def outConnectionLost(self):
-        pass # print "outConnectionLost! The child closed their stdout!"
-
-    def errConnectionLost(self):
-        pass # print "errConnectionLost! The child closed their stderr."
-
-    def processEnded(self, status_object):
-        print "Ended, status %d" % status_object.value.exitCode
-        #print "STOP REACTOR"
-        #reactor.stop()
-
-
-def kill_process(process_transport, sig=15, verify_timeout=1.0):
-    """
-    Kills a process started using reactor.spawnProcess
-    Double checks after 0.1 second
-    """
-    global state
-
-    try:
-        process_transport.signalProcess(sig)
-    except Exception, e:
-        print e
-    if sig == 15:
-        reactor.callLater(verify_timeout, kill_process, process_transport, 9)
-    else:
-        process_transport.loseConnection()
-        state = STOPPED
-
-def on_iperf_client_results(results, commands, extra_arg, caller):
-    """
-    Called once a bunch of child processes are done.
-    
-    See utils.commands
-    """
-    global state
-    for i in range(len(results)): # should have a len() of 1
-        result = results[i]
-        success, results_infos = result
-        command = commands[i]
-        
-        if isinstance(results_infos, failure.Failure):
-            print ">>>> FAILURE : ", results_infos.getErrorMessage()  # if there is an error, the programmer should fix it.
-        else:
-            stdout, stderr, signal_or_code = results_infos
-            if success:
-                print "stdout:", stdout
-                iperf_stats = _parse_iperf_output(stdout.splitlines())
-                print iperf_stats
-                state = STOPPED
- 
-class NetworkError(Exception):
-    """Any error due to iperf."""
-    pass
-
 def _parse_iperf_output(lines):
     """
     Parses the output of iperf -c <host> -u
@@ -149,7 +55,7 @@ def _parse_iperf_output(lines):
             # error !!
             raise NetworkError("Impossible to reach remote iperf server.")
         if line.startswith("2"): # date
-            print line
+            #print line
             if line_index == 0:
                 line_index += 1
             else: # 2nd line is the only one we need
@@ -187,51 +93,151 @@ def _parse_iperf_output(lines):
 #    [  3] Sent 852 datagrams
 #    [  3] Server Report:
 #    [  3]  0.0-10.0 sec  1.19 MBytes  1000 Kbits/sec  0.006 ms    0/  852 (0%)
-def start_iperf_client(caller, server_addr, bandwidth_megabits=1, duration=10):
-    """
-    Starts  iperf -c localhost -u -t 10 -b 1M
-    """
-    global executable
-    global state
+
+
+class IperfServerProcessProtocol(protocol.ProcessProtocol):
+    def __init__(self):
+        pass
+
+    def connectionMade(self):
+        pass # print "connectionMade"
+
+    def outReceived(self, data):
+        print data
+
+    def errReceived(self, data):
+        pass # print "errReceived! with %d bytes!" % len(data)
+
+    def inConnectionLost(self):
+        pass # print "inConnectionLost! stdin is closed! (we probably did it)"
+
+    def outConnectionLost(self):
+        pass # print "outConnectionLost! The child closed their stdout!"
+
+    def errConnectionLost(self):
+        pass # print "errConnectionLost! The child closed their stderr."
+
+    def processEnded(self, status_object):
+        print "Ended, status %d" % status_object.value.exitCode
+        #print "STOP REACTOR"
+        #reactor.stop()
+
+class NetworkError(Exception):
+    """Any error due to iperf."""
+    pass
+
+
+class IperfTester(object):
+    # constants
+    STOPPED = 0
+    SERVER_RUNNING = 1
+    CLIENT_RUNNING = 2 
     
-    if state == STOPPED:
-        command = ["iperf", "-c", server_addr, "-t ", str(duration), "-y", "c", "-u", "-b", "%dM" % (bandwidth_megabits)] 
-        #deferred = commands._command_start(executable, command)
-        extra_arg = None
-        callback = on_iperf_client_results
+    def __init__(self):
+        # globals
+        self.iperf_server = None
+        self.iperf_client = None
+        self.api = None
+        self.state = self.STOPPED
+
+    def kill_process(self, process_transport, sig=15, verify_timeout=1.0):
+        """
+        Kills a process started using reactor.spawnProcess
+        Double checks after 0.1 second
+        
+        Used in this case to kill the iperf server.
+        """
         try:
-            commands.single_command_start(command, callback, extra_arg, caller)
+            process_transport.signalProcess(sig)
         except Exception, e:
             print e
+        if sig == 15:
+            reactor.callLater(verify_timeout, self.kill_process, process_transport, 9)
         else:
-            state = CLIENT_RUNNING
+            process_transport.loseConnection()
+            self.state = self.STOPPED
 
-def start_iperf_server():
-    """
-    Starts `iperf -s -u`
-    """
-    global state, iperf_server
+    def on_iperf_client_results(self, results, commands, extra_arg, caller):
+        """
+        Called once a bunch of child processes are done.
+        
+        See utils.commands
+        """
+        for i in range(len(results)): # should have a len() of 1
+            result = results[i]
+            success, results_infos = result
+            command = commands[i]
+            
+            if isinstance(results_infos, failure.Failure):
+                print ">>>> FAILURE : ", results_infos.getErrorMessage()  # if there is an error, the programmer should fix it.
+            else:
+                stdout, stderr, signal_or_code = results_infos
+                if success:
+                    #print "stdout:", stdout
+                    iperf_stats = _parse_iperf_output(stdout.splitlines())
+                    self.state = self.STOPPED
+                    self.notify_api(caller, "stats", iperf_stats)
+                else:
+                    self.notify_api(caller, "error", "Unknown error.") # TODO
 
-    if state == STOPPED:
-        proto = IperfServerProcessProtocol()
-        try:
-            iperf_server = reactor.spawnProcess(proto, "/usr/bin/iperf", ["/usr/bin/iperf", "-s", "-u"], os.environ)
-        except OSError, e:
-            print "Error starting process: ", e 
-        else:
-            state = SERVER_RUNNING
-            reactor.callLater(15.0, kill_process, iperf_server)
+    def notify_api(self, caller, key, res):
+        if key == "stats":
+            print "STATS: ", res
+            print "(caller is %s)" % (caller)
+        elif key == "error":
+            print "ERROR !", res
+
+    def start_iperf_client(self, caller, server_addr, bandwidth_megabits=1, duration=10):
+        """
+        Starts  iperf -c localhost -u -t 10 -b 1M
+        """
+        
+        if self.state == self.STOPPED:
+            command = ["iperf", "-c", server_addr, "-t", str(duration), "-y", "c", "-u", "-b", "%dM" % (bandwidth_megabits)] 
+            extra_arg = None
+            callback = self.on_iperf_client_results
+            try:
+                commands.single_command_start(command, callback, extra_arg, caller)
+            except Exception, e:
+                print e
+            else:
+               self.state = self.CLIENT_RUNNING
+
+    def start_iperf_server(self):
+        """
+        Starts `iperf -s -u`
+        """
+        if self.state == self.STOPPED:
+            proto = IperfServerProcessProtocol()
+            try:
+                self.iperf_server = reactor.spawnProcess(proto, "/usr/bin/iperf", ["/usr/bin/iperf", "-s", "-u"], os.environ)
+            except OSError, e:
+                print "Error starting process: ", e 
+            else:
+                self.state = self.SERVER_RUNNING
+                reactor.callLater(15.0, self.kill_process, self.iperf_server)
 
 def debug_meanwhile():
-    global state
-    print "waiting...", state
+    print "waiting..."
     reactor.callLater(1.0, debug_meanwhile)
 
+# functions ---------------------------------------------
+def start(subject):
+    """
+    Initial setup of the whole module.
+    """
+    iperf = IperfTester()
+    iperf.api = subject
+    executable = commands.find_command("iperf", 
+            "`iperf` command not found. Please see See https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting for installation instructions.")
+    return iperf
+
 if __name__ == "__main__":
+    iperf = IperfTester()
     if len(sys.argv) == 2:
         if sys.argv[1] == "client":
             print "starting client..."
-            start_iperf_client(None, "10.10.10.65") # "localhost")
+            iperf.start_iperf_client("Dummy caller", "10.10.10.65", 1, 1) # "localhost"
         else:
             print "usage: <file name> client"
     else:
