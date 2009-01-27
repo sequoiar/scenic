@@ -20,27 +20,22 @@ body {
 	padding: 20px;
 }
 
-#media_but {
+#tabs {
 	position: absolute;
-	left: 50px;
-	height: 30px;
-	width: 160px;
-	background-color: #afc4c4;
-}
-
-#network_but {
-	position: absolute;
-	left: 250px;
-	height: 30px;
-	width: 160px;
-	background-color: #adaec4;
+	top: 0px;
+	bottom: 22px;
+	left: 300px;
+	background: #eee;
+	width: 30px;
+	padding: 30px 5px;
+	text-align: center;
 }
 
 #right_pan {
 	position: absolute;
 	top: 0px;
 	bottom: 22px;
-	left: 300px;
+	left: 340px;
 	right: 0px;
 	overflow: auto;
 }
@@ -78,81 +73,6 @@ body {
 	margin-right: 320px;
 }
 
-#contacts {
-	width: 220px;
-	height: 100px;
-	overflow: auto;
-	background-color: #FFF;
-	border: solid 1px #999;
-	font-size: 11px;
-}
-
-#contacts table {
-	width: 100%;
-	border-collapse: collapse;
-}
-
-#contacts td {
-	border-bottom: 1px dotted #999;
-	height: 16px;
-	padding: 2px 4px;
-}
-
-h3 span {
-	background-color: #FFF;
-	border: 1px solid #999;
-	padding: 0 3px;
-}
-
-td.active {
-	background-color: #99DD99;
-	width: 12px;
-}
-
-td.toto {
-	background-color: #DD9999;
-	width: 12px;
-}
-
-td.chati {
-	background: url(../img/internet-group-chat.png) no-repeat;
-	width: 16px;
-}
-
-#contact_field {
-	width: 220px;
-	border-collapse: collapse;
-}
-
-#contact_field td {
-	font-size: 11px;
-	text-align: right;
-	padding: 2px;
-}
-
-#contact_field input {
-	border: 1px solid #999;
-	padding: 0 2px;
-}
-
-#status {
-	margin-top: 13px;
-	background-color: #c0f4c5;
-	text-align: center;
-	font-size: 13px;
-	line-height: 20px;
-	height: 20px;
-}
-
-table.graph {
-	width: 220px;
-}
-
-table.graph td {
-	font-size: 9px;
-}
-
-
 .bottom_title {
 	position: relative;
 	background-color: #333;
@@ -161,19 +81,6 @@ table.graph td {
 	color: #FFF;
 	font-weight: bold;
 	font-size: 14px;
-}
-
-.substat {
-	position: relative;
-	height: 18px;
-	padding: 2px 20px 2px;
-	color: #000;
-	font-size: 11px;
-	border-bottom: 1px dotted #999;
-}
-
-#contact_details_cont, #substatus_cont {
-	border-bottom: 1px dotted #999;
 }
 
 .bot_triangle {
@@ -198,67 +105,21 @@ table.graph td {
 	background: url(../img/triangle_1.png) no-repeat;
 }
 
-.bot_trianble {
-	position: absolute;
-	width: 12px;
-	height: 12px;
-	left: 5px;
-	top: 3px;
-	background: url(../img/trianble_up_0.png) no-repeat;
-}
 
-.bot_trianble:hover {
-	background: url(../img/trianble_up_1.png) no-repeat;
-	cursor: pointer;
-}
-
-.bot_trianble_up {
-	background: url(../img/trianble_0.png) no-repeat;
-}
-
-.bot_trianble_up:hover {
-	background: url(../img/trianble_1.png) no-repeat;
-}
-
-#media_thumb {
-	position: absolute;
-	left: 400px;
-	margin-top: -30px;
-	height: 30px;
-	width: 300px;
-}
 
 #network {
-	position: inherit;
-	display: none;
-	margin-top: 30px;
+/*	display: none;*/
+	padding: 20px 30px;
 }
 
 .module {
 	margin: 20px 0;
 }
 
-#modules_pan { 
-/*
+#modules { 
 	display: none;
-
-*/	position: inherit;
+	position: inherit;
 	padding-bottom: 22px;
-	margin-top: 30px;
-}
- 
-#modules_tab { 
-	background-color: #afc4c4;
-	height: 30px;
-	line-height: 30px;
-	padding: 0 20px;
-}
- 
-#network_tab { 
-	background-color: #adaec4;
-	height: 30px;
-	line-height: 30px;
-	padding: 0 20px;
 }
  
 ul#sortables {
@@ -284,46 +145,9 @@ li.module {
 	cursor: move;
 }
 
-.mod_title select {
-	position: absolute;
-	height: 16px;
-	left: 145px;
-	top: 3px;
-	z-index: 100000;
-	font-size: 10px;
-}
-
-.sett {
-	position: relative;
-}
-
-.subsettings {
-	border: 1px dotted #999;
-	padding: 10px;
-	
-}
-
 .controls {
-	position: relative;
 	border: 1px solid #ddd;
-/*	height: 100px;*/
-	padding: 15px 10px;
-	font-size: 10px;
-}
-
-.controls select {
-	font-size: 10px;
-}
-
-.controls input {
-	font-size: 10px;
-	width: 50px;
-}
-
-.sett {
-	border-top: 1px dotted #CCC;
-	margin-top: 10px;
-	padding-top: 3px;
+	height: 100px;
 }
 
 .close {
@@ -362,13 +186,6 @@ li.module {
 	background: url(../img/triangle_up_1.png) no-repeat;
 }
 
-.text_but {
-	font-weight: bold;
-	text-align: center;
-	font-size: 13px;
-	line-height: 30px;
-}
-
 .text_but:hover {
 	cursor: pointer;
 }
@@ -405,4 +222,7 @@ h3 {
 
 #video_loc .mod_title, #thumb_video_loc {
 	background-color: #c3c;
+}
+#sylvain_loc .mod_title, #thumb_sylvain_loc {
+	background-color: #33c;
 }

@@ -151,6 +151,7 @@ class Stream(object):
         self._core = core
         self.port = None  # (int) 
         self.buffer = None  # (int) 
+        self.engine = None  # (int) 
 #        self.mode = None  # (string) send or receive
         self._state = 0
     

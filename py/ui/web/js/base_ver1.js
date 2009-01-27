@@ -4,17 +4,15 @@
 
  window.addEvent('domready', function(){
  	
-	$('c_name').setProperty('value', '');
- 	
 	// Media/Network toggle
 	$('media_but').addEvent('click', function() {
-		$('modules_pan').setStyle('display', 'block');
+		$('modules').setStyle('display', 'block');
 		$('media_thumb').setStyle('display', 'block');
 		$('network').setStyle('display', 'none');
 	});
 	
 	$('network_but').addEvent('click', function() {
-		$('modules_pan').setStyle('display', 'none');
+		$('modules').setStyle('display', 'none');
 		$('media_thumb').setStyle('display', 'none');
 		$('network').setStyle('display', 'block');
 	});
@@ -32,7 +30,7 @@
 		thisId = this.getParent().getParent().id;
 		var control = bot_controls[thisId];
 		if (thisId == "help") {
-			var modPad = $('modules_pan');
+			var modPad = $('modules');
 		}
 		if (control.wrapper.offsetHeight == 0) {
 			this.addClass('bot_triangle_up');
@@ -49,18 +47,6 @@
 		}
 	});
 
-	$$('div.bot_trianble').addEvent('click', function() {
-		thisId = this.getParent().getParent().id;
-		var control = bot_controls[thisId];
-		if (control.wrapper.offsetHeight == 0) {
-			this.addClass('bot_trianble_up');
-			control.slideIn();
-		} else {
-			this.removeClass('bot_trianble_up');
-			control.slideOut();
-		}
-	});
-
 	// Module close button
 	$$('div.close').addEvent('click', function(){
 		var mod_parent = this.getParent().getParent();
@@ -69,9 +55,7 @@
  		   'styles': {
 		        'width': '20px',
 		        'height': '20px',
-				'cursor': 'pointer',
-				'float': 'left',
-				'margin': '5px 2px'
+				'cursor': 'pointer'
 		    },
 		    'events': {
 		        'click': function(){
@@ -106,40 +90,6 @@
 	 new Sortables($('modules'), {
 	 	handles: '.mod_title'
 	 }); 
-
-	// Contact list selection
-	var contact_rows = $$('#contacts table tr')
-	contact_rows.addEvent('click', function(){
-		contact_rows.setStyle('background-color', '#FFF');
-		this.setStyle('background-color', '#e2f6ff');
-		$('c_name').setProperty('value', this.getChildren()[0].getText());
-	});
-	
-	// remove contact
-	$('moins').addEvent('click', function(){
-		$('c_name').setProperty('value', '');
-		contact_rows.each(function(row){
-			if (row.getStyle('background-color') == '#e2f6ff') {
-				row.remove();
-			}
-		});
-	});
-
-	// add contact
-	$('plus').addEvent('click', function(){
-		contact_rows.setStyle('background-color', '#FFF');
-		$('c_name').setProperty('value', 'New Contact');
-		var control = bot_controls['contact_details'];
-		if (control.wrapper.offsetHeight == 0) {
-		$$('#contact_details div.bot_trianble')[0].addClass('bot_trianble_up');
-			control.slideIn();
-		}
-	});
-	
-	$('c_name').addEvent('click', function(){
-		if (this.getProperty('value') == 'New Contact') {
-			this.setProperty('value', '');
-		}
-	});
+ 
 });
 

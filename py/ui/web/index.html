@@ -10,45 +10,161 @@
 </head>
 	<body>
 		<div id="left_pan">
-			<h2>Sropulpof</h2>
+			<h2>Propulseart</h2>
 			<hr />
-			Presets:
-			<select>
-				<option>Beluga</option>
-				<option>Manchester</option>
-				<option>Edit...</option>
-			</select>
-			<h3>Buddies</h3>
-			<select multiple="multiple" size="6" style="width: 200px;">
-				<option>Mes amis</option>
-				<option>Les autres</option>
-				<option>Le pas fin</option>
-				<option>Belinda</option>
-			</select>
-			<h3>+ -</h3>
-			<h3>Name</h3>
-			<input type="text"/>
-			<h3>Address</h3>
-			<input type="text"/>
+			<h3>Contacts</h3>
+			<div id="contacts">
+				<table>
+					<tr>
+						<td>Mes amis</td>
+						<td>&nbsp;</td>
+						<td class="active">&nbsp;</td>
+					</tr>
+					<tr>
+						<td>Les autres</td>
+						<td class="chati"></td>
+						<td class="active"></td>
+					</tr>
+					<tr>
+						<td>Le pas fin</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Belinda</td>
+						<td></td>
+						<td class="toto"></td>
+					</tr>
+				</table>
+			</div>
+			<h3><span id="plus">+</span> <span id="moins">-</span></h3>
 			<h3></h3>
+			<div id="contact_details">
+				<div class="substat">
+					<div class="bot_trianble"></div>
+					Details
+				</div>
+				<div id="contact_details_cont" class="bot_controls">
+					<table id="contact_field">
+						<tr>
+							<td>Name: </td>
+							<td><input id="c_name" type="text"/></td>
+						</tr>
+						<tr>
+							<td>Address: </td>
+							<td><input type="text"/></td>
+						</tr>
+						<tr>
+							<td>Port: </td>
+							<td><input type="text"/></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<h3>&nbsp;</h3>
 			<input type="button" value="Connect"/>
 			<h3></h3>
 			<input type="checkbox"/> Test&nbsp; &nbsp;<input type="checkbox"/> Loop
 			<h3></h3>
 			<hr />
-			<h3>Status</h3>
-			<p>
-				<b>Connection:</b> None<br />
-				<b>Internet Address:</b> 192.168.2.34<br />
-				<b>Private Address:</b> 136.2.1.23<br />
-				<br />
-				<b>Audio:</b> 2 Channels PCM 8 bits / 48 KHz<br />
-				<b>Video:</b> DV<br />
-				<b>Data:</b> None<br />
-				<br />
-				<br />
-				Idle
-			</p>
+			<h3>Connection Status</h3>
+			<div id="status">Good</div>
+			<table class="graph">
+				<tr>
+					<td rowspan="3" style="line-height: 8px;">S&nbsp;&nbsp; e n d</td>
+					<td>Bandwidth</td>
+					<td>Latency</td>
+					<td>Jitter</td>
+					<td>Packet Loss</td>
+				</tr>
+				<tr>
+					<td><img src="img/graphs1.png" width="53" height="25" /></td>
+					<td><img src="img/graphs2.png" width="53" height="25" /></td>
+					<td><img src="img/graphs3.png" width="53" height="25" /></td>
+					<td><img src="img/graphs4.png" width="53" height="25" /></td>
+				</tr>
+				<tr>
+					<td>2354 Mbps</td>
+					<td>33 ms</td>
+					<td>23 ms</td>
+					<td>0.1 %</td>
+				</tr>
+				<tr>
+					<td rowspan="2" style="line-height: 8px;">R&nbsp;&nbsp; e c v</td>
+					<td><img src="img/graphs1.png" width="53" height="25" /></td>
+					<td><img src="img/graphs2.png" width="53" height="25" /></td>
+					<td><img src="img/graphs3.png" width="53" height="25" /></td>
+					<td><img src="img/graphs4.png" width="53" height="25" /></td>
+				</tr>
+				<tr>
+					<td>2354 Mbps</td>
+					<td>33 ms</td>
+					<td>23 ms</td>
+					<td>0.1 %</td>
+				</tr>
+			</table>
+			<div id="substatus">
+				<div class="substat">
+					<div class="bot_trianble"></div>
+					Details
+				</div>
+				<div id="substatus_cont" class="bot_controls">
+					<table class="graph">
+						<tr>
+							<td rowspan="2" style="line-height: 8px;">S&nbsp;V e&nbsp;1 n&nbsp; d&nbsp;</td>
+							<td><img src="img/graphs1.png" width="53" height="25" /></td>
+							<td><img src="img/graphs2.png" width="53" height="25" /></td>
+							<td><img src="img/graphs3.png" width="53" height="25" /></td>
+							<td><img src="img/graphs4.png" width="53" height="25" /></td>
+						</tr>
+						<tr>
+							<td>1549 Mbps</td>
+							<td>31 ms</td>
+							<td>10 ms</td>
+							<td>0.1 %</td>
+						</tr>
+						<tr>
+							<td rowspan="2" style="line-height: 8px;">R&nbsp;V e&nbsp;1 c&nbsp; v&nbsp;</td>
+							<td><img src="img/graphs3.png" width="53" height="25" /></td>
+							<td><img src="img/graphs4.png" width="53" height="25" /></td>
+							<td><img src="img/graphs1.png" width="53" height="25" /></td>
+							<td><img src="img/graphs2.png" width="53" height="25" /></td>
+						</tr>
+						<tr>
+							<td>805 Mbps</td>
+							<td>2 ms</td>
+							<td>13 ms</td>
+							<td>0.0 %</td>
+						</tr>
+						<tr>
+							<td rowspan="2" style="line-height: 8px;">S&nbsp;A e&nbsp;1 n&nbsp; d&nbsp;</td>
+							<td><img src="img/graphs1.png" width="53" height="25" /></td>
+							<td><img src="img/graphs2.png" width="53" height="25" /></td>
+							<td><img src="img/graphs3.png" width="53" height="25" /></td>
+							<td><img src="img/graphs4.png" width="53" height="25" /></td>
+						</tr>
+						<tr>
+							<td>1549 Mbps</td>
+							<td>31 ms</td>
+							<td>10 ms</td>
+							<td>0.1 %</td>
+						</tr>
+						<tr>
+							<td rowspan="2" style="line-height: 8px;">R&nbsp;A e&nbsp;1 c&nbsp; v&nbsp;</td>
+							<td><img src="img/graphs3.png" width="53" height="25" /></td>
+							<td><img src="img/graphs4.png" width="53" height="25" /></td>
+							<td><img src="img/graphs1.png" width="53" height="25" /></td>
+							<td><img src="img/graphs2.png" width="53" height="25" /></td>
+						</tr>
+						<tr>
+							<td>805 Mbps</td>
+							<td>2 ms</td>
+							<td>13 ms</td>
+							<td>0.0 %</td>
+						</tr>
+					</table>
+				</div>
+			</div>
 		</div>
 
 		<div id="chat">
@@ -59,66 +175,234 @@
 			<div id="chat_cont" class="bot_controls">Blabla</div>
 		</div>
 		
-		<div id="tabs">
-			<div id="media_but" class="text_but">M</div>
-			<div id="network_but" class="text_but">N</div>
-			<div id="media_thumb"></div>				
-		</div>
-
 		<div id="right_pan">
-			<ul id="modules">
-				<li id="audio_loc" class="module">
-					<div class="mod_title">
-						<div class="triangle"></div>
-						Audio
-						<div class="close"></div>
-					</div>
-					<div class="controls">
-						
-					</div>
-				</li>
-		
-				<li id="data_loc" class="module">
-					<div class="mod_title">
-						<div class="triangle"></div>
-						Data
-						<div class="close"></div>
-					</div>
-					<div class="controls">
-						
-					</div>
-				</li>
-				<li id="video_loc" class="module">
-					<div class="mod_title">
-						<div class="triangle"></div>
-						Video
-						<div class="close"></div>
-					</div>
-					<div class="controls">
-						
-					</div>
-				</li>
-				<li id="sylvain_loc" class="module">
-					<div class="mod_title">
-						<div class="triangle"></div>
-						Sylvain
-						<div class="close"></div>
-					</div>
-					<div class="controls">
-						
-					</div>
-				</li>
-			</ul>
-			
+			<div id="media_but" class="text_but">Media Streams</div>
+			<div id="network_but" class="text_but">Network</div>
+			<div id="modules_pan">
+				<div id="modules_tab">
+					Presets:
+					<select>
+						<option>Audio Stereo</option>
+						<option>A/V Conference</option>
+						<option>Edit...</option>
+					</select>
+					<div id="media_thumb"></div>				
+				</div>
+				<ul id="modules">
+					<li id="audio_loc" class="module">
+						<div class="mod_title">
+							<div class="triangle"></div>
+							Audio
+							<select>
+								<option>MP3 Stereo</option>
+								<option>PCM 8 Channels</option>
+								<option>Edit...</option>
+							</select>
+							<div class="close"></div>
+						</div>
+						<div class="controls">
+								<table>
+									<tr align="center">
+										<td><img src="img/vumeter.png" width="15" height="60" alt="vumeter" /></td>
+										<td><img src="img/vumeter.png" width="15" height="60" alt="vumeter" /></td>
+									</tr>
+									<tr align="center">
+										<td><input type="text" value="Track 1" /></td>
+										<td><input type="text" value="Track 2" /></td>
+									</tr>
+								</table>
+							<div id="asf" class="sett">
+								<div>
+								&nbsp;&nbsp;&nbsp;&nbsp;Settings
+								<div class="bot_trianble"></div></div>
+								<div class="subsettings bot_controls">
+									<table>
+										<tr>
+											<td>
+												Engine: 
+												<select>
+													<option>GST</option>
+												</select> 
+											</td>
+											<td>
+												Channels: 
+												<select>
+													<option>2</option>
+													<option>8</option>
+												</select> 
+											</td>
+											<td>
+												Codec: 
+												<select>
+													<option>MP3</option>
+													<option>PCM</option>
+													<option>Vorbis</option>
+												</select> 
+											</td>
+											<td>
+												Samplerate: 
+												<select>
+													<option>44100</option>
+													<option>48000</option>
+												</select> 
+												 HZ 
+											</td>
+											<td>
+												Input: 
+												<select>
+													<option>JACK Audio</option>
+													<option>ALSA</option>
+												</select> 
+											</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</li>
+					<li id="video_loc" class="module">
+						<div class="mod_title">
+							<div class="triangle"></div>
+							Video
+							<select>
+								<option>DV NTSC</option>
+								<option>HD h264</option>
+								<option>Edit...</option>
+							</select>
+							<div class="close"></div>
+						</div>
+						<div class="controls">
+							<img src="img/video_prev.png" width="320" height="240"/>
+							<div id="ashh" class="sett">
+								<div>
+								&nbsp;&nbsp;&nbsp;&nbsp;Settings
+								<div class="bot_trianble"></div></div>
+								<div class="subsettings bot_controls">
+									<table>
+										<tr>
+											<td>
+												Engine: 
+												<select>
+													<option>GST</option>
+												</select> 
+											</td>
+											<td>
+												Dimensions: 
+												<select>
+													<option>640x480</option>
+													<option>800x600</option>
+												</select> 
+											</td>
+											<td>
+												Codec: 
+												<select>
+													<option>DV</option>
+													<option>H264</option>
+													<option>MPEG4</option>
+												</select> 
+											</td>
+											<td>
+												Bitrate: 
+												<input type="text" value="2"/>
+												 Mbps 
+											</td>
+										</tr>
+										<tr>
+											<td>
+												Input: 
+												<select>
+													<option>IEEE 1394</option>
+													<option>Video4Linux</option>
+												</select> 
+											</td>
+											<td>
+												Device: 
+												<select>
+													<option>/dev/video0</option>
+													<option>/dev/video1</option>
+												</select> 
+											</td>
+											<td>
+												Output: 
+												<select>
+													<option>xvimagesink</option>
+													<option>glimagesink</option>
+												</select> 
+											</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</li>
+					<li id="data_loc" class="module">
+						<div class="mod_title">
+							<div class="triangle"></div>
+							MIDI
+							<select>
+								<option>Keyboard IN</option>
+								<option>VST Synth</option>
+								<option>Edit...</option>
+							</select>
+							<div class="close"></div>
+						</div>
+						<div class="controls">
+							<b>Channel 1</b> <img src="img/flash.png" width="16" height="16" alt="flasher" style="position:relative;top:4px;" />
+							<div id="middi" class="sett">
+								<div>
+								&nbsp;&nbsp;&nbsp;&nbsp;Settings
+								<div class="bot_trianble"></div></div>
+								<div class="subsettings bot_controls">
+									<table>
+										<tr>
+											<td>
+												Engine: 
+												<select>
+													<option>MIDI</option>
+												</select> 
+											</td>
+											<td>
+												Channel: 
+												<select>
+													<option>1</option>
+													<option>2</option>
+													<option>3</option>
+												</select> 
+											</td>
+											<td>
+												Input: 
+												<select>
+													<option>IEEE 1394</option>
+													<option>Video4Linux</option>
+												</select> 
+											</td>
+											<td>
+												Device: 
+												<select>
+													<option>/dev/video0</option>
+													<option>/dev/video1</option>
+												</select> 
+											</td>
+										</tr>
+									</table>
+								</div>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>		
+				
 			<div id="network">
-				<h2>Network Settings</h2>
-				Location:
-				<select>
-					<option>Chicoutimi</option>
-					<option>Maison</option>
-					<option>Edit...</option>
-				</select>
-				<table>
+				<div id="network_tab">
+					Location:
+					<select>
+						<option>Chicoutimi</option>
+						<option>Maison</option>
+						<option>Edit...</option>
+					</select>
+				</div>
+				<span class="text_but" style="padding: 0px 30px;">Settings</span>
+				<table style="margin: 0px 30px 20px;padding: 0 10px 0 20px;border: dotted 1px #999;">
 					<tr>
 						<td>
 							<h3>Internet</h3>
@@ -228,6 +512,37 @@
 						</td>
 					</tr>
 				</table>
+				<span class="text_but" style="padding: 0px 30px;">Testing</span>
+				<div "iperf" style="margin: 0px 30px 20px;padding: 0 10px 0 20px;border: 1px dotted #999;">
+					<table style="padding: 10px;margin-right: 10px;margin-bottom: 10px;">
+						<tr>
+							<td align="right">Bandwidth: </td>
+							<td><input type="text" value="2" style="width: 40px;text-align: right;" /> Mbps</td>
+							<td align="right">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mode:</td>
+							<td><input type="radio" name="test_mode" value="one_way" checked="checked"/> from local to remote</td>
+						</tr>
+						<tr>
+							<td align="right">Test duration: </td>
+							<td><input type="text" value="30"  style="width: 40px;text-align: right;" /> Sec.</td>
+							<td></td>
+							<td><input type="radio" name="test_mode" value="bi_seq" /> bidirectionnal sequential</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td><input type="radio" name="test_mode" value="bi_sim" /> bidirectional simultaneous</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td align="right"><br /><input type="button" name="test_start" value="Start" /></td>
+						</tr>
+					</table>
+					<b>Results</b>
+					<div style="height: 200px;border: 1px #999 solid;margin: 0 10px 20px 0"></div>
+				</div>
 			</div>
 		</div>
 	
