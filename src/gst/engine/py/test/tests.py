@@ -31,6 +31,7 @@ Usage: trial test/tests.py
 import os, sys
 import twisted.trial.unittest 
 import sropulpof
+import time
 
 
 def run(rxArgs, txArgs):
@@ -38,29 +39,46 @@ def run(rxArgs, txArgs):
         pidRx = os.fork()
         # child
         if pidRx == 0:
-            result = sropulpof.run(['-r'] + rxArgs)
+            sropulpof.run(['-r'] + rxArgs)
             print "DONE RECEIVING"
-            return result
+            sys.exit(0)
+        else:
+            try:
+                pidTx = os.fork()
+                # child
+                if pidTx == 0:
+                    sropulpof.run(['-s'] + txArgs)
+                    print "DONE SENDING"
+                    sys.exit(0)
+                else:
+                # parent
+                wait()
+                wait()
+            except OSError, e:
+                print >>sys.stderr, "sender process failed: %d (%s)" % (e.errno, e.strerror)
+                sys.exit(1)
     except OSError, e:
         print >>sys.stderr, "receiver process failed: %d (%s)" % (e.errno, e.strerror)
         sys.exit(1)
 
-    try:
-        pidTx = os.fork()
-        # child
-        if pidTx == 0:
-            result = sropulpof.run(['-s'] + txArgs)
-            print "DONE SENDING"
-            return result
-    except OSError, e:
-        print >>sys.stderr, "sender process failed: %d (%s)" % (e.errno, e.strerror)
-        sys.exit(1)
 
 
 class MilhouseTest(twisted.trial.unittest.TestCase):
 
     def test_01_defaults(self):
-        rxArgs = ['-o', '5000']
-        txArgs = ['-o', '5000']
-        self.failUnless(run(rxArgs, txArgs))
+        test_time = 5000
+        rxArgs = ['-o', str(test_time) ]
+        txArgs = ['-o', str(test_time) ]
+        run(rxArgs, txArgs)
+        time.sleep(test_time/1000 + 1)
+        return True
 
+    def test_02_defaults(self):
+        test_time = 5000
+        rxArgs = ['-o', str(test_time) ]
+        txArgs = ['-o', str(test_time) ]
+        run(rxArgs, txArgs)
+        time.sleep(test_time/1000 + 1)
+        return True
+
+    
