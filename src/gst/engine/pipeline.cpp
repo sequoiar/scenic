@@ -93,8 +93,6 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
             }
         case GST_MESSAGE_ELEMENT:
             {
-                //Pipeline *context = static_cast<Pipeline*>(data);
-                //context->updateListeners(msg);
                 Instance()->updateListeners(msg);
                 break;
             }

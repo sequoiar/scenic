@@ -115,7 +115,7 @@ def runAsSender(options):
 
 
 def run(myArgs):
-    setHandler() # to catch interrupts
+    setHandler() # to catch interrupts at cpp level first
     options = parseArgs(myArgs)[0]
     
     if options.isSender:

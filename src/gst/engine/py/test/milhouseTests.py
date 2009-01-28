@@ -10,7 +10,6 @@ pidRx = 0
 pidTx = 0
 
 class MilhouseTests():
-
     def __init__(self):
         signal.signal(signal.SIGINT, self.receiveInterrupt)
 
@@ -73,6 +72,6 @@ class MilhouseTests():
 
 
 # here we run all the tests thanks to the wonders of reflective programming
-for test in prefixedMethods(MilhouseTests(), 'test_03'):
+for test in prefixedMethods(MilhouseTests(), 'test_'):
     test()
 

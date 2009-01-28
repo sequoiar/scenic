@@ -58,6 +58,23 @@ bool Codec::isSupportedCodec(const std::string & codecStr)
     return std::find(VALID_CODECS, VALID_CODECS_END, codecStr) != VALID_CODECS_END;
 }
 
+
+/// Returns bitrate property for this encoder
+double Encoder::getBitrate()
+{
+    assert(codec_);
+    double bitrate; 
+    g_object_get(G_OBJECT(codec_), "bitrate", &bitrate, NULL);
+    return bitrate;
+}
+
+/// Sets bitrate property for this encoder
+void Encoder::setBitrate(double bitrate)
+{
+    assert(codec_);
+    g_object_set(G_OBJECT(codec_), "bitrate", bitrate, NULL);
+}
+
 /// Constructor 
 AudioConvertedEncoder::AudioConvertedEncoder() : 
     aconv_(0) 
