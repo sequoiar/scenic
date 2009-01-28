@@ -8,24 +8,19 @@ def run():
     pid = os.fork()
 
     if pid == 0:
-        print "first child"
+        print "receiver process"
         os.system('./sropulpof.py -r -o 5000')
-        time.sleep(1)
         sys.exit(0)
     else:
         # parent
         pid = os.fork()
         if pid == 0:
-            print "second child"
+            print "sender process child"
             os.system('./sropulpof.py -s -o 5000')
-            time.sleep(1)
             sys.exit(0)
         else:
             os.waitpid(pid, 0)
             print "finally, i'm the parent"
 
-run()
-run()
-run()
-run()
-run()
+for i in xrange(0, 4):
+    run()
