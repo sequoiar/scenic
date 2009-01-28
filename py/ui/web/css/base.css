@@ -36,6 +36,7 @@ body {
 	background-color: #adaec4;
 }
 
+
 #right_pan {
 	position: absolute;
 	top: 0px;
@@ -49,7 +50,7 @@ body {
 	position: absolute;
 	bottom: 0px;
 	left: 0px;
-	background: #cff;
+	background: #fff;
 	width: 300px;
 }
 
@@ -284,7 +285,7 @@ li.module {
 .mod_title {
 	position: relative;
 	background-color: #333;
-	height: 18px;
+	height: 20px;
 	padding: 2px 30px 2px;
 	color: #FFF;
 	font-weight: bold;
@@ -316,15 +317,15 @@ li.module {
 	border: 1px solid #ddd;
 /*	height: 100px;*/
 	padding: 15px 10px;
-	font-size: 10px;
+	font-size: 11px;
 }
 
 .controls select {
-	font-size: 10px;
+	font-size: 11px;
 }
 
 .controls input {
-	font-size: 10px;
+	font-size: 11px;
 	width: 50px;
 }
 
@@ -404,13 +405,13 @@ h3 {
 /* MODULES */
 
 #audio_loc .mod_title, #thumb_audio_loc {
-	background-color: #cc3;
+	background-color: #a8c0b2;
 }
 
 #data_loc .mod_title, #thumb_data_loc {
-	background-color: #c33;
+	background-color: #a1bac9;
 }
 
 #video_loc .mod_title, #thumb_video_loc {
-	background-color: #c3c;
+	background-color: #b4b9c6;
 }

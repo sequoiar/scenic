@@ -62,107 +62,143 @@
 				</div>
 			</div>
 			<h3>&nbsp;</h3>
-			<input type="button" value="Connect" class="but"/>
+			<input type="button" id="connect_but" value="Connect" class="but"/>
 			<h3></h3>
 			<input type="checkbox"/> Test&nbsp; &nbsp;<input type="checkbox"/> Loop
 			<h3></h3>
 			<hr />
-			<h3>Connection Status</h3>
-			<div id="status">Good</div>
-			<table class="graph">
-				<tr>
-					<td rowspan="3" style="line-height: 8px;">S&nbsp;&nbsp; e n d</td>
-					<td>Bandwidth</td>
-					<td>Latency</td>
-					<td>Jitter</td>
-					<td>Packet Loss</td>
-				</tr>
-				<tr>
-					<td><img src="img/graphs1.png" width="53" height="25" /></td>
-					<td><img src="img/graphs2.png" width="53" height="25" /></td>
-					<td><img src="img/graphs3.png" width="53" height="25" /></td>
-					<td><img src="img/graphs4.png" width="53" height="25" /></td>
-				</tr>
-				<tr>
-					<td>2354 Mbps</td>
-					<td>33 ms</td>
-					<td>23 ms</td>
-					<td>0.1 %</td>
-				</tr>
-				<tr>
-					<td rowspan="2" style="line-height: 8px;">R&nbsp;&nbsp; e c v</td>
-					<td><img src="img/graphs1.png" width="53" height="25" /></td>
-					<td><img src="img/graphs2.png" width="53" height="25" /></td>
-					<td><img src="img/graphs3.png" width="53" height="25" /></td>
-					<td><img src="img/graphs4.png" width="53" height="25" /></td>
-				</tr>
-				<tr>
-					<td>2354 Mbps</td>
-					<td>33 ms</td>
-					<td>23 ms</td>
-					<td>0.1 %</td>
-				</tr>
-			</table>
-			<div id="substatus">
-				<div class="substat">
-					<div class="bot_trianble"></div>
-					Details
-				</div>
-				<div id="substatus_cont" class="bot_controls">
-					<table class="graph">
-						<tr>
-							<td rowspan="2" style="line-height: 8px;">S&nbsp;V e&nbsp;1 n&nbsp; d&nbsp;</td>
-							<td><img src="img/graphs1.png" width="53" height="25" /></td>
-							<td><img src="img/graphs2.png" width="53" height="25" /></td>
-							<td><img src="img/graphs3.png" width="53" height="25" /></td>
-							<td><img src="img/graphs4.png" width="53" height="25" /></td>
-						</tr>
-						<tr>
-							<td>1549 Mbps</td>
-							<td>31 ms</td>
-							<td>10 ms</td>
-							<td>0.1 %</td>
-						</tr>
-						<tr>
-							<td rowspan="2" style="line-height: 8px;">R&nbsp;V e&nbsp;1 c&nbsp; v&nbsp;</td>
-							<td><img src="img/graphs3.png" width="53" height="25" /></td>
-							<td><img src="img/graphs4.png" width="53" height="25" /></td>
-							<td><img src="img/graphs1.png" width="53" height="25" /></td>
-							<td><img src="img/graphs2.png" width="53" height="25" /></td>
-						</tr>
-						<tr>
-							<td>805 Mbps</td>
-							<td>2 ms</td>
-							<td>13 ms</td>
-							<td>0.0 %</td>
-						</tr>
-						<tr>
-							<td rowspan="2" style="line-height: 8px;">S&nbsp;A e&nbsp;1 n&nbsp; d&nbsp;</td>
-							<td><img src="img/graphs1.png" width="53" height="25" /></td>
-							<td><img src="img/graphs2.png" width="53" height="25" /></td>
-							<td><img src="img/graphs3.png" width="53" height="25" /></td>
-							<td><img src="img/graphs4.png" width="53" height="25" /></td>
-						</tr>
-						<tr>
-							<td>1549 Mbps</td>
-							<td>31 ms</td>
-							<td>10 ms</td>
-							<td>0.1 %</td>
-						</tr>
-						<tr>
-							<td rowspan="2" style="line-height: 8px;">R&nbsp;A e&nbsp;1 c&nbsp; v&nbsp;</td>
-							<td><img src="img/graphs3.png" width="53" height="25" /></td>
-							<td><img src="img/graphs4.png" width="53" height="25" /></td>
-							<td><img src="img/graphs1.png" width="53" height="25" /></td>
-							<td><img src="img/graphs2.png" width="53" height="25" /></td>
-						</tr>
-						<tr>
-							<td>805 Mbps</td>
-							<td>2 ms</td>
-							<td>13 ms</td>
-							<td>0.0 %</td>
-						</tr>
-					</table>
+			<div id="net_test">
+				<h3>Network Test</h3>
+				<table style="padding: 10px;margin-right: 10px;margin-bottom: 10px;font-size:11px;">
+					<tr>
+						<td align="right">Bandwidth: </td>
+						<td><input type="text" value="2" style="width: 40px;text-align: right;font-size:11px;" /> Mbps</td>
+					</tr>
+					<tr>
+						<td align="right">Test duration: </td>
+						<td><input type="text" value="30"  style="width: 40px;text-align: right;font-size:11px;" /> Sec.</td>
+					</tr>
+					<tr>
+						<td align="right">Mode:</td>
+						<td>
+							<select style="font-size:11px;width: 140px;">
+								<option>from local to remote</option>
+								<option>from remote to local</option>
+								<option>bidirectionnal sequential</option>
+								<option>bidirectional simultaneous</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td align="right"><br /><input type="button" name="test_start" id="test_start" value="Start" class="but" /></td>
+					</tr>
+				</table>
+				<b>Results</b>
+				<div style="border-top: 1px dotted #999;" id="net_results">Packet Lost: 0,02 %<br />
+				Jitter: 3 ms<br />
+				Bandwidth: 2533 Mbps<br />
+				Latency: 2 ms</div>
+			</div>
+			
+			<div id="conn_status">
+				<h3>Connection Status</h3>
+				<div id="status">Good</div>
+				<table class="graph">
+					<tr>
+						<td rowspan="3" style="line-height: 8px;">S&nbsp;&nbsp; e n d</td>
+						<td>Bandwidth</td>
+						<td>Latency</td>
+						<td>Jitter</td>
+						<td>Packet Loss</td>
+					</tr>
+					<tr>
+						<td><img src="img/graphs1.png" width="53" height="25" /></td>
+						<td><img src="img/graphs2.png" width="53" height="25" /></td>
+						<td><img src="img/graphs3.png" width="53" height="25" /></td>
+						<td><img src="img/graphs4.png" width="53" height="25" /></td>
+					</tr>
+					<tr>
+						<td>2354 Mbps</td>
+						<td>33 ms</td>
+						<td>23 ms</td>
+						<td>0.1 %</td>
+					</tr>
+					<tr>
+						<td rowspan="2" style="line-height: 8px;">R&nbsp;&nbsp; e c v</td>
+						<td><img src="img/graphs1.png" width="53" height="25" /></td>
+						<td><img src="img/graphs2.png" width="53" height="25" /></td>
+						<td><img src="img/graphs3.png" width="53" height="25" /></td>
+						<td><img src="img/graphs4.png" width="53" height="25" /></td>
+					</tr>
+					<tr>
+						<td>2354 Mbps</td>
+						<td>33 ms</td>
+						<td>23 ms</td>
+						<td>0.1 %</td>
+					</tr>
+				</table>
+				<div id="substatus">
+					<div class="substat">
+						<div class="bot_trianble"></div>
+						Details
+					</div>
+					<div id="substatus_cont" class="bot_controls">
+						<table class="graph">
+							<tr>
+								<td rowspan="2" style="line-height: 8px;">S&nbsp;V e&nbsp;1 n&nbsp; d&nbsp;</td>
+								<td><img src="img/graphs1.png" width="53" height="25" /></td>
+								<td><img src="img/graphs2.png" width="53" height="25" /></td>
+								<td><img src="img/graphs3.png" width="53" height="25" /></td>
+								<td><img src="img/graphs4.png" width="53" height="25" /></td>
+							</tr>
+							<tr>
+								<td>1549 Mbps</td>
+								<td>31 ms</td>
+								<td>10 ms</td>
+								<td>0.1 %</td>
+							</tr>
+							<tr>
+								<td rowspan="2" style="line-height: 8px;">R&nbsp;V e&nbsp;1 c&nbsp; v&nbsp;</td>
+								<td><img src="img/graphs3.png" width="53" height="25" /></td>
+								<td><img src="img/graphs4.png" width="53" height="25" /></td>
+								<td><img src="img/graphs1.png" width="53" height="25" /></td>
+								<td><img src="img/graphs2.png" width="53" height="25" /></td>
+							</tr>
+							<tr>
+								<td>805 Mbps</td>
+								<td>2 ms</td>
+								<td>13 ms</td>
+								<td>0.0 %</td>
+							</tr>
+							<tr>
+								<td rowspan="2" style="line-height: 8px;">S&nbsp;A e&nbsp;1 n&nbsp; d&nbsp;</td>
+								<td><img src="img/graphs1.png" width="53" height="25" /></td>
+								<td><img src="img/graphs2.png" width="53" height="25" /></td>
+								<td><img src="img/graphs3.png" width="53" height="25" /></td>
+								<td><img src="img/graphs4.png" width="53" height="25" /></td>
+							</tr>
+							<tr>
+								<td>1549 Mbps</td>
+								<td>31 ms</td>
+								<td>10 ms</td>
+								<td>0.1 %</td>
+							</tr>
+							<tr>
+								<td rowspan="2" style="line-height: 8px;">R&nbsp;A e&nbsp;1 c&nbsp; v&nbsp;</td>
+								<td><img src="img/graphs3.png" width="53" height="25" /></td>
+								<td><img src="img/graphs4.png" width="53" height="25" /></td>
+								<td><img src="img/graphs1.png" width="53" height="25" /></td>
+								<td><img src="img/graphs2.png" width="53" height="25" /></td>
+							</tr>
+							<tr>
+								<td>805 Mbps</td>
+								<td>2 ms</td>
+								<td>13 ms</td>
+								<td>0.0 %</td>
+							</tr>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -177,7 +213,7 @@
 		
 		<div id="right_pan">
 			<div id="media_but" class="text_but">Media Streams</div>
-			<div id="network_but" class="text_but">Network</div>
+			<div id="network_but" class="text_but">Network Settings</div>
 			<div id="modules_pan">
 				<div id="modules_tab">
 					Presets:
@@ -187,6 +223,12 @@
 						<option>Edit...</option>
 					</select>
 					<div id="media_thumb"></div>				
+				</div>
+				<div style="padding: 15px 40px 0px">Mode: <select>
+						<option>Symetrical</option>
+						<option>One way</option>
+						<option>Assymetrical</option>
+					</select>
 				</div>
 				<ul id="modules">
 					<li id="audio_loc" class="module">
@@ -213,7 +255,7 @@
 									<td><input type="text" value="Track 2" /></td>
 								</tr>
 							</table>
-							<div style="color:#FFF;font-size:12px;background-color:#FF9999;margin:10px;padding:5px;text-decoration:blink;"><b>Warning:</b> JACK Audio is not available</div>
+							<div style="color:#FFF;font-size:12px;background-color:#f4002b;margin:10px;padding:5px;"><b>Warning:</b> JACK Audio is not available</div>
 							<div id="asf" class="sett">
 								<div>
 								&nbsp;&nbsp;&nbsp;&nbsp;Settings
@@ -527,6 +569,12 @@
 						<tr>
 							<td align="right">Test duration: </td>
 							<td><input type="text" value="30"  style="width: 40px;text-align: right;" /> Sec.</td>
+							<td></td>
+							<td><input type="radio" name="test_mode" value="one_way" checked="checked"/> from remote to local</td>
+						</tr>
+						<tr>
+							<td></td>
+							<td></td>
 							<td></td>
 							<td><input type="radio" name="test_mode" value="bi_seq" /> bidirectionnal sequential</td>
 						</tr>

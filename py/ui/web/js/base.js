@@ -101,6 +101,25 @@
 			control.slideOut();
 		}
 	});
+
+	// Network test
+	var net_results = new Fx.Slide($('net_results'));
+	net_results.hide();
+	$('test_start').addEvent('click', function(){
+		net_results.toggle();
+	});
+ 
+ 	//Change net test for net status
+	var net_test = new Fx.Style('net_test', 'opacity', {duration:200});
+	$('conn_status').setStyle('opacity', '0');
+	var net_status = new Fx.Style('conn_status', 'opacity', {duration:2000});
+	
+	$('connect_but').addEvent('click', function(){
+		net_test.start(0).chain(function(){
+			$('net_test').setStyle('display', 'none');
+			net_status.start(100);
+		});
+	});
  
  	// Module reorder (drag and drop)
 	 new Sortables($('modules'), {
