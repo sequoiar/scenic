@@ -1190,11 +1190,11 @@ class CliView(Observer):
     
     def _devices_added(self, origin, data):
         """
-        :data: list of devices
+        :data: dict of devices
         all from the same driver.
         """
         msg = []
-        for device in data:
+        for device in data.values():
             msg.append("New device : %s:%s." % (device.driver.name, device.name))
         self.write("\n".join(msg), true)
 
