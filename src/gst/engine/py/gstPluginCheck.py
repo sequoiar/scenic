@@ -18,6 +18,12 @@ GST_PLUGINS = ['level', 'audioconvert', 'alsasink', 'pulsesink', 'jackaudiosink'
 
 
 for plug in GST_PLUGINS:
-   if gst.element_factory_find(plug) is None: 
-       raise gst.PluginNotFoundError("Gstreamer Plugin " + plug + " is not found")
+    if gst.element_factory_find(plug) is None: 
+        raise gst.PluginNotFoundError("Gstreamer Plugin " + plug + " is not found")
+    else:
+        print plug + " installed"
 
+    
+
+print "-------------------------------"
+print "All necessary plugins installed"
