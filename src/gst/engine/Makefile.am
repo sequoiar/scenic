@@ -1,6 +1,6 @@
 include $(top_srcdir)/src/globals.mak
 if PROJ_DEBUG
-SUBDIRS = . test py
+SUBDIRS = . test
 endif
 
 noinst_LIBRARIES = libgst.a
