@@ -38,6 +38,7 @@ from utils import commands
 
 log = log.start('debug', 1, 0, 'network')
 
+# functions
 def _parse_iperf_output(lines):
     """
     Parses the output of iperf -c <host> -u
@@ -63,7 +64,7 @@ def _parse_iperf_output(lines):
                 word_index = 0
                 for word in words:# interval, transfert, jitter, packet loss (%)
                     k = keys[word_index]
-                    if k == 'loss': 
+                    if k == 'latency':  # TODO: is it correct?
                         ret[k] = float(word) # %
                     elif k == 'bandwidth': 
                         ret[k] = int(word) # Kbits/sec
@@ -96,6 +97,9 @@ def _parse_iperf_output(lines):
 
 
 class IperfServerProcessProtocol(protocol.ProcessProtocol):
+    """
+    Manages the process of the `iperf -s -u` command
+    """
     def __init__(self):
         pass
 
@@ -123,11 +127,18 @@ class IperfServerProcessProtocol(protocol.ProcessProtocol):
         #reactor.stop()
 
 class NetworkError(Exception):
-    """Any error due to iperf."""
+    """
+    Any error due to network testing (with iperf).
+    """
     pass
 
-
-class IperfTester(object):
+class NetworkTester(object):
+    """
+    Network tester using `iperf`.
+    
+    The `iperf` command can be used either as a client or a server.
+    It is the client that initiates the testing.
+    """
     # constants
     STOPPED = 0
     SERVER_RUNNING = 1
@@ -157,7 +168,7 @@ class IperfTester(object):
             process_transport.loseConnection()
             self.state = self.STOPPED
 
-    def on_iperf_client_results(self, results, commands, extra_arg, caller):
+    def on_client_results(self, results, commands, extra_arg, caller):
         """
         Called once a bunch of child processes are done.
         
@@ -181,21 +192,21 @@ class IperfTester(object):
                     self.notify_api(caller, "error", "Unknown error.") # TODO
 
     def notify_api(self, caller, key, res):
-        if key == "stats":
-            print "STATS: ", res
-            print "(caller is %s)" % (caller)
-        elif key == "error":
-            print "ERROR !", res
+        if self.api is not None:
+            if key == "stats":
+                print "STATS: ", res
+                print "(caller is %s)" % (caller)
+            elif key == "error":
+                print "ERROR !", res
 
-    def start_iperf_client(self, caller, server_addr, bandwidth_megabits=1, duration=10):
+    def start_client(self, caller, server_addr, bandwidth_megabits=1, duration=10):
         """
-        Starts  iperf -c localhost -u -t 10 -b 1M
+        Starts `iperf -c localhost -u -t 10 -b 1M`
         """
-        
         if self.state == self.STOPPED:
             command = ["iperf", "-c", server_addr, "-t", str(duration), "-y", "c", "-u", "-b", "%dM" % (bandwidth_megabits)] 
             extra_arg = None
-            callback = self.on_iperf_client_results
+            callback = self.on_client_results
             try:
                 commands.single_command_start(command, callback, extra_arg, caller)
             except Exception, e:
@@ -203,7 +214,7 @@ class IperfTester(object):
             else:
                self.state = self.CLIENT_RUNNING
 
-    def start_iperf_server(self):
+    def start_server(self):
         """
         Starts `iperf -s -u`
         """
@@ -217,39 +228,43 @@ class IperfTester(object):
                 self.state = self.SERVER_RUNNING
                 reactor.callLater(15.0, self.kill_process, self.iperf_server)
 
-def debug_meanwhile():
-    print "waiting..."
-    reactor.callLater(1.0, debug_meanwhile)
-
 # functions ---------------------------------------------
 def start(subject):
     """
-    Initial setup of the whole module.
+    Initial setup of the whole module for miville's use.
+    
+    Raises CommandNotFoundError if `iperf` command not found.
     """
-    iperf = IperfTester()
-    iperf.api = subject
+    # will raise CommandNotFoundError if not found:
     executable = commands.find_command("iperf", 
             "`iperf` command not found. Please see See https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting for installation instructions.")
-    return iperf
+    network_tester = NetworkTester()
+    network_tester.api = subject
+    return network_tester
 
 if __name__ == "__main__":
-    iperf = IperfTester()
+    # SIMPLE TEST
+    def debug_meanwhile():
+        # TODO : remove
+        print "waiting..."
+        reactor.callLater(1.0, debug_meanwhile)
+    iperf = NetworkTester()
     if len(sys.argv) == 2:
         if sys.argv[1] == "client":
             print "starting client..."
-            iperf.start_iperf_client("Dummy caller", "10.10.10.65", 1, 1) # "localhost"
+            iperf.start_client("Dummy caller", "10.10.10.65", 1, 1) # "localhost"
         else:
             print "usage: <file name> client"
     else:
-        start_iperf_server()
+        iperf.start_server()
     reactor.callLater(1.0, debug_meanwhile)
     reactor.run()
-#    txt = """
-#    20090126182857,10.10.10.145,35875,10.10.10.65,5001,3,0.0-10.0,1252440,999997
-#    20090126182857,10.10.10.65,5001,10.10.10.145,35875,3,0.0-10.0,1252440,999970,0.008,0,852,0.000,0
-#    """
-#    
-#    lines = txt.strip().splitlines()
-#    pprint.pprint(_parse_iperf_output(lines))
+    #    txt = """
+    #    20090126182857,10.10.10.145,35875,10.10.10.65,5001,3,0.0-10.0,1252440,999997
+    #    20090126182857,10.10.10.65,5001,10.10.10.145,35875,3,0.0-10.0,1252440,999970,0.008,0,852,0.000,0
+    #    """
+    #    
+    #    lines = txt.strip().splitlines()
+    #    pprint.pprint(_parse_iperf_output(lines))
 
 

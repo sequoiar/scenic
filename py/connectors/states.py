@@ -18,7 +18,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
-# CONNECTIONS STATE CONSTANTS
+"""
+CONNECTIONS STATE CONSTANTS
+"""
 DISCONNECTED = 0
 ASKING = 1
 CONNECTING = 2

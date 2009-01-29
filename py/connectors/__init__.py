@@ -62,7 +62,7 @@ class Connection(object):
             self.contact.state = ASKING
             self._start()
         else:
-            raise ConnectionError, 'A connection is already establish.'
+            raise ConnectionError, 'A connection is already established.'
 
     def _start(self):
         raise NotImplementedError, '_start() method not implemented for this connector: %s.' % self.contact.connector
@@ -146,6 +146,9 @@ class Connection(object):
 
 
 def create_connection(contact, api):
+    """
+    Connects to a contact. 
+    """
     if contact.kind == 'group':
         raise NotImplementedError, 'Group contact not implemented for the moment.'
     if contact.state > DISCONNECTED:
@@ -163,6 +166,9 @@ def create_connection(contact, api):
 
 
 def stop_connection(contact):
+    """
+    Disconnect from a contact.
+    """
     if contact.state == DISCONNECTED:
         return 'Cannot stop the connection because there\'s no connection.'
     if contact.state in (DISCONNECTING, HUNGUP):
@@ -180,6 +186,10 @@ def stop_connection(contact):
     return 'Cannot stop the connection. Unknown connection state (%s)' % contact.state
 
 def receive_connection(address, port=None):
+    """
+    If contact is not in address book, adds it
+    """
+    # TODO is contact a global variable ?
     if port:
         name = '%s:%s' % (address, port)
     else:
@@ -191,6 +201,9 @@ def receive_connection(address, port=None):
 
 
 def load_connectors(api):
+    """
+    On startup, loads all modules that are part of this package.
+    """ 
     modules = common.load_modules(common.find_modules('connectors'))
     for module in modules:
         name = module.__name__.rpartition('.')[2]

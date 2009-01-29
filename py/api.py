@@ -27,6 +27,7 @@ from errors import *
 import connectors
 from connectors.states import *
 import devices
+import network
 
 class ControllerApi(object):
     """
@@ -48,6 +49,7 @@ class ControllerApi(object):
         self.connectors = core.connectors
         self.connection = None
         devices.start(self) # api as an argument
+        self.network_tester = network.start(self)
 
     ### Contacts ###
 
@@ -236,6 +238,7 @@ class ControllerApi(object):
     def get_default_port(self, connector):
         return self.connectors[connector].PORT
     
+    # devives use cases ---------------------------------------------------------------------
     def device_list_attributes(self, caller, driver_kind, driver_name, device_name): 
         # TODO: add driver_kind in cli
         # TODO: updatre CLI to correct method name.
@@ -322,5 +325,41 @@ class ControllerApi(object):
             for device in driver.devices.values():
                 devices_list.append(device)
         self.notify(caller, devices_list, 'devices_list') # with a dict
+    
+    # network test use cases ----------------------------------------------------
+    def network_test_start(self, caller, bandwidth=1, duration=10):
+        """
+        Asks the contact if she wants to test the network
+        
+        
 
+        :param badnwidth: in Mbit
+        :param duration: in seconds
+        """
+        # TODO
+        pass
+        #self.network_tester.
+
+    def network_test_stop(self, caller):
+        """
+        Interrupts suddenly the network test.
+        """
+        #TODO
+        pass
+
+    def network_test_enable_autoaccept(self, caller, enabled=True):
+        """
+        Enables/disables auto accept of network tests from remote selected contact.
+        :param enabled: wheter to enable it or not.
+        """
+        # TODO
+        pass
+
+    def network_test_accept(self, caller, accepted=True):
+        """
+        Accepts/refuses network test asked from selected contact.
+        :param accepted: wheter to accept it or not.
+        """
+        # TODO
+        pass
 

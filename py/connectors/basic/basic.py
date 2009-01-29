@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
+"""
+The BasicServer and BasicClient protocols are used to negociate the connection 
+between 2 running miville software. (with a contact)
 
+It is the session initialization routine. It negociates the settings for the streams. 
+
+The client takes the initiative. (ASK) The server receives it and responds with ACCEPT or REFUSE.
+
+The connector.basic package is good an example of a simple way to communicate between two miville software. 
+"""
 # Sropulpof
 # # Copyright (C) 2008 Société des arts technoligiques (SAT)
 # http://www.sat.qc.ca
@@ -36,7 +45,6 @@ from errors import ConnectionError
 
 log = log.start('debug', 1, 0, 'basic')
 
-
 PORT = 2222
 
 # SERVER STATES
@@ -44,6 +52,9 @@ IDLE = 0
 WAITING = 1
 
 class BasicServer(LineReceiver):
+    """
+    The session initialization protocol for miville. - server side
+    """
     def __init__(self):
         self.api = None
         self.state = IDLE
@@ -124,6 +135,9 @@ class BasicServerFactory(protocol.ServerFactory):
 
 
 class BasicClient(LineReceiver):
+    """
+    The session initialization protocol for miville. - client side
+    """
     def __init__(self):
         self.callbacks = {}
 
@@ -151,6 +165,9 @@ class BasicClient(LineReceiver):
 
 
 class ConnectionBasic(Connection):
+    """
+    Connection that uses the "connectors.basic" protocol.
+    """
     def __init__(self, contact, api):
         Connection.__init__(self, contact, api)
         self._state = DISCONNECTED
@@ -165,11 +182,12 @@ class ConnectionBasic(Connection):
         deferred = client_creator.connectTCP(self.contact.address, port, timeout=2)
         deferred.addCallback(self._connection_ready)
         deferred.addErrback(self._connection_failed)
-
+    
+    # Class attribtues, wich are aliases for some method names.
     _start = _create_connection
 
     _stop = _create_connection
-
+    
     stop_connecting = Connection.stop
 
     def _connection_ready(self, connection):
@@ -224,6 +242,11 @@ class ConnectionBasic(Connection):
             self.api.network_test.server_started(self) 
     
     def settings(self, settings):
+        """
+        Receives the settings for the streams.
+
+        :param settings: dict kind => dict "stream" ... whose keys are "name" and "engine"
+        """
         self.com_chan.delete(self.settings)
         self.api.select_streams(self, 'receive')
         for kind, stream in settings.items():
@@ -236,6 +259,12 @@ class ConnectionBasic(Connection):
         self.api.start_streams(self, None, self.com_chan)
 
     def send_settings(self):
+        """
+        Sends the settings for the streams. 
+        
+        Sends each stream set in the API. The setting method in this very 
+        same class handles its result on the receiving end.
+        """
         settings = {}
         for name, stream in self.api.streams.streams.items():
             kind = self.api.streams.get_kind(stream)
@@ -267,6 +296,11 @@ class ConnectionBasic(Connection):
 
 
 def start(api):
+    """
+    Starts the Basic connector protocol for miville. 
+    
+    :param api: miville's api
+    """
     global PORT
     if len(sys.argv) > 1:
         PORT += 1
