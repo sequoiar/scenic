@@ -203,7 +203,9 @@ def receive_connection(address, port=None):
 def load_connectors(api):
     """
     On startup, loads all modules that are part of this package.
-    """ 
+    
+    It returned to the core as a dict. The keys are the name of each connector module.
+    """
     modules = common.load_modules(common.find_modules('connectors'))
     for module in modules:
         name = module.__name__.rpartition('.')[2]

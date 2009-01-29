@@ -51,6 +51,8 @@ class ControllerApi(object):
     def _start(self, core):
         """
         Starts the API once all parts have been loaded.
+        
+        Some attributes are defined here, but should be defined in __init__ 
         """
         self.core = core
         self.adb = core.adb
@@ -283,6 +285,12 @@ class ControllerApi(object):
         # TODO: modify method name in CLI
 
     def devices_list(self, caller, driver_kind):
+        """
+        Gets the list of devices for a driver_kind.
+
+        :param driver_kind: 'video', 'audio' or 'data'
+        """
+        
         try: 
             manager = devices.managers[driver_kind]
         except KeyError:

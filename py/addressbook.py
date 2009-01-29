@@ -56,8 +56,10 @@ class AddressBook(object):
     Class representing the Address Book of the application.
     The Address Book is written to disk an read back.
     The Address Book is mostly a dictionnary of Contact instances.
+    
+    Once a contact is selected, the user can start the communication with her 
+    using a basic connector. THe next step is to start the streams. 
     """
-
     def __init__(self, filename, api=None):
         """
         Filename must be given. The Address Book is save in file named
