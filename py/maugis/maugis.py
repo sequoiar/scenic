@@ -142,7 +142,7 @@ class Mediator:
     def check_ext_program(self, gui):
         global __version__, _TEST
         if not _TEST:
-            # verify pof version
+            # verify propulseart version
             try:
                 w, r, err = os.popen3(self.config.gstsend + ' -v')
                 err_str = err.read()
@@ -541,8 +541,8 @@ class Config:
     # Default values
     gstsendport = 8000
     negotiationport = 17446
-    gstsend = "pof"
-    gstrecv = "pof"
+    gstsend = "propulseart"
+    gstrecv = "propulseart"
     smtpserver = "smtp.sat.qc.ca"
     emailinfo = "maugis@sat.qc.ca"
     audiolib = "oss"
@@ -813,7 +813,7 @@ class Processes(Colleague):
         divider = base / bandwidth
         
 
-        # First start the gst_recv process, gstsend needs a remote running pof --receive to work
+        # First start the gst_recv process, gstsend needs a remote running propulseart --receive to work
         self.gstrecv_cmd = [self.config.gstrecv,
                                         '--receiver', 
                                         '--address', host,
@@ -838,7 +838,7 @@ class Processes(Colleague):
                                             self.watch_gstrecv  )
         # Now we launch the sender
         # Do we need a little sleep?
-        #self.gstrecv_child = subprocess.Popen( '/usr/local/bin/pof --receiver --address %s --videocodec h264 --audiocodec vorbis --videoport 8000 --audioport 8010' %host )
+        #self.gstrecv_child = subprocess.Popen( '/usr/local/bin/propulseart --receiver --address %s --videocodec h264 --audiocodec vorbis --videoport 8000 --audioport 8010' %host )
 
         time.sleep(1)
 
