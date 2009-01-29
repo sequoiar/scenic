@@ -16,14 +16,23 @@ GST_PLUGINS = ['level', 'audioconvert', 'alsasink', 'pulsesink', 'jackaudiosink'
             'jackaudiosrc', 'dv1394src', 'pulsesrc', 'jackaudiosink', 'alsasink', 'pulsesink', 
             'videotestsrc', 'v4l2src', 'rtpvorbispay', 'rtpvorbisdepay']
 
+missingPlugins = []
 
 for plug in GST_PLUGINS:
     if gst.element_factory_find(plug) is None: 
-        raise gst.PluginNotFoundError("Gstreamer Plugin " + plug + " is not found")
+        print "Error: plugin " + plug + " is NOT installed"
+        missingPlugins.append(plug)
     else:
         print plug + " installed"
 
-    
-
-print "-------------------------------"
-print "All necessary plugins installed"
+if missingPlugins == []:
+    print "-------------------------------"
+    print "All necessary plugins installed"
+else:
+    print "-------------------------------"
+    print "The following gstreamer plugins need to be installed: "
+    for plug in missingPlugins:
+        print plug
+    print "You may have to install the corresponding development headers (i.e. lib<MODULE>-dev) " 
+    print "before building the missing gstreamer plugins"
+        
