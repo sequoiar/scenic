@@ -48,6 +48,7 @@ from twisted.internet import reactor #, protocol
 from twisted.internet.error import AlreadyCalled # for when we cancel twice an event.
 # App imports
 from utils import log, commands
+from errors import DeviceError
 
 log = log.start('debug', 1, 0, 'devices')
 
@@ -509,3 +510,70 @@ def get_manager(manager_kind):
 
 # each Driver module should do something like this: 
 # devices.get_manager('video').add_driver(Video4LinuxDriver())
+
+def list_attributes(caller, driver_kind, driver_name, device_name):
+    """
+    Lists a device's attributes
+    
+    Called from the API.device_list_attributes.
+    Might raise a DeviceError
+    
+    :param driver_kind: 'video', 'audio' or 'data'
+    :param driver_name: 'alsa', 'v4l2'
+    :param device_name: '/dev/video0', 'hw:1'
+    """
+    global managers
+    try: 
+        manager = managers[driver_kind]
+    except KeyError:
+        raise DeviceError('No such kind of driver: %s' % (driver_kind))
+    try:
+        driver = manager.drivers[driver_name]
+    except KeyError:
+        raise DeviceError('No such driver name: %s' % (driver_name))
+    try:
+        device = driver.devices[device_name]
+    except KeyError:
+        raise DeviceError('No such device: %s' % (device_name))
+    return device.attributes
+
+
+def modify_attribute(caller, driver_kind, driver_name, device_name, attribute_name, value):
+    """
+    Modifies a device's attribute
+    
+    
+    Might raise a DeviceError
+    :param driver_kind: 'video', 'audio' or 'data'
+    :param driver_name: 'alsa', 'v4l2'
+    :param device_name: '/dev/video0', 'hw:1'
+    :param attribute_name:
+    """
+    global managers
+    
+    try: 
+        manager = managers[driver_kind]
+    except KeyError:
+        raise DeviceError('No such kind of driver: %s' % (driver_kind))
+    try:
+        driver = manager.drivers[driver_name]
+    except KeyError:
+        raise DeviceError('No such driver name: %s' % (driver_name))
+    try:
+        device = driver.devices[device_name]
+    except KeyError:
+        raise DeviceError('No such device: %s' % (device_name))
+    try:
+        attribute = device.attributes[attribute_name]
+    except KeyError:
+        raise DeviceError('No such attribute: %s' % (attribute_name))
+    attribute.set_value(value, caller, 'device_modify_attribute') #'device_attributes_changed') # TODO : I think that key is not correct.
+    #self.notify(caller, attribute, 'device_attributes_changed') # TODO: make asynchronous
+    driver.poll_now(caller, 'device_modify_attribute')
+    # TODO: attribute_changed should be triggered
+    
+    #self.notify(caller, 'No such attributes for driver/device: %s %s %s:%s' % (driver_name, device_name, attribute_name, str(value)), 'info')
+    #self.notify(caller, 'you called devices_modify_attributes', 'devices_modify_attribute')
+    #self.notify(caller, 
+    # devices.get_driver(driver_name).devices[device_name].attributes[attribute_name].set_value(value)
+

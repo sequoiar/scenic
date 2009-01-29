@@ -46,6 +46,15 @@ class Core(Subject):
         self.startup()
 
     def startup(self):
+        """
+        Actually does the job that should be done in __init__
+        (defines attributes and does the startup routine.)
+
+        Deprecated (IMHO) aalex
+        Should be removed and merged to __init__
+        """
+        # TODO: merge with __init__
+
         self.api = api.ControllerApi(self.notify)
         self.load_uis()
         self.adb = addressbook.AddressBook('sropulpof', self.api)
@@ -60,6 +69,9 @@ class Core(Subject):
         self.api._start(self)
         
     def load_uis(self):
+        """
+        Loads the user interface modules
+        """
         self.uis = common.load_modules(common.find_modules('ui'))
         count = 0
         for mod in self.uis:
@@ -86,18 +98,26 @@ class Core(Subject):
 
 
 def chk_ob(core):
+    """
+        I guess this is a function to print some variables 
+    """
     print "Contacts: %r" % core.adb.contacts.keys()
 #    print dir(ui.cli)
 
 core = None
 
 def main():    
+    """
+    Startup of the application.
+    """
     global core
     core = Core()
 #    l = task.LoopingCall(chk_ob, core)
 #    l.start(2.0, False)
+
 def exit():
-    # on exit
+    
+    """on application exit"""
     core.adb.write(False)
 
 
