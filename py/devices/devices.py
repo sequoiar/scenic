@@ -205,11 +205,11 @@ class Driver(object): #shell.ShellCommander):
         Should be implemented in child classes. The prepare mothod in 
         child classes should then call this one. Like this:
         Device.prepare(self)
-        
-        returns a Deferred
         """
         if self.state_poll_enabled:
-            return self._poll_devices()
+            #return self._poll_devices()
+            # changed to avoid calling a twisted start_single_command before reactor is started.
+            self._delayed_id = reactor.callLater(self.polling_interval, self._poll_devices)
     
     def on_attribute_change(self, attribute, caller=None, event_key=None):
         """

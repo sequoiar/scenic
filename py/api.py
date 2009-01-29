@@ -81,7 +81,7 @@ class ControllerApi(object):
         """
         Get the named contact instance.
         """
-        return self.adbself.connectors.get_contact(name)
+        return self.adb.get_contact(name) # self.connectors
 
     def find_contact(self, address, port=None, connector=None):
 #        return self.adb.find_contact(address, port)

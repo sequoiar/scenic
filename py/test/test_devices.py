@@ -36,12 +36,14 @@ import imiville as app
 app.main()
 app.me.verbose = False
 app.view.verbose = False
+app.go()
 
 class Test_devices_v4l2(unittest.TestCase):
     """
     Integration tests for v4l2 devices.
     """
     def test_01_video0(self):
+        app.go()
         app.api.devices_list(app.me, 'video')
         value = app.last.value
         if not isinstance(value, list):
@@ -52,6 +54,7 @@ class Test_devices_v4l2(unittest.TestCase):
             self.fail('Last notify should give a Device instance.')
     
     def test_02_attributes(self):
+        app.go()
         app.api.device_modify_attribute(app.me, 'video', 'v4l2', '/dev/video0', 'norm', 'pal')
         app.go()
         
@@ -71,6 +74,7 @@ class Test_devices_v4l2(unittest.TestCase):
         app.go()
         
     def test_03_width_height(self):
+        app.go()
         v4l2 = devices.get_manager('video').drivers['v4l2']
         
         try:
@@ -97,6 +101,7 @@ class Test_devices_jackd(unittest.TestCase):
     Integration tests for jackd devices.
     """
     def test_01_devices(self):
+        app.go()
         app.api.devices_list(app.me, 'audio')
         value = app.last.value
         if not isinstance(value, list):
@@ -107,6 +112,7 @@ class Test_devices_jackd(unittest.TestCase):
             self.fail('Last notify should give a Device instance.')
     
     def test_02_attributes(self):
+        app.go()
         app.api.device_list_attributes(app.me, 'audio', 'jackd', 'default')
         value = app.last.value
         has_attr = False
