@@ -38,7 +38,7 @@ def parseArgs(args):
     parser.add_option("-i", "--address", 
             dest="ip", default="127.0.0.1", help="provide ip address")
     parser.add_option("-v", "--videocodec", 
-            dest="videoCodec", default="h264", help="video codec: h264, h263 or mpeg4")
+            dest="videoCodec", default="mpeg4", help="video codec: h264, h263 or mpeg4")
     parser.add_option("-a", "--audiocodec", 
             dest="audioCodec", default="raw", help="audio codec: vorbis, raw or mp3")
     parser.add_option("-k", "--videosink", 

@@ -20,8 +20,13 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 #
 
-import os
-import gst
+import sys
+
+try:
+    import gst
+except ImportError:
+    print "import gst failed, gst-python must be installed before running this script"
+    sys.exit(0)
 
 GST_PLUGINS = ['level', 'audioconvert', 'alsasink', 'pulsesink', 'jackaudiosink', 
             'decodebin', 'capsfilter', 'dvdemux', 'queue', 'ffmpegcolorspace', 
