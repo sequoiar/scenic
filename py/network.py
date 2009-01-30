@@ -182,18 +182,21 @@ class NetworkTester(object):
                 if success:
                     # print "stdout:", stdout
                     ip = extra_arg['ip']
-                    iperf_stats = _parse_iperf_output(stdout.splitlines())
-                    if len(iperf_stats) == 0:
-                        # TODO
-                        raise Exception("iperf command gave unexpected results.")
-                    
-                    iperf_stats.update(extra_arg)
-                    self.state = self.STOPPED
+                    try:
+                        iperf_stats = _parse_iperf_output(stdout.splitlines())
+                        if len(iperf_stats) == 0:
+                            # TODO
+                            raise NetworkError("iperf command gave unexpected results. Is remote iperf running ?")
+                    except NetworkError, e:
+                        self.notify_api(caller, 'info', e.message)
+                    else:    
+                        iperf_stats.update(extra_arg)
+                        self.state = self.STOPPED
 
-                    self.notify_api(caller, 'info', "iperf stats ifor IP %s: %s" % (ip, str(iperf_stats)))
-                    self.notify_api(caller, "network_test_done", iperf_stats)
+                        self.notify_api(caller, 'info', "iperf stats ifor IP %s: %s" % (ip, str(iperf_stats)))
+                        self.notify_api(caller, "network_test_done", iperf_stats)
                 else:
-                    self.notify_api(caller, "error", "Unknown error.") # TODO
+                    self.notify_api(caller, "info", "network performance : Unknown error.") # TODO use error key
 
     def notify_api(self, caller, key, val):
         """

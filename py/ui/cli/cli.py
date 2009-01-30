@@ -1196,7 +1196,7 @@ class CliView(Observer):
         msg = []
         for device in data.values():
             msg.append("New device : %s:%s." % (device.driver.name, device.name))
-        self.write("\n".join(msg), true)
+        self.write("\n".join(msg), True)
 
     def _devices_list(self, origin, data):
         """
