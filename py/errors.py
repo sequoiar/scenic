@@ -19,6 +19,13 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 
+### Settings ###
+class SettingsError(Exception):
+    """
+    Master Exception Class for the settings.
+    """
+    pass
+
 ### Address Book ###
 
 class AddressBookError(Exception):

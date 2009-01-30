@@ -95,6 +95,8 @@ def start_process(command, isVerbose=False, logPrefix=''):
     Returns a pexpect.spawn object
     """
     try:
+        directory = os.getcwd()
+        println('Current working dir: ' + directory)
         println('Starting \"%s\"' % command)
         
         if isVerbose:
@@ -117,7 +119,10 @@ def is_running(process):
     Returns boolean
     """
     if (process.isalive() == False):
-        println("Error starting server: %s" % client.status or "client status = None")
+        status = "no status available" 
+        if client:
+            status = client.status
+        println("Error starting server: %s" % status)
         return False
     else:
         return process

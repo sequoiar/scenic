@@ -35,6 +35,7 @@ import settings
 from protocols import com_chan
 import connectors
 
+from twisted.internet.error import CannotListenError
 
 class Core(Subject):
     """Main class of the application and containing the 'Model' in the MVC"""
@@ -59,8 +60,10 @@ class Core(Subject):
         self.load_uis()
         self.adb = addressbook.AddressBook('sropulpof', self.api)
         self.engines = self.find_engines()
+        # create the settings collection
         self.settings = settings.Settings()
-        self.curr_setting = self.settings.select()
+        
+        #self.curr_setting = self.settings.select()
         self.connectors = connectors.load_connectors(self.api)
         port = 37054
         if len(sys.argv) > 1:
@@ -118,16 +121,17 @@ def main():
 def exit():
     
     """on application exit"""
-    core.adb.write(False)
+    if core.adb != None:
+        core.adb.write(False)
 
 
 if __name__ == '__main__':
     log.start()
     log.info('Starting Sropulpof...')
-    main()
-    
-    reactor.run()
-    exit()
-
-
-
+    try:
+        main()
+        reactor.run()
+    except CannotListenError, e:
+        log.error(str(e))
+	
+    exit()       

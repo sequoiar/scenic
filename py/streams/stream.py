@@ -141,11 +141,6 @@ class Streams(object):
             for stream in self.streams.values():
                 stream.stop_receiving()
             return 'Stopping receiving...'
-    
-    
-    
-    
-
 
 class Stream(object):
     """

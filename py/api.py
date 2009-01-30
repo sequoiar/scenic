@@ -29,6 +29,27 @@ from connectors.states import *
 import devices
 import network
 
+import repr
+
+from utils import log
+log = log.start('error', 1, 0, 'api') # added by hugo
+
+
+
+def modify(who, name_of_who, what, new_value):
+    """
+    Given an object reference, returns a command that modifies the value of a member
+    of that object. this command string can then be used by exec to do its work
+    """
+    members = dir(who)
+    if not what in members:
+        raise SettingsError, "Property \"" + attribute + "\" does not exist"
+    value = str(new_value)
+    if isinstance(new_value, str):
+        value = repr.repr(new_value)
+    cmd = "%s.%s = %s" % (name_of_who, what, value )
+    return cmd    
+   
 class ControllerApi(object):
     """
     The API of the application. 
@@ -54,11 +75,14 @@ class ControllerApi(object):
         
         Some attributes are defined here, but should be defined in __init__ 
         """
+        
+        self.settings = core.settings
+        
         self.core = core
         self.adb = core.adb
-        self.all_streams = core.curr_setting.streams
-        self.curr_streams = 'send'
-        self.streams = self.all_streams[self.curr_streams]
+#        self.all_streams = core.curr_setting.streams
+#        self.curr_streams = 'send'
+#        self.streams = self.all_streams[self.curr_streams]
         self.connectors = core.connectors
         self.connection = None
         devices.start(self) # api as an argument
@@ -189,6 +213,300 @@ class ControllerApi(object):
             result = err
         self.notify(caller, result)
 
+    ### Settings ###
+    
+    def modify_media_stream(self, caller, global_setting_name, stream_subgroup_name, media_stream_name, attribute, new_value ):
+        try:
+            result = None
+            log.info("modify_media_stream")
+            glob = self.settings.get_global_setting(global_setting_name)
+            sub = glob.get_stream_subgroup(stream_subgroup_name)
+            stream = sub.get_media_stream(media_stream_name)
+            cmd = modify(stream,'stream', attribute, new_value)
+            exec(cmd) 
+            #result = True
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)        
+    
+    def erase_media_stream (self, caller, global_setting_name, stream_subgroup_name, media_stream_name):
+        try:
+            result = None
+            log.info("erase_media_stream")
+            global_setting = self.settings.get_global_setting(global_setting_name)
+            stream_subgroup= global_setting.get_stream_subgroup(stream_subgroup_name) 
+            result = stream_subgroup.erase_media_stream(media_stream_name)
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+            
+    def list_media_stream(self, caller, global_setting_name, stream_subgroup_name):
+        try:
+            result = None
+            log.info("list_media_stream")
+            global_setting = self.settings.get_global_setting(global_setting_name)
+            stream_subgroup= global_setting.get_stream_subgroup(stream_subgroup_name) 
+            result =  stream_subgroup.list_media_stream()
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+
+    def add_media_stream (self, caller, type_name, global_setting_name, stream_subgroup_name):
+        try:
+            result = None
+            log.info("add_media_stream")
+            glob = self.settings.get_global_setting(global_setting_name)
+            subgroup = glob.get_stream_subgroup(stream_subgroup_name)
+            result = subgroup.add_media_stream(type_name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+    def erase_stream_subgroup (self, caller, name, global_setting_name, stream_subgroup_name):
+        try:
+            result = None
+            log.info("erase_media_stream")
+            glob = self.settings.get_global_setting(global_setting_name)
+            subgroup = glob.get_stream_subgroup(stream_subgroup_name)
+            result = subgroup.erase_media_stream(type_name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+    
+    def list_stream_subgroup (self, caller, global_setting_name):
+        try:
+            result = None
+            log.info("list_stream_subgroup")
+            result = self.settings.get_global_setting(global_setting_name).list_stream_subgroup() 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def add_stream_subgroup (self, caller, name, global_setting_name):
+        try:
+            result = None
+            log.info("add_stream_subgroup")
+            result = self.settings.get_global_setting(global_setting_name).add_stream_subgroup(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+            
+    def erase_stream_subgroup (self, caller, name, global_setting_name):
+        try:
+            result = None
+            log.info("erase_stream_subgroup")
+            result = self.settings.get_global_setting(global_setting_name).erase_stream_subgroup(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+    def modify_stream_subgroup (self, caller, global_setting_name,  name, attribute, new_value):
+        try:
+            result = None
+            log.info("modify_stream_subgroup")
+            glob = self.settings.get_global_setting(global_setting_name)
+            sub = glob.get_stream_subgroup(name)
+            cmd = modify(sub,'sub', attribute, new_value)
+            exec(cmd) 
+            #result = True
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def duplicate_stream_subgroup (self, caller, name, global_setting_name):
+        try:
+            result = None
+            log.info("duplicate_stream_subgroup")
+            result = self.settings.get_global_setting(global_setting_name).duplicate_stream_subgroup(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def select_stream_subgroup (self, caller, name, global_setting_name):
+        try:
+            result = None
+            log.info("select_stream_subgroup")
+            result = self.settings.get_global_setting(global_setting_name).select_stream_subgroup(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+
+        
+    def list_media_setting (self, caller):
+        try:
+            result = None
+            log.info("list_media_setting")
+            result = self.settings.list_media_setting() 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def add_media_setting (self, caller, name):
+        try:
+            result = None
+            log.info("add_media_setting")
+            result = self.settings.add_media_setting(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)      
+        
+    def erase_media_setting (self, caller, name):
+        try:
+            result = None
+            log.info("erase_media_setting")
+            result = self.settings.erase_media_setting(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def modify_media_setting (self, caller, name, attribute, value):
+        try:
+            result = None
+            log.info("modify_media_setting")
+            x = self.settings.get_media_setting(name)
+            cmd = modify(x, 'x', attribute, value)
+            exec(cmd) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def duplicate_media_setting (self, caller, name):
+        try:
+            result = None
+            log.info("duplicate_media_setting")
+            result = self.settings.duplicate_media_setting(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def select_media_setting (self, caller, name):
+        try:
+            result = None
+            log.info("select_media_setting")
+            result = self.settings.select_media_setting(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def keep_media_setting (self, caller):
+        try:
+            result = None
+            log.info("keep_media_setting")
+            result = self.settings.keep_media_setting(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+        
+    def list_global_setting (self, caller):
+        try:
+            result = None
+            log.info("list_global_settings")
+            result = self.settings.list_global_setting() 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def add_global_setting (self, caller, name):
+        try:
+            result = None
+            log.info("add_global_setting")
+            result = self.settings.add_global_setting(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def type_global_setting (self, caller, name):
+        try:
+            result = None
+            log.info("type_global_setting")
+            result = self.settings.type_global_setting(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def erase_global_setting (self, caller, name):
+        try:
+            result = None
+            log.info("erase_global_setting")
+            result = self.settings.erase_global_setting(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def modify_global_setting (self, caller, global_setting_name, attribute, value):
+        try:
+            result = None
+            log.info("modify_global_setting")
+            glob = self.settings.get_global_setting(global_setting_name)
+            # result = glob.modify_global_setting(attribute, value)
+            cmd = modify(glob, 'glob', attribute, value)
+            exec(cmd) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def duplicate_global_setting (self, caller, name):
+        try:
+            result = None
+            log.info("duplicate_global_setting")
+            result = self.settings.duplicate_global_setting(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def select_global_setting (self, caller, name):
+        try:
+            result = None
+            log.info("select_global_setting")
+            result = self.settings.select_global_setting(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+    
+    def load_settings (self, caller):
+        try:
+            result = None
+            log.info("load_global_setting")
+            result = self.settings.load() 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)       
+        
+    def save_settings (self, caller):
+        try:
+            result = None
+            log.info("save_global_setting")
+            result = self.settings.save()
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+        
+        
+    def description_global_setting (self, caller, name):
+        try:
+            result = None
+            log.info("description_global_setting")
+            result = self.settings.description_global_setting(name) 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)      
+        
 
     ### Streams ###
 
@@ -401,4 +719,89 @@ class ControllerApi(object):
     #    """
     #    # TODO
     #    pass
+   
+    ### devices ###
+
+    def device_list_attributes(self, caller, driver_kind, driver_name, device_name): 
+        """
+        :param driver_kind: 'video', 'audio' or 'data'
+        :param driver_name: 'alsa', 'v4l2'
+        :param device_name: '/dev/video0', 'hw:1'
+        """
+        # TODO: updatre CLI to correct method name.
+        try:
+            attributes = devices.list_attributes(caller, driver_kind, driver_name, device_name)
+        except DeviceError, e:
+            self.notify(caller, e.message, 'info')
+        else:
+            self.notify(caller, attributes, 'device_list_attributes') # dict
+
+    def device_modify_attribute(self, caller, driver_kind, driver_name, device_name, attribute_name, value):
+        """
+        Modifies a device's attribute
+        
+        
+        :param driver_kind: 'video', 'audio' or 'data'
+        :param driver_name: 'alsa', 'v4l2'
+        :param device_name: '/dev/video0', 'hw:1'
+        :param attribute_name:
+        """
+        try:
+            devices.modify_attribute(caller, driver_kind, driver_name, device_name, attribute_name, value)
+        except DeviceError, e:
+            self.notify(caller, e.message, 'info') # TODO: there should be a 'user_error' key.
+
+        # TODO: modify method name in CLI
+
+    def devices_list(self, caller, driver_kind):
+        try: 
+            manager = devices.managers[driver_kind]
+        except KeyError:
+            self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
+            return
+
+        #self.notify(caller, 'you called devices_list', 'devices_list')
+        # TODO: make asynchronous
+        devices_list = []
+        for driver in manager.drivers.values():
+            for device in driver.devices.values():
+                devices_list.append(device)
+        self.notify(caller, devices_list, 'devices_list') # with a dict
+    
+    # network test use cases ----------------------------------------------------
+    def network_test_start(self, caller, bandwidth=1, duration=10):
+        """
+        Asks the contact if she wants to test the network
+        
+        
+
+        :param badnwidth: in Mbit
+        :param duration: in seconds
+        """
+        # TODO
+        pass
+        #self.network_tester.
+
+    def network_test_stop(self, caller):
+        """
+        Interrupts suddenly the network test.
+        """
+        #TODO
+        pass
+
+    def network_test_enable_autoaccept(self, caller, enabled=True):
+        """
+        Enables/disables auto accept of network tests from remote selected contact.
+        :param enabled: wheter to enable it or not.
+        """
+        # TODO
+        pass
+
+    def network_test_accept(self, caller, accepted=True):
+        """
+        Accepts/refuses network test asked from selected contact.
+        :param accepted: wheter to accept it or not.
+        """
+        # TODO
+        pass
 

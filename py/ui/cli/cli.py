@@ -213,7 +213,8 @@ class CliController(TelnetServer):
         self.shortcuts = {'c': 'contacts',
                           'a': 'audio',
                           'v': 'video',
-                          's': 'streams',
+                          's': 'settings',
+                          'z': 'streams',
                           'j': 'join',
                           'e': 'exit',
                           'q': 'quit',
@@ -255,6 +256,103 @@ class CliController(TelnetServer):
         elif self.block:
             self.write('This is not a valid answer.\n[Y/n]:')
 
+    def _pyt(self, line):
+        s = str(line)
+        log.info("pyt: " + s)
+        
+    def _settings(self, line):
+        
+        cp = CliParser(self, prog=line[0], description="Manages the settings.")
+        cp.add_option("-l", "--list", action='store_true', help="List all the settings")
+        cp.add_option("-a", "--add", type="string", help="Add a setting")
+        cp.add_option("-t", "--type", type="string", help="Type of setting (global, streamsubgroup, stream or media )")
+        cp.add_option("-e", "--erase", "--remove", "--delete", type="string", help="Erase a setting")
+        cp.add_option("-m", "--modify", type="string", help="Modify a setting")
+        cp.add_option("-d", "--duplicate", action="store_true", help="Duplicate a setting")
+        cp.add_option("-s", "--select", help="Select a setting")
+        cp.add_option("-k", "--save", action="store_true", help="Save user settings")
+        cp.add_option("-o", "--load", action="store_true", help="Load presets and user settings (overwrites current settings)")
+       
+        # options to select global setting to use when manipulating streamgroups and streams
+        cp.add_option("-g", "--globalsetting", type="string", help="The global setting name to use when editing global settings")
+        cp.add_option("-p", "--subgroup", type="string", help="The stream subgroup name to use when editing media streams")
+        cp.add_option("-n", "--mediasetting", type="string", help="The media setting name to use when editing media settings")
+        cp.add_option("-i", "--mediastream", type="string", help="The media stream name to use when editing media streams")
+        
+               
+        cp.add_option("-z", "--description", action='store_true', help="Display description")
+        (options, args) = cp.parse_args(line)
+        
+        
+        if options.save:
+            self.core.save_settings(self)
+        elif options.load:
+            self.core.load_settings(self)
+        elif options.description:
+            cp.print_description()
+        
+        elif options.type:
+            if options.modify:
+                tokens  = options.modify.split("=")
+                attribute = tokens[0]
+                new_value = tokens[1]
+            if options.type == 'global':   
+                if options.list:
+                    self.core.list_global_setting(self)
+                elif options.add:
+                    self.core.add_global_setting(self, options.add) # options.type
+                elif options.erase:
+                    self.core.erase_global_setting(self,options.erase)
+                elif options.modify:
+                    self.core.modify_global_setting(self, options.globalsetting, attribute, new_value)
+                elif options.duplicate:
+                    self.core.duplicate_global_setting(self,None)
+                elif options.select:
+                    self.core.select_global_setting(self,options.select)
+                
+            elif options.type == 'media':
+                if options.list:
+                    self.core.list_media_setting(self)
+                elif options.add:
+                    self.core.add_media_setting(self, options.add) # options.type
+                elif options.erase:
+                    self.core.erase_media_setting(self,options.erase)
+                elif options.modify:
+                    self.core.modify_media_setting(self,options.mediasetting, attribute, new_value)
+                elif options.duplicate:
+                    self.core.duplicate_media_setting(self,None)
+                elif options.select:
+                    self.core.select_media_setting(self,options.select)
+            elif options.type == 'streamsubgroup':
+                if options.list:
+                    self.core.list_stream_subgroup(self, options.globalsetting)
+                elif options.add:
+                    self.core.add_stream_subgroup(self, options.add, options.globalsetting) # options.type
+                elif options.erase:
+                    self.core.erase_stream_subgroup(self,options.erase, options.globalsetting)
+                elif options.modify:
+                    self.core.modify_stream_subgroup(self, options.globalsetting, options.subgroup, attribute, new_value)
+                elif options.duplicate:
+                    self.core.duplicate_stream_subgroup(self,None, options.globalsetting)
+                elif options.select:
+                    self.core.select_stream_subgroup(self,options.select, options.globalsetting)
+            elif options.type == 'stream':
+                if options.list:
+                    self.core.list_media_stream(self, options.globalsetting, options.subgroup)
+                elif options.add:
+                    self.core.add_media_stream(self, options.add, options.globalsetting, options.subgroup) # options.type
+                elif options.erase:
+                    self.core.erase_media_stream(self, options.globalsetting, options.subgroup, options.erase)
+                elif options.modify:
+                    self.core.modify_media_stream(self, options.globalsetting, options.subgroup, options.mediastream, attribute, new_value )
+                elif options.duplicate:
+                    self.core.duplicate_media_stream(self, options.globalsetting, options.subgroup)
+                elif options.select:
+                    self.core.select_media_stream(self,options.select, options.globalsetting, options.subgroup) 
+        else:    
+            cp.print_help()
+                
+    
     def _contacts(self, line):
         cp = CliParser(self, prog=line[0], description="Manages the address book.")
         cp.add_option("-l", "--list", action='store_true', help="List all the contacts")
@@ -265,7 +363,6 @@ class CliController(TelnetServer):
         cp.add_option("-s", "--select", help="Select a contact")
         cp.add_option("-k", "--keep", "--save", action="store_true", help="Keep (save) an auto-created contact (a caller)")
         cp.add_option("-z", "--description", action='store_true', help="Display description")
-        
         (options, args) = cp.parse_args(line)
 
         if options.list:
@@ -811,7 +908,258 @@ class CliView(Observer):
         self.controller.write(msg)
         if prompt:
             self.controller.write_prompt()
+            
+    ### Settings
+    
+    def _modify_media_stream(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not modify media stream.\nReason: ' +  str(data))
+            else:
+                self.write('Stream settings modified')
 
+    
+    def _erase_media_stream(self,origin,data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not erase media stream.\nReason: ' +  str(data))
+            else:
+                self.write('Media stream removed')        
+        
+    def _add_media_stream(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not add media stream.\nReason: ' +  str(data))
+            else:
+                self.write('Media stream added')
+                    
+    
+    def _list_media_stream(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not list media streams.\nReason: ' +  str(data))
+            else:
+                (media_streams, selected_media_stream) = data
+                if len(media_streams) == 0:
+                    self.write('There are no media streams\n')
+                else:
+                    txt = ""
+                    for media_stream in media_streams:
+                        name = media_stream.name
+                        setting = str(media_stream.setting)
+                        if name == selected_media_stream:
+                            name = bold(name + ": <---")
+                        port = media_stream.port
+                        port = str(port)
+                        gain = 'no pain'
+                        #gain = media_stream.gain_levels
+                        txt += """%(name)s:
+    port       : %(port)s
+    gain levels: %(gain)s
+""" % locals()
+                    self.write( txt )
+                        
+    
+    def _list_stream_subgroup(self, origin, data): # list media settings
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not list media settings.\nReason: ' +  str(data))
+            else:
+                (stream_subgroups, selected_stream_subgroup) = data
+                if len(stream_subgroups) == 0:
+                    self.write('There are no streamsubgroup settings\n')
+                else:
+                    txt = ''
+                    for k in stream_subgroups.keys():
+                        sub_group = stream_subgroups[k]
+                        name = sub_group.name
+                        if name == selected_stream_subgroup:
+                            name = bold(name + ": <---")
+                        enabled = str(sub_group.enabled)
+                        mode = str(sub_group.mode)
+                        port = str(sub_group.port)
+                        container = str(sub_group.container)
+                        txt += """%(name)s:
+    id        : %(k)3d
+    enabled   : %(enabled)s
+    mode      : %(mode)s
+    port      : %(port)s
+    container : %(container)s """ % locals()
+                        self.write( txt )
+
+
+    def _add_stream_subgroup(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not add stream  settings.\nReason: ' +  str(data))
+            else:
+                self.write('Stream subgroup added')
+
+
+    def _erase_stream_subgroup(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not erase stream  settings.\nReason: ' +  str(data))
+            else:
+                self.write('Stream subgroup removed')
+
+    def _modify_stream_subgroup(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not modify stream  settings.\nReason: ' +  str(data))
+            else:
+                self.write('Stream settings modified')
+
+    def _duplicate_stream_subgroup(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not duplicate stream  settings.\nReason: ' +  str(data))
+            else:
+                self.write('stream settings duplicate')
+
+    def _select_stream_subgroup(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not select stream  settings.\nReason: ' +  str(data))
+            else:
+                self.write('Stream settings select')
+    
+    def _list_media_setting(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not list media settings.\nReason: ' +  str(data))
+            else:
+                (media_settings, selected_media_setting) = data
+                if len(media_settings) == 0:
+                    self.write('There are no media settings\n')
+                else:
+                    txt = ''
+                    for k in media_settings.keys():
+                        name = media_settings[k].name
+                        settings_ = str(media_settings[k].settings)
+                        if name == selected_media_setting:
+                            name = bold(name + ": <---")
+                        others = "None"
+                        txt += """%(name)s:
+    id      : %(k)3d
+    settings: %(settings_)s""" % locals()
+                    self.write( txt )
+
+    def _add_media_setting(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not add media setting.\nReason: ' +  str(data))
+            else:
+                self.write('Media setting added')
+
+    def _erase_media_setting(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not erase media setting.\nReason: ' +  str(data))
+            else:
+                self.write('Media setting removed')
+
+    def _modify_media_setting(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not modify media setting.\nReason: ' +  str(data))
+            else:
+                self.write('Media setting modified')
+
+    def _duplicate_media_setting(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not duplicate media setting.\nReason: ' +  str(data))
+            else:
+                self.write('Media setting duplicated')
+
+    def _select_media_setting(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not select media setting.\nReason: ' +  str(data))
+            else:
+                self.write('Media setting selected')
+  
+    def _list_global_setting(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not list global settings.\nReason: ' +  str(data))
+            else:
+                (global_settings, selected_global_setting) = data
+                if len(global_settings) == 0:
+                    self.write('There are no global settings\n')
+                else:
+                    txt = ''
+                    for k in global_settings.keys():
+                        comm = "3-way"
+                        name = global_settings[k].name
+                        if name == selected_global_setting:
+                            name = bold(name + ": <---")
+                        others = "None"
+                        txt += """%(name)s:
+    id:            %(k)3d
+    communication: %(comm)s
+    others:        %(others)s\n""" % locals()
+                    self.write( txt )
+
+    def _add_global_setting(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not add settings.\nReason: ' +  str(data) )
+            else:
+                self.write('Global setting added')
+
+    def _erase_global_setting(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not erase settings.\nReason: ' +  str(data))
+            else:
+                self.write('Global setting removed')
+
+    def _modify_global_setting(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not modify global settings.\nReason: ' +  str(data))
+            else:
+                self.write('Global setting modified')
+
+    def _duplicate_global_setting(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not duplicate settings.\nReason: ' +  str(data))
+            else:
+                self.write('Global setting duplicated')
+
+    def _select_global_setting(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not select settings.\nReason: ' +  str(data))
+            else:
+                self.write('Global setting selected')
+
+    def _load_settings(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not load settings.\nReason: ' +  str(data))
+            else:
+                self.write('Settings loaded')
+
+    def _save_settings(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not save settings.\nReason: ' +  str(data))
+            else:
+                self.write('Settings saved')
+
+#    def _description_global_setting(self, origin, data):
+#        if origin is self.controller:
+#            if isinstance(data, Exception):
+#                self.write('Could not describe settings.\nReason: ' +  str(data))
+#            else:
+#                self.write('Settings added')
+    
+    ### Contacts
+    
     def _get_contacts(self, origin, data):
         """
         called by api.py:
