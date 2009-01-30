@@ -79,7 +79,8 @@ class AddressBook(object):
 
     def add(self, name, address, port=None, auto_created=False, connector=None, setting=0):
         """
-        Add a contact to the Address Book.
+        Adds a contact to the Address Book.
+        
         Name and address are mandatory, port is optional and if connector is
         None, it will be deduce from the address type. Setting is set to 0
         (base setting) by default.
@@ -96,7 +97,7 @@ class AddressBook(object):
 
     def delete(self, name=None):
         """
-        Delete the named contact from the Address Book or the selected
+        Deletes the named contact from the Address Book or the selected
         if no name is given.
         """
         name = self._get_name(name)
@@ -108,7 +109,7 @@ class AddressBook(object):
 
     def modify(self, name=None, new_name=None, address=None, port=None, connector=None):
         """
-        Change one or more attributes of a contact.
+        Changes one or more attributes of a contact.
         If no name is given, modify the selected contact.
         """
         name = self._get_name(name)
@@ -136,7 +137,7 @@ class AddressBook(object):
 
     def duplicate(self, name=None, new_name=None):
         """
-        Add a copy of the named contact in the Address Book and add the string
+        Adds a copy of the named contact in the Address Book and add the string
         ' (copy)' to is name if no new name is given, else give the new name.
         If no name is given, copy the selected contact.
         """
@@ -165,7 +166,7 @@ class AddressBook(object):
 
     def select(self, name):
         """
-        Select one contact in the Address Book (by name). It become the 'active'
+        Selects one contact in the Address Book (by name). It become the 'active'
         contact.
         """
         name = to_utf(name)

@@ -90,8 +90,12 @@ class Streams(object):
     
     def set_attr(self, name, value):
         """
-        name: string
-        value: 
+        Sets an attribute (settings) for the streams manager. 
+            
+        :param name: string
+        :param value: 
+        
+        Attributes names of the Streas class are : mode, container, port
         """
         if hasattr(self, name):
             setattr(self, name, value)
@@ -103,9 +107,10 @@ class Streams(object):
     
     def start(self, address='127.0.0.1', channel=None):
         """
-        Start all the sub-streams.
+        Starts all the sub-streams.
                 
-        address: string or None
+        (either in send or receive mode depending on self.mode)
+        address: string or None (IP)
         """
         keys = self.streams.keys()
         keys.reverse()

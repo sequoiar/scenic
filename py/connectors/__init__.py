@@ -147,7 +147,8 @@ class Connection(object):
 
 def create_connection(contact, api):
     """
-    Connects to a contact. 
+    Connects to a contact using its specified connector (an attribute of the Contact class). 
+
     """
     if contact.kind == 'group':
         raise NotImplementedError, 'Group contact not implemented for the moment.'
@@ -156,7 +157,7 @@ def create_connection(contact, api):
 #    if contact.name in connections:
 #        raise ConnectionError, 'Can not connect. This contact \'%s\' already have a connection.' % contact.name
     if not contact.connector:
-        raise ConnectorError, 'Cannot connect. No connector specify.'
+        raise ConnectorError, 'Cannot connect. No connector specified for that contact.'
     if contact.connector not in connectors:
         raise ConnectorError, 'Cannot connect. Connector \'%s\' not available.' % contact.connector
 

@@ -104,12 +104,22 @@ class ControllerApi(object):
         return None
 
     def get_connector_port(self, connector):
+        """Returns the port number for a connector. (identified by its name) """
         return self.connectors[connector].PORT
 
     def client_contact(self, address, port=None):
+        """
+        Creates a temporary contact for the caller if he is not already in the
+        Address Book. Contact are searched by address and port (optional).
+        """
         return self.adb.client_contact(address, port)
 
     def save_client_contact(self, caller, name=None, new_name=None):
+        """
+        Saved permanently an auto created contact to the Address Book.
+        If no name is given, the selected is use. If new_name is given the
+        contact will be saved under this new name.
+        """
         try:
             result = self.adb.save_client_contact(name, new_name)
         except AddressBookError, err:
@@ -117,21 +127,39 @@ class ControllerApi(object):
         self.notify(caller, result)
 
     def add_contact(self, caller, name, address, port=None, auto_created=False):
+        """
+        Adds a contact to the Address Book.
+        
+        Name and address are mandatory, port is optional and if connector is
+        None, it will be deduce from the address type. Setting is set to 0
+        (base setting) by default.
+
+        Address, port and setting are validated and exception are raise
+        on problems.
+        """
         try:
             result = self.adb.add(name, address, port, auto_created)
         except AddressBookError, err:
             result = err
-        self.notify(caller, result)
+        self.notify(caller, result) # implicit key: 'add_contact'
         return result
 
     def delete_contact(self, caller, name=None):
+        """
+        Deletes the named contact from the Address Book or the selected
+        if no name is given.
+        """
         try:
             result = self.adb.delete(name)
         except AddressBookError, err:
             result = err
-        self.notify(caller, result)
+        self.notify(caller, result) # implicit key: 'delete_contact'
 
     def modify_contact(self, caller, name=None, new_name=None, address=None, port=None):
+        """
+        Changes one or more attributes of a contact.
+        If no name is given, modify the selected contact.
+        """
         try:
             result = self.adb.modify(name, new_name, address, port)
         except AddressBookError, err:
@@ -139,6 +167,11 @@ class ControllerApi(object):
         self.notify(caller, result)
 
     def duplicate_contact(self, caller, name=None, new_name=None):
+        """
+        Adds a copy of the named contact in the Address Book and add the string
+        ' (copy)' to is name if no new name is given, else give the new name.
+        If no name is given, copy the selected contact.
+        """
         try:
             result = self.adb.duplicate(name, new_name)
         except AddressBookError, err:
@@ -146,6 +179,10 @@ class ControllerApi(object):
         self.notify(caller, result)
 
     def select_contact(self, caller, name):
+        """
+        Selects one contact in the Address Book (by name). It become the 'active'
+        contact.
+        """
         try:
             result = self.adb.select(name)
         except AddressBookError, err:
@@ -156,12 +193,28 @@ class ControllerApi(object):
     ### Streams ###
 
     def start_streams(self, caller, address, channel=None):
+        """
+        Starts all the sub-streams. (audio, video and data)
+                
+        address: string or None (IP)
+        """
         self.notify(caller, self.streams.start(address, channel))
 
     def stop_streams(self, caller):
+        """
+        Stop all the sub-streams. (audio, video and data)
+        """
         self.notify(caller, self.streams.stop())
 
     def set_streams(self, caller, attr, value):
+        """
+        Sets an attribute (settings) for the streams manager. 
+            
+        :param name: string
+        :param value: 
+        
+        Attributes names of the Streas class are : mode, container, port
+        """
         self.notify(caller, self.streams.set_attr(attr, value))
 
     def select_streams(self, caller, name):

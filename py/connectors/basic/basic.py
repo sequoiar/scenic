@@ -29,6 +29,7 @@ The connector.basic package is good an example of a simple way to communicate be
 
 # System imports
 import sys
+import traceback # TODO remove
 
 # Twisted imports
 from twisted.internet import reactor, protocol, error
@@ -42,6 +43,11 @@ import streams.stream
 from connectors import Connection
 from connectors.states import *
 from errors import ConnectionError
+
+def track(msg):
+    print ""
+    print "###########", msg, "############"
+    traceback.print_stack()
 
 log = log.start('debug', 1, 0, 'basic')
 
@@ -174,6 +180,7 @@ class ConnectionBasic(Connection):
         self._timeout = None
 
     def _create_connection(self):
+        #track("create connection") # TODO
         self._state = CONNECTING
         port = self.contact.port
         if port == None:
@@ -191,6 +198,7 @@ class ConnectionBasic(Connection):
     stop_connecting = Connection.stop
 
     def _connection_ready(self, connection):
+        #track("connection_ready") # TODO
         self._state = CONNECTED
         self.connection = connection    # Maybe private ???
         self.connection.connectionLost = self._connection_lost
@@ -224,12 +232,14 @@ class ConnectionBasic(Connection):
         self.connection = None
 
     def _accepted(self):
+        track("accepted") # TODO
         self.local_name = '%s:%s' % (self.connection.transport.getHost().host, PORT)
         self._close_connection()
 #        Connection.accepted(self)
 #        self.send_settings()
 
     def com_chan_started_client(self, action="media"):
+        track("com_chan_started_client") # TODO
         if action == "media":
             self.send_settings()
         elif action == "network_test":
