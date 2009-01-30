@@ -38,6 +38,10 @@ import os
 import sys
 import glob
 import pprint
+from exceptions import DeprecationWarning
+import warnings
+
+warnings.simplefilter("ignore", DeprecationWarning)
 
 # Twisted imports
 from twisted.internet import reactor, protocol
@@ -231,6 +235,7 @@ class JackDriver(AudioDriver):
         #print "will start commands:"
         #pprint.pprint(commands_to_start)  # TODO: add a timeout !!!
         deferred = commands_start(commands_to_start, self.on_commands_results, extra_args, caller)
+        #warnings.simplefilter("ignore", DeprecationWarning)
         deferred.setTimeout(2.0, self._on_timeout, commands_to_start, extra_args) # 1 second is plenty
         # TODO: setTimeout is deprecated !!!!!
         return deferred 

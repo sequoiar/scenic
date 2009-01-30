@@ -62,7 +62,7 @@ class ControllerApi(object):
         self.connectors = core.connectors
         self.connection = None
         devices.start(self) # api as an argument
-        self.network_tester = network.start(self)
+        self.network_tester = network.start(self) # dict with 'client' and 'server' keys
 
     ### Contacts ###
 
@@ -334,7 +334,6 @@ class ControllerApi(object):
             devices.modify_attribute(caller, driver_kind, driver_name, device_name, attribute_name, value)
         except DeviceError, e:
             self.notify(caller, e.message, 'info') # TODO: there should be a 'user_error' key.
-
         # TODO: modify method name in CLI
 
     def devices_list(self, caller, driver_kind):
@@ -359,39 +358,47 @@ class ControllerApi(object):
         self.notify(caller, devices_list, 'devices_list') # with a dict
     
     # network test use cases ----------------------------------------------------
-    def network_test_start(self, caller, bandwidth=1, duration=10):
+    def network_test_start(self, caller, bandwidth=1, duration=1):
         """
-        Asks the contact if she wants to test the network
+        Starts to test the network using `iperf -c <host> -u [...]`
         
+        Uses the selected contact to start the test.
         
-
-        :param badnwidth: in Mbit
+        :param bandwidth: in Mbit
         :param duration: in seconds
         """
         # TODO
-        pass
-        #self.network_tester.
-
+        client = self.network_tester['client']
+        contact = self.get_contact()
+        if contact is None:
+            self.notify(caller, "Please select a contact prior to start a network test.", "info")
+        else:
+            server_addr = contact.address
+            
+            client.start_client(caller, server_addr, bandwidth, duration)
+            self.notify(caller, "Starting network performance test with contact %s" % (contact.name), "info")
+    
     def network_test_stop(self, caller):
         """
         Interrupts suddenly the network test.
         """
         #TODO
         pass
+        self.notify(caller, 'not implemented yet', 'info')
 
-    def network_test_enable_autoaccept(self, caller, enabled=True):
-        """
-        Enables/disables auto accept of network tests from remote selected contact.
-        :param enabled: wheter to enable it or not.
-        """
-        # TODO
-        pass
+    #def network_test_enable_autoaccept(self, caller, enabled=True):
+    #    """
+    #    Enables/disables auto accept of network tests from remote selected contact.
+    #    :param enabled: wheter to enable it or not.
+    #    """
+    #    # TODO
+    #    pass
 
-    def network_test_accept(self, caller, accepted=True):
-        """
-        Accepts/refuses network test asked from selected contact.
-        :param accepted: wheter to accept it or not.
-        """
-        # TODO
-        pass
+    #def network_test_accept(self, caller, accepted=True):
+    #    """
+    #    Accepts/refuses network test asked from selected contact.
+    #    :param accepted: wheter to accept it or not.
+    #    """
+    #    # TODO
+    #    pass
 
