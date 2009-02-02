@@ -31,7 +31,7 @@
 namespace videofactory
 {
     static const char *V_SINK = "xvimagesink";
-    static const char *V_CODEC = "h264";
+    static const char *V_CODEC = "mpeg4";
     static const int MSG_ID = 2;
 
     static boost::shared_ptr<VideoReceiver> 

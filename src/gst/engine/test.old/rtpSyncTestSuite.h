@@ -34,6 +34,7 @@ class SyncTestSuiteRtp
         {
             // DANGER: if this is too short you're likely to have race cond's.
             testLength_ = 10000000;
+                TEST_ADD(SyncTestSuiteRtp::start_stop_dv_audio_dv_video)
             
                 TEST_ADD(SyncTestSuiteRtp::start_stop_jack_v4l)
 
@@ -43,7 +44,6 @@ class SyncTestSuiteRtp
 
                 TEST_ADD(SyncTestSuiteRtp::start_stop_8ch_audiofile_dv)
 
-                TEST_ADD(SyncTestSuiteRtp::start_stop_dv_audio_dv_video)
 
         }
 
