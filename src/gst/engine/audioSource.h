@@ -54,13 +54,16 @@ class AudioSource : public GstLinkableSource
         const AudioSourceConfig &config_;
         
         /// GstElements representing each source and audioconvert 
-        std::vector<GstElement *>sources_, aconvs_;
+        GstElement *source_;
 
     private:
-        virtual void init_source();
-        virtual void link_elements();
         
-        GstElement *srcElement() { return aconvs_[0]; }
+        GstElement *srcElement() { return source_; }
+        
+        /// No Copy Constructor
+        AudioSource(const AudioSource&);     
+        /// No Assignment Operator
+        AudioSource& operator=(const AudioSource&);     
 };
 
 /** 
@@ -72,7 +75,7 @@ class InterleavedAudioSource
 {
     protected:
         /// Object initializer 
-        void init();
+        void sub_init();
 
         explicit InterleavedAudioSource(const AudioSourceConfig &config);
         
@@ -80,11 +83,9 @@ class InterleavedAudioSource
 
         /// Object which performs the interleaving of this source's channels 
         Interleave interleave_;
+        std::vector<GstElement*> sources_, aconvs_;
 
     private:
-        void init_source();
-        
-        void link_elements();
         
         GstElement *srcElement() { return interleave_.srcElement(); }
 };
@@ -149,12 +150,17 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
                                    void *data);
         void loop(int nTimes);
         void sub_init();
-        void link_elements();
 
         void restartPlayback();
-        std::vector<GstElement*> decoders_;
+        GstElement* decoder_;
+        GstElement* aconv_;
         int loopCount_;
         static const int LOOP_INFINITE;
+        
+        /// No Copy Constructor
+        AudioFileSource(const AudioFileSource&);     
+        /// No Assignment Operator
+        AudioFileSource& operator=(const AudioFileSource&);     
 };
 
 /** 
@@ -172,9 +178,9 @@ class AudioAlsaSource : public AudioSource
 
         void sub_init();
         GstElement *srcElement() { return capsFilter_; }
-        void link_elements();
 
         GstElement *capsFilter_;
+        GstElement *aconv_;
         /// No Copy Constructor
         AudioAlsaSource(const AudioAlsaSource&);     
         /// No Assignment Operator
@@ -196,8 +202,8 @@ class AudioPulseSource : public AudioSource
         void sub_init();
         GstElement *srcElement() { return capsFilter_; }
     
-        void link_elements();
         GstElement *capsFilter_;
+        GstElement *aconv_;
         /// No Copy Constructor
         AudioPulseSource(const AudioPulseSource&);     
         /// No Assignment Operator
@@ -218,10 +224,10 @@ class AudioJackSource : public AudioSource
         ~AudioJackSource();
 
         GstElement *srcElement() { return capsFilter_; }
-        void link_elements();
         void sub_init();
 
         GstElement *capsFilter_;
+        GstElement *aconv_;
         /// No Copy Constructor
         AudioJackSource(const AudioJackSource&);     
         /// No Assignment Operator
@@ -245,13 +251,10 @@ class AudioDvSource : public AudioSource
     
     private:
         ~AudioDvSource();
-        void init_source();
         void sub_init();
 
-        static void cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, void *data);
-        void link_elements();
-        GstElement *demux_, *queue_;
-        bool dvIsNew_;
+        GstElement *queue_;
+        GstElement *srcElement() { return queue_; }
         /// No Copy Constructor
         AudioDvSource(const AudioDvSource&);     
         /// No Assignment Operator

@@ -220,14 +220,18 @@ const char *H263Decoder::getCaps() const
 
 /// Constructor 
 Mpeg4Encoder::Mpeg4Encoder() : 
-    bitrate_(2048000)    // in bits/sec
+    bitrate_(2048000), colorspc_(0)    // in bits/sec
 {}
 
 
 void Mpeg4Encoder::init()
 {
+    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
+
     codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
     g_object_set(G_OBJECT(codec_), "bitrate", bitrate_, NULL);
+
+    gstlinkable::link(colorspc_, codec_);
 }
 
 
@@ -299,6 +303,11 @@ RtpPay* VorbisDecoder::createDepayloader() const
 RawEncoder::RawEncoder()
 {}
 
+
+void RawEncoder::init()
+{
+    AudioConvertedEncoder::init();
+}
 
 /// Creates an RtpL16Payloader 
 RtpPay* RawEncoder::createPayloader() const

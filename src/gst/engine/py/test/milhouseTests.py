@@ -64,12 +64,14 @@ class MilhouseTests():
     def test_01_defaults(self):
         """ Test with default args and 5 second timeout """
         self.countdown("START")
+
         rxArgs, txArgs = self.timeouts()
         self.runTest(rxArgs, txArgs)
 
     def test_02_jack(self):
-        """ Test with 1-8 channels and 5 second timeout for jacksrc and dv1394src"""
+        """ Test with 1-8 channels and 5 second timeout for jacksrc and dv1394src """
         self.countdown("START")
+
         rxArgs, txArgs = self.timeouts()
         for c in xrange(1, 9): 
             self.runTest(rxArgs, txArgs + '-c ' + str(c)) 
@@ -77,12 +79,14 @@ class MilhouseTests():
     def test_03_dv(self):
         """ Test dv inputs """
         self.countdown("START")
+
         rxArgs, txArgs = self.timeouts()
         self.runTest(rxArgs, txArgs + ' --videosource dv1394src --audiosource dv1394src')
    
     def test_04_alsa(self):
         """ Test with 1-8 channels for alsa with a 5 second timeout """
         self.countdown("STOP")
+
         rxArgs, txArgs = self.timeouts()
         source = 'alsasrc'
         sink = 'alsasink'
@@ -100,17 +104,33 @@ class MilhouseTests():
             self.runTest(rxArgs + ' --audiosink ' + sink, txArgs + '-c ' + str(c) + ' --audiosource ' + source)
 
     def test_06_vorbis(self):
-        """ Test with 1-8 channels for pulse with a 5 second timeout """
+        """ Test with 1-8 channels for vorbis with jack with a 5 second timeout """
         self.countdown("START")
-        rxArgs, txArgs = self.timeouts()
-        for c in xrange(1, 7): 
-            self.runTest(rxArgs + ' --audiocodec ' + 'vorbis', txArgs + '-c ' + str(c) + ' --audiocodec ' + 'vorbis')
 
+        audiocodec = 'vorbis'
+
+        rxArgs, txArgs = self.timeouts()
+        for c in xrange(1, 9): 
+            self.runTest(rxArgs + ' --audiocodec ' + audiocodec, txArgs + '-c ' + str(c) + ' --audiocodec ' + audiocodec)
+
+    def test_07_dv_vorbis(self):
+        """ Test with 1-8 channels for vorbis with dv and jack with a 5 second timeout """
+        self.countdown("START")
+
+        audiocodec = 'vorbis'
+
+        rxArgs, txArgs = self.timeouts()
+        txArgs += ' --audiosource dv1394src --videosource dv1394src --audiocodec vorbis'
+        rxArgs += ' --audiocodec vorbis '
+        self.runTest(rxArgs, txArgs)
 
 
 
 
 # here we run all the tests thanks to the wonders of reflective programming
-for test in prefixedMethods(MilhouseTests(), 'test_'):
+tests = prefixedMethods(MilhouseTests(), 'test_')
+
+for test in tests:
+    print "TEST: "  + test.__doc__
     test()
 

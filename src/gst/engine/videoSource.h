@@ -99,10 +99,8 @@ class VideoDvSource
         
         _GstElement *srcElement() { return dvdec_; }
         void init();
-        static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, void *data);
 
-        _GstElement *demux_, *queue_, *dvdec_;
-        bool dvInPipeline_;
+        _GstElement *queue_, *dvdec_;
         VideoDvSource(const VideoDvSource&);     //No Copy Constructor
         VideoDvSource& operator=(const VideoDvSource&);     //No Assignment Operator
 };
@@ -112,9 +110,11 @@ class VideoV4lSource
 {
     public:
         explicit VideoV4lSource(const VideoSourceConfig &config)
-            : VideoSource(config) {}
+            : VideoSource(config), capsFilter_(0) {}
     private:
         void init();
+        _GstElement *capsFilter_;
+        _GstElement *srcElement() { return capsFilter_; }
         VideoV4lSource(const VideoV4lSource&);     //No Copy Constructor
         VideoV4lSource& operator=(const VideoV4lSource&);     //No Assignment Operator
 };

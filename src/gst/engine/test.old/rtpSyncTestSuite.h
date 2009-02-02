@@ -36,13 +36,15 @@ class SyncTestSuiteRtp
             testLength_ = 10000000;
                 TEST_ADD(SyncTestSuiteRtp::start_stop_dv_audio_dv_video)
             
-                TEST_ADD(SyncTestSuiteRtp::start_stop_jack_v4l)
+            TEST_ADD(SyncTestSuiteRtp::start_stop_jack_v4l)
 
-                TEST_ADD(SyncTestSuiteRtp::start_stop_jack_v4l_vorbis)
-                
-                TEST_ADD(SyncTestSuiteRtp::start_stop_audiotest_videotest)
+            TEST_ADD(SyncTestSuiteRtp::start_stop_dv_audio_dv_video)
 
-                TEST_ADD(SyncTestSuiteRtp::start_stop_8ch_audiofile_dv)
+            TEST_ADD(SyncTestSuiteRtp::start_stop_jack_v4l_vorbis)
+
+            TEST_ADD(SyncTestSuiteRtp::start_stop_audiotest_videotest)
+
+            TEST_ADD(SyncTestSuiteRtp::start_stop_8ch_audiofile_dv)
 
 
         }
@@ -50,7 +52,7 @@ class SyncTestSuiteRtp
         // some tests
 
     private:
-        
+
         void start_stop_8ch_audiofile_dv();
 
         void start_stop_dv_audio_dv_video();

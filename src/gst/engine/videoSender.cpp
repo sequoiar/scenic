@@ -33,7 +33,9 @@
 /// Returns the capabilities of this VideoSender's RtpSession 
 std::string VideoSender::getCaps() const
 { 
-    return session_.getCaps(); 
+    std::string capsStr = session_.getCaps();
+    assert(capsStr != "");
+    return capsStr;
 }
 
 VideoSender::~VideoSender()

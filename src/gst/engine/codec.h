@@ -191,8 +191,15 @@ class Mpeg4Encoder : public Encoder
 
     private:
         void init();
-        RtpPay* createPayloader() const;
         unsigned long long bitrate_;
+        _GstElement *colorspc_;
+        _GstElement *sinkElement() { return colorspc_; }
+        RtpPay* createPayloader() const;
+        
+        /// No Copy Constructor
+        Mpeg4Encoder(const Mpeg4Encoder&);     
+        /// No Assignment Operator
+        Mpeg4Encoder& operator=(const Mpeg4Encoder&);     
 };
 
 
@@ -235,12 +242,12 @@ class RawEncoder : public AudioConvertedEncoder
 {
     public:
         RawEncoder();
+        _GstElement *srcElement() { return aconv_; }
 
     private:
+        void init();
         RtpPay* createPayloader() const;
     
-        _GstElement *srcElement() { return aconv_; }
-        
         /// No Copy Constructor 
         RawEncoder(const RawEncoder&);     
         ///No Assignment Operator

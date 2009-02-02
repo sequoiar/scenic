@@ -22,6 +22,7 @@
 
 #include <gst/gst.h>
 #include "pipeline.h"
+#include "dv1394.h"
 #include "busMsgHandler.h"
 
 // NOTES:
@@ -245,6 +246,7 @@ void Pipeline::remove(GstElement **element) // guarantees that original pointer 
         if (refCount_ <= 0)
         {
             assert(refCount_ == 0);
+            Dv1394::reset();
             reset();
         }
     }

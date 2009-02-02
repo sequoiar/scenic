@@ -48,8 +48,8 @@ void SyncTestSuiteRtp::start_stop_jack_v4l()
     int numChannels = 8;
 
     if (id_ == 0) {
-        boost::shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
         boost::shared_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
+        boost::shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
         playback::start();
 
         BLOCK();
@@ -67,8 +67,8 @@ void SyncTestSuiteRtp::start_stop_jack_v4l()
         AudioSourceConfig aConfig("jackaudiosrc", numChannels);
         boost::shared_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ports::IP, "raw", ports::A_PORT));
         playback::start();
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
 
 
         BLOCK();
@@ -171,8 +171,8 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video()
     int numChannels = 2;
 
     if (id_ == 0) {
-        boost::shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
         boost::shared_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver());
+        boost::shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver());
         
         playback::start();
 
@@ -192,9 +192,8 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video()
         AudioSourceConfig aConfig("dv1394src", numChannels);
         boost::shared_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig));
         playback::start();
-        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
-        //usleep(100000); // GIVE receiver chance to start waiting
+        TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
 
         BLOCK();
 
