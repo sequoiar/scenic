@@ -40,7 +40,6 @@ bool GstReceiverThread::video_start(MapMsg& msg)
     {
         LOG_INFO("video_start");
         video_ = videofactory::buildVideoReceiver_(get_host_ip(),msg["codec"].c_str().c_str(),msg["port"],0,"xvimagesink");
-        video_->init();
         playback::start();
 //        queue_.push(MapMsg("video_started"));
         return true;
@@ -63,7 +62,6 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
     try
     {
         audio_ = audiofactory::buildAudioReceiver_(get_host_ip(),msg["codec"].c_str().c_str(),msg["port"]);
-        audio_->init();
         playback::start();
 //        queue_.push(MapMsg("audio_started"));
         return true;
@@ -107,7 +105,6 @@ bool GstSenderThread::video_start(MapMsg& msg)
             VideoSourceConfig config(msg["source"], std::string(msg["location"]));
             video_ = videofactory::buildVideoSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
         }
-        video_->init();
         playback::start();
         return true;
     }
@@ -140,7 +137,6 @@ bool GstSenderThread::audio_start(MapMsg& msg)
             AudioSourceConfig config(msg["source"], msg["location"], msg["channels"]);
             audio_ = asender = audiofactory::buildAudioSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
         }
-        audio_->init();
         playback::start();
 
         //Build Caps Msg

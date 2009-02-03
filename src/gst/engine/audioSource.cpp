@@ -54,7 +54,6 @@ AudioSource::~AudioSource()
 }
 
 
-
 /// Constructor 
 InterleavedAudioSource::InterleavedAudioSource(const AudioSourceConfig &config) : 
     AudioSource(config), interleave_(config_), sources_(), aconvs_()

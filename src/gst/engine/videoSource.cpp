@@ -20,8 +20,6 @@
 
 #include "util.h"
 
-#include <fstream>
-#include <gst/gst.h>
 #include "gstLinkable.h"
 #include "videoSource.h"
 #include "pipeline.h"
@@ -72,7 +70,7 @@ void VideoTestSource::filterCaps()
 {
     // otherwise videotestsrc defaults to 320 by 240
     std::ostringstream capsStr;
-    capsStr << "video/x-raw-yuv, width="<< width_ << ", height=" << height_; 
+    capsStr << "video/x-raw-yuv, width=" << width_ << ", height=" << height_; 
 
     GstCaps *videoCaps = gst_caps_from_string(capsStr.str().c_str());
     g_object_set(G_OBJECT(capsFilter_), "caps", videoCaps, NULL);
