@@ -46,6 +46,7 @@ class Pipeline
         void remove(std::vector < _GstElement * >&elementVec);
         bool isPlaying() const;
         bool isPaused() const;
+        bool isStopped() const;
         void seekTo(gint64 pos);
         void start();
         void pause();

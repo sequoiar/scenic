@@ -169,6 +169,16 @@ bool Pipeline::isPaused() const
         return false;
 }
 
+
+bool Pipeline::isStopped() const
+{
+    if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_NULL))
+        return true;
+    else
+        return false;
+}
+
+
 bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 {
     if (ret == GST_STATE_CHANGE_NO_PREROLL)
@@ -201,6 +211,8 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 
 void Pipeline::start()
 {
+    if (isPlaying())        // only needs to be started once
+        return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
     assert(checkStateChange(ret)); // set it to playing
     LOG_DEBUG("Now playing");
@@ -209,6 +221,8 @@ void Pipeline::start()
 
 void Pipeline::pause()
 {
+    if (isPaused())        // only needs to be paused once
+        return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
     assert(checkStateChange(ret)); // set it to paused
     LOG_DEBUG("Now paused");
@@ -217,6 +231,8 @@ void Pipeline::pause()
 
 void Pipeline::stop()
 {
+    if (isStopped())        // only needs to be stopped once
+        return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
     assert(checkStateChange(ret)); // set it to paused
     LOG_DEBUG("Now stopped/null");
