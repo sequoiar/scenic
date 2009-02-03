@@ -58,6 +58,8 @@ body {
 	position: relative;
 	height: 100px;
 	overflow: hidden;
+	padding: 5px 10px 0;
+	background-color: #F6F6F6;
 }
 
 #help {
@@ -77,10 +79,16 @@ body {
 
 #help_cont p {
 	margin-right: 320px;
+	padding: 0 20px;
+	font-size: 11px;
 }
 
 #contacts {
-	width: 220px;
+	border: dotted 1px #999;
+	padding: 10px;
+}
+
+#contacts_list {
 	height: 100px;
 	overflow: auto;
 	background-color: #FFF;
@@ -129,11 +137,20 @@ td.chati {
 	font-size: 11px;
 	text-align: right;
 	padding: 2px;
+	border: 0;
 }
 
 #contact_field input {
+	border: 1px solid #b3bcc3;
+	padding: 0 2px;
+	background-color: transparent;
+	width: 150px;
+}
+
+#contact_field.active_field input {
 	border: 1px solid #999;
 	padding: 0 2px;
+	background-color: #FFF;
 }
 
 #status {
@@ -240,27 +257,43 @@ table.graph td {
 }
 
 #modules_pan { 
-/*
-	display: none;
-
-*/	position: inherit;
+	position: inherit;
 	padding-bottom: 22px;
-	margin-top: 30px;
+	margin-top: 60px;
 }
- 
+
+#status_pan {
+	background-color: #e1e8eb;
+	position: relative;
+	padding-top: 72px;
+	width: 120px;
+	margin-left: 300px;
+	height: 100%;
+}
+
 input, select, textarea {
 	border: 1px solid #999;
 }
 
-input.but {
+input.but, #contact_field input.but {
 	border: 2px #F0F0F0 outset;
 }
 
-#modules_tab { 
-	background-color: #afc4c4;
+#modules_tab {
+	position: fixed;
+	background-color: #6679b9;
+/*
 	height: 30px;
-	line-height: 30px;
-	padding: 0 20px;
+
+*/	line-height: 30px;
+	padding: 0;
+/*
+	width: 69%;
+*/
+	right: 16px;
+	left: 300px;
+	z-index: 100000;
+	color: #FFF;
 }
  
 #network_tab { 
@@ -269,7 +302,7 @@ input.but {
 	line-height: 30px;
 	padding: 0 20px;
 }
- 
+
 ul#sortables {
 	width: 800px;
 	margin: 0;
@@ -277,9 +310,7 @@ ul#sortables {
 }
  
 li.module {
-	cursor: pointer;
 	list-style: none;
-	width: 800px;
 }
 
 .mod_title {
@@ -302,10 +333,6 @@ li.module {
 	font-size: 10px;
 }
 
-.sett {
-	position: relative;
-}
-
 .subsettings {
 	border: 1px dotted #999;
 	padding: 10px;
@@ -316,7 +343,7 @@ li.module {
 	position: relative;
 	border: 1px solid #ddd;
 /*	height: 100px;*/
-	padding: 15px 10px;
+	padding: 5px 10px 10px;
 	font-size: 11px;
 }
 
@@ -330,9 +357,8 @@ li.module {
 }
 
 .sett {
-	border-top: 1px dotted #CCC;
-	margin-top: 10px;
-	padding-top: 3px;
+	position: relative;
+	padding-top: 2px;
 }
 
 .close {

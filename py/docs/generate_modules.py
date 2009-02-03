@@ -218,7 +218,7 @@ def check_py_file(files):
     """
     Return a list with only the python scripts (remove all other files). 
     """
-    py_files = [fich for fich in files if fich[ - 3:] == '.py']
+    py_files = [fich for fich in files if fich[-3:] == '.py']
     return py_files
 
 
