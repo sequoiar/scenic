@@ -319,7 +319,10 @@ GstClock* Pipeline::clock() const
 GstElement *Pipeline::makeElement(const char *factoryName, const char *elementName) 
 {
     GstElement *element = gst_element_factory_make(factoryName, elementName);
-    assert(element);
+    if(!element)
+    {
+        THROW_ERROR("element not connected factoryName " << factoryName << " elementName " << elementName); 
+    }
     add(element);
     return element;
 }

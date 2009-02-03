@@ -61,7 +61,7 @@ videofactory::buildVideoReceiver_(const char *ip, const char *codec, int port, i
         sink = V_SINK;
     VideoSinkConfig vConfig(sink, screen_num);
     int id;
-    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::VIDEO_CAPS_PORT, id)); // get caps from remote sender
+    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(port, id)); // get caps from remote sender
     assert(id == MSG_ID);
     VideoReceiver* rx = new VideoReceiver(vConfig, rConfig);
     rx->init();
