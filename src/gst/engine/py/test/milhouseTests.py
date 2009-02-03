@@ -123,6 +123,13 @@ class MilhouseTests():
         txArgs += ' --audiosource dv1394src --videosource dv1394src --audiocodec vorbis'
         rxArgs += ' --audiocodec vorbis '
         self.runTest(rxArgs, txArgs)
+    
+    def test_08_videotestsrc_v4l(self):
+        """ Test v4l """
+        self.countdown("START")
+
+        rxArgs, txArgs = self.timeouts()
+        self.runTest(rxArgs + ' --videocodec h264', txArgs + ' --videosource videotestsrc --videocodec h264')
 
 
 
