@@ -18,86 +18,8 @@
  */
 
 #include "gstSenderThread.h"
-#include "engine/audioSender.h"
-#include "engine/videoSender.h"
-#include "engine/playback.h"
+#include "gst/videoFactoryInternal.h"
+#include "gst/audioFactoryInternal.h"
 
-GstSenderThread::~GstSenderThread()
-{
-    delete video_;
-    delete audio_;
-}
-
-bool GstSenderThread::video_start(MapMsg& msg)
-{
-    delete video_;
-    video_ = 0;
-
-    try
-    {
-        //VideoSourceConfig config("dv1394src");
-        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
-
-        if(msg["location"].empty())
-        {
-            VideoSourceConfig config(msg["source"]);
-            video_ =  new VideoSender(config, rConfig);
-        }
-        else
-        {
-            VideoSourceConfig config(msg["source"], std::string(msg["location"]));
-            video_ =  new VideoSender(config, rConfig);
-        }
-        video_->init();
-        playback::start();
-        return true;
-    }
-    catch(Except e)
-    {
-        LOG_WARNING(e.msg_);
-        delete video_;
-        video_ = 0;
-        return false;
-    }
-}
-
-
-bool GstSenderThread::audio_start(MapMsg& msg)
-{
-    delete audio_;
-    audio_ = 0;
-    try
-    {
-        AudioSender* asender;
-
-        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
-        if(msg["location"].empty())
-        {
-            AudioSourceConfig config(msg["source"], msg["channels"]);
-            audio_ = asender = new AudioSender(config, rConfig);
-        }
-        else
-        {
-            AudioSourceConfig config(msg["source"], msg["location"], msg["channels"]);
-            audio_ = asender = new AudioSender(config, rConfig);
-        }
-        audio_->init();
-        playback::start();
-
-        //Build Caps Msg
-        MapMsg caps("caps");
-        caps["caps_str"] = asender->getCaps();
-        //Forward to tcp
-        queue_.push(caps);
-        return true;
-    }
-    catch(Except e)
-    {
-        LOG_WARNING(e.msg_);
-        delete audio_;
-        audio_ = 0;
-        return false;
-    }
-}
 
 

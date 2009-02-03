@@ -26,7 +26,24 @@
 #include "gstThread.h"
 class ReceiverBase;
 
-/// MapMsg handler thread that calls GST media functionality
+/**MapMsg handler thread that calls GST media functionality
+ *
+ *
+ * msc {
+  a,b;
+
+    a->b [label="audio_stream"]
+    b->a [label="ok"]
+    a->b [label="video_stream"]
+    b->a [label="ok"]
+    a->b [label="play"]
+    b->a [label="ok"]
+    --- [label="receiving stream(s)"]
+    a->b [label="stop"]
+    b->a [lavel="ok"]
+    --- [label="stopped receiving stream(s)"]
+  }
+*/
 class GstReceiverThread
     : public GstThread
 {

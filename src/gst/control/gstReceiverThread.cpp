@@ -20,10 +20,10 @@
 #include "util.h"
 
 #include "gstReceiverThread.h"
+#include "gstSenderThread.h"
 
-#include "engine/audioReceiver.h"
-#include "engine/videoReceiver.h"
-#include "engine/playback.h"
+#include "gst/videoFactoryInternal.h"
+#include "gst/audioFactoryInternal.h"
 
 GstReceiverThread::~GstReceiverThread()
 {
@@ -38,9 +38,7 @@ bool GstReceiverThread::video_start(MapMsg& msg)
 
     try
     {
-        VideoSinkConfig config("xvimagesink");
-        ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"], "");
-        video_ = new VideoReceiver(config, rConfig);
+        video_ = videofactory::buildVideoReceiver_(get_host_ip(),msg["codec"].c_str().c_str(),msg["port"],0,"xvimagesink");
         video_->init();
         playback::start();
 //        queue_.push(MapMsg("video_started"));
@@ -63,12 +61,91 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
 
     try
     {
-        AudioSinkConfig config("jackaudiosink");
-        ReceiverConfig rConfig(msg["codec"], get_host_ip(), msg["port"], msg["caps"]);
-        audio_ = new AudioReceiver(config, rConfig);
+        audio_ = audiofactory::buildAudioReceiver_(get_host_ip(),msg["codec"].c_str().c_str(),msg["port"]);
         audio_->init();
         playback::start();
 //        queue_.push(MapMsg("audio_started"));
+        return true;
+    }
+    catch(Except e)
+    {
+        LOG_WARNING(e.msg_);
+        delete audio_;
+        audio_ = 0;
+        return false;
+    }
+}
+
+
+
+
+GstSenderThread::~GstSenderThread()
+{
+    delete video_;
+    delete audio_;
+}
+
+bool GstSenderThread::video_start(MapMsg& msg)
+{
+    delete video_;
+    video_ = 0;
+
+    try
+    {
+        //VideoSourceConfig config("dv1394src");
+        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
+
+        if(msg["location"].empty())
+        {
+            VideoSourceConfig config(msg["source"]);
+            video_ = videofactory::buildVideoSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
+        }
+        else
+        {
+            VideoSourceConfig config(msg["source"], std::string(msg["location"]));
+            video_ = videofactory::buildVideoSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
+        }
+        video_->init();
+        playback::start();
+        return true;
+    }
+    catch(Except e)
+    {
+        LOG_WARNING(e.msg_);
+        delete video_;
+        video_ = 0;
+        return false;
+    }
+}
+
+
+bool GstSenderThread::audio_start(MapMsg& msg)
+{
+    delete audio_;
+    audio_ = 0;
+    try
+    {
+        AudioSender* asender;
+
+        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
+        if(msg["location"].empty())
+        {
+            AudioSourceConfig config(msg["source"], msg["channels"]);
+            audio_ = asender = audiofactory::buildAudioSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
+        }
+        else
+        {
+            AudioSourceConfig config(msg["source"], msg["location"], msg["channels"]);
+            audio_ = asender = audiofactory::buildAudioSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
+        }
+        audio_->init();
+        playback::start();
+
+        //Build Caps Msg
+        MapMsg caps("caps");
+        caps["caps_str"] = asender->getCaps();
+        //Forward to tcp
+        queue_.push(caps);
         return true;
     }
     catch(Except e)

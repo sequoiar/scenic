@@ -1,4 +1,3 @@
-
 /* audioFactory.h
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
@@ -29,40 +28,25 @@
 
 #include "ports.h"
 
+#include "gst/audioFactoryInternal.h"
+
 namespace audiofactory
 {
-    static const char* A_SINK = "jackaudiosink";
-    static const char* A_CODEC = "raw";
-    static const int MSG_ID = 1;
 
     static boost::shared_ptr<AudioSender> 
     buildAudioSender(const AudioSourceConfig aConfig, const char* ip = ports::IP, const char *codec = A_CODEC, 
-            const long port = ports::A_PORT);
+            int port = ports::A_PORT)
+    {
+        return boost::shared_ptr<AudioSender>(buildAudioSender_(aConfig,ip,codec,port));
+    }
 
     static boost::shared_ptr<AudioReceiver> 
-    buildAudioReceiver(const char *ip = ports::IP, const char * codec = A_CODEC, const long port = ports::A_PORT, 
-                       const char *sink = A_SINK);
-}
+    buildAudioReceiver(const char *ip = ports::IP, const char * codec = A_CODEC, int port = ports::A_PORT, 
+                       const char *sink = A_SINK)
+    {
+        return boost::shared_ptr<AudioReceiver>(buildAudioReceiver_(ip,codec,port,sink));
+    }
 
-boost::shared_ptr<AudioSender> 
-audiofactory::buildAudioSender(const AudioSourceConfig aConfig, const char* ip, const char *codec, const long port)
-{
-    SenderConfig rConfig(codec, ip, port);
-    boost::shared_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
-    tx->init();
-    return tx;
-}
-
-boost::shared_ptr<AudioReceiver> 
-audiofactory::buildAudioReceiver(const char *ip, const char *codec, const long port, const char *sink)
-{
-    AudioSinkConfig aConfig(sink);
-    int id;
-    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::AUDIO_CAPS_PORT, id)); // get caps from remote sender
-    assert(id == MSG_ID);
-    boost::shared_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
-    rx->init();
-    return rx;
 }
 
 

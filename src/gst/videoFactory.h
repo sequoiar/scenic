@@ -28,43 +28,27 @@
 #include <boost/shared_ptr.hpp>   // for boost::shared_ptr
 #include "tcp/singleBuffer.h"
 
+#include "videoFactoryInternal.h"
+
 namespace videofactory
 {
-    static const char *V_SINK = "xvimagesink";
-    static const char *V_CODEC = "mpeg4";
-    static const int MSG_ID = 2;
 
     static boost::shared_ptr<VideoReceiver> 
-    buildVideoReceiver(const char *ip = ports::IP, const char * codec = V_CODEC, const long port = ports::V_PORT, 
-            int screen_num = 0, const char *sink = V_SINK);
+    buildVideoReceiver(const char *ip = ports::IP, const char * codec = V_CODEC, int port = ports::V_PORT, 
+            int screen_num = 0, const char *sink = V_SINK)
+    {
+        return boost::shared_ptr<VideoReceiver>(buildVideoReceiver_(ip,codec,port,screen_num,sink));
+    }
 
     static boost::shared_ptr<VideoSender> 
     buildVideoSender(const VideoSourceConfig vConfig, 
-            const char *ip = ports::IP, const char *codec = V_CODEC, const long port = ports::V_PORT);
+            const char *ip = ports::IP, const char *codec = V_CODEC, int port = ports::V_PORT)
+    {
+        return boost::shared_ptr<VideoSender>(buildVideoSender_(vConfig,ip,codec,port));
+    }
+
 }
 
-boost::shared_ptr<VideoSender> 
-videofactory::buildVideoSender(const VideoSourceConfig vConfig, const char *ip, const char *codec, const long port)
-{
-    SenderConfig rConfig(codec, ip, port);
-    boost::shared_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
-    tx->init(); 
-    return tx;
-}
-
-boost::shared_ptr<VideoReceiver> 
-videofactory::buildVideoReceiver(const char *ip, const char *codec, const long port, const int screen_num, const char *sink)
-{
-    if(!sink)
-        sink = V_SINK;
-    VideoSinkConfig vConfig(sink, screen_num);
-    int id;
-    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::VIDEO_CAPS_PORT, id)); // get caps from remote sender
-    assert(id == MSG_ID);
-    boost::shared_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
-    rx->init();
-    return rx;
-}
 
 #endif // _VIDEO_FACTORY_H_
 

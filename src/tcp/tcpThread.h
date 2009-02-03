@@ -49,5 +49,8 @@ class TcpThread
 };
 
 
+std::string tcpGetBuffer(int port, int &id);
+bool tcpSendBuffer(const char *ip, int port, int id, const std::string &caps);
+
 #endif // _TCP_THREAD_H_
 
