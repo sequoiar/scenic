@@ -30,7 +30,7 @@
 #include "rtpReceiver.h"
 #include "remoteConfig.h"
 
-std::list<GstElement *> RtpReceiver::usedDepayloaders_;
+std::list<GstElement *> RtpReceiver::depayloaders_;
 
 
 RtpReceiver::~RtpReceiver()
@@ -39,11 +39,11 @@ RtpReceiver::~RtpReceiver()
 
     // find this->depayloader in the static list of depayloaders
     std::list<GstElement *>::iterator iter;
-    iter = std::find(usedDepayloaders_.begin(), usedDepayloaders_.end(), depayloader_);
+    iter = std::find(depayloaders_.begin(), depayloaders_.end(), depayloader_);
 
     // make sure we found it and remove it
-    assert(iter != usedDepayloaders_.end());
-    usedDepayloaders_.erase(iter);
+    assert(iter != depayloaders_.end());
+    depayloaders_.erase(iter);
 }
 
 
@@ -87,10 +87,9 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
         LOG_DEBUG("Wrong pad");
         return;
     }
-    // FIXME: We only have this really stupid method of comparing the caps strings of all
-    // the sinks that have been attached to our RtpReceiver so far (stored in a list) against those of the new pad.
-    GstPad *sinkPad = get_matching_sink_pad(srcPad);
-    //GstPad *sinkPad = gst_element_get_static_pad(depayloader, "sink");
+    // FIXME: We only have this really moderately stupid method of comparing the caps of all
+    // the sinks that have been attached to RtpReceiver's in general (stored in a static list) against those of the new pad.
+    GstPad *sinkPad = getMatchingDepayloaderSinkPad(srcPad);
 
     if (gst_pad_is_linked(sinkPad)) // only link once
     {
@@ -105,21 +104,32 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
 }
 
 
-GstPad *RtpReceiver::get_matching_sink_pad(GstPad *srcPad)
+std::string RtpReceiver::getMediaType(GstPad *pad)
+{
+    GstStructure *structure = gst_caps_get_structure(gst_pad_get_caps(pad), 0);
+    const GValue *str = gst_structure_get_value(structure, "media");
+    std::string result(g_value_get_string(str));
+
+    if (result != "video" && result != "audio")
+        THROW_ERROR("Media type of depayloader sink pad is neither audio nor video!");
+
+    return result;
+}
+
+
+GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(GstPad *srcPad)
 {
     GstPad *sinkPad;
 
-    sinkPad = gst_element_get_static_pad(usedDepayloaders_.front(), "sink");
+    sinkPad = gst_element_get_static_pad(depayloaders_.front(), "sink");
 
-    // look for caps whose first 37 characters match (this includes the parameter that describes media type)
-    // FIXME: could just check the depayloader types/names
+    // match depayloader to rtp pad by media type
 
-    const int CAPS_LEN = 37;
-    std::list<GstElement *>::iterator iter = usedDepayloaders_.begin();
-    std::string srcCaps(gst_caps_to_string(gst_pad_get_caps(srcPad)));
+    std::list<GstElement *>::iterator iter = depayloaders_.begin();
+    std::string srcMediaType(getMediaType(srcPad));
 
-    while (strncmp(gst_caps_to_string(gst_pad_get_caps(sinkPad)), srcCaps.c_str(), CAPS_LEN)
-           && iter != usedDepayloaders_.end())
+    while (getMediaType(sinkPad) != srcMediaType
+           && iter != depayloaders_.end())
     {
         gst_object_unref(sinkPad);
         sinkPad = gst_element_get_static_pad(*iter, "sink");
@@ -166,10 +176,11 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     assert(gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink));
     assert(gstlinkable::link_pads(send_rtcp_src, rtcpSenderSink));
 
-    usedDepayloaders_.push_back(depayloader_);
+    depayloaders_.push_back(depayloader_);
     // when pad is created, it must be linked to new sink
-    g_signal_connect(rtpbin_, "pad-added", G_CALLBACK(RtpReceiver::cb_new_src_pad), 
-            static_cast<void*>(depayloader_));
+    g_signal_connect(rtpbin_, "pad-added", 
+            G_CALLBACK(RtpReceiver::cb_new_src_pad), 
+            NULL);
 
     // release request pads (in reverse order)
     gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);

@@ -41,12 +41,13 @@ class RtpReceiver
         void add(RtpPay * depayloader, const ReceiverConfig & config);
 
     private:
-        static _GstPad *get_matching_sink_pad(_GstPad *srcPad);
+        static _GstPad *getMatchingDepayloaderSinkPad(_GstPad *srcPad);
+        static std::string getMediaType(_GstPad *pad);
         static void cb_new_src_pad(_GstElement * element, _GstPad * srcPad, void *data);
 
         _GstElement *rtp_receiver_;
         _GstElement *depayloader_;
-        static std::list<_GstElement *> usedDepayloaders_;
+        static std::list<_GstElement *> depayloaders_;
 
         RtpReceiver(const RtpReceiver&); //No Copy Constructor
         RtpReceiver& operator=(const RtpReceiver&); //No Assignment Operator
