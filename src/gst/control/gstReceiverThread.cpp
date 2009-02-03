@@ -93,7 +93,7 @@ bool GstSenderThread::video_start(MapMsg& msg)
     try
     {
         //VideoSourceConfig config("dv1394src");
-        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
+        //SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
 
         if(msg["location"].empty())
         {
@@ -127,7 +127,7 @@ bool GstSenderThread::audio_start(MapMsg& msg)
     {
         AudioSender* asender;
 
-        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
+//        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
         if(msg["location"].empty())
         {
             AudioSourceConfig config(msg["source"], msg["channels"]);
@@ -142,10 +142,10 @@ bool GstSenderThread::audio_start(MapMsg& msg)
         playback::start();
 
         //Build Caps Msg
-        MapMsg caps("caps");
-        caps["caps_str"] = asender->getCaps();
+ //       MapMsg caps("caps");
+ //       caps["caps_str"] = asender->getCaps();
         //Forward to tcp
-        queue_.push(caps);
+ //       queue_.push(caps);
         return true;
     }
     catch(Except e)
