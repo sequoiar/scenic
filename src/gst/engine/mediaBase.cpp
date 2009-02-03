@@ -25,24 +25,30 @@
 
 void LocalBase::init()  // template method
 {
+    assert(!initialized_);
     // these methods are defined in subclasses
     init_source();
     init_sink();
+    initialized_ = true;
 }
 
 void SenderBase::init()  // template method
 {
     // these methods are defined in subclasses
+    assert(!initialized_);
     init_source();
     init_codec();
     init_payloader();
+    initialized_ = true;
 }
 
 void ReceiverBase::init()  // template method
 {
     // these methods are defined in subclasses
+    assert(!initialized_);
     init_codec();
     init_depayloader();
     init_sink();
+    initialized_ = true;
 }
 
