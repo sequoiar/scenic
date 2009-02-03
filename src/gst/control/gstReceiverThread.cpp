@@ -38,6 +38,7 @@ bool GstReceiverThread::video_start(MapMsg& msg)
 
     try
     {
+        LOG_INFO("video_start");
         video_ = videofactory::buildVideoReceiver_(get_host_ip(),msg["codec"].c_str().c_str(),msg["port"],0,"xvimagesink");
         video_->init();
         playback::start();
@@ -94,6 +95,7 @@ bool GstSenderThread::video_start(MapMsg& msg)
     {
         //VideoSourceConfig config("dv1394src");
         //SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
+        LOG_INFO("video_start");
 
         if(msg["location"].empty())
         {
