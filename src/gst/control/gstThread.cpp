@@ -95,10 +95,10 @@ bool GstReceiverThread::video_start(MapMsg& msg)
 {
     delete video_;
     video_ = 0;
-
+ 
     try
     {
-        LOG_INFO("video_start");
+        LOG_INFO("video_start0");
         video_ = videofactory::buildVideoReceiver_(get_host_ip(),msg["codec"].c_str().c_str(),msg["port"],0,"xvimagesink");
         playback::start();
 //        queue_.push(MapMsg("video_started"));
