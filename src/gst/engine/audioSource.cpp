@@ -361,14 +361,17 @@ void AudioJackSource::sub_init()
     for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
 #endif
+    // TODO: fine tune this in conjunction with jitterbuffer
+    //g_object_set(G_OBJECT(source_), "buffer-time", 75000, NULL);
+
     // otherwise jackaudiosrc defaults to 2 channels
     std::ostringstream capsStr;
     capsStr << "audio/x-raw-int, channels=" << config_.numChannels() 
         << ", clock-rate=" << Pipeline::SAMPLE_RATE;
 
     GstCaps *jackCaps = gst_caps_from_string(capsStr.str().c_str());
-    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
+    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     g_object_set(G_OBJECT(capsFilter_), "caps", jackCaps, NULL);
 
     gst_caps_unref(jackCaps);

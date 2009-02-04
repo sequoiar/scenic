@@ -135,7 +135,7 @@ class MilhouseTests():
 
 
 # here we run all the tests thanks to the wonders of reflective programming
-tests = prefixedMethods(MilhouseTests(), 'test_')
+tests = prefixedMethods(MilhouseTests(), 'test_01')
 
 for test in tests:
     print "TEST: "  + test.__doc__

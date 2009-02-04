@@ -67,7 +67,7 @@ void VideoSink::makeWindowBlack()
 void VideoSink::showWindow()
 {
     makeWindowBlack();
-    gtk_window_set_title(GTK_WINDOW(window_), "Sropulpof");
+    gtk_window_set_title(GTK_WINDOW(window_), "Milhouse");
     gtk_widget_show_all(window_);
 }
 
@@ -166,7 +166,7 @@ void XvImageSink::init()
     }
 
     gtk_window_set_default_size(GTK_WINDOW(window_), VideoSink::WIDTH, VideoSink::HEIGHT);
-    gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
+    //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
 
 //g_signal_connect(G_OBJECT(window_), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
 
