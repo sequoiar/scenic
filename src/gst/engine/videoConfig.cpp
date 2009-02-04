@@ -34,6 +34,8 @@ VideoSource * VideoSourceConfig::createSource() const
         return new VideoTestSource(*this);
     else if (source_ == "v4l2src")
         return new VideoV4lSource(*this);
+    else if (source_ == "v4lsrc")
+        return new VideoV4lSource(*this);
     else if (source_ == "dv1394src")
         return new VideoDvSource(*this);
     else if (source_ == "filesrc")
