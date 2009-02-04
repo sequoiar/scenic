@@ -34,15 +34,19 @@ namespace audiofactory
 {
 
     static boost::shared_ptr<AudioSender> 
-    buildAudioSender(const AudioSourceConfig aConfig, const char* ip = ports::IP, const char *codec = A_CODEC, 
-            int port = ports::A_PORT)
+    buildAudioSender(const AudioSourceConfig aConfig, 
+                     const std::string &ip = ports::IP, 
+                     const std::string &codec = A_CODEC, 
+                     int port = ports::A_PORT)
     {
-        return boost::shared_ptr<AudioSender>(buildAudioSender_(aConfig,ip,codec,port));
+        return boost::shared_ptr<AudioSender>(buildAudioSender_(aConfig, ip, codec, port));
     }
 
     static boost::shared_ptr<AudioReceiver> 
-    buildAudioReceiver(const char *ip = ports::IP, const char * codec = A_CODEC, int port = ports::A_PORT, 
-                       const char *sink = A_SINK)
+    buildAudioReceiver(const std::string &ip = ports::IP, 
+                       const std::string &codec = A_CODEC, 
+                       int port = ports::A_PORT, 
+                       const std::string &sink = A_SINK)
     {
         return boost::shared_ptr<AudioReceiver>(buildAudioReceiver_(ip,codec,port,sink));
     }

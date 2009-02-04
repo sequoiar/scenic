@@ -30,23 +30,26 @@
 
 namespace videofactory
 {
-    static const char *V_SINK = "xvimagesink";
-    static const char *V_CODEC = "mpeg4";
+    static const std::string V_SINK = "xvimagesink";
+    static const std::string V_CODEC = "mpeg4";
     static const int MSG_ID = 2;
 
     static VideoReceiver* 
-    buildVideoReceiver_(const char *ip = ports::IP, const char * codec = V_CODEC, int port = ports::V_PORT, 
-            int screen_num = 0, const char *sink = V_SINK);
+    buildVideoReceiver_(const std::string &ip = ports::IP, const std::string &codec = V_CODEC, int port = ports::V_PORT, 
+            int screen_num = 0, const std::string &sink = V_SINK);
 
     static VideoSender* 
     buildVideoSender_(const VideoSourceConfig vConfig, 
-            const char *ip = ports::IP, const char *codec = V_CODEC, int port = ports::V_PORT);
+            const std::string &ip = ports::IP, const std::string &codec = V_CODEC, int port = ports::V_PORT);
 
 
 }
 
 VideoSender* 
-videofactory::buildVideoSender_(const VideoSourceConfig vConfig, const char *ip, const char *codec, int port)
+videofactory::buildVideoSender_(const VideoSourceConfig vConfig, 
+                                const std::string &ip, 
+                                const std::string &codec, 
+                                int port)
 {
     SenderConfig rConfig(codec, ip, port);
     VideoSender* tx = new VideoSender(vConfig, rConfig);
@@ -55,10 +58,13 @@ videofactory::buildVideoSender_(const VideoSourceConfig vConfig, const char *ip,
 }
 
 VideoReceiver*
-videofactory::buildVideoReceiver_(const char *ip, const char *codec, int port, int screen_num, const char *sink)
+videofactory::buildVideoReceiver_(const std::string &ip, 
+                                  const std::string &codec, 
+                                  int port, 
+                                  int screen_num, 
+                                  const std::string &sink)
 {
-    if(!sink)
-        sink = V_SINK;
+    assert(!sink.empty());
     VideoSinkConfig vConfig(sink, screen_num);
     int id;
     ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::VIDEO_CAPS_PORT, id)); // get caps from remote sender

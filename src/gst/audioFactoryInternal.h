@@ -30,22 +30,29 @@
 
 namespace audiofactory
 {
-    static const char* A_SINK = "jackaudiosink";
-    static const char* A_CODEC = "raw";
+    static const std::string &A_SINK = "jackaudiosink";
+    static const std::string &A_CODEC = "raw";
     static const int MSG_ID = 1;
 
     static AudioSender* 
-    buildAudioSender_(const AudioSourceConfig aConfig, const char* ip = ports::IP, const char *codec = A_CODEC, 
-            int port = ports::A_PORT);
+    buildAudioSender_(const AudioSourceConfig aConfig, 
+                      const std::string &ip = ports::IP, 
+                      const std::string &codec = A_CODEC, 
+                      int port = ports::A_PORT);
 
     static AudioReceiver*
-    buildAudioReceiver_(const char *ip = ports::IP, const char * codec = A_CODEC, int port = ports::A_PORT, 
-                       const char *sink = A_SINK);
+    buildAudioReceiver_(const std::string &ip = ports::IP, 
+                        const std::string &codec = A_CODEC, 
+                        int port = ports::A_PORT, 
+                        const std::string &sink = A_SINK);
 
 }
 
 static AudioSender*
-audiofactory::buildAudioSender_(const AudioSourceConfig aConfig, const char* ip, const char *codec, int port)
+audiofactory::buildAudioSender_(const AudioSourceConfig aConfig, 
+                                const std::string &ip, 
+                                const std::string &codec, 
+                                int port)
 {
     SenderConfig rConfig(codec, ip, port);
     AudioSender* tx = new AudioSender(aConfig, rConfig);
@@ -54,7 +61,10 @@ audiofactory::buildAudioSender_(const AudioSourceConfig aConfig, const char* ip,
 }
 
 static AudioReceiver*
-audiofactory::buildAudioReceiver_(const char *ip, const char *codec, int port, const char *sink)
+audiofactory::buildAudioReceiver_(const std::string &ip, 
+                                  const std::string &codec, 
+                                  int port, 
+                                  const std::string &sink)
 {
     AudioSinkConfig aConfig(sink);
     int id;
