@@ -6,21 +6,6 @@
  	
 	$('c_name').setProperty('value', '');
  	
-	// Media/Network toggle
-/*
-	$('media_but').addEvent('click', function() {
-		$('modules_pan').setStyle('display', 'block');
-		$('media_thumb').setStyle('display', 'block');
-		$('network').setStyle('display', 'none');
-	});
-	
-	$('network_but').addEvent('click', function() {
-		$('modules_pan').setStyle('display', 'none');
-		$('media_thumb').setStyle('display', 'none');
-		$('network').setStyle('display', 'block');
-	});
-
-*/	
 	// Chat/Help collapse button (triangle)
 	var bot_controls = new Array();
 	
@@ -63,10 +48,12 @@
 		}
 	});
 
+	$$('#global_stat div.bot_trianble')[0].addClass('bot_trianble_up');
+	bot_controls['global_stat'].show();
+
 	// Module close button
 	$$('div.close').addEvent('click', function(){
 		var mod_parent = this.getParent().getParent();
-		console.info(this);
 		mod_parent.style.display = "none";
 		var thumb = new Element('div', {
  		   'styles': {
@@ -129,9 +116,11 @@
 	var net_stat_pan = new Fx.Slide($('status_pan'), {mode: 'horizontal'});
 	var right_pan = new Fx.Style($('right_pan'), 'margin-left');
 	var modules_tab = new Fx.Style($('modules_tab'), 'left');
-	console.info();
 	net_stat_pan.hide();
-	$('stat_pan_but').addEvent('click', function(){
+	//slidePan();
+	$('stat_pan_but').addEvent('click', slidePan);
+
+	function slidePan(){
 		var pan_size = $('modules_tab').getStyle('left').toInt();
 		if (net_stat_pan.wrapper.offsetWidth == 0) {
 			net_stat_pan.slideIn();
@@ -142,17 +131,19 @@
 			right_pan.start(0);
 			modules_tab.start(pan_size - $('status_pan').getSize().size.x);
 		};
-	});
-
+	}
+	
 	// Stream button
 	$('stream_but').addEvent('click', function(){
 		if (this.value == 'Stream') {
 			this.value = 'Stop';
 			gray(true);
 			auto_connect(true);
+			$('glob_net_stat').setStyle('display', 'inline');
 		} else {
 			this.value = 'Stream';
 			gray(false);
+			$('glob_net_stat').setStyle('display', 'none');
 		}
 	});
  
@@ -164,7 +155,6 @@
  
  	//Change net test for net status
 	var net_test = new Fx.Style('net_test', 'opacity', {duration:200});
-	$('conn_status').setStyle('opacity', '0');
 	var net_status = new Fx.Style('conn_status', 'opacity', {duration:2000});
 	
 	$('connect_but').addEvent('click', function(){

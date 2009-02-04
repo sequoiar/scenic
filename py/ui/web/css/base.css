@@ -11,6 +11,10 @@ body {
 	font-size: 12px;
 }
 
+h2 {
+	margin: 0; 
+}
+
 #left_pan {
 	position: absolute;
 	top: 0px;
@@ -78,7 +82,6 @@ body {
 }
 
 #help_cont p {
-	margin-right: 320px;
 	padding: 0 20px;
 	font-size: 11px;
 }
@@ -114,13 +117,13 @@ h3 span {
 }
 
 td.active {
-	background-color: #99DD99;
-	width: 12px;
+	background: url(../img/network-transmit-receive.png) no-repeat;
+	width: 16px;
 }
 
 td.toto {
-	background-color: #DD9999;
-	width: 12px;
+	background: url(../img/network-error.png) no-repeat;
+	width: 16px;
 }
 
 td.chati {
@@ -163,12 +166,28 @@ td.chati {
 }
 
 table.graph {
-	width: 220px;
+	width: auto;
+	border-collapse: collapse;
 }
 
 table.graph td {
 	font-size: 9px;
+	padding: 1px 2px 0 0;
 }
+
+table.graph th {
+	text-align: left;
+}
+
+table.graph tr.info_type td {
+	border-bottom: 1px dotted #999;
+	padding: 4px 2px 0px 0;
+}
+
+table.graph td.way {
+	padding-left: 2px;
+}
+
 
 
 .bottom_title {
@@ -188,6 +207,15 @@ table.graph td {
 	color: #000;
 	font-size: 11px;
 	border-bottom: 1px dotted #999;
+}
+
+.subnetstat {
+	position: relative;
+	height: 16px;
+	padding: 2px 20px 0px;
+	color: #000;
+	font-size: 12px;
+	font-weight: bold;
 }
 
 #contact_details_cont, #substatus_cont {
@@ -259,16 +287,20 @@ table.graph td {
 #modules_pan { 
 	position: inherit;
 	padding-bottom: 22px;
-	margin-top: 60px;
+	margin-top: 105px;
 }
 
 #status_pan {
 	background-color: #e1e8eb;
 	position: relative;
-	padding-top: 72px;
-	width: 120px;
+	padding: 0px;
+	width: 125px;
 	margin-left: 300px;
-	height: 100%;
+	height: 1000px;
+}
+
+#stat_pan_but:hover {
+	cursor:pointer;
 }
 
 input, select, textarea {
@@ -359,6 +391,7 @@ li.module {
 .sett {
 	position: relative;
 	padding-top: 2px;
+	padding-left: 20px;
 }
 
 .close {
