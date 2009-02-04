@@ -25,4 +25,4 @@ aclocal -I m4
 autoheader
 autoconf -f
 automake -a -f
-./configure $@
+#./configure $@
