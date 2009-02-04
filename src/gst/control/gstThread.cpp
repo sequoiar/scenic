@@ -148,7 +148,7 @@ bool GstSenderThread::video_start(MapMsg& msg)
 {
     delete video_;
     video_ = 0;
-
+    VideoSender* sender;
     try
     {
         //VideoSourceConfig config("dv1394src");
@@ -158,14 +158,15 @@ bool GstSenderThread::video_start(MapMsg& msg)
         if(msg["location"].empty())
         {
             VideoSourceConfig config(msg["source"]);
-            video_ = videofactory::buildVideoSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
+            video_ = sender = videofactory::buildVideoSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
         }
         else
         {
             VideoSourceConfig config(msg["source"], std::string(msg["location"]));
-            video_ = videofactory::buildVideoSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
+            video_ = sender = videofactory::buildVideoSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
         }
         playback::start();
+        assert(tcpSendBuffer(msg["address"].c_str().c_str(), ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, sender->getCaps()));
         return true;
     }
     catch(Except e)
