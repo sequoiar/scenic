@@ -208,7 +208,7 @@ std::string tcpGetBuffer(int port, int &id)
 
 #include <errno.h>
 
-bool tcpSendBuffer(const char *ip, int port, int id, const std::string &caps)
+bool tcpSendBuffer(const std::string &ip, int port, int id, const std::string &caps)
 {
     MapMsg msg("buffer");
 

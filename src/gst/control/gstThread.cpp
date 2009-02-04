@@ -99,7 +99,7 @@ bool GstReceiverThread::video_start(MapMsg& msg)
     try
     {
         LOG_INFO("video_start");
-        video_ = videofactory::buildVideoReceiver_(get_host_ip(),msg["codec"].c_str().c_str(),msg["port"],0,"xvimagesink");
+        video_ = videofactory::buildVideoReceiver_(get_host_ip(), msg["codec"], msg["port"], 0, "xvimagesink");
         playback::start();
 //        queue_.push(MapMsg("video_started"));
         return true;
@@ -121,7 +121,7 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
 
     try
     {
-        audio_ = audiofactory::buildAudioReceiver_(get_host_ip(),msg["codec"].c_str().c_str(),msg["port"]);
+        audio_ = audiofactory::buildAudioReceiver_(get_host_ip(), msg["codec"], msg["port"]);
         playback::start();
 //        queue_.push(MapMsg("audio_started"));
         return true;
@@ -158,15 +158,15 @@ bool GstSenderThread::video_start(MapMsg& msg)
         if(msg["location"].empty())
         {
             VideoSourceConfig config(msg["source"]);
-            video_ = sender = videofactory::buildVideoSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
+            video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
         else
         {
             VideoSourceConfig config(msg["source"], std::string(msg["location"]));
-            video_ = sender = videofactory::buildVideoSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
+            video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
         playback::start();
-        assert(tcpSendBuffer(msg["address"].c_str().c_str(), ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, sender->getCaps()));
+        assert(tcpSendBuffer(msg["address"], ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, sender->getCaps()));
         return true;
     }
     catch(Except e)
@@ -191,12 +191,12 @@ bool GstSenderThread::audio_start(MapMsg& msg)
         if(msg["location"].empty())
         {
             AudioSourceConfig config(msg["source"], msg["channels"]);
-            audio_ = asender = audiofactory::buildAudioSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
+            audio_ = asender = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
         else
         {
             AudioSourceConfig config(msg["source"], msg["location"], msg["channels"]);
-            audio_ = asender = audiofactory::buildAudioSender_(config,msg["address"].c_str().c_str(),msg["codec"].c_str().c_str(),msg["port"]);
+            audio_ = asender = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
         playback::start();
 
