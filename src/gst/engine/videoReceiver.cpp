@@ -28,6 +28,20 @@
 #include "codec.h"
 #include "rtpPay.h"
 
+    
+VideoReceiver::VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig rConfig) : 
+    videoConfig_(vConfig), 
+    remoteConfig_(rConfig), 
+    session_(), 
+    depayloader_(0), 
+    decoder_(0), 
+    sink_(0), 
+    gotCaps_(false) 
+{
+    assert(remoteConfig_.hasCodec()); 
+    assert(remoteConfig_.capsMatchCodec()); 
+}
+
 VideoReceiver::~VideoReceiver()
 {
     delete sink_;
@@ -55,7 +69,7 @@ void VideoReceiver::init_depayloader()
     gstlinkable::link(*depayloader_, *decoder_);
 
     session_.add(depayloader_, remoteConfig_);
-    
+
     session_.setCaps(decoder_->getCaps());
 }
 

@@ -32,10 +32,17 @@
 /** Constructor parameterized by an AudioSinkConfig 
  * and a ReceiverConfig */
 AudioReceiver::AudioReceiver(const AudioSinkConfig aConfig, const ReceiverConfig rConfig) : 
-    audioConfig_(aConfig), remoteConfig_(rConfig), session_(), 
-    gotCaps_(false),depayloader_(0), decoder_(0), level_(), sink_(0)
+    audioConfig_(aConfig), 
+    remoteConfig_(rConfig), 
+    session_(), 
+    gotCaps_(false),
+    depayloader_(0), 
+    decoder_(0), 
+    level_(), 
+    sink_(0)
 { 
     assert(remoteConfig_.hasCodec()); 
+    assert(remoteConfig_.capsMatchCodec()); 
 }
 
 /// Destructor 

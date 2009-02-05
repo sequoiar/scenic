@@ -34,9 +34,7 @@ class VideoReceiver
     : public ReceiverBase
 {
     public:
-        VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig rConfig)
-            : videoConfig_(vConfig), remoteConfig_(rConfig), session_(), depayloader_(0), 
-            decoder_(0), sink_(0), gotCaps_(false) {}
+        VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig rConfig);
 
         void makeFullscreen();
 

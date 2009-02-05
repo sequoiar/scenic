@@ -60,16 +60,16 @@ bool Codec::isSupportedCodec(const std::string & codecStr)
 
 
 /// Returns bitrate property for this encoder
-double Encoder::getBitrate()
+unsigned Encoder::getBitrate()
 {
     assert(codec_);
-    double bitrate; 
+    unsigned bitrate; 
     g_object_get(G_OBJECT(codec_), "bitrate", &bitrate, NULL);
     return bitrate;
 }
 
 /// Sets bitrate property for this encoder
-void Encoder::setBitrate(double bitrate)
+void Encoder::setBitrate(unsigned bitrate)
 {
     assert(codec_);
     g_object_set(G_OBJECT(codec_), "bitrate", bitrate, NULL);
@@ -112,7 +112,7 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
 
 /// Constructor 
 H264Encoder::H264Encoder() : 
-    colorspc_(0), bitrate_(3000) // in kb/s
+    colorspc_(0)
 {}
 
 
@@ -130,7 +130,7 @@ void H264Encoder::init()
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
     // subme: subpixel motion estimation 1=fast, 6=best
     // threads: 1-4, 0 for automatic 
-    g_object_set(G_OBJECT(codec_), "bitrate", bitrate_, "byte-stream", TRUE, "threads", 3, NULL);
+    setBitrate(3000);   // kb/s
 
     gstlinkable::link(colorspc_, codec_);
 }
@@ -166,8 +166,7 @@ const char *H264Decoder::getCaps() const
 
 /// Constructor 
 H263Encoder::H263Encoder() : 
-    colorspc_(0), 
-    bitrate_(3000000)    // in bits/sec
+    colorspc_(0)
 {}
 
 
@@ -183,7 +182,7 @@ void H263Encoder::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("ffenc_h263", NULL);
-    g_object_set(G_OBJECT(codec_), "bitrate", bitrate_, NULL);
+    setBitrate(3000000);    // in bits/sec
 
     gstlinkable::link(colorspc_, codec_);
 }
@@ -220,7 +219,7 @@ const char *H263Decoder::getCaps() const
 
 /// Constructor 
 Mpeg4Encoder::Mpeg4Encoder() : 
-    bitrate_(2048000), colorspc_(0)    // in bits/sec
+    colorspc_(0)
 {}
 
 
@@ -229,7 +228,7 @@ void Mpeg4Encoder::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
-    g_object_set(G_OBJECT(codec_), "bitrate", bitrate_, NULL);
+    setBitrate(2048000);    // in bits/sec
 
     gstlinkable::link(colorspc_, codec_);
 }

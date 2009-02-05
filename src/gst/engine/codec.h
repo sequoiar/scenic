@@ -61,8 +61,8 @@ class Encoder : public Codec
     public:
         /// Abstract Factory method that will create payloaders corresponding to this Encoder's codec type 
         virtual RtpPay* createPayloader() const = 0;
-        double getBitrate();
-        void setBitrate(double bitrate);
+        unsigned getBitrate();
+        void setBitrate(unsigned bitrate);
 };
 
 /** 
@@ -129,7 +129,6 @@ class H264Encoder : public Encoder
         RtpPay* createPayloader() const;
 
         _GstElement *colorspc_;
-        unsigned long long bitrate_;
         _GstElement *sinkElement() { return colorspc_; }
 
         /// No Copy Constructor
@@ -163,7 +162,6 @@ class H263Encoder : public Encoder
         RtpPay* createPayloader() const;
 
         _GstElement *colorspc_;
-        unsigned long long bitrate_;
         _GstElement *sinkElement() { return colorspc_; }
 
         /// No Copy Constructor
@@ -191,7 +189,6 @@ class Mpeg4Encoder : public Encoder
 
     private:
         void init();
-        unsigned long long bitrate_;
         _GstElement *colorspc_;
         _GstElement *sinkElement() { return colorspc_; }
         RtpPay* createPayloader() const;

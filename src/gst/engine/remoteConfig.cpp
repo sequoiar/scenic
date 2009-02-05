@@ -21,6 +21,7 @@
 #include "util.h"
 
 #include <algorithm>
+#include <gst/gst.h>
 #include "remoteConfig.h"
 #include "codec.h"
 
@@ -112,6 +113,31 @@ Decoder * ReceiverConfig::createAudioDecoder() const
     {
         THROW_ERROR(codec_ << " is an invalid codec!");
         return 0;
+    }
+}
+
+bool ReceiverConfig::capsMatchCodec() const
+{
+    GstStructure *structure = gst_caps_get_structure(gst_caps_from_string(caps_.c_str()), 0);
+    const GValue *str = gst_structure_get_value(structure, "encoding-name");
+    std::string encodingName(g_value_get_string(str));
+
+    if (encodingName == "VORBIS" && codec_ == "vorbis")
+        return true;
+    else if (encodingName == "L16" && codec_ == "raw")
+        return true;
+    else if (encodingName == "MPA" && codec_ == "mp3")
+        return true;
+    else if (encodingName == "MP4V-ES" && codec_ == "mpeg4")
+        return true;
+    else if (encodingName == "H264" && codec_ == "h264")
+        return true;
+    else if (encodingName == "H263" && codec_ == "h263")
+        return true;
+    else
+    {
+        LOG_WARNING("Caps don't match codec");
+        return false;
     }
 }
 

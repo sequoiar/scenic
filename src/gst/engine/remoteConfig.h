@@ -93,6 +93,7 @@ class ReceiverConfig : public RemoteConfig
         Decoder* createAudioDecoder() const;
 
         const char *caps() const { return caps_.c_str(); }
+        bool capsMatchCodec() const;
 
     private:
         const std::string caps_;
