@@ -314,11 +314,14 @@
 		<div id="right_pan">
 			<div id="modules_tab">
 				<b style="font-size: 14px;">&nbsp;&nbsp;&nbsp;Media Streams</b>&nbsp;&nbsp;&nbsp;&nbsp; Presets:
-				<select>
-					<option>Audio Stereo</option>
+				<select id="globalSett">
 					<option>A/V Conference</option>
+					<option>Audio Stereo</option>
 					<option>Edit...</option>
 				</select>
+				<input type="button" value="Save" class="but save" />
+				<input type="button" value="Save As..." class="but save" />
+				<input type="button" value="Reset" class="but save" />
 				<div id="media_thumb"></div>				
 				<div style="padding: 5px 40px 0px 0px;background-color:#EEE;">
 					<img src="img/utilities-system-monitor.png" id="stat_pan_but" style="float:left;padding:10px 8px;" />
@@ -328,11 +331,14 @@
 								<input disabled type="button" id="stream_but" value="Stream" class="but" style="margin: 4px;width:70px;" />
 								<span id="glob_net_stat" style="padding-left: 10px;display:none;">Network status: <span style="background: #79f55c;padding: 3px 10px;">Good</span></span><br />
 								<input type="checkbox"/>Use test medias&nbsp; &nbsp;<input type="checkbox"/> Send back stream</td>
-							<td align="right">Mode: <select>
-						<option>Symetrical</option>
-						<option>One way</option>
-						<option>Asymetrical</option>
-					</select></td>
+							<td align="right">
+								Mode:
+								<select>
+									<option>Symetrical</option>
+									<option>One way</option>
+									<option>Asymetrical</option>
+								</select>
+							</td>
 						</tr>
 					</table>
 				</div>
@@ -342,14 +348,15 @@
 					<li id="audio_loc" class="module">
 						<div class="mod_title">
 							<div class="triangle"></div>
-							<span style="background-color:#F4002B;padding: 2px 4px;">Audio</span>
+							<span style="padding: 2px 4px;">Audio</span>
 							<select>
-								<option>MP3 Stereo (modified)</option>
+								<option>MP3 Stereo</option>
 								<option>PCM 8 Channels</option>
 								<option>Edit...</option>
 							</select>
-							<input type="button" value="Save" class="but" style="font-size:10px;position:relative;left:210px;" />
-							<input type="button" value="Save As..." class="but" style="font-size:10px;position:relative;left:210px;" />
+							<input type="button" value="Save" class="but save" style="font-size:10px;position:relative;left:210px;" />
+							<input type="button" value="Save As..." class="but save" style="font-size:10px;position:relative;left:210px;" />
+							<input type="button" value="Reset" class="but save" style="font-size:10px;position:relative;left:210px;" />
 							<div class="close"></div>
 						</div>
 						<div class="controls">
@@ -391,16 +398,16 @@
 											</td>
 											<td>
 												Input: 
-												<select>
+												<select id="audio_input">
 													<option>JACK Audio</option>
-													<option>ALSA</option>
+													<option selected="selected">ALSA</option>
 												</select> 
 											</td>
 										</tr>
 									</table>
 								</div>
 							</div>
-							<div style="color:#FFF;font-size:12px;background-color:#f4002b;margin:10px;padding:5px;"><b>Warning:</b> JACK Audio is not available</div>
+							<div id="warning" style="display:none;color:#FFF;font-size:12px;background-color:#f4002b;margin:10px;padding:5px;"><b>Warning:</b> JACK Audio is not available</div>
 							<table>
 								<tr align="center">
 									<td><img src="img/vumeter.png" width="15" height="60" alt="vumeter" /></td>
@@ -422,6 +429,9 @@
 								<option>HD h264</option>
 								<option>Edit...</option>
 							</select>
+							<input type="button" value="Save" class="but save" style="font-size:10px;position:relative;left:210px;" />
+							<input type="button" value="Save As..." class="but save" style="font-size:10px;position:relative;left:210px;" />
+							<input type="button" value="Reset" class="but save" style="font-size:10px;position:relative;left:210px;" />
 							<div class="close"></div>
 						</div>
 						<div class="controls">
@@ -454,7 +464,7 @@
 											</td>
 											<td>
 												Bitrate: 
-												<input type="text" value="2"/>
+												<input type="text" value="3.6"/>
 												 Mbps 
 											</td>
 										</tr>
@@ -496,6 +506,9 @@
 								<option>VST Synth</option>
 								<option>Edit...</option>
 							</select>
+							<input type="button" value="Save" class="but save" style="font-size:10px;position:relative;left:210px;" />
+							<input type="button" value="Save As..." class="but save" style="font-size:10px;position:relative;left:210px;" />
+							<input type="button" value="Reset" class="but save" style="font-size:10px;position:relative;left:210px;" />
 							<div class="close"></div>
 						</div>
 						<div class="controls">

@@ -67,6 +67,7 @@
 		        'click': function(){
 		            $(mod_parent.id).style.display = 'list-item';
 					this.remove();
+					globalSave();
 		        }
 		    },
 			'id': 'thumb_' + mod_parent.id
@@ -76,6 +77,8 @@
 		
 	});
 
+	$E('div.close', 'data_loc').fireEvent('click');
+	
 	// Module collapse button (triangle)
 	var controls = new Array();
 	
@@ -117,7 +120,7 @@
 	var right_pan = new Fx.Style($('right_pan'), 'margin-left');
 	var modules_tab = new Fx.Style($('modules_tab'), 'left');
 	net_stat_pan.hide();
-	//slidePan();
+//	slidePan();
 	$('stat_pan_but').addEvent('click', slidePan);
 
 	function slidePan(){
@@ -140,9 +143,11 @@
 			gray(true);
 			auto_connect(true);
 			$('glob_net_stat').setStyle('display', 'inline');
+			switchGraph(true);
 		} else {
 			this.value = 'Stream';
 			gray(false);
+			switchGraph(false);
 			$('glob_net_stat').setStyle('display', 'none');
 		}
 	});
@@ -249,5 +254,86 @@
 	$('contact_edit').addEvent('click', function(){
 		set_fields(true);
 	});
+	
+	// Warning
+	$('audio_input').addEvent('change', function(){
+		var title = $$('#audio_loc span')[0];
+		var warning = $('warning');
+		if (this.value == 'JACK Audio') {
+			title.setStyle('background-color', '#f4002b');
+			warning.setStyle('display', 'block');
+			this.setStyle('border', '1px solid #f4002b');
+		} else {
+			title.setStyle('background-color', 'transparent');
+			warning.setStyle('display', 'none');
+			this.setStyle('border', '1px solid #999');
+		}
+	});
+	
+	// Disable meters
+	var black = new Element('div', {
+		'class':'black'
+	});
+	var meters = $$('#status_pan img').filterByAttribute('width', '=', '50');
+	meters.setStyle('display', 'none');
+	meters.each(function(elem){
+		black.clone().injectBefore(elem);
+	});
+	
+	function switchGraph(state) {
+		if (state) {
+			$$('div.black').setStyle('display', 'none');
+			meters.setStyle('display', 'block');
+		} else {
+			$$('div.black').setStyle('display', 'block');
+			meters.setStyle('display', 'none');
+		}
+	}
+	
+	// Show save settings
+	$$('div.subsettings select', 'div.subsettings input').addEvent('change', function(){
+		var gp = getGrandParent(this, 10);
+		var menu = $E('select', gp);
+		var index = menu.selectedIndex;
+		var option = menu.options[index];
+		if (!option.text.contains('(modified)', '')) {
+			option.text += ' (modified)';
+			$ES('input.save', gp).setStyle('display', 'inline');			
+		}
+	});
+	
+	// Show global save settings
+	$$('div.mod_title select').addEvent('change', globalSave);
+	$E('td select', 'modules_tab').addEvent('change', globalSave);
+	$$('div.close').addEvent('click', globalSave);
+	
+	function globalSave(state) {
+		var menu = $('globalSett');
+		var index = menu.selectedIndex;
+		var option = menu.options[index];
+		if (!option.text.contains('(modified)', '')) {
+			option.text += ' (modified)';
+			$ES('input.save', 'modules_tab').setStyle('display', 'inline');
+		}		
+	}
+	
+	// Hide save settings
+	$$('input.save').addEvent('click', function(){
+		var parent = this.getParent();
+		$ES('input.save', parent).setStyle('display', 'none');
+		var menu = $E('select', parent);
+		var index = menu.selectedIndex;
+		var option = menu.options[index];
+		option.text = option.text.replace(' (modified)', '');
+	});
+	
+	function getGrandParent(elem, level){
+		var grandParent = elem;
+		for (var i=0; i<level; i++){
+			grandParent = grandParent.getParent();
+		}
+		return grandParent;
+	}
+	
 });
 
