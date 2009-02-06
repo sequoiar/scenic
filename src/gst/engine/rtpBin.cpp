@@ -74,7 +74,7 @@ void RtpBin::printSourceStats(GObject * source)
 gboolean RtpBin::printStatsCallback(gpointer data)
 {
     GObject *session;
-    GValueArray *arr;
+    GValueArray *arrayOfSources;
     GValue *val;
     guint i;
     
@@ -88,18 +88,18 @@ gboolean RtpBin::printStatsCallback(gpointer data)
         g_signal_emit_by_name(rtpbin, "get-internal-session", sessionId, &session);
 
         // print all the sources in the session, this include the internal source
-        g_object_get(session, "sources", &arr, NULL);
+        g_object_get(session, "sources", &arrayOfSources, NULL);
 
-        for (i = 0; i < arr->n_values; ++i)
+        for (i = 0; i < arrayOfSources->n_values; ++i)
         {
             GObject *source;
 
-            val = g_value_array_get_nth(arr, i);
+            val = g_value_array_get_nth(arrayOfSources, i);
             source = static_cast<GObject*>(g_value_get_object(val));
 
             printSourceStats(source);
         }
-        g_value_array_free(arr);
+        g_value_array_free(arrayOfSources);
 
         g_object_unref(session);
 

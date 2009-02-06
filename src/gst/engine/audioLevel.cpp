@@ -33,7 +33,7 @@
 /** Constructor sets by default emitMessages to true 
  * and message interval to one second */
 AudioLevel::AudioLevel() : 
-    level_(0), emitMessages_(true), rmsValues_(0), interval_(1000000000LL) {}
+    level_(0), emitMessages_(true), interval_(1000000000LL) {}
 
 /// Destructor 
 AudioLevel::~AudioLevel()
@@ -61,17 +61,6 @@ void AudioLevel::emitMessages(bool doEmit)
 }
 
 
-/// Updates most recent rms value of the specified channel. 
-void AudioLevel::updateRms(double rmsDb, size_t channelIdx)
-{
-    if (channelIdx == rmsValues_.size())
-        rmsValues_.push_back(dbToLinear(rmsDb));    // new channel
-    else if (channelIdx > rmsValues_.size())
-        LOG_WARNING("Invalid channel index, discarding rms value");
-    else
-        rmsValues_[channelIdx] = dbToLinear(rmsDb);
-}
-
 /// Converts from decibel to linear (0.0 to 1.0) scale. 
 double AudioLevel::dbToLinear(double db)
 {
@@ -85,6 +74,7 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
 {
     const GstStructure *s = gst_message_get_structure(msg);
     const gchar *name = gst_structure_get_name(s);
+    std::vector<double> rmsValues;
 
     if (strncmp(name, "level", strlen("level")) == 0) {   // this is level's msg
         guint channels;
@@ -100,9 +90,9 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
             list = gst_structure_get_value(s, "rms");
             value = gst_value_list_get_value(list, channelIdx);
             rmsDb = g_value_get_double(value);
-            updateRms(rmsDb, channelIdx);
+            rmsValues.push_back(dbToLinear(rmsDb));    // new channel
         }
-        post();
+        post(rmsValues);
 
         return true;
     }
@@ -112,21 +102,21 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
 
 
 /// Prints current rms values through the LogWriter system. 
-void AudioLevel::print() const
+void AudioLevel::print(const std::vector<double> &rmsValues) const
 {
     std::ostringstream os;
-    std::copy(rmsValues_.begin(), rmsValues_.end(), std::ostream_iterator<double>(os, " "));
+    std::copy(rmsValues.begin(), rmsValues.end(), std::ostream_iterator<double>(os, " "));
 
     LOG_DEBUG("rms values: " << os.str());
 }
 
 
 /// Posts the rms values to be handled at a higher level by the MapMsg system. 
-void AudioLevel::post() const
+void AudioLevel::post(const std::vector<double> &rmsValues) const
 {
     MapMsg mapMsg("levels");
 
-    mapMsg["values"] = rmsValues_;
+    mapMsg["values"] = rmsValues;
     msg::post(mapMsg);
 }
 

@@ -54,17 +54,16 @@ class AudioLevel : public GstLinkableFilter, public BusMsgHandler
 
         _GstElement *sinkElement() { return level_; }
 
-        void updateRms(double rmsDb, size_t channelIdx);
+        //void updateRms(double rmsDb, size_t channelIdx);
 
         static double dbToLinear(double db);
 
-        void print() const;
+        void print(const std::vector<double> &rmsValues) const;
 
-        void post() const;
+        void post(const std::vector<double> &rmsValues) const;
 
         _GstElement *level_;
         bool emitMessages_;
-        std::vector<double> rmsValues_;
         unsigned long long interval_;
 
         AudioLevel(const AudioLevel&);     //No Copy Constructor
