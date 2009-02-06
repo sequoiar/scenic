@@ -30,17 +30,17 @@ class ReceiverBase;
  *
  *
  \msc 
-  a,b;
+  miville,gst;
 
-    a->b [label="audio_stream"];
-    b->a [label="ok"];
-    a->b [label="video_stream"];
-    b->a [label="ok"];
-    a->b [label="play"];
-    b->a [label="ok"];
+    miville->gst [label="audio_init:"];
+    gst->miville [label="audio_init: ack=ok"];
+    miville->gst [label="video_init:"];
+    gst->miville [label="video_init: ack=ok"];
+    miville->gst [label="start:"];
+    gst->miville [label="start: ack=ok"];
     --- [label="receiving stream(s)"];
-    a->b [label="stop"];
-    b->a [label="ok"];
+    miville->gst [label="stop"];
+    gst->miville [label="stop: ack=ok"];
     --- [label="stopped receiving stream(s)"];
  \endmsc
 */
