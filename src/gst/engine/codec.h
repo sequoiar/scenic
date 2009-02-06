@@ -61,7 +61,8 @@ class Encoder : public Codec
     public:
         /// Abstract Factory method that will create payloaders corresponding to this Encoder's codec type 
         virtual RtpPay* createPayloader() const = 0;
-        unsigned getBitrate();
+        int getBitrate();
+        void postBitrate();
         void setBitrate(unsigned bitrate);
 };
 

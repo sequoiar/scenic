@@ -26,6 +26,7 @@
 #include "codec.h"
 #include "rtpPay.h"
 #include "pipeline.h"
+#include "mapMsg.h"
 
 
 const std::string Codec::VALID_CODECS[NUM_CODECS] = {"h264", "raw", "vorbis", "mp3", "mpeg4", "h263"};
@@ -60,7 +61,7 @@ bool Codec::isSupportedCodec(const std::string & codecStr)
 
 
 /// Returns bitrate property for this encoder
-unsigned Encoder::getBitrate()
+int Encoder::getBitrate()
 {
     assert(codec_);
     unsigned bitrate; 
@@ -73,6 +74,19 @@ void Encoder::setBitrate(unsigned bitrate)
 {
     assert(codec_);
     g_object_set(G_OBJECT(codec_), "bitrate", bitrate, NULL);
+}
+
+
+/// Posts bitrate using MapMsg
+void Encoder::postBitrate()
+{
+    assert(codec_);
+    MapMsg mapMsg("bitrate");
+    std::string codecName(gst_element_factory_get_longname(gst_element_get_factory(codec_)));
+    std::stringstream msgStream; 
+    msgStream << codecName << ": " << getBitrate();
+    mapMsg["value"] = msgStream.str();
+    msg::post(mapMsg);
 }
 
 /// Constructor 
