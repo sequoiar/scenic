@@ -23,8 +23,8 @@
 #include "gstThread.h"
 #include "engine/playback.h"
 
-void GstThread::stop(MapMsg& ){ playback::stop();} 
-void GstThread::start(MapMsg& ){ playback::start();} 
+void GstThread::audio_stop(MapMsg& ){ playback::stop();} 
+void GstThread::video_stop(MapMsg& ){ playback::stop();} 
 int GstThread::main()
 {
     bool done = false;
@@ -48,17 +48,21 @@ int GstThread::main()
                 queue_.push(f);
                 done = true;
             }
-            else if(s == "audio_init")
+            else if(s == "audio_start")
             {
-                audio_init(f);
+                audio_start(f);
             }
-            else if(s == "video_init")
+            else if(s == "audio_stop")
+            {
+                audio_stop(f);
+            }
+            else if(s == "video_start")
             {
                 video_start(f);
             }
-            else if(s == "stop")
+            else if(s == "video_stop")
             {
-                stop(f);
+                video_stop(f);
             }
             else if(s == "levels")
             {
@@ -87,7 +91,7 @@ GstReceiverThread::~GstReceiverThread()
     delete audio_;
 }
 
-bool GstReceiverThread::video_init(MapMsg& msg)
+bool GstReceiverThread::video_start(MapMsg& msg)
 {
     delete video_;
     video_ = 0;
@@ -110,7 +114,7 @@ bool GstReceiverThread::video_init(MapMsg& msg)
 }
 
 
-bool GstReceiverThread::audio_init(MapMsg& msg)
+bool GstReceiverThread::audio_start(MapMsg& msg)
 {
     delete audio_;
     audio_ = 0;
@@ -140,7 +144,7 @@ GstSenderThread::~GstSenderThread()
     delete audio_;
 }
 
-bool GstSenderThread::video_init(MapMsg& msg)
+bool GstSenderThread::video_start(MapMsg& msg)
 {
     delete video_;
     video_ = 0;
@@ -175,7 +179,7 @@ bool GstSenderThread::video_init(MapMsg& msg)
 }
 
 
-bool GstSenderThread::audio_init(MapMsg& msg)
+bool GstSenderThread::audio_start(MapMsg& msg)
 {
     delete audio_;
     audio_ = 0;
