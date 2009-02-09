@@ -157,12 +157,12 @@ bool GstSenderThread::video_start(MapMsg& msg)
 
         if(msg["location"].empty())
         {
-            VideoSourceConfig config(msg["source"]);
+            VideoSourceConfig config(msg["source"], msg["bitrate"]);
             video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
         else
         {
-            VideoSourceConfig config(msg["source"], std::string(msg["location"]));
+            VideoSourceConfig config(msg["source"], msg["bitrate"], std::string(msg["location"]));
             video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
         playback::start();

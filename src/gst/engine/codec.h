@@ -121,6 +121,7 @@ class H264Encoder : public Encoder
 {
     public: 
         H264Encoder();
+        void setBitrate(unsigned);
 
     private:
         ~H264Encoder();

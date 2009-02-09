@@ -68,7 +68,7 @@ short pof::run(int argc, char **argv)
     options.add(new IntArg(&screenNum, "screen", 'n', "screen", "xinerama screen num"));
     options.add(new BoolArg(&version, "version", '\0', "version number"));
     options.add(new IntArg(&numChannels, "numChannels", 'c', "numChannels", "2"));
-    options.add(new IntArg(&videoBitrate, "videobitrate", 'x', "videobitrate", ""));
+    options.add(new IntArg(&videoBitrate, "videobitrate", 'x', "videobitrate", "3000000"));
 
     options.parse(argc, argv);
 

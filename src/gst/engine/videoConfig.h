@@ -29,11 +29,11 @@ class VideoSourceConfig
 {
     public:
         //* for a simple source */
-        explicit VideoSourceConfig(const std::string &source__, const unsigned bitrate__) 
+        explicit VideoSourceConfig(const std::string &source__, const int bitrate__) 
             : source_(source__), bitrate_(bitrate__), location_("") {}
 
         //* for source (remote) w/ location i.e. filename or url */
-        VideoSourceConfig(const std::string &source__, const unsigned bitrate__, const std::string &location__)
+        VideoSourceConfig(const std::string &source__, const int bitrate__, const std::string &location__)
             : source_(source__), bitrate_(bitrate__), location_(location__)  {}
 
         //* copy constructor */
@@ -43,7 +43,7 @@ class VideoSourceConfig
         VideoSource* createSource() const;  // factory method
 
         const char *source() const { return source_.c_str(); }
-        unsigned bitrate() const { return bitrate_; }
+        int bitrate() const { return bitrate_; }
 
         bool hasLocation() const { return location_.empty(); }
         bool fileExists() const;
@@ -51,7 +51,7 @@ class VideoSourceConfig
 
     private:
         const std::string source_;
-        const unsigned bitrate_;
+        const int bitrate_;
         const std::string location_;
         /// No Assignment Operator 
         VideoSourceConfig& operator=(const VideoSourceConfig&);     
