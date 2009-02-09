@@ -63,7 +63,7 @@ class Encoder : public Codec
         virtual RtpPay* createPayloader() const = 0;
         int getBitrate();
         void postBitrate();
-        void setBitrate(unsigned bitrate);
+        virtual void setBitrate(unsigned bitrate);
 };
 
 /** 

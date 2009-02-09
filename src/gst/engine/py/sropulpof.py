@@ -70,6 +70,9 @@ def parseArgs(args):
     parser.add_option("-o", "--timeout",
             type="int", dest="timeout", default=0, 
             help="time in ms before stopping, 0 means play forever")
+    parser.add_option("-z", "--videobitrate",
+            type="int", dest="videoBitrate", default=3000000, 
+            help="videobitrate in bit/s")
 
     return parser.parse_args(args)
 
@@ -93,9 +96,9 @@ def runAsSender(options):
     """ Sends media to a remote receiver """
     vConfig = None
     if options.videoDevice is None:
-        vConfig = VideoSourceConfig(options.videoSource)
+        vConfig = VideoSourceConfig(options.videoSource, options.videoBitrate)
     else:
-        vConfig = VideoSourceConfig(options.videoSource, options.videoDevice)
+        vConfig = VideoSourceConfig(options.videoSource, options.videoBitrate, options.videoDevice)
     
     vTx = buildVideoSender(vConfig, options.ip, options.videoCodec, options.videoPort)
 
