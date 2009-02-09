@@ -47,6 +47,7 @@ short pof::run(int argc, char **argv)
     char *videoSink = 0;
     int audioPort = 0;
     int videoPort = 0;
+    int videoBitrate = 3000000;
     char *videoDevice = 0;
 
     int screenNum = 0;
@@ -67,6 +68,7 @@ short pof::run(int argc, char **argv)
     options.add(new IntArg(&screenNum, "screen", 'n', "screen", "xinerama screen num"));
     options.add(new BoolArg(&version, "version", '\0', "version number"));
     options.add(new IntArg(&numChannels, "numChannels", 'c', "numChannels", "2"));
+    options.add(new IntArg(&videoBitrate, "videobitrate", 'x', "videobitrate", ""));
 
     options.parse(argc, argv);
 
@@ -108,9 +110,9 @@ short pof::run(int argc, char **argv)
         VideoSourceConfig *vConfig; 
 
         if (videoDevice)
-            vConfig = new VideoSourceConfig("v4l2src", videoDevice);
+            vConfig = new VideoSourceConfig("v4l2src", videoBitrate, videoDevice);
         else
-            vConfig = new VideoSourceConfig("v4l2src");
+            vConfig = new VideoSourceConfig("v4l2src", videoBitrate);
 
         boost::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
         delete vConfig;

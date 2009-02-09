@@ -150,6 +150,13 @@ void H264Encoder::init()
 }
 
 
+/// Overridden to convert from bit/s to kbit/s
+void H264Encoder::setBitrate(unsigned newBitrate)
+{
+    Encoder::setBitrate(newBitrate * 0.001);
+}
+
+
 /// Creates an h.264 rtp payloader 
 RtpPay* H264Encoder::createPayloader() const
 {
