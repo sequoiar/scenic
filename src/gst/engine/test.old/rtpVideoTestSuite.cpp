@@ -45,7 +45,7 @@ void RtpVideoTestSuite::start_stop_test_video()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("videotestsrc");
+        VideoSourceConfig vConfig("videotestsrc", 3000000);
         boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
@@ -74,7 +74,7 @@ void RtpVideoTestSuite::start_stop_test_video_gl()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("videotestsrc");
+        VideoSourceConfig vConfig("videotestsrc", 3000000);
         boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
@@ -104,7 +104,7 @@ void RtpVideoTestSuite::start_stop_mpeg4()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("videotestsrc");
+        VideoSourceConfig vConfig("videotestsrc", 3000000);
         boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "mpeg4"));
 
         playback::start();
@@ -134,7 +134,7 @@ void RtpVideoTestSuite::start_stop_h263()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("videotestsrc");
+        VideoSourceConfig vConfig("videotestsrc", 3000000);
         boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "h263"));
 
         playback::start();
@@ -164,7 +164,7 @@ void RtpVideoTestSuite::start_stop_h263_v4l()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("v4l2src");
+        VideoSourceConfig vConfig("v4l2src", 3000000);
         boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "h263"));
 
         playback::start();
@@ -194,7 +194,7 @@ void RtpVideoTestSuite::start_stop_mpeg4_v4l()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("v4l2src");
+        VideoSourceConfig vConfig("v4l2src", 3000000);
         boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig, ports::IP, "mpeg4"));
 
         playback::start();
@@ -225,7 +225,7 @@ void RtpVideoTestSuite::start_stop_v4l()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("v4l2src");
+        VideoSourceConfig vConfig("v4l2src", 3000000);
         boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
@@ -255,7 +255,7 @@ void RtpVideoTestSuite::start_stop_v4l_gl()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("v4l2src");
+        VideoSourceConfig vConfig("v4l2src", 3000000);
         boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
@@ -284,7 +284,7 @@ void RtpVideoTestSuite::start_stop_dv()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("dv1394src");
+        VideoSourceConfig vConfig("dv1394src", 3000000);
         boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
@@ -313,7 +313,7 @@ void RtpVideoTestSuite::start_stop_dv_gl()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("dv1394src");
+        VideoSourceConfig vConfig("dv1394src", 3000000);
         boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 
         playback::start();
@@ -342,7 +342,7 @@ void RtpVideoTestSuite::start_stop_file()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("filesrc", videoFilename_);
+        VideoSourceConfig vConfig("filesrc", 3000000, videoFilename_);
         
         boost::shared_ptr<VideoSender> tx(videofactory::buildVideoSender(vConfig));
 

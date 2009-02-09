@@ -33,7 +33,7 @@ const int VideoTestSuite::GL_SCREEN = 0;
 
 void VideoTestSuite::start_stop_test_video_gl()
 {
-    VideoSourceConfig srcConfig("videotestsrc");
+    VideoSourceConfig srcConfig("videotestsrc", 3000000);
     VideoSinkConfig sinkConfig("glimagesink", GL_SCREEN);
     VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
@@ -51,7 +51,7 @@ void VideoTestSuite::start_stop_test_video_gl()
 
 void VideoTestSuite::start_stop_test_video()
 {
-    VideoSourceConfig srcConfig("videotestsrc");
+    VideoSourceConfig srcConfig("videotestsrc", 3000000);
     VideoSinkConfig sinkConfig("xvimagesink");
     VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
@@ -70,7 +70,7 @@ void VideoTestSuite::start_stop_test_video()
 
 void VideoTestSuite::start_stop_v4l()
 {
-    VideoSourceConfig srcConfig("v4l2src");
+    VideoSourceConfig srcConfig("v4l2src", 3000000);
     VideoSinkConfig sinkConfig("xvimagesink");
     VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
@@ -89,7 +89,7 @@ void VideoTestSuite::start_stop_v4l()
 
 void VideoTestSuite::start_stop_v4l_gl()
 {
-    VideoSourceConfig srcConfig("v4l2src");
+    VideoSourceConfig srcConfig("v4l2src", 3000000);
     VideoSinkConfig sinkConfig("glimagesink");
     VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
@@ -107,7 +107,7 @@ void VideoTestSuite::start_stop_v4l_gl()
 
 void VideoTestSuite::start_stop_dv()
 {
-    VideoSourceConfig srcConfig("dv1394src");
+    VideoSourceConfig srcConfig("dv1394src", 3000000);
     VideoSinkConfig sinkConfig("xvimagesink");
     VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
@@ -126,7 +126,7 @@ void VideoTestSuite::start_stop_dv()
 
 void VideoTestSuite::start_stop_file()
 {
-    VideoSourceConfig srcConfig("filesrc", videoFilename_);
+    VideoSourceConfig srcConfig("filesrc", 3000000, videoFilename_);
     VideoSinkConfig sinkConfig("xvimagesink");
     VideoLocal tx(srcConfig, sinkConfig);
     tx.init();
