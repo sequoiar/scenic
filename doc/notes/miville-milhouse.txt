@@ -1,28 +1,38 @@
-/** \file miville-milhouse.txt
+/** \page Miville and friends miville-milhouse.txt
  *
  *
  * miville - milhouse integration
+ * \section other friends
  *
  *
+ * \section lamers
+ *
+ * \subsection crashers
  *
  *
+ * \msc 
+ *  miville,gst;
  *
- *
+ *    miville->gst [label="audio_init:"];
+ *    gst->miville [label="audio_init: ack=ok"];
+ *    miville->gst [label="video_init:"];
+ *    gst->miville [label="video_init: ack=ok"];
+ *    miville->gst [label="start:"];
+ *    gst->miville [label="start: ack=ok"];
+ *    --- [label="receiving stream(s)"];
+ *    miville->gst [label="stop"];
+ *    gst->miville [label="stop: ack=ok"];
+ *    --- [label="stopped receiving stream(s)"];
+ * \endmsc
+ * \page page 1 some random page
+  
+  Leading text.
+   \section sec An example section
+   This page contains the subsections \ref subsection1 and \ref subsection2.
+   For more info see page \ref page2.
+   \subsection subsection1 The first subsection
+   Text.
+   \subsection subsection2 The second subsection
+   More text.
+ 
  */
-#if 0
-
- \msc 
-  miville,gst;
-
-    miville->gst [label="audio_init:"];
-    gst->miville [label="audio_init: ack=ok"];
-    miville->gst [label="video_init:"];
-    gst->miville [label="video_init: ack=ok"];
-    miville->gst [label="start:"];
-    gst->miville [label="start: ack=ok"];
-    --- [label="receiving stream(s)"];
-    miville->gst [label="stop"];
-    gst->miville [label="stop: ack=ok"];
-    --- [label="stopped receiving stream(s)"];
- \endmsc
-#endif
