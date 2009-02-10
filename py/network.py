@@ -1,3 +1,4 @@
+#!/usr/bin/env python 
 ## -*- coding: utf-8 -*-
 
 # Sropulpof
@@ -26,11 +27,14 @@ See https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting
 
 import os
 import sys
+import time
 
-from twisted.internet import protocol
 from twisted.internet import reactor
+from twisted.internet import protocol
+from twisted.internet import defer
 from twisted.internet.error import ProcessExitedAlready
 from twisted.python import failure
+from twisted.protocols import basic
 
 # App imports
 from utils import log
@@ -38,9 +42,129 @@ from utils import commands
 
 log = log.start('debug', 1, 0, 'network')
 
+class TestServerProtocol(basic.LineReceiver):
+    """
+    server side communication protocol
+
+    usage :
+    * quit
+    * test <float ms> args
+    * ping
+    """
+    def connectionMade(self):
+        print "Connection from", self.transport.getPeer().host
+
+    def lineReceived(self, line):
+        if line == 'quit':
+            self.sendLine("Goodbye.")
+            self.transport.loseConnection()
+        elif line.startswith("test"):
+            args = line.split(" ")[1:]
+            print "server received test with args : ", args
+            self.sendLine("starting test")
+        elif line == "ping":
+            print "server received ping"
+            self.sendLine("pong")
+        else:
+            self.sendLine("You said: " + line)
+
+class TestServerFactory(protocol.ServerFactory):
+    protocol  = TestServerProtocol
+
+class TestClientProtocol(basic.LineReceiver):
+    """
+    client side protocol for network tests
+
+    usage : 
+    * starting test
+    * pong 
+    """
+    def __init__(self):
+        self.ping_started = 0.0000 # time.time()
+
+    def lineReceived(self, line):
+        #log.debug('Line received from %s:%s: %s' % (self.transport.realAddress[0], self.transport.realAddress[1], line))
+        #log.info('Bad command receive from remote')
+        #print "client received ", line
+
+        if line == "starting test":
+            print "client received starting test"
+            self.sendLine("quit")
+            #self.transport.loseConnection()
+
+        elif line == "pong":
+            print "client received pong"
+            latency = (time.time() - self.ping_started) * 1000 # roughly estimated in ms
+            print "latency : %f ms" % latency 
+            latency = latency / 2.0 # unidirectional
+            self.sendLine("test %f" % latency)
+
+    def connectionMade(self):
+        self.factory.deferred.callback("Connected !")
+        self.ping_started = time.time()
+        self.sendLine("ping")
+
+    def connectionLost(self, reason):
+        """
+        The reason Failure wraps a twisted.internet.error.ConnectionDone or twisted.internet.error.ConnectionLost instance
+        """
+        print "client : connectionLost"
+        try:
+            print reason.message
+        except AttributeError:
+            pass
+        #reactor.stop()
+
+class TestClientFactory(protocol.ClientFactory):
+    protocol = TestClientProtocol
+    def __init__(self):
+        self.deferred = defer.Deferred()
+
+    def clientConnectionFailed(self, connector, reason):
+        self.deferred.errBack(reason)
+
+class TestClient:
+    """
+    The actual client for network tests
+    
+    This is the class that does the job.
+    """
+    def __init__(self): #, contact, api):
+        self._state = "DISCONNECTED"
+
+    def connect_to(self, host, port):
+        """
+        Connects to a remote TestServerFactory
+
+        :return: a defer.Deferred instance.
+        """
+        test_factory = TestClientFactory()
+        reactor.connectTCP(host, port, test_factory)
+        test_factory.deferred.addCallback(self.handle_success, host, port)
+        test_factory.deferred.addErrback(self.handle_failure, host, port)
+        return test_factory.deferred
+
+    def handle_success(self, result, host, port):
+        """
+        Callback for successful connection to a remote test server
+        """
+        print "connected to port %i" % port
+        self.state = "CONNECTED"
+
+    def handle_failure(self, failure, host, port):
+        """
+        Errback for a failure when trying to connect to a remore test server.
+        """
+        print "error connecting to port %i" % port
+        print failure.getErrorMessage()
+        # reactor.stop()
+
+
+
+# --------------------- constants --------------------------------
 NETPERF_TEST_UNIDIRECTIONAL = "unidirectional from local to remote"
 
-# functions
+# functions -----------------------------------------------------
 def _parse_iperf_output(lines):
     """
     Parses the output of iperf -c <host> -u
@@ -118,7 +242,7 @@ class IperfServerProcessProtocol(protocol.ProcessProtocol):
         pass # print "errConnectionLost! The child closed their stderr."
 
     def processEnded(self, status_object):
-        print "Ended, status %d" % status_object.value.exitCode
+        print "Ended iperf server, status %d" % status_object.value.exitCode
         #print "STOP REACTOR"
         #reactor.stop()
 
@@ -156,13 +280,14 @@ class NetworkTester(object):
         """
         try:
             process_transport.signalProcess(sig)
-        except Exception, e:
-            print e
-        if sig == 15:
-            reactor.callLater(verify_timeout, self.kill_process, process_transport, 9)
+        except ProcessExitedAlready, e:
+            print "error : ProcessExitedAlready", e.message
         else:
-            process_transport.loseConnection()
-            self.state = self.STOPPED
+            if sig == 15:
+                reactor.callLater(verify_timeout, self.kill_process, process_transport, 9)
+            else:
+                process_transport.loseConnection()
+                self.state = self.STOPPED
 
     def on_client_results(self, results, commands, extra_arg, caller):
         """
@@ -236,8 +361,8 @@ class NetworkTester(object):
             callback = self.on_client_results
             try:
                 commands.single_command_start(command, callback, extra_arg, caller)
-            except Exception, e:
-                print e
+            except CommandNotFoundError, e: # TODO: 
+                print "error: ", e.message
             else:
                self.state = self.CLIENT_RUNNING
 
@@ -265,9 +390,13 @@ def start(subject):
     Returns a dict whose keys are 'client' and 'server'
     """
     # will raise CommandNotFoundError if not found:
-    executable = commands.find_command("iperf", 
+    try:
+        executable = commands.find_command("iperf", 
             "`iperf` command not found. Please see See https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting for installation instructions.")
-    
+    except CommandNotFoundError, e:
+        if subject is not None:
+            subject.notify(subject, e.message, "error")
+        print e.message
     server = NetworkTester()
     server.api = subject
     server.start_server()
@@ -277,25 +406,6 @@ def start(subject):
     
     return {'server':server, 'client':client}
 
-if __name__ == "__main__":
-    # SIMPLE TEST
-    def debug_meanwhile():
-        # TODO : remove
-        print "waiting..."
-        reactor.callLater(0.5, debug_meanwhile)
-
-    iperf = NetworkTester()
-    if len(sys.argv) == 2:
-        if sys.argv[1] == "client":
-            print "starting client..."
-            iperf.start_client("Dummy caller", "10.10.10.65", 1, 1) # "localhost"
-        else:
-            print "usage: <file name> client"
-    else:
-        iperf.start_server()
-    reactor.callLater(0.5, debug_meanwhile)
-    reactor.callLater(2.0, lambda: reactor.stop())
-    reactor.run()
     #    txt = """
     #    20090126182857,10.10.10.145,35875,10.10.10.65,5001,3,0.0-10.0,1252440,999997
     #    20090126182857,10.10.10.65,5001,10.10.10.145,35875,3,0.0-10.0,1252440,999970,0.008,0,852,0.000,0
@@ -304,4 +414,50 @@ if __name__ == "__main__":
     #    lines = txt.strip().splitlines()
     #    pprint.pprint(_parse_iperf_output(lines))
 
+# -------------------------- MAIN ---------------------------------
+if __name__ == "__main__":
+    if True: #False: # ------------------- test iperf
+        # SIMPLE TEST
+        def debug_meanwhile():
+            # TODO : remove
+            print "waiting..."
+            reactor.callLater(0.5, debug_meanwhile)
+        
+        # default : client
+        
+        iperf = NetworkTester()
+        if len(sys.argv) == 2:
+            if sys.argv[1] == "server":
+                iperf.start_server()
+            else:
+                print "usage: <file name> [server]"
+        else:
+            print "starting client..."
+            iperf.start_client("Dummy caller", "10.10.10.66", 1, 1) # "localhost" | tzing !
+        reactor.callLater(0.5, debug_meanwhile)
+        reactor.callLater(2.0, lambda: reactor.stop())
+    #    try:
+        reactor.run()
+    #    except KeyboardInterrupt:
+    #        print "you pressed ctrl-c"
+    #        reactor.stop() 
+        print "-----------------------------------"
+        print "reactor has stopped"
+    else: # ---------- test network protocol
+        # ----------------------------------------------------------------
+        # and now, the test for the network test protocol.
+        port = 15432
+        host = "localhost"
+        reactor.listenTCP(port, TestServerFactory())
+        print "Server running on port %d, press ctrl-C to stop." % (port)
+        print "starting client"
+        client = TestClient()
+        client.connect_to(host, port)
+        #reactor.callLater(2.0, lambda: reactor.stop())
+        #try: 
+        reactor.run()
+        #except KeyboardInterrupt:
+        #    print "you pressed ctrl-c"
+        #    reactor.stop() 
+        print "reactor has stopped"
 
