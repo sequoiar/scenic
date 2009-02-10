@@ -44,6 +44,7 @@ class RtpBin
         static int printStatsCallback(void * rtpbin);
         static void printSourceStats(_GObject *source);
         static int dropOnLatency(void * data);
+        static void parseSourceStats(_GObject * source, int sessionId);
 
         RtpBin(const RtpBin&); //No Copy Constructor
         RtpBin& operator=(const RtpBin&); //No Assignment Operator

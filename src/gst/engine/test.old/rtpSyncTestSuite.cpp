@@ -38,6 +38,8 @@
 /* Helper functions                             */
 /*----------------------------------------------*/ 
 
+static const int V_BITRATE = 3000000;
+
 /*----------------------------------------------*/ 
 /* Unit tests                                   */
 /*----------------------------------------------*/ 
@@ -61,7 +63,7 @@ void SyncTestSuiteRtp::start_stop_jack_v4l()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("v4l2src", 3000000); 
+        VideoSourceConfig vConfig("v4l2src", V_BITRATE); 
         boost::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         AudioSourceConfig aConfig("jackaudiosrc", numChannels);
@@ -101,7 +103,7 @@ void SyncTestSuiteRtp::start_stop_jack_v4l_vorbis()
         TEST_ASSERT(!playback::isPlaying());
     }
     else {
-        VideoSourceConfig vConfig("v4l2src", 3000000); 
+        VideoSourceConfig vConfig("v4l2src", V_BITRATE); 
         boost::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         AudioSourceConfig aConfig("jackaudiosrc", numChannels);
@@ -149,7 +151,7 @@ void SyncTestSuiteRtp::start_stop_8ch_audiofile_dv()
         playback::start();
     
 
-        VideoSourceConfig vConfig("dv1394src", 3000000); 
+        VideoSourceConfig vConfig("dv1394src", V_BITRATE); 
         boost::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         TEST_ASSERT(tcpSendBuffer(ports::IP, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
@@ -186,7 +188,7 @@ void SyncTestSuiteRtp::start_stop_dv_audio_dv_video()
     }
     else {
 
-        VideoSourceConfig vConfig("dv1394src", 3000000); 
+        VideoSourceConfig vConfig("dv1394src", V_BITRATE); 
         boost::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         AudioSourceConfig aConfig("dv1394src", numChannels);
@@ -226,7 +228,7 @@ void SyncTestSuiteRtp::start_stop_audiotest_videotest()
     }
     else {
 
-        VideoSourceConfig vConfig("videotestsrc", 3000000); 
+        VideoSourceConfig vConfig("videotestsrc", V_BITRATE); 
         boost::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(vConfig));
 
         AudioSourceConfig aConfig("audiotestsrc", numChannels);

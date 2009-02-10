@@ -33,7 +33,7 @@
 /** Constructor sets by default emitMessages to true 
  * and message interval to one second */
 AudioLevel::AudioLevel() : 
-    level_(0), emitMessages_(true), interval_(1000000000LL) {}
+    level_(0), emitMessages_(true) {}
 
 /// Destructor 
 AudioLevel::~AudioLevel()
@@ -45,7 +45,7 @@ AudioLevel::~AudioLevel()
 void AudioLevel::init()
 {
     level_ = Pipeline::Instance()->makeElement("level", NULL);
-    g_object_set(G_OBJECT(level_), "interval", interval_, "message", emitMessages_, NULL);
+    g_object_set(G_OBJECT(level_), "interval", 1000000000LL, "message", emitMessages_, NULL);
 
     // register this level to handle level msg
     Pipeline::Instance()->subscribe(this);
@@ -124,7 +124,7 @@ void AudioLevel::post(const std::vector<double> &rmsValues) const
 /// Sets the reporting interval in nanoseconds. 
 void AudioLevel::interval(unsigned long long newInterval)
 {
-    interval_ = newInterval;
-    g_object_set (G_OBJECT(level_), "interval", interval_, "message", emitMessages_, NULL);
+    assert(newInterval > 0);
+    g_object_set (G_OBJECT(level_), "interval", newInterval, "message", emitMessages_, NULL);
 }
 

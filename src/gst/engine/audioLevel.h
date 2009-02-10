@@ -64,7 +64,6 @@ class AudioLevel : public GstLinkableFilter, public BusMsgHandler
 
         _GstElement *level_;
         bool emitMessages_;
-        unsigned long long interval_;
 
         AudioLevel(const AudioLevel&);     //No Copy Constructor
         AudioLevel& operator=(const AudioLevel&);     //No Assignment Operator

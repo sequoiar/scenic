@@ -188,7 +188,7 @@ class AudioAlsaSource : public AudioSource
 };
 
 /** 
- *  Concrete AudioSource which captures audio from PulseAudio.
+ *  Concrete AudioSource which captures audio from PulseAudio
  *  Has caps filter to allow number of channels to be variable.
  */
 

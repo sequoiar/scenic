@@ -41,7 +41,7 @@ void RtpBin::init()
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
     
     // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
-    g_object_set(G_OBJECT(rtpbin_), "latency", 10, NULL);
+    g_object_set(G_OBJECT(rtpbin_), "latency", 30, NULL);
     
     // uncomment this to print stats
 #if RTP_REPORTING
@@ -49,9 +49,26 @@ void RtpBin::init()
                   static_cast<GSourceFunc>(printStatsCallback),
                   static_cast<gpointer>(rtpbin_));
 #endif
-    
 }
 
+
+void RtpBin::parseSourceStats(GObject * source, int sessionId)
+{
+    GstStructure *stats;
+
+    // get the source stats
+    g_object_get(source, "stats", &stats, NULL);
+
+    const GValue *val = gst_structure_get_value(stats, "internal");
+    if (g_value_get_boolean(val))
+        return; // we don't care about internal sources
+
+    g_print("SESSION %d:\n", sessionId);
+    guint jitter = g_value_get_uint(gst_structure_get_value(stats, "rb-jitter"));
+    g_print("JITTER: %u\n", jitter);
+    int packetLoss = g_value_get_int(gst_structure_get_value(stats, "rb-packetslost"));
+    g_print("PACKETS LOST: %d\n", packetLoss);
+}
 
 void RtpBin::printSourceStats(GObject * source)
 {
@@ -61,14 +78,9 @@ void RtpBin::printSourceStats(GObject * source)
     // get the source stats
     g_object_get(source, "stats", &stats, NULL);
 
-    const GValue *val = gst_structure_get_value(stats, "internal");
-    if (g_value_get_boolean(val))
-        return; // don't care about internal rtpsources
-    
     // dump the whole structure
     str = gst_structure_to_string(stats);
     g_print("source stats: %s\n", str);
-
 
     gst_structure_free(stats);
     g_free(str);
@@ -89,7 +101,6 @@ gboolean RtpBin::printStatsCallback(gpointer data)
     // get sessions
     for (unsigned int sessionId = 0; sessionId < sessionCount_; ++sessionId)
     {
-        g_print("SESSION %d:\n", sessionId);
         g_signal_emit_by_name(rtpbin, "get-internal-session", sessionId, &session);
 
         // print all the sources in the session, this include the internal source
@@ -102,7 +113,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
             val = g_value_array_get_nth(arrayOfSources, i);
             source = static_cast<GObject*>(g_value_get_object(val));
 
-            printSourceStats(source);
+            parseSourceStats(source, sessionId);
         }
         g_value_array_free(arrayOfSources);
 
