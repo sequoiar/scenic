@@ -39,6 +39,7 @@ namespace audiofactory
                      const std::string &codec = A_CODEC, 
                      int port = ports::A_PORT)
     {
+        assert(port != VIDEO_CAPS_PORT && port != AUDIO_CAPS_PORT); 
         return boost::shared_ptr<AudioSender>(buildAudioSender_(aConfig, ip, codec, port));
     }
 
@@ -48,6 +49,7 @@ namespace audiofactory
                        int port = ports::A_PORT, 
                        const std::string &sink = A_SINK)
     {
+        assert(port != VIDEO_CAPS_PORT && port != AUDIO_CAPS_PORT); 
         return boost::shared_ptr<AudioReceiver>(buildAudioReceiver_(ip,codec,port,sink));
     }
 

@@ -551,7 +551,8 @@ class Config:
     video_input = "v4l2src"
     video_device = "/dev/video0"
     videosink = "xvimagesink"
-    video_codec = "h264"
+    video_codec = "mpeg4"
+    video_bitrate = "3000000"
     video_port = gstsendport
     audio_port = video_port + 10
 
@@ -846,6 +847,7 @@ class Processes(Colleague):
             self.gstsend_cmd = [self.config.gstsend, '--sender', 
                                             '--address', host,
                                             '--videocodec', self.config.video_codec,
+                                            '--videobitrate', self.config.video_bitrate,
                                             '--audiocodec', self.config.audio_codec,
                                             '--videoport', str(self.video_port),
                                             '--audioport', str(self.audio_port)]
@@ -854,6 +856,7 @@ class Processes(Colleague):
             self.gstsend_cmd = [self.config.gstsend, '--sender', 
                                             '--address', host,
                                             '--videocodec', self.config.video_codec,
+                                            '--videobitrate', self.config.video_bitrate,
                                             '--audiocodec', self.config.audio_codec,
                                             '--videoport', str(self.video_port),
                                             '--audioport', str(self.audio_port)]

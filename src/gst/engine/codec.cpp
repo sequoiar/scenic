@@ -73,7 +73,16 @@ int Encoder::getBitrate()
 void Encoder::setBitrate(unsigned bitrate)
 {
     assert(codec_);
-    g_object_set(G_OBJECT(codec_), "bitrate", bitrate, NULL);
+    // if pipeline is playing, we need to set it to ready to make 
+    // the bitrate change actually take effect
+    if (Pipeline::Instance()->isPlaying())
+    {
+        Pipeline::Instance()->makeReady();
+        g_object_set(G_OBJECT(codec_), "bitrate", bitrate, NULL);
+        Pipeline::Instance()->start();
+    }
+    else
+        g_object_set(G_OBJECT(codec_), "bitrate", bitrate, NULL);
 }
 
 

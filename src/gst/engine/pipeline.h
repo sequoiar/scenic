@@ -45,11 +45,13 @@ class Pipeline
         void remove(_GstElement ** element);
         void remove(std::vector < _GstElement * >&elementVec);
         bool isPlaying() const;
+        bool isReady() const;
         bool isPaused() const;
         bool isStopped() const;
         void seekTo(gint64 pos);
         void start();
         void pause();
+        void makeReady();
         void stop();
         void makeVerbose();
         const char *getElementPadCaps(GstElement *element, const char *padName) const;

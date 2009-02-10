@@ -161,6 +161,15 @@ bool Pipeline::isPlaying() const
 }
 
 
+bool Pipeline::isReady() const
+{
+    if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_READY))
+        return true;
+    else
+        return false;
+}
+
+
 bool Pipeline::isPaused() const
 {
     if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_PAUSED))
@@ -217,6 +226,18 @@ void Pipeline::start()
     assert(checkStateChange(ret)); // set it to playing
     LOG_DEBUG("Now playing");
 }
+
+
+
+void Pipeline::makeReady()
+{
+    if (isReady())        // only needs to be started once
+        return;
+    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_READY);
+    assert(checkStateChange(ret)); // set it to playing
+    LOG_DEBUG("Now ready");
+}
+
 
 
 void Pipeline::pause()
