@@ -39,7 +39,6 @@ VideoReceiver::VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig
     gotCaps_(false) 
 {
     assert(remoteConfig_.hasCodec()); 
-    assert(remoteConfig_.capsMatchCodec()); 
 }
 
 VideoReceiver::~VideoReceiver()
@@ -81,6 +80,7 @@ void VideoReceiver::init_sink()
     gstlinkable::link(*decoder_, *sink_);
     setCaps();
     assert(gotCaps_);
+    assert(remoteConfig_.capsMatchCodec()); 
 }
 
 /// Used to set this VideoReceiver's RtpReceiver's caps 

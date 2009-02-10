@@ -144,7 +144,6 @@ void H264Encoder::init()
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
     // subme: subpixel motion estimation 1=fast, 6=best
     // threads: 1-4, 0 for automatic 
-    setBitrate(3000);   // kb/s
 
     gstlinkable::link(colorspc_, codec_);
 }
@@ -203,7 +202,6 @@ void H263Encoder::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("ffenc_h263", NULL);
-    setBitrate(3000000);    // in bits/sec
 
     gstlinkable::link(colorspc_, codec_);
 }
@@ -249,7 +247,6 @@ void Mpeg4Encoder::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
-    setBitrate(2048000);    // in bits/sec
 
     gstlinkable::link(colorspc_, codec_);
 }
