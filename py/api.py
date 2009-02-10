@@ -85,7 +85,6 @@ class ControllerApi(object):
 #        self.streams = self.all_streams[self.curr_streams]
         self.connectors = core.connectors
         self.connection = None
-        devices.start(self) # api as an argument
         self.network_tester = network.start(self) # dict with 'client' and 'server' keys
 
     ### Contacts ###

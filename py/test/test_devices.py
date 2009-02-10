@@ -83,13 +83,15 @@ class Test_devices_v4l2(unittest.TestCase):
         except KeyError, e:
             pass #self.fail('no device /dev/video0')
         else:
-            attr_w = v4l2.devices['/dev/video0'].attributes['width']
-            attr_h = v4l2.devices['/dev/video0'].attributes['height']
             for w, h in ((320, 240), (1024, 768), (640, 480)):
+                attr_w = v4l2.devices['/dev/video0'].attributes['width']
+                attr_h = v4l2.devices['/dev/video0'].attributes['height']
                 attr_w.set_value(w)
                 attr_h.set_value(h)
                 v4l2.poll_now()
                 app.go()
+                attr_w = v4l2.devices['/dev/video0'].attributes['width']
+                attr_h = v4l2.devices['/dev/video0'].attributes['height']
                 val_w, val_h = attr_w.get_value(), attr_h.get_value()
                 if val_w != w:
                     self.fail('Width should has been changed to %d but is %d.' % (w, val_w))

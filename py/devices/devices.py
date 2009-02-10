@@ -176,7 +176,7 @@ class Driver(object): #shell.ShellCommander):
         #print "DONE"
         if event_key == 'devices_list':
             self._call_event_listener('devices_list', self.devices, caller) # dict !!!!
-        #TODO: maybe not call it every time.:wq
+        #TODO: maybe not call it every time.
         
       
     def _call_event_listener(self, event_key, argument, caller=None):
@@ -567,9 +567,13 @@ def modify_attribute(caller, driver_kind, driver_name, device_name, attribute_na
         attribute = device.attributes[attribute_name]
     except KeyError:
         raise DeviceError('No such attribute: %s' % (attribute_name))
-    attribute.set_value(value, caller, 'device_modify_attribute') #'device_attributes_changed') # TODO : I think that key is not correct.
-    #self.notify(caller, attribute, 'device_attributes_changed') # TODO: make asynchronous
-    driver.poll_now(caller, 'device_modify_attribute')
+    try:
+        attribute.set_value(value, caller, 'device_modify_attribute') #'device_attributes_changed') # TODO : I think that key is not correct.
+    except CommandNotFoundError, e:
+        raise DeviceError(e.message)
+    else:
+        #self.notify(caller, attribute, 'device_attributes_changed') # TODO: make asynchronous
+        driver.poll_now(caller, 'device_modify_attribute')
     # TODO: attribute_changed should be triggered
     
     #self.notify(caller, 'No such attributes for driver/device: %s %s %s:%s' % (driver_name, device_name, attribute_name, str(value)), 'info')

@@ -34,6 +34,7 @@ import addressbook
 import settings
 from protocols import com_chan
 import connectors
+import devices
 
 from twisted.internet.error import CannotListenError
 
@@ -57,6 +58,7 @@ class Core(Subject):
         # TODO: merge with __init__
 
         self.api = api.ControllerApi(self.notify)
+        devices.start(self.api) # api as an argument
         self.load_uis()
         self.adb = addressbook.AddressBook('sropulpof', self.api)
         self.engines = self.find_engines()
