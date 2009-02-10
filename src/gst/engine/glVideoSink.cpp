@@ -61,7 +61,7 @@ gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
     GLfloat vwinRatio = (gfloat)VideoSink::WIDTH/(gfloat)VideoSink::HEIGHT ;
     g_print("WIDTH: %u, HEIGHT: %u", width, height);
     
-    //TODO:oldDOCS
+    // /TODO:oldDOCS
     // explain below -- ( screen x - ( needed x res)) == extra space
     //move origin to extra space / 2 -- so that quad is in the middle of screen
     //: Why  the disparity between 4/3 and videosink aspect?   

@@ -361,7 +361,7 @@ void AudioJackSource::sub_init()
     for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
         g_object_set(G_OBJECT(*src), "connect", 0, NULL);
 #endif
-    // TODO: fine tune this in conjunction with jitterbuffer
+    // /TODO: fine tune this in conjunction with jitterbuffer
     //g_object_set(G_OBJECT(source_), "buffer-time", 75000, NULL);
 
     // otherwise jackaudiosrc defaults to 2 channels

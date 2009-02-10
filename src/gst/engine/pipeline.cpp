@@ -126,7 +126,6 @@ void Pipeline::init()
 }
 
 
-// TODO: check if this is safe, we're destroying and recreating the pipeline
 // This can be a class method or a member method, it's a class method for the sake of 
 // looking like Instance()
 

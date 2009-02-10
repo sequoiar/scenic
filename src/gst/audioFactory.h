@@ -37,19 +37,19 @@ namespace audiofactory
     buildAudioSender(const AudioSourceConfig aConfig, 
                      const std::string &ip = ports::IP, 
                      const std::string &codec = A_CODEC, 
-                     int port = ports::A_PORT)
+                     unsigned long port = ports::A_PORT)
     {
-        assert(port != VIDEO_CAPS_PORT && port != AUDIO_CAPS_PORT); 
+        assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
         return boost::shared_ptr<AudioSender>(buildAudioSender_(aConfig, ip, codec, port));
     }
 
     static boost::shared_ptr<AudioReceiver> 
     buildAudioReceiver(const std::string &ip = ports::IP, 
                        const std::string &codec = A_CODEC, 
-                       int port = ports::A_PORT, 
+                       unsigned long port = ports::A_PORT, 
                        const std::string &sink = A_SINK)
     {
-        assert(port != VIDEO_CAPS_PORT && port != AUDIO_CAPS_PORT); 
+        assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
         return boost::shared_ptr<AudioReceiver>(buildAudioReceiver_(ip,codec,port,sink));
     }
 

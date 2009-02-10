@@ -36,11 +36,11 @@ namespace videofactory
     static boost::shared_ptr<VideoReceiver> 
     buildVideoReceiver(const std::string &ip = ports::IP, 
                        const std::string &codec = V_CODEC, 
-                       int port = ports::V_PORT, 
+                       unsigned long port = ports::V_PORT, 
                        int screen_num = 0, 
                        const std::string &sink = V_SINK)
     {
-        assert(port != VIDEO_CAPS_PORT && port != AUDIO_CAPS_PORT); 
+        assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
         return boost::shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, screen_num, sink));
     }
 
@@ -48,9 +48,9 @@ namespace videofactory
     buildVideoSender(const VideoSourceConfig vConfig, 
                      const std::string &ip = ports::IP, 
                      const std::string &codec = V_CODEC, 
-                     int port = ports::V_PORT)
+                     unsigned long port = ports::V_PORT)
     {
-        assert(port != VIDEO_CAPS_PORT && port != AUDIO_CAPS_PORT); 
+        assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
         return boost::shared_ptr<VideoSender>(buildVideoSender_(vConfig,ip,codec,port));
     }
 

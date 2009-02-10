@@ -61,9 +61,14 @@ void RtpBin::printSourceStats(GObject * source)
     // get the source stats
     g_object_get(source, "stats", &stats, NULL);
 
+    const GValue *val = gst_structure_get_value(stats, "internal");
+    if (g_value_get_boolean(val))
+        return; // don't care about internal rtpsources
+    
     // dump the whole structure
     str = gst_structure_to_string(stats);
     g_print("source stats: %s\n", str);
+
 
     gst_structure_free(stats);
     g_free(str);
