@@ -1,0 +1,28 @@
+/** \file miville-milhouse.txt
+ *
+ *
+ * miville - milhouse integration
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+#if 0
+
+ \msc 
+  miville,gst;
+
+    miville->gst [label="audio_init:"];
+    gst->miville [label="audio_init: ack=ok"];
+    miville->gst [label="video_init:"];
+    gst->miville [label="video_init: ack=ok"];
+    miville->gst [label="start:"];
+    gst->miville [label="start: ack=ok"];
+    --- [label="receiving stream(s)"];
+    miville->gst [label="stop"];
+    gst->miville [label="stop: ack=ok"];
+    --- [label="stopped receiving stream(s)"];
+ \endmsc
+#endif
