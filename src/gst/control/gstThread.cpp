@@ -23,8 +23,7 @@
 #include "gstThread.h"
 #include "engine/playback.h"
 
-void GstThread::audio_stop(MapMsg& ){ playback::stop();} 
-void GstThread::video_stop(MapMsg& ){ playback::stop();} 
+void GstThread::stop(MapMsg& ){ playback::stop();} 
 int GstThread::main()
 {
     bool done = false;
@@ -48,21 +47,17 @@ int GstThread::main()
                 queue_.push(f);
                 done = true;
             }
-            else if(s == "audio_start")
+            else if(s == "audio_init")
             {
                 audio_start(f);
             }
-            else if(s == "audio_stop")
+            else if(s == "stop")
             {
-                audio_stop(f);
+                stop(f);
             }
-            else if(s == "video_start")
+            else if(s == "video_init")
             {
                 video_start(f);
-            }
-            else if(s == "video_stop")
-            {
-                video_stop(f);
             }
             else if(s == "levels")
             {

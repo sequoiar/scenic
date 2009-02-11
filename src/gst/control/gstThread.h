@@ -32,10 +32,8 @@ class GstThread
         virtual bool audio_start(MapMsg& msg) = 0;
         /// incomming video_start request 
         virtual bool video_start(MapMsg& msg) = 0;
-        /// incomming audio_stop request 
-        void audio_stop(MapMsg& ); 
-        /// incomming video_stop request 
-        void video_stop(MapMsg& ); 
+        /// incomming stop request 
+        void stop(MapMsg& ); 
 
 
 

@@ -49,7 +49,7 @@ class MainModule
 
         MainModule(bool send, int port)
             : tcpThread_(MsgThreadFactory::Tcp(port, true)),
-              gstThread_(MsgThreadFactory::Gst(send)),
+              gstThread_(MsgThreadFactory::Gst(send)), msg_count(0),
               func(gstThread_){}
 
         ~MainModule(){delete gstThread_; delete tcpThread_;}
@@ -57,6 +57,7 @@ class MainModule
         MsgThread* tcpThread_;
         MsgThread* gstThread_;
         MainSubscriber func;
+        int msg_count;
 
         MainModule(MainModule&);    //No Copy Constructor
         MainModule& operator=(const MainModule&);
@@ -93,7 +94,12 @@ bool MainModule::run()
             if (command == "exception")
                 throw tmsg["exception"].except();
             else
+            {
                 gst_queue.push(tmsg);
+                tmsg["ack"] = "ok";
+                tmsg["id"] = ++msg_count;
+                tcp_queue.push(tmsg);
+            }
         }
     }
     catch(ErrorExcept e)
