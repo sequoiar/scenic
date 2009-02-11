@@ -1,0 +1,15 @@
+
+msc
+{        
+    test, telnet_tx, telnet_rx, gst_tx, gst_rx;
+    
+test=>gst_rx [label="instanciate rx propulseart!"];
+test=>telnet_rx [label="instanciate telnet rx!"];
+test->telnet_rx [label="video_start: codec=\"h264\" port=12030 address=\"127.0.0.1\""];
+telnet_rx->gst_rx [label="video_start: codec=\"h264\" port=12030 address=\"127.0.0.1\""];
+gst_rx->telnet_rx [label="video_start"];
+test->telnet_rx [label="video_stop:"];
+telnet_rx->gst_rx [label="video_stop:"];
+gst_rx->telnet_rx [label=""];
+
+}

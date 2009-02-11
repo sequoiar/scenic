@@ -1,0 +1,24 @@
+
+msc
+{        
+    test, telnet_tx, telnet_rx, gst_tx, gst_rx;
+    
+test=>gst_rx [label="instanciate rx propulseart!"];
+test=>telnet_rx [label="instanciate telnet rx!"];
+test=>gst_tx [label="instanciate tx propulseart!"];
+test=>telnet_tx [label="instanciate telnet tx!"];
+test->telnet_rx [label="audio_start: codec=\"vorbis\" port=12005 address=\"127.0.0.1\""];
+telnet_rx->gst_rx [label="audio_start: codec=\"vorbis\" port=12005 address=\"127.0.0.1\""];
+gst_rx->telnet_rx [label="audio_start"];
+test->telnet_tx [label="audio_start: codec=\"vorbis\" port=12005 address=\"127.0.0.1\" source=\"audiotestsrc\""];
+telnet_tx->gst_tx [label="audio_start: codec=\"vorbis\" port=12005 address=\"127.0.0.1\" source=\"audiotestsrc\""];
+gst_tx->telnet_tx [label="audio_start"];
+---  [ label = "streaming data for 5.0 seconds"]; 
+test->telnet_tx [label="audio_stop:"];
+telnet_tx->gst_tx [label="audio_stop:"];
+gst_tx->telnet_tx [label=""];
+test->telnet_rx [label="audio_stop:"];
+telnet_rx->gst_rx [label="audio_stop:"];
+gst_rx->telnet_rx [label=""];
+
+}
