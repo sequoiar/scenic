@@ -135,7 +135,7 @@ AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
 AX_BOOST_PYTHON
 AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes")
 if test "$ac_cv_boost_python"  = "yes" ; then
-    AC_DEFINE(CONFIG_PYTHON,[],[CONFIG_BOOST defined])
+    AC_DEFINE(CONFIG_BOOST,[],[CONFIG_BOOST defined])
 fi
 
 AX_CHECK_GL
