@@ -31,6 +31,12 @@ namespace pof
 {
     short run(int argc, char **argv);
     const short NUM_CHANNELS = 2;
+
+#ifdef CONFIG_BOOST
+    using namespace boost;
+#else
+    using namespace std::tr1;
+#endif
 }
 
 // 2way audio and video
@@ -90,8 +96,8 @@ short pof::run(int argc, char **argv)
         if(videoSink == 0)
             THROW_ERROR("argument error: missing videoSink. see --help");
 
-        boost::shared_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink));
-        boost::shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver(ip, audioCodec, audioPort));
+        shared_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink));
+        shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver(ip, audioCodec, audioPort));
 
 #ifdef CONFIG_DEBUG_LOCAL
         playback::makeVerbose();
@@ -114,11 +120,11 @@ short pof::run(int argc, char **argv)
         else
             vConfig = new VideoSourceConfig("v4l2src", videoBitrate);
 
-        boost::shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
+        shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
         delete vConfig;
 
         AudioSourceConfig aConfig("jackaudiosrc", numChannels);
-        boost::shared_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort));
+        shared_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort));
 
 #ifdef CONFIG_DEBUG_LOCAL
         playback::makeVerbose();

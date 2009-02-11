@@ -23,34 +23,44 @@
 #define _AUDIO_FACTORY_H_
 
 #include "gst/engine.h"
-#include <boost/shared_ptr.hpp>   // for boost::shared_ptr
 #include "tcp/singleBuffer.h"
-
 #include "ports.h"
+
+#ifdef CONFIG_BOOST
+#include <boost/shared_ptr.hpp>   // for boost::shared_ptr
+#else
+#include <tr1/memory>
+#endif
+
 
 #include "gst/audioFactoryInternal.h"
 
 namespace audiofactory
 {
+#ifdef CONFIG_BOOST
+    using namespace boost;
+#else
+    using namespace std::tr1;
+#endif
 
-    static boost::shared_ptr<AudioSender> 
+    static shared_ptr<AudioSender> 
     buildAudioSender(const AudioSourceConfig aConfig, 
                      const std::string &ip = ports::IP, 
                      const std::string &codec = A_CODEC, 
                      unsigned long port = ports::A_PORT)
     {
         assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
-        return boost::shared_ptr<AudioSender>(buildAudioSender_(aConfig, ip, codec, port));
+        return shared_ptr<AudioSender>(buildAudioSender_(aConfig, ip, codec, port));
     }
 
-    static boost::shared_ptr<AudioReceiver> 
+    static shared_ptr<AudioReceiver> 
     buildAudioReceiver(const std::string &ip = ports::IP, 
                        const std::string &codec = A_CODEC, 
                        unsigned long port = ports::A_PORT, 
                        const std::string &sink = A_SINK)
     {
         assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
-        return boost::shared_ptr<AudioReceiver>(buildAudioReceiver_(ip,codec,port,sink));
+        return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip,codec,port,sink));
     }
 
 }

@@ -25,15 +25,26 @@
 
 #include "ports.h"
 #include "gst/engine.h"
-#include <boost/shared_ptr.hpp>   // for boost::shared_ptr
 #include "tcp/singleBuffer.h"
 
 #include "videoFactoryInternal.h"
 
+#ifdef CONFIG_BOOST
+#include <boost/shared_ptr.hpp>   // for boost::shared_ptr
+#else
+#include <tr1/memory>
+#endif
+
 namespace videofactory
 {
+#ifdef CONFIG_BOOST
+    using namespace boost;
+#else
+    using namespace std::tr1;
+#endif
 
-    static boost::shared_ptr<VideoReceiver> 
+    static 
+    shared_ptr<VideoReceiver> 
     buildVideoReceiver(const std::string &ip = ports::IP, 
                        const std::string &codec = V_CODEC, 
                        unsigned long port = ports::V_PORT, 
@@ -41,17 +52,18 @@ namespace videofactory
                        const std::string &sink = V_SINK)
     {
         assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
-        return boost::shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, screen_num, sink));
+        return shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, screen_num, sink));
     }
 
-    static boost::shared_ptr<VideoSender> 
+    static 
+    shared_ptr<VideoSender> 
     buildVideoSender(const VideoSourceConfig vConfig, 
                      const std::string &ip = ports::IP, 
                      const std::string &codec = V_CODEC, 
                      unsigned long port = ports::V_PORT)
     {
         assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
-        return boost::shared_ptr<VideoSender>(buildVideoSender_(vConfig,ip,codec,port));
+        return shared_ptr<VideoSender>(buildVideoSender_(vConfig,ip,codec,port));
     }
 
 }

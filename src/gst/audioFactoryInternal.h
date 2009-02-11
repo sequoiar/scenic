@@ -23,7 +23,6 @@
 #define _AUDIO_FACTORY_INTERNAL_H_
 
 #include "gst/engine.h"
-#include <boost/shared_ptr.hpp>   // for boost::shared_ptr
 #include "tcp/singleBuffer.h"
 
 #include "ports.h"
