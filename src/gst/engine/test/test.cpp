@@ -13,5 +13,4 @@ int main(int, char**)
 {
     ComplexNumberTest test("Hello");
     test.runTest();
-
 }

@@ -241,7 +241,7 @@ class AudioJackSource : public AudioSource
  *  This object is tightly coupled with VideoDvSource, as both (if present) will share one source_ GstElement, 
  *  and one dvdemux GstElement. It will look for both of these in the pipeline before trying to instantiate them. 
  *  If these GstElement are already present, AudioDvSource will simply store their addresses and link to them, if not
- *  it will create them. Audio can only be stereo or 4 channels according to gstreamer.
+ *  it will create them. DVAudio can only be stereo or 4 channels according to gstreamer.
  */
 
 class AudioDvSource : public AudioSource

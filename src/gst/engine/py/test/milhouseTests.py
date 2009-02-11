@@ -17,12 +17,12 @@ class MilhouseTests():
     @staticmethod
     def timeouts():
         """ Returns tuple of timeout arguments """
-        timeout = '-o 5000 '
+        timeout = '-o 20000 '
         return timeout, timeout
 
     @staticmethod
     def countdown(warning):
-        countdown = 3
+        countdown = 1
         while countdown > 0:
             print "PLEASE " + warning + " JACK SERVER NOW, YOU HAVE " + str(countdown) + " SECONDS" 
             time.sleep(1)
@@ -124,12 +124,19 @@ class MilhouseTests():
         rxArgs += ' --audiocodec vorbis '
         self.runTest(rxArgs, txArgs)
     
-    def test_08_videotestsrc_v4l(self):
+    def test_08_videotestsrc_h264(self):
         """ Test v4l """
         self.countdown("START")
 
         rxArgs, txArgs = self.timeouts()
         self.runTest(rxArgs + ' --videocodec h264', txArgs + ' --videosource videotestsrc --videocodec h264')
+
+    def test_09_glImagesink(self):
+        """ Test v4l """
+        self.countdown("START")
+
+        rxArgs, txArgs = self.timeouts()
+        self.runTest(rxArgs + ' --videosink glimagesink --videocodec h264', txArgs + ' --videosource videotestsrc --videocodec h264')
 
 
 
