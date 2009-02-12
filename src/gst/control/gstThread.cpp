@@ -24,6 +24,7 @@
 #include "engine/playback.h"
 
 void GstThread::stop(MapMsg& ){ playback::stop();} 
+void GstThread::start(MapMsg& ){ playback::start();} 
 int GstThread::main()
 {
     bool done = false;
@@ -54,6 +55,10 @@ int GstThread::main()
             else if(s == "stop")
             {
                 stop(f);
+            }
+            else if(s == "start")
+            {
+                start(f);
             }
             else if(s == "video_init")
             {
@@ -95,7 +100,6 @@ bool GstReceiverThread::video_start(MapMsg& msg)
     {
         LOG_INFO("video_start");
         video_ = videofactory::buildVideoReceiver_(get_host_ip(), msg["codec"], msg["port"], 0, "xvimagesink");
-        playback::start();
 //        queue_.push(MapMsg("video_started"));
         return true;
     }
@@ -117,7 +121,6 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
     try
     {
         audio_ = audiofactory::buildAudioReceiver_(get_host_ip(), msg["codec"], msg["port"]);
-        playback::start();
 //        queue_.push(MapMsg("audio_started"));
         return true;
     }
@@ -160,7 +163,6 @@ bool GstSenderThread::video_start(MapMsg& msg)
             VideoSourceConfig config(msg["source"], msg["bitrate"], std::string(msg["location"]));
             video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
-        playback::start();
         assert(tcpSendBuffer(msg["address"], ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, sender->getCaps()));
         return true;
     }
@@ -193,7 +195,6 @@ bool GstSenderThread::audio_start(MapMsg& msg)
             AudioSourceConfig config(msg["source"], msg["location"], msg["channels"]);
             audio_ = asender = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
-        playback::start();
 
         //Build Caps Msg
  //       MapMsg caps("caps");
