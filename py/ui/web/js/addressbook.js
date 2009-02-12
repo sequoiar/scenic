@@ -1,10 +1,10 @@
 // import Nevow.Athena
 
-AddressBook.List = Nevow.Athena.Widget.subclass('AddressBook.List');
+Addressbook = Nevow.Athena.Widget.subclass('Addressbook');
 
-AddressBook.List.methods(
+Addressbook.methods(
     function __init__(self, node) {
-        AddressBook.List.upcall(self, "__init__", node);
+        Addressbook.upcall(self, "__init__", node);
         self.adbList = self.nodeByAttribute('name', 'adbList');
     },  
 
