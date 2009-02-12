@@ -1484,6 +1484,12 @@ class CliView(Observer):
 
     def _info(self, origin, data):
         self.write(data)
+    
+    def _error(self, origin, data):
+        """
+        Similar to the "info" key, but for error messages to the users.
+        """
+        self.write(data)
 
     def _answer(self, origin, data):
         self.write('\n' + data)
