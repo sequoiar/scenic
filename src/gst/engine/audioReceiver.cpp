@@ -42,7 +42,6 @@ AudioReceiver::AudioReceiver(const AudioSinkConfig aConfig, const ReceiverConfig
     sink_(0)
 { 
     assert(remoteConfig_.hasCodec()); 
-    assert(remoteConfig_.capsMatchCodec()); 
 }
 
 /// Destructor 
@@ -86,6 +85,7 @@ void AudioReceiver::init_sink()
     gstlinkable::link(level_, *sink_);   
     setCaps();
     assert(gotCaps_);
+    assert(remoteConfig_.capsMatchCodec()); 
 }
 
 /// Used to set this AudioReceiver's RtpReceiver's caps 

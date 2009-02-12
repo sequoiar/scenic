@@ -138,11 +138,24 @@ class MilhouseTests():
         rxArgs, txArgs = self.timeouts()
         self.runTest(rxArgs + ' --videosink glimagesink --videocodec h264', txArgs + ' --videosource videotestsrc --videocodec h264')
 
+    def test_10_audioOnly(self):
+        """ Test with just audio """
+        self.countdown("START")
+
+        rxArgs, txArgs = self.timeouts()
+        self.runTest(rxArgs + ' --disable-video', txArgs + ' --disable-video')
+    
+    def test_11_videoOnly(self):
+        """ Test with just video """
+        self.countdown("START")
+
+        rxArgs, txArgs = self.timeouts()
+        self.runTest(rxArgs + ' --disable-audio', txArgs + ' --disable-audio')
 
 
 
 # here we run all the tests thanks to the wonders of reflective programming
-tests = prefixedMethods(MilhouseTests(), 'test_')
+tests = prefixedMethods(MilhouseTests(), 'test_11')
 
 for test in tests:
     print "TEST: "  + test.__doc__
