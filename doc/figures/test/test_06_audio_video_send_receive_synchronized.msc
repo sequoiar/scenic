@@ -1,7 +1,0 @@
-
-msc
-{        
-    test, telnet_tx, telnet_rx, gst_tx, gst_rx;
-    
-
-}
