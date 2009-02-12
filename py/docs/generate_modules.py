@@ -111,7 +111,7 @@ def create_package_file(root, subroot, py_files, opts, subs=None):
             kind = "Module"
             if py_file == '__init__':
                 kind = "Package"
-            text += write_sub (kind == 'Package' and package or py_file, kind)
+            text += write_sub(kind == 'Package' and package or py_file, kind)
             text += write_directive(kind == "Package" and subroot or py_path)
             text += '\n'
 
