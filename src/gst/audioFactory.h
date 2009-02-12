@@ -23,7 +23,6 @@
 #define _AUDIO_FACTORY_H_
 
 #include "gst/engine.h"
-#include "tcp/singleBuffer.h"
 #include "ports.h"
 
 #ifdef CONFIG_BOOST
