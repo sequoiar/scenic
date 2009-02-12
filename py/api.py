@@ -735,8 +735,11 @@ class ControllerApi(object):
         :param duration: in seconds
         :param kind: string "unidirectional", "tradeoff" or "dualtest"
         """
-        contact = self.get_contact()
-        if contact is None:
+        try:
+            contact = self.get_contact()
+        except AddressBookError:
+        #    contact = None
+        #if contact is None:
             self.notify(caller, "Please select a contact prior to start a network test.", "error")
         else:
             if contact.state != addressbook.CONNECTED:
@@ -745,7 +748,14 @@ class ControllerApi(object):
                 com_chan = contact.connector.com_chan    
                 remote_addr = contact.address
                 # TODO
-                #client = self.network_tester['client']
+                kinds = {
+                    "unidirectional":network.KIND_UNIDIRECTIONAL, 
+                    "dualtest":network.KIND_DUALTEST, 
+                    "unidirectional":network.KIND_UNIDIRECTIONAL, 
+                }
+
+                #self.network_tester.start_test(caller, remote_addr, bandwidth, duration, kind, com_chan)
+
                 #client.start_client(caller, server_addr, bandwidth, duration)
                 self.notify(caller, "Starting network performance test with contact %s" % (contact.name), "info")
     

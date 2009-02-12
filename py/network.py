@@ -41,6 +41,17 @@ from utils import log
 from utils import commands
 
 log = log.start('debug', 1, 0, 'network')
+
+# -------------------- constants -----------------------------------
+STATE_IDLE = 0
+KIND_UNIDIRECTIONAL = 1
+KIND_TRADEOFF = 2
+KIND_DUALTEST_CLIENT = 3
+KIND_DUALTEST_SERVER = 4
+STATE_QUERIED_FOR_DUALTEST = 5
+STATE_WAITING_REMOTE_ANSWER = 6
+STATE_ANSWERED_OK = 7
+
 # --------------------------------- server side ---------------------
 class TestServerProtocol(basic.LineReceiver):
     """

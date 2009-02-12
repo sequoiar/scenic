@@ -54,6 +54,9 @@ class Core(Subject):
 
         Deprecated (IMHO) aalex
         Should be removed and merged to __init__
+
+        If Miville is started by any argument on the CLI, its basic connector will listen on port 
+        37055 instead of the default 37054. Useful for debugging.
         """
         # TODO: merge with __init__
 
