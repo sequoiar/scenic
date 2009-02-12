@@ -73,14 +73,20 @@ def parseArgs(args):
     parser.add_option("-z", "--videobitrate",
             type="int", dest="videoBitrate", default=3000000, 
             help="videobitrate in bit/s")
+    parser.add_option("-q", "--disable-video",
+            action="store_true", dest="disableVideo", default=False, help="stream audio only")
+    parser.add_option("-j", "--disable-audio",
+            action="store_true", dest="disableAudio", default=False, help="stream video only")
 
     return parser.parse_args(args)
 
 
 def runAsReceiver(options):
     """ Receives media from a remote sender """
-    vRx = buildVideoReceiver(options.ip, options.videoCodec, options.videoPort, options.screenNum, options.videoSink)
-    aRx = buildAudioReceiver(options.ip, options.audioCodec, options.audioPort, options.audioSink)
+    if not options.disableVideo:
+        vRx = buildVideoReceiver(options.ip, options.videoCodec, options.videoPort, options.screenNum, options.videoSink)
+    if not options.disableAudio:
+        aRx = buildAudioReceiver(options.ip, options.audioCodec, options.audioPort, options.audioSink)
 
     start()
     if options.fullscreen:
@@ -94,21 +100,25 @@ def runAsReceiver(options):
 
 def runAsSender(options):
     """ Sends media to a remote receiver """
-    vConfig = None
-    if options.videoDevice is None:
-        vConfig = VideoSourceConfig(options.videoSource, options.videoBitrate)
-    else:
-        vConfig = VideoSourceConfig(options.videoSource, options.videoBitrate, options.videoDevice)
-    
-    vTx = buildVideoSender(vConfig, options.ip, options.videoCodec, options.videoPort)
+    if not options.disableVideo:
+        vConfig = None
+        if options.videoDevice is None:
+            vConfig = VideoSourceConfig(options.videoSource, options.videoBitrate)
+        else:
+            vConfig = VideoSourceConfig(options.videoSource, options.videoBitrate, options.videoDevice)
+        
+        vTx = buildVideoSender(vConfig, options.ip, options.videoCodec, options.videoPort)
 
-    aConfig = AudioSourceConfig(options.audioSource, options.numChannels)
-    aTx = buildAudioSender(aConfig, options.ip, options.audioCodec, options.audioPort)
+    if not options.disableAudio:
+        aConfig = AudioSourceConfig(options.audioSource, options.numChannels)
+        aTx = buildAudioSender(aConfig, options.ip, options.audioCodec, options.audioPort)
 
     start() 
     
-    assert(tcpSendBuffer(options.ip, VIDEO_CAPS_PORT, VIDEO_MSG_ID, vTx.getCaps()))
-    assert(tcpSendBuffer(options.ip, AUDIO_CAPS_PORT, AUDIO_MSG_ID, aTx.getCaps()))
+    if not options.disableVideo:
+        assert(tcpSendBuffer(options.ip, VIDEO_CAPS_PORT, VIDEO_MSG_ID, vTx.getCaps()))
+    if not options.disableAudio:
+        assert(tcpSendBuffer(options.ip, AUDIO_CAPS_PORT, AUDIO_MSG_ID, aTx.getCaps()))
 
     eventLoop(options.timeout)
     wasPlaying = isPlaying()
@@ -120,6 +130,9 @@ def runAsSender(options):
 def run(myArgs):
     setHandler() # to catch interrupts at cpp level first
     options = parseArgs(myArgs)[0]
+    
+    if options.disableVideo and options.disableAudio:
+        raise PofExcept("Do not disable audio and video")
     
     if options.isSender:
         print "running as sender"

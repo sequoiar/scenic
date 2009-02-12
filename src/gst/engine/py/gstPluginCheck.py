@@ -23,12 +23,14 @@
 import sys
 
 try:
+    import pygst
+    pygst.require('0.10')
     import gst
 except ImportError:
     print "import gst failed, gst-python must be installed before running this script"
     sys.exit(0)
 
-GST_PLUGINS = ['level', 'audioconvert', 'alsasink', 'pulsesink', 'jackaudiosink', 
+GST_PLUGINS = ['level', 'audioconvert', 'alsasink', 'pulsesink', 
             'decodebin', 'capsfilter', 'dvdemux', 'queue', 'ffmpegcolorspace', 
             'x264enc', 'ffdec_h264', 'ffdec_h263', 'ffenc_h263', 'ffenc_mpeg4', 
             'ffdec_mpeg4', 'vorbisenc', 'vorbisdec', 'lame', 'mad', 'glupload', 
