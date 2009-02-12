@@ -28,6 +28,7 @@ import connectors
 from connectors.states import *
 import devices
 import network
+import addressbook # for network_test_*
 
 import repr
 
@@ -674,51 +675,6 @@ class ControllerApi(object):
                 devices_list.append(device)
         self.notify(caller, devices_list, 'devices_list') # with a dict
     
-    # network test use cases ----------------------------------------------------
-    def network_test_start(self, caller, bandwidth=1, duration=1):
-        """
-        Starts to test the network using `iperf -c <host> -u [...]`
-        
-        Uses the selected contact to start the test.
-        
-        :param bandwidth: in Mbit
-        :param duration: in seconds
-        """
-        # TODO
-        client = self.network_tester['client']
-        contact = self.get_contact()
-        if contact is None:
-            self.notify(caller, "Please select a contact prior to start a network test.", "info")
-        else:
-            server_addr = contact.address
-            
-            client.start_client(caller, server_addr, bandwidth, duration)
-            self.notify(caller, "Starting network performance test with contact %s" % (contact.name), "info")
-    
-    def network_test_stop(self, caller):
-        """
-        Interrupts suddenly the network test.
-        """
-        #TODO
-        pass
-        self.notify(caller, 'not implemented yet', 'info')
-
-    #def network_test_enable_autoaccept(self, caller, enabled=True):
-    #    """
-    #    Enables/disables auto accept of network tests from remote selected contact.
-    #    :param enabled: wheter to enable it or not.
-    #    """
-    #    # TODO
-    #    pass
-
-    #def network_test_accept(self, caller, accepted=True):
-    #    """
-    #    Accepts/refuses network test asked from selected contact.
-    #    :param accepted: wheter to accept it or not.
-    #    """
-    #    # TODO
-    #    pass
-   
     ### devices ###
 
     def device_list_attributes(self, caller, driver_kind, driver_name, device_name): 
@@ -768,19 +724,31 @@ class ControllerApi(object):
         self.notify(caller, devices_list, 'devices_list') # with a dict
     
     # network test use cases ----------------------------------------------------
-    def network_test_start(self, caller, bandwidth=1, duration=10):
+    def network_test_start(self, caller, bandwidth=1, duration=10, kind="unidirectional"):
         """
-        Asks the contact if she wants to test the network
+        Tries to start a network test with currently connected contact.
         
+        If dualtest, asks the contact if she wants to test the network
+        Starts to test the network using `iperf -c <host> -u [...]`
         
-
-        :param badnwidth: in Mbit
+        :param bandwidth: in Mbit
         :param duration: in seconds
+        :param kind: string "unidirectional", "tradeoff" or "dualtest"
         """
-        # TODO
-        pass
-        #self.network_tester.
-
+        contact = self.get_contact()
+        if contact is None:
+            self.notify(caller, "Please select a contact prior to start a network test.", "error")
+        else:
+            if contact.state != addressbook.CONNECTED:
+                self.notify(caller, "Please connect to a contact prior to start a network test.", "error")
+            else:
+                com_chan = contact.connector.com_chan    
+                remote_addr = contact.address
+                # TODO
+                #client = self.network_tester['client']
+                #client.start_client(caller, server_addr, bandwidth, duration)
+                self.notify(caller, "Starting network performance test with contact %s" % (contact.name), "info")
+    
     def network_test_stop(self, caller):
         """
         Interrupts suddenly the network test.
@@ -790,7 +758,7 @@ class ControllerApi(object):
 
     def network_test_enable_autoaccept(self, caller, enabled=True):
         """
-        Enables/disables auto accept of network tests from remote selected contact.
+        Enables/disables auto accept of network dualtests from remote selected contact.
         :param enabled: wheter to enable it or not.
         """
         # TODO
@@ -798,7 +766,7 @@ class ControllerApi(object):
 
     def network_test_accept(self, caller, accepted=True):
         """
-        Accepts/refuses network test asked from selected contact.
+        Accepts/refuses network dualtest asked from selected contact.
         :param accepted: wheter to accept it or not.
         """
         # TODO

@@ -41,7 +41,7 @@ from utils import log
 from utils import commands
 
 log = log.start('debug', 1, 0, 'network')
-
+# --------------------------------- server side ---------------------
 class TestServerProtocol(basic.LineReceiver):
     """
     server side communication protocol
@@ -70,7 +70,7 @@ class TestServerProtocol(basic.LineReceiver):
 
 class TestServerFactory(protocol.ServerFactory):
     protocol  = TestServerProtocol
-
+# ------------------------------------- client side ----------------
 class TestClientProtocol(basic.LineReceiver):
     """
     client side protocol for network tests
@@ -129,8 +129,12 @@ class TestClient:
     
     This is the class that does the job.
     """
+    # constants 
+    DISCONNECTED = 0
+    CONNECTED = 1
+
     def __init__(self): #, contact, api):
-        self._state = "DISCONNECTED"
+        self._state = self.DISCONNECTED
 
     def connect_to(self, host, port):
         """
@@ -149,7 +153,7 @@ class TestClient:
         Callback for successful connection to a remote test server
         """
         print "connected to port %i" % port
-        self.state = "CONNECTED"
+        self.state = self.CONNECTED
 
     def handle_failure(self, failure, host, port):
         """
@@ -160,11 +164,25 @@ class TestClient:
         # reactor.stop()
 
 
+# -------------------------------- iperf --------------------------------------
+# local  : datetime, local ip, local port, remote ip, remote port, test index, interval (0-10) sec, transfer (bytes), bandwidth (Mbit/sec)
+# remote  : datetime, local ip, local port, remote ip, remote port, test index, interval (0-10) sec, transfer (bytes), bandwidth (Mbit/sec), 
+#            jitter (ms), datagrams lost, total datagrams, % loss, datagrams out of order.
+#
+# WARNING: did not receive ack of last datagram after 10 tries.
+# if client tells this, unable to reach server.
+#
+# aalex@plank:~$ iperf -c localhost -u -y c -t 1 -b 1M
+# 20090130142704,127.0.0.1,35745,127.0.0.1,5001,3,0.0-1.0,127890,999957
+# 20090130142704,127.0.0.1,5001,127.0.0.1,35745,3,0.0-1.0,127890,1000047,0.005,0,87,0.000,0
 
+# actually in the stdout
+# 20090130143525,10.10.10.145,57442,10.10.10.65,5001,3,0.0-1.0,127890,999964
+# 20090130143525,10.10.10.65,5001,10.10.10.145,57442,3,0.0-1.0,127890,1000013,0.010,0,87,0.000,0
 # --------------------- constants --------------------------------
 NETPERF_TEST_UNIDIRECTIONAL = "unidirectional from local to remote"
 
-# functions -----------------------------------------------------
+# functions ------------------------------------------------------
 def _parse_iperf_output(lines):
     """
     Parses the output of iperf -c <host> -u
@@ -200,21 +218,6 @@ def _parse_iperf_output(lines):
                         ret[k] = float(word) # %
                     word_index += 1
     return ret
-
-# local  : datetime, local ip, local port, remote ip, remote port, test index, interval (0-10) sec, transfer (bytes), bandwidth (Mbit/sec)
-# remote  : datetime, local ip, local port, remote ip, remote port, test index, interval (0-10) sec, transfer (bytes), bandwidth (Mbit/sec), 
-#            jitter (ms), datagrams lost, total datagrams, % loss, datagrams out of order.
-#
-# WARNING: did not receive ack of last datagram after 10 tries.
-# if client tells this, unable to reach server.
-#
-# aalex@plank:~$ iperf -c localhost -u -y c -t 1 -b 1M
-# 20090130142704,127.0.0.1,35745,127.0.0.1,5001,3,0.0-1.0,127890,999957
-# 20090130142704,127.0.0.1,5001,127.0.0.1,35745,3,0.0-1.0,127890,1000047,0.005,0,87,0.000,0
-
-# actually in the stdout
-# 20090130143525,10.10.10.145,57442,10.10.10.65,5001,3,0.0-1.0,127890,999964
-# 20090130143525,10.10.10.65,5001,10.10.10.145,57442,3,0.0-1.0,127890,1000013,0.010,0,87,0.000,0
 
 class IperfServerProcessProtocol(protocol.ProcessProtocol):
     """
@@ -341,6 +344,21 @@ class NetworkTester(object):
         else:
             self.api.notify(caller, val, key) #key, res)
 
+    def start_bidirectional_as_client(self, caller, server_addr, bandwidth_megabits=1, duration=10):
+        # TODO
+        if self.state == self.STOPPED:
+            
+           self._on_bidirectional_ok(caller, server_addr, bandwidth_megabits, duration)
+        else:
+            self.notify_api(caller, "error", "Network test is already happening.")
+
+    def _on_bidirectional_ok(self, caller, server_addr, bandwidth_megabits=1, duration=10):
+        # TODO
+        """
+        Called when remote server has said it would be ok to start the iperf bidirectional test.
+        """
+        self.start_client(caller, server_addr, bandwidth_megabits, duration)
+
     def start_client(self, caller, server_addr, bandwidth_megabits=1, duration=10):
         """
         Starts `iperf -c localhost -y c -u -t 10 -b 1M`
@@ -365,6 +383,8 @@ class NetworkTester(object):
                 print "error: ", e.message
             else:
                self.state = self.CLIENT_RUNNING
+        else:
+            self.notify_api(caller, "error", "Network test is already happening.")
 
     def start_server(self):
         """
@@ -397,9 +417,9 @@ def start(subject):
         if subject is not None:
             subject.notify(subject, e.message, "error")
         print e.message
-    server = NetworkTester()
-    server.api = subject
-    server.start_server()
+    tester = NetworkTester()
+    tester.api = subject
+    tester.start_server()
     
     client = NetworkTester()
     client.api = subject
