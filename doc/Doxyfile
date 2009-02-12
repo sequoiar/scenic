@@ -25,7 +25,7 @@ DOXYFILE_ENCODING      = UTF-8
 # The PROJECT_NAME tag is a single word (or a sequence of words surrounded 
 # by quotes) that should identify the project.
 
-PROJECT_NAME           = propulse
+PROJECT_NAME           = propulseArt
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. 
 # This could be handy for archiving the generated documentation or 
@@ -924,7 +924,7 @@ LATEX_HIDE_INDICES     = NO
 # The RTF output is optimized for Word 97 and may not look very pretty with 
 # other RTF readers or editors.
 
-GENERATE_RTF           = NO
+GENERATE_RTF           = YES
 
 # The RTF_OUTPUT tag is used to specify where the RTF docs will be put. 
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be 
@@ -936,7 +936,7 @@ RTF_OUTPUT             = rtf
 # RTF documents. This may be useful for small projects and may help to 
 # save some trees in general.
 
-COMPACT_RTF            = NO
+COMPACT_RTF            = YES
 
 # If the RTF_HYPERLINKS tag is set to YES, the RTF that is generated 
 # will contain hyperlink fields. The RTF file will 
@@ -945,7 +945,7 @@ COMPACT_RTF            = NO
 # programs which support those fields. 
 # Note: wordpad (write) and others do not support links.
 
-RTF_HYPERLINKS         = NO
+RTF_HYPERLINKS         = YES
 
 # Load stylesheet definitions from file. Syntax is similar to doxygen's 
 # config file, i.e. a series of assignments. You only have to provide 
@@ -994,7 +994,7 @@ MAN_LINKS              = NO
 # generate an XML file that captures the structure of 
 # the code including all documentation.
 
-GENERATE_XML           = NO
+GENERATE_XML           = YES
 
 # The XML_OUTPUT tag is used to specify where the XML pages will be put. 
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be 
@@ -1031,7 +1031,7 @@ XML_PROGRAMLISTING     = YES
 # documentation. Note that this feature is still experimental 
 # and incomplete at the moment.
 
-GENERATE_AUTOGEN_DEF   = NO
+GENERATE_AUTOGEN_DEF   = YES
 
 #---------------------------------------------------------------------------
 # configuration options related to the Perl module output
