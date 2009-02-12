@@ -266,6 +266,16 @@ class NetworkError(Exception):
     """
     pass
 
+# --------------- states : ------------
+#STATE_IDLE = 0
+#KIND_UNIDIRECTIONAL = 1
+#KIND_TRADEOFF = 2
+#KIND_DUALTEST_CLIENT = 3
+#KIND_DUALTEST_SERVER = 4
+#STATE_QUERIED_FOR_DUALTEST = 5
+#STATE_WAITING_REMOTE_ANSWER = 6
+#STATE_ANSWERED_OK = 7
+
 class NetworkTester(object):
     """
     Network tester using `iperf`.
@@ -283,9 +293,20 @@ class NetworkTester(object):
         self.iperf_server = None
         self.iperf_client = None
         self.api = None
-        self.state = self.STOPPED
+        self.state = STATE_IDLE #STOPPED
+        self.iperf_server_is_running = True
+        # ------ current stats and config
+        self.current_remote_addr = None
+        self.current_bandwidth = 10 # Mbits
+        self.current_duration = 1 # seconds
+        self.current_caller = None # instance
+        self.current_stats_local = None # dict
+        self.current_stats_remote = None # dict
+        # -------- settings
+        self.accept_timeout = 20 # timeout before auto rejecting dualtest query
+        self.remote_results_timeout = 5 # how many extra seconds over the duration of a test to wait for remote stats before giving up.
 
-    def kill_process(self, process_transport, sig=15, verify_timeout=1.0):
+    def kill_server_process(self, process_transport, sig=15, verify_timeout=1.0):
         """
         Kills a process started using reactor.spawnProcess
         Double checks after 0.1 second
@@ -294,16 +315,18 @@ class NetworkTester(object):
         """
         try:
             process_transport.signalProcess(sig)
+            self.state = STATE_IDLE
         except ProcessExitedAlready, e:
-            print "error : ProcessExitedAlready", e.message
+            print "error : ProcessExitedAlready (may be ok)", e.message
+            self.state = STATE_IDLE
         else:
-            if sig == 15:
-                reactor.callLater(verify_timeout, self.kill_process, process_transport, 9)
-            else:
+            if sig == 15: # (first time)
+                reactor.callLater(verify_timeout, self.kill_server_process, process_transport, 9)
+            else: # sig = 9 (second time)
                 process_transport.loseConnection()
-                self.state = self.STOPPED
+                self.state = STATE_IDLE # STOPPED
 
-    def on_client_results(self, results, commands, extra_arg, caller):
+    def on_iperf_command_results(self, results, commands, extra_arg, caller):
         """
         Called once a bunch of child processes are done.
         
@@ -355,11 +378,11 @@ class NetworkTester(object):
         else:
             self.api.notify(caller, val, key) #key, res)
 
-    def start_bidirectional_as_client(self, caller, server_addr, bandwidth_megabits=1, duration=10):
+    def start_bidirectional_as_client(self, caller, remote_addr, bandwidth_megabits=1, duration=10):
         # TODO
         if self.state == self.STOPPED:
             
-           self._on_bidirectional_ok(caller, server_addr, bandwidth_megabits, duration)
+           self._on_bidirectional_ok(caller, remote_addr, remote_addr, bandwidth_megabits, duration)
         else:
             self.notify_api(caller, "error", "Network test is already happening.")
 
@@ -368,9 +391,9 @@ class NetworkTester(object):
         """
         Called when remote server has said it would be ok to start the iperf bidirectional test.
         """
-        self.start_client(caller, server_addr, bandwidth_megabits, duration)
+        self.start_test(caller, server_addr, bandwidth_megabits, duration)
 
-    def start_client(self, caller, server_addr, bandwidth_megabits=1, duration=10):
+    def start_test(self, caller, server_addr, bandwidth_megabits=1, duration=10): # start_client
         """
         Starts `iperf -c localhost -y c -u -t 10 -b 1M`
         
@@ -382,12 +405,11 @@ class NetworkTester(object):
             command = ["iperf", "-c", server_addr, "-t", "%d" % (duration), "-y", "c", "-u", "-b", "%dM" % (bandwidth_megabits)] 
             extra_arg = {
                 'ip': server_addr, 
-                'ip': server_addr, 
                 'bandwidth': bandwidth_megabits, 
                 'duration': duration, 
                 'kind': NETPERF_TEST_UNIDIRECTIONAL # TODO
             }
-            callback = self.on_client_results
+            callback = self.on_iperf_command_results
             try:
                 commands.single_command_start(command, callback, extra_arg, caller)
             except CommandNotFoundError, e: # TODO: 
@@ -396,8 +418,14 @@ class NetworkTester(object):
                self.state = self.CLIENT_RUNNING
         else:
             self.notify_api(caller, "error", "Network test is already happening.")
+    
+    def _start_iperf_client(self):
+        """
+        this is where we actually start the iperf process as a client
+        """
+        
 
-    def start_server(self):
+    def _start_iperf_server_process(self):
         """
         Starts `iperf -s -u`
         """
@@ -408,17 +436,17 @@ class NetworkTester(object):
             except OSError, e:
                 print "Error starting process: ", e 
             else:
-                self.state = self.SERVER_RUNNING
-                reactor.callLater(15.0, self.kill_process, self.iperf_server)
-
+                self.iperf_server_is_running = True
+                #self.state = self.SERVER_RUNNING
+                #reactor.callLater(15.0, self.kill_server_process, self.iperf_server)
+    
 # functions ---------------------------------------------
 def start(subject):
     """
     Initial setup of the whole module for miville's use.
     
-    Raises CommandNotFoundError if `iperf` command not found.
-
-    Returns a dict whose keys are 'client' and 'server'
+    Notifies with 'error' key  if `iperf` command not found. (CommandNotFoundError)
+    Returns a NetworkTester instance with the server started.
     """
     # will raise CommandNotFoundError if not found:
     try:
@@ -430,7 +458,7 @@ def start(subject):
         print e.message
     tester = NetworkTester()
     tester.api = subject
-    tester.start_server()
+    tester._start_iperf_server_process()
     
     #client = NetworkTester()
     #client.api = subject
@@ -459,12 +487,12 @@ if __name__ == "__main__":
         iperf = NetworkTester()
         if len(sys.argv) == 2:
             if sys.argv[1] == "server":
-                iperf.start_server()
+                iperf._start_iperf_server_process()
             else:
                 print "usage: <file name> [server]"
         else:
             print "starting client..."
-            iperf.start_client("Dummy caller", "10.10.10.66", 1, 1) # "localhost" | tzing !
+            iperf.start_test("Dummy caller", "10.10.10.66", 1, 1) # "localhost" | tzing !
         reactor.callLater(0.5, debug_meanwhile)
         reactor.callLater(2.0, lambda: reactor.stop())
     #    try:
