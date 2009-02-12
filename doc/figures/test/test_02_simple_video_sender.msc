@@ -3,16 +3,16 @@ msc
 {        
     test, telnet_tx, telnet_rx, gst_tx, gst_rx;
     
-test=>gst_tx [label="$> propulseart 1 1220"];
-test=>telnet_tx [label="$> telnet localhost 1220"];
-test->telnet_tx [label="video_init: codec=\"h264\" port=12020 address=\"127.0.0.1\" source=\"v4lsrc\""];
-telnet_tx->gst_tx [label="video_init: codec=\"h264\" port=12020 address=\"127.0.0.1\" source=\"v4lsrc\""];
-gst_tx->telnet_tx [label="video_init: ack=\"ok\""];
-test->telnet_tx [label="start:"];
-telnet_tx->gst_tx [label="start:"];
-gst_tx->telnet_tx [label="start: ack=\"ok\""];
-test->telnet_tx [label="stop:"];
-telnet_tx->gst_tx [label="stop:"];
-gst_tx->telnet_tx [label="stop: ack=\"ok\""];
+test:>gst_tx [label="$> propulseart 1 1220"];
+test:>telnet_tx [label="$> telnet localhost 1220"];
+test=>telnet_tx [label="video_init: codec=\"h264\" port=12020 address=\"127.0.0.1\" bitrate=3000000 source=\"v4lsrc\""];
+telnet_tx=>gst_tx [label="video_init: codec=\"h264\" port=12020 address=\"127.0.0.1\" bitrate=3000000 source=\"v4lsrc\""];
+gst_tx>>telnet_tx [label="video_init: ack=\"ok\""];
+test=>telnet_tx [label="start:"];
+telnet_tx=>gst_tx [label="start:"];
+gst_tx>>telnet_tx [label="start: ack=\"ok\""];
+test=>telnet_tx [label="stop:"];
+telnet_tx=>gst_tx [label="stop:"];
+gst_tx>>telnet_tx [label="stop: ack=\"ok\""];
 
 }
