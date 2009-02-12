@@ -421,10 +421,10 @@ def start(subject):
     tester.api = subject
     tester.start_server()
     
-    client = NetworkTester()
-    client.api = subject
-    
-    return {'server':server, 'client':client}
+    #client = NetworkTester()
+    #client.api = subject
+    return tester
+    #return {'server':server, 'client':client}
 
     #    txt = """
     #    20090126182857,10.10.10.145,35875,10.10.10.65,5001,3,0.0-10.0,1252440,999997
