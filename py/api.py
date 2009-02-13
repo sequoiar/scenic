@@ -757,7 +757,7 @@ class ControllerApi(object):
                     kind = kinds[kind]
                 except KeyError:
                     self.notify(caller, "Could not start network test: Invalid kind of test \"%s\"." % kind, "error")
-                #self.network_tester.start_test(caller, remote_addr, bandwidth, duration, kind, com_chan)
+                self.network_tester.start_test(caller, remote_addr, bandwidth, duration, kind, com_chan)
                 #client.start_client(caller, server_addr, bandwidth, duration)
                 self.notify(caller, "Starting network performance test with contact %s" % (contact.name), "info")
     

@@ -36,23 +36,36 @@ app.main()
 app.me.verbose = False
 app.view.verbose = False #True 
 app.go()
+remote = ("tzing", "10.10.10.66")
+previous = None 
 
 class Test_Network_Test(unittest.TestCase):
     """
     Integration tests for v4l2 devices.
     """
-    def test_01_unidirectional_local_to_remote(self):
+    def setUp(self):
+        app.api.delete_contact(app.me, remote[0])
+        app.api.add_contact(app.me, remote[0], remote[1], 2222)
+        app.api.select_contact(app.me, remote[0])
+
+    def _run_miville(self):
+        global previous
+        print "please wait..."
+        if app.last is not previous:
+            print "Miville notification: ", app.last.value 
+            previous = app.last
+        app.go(0.1)
+        
+
+    def test_01_unidirectional(self):
         # We need a remote host with iperf set in the contacts.
         # and it must be selected.
-        app.api.delete_contact(app.me, 'brrr')
-        app.api.add_contact(app.me, 'brrr', '10.10.10.65')
-        app.api.select_contact(app.me, 'brrr')
-        
+        app.api.start_connection(app.me)
+        for i in range(5):
+            self._run_miville()
         app.api.network_test_start(app.me)
-        for i in range(3):
-            print "please wait..."
-            app.go(1)
-        
+        for i in range(5):
+            self._run_miville()
         # cleanup
-        app.api.delete_contact(app.me, 'brrr')
+        app.api.delete_contact(app.me, remote[0]) 
 

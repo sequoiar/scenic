@@ -101,15 +101,16 @@ class IperfServerProcessProtocol(protocol.ProcessProtocol):
     """
     def __init__(self):
         self.network_tester = None # which started this process
-        self.verbose = True
+        self.verbose = False
         self.prefix = "iperf -s>"
         self.network_tester_warned = False
     
     def connectionMade(self):
         if self.verbose:
-            print self.prefix, "connectionMade"
+            print self.prefix, "process started"
     
     def outReceived(self, data):
+        log.info("iperf server started")
         if self.verbose:
             for line in data.splitlines():
                 print self.prefix, line
