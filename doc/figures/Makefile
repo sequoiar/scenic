@@ -1,17 +1,10 @@
-all: index.html
-	
+all: $(addsuffix .svg,$(basename $(wildcard *msc))) $(addsuffix .png,$(basename $(wildcard *msc)))
 
-.html.svg:
-	@echo '<HTML><HEAD><meta http-equiv="refresh" content="2;url=figures.html"> </HEAD><BODY></BODY></HTML>' >> index.html
 
-.png.msc: 
+%.png: %.msc
 	mscgen -T png -i $< -o $@
 
-.svg.msc:
+%.svg: %.msc
 	mscgen -T svg -i $< -o $@
 
-clean:
-	rm -f *.png
-	rm -f *.svg
-	rm -f index.html
 
