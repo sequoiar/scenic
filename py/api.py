@@ -742,15 +742,18 @@ class ControllerApi(object):
         #if contact is None:
             self.notify(caller, "Please select a contact prior to start a network test.", "error")
         else:
-            if contact.state != addressbook.CONNECTED:
+            if contact.state != addressbook.CONNECTED and kind == "dualtest":
                 self.notify(caller, "Please connect to a contact prior to start a network test.", "error")
             else:
-                com_chan = contact.connector.com_chan    
+                if kind == "dualtest":
+                    com_chan = contact.connector.com_chan    
+                else:
+                    com_chan = None
                 remote_addr = contact.address
                 # TODO
                 kinds = {
                     "unidirectional":network.KIND_UNIDIRECTIONAL, 
-                    "dualtest":network.KIND_DUALTEST, 
+                    "dualtest":network.KIND_DUALTEST_CLIENT, 
                     "unidirectional":network.KIND_UNIDIRECTIONAL, 
                 }
                 try:

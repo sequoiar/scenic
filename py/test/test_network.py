@@ -41,31 +41,50 @@ previous = None
 
 class Test_Network_Test(unittest.TestCase):
     """
-    Integration tests for v4l2 devices.
+    Integration tests for network tests.
+    
+    We need to start miville on tzing prior to run this test.
+
+    We need a remote host with iperf set in the contacts.
+    and it must be selected.
     """
     def setUp(self):
+        self._verbose = True
         app.api.delete_contact(app.me, remote[0])
         app.api.add_contact(app.me, remote[0], remote[1], 2222)
         app.api.select_contact(app.me, remote[0])
 
     def _run_miville(self):
         global previous
-        print "please wait..."
+        if self._verbose:
+            sys.stdout.write(".")
+            sys.stdout.flush()
         if app.last is not previous:
-            print "Miville notification: ", app.last.value 
+            if self._verbose:
+                print "Miville notification: ", app.last.value 
             previous = app.last
         app.go(0.1)
         
 
     def test_01_unidirectional(self):
-        # We need a remote host with iperf set in the contacts.
-        # and it must be selected.
+        """
+        network_test_start(self, caller, bandwidth=1, duration=10, kind="unidirectional")
+        
+        """
         app.api.start_connection(app.me)
-        for i in range(5):
+        if self._verbose:
+            print "\nwaiting for 2 seconds:"
+        for i in range(20):
             self._run_miville()
-        app.api.network_test_start(app.me)
-        for i in range(5):
+        app.api.network_test_start(app.me, 30, 1, "unidirectional")
+        for i in range(30):
             self._run_miville()
+        if not isinstance(app.last, app.Update):
+            self.fail("last notification should be a miville notification.")
+        #  {'loss': 0.0, 'bandwidth': 30, 'jitter': 0.001, 'duration': 1, 'ip': '10.10.10.66', 'kind': 1}
+        for k in ("loss", "jitter", "bandwidth"):
+            if not app.last.value.has_key(k):
+                self.fail("The dict in the notification from network_test should contain key %s" % k)
         # cleanup
         app.api.delete_contact(app.me, remote[0]) 
 
