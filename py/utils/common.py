@@ -63,9 +63,14 @@ def load_modules(mods):
             loaded_mods.append(loaded_mod)
     return loaded_mods
     
-def find_callbacks(obj):
+def find_callbacks(obj, prefix=None):
     callbacks = {}
-    for attr in dir(obj):
-        if attr[0] == '_' and attr[1] != '_': 
-            callbacks[attr[1:]] = getattr(obj, attr)
+    if prefix:
+        for attr in dir(obj):
+            if attr.startswith(prefix): 
+                callbacks[attr[len(prefix):]] = getattr(obj, attr)
+    else:
+        for attr in dir(obj):
+            if attr[0] == '_' and attr[1] != '_': 
+                callbacks[attr[1:]] = getattr(obj, attr)
     return callbacks
