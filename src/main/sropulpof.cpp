@@ -46,6 +46,8 @@ short pof::run(int argc, char **argv)
     bool send = false;
     bool recv = false;
     bool full = false;
+    bool disableAudio = false;
+    bool disableVideo = false;
     OptionArgs options;
     char *ip = 0;
     char *videoCodec = 0;
@@ -70,6 +72,8 @@ short pof::run(int argc, char **argv)
     options.add(new BoolArg(&send,"sender", 's', "sender"));
     options.add(new BoolArg(&recv,"receiver", 'r', "receiver"));
     options.add(new BoolArg(&full,"fullscreen", 'f', "default to fullscreen"));
+    options.add(new BoolArg(&disableAudio,"disableaudio", 'y', "disable audio"));
+    options.add(new BoolArg(&disableVideo,"disablevideo", 'z', "disable video"));
     options.add(new StringArg(&videoDevice, "videodevice", 'd', "device", "/dev/video0 /dev/video1"));
     options.add(new IntArg(&screenNum, "screen", 'n', "screen", "xinerama screen num"));
     options.add(new BoolArg(&version, "version", '\0', "version number"));
@@ -83,29 +87,48 @@ short pof::run(int argc, char **argv)
         LOG_INFO("version " << PACKAGE_VERSION << '\b' << RELEASE_CANDIDATE);
         return 0;
     }
-    pid = send ? 's' : 'r';
+
+    if (send)
+        pid = 's';
+    else if (recv)
+        pid = 'r';
+    else
+        THROW_ERROR("argument error: must be sender or receiver. see --help");
 
     LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
 
     if(ip == 0) 
         THROW_ERROR("argument error: missing ip. see --help");
-    if(videoCodec == 0)
+    if(!disableVideo && videoCodec == 0)
         THROW_ERROR("argument error: missing videoCodec. see --help");
+    if (disableVideo && disableAudio)
+        THROW_ERROR("argument error: can't disable video and audio. see --help");
 
     if (pid == 'r') {
-        if(videoSink == 0)
-            THROW_ERROR("argument error: missing videoSink. see --help");
+        shared_ptr<VideoReceiver> vRx;
+        shared_ptr<AudioReceiver> aRx;
 
-        shared_ptr<VideoReceiver> vRx(videofactory::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink));
-        shared_ptr<AudioReceiver> aRx(audiofactory::buildAudioReceiver(ip, audioCodec, audioPort));
+        if (!disableVideo)
+        {
+            if(videoSink == 0)
+                THROW_ERROR("argument error: missing videoSink. see --help");
+
+            vRx = videofactory::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink);
+        }
+        if (!disableAudio)
+            aRx = audiofactory::buildAudioReceiver(ip, audioCodec, audioPort);
 
 #ifdef CONFIG_DEBUG_LOCAL
         playback::makeVerbose();
 #endif
 
         playback::start();
-        if(full)
-            vRx->makeFullscreen();
+
+        if (!disableVideo)
+        {
+            if(full)
+                vRx->makeFullscreen();
+        }
 
         BLOCK();
         assert(playback::isPlaying());
@@ -113,18 +136,27 @@ short pof::run(int argc, char **argv)
         playback::stop();
     }
     else {
-        VideoSourceConfig *vConfig; 
+        shared_ptr<VideoSender> vTx;
+        shared_ptr<AudioSender> aTx;
 
-        if (videoDevice)
-            vConfig = new VideoSourceConfig("v4l2src", videoBitrate, videoDevice);
-        else
-            vConfig = new VideoSourceConfig("v4l2src", videoBitrate);
+        if (!disableVideo)
+        {
+            VideoSourceConfig *vConfig; 
 
-        shared_ptr<VideoSender> vTx(videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort));
-        delete vConfig;
+            if (videoDevice)
+                vConfig = new VideoSourceConfig("v4l2src", videoBitrate, videoDevice);
+            else
+                vConfig = new VideoSourceConfig("v4l2src", videoBitrate);
 
-        AudioSourceConfig aConfig("jackaudiosrc", numChannels);
-        shared_ptr<AudioSender> aTx(audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort));
+            vTx = videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort);
+            delete vConfig;
+        }
+
+        if (!disableAudio)
+        {
+            AudioSourceConfig aConfig("jackaudiosrc", numChannels);
+            aTx = audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort);
+        }
 
 #ifdef CONFIG_DEBUG_LOCAL
         playback::makeVerbose();
@@ -132,8 +164,10 @@ short pof::run(int argc, char **argv)
 
         playback::start();
 
-        assert(tcpSendBuffer(ip, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
-        assert(tcpSendBuffer(ip, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
+        if (!disableVideo)
+            assert(tcpSendBuffer(ip, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
+        if (!disableAudio)
+            assert(tcpSendBuffer(ip, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
 
         BLOCK();
         assert(playback::isPlaying());
