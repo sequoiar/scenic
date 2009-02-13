@@ -1,4 +1,5 @@
-all:
+all: $(addsuffix .svg,$(basename $(wildcard *msc))) $(addsuffix .png,$(basename $(wildcard *msc)))
+
 
 %.png: %.msc
 	mscgen -T png -i $< -o $@
@@ -6,9 +7,4 @@ all:
 %.svg: %.msc
 	mscgen -T svg -i $< -o $@
 
-%.svg: %.dot
-	dot -Tsvg $< > $@.svg
-
-%.png: %.dot
-	dot -Tpng $< > $@.png
 
