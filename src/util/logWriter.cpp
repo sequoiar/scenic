@@ -124,6 +124,7 @@ bool logLevelMatch(LogLevel level)
         return false;
 }
 
+#include <iomanip>
 
 std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, int lineNum)
@@ -137,7 +138,9 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
         struct tm * timeinfo = localtime(&rawtime);
         //asctime adds a linefeed
         logMsg << logLevelStr(level) << msg << " " << functionName <<  "() in " << fileName
-            << ":" << " line " << lineNum << " " <<asctime(timeinfo);
+            << ":" << " line " << lineNum << " " << std::setfill('0') << std::setw(2) 
+            << timeinfo->tm_hour <<":"<< std::setw(2) << timeinfo->tm_min 
+            <<":" << std::setw(2) << timeinfo->tm_sec << std::endl;
 #else
         logMsg <<  msg << std::endl;
 #endif
