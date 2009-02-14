@@ -18,7 +18,7 @@ install:
         (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) install); done
 
 clean:
-	rm -rf html latex xml rtf
+	rm -rf html latex xml rtf def
 	@for i in $(SUBDIRS); do \
         echo "Clearing in $$i..."; \
         (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) clean); done
