@@ -1,21 +1,29 @@
 #list of msc filenames with extension stripped
 MSC_GLOB = $(basename $(wildcard *msc))
-
+HTML_TARGETS = $(addsuffix _msc.svg,$(MSC_GLOB)) \
+			   $(addsuffix _msc.png,$(MSC_GLOB)) \
+			   $(addsuffix _dot.png,$(basename $(wildcard *dot))) \
+			   $(addsuffix _dot.svg,$(basename $(wildcard *dot)))
 all: 
 
-html: $(addsuffix .svg,$(MSC_GLOB)) $(addsuffix .png,$(MSC_GLOB))
+html: $(HTML_TARGETS)
 
+%_dot.png: %.dot
+		dot -Tpng $< > $@
 
-%.png: %.msc
-	mscgen -T png -i $< -o $@
+%_dot.svg: %.dot
+		dot -Tsvg $< > $@
 
-%.svg: %.msc
-	mscgen -T svg -i $< -o $@
+%_msc.png: %.msc
+		mscgen -T png -i $< -o $@
+
+%_msc.svg: %.msc 
+		mscgen -T svg -i $< -o $@
 
 install:
 
-clean: $(addsuffix .png,$(MSC_GLOB)) $(addsuffix .svg,$(MSC_GLOB))
-	rm -f $^
+clean: 
+	rm -f $(HTML_TARGETS)
 
 moreclean:
 
