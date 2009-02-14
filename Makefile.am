@@ -1,2 +1,2 @@
-SUBDIRS = src
+SUBDIRS = src doc py
 ACLOCAL_AMFLAGS = -I m4
