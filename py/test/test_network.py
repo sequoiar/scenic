@@ -50,11 +50,19 @@ class Test_Network_Test(unittest.TestCase):
     """
     def setUp(self):
         self._verbose = True
+    
+    def _initial_setup(self):
         app.api.delete_contact(app.me, remote[0])
         app.api.add_contact(app.me, remote[0], remote[1], 2222)
         app.api.select_contact(app.me, remote[0])
+        app.api.start_connection(app.me)
+        if self._verbose:
+            print "\nwaiting for 2 seconds:"
 
-    def _run_miville(self):
+    def tearDown(self):
+        app.api.delete_contact(app.me, remote[0])
+    
+    def _run_miville_a_little_while(self):
         global previous
         if self._verbose:
             sys.stdout.write(".")
@@ -65,26 +73,47 @@ class Test_Network_Test(unittest.TestCase):
             previous = app.last
         app.go(0.1)
         
-
     def test_01_unidirectional(self):
         """
         network_test_start(self, caller, bandwidth=1, duration=10, kind="unidirectional")
         
+        iperf -c 10.10.10.66 -t 1 -y c -u -b 30M 
         """
-        app.api.start_connection(app.me)
-        if self._verbose:
-            print "\nwaiting for 2 seconds:"
-        for i in range(20):
-            self._run_miville()
+        self._initial_setup()
+        
         app.api.network_test_start(app.me, 30, 1, "unidirectional")
+        if self._verbose:
+            print "\nwaiting for 3 seconds:"
         for i in range(30):
-            self._run_miville()
-        if not isinstance(app.last, app.Update):
-            self.fail("last notification should be a miville notification.")
+            self._run_miville_a_little_while()
+        
+        if not isinstance(app.last.value, dict):
+            self.fail("last notification should contain a dict.")
         #  {'loss': 0.0, 'bandwidth': 30, 'jitter': 0.001, 'duration': 1, 'ip': '10.10.10.66', 'kind': 1}
         for k in ("loss", "jitter", "bandwidth"):
             if not app.last.value.has_key(k):
                 self.fail("The dict in the notification from network_test should contain key %s" % k)
-        # cleanup
-        app.api.delete_contact(app.me, remote[0]) 
+
+    def test_02_tradeoff(self):
+        """
+        network_test_start(self, caller, bandwidth=1, duration=10, kind="tradeoff")
+        
+        iperf -c 10.10.10.66 -t 1 -y c -u -b 30M -r
+        """
+        if self._verbose:
+            print "\nwaiting for 1 seconds:"
+        for i in range(10):
+            self._run_miville_a_little_while()
+        app.api.network_test_start(app.me, 30, 1, "tradeoff")
+        if self._verbose:
+            print "\nwaiting for 6 seconds:"
+        for i in range(60):
+            self._run_miville_a_little_while()
+        
+        if not isinstance(app.last.value, dict):
+            self.fail("last notification should contain have a dict as value.")
+        #  {'loss': 0.0, 'bandwidth': 30, 'jitter': 0.001, 'duration': 1, 'ip': '10.10.10.66', 'kind': 1}
+        for k in ("loss", "jitter", "bandwidth"):
+            if not app.last.value.has_key(k):
+                self.fail("The dict in the notification from network_test should contain key %s" % k)
 
