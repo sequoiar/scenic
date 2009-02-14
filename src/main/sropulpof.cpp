@@ -39,6 +39,8 @@ namespace pof
 #endif
 }
 
+int telnetServer(int,int);
+
 // 2way audio and video
 short pof::run(int argc, char **argv)
 {
@@ -63,14 +65,14 @@ short pof::run(int argc, char **argv)
     
     bool version = false;
 
+    options.add(new BoolArg(&send,"sender", 's', "sender"));
+    options.add(new BoolArg(&recv,"receiver", 'r', "receiver"));
     options.add(new StringArg(&ip, "address", 'i', "address", "provide ip address"));
     options.add(new StringArg(&videoCodec, "videocodec", 'v', "videocodec", "h264"));
     options.add(new StringArg(&audioCodec, "audiocodec", 'a', "audiocodec", "vorbis raw mp3"));
     options.add(new StringArg(&videoSink, "videosink", 'k', "videosink", "xvimagesink glimagesink"));
     options.add(new IntArg(&audioPort, "audioport", 't', "audioport", "portnum"));
     options.add(new IntArg(&videoPort, "videoport", 'p', "videoport", "portnum"));
-    options.add(new BoolArg(&send,"sender", 's', "sender"));
-    options.add(new BoolArg(&recv,"receiver", 'r', "receiver"));
     options.add(new BoolArg(&full,"fullscreen", 'f', "default to fullscreen"));
     options.add(new BoolArg(&disableAudio,"disableaudio", 'y', "disable audio"));
     options.add(new BoolArg(&disableVideo,"disablevideo", 'z', "disable video"));
@@ -79,6 +81,10 @@ short pof::run(int argc, char **argv)
     options.add(new BoolArg(&version, "version", '\0', "version number"));
     options.add(new IntArg(&numChannels, "numChannels", 'c', "numChannels", "2"));
     options.add(new IntArg(&videoBitrate, "videobitrate", 'x', "videobitrate", "3000000"));
+
+    //telnetServer param
+    int serverport=0;
+    options.add(new IntArg(&serverport, "serverport", '\0', "run as server", "port to listen on"));
 
     options.parse(argc, argv);
 
@@ -96,6 +102,9 @@ short pof::run(int argc, char **argv)
         THROW_ERROR("argument error: must be sender or receiver. see --help");
 
     LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
+
+    if(serverport)
+        return telnetServer(pid == 's', serverport);
 
     if(ip == 0) 
         THROW_ERROR("argument error: missing ip. see --help");
@@ -178,7 +187,7 @@ short pof::run(int argc, char **argv)
 }
 
 
-int mainPof(int argc, char **argv)
+int main(int argc, char **argv)
 {
     try {
         return pof::run(argc, argv);
@@ -188,5 +197,6 @@ int mainPof(int argc, char **argv)
         //std::cerr << e.msg_;
         return 1;
     }
+    return 0;
 }
 

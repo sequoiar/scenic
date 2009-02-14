@@ -49,8 +49,8 @@ class MainModule
 
         MainModule(bool send, int port)
             : tcpThread_(MsgThreadFactory::Tcp(port, true)),
-              gstThread_(MsgThreadFactory::Gst(send)), msg_count(0),
-              func(gstThread_){}
+              gstThread_(MsgThreadFactory::Gst(send)),
+              func(gstThread_), msg_count(0){}
 
         ~MainModule(){delete gstThread_; delete tcpThread_;}
     private:
@@ -127,21 +127,11 @@ void parseArgs(int argc, char** argv)
             "Invalid command line arguments -- Port must be in the range of 1024-65000");
 }
 
-int mainPof(int,char**);
-
-int main(int argc, char** argv)
+int telnetServer(int s,int p)
 {
-    if(argc > 1){
-        int temp;
-        if (sscanf(argv[1], "%d", &temp) != 1 || temp < 0 || temp > 1)
-            return mainPof(argc,argv);
-    }else
-        return mainPof(argc,argv);
-
     try
     {
-        parseArgs(argc, argv);
-        MainModule m(send, port);
+        MainModule m(s,p);
 
         while(m.run())
         {}
