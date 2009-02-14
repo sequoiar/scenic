@@ -28,6 +28,7 @@
 #include <iostream>
 #include <Python.h>
 #include <boost/python.hpp>
+#define USE_SMART_PTR //Factories return a shared_ptr
 #include <gst/videoFactory.h>
 #include <gst/audioFactory.h>
 #include "util.h"

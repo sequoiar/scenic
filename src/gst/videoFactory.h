@@ -1,4 +1,3 @@
-
 /* videoFactory.h
  * Copyright 2008 Koya Charles & Tristan Matthews 
  *
@@ -26,8 +25,56 @@
 #include "ports.h"
 #include "gst/engine.h"
 
-#include "videoFactoryInternal.h"
+#include "tcp/singleBuffer.h"
 
+namespace videofactory
+{
+    static const std::string V_SINK = "xvimagesink";
+    static const std::string V_CODEC = "mpeg4";
+    static const int MSG_ID = 2;
+
+    static VideoReceiver* 
+    buildVideoReceiver_(const std::string &ip = ports::IP, const std::string &codec = V_CODEC, int port = ports::V_PORT, 
+            int screen_num = 0, const std::string &sink = V_SINK);
+
+    static VideoSender* 
+    buildVideoSender_(const VideoSourceConfig vConfig, 
+            const std::string &ip = ports::IP, const std::string &codec = V_CODEC, int port = ports::V_PORT);
+}
+
+
+
+VideoSender* 
+videofactory::buildVideoSender_(const VideoSourceConfig vConfig, 
+                                const std::string &ip, 
+                                const std::string &codec, 
+                                int port)
+{
+    SenderConfig rConfig(codec, ip, port);
+    VideoSender* tx = new VideoSender(vConfig, rConfig);
+    tx->init(); 
+    return tx;
+}
+
+
+VideoReceiver*
+videofactory::buildVideoReceiver_(const std::string &ip, 
+                                  const std::string &codec, 
+                                  int port, 
+                                  int screen_num, 
+                                  const std::string &sink)
+{
+    assert(!sink.empty());
+    VideoSinkConfig vConfig(sink, screen_num);
+    int id;
+    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::VIDEO_CAPS_PORT, id)); // get caps from remote sender
+    assert(id == MSG_ID);
+    VideoReceiver* rx = new VideoReceiver(vConfig, rConfig);
+    rx->init();
+    return rx;
+}
+
+#ifdef USE_SMART_PTR
 #ifdef CONFIG_BOOST
 #include <boost/shared_ptr.hpp>   // for boost::shared_ptr
 #else
@@ -42,8 +89,7 @@ namespace videofactory
     using namespace std::tr1;
 #endif
 
-    static 
-    shared_ptr<VideoReceiver> 
+    static shared_ptr<VideoReceiver> 
     buildVideoReceiver(const std::string &ip = ports::IP, 
                        const std::string &codec = V_CODEC, 
                        unsigned long port = ports::V_PORT, 
@@ -54,8 +100,7 @@ namespace videofactory
         return shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, screen_num, sink));
     }
 
-    static 
-    shared_ptr<VideoSender> 
+    static shared_ptr<VideoSender> 
     buildVideoSender(const VideoSourceConfig vConfig, 
                      const std::string &ip = ports::IP, 
                      const std::string &codec = V_CODEC, 
@@ -66,6 +111,7 @@ namespace videofactory
     }
 
 }
+#endif //USE_SHARED_PTR
 
 
 #endif // _VIDEO_FACTORY_H_

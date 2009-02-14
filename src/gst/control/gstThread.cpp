@@ -82,8 +82,8 @@ int GstThread::main()
 #include "gstReceiverThread.h"
 #include "gstSenderThread.h"
 
-#include "gst/videoFactoryInternal.h"
-#include "gst/audioFactoryInternal.h"
+#include "gst/videoFactory.h"
+#include "gst/audioFactory.h"
 
 GstReceiverThread::~GstReceiverThread()
 {
