@@ -191,6 +191,11 @@ std::string tcpGetBuffer(int port, int &id)
             continue;
         try
         {
+            if(std::string(f["command"]) == "quit")
+            {
+                LOG_INFO("quit in tcpGetBuffer");
+                break;
+            }
             if(std::string(f["command"]) != "buffer")
             {
                 LOG_INFO("Unknown msg.");

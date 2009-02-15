@@ -23,6 +23,8 @@
 
 #include <glib.h>
 #include <string>
+#include <set>
+#include <algorithm>
 #include "baseModule.h"
 #include "queuePair.h"
 
@@ -38,21 +40,43 @@ class BaseThread
         QueuePair_ < T > &getQueue();
         bool run();
 
+        static void broadcastQuit();
     protected:
         virtual int main() { return 0; }
         static void *thread_main(void *pThreadObj);
         virtual bool ready() { return true; }
-
+        static void postQuit(BaseThread<T>* bt);
+        //static void postQuit(typename std::set< BaseThread < T > *>::iterator& curThread);
         GThread *th_;
         QueuePair_ < T > queue_;
         QueuePair_ < T > flippedQueue_;
+    
 
+        static std::set< BaseThread < T > *> allThreads_;
+        typename std::set<BaseThread<T> *>::iterator t;
+        std::set<std::string>::const_iterator sit;
     private:
         /** No Copy Constructor */
         BaseThread(const BaseThread&); 
         /** No Assignment Operator */
         BaseThread& operator=(const BaseThread&); 
 };
+
+template < class T >
+std::set< BaseThread < T > *> BaseThread<T>::allThreads_;
+
+template < class T >
+void BaseThread < T >::postQuit(BaseThread<T>* bt)
+{
+    QueuePair_ <T> & qp = bt->queue_;
+    qp.push(T("quit"));
+}
+
+template < class T >
+void BaseThread < T >::broadcastQuit()
+{
+    for_each(allThreads_.begin(), allThreads_.end(), BaseThread<T>::postQuit);
+}
 
 /// client access to async QueuePair 
 template < class T >
@@ -69,6 +93,7 @@ BaseThread < T >::BaseThread()
         g_thread_init (NULL);
     queue_.init();
     flippedQueue_.flip(queue_);
+    allThreads_.insert(this);
 }
 
 template < class T >
@@ -78,6 +103,7 @@ BaseThread < T >::~BaseThread()
         T t("quit"); //TODO: this is forcing the template param to have char* constructor
         flippedQueue_.push(t);
         g_thread_join(th_);
+        allThreads_.erase(this);
     }
 }
 

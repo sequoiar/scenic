@@ -90,7 +90,10 @@ bool MainModule::run()
                 continue;
             LOG_DEBUG(std::string(tmsg["command"]));
             if (command == "quit")
+            {
+                gstThread_->broadcastQuit();
                 break;
+            }
             if (command == "exception")
                 throw tmsg["exception"].except();
             else
