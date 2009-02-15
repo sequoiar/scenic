@@ -50,11 +50,8 @@ class BaseThread
         GThread *th_;
         QueuePair_ < T > queue_;
         QueuePair_ < T > flippedQueue_;
-    
 
         static std::set< BaseThread < T > *> allThreads_;
-        typename std::set<BaseThread<T> *>::iterator t;
-        std::set<std::string>::const_iterator sit;
     private:
         /** No Copy Constructor */
         BaseThread(const BaseThread&); 
