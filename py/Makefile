@@ -10,6 +10,9 @@ check:
 html:
 	@echo Do some html in $(PWD)
 
+install:
+	@echo Install $(PWD)
+
 # in case target exits in directory
 # u want to 
 .PHONY: clean test 
