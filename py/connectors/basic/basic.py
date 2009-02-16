@@ -1,14 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-The BasicServer and BasicClient protocols are used to negociate the connection 
-between 2 running miville software. (with a contact)
-
-It is the session initialization routine. It negociates the settings for the streams. 
-
-The client takes the initiative. (ASK) The server receives it and responds with ACCEPT or REFUSE.
-
-The connector.basic package is good an example of a simple way to communicate between two miville software. 
-"""
 # Sropulpof
 # # Copyright (C) 2008 Société des arts technoligiques (SAT)
 # http://www.sat.qc.ca
@@ -26,6 +16,16 @@ The connector.basic package is good an example of a simple way to communicate be
 #
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+"""
+The BasicServer and BasicClient protocols are used to negociate the connection 
+between 2 running miville software. (with a contact)
+
+It is the session initialization routine. 
+
+The client takes the initiative. (ASK) The server receives it and responds with ACCEPT or REFUSE.
+
+The connector.basic package is a good example of a simple way to establish a connection between two miville software. 
+"""
 
 # System imports
 import sys
@@ -71,8 +71,13 @@ class BasicServer(LineReceiver):
         log.debug('Line received from %s:%s: %s' % (self.addr.host, self.addr.port, line))
         if line[0:3] == "ASK":
             self.set_port(line)
-            self.state = WAITING
-            self.api.notify(self, (self.addr.host, self), 'ask')
+            contact = self.api.find_contact(self.addr.host, self.client_port, 'basic')
+            if contact and contact.auto_answer:
+                self.api.notify(self, 'Contact %s:%s is now connected (it was in auto-answer mode).' % (self.addr.host, self), 'info')
+                self.accept()
+            else:
+                self.state = WAITING
+                self.api.notify(self, (self.addr.host, self), 'ask')
         elif line[0:4] == "STOP":
             self.api.stop_streams(self)
             self.set_port(line)

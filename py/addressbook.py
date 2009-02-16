@@ -376,6 +376,7 @@ class Contact(object):
         self.state = DISCONNECTED   #TODO: add AddressBook.write() after state
                                     # change to support recovery mode
         self.auto_created = auto_created
+        self.auto_answer = True
         self.connection = None
 
         self.set_address(address)
