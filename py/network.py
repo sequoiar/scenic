@@ -274,6 +274,20 @@ class NetworkTester(object):
         """
         reactor.callLater(self.current_latency / 2.0, self._start_iperf_client)
         
+    def _setup_com_chan(self):
+        """
+        Registers com chan callbacks
+        """
+        # TODO
+        com = self.current_com_chan
+        if self.current_kind == KIND_DUALTEST_CLIENT:
+            pass
+            # :*args: is a tuple of data, whose 0th element is the name of the remote procedure to call.
+            # callRemote(self, *args):
+        else: # SERVER
+            pass
+        
+
 
     def start_test(self, caller, server_addr, bandwidth_megabits=1, duration=10, kind=KIND_UNIDIRECTIONAL, com_chan=None): # start_client
         """

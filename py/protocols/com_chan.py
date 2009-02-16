@@ -74,6 +74,7 @@ class ComChannel(object):
         Called when a remote call is received. 
         
         This method with look in the registered callbacks and call the proper one.
+        :param *args: is a tuple of data, whose 0th element is the name of the procedure to call.
         """
         if len(args) < 1:
             log.info('Receive an empty remote call')
@@ -89,7 +90,7 @@ class ComChannel(object):
         """
         Calls a remote procedures provided by the remote peer.
         
-        :*args: is a tuple of data, whose 0th element is the name of the remote procedure to call.
+        :param *args: is a tuple of data, whose 0th element is the name of the remote procedure to call.
         """
         if self.remote:
             self.remote.callRemote('main', *args)
@@ -101,6 +102,9 @@ class ComChannel(object):
         Registers a local callback.
         
         Makes it available to the remote peer.
+        :param cmd: The callback to register.
+        :param name: The name to which identify this callback. 
+        (Defaults to the class.method provided as the cmd argument, but you are better to provide a name)
         """
         if not name:
             name = cmd.im_class.__name__ + '.' + cmd.__name__
@@ -113,7 +117,8 @@ class ComChannel(object):
         """
         Deletes a local callback. 
 
-        Makes it no longer availble to be called by remote peer.
+        Makes it no longer available to be called by remote peer.
+        :param name: The name to which identify this callback.
         """
         if ismethod(name):
             name = name.im_class.__name__ + '.' + name.__name__
