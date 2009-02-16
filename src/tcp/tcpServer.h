@@ -44,6 +44,8 @@ class TcpServer
         bool set_non_blocking(int sockfd);
 
         bool connected(){return connected_;}
+
+        int getFD(){ return newsockfd;}
     private:
         int sockfd, newsockfd;
 

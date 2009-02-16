@@ -178,7 +178,6 @@ bool TcpThread::socket_connect_send(const std::string& addr, MapMsg& msg)
 }
 
 
-
 std::string tcpGetBuffer(int port, int &id)
 {
     TcpThread tcp(port);
