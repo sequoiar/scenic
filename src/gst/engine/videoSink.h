@@ -28,21 +28,37 @@ class _GdkEventKey;
 class _GdkEventScroll;
 class _GstElement;
 
-class VideoSink
-    : public GstLinkableSink
+class VideoSink : public GstLinkableSink
 {
     public:
-        VideoSink()
-            : sink_(0), window_(0), screen_num_(0) {};
+       VideoSink()
+            : sink_(0) {};
         virtual ~VideoSink(){};
+        virtual void init() = 0;
+        virtual void makeFullscreen() = 0;
+        virtual void makeUnfullscreen() = 0; 
+        void destroySink();
+
+    protected:
+        _GstElement *sink_;
+
+    private:
+        _GstElement *sinkElement() { return sink_; }
+};
+
+class GtkVideoSink
+    : public VideoSink
+{
+    public:
+       GtkVideoSink()
+            : window_(0), screen_num_(0) {};
+        virtual ~GtkVideoSink(){};
         void makeFullscreen() { makeFullscreen(window_); }
         void makeUnfullscreen() { makeUnfullscreen(window_); }
-        virtual void init() = 0;
         void showWindow();
 
         
     protected:
-        _GstElement *sink_;
         _GtkWidget *window_;
         int screen_num_;
         static const unsigned int WIDTH;
@@ -50,7 +66,6 @@ class VideoSink
 
         Window getXWindow();
         void prepareSink();
-        void destroySink();
         static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
         void makeWindowBlack();
         static void makeFullscreen(_GtkWidget *widget);
@@ -58,15 +73,14 @@ class VideoSink
         static void toggleFullscreen(_GtkWidget *widget);
 
     private:
-        _GstElement *sinkElement() { return sink_; }
 
-        VideoSink(const VideoSink&);     //No Copy Constructor
-        VideoSink& operator=(const VideoSink&);     //No Assignment Operator
+       GtkVideoSink(const GtkVideoSink&);     //No Copy Constructor
+       GtkVideoSink& operator=(const GtkVideoSink&);     //No Assignment Operator
 };
 
 
 class XvImageSink
-    : public VideoSink
+    : public GtkVideoSink
 {
     public:
         XvImageSink() {};

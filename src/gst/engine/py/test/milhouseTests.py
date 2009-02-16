@@ -17,7 +17,7 @@ class MilhouseTests():
     @staticmethod
     def timeouts():
         """ Returns tuple of timeout arguments """
-        timeout = '-o 5000'
+        timeout = '-o 50000'
         return timeout, timeout
 
     @staticmethod
@@ -131,12 +131,12 @@ class MilhouseTests():
         rxArgs, txArgs = self.timeouts()
         self.runTest(rxArgs + ' --videocodec h264', txArgs + ' --videosource videotestsrc --videocodec h264')
 
-    def test_09_glImagesink(self):
-        """ Test v4l """
+    def test_09_glImagesink_testsrc(self):
+        """ Test glimagesink """
         self.countdown("START")
 
         rxArgs, txArgs = self.timeouts()
-        self.runTest(rxArgs + ' --videosink glimagesink --videocodec h264', txArgs + ' --videosource videotestsrc --videocodec h264')
+        self.runTest(rxArgs + ' --videosink glimagesink', txArgs + ' --videosource videotestsrc')
 
     def test_10_audioOnly(self):
         """ Test with just audio """
@@ -152,10 +152,23 @@ class MilhouseTests():
         rxArgs, txArgs = self.timeouts()
         self.runTest(rxArgs + ' --disable-audio', txArgs + ' --disable-audio')
 
+    def test_12_ximagesink(self):
+        """ Test with ximagesink"""
+        self.countdown("START")
+
+        rxArgs, txArgs = self.timeouts()
+        self.runTest(rxArgs + ' --videosink ximagesink', txArgs)
+    
+    def test_13_glImagesink_v4l2src(self):
+        """ Test v4l with glimagesink """
+        self.countdown("START")
+
+        rxArgs, txArgs = self.timeouts()
+        self.runTest(rxArgs + ' --videosink glimagesink', txArgs + ' --videosource v4l2src')
 
 
 # here we run all the tests thanks to the wonders of reflective programming
-tests = prefixedMethods(MilhouseTests(), 'test_')
+tests = prefixedMethods(MilhouseTests(), 'test_01')
 
 for test in tests:
     print "TEST: "  + test.__doc__

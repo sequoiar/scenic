@@ -18,6 +18,8 @@
  *
  */
 
+#define USE_SMART_PTR
+
 #include "util.h"
 
 #include <cpptest.h>

@@ -111,8 +111,7 @@ namespace videofactory
     }
 
 }
+
 #endif //USE_SHARED_PTR
-
-
 #endif // _VIDEO_FACTORY_H_
 

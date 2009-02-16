@@ -199,11 +199,10 @@ void VideoV4lSource::init()
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
 
-    // FIXES BUG WITH IMAGE BEING DISTORTED
-    std::ostringstream capsStr;
-    capsStr << "video/x-raw-yuv, pixel-aspect-ratio=10/11"; 
+    // fixes bug with image being distorted geometrically
+    std::string capsStr("video/x-raw-yuv, pixel-aspect-ratio=10/11"); 
 
-    GstCaps *videoCaps = gst_caps_from_string(capsStr.str().c_str());
+    GstCaps *videoCaps = gst_caps_from_string(capsStr.c_str());
     g_object_set(G_OBJECT(capsFilter_), "caps", videoCaps, NULL);
 
     gst_caps_unref(videoCaps);

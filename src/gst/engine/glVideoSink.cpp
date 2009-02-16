@@ -58,7 +58,7 @@ GLfloat GLImageSink::bottomCrop_ = INIT_BOTTOM_CROP;
 
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
-    GLfloat vwinRatio = (gfloat)VideoSink::WIDTH/(gfloat)VideoSink::HEIGHT ;
+    GLfloat vwinRatio = (gfloat) GtkVideoSink::WIDTH / (gfloat) GtkVideoSink::HEIGHT ;
     g_print("WIDTH: %u, HEIGHT: %u", width, height);
     
     // /TODO:oldDOCS
@@ -70,12 +70,10 @@ gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
     else
         glViewport(0, (height-(width*(1.0/vwinRatio)))/2.0, width, (float)width*(1.0/vwinRatio));
 
-    
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     
     gluPerspective(45, NTSC_VIDEO_RATIO , 0.1, 100);  
-
 
 
     glMatrixMode(GL_MODELVIEW);	
@@ -283,7 +281,7 @@ GLImageSink::~GLImageSink()
     resetGLparams();
 
     Pipeline::Instance()->remove(&glUpload_);
-    VideoSink::destroySink();
+    GtkVideoSink::destroySink();
     if (window_)
     {
         gtk_widget_destroy(window_);
@@ -343,3 +341,4 @@ void GLImageSink::init()
     showWindow();
 }
 #endif //CONFIG_GL
+
