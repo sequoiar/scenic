@@ -46,6 +46,7 @@ class TcpServer
         bool connected(){return connected_;}
 
         int getFD(){ return newsockfd;}
+        ~TcpServer(){ close(); }
     private:
         int sockfd, newsockfd;
 
