@@ -125,7 +125,7 @@ class MilhouseTests():
         self.runTest(rxArgs, txArgs)
     
     def test_08_videotestsrc_h264(self):
-        """ Test v4l """
+        """ Test h264 with videotestsrc """
         self.countdown("START")
 
         rxArgs, txArgs = self.timeouts()
@@ -182,7 +182,7 @@ class MilhouseTests():
 
 
 # here we run all the tests thanks to the wonders of reflective programming
-tests = prefixedMethods(MilhouseTests(), 'test_15')
+tests = prefixedMethods(MilhouseTests(), 'test_11')
 
 for test in tests:
     print "TEST: "  + test.__doc__

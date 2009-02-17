@@ -44,6 +44,8 @@ class VideoSink : public GstLinkableSink
 
     private:
         _GstElement *sinkElement() { return sink_; }
+       VideoSink(const VideoSink&);     //No Copy Constructor
+       VideoSink& operator=(const VideoSink&);     //No Assignment Operator
 };
 
 class GtkVideoSink

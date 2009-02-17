@@ -107,14 +107,14 @@ void Dv1394::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, void 
     {
         LOG_DEBUG("Got video stream from DV");
         if (Instance()->videoSink_ == 0)
-            return; // possible to get video streams without them coming from dv
+            return; // possible to get video streams from dv without wanting them
         sinkElement = Instance()->videoSink_;
     }
     else if (std::string("audio") == gst_pad_get_name(srcPad))
     {
         LOG_DEBUG("Got audio stream from DV");
         if (Instance()->audioSink_ == 0)
-            return; // possible to get audio streams without them coming from dv
+            return; // possible to get audio streams from dv with wanting them
         sinkElement = Instance()->audioSink_;
     }
     else {
