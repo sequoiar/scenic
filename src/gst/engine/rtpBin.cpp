@@ -28,7 +28,7 @@
 #include "pipeline.h"
 
 #ifdef CONFIG_DEBUG_LOCAL
-#define RTP_REPORTING 1
+#define RTP_REPORTING 0
 #endif
 
 GstElement *RtpBin::rtpbin_ = 0;
@@ -41,7 +41,7 @@ void RtpBin::init()
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
     
     // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
-    g_object_set(G_OBJECT(rtpbin_), "latency", 30, NULL);
+    g_object_set(G_OBJECT(rtpbin_), "latency", 20, NULL);
     
     // uncomment this to print stats
 #if RTP_REPORTING

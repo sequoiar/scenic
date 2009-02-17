@@ -35,6 +35,9 @@
 #include <GL/glu.h>
 
 #include "glVideoSink.h"
+
+const unsigned int GLImageSink::WIDTH = 720;
+const unsigned int GLImageSink::HEIGHT = 528;
         
 const GLfloat NTSC_VIDEO_RATIO = 4.0 / 3.0;
 const GLfloat GLImageSink::INIT_X = -0.5 * NTSC_VIDEO_RATIO; 
@@ -45,7 +48,7 @@ const GLfloat GLImageSink::INIT_LEFT_CROP = 0.0;
 const GLfloat GLImageSink::INIT_RIGHT_CROP = 0.0;
 const GLfloat GLImageSink::INIT_BOTTOM_CROP = 0.0;
 const GLfloat GLImageSink::INIT_TOP_CROP = 0.0;
-const GLfloat GLImageSink::STEP = 0.001;
+const GLfloat GLImageSink::STEP = 0.1;
 
 GLfloat GLImageSink::x_ = INIT_X;
 GLfloat GLImageSink::y_ = INIT_Y;
@@ -58,23 +61,22 @@ GLfloat GLImageSink::bottomCrop_ = INIT_BOTTOM_CROP;
 
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
-    GLfloat vwinRatio = (gfloat) GtkVideoSink::WIDTH / (gfloat) GtkVideoSink::HEIGHT ;
-    g_print("WIDTH: %u, HEIGHT: %u", width, height);
+    GLfloat vwinRatio = (gfloat) GLImageSink::WIDTH / (gfloat) GLImageSink::HEIGHT ;
+    LOG_DEBUG("WIDTH: " << width << ", HEIGHT: " << height << std::endl);
     
     // /TODO:oldDOCS
     // explain below -- ( screen x - ( needed x res)) == extra space
     //move origin to extra space / 2 -- so that quad is in the middle of screen
     //: Why  the disparity between 4/3 and videosink aspect?   
     if (width > height)
-        glViewport((width-height*vwinRatio)/2.0, 0, height*(vwinRatio),height);
+        glViewport((width - height * vwinRatio) * 0.5, 0, height * vwinRatio, height);
     else
-        glViewport(0, (height-(width*(1.0/vwinRatio)))/2.0, width, (float)width*(1.0/vwinRatio));
+        glViewport(0, (height - (width * (1.0 / vwinRatio))) * 0.5, width, (float) width * (1.0 / vwinRatio));
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     
     gluPerspective(45, NTSC_VIDEO_RATIO , 0.1, 100);  
-
 
     glMatrixMode(GL_MODELVIEW);	
     return TRUE;
@@ -280,7 +282,6 @@ GLImageSink::~GLImageSink()
 {
     resetGLparams();
 
-    Pipeline::Instance()->remove(&glUpload_);
     GtkVideoSink::destroySink();
     if (window_)
     {
@@ -295,12 +296,12 @@ void GLImageSink::init()
     if (!gtk_initialized)
         gtk_init(0, NULL);
 
-    glUpload_ = Pipeline::Instance()->makeElement("glupload", "colorspace");
+    //glColorscale_ = Pipeline::Instance()->makeElement("glcolorscale", "colorspace");
 
     sink_ = Pipeline::Instance()->makeElement("glimagesink", "videosink");
     g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
-    gstlinkable::link(glUpload_, sink_);
+   // gstlinkable::link(glColorscale_, sink_);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    
     assert(window_);
@@ -323,7 +324,7 @@ void GLImageSink::init()
             gtk_window_move(GTK_WINDOW(window_), xine[j].x_org,xine[j].y_org);
     }
 
-    gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
+    gtk_window_set_default_size(GTK_WINDOW(window_), GLImageSink::WIDTH, GLImageSink::HEIGHT);
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
     gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(expose_cb), 
@@ -338,6 +339,7 @@ void GLImageSink::init()
     /* configure elements */
     g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
     g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
+
     showWindow();
 }
 #endif //CONFIG_GL

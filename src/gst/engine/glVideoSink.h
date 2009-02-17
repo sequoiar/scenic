@@ -34,7 +34,7 @@ class GLImageSink
 {
     public:
         /// Constructor 
-        GLImageSink(int screen_num = 0) : glUpload_(0) {screen_num_ = screen_num;}
+        GLImageSink(int screen_num = 0) : glColorscale_(0) {screen_num_ = screen_num;}
 
     private:
 
@@ -43,7 +43,7 @@ class GLImageSink
         ~GLImageSink();
         void init();
 
-        _GstElement *sinkElement() { return glUpload_; }
+        _GstElement *sinkElement() { return sink_; }
 
         /** 
          * This method resets all of our static variables used for positioning our texture, 
@@ -66,7 +66,7 @@ class GLImageSink
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
 
-        _GstElement *glUpload_;
+        _GstElement *glColorscale_;
         static const GLfloat STEP;
         static GLfloat x_;     // FIXME: separate out gl stuff into separate class
         static GLfloat y_;
@@ -83,6 +83,8 @@ class GLImageSink
         static const GLfloat INIT_RIGHT_CROP;
         static const GLfloat INIT_BOTTOM_CROP;
         static const GLfloat INIT_TOP_CROP;
+        static const unsigned int WIDTH;
+        static const unsigned int HEIGHT;
         static int window_width_;
         static int window_height_;
         

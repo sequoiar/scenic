@@ -32,6 +32,12 @@ class RtpVideoTestSuite
         RtpVideoTestSuite()
         {
             testLength_ = 80000;
+
+#ifdef CONFIG_GL
+            TEST_ADD(RtpVideoTestSuite::start_stop_v4l_gl)
+            TEST_ADD(RtpVideoTestSuite::start_stop_test_video_gl)
+            TEST_ADD(RtpVideoTestSuite::start_stop_dv_gl)
+#endif
             
             TEST_ADD(RtpVideoTestSuite::start_stop_mpeg4_v4l)
 
@@ -48,13 +54,6 @@ class RtpVideoTestSuite
 
             TEST_ADD(RtpVideoTestSuite::start_stop_file)
 
-#ifdef CONFIG_GL
-            TEST_ADD(RtpVideoTestSuite::start_stop_test_video_gl)
-
-            TEST_ADD(RtpVideoTestSuite::start_stop_v4l_gl)
-
-            TEST_ADD(RtpVideoTestSuite::start_stop_dv_gl)
-#endif
             TEST_ADD(RtpVideoTestSuite::start_stop_dv)
             
 

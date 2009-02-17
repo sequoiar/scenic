@@ -1,7 +1,5 @@
--LATENCY!!!!
--fix glvideosink w/real video
--Generic interface for objects who link to elements asynchronously, which allows them to have a list of elements to which they
-must connect, see dv1394src. 
+-LATENCY TESTS!!!!
+-fix glvideosink's black at startup/until fullscreen bug
 -try (in a branch) to queue network sources (as per the app-devel guide section on threading)
 -teeing video and audio, start with tests
 
