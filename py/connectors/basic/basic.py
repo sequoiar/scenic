@@ -29,25 +29,16 @@ The connector.basic package is a good example of a simple way to establish a con
 
 # System imports
 import sys
-import traceback # TODO remove
 
 # Twisted imports
 from twisted.internet import reactor, protocol, error
 from twisted.protocols.basic import LineReceiver
-#from twisted.spread import jelly
 
 # App imports
 from utils import log
-from protocols import com_chan
-import streams.stream
 from connectors import Connection
 from connectors.states import *
-from errors import ConnectionError
 
-def track(msg):
-    print ""
-    print "###########", msg, "############"
-    traceback.print_stack()
 
 log = log.start('debug', 1, 0, 'basic')
 
@@ -185,7 +176,6 @@ class ConnectionBasic(Connection):
         self._timeout = None
 
     def _create_connection(self):
-        #track("create connection") # TODO
         self._state = CONNECTING
         port = self.contact.port
         if port == None:
@@ -203,7 +193,6 @@ class ConnectionBasic(Connection):
     stop_connecting = Connection.stop
 
     def _connection_ready(self, connection):
-        #track("connection_ready") # TODO
         self._state = CONNECTED
         self.connection = connection    # Maybe private ???
         self.connection.connectionLost = self._connection_lost
@@ -237,20 +226,18 @@ class ConnectionBasic(Connection):
         self.connection = None
 
     def _accepted(self):
-        track("accepted") # TODO
         self.local_name = '%s:%s' % (self.connection.transport.getHost().host, PORT)
         self._close_connection()
 #        Connection.accepted(self)
 #        self.send_settings()
 
-    def com_chan_started_client(self, action="media"):
-        track("com_chan_started_client") # TODO
+    def com_chan_started_client(self, action="join"):
         if action == "media":
             self.send_settings()
         elif action == "network_test":
             self.api.network_test.client_started(self) 
 
-    def com_chan_started_server(self, action="media"):
+    def com_chan_started_server(self, action="join"):
         if action == "media":
             self.com_chan.add(self.settings)
         elif action == "network_test":
