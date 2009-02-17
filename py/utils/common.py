@@ -18,9 +18,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
+"""
+This module is a regroupment of different functions that can be use
+by any other modules.
+"""
 
 # System imports
 import sys
+import os
 
 # Twisted imports
 from twisted.python.modules import getModule
@@ -28,6 +33,8 @@ from twisted.python.filepath import FilePath
 
 # App import
 from utils import log
+from errors import InstallFileError
+from i18n import to_utf
 
 
 def get_def_name(level=2):
@@ -35,7 +42,6 @@ def get_def_name(level=2):
     Finds who called the caller of this function
     """
     return sys._getframe(level).f_code.co_name
-
     
 def find_modules(kind):
     """
@@ -64,6 +70,14 @@ def load_modules(mods):
     return loaded_mods
     
 def find_callbacks(obj, prefix=None):
+    """
+    Find all methods that there name start with the given prefix and return
+    a dictionnary of theses methods where the key is the name of the method
+    and the value is the method object.
+    
+    If no prefix is specify, the function will return all methods that start by
+    one underscore (_) but not by two.
+    """
     callbacks = {}
     if prefix:
         for attr in dir(obj):
@@ -74,3 +88,26 @@ def find_callbacks(obj, prefix=None):
             if attr[0] == '_' and attr[1] != '_': 
                 callbacks[attr[1:]] = getattr(obj, attr)
     return callbacks
+
+def install_dir(filename, dirname='.sropulpof'):
+    """
+    Return the complete path.
+    (home directory + the application directory + the filename)
+    Check before if the directory exist and try to create it if not.
+    """
+    filename = to_utf(filename).strip()
+    dirname = to_utf(dirname).strip()
+    if not filename:
+        raise InstallFileError, 'File name <%s> is not valid.' % filename
+    if not dirname:
+        raise InstallFileError, 'Directory name <%s> is not valid.' % dirname
+    dirpath = os.path.join(os.environ['HOME'], dirname)
+    if not os.path.isdir(dirpath):
+        try:
+            os.makedirs(dirpath)
+        except:
+            log.warning('Could not create the directory %s.' % dirpath)
+            raise InstallFileError, 'Could not create the directory %s.' % dirpath
+    return os.path.join(dirpath, filename)
+     
+

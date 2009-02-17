@@ -23,16 +23,21 @@
 # System imports
 import logging
 import sys
+import os
 import types
 
 # Twisted imports
 import twisted.python.log as tw_log
 import twisted
+# deal with older version of twisted (in Ubuntu and other)
 version = int(twisted.__version__.split('.')[0])
 if version < 8:
     from utils.twisted_old import PythonLoggingObserver
     tw_log.PythonLoggingObserver = PythonLoggingObserver
 
+# App import
+import utils.common
+from errors import InstallFileError
 
 #TODO: Specified the level by output
 
@@ -49,7 +54,6 @@ logging.setLoggerClass(CoreLogger)
 
 
 def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
-    log_file = 'miville.log'
     logger = logging.getLogger(log_name)
     formatter = logging.Formatter('%(asctime)s %(name)-8s %(levelname)-8s %(message)s')
     set_level(level, log_name)
@@ -58,10 +62,15 @@ def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
         so_handler.setFormatter(formatter)
         logger.addHandler(so_handler)
     if to_file:
-#        file_handler = logging.FileHandler(log_file, mode='a', encoding='utf-8')
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
+        try:
+            log_file = utils.common.install_dir('sropulpof.log')
+        except InstallFileError, err:
+            print "Logging module ERROR\t%s" % err
+        else:
+    #        file_handler = logging.FileHandler(log_file, mode='a', encoding='utf-8')
+            file_handler = logging.FileHandler(log_file)
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
     if log_name == 'twisted':
         observer = tw_log.PythonLoggingObserver(log_name)
         observer.start()

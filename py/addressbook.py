@@ -38,8 +38,9 @@ from twisted.spread.jelly import jelly, unjelly
 
 # App imports
 from utils import log
+from utils import common
 from utils.i18n import to_utf
-from errors import AddressBookError, AddressBookNameError
+from errors import AddressBookError, AddressBookNameError, InstallFileError
 
 log = log.start('debug', 1, 0, 'adb')
 
@@ -66,9 +67,7 @@ class AddressBook(object):
         'filename.adb' in the directory '~/.filename/'.
         """
         self.api = api
-        filename = to_utf(filename).lstrip()
-        if not filename:
-            raise AddressBookError, 'File name <%s> is not valid.' % filename
+        self.filename = common.install_dir(filename)
         self.major = 1
         self.minor = None
         self.dup_suffix = ' (copy)'
@@ -309,13 +308,6 @@ class AddressBook(object):
         Write back to disk the Address Book. Raise error on problems.
         """
         if self.contacts:
-            directory = os.path.dirname(self.filename)  #TODO: move this the Main/Startup
-            if not os.path.isdir(directory):
-                try:
-                    os.makedirs(directory)
-                except:
-                    log.warning('Could not create the directory %s.' % directory)
-                    raise AddressBookError, 'Could not create the directory %s.' % directory
             try:
                 adb_file = open(self.filename, 'w')
             except:

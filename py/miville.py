@@ -61,9 +61,9 @@ class Core(Subject):
         # TODO: merge with __init__
 
         self.api = api.ControllerApi(self.notify)
-        devices.start(self.api) # api as an argument
+#        devices.start(self.api) # api as an argument
         self.load_uis()
-        self.adb = addressbook.AddressBook('sropulpof', self.api)
+        self.adb = addressbook.AddressBook('sropulpof.adb', self.api)
         self.engines = self.find_engines()
         # create the settings collection
         self.settings = settings.Settings()

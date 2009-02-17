@@ -41,6 +41,13 @@ class AddressBookNameError(AddressBookError):
     """
     pass
 
+### Utils ###
+
+class InstallFileError(Exception):
+    """
+    Exception with a preference file.
+    """
+
 
 ### Connection ###
 
