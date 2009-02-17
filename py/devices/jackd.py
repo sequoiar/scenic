@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env python 
 # -*- coding: utf-8 -*-
 # Sropulpof
 # Copyright (C) 2008 Société des arts technologiques (SAT)
@@ -41,18 +41,22 @@ import pprint
 from exceptions import DeprecationWarning
 import warnings
 
-warnings.simplefilter("ignore", DeprecationWarning)
-
 # Twisted imports
 from twisted.internet import reactor, protocol
 from twisted.python import procutils
 from twisted.python import failure
 
 # App imports
-#from utils import log
-from utils.commands import *
 from devices import *
+from utils.commands import *
 from errors import DeviceError
+from utils import log
+
+warnings.simplefilter("ignore", DeprecationWarning)
+try:
+    log = log.start('debug', 1, 0, 'devices_jackd')
+except AttributeError, e:
+    print e.message
 
 def _parse_jack_lsp(lines):
     """
@@ -95,6 +99,7 @@ def jackd_get_infos():
     'pid': 7471,
     'rate': 44100}]
     """
+    # TODO: each short arg has a long version which should be implemented too.
     # /dev/shm/jack-$UID for jackd name 
     # g = glob.glob('/dev/shm/jack-1002/*/*-0')
     # file("/proc/28923/cmdline").read()
@@ -116,69 +121,78 @@ def jackd_get_infos():
             ret.append({}) # populate a dict
             ret[i]['name'] = name # probably 'default' or $JACK_DEFAULT_SERVER
             ret[i]['pid'] = pid
-            f = file("/proc/%d/cmdline" % (pid), "r")
-            s = f.read()
-            f.close()
-            # '/usr/bin/jackd\x00-dalsa\x00-dhw:0\x00-r44100\x00-p1024\x00-n2\x002\x00'
-            cmdline = s.split('\x00') # ['/usr/bin/jackd', '-dalsa', '-dhw:0', '-r44100', '-p1024', '-n2', '2', '']
-            backends = ['alsa', 'freebob'] # supported backends so far. #TODO: add more
-            backend = None
-            for arg in cmdline:
-                arg_name = None
-                cast = int
-                default = None
-                offset = 2
-                if backend == None: # jackd general arguments
-                    if arg.startswith('-d'): # backend (actual audio driver)
-                        arg_name = 'backend'
-                        cast = str
-                
-                elif backend == 'freebob': # freebob arguments
-                    #Default values for freebob:
-                    #-p, --period    Frames per period (default: 1024)
-                    #-n, --nperiods  Number of periods of playback latency (default: 3)
-                    #-r, --rate      Sample rate (default: 48000)
-                    # TODO: For USB audio devices it is recommended to use -n 3.  Firewire  devices  sup‐
-                    # ported by FFADO (formerly Freebob) are configured with -n 3 by default.
-                    if arg.startswith('-r'):
-                        arg_name = 'rate'
-                        default = 48000
-                    elif arg.startswith('-n'):
-                        arg_name = 'nperiods'
-                        default = 3
-                    elif arg.startswith('-p'):
-                        arg_name = 'period'
-                        default = 1024
-                
-                elif backend == 'alsa': # ALSA arguments
-                    if arg.startswith('-r'): # common for all channels.
-                        arg_name = 'rate'
-                        default = 48000
-                    elif arg.startswith('-n') and backend == 'alsa': # -n is for JACK name, or -npriods if ALSA arg
-                        arg_name = 'nperiods' # default is 2. See man jackd
-                        default = 2
-                    elif arg.startswith('-p'):
-                        arg_name = 'period'
-                        default = 1024
-                    elif arg.startswith('-d'):
-                        arg_name = 'device'
-                        cast = str
-                        default = "hw:0"# The ALSA pcm device name to use.  If none is specified, JACK will use "hw:0",
-                                        # the first hardware card defined in /etc/modules.conf.
-                # now actually assign it.
-                if arg_name is not None:
-                    try:
-                        val = cast(arg[offset:].strip()) # TODO: assumes that jackd has been started with short args form. (-r and not --rate)
-                        ret[i][arg_name] = val 
-                    except ValueError:
-                        ret[i][arg_name] = default
-                    else:
-                        # All the arguments after having specified a backend (-d alsa) are arguments specific for this backend.
-                        if arg_name == 'backend':
-                            for b in backends:
-                                if val == b:
-                                    backend = b
-        i += 1
+            try:
+                f = file("/proc/%d/cmdline" % (pid), "r")
+                s = f.read()
+                f.close()
+            except IOError, e:
+                print "ERROR", e.message # log.error(e.message)
+                ret.pop(i)
+            else:
+                # '/usr/bin/jackd\x00-dalsa\x00-dhw:0\x00-r44100\x00-p1024\x00-n2\x002\x00'
+                cmdline = s.split('\x00') # ['/usr/bin/jackd', '-dalsa', '-dhw:0', '-r44100', '-p1024', '-n2', '2', '']
+                backends = ['alsa', 'freebob'] # supported backends so far. #TODO: add more
+                backend = None
+                for arg in cmdline:
+                    arg_name = None
+                    cast = int
+                    default = None
+                    offset = 2
+                    if backend == None: # jackd general arguments
+                        if arg.startswith('-d'): # backend (actual audio driver)
+                            arg_name = 'backend'
+                            cast = str
+                    
+                    elif backend == 'freebob': # freebob arguments
+                        #Default values for freebob:
+                        #-p, --period    Frames per period (default: 1024)
+                        #-n, --nperiods  Number of periods of playback latency (default: 3)
+                        #-r, --rate      Sample rate (default: 48000)
+                        # TODO: For USB audio devices it is recommended to use -n 3.  Firewire  devices  sup‐
+                        # ported by FFADO (formerly Freebob) are configured with -n 3 by default.
+                        if arg.startswith('-r'):
+                            arg_name = 'rate'
+                            default = 48000
+                        elif arg.startswith('-n'):
+                            arg_name = 'nperiods'
+                            default = 3
+                        elif arg.startswith('-p'):
+                            arg_name = 'period'
+                            default = 1024
+                    
+                    elif backend == 'alsa': # ALSA arguments
+                        if arg.startswith('-r'): # common for all channels.
+                            arg_name = 'rate'
+                            default = 48000
+                        elif arg.startswith('-n') and backend == 'alsa': # -n is for JACK name, or -npriods if ALSA arg
+                            arg_name = 'nperiods' # default is 2. See man jackd
+                            default = 2
+                        elif arg.startswith('-p'):
+                            arg_name = 'period'
+                            default = 1024
+                        elif arg.startswith('-d'):
+                            arg_name = 'device'
+                            cast = str
+                            default = "hw:0"# The ALSA pcm device name to use.  If none is specified, JACK will use "hw:0",
+                                            # the first hardware card defined in /etc/modules.conf.
+                    # now actually assign it.
+                    if arg_name is not None:
+                        try:
+                            val = cast(arg[offset:].strip()) # TODO: assumes that jackd has been started with short args form. (-r and not --rate)
+                            ret[i][arg_name] = val 
+                        except ValueError:
+                            ret[i][arg_name] = default
+                        else:
+                            # All the arguments after having specified a backend (-d alsa) are arguments specific for this backend.
+                            if arg_name == 'backend':
+                                for b in backends:
+                                    if val == b:
+                                        backend = b
+                # now, the command line args used to start jackd (as a string)
+                ret[i]["cmdline"] = ""
+                for arg in cmdline[1:]:
+                    ret[i]["cmdline"] += " " + arg
+            i += 1 # very important...
     return ret
 
 class JackDriver(AudioDriver):
@@ -196,7 +210,9 @@ class JackDriver(AudioDriver):
         try:
             tmp = find_command('jack_lsp')
         except:
-            raise CommandNotFoundError("jacklsp command not found. Please sudo apt-get install jackd")
+            self.api.notify(None, "jack_lsp command not found. Please sudo apt-get install jackd", "error")
+            log.error("jack_lsp command not found. Please sudo apt-get install jackd")
+            #raise CommandNotFoundError("jacklsp command not found. Please sudo apt-get install jackd")
         #name = os.getenv("JACK_DEFAULT_SERVER")
         #if isinstance(name, str):
         #    self._jack_server_name = name
@@ -209,7 +225,7 @@ class JackDriver(AudioDriver):
 
         Must return a Deferred instance.
         """
-        jacks = jackd_get_infos()
+        jacks = jackd_get_infos() # returns a list a dict such as :
         #[{'backend': 'alsa',
         #'device': 'hw:0',
         #'name': 'default',
@@ -223,26 +239,39 @@ class JackDriver(AudioDriver):
         for jack in jacks:
             d = Device(jack['name']) # name is the jackd name
             self._add_new_device(d)
-            d.add_attribute(StringAttribute('backend', jack['backend'], 'no default'))
-            d.add_attribute(StringAttribute('device', jack['device'], 'no default'))
-            
-            d.add_attribute(IntAttribute('nperiods', jack['nperiods'], 2, 0, 1024)) # in seconds min, max
-            d.add_attribute(IntAttribute('period', jack['period'], 1024, 2, 16777216)) # must be a power of two
-            d.add_attribute(IntAttribute('pid', jack['pid']))  # no default, min or max
-            d.add_attribute(IntAttribute('rate', jack['rate'], 48000, 44100, 192000))
-            commands_to_start.append(['jack_lsp']) # TODO: can we specify the server name??
-            extra_args.append(jack['name'])
+            try:
+                d.add_attribute(StringAttribute('name', jack['name'], 'default'))
+                d.add_attribute(StringAttribute('args', jack['cmdline'], ''))
+                d.add_attribute(StringAttribute('device', jack['device'], ''))
+                d.add_attribute(StringAttribute('backend', jack['backend'], ''))
+
+                d.add_attribute(IntAttribute('nperiods', jack['nperiods'], 2, 0, 1024)) # in seconds min, max
+                d.add_attribute(IntAttribute('period', jack['period'], 1024, 2, 16777216)) # must be a power of two
+                d.add_attribute(IntAttribute('pid', jack['pid']))  # no default, min or max
+                d.add_attribute(IntAttribute('rate', jack['rate'], 48000, 44100, 192000))
+            except KeyError, e:
+                print "ERROR", "no such key", e.message # TODO
+                self.kill_and_resurrect_jackd(None, self._new_devices) # TODO: is this abusive ?
+            else:
+                commands_to_start.append(['jack_lsp']) # TODO: can we specify the server name??
+                extra_args.append(jack['name'])
         #print "will start commands:"
         #pprint.pprint(commands_to_start)  # TODO: add a timeout !!!
         deferred = commands_start(commands_to_start, self.on_commands_results, extra_args, caller)
+        # setTimeout(self, seconds, timeoutFunc=timeout, *args, **kw):
         #warnings.simplefilter("ignore", DeprecationWarning)
-        deferred.setTimeout(2.0, self._on_timeout, commands_to_start, extra_args) # 1 second is plenty
+        # XXX TODO XXX TODO : this is deprecated !
+        deferred.setTimeout(2.0, self._on_timeout, commands_to_start) #, (extra_args)) # 1 second is plenty
         # TODO: setTimeout is deprecated !!!!!
         return deferred 
     
-    def _on_timeout(self, commands, devices_names):
+    def _on_timeout(self, commands, devices_names=None, what_is_that=None):
         print "jackd seems to be frozen !!"
+        #print "4th arg to _on_timeout:" + str(what_is_that)
         #for d in devices_names
+        # TODO 
+        # self.kill_and_resurrect_jackd()
+        self.kill_and_resurrect_jackd(None, self._new_devices)
         self._new_devices.clear()
         self._on_done_devices_polling() 
  
@@ -261,7 +290,7 @@ class JackDriver(AudioDriver):
         """
         Parses commands results
         
-        extra_arg can be device name, such as /dev/video0
+        extra_arg is a device name, such as /dev/video0
         """
         for i in range(len(results)):
             result = results[i]
@@ -292,27 +321,92 @@ class JackDriver(AudioDriver):
         if command[0] == 'jack_lsp':
             try:
                 device = self._new_devices[extra_arg]
-            except IndexError:
+            except KeyError:
                 pass # TODO: notify with exception
             else:
                 splitted = results.splitlines()
                 dic = _parse_jack_lsp(splitted)
-                #if not dic['running']:
+                if not dic['running']:
+                    devices = self._new_devices
+                    self.kill_and_resurrect_jackd(caller, devices) # XXX
+                    #self._new_devices.pop(extra_arg)
+                else:
                     #device.attributes['running'].set_value(False)
-                #else:
-                device.add_attribute(IntAttribute('nb_sys_sinks', dic['nb_sys_sinks'], 2, 0, 64))
-                device.add_attribute(IntAttribute('nb_sys_sources', dic['nb_sys_sources'], 2, 0, 64)) 
-                #device.attributes['running'].set_value(True)
+                    #else:
+                    device.add_attribute(IntAttribute('nb_sys_sinks', dic['nb_sys_sinks'], 2, 0, 64))
+                    device.add_attribute(IntAttribute('nb_sys_sources', dic['nb_sys_sources'], 2, 0, 64)) 
+                    #device.attributes['running'].set_value(True)
+    
+    def kill_and_resurrect_jackd(self, caller=None, devices={}):
+        """
+        Kills all running jackd, makes sure they were killed, and then restarts them.
+        
+        sequence : 
+        1) kill_and_resurrect_jackd
+        2) _kill_kill_jackd
+        3) _resurrect_jackd
+        """
+        print "will now kill and resurrect all jackd instances", str(devices.values())
+        for device in devices.values():
+            try:
+                args = device.attributes["args"].get_value() # str
+                pid = device.attributes["pid"].get_value() # int
+            except KeyError, e:
+                print "impossible to kill and resurrect jackd. KeyError :", e.message
+            else:
+                # first kill with SIG 15, next with 9
+                try:
+                    os.kill(pid, 15)
+                except OSError, e:
+                    print "error killing jackd", e.message
+                else:
+                    if caller is not None:
+                        self.api.notify(caller, "Killed -15 jackd", "info")
+                reactor.callLater(1.0, self._kill_kill_jackd, caller, args, pid)
 
+    def _kill_kill_jackd(self, caller, args, pid):
+        """
+        Kills -9 every running jackd
+        
+        (makes sure it has been killed)
+        """
+        print "kill -9 jackd"
+        try:
+            os.kill(pid, 9)
+        except OSError, e:
+            print "error killing jackd", e.message
+        else:
+            if caller is not None:
+                self.api.notify(caller, "Killed -9 jackd", "info")
+        reactor.callLater(1.0, self._resurrect_jackd, caller, args, pid)
+
+    def _resurrect_jackd(self, caller, args, pid):
+        """
+        Starts jackd again
+        """
+        print "resurrecting jackd"
+        commands_to_start = [["/usr/bin/python", "./devices/start_jackd.py"]] # TODO : maybe specify the absolute path?
+        print "starting /usr/bin/python ./devices/start_jackd.py" + str(args.split())
+        commands_to_start[0].append(args.strip.split()) 
+        extra_args = None
+        try:
+            deferred = commands_start(commands_to_start, self.on_commands_results, extra_args, caller)
+        except CommandNotFoundError, e:
+            print "ERROR, could not find command python ???", e.message
+        if caller is not None:
+            self.api.notify(caller, "Starting jackd again.", "info")
+        print "jackd resurrected"
 
 def start(api):
     """
-    Starts this driver
+    Starts this driver.
+    
+    Called from the core.
     """
     driver = JackDriver()
     driver.api = api
     managers['audio'].add_driver(driver)
-    driver.prepare()
+    reactor.callLater(0, driver.prepare)
 
 if __name__ == '__name__':
     print "JACK infos:"

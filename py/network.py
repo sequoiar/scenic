@@ -89,6 +89,22 @@ def _parse_iperf_output(lines):
                     word_index += 1
     return ret
 
+# from wajig source iperf: src/ReportCSV.c :
+# // UDP Reporting
+#        printf( reportCSV_bw_jitter_loss_format,
+#                timestamp,
+#                (stats->reserved_delay == NULL ? ",,," : stats->reserved_delay),
+#                stats->transferID,
+#                stats->startTime,
+#                stats->endTime,
+#                stats->TotalLen,
+#                speed,
+#                stats->jitter*1000.0,
+#                stats->cntError,
+#                stats->cntDatagrams,
+#                (100.0 * stats->cntError) / stats->cntDatagrams, stats->cntOutofOrder );
+#
+
 class NetworkError(Exception):
     """
     Any error due to network testing (with iperf).

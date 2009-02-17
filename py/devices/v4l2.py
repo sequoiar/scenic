@@ -23,10 +23,12 @@ VideoDriver that manages v4l2 devices.
 
 Uses v4l2-ctl from Debian/Ubuntu package ivtv-utils
 """
-#TODO: 
+#TODO:: will notify with an error in case some command-line tool is not found. 
 # ----------------------------------------------------------
 # System imports
-import os, sys, glob
+import os
+import sys
+import glob
 import pprint
 
 # Twisted imports
@@ -38,8 +40,10 @@ from twisted.python import failure
 from utils import log
 from utils.commands import *
 from devices import *
-
-#log = log.start('debug', 1, 0, 'devices')
+try:
+    log = log.start('debug', 1, 0, 'devices_v4l2')
+except AttributeError, e:
+    print e.message
 
 # ---------------------------------------------------------
 def _parse_v4l2_ctl_all(lines):
@@ -143,7 +147,9 @@ class Video4LinuxDriver(VideoDriver):
         try:
             tmp = find_command('v4l2-ctl') # will fail if not found
         except:
-            raise CommandNotFoundError("v4l2-ctl command not found. Please sudo apt-get install ivtv-utils")
+            self.api.notify(None, "v4l2-ctl command not found. Please sudo apt-get install ivtv-utils", "error")
+            #raise CommandNotFoundError("v4l2-ctl command not found. Please sudo apt-get install ivtv-utils")
+            log.error("v4l2-ctl command not found. Please sudo apt-get install ivtv-utils")
         return Driver.prepare(self)
     
     def _on_devices_polling(self, caller=None, event_key=None):
@@ -333,7 +339,8 @@ def start(api):
     driver = Video4LinuxDriver()
     driver.api = api
     managers['video'].add_driver(driver)
-    driver.prepare()
+    reactor.callLater(0, driver.prepare)
+
 
     
     

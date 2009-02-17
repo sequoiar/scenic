@@ -20,16 +20,19 @@
 
 """
 Classes for handling commands (processes).
-
-TODO: Improve errors, exceptions and failures handling. 
 """
+#TODO: Improve errors, exceptions and failures handling. 
 
 import os
 import pprint
 import sys
 import traceback
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
 
-from twisted.internet import reactor, defer # protocol,
+from twisted.internet import reactor, defer, protocol
 from twisted.python import procutils, failure
 from twisted.internet import utils
 
@@ -73,6 +76,9 @@ def _command_start(executable, command):
         if len(command) > 1:
             args = command[1:]
         deferred = utils.getProcessOutputAndValue(executable, args, os.environ)
+        # setTimeout(self, seconds, timeoutFunc=timeout, *args, **kw):
+        # #TODO: get rid of this and, instead, change utils.commands and add it a 
+        # ProcessProtocol which supports a timeout. 
     except Exception,e:
         #print "ERROR:",sys.exc_info()
         # TODO: handle better
@@ -169,6 +175,66 @@ def single_command_start(command, callback=None, extra_arg=None, caller=None): #
         callback = on_commands_results
     defer_list.addCallback(callback, [command], extra_arg, caller)
     return defer_list
+
+
+class EverythingGetterProcessProtocol(protocol.ProcessProtocol):
+    """
+    ProcessProtocol that buffers the stdout of a process.
+    
+    Taken from twisted.internet.utils._EverythingGetter
+    """
+    def __init__(self, deferred):
+        self.deferred = deferred
+        self.outBuf = StringIO.StringIO()
+        self.errBuf = StringIO.StringIO()
+        self.outReceived = self.outBuf.write
+        self.errReceived = self.errBuf.write
+    
+    def processEnded(self, reason):
+        out = self.outBuf.getvalue()
+        err = self.errBuf.getvalue()
+        e = reason.value
+        code = e.exitCode
+        if e.signal:
+            self.deferred.errback((out, err, e.signal))
+        else:
+            self.deferred.callback((out, err, code))
+
+def _call_protocol_with_deferred(protocol, executable, args, env, path, reactor=None):
+    if reactor is None:
+        from twisted.internet import reactor
+
+    d = defer.Deferred()
+    p = protocol(d)
+    reactor.spawnProcess(p, executable, (executable,)+tuple(args), env, path)
+    return d
+
+def _get_process_output_and_value(executable, args=(), env={}, path='.', reactor=None):
+    """Spawn a process and returns a Deferred that will be called back with
+    its output (from stdout and stderr) and it's exit code as (out, err, code)
+    If a signal is raised, the Deferred will errback with the stdout and
+    stderr up to that point, along with the signal, as (out, err, signalNum)
+    
+
+    @param executable: The file name to run and get the output of - the
+                       full path should be used.
+
+    @param args: the command line arguments to pass to the process; a
+                 sequence of strings. The first string should *NOT* be the
+                 executable's name.
+
+    @param env: the environment variables to pass to the processs; a
+                dictionary of strings. os.environ is best.
+
+    @param path: the path to run the subprocess in - defaults to the
+                 current directory.
+
+    @param reactor: the reactor to use - defaults to the default reactor
+    @param errortoo: if 1, capture stderr too
+    """
+    # taken from twisted.internet.utils.getProcessOutputAndValue
+    return _call_protocol_with_deferred(EverythingGetterProcessProtocol, executable, args, env, path,
+                                    reactor)
 
 if __name__ == '__main__':
     print "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
