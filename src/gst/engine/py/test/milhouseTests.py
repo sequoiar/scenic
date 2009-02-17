@@ -152,7 +152,7 @@ class MilhouseTests():
         rxArgs, txArgs = self.timeouts()
         self.runTest(rxArgs + ' --disable-audio', txArgs + ' --disable-audio')
 
-    def test_12_ximagesink(self):
+    def test_12_ximagesink_v4l2src(self):
         """ Test with ximagesink"""
         self.countdown("START")
 
@@ -166,9 +166,23 @@ class MilhouseTests():
         rxArgs, txArgs = self.timeouts()
         self.runTest(rxArgs + ' --videosink glimagesink', txArgs + ' --videosource v4l2src')
 
+    def test_14_ximagesink_dv1394src(self):
+        """ Test dv with ximagesink"""
+        self.countdown("START")
+
+        rxArgs, txArgs = self.timeouts()
+        self.runTest(rxArgs + ' --videosink ximagesink', txArgs + ' --videosource dv1394src')
+
+    def test_15_glimagesink_dv1394src(self):
+        """ Test dv with glimagesink"""
+        self.countdown("START")
+
+        rxArgs, txArgs = self.timeouts()
+        self.runTest(rxArgs + ' --videosink glimagesink', txArgs + ' --videosource dv1394src')
+
 
 # here we run all the tests thanks to the wonders of reflective programming
-tests = prefixedMethods(MilhouseTests(), 'test_01')
+tests = prefixedMethods(MilhouseTests(), 'test_15')
 
 for test in tests:
     print "TEST: "  + test.__doc__

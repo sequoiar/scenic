@@ -197,6 +197,8 @@ void XImageSink::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     sink_ = Pipeline::Instance()->makeElement("ximagesink", "videosink");
+    g_object_set(sink_, "pixel-aspect-ratio", "10/11", NULL);
+    g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
     //    prepareSink();
 
     gstlinkable::link(colorspc_, sink_);

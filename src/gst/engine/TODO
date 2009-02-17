@@ -1,5 +1,5 @@
 -LATENCY!!!!
--fix glvideosink w/v4l2src, fix ximagesink
+-fix glvideosink w/v4l2src, fix ximagesink (could be due to pixel aspect ratio or other caps issue)
 -Generic interface for objects who link to elements asynchronously, which allows them to have a list of elements to which they
 must connect, see dv1394src. 
 -try (in a branch) to queue network sources (as per the app-devel guide section on threading)
