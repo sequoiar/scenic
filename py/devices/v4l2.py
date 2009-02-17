@@ -37,13 +37,10 @@ from twisted.python import procutils
 from twisted.python import failure
 
 # App imports
-from utils import log
+from utils import log as logger
 from utils.commands import *
 from devices import *
-try:
-    log = log.start('debug', 1, 0, 'devices_v4l2')
-except AttributeError, e:
-    print e.message
+log = logger.start('debug', 1, 0, 'devices_v4l2')
 
 # ---------------------------------------------------------
 def _parse_v4l2_ctl_all(lines):
@@ -251,7 +248,8 @@ class Video4LinuxDriver(VideoDriver):
             result = results[i]
             success, results_infos = result
             if isinstance(results_infos, failure.Failure):
-                print "failure ::: ", results_infos.getErrorMessage()  # if there is an error, the programmer should fix it.
+                msg = "command failure :" + results_infos.getErrorMessage()  # if there is an error, the programmer should fix it.
+                log.error(msg)
             else:
                 command = commands[i]
                 stdout, stderr, signal_or_code = results_infos
@@ -263,9 +261,10 @@ class Video4LinuxDriver(VideoDriver):
                         arg = extra_arg
                     self._handle_shell_infos_results(command, stdout, arg, caller) # this is where all the poutine happens
                 else:
-                    print "failure for command %s" % (command[0])
-                    print "stderr: %s" % (stderr)
-                    print "signal is ", signal_or_code
+                    msg = "non-succes for command %s" % (command[0])
+                    msg += " stderr: %s" % (stderr)
+                    msg += " signal is " + str(signal_or_code)
+                    log.error(msg)
         if extra_arg == 'attr_change':
             event_name = 'attr'
         else:

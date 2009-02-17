@@ -50,13 +50,10 @@ from twisted.python import failure
 from devices import *
 from utils.commands import *
 from errors import DeviceError
-from utils import log
+from utils import log as logger
 
 warnings.simplefilter("ignore", DeprecationWarning)
-try:
-    log = log.start('debug', 1, 0, 'devices_jackd')
-except AttributeError, e:
-    print e.message
+log = logger.start('debug', 1, 0, 'devices_jackd')
 
 def _parse_jack_lsp(lines):
     """
@@ -126,7 +123,7 @@ def jackd_get_infos():
                 s = f.read()
                 f.close()
             except IOError, e:
-                print "ERROR", e.message # log.error(e.message)
+                log.error("ERROR: " + e.message) # log.error(e.message)
                 ret.pop(i)
             else:
                 # '/usr/bin/jackd\x00-dalsa\x00-dhw:0\x00-r44100\x00-p1024\x00-n2\x002\x00'
@@ -250,7 +247,7 @@ class JackDriver(AudioDriver):
                 d.add_attribute(IntAttribute('pid', jack['pid']))  # no default, min or max
                 d.add_attribute(IntAttribute('rate', jack['rate'], 48000, 44100, 192000))
             except KeyError, e:
-                print "ERROR", "no such key", e.message # TODO
+                log.error("no such key"+ e.message) # TODO
                 self.kill_and_resurrect_jackd(None, self._new_devices) # TODO: is this abusive ?
             else:
                 commands_to_start.append(['jack_lsp']) # TODO: can we specify the server name??
@@ -266,7 +263,7 @@ class JackDriver(AudioDriver):
         return deferred 
     
     def _on_timeout(self, commands, devices_names=None, what_is_that=None):
-        print "jackd seems to be frozen !!"
+        log.warning("jackd seems to be frozen !!")
         #print "4th arg to _on_timeout:" + str(what_is_that)
         #for d in devices_names
         # TODO 
@@ -306,9 +303,9 @@ class JackDriver(AudioDriver):
                         arg = extra_arg[i]
                     self._handle_shell_infos_results(command, stdout, arg, caller) # this is where all the poutine happens
                 else:
-                    print "failure for command %s" % (command[0])
-                    print "stderr: %s" % (stderr)
-                    print "signal is ", signal_or_code
+                    log.warning("failure for command %s with stderr %s and signal: %s" % (command[0], stderr, str(signal_or_code)))
+                    #print "stderr: %s" % (stderr)
+                    #print "signal is ", signal_or_code
         self._on_done_devices_polling() #TODO add caller argument 
     
     def _handle_shell_infos_results(self, command, results, extra_arg=None, caller=None):
@@ -346,19 +343,19 @@ class JackDriver(AudioDriver):
         2) _kill_kill_jackd
         3) _resurrect_jackd
         """
-        print "will now kill and resurrect all jackd instances", str(devices.values())
+        log.info("will now kill and resurrect all jackd instances" + str(devices.values()))
         for device in devices.values():
             try:
                 args = device.attributes["args"].get_value() # str
                 pid = device.attributes["pid"].get_value() # int
             except KeyError, e:
-                print "impossible to kill and resurrect jackd. KeyError :", e.message
+                log.error("impossible to kill and resurrect jackd. KeyError :" + e.message)
             else:
                 # first kill with SIG 15, next with 9
                 try:
                     os.kill(pid, 15)
                 except OSError, e:
-                    print "error killing jackd", e.message
+                    log.error("error killing jackd "+ e.message)
                 else:
                     if caller is not None:
                         self.api.notify(caller, "Killed -15 jackd", "info")
@@ -370,11 +367,11 @@ class JackDriver(AudioDriver):
         
         (makes sure it has been killed)
         """
-        print "kill -9 jackd"
+        log.info("kill -9 jackd")
         try:
             os.kill(pid, 9)
         except OSError, e:
-            print "error killing jackd", e.message
+            log.error("error killing jackd:" + e.message)
         else:
             if caller is not None:
                 self.api.notify(caller, "Killed -9 jackd", "info")
@@ -384,18 +381,18 @@ class JackDriver(AudioDriver):
         """
         Starts jackd again
         """
-        print "resurrecting jackd"
+        log.info("resurrecting jackd")
         commands_to_start = [["/usr/bin/python", "./devices/start_jackd.py"]] # TODO : maybe specify the absolute path?
-        print "starting /usr/bin/python ./devices/start_jackd.py" + str(args.split())
+        #print "starting /usr/bin/python ./devices/start_jackd.py" + str(args.split())
         commands_to_start[0].append(args.strip.split()) 
         extra_args = None
         try:
             deferred = commands_start(commands_to_start, self.on_commands_results, extra_args, caller)
         except CommandNotFoundError, e:
-            print "ERROR, could not find command python ???", e.message
+            log.error("ERROR, could not find command " + e.message)
         if caller is not None:
             self.api.notify(caller, "Starting jackd again.", "info")
-        print "jackd resurrected"
+        #print "jackd resurrected"
 
 def start(api):
     """
