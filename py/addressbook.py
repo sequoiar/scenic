@@ -73,7 +73,6 @@ class AddressBook(object):
         self.dup_suffix = ' (copy)'
         self.contacts = {}
         self.selected = None
-        self.filename = os.environ['HOME'] + '/.' + filename + '/' + filename + '.adb'
         self.read()
 
     def add(self, name, address, port=None, auto_created=False, connector=None, setting=0):
