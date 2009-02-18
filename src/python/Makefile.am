@@ -1,5 +1,8 @@
 include $(top_srcdir)/src/globals.mak
 
+TESTS_ENVIRONMENT = $(PYTHON)
+TESTS = test.py
+
 lib_LTLIBRARIES = milhouse.la
 
 milhouse_la_SOURCES = exports.cpp pyMsgThread.cpp

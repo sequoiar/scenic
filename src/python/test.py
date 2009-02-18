@@ -5,4 +5,4 @@ class pycb(DictHandler):
         return {"command":"ack"}
 c = TcpWrapConfig(1044,0)
 cb = pycb()
-t = ThreadWrap(c,cb)
+#t = ThreadWrap(c,cb)
