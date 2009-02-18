@@ -36,9 +36,9 @@ from twisted.internet import defer
 from twisted.internet.error import ProcessExitedAlready
 from twisted.python import failure
 from twisted.protocols import basic
-from twisted.internet.error import PotentialZombieWarning
+#from twisted.internet.error import PotentialZombieWarning
 
-warnings.simplefilter("ignore", PotentialZombieWarning)
+#warnings.simplefilter("ignore", PotentialZombieWarning)
 # this is just to be able to use imiville without an error message
 # Emitted when IReactorProcess.spawnProcess is called in a way which may result in termination of the created child process not being reported.  
 
