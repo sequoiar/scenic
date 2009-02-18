@@ -17,7 +17,7 @@ class MilhouseTests():
     @staticmethod
     def timeouts():
         """ Returns tuple of timeout arguments """
-        timeout = '-o 50000'
+        timeout = '-o 500000'
         return timeout, timeout
 
     @staticmethod
@@ -182,7 +182,7 @@ class MilhouseTests():
 
 
 # here we run all the tests thanks to the wonders of reflective programming
-tests = prefixedMethods(MilhouseTests(), 'test_15')
+tests = prefixedMethods(MilhouseTests(), 'test_01')
 
 for test in tests:
     print "TEST: "  + test.__doc__
