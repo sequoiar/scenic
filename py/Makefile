@@ -6,7 +6,8 @@ clean:
 
 check:
 	@echo Do tests in $(PWD)
-
+	trial test
+	
 html:
 	@echo Do some html in $(PWD)
 
