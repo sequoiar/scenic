@@ -70,7 +70,10 @@ class BasicServer(LineReceiver):
                 self.state = WAITING
                 self.api.notify(self, (self.addr.host, self), 'ask')
         elif line[0:4] == "STOP":
-            self.api.stop_streams(self)
+            try:    #TODO: to this correctly
+                self.api.stop_streams(self)
+            except:
+                pass
             self.set_port(line)
             contact = self.api.find_contact(self.addr.host, self.client_port, 'basic')
             self.transport.loseConnection()
@@ -110,7 +113,7 @@ class BasicServer(LineReceiver):
         contact = self.api.client_contact(self.addr.host, self.client_port)
         contact.connection = ConnectionBasic(contact, self.api)
         contact.state = CONNECTING
-        self.sendLine('ACCEPT')
+        self.sendLine('ACCEPT %s' % self.api.get_com_chan_port())
         self.transport.loseConnection()
 
 
@@ -160,8 +163,11 @@ class BasicClient(LineReceiver):
     def lineReceived(self, line):
         log.debug('Line received from %s:%s: %s' % (self.transport.realAddress[0], self.transport.realAddress[1], line))
 
-        if line in self.callbacks:
-            self.callbacks[line]()
+        args = line.split()
+        cmd = args[0]
+        del args[0]
+        if cmd in self.callbacks:
+            self.callbacks[cmd](*args)
         else:
             log.info('Bad command receive from remote')
 

@@ -47,6 +47,7 @@ class Connection(object):
         self.com_chan = None
         self.local_name = None
         self.contact = contact
+        self.remote_com_chan_port = com_chan.PORT
         contact.state = DISCONNECTED
         self.connection = None
         port = self.contact.port
@@ -67,7 +68,8 @@ class Connection(object):
     def _start(self):
         raise NotImplementedError, '_start() method not implemented for this connector: %s.' % self.contact.connector
 
-    def accepted(self):
+    def accepted(self, port=com_chan.PORT):
+        self.remote_com_chan_port = int(port)
         self._accepted()
         self.api.notify(self, 'The invitation to %s (%s) was accepted.' % (self.contact.name, self.contact.address), 'answer')
         self.setup()
@@ -111,7 +113,7 @@ class Connection(object):
 
     def setup(self):
         self.contact.state = CONNECTING
-        channel, deferred = com_chan.connect(self.local_name, self.contact.address)
+        channel, deferred = com_chan.connect(self.local_name, self.contact.address, self.remote_com_chan_port)
         deferred.addCallback(self.attached, channel)
         deferred.addErrback(self.not_attached)
 
@@ -139,7 +141,10 @@ class Connection(object):
         if hasattr(self.com_chan, 'disconnect'):
             self.com_chan.disconnect()
         if self.contact.state == DISCONNECTING:
-            self.api.stop_streams(self)
+            try:    # TODO: do this correctly
+                self.api.stop_streams(self)
+            except:
+                pass
         self.contact.state = DISCONNECTED
         self.contact.connection = None
         del connections[self.address]

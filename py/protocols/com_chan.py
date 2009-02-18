@@ -193,6 +193,7 @@ class ComChanCheck:
     def requestAvatarId(self, credentials):
         name = str(credentials.username)
         log.info('\'%s\' is trying to connect.' % name)
+        print name, connections
         if name in connections:
             return defer.maybeDeferred(credentials.checkPassword,
                                        'pofword').addCallback(

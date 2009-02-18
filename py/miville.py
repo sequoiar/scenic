@@ -61,7 +61,7 @@ class Core(Subject):
         # TODO: merge with __init__
 
         self.api = api.ControllerApi(self.notify)
-#        devices.start(self.api) # api as an argument
+        devices.start(self.api) # api as an argument
         self.load_uis()
         self.adb = addressbook.AddressBook('sropulpof.adb', self.api)
         self.engines = self.find_engines()
@@ -70,10 +70,10 @@ class Core(Subject):
         
         #self.curr_setting = self.settings.select()
         self.connectors = connectors.load_connectors(self.api)
-        port = 37054
+        self.com_chan_port = 37054
         if len(sys.argv) > 1:
-            port += 1
-        com_chan.start(connectors.connections, port)
+            self.com_chan_port += 1
+        com_chan.start(connectors.connections, self.com_chan_port)
         self.api._start(self)
         
     def load_uis(self):

@@ -86,7 +86,7 @@ class ControllerApi(object):
 #        self.streams = self.all_streams[self.curr_streams]
         self.connectors = core.connectors
         self.connection = None
-        self.network_tester = network.start(self) # dict with 'client' and 'server' keys
+#        self.network_tester = network.start(self) # dict with 'client' and 'server' keys
 
     ### Contacts ###
 
@@ -621,6 +621,9 @@ class ControllerApi(object):
 
     def get_default_port(self, connector):
         return self.connectors[connector].PORT
+    
+    def get_com_chan_port(self):
+        return self.core.com_chan_port
    
     ### devices ###
 
