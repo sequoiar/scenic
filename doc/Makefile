@@ -17,6 +17,9 @@ install:
         echo "Installing in $$i..."; \
         (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) install); done
 
+check:
+	@echo tests for docs?
+
 clean:
 	rm -rf html latex xml rtf def
 	@for i in $(SUBDIRS); do \
