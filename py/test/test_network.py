@@ -36,7 +36,8 @@ app.main()
 app.me.verbose = False
 app.view.verbose = False #True 
 app.go()
-remote = ("tzing", "10.10.10.66")
+# XXX the folowwing line represents the address of the remote host to test with
+remote = ("tzing", "10.10.10.66") # It must have a miville running with standard port numbers.
 previous = None 
 
 class Test_Network_Test(unittest.TestCase):
@@ -67,11 +68,11 @@ class Test_Network_Test(unittest.TestCase):
         if self._verbose:
             sys.stdout.write(".")
             sys.stdout.flush()
+        app.go(0.1)
         if app.last is not previous:
             if self._verbose:
                 print "Miville notification: ", app.last.value 
             previous = app.last
-        app.go(0.1)
         
     def test_01_unidirectional(self):
         """
