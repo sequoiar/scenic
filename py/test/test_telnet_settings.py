@@ -176,7 +176,7 @@ class Test_004_Settings(TestBase):
         # clean up
         self.tst("s -t global -e gset08", 'setting removed')        
         
-    def test_09_save_settings(self):
+    def xtest_09_save_settings(self):
         """
         test that pickling of settings works
         """
