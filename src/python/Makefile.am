@@ -1,6 +1,6 @@
 include $(top_srcdir)/src/globals.mak
 
-TESTS_ENVIRONMENT = $(PYTHON)
+TESTS_ENVIRONMENT = PYTHONPATH=$(top_srcdir)/src/python/.libs $(PYTHON) 
 TESTS = test.py
 
 lib_LTLIBRARIES = milhouse.la
