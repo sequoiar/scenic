@@ -47,7 +47,7 @@ from twisted.python import procutils
 from twisted.python import failure
 
 # App imports
-from devices import *
+import devices #from devices import *
 from utils.commands import *
 from errors import DeviceError
 from utils import log as logger
@@ -192,7 +192,7 @@ def jackd_get_infos():
             i += 1 # very important...
     return ret
 
-class JackDriver(AudioDriver):
+class JackDriver(devices.AudioDriver):
     """
     JACK audio server.
     
@@ -213,7 +213,7 @@ class JackDriver(AudioDriver):
         #name = os.getenv("JACK_DEFAULT_SERVER")
         #if isinstance(name, str):
         #    self._jack_server_name = name
-        return Driver.prepare(self)
+        return devices.Driver.prepare(self)
     
     def _on_devices_polling(self, caller=None, event_key=None):
         """
@@ -234,18 +234,18 @@ class JackDriver(AudioDriver):
         extra_args = []
         
         for jack in jacks:
-            d = Device(jack['name']) # name is the jackd name
+            d = devices.Device(jack['name']) # name is the jackd name
             self._add_new_device(d)
             try:
-                d.add_attribute(StringAttribute('name', jack['name'], 'default'))
-                d.add_attribute(StringAttribute('args', jack['cmdline'], ''))
-                d.add_attribute(StringAttribute('device', jack['device'], ''))
-                d.add_attribute(StringAttribute('backend', jack['backend'], ''))
+                d.add_attribute(devices.StringAttribute('name', jack['name'], 'default'))
+                d.add_attribute(devices.StringAttribute('args', jack['cmdline'], ''))
+                d.add_attribute(devices.StringAttribute('device', jack['device'], ''))
+                d.add_attribute(devices.StringAttribute('backend', jack['backend'], ''))
 
-                d.add_attribute(IntAttribute('nperiods', jack['nperiods'], 2, 0, 1024)) # in seconds min, max
-                d.add_attribute(IntAttribute('period', jack['period'], 1024, 2, 16777216)) # must be a power of two
-                d.add_attribute(IntAttribute('pid', jack['pid']))  # no default, min or max
-                d.add_attribute(IntAttribute('rate', jack['rate'], 48000, 44100, 192000))
+                d.add_attribute(devices.IntAttribute('nperiods', jack['nperiods'], 2, 0, 1024)) # in seconds min, max
+                d.add_attribute(devices.IntAttribute('period', jack['period'], 1024, 2, 16777216)) # must be a power of two
+                d.add_attribute(devices.IntAttribute('pid', jack['pid']))  # no default, min or max
+                d.add_attribute(devices.IntAttribute('rate', jack['rate'], 48000, 44100, 192000))
             except KeyError, e:
                 log.error("no such key"+ e.message) # TODO
                 self.kill_and_resurrect_jackd(None, self._new_devices) # TODO: is this abusive ?
@@ -324,17 +324,17 @@ class JackDriver(AudioDriver):
                 splitted = results.splitlines()
                 dic = _parse_jack_lsp(splitted)
                 if not dic['running']:
-                    devices = self._new_devices
-                    self.kill_and_resurrect_jackd(caller, devices) # XXX
+                    devs = self._new_devices
+                    self.kill_and_resurrect_jackd(caller, devs) # XXX
                     #self._new_devices.pop(extra_arg)
                 else:
                     #device.attributes['running'].set_value(False)
                     #else:
-                    device.add_attribute(IntAttribute('nb_sys_sinks', dic['nb_sys_sinks'], 2, 0, 64))
-                    device.add_attribute(IntAttribute('nb_sys_sources', dic['nb_sys_sources'], 2, 0, 64)) 
+                    device.add_attribute(devices.IntAttribute('nb_sys_sinks', dic['nb_sys_sinks'], 2, 0, 64))
+                    device.add_attribute(devices.IntAttribute('nb_sys_sources', dic['nb_sys_sources'], 2, 0, 64)) 
                     #device.attributes['running'].set_value(True)
     
-    def kill_and_resurrect_jackd(self, caller=None, devices={}):
+    def kill_and_resurrect_jackd(self, caller=None, devs={}):
         """
         Kills all running jackd, makes sure they were killed, and then restarts them.
         
@@ -344,7 +344,7 @@ class JackDriver(AudioDriver):
         3) _resurrect_jackd
         """
         log.info("will now kill and resurrect all jackd instances" + str(devices.values()))
-        for device in devices.values():
+        for device in devs.values():
             try:
                 args = device.attributes["args"].get_value() # str
                 pid = device.attributes["pid"].get_value() # int
@@ -402,7 +402,7 @@ def start(api):
     """
     driver = JackDriver()
     driver.api = api
-    managers['audio'].add_driver(driver)
+    devices.managers['audio'].add_driver(driver)
     reactor.callLater(0, driver.prepare)
 
 if __name__ == '__name__':

@@ -28,6 +28,7 @@ See https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting
 import os
 import sys
 import time
+import warnings 
 
 from twisted.internet import reactor
 from twisted.internet import protocol
@@ -35,12 +36,19 @@ from twisted.internet import defer
 from twisted.internet.error import ProcessExitedAlready
 from twisted.python import failure
 from twisted.protocols import basic
+from twisted.internet.error import PotentialZombieWarning
+
+warnings.simplefilter("ignore", PotentialZombieWarning)
+# this is just to be able to use imiville without an error message
+# Emitted when IReactorProcess.spawnProcess is called in a way which may result in termination of the created child process not being reported.  
 
 # App imports
 from utils import log
 from utils import commands
-
+from errors import CommandNotFoundError
 log = log.start('debug', 1, 0, 'network')
+
+
 
 # -------------------- constants -----------------------------------
 STATE_IDLE = 0
@@ -395,7 +403,7 @@ def start(subject):
         print e.message
     tester = NetworkTester()
     tester.api = subject
-    reactor.callLater(0, tester._start_iperf_server_process)
+    reactor.callLater(0.01, tester._start_iperf_server_process)
     
     #client = NetworkTester()
     #client.api = subject

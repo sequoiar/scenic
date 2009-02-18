@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from devices import *
+from errors import CommandNotFoundError
 # TODO: from utils import find_modules, load_modules
 
 # drivers

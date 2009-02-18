@@ -39,7 +39,8 @@ from twisted.python import failure
 # App imports
 from utils import log as logger
 from utils.commands import *
-from devices import *
+import devices
+#from devices import *
 log = logger.start('debug', 1, 0, 'devices_v4l2')
 
 # ---------------------------------------------------------
@@ -125,7 +126,7 @@ def _parse_v4l2_ctl_list_inputs(lines):
     return inputs
 # ---------------------------------------------------------
 
-class Video4LinuxDriver(VideoDriver):
+class Video4LinuxDriver(devices.VideoDriver):
     """
     Video4linux 2 Driver.
     
@@ -134,7 +135,7 @@ class Video4LinuxDriver(VideoDriver):
     name = 'v4l2'
     
     def __init__(self, polling_interval=15.0):
-        Driver.__init__(self, polling_interval)
+        devices.Driver.__init__(self, polling_interval)
         self.selected_device = '/dev/video0' # Use this to set the video card we use.
         
     def prepare(self):
@@ -147,7 +148,7 @@ class Video4LinuxDriver(VideoDriver):
             self.api.notify(None, "v4l2-ctl command not found. Please sudo apt-get install ivtv-utils", "error")
             #raise CommandNotFoundError("v4l2-ctl command not found. Please sudo apt-get install ivtv-utils")
             log.error("v4l2-ctl command not found. Please sudo apt-get install ivtv-utils")
-        return Driver.prepare(self)
+        return devices.Driver.prepare(self)
     
     def _on_devices_polling(self, caller=None, event_key=None):
         """
@@ -164,13 +165,13 @@ class Video4LinuxDriver(VideoDriver):
         extra_arg = []
 
         for name in device_names:
-            device = Device(name)
+            device = devices.Device(name)
             self._add_new_device(device) # in_new_devices # TODO : make add_device cleaner.
             # TODO: does it notify the api ?
             
             # add its attributes with default values.
             # next, we will populate the rael options
-            attr = OptionsAttribute('input', 'Composite0', 'Composite0', ['Composite0', 'Composite1', 'S-Video']) # 'Composite2'
+            attr = devices.OptionsAttribute('input', 'Composite0', 'Composite0', ['Composite0', 'Composite1', 'S-Video']) # 'Composite2'
             device.add_attribute(attr)
             
             # now, the commands (TODO)
@@ -297,18 +298,18 @@ class Video4LinuxDriver(VideoDriver):
                     for key in dic:
                         value = dic[key]
                         if key in ['driver','card','pixel format']:
-                            device.add_attribute(StringAttribute(key, dic[key], 'no default'))
+                            device.add_attribute(devices.StringAttribute(key, dic[key], 'no default'))
                         elif key == 'width':
-                            device.add_attribute(IntAttribute(key, int(dic[key]), 640, 320, 9999)) # TODO better min/max
+                            device.add_attribute(devices.IntAttribute(key, int(dic[key]), 640, 320, 9999)) # TODO better min/max
                         elif key == 'height':
-                            device.add_attribute(IntAttribute(key, int(dic[key]), 480, 240, 9999)) # TODO better min/max 
+                            device.add_attribute(devices.IntAttribute(key, int(dic[key]), 480, 240, 9999)) # TODO better min/max 
                         elif key == 'input':
                             # Composite0, Composite1,  Composite2, S-Video
                             #attr = devices.OptionsAttribute(key, , 0, ['Composite0', 'Composite1', 'S-Video']) # 'Composite2'
                             #device.add_attribute(attr)
                             device.attributes[key].set_value(value, False)
                         elif key == "norm":
-                            attr = OptionsAttribute(key, dic[key], 'ntsc', ['ntsc', 'pal', 'secam'])
+                            attr = devices.OptionsAttribute(key, dic[key], 'ntsc', ['ntsc', 'pal', 'secam'])
                             device.add_attribute(attr) # we could check if value is valid
             elif command[1] == '--list-inputs':
                 try:
@@ -337,7 +338,7 @@ def start(api):
     """
     driver = Video4LinuxDriver()
     driver.api = api
-    managers['video'].add_driver(driver)
+    devices.managers['video'].add_driver(driver)
     reactor.callLater(0, driver.prepare)
 
 
