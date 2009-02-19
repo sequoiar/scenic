@@ -30,6 +30,8 @@ log = log.start('debug', 1, 0, 'connectors')
 
 connections = {}
 connectors = {}
+connect_callbacks = {}
+disconnect_callbacks = {}
 
 def chk_ob():
     print "Connections: %r" % connections
@@ -132,9 +134,13 @@ class Connection(object):
         self.stop()
 
     def com_chan_started_client(self):
+        for callback in connect_callbacks.values():
+            callback(self.com_chan, 'client')
         self._com_chan_started_client()
 
     def com_chan_started_server(self):
+        for callback in connect_callbacks.values():
+            callback(self.com_chan, 'server')
         self._com_chan_started_server()
 
     def _com_chan_started_client(self):
@@ -144,6 +150,8 @@ class Connection(object):
         raise NotImplementedError, 'com_chan_started_server() method not implemented for this connector: %s.' % self.contact.connector
 
     def cleanup(self):
+        for callback in disconnect_callbacks.values():
+            callback(self) # TODO: how can we know if we were server or client ?
         if hasattr(self.com_chan, 'disconnect'):
             self.com_chan.disconnect()
         if self.contact.state == DISCONNECTING:
@@ -227,4 +235,18 @@ def load_connectors(api):
             connectors[name] = module
             log.info('Connector \'%s\' started.' % name)
     return connectors
+
+
+def register_callback(key, callback, event="connect"):
+    """
+    registers a callback for "disconnect" or "connect" event.
+    :param callback: a function of method to call. Its first argument will be the com_chan object.
+    If it is a "connect" callback, its second argument will be the string "server" or "client"
+    
+    If you ever want to unregister a callback, do it manually or write an other function for it.
+    """
+    if event == "disconnect":
+        disconnect_callbacks[key] = callback
+    else:
+        connect_callbacks[key] = callback
 

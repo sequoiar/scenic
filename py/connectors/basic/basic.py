@@ -239,16 +239,10 @@ class ConnectionBasic(Connection):
 #        self.send_settings()
 
     def _com_chan_started_client(self, action="join"):
-        if action == "media":
-            self.send_settings()
-        elif action == "network_test":
-            self.api.network_test.client_started(self) 
+        self.send_settings()
 
     def _com_chan_started_server(self, action="join"):
-        if action == "media":
-            self.com_chan.add(self.settings)
-        elif action == "network_test":
-            self.api.network_test.server_started(self) 
+        self.com_chan.add(self.settings)
     
     def settings(self, settings):
         """

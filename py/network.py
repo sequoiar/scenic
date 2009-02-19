@@ -46,6 +46,7 @@ except ImportError:
 # App imports
 from utils import log
 from utils import commands
+import connectors
 from errors import CommandNotFoundError
 log = log.start('debug', 1, 0, 'network')
 
@@ -387,6 +388,25 @@ class NetworkTester(object):
             else:
                 self.iperf_server_is_running = True
     
+    def on_com_chan_connected(self, com_chan_instance, role="client"):
+        """
+        Called from the Connector class in its com_chan_started_client or com_chan_started_server method.
+
+        :param role: string "client" or "server"
+        We actually do not care if this miville is a com_chan client or server.
+        """
+        # TODO register com_chan callbacks
+        # those callbacks will 
+        # a) start and stop the iperf server and the testing
+        # 
+        #self.current_com_chan = 
+        pass
+        #print "on_com_chan_connected"
+
+    def on_com_chan_disconnected(self, com_chan_instance):
+        #print "on_com_chan_disconnected"
+        pass
+
 # functions ---------------------------------------------
 def start(subject):
     """
@@ -406,6 +426,9 @@ def start(subject):
     tester.api = subject
     #XXX reactor.callLater(0.01, tester._start_iperf_server_process)
     
+    connectors.register_callback("networktest_on_connect", tester.on_com_chan_connected, event="connect")
+    connectors.register_callback("networktest_on_disconnect", tester.on_com_chan_connected, event="disconnect")
+
     #client = NetworkTester()
     #client.api = subject
     return tester
