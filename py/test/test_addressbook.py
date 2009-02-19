@@ -222,7 +222,7 @@ class Test_3_AddressBook(unittest.TestCase):
         shutil.rmtree(os.environ['HOME'] + '/.sropulpof', True)
         os.environ['HOME'] = self.orig_home        
         
-    def test_1_init(self):
+    def dont_test_1_init(self):
         for filename, result in self.filenames.items():
             strip_filename = filename.strip()
             try:
