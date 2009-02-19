@@ -1,5 +1,7 @@
 /* parser.h
- * Copyright 2008 Koya Charles & Tristan Matthews
+ * Copyright (C) 2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

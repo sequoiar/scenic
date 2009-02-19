@@ -1,7 +1,9 @@
 
 // raw1394util.h
 // Based on raw1394util.h, part of dvgrab available at <http://www.kinodv.org/>
-// Copyright 2008 Koya Charles & Tristan Matthews //
+// Copyright (C) 2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify

@@ -1,5 +1,7 @@
 /* remoteConfig.cpp
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
