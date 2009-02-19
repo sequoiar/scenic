@@ -25,22 +25,23 @@ Integration tests within the API for Network performance testing.
 Usage: trial test/test_network.py
 """ 
 # system imports
-import unittest
-import sys
+
+##import unittest
+##import sys
 
 # app imports
-import imiville as app
+##import imiville as app
 
 # startup poutine
-app.main()
-app.me.verbose = False
-app.view.verbose = False #True 
-app.go()
+##app.main()
+##app.me.verbose = False
+##app.view.verbose = False #True 
+##app.go()
 # XXX the folowwing line represents the address of the remote host to test with
-remote = ("tzing", "10.10.10.66") # It must have a miville running with standard port numbers.
-previous = None 
+##remote = ("tzing", "10.10.10.66") # It must have a miville running with standard port numbers.
+##previous = None 
 
-class Test_Network_Test(unittest.TestCase):
+class Dont_Test_Network_Test(unittest.TestCase):
     """
     Integration tests for network tests.
     
