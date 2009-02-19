@@ -105,7 +105,7 @@ class AddressBook(object):
         self.write()
         return True
 
-    def modify(self, name=None, new_name=None, address=None, port=None, connector=None):
+    def modify(self, name=None, new_name=None, address=None, port=None, setting=None, connector=None):
         """
         Changes one or more attributes of a contact.
         If no name is given, modify the selected contact.
@@ -129,6 +129,7 @@ class AddressBook(object):
         contact.set_port(port)
         contact.set_address(address)
         contact.assign_connector(connector)
+        contact.set_setting(setting)
 
         self.write()
         return True
@@ -378,7 +379,11 @@ class Contact(object):
         if not isinstance(setting, int):    #TODO: validate if the setting exist
             raise AddressBookError, "The 'setting' arguments should be an integer. Got %s of type %s." % (setting, type(setting))
         self.setting = setting
-
+    
+    def set_setting(self, setting):
+        if setting != None:
+            self.setting = int(setting)
+    
     def set_address(self, address):
         """
         Set the address attribute of the contact in function of is kind
