@@ -7,7 +7,7 @@ clean:
 check: test_addressbook.py test_com_chan.py \
 		test_common.py test_devices.py test_i18n.py \
 		test_log.py test_network.py test_observer.py \
-		test/solo_test_telnet_settings.py 
+		solo_test_telnet_settings.py 
 
 %.py: 
 	trial test/$@
