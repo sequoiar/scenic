@@ -15,6 +15,9 @@ check: test_com_chan.py test_addressbook.py \
 	@echo ==================== test/$@ ======================
 	trial test/$@
 
+pylint:
+	@echo Checks with pylint if python files are buzzwords-compliant in $(PWD)
+	find . -name \*.py -exec pylint {} \;
 
 html:
 	@echo Do some html in $(PWD)
