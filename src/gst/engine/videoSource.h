@@ -1,5 +1,5 @@
 // videoSource.h
-// Copyright (C) 2009 Société des arts technologiques (SAT)
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
 // http://www.sat.qc.ca
 // All rights reserved.
 // This file is part of [propulse]ART.

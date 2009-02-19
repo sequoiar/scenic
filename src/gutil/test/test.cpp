@@ -1,5 +1,5 @@
 /* GTHREAD-QUEUE-PAIR - Library of Thread Queue Routines for GLIB
- * Copyright (C) 2009 Société des arts technologiques (SAT)
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
  *
