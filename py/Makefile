@@ -6,6 +6,7 @@ clean:
 
 check:
 	@echo Do tests in $(PWD)
+	rm test/*.pyc
 	trial test/solo_test_telnet_settings.py
 	trial test
 	
