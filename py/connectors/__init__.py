@@ -132,9 +132,15 @@ class Connection(object):
         self.stop()
 
     def com_chan_started_client(self):
-        raise NotImplementedError, 'com_chan_started_client() method not implemented for this connector: %s.' % self.contact.connector
+        self._com_chan_started_client()
 
     def com_chan_started_server(self):
+        self._com_chan_started_server()
+
+    def _com_chan_started_client(self):
+        raise NotImplementedError, 'com_chan_started_client() method not implemented for this connector: %s.' % self.contact.connector
+
+    def _com_chan_started_server(self):
         raise NotImplementedError, 'com_chan_started_server() method not implemented for this connector: %s.' % self.contact.connector
 
     def cleanup(self):

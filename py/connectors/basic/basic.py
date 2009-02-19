@@ -238,13 +238,13 @@ class ConnectionBasic(Connection):
 #        Connection.accepted(self)
 #        self.send_settings()
 
-    def com_chan_started_client(self, action="join"):
+    def _com_chan_started_client(self, action="join"):
         if action == "media":
             self.send_settings()
         elif action == "network_test":
             self.api.network_test.client_started(self) 
 
-    def com_chan_started_server(self, action="join"):
+    def _com_chan_started_server(self, action="join"):
         if action == "media":
             self.com_chan.add(self.settings)
         elif action == "network_test":
