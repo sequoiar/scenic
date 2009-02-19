@@ -18,6 +18,14 @@ def start(api):
     except CommandNotFoundError, e:
         api.notify(api, e.message, "error")
 
+def stop():
+    """
+    The idea is to call the destructors of every drivers in order to 
+    remove any reactor.callLater
+    """
+    del devices.managers['audio'].drivers['jackd']
+    del devices.managers['video'].drivers['v4l2']
+
 # def load_drivers(api):
 #     # TODO !!!
 #     """

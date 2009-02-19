@@ -104,7 +104,6 @@ class Core(Subject):
         return engines
 
 
-
 def chk_ob(core):
     """
         I guess this is a function to print some variables 
@@ -128,7 +127,7 @@ def exit():
     """on application exit"""
     if core.adb != None:
         core.adb.write(False)
-
+    devices.stop()
 
 if __name__ == '__main__':
     log.start()

@@ -45,7 +45,7 @@ import os, sys
 
 # Twisted imports
 from twisted.internet import reactor #, protocol
-from twisted.internet.error import AlreadyCalled # for when we cancel twice an event.
+from twisted.internet.error import AlreadyCalled, AlreadyCancelled # for when we cancel twice an event.
 # App imports
 from utils import log, commands
 from errors import DeviceError
@@ -253,6 +253,8 @@ class Driver(object): #shell.ShellCommander):
             try:
                 self._delayed_id.cancel()
             except AttributeError:
+                pass
+            except AlreadyCancelled:
                 pass
             except AlreadyCalled:
                 pass
