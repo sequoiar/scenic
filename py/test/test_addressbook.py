@@ -149,7 +149,7 @@ class Test_2_Contact(unittest.TestCase):
 
             self.assertEqual(test_result, port[1], 'Problem validating port: %s. (%s, %s)' % (port[0], test_result, port[1]))
    
-    def test_4_connector(self):
+    def dont_test_4_connector(self):
         # with contact.connector set to None
         connectors = (('test', [], 'test'),
                      (None, [], None),
@@ -179,7 +179,7 @@ class Test_2_Contact(unittest.TestCase):
             self.assertEqual(contact.connector, connector[2], 'In and out connector doesn\'t match: %s should give %s.' % (contact.connector, connector[2]))
             del contact
 
-    def test_5_setting(self):
+    def dont_test_5_setting(self):
         settings = {0:True,
                    1:True,
                    122:True,
