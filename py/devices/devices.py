@@ -253,6 +253,7 @@ class Driver(object): #shell.ShellCommander):
             try:
                 self._delayed_id.cancel()
             except AttributeError:
+                log.info("No such delayed call for driver !")
                 pass
             except AlreadyCancelled:
                 pass

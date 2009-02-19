@@ -96,7 +96,7 @@ view = None
 def main():
     global core, api, me, view
     miville.main()
-    go(0.25)
+    go(0.5)
     core = miville.core
     api = miville.core.api
     me = IPythonController()

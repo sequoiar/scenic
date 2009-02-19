@@ -46,19 +46,21 @@ class Core(Subject):
         self.uis = None
         self.api = None
         self.startup()
+        self.adb = None
+        # more stuff
+        self.engines = None
+        self.settings = None
+        self.com_chan_port = None
+
 
     def startup(self):
         """
         Actually does the job that should be done in __init__
         (defines attributes and does the startup routine.)
 
-        Deprecated (IMHO) aalex
-        Should be removed and merged to __init__
-
         If Miville is started by any argument on the CLI, its basic connector will listen on port 
         37055 instead of the default 37054. Useful for debugging.
         """
-        # TODO: merge with __init__
 
         self.api = api.ControllerApi(self.notify)
         devices.start(self.api) # api as an argument
@@ -69,6 +71,9 @@ class Core(Subject):
         self.settings = settings.Settings()
         
         #self.curr_setting = self.settings.select()
+        # TODO: causes a couldn't listen error if another miville runs on the same port. 
+        # and makes the application crash. 
+        # maybe something more elegant could be done.
         self.connectors = connectors.load_connectors(self.api)
         self.com_chan_port = 37054
         if len(sys.argv) > 1:
@@ -124,13 +129,21 @@ def main():
 
 def exit():
     
-    """on application exit"""
+    """on application exit
+    Cancel delayed calls, stop ports, disconnect connections. 
+    """
+    # TODO : Cancel delayed calls, stop ports, disconnect connections.
     try:
         if core.adb != None:
             core.adb.write(False)
     except AttributeError:
         pass
     devices.stop()
+    reactor.disconnectAll()
+    reactor.removeAll()
+    #reactor.stop()
+    # that'll do something, but maybe not what you expect.
+    #del reactor
 
 if __name__ == '__main__':
     log.start()
@@ -141,4 +154,5 @@ if __name__ == '__main__':
     except CannotListenError, e:
         log.error(str(e))
 	
-    exit()       
+    exit()
+

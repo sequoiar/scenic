@@ -26,11 +26,11 @@ Usage: trial test/test_network.py
 """ 
 # system imports
 
-##import unittest
-##import sys
+import unittest
+import sys
 
 # app imports
-##import imiville as app
+import imiville as app
 
 # startup poutine
 ##app.main()

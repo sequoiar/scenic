@@ -404,7 +404,7 @@ def start(subject):
         print e.message
     tester = NetworkTester()
     tester.api = subject
-    reactor.callLater(0.01, tester._start_iperf_server_process)
+    #XXX reactor.callLater(0.01, tester._start_iperf_server_process)
     
     #client = NetworkTester()
     #client.api = subject

@@ -32,18 +32,16 @@ import sys
 import devices
 import imiville as app
 
-# startup poutine
-app.main()
-app.me.verbose = False
-app.view.verbose = False
-app.go()
-
-class Dont_Test_devices_v4l2(unittest.TestCase):
+class Test_01_devices_v4l2(unittest.TestCase):
     """
     Integration tests for v4l2 devices.
     """
     def test_01_video0(self):
-        app.go()
+        # startup poutine XXX
+        app.main()
+        app.me.verbose = False
+        app.view.verbose = False
+        
         app.api.devices_list(app.me, 'video')
         value = app.last.value
         if not isinstance(value, list):
@@ -100,7 +98,8 @@ class Dont_Test_devices_v4l2(unittest.TestCase):
                     self.fail('Height should has been changed to %d but is %d.' % (h, val_h))
                 else:
                     pass
-class Dont_Test_devices_jackd(unittest.TestCase):
+
+class Test_02_devices_jackd(unittest.TestCase):
     """
     Integration tests for jackd devices.
     """
@@ -109,7 +108,7 @@ class Dont_Test_devices_jackd(unittest.TestCase):
         app.api.devices_list(app.me, 'audio')
         value = app.last.value
         if not isinstance(value, list):
-            self.fail('Last notify should give a list.')
+             self.fail('Last notify should give a list.')
         elif len(value) == 0:
             pass #self.fail("There are no jackd running on this computer.")
         elif not isinstance(value[0], devices.Device):
@@ -127,4 +126,6 @@ class Dont_Test_devices_jackd(unittest.TestCase):
                 x = value['rate'].get_value()
             except IndexError:
                 self.fail("Device has no rate attribute.")
-
+    
+    def test_03_stop_devices(self):
+        app.miville.exit()

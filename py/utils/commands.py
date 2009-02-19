@@ -75,7 +75,7 @@ def _command_start(executable, command):
         args = []
         if len(command) > 1:
             args = command[1:]
-        deferred = utils.getProcessOutputAndValue(executable, args, os.environ)
+        deferred = utils.getProcessOutputAndValue(executable, args, os.environ, '.', reactor)
         # setTimeout(self, seconds, timeoutFunc=timeout, *args, **kw):
         # #TODO: get rid of this and, instead, change utils.commands and add it a 
         # ProcessProtocol which supports a timeout. 

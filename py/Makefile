@@ -1,8 +1,10 @@
 all:
 	@echo Do some code validation in $(PWD)
+	find . -name \*.py -exec py_compilefiles {} \;
 
 clean:
 	@echo Do some cleanup in $(PWD) 
+	find . -name \*.pyc -exec rm {} \;
 
 check: test_com_chan.py test_addressbook.py \
 		test_common.py test_devices.py test_i18n.py \
@@ -10,6 +12,7 @@ check: test_com_chan.py test_addressbook.py \
 		solo_test_telnet_settings.py 
 
 %.py: 
+	@echo ==================== test/$@ ======================
 	trial test/$@
 
 
