@@ -38,7 +38,7 @@ app.me.verbose = False
 app.view.verbose = False
 app.go()
 
-class Test_devices_v4l2(unittest.TestCase):
+class Dont_Test_devices_v4l2(unittest.TestCase):
     """
     Integration tests for v4l2 devices.
     """
@@ -100,7 +100,7 @@ class Test_devices_v4l2(unittest.TestCase):
                     self.fail('Height should has been changed to %d but is %d.' % (h, val_h))
                 else:
                     pass
-class Test_devices_jackd(unittest.TestCase):
+class Dont_Test_devices_jackd(unittest.TestCase):
     """
     Integration tests for jackd devices.
     """

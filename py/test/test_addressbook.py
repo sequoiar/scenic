@@ -40,7 +40,7 @@ addressbook.log = utils.log.start('error', 1, 0, 'adb')
             
 class Test_1_Ip_range(unittest.TestCase):
     
-    def dont_test_ip_range(self):
+    def test_ip_range(self):
         addresses = {'123.123.123.123':True,
                      u'123.123.123.123':True,
                      '423.123.123.123':False,
@@ -59,7 +59,7 @@ class Test_1_Ip_range(unittest.TestCase):
   
 class Test_2_Contact(unittest.TestCase):
     
-    def dont_test_1_name(self):
+    def test_1_name(self):
         names = {'':False,
                  'a':True,
                  ' ':True,
@@ -82,7 +82,7 @@ class Test_2_Contact(unittest.TestCase):
 
             self.assertEqual(test_result, result, 'Problem validating name: %s. (%s, %s)' % (name, test_result, result))
             
-    def dont_test_2_kind_address(self):
+    def test_2_kind_address(self):
         addresses = (('', False),
                      ('240.123.123.123', True, 'ip', 'basic'),
                      ('23.123.45.222', True, 'ip', 'basic'),
@@ -114,7 +114,7 @@ class Test_2_Contact(unittest.TestCase):
                 
             self.assertEqual(test_result, address[1], 'Problem validating address: %s. (%s, %s)' % (address[0], test_result, address[1]))
                     
-    def dont_test_3_port(self):
+    def test_3_port(self):
         ports = (('', True),
                  (0, True),
                  ('0', True),
@@ -149,7 +149,7 @@ class Test_2_Contact(unittest.TestCase):
 
             self.assertEqual(test_result, port[1], 'Problem validating port: %s. (%s, %s)' % (port[0], test_result, port[1]))
    
-    def dont_test_4_connector(self):
+    def test_4_connector(self):
         # with contact.connector set to None
         connectors = (('test', [], 'test'),
                      (None, [], None),
@@ -179,7 +179,7 @@ class Test_2_Contact(unittest.TestCase):
             self.assertEqual(contact.connector, connector[2], 'In and out connector doesn\'t match: %s should give %s.' % (contact.connector, connector[2]))
             del contact
 
-    def dont_test_5_setting(self):
+    def test_5_setting(self):
         settings = {0:True,
                    1:True,
                    122:True,
@@ -222,7 +222,7 @@ class Test_3_AddressBook(unittest.TestCase):
         shutil.rmtree(os.environ['HOME'] + '/.sropulpof', True)
         os.environ['HOME'] = self.orig_home        
         
-    def dont_test_1_init(self):
+    def test_1_init(self):
         for filename, result in self.filenames.items():
             strip_filename = filename.strip()
             try:
