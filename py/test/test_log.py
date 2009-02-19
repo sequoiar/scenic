@@ -23,6 +23,7 @@ import os
 import sys
 import shutil
 from twisted.trial import unittest
+import tempfile
 
 from utils import log
 #test to_utf and open
@@ -41,12 +42,13 @@ class TestLog(unittest.TestCase):
     
     def setUp(self):
         self.orig_home = os.environ['HOME']
-        os.environ['HOME'] = '/var/tmp'
+        self.tmp_dir = tempfile.mkdtemp()
+        os.environ['HOME'] = self.tmp_dir
         log.start('debug', 1, 1, 'test')
 
     def tearDown(self):
-        shutil.rmtree(os.environ['HOME'] + '/.sropulpof', True)
         os.environ['HOME'] = self.orig_home        
+        shutil.rmtree(self.tmp_dir, True)      
         log.stop()
 
 #    def test_start(self):  

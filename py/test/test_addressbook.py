@@ -23,6 +23,7 @@ from twisted.trial import unittest
 import os
 import shutil
 import copy
+import tempfile
 
 import addressbook
 from addressbook import AddressBook, Contact, ip_range
@@ -216,11 +217,12 @@ class Test_3_AddressBook(unittest.TestCase):
 
     def setUp(self):
         self.orig_home = os.environ['HOME']
-        os.environ['HOME'] = '/var/tmp'
+        self.tmp_dir = tempfile.mkdtemp()
+        os.environ['HOME'] = self.tmp_dir
 
     def tearDown(self):
-        shutil.rmtree(os.environ['HOME'] + '/.sropulpof', True)
-        os.environ['HOME'] = self.orig_home        
+        os.environ['HOME'] = self.orig_home
+        shutil.rmtree(self.tmp_dir, True)      
         
     def test_1_init(self):
         for filename, result in self.filenames.items():
