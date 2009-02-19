@@ -125,8 +125,11 @@ def main():
 def exit():
     
     """on application exit"""
-    if core.adb != None:
-        core.adb.write(False)
+    try:
+        if core.adb != None:
+            core.adb.write(False)
+    except AttributeError:
+        pass
     devices.stop()
 
 if __name__ == '__main__':

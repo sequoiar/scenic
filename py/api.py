@@ -86,7 +86,7 @@ class ControllerApi(object):
 #        self.streams = self.all_streams[self.curr_streams]
         self.connectors = core.connectors
         self.connection = None
-        self.network_tester = network.start(self) 
+        self.network_tester = network.start(self)  # TODO: move to core.
 
     ### Contacts ###
 
@@ -757,7 +757,7 @@ class ControllerApi(object):
                 kinds = {
                     "unidirectional":network.KIND_UNIDIRECTIONAL, 
                     "dualtest":network.KIND_DUALTEST_CLIENT, 
-                    "unidirectional":network.KIND_UNIDIRECTIONAL, 
+                    "tradeoff":network.KIND_TRADEOFF, 
                 }
                 try:
                     kind = kinds[kind]

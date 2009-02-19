@@ -221,7 +221,8 @@ class ConnectionBasic(Connection):
 
     def _connection_lost(self, reason=protocol.connectionDone):
         self._state = DISCONNECTED
-        log.info('Lost the connection. Reason:\n%s' % reason)
+        if reason != protocol.connectionDone: # quiet, please
+            log.info('Lost the connection. Reason:\n%s' % reason)
 
     def _close_connection(self):
         try:

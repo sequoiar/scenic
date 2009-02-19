@@ -218,6 +218,8 @@ class CliController(TelnetServer):
                           'j': 'join',
                           'e': 'exit',
                           'q': 'quit',
+                          'n': 'network',
+                          'd': 'devices',
                           'h': 'help'
                           }
 
@@ -724,6 +726,49 @@ class CliController(TelnetServer):
             cp.print_description()
         else:
             cp.print_help()
+
+
+    def _network(self, line):
+        """
+        Starts (or stop) a network test.
+        
+        Usage:
+        network -b 30 -t 10 -k unidirectional
+        """
+        cp = CliParser(self, prog=line[0], description="Manages the audio/video/data devices.")
+        # booleans (action)
+        cp.add_option("-z", "--description", action='store_true', help="Displays description") # TODO: add examples
+        cp.add_option("-s", "--start", action='store_true', help="Starts a test")
+        cp.add_option("-q", "--stop", action='store_true', help="Stops the current test")
+        #cp.add_option("-h", "--help", action='store_true', help="Displays help")
+        # strings options
+        cp.add_option("-k", "--kind", type='string', help="Kind of network test. (unidirectional | tradeoff | dualtest)")
+        # int options
+        cp.add_option("-b", "--bandwidth", type="int", help="Bandwidth in megabits. (default:1)")
+        cp.add_option("-d", "--duration", type="int", help="Duration in seconds. (default:10)")
+        (options, args) = cp.parse_args(line)
+        
+        # default values : 
+        bandwidth = 1
+        duration = 10 
+        kind = "unidirectional"
+        caller = self
+
+        if options.description:
+            cp.print_description()
+        elif options.stop:
+            self.core.network_test_stop(caller)
+        elif  options.start:
+            if options.kind:
+                kind = options.kind
+            if options.bandwidth:
+                bandwidth = options.bandwidth
+            if options.duration:
+                duration = options.duration
+            self.core.network_test_start(caller, bandwidth, duration, kind)
+        else: # options.help
+            cp.print_help()
+
 
 class CliParser(optparse.OptionParser):
     """
@@ -1566,8 +1611,19 @@ class CliView(Observer):
                 for device in data:
                     msg.append("\t%s" % (device.name))
         self.write("\n".join(msg), True)
-
-
+    
+    def _network_test_done(self, origin, data):
+        """
+        Results of a network test. 
+        See network.py
+        :param data: a dict with iperf statistics
+        """
+        # TODO : make more beautiful
+        txt = "\n" + "Network test results:\n"
+        for k in data:
+            txt += k + "\t\t: " + str(data[k])
+        self.write(txt, True)
+        
 
 def bold(msg):
     return "%s[1m%s%s[0m" % (ESC, msg, ESC)
