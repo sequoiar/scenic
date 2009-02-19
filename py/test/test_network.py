@@ -41,7 +41,7 @@ Usage: trial test/test_network.py
 ##remote = ("tzing", "10.10.10.66") # It must have a miville running with standard port numbers.
 ##previous = None 
 
-class Dont_Test_Network_Test(unittest.TestCase):
+class Dont_Test_Network_Test(): #unittest.TestCase):
     """
     Integration tests for network tests.
     
