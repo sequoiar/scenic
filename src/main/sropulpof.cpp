@@ -48,13 +48,13 @@ int telnetServer(int,int);
 // 2way audio and video
 short pof::run(int argc, char **argv)
 {
-    char pid;
-    bool send = false;
-    bool recv = false;
-    bool full = false;
-    bool disableAudio = false;
-    bool disableVideo = false;
     OptionArgs options;
+    char pid;
+    int send = false;
+    int recv = false;
+    int full = false;
+    int disableAudio = false;
+    int disableVideo = false;
     char *ip = 0;
     char *videoCodec = 0;
     char *audioCodec = 0;
@@ -67,10 +67,10 @@ short pof::run(int argc, char **argv)
     int screenNum = 0;
     int numChannels = NUM_CHANNELS;
     
-    bool version = false;
+    int version = false;
 
-    options.add(new BoolArg(&send,"sender", 's', "sender"));
     options.add(new BoolArg(&recv,"receiver", 'r', "receiver"));
+    options.add(new BoolArg(&send,"sender", 's', "sender"));
     options.add(new StringArg(&ip, "address", 'i', "address", "provide ip address"));
     options.add(new StringArg(&videoCodec, "videocodec", 'v', "videocodec", "h264"));
     options.add(new StringArg(&audioCodec, "audiocodec", 'a', "audiocodec", "vorbis raw mp3"));
@@ -82,13 +82,13 @@ short pof::run(int argc, char **argv)
     options.add(new BoolArg(&disableVideo,"disablevideo", 'z', "disable video"));
     options.add(new StringArg(&videoDevice, "videodevice", 'd', "device", "/dev/video0 /dev/video1"));
     options.add(new IntArg(&screenNum, "screen", 'n', "screen", "xinerama screen num"));
-    options.add(new BoolArg(&version, "version", '\0', "version number"));
+    options.add(new BoolArg(&version, "version", 'w', "version number"));
     options.add(new IntArg(&numChannels, "numChannels", 'c', "numChannels", "2"));
     options.add(new IntArg(&videoBitrate, "videobitrate", 'x', "videobitrate", "3000000"));
 
     //telnetServer param
     int serverport=0;
-    options.add(new IntArg(&serverport, "serverport", '\0', "run as server", "port to listen on"));
+    options.add(new IntArg(&serverport, "serverport", 'y', "run as server", "port to listen on"));
 
     options.parse(argc, argv);
 
@@ -97,7 +97,7 @@ short pof::run(int argc, char **argv)
         LOG_INFO("version " << PACKAGE_VERSION << '\b' << RELEASE_CANDIDATE);
         return 0;
     }
-
+    LOG_WARNING("send " << send << " r " << recv); 
     if (send)
         pid = 's';
     else if (recv)
