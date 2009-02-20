@@ -14,5 +14,5 @@ pylint:
 done 
 	for pfile in *.py; do \
     if [ $$pfile != "*.py" ]; then \
-    pylint $$pfile; fi; \
+    pylint *.py; break; fi; \
 done 
