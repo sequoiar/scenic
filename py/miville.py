@@ -42,27 +42,15 @@ class Core(Subject):
     """Main class of the application and containing the 'Model' in the MVC"""
         
     def __init__(self):
-        Subject.__init__(self)
-        self.uis = None
-        self.api = None
-        self.adb = None
-        # more stuff
-        self.engines = None
-        self.settings = None
-        self.com_chan_port = 37054
-        # HAS TO BE LAST !
-        self.startup()
-
-
-    def startup(self):
         """
-        Actually does the job that should be done in __init__
-        (defines attributes and does the startup routine.)
+        defines attributes and does the startup routine.
 
         If Miville is started by any argument on the CLI, its basic connector will listen on port 
         37055 instead of the default 37054. Useful for debugging.
         """
-
+        Subject.__init__(self)
+        self.uis = None
+        self.com_chan_port = 37054
         self.api = api.ControllerApi(self.notify)
         devices.start(self.api) # api as an argument
         self.load_uis()
