@@ -31,4 +31,6 @@ moreclean:
         echo "Clearing in $$i..."; \
         (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) moreclean); done
 
+distclean: clean
+
 .PHONY: html doxygen install clean moreclean

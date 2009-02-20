@@ -25,6 +25,8 @@ locale:
 	done;
 
 clean:
+
+distclean: clean
 	
 
 .PHONY: locale
