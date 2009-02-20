@@ -7,12 +7,16 @@ uncrustify:
 	-uncrustify -c $(top_srcdir)/utils/uncrustify.cfg -q --no-backup *.cpp
 	-uncrustify -c $(top_srcdir)/utils/uncrustify.cfg -q --no-backup *.h
 
-pylint: 
+pylint: $(addsuffix _pylint.txt,$(basename $(wildcard *.py)))
 	for i in $(SUBDIRS); do \
     echo "Pass a pylint brush in $$i"; \
     (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) pylint); \
 done 
-	for pfile in *.py; do \
+
+%_pylint.txt: %.py
+		pylint $^ > $@ 
+
+#	for pfile in *.py; do \
     if [ $$pfile != "*.py" ]; then \
-    pylint *.py; break; fi; \
+        pylint *.py; break; fi; \
 done 
