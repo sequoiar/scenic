@@ -300,18 +300,18 @@ class NetworkTester(object):
         """
         reactor.callLater(self.current_latency / 2.0, self._start_iperf_client)
         
-    def _setup_com_chan(self):
-        """
-        Registers com chan callbacks
-        """
-        # TODO
-        com = self.current_com_chan
-        if self.current_kind == KIND_DUALTEST_CLIENT:
-            pass
-            # :*args: is a tuple of data, whose 0th element is the name of the remote procedure to call.
-            # callRemote(self, *args):
-        else: # SERVER
-            pass
+    #def _setup_com_chan(self):
+    #    """
+    #    Registers com chan callbacks
+    #    """
+    #    # TODO
+    #    com = self.current_com_chan
+    #    if self.current_kind == KIND_DUALTEST_CLIENT:
+    #        pass
+    #        # :*args: is a tuple of data, whose 0th element is the name of the remote procedure to call.
+    #        # callRemote(self, *args):
+    #    else: # SERVER
+    #        pass
         
 
 
@@ -388,7 +388,40 @@ class NetworkTester(object):
             else:
                 self.iperf_server_is_running = True
     
-    def on_com_chan_connected(self, com_chan_instance, role="client"):
+    def _handle_comm_network_start_test(self, *args):
+        """
+        handles com_chan message "network_start_test"
+
+        :param *args: list [bandwidth, duration, kind]
+        bandwidth is a int
+        duration is a int
+        kind is a int (constant)
+        """
+        pass
+        #TODO
+
+
+    def _handle_comm_network_stop_test(self, *args):
+        """
+        handles com_chan message "network_stop_test"
+
+        :param *args: empty list
+        """
+        pass
+        # TODO
+    
+    def _handle_comm_network_test_results(self, *args):
+        """
+        handles com_chan message "network_test_results"
+
+        :param *args: list [kind, stats]
+        kind is a int
+        stats is a dict
+        """
+        pass
+        # TODO
+
+    def on_com_chan_connected(self, com_channel, role="client"):
         """
         Called from the Connector class in its com_chan_started_client or com_chan_started_server method.
 
@@ -401,6 +434,21 @@ class NetworkTester(object):
         # 
         #self.current_com_chan = 
         pass
+        # calls to ComChannel.add(callback, key) 
+        com_channel.add(self._handle_comm_network_start_test, network_start_test)
+        com_channel.add(self._handle_comm_network_stop_test, network_stop_test)
+        com_channel.add(self._handle_comm_network_test_results, network_test_results)
+        log.info("registered com_chan callbacks")
+        log.info("registered com_chan callbacks")
+        log.info("registered com_chan callbacks")
+        log.info("registered com_chan callbacks")
+        log.info("registered com_chan callbacks")
+        log.info("registered com_chan callbacks")
+        log.info("registered com_chan callbacks")
+        log.info("registered com_chan callbacks")
+        log.info("registered com_chan callbacks")
+        log.info("registered com_chan callbacks")
+        #callRemote(self, *args):
         #print "on_com_chan_connected"
 
     def on_com_chan_disconnected(self, com_chan_instance):
@@ -427,8 +475,8 @@ def start(subject):
     #XXX reactor.callLater(0.01, tester._start_iperf_server_process)
     
     connectors.register_callback("networktest_on_connect", tester.on_com_chan_connected, event="connect")
-    connectors.register_callback("networktest_on_disconnect", tester.on_com_chan_connected, event="disconnect")
-
+    #connectors.register_callback("networktest_on_disconnect", tester.on_com_chan_disconnected, event="disconnect")
+    
     #client = NetworkTester()
     #client.api = subject
     return tester

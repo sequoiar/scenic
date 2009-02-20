@@ -38,7 +38,7 @@ from twisted.protocols.basic import LineReceiver
 from utils import log
 from connectors import Connection
 from connectors.states import *
-
+import errors
 
 log = log.start('debug', 1, 0, 'basic')
 
@@ -111,11 +111,16 @@ class BasicServer(LineReceiver):
     def accept(self):
         self.state = IDLE
         contact = self.api.client_contact(self.addr.host, self.client_port)
-        contact.connection = ConnectionBasic(contact, self.api)
-        contact.state = CONNECTING
-        self.sendLine('ACCEPT %s' % self.api.get_com_chan_port())
+        if True:
+        #try:
+            contact.connection = ConnectionBasic(contact, self.api)
+        #except errors.ConnectionError, e:
+            #notify(self, caller, value, key=None):
+        #    self.api.notify(None, e.message, "error")
+        #else:
+            contact.state = CONNECTING
+            self.sendLine('ACCEPT %s' % self.api.get_com_chan_port())
         self.transport.loseConnection()
-
 
 
 class BasicServerFactory(protocol.ServerFactory):

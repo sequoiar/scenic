@@ -583,7 +583,7 @@ class ControllerApi(object):
                 connection.start()
                 result = 'Trying to connect with %s (%s)...' % (contact.name, contact.address)
             except ConnectionError, err:
-                result = err
+                result = err.message # changed err for err.message XXX
             self.notify(caller, result)
         else:
             self.notify(caller, 'Cannot start connection. No valid contact selected.')

@@ -57,7 +57,7 @@ class Connection(object):
             port = self.api.get_default_port(self.contact.connector)
         self.address = '%s:%s' % (self.contact.address, port)
         if self.address in connections:
-            raise ConnectionError, 'Cannot connect. This address \'%s\' already have a connection (%s).' % (self.address, self.contact.name)
+            raise ConnectionError, 'Cannot connect. This address \'%s\' already have a connection (%s). %s' % (self.address, self.contact.name, str(connections))
         connections[self.address] = self
 
     def start(self):
@@ -151,7 +151,7 @@ class Connection(object):
 
     def cleanup(self):
         for callback in disconnect_callbacks.values():
-            callback(self) # TODO: how can we know if we were server or client ?
+            callback(self.com_chan) # TODO: how can we know if we were server or client ?
         if hasattr(self.com_chan, 'disconnect'):
             self.com_chan.disconnect()
         if self.contact.state == DISCONNECTING:
