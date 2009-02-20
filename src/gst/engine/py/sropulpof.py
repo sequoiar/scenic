@@ -107,7 +107,7 @@ def runAsSender(options):
         else:
             vConfig = VideoSourceConfig(options.videoSource, options.videoBitrate, options.videoDevice)
     
-    vTx = buildVideoSender(vConfig, options.ip, options.videoCodec, options.videoPort)
+        vTx = buildVideoSender(vConfig, options.ip, options.videoCodec, options.videoPort)
 
     if not options.disableAudio:
         aConfig = AudioSourceConfig(options.audioSource, options.numChannels)
