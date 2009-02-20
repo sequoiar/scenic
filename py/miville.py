@@ -45,12 +45,13 @@ class Core(Subject):
         Subject.__init__(self)
         self.uis = None
         self.api = None
-        self.startup()
         self.adb = None
         # more stuff
         self.engines = None
         self.settings = None
         self.com_chan_port = 37054
+        # HAS TO BE LAST !
+        self.startup()
 
 
     def startup(self):
