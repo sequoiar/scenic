@@ -180,7 +180,7 @@ void RtpAudioTestSuite::start_stop_8ch_jack()
 {
     const int NUM_CHANNELS = 8;
     if (id_ == 0) {
-        boost::shared_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver(ports::IP, "vorbis"));
+        boost::shared_ptr<AudioReceiver> rx(audiofactory::buildAudioReceiver(ports::IP, "raw"));
 
         playback::start();
 
@@ -192,7 +192,7 @@ void RtpAudioTestSuite::start_stop_8ch_jack()
     }
     else {
         AudioSourceConfig aConfig("jackaudiosrc", NUM_CHANNELS);
-        boost::shared_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig, ports::IP, "vorbis"));
+        boost::shared_ptr<AudioSender> tx(audiofactory::buildAudioSender(aConfig, ports::IP, "raw"));
 
         playback::start();
 

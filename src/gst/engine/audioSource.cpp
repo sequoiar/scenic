@@ -365,8 +365,8 @@ void AudioJackSource::sub_init()
 #endif
     // /TODO: fine tune this in conjunction with jitterbuffer
     
-    //g_object_set(G_OBJECT(source_), "buffer-time", 150000, NULL);
-    //g_object_set(G_OBJECT(source_), "latency-time", 7500, NULL);
+    //g_object_set(G_OBJECT(source_), "buffer-time", 100000LL, NULL);
+    //g_object_set(G_OBJECT(source_), "latency-time", 7500LL, NULL);
 
     // otherwise jackaudiosrc defaults to 2 channels
     std::ostringstream capsStr;

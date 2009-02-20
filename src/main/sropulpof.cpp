@@ -110,12 +110,14 @@ short pof::run(int argc, char **argv)
     if(serverport)
         return telnetServer(pid == 's', serverport);
 
+    if (disableVideo && disableAudio)
+        THROW_ERROR("argument error: can't disable video and audio. see --help");
     if(ip == 0) 
         THROW_ERROR("argument error: missing ip. see --help");
     if(!disableVideo && videoCodec == 0)
         THROW_ERROR("argument error: missing videoCodec. see --help");
-    if (disableVideo && disableAudio)
-        THROW_ERROR("argument error: can't disable video and audio. see --help");
+    if(!disableAudio && audioCodec == 0)
+        THROW_ERROR("argument error: missing audioCodec. see --help");
 
     if (pid == 'r') {
         shared_ptr<VideoReceiver> vRx;
@@ -190,7 +192,6 @@ short pof::run(int argc, char **argv)
     return 0;
 }
 
-
 int main(int argc, char **argv)
 {
     try {
@@ -198,7 +199,7 @@ int main(int argc, char **argv)
     }
     catch (Except e)
     {
-        //std::cerr << e.msg_;
+        LOG_DEBUG(e.msg_);
         return 1;
     }
     return 0;
