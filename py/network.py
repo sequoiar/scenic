@@ -494,7 +494,7 @@ class NetworkTester(object):
         #self.current_com_chan = 
         pass
         # calls to ComChannel.add(callback, key) 
-        com_channel.add(self.on_remote_message, network_test) # one handler for all messages
+        com_channel.add(self.on_remote_message, "network_test") # one handler for all messages
         self.current_com_chan = com_channel # Maybe not necessary
         log.info("registered com_chan callback")
         #log.info("registered com_chan callbacks")
