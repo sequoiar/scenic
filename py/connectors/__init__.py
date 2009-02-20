@@ -71,6 +71,8 @@ class Connection(object):
         raise NotImplementedError, '_start() method not implemented for this connector: %s.' % self.contact.connector
 
     def accepted(self, port=com_chan.PORT):
+        if port is None:
+            port = com_chan.PORT
         self.remote_com_chan_port = int(port)
         self._accepted()
         self.api.notify(self, 'The invitation to %s (%s) was accepted.' % (self.contact.name, self.contact.address), 'answer')
