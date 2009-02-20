@@ -50,15 +50,14 @@ import connectors
 from errors import CommandNotFoundError
 log = log.start('debug', 1, 0, 'network')
 
-
-
 # -------------------- constants -----------------------------------
 STATE_IDLE = 0
 KIND_UNIDIRECTIONAL = 1
 KIND_TRADEOFF = 2
-KIND_DUALTEST_CLIENT = 3
-KIND_DUALTEST_SERVER = 4
-STATE_QUERIED_FOR_DUALTEST = 5
+KIND_DUALTEST = 3
+# KIND_DUALTEST_CLIENT = 3
+# KIND_DUALTEST_SERVER = 4
+STATE_QUERIED = 5
 STATE_WAITING_REMOTE_ANSWER = 6
 STATE_ANSWERED_OK = 7
 
@@ -176,7 +175,7 @@ class IperfServerProcessProtocol(protocol.ProcessProtocol):
 #KIND_TRADEOFF = 2
 #KIND_DUALTEST_CLIENT = 3
 #KIND_DUALTEST_SERVER = 4
-#STATE_QUERIED_FOR_DUALTEST = 5
+#STATE_QUERIED = 5
 #STATE_WAITING_REMOTE_ANSWER = 6
 #STATE_ANSWERED_OK = 7
 
@@ -187,6 +186,7 @@ class NetworkTester(object):
     The `iperf` command can be used either as a client or a server.
     It is the client that initiates the testing.
     """
+
     def __init__(self):
         # globals
         self.iperf_server = None
@@ -204,8 +204,8 @@ class NetworkTester(object):
         self.current_com_chan = None # com_chan
         self.current_kind = None
         self.current_latency = 0 # milliseconds
-        self.current_ping_time = 0 # UNIX timestamp
-
+        self.current_ping_started_time  = 0 # UNIX timestamp
+        
         # -------- settings
         self.accept_timeout = 20 # timeout before auto rejecting dualtest query
         self.remote_results_timeout = 5 # how many extra seconds over the duration of a test to wait for remote stats before giving up.
@@ -269,7 +269,7 @@ class NetworkTester(object):
                     else:    
                         iperf_stats.update(extra_arg) # appends the infos to the results dict
                         self.state = STATE_IDLE 
-
+                        
                         self.notify_api(caller, 'info', "iperf stats for IP %s: %s" % (ip, str(iperf_stats)))
                         self.notify_api(caller, "network_test_done", iperf_stats)
                 else:
@@ -324,24 +324,25 @@ class NetworkTester(object):
         bandwidth_megabits : int
         server_addr: str
         """
-        if self.state == STATE_IDLE:
+        if self.state != STATE_IDLE:
+            self.notify_api(caller, "error", "A network test is already being done.")
+        else:
+            self.current_stats_local = None # dict
+            self.current_stats_remote = None # dict
+            
             self.current_remote_addr = server_addr
             self.current_bandwidth = bandwidth_megabits # Mbits
             self.current_duration = duration # seconds
             self.current_caller = caller # instance
-            self.current_com_chan = com_chan # only neededi for dualtests
-            self.current_stats_local = None # dict
-            self.current_stats_remote = None # dict
+            if com_chan is not None:
+                self.current_com_chan = com_chan # only neededi for dualtests
             self.current_kind = kind
             
-            if kind in (KIND_UNIDIRECTIONAL, KIND_TRADEOFF):
-                self._start_iperf_client()
-            else:
-                # KIND_DUALTEST
-                # TODO
-                pass
-        else:
-            self.notify_api(caller, "error", "Network test is already happening.")
+            self.current_ping_started_time = self._get_time_now()
+            self.state = STATE_WAITING_REMOTE_ANSWER 
+            if kind == KIND_DUALTEST:
+                self._start_iperf_server_process()
+            self._send_message("ping")
 
     def _start_iperf_client(self):
         """
@@ -372,6 +373,15 @@ class NetworkTester(object):
         else:
            self.state = self.current_kind # set the state to the current kind
 
+    def _stop_iperf_server_process(self):
+        """
+        Wrapper to simplify calling kill_server_process
+        """
+        if self.iperf_server_is_running:
+            self.kill_server_process(self.iperf_server)
+        else:
+            log.error("Called _stop_iperf_server_process while not running.")
+    
     def _start_iperf_server_process(self):
         """
         Starts `iperf -s -u`
@@ -384,42 +394,91 @@ class NetworkTester(object):
                         "/usr/bin/iperf", ["/usr/bin/iperf", "-s", "-u"],\
                         os.environ)
             except OSError, e:
-                print "Error starting process: ", e 
+                log.error("Error starting process: "+ e.message) 
             else:
                 self.iperf_server_is_running = True
-    
-    def _handle_comm_network_start_test(self, *args):
-        """
-        handles com_chan message "network_start_test"
 
-        :param *args: list [bandwidth, duration, kind]
-        bandwidth is a int
-        duration is a int
-        kind is a int (constant)
+    def _get_time_now(self):
         """
-        pass
-        #TODO
+        Returns current UNIT time in ms.
+        
+        (it is a float)
+        """
+        return time.time() * 1000.0 #  in ms
 
-
-    def _handle_comm_network_stop_test(self, *args):
+    def on_remote_message(self, key, *args):
         """
-        handles com_chan message "network_stop_test"
-
-        :param *args: empty list
+        Called by the com_chan whenever a message is received from the remote contact through the com_chan with the "network_test" key.
+        
+        :param key: string defining the action/message
+        :param *args: list of arguments
+        
+        The key and *args can be one of the following...
+        
+        
+        Messages sent by the one that initiates the test:
+        * ping (used to measure latency)
+        * start <int kind> <dict params{bandwidth:<int>, duration:<float>, latency:<float>}>
+        * stop (asks the remote to stop its iperf server and give us the results)
+        
+        Messages received by the one that initiates the test:
+        * pong
+        * ok (means the remote iperf server is started, and the remote client too if dualtest)
+        * results <int kind> <dict stats>
         """
-        pass
-        # TODO
-    
-    def _handle_comm_network_test_results(self, *args):
+        log.debug("received network_test" + key + str(args))
+        if key == "ping":
+            self._start_iperf_server_process()
+            if self.state != STATE_IDLE:
+                log.error("Received a ping while being busy doing some network test. (state = %d)" % self.state)
+            else:
+                self._send_message("pong")
+        elif key == "pong":
+            if self.state != STATE_WAITING_REMOTE_ANSWER:
+                log.error("Received pong while not being wainting for an answer. (state = %d)" % self.state)
+            else:
+                # measure latency
+                self.current_latency = self._get_time_now() - self.current_ping_started_time
+                params = {
+                    'duration':self.current_duration,
+                    'bandwidth':self.current_bandwidth,
+                    'latency':self.current_latency
+                }
+                self._send_message("start", [self.current_kind, params])
+                reactor.callLater(self.current_latency, self._start_iperf_client)
+        
+        elif key == "start":
+            kind = args[0]
+            params = args[1]
+            self.current_kind = kind
+            if kind == KIND_DUALTEST:
+                # TODO
+                self.current_duration = params['duration']
+                self.current_bandwidth = params['bandwidth']
+                self.current_latency = params['latency']
+                reactor.callLater(self.current_latency / 2.0, self._start_iperf_client)
+            self._start_iperf_server_process()
+        elif key == "ok":
+            pass
+        elif key == "stop":
+            self._stop_iperf_server_process()
+        elif key == "results":
+            kind = args[0]
+            stats = args[1]
+            if self.current_kind == KIND_DUALTEST:
+                self._stop_iperf_server_process()
+        
+    def _send_message(self, key, *args):
         """
-        handles com_chan message "network_test_results"
-
-        :param *args: list [kind, stats]
-        kind is a int
-        stats is a dict
+        Sends a message to the current remote contact through the com_chan with key "network_test".
         """
-        pass
-        # TODO
+        args = list(args)
+        args.insert(0, key)
+        args.insert(0, "network_test")
+        try:
+            self.current_com_chan.callRemote(self, *args)
+        except AttributeError, e:
+            log.error("Could not send message to remote. ComChan is None" + e.message)
 
     def on_com_chan_connected(self, com_channel, role="client"):
         """
@@ -435,24 +494,13 @@ class NetworkTester(object):
         #self.current_com_chan = 
         pass
         # calls to ComChannel.add(callback, key) 
-        com_channel.add(self._handle_comm_network_start_test, network_start_test)
-        com_channel.add(self._handle_comm_network_stop_test, network_stop_test)
-        com_channel.add(self._handle_comm_network_test_results, network_test_results)
-        log.info("registered com_chan callbacks")
-        log.info("registered com_chan callbacks")
-        log.info("registered com_chan callbacks")
-        log.info("registered com_chan callbacks")
-        log.info("registered com_chan callbacks")
-        log.info("registered com_chan callbacks")
-        log.info("registered com_chan callbacks")
-        log.info("registered com_chan callbacks")
-        log.info("registered com_chan callbacks")
-        log.info("registered com_chan callbacks")
-        #callRemote(self, *args):
+        com_channel.add(self.on_remote_message, network_test) # one handler for all messages
+        self.current_com_chan = com_channel # Maybe not necessary
+        log.info("registered com_chan callback")
+        #log.info("registered com_chan callbacks")
         #print "on_com_chan_connected"
 
     def on_com_chan_disconnected(self, com_chan_instance):
-        #print "on_com_chan_disconnected"
         pass
 
 # functions ---------------------------------------------
@@ -465,22 +513,17 @@ def start(subject):
     """
     try:
         executable = commands.find_command("iperf", 
-            "`iperf` command not found. Please see See https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting for installation instructions.")
+            "`iperf` command not found. Please see https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting for installation instructions.")
     except CommandNotFoundError, e:
         if subject is not None:
             subject.notify(subject, e.message, "error")
         print e.message
     tester = NetworkTester()
     tester.api = subject
-    #XXX reactor.callLater(0.01, tester._start_iperf_server_process)
     
     connectors.register_callback("networktest_on_connect", tester.on_com_chan_connected, event="connect")
-    #connectors.register_callback("networktest_on_disconnect", tester.on_com_chan_disconnected, event="disconnect")
-    
-    #client = NetworkTester()
-    #client.api = subject
+    connectors.register_callback("networktest_on_disconnect", tester.on_com_chan_disconnected, event="disconnect")
     return tester
-    #return {'server':server, 'client':client}
 
     #    txt = """
     #    20090126182857,10.10.10.145,35875,10.10.10.65,5001,3,0.0-10.0,1252440,999997

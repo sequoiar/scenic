@@ -756,7 +756,7 @@ class ControllerApi(object):
                 # TODO
                 kinds = {
                     "unidirectional":network.KIND_UNIDIRECTIONAL, 
-                    "dualtest":network.KIND_DUALTEST_CLIENT, 
+                    "dualtest":network.KIND_DUALTEST, #_CLIENT, 
                     "tradeoff":network.KIND_TRADEOFF, 
                 }
                 try:
