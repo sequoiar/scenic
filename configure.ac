@@ -173,7 +173,6 @@ AC_CONFIG_FILES([Makefile
                  py/connectors/basic/Makefile
                  py/connectors/sip/Makefile
                  py/devices/Makefile
-                 py/maugis/Makefile
                  py/protocols/Makefile
                  py/streams/Makefile
                  py/streams/audio/Makefile
@@ -191,6 +190,7 @@ AC_CONFIG_FILES([Makefile
                  src/python/Makefile
                  src/sip/Makefile
                  ])
+#                 py/maugis/Makefile
 
 #if test  "x${enable_debug}" = "xyes"  -a  "x${have_cpptest}" = "xtrue"  ; then
 

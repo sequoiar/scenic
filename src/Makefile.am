@@ -1,3 +1,4 @@
+include $(top_srcdir)/globals.mak
 if SIP
 SIPDIR = sip
 endif

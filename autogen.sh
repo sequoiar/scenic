@@ -24,5 +24,5 @@ libtoolize --force
 aclocal -I m4
 autoheader
 autoconf -f
-automake -a -f
+automake -a -f -Wno-portability 
 #./configure $@

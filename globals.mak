@@ -9,8 +9,10 @@ uncrustify:
 
 pylint: 
 	for i in $(SUBDIRS); do \
-        echo "make pylint in $$i..."; \
-        (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) pylint); done
-	@echo Checks with pylint if python files are buzzwords-compliant in $(PWD) 
+    echo "Pass a pylint brush in $$i"; \
+    (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) pylint); \
+done 
 	for pfile in *.py; do \
-        pylint $$pfile; done 
+    if [ $$pfile != "*.py" ]; then \
+    pylint $$pfile; fi; \
+done 
