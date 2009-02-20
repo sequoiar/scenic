@@ -80,14 +80,14 @@ class BoolArg
     : public BaseArg
 {
     public:
-        bool* const arg;
+        int* const arg;
         /** @param b pointer to bool to fill
          * @param l long option i.e. --option
          * @param s short option i.e. -o
          * @param d description
          * @param a argument description        
          * */
-        BoolArg(bool* b, std::string l, char s, std::string d)
+        BoolArg(int* b, std::string l, char s, std::string d)
             : BaseArg('b', l, s, d, std::string()), arg(b){}
 
     private:
