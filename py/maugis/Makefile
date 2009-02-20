@@ -5,6 +5,9 @@ progname=maugis
 
 all:
 
+check:
+html:
+
 install:
 	install -m 755 $(progname).py $(prefix)/bin/$(progname).py
 	install -m 755 $(progname).sh $(prefix)/bin/$(progname)
