@@ -3,6 +3,8 @@ prefix=$(PREFIX)
 lang = en_US fr_CA
 progname=maugis
 
+all:
+
 install:
 	install -m 755 $(progname).py $(prefix)/bin/$(progname).py
 	install -m 755 $(progname).sh $(prefix)/bin/$(progname)
