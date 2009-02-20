@@ -17,6 +17,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+"""
+Please write a description here
+"""
 
 from twisted.internet import task
 # App imports
@@ -24,7 +27,6 @@ from errors import ConnectorError, ConnectionError
 from connectors.states import *
 from utils import common, log
 from protocols import com_chan
-
 
 log = log.start('debug', 1, 0, 'connectors')
 
@@ -36,6 +38,9 @@ disconnect_callbacks = {}
 def chk_ob():
     print "Connections: %r" % connections
 
+"""
+Uncomment those two lines to te permettera de voir continuellement quelles sont les connexions existantes
+"""
 #l = task.LoopingCall(chk_ob)
 #l.start(2.0, False)
 

@@ -50,7 +50,7 @@ class Core(Subject):
         # more stuff
         self.engines = None
         self.settings = None
-        self.com_chan_port = None
+        self.com_chan_port = 37054
 
 
     def startup(self):
@@ -75,7 +75,6 @@ class Core(Subject):
         # and makes the application crash. 
         # maybe something more elegant could be done.
         self.connectors = connectors.load_connectors(self.api)
-        self.com_chan_port = 37054
         if len(sys.argv) > 1:
             self.com_chan_port += 1
         com_chan.start(connectors.connections, self.com_chan_port)
