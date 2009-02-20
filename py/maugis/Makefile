@@ -24,5 +24,8 @@ locale:
 		msgfmt locale/$$language/LC_MESSAGES/$$language.po -o locale/$$language/LC_MESSAGES/$$language.mo; \
 	done;
 
+clean:
+	
+
 .PHONY: locale
 
