@@ -168,6 +168,19 @@ AC_MSG_NOTICE([define CONFIG_IEEE1394])
 fi
 AC_CONFIG_FILES([Makefile
                  src/Makefile
+                 py/Makefile
+                 py/connectors/Makefile
+                 py/connectors/basic/Makefile
+                 py/connectors/sip/Makefile
+                 py/devices/Makefile
+                 py/maugis/Makefile
+                 py/protocols/Makefile
+                 py/streams/Makefile
+                 py/streams/audio/Makefile
+                 py/streams/video/Makefile
+                 py/streams/data/Makefile
+                 py/ui/Makefile
+                 py/utils/Makefile
                  src/util/Makefile
                  src/gutil/Makefile
                  src/tcp/Makefile

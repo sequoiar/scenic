@@ -1,4 +1,4 @@
-include $(top_srcdir)/src/globals.mak
+include $(top_srcdir)/globals.mak
 
 bin_PROGRAMS = allTester
 allTester_SOURCES =   syncTestSuite.cpp rtpSyncTestSuite.cpp videoTestSuite.cpp rtpVideoTestSuite.cpp rtpAudioTestSuite.cpp audioTestSuite.cpp gstTestSuite.cpp main.cpp 

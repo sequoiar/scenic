@@ -1,4 +1,4 @@
-include $(top_srcdir)/src/globals.mak
+include $(top_srcdir)/globals.mak
 
 PJSIP_LIBS = -lpjsip -lpjsip-ua  -lpjlib-util -lpj -lpjsua -lpjmedia
 

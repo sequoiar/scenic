@@ -1,4 +1,4 @@
-include $(top_srcdir)/src/globals.mak
+include $(top_srcdir)/globals.mak
 
 bin_PROGRAMS = utilTester
 

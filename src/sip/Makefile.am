@@ -1,4 +1,4 @@
-include $(top_srcdir)/src/globals.mak
+include $(top_srcdir)/globals.mak
 #if x86_64 pjsip must be built with -fPIC option see note below
 PJSIP_LIBS = -lpjsip -lpjsip-ua  -lpjlib-util -lpj -lpjsua -lpjsdp
 
