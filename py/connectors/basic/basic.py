@@ -244,7 +244,8 @@ class ConnectionBasic(Connection):
 #        self.send_settings()
 
     def _com_chan_started_client(self, action="join"):
-        self.send_settings()
+        pass
+#        self.send_settings()
 
     def _com_chan_started_server(self, action="join"):
         self.com_chan.add(self.settings)
@@ -255,7 +256,7 @@ class ConnectionBasic(Connection):
 
         :param settings: dict kind => dict "stream" ... whose keys are "name" and "engine"
         """
-        self.com_chan.delete(self.settings)
+#        self.com_chan.delete(self.settings)
         self.api.select_streams(self, 'receive')
         for kind, stream in settings.items():
             name = stream.pop('name') + '.rem'

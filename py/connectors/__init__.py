@@ -41,8 +41,8 @@ def chk_ob():
 """
 Uncomment those two lines to te permettera de voir continuellement quelles sont les connexions existantes
 """
-#l = task.LoopingCall(chk_ob)
-#l.start(2.0, False)
+l = task.LoopingCall(chk_ob)
+l.start(2.0, False)
 
 
 class Connection(object):
@@ -76,8 +76,8 @@ class Connection(object):
         raise NotImplementedError, '_start() method not implemented for this connector: %s.' % self.contact.connector
 
     def accepted(self, port=com_chan.PORT):
-        if port is None:
-            port = com_chan.PORT
+#        if port is None:
+#            port = com_chan.PORT
         self.remote_com_chan_port = int(port)
         self._accepted()
         self.api.notify(self, 'The invitation to %s (%s) was accepted.' % (self.contact.name, self.contact.address), 'answer')
