@@ -3,6 +3,7 @@
 import sys
 sys.path.append('.libs')
 from milhouse import TcpWrapConfig
+from milhouse import DictHandler
 
 class Pycb(DictHandler):
     """
