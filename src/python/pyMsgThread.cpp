@@ -96,9 +96,9 @@ int PythonThread::main()
     for(;;)
     {
         MapMsg m = q_.timed_pop(10);
-        if(m["command"].empty())
+        if(m.cmd().empty())
             continue;
-        if(std::string(m["command"]) == "quit")
+        if(std::string(m.cmd()) == "quit")
             break;
 
         PyGILState_STATE state = PyGILState_Ensure();

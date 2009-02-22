@@ -137,9 +137,9 @@ bool TcpThread::gotQuit()
 {
     MapMsg f = queue_.timed_pop(1);
     std::string command;
-    if(f["command"].empty())
+    if(f.cmd().empty())
         return false;
-    if(f["command"] == "quit")
+    if(f.cmd() == "quit")
         return true;
     else
         send(f);
@@ -161,7 +161,7 @@ bool TcpThread::send(MapMsg& msg)
     }
     catch(ErrorExcept e)
     {
-        LOG_DEBUG(std::string(msg["command"]) << " Error at Send. Cancelled. " <<
+        LOG_DEBUG(std::string(msg.cmd()) << " Error at Send. Cancelled. " <<
                   strerror(e.errno_));
         lf_->enable();
         if(e.errno_ == EBADF) //Bad File Descriptor
@@ -188,16 +188,16 @@ std::string tcpGetBuffer(int port, int &id)
     for(;;)
     {
         MapMsg f = queue.timed_pop(100000);
-        if(f["command"].empty())
+        if(f.cmd().empty())
             continue;
         try
         {
-            if(std::string(f["command"]) == "quit")
+            if(std::string(f.cmd()) == "quit")
             {
                 LOG_INFO("quit in tcpGetBuffer");
                 break;
             }
-            if(std::string(f["command"]) != "buffer")
+            if(std::string(f.cmd()) != "buffer")
             {
                 LOG_INFO("Unknown msg.");
                 continue;

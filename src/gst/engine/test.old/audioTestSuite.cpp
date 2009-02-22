@@ -40,7 +40,7 @@ class GstAudioTestSubscriber : public msg::Subscriber
         std::vector<double> v_ = msg["values"];
         std::vector<double>::const_iterator it;
         std::stringstream st;
-        st << "Msg: " << msg["command"].c_str() << " received by " << s_; 
+        st << "Msg: " << std::string(msg.cmd()) << " received by " << s_; 
         for(it = v_.begin();it != v_.end();++it)
             st << " " << *it;
 

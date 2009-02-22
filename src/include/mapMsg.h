@@ -75,6 +75,11 @@ public:
     MapMsg():map_(),it_(){}
     MapMsg(std::string cmd):map_(),it_(){ map_["command"] = cmd;}
 
+    StrIntFloat& cmd()
+    {
+        return (*this)["command"];
+    }
+
     StrIntFloat& operator[](const std::string& str)
     {    
         StrIntFloat& sif = map_[str];

@@ -40,9 +40,9 @@ int GstThread::main()
         //std::cout.flush();
         MapMsg f = queue_.timed_pop(100000);
 
-        if(!f["command"].empty())
+        if(!f.cmd().empty())
         {
-            std::string s( f["command"]);
+            std::string s( f.cmd());
 
             if(s == "quit")
             {

@@ -83,14 +83,14 @@ bool MainModule::run()
             MapMsg tmsg = tcp_queue.timed_pop(1);
             MapMsg gmsg = gst_queue.timed_pop(1000);
 
-            if (!gmsg["command"].empty())
+            if (!gmsg.cmd().empty())
                 tcp_queue.push(gmsg);
-            if (tmsg["command"].empty())
+            if (tmsg.cmd().empty())
                 continue;
-            std::string command(tmsg["command"]);
+            std::string command(tmsg.cmd());
             if(command.empty())
                 continue;
-            LOG_DEBUG(std::string(tmsg["command"]));
+            LOG_DEBUG(std::string(tmsg.cmd()));
             if (command == "quit")
             {
                 gstThread_->broadcastQuit();
