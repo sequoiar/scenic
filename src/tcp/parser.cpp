@@ -30,7 +30,7 @@ using namespace Parser;
 typedef std::string::size_type POS;
 
 
-static std::string strEsq(const std::string& str)
+static std::string strEsq(std::string str)
 {
     std::string out;
 

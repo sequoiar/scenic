@@ -87,8 +87,8 @@ bool MainModule::run()
                 tcp_queue.push(gmsg);
             if (tmsg["command"].empty())
                 continue;
-            std::string command;
-            if(!tmsg["command"].get(command))
+            std::string command(tmsg["command"]);
+            if(command.empty())
                 continue;
             LOG_DEBUG(std::string(tmsg["command"]));
             if (command == "quit")

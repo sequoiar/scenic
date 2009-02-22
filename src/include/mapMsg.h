@@ -33,26 +33,22 @@
 class StrIntFloat
 {
     public:
-        StrIntFloat();
+        StrIntFloat()
+            : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(),key_(){}
         char get_type() const; 
         bool empty() const;
-        std::string c_str()const;
         Except except()const { return e_;}
 
-        operator std::string ()const;
+        operator std::string () const;
         operator std::vector<double> () const;
         operator int ()const;
         operator double ()const;
 
-        bool get(std::string& s) const;
-        bool get(int& i) const;
-        bool get(double& f) const;
-        bool get(Except& e) const;
-
+        bool operator==(const std::string& in);
         StrIntFloat& operator=(const std::string& in);
         StrIntFloat& operator=(const int& in);
-        StrIntFloat& operator=(const double& in);
         StrIntFloat& operator=(const Except& in);
+        StrIntFloat& operator=(const double& in);
         StrIntFloat& operator=(const std::vector<double>& in);
 
         StrIntFloat(const StrIntFloat& sif_);

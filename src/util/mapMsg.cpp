@@ -43,8 +43,6 @@ bool msg::post(MapMsg& msg)
     return false;
 }
 
-StrIntFloat::StrIntFloat()
-    : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(),key_(){}
 
 #define T_EXPAND(x) (x == 'f'?"double":x == 's'?"string":x == 'i'?"interger":x == 'F'?"vector<double>":"unknown")
 
@@ -57,42 +55,31 @@ StrIntFloat::StrIntFloat()
         QUIET_THROW("Parameter " << key_ << " should be " << #xtype << " not " << T_EXPAND(type_) << "." );\
     return gtype   
 
-bool StrIntFloat::get(std::string& s) const
-{
-    if(type_ != 's')
-        return false;
-    s = s_;
-    return true;
-}
-
-bool StrIntFloat::empty() const
-{
+bool StrIntFloat::empty() const {
     return type_ == 'n';
 }
+
 char StrIntFloat::get_type() const { return type_;}
-std::string StrIntFloat::c_str()const
-{ 
+
+StrIntFloat::operator std::string () const {   
     TYPE_CHECKMSG(s_,string);
 }
 
-StrIntFloat::operator std::string ()const
-{   
-    TYPE_CHECKMSG(s_,string);
-}
-
-StrIntFloat::operator std::vector<double> () const
-{
+StrIntFloat::operator std::vector<double> () const {
     TYPE_CHECKMSG(F_,vector<double>);
 }
 
-StrIntFloat::operator int ()const
-{
+StrIntFloat::operator int ()const {
     TYPE_CHECKMSG(i_,integer);
 }
 
-StrIntFloat::operator double ()const
-{
+StrIntFloat::operator double ()const {
     TYPE_CHECKMSG(f_,float);
+}
+
+bool StrIntFloat::operator==(const std::string& in) {
+    if(type_ != 's') return false;
+    return (s_ == in);
 }
 
 StrIntFloat& StrIntFloat::operator=(const std::string& in){
@@ -121,8 +108,12 @@ StrIntFloat& StrIntFloat::operator=(const std::vector<double>& in){
 }
 
 StrIntFloat::StrIntFloat(const StrIntFloat& sif_)
-    : type_(sif_.type_), s_(sif_.s_), i_(sif_.i_), f_(sif_.f_),e_(sif_.e_),F_(sif_.F_),key_(sif_.key_){}
-StrIntFloat& StrIntFloat::operator=(const StrIntFloat& in)
+    : type_(sif_.type_), s_(sif_.s_), i_(sif_.i_),
+    f_(sif_.f_),e_(sif_.e_),F_(sif_.F_),key_(sif_.key_)
+{}
+
+
+StrIntFloat& StrIntFloat::operator=(const StrIntFloat& in) 
 {
     if(this == &in)
         return *this;

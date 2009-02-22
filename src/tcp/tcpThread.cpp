@@ -139,7 +139,7 @@ bool TcpThread::gotQuit()
     std::string command;
     if(f["command"].empty())
         return false;
-    if(f["command"].get(command)&& command == "quit")
+    if(f["command"] == "quit")
         return true;
     else
         send(f);

@@ -42,8 +42,7 @@ int GstThread::main()
 
         if(!f["command"].empty())
         {
-            std::string s;
-            f["command"].get(s);
+            std::string s( f["command"]);
 
             if(s == "quit")
             {
