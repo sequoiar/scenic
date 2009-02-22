@@ -21,23 +21,23 @@
  */
 
 #include "mapMsg.h"
-static msg::Subscriber* pf = 0;
+static MapMsg::Subscriber* pf = 0;
 
-msg::Subscriber::Subscriber()
+MapMsg::Subscriber::Subscriber()
 {
     pf = this;
 }
 
-msg::Subscriber::~Subscriber()
+MapMsg::Subscriber::~Subscriber()
 {
     pf = 0;
 }
 
-bool msg::post(MapMsg& msg)
+bool MapMsg::post()
 {
     if(pf)
     {
-        (*pf)(msg);
+        (*pf)(*this);
         return true;
     }
     return false;
@@ -121,4 +121,26 @@ StrIntFloat& StrIntFloat::operator=(const StrIntFloat& in)
     return *this;
 }
 
+MapMsg::Item MapMsg::next()
+{ 
+    if (++it_ != map_.end())
+        return &(*it_);
+    else 
+        return 0;
+}
 
+MapMsg::Item MapMsg::begin()
+{
+    it_ = map_.begin(); 
+    if(it_ != map_.end())
+        return &(*it_);
+    else
+        return 0;
+}
+
+StrIntFloat& MapMsg::operator[](const std::string& str)
+{    
+    StrIntFloat& sif = map_[str];
+    sif.key_ = str; 
+    return sif;
+}

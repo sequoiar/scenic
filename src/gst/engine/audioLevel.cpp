@@ -119,7 +119,7 @@ void AudioLevel::post(const std::vector<double> &rmsValues) const
     MapMsg mapMsg("levels");
 
     mapMsg["values"] = rmsValues;
-    msg::post(mapMsg);
+    mapMsg.post();
 }
 
 

@@ -69,48 +69,27 @@ class StrIntFloat
 class MapMsg
 {
     typedef std::map<std::string, StrIntFloat> MapMsg_;
+    typedef const std::pair<const std::string,StrIntFloat>* Item;
     MapMsg_ map_;
     MapMsg_::const_iterator it_;
 public:
     MapMsg():map_(),it_(){}
-    MapMsg(std::string cmd):map_(),it_(){ map_["command"] = cmd;}
-
-    StrIntFloat& cmd()
-    {
-        return (*this)["command"];
-    }
-
-    StrIntFloat& operator[](const std::string& str)
-    {    
-        StrIntFloat& sif = map_[str];
-        sif.key_ = str; 
-        return sif;
-    }
+    MapMsg(std::string command):map_(),it_(){ cmd() = command;}
+    StrIntFloat& cmd() { return (*this)["command"]; }
+    StrIntFloat& operator[](const std::string& str);
+    Item begin();
+    Item next();
     void clear(){map_.clear();}
-    const std::pair<const std::string,StrIntFloat>* begin()
-    {
-        it_ = map_.begin(); 
-        if(it_ != map_.end())
-            return &(*it_);
-        else
-            return 0;
-    }
-    const std::pair<const std::string,StrIntFloat>* next()
-    { 
-        if (++it_ != map_.end())
-            return &(*it_);
-        else 
-            return 0;
-    }
-};
+//};
+
 
 
 /** Used by code that need msg posting but does not use 
  * a MsgThread class eg. gst/audioLevel.cpp */
-namespace msg
-{
+//namespace msg
+//{
     /// to send a MapMsg to Subscriber 
-    bool post(MapMsg& msg);
+    bool post();
     /// MapMsg will go to most recent registered  
     class Subscriber
     {
@@ -119,7 +98,7 @@ namespace msg
             virtual void operator()(MapMsg&){}
             virtual ~Subscriber();
     };
-}
+};
 
 
 #endif

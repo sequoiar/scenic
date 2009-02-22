@@ -97,7 +97,7 @@ void Encoder::postBitrate()
     std::stringstream msgStream; 
     msgStream << codecName << ": " << getBitrate();
     mapMsg["value"] = msgStream.str();
-    msg::post(mapMsg);
+    mapMsg.post();
 }
 
 /// Constructor 

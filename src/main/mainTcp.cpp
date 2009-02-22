@@ -25,7 +25,7 @@
 
 ///Instance will register a particular MsgThread as a MapMsg handler
 class MainSubscriber
-    : public msg::Subscriber
+    : public MapMsg::Subscriber
 {
     MsgThread &t_;
     public:
