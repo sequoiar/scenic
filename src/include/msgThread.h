@@ -35,5 +35,21 @@ class MsgThread
 
 };
 
+///Instance will register a particular MsgThread as a MapMsg handler
+class MainSubscriber
+    : public MapMsg::Subscriber
+{
+    MsgThread &t_;
+    public:
+        MainSubscriber(MsgThread* pt)
+            : t_(*pt)
+        {}
+
+        void operator()(MapMsg& msg)
+        {
+            t_.getQueue().push(msg);
+        }
+};
+
 #endif
 

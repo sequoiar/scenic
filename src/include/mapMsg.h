@@ -80,16 +80,14 @@ public:
     Item begin();
     Item next();
     void clear(){map_.clear();}
-//};
 
 
 
-/** Used by code that need msg posting but does not use 
- * a MsgThread class eg. gst/audioLevel.cpp */
-//namespace msg
-//{
-    /// to send a MapMsg to Subscriber 
+/** Used by code that needs to post messages but does not use 
+ * a MsgThread class (gst/audioLevel.cpp) send a MapMsg to Subscriber */
+
     bool post();
+
     /// MapMsg will go to most recent registered  
     class Subscriber
     {
