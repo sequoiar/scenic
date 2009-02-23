@@ -1,5 +1,4 @@
 PREFIX=$(prefix)
-prefix=$(PREFIX)
 lang = en_US fr_CA
 progname=maugis
 
