@@ -30,7 +30,7 @@
 #include "mapMsg.h"
 #include "playback.h"
 
-class GstAudioTestSubscriber : public msg::Subscriber
+class GstAudioTestSubscriber : public MapMsg::Subscriber
 {
     std::string s_;
     public:
