@@ -21,6 +21,7 @@
 """ Public API of Sropulpof """
 
 import sys
+import pprint 
 
 # App imports
 from errors import *
@@ -727,7 +728,7 @@ class ControllerApi(object):
         self.notify(caller, devices_list, 'devices_list') # with a dict
     
     # network test use cases ----------------------------------------------------
-    def network_test_start(self, caller, bandwidth=1, duration=10, kind="unidirectional"):
+    def network_test_start(self, caller, bandwidth=1, duration=10, kind="unidirectional", contact=None):
         """
         Tries to start a network test with currently connected contact.
         
@@ -739,33 +740,39 @@ class ControllerApi(object):
         :param kind: string "unidirectional", "tradeoff" or "dualtest"
         """
         try:
-            contact = self.get_contact()
+            if contact is None:
+                contact = self.get_contact()
         except AddressBookError:
         #    contact = None
         #if contact is None:
             self.notify(caller, "Please select a contact prior to start a network test.", "error")
         else:
-            if contact.state != addressbook.CONNECTED and kind == "dualtest":
+            pprint.pprint(contact.__dict__)
+            
+            if contact.state != addressbook.CONNECTED: #  and kind == "dualtest"
                 self.notify(caller, "Please connect to a contact prior to start a network test.", "error")
             else:
-                if kind == "dualtest":
-                    com_chan = contact.connector.com_chan    
-                else:
-                    com_chan = None
+                log.debug("connector : " + str(contact.connector))
+                com_chan = None 
+                try:
+                    com_chan = contact.connection.com_chan
+                except Exception, e:
+                    debug.error("network_test_start(): " + e.message)
+                #print "contact:"
+                # pprint.pprint(contact)
                 remote_addr = contact.address
-                # TODO
                 kinds = {
                     "unidirectional":network.KIND_UNIDIRECTIONAL, 
-                    "dualtest":network.KIND_DUALTEST, #_CLIENT, 
+                    "dualtest":network.KIND_DUALTEST, 
                     "tradeoff":network.KIND_TRADEOFF, 
                 }
                 try:
                     kind = kinds[kind]
                 except KeyError:
                     self.notify(caller, "Could not start network test: Invalid kind of test \"%s\"." % kind, "error")
-                self.network_tester.start_test(caller, remote_addr, bandwidth, duration, kind, com_chan)
-                #client.start_client(caller, server_addr, bandwidth, duration)
-                self.notify(caller, "Starting network performance test with contact %s" % (contact.name), "info")
+                else:
+                    self.network_tester.start_test(caller, remote_addr, bandwidth, duration, kind, com_chan)
+                    self.notify(caller, "Starting network performance test with contact %s" % (contact.name), "info")
     
     def network_test_stop(self, caller):
         """

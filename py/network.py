@@ -324,6 +324,7 @@ class NetworkTester(object):
         bandwidth_megabits : int
         server_addr: str
         """
+        # TODO: remove com_chan
         if self.state != STATE_IDLE:
             self.notify_api(caller, "error", "A network test is already being done.")
         else:
@@ -334,11 +335,13 @@ class NetworkTester(object):
             self.current_bandwidth = bandwidth_megabits # Mbits
             self.current_duration = duration # seconds
             self.current_caller = caller # instance
+            # XXX
             if com_chan is not None:
                 log.debug("Using comm channel %s." % (com_chan))
+            #    self.current_com_chan
                 self.current_com_chan = com_chan # only neededi for dualtests
             else:
-                log.debug("Not using any com_chan. It is None")
+                log.error("Invalid com_chan. It is None")
             self.current_kind = kind
             
             self.current_ping_started_time = self._get_time_now()

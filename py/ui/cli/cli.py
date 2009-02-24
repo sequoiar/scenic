@@ -735,6 +735,7 @@ class CliController(TelnetServer):
         Usage:
         network -b 30 -t 10 -k unidirectional
         """
+        # TODO: add contact (-c) argument
         cp = CliParser(self, prog=line[0], description="Manages the audio/video/data devices.")
         # booleans (action)
         cp.add_option("-z", "--description", action='store_true', help="Displays description") # TODO: add examples

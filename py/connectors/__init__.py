@@ -128,6 +128,7 @@ class Connection(object):
 
     def attached(self, client, channel):
         self.com_chan = channel
+        self.contact.state = CONNECTED
         if client == 'server':
             self.com_chan_started_server()
         else:
