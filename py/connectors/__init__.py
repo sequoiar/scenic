@@ -80,7 +80,7 @@ class Connection(object):
 #            port = com_chan.PORT
         self.remote_com_chan_port = int(port)
         self._accepted()
-        self.api.notify(self, 'The invitation to %s (%s) was accepted.' % (self.contact.name, self.contact.address), 'answer')
+        self.api.notify(self, 'The invitation has been accepted by %s. (%s)' % (self.contact.name, self.contact.address), 'answer')
         self.setup()
 
     def _accepted(self):
