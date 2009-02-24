@@ -123,20 +123,25 @@ class Connection(object):
 
     def setup(self):
         self.contact.state = CONNECTING
-        channel, deferred = com_chan.connect(self.local_name, self.contact.address, self.remote_com_chan_port)
-        deferred.addCallback(self.attached, channel)
+        com_channel, deferred = com_chan.connect(self.local_name, self.contact.address, self.remote_com_chan_port)
+        deferred.addCallback(self.attached, com_channel)
         deferred.addErrback(self.not_attached)
 
-    def attached(self, channel): # had argument client
-        self.com_chan = channel
-        if client == 'server':
+    def attached(self, channel, kind=None): # had argument client
+        """
+        This method is different than the attached method of the ComChan class !
+        """
+        self.com_chan = channel # XXX channel is None
+        
+        # if channel == 'server':
+        if kind == 'server':
             self.com_chan_started_server()
         else:
             self.com_chan_started_client()
 
     def not_attached(self, failure):
         log.error('Could not start the communication channel. Closing connection. reason: ' + failure.getErrorMessage())
-        # sys.stdout.write(failure.getTraceback()) # XXX
+        sys.stdout.write(failure.getTraceback()) # XXX
         # failure.raiseException() # XXX
         self.api.notify(self,
                     'Connection failed. Address: %s | Port: %s' % (self.contact.address, self.contact.port),
@@ -239,8 +244,8 @@ def load_connectors(api):
         name = module.__name__.rpartition('.')[2]
         try:
             module.start(api)
-        except:
-            log.error('Connector \'%s\' failed to start.' % name)
+        except Exception, e:
+            log.error('Connector \'%s\' failed to start. %s' % (name, e.message))
         else:
             connectors[name] = module
             log.info('Connector \'%s\' started.' % name)

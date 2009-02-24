@@ -335,12 +335,16 @@ class NetworkTester(object):
             self.current_duration = duration # seconds
             self.current_caller = caller # instance
             if com_chan is not None:
+                log.debug("Using comm channel %s." % (com_chan))
                 self.current_com_chan = com_chan # only neededi for dualtests
+            else:
+                log.debug("Not using any com_chan. It is None")
             self.current_kind = kind
             
             self.current_ping_started_time = self._get_time_now()
             self.state = STATE_WAITING_REMOTE_ANSWER 
             if kind == KIND_DUALTEST:
+                log.info("starting iperf server process")
                 self._start_iperf_server_process()
             self._send_message("ping")
 
@@ -484,21 +488,20 @@ class NetworkTester(object):
         """
         Called from the Connector class in its com_chan_started_client or com_chan_started_server method.
 
+        registers the com_chan callback for network_test
+        
         :param role: string "client" or "server"
         We actually do not care if this miville is a com_chan client or server.
         """
-        # TODO register com_chan callbacks
-        # those callbacks will 
-        # a) start and stop the iperf server and the testing
-        # 
-        #self.current_com_chan = 
-        pass
-        # calls to ComChannel.add(callback, key) 
-        com_channel.add(self.on_remote_message, "network_test") # one handler for all messages
-        self.current_com_chan = com_channel # Maybe not necessary
-        log.info("registered com_chan callback")
-        #log.info("registered com_chan callbacks")
-        #print "on_com_chan_connected"
+        if com_channel is None:
+            log.error("network.py: The provided com_channel is None !")
+        else:
+            # calls to ComChannel.add(callback, key) 
+            com_channel.add(self.on_remote_message, "network_test") # one handler for all messages
+            self.current_com_chan = com_channel # Maybe not necessary
+            log.info("registered com_chan callback")
+            #log.info("registered com_chan callbacks")
+            #print "on_com_chan_connected"
 
     def on_com_chan_disconnected(self, com_chan_instance):
         pass

@@ -66,7 +66,7 @@ class ComChannel(object):
         """
         Called when the Connection is made. 
         """
-        log.info("Connected: %r" % remote)
+        log.info("%s connected: %r" % (self.__class__.__name__, remote))
         self.remote = remote
 
     def main(self, *args):
@@ -159,9 +159,12 @@ class ComChanRealm:
         avatar = ComChanContact(name)
         avatar.attached(remote)
         try:
+            # calling Connexion.attached(self, channel, kind=None)
             # XXX Etienne, est-ce que c'est correct ? -- aalex
             # OLD VERSION : connections[name].attached('server', avatar)
-            connections[name] = avatar # .attached(avatar)
+            connections[name].attached(avatar, 'server')
+            # connections[name] = avatar # .attached(avatar)
+            #connection[name].attached('server') # XXX aalex was here.
         except Exception, e:
             log.error("ComChanRealm.requestAvatar error: " + e.message)
         return pb.IPerspective, avatar, lambda a = avatar:a.detached(remote)
