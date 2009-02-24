@@ -23,27 +23,14 @@ from ui.web.web import Widget, expose
 from utils import log
 from utils.i18n import to_utf
 
-log = log.start('debug', 1, 0, 'web_adb')
+log = log.start('debug', 1, 0, 'web_hlp')
 
 
-class Addressbook(Widget):
+class Help(Widget):
     """
     """
-#    help = {'adb_list':_('This is the list of contacts'),
-#            'adb_add':_('Add a new contact to the list')
-#            }
-        
-    def cb_get_contacts(self, origin, data):
-        adb = []
-        contacts = data[0].items()
-        contacts.sort()
-        for name, contact in contacts:
-            adb.append((contact.name, to_utf(contact.address), contact.port))
-        log.info('receive update: %r' % self)
-        self.callRemote('updateList', adb)
-        
-    def rc_get_list(self):
-        self.api.get_contacts(self)
+    def rc_manual(self):
+        print "OPEN MANUAL"
         return False
-        
+    
     expose(locals())

@@ -18,28 +18,88 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
+"""
+This modules is the base of the web client (web user interface)
+of the application. Its support internationalisation (i18n).
+
+More about the i18n process
+---------------------------
+
+Here we describe all the steps involved in producing translations for this modules.
+Maybe, at the moment you read this, there will be script that simplify the process.
+But anyway it's good to know how it works.
+
+So here the steps to produce translation from scratch:
+
+    We will use the context of creating a new Widget as an example.
+    
+    1. from nevow.i18n import _ and use this function everywhere you need
+       something translated in your python code::
+        
+          from nevow.i18n import _
+          
+          def example(feature):
+              return _('Sorry, the feature %s is not implemented.' % feature)
+
+    2. In your HTML template put the attribute n:render="i18" inside the
+       element you need to translate::
+       
+           <h3 n:render="i18n">Nerds</h3>
+           
+    3. Extract the strings to translate from your python script with GNU xgettext.
+       Put the name of your Widget as the name of the .poy file::
+       
+           $ xgettext -o pathToLocaleDirectory/your_widget.poy your_widget.py
+    
+    4. Extract the strings to translate from your HTML template with
+       nevow-xmlgettext. Put the name of your Widget as the name of the .poh file::
+       
+           $ nevow-xmlgettext your_widget.html > pathToLocaleDirctory/your_widget.poh
+           
+    5. Merge the two newly created files (.poy and .poh) with msgcat.
+       Put the .poy file first::
+       
+           $ cd pathToLocaleDirectory
+           $ msgcat -o your_widget.pot your_widget.poy your_widget.poh
+           
+    6. Create one .po file for each language you want to support with msginit::
+    
+           $ msginit -l fr_CA -i your_widget.pot
+           
+       The resulting file your_widget.po should be created in the directory
+       localeDirectory/LL_CC/LC_MESSAGES/. You can add the -o arguments to
+       msginit to specified the right place.
+        
+    7. Translate all the strings in you your_widget.po file for each languages.
+       You can do this with a tool like Poedit.
+       
+    8. Convert .po file to the binary format .mo with msgfmt::
+    
+           $ msgfmt localeDirectory/fr_CA/LC_MESSAGES/your_widget.po
+           
+    That's it! Now we need to add how to update the translations with
+    the evolution of the code and template.
+           
+"""
+
+
 #System imports
 import os.path as path
 import os
 from xml.etree import ElementTree
-import glob
-from pprint import pprint
-import new
 
 #Twisted imports
 from twisted.internet import reactor
-from twisted.python.filepath import FilePath
 from twisted.python.modules import getModule
-from nevow import rend, loaders, appserver, static, tags, stan
-from nevow.athena import LivePage, LiveElement, expose
+from nevow import loaders, appserver, static, tags, inevow
+from nevow.athena import LivePage, LiveFragment, expose as nevow_expose
+from nevow.i18n import render as i18nrender
+from nevow.i18n import _, I18NConfig
 
 #App imports
 from utils import Observer, log
 from utils.i18n import to_utf
-import ui
 from utils.common import find_callbacks
-from streams import audio, video, data
-from streams.stream import AudioStream, VideoStream, DataStream
 
 log = log.start('debug', 1, 0, 'web')
 
@@ -65,6 +125,7 @@ def import_widgets():
         else:
             try:
                 mod = widget.load()
+                log.debug('Loaded the module %s' % widget.name)
             except:
                 log.error('Unable to load the module %s' % widget.name)
             else:
@@ -82,13 +143,16 @@ def widget_factory(mod):
     for each widget.
     """
     # get the module name without the path
-    mod_name = mod.__name__.split('.')[-1]
+    mod_name = mod.__name__.split('.')[ - 1]
     # convert the module to the class name by removing the underscore and camelcasing it
     klass_name = camel_name(mod_name)
     # get the class from the widget module
     klass = getattr(mod, klass_name)
     
     def render_widget(self, ctx, data):
+        """
+        Generic method use to render all widget from the Index class.
+        """
         widget = klass(self.api, self.template)
         widget.setFragmentParent(self)
         return widget
@@ -99,13 +163,21 @@ def camel_name(name):
     """
     Transform a file name (small case with underscore) to a class name style
     (camel case without underscore). Put first character and each character
-    after an underscore in uppper case and remove the underscores. 
+    after an underscore in uppper case and remove the underscores.
+    
+    Example::
+    
+        class_name -> ClassName
     """
     return ''.join([part.title() for part in name.split('_')])
 
 def small_name(name):
     """
     Transform a class name to a file name (all lower case with underscore)
+    
+    Example::
+    
+        ClassName -> class_name
     """
     chars = list(name)
     for i, char in enumerate(chars):
@@ -113,8 +185,25 @@ def small_name(name):
             chars.insert(i, '_')
     return ''.join(chars).lower()
 
+def create_css(href):
+    """
+    Create a css link Stan tag
+    """ 
+    return tags.link(rel="stylesheet", type="text/css", href=href)
+
+def create_js(src):
+    """
+    Create a js script Stan tag
+    """ 
+    return tags.script(src=src, type="text/javascript")
+
+
 
 class Index(LivePage, Observer):
+    """
+    Class representing the base of the root page (/index.html).
+    """
+    
     addSlash = True
     
     base_path = os.getcwdu()
@@ -125,41 +214,84 @@ class Index(LivePage, Observer):
     child_js = static.File('ui/web/templates/default/js/')
     child_img = static.File('ui/web/templates/default/img/')
 
+#    render_i18n = i18nrender()
+
     def __init__(self, subject, template=None):
         Observer.__init__(self, subject)
         self.subject = subject
         self.api = subject.api
         self.template = template
-                
+        self.lang = 'en'
+
         # load base HTML file
         self.docFactory = loaders.xmlfile(path.join(path.dirname(__file__), 'index.html'))
         
-        if self.template:
-            self.child_template = static.File(path.join('ui/web/templates', self.template))
+# not use anymore ?
+#        if self.template:
+#            self.child_template = static.File(path.join('ui/web/templates', self.template))
   
         LivePage.__init__(self)
 
-    
+    def renderHTTP(self, ctx):
+        """
+        Overwrite renderHTTP to get GET arguments, cookies values
+        and client IP address.
+        """
+        
+        # We're only overriding renderHTTP to look for a 'lang' query parameter
+        # without cluttering up the messages renderer, below.
+        
+        # If 'lang' is present then we "force" the translation language. This
+        # simulates how user preferences from the session might be used to
+        # override the browser's language settings.
+        lang = ctx.arg('lang')
+        if lang is not None:
+            ctx.remember([lang], inevow.ILanguages)
+#        request = inevow.IRequest(ctx)
+#        request.addCookie('temp', 'allo', expires=None, domain=None, path=None, max_age=None, comment=None, secure=None)
+#        cookie = request.getCookie('temp')
+#        print cookie
+
+        # add the locale file for the index
+        ctx.remember(I18NConfig(domain='index', localeDir='locale'), inevow.II18NConfig)                
+
+        # get the client IP address to look if he is in the LAN
+#        client_ip = request.getClientIP())
+
+        # Let the base class handle it, really.
+        return LivePage.renderHTTP(self, ctx)
+
     def list_widgets(self):
+        """
+        This method return a list of all the Widgets that are present
+        in the index template.
+        """
         base_path = path.dirname(__file__)
         template_path = path.join(base_path, 'templates/default/html/index.html')
+        # if we don'T use default template check if there's a valid index.html
+        # in the choose template directory and set the path accordinally
         if self.template:
             tmp_path = path.join(base_path, 'templates', self.template, 'html/index.html')
             if path.isfile(tmp_path):
                 template_path = tmp_path
         
+        # parse the XML, find the widget element and return the list
+        # of widget's name
         tree = ElementTree.parse(template_path)
         divs = tree.getiterator('div')
         attribute = '{http://nevow.com/ns/nevow/0.1}render'
         widgets = [div.attrib[attribute]
                    for div in divs
-                   if div.attrib.has_key(attribute)]
+                   if (div.attrib.has_key(attribute)
+                       # remove i18n because it's not a widget
+                       and div.attrib[attribute] != 'i18n')]
         return widgets
     
     def render_header(self, ctx, data):
         """
         Add javascript and css import to the page header.
         """
+
         base_path = path.dirname(__file__).replace(self.base_path + '/', '')
         templates_path = path.join(base_path, 'templates')
 
@@ -172,12 +304,12 @@ class Index(LivePage, Observer):
         # add style.css files
         style_file = 'css/style.css'
         if path.isfile(path.join(templates_path, 'default', style_file)):
-            links.append(self.create_css(style_file))
+            links.append(create_css(style_file))
         if self.template and \
         path.isfile(path.join(templates_path, self.template, style_file)):
-            links.append(self.create_css(path.join('template', style_file)))
+            links.append(create_css(path.join('template', style_file)))
                 
-        kinds = {'css':self.create_css, 'js':self.create_js}
+        kinds = {'css':create_css, 'js':create_js}
         
         # add nevow js, display js and css for every widget
         for widget in widgets:
@@ -199,22 +331,10 @@ class Index(LivePage, Observer):
                     links.append(kinds[kind](path.join(end_path)))
 
         # prettier html output
-        for i in range(1, len(links)*2, 2):
+        for i in range(1, len(links) * 2, 2):
             links.insert(i, ['\n\t\t'])
             
         return links
-
-    def create_css(self, href):
-        """
-        Create a css link tag
-        """ 
-        return tags.link(rel="stylesheet", type="text/css", href=href)
-
-    def create_js(self, src):
-        """
-        Create a js script tag
-        """ 
-        return tags.script(src=src, type="text/javascript")
 
     def render_body(self, ctx, data):
         """
@@ -232,21 +352,45 @@ class Index(LivePage, Observer):
 
     def child_ (self, ctx):
         """
-        This send a new Index instance on browser refresh and multiple connections.
+        This create a new Index instance on browser refresh and multiple connections.
         """
         return Index(self.subject)
 
     def update(self, origin, key, data):
+        """
+        Observer update method.
+        Call proper callbacks in all the Widgets.
+        """
         for children in self.liveFragmentChildren:
             if hasattr(children, 'callbacks') and key in children.callbacks:
                 children.callbacks[key](origin, data)
+
+
+# Remove the rewrite of the HTML element id
+# (now we need to avoid clash of id ourself)
+for key, preprocessors in enumerate(LiveFragment.preprocessors):
+    if preprocessors.__name__ == "rewriteAthenaIds":
+        del LiveFragment.preprocessors[key]
  
         
-class Widget(LiveElement):
+class Widget(LiveFragment):
     """
     Base class for all the widget classes.
+    
+    *Note: we use the deprecated LiveFragment instead of LiveElement because
+    i18n need the context, so it doesn't work with LiveElement.* 
     """
+
+    # add the translation renderer
+    render_i18n = i18nrender()
+
     def __init__(self, api, template):
+        """
+        Get the name of the widget and find the template file (in template and,
+        if not, in 'default'.)
+        """
+
+        self.docFactory = ['']  # not sure if it's a good idea ?
         class_name = self.__class__.__name__
         tmpl_name = 'html/%s.html' % small_name(class_name)
         tmpl_path = path.join(path.dirname(__file__), 'templates')
@@ -256,10 +400,47 @@ class Widget(LiveElement):
             self.docFactory = loaders.xmlfile(path.join('ui/web/templates/default', tmpl_name))
         else:
             log.error("Didn't found any valid %s.html template." % small_name(class_name))
+        # add the JS class for this widget
+        # (should be the same name has the python class) 
         self.jsClass = to_utf(class_name)
-        LiveElement.__init__(self)
-        self.callbacks = find_callbacks(self)
+        LiveFragment.__init__(self)
+        self.callbacks = find_callbacks(self, 'cb_')
         self.api = api
+
+    def rend(self, ctx, data):
+        """
+        We overwrite LiveFragment.rend to add the good i18n domain
+        to the context of each Widget base on the module name of the widget. 
+        """
+        # TODO: get the good localeDir for each platform
+        domain = self.__module__.split('.')[ - 1]
+        ctx.remember(I18NConfig(domain=domain, localeDir='locale'),
+                     inevow.II18NConfig)                
+
+        # Let the base class handle it.
+        return LiveFragment.rend(self, ctx, data)
+        
+
+def expose(loc):
+    """
+    Function that automatically expose (that mean become accessible from javascript)
+    all methods beginning by "rc\_" (for "remote call") in the local scope
+    of a Class.
+    
+    :param loc: Should be a dictionnary where values are method object
+                (usually you pass locals())
+     
+    Usage::
+        
+        class Widget(LiveElement):
+            def rc_method(self):
+                pass
+            expose(locals())
+    
+    """
+    for key, value in loc.iteritems():
+        if key.startswith('rc_'):
+            nevow_expose(value)
     
 
 

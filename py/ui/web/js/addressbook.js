@@ -9,7 +9,7 @@ Addressbook.methods(
     },  
 
     function getList(self) {
-        self.callRemote("get_list");
+        self.callRemote("rc_get_list");
         return false;
     },
  
@@ -26,4 +26,4 @@ Addressbook.methods(
 	        self.adbList.appendChild(newNode);
 		}
 		return false;
-    });
+});

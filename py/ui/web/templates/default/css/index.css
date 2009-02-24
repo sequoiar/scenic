@@ -6,24 +6,22 @@ html, body {
 	overflow: hidden;
 }
 
-body {
-	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
-	font-size: 12px;
-	background-color: #ff89aa;
-}
-
-h2 {
-	margin: 0; 
-}
-
-#left_pan {
+#index_left_pans {
 	position: absolute;
 	top: 0px;
-	bottom: 22px;
+/*	bottom: 22px; for chat*/
+	bottom: 0px;
 	width: 260px;
-	background: #c3ccd3;
 	padding: 20px;
 }
+
+.help_str {
+	display: none;
+}
+
+/*************************************/
+/* LINE BETWEEN THE GOOD AND THE BAD */
+/*************************************/
 
 #media_but {
 	position: absolute;

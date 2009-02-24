@@ -1,0 +1,16 @@
+body {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+
+h1 {
+	margin: 0; 
+}
+
+.color_one {
+	background-color: #c3ccd3;	
+}
+
+.color_help {
+	background-color: #fffcd9;
+}
