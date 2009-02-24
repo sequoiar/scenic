@@ -158,7 +158,12 @@ class ComChanRealm:
         assert pb.IPerspective in interfaces
         avatar = ComChanContact(name)
         avatar.attached(remote)
-        connections[name].attached('server', avatar)
+        try:
+            # XXX Etienne, est-ce que c'est correct ? -- aalex
+            # OLD VERSION : connections[name].attached('server', avatar)
+            connections[name] = avatar # .attached(avatar)
+        except Exception, e:
+            log.error("ComChanRealm.requestAvatar error: " + e.message)
         return pb.IPerspective, avatar, lambda a = avatar:a.detached(remote)
 
 

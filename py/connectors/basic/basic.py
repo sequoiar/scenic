@@ -64,7 +64,7 @@ class BasicServer(LineReceiver):
             self.set_port(line)
             contact = self.api.find_contact(self.addr.host, self.client_port, 'basic')
             if contact and contact.auto_answer:
-                self.api.notify(self, 'Contact %s:%s is now connected (it was in auto-answer mode).' % (self.addr.host, self), 'info')
+                self.api.notify(self, 'Contact %s:%s is now connected (it was in auto-answer mode).' % (self.addr.host, self.__class__.__name__), 'info')
                 self.accept()
             else:
                 self.state = WAITING
@@ -226,8 +226,9 @@ class ConnectionBasic(Connection):
 
     def _connection_lost(self, reason=protocol.connectionDone):
         self._state = DISCONNECTED
-        if reason != protocol.connectionDone: # quiet, please
-            log.info('Lost the connection. Reason:\n%s' % reason)
+        #if not isinstance(reason, protocol.connectionDone) and not isinstance(reason, error.ConnectionDone): # quiet, please
+            # twisted.internet.error.ConnectionDone
+        log.info('Basic connector is done. %s' % (reason.getErrorMessage()))
 
     def _close_connection(self):
         try:

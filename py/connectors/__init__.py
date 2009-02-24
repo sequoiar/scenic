@@ -20,6 +20,7 @@
 """
 Please write a description here
 """
+import sys
 
 from twisted.internet import task
 # App imports
@@ -80,7 +81,7 @@ class Connection(object):
 #            port = com_chan.PORT
         self.remote_com_chan_port = int(port)
         self._accepted()
-        self.api.notify(self, 'The invitation to %s (%s) was accepted.' % (self.contact.name, self.contact.address), 'answer')
+        self.api.notify(self, 'The invitation has been accepted by %s. (%s)' % (self.contact.name, self.contact.address), 'answer')
         self.setup()
 
     def _accepted(self):
@@ -126,15 +127,17 @@ class Connection(object):
         deferred.addCallback(self.attached, channel)
         deferred.addErrback(self.not_attached)
 
-    def attached(self, client, channel):
+    def attached(self, channel): # had argument client
         self.com_chan = channel
         if client == 'server':
             self.com_chan_started_server()
         else:
             self.com_chan_started_client()
 
-    def not_attached(self, client):
-        log.error('Could not start the communication channel. Closing connection')
+    def not_attached(self, failure):
+        log.error('Could not start the communication channel. Closing connection. reason: ' + failure.getErrorMessage())
+        # sys.stdout.write(failure.getTraceback()) # XXX
+        # failure.raiseException() # XXX
         self.api.notify(self,
                     'Connection failed. Address: %s | Port: %s' % (self.contact.address, self.contact.port),
                     'info')
@@ -179,7 +182,7 @@ def create_connection(contact, api):
     if contact.kind == 'group':
         raise NotImplementedError, 'Group contact not implemented for the moment.'
     if contact.state > DISCONNECTED:
-        raise ConnectionError, 'Contact \'%s\' already engage in a connection. State: %s.' % (contact.name, contact.state)
+        raise ConnectionError, 'Contact \'%s\' is already engaged in a connection. State: %s.' % (contact.name, contact.state)
 #    if contact.name in connections:
 #        raise ConnectionError, 'Can not connect. This contact \'%s\' already have a connection.' % contact.name
     if not contact.connector:
