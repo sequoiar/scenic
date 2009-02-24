@@ -90,7 +90,8 @@ class ComChannel(object):
         """
         Calls a remote procedures provided by the remote peer.
         
-        :param *args: is a tuple of data, whose 0th element is the name of the remote procedure to call.
+        :param *args: is a tuple of data, whose 0th element is the name of the remote class and method in the form Class.method to call. The other elements are the args.
+        For now, no object. List, dict, str and int for now.
         """
         if self.remote:
             self.remote.callRemote('main', *args)

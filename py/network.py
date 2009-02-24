@@ -133,9 +133,9 @@ class IperfServerProcessProtocol(protocol.ProcessProtocol):
     def connectionMade(self):
         if self.verbose:
             print self.prefix, "process started"
+        log.info("Started the iperf server process.")
     
     def outReceived(self, data):
-        log.info("iperf server started")
         if self.verbose:
             for line in data.splitlines():
                 print self.prefix, line
@@ -154,7 +154,8 @@ class IperfServerProcessProtocol(protocol.ProcessProtocol):
         self._warn_network_tester_that_i_died()
 
     def processEnded(self, status):
-        print self.prefix, "Ended iperf server, status %d" % status.value.exitCode
+        #print self.prefix, "Ended iperf server, status %d" % status.value.exitCode
+        log.info("The iperf server process is done. exit code : %d" % (status.value.exitCode))
         #print "STOP REACTOR"
         #reactor.stop()
         try:
@@ -340,6 +341,9 @@ class NetworkTester(object):
                 log.debug("Using comm channel %s." % (com_chan))
             #    self.current_com_chan
                 self.current_com_chan = com_chan # only neededi for dualtests
+                # XXX We register again our callbacks !!
+                log.debug("registering our callback once again.")
+                self._register_my_callbacks_to_com_chan(com_chan)
             else:
                 log.error("Invalid com_chan. It is None")
             self.current_kind = kind
@@ -411,9 +415,9 @@ class NetworkTester(object):
         
         (it is a float)
         """
-        return time.time() * 1000.0 #  in ms
+        return time.time() / 1000.0 #  in ms
 
-    def on_remote_message(self, key, *args):
+    def on_remote_message(self, key, args):
         """
         Called by the com_chan whenever a message is received from the remote contact through the com_chan with the "network_test" key.
         
@@ -435,7 +439,7 @@ class NetworkTester(object):
         """
         # TODO: we should check from which contact this message is from !!!!!!!!!!
 
-        log.debug("received network_test" + key + str(args))
+        log.debug("received network_test %s:(%s)" % (key, str(args)))
         if key == "ping": # from A
             self._start_iperf_server_process()
             if self.state != STATE_IDLE:
@@ -465,14 +469,15 @@ class NetworkTester(object):
             self.current_kind = kind
             if kind == KIND_DUALTEST:
                 # TODO
+                log.debug("Starting iperf client, since it is a dualtest.")
                 self.current_duration = params['duration']
                 self.current_bandwidth = params['bandwidth']
                 self.current_latency = params['latency']
                 reactor.callLater(self.current_latency / 2.0, self._start_iperf_client)
             self._start_iperf_server_process()
+            self._send_message("ok")
         elif key == "ok": # from B
             log.debug("received ok")
-            pass
         elif key == "stop": # from A
             log.debug("received stop")
             self._stop_iperf_server_process()
@@ -482,19 +487,32 @@ class NetworkTester(object):
             stats = args[1]
             if self.current_kind == KIND_DUALTEST:
                 self._stop_iperf_server_process()
+            self._send_message("stop")
         
-    def _send_message(self, key, *args):
+    def _send_message(self, key, args_list=[]):
         """
         Sends a message to the current remote contact through the com_chan with key "network_test".
+        :param args: list
         """
-        args = list(args)
-        args.insert(0, key)
-        args.insert(0, "network_test")
+        #args.insert(0, key)
+        #args.insert(0, "network_test")
+        #args.insert(0, "")
         try:
-            self.current_com_chan.callRemote(self, *args)
+            self.current_com_chan.callRemote("network_test", key, args_list) # list with key as 0th element
         except AttributeError, e:
             log.error("Could not send message to remote. ComChan is None" + e.message)
         log.debug("Sent %s." % key)
+    
+    def _register_my_callbacks_to_com_chan(self, com_channel):
+        """
+        this is where we actually registers the callbacks
+        """
+        if com_channel is None:
+            log.error("network.py: The provided com_channel is None !")
+        else:
+            # calls ComChannel.add(callback, key) 
+            com_channel.add(self.on_remote_message, "network_test")
+            log.info("Registered the com_chan callback with a new com_channel for the network_test instance.")
 
     def on_com_chan_connected(self, com_channel, role="client"):
         """
@@ -505,15 +523,8 @@ class NetworkTester(object):
         :param role: string "client" or "server"
         We actually do not care if this miville is a com_chan client or server.
         """
-        if com_channel is None:
-            log.error("network.py: The provided com_channel is None !")
-        else:
-            # calls to ComChannel.add(callback, key) 
-            com_channel.add(self.on_remote_message, "network_test") # one handler for all messages
-            self.current_com_chan = com_channel # Maybe not necessary
-            log.info("Registered the com_chan callback with a new com_channel for the network_test instance.")
-            #log.info("registered com_chan callbacks")
-            #print "on_com_chan_connected"
+        self.current_com_chan = com_channel # Maybe not necessary
+        self._register_my_callbacks_to_com_chan(com_channel)
 
     def on_com_chan_disconnected(self, com_chan_instance):
         pass
