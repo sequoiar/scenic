@@ -433,17 +433,21 @@ class NetworkTester(object):
         * ok (means the remote iperf server is started, and the remote client too if dualtest)
         * results <int kind> <dict stats>
         """
+        # TODO: we should check from which contact this message is from !!!!!!!!!!
+
         log.debug("received network_test" + key + str(args))
-        if key == "ping":
+        if key == "ping": # from A
             self._start_iperf_server_process()
             if self.state != STATE_IDLE:
                 log.error("Received a ping while being busy doing some network test. (state = %d)" % self.state)
             else:
+                log.debug("received ping")
                 self._send_message("pong")
-        elif key == "pong":
+        elif key == "pong": # from B 
             if self.state != STATE_WAITING_REMOTE_ANSWER:
                 log.error("Received pong while not being wainting for an answer. (state = %d)" % self.state)
             else:
+                log.debug("received pong")
                 # measure latency
                 self.current_latency = self._get_time_now() - self.current_ping_started_time
                 params = {
@@ -454,7 +458,8 @@ class NetworkTester(object):
                 self._send_message("start", [self.current_kind, params])
                 reactor.callLater(self.current_latency, self._start_iperf_client)
         
-        elif key == "start":
+        elif key == "start": # from A
+            log.debug("received start")
             kind = args[0]
             params = args[1]
             self.current_kind = kind
@@ -465,11 +470,14 @@ class NetworkTester(object):
                 self.current_latency = params['latency']
                 reactor.callLater(self.current_latency / 2.0, self._start_iperf_client)
             self._start_iperf_server_process()
-        elif key == "ok":
+        elif key == "ok": # from B
+            log.debug("received ok")
             pass
-        elif key == "stop":
+        elif key == "stop": # from A
+            log.debug("received stop")
             self._stop_iperf_server_process()
-        elif key == "results":
+        elif key == "results": # from B
+            log.debug("received results")
             kind = args[0]
             stats = args[1]
             if self.current_kind == KIND_DUALTEST:
@@ -486,6 +494,7 @@ class NetworkTester(object):
             self.current_com_chan.callRemote(self, *args)
         except AttributeError, e:
             log.error("Could not send message to remote. ComChan is None" + e.message)
+        log.debug("Sent %s." % key)
 
     def on_com_chan_connected(self, com_channel, role="client"):
         """
@@ -502,7 +511,7 @@ class NetworkTester(object):
             # calls to ComChannel.add(callback, key) 
             com_channel.add(self.on_remote_message, "network_test") # one handler for all messages
             self.current_com_chan = com_channel # Maybe not necessary
-            log.info("registered com_chan callback")
+            log.info("Registered the com_chan callback with a new com_channel for the network_test instance.")
             #log.info("registered com_chan callbacks")
             #print "on_com_chan_connected"
 
