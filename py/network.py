@@ -270,9 +270,10 @@ class NetworkTester(object):
                     else:    
                         iperf_stats.update(extra_arg) # appends the infos to the results dict
                         self.state = STATE_IDLE 
-                        
-                        self.notify_api(caller, 'info', "iperf stats for IP %s: %s" % (ip, str(iperf_stats)))
+                        # SUCCESS !!!!!!!!!!!!!!!!!!!
+                        #self.notify_api(caller, 'info', "iperf stats for IP %s: %s" % (ip, str(iperf_stats)))
                         self.notify_api(caller, "network_test_done", iperf_stats)
+                        self._send_message("stop")
                 else:
                     self.notify_api(caller, "error", "network performance : Unknown error.") # TODO use error key
 
