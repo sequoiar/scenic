@@ -74,8 +74,10 @@ AudioSource* AudioSourceConfig::createSource() const
         return new AudioFileSource(*this);
     else if (source_ == "alsasrc")
         return new AudioAlsaSource(*this);
-    else if (source_ == "jackaudiosrc")
-        return new AudioJackSource(*this);
+    else if (source_ == "jackaudiosrc") /* with video, more buffer time */
+        return new AudioJackSource(*this, 35000LL /* microseconds */);
+    else if (source_ == "fastjackaudiosrc") /* without video, lower buffertime */
+        return new AudioJackSource(*this, 25000LL /* microseconds */);
     else if (source_ == "dv1394src")
         return new AudioDvSource(*this);
     else if (source_ == "pulsesrc")

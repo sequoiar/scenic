@@ -220,7 +220,7 @@ class AudioPulseSource : public AudioSource
 class AudioJackSource : public AudioSource
 {
     public:
-        explicit AudioJackSource(const AudioSourceConfig &config);
+        AudioJackSource(const AudioSourceConfig &config, unsigned long long bufferTime);
     
     private:
         ~AudioJackSource();
@@ -230,6 +230,7 @@ class AudioJackSource : public AudioSource
 
         GstElement *capsFilter_;
         GstElement *aconv_;
+        unsigned long long bufferTime_;
         /// No Copy Constructor
         AudioJackSource(const AudioJackSource&);     
         /// No Assignment Operator

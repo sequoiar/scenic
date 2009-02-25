@@ -337,8 +337,8 @@ void AudioPulseSource::sub_init()
 
 
 /// Constructor 
-AudioJackSource::AudioJackSource(const AudioSourceConfig &config) : 
-    AudioSource(config), capsFilter_(0), aconv_(0)
+AudioJackSource::AudioJackSource(const AudioSourceConfig &config, unsigned long long bufferTime) : 
+    AudioSource(config), capsFilter_(0), aconv_(0), bufferTime_(bufferTime)
 {}
 
 
@@ -352,7 +352,7 @@ AudioJackSource::~AudioJackSource()
 
 void AudioJackSource::sub_init()
 {
-    AudioSource::sub_init();
+    source_ = Pipeline::Instance()->makeElement("jackaudiosrc", NULL);  // because of fastjackaudiosrc
 
     if (!Jack::is_running())
         THROW_ERROR("Jack is not running");
@@ -365,8 +365,8 @@ void AudioJackSource::sub_init()
 #endif
     // /TODO: fine tune this in conjunction with jitterbuffer
     
-    g_object_set(G_OBJECT(source_), "buffer-time", 25000LL, NULL);
-    //g_object_set(G_OBJECT(source_), "latency-time", 7500LL, NULL);
+    //g_object_set(G_OBJECT(source_), "buffer-time", 25000LL, NULL);
+    g_object_set(G_OBJECT(source_), "buffer-time", bufferTime_, NULL);
 
     // otherwise jackaudiosrc defaults to 2 channels
     std::ostringstream capsStr;

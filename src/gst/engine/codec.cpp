@@ -258,6 +258,7 @@ void Mpeg4Encoder::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
+    g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
 
     gstlinkable::link(colorspc_, codec_);
 }
