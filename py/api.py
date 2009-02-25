@@ -772,7 +772,7 @@ class ControllerApi(object):
                     self.notify(caller, "Could not start network test: Invalid kind of test \"%s\"." % kind, "error")
                 else:
                     self.network_tester.start_test(caller, remote_addr, bandwidth, duration, kind, com_chan)
-                    self.notify(caller, "Starting network performance test with contact %s" % (contact.name), "info")
+                    self.notify(caller, "Starting network performance test with contact %s for %d seconds." % (contact.name, duration), "info")
     
     def network_test_stop(self, caller):
         """

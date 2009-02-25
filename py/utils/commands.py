@@ -105,7 +105,7 @@ def commands_start(commands, callback=None, extra_arg=None, caller=None):
             raise CommandNotFoundError,'Cannot find the shell command: %s. Reason: %s' % (command[0], e.message)
     for command in commands:
         executable = find_command(command[0])
-        deferreds.append(_command_start(executable, command))
+        deferreds.append(defer.maybeDeferred(_command_start, executable, command))
     defer_list = defer.DeferredList(deferreds, consumeErrors=True).addErrback(on_commands_error, commands, extra_arg, caller)
     if callback is None:
         callback = on_commands_results
@@ -168,8 +168,8 @@ def single_command_start(command, callback=None, extra_arg=None, caller=None): #
     """
     try:
         executable = find_command(command[0]) # gets the executable
-    except Exception:
-        raise Exception, 'Cannot find the shell command: %s' % (command[0])
+    except CommandNotFoundError:
+        raise CommandNotFoundError, 'Cannot find the shell command: %s' % (command[0])
     deferreds = [defer.maybeDeferred(_command_start, executable, command)] # list with a single deferred
     # deferreds = [_command_start(executable, command)] # list with a single deferred
     defer_list = defer.DeferredList(deferreds, consumeErrors=True).addErrback(on_commands_error, [command], extra_arg, caller)

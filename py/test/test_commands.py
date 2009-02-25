@@ -78,9 +78,9 @@ def on_commands_error(command_failure, commands, extra_arg=None):
         #print "@@@@@@@@@"
         test.fail('on_commands_error() with error: %s' % (command_failure.value.message))
     
-class Test_1_Shell(unittest.TestCase):
+class Test_1_Commands(unittest.TestCase):
     """
-    tests for utils.shell
+    tests for utils.commands
     """
     def setUp(self):
         global test

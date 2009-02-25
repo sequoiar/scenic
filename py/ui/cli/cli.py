@@ -1620,9 +1620,10 @@ class CliView(Observer):
         :param data: a dict with iperf statistics
         """
         # TODO : make more beautiful
-        txt = "\n" + "Network test results:\n"
+        txt = "\n" + "Network test done. Results:\n"
         for k in data:
-            txt += k + "\t\t: " + str(data[k])
+            txt += "\t%s: %s\n" % (k, str(data[k]))
+            #txt += k + "\t\t: " + str(data[k])
         self.write(txt, True)
         
 
