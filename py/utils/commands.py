@@ -34,7 +34,7 @@ except ImportError:
 
 from twisted.internet import reactor, defer, protocol
 from twisted.python import procutils, failure
-from twisted.internet import utils
+#from twisted.internet import utils
 
 # App imports
 from utils import log
@@ -75,7 +75,8 @@ def _command_start(executable, command):
         args = []
         if len(command) > 1:
             args = command[1:]
-        deferred = utils.getProcessOutputAndValue(executable, args, os.environ, '.', reactor)
+        deferred = _get_process_output_and_value(executable, args, os.environ, '.', reactor)
+        # was utils.getProcessOutputAndValue
         # setTimeout(self, seconds, timeoutFunc=timeout, *args, **kw):
         # #TODO: get rid of this and, instead, change utils.commands and add it a 
         # ProcessProtocol which supports a timeout. 
