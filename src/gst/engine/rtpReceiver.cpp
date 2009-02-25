@@ -100,7 +100,7 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
         return;
     }
 
-    assert(gstlinkable::link_pads(srcPad, sinkPad));
+    assert(gstlinkable::link_pads(srcPad, sinkPad));    // link our udpsrc to the corresponding depayloader
 
     gst_object_unref(sinkPad);
 }

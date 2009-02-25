@@ -64,7 +64,7 @@ void AudioAlsaSink::init()
     audioconvert_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     sink_ = Pipeline::Instance()->makeElement("alsasink", NULL);
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
 
     gstlinkable::link(audioconvert_, sink_);
@@ -86,7 +86,7 @@ void AudioPulseSink::init()
     audioconvert_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     sink_ = Pipeline::Instance()->makeElement("pulsesink", NULL);
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     gstlinkable::link(audioconvert_, sink_);
 }
@@ -109,7 +109,8 @@ void AudioJackSink::init()
     sink_ = Pipeline::Instance()->makeElement("jackaudiosink", NULL);
     // uncomment to turn off autoconnect
     //g_object_set(G_OBJECT(sink_), "connect", 0, NULL);
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    g_object_set(G_OBJECT(sink_), "buffer-time", 20000LL, NULL);
+    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     if (Pipeline::SAMPLE_RATE != Jack::samplerate())
         THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()

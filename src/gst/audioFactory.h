@@ -110,7 +110,7 @@ namespace audiofactory
                        const std::string &sink = A_SINK)
     {
         assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
-        return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip,codec,port,sink));
+        return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink));
     }
 }
 

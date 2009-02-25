@@ -365,7 +365,7 @@ void AudioJackSource::sub_init()
 #endif
     // /TODO: fine tune this in conjunction with jitterbuffer
     
-    //g_object_set(G_OBJECT(source_), "buffer-time", 100000LL, NULL);
+    g_object_set(G_OBJECT(source_), "buffer-time", 25000LL, NULL);
     //g_object_set(G_OBJECT(source_), "latency-time", 7500LL, NULL);
 
     // otherwise jackaudiosrc defaults to 2 channels
@@ -386,13 +386,15 @@ void AudioJackSource::sub_init()
 
     gstlinkable::link(source_, aconv_);
     gstlinkable::link(aconv_, capsFilter_);
+    //gstlinkable::link(source_, capsFilter_);
 }
 
 
 /// Constructor 
 AudioDvSource::AudioDvSource(const AudioSourceConfig &config) : 
     AudioSource(config), 
-    queue_(0)
+    queue_(0),
+    aconv_(0)
 {}
 
 
@@ -407,8 +409,10 @@ AudioDvSource::~AudioDvSource()
 void AudioDvSource::sub_init()
 {
     queue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     // Now the Dv1394 will be able to link this queue to the dvdemux when the audio pad is created
     Dv1394::Instance()->setAudioSink(queue_);
+    gstlinkable::link(queue_, aconv_);
 }
 

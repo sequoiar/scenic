@@ -69,7 +69,7 @@ void AudioReceiver::init_depayloader()
     gstlinkable::link(*depayloader_, *decoder_);
     session_.add(depayloader_, remoteConfig_);
 
-    init_level();
+    //init_level();
 }
 
 
@@ -84,7 +84,8 @@ void AudioReceiver::init_sink()
 {
     assert(sink_ = audioConfig_.createSink());
     sink_->init();
-    gstlinkable::link(level_, *sink_);   
+    //gstlinkable::link(level_, *sink_);   
+    gstlinkable::link(*decoder_, *sink_);   
     setCaps();
     assert(gotCaps_);
     assert(remoteConfig_.capsMatchCodec()); 

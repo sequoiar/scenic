@@ -30,7 +30,7 @@
 #include "pipeline.h"
 
 #ifdef CONFIG_DEBUG_LOCAL
-#define RTP_REPORTING 0
+#define RTP_REPORTING 1
 #endif
 
 GstElement *RtpBin::rtpbin_ = 0;
@@ -43,14 +43,17 @@ void RtpBin::init()
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
     
     // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
-    g_object_set(G_OBJECT(rtpbin_), "latency", 20, NULL);
+    g_object_set(G_OBJECT(rtpbin_), "latency", 0, NULL);
     
     // uncomment this to print stats
 #if RTP_REPORTING
-    g_timeout_add(1000 /* ms */, 
+    g_timeout_add(5000 /* ms */, 
                   static_cast<GSourceFunc>(printStatsCallback),
                   static_cast<gpointer>(rtpbin_));
 #endif
+    g_timeout_add(6000 /* ms */, 
+                  static_cast<GSourceFunc>(dropOnLatency),
+                  static_cast<gpointer>(rtpbin_));
 }
 
 

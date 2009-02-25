@@ -334,7 +334,9 @@ RawEncoder::RawEncoder()
 
 void RawEncoder::init()
 {
-    AudioConvertedEncoder::init();
+    aconv_ = Pipeline::Instance()->makeElement("identity", NULL);
+    g_object_set(aconv_, "silent", TRUE, NULL);
+    //AudioConvertedEncoder::init();
 }
 
 /// Creates an RtpL16Payloader 

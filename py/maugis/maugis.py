@@ -547,6 +547,7 @@ class Config:
     emailinfo = "maugis@sat.qc.ca"
     audiolib = "oss"
     audio_input = "jackaudiosrc"
+    audio_output = "jackaudiosink"
     audio_codec = "raw"
     video_input = "v4l2src"
     video_device = "/dev/video0"
@@ -819,6 +820,7 @@ class Processes(Colleague):
                                         '--receiver', 
                                         '--address', host,
                                         '--videosink', self.config.videosink,
+                                        '--audiosink', self.config.audiosink,
                                         '--videocodec', self.config.video_codec,
                                         '--audiocodec', self.config.audio_codec,
                                         '--videoport', str(self.video_port),
@@ -846,8 +848,10 @@ class Processes(Colleague):
         if _DEBUG:
             self.gstsend_cmd = [self.config.gstsend, '--sender', 
                                             '--address', host,
+                                            '--videosource', self.config.video_input,
                                             '--videocodec', self.config.video_codec,
                                             '--videobitrate', self.config.video_bitrate,
+                                            '--audiosource', self.config.audio_input,
                                             '--audiocodec', self.config.audio_codec,
                                             '--videoport', str(self.video_port),
                                             '--audioport', str(self.audio_port)]
@@ -855,8 +859,10 @@ class Processes(Colleague):
         else:
             self.gstsend_cmd = [self.config.gstsend, '--sender', 
                                             '--address', host,
+                                            '--videosource', self.config.video_input,
                                             '--videocodec', self.config.video_codec,
                                             '--videobitrate', self.config.video_bitrate,
+                                            '--audiosource', self.config.audio_input,
                                             '--audiocodec', self.config.audio_codec,
                                             '--videoport', str(self.video_port),
                                             '--audioport', str(self.audio_port)]

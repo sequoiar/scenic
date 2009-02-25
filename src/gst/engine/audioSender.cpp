@@ -60,7 +60,7 @@ void AudioSender::init_source()
 {
     assert(source_ = audioConfig_.createSource());
     source_->init();
-    init_level();
+    //init_level();
 }
 
 
@@ -76,7 +76,8 @@ void AudioSender::init_codec()
     assert(encoder_ = remoteConfig_.createAudioEncoder());
     encoder_->init();
 
-    gstlinkable::link(level_, *encoder_);
+    //gstlinkable::link(level_, *encoder_);
+    gstlinkable::link(*source_, *encoder_);
 }
 
 

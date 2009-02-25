@@ -256,7 +256,8 @@ class AudioDvSource : public AudioSource
         void sub_init();
 
         GstElement *queue_;
-        GstElement *srcElement() { return queue_; }
+        GstElement *aconv_;
+        GstElement *srcElement() { return aconv_; }
         /// No Copy Constructor
         AudioDvSource(const AudioDvSource&);     
         /// No Assignment Operator

@@ -58,7 +58,10 @@ short pof::run(int argc, char **argv)
     char *ip = 0;
     char *videoCodec = 0;
     char *audioCodec = 0;
+    char *videoSource = 0;
+    char *audioSource = 0;
     char *videoSink = 0;
+    char *audioSink = 0;
     int audioPort = 0;
     int videoPort = 0;
     int videoBitrate = 3000000;
@@ -75,6 +78,7 @@ short pof::run(int argc, char **argv)
     options.add(new StringArg(&videoCodec, "videocodec", 'v', "videocodec", "h264"));
     options.add(new StringArg(&audioCodec, "audiocodec", 'a', "audiocodec", "vorbis raw mp3"));
     options.add(new StringArg(&videoSink, "videosink", 'k', "videosink", "xvimagesink glimagesink"));
+    options.add(new StringArg(&audioSink, "audiosink", 'l', "audiosink", "jackaudiosink alsasink pulsesink"));
     options.add(new IntArg(&audioPort, "audioport", 't', "audioport", "portnum"));
     options.add(new IntArg(&videoPort, "videoport", 'p', "videoport", "portnum"));
     options.add(new BoolArg(&full,"fullscreen", 'f', "default to fullscreen"));
@@ -85,6 +89,8 @@ short pof::run(int argc, char **argv)
     options.add(new BoolArg(&version, "version", 'w', "version number"));
     options.add(new IntArg(&numChannels, "numChannels", 'c', "numChannels", "2"));
     options.add(new IntArg(&videoBitrate, "videobitrate", 'x', "videobitrate", "3000000"));
+    options.add(new StringArg(&audioSource, "audiosource", 'e', "audiosource", "jackaudiosrc alsasrc pulsesrc"));
+    options.add(new StringArg(&videoSource, "videosource", 'u', "videosource", "v4l2src v4lsrc dv1394src"));
 
     //telnetServer param
     int serverport=0;
@@ -126,12 +132,17 @@ short pof::run(int argc, char **argv)
         if (!disableVideo)
         {
             if(videoSink == 0)
-                THROW_ERROR("argument error: missing videoSink. see --help");
+                THROW_ERROR("argument error: missing --videosink. see --help");
 
             vRx = videofactory::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink);
         }
         if (!disableAudio)
-            aRx = audiofactory::buildAudioReceiver(ip, audioCodec, audioPort);
+        {
+            if(audioSink == 0)
+                THROW_ERROR("argument error: missing --audiosink. see --help");
+
+            aRx = audiofactory::buildAudioReceiver(ip, audioCodec, audioPort, audioSink);
+        }
 
 #ifdef CONFIG_DEBUG_LOCAL
         playback::makeVerbose();
@@ -158,10 +169,13 @@ short pof::run(int argc, char **argv)
         {
             VideoSourceConfig *vConfig; 
 
+            if (videoSource == 0)
+                THROW_ERROR("argument error: missing --videosource. see --help");
+
             if (videoDevice)
-                vConfig = new VideoSourceConfig("v4l2src", videoBitrate, videoDevice);
+                vConfig = new VideoSourceConfig(videoSource, videoBitrate, videoDevice);
             else
-                vConfig = new VideoSourceConfig("v4l2src", videoBitrate);
+                vConfig = new VideoSourceConfig(videoSource, videoBitrate);
 
             vTx = videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort);
             delete vConfig;
@@ -169,7 +183,9 @@ short pof::run(int argc, char **argv)
 
         if (!disableAudio)
         {
-            AudioSourceConfig aConfig("jackaudiosrc", numChannels);
+            if (audioSource == 0)
+                THROW_ERROR("argument error: missing --audiosource. see --help");
+            AudioSourceConfig aConfig(audioSource, numChannels);
             aTx = audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort);
         }
 

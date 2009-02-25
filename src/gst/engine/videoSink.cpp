@@ -105,7 +105,7 @@ void GtkVideoSink::makeUnfullscreen(GtkWidget *widget)
 
 void GtkVideoSink::prepareSink()
 {
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
 }
 
