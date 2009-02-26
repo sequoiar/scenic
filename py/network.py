@@ -61,6 +61,29 @@ STATE_QUERIED = 5
 STATE_WAITING_REMOTE_ANSWER = 6
 STATE_ANSWERED_OK = 7
 
+
+"""
+This dict explains the 2nd line of the output of `iperf -y c -u -c <host>`
+"""
+iperf_results_indices = {
+    0:["datetime_YmdHis", "str"], # 0 str
+    1:["remote_ip", "str"], # 1 str                         # XXX local is actually remote... since it is the local remote server... 
+    2:["remote_port", "int"], # 2 int
+    3:["local_ip", "str"], # 3 str
+    4:["local_port", "int"], # 4 int
+    5:["transfert_ID", "int"], # 5 int 
+    6:["start_and_end_time", "str"], # 6 str #%.1f-%.1f
+    # ------------------------ end of first line.
+    #                          2nd line has more:
+    7:["total_length", "int"], # 8 long int
+    8:["speed", "int"], # 9 long int 
+    9:["jitter", "float"], # 10 float 
+    10:["count_errors", "int"], # 11 int
+    11:["count_datagrams", "int"], # 12 int 
+    12:["percent_errors", "float"], # 13 float
+    13:["count_out_of_order", "int"] # 14 int
+}
+
 # functions ------------------------------------------------------
 def _parse_iperf_output(lines):
     """
@@ -68,37 +91,67 @@ def _parse_iperf_output(lines):
 
     Might raise NetworkError
     """
-    #  iperf results: 20090225111131,10.10.10.65,35428,10.10.10.68,5001,3,0.0-10.0,64425739815,51440124145    ??????
     ret = {}
-    keys = ['datetime', 'local ip', 'local port', 'remote ip', 'remote port', 'test index', 
-           'interval', 'transfer', 'bandwidth', 
-           'jitter', 'datagrams lost', 'total datagrams', 'loss',  'datagrams out of order']
+#     keys = ['datetime', 'local ip', 'local port', 'remote ip', 'remote port', 'test index', 
+#            'interval', 'transfer', 'bandwidth', 
+#            'jitter', 'datagrams lost', 'total datagrams', 'loss',  'datagrams out of order']
     #print "TODO: parse, change state and notify"
     line_index = 0
+    was_ok = False
     for line in lines:
         if line.find("WARNING: did not receive ack of last datagram after 10 tries.") != -1:
             # error !!
             raise NetworkError("Impossible to reach remote iperf server.")
-        if line.startswith("2"): # date
+        elif line.startswith("2"): # date
             #print line
             if line_index == 0:
                 line_index += 1
             else: # 2nd line is the only one we need
                 words = line.split(",")
                 word_index = 0
-                for word in words:# interval, transfert, jitter, packet loss (%)
-                    k = keys[word_index]
-                    if k == 'latency':  # TODO: is it correct?
-                        ret[k] = float(word) # %
-                    elif k == 'bandwidth': 
-                        ret[k] = int(word) # Kbits/sec
-                    elif k == 'jitter': 
-                        ret[k] = float(word) # ms
-                    elif k == 'loss': 
-                        ret[k] = float(word) # %
+                for str_value in words:
+                    key_name = iperf_results_indices[word_index][0]
+                    cast_type = iperf_results_indices[word_index][1]
+                    to_exec = "tmp = %s(\"%s\")" % (cast_type, str_value)
+                    try:
+                        # print to_exec
+                        exec(to_exec)
+                    except ValueError:
+                        log.error("Could not cast %s string to %s for index %s." % (str_value, cast_type, key_name))
+                    ret[key_name] = tmp
                     word_index += 1
+                was_ok = True
+    if not was_ok:
+        raise NetworkError("Could not get satisfying iperf output.")
     return ret
+# XXX former algo : 
+#                 for word in words:# interval, transfert, jitter, packet loss (%)
+#                     k = keys[word_index]
+#                     if k == 'latency':  # TODO: is it correct?
+#                         ret[k] = float(word) # %
+#                     elif k == 'bandwidth': 
+#                         ret[k] = int(word) # Kbits/sec
+#                     elif k == 'jitter': 
+#                         ret[k] = float(word) # ms
+#                     elif k == 'loss': 
+#                         ret[k] = float(word) # %
+#                     word_index += 1
+# TODO : in the process to parse the iperf output better...
+#------------------- SAT rules --------------------
+# %s,%s,%d,%.1f-%.1f,%lld,%lld,%.3f,%d,%d,%.3f,%d
+#20090226155534,
+# 10.10.10.65,5001,    10.10.10.68,43627,
+# 3, 0.0-10.0, 1252440, 999983, 0.006, 0,852, 0.000,0
 
+# NOTES ----------------------------------------------------------
+# example outputs: 
+# iperf -c 10.10.10.68 -t 10 -y c -u -b 1M
+# 20090226144430,10.10.10.65,47632,10.10.10.68,5001,3,0.0-10.0,64425739815,51440119011
+# --------------
+# iperf -c 10.10.10.65 -t 10 -y c -u -b 1M
+# 20090226144426,10.10.10.68,48338,10.10.10.65,5001,3,0.0-10.0,1252440,999996
+# 20090226144426,10.10.10.65,5001,10.10.10.68,48338,3,0.0-10.0,1252440,999986,0.004,0,852,0.000,0
+# ----------------------------------------------------------------
 # from wajig source iperf: src/ReportCSV.c :
 # // UDP Reporting
 #        printf( reportCSV_bw_jitter_loss_format,
@@ -113,7 +166,27 @@ def _parse_iperf_output(lines):
 #                stats->cntError,
 #                stats->cntDatagrams,
 #                (100.0 * stats->cntError) / stats->cntDatagrams, stats->cntOutofOrder );
-#
+# -----------------------------------------------------------------
+# from wajig source iperf: src/Locale.c :
+#   #ifdef HAVE_PRINTF_QD
+#   XXX TCP
+#   const char reportCSV_bw_format[] =
+#   "%s,%s,%d,%.1f-%.1f,%qd,%qd\n";
+#  XXX UDP: 
+#   const char reportCSV_bw_jitter_loss_format[] =
+#   "%s,%s,%d,%.1f-%.1f,%qd,%qd,%.3f,%d,%d,%.3f,%d\n";
+#   #else // HAVE_PRINTF_QD
+#   const char reportCSV_bw_format[] =
+#  "%s,%s,%d,%.1f-%.1f,%lld,%lld\n";
+#   
+#   const char reportCSV_bw_jitter_loss_format[] =
+#   "%s,%s,%d,%.1f-%.1f,%lld,%lld,%.3f,%d,%d,%.3f,%d\n";
+#   #endif // HAVE_PRINTF_QD
+# -----------------------------------------------------------------
+
+# XXX timestamp format : 
+# "%Y%m%d%H%M%S"
+
 
 class NetworkError(Exception):
     """
@@ -180,7 +253,7 @@ class NetworkTester(object):
         self.iperf_client = None
         self.api = None
         self.state = STATE_IDLE #STOPPED
-        self.iperf_server_is_running = True
+        self.iperf_server_is_running = False
         # ------ current stats and config
         self.current_remote_addr = None
         self.local_addr = None
@@ -208,15 +281,16 @@ class NetworkTester(object):
         #process_transport = self.iperf_server
         try:
             process_transport.signalProcess(sig)
-            self.iperf_server_is_running = False
         except AttributeError, e:
             log.error("Error in kill_server_process: %s" % e.message)
         except ProcessExitedAlready, e:
             log.debug("Successfuly killed the iperf server. (%s)" % e.message)
-            self.state = STATE_IDLE
+            #self.state = STATE_IDLE
+            self.iperf_server_is_running = False
         else:
             if sig == 15: # (first time)
                 reactor.callLater(verify_timeout, self.kill_server_process, process_transport, 9)
+                self.iperf_server_is_running = False
             else: # sig = 9 (second time)
                 process_transport.loseConnection()
                 self.iperf_server_is_running = False
@@ -226,10 +300,11 @@ class NetworkTester(object):
         """
         Called when the iperf -s process is done.
         """
+        log.debug("iperf server is done.")
         self.iperf_server_is_running = False
-        if not intentional:
-            print "iperf server process died unintentionally. will start it again." # TODO: log
-            reactor.callLater(1.0, self._start_iperf_server_process)
+        #if not intentional:
+        #    print "iperf server process died unintentionally. will start it again." # TODO: log
+        #    reactor.callLater(1.0, self._start_iperf_server_process)
 
     def on_iperf_command_results(self, results, commands, extra_arg, caller):
         """
@@ -252,15 +327,17 @@ class NetworkTester(object):
                     try:
                         iperf_stats = _parse_iperf_output(stdout.splitlines())
                         log.debug("iperf results: %s" % stdout)
-                        if len(iperf_stats) == 0:
-                            # TODO
-                            raise NetworkError("iperf command gave empty results - or only 1 line. Is remote iperf server running ?")
+                        #if len(iperf_stats) == 0:
+                        #    # TODO
+                        #    raise NetworkError("iperf command gave empty results - or only 1 line. Is remote iperf server running ?")
                     except NetworkError, e:
                         self.notify_api(caller, 'error', e.message)
                         log.error(e.message)
                     else:    
                         # TODO : send updated dict to remote A
-                        iperf_stats.update(extra_arg) # appends the infos to the dict we used for arguments to start it.
+                        log.debug("iperf stats : %r" % iperf_stats)
+                        #iperf_stats.update(extra_arg) # appends the infos to the dict we used for arguments to start it.
+                        #iperf_stats['kind'] = extra_arg['kind']
                         self.state = STATE_IDLE 
                         # SUCCESS !!!!!!!!!!!!!!!!!!!
                         #self.notify_api(caller, 'info', "iperf stats for IP %s: %s" % (ip, str(iperf_stats)))
@@ -301,20 +378,6 @@ class NetworkTester(object):
         except:
             pass
         return ret
-    #def _setup_com_chan(self):
-    #    """
-    #    Registers com chan callbacks
-    #    """
-    #    # TODO
-    #    com = self.current_com_chan
-    #    if self.current_kind == KIND_DUALTEST_CLIENT:
-    #        pass
-    #        # :*args: is a tuple of data, whose 0th element is the name of the remote procedure to call.
-    #        # callRemote(self, *args):
-    #    else: # SERVER
-    #        pass
-        
-
 
     def start_test(self, caller, server_addr, bandwidth_megabits=1, duration=10, kind=KIND_UNIDIRECTIONAL, com_chan=None): # start_client
         """
@@ -352,11 +415,10 @@ class NetworkTester(object):
             self.current_kind = kind
             
             self.current_ping_started_time = self._get_time_now()
-            self.state = STATE_WAITING_REMOTE_ANSWER 
             #if kind == KIND_DUALTEST:
-            log.info("starting iperf server process")
             self._start_iperf_server_process()
             self._send_message("ping")
+            self.state = STATE_WAITING_REMOTE_ANSWER 
 
     def _start_iperf_client(self):
         """
@@ -382,7 +444,8 @@ class NetworkTester(object):
         for i in range(len(command)):
             if not isinstance(command[i], str):
                 command[i] = str(command[i])
-        log.debug("Calling %r." % (command))
+        #log.debug("Calling %r." % (command))
+        log.debug("Calling %r." % (" ".join(command)))
         callback = self.on_iperf_command_results
         try:
             commands.single_command_start(command, callback, extra_arg, self.current_caller)
@@ -404,7 +467,11 @@ class NetworkTester(object):
         """
         Starts `iperf -s -u`
         """
-        if self.state == STATE_IDLE: 
+        #if self.state != STATE_IDLE: 
+        log.info("starting iperf server process")
+        if self.iperf_server_is_running:
+            log.error("Could not start iperf server, since it is already running.")
+        else:
             proto = IperfServerProcessProtocol()
             proto.network_tester = self
             try:
@@ -445,20 +512,18 @@ class NetworkTester(object):
         """
         # TODO: we should check from which contact this message is from !!!!!!!!!!
 
-        log.debug("received network_test %s:(%s)" % (key, str(args)))
+        log.debug("received %s:(%s)" % (key, str(args)))
         if key == "ping": # from A
             self._start_iperf_server_process()
             if self.state != STATE_IDLE:
                 log.error("Received a ping while being busy doing some network test. (state = %d)" % self.state)
             else:
-                log.debug("received ping")
                 self._send_message("pong")
         
         elif key == "pong": # from B 
             if self.state != STATE_WAITING_REMOTE_ANSWER:
                 log.error("Received pong while not being wainting for an answer. (state = %d)" % self.state)
             else:
-                log.debug("received pong")
                 # measure latency
                 self.current_latency = self._get_time_now() - self.current_ping_started_time # seconds
                 params = {
@@ -468,10 +533,11 @@ class NetworkTester(object):
                     #'remote_addr':self.current_remote_addr
                 }
                 self._send_message("start", [self.current_kind, params])
-                reactor.callLater(self.current_latency / 2.0, self._start_iperf_client)
+                wait_for = self.current_latency
+                log.debug("Will start iperf client in %f seconds" % wait_for)
+                reactor.callLater(wait_for, self._start_iperf_client)
         
         elif key == "start": # from A
-            log.debug("received start")
             kind = args[0]
             params = args[1]
             self.current_kind = kind
@@ -484,26 +550,32 @@ class NetworkTester(object):
                 self.current_latency = params['latency']
                 #self.current_remote_addr = params['remote_addr'] # IMPORTANT 
                 self.current_remote_addr = self._get_remote_addr() # TODO XXX Make more sturdy
-                reactor.callLater(self.current_latency / 2.0, self._start_iperf_client)
+                wait_for = self.current_latency / 2.0
+                log.debug("Will start iperf client in %f seconds" % wait_for)
+                reactor.callLater(wait_for, self._start_iperf_client)
+            else:
+                log.debug("No test to start from this side.")
             self._send_message("ok")
         
         elif key == "ok": # from B
-            log.debug("Received ok. Test should be happening.")
+            log.debug("Test should be happening.")
         
         elif key == "results": # from B
             kind = args[0]
             stats = args[1]
             log.debug("received remote iperf client results : %r" % stats)
             #if self.current_kind == KIND_DUALTEST:
-            self._stop_iperf_server_process()
+            reactor.callLater(0.5, self._stop_iperf_server_process)
             self._send_message("stop")
+            self.state = STATE_IDLE 
         
         elif key == "stop": # from A
             log.debug("Received stop")
-            self._stop_iperf_server_process()
-        
+            reactor.callLater(0.5, self._stop_iperf_server_process)
+            self.state = STATE_IDLE 
         else:
             log.error("Unhandled com_chan message. %s" % key)
+        log.debug("state is %d" % self.state)
         
     def _send_message(self, key, args_list=[]):
         """
@@ -566,12 +638,4 @@ def start(subject):
     connectors.register_callback("networktest_on_connect", tester.on_com_chan_connected, event="connect")
     connectors.register_callback("networktest_on_disconnect", tester.on_com_chan_disconnected, event="disconnect")
     return tester
-
-    #    txt = """
-    #    20090126182857,10.10.10.145,35875,10.10.10.65,5001,3,0.0-10.0,1252440,999997
-    #    20090126182857,10.10.10.65,5001,10.10.10.145,35875,3,0.0-10.0,1252440,999970,0.008,0,852,0.000,0
-    #    """
-    #    
-    #    lines = txt.strip().splitlines()
-    #    pprint.pprint(_parse_iperf_output(lines))
 
