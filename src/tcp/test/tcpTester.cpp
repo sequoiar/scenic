@@ -22,8 +22,8 @@ int main(int argc, char** argv)
             try
             {
                 MapMsg f = queue.timed_pop(1000000);
-                std::string command;
-                if(f.cmd().get(command))
+                std::string command(f.cmd());
+                if(!command.empty())
                 {
                     if(command == "quit")
                         break;
