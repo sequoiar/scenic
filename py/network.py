@@ -337,7 +337,7 @@ class NetworkTester(object):
                         # TODO : send updated dict to remote A
                         log.debug("iperf stats : %r" % iperf_stats)
                         #iperf_stats.update(extra_arg) # appends the infos to the dict we used for arguments to start it.
-                        #iperf_stats['kind'] = extra_arg['kind']
+                        iperf_stats['test_kind'] = extra_arg['kind']
                         self.state = STATE_IDLE 
                         # SUCCESS !!!!!!!!!!!!!!!!!!!
                         #self.notify_api(caller, 'info', "iperf stats for IP %s: %s" % (ip, str(iperf_stats)))
