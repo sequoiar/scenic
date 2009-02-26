@@ -249,7 +249,7 @@ const char *H263Decoder::getCaps() const
 
 /// Constructor 
 Mpeg4Encoder::Mpeg4Encoder() : 
-    colorspc_(0)
+    deinterlace_(0), queue_(0), colorspc_(0)
 {}
 
 
@@ -258,7 +258,17 @@ void Mpeg4Encoder::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
-    g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
+
+    if (doDeinterlace_)
+    {
+        LOG_DEBUG("DO THE DEINTERLACE");
+        deinterlace_ = Pipeline::Instance()->makeElement("deinterlace2", NULL);
+        queue_ = Pipeline::Instance()->makeElement("queue", NULL);
+        gstlinkable::link(deinterlace_, queue_);
+        gstlinkable::link(queue_, colorspc_);
+    }
+    else
+        g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
 
     gstlinkable::link(colorspc_, codec_);
 }
@@ -285,8 +295,8 @@ RtpPay* Mpeg4Decoder::createDepayloader() const
 
 
 /** The config string will vary depending on resolution. Not an issue for NTSC only,
-but for other resolutions this will lead to a picture melting, sensory experience.
-*/
+  but for other resolutions this will lead to a picture melting, sensory experience.
+  */
 const char *Mpeg4Decoder::getCaps() const
 {
     // FIXME: This sucks!!!!!! This should be sent to the receiver from the sender.

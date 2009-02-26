@@ -53,6 +53,7 @@ short pof::run(int argc, char **argv)
     int send = false;
     int recv = false;
     int full = false;
+    int doDeinterlace = false;
     int disableAudio = false;
     int disableVideo = false;
     char *ip = 0;
@@ -84,6 +85,7 @@ short pof::run(int argc, char **argv)
     options.add(new BoolArg(&full,"fullscreen", 'f', "default to fullscreen"));
     options.add(new BoolArg(&disableAudio,"disableaudio", 'y', "disable audio"));
     options.add(new BoolArg(&disableVideo,"disablevideo", 'z', "disable video"));
+    options.add(new BoolArg(&doDeinterlace,"deinterlace", 'o', "deinterlace video"));
     options.add(new StringArg(&videoDevice, "videodevice", 'd', "device", "/dev/video0 /dev/video1"));
     options.add(new IntArg(&screenNum, "screen", 'n', "screen", "xinerama screen num"));
     options.add(new BoolArg(&version, "version", 'w', "version number"));
@@ -173,9 +175,9 @@ short pof::run(int argc, char **argv)
                 THROW_ERROR("argument error: missing --videosource. see --help");
 
             if (videoDevice)
-                vConfig = new VideoSourceConfig(videoSource, videoBitrate, videoDevice);
+                vConfig = new VideoSourceConfig(videoSource, videoBitrate, videoDevice, doDeinterlace);
             else
-                vConfig = new VideoSourceConfig(videoSource, videoBitrate);
+                vConfig = new VideoSourceConfig(videoSource, videoBitrate, doDeinterlace);
 
             vTx = videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort);
             delete vConfig;

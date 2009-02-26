@@ -58,6 +58,8 @@ void VideoSender::init_source()
 void VideoSender::init_codec()
 {
     assert(encoder_ = remoteConfig_.createVideoEncoder());
+    if (videoConfig_.doDeinterlace())
+        encoder_->doDeinterlace();
     encoder_->init();
     encoder_->setBitrate(videoConfig_.bitrate());
     gstlinkable::link(*source_, *encoder_);// FIXME: this shouldn't happen for VideoFileSource

@@ -117,9 +117,17 @@ class AudioConvertedDecoder : public Decoder
         AudioConvertedDecoder & operator=(const AudioConvertedDecoder&);     
 };
 
+class VideoEncoder : public Encoder 
+{
+    public: 
+        VideoEncoder() : doDeinterlace_(false) {};
+        void doDeinterlace() { doDeinterlace_ = true; }
+    protected:
+        bool doDeinterlace_;
+};
 
 /// Encoder that encodes raw video into H.264 using the x264 encoder
-class H264Encoder : public Encoder
+class H264Encoder : public VideoEncoder
 {
     public: 
         H264Encoder();
@@ -153,7 +161,7 @@ class H264Decoder : public Decoder
 
 
 /// Encoder that encodes raw video into H.263 using the ffmpeg h263 encoder
-class H263Encoder : public Encoder
+class H263Encoder : public VideoEncoder
 {
     public: 
         H263Encoder();
@@ -186,15 +194,24 @@ class H263Decoder : public Decoder
 
 
 /// Encoder that encodes raw video into mpeg4 using the ffmpeg mpeg4 encoder
-class Mpeg4Encoder : public Encoder
+class Mpeg4Encoder : public VideoEncoder
 {
     public:
         Mpeg4Encoder();
 
     private:
         void init();
+        _GstElement *deinterlace_;
+        _GstElement *queue_;
         _GstElement *colorspc_;
-        _GstElement *sinkElement() { return colorspc_; }
+        _GstElement *sinkElement() 
+        { 
+            if (!doDeinterlace_)
+                return colorspc_; 
+            else
+                return deinterlace_; 
+        }
+
         RtpPay* createPayloader() const;
         
         /// No Copy Constructor

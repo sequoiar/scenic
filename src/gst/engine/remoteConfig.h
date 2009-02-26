@@ -31,6 +31,7 @@
 #include <string>
 
 class Encoder;
+class VideoEncoder;
 class Decoder;
 
 class RemoteConfig 
@@ -74,7 +75,7 @@ class SenderConfig : public RemoteConfig
             : RemoteConfig(m)
         {}
 
-        Encoder* createVideoEncoder() const;
+        VideoEncoder* createVideoEncoder() const;
         Encoder* createAudioEncoder() const;
 };
 

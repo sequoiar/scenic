@@ -29,7 +29,7 @@
 #include "rtpSender.h"
 
 class VideoSource;
-class Encoder;
+class VideoEncoder;
 class RtpPay;
 
 class VideoSender
@@ -53,7 +53,7 @@ class VideoSender
         const SenderConfig remoteConfig_;
         RtpSender session_;
         VideoSource *source_;
-        Encoder *encoder_;
+        VideoEncoder *encoder_;
         RtpPay *payloader_; 
 
         // hidden

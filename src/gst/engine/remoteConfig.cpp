@@ -43,7 +43,7 @@ RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remote
 }
 
 
-Encoder * SenderConfig::createVideoEncoder() const
+VideoEncoder * SenderConfig::createVideoEncoder() const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make encoder without codec being specified.");
