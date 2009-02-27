@@ -147,7 +147,6 @@ class MilhouseTests():
     
     def test_11_videoOnly(self):
         """ Test with just video """
-        self.countdown("START")
 
         rxArgs, txArgs = self.timeouts()
         self.runTest(rxArgs + ' --disable-audio', txArgs + ' --disable-audio')
@@ -180,9 +179,21 @@ class MilhouseTests():
         rxArgs, txArgs = self.timeouts()
         self.runTest(rxArgs + ' --videosink glimagesink', txArgs + ' --videosource dv1394src')
 
+    def test_16_videoOnly_deinterlace(self):
+        """ Test with just video deinterlaced """
+
+        rxArgs, txArgs = self.timeouts()
+        self.runTest(rxArgs + ' --disable-audio', txArgs + ' --deinterlace --disable-audio')
+
+    def test_17_videoOnly_deinterlace_glimagesink(self):
+        """ Test with just video deinterlaced """
+
+        rxArgs, txArgs = self.timeouts()
+        self.runTest(rxArgs + ' --disable-audio --videosink glimagesink', txArgs + ' --deinterlace --disable-audio')
+
 
 # here we run all the tests thanks to the wonders of reflective programming
-tests = prefixedMethods(MilhouseTests(), 'test_10')
+tests = prefixedMethods(MilhouseTests(), 'test_17')
 
 for test in tests:
     print "TEST: "  + test.__doc__

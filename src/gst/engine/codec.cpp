@@ -84,7 +84,10 @@ void Encoder::setBitrate(unsigned bitrate)
         Pipeline::Instance()->start();
     }
     else
+    {
+        LOG_DEBUG("SETTING BITRATE TO " << bitrate);
         g_object_set(G_OBJECT(codec_), "bitrate", bitrate, NULL);
+    }
 }
 
 

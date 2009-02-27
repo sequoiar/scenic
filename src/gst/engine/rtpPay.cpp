@@ -27,7 +27,7 @@
 #include "pipeline.h"
 
 
-const long long Payloader::MAX_PTIME = 2000000;
+const long long Payloader::MAX_PTIME = 2000000LL;
 
 RtpPay::~RtpPay()
 {

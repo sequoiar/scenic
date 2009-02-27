@@ -77,6 +77,8 @@ def parseArgs(args):
             action="store_true", dest="disableVideo", default=False, help="stream audio only")
     parser.add_option("-j", "--disable-audio",
             action="store_true", dest="disableAudio", default=False, help="stream video only")
+    parser.add_option("-u", "--deinterlace",
+            action="store_true", dest="deinterlace", default=False, help="deinterlace video")
 
     return parser.parse_args(args)
 
@@ -103,9 +105,9 @@ def runAsSender(options):
     if not options.disableVideo:
         vConfig = None
         if options.videoDevice is None:
-            vConfig = VideoSourceConfig(options.videoSource, options.videoBitrate)
+            vConfig = VideoSourceConfig(options.videoSource, options.videoBitrate, options.deinterlace)
         else:
-            vConfig = VideoSourceConfig(options.videoSource, options.videoBitrate, options.videoDevice)
+            vConfig = VideoSourceConfig(options.videoSource, options.videoBitrate, options.videoDevice, options.deinterlace)
     
         vTx = buildVideoSender(vConfig, options.ip, options.videoCodec, options.videoPort)
 
