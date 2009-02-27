@@ -661,17 +661,19 @@ class NetworkTester(object):
             com_channel.add(self.on_remote_message, "network_test")
             log.info("Registered the com_chan callback with a new com_channel for the network_test instance.")
 
-    def on_com_chan_connected(self, com_channel, role="client"):
+    def on_com_chan_connected(self, connection_handle, role="client"):
         """
         Called from the Connector class in its com_chan_started_client or com_chan_started_server method.
 
         registers the com_chan callback for network_test
         
+        :param connection_handle: connectors.Connection object.
         :param role: string "client" or "server"
         We actually do not care if this miville is a com_chan client or server.
         """
-        self.current_com_chan = com_channel # Maybe not necessary
-        self._register_my_callbacks_to_com_chan(com_channel)
+        self.current_contact = connection_handle.contact
+        self.current_com_chan = connection_handle.com_chan 
+        self._register_my_callbacks_to_com_chan(self.current_com_chan)
 
     def on_com_chan_disconnected(self, com_chan_instance):
         pass

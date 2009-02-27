@@ -738,6 +738,7 @@ class ControllerApi(object):
         :param bandwidth: in Mbit
         :param duration: in seconds
         :param kind: string "localtoremote","remotetolocal",  "tradeoff" or "dualtest"
+        :param contact: addressbook.Contact object.
         """
         try:
             if contact is None:
@@ -747,7 +748,7 @@ class ControllerApi(object):
         #if contact is None:
             self.notify(caller, "Please select a contact prior to start a network test.", "error")
         else:
-            pprint.pprint(contact.__dict__)
+            #pprint.pprint(contact.__dict__)
             
             if contact.state != addressbook.CONNECTED: #  and kind == "dualtest"
                 self.notify(caller, "Please connect to a contact prior to start a network test.", "error")
