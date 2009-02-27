@@ -266,7 +266,7 @@ class NetworkTester(object):
         self.current_kind = None
         self.current_latency = 0 # milliseconds
         self.current_ping_started_time  = 0 # UNIX timestamp
-        
+        self.current_results_sent = False
         # -------- settings
         self.accept_timeout = 20 # timeout before auto rejecting dualtest query
         self.remote_results_timeout = 5 # how many extra seconds over the duration of a test to wait for remote stats before giving up.
@@ -306,46 +306,6 @@ class NetworkTester(object):
         #    print "iperf server process died unintentionally. will start it again." # TODO: log
         #    reactor.callLater(1.0, self._start_iperf_server_process)
 
-    def on_iperf_command_results(self, results, commands, extra_arg, caller):
-        """
-        Called once a bunch of child processes are done.
-        
-        See utils.commands
-        """
-        for i in range(len(results)): # should have a len() of 1
-            result = results[i]
-            success, results_infos = result
-            command = commands[i]
-            
-            if isinstance(results_infos, failure.Failure):
-                print ">>>> FAILURE : ", results_infos.getErrorMessage()  # if there is an error, the programmer should fix it.
-            else:
-                stdout, stderr, signal_or_code = results_infos
-                if success:
-                    # print "stdout:", stdout
-                    ip = extra_arg['ip']
-                    try:
-                        iperf_stats = _parse_iperf_output(stdout.splitlines())
-                        log.debug("iperf results: %s" % stdout)
-                        #if len(iperf_stats) == 0:
-                        #    # TODO
-                        #    raise NetworkError("iperf command gave empty results - or only 1 line. Is remote iperf server running ?")
-                    except NetworkError, e:
-                        self.notify_api(caller, 'error', e.message)
-                        log.error(e.message)
-                    else:    
-                        # TODO : send updated dict to remote A
-                        log.debug("iperf stats : %r" % iperf_stats)
-                        #iperf_stats.update(extra_arg) # appends the infos to the dict we used for arguments to start it.
-                        iperf_stats['test_kind'] = extra_arg['kind']
-                        self.state = STATE_IDLE 
-                        # SUCCESS !!!!!!!!!!!!!!!!!!!
-                        #self.notify_api(caller, 'info', "iperf stats for IP %s: %s" % (ip, str(iperf_stats)))
-                        self.notify_api(caller, "network_test_done", iperf_stats)
-                        # XXX add an if
-                        self._send_message("stop")
-                else:
-                    self.notify_api(caller, "error", "Network performance : Unknown error.") # TODO use error key
 
     def notify_api(self, caller, key, val):
         """
@@ -364,6 +324,7 @@ class NetworkTester(object):
                 print "ERROR !", val
         else:
             self.api.notify(caller, val, key) #key, res)
+
     def _get_remote_addr(self):
         """
         Returns the IP of the current remote contact.
@@ -393,7 +354,7 @@ class NetworkTester(object):
         """
         # TODO: remove com_chan
         if self.state != STATE_IDLE:
-            self.notify_api(caller, "error", "A network test is already being done.")
+            self.notify_api(caller, "error", "A network test is already in process.")
         else:
             self.current_stats_local = None # dict
             self.current_stats_remote = None # dict
@@ -402,6 +363,7 @@ class NetworkTester(object):
             self.current_bandwidth = bandwidth_megabits # Mbits
             self.current_duration = duration # seconds
             self.current_caller = caller # instance
+            self.current_results_sent = False
             # XXX
             if com_chan is not None:
                 log.debug("Using comm channel %s." % (com_chan))
@@ -561,22 +523,97 @@ class NetworkTester(object):
             log.debug("Test should be happening.")
         
         elif key == "results": # from B
+            # [int kind, dict stats]
             kind = args[0]
             stats = args[1]
-            log.debug("received remote iperf client results : %r" % stats)
-            #if self.current_kind == KIND_DUALTEST:
+            self.current_stats_remote = stats
+            #log.debug("received remote iperf client results : %r" % stats)
+            self._send_results_if_ready()
             reactor.callLater(0.5, self._stop_iperf_server_process)
             self._send_message("stop")
             self.state = STATE_IDLE 
         
         elif key == "stop": # from A
-            log.debug("Received stop")
+            #log.debug("Received stop")
             reactor.callLater(0.5, self._stop_iperf_server_process)
             self.state = STATE_IDLE 
         else:
             log.error("Unhandled com_chan message. %s" % key)
         log.debug("state is %d" % self.state)
+    
+    def _send_results_if_ready(self):
+        """
+        For each kind of test, check if it has gathered all the infos
+        and notify the UI if the data in complete. 
+        """
+        if not self.current_results_sent:
+            must_have_local = True
+            must_have_remote = False
+            ok = True
+            results = {}
+
+            if self.current_kind == KIND_DUALTEST:
+                must_have_remote = True
+            if must_have_remote:
+                if self.current_stats_remote is None:
+                    ok = False
+                else:
+                    results['remote'] = self.current_stats_remote
+            if must_have_local:
+                if self.current_stats_local is None:
+                    ok = False
+                else:
+                    results['local'] = self.current_stats_local
+            if ok:
+                self.notify_api(self.current_caller, "network_test_done", results)
+                self.current_results_sent = True
+        else:
+            log.debug("results were already sent to observers.")
+
+    def on_iperf_command_results(self, results, commands, extra_arg, caller):
+        """
+        Called once the iperf client child process is done.
         
+        See utils.commands
+        """
+        for i in range(len(results)): # should have a len() of 1
+            result = results[i]
+            success, results_infos = result
+            command = commands[i]
+            
+            if isinstance(results_infos, failure.Failure):
+                print ">>>> FAILURE : ", results_infos.getErrorMessage()  # if there is an error, the programmer should fix it.
+            else:
+                stdout, stderr, signal_or_code = results_infos
+                if success:
+                    # print "stdout:", stdout
+                    ip = extra_arg['ip']
+                    try:
+                        iperf_stats = _parse_iperf_output(stdout.splitlines())
+                        log.debug("iperf results: %s" % stdout)
+                    except NetworkError, e:
+                        self.notify_api(caller, 'error', e.message)
+                        log.error(e.message)
+                    else:    
+                        kind = extra_arg['kind']
+                        iperf_stats['test_kind'] = kind
+                        log.debug("on_iperf_commands_results : %r" % iperf_stats)
+                        if kind == KIND_DUALTEST_SERVER:
+                            log.debug("KIND_DUALTEST_SERVER")
+                            log.debug('Sending iperf stats %r' % iperf_stats)
+                            try:
+                                self._send_message('results', [kind, iperf_stats]) 
+                                # [int kind, dict stats]
+                            except Exception, e:
+                                log.error("Error sending results to remote peer : %s" % e.message)
+                        else:
+                            self.current_stats_local = iperf_stats
+                            self._send_results_if_ready()
+                            self._send_message("stop")
+                        self.state = STATE_IDLE 
+                else:
+                    self.notify_api(caller, "error", "Network performance : Unknown error.") 
+    
     def _send_message(self, key, args_list=[]):
         """
         Sends a message to the current remote contact through the com_chan with key "network_test".
@@ -589,7 +626,7 @@ class NetworkTester(object):
             self.current_com_chan.callRemote("network_test", key, args_list) # list with key as 0th element
         except AttributeError, e:
             log.error("Could not send message to remote. ComChan is None" + e.message)
-        log.debug("Sent %s." % key)
+        log.debug("Sent %s. %r" % (key, args_list))
     
     def _register_my_callbacks_to_com_chan(self, com_channel):
         """
