@@ -167,7 +167,7 @@ class Connection(object):
 
     def cleanup(self):
         for callback in disconnect_callbacks.values():
-            callback(self.com_chan) # TODO: how can we know if we were server or client ?
+            callback(self)  
         if hasattr(self.com_chan, 'disconnect'):
             self.com_chan.disconnect()
         if self.contact.state == DISCONNECTING:

@@ -78,6 +78,14 @@ STATE_QUERIED = 5
 STATE_WAITING_REMOTE_ANSWER = 6
 STATE_ANSWERED_OK = 7
 
+#---------------------- module variables ---------------------------
+# IMPORTANT MODULE VARIABLES
+# there can be only one network test at a time.
+_is_currently_busy = False
+# dict of NetworkTester instances. One for each contact to which we are connected.
+# keys are unicode strings.
+_testers = {}
+_api = None
 
 """
 This dict explains the 2nd line of the output of `iperf -y c -u -c <host>`
@@ -273,7 +281,7 @@ class NetworkTester(object):
         self.iperf_server_is_running = False
         # ------ current stats and config
         self.current_remote_addr = None
-        self.local_addr = None
+        #self.local_addr = None
         self.current_bandwidth = 10 # Mbits
         self.current_duration = 1 # seconds
         self.current_caller = None # instance
@@ -661,22 +669,59 @@ class NetworkTester(object):
             com_channel.add(self.on_remote_message, "network_test")
             log.info("Registered the com_chan callback with a new com_channel for the network_test instance.")
 
-    def on_com_chan_connected(self, connection_handle, role="client"):
-        """
-        Called from the Connector class in its com_chan_started_client or com_chan_started_server method.
+def on_com_chan_connected(connection_handle, role="client"):
+    """
+    Called from the Connector class in its com_chan_started_client or com_chan_started_server method.
 
-        registers the com_chan callback for network_test
-        
-        :param connection_handle: connectors.Connection object.
-        :param role: string "client" or "server"
-        We actually do not care if this miville is a com_chan client or server.
-        """
-        self.current_contact = connection_handle.contact
-        self.current_com_chan = connection_handle.com_chan 
-        self._register_my_callbacks_to_com_chan(self.current_com_chan)
+    registers the com_chan callback for network_test
+    
+    :param connection_handle: connectors.Connection object.
+    :param role: string "client" or "server"
+    We actually do not care if this miville is a com_chan client or server.
+    """
+    global _testers
 
-    def on_com_chan_disconnected(self, com_chan_instance):
-        pass
+    # creates a new tester object
+    tester = NetworkTester()
+    contact = connection_handle.contact
+    tester.current_contact = contact
+    name = contact.name
+    tester.current_com_chan = connection_handle.com_chan
+    tester._register_my_callbacks_to_com_chan(tester.current_com_chan)
+    tester.api = _api
+    tester.current_remote_addr = contact.address
+    _testers[tester.current_contact.name] = tester
+    log.debug("testers: " + str(_testers))
+
+
+def on_com_chan_disconnected(connection_handle):
+    """
+    Called when a connection is stopped
+    """
+    global _testers
+    try:
+        del _testers[connection_handle.contact.name]
+        log.debug("testers: " + str(_testers))
+    except Exception, e:
+        log.error(e.message)
+
+def get_tester_for_contact(contact_name=None):
+    """
+    Returns a NetworkTester instance for contact name, or raises a  NetworkError.
+
+    :param contact_name: unicode string
+    """
+    global _testers
+    ret = None
+    try:
+        ret = _testers[contact_name]
+    except KeyError:
+        raise KeyError("No Network Tester for contact.") # TODO: use NetworkError
+    else:
+        return ret
+
+
+
 
 # functions ---------------------------------------------
 def start(subject):
@@ -686,6 +731,8 @@ def start(subject):
     Notifies with 'error' key  if `iperf` command not found. (CommandNotFoundError)
     Returns a NetworkTester instance with the server started.
     """
+    global _api
+
     try:
         executable = commands.find_command("iperf", 
             "`iperf` command not found. Please see https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting for installation instructions.")
@@ -693,10 +740,10 @@ def start(subject):
         if subject is not None:
             subject.notify(subject, e.message, "error")
         print e.message
-    tester = NetworkTester()
-    tester.api = subject
+    # tester = NetworkTester()
+    _api = subject
     
-    connectors.register_callback("networktest_on_connect", tester.on_com_chan_connected, event="connect")
-    connectors.register_callback("networktest_on_disconnect", tester.on_com_chan_disconnected, event="disconnect")
-    return tester
+    connectors.register_callback("networktest_on_connect", on_com_chan_connected, event="connect")
+    connectors.register_callback("networktest_on_disconnect", on_com_chan_disconnected, event="disconnect")
+    #return tester
 

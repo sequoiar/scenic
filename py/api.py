@@ -87,7 +87,8 @@ class ControllerApi(object):
 #        self.streams = self.all_streams[self.curr_streams]
         self.connectors = core.connectors
         self.connection = None
-        self.network_tester = network.start(self)  # TODO: move to core.
+        #self.network_tester = 
+        network.start(self)  # TODO: move to core.
 
     ### Contacts ###
 
@@ -740,6 +741,7 @@ class ControllerApi(object):
         :param kind: string "localtoremote","remotetolocal",  "tradeoff" or "dualtest"
         :param contact: addressbook.Contact object.
         """
+        # TODO: accept a contact name instead of contact object ? 
         try:
             if contact is None:
                 contact = self.get_contact()
@@ -750,17 +752,16 @@ class ControllerApi(object):
         else:
             #pprint.pprint(contact.__dict__)
             
-            if contact.state != addressbook.CONNECTED: #  and kind == "dualtest"
+            if contact.state != addressbook.CONNECTED: 
                 self.notify(caller, "Please connect to a contact prior to start a network test.", "error")
             else:
-                log.debug("connector : " + str(contact.connector))
+                #log.debug("connector : " + str(contact.connector))
                 com_chan = None 
                 try:
                     com_chan = contact.connection.com_chan
                 except Exception, e:
                     debug.error("network_test_start(): " + e.message)
-                #print "contact:"
-                # pprint.pprint(contact)
+                
                 remote_addr = contact.address
                 kinds = {
                     "localtoremote":network.KIND_UNIDIRECTIONAL, 
@@ -769,12 +770,17 @@ class ControllerApi(object):
                     "tradeoff":network.KIND_TRADEOFF, 
                 }
                 try:
-                    kind = kinds[kind]
-                except KeyError:
-                    self.notify(caller, "Could not start network test: Invalid kind of test \"%s\"." % kind, "error")
+                    tester = network.get_tester_for_contact(contact.name)
+                except KeyError, e:
+                    self.notify(caller, "No network tester for contact", "error")
                 else:
-                    self.network_tester.start_test(caller, remote_addr, bandwidth, duration, kind, com_chan)
-                    self.notify(caller, "Starting network performance test with contact %s for %d seconds." % (contact.name, duration), "info")
+                    try:
+                        kind = kinds[kind]
+                    except KeyError:
+                        self.notify(caller, "Could not start network test: Invalid kind of test \"%s\"." % kind, "error")
+                    else:
+                        tester.start_test(caller, remote_addr, bandwidth, duration, kind, com_chan) # TODO: dont need com_chan arg anymore
+                        self.notify(caller, "Starting network performance test with contact %s for %d seconds..." % (contact.name, duration), "info")
     
     def network_test_stop(self, caller):
         """
