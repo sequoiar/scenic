@@ -10,6 +10,8 @@
 
 #include <cstdlib>
 #include <iostream>
+
+#ifdef HAVE_BOOST_ASIO
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 
@@ -186,4 +188,4 @@ int main(int argc, char* argv[])
 
     return 0;
 }
-
+#endif

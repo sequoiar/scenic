@@ -132,11 +132,15 @@ fi
 
 AX_PYTHON
 AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
+AX_BOOST_BASE
+AX_BOOST_ASIO
 AX_BOOST_PYTHON
 AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes")
-if test "$ac_cv_boost_python"  = "yes" ; then
-    AC_DEFINE(CONFIG_BOOST,[],[CONFIG_BOOST defined])
-fi
+
+#HAVE_BOOST_PYTHON
+#if test "$ac_cv_boost_python"  = "yes" ; then
+#    AC_DEFINE(CONFIG_BOOST,[],[CONFIG_BOOST defined])
+#fi
 
 AX_CHECK_GL
 AX_CHECK_GLU
