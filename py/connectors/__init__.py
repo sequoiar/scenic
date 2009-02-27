@@ -142,13 +142,21 @@ class Connection(object):
         self.stop()
 
     def com_chan_started_client(self):
+        """
+        Called when the com_chan is established.
+        That calls all register callbacks passing them the connection.
+        """
         for callback in connect_callbacks.values():
-            callback(self.com_chan, 'client')
+            callback(self, 'client')
         self._com_chan_started_client()
 
     def com_chan_started_server(self):
+        """
+        Called when the com_chan is established.
+        That calls all register callbacks passing them the connection.
+        """
         for callback in connect_callbacks.values():
-            callback(self.com_chan, 'server')
+            callback(self, 'server')
         self._com_chan_started_server()
 
     def _com_chan_started_client(self):
