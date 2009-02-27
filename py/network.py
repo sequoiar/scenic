@@ -23,6 +23,21 @@
 Network performance tests manager using iperf.
 
 See https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting
+
+4 kinds of network tests and their commands :
+
+ * from local to remote (KIND_UNIDIRECTIONAL)
+    local:  'iperf -c 10.10.10.66 -t 1 -y c -u -b 1M'
+
+ * from remote to local (KIND_REMOTETOLOCAL)
+    remote: 'iperf -c 10.10.10.68 -t 1 -y c -u -b 1M'
+
+ * bidirectional sequential (KIND_TRADEOFF)
+    local: 'iperf -c 10.10.10.66 -t 1 -y c -u -b 1M -r'
+
+ * bidirectional simetrical (KIND_DUALTEST)
+    local:  'iperf -c 10.10.10.66 -t 1 -y c -u -b 1M'
+    remote: 'iperf -c 10.10.10.68 -t 1 -y c -u -b 1M'
 """
 
 import os
