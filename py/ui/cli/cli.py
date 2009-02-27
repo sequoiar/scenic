@@ -743,7 +743,7 @@ class CliController(TelnetServer):
         cp.add_option("-q", "--stop", action='store_true', help="Stops the current test")
         #cp.add_option("-h", "--help", action='store_true', help="Displays help")
         # strings options
-        cp.add_option("-k", "--kind", type='string', help="Kind of network test. (unidirectional | tradeoff | dualtest)")
+        cp.add_option("-k", "--kind", type='string', help="Kind of network test. (locaotoremote | remotetolocal tradeoff | dualtest)")
         # int options
         cp.add_option("-b", "--bandwidth", type="int", help="Bandwidth in megabits. (default:1)")
         cp.add_option("-t", "--time", type="int", help="Duration in seconds. (default:10)")
@@ -752,7 +752,7 @@ class CliController(TelnetServer):
         # default values : 
         bandwidth = 1
         duration = 10 
-        kind = "unidirectional"
+        kind = "localtoremote"
         caller = self
 
         if options.description:

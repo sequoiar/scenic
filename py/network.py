@@ -53,6 +53,8 @@ log = log.start('debug', 1, 0, 'network')
 # -------------------- constants -----------------------------------
 STATE_IDLE = 0
 KIND_UNIDIRECTIONAL = 1
+KIND_REMOTETOLOCAL = 8
+KIND_REMOTETOLOCAL_SERVER = 9
 KIND_TRADEOFF = 2
 KIND_DUALTEST = 3 # CLIENT
 # KIND_DUALTEST_CLIENT = 3
@@ -377,7 +379,6 @@ class NetworkTester(object):
             self.current_kind = kind
             
             self.current_ping_started_time = self._get_time_now()
-            #if kind == KIND_DUALTEST:
             self._start_iperf_server_process()
             self._send_message("ping")
             self.state = STATE_WAITING_REMOTE_ANSWER 
@@ -486,7 +487,6 @@ class NetworkTester(object):
             if self.state != STATE_WAITING_REMOTE_ANSWER:
                 log.error("Received pong while not being wainting for an answer. (state = %d)" % self.state)
             else:
-                # measure latency
                 self.current_latency = self._get_time_now() - self.current_ping_started_time # seconds
                 params = {
                     'duration':self.current_duration,
@@ -497,16 +497,20 @@ class NetworkTester(object):
                 self._send_message("start", [self.current_kind, params])
                 wait_for = self.current_latency
                 log.debug("Will start iperf client in %f seconds" % wait_for)
-                reactor.callLater(wait_for, self._start_iperf_client)
+                if self.current_kind != KIND_REMOTETOLOCAL:
+                    reactor.callLater(wait_for, self._start_iperf_client)
         
         elif key == "start": # from A
             kind = args[0]
             params = args[1]
             self.current_kind = kind
-            if kind == KIND_DUALTEST:
+            if kind == KIND_DUALTEST or kind == KIND_REMOTETOLOCAL:
                 # TODO
-                self.current_kind = KIND_DUALTEST_SERVER
-                log.debug("Starting iperf client, since it is a dualtest.")
+                if kind == kind == KIND_DUALTEST:
+                    self.current_kind = KIND_DUALTEST_SERVER
+                elif kind == KIND_REMOTETOLOCAL:
+                    self.current_kind = KIND_REMOTETOLOCAL_SERVER
+                log.debug("Starting iperf client.")
                 self.current_duration = params['duration']
                 self.current_bandwidth = params['bandwidth']
                 self.current_latency = params['latency']
@@ -552,8 +556,11 @@ class NetworkTester(object):
             ok = True
             results = {}
 
-            if self.current_kind == KIND_DUALTEST:
+            if self.current_kind == KIND_DUALTEST: 
                 must_have_remote = True
+            if self.current_kind == KIND_REMOTETOLOCAL:
+                must_have_remote = True
+                must_have_local = False
             if must_have_remote:
                 if self.current_stats_remote is None:
                     ok = False
@@ -598,9 +605,9 @@ class NetworkTester(object):
                         kind = extra_arg['kind']
                         iperf_stats['test_kind'] = kind
                         log.debug("on_iperf_commands_results : %r" % iperf_stats)
-                        if kind == KIND_DUALTEST_SERVER:
-                            log.debug("KIND_DUALTEST_SERVER")
-                            log.debug('Sending iperf stats %r' % iperf_stats)
+                        if kind == KIND_DUALTEST_SERVER or kind == KIND_REMOTETOLOCAL_SERVER:
+                            #log.debug("KIND_DUALTEST_SERVER")
+                            #log.debug('Sending iperf stats %r' % iperf_stats)
                             try:
                                 self._send_message('results', [kind, iperf_stats]) 
                                 # [int kind, dict stats]

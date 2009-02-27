@@ -728,7 +728,7 @@ class ControllerApi(object):
         self.notify(caller, devices_list, 'devices_list') # with a dict
     
     # network test use cases ----------------------------------------------------
-    def network_test_start(self, caller, bandwidth=1, duration=10, kind="unidirectional", contact=None):
+    def network_test_start(self, caller, bandwidth=1, duration=10, kind="localtoremote", contact=None):
         """
         Tries to start a network test with currently connected contact.
         
@@ -737,7 +737,7 @@ class ControllerApi(object):
         
         :param bandwidth: in Mbit
         :param duration: in seconds
-        :param kind: string "unidirectional", "tradeoff" or "dualtest"
+        :param kind: string "localtoremote","remotetolocal",  "tradeoff" or "dualtest"
         """
         try:
             if contact is None:
@@ -762,7 +762,8 @@ class ControllerApi(object):
                 # pprint.pprint(contact)
                 remote_addr = contact.address
                 kinds = {
-                    "unidirectional":network.KIND_UNIDIRECTIONAL, 
+                    "localtoremote":network.KIND_UNIDIRECTIONAL, 
+                    "remotetolocal":network.KIND_REMOTETOLOCAL,
                     "dualtest":network.KIND_DUALTEST, 
                     "tradeoff":network.KIND_TRADEOFF, 
                 }
