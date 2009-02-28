@@ -737,13 +737,17 @@ class CliController(TelnetServer):
         """
         # TODO: add contact (-c) argument
         cp = CliParser(self, prog=line[0], description="Manages the audio/video/data devices.")
+        
         # booleans (action)
         cp.add_option("-z", "--description", action='store_true', help="Displays description") # TODO: add examples
         cp.add_option("-s", "--start", action='store_true', help="Starts a test")
         cp.add_option("-q", "--stop", action='store_true', help="Stops the current test")
         #cp.add_option("-h", "--help", action='store_true', help="Displays help")
+        
         # strings options
         cp.add_option("-k", "--kind", type='string', help="Kind of network test. (locaotoremote | remotetolocal tradeoff | dualtest)")
+        #cp.add_option("-c", "--contact", type='string', help="Specifies a contact to test with")
+        
         # int options
         cp.add_option("-b", "--bandwidth", type="int", help="Bandwidth in megabits. (default:1)")
         cp.add_option("-t", "--time", type="int", help="Duration in seconds. (default:10)")
@@ -1619,14 +1623,19 @@ class CliView(Observer):
         See network.py
         :param data: a dict with iperf statistics
         """
-        print "UI/CLI/CLI: " 
-        print data
-        txt = "\n" + bold("Network test results") +" :\n"
-        for host_name in data:
-            txt += bold("%s host" % host_name) + "\n"
-            host_data = data[host_name]
-            for k in host_data:
-                txt += "\t%s: %s\n" % (k, str(host_data[k]))
+        #print "UI/CLI/CLI: " 
+        #print data
+        contact_name = data['contact'].name
+        txt = "\n" + bold("Network test results with %s" % contact_name) +" :\n"
+        for host_name in ['local', 'remote']:
+            if data.has_key(host_name):
+                if host_name == "local":
+                    txt += bold("From remote to local") + "\n"
+                else: # remote
+                    txt += bold("From local to remote") + "\n"
+                host_data = data[host_name]
+                for k in host_data:
+                    txt += "\t%s: %s\n" % (k, str(host_data[k]))
         self.write(txt, True)
         
 

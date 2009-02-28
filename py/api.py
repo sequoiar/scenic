@@ -779,9 +779,12 @@ class ControllerApi(object):
                     except KeyError:
                         self.notify(caller, "Could not start network test: Invalid kind of test \"%s\"." % kind, "error")
                     else:
-                        tester.start_test(caller, remote_addr, bandwidth, duration, kind, com_chan) # TODO: dont need com_chan arg anymore
-                        self.notify(caller, "Starting network performance test with contact %s for %d seconds..." % (contact.name, duration), "info")
-    
+                        ret = tester.start_test(caller, bandwidth, duration, kind) # TODO: dont need com_chan arg anymore
+                        if ret:
+                            self.notify(caller, "Starting network performance test with contact %s for %d seconds..." % (contact.name, duration), "info")
+                        else:
+                            self.notify(caller, "An error occuring while trying to start network test.", "error")
+
     def network_test_stop(self, caller):
         """
         Interrupts suddenly the network test.

@@ -273,7 +273,7 @@ class NetworkTester(object):
     """
 
     def __init__(self):
-        # globals
+        self.current_contact = None
         self.iperf_server = None
         self.iperf_client = None
         self.api = None
@@ -356,6 +356,7 @@ class NetworkTester(object):
 
         Useful for dualtest case.
         """
+        return self.current_contact.address
         # TODO : make more sturdy.
         ret = None
         contact = self.api.get_contact()
@@ -365,7 +366,7 @@ class NetworkTester(object):
             pass
         return ret
 
-    def start_test(self, caller, server_addr, bandwidth_megabits=1, duration=10, kind=KIND_UNIDIRECTIONAL, com_chan=None): # start_client
+    def start_test(self, caller, bandwidth_megabits=1, duration=10, kind=KIND_UNIDIRECTIONAL): # start_client
         """
         Method called from the core API to try to start a network test.
         
@@ -374,37 +375,49 @@ class NetworkTester(object):
         
         :param duration: int
         :param bandwidth_megabits: int
-        :param server_addr: str
+        :param server_addr: str DEPRECATED PARAM
         :param kind: int Must match one of the constants in this module. 
+        :return success: boolean
         """
-        # TODO: remove com_chan
-        if self.state != STATE_IDLE:
+        global _is_currently_busy 
+
+        # TODO: remove com_chan argument
+        # TODO: remove address argument
+        if self.state != STATE_IDLE or _is_currently_busy :
             self.notify_api(caller, "error", "A network test is already in process.")
+            return False
         else:
             self.current_stats_local = None # dict
             self.current_stats_remote = None # dict
-            
-            self.current_remote_addr = server_addr
             self.current_bandwidth = bandwidth_megabits # Mbits
             self.current_duration = duration # seconds
             self.current_caller = caller # instance
             self.current_results_sent = False
             # XXX
-            if com_chan is not None:
-                log.debug("Using comm channel %s." % (com_chan))
-            #    self.current_com_chan
-                self.current_com_chan = com_chan # only neededi for dualtests
-                # XXX We register again our callbacks !!
-                log.debug("registering our callback once again.")
-                self._register_my_callbacks_to_com_chan(com_chan)
-            else:
-                log.error("Invalid com_chan. It is None")
+            # if com_chan is not None:
+            #     log.debug("Using comm channel %s." % (com_chan))
+            # #    self.current_com_chan
+            #     self.current_com_chan = com_chan # only neededi for dualtests
+            #     # XXX We register again our callbacks !!
+            #     log.debug("registering our callback once again.")
+            #     self._register_my_callbacks_to_com_chan(com_chan)
+            # else:
+            #     log.error("Invalid com_chan. It is None")
             self.current_kind = kind
-            
             self.current_ping_started_time = self._get_time_now()
             self._start_iperf_server_process()
             self._send_message("ping")
             self.state = STATE_WAITING_REMOTE_ANSWER 
+            _is_currently_busy = True
+            return True
+    
+    def _when_done(self):
+        """
+        Call this when you are done to change out state to available.
+        """
+        global _is_currently_busy
+        _is_currently_busy = False
+        self.state = STATE_IDLE
 
     def _start_iperf_client(self):
         """
@@ -496,15 +509,17 @@ class NetworkTester(object):
         * A: stop (asks the remote to stop its iperf server and give us the results)
         * B: results <int kind> <dict stats>
         """
+        global _is_currently_busy
         # TODO: we should check from which contact this message is from !!!!!!!!!!
 
         log.debug("received %s:(%s)" % (key, str(args)))
         if key == "ping": # from A
             self._start_iperf_server_process()
-            if self.state != STATE_IDLE:
+            if self.state != STATE_IDLE or _is_currently_busy:
                 log.error("Received a ping while being busy doing some network test. (state = %d)" % self.state)
             else:
                 self._send_message("pong")
+                _is_currently_busy = True
         
         elif key == "pong": # from B 
             if self.state != STATE_WAITING_REMOTE_ANSWER:
@@ -520,7 +535,7 @@ class NetworkTester(object):
                 self._send_message("start", [self.current_kind, params])
                 wait_for = self.current_latency
                 log.debug("Will start iperf client in %f seconds" % wait_for)
-                if self.current_kind != KIND_REMOTETOLOCAL:
+                if self.current_kind != KIND_REMOTETOLOCAL: # the only case where we do not send from local to remote
                     reactor.callLater(wait_for, self._start_iperf_client)
         
         elif key == "start": # from A
@@ -538,7 +553,7 @@ class NetworkTester(object):
                 self.current_bandwidth = params['bandwidth']
                 self.current_latency = params['latency']
                 #self.current_remote_addr = params['remote_addr'] # IMPORTANT 
-                self.current_remote_addr = self._get_remote_addr() # TODO XXX Make more sturdy
+                #self.current_remote_addr = self._get_remote_addr() # TODO XXX Make more sturdy
                 wait_for = self.current_latency / 2.0
                 log.debug("Will start iperf client in %f seconds" % wait_for)
                 reactor.callLater(wait_for, self._start_iperf_client)
@@ -558,12 +573,12 @@ class NetworkTester(object):
             self._send_results_if_ready()
             reactor.callLater(0.5, self._stop_iperf_server_process)
             self._send_message("stop")
-            self.state = STATE_IDLE 
         
         elif key == "stop": # from A
             #log.debug("Received stop")
             reactor.callLater(0.5, self._stop_iperf_server_process)
             self.state = STATE_IDLE 
+            self._when_done()
         else:
             log.error("Unhandled com_chan message. %s" % key)
         log.debug("state is %d" % self.state)
@@ -595,8 +610,10 @@ class NetworkTester(object):
                 else:
                     results['local'] = self.current_stats_local
             if ok:
+                results['contact'] = self.current_contact
                 self.notify_api(self.current_caller, "network_test_done", results)
                 self.current_results_sent = True
+                self._when_done()
         else:
             log.debug("results were already sent to observers.")
 
