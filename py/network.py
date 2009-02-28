@@ -517,10 +517,16 @@ class NetworkTester(object):
             self._start_iperf_server_process()
             if self.state != STATE_IDLE or _is_currently_busy:
                 log.error("Received a ping while being busy doing some network test. (state = %d)" % self.state)
+                self._send_message("busy")
             else:
                 self._send_message("pong")
                 _is_currently_busy = True
         
+        elif key == "busy": # from B
+            self.notify_api(self.current_caller, "error", "Network test not possible. Remote peer is busy.")
+            self._when_done()
+            self._stop_iperf_server_process()
+
         elif key == "pong": # from B 
             if self.state != STATE_WAITING_REMOTE_ANSWER:
                 log.error("Received pong while not being wainting for an answer. (state = %d)" % self.state)
