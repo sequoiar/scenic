@@ -54,6 +54,7 @@ logging.setLoggerClass(CoreLogger)
 
 
 def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
+    to_file = True # XXX FIXME TODO: remove this hackish line !!!!!!!!!!!!!!!!! XXX FIXME TODO
     logger = logging.getLogger(log_name)
     formatter = logging.Formatter('%(asctime)s %(name)-8s %(levelname)-8s %(message)s')
     set_level(level, log_name)

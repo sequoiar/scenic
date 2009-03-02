@@ -62,7 +62,8 @@ class Connection(object):
             port = self.api.get_default_port(self.contact.connector)
         self.address = '%s:%s' % (self.contact.address, port)
         if self.address in connections:
-            raise ConnectionError, 'Cannot connect. This address \'%s\' already have a connection (%s). %s' % (self.address, self.contact.name, str(connections))
+            #raise ConnectionError, 'Cannot connect. This address \'%s\' already have a connection (%s). %s' % (self.address, self.contact.name, str(connections))
+            log.error('This address \'%s\' already have a connection (%s). %s. Connecting anyways.' % (self.address, self.contact.name, str(connections)))
         connections[self.address] = self
 
     def start(self):

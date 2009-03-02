@@ -7,7 +7,7 @@
 # example : 
 # source ~/src/miville/trunk/py/test/config_test.sh
 
-export MIVILLE_TEST_REMOTE_HOST="10.10.10.65" # tzing
+export MIVILLE_TEST_REMOTE_HOST="10.10.10.66" # tzing
 export MIVILLE_TEST_REMOTE_CONTACT="tzing"
 export MIVILLE_PATH="$HOME/src/miville/trunk/py"
 export PROPULSEART_PATH="$HOME/src/miville/trunk/src/main"
