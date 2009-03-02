@@ -137,8 +137,10 @@ def exit():
 if __name__ == '__main__':
     log.start()
     log.info('Starting Sropulpof...')
-    hostname = socket.gethostname()
-    sys.stdout.write(']2;miville on ' + hostname + '')
+    for terminal in [ 'xterm', 'rxvt' ]:
+        if terminal.find:
+            hostname = socket.gethostname()
+            sys.stdout.write(']2;miville on ' + hostname + '')
     try:
         main()
         reactor.run()
