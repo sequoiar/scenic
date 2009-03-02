@@ -1630,9 +1630,9 @@ class CliView(Observer):
         for host_name in ['local', 'remote']:
             if data.has_key(host_name):
                 if host_name == "local":
-                    txt += bold("From remote to local") + "\n"
-                else: # remote
                     txt += bold("From local to remote") + "\n"
+                else: # remote
+                    txt += bold("From remote to local") + "\n"
                 host_data = data[host_name]
                 for k in host_data:
                     txt += "\t%s: %s\n" % (k, str(host_data[k]))

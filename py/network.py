@@ -593,6 +593,11 @@ class NetworkTester(object):
         """
         For each kind of test, check if it has gathered all the infos
         and notify the UI if the data in complete. 
+        
+        The resulting dict has keys 'local' and 'remote'
+         * 'local' :  stats for local to remote
+         * 'remote' : stats for remote to local
+         * 'contact' : the name of the contact the test has been done with.
         """
         if not self.current_results_sent:
             must_have_local = True
