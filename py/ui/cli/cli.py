@@ -48,6 +48,7 @@ What happens when the user types "c -l":
 import optparse
 import re
 import os
+import socket
 
 # Twisted imports
 from twisted.internet import reactor, protocol
@@ -123,6 +124,9 @@ class TelnetServer(recvline.HistoricRecvLine):
 
         log.info("%s is connecting in Telnet on port %s" % (self.addr.host, self.addr.port))
         self.write("Welcome to Sropulpof!")
+        hostname = socket.gethostname()
+        msg = ']2;telnet miville to %s' % hostname
+        self.terminal.write("%s" % (msg.encode('utf-8')))
         self.write_prompt()
 
     def handle_RETURN(self):
