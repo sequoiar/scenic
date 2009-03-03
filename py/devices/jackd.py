@@ -343,7 +343,7 @@ class JackDriver(devices.AudioDriver):
         2) _kill_kill_jackd
         3) _resurrect_jackd
         """
-        log.info("will now kill and resurrect all jackd instances" + str(devices.values()))
+        log.info("will now kill and resurrect all jackd instances")#  + str(devices.values()))
         for device in devs.values():
             try:
                 args = device.attributes["args"].get_value() # str
