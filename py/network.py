@@ -508,6 +508,8 @@ class NetworkTester(object):
             reactor.cancelCallLater(self.timeout_call_later_id)
         except AlreadyCancelled, e:
             pass
+        except AttributeError, e:
+            pass
 
     def on_remote_message(self, key, args):
         """

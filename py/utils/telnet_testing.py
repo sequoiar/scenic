@@ -133,13 +133,15 @@ def start_process(command, isVerbose=False, logPrefix='', color='CYAN'):
             process = pexpect.spawn(command)
         time.sleep(1.0) # seconds
         if is_running(process) == False:
+            raise Exception("Process is not running !")
             println("Process is not running !") # or raise error ?
-            die()
+            #die()
         else:
             return process
     except pexpect.ExceptionPexpect, e:
         println("Error starting client: heh" + str(e))
-        die()
+        raise
+        #die()
 
 def is_running(process):
     """
@@ -173,7 +175,7 @@ def kill_process(process):
                 process.kill(9)
     except Exception, e:
         print "Error killing process", e
-        raise e
+        raise
     
 def die():
     """
