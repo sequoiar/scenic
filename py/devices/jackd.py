@@ -30,6 +30,8 @@ Attributes of its (jackd) devices:
 * buffer size
 
 "quand jackd est faché, lui toujours faire ainsi"
+
+WARNING: For now, only supports short options to jackd. (such as "-d alsa" and not "--driver alsa")
 """
 #TODO: 
 # ----------------------------------------------------------
@@ -237,19 +239,27 @@ class JackDriver(devices.AudioDriver):
             d = devices.Device(jack['name']) # name is the jackd name
             self._add_new_device(d)
             try:
+                # CRUCIAL ATTRIBUTES : 
                 d.add_attribute(devices.StringAttribute('name', jack['name'], 'default'))
-                d.add_attribute(devices.StringAttribute('args', jack['cmdline'], ''))
-                d.add_attribute(devices.StringAttribute('device', jack['device'], ''))
-                d.add_attribute(devices.StringAttribute('backend', jack['backend'], ''))
-
-                d.add_attribute(devices.IntAttribute('nperiods', jack['nperiods'], 2, 0, 1024)) # in seconds min, max
-                d.add_attribute(devices.IntAttribute('period', jack['period'], 1024, 2, 16777216)) # must be a power of two
                 d.add_attribute(devices.IntAttribute('pid', jack['pid']))  # no default, min or max
-                d.add_attribute(devices.IntAttribute('rate', jack['rate'], 48000, 44100, 192000))
+                d.add_attribute(devices.StringAttribute('args', jack['cmdline'], ''))
+                
             except KeyError, e:
-                log.error("no such key"+ e.message) # TODO
+                log.error("no such key in _on_devices_polling : KeyError "+ e.message) # TODO
                 self.kill_and_resurrect_jackd(None, self._new_devices) # TODO: is this abusive ?
+                
             else:
+                if jack.has_key('device'):
+                    d.add_attribute(devices.StringAttribute('device', jack['device'], ''))
+                if jack.has_key('backend'):
+                    d.add_attribute(devices.StringAttribute('backend', jack['backend'], ''))
+                if jack.has_key('nperiods'):
+                    d.add_attribute(devices.IntAttribute('nperiods', jack['nperiods'], 2, 0, 1024)) # in seconds min, max
+                if jack.has_key('period'):
+                    d.add_attribute(devices.IntAttribute('period', jack['period'], 1024, 2, 16777216)) # must be a power of two
+                if jack.has_key('rate'):
+                    d.add_attribute(devices.IntAttribute('rate', jack['rate'], 48000, 44100, 192000))
+                
                 commands_to_start.append(['jack_lsp']) # TODO: can we specify the server name??
                 extra_args.append(jack['name'])
         #print "will start commands:"
@@ -357,6 +367,7 @@ class JackDriver(devices.AudioDriver):
                 except OSError, e:
                     log.error("error killing jackd "+ e.message)
                 else:
+                    log.info("Just KILLED jackd (pid:%d)" % pid)
                     if caller is not None:
                         self.api.notify(caller, "Killed -15 jackd", "info")
                 reactor.callLater(1.0, self._kill_kill_jackd, caller, args, pid)
@@ -384,7 +395,8 @@ class JackDriver(devices.AudioDriver):
         log.info("resurrecting jackd")
         commands_to_start = [["/usr/bin/python", "./devices/start_jackd.py"]] # TODO : maybe specify the absolute path?
         #print "starting /usr/bin/python ./devices/start_jackd.py" + str(args.split())
-        commands_to_start[0].append(args.strip.split()) 
+        for arg in args.strip().split():
+            commands_to_start[0].append(arg) 
         extra_args = None
         try:
             deferred = commands_start(commands_to_start, self.on_commands_results, extra_args, caller)
