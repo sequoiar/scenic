@@ -105,7 +105,6 @@ short pof::run(int argc, char **argv)
         LOG_INFO("version " << PACKAGE_VERSION << '\b' << RELEASE_CANDIDATE);
         return 0;
     }
-    LOG_WARNING("send " << send << " r " << recv); 
     if (send)
         pid = 's';
     else if (recv)
