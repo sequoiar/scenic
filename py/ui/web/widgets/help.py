@@ -29,8 +29,9 @@ log = log.start('debug', 1, 0, 'web_hlp')
 class Help(Widget):
     """
     """
-    def rc_manual(self):
-        print "OPEN MANUAL"
-        return False
-    
-    expose(locals())
+    pass
+#    def rc_manual(self):
+#        print "OPEN MANUAL"
+#        return False
+#    
+#    expose(locals())

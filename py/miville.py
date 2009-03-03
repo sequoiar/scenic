@@ -77,14 +77,14 @@ class Core(Subject):
         self.uis = common.load_modules(common.find_modules('ui'))
         count = 0
         for mod in self.uis:
-            try:
+#            try:
                 if len(sys.argv) > 1:
                     mod.start(self, int(sys.argv[1]) + count)
                     count += 10
                 else:
                     mod.start(self)
-            except:
-                log.error('Unable to start UI module %s.' % mod.__name__)
+#            except:
+#                log.error('Unable to start UI module %s.' % mod.__name__)
 
     def find_engines(self):
         """

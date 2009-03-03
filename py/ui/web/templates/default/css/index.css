@@ -6,7 +6,11 @@ html, body {
 	overflow: hidden;
 }
 
-#index_left_pans {
+h3 {
+	margin-bottom: 5px;
+}
+
+#index_left_pan {
 	position: absolute;
 	top: 0px;
 /*	bottom: 22px; for chat*/
@@ -15,7 +19,7 @@ html, body {
 	padding: 20px;
 }
 
-.help_str {
+.help_str, .js_str {
 	display: none;
 }
 
@@ -110,7 +114,7 @@ html, body {
 	padding: 2px 4px;
 }
 
-h3 span {
+h3 span-dis {
 	background-color: #FFF;
 	border: 1px solid #999;
 	padding: 0 3px;
@@ -448,10 +452,6 @@ li.module {
 
 .text_but:hover {
 	cursor: pointer;
-}
-
-h3 {
-	margin-bottom: 0;
 }
 
 .sub_sec {

@@ -29,21 +29,31 @@ log = log.start('debug', 1, 0, 'web_adb')
 class Addressbook(Widget):
     """
     """
-#    help = {'adb_list':_('This is the list of contacts'),
-#            'adb_add':_('Add a new contact to the list')
-#            }
+        
+    def rc_get_list(self):
+        self.api.get_contacts(self)
+        return False
         
     def cb_get_contacts(self, origin, data):
         adb = []
         contacts = data[0].items()
         contacts.sort()
         for name, contact in contacts:
-            adb.append((contact.name, to_utf(contact.address), contact.port))
+            adb.append((contact.name, contact.state))
         log.info('receive update: %r' % self)
         self.callRemote('updateList', adb)
         
-    def rc_get_list(self):
-        self.api.get_contacts(self)
+    def rc_get_contact(self, name):
+        self.api.get_contact(name, self)
         return False
+    
+    def cb_get_contact(self, origin, data):
+        if origin is self:
+            self.callRemote('showContact', data.__dict__)
+
+    def rc_modify_contact(self, name, new_name, address, port):
+        self.api.modify_contact(self, name, new_name, address, port)
+        return False
+    
         
     expose(locals())

@@ -41,7 +41,7 @@ So here the steps to produce translation from scratch:
           def example(feature):
               return _('Sorry, the feature %s is not implemented.' % feature)
 
-    2. In your HTML template put the attribute n:render="i18" inside the
+    2. In your XML template put the attribute n:render="i18" inside the
        element you need to translate::
        
            <h3 n:render="i18n">Nerds</h3>
@@ -51,10 +51,10 @@ So here the steps to produce translation from scratch:
        
            $ xgettext -o pathToLocaleDirectory/your_widget.poy your_widget.py
     
-    4. Extract the strings to translate from your HTML template with
+    4. Extract the strings to translate from your XML template with
        nevow-xmlgettext. Put the name of your Widget as the name of the .poh file::
        
-           $ nevow-xmlgettext your_widget.html > pathToLocaleDirctory/your_widget.poh
+           $ nevow-xmlgettext your_widget.xml > pathToLocaleDirctory/your_widget.poh
            
     5. Merge the two newly created files (.poy and .poh) with msgcat.
        Put the .poy file first::
@@ -201,7 +201,7 @@ def create_js(src):
 
 class Index(LivePage, Observer):
     """
-    Class representing the base of the root page (/index.html).
+    Class representing the base of the root page (/index.xml).
     """
     
     addSlash = True
@@ -223,8 +223,8 @@ class Index(LivePage, Observer):
         self.template = template
         self.lang = 'en'
 
-        # load base HTML file
-        self.docFactory = loaders.xmlfile(path.join(path.dirname(__file__), 'index.html'))
+        # load base XML file
+        self.docFactory = loaders.xmlfile(path.join(path.dirname(__file__), 'index.xml'))
         
 # not use anymore ?
 #        if self.template:
@@ -267,11 +267,11 @@ class Index(LivePage, Observer):
         in the index template.
         """
         base_path = path.dirname(__file__)
-        template_path = path.join(base_path, 'templates/default/html/index.html')
-        # if we don'T use default template check if there's a valid index.html
+        template_path = path.join(base_path, 'templates/default/xml/index.xml')
+        # if we don'T use default template check if there's a valid index.xml
         # in the choose template directory and set the path accordinally
         if self.template:
-            tmp_path = path.join(base_path, 'templates', self.template, 'html/index.html')
+            tmp_path = path.join(base_path, 'templates', self.template, 'xml/index.xml')
             if path.isfile(tmp_path):
                 template_path = tmp_path
         
@@ -330,7 +330,7 @@ class Index(LivePage, Observer):
                 elif path.isfile(path.join(templates_path, 'default', end_path)):
                     links.append(kinds[kind](path.join(end_path)))
 
-        # prettier html output
+        # prettier xml output
         for i in range(1, len(links) * 2, 2):
             links.insert(i, ['\n\t\t'])
             
@@ -340,7 +340,7 @@ class Index(LivePage, Observer):
         """
         Load and render the body of the page from the selected template.
         """
-        body_file = 'html/index.html'
+        body_file = 'xml/index.xml'
         templates_path = path.join(path.dirname(__file__), 'templates')
         if self.template and path.isfile(path.join(templates_path, self.template, body_file)):
             template = self.template
@@ -366,7 +366,7 @@ class Index(LivePage, Observer):
                 children.callbacks[key](origin, data)
 
 
-# Remove the rewrite of the HTML element id
+# Remove the rewrite of the XML element id
 # (now we need to avoid clash of id ourself)
 for key, preprocessors in enumerate(LiveFragment.preprocessors):
     if preprocessors.__name__ == "rewriteAthenaIds":
@@ -392,14 +392,14 @@ class Widget(LiveFragment):
 
         self.docFactory = ['']  # not sure if it's a good idea ?
         class_name = self.__class__.__name__
-        tmpl_name = 'html/%s.html' % small_name(class_name)
+        tmpl_name = 'xml/%s.xml' % small_name(class_name)
         tmpl_path = path.join(path.dirname(__file__), 'templates')
         if template and path.isfile(path.join(tmpl_path, template, tmpl_name)):
             self.docFactory = loaders.xmlfile(path.join('ui/web/templates/', template, tmpl_name))
         elif path.isfile(path.join(tmpl_path, 'default', tmpl_name)):
             self.docFactory = loaders.xmlfile(path.join('ui/web/templates/default', tmpl_name))
         else:
-            log.error("Didn't found any valid %s.html template." % small_name(class_name))
+            log.error("Didn't found any valid %s.xml template." % small_name(class_name))
         # add the JS class for this widget
         # (should be the same name has the python class) 
         self.jsClass = to_utf(class_name)
@@ -419,6 +419,37 @@ class Widget(LiveFragment):
 
         # Let the base class handle it.
         return LiveFragment.rend(self, ctx, data)
+
+    def callRemote(self, methodName, *args):
+        """
+        Overwrite callRemote to tranform all object of type string to utf.
+        """
+        args = tree_to_utf(*args)
+        
+        # call the base class callRemote
+        LiveFragment.callRemote(self, methodName, *args)
+
+        
+def tree_to_utf(*args):
+    """
+    Convert every string to utf in mixed structure of int, float, string,
+    unicode, list, tuple and dict to be ready for JSON.
+    """
+    clean_args = []
+    for arg in args:
+        if isinstance(arg, str):
+            clean_args.append(to_utf(arg))
+        elif isinstance(arg, (tuple, list)):
+            clean_args.append(tree_to_utf(*arg))
+        elif isinstance(arg, dict):
+            clean_dict = {}
+            for key, value in arg.items():
+                clean_dict[to_utf(key)] = tree_to_utf(value)[0]
+            clean_args.append(clean_dict)
+        else:
+            clean_args.append(arg)
+            
+    return clean_args
         
 
 def expose(loc):

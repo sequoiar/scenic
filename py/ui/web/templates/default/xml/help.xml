@@ -1,0 +1,6 @@
+<div xmlns:n="http://nevow.com/ns/nevow/0.1"
+    xmlns:athena="http://divmod.org/ns/athena/0.7"
+    n:render="liveFragment">
+	<h3 n:render="i18n"><athena:handler event="onclick" handler="manual" />Help</h3>
+	<div n:render="i18n" id="help_content" class="color_help">Here you see the contextual <b>help</b> on what's under the mouse. For any subject, if you want more informations, just press control-H on the keyboard and the manual will open at the right page.</div>
+</div>

@@ -103,11 +103,14 @@ class ControllerApi(object):
         """
         self.notify(caller, (self.adb.contacts, self.adb.selected))
 
-    def get_contact(self, name=None):
+    def get_contact(self, name=None, caller=None):
         """
         Get the named contact instance.
         """
-        return self.adb.get_contact(name) # self.connectors
+        if caller:
+            self.notify(caller, self.adb.get_contact(name))
+        else:
+            return self.adb.get_contact(name) # self.connectors
 
     def find_contact(self, address, port=None, connector=None):
 #        return self.adb.find_contact(address, port)

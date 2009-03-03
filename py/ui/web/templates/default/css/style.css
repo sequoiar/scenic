@@ -7,10 +7,35 @@ h1 {
 	margin: 0; 
 }
 
+input.notify {
+	background-color: #ffcec2;
+}
+
 .color_one {
 	background-color: #c3ccd3;	
 }
 
+.color_zebra {
+	background-color: #e9f2f9;	
+}
+
 .color_help {
 	background-color: #fffcd9;
+}
+
+.color_selectable:hover {
+	background-color: #ffeaab;
+}
+
+.color_selectable:active {
+	background-color: #ffd75a;
+}
+
+.color_selected, .color_selected:hover {
+	background-color: #ffd75a;
+}
+
+.section {
+	border: dotted 1px #999;
+	padding: 10px;
 }

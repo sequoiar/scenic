@@ -117,8 +117,8 @@ class AddressBook(object):
         if new_name is None and address is None and port is None:
             raise AddressBookError, 'No property to change.'
 
-        if new_name:
-            new_name = to_utf(new_name)
+        new_name = to_utf(new_name)
+        if new_name and new_name != name:
             if new_name in self.contacts:
                 raise AddressBookNameError, 'This name %s already exist.' % new_name
             contact.name = new_name
@@ -342,6 +342,9 @@ class AddressBook(object):
                 else:
                     pickle.dump(contacts, adb_file, 1)
                 adb_file.close()
+                
+            # notify the observers that the addressbook as change
+            self.api.get_contacts(self)
 
 
 class Contact(object):

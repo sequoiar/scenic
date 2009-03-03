@@ -1,0 +1,85 @@
+#adb_list {
+	height: 102px;
+	overflow: auto;
+	background-color: #FFF;
+	border: solid 1px #999;
+	font-size: 11px;
+	position: relative;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+#adb_list li {
+/*
+	border-bottom: 1px dotted #999;
+*/
+	height: 16px;
+	padding: 2px 4px;
+	position: relative;
+}
+
+.conn_icon {
+	background: transparent;
+	width: 16px;
+	height: 16px;
+	float: right;
+	margin-left: 4px;
+}
+
+#adb_add {
+	display: block;
+	float: left;
+	width: 22px;
+	height: 22px;
+	background: url(/img/list-add.png) no-repeat;
+}
+
+#adb_add:hover {
+	cursor: pointer;
+	background-color: #d2dce5;
+}
+
+
+
+
+
+
+.toto {
+	background: url(/img/network-error.png) no-repeat;
+	width: 16px;
+}
+
+.cha {
+	background: url(/img/internet-group-chat.png) no-repeat;
+	width: 16px;
+	height: 16px;
+	float: right;
+	margin-left: 4px;
+}
+
+#contact_field {
+	width: 220px;
+	border-collapse: collapse;
+}
+
+#contact_field td {
+	font-size: 11px;
+	text-align: right;
+	padding: 2px;
+	border: 0;
+}
+
+#contact_field input {
+	border: 1px solid #b3bcc3;
+	padding: 0 2px;
+	background-color: transparent;
+	width: 150px;
+}
+
+#contact_field.active_field input {
+	border: 1px solid #999;
+	padding: 0 2px;
+	background-color: #FFF;
+}
+ 

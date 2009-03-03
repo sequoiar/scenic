@@ -37,7 +37,12 @@ UALPHABET = u'2abcdefghijklmnopqrstuvwxyz_@ ABCDEFÙ1234\'2345-678"9."0!?=+%$()[
 del addressbook.log
 addressbook.log = utils.log.start('error', 1, 0, 'adb')
 
-
+class DummyApi(object):
+    def get_contacts(self, caller):
+        pass
+    
+    def get_default_port(self, connector):
+        return 2222
             
 class Test_1_Ip_range(unittest.TestCase):
     
@@ -206,14 +211,16 @@ class Test_3_AddressBook(unittest.TestCase):
     filenames = {'':False,
                   u'':False,
                   'a':True,
-#                  u'b':True,
-#                  ' c':True,
-#                  u' d':True,
-#                  ALPHABET:True,
-#                  UALPHABET:True
+                  u'b':True,
+                  ' c':True,
+                  u' d':True,
+                  ALPHABET:True,
+                  UALPHABET:True
                   }
     
     base_file = 'test'
+    
+    api = DummyApi()
 
     def setUp(self):
         self.orig_home = os.environ['HOME']
@@ -228,7 +235,7 @@ class Test_3_AddressBook(unittest.TestCase):
         for filename, result in self.filenames.items():
             strip_filename = filename.strip()
             try:
-                adb = AddressBook(filename)
+                adb = AddressBook(filename, self.api)
                 if adb:
                     test_result = True
             except InstallFileError:
@@ -241,7 +248,7 @@ class Test_3_AddressBook(unittest.TestCase):
     def test_2_read_write_add(self):
         for filename, result in self.filenames.items():
             try:
-                adb = AddressBook(filename)
+                adb = AddressBook(filename, self.api)
             except InstallFileError:
                 pass
             else:
@@ -259,7 +266,7 @@ class Test_3_AddressBook(unittest.TestCase):
                         
     def test_3_select(self):
         try:
-            adb = AddressBook(self.base_file)
+            adb = AddressBook(self.base_file, self.api)
             adb.add('Jules', [])
         except AddressBookError:
             pass
@@ -270,7 +277,7 @@ class Test_3_AddressBook(unittest.TestCase):
             
     def test_4_get_current(self):
         try:
-            adb = AddressBook(self.base_file)
+            adb = AddressBook(self.base_file, self.api)
             adb.add('Jules', [])
         except AddressBookError:
             pass
@@ -281,7 +288,7 @@ class Test_3_AddressBook(unittest.TestCase):
             
     def test_5_delete(self):
         try:
-            adb = AddressBook(self.base_file)
+            adb = AddressBook(self.base_file, self.api)
             adb.add('Jules', [])
             adb.select('Jules')
             adb.add('Guenièvre Temps-Dur', [])
@@ -300,7 +307,7 @@ class Test_3_AddressBook(unittest.TestCase):
             
     def test_6_duplicate(self):
         try:
-            adb = AddressBook(self.base_file)
+            adb = AddressBook(self.base_file, self.api)
             adb.add('Jules', [])
             adb.add('Guenièvre Temps-Dur', [])
         except AddressBookError:
@@ -320,7 +327,7 @@ class Test_3_AddressBook(unittest.TestCase):
         
     def test_7_modify(self):
         try:
-            adb = AddressBook(self.base_file)
+            adb = AddressBook(self.base_file, self.api)
             adb.add('Jules', [])
             adb.add('Guenièvre Temps-Dur', [])
         except AddressBookError:
