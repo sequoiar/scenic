@@ -58,6 +58,9 @@ class AudioSource : public GstLinkableSource
         /// GstElements representing each source and audioconvert 
         GstElement *source_;
 
+        /// Caps used by any source with a capsfilter
+        const char *getCapsFilterCapsString();
+
     private:
         
         GstElement *srcElement() { return source_; }

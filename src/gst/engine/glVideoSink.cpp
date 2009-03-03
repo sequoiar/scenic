@@ -38,8 +38,6 @@
 
 #include "glVideoSink.h"
 
-const unsigned int GLImageSink::WIDTH = 720;
-const unsigned int GLImageSink::HEIGHT = 528;
         
 const GLfloat NTSC_VIDEO_RATIO = 4.0 / 3.0;
 const GLfloat GLImageSink::INIT_X = -0.5 * NTSC_VIDEO_RATIO; 
@@ -63,7 +61,7 @@ GLfloat GLImageSink::bottomCrop_ = INIT_BOTTOM_CROP;
 
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
-    GLfloat vwinRatio = (gfloat) GLImageSink::WIDTH / (gfloat) GLImageSink::HEIGHT ;
+    GLfloat vwinRatio = (gfloat) WIDTH / (gfloat) HEIGHT ;
     LOG_DEBUG("WIDTH: " << width << ", HEIGHT: " << height << std::endl);
     
     // /TODO:oldDOCS
@@ -138,8 +136,8 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
         glVertex3f(aspectRatio,0.0f,0.0f);
         glVertex3f(0.0f, 0.0f, 0.0f);
         glVertex3f(0.0f,  -1.0f, 0.0f);
-        glVertex3f(2*aspectRatio,  -1.0f, 0.0f); 
-        glVertex3f(2*aspectRatio,  1.0f, 0.0f);
+        glVertex3f(2 * aspectRatio,  -1.0f, 0.0f); 
+        glVertex3f(2 * aspectRatio,  1.0f, 0.0f);
         glVertex3f(aspectRatio,  1.0f, 0.0f);
     glEnd();
     glEnable (GL_TEXTURE_RECTANGLE_ARB);
@@ -326,7 +324,7 @@ void GLImageSink::init()
             gtk_window_move(GTK_WINDOW(window_), xine[j].x_org,xine[j].y_org);
     }
 
-    gtk_window_set_default_size(GTK_WINDOW(window_), GLImageSink::WIDTH, GLImageSink::HEIGHT);
+    gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
     gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(expose_cb), 

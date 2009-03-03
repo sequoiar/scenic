@@ -56,6 +56,16 @@ AudioSource::~AudioSource()
 }
 
 
+const char *AudioSource::getCapsFilterCapsString()
+{
+    // otherwise alsasrc defaults to 2 channels when using plughw
+    std::ostringstream capsStr;
+    capsStr << "audio/x-raw-int, channels=" << config_.numChannels() 
+        << ", clock-rate=" << Pipeline::SAMPLE_RATE;
+    return capsStr.str().c_str();
+}
+
+
 /// Constructor 
 InterleavedAudioSource::InterleavedAudioSource(const AudioSourceConfig &config) : 
     AudioSource(config), interleave_(config_), sources_(), aconvs_()
@@ -282,12 +292,7 @@ void AudioAlsaSource::sub_init()
         THROW_ERROR("Jack is running, ALSA unavailable");
     g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
 
-    // otherwise alsasrc defaults to 2 channels when using plughw
-    std::ostringstream capsStr;
-    capsStr << "audio/x-raw-int, channels=" << config_.numChannels() 
-        << ", clock-rate=" << Pipeline::SAMPLE_RATE;
-
-    GstCaps *alsaCaps = gst_caps_from_string(capsStr.str().c_str());
+    GstCaps *alsaCaps = gst_caps_from_string(getCapsFilterCapsString());
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
     g_object_set(G_OBJECT(capsFilter_), "caps", alsaCaps, NULL);
@@ -319,12 +324,7 @@ void AudioPulseSource::sub_init()
 {
     AudioSource::sub_init();
 
-    std::ostringstream capsStr;
-    //g_object_set(G_OBJECT(sources_[0]), "device", alsa::DEVICE_NAME, NULL);
-    capsStr << "audio/x-raw-int, channels=" << config_.numChannels()
-        << ", clock-rate=" << Pipeline::SAMPLE_RATE;
-
-    GstCaps *pulseCaps = gst_caps_from_string(capsStr.str().c_str());
+    GstCaps *pulseCaps = gst_caps_from_string(getCapsFilterCapsString());
     aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     g_object_set(G_OBJECT(capsFilter_), "caps", pulseCaps, NULL);
@@ -365,15 +365,9 @@ void AudioJackSource::sub_init()
 #endif
     // /TODO: fine tune this in conjunction with jitterbuffer
     
-    //g_object_set(G_OBJECT(source_), "buffer-time", 25000LL, NULL);
     g_object_set(G_OBJECT(source_), "buffer-time", bufferTime_, NULL);
 
-    // otherwise jackaudiosrc defaults to 2 channels
-    std::ostringstream capsStr;
-    capsStr << "audio/x-raw-int, channels=" << config_.numChannels() 
-        << ", clock-rate=" << Pipeline::SAMPLE_RATE;
-
-    GstCaps *jackCaps = gst_caps_from_string(capsStr.str().c_str());
+    GstCaps *jackCaps = gst_caps_from_string(getCapsFilterCapsString());
     aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     g_object_set(G_OBJECT(capsFilter_), "caps", jackCaps, NULL);

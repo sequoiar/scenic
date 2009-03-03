@@ -1,5 +1,4 @@
 https://trac.sat.qc.ca/trac/miville/wiki/NetEm
 -fix glvideosink's black at startup/until fullscreen bug
--try (in a branch) to queue network sources (as per the app-devel guide section on threading)
 -teeing video and audio, start with tests
 
