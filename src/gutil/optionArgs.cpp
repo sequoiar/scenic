@@ -73,8 +73,8 @@ GOptionEntry* OptionArgs::getArray()
 
     for(Options::iterator it = options_.begin(); it != options_.end(); ++it)
     {
-        LOG_DEBUG(it->long_name << " short_name: " << it->short_name << " description: " << it->description 
-                << " arg_description: " << it->arg_description);
+        //LOG_DEBUG(it->long_name << " short_name: " << it->short_name << " description: " << it->description 
+         //       << " arg_description: " << it->arg_description);
         pA_[count++] = *it;
     }
     pA_[count] =  n;
