@@ -38,6 +38,7 @@
  * \return number of ports found
  */
 #ifdef CONFIG_IEEE1394
+
 int raw1394_get_num_ports()
 {
 	int n_ports;

@@ -36,7 +36,7 @@ namespace pof
     short run(int argc, char **argv);
     const short NUM_CHANNELS = 2;
 
-#ifdef CONFIG_BOOST
+#ifdef HAVE_BOOST
     using namespace boost;
 #else
     using namespace std::tr1;
@@ -95,7 +95,7 @@ short pof::run(int argc, char **argv)
     options.add(new StringArg(&videoSource, "videosource", 'u', "videosource", "v4l2src v4lsrc dv1394src"));
 
     //telnetServer param
-    int serverport=0;
+    int serverport = 0;
     options.add(new IntArg(&serverport, "serverport", 'y', "run as server", "port to listen on"));
 
     options.parse(argc, argv);

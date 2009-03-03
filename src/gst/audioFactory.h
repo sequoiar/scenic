@@ -78,7 +78,7 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
 }
 
 #ifdef USE_SMART_PTR
-#ifdef CONFIG_BOOST
+#ifdef HAVE_BOOST
 #include <boost/shared_ptr.hpp>   // for boost::shared_ptr
 #else
 #include <tr1/memory>
@@ -87,7 +87,7 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
 namespace audiofactory
 {
 #define USE_SHARED_PTR
-#ifdef CONFIG_BOOST
+#ifdef HAVE_BOOST
     using namespace boost;
 #else
     using namespace std::tr1;

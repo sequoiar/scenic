@@ -44,6 +44,9 @@ VideoSource * VideoSourceConfig::createSource() const
         return new VideoFileSource(*this);
     else 
         THROW_ERROR(source_ << " is an invalid source!");
+            
+    LOG_DEBUG("Video source options: " << source_ << ", bitrate: " << bitrate_ << ", deinterlace: " 
+            << (doDeinterlace() ? "true" : "false") << ", location: " << location_);
     return 0;
 }
 
@@ -81,6 +84,8 @@ VideoSink * VideoSinkConfig::createSink() const
 #endif
     else
         THROW_ERROR(sink_ << " is an invalid sink");
+    
+    LOG_DEBUG("Video sink " << sink_ << " built"); 
     return 0;
 }
 

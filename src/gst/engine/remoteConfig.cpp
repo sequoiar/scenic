@@ -56,6 +56,7 @@ VideoEncoder * SenderConfig::createVideoEncoder() const
         THROW_ERROR(codec_ << " is an invalid codec!");
         return 0;
     }
+    LOG_DEBUG("Video encoder " << codec_ << " built"); 
 }
 
 
@@ -75,6 +76,7 @@ Encoder * SenderConfig::createAudioEncoder() const
         THROW_ERROR(codec_ << " is an invalid codec!");
         return 0;
     }
+    LOG_DEBUG("Audio encoder " << codec_ << " built"); 
 }
 
 
@@ -94,6 +96,7 @@ Decoder * ReceiverConfig::createVideoDecoder() const
         THROW_ERROR(codec_ << " is an invalid codec!");
         return 0;
     }
+    LOG_DEBUG("Video decoder " << codec_ << " built"); 
 }
 
 
@@ -113,6 +116,7 @@ Decoder * ReceiverConfig::createAudioDecoder() const
         THROW_ERROR(codec_ << " is an invalid codec!");
         return 0;
     }
+    LOG_DEBUG("Audio decoder " << codec_ << " built"); 
 }
 
 bool ReceiverConfig::capsMatchCodec() const
