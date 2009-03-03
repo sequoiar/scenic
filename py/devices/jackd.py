@@ -57,6 +57,8 @@ from utils import log as logger
 warnings.simplefilter("ignore", DeprecationWarning)
 log = logger.start('debug', 1, 0, 'devices_jackd')
 
+_state_printed_jackd_is_frozen = False
+
 def _parse_jack_lsp(lines):
     """
     Parses the output of the `jack_lsp` command.
@@ -98,6 +100,7 @@ def jackd_get_infos():
     'pid': 7471,
     'rate': 44100}]
     """
+    global _state_printed_jackd_is_frozen
     # TODO: each short arg has a long version which should be implemented too.
     # /dev/shm/jack-$UID for jackd name 
     # g = glob.glob('/dev/shm/jack-1002/*/*-0')
@@ -126,9 +129,12 @@ def jackd_get_infos():
                 s = f.read()
                 f.close()
             except IOError, e:
-                log.info("Jackd seems frozen. IOError : (trying to read %s) %s" % (filename , str(e.message))) # log.error(e.message)
+                if not _state_printed_jackd_is_frozen:
+                    log.info("Jackd seems frozen. IOError : (trying to read %s) %s" % (filename , str(e.message))) # log.error(e.message)
+                    _state_printed_jackd_is_frozen = True 
                 ret.pop(i)
             else:
+                _state_printed_jackd_is_frozen = False 
                 # '/usr/bin/jackd\x00-dalsa\x00-dhw:0\x00-r44100\x00-p1024\x00-n2\x002\x00'
                 cmdline = s.split('\x00') # ['/usr/bin/jackd', '-dalsa', '-dhw:0', '-r44100', '-p1024', '-n2', '2', '']
                 backends = ['alsa', 'freebob'] # supported backends so far. #TODO: add more
