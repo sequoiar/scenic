@@ -34,12 +34,9 @@ const int RemoteConfig::PORT_MAX = 65000;
 RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remoteHost__,
         int port__) : codec_(codec__), remoteHost_(remoteHost__), port_(port__)
 {
-    if(!Codec::isSupportedCodec(codec_))
-        THROW_ERROR("Bad codec: " << codec_);
     if (port_ < PORT_MIN || port_ > PORT_MAX)
         THROW_ERROR("Invalid port " << port_ << ", must be in range [" 
                 << PORT_MIN << "," << PORT_MAX << "]");  
-
 }
 
 

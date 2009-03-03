@@ -31,8 +31,6 @@
 #include "mapMsg.h"
 
 
-const std::string Codec::VALID_CODECS[NUM_CODECS] = {"h264", "raw", "vorbis", "mp3", "mpeg4", "h263"};
-
 /// Constructor 
 Codec::Codec() : 
     codec_(0) 
@@ -43,22 +41,6 @@ Codec::Codec() :
 Codec::~Codec()
 {
     Pipeline::Instance()->remove(&codec_);
-}
-
-
-/// Returns true if the specified codec is supported by our architecture
-bool Codec::isSupportedCodec(const std::string & codecStr)
-{
-    if (codecStr.empty())
-    {
-        LOG_WARNING("Empty codec string given");
-        return false;
-    }
-
-    // ptr to one past the end of our array of codecs
-    const std::string *VALID_CODECS_END = VALID_CODECS + (NUM_CODECS * sizeof(std::string));
-    // search for codecStr in Codec's list of supported codecs
-    return std::find(VALID_CODECS, VALID_CODECS_END, codecStr) != VALID_CODECS_END;
 }
 
 
