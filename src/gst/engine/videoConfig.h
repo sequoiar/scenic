@@ -48,7 +48,7 @@ class VideoSourceConfig
         int bitrate() const { return bitrate_; }
         bool doDeinterlace() const { return doDeinterlace_; }
 
-        bool hasLocation() const { return location_.empty(); }
+        bool hasLocation() const { return !location_.empty(); }
         bool fileExists() const;
         const char *location() const;
 
