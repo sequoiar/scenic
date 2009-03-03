@@ -42,7 +42,7 @@ from twisted.python import failure
 # App imports
 from utils import log
 
-log = log.start('debug', 1, 0, 'com_chan')
+log = log.start('debug', 1, True, 'com_chan') # LOG TO FILE = True
 
 # constants
 PORT = 37054

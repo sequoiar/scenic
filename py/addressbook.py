@@ -90,6 +90,7 @@ class AddressBook(object):
         if name in self.contacts:
             raise AddressBookNameError, 'Name %s already in Address Book' % name
         self.contacts[name] = Contact(name, address, port, auto_created, connector, setting)
+        log.debug("adding contact %s %s" % (name, address))
         self.write()
         return True
 

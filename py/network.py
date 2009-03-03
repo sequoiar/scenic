@@ -48,7 +48,7 @@ import warnings
 from twisted.internet import reactor
 from twisted.internet import protocol
 from twisted.internet import defer
-from twisted.internet.error import ProcessExitedAlready
+from twisted.internet.error import ProcessExitedAlready, AlreadyCancelled
 from twisted.python import failure
 from twisted.protocols import basic
 try:
@@ -63,7 +63,7 @@ from utils import log
 from utils import commands
 import connectors
 from errors import CommandNotFoundError
-log = log.start('debug', 1, 0, 'network')
+log = log.start('debug', 1, True, 'network') # LOG TO FILE = True
 
 # -------------------- constants -----------------------------------
 STATE_IDLE = 0
@@ -86,6 +86,7 @@ _is_currently_busy = False
 # keys are unicode strings.
 _testers = {}
 _api = None
+_TIMEOUT = 30.0 # timeout in seconds max to wait before calling _timeout.
 
 """
 This dict explains the 2nd line of the output of `iperf -y c -u -c <host>`
@@ -293,8 +294,10 @@ class NetworkTester(object):
         self.current_ping_started_time  = 0 # UNIX timestamp
         self.current_results_sent = False
         # -------- settings
+        # TODO use those 2 vars:
         self.accept_timeout = 20 # timeout before auto rejecting dualtest query
         self.remote_results_timeout = 5 # how many extra seconds over the duration of a test to wait for remote stats before giving up.
+        self.timeout_call_later_id = None
 
     def kill_server_process(self, process_transport, sig=15, verify_timeout=1.0):
         """
@@ -409,8 +412,18 @@ class NetworkTester(object):
             self._send_message("ping")
             self.state = STATE_WAITING_REMOTE_ANSWER 
             _is_currently_busy = True
+            self.timeout_call_later_id = reactor.callLater(_TIMEOUT + duration, self._timeout)
             return True
-    
+
+    def _timeout(self):
+        """
+        After a little while, if nothing happened, makes sure we are available for a test.
+        """
+        if _is_currently_busy or self.state != STATE_IDLE:
+            self._when_done()
+            if self.iperf_server_is_running: # XXX
+                self._stop_iperf_server_process()
+
     def _when_done(self):
         """
         Call this when you are done to change out state to available.
@@ -489,6 +502,12 @@ class NetworkTester(object):
         (it is a float)
         """
         return time.time() # * 1000.0 #  in ms
+    
+    def _cancel_timeout(self):
+        try:
+            reactor.cancelCallLater(self.timeout_call_later_id)
+        except AlreadyCancelled, e:
+            pass
 
     def on_remote_message(self, key, args):
         """
@@ -512,15 +531,22 @@ class NetworkTester(object):
         global _is_currently_busy
         # TODO: we should check from which contact this message is from !!!!!!!!!!
 
-        log.debug("received %s:(%s)" % (key, str(args)))
+        #log.debug("received %s:(%s)" % (key, str(args)))
         if key == "ping": # from A
             self._start_iperf_server_process()
-            if self.state != STATE_IDLE or _is_currently_busy:
+            if self.state != STATE_IDLE:
                 log.error("Received a ping while being busy doing some network test. (state = %d)" % self.state)
                 self._send_message("busy")
+            if _is_currently_busy:
+                log.error("Received a ping while being busy doing some network test. (_is_currently_busy)")
+                self._send_message("busy")
             else:
+                # TODO: use 
+                # self.accept_timeout = 20 # timeout before auto rejecting dualtest query
                 self._send_message("pong")
                 _is_currently_busy = True
+                self._cancel_timeout()
+                self.timeout_call_later_id = reactor.callLater(_TIMEOUT, self._timeout) # XXX FIXME
         
         elif key == "busy": # from B
             self.notify_api(self.current_caller, "error", "Network test not possible. Remote peer is busy.")
@@ -543,11 +569,14 @@ class NetworkTester(object):
                 log.debug("Will start iperf client in %f seconds" % wait_for)
                 if self.current_kind != KIND_REMOTETOLOCAL: # the only case where we do not send from local to remote
                     reactor.callLater(wait_for, self._start_iperf_client)
+                self._cancel_timeout()
+                self.timeout_call_later_id = reactor.callLater(_TIMEOUT + self.current_duration, self._timeout) # XXX FIXME
         
         elif key == "start": # from A
             kind = args[0]
             params = args[1]
             self.current_kind = kind
+            # the two cases where B starts an iperf client.
             if kind == KIND_DUALTEST or kind == KIND_REMOTETOLOCAL:
                 # TODO
                 if kind == kind == KIND_DUALTEST:
@@ -599,6 +628,8 @@ class NetworkTester(object):
          * 'remote' : stats for remote to local
          * 'contact' : the name of the contact the test has been done with.
         """
+        # TODO: use
+        #self.remote_results_timeout = 5 # how many extra seconds over the duration of a test to wait for remote stats before giving up.
         if not self.current_results_sent:
             must_have_local = True
             must_have_remote = False
@@ -653,6 +684,7 @@ class NetworkTester(object):
                         self.notify_api(caller, 'error', e.message)
                         log.error(e.message)
                     else:    
+                        log.debug("we made it until here")
                         kind = extra_arg['kind']
                         iperf_stats['test_kind'] = kind
                         log.debug("on_iperf_commands_results : %r" % iperf_stats)
