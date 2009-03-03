@@ -120,7 +120,7 @@ class AddressBook(object):
         new_name = to_utf(new_name)
         if new_name and new_name != name:
             if new_name in self.contacts:
-                raise AddressBookNameError, 'This name %s already exist.' % new_name
+                raise AddressBookNameError, 'The name "%s" already exist.' % new_name
             contact.name = new_name
             del self.contacts[name]
             self.contacts[new_name] = contact

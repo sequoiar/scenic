@@ -102,9 +102,18 @@ Addressbook.methods(
 		self.adb_port.value = contact.port;
 	},
 
-	function modifyContact(self, contact) {
+	function modifyContact(self) {
 		self.callRemote('rc_modify_contact', self.selected, self.adb_name.value, self.adb_address.value, self.adb_port.value);
 		self.selected = self.adb_name.value;
+	},
+
+	function addContact(self) {
+		self.callRemote('rc_add_contact', self.adb_name.value, self.adb_address.value, self.adb_port.value);
+		self.selected = self.adb_name.value;
+	},
+
+	function error(self, msg) {
+		StickyWin.alert('Error', msg);
 	},
 
 
@@ -140,7 +149,11 @@ Addressbook.methods(
 			if (validate) {
 				self.adb_edit.value = self.edit_str;
 				self.fieldState(true);
-				self.modifyContact();
+				if (self.selected) {
+					self.modifyContact();
+				} else {
+					self.addContact();
+				}
 			}
 		} else {
 			self.adb_edit.value = self.save_str;
@@ -149,13 +162,21 @@ Addressbook.methods(
 		}
 	},
 
+	function deSelect(self, name) {
+		self.selected = name;
+		self.adb_list.getElements('li.color_selected').removeClass('color_selected')
+		self.cleanFields();
+	},
+
 	function add(self) {
+		self.deSelect(null)
 		self.adb_edit.value = self.save_str;	
 		self.adb_edit.disabled = false;
-		self.fieldState = true;
-		self.adb_name.value = '';
-		self.adb_address.value = '';
-		self.adb_port.value = '';
+		self.adb_fields.each(function(elem) {
+			elem.value = '';
+		});
+		self.fieldState(false);
+		self.adb_name.select();
 	}
 	
 );
