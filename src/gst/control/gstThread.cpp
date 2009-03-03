@@ -100,7 +100,9 @@ bool GstReceiverThread::video_start(MapMsg& msg)
     try
     {
         LOG_INFO("video_start");
-        video_ = videofactory::buildVideoReceiver_(get_host_ip(), msg["codec"], msg["port"], 0, "xvimagesink");
+        const int SCREEN_NUM = 0;
+        const char *VIDEO_SINK = "xvimagesink";
+        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], SCREEN_NUM, VIDEO_SINK);
 //        queue_.push(MapMsg("video_started"));
         return true;
     }
@@ -121,7 +123,8 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
 
     try
     {
-        audio_ = audiofactory::buildAudioReceiver_(get_host_ip(), msg["codec"], msg["port"]);
+        const char *AUDIO_SINK = "jackaudiosink";
+        audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], AUDIO_SINK);
 //        queue_.push(MapMsg("audio_started"));
         return true;
     }
@@ -153,15 +156,17 @@ bool GstSenderThread::video_start(MapMsg& msg)
         //VideoSourceConfig config("dv1394src");
         //SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
         LOG_INFO("video_start");
+        const std::string VIDEO_DEVICE = "";
+        bool DO_DEINTERLACE = false;
 
         if(msg["location"].empty())
         {
-            VideoSourceConfig config(msg["source"], msg["bitrate"]);
+            VideoSourceConfig config(msg["source"], msg["bitrate"], VIDEO_DEVICE, DO_DEINTERLACE);
             video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
         else
         {
-            VideoSourceConfig config(msg["source"], msg["bitrate"], std::string(msg["location"]));
+            VideoSourceConfig config(msg["source"], msg["bitrate"], std::string(msg["location"]), DO_DEINTERLACE);
             video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
         assert(tcpSendBuffer(msg["address"], ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, sender->getCaps()));
@@ -197,6 +202,7 @@ bool GstSenderThread::audio_start(MapMsg& msg)
             audio_ = asender = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
 
+        assert(tcpSendBuffer(msg["address"], ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, asender->getCaps()));
         //Build Caps Msg
  //       MapMsg caps("caps");
  //       caps["caps_str"] = asender->getCaps();
