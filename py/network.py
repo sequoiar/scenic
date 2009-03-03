@@ -63,7 +63,8 @@ from utils import log
 from utils import commands
 import connectors
 from errors import CommandNotFoundError
-log = log.start('debug', 1, True, 'network') # LOG TO FILE = True
+log = log.start('info', 1, True, 'network') # LOG TO FILE = True
+# CHANGE IT TO debug LEVEL TO GET MORE OUTPUT
 
 # -------------------- constants -----------------------------------
 STATE_IDLE = 0
@@ -673,7 +674,7 @@ class NetworkTester(object):
             command = commands[i]
             
             if isinstance(results_infos, failure.Failure):
-                print ">>>> FAILURE : ", results_infos.getErrorMessage()  # if there is an error, the programmer should fix it.
+                log.error("FAILURE : " + str( results_infos.getErrorMessage()))  # if there is an error, the programmer should fix it.
             else:
                 stdout, stderr, signal_or_code = results_infos
                 if success:
@@ -686,7 +687,6 @@ class NetworkTester(object):
                         self.notify_api(caller, 'error', e.message)
                         log.error(e.message)
                     else:    
-                        log.debug("we made it until here")
                         kind = extra_arg['kind']
                         iperf_stats['test_kind'] = kind
                         log.debug("on_iperf_commands_results : %r" % iperf_stats)

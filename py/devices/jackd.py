@@ -120,12 +120,13 @@ def jackd_get_infos():
             ret.append({}) # populate a dict
             ret[i]['name'] = name # probably 'default' or $JACK_DEFAULT_SERVER
             ret[i]['pid'] = pid
+            filename = "/proc/%d/cmdline" % (pid)
             try:
-                f = file("/proc/%d/cmdline" % (pid), "r")
+                f = file(filename, "r")
                 s = f.read()
                 f.close()
             except IOError, e:
-                log.error("ERROR: " + e.message) # log.error(e.message)
+                log.info("Jackd seems frozen. IOError : (trying to read %s) %s" % (filename , str(e.message))) # log.error(e.message)
                 ret.pop(i)
             else:
                 # '/usr/bin/jackd\x00-dalsa\x00-dhw:0\x00-r44100\x00-p1024\x00-n2\x002\x00'

@@ -53,7 +53,7 @@ Addressbook.methods(
 	//////////////////////
 
     function updateList(self, contacts) {
-		console.info(self.adb_list.getScroll().y);
+// console.info(self.adb_list.getScroll().y);
 		self.adb_list.empty();
 		var counter = 0;
 		var selected = null;
@@ -140,7 +140,7 @@ Addressbook.methods(
 			if (self.isEmpty.test(self.adb_name)) {
 				validate = false;
 				self.adb_name.addClass('notify');
-				console.info(self.isEmpty.getError(self.adb_name));
+				//console.info(self.isEmpty.getError(self.adb_name));
 			}
 			if (self.isEmpty.test(self.adb_address)) {
 				validate = false;
