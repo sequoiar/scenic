@@ -39,6 +39,8 @@ AC_ARG_ENABLE([debug], [
 AC_MSG_WARN([${ac_prefix}])
 # Checks for library functions.
 
+AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
+
 if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
     CXXFLAGS="-g -std=c++0x -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
