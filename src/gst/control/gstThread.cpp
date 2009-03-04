@@ -30,11 +30,6 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 
-#if 0
-std::string stored_ip[2];
-int stored_ports[2];
-int 
-#endif
 boost::function<void (std::string)> ff[2];
 void GstThread::stop(MapMsg& ){ playback::stop();} 
 void GstThread::start(MapMsg&)
@@ -44,7 +39,6 @@ void GstThread::start(MapMsg&)
 
 void GstSenderThread::start(MapMsg& )
 { 
-    LOG_INFO("GstSenderThread start");
     playback::start();
     if(ff[0])
         ff[0](video_->getCaps());
