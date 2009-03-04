@@ -44,6 +44,7 @@ void GstThread::start(MapMsg&)
 
 void GstSenderThread::start(MapMsg& )
 { 
+    LOG_INFO("GstSenderThread start");
     playback::start();
     if(ff[0])
         ff[0](video_->getCaps());
@@ -122,7 +123,7 @@ bool GstReceiverThread::video_start(MapMsg& msg)
  
     try
     {
-        LOG_INFO("video_start");
+        LOG_INFO("video_init");
         const int SCREEN_NUM = 0;
         const char *VIDEO_SINK = "xvimagesink";
         video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], SCREEN_NUM, VIDEO_SINK);
@@ -178,7 +179,7 @@ bool GstSenderThread::video_start(MapMsg& msg)
     {
         //VideoSourceConfig config("dv1394src");
         //SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
-        LOG_INFO("video_start");
+        LOG_INFO("video_init");
         const std::string VIDEO_DEVICE = "";
         bool DO_DEINTERLACE = false;
 
