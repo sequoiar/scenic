@@ -30,9 +30,8 @@
 
 #define ASSERT_THROWS   
 
-#ifndef ASSERT_THROWS
 #include <assert.h>
-#else //ASSERT_THROWS
+#ifdef ASSERT_THROWS
 
 #include <assert.h>
 
@@ -45,10 +44,9 @@
      ?__ASSERT_VOID_CAST (0)            \
      :  assert_throw(__STRING(expr), __FILE__, __LINE__, __ASSERT_FUNCTION))
 
-
+///throws an exception in case of assertion failure
 void assert_throw(__const char *__assertion, __const char *__file,
                            unsigned int __line, __const char *__function);
-
 #endif  //ASSERT_THROWS
 
 #endif  //__LASSERT_H__

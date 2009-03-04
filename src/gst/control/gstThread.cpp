@@ -23,10 +23,34 @@
 #include "util.h"
 
 #include "gstThread.h"
+#include "gstSenderThread.h"
 #include "engine/playback.h"
 
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
+
+#if 0
+std::string stored_ip[2];
+int stored_ports[2];
+int 
+#endif
+boost::function<void (std::string)> ff[2];
 void GstThread::stop(MapMsg& ){ playback::stop();} 
-void GstThread::start(MapMsg& ){ playback::start();} 
+void GstThread::start(MapMsg&)
+{
+    playback::start();
+}
+
+void GstSenderThread::start(MapMsg& )
+{ 
+    playback::start();
+#if 0
+    if(ff[0])
+        ff[0](video_->getCaps());
+    if(ff[1])
+        ff[1](audio_->getCaps());
+#endif
+} 
 int GstThread::main()
 {
     bool done = false;
@@ -169,7 +193,10 @@ bool GstSenderThread::video_start(MapMsg& msg)
             VideoSourceConfig config(msg["source"], msg["bitrate"], std::string(msg["location"]), DO_DEINTERLACE);
             video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
-        assert(tcpSendBuffer(msg["address"], ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, sender->getCaps()));
+
+        ff[0] = boost::bind(tcpSendBuffer,msg["address"], ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, _1);
+        //sender->getCaps());
+//        ff[0]();
         return true;
     }
     catch(Except e)
@@ -201,8 +228,7 @@ bool GstSenderThread::audio_start(MapMsg& msg)
             AudioSourceConfig config(msg["source"], msg["location"], msg["channels"]);
             audio_ = asender = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
-
-        assert(tcpSendBuffer(msg["address"], ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, asender->getCaps()));
+        ff[1] = boost::bind(tcpSendBuffer,msg["address"], ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, _1);
         //Build Caps Msg
  //       MapMsg caps("caps");
  //       caps["caps_str"] = asender->getCaps();

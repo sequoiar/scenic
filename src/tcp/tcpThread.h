@@ -52,7 +52,7 @@ class TcpThread
 
 
 std::string tcpGetBuffer(int port, int &id);
-bool tcpSendBuffer(const std::string &ip, int port, int id, const std::string &caps);
+bool tcpSendBuffer(const std::string ip, int port, int id, const std::string caps);
 
 #endif // _TCP_THREAD_H_
 

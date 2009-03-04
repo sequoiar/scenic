@@ -33,6 +33,7 @@ class GstSenderThread
         GstSenderThread()
             : video_(0), audio_(0) {}
         ~GstSenderThread();
+        virtual void start(MapMsg& ); 
     private:
         /// incomming audio_start request 
         bool audio_start(MapMsg& msg);

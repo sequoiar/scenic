@@ -47,6 +47,7 @@ class SenderBase
         SenderBase() : initialized_(false) {};
         virtual ~SenderBase(){};
 
+        virtual std::string getCaps() const = 0;
     private:
         virtual void init_source() = 0;
         virtual void init_codec() = 0;

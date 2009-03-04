@@ -37,7 +37,7 @@ class GstThread
         /// incomming stop request 
         void stop(MapMsg& ); 
         /// incomming start request 
-        void start(MapMsg& ); 
+        virtual void start(MapMsg& ); 
 
 
 

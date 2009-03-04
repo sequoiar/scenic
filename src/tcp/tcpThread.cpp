@@ -214,8 +214,9 @@ std::string tcpGetBuffer(int port, int &id)
 
 #include <errno.h>
 
-bool tcpSendBuffer(const std::string &ip, int port, int id, const std::string &caps)
+bool tcpSendBuffer(const std::string ip, int port, int id, const std::string caps)
 {
+    LOG_INFO("got " << ip << port << id << caps);
     MapMsg msg("buffer");
 
     TcpThread tcp(port);
