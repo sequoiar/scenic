@@ -43,7 +43,7 @@ namespace pof
 #endif
 }
 
-int telnetServer(int,int);
+int telnetServer(int, int);
 
 // 2way audio and video
 short pof::run(int argc, char **argv)
@@ -73,6 +73,7 @@ short pof::run(int argc, char **argv)
     
     int version = false;
 
+    // add options here
     options.add(new BoolArg(&recv,"receiver", 'r', "receiver"));
     options.add(new BoolArg(&send,"sender", 's', "sender"));
     options.add(new StringArg(&ip, "address", 'i', "address", "provide ip address"));
@@ -176,7 +177,10 @@ short pof::run(int argc, char **argv)
             if (videoDevice)
                 vConfig = new VideoSourceConfig(videoSource, videoBitrate, videoDevice, doDeinterlace);
             else
-                vConfig = new VideoSourceConfig(videoSource, videoBitrate, doDeinterlace);
+            {
+                const std::string VIDEO_LOCATION = "";
+                vConfig = new VideoSourceConfig(videoSource, videoBitrate, VIDEO_LOCATION, doDeinterlace);
+            }
 
             vTx = videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort);
             delete vConfig;
@@ -186,7 +190,8 @@ short pof::run(int argc, char **argv)
         {
             if (audioSource == 0)
                 THROW_ERROR("argument error: missing --audiosource. see --help");
-            AudioSourceConfig aConfig(audioSource, numChannels);
+            const std::string AUDIO_LOCATION = "";
+            AudioSourceConfig aConfig(audioSource, AUDIO_LOCATION, numChannels);
             aTx = audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort);
         }
 

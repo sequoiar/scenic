@@ -75,7 +75,7 @@ const char* VideoSourceConfig::location() const
 VideoSink * VideoSinkConfig::createSink() const
 {
     if (sink_ == "xvimagesink")
-        return new XvImageSink();
+        return new XvImageSink(screenNum_);
     else if (sink_ == "ximagesink")
         return new XImageSink();
 #ifdef CONFIG_GL

@@ -31,6 +31,8 @@
 #include "dv1394.h"
 
 
+#include <iostream>
+
 /// Constructor 
 AudioSource::AudioSource(const AudioSourceConfig &config) : 
     config_(config), 
@@ -56,13 +58,31 @@ AudioSource::~AudioSource()
 }
 
 
-const char *AudioSource::getCapsFilterCapsString()
+std::string AudioSource::getCapsFilterCapsString()
 {
     // otherwise alsasrc defaults to 2 channels when using plughw
     std::ostringstream capsStr;
     capsStr << "audio/x-raw-int, channels=" << config_.numChannels() 
         << ", clock-rate=" << Pipeline::SAMPLE_RATE;
-    return capsStr.str().c_str();
+    std::cout << "Audiosource caps = " << capsStr.str();
+    return capsStr.str();
+}
+
+
+void AudioSource::setupCapsFilter(GstElement* &aconv, GstElement* &capsFilter)
+{
+    // setup capsfilter
+    GstCaps *caps = 0;
+    caps = gst_caps_from_string(getCapsFilterCapsString().c_str());
+    assert(caps);
+    capsFilter = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    aconv = Pipeline::Instance()->makeElement("audioconvert", NULL);
+    g_object_set(G_OBJECT(capsFilter), "caps", caps, NULL);
+
+    gst_caps_unref(caps);
+    
+    gstlinkable::link(source_, aconv);
+    gstlinkable::link(aconv, capsFilter);
 }
 
 
@@ -271,8 +291,8 @@ AudioFileSource::~AudioFileSource()
 
 
 /// Constructor 
-AudioAlsaSource::AudioAlsaSource(const AudioSourceConfig &config) : 
-    AudioSource(config), capsFilter_(0), aconv_(0)
+AudioAlsaSource::AudioAlsaSource(const AudioSourceConfig &config, unsigned long long bufferTime) : 
+    AudioSource(config), capsFilter_(0), aconv_(0), bufferTime_(bufferTime)
 {}
 
 /// Destructor 
@@ -291,24 +311,18 @@ void AudioAlsaSource::sub_init()
     if (Jack::is_running())
         THROW_ERROR("Jack is running, ALSA unavailable");
     g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
+    g_object_set(G_OBJECT(source_), "buffer-time", bufferTime_, NULL);
 
-    GstCaps *alsaCaps = gst_caps_from_string(getCapsFilterCapsString());
-    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-    g_object_set(G_OBJECT(capsFilter_), "caps", alsaCaps, NULL);
-
-    gst_caps_unref(alsaCaps);
-    
-    gstlinkable::link(source_, aconv_);
-    gstlinkable::link(aconv_, capsFilter_);
+    setupCapsFilter(aconv_, capsFilter_);
 }
 
 
 /// Constructor 
-AudioPulseSource::AudioPulseSource(const AudioSourceConfig &config) : 
+AudioPulseSource::AudioPulseSource(const AudioSourceConfig &config, unsigned long long bufferTime) : 
     AudioSource(config), 
     capsFilter_(0),
-    aconv_(0)
+    aconv_(0),
+    bufferTime_(bufferTime)
 {}
 
 
@@ -324,14 +338,8 @@ void AudioPulseSource::sub_init()
 {
     AudioSource::sub_init();
 
-    GstCaps *pulseCaps = gst_caps_from_string(getCapsFilterCapsString());
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
-    g_object_set(G_OBJECT(capsFilter_), "caps", pulseCaps, NULL);
-    gst_caps_unref(pulseCaps);
-
-    gstlinkable::link(source_, aconv_);
-    gstlinkable::link(aconv_, capsFilter_);
+    g_object_set(G_OBJECT(source_), "buffer-time", bufferTime_, NULL);
+    setupCapsFilter(aconv_, capsFilter_);
 }
 
 
@@ -367,20 +375,11 @@ void AudioJackSource::sub_init()
     
     g_object_set(G_OBJECT(source_), "buffer-time", bufferTime_, NULL);
 
-    GstCaps *jackCaps = gst_caps_from_string(getCapsFilterCapsString());
-    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
-    g_object_set(G_OBJECT(capsFilter_), "caps", jackCaps, NULL);
-
-    gst_caps_unref(jackCaps);
+    setupCapsFilter(aconv_, capsFilter_);
 
     if (Pipeline::SAMPLE_RATE != Jack::samplerate())
         THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
                 << " does not match default sample rate " << Pipeline::SAMPLE_RATE);
-
-    gstlinkable::link(source_, aconv_);
-    gstlinkable::link(aconv_, capsFilter_);
-    //gstlinkable::link(source_, capsFilter_);
 }
 
 

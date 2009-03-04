@@ -34,10 +34,10 @@ class AudioSink;
 class AudioSourceConfig
 {
     public:
-        AudioSourceConfig(const std::string & source__, int numChannels__);
         
-        AudioSourceConfig(const std::string & source__, const std::string & location__,
-                int numChannels__);
+        AudioSourceConfig(const std::string & source__,     
+                          const std::string & location__,
+                          int numChannels__);
         
         AudioSourceConfig(const AudioSourceConfig& m);
 

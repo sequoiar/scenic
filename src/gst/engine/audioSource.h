@@ -59,7 +59,9 @@ class AudioSource : public GstLinkableSource
         GstElement *source_;
 
         /// Caps used by any source with a capsfilter
-        const char *getCapsFilterCapsString();
+        std::string getCapsFilterCapsString();
+
+        void setupCapsFilter(GstElement* &aconv, GstElement* &capsfilter);
 
     private:
         
@@ -176,7 +178,7 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
 class AudioAlsaSource : public AudioSource
 {
     public:
-        explicit AudioAlsaSource(const AudioSourceConfig &config);
+        AudioAlsaSource(const AudioSourceConfig &config, unsigned long long bufferTime);
 
     private:
         ~AudioAlsaSource();
@@ -186,6 +188,7 @@ class AudioAlsaSource : public AudioSource
 
         GstElement *capsFilter_;
         GstElement *aconv_;
+        unsigned long long bufferTime_;
         /// No Copy Constructor
         AudioAlsaSource(const AudioAlsaSource&);     
         /// No Assignment Operator
@@ -200,15 +203,16 @@ class AudioAlsaSource : public AudioSource
 class AudioPulseSource : public AudioSource
 {
     public:
-        explicit AudioPulseSource(const AudioSourceConfig &config);
+        AudioPulseSource(const AudioSourceConfig &config, unsigned long long bufferTime);
     private:
         ~AudioPulseSource();
     
         void sub_init();
         GstElement *srcElement() { return capsFilter_; }
-    
+
         GstElement *capsFilter_;
         GstElement *aconv_;
+        unsigned long long bufferTime_;
         /// No Copy Constructor
         AudioPulseSource(const AudioPulseSource&);     
         /// No Assignment Operator

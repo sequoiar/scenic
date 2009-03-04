@@ -54,8 +54,8 @@ class GtkVideoSink
     : public VideoSink
 {
     public:
-       GtkVideoSink()
-            : window_(0), screen_num_(0) {};
+       GtkVideoSink(int screen_num)
+            : window_(0), screen_num_(screen_num) {};
         virtual ~GtkVideoSink(){};
         void makeFullscreen() { makeFullscreen(window_); }
         void makeUnfullscreen() { makeUnfullscreen(window_); }
@@ -87,7 +87,7 @@ class XvImageSink
     : public GtkVideoSink
 {
     public:
-        XvImageSink() {};
+        XvImageSink(int screenNum) : GtkVideoSink(screenNum) {};
 
     private:
         void init();

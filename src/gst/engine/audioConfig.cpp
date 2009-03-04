@@ -27,24 +27,17 @@
 #include "audioSource.h"
 #include "audioSink.h"
 
-/// Constructor sets by default location to an empty string and loop to LOOP_NONE 
+///  Constuctor sets by default loop to LOOP_NONE, but has file location specified 
 AudioSourceConfig::AudioSourceConfig(const std::string & source__, 
-                  int numChannels__) : 
-    source_(source__), location_(""), numChannels_(numChannels__)
+        const std::string & location__,
+        int numChannels__) : 
+    source_(source__), location_(location__), numChannels_(numChannels__)
 {
     if (source_.empty())
         THROW_ERROR("No source specified");
     if(numChannels_ < 1 || numChannels_ > 8)
         THROW_ERROR("Invalid number of channels");
 }
-
-
-///  Constuctor sets by default loop to LOOP_NONE, but has file location specified 
-AudioSourceConfig::AudioSourceConfig(const std::string & source__, 
-                  const std::string & location__,
-                  int numChannels__) : 
-    source_(source__), location_(location__), numChannels_(numChannels__)
-{}
 
 
 /// Copy constructor 
@@ -68,20 +61,19 @@ int AudioSourceConfig::numChannels() const
 /// Factory method that creates an AudioSource based on this object's source_ string 
 AudioSource* AudioSourceConfig::createSource() const
 {
+    const unsigned long long BUFFER_TIME = 35000LL; /* microseconds */
     if (source_ == "audiotestsrc")
         return new AudioTestSource(*this);
     else if (source_ == "filesrc")
         return new AudioFileSource(*this);
     else if (source_ == "alsasrc")
-        return new AudioAlsaSource(*this);
+        return new AudioAlsaSource(*this, BUFFER_TIME);
     else if (source_ == "jackaudiosrc") /* with video, more buffer time */
-        return new AudioJackSource(*this, 35000LL /* microseconds */);
-    else if (source_ == "fastjackaudiosrc") /* without video, lower buffertime */
-        return new AudioJackSource(*this, 25000LL /* microseconds */);
+        return new AudioJackSource(*this, BUFFER_TIME);
     else if (source_ == "dv1394src")
         return new AudioDvSource(*this);
     else if (source_ == "pulsesrc")
-        return new AudioPulseSource(*this);
+        return new AudioPulseSource(*this, BUFFER_TIME);
     else 
         THROW_ERROR(source_ << " is an invalid source");
     return 0;

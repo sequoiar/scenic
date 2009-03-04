@@ -30,19 +30,17 @@ class VideoSink;
 class VideoSourceConfig
 {
     public:
-        //* for a simple source */
-        VideoSourceConfig(const std::string &source__, const int bitrate__, const bool doDeinterlace__ = false) 
-            : source_(source__), bitrate_(bitrate__), doDeinterlace_(doDeinterlace__), location_("") 
-        {}
-
         //* for source (remote) w/ location i.e. filename or url */
-        VideoSourceConfig(const std::string &source__, const int bitrate__, const std::string &location__, const bool doDeinterlace__ = false)
-            : source_(source__), bitrate_(bitrate__), doDeinterlace_(doDeinterlace__), location_(location__)  
+        VideoSourceConfig(const std::string &source__, 
+                          const int bitrate__, 
+                          const std::string &location__, 
+                          const bool doDeinterlace__)
+            : source_(source__), bitrate_(bitrate__), location_(location__), doDeinterlace_(doDeinterlace__) 
         {}
 
         //* copy constructor */
         VideoSourceConfig(const VideoSourceConfig& m)
-            : source_(m.source_), bitrate_(m.bitrate_), doDeinterlace_(m.doDeinterlace_), location_(m.location_) 
+            : source_(m.source_), bitrate_(m.bitrate_), location_(m.location_), doDeinterlace_(m.doDeinterlace_)
         {}
 
         VideoSource* createSource() const;  // factory method
@@ -58,8 +56,8 @@ class VideoSourceConfig
     private:
         const std::string source_;
         const int bitrate_;
-        const bool doDeinterlace_;
         const std::string location_;
+        const bool doDeinterlace_;
         /// No Assignment Operator 
         VideoSourceConfig& operator=(const VideoSourceConfig&);     
 };
@@ -69,7 +67,7 @@ class VideoSinkConfig
 {
     public:
 
-        explicit VideoSinkConfig(const std::string & sink__, int screenNum = 0)
+        explicit VideoSinkConfig(const std::string & sink__, int screenNum)
             : sink_(sink__), screenNum_(screenNum)
         {}
 

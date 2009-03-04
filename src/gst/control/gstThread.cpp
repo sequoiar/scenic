@@ -214,7 +214,8 @@ bool GstSenderThread::audio_start(MapMsg& msg)
 //        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
         if(msg["location"].empty())
         {
-            AudioSourceConfig config(msg["source"], msg["channels"]);
+            std::string AUDIO_LOCATION = "";
+            AudioSourceConfig config(msg["source"], AUDIO_LOCATION, msg["channels"]);
             audio_ = asender = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
         else

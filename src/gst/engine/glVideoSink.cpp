@@ -296,12 +296,8 @@ void GLImageSink::init()
     if (!gtk_initialized)
         gtk_init(0, NULL);
 
-    //glColorscale_ = Pipeline::Instance()->makeElement("glcolorscale", "colorspace");
-
     sink_ = Pipeline::Instance()->makeElement("glimagesink", "videosink");
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-
-   // gstlinkable::link(glColorscale_, sink_);
+    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    
     assert(window_);

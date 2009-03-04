@@ -36,7 +36,7 @@ class GLImageSink
 {
     public:
         /// Constructor 
-        GLImageSink(int screen_num = 0) : glColorscale_(0) {screen_num_ = screen_num;}
+        GLImageSink(int screen_num) : GtkVideoSink(screen_num) {}
 
     private:
 

@@ -72,11 +72,11 @@ BOOST_PYTHON_MODULE(milhouse)
     def("buildAudioReceiver", audiofactory::buildAudioReceiver);
     def("buildAudioSender", audiofactory::buildAudioSender);
 
-    class_< VideoSourceConfig >("VideoSourceConfig", init<std::string, int, bool>()) 
-        .def(init<std::string, int, std::string, bool>()); // overloaded constructor
+    class_< VideoSourceConfig >("VideoSourceConfig", init<std::string, int, std::string, bool>());
+        //.def(init<std::string, int, std::string, bool>()); // overloaded constructor
 
-    class_< AudioSourceConfig >("AudioSourceConfig", init<std::string, int>()) 
-        .def(init<std::string, std::string, int>()); // overloaded constructor
+    class_< AudioSourceConfig >("AudioSourceConfig", init<std::string, std::string, int>());
+        //.def(init<std::string, std::string, int>()); // overloaded constructor
 
     def("tcpSendBuffer", tcpSendBuffer);        
 

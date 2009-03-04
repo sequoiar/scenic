@@ -32,21 +32,19 @@
 
 namespace audiofactory
 {
-    static const std::string &A_SINK = "jackaudiosink";
-    static const std::string &A_CODEC = "raw";
     static const int MSG_ID = 1;
 
     static AudioSender* 
     buildAudioSender_(const AudioSourceConfig aConfig, 
-                      const std::string &ip = ports::IP, 
-                      const std::string &codec = A_CODEC, 
-                      int port = ports::A_PORT);
+                      const std::string &ip, 
+                      const std::string &codec, 
+                      int port);
 
     static AudioReceiver*
-    buildAudioReceiver_(const std::string &ip = ports::IP, 
-                        const std::string &codec = A_CODEC, 
-                        int port = ports::A_PORT, 
-                        const std::string &sink = A_SINK);
+    buildAudioReceiver_(const std::string &ip, 
+                        const std::string &codec, 
+                        int port, 
+                        const std::string &sink);
 }
 
 
@@ -96,19 +94,19 @@ namespace audiofactory
 
     static shared_ptr<AudioSender> 
     buildAudioSender(const AudioSourceConfig aConfig, 
-                     const std::string &ip = ports::IP, 
-                     const std::string &codec = A_CODEC, 
-                     unsigned long port = ports::A_PORT)
+                     const std::string &ip, 
+                     const std::string &codec, 
+                     unsigned long port)
     {
         assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<AudioSender>(buildAudioSender_(aConfig, ip, codec, port));
     }
 
     static shared_ptr<AudioReceiver> 
-    buildAudioReceiver(const std::string &ip = ports::IP, 
-                       const std::string &codec = A_CODEC, 
-                       unsigned long port = ports::A_PORT, 
-                       const std::string &sink = A_SINK)
+    buildAudioReceiver(const std::string &ip, 
+                       const std::string &codec, 
+                       unsigned long port, 
+                       const std::string &sink)
     {
         assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink));

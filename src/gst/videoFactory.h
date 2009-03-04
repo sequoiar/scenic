@@ -31,17 +31,15 @@
 
 namespace videofactory
 {
-    static const std::string V_SINK = "xvimagesink";
-    static const std::string V_CODEC = "mpeg4";
     static const int MSG_ID = 2;
 
     static VideoReceiver* 
-    buildVideoReceiver_(const std::string &ip = ports::IP, const std::string &codec = V_CODEC, int port = ports::V_PORT, 
-            int screen_num = 0, const std::string &sink = V_SINK);
+    buildVideoReceiver_(const std::string &ip, const std::string &codec, int port, 
+            int screen_num, const std::string &sink);
 
     static VideoSender* 
     buildVideoSender_(const VideoSourceConfig vConfig, 
-            const std::string &ip = ports::IP, const std::string &codec = V_CODEC, int port = ports::V_PORT);
+            const std::string &ip, const std::string &codec, int port);
 }
 
 
@@ -93,11 +91,11 @@ namespace videofactory
 #endif
 
     static shared_ptr<VideoReceiver> 
-    buildVideoReceiver(const std::string &ip = ports::IP, 
-                       const std::string &codec = V_CODEC, 
-                       unsigned long port = ports::V_PORT, 
-                       int screen_num = 0, 
-                       const std::string &sink = V_SINK)
+    buildVideoReceiver(const std::string &ip, 
+                       const std::string &codec, 
+                       unsigned long port, 
+                       int screen_num, 
+                       const std::string &sink)
     {
         assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, screen_num, sink));
@@ -105,9 +103,9 @@ namespace videofactory
 
     static shared_ptr<VideoSender> 
     buildVideoSender(const VideoSourceConfig vConfig, 
-                     const std::string &ip = ports::IP, 
-                     const std::string &codec = V_CODEC, 
-                     unsigned long port = ports::V_PORT)
+                     const std::string &ip, 
+                     const std::string &codec, 
+                     unsigned long port)
     {
         assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<VideoSender>(buildVideoSender_(vConfig,ip,codec,port));
