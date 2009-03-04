@@ -22,6 +22,7 @@
 
 #include "util.h"
 
+#include "engine/mediaBase.h"
 #include "gstThread.h"
 #include "gstSenderThread.h"
 #include "engine/playback.h"
@@ -44,12 +45,10 @@ void GstThread::start(MapMsg&)
 void GstSenderThread::start(MapMsg& )
 { 
     playback::start();
-#if 0
     if(ff[0])
         ff[0](video_->getCaps());
     if(ff[1])
         ff[1](audio_->getCaps());
-#endif
 } 
 int GstThread::main()
 {
