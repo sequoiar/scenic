@@ -38,7 +38,7 @@ tc qdisc del dev ${INTERFACE} root
 # root node
 tc qdisc add dev ${INTERFACE} root handle 1: prio bands 10
 # netem qdisc
-tc qdisc add dev ${INTERFACE} parent 1:1 handle 10: netem loss 2%
+tc qdisc add dev ${INTERFACE} parent 1:1 handle 10: netem loss 1%
 tc filter add dev ${INTERFACE} protocol ip parent 1:0 prio 1 u32 match ip src ${SOURCE_HOST}/32 match ip dst ${DEST_HOST}/32 flowid 10:1
 # other qdisc
 tc qdisc add dev ${INTERFACE} parent 1:2 handle 20: pfifo

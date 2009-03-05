@@ -55,6 +55,8 @@ class Pipeline
         void pause();
         void makeReady();
         void stop();
+        void notifyQuitted() { quitted_ = true; }
+        bool quitted() { return quitted_; }
         void makeVerbose();
         const char *getElementPadCaps(GstElement *element, const char *padName) const;
 
@@ -84,6 +86,7 @@ class Pipeline
         GstClockTime startTime_;
         std::vector<BusMsgHandler*> handlers_;
         int refCount_;
+        bool quitted_;
 };
 
 #endif // _PIPELINE_H_

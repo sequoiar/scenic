@@ -159,7 +159,7 @@ short pof::run(int argc, char **argv)
         }
 
         BLOCK();
-        assert(playback::isPlaying());
+        assert(playback::isPlaying() || playback::quitted());
 
         playback::stop();
     }
@@ -207,7 +207,7 @@ short pof::run(int argc, char **argv)
             assert(tcpSendBuffer(ip, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
 
         BLOCK();
-        assert(playback::isPlaying());
+        assert(playback::isPlaying() || playback::quitted());
 
         playback::stop();
     }

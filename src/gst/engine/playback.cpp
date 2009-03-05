@@ -51,11 +51,17 @@ bool playback::isPlaying()
 void playback::quit()
 {
     stop();
+    Pipeline::Instance()->notifyQuitted();
     gutil::killMainLoop();
 }
 
 void playback::makeVerbose()
 {
     Pipeline::Instance()->makeVerbose();
+}
+
+bool playback::quitted()
+{
+    return Pipeline::Instance()->quitted();
 }
 

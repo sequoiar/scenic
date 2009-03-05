@@ -30,6 +30,7 @@ namespace playback {
         bool isPlaying();
         void makeVerbose();
         void quit();
+        bool quitted();
 }
 
 #endif // _PLAYBACK_H_

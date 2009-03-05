@@ -119,11 +119,11 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             toggleFullscreen(widget);
             break;
 
-        case GDK_q:
         case GDK_Q:
             // Quit application, this quits the main loop
             // (if there is one)
-            playback::quit();
+                LOG_INFO("Q key pressed, quitting.");
+                playback::quit();
             break;
 
         default:
