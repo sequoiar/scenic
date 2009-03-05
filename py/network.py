@@ -506,10 +506,17 @@ class NetworkTester(object):
         return time.time() # * 1000.0 #  in ms
     
     def _cancel_timeout(self):
+        """
+        Cancels a call later to the method that cancels the iperf test in case of timeout.
+
+        see twisted.internet.interfaces.IDelayedCall
+        """
         try:
-            reactor.cancelCallLater(self.timeout_call_later_id)
-        except AlreadyCancelled, e:
-            pass
+            if self.timeout_call_later_id.active():
+                self.timeout_call_later_id.cancel()
+            #reactor.cancelCallLater(self.timeout_call_later_id)
+        #except AlreadyCancelled, e:
+        #    pass
         except AttributeError, e:
             pass
 
