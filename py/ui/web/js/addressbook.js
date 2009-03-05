@@ -53,7 +53,7 @@ Addressbook.methods(
 	//////////////////////
 
     function updateList(self, contacts) {
-// console.info(self.adb_list.getScroll().y);
+		dbug.info(self.adb_list.getScroll().y);
 		self.adb_list.empty();
 		var counter = 0;
 		var selected = null;
@@ -92,6 +92,11 @@ Addressbook.methods(
 		})
 		if (selected){
 			selected.fireEvent('click');
+		} else {
+			self.adb_fields.each(function(elem) {
+				elem.value = '';
+			});
+			self.fieldState(true);
 		}
 		return false;
 	},
@@ -140,7 +145,7 @@ Addressbook.methods(
 			if (self.isEmpty.test(self.adb_name)) {
 				validate = false;
 				self.adb_name.addClass('notify');
-				//console.info(self.isEmpty.getError(self.adb_name));
+				dbug.info(self.isEmpty.getError(self.adb_name));
 			}
 			if (self.isEmpty.test(self.adb_address)) {
 				validate = false;
@@ -177,6 +182,13 @@ Addressbook.methods(
 		});
 		self.fieldState(false);
 		self.adb_name.select();
+	},
+	
+	function remove(self) {
+		dbug.info('remove');
+		if (self.selected) {
+			self.callRemote('rc_remove_contact', self.selected);
+		}
 	}
 	
 );

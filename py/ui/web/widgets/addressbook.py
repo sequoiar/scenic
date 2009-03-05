@@ -55,14 +55,18 @@ class Addressbook(Widget):
         self.api.add_contact(self, name, address, port)
         return False
     
+    def rc_remove_contact(self, name):
+        self.api.delete_contact(self, name)
+        return False
+    
     def rc_modify_contact(self, name, new_name, address, port):
         self.api.modify_contact(self, name, new_name, address, port)
         return False
     
     def cb_modify_contact(self, origin, data):
-        if origin is self:
-            if isinstance(data, Exception):
-                self.callRemote('error', data.message)
+        if origin is self and isinstance(data, Exception):
+            self.callRemote('error', data.message)
 
+    cb_add_contact = cb_modify_contact
         
     expose(locals())

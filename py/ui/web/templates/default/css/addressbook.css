@@ -35,7 +35,15 @@
 	background: url(/img/list-add.png) no-repeat;
 }
 
-#adb_add:hover {
+#adb_remove {
+	display: block;
+	float: left;
+	width: 22px;
+	height: 22px;
+	background: url(/img/list-remove.png) no-repeat;
+}
+
+#adb_add:hover, #adb_remove:hover {
 	cursor: pointer;
 	background-color: #d2dce5;
 }
