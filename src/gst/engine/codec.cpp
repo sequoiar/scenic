@@ -30,7 +30,6 @@
 #include "pipeline.h"
 #include "mapMsg.h"
 
-
 /// Constructor 
 Codec::Codec() : 
     codec_(0) 
@@ -172,13 +171,6 @@ RtpPay* H264Decoder::createDepayloader() const
 }
 
 
-const char *H264Decoder::getCaps() const
-{
-    return "application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264," 
-    "profile-level-id=(string)4d4033, sprop-parameter-sets=(string)\"Z01AM5JUBgHtgIgAAB9IAAdTBHjBlQ\\=\\=\\,aO48gA\\=\\=\","
-    "payload=(int)96";
-}
-
 
 /// Constructor 
 H263Encoder::H263Encoder() : 
@@ -220,15 +212,6 @@ void H263Decoder::init()
 RtpPay* H263Decoder::createDepayloader() const
 {
     return new H263Depayloader();
-}
-
-
-/// These caps are the same for any h263 stream
-const char *H263Decoder::getCaps() const
-{
-    return "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
-        "encoding-name=(string)H263,"
-        "payload=(int)96";
 }
 
 
@@ -276,20 +259,6 @@ void Mpeg4Decoder::init()
 RtpPay* Mpeg4Decoder::createDepayloader() const
 {
     return new Mpeg4Depayloader();
-}
-
-
-/** The config string will vary depending on resolution. Not an issue for NTSC only,
-  but for other resolutions this will lead to a picture melting, sensory experience.
-  */
-const char *Mpeg4Decoder::getCaps() const
-{
-    // FIXME: This sucks!!!!!! This should be sent to the receiver from the sender.
-    return "application/x-rtp,media=(string)video,clock-rate=(int)90000,"
-        "config=(string)000001b001000001b58913000001000000012000c48d8ba98518043c1463000001b24c61766335322e362e30,"
-        "encoding-name=(string)MP4V-ES,"
-        "profile-level-id=(string)1,"
-        "payload=(int)96";
 }
 
 

@@ -71,7 +71,7 @@ void VideoReceiver::init_depayloader()
 
     session_.add(depayloader_, remoteConfig_);
 
-    session_.setCaps(decoder_->getCaps());
+    //session_.setCaps(decoder_->getCaps());
 }
 
 
