@@ -464,6 +464,7 @@ class NetworkTester(object):
             commands.single_command_start(command, callback, extra_arg, self.current_caller)
         except CommandNotFoundError, e: 
             log.error("CommandNotFoundError %s" % e.message)
+            self.notify_api(self.current_caller, "error", e.message)
         else:
            self.state = self.current_kind # set the state to the current kind
 
@@ -674,7 +675,7 @@ class NetworkTester(object):
             command = commands[i]
             
             if isinstance(results_infos, failure.Failure):
-                log.error("FAILURE : " + str( results_infos.getErrorMessage()))  # if there is an error, the programmer should fix it.
+                log.error("FAILURE in on_iperf_command_results: " + str( results_infos.getErrorMessage()))  # if there is an error, the programmer should fix it.
             else:
                 stdout, stderr, signal_or_code = results_infos
                 if success:
@@ -685,7 +686,7 @@ class NetworkTester(object):
                         log.debug("iperf results: %s" % stdout)
                     except NetworkError, e:
                         self.notify_api(caller, 'error', e.message)
-                        log.error(e.message)
+                        log.error("NetworkError in on_iperf_command_results" + e.message) # XXX
                     else:    
                         kind = extra_arg['kind']
                         iperf_stats['test_kind'] = kind
@@ -765,7 +766,7 @@ def on_com_chan_disconnected(connection_handle):
         del _testers[connection_handle.contact.name]
         log.debug("testers: " + str(_testers))
     except Exception, e:
-        log.error(e.message)
+        log.error("error in on_com_chan_disconnected" + e.message)
 
 def get_tester_for_contact(contact_name=None):
     """
@@ -778,7 +779,7 @@ def get_tester_for_contact(contact_name=None):
     try:
         ret = _testers[contact_name]
     except KeyError:
-        raise KeyError("No Network Tester for contact.") # TODO: use NetworkError
+        raise KeyError("In get_tester_for_contact: No Network Tester for contact.") # TODO: use NetworkError
     else:
         return ret
 
@@ -800,7 +801,7 @@ def start(subject):
             "`iperf` command not found. Please see https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting for installation instructions.")
     except CommandNotFoundError, e:
         if subject is not None:
-            subject.notify(subject, e.message, "error")
+            subject.notify(subject, e.message, "error") # notifies the user. But therer are no users at startup
         print e.message
     # tester = NetworkTester()
     _api = subject
