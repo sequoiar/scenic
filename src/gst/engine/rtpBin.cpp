@@ -43,7 +43,7 @@ void RtpBin::init()
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
     
     // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
-    g_object_set(G_OBJECT(rtpbin_), "latency", 5, NULL);
+    g_object_set(G_OBJECT(rtpbin_), "latency", 0, NULL);
     
     // uncomment this to print stats
 #if RTP_REPORTING
