@@ -48,6 +48,17 @@ Uncomment those two lines to te permettera de voir continuellement quelles sont 
 class Connection(object):
     """
     Base Class representing one connection between two clients.
+
+    The connector do not last so long and die after the connection is established. 
+    Later, when there are only Connection objects that last longer. 
+    There is one Connection for each Contact we are connected to. 
+    Connections are initiated using the ControllerApi.start_connection method.
+
+    The Connection has a com_chan object. The com_chan has a handle to its owner using its 'owner' attribute.
+    When there is a dead perspective broker, the com chan warns his owner using ********
+    When this happens, we delete the com_chan and close the connection.
+    The user can also close the connection by calling the ControllerApi.stop_connection method. Of course !
+    
     """
     def __init__(self, contact, api):
         self.api = api
@@ -128,7 +139,12 @@ class Connection(object):
         deferred.addErrback(self.not_attached)
 
     def attached(self, client, channel):
+        """
+        Callback for when we have a successful connection. 
+        
+        """
         self.com_chan = channel
+        self.com_chan.owner = self # added for when there is an error and we need to delete the com_chan.
         self.contact.state = CONNECTED
         if client == 'server':
             self.com_chan_started_server()

@@ -37,6 +37,7 @@ from zope.interface import implements
 from twisted.internet import reactor, defer
 from twisted.cred import portal, checkers, credentials, error
 from twisted.spread import pb
+from twisted.spread.pb import DeadReferenceError
 from twisted.python import failure
 
 # App imports
@@ -61,6 +62,7 @@ class ComChannel(object):
     def __init__(self):
         self.remote = None
         self.methods = {}
+        self.owner = None # The connection that owns it. In order to delete this instance. 
         
     def attached(self, remote):
         """
@@ -77,7 +79,7 @@ class ComChannel(object):
         :param *args: is a tuple of data, whose 0th element is the name of the procedure to call.
         """
         if len(args) < 1:
-            log.info('Receive an empty remote call')
+            log.info('Received an empty remote call')
         else:
             cmd = args[0]
             if cmd not in self.methods:
@@ -90,11 +92,26 @@ class ComChannel(object):
         """
         Calls a remote procedures provided by the remote peer.
         
+        Warning : will close the connection with remote host in case of DeadReferenceError.
+        (when unable to reach remote miville.)
+        
         :param *args: is a tuple of data, whose 0th element is the name of the remote class and method in the form Class.method to call. The other elements are the args.
-        For now, no object. List, dict, str and int for now.
+        For now, no object, just list, dict, str and int are supported.
         """
         if self.remote:
-            self.remote.callRemote('main', *args)
+            try:
+                self.remote.callRemote('main', *args)
+            except DeadReferenceError, e:
+                # This error is raised when a method is called on a dead reference (one whose
+                # broker has been disconnected).
+                # TODO notify observers with an error.
+                # TODO : disconnect com_chan
+                log.error("DeadReferenceError in com_chan.callRemote() ! Will close the connection.")
+                try:
+                    self.owner.stop() # STOPS THE CONNECTION !!! 
+                except:
+                    log.error("Error calling Connection.stop()" + e.message)
+                log.error("Error in ComChannel.callRemote: " + e.message)
         else:
             log.debug('No remote')
             

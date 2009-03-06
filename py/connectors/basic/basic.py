@@ -82,7 +82,7 @@ class BasicServer(LineReceiver):
                 if contact.auto_created:
                     self.api.delete_contact(self, contact.name)
 #            self.state = IDLE
-            self.api.notify(self, 'Connection was stop by the other side (%s)' % self.addr.host, 'answer')
+            self.api.notify(self, 'Connection was stopped by the other side (%s)' % self.addr.host, 'answer')
         else:
             log.info('Bad command receive from %s.' % self.addr.host)
 
@@ -99,7 +99,7 @@ class BasicServer(LineReceiver):
 
     def connectionLost(self, reason=protocol.connectionDone):
         if self.state == WAITING:
-            self.api.notify(self, 'You didn\'t answer soon enough. Connection close.', 'ask_timeout')
+            self.api.notify(self, 'You didn\'t answer soon enough. Connection closed.', 'ask_timeout')
 #            self.state = IDLE
         log.info('Client %s:%s disconnected. Reason: %s' % (self.addr.host, self.addr.port, reason.value))
 
@@ -174,7 +174,7 @@ class BasicClient(LineReceiver):
         if cmd in self.callbacks:
             self.callbacks[cmd](*args)
         else:
-            log.info('Bad command receive from remote')
+            log.info('Bad command received from remote')
 
 
 class ConnectionBasic(Connection):
@@ -204,6 +204,9 @@ class ConnectionBasic(Connection):
     stop_connecting = Connection.stop
 
     def _connection_ready(self, connection):
+        """
+        Callback for when we are connected sucessfully.
+        """
         self._state = CONNECTED
         self.connection = connection    # Maybe private ???
         self.connection.connectionLost = self._connection_lost
@@ -220,6 +223,9 @@ class ConnectionBasic(Connection):
                 self.api.delete_contact(self, self.contact.name)
 
     def _connection_failed(self, conn):
+        """
+        Errback for when we try to connect.
+        """
         self._state = DISCONNECTED
         log.debug('Connection failed. Address: %s | Port: %s' % (self.contact.address, self.contact.port))
         self.connection_failed(conn.value)
