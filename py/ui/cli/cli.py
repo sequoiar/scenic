@@ -224,7 +224,8 @@ class CliController(TelnetServer):
                           'q': 'quit',
                           'n': 'network',
                           'd': 'devices',
-                          'h': 'help'
+                          'h': 'help',
+                          'p': 'ping'
                           }
 
     def parse(self, line):
@@ -778,6 +779,11 @@ class CliController(TelnetServer):
         else: # options.help
             cp.print_help()
 
+    def _ping(self, line):
+        """
+        Starts (or stop) a pinger test.
+        """
+        self.core.pinger_start(self) # arg should be caller.
 
 class CliParser(optparse.OptionParser):
     """

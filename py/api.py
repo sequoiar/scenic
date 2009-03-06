@@ -30,7 +30,7 @@ from connectors.states import *
 import devices
 import network
 import addressbook # for network_test_*
-
+from protocols import pinger
 import repr
 
 from utils import log
@@ -89,6 +89,7 @@ class ControllerApi(object):
         self.connection = None
         #self.network_tester = 
         network.start(self)  # TODO: move to core.
+        pinger.start(self)  # TODO: move to core.
 
     ### Contacts ###
 
@@ -759,11 +760,11 @@ class ControllerApi(object):
                 self.notify(caller, "Please connect to a contact prior to start a network test.", "error")
             else:
                 #log.debug("connector : " + str(contact.connector))
-                com_chan = None 
-                try:
-                    com_chan = contact.connection.com_chan
-                except Exception, e:
-                    debug.error("network_test_start(): " + e.message)
+                # com_chan = None 
+                # try:
+                #     com_chan = contact.connection.com_chan
+                # except Exception, e:
+                #     debug.error("network_test_start(): " + e.message)
                 
                 remote_addr = contact.address
                 kinds = {
@@ -810,4 +811,38 @@ class ControllerApi(object):
         """
         # TODO
         pass
+
+    def pinger_start(self, caller, contact=None):
+        """
+        Tries to start a pinger test.
+        
+        :param contact: addressbook.Contact object.
+        """
+        try:
+            if contact is None:
+                contact = self.get_contact()
+        except AddressBookError:
+            self.notify(caller, "Please select a contact prior to start a pinger test.", "error")
+        else:
+            if contact.state != addressbook.CONNECTED: 
+                self.notify(caller, "Please connect to a contact prior to start a pinger test.", "error")
+            else:
+                com_chan = None 
+                try:
+                    com_chan = contact.connection.com_chan
+                except Exception, e:
+                    debug.error("ping_start(): " + e.message)
+                remote_addr = contact.address
+                
+                
+                try:
+                    ping = pinger.get_pinger_for_contact(contact.name)
+                except KeyError, e:
+                    self.notify(caller, "No pinger for contact", "error")
+                else:
+                    ret = ping.start_ping(caller)
+                    if ret:
+                        self.notify(caller, "Starting pinger test with contact %s" % (contact.name), "info")
+                    else:
+                        self.notify(caller, "An error occuring while trying to pinger test.", "error")
 
