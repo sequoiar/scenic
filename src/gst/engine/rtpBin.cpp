@@ -51,9 +51,9 @@ void RtpBin::init()
                   static_cast<GSourceFunc>(printStatsCallback),
                   static_cast<gpointer>(rtpbin_));
 #endif
-    g_timeout_add(6000 /* ms */, 
-                  static_cast<GSourceFunc>(dropOnLatency),
-                  static_cast<gpointer>(rtpbin_));
+//    g_timeout_add(6000 /* ms */, 
+ //                 static_cast<GSourceFunc>(dropOnLatency),
+  //                static_cast<gpointer>(rtpbin_));
 }
 
 
