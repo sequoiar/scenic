@@ -51,9 +51,8 @@ void RtpBin::init()
                   static_cast<GSourceFunc>(printStatsCallback),
                   static_cast<gpointer>(rtpbin_));
 #endif
-//    g_timeout_add(6000 /* ms */, 
- //                 static_cast<GSourceFunc>(dropOnLatency),
-  //                static_cast<gpointer>(rtpbin_));
+
+// DON'T USE THE DROP-ON-LATENCY SETTING, WILL CAUSE AUDIO TO DROP OUT WITH LITTLE OR NO FANFARE
 }
 
 
@@ -128,31 +127,6 @@ gboolean RtpBin::printStatsCallback(gpointer data)
     return TRUE;
 }
 
-
-/// set drop-on-latency to TRUE, needs to be called upon creation of jitterbuffers, via a signal handler.
-/// No visible effect, so not used. 
-
-int RtpBin::dropOnLatency(gpointer data)
-{
-    RtpBin *context = static_cast<RtpBin*>(data);
-    for (unsigned int sessionId = 0; sessionId < sessionCount_; ++sessionId)
-        context->dropOnLatency(sessionId);
-
-    return FALSE; // called once
-}
-
-
-void RtpBin::dropOnLatency(guint sessionID)
-{
-    GValue val;
-    memset(&val, 0, sizeof(val));
-    g_value_init(&val, G_TYPE_BOOLEAN);
-    g_value_set_boolean(&val, TRUE);
-
-    std::stringstream jitterbufferName;
-    jitterbufferName << "rtpjitterbuffer" << sessionID << "::drop-on-latency";
-    gst_child_proxy_set_property(GST_OBJECT(rtpbin_), jitterbufferName.str().c_str(), &val);
-}
 
 
 const char *RtpBin::padStr(const char *padName)
