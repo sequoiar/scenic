@@ -30,7 +30,6 @@ namespace ports {
         static const unsigned long V_PORT = 23456;
         static const unsigned long AUDIO_CAPS_PORT = 34567; 
         static const unsigned long VIDEO_CAPS_PORT = 45678; 
-        static const char *IP = "127.0.0.1";
 }
 
 #endif // _PORTS_H_
