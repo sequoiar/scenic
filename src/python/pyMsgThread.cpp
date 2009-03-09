@@ -22,12 +22,25 @@
 
 #include "pyMsgThread.h"
 
+MapMsg::Item GetBegin(MapMsg& m)
+{
+    return m.begin();
 
-static boost::python::dict makeDict(MapMsg& m)
+}
+
+MapMsg::Item GetNext(MapMsg& m)
+{
+    return m.next();
+}
+
+
+
+
+boost::python::dict makeDict(MapMsg& m)
 { 
     boost::python::dict d;
-    const std::pair<const std::string, StrIntFloat>* it;
-    for(it = m.begin(); it != 0; it = m.next())
+    MapMsg::Item it;
+    for(it = GetBegin(m); it != 0; it = GetNext(m))
     {
         LOG_DEBUG("");
         switch(it->second.get_type())
