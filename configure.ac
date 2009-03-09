@@ -41,7 +41,7 @@ AC_MSG_WARN([${ac_prefix}])
 
 
 AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
-CXXFLAGS="-g -std=c++0x -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow -fPIC "
+CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow -fPIC "
 
 #Trying to set CPPUNIT_LIBS using pkg-config
 #PKG_CHECK_MODULES(CPPUNIT, cppunit, have_cppunit=true, have_cppunit=false)

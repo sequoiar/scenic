@@ -68,7 +68,6 @@ class GLImageSink
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
 
-        _GstElement *glColorscale_;
         static const GLfloat STEP;
         static GLfloat x_;     // FIXME: separate out gl stuff into separate class
         static GLfloat y_;

@@ -48,7 +48,7 @@ static int doioctl(int fd, int request, void *parm, const char *name)
 }
 
 
-bool checkFormat(const char * expected)
+bool checkFormat(std::string expected)
 {
 
     v4l2_std_id std;
@@ -91,6 +91,10 @@ bool checkFormat(const char * expected)
         };
 
         printf("Video Standard = 0x%08llx\n", (unsigned long long)std);
+        if (std & FORMATS[expected.c_str()]) 
+            return true;
+        else
+            return false;
 
         if (std & FORMATS["PAL"]) {
             print_std("PAL", pal, std);
@@ -117,10 +121,12 @@ int main(int argc, const char* argv[])
         return 1;
     }
 
-    if (checkFormat(argv[1]))
-        std::cout << "Correct format " << argv[1] << std::endl;
+    std::string format(argv[1]);
+
+    if (checkFormat(format))
+        std::cout << "Correct format " << format << std::endl;
     else 
-        std::cout << "Incorrect format " << argv[1] << std::endl;
+        std::cout << "Incorrect format " << format << std::endl;
 
     return 0;
 }

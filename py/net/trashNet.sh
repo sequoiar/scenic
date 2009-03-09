@@ -1,5 +1,5 @@
 #!/bin/bash
-# run this script as root to create 2% packet loss conditions between SOURCE_IP an DEST IP
+# run this script as root to create 1% packet loss conditions between SOURCE_IP an DEST IP
 #
 usage () 
 {
