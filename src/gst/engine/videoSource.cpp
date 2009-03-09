@@ -28,6 +28,7 @@
 #include "videoConfig.h"
 
 #include "dv1394.h"
+#include "v4l2util.h"
 
 /// Constructor
 VideoSource::VideoSource(const VideoSourceConfig &config) : 
@@ -198,6 +199,15 @@ void VideoV4lSource::init()
     if (config_.hasLocation() && config_.fileExists())
         g_object_set(G_OBJECT(source_), "device", config_.location(), NULL);
     
+    gchar *deviceStr;
+    g_object_get(G_OBJECT(source_), "device", &deviceStr, NULL);
+
+    std::string deviceString(deviceStr);        // stay safe from memory leaks
+    g_free(deviceStr);
+
+    if (!v4l2util::checkStandard(expectedStandard_, deviceString))
+        THROW_ERROR("V4l2 device " << deviceString << " is not set to expected standard " << expectedStandard_);
+
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
 

@@ -55,11 +55,8 @@ bool VideoSourceConfig::fileExists() const
 {
     std::fstream in;
     in.open(location_.c_str(), std::fstream::in);
-    if (in.fail())
-    {
-        LOG_DEBUG("File " << location_ << " does not exist");
+    if (in.fail()) // file doesn't exist
         return false;
-    }
 
     in.close();
     return true;

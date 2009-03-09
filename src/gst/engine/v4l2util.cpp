@@ -1,6 +1,24 @@
+// v4l2util.cpp
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
+// This file is part of [propulse]ART.
+//
+// [propulse]ART is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// [propulse]ART is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+//
 
-
-// largely taken from v4l2-ctl.cpp
+// see v4l2-ctl.cpp for reference
 
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
@@ -10,6 +28,7 @@
 #include <map>
 #include <cassert>
 
+#include "util.h"
 #include "v4l2util.h"
 
 static int doioctl(int fd, int request, void *parm, const char *name)
@@ -27,7 +46,7 @@ static int doioctl(int fd, int request, void *parm, const char *name)
 }
 
 
-static bool v4l2util::checkStandard(const std::string &expected)
+bool v4l2util::checkStandard(const std::string &expected, const std::string &device)
 {
 
     bool result = false;
@@ -40,13 +59,8 @@ static bool v4l2util::checkStandard(const std::string &expected)
     FORMATS["SECAM"] = 0xff0000;
     FORMATS["ATSC/HDTV"] =  0xf000000;
     
-    char *device = strdup("/dev/video0");
-    if ((fd = open(device, O_RDWR)) < 0) 
-    {
-        std::cerr << "Failed to open " << device << ": " << strerror(errno) << std::endl;
-        exit(1);
-    }
-    free(device);
+    if ((fd = open(device.c_str(), O_RDWR)) < 0) 
+        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
 
     if (doioctl(fd, VIDIOC_G_STD, &std, "VIDIOC_G_STD") == 0) 
     {
@@ -55,6 +69,7 @@ static bool v4l2util::checkStandard(const std::string &expected)
             if (std & (*iter).second)
                 result = (result || (expected == (*iter).first));
     }
+
     return result;
 }
 

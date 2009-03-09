@@ -112,10 +112,11 @@ class VideoV4lSource
 {
     public:
         explicit VideoV4lSource(const VideoSourceConfig &config)
-            : VideoSource(config), capsFilter_(0) {}
+            : VideoSource(config), capsFilter_(0), expectedStandard_("NTSC") {}
     private:
         void init();
         _GstElement *capsFilter_;
+        std::string expectedStandard_;
         _GstElement *srcElement() { return capsFilter_; }
         VideoV4lSource(const VideoV4lSource&);     //No Copy Constructor
         VideoV4lSource& operator=(const VideoV4lSource&);     //No Assignment Operator
