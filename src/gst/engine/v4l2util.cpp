@@ -31,28 +31,25 @@
 #include "util.h"
 #include "v4l2util.h"
 
-static int doioctl(int fd, int request, void *parm, const char *name)
+static int doioctl(int fd, int request, void *parm, const std::string &name)
 {
     int retVal;
 
     retVal = ioctl(fd, request, parm);
-    std::cout << name << ": ";
     if (retVal < 0)
-        std::cout << "failed: " << strerror(errno) << std::endl;
-    //else
-        // printf("ioctl ok\n");
+        THROW_ERROR("IOCTL " << name << " failed: " << strerror(errno) << std::endl);
 
     return retVal;
 }
 
-
+/// Check current standard of v4l2 device to make sure it is what we expect
 bool v4l2util::checkStandard(const std::string &expected, const std::string &device)
 {
-
     bool result = false;
     v4l2_std_id std;
     int fd = -1;
 
+    // map of format coes
     std::map<std::string, unsigned long long> FORMATS;
     FORMATS["PAL"] = 0xfff;
     FORMATS["NTSC"] = 0xf000;
@@ -64,32 +61,12 @@ bool v4l2util::checkStandard(const std::string &expected, const std::string &dev
 
     if (doioctl(fd, VIDIOC_G_STD, &std, "VIDIOC_G_STD") == 0) 
     {
-        for (std::map<std::string, unsigned long long>::const_iterator iter = FORMATS.begin();
-                iter != FORMATS.end(); ++iter)
-            if (std & (*iter).second)
-                result = (result || (expected == (*iter).first));
+        std::map<std::string, unsigned long long>::const_iterator iter;
+        for (iter = FORMATS.begin(); iter != FORMATS.end(); ++iter)
+            if (std & (*iter).second)    // true if current format matches this iter's key
+                result = (result || (expected == (*iter).first)); // can have multiple positives, hence the or
     }
 
     return result;
 }
 
-
-#if 0
-int main(int argc, const char* argv[])
-{
-    if (argc != 2)
-    { 
-        std::cout << "Usage: v4l2standard <FORMAT>" << std::endl;
-        return 1;
-    }
-
-    std::string format(argv[1]);
-
-    if (v4l2util::checkStandard(format))
-        std::cout << "Correct format " << format << std::endl;
-    else 
-        std::cout << "Incorrect format " << format << std::endl;
-
-    return 0;
-}
-#endif
