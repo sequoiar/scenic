@@ -34,22 +34,25 @@ AC_ARG_ENABLE([sip], [ ****************
   --enable-sip build sip],,enable_sip=yes)
 AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
-        enable_debug=no)
+        enable_debug=yes)
 
 AC_MSG_WARN([${ac_prefix}])
 # Checks for library functions.
 
 
-AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
-CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow -fPIC "
+if test "x${enable_debug}" = "xyes" ; then
+    AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
+    CXXFLAGS="-g -O0 -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
 
 #Trying to set CPPUNIT_LIBS using pkg-config
-#PKG_CHECK_MODULES(CPPUNIT, cppunit, have_cppunit=true, have_cppunit=false)
-#if test "x${have_cppunit}" = "xfalse" ; then
-#    AC_MSG_WARN([libcppunit not found.-- ])
-#fi
+PKG_CHECK_MODULES(CPPUNIT, cppunit, have_cppunit=true, have_cppunit=false)
+if test "x${have_cppunit}" = "xfalse" ; then
+    AC_MSG_WARN([libcppunit not found.-- ])
+fi
 
+fi
 
+CXXFLAGS+=" -fPIC "
 
 #Trying to set GLIB using pkg-config
 PKG_CHECK_MODULES(GLIB, [glib-2.0 gthread-2.0], have_glib=true, have_glib=false)
