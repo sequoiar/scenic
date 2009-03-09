@@ -4,57 +4,37 @@
 
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
-#include <fcntl.h>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include <fcntl.h>  // for O_RDWR
 #include <cerrno>
 #include <iostream>
 #include <map>
 #include <cassert>
 
-static void print_std(const char *prefix, const char *stds[], unsigned long long std)
-{
-    int first = 1;
-
-    printf("\t%s-", prefix);
-    while (*stds) 
-    {
-        if (std & 1) 
-        {
-            if (!first)
-                printf("/");
-            first = 0;
-            printf("%s", *stds);
-        }
-        stds++;
-        std >>= 1;
-    }
-    printf("\n");
-}
+#include "v4l2util.h"
 
 static int doioctl(int fd, int request, void *parm, const char *name)
 {
     int retVal;
 
     retVal = ioctl(fd, request, parm);
-    printf("%s: ", name);
+    std::cout << name << ": ";
     if (retVal < 0)
-        printf("failed: %s\n", strerror(errno));
-    else
-        printf("ok\n");
+        std::cout << "failed: " << strerror(errno) << std::endl;
+    //else
+        // printf("ioctl ok\n");
 
     return retVal;
 }
 
 
-bool checkFormat(std::string expected)
+static bool v4l2util::checkStandard(const std::string &expected)
 {
 
+    bool result = false;
     v4l2_std_id std;
     int fd = -1;
 
-    std::map<const char *, unsigned long long> FORMATS;
+    std::map<std::string, unsigned long long> FORMATS;
     FORMATS["PAL"] = 0xfff;
     FORMATS["NTSC"] = 0xf000;
     FORMATS["SECAM"] = 0xff0000;
@@ -63,56 +43,23 @@ bool checkFormat(std::string expected)
     char *device = strdup("/dev/video0");
     if ((fd = open(device, O_RDWR)) < 0) 
     {
-        fprintf(stderr, "Failed to open %s: %s\n", device,
-                strerror(errno));
+        std::cerr << "Failed to open " << device << ": " << strerror(errno) << std::endl;
         exit(1);
     }
     free(device);
 
-
     if (doioctl(fd, VIDIOC_G_STD, &std, "VIDIOC_G_STD") == 0) 
     {
-        static const char *pal[] = {
-            "B", "B1", "G", "H", "I", "D", "D1", "K",
-            "M", "N", "Nc", "60",
-            NULL
-        };
-        static const char *ntsc[] = {
-            "M", "M-JP", "443", "M-KR",
-            NULL
-        };
-        static const char *secam[] = {
-            "B", "D", "G", "H", "K", "K1", "L", "Lc",
-            NULL
-        };
-        static const char *atsc[] = {
-            "ATSC-8-VSB", "ATSC-16-VSB",
-            NULL
-        };
-
-        printf("Video Standard = 0x%08llx\n", (unsigned long long)std);
-        if (std & FORMATS[expected.c_str()]) 
-            return true;
-        else
-            return false;
-
-        if (std & FORMATS["PAL"]) {
-            print_std("PAL", pal, std);
-        }
-        if (std & FORMATS["NTSC"]) {
-            print_std("NTSC", ntsc, std >> 12);
-        }
-        if (std & FORMATS["SECAM"]) {
-            print_std("SECAM", secam, std >> 16);
-        }
-        if (std & FORMATS["ATSC/HDTV"]) {
-            print_std("ATSC/HDTV", atsc, std >> 24);
-        }
-
+        for (std::map<std::string, unsigned long long>::const_iterator iter = FORMATS.begin();
+                iter != FORMATS.end(); ++iter)
+            if (std & (*iter).second)
+                result = (result || (expected == (*iter).first));
     }
+    return result;
 }
 
 
+#if 0
 int main(int argc, const char* argv[])
 {
     if (argc != 2)
@@ -123,11 +70,11 @@ int main(int argc, const char* argv[])
 
     std::string format(argv[1]);
 
-    if (checkFormat(format))
+    if (v4l2util::checkStandard(format))
         std::cout << "Correct format " << format << std::endl;
     else 
         std::cout << "Incorrect format " << format << std::endl;
 
     return 0;
 }
-
+#endif
