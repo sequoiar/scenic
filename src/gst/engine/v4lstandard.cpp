@@ -11,6 +11,7 @@
 #include <cerrno>
 #include <iostream>
 #include <map>
+#include <cassert>
 
 static void print_std(const char *prefix, const char *stds[], unsigned long long std)
 {
@@ -47,7 +48,7 @@ static int doioctl(int fd, int request, void *parm, const char *name)
 }
 
 
-int main()
+bool checkFormat(const char * expected)
 {
 
     v4l2_std_id std;
@@ -90,6 +91,7 @@ int main()
         };
 
         printf("Video Standard = 0x%08llx\n", (unsigned long long)std);
+
         if (std & FORMATS["PAL"]) {
             print_std("PAL", pal, std);
         }
@@ -102,6 +104,24 @@ int main()
         if (std & FORMATS["ATSC/HDTV"]) {
             print_std("ATSC/HDTV", atsc, std >> 24);
         }
+
     }
+}
+
+
+int main(int argc, const char* argv[])
+{
+    if (argc != 2)
+    { 
+        std::cout << "Usage: v4l2standard <FORMAT>" << std::endl;
+        return 1;
+    }
+
+    if (checkFormat(argv[1]))
+        std::cout << "Correct format " << argv[1] << std::endl;
+    else 
+        std::cout << "Incorrect format " << argv[1] << std::endl;
+
+    return 0;
 }
 
