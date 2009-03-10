@@ -89,7 +89,7 @@ fi
 #Trying to set LIBV4L2 using pkg-config
 PKG_CHECK_MODULES(LIBV4L2, [libv4l2], have_libv4l2=true, have_libv4l2=false)
 if test "x${have_libv4l2}" = "xfalse" ; then
-	AC_MSG_ERROR([missing pkg - libvl42-dev ])
+	AC_MSG_ERROR([missing pkg - libv4l2-dev ])
 fi
 
 #Trying to set LIBAVC1394 using pkg-config
