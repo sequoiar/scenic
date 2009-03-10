@@ -18,7 +18,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof. If not, see <http:#www.gnu.org/licenses/>.
 
-""" Public API of Sropulpof """
+"""
+Public API of Sropulpof
+
+Errors managment in notify
+==========================
+
+
+
+"""
 
 import sys
 import pprint 
@@ -109,10 +117,14 @@ class ControllerApi(object):
         """
         Get the named contact instance.
         """
+        try:
+            result = self.adb.get_contact(name)
+        except AddressBookError, err:
+            result = err
         if caller:
-            self.notify(caller, self.adb.get_contact(name))
+            self.notify(caller, result)
         else:
-            return self.adb.get_contact(name) # self.connectors
+            return result # self.connectors
 
     def find_contact(self, address, port=None, connector=None):
 #        return self.adb.find_contact(address, port)
