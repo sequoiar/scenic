@@ -37,7 +37,7 @@ static int doioctl(int fd, int request, void *parm, const std::string &name)
 
     retVal = ioctl(fd, request, parm);
     if (retVal < 0)
-        THROW_ERROR("IOCTL " << name << " failed: " << strerror(errno) << std::endl);
+        THROW_ERROR("IOCTL " << name << " failed: ");// << strerror(errno) << std::endl);
 
     return retVal;
 }
@@ -57,7 +57,7 @@ bool v4l2util::checkStandard(const std::string &expected, const std::string &dev
     FORMATS["ATSC/HDTV"] =  0xf000000;
     
     if ((fd = open(device.c_str(), O_RDWR)) < 0) 
-        THROW_ERROR("Failed to open " << device << ": " << strerror(errno));
+        THROW_ERROR("Failed to open " << device << ": ");// << strerror(errno));
 
     if (doioctl(fd, VIDIOC_G_STD, &std, "VIDIOC_G_STD") == 0) 
     {
