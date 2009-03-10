@@ -31,7 +31,7 @@
 #include "util.h"
 #include "v4l2util.h"
 
-static int doioctl(int fd, int request, void *parm, const std::string &name)
+static int doioctl(int fd, long request, void *parm, const std::string &name)
 {
     int retVal;
 
