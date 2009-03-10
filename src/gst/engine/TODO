@@ -1,4 +1,6 @@
-https://trac.sat.qc.ca/trac/miville/wiki/NetEm
+-replace params with MapMsg (maps with dynamic vars)
+-adjust audio buffer time based on codec and numchannels and TEST THOROUGHLY
+-figure out why bitrate varies so much, could be due to ffenc_mpeg4's setting that seems to let it fluctuate by 8mbits!!! use iptraf
 -fix glvideosink's black at startup/until fullscreen bug
 -teeing video and audio, start with tests
 
