@@ -86,6 +86,12 @@ if test "x${have_jack}" = "xfalse" ; then
     AC_MSG_ERROR([missing pkg -  libjack0 and/or libjack-dev])
 fi
 
+#Trying to set LIBV4L2 using pkg-config
+PKG_CHECK_MODULES(LIBV4L2, [libv4l2], have_libv4l2=true, have_libv4l2=false)
+if test "x${have_libv4l2}" = "xfalse" ; then
+	AC_MSG_ERROR([missing pkg - libvl42-dev ])
+fi
+
 #Trying to set LIBAVC1394 using pkg-config
 PKG_CHECK_MODULES(LIBAVC1394, [libavc1394], have_libavc1394=true, have_libavc1394=false)
 if test "x${have_libavc1394}" = "xfalse" ; then
