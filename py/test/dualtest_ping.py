@@ -32,7 +32,7 @@ import sys
 
 import utils.telnet_testing as testing
 
-testing.VERBOSE_CLIENT = False
+testing.VERBOSE_CLIENT = False #True
 testing.VERBOSE_SERVER = False
 testing.START_SERVER = False # You must start miville manually on both local and remote host.
 testing.start()
@@ -72,6 +72,6 @@ class Test_2_Ping(testing.TelnetBaseTest):
     """
     def test_01_ping(self):
         self.client.sendline("ping")
-        self.sleep(1.9)
+        self.sleep(0.3)
         self.expectTest('pong', 'Did not receive pong answer.')
 

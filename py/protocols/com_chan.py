@@ -109,6 +109,7 @@ class ComChannel(object):
                 log.error("DeadReferenceError in com_chan.callRemote() ! Will close the connection.")
                 try:
                     self.owner.stop() # STOPS THE CONNECTION !!! 
+                    # TODO: self.owner.cleanup()
                 except:
                     log.error("Error calling Connection.stop()" + e.message)
                 log.error("Error in ComChannel.callRemote: " + e.message)
@@ -162,6 +163,8 @@ class ComChanClient(pb.Referenceable, ComChannel):
         return deferred
 
     def disconnect(self):
+        print "COMCHAN_DISCONNECTED in ComChanClient"
+        self.owner.cleanup(True) # arg = called by com_chan
         self.factory.disconnect()
 
 
@@ -191,6 +194,8 @@ class ComChanContact(pb.Avatar, ComChannel):
     perspective_main = ComChannel.main
 
     def detached(self, remote):
+        print "COMCHAN_DISCONNECTED in ComChanContact"
+        self.owner.cleanup()
         self.remote = None
 
 

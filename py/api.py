@@ -840,8 +840,8 @@ class ControllerApi(object):
         try:
             if contact is None:
                 contact = self.get_contact()
-        except AddressBookError:
-            self.notify(caller, "Please select a contact prior to start a pinger test.", "error")
+        except AddressBookError, e:
+            self.notify(caller, "Please select a contact prior to start a pinger test." + e.message, "error")
         else:
             if contact.state != addressbook.CONNECTED: 
                 self.notify(caller, "Please connect to a contact prior to start a pinger test.", "error")
@@ -850,10 +850,8 @@ class ControllerApi(object):
                 try:
                     com_chan = contact.connection.com_chan
                 except Exception, e:
-                    debug.error("ping_start(): " + e.message)
+                    debug.error("No com_chan in pinger_start(): " + e.message)
                 remote_addr = contact.address
-                
-                
                 try:
                     ping = pinger.get_pinger_for_contact(contact.name)
                 except KeyError, e:

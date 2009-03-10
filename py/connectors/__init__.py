@@ -30,6 +30,11 @@ from protocols import com_chan
 
 log = log.start('debug', 1, 0, 'connectors')
 
+"""
+Dict of all Connection subclasses instances.
+key = contact name 
+value = instance
+"""
 connections = {}
 connectors = {}
 connect_callbacks = {}
@@ -182,10 +187,10 @@ class Connection(object):
     def _com_chan_started_server(self):
         raise NotImplementedError, 'com_chan_started_server() method not implemented for this connector: %s.' % self.contact.connector
 
-    def cleanup(self):
+    def cleanup(self, called_by_com_chan=False):
         for callback in disconnect_callbacks.values():
             callback(self)  
-        if hasattr(self.com_chan, 'disconnect'):
+        if hasattr(self.com_chan, 'disconnect') and not called_by_com_chan:
             self.com_chan.disconnect()
         if self.contact.state == DISCONNECTING:
             try:    # TODO: do this correctly
@@ -194,8 +199,17 @@ class Connection(object):
                 pass
         self.contact.state = DISCONNECTED
         self.contact.connection = None
-        del connections[self.address]
+        try:
+            self.com_chan.connection = None
+        except:
+            print "errrreur deleting com_chan"
+        try:
+            del connections[self.address]
+        except KeyError:
+            pass
 
+    def __del__(self):
+        log.debug("__del__")
 
 def create_connection(contact, api):
     """

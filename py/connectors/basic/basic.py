@@ -78,9 +78,10 @@ class BasicServer(LineReceiver):
             contact = self.api.find_contact(self.addr.host, self.client_port, 'basic')
             self.transport.loseConnection()
             if contact:
-                contact.connection.cleanup()
-                if contact.auto_created:
-                    self.api.delete_contact(self, contact.name)
+                if contact.connection:
+                    contact.connection.cleanup()
+                    if contact.auto_created:
+                        self.api.delete_contact(self, contact.name)
 #            self.state = IDLE
             self.api.notify(self, 'Connection was stopped by the other side (%s)' % self.addr.host, 'answer')
         else:
