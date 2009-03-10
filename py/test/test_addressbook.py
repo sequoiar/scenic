@@ -30,7 +30,7 @@ from addressbook import AddressBook, Contact, ip_range
 from errors import AddressBookError, InstallFileError
 from utils.i18n import to_utf
 import utils.log
-
+print os.environ['LANG']
 ALPHABET = 'abcdefghijklmnopqrstuvwxyz_@ ABCDEFÙ1234\'2345-678"9."0!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ~'
 UALPHABET = u'2abcdefghijklmnopqrstuvwxyz_@ ABCDEFÙ1234\'2345-678"9."0!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ~'
 
