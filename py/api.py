@@ -23,15 +23,27 @@ Public API of Sropulpof
 
 Errors managment in notify
 ==========================
+In the new design, errors are sent to the observers as a dict. 
+It contains the following keys : 
+ * 'msg' : a string describing the error in a human-readable way.
+ * 'context': a string referring to a section of this software. 
+ * 'exception': should contain a string representing the error. (and not the exception itself?)
+For now, the contexts in Miville are : 
+ * devices, network, settings, connection, streams, system
 
-Ex::
-        self.api.notify(self, {'address':self.contact.address, 
-                                   'port':self.contact.port,
-                                   'exception':'%s' % err,
-                                   'msg':'Connection failed',
-                                   'context':'connection'})
+The idea is to use only built-in types so that it is easy to convert to javascript. (no python objects)
 
-
+Example ::
+self.api.notify(
+    caller, 
+    {
+    'address':self.contact.address, 
+    'port':self.contact.port,
+    'exception':'%s' % err,
+    'msg':'Connection failed',
+    'context':'connection'
+    }, 
+    "error")
 """
 
 import sys
