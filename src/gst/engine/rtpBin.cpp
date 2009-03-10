@@ -35,6 +35,7 @@
 
 GstElement *RtpBin::rtpbin_ = 0;
 unsigned int RtpBin::sessionCount_ = 0;
+bool RtpBin::destroyed_ = false;
 
 void RtpBin::init()
 {
@@ -94,6 +95,12 @@ void RtpBin::printSourceStats(GObject * source)
 // callback to print the rtp stats 
 gboolean RtpBin::printStatsCallback(gpointer data)
 {
+    if (destroyed_)
+    {
+        LOG_DEBUG("No active rtpsessions, unregistering reporting callback");
+        return FALSE;
+    }
+
     GObject *session;
     GValueArray *arrayOfSources;
     GValue *val;
@@ -152,6 +159,7 @@ RtpBin::~RtpBin()
         assert(sessionCount_ == 0);
         Pipeline::Instance()->remove(&rtpbin_);
         rtpbin_ = 0;
+        destroyed_ = true;
     }
 }
 

@@ -38,6 +38,7 @@ class RtpBin
         static const char *padStr(const char *padName);
 
         static _GstElement *rtpbin_;
+        static bool destroyed_;
         static unsigned int sessionCount_;
         _GstElement *rtcp_sender_, *rtcp_receiver_;
 
