@@ -23,9 +23,10 @@
 #ifndef _V4L2UTIL_H_
 #define _V4L2UTIL_H_
  	
- 	namespace v4l2util
- 	{
- 	bool checkStandard(const std::string &expected, const std::string &device);
- 	}
- 	#endif // _V4L2UTIL_H_
- 	
+namespace v4l2util
+{
+    bool checkStandard(const std::string &expected, const std::string &device);
+}
+
+#endif // _V4L2UTIL_H_
+
