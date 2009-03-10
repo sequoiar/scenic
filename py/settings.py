@@ -27,11 +27,121 @@ from utils.i18n import to_utf
 from errors import *
 # persistence is not futile
 from twisted.spread.jelly import jelly, unjelly
+import connectors
+from twisted.internet import reactor
 
-log = log.start('info', 1, 0, 'settings')
+log = log.start('debug', 1, 0, 'settings')
 
 # The currently supported file version
 current_major_version_number = 1
+
+COM_CHAN_KEY = "settings"
+
+_api = None
+_settings_channels_dict = {}
+
+
+class SettingsChannel(object):
+    """
+    Allows to send and receive setting information
+    via the com_chan protocol, once we are joined to
+    a remote contact
+    """
+    
+    def __init__(self):
+        log.debug('SettingsChannel.__init__')
+        self.com_chan = None
+        self.contact = None
+        self.api = None
+        self.caller = None
+        self.remote_addr = None    
+        
+        
+    def on_remote_message(self, key, args):
+        """
+        Called by the com_chan whenever a message is received from the remote contact 
+        through the com_chan with the "pinger" key.
+        
+        :param key: string defining the action/message
+        :param *args: list of arguments
+        
+        The key and *args can be one of the following...
+        
+        """
+        log.debug('SettingsChannel.on_remote_message')
+        if key == "ping": # from A
+            print "PING"
+            self._send_message("pong")
+            
+            val = "received PING"
+            key = "info"
+            caller = None
+            self.api.notify(caller, val, key)
+        elif key == "pong": # from B 
+            val = "Received PONG"
+            key = "info"
+            self.api.notify(caller, val, key)
+            self.api.notify(caller, val, key)
+    
+    def _send_message(self, key, args_list=[]):
+        """
+        Sends a message to the current remote contact through the com_chan with key "network_test".
+        :param args: list
+        """
+        log.debug("SettingsChannel._send_message %s. %r" % (key, args_list))
+        try:
+            # list with key as 0th element
+            global COM_CHAN_KEY
+            self.com_chan.callRemote(COM_CHAN_KEY, key, args_list)
+        except AttributeError, e:
+            log.error("Could not send message to remote: " + e.message)
+        
+  
+def on_com_chan_connected(connection_handle, role="client"):
+    """
+    Called from the Connector class in its com_chan_started_client or com_chan_started_server method.
+
+    registers the com_chan callback for network_test
+    
+    :param connection_handle: connectors.Connection object.
+    :param role: string "client" or "server"
+    We actually do not care if this miville is a com_chan client or server.
+    """
+    global _api
+    global _settings_channels_dict
+    global COM_CHAN_KEY
+    log.debug("on_com_chan_connected")
+    settings_chan = SettingsChannel()
+    contact = connection_handle.contact
+    settings_chan.contact = contact
+    settings_chan.com_chan = connection_handle.com_chan
+    callback = settings_chan.on_remote_message
+    settings_chan.com_chan.add(callback, COM_CHAN_KEY)
+    settings_chan.api = _api
+    settings_chan.remote_addr = contact.address
+    _settings_channels_dict[settings_chan.contact.name] = settings_chan
+    log.debug("settings_chans: " + str(_settings_channels_dict))
+    reactor.callLater(10, settings_chan._send_message, "ping" )
+    
+
+def init_connection_listeners(api):
+    global _api
+    _api = api
+    log.debug("init_connection_listeners")
+    connectors.register_callback("settings_on_connect", on_com_chan_connected, event="connect")
+    connectors.register_callback("settings_on_disconnect", on_com_chan_disconnected, event="disconnect")
+  
+
+def on_com_chan_disconnected(connection_handle):
+    """
+    Called when a connection is stopped
+    """
+    global _settings_channels_dict
+    try:
+        del _settings_channels_dict[connection_handle.contact.name]
+        log.debug("settings_chans: " + str(_settings_channels_dict))
+    except KeyError, e:
+        log.error("error in on_com_chan_disconnected : KeyError " + e.message)        
   
 class Settings(object):
     """

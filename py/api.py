@@ -32,6 +32,7 @@ import network
 import addressbook # for network_test_*
 from protocols import pinger
 import repr
+import settings
 
 from utils import log
 log = log.start('error', 1, 0, 'api') # added by hugo
@@ -90,7 +91,7 @@ class ControllerApi(object):
         #self.network_tester = 
         network.start(self)  # TODO: move to core.
         pinger.start(self)  # TODO: move to core.
-
+        settings.init_connection_listeners(self)
     ### Contacts ###
 
     def get_contacts(self, caller):
