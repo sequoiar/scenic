@@ -24,6 +24,12 @@ Public API of Sropulpof
 Errors managment in notify
 ==========================
 
+Ex::
+        self.api.notify(self, {'address':self.contact.address, 
+                                   'port':self.contact.port,
+                                   'exception':'%s' % err,
+                                   'msg':'Connection failed',
+                                   'context':'connection'})
 
 
 """
