@@ -80,6 +80,7 @@ class SettingsChannel(object):
         elif key == "pong": # from B 
             val = "Received PONG"
             key = "info"
+            caller = None
             self.api.notify(caller, val, key)
             self.api.notify(caller, val, key)
     
