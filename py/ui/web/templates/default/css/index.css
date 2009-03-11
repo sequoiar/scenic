@@ -23,6 +23,13 @@ h3 {
 	display: none;
 }
 
+#help {
+	position: absolute;
+	bottom: 0px;
+	left: 300px;
+	right: 0px;
+}
+
 /*************************************/
 /* LINE BETWEEN THE GOOD AND THE BAD */
 /*************************************/
@@ -68,14 +75,6 @@ h3 {
 	overflow: hidden;
 	padding: 5px 10px 0;
 	background-color: #F6F6F6;
-}
-
-#help {
-	position: absolute;
-	bottom: 0px;
-	left: 300px;
-	right: 0px;
-	background: #cff;
 }
 
 #help_cont {

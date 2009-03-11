@@ -5,6 +5,8 @@
 			<div n:render="addressbook">ADDRESSBOOK place holder</div>
 		</div>
 		
-		<div n:render="help">HELP place holder</div>
+		<div id="help">
+			<div n:render="help">HELP place holder</div>
+		</div>
 		
 	</body>

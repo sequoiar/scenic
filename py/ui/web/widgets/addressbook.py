@@ -18,6 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
+
 #App imports
 from ui.web.web import Widget, expose
 from utils import log
@@ -35,10 +36,17 @@ class Addressbook(Widget):
         return False
         
     def cb_get_contacts(self, origin, data):
+        """
+        Maybe we should add a better sorting algorithm with collation support
+        and/or natural order. See:
+        http://jtauber.com/2006/02/13/pyuca.py
+        http://www.codinghorror.com/blog/archives/001018.html
+        """
         adb = []
-        contacts = data[0].items()
-        contacts.sort()
-        for name, contact in contacts:
+        contacts_dict = data[0]
+        sorted_keys = sorted(contacts_dict, key=unicode.lower)
+        for key in sorted_keys:
+            contact = contacts_dict[key]
             adb.append((contact.name, contact.state))
         log.info('receive update: %r' % self)
         self.callRemote('updateList', adb)
@@ -48,8 +56,35 @@ class Addressbook(Widget):
         return False
     
     def cb_get_contact(self, origin, data):
+        log.debug('GCOrigin: %s - Data: %s' % (origin, data))
         if origin is self:
-            self.callRemote('showContact', data.__dict__)
+            contact_info = data.__dict__.copy()
+            del contact_info['connection']
+            self.callRemote('showContact', contact_info)
+
+    def rc_start_connection(self, name):
+        contact = self.api.get_contact(name)
+        if isinstance(contact, Exception):
+            self.callRemote('error', contact.message)
+        else:
+            self.api.start_connection(self, contact)
+        return False
+    
+    def cb_start_connection(self, origin, data):
+        log.debug('SCOrigin: %s - Data: %s' % (origin, data))
+        if origin is self:
+            if isinstance(data, Exception):
+                self.callRemote('error', data.msg)
+            else:
+                self.callRemote('status', data)
+    
+    def cb_connection_failed(self, origin, data):
+        log.debug('CFOrigin: %s - Data: %s' % (origin, data))
+        self.callRemote('status', data)
+    
+    def cb_info(self, origin, data):
+        log.debug('IOrigin: %s - Data: %s' % (origin, data))
+#        self.callRemote('status', data)
 
     def rc_add_contact(self, name, address, port):
         self.api.add_contact(self, name, address, port)
@@ -64,6 +99,7 @@ class Addressbook(Widget):
         return False
     
     def cb_modify_contact(self, origin, data):
+        log.debug('MCOrigin: %s - Data: %s' % (origin, data))
         if origin is self and isinstance(data, Exception):
             self.callRemote('error', data.message)
 

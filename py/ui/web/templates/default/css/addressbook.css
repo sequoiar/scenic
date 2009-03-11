@@ -1,4 +1,4 @@
-#adb_list {
+ #adb_list {
 	height: 102px;
 	overflow: auto;
 	background-color: #FFF;
@@ -11,46 +11,72 @@
 }
 
 #adb_list li {
-/*
-	border-bottom: 1px dotted #999;
-*/
 	height: 16px;
 	padding: 2px 4px;
 	position: relative;
 }
 
 .conn_icon {
-	background: transparent;
+	background-color: transparent;
+	background-repeat: no-repeat;
 	width: 16px;
 	height: 16px;
 	float: right;
 	margin-left: 4px;
 }
 
+.conn_connected {
+	background-image: url(/img/network-transmit-receive.png);
+}
+
 #adb_add {
-	display: block;
 	float: left;
 	width: 22px;
 	height: 22px;
-	background: url(/img/list-add.png) no-repeat;
+	background-image: url(/img/list-add.png);
+	background-repeat: no-repeat;
 }
 
 #adb_remove {
-	display: block;
 	float: left;
 	width: 22px;
 	height: 22px;
-	background: url(/img/list-remove.png) no-repeat;
+	background-image: url(/img/list-remove.png);
+	background-repeat: no-repeat;
 }
 
-#adb_add:hover, #adb_remove:hover {
+#adb_join {
+	position: absolute;
+	right: 0px;
+	margin-right: 32px;
+}
+
+#adb_fields {
+	clear: both;
+	font-size: 11px;
+	text-align: right;
+}
+
+.button:hover {
 	cursor: pointer;
+}
+
+div.button:hover {
 	background-color: #d2dce5;
 }
 
+.button_disabled:hover {
+	cursor: default;
+	background-color: transparent;
+}
 
+#adb_status_icon {
+	float: left;
+	height: 22px;
+	width: 0px;
+}
 
-
+/* THE PART LINE */
 
 
 .toto {

@@ -39,3 +39,20 @@ input.notify {
 	border: dotted 1px #999;
 	padding: 10px;
 }
+
+.spinner_small {
+	background-image: url(/img/spinner16.png);
+	background-repeat: no-repeat;
+	width: 16px;
+}
+
+.spinner_medium {
+	background-image: url(/img/spinner22.png);
+	background-repeat: no-repeat;
+	width: 22px;
+}
+
+/*.spinner_big {
+	background-image: url(/img/spinner32.png);
+	background-repeat: no-repeat;
+}*/

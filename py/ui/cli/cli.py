@@ -92,7 +92,7 @@ class TelnetServer(recvline.HistoricRecvLine):
         
 
     def write(self, msg, prompt=False, endl=True):
-        msg2 = str(msg)
+        msg2 = str(msg) # Why this change ???
         self.terminal.write("%s" % (msg2.encode('utf-8')))
         if endl:
             self.terminal.nextLine()
@@ -1523,6 +1523,9 @@ class CliView(Observer):
 
     def _info(self, origin, data):
         self.write(data)
+    
+    def _connection_failed(self, origin, data):
+        self.write('%s. %s:%s %s' % (data['msg'], data['address'], data['port'], data['exception']))
     
     def _error(self, origin, data):
         """

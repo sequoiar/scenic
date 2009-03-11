@@ -24,7 +24,6 @@ This module deal with the Address Book and its contacts.
 
 
 # System imports
-import os, os.path
 try:
     import cPickle as pickle
 except ImportError:
@@ -40,16 +39,11 @@ from twisted.spread.jelly import jelly, unjelly
 from utils import log
 from utils import common
 from utils.i18n import to_utf
-from errors import AddressBookError, AddressBookNameError, InstallFileError
+from errors import AddressBookError, AddressBookNameError
+from connectors.states import DISCONNECTED
 
 log = log.start('debug', 1, 0, 'adb')
 
-# STATE CONSTANTS
-DISCONNECTED = 0
-ASKING = 1
-CONNECTING = 2
-CONNECTED = 3
-HUNGUP = 4
 
 
 class AddressBook(object):
@@ -74,6 +68,7 @@ class AddressBook(object):
         self.contacts = {}
         self.selected = None
         self.read()
+        Contact.adb = self
 
     def add(self, name, address, port=None, auto_created=False, connector=None, setting=0):
         """
@@ -130,7 +125,7 @@ class AddressBook(object):
         contact.set_port(port)
         contact.set_address(address)
         contact.assign_connector(connector)
-        contact.set_setting(setting)
+        contact.setting = setting
         
         self.write()
         return True
@@ -351,6 +346,7 @@ class Contact(object):
     """
     Class representing a contact in the address book
     """
+    adb = None
 
     def __init__(self, name, address, port=None, auto_created=False, connector=None, setting=0):
         """
@@ -369,8 +365,7 @@ class Contact(object):
         self.port = None
         self.kind = None
         self.connector = None
-        self.state = DISCONNECTED   #TODO: add AddressBook.write() after state
-                                    # change to support recovery mode
+        self.state = DISCONNECTED
         self.auto_created = auto_created
         self.auto_answer = True
         self.connection = None
@@ -384,6 +379,26 @@ class Contact(object):
             raise AddressBookError, "The 'setting' arguments should be an integer. Got %s of type %s." % (setting, type(setting))
         self.setting = setting
 
+    def __setattr__(self, name, value):
+        """
+        Catch any attribute changes and call Addressbook.write() (and api.notify())
+        on change.
+        """
+        if name == 'setting':
+            if value != None:
+                value = int(value)
+                
+        write = False
+        if name == 'state' and self.adb:
+            state = getattr(self, 'state', None)
+            if state != value and state:
+                write = True
+                log.debug('Write on state change: %s - %s - %s' % (self.state, value, self.name))
+        object.__setattr__(self, name, value)
+        if write:
+            self.adb.write()
+        
+
     def set_address(self, address):
         """
         Set the address attribute of the contact in function of is kind
@@ -395,14 +410,15 @@ class Contact(object):
                 self.address = address
             else:
                 self.address = address.encode('utf-8')
-    
-    def set_setting(self, setting):
-        """
-        Sets the setting attribute. 
-        """
-        if setting != None:
-            id = int(setting)
-            self.setting = id
+
+# Not necessary, set the attribute directly, check __setattr__ above for more detail    
+#    def set_setting(self, setting):
+#        """
+#        Sets the setting attribute. 
+#        """
+#        if setting != None:
+#            id = int(setting)
+#            self.setting = id
             
     def set_port(self, port):
         """
