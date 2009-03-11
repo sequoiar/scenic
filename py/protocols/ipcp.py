@@ -61,8 +61,6 @@ class IPCP(LineReceiver):
     def lineReceived(self, line):
         log.debug("Line received: %s" % line)
         cmd, sep, args = line.partition(':')
-#        tokens = self.r.findall(line)
-#        cmd = tokens[0][0][:-1]
         if cmd not in self.callbacks:
             log.info('Command %s not in callback list.' % cmd)
         else:
@@ -74,7 +72,7 @@ class IPCP(LineReceiver):
                 end = data.find('=', start)
                 if end == -1:
                     break
-                attr = data[start:end]
+                attr = data[start:end].strip()
                 start = end + 1
                 is_string = False
                 if data[start] == '"':
@@ -115,6 +113,7 @@ class IPCP(LineReceiver):
                 args[attr] = value
                 start = end + 1
             log.debug("Received: " + cmd + repr(args))
+            log.debug("Callback " + str(self.callbacks[cmd]) )
             self.callbacks[cmd](**args)
     
     def send_cmd(self, cmd, *args):
@@ -130,7 +129,7 @@ class IPCP(LineReceiver):
                 if parg:
                     line.append(parg)
         line = ' '.join(line)
-        log.debug('Sending: ' + line)
+        log.info('IPCP.send_cmd: ' + line)
         self.sendLine(line)
 
     def _process_arg(self, arg):
@@ -270,7 +269,7 @@ def connectionReady(protocol):
 if __name__ == "__main__":
     # Client example
     # Create creator and connect
-    deferred = connect('127.0.0.1', 22222)
+    deferred = connect('127.0.0.1', 2222)
     deferred.addCallback(connectionReady)
     deferred.addErrback(connection_failed)
     reactor.run()

@@ -25,15 +25,26 @@ from streams.stream import Streams
 from utils import log
 from utils.i18n import to_utf
 from errors import *
+from utils.common import install_dir
 # persistence is not futile
 from twisted.spread.jelly import jelly, unjelly
 import connectors
 from twisted.internet import reactor
 
+import streams
+
 log = log.start('debug', 1, 0, 'settings')
+
+# magic numbers
+first_global_id = 10000
+first_media_setting = 10000
 
 # The currently supported file version
 current_major_version_number = 1
+
+global_settings = {}
+media_settings = {}
+
 
 COM_CHAN_KEY = "settings"
 
@@ -143,6 +154,7 @@ def on_com_chan_disconnected(connection_handle):
         log.debug("settings_chans: " + str(_settings_channels_dict))
     except KeyError, e:
         log.error("error in on_com_chan_disconnected : KeyError " + e.message)        
+
   
 class Settings(object):
     """
@@ -150,20 +162,22 @@ class Settings(object):
     merges them with user settings.
     Settings instances contain global settings and media settings
     
-    quote: 0B1knob: 'Use defaults, Luke!'
+    quote: 'Use defaults, Luke!', 0B1knob ... a long time ago
     """
-    
-    def __init__(self, current=None):
-        #self.settings = {}
-        #self.current = current
-
-        self.global_settings = {}
-        self.selected_global_setting = None
-        self.current_global_id = 0
+    def __init__(self):
         
-        self.media_settings = {}
+        self.global_settings = global_settings
+        self.selected_global_setting = None
+        #self.current_global_id = 0  [i for i in l if i<20]
+        self.media_settings = media_settings
         self.selected_media_setting = None
-        self.current_media_id = 0
+        
+    
+    @staticmethod
+    def get_media_setting_from_id(id):
+        if media_settings.keys().__contains__(id):
+            return media_settings[id]
+        raise SettingsError, ""
 
     @staticmethod
     def _load_nice_object_from_file(filename, major_version):
@@ -208,12 +222,14 @@ class Settings(object):
         """
         try:
             file = open(filename, 'w')
+            log.info('Saving settings to file: ' + filename)
         except:
                 msg = 'Could not open the file %s.' % filename
                 log.warning(msg)
                 raise SettingsError, msg
         else:
             if major_version == current_major_version_number:
+                log.info("Saving object jelly: " + str(object) )
                 jello = jelly(object)
                 dump = repr(jello)
                 level = 0
@@ -231,132 +247,113 @@ class Settings(object):
             else:
                 pickle.dump(object, file, 1)
                 file.close()    
-    
-    @staticmethod   
-    def _get_user_settings_filename():
-        localDir = os.path.expanduser("~")+"/.sropulpof/"
-        localFile = "settings.sets"
-        localPath = os.path.join(localDir, localFile)
-        return localPath
-    
-    @staticmethod
-    def _get_preset_settings_filename():
-        localDir = os.path.expanduser("~")+"/.sropulpof/"
-        localFile = "presets.sets"
-        localPath = os.path.join(localDir, localFile)
-        return localPath
+
 
     def load(self):
-        presets_file_name       = Settings._get_preset_settings_filename()
-        user_settings_file_name = Settings._get_user_settings_filename()
+        presets_file_name       = install_dir("presets.sets")
+        user_settings_file_name = install_dir("settings.sets")
         
         # settings are saved as tuple()
         presets = {}
         user_settings = {}
         
+        
         # we should expect presets settings to exist, but however
         # we will ramp it up slowly
         if os.path.exists(presets_file_name):
+            log.info("Loading object jelly from: " + presets_file_name)
             presets = Settings._load_nice_object_from_file(presets_file_name, current_major_version_number)
         
         # user settings file is optional...
         if os.path.exists(user_settings_file_name):
+            log.info("Loading object jelly from: " + user_settings_file_name)
             user_settings = Settings._load_nice_object_from_file(user_settings_file_name, current_major_version_number)
         
-        # merge presets and user global settings
-        highest_global_id =0
-        user_global_settings = user_settings[0]
-        presets_globals = presets[0]
-        self.global_settings.clear()
-        self.selected_global_setting = None
-        for k, glob in presets_globals.iteritems():
-             self.global_settings[k] = glob
-             if k > highest_global_id:
-                 highest_global_id = k
-        
-        for k, glob in user_global_settings.iteritems():
-            # check for duplicates
-            if not self.global_settings.has_key(k):
-                self.global_settings[k] = glob
-                if k > highest_global_id:
-                    highest_global_id = k
-            else:
-                log.error("Global user setting %d clashes with preset" % k)
+        # load presets and then user global settings
+        if presets:
+            presets_globals = presets[0]
+            self.global_settings.clear()
+            self.selected_global_setting = None
+            for k, glob in presets_globals.iteritems():
+                 self.global_settings[k] = glob
+                     
+        if user_settings:   
+            user_global_settings = user_settings[0] 
+            for k, glob in user_global_settings.iteritems():
+                # check for duplicates
+                if not self.global_settings.has_key(k):
+                    self.global_settings[k] = glob
+                else:
+                    log.error("Global user setting %d clashes with preset" % k)
     
-        # merge presets and user media settings
-        user_media_settings = user_settings[1]
-        presets_media_settings = presets[1]
-        highest_media_setting_id = 0
-        self.media_settings.clear()
-        self.selected_media_setting = None
-        for k, med in presets_media_settings.iteritems():
-            self.media_settings[k] = med
-            if k > highest_media_setting_id:
-                highest_media_setting_id = k
-        for k, med in user_media_settings.iteritems():
-            # check for duplicates
-            if not self.media_settings.has_key(k):
+        # load presets and user media settings
+        if presets:
+            presets_media_settings = presets[1]
+            self.media_settings.clear()
+            self.selected_media_setting = None
+            for k, med in presets_media_settings.iteritems():
                 self.media_settings[k] = med
-                if k > highest_global_id:
-                    highest_media_id = k
-            else:
-                log.error("Media user setting %d: '%s' clashes with preset" % (k,med.name))
-            
-            
-            
+                
+        if user_settings:
+            user_media_settings = user_settings[1]
+            for k, med in user_media_settings.iteritems():
+                # check for duplicates
+                if not self.media_settings.has_key(k):
+                    self.media_settings[k] = med
+                else:
+                    log.error("Media user setting %d: '%s' clashes with preset" % (k,med.name))
+                 
     def save(self):
         user_media_settings = {} 
         user_global_settings =  {}
         
+        first_user_setting_id = 10000
+        
         for k in self.global_settings.keys():
             glob = self.global_settings[k]
-            if not glob.is_preset:
+            if k >= first_user_setting_id: 
                 user_global_settings[k] = glob
         
         for k in self.media_settings.keys():
             med = self.media_settings[k]
-            if not med.is_preset:
+            if k >= first_user_setting_id:
                 user_media_settings[k] = med
         
-        filename = Settings._get_user_settings_filename()
+        filename = install_dir("settings.sets")
         
         # little hack to  create a preset file
-        make_presets = False
-        if make_presets:
-            for k in self.global_settings.keys():
-                glob = self.global_settings[k]
-                glob.is_preset = True
-        
-            for k in self.media_settings.keys():
-                med = self.media_settings[k]
-                med.is_preset = True
-            filename = Settings._get_preset_settings_filename()
-            
         stuff = (user_global_settings, user_media_settings)  
         Settings._save_object_to_file_nicely(stuff, filename, current_major_version_number)
 
-    
     def get_media_setting(self, name):
         id = self._get_media_setting_id_from_name(name)
         return self.media_settings[id]
+    
+    def get_global_setting_from_id(self, id):
+        if self.global_settings.has_key(id):
+            return self.global_settings[id]
+        raise SettingsError, 'The global setting ' + str(id) + ' does not exist'  
     
     def get_global_setting(self, name):
         id = self._get_global_setting_id_from_name(name)
         return self.global_settings[id]
         
-
     def list_global_setting(self):
          return (self.global_settings, self.selected_global_setting)
        
     def add_global_setting(self,name):
         if not name:
             raise SettingsError, 'Global setting must have a unique name'
-        if self.global_settings.has_key(name):
+        if self._get_global_setting_id_from_name_no_fail(name) >= 0:
             raise SettingsError, 'Global setting "%s" already exists' % name
         try:
             glob = GlobalSetting(name)
-            self.global_settings[self.current_global_id] = glob
-            self.current_global_id += 1
+            new_id = first_global_id
+            if len(self.global_settings) > 0: 
+                new_id = max(self.global_settings.keys()) + 1
+                if new_id < first_global_id:
+                    new_id = first_global_id
+            self.global_settings[new_id] = glob
         finally:
             pass 
         return True
@@ -383,12 +380,23 @@ class Settings(object):
                 return id
         raise SettingsError, 'Media setting "%s" does not exist' % name
     
-    def _get_global_setting_id_from_name(self,name):
+    def _get_global_setting_id_from_name_no_fail(self, name):
         for id in self.global_settings.keys():
             setting_name = self.global_settings[id].name
             if  setting_name == name:
                 return id
-        raise SettingsError, 'Global setting "%s" does not exist' % name
+        return -1
+    
+    def _get_global_setting_id_from_name(self,name):
+        id = self._get_global_setting_id_from_name_no_fail(name)
+        if id == -1:
+            raise SettingsError, 'Global setting "%s" does not exist' % name
+        return id
+
+    def select_global_setting(self,name):
+        id = self._get_global_setting_id_from_name(name)
+        self.selected_global_setting = name
+        return True
             
     def select_global_setting(self,name):
         id = self._get_global_setting_id_from_name(name)
@@ -400,21 +408,27 @@ class Settings(object):
         raise SettingsError, 'This command is not implemented yet' 
         return True
 
-
-
     def list_media_setting(self):
          return (self.media_settings, self.selected_media_setting)
        
     def add_media_setting(self,name):
         if not name:
-            raise SettingsError, 'Media setting must have a unique name'
-        if self.media_settings.has_key(name):
-            raise SettingsError, 'Media setting "%s" already exists' % name
-        
-        new_setting = MediaSetting(name)
-        self.media_settings[self.current_media_id] = new_setting
-        self.current_media_id += 1
-        return True
+            raise SettingsError, 'Media setting must have a name'
+        for media in self.media_settings.values():
+            if media.name == name: 
+                raise SettingsError, 'Media setting "%s" already exists' % name
+        # the nex id is either first_media_setting or, if there are
+        # items already, the next possible id that's equal or higher than the 
+        # first usr id
+        id = first_media_setting
+        if len(self.media_settings) > 0:
+            id = max(self.media_settings.keys()) + 1
+            if id < first_media_setting:
+                id = first_media_setting
+                
+        new_setting = MediaSetting(name, id)
+        self.media_settings[new_setting.id] = new_setting
+        return new_setting. id
     
     def erase_media_setting(self,name):
         id = self._get_media_setting_id_from_name(name)
@@ -429,35 +443,6 @@ class Settings(object):
         self.selected_media_setting = name
         return True
 
-
-#class Setting(object):
-#    
-#    def __init__(self, name):
-#        log.info("Setting init: " + name)
-#        self.globals = {}
-#        self.media = {}
-#            
-#        if name == 'Custom':
-#            self.name = name
-#            self.streams = {'send':Streams(),
-#                            'receive':Streams('receive')}
-#            self.contact = None
-#            self.others = {'gst':
-#                                {'port_s':10000,
-#                                 'port_r':10010,
-#                                 'addr_s':'127.0.0.1',
-#                                 'addr_r':'127.0.0.1',
-#                                 'acodec':'vorbis',
-#                                 'vcodec':'h264',
-#                                 'port':1244}
-#                            }
-#
-#    def _save(self):
-#        """
-#        Save to disk
-#        """
-#        pass
-    
         
 class GlobalSetting(object):
     """
@@ -465,14 +450,23 @@ class GlobalSetting(object):
     """
     def __init__(self, name):
         self.is_preset = False
-        self.name = None
         self.stream_subgroups = {}
         self.selected_stream_subgroup = None
-        self.current_streamsubgroup_id = 0
+        
         self.name = name
+        self.communication = ''
         log.info("GlobalSetting__init__ " + name)
     
+    def start_streaming(self, listener, address):
+        for id, group in self.stream_subgroups.iteritems():
+            if group.enabled:
+                group.start_streaming(listener, address)
     
+    def stop_streaming(self):
+        for id, group in self.stream_subgroups.iteritems():
+            if group.enabled:
+                group.stop_streaming()
+        
     def _get_stream_subgroup_id_from_name(self,name):
         for id in self.stream_subgroups.keys():
             setting_name = self.stream_subgroups[id].name
@@ -498,8 +492,11 @@ class GlobalSetting(object):
             raise SettingsError, 'Stream subgroup "%s" already exists' % name
         try:
             new_guy = StreamSubgroup(name)
-            self.stream_subgroups[self.current_streamsubgroup_id] = new_guy
-            self.current_streamsubgroup_id += 1
+            new_id = 1
+            if len(self.stream_subgroups) > 0:
+                new_id = max(self.stream_subgroups.keys())+1
+            self.stream_subgroups[new_id] = new_guy
+            
         finally:
             pass
         return True
@@ -520,7 +517,6 @@ class StreamSubgroup(object):
     """
     Stream subgroup instances contain media streams.
     """
-   
     def __init__(self, name):
         self.name = None
         self.enabled = False
@@ -535,6 +531,16 @@ class StreamSubgroup(object):
         # these ids insure that every media stream has a unique name 
         self.media_stream_ids = {}
 
+    def start_streaming(self, listener, address):
+        for stream in self.media_streams:
+            stream.init_streaming(listener, self.mode, address)
+        for stream in self.media_streams:    
+            stream.start_streaming()
+    
+    def stop_streaming(self):
+        for stream in self.media_streams:
+            stream.stop_streaming()
+    
     def _find_media_stream(self,name):
         for m in self.media_streams:
             setting_name = m.name
@@ -556,7 +562,9 @@ class StreamSubgroup(object):
             raise SettingsError, 'Media stream must have a type'
         # create a new stream with a unique id
         new_guy = MediaStream.create(typename, self.media_stream_ids)
+        new_guy.port = self.port
         self.media_streams.append(new_guy)
+        return new_guy
     
     def erase_media_stream(self,name):
         media_stream = self.get_media_stream(name)
@@ -565,11 +573,21 @@ class StreamSubgroup(object):
         self.media_streams.remove(media_stream)
     
     def select_media_stream(self,name):
-        id = self._get_media_stream_id_from_name(name)
-        if id == None:
-            raise SettingsError, 'Media stream "%s" does not exist' % name
+        id = self.get_media_stream(name)
         self.selected_media_setting = name
-        
+
+class MediaSetting(object):
+    """
+    General settings information. They are loaded from a preset file and
+    user generated files.
+    """
+    
+    def __init__(self, name, id):
+        self.id = id
+        self.name = name
+        self.settings = {}
+        self.is_preset = False
+        log.info("MediaSetting__init__: " + name)        
 
 class MediaStream(object):
     """
@@ -582,8 +600,7 @@ class MediaStream(object):
     # the create method will create an instance of the type as long as the
     # type is in the list 
     media_stream_kinds ={}
-    
-    
+        
     def __init__(self, name):
        self.name = name
        self.enabled = False
@@ -593,6 +610,7 @@ class MediaStream(object):
        self.channel_names ={}
        # media setting id
        self.setting = None
+       self.engine = None
        
     def _create(media_stream_kind, media_stream_ids):
         """
@@ -610,9 +628,11 @@ class MediaStream(object):
         instanceName = media_stream_kind + number
         command = class_name + '("' + instanceName+ '")'
         return eval(command)
+
+    
     # make create a class  (aka static)method     
     create = staticmethod(_create)
-    
+        
 
 class AudioStream(MediaStream):
     """
@@ -621,36 +641,59 @@ class AudioStream(MediaStream):
     MediaStream.media_stream_kinds['audio']= 'AudioStream'
     pass
 
-class VideoStream(MediaStream):
-    """
-    Contains Video Settings information
-    """
-    MediaStream.media_stream_kinds['video'] = 'VideoStream'
-    pass
-
 class DataStream(MediaStream):
     """
     Contains Data Settings information
     """    
     MediaStream.media_stream_kinds['data'] = 'DataStream'
-    pass
+    
+ 
 
-class MediaSetting(object):
+class VideoStream(MediaStream):
     """
-    General settings information. They are loaded from a preset file and
-    user generated files.
+    Contains Video Settings information
     """
+    MediaStream.media_stream_kinds['video'] = 'VideoStream'
     
-    next_id = 1
+    def _start_the_engine(self, engine_name):
+        self.engine = streams.create__video_engine(engine_name)
+        # return engine      
+        msg = 'Engine "' + engine_name + '" is not supported'
+        log.error(msg)
+        raise SettingsError, msg
+
+    def init_streaming(self, listener, mode, address):
+        log.info("VideoStream init_streaming: " + self.name)
+        self.listener = listener
+        if listener != None:
+            if listener != self.listener:
+                self.listener = listener
+        
+        media_type = 'Video'
+        id = self.setting 
+        media_setting = Settings.get_media_setting_from_id(id)
+        stream_port = self.port
+        engine_name = media_setting.settings['engine']
+        codec = media_setting.settings['codec']
+        source = media_setting.settings['source']
+        bitrate = int(media_setting.settings['bitrate'])
+        gst_port = int(media_setting.settings['GstPort'])
+        gst_address = media_setting.settings['GstAddress'] 
+        
+        self.engine = streams.create__video_engine(engine_name)
+        self.engine.apply_settings(listener, mode, stream_port, codec, bitrate, source, address, gst_port, gst_address)
+        
+    def start_streaming(self):
+        log.info("VideoStream start_streaming: " + self.name)
+        self.engine.start_streaming()  
     
-    def __init__(self, name):
-        self.id = MediaSetting.next_id
-        MediaSetting.next_id +=1
-        self.name = name
-        self.settings = []
-        self.is_preset = False
-        log.info("MediaSetting__init__: " + name)
-    
+    def stop_streaming(self):
+        self.engine.stop_streaming()
+        self.engine = None
+        self.listener = None
+
+ 
+
 
 
 

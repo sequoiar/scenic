@@ -20,4 +20,11 @@
 
 
 # App imports
+from streams.video.gst import VideoGst
+from errors import *
 
+def create__video_engine(engine_name):
+    engine_name = str(engine_name)
+    if engine_name.upper() == 'GST':
+        return VideoGst()
+    raise StreamsError, 'Engine "%s" is not supported' %  engine_name 

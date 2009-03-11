@@ -39,11 +39,11 @@ server_command = os.path.expanduser("./miville.py")
 client_command = 'telnet localhost %s' % server_port
 waiting_delay = 1.0 # seconds before starting client after server start
 
-VERBOSE_CLIENT = False
-#VERBOSE_CLIENT = True
+#VERBOSE_CLIENT = False
+VERBOSE_CLIENT = True
 
-VERBOSE_SERVER = False
-#VERBOSE_SERVER = True
+#VERBOSE_SERVER = False
+VERBOSE_SERVER = True
 
 # ---------------------------------------------------------------------
 # a class for output redirection
@@ -70,10 +70,10 @@ class ProcessOutputLogger:
         
         Adds some pretty colors as well.
         """
-        sys.stdout.write(getColor('CYAN'))
+        #sys.stdout.write(getColor('CYAN'))
         for s in self.buffer:
             sys.stdout.write(s)
-        sys.stdout.write(getColor())
+        #sys.stdout.write(getColor())
         sys.stdout.flush()
         self.buffer = []
 
@@ -83,10 +83,7 @@ def println(s, endl=True):
     """
     Prints a line to standard output with a prefix.
     """
-    if endl:
-        print getColor('MAGENTA'), ">>>>", s, getColor()
-    else:
-        print ">>>>", s, # note the comma (",") at end of line
+    print ">>>>", s, # note the comma (",") at end of line
 
 def start_process(command, isVerbose=False, logPrefix=''):
     """
@@ -96,8 +93,8 @@ def start_process(command, isVerbose=False, logPrefix=''):
     """
     try:
         directory = os.getcwd()
-        println('Current working dir: ' + directory)
-        println('Starting \"%s\"' % command)
+        println('\nCurrent working dir: ' + directory)
+        println('\nStarting \"%s\"' % command)
         
         if isVerbose:
             process = pexpect.spawn(command, logfile=ProcessOutputLogger(logPrefix))
@@ -141,7 +138,8 @@ def getColor(c=None):
         s = '35m'
     else:
         s = '0m' # default (black or white)
-    return "\x1b[" + s
+    #return "\x1b[" + s
+    return ""
 
 def kill_process(process):
     """
@@ -217,19 +215,6 @@ class TelnetBaseTest(unittest.TestCase):
         """Waits a bit between each command."""
         time.sleep(0.025)
 
-    def prepareTest(self, server, client):
-        """
-        Returns tuple of two pexpect.spawn objects
-        """
-        #global server
-        #global client
-        
-        if (is_running(server) == False):
-            server = start_process(server_command)
-        if (is_running(client) == False):
-            client = start_process(client_command)
-        return(server, client)
-
     def evalTest(self, index, message):
         """
         Fails a test, displaying a message, if the provided index resulting 
@@ -239,7 +224,7 @@ class TelnetBaseTest(unittest.TestCase):
         self.failIfEqual(index, 1, 'Problem : Unexpected EOF')
         self.failIfEqual(index, 2, 'Problem : Time out.')
 
-    def expectTest(self, expected, message):
+    def expectTest(self, expected, message, timeout=2):
         """
         Fails a test if the expected regex value is not read from the client output.
         
@@ -552,16 +537,12 @@ class Test_004_Settings(TelnetBaseTest):
         path = "/usr/share/sropulpof/globalSettings.presets"
         self.assertTrue(os.path.exists(path), 'Global Preset file "%s" is missing' % path)
 
-        
-        
-        
     def test_02_MediaPresets(self):    
         """
         test that preset file exist.
         look for a known preset
         check that you can't delete a preset
         """
-
         path = "/usr/share/sropulpof/mediaSettings.presets"
         self.assertTrue(os.path.exists(path), 'Global Preset file "%s" is missing' % path)
         

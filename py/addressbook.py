@@ -114,7 +114,7 @@ class AddressBook(object):
         name = self._get_name(name)
         contact = self.contacts[name]
 
-        if new_name is None and address is None and port is None:
+        if new_name is None and setting is None and address is None and port is None:
             raise AddressBookError, 'No property to change.'
 
         new_name = to_utf(new_name)
@@ -131,7 +131,7 @@ class AddressBook(object):
         contact.set_address(address)
         contact.assign_connector(connector)
         contact.set_setting(setting)
-
+        
         self.write()
         return True
 
@@ -383,11 +383,7 @@ class Contact(object):
         if not isinstance(setting, int):    #TODO: validate if the setting exist
             raise AddressBookError, "The 'setting' arguments should be an integer. Got %s of type %s." % (setting, type(setting))
         self.setting = setting
-    
-    def set_setting(self, setting):
-        if setting != None:
-            self.setting = int(setting)
-    
+
     def set_address(self, address):
         """
         Set the address attribute of the contact in function of is kind
@@ -399,7 +395,15 @@ class Contact(object):
                 self.address = address
             else:
                 self.address = address.encode('utf-8')
-
+    
+    def set_setting(self, setting):
+        """
+        Sets the setting attribute. 
+        """
+        if setting != None:
+            id = int(setting)
+            self.setting = id
+            
     def set_port(self, port):
         """
         Validate and set the port of the contact. If the port did not validate,

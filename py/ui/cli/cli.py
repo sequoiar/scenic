@@ -92,7 +92,8 @@ class TelnetServer(recvline.HistoricRecvLine):
         
 
     def write(self, msg, prompt=False, endl=True):
-        self.terminal.write("%s" % (msg.encode('utf-8')))
+        msg2 = str(msg)
+        self.terminal.write("%s" % (msg2.encode('utf-8')))
         if endl:
             self.terminal.nextLine()
         if prompt:
@@ -215,8 +216,8 @@ class CliController(TelnetServer):
         # build a dict of all semi-private methods
         self.callbacks = find_callbacks(self)
         self.shortcuts = {'c': 'contacts',
-                          'a': 'audio',
-                          'v': 'video',
+                          #'a': 'audio',
+                          #'v': 'video',
                           's': 'settings',
                           'z': 'streams',
                           'j': 'join',
@@ -398,6 +399,7 @@ class CliController(TelnetServer):
                 new_name = None
                 address = None
                 port = None
+                setting = None
                 for i, arg in enumerate(args):
                     if i > 0:
                         if '=' in arg:
@@ -410,6 +412,8 @@ class CliController(TelnetServer):
                                 address = value
                             elif key == 'port':
                                 port = value
+                            elif key == 'setting':
+                                setting = value
                             else:
                                 self.write("Unable to change %s: unexisting property" % (key) , False)
                         elif new_name == None: #if no key=value pair, resolution order:
@@ -421,7 +425,7 @@ class CliController(TelnetServer):
                         elif name == None:
                             name = arg
 
-                self.core.modify_contact(self, name, new_name, address, port)
+                self.core.modify_contact(self, name, new_name, address, port, setting)
             else:
                 self.write('You need to give at least one argument.', True)
         elif options.duplicate:
@@ -455,170 +459,140 @@ class CliController(TelnetServer):
         else:
             cp.print_help()
 
-    def _audio(self, line):
-        kind = 'audio'
-        cp = CliParser(self, prog=line[0], description="Manage the audio streams.")
-        cp.add_option("-l", "--list", action='store_true', help="List all the audio streams or settings if stream is specified")
-
-        cp.add_option("-a", "--add", type="string", help="Add an audio stream")
-        cp.add_option("-e", "--erase", type="string", help="Erase an audio stream")
-        cp.add_option("-m", "--modify", type="string", help="Modify the name of an audio stream")
-
-        cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
-        cp.add_option("-c", "--codec", type="string", help="Set the codec")
-        cp.add_option("-s", "--settings", type="string", help="Set the codec settings (set1:val,set2:val)")
-        cp.add_option("-d", "--bitdepth", type="int", help="Set the bitdepth of the audio (default: 16 bit)")
-        cp.add_option("-r", "--samplerate", type="int", help="Set the samplerate of the audio (default: 48000 Hz")
-        cp.add_option("-v", "--channels", "--voices", type="int", help="Set the number of audio channels (from 1 to 8)")
-        cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
-        cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
-        cp.add_option("-i", "--input", "--source", type="string", help="Set the audio source (input).")
-        cp.add_option("-z", "--description", action='store_true', help="Display description")
-        
-        
-        (options, args) = cp.parse_args(line)
-
-        if len(args) > 1:
-            name = args[1]
-            if options.list:
-                self.core.settings_stream(self, name, kind)
-            elif options.modify:
-                self.core.rename_stream(self, name, options.modify, kind)
-            elif [opt for opt in options.__dict__.values() if opt]:
-                if options.container:
-                    self.core.set_stream(self, name, kind, 'container', options.container)
-                if options.codec:
-                    self.core.set_stream(self, name, kind, 'codec', options.codec)
-                if options.settings:
-                    self.core.set_stream(self, name, kind, 'codec_settings', options.settings)
-                if options.bitdepth:
-                    self.core.set_stream(self, name, kind, 'bitdepth', options.bitdepth)
-                if options.samplerate:
-                    self.core.set_stream(self, name, kind, 'sample_rate', options.samplerate)
-                if options.channels:
-                    self.core.set_stream(self, name, kind, 'channels', options.channels)
-                if options.port:
-                    self.core.set_stream(self, name, kind, 'port', options.port)
-                if options.buffer:
-                    self.core.set_stream(self, name, kind, 'buffer', options.buffer)
-                if options.input:
-                    input = add_quotes(options.input)
-                    self.core.set_stream(self, name, kind, 'source', input)
-        elif options.list:
-            self.core.list_stream(self, kind)
-        elif options.description:
-            cp.print_description()
-        elif options.add:
-            self.core.add_stream(self, options.add, kind, 'gst')
-        elif options.erase:
-            self.core.delete_stream(self, options.erase, kind)
-        else:
-            cp.print_help()
-
-    def _video(self, line):
-        kind = 'video'
-        cp = CliParser(self, prog=line[0], description="Manage the video streams.")
-        cp.add_option("-l", "--list", action='store_true', help="List all the video streams or settings if stream is specified")
-
-        cp.add_option("-a", "--add", type="string", help="Add an video stream")
-        cp.add_option("-e", "--erase", type="string", help="Erase an video stream")
-        cp.add_option("-m", "--modify", type="string", help="Modify the name of an video stream")
-
-        cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
-        cp.add_option("-c", "--codec", type="string", help="Set the codec")
-        cp.add_option("-s", "--settings", type="string", help="Set the codec settings (set1:val,set2:val)")
-        cp.add_option("-w", "--width", type="int", help="Set the width of the video in pixels (default: 640 px)")
-        cp.add_option("-r", "--height", "--rise", type="int", help="Set the height of the video in pixels (default: 480 px")
-        cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
-        cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
-        cp.add_option("-i", "--input", "--source", type="string", help="Set the video source (input).")
-        cp.add_option("-z", "--description", action='store_true', help="Display description")
-        
-        
-        (options, args) = cp.parse_args(line)
-
-        if len(args) > 1:
-            name = args[1]
-            if options.list:
-                self.core.settings_stream(self, name, kind)
-            elif options.modify:
-                self.core.rename_stream(self, name, options.modify, kind)
-            elif [opt for opt in options.__dict__.values() if opt]:
-                # calls ControllerApi.set_stream(caller, name, 'video', attr, value)
-                if options.container:
-                    self.core.set_stream(self, name, kind, 'container', options.container)
-                if options.codec:
-                    self.core.set_stream(self, name, kind, 'codec', options.codec)
-                if options.settings:
-                    self.core.set_stream(self, name, kind, 'codec_settings', options.settings)
-                if options.width:
-                    self.core.set_stream(self, name, kind, 'width', options.width)
-                if options.height:
-                    self.core.set_stream(self, name, kind, 'height', options.height)
-                if options.port:
-                    self.core.set_stream(self, name, kind, 'port', options.port)
-                if options.buffer:
-                    self.core.set_stream(self, name, kind, 'buffer', options.buffer)
-                if options.input:
-                    input = add_quotes(options.input)
-                    self.core.set_stream(self, name, kind, 'source', input)
-        elif options.list:
-            self.core.list_stream(self, kind)
-        elif options.description:
-            cp.print_description()
-        elif options.add:
-            self.core.add_stream(self, options.add, kind, 'gst')
-        elif options.erase:
-            self.core.delete_stream(self, options.erase, kind)
-        else:
-            cp.print_help()
+#    def _audio(self, line):
+#        kind = 'audio'
+#        cp = CliParser(self, prog=line[0], description="Manage the audio streams.")
+#        cp.add_option("-l", "--list", action='store_true', help="List all the audio streams or settings if stream is specified")
+#
+#        cp.add_option("-a", "--add", type="string", help="Add an audio stream")
+#        cp.add_option("-e", "--erase", type="string", help="Erase an audio stream")
+#        cp.add_option("-m", "--modify", type="string", help="Modify the name of an audio stream")
+#
+#        cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
+#        cp.add_option("-c", "--codec", type="string", help="Set the codec")
+#        cp.add_option("-s", "--settings", type="string", help="Set the codec settings (set1:val,set2:val)")
+#        cp.add_option("-d", "--bitdepth", type="int", help="Set the bitdepth of the audio (default: 16 bit)")
+#        cp.add_option("-r", "--samplerate", type="int", help="Set the samplerate of the audio (default: 48000 Hz")
+#        cp.add_option("-v", "--channels", "--voices", type="int", help="Set the number of audio channels (from 1 to 8)")
+#        cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
+#        cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
+#        cp.add_option("-i", "--input", "--source", type="string", help="Set the audio source (input).")
+#        cp.add_option("-z", "--description", action='store_true', help="Display description")
+#        
+#        
+#        (options, args) = cp.parse_args(line)
+#
+#        if len(args) > 1:
+#            name = args[1]
+#            if options.list:
+#                self.core.settings_stream(self, name, kind)
+#            elif options.modify:
+#                self.core.rename_stream(self, name, options.modify, kind)
+#            elif [opt for opt in options.__dict__.values() if opt]:
+#                if options.container:
+#                    self.core.set_stream(self, name, kind, 'container', options.container)
+#                if options.codec:
+#                    self.core.set_stream(self, name, kind, 'codec', options.codec)
+#                if options.settings:
+#                    self.core.set_stream(self, name, kind, 'codec_settings', options.settings)
+#                if options.bitdepth:
+#                    self.core.set_stream(self, name, kind, 'bitdepth', options.bitdepth)
+#                if options.samplerate:
+#                    self.core.set_stream(self, name, kind, 'sample_rate', options.samplerate)
+#                if options.channels:
+#                    self.core.set_stream(self, name, kind, 'channels', options.channels)
+#                if options.port:
+#                    self.core.set_stream(self, name, kind, 'port', options.port)
+#                if options.buffer:
+#                    self.core.set_stream(self, name, kind, 'buffer', options.buffer)
+#                if options.input:
+#                    input = add_quotes(options.input)
+#                    self.core.set_stream(self, name, kind, 'source', input)
+#        elif options.list:
+#            self.core.list_stream(self, kind)
+#        elif options.description:
+#            cp.print_description()
+#        elif options.add:
+#            self.core.add_stream(self, options.add, kind, 'gst')
+#        elif options.erase:
+#            self.core.delete_stream(self, options.erase, kind)
+#        else:
+#            cp.print_help()
+#
+#    def _video(self, line):
+#        kind = 'video'
+#        cp = CliParser(self, prog=line[0], description="Manage the video streams.")
+#        cp.add_option("-l", "--list", action='store_true', help="List all the video streams or settings if stream is specified")
+#
+#        cp.add_option("-a", "--add", type="string", help="Add an video stream")
+#        cp.add_option("-e", "--erase", type="string", help="Erase an video stream")
+#        cp.add_option("-m", "--modify", type="string", help="Modify the name of an video stream")
+#
+#        cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
+#        cp.add_option("-c", "--codec", type="string", help="Set the codec")
+#        cp.add_option("-s", "--settings", type="string", help="Set the codec settings (set1:val,set2:val)")
+#        cp.add_option("-w", "--width", type="int", help="Set the width of the video in pixels (default: 640 px)")
+#        cp.add_option("-r", "--height", "--rise", type="int", help="Set the height of the video in pixels (default: 480 px")
+#        cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
+#        cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
+#        cp.add_option("-i", "--input", "--source", type="string", help="Set the video source (input).")
+#        cp.add_option("-z", "--description", action='store_true', help="Display description")
+#        
+#        
+#        (options, args) = cp.parse_args(line)
+#
+#        if len(args) > 1:
+#            name = args[1]
+#            if options.list:
+#                self.core.settings_stream(self, name, kind)
+#            elif options.modify:
+#                self.core.rename_stream(self, name, options.modify, kind)
+#            elif [opt for opt in options.__dict__.values() if opt]:
+#                # calls ControllerApi.set_stream(caller, name, 'video', attr, value)
+#                if options.container:
+#                    self.core.set_stream(self, name, kind, 'container', options.container)
+#                if options.codec:
+#                    self.core.set_stream(self, name, kind, 'codec', options.codec)
+#                if options.settings:
+#                    self.core.set_stream(self, name, kind, 'codec_settings', options.settings)
+#                if options.width:
+#                    self.core.set_stream(self, name, kind, 'width', options.width)
+#                if options.height:
+#                    self.core.set_stream(self, name, kind, 'height', options.height)
+#                if options.port:
+#                    self.core.set_stream(self, name, kind, 'port', options.port)
+#                if options.buffer:
+#                    self.core.set_stream(self, name, kind, 'buffer', options.buffer)
+#                if options.input:
+#                    input = add_quotes(options.input)
+#                    self.core.set_stream(self, name, kind, 'source', input)
+#        elif options.list:
+#            self.core.list_stream(self, kind)
+#        elif options.description:
+#            cp.print_description()
+#        elif options.add:
+#            self.core.add_stream(self, options.add, kind, 'gst')
+#        elif options.erase:
+#            self.core.delete_stream(self, options.erase, kind)
+#        else:
+#            cp.print_help()
     
 
     def _streams(self, line):
         cp = CliParser(self, prog=line[0], description="Manage the wrapper stream.")
-        cp.add_option("-l", "--list", action='store_true', help="List all the streams included")
-
-#        cp.add_option("-a", "--add", type="string", help="Add a stream")
-#        cp.add_option("-e", "--erase", type="string", help="Erase a stream")
-#        cp.add_option("-m", "--modify", type="string", help="Modify the name of a stream")
-
-        cp.add_option("-c", "--select", "--choose", type="string", help="Select the current stream")
-
-        cp.add_option("-s", "--start", type="string", help="Start a stream of playing")
+        cp.add_option("-s", "--start", type="string", help="Start streaming with specified contact")
         cp.add_option("-i", "--stop", "--interrupt", action='store_true', help="Stop a stream of playing")
-
-        cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
-        cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
-        cp.add_option("-o", "--send", "--out", action='store_true', dest="mode", help="Set the mode to 'send'")
-        cp.add_option("-r", "--receive", "--in", action='store_false', dest="mode", help="Set the mode to 'receive'")
         cp.add_option("-z", "--description", action='store_true', help="Display description")
         
         (options, args) = cp.parse_args(line)
-
         kind = 'streams'
-
-        if options.list:
-            if len(args) > 1:
-                self.core.list_streams(self)
-            else:
-                self.core.list_stream(self, kind)
+        if options.start:
+            contact_name = options.start
+            self.core.start_streams(self, contact_name)
         elif options.stop:
             self.core.stop_streams(self)
         elif options.description:
             cp.print_description()
-        elif options.select:
-            self.core.select_streams(self, options.select)
-        elif [opt for opt in options.__dict__.values() if opt != None]:
-            if options.container:
-                self.core.set_streams(self, 'container', options.container)
-            if options.port:
-                self.core.set_streams(self, 'port', options.port)
-            if options.mode == True:
-                self.core.set_streams(self, 'mode', 'send')
-            elif options.mode == False:
-                self.core.set_streams(self, 'mode', 'receive')
-            if options.start:
-                self.core.start_streams(self, options.start)
         else:
             cp.print_help()
 
@@ -1012,10 +986,12 @@ class CliView(Observer):
                         port = media_stream.port
                         port = str(port)
                         gain = 'no pain'
+                        
                         #gain = media_stream.gain_levels
                         txt += """%(name)s:
-    port       : %(port)s
-    gain levels: %(gain)s
+    port          : %(port)s
+    gain levels   : %(gain)s
+    media setting : %(setting)s
 """ % locals()
                     self.write( txt )
                         
@@ -1096,13 +1072,15 @@ class CliView(Observer):
                     txt = ''
                     for k in media_settings.keys():
                         name = media_settings[k].name
-                        settings_ = str(media_settings[k].settings)
+                        settings_ = "\n" #str(media_settings[k].settings)
+                        for setting_name, setting_value in media_settings[k].settings.iteritems():
+                            settings_ += "                " + str(setting_name) + ':' + str(setting_value) + "\n"
                         if name == selected_media_setting:
                             name = bold(name + ": <---")
                         others = "None"
                         txt += """%(name)s:
     id      : %(k)3d
-    settings: %(settings_)s""" % locals()
+    settings: %(settings_)s\n""" % locals()
                     self.write( txt )
 
     def _add_media_setting(self, origin, data):
@@ -1151,7 +1129,7 @@ class CliView(Observer):
                 else:
                     txt = ''
                     for k in global_settings.keys():
-                        comm = "3-way"
+                        comm = global_settings[k].communication
                         name = global_settings[k].name
                         if name == selected_global_setting:
                             name = bold(name + ": <---")
@@ -1238,10 +1216,11 @@ class CliView(Observer):
                 else:
                     msg.append(contact.name + ":")
                 msg.append("\taddress: %s" % contact.address)
-                if contact.port:
-                    msg.append("\tport   : %s" % contact.port)
-                if contact.kind:
-                    msg.append("\tkind   : %s" % contact.kind)
+                #if contact.port:
+                msg.append("\tport   : %s" % str(contact.port))
+                #if contact.kind:
+                msg.append("\tkind   : %s" % str(contact.kind))
+                msg.append("\tsetting   : %s" % str(contact.setting))
             msg_out = "\n".join(msg)
             self.write(msg_out)
 

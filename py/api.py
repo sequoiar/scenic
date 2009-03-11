@@ -72,7 +72,7 @@ def modify(who, name_of_who, what, new_value):
     """
     members = dir(who)
     if not what in members:
-        raise SettingsError, "Property \"" + attribute + "\" does not exist"
+        raise SettingsError, "Property \"" + what + "\" does not exist"
     value = str(new_value)
     if isinstance(new_value, str):
         value = repr.repr(new_value)
@@ -216,13 +216,13 @@ class ControllerApi(object):
             result = err
         self.notify(caller, result) # implicit key: 'delete_contact'
 
-    def modify_contact(self, caller, name=None, new_name=None, address=None, port=None):
+    def modify_contact(self, caller, name=None, new_name=None, address=None, port=None, setting = None):
         """
         Changes one or more attributes of a contact.
         If no name is given, modify the selected contact.
         """
         try:
-            result = self.adb.modify(name, new_name, address, port)
+            result = self.adb.modify(name, new_name, address, port, setting)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)
@@ -406,8 +406,17 @@ class ControllerApi(object):
             result = None
             log.info("modify_media_setting")
             x = self.settings.get_media_setting(name)
-            cmd = modify(x, 'x', attribute, value)
-            exec(cmd) 
+            if attribute == 'settings':
+                toks = value.partition(':')
+                key = toks[0]
+                val = toks[2]
+                if not val:
+                    x.settings.pop(key)
+                else:
+                    x.settings[key] = val
+            else:
+                cmd = modify(x, 'x', attribute, value)
+                exec(cmd) 
         except SettingsError, err:
             result = err
         self.notify(caller, result)
@@ -491,7 +500,11 @@ class ControllerApi(object):
             glob = self.settings.get_global_setting(global_setting_name)
             # result = glob.modify_global_setting(attribute, value)
             cmd = modify(glob, 'glob', attribute, value)
-            exec(cmd) 
+            try:
+                exec(cmd)
+            except Exception, err:
+              result = err
+              self.notify(caller, result)   
         except SettingsError, err:
             result = err
         self.notify(caller, result)
@@ -523,6 +536,8 @@ class ControllerApi(object):
             result = self.settings.load() 
         except SettingsError, err:
             result = err
+        except InstallFileError, err:
+            result = err
         self.notify(caller, result)       
         
     def save_settings (self, caller):
@@ -547,70 +562,50 @@ class ControllerApi(object):
 
     ### Streams ###
 
-    def start_streams(self, caller, address, channel=None):
+    def start_streams(self, caller, contact_name):
         """
         Starts all the sub-streams. (audio, video and data)
                 
         address: string or None (IP)
         """
-        self.notify(caller, self.streams.start(address, channel))
+        log.info("start_streams: ")
+        result = "started"
+        try:
+            contact = self.adb.get_contact(contact_name)
+            id = contact.setting
+            global_setting = self.settings.get_global_setting_from_id(id)
+            address = contact.address
+            # Join contact if necessary?
+            # see start_connection
+            global_setting.start_streaming(self, address)
+        except AddressBookError, err:
+            result = err   
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)    
+        #self.notify(caller, self.streams.start(address, channel))
 
     def stop_streams(self, caller):
         """
         Stop all the sub-streams. (audio, video and data)
         """
-        self.notify(caller, self.streams.stop())
-
-    def set_streams(self, caller, attr, value):
-        """
-        Sets an attribute (settings) for the streams manager. 
+        result = True
+        try:
+            contact = self.adb.contacts[self.adb.selected]
+            id = contact.setting
             
-        :param name: string
-        :param value: 
-        
-        Attributes names of the Streas class are : mode, container, port
-        """
-        self.notify(caller, self.streams.set_attr(attr, value))
-
-    def select_streams(self, caller, name):
-        if name in self.all_streams:
-            self.streams = self.all_streams[name]
-            self.curr_streams = name
-            self.notify(caller, (name, True))
-        else:
-            self.notify(caller, (name, False))
-
-    def list_streams(self, caller):
-        self.notify(caller, (self.all_streams, self.curr_streams))
-
-
-    ### Stream ###
-
-    def set_stream(self, caller, name, kind, attr, value):
-        stream = self.streams.get(name, kind)
-        if stream:
-            self.notify(caller, (stream.set_attr(attr, value), name), kind + '_set')
-        else:
-            self.notify(caller, (name,kind), 'not_found') # calls self.notify(caller, value, key=None)
-
-    def settings_stream(self, caller, name, kind):
-        self.notify(caller, (self.streams.get(name, kind), name), kind + '_settings')
-
-    def add_stream(self, caller, name, kind, engine):
-        self.notify(caller, (self.streams.add(name, kind, engine, self.core), name), kind + '_add')
-
-    def delete_stream(self, caller, name, kind):
-        self.notify(caller, (self.streams.delete(name, kind), name), kind + '_delete')
-
-    def rename_stream(self, caller, name, new_name, kind):
-        self.notify(caller, (self.streams.rename(name, new_name, kind), name, new_name), kind + '_rename')
-
-    def list_stream(self, caller, kind):
-        self.notify(caller, self.streams.list(kind), kind + '_list')
+            global_setting = self.settings.global_settings[id]
+            
+            address = contact.address
+            log.info("start_streams: ")
+            global_setting.stop_streaming(self, address)
+            
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)   
 
 
     ### Connect ###
-
     def start_connection(self, caller, contact=None):
         if contact == None:
             contact = self.adb.get_current()
@@ -618,6 +613,7 @@ class ControllerApi(object):
             try:
                 connection = connectors.create_connection(contact, self)
                 connection.start()
+                
                 result = 'Trying to connect with %s (%s)...' % (contact.name, contact.address)
             except ConnectionError, err:
                 result = err.message # changed err for err.message XXX
@@ -633,16 +629,6 @@ class ControllerApi(object):
             self.notify(caller, result, 'info')
         else:
             self.notify(caller, 'Cannot stop connection. No valid contact selected.', 'info')
-
-#        self.stop_streams(caller)
-#        if self.curr_streams == 'send':
-#            contact = self.adb.get_current()
-#            connector = self.connectors[contact.kind()]
-#            client = connector.disconnect(self, contact.address, contact.port)
-#        else:
-#            connector = self.connectors[self.connection[2]]
-#            client = connector.disconnect(self, self.connection[0], self.connection[1])
-#        self.notify(caller, 'Communication was stopped.', 'info')
 
     def accept_connection(self, caller, connection):
         connection.accept()

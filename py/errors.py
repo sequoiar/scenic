@@ -20,6 +20,14 @@
 
 
 ### Settings ###
+
+class StreamsError(Exception):
+    """
+    Master Exception Class for the settings.
+    """
+    pass
+
+
 class SettingsError(Exception):
     """
     Master Exception Class for the settings.

@@ -30,74 +30,71 @@ from protocols.ipcp import parse
 
 log = log.start('debug', 1, 0, 'videoGst')
 
-class VideoGst(VideoStream, GstClient):
+class VideoGst(GstClient):
     """Class streams->video->gst.VideoGst
     """
     
-    def __init__(self, core=None):
-        VideoStream.__init__(self, core)
-        setting = core.curr_setting.others['gst']
-        self.port = setting['port'] + 10
-        self.codec = setting['vcodec']
-        mode = core.curr_setting.streams[core.api.curr_streams].mode
-        if mode == 'send':
-            port = setting['port_s']
-            address = setting['addr_s']
-        else:
-            port = setting['port_r']
-            address = setting['addr_r']
-        GstClient.__init__(self, core.api, mode, port, address)
-#        self._chan = None
-            
-    def start_sending(self, address, channel):
-        """function start_sending
-        address: string
-        """
-#        self._chan = channel
-        # parse source args and add them to the message
-        source = None
-        if self.source:
-            source = self.source
-            self.source, sep, args = source.partition(':')
-            args = parse(args)
-        attrs = self.get_attrs()
+    def apply_settings(self, listener, mode, stream_port , codec,  bitrate, source, address, gst_port, gst_address ):    
+        self.listener = listener
+        self.codec = codec
+        self.stream_port = stream_port
+        self.gst_port = gst_port
+        self.address = address
+        self.source = source
+        self.bitrate = bitrate
+        self.setup_gst_client(mode, self.gst_port, gst_address)
+         
+        attrs = []
+        if codec:
+            att  = ('codec', self.codec)
+            attrs.append(att)
+        if stream_port:    
+            att = ('port', self.stream_port)
+            attrs.append(att)
+        if address:
+            att = ('address', self.address)
+            attrs.append(att)
+        if bitrate:
+            att = ('bitrate', bitrate)
+            attrs.append(att)
         if source:
-            self.source = source
-            attrs.extend(args.items()) 
-        attrs.append(('address', address))
-        
-        self._send_cmd('video_start', attrs)
+            att = ('source', self.source)
+            attrs.append(att)
+        self._send_cmd('video_init', attrs)
+
+ 
+    def start_streaming(self):
+        """function start_sending
+         address: string
+        """
+        self._send_cmd('start')
+
+    def notify(self, state, message):
+        log.info("Notify")
+        self.listener.notify(state, message)
         
     def sending_started(self):
         self._del_callback()
-#        if caps.isdigit():
-#            self._core.notify(None, caps, 'video_sending_started')
-#        else:
-#            self._core.notify(None, 1, 'video_sending_started')
-#            log.info('SHOULD SEND CAPS VIA TCP HERE!')
-   
-    def stop_sending(self):
+                
+    def stop_streaming(self):
         """function stop_sending
         """
-        self._send_cmd('video_stop')
+        self._send_cmd('stop')
         self.stop_process()
     
     def sending_stopped(self, state):
         self._del_callback()
-        self._core.notify(None, state, 'video_sending_stopped')
+        self._notify(None, state, 'video_sending_stopped')
    
     def start_receiving(self, channel):
         """function start_receiving"""
         attrs = self.get_attrs()
-        self._send_cmd('video_start', attrs)
+        self._send_cmd('start', attrs)
     
     def stop_receiving(self, state):
-        """function stop_receiving
-        
-        returns 
+        """function stop_receiving    
         """
         self._del_callback()
-        self._core.notify(self, state, 'video_receiving_stopped')
+        self._notify(self, state, 'video_receiving_stopped')
     
-def start(core):
-    return VideoGst(core)
+

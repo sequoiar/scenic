@@ -36,8 +36,8 @@ class TestBase(test.systest_telnet.TelnetBaseTest):
         self.sleep()
         err = errorMsg or 'The command did not return: "%s" as expected' % expected
         self.expectTest(expected, err)
-
-class Test_004_Settings(TestBase):
+        
+class Test_001_Settings(TestBase):
     """
     System Tests for presets
     """
@@ -60,6 +60,9 @@ class Test_004_Settings(TestBase):
         self.tst("s -t global -l", "<---")
         # delete bogus setting
         self.tst("s -t global -e twit", '"twit" does not exist')
+        # add setting again, same name
+        self.tst("s -t global -a MyFirstGlobalSetting","already exists")
+                
         # delete setting
         self.tst("s -t global -e MyFirstGlobalSetting", 'setting removed')
     
@@ -104,6 +107,11 @@ class Test_004_Settings(TestBase):
         self.tst("settings --type media --mediasetting foobarbaz --modify name='zabraboof'", "modified")
         # check that the new name is there 
         self.tst('settings -t media --list', 'zabraboof')
+        # change the settings dictionnary inside the media setting
+        self.tst('s -t media --mediasetting zabraboof  -m settings=codec:mpeg4', 'modified')
+        # check that the new name is there 
+        self.tst('settings -t media --list', 'mpeg4')
+        
         # clean up
         self.tst("s -t media -e zabraboof", 'removed')     
 

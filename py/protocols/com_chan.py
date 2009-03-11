@@ -227,6 +227,7 @@ class ComChanCheck:
         if matched:
             return name
         else:
+            log.debug('Unauthorized login')
             return failure.Failure(error.UnauthorizedLogin())
 
 # functions 

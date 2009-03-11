@@ -34,7 +34,10 @@ class AudioGst(AudioStream, GstClient):
     """Class streams->audio->gst.AudioGst
     """
     
-    def __init__(self, core):
+    def __init__(self, core): # (self, audio_setting, callback) # cb(caller, p2, msg)
+        
+        # todo use the settings and get them in the init
+        
         AudioStream.__init__(self, core)
         setting = core.curr_setting.others['gst']
         self.port = setting['port']
