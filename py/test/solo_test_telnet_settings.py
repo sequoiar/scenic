@@ -52,7 +52,9 @@ class Test_001_Settings(TestBase):
         print
         print
         print cmd
-        print str(output)
+        lines = output.split("\n")
+        for line in lines:
+            print line
         print
         print
         
