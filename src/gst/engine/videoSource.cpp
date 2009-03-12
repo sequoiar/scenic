@@ -206,13 +206,13 @@ void VideoV4lSource::init()
     g_free(deviceStr);
 
     if (!v4l2util::checkStandard(expectedStandard_, deviceString))
-        THROW_ERROR("V4l2 device " << deviceString << " is not set to expected standard " << expectedStandard_);
+        LOG_WARNING("V4l2 device " << deviceString << " is not set to expected standard " << expectedStandard_);
 
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
 
     // fixes bug with image being distorted geometrically
-    std::string capsStr("video/x-raw-yuv, pixel-aspect-ratio=10/11"); 
+    std::string capsStr("video/x-raw-yuv, width=720, height=480, pixel-aspect-ratio=10/11"); 
 
     GstCaps *videoCaps = gst_caps_from_string(capsStr.c_str());
     g_object_set(G_OBJECT(capsFilter_), "caps", videoCaps, NULL);

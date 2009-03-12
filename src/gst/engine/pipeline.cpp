@@ -343,7 +343,7 @@ GstElement *Pipeline::makeElement(const char *factoryName, const char *elementNa
     GstElement *element = gst_element_factory_make(factoryName, elementName);
     if(!element)
     {
-        THROW_ERROR("element not connected factoryName " << factoryName << " elementName " << elementName); 
+        THROW_ERROR("element not made. factoryName: " << factoryName << " elementName: " << elementName); 
     }
     add(element);
     return element;
