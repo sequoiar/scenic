@@ -96,8 +96,7 @@ def start_process(command, isVerbose=False, logPrefix=''):
     try:
         directory = os.getcwd()
         println('\nCurrent working dir: ' + directory)
-        println('\nStarting \"%s\"' % command)
-        
+                
         if isVerbose:
             cmd = "ps aux |grep miville"
             status = commands.getstatusoutput(cmd)
@@ -111,7 +110,7 @@ def start_process(command, isVerbose=False, logPrefix=''):
                     print line
             print
             print
- 
+            println('\nStarting \"%s\"' % command)
             process = pexpect.spawn(command, logfile=ProcessOutputLogger(logPrefix))
         else:
             process = pexpect.spawn(command)
