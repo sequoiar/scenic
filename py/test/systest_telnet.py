@@ -31,6 +31,8 @@ import pexpect
 import os
 import time
 import sys
+import commands
+
 # ---------------------------------------------------------------------
 # config 
 server_port = "14444"
@@ -97,6 +99,19 @@ def start_process(command, isVerbose=False, logPrefix=''):
         println('\nStarting \"%s\"' % command)
         
         if isVerbose:
+            cmd = "ps aux |grep miville"
+            status = commands.getstatusoutput(cmd)
+            output = status[1]
+            print
+            print
+            print cmd
+            lines = output.split("\n")
+            for line in lines:
+                if line.find(cmd) == -1:
+                    print line
+            print
+            print
+ 
             process = pexpect.spawn(command, logfile=ProcessOutputLogger(logPrefix))
         else:
             process = pexpect.spawn(command)
@@ -106,7 +121,7 @@ def start_process(command, isVerbose=False, logPrefix=''):
         else:
             return process
     except pexpect.ExceptionPexpect, e:
-        println("Error starting client: heh" + str(e))
+        println("Error starting client: " + str(e))
         die()
 
 def is_running(process):
@@ -148,11 +163,12 @@ def kill_process(process):
     See kill -l for flags
     """
     try:
-        if (is_running(process) == True):
-            process.kill(15)
-            time.sleep(2)
+        if process != None:
             if (is_running(process) == True):
-                process.kill(9)
+                process.kill(15)
+                time.sleep(2)
+                if (is_running(process) == True):
+                    process.kill(9)
     except Exception, e:
         print "Error killing process", e
     
