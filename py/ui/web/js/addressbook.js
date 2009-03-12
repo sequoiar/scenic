@@ -101,15 +101,15 @@ Addressbook.methods(
 			if (counter % 2) {
 				li.addClass('color_zebra');
 			}
+			self.conn_icon.clone().inject(li, 'top');
+			li.inject(self.adb_list);
 			var conn_state = self.conn_icon.clone();
 			if (item[1] > 0 && item[1] < 3) {
-				conn_state.addClass('spinner');
+				conn_state.addClass('spinner_small');
 			} else if (item[1] == 3) {
 				conn_state.addClass('conn_connected');
 			}
 			conn_state.inject(li, 'top');
-			self.conn_icon.clone().inject(li, 'top');
-			li.inject(self.adb_list);
 			if (item[0] == self.selected) {
 				selected = li;
 			}
@@ -146,9 +146,15 @@ Addressbook.methods(
 		StickyWin.alert('Error', msg);
 	},
 
-	function status(self, msg) {
-		dbug.info(msg);
-//		self.adb_status.set('text', msg);
+	function status(self, msg, details) {
+		if (details == null) {
+			self.adb_status.set('text', msg);
+			self.adb_status.set('title', '');
+		} else {
+			self.adb_status.set('text', msg);
+			self.adb_status.set('title', details);
+			dbug.info(details);
+		}
 	},
 
 

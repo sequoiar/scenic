@@ -15,6 +15,10 @@ input.notify {
 	background-color: #c3ccd3;	
 }
 
+.color_text_fade {
+	color: #333333;	
+}
+
 .color_zebra {
 	background-color: #e9f2f9;	
 }

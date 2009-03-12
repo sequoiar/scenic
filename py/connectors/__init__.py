@@ -118,9 +118,9 @@ class Connection(object):
     def connection_failed(self, err=None):
         self.cleanup()
 #        if err:
-        print 'ERR:', dir(err)
         self.api.notify(self, {'address':self.contact.address, 
                                    'port':self.contact.port,
+                                   'name':self.contact.name,
                                    'exception':'%s' % err,
                                    'msg':'Connection failed',
                                    'context':'connection'})

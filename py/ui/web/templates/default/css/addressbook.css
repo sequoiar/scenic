@@ -70,6 +70,12 @@ div.button:hover {
 	background-color: transparent;
 }
 
+#adb_status {
+	height: 22px;
+	line-height: 22px;
+	font-size: 10px;
+}
+
 #adb_status_icon {
 	float: left;
 	height: 22px;

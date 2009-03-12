@@ -613,11 +613,16 @@ class ControllerApi(object):
             try:
                 connection = connectors.create_connection(contact, self)
                 connection.start()
-                
-                result = 'Trying to connect with %s (%s)...' % (contact.name, contact.address)
+                self.notify(caller, {'name':contact.name, 
+                                 'address':contact.address,
+                                 'msg':'Trying to connect',
+                                 'context':'connection'}) 
             except ConnectionError, err:
-                result = err.message # changed err for err.message XXX
-            self.notify(caller, result)
+                self.notify(caller, {'name':contact.name, 
+                                 'address':contact.address,
+                                 'exception':'%s' % err,
+                                 'msg':'Connection failed',
+                                 'context':'connection'}) 
         else:
             self.notify(caller, 'Cannot start connection. No valid contact selected.')
 

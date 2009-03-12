@@ -1519,7 +1519,10 @@ class CliView(Observer):
         self.controller.remote = None
 
     def _start_connection(self, origin, data):
-        self.write('%s' % data)
+        if origin is self and data.has_key('exception'):
+            self.write('%s with %s. Error: %s' % (data['msg'], data['name'], data['exception']))
+        else:
+            self.write('%s with %s...' % (data['msg'], data['name']))
 
     def _info(self, origin, data):
         self.write(data)

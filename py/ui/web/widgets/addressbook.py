@@ -72,15 +72,19 @@ class Addressbook(Widget):
     
     def cb_start_connection(self, origin, data):
         log.debug('SCOrigin: %s - Data: %s' % (origin, data))
-        if origin is self:
-            if isinstance(data, Exception):
-                self.callRemote('error', data.msg)
-            else:
-                self.callRemote('status', data)
+        if origin is self and data.has_key('exception'):
+            self.callRemote('status', '%s with %s. Error: %s' % (data['msg'], data['name'], data['exception']))
+        else:
+            self.callRemote('status', '%s with %s...' % (data['msg'], data['name']))
     
     def cb_connection_failed(self, origin, data):
         log.debug('CFOrigin: %s - Data: %s' % (origin, data))
-        self.callRemote('status', data)
+        if data['port']:
+            port = ':%s' % data['port']
+        else:
+            port = ''
+        self.callRemote('status', '%s with %s' % (data['msg'], data['name']),
+                        '%s with %s%s. Error: %s' % (data['msg'], data['address'], port, data['exception']))
     
     def cb_info(self, origin, data):
         log.debug('IOrigin: %s - Data: %s' % (origin, data))

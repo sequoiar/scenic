@@ -391,7 +391,7 @@ class Contact(object):
         write = False
         if name == 'state' and self.adb:
             state = getattr(self, 'state', None)
-            if state != value and state:
+            if state != value and state is not None:
                 write = True
                 log.debug('Write on state change: %s - %s - %s' % (self.state, value, self.name))
         object.__setattr__(self, name, value)

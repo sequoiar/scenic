@@ -6,7 +6,7 @@
 		<ul class="js_help" id="adb_list">
 			<li><div class="conn_icon"></div><div class="conn_icon"></div>Test</li>
 		</ul>
-		<div id="adb_status">
+		<div id="adb_status" class="color_text_fade">
 			<div id="adb_status_icon"></div>
 		</div>
 		<div>
