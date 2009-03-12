@@ -27,21 +27,6 @@ Usage: trial test/systest_settings.py
 import os
 import sys
 import test.systest_telnet
-import commands
-import time
-
-def is_miville_out_there():
-    cmd = "ps aux |grep miville"
-    status = commands.getstatusoutput(cmd)
-    output = status[1]
-    print
-    print
-    print cmd
-    lines = output.split("\n")
-    for line in lines:
-        print line
-    print
-    print
 
 
 
@@ -61,7 +46,6 @@ class Test_001_Settings(TestBase):
     
        
     def test_00_yes(self):
-        is_miville_out_there()
         self.expectTest('pof: ', 'The default prompt is not appearing.')
         
     def test_01_add_list_delete_modify_global_setting(self):
