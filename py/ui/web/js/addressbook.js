@@ -83,12 +83,16 @@ Addressbook.methods(
 						var name = this.get('name');
 						self.callRemote('rc_get_contact', name);
 						self.adb_edit.disabled = false;
-						self.joinState(this.get('state'));
-						self.adb_remove.removeClass('button_disabled');
+						var state = this.get('state');
+						self.joinState(state);
 						self.adb_remove.removeEvents('click');
-						self.adb_remove.addEvent('click', function(){
-							self.remove();
-						});
+						self.adb_remove.addClass('button_disabled');
+						if (state == 0) {
+							self.adb_remove.removeClass('button_disabled');
+							self.adb_remove.addEvent('click', function(){
+								self.remove();
+							});
+						}
 						self.selected = name;
 						self.cleanFields();
 						Cookie.write('adb_selected', name, {duration: 365});						

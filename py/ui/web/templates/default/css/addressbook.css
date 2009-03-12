@@ -65,7 +65,7 @@ div.button:hover {
 	background-color: #d2dce5;
 }
 
-.button_disabled:hover {
+div.button_disabled:hover {
 	cursor: default;
 	background-color: transparent;
 }

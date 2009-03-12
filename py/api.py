@@ -624,7 +624,8 @@ class ControllerApi(object):
                                  'msg':'Connection failed',
                                  'context':'connection'}) 
         else:
-            self.notify(caller, 'Cannot start connection. No valid contact selected.')
+            self.notify(caller, {'msg':'No contact selected',
+                                 'context':'connection'})
 
     def stop_connection(self, caller, contact=None):
         if contact == None:
