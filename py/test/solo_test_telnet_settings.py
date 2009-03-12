@@ -27,6 +27,9 @@ Usage: trial test/systest_settings.py
 import os
 import sys
 import test.systest_telnet
+import commands
+
+
 
 
 class TestBase(test.systest_telnet.TelnetBaseTest):
@@ -41,6 +44,19 @@ class Test_001_Settings(TestBase):
     """
     System Tests for presets
     """
+    
+    def test_000_is_anybody_there(self):
+        cmd = "ps aux |grep miville"
+        status = commands.getstatusoutput(cmd)
+        output = status[1]
+        print
+        print
+        print cmd
+        print str(output)
+        print
+        print
+        
+        
     def test_00_yes(self):
         self.expectTest('pof: ', 'The default prompt is not appearing.')
         
