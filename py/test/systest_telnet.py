@@ -47,6 +47,19 @@ VERBOSE_CLIENT = True
 #VERBOSE_SERVER = False
 VERBOSE_SERVER = True
 
+def bash_it(cmd):
+    status = commands.getstatusoutput(cmd)
+    output = status[1]
+    print
+    print
+    print cmd
+    lines = output.split("\n")
+    for line in lines:
+        if line.find(cmd) == -1:
+            print line
+    print
+    print
+
 # ---------------------------------------------------------------------
 # a class for output redirection
 class ProcessOutputLogger:
@@ -98,23 +111,12 @@ def start_process(command, isVerbose=False, logPrefix=''):
         println('\nCurrent working dir: ' + directory)
                 
         if isVerbose:
-            cmd = "ps aux |grep miville"
-            status = commands.getstatusoutput(cmd)
-            output = status[1]
-            print
-            print
-            print cmd
-            lines = output.split("\n")
-            for line in lines:
-                if line.find(cmd) == -1:
-                    print line
-            print
-            print
+            bash_it( "ps aux |grep miville")
             println('\nStarting \"%s\"' % command)
             process = pexpect.spawn(command, logfile=ProcessOutputLogger(logPrefix))
         else:
             process = pexpect.spawn(command)
-        time.sleep(waiting_delay) # seconds
+            time.sleep(waiting_delay) # seconds
         if (is_running(process) == False):
             die()
         else:
