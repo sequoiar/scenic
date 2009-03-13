@@ -64,7 +64,7 @@ std::string AudioSource::getCapsFilterCapsString()
     std::ostringstream capsStr;
     capsStr << "audio/x-raw-int, channels=" << config_.numChannels() 
         << ", clock-rate=" << Pipeline::SAMPLE_RATE;
-    std::cout << "Audiosource caps = " << capsStr.str();
+    LOG_DEBUG("Audiosource caps = " << capsStr.str());
     return capsStr.str();
 }
 
@@ -365,7 +365,7 @@ void AudioJackSource::sub_init()
     if (!Jack::is_running())
         THROW_ERROR("Jack is not running");
 
-#if 1
+#if 0
     // uncomment to turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
     // jackOut -> jackIn -> jackOut ->jackIn.....
     g_object_set(G_OBJECT(source_), "connect", 0, NULL);
