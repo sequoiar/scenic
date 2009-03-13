@@ -8,7 +8,7 @@ AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
 
-AM_INIT_AUTOMAKE()
+AM_INIT_AUTOMAKE([-Wno-portability])
 
 #AM_CONFIG_HEADER(config.h)
 # Check for C and C++ compilers
