@@ -549,9 +549,10 @@ class Config:
     audio_input = "jackaudiosrc"
     audio_output = "jackaudiosink"
     audio_codec = "raw"
+    audio_channels = 8
     video_input = "v4l2src"
     video_device = "/dev/video0"
-    videosink = "xvimagesink"
+    video_output = "xvimagesink"
     video_codec = "mpeg4"
     video_bitrate = "3000000"
     video_port = gstsendport
@@ -819,8 +820,8 @@ class Processes(Colleague):
         self.gstrecv_cmd = [self.config.gstrecv,
                                         '--receiver', 
                                         '--address', host,
-                                        '--videosink', self.config.videosink,
-                                        '--audiosink', self.config.audiosink,
+                                        '--videosink', self.config.video_output,
+                                        '--audiosink', self.config.audio_output,
                                         '--videocodec', self.config.video_codec,
                                         '--audiocodec', self.config.audio_codec,
                                         '--videoport', str(self.video_port),
