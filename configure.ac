@@ -30,8 +30,8 @@ AC_PROG_GCC_TRADITIONAL
 AC_CHECK_FUNCS([inet_ntoa memset socket])
 
 AC_MSG_CHECKING(whether to enable debugging)
-AC_ARG_ENABLE([sip], [ **************** 
-  --enable-sip build sip],,enable_sip=yes)
+#AC_ARG_ENABLE([sip], [ **************** 
+#  --enable-sip build sip],,enable_sip=yes)
 AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
         enable_debug=yes)
@@ -108,20 +108,20 @@ fi
 AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
 #AC_SUBST(ALL_GST_LIBS)
 
-if test "x${enable_sip}" = "xyes" ; then
+#if test "x${enable_sip}" = "xyes" ; then
 
 #Trying to set PJSIP using pkg-config
-PKG_CHECK_MODULES(UUID, uuid, have_uuid=true, have_uuid=false)
-if test "x${have_libuuid}" = "xfalse" ; then
-    AC_MSG_WARN([UUID not found. pkg libuuid1])
-fi
+#PKG_CHECK_MODULES(UUID, uuid, have_uuid=true, have_uuid=false)
+#if test "x${have_libuuid}" = "xfalse" ; then
+#    AC_MSG_WARN([UUID not found. pkg libuuid1])
+#fi
 
 #Trying to set PJSIP using pkg-config
-PKG_CHECK_MODULES(PJSIP, libpj, have_libpj=true, have_libpj=false)
-if test "x${have_libpj}" = "xfalse" ; then
-    AC_MSG_WARN([PJSIP not found. http://www.pjsip.org/download.htm])
-fi
-fi
+#PKG_CHECK_MODULES(PJSIP, libpj, have_libpj=true, have_libpj=false)
+#if test "x${have_libpj}" = "xfalse" ; then
+#    AC_MSG_WARN([PJSIP not found. http://www.pjsip.org/download.htm])
+#fi
+#fi
 
 #Trying to set LIBLO using pkg-config
 #PKG_CHECK_MODULES(LIBLO, liblo >= 0.25, have_liblo=true, have_liblo=false)
@@ -168,7 +168,7 @@ fi
 #
 #
 #
-AM_CONDITIONAL([SIP],test "x${enable_sip}" = "xyes" -a "x{have_libpj}" = "xtrue" )
+#AM_CONDITIONAL([SIP],test "x${enable_sip}" = "xyes" -a "x{have_libpj}" = "xtrue" )
 #AM_CONDITIONAL([IEEE1394],test "x{have_libavc1394}" = "xtrue" -a "x{have_libraw1394}" = "xtrue" )
 AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes" -a "x${have_cppunit}" = "xtrue" )
 
@@ -201,9 +201,8 @@ AC_CONFIG_FILES([Makefile
                  src/gst/control/Makefile
                  src/main/Makefile
                  src/python/Makefile
-                 src/sip/Makefile
                  ])
-#                 py/maugis/Makefile
+#                 src/sip/Makefile
 
 #if test  "x${enable_debug}" = "xyes"  -a  "x${have_cpptest}" = "xtrue"  ; then
 
@@ -230,9 +229,9 @@ if test  "x${enable_debug}" = "xyes" -a "x${have_cppunit}" = "xfalse"  ; then
 AC_MSG_NOTICE([Not building test directories -- no cppunit found])
 fi
 
-if test  "x${enable_sip}" = "xyes" -a "x${have_libpj}" = "xfalse"  ; then
-AC_MSG_NOTICE([Not building sip directory -- libpj missing])
-fi
+#if test  "x${enable_sip}" = "xyes" -a "x${have_libpj}" = "xfalse"  ; then
+#AC_MSG_NOTICE([Not building sip directory -- libpj missing])
+#fi
 
 if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
 AC_MSG_NOTICE([Not building 1394 support])
