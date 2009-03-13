@@ -31,6 +31,7 @@
 
 namespace videofactory
 {
+    // FIXME: this sucks!!!!!!!!!!!!!!!!! replace with OSC-style path
     static const int MSG_ID = 2;
 
     static VideoReceiver* 
@@ -93,7 +94,7 @@ namespace videofactory
     static shared_ptr<VideoReceiver> 
     buildVideoReceiver(const std::string &ip, 
                        const std::string &codec, 
-                       unsigned long port, 
+                       int port, 
                        int screen_num, 
                        const std::string &sink)
     {
@@ -105,7 +106,7 @@ namespace videofactory
     buildVideoSender(const VideoSourceConfig vConfig, 
                      const std::string &ip, 
                      const std::string &codec, 
-                     unsigned long port)
+                     int port)
     {
         assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<VideoSender>(buildVideoSender_(vConfig,ip,codec,port));

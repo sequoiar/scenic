@@ -32,6 +32,7 @@
 
 namespace audiofactory
 {
+    // FIXME: this sucks!!!!!!!!!!!!!!!!! replace with OSC-style path
     static const int MSG_ID = 1;
 
     static AudioSender* 
@@ -96,7 +97,7 @@ namespace audiofactory
     buildAudioSender(const AudioSourceConfig aConfig, 
                      const std::string &ip, 
                      const std::string &codec, 
-                     unsigned long port)
+                     int port)
     {
         assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<AudioSender>(buildAudioSender_(aConfig, ip, codec, port));
@@ -105,7 +106,7 @@ namespace audiofactory
     static shared_ptr<AudioReceiver> 
     buildAudioReceiver(const std::string &ip, 
                        const std::string &codec, 
-                       unsigned long port, 
+                       int port, 
                        const std::string &sink)
     {
         assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 

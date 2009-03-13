@@ -43,6 +43,7 @@ class StrIntFloat
         operator std::vector<double> () const;
         operator int ()const;
         operator double ()const;
+        operator bool ()const;
 
         bool operator==(const std::string& in);
         StrIntFloat& operator=(const std::string& in);
@@ -89,8 +90,8 @@ private:
 public:
     MapMsg():map_(),it_(){}
     MapMsg(std::string command):map_(),it_(){ cmd() = command;}
-    StrIntFloat& cmd() { return (*this)["command"]; }
-    StrIntFloat& operator[](const std::string& str);
+    StrIntFloat &cmd() { return (*this)["command"]; }
+    StrIntFloat &operator[](const std::string& str);
 private:
     Item begin();
     Item next();

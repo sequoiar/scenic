@@ -48,102 +48,93 @@ int telnetServer(int, int);
 // 2way audio and video
 short pof::run(int argc, char **argv)
 {
+    LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
     OptionArgs options;
-    char pid;
-    int send = false;
-    int recv = false;
-    int full = false;
-    int doDeinterlace = false;
-    int disableAudio = false;
-    int disableVideo = false;
-    char *ip = 0;
-    char *videoCodec = 0;
-    char *audioCodec = 0;
-    char *videoSource = 0;
-    char *audioSource = 0;
-    char *videoSink = 0;
-    char *audioSink = 0;
-    int audioPort = 0;
-    int videoPort = 0;
-    int videoBitrate = 3000000;
-    char *videoDevice = 0;
-
-    int screenNum = 0;
-    int numChannels = NUM_CHANNELS;
-    
-    int version = false;
 
     // add options here
-    options.add(new BoolArg(&recv,"receiver", 'r', "receiver"));
-    options.add(new BoolArg(&send,"sender", 's', "sender"));
-    options.add(new StringArg(&ip, "address", 'i', "address", "provide ip address"));
-    options.add(new StringArg(&videoCodec, "videocodec", 'v', "videocodec", "h264"));
-    options.add(new StringArg(&audioCodec, "audiocodec", 'a', "audiocodec", "vorbis raw mp3"));
-    options.add(new StringArg(&videoSink, "videosink", 'k', "videosink", "xvimagesink glimagesink"));
-    options.add(new StringArg(&audioSink, "audiosink", 'l', "audiosink", "jackaudiosink alsasink pulsesink"));
-    options.add(new IntArg(&audioPort, "audioport", 't', "audioport", "portnum"));
-    options.add(new IntArg(&videoPort, "videoport", 'p', "videoport", "portnum"));
-    options.add(new BoolArg(&full,"fullscreen", 'f', "default to fullscreen"));
-    options.add(new BoolArg(&disableAudio,"disableaudio", 'y', "disable audio"));
-    options.add(new BoolArg(&disableVideo,"disablevideo", 'z', "disable video"));
-    options.add(new BoolArg(&doDeinterlace,"deinterlace", 'o', "deinterlace video"));
-    options.add(new StringArg(&videoDevice, "videodevice", 'd', "device", "/dev/video0 /dev/video1"));
-    options.add(new IntArg(&screenNum, "screen", 'n', "screen", "xinerama screen num"));
-    options.add(new BoolArg(&version, "version", 'w', "version number"));
-    options.add(new IntArg(&numChannels, "numChannels", 'c', "numChannels", "2"));
-    options.add(new IntArg(&videoBitrate, "videobitrate", 'x', "videobitrate", "3000000"));
-    options.add(new StringArg(&audioSource, "audiosource", 'e', "audiosource", "jackaudiosrc alsasrc pulsesrc"));
-    options.add(new StringArg(&videoSource, "videosource", 'u', "videosource", "v4l2src v4lsrc dv1394src"));
+    options.addBool("receiver", 'r', "receiver");
+    options.addBool("sender", 's', "sender");
+    options.addString("address", 'i', "address", "provide ip address of remote host");
+    options.addString("videocodec", 'v', "videocodec", "h264");
+    options.addString("audiocodec", 'a', "audiocodec", "vorbis raw mp3");
+    options.addString("videosink", 'k', "videosink", "xvimagesink glimagesink");
+    options.addString("audiosink", 'l', "audiosink", "jackaudiosink alsasink pulsesink");
+    options.addInt("audioport", 't', "audioport", "portnum");
+    options.addInt("videoport", 'p', "videoport", "portnum");
+    options.addBool("fullscreen", 'f', "default to fullscreen");
+    options.addBool("disableaudio", 'y', "disable audio"); // FIXME: deduce from args
+    options.addBool("disablevideo", 'z', "disable video"); // FIXME: deduce from args
+    options.addBool("deinterlace", 'o', "deinterlace video");
+    options.addString("videodevice", 'd', "device", "/dev/video0 /dev/video1");
+    options.addInt("screen", 'n', "screen", "xinerama screen num");
+    options.addBool("version", 'w', "version number");
+    options.addInt("numchannels", 'c', "numchannels", "2");
+    options.addInt("videobitrate", 'x', "videobitrate", "3000000");
+    options.addString("audiosource", 'e', "audiosource", "jackaudiosrc alsasrc pulsesrc");
+    options.addString("videosource", 'u', "videosource", "v4l2src v4lsrc dv1394src");
 
     //telnetServer param
-    int serverport = 0;
-    options.add(new IntArg(&serverport, "serverport", 'y', "run as server", "port to listen on"));
+    options.addInt("serverport", 'y', "run as server", "port to listen on");
 
     options.parse(argc, argv);
 
-    if(version)
+    if(options["version"])
     {
         LOG_INFO("version " << PACKAGE_VERSION << '\b' << RELEASE_CANDIDATE);
         return 0;
     }
-    if (send)
-        pid = 's';
-    else if (recv)
-        pid = 'r';
-    else
-        THROW_ERROR("argument error: must be sender or receiver. see --help");
 
-    LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
+    if ((!options["sender"] && !options["receiver"]) || (options["sender"] && options["receiver"]))
+        THROW_ERROR("argument error: must be sender OR receiver. see --help"); 
 
-    if(serverport)
-        return telnetServer(pid == 's', serverport);
+    if(options["serverport"])
+        return telnetServer(options["sender"], options["serverport"]);
+
+    int disableVideo = options["disablevideo"];
+    int disableAudio = options["disableaudio"];
+
+    if (disableVideo)
+        LOG_DEBUG("Video disabled.");
+    if (disableAudio) 
+        LOG_DEBUG("Audio disabled.");
 
     if (disableVideo && disableAudio)
-        THROW_ERROR("argument error: can't disable video and audio. see --help");
-    if(ip == 0) 
-        THROW_ERROR("argument error: missing ip. see --help");
-    if(!disableVideo && videoCodec == 0)
-        THROW_ERROR("argument error: missing videoCodec. see --help");
-    if(!disableAudio && audioCodec == 0)
-        THROW_ERROR("argument error: missing audioCodec. see --help");
+        THROW_ERROR("argument error: must provide video and/or audio parameters. see --help");
 
-    if (pid == 'r') {
+    if(!options["address"]) 
+        THROW_ERROR("argument error: missing address. see --help");
+
+    if(!disableVideo && !options["videocodec"])
+        THROW_ERROR("argument error: missing videoCodec. see --help");
+    if(!disableVideo && !options["videoport"])
+        THROW_ERROR("argument error: missing videoport. see --help");
+
+    if(!disableAudio && !options["audiocodec"])
+        THROW_ERROR("argument error: missing audioCodec. see --help");
+    if(!disableAudio && !options["audioport"])
+        THROW_ERROR("argument error: missing audioport. see --help");
+
+    if (options["receiver"]) 
+    {
+        LOG_DEBUG("Running as receiver");
         shared_ptr<VideoReceiver> vRx;
         shared_ptr<AudioReceiver> aRx;
 
-        if (!disableVideo)
+        if (!disableVideo)       
         {
-            if(videoSink == 0)
-                THROW_ERROR("argument error: missing --videosink. see --help");
+            if(!options["videosink"])
+                THROW_ERROR("argument error: missing videosink. see --help");
 
-            vRx = videofactory::buildVideoReceiver(ip, videoCodec, videoPort, screenNum, videoSink);
+            vRx = videofactory::buildVideoReceiver(options["address"], options["videocodec"], 
+                    options["videoport"], options["screen"], options["videosink"]);
         }
         if (!disableAudio)
         {
-            if(audioSink == 0)
-                THROW_ERROR("argument error: missing --audiosink. see --help");
+            if(!options["audiosink"])
+                THROW_ERROR("argument error: missing audiosink. see --help");
 
-            aRx = audiofactory::buildAudioReceiver(ip, audioCodec, audioPort, audioSink);
+            aRx = audiofactory::buildAudioReceiver(options["address"], options["audiocodec"], 
+                    options["audioport"], options["audiosink"]);
         }
 
 #ifdef CONFIG_DEBUG_LOCAL
@@ -154,7 +145,7 @@ short pof::run(int argc, char **argv)
 
         if (!disableVideo)
         {
-            if(full)
+            if(options["fullscreen"])
                 vRx->makeFullscreen();
         }
 
@@ -163,36 +154,45 @@ short pof::run(int argc, char **argv)
 
         playback::stop();
     }
-    else {
+    else 
+    {
+        LOG_DEBUG("Running as sender");
         shared_ptr<VideoSender> vTx;
         shared_ptr<AudioSender> aTx;
 
         if (!disableVideo)
         {
-            VideoSourceConfig *vConfig; 
-
-            if (videoSource == 0)
+            if (!options["videosource"])
                 THROW_ERROR("argument error: missing --videosource. see --help");
 
-            if (videoDevice)
-                vConfig = new VideoSourceConfig(videoSource, videoBitrate, videoDevice, doDeinterlace);
-            else
-            {
-                const std::string VIDEO_LOCATION = "";
-                vConfig = new VideoSourceConfig(videoSource, videoBitrate, VIDEO_LOCATION, doDeinterlace);
-            }
+            std::string videoLocation = ""; 
 
-            vTx = videofactory::buildVideoSender(*vConfig, ip, videoCodec, videoPort);
-            delete vConfig;
+            if (options["videodevice"]) 
+                videoLocation = (std::string) options["videodevice"]; 
+
+            int videoBitrate = 3000000;
+            if (options["videobitrate"]) 
+                videoBitrate = options["videobitrate"];
+            LOG_DEBUG("VIDEOBITRATE IS " << videoBitrate);
+
+            VideoSourceConfig vConfig(options["videosource"], videoBitrate, 
+                    videoLocation, options["deinterlace"]);
+
+            vTx = videofactory::buildVideoSender(vConfig, options["address"], options["videocodec"], 
+                    options["videoport"]);
         }
 
         if (!disableAudio)
         {
-            if (audioSource == 0)
+            if (!options["audiosource"])
                 THROW_ERROR("argument error: missing --audiosource. see --help");
             const std::string AUDIO_LOCATION = "";
-            AudioSourceConfig aConfig(audioSource, AUDIO_LOCATION, numChannels);
-            aTx = audiofactory::buildAudioSender(aConfig, ip, audioCodec, audioPort);
+            int numChannels = 2;
+            if (options["numchannels"]) 
+                numChannels = options["numchannels"];
+
+            AudioSourceConfig aConfig(options["audiosource"], AUDIO_LOCATION, options["numchannels"]);
+            aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], options["audioport"]);
         }
 
 #ifdef CONFIG_DEBUG_LOCAL
@@ -202,9 +202,9 @@ short pof::run(int argc, char **argv)
         playback::start();
 
         if (!disableVideo)
-            assert(tcpSendBuffer(ip, ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
+            assert(tcpSendBuffer(options["address"], ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
         if (!disableAudio)
-            assert(tcpSendBuffer(ip, ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
+            assert(tcpSendBuffer(options["address"], ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
 
         BLOCK();
         assert(playback::isPlaying() || playback::quitted());
@@ -221,7 +221,7 @@ int main(int argc, char **argv)
     }
     catch (Except e)
     {
-        LOG_DEBUG(e.msg_);
+//        LOG_DEBUG(e.msg_);
         return 1;
     }
     return 0;

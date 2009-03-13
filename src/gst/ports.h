@@ -26,10 +26,10 @@
 #define _PORTS_H_
 
 namespace ports {
-        static const unsigned long A_PORT = 12345; // arbitrary port numbers
-        static const unsigned long V_PORT = 23456;
-        static const unsigned long AUDIO_CAPS_PORT = 34567; 
-        static const unsigned long VIDEO_CAPS_PORT = 45678; 
+        static const int A_PORT = 12345; // arbitrary port numbers
+        static const int V_PORT = 23456;
+        static const int AUDIO_CAPS_PORT = 34567; 
+        static const int VIDEO_CAPS_PORT = 45678; 
 }
 
 #endif // _PORTS_H_

@@ -44,7 +44,7 @@ bool MapMsg::post()
 }
 
 
-#define T_EXPAND(x) (x == 'f'?"double":x == 's'?"string":x == 'i'?"interger":x == 'F'?"vector<double>":"unknown")
+#define T_EXPAND(x) (x == 'f'?"double":x == 's'?"string":x == 'i'?"integer":x == 'F'?"vector<double>":"unknown")
 
 #define TYPE_CHECKMSG(gtype,xtype) \
     const char* t = #gtype; \
@@ -73,8 +73,22 @@ StrIntFloat::operator int ()const {
     TYPE_CHECKMSG(i_,integer);
 }
 
+StrIntFloat::operator bool ()const {
+    if(type_ == 'n')
+        return false;
+    if(type_ == 's')
+        return true;
+    if(type_ != 'i')
+        THROW_ERROR("non int type");
+
+    if(i_ == 0)
+        return false;
+
+    return true;  
+}
+
 StrIntFloat::operator double ()const {
-    TYPE_CHECKMSG(f_,float);
+    TYPE_CHECKMSG(f_,double);
 }
 
 bool StrIntFloat::operator==(const std::string& in) {
@@ -138,9 +152,10 @@ MapMsg::Item MapMsg::begin()
         return 0;
 }
 
-StrIntFloat& MapMsg::operator[](const std::string& str)
+StrIntFloat &MapMsg::operator[](const std::string& str)
 {    
-    StrIntFloat& sif = map_[str];
+    StrIntFloat &sif = map_[str];
     sif.key_ = str; 
     return sif;
 }
+
