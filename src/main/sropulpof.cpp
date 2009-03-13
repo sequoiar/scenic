@@ -191,7 +191,7 @@ short pof::run(int argc, char **argv)
             if (options["numchannels"]) 
                 numChannels = options["numchannels"];
 
-            AudioSourceConfig aConfig(options["audiosource"], AUDIO_LOCATION, options["numchannels"]);
+            AudioSourceConfig aConfig(options["audiosource"], AUDIO_LOCATION, numChannels);
             aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], options["audioport"]);
         }
 
