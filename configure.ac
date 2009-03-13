@@ -193,6 +193,7 @@ AC_CONFIG_FILES([Makefile
                  py/streams/data/Makefile
                  py/ui/Makefile
                  py/utils/Makefile
+                 src/include/Makefile
                  src/util/Makefile
                  src/gutil/Makefile
                  src/tcp/Makefile
@@ -210,10 +211,10 @@ AC_CONFIG_FILES([Makefile
 #                 src/gutil/test/Makefile
 #                 src/tcp/test/Makefile
 #                 src/sip/test/Makefile
+#                 src/gst/engine/test.old/Makefile
 
 AC_CONFIG_FILES([
                  src/gst/engine/test/Makefile
-                 src/gst/engine/test.old/Makefile
                  ])
 
 

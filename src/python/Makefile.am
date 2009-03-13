@@ -5,7 +5,11 @@ TESTS = test.py
 
 lib_LTLIBRARIES = milhouse.la
 
-milhouse_la_SOURCES = exports.cpp pyMsgThread.cpp
+milhouse_la_SOURCES = exports.cpp pyMsgThread.cpp \
+                      pyMsgThread.h pyCallback.h
+
+
+
 milhouse_la_LDFLAGS = -version-info 1:1:1 -module
 
 # add your libs i.e. ../hello/libhello.la  
