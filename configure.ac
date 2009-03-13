@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(PROPULSE_ART, 0.1.2 )
+AC_INIT(PROPULSEART, 0.1.2)
 AC_DEFINE(RELEASE_CANDIDATE,["-rc3"],[rc version num])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -181,6 +181,7 @@ fi
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  py/Makefile
+                 py/maugis/Makefile
                  py/connectors/Makefile
                  py/connectors/basic/Makefile
                  py/connectors/sip/Makefile
