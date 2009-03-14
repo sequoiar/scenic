@@ -140,13 +140,16 @@ AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
 
 AX_PYTHON
 AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
-AX_BOOST_BASE
+AX_BOOST_BASE([1.34])
 AX_BOOST_THREAD
 AX_BOOST_ASIO
-AX_ASIO
+
+if test "$ac_cv_boost_asio" != "yes" ; then
+    AX_ASIO
+fi
 
 AX_BOOST_PYTHON
-AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes")
+AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes"])
 
 #HAVE_BOOST_PYTHON
 #if test "$ac_cv_boost_python"  = "yes" ; then
@@ -245,3 +248,6 @@ if test "x${no_glu}" = "xyes" ; then
 AC_MSG_NOTICE([Not building OpenGL support])
 fi
 
+if test "${ac_cv_asio}" != "yes" -a "${ac_cv_boost_asio}" != "yes" ; then
+        AC_MSG_WARN([Missing both boost::asio and asio])
+fi

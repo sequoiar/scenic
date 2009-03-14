@@ -44,7 +44,7 @@ AC_DEFUN([AX_ASIO],
 		LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
 		export LDFLAGS
 
-        AC_CACHE_CHECK(whether the Boost::ASIO library is available,
+        AC_CACHE_CHECK(whether the ASIO library is available,
 					   ax_cv_asio,
         [AC_LANG_PUSH([C++])
 		 AC_COMPILE_IFELSE(AC_LANG_PROGRAM([[ @%:@include <asio.hpp>
