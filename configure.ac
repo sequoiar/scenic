@@ -143,6 +143,8 @@ AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
 AX_BOOST_BASE
 AX_BOOST_THREAD
 AX_BOOST_ASIO
+AX_ASIO
+
 AX_BOOST_PYTHON
 AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes")
 

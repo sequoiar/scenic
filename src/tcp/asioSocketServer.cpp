@@ -29,11 +29,21 @@ using boost::asio::placeholders::bytes_transferred;
 #endif
 
 #ifdef HAVE_ASIO
+#ifdef HAVE_BOOST_BASE
+#include <boost/bind.hpp>
 #include <asio.hpp>
 
 using asio::ip::tcp;
 using asio::ip::udp;
+using asio::io_service;
+using asio::error_code;
+using asio::async_write;
+using asio::buffer;
+using asio::placeholders::error;
+using asio::placeholders::bytes_transferred;
+
 #define AN_ASIO
+#endif
 #endif
 
 #ifdef AN_ASIO
