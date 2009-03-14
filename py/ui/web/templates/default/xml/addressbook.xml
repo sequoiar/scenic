@@ -4,10 +4,8 @@
 	<h3 n:render="i18n">Connections</h3>
 	<div class="section">
 		<ul class="js_help" id="adb_list">
-			<li><div class="conn_icon"></div><div class="conn_icon"></div>Test</li>
 		</ul>
 		<div id="adb_status" class="color_text_fade">
-			<div id="adb_status_icon"></div>
 		</div>
 		<div>
 			<div class="js_help button" id="adb_add"><athena:handler event="onclick" handler="add" /></div> 

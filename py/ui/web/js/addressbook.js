@@ -38,6 +38,7 @@ Addressbook.methods(
 		self.conn_icon = new Element('div', {
 			'class': 'conn_icon'
 		});
+		self.status_div = new Element('div');
 		
 		self.isEmpty = new InputValidator('required', {
 		    errorMsg: 'This field is required.',
@@ -64,59 +65,93 @@ Addressbook.methods(
 
     function updateList(self, contacts) {
 		// dbug.info(self.adb_list.getScroll().y);
-		self.adb_list.empty();
+//		self.adb_list.empty();
 		var counter = 0;
+		var previous = null;
 		var selected = null;
+		var server_list = contacts.map(function(item, index){
+			return item[0];
+		});
+		var client_list = self.adb_list.getChildren('li').get('name');
+		client_list.each(function(item){
+			if (item && !server_list.contains(item)) {
+				self.adb_list.getElement('li[name=' + item + ']').dispose();
+			}
+		});
 		contacts.each(function(item){
 			counter += 1;
 			dbug.info(item)
-			var li = new Element('li', {
-				'class': 'color_selectable',
-				'html': '',
-				'text': item[0],
-				'name': item[0],
-				'state': item[1],
-				'events': {
-					'click': function() {	// should be move in the client section
-				self.adb_list.getElements('li.color_selected').removeClass('color_selected')
-				this.addClass('color_selected');
-						var name = this.get('name');
-						self.callRemote('rc_get_contact', name);
-						self.adb_edit.disabled = false;
-						var state = this.get('state');
-						self.joinState(state);
-						self.adb_remove.removeEvents('click');
-						self.adb_remove.addClass('button_disabled');
-						if (state == 0) {
-							self.adb_remove.removeClass('button_disabled');
-							self.adb_remove.addEvent('click', function(){
-								self.remove();
-							});
+			if (client_list.contains(item[0])) {
+				var li = self.adb_list.getElement('li[name=' + item[0] + ']');
+				li.set('state', item[1]);
+			} else {
+				var li = new Element('li', {
+					'class': 'color_selectable',
+					'html': '',
+					'text': item[0],
+					'name': item[0],
+					'state': item[1],
+					'status': '',
+					'error': '',
+					'events': {
+						'click': function() {	// should be move in the client section
+					self.adb_list.getElements('li.color_selected').removeClass('color_selected')
+					this.addClass('color_selected');
+							var name = this.get('name');
+							self.callRemote('rc_get_contact', name);
+							self.adb_edit.disabled = false;
+							var state = this.get('state');
+							self.joinState(state);
+							self.adb_status.set('text', this.get('status'));
+							self.adb_status.set('title', this.get('error'));
+							self.adb_remove.removeEvents('click');
+							self.adb_remove.addClass('button_disabled');
+							if (state == 0) {
+								self.adb_remove.removeClass('button_disabled');
+								self.adb_remove.addEvent('click', function(){
+									self.remove();
+								});
+							}
+							self.selected = name;
+							self.cleanFields();
+							Cookie.write('adb_selected', name, {duration: 365});						
+						},
+						'dblclick': function() {
+							self.editSave();
 						}
-						self.selected = name;
-						self.cleanFields();
-						Cookie.write('adb_selected', name, {duration: 365});						
-					},
-					'dblclick': function() {
-						self.editSave();
 					}
+				});
+				self.conn_icon.clone().inject(li, 'top');
+				self.conn_icon.clone().inject(li, 'top');
+				if (previous) {
+					li.inject(previous, 'after');
+				} else if (counter == 1) {
+					li.inject(self.adb_list, 'top');
+				} else {
+					li.inject(self.adb_list);
 				}
-			});
+			}
+			previous = li;
+			
 			if (counter % 2) {
 				li.addClass('color_zebra');
+			} else {
+				li.removeClass('color_zebra');
 			}
-			self.conn_icon.clone().inject(li, 'top');
-			li.inject(self.adb_list);
-			var conn_state = self.conn_icon.clone();
+		
+			var conn_state = li.getChildren()[0];
+			conn_state.removeClass('spinner_small');
+			conn_state.removeClass('conn_connected');
 			if (item[1] > 0 && item[1] < 3) {
 				conn_state.addClass('spinner_small');
 			} else if (item[1] == 3) {
 				conn_state.addClass('conn_connected');
 			}
-			conn_state.inject(li, 'top');
+			
 			if (item[0] == self.selected) {
 				selected = li;
 			}
+
 		})
 
 		if (selected){
@@ -150,14 +185,22 @@ Addressbook.methods(
 		StickyWin.alert('Error', msg);
 	},
 
-	function status(self, msg, details) {
+	function status(self, contact, msg, details) {
+		var owner = self.adb_list.getElement('li[name=' + contact + ']')
+		owner.set('status', msg);
 		if (details == null) {
-			self.adb_status.set('text', msg);
-			self.adb_status.set('title', '');
+			owner.set('error', '');
 		} else {
-			self.adb_status.set('text', msg);
-			self.adb_status.set('title', details);
+			owner.set('error', details);
 			dbug.info(details);
+		}
+		if (contact == self.selected) {
+			self.adb_status.set('text', msg);
+			if (details == null) {
+				self.adb_status.set('title', '');
+			} else {
+				self.adb_status.set('title', details);
+			}
 		}
 	},
 

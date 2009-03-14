@@ -86,7 +86,7 @@ class Addressbook(Widget):
             port = ':%s' % data['port']
         else:
             port = ''
-        self.callRemote('status', '%s with %s' % (data['msg'], data['name']),
+        self.callRemote('status', data['name'], '%s with %s' % (data['msg'], data['name']),
                         '%s with %s%s. Error: %s' % (data['msg'], data['address'], port, data['exception']))
     
     def cb_info(self, origin, data):
