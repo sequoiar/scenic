@@ -11,10 +11,20 @@
 #include <cstdlib>
 #include <iostream>
 
-#include <boost/bind.hpp>
+#include "util.h"
 
 #ifdef HAVE_BOOST_ASIO
+#include <boost/bind.hpp>
 #include <boost/asio.hpp>
+using boost::asio::ip::tcp;
+using boost::asio::ip::udp;
+using boost::asio::io_service;
+using boost::system::error_code;
+using boost::asio::async_write;
+using boost::asio::buffer;
+using boost::asio::placeholders::error;
+using boost::asio::placeholders::bytes_transferred;
+
 #define AN_ASIO
 #endif
 
@@ -30,8 +40,8 @@ using asio::ip::udp;
 class tcp_session
 {
     public:
-        tcp_session(asio::io_service& io_service)
-            : socket_(io_service)
+        tcp_session(io_service& io_service)
+            : socket_(io_service), welcome_()
         {
         }
 
@@ -43,21 +53,21 @@ class tcp_session
         void start()
         {
             welcome_ = "welcome.\nREADY:\n"; 
-                asio::async_write(socket_,
-                        asio::buffer(welcome_),
+                async_write(socket_,
+                        buffer(welcome_),
                         boost::bind(&tcp_session::write_cb, this,
-                            asio::placeholders::error));
+                            error));
         }
 
-        void read_cb(const asio::error_code& error,
+        void read_cb(const error_code& error,
                 size_t bytes_transferred)
         {
             if (!error)
             {
-                asio::async_write(socket_,
-                        asio::buffer(data_, bytes_transferred),
+                async_write(socket_,
+                        buffer(data_, bytes_transferred),
                         boost::bind(&tcp_session::write_cb, this,
-                            asio::placeholders::error));
+                            error));
             }
             else
             {
@@ -65,14 +75,14 @@ class tcp_session
             }
         }
 
-        void write_cb(const asio::error_code& error)
+        void write_cb(const error_code& error)
         {
             if (!error)
             {
-                socket_.async_read_some(asio::buffer(data_, max_length),
+                socket_.async_read_some(buffer(data_, max_length),
                         boost::bind(&tcp_session::read_cb, this,
-                            asio::placeholders::error,
-                            asio::placeholders::bytes_transferred));
+                            error,
+                            bytes_transferred));
             }
             else
             {
@@ -90,18 +100,18 @@ class tcp_session
 class tcp_server
 {
     public:
-        tcp_server(asio::io_service& io_service, short port)
+        tcp_server(io_service& io_service, short port)
             : io_service_(io_service),
             acceptor_(io_service, tcp::endpoint(tcp::v4(), port))
         {
             tcp_session* new_tcp_session = new tcp_session(io_service_);
             acceptor_.async_accept(new_tcp_session->socket(),
                     boost::bind(&tcp_server::handle_accept, this, new_tcp_session,
-                        asio::placeholders::error));
+                        error));
         }
 
         void handle_accept(tcp_session* new_tcp_session,
-                const asio::error_code& error)
+                const error_code& error)
         {
             if (!error)
             {
@@ -109,7 +119,7 @@ class tcp_server
                 new_tcp_session = new tcp_session(io_service_);
                 acceptor_.async_accept(new_tcp_session->socket(),
                         boost::bind(&tcp_server::handle_accept, this, new_tcp_session,
-                            asio::placeholders::error));
+                            error));
             }
             else
             {
@@ -118,7 +128,7 @@ class tcp_server
         }
 
     private:
-        asio::io_service& io_service_;
+        io_service& io_service_;
         tcp::acceptor acceptor_;
 };
 
@@ -126,56 +136,56 @@ class tcp_server
 class udp_server
 {
     public:
-        udp_server(asio::io_service& io_service, short port)
+        udp_server(io_service& io_service, short port)
             : io_service_(io_service),
-            socket_(io_service, udp::endpoint(udp::v4(), port))
+            socket_(io_service, udp::endpoint(udp::v4(), port)), sender_endpoint_()
         {
             socket_.async_receive_from(
-                    asio::buffer(data_, max_length), sender_endpoint_,
+                    buffer(data_, max_length), sender_endpoint_,
                     boost::bind(&udp_server::handle_receive_from, this,
-                        asio::placeholders::error,
-                        asio::placeholders::bytes_transferred));
+                        error,
+                        bytes_transferred));
         }
 
-        void handle_receive_from(const asio::error_code& error,
+        void handle_receive_from(const error_code& error,
                 size_t bytes_recvd)
         {
             if (!error && bytes_recvd > 0)
             {
                 socket_.async_send_to(
-                        asio::buffer(data_, bytes_recvd), sender_endpoint_,
+                        buffer(data_, bytes_recvd), sender_endpoint_,
                         boost::bind(&udp_server::handle_send_to, this,
-                            asio::placeholders::error,
-                            asio::placeholders::bytes_transferred));
+                            error,
+                            bytes_transferred));
             }
             else
             {
                 socket_.async_receive_from(
-                        asio::buffer(data_, max_length), sender_endpoint_,
+                        buffer(data_, max_length), sender_endpoint_,
                         boost::bind(&udp_server::handle_receive_from, this,
-                            asio::placeholders::error,
-                            asio::placeholders::bytes_transferred));
+                            error,
+                            bytes_transferred));
             }
         }
 
-        void handle_send_to(const asio::error_code& error, size_t bytes_sent)
+        void handle_send_to(const error_code& error, size_t )//bytes_sent)
         {
             socket_.async_receive_from(
-                    asio::buffer(data_, max_length), sender_endpoint_,
+                    buffer(data_, max_length), sender_endpoint_,
                     boost::bind(&udp_server::handle_receive_from, this,
-                        asio::placeholders::error,
-                        asio::placeholders::bytes_transferred));
+                        error,
+                        bytes_transferred));
         }
 
     private:
-        asio::io_service& io_service_;
+        io_service& io_service_;
         udp::socket socket_;
         udp::endpoint sender_endpoint_;
         enum { max_length = 1024 };
         char data_[max_length];
 };
 #endif
-int main(int argc, char* argv[])
+int asio_main(int argc, char* argv[])
 {
     try
     {
@@ -186,7 +196,7 @@ int main(int argc, char* argv[])
         }
         std::cout << "got " << atoi(argv[1]);
 #ifdef AN_ASIO
-        asio::io_service io_service;
+        io_service io_service;
 
         using namespace std; // For atoi.
         tcp_server s(io_service, atoi(argv[1]));
