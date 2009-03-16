@@ -60,7 +60,7 @@ AudioSource::~AudioSource()
 
 std::string AudioSource::getCapsFilterCapsString()
 {
-    // otherwise alsasrc defaults to 2 channels when using plughw
+    // force proper number of channels on output
     std::ostringstream capsStr;
     capsStr << "audio/x-raw-int, channels=" << config_.numChannels() 
         << ", clock-rate=" << Pipeline::SAMPLE_RATE;
@@ -302,15 +302,18 @@ AudioAlsaSource::~AudioAlsaSource()
     Pipeline::Instance()->remove(&capsFilter_);
 }
 
-// FIXME : encapsulate capsfilter stuff into one class
-
 void AudioAlsaSource::sub_init()
 {
     AudioSource::sub_init();
 
     if (Jack::is_running())
         THROW_ERROR("Jack is running, ALSA unavailable");
-    g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
+
+    if (config_.location() != std::string(""))
+        g_object_set(G_OBJECT(source_), "device", config_.location(), NULL);
+    else
+        g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
+
     g_object_set(G_OBJECT(source_), "buffer-time", bufferTime_, NULL);
 
     setupCapsFilter(aconv_, capsFilter_);

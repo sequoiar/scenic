@@ -25,6 +25,8 @@
 #include <string>
 #include "gstLinkable.h"
 
+// forward declarations
+class AudioSinkConfig;
 class _GstElement;
 
 /** Abstract base class representing a sink for audio streams */
@@ -58,7 +60,7 @@ class AudioSink : public GstLinkableSink
 class AudioAlsaSink : public AudioSink
 {
     public:
-        AudioAlsaSink();
+        AudioAlsaSink(const AudioSinkConfig &config);
         
     private:
         ~AudioAlsaSink();
@@ -68,6 +70,9 @@ class AudioAlsaSink : public AudioSink
          * raw-audio conversion happens before audio is output to ALSA */
         _GstElement *sinkElement() { return audioconvert_; }
         _GstElement *audioconvert_;
+
+        const AudioSinkConfig &config_;
+
         /// No Copy Constructor
         AudioAlsaSink(const AudioAlsaSink&);     
         /// No Assignment Operator
@@ -78,12 +83,13 @@ class AudioAlsaSink : public AudioSink
 class AudioPulseSink : public AudioSink
 {
     public:
-        AudioPulseSink();
+        AudioPulseSink(const AudioSinkConfig &config);
         ~AudioPulseSink();
     private:
         void init();
         _GstElement *sinkElement() { return audioconvert_; }
         _GstElement *audioconvert_;
+        const AudioSinkConfig &config_;
         /// No Copy Constructor
         AudioPulseSink(const AudioPulseSink&);     
         /// No Assignment Operator

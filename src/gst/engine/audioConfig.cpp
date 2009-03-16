@@ -62,18 +62,19 @@ int AudioSourceConfig::numChannels() const
 AudioSource* AudioSourceConfig::createSource() const
 {
     const unsigned long long BUFFER_TIME = 35000LL; /* microseconds */
+    const unsigned long long ALSA_BUFFER_TIME = 40000LL; /* microseconds */
     if (source_ == "audiotestsrc")
         return new AudioTestSource(*this);
     else if (source_ == "filesrc")
         return new AudioFileSource(*this);
     else if (source_ == "alsasrc")
-        return new AudioAlsaSource(*this, BUFFER_TIME);
-    else if (source_ == "jackaudiosrc") /* with video, more buffer time */
+        return new AudioAlsaSource(*this, ALSA_BUFFER_TIME);
+    else if (source_ == "jackaudiosrc") 
         return new AudioJackSource(*this, BUFFER_TIME);
     else if (source_ == "dv1394src")
         return new AudioDvSource(*this);
     else if (source_ == "pulsesrc")
-        return new AudioPulseSource(*this, BUFFER_TIME);
+        return new AudioPulseSource(*this, ALSA_BUFFER_TIME);
     else 
         THROW_ERROR(source_ << " is an invalid source");
     return 0;
@@ -83,9 +84,6 @@ AudioSource* AudioSourceConfig::createSource() const
 /// Returns c-style string specifying the location (either filename or device descriptor) 
 const char* AudioSourceConfig::location() const
 {
-    if (location_.empty())
-        THROW_ERROR("No location specified");
-
     return location_.c_str();
 }
 
@@ -94,7 +92,10 @@ const char* AudioSourceConfig::location() const
 bool AudioSourceConfig::fileExists() const
 {
     if (location_.empty())
-        THROW_ERROR("No file location given");
+    {
+        LOG_DEBUG("No location specified");
+        return false;
+    }
 
     std::fstream in;
     in.open(location(), std::fstream::in);
@@ -107,12 +108,12 @@ bool AudioSourceConfig::fileExists() const
 }
 
 /// Constructor 
-AudioSinkConfig::AudioSinkConfig(const std::string & sink__) : 
-    sink_(sink__)
+AudioSinkConfig::AudioSinkConfig(const std::string & sink__, const std::string & location__) : 
+    sink_(sink__), location_(location__)
 {}
 
 /// Copy constructor 
-AudioSinkConfig::AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_) 
+AudioSinkConfig::AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_), location_(m.location_) 
 {}
 
 /// Factory method that creates an AudioSink based on this object's sink_ string 
@@ -121,19 +122,19 @@ AudioSink* AudioSinkConfig::createSink() const
     if (sink_ == "jackaudiosink")
         return new AudioJackSink();
     else if (sink_ == "alsasink")
-        return new AudioAlsaSink();
+        return new AudioAlsaSink(*this);
     else if (sink_ == "pulsesink")
-        return new AudioPulseSink();
-    else if (sink_.empty()) 
-    {
-        LOG_WARNING("No sink specified, using default jackaudiosink");
-        return new AudioJackSink();
-    }
+        return new AudioPulseSink(*this);
     else
     {
-        LOG_WARNING(sink_ << " is an invalid sink, using default jackaudiosink");
-        return new AudioJackSink();
+        THROW_ERROR(sink_ << " is an invalid sink, using default jackaudiosink");
+        return 0;
     }
 }
 
+/// Returns c-style string specifying the location (either filename or device descriptor) 
+const char* AudioSinkConfig::location() const
+{
+    return location_.c_str();
+}
 

@@ -24,6 +24,7 @@
 
 #include <gst/gst.h>
 #include "audioSink.h"
+#include "audioConfig.h"
 #include "jackUtils.h"
 #include "pipeline.h"
 #include "alsa.h"
@@ -46,8 +47,8 @@ std::string AudioSink::getCaps()
 }
 
 /// Constructor 
-AudioAlsaSink::AudioAlsaSink() : 
-    audioconvert_(0) 
+AudioAlsaSink::AudioAlsaSink(const AudioSinkConfig &config) : 
+    audioconvert_(0), config_(config)
 {}
 
 /// Destructor
@@ -65,14 +66,18 @@ void AudioAlsaSink::init()
 
     sink_ = Pipeline::Instance()->makeElement("alsasink", NULL);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-    g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
+    if (config_.location() != std::string(""))
+        g_object_set(G_OBJECT(sink_), "device", config_.location(), NULL);
+    else
+        g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
+
 
     gstlinkable::link(audioconvert_, sink_);
 }
 
 /// Constructor 
-AudioPulseSink::AudioPulseSink() : 
-    audioconvert_(0) 
+AudioPulseSink::AudioPulseSink(const AudioSinkConfig &config) : 
+    audioconvert_(0), config_(config) 
 {}
 
 /// Destructor 
@@ -87,6 +92,11 @@ void AudioPulseSink::init()
 
     sink_ = Pipeline::Instance()->makeElement("pulsesink", NULL);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    if (config_.location() != std::string(""))
+        g_object_set(G_OBJECT(sink_), "device", config_.location(), NULL);
+    else
+        g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
+
 
     gstlinkable::link(audioconvert_, sink_);
 }

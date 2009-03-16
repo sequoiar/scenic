@@ -142,7 +142,8 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
     try
     {
         const char *AUDIO_SINK = "jackaudiosink";
-        audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], AUDIO_SINK);
+        const char *AUDIO_LOCATION = "";
+        audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], AUDIO_SINK, AUDIO_LOCATION);
 //        queue_.push(MapMsg("audio_started"));
         return true;
     }

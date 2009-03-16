@@ -64,6 +64,7 @@ short pof::run(int argc, char **argv)
     options.addBool("fullscreen", 'f', "default to fullscreen");
     options.addBool("deinterlace", 'o', "deinterlace video");
     options.addString("videodevice", 'd', "device", "/dev/video0 /dev/video1");
+    options.addString("audiodevice", 'q', "audio device", "hw:0 hw:2 plughw:0 plughw:2 filename");
     options.addInt("screen", 'n', "screen", "xinerama screen num");
     options.addBool("version", 'w', "version number");
     options.addInt("numchannels", 'c', "numchannels", "2");
@@ -130,9 +131,16 @@ short pof::run(int argc, char **argv)
         {
             if(!options["audiosink"])
                 THROW_ERROR("argument error: missing audiosink. see --help");
+            
+            // FIXME: should we distinguish between device and location, since
+            // a src or sink is either dealing with a file or a device, but 
+            // never both?
+            std::string audioLocation = "";
+            if (options["audiodevice"])
+                audioLocation = (std::string) options["audiodevice"];
 
             aRx = audiofactory::buildAudioReceiver(options["address"], options["audiocodec"], 
-                    options["audioport"], options["audiosink"]);
+                    options["audioport"], options["audiosink"], audioLocation);
         }
 
 #ifdef CONFIG_DEBUG_LOCAL
@@ -163,10 +171,10 @@ short pof::run(int argc, char **argv)
             if (!options["videosource"])
                 THROW_ERROR("argument error: missing --videosource. see --help");
 
-            std::string videoLocation = ""; 
+            std::string videoDevice = ""; 
 
             if (options["videodevice"]) 
-                videoLocation = (std::string) options["videodevice"]; 
+                videoDevice = (std::string) options["videodevice"]; 
 
             int videoBitrate = 3000000;
             if (options["videobitrate"]) 
@@ -174,7 +182,7 @@ short pof::run(int argc, char **argv)
             LOG_DEBUG("VIDEOBITRATE IS " << videoBitrate);
 
             VideoSourceConfig vConfig(options["videosource"], videoBitrate, 
-                    videoLocation, options["deinterlace"]);
+                    videoDevice, options["deinterlace"]);
 
             vTx = videofactory::buildVideoSender(vConfig, options["address"], options["videocodec"], 
                     options["videoport"]);
@@ -184,12 +192,16 @@ short pof::run(int argc, char **argv)
         {
             if (!options["audiosource"])
                 THROW_ERROR("argument error: missing --audiosource. see --help");
-            const std::string AUDIO_LOCATION = "";
+
             int numChannels = 2;
             if (options["numchannels"]) 
                 numChannels = options["numchannels"];
 
-            AudioSourceConfig aConfig(options["audiosource"], AUDIO_LOCATION, numChannels);
+            std::string audioLocation = "";
+            if (options["audiodevice"])
+                audioLocation = (std::string) options["audiodevice"];
+
+            AudioSourceConfig aConfig(options["audiosource"], audioLocation, numChannels);
             aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], options["audioport"]);
         }
 
