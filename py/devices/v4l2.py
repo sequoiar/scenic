@@ -77,7 +77,8 @@ def _parse_v4l2_ctl_all(lines):
                 elif key == 'Pixel Format' and not pixel_format_is_done:
                     results['pixel format'] = value
                     pixel_format_is_done= True
-                elif key == 'Width/Height':
+                elif key == 'Width/Height' and category.startswith('Format Video Capture'):
+                    log.debug("parsing width/height in category %s/%s" % (category, sub_category))
                     dimen = value.split('/')
                     results['width'] = dimen[0]
                     results['height'] = dimen[1]

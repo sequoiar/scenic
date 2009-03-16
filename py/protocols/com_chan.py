@@ -163,7 +163,7 @@ class ComChanClient(pb.Referenceable, ComChannel):
         return deferred
 
     def disconnect(self):
-        print "COMCHAN_DISCONNECTED in ComChanClient"
+        #print "COMCHAN_DISCONNECTED in ComChanClient"
         self.owner.cleanup(True) # arg = called by com_chan
         self.factory.disconnect()
 

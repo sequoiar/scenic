@@ -594,7 +594,7 @@ class ControllerApi(object):
             contact = self.adb.contacts[self.adb.selected]
             id = contact.setting
             
-            global_setting = self.settings.global_settings[id]
+            global_setting = self.settings.global_settings[id] # might cause KeyError
             
             address = contact.address
             log.info("start_streams: ")
