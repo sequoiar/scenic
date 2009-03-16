@@ -62,8 +62,6 @@ short pof::run(int argc, char **argv)
     options.addInt("audioport", 't', "audioport", "portnum");
     options.addInt("videoport", 'p', "videoport", "portnum");
     options.addBool("fullscreen", 'f', "default to fullscreen");
-    options.addBool("disableaudio", 'y', "disable audio"); // FIXME: deduce from args
-    options.addBool("disablevideo", 'z', "disable video"); // FIXME: deduce from args
     options.addBool("deinterlace", 'o', "deinterlace video");
     options.addString("videodevice", 'd', "device", "/dev/video0 /dev/video1");
     options.addInt("screen", 'n', "screen", "xinerama screen num");
@@ -90,8 +88,8 @@ short pof::run(int argc, char **argv)
     if(options["serverport"])
         return telnetServer(options["sender"], options["serverport"]);
 
-    int disableVideo = options["disablevideo"];
-    int disableAudio = options["disableaudio"];
+    int disableVideo = !options["videocodec"] && !options["videoport"];
+    int disableAudio = !options["audiocodec"] && !options["audioport"];
 
     if (disableVideo)
         LOG_DEBUG("Video disabled.");
