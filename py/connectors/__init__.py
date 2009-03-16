@@ -192,8 +192,15 @@ class Connection(object):
         raise NotImplementedError, 'com_chan_started_server() method not implemented for this connector: %s.' % self.contact.connector
 
     def cleanup(self, called_by_com_chan=False):
-        for callback in disconnect_callbacks.values():
-            callback(self)  
+        """
+        Called when closing a connection with a contact.
+
+        :param called_by_com_chan: boolean to prevent from infinite loops.
+        """
+        # TODO: just added the next line
+        if called_by_com_chan:
+            for callback in disconnect_callbacks.values():
+                callback(self)  
         if hasattr(self.com_chan, 'disconnect') and not called_by_com_chan:
             self.com_chan.disconnect()
         if self.contact.state == DISCONNECTING:
@@ -206,6 +213,7 @@ class Connection(object):
         try:
             self.com_chan.connection = None
         except:
+            # TODO: remove this print
             print "errrreur deleting com_chan"
         try:
             del connections[self.address]

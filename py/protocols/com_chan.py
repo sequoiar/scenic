@@ -106,13 +106,13 @@ class ComChannel(object):
                 # broker has been disconnected).
                 # TODO notify observers with an error.
                 # TODO : disconnect com_chan
-                log.error("DeadReferenceError in com_chan.callRemote() ! Will close the connection.")
+                log.debug("DeadReferenceError in com_chan.callRemote() ! Will close the connection.")
                 try:
                     self.owner.stop() # STOPS THE CONNECTION !!! 
                     # TODO: self.owner.cleanup()
                 except:
                     log.error("Error calling Connection.stop()" + e.message)
-                log.error("Error in ComChannel.callRemote: " + e.message)
+                # log.debug("Connection lost in ComChannel.callRemote: " + e.message)
         else:
             log.debug('No remote')
             

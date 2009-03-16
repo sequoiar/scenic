@@ -607,12 +607,31 @@ class ControllerApi(object):
 
     ### Connect ###
     def start_connection(self, caller, contact=None):
+        """
+        Connects to a contact. 
+
+        This step is mandatory prior to :
+         * communicate using a com_chan
+         * do network tests
+         * start a stream
+        
+        The following steps are then done : 
+         * create a connector
+         * create a connection if connector was succesful
+         * create a com_chan
+         * register com_chan callbacks 
+        """
         if contact == None:
             contact = self.adb.get_current()
         if contact and contact.name in self.adb.contacts:
             try:
                 connection = connectors.create_connection(contact, self)
                 connection.start()
+                # key is 'start_connection'
+                # now, we use a dict, not a string in order to give
+                # good visual feedback for the web UI.
+                # 'context' key could be removed, since we know the 
+                # 'key' arg is 'start_connection'
                 self.notify(caller, {'name':contact.name, 
                                  'address':contact.address,
                                  'msg':'Trying to connect',
@@ -622,7 +641,7 @@ class ControllerApi(object):
                                  'address':contact.address,
                                  'exception':'%s' % err,
                                  'msg':'Connection failed',
-                                 'context':'connection'}) 
+                                 'context':'connection'})
         else:
             self.notify(caller, {'msg':'No contact selected',
                                  'context':'connection'})

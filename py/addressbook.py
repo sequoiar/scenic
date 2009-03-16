@@ -40,7 +40,7 @@ from utils import log
 from utils import common
 from utils.i18n import to_utf
 from errors import AddressBookError, AddressBookNameError
-from connectors.states import DISCONNECTED
+from connectors.states import DISCONNECTED, CONNECTED 
 
 log = log.start('debug', 1, 0, 'adb')
 

@@ -1519,6 +1519,17 @@ class CliView(Observer):
         self.controller.remote = None
 
     def _start_connection(self, origin, data):
+        """
+        Called as an answer to api.start_connection
+        
+        Data is a dict. 
+        Possible keys in this dict are : 
+         * name : contact name
+         * address : ip
+         * msg : string
+         * context : string (could be removed)
+         * exception : Exception instance
+        """
         if origin is self:
             if data.has_key('exception'):
                 self.write('%s with %s. Error: %s' % (data['msg'], data['name'], data['exception']))
@@ -1531,7 +1542,7 @@ class CliView(Observer):
         self.write(data)
     
     def _connection_failed(self, origin, data):
-        self.write('%s. %s:%s %s' % (data['msg'], data['address'], data['port'], data['exception']))
+        self.write('%s. %s:%s %s Are you both connected to the internet ?' % (data['msg'], data['address'], data['port'], data['exception']))
     
     def _error(self, origin, data):
         """
