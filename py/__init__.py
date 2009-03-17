@@ -30,6 +30,7 @@ At installation time, the "py" directory is renamed to
 
 import miville
 
+
 # for when calling 'from <package> import *'
 __all__ = ['miville']
 
