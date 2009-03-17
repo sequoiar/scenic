@@ -130,7 +130,7 @@ class H264Encoder : public VideoEncoder
         void setBitrate(unsigned);
 
     private:
-        static const int NUM_THREADS = 3;
+        static const int NUM_THREADS = 2;
         ~H264Encoder();
 
         void init();
