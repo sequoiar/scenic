@@ -809,7 +809,7 @@ def start(subject):
     except CommandNotFoundError, e:
         if subject is not None:
             subject.notify(subject, e.message, "error") # notifies the user. But therer are no users at startup
-        print e.message
+        log.error(e.message)
     # tester = NetworkTester()
     _api = subject
     

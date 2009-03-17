@@ -41,8 +41,11 @@ from twisted.python import failure
 from utils import log as logger
 from utils.commands import *
 import devices
+import errors
 #from devices import *
 log = logger.start('debug', 1, 0, 'devices_v4l2')
+
+_did_print_command_not_found = False
 
 # ---------------------------------------------------------
 def _parse_v4l2_ctl_all(lines):
@@ -159,6 +162,7 @@ class Video4LinuxDriver(devices.VideoDriver):
         
         Must return a Deferred instance.
         """
+        global _did_print_command_not_found
         # TODO: we must populate an other dict 
         # so that we can still access the data while populating.
         # since it is asynchronous
@@ -187,7 +191,16 @@ class Video4LinuxDriver(devices.VideoDriver):
             #cmd = ['v4l2-ctl','--get-input']
             #cmd = ['v4l2-ctl','--list-ctrls'] (brightness and contrast)
         #print "commands_start(%s, %s, %s)" % (str(commands), str(self.on_commands_results), extra_arg)
-        return commands_start(commands, self.on_commands_results, extra_arg, caller) # returns a Deferred
+        try:
+            ret = commands_start(commands, self.on_commands_results, extra_arg, caller) # returns a Deferred
+        except errors.CommandNotFoundError, e:
+            # we will never be able to know if there are v4l2 devices.
+            if not _did_print_command_not_found:
+                _did_print_command_not_found = True
+                # actually, let's not print it
+                # log.error("Command not found in v4l2 driver: " + e.message)
+        else:
+            return ret
         # TODO: adds an other arg to commands_start for the caller object
     
     def on_attribute_change(self, attr, caller=None, event_key=None):
