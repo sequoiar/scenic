@@ -61,20 +61,20 @@ int AudioSourceConfig::numChannels() const
 /// Factory method that creates an AudioSource based on this object's source_ string 
 AudioSource* AudioSourceConfig::createSource() const
 {
-    const unsigned long long BUFFER_TIME = 35000LL; /* microseconds */
-    const unsigned long long ALSA_BUFFER_TIME = 40000LL; /* microseconds */
+    //const unsigned long long BUFFER_TIME = 35000LL; /* microseconds */
+    const unsigned long long BUFFER_TIME = 40000LL; /* microseconds */
     if (source_ == "audiotestsrc")
         return new AudioTestSource(*this);
     else if (source_ == "filesrc")
         return new AudioFileSource(*this);
     else if (source_ == "alsasrc")
-        return new AudioAlsaSource(*this, ALSA_BUFFER_TIME);
+        return new AudioAlsaSource(*this, BUFFER_TIME);
     else if (source_ == "jackaudiosrc") 
         return new AudioJackSource(*this, BUFFER_TIME);
     else if (source_ == "dv1394src")
         return new AudioDvSource(*this);
     else if (source_ == "pulsesrc")
-        return new AudioPulseSource(*this, ALSA_BUFFER_TIME);
+        return new AudioPulseSource(*this, BUFFER_TIME);
     else 
         THROW_ERROR(source_ << " is an invalid source");
     return 0;
