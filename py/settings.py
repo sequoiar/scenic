@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+# 
 # Sropulpof
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -17,8 +17,37 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+# along with Sropulpof.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Audio/video/data settings handling for miville. (configuration)
+
+State Saving
+============
+Settings are saved in the ~/.scropulpof/settings.sets file.
+there is a dict. all settings with id under 10000 are presets. Those with ID over
+10000 are user settings. (changed by the user)
+
+Streaming initialization 
+========================
+In get_init_params, we turn the media settings into the arguments for the 
+sropulpof process. 
+
+Types of Settings
+=================
+ * A Media Setting is related to a audio or video stream
+ * A global setting is linked to a contact in the addressbook. 
+ * A devices setting has to deal with the harware configuration in the devices packages.
+ * A preset is how we call a default factory setting. 
+
+Design Notes
+============
+ * Stream subgroup instances contain media streams. (audio and video)
+
+Usage
+=====
+In the telnet UI, type "s --load" to load settings
+"""
 import os
 import re # used when reading settings file
 from streams.stream import Streams
@@ -35,22 +64,20 @@ import streams
 
 log = log.start('debug', 1, 0, 'settings')
 
-# magic numbers
+# All settings with id under 10000 are presets. Those with ID over
+# 10000 are user settings. (changed by the user)
 first_global_id = 10000
 first_media_setting = 10000
 
 # The currently supported file version
-current_major_version_number = 1
+current_major_version_number = 1 # TODO: replace with __version__ 
 
+# Global (module scope) variables for the SettingsChannel instances.
 global_settings = {}
 media_settings = {}
-
-
-COM_CHAN_KEY = "settings"
-
+COM_CHAN_KEY = "settings" # key for com_chan messages.
 _api = None
 _settings_channels_dict = {}
-
 
 class SettingsChannel(object):
     """
@@ -67,7 +94,6 @@ class SettingsChannel(object):
         self.caller = None
         self.remote_addr = None    
         
-        
     def on_remote_message(self, key, args):
         """
         Called by the com_chan whenever a message is received from the remote contact 
@@ -77,7 +103,6 @@ class SettingsChannel(object):
         :param *args: list of arguments
         
         The key and *args can be one of the following...
-        
         """
         log.debug('SettingsChannel.on_remote_message')
         if key == "ping": # from A
@@ -93,7 +118,6 @@ class SettingsChannel(object):
             key = "info"
             caller = None
             self.api.notify(caller, val, key)
-            self.api.notify(caller, val, key)
     
     def _send_message(self, key, args_list=[]):
         """
@@ -107,13 +131,14 @@ class SettingsChannel(object):
             self.com_chan.callRemote(COM_CHAN_KEY, key, args_list)
         except AttributeError, e:
             log.error("Could not send message to remote: " + e.message)
-        
   
 def on_com_chan_connected(connection_handle, role="client"):
     """
+    Called when a new connection with a contact is made.
+    
     Called from the Connector class in its com_chan_started_client or com_chan_started_server method.
 
-    registers the com_chan callback for network_test
+    registers the com_chan callback for settings transferts.
     
     :param connection_handle: connectors.Connection object.
     :param role: string "client" or "server"
@@ -122,6 +147,7 @@ def on_com_chan_connected(connection_handle, role="client"):
     global _api
     global _settings_channels_dict
     global COM_CHAN_KEY
+
     log.debug("on_com_chan_connected")
     settings_chan = SettingsChannel()
     contact = connection_handle.contact
@@ -134,15 +160,18 @@ def on_com_chan_connected(connection_handle, role="client"):
     _settings_channels_dict[settings_chan.contact.name] = settings_chan
     log.debug("settings_chans: " + str(_settings_channels_dict))
     reactor.callLater(10, settings_chan._send_message, "ping" )
-    
 
 def init_connection_listeners(api):
+    """
+    Registers the callbacks to the com_chan. 
+
+    This function must be called from the API.
+    """
     global _api
     _api = api
     log.debug("init_connection_listeners")
     connectors.register_callback("settings_on_connect", on_com_chan_connected, event="connect")
     connectors.register_callback("settings_on_disconnect", on_com_chan_disconnected, event="disconnect")
-  
 
 def on_com_chan_disconnected(connection_handle):
     """
@@ -154,24 +183,25 @@ def on_com_chan_disconnected(connection_handle):
         log.debug("settings_chans: " + str(_settings_channels_dict))
     except KeyError, e:
         log.error("error in on_com_chan_disconnected : KeyError " + e.message)        
-
   
 class Settings(object):
     """
-    Settings: all the gear related settings: reads the presets from file, 
-    merges them with user settings.
-    Settings instances contain global settings and media settings
+    Settings handling utilities. 
     
+    Contains method/function to : 
+     * read the presets from file
+     * merge them with user settings
+     * etc.
+
+    Settings instances contain global settings and media settings.
     quote: 'Use defaults, Luke!', 0B1knob ... a long time ago
     """
     def __init__(self):
-        
         self.global_settings = global_settings
         self.selected_global_setting = None
         #self.current_global_id = 0  [i for i in l if i<20]
         self.media_settings = media_settings
         self.selected_media_setting = None
-        
     
     @staticmethod
     def get_media_setting_from_id(id):
@@ -183,7 +213,7 @@ class Settings(object):
     def _load_nice_object_from_file(filename, major_version):
         """
         this 'private' method loads an object from a text file, using the 
-        nice representation (line breaks and tabs)
+        nice representation (dict with line breaks and tabs)
         """
         object = {}
         try:
@@ -217,7 +247,7 @@ class Settings(object):
     @staticmethod    
     def _save_object_to_file_nicely(object, filename, major_version):
         """
-        this 'private' method saves an object to a text file, using the 
+        This 'private' method saves an object to a text file, using the 
         nice representation (jelly text with line breaks and tabs)
         """
         try:
@@ -248,15 +278,19 @@ class Settings(object):
                 pickle.dump(object, file, 1)
                 file.close()    
 
-
     def load(self):
+        """
+        Loads presets from the settings state saving file.
+        
+        Default location of this file is ~/.sropulpof/presets.sets
+        If not present, it loads presets.sets
+        """
         presets_file_name       = install_dir("presets.sets")
         user_settings_file_name = install_dir("settings.sets")
         
         # settings are saved as tuple()
         presets = {}
         user_settings = {}
-        
         
         # we should expect presets settings to exist, but however
         # we will ramp it up slowly
@@ -304,10 +338,13 @@ class Settings(object):
                     log.error("Media user setting %d: '%s' clashes with preset" % (k,med.name))
                  
     def save(self):
+        """
+        Saves the current settings to a file. 
+        """
         user_media_settings = {} 
         user_global_settings =  {}
         
-        first_user_setting_id = 10000
+        first_user_setting_id = 10000 #TODO: this is defined in a constant, no ?
         
         for k in self.global_settings.keys():
             glob = self.global_settings[k]
@@ -341,7 +378,7 @@ class Settings(object):
     def list_global_setting(self):
          return (self.global_settings, self.selected_global_setting)
        
-    def add_global_setting(self,name):
+    def add_global_setting(self, name):
         if not name:
             raise SettingsError, 'Global setting must have a unique name'
         if self._get_global_setting_id_from_name_no_fail(name) >= 0:
@@ -358,7 +395,7 @@ class Settings(object):
             pass 
         return True
     
-    def erase_global_setting(self,name):
+    def erase_global_setting(self, name):
         id = self._get_global_setting_id_from_name(name)
         if self.selected_global_setting == name:
             self.selected_global_setting = None
@@ -369,11 +406,11 @@ class Settings(object):
         raise SettingsError, 'settings.py l 92 MODIFY : ' + global_setting_name + " " + attribute + " = " + new_value  
         return True
        
-    def duplicate_global_setting(self,name):
+    def duplicate_global_setting(self, name):
         raise SettingsError, 'This command is not implemented yet' 
         return True
 
-    def _get_media_setting_id_from_name(self,name):
+    def _get_media_setting_id_from_name(self, name):
         for id in self.media_settings.keys():
             setting_name = self.media_settings[id].name
             if  setting_name == name:
@@ -387,31 +424,31 @@ class Settings(object):
                 return id
         return -1
     
-    def _get_global_setting_id_from_name(self,name):
+    def _get_global_setting_id_from_name(self, name):
         id = self._get_global_setting_id_from_name_no_fail(name)
         if id == -1:
             raise SettingsError, 'Global setting "%s" does not exist' % name
         return id
 
-    def select_global_setting(self,name):
+    def select_global_setting(self, name):
         id = self._get_global_setting_id_from_name(name)
         self.selected_global_setting = name
         return True
             
-    def select_global_setting(self,name):
+    def select_global_setting(self, name):
         id = self._get_global_setting_id_from_name(name)
         self.selected_global_setting = name
         return True
        
        
-    def description_global_setting(self,name):
+    def description_global_setting(self, name):
         raise SettingsError, 'This command is not implemented yet' 
         return True
 
     def list_media_setting(self):
          return (self.media_settings, self.selected_media_setting)
        
-    def add_media_setting(self,name):
+    def add_media_setting(self, name):
         if not name:
             raise SettingsError, 'Media setting must have a name'
         for media in self.media_settings.values():
@@ -430,7 +467,7 @@ class Settings(object):
         self.media_settings[new_setting.id] = new_setting
         return new_setting. id
     
-    def erase_media_setting(self,name):
+    def erase_media_setting(self, name):
         id = self._get_media_setting_id_from_name(name)
         if id == None:
             raise SettingsError, 'Media setting "%s" does not exist' % name
@@ -438,7 +475,7 @@ class Settings(object):
             self.selected_media_setting = None
         del self.media_settings[id]
 
-    def select_media_setting(self,name):
+    def select_media_setting(self, name):
         id = self._get_media_setting_id_from_name(name)
         self.selected_media_setting = name
         return True
@@ -458,16 +495,25 @@ class GlobalSetting(object):
         log.info("GlobalSetting__init__ " + name)
     
     def start_streaming(self, listener, address):
+        """
+        Start the audio/video/data streaming between two miville programs. 
+
+        this is where the arguments to the sropulpof processes are exchanged. 
+        A stream can be of audio or video type. 
+        """
         for id, group in self.stream_subgroups.iteritems():
             if group.enabled:
                 group.start_streaming(listener, address)
     
     def stop_streaming(self):
+        """
+        Stops the audio/video/data streams.
+        """
         for id, group in self.stream_subgroups.iteritems():
             if group.enabled:
                 group.stop_streaming()
         
-    def _get_stream_subgroup_id_from_name(self,name):
+    def _get_stream_subgroup_id_from_name(self, name):
         for id in self.stream_subgroups.keys():
             setting_name = self.stream_subgroups[id].name
             if  setting_name == name:
@@ -485,7 +531,7 @@ class GlobalSetting(object):
     def list_stream_subgroup(self):
          return (self.stream_subgroups, self.selected_stream_subgroup)
        
-    def add_stream_subgroup(self,name):
+    def add_stream_subgroup(self, name):
         if not name:
             raise SettingsError, 'Stream subgroup must have a unique name'
         if self.stream_subgroups.has_key(name):
@@ -501,13 +547,13 @@ class GlobalSetting(object):
             pass
         return True
     
-    def erase_stream_subgroup(self,name):
+    def erase_stream_subgroup(self, name):
         id = self._get_stream_subgroup_id_from_name(name)
         if self.selected_stream_subgroup == name:
             self.selected_stream_subgroup = None
         del self.stream_subgroups[id]
     
-    def select_stream_subgroup(self,name):
+    def select_stream_subgroup(self, name):
         id = self._get_stream_subgroup_id_from_name(name)
         self.selected_media_setting = name
         return True
@@ -541,14 +587,14 @@ class StreamSubgroup(object):
         for stream in self.media_streams:
             stream.stop_streaming()
     
-    def _find_media_stream(self,name):
+    def _find_media_stream(self, name):
         for m in self.media_streams:
             setting_name = m.name
             if  setting_name == name:
                 return m
         return None 
         
-    def get_media_stream(self,name):
+    def get_media_stream(self, name):
         r = self._find_media_stream(name)
         if r == None:
             raise SettingsError, 'Media stream "%s" does not exist' % name
@@ -566,13 +612,13 @@ class StreamSubgroup(object):
         self.media_streams.append(new_guy)
         return new_guy
     
-    def erase_media_stream(self,name):
+    def erase_media_stream(self, name):
         media_stream = self.get_media_stream(name)
         if self.selected_media_stream == name:
             self.selected_media_stream = None
         self.media_streams.remove(media_stream)
     
-    def select_media_stream(self,name):
+    def select_media_stream(self, name):
         id = self.get_media_stream(name)
         self.selected_media_setting = name
 
@@ -580,6 +626,8 @@ class MediaSetting(object):
     """
     General settings information. They are loaded from a preset file and
     user generated files.
+
+    A media setting is for audio/video streams. 
     """
     
     def __init__(self, name, id):
@@ -593,13 +641,22 @@ class MediaStream(object):
     """
     Each media stream instance references a media setting. The MediaStream class
     is a a base class for each stream type: AudioStream, DataStream, VideoStream...
+
+    Synchronization
+    ===============
+
+    A sync_group is an attribute of the media stream. Its default value is 'master'. 
+    This is for when we want the audio and video not to be in sync. 
+    Not being in sync can be achieve by starting on each 
+    side two sender processes, and two receiver processes. One for the 
+    audio and one for the video. Otherwise, when there is only one process for sending
+    both the audio and the video streams, Gstreamer makes sure there are all in sync. 
     """
-    
     # this class variable contains the list of available types of streams
     # each subclass adds a string that identifies its type.
     # the create method will create an instance of the type as long as the
     # type is in the list 
-    media_stream_kinds ={}
+    media_stream_kinds = {}
         
     def __init__(self, name):
        self.name = name
@@ -629,10 +686,8 @@ class MediaStream(object):
         command = class_name + '("' + instanceName+ '")'
         return eval(command)
 
-    
     # make create a class  (aka static)method     
     create = staticmethod(_create)
-        
 
 class AudioStream(MediaStream):
     """
@@ -643,15 +698,13 @@ class AudioStream(MediaStream):
 
 class DataStream(MediaStream):
     """
-    Contains Data Settings information
+    Contains data settings informations.
     """    
     MediaStream.media_stream_kinds['data'] = 'DataStream'
-    
- 
 
 class VideoStream(MediaStream):
     """
-    Contains Video Settings information
+    Contains video settings informations.
     """
     MediaStream.media_stream_kinds['video'] = 'VideoStream'
     
@@ -691,11 +744,4 @@ class VideoStream(MediaStream):
         self.engine.stop_streaming()
         self.engine = None
         self.listener = None
-
- 
-
-
-
-
-
 
