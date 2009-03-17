@@ -43,7 +43,6 @@ What happens when the user types "c -l":
    
 """
 
-
 # System imports
 import optparse
 import re
@@ -53,9 +52,12 @@ import socket
 # Twisted imports
 from twisted.internet import reactor, protocol
 #from twisted.conch import telnet
-from twisted.conch import recvline
-from twisted.conch.insults import insults
-from twisted.conch.telnet import TelnetTransport, TelnetBootstrapProtocol
+try:
+    from twisted.conch import recvline
+    from twisted.conch.insults import insults
+    from twisted.conch.telnet import TelnetTransport, TelnetBootstrapProtocol
+except ImportError:
+    raise ImportError, 'If you want to use the Telnet interface, you need to install twisted.conch.'
 
 #App imports
 from utils import Observer, log # also imports Observer and Subject from utils/observer.py

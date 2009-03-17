@@ -91,10 +91,14 @@ from xml.etree import ElementTree
 #Twisted imports
 from twisted.internet import reactor
 from twisted.python.modules import getModule
-from nevow import loaders, appserver, static, tags, inevow
-from nevow.athena import LivePage, LiveFragment, expose as nevow_expose
-from nevow.i18n import render as i18nrender
-from nevow.i18n import _, I18NConfig
+
+try:
+    from nevow import loaders, appserver, static, tags, inevow
+    from nevow.athena import LivePage, LiveFragment, expose as nevow_expose
+    from nevow.i18n import render as i18nrender
+    from nevow.i18n import _, I18NConfig
+except ImportError:
+    raise ImportError, 'If you want to use the Web interface, you need to install Nevow.'
 
 #App imports
 from utils import Observer, log
