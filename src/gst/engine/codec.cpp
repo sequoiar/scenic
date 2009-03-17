@@ -137,6 +137,7 @@ void H264Encoder::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
+    g_object_set(codec_, "threads", 0, NULL);
     // subme: subpixel motion estimation 1=fast, 6=best
     // threads: 1-4, 0 for automatic 
 
