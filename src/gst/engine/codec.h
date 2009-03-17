@@ -130,15 +130,23 @@ class H264Encoder : public VideoEncoder
         void setBitrate(unsigned);
 
     private:
+        static const int NUM_THREADS = 3;
         ~H264Encoder();
 
         void init();
         
         RtpPay* createPayloader() const;
-
+        _GstElement *deinterlace_;
+        _GstElement *queue_;
         _GstElement *colorspc_;
-        _GstElement *sinkElement() { return colorspc_; }
-
+        _GstElement *sinkElement() 
+        { 
+            if (doDeinterlace_)
+                return deinterlace_;
+            else
+                return colorspc_;
+        }
+        
         /// No Copy Constructor
         H264Encoder(const H264Encoder&);     
         /// No Assignment Operator

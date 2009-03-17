@@ -216,7 +216,8 @@ std::string tcpGetBuffer(int port, int &id)
 
 bool tcpSendBuffer(const std::string ip, int port, int id, const std::string caps)
 {
-    LOG_INFO("got " << ip << port << id << caps);
+    LOG_INFO("got ip=" << ip << " port=" << port << " id=" << 
+            id << " caps=" << caps);
     MapMsg msg("buffer");
 
     TcpThread tcp(port);

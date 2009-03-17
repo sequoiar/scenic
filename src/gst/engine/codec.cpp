@@ -121,7 +121,7 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
 
 /// Constructor 
 H264Encoder::H264Encoder() : 
-    colorspc_(0)
+    deinterlace_(0), queue_(0), colorspc_(0)
 {}
 
 
@@ -129,17 +129,31 @@ H264Encoder::H264Encoder() :
 H264Encoder::~H264Encoder()
 {
     Pipeline::Instance()->remove(&colorspc_);
+    Pipeline::Instance()->remove(&deinterlace_);
+    Pipeline::Instance()->remove(&queue_);
 }
 
+// FIXME: push up common stuff to VideoEncoder base class
 
 void H264Encoder::init()
 {
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
-    g_object_set(codec_, "threads", 0, NULL);
+    g_object_set(codec_, "threads", NUM_THREADS, NULL);
     // subme: subpixel motion estimation 1=fast, 6=best
     // threads: 1-4, 0 for automatic 
+
+    if (doDeinterlace_)
+    {
+        LOG_DEBUG("DO THE DEINTERLACE");
+        deinterlace_ = Pipeline::Instance()->makeElement("deinterlace2", NULL);
+        queue_ = Pipeline::Instance()->makeElement("queue", NULL);
+        gstlinkable::link(deinterlace_, queue_);
+        gstlinkable::link(queue_, colorspc_);
+    }
+    else
+        g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
 
     gstlinkable::link(colorspc_, codec_);
 }
