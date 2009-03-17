@@ -11,9 +11,6 @@
 # Get MIVILLE_PATH or assign a default value
 MIVILLE_PATH=${MIVILLE_PATH:-$HOME/src/miville/trunk/py}
 
-HOME=/var/tmp
-rm -f /var/tmp/.spropulpof.adb
-
 if  [ -d /dev/shm/jack-* ]; then
     if [ ! -w /dev/shm/jack-* ]; then
         echo 'User $(stat -c %U /dev/shm/jack*) is running jackd'
@@ -42,6 +39,8 @@ fi
 ps aux | grep -q [m]ivillle.py
 if [ $? -eq 1 ]; then
     cd $MIVILLE_PATH
+    HOME=/var/tmp
+    rm -f /var/tmp/.spropulpof.adb
     ./miville.py
 else
     user_running_miville=$(ps aux | awk '/[m]iville.py/ { print $1 }')
