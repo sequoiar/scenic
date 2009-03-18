@@ -517,11 +517,17 @@ class GlobalSetting(object):
                
     def start_streaming(self, listener, address):
         """
-        Start the audio/video/data streaming between two miville programs. 
+        Starts the audio/video/data streaming between two miville programs. 
 
         this is where the arguments to the sropulpof processes are exchanged. 
         A stream can be of audio or video type. 
+        
+        first, the settings are browsed and sorted between receiver an sender
+        processes (local and remote), according to the streams type and
+        sync groups. Then the settings are sent to the engines (pobably GST)
         """
+        receiver_procs = {}
+        sender_procs = {}
         for id, group in self.stream_subgroups.iteritems():
             if group.enabled:
                 # procs is used to select between rx and tx process groups
@@ -557,12 +563,6 @@ class GlobalSetting(object):
 #                for stream in group.media_streams:    
 #                    if stream.enabled:
 #                        stream.start_streaming()
-                        
-        
-    
-                
-                
-                
     
     def stop_streaming(self):
         """
@@ -635,14 +635,6 @@ class StreamSubgroup(object):
         # these ids insure that every media stream has a unique name 
         self.media_stream_ids = {}
 
-#    def start_streaming(self, listener, address):
-#        for stream in self.media_streams:
-#            if stream.enabled:
-#                stream.init_streaming(listener, self.mode, address)
-#        for stream in self.media_streams:    
-#            if stream.enabled:
-#                stream.start_streaming()
-   
     def stop_streaming(self):
         for stream in self.media_streams:
             stream.stop_streaming()
@@ -798,8 +790,6 @@ class VideoStream(MediaStream):
         params['GstAddress']
         self.engine = streams.create__video_engine(engine_name)
         gst_address = self.engine.apply_settings(listener, mode, stream_port, codec, bitrate, source, address, gst_port, gst_address)
-        
-        
        
     def start_streaming(self):
         log.info("VideoStream start_streaming: " + self.name)
