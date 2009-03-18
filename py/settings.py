@@ -199,9 +199,9 @@ class Settings(object):
     def __init__(self):
         self.global_settings = global_settings
         self.selected_global_setting = None
+        self.selected_media_setting = None
         #self.current_global_id = 0  [i for i in l if i<20]
         self.media_settings = media_settings
-        self.selected_media_setting = None
     
     @staticmethod
     def get_media_setting_from_id(id):
@@ -374,6 +374,9 @@ class Settings(object):
     def get_global_setting(self, name):
         id = self._get_global_setting_id_from_name(name)
         return self.global_settings[id]
+    
+    def  pretty_list_settings(self):
+         return (self.global_settings, self.media_settings)
         
     def list_global_setting(self):
          return (self.global_settings, self.selected_global_setting)
@@ -489,11 +492,29 @@ class GlobalSetting(object):
         self.is_preset = False
         self.stream_subgroups = {}
         self.selected_stream_subgroup = None
-        
         self.name = name
         self.communication = ''
         log.info("GlobalSetting__init__ " + name)
     
+    def _init_stream_engines(self, listener, mode, procs_params):
+        engines = []
+        for group_name, sync_group in procs_params.iteritems():
+            log.debug(" sync group: " + group_name) 
+            engine = None
+            for stream_name, stream_params in sync_group.iteritems():
+                log.debug("  stream: " + stream_name)
+                engine_name = stream_params['engine']
+                if engine == None:
+                    engine = streams.create_engine(engine_name)
+                engine.apply_settings(listener, mode, stream_name, stream_params)
+            engines.append(engine)
+        return engines
+    
+    def _start_stream_engines(self, engines):
+        for engine in engines:
+            log.debug('starting ' + str(engine))
+            engine.start_streaming()
+               
     def start_streaming(self, listener, address):
         """
         Start the audio/video/data streaming between two miville programs. 
@@ -503,7 +524,45 @@ class GlobalSetting(object):
         """
         for id, group in self.stream_subgroups.iteritems():
             if group.enabled:
-                group.start_streaming(listener, address)
+                # procs is used to select between rx and tx process groups
+                procs = receiver_procs
+                if group.mode == 'send':
+                    procs = sender_procs
+                    
+                for stream in group.media_streams:
+                    if stream.enabled:
+                        proc_params = None
+                        if not sender_procs.has_key(stream.sync_group):
+                            procs[stream.sync_group]  = {}
+                            proc_params = procs[stream.sync_group]
+                        else:
+                            if not receiver_procs.has_key(stream.sync_group):
+                               procs[stream.sync_group]  = {}
+                               proc_params = procs[stream.sync_group]
+                        # proc_params now points to a valid dict.
+                        params = stream.get_init_params()
+                        params['address'] = address
+                        proc_params[stream.name]= params
+                            
+        log.debug("RECEIVING PROCESSES:")
+        receivers = self._init_stream_engines(listener, 'receive', receiver_procs)
+        
+        log.debug("SENDING PROCESSES:")
+        senders = self._init_stream_engines(listener, 'send', sender_procs)
+        
+        self._start_stream_engines(receivers)
+        
+        self._start_stream_engines(senders)
+        
+#                for stream in group.media_streams:    
+#                    if stream.enabled:
+#                        stream.start_streaming()
+                        
+        
+    
+                
+                
+                
     
     def stop_streaming(self):
         """
@@ -564,7 +623,6 @@ class StreamSubgroup(object):
     Stream subgroup instances contain media streams.
     """
     def __init__(self, name):
-        self.name = None
         self.enabled = False
         self.mode = None
         self.container = None
@@ -577,12 +635,14 @@ class StreamSubgroup(object):
         # these ids insure that every media stream has a unique name 
         self.media_stream_ids = {}
 
-    def start_streaming(self, listener, address):
-        for stream in self.media_streams:
-            stream.init_streaming(listener, self.mode, address)
-        for stream in self.media_streams:    
-            stream.start_streaming()
-    
+#    def start_streaming(self, listener, address):
+#        for stream in self.media_streams:
+#            if stream.enabled:
+#                stream.init_streaming(listener, self.mode, address)
+#        for stream in self.media_streams:    
+#            if stream.enabled:
+#                stream.start_streaming()
+   
     def stop_streaming(self):
         for stream in self.media_streams:
             stream.stop_streaming()
@@ -660,10 +720,10 @@ class MediaStream(object):
     def __init__(self, name):
        self.name = name
        self.enabled = False
-       
        self.port = None
-       self.gain_levels = None
+       self.gain_levels = 'no pain'
        self.channel_names ={}
+       self.sync_group = "master"
        # media setting id
        self.setting = None
        self.engine = None
@@ -714,27 +774,33 @@ class VideoStream(MediaStream):
         log.error(msg)
         raise SettingsError, msg
 
-    def init_streaming(self, listener, mode, address):
-        log.info("VideoStream init_streaming: " + self.name)
-        self.listener = listener
-        if listener != None:
-            if listener != self.listener:
-                self.listener = listener
-        
-        media_type = 'Video'
-        id = self.setting 
+    def get_init_params(self):
+        params = {}
+        id = self.setting
         media_setting = Settings.get_media_setting_from_id(id)
         stream_port = self.port
-        engine_name = media_setting.settings['engine']
-        codec = media_setting.settings['codec']
-        source = media_setting.settings['source']
-        bitrate = int(media_setting.settings['bitrate'])
-        gst_port = int(media_setting.settings['GstPort'])
-        gst_address = media_setting.settings['GstAddress'] 
-        
+        params['engine'] = media_setting.settings['engine']
+        params['codec'] = media_setting.settings['codec']
+        params['source'] = media_setting.settings['source']
+        params['bitrate'] = int(media_setting.settings['bitrate'])
+        params['gst_port'] = int(media_setting.settings['GstPort'])
+        params['gst_address'] = media_setting.settings['GstAddress']
+        return params
+     
+    def init_streaming(self, listener, params):
+        engine_name = params['engine']
+        mode = params['mode']
+        stream_port = params['port']
+        codec = params['codec']
+        source = params['source']
+        bitrate = params['bitrate']
+        gst_port = params['GstPort']
+        params['GstAddress']
         self.engine = streams.create__video_engine(engine_name)
-        self.engine.apply_settings(listener, mode, stream_port, codec, bitrate, source, address, gst_port, gst_address)
+        gst_address = self.engine.apply_settings(listener, mode, stream_port, codec, bitrate, source, address, gst_port, gst_address)
         
+        
+       
     def start_streaming(self):
         log.info("VideoStream start_streaming: " + self.name)
         self.engine.start_streaming()  

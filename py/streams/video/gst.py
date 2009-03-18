@@ -27,9 +27,44 @@ from streams.stream import VideoStream, Stream
 from streams.gst_client import GstClient
 from utils import log
 from protocols.ipcp import parse 
+from errors import *
 
 log = log.start('debug', 1, 0, 'videoGst')
 
+class AudioVideoGst(GstClient):
+         
+    def apply_settings(self, listener, mode, stream_name, parameters ):
+       
+       gst_parameters = []
+       
+       for k,v in parameters.iteritems():
+           if k not in ['engine','gst_address','gst_port']:
+               gst_parameters.append( (k, v) )      
+       
+       log.debug('AudioVideoGst.apply_settings ' + str(gst_parameters))
+       gst_address = parameters['gst_address']
+       gst_port = parameters['gst_port']
+       
+       self.setup_gst_client(mode, gst_port, gst_address)
+       if stream_name.upper().startswith('VIDEO'):
+           self._send_cmd('video_init', gst_parameters)
+       elif stream_name.upper().startswith('AUDIO'):
+           self._send_cmd('audio_init', gst_parameters)
+       else:
+          raise StreamsError, 'Engine AudioVideoGst does not support "%s" parameters' %  stream_name 
+
+    def start_streaming(self):
+        """function start_sending
+         address: string
+        """
+        self._send_cmd('start')
+
+    def stop_streaming(self):
+        """function stop_sending
+        """
+        self._send_cmd('stop')
+        self.stop_process()
+        
 class VideoGst(GstClient):
     """Class streams->video->gst.VideoGst
     """
@@ -61,13 +96,10 @@ class VideoGst(GstClient):
             att = ('source', self.source)
             attrs.append(att)
         self._send_cmd('video_init', attrs)
-
- 
-    def start_streaming(self):
-        """function start_sending
-         address: string
-        """
-        self._send_cmd('start')
+    
+    def sending_stopped(self, state):
+        self._del_callback()
+        self._notify(None, state, 'video_sending_stopped')
 
     def notify(self, state, message):
         log.info("Notify")
@@ -75,16 +107,6 @@ class VideoGst(GstClient):
         
     def sending_started(self):
         self._del_callback()
-                
-    def stop_streaming(self):
-        """function stop_sending
-        """
-        self._send_cmd('stop')
-        self.stop_process()
-    
-    def sending_stopped(self, state):
-        self._del_callback()
-        self._notify(None, state, 'video_sending_stopped')
    
     def start_receiving(self, channel):
         """function start_receiving"""

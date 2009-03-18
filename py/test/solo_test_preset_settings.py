@@ -123,7 +123,8 @@ class Test_001_Gen_Settings(TestBase):
         # add media stream
         self.tst("settings --type stream --globalsetting vid_tx_setting --subgroup send --add video"                    , "Media stream added")
         self.tst("settings --type stream --globalsetting vid_tx_setting --subgroup send --mediastream video01 --modify setting=10000"  , "modified")
-                 
+        self.tst("settings --type stream --globalsetting vid_tx_setting --subgroup send --mediastream video01 --modify enabled=True"  , "modified")
+                
         self.tst("settings --type stream --globalsetting vid_tx_setting --subgroup send --list"                         , "video01")
         self.tst("s --type global --list"                   , 'vid_tx_setting')
         time.sleep(2)

@@ -43,7 +43,7 @@ CONNECTED = 4
 STREAMSTOPPED = 5
 STREAMINIT = 6
 STREAMING = 7
- 
+
 
 streaming_server_process_name = "propulseart"
 
@@ -67,9 +67,8 @@ class BaseGst(object):
             return True, name, value
         return False, name, value
 
-
 class GstServer(object):
-    
+
     def __init__(self, mode, port, address): #address='127.0.0.1'
         log.info("GstServer.__init__(mode = %s, port=%d, address=%s)" % (mode, port, address))
         self.process = None
@@ -80,7 +79,7 @@ class GstServer(object):
         self.port = port
         self.address = address
         self.commands = []
-        
+
     def connect(self):
         log.debug("GstServer.connect")
         if self.state == RUNNING:
@@ -88,7 +87,7 @@ class GstServer(object):
             deferred = ipcp.connect(self.address, self.port)
             deferred.addCallback(self.connection_ready)
             deferred.addErrback(self.connection_failed)
-            
+
     def change_state(self, new_state):
          old_state = self.state
          self.state = new_state
@@ -97,7 +96,7 @@ class GstServer(object):
                    CONNECTING:'CONNECTING', CONNECTED:'CONNECTED', STREAMSTOPPED: 'STREAMSTOPPED',
                    STREAMINIT:'STREAMINIT', STREAMING:'STREAMING'}
          log.debug('GstServer state changed from %s to %s handle: %s ' % (all_states[old_state], all_states[new_state], str(self) ))
-    
+
     def connection_ready(self, conn):
         msg = 'GstServer.connection_ready: Address: %s, Port: %s, conn %s' % (self.address, self.port, str(conn) )
         log.debug(msg)
@@ -112,12 +111,10 @@ class GstServer(object):
         self.change_state(CONNECTED)
         log.info('GST inter-process link created')
         
-
-    def gst_video_init(self, ack, id, port, source, codec, address, bitrate):
+    def gst_video_init(self, ack, id, port,  codec='', address='', bitrate=0, source=""):
         log.debug('GST VIDEO INIT acknowledged [%s]... our ticket is: %d' % (ack,id) )
         self.change_state(STREAMINIT)
-        
-    
+
     def gst_start(self, ack, id):
         log.debug('GST START acknowledged [%s]... our ticket is: %d' % (ack,id) )
         self.change_state(STREAMING)
@@ -125,8 +122,7 @@ class GstServer(object):
     def gst_stop(self, ack, id):
         log.debug('GST STOP acknowledged [%s]... our ticket is: %d' % (ack,id) )
         self.change_state(STREAMSTOPPED)
-        
-        
+
     def gst_audio_init(self, ack, id):
         log.debug('GST AUDIO INIT acknowledged [%s]... our ticket is: %d' % (ack,id) )
         self.change_state(STREAMINIT)
@@ -142,8 +138,6 @@ class GstServer(object):
         self.conn.del_callback('log')
         log.info('Lost the server connection. Reason:\n%s' % reason)
 
-
-    
     def start_process(self):
         log.debug("GstServer.start_process...")
         #if self.state < RUNNING: self.state = RUNNING    # Uncomment this line to start the GST process "by hand"
@@ -169,13 +163,9 @@ class GstServer(object):
                     log.critical('Cannot start the GST application "%s": %s ' % (streaming_server_process_name, str(e)) )
             else:
                 log.critical('Cannot find the GST application: %s' % streaming_server_process_name)
-#        elif self.state == RUNNING:
-#            self.connect()
-#        
         else:
             log.error("GstServer.start_process: not in proper state for starting")
-            
-            
+
     def kill(self):
         log.debug("GstServer.kill")
         self.change_state(STOPPED)

@@ -289,18 +289,18 @@ class CliController(TelnetServer):
         cp.add_option("-n", "--mediasetting", type="string", help="The media setting name to use when editing media settings")
         cp.add_option("-i", "--mediastream", type="string", help="The media stream name to use when editing media streams")
         
-               
+        cp.add_option("-x", "--xlist", action='store_true', help="List settings hierarchy")      
         cp.add_option("-z", "--description", action='store_true', help="Display description")
         (options, args) = cp.parse_args(line)
         
-        
-        if options.save:
+        if options.xlist:
+            self.core.pretty_list_settings(self)
+        elif options.save:
             self.core.save_settings(self)
         elif options.load:
             self.core.load_settings(self)
         elif options.description:
-            cp.print_description()
-        
+            cp.print_description() 
         elif options.type:
             if options.modify:
                 tokens  = options.modify.split("=")
@@ -461,123 +461,6 @@ class CliController(TelnetServer):
         else:
             cp.print_help()
 
-#    def _audio(self, line):
-#        kind = 'audio'
-#        cp = CliParser(self, prog=line[0], description="Manage the audio streams.")
-#        cp.add_option("-l", "--list", action='store_true', help="List all the audio streams or settings if stream is specified")
-#
-#        cp.add_option("-a", "--add", type="string", help="Add an audio stream")
-#        cp.add_option("-e", "--erase", type="string", help="Erase an audio stream")
-#        cp.add_option("-m", "--modify", type="string", help="Modify the name of an audio stream")
-#
-#        cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
-#        cp.add_option("-c", "--codec", type="string", help="Set the codec")
-#        cp.add_option("-s", "--settings", type="string", help="Set the codec settings (set1:val,set2:val)")
-#        cp.add_option("-d", "--bitdepth", type="int", help="Set the bitdepth of the audio (default: 16 bit)")
-#        cp.add_option("-r", "--samplerate", type="int", help="Set the samplerate of the audio (default: 48000 Hz")
-#        cp.add_option("-v", "--channels", "--voices", type="int", help="Set the number of audio channels (from 1 to 8)")
-#        cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
-#        cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
-#        cp.add_option("-i", "--input", "--source", type="string", help="Set the audio source (input).")
-#        cp.add_option("-z", "--description", action='store_true', help="Display description")
-#        
-#        
-#        (options, args) = cp.parse_args(line)
-#
-#        if len(args) > 1:
-#            name = args[1]
-#            if options.list:
-#                self.core.settings_stream(self, name, kind)
-#            elif options.modify:
-#                self.core.rename_stream(self, name, options.modify, kind)
-#            elif [opt for opt in options.__dict__.values() if opt]:
-#                if options.container:
-#                    self.core.set_stream(self, name, kind, 'container', options.container)
-#                if options.codec:
-#                    self.core.set_stream(self, name, kind, 'codec', options.codec)
-#                if options.settings:
-#                    self.core.set_stream(self, name, kind, 'codec_settings', options.settings)
-#                if options.bitdepth:
-#                    self.core.set_stream(self, name, kind, 'bitdepth', options.bitdepth)
-#                if options.samplerate:
-#                    self.core.set_stream(self, name, kind, 'sample_rate', options.samplerate)
-#                if options.channels:
-#                    self.core.set_stream(self, name, kind, 'channels', options.channels)
-#                if options.port:
-#                    self.core.set_stream(self, name, kind, 'port', options.port)
-#                if options.buffer:
-#                    self.core.set_stream(self, name, kind, 'buffer', options.buffer)
-#                if options.input:
-#                    input = add_quotes(options.input)
-#                    self.core.set_stream(self, name, kind, 'source', input)
-#        elif options.list:
-#            self.core.list_stream(self, kind)
-#        elif options.description:
-#            cp.print_description()
-#        elif options.add:
-#            self.core.add_stream(self, options.add, kind, 'gst')
-#        elif options.erase:
-#            self.core.delete_stream(self, options.erase, kind)
-#        else:
-#            cp.print_help()
-#
-#    def _video(self, line):
-#        kind = 'video'
-#        cp = CliParser(self, prog=line[0], description="Manage the video streams.")
-#        cp.add_option("-l", "--list", action='store_true', help="List all the video streams or settings if stream is specified")
-#
-#        cp.add_option("-a", "--add", type="string", help="Add an video stream")
-#        cp.add_option("-e", "--erase", type="string", help="Erase an video stream")
-#        cp.add_option("-m", "--modify", type="string", help="Modify the name of an video stream")
-#
-#        cp.add_option("-t", "--container", "--tank", "--type", type="string", help="Set the container")
-#        cp.add_option("-c", "--codec", type="string", help="Set the codec")
-#        cp.add_option("-s", "--settings", type="string", help="Set the codec settings (set1:val,set2:val)")
-#        cp.add_option("-w", "--width", type="int", help="Set the width of the video in pixels (default: 640 px)")
-#        cp.add_option("-r", "--height", "--rise", type="int", help="Set the height of the video in pixels (default: 480 px")
-#        cp.add_option("-p", "--port", type="int", help="Set the network port (5020-5030)")
-#        cp.add_option("-b", "--buffer", type="int", help="Set the latency buffer (in millisec)")
-#        cp.add_option("-i", "--input", "--source", type="string", help="Set the video source (input).")
-#        cp.add_option("-z", "--description", action='store_true', help="Display description")
-#        
-#        
-#        (options, args) = cp.parse_args(line)
-#
-#        if len(args) > 1:
-#            name = args[1]
-#            if options.list:
-#                self.core.settings_stream(self, name, kind)
-#            elif options.modify:
-#                self.core.rename_stream(self, name, options.modify, kind)
-#            elif [opt for opt in options.__dict__.values() if opt]:
-#                # calls ControllerApi.set_stream(caller, name, 'video', attr, value)
-#                if options.container:
-#                    self.core.set_stream(self, name, kind, 'container', options.container)
-#                if options.codec:
-#                    self.core.set_stream(self, name, kind, 'codec', options.codec)
-#                if options.settings:
-#                    self.core.set_stream(self, name, kind, 'codec_settings', options.settings)
-#                if options.width:
-#                    self.core.set_stream(self, name, kind, 'width', options.width)
-#                if options.height:
-#                    self.core.set_stream(self, name, kind, 'height', options.height)
-#                if options.port:
-#                    self.core.set_stream(self, name, kind, 'port', options.port)
-#                if options.buffer:
-#                    self.core.set_stream(self, name, kind, 'buffer', options.buffer)
-#                if options.input:
-#                    input = add_quotes(options.input)
-#                    self.core.set_stream(self, name, kind, 'source', input)
-#        elif options.list:
-#            self.core.list_stream(self, kind)
-#        elif options.description:
-#            cp.print_description()
-#        elif options.add:
-#            self.core.add_stream(self, options.add, kind, 'gst')
-#        elif options.erase:
-#            self.core.delete_stream(self, options.erase, kind)
-#        else:
-#            cp.print_help()
     
 
     def _streams(self, line):
@@ -987,13 +870,15 @@ class CliView(Observer):
                             name = bold(name + ": <---")
                         port = media_stream.port
                         port = str(port)
-                        gain = 'no pain'
-                        
-                        #gain = media_stream.gain_levels
+                        gain = str(media_stream.gain_levels)
+                        sync = str(media_stream.sync_group)
+                        enabled = str(media_stream.enabled)
                         txt += """%(name)s:
+    enabled       : %(enabled)s
     port          : %(port)s
     gain levels   : %(gain)s
     media setting : %(setting)s
+    sync group    : %(sync)s
 """ % locals()
                     self.write( txt )
                         
@@ -1119,7 +1004,28 @@ class CliView(Observer):
                 self.write('Could not select media setting.\nReason: ' +  str(data))
             else:
                 self.write('Media setting selected')
-  
+    
+    def _pretty_list_settings(self, origin, data):
+        if origin is self.controller:
+            if isinstance(data, Exception):
+                self.write('Could not list global settings.\nReason: ' +  str(data))
+            else:
+                got_some = False
+                (global_settings, media_settings) = data
+                txt = "GLOBAL SETTINGS:\n"
+                for k, v in global_settings.iteritems():
+                    txt += " [" + str(k) + "] " + v.name + "\n"
+                    for gid,group in v.stream_subgroups.iteritems():
+                        txt += "  [" + str(gid) + "] " + group.name + "\n"
+                        for stream in group.media_streams:
+                            txt += "   " + stream.name + "\n"
+                        
+                txt += "MEDIA SETTINGS...\n"
+                for k, v in media_settings.iteritems():
+                    txt += " [" + str(k) + "] " + v.name + "\n"
+                self.write( txt )
+                    
+    
     def _list_global_setting(self, origin, data):
         if origin is self.controller:
             if isinstance(data, Exception):

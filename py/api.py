@@ -451,8 +451,15 @@ class ControllerApi(object):
             result = err
         self.notify(caller, result)
         
-        
-        
+    def pretty_list_settings(self, caller):    
+        try:
+            result = None
+            log.info("pretty_list_settings")
+            result = self.settings.pretty_list_settings() 
+        except SettingsError, err:
+            result = err
+        self.notify(caller, result)
+               
     def list_global_setting (self, caller):
         try:
             result = None
