@@ -1012,17 +1012,20 @@ class CliView(Observer):
             else:
                 got_some = False
                 (global_settings, media_settings) = data
-                txt = "GLOBAL SETTINGS:\n"
+                txt = "\nGLOBAL SETTINGS:\n"
                 for k, v in global_settings.iteritems():
                     txt += " [" + str(k) + "] " + v.name + "\n"
                     for gid,group in v.stream_subgroups.iteritems():
                         txt += "  [" + str(gid) + "] " + group.name + "\n"
+                        txt += "   enabled: " + str(group.enabled)
+                        txt += "   mode: " + str(group.mode)
                         for stream in group.media_streams:
                             txt += "   " + stream.name + "\n"
+                            txt += "    enabled: " + str(stream.enabled)
                             txt += "    sync: " + stream.sync_group + "\n"
                             txt += "    media setting: %d\n" % stream.setting
                         
-                txt += "MEDIA SETTINGS...\n"
+                txt += "\nMEDIA SETTINGS...\n"
                 for k, v in media_settings.iteritems():
                     txt += " [" + str(k) + "] " + v.name + "\n"
                     for key, value in v.settings.iteritems():
