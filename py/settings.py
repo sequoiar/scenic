@@ -550,14 +550,18 @@ class GlobalSetting(object):
                         params['address'] = address
                         proc_params[stream.name]= params
                             
-        log.debug("RECEIVING PROCESSES:")
+        log.debug("Init RECEIVING PROCESSES:")
         receivers = self._init_stream_engines(listener, 'receive', receiver_procs)
         
-        log.debug("SENDING PROCESSES:")
+        
+        
+        log.debug("Init SENDING PROCESSES:")
         senders = self._init_stream_engines(listener, 'send', sender_procs)
         
+        log.debug("Starting RECEIVING PROCESSES:")
         self._start_stream_engines(receivers)
         
+        log.debug("Starting RECEIVING PROCESSES:")
         self._start_stream_engines(senders)
         
 #                for stream in group.media_streams:    
