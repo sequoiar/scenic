@@ -29,7 +29,7 @@
 #include "pipeline.h"
 #include "alsa.h"
 
-const unsigned long long AudioSink::BUFFER_TIME = 2000LL;
+const unsigned long long AudioSink::BUFFER_TIME = 10000LL;
         
 /// Constructor 
 AudioSink::AudioSink() : 
