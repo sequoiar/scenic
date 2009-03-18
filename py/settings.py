@@ -642,8 +642,7 @@ class MediaStream(object):
     Each media stream instance references a media setting. The MediaStream class
     is a a base class for each stream type: AudioStream, DataStream, VideoStream...
 
-    Synchronization
-    ===============
+    = Synchronization =
 
     A sync_group is an attribute of the media stream. Its default value is 'master'. 
     This is for when we want the audio and video not to be in sync. 

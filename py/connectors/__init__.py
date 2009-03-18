@@ -300,8 +300,7 @@ def register_callback(key, callback, event="connect"):
     """
     registers a callback for "disconnect" or "connect" event.
     
-    :param callback: a function of method to call. Its first argument will be the com_chan object.
-    If it is a "connect" callback, its second argument will be the string "server" or "client"
+    :param callback: a function of method to call. Its first argument will be the com_chan object. If it is a "connect" callback, its second argument will be the string "server" or "client"
     
     If you ever want to unregister a callback, do it manually or write an other function for it.
     """

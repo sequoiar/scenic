@@ -19,7 +19,7 @@
 # along with Sropulpof. If not, see <http:#www.gnu.org/licenses/>.
 
 """
-Public API of Sropulpof
+Public API of Miville
 
 Errors managment in notify
 ==========================

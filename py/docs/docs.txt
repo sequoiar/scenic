@@ -16,7 +16,7 @@ Requirements
 
     It's easy to install it with the command::
 
-        sudo easy_install --prefix /usr/local sphinx
+        sudo easy_install -E --prefix /usr/local sphinx==0.5.1
 
         
 Build Process
