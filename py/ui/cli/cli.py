@@ -1017,8 +1017,8 @@ class CliView(Observer):
                     txt += " [" + str(k) + "] " + v.name + "\n"
                     for gid,group in v.stream_subgroups.iteritems():
                         txt += "  [" + str(gid) + "] " + group.name + "\n"
-                        txt += "   enabled: " + str(group.enabled)
-                        txt += "   mode: " + str(group.mode)
+                        txt += "   enabled: " + str(group.enabled) + "\n"
+                        txt += "   mode: " + str(group.mode) + "\n"
                         for stream in group.media_streams:
                             txt += "   " + stream.name + "\n"
                             txt += "    enabled: " + str(stream.enabled)
