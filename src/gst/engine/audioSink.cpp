@@ -28,6 +28,8 @@
 #include "jackUtils.h"
 #include "pipeline.h"
 #include "alsa.h"
+
+const unsigned long long AudioSink::BUFFER_TIME = 2000LL;
         
 /// Constructor 
 AudioSink::AudioSink() : 
@@ -65,6 +67,7 @@ void AudioAlsaSink::init()
     audioconvert_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     sink_ = Pipeline::Instance()->makeElement("alsasink", NULL);
+    g_object_set(G_OBJECT(sink_), "buffer-time", BUFFER_TIME, NULL);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     if (config_.location() != std::string(""))
         g_object_set(G_OBJECT(sink_), "device", config_.location(), NULL);
@@ -91,6 +94,7 @@ void AudioPulseSink::init()
     audioconvert_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     sink_ = Pipeline::Instance()->makeElement("pulsesink", NULL);
+    g_object_set(G_OBJECT(sink_), "buffer-time", BUFFER_TIME, NULL);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     if (config_.location() != std::string(""))
         g_object_set(G_OBJECT(sink_), "device", config_.location(), NULL);
@@ -119,7 +123,7 @@ void AudioJackSink::init()
     sink_ = Pipeline::Instance()->makeElement("jackaudiosink", NULL);
     // uncomment to turn off autoconnect
     //g_object_set(G_OBJECT(sink_), "connect", 0, NULL);
-    g_object_set(G_OBJECT(sink_), "buffer-time", 20000LL, NULL);
+    g_object_set(G_OBJECT(sink_), "buffer-time", BUFFER_TIME, NULL);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     if (Pipeline::SAMPLE_RATE != Jack::samplerate())

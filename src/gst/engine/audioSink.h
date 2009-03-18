@@ -43,6 +43,7 @@ class AudioSink : public GstLinkableSink
 
     protected:
         _GstElement *sink_;
+        const static unsigned long long BUFFER_TIME;
 
     private:
         _GstElement *sinkElement() { return sink_; }

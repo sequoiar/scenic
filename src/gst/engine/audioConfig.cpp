@@ -62,7 +62,7 @@ int AudioSourceConfig::numChannels() const
 AudioSource* AudioSourceConfig::createSource() const
 {
     //const unsigned long long BUFFER_TIME = 35000LL; /* microseconds */
-    const unsigned long long BUFFER_TIME = 40000LL; /* microseconds */
+    const unsigned long long BUFFER_TIME = 200000LL; /* microseconds */ // same as default 
     if (source_ == "audiotestsrc")
         return new AudioTestSource(*this);
     else if (source_ == "filesrc")
