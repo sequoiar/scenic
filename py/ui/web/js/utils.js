@@ -12,10 +12,10 @@ function register(name, widget) {
 }
 
 // Notify all registered widgets (except the caller) of this event
-function notify(caller, call, data) {
+function notify(caller, key, value) {
 	widgets.each(function(widget, name) {
 		if (caller != name) {
-			widget.update(caller, call, data);
+			widget.update(caller, key, value);
 		}
 	});
 }

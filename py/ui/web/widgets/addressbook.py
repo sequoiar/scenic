@@ -49,7 +49,7 @@ class Addressbook(Widget):
             contact = contacts_dict[key]
             adb.append((contact.name, contact.state))
         log.info('receive update: %r' % self)
-        self.callRemote('updateList', adb)
+        self.callRemote('update_list', adb)
         
     def rc_get_contact(self, name):
         self.api.get_contact(name, self)
