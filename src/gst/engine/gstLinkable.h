@@ -42,6 +42,7 @@ namespace gstlinkable
     void link(GstLinkableSource &src, GstLinkableSink &sink);
     void link(std::vector<_GstElement*> &sources, GstLinkableSink &sink);
     void link(GstLinkableSource &source, std::vector<_GstElement*> &sinks);
+    void tryLink(_GstElement *src, _GstElement *sink);
 }
 
 class GstLinkableSource 
