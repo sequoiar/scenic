@@ -1,0 +1,67 @@
+restindex
+    crumb: Instructions for distibuted telnet system test
+    format: rest
+    page-title: Instructions for distibuted telnet system test
+    encoding: utf-8
+    output-encoding: None
+/restindex
+
+|sat_logo|
+
+.. |sat_logo| image:: ../images/logo_sat.png
+
+:Author: Sylvain Cormier
+
+
+Purpose
+-------
+
+Scripts to run test cases via telnet to satify system tests between two machines.
+
+Files
++++++
+
+start_miville.sh
+dist_telnet_sys_test1.py
+dist_telnet_sys_test2.py
+
+Instructions
+------------
+
+Mofify line 41 of systest_telnet.py to fit IP address on each machine
+
+::
+
+	client_command = 'telnet IP address %s' % server_port
+
+
+Run the start_miville.sh on each machine
+
+::
+
+	user@machine:~/src/miville/trunk/py/test/$sh miville.sh
+
+
+Mofify line 41 of each dist_telnet_sys_test*.py to fit user and IP address on each machine.
+
+::
+	self.tst("contacts --add user IP address", "Contact added")
+
+Run the scripts on each machine, starting with the receiver.
+
+::
+
+	user@machine:~/src/miville/trunk/py/$trial test/dist_telnet_sys_test1.py
+
+
+
+
+
+
+
+
+
+
+
+
+
