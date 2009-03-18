@@ -183,6 +183,10 @@ def on_com_chan_disconnected(connection_handle):
         log.debug("settings_chans: " + str(_settings_channels_dict))
     except KeyError, e:
         log.error("error in on_com_chan_disconnected : KeyError " + e.message)        
+
+def get_settings_channel_for_contact(contact):
+    return _settings_channels_dict[contact]
+
   
 class Settings(object):
     """
@@ -515,7 +519,7 @@ class GlobalSetting(object):
             log.debug('starting ' + str(engine))
             engine.start_streaming()
                
-    def start_streaming(self, listener, address):
+    def start_streaming(self, listener, address, settings_com_channel):
         """
         Starts the audio/video/data streaming between two miville programs. 
 
@@ -532,7 +536,8 @@ class GlobalSetting(object):
             if group.enabled:
                 # procs is used to select between rx and tx process groups
                 procs = receiver_procs
-                if group.mode.upper().startswith('send'):
+                s = group.mode.upper() 
+                if s.startswith('SEND'):
                     procs = sender_procs
                     
                 for stream in group.media_streams:
