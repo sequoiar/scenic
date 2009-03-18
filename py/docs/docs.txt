@@ -9,10 +9,11 @@ Requirements
 - `Jinja <http://jinja.pocoo.org/>`_
 - `Docutils <http://docutils.sourceforge.net/>`_
 - `Sphinx Python Documentation Generator <http://sphinx.pocoo.org/>`_
+- `Python Setuptools <http://pypi.python.org/pypi/setuptools>`_
 
     In Debian-based GNU/Linux distributions, you can install the requirements with::
 
-        sudo apt-get install python-pygments python-jinja
+        sudo apt-get install python-pygments python-jinja python-setuptools
 
     It's easy to install it with the command::
 
