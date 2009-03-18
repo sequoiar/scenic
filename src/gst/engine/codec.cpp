@@ -20,11 +20,13 @@
  *
  */
 
-#include "util.h"
+#include <algorithm> // for std::find
+#include <unistd.h>
 
 #include <gst/gst.h>
-#include <algorithm> // for std::find
 #include <gst/audio/multichannel.h>
+
+#include "util.h"
 #include "codec.h"
 #include "rtpPay.h"
 #include "pipeline.h"
@@ -140,7 +142,12 @@ void H264Encoder::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
-    //g_object_set(codec_, "threads", NUM_THREADS, NULL);
+
+    // set threads variable equal to number of processors online (POSIX specific). see
+    // http://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
+    int numThreads = sysconf(_SC_NPROCESSORS_ONLN);
+
+    g_object_set(codec_, "threads", numThreads, NULL);
     //g_object_set(codec_, "byte-stream", TRUE, NULL);
 
     // subme: subpixel motion estimation 1=fast, 6=best
