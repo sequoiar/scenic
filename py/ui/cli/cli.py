@@ -1019,10 +1019,14 @@ class CliView(Observer):
                         txt += "  [" + str(gid) + "] " + group.name + "\n"
                         for stream in group.media_streams:
                             txt += "   " + stream.name + "\n"
+                            txt += "    sync: " + stream.sync_group + "\n"
+                            txt += "    media setting: %d\n" % stream.setting
                         
                 txt += "MEDIA SETTINGS...\n"
                 for k, v in media_settings.iteritems():
                     txt += " [" + str(k) + "] " + v.name + "\n"
+                    for key, value in v.settings.iteritems():
+                        txt += "  %s : %s\n" % (key, str(value))
                 self.write( txt )
                     
     
