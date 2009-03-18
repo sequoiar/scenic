@@ -111,8 +111,8 @@ class GstServer(object):
         self.change_state(CONNECTED)
         log.info('GST inter-process link created')
         
-    def gst_video_init(self, ack, id, port,  codec='', address='', bitrate=0, source=""):
-        log.debug('GST VIDEO INIT acknowledged [%s]... our ticket is: %d' % (ack,id) )
+    def gst_video_init(self, **args):
+        log.debug('GST VIDEO INIT acknowledged:  args %s' %  str(args) )
         self.change_state(STREAMINIT)
 
     def gst_start(self, ack, id):
