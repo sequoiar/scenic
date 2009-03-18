@@ -59,7 +59,7 @@ from utils.common import install_dir
 from twisted.spread.jelly import jelly, unjelly
 import connectors
 from twisted.internet import reactor
-
+import pprint
 import streams
 
 log = log.start('debug', 1, 0, 'settings')
@@ -532,7 +532,7 @@ class GlobalSetting(object):
             if group.enabled:
                 # procs is used to select between rx and tx process groups
                 procs = receiver_procs
-                if group.mode == 'send':
+                if group.mode.upper().startswith('send'):
                     procs = sender_procs
                     
                 for stream in group.media_streams:
@@ -551,11 +551,14 @@ class GlobalSetting(object):
                         proc_params[stream.name]= params
                             
         log.debug("Init RECEIVING PROCESSES:")
+        
+        log.debug( pprint.pformat(receiver_procs)) 
         receivers = self._init_stream_engines(listener, 'receive', receiver_procs)
         
         
         
         log.debug("Init SENDING PROCESSES:")
+        log.debug( pprint.pformat(sender_procs)) 
         senders = self._init_stream_engines(listener, 'send', sender_procs)
         
         log.debug("Starting RECEIVING PROCESSES:")
