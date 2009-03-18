@@ -40,7 +40,8 @@ ps aux | grep -q [m]ivillle.py
 if [ $? -eq 1 ]; then
     cd $MIVILLE_PATH
     HOME=/var/tmp
-    rm -f /var/tmp/.spropulpof.adb
+    rm -f /var/tmp/.sropulpof/.spropulpof.adb
+    rm -rf /var/tmp/.sropulpof
     ./miville.py
 else
     user_running_miville=$(ps aux | awk '/[m]iville.py/ { print $1 }')
