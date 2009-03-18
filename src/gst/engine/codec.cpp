@@ -146,6 +146,8 @@ void H264Encoder::init()
     // set threads variable equal to number of processors online (POSIX specific). see
     // http://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
     int numThreads = sysconf(_SC_NPROCESSORS_ONLN);
+    if (numThreads > 1)
+        --numThreads;   
 
     g_object_set(codec_, "threads", numThreads, NULL);
     //g_object_set(codec_, "byte-stream", TRUE, NULL);
