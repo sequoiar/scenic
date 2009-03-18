@@ -1,4 +1,6 @@
 /**
+ * Mockup for the web interface.
+ *
  * @author etienne
  */
 
@@ -101,6 +103,9 @@
 	var net_results = new Fx.Slide($('net_results'));
 	net_results.hide();
 	$('test_start').addEvent('click', function(){
+        /**
+         * metwork test
+         */
 		if (this.value == "Start") {
 			this.value = "Stop";
 			net_results.hide();
@@ -124,6 +129,9 @@
 	$('stat_pan_but').addEvent('click', slidePan);
 
 	function slidePan(){
+ 	    /**
+         * Slide out network status
+         */
 		var pan_size = $('modules_tab').getStyle('left').toInt();
 		if (net_stat_pan.wrapper.offsetWidth == 0) {
 			net_stat_pan.slideIn();
@@ -138,6 +146,9 @@
 	
 	// Stream button
 	$('stream_but').addEvent('click', function(){
+	    /**
+         * Stream button
+         */
 		if (this.value == 'Stream') {
 			this.value = 'Stop';
 			gray(true);
@@ -220,7 +231,10 @@
 
 	// add contact
 	$('plus').addEvent('click', function(){
-		contact_rows.setStyle('background-color', '#FFF');
+		/**
+         * Adds a contact
+         */
+        contact_rows.setStyle('background-color', '#FFF');
 		$('c_name').setProperty('value', 'New Contact');
 		set_fields(true);
 	});
@@ -233,6 +247,9 @@
 
 	// edit contact
 	function set_fields(state){
+		/**
+         * Edits a contact
+         */
 		var element = $('contact_edit');
 		var fields = $$('#contact_field input');
 		element.disabled = false;
@@ -292,6 +309,9 @@
 	
 	// Show save settings
 	$$('div.subsettings select', 'div.subsettings input').addEvent('change', function(){
+        /**
+         * Shows save settings
+         */
 		var gp = getGrandParent(this, 10);
 		var menu = $E('select', gp);
 		var index = menu.selectedIndex;
@@ -308,7 +328,10 @@
 	$$('div.close').addEvent('click', globalSave);
 	
 	function globalSave(state) {
-		var menu = $('globalSett');
+		/**
+         * Saves global settings
+         */
+        var menu = $('globalSett');
 		var index = menu.selectedIndex;
 		var option = menu.options[index];
 		if (!option.text.contains('(modified)', '')) {
