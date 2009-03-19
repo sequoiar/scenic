@@ -44,7 +44,9 @@ void RtpBin::init()
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
     
     // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
-    g_object_set(G_OBJECT(rtpbin_), "latency", 0, NULL);
+    // rule of thumb: 2-3 times the maximum network jitter
+    const int MAX_JITTER = 1; // ms
+    g_object_set(G_OBJECT(rtpbin_), "latency", 3 * MAX_JITTER, NULL);
     
     // uncomment this to print stats
 #if RTP_REPORTING
