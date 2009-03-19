@@ -60,7 +60,7 @@ class Addressbook(Widget):
         if origin is self:
             contact_info = data.__dict__.copy()
             del contact_info['connection']
-            self.callRemote('showContact', contact_info)
+            self.callRemote('show_contact_info', contact_info)
 
     def rc_start_connection(self, name):
         contact = self.api.get_contact(name)

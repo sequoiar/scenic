@@ -9,6 +9,8 @@ Addressbook.methods(
 		// State variables
 		// Get the selected cookie.
 		self.selected = Cookie.read('adb_selected');
+		self.selected_li = null;
+		self.new_modify = null;
 		
 		// Get elements.
         self.list = $('adb_list');
@@ -22,13 +24,13 @@ Addressbook.methods(
 		self.contact_flds = [self.name_fld, self.address_fld, self.port_fld]
 		self.edit_btn = $('adb_edit');
 
-		// Get string translations. (maybe we can do this automatically?)
+		// Get string translations. TODO: (maybe we can do this automatically?)
 		self.save_str = $('js_adb_save').get('text');
 		self.edit_str = $('js_adb_edit').get('text');
 		self.join_str = $('js_adb_join').get('text');
 		self.unjoin_str = $('js_adb_unjoin').get('text');
 		
-		// Set translations.	#maybe call notify_controllers('init')
+		// Set translations.	TODO: #maybe call notify_controllers('init')
 		self.edit_btn.value = self.edit_str;
 		self.join_btn.value = self.join_str;
 
@@ -37,7 +39,7 @@ Addressbook.methods(
 			'class': 'conn_icon'
 		});
 				
-		// Create the empty field validator. (move to utils?)
+		// Create the empty field validator. TODO: (move to utils?)
 		self.isEmpty = new InputValidator('required', {
 		    errorMsg: 'This field is required.',
 		    test: function(field) {
@@ -48,7 +50,7 @@ Addressbook.methods(
 		// Add some keyboard events to the info fields. 
 		self.contact_flds.each(function(elem) {
 			elem.addEvent('enter', function(event){
-				self.upd_edit_btn();
+				self.save_contact();
 			});
 			
 			elem.addEvent('escape', function(event){
@@ -71,31 +73,26 @@ Addressbook.methods(
 	// Notify all the controllers (buttons/fields/etc) state when an event call this method.
 	// For every controller you want to be notify you have to call to the method
 	// that update the controller from here.
-	// !Atchung! the order theses controller methods are call can be very important
+	// !Achtung! the order theses controller methods are call can be very important
 	// if the state of a controller is dependant of the state of another controller.
 	// So put the least dependants at the top and more dependants at the bottom.
 	function notify_controllers(self, event){
-			self.upd_remove_btn(event);
-	},
-
-	// Return the selected contact li element or null. 
-	function get_selected(self) {
-		if (self.selected) {
-			return self.list.getElement('li[name=' + self.selected +']');
-		} else {
-			return null;
-		}
+		self.upd_list(event);
+		self.upd_edit_btn(event);
+		self.upd_fields(event);
+		self.upd_add_btn(event);
+		self.upd_remove_btn(event);
 	},
 
 	// Return the state contact li element or null. 
 	function get_selected_state(self) {
-		var contact = self.get_selected();
-		if (contact) {
-			return contact.get('state');
+		if (self.selected_li) {
+			return self.selected_li.get('state');
 		} else {
 			return null;
 		}
 	},
+
 
 	//////////////////////
 	/* Call from Server */
@@ -120,7 +117,7 @@ Addressbook.methods(
 		// list of contact names on the client side
 		var client_list = self.list.getChildren('li').get('name');
 		
-		// remove deleted contacts on the client side 
+		// remove on the client side deleted contacts  
 		client_list.each(function(item){
 			if (item && !server_list.contains(item)) {
 				self.list.getElement('li[name=' + item + ']').dispose();
@@ -154,7 +151,7 @@ Addressbook.methods(
 							self.contact_selected(this);
 						},
 						'dblclick': function() {
-							self.upd_edit_btn();
+							self.edit_contact();
 						}
 					}
 				});
@@ -172,7 +169,7 @@ Addressbook.methods(
 					li.inject(self.list);
 				}
 			}
-			// keep the current position
+			// keep the current li
 			previous = li;
 			
 			// deal with row coloring
@@ -194,15 +191,17 @@ Addressbook.methods(
 			
 			// keep the current selected li element
 			if (item[0] == self.selected) {
-				selected = li;
+				self.selected_li = li;
 			}
 		})
 
-		if (selected){
+		if (self.selected_li){
 			// update the display of selected contact info and button states
-			selected.fireEvent('click');
+			self.notify_controllers('contact_selected');
+			notify('adb', 'contact_selected', self.selected);
 		} else {
-			// or if no selection, clear the info and update button states 
+			// or if no selection, clear the info and update button states
+			//TODO: should probably move this elsewhere
 			self.contact_flds.each(function(elem) {
 				elem.value = '';
 			});
@@ -211,22 +210,17 @@ Addressbook.methods(
 		return false;
 	},
 	
-	function showContact(self, contact) {
+	// show selected contact info coming from the server in fields 
+	function show_contact_info(self, contact) {
 		self.name_fld.value = contact.name;
 		self.address_fld.value = contact.address;
 		self.port_fld.value = contact.port;
 	},
 
-	function modifyContact(self) {
-		self.callRemote('rc_modify_contact', self.selected, self.name_fld.value, self.address_fld.value, self.port_fld.value);
-		self.selected = self.name_fld.value;
-	},
 
-	function addContact(self) {
-		self.callRemote('rc_add_contact', self.name_fld.value, self.address_fld.value, self.port_fld.value);
-		self.selected = self.name_fld.value;
-	},
 
+	///////////////////////////////////////////////////////////////
+	
 	function error(self, msg) {
 		StickyWin.alert('Error', msg);
 	},
@@ -267,172 +261,60 @@ Addressbook.methods(
 		dbug.info(value);
 	},
 
-	// update the interface in function of the selected contact
+	// one contact is selected
 	function contact_selected(self, contact) {
-
-		// updated the selection color
-		var curr_selection = self.list.getElements('li.color_selected')
-		if (curr_selection) {
-			curr_selection.removeClass('color_selected');
-		}
-		contact.addClass('color_selected');
-		
-		// get the contact infos
-		var name = contact.get('name');
-		self.callRemote('rc_get_contact', name);
-		
-		// update the buttons state
-		var state = contact.get('state');
-
-		self.add_state('enable');
-		
-		self.edit_btn.disabled = state;
-		self.joinState(state);
-		self.status.set('text', contact.get('status'));
-		self.status.set('title', contact.get('error'));
-		self.cleanFields();
-		
-		// save the selected contact name
-		self.selected = name;
-		Cookie.write('adb_selected', name, {duration: 365});
-		
-		// notify the others widgets of this selection
-		self.notify_controllers('contact_selected');
-		notify('adb', 'selection', self.selected);
-	},
-
-	// manage add button state
-	function add_state(self, state) {
-		(state == 'enable') ? state=false : state=true
-		self.add_btn.disabled = state;
-	},
-
-	// Update remove button state.
-	function upd_remove_btn(self, event) {
-		// list of events that "remove" should react to
-		var events = ['contact_selected'];
-		if (events.contains(event)) {
-			// set the default state
-			var button_state = 'disabled';
-
-			// get the state of other controls necessary to find the state
-			var contact_state = self.get_selected_state();	// state of selected contact
-			var edit_state = self.edit_btn.disabled;	// state of edit button
-			if (contact_state == 0 && edit_state) {
-				button_state = 'enabled';	
-			}
-			
-			// set the state of the button
-			self.remove_btn.removeEvents('click');
-			if (button_state == 'enabled') {
-				self.remove_btn.removeClass('button_disabled');
-				self.remove_btn.addEvent('click', function(){
-					self.remove();
-				});
-			} else if (!self.remove_btn.hasClass('button_disabled')) {
-				self.remove_btn.addClass('button_disabled');
-			}
-		}
-	},
-
-	// manage edit/save button state
-	function edit_save_state(self) {
-		if (self.edit_btn.value == self.save_str) {
-			var validate = true;
-			if (self.isEmpty.test(self.name_fld)) {
-				validate = false;
-				self.name_fld.addClass('notify');
-				dbug.info(self.isEmpty.getError(self.name_fld));
-			}
-			if (self.isEmpty.test(self.address_fld)) {
-				validate = false;
-				self.address_fld.addClass('notify');
-			}
-			if (validate) {
-				self.edit_btn.value = self.edit_str;
-				self.fieldState(true);
-				if (self.selected) {
-					self.modifyContact();
-				} else {
-					self.addContact();
-				}
-			}
-		} else {
-			self.edit_btn.value = self.save_str;
-			self.fieldState(false);
-			self.name_fld.select();
-		}
-	},
-
-	function joinState(self, state) {
-		if (state == 0) {
-			self.join_btn.disabled = false;							
-			self.join_btn.value = self.join_str;							
-		} else if (state > 0 && state < 3) {
-			self.join_btn.disabled = false;
-			self.join_btn.value = self.unjoin_str;							
-		} else {
-			self.join_btn.disabled = true;
-			self.join_btn.value = self.join_str;							
-		}
-	},
-
-	function select(self, name) {
-		if (name){
-			name.fireEvent('click');
-		} else {
-			self.contact_flds.each(function(elem) {
-				elem.value = '';
+		// pass if it's the same contact (but not if in edit mode)
+		if (contact != self.selected_li || self.edit_btn.value == self.save_str) {
+			self.selected_li = contact;
+			self.new_modify = null;
+			// save the selected contact name
+			self.selected = contact.get('name');
+			Cookie.write('adb_selected', self.selected, {
+				duration: 365
 			});
-			self.fieldState(true);
+			
+			// notify the controllers of this selection
+			self.notify_controllers('contact_selected');
+			notify('adb', 'selection', self.selected);
 		}
 	},
 
-	function fieldState(self, state) {
-		self.contact_flds.each(function(elem) {
-			elem.disabled = state;
-		});
-	},
-
-	function cleanFields(self) {
-		self.name_fld.removeClass('notify');
-		self.address_fld.removeClass('notify');
-		self.fieldState(true);
-		self.edit_btn.value = self.edit_str;
-	},
-
-	function cancelEdit(self) {
-		if (self.selected) {
-			var elem = self.list.getElement('li[name=' + self.selected +']');
-			if (elem) {
-				elem.fireEvent('click');
-			}
+	// edit contact info
+	function edit_contact(self) {
+		if (self.get_selected_state() == 0) {
+			self.new_modify = 'modify';
+			self.notify_controllers('edit_contact');
 		}
 	},
 
-	function deSelect(self, name) {
-		self.selected = name;
-		self.list.getElements('li.color_selected').removeClass('color_selected')
-		self.cleanFields();
+	// add a new contact
+	function add_contact(self) {
+		self.new_modify = 'new';
+		self.notify_controllers('add_contact');
+	},
+	
+	// save a contact (for a new or a modified contact) 
+	function save_contact(self) {
+		if (self.new_modify == 'new') {
+			self.callRemote('rc_add_contact',
+							self.name_fld.value,
+							self.address_fld.value,
+							self.port_fld.value);
+		} else if (self.new_modify == 'modify') {
+			self.callRemote('rc_modify_contact',
+							self.selected,
+							self.name_fld.value,
+							self.address_fld.value,
+							self.port_fld.value);
+		}
+		// update the selected name
+		self.selected = self.name_fld.value;
+		
+		self.notify_controllers('save_contact');
 	},
 
-	function start_connection(self) {
-		self.callRemote('rc_start_connection', self.selected);
-		dbug.info(self.selected);
-	},
-	
-	function add(self) {
-		self.deSelect(null)
-		self.edit_btn.value = self.save_str;	
-		self.edit_btn.disabled = false;
-		self.contact_flds.each(function(elem) {
-			elem.value = '';
-		});
-		self.fieldState(false);
-		self.name_fld.select();
-	},
-	
-	function remove(self) {
+	// remove a contact from the list ICICICICICICICICICIC!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	function remove_contact(self) {
 		if (self.selected) {
 			var selected = self.list.getElement('li.color_selected');
 			var new_selection = null;
@@ -450,6 +332,219 @@ Addressbook.methods(
 			}
 			self.callRemote('rc_remove_contact', removed);
 		}
+	},
+	
+	// cancel contact info editing on cancel key down
+	function cancel_edit_flds(self) {
+		if (self.selected_li) {
+			self.notify_controllers('contact_selected');
+		}
+	},
+
+
+	////////////////////////
+	/* Update controllers */
+	////////////////////////
+
+	// Update the interface in function of the selected contact.
+	function upd_list(self, event) {
+		// list of events that "list" should react to
+		if (event == 'contact_selected') {
+			// updated the selection color
+			self.unselect_contact();
+			self.selected_li.addClass('color_selected');
+			
+			// update the buttons state
+			var state = self.selected_li.get('state');
+				
+//			self.joinState(state);
+			self.status.set('text', self.selected_li.get('status'));
+			self.status.set('title', self.selected_li.get('error'));
+			self.cleanFields();
+		} else if (event == 'add_contact') {
+			self.unselect_contact();
+		}
+	},
+
+	// Unselect contact from the list (display update)
+	function unselect_contact(self) {
+		var curr_selection = self.list.getElements('li.color_selected')
+		if (curr_selection) {
+			curr_selection.removeClass('color_selected');
+		}
+//		self.cleanFields();
+	},
+
+	// Update contact fields
+	function upd_fields(self, event) {
+		// list of events that "fields" should react to
+		if (event == 'contact_selected') {
+			self.set_fields_state('disabled');
+			self.callRemote('rc_get_contact', self.selected);
+		} else if (event == 'edit_contact' || event == 'add_contact') {
+			if (event == 'add_contact') {
+				// clear the contact info fields
+				self.contact_flds.each(function(elem) {
+					elem.value = '';
+				});
+			}
+			self.set_fields_state('enable');
+			self.name_fld.select();
+		}
+	},
+
+	// Enable/disabled the contact info fields
+	function set_fields_state(self, state) {
+		var value = true;
+		if (state == 'enable') value = false;
+		self.contact_flds.each(function(elem) {
+			elem.disabled = value;
+		});
+	},
+
+	function cleanFields(self) {
+		self.name_fld.removeClass('notify');
+		self.address_fld.removeClass('notify');
+		self.set_fields_state('disabled');
+		self.edit_btn.value = self.edit_str;
+	},
+
+	// Update add button state
+	function upd_add_btn(self, event) {
+		// list of events that "add" should react to
+		if (['contact_selected', 'edit_contact'].contains(event)) {
+			// set the default state
+			var button_state = 'enabled';
+			
+			// get the state of other controls necessary to find the state
+			if (self.edit_btn.value == self.save_str) {
+				button_state = 'disabled';	
+			}
+			
+			// set the state of the button
+			self.add_btn.removeEvents('click');
+			if (button_state == 'enabled') {
+				self.add_btn.removeClass('button_disabled');
+				self.add_btn.addEvent('click', function(){
+					self.add_contact();
+				});
+			} else if (!self.add_btn.hasClass('button_disabled')) {
+				self.add_btn.addClass('button_disabled');
+			}
+		} else if (event == 'add_contact') {
+			self.add_btn.removeEvents('click');
+			if (!self.add_btn.hasClass('button_disabled')) {
+				self.add_btn.addClass('button_disabled');
+			}		
+		}
+	},
+
+	// Update remove button state.
+	function upd_remove_btn(self, event) {
+		// list of events that "remove" should react to
+		if (['contact_selected', 'edit_contact', 'add_contact'].contains(event)) {
+			// set the default state
+			var button_state = 'disabled';
+
+			// get the state of other controls necessary to find the state
+			var contact_state = self.get_selected_state();	// state of selected contact
+			if (contact_state == 0 && self.edit_btn.value == self.edit_str) {
+				button_state = 'enabled';	
+			}
+			
+			// set the state of the button
+			self.remove_btn.removeEvents('click');
+			if (button_state == 'enabled') {
+				self.remove_btn.removeClass('button_disabled');
+				self.remove_btn.addEvent('click', function(){
+					self.remove_contact();
+				});
+			} else if (!self.remove_btn.hasClass('button_disabled')) {
+				self.remove_btn.addClass('button_disabled');
+			}
+		}
+	},
+
+	// Update edit/save button state.
+	function upd_edit_btn(self, event) {
+		if (event == 'contact_selected') {
+			// set the default states
+			var button_state = 'enabled';
+			
+			// get the state of other controls necessary to find the state
+			var contact_state = self.get_selected_state();	// state of selected contact
+			if (contact_state != 0) {
+				button_state = 'disabled';	
+			}
+			
+			// set the state of the button
+			self.edit_btn.value = self.edit_str;
+			self.edit_btn.removeEvents('click');
+			if (button_state == 'enabled') {
+				self.edit_btn.disabled = false;
+				self.edit_btn.addEvent('click', function(){
+					self.edit_contact();
+				});
+			} else {
+				self.edit_btn.disabled = true;
+			}
+
+		} else if (event == 'edit_contact' || event == 'add_contact') {
+			self.edit_btn.removeEvents('click');
+			self.edit_btn.disabled = false;
+			self.edit_btn.value = self.save_str;
+			self.edit_btn.addEvent('click', function(){
+				self.save_contact();
+			});
+			
+
+			
+		/*	if (self.edit_btn.value == self.save_str) {
+				var validate = true;
+				if (self.isEmpty.test(self.name_fld)) {
+					validate = false;
+					self.name_fld.addClass('notify');
+					dbug.info(self.isEmpty.getError(self.name_fld));
+				}
+				if (self.isEmpty.test(self.address_fld)) {
+					validate = false;
+					self.address_fld.addClass('notify');
+				}
+				if (validate) {
+					self.edit_btn.value = self.edit_str;
+					self.fieldState(true);
+					if (self.selected) {
+						self.modifyContact();
+					} else {
+						self.addContact();
+					}
+				}
+			}*/
+			
+			
+		}
+	},
+
+
+	//////////////////////////////////////////////////////////////////
+
+
+	function joinState(self, state) {
+		if (state == 0) {
+			self.join_btn.disabled = false;							
+			self.join_btn.value = self.join_str;							
+		} else if (state > 0 && state < 3) {
+			self.join_btn.disabled = false;
+			self.join_btn.value = self.unjoin_str;							
+		} else {
+			self.join_btn.disabled = true;
+			self.join_btn.value = self.join_str;							
+		}
+	},
+
+	function start_connection(self) {
+		self.callRemote('rc_start_connection', self.selected);
+		dbug.info(self.selected);
 	}
 	
 );

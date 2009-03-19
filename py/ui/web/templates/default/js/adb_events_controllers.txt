@@ -1,0 +1,17 @@
+
+EVENTS
+======
+-contact_selected
+-edit_contact
+-add_contact
+-save_contact
+-remove_contact
+
+
+CONTROLLERS
+===========
+-list
+-edit
+-fields
+-add
+-remove

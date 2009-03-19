@@ -8,7 +8,7 @@
 		<div id="adb_status" class="color_text_fade">
 		</div>
 		<div>
-			<div class="js_help button" id="adb_add"><athena:handler event="onclick" handler="add" /></div> 
+			<div class="js_help button" id="adb_add"><athena:handler event="onclick" handler="add_contact" /></div> 
 			<div class="js_help button button_disabled" id="adb_remove"></div>
 			<input type="button" id="adb_join" value="Connect" class="js_help button" disabled="true"><athena:handler event="onclick" handler="start_connection" /></input>
 		</div>
@@ -27,7 +27,7 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td><athena:handler event="onclick" handler="editSave" /><input class="js_help button" id="adb_edit" disabled="true" type="button" value="Edit" /></td>
+				<td><input class="js_help button" id="adb_edit" disabled="true" type="button" value="Edit" /></td>
 			</tr>
 		</table>
 	</div>
