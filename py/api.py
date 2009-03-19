@@ -116,7 +116,7 @@ class ControllerApi(object):
         self.connection = None
         #self.network_tester = 
         network.start(self)  # TODO: move to core.
-        pinger.start(self)  # TODO: move to core.
+        pinger.start(self)   # TODO: move to core.
         settings.init_connection_listeners(self)
     ### Contacts ###
 
@@ -583,8 +583,19 @@ class ControllerApi(object):
             global_setting = self.settings.get_global_setting_from_id(id)
             address = contact.address
             # Join contact if necessary?
+            
+            settings_com_channel = None
+            try:
+                settings_com_channel = contact.connection.com_chan
+            except Exception, e:
+                log.error("No settings communication channel for contact: " + e.message)
+            #remote_addr = contact.address
+            try:
+                settings_com_channel = settings.get_settings_channel_for_contact(contact.name)
+            except KeyError, e:
+                self.notify(caller, 'No settings channel for contact "' + contact.name+ '"' , "error")
             # see start_connection
-            global_setting.start_streaming(self, address)
+            global_setting.start_streaming(self, address, settings_com_channel)
         except AddressBookError, err:
             result = err   
         except SettingsError, err:

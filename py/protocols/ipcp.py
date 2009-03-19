@@ -53,7 +53,7 @@ class IPCP(LineReceiver):
             del self.callbacks[name]
         else:
             log.debug('Cannot delete the callback %s because is not registered.' % name)
-        log.debug('Callback list: ' + repr(self.callbacks))
+        #log.debug('Callback list: ' + repr(self.callbacks))
               
     def connectionMade(self):
         log.info('Connection made to the server.')
