@@ -47,11 +47,12 @@ VERBOSE_CLIENT = True
 #VERBOSE_SERVER = False
 VERBOSE_SERVER = True
 
-
-
-def set_ip_address(address):
-
+if len(sys.argv) == 3:
+    global server_port
+    address = sys.argv[2]
     client_command = 'telnet  %s %s ' %  (address, server_port)
+    print "CLIENT COMMAND: ", client_command
+
 
 def bash_it(cmd):
     status = commands.getstatusoutput(cmd)

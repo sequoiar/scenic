@@ -29,9 +29,8 @@ import sys
 import test.systest_telnet
 import time
 
-ip_address= sys.argv[0]
 
-test.systest_telnet.set_ip_address(ip_address)
+
 
 #VERBOSE_CLIENT = False
 VERBOSE_CLIENT = True
@@ -46,7 +45,6 @@ class TestBase(test.systest_telnet.TelnetBaseTest):
     """  
     def tst(self, command, expected, timeout=2, errorMsg = None):
         
-#        
         self.client.sendline(command)
         err = errorMsg or 'The command did not return: "%s" as expected' % expected
         self.expectTest(expected, err, timeout=timeout)
