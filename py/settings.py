@@ -782,7 +782,7 @@ class VideoStream(MediaStream):
         params = {}
         id = self.setting
         media_setting = Settings.get_media_setting_from_id(id)
-        stream_port = self.port
+        params['port'] = self.port
         params['engine'] = media_setting.settings['engine']
         params['codec'] = media_setting.settings['codec']
         params['source'] = media_setting.settings['source']
