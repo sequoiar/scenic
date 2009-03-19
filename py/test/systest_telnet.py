@@ -47,6 +47,12 @@ VERBOSE_CLIENT = True
 #VERBOSE_SERVER = False
 VERBOSE_SERVER = True
 
+
+
+def set_ip_address(address):
+
+    client_command = 'telnet  %s %s ' %  (address, server_port)
+
 def bash_it(cmd):
     status = commands.getstatusoutput(cmd)
     output = status[1]
@@ -62,6 +68,7 @@ def bash_it(cmd):
 
 # ---------------------------------------------------------------------
 # a class for output redirection
+
 class ProcessOutputLogger:
     """
     Adds a prefix to each line printed by a spawn process.

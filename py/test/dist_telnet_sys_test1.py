@@ -29,6 +29,9 @@ import sys
 import test.systest_telnet
 import time
 
+ip_address= sys.argv[0]
+
+test.systest_telnet.set_ip_address(ip_address)
 
 #VERBOSE_CLIENT = False
 VERBOSE_CLIENT = True
@@ -99,12 +102,13 @@ class Test_001_Gen_Settings(TestBase):
         
         self.tst("settings --type streamsubgroup -g vid_tx_setting --subgroup send --modify mode='send'","modified")                                                                                      
        
+
         #add media stream        
 
         self.tst("settings --type stream --globalsetting vid_tx_setting --subgroup send --add video", "Media stream added")         
         self.tst("settings --type stream --globalsetting vid_tx_setting --subgroup send --mediastream video01 --modify setting=10000", "modified")
         self.tst("settings --type stream --globalsetting vid_tx_setting --subgroup send --mediastream video01 --modify port=6666", "modified")        
-       
+        self.tst("settings --type stream --globalsetting vid_tx_setting --subgroup send --mediastream video01 --modify enabled=True", "modified")
                
        
         
