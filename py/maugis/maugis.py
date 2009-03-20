@@ -541,8 +541,8 @@ class Config:
     # Default values
     gstsendport = 8000
     negotiationport = 17446
-    gstsend = "propulseart"
-    gstrecv = "propulseart"
+    gstsend = "milhouse"
+    gstrecv = gstsend
     smtpserver = "smtp.sat.qc.ca"
     emailinfo = "maugis@sat.qc.ca"
     audiolib = "oss"
