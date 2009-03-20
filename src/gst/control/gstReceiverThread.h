@@ -55,9 +55,9 @@ class GstReceiverThread
         ~GstReceiverThread();
     private:
         /// incomming audio_start request 
-        bool audio_start(MapMsg& msg);
+        void audio_start(MapMsg& msg);
         /// incomming video_start request 
-        bool video_start(MapMsg& msg);
+        void video_start(MapMsg& msg);
         
         ReceiverBase* video_;
         ReceiverBase* audio_;

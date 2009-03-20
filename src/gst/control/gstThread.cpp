@@ -69,19 +69,51 @@ int GstThread::main()
             }
             else if(s == "audio_init")
             {
-                audio_start(f);
+                try
+                {
+                    audio_start(f);
+                    MapMsg r("success");
+                    r["id"] = f["id"];
+                    queue_.push(r);
+                }
+                catch(Except e)
+                {
+                    MapMsg r("failure");
+                    r["id"] = f["id"];
+                    r["errmsg"] = e.msg_;
+                    queue_.push(r);
+                }
             }
             else if(s == "stop")
             {
                 stop(f);
+                MapMsg r("success");
+                r["id"] = f["id"];
+                queue_.push(r);
             }
             else if(s == "start")
             {
                 start(f);
+                MapMsg r("success");
+                r["id"] = f["id"];
+                queue_.push(r);
             }
             else if(s == "video_init")
             {
-                video_start(f);
+                try
+                {
+                    video_start(f);
+                    MapMsg r("success");
+                    r["id"] = f["id"];
+                    queue_.push(r);
+                }
+                catch(Except e)
+                {
+                    MapMsg r("failure");
+                    r["id"] = f["id"];
+                    r["errmsg"] = e.msg_;
+                    queue_.push(r);
+                }
             }
             else if(s == "levels")
             {
@@ -110,7 +142,7 @@ GstReceiverThread::~GstReceiverThread()
     delete audio_;
 }
 
-bool GstReceiverThread::video_start(MapMsg& msg)
+void GstReceiverThread::video_start(MapMsg& msg)
 {
     delete video_;
     video_ = 0;
@@ -122,19 +154,18 @@ bool GstReceiverThread::video_start(MapMsg& msg)
         const char *VIDEO_SINK = "xvimagesink";
         video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], SCREEN_NUM, VIDEO_SINK);
 //        queue_.push(MapMsg("video_started"));
-        return true;
     }
     catch(Except e)
     {
         LOG_WARNING(e.msg_);
         delete video_;
         video_ = 0;
-        return false;
+        throw(e);
     }
 }
 
 
-bool GstReceiverThread::audio_start(MapMsg& msg)
+void GstReceiverThread::audio_start(MapMsg& msg)
 {
     delete audio_;
     audio_ = 0;
@@ -145,14 +176,13 @@ bool GstReceiverThread::audio_start(MapMsg& msg)
         const char *AUDIO_LOCATION = "";
         audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], AUDIO_SINK, AUDIO_LOCATION);
 //        queue_.push(MapMsg("audio_started"));
-        return true;
     }
     catch(Except e)
     {
         LOG_WARNING(e.msg_);
         delete audio_;
         audio_ = 0;
-        return false;
+        throw(e);
     }
 }
 
@@ -165,7 +195,7 @@ GstSenderThread::~GstSenderThread()
     delete audio_;
 }
 
-bool GstSenderThread::video_start(MapMsg& msg)
+void GstSenderThread::video_start(MapMsg& msg)
 {
     delete video_;
     video_ = 0;
@@ -192,19 +222,18 @@ bool GstSenderThread::video_start(MapMsg& msg)
         ff[0] = boost::bind(tcpSendBuffer,msg["address"], ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, _1);
         //sender->getCaps());
 //        ff[0]();
-        return true;
     }
     catch(Except e)
     {
         LOG_WARNING(e.msg_);
         delete video_;
         video_ = 0;
-        return false;
+        throw(e);
     }
 }
 
 
-bool GstSenderThread::audio_start(MapMsg& msg)
+void GstSenderThread::audio_start(MapMsg& msg)
 {
     delete audio_;
     audio_ = 0;
@@ -230,14 +259,13 @@ bool GstSenderThread::audio_start(MapMsg& msg)
  //       caps["caps_str"] = asender->getCaps();
         //Forward to tcp
  //       queue_.push(caps);
-        return true;
     }
     catch(Except e)
     {
         LOG_WARNING(e.msg_);
         delete audio_;
         audio_ = 0;
-        return false;
+        throw(e);
     }
 }
 

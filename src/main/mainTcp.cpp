@@ -89,9 +89,9 @@ bool MainModule::run()
                 throw tmsg["exception"].except();
             else
             {
+                tmsg["id"] = ++msg_count;
                 gst_queue.push(tmsg);
                 tmsg["ack"] = "ok";
-                tmsg["id"] = ++msg_count;
                 tcp_queue.push(tmsg);
             }
         }

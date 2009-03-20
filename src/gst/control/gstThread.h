@@ -31,9 +31,9 @@ class GstThread
     protected:
         GstThread(){}
         /// incomming audio_start request 
-        virtual bool audio_start(MapMsg& msg) = 0;
+        virtual void audio_start(MapMsg& msg) = 0;
         /// incomming video_start request 
-        virtual bool video_start(MapMsg& msg) = 0;
+        virtual void video_start(MapMsg& msg) = 0;
         /// incomming stop request 
         void stop(MapMsg& ); 
         /// incomming start request 
