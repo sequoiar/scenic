@@ -21,14 +21,32 @@
 
 """
 Distibuted telnet system test, local file 
-Usage: trial test/dist_telnet_sys_test3.py
+Usage: On local machine: trial test/dist_telnet_sys_test3.py IP_ADDRESS
 """ 
 
 import os
 import sys
 import test.systest_telnet
 import time
+import unittest
+import pexpect
+import subprocess
 
+
+
+
+
+
+    
+
+stdin, stdout, stderr = os.popen3("ssh bloup")
+stdin.write("""cd /home/scormier/src/miville/trunk/py;trial test/dist_telnet_sys_test4.py 10.10.10.73\n""")
+time.sleep(10)        
+stdin.write("""exit\n""")
+stdin.close()
+stdout.close()
+stderr.close()
+        
 
 
 
@@ -56,12 +74,24 @@ class TestBase(test.systest_telnet.TelnetBaseTest):
         b = b.replace ('\r', '')
         print b
 
+
+    
+
+   
+
+
 class Test_001_Gen_Settings(TestBase):
     """
     System Tests for presets
     """
 
-    def test_00_yes(self):
+    
+
+     
+
+
+
+    def test_02_yes(self):
         self.expectTest('pof: ', 'The default prompt is not appearing.')
 
 
@@ -69,7 +99,7 @@ class Test_001_Gen_Settings(TestBase):
 ################################Receiver settings###############################################
     
         
-    def test_02_save_basic_video_streaming_settings(self):
+    def test_03_save_basic_video_streaming_settings(self):
         print
         print "HOME IS: " + os.environ['HOME']
         # add a contact
