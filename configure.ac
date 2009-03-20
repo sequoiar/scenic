@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(PROPULSEART, 0.1.2)
+AC_INIT(MILHOUSE, 0.1.2)
 AC_DEFINE(RELEASE_CANDIDATE,["-rc3"],[rc version num])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
