@@ -27,6 +27,8 @@ A Python package is a directory containing related modules files together.
 At installation time, the "py" directory is renamed to 
 /usr/local/lib/python2.5/site-packages/miville
 """
+import sys
+# sys.path.append()
 
 import miville
 

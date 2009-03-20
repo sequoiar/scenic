@@ -760,6 +760,15 @@ class ControllerApi(object):
         else:
             self.notify(caller, attributes, 'device_list_attributes') # dict
 
+    def devices_toggle_kill_jackd_enabled(self, enabled=False):
+        """
+        Enables or disables the auto kill and resurrect jackd when it seems to be frozen.
+        """
+        try:
+            devices.jackd.toggle_kill_jackd_enabled(enabled)
+        except Exception, e:
+            log.error(e.message)
+
     def device_modify_attribute(self, caller, driver_kind, driver_name, device_name, attribute_name, value):
         """
         Modifies a device's attribute

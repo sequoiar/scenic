@@ -58,6 +58,7 @@ warnings.simplefilter("ignore", DeprecationWarning)
 log = logger.start('debug', 1, 0, 'devices_jackd')
 
 _state_printed_jackd_is_frozen = False
+_enable_kill_jackd = True
 
 def _parse_jack_lsp(lines):
     """
@@ -360,24 +361,27 @@ class JackDriver(devices.AudioDriver):
         2) _kill_kill_jackd
         3) _resurrect_jackd
         """
-        log.info("will now kill and resurrect all jackd instances")#  + str(devices.values()))
-        for device in devs.values():
-            try:
-                args = device.attributes["args"].get_value() # str
-                pid = device.attributes["pid"].get_value() # int
-            except KeyError, e:
-                log.error("impossible to kill and resurrect jackd. KeyError :" + e.message)
-            else:
-                # first kill with SIG 15, next with 9
+        global _enable_kill_jackd
+
+        if _enable_kill_jackd:
+            log.info("will now kill and resurrect all jackd instances")#  + str(devices.values()))
+            for device in devs.values():
                 try:
-                    os.kill(pid, 15)
-                except OSError, e:
-                    log.error("error killing jackd "+ e.message)
+                    args = device.attributes["args"].get_value() # str
+                    pid = device.attributes["pid"].get_value() # int
+                except KeyError, e:
+                    log.error("impossible to kill and resurrect jackd. KeyError :" + e.message)
                 else:
-                    log.info("Just KILLED jackd (pid:%d)" % pid)
-                    if caller is not None:
-                        self.api.notify(caller, "Killed -15 jackd", "info")
-                reactor.callLater(1.0, self._kill_kill_jackd, caller, args, pid)
+                    # first kill with SIG 15, next with 9
+                    try:
+                        os.kill(pid, 15)
+                    except OSError, e:
+                        log.error("error killing jackd "+ e.message)
+                    else:
+                        log.info("Just KILLED jackd (pid:%d)" % pid)
+                        if caller is not None:
+                            self.api.notify(caller, "Killed -15 jackd", "info")
+                    reactor.callLater(1.0, self._kill_kill_jackd, caller, args, pid)
 
     def _kill_kill_jackd(self, caller, args, pid):
         """
@@ -423,6 +427,13 @@ def start(api):
     driver.api = api
     devices.managers['audio'].add_driver(driver)
     reactor.callLater(0, driver.prepare)
+
+def toggle_kill_jackd_enabled(enabled=False):
+    """
+    Enables or disables the auto kill and resurrect jackd when it seems to be frozen.
+    """
+    global _enable_kill_jackd
+    _enable_kill_jackd = enabled
 
 if __name__ == '__name__':
     print "JACK infos:"

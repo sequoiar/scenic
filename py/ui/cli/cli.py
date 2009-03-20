@@ -1462,8 +1462,31 @@ class CliView(Observer):
     def _error(self, origin, data):
         """
         Similar to the "info" key, but for error messages to the users.
+        
+        There are 2 ways to use this notify key. 
+         * with a string argument
+         * with a dict argument. Mandatory keys are: 'msg' and 'context'
+        
+        Example ::
+        self.api.notify(
+            caller, 
+            {
+            'address':self.contact.address, 
+            'port':self.contact.port,
+            'exception':'%s' % err,
+            'msg':'Connection failed',
+            'context':'connection'
+            }, 
+            "error")
         """
-        self.write(data)
+        if type(data) is dict:
+            msg = "Error: \n"
+            # mandatory arguments
+            for k in data.keys():
+                msg += "  %s\n" % (data[k])
+            self.write(msg)
+        else:
+            self.write(data)
 
     def _answer(self, origin, data):
         self.write('\n' + data)
