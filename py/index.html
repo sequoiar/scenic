@@ -1,0 +1,52 @@
+<html>
+    <head>
+    <title>Test_telnet_milhouse</title>
+    </head>
+    <body>
+    <h1>Test_telnet_milhouse</h1>
+    <p>
+    System test telnet propulseart:
+    Runs a series of streaming tests with propulseart.
+    The tests starts and stop various propulseart processes in sender and receiver mode,
+    and controls them via a telnet protocol.  
+    </p>
+    <h2>test_02_simple_video_sender</h2>
+                    <p>
+        create a video sender process that waits for connections. The 
+        process is controlled from port 1220 and its videostream is set on port
+        12020 
+        The port numbers are printed for debuggind convenience.
+        The process is then stopped without any streaming.
+        
+        This tests that the process exists and responds to basic commands.
+        </p>
+                    <img src='test_02_simple_video_sender.png' align='middle' />
+                    <h2>test_03_simple_video_receiver</h2>
+                    <p>
+        Same as test2, but this time the process is started in receiver mode
+        </p>
+                    <img src='test_03_simple_video_receiver.png' align='middle' />
+                    <h2>test_04_video_sender_receiver</h2>
+                    <p>
+        Finally, we get some streaming going: a receiver and a sender are started and stopped.
+        During the 5 second sleep, the video stream should appear on the screen.
+        
+        This test should check for actual transfered data when the command is available.
+        </p>
+                    <img src='test_04_video_sender_receiver.png' align='middle' />
+                    <h2>test_05_audio_send_receiv</h2>
+                    <p>
+        Streaming audio test betweeen 2 instances of propulseart.
+        </p>
+                    <img src='test_05_audio_send_receiv.png' align='middle' />
+                    <h2>test_06_audio_video_synchronized</h2>
+                    <p>
+        This test is a streaming test where audio and video are streamed 
+        simultaneously with synchronisation.
+        The commands for this test are not implemented yet.
+        </p>
+                    <img src='test_06_audio_video_synchronized.png' align='middle' />
+                    
+    </body>
+    </html>
+    

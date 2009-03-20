@@ -50,17 +50,19 @@ In the telnet UI, type "s --load" to load settings
 """
 import os
 import re # used when reading settings file
+import pprint
+
 from streams.stream import Streams
 from utils import log
 from utils.i18n import to_utf
 from errors import *
+import connectors
 from utils.common import install_dir
 # persistence is not futile
-from twisted.spread.jelly import jelly, unjelly
-import connectors
-from twisted.internet import reactor
-import pprint
 import streams
+
+from twisted.spread.jelly import jelly, unjelly
+from twisted.internet import reactor
 
 log = log.start('debug', 1, 0, 'settings')
 
@@ -79,13 +81,33 @@ COM_CHAN_KEY = "settings" # key for com_chan messages.
 _api = None
 _settings_channels_dict = {}
 
+
+def _create_stream_engines( listener, mode, procs_params):
+    """
+    Returns list of new stream engines. 
+    
+    AudioVideoGst instances.
+    """
+    engines = []
+    for group_name, sync_group in procs_params.iteritems():
+        log.debug(" sync group: " + group_name) 
+        engine = None
+        for stream_name, stream_params in sync_group.iteritems():
+            log.debug("  stream: " + stream_name)
+            engine_name = stream_params['engine']
+            if engine == None:
+                # engine is a AudioVideoGst instance
+                engine = streams.create_engine(engine_name)
+            engine.apply_settings(listener, mode, stream_name, stream_params)
+        engines.append(engine)
+    return engines
+
 class SettingsChannel(object):
     """
     Allows to send and receive setting information
     via the com_chan protocol, once we are joined to
     a remote contact
     """
-    
     def __init__(self):
         log.debug('SettingsChannel.__init__')
         self.com_chan = None
@@ -94,7 +116,12 @@ class SettingsChannel(object):
         self.caller = None
         self.remote_addr = None    
         
-    def on_remote_message(self, key, args):
+        self.receiver_procs_params = None
+        self.sender_procs_params = None
+        self.receiver_engines = None
+        self.sender_engines = None
+        
+    def on_remote_message(self, key, args=None):
         """
         Called by the com_chan whenever a message is received from the remote contact 
         through the com_chan with the "pinger" key.
@@ -104,10 +131,11 @@ class SettingsChannel(object):
         
         The key and *args can be one of the following...
         """
-        log.debug('SettingsChannel.on_remote_message')
+        caller = None
+        log.debug('SettingsChannel.on_remote_message: %s : %s' %  (key, str(args) )  )
         if key == "ping": # from A
             print "PING"
-            self._send_message("pong")
+            self.send_message("pong")
             
             val = "received PING"
             key = "info"
@@ -118,8 +146,62 @@ class SettingsChannel(object):
             key = "info"
             caller = None
             self.api.notify(caller, val, key)
+            
+#        elif key == "gst_receivers_ready":
+#            self._start_local_gst_senders()
+            
+        elif key == "remote_gst_params":
+            self.api.notify(caller, "Got remote params", "info" )
+            self.start_local_gst_processes(args[0], args[1] )
+            
+        else:
+            log.error("Unknown key in settings channel: " + key +  " args: %s"  % str(args) )
     
-    def _send_message(self, key, args_list=[]):
+    def _start_stream_engines(self, engines):
+        """
+        Let us start streaming
+        """
+        for engine in engines:
+            log.debug('starting ' + str(engine))
+            engine.start_streaming()
+            
+    def stop_streaming(self):
+        pass # TODO 
+        
+#    def _start_local_gst_senders(self):
+#        """
+#        creates processses and send init messages
+#        """
+#        log.debug("SettingsChannel.on_remote_message: received gst_receiver_params: %s" % str(self.sender_procs_params) )
+#        log.debug("Initialize SENDING PROCESSES:")
+#        log.debug( pprint.pformat(self.sender_procs_params)) 
+#        self.sender_engines = _create_stream_engines(self.api, 'send', self.sender_procs_params)
+#        self._start_stream_engines(self.sender_engines)
+#        
+    def start_local_gst_processes(self, rx_params, tx_params):
+        """
+        creates processses and send init messages
+        """
+        log.debug("SettingsChannel.on_remote_message: received gst_receiver_params: %s" % str(self.receiver_procs_params) )
+        self.receiver_procs_params = rx_params
+        self.sender_procs_params = tx_params
+        # reactor.callLater(2, self.send_message, "gst_receivers_ready" )
+        
+        log.debug("Initialize RECEIVING PROCESSES:")
+        log.debug( pprint.pformat(self.receiver_procs_params)) 
+        self.receiver_engines = _create_stream_engines(self.api, 'receive', self.receiver_procs_params)
+        self._start_stream_engines(self.receiver_engines)
+        
+        log.debug("SettingsChannel.on_remote_message: received gst_receiver_params: %s" % str(self.sender_procs_params) )
+        log.debug("Initialize SENDING PROCESSES:")
+        log.debug( pprint.pformat(self.sender_procs_params)) 
+        self.sender_engines = _create_stream_engines(self.api, 'send', self.sender_procs_params)
+        self._start_stream_engines(self.sender_engines)        
+#        # wait for remote receivers started
+#        log.debug("Start streaming SENDING PROCESSES:")
+#        
+            
+    def send_message(self, key, args_list=[]):
         """
         Sends a message to the current remote contact through the com_chan with key "network_test".
         :param args: list
@@ -159,7 +241,7 @@ def on_com_chan_connected(connection_handle, role="client"):
     settings_chan.remote_addr = contact.address
     _settings_channels_dict[settings_chan.contact.name] = settings_chan
     log.debug("settings_chans: " + str(_settings_channels_dict))
-    reactor.callLater(10, settings_chan._send_message, "ping" )
+    
 
 def init_connection_listeners(api):
     """
@@ -487,10 +569,11 @@ class Settings(object):
         self.selected_media_setting = name
         return True
 
-        
 class GlobalSetting(object):
     """
-    Global setting instances contain a list of stream subgroups.
+    Global setting instances contain a list of stream subgroups (see StreamSubGroup class).
+    subgroups, in turn, contain streams settings (see MediaStream class)
+    A global setting is the first level of settings...
     """
     def __init__(self, name):
         self.is_preset = False
@@ -500,43 +583,15 @@ class GlobalSetting(object):
         self.communication = ''
         log.info("GlobalSetting__init__ " + name)
     
-    def _init_stream_engines(self, listener, mode, procs_params):
-        engines = []
-        for group_name, sync_group in procs_params.iteritems():
-            log.debug(" sync group: " + group_name) 
-            engine = None
-            for stream_name, stream_params in sync_group.iteritems():
-                log.debug("  stream: " + stream_name)
-                engine_name = stream_params['engine']
-                if engine == None:
-                    engine = streams.create_engine(engine_name)
-                engine.apply_settings(listener, mode, stream_name, stream_params)
-            engines.append(engine)
-        return engines
-    
-    def _start_stream_engines(self, engines):
-        for engine in engines:
-            log.debug('starting ' + str(engine))
-            engine.start_streaming()
-               
-    def start_streaming(self, listener, address, settings_com_channel):
-        """
-        Starts the audio/video/data streaming between two miville programs. 
-
-        this is where the arguments to the sropulpof processes are exchanged. 
-        A stream can be of audio or video type. 
-        
-        first, the settings are browsed and sorted between receiver an sender
-        processes (local and remote), according to the streams type and
-        sync groups. Then the settings are sent to the engines (pobably GST)
-        """
+    def _split_gst_parameters(self, address):
         receiver_procs = {}
         sender_procs = {}
+        
         for id, group in self.stream_subgroups.iteritems():
             if group.enabled:
                 # procs is used to select between rx and tx process groups
                 procs = receiver_procs
-                s = group.mode.upper() 
+                s = group.mode.upper()
                 if s.startswith('SEND'):
                     procs = sender_procs
                     
@@ -554,27 +609,29 @@ class GlobalSetting(object):
                         params = stream.get_init_params()
                         params['address'] = address
                         proc_params[stream.name]= params
-                            
-        log.debug("Init RECEIVING PROCESSES:")
+        return receiver_procs, sender_procs           
+    
+    def start_streaming(self, listener, address, settings_channel):
+        """
+        Starts the audio/video/data streaming between two miville programs. 
+
+        this is where the arguments to the sropulpof processes are exchanged. 
+        A stream can be of audio or video type. 
         
-        log.debug( pprint.pformat(receiver_procs)) 
-        receivers = self._init_stream_engines(listener, 'receive', receiver_procs)
+        first, the settings are browsed and sorted between receiver an sender
+        processes (local and remote), according to the streams type and
+        sync groups. Then the settings are sent to the engines (pobably GST)
+        """
+        # TODO first making sure the stream is off...
+        # self.stop_streaming()
+        receiver_procs_params, sender_procs_params = self._split_gst_parameters(address)
         
+        # send settings to remote miville
+        settings_channel.start_local_gst_processes(receiver_procs_params,  sender_procs_params)
+        settings_channel.send_message("remote_gst_params",[sender_procs_params,receiver_procs_params] )
         
-        
-        log.debug("Init SENDING PROCESSES:")
-        log.debug( pprint.pformat(sender_procs)) 
-        senders = self._init_stream_engines(listener, 'send', sender_procs)
-        
-        log.debug("Starting RECEIVING PROCESSES:")
-        self._start_stream_engines(receivers)
-        
-        log.debug("Starting RECEIVING PROCESSES:")
-        self._start_stream_engines(senders)
-        
-#                for stream in group.media_streams:    
-#                    if stream.enabled:
-#                        stream.start_streaming()
+       
+       
     
     def stop_streaming(self):
         """
@@ -582,6 +639,7 @@ class GlobalSetting(object):
         """
         for id, group in self.stream_subgroups.iteritems():
             if group.enabled:
+                log.info("stopping streaming with ") # TODO: add contact name
                 group.stop_streaming()
         
     def _get_stream_subgroup_id_from_name(self, name):
@@ -752,13 +810,6 @@ class MediaStream(object):
     # make create a class  (aka static)method     
     create = staticmethod(_create)
 
-class AudioStream(MediaStream):
-    """
-    Contains Audio Settings information
-    """
-    MediaStream.media_stream_kinds['audio']= 'AudioStream'
-    pass
-
 class DataStream(MediaStream):
     """
     Contains data settings informations.
@@ -791,18 +842,6 @@ class VideoStream(MediaStream):
         params['gst_address'] = media_setting.settings['GstAddress']
         return params
      
-    def init_streaming(self, listener, params):
-        engine_name = params['engine']
-        mode = params['mode']
-        stream_port = params['port']
-        codec = params['codec']
-        source = params['source']
-        bitrate = params['bitrate']
-        gst_port = params['GstPort']
-        params['GstAddress']
-        self.engine = streams.create__video_engine(engine_name)
-        gst_address = self.engine.apply_settings(listener, mode, stream_port, codec, bitrate, source, address, gst_port, gst_address)
-       
     def start_streaming(self):
         log.info("VideoStream start_streaming: " + self.name)
         self.engine.start_streaming()  
@@ -812,3 +851,10 @@ class VideoStream(MediaStream):
         self.engine = None
         self.listener = None
 
+
+class AudioStream(VideoStream):
+    """
+    Contains Audio Settings information
+    """
+    MediaStream.media_stream_kinds['audio']= 'AudioStream'
+    pass

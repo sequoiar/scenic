@@ -151,7 +151,10 @@ class TelnetServer(recvline.HistoricRecvLine):
                 if len(self.historyLines) > 50:
                     self.history_file.write('\n'.join(self.historyLines[-50:]))
                 else:
-                    self.history_file.write('\n'.join(self.historyLines))
+                    try:
+                        self.history_file.write('\n'.join(self.historyLines))
+                    except TypeError, e:
+                        log.error(e.message)
                 self.history_file.close()
         self.historyPosition = len(self.historyLines)
         

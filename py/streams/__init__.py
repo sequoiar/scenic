@@ -20,7 +20,6 @@
 
 
 # App imports
-from streams.video.gst import VideoGst
 from streams.video.gst import AudioVideoGst
 
 from errors import *

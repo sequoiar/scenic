@@ -118,6 +118,7 @@ class GstServer(object):
     def gst_start(self, ack, id):
         log.debug('GST START acknowledged [%s]... our ticket is: %d' % (ack,id) )
         self.change_state(STREAMING)
+        
 
     def gst_stop(self, ack, id):
         log.debug('GST STOP acknowledged [%s]... our ticket is: %d' % (ack,id) )

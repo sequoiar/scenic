@@ -576,32 +576,37 @@ class ControllerApi(object):
         address: string or None (IP)
         """
         log.info("start_streams: ")
-        result = "started"
         try:
-            contact = self.adb.get_contact(contact_name)
-            id = contact.setting
-            global_setting = self.settings.get_global_setting_from_id(id)
-            address = contact.address
-            # Join contact if necessary?
-            
-            settings_com_channel = None
-            try:
-                settings_com_channel = contact.connection.com_chan
-            except Exception, e:
-                log.error("No settings communication channel for contact: " + e.message)
-            #remote_addr = contact.address
-            try:
-                settings_com_channel = settings.get_settings_channel_for_contact(contact.name)
-            except KeyError, e:
-                self.notify(caller, 'No settings channel for contact "' + contact.name+ '"' , "error")
-            # see start_connection
-            global_setting.start_streaming(self, address, settings_com_channel)
-        except AddressBookError, err:
-            result = err   
+            contact = self.adb.get_contact(contact_name)    
+            if contact.state != addressbook.CONNECTED: 
+                self.notify(caller, "Please connect to a contact prior to start streaming.", "error")
+            else:
+                com_chan = None 
+                try:
+                    com_chan = contact.connection.com_chan
+                except Exception, e:
+                    msg = "No com_chan in start_streams(): " + e.message
+                    debug.error(msg)
+                    self.notify(caller, msg, "error")
+                else:
+                    remote_addr = contact.address
+                    try:
+                        settings_com_channel = settings.get_settings_channel_for_contact(contact.name)
+                    except KeyError, e:
+                        self.notify(caller, "No settings channel for contact", "error")
+                    else:
+                        id = contact.setting
+                        global_setting = self.settings.get_global_setting_from_id(id)
+                        address = contact.address
+                        global_setting.start_streaming(self, address, settings_com_channel)
+                        self.notify(caller, "streaming started") 
+        except AddressBookError, e:
+                self.notify(caller, "Please select a contact prior to start streaming." + e.message, "error")   
         except SettingsError, err:
-            result = err
-        self.notify(caller, result)    
-        #self.notify(caller, self.streams.start(address, channel))
+            self.notify(caller, err)    
+        except StreamsError, err:
+            self.notify(caller, err)    
+        
 
     def stop_streams(self, caller):
         """
@@ -615,11 +620,13 @@ class ControllerApi(object):
             global_setting = self.settings.global_settings[id] # might cause KeyError
             
             address = contact.address
-            log.info("start_streams: ")
-            global_setting.stop_streaming(self, address)
+            log.info("stop_streams: ")
+            global_setting.stop_streaming() #self, address)
             
         except SettingsError, err:
             result = err
+        except KeyError, e:
+            log.error("KeyError in stop_streams : " + e.message)
         self.notify(caller, result)   
 
 
@@ -900,16 +907,19 @@ class ControllerApi(object):
                 try:
                     com_chan = contact.connection.com_chan
                 except Exception, e:
-                    debug.error("No com_chan in pinger_start(): " + e.message)
-                remote_addr = contact.address
-                try:
-                    ping = pinger.get_pinger_for_contact(contact.name)
-                except KeyError, e:
-                    self.notify(caller, "No pinger for contact", "error")
+                    msg = "No com_chan in pinger_start(): " + e.message
+                    debug.error(msg)
+                    self.notify(caller, msg, "error")
                 else:
-                    ret = ping.start_ping(caller)
-                    if ret:
-                        self.notify(caller, "Starting pinger test with contact %s" % (contact.name), "info")
+                    remote_addr = contact.address
+                    try:
+                        ping = pinger.get_pinger_for_contact(contact.name)
+                    except KeyError, e:
+                        self.notify(caller, "No pinger for contact", "error")
                     else:
-                        self.notify(caller, "An error occuring while trying to pinger test.", "error")
+                        ret = ping.start_ping(caller)
+                        if ret:
+                            self.notify(caller, "Starting pinger test with contact %s" % (contact.name), "info")
+                        else:
+                            self.notify(caller, "An error occuring while trying to pinger test.", "error")
 
