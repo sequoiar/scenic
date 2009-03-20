@@ -23,6 +23,8 @@
 #include "util.h"
 #include "msgThreadFactory.h"
 
+#include "tcp/asioThread.h"
+
 /** Main command line entry point
  * launches the threads and dispatches
  * MapMsg between the threads
@@ -35,13 +37,14 @@ class MainModule
 
         MainModule(bool send, int port)
             : tcpThread_(MsgThreadFactory::Tcp(port, true)),
-              gstThread_(MsgThreadFactory::Gst(send)),
+              gstThread_(MsgThreadFactory::Gst(send)), asio_thread_(new asio_thread()),
               func(gstThread_), msg_count(0){}
 
-        ~MainModule(){delete gstThread_; delete tcpThread_;}
+        ~MainModule(){delete gstThread_; delete tcpThread_; delete asio_thread_;}
     private:
         MsgThread* tcpThread_;
         MsgThread* gstThread_;
+        MsgThread* asio_thread_;
         MainSubscriber func;
         int msg_count;
 
@@ -59,13 +62,15 @@ bool MainModule::run()
             THROW_ERROR("GstThread not running");
         if(tcpThread_ == 0 || !tcpThread_->run())
             THROW_ERROR("TcpThread not running");
+        if(asio_thread_ == 0 || !asio_thread_->run())
+            THROW_ERROR("asioThread not running");
         QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
 
         while(!signalFlag())
         {
-            MapMsg tmsg = tcp_queue.timed_pop(1);
-            MapMsg gmsg = gst_queue.timed_pop(1000);
+            MapMsg tmsg = tcp_queue.timed_pop(2000);
+            MapMsg gmsg = gst_queue.timed_pop(2000);
 
             if (!gmsg.cmd().empty())
                 tcp_queue.push(gmsg);
@@ -104,9 +109,9 @@ bool MainModule::run()
 }
 
 
-static int port, send;
 void parseArgs(int argc, char** argv)
 {
+static int port, send;
     if(argc != 3)
         THROW_CRITICAL("Invalid command line arguments -- 0/1 for receive/send and a port");
     if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)

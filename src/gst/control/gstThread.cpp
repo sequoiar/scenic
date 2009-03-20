@@ -56,7 +56,7 @@ int GstThread::main()
         //std::cout << (flipflop ? "-\r" : " \r");
         flipflop = !flipflop;
         //std::cout.flush();
-        MapMsg f = queue_.timed_pop(100000);
+        MapMsg f = queue_.timed_pop(2000);
 
         if(!f.cmd().empty())
         {

@@ -80,7 +80,6 @@ int TcpThread::main()
             {
                 if((quit = gotQuit()))
                     return 0;
-                usleep(10000);
             }
             try
             {
@@ -105,8 +104,6 @@ int TcpThread::main()
                         }
                         while(!line.empty());
                     }
-                    else
-                        usleep(1000);
                 }
             }
             catch(Except e)
@@ -135,7 +132,7 @@ int TcpThread::main()
 
 bool TcpThread::gotQuit()
 {
-    MapMsg f = queue_.timed_pop(1);
+    MapMsg f = queue_.timed_pop(2000);
     std::string command;
     if(f.cmd().empty())
         return false;
@@ -187,7 +184,7 @@ std::string tcpGetBuffer(int port, int &id)
     QueuePair& queue = tcp.getQueue();
     for(;;)
     {
-        MapMsg f = queue.timed_pop(100000);
+        MapMsg f = queue.timed_pop(2000);
         if(f.cmd().empty())
             continue;
         try
