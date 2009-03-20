@@ -30,6 +30,7 @@
 // NOTES:
 // Change verbose_ to true if you want Gstreamer to tell you everything that's going on
 // in the pipeline
+// This class uses the Singleton pattern
 
 Pipeline *Pipeline::instance_ = 0;
 
@@ -99,6 +100,16 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
                 Instance()->updateListeners(msg);
                 break;
             }
+
+        case GST_MESSAGE_LATENCY:
+            {
+                LOG_DEBUG("Latency change, recalculating latency for pipeline");
+                // when pipeline latency is changed, this msg is posted on the bus. we then have
+                // to explicitly tell the pipeline to recalculate its latency
+                gst_bin_recalculate_latency (GST_BIN_CAST (Instance()->pipeline_));
+                break;
+            }
+
         default:
             break;
     }

@@ -74,6 +74,18 @@ void GtkVideoSink::showWindow()
 }
 
 
+void GtkVideoSink::milhouseify(GtkWidget *widget)
+{
+    static gboolean milhouseified = FALSE;
+
+    if (milhouseified == FALSE)
+    {
+        // add a nice background
+        gtk_widget_set_name(widget, "window");
+        gtk_rc_parse("milhouse.rc");
+    }
+}
+
 void GtkVideoSink::toggleFullscreen(GtkWidget *widget)
 {
 #if 0
@@ -119,11 +131,15 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             toggleFullscreen(widget);
             break;
 
+        case GDK_M:
+            //milhouseify(widget);
+            break;
+
         case GDK_Q:
             // Quit application, this quits the main loop
             // (if there is one)
-                LOG_INFO("Q key pressed, quitting.");
-                playback::quit();
+            LOG_INFO("Q key pressed, quitting.");
+            playback::quit();
             break;
 
         default:

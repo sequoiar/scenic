@@ -41,21 +41,29 @@ void RtpBin::init()
 {
     // only initialize rtpbin once per process
     if (rtpbin_ == 0) 
+    {
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
-    
-    // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
-    // rule of thumb: 2-3 times the maximum network jitter
-    const int MAX_JITTER = 1; // ms
-    g_object_set(G_OBJECT(rtpbin_), "latency", 3 * MAX_JITTER, NULL);
-    
-    // uncomment this to print stats
-#if RTP_REPORTING
-    g_timeout_add(5000 /* ms */, 
-                  static_cast<GSourceFunc>(printStatsCallback),
-                  static_cast<gpointer>(rtpbin_));
-#endif
 
-// DON'T USE THE DROP-ON-LATENCY SETTING, WILL CAUSE AUDIO TO DROP OUT WITH LITTLE OR NO FANFARE
+        // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
+        // rule of thumb: 2-3 times the maximum network jitter
+        const int LATENCY = 3; // ms
+        setLatency(LATENCY);
+
+        // uncomment this to print stats
+#if RTP_REPORTING
+        g_timeout_add(5000 /* ms */, 
+                static_cast<GSourceFunc>(printStatsCallback),
+                static_cast<gpointer>(rtpbin_));
+#endif
+    }
+    // DON'T USE THE DROP-ON-LATENCY SETTING, WILL CAUSE AUDIO TO DROP OUT WITH LITTLE OR NO FANFARE
+}
+
+
+void RtpBin::setLatency(int latency)
+{
+    assert(rtpbin_);
+    g_object_set(G_OBJECT(rtpbin_), "latency", latency, NULL);
 }
 
 
@@ -77,22 +85,6 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
     g_print("PACKETS LOST: %d\n", packetLoss);
 }
 
-void RtpBin::printSourceStats(GObject * source)
-{
-    GstStructure *stats;
-    gchar *str;
-
-    // get the source stats
-    g_object_get(source, "stats", &stats, NULL);
-
-    // dump the whole structure
-    str = gst_structure_to_string(stats);
-    g_print("source stats: %s\n", str);
-
-    gst_structure_free(stats);
-    g_free(str);
-}
-
 
 // callback to print the rtp stats 
 gboolean RtpBin::printStatsCallback(gpointer data)
@@ -107,7 +99,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
     GValueArray *arrayOfSources;
     GValue *val;
     guint i;
-    
+
     GstElement *rtpbin = static_cast<GstElement*>(data);
 
     g_print("/*----------------------------------------------*/\n");  
@@ -131,7 +123,6 @@ gboolean RtpBin::printStatsCallback(gpointer data)
         g_value_array_free(arrayOfSources);
 
         g_object_unref(session);
-
     }
     return TRUE;
 }
