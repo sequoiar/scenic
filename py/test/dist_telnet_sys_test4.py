@@ -23,8 +23,8 @@
 
 System test for ditributed telnet, remote script
 Usage: 
-local:trial test/dist_tenet_sys_test3.py
-remote:trial test/dist_tenet_sys_test4.py
+On local machine:trial test/dist_tenet_sys_test3.py
+
 
 
 """ 
