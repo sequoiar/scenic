@@ -16,6 +16,8 @@
 #ifdef HAVE_BOOST_ASIO
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
 using boost::asio::io_service;
@@ -88,15 +90,20 @@ class tcp_session
 class tcp_server
 {
     public:
-        tcp_server(io_service& io_service, short port)
+        tcp_server(io_service& io_service, short port, QueuePair& queue)
             : io_service_(io_service),
-            acceptor_(io_service, tcp::endpoint(tcp::v4(), port))
+            acceptor_(io_service, tcp::endpoint(tcp::v4(), port)), queue_(queue),
+            t_(io_service, boost::posix_time::seconds(1))
         {
             tcp_session* new_tcp_session = new tcp_session(io_service_);
             acceptor_.async_accept(new_tcp_session->socket(),
                     boost::bind(&tcp_server::handle_accept, this, new_tcp_session,
                         error));
+            t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
+            //t_.async_wait(tcp_server::handle_timer);
         }
+
+
 
         void handle_accept(tcp_session* new_tcp_session,
                 const error_code& error)
@@ -115,9 +122,22 @@ class tcp_server
             }
         }
 
+        void handle_timer(const error_code& /*error*/)
+        {
+            t_.expires_at(t_.expires_at() + boost::posix_time::seconds(1));
+            t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
+            MapMsg msg;
+            msg = queue_.timed_pop(1);
+            if(!msg.cmd().empty())
+                if(msg.cmd() == "quit")
+                    THROW_ERROR("Got quit");
+        }
+
     private:
         io_service& io_service_;
         tcp::acceptor acceptor_;
+        QueuePair& queue_;
+        boost::asio::deadline_timer t_;
 };
 
 
@@ -186,19 +206,10 @@ int asio_thread::main()
         io_service io_service;
 
         using namespace std; // For atoi.
-        tcp_server s(io_service, 1111);
+        tcp_server s(io_service, 1111,queue_);
         udp_server us(io_service, 1111);
-
-        MapMsg msg;
-        for(;;)
-        {
-            msg = queue_.timed_pop(2000);
-            if(msg.cmd().empty())
-                io_service.poll();
-            else
-                if(msg.cmd() == "quit")
-                    break;
-        }
+    
+        io_service.run();
 #endif
     }
     catch (std::exception& e)
