@@ -147,9 +147,8 @@ class tcp_server
             t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
             MapMsg msg;
             msg = queue_.timed_pop(1);
-            if(!msg.cmd().empty())
                 if(msg.cmd() == "quit")
-                    THROW_ERROR("Got quit");
+                    THROW_END_THREAD("bye");
         }
 
     private:

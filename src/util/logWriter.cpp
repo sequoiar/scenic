@@ -36,12 +36,6 @@
 #define LOG_LEVEL INFO
 #endif
 
-void assert_throw(__const char *__assertion, __const char *__file,
-                           unsigned int __line, __const char *__function)
-{
-    cerr_log_( __assertion, ASSERT_FAIL, __file, __function, __line,0);
-}
-
 bool logLevelIsValid(LogLevel level)
 {
     switch (level)
@@ -49,6 +43,7 @@ bool logLevelIsValid(LogLevel level)
         case DEBUG:
         case INFO:
         case WARNING:
+        case THROW:
         case ERROR:
         case CRITICAL:
         case ASSERT_FAIL:
@@ -67,22 +62,25 @@ std::string logLevelStr(LogLevel level)
     switch (level)
     {
         case DEBUG:
-            lstr = "\r\x1b[32mDEBUG";
+            lstr = "\r\x1b[19C\x1b[32mDEBUG";
             break;
         case INFO:
-            lstr = "\r\x1b[34mINFO";
+            lstr = "\r\x1b[19C\x1b[34mINFO";
+            break;
+        case THROW:
+            lstr = "\r\x1b[19C\x1b[33mTHROW";
             break;
         case WARNING:
-            lstr = "\r\x1b[33mWARNING";
+            lstr = "\r\x1b[19C\x1b[33mWARNING";
             break;
         case ERROR:
-            lstr = "\r\x1b[31mERROR";
+            lstr = "\r\x1b[19C\x1b[31mERROR";
             break;
         case CRITICAL:
-            lstr = "\r\x1b[41mCRITICAL";
+            lstr = "\r\x1b[19C\x1b[41mCRITICAL";
             break;
         case ASSERT_FAIL:
-            lstr = "\r\x1b[41mASSERT_FAIL";
+            lstr = "\r\x1b[19C\x1b[41mASSERT_FAIL";
             break;
         default:
             lstr = "INVALID LOG LEVEL";
@@ -139,10 +137,11 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
         time( &rawtime );
         struct tm * timeinfo = localtime(&rawtime);
         //asctime adds a linefeed
-        logMsg << logLevelStr(level) << msg << " " << functionName <<  "() in " << fileName
-            << ":" << " line " << lineNum << " " << std::setfill('0') << std::setw(2) 
+        logMsg << std::setfill('0') << std::setw(2) 
             << timeinfo->tm_hour <<":"<< std::setw(2) << timeinfo->tm_min 
-            <<":" << std::setw(2) << timeinfo->tm_sec << std::endl;
+            <<":" << std::setw(2) << timeinfo->tm_sec 
+            << " line" << std::setfill('0') << std::setw(5) << lineNum 
+            << logLevelStr(level) << msg << " " << functionName <<  "() in " << fileName << std::endl;
 #else
         logMsg <<  msg << std::endl;
 #endif
@@ -152,7 +151,7 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
 }
 
 
-void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileName,
+void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, int lineNum,int err)
 {
     std::string strerr = log_(msg,level,fileName,functionName,lineNum);
@@ -168,7 +167,7 @@ void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileN
         return;
     }
     std::cerr << strerr;
-    if(level < ERROR)
+    if(level < THROW)
         return;
 
     if(level < CRITICAL)
@@ -179,4 +178,10 @@ void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileN
 
 }
 
+
+void assert_throw(__const char *__assertion, __const char *__file,
+                           unsigned int __line, __const char *__function)
+{
+    cerr_log_throw( __assertion, ASSERT_FAIL, __file, __function, __line,0);
+}
 

@@ -54,13 +54,14 @@
 enum LogLevel {
     NONE = 0,
     DEBUG = 10,
-    INFO = 20,
+    INFO = 20,THROW = 35, 
     WARNING = 30,
     ERROR = 40,
     CRITICAL = 50,
     ASSERT_FAIL = 60
 };
 #define THROW_ERRNO(msg,err)      THROW_(msg, ERROR,err)
+#define THROW_END_THREAD(msg)  THROW_(msg, THROW,0)
 #define THROW_ERROR(msg)      THROW_(msg, ERROR,0)
 #define THROW_CRITICAL(msg)   THROW_(msg, CRITICAL,0)
 #define LOG_INFO(msg)       LOG(msg, INFO)
@@ -127,14 +128,14 @@ namespace logger
             do{                         \
             std::ostringstream mangle84579568749576948;      \
             mangle84579568749576948 << msg;                  \
-            cerr_log_(mangle84579568749576948.str(), level, __FILE__, __FUNCTION__, __LINE__,err);    \
+            cerr_log_throw(mangle84579568749576948.str(), level, __FILE__, __FUNCTION__, __LINE__,err);    \
             }                           \
             while(0)
 
 std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, int lineNum);
 
-void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileName,
+void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, int lineNum,int err);
 
 
