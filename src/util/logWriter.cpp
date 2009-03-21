@@ -143,7 +143,7 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
             << " line" << std::setfill('0') << std::setw(5) << lineNum 
             << logLevelStr(level) << msg << " " << functionName <<  "() in " << fileName << std::endl;
 #else
-        logMsg <<  msg << std::endl;
+        logMsg <<  msg <<  std::endl;
 #endif
     }
 

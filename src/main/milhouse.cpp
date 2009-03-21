@@ -48,7 +48,6 @@ int telnetServer(int, int);
 // 2way audio and video
 short pof::run(int argc, char **argv)
 {
-    LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
     OptionArgs options;
 
     // add options here
@@ -226,14 +225,16 @@ short pof::run(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
+    int ret = 0;
+    LOG_INFO("\x1b[0;10r\x1b[2JBuilt on " << __DATE__ << " at " << __TIME__);
     try {
-        return pof::run(argc, argv);
+        ret = pof::run(argc, argv);
     }
     catch (Except e)
     {
-//        LOG_DEBUG(e.msg_);
-        return 1;
+        ret = 1;
     }
-    return 0;
+    LOG_INFO("\x1b[rBuilt on " << __DATE__ << " at " << __TIME__);
+    return ret;
 }
 
