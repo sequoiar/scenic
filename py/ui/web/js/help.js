@@ -6,6 +6,12 @@
 
 // import Nevow.Athena
 
+/**
+ * This is the base class of the Help Widget.
+ *
+ * @class Help
+ * @extends Nevow.Athena.Widget
+ */
 Help = Nevow.Athena.Widget.subclass('Help');
 
 Help.methods(
@@ -19,6 +25,11 @@ Help.methods(
         Help.upcall(self, "__init__", node);
     },  
 
+    /**
+     * Call the server side manual method.
+     *
+     * @member Help
+     */
     function manual(self) {
         /**
          * The manual.
