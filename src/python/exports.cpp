@@ -20,13 +20,6 @@
  *
  */
 
-/** \file
- * This file exposes class to python 
- *
- * Exposes object modules to python interpreter, available by calling "from libmilhouse import *".
- *
- */
-
 #include <iostream>
 #include <Python.h>
 #include <boost/python.hpp>
@@ -42,7 +35,12 @@ using namespace boost::python;
 #include "tcp/tcpThread.h"
 #include "pyMsgThread.h"
 
-/// BOOST PYTHON MOD
+/** 
+ * This file exposes class to python 
+ 
+ * Exposes object modules to python interpreter, available by calling "from libmilhouse import *".
+ *
+ */
 BOOST_PYTHON_MODULE(milhouse)
 {
 

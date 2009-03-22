@@ -20,19 +20,6 @@
  *
  */
 
-/** \file
- *      Log writer macro, usage:
- *
- *      LOG_DEBUG("This is a log");
- *      
- *      LOG_INFO("Got Error errno: " << 100);
- *      
- *      THROW_ERROR(99);
- *
- *      To disable logging, define the macro ENABLE_LOG (in this file) to 0.
- *
- */
-
 #ifndef _LOG_WRITER_H_
 #define _LOG_WRITER_H_
 
@@ -104,7 +91,23 @@ public:
     AssertExcept(std::string log_msg):CriticalExcept(log_msg){log_ = ASSERT_FAIL;}
 };
 
-namespace logger
+/**  
+ *      Utility functions for logWriter 
+ *
+ *      Log writer macro, usage:
+ *
+ *      LOG_DEBUG("This is a log");
+ *      
+ *      LOG_INFO("Got Error errno: " << 100);
+ *      
+ *      THROW_ERROR(99);
+ *
+ *      To disable logging, define the macro ENABLE_LOG (in this file) to 0.
+ *
+ */
+
+
+namespace Log
 {
     /// log Subscriber 
     class Subscriber

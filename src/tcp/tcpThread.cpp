@@ -25,18 +25,18 @@
 #include <errno.h>
 #include <string.h>
 
-class TcpLogger
-    : public logger::Subscriber
+class TcpLog
+    : public Log::Subscriber
 {
     public:
-        TcpLogger(TcpThread& tcp)
+        TcpLog(TcpThread& tcp)
             : tcp_(tcp){}
         TcpThread& tcp_;
         void operator()(LogLevel&, std::string& msg);
 };
 
 
-void TcpLogger::operator()(LogLevel& level, std::string& msg)
+void TcpLog::operator()(LogLevel& level, std::string& msg)
 {
     MapMsg m("log");
     m["level"] = level;
@@ -45,7 +45,7 @@ void TcpLogger::operator()(LogLevel& level, std::string& msg)
 }
 
 TcpThread::TcpThread(int inport, bool logF)            
-: serv_(inport), logFlag_(logF), lf_(new TcpLogger(*this))
+: serv_(inport), logFlag_(logF), lf_(new TcpLog(*this))
 {
 }
 

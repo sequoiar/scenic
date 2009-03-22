@@ -19,11 +19,6 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file
- *  A simple server in the internet domain using TCP
- *
- *  The port number is passed as an argument
- */
 
 #include "util.h"
 

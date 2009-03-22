@@ -19,10 +19,6 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file audioSource.h
- *      A family of classes representing different types/sources of audio input.
- */
-
 #ifndef _AUDIO_SOURCE_H_
 #define _AUDIO_SOURCE_H_
 

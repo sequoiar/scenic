@@ -20,10 +20,6 @@
  *
  */
 
-/** \file 
- *      Utility functions for logWriter 
- */
-
 #include "util.h"
 
 #include <iostream>
@@ -89,29 +85,29 @@ std::string logLevelStr(LogLevel level)
     return lstr;
 }
 
-static logger::Subscriber emptyLogSubscriber;
-static logger::Subscriber* lf = &emptyLogSubscriber;
+static Log::Subscriber emptyLogSubscriber;
+static Log::Subscriber* lf = &emptyLogSubscriber;
 static bool hold_flag = false;
 
 
-logger::Subscriber::~Subscriber()
+Log::Subscriber::~Subscriber()
 {
     lf = &emptyLogSubscriber;
 }
 
 
-void logger::Subscriber::hold()
+void Log::Subscriber::hold()
 {
     hold_flag = true;
 }
 
 
-void logger::Subscriber::enable()
+void Log::Subscriber::enable()
 {
     hold_flag = false;
 }
 
-logger::Subscriber::Subscriber()
+Log::Subscriber::Subscriber()
 {
     lf = this;
 }

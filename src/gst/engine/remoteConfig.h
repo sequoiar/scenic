@@ -20,11 +20,6 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file
- *      Immutable class that is used to setup rtp using objects.
- *
- */
-
 #ifndef _REMOTE_CONFIG_H_
 #define _REMOTE_CONFIG_H_
 
@@ -34,6 +29,10 @@ class Encoder;
 class VideoEncoder;
 class Decoder;
 
+/** 
+ *      Immutable class that is used to setup rtp using objects.
+ *
+ */
 class RemoteConfig 
 {
     public:

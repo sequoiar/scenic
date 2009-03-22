@@ -20,11 +20,6 @@
  *
  */
 
-/** \file 
- *      allows assert to throw an exception
- *
- */
-
 #ifndef __LASSERT_H__
 #define __LASSERT_H__
 

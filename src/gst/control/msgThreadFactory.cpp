@@ -21,11 +21,6 @@
  */
 
 
-/** \file
- *      Simple Builder Functions to abstract the type of Thread
- *
- */
-
 #include "msgThreadFactory.h"
 #include "tcp/tcpThread.h"
 #include "gstSenderThread.h"
