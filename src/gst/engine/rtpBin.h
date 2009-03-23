@@ -44,6 +44,7 @@ class RtpBin
         _GstElement *rtcp_sender_, *rtcp_receiver_;
 
     private:
+        static const int MIN_LATENCY = 3;
         static int printStatsCallback(void * rtpbin);
         static void printSourceStats(_GObject *source);
         static int dropOnLatency(void * data);

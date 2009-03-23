@@ -198,6 +198,7 @@ AC_CONFIG_FILES([Makefile
                  src/gst/Makefile
                  src/gst/engine/Makefile
                  src/gst/control/Makefile
+                 src/devices/Makefile
                  src/main/Makefile
                  src/python/Makefile
                  ])

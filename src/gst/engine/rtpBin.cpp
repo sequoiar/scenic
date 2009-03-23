@@ -46,8 +46,7 @@ void RtpBin::init()
 
         // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
         // rule of thumb: 2-3 times the maximum network jitter
-        const int LATENCY = 3; // ms
-        setLatency(LATENCY);
+        setLatency(MIN_LATENCY);
 
         // uncomment this to print stats
 #if RTP_REPORTING
@@ -63,6 +62,8 @@ void RtpBin::init()
 void RtpBin::setLatency(int latency)
 {
     assert(rtpbin_);
+    if (latency <= 0)
+        THROW_ERROR("Cannot set rtpbin latency to " << latency << ", must be > 0");
     g_object_set(G_OBJECT(rtpbin_), "latency", latency, NULL);
 }
 

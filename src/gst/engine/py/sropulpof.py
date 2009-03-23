@@ -26,6 +26,9 @@ import sys
 
 from milhouse import * # python bindings to our gst module
 
+disableVideo = False
+disableAudio = False
+
 class PofExcept(Exception): pass
 
 def parseArgs(args):
@@ -73,22 +76,22 @@ def parseArgs(args):
     parser.add_option("-z", "--videobitrate",
             type="int", dest="videoBitrate", default=3000000, 
             help="videobitrate in bit/s")
-    parser.add_option("-q", "--disable-video",
-            action="store_true", dest="disableVideo", default=False, help="stream audio only")
-    parser.add_option("-j", "--disable-audio",
-            action="store_true", dest="disableAudio", default=False, help="stream video only")
     parser.add_option("-u", "--deinterlace",
             action="store_true", dest="deinterlace", default=False, help="deinterlace video")
+    parser.add_option("-q", "--audiodevice", type="string", dest="audioDevice", default="", 
+            help="audio device handle: hw:0 hw:2 plughw:0 plughw:2 filename");
 
-    return parser.parse_args(args)
-
+    parsedArgs = parser.parse_args(args)[0]
+    disableVideo = (parsedArgs.videoCodec is None) and (parsedArgs.videoport is None)
+    disableAudio = (parsedArgs.audioCodec is None) and (parsedArgs.audioport is None)
+    return parsedArgs
 
 def runAsReceiver(options):
     """ Receives media from a remote sender """
-    if not options.disableVideo:
+    if not disableVideo:
         vRx = buildVideoReceiver(options.ip, options.videoCodec, options.videoPort, options.screenNum, options.videoSink)
-    if not options.disableAudio:
-        aRx = buildAudioReceiver(options.ip, options.audioCodec, options.audioPort, options.audioSink)
+    if not disableAudio:
+        aRx = buildAudioReceiver(options.ip, options.audioCodec, options.audioPort, options.audioSink, options.audioDevice)
 
     start()
     if options.fullscreen:
@@ -102,7 +105,7 @@ def runAsReceiver(options):
 
 def runAsSender(options):
     """ Sends media to a remote receiver """
-    if not options.disableVideo:
+    if not disableVideo:
         vConfig = None
         if options.videoDevice is None:
             vConfig = VideoSourceConfig(options.videoSource, options.videoBitrate, "", options.deinterlace)
@@ -111,15 +114,15 @@ def runAsSender(options):
     
         vTx = buildVideoSender(vConfig, options.ip, options.videoCodec, options.videoPort)
 
-    if not options.disableAudio:
+    if not disableAudio:
         aConfig = AudioSourceConfig(options.audioSource, "", options.numChannels)
         aTx = buildAudioSender(aConfig, options.ip, options.audioCodec, options.audioPort)
 
     start() 
     
-    if not options.disableVideo:
+    if not disableVideo:
         assert(tcpSendBuffer(options.ip, VIDEO_CAPS_PORT, VIDEO_MSG_ID, vTx.getCaps()))
-    if not options.disableAudio:
+    if not disableAudio:
         assert(tcpSendBuffer(options.ip, AUDIO_CAPS_PORT, AUDIO_MSG_ID, aTx.getCaps()))
 
     eventLoop(options.timeout)
@@ -127,13 +130,11 @@ def runAsSender(options):
     stop()
     return wasPlaying
 
-
-
 def run(myArgs):
     setHandler() # to catch interrupts at cpp level first
-    options = parseArgs(myArgs)[0]
+    options = parseArgs(myArgs)
     
-    if options.disableVideo and options.disableAudio:
+    if disableVideo and disableAudio:
         raise PofExcept("Do not disable audio and video")
     
     if options.isSender:

@@ -106,7 +106,8 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
                 LOG_DEBUG("Latency change, recalculating latency for pipeline");
                 // when pipeline latency is changed, this msg is posted on the bus. we then have
                 // to explicitly tell the pipeline to recalculate its latency
-                gst_bin_recalculate_latency (GST_BIN_CAST (Instance()->pipeline_));
+                if (!gst_bin_recalculate_latency (GST_BIN_CAST (Instance()->pipeline_)))
+                    LOG_WARNING("Could not reconfigure latency.");
                 break;
             }
 

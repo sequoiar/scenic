@@ -39,7 +39,7 @@ GST_PLUGINS = ['level', 'audioconvert', 'alsasink', 'pulsesink',
             'rtpL16pay', 'rtpL16depay', 'rtpmpapay', 'rtpmpadepay', 'udpsrc', 'udpsink', 
             'xvimagesink', 'ximagesink', 'dvdec', 'audiotestsrc', 'filesrc', 'alsasrc', 
             'jackaudiosrc', 'dv1394src', 'pulsesrc', 'jackaudiosink', 'alsasink', 'pulsesink', 
-            'videotestsrc', 'v4l2src', 'rtpvorbispay', 'rtpvorbisdepay']
+            'videotestsrc', 'v4l2src', 'rtpvorbispay', 'rtpvorbisdepay', 'deinterlace2']
 
 missingPlugins = []
 
