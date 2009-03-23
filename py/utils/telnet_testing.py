@@ -254,6 +254,21 @@ class TelnetBaseTest(unittest.TestCase):
         index = self.client.expect([expected, pexpect.EOF, pexpect.TIMEOUT], timeout=2) # 2 seconds max
         self.evalTest(index, message)
 
+    def tst(self, command, expected, timeout=2, errorMsg = None):
+        """
+        Convenient little gem of a tst method that
+        sends a telnet request and tests for an expected reply.
+        """
+        self.client.sendline(command)
+        err = errorMsg or 'The command did not return: "%s" as expected' % expected
+        self.expectTest(expected, err)
+        time.sleep(0.5)
+        #b = self.client.buffer.rstrip()
+        #b = b.lstrip()
+        #print "\n============================================"    
+        #print command
+        #b = b.replace ('\r', '')
+        #print b
 
 # ----------------------------- startup poutine -----------------------
 # TODO: Fix the process.logfile not getting to sys.stdout

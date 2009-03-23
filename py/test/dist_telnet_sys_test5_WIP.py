@@ -22,6 +22,7 @@
 """
 Distibuted telnet system test, local file 
 Usage: On local machine: trial test/dist_telnet_sys_test3.py IP_ADDRESS
+You should set your env variables first. 
 """ 
 import unittest
 import pexpect
@@ -36,19 +37,6 @@ testing.VERBOSE_SERVER = False
 testing.START_SERVER = False # You must start miville manually on both local and remote host.
 testing.start()
 
-
-#stdin, stdout, stderr = os.popen3("ssh bloup")
-#stdin.write("""cd /home/scormier/src/miville/trunk/py;trial test/dist_telnet_sys_test4.py 10.10.10.73\n""")
-#time.sleep(10)        
-#stdin.write("""exit\n""")
-#stdin.close()
-#stdout.close()
-#stderr.close()
-        
-
-
-    
-
 #TC1-Interface accessed
 class Test_001_Gen_Settings(testing.TelnetBaseTest):
     def test_02_yes(self):
@@ -57,11 +45,14 @@ class Test_001_Gen_Settings(testing.TelnetBaseTest):
         print "**********************TC1_2 Satisfied**********************************"
         print "***********************************************************************"   
 
+    def clean_03_contacts(self):
+        self.client.sendline("contacts -e test")
+        self.client.sendline("contacts -e test2")
+
 #TC2-Contacts are shown     
 class Test_001_List_Contacts(testing.TelnetBaseTest):
     """
     System Tests for listing contacts
-    
     """
     def test_01_list_empty_contacts(self):
         self.tst("contacts --list","")
@@ -98,3 +89,10 @@ class Test_001_List_Contacts(testing.TelnetBaseTest):
 #        self.client.close()
 
 
+#stdin, stdout, stderr = os.popen3("ssh bloup")
+#stdin.write("""cd /home/scormier/src/miville/trunk/py;trial test/dist_telnet_sys_test4.py 10.10.10.73\n""")
+#time.sleep(10)        
+#stdin.write("""exit\n""")
+#stdin.close()
+#stdout.close()
+#stderr.close()
