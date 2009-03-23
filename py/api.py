@@ -742,9 +742,6 @@ class ControllerApi(object):
         except KeyError:
             self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
             return
-
-        #self.notify(caller, 'you called devices_list', 'devices_list')
-        # TODO: make asynchronous
         devices_list = []
         for driver in manager.drivers.values():
             for device in driver.devices.values():
@@ -775,6 +772,15 @@ class ControllerApi(object):
             devices.jackd.toggle_kill_jackd_enabled(enabled)
         except Exception, e:
             log.error(e.message)
+    
+    def set_video_standard(self, caller, value=None):
+        """
+        Easily sets the video standard. (norm)
+        
+        Valid string values are "ntsc", "secam" and "pal".
+        If value is None, sets it according to the time zone.
+        """
+        return devices.set_video_standard(caller, value)
 
     def device_modify_attribute(self, caller, driver_kind, driver_name, device_name, attribute_name, value):
         """

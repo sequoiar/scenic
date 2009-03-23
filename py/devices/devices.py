@@ -584,3 +584,35 @@ def modify_attribute(caller, driver_kind, driver_name, device_name, attribute_na
     #self.notify(caller, 
     # devices.get_driver(driver_name).devices[device_name].attributes[attribute_name].set_value(value)
 
+def set_video_standard(caller, value=None):
+    """
+    Easily sets the video standard. (norm)
+    
+    Valid string values are "ntsc", "secam" and "pal".
+    If value is None, sets it according to the time zone.
+    """
+    if value not in ['ntsc', 'pal', 'secam']:
+        value = 'ntsc' # default
+        try:
+        # TODO: check more time zones
+            f = open('/etc/timezone', 'r')
+            tz = f.read()
+            log.debug('time zone is %s' % (tz))
+            f.close()
+            if tz.split("/")[0] in ['Europe']:
+                value = 'pal'
+        except Exception, e:
+            log.error('set_video_standard: ' + e.message)
+    driver_kind = 'video'
+    try: 
+        manager = managers[driver_kind]
+    except KeyError:
+        self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
+    else:
+        devices_list = []
+        # for every video driver.
+        for driver in manager.drivers.values():
+            for device in driver.devices.values():
+                modify_attribute(caller, driver.kind, driver.name, device_name, 'norm', value)
+    return value
+

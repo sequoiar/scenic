@@ -537,6 +537,24 @@ class CliController(TelnetServer):
         #else:
         self.print_all_commands()
 
+    def _norm(self, line):                                                                       
+        """                                                                                      
+        Easily sets the video standard. (norm)                                                   
+                                                                                                 
+        Valid string values are "ntsc", "secam" and "pal".                                       
+        If value is None, sets it according to the time zone.                                    
+        """                                                                                      
+                                                                                                 
+        cp = CliParser(self, prog=line[0], description="Easily sets the video standard.")        
+        # strings options                                                                        
+        cp.add_option("-n", "--norm", type='string', default="ntsc", help="Specifies the norm such as 'ntsc', 'pal' or 'secam'")
+        (options, args) = cp.parse_args(line)                                                    
+        
+        if options.norm:                                                                         
+            value = self.core.set_video_standard(self, options.norm)
+            self.write("\nSet video standard to %s\n" % (value))
+        else:
+            cp.print_help()    
 
     def _devices(self, line):
         """
