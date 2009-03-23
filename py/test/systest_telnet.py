@@ -541,7 +541,7 @@ class Test_004_Settings(TelnetBaseTest):
     def tst(self, command, expected, errorMsg = None):
         self.client.sendline(command)
         self.sleep()
-        err = errorMsg or 'The command did not return: "%s" as excpected' % expected
+        err = errorMsg or 'The command did not return: "%s" as expected' % expected
         self.expectTest(expected, err)
         
     def test_00_yes(self):

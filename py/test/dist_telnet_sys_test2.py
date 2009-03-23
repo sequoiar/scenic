@@ -113,7 +113,8 @@ class Test_001_Gen_Settings(TestBase):
         # add media stream
         self.tst("settings --type stream --globalsetting vid_rx_setting --subgroup recv --add video" , "Media stream added")
         self.tst("settings --type stream --globalsetting vid_rx_setting --subgroup recv --mediastream video01 --modify setting=10000", "modified")
- 	self.tst("settings --type stream --globalsetting vid_rx_setting --subgroup recv --mediastream video01 --modify port=6666","modified")                 
+ 	self.tst("settings --type stream --globalsetting vid_rx_setting --subgroup recv --mediastream video01 --modify port=6666","modified")
+	                 
       
         time.sleep(2)
         self.tst("streams --start bloup", "")

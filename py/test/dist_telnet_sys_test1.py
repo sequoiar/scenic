@@ -65,6 +65,9 @@ class Test_001_Gen_Settings(TestBase):
         self.expectTest('pof: ', 'The default prompt is not appearing.')
     
     
+
+
+
         
     def test_02_save_basic_video_streaming_settings(self):
         print
@@ -76,7 +79,7 @@ class Test_001_Gen_Settings(TestBase):
         
         # add media setting
         self.tst("settings --type media --add mpeg4_basic_tx", "Media setting added")
-        # list again, check that the new setting is there
+        
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=codec:mpeg4'           , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=bitrate:2048000'       , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=engine:Gst'            , 'modified')
