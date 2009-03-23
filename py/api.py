@@ -54,6 +54,7 @@ from errors import *
 import connectors
 from connectors.states import *
 import devices
+from devices import firewire
 import network
 import addressbook # for network_test_*
 from protocols import pinger
@@ -117,6 +118,7 @@ class ControllerApi(object):
         #self.network_tester = 
         network.start(self)  # TODO: move to core.
         pinger.start(self)   # TODO: move to core.
+        firewire.start(self)
         settings.init_connection_listeners(self)
     ### Contacts ###
 
@@ -781,6 +783,13 @@ class ControllerApi(object):
         If value is None, sets it according to the time zone.
         """
         return devices.set_video_standard(caller, value)
+    
+    def reset_firewire_bus(self, caller):
+        """
+        Resets the firewire (ieee1394) bus.
+        """
+        # TODO: add bus number ?
+        firewire.firewire_bus_reset(caller)
 
     def device_modify_attribute(self, caller, driver_kind, driver_name, device_name, attribute_name, value):
         """

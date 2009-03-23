@@ -665,6 +665,12 @@ class CliController(TelnetServer):
         """
         self.core.pinger_start(self) # arg should be caller.
 
+    def _firereset(self, line):
+        """
+        Resets the firewire bus.
+        """
+        self.core.reset_firewire_bus(self)
+
 class CliParser(optparse.OptionParser):
     """
     Base class for each CLI command 
