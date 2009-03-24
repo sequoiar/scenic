@@ -28,7 +28,7 @@
 
 #include "util.h"
 
-#ifdef HAVE_BOOST_THREAD
+#ifdef HAVE_BOOST_THREAD  // needs config.h, in util.h
 #include <boost/thread/thread.hpp>
 #endif // HAVE_BOOST_THREAD
 
