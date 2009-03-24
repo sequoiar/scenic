@@ -146,7 +146,7 @@ AX_BOOST_THREAD
 AX_BOOST_ASIO
 
 AX_BOOST_PYTHON
-AM_CONDITIONAL([BOOST_PYTHON], test "$ax_cv_boost_python" = "yes"])
+AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes")
 
 AX_CHECK_GL
 AX_CHECK_GLU
