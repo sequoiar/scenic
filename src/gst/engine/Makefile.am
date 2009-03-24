@@ -22,4 +22,4 @@ libgst_a_SOURCES = mediaBase.cpp \
 				   videoReceiver.h videoSender.h videoSource.h videoLocal.h raw1394Util.h \
 				   audioLevel.h glVideoSink.h playback.h dv1394.h v4l2util.h 
 
-libgst_a_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS)
+libgst_a_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS)

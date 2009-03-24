@@ -27,6 +27,11 @@
 #include <gst/audio/multichannel.h>
 
 #include "util.h"
+
+#ifdef HAVE_BOOST_THREAD
+#include <boost/thread/thread.hpp>
+#endif // HAVE_BOOST_THREAD
+
 #include "codec.h"
 #include "rtpPay.h"
 #include "pipeline.h"
@@ -143,11 +148,19 @@ void H264Encoder::init()
 
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
 
-    // set threads variable equal to number of processors online (POSIX specific). see
+#ifdef HAVE_BOOST_THREAD        // more portable
+    int numThreads = boost::thread::hardware_concurrency();
+#else
+    // set threads variable equal to number of processors online 
+    // (POSIX specific). see
     // http://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
     int numThreads = sysconf(_SC_NPROCESSORS_ONLN);
-    if (numThreads > 1)
+#endif // HAVE_BOOST_THREAD
+
+    if (numThreads > 1) // don't hog all the cores
         --numThreads;   
+    else if (numThreads == 0)
+        numThreads = 1;
 
     g_object_set(codec_, "threads", numThreads, NULL);
     //g_object_set(codec_, "byte-stream", TRUE, NULL);
