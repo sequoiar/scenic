@@ -1,4 +1,3 @@
-
 /* sigint.h
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
@@ -20,6 +19,8 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
+#ifndef _SIGINT_H
+#define _SIGINT_H
 void set_handler();
 bool signalFlag();
+#endif

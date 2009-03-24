@@ -49,6 +49,8 @@ int GstThread::main()
 {
     bool done = false;
     bool flipflop = false;
+    int play_id = 0;
+    int stop_id = 0;
     while(!done)
     {
         if(g_main_context_iteration(NULL, FALSE))
@@ -57,6 +59,21 @@ int GstThread::main()
         flipflop = !flipflop;
         //std::cout.flush();
         MapMsg f = queue_.timed_pop(2000);
+            
+        if(play_id && playback::isPlaying())
+        {
+            MapMsg r("success");
+            r["id"] = play_id;
+            queue_.push(r);
+            play_id = 0;
+        }
+        if(stop_id && !playback::isPlaying())
+        {
+            MapMsg r("success");
+            r["id"] = stop_id;
+            queue_.push(r);
+            stop_id = 0;
+        }
 
         if(!f.cmd().empty())
         {
@@ -87,16 +104,12 @@ int GstThread::main()
             else if(s == "stop")
             {
                 stop(f);
-                MapMsg r("success");
-                r["id"] = f["id"];
-                queue_.push(r);
+                stop_id = f["id"];
             }
             else if(s == "start")
             {
                 start(f);
-                MapMsg r("success");
-                r["id"] = f["id"];
-                queue_.push(r);
+                play_id = f["id"];
             }
             else if(s == "video_init")
             {
