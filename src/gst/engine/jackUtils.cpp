@@ -23,6 +23,8 @@
 #include "util.h"
 
 #include <jack/jack.h>
+#include <gst/gst.h>
+
 #include "jackUtils.h"
 
 bool Jack::is_running()
@@ -107,5 +109,29 @@ unsigned int Jack::samplerate()
     jack_client_close(client);
 
     return jackRate;
+}
+
+
+bool Jack::autoForcedSupported(GstElement *jackElement)
+{
+    GParamSpecEnum *enum_property; 
+    enum_property = G_PARAM_SPEC_ENUM(g_object_class_find_property(G_OBJECT_GET_CLASS(jackElement), "auto-forced"));
+    GEnumClass *enum_class = enum_property->enum_class;
+    GEnumValue *enum_value;
+    gint value;
+    bool found = false;
+
+    for(value = enum_class->minimum; value <= enum_class->maximum; value++) 
+    {
+        if((enum_value = g_enum_get_value(enum_class, value))) 
+        {
+            if (std::string("auto-forced") == enum_value->value_nick)
+                found = true;
+        }
+    }
+    if (!found)
+        LOG_WARNING("Jack element " << GST_ELEMENT_NAME(jackElement) << "is out of date, please update gst-plugins-bad");
+
+    return found;
 }
 

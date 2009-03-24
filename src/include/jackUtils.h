@@ -22,10 +22,13 @@
 #ifndef _JACK_UTILS_H_
 #define _JACK_UTILS_H_
 
+class _GstElement;
+
 /// Utility functions for jack related issues. 
 namespace Jack {
 
     bool is_running();
+    bool autoForcedSupported(_GstElement *jackElement);
     unsigned int samplerate();
 
 }

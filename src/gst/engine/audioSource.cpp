@@ -373,8 +373,11 @@ void AudioJackSource::sub_init()
     // jackOut -> jackIn -> jackOut ->jackIn.....
     g_object_set(G_OBJECT(source_), "connect", 0, NULL);
 #endif
-    // /TODO: fine tune this in conjunction with jitterbuffer
+    // use auto-forced connect mode if available
+    if (Jack::autoForcedSupported(source_))
+        g_object_set(G_OBJECT(source_), "connect", 2, NULL);
     
+    // /TODO: fine tune this in conjunction with jitterbuffer
     g_object_set(G_OBJECT(source_), "buffer-time", bufferTime_, NULL);
 
     setupCapsFilter(aconv_, capsFilter_);

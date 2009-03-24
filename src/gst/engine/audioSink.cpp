@@ -123,6 +123,10 @@ void AudioJackSink::init()
     sink_ = Pipeline::Instance()->makeElement("jackaudiosink", NULL);
     // uncomment to turn off autoconnect
     //g_object_set(G_OBJECT(sink_), "connect", 0, NULL);
+    // use auto-forced connect mode if available
+    if (Jack::autoForcedSupported(sink_))
+        g_object_set(G_OBJECT(sink_), "connect", 2, NULL);
+
     g_object_set(G_OBJECT(sink_), "buffer-time", BUFFER_TIME, NULL);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
