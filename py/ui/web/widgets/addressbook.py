@@ -59,9 +59,8 @@ class Addressbook(Widget):
         log.debug('GCOrigin: %s - Data: %s' % (origin, data))
         if origin is self:
             contact_info = data.__dict__.copy()
-            if contact_info.has_key('connection'):
-                del contact_info['connection']
-            self.callRemote('show_contact_info', contact_info)
+            del contact_info['connection']
+            self.callRemote('showContact', contact_info)
 
     def rc_start_connection(self, name):
         contact = self.api.get_contact(name)
@@ -69,14 +68,6 @@ class Addressbook(Widget):
             self.callRemote('error', contact.message)
         else:
             self.api.start_connection(self, contact)
-        return False
-    
-    def rc_stop_connection(self, name):
-        contact = self.api.get_contact(name)
-        if isinstance(contact, Exception):
-            self.callRemote('error', contact.message)
-        else:
-            self.api.stop_connection(self, contact)
         return False
     
     def cb_start_connection(self, origin, data):

@@ -1050,7 +1050,9 @@ class CliView(Observer):
                             txt += "   " + stream.name + "\n"
                             txt += "    enabled: " + str(stream.enabled)
                             txt += "    sync: " + stream.sync_group + "\n"
+                            txt += "    port: %s\n" % str(stream.port)
                             txt += "    media setting: %s\n" % str(stream.setting)
+
                         
                 txt += "\nMEDIA SETTINGS...\n"
                 for k, v in media_settings.iteritems():
