@@ -35,9 +35,10 @@ import inspect
 
 import repr
 
-
 # global constants
 
+EXECUTABLE = "milhouse" 
+# used to be "propulseart"
 #video_src = "videotestsrc"
 video_src = "videotestsrc"
 
@@ -233,7 +234,8 @@ msc
         self._evalTest(index, message)
     
     def _start_propulseart(self, mode, port, serv_name, tel_name):
-        server_command = "propulseart -%s --serverport %d" % (mode, port) 
+        global EXECUTABLE 
+        server_command = "%s -%s --serverport %d" % (EXECUTABLE,  mode, port) 
         client_command = 'telnet localhost %d' % port
         server = start_process(server_command, VERBOSE_SERVER, "SERVER> ")
         time.sleep(2)

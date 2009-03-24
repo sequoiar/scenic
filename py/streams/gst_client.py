@@ -45,7 +45,8 @@ STREAMINIT = 6
 STREAMING = 7
 
 
-streaming_server_process_name = "propulseart"
+# streaming_server_process_name = "propulseart"
+streaming_server_process_name = "milhouse"
 
 class BaseGst(object):
     def get_attr(self, name):
