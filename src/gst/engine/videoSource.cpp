@@ -54,7 +54,7 @@ VideoSource::~VideoSource()
 VideoTestSource::VideoTestSource(const VideoSourceConfig &config) : 
     VideoSource(config),
     capsFilter_(0),
-    width_(768),
+    width_(720),
     height_(480)
 {}
 
@@ -64,6 +64,7 @@ void VideoTestSource::init()
     g_object_set(G_OBJECT(source_), "is-live", FALSE, NULL); // necessary for clocked callback to work
     
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    filterCaps();
     gstlinkable::link(source_, capsFilter_);
 }
 
@@ -71,6 +72,7 @@ void VideoTestSource::init()
 // optionally called to force resolution
 void VideoTestSource::filterCaps()
 {
+    assert(capsFilter_);
     // otherwise videotestsrc defaults to 320 by 240
     std::ostringstream capsStr;
     capsStr << "video/x-raw-yuv, width=" << width_ << ", height=" << height_; 
