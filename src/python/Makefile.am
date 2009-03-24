@@ -18,7 +18,7 @@ milhouse_la_LIBADD =  -l$(BOOST_PYTHON_LIB) $(GLIB_LIBS) \
 						   $(src)/gst/control/libgstthread.a \
 						   $(src)/gst/engine/libgst.a $(GTK_LIBS) \
 						   $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(src)/util/libutil.a \
-						   $(src)/gutil/libgutil.a 
+						   $(src)/gutil/libgutil.a  $(BOOST_THREAD_LIB)
 
 milhouse_la_CPPFLAGS = -I$(PYTHON_INCLUDE_DIR) $(AM_CPPFLAGS)
 
