@@ -1048,9 +1048,9 @@ class CliView(Observer):
                         txt += "   mode: " + str(group.mode) + "\n"
                         for stream in group.media_streams:
                             txt += "   " + stream.name + "\n"
-                            txt += "    enabled: " + str(stream.enabled)
+                            txt += "    enabled: " + str(stream.enabled) + "\n"
                             txt += "    sync: " + stream.sync_group + "\n"
-                            txt += "    port: %s\n" % str(stream.port)
+                            txt += "    port: %s\n" % str(stream.port) + "\n"
                             txt += "    media setting: %s\n" % str(stream.setting)
 
                         
