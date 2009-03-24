@@ -76,16 +76,13 @@ bool MainModule::run()
                 tcp_queue.push(gmsg);
             if (tmsg.cmd().empty())
                 continue;
-            std::string command(tmsg.cmd());
-            if(command.empty())
-                continue;
             LOG_DEBUG(std::string(tmsg.cmd()));
-            if (command == "quit")
+            if (tmsg.cmd() == "quit")
             {
                 gstThread_->broadcastQuit();
                 break;
             }
-            if (command == "exception")
+            if (tmsg.cmd() == "exception")
                 throw tmsg["exception"].except();
             else
             {
