@@ -74,7 +74,7 @@ first_media_setting = 10000
 # The currently supported file version
 current_major_version_number = 1 # TODO: replace with __version__ 
 
-# Global (module scope) variables for the SettingsChannel instances.
+# Global (module scope) variables for the GstChannel instances.
 global_settings = {}
 media_settings = {}
 COM_CHAN_KEY = "settings" # key for com_chan messages.
@@ -102,14 +102,14 @@ def _create_stream_engines( listener, mode, procs_params):
         engines.append(engine)
     return engines
 
-class SettingsChannel(object):
+class GstChannel(object):
     """
     Allows to send and receive setting information
     via the com_chan protocol, once we are joined to
     a remote contact
     """
     def __init__(self):
-        log.debug('SettingsChannel.__init__')
+        log.debug('GstChannel.__init__')
         self.com_chan = None
         self.contact = None
         self.api = None
@@ -132,25 +132,9 @@ class SettingsChannel(object):
         The key and *args can be one of the following...
         """
         caller = None
-        log.debug('SettingsChannel.on_remote_message: %s : %s' %  (key, str(args) )  )
-        if key == "ping": # from A
-            print "PING"
-            self.send_message("pong")
+        log.debug('GstChannel.on_remote_message: %s : %s' %  (key, str(args) )  )
             
-            val = "received PING"
-            key = "info"
-            caller = None
-            self.api.notify(caller, val, key)
-        elif key == "pong": # from B 
-            val = "Received PONG"
-            key = "info"
-            caller = None
-            self.api.notify(caller, val, key)
-            
-#        elif key == "gst_receivers_ready":
-#            self._start_local_gst_senders()
-            
-        elif key == "remote_gst_params":
+        if key == "remote_gst_params":
             self.api.notify(caller, "Got remote params", "info" )
             self.start_local_gst_processes(args[0], args[1] )
             
@@ -172,7 +156,7 @@ class SettingsChannel(object):
 #        """
 #        creates processses and send init messages
 #        """
-#        log.debug("SettingsChannel.on_remote_message: received gst_receiver_params: %s" % str(self.sender_procs_params) )
+#        log.debug("GstChannel.on_remote_message: received gst_receiver_params: %s" % str(self.sender_procs_params) )
 #        log.debug("Initialize SENDING PROCESSES:")
 #        log.debug( pprint.pformat(self.sender_procs_params)) 
 #        self.sender_engines = _create_stream_engines(self.api, 'send', self.sender_procs_params)
@@ -182,7 +166,7 @@ class SettingsChannel(object):
         """
         creates processses and send init messages
         """
-        log.debug("SettingsChannel.on_remote_message: received gst_receiver_params: %s" % str(self.receiver_procs_params) )
+        log.debug("GstChannel.on_remote_message: received gst_receiver_params: %s" % str(self.receiver_procs_params) )
         self.receiver_procs_params = rx_params
         self.sender_procs_params = tx_params
         # reactor.callLater(2, self.send_message, "gst_receivers_ready" )
@@ -192,7 +176,7 @@ class SettingsChannel(object):
         self.receiver_engines = _create_stream_engines(self.api, 'receive', self.receiver_procs_params)
         self._start_stream_engines(self.receiver_engines)
         
-        log.debug("SettingsChannel.on_remote_message: received gst_receiver_params: %s" % str(self.sender_procs_params) )
+        log.debug("GstChannel.on_remote_message: received gst_receiver_params: %s" % str(self.sender_procs_params) )
         log.debug("Initialize SENDING PROCESSES:")
         log.debug( pprint.pformat(self.sender_procs_params)) 
         self.sender_engines = _create_stream_engines(self.api, 'send', self.sender_procs_params)
@@ -206,7 +190,7 @@ class SettingsChannel(object):
         Sends a message to the current remote contact through the com_chan with key "network_test".
         :param args: list
         """
-        log.debug("SettingsChannel._send_message %s. %r" % (key, args_list))
+        log.debug("GstChannel._send_message %s. %r" % (key, args_list))
         try:
             # list with key as 0th element
             global COM_CHAN_KEY
@@ -231,7 +215,7 @@ def on_com_chan_connected(connection_handle, role="client"):
     global COM_CHAN_KEY
 
     log.debug("on_com_chan_connected")
-    settings_chan = SettingsChannel()
+    settings_chan = GstChannel()
     contact = connection_handle.contact
     settings_chan.contact = contact
     settings_chan.com_chan = connection_handle.com_chan
@@ -629,9 +613,6 @@ class GlobalSetting(object):
         # send settings to remote miville
         settings_channel.start_local_gst_processes(receiver_procs_params,  sender_procs_params)
         settings_channel.send_message("remote_gst_params",[sender_procs_params,receiver_procs_params] )
-        
-       
-       
     
     def stop_streaming(self):
         """
