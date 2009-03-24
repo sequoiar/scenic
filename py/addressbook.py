@@ -64,7 +64,7 @@ class AddressBook(object):
         self.filename = common.install_dir(filename)
         self.major = 1
         self.minor = None
-        self.dup_suffix = ' (copy)'
+        self.dup_suffix = '_copy'
         self.contacts = {}
         self.selected = None
         self.read()
