@@ -115,7 +115,7 @@ unsigned int Jack::samplerate()
 bool Jack::autoForcedSupported(GstElement *jackElement)
 {
     GParamSpecEnum *enum_property; 
-    enum_property = G_PARAM_SPEC_ENUM(g_object_class_find_property(G_OBJECT_GET_CLASS(jackElement), "auto-forced"));
+    enum_property = G_PARAM_SPEC_ENUM(g_object_class_find_property(G_OBJECT_GET_CLASS(jackElement), "connect"));
     GEnumClass *enum_class = enum_property->enum_class;
     GEnumValue *enum_value;
     gint value;
