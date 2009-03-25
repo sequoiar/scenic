@@ -591,6 +591,8 @@ def set_video_standard(caller, value=None):
     Valid string values are "ntsc", "secam" and "pal".
     If value is None, sets it according to the time zone.
     """
+    global managers
+
     if value not in ['ntsc', 'pal', 'secam']:
         value = 'ntsc' # default
         try:
@@ -613,6 +615,6 @@ def set_video_standard(caller, value=None):
         # for every video driver.
         for driver in manager.drivers.values():
             for device in driver.devices.values():
-                modify_attribute(caller, driver.kind, driver.name, device_name, 'norm', value)
+                modify_attribute(caller, driver.kind, driver.name, device.name, 'norm', value)
     return value
 

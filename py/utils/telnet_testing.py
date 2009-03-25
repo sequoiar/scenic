@@ -145,7 +145,7 @@ def start_process(command, isVerbose=False, logPrefix='', color='CYAN'):
             process = pexpect.spawn(command)
         time.sleep(1.0) # seconds
         if is_running(process) == False:
-            raise Exception("Process is not running !")
+            raise Exception("Process is not running ! Is an other miville running at the same time?")
             println("Process is not running !") # or raise error ?
             #die()
         else:
@@ -312,7 +312,7 @@ def start():
     if VERBOSE_CLIENT:
         print "VERBOSE_CLIENT"
     if START_SERVER:
-        global_server = start_process(SERVER_COMMAND, VERBOSE_SERVER, "S>", 'BLUE')
+        sys.stdout.write(get_color('MAGENTA'))
         try:
             #delete ~/.sropulpof/sropulpof.adb
             #orig_home = os.environ['HOME']
@@ -321,16 +321,18 @@ def start():
                 os.mkdir(TMP_NAME)
                 os.environ['HOME'] = TMP_NAME
                 print "using %s as a $HOME. (for adb and log)" % (TMP_NAME)
-
-            if VERBOSE_SERVER:
-                print "VERBOSE_SERVER"
-                print "You should try this:"
-                print "tail -f %s/.sropulpof/sropulpof.log" % (TMP_NAME)
-            # os.remove('%s/.sropulpof/sropulpof.adb' % (TMP_NAME))
-            sys.stdout.write(get_color('MAGENTA'))
-            sys.stdout.write(get_color())
         except Exception, e:
             print "Error removing setting $HOME to %s: %s" % (TMP_NAME, e)
+        
+        if VERBOSE_SERVER:
+            print "SERVER_COMMAND:", SERVER_COMMAND 
+            print "VERBOSE_SERVER"
+            print "You should try this:"
+            print "tail -f %s/.sropulpof/sropulpof.log" % (TMP_NAME)
+            # os.remove('%s/.sropulpof/sropulpof.adb' % (TMP_NAME))
+        sys.stdout.write(get_color())
+        global_server = start_process(SERVER_COMMAND, VERBOSE_SERVER, "S>", 'BLUE')
+
     time.sleep(2.0)
     global_client = start_process(CLIENT_COMMAND, VERBOSE_CLIENT, "C>", 'CYAN')
 
