@@ -42,11 +42,13 @@ server_command = os.path.expanduser("./miville.py")
 client_command = 'telnet localhost %s' % server_port
 waiting_delay = 1.0 # seconds before starting client after server start
 
-#VERBOSE_CLIENT = False
-VERBOSE_CLIENT = True
+VERBOSE_BLABLA = False
 
-#VERBOSE_SERVER = False
-VERBOSE_SERVER = True
+VERBOSE_CLIENT = False
+#VERBOSE_CLIENT = True
+
+VERBOSE_SERVER = False
+#VERBOSE_SERVER = True
 
 
 TMP_NAME = tempfile.mktemp()
@@ -111,7 +113,8 @@ def println(s, endl=True):
     """
     Prints a line to standard output with a prefix.
     """
-    print ">>>>", s, # note the comma (",") at end of line
+    if VERBOSE_BLABLA:
+        print ">>>>", s, # note the comma (",") at end of line
 
 def start_process(command, isVerbose=False, logPrefix=''):
     """

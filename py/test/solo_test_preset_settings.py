@@ -29,11 +29,17 @@ import sys
 import test.systest_telnet
 import time
 
-#VERBOSE_CLIENT = False
-VERBOSE_CLIENT = True
+VERBOSE_CLIENT = False
+#VERBOSE_CLIENT = True
 
-#VERBOSE_SERVER = False
-VERBOSE_SERVER = True
+VERBOSE_SERVER = VERBOSE_CLIENT
+#VERBOSE_SERVER = True
+
+VERBOSE_BLABLA = False
+
+def blabla(msg):
+    if VERBOSE_BLABLA:
+        print msg
 
 class TestBase(test.systest_telnet.TelnetBaseTest):
     """
@@ -49,10 +55,10 @@ class TestBase(test.systest_telnet.TelnetBaseTest):
         time.sleep(0.5)
         b = self.client.buffer.rstrip()
         b = b.lstrip()
-        print "\n============================================"    
-        print command
+        blabla( "\n============================================")    
+        blabla( command )
         b = b.replace ('\r', '')
-        print b
+        blabla( b )
 
 class Test_001_Gen_Settings(TestBase):
     """
