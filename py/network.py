@@ -475,7 +475,7 @@ class NetworkTester(object):
         if self.iperf_server_is_running:
             self.kill_server_process(self.iperf_server)
         else:
-            log.error("Called _stop_iperf_server_process while not running.")
+            log.debug("Called _stop_iperf_server_process while not running.")
     
     def _start_iperf_server_process(self):
         """
