@@ -22,21 +22,25 @@
 """
 System test tools for two computers with the telnet UI.
 
+Starts a server, if desired, and a telnet client to make pexpect tests.
+
 Usage: trial test/test_twoboxes_network.py
 
 pexpect expected strings are regular expression. See the re module.
 
-IMPORTANT : you must first import this file from the telnet test, and 
-then call this module's main() function.
+IMPORTANT : you must first import this file from the telnet test, override some 
+module varaibles as needed and then call this module's main() function.
 """ 
 import unittest
 import pexpect
 import os
 import time
 import sys
+import tempfile
+import commands
 # ---------------------------------------------------------------------
 # config 
-SERVER_PORT = "14444"
+SERVER_PORT = "14444" # port to which connect using telnet
 SERVER_COMMAND = os.path.expanduser("./miville.py")
 CLIENT_COMMAND = 'telnet localhost %s' % SERVER_PORT
 #WAITING_DELAY = 1.0 # seconds before starting client after server start
@@ -44,6 +48,7 @@ CLIENT_COMMAND = 'telnet localhost %s' % SERVER_PORT
 VERBOSE_CLIENT = False
 VERBOSE_SERVER = False
 START_SERVER = True
+CHANGE_HOME_PATH = True # wheter we should change the home to some tmp dir or not.
 # ---------------------------------------------------------------------
 # startup poutine
 try:
@@ -52,6 +57,12 @@ try:
 except KeyError:
     raise Exception("You must define the env variables defined in py/test/config_test.sh")
 
+# if len(sys.argv) == 3:
+#     global server_port
+#     address = sys.argv[2]
+#     client_command = 'telnet  %s %s ' %  (address, server_port)
+#     print "CLIENT COMMAND: ", client_command
+# ---------------------------------------------------------------------
 def get_color(color=None):
     """
     Returns ANSI escaped color code.
@@ -127,6 +138,7 @@ def start_process(command, isVerbose=False, logPrefix='', color='CYAN'):
         if isVerbose:
             println('Current working dir: ' + directory)
             println('Starting \"%s\"' % command)
+            # TODO: bash_it( "ps aux | grep miville")
             process = pexpect.spawn(command, logfile=ProcessOutputLogger(logPrefix, color))
             #process = pexpect.spawn(command, logfile=sys.stdout)
         else:
@@ -150,11 +162,13 @@ def is_running(process):
     Returns boolean
     """
     if process is None:
+        print "is_running: process is None"
         return False
     if process.isalive() == False:
         status = "no status available" 
         if process:
             status = process.status
+        print "is_running: process.isalive() is False"
         println("Error starting process: %s" % status)
         return False
     else:
@@ -167,6 +181,7 @@ def kill_process(process):
     
     See kill -l for flags
     """
+    print "KILLING process" + str(process)
     try:
         if is_running(process) == True:
             process.kill(15)
@@ -186,7 +201,20 @@ def die():
     kill_process(global_server)
     sys.exit(1)
 
+def bash_it(cmd):
+    """
+    Executes a bash string 
 
+    You can use pipes and other shell goodies.
+    """
+    status = commands.getstatusoutput(cmd)
+    output = status[1]
+    print cmd
+    lines = output.split("\n")
+    for line in lines:
+        if line.find(cmd) == -1:
+            print line
+    print
 # ---------------------------------------------------------------------
 # System test classes
 class TelnetBaseTest(unittest.TestCase):
@@ -202,8 +230,8 @@ class TelnetBaseTest(unittest.TestCase):
 
         self.client = global_client
         self.server = global_server
-        if is_running(self.server) is False:
-            if START_SERVER:
+        if START_SERVER:
+            if is_running(self.server) is False:
                 self.server = start_process(SERVER_COMMAND, VERBOSE_SERVER, "S>", 'CYAN')
         if is_running(self.client) is False:
             self.client = start_process(CLIENT_COMMAND, VERBOSE_CLIENT, "C>", 'MAGENTA')
@@ -279,25 +307,30 @@ def start():
     global VERBOSE_SERVER
     global VERBOSE_CLIENT
     global START_SERVER
+    global CHANGE_HOME_PATH
+
     if VERBOSE_CLIENT:
         print "VERBOSE_CLIENT"
-    if VERBOSE_SERVER:
-        print "VERBOSE_SERVER"
-        print "You should try this:"
-        print "         tail -f /var/tmp/.sropulpof/sropulpof.log"
     if START_SERVER:
         global_server = start_process(SERVER_COMMAND, VERBOSE_SERVER, "S>", 'BLUE')
-        # -----------------------------------  REMOVE ADDRESSBOOK DB
         try:
             #delete ~/.sropulpof/sropulpof.adb
             #orig_home = os.environ['HOME']
-            os.environ['HOME'] = '/var/tmp'
-            os.remove('/var/tmp/.sropulpof/sropulpof.adb')
+            if CHANGE_HOME_PATH:
+                TMP_NAME = tempfile.mktemp()
+                os.mkdir(TMP_NAME)
+                os.environ['HOME'] = TMP_NAME
+                print "using %s as a $HOME. (for adb and log)" % (TMP_NAME)
+
+            if VERBOSE_SERVER:
+                print "VERBOSE_SERVER"
+                print "You should try this:"
+                print "tail -f %s/.sropulpof/sropulpof.log" % (TMP_NAME)
+            # os.remove('%s/.sropulpof/sropulpof.adb' % (TMP_NAME))
             sys.stdout.write(get_color('MAGENTA'))
-            print "using /var/tmp as a $HOME for .sropulpof/sropulpof.adb"
             sys.stdout.write(get_color())
         except Exception, e:
-            print("Error removing old sropulpof.adb or setting HOME to /var/tmp." + str(e))
-    time.sleep(2.0)  # !
+            print "Error removing setting $HOME to %s: %s" % (TMP_NAME, e)
+    time.sleep(2.0)
     global_client = start_process(CLIENT_COMMAND, VERBOSE_CLIENT, "C>", 'CYAN')
 

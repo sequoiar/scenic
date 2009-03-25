@@ -20,7 +20,10 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 """
-System test tools for network tests.
+System test tools for a com_chan ping.
+
+Tests with prefic dualtest_* expects that you first start a miville on both local 
+and remote host.
 
 Usage: trial test/<scriptname>.py
 """ 
