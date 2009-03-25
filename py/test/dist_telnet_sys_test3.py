@@ -38,13 +38,13 @@ import subprocess
 
 #start the script on remote machine    
 
-#stdin, stdout, stderr = os.popen3("ssh bloup")
-#stdin.write("""cd /home/scormier/src/miville/trunk/py;trial test/dist_telnet_sys_test4.py 10.10.10.73\n""")
-#time.sleep(10)        
-#stdin.write("""exit\n""")
-#stdin.close()
-#stdout.close()
-#stderr.close()
+stdin, stdout, stderr = os.popen3("ssh bloup")
+stdin.write("""cd /home/scormier/src/miville/trunk/py;trial test/dist_telnet_sys_test4.py 10.10.10.73\n""")
+time.sleep(10)        
+stdin.write("""exit\n""")
+stdin.close()
+stdout.close()
+stderr.close()
         
 
 
@@ -75,35 +75,10 @@ class TestBase(test.systest_telnet.TelnetBaseTest):
 
 
            
-#TC-2        
-class Test_001_List_Contacts(TestBase):        
-
-    """
-    System Tests for listing contacts
-    
-    """
-
-
-    def test_01_List_empty_contacts(self):
-        self.tst("contacts --list","")
-        print "**********************TC2_1 Satisfied**********************************"
-    def test_02_add_contact(self):    
-        self.tst("contacts --add test 10.10.10.100", "Contact added")
-        time.sleep(2)
-    def test_03_list_contact(self):    
-        self.tst("contacts --list","test")
-        time.sleep(2)
-    def test_04_add_contact(self):    
-        self.tst("contacts --add test2 10.10.10.101","Contact added")
-        time.sleep(2)
-    def test_05_list_contacts(self):    
-        self.tst("contacts --list","[.*test2]")
-        print "**********************TC2_2 Satisfied**********************************" 
-            
 
    
 
-"""
+
 class Test_002_Gen_Settings(TestBase):
    
 
@@ -230,5 +205,4 @@ class Test_002_Gen_Settings(TestBase):
         time.sleep(50)
 
         
-
-"""        
+       

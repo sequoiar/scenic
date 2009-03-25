@@ -37,14 +37,23 @@ testing.VERBOSE_SERVER = False
 testing.START_SERVER = False # You must start miville manually on both local and remote host.
 testing.start()
 
+
+stdin, stdout, stderr = os.popen3("ssh bloup")
+stdin.write("""cd /home/scormier/src/miville/trunk/py;trial test/dist_telnet_sys_test4.py 10.10.10.73\n""")
+time.sleep(10)        
+stdin.write("""exit\n""")
+stdin.close()
+stdout.close()
+stderr.close()
+        
+
+
+
 #TC1-Interface accessed
 class Test_001_Gen_Settings(testing.TelnetBaseTest):
     def test_02_yes(self):
         self.expectTest('pof: ', 'The default prompt is not appearing.')
-        print "***********************************************************************"
-        print "**********************TC1_2 Satisfied**********************************"
-        print "***********************************************************************"   
-
+        
     def clean_03_contacts(self):
         self.client.sendline("contacts -e test")
         self.client.sendline("contacts -e test2")
@@ -56,10 +65,7 @@ class Test_001_List_Contacts(testing.TelnetBaseTest):
     """
     def test_01_list_empty_contacts(self):
         self.tst("contacts --list","")
-        print "***********************************************************************"
-        print "**********************TC2_1 Satisfied**********************************"
-        print "***********************************************************************"
-
+        
     def test_02_add_contact(self):    
         self.tst("contacts --add test 10.10.10.100", "Contact added")
         time.sleep(2)
@@ -74,15 +80,9 @@ class Test_001_List_Contacts(testing.TelnetBaseTest):
 
     def test_05_list_contacts(self):    
         self.tst("contacts --list","[.*test2]")
-        print "***********************************************************************"
-        print "**********************TC2_2 Satisfied**********************************" 
-        print "***********************************************************************"    
         
     def test_06_remove_contact(self):    
         self.tst("contacts --erase test","Contact deleted")
-        print "***********************************************************************"
-        print "**********************NONE*********************************************" 
-        print "***********************************************************************"       
         self.sleep()
        
 #    def test_99_close(self):
