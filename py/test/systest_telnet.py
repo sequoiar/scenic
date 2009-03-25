@@ -32,6 +32,7 @@ import os
 import time
 import sys
 import commands
+import tempfile
 
 # ---------------------------------------------------------------------
 # config 
@@ -46,6 +47,9 @@ VERBOSE_CLIENT = True
 
 #VERBOSE_SERVER = False
 VERBOSE_SERVER = True
+
+
+TMP_NAME = tempfile.mktemp()
 
 if len(sys.argv) == 3:
     global server_port
@@ -200,10 +204,10 @@ server = None
 try:
     #delete ~/.sropulpof/sropulpof.adb
     #orig_home = os.environ['HOME']
-    os.environ['HOME'] = '/var/tmp'
-    os.remove('/var/tmp/.sropulpof/sropulpof.adb')
+    os.environ['HOME'] = '/var/tmp/%s' % (TMP_NAME)
+    os.remove('/var/tmp/%s/.sropulpof/sropulpof.adb' % (TMP_NAME))
 except Exception, e:
-    println("Warning removing old sropulpof.adb or setting HOME to /var/tmp." + str(e))
+    println("Warning removing old sropulpof.adb or setting HOME to /var/tmp/%s : %s" % (TMP_NAME, str(e)))
 
 # TODO: Fix the process.logfile not getting to sys.stdout
 # TODO: If the test fails, check if client and server are still running.
