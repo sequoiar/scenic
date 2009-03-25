@@ -26,11 +26,20 @@
 #include <algorithm>
 #include <cstring>
 #include <gst/gst.h>
+
 #include "gstLinkable.h"
 #include "pipeline.h"
 #include "rtpPay.h"
 #include "rtpReceiver.h"
 #include "remoteConfig.h"
+
+
+#ifdef CONFIG_DEBUG_LOCAL
+#include <gtk/gtk.h>
+GtkWidget *RtpReceiver::control_ = 0;
+bool RtpReceiver::madeControl_ = false;
+#endif
+
 
 std::list<GstElement *> RtpReceiver::depayloaders_;
 
@@ -46,6 +55,13 @@ RtpReceiver::~RtpReceiver()
     // make sure we found it and remove it
     assert(iter != depayloaders_.end());
     depayloaders_.erase(iter);
+
+#ifdef CONFIG_DEBUG_LOCAL
+    madeControl_ = false;
+    gtk_widget_destroy(control_);
+    LOG_DEBUG("Videosink window destroyed");
+    control_ = 0;
+#endif
 }
 
 
@@ -193,6 +209,66 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     gst_object_unref(GST_OBJECT(rtcpSenderSink));
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
     gst_object_unref(GST_OBJECT(rtpReceiverSrc));
+
+#ifdef CONFIG_DEBUG_LOCAL
+    createLatencyControl();
+#endif
 }
 
+
+void RtpReceiver::updateLatencyCb(GtkAdjustment *adj)
+{
+    unsigned val = static_cast<unsigned>(adj->value);
+    g_print("Setting latency to %d\n", val);
+    RtpBin::setLatency(val);
+}
+
+/* makes the latency window */
+void RtpReceiver::createLatencyControl()
+{
+    if (madeControl_)
+        return;
+    
+    static bool gtk_initialized = false;
+    if (!gtk_initialized)
+    {
+        gtk_init(0, NULL);
+        gtk_initialized = true;
+    }
+
+    GtkWidget *box1;
+    GtkWidget *hscale;
+    GtkObject *adj;
+    const int WIDTH = 400;
+    const int HEIGHT = 70;
+
+    /* Standard window-creating stuff */
+    control_ = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_default_size(GTK_WINDOW(control_), WIDTH, HEIGHT);
+    gtk_window_set_title (GTK_WINDOW (control_), "Rtpjitterbuffer Latency (ms)");
+
+    box1 = gtk_vbox_new (FALSE, 0);
+    gtk_container_add (GTK_CONTAINER (control_), box1);
+    gtk_widget_show (box1);
+
+    /* value, lower, upper, step_increment, page_increment, page_size */
+    /* Note that the page_size value only makes a difference for
+     * scrollbar widgets, and the highest value you'll get is actually
+     * (upper - page_size). */
+    adj = gtk_adjustment_new (3.0, 1.0, 201.0, 1.0, 1.0, 1.0);
+
+    gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
+            GTK_SIGNAL_FUNC(updateLatencyCb), NULL);
+
+  
+    hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+    // Signal emitted only when value is done changing
+    gtk_range_set_update_policy (GTK_RANGE (hscale), 
+                                 GTK_UPDATE_DISCONTINUOUS);
+    gtk_box_pack_start (GTK_BOX (box1), hscale, TRUE, TRUE, 0);
+    gtk_widget_show (hscale);
+
+    gtk_widget_show (control_);
+    madeControl_ = true;
+}
 

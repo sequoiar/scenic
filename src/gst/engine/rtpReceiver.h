@@ -23,6 +23,7 @@
 #ifndef _RTP_RECEIVER_H_
 #define _RTP_RECEIVER_H_
 
+#include "config.h"
 #include <list>
 #include "rtpBin.h"
 
@@ -30,6 +31,11 @@ class ReceiverConfig;
 class _GstElement;
 class _GstPad;
 class RtpPay;
+
+#ifdef CONFIG_DEBUG_LOCAL
+class _GtkAdjustment;
+class _GtkWidget;
+#endif
 
 class RtpReceiver
     : public RtpBin
@@ -46,10 +52,17 @@ class RtpReceiver
         static _GstPad *getMatchingDepayloaderSinkPad(_GstPad *srcPad);
         static std::string getMediaType(_GstPad *pad);
         static void cb_new_src_pad(_GstElement * element, _GstPad * srcPad, void *data);
+        static void createLatencyControl();
+        static void updateLatencyCb(_GtkAdjustment *adj);
 
         _GstElement *rtp_receiver_;
         _GstElement *depayloader_;
         static std::list<_GstElement *> depayloaders_;
+
+#ifdef CONFIG_DEBUG_LOCAL
+        static bool madeControl_;
+        static _GtkWidget *control_;
+#endif
 
         RtpReceiver(const RtpReceiver&); //No Copy Constructor
         RtpReceiver& operator=(const RtpReceiver&); //No Assignment Operator

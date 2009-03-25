@@ -204,7 +204,7 @@ XvImageSink::~XvImageSink()
     if (window_)
     {
         gtk_widget_destroy(window_);
-        LOG_DEBUG("Widget destroyed");
+        LOG_DEBUG("Videosink window destroyed");
     }
 }
 
