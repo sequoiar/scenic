@@ -66,11 +66,16 @@ bool MainModule::run()
             THROW_ERROR("asioThread not running");
         QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
+        QueuePair &asio_queue = asio_thread_->getQueue();
 
         while(!signalFlag())
         {
             MapMsg tmsg = tcp_queue.timed_pop(2000);
             MapMsg gmsg = gst_queue.timed_pop(2000);
+            MapMsg amsg = asio_queue.timed_pop(2);
+
+            if(amsg.cmd() == "data")
+                LOG_DEBUG(std::string(amsg["str"]));
 
             if (!gmsg.cmd().empty())
                 tcp_queue.push(gmsg);

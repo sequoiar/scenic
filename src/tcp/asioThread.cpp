@@ -49,8 +49,8 @@ using boost::asio::placeholders::bytes_transferred;
 class tcp_session
 {
     public:
-        tcp_session(io_service& io_service)
-            : socket_(io_service), welcome_()
+        tcp_session(io_service& io_service, QueuePair& queue)
+            : socket_(io_service),queue_(queue), welcome_()
         {
         }
 
@@ -67,11 +67,17 @@ class tcp_session
                             error));
         }
 
-        void read_cb(const error_code& error,
+        void read_cb(const error_code& err,
                 size_t bytes_transferred)
         {
-            if (!error)
+            if (!err)
             {
+                static char c('a');
+                c++;
+                MapMsg m("data");
+                data_[0] = c;
+                m["str"] = data_;
+                queue_.push(m);
                 async_write(socket_, buffer(data_, bytes_transferred),
                         boost::bind(&tcp_session::write_cb, this,
                             error));
@@ -82,9 +88,9 @@ class tcp_session
             }
         }
 
-        void write_cb(const error_code& error)
+        void write_cb(const error_code& err)
         {
-            if (!error)
+            if (!err)
             {
                 socket_.async_read_some(buffer(data_, max_length),
                         boost::bind(&tcp_session::read_cb, this, 
@@ -100,6 +106,7 @@ class tcp_session
         tcp::socket socket_;
         enum { max_length = 1024 };
         char data_[max_length];
+        QueuePair& queue_;
         std::string welcome_;
 };
 
@@ -111,7 +118,7 @@ class tcp_server
             acceptor_(io_service, tcp::endpoint(tcp::v4(), port)), queue_(queue),
             t_(io_service, boost::posix_time::seconds(1))
         {
-            tcp_session* new_tcp_session = new tcp_session(io_service_);
+            tcp_session* new_tcp_session = new tcp_session(io_service_,queue_);
             acceptor_.async_accept(new_tcp_session->socket(),
                     boost::bind(&tcp_server::handle_accept, this, new_tcp_session, 
                         error));
@@ -122,12 +129,12 @@ class tcp_server
 
 
         void handle_accept(tcp_session* new_tcp_session,
-                const error_code& error)
+                const error_code& err)
         {
-            if (!error)
+            if (!err)
             {
                 new_tcp_session->start();
-                new_tcp_session = new tcp_session(io_service_);
+                new_tcp_session = new tcp_session(io_service_,queue_);
                 acceptor_.async_accept(new_tcp_session->socket(),
                         boost::bind(&tcp_server::handle_accept, this, new_tcp_session,
                             error));
@@ -163,35 +170,31 @@ class udp_server
             : io_service_(io_service),
             socket_(io_service, udp::endpoint(udp::v4(), port)), sender_endpoint_()
         {
-            socket_.async_receive_from(
-                    buffer(data_, max_length), sender_endpoint_,
-                    boost::bind(&udp_server::handle_receive_from, this,
+            socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_, 
+                    boost::bind(&udp_server::handle_receive_from, this, 
                         error, bytes_transferred));
         }
 
-        void handle_receive_from(const error_code& error,
+        void handle_receive_from(const error_code& err,
                 size_t bytes_recvd)
         {
-            if (!error && bytes_recvd > 0)
+            if (!err && bytes_recvd > 0)
             {
-                socket_.async_send_to(
-                        buffer(data_, bytes_recvd), sender_endpoint_,
+                socket_.async_send_to(buffer(data_, bytes_recvd), sender_endpoint_,
                         boost::bind(&udp_server::handle_send_to, this,
                             error, bytes_transferred));
             }
             else
             {
-                socket_.async_receive_from(
-                        buffer(data_, max_length), sender_endpoint_,
+                socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_,
                         boost::bind(&udp_server::handle_receive_from, this,
                             error, bytes_transferred));
             }
         }
 
-        void handle_send_to(const error_code& error, size_t )//bytes_sent)
+        void handle_send_to(const error_code& , size_t )//bytes_sent)
         {
-            socket_.async_receive_from(
-                    buffer(data_, max_length), sender_endpoint_,
+            socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_,
                     boost::bind(&udp_server::handle_receive_from, this,
                         error, bytes_transferred));
         }
