@@ -635,7 +635,7 @@ class ControllerApi(object):
     ### Connect ###
     def start_connection(self, caller, contact=None):
         """
-        Connects to a contact. 
+        Connects (JOIN) to a contact. 
 
         This step is mandatory prior to :
          * communicate using a com_chan
@@ -880,28 +880,28 @@ class ControllerApi(object):
                         else:
                             self.notify(caller, "An error occuring while trying to start network test.", "error")
 
-    def network_test_stop(self, caller):
-        """
-        Interrupts suddenly the network test.
-        """
-        #TODO
-        pass
-
-    def network_test_enable_autoaccept(self, caller, enabled=True):
-        """
-        Enables/disables auto accept of network dualtests from remote selected contact.
-        :param enabled: wheter to enable it or not.
-        """
-        # TODO
-        pass
-
-    def network_test_accept(self, caller, accepted=True):
-        """
-        Accepts/refuses network dualtest asked from selected contact.
-        :param accepted: wheter to accept it or not.
-        """
-        # TODO
-        pass
+#     def network_test_stop(self, caller):
+#         """
+#         Interrupts suddenly the network test.
+#         """
+#         #TODO
+#         pass
+# 
+#     def network_test_enable_autoaccept(self, caller, enabled=True):
+#         """
+#         Enables/disables auto accept of network dualtests from remote selected contact.
+#         :param enabled: wheter to enable it or not.
+#         """
+#         # TODO
+#         pass
+# 
+#     def network_test_accept(self, caller, accepted=True):
+#         """
+#         Accepts/refuses network dualtest asked from selected contact.
+#         :param accepted: wheter to accept it or not.
+#         """
+#         # TODO
+#         pass
 
     def pinger_start(self, caller, contact=None):
         """

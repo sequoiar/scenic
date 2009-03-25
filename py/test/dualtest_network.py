@@ -73,7 +73,7 @@ class Test_2_Join(testing.TelnetBaseTest):
         self.client.sendline("j -s")
         self.sleep(0.4)
         # TODO : test if successful
-        #self.expectTest('accepted', 'Could not join contact.')
+        # self.expectTest('accepted', 'Could not join contact.')
 
 class Test_3_Network(testing.TelnetBaseTest):
     """
