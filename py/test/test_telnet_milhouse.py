@@ -56,11 +56,15 @@ stop_ok = 'stop: ack="ok"'
 
 waiting_delay = 1.0 # seconds before starting client after server start
 
-#VERBOSE_CLIENT = False
-VERBOSE_CLIENT = True
+VERBOSE_CLIENT = False
+#VERBOSE_CLIENT = True
 
-#VERBOSE_SERVER = False
-VERBOSE_SERVER = True
+VERBOSE_SERVER = False
+#VERBOSE_SERVER = True
+
+def verb(to_print=''):
+    #if VERBOSE_CLIENT:
+    print to_print
 
 # ---------------------------------------------------------------------
 # a class for output redirection
@@ -103,11 +107,10 @@ def start_process(command, isVerbose=False, logPrefix=''):
     try:
         directory = os.getcwd()
         #print 'Current working dir: ' + directory
-        print
-        print 'starting process "$>%s"' % command
-        print
-        
         if isVerbose:
+            print
+            print 'starting process "$>%s"' % command
+            print
             process = pexpect.spawn(command, logfile=ProcessOutputLogger(logPrefix))
         else:
             process = pexpect.spawn(command)
@@ -361,8 +364,8 @@ class Test_telnet_milhouse(TelnetBaseTest):
         stream_port = 12020 
         bitrate = 3000000
         tx_init_msg = "video_init:" + self._get_start_command('h264', stream_port, "127.0.0.1", bitrate=bitrate, source=video_src)
-        print
-        print tx_init_msg 
+        verb('')
+        verb( tx_init_msg) 
         # start process and a telnet on port 1200 for control
         self.start_propulseart_tx(telnet_tx_port) 
         # start a sender on port 12000
@@ -378,8 +381,8 @@ class Test_telnet_milhouse(TelnetBaseTest):
         telnet_rx_port = 1230
         stream_port = 12030 
         rx_init_msg = "video_init:" + self._get_start_command('h264', stream_port, "127.0.0.1")
-        print
-        print rx_init_msg
+        verb('')
+        verb(rx_init_msg)
         self.start_propulseart_rx(telnet_rx_port)
         
         self.tst_rx(rx_init_msg, video_init_ok)
@@ -404,17 +407,17 @@ class Test_telnet_milhouse(TelnetBaseTest):
         
         This test should check for actual transfered data when the command is available.
         """
-        print
+        verb('')
         
         
         telnet_rx_port = 1240
         rx_init_command = "video_init:" + self._get_start_command('h264', 12040, "127.0.0.1")
-        print "RX> " + rx_init_command
+        verb("RX> " + rx_init_command)
         
         bitrate = 3000000
         telnet_tx_port = 1340
         tx_init_command = "video_init:" + self._get_start_command('h264', 12040, "127.0.0.1", bitrate=bitrate,source=video_src)  
-        print "TX> " + tx_init_command
+        verb( "TX> " + tx_init_command)
         
         self.start_propulseart_rx(telnet_rx_port)
         self.start_propulseart_tx(telnet_tx_port)
@@ -436,14 +439,14 @@ class Test_telnet_milhouse(TelnetBaseTest):
         Streaming audio test betweeen 2 instances of propulseart.
         """
         
-        print
+        verb('')
         telnet_rx_port = 1250
         telnet_tx_port = 1350
         
         rx_init_cmd = "audio_init:" + self._get_start_command('vorbis', 12005, "127.0.0.1")
-        print "RX:>" + rx_init_cmd
+        verb( "RX:>" + rx_init_cmd)
         tx_init_cmd =  "audio_init:" + self._get_start_command ('vorbis', 12005, "127.0.0.1", source=audio_src)
-        print "TX:>" + tx_init_cmd
+        verb( "TX:>" + tx_init_cmd)
         self.start_propulseart_rx(telnet_rx_port)
         self.start_propulseart_tx(telnet_tx_port)
         # self.tst_rx( self.get_audio_start(12000) , 'audio_start audio_start()' )
@@ -454,10 +457,11 @@ class Test_telnet_milhouse(TelnetBaseTest):
         self.tst_tx("start:", start_ok)
         # check for transfered data
         # should be well above 0 bytes at this point
-        print "DATA is flowing..."
+        
+        verb("DATA is flowing... or is it?")
         self._stream_dream(5.)
         # cleanup and go home
-        print "stopping the streaming..."
+        verb("stopping the streaming...")
         self.tst_tx("stop:", stop_ok)
         self.tst_rx("stop:", stop_ok)
         # check for data
@@ -468,20 +472,20 @@ class Test_telnet_milhouse(TelnetBaseTest):
         simultaneously with synchronisation.
         The commands for this test are not implemented yet.
         """
-        print
+        verb('')
         telnet_rx_port = 1270
         telnet_tx_port = 1370
         
         rx_video_init_cmd = "video_init:" + self._get_start_command('h264',   12007, "127.0.0.1")
         rx_audio_init_cmd = "audio_init:" + self._get_start_command('vorbis', 12107, "127.0.0.1")        
-        print 'RX video: ' + prompt(rx_video_init_cmd)
-        print 'RX audio: ' + prompt(rx_audio_init_cmd)
+        verb( 'RX video: ' + prompt(rx_video_init_cmd) )
+        verb( 'RX audio: ' + prompt(rx_audio_init_cmd) )
         
         bitrate = 3000000
         tx_video_init_cmd = "video_init:" + self._get_start_command('h264',   12007, "127.0.0.1", bitrate=bitrate, source=video_src)
         tx_audio_init_cmd = "audio_init:" + self._get_start_command('vorbis', 12107, "127.0.0.1", source=audio_src)   
-        print 'TX video: ' + prompt(tx_video_init_cmd)
-        print 'TX audio: ' + prompt(tx_audio_init_cmd)
+        verb(  'TX video: ' + prompt(tx_video_init_cmd))
+        verb( 'TX audio: ' + prompt(tx_audio_init_cmd))
                  
         self.start_propulseart_rx(telnet_rx_port)
         self.start_propulseart_tx(telnet_tx_port)
@@ -509,4 +513,4 @@ index_file = os.path.realpath('index.html')
 f = open(index_file,'w')
 f.write(index)
 f.close() 
-print "Index.html saved to> " + index_file        
+verb(  "Index.html saved to> " + index_file)        
