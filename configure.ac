@@ -185,6 +185,7 @@ AC_CONFIG_FILES([Makefile
                  py/connectors/sip/Makefile
                  py/devices/Makefile
                  py/protocols/Makefile
+                 py/engines/Makefile
                  py/streams/Makefile
                  py/streams/audio/Makefile
                  py/streams/video/Makefile
