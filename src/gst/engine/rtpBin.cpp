@@ -44,10 +44,6 @@ void RtpBin::init()
     {
         rtpbin_ = Pipeline::Instance()->makeElement("gstrtpbin", NULL);
 
-        // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
-        // rule of thumb: 2-3 times the maximum network jitter
-        setLatency(MIN_LATENCY);
-
         // uncomment this to print stats
 #if RTP_REPORTING
         g_timeout_add(5000 /* ms */, 
@@ -56,15 +52,6 @@ void RtpBin::init()
 #endif
     }
     // DON'T USE THE DROP-ON-LATENCY SETTING, WILL CAUSE AUDIO TO DROP OUT WITH LITTLE OR NO FANFARE
-}
-
-
-void RtpBin::setLatency(int latency)
-{
-    assert(rtpbin_);
-    if (latency <= 0)
-        THROW_ERROR("Cannot set rtpbin latency to " << latency << ", must be > 0");
-    g_object_set(G_OBJECT(rtpbin_), "latency", latency, NULL);
 }
 
 

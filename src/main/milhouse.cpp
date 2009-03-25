@@ -211,9 +211,9 @@ short pof::run(int argc, char **argv)
         playback::start();
 
         if (!disableVideo)
-            assert(tcpSendBuffer(options["address"], ports::VIDEO_CAPS_PORT, videofactory::MSG_ID, vTx->getCaps()));
+            assert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + (int)options["videoport"], videofactory::MSG_ID, vTx->getCaps()));
         if (!disableAudio)
-            assert(tcpSendBuffer(options["address"], ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
+            assert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + (int)options["audioport"], audiofactory::MSG_ID, aTx->getCaps()));
 
         BLOCK();
         assert(playback::isPlaying() or playback::quitted());

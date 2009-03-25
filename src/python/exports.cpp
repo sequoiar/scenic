@@ -88,8 +88,7 @@ BOOST_PYTHON_MODULE(milhouse)
     boost::python::scope().attr("VIDEO_PORT") = ports::V_PORT;
     boost::python::scope().attr("AUDIO_PORT") = ports::A_PORT;
 
-    boost::python::scope().attr("VIDEO_CAPS_PORT") = ports::VIDEO_CAPS_PORT;
-    boost::python::scope().attr("AUDIO_CAPS_PORT") = ports::AUDIO_CAPS_PORT;
+    boost::python::scope().attr("CAPS_OFFSET") = ports::CAPS_OFFSET;
 
     boost::python::scope().attr("VIDEO_MSG_ID") = videofactory::MSG_ID;
     boost::python::scope().attr("AUDIO_MSG_ID") = audiofactory::MSG_ID;

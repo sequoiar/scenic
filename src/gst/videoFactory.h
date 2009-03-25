@@ -68,8 +68,9 @@ videofactory::buildVideoReceiver_(const std::string &ip,
     assert(!sink.empty());
     VideoSinkConfig vConfig(sink, screen_num);
     int id;
-    LOG_DEBUG("Waiting for video caps on port: " << ports::VIDEO_CAPS_PORT);
-    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::VIDEO_CAPS_PORT, id)); // get caps from remote sender
+    int videoCapsPort = port + ports::CAPS_OFFSET;
+    LOG_DEBUG("Waiting for video caps on port: " << videoCapsPort);
+    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(videoCapsPort, id)); // get caps from remote sender
     assert(id == MSG_ID);
     VideoReceiver* rx = new VideoReceiver(vConfig, rConfig);
     rx->init();
@@ -98,7 +99,6 @@ namespace videofactory
                        int screen_num, 
                        const std::string &sink)
     {
-        assert(port != ports::VIDEO_CAPS_PORT and port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, screen_num, sink));
     }
 
@@ -108,8 +108,7 @@ namespace videofactory
                      const std::string &codec, 
                      int port)
     {
-        assert(port != ports::VIDEO_CAPS_PORT and port != ports::AUDIO_CAPS_PORT); 
-        return shared_ptr<VideoSender>(buildVideoSender_(vConfig,ip,codec,port));
+        return shared_ptr<VideoSender>(buildVideoSender_(vConfig, ip, codec, port));
     }
 
 }

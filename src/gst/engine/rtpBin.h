@@ -32,7 +32,6 @@ class RtpBin
     public:
         virtual ~RtpBin();
         void init();
-        static void setLatency(int latency);
 
     protected:
         RtpBin() : rtcp_sender_(0), rtcp_receiver_(0) { ++sessionCount_; }
@@ -44,7 +43,6 @@ class RtpBin
         _GstElement *rtcp_sender_, *rtcp_receiver_;
 
     private:
-        static const int MIN_LATENCY = 3;
         static int printStatsCallback(void * rtpbin);
         static void printSourceStats(_GObject *source);
         static void parseSourceStats(_GObject * source, int sessionId);

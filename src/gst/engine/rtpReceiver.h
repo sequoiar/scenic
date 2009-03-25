@@ -44,6 +44,7 @@ class RtpReceiver
         RtpReceiver() : rtp_receiver_(0), depayloader_(0) {}
         ~RtpReceiver();
         void setCaps(const char* capsStr);
+        static void setLatency(int latency);
         void checkSampleRate();
 
         void add(RtpPay * depayloader, const ReceiverConfig & config);
@@ -54,6 +55,7 @@ class RtpReceiver
         static void cb_new_src_pad(_GstElement * element, _GstPad * srcPad, void *data);
         static void createLatencyControl();
         static void updateLatencyCb(_GtkAdjustment *adj);
+        static const int MIN_LATENCY = 3;
 
         _GstElement *rtp_receiver_;
         _GstElement *depayloader_;

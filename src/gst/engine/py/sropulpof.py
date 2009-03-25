@@ -82,8 +82,8 @@ def parseArgs(args):
             help="audio device handle: hw:0 hw:2 plughw:0 plughw:2 filename");
 
     parsedArgs = parser.parse_args(args)[0]
-    disableVideo = (parsedArgs.videoCodec is None) and (parsedArgs.videoport is None)
-    disableAudio = (parsedArgs.audioCodec is None) and (parsedArgs.audioport is None)
+    disableVideo = (parsedArgs.videoCodec is None) and (parsedArgs.videoPort is None)
+    disableAudio = (parsedArgs.audioCodec is None) and (parsedArgs.audioPort is None)
     return parsedArgs
 
 def runAsReceiver(options):
@@ -121,9 +121,9 @@ def runAsSender(options):
     start() 
     
     if not disableVideo:
-        assert(tcpSendBuffer(options.ip, VIDEO_CAPS_PORT, VIDEO_MSG_ID, vTx.getCaps()))
+        assert(tcpSendBuffer(options.ip, CAPS_OFFSET + options.videoPort, VIDEO_MSG_ID, vTx.getCaps()))
     if not disableAudio:
-        assert(tcpSendBuffer(options.ip, AUDIO_CAPS_PORT, AUDIO_MSG_ID, aTx.getCaps()))
+        assert(tcpSendBuffer(options.ip, CAPS_OFFSET + options.audioPort, AUDIO_MSG_ID, aTx.getCaps()))
 
     eventLoop(options.timeout)
     wasPlaying = isPlaying()

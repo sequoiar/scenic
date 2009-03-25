@@ -68,6 +68,16 @@ RtpReceiver::~RtpReceiver()
 }
 
 
+void RtpReceiver::setLatency(int latency)
+{
+    assert(rtpbin_);
+    if (latency <= 0)
+        THROW_ERROR("Cannot set rtpbin latency to " << latency << ", must be > 0");
+    g_object_set(G_OBJECT(rtpbin_), "latency", latency, NULL);
+}
+
+
+
 void RtpReceiver::setCaps(const char *capsStr)
 {
     GstCaps *caps;
@@ -164,6 +174,10 @@ GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(GstPad *srcPad)
 void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 {
     RtpBin::init();
+    // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
+    // rule of thumb: 2-3 times the maximum network jitter
+    setLatency(MIN_LATENCY);
+
 
     GstPad *recv_rtp_sink;
     GstPad *send_rtcp_src;
@@ -223,7 +237,7 @@ void RtpReceiver::updateLatencyCb(GtkAdjustment *adj)
 {
     unsigned val = static_cast<unsigned>(adj->value);
     g_print("Setting latency to %d\n", val);
-    RtpBin::setLatency(val);
+    setLatency(val);
 }
 
 /* makes the latency window */
@@ -252,7 +266,6 @@ void RtpReceiver::createLatencyControl()
 
     box1 = gtk_vbox_new (FALSE, 0);
     gtk_container_add (GTK_CONTAINER (control_), box1);
-    gtk_widget_show (box1);
 
     /* value, lower, upper, step_increment, page_increment, page_size */
     /* Note that the page_size value only makes a difference for
@@ -270,7 +283,7 @@ void RtpReceiver::createLatencyControl()
             GTK_UPDATE_DISCONTINUOUS);
     gtk_box_pack_start (GTK_BOX (box1), hscale, TRUE, TRUE, 0);
     gtk_widget_show (hscale);
-
+    gtk_widget_show (box1);
     gtk_widget_show (control_);
     madeControl_ = true;
 }

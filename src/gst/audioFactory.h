@@ -71,8 +71,9 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
 {
     AudioSinkConfig aConfig(sink, location);
     int id;
-    LOG_DEBUG("Waiting for audio caps on port: " << ports::AUDIO_CAPS_PORT);
-    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(ports::AUDIO_CAPS_PORT, id)); // get caps from remote sender
+    int audioCapsPort = port + ports::CAPS_OFFSET;
+    LOG_DEBUG("Waiting for audio caps on port: " << audioCapsPort);
+    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(audioCapsPort, id)); // get caps from remote sender
     assert(id == MSG_ID);
     AudioReceiver* rx = new AudioReceiver(aConfig, rConfig);
     rx->init();
@@ -101,7 +102,6 @@ namespace audiofactory
                      const std::string &codec, 
                      int port)
     {
-        assert(port != ports::VIDEO_CAPS_PORT and port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<AudioSender>(buildAudioSender_(aConfig, ip, codec, port));
     }
 
@@ -112,7 +112,6 @@ namespace audiofactory
                        const std::string &sink,
                        const std::string &location)
     {
-        assert(port != ports::VIDEO_CAPS_PORT and port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink, location));
     }
 }
