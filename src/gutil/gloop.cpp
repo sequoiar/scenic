@@ -66,5 +66,6 @@ void gutil::runMainLoop(unsigned int ms)
 
     g_main_loop_run(loop_);
     g_main_loop_unref(loop_);
+    loop_ = 0;
 }
 
