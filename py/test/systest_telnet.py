@@ -50,6 +50,7 @@ VERBOSE_SERVER = True
 
 
 TMP_NAME = tempfile.mktemp()
+os.mkdir(TMP_NAME)
 
 if len(sys.argv) == 3:
     global server_port
@@ -204,10 +205,10 @@ server = None
 try:
     #delete ~/.sropulpof/sropulpof.adb
     #orig_home = os.environ['HOME']
-    os.environ['HOME'] = '/var/tmp/%s' % (TMP_NAME)
-    os.remove('/var/tmp/%s/.sropulpof/sropulpof.adb' % (TMP_NAME))
+    os.environ['HOME'] = '%s' % (TMP_NAME)
+    os.remove('%s/.sropulpof/sropulpof.adb' % (TMP_NAME))
 except Exception, e:
-    println("Warning removing old sropulpof.adb or setting HOME to /var/tmp/%s : %s" % (TMP_NAME, str(e)))
+    println("Warning removing old sropulpof.adb or setting HOME to %s : %s" % (TMP_NAME, str(e)))
 
 # TODO: Fix the process.logfile not getting to sys.stdout
 # TODO: If the test fails, check if client and server are still running.
