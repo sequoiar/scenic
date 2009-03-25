@@ -49,7 +49,7 @@ bool v4l2util::checkStandard(const std::string &expected, const std::string &dev
     v4l2_std_id std;
     int fd = -1;
 
-    // map of format coes
+    // map of format codes
     std::map<std::string, unsigned long long> FORMATS;
     FORMATS["PAL"] = 0xfff;
     FORMATS["NTSC"] = 0xf000;
@@ -64,7 +64,7 @@ bool v4l2util::checkStandard(const std::string &expected, const std::string &dev
         std::map<std::string, unsigned long long>::const_iterator iter;
         for (iter = FORMATS.begin(); iter != FORMATS.end(); ++iter)
             if (std & (*iter).second)    // true if current format matches this iter's key
-                result = (result || (expected == (*iter).first)); // can have multiple positives, hence the or
+                result = (result or (expected == (*iter).first)); // can have multiple positives, hence the or
     }
 
     return result;

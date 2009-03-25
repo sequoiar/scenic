@@ -98,7 +98,7 @@ namespace videofactory
                        int screen_num, 
                        const std::string &sink)
     {
-        assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
+        assert(port != ports::VIDEO_CAPS_PORT and port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, screen_num, sink));
     }
 
@@ -108,7 +108,7 @@ namespace videofactory
                      const std::string &codec, 
                      int port)
     {
-        assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
+        assert(port != ports::VIDEO_CAPS_PORT and port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<VideoSender>(buildVideoSender_(vConfig,ip,codec,port));
     }
 

@@ -82,34 +82,34 @@ short pof::run(int argc, char **argv)
         return 0;
     }
 
-    if ((!options["sender"] && !options["receiver"]) || (options["sender"] && options["receiver"]))
+    if ((!options["sender"] and !options["receiver"]) or (options["sender"] and options["receiver"]))
         THROW_ERROR("argument error: must be sender OR receiver. see --help"); 
 
     if(options["serverport"])
         return telnetServer(options["sender"], options["serverport"]);
 
-    int disableVideo = !options["videocodec"] && !options["videoport"];
-    int disableAudio = !options["audiocodec"] && !options["audioport"];
+    int disableVideo = !options["videocodec"] and !options["videoport"];
+    int disableAudio = !options["audiocodec"] and !options["audioport"];
 
     if (disableVideo)
         LOG_DEBUG("Video disabled.");
     if (disableAudio) 
         LOG_DEBUG("Audio disabled.");
 
-    if (disableVideo && disableAudio)
+    if (disableVideo and disableAudio)
         THROW_ERROR("argument error: must provide video and/or audio parameters. see --help");
 
     if(!options["address"]) 
         THROW_ERROR("argument error: missing address. see --help");
 
-    if(!disableVideo && !options["videocodec"])
+    if(!disableVideo and !options["videocodec"])
         THROW_ERROR("argument error: missing videoCodec. see --help");
-    if(!disableVideo && !options["videoport"])
+    if(!disableVideo and !options["videoport"])
         THROW_ERROR("argument error: missing videoport. see --help");
 
-    if(!disableAudio && !options["audiocodec"])
+    if(!disableAudio and !options["audiocodec"])
         THROW_ERROR("argument error: missing audioCodec. see --help");
-    if(!disableAudio && !options["audioport"])
+    if(!disableAudio and !options["audioport"])
         THROW_ERROR("argument error: missing audioport. see --help");
 
     if (options["receiver"]) 
@@ -155,7 +155,7 @@ short pof::run(int argc, char **argv)
         }
 
         BLOCK();
-        assert(playback::isPlaying() || playback::quitted());
+        assert(playback::isPlaying() or playback::quitted());
 
         playback::stop();
     }
@@ -216,7 +216,7 @@ short pof::run(int argc, char **argv)
             assert(tcpSendBuffer(options["address"], ports::AUDIO_CAPS_PORT, audiofactory::MSG_ID, aTx->getCaps()));
 
         BLOCK();
-        assert(playback::isPlaying() || playback::quitted());
+        assert(playback::isPlaying() or playback::quitted());
 
         playback::stop();
     }

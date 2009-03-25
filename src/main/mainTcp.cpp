@@ -58,11 +58,11 @@ bool MainModule::run()
     try
     {
         set_handler();
-        if(gstThread_ == 0 || !gstThread_->run())
+        if(gstThread_ == 0 or !gstThread_->run())
             THROW_ERROR("GstThread not running");
-        if(tcpThread_ == 0 || !tcpThread_->run())
+        if(tcpThread_ == 0 or !tcpThread_->run())
             THROW_ERROR("TcpThread not running");
-        if(asio_thread_ == 0 || !asio_thread_->run())
+        if(asio_thread_ == 0 or !asio_thread_->run())
             THROW_ERROR("asioThread not running");
         QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
@@ -116,9 +116,9 @@ void parseArgs(int argc, char** argv)
 static int port, send;
     if(argc != 3)
         THROW_CRITICAL("Invalid command line arguments -- 0/1 for receive/send and a port");
-    if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
+    if(sscanf(argv[1], "%d", &send) != 1 or send < 0 or send > 1)
         THROW_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
-    if(sscanf(argv[2], "%d", &port) != 1 || port < 1024 || port > 65000)
+    if(sscanf(argv[2], "%d", &port) != 1 or port < 1024 or port > 65000)
         THROW_CRITICAL(
             "Invalid command line arguments -- Port must be in the range of 1024-65000");
 }

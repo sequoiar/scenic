@@ -157,7 +157,7 @@ void AudioTestSource::sub_init()
             Pipeline::SAMPLE_RATE, "channels", G_TYPE_INT, 1, NULL);
 
     // is-live must be true for clocked callback to work properly
-    for (src = sources_.begin(); src != sources_.end() && channelIdx != config_.numChannels(); ++src, ++channelIdx)
+    for (src = sources_.begin(); src != sources_.end() and channelIdx != config_.numChannels(); ++src, ++channelIdx)
     {
         GstPad *pad;
         g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", FREQUENCY[0][channelIdx], "is-live", TRUE, NULL);
@@ -220,7 +220,7 @@ bool AudioFileSource::handleBusMsg(_GstMessage *msg)
     if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS)
     {
         LOG_DEBUG("Got end of stream, here's where we should playback if needed");
-        if (loopCount_ > 0 || loopCount_ == AudioFileSource::LOOP_INFINITE)
+        if (loopCount_ > 0 or loopCount_ == AudioFileSource::LOOP_INFINITE)
         {
             LOG_DEBUG("playback about to restart, " << loopCount_ << " times to go");
             restartPlayback();

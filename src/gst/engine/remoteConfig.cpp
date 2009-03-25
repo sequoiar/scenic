@@ -125,17 +125,17 @@ bool ReceiverConfig::capsMatchCodec() const
     const GValue *str = gst_structure_get_value(structure, "encoding-name");
     std::string encodingName(g_value_get_string(str));
 
-    if (encodingName == "VORBIS" && codec_ == "vorbis")
+    if (encodingName == "VORBIS" and codec_ == "vorbis")
         return true;
-    else if (encodingName == "L16" && codec_ == "raw")
+    else if (encodingName == "L16" and codec_ == "raw")
         return true;
-    else if (encodingName == "MPA" && codec_ == "mp3")
+    else if (encodingName == "MPA" and codec_ == "mp3")
         return true;
-    else if (encodingName == "MP4V-ES" && codec_ == "mpeg4")
+    else if (encodingName == "MP4V-ES" and codec_ == "mpeg4")
         return true;
-    else if (encodingName == "H264" && codec_ == "h264")
+    else if (encodingName == "H264" and codec_ == "h264")
         return true;
-    else if (encodingName == "H263" && codec_ == "h263")
+    else if (encodingName == "H263" and codec_ == "h263")
         return true;
     else
     {

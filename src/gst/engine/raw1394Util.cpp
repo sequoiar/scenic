@@ -113,7 +113,7 @@ int discoverAVC(int* port, octlet_t* guid)
 		m = *port + 1;
 	}
 
-	for (; j < m && device == -1; j++)
+	for (; j < m and device == -1; j++)
 	{
 		handle = raw1394_open(j);
 		for (i = 0; i < raw1394_get_nodecount(handle); ++i)
@@ -138,8 +138,8 @@ int discoverAVC(int* port, octlet_t* guid)
                     // /TODO: note: never gets to continue
 					continue;
 				}
-				if (((rom1394_get_node_type(&rom_dir) == ROM1394_NODE_TYPE_AVC) &&
-				         avc1394_check_subunit_type(handle, i, AVC1394_SUBUNIT_TYPE_VCR)) ||
+				if (((rom1394_get_node_type(&rom_dir) == ROM1394_NODE_TYPE_AVC) and 
+				         avc1394_check_subunit_type(handle, i, AVC1394_SUBUNIT_TYPE_VCR)) or 
 				       (rom_dir.unit_spec_id == MOTDCT_SPEC_ID))
 				{
 					rom1394_free_directory(&rom_dir);

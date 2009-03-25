@@ -75,7 +75,7 @@ void gstlinkable::link(GstLinkableSource &src, GstLinkableSink &sink)
 
     //FIXME: this conditional is a hack to deal with leaf classes that don't implement srcElement
     //and/or sinkElement
-    if (srcElement && sinkElement)
+    if (srcElement and sinkElement)
         tryLink(srcElement, sinkElement);
 }
 

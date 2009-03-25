@@ -131,7 +131,7 @@ std::string RtpReceiver::getMediaType(GstPad *pad)
     const GValue *str = gst_structure_get_value(structure, "media");
     std::string result(g_value_get_string(str));
 
-    if (result != "video" && result != "audio")
+    if (result != "video" and result != "audio")
         THROW_ERROR("Media type of depayloader sink pad is neither audio nor video!");
 
     return result;
@@ -150,7 +150,7 @@ GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(GstPad *srcPad)
     std::string srcMediaType(getMediaType(srcPad));
 
     while (getMediaType(sinkPad) != srcMediaType
-            && iter != depayloaders_.end())
+            and iter != depayloaders_.end())
     {
         gst_object_unref(sinkPad);
         sinkPad = gst_element_get_static_pad(*iter, "sink");

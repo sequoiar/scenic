@@ -198,7 +198,7 @@ void VideoV4lSource::init()
 {
     VideoSource::init();
     // set a v4l2src if given to config as an arg, otherwise use default
-    if (config_.hasLocation() && config_.fileExists())
+    if (config_.hasLocation() and config_.fileExists())
         g_object_set(G_OBJECT(source_), "device", config_.location(), NULL);
     
     gchar *deviceStr;

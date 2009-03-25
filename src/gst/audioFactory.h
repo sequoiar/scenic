@@ -101,7 +101,7 @@ namespace audiofactory
                      const std::string &codec, 
                      int port)
     {
-        assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
+        assert(port != ports::VIDEO_CAPS_PORT and port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<AudioSender>(buildAudioSender_(aConfig, ip, codec, port));
     }
 
@@ -112,7 +112,7 @@ namespace audiofactory
                        const std::string &sink,
                        const std::string &location)
     {
-        assert(port != ports::VIDEO_CAPS_PORT && port != ports::AUDIO_CAPS_PORT); 
+        assert(port != ports::VIDEO_CAPS_PORT and port != ports::AUDIO_CAPS_PORT); 
         return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink, location));
     }
 }

@@ -91,7 +91,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
     static gint nbFrames = 0;  
 
     g_get_current_time (&current_time);
-    if((current_time.tv_sec - last_sec < 1) && (current_time.tv_usec - last_usec < 5000))
+    if((current_time.tv_sec - last_sec < 1) and (current_time.tv_usec - last_usec < 5000))
     {	
         usleep((current_time.tv_usec - last_usec) >> 1);
         return FALSE;

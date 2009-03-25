@@ -35,7 +35,7 @@ AudioSourceConfig::AudioSourceConfig(const std::string & source__,
 {
     if (source_.empty())
         THROW_ERROR("No source specified");
-    if(numChannels_ < 1 || numChannels_ > 8)
+    if(numChannels_ < 1 or numChannels_ > 8)
         THROW_ERROR("Invalid number of channels");
 }
 

@@ -167,7 +167,7 @@ void Pipeline::makeVerbose()
 
 bool Pipeline::isPlaying() const
 {
-    if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_PLAYING))
+    if (pipeline_ and (GST_STATE(pipeline_) == GST_STATE_PLAYING))
         return true;
     else
         return false;
@@ -176,7 +176,7 @@ bool Pipeline::isPlaying() const
 
 bool Pipeline::isReady() const
 {
-    if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_READY))
+    if (pipeline_ and (GST_STATE(pipeline_) == GST_STATE_READY))
         return true;
     else
         return false;
@@ -185,7 +185,7 @@ bool Pipeline::isReady() const
 
 bool Pipeline::isPaused() const
 {
-    if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_PAUSED))
+    if (pipeline_ and (GST_STATE(pipeline_) == GST_STATE_PAUSED))
         return true;
     else
         return false;
@@ -194,7 +194,7 @@ bool Pipeline::isPaused() const
 
 bool Pipeline::isStopped() const
 {
-    if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_NULL))
+    if (pipeline_ and (GST_STATE(pipeline_) == GST_STATE_NULL))
         return true;
     else
         return false;
@@ -394,7 +394,7 @@ void Pipeline::seekTo(gint64 pos)
 
 const char* Pipeline::getElementPadCaps(GstElement *element, const char * padName) const
 {
-    assert(isPlaying() || isPaused());
+    assert(isPlaying() or isPaused());
 
     GstPad *pad;
     GstCaps *caps;
