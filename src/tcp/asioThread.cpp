@@ -62,8 +62,7 @@ class tcp_session
         void start()
         {
             welcome_ = "welcome.\nREADY:\n"; 
-                async_write(socket_,
-                        buffer(welcome_),
+                async_write(socket_, buffer(welcome_),
                         boost::bind(&tcp_session::write_cb, this,
                             error));
         }
@@ -73,8 +72,7 @@ class tcp_session
         {
             if (!error)
             {
-                async_write(socket_,
-                        buffer(data_, bytes_transferred),
+                async_write(socket_, buffer(data_, bytes_transferred),
                         boost::bind(&tcp_session::write_cb, this,
                             error));
             }
@@ -89,9 +87,8 @@ class tcp_session
             if (!error)
             {
                 socket_.async_read_some(buffer(data_, max_length),
-                        boost::bind(&tcp_session::read_cb, this,
-                            error,
-                            bytes_transferred));
+                        boost::bind(&tcp_session::read_cb, this, 
+                            error, bytes_transferred));
             }
             else
             {
@@ -116,7 +113,7 @@ class tcp_server
         {
             tcp_session* new_tcp_session = new tcp_session(io_service_);
             acceptor_.async_accept(new_tcp_session->socket(),
-                    boost::bind(&tcp_server::handle_accept, this, new_tcp_session,
+                    boost::bind(&tcp_server::handle_accept, this, new_tcp_session, 
                         error));
             t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
             //t_.async_wait(tcp_server::handle_timer);
@@ -147,8 +144,8 @@ class tcp_server
             t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
             MapMsg msg;
             msg = queue_.timed_pop(1);
-                if(msg.cmd() == "quit")
-                    THROW_END_THREAD("bye");
+            if(msg.cmd() == "quit")
+                THROW_END_THREAD("bye");
         }
 
     private:
@@ -169,8 +166,7 @@ class udp_server
             socket_.async_receive_from(
                     buffer(data_, max_length), sender_endpoint_,
                     boost::bind(&udp_server::handle_receive_from, this,
-                        error,
-                        bytes_transferred));
+                        error, bytes_transferred));
         }
 
         void handle_receive_from(const error_code& error,
@@ -181,16 +177,14 @@ class udp_server
                 socket_.async_send_to(
                         buffer(data_, bytes_recvd), sender_endpoint_,
                         boost::bind(&udp_server::handle_send_to, this,
-                            error,
-                            bytes_transferred));
+                            error, bytes_transferred));
             }
             else
             {
                 socket_.async_receive_from(
                         buffer(data_, max_length), sender_endpoint_,
                         boost::bind(&udp_server::handle_receive_from, this,
-                            error,
-                            bytes_transferred));
+                            error, bytes_transferred));
             }
         }
 
@@ -199,8 +193,7 @@ class udp_server
             socket_.async_receive_from(
                     buffer(data_, max_length), sender_endpoint_,
                     boost::bind(&udp_server::handle_receive_from, this,
-                        error,
-                        bytes_transferred));
+                        error, bytes_transferred));
         }
 
     private:
