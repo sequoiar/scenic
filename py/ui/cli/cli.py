@@ -587,6 +587,9 @@ class CliController(TelnetServer):
             if options.kind:
                 # devices_list(self, caller, driver_kind)
                 self.core.devices_list(self, options.kind)
+            else:
+                self.write("Please specify a driver kind such as 'video' or 'audio'")
+                cp.print_help()
 
         # 2) device_list_attributes
         elif options.attributes:
@@ -594,6 +597,7 @@ class CliController(TelnetServer):
                 # device_list_attributes(self, caller, driver_kind, driver_name, device_name)
                 self.core.device_list_attributes(self, options.kind, options.driver, options.device)
             else:
+                self.write("Please specify a driver kind, a device and a driver.")
                 cp.print_help()
 
         # 3) device_modify_attribute
@@ -604,6 +608,7 @@ class CliController(TelnetServer):
                 self.core.device_modify_attribute(self, options.kind, options.driver, options.device, options.modify, value) 
                 # TODO: should return success.
             else:
+                self.write("Please specify a driver, a driver kind and a device")
                 cp.print_help()
         
         # HELP:
@@ -611,6 +616,7 @@ class CliController(TelnetServer):
             cp.print_description()
         else:
             cp.print_help()
+        self.write_prompt()
 
 
     def _network(self, line):
@@ -658,18 +664,21 @@ class CliController(TelnetServer):
             self.core.network_test_start(caller, bandwidth, duration, kind)
         else: # options.help
             cp.print_help()
+        self.write_prompt()
 
     def _ping(self, line):
         """
         Starts (or stop) a pinger test.
         """
         self.core.pinger_start(self) # arg should be caller.
+        self.write_prompt()
 
     def _firereset(self, line):
         """
         Resets the firewire bus.
         """
         self.core.reset_firewire_bus(self)
+        self.write_prompt()
 
 class CliParser(optparse.OptionParser):
     """
@@ -849,6 +858,8 @@ class CliView(Observer):
         """
         if key in self.callbacks:
             self.callbacks[key](origin, data)
+        else:
+            log.error("update(): Notification not in callbacks: %s" % (key))
 
     def write(self, msg, prompt=True):
         self.controller.write(msg)
@@ -1541,7 +1552,11 @@ class CliView(Observer):
             driver_name = attribute.device.driver.name
             msg.append("Attribute %s of device %s (driver %s) changed to %s." % (name, bold(device_name), driver_name, value))
         self.write("\n".join(msg), True)
-    
+
+    def _device_modify_attribute(self, origin, data):
+        # TODO: improve this.
+        self.write("Successfully changed attribute." + str(data))
+
     def _device_list_attributes(self, origin, data):
         """
         :data: list of attributes
