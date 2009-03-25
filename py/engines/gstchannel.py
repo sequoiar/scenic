@@ -20,8 +20,8 @@
 
 from utils import log
 from errors import *
-
-
+import pprint
+import audiovideogst
 
 def _create_stream_engines( listener, mode, procs_params):
     """
@@ -38,7 +38,11 @@ def _create_stream_engines( listener, mode, procs_params):
             engine_name = stream_params['engine']
             if engine == None:
                 # engine is a AudioVideoGst instance
-                engine = create_engine(engine_name)
+                if engine_name.upper() == 'GST':
+                    engine =  audiovideogst.AudioVideoGst()
+                else:
+                    raise StreamsError, 'Engine "%s" is not supported' %  engine_name
+
             engine.apply_settings(listener, mode, stream_name, stream_params)
         engines.append(engine)
     return engines

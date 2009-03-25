@@ -33,8 +33,3 @@ def create_channel(engine_name):
         return chan
     raise StreamsError, 'Engine "%s" has no communication channel' %  engine_name
 
-def create_engine(engine_name):
-    engine_name = str(engine_name)
-    if engine_name.upper() == 'GST':
-        return audiovideogst.AudioVideoGst()
-    raise StreamsError, 'Engine "%s" is not supported' %  engine_name
