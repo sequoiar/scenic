@@ -17,7 +17,7 @@ class MilhouseTests():
     @staticmethod
     def timeouts():
         """ Returns tuple of timeout arguments """
-        timeout = '-o 4000'
+        timeout = '-o 40000'
         return timeout, timeout
 
     @staticmethod

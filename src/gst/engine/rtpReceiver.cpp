@@ -57,10 +57,13 @@ RtpReceiver::~RtpReceiver()
     depayloaders_.erase(iter);
 
 #ifdef CONFIG_DEBUG_LOCAL
-    madeControl_ = false;
-    gtk_widget_destroy(control_);
-    LOG_DEBUG("Videosink window destroyed");
-    control_ = 0;
+    if (control_)
+    {
+        madeControl_ = false;
+        gtk_widget_destroy(control_);
+        LOG_DEBUG("RTP jitterbuffer control window destroyed");
+        control_ = 0;
+    }
 #endif
 }
 
@@ -147,7 +150,7 @@ GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(GstPad *srcPad)
     std::string srcMediaType(getMediaType(srcPad));
 
     while (getMediaType(sinkPad) != srcMediaType
-           && iter != depayloaders_.end())
+            && iter != depayloaders_.end())
     {
         gst_object_unref(sinkPad);
         sinkPad = gst_element_get_static_pad(*iter, "sink");
@@ -180,7 +183,7 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 
     rtcp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
     g_object_set(rtcp_sender_, "host", config.remoteHost(), "port",
-                 config.port() + 5, "sync", FALSE, "async", FALSE, NULL);
+            config.port() + 5, "sync", FALSE, "async", FALSE, NULL);
 
     assert(recv_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_")));
     assert(send_rtcp_src = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_")));
@@ -228,7 +231,7 @@ void RtpReceiver::createLatencyControl()
 {
     if (madeControl_)
         return;
-    
+
     static bool gtk_initialized = false;
     if (!gtk_initialized)
     {
@@ -260,11 +263,11 @@ void RtpReceiver::createLatencyControl()
     gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
             GTK_SIGNAL_FUNC(updateLatencyCb), NULL);
 
-  
+
     hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
     // Signal emitted only when value is done changing
     gtk_range_set_update_policy (GTK_RANGE (hscale), 
-                                 GTK_UPDATE_DISCONTINUOUS);
+            GTK_UPDATE_DISCONTINUOUS);
     gtk_box_pack_start (GTK_BOX (box1), hscale, TRUE, TRUE, 0);
     gtk_widget_show (hscale);
 
