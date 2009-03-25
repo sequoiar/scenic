@@ -191,7 +191,7 @@ std::string tcpGetBuffer(int port, int &id)
         {
             if(std::string(f.cmd()) == "quit")
             {
-                LOG_INFO("quit in tcpGetBuffer");
+                THROW_ERROR("quit in tcpGetBuffer");
                 break;
             }
             if(std::string(f.cmd()) != "buffer")
@@ -202,8 +202,10 @@ std::string tcpGetBuffer(int port, int &id)
             id = f["id"];
             return f["str"];
         }
-        catch(ErrorExcept)
+        catch(ErrorExcept e)
         {
+            if (f.cmd() == "quit")
+                throw e;
         }
     }
     return "";

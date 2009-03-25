@@ -27,6 +27,7 @@
 // extend namespace gutil
 namespace gutil {
     static GMainLoop *loop_ = 0;
+    int checkSignal(gpointer data = NULL);
 }
 
 
@@ -39,17 +40,30 @@ int gutil::killMainLoop(gpointer /*data*/)
     return FALSE;       // won't be called again
 }
 
+int gutil::checkSignal(gpointer /*data*/)
+{
+    if (signalFlag())
+    {
+        killMainLoop(NULL);
+        //THROW_END_THREAD("Got signal flag in gloop");
+        return FALSE; // won't be called again
+    }
+
+    return TRUE; // keep calling
+}
 
 /// ms to run - 0 is forever
 void gutil::runMainLoop(unsigned int ms)
 {
-    //   std::cout.flush();
-    //   std::cout << filename << ":" << function << ":" << lineNumber
-    //             << ": in g_main_loop for` " << ms << " milliseconds" << std::endl;
     loop_ = g_main_loop_new (NULL, FALSE);                       
     if(ms)
         g_timeout_add(ms, static_cast<GSourceFunc>(gutil::killMainLoop),
                 NULL);
+
+    g_timeout_add(1000 /*ms*/,  // poll signal status every second
+            static_cast<GSourceFunc>(gutil::checkSignal),
+            NULL);
+
     g_main_loop_run(loop_);
     g_main_loop_unref(loop_);
 }

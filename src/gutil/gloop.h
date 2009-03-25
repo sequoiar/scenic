@@ -26,10 +26,9 @@
 #include <glib.h>
 
 namespace gutil {
-    int killMainLoop(gpointer data = NULL);
-    
     /// ms to run - 0 is forever
     void runMainLoop(unsigned int ms);
+    int killMainLoop(gpointer data = NULL);
 }
 
 #endif // __GUTIL_H__

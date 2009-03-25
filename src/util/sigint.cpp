@@ -24,6 +24,7 @@
 #include <signal.h>
 #include "sigint.h"
 #include "logWriter.h"
+#include "msgThread.h"
 
 static bool signal_flag = false;
 
@@ -43,6 +44,7 @@ static void handler(int /*sig*/, siginfo_t* /* si*/, void* /* unused*/)
     sa.sa_sigaction = NULL;
     if (sigaction(SIGINT, &sa, NULL) == -1)
         THROW_ERROR("Cannot register SIGINT handler");
+    MsgThread::broadcastQuit();
 }
 
 

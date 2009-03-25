@@ -29,7 +29,7 @@
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
 
-#define BLOCK() gutil::runMainLoop(0);
+#define BLOCK() gutil::runMainLoop(0); 
 
 namespace pof 
 {
@@ -103,12 +103,12 @@ short pof::run(int argc, char **argv)
         THROW_ERROR("argument error: missing address. see --help");
 
     if(!disableVideo and !options["videocodec"])
-        THROW_ERROR("argument error: missing videoCodec. see --help");
+        THROW_ERROR("argument error: missing videocodec. see --help");
     if(!disableVideo and !options["videoport"])
         THROW_ERROR("argument error: missing videoport. see --help");
 
     if(!disableAudio and !options["audiocodec"])
-        THROW_ERROR("argument error: missing audioCodec. see --help");
+        THROW_ERROR("argument error: missing audiocodec. see --help");
     if(!disableAudio and !options["audioport"])
         THROW_ERROR("argument error: missing audioport. see --help");
 
@@ -228,9 +228,10 @@ int main(int argc, char **argv)
     int ret = 0;
     LOG_INFO("\x1b[0;10r\x1b[2JBuilt on " << __DATE__ << " at " << __TIME__);
     try {
+        set_handler();
         ret = pof::run(argc, argv);
     }
-    catch (Except e)
+    catch (std::exception)
     {
         ret = 1;
     }
