@@ -106,6 +106,8 @@ def start_process(command, isVerbose=False, logPrefix=''):
     """
     try:
         directory = os.getcwd()
+	display = os.environ['DISPLAY']
+	print 'Current DISPLAY: ' + display
         #print 'Current working dir: ' + directory
         if isVerbose:
             print
