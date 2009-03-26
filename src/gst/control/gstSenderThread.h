@@ -24,6 +24,7 @@
 #define _GST_SENDER_THREAD_H_
 
 #include "gstThread.h"
+#include <boost/function.hpp>
 class SenderBase;
 /// MapMsg handler thread that calls GST media functionality
 class GstSenderThread
@@ -47,6 +48,7 @@ class GstSenderThread
         GstSenderThread(const GstSenderThread&); 
         /// No Assignment Operator 
         GstSenderThread& operator=(const GstSenderThread&); 
+        boost::function<void (std::string)> ff[2];
 };
 
 #endif // _GST_SENDER_THREAD_H_

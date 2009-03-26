@@ -222,25 +222,28 @@ bool tcpSendBuffer(const std::string ip, int port, int id, const std::string cap
             id << " caps=" << caps);
     MapMsg msg("buffer");
 
-    TcpThread tcp(port);
-
+    TcpServer tcp(port);
     msg["str"] = caps;
     msg["id"] = id;
 
     const int MAX_TRIES = 100;
 
+    std::string msg_str;
+    Parser::stringify(msg, msg_str);
     for(int i = 0; i < MAX_TRIES; ++i)
     {
+        if(MsgThread::isQuitted())
+            return false;
         try
         {
-            bool ret = tcp.socket_connect_send(ip, msg);
+            bool ret = tcp.socket_connect_send(ip, msg_str);
             if(ret)
                 return true;
         }
         catch(ErrorExcept e)
         {
            if(e.errno_ == ECONNREFUSED ) 
-               LOG_DEBUG("GOT ECONNREFUSED");
+               ; //LOG_DEBUG("GOT ECONNREFUSED");
            else
                return false;
         }

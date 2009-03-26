@@ -86,7 +86,8 @@ bool TcpServer::socket_connect_send(const std::string& addr, const std::string& 
     if (connect(ssockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
     {
         ::close(ssockfd);
-        THROW_ERRNO("Cannot Connect to peer. " <<  strerror(errno), errno);
+        return false;
+        //THROW_ERRNO("Cannot Connect to peer. " <<  strerror(errno), errno);
     }
     int n=0;
     n = ::write(ssockfd, msg.c_str(), msg.size());

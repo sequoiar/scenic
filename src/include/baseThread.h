@@ -40,6 +40,7 @@ class BaseThread
         bool run();
 
         static void broadcastQuit();
+        static bool isQuitted();
     protected:
         virtual int main() { return 0; }
         static void *thread_main(void *pThreadObj);
@@ -51,12 +52,21 @@ class BaseThread
         QueuePair_ < T > flippedQueue_;
 
         static std::set< BaseThread < T > *> allThreads_;
+        static bool Quitted;
     private:
         /** No Copy Constructor */
         BaseThread(const BaseThread&); 
         /** No Assignment Operator */
         BaseThread& operator=(const BaseThread&); 
 };
+
+template < class T >
+bool BaseThread< T >::Quitted = false;
+
+template < class T >
+bool BaseThread< T >::isQuitted(){
+    return Quitted;
+}
 
 template < class T >
 std::set< BaseThread < T > *> BaseThread<T>::allThreads_;
@@ -73,6 +83,7 @@ template < class T >
 void BaseThread < T >::broadcastQuit()
 {
     for_each(allThreads_.begin(), allThreads_.end(), BaseThread<T>::postQuit);
+    Quitted = true;
 }
 
 /// client access to async QueuePair 

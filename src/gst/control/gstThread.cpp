@@ -30,7 +30,6 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 
-boost::function<void (std::string)> ff[2];
 void GstThread::stop(MapMsg& ){ playback::stop();} 
 void GstThread::start(MapMsg&)
 {
