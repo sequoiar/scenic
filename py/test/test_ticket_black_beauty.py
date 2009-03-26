@@ -354,7 +354,7 @@ class Test_telnet_milhouse(TelnetBaseTest):
          if source:
              s += ' source="%s"' % source
          if channels:
-              s += ' channels="%d"' % channels   
+              s += ' channels=%d' % channels   
          return s
     
       
@@ -390,8 +390,10 @@ class Test_telnet_milhouse(TelnetBaseTest):
         self.tst_tx(tx_video_init_cmd, video_init_ok)
         self.tst_tx(tx_audio_init_cmd , audio_init_ok)
                 
-        self.tst_rx( 'start:', start_ok )
         self.tst_tx( 'start:', start_ok )
+        time.sleep(1)
+        self.tst_rx( 'start:', start_ok )
+       
         self._stream_dream(5.)
         # check number of packets TBD
         self.tst_rx("stop:", stop_ok)
