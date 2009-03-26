@@ -404,7 +404,7 @@ class Test_telnet_milhouse(TelnetBaseTest):
         #self.msc += 'test:>test [label="waiting"];\n' % str(delay)
         self.msc += '---  [ label = "streaming data for %s seconds"]; \n' % str(delay)
     
-    def atest_04_video_sender_receiver(self):
+    def test_04_video_sender_receiver(self):
         """
         Finally, we get some streaming going: a receiver and a sender are started and stopped.
         During the 5 second sleep, the video stream should appear on the screen.
