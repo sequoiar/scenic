@@ -42,9 +42,12 @@ if __name__ == '__main__':
     
     # configure miville
     config = MivilleConfiguration()
-    if options.interfaces is not None:
+    if type(options.interfaces) is list:
         # print "INTERFACES: %s" % (options.interfaces)
-        config.listen_to_interfaces.append(options.interfaces) # a list
+        if type(config.listen_to_interfaces) is list:
+            config.listen_to_interfaces.append(options.interfaces) # a list
+        else:
+            config.listen_to_interfaces = options.interfaces
 
     log.start()
     log.info('Starting Miville...')

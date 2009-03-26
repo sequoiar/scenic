@@ -61,7 +61,8 @@ class MivilleConfiguration(object):
         #self.midi_port = 44000
         #self.ipcp_port = 999999999999
         self.port_numbers_offset = 0
-        self.listen_to_interfaces = ['127.0.0.1'] # default is only local host
+        self.listen_to_interfaces = '' # means all interfaces
+        # ['127.0.0.1'] # default is only local host
         # files
         #self.miville_home = "~/.miville"
         #self.addressbook_filename = "contacts.txt"
