@@ -62,8 +62,8 @@ bool MainModule::run()
             THROW_ERROR("GstThread not running");
         if(tcpThread_ == 0 or !tcpThread_->run())
             THROW_ERROR("TcpThread not running");
-        if(asio_thread_ == 0 or !asio_thread_->run())
-            THROW_ERROR("asioThread not running");
+//        if(asio_thread_ == 0 or !asio_thread_->run())
+//            THROW_ERROR("asioThread not running");
         QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
         QueuePair &asio_queue = asio_thread_->getQueue();
