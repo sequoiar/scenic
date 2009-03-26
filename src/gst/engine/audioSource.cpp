@@ -161,6 +161,7 @@ void AudioTestSource::sub_init()
     {
         GstPad *pad;
         g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", FREQUENCY[0][channelIdx], "is-live", TRUE, NULL);
+        g_object_set(G_OBJECT(*src), "is-live", TRUE, NULL);
         assert(pad = gst_element_get_static_pad(*src, "src"));
         assert(gst_pad_set_caps(pad, caps));
         g_object_unref(pad);

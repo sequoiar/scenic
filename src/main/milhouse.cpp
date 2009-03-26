@@ -131,9 +131,7 @@ short pof::run(int argc, char **argv)
             if(!options["audiosink"])
                 THROW_ERROR("argument error: missing audiosink. see --help");
             
-            // FIXME: should we distinguish between device and location, since
-            // a src or sink is either dealing with a file or a device, but 
-            // never both?
+            // FIXME: we should distinguish between device and location
             std::string audioLocation = "";
             if (options["audiodevice"])
                 audioLocation = (std::string) options["audiodevice"];

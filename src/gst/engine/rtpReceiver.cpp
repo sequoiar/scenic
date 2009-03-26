@@ -176,7 +176,7 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     RtpBin::init();
     // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
     // rule of thumb: 2-3 times the maximum network jitter
-    setLatency(MIN_LATENCY);
+    setLatency(INIT_LATENCY);
 
 
     GstPad *recv_rtp_sink;
@@ -271,7 +271,8 @@ void RtpReceiver::createLatencyControl()
     /* Note that the page_size value only makes a difference for
      * scrollbar widgets, and the highest value you'll get is actually
      * (upper - page_size). */
-    adj = gtk_adjustment_new (3.0, 1.0, 201.0, 1.0, 1.0, 1.0);
+
+    adj = gtk_adjustment_new (INIT_LATENCY, MIN_LATENCY, MAX_LATENCY + 1, 1.0, 1.0, 1.0);
 
     gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
             GTK_SIGNAL_FUNC(updateLatencyCb), NULL);

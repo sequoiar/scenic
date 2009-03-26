@@ -121,9 +121,9 @@ bool Jack::autoForcedSupported(GstElement *jackElement)
     gint value;
     bool found = false;
 
-    for(value = enum_class->minimum; value <= enum_class->maximum; value++) 
+    for (value = enum_class->minimum; value <= enum_class->maximum; value++) 
     {
-        if((enum_value = g_enum_get_value(enum_class, value))) 
+        if ((enum_value = g_enum_get_value(enum_class, value))) 
         {
             if (std::string("auto-forced") == enum_value->value_nick)
                 found = true;

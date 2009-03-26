@@ -55,7 +55,9 @@ class RtpReceiver
         static void cb_new_src_pad(_GstElement * element, _GstPad * srcPad, void *data);
         static void createLatencyControl();
         static void updateLatencyCb(_GtkAdjustment *adj);
-        static const int MIN_LATENCY = 3;
+        static const int MIN_LATENCY = 1;
+        static const int INIT_LATENCY = 3;
+        static const int MAX_LATENCY = 400;
 
         _GstElement *rtp_receiver_;
         _GstElement *depayloader_;
