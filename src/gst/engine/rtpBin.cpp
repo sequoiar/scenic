@@ -96,6 +96,9 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
 // callback to print the rtp stats 
 gboolean RtpBin::printStatsCallback(gpointer data)
 {
+    if (sessionCount_ <= 0) // no sessions o print yet
+        return TRUE; 
+
     if (destroyed_)
     {
         LOG_DEBUG("No active rtpsessions, unregistering reporting callback");
@@ -115,7 +118,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
     {
         g_signal_emit_by_name(rtpbin, "get-internal-session", sessionId, &session);
 
-        // print all the sources in the session, this include the internal source
+        // parse stats of all the sources in the session, this include the internal source
         g_object_get(session, "sources", &arrayOfSources, NULL);
 
         for (i = 0; i < arrayOfSources->n_values; ++i)
