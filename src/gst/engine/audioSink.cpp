@@ -30,7 +30,7 @@
 #include "alsa.h"
 
 //const unsigned long long AudioSink::BUFFER_TIME = 10000LL;
-const unsigned long long AudioSink::BUFFER_TIME = 20000LL;
+const unsigned long long AudioSink::BUFFER_TIME = 30000LL;
         
 /// Constructor 
 AudioSink::AudioSink() : 
