@@ -339,13 +339,14 @@ class Test_telnet_milhouse(TelnetBaseTest):
     """
     
         
-    def _get_start_command(self, codec, port, address, bitrate=None, source =None):
+    def _get_start_command(self, codec, port, address, bitrate=None, source =None, channels):
          s = ' codec="%s" port=%d address="%s"' %  (codec, port, address)
          if bitrate:
              s += ' bitrate=%d' % bitrate
          if source:
              s += ' source="%s"' % source
-             
+         if channels:
+             s += ' channels=%d' % channels    
          return s
     
 #    def test_01_generate_html_index(self):
