@@ -220,10 +220,18 @@ short pof::run(int argc, char **argv)
     }
     return 0;
 }
+#include <stdlib.h>
+
+void onExit(void)
+{
+    LOG_INFO("\x1b[r\x1b[10BBuilt on " << __DATE__ << " at " << __TIME__);
+}
+
 
 int main(int argc, char **argv)
 {
     int ret = 0;
+    atexit (onExit);
     LOG_INFO("\x1b[0;10r\x1b[2JBuilt on " << __DATE__ << " at " << __TIME__);
     try {
         set_handler();
