@@ -115,16 +115,16 @@ class GstServer(object):
         log.debug('GST VIDEO INIT acknowledged:  args %s' %  str(args) )
         self.change_state(STREAMINIT)
 
-    def gst_start(self, ack, id):
+    def gst_start(self,  **args):
         log.debug('GST START acknowledged [%s]... our ticket is: %d' % (ack,id) )
         self.change_state(STREAMING)
         
 
-    def gst_stop(self, ack, id):
+    def gst_stop(self,  **args):
         log.debug('GST STOP acknowledged [%s]... our ticket is: %d' % (ack,id) )
         self.change_state(STREAMSTOPPED)
 
-    def gst_audio_init(self, ack, id):
+    def gst_audio_init(self,  **args):
         log.debug('GST AUDIO INIT acknowledged [%s]... our ticket is: %d' % (ack,id) )
         self.change_state(STREAMINIT)
 
