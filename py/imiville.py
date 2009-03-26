@@ -1,11 +1,13 @@
-from twisted.internet import reactor 
+
 from pprint import pprint, pformat
-import miville
-from utils.observer import Observer
-from ui.cli import CliView
 import time
 import sys
 
+from twisted.internet import reactor 
+
+import core as miville
+from utils.observer import Observer
+from ui.cli import CliView
 import devices
 
 """
