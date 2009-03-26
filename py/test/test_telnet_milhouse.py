@@ -339,7 +339,7 @@ class Test_telnet_milhouse(TelnetBaseTest):
     """
     
         
-    def _get_start_command(self, codec, port, address, bitrate=None, source =None, channels):
+    def _get_start_command(self, codec, port, address, bitrate=None, source =None, channels=None):
          s = ' codec="%s" port=%d address="%s"' %  (codec, port, address)
          if bitrate:
              s += ' bitrate=%d' % bitrate
