@@ -128,7 +128,8 @@ class Test_02_devices_jackd(unittest.TestCase):
                 self.fail("Device has no rate attribute.")
     
     def test_03_stop_devices(self):
-        app.miville.exit()
+        # app.miville.exit()
+        pass
 
     def disable_kill_jackd(self):
         """

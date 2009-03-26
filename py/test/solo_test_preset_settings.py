@@ -26,41 +26,17 @@ Usage: trial test/systest_settings.py
 
 import os
 import sys
-import test.systest_telnet
 import time
+import utils.telnet_testing as testing
 
-VERBOSE_CLIENT = False
-#VERBOSE_CLIENT = True
+# starts the miville server internally !
+testing.VERBOSE_CLIENT = False
+testing.VERBOSE_SERVER = False
+testing.START_SERVER = True  
 
-VERBOSE_SERVER = VERBOSE_CLIENT
-#VERBOSE_SERVER = True
+testing.start()
 
-VERBOSE_BLABLA = False
-
-def blabla(msg):
-    if VERBOSE_BLABLA:
-        print msg
-
-class TestBase(test.systest_telnet.TelnetBaseTest):
-    """
-    Convenient little gem of a class with a tst method that
-    sends a telnet request and tests for an expected reply.
-    """  
-    def tst(self, command, expected, timeout=2, errorMsg = None):
-        
-#        
-        self.client.sendline(command)
-        err = errorMsg or 'The command did not return: "%s" as expected' % expected
-        self.expectTest(expected, err, timeout=timeout)
-        time.sleep(0.5)
-        b = self.client.buffer.rstrip()
-        b = b.lstrip()
-        blabla( "\n============================================")    
-        blabla( command )
-        b = b.replace ('\r', '')
-        blabla( b )
-
-class Test_001_Gen_Settings(TestBase):
+class Test_001_Gen_Settings(testing.TelnetBaseTest):
     """
     System Tests for presets
     """
@@ -69,7 +45,6 @@ class Test_001_Gen_Settings(TestBase):
         self.expectTest('pof: ', 'The default prompt is not appearing.')
     
     def test_01_add_2_media_settings(self):
-        print
         self.tst("settings --type media --add med1" , "Media setting added")
         self.tst("settings --type media --list"     , "med1")
         self.tst("settings --type media --add med2" , "Media setting added")
@@ -79,8 +54,7 @@ class Test_001_Gen_Settings(TestBase):
         self.tst("settings --type media --erase med2"     , 'setting removed')
         
     def test_02_save_basic_video_streaming_settings(self):
-        print
-        print "HOME IS: " + os.environ['HOME']
+        # print "HOME IS: " + os.environ['HOME']
         # add a contact
         self.tst("contacts --add testmelonglongtime 127.0.0.1", "Contact added")
         self.tst("contacts --select testmelonglongtime", "Contact selected")   
@@ -133,10 +107,10 @@ class Test_001_Gen_Settings(TestBase):
                 
         self.tst("settings --type stream --globalsetting vid_tx_setting --subgroup send --list"                         , "video01")
         self.tst("s --type global --list"                   , 'vid_tx_setting')
-        time.sleep(2)
+        time.sleep(0.2)
         
         self.tst("settings --save"                          , "saved", timeout=5.0)
-        time.sleep(2)
+        time.sleep(0.2)
         self.tst("s --type global --list"                   , 'vid_tx_setting')
 
         # time.sleep(2)

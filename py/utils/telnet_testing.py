@@ -143,15 +143,14 @@ def start_process(command, isVerbose=False, logPrefix='', color='CYAN'):
             #process = pexpect.spawn(command, logfile=sys.stdout)
         else:
             process = pexpect.spawn(command)
-        time.sleep(1.0) # seconds
+        time.sleep(0.5) # seconds
         if is_running(process) == False:
-            raise Exception("Process is not running ! Is an other miville running at the same time?")
-            println("Process is not running !") # or raise error ?
+            raise Exception("Process %s could not be started. Not running. Is an other miville running at the same time?" % (command))
             #die()
         else:
             return process
     except pexpect.ExceptionPexpect, e:
-        println("Error starting client: heh" + str(e))
+        println("Error starting process %s: %s" % (command, str(e)))
         raise
         #die()
 
@@ -185,7 +184,7 @@ def kill_process(process):
     try:
         if is_running(process) == True:
             process.kill(15)
-            time.sleep(2)
+            time.sleep(0.5)
             if is_running(process) == True:
                 process.kill(9)
     except Exception, e:
@@ -290,7 +289,7 @@ class TelnetBaseTest(unittest.TestCase):
         self.client.sendline(command)
         err = errorMsg or 'The command did not return: "%s" as expected' % expected
         self.expectTest(expected, err)
-        time.sleep(0.5)
+        time.sleep(0.2)
         #b = self.client.buffer.rstrip()
         #b = b.lstrip()
         #print "\n============================================"    
@@ -320,7 +319,7 @@ def start():
                 TMP_NAME = tempfile.mktemp()
                 os.mkdir(TMP_NAME)
                 os.environ['HOME'] = TMP_NAME
-                print "using %s as a $HOME. (for adb and log)" % (TMP_NAME)
+                print "using %s/ as a $HOME. (for adb and log)" % (TMP_NAME)
         except Exception, e:
             print "Error removing setting $HOME to %s: %s" % (TMP_NAME, e)
         
@@ -333,6 +332,6 @@ def start():
         sys.stdout.write(get_color())
         global_server = start_process(SERVER_COMMAND, VERBOSE_SERVER, "S>", 'BLUE')
 
-    time.sleep(2.0)
+    time.sleep(1.0)
     global_client = start_process(CLIENT_COMMAND, VERBOSE_CLIENT, "C>", 'CYAN')
 

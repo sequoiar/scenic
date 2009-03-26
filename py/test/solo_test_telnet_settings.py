@@ -26,30 +26,23 @@ Usage: trial test/systest_settings.py
 
 import os
 import sys
-import test.systest_telnet
+import utils.telnet_testing as testing
 
+# starts the miville server internally !
+testing.VERBOSE_CLIENT = False
+testing.VERBOSE_SERVER = False
+testing.START_SERVER = True  
 
+testing.start()
 
-
-class TestBase(test.systest_telnet.TelnetBaseTest):
-    
-    def tst(self, command, expected, errorMsg = None):
-        self.client.sendline(command)
-        self.sleep()
-        err = errorMsg or 'The command did not return: "%s" as expected' % expected
-        self.expectTest(expected, err)
-        
-class Test_001_Settings(TestBase):
+class Test_001_Settings(testing.TelnetBaseTest):
     """
     System Tests for presets
     """
-    
-       
     def test_00_yes(self):
         self.expectTest('pof: ', 'The default prompt is not appearing.')
         
     def test_01_add_list_delete_modify_global_setting(self):
-       
         # list settings -> empty
         self.tst('settings --type global --list', 'no global settings')
         # add setting
@@ -99,7 +92,6 @@ class Test_001_Settings(TestBase):
         self.tst("s -t media -e twit", '"twit" does not exist')
         # delete setting
         self.tst("s -t media -e aMediaSetting", 'removed')
-        
         
     def test_04_modify_media_setting(self):    
         # modify

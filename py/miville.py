@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Sropulpof
+# Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
@@ -11,13 +11,13 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# Sropulpof is distributed in the hope that it will be useful,
+# Miville is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+# along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 
@@ -39,9 +39,38 @@ import socket
 
 from twisted.internet.error import CannotListenError
 
+__version__ = "0.1 alpha"
+
+# module variables
+core = None
+
+class MivilleConfiguration(object):
+    """
+    Stores configuration options for miville. 
+    
+    Default values are set here.
+    They can be overriden using a dict passed to the constructor.
+    This class is not actually used yet.
+    """
+    def __init__(self, dictionary=None):
+        self.com_chan_port = 37054
+        self.addressbook_filename = "contacts.txt"
+        self.port_numbers_offset = 0
+        self.verbose = False
+
+        # update the attributes to match passed dict
+        if dictionary is not None:
+            self.__dict__.update(dictionary)
+
+    def print_values(self):
+        for key, value in self.__dict__.items():
+            print "%20s: %s" % (key, value)
+
+
 class Core(Subject):
-    """Main class of the application and containing the 'Model' in the MVC"""
-        
+    """
+    Main class of the application and containing the 'Model' in the MVC
+    """    
     def __init__(self):
         """
         defines attributes and does the startup routine.
@@ -53,13 +82,16 @@ class Core(Subject):
         self.uis = None
         self.com_chan_port = 37054
         self.api = api.ControllerApi(self.notify)
-        devices.start(self.api) # api as an argument
+        
+        # much important is to start the devices modules
+        devices.start(self.api) # passing this api as an argument, 
+                                # so that both share the same notify method.
         self.load_uis()
+        # TODO: rename this addressbook !
         self.adb = addressbook.AddressBook('sropulpof.adb', self.api)
         self.engines = self.find_engines()
         # create the settings collection
         self.settings = settings.Settings()
-        
         #self.curr_setting = self.settings.select()
         # TODO: causes a couldn't listen error if another miville runs on the same port. 
         # and makes the application crash. 
@@ -98,14 +130,13 @@ class Core(Subject):
         return engines
 
 
-def chk_ob(core):
-    """
-        I guess this is a function to print some variables 
-    """
-    print "Contacts: %r" % core.adb.contacts.keys()
-#    print dir(ui.cli)
+# def chk_ob(core):
+#     """
+#     Please document this function.
+#     """
+#     print "Contacts: %r" % core.adb.contacts.keys()
+# #    print dir(ui.cli)
 
-core = None
 
 def main():    
     """
@@ -116,36 +147,56 @@ def main():
 #    l = task.LoopingCall(chk_ob, core)
 #    l.start(2.0, False)
 
-def exit():
+def exit(app_return_val=0):
+    """
+    Called on application exit
     
-    """on application exit
     Cancel delayed calls, stop ports, disconnect connections. 
     """
-    # TODO : Cancel delayed calls, stop ports, disconnect connections.
     try:
         if core.adb != None:
             core.adb.write(False)
     except AttributeError:
         pass
     devices.stop()
+    # that'll do something, but maybe not what you expect.
     reactor.disconnectAll()
     reactor.removeAll()
     #reactor.stop()
-    # that'll do something, but maybe not what you expect.
     #del reactor
+    sys.exit(app_return_val)
 
 if __name__ == '__main__':
+    """
+    Everything that is related to using Miville from 
+    a shell such as command line arguments parsing, and environment
+    variables checking must be here.
+    """
+    from optparse import OptionParser
+
+    # command line parsing
+    # parser = OptionParser(usage="%prog [version]", version=str(__version__))
+    # parser.add_option("-o", "--offset", dest="offset", default=0, type="int", \
+    #     help="Specifies an offset for port numbers to be changed..")
+    # parser.add_option("-H", "--hosts", type="string", default="localhost", \
+    #     help="Listens only to those hosts.")
+    # parser.add_option("-v", "--verbose", dest="verbose", action="store_true", \
+    #     help="Sets the output to be verbose.")
+    # (options, args) = parser.parse_args()
+
     log.start()
-    log.info('Starting Sropulpof...')
-    for terminal in [ 'xterm', 'rxvt' ]:
+    log.info('Starting Miville...')
+    # changes terminal title
+    for terminal in ['xterm', 'rxvt']:
         if terminal.find:
             hostname = socket.gethostname()
             sys.stdout.write(']2;miville on ' + hostname + '')
+
     try:
         main()
         reactor.run()
     except CannotListenError, e:
         log.error(str(e))
-	
-    exit()
+        exit(1)
+    exit(0)
 
