@@ -49,7 +49,7 @@ video_init_ok = 'video_init: ack="ok"'
 audio_init_ok = 'audio_init: ack="ok"'
 start_ok = 'start: ack="ok"'
 stop_ok =  'stop: ack="ok"'
-#stop_ok =  ''
+stop_but_not_ok =  ''
 
 
 # ---------------------------------------------------------------------
@@ -468,8 +468,8 @@ class Test_telnet_milhouse(TelnetBaseTest):
         verb("stopping the streaming...")
  
  
-        self.tst_tx("stop:", '')
-        #self.tst_tx("stop:", stop_ok)
+        self.tst_tx("stop:", stop_but_not_ok) # CARAMBA!
+        self.tst_rx("stop:", stop_ok)
         
  
         # check for data
@@ -512,7 +512,7 @@ class Test_telnet_milhouse(TelnetBaseTest):
        
         self._stream_dream(5.)
         # check number of packets TBD
-        self.tst_rx("stop:", '') # CARAMBA!!!
+        self.tst_rx("stop:", stop_but_not_ok) # CARAMBA!!!
         self.tst_tx("stop:", stop_ok)
        
        
