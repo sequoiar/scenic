@@ -63,14 +63,33 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
     g_object_get(source, "stats", &stats, NULL);
 
     const GValue *val = gst_structure_get_value(stats, "internal");
-    if (g_value_get_boolean(val))
-        return; // we don't care about internal sources
+
+    /* simply dump the stats structure */
+    //    gchar *str = gst_structure_to_string (stats);
+    //    g_print ("source stats: %s\n", str);
+
+    if (g_value_get_boolean(val))   // is-internal
+    {
+        val = gst_structure_get_value(stats, "is-sender");
+        if (g_value_get_boolean(val))    // is-sender
+        {
+            guint64 bitrate = g_value_get_uint64(gst_structure_get_value(stats, "bitrate"));
+            g_print("BITRATE: %" G_GUINT64_FORMAT "\n", bitrate);
+        }
+
+        gst_structure_free (stats);
+        return; // otherwise we don't care about internal sources
+    }
 
     g_print("SESSION %d:\n", sessionId);
     guint jitter = g_value_get_uint(gst_structure_get_value(stats, "rb-jitter"));
     g_print("JITTER: %u\n", jitter);
     int packetLoss = g_value_get_int(gst_structure_get_value(stats, "rb-packetslost"));
     g_print("PACKETS LOST: %d\n", packetLoss);
+
+    // free structures
+    gst_structure_free (stats);
+    //g_free (str);
 }
 
 
