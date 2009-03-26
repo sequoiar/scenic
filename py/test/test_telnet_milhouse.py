@@ -447,7 +447,7 @@ class Test_telnet_milhouse(TelnetBaseTest):
         
         rx_init_cmd = "audio_init:" + self._get_start_command('vorbis', 12005, "127.0.0.1")
         verb( "RX:>" + rx_init_cmd)
-        tx_init_cmd =  "audio_init:" + self._get_start_command ('vorbis', 12005, "127.0.0.1", source=audio_src)
+        tx_init_cmd =  "audio_init:" + self._get_start_command ('vorbis', 12005, "127.0.0.1", source=audio_src, channels=2)
         verb( "TX:>" + tx_init_cmd)
         self.start_propulseart_rx(telnet_rx_port)
         self.start_propulseart_tx(telnet_tx_port)
@@ -468,7 +468,7 @@ class Test_telnet_milhouse(TelnetBaseTest):
         self.tst_rx("stop:", stop_ok)
         # check for data
         
-    def test_06_audio_video_synchronized(self): 
+    def test_audio_video_synchronized(self): 
         """
         This test is a streaming test where audio and video are streamed 
         simultaneously with synchronisation.
@@ -478,21 +478,21 @@ class Test_telnet_milhouse(TelnetBaseTest):
         telnet_rx_port = 1270
         telnet_tx_port = 1370
         
-        rx_video_init_cmd = "video_init:" + self._get_start_command('h264',   12007, "127.0.0.1")
-        rx_audio_init_cmd = "audio_init:" + self._get_start_command('vorbis', 12107, "127.0.0.1")        
+        rx_video_init_cmd = "video_init:" + self._get_start_command('mpeg4',   12007, "127.0.0.1")
+        rx_audio_init_cmd = "audio_init:" + self._get_start_command('raw', 12107, "127.0.0.1", channels =2)        
         verb( 'RX video: ' + prompt(rx_video_init_cmd) )
         verb( 'RX audio: ' + prompt(rx_audio_init_cmd) )
         
         bitrate = 3000000
-        tx_video_init_cmd = "video_init:" + self._get_start_command('h264',   12007, "127.0.0.1", bitrate=bitrate, source=video_src)
-        tx_audio_init_cmd = "audio_init:" + self._get_start_command('vorbis', 12107, "127.0.0.1", source=audio_src)   
+        tx_video_init_cmd = "video_init:" + self._get_start_command('mpeg4',   12007, "127.0.0.1", bitrate=bitrate, source=video_src)
+        tx_audio_init_cmd = "audio_init:" + self._get_start_command('raw', 12107, "127.0.0.1", source=audio_src, channels =2)   
         verb(  'TX video: ' + prompt(tx_video_init_cmd))
         verb( 'TX audio: ' + prompt(tx_audio_init_cmd))
                  
         self.start_propulseart_rx(telnet_rx_port)
         self.start_propulseart_tx(telnet_tx_port)
         
-        # this should fail... as init is not yet implemented
+
         self.tst_rx(rx_video_init_cmd , video_init_ok )
         self.tst_rx(rx_audio_init_cmd , audio_init_ok  )
         
@@ -500,8 +500,10 @@ class Test_telnet_milhouse(TelnetBaseTest):
         self.tst_tx(tx_video_init_cmd, video_init_ok)
         self.tst_tx(tx_audio_init_cmd , audio_init_ok)
                 
-        self.tst_rx( 'start:', start_ok )
         self.tst_tx( 'start:', start_ok )
+        time.sleep(1)
+        self.tst_rx( 'start:', start_ok )
+       
         self._stream_dream(5.)
         # check number of packets TBD
         self.tst_rx("stop:", stop_ok)
