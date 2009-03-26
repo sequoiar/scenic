@@ -96,8 +96,8 @@ template < class T >
 BaseThread < T >::~BaseThread()
 {
     if (th_){
-        T t("quit"); //TODO: this is forcing the template param to have char* constructor
-        flippedQueue_.push(t);
+        //T t("quit"); //TODO: this is forcing the template param to have char* constructor
+        //flippedQueue_.push(t);
         g_thread_join(th_);
         allThreads_.erase(this);
     }

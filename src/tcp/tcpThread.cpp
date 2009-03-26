@@ -79,7 +79,7 @@ int TcpThread::main()
             while(!serv_.accept())
             {
                 if((quit = gotQuit()))
-                    return 0;
+                    break;
             }
             try
             {

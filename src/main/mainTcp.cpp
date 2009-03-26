@@ -84,7 +84,7 @@ bool MainModule::run()
             LOG_DEBUG(std::string(tmsg.cmd()));
             if (tmsg.cmd() == "quit")
             {
-                gstThread_->broadcastQuit();
+                MsgThread::broadcastQuit();
                 break;
             }
             if (tmsg.cmd() == "exception")
