@@ -188,6 +188,7 @@ class ConnectionBasic(Connection):
         self._timeout = None
 
     def _create_connection(self):
+        global PORT
         self._state = CONNECTING
         port = self.contact.port
         if port == None:
@@ -205,6 +206,7 @@ class ConnectionBasic(Connection):
     stop_connecting = Connection.stop
 
     def _connection_ready(self, connection):
+        global PORT
         """
         Callback for when we are connected sucessfully.
         """
@@ -246,6 +248,7 @@ class ConnectionBasic(Connection):
         self.connection = None
 
     def _accepted(self):
+        global PORT
         self.local_name = '%s:%s' % (self.connection.transport.getHost().host, PORT)
         self._close_connection()
 #        Connection.accepted(self)
@@ -319,9 +322,15 @@ def start(api):
     :param api: miville's api
     """
     global PORT
-    if len(sys.argv) > 1:
-        PORT += 1
+    PORT = api.core.config.connector_port + api.core.config.port_numbers_offset 
+    #if len(sys.argv) > 1:
+    #    PORT += 1
     server_factory = BasicServerFactory()
     server_factory.api = api
-    reactor.listenTCP(PORT, server_factory)
+    
+    # listen TCP
+    interfaces = api.core.config.listen_to_interfaces
+    listen_queue_size = 50
+
+    api.listen_tcp(PORT, server_factory, listen_queue_size, interfaces)
 

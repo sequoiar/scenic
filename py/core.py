@@ -52,18 +52,26 @@ class MivilleConfiguration(object):
     This class is not actually used yet.
     """
     def __init__(self, dictionary=None):
-        self.com_chan_port = 37054
-        self.addressbook_filename = "contacts.txt"
-        self.port_numbers_offset = 0
         self.verbose = False
-
+        # network
+        #self.com_chan_port = 37054
+        #self.telnet_port = 14444
+        self.connector_port = 2222
+        #self.web_port = 8080
+        #self.midi_port = 44000
+        #self.ipcp_port = 999999999999
+        self.port_numbers_offset = 0
+        self.listen_to_interfaces = ['127.0.0.1'] # default is only local host
+        # files
+        #self.miville_home = "~/.miville"
+        #self.addressbook_filename = "contacts.txt"
+        
         # update the attributes to match passed dict
         if dictionary is not None:
-            self.__dict__.update(dictionary)
+            self.update_dict(dictionary)
 
     def update_dict(self, dico):
         self.__dict__.update(dictionary)
-
 
     def print_values(self):
         for key, value in self.__dict__.items():
@@ -74,19 +82,21 @@ class Core(Subject):
     """
     Main class of the application and containing the 'Model' in the MVC
     """    
-    def __init__(self):
+    def __init__(self, config_object):
         """
         defines attributes and does the startup routine.
 
         If Miville is started by any argument on the CLI, its basic connector will listen on port 
         37055 instead of the default 37054. Useful for debugging.
+
+        :arg config: MivilleConfiguration instance.
         """
         Subject.__init__(self)
-        self.config = MivilleConfiguration()
+        self.config = config_object
         self.uis = None
         self.com_chan_port = 37054
         self.api = api.ControllerApi(self.notify)
-        
+        self.api.core = self 
         # much important is to start the devices modules
         devices.start(self.api) # passing this api as an argument, 
                                 # so that both share the same notify method.
@@ -142,12 +152,14 @@ class Core(Subject):
 # #    print dir(ui.cli)
 
 
-def main():    
+def main(config_object):    
     """
     Startup of the application.
     """
     global core
-    core = Core()
+    
+    core = Core(config_object)
+    
 #    l = task.LoopingCall(chk_ob, core)
 #    l.start(2.0, False)
 

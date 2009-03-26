@@ -288,8 +288,9 @@ def load_connectors(api):
         name = module.__name__.rpartition('.')[2]
         try:
             module.start(api)
-        except:
-            log.error('Connector \'%s\' failed to start.' % name)
+        except Exception, e:
+            log.error('Connector \'%s\' failed to start. %s' % (name, e))
+            raise # TODO: remove me !
         else:
             connectors[name] = module
             log.info('Connector \'%s\' started.' % name)

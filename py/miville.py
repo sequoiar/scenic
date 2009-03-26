@@ -21,6 +21,7 @@
 
 from core import *
 from optparse import OptionParser
+__version__ = "0.1 alpha"
 
 if __name__ == '__main__':
     """
@@ -30,14 +31,20 @@ if __name__ == '__main__':
     """
 
     # command line parsing
-    # parser = OptionParser(usage="%prog [version]", version=str(__version__))
-    # parser.add_option("-o", "--offset", dest="offset", default=0, type="int", \
-    #     help="Specifies an offset for port numbers to be changed..")
-    # parser.add_option("-H", "--hosts", type="string", default="localhost", \
-    #     help="Listens only to those hosts.")
-    # parser.add_option("-v", "--verbose", dest="verbose", action="store_true", \
-    #     help="Sets the output to be verbose.")
-    # (options, args) = parser.parse_args()
+    parser = OptionParser(usage="%prog", version=str(__version__))
+    parser.add_option("-o", "--offset", dest="offset", default=0, type="int", \
+        help="Specifies an offset for port numbers to be changed..")
+    parser.add_option("-i", "--interfaces", type="string", action="append", \
+        help="""Listens only to those interfaces IP. Use this flag many times if needed. Example: -i 127.0.0.1 -i 10.10.10.55""")
+    parser.add_option("-v", "--verbose", dest="verbose", action="store_true", \
+        help="Sets the output to be verbose.")
+    (options, args) = parser.parse_args()
+    
+    # configure miville
+    config = MivilleConfiguration()
+    if options.interfaces is not None:
+        # print "INTERFACES: %s" % (options.interfaces)
+        config.listen_to_interfaces.append(options.interfaces) # a list
 
     log.start()
     log.info('Starting Miville...')
@@ -48,7 +55,7 @@ if __name__ == '__main__':
             sys.stdout.write(']2;miville on ' + hostname + '')
 
     try:
-        main()
+        main(config)
         reactor.run()
     except CannotListenError, e:
         log.error(str(e))

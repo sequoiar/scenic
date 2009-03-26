@@ -64,7 +64,7 @@ import settings
 from utils import log
 log = log.start('error', 1, 0, 'api') # added by hugo
 
-
+from twisted.internet import reactor
 
 def modify(who, name_of_who, what, new_value):
     """
@@ -121,6 +121,21 @@ class ControllerApi(object):
         firewire.start(self)
         settings.init_connection_listeners(self)
     ### Contacts ###
+    
+    def listen_tcp(self, port, factory, listen_queue_size=50, interfaces=''):
+        """
+        Wraps reactor.listenTCP
+        """
+        if type(interfaces) is not list:
+            # '' mean all interfaces
+            interface = interfaces
+            log.debug("listenTCP:%s %s %s %s" % (port, factory, listen_queue_size, interface))
+            reactor.listenTCP(port, factory, listen_queue_size, interface)
+        else:
+            for interface in interfaces:
+                log.debug("listenTCP:%s %s %s %s" % (port, factory, listen_queue_size, interface))
+                reactor.listenTCP(port, factory, listen_queue_size, interface)
+
 
     def get_contacts(self, caller):
         """
