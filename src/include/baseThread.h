@@ -65,6 +65,7 @@ template < class T >
 void BaseThread < T >::postQuit(BaseThread<T>* bt)
 {
     QueuePair_ <T> & qp = bt->queue_;
+    LOG_DEBUG("postQuit");
     qp.push(T("quit"));
 }
 
@@ -96,10 +97,11 @@ template < class T >
 BaseThread < T >::~BaseThread()
 {
     if (th_){
-        //T t("quit"); //TODO: this is forcing the template param to have char* constructor
-        //flippedQueue_.push(t);
-        g_thread_join(th_);
+        T t("quit"); //TODO: this is forcing the template param to have char* constructor
+        flippedQueue_.push(t);
+        LOG_DEBUG("Thread Stoping " << this);
         allThreads_.erase(this);
+        g_thread_join(th_);
     }
 }
 
@@ -127,6 +129,7 @@ bool BaseThread < T >::run()
         return false;
 
     th_ = thread_create(BaseThread::thread_main, this, &err);
+    LOG_DEBUG("Thread Started " << this);
 
     if (!th_)       //BaseThread failed
     {

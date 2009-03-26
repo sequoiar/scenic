@@ -81,34 +81,37 @@ int TcpThread::main()
                 if((quit = gotQuit()))
                     break;
             }
-            try
+            if(!quit)
             {
-                LOG_INFO("Got Connection.");
-                if(logFlag_)
-                    lf_->enable();
-                while(serv_.connected())
+                try
                 {
-                    if((quit = gotQuit()))
-                        break;
-                    if(serv_.recv(msg))
+                    LOG_INFO("Got Connection.");
+                    if(logFlag_)
+                        lf_->enable();
+                    while(serv_.connected())
                     {
-                        std::string line = get_line(msg);
-                        do
+                        if((quit = gotQuit()))
+                            break;
+                        if(serv_.recv(msg))
                         {
-                            MapMsg mapMsg;
-                            if(Parser::tokenize(line, mapMsg))
-                                queue_.push(mapMsg);
-                            else
-                                LOG_WARNING("Bad Msg Received.");
-                            line = get_line(msg);
+                            std::string line = get_line(msg);
+                            do
+                            {
+                                MapMsg mapMsg;
+                                if(Parser::tokenize(line, mapMsg))
+                                    queue_.push(mapMsg);
+                                else
+                                    LOG_WARNING("Bad Msg Received.");
+                                line = get_line(msg);
+                            }
+                            while(!line.empty());
                         }
-                        while(!line.empty());
                     }
                 }
-            }
-            catch(Except e)
-            {
-                LOG_DEBUG( "CAUGHT " << e.msg_);
+                catch(Except e)
+                {
+                    LOG_DEBUG( "CAUGHT " << e.msg_);
+                }
             }
             if(logFlag_)
                 lf_->hold();

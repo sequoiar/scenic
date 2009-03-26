@@ -235,7 +235,7 @@ int main(int argc, char **argv)
     {
         ret = 1;
     }
-    LOG_INFO("\x1b[rBuilt on " << __DATE__ << " at " << __TIME__);
+    LOG_INFO("\x1b[r\x1b[10BBuilt on " << __DATE__ << " at " << __TIME__);
     return ret;
 }
 

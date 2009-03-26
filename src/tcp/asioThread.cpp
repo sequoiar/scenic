@@ -226,9 +226,8 @@ int asio_thread::main()
         io_service.run();
 #endif
     }
-    catch (std::exception& e)
+    catch (Except)
     {
-        std::cerr << "Exception: " << e.what() << "\n";
     }
 
     return 0;
