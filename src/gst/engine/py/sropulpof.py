@@ -91,7 +91,7 @@ def runAsReceiver(options):
     if not disableVideo:
         vRx = buildVideoReceiver(options.ip, options.videoCodec, options.videoPort, options.screenNum, options.videoSink)
     if not disableAudio:
-        aRx = buildAudioReceiver(options.ip, options.audioCodec, options.audioPort, options.audioSink, options.audioDevice)
+        aRx = buildAudioReceiver(options.ip, options.audioCodec, options.audioPort, options.audioSink, options.audioDevice, AUDIO_BUFFER_TIME)
 
     start()
     if options.fullscreen:

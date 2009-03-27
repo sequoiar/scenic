@@ -63,16 +63,18 @@ class AudioSourceConfig
 class AudioSinkConfig 
 {
     public:
-        AudioSinkConfig(const std::string & sink__, const std::string & location__);
+        AudioSinkConfig(const std::string & sink__, const std::string & location__, unsigned long long bufferTime);
         
         AudioSinkConfig(const AudioSinkConfig & m); 
 
         AudioSink* createSink() const;
         const char *location() const;
+        unsigned long long bufferTime() const;
 
     private:
         const std::string sink_;
         const std::string location_;
+        const unsigned long long bufferTime_;
 };
 
 #endif // _AUDIO_LOCAL_CONFIG_H_

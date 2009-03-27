@@ -92,6 +92,7 @@ BOOST_PYTHON_MODULE(milhouse)
 
     boost::python::scope().attr("VIDEO_MSG_ID") = videofactory::MSG_ID;
     boost::python::scope().attr("AUDIO_MSG_ID") = audiofactory::MSG_ID;
+    boost::python::scope().attr("AUDIO_BUFFER_TIME") = audiofactory::AUDIO_BUFFER_TIME;
 
     // expose macro to python
     boost::python::scope().attr("PACKAGE_VERSION") = PACKAGE_VERSION;

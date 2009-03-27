@@ -101,10 +101,11 @@ class AudioPulseSink : public AudioSink
 class AudioJackSink : public AudioSink
 {
     public:
-        AudioJackSink();
+        AudioJackSink(const AudioSinkConfig &config);
         ~AudioJackSink();
     private:
         void init();
+        const AudioSinkConfig &config_;
         /// No Copy Constructor 
         AudioJackSink(const AudioJackSink&);     
         /// No Assignment Operator 

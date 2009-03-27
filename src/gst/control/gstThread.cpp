@@ -186,7 +186,12 @@ void GstReceiverThread::audio_start(MapMsg& msg)
     {
         const char *AUDIO_SINK = "jackaudiosink";
         const char *AUDIO_LOCATION = "";
-        audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], AUDIO_SINK, AUDIO_LOCATION);
+        int audioBufferTime = audiofactory::AUDIO_BUFFER_TIME;
+        if (msg["audio_buffer_time"]) // take specified buffer time if present, otherwise use default
+            audioBufferTime = msg["audio_buffer_time"];
+
+        audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], 
+                AUDIO_SINK, AUDIO_LOCATION, audioBufferTime);
 //        queue_.push(MapMsg("audio_started"));
     }
     catch(Except e)

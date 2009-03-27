@@ -174,7 +174,7 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
 class AudioAlsaSource : public AudioSource
 {
     public:
-        AudioAlsaSource(const AudioSourceConfig &config, unsigned long long bufferTime);
+        AudioAlsaSource(const AudioSourceConfig &config);
 
     private:
         ~AudioAlsaSource();
@@ -184,7 +184,6 @@ class AudioAlsaSource : public AudioSource
 
         GstElement *capsFilter_;
         GstElement *aconv_;
-        unsigned long long bufferTime_;
         /// No Copy Constructor
         AudioAlsaSource(const AudioAlsaSource&);     
         /// No Assignment Operator
@@ -199,7 +198,7 @@ class AudioAlsaSource : public AudioSource
 class AudioPulseSource : public AudioSource
 {
     public:
-        AudioPulseSource(const AudioSourceConfig &config, unsigned long long bufferTime);
+        AudioPulseSource(const AudioSourceConfig &config);
     private:
         ~AudioPulseSource();
     
@@ -208,7 +207,6 @@ class AudioPulseSource : public AudioSource
 
         GstElement *capsFilter_;
         GstElement *aconv_;
-        unsigned long long bufferTime_;
         /// No Copy Constructor
         AudioPulseSource(const AudioPulseSource&);     
         /// No Assignment Operator
@@ -223,7 +221,7 @@ class AudioPulseSource : public AudioSource
 class AudioJackSource : public AudioSource
 {
     public:
-        AudioJackSource(const AudioSourceConfig &config, unsigned long long bufferTime);
+        AudioJackSource(const AudioSourceConfig &config);
     
     private:
         ~AudioJackSource();
@@ -233,7 +231,6 @@ class AudioJackSource : public AudioSource
 
         GstElement *capsFilter_;
         GstElement *aconv_;
-        unsigned long long bufferTime_;
         /// No Copy Constructor
         AudioJackSource(const AudioJackSource&);     
         /// No Assignment Operator

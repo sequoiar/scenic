@@ -29,8 +29,8 @@
 #include "pipeline.h"
 #include "alsa.h"
 
-//const unsigned long long AudioSink::BUFFER_TIME = 10000LL;
-const unsigned long long AudioSink::BUFFER_TIME = 30000LL;
+// const unsigned long long AudioSink::BUFFER_TIME = 10000LL; better
+// const unsigned long long AudioSink::BUFFER_TIME = 30000LL; safer 
         
 /// Constructor 
 AudioSink::AudioSink() : 
@@ -68,7 +68,7 @@ void AudioAlsaSink::init()
     audioconvert_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     sink_ = Pipeline::Instance()->makeElement("alsasink", NULL);
-    g_object_set(G_OBJECT(sink_), "buffer-time", BUFFER_TIME, NULL);
+    g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     if (config_.location() != std::string(""))
         g_object_set(G_OBJECT(sink_), "device", config_.location(), NULL);
@@ -95,7 +95,7 @@ void AudioPulseSink::init()
     audioconvert_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     sink_ = Pipeline::Instance()->makeElement("pulsesink", NULL);
-    g_object_set(G_OBJECT(sink_), "buffer-time", BUFFER_TIME, NULL);
+    g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     if (config_.location() != std::string(""))
         g_object_set(G_OBJECT(sink_), "device", config_.location(), NULL);
@@ -107,7 +107,8 @@ void AudioPulseSink::init()
 }
 
 /// Constructor 
-AudioJackSink::AudioJackSink() 
+AudioJackSink::AudioJackSink(const AudioSinkConfig &config) :  
+    config_(config)
 {}
 
 /// Destructor 
@@ -128,7 +129,7 @@ void AudioJackSink::init()
     if (Jack::autoForcedSupported(sink_))
         g_object_set(G_OBJECT(sink_), "connect", 2, NULL);
 
-    g_object_set(G_OBJECT(sink_), "buffer-time", BUFFER_TIME, NULL);
+    g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     if (Pipeline::SAMPLE_RATE != Jack::samplerate())

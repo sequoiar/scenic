@@ -291,8 +291,8 @@ AudioFileSource::~AudioFileSource()
 
 
 /// Constructor 
-AudioAlsaSource::AudioAlsaSource(const AudioSourceConfig &config, unsigned long long bufferTime) : 
-    AudioSource(config), capsFilter_(0), aconv_(0), bufferTime_(bufferTime)
+AudioAlsaSource::AudioAlsaSource(const AudioSourceConfig &config) : 
+    AudioSource(config), capsFilter_(0), aconv_(0)
 {}
 
 /// Destructor 
@@ -314,18 +314,15 @@ void AudioAlsaSource::sub_init()
     else
         g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
 
-    g_object_set(G_OBJECT(source_), "buffer-time", bufferTime_, NULL);
-
     setupCapsFilter(aconv_, capsFilter_);
 }
 
 
 /// Constructor 
-AudioPulseSource::AudioPulseSource(const AudioSourceConfig &config, unsigned long long bufferTime) : 
+AudioPulseSource::AudioPulseSource(const AudioSourceConfig &config) : 
     AudioSource(config), 
     capsFilter_(0),
-    aconv_(0),
-    bufferTime_(bufferTime)
+    aconv_(0)
 {}
 
 
@@ -341,15 +338,14 @@ void AudioPulseSource::sub_init()
 {
     AudioSource::sub_init();
 
-    g_object_set(G_OBJECT(source_), "buffer-time", bufferTime_, NULL);
     setupCapsFilter(aconv_, capsFilter_);
 }
 
 
 
 /// Constructor 
-AudioJackSource::AudioJackSource(const AudioSourceConfig &config, unsigned long long bufferTime) : 
-    AudioSource(config), capsFilter_(0), aconv_(0), bufferTime_(bufferTime)
+AudioJackSource::AudioJackSource(const AudioSourceConfig &config) : 
+    AudioSource(config), capsFilter_(0), aconv_(0)
 {}
 
 
@@ -377,9 +373,6 @@ void AudioJackSource::sub_init()
     if (Jack::autoForcedSupported(source_))
         g_object_set(G_OBJECT(source_), "connect", 2, NULL);
     
-    // /TODO: fine tune this in conjunction with jitterbuffer
-    g_object_set(G_OBJECT(source_), "buffer-time", bufferTime_, NULL);
-
     setupCapsFilter(aconv_, capsFilter_);
 
     if (Pipeline::SAMPLE_RATE != Jack::samplerate())

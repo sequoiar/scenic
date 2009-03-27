@@ -61,20 +61,18 @@ int AudioSourceConfig::numChannels() const
 /// Factory method that creates an AudioSource based on this object's source_ string 
 AudioSource* AudioSourceConfig::createSource() const
 {
-    //const unsigned long long BUFFER_TIME = 35000LL; /* microseconds */
-    const unsigned long long BUFFER_TIME = 200000LL; /* microseconds */ // same as default 
     if (source_ == "audiotestsrc")
         return new AudioTestSource(*this);
     else if (source_ == "filesrc")
         return new AudioFileSource(*this);
     else if (source_ == "alsasrc")
-        return new AudioAlsaSource(*this, BUFFER_TIME);
+        return new AudioAlsaSource(*this);
     else if (source_ == "jackaudiosrc") 
-        return new AudioJackSource(*this, BUFFER_TIME);
+        return new AudioJackSource(*this);
     else if (source_ == "dv1394src")
         return new AudioDvSource(*this);
     else if (source_ == "pulsesrc")
-        return new AudioPulseSource(*this, BUFFER_TIME);
+        return new AudioPulseSource(*this);
     else 
         THROW_ERROR(source_ << " is an invalid source");
     return 0;
@@ -108,26 +106,26 @@ bool AudioSourceConfig::fileExists() const
 }
 
 /// Constructor 
-AudioSinkConfig::AudioSinkConfig(const std::string & sink__, const std::string & location__) : 
-    sink_(sink__), location_(location__)
+AudioSinkConfig::AudioSinkConfig(const std::string & sink__, const std::string & location__, unsigned long long bufferTime__) : 
+    sink_(sink__), location_(location__), bufferTime_(bufferTime__)
 {}
 
 /// Copy constructor 
-AudioSinkConfig::AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_), location_(m.location_) 
+AudioSinkConfig::AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_), location_(m.location_), bufferTime_(m.bufferTime_) 
 {}
 
 /// Factory method that creates an AudioSink based on this object's sink_ string 
 AudioSink* AudioSinkConfig::createSink() const
 {
     if (sink_ == "jackaudiosink")
-        return new AudioJackSink();
+        return new AudioJackSink(*this);
     else if (sink_ == "alsasink")
         return new AudioAlsaSink(*this);
     else if (sink_ == "pulsesink")
         return new AudioPulseSink(*this);
     else
     {
-        THROW_ERROR(sink_ << " is an invalid sink, using default jackaudiosink");
+        THROW_ERROR(sink_ << " is an invalid sink");
         return 0;
     }
 }
@@ -136,5 +134,12 @@ AudioSink* AudioSinkConfig::createSink() const
 const char* AudioSinkConfig::location() const
 {
     return location_.c_str();
+}
+
+
+/// Returns buffer time, which must be an unsigned long long for gstreamer's audiosink's to accept it safely
+unsigned long long AudioSinkConfig::bufferTime() const
+{
+    return bufferTime_;
 }
 

@@ -34,6 +34,7 @@ namespace audiofactory
 {
     // FIXME: this sucks!!!!!!!!!!!!!!!!! replace with OSC-style path
     static const int MSG_ID = 1;
+    static const int AUDIO_BUFFER_TIME = 10000LL;
 
     static AudioSender* 
     buildAudioSender_(const AudioSourceConfig aConfig, 
@@ -46,7 +47,8 @@ namespace audiofactory
                         const std::string &codec, 
                         int port, 
                         const std::string &sink,
-                        const std::string &location);
+                        const std::string &location,
+                        int audioBufferTime);
 }
 
 
@@ -67,9 +69,10 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
                                   const std::string &codec, 
                                   int port, 
                                   const std::string &sink,
-                                  const std::string &location)
+                                  const std::string &location,
+                                  int audioBufferTime)
 {
-    AudioSinkConfig aConfig(sink, location);
+    AudioSinkConfig aConfig(sink, location, audioBufferTime);
     int id;
     int audioCapsPort = port + ports::CAPS_OFFSET;
     LOG_DEBUG("Waiting for audio caps on port: " << audioCapsPort);
@@ -110,9 +113,10 @@ namespace audiofactory
                        const std::string &codec, 
                        int port, 
                        const std::string &sink,
-                       const std::string &location)
+                       const std::string &location,
+                       int audioBufferTime)
     {
-        return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink, location));
+        return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink, location, audioBufferTime));
     }
 }
 
