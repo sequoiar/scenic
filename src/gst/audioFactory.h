@@ -34,7 +34,7 @@ namespace audiofactory
 {
     // FIXME: this sucks!!!!!!!!!!!!!!!!! replace with OSC-style path
     static const int MSG_ID = 1;
-    static const int AUDIO_BUFFER_TIME = AudioSinkConfig::MIN_BUFFER_TIME;
+    static const int AUDIO_BUFFER_USEC = AudioSinkConfig::MIN_BUFFER_TIME;
 
     static AudioSender* 
     buildAudioSender_(const AudioSourceConfig aConfig, 

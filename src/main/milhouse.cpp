@@ -137,7 +137,7 @@ short pof::run(int argc, char **argv)
                 audioLocation = (std::string) options["audiodevice"];
 
             aRx = audiofactory::buildAudioReceiver(options["address"], options["audiocodec"], 
-                    options["audioport"], options["audiosink"], audioLocation, audiofactory::AUDIO_BUFFER_TIME);
+                    options["audioport"], options["audiosink"], audioLocation, audiofactory::AUDIO_BUFFER_USEC);
         }
 
 #ifdef CONFIG_DEBUG_LOCAL

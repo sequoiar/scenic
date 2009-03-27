@@ -40,7 +40,13 @@ class MainModule
               gstThread_(MsgThreadFactory::Gst(send)), asio_thread_(new asio_thread()),
               func(gstThread_), msg_count(0){}
 
-        ~MainModule(){delete gstThread_; delete tcpThread_; delete asio_thread_;}
+        ~MainModule()
+        {
+            delete gstThread_; 
+            delete tcpThread_; 
+            delete asio_thread_;
+        }
+
     private:
         MsgThread* tcpThread_;
         MsgThread* gstThread_;
@@ -111,18 +117,6 @@ bool MainModule::run()
 }
 
 
-void parseArgs(int argc, char** argv)
-{
-static int port, send;
-    if(argc != 3)
-        THROW_CRITICAL("Invalid command line arguments -- 0/1 for receive/send and a port");
-    if(sscanf(argv[1], "%d", &send) != 1 or send < 0 or send > 1)
-        THROW_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
-    if(sscanf(argv[2], "%d", &port) != 1 or port < 1024 or port > 65000)
-        THROW_CRITICAL(
-            "Invalid command line arguments -- Port must be in the range of 1024-65000");
-}
-
 int telnetServer(int s,int p)
 {
     try
@@ -140,5 +134,3 @@ int telnetServer(int s,int p)
 
     return 0;
 }
-
-
