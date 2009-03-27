@@ -436,7 +436,7 @@ class Test_telnet_milhouse(TelnetBaseTest):
         # should be well above 0 bytes at this point
         
         self.tst_tx("stop:", stop_ok)
-        self.tst_rx("stop:", stop_ok)
+        self.tst_rx("stop:", stop_but_not_ok)
         
     def test_05_audio_send_receiv(self):
         """
