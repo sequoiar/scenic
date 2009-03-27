@@ -223,7 +223,7 @@ void GstSenderThread::video_start(MapMsg& msg)
         //SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
         LOG_INFO("video_init");
         const std::string VIDEO_DEVICE = "";
-        bool DO_DEINTERLACE = false;
+        const bool DO_DEINTERLACE = false;
 
         if(msg["location"].empty())
         {
