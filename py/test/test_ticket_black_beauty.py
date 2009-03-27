@@ -394,11 +394,14 @@ class Test_telnet_milhouse(TelnetBaseTest):
         time.sleep(1)
         self.tst_rx( 'start:', start_ok )
        
-        self._stream_dream(5.)
+        self._stream_dream(30.)
         # check number of packets TBD
         self.tst_rx("stop:", stop_ok)
         self.tst_tx("stop:", stop_ok)
-       
+        self.tst_rx("quit:", "")
+        self.tst_tx("quit:", "")
+        
+        
        
 index = generate_html(Test_telnet_milhouse)
 

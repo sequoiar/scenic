@@ -596,7 +596,7 @@ class ControllerApi(object):
         try:
             contact = self.adb.get_contact(contact_name)    
             if contact.state != addressbook.CONNECTED: 
-                self.notify(caller, "Please connect to a contact prior to start streaming.", "error")
+                self.notify(caller, "You must be joined with the contact prior to start streaming.", "error")
             else:
                 com_chan = None 
                 try:
@@ -625,7 +625,7 @@ class ControllerApi(object):
             self.notify(caller, err)    
         
 
-    def stop_streams(self, caller):
+    def stop_streams(self, caller, contact_name = None):
         """
         Stop all the sub-streams. (audio, video and data)
         """

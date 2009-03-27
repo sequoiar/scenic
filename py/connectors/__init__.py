@@ -117,18 +117,12 @@ class Connection(object):
 
     def connection_failed(self, err=None):
         self.cleanup()
-#        if err:
         self.api.notify(self, {'address':self.contact.address, 
                                    'port':self.contact.port,
                                    'name':self.contact.name,
                                    'exception':'%s' % err,
                                    'msg':'Connection failed',
                                    'context':'connection'})
-#            self.api.notify(self,
-#                        'Connection failed. Address: %s | Port: %s | Error: %s' % (self.contact.address, self.contact.port, err))
-#        else:
-#            self.api.notify(self,
-#                        'Connection failed. Address: %s | Port: %s' % (self.contact.address, self.contact.port))
 
     def stop(self):
         if self.contact.state > DISCONNECTED and self.contact.state < DISCONNECTING:

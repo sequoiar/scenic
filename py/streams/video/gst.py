@@ -23,8 +23,7 @@
 from twisted.internet import reactor, protocol, defer
 
 # App imports
-from streams.stream import VideoStream, Stream
-from streams.gst_client import GstClient
+from engines.base_gst import GstClient
 from utils import log
 from protocols.ipcp import parse 
 from errors import *

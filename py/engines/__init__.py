@@ -23,10 +23,13 @@
 import base_gst
 import audiovideogst 
 import gstchannel
-
+from utils import log
 from errors import *
 
+log = log.start('debug', 1, 0, 'engines')
+
 def create_channel(engine_name):
+    log.debug('settings.create_channel: ' + str(engine_name) )
     engine_name = str(engine_name)
     if engine_name.upper() == 'GST':
         chan = gstchannel.GstChannel()

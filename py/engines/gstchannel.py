@@ -23,6 +23,8 @@ from errors import *
 import pprint
 import audiovideogst
 
+log = log.start('debug', 1, 0, 'gstchannel')
+
 def _create_stream_engines( listener, mode, procs_params):
     """
     Returns list of new stream engines. 
@@ -55,7 +57,7 @@ class GstChannel(object):
     a remote contact
     """
     def __init__(self):
-        log.debug('GstChannel.__init__')
+        log.debug('GstChannel.__init__: ' + str(self))
         self.com_chan = None
         self.contact = None
         self.api = None
@@ -84,7 +86,6 @@ class GstChannel(object):
             self.api.notify(caller, "Got remote params", "info" )
             rx_params = args[0]
             tx_params = args[1]
-            
             self.start_local_gst_processes(rx_params, tx_params )
             
         else:
@@ -95,7 +96,7 @@ class GstChannel(object):
         Let us start streaming
         """
         for engine in engines:
-            log.debug('starting ' + str(engine))
+            log.debug('GstChannel._start_stream_engines: ' + str(engine))
             engine.start_streaming()
             
     def stop_streaming(self):
@@ -105,24 +106,23 @@ class GstChannel(object):
         """
         creates processses and send init messages
         """
-        log.debug("GstChannel.on_remote_message: received gst_receiver_params: %s" % str(self.receiver_procs_params) )
+        log.debug("GstChannel.start_local_gst_processes")
         self.receiver_procs_params = rx_params
         self.sender_procs_params = tx_params
-        # reactor.callLater(2, self.send_message, "gst_receivers_ready" )
-        
-        log.debug("Initialize RECEIVING PROCESSES:")
+        log.debug("   RX params :" + str(rx_params))
+        log.debug("   TX params :" + str(tx_params))
+
+        log.debug("   Initialize RECEIVING PROCESSES:")
         log.debug( pprint.pformat(self.receiver_procs_params)) 
         self.receiver_engines = _create_stream_engines(self.api, 'receive', self.receiver_procs_params)
         self._start_stream_engines(self.receiver_engines)
         
-        log.debug("GstChannel.on_remote_message: received gst_receiver_params: %s" % str(self.sender_procs_params) )
-        log.debug("Initialize SENDING PROCESSES:")
+        log.debug("   GstChannel.on_remote_message: received gst_receiver_params: %s" % str(self.sender_procs_params) )
+        log.debug("   Initialize SENDING PROCESSES:")
         log.debug( pprint.pformat(self.sender_procs_params)) 
         self.sender_engines = _create_stream_engines(self.api, 'send', self.sender_procs_params)
         self._start_stream_engines(self.sender_engines)        
-#        # wait for remote receivers started
-#        log.debug("Start streaming SENDING PROCESSES:")
-#        
+        
             
     def send_message(self, key, args_list=[]):
         """
@@ -132,7 +132,6 @@ class GstChannel(object):
         log.debug("GstChannel._send_message %s. %r" % (key, args_list))
         try:
             # list with key as 0th element
-            global COM_CHAN_KEY
-            self.com_chan.callRemote(COM_CHAN_KEY, key, args_list)
+            self.com_chan.callRemote('Gst', key, args_list)
         except AttributeError, e:
             log.error("Could not send message to remote: " + e.message)
