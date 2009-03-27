@@ -70,6 +70,7 @@ class AudioSinkConfig
         AudioSink* createSink() const;
         const char *location() const;
         unsigned long long bufferTime() const;
+        static const unsigned long long MIN_BUFFER_TIME = 10000LL;
 
     private:
         const std::string sink_;

@@ -71,8 +71,9 @@ RtpReceiver::~RtpReceiver()
 void RtpReceiver::setLatency(int latency)
 {
     assert(rtpbin_);
-    if (latency <= 0)
-        THROW_ERROR("Cannot set rtpbin latency to " << latency << ", must be > 0");
+    if (latency < MIN_LATENCY or latency > MAX_LATENCY)
+        THROW_ERROR("Cannot set rtpbin latency to " << latency << ", must be in range "
+                << MIN_LATENCY << " to " << MAX_LATENCY);
     g_object_set(G_OBJECT(rtpbin_), "latency", latency, NULL);
 }
 

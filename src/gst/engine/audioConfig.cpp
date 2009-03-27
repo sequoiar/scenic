@@ -108,7 +108,10 @@ bool AudioSourceConfig::fileExists() const
 /// Constructor 
 AudioSinkConfig::AudioSinkConfig(const std::string & sink__, const std::string & location__, unsigned long long bufferTime__) : 
     sink_(sink__), location_(location__), bufferTime_(bufferTime__)
-{}
+{
+    if (bufferTime_ < MIN_BUFFER_TIME)
+        THROW_ERROR("Audio sink buffer time " << bufferTime_ << " is too low, must be greater than " << MIN_BUFFER_TIME);
+}
 
 /// Copy constructor 
 AudioSinkConfig::AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_), location_(m.location_), bufferTime_(m.bufferTime_) 
