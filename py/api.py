@@ -930,9 +930,13 @@ class ControllerApi(object):
         except AddressBookError, e:
             self.notify(caller, "Please select a contact prior to start a pinger test." + e.message, "error")
         else:
-            if contact.state != addressbook.CONNECTED: 
+            connected = False
+            try:
+                if contact.state != addressbook.CONNECTED: 
+                    self.notify(caller, "Please connect to a contact prior to start a pinger test.", "error")
+            except NameError:
                 self.notify(caller, "Please connect to a contact prior to start a pinger test.", "error")
-            else:
+            if connected:
                 com_chan = None 
                 try:
                     com_chan = contact.connection.com_chan
