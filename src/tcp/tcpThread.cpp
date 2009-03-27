@@ -150,24 +150,25 @@ bool TcpThread::gotQuit()
 bool TcpThread::send(MapMsg& msg)
 {
     std::string msg_str;
-    bool ret;
-    lf_->hold(); // to insure no recursive calls due to log message calling send
-    try
+    bool ret= false;
+    if(th_)
     {
-        Parser::stringify(msg, msg_str);
-        ret = serv_.send(msg_str);
-        lf_->enable();
+        try
+        {
+            lf_->hold(); // to insure no recursive calls due to log message calling send
+            Parser::stringify(msg, msg_str);
+            ret = serv_.send(msg_str);
+            lf_->enable();
 
+        }
+        catch(ErrorExcept e)
+        {
+            LOG_DEBUG(msg.cmd() << " Error at Send. Cancelled. " << strerror(e.errno_));
+            lf_->enable();
+            //if(e.errno_ == EBADF) //Bad File Descriptor
+            //    throw (e);
+        }
     }
-    catch(ErrorExcept e)
-    {
-        LOG_DEBUG(std::string(msg.cmd()) << " Error at Send. Cancelled. " <<
-                  strerror(e.errno_));
-        lf_->enable();
-        if(e.errno_ == EBADF) //Bad File Descriptor
-            throw (e);
-    }
-
     return ret;
 }
 
@@ -182,42 +183,45 @@ bool TcpThread::socket_connect_send(const std::string& addr, MapMsg& msg)
 
 std::string tcpGetBuffer(int port, int &id)
 {
+    std::string ret;
     TcpThread tcp(port);
     tcp.run();
     QueuePair& queue = tcp.getQueue();
     for(;;)
     {
         MapMsg f = queue.timed_pop(2000);
-        if(f.cmd().empty())
-            continue;
-        try
+        if(f.cmd())
         {
-            if(std::string(f.cmd()) == "quit")
+            try
             {
-                THROW_ERROR("quit in tcpGetBuffer");
-                break;
+                if(f.cmd() == "quit")
+                {
+                    THROW_ERROR("quit in tcpGetBuffer");
+                }
+                if(f.cmd() == "buffer")
+                {
+                    id = f["id"];
+                    ret = static_cast<std::string>(f["str"]);
+                    break;
+                }
+                else
+                    LOG_INFO("Unknown msg.");
             }
-            if(std::string(f.cmd()) != "buffer")
+            catch(ErrorExcept e)
             {
-                LOG_INFO("Unknown msg.");
-                continue;
+                if (f.cmd() == "quit")
+                    throw e;
             }
-            id = f["id"];
-            return f["str"];
-        }
-        catch(ErrorExcept e)
-        {
-            if (f.cmd() == "quit")
-                throw e;
         }
     }
-    return "";
+    return ret;
 }
 
 #include <errno.h>
 
 bool tcpSendBuffer(const std::string ip, int port, int id, const std::string caps)
 {
+    bool ret = false;
     LOG_INFO("got ip=" << ip << " port=" << port << " id=" << 
             id << " caps=" << caps);
     MapMsg msg("buffer");
@@ -233,23 +237,23 @@ bool tcpSendBuffer(const std::string ip, int port, int id, const std::string cap
     for(int i = 0; i < MAX_TRIES; ++i)
     {
         if(MsgThread::isQuitted())
-            return false;
+            break;
         try
         {
-            bool ret = tcp.socket_connect_send(ip, msg_str);
+            ret = tcp.socket_connect_send(ip, msg_str);
             if(ret)
-                return true;
+                break;
         }
         catch(ErrorExcept e)
         {
            if(e.errno_ == ECONNREFUSED ) 
-               ; //LOG_DEBUG("GOT ECONNREFUSED");
+               LOG_DEBUG("GOT ECONNREFUSED");
            else
-               return false;
+               break;
         }
         usleep(100000);
     }
-    return false;
+    return ret;
 }
 
 
