@@ -74,9 +74,9 @@ int GstThread::main()
             stop_id = 0;
         }
 
-        if(!f.cmd().empty())
+        if(f.cmd())
         {
-            std::string s( f.cmd());
+            std::string s(f.cmd());
 
             if(s == "quit")
             {
@@ -236,7 +236,7 @@ void GstSenderThread::video_start(MapMsg& msg)
             video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
 
-        ff[0] = boost::bind(tcpSendBuffer, msg["address"], (int) msg["port"] + ports::CAPS_OFFSET, videofactory::MSG_ID, _1);
+        ff[0] = boost::bind(tcpSendBuffer, msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, videofactory::MSG_ID, _1);
         //sender->getCaps());
 //        ff[0]();
     }
@@ -270,7 +270,7 @@ void GstSenderThread::audio_start(MapMsg& msg)
             AudioSourceConfig config(msg["source"], msg["location"], msg["channels"]);
             audio_ = asender = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
         }
-        ff[1] = boost::bind(tcpSendBuffer,msg["address"], (int) msg["port"] + ports::CAPS_OFFSET, audiofactory::MSG_ID, _1);
+        ff[1] = boost::bind(tcpSendBuffer,msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, audiofactory::MSG_ID, _1);
         //Build Caps Msg
  //       MapMsg caps("caps");
  //       caps["caps_str"] = asender->getCaps();

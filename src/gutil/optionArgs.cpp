@@ -135,7 +135,7 @@ void OptionArgs::parse(int argc, char **argv)
                     int val = (*static_cast<gboolean*>(it->first.arg_data) == TRUE) ? 1 : 0;
                     store[it->first.long_name] = val;
                     if(val)
-                        LOG_DEBUG("key: " << it->first.long_name << " value: " << int(store[it->first.long_name]) ); 
+                        LOG_DEBUG("key: " << it->first.long_name << " value: " << store[it->first.long_name] ); 
                     break;
                 }
             case G_OPTION_ARG_INT: // int 
@@ -143,14 +143,14 @@ void OptionArgs::parse(int argc, char **argv)
                     int val(*static_cast<gint*>(it->first.arg_data));
                     store[it->first.long_name] = val;
                     if(val)
-                        LOG_DEBUG("key: " << it->first.long_name << " value: " << static_cast<gint>(store[it->first.long_name]));
+                        LOG_DEBUG("key: " << it->first.long_name << " value: " << store[it->first.long_name]);
                     break;
                 }
             case G_OPTION_ARG_STRING: // string
                 if(*(it->second))
                 {
                     store[it->first.long_name] = std::string(*(it->second));
-                    LOG_DEBUG("key: " << it->first.long_name << " value: " << static_cast<std::string>(store[it->first.long_name]));
+                    LOG_DEBUG("key: " << it->first.long_name << " value: " << store[it->first.long_name]);
                 }
                 break;
             default:

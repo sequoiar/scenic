@@ -210,7 +210,7 @@ bool Parser::stringify(MapMsg& cmd_map, std::string& rstr)
     std::stringstream sstr;
     rstr.clear();
     //locate "command" and output value to str
-    sstr << std::string(cmd_map.cmd()) << ":";
+    sstr << cmd_map.cmd() << ":";
     const std::pair<const std::string, StrIntFloat>* it;
 
     //for each pair in the map

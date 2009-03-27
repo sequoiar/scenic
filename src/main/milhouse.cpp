@@ -130,11 +130,11 @@ short pof::run(int argc, char **argv)
         {
             if(!options["audiosink"])
                 THROW_ERROR("argument error: missing audiosink. see --help");
-            
+
             // FIXME: we should distinguish between device and location
             std::string audioLocation = "";
             if (options["audiodevice"])
-                audioLocation = (std::string) options["audiodevice"];
+                audioLocation = static_cast<std::string>(options["audiodevice"]);
 
             aRx = audiofactory::buildAudioReceiver(options["address"], options["audiocodec"], 
                     options["audioport"], options["audiosink"], audioLocation, audiofactory::AUDIO_BUFFER_USEC);
