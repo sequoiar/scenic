@@ -36,6 +36,8 @@ from utils import log
 from errors import InstallFileError
 from i18n import to_utf
 
+log = log.start('debug', 1, 0, 'common')
+
 
 def get_def_name(level=2):
     """
@@ -80,11 +82,11 @@ def find_callbacks(obj, prefix=None):
     """
     callbacks = {}
     if prefix:
-        for attr in dir(obj):
+        for attr in vars(obj.__class__).keys():
             if attr.startswith(prefix): 
                 callbacks[attr[len(prefix):]] = getattr(obj, attr)
     else:
-        for attr in dir(obj):
+        for attr in vars(obj.__class__).keys():
             if attr[0] == '_' and attr[1] != '_': 
                 callbacks[attr[1:]] = getattr(obj, attr)
     return callbacks
