@@ -66,14 +66,14 @@ class MivilleConfiguration(object):
         # ['127.0.0.1'] # default is only local host
         # files
         #self.miville_home = "~/.miville"
-        #self.addressbook_filename = "contacts.txt"
+        self.addressbook_filename = 'sropulpof.adb' # TODO: "contacts.txt"
         
         # update the attributes to match passed dict
         if dictionary is not None:
             self.update_dict(dictionary)
 
     def update_dict(self, dico):
-        self.__dict__.update(dictionary)
+        self.__dict__.update(dico)
 
     def print_values(self):
         for key, value in self.__dict__.items():
@@ -104,7 +104,7 @@ class Core(Subject):
                                 # so that both share the same notify method.
         self.load_uis()
         # TODO: rename this addressbook !
-        self.adb = addressbook.AddressBook('sropulpof.adb', self.api)
+        self.adb = addressbook.AddressBook(self.config.addressbook_filename, self.api)
         self.engines = self.find_engines()
         # create the settings collection
         self.settings = settings.Settings()
@@ -133,18 +133,6 @@ class Core(Subject):
                 mod.start(self, port)
             except Exception, e:
                 log.error('Unable to start UI module %s. %s' % (mod.__name__, e)) # traceback please
-        
-        # self.uis = common.load_modules(common.find_modules('ui'))
-        # count = 0
-        # for mod in self.uis:
-        #     try:
-        #         if len(sys.argv) > 1:
-        #             mod.start(self, int(sys.argv[1]) + count)
-        #             count += 10
-        #         else:
-        #             mod.start(self)
-        #     except Exception, e:
-        #         log.error('Unable to start UI module %s. %s' % (mod.__name__, e)) # traceback please
 
     def find_engines(self):
         """
@@ -157,13 +145,6 @@ class Core(Subject):
                 engines[engine.name] = engine
         return engines
 
-
-# def chk_ob(core):
-#     """
-#     Please document this function.
-#     """
-#     print "Contacts: %r" % core.adb.contacts.keys()
-# #    print dir(ui.cli)
 
 
 def main(config_object):    

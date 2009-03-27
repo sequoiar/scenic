@@ -1651,12 +1651,16 @@ def add_quotes(input):
 
 
 def start(subject, port=14444):
-    """This runs the protocol on port 14444"""
+    """
+    This runs the telnet server on specifed port 
+    """
     factory = protocol.ServerFactory()
     factory.protocol = lambda: TelnetTransport(TelnetBootstrapProtocol,
                                                insults.ServerProtocol,
                                                CliController, subject)
-    reactor.listenTCP(port, factory)
+    # subject is the core...
+    subject.api.listen_tcp(port, factory, 50, subject.config.ui_network_interfaces)
+    #reactor.listenTCP(port, factory)
 
 
 # this only runs if the module was *not* imported
@@ -1664,6 +1668,6 @@ if __name__ == '__main__':
     from utils import Subject
     from utils import log as logging
     logging.start()
-    start(Subject())
+    start(Subject()) # will not work, since some attributes are missing. (core) 
     reactor.run()
 
