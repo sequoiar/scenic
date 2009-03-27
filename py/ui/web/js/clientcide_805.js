@@ -6,7 +6,7 @@ License:
 	http://www.clientcide.com/wiki/cnet-libraries#license
 */
 var Clientcide = {
-	version: ' 763',
+	version: '805',
 	setAssetLocation: function(baseHref) {
 		if (window.StickyWin && StickyWin.ui) {
 			StickyWin.UI.refactor({
@@ -119,20 +119,22 @@ var dbug = {
 		} else dbug.log('no such timer: %s', name);
 	},
 	enable: function(silent) { 
-		if(dbug.firebug) {
+		var con = window.firebug ? firebug.d.console.cmd : window.console;
+
+		if((!!window.console && !!window.console.warn) || window.firebug) {
 			try {
 				dbug.enabled = true;
 				dbug.log = function(){
-						(console.debug || console.log).apply(console, arguments);
+						(con.debug || con.log).apply(con, arguments);
 				};
 				dbug.time = function(){
-					console.time.apply(console, arguments);
+					con.time.apply(con, arguments);
 				};
 				dbug.timeEnd = function(){
-					console.timeEnd.apply(console, arguments);
+					con.timeEnd.apply(con, arguments);
 				};
 				if(!silent) dbug.log('enabling dbug');
-				for(var i=0;i<dbug.logged.length;i++){ dbug.log.apply(console, dbug.logged[i]); }
+				for(var i=0;i<dbug.logged.length;i++){ dbug.log.apply(con, dbug.logged[i]); }
 				dbug.logged=[];
 			} catch(e) {
 				dbug.enable.delay(400);
@@ -163,18 +165,19 @@ var dbug = {
 };
 
 (function(){
-	var fb = typeof console != "undefined";
+	var fb = !!window.console || !!window.firebug;
+	var con = window.firebug ? window.firebug.d.console.cmd : window.console;
 	var debugMethods = ['debug','info','warn','error','assert','dir','dirxml'];
 	var otherMethods = ['trace','group','groupEnd','profile','profileEnd','count'];
 	function set(methodList, defaultFunction) {
 		for(var i = 0; i < methodList.length; i++){
-			dbug[methodList[i]] = (fb && console[methodList[i]])?console[methodList[i]]:defaultFunction;
+			dbug[methodList[i]] = (fb && con[methodList[i]])?con[methodList[i]]:defaultFunction;
 		}
 	};
 	set(debugMethods, dbug.log);
 	set(otherMethods, function(){});
 })();
-if (typeof console != "undefined" && console.warn){
+if ((!!window.console && !!window.console.warn) || window.firebug){
 	dbug.firebug = true;
 	var value = document.cookie.match('(?:^|;)\\s*jsdebug=([^;]*)');
 	var debugCookie = value ? unescape(value[1]) : false;
@@ -495,9 +498,8 @@ License:
 	http://www.clientcide.com/wiki/cnet-libraries#license
 */	
 var IframeShim = new Class({
-	Implements: [Options, Events],
+	Implements: [Options, Events, Occlude, ToElement],
 	options: {
-		name: '',
 		className:'iframeShim',
 		display:false,
 		zindex: null,
@@ -508,19 +510,19 @@ var IframeShim = new Class({
 		},
 		browsers: (Browser.Engine.trident4 || (Browser.Engine.gecko && !Browser.Engine.gecko19 && Browser.Platform.mac))
 	},
+	property: 'IframeShim',
 	initialize: function (element, options){
-		this.setOptions(options);
-		//legacy
-		if(this.options.offset && this.options.offset.top) this.options.offset.y = this.options.offset.top;
-		if(this.options.offset && this.options.offset.left) this.options.offset.x = this.options.offset.left;
 		this.element = $(element);
+		if (this.occlude()) return this.occluded;
+		this.setOptions(options);
 		this.makeShim();
 		return;
 	},
 	makeShim: function(){
-		this.shim = new Element('iframe');
-		this.id = this.options.name || new Date().getTime() + "_shim";
+		this.shim = new Element('iframe').store('IframeShim', this);
 		if(!this.options.browsers) return;
+		var pos = this.element.getStyle('position');
+		if (pos == "static" || !pos) this.element.setStyle('position', 'relative');
 		if(this.element.getStyle('z-Index').toInt()<1 || isNaN(this.element.getStyle('z-Index').toInt()))
 			this.element.setStyle('z-Index',5);
 		var z = this.element.getStyle('z-Index')-1;
@@ -529,19 +531,18 @@ var IframeShim = new Class({
 			 this.element.getStyle('z-Index').toInt() > this.options.zindex)
 			 z = this.options.zindex;
 			
- 		this.shim.setStyles({
-			'position': 'absolute',
-			'zIndex': z,
-			'border': 'none',
-			'filter': 'progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)'
-		}).setProperties({
-			'src': (window.location.protocol == 'https') ? '://0' : 'javascript:void(0)',
-			'frameborder':'0',
-			'scrolling':'no',
-			'id':this.id
-		}).addClass(this.options.className);
-		
-		this.element.store('shim', this);
+ 		this.shim.set({
+			src: (window.location.protocol == 'https') ? '://0' : 'javascript:void(0)',
+			frameborder:'0',
+			scrolling:'no',
+			styles: {
+				position: 'absolute',
+				zIndex: z,
+				border: 'none',
+				filter: 'progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)'
+			},
+			'class':this.options.className
+		});
 
 		var inject = function(){
 			this.shim.inject(this.element, 'after');
@@ -549,26 +550,19 @@ var IframeShim = new Class({
 			else this.hide();
 			this.fireEvent('onInject');
 		};
-		if(this.options.browsers){
-			if(Browser.Engine.trident && !IframeShim.ready) {
-				window.addEvent('load', inject.bind(this));
-			} else {
-				inject.run(null, this);
-			}
-		}
+		if(Browser.Engine.trident && !IframeShim.ready) window.addEvent('load', inject.bind(this));
+		else inject.run(null, this);
 	},
 	position: function(shim){
 		if(!this.options.browsers || !IframeShim.ready) return this;
-		var putItBack = this.element.expose();
-		var size = this.element.getSize();
-		putItBack();
+		var size = this.element.measure(function(){ return this.getSize(); });
 		if($type(this.options.margin)){
 			size.x = size.x-(this.options.margin*2);
 			size.y = size.y-(this.options.margin*2);
 			this.options.offset.x += this.options.margin; 
 			this.options.offset.y += this.options.margin;
 		}
- 		this.shim.setStyles({
+ 		this.shim.set({
 			'width': size.x,
 			'height': size.y
 		}).setPosition({
@@ -578,12 +572,12 @@ var IframeShim = new Class({
 		return this;
 	},
 	hide: function(){
-		if(this.options.browsers) this.shim.setStyle('display','none');
+		if(this.options.browsers) this.shim.hide();
 		return this;
 	},
 	show: function(){
 		if(!this.options.browsers) return this;
-		this.shim.setStyle('display','block');
+		this.shim.show();
 		return this.position();
 	},
 	dispose: function(){
@@ -993,8 +987,8 @@ $extend(Date, {
 				var d = new Date();
 				var culture = Date.$cultures[Date.$culture];
 				d.set('year', bits[Date.$cIndex('year')]);
-				d.set('month', bits[Date.$cIndex('month')] - 1);
 				d.set('date', bits[Date.$cIndex('date')]);
+				d.set('month', bits[Date.$cIndex('month')] - 1);
 				return Date.fixY2K(d);
 			}
 		},
@@ -1005,8 +999,8 @@ $extend(Date, {
 			handler: function(bits){
 				var d = new Date();
 				d.set('year', bits[Date.$cIndex('year')]);
-				d.set('month', bits[Date.$cIndex('month')] - 1);
 				d.set('date', bits[Date.$cIndex('date')]);
+				d.set('month', bits[Date.$cIndex('month')] - 1);
 				d.set('hr', bits[4]);
 				d.set('min', bits[5]);
 				d.set('ampm', bits[6]);
@@ -1020,8 +1014,8 @@ $extend(Date, {
 				var d = new Date();
 				var culture = Date.$cultures[Date.$culture];
 				d.set('year', bits[Date.$cIndex('year')]);
-				d.set('month', bits[Date.$cIndex('month')] - 1);
 				d.set('date', bits[Date.$cIndex('date')]);
+				d.set('month', bits[Date.$cIndex('month')] - 1);
 				d.set('hours', bits[4]);
 				d.set('minutes', bits[5]);
 				d.set('seconds', bits[6]);
@@ -1063,9 +1057,8 @@ License:
 });
 
 Date.implement({
-	timeDiffInWords: function(){
-		var relative_to = (arguments.length > 0) ? arguments[1] : new Date();
-		return Date.distanceOfTimeInWords(this, relative_to);
+	timeDiffInWords: function(relative_to){
+		return Date.distanceOfTimeInWords(this, relative_to || new Date);
 	},
 	getOrdinal: function() {
 		var test = this.get('date');
@@ -1168,8 +1161,8 @@ Date.$parsePatterns.extend([
 			var d = new Date();
 			var culture = Date.$cultures[Date.$culture];
 			d.set('year', bits[1]);
-			d.set('month', bits[2] - 1);
 			d.set('date', bits[3]);
+			d.set('month', bits[2] - 1);
 			d.set('hours', bits[4]);
 			d.set('minutes', bits[5]);
 			d.set('seconds', bits[6]);
@@ -1560,17 +1553,22 @@ Element.implement({
 	// Daniel Steigerwald - MIT licence
 	measure: function(fn) {
 		var restore = this.expose();
-		fn.apply(this);
-		return restore();
+		var result = fn.apply(this);
+		restore();
+		return result;
 	},
 
 	expose: function(){
-		var style = this.style;
-    var cssText = style.cssText;
-    style.visibility = 'hidden';
-    style.position = 'absolute';
-    if (style.display == 'none') style.display = '';
-		return (function(){ return this.set('style', cssText); }).bind(this);
+		if (this.getStyle('display') != 'none') return $empty;
+		var before = {};
+		var styles = { visibility: 'hidden', display: 'block', position:'absolute' };
+		//use this method instead of getStyles 
+		$each(styles, function(value, style){
+			before[style] = this.style[style]||'';
+		}, this);
+		//this.getStyles('visibility', 'display', 'position');
+		this.setStyles(styles);
+		return (function(){ this.setStyles(before); }).bind(this);
 	},
 	
 	getDimensions: function(options) {
@@ -1810,6 +1808,19 @@ License:
 	http://www.clientcide.com/wiki/cnet-libraries#license
 */
 
+Element.Properties.position = {
+
+	set: function(options){
+		this.setPosition(options);
+	},
+
+	get: function(options){
+		if (options) this.setPosition(options);
+		return this.getPosition();
+	}
+
+};
+
 Element.implement({
 
 	setPosition: function(options){
@@ -1821,7 +1832,7 @@ Element.implement({
 				y: 'center' //top, center, bottom
 			},
 			edge: false,
-			offset: {x:0,y:0},
+			offset: {x: 0, y: 0},
 			returnPos: false,
 			relFixedPosition: false,
 			ignoreMargins: false,
@@ -1830,55 +1841,63 @@ Element.implement({
 		//compute the offset of the parent positioned element if this element is in one
 		var parentOffset = {x: 0, y: 0};
 		var parentPositioned = false;
-		var putItBack = this.expose();
-    /* dollar around getOffsetParent should not be necessary, but as it does not return 
-     * a mootools extended element in IE, an error occurs on the call to expose. See:
+		/* dollar around getOffsetParent should not be necessary, but as it does not return
+		 * a mootools extended element in IE, an error occurs on the call to expose. See:
 		 * http://mootools.lighthouseapp.com/projects/2706/tickets/333-element-getoffsetparent-inconsistency-between-ie-and-other-browsers */
-		var offsetParent = $(this.getOffsetParent());
-		putItBack();
-		if(offsetParent && offsetParent != this.getDocument().body) {
-			var putItBack = offsetParent.expose();
-			parentOffset = offsetParent.getPosition();
-			putItBack();
+		var offsetParent = this.measure(function(){
+			return $(this.getOffsetParent());
+		});
+		if (offsetParent && offsetParent != this.getDocument().body){
+			parentOffset = offsetParent.measure(function(){
+				return this.getPosition();
+			});
 			parentPositioned = true;
 			options.offset.x = options.offset.x - parentOffset.x;
 			options.offset.y = options.offset.y - parentOffset.y;
 		}
 		//upperRight, bottomRight, centerRight, upperLeft, bottomLeft, centerLeft
 		//topRight, topLeft, centerTop, centerBottom, center
-		function fixValue(option) {
-			if($type(option) != "string") return option;
+		var fixValue = function(option){
+			if ($type(option) != "string") return option;
 			option = option.toLowerCase();
 			var val = {};
-			if(option.test('left')) val.x = 'left';
-			else if(option.test('right')) val.x = 'right';
+			if (option.test('left')) val.x = 'left';
+			else if (option.test('right')) val.x = 'right';
 			else val.x = 'center';
-
-			if(option.test('upper')||option.test('top')) val.y = 'top';
+			if (option.test('upper') || option.test('top')) val.y = 'top';
 			else if (option.test('bottom')) val.y = 'bottom';
 			else val.y = 'center';
 			return val;
 		};
 		options.edge = fixValue(options.edge);
 		options.position = fixValue(options.position);
-		if(!options.edge) {
-			if(options.position.x == 'center' && options.position.y == 'center') options.edge = {x:'center',y:'center'};
-			else options.edge = {x:'left',y:'top'};
+		if (!options.edge){
+			if (options.position.x == 'center' && options.position.y == 'center') options.edge = {x:'center', y:'center'};
+			else options.edge = {x:'left', y:'top'};
 		}
-		
+
 		this.setStyle('position', 'absolute');
 		var rel = $(options.relativeTo) || document.body;
-		var top = (rel == document.body)?window.getScroll().y:rel.getPosition().y;
-		var left = (rel == document.body)?window.getScroll().x:rel.getPosition().x;
+		var calc = rel == document.body ? window.getScroll() : rel.getPosition();
+		var top = calc.y;
+		var left = calc.x;
+
+		if (Browser.Engine.trident){
+			var scrolls = rel.getScrolls();
+			top += scrolls.y;
+			left += scrolls.x;
+		}
+
 		var dim = this.getDimensions({computeSize: true, styles:['padding', 'border','margin']});
-		if (options.ignoreMargins) {
+		if (options.ignoreMargins){
 			options.offset.x = options.offset.x - dim['margin-left'];
 			options.offset.y = options.offset.y - dim['margin-top'];
 		}
 		var pos = {};
-		var prefY = options.offset.y.toInt();
-		var prefX = options.offset.x.toInt();
-		switch(options.position.x) {
+		var prefY = options.offset.y;
+		var prefX = options.offset.x;
+		var winSize = window.getSize();
+		switch(options.position.x){
 			case 'left':
 				pos.x = left + prefX;
 				break;
@@ -1886,10 +1905,10 @@ Element.implement({
 				pos.x = left + prefX + rel.offsetWidth;
 				break;
 			default: //center
-				pos.x = left + (((rel == document.body)?window.getSize().x:rel.offsetWidth)/2) + prefX;
+				pos.x = left + ((rel == document.body ? winSize.x : rel.offsetWidth)/2) + prefX;
 				break;
 		};
-		switch(options.position.y) {
+		switch(options.position.y){
 			case 'top':
 				pos.y = top + prefY;
 				break;
@@ -1897,14 +1916,14 @@ Element.implement({
 				pos.y = top + prefY + rel.offsetHeight;
 				break;
 			default: //center
-				pos.y = top + (((rel == document.body)?window.getSize().y:rel.offsetHeight)/2) + prefY;
+				pos.y = top + ((rel == document.body ? winSize.y : rel.offsetHeight)/2) + prefY;
 				break;
 		};
-		
-		if(options.edge){
+
+		if (options.edge){
 			var edgeOffset = {};
-			
-			switch(options.edge.x) {
+
+			switch(options.edge.x){
 				case 'left':
 					edgeOffset.x = 0;
 					break;
@@ -1915,7 +1934,7 @@ Element.implement({
 					edgeOffset.x = -(dim.x/2);
 					break;
 			};
-			switch(options.edge.y) {
+			switch(options.edge.y){
 				case 'top':
 					edgeOffset.y = 0;
 					break;
@@ -1926,22 +1945,24 @@ Element.implement({
 					edgeOffset.y = -(dim.y/2);
 					break;
 			};
-			pos.x = pos.x+edgeOffset.x;
-			pos.y = pos.y+edgeOffset.y;
+			pos.x = pos.x + edgeOffset.x;
+			pos.y = pos.y + edgeOffset.y;
 		}
 		pos = {
-			left: ((pos.x >= 0 || parentPositioned || options.allowNegative)?pos.x:0).toInt(),
-			top: ((pos.y >= 0 || parentPositioned || options.allowNegative)?pos.y:0).toInt()
+			left: ((pos.x >= 0 || parentPositioned || options.allowNegative) ? pos.x : 0).toInt(),
+			top: ((pos.y >= 0 || parentPositioned || options.allowNegative) ? pos.y : 0).toInt()
 		};
-		if(rel.getStyle('position') == "fixed"||options.relFixedPosition) {
-			pos.top = pos.top.toInt() + window.getScroll().y;
-			pos.left = pos.left.toInt() + window.getScroll().x;
+		if (rel.getStyle('position') == "fixed" || options.relFixedPosition){
+			var winScroll = window.getScroll();
+			pos.top = pos.top.toInt() + winScroll.y;
+			pos.left = pos.left.toInt() + winScroll.x;
 		}
 
-		if(options.returnPos) return pos;
+		if (options.returnPos) return pos;
 		else this.setStyles(pos);
 		return this;
 	}
+
 });
 
 
@@ -2254,12 +2275,12 @@ Fx.Reveal = new Class({
 					this.start(startStyles);
 					if (!this.$chain) this.$chain = [];
 					this.$chain.unshift(function(){
+						this.element.setStyle('overflow', overflowBefore);
 						if (!this.options.heightOverride && setToAuto) {
 							if (["vertical", "both"].contains(this.options.mode)) this.element.setStyle('height', 'auto');
 							if (["width", "both"].contains(this.options.mode)) this.element.setStyle('width', 'auto');
 						}
 						if(!this.hidden) this.showing = false;
-						this.element.setStyle('overflow', overflowBefore);
 						this.callChain();
 						this.fireEvent('onShow', this.element);
 					}.bind(this));
@@ -2585,206 +2606,6 @@ var JsonP = new Class({
 });
 JsonP.requestors = [];
 
-
-/*
-Script: Request.NoCache.js
-	Extends Request and Request.HTML to automatically include a unique noCache value to prevent request caching.
-
-License:
-	http://www.clientcide.com/wiki/cnet-libraries#license
-*/
-(function(){
-	var rqst = function(cls) {
-		return Class.refactor(cls, {
-/*		options: {
-				noCache: false
-			}, */
-			send: function(options){
-				if (this.options.noCache) {
-					var type = $type(options);
-					if (type == 'string' || type == 'element') options = {data: options};
-
-					var old = this.options;
-					options = $extend({data: old.data, url: old.url, method: old.method}, options);
-					var data = options.data, url = options.url, method = options.method;
-
-					if (options.url) {
-						options.url += (options.url.contains("?")?"&":"?")+"noCache=" + new Date().getTime();
-					} else  {
-						switch ($type(data)){
-							case 'element': data = $(data).toQueryString(); break;
-							case 'object': case 'hash': data = Hash.toQueryString(data);
-						}
-						data += (data.length?"&":"") + "noCache=" + new Date().getTime();
-						options.data = data;
-					}
-				}
-				this.parent(options);
-			}
-		});
-	};
-	Request = rqst(Request);
-	Request.HTML = rqst(Request.HTML);
-})();
-
-/*
-Script: Request.Queue.js
-	Controls several instances of Request and its variants to run only one request at a time.
-
-License:
-	http://www.clientcide.com/wiki/cnet-libraries#license
- */
-Request.Queue = new Class({
-	Implements: [Options, Events],
-	Binds: ['attach', 'onRequest', 'onComplete', 'onCancel', 'onSuccess', 'onFailure', 'onException'],
-	reqBinders: {},
-	queue: [],
-	options: {
-/*	onRequestStart: $empty,
-		onRequestEnd: $empty,
-		onRequestSuccess: $empty,
-		onRequestComplete: $empty,
-		onRequestCancel: $empty,
-		onRequestException: $empty,
-		onRequestFailure: $empty, */
-		stopOnFailure: true,
-		autoAdvance: true,
-		concurrent: 1,
-		requests: {}
-	},
-	initialize: function(options){
-		this.setOptions(options);
-		this.requests = new Hash();
-		this.addRequests(this.options.requests);
-	},
-	addRequest: function(name, request){
-		this.requests.set(name, request);
-		this.attach(name, request);
-		return this;
-	},
-	addRequests: function(reqs){
-		$each(reqs, function(v, k){
-			this.addRequest(k, v);
-		}, this);
-		return this;
-	},
-	getName: function(req) {
-		return this.requests.keyOf(req);
-	},
-	attach: function(name, req){
-		if (req._groupSend) return this;
-		['onRequest', 'onComplete', 'onCancel', 'onSuccess', 'onFailure', 'onException'].each(function(evt){
-			this.reqBinders[name] = this.reqBinders[name] || {};
-			this.reqBinders[name][evt] = function(){
-				this[evt].apply(this, [name, req].extend(arguments));
-			}.bind(this);
-			req.addEvent(evt, this.reqBinders[name][evt]);
-		}, this);
-		req._groupSend = req.send;
-		req.send = function(options){
-			this.send(name, options);
-			return req;
-		}.bind(this);
-		return this;
-	},
-	removeRequest: function(req) {
-		var name = $type(req) == 'object' ? this.getName(req) : req;
-		if (!name && $type(name) != 'string') return false;
-		req = this.requests.get(name);
-		if (!req) return false;
-		['onRequest', 'onComplete', 'onCancel', 'onSuccess', 'onFailure', 'onException'].each(function(evt) {
-			req.removeEvent(evt, this.reqBinders[name][evt]);
-		}, this);
-		req.send = req._groupSend;
-		delete req._groupSend;
-		return this;
-	},
-	getRunning: function(){
-		var running = [];
-		this.requests.each(function(req) {
-			if (req.running) running.include(req);
-		});
-		return running;
-	},
-	isRunning: function(){ 
-		return !!this.getRunning().length 
-	},
-	send: function(name, options) {
-		var q;
-		q = function(){
-			this.requests.get(name)._groupSend(options);
-			this.queue.erase(q);
-		}.bind(this);
-		q.name = name;
-		if (this.getRunning().length >= this.options.concurrent || (this.error && this.options.stopOnFailure)) this.queue.push(q);
-		else q();
-		return this;
-	},
-	hasNext: function(name){
-		if (!name) return !!this.queue.length;
-		return !!this.queue.filter(function(q) { return q.name == name; }).length;
-	},
-	resume: function(){
-		this.error = false;
-		(this.options.concurrent - this.getRunning().length).times(this.runNext.bind(this));
-		return this;
-	},
-	runNext: function(name){
-		if (this.queue.length) {
-			if (!name) {
-				this.queue[0]();
-			} else {
-				var found;
-				this.queue.each(function(q){
-					if (!found && q.name == name) {
-						found = true;
-						q();
-					}
-				});
-			}
-		}
-		return this;
-	},
-	clear: function(name){
-		if (!name) {
-			this.queue.empty();
-		} else {
-			this.queue = this.queue.map(function(q){
-				if (q.name != name) return q;
-				else return false;
-			}).filter(function(q){ return q; });
-		}
-	},
-	cancel: function(name) {
-		this.requests.get(name).cancel();
-		return this;
-	},
-	onRequest: function(){
-		this.fireEvent('onRequest', arguments);
-	},
-	onComplete: function(){
-		this.fireEvent('onComplete', arguments);		
-	},
-	onCancel: function(){
-		if (this.options.autoAdvance && !this.error) this.runNext();
-		this.fireEvent('onCancel', arguments);
-	},
-	onSuccess: function(){
-		if (this.options.autoAdvance && !this.error) this.runNext();
-		this.fireEvent('onSuccess', arguments);
-	},
-	onFailure: function(){
-		this.error = true;
-		if (!this.options.stopOnFailure && this.options.autoAdvance) this.runNext();
-		this.fireEvent('onFailure', arguments);
-	},
-	onException: function(){
-		this.error = true;
-		if (!this.options.stopOnFailure && this.options.autoAdvance) this.runNext();
-		this.fireEvent('onException', arguments);
-	}
-	
-});
 
 /*
 Script: IconMenu.js
@@ -3265,9 +3086,9 @@ var Modalizer = new Class({
 	},
 	setModalOptions: function(options){
 		this.modalOptions = $merge({
-			width:(window.getScrollSize().x+300),
-			height:(window.getScrollSize().y+300),
-			elementsToHide: 'select',
+			width:(window.getScrollSize().x),
+			height:(window.getScrollSize().y),
+			elementsToHide: 'select, embed, object',
 			hideOnClick: true,
 			modalStyle: {},
 			updateOnResize: true,
@@ -3282,10 +3103,10 @@ var Modalizer = new Class({
 		return $(this.modalOptions.layerId) || new Element('div', {id: this.modalOptions.layerId}).inject(document.body);
 	},
 	resize: function(){
-		if(this.layer()) {
+		if (this.layer()) {
 			this.layer().setStyles({
-				width:(window.getScrollSize().x+300),
-				height:(window.getScrollSize().y+300)
+				width:(window.getScrollSize().x),
+				height:(window.getScrollSize().y)
 			});
 		}
 	},
@@ -3295,18 +3116,18 @@ var Modalizer = new Class({
 			width:this.modalOptions.width,
 			height:this.modalOptions.height
 		}, styleObject);
-		if(this.layer()) this.layer().setStyles(this.modalStyle);
+		if (this.layer()) this.layer().setStyles(this.modalStyle);
 		return(this.modalStyle);
 	},
 	modalShow: function(options){
 		this.setModalOptions(options);
 		this.layer().setStyles(this.setModalStyle(this.modalOptions.modalStyle));
-		if(Browser.Engine.trident4) this.layer().setStyle('position','absolute');
+		if (Browser.Engine.trident4) this.layer().setStyle('position','absolute');
 		this.layer().removeEvents('click').addEvent('click', function(){
 			this.modalHide(this.modalOptions.hideOnClick);
 		}.bind(this));
 		this.bound = this.bound||{};
-		if(!this.bound.resize && this.modalOptions.updateOnResize) {
+		if (!this.bound.resize && this.modalOptions.updateOnResize) {
 			this.bound.resize = this.resize.bind(this);
 			window.addEvent('resize', this.bound.resize);
 		}
@@ -3316,19 +3137,19 @@ var Modalizer = new Class({
 		return this;
 	},
 	modalHide: function(override, force){
-		if(override === false) return false; //this is internal, you don't need to pass in an argument
+		if (override === false) return false; //this is internal, you don't need to pass in an argument
 		this.togglePopThroughElements(1);
 		if ($type(this.modalOptions.onModalHide) == "function") this.modalOptions.onModalHide();
 		this.layer().setStyle('display','none');
-		if(this.modalOptions.updateOnResize) {
+		if (this.modalOptions.updateOnResize) {
 			this.bound = this.bound||{};
-			if(!this.bound.resize) this.bound.resize = this.resize.bind(this);
+			if (!this.bound.resize) this.bound.resize = this.resize.bind(this);
 			window.removeEvent('resize', this.bound.resize);
 		}
 		return this;
 	},
 	togglePopThroughElements: function(opacity){
-		if(Browser.Engine.trident4 || (Browser.Engine.gecko && Browser.Platform.mac)) {
+		if (Browser.Engine.trident4 || (Browser.Engine.gecko && Browser.Platform.mac)) {
 			$$(this.modalOptions.elementsToHide).each(function(sel){
 				sel.setStyle('opacity', opacity);
 			});
@@ -3742,19 +3563,18 @@ var StickyWin = new Class({
 		allowMultiple: true,
 		showNow: true,
 		useIframeShim: true,
-		iframeShimSelector: ''
+		iframeShimSelector: '',
+		inject: {
+			where: 'bottom' 
+		}
 	},
 	css: '.SWclearfix:after {content: "."; display: block; height: 0; clear: both; visibility: hidden;}'+
 			 '.SWclearfix {display: inline-table;}'+
 			 '* html .SWclearfix {height: 1%;}'+
 			 '.SWclearfix {display: block;}',
 	initialize: function(options){
-		this.options.inject = {
-			target: document.body,
-			where: 'bottom' 
-		};
 		this.setOptions(options);
-		
+		this.options.inject.target = this.options.inject.target || document.body;
 		this.id = this.options.id || 'StickyWin_'+new Date().getTime();
 		this.makeWindow();
 
@@ -4056,7 +3876,7 @@ var modalWinBase = function(extend){
 		},
 		hide: function(hideModal){
 			if($pick(hideModal, true)) this.modalHide();
-			this.parent();
+			else this.parent();
 		}
 	}
 };
@@ -4170,7 +3990,7 @@ StickyWin.UI = new Class({
 		css: "div.DefaultStickyWin div.body{font-family:verdana; font-size:11px; line-height: 13px;}"+
 			"div.DefaultStickyWin div.top_ul{background:url({%baseHref%}full.png) top left no-repeat; height:30px; width:15px; float:left}"+
 			"div.DefaultStickyWin div.top_ur{position:relative; left:0px !important; left:-4px; background:url({%baseHref%}full.png) top right !important; height:30px; margin:0px 0px 0px 15px !important; margin-right:-4px; padding:0px}"+
-			"div.DefaultStickyWin h1.caption{clear: none !important; margin:0px 5px 0px 0px !important; overflow: hidden; padding:0 !important; font-weight:bold; color:#555; font-size:14px !important; position:relative; top:8px !important; left:5px !important; float: left; height: 22px !important;}"+
+			"div.DefaultStickyWin h1.caption{clear: none !important; margin:0px !important; overflow: hidden; padding:0 !important; font-weight:bold; color:#555; font-size:14px !important; position:relative; top:8px !important; left:5px !important; float: left; height: 22px !important;}"+
 			"div.DefaultStickyWin div.middle, div.DefaultStickyWin div.closeBody {background:url({%baseHref%}body.png) top left repeat-y; margin:0px 20px 0px 0px !important;	margin-bottom: -3px; position: relative;	top: 0px !important; top: -3px;}"+
 			"div.DefaultStickyWin div.body{background:url({%baseHref%}body.png) top right repeat-y; padding:8px 30px 8px 0px !important; margin-left:5px !important; position:relative; right:-20px !important;}"+
 			"div.DefaultStickyWin div.bottom{clear:both}"+
@@ -4270,7 +4090,7 @@ StickyWin.UI = new Class({
 		this.caption = caption;
 		var opt = this.options;
 		var h1Caption = new Element('h1').addClass('caption');
-		if (opt.width) h1Caption.setStyle('width', (opt.width-(opt.cornerHandle?70:60)));
+		if (opt.width) h1Caption.setStyle('width', (opt.width-(opt.cornerHandle?55:40)-(opt.closeButton?10:0)));
 		if($(this.caption)) h1Caption.adopt(this.caption);
 		else h1Caption.set('html', this.caption);
 		this.top_ur.adopt(h1Caption);
@@ -4343,7 +4163,7 @@ StickyWin.UI.Pointy = new Class({
 		"div.DefaultPointyTip div.top {position: relative;height: 25px; overflow: visible}"+
 		"div.DefaultPointyTip div.top_ul{background: url({%baseHref%}{%imgset%}_back.png) top left no-repeat;width: 8px;height: 25px; position: absolute; left: 0px;}"+
 		"div.DefaultPointyTip div.top_ur{background: url({%baseHref%}{%imgset%}_back.png) top right !important;margin: 0 0 0 8px !important;height: 25px;position: relative;left: 0px !important;padding: 0;}"+
-		"div.DefaultPointyTip h1.caption{color: {%fgColor%};left: 0px !important;top: 4px !important;clear: none !important;overflow: hidden;font-weight: 700;font-size: 12px !important;position: relative;float: left;height: 22px !important;margin: 0 22px 0 0 !important;padding: 0 !important;}"+
+		"div.DefaultPointyTip h1.caption{color: {%fgColor%};left: 0px !important;top: 4px !important;clear: none !important;overflow: hidden;font-weight: 700;font-size: 12px !important;position: relative;float: left;height: 22px !important;margin: 0 !important;padding: 0 !important;padding-right: 15px !important;}"+
 		"div.DefaultPointyTip div.middle,div.DefaultPointyTip div.closeBody{background:  {%bgColor%};margin: 0 0px 0 0 !important;position: relative;top: 0 !important;}"+
 		"div.DefaultPointyTip div.bottom {clear: both;} "+
 		"div.DefaultPointyTip div.bottom_ll{font-size:1; background: url({%baseHref%}{%imgset%}_back.png) bottom left no-repeat;width: 6px;height: 6px;position: absolute; left: 0px;}"+
@@ -4526,6 +4346,10 @@ StickyWin.UI.Pointy = new Class({
 		if (Browser.Engine.trident4) $(this).getElements('.bottom_ll, .bottom_lr').setStyle('font-size', 1); //IE6 bullshit
 		this.positionPointer();
 		return this;
+	},
+	makeCaption: function(){
+		this.parent.apply(this, arguments);
+		if (this.options.width && this.h1) this.h1.setStyle('width', (this.options.width-(this.options.closeButton?25:15)));
 	}
 });
 
@@ -4533,6 +4357,13 @@ StickyWin.ui.pointy = function(caption, body, options){
 	return $(new StickyWin.UI.Pointy(caption, body, options));
 };
 
+/*
+Script: StickyWin.PointyTip.js
+	Positions a pointy tip relative to the element you specify.
+
+License:
+	http://www.clientcide.com/wiki/cnet-libraries#license
+*/
 StickyWin.PointyTip = new Class({
 	Extends: StickyWin,
 	options: {
@@ -4559,7 +4390,7 @@ StickyWin.PointyTip = new Class({
 		this.pointy = new StickyWin.UI.Pointy(args.caption, args.body, popts);
 		this.options.content = null;
 		
-		this.setOptions(args.options, this.getPositionSettings());
+		this.setOptions(this.getPositionSettings(), args.options);
 		this.parent(this.options);
 		this.win.empty().adopt(this.pointy);
 		this.attachHandlers(this.win);
@@ -4637,11 +4468,23 @@ StickyWin.PointyTip = new Class({
 	}
 });
 
+/*
+Script: Tips.Pointy.js
+	Defines Tips.Pointy, An extension to Tips that adds a pointy style to the tip.
+
+License:
+	http://www.clientcide.com/wiki/cnet-libraries#license
+*/
+
 Tips.Pointy = new Class({
 	Extends: Tips,
 	options: {
-		onShow: $empty,
-		onHide: $empty,
+		onShow: function(tip){
+			tip.show();
+		},
+		onHide: function(tip){
+			tip.hide();
+		},
 		pointyTipOptions: {
 			point: 11,
 			width: 150,
@@ -4653,18 +4496,21 @@ Tips.Pointy = new Class({
 	initialize: function(){
 		var params = Array.link(arguments, {options: Object.type, elements: $defined});
 		this.setOptions(params.options);
-		this.tip = new StickyWin.PointyTip($extend(this.options.pointyTipOptions, {
+		this.element = new StickyWin.PointyTip($extend(this.options.pointyTipOptions, {
 			showNow: false
 		}));
-		if (this.options.className) $(this.tip).addClass(this.options.className);
+		if (this.options.className) $(this.element).addClass(this.options.className);
 		if (params.elements) this.attach(params.elements);
+	},
+	toElement: function(){
+		return $(this.element);
 	},
 	elementEnter: function(event, element){
 
 		var title = element.retrieve('tip:title');
 		var text = element.retrieve('tip:text');
 		
-		this.tip.setContent(title, text);
+		this.element.setContent(title, text);
 
 		this.timer = $clear(this.timer);
 		this.timer = this.show.delay(this.options.showDelay, this);
@@ -4682,20 +4528,20 @@ Tips.Pointy = new Class({
 	},
 
 	position: function(element){
-		this.tip.setOptions({
+		this.element.setOptions({
 			relativeTo: element
 		});
-		this.tip.position();
+		this.element.position();
 	},
 
 	show: function(){
-		this.fireEvent('show', this.tip);
-		this.tip.show();
+		this.fireEvent('show', $(this.element));
+		this.element.show();
 	},
 
 	hide: function(){
-		this.fireEvent('hide', this.tip);
-		this.tip.hide();
+		this.fireEvent('hide', $(this.element));
+		this.element.hide();
 	}
 
 });
@@ -4943,13 +4789,6 @@ var Collapsable = new Class({
 	}
 });
 
-/*
-Script: HoverGroup.js
-	Manages mousing in and out of multiple objects (think drop-down menus).
-
-License:
-	http://www.clientcide.com/wiki/cnet-libraries#license
-*/
 var HoverGroup = new Class({
 	Implements: [Options, Events],
 	Binds: ['enter', 'leave', 'remain'],
@@ -4976,24 +4815,26 @@ var HoverGroup = new Class({
 	},
 	elements: [],
 	attachTo: function(elements, detach){
-		var actions = {};
+		var starters = {}, remainers = {}, enders = {};
 		elements = $G(elements);
 		this.options.start.each(function(start) {
-			actions[start] = this.enter;
+			starters[start] = this.enter;
 		}, this);
 		this.options.end.each(function(end) {
-			actions[end] = this.leave;
+			enders[end] = this.leave;
 		}, this);
 		this.options.remain.each(function(remain){
-			actions[remain] = this.remain;
+			remainers[remain] = this.remain;
 		}, this);
 		if (detach) {
 			elements.each(function(el) {
-				el.removeEvents(actions);
+				el.removeEvents(starters).removeEvents(enders).removeEvents(remainers);
 				this.elements.erase(el);
 			});
 		} else {
-			elements.addEvents(actions);
+			elements.each(function(el){
+				el.addEvents(starters).addEvents(enders).addEvents(remainers);
+			});
 			this.elements.combine(elements);
 		}
 		return this;
@@ -5001,22 +4842,22 @@ var HoverGroup = new Class({
 	detachFrom: function(elements){
 		this.attachTo(elements, true);
 	},
-	enter: function(){
+	enter: function(e){
 		this.isMoused = true;
-		this.assert();
+		this.assert(e);
 	},
-	leave: function(){
+	leave: function(e){
 		this.isMoused = false;
-		this.assert();
+		this.assert(e);
 	},
-	remain: function(){
-		if (this.active) this.enter();
+	remain: function(e){
+		if (this.active) this.enter(e);
 	},
-	assert: function(){
+	assert: function(e){
 		$clear(this.assertion);
 		this.assertion = (function(){
-			if (!this.isMoused && this.active) this.fireEvent('leave');
-			else if (this.isMoused && !this.active) this.fireEvent('enter');
+			if (!this.isMoused && this.active) this.fireEvent('leave', e);
+			else if (this.isMoused && !this.active) this.fireEvent('enter', e);
 		}).delay(this.options.delay, this);
 	}
 });
@@ -5090,7 +4931,8 @@ var MenuSlider = new Class({
 			transition: 'expo:out',
 			link: 'cancel'
 		},
-		useIframeShim: true
+		useIframeShim: true,
+		slideOut: false
 	},
 	initialize: function(menu, subMenu, options) {
 		this.menu = $(menu);
@@ -5125,7 +4967,8 @@ var MenuSlider = new Class({
 		$clear(this.hoverGroup.assertion);
 		this.hoverGroup.active = false;
 		this.slider.cancel();
-		this.slider.hide();
+		if (this.options.slideOut) this.slider.slideOut();
+		else this.slider.hide();
 		if (this.shim) this.shim.hide();
 		return this;
 	}
@@ -5354,21 +5197,13 @@ var MultipleOpenAccordion = new Class({
 		this.openSections = this.showSections.bind(this);
 		this.closeSections = this.hideSections.bind(this);
 	},
-	addSection: function(toggler, element, pos){
+	addSection: function(toggler, element){
 		toggler = $(toggler);
 		element = $(element);
 		var test = this.togglers.contains(toggler);
 		var len = this.togglers.length;
 		this.togglers.include(toggler);
 		this.elements.include(element);
-		if (len && (!test || pos)){
-			pos = $pick(pos - 1, len - 1);
-			toggler.inject(this.elements[pos], 'after');
-			element.inject(toggler, 'after');
-		} else if (this.container && !test){
-			toggler.inject(this.container);
-			element.inject(this.container);
-		}
 		var idx = this.togglers.indexOf(toggler);
 		toggler.addEvent('click', this.toggleSection.bind(this, idx));
 		var mode;
@@ -5520,6 +5355,7 @@ var SimpleCarousel = new Class({
 		return this;
 	},
 	autoplay: function(){
+		this.slideFx.setOptions(this.slideFx.options, {duration: this.options.transitionDuration});
 		this.slideshowInt = this.rotate.periodical(this.options.slideInterval, this);
 		this.fireEvent('onAutoPlay');
 		return this;
@@ -5530,8 +5366,8 @@ var SimpleCarousel = new Class({
 		return this;
 	},
 	rotate: function(){
-		current = this.currentSlide;
-		next = (current+1 >= this.slides.length) ? 0 : current+1;
+		var current = this.currentSlide;
+		var next = (current+1 >= this.slides.length) ? 0 : current+1;
 		this.showSlide(next);
 		this.fireEvent('onRotate', next);
 		return this;
@@ -5976,52 +5812,6 @@ var TabSwapper = new Class({
 
 
 /*
-Script: Clipboard.js
-	Provides access to the OS clipboard so that data can be copied to it (using a flash plugin).
-
-License:
-	http://www.clientcide.com/wiki/cnet-libraries#license
-*/
-var Clipboard = {
-	swfLocation: 'http://www.cnet.com/html/rb/assets/global/clipboard/_clipboard.swf',
-	copyFromElement: function(element) {
-		element = $(element);
-		if(!element) return null;
-		if (Browser.Engine.trident) {
-			try {
-				window.addEvent('domready', function() {
-					var range = element.createTextRange();
-					if(range) range.execCommand('Copy');
-				});
-			}catch(e){
-				dbug.log('cannot copy to clipboard: %s', o)
-			}
-		} else {
-			var text = (element.getSelectedText)?element.getSelectedText():element.get('value');
-			if (text) Clipboard.copy(text);
-		}
-		return element;
-	},
-	copy: function(text) {
-		if(Browser.Engine.trident){
-			window.addEvent('domready', function() {
-				var cb = new Element('textarea', {styles: {display: 'none'}}).inject(document.body);
-				cb.set('value', text).select();
-				Clipboard.copyFromElement(cb);
-				cb.dispose();
-			});
-		} else {
-			var swf = ($('flashcopier'))?$('flashcopier'):new Element('div', {
-				id: 'flashcopier'
-			}).inject(document.body);
-			swf.empty();
-			swf.set('html', '<embed src="'+this.swfLocation+'" FlashVars="clipboard='+escape(text)+'" width="0" height="0" type="application/x-shockwave-flash"></embed>');
-		}
-	}
-};
-
-
-/*
 Script: Confirmer.js
 	Fades a message in and out for the user to tell them that some event (like an ajax save) has occurred.
 
@@ -6330,7 +6120,7 @@ var DatePicker;
 				cal.addEvent('click', this.clickCalendar.bind(this));
 				this.calendar = cal;
 				this.container = new Element('div').adopt(cal).addClass('calendarHolder');
-				this.content = StickyWin.ui('', this.container, $merge(this.options.stickyWinUiOptions, {
+				this.content = StickyWin.ui(' ', this.container, $merge(this.options.stickyWinUiOptions, {
 					cornerHandle: this.options.stickyWinOptions.draggable,
 					width: this.calWidth
 				}));
@@ -6804,7 +6594,7 @@ var FormValidator = new Class({
 				par = par.getParent();
 			};
 			var fx = par.retrieve('fvScroller');
-			if (!fx && window.Fx) {
+			if (!fx && window.Fx && Fx.Scroll) {
 				fx = new Fx.Scroll(par, {
 					transition: 'quad:out',
 					offset: {
@@ -6939,16 +6729,16 @@ var FormValidator = new Class({
 	makeAdvice: function(className, field, error, warn){
 		var errorMsg = (warn)?this.warningPrefix:this.errorPrefix;
 				errorMsg += (this.options.useTitles) ? field.title || error:error;
+		var cssClass = (warn)?'warning-advice':'validation-advice';
 		var advice = this.getAdvice(className, field);
-		if(!advice){
-			var cssClass = (warn)?'warning-advice':'validation-advice';
+		if(advice) {
+			advice = advice.clone(true).set('html', errorMsg).replaces(advice);
+		} else {
 			advice = new Element('div', {
-				text: errorMsg,
+				html: errorMsg,
 				styles: { display: 'none' },
 				id: 'advice-'+className+'-'+this.getFieldId(field)
 			}).addClass(cssClass);
-		} else{
-			advice.set('html', errorMsg);
 		}
 		field.store('advice-'+className, advice);
 		return advice;
@@ -7436,7 +7226,7 @@ FormValidator.addAllThese([
       return oneCheckedItem;
     }
   }],
-  ['validate-validate-match', {
+  ['validate-match', {
     errorMsg: function(element, props) {
 			return FormValidator.getMsg('match').substitute({matchName: props.matchName || $(props.matchInput).get('name')});
     }, 
@@ -7522,7 +7312,7 @@ var Fupdate = new Class({
 	property: 'fupdate',
 	initialize: function(form, update, options) {
 		this.element = $(form);
-		if (this.occlude()) return this.occludes;
+		if (this.occlude()) return this.occluded;
 		this.update = $(update);
 		this.setOptions(options);
 		this.makeRequest();
@@ -7539,7 +7329,8 @@ var Fupdate = new Class({
 				url: $(this).get('action'),
 				update: this.update,
 				emulation: false,
-				waiterTarget: $(this)
+				waiterTarget: $(this),
+				method: this.options.requestOptions.method || $(this).get('method') || 'post'
 		}, this.options.requestOptions)).addEvents({
 			success: function(text, xml){
 				['success', 'complete'].each(function(evt){
@@ -7697,10 +7488,10 @@ License:
 			},
 			makeStickyWin: function(form){
 				if ($(form)) form = $(form);
-				this.swin = new this.options.stickyWinToUse({
+				this.swin = new this.options.stickyWinToUse($merge({
 					content: this.options.useUi?StickyWin.ui('Update Info', form, this.options.stickyWinUiOptions):form,
 					showNow: false
-				});
+				}, this.options.stickyWinOptions));
 				this.element = this.swin.win.getElement('form');
 				this.initAfterUpdate();
 			},
@@ -7755,7 +7546,7 @@ License:
 					handleResponse: function(response) {
 						var responseScript = "";
 						this.swin.Request.response.text.stripScripts(function(script){	responseScript += script; });
-						var content = StickyWin.ui('Update Info', response, this.options.stickyWinUiOptions);
+						var content = this.options.useUi?StickyWin.ui('Update Info', response, this.options.stickyWinUiOptions):response;
 						this.swin.setContent(content);
 						this.element = this.swin.win.getElement('form');
 						this.initAfterUpdate();
@@ -8369,11 +8160,11 @@ License:
 	http://www.clientcide.com/wiki/cnet-libraries#license
 */
 var SimpleEditor = new Class({
-	Implements: [ToElement, Occlude],
+	Implements: [Class.ToElement, Class.Occlude],
 	property: 'SimpleEditor',
 	initialize: function(input, buttons, commands){
 		this.element = $(input);
-		if (this.occlude()) return this.occludes;
+		if (this.occlude()) return this.occluded;
 		this.commands = new Hash($extend(SimpleEditor.commands, commands||{}));
 		this.buttons = $$(buttons);
 		this.buttons.each(function(button){
@@ -8384,7 +8175,7 @@ var SimpleEditor = new Class({
 		$(this).addEvent('keydown', function(e){
 			if (e.control||e.meta) {
 				var key = this.shortCutToKey(e.key, e.shift);
-				if(key) {
+				if (key) {
 					e.stop();
 					this.exec(key);
 				}
@@ -8395,7 +8186,7 @@ var SimpleEditor = new Class({
 		var returnKey = false;
 		this.commands.each(function(value, key){
 			var char = (value.shortcut ? value.shortcut.toLowerCase() : value.shortcut);
-			if(value.shortcut == shortcut || (shift && char == shortcut)) returnKey = key;
+			if (value.shortcut == shortcut || (shift && char == shortcut)) returnKey = key;
 		});
 		return returnKey;
 	},
@@ -8416,8 +8207,8 @@ var SimpleEditor = new Class({
 				scrollLeft: $(this).getScroll().x
 			};
 		}
-		if(this.commands.has(key)) this.commands.get(key).command($(this));
-		if(currentScrollPos) {
+		if (this.commands.has(key)) this.commands.get(key).command($(this));
+		if (currentScrollPos) {
 			$(this).set('scrollTop', currentScrollPos.getScroll().y);
 			$(this).set('scrollLeft', currentScrollPos.getScroll().x);
 		}
@@ -8439,20 +8230,20 @@ SimpleEditor.addCommands({
 	bold: {
 		shortcut: 'b',
 		command: function(input){
-			input.insertAroundCursor({before:'<b>',after:'</b>'});
+			input.insertAroundCursor({before:'<strong>',after:'</strong>'});
 		}
 	},
 	underline: {
 		shortcut: 'u',
 		command: function(input){
-			input.insertAroundCursor({before:'<u>',after:'</u>'});
+			input.insertAroundCursor({before:'<span style="text-decoration:underline">',after:'</span>'});
 		}
 	},
 	anchor: {
 		shortcut: 'l',
 		command: function(input){
-			if(window.TagMaker){
-				if(!this.linkBuilder) this.linkBuilder = new TagMaker.anchor();
+			if (window.TagMaker){
+				if (!this.linkBuilder) this.linkBuilder = new TagMaker.anchor();
 				this.linkBuilder.prompt(input);
 			} else {
 				var href = window.prompt(SimpleEditor.getMsg('linkURL'));
@@ -8460,23 +8251,6 @@ SimpleEditor.addCommands({
 				if (!input.getSelectedText()) opts.defaultMiddle = window.prompt(SimpleEditor.getMsg('linkText'));
 				input.insertAroundCursor(opts);
 			}
-		}
-	},
-	copy: {
-		shortcut: false,
-		command: function(input){
-			if(Clipboard) Clipboard.copyFromElement(input);
-			else simpleErrorPopup(SimpleEditor.getMsg('woops'), SimpleEditor.getMsg('nopeCtrlC'));
-			input.focus();
-		}
-	},
-	cut: {
-		shortcut: false,
-		command: function(input){
-			if(Clipboard) {
-				Clipboard.copyFromElement(input);
-				input.insertAtCursor('');
-			} else simpleErrorPopup(SimpleEditor.getMsg('woops'), SimpleEditor.getMsg('nopeCtrlX'));
 		}
 	},
 	hr: {
@@ -8488,8 +8262,8 @@ SimpleEditor.addCommands({
 	img: {
 		shortcut: 'g',
 		command: function(input){
-			if(window.TagMaker) {
-				if(!this.anchorBuilder) this.anchorBuilder = new TagMaker.image();
+			if (window.TagMaker) {
+				if (!this.anchorBuilder) this.anchorBuilder = new TagMaker.image();
 				this.anchorBuilder.prompt(input);
 			} else {
 				var href = window.prompt(SimpleEditor.getMsg('imgURL'));
@@ -8537,7 +8311,7 @@ SimpleEditor.addCommands({
 	italics: {
 		shortcut: 'i',
 		command: function(input){
-			input.insertAroundCursor({before:'<i>',after:'</i>'});
+			input.insertAroundCursor({before:'<em>',after:'</em>'});
 		}
 	},
 	bullets: {
@@ -8562,7 +8336,7 @@ SimpleEditor.addCommands({
 		shortcut: false,
 		command: function(input){
 			try {
-				if(!this.container){
+				if (!this.container){
 					this.container = new Element('div', {
 						styles: {
 							border: '1px solid black',
@@ -8649,14 +8423,6 @@ var TagMaker = new Class({
 	initialize: function(options){
 		this.setOptions(options);
 		this.buttons = [
-			{
-				text: 'Copy',
-				onClick: this.copyToClipboard.bind(this),
-				properties: {
-					'class': 'closeSticky tip',
-					title: 'Copy::Copy the html to your OS clipboard (like hitting Ctrl+C)'
-				}
-			},
 			{
 				text: 'Paste',
 				onClick: function(){
@@ -8819,15 +8585,6 @@ var TagMaker = new Class({
 		});
 		return this.resultInput.value = html;
 	},
-	copyToClipboard: function(){
-		var inputs = this.form.getElements('input');
-		var result = inputs[inputs.length-1];
-		result.select();
-		Clipboard.copyFromElement(result);
-		$$('.tagMaker-tip').hide();
-		this.win.hide();
-		this.fireEvent('onChoose');
-	},
 	insert: function(){
 		if(!this.target) {
 			simpleErrorPopup('Cannot Paste','This tag builder was not launched with a target input specified; you\'ll have to copy the tag yourself. Sorry!');
@@ -8921,1106 +8678,3 @@ TagMaker.anchor = new Class({
 		}
 	}
 });
-
-/**
- * Autocompleter
- *
- * @version		1.1.1
- *
- * @todo: Caching, no-result handling!
- *
- *
- * @license		MIT-style license
- * @author		Harald Kirschner <mail [at] digitarald.de>
- * @copyright	Author
- */
-var Autocompleter = {};
-
-var OverlayFix = IframeShim;
-
-Autocompleter.Base = new Class({
-	
-	Implements: [Options, Events],
-	
-	options: {
-		minLength: 1,
-		markQuery: true,
-		width: 'inherit',
-		maxChoices: 10,
-//		injectChoice: null,
-//		customChoices: null,
-		className: 'autocompleter-choices',
-		zIndex: 42,
-		delay: 400,
-		observerOptions: {},
-		fxOptions: {},
-//		onSelection: $empty,
-//		onShow: $empty,
-//		onHide: $empty,
-//		onBlur: $empty,
-//		onFocus: $empty,
-
-		autoSubmit: false,
-		overflow: false,
-		overflowMargin: 25,
-		selectFirst: false,
-		filter: null,
-		filterCase: false,
-		filterSubset: false,
-		forceSelect: false,
-		selectMode: true,
-		choicesMatch: null,
-
-		multiple: false,
-		separator: ', ',
-		separatorSplit: /\s*[,;]\s*/,
-		autoTrim: true,
-		allowDupes: false,
-
-		cache: true,
-		relative: false
-	},
-
-	initialize: function(element, options) {
-		this.element = $(element);
-		this.setOptions(options);
-		this.build();
-		this.observer = new Observer(this.element, this.prefetch.bind(this), $merge({
-			'delay': this.options.delay
-		}, this.options.observerOptions));
-		this.queryValue = null;
-		if (this.options.filter) this.filter = this.options.filter.bind(this);
-		var mode = this.options.selectMode;
-		this.typeAhead = (mode == 'type-ahead');
-		this.selectMode = (mode === true) ? 'selection' : mode;
-		this.cached = [];
-	},
-
-	/**
-	 * build - Initialize DOM
-	 *
-	 * Builds the html structure for choices and appends the events to the element.
-	 * Override this function to modify the html generation.
-	 */
-	build: function() {
-		if ($(this.options.customChoices)) {
-			this.choices = this.options.customChoices;
-		} else {
-			this.choices = new Element('ul', {
-				'class': this.options.className,
-				'styles': {
-					'zIndex': this.options.zIndex
-				}
-			}).inject(document.body);
-			this.relative = false;
-			if (this.options.relative || this.element.getOffsetParent() != document.body) {
-				this.choices.inject(this.element, 'after');
-				this.relative = this.element.getOffsetParent();
-			}
-			this.fix = new OverlayFix(this.choices);
-		}
-		if (!this.options.separator.test(this.options.separatorSplit)) {
-			this.options.separatorSplit = this.options.separator;
-		}
-		this.fx = (!this.options.fxOptions) ? null : new Fx.Tween(this.choices, $merge({
-			'property': 'opacity',
-			'link': 'cancel',
-			'duration': 200
-		}, this.options.fxOptions)).addEvent('onStart', Chain.prototype.clearChain).set(0);
-		this.element.setProperty('autocomplete', 'off')
-			.addEvent((Browser.Engine.trident || Browser.Engine.webkit) ? 'keydown' : 'keypress', this.onCommand.bind(this))
-			.addEvent('click', this.onCommand.bind(this, [false]))
-			.addEvent('focus', this.toggleFocus.create({bind: this, arguments: true, delay: 100}));
-			//.addEvent('blur', this.toggleFocus.create({bind: this, arguments: false, delay: 100}));
-		document.addEvent('click', function(e){
-			if (e.target != this.choices) this.toggleFocus(false);
-		}.bind(this));
-	},
-
-	destroy: function() {
-		if (this.fix) this.fix.dispose();
-		this.choices = this.selected = this.choices.destroy();
-	},
-
-	toggleFocus: function(state) {
-		this.focussed = state;
-		if (!state) this.hideChoices(true);
-		this.fireEvent((state) ? 'onFocus' : 'onBlur', [this.element]);
-	},
-
-	onCommand: function(e) {
-		if (!e && this.focussed) return this.prefetch();
-		if (e && e.key && !e.shift) {
-			switch (e.key) {
-				case 'enter':
-					if (this.element.value != this.opted) return true;
-					if (this.selected && this.visible) {
-						this.choiceSelect(this.selected);
-						return !!(this.options.autoSubmit);
-					}
-					break;
-				case 'up': case 'down':
-					if (!this.prefetch() && this.queryValue !== null) {
-						var up = (e.key == 'up');
-						this.choiceOver((this.selected || this.choices)[
-							(this.selected) ? ((up) ? 'getPrevious' : 'getNext') : ((up) ? 'getLast' : 'getFirst')
-						](this.options.choicesMatch), true);
-					}
-					return false;
-				case 'esc': case 'tab':
-					this.hideChoices(true);
-					break;
-			}
-		}
-		return true;
-	},
-
-	setSelection: function(finish) {
-		var input = this.selected.inputValue, value = input;
-		var start = this.queryValue.length, end = input.length;
-		if (input.substr(0, start).toLowerCase() != this.queryValue.toLowerCase()) start = 0;
-		if (this.options.multiple) {
-			var split = this.options.separatorSplit;
-			value = this.element.value;
-			start += this.queryIndex;
-			end += this.queryIndex;
-			var old = value.substr(this.queryIndex).split(split, 1)[0];
-			value = value.substr(0, this.queryIndex) + input + value.substr(this.queryIndex + old.length);
-			if (finish) {
-				var space = /[^\s,]+/;
-				var tokens = value.split(this.options.separatorSplit).filter(space.test, space);
-				if (!this.options.allowDupes) tokens = [].combine(tokens);
-				var sep = this.options.separator;
-				value = tokens.join(sep) + sep;
-				end = value.length;
-			}
-		}
-		this.observer.setValue(value);
-		this.opted = value;
-		if (finish || this.selectMode == 'pick') start = end;
-		this.element.selectRange(start, end);
-		this.fireEvent('onSelection', [this.element, this.selected, value, input]);
-	},
-
-	showChoices: function() {
-		var match = this.options.choicesMatch, first = this.choices.getFirst(match);
-		this.selected = this.selectedValue = null;
-		if (this.fix) {
-			var pos = this.element.getCoordinates(this.relative), width = this.options.width || 'auto';
-			this.choices.setStyles({
-				'left': pos.left,
-				'top': pos.bottom,
-				'width': (width === true || width == 'inherit') ? pos.width : width
-			});
-		}
-		if (!first) return;
-		if (!this.visible) {
-			this.visible = true;
-			this.choices.setStyle('display', '');
-			if (this.fx) this.fx.start(1);
-			this.fireEvent('onShow', [this.element, this.choices]);
-		}
-		if (this.options.selectFirst || this.typeAhead || first.inputValue == this.queryValue) this.choiceOver(first, this.typeAhead);
-		var items = this.choices.getChildren(match), max = this.options.maxChoices;
-		var styles = {'overflowY': 'hidden', 'height': ''};
-		this.overflown = false;
-		if (items.length > max) {
-			var item = items[max - 1];
-			styles.overflowY = 'scroll';
-			styles.height = item.getCoordinates(this.choices).bottom;
-			this.overflown = true;
-		};
-		this.choices.setStyles(styles);
-		this.fix.show();
-	},
-
-	hideChoices: function(clear) {
-		if (clear) {
-			var value = this.element.value;
-			if (this.options.forceSelect) value = this.opted;
-			if (this.options.autoTrim) {
-				value = value.split(this.options.separatorSplit).filter($arguments(0)).join(this.options.separator);
-			}
-			this.observer.setValue(value);
-		}
-		if (!this.visible) return;
-		this.visible = false;
-		this.observer.clear();
-		var hide = function(){
-			this.choices.setStyle('display', 'none');
-			this.fix.hide();
-		}.bind(this);
-		if (this.fx) this.fx.start(0).chain(hide);
-		else hide();
-		this.fireEvent('onHide', [this.element, this.choices]);
-	},
-
-	prefetch: function() {
-		var value = this.element.value, query = value;
-		if (this.options.multiple) {
-			var split = this.options.separatorSplit;
-			var values = value.split(split);
-			var index = this.element.getCaretPosition();
-			var toIndex = value.substr(0, index).split(split);
-			var last = toIndex.length - 1;
-			index -= toIndex[last].length;
-			query = values[last];
-		}
-		if (query.length < this.options.minLength) {
-			this.hideChoices();
-		} else {
-			if (query === this.queryValue || (this.visible && query == this.selectedValue)) {
-				if (this.visible) return false;
-				this.showChoices();
-			} else {
-				this.queryValue = query;
-				this.queryIndex = index;
-				if (!this.fetchCached()) this.query();
-			}
-		}
-		return true;
-	},
-
-	fetchCached: function() {
-		return false;
-		if (!this.options.cache
-			|| !this.cached
-			|| !this.cached.length
-			|| this.cached.length >= this.options.maxChoices
-			|| this.queryValue) return false;
-		this.update(this.filter(this.cached));
-		return true;
-	},
-
-	update: function(tokens) {
-		this.choices.empty();
-		this.cached = tokens;
-		if (!tokens || !tokens.length) {
-			this.hideChoices();
-		} else {
-			if (this.options.maxChoices < tokens.length && !this.options.overflow) tokens.length = this.options.maxChoices;
-			tokens.each(this.options.injectChoice || function(token){
-				var choice = new Element('li', {'html': this.markQueryValue(token)});
-				choice.inputValue = token;
-				this.addChoiceEvents(choice).inject(this.choices);
-			}, this);
-			this.showChoices();
-		}
-	},
-
-	choiceOver: function(choice, selection) {
-		if (!choice || choice == this.selected) return;
-		if (this.selected) this.selected.removeClass('autocompleter-selected');
-		this.selected = choice.addClass('autocompleter-selected');
-		this.fireEvent('onSelect', [this.element, this.selected, selection]);
-		if (!selection) return;
-		this.selectedValue = this.selected.inputValue;
-		if (this.overflown) {
-			var coords = this.selected.getCoordinates(this.choices), margin = this.options.overflowMargin,
-				top = this.choices.scrollTop, height = this.choices.offsetHeight, bottom = top + height;
-			if (coords.top - margin < top && top) this.choices.scrollTop = Math.max(coords.top - margin, 0);
-			else if (coords.bottom + margin > bottom) this.choices.scrollTop = Math.min(coords.bottom - height + margin, bottom);
-		}
-		if (this.selectMode) this.setSelection();
-	},
-
-	choiceSelect: function(choice) {
-		if (choice) this.choiceOver(choice);
-		this.setSelection(true);
-		this.queryValue = false;
-		this.hideChoices();
-	},
-
-	filter: function(tokens) {
-		var regex = new RegExp(((this.options.filterSubset) ? '' : '^') + this.queryValue.escapeRegExp(), (this.options.filterCase) ? '' : 'i');
-		return (tokens || this.tokens).filter(regex.test, regex);
-	},
-
-	/**
-	 * markQueryValue
-	 *
-	 * Marks the queried word in the given string with <span class="autocompleter-queried">*</span>
-	 * Call this i.e. from your custom parseChoices, same for addChoiceEvents
-	 *
-	 * @param		{String} Text
-	 * @return		{String} Text
-	 */
-	markQueryValue: function(str) {
-		return (!this.options.markQuery || !this.queryValue) ? str
-			: str.replace(new RegExp('(' + ((this.options.filterSubset) ? '' : '^') + this.queryValue.escapeRegExp() + ')', (this.options.filterCase) ? '' : 'i'), '<span class="autocompleter-queried">$1</span>');
-	},
-
-	/**
-	 * addChoiceEvents
-	 *
-	 * Appends the needed event handlers for a choice-entry to the given element.
-	 *
-	 * @param		{Element} Choice entry
-	 * @return		{Element} Choice entry
-	 */
-	addChoiceEvents: function(el) {
-		return el.addEvents({
-			'mouseover': this.choiceOver.bind(this, [el]),
-			'click': this.choiceSelect.bind(this, [el])
-		});
-	}
-});
-
-
-/**
- * Autocompleter.Local
- *
- * @version		1.1.1
- *
- * @todo: Caching, no-result handling!
- *
- *
- * @license		MIT-style license
- * @author		Harald Kirschner <mail [at] digitarald.de>
- * @copyright	Author
- */
-Autocompleter.Local = new Class({
-
-	Extends: Autocompleter.Base,
-
-	options: {
-		minLength: 0,
-		delay: 200
-	},
-
-	initialize: function(element, tokens, options) {
-		this.parent(element, options);
-		this.tokens = tokens;
-	},
-
-	query: function() {
-		this.update(this.filter());
-	}
-
-});
-
-
-/**
- * Autocompleter.Remote
- *
- * @version		1.1.1
- *
- * @todo: Caching, no-result handling!
- *
- *
- * @license		MIT-style license
- * @author		Harald Kirschner <mail [at] digitarald.de>
- * @copyright	Author
- */
-
-Autocompleter.Ajax = {};
-
-Autocompleter.Ajax.Base = new Class({
-
-	Extends: Autocompleter.Base,
-
-	options: {
-		postVar: 'value',
-		postData: {},
-		ajaxOptions: {},
-		onRequest: $empty,
-		onComplete: $empty
-	},
-
-	initialize: function(element, options) {
-		this.parent(element, options);
-		var indicator = $(this.options.indicator);
-		if (indicator) {
-			this.addEvents({
-				'onRequest': indicator.show.bind(indicator),
-				'onComplete': indicator.hide.bind(indicator)
-			}, true);
-		}
-	},
-
-	query: function(){
-		var data = $unlink(this.options.postData);
-		data[this.options.postVar] = this.queryValue;
-		this.fireEvent('onRequest', [this.element, this.request, data, this.queryValue]);
-		this.request.send({'data': data});
-	},
-
-	/**
-	 * queryResponse - abstract
-	 *
-	 * Inherated classes have to extend this function and use this.parent(resp)
-	 *
-	 * @param		{String} Response
-	 */
-	queryResponse: function() {
-		this.fireEvent('onComplete', [this.element, this.request, this.response]);
-	}
-
-});
-
-Autocompleter.Ajax.Json = new Class({
-
-	Extends: Autocompleter.Ajax.Base,
-
-	initialize: function(el, url, options) {
-		this.parent(el, options);
-		this.request = new Request.JSON($merge({
-			'url': url,
-			'link': 'cancel'
-		}, this.options.ajaxOptions)).addEvent('onComplete', this.queryResponse.bind(this));
-	},
-
-	queryResponse: function(response) {
-		this.parent();
-		this.update(response);
-	}
-
-});
-
-Autocompleter.Ajax.Xhtml = new Class({
-
-	Extends: Autocompleter.Ajax.Base,
-
-	initialize: function(el, url, options) {
-		this.parent(el, options);
-		this.request = new Request.HTML($merge({
-			'url': url,
-			'link': 'cancel',
-			'update': this.choices
-		}, this.options.ajaxOptions)).addEvent('onComplete', this.queryResponse.bind(this));
-	},
-
-	queryResponse: function(tree, elements) {
-		this.parent();
-		if (!elements || !elements.length) {
-			this.hideChoices();
-		} else {
-			this.choices.getChildren(this.options.choicesMatch).each(this.options.injectChoice || function(choice) {
-				var value = choice.innerHTML;
-				choice.inputValue = value;
-				this.addChoiceEvents(choice.set('html', this.markQueryValue(value)));
-			}, this);
-			this.showChoices();
-		}
-
-	}
-
-});
-
-
-/*
-Script: Autocompleter.JsonP.js
-	Implements JsonP support for the Autocompleter class.
-
-License:
-	http://www.clientcide.com/wiki/cnet-libraries#license
-*/
-
-Autocompleter.JsonP = new Class({
-
-	Extends: Autocompleter.Ajax.Json,
-
-	options: {
-		postVar: 'query',
-		jsonpOptions: {},
-//		onRequest: $empty,
-//		onComplete: $empty,
-//		filterResponse: $empty
-		minLength: 1
-	},
-
-	initialize: function(el, url, options) {
-		this.url = url;
-		this.setOptions(options);
-		this.parent(el, options);
-	},
-
-	query: function(){
-		var data = $unlink(this.options.jsonpOptions.data||{});
-		data[this.options.postVar] = this.queryValue;
-		this.jsonp = new JsonP(this.url, $merge({data: data},	this.options.jsonpOptions));
-		this.jsonp.addEvent('onComplete', this.queryResponse.bind(this));
-		this.fireEvent('onRequest', [this.element, this.jsonp, data, this.queryValue]);
-		this.jsonp.request();
-	},
-	
-	queryResponse: function(response) {
-		this.parent();
-		var data = (this.options.filter)?this.options.filter.run([response], this):response;
-		this.update(data);
-	}
-
-});
-
-/**
- * Observer - Observe formelements for changes
- *
- * @version		1.0rc3
- *
- * @license		MIT-style license
- * @author		Harald Kirschner <mail [at] digitarald.de>
- * @copyright	Author
- */
-var Observer = new Class({
-
-	Implements: [Options, Events],
-
-	options: {
-		periodical: false,
-		delay: 1000
-	},
-
-	initialize: function(el, onFired, options){
-		this.setOptions(options);
-		this.addEvent('onFired', onFired);
-		this.element = $(el) || $$(el);
-		/* Clientcide change */
-		this.boundChange = this.changed.bind(this);
-		this.resume();
-	},
-
-	changed: function() {
-		var value = this.element.get('value');
-		if ($equals(this.value, value)) return;
-		this.clear();
-		this.value = value;
-		this.timeout = this.onFired.delay(this.options.delay, this);
-	},
-
-	setValue: function(value) {
-		this.value = value;
-		this.element.set('value', value);
-		return this.clear();
-	},
-
-	onFired: function() {
-		this.fireEvent('onFired', [this.value, this.element]);
-	},
-
-	clear: function() {
-		$clear(this.timeout || null);
-		return this;
-	},
-	/* Clientcide change */
-	pause: function(){
-		$clear(this.timeout);
-		$clear(this.timer);
-		this.element.removeEvent('keyup', this.boundChange);
-		return this;
-	},
-	resume: function(){
-		this.value = this.element.get('value');
-		if (this.options.periodical) this.timer = this.changed.periodical(this.options.periodical, this);
-		else this.element.addEvent('keyup', this.boundChange);
-		return this;
-	}
-
-});
-
-var $equals = function(obj1, obj2) {
-	return (obj1 == obj2 || JSON.encode(obj1) == JSON.encode(obj2));
-};
-
-/*
-Script: AutoCompleter.Clientcide.js
-	Adds Clientcide css assets to autocompleter automatically.
-
-License:
-	http://www.clientcide.com/wiki/cnet-libraries#license
-*/
-(function(){
-	var AcClientcide = function(){
-		return {
-			options: {
-				baseHref: 'http://www.cnet.com/html/rb/assets/global/autocompleter/'
-			},
-			initialize: function() {
-				this.parent.apply(this,arguments);
-				this.writeStyle();
-			},
-			writeStyle: function(){
-				window.addEvent('domready', function(){
-					if($('AutocompleterCss')) return;
-					new Element('link', {
-						rel: 'stylesheet', 
-						media: 'screen', 
-						type: 'text/css', 
-						href: this.options.baseHref+'Autocompleter.css', 
-						id: 'AutocompleterCss'
-					}).inject(document.head);
-				}.bind(this));
-			}
-		};
-	};
-	Autocompleter.Base.refactor(AcClientcide());
-	if (Autocompleter.Ajax) {
-		["Base", "Xhtml", "Json"].each(function(c){
-			if(Autocompleter.Ajax[c]) Autocompleter.Ajax[c] = Autocompleter.Ajax[c].refactor(AcClientcide());
-		});
-	}
-	if (Autocompleter.Local) Autocompleter.Local.refactor(AcClientcide());
-	if (Autocompleter.JsonP) Autocompleter.JsonP.refactor(AcClientcide());
-})();
-
-
-/*
-Script: Lightbox.js
-	A lightbox clone for MooTools.
-
-* Christophe Beyls (http://www.digitalia.be); MIT-style license.
-* Inspired by the original Lightbox v2 by Lokesh Dhakar: http://www.huddletogether.com/projects/lightbox2/.
-* Refactored by Aaron Newton 
-
-*/
-var Lightbox = new Class({
-	Implements: [Options, Events, Modalizer],
-	binds: ['click', 'keyboardListener', 'addHtmlElements'],
-	options: {
-//	anchors: null,
-		resizeDuration: 400,
-//	resizeTransition: false,	// default transition
-		initialWidth: 250,
-		initialHeight: 250,
-		zIndex: 5000,
-		animateCaption: true,
-		showCounter: true,
-		autoScanLinks: true,
-		relString: 'lightbox',
-		useDefaultCss: true,
-		assetBaseUrl: 'http://www.cnet.com/html/rb/assets/global/slimbox/',
-		overlayStyles: {
-			opacity: 0.8
-		}
-//	onImageShow: $empty,
-//	onDisplay: $empty,
-//	onHide: $empty
-	},
-
-	initialize: function(){
-		var args = Array.link(arguments, {options: Object.type, links: Array.type});
-		this.setOptions(args.options);
-		var anchors = args.links || this.options.anchors;
-		if (this.options.autoScanLinks && !anchors) anchors = $$('a[rel^='+this.options.relString+']');
-		if(!$$(anchors).length) return; //no links!
-		this.addAnchors(anchors);
-		if(this.options.useDefaultCss) this.addCss();
-		window.addEvent('domready', this.addHtmlElements.bind(this));
-	},
-		
-	anchors: [],
-	
-	addAnchors: function(anchors){
-		$$(anchors).each(function(el){
-			if(!el.retrieve('lightbox')) {
-				el.store('lightbox', this);
-				this.attach(el);
-			}
-		}.bind(this));
-	},
-	
-	attach: function(el) {		
-		el.addEvent('click', this.click.pass(el, this));
-		this.anchors.include(el);
-	},
-
-	addHtmlElements: function(){
-		this.container = new Element('div', {
-			'class':'lbContainer'
-		}).inject(document.body);
-		this.setModalOptions({
-			elementsToHide: ''
-		});
-		this.overlay = this.layer().addClass('lbOverlay');
-		this.setModalStyle(this.options.overlayStyles);
-		this.popup = new Element('div', {
-			'class':'lbPopup'
-		}).inject(this.container);
-		this.overlay.inject(this.popup).setStyles(this.options.overlayStyles);
-		this.center = new Element('div', {
-			styles: {	
-				width: this.options.initialWidth, 
-				height: this.options.initialHeight, 
-				marginLeft: (-(this.options.initialWidth/2)),
-				display: 'none',
-				zIndex:this.options.zIndex+1
-			}
-		}).inject(this.popup).addClass('lbCenter');
-		this.image = new Element('div', {
-			'class': 'lbImage'
-		}).inject(this.center);
-		
-		this.prevLink = new Element('a', {
-			'class': 'lbPrevLink', 
-			href: 'javascript:void(0);', 
-			styles: {'display': 'none'}
-		}).inject(this.image);
-		this.nextLink = this.prevLink.clone().removeClass('lbPrevLink').addClass('lbNextLink').inject(this.image);
-		this.prevLink.addEvent('click', this.previous.bind(this));
-		this.nextLink.addEvent('click', this.next.bind(this));
-
-		this.bottomContainer = new Element('div', {
-			'class': 'lbBottomContainer', 
-			styles: {
-				display: 'none', 
-				zIndex:this.options.zIndex+1
-		}}).inject(this.popup);
-		this.bottom = new Element('div', {'class': 'lbBottom'}).inject(this.bottomContainer);
-		new Element('a', {
-			'class': 'lbCloseLink', 
-			href: 'javascript:void(0);'
-		}).inject(this.bottom).addEvent('click', this.close.bind(this));
-		this.overlay.addEvent('click', this.close.bind(this));
-		this.caption = new Element('div', {'class': 'lbCaption'}).inject(this.bottom);
-		this.number = new Element('div', {'class': 'lbNumber'}).inject(this.bottom);
-		new Element('div', {'styles': {'clear': 'both'}}).inject(this.bottom);
-		var nextEffect = this.nextEffect.bind(this);
-		this.fx = {
-			overlay: new Fx.Tween(this.overlay, {property: 'opacity', duration: 500}).set(0),
-			resize: new Fx.Morph(this.center, $extend({
-				duration: this.options.resizeDuration, 
-				onComplete: nextEffect}, 
-				this.options.resizeTransition ? {transition: this.options.resizeTransition} : {})),
-			image: new Fx.Tween(this.image, {property: 'opacity', duration: 500, onComplete: nextEffect}),
-			bottom: new Fx.Tween(this.bottom, {property: 'margin-top', duration: 400, onComplete: nextEffect})
-		};
-
-		this.preloadPrev = new Element('img');
-		this.preloadNext = new Element('img');
-	},
-	
-	addCss: function(){
-		window.addEvent('domready', function(){
-			if($('LightboxCss')) return;
-			new Element('link', {
-				rel: 'stylesheet', 
-				media: 'screen', 
-				type: 'text/css', 
-				href: this.options.assetBaseUrl + 'slimbox.css',
-				id: 'LightboxCss'
-			}).inject(document.head);
-		}.bind(this));
-	},
-
-	click: function(el){
-		link = $(el);
-		var rel = link.get('rel')||this.options.relString;
-		if (rel == this.options.relString) return this.show(link.get('href'), link.get('title'));
-
-		var j, imageNum, images = [];
-		this.anchors.each(function(el){
-			if (el.get('rel') == link.get('rel')){
-				for (j = 0; j < images.length; j++) if(images[j][0] == el.get('href')) break;
-				if (j == images.length){
-					images.push([el.get('href'), el.get('title')]);
-					if (el.get('href') == link.get('href')) imageNum = j;
-				}
-			}
-		}, this);
-		return this.open(images, imageNum);
-	},
-
-	show: function(url, title){
-		return this.open([[url, title]], 0);
-	},
-
-	open: function(images, imageNum){
-		this.fireEvent('onDisplay');
-		this.images = images;
-		this.setup(true);
-		this.top = (window.getScroll().y + (window.getSize().y / 15)).toInt();
-		this.center.setStyles({
-			top: this.top,
-			display: ''
-		});
-		this.fx.overlay.start(this.options.overlayStyles.opacity);
-		return this.changeImage(imageNum);
-	},
-
-	setup: function(open){
-		var elements = $$('object, iframe');
-		elements.extend($$(Browser.Engine.trident ? 'select' : 'embed'));
-		elements.reverse().each(function(el){
-			if (open) el.store('lbBackupStyle', el.getStyle('visibility') || 'visible');
-			var vis = (open ? 'hidden' : el.retrieve('lbBackupStyle') || 'visible');
-			el.setStyle('visibility', vis);
-		});
-		var fn = open ? 'addEvent' : 'removeEvent';
-		document[fn]('keydown', this.keyboardListener);
-		this.step = 0;
-	},
-
-	keyboardListener: function(event){
-		switch (event.code){
-			case 27: case 88: case 67: this.close(); break;
-			case 37: case 80: this.previous(); break;	
-			case 39: case 78: this.next();
-		}
-	},
-
-	previous: function(){
-		return this.changeImage(this.activeImage-1);
-	},
-
-	next: function(){
-		return this.changeImage(this.activeImage+1);
-	},
-
-	changeImage: function(imageNum){
-		this.fireEvent('onImageShow', [imageNum, this.images[imageNum]]);
-		if (this.step || (imageNum < 0) || (imageNum >= this.images.length)) return false;
-		this.step = 1;
-		this.activeImage = imageNum;
-
-		this.center.setStyle('backgroundColor', '');
-		this.bottomContainer.setStyle('display', 'none');
-		this.prevLink.setStyle('display', 'none');
-		this.nextLink.setStyle('display', 'none');
-		this.fx.image.set(0);
-		this.center.addClass('lbLoading');
-		this.preload = new Element('img', {
-			events: {
-				load: function(){
-					this.nextEffect.delay(100, this)
-				}.bind(this)
-			}
-		});
-		this.preload.set('src', this.images[imageNum][0]);
-		return false;
-	},
-
-	nextEffect: function(){
-		switch (this.step++){
-		case 1:
-			this.image.setStyle('backgroundImage', 'url('+this.images[this.activeImage][0]+')');
-			this.image.setStyle('width', this.preload.width);
-			this.bottom.setStyle('width',this.preload.width);
-			this.image.setStyle('height', this.preload.height);
-			this.prevLink.setStyle('height', this.preload.height);
-			this.nextLink.setStyle('height', this.preload.height);
-
-			this.caption.set('html',this.images[this.activeImage][1] || '');
-			this.number.set('html',(!this.options.showCounter || (this.images.length == 1)) ? '' : 'Image '+(this.activeImage+1)+' of '+this.images.length);
-
-			if (this.activeImage) $(this.preloadPrev).set('src', this.images[this.activeImage-1][0]);
-			if (this.activeImage != (this.images.length - 1)) 
-				$(this.preloadNext).set('src',  this.images[this.activeImage+1][0]);
-			if (this.center.clientHeight != this.image.offsetHeight){
-				this.fx.resize.start({height: this.image.offsetHeight});
-				break;
-			}
-			this.step++;
-		case 2:
-			if (this.center.clientWidth != this.image.offsetWidth){
-				this.fx.resize.start({width: this.image.offsetWidth, marginLeft: -this.image.offsetWidth/2});
-				break;
-			}
-			this.step++;
-		case 3:
-			this.bottomContainer.setStyles({
-				top: (this.top + this.center.getSize().y), 
-				height: 0, 
-				marginLeft: this.center.getStyle('margin-left'), 
-				display: ''
-			});
-			this.fx.image.start(1);
-			break;
-		case 4:
-			this.center.style.backgroundColor = '#000';
-			if (this.options.animateCaption){
-				this.fx.bottom.set(-this.bottom.offsetHeight);
-				this.bottomContainer.setStyle('height', '');
-				this.fx.bottom.start(0);
-				break;
-			}
-			this.bottomContainer.style.height = '';
-		case 5:
-			if (this.activeImage) this.prevLink.setStyle('display', '');
-			if (this.activeImage != (this.images.length - 1)) this.nextLink.setStyle('display', '');
-			this.step = 0;
-		}
-	},
-
-	close: function(){
-		this.fireEvent('onHide');
-		if (this.step < 0) return;
-		this.step = -1;
-		if (this.preload) this.preload.destroy();
-		for (var f in this.fx) this.fx[f].cancel();
-		this.center.setStyle('display', 'none');
-		this.bottomContainer.setStyle('display', 'none');
-		this.fx.overlay.chain(this.setup.pass(false, this)).start(0);
-		return;
-	}
-});
-window.addEvent('domready', function(){if($(document.body).get('html').match(/rel=?.lightbox/i)) new Lightbox()});
-
-
-/*
-Script: FormValidator.French.js
-	FormValidator messages in French. Thanks Miquel Hudin.
-
-License:
-	http://www.clientcide.com/wiki/cnet-libraries#license
-*/
-FormValidator.resources.FR = {
-	required:'Ce champ est obligatoire.',
-	minLength:'S\'il vous vous plat crivez au moins {minLength} caractres (vous avez crit {length} caractres).',
-	maxLength:'S\'il vous vous plat n\'crivez pas plus de {maxLength} caractres (vous avez crit {length} caractres).',
-	integer:'S\'il vous vous plat crivez un nombre entier dans ce champ. Les nombres avec des dcimals  (p.ex. 1\'25) ne sont pas permis.',
-	numeric:'S\'il vous vous plat crivez seulement des chiffres dans ce champ (p.ex. "1" ou "1\'1" ou "-1" or "-1\'1").',
-	digits:'S\'il vous vous plat crivez des nombres et des signes de ponctuation seulement dans ce champ (par exemple, un numro de tlphone avec des traits d\'union est permis).',
-	alpha:'S\'il vous vous plat crivez seulement des lettres (a-z) dans ce champ. Les espaces ou d\'autres caractres ne sont pas permis.',
-	alphanum:'S\'il vous vous plat crivez seulement des lettres (a-z) ou des chiffres (0-9) dans ce champ. Les espaces ou d\'autres caractres ne sont pas permis.',
-	dateSuchAs:'S\'il vous vous plat crivez une date correcte, comme {date}',
-	dateInFormatMDY:'S\'il vous vous plat crivez une date correcte, comme JJ/MM/AAAA (p.ex. "31/11/1999")',
-	email:'S\'il vous vous plat crivez une adresse de courrier lectronique. Par example "fred@domain.com".',
-	url:'S\'il vous vous plat crivez une URL, comme http://www.google.com.',
-	currencyDollar:'S\'il vous vous plat crivez une quantit correcte. Par example $100.00 .',
-	oneRequired:'S\'il vous vous plat slectionnez au moins une de ces options.',
-	errorPrefix: 'Erreur: ',
-	warningPrefix: 'Attention: '
-};
-
-/*
-Script: SimpleEditor.French.js
-	SimpleEditor messages in French. Thanks Miquel Hudin.
-
-License:
-	http://www.clientcide.com/wiki/cnet-libraries#license
-*/
-SimpleEditor.resources.FR = {
-	woops:'Oops',
-	nopeCtrlC:'Désolé, cette fonction ne fonctionne pas ici. Utilisez ctrl+c.',
-	nopeCtrlX:'Désolé, cette fonction ne fonctionne pas ici. Utilisez ctrl+x.',
-	linkURL:'L\'URL pour le lien',
-	linkText:'Texte du lien',
-	imgURL:'L\'URL de l\'image',
-	imgAlt:'Le titre (alt) de l\'image'
-};
-
-
-/*
-Script: Element.Delegation.js
-	Extends the Element native object to include the delegate method for more efficient event management.
-	
-	Event checking based on the work of Daniel Steigerwald.
-	License: MIT-style license.
-	Copyright: Copyright (c) 2008 Daniel Steigerwald, daniel.steigerwald.cz
-
-License:
-	http://www.clientcide.com/wiki/cnet-libraries#license
-*/
-(function(){
-	
-	var getType = function(type) {
-		var custom = Element.Events.get(type);
-		return custom ? custom.base : type;
-	};
-
-	var checkOverOut = function(el, e){
-		if (el == e.target || el.hasChild(e.target)) {
-			var related = e.relatedTarget;
-			if (related == undefined) return true;
-			if (related === false) return false;
-			return ($type(el) != 'document' && related != el && related.prefix != 'xul' && !el.hasChild(related));
-		}
-	};
-	
-	var check = function(e, test) {
-		var target = e.target;
-		var isOverOut = /^(mouseover|mouseout)$/.test(e.type);
-		var els = this.getElements(test);
-		var match = els.indexOf(target);
-		if (match >= 0) return els[match];
-		for (var i = els.length; i--; ) {
-			var el = els[i];
-			if (el == target || el.hasChild(target)) {
-				return (!isOverOut || checkOverOut(el, e)) ? el : false;
-			}
-		}
-	};
-	
-	var splitType = function(type) {
-		if (type.test(/^.*?\(.*?\)$/)) {
-			return {
-				event: type.match(/.*?(?=\()/),
-				selector: type.replace(/^.*?\((.*)\)$/,"$1")
-			}
-		}
-		return {event: type};
-	};
-	
-	var oldAddEvent = Element.prototype.addEvent,
-		oldAddEvents = Element.prototype.addEvents,
-	 	oldRemoveEvent = Element.prototype.removeEvent,
-	 	oldRemoveEvents = Element.prototype.removeEvents;
-	Element.implement({
-		//use as usual (this.addEvent('click', fn))
-		//or for delegation
-		//this.addEvent('click(div.foo)', fn)
-		addEvent: function(type, fn){
-			var splitted = splitType(type);
-			//if the type has a selector
-			if (splitted.selector) {
-				//get the delegates and the monitors
-				var monitors = this.retrieve('$moo:delegateMonitors', {});
-				//if there's not a delegate for this type already
-				if (!monitors[type]) {
-					//create a monitor that will fire the event when it occurs
-					var monitor = function(e) { 
-						var el = check.call(this, e, splitted.selector);
-						if (el) this.fireEvent(type, [e, el], 0, el);
-					}.bind(this);
-					monitors[type] = monitor;
-					//add the monitor to the element
-					//translates to this.addEvent('click', monitor);
-					//monitor just looks for clicks that match the selector
-					//and fires the event
-					//we only create one monitor for a given selector and all it does
-					//is calls fireEvent for that selector
-					//i.e. this.fireEvent('click:div.foo')
-					oldAddEvent.call(this, splitted.event, monitor);
-				}
-			}
-			return oldAddEvent.apply(this, arguments);
-		},
-		removeEvent: function(type, fn){
-			//if we're removing an event with a selector
-			var splitted = splitType(type);
-			if (splitted.selector) {
-				var events = this.retrieve('events');
-				//if there are no events with this type or
-				//if a specific fn is being removed but isn't attached, return
-				if (!events[type] || (fn && !events[type].contains(fn))) return this;
-				//if a fn is defined, remove it from the events
-				if (fn) events[type].erase(fn);
-				//else empty all the events of this type
-				else events[type].empty();
-				//if there are none left, we remove the monitor, too
-				if (events[type].length == 0) {
-					//get the monitors we've created
-					var monitors = this.retrieve('$moo:delegateMonitors', {});
-					//remove the monitor
-					oldRemoveEvent(splitted.event, monitors[type]);
-					//delete the monitor from the monitors list
-					delete monitors[type];
-				}
-				return this;
-			}
-			//otherwise do what you normally do and remove the event (no selector involved)
-			return oldRemoveEvent.apply(this, arguments);
-		},
-		//fireEvent is changed to allow a bind argument so that we can bind
-		//the method to the element in our monitor above
-		fireEvent: function(type, args, delay, bind){
-			var events = this.retrieve('events');
-			if (!events || !events[type]) return this;
-			events[type].keys.each(function(fn){
-				//added the bind||this
-				fn.create({'bind': bind||this, 'delay': delay, 'arguments': args})();
-			}, this);
-			return this;
-		}
-	});
-
-})();

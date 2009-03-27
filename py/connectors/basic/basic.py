@@ -63,9 +63,13 @@ class BasicServer(LineReceiver):
         if line[0:3] == "ASK":
             self.set_port(line)
             contact = self.api.find_contact(self.addr.host, self.client_port, 'basic')
-            if contact and contact.auto_answer:
-                self.api.notify(self, 'Contact %s:%s is now connected (it was in auto-answer mode).' % (self.addr.host, self.__class__.__name__), 'info')
-                self.accept()
+            if contact:
+                if contact.auto_answer:
+                    self.api.notify(self, 'Contact %s:%s is now connected (it was in auto-answer mode).' % (self.addr.host, self.__class__.__name__), 'info')
+                    self.accept()
+                else:
+                    self.state = WAITING
+                    self.api.notify(self, (self.addr.host, self, contact.name), 'ask')
             else:
                 self.state = WAITING
                 self.api.notify(self, (self.addr.host, self), 'ask')
@@ -100,7 +104,7 @@ class BasicServer(LineReceiver):
 
     def connectionLost(self, reason=protocol.connectionDone):
         if self.state == WAITING:
-            self.api.notify(self, 'You didn\'t answer soon enough. Connection closed.', 'ask_timeout')
+            self.api.notify(self, self.addr.host, 'ask_timeout')
 #            self.state = IDLE
         log.info('Client %s:%s disconnected. Reason: %s' % (self.addr.host, self.addr.port, reason.value))
 

@@ -7,7 +7,7 @@
 		<title>Propulseart</title>
 		<script src="jslib/mootools-1.2.1-core.js" type="text/javascript"></script>
 		<script src="jslib/mootools-1.2-more.js" type="text/javascript"></script>
-		<script src="jslib/clientcide_763.js" type="text/javascript"></script>
+		<script src="jslib/clientcide_805.js" type="text/javascript"></script>
 		<script src="jslib/utils.js" type="text/javascript"></script>
 		<n:invisible n:render="header" />
 	</head>

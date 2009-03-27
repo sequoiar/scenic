@@ -11,6 +11,7 @@ Addressbook.methods(
 		self.selected = Cookie.read('adb_selected');
 		self.selected_li = null;
 		self.new_modify = null;
+		self.ask_win = null;
 		
 		// Get elements.
         self.list = $('adb_list');
@@ -29,6 +30,8 @@ Addressbook.methods(
 		self.edit_str = $('js_adb_edit').get('text');
 		self.connect_str = $('js_adb_join').get('text');
 		self.disconnect_str = $('js_adb_unjoin').get('text');
+		self.accept_str = $('js_adb_accept').get('text');
+		self.refuse_str = $('js_adb_refuse').get('text');
 		
 		// Set translations.	TODO: #maybe call notify_controllers('init')
 		self.edit_btn.value = self.edit_str;
@@ -213,6 +216,55 @@ Addressbook.methods(
 		self.port_fld.value = contact.port;
 	},
 
+	// show prompt asking to accept an invitation to connect 
+	function ask(self, connection, caption, body) {
+		dbug.info(caption + body);
+		// TODO: add support for many requests at the same time
+		if (self.ask_win) {
+			self.ask_win.hide();
+		}
+		self.ask_win = new StickyWin.PointyTip(caption, body, {
+			relativeTo: self.list,
+			offset: {x: 10, y: -52},
+			zIndex: 404004,
+	//	    width: 238,
+			pointyOptions: {
+			    closeButton: false,
+				buttons: [{
+					text: self.accept_str,
+					onClick: function(){
+						this.hide();
+						self.callRemote('rc_accept', self.ask_win.connection);
+					}
+				},
+				{
+					text: self.refuse_str,
+					onClick: function(){
+						this.hide();
+						self.callRemote('rc_refuse', self.ask_win.connection);
+					}
+				}]
+			},
+		    point: 10
+		});
+		self.ask_win.connection = connection;
+	},
+
+	// show prompt telling that the invitation is now over 
+	function ask_timeout(self, caption, body) {
+		if (self.ask_win) {
+			self.ask_win.hide(); // TODO: should dispose also
+		}
+		self.ask_win = new StickyWin.PointyTip(caption, body, {
+			relativeTo: self.list,
+			offset: {x: 10, y: -52},
+			zIndex: 404004,
+//		    width: 238, // TODO: should modify the css and remove the css hack in clientcide StickyWin.UI.Pointy
+		    closeButton: false,
+		    point: 10
+		});
+	},
+
 
 
 	///////////////////////////////////////////////////////////////
@@ -272,6 +324,7 @@ Addressbook.methods(
 			// notify the controllers of this selection
 			self.notify_controllers('contact_selected');
 			notify('adb', 'selection', self.selected);
+			
 		}
 	},
 

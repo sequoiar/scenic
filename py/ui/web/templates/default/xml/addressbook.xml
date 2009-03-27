@@ -44,4 +44,6 @@
 	<span n:render="i18n" id="js_adb_edit" class="adb js_str">Edit</span>
 	<span n:render="i18n" id="js_adb_join" class="adb js_str">Connect</span>
 	<span n:render="i18n" id="js_adb_unjoin" class="adb js_str">Disconnect</span>
+	<span n:render="i18n" id="js_adb_accept" class="adb js_str">Accept</span>
+	<span n:render="i18n" id="js_adb_refuse" class="adb js_str">Refuse</span>
 </div>

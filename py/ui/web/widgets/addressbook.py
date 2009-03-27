@@ -31,6 +31,10 @@ class Addressbook(Widget):
     """
     """
         
+    def __init__(self, api, template):
+        Widget.__init__(self, api, template)
+        self.connections = {}
+        
     def rc_get_list(self):
         self.api.get_contacts(self)
         return False
@@ -59,8 +63,9 @@ class Addressbook(Widget):
         log.debug('GCOrigin: %s - Data: %s' % (origin, data))
         if origin is self:
             contact_info = data.__dict__.copy()
-            del contact_info['connection']
-            self.callRemote('showContact', contact_info)
+            if contact_info.has_key('connection'):  # TODO: deal properly with auto created contact
+                del contact_info['connection']
+            self.callRemote('show_contact_info', contact_info)
 
     def rc_start_connection(self, name):
         contact = self.api.get_contact(name)
@@ -88,6 +93,47 @@ class Addressbook(Widget):
             port = ''
         self.callRemote('status', data['name'], '%s with %s' % (data['msg'], data['name']),
                         '%s with %s%s. Error: %s' % (data['msg'], data['address'], port, data['exception']))
+
+    def cb_ask(self, origin, data):
+        log.debug('ASKOrigin: %s - Data: %s' % (origin, data))
+        if len(data) > 2:
+            caption = '%s is inviting you.<br /><em>(address: %s)</em>' % (data[2], data[0])
+        else:
+            caption = '%s is inviting you.' % data[0]
+        body = 'Do you accept?'
+        if self.connections.has_key(data[0]):
+            log.warning('%s was already in connections!?!' % data[0])
+        else:
+            self.connections[data[0]] = data[1]
+        self.callRemote('ask', data[0], caption, body)
+    
+    def cb_ask_timeout(self, origin, data):
+        log.debug('ASKTOOrigin: %s - Data: %s' % (origin, data))
+        if self.connections.has_key(data):
+            del self.connections[data]
+        caption = 'You didn\'t answer soon enough.'
+        body = 'Connection closed.'
+        self.callRemote('ask_timeout', caption, body)
+    
+    def rc_accept(self, connection):
+        if self.connections.has_key(connection):
+            self.api.accept_connection(self, self.connections[connection])
+            del self.connections[connection]
+        return False
+    
+    def rc_refuse(self, connection):
+        if self.connections.has_key(connection):
+            self.api.refuse_connection(self, self.connections[connection])
+            del self.connections[connection]
+        return False
+    
+    def rc_stop_connection(self, name):
+        contact = self.api.get_contact(name)
+        if isinstance(contact, Exception):
+            self.callRemote('error', contact.message)
+        else:
+            self.api.stop_connection(self, contact)
+        return False
     
     def cb_info(self, origin, data):
         log.debug('IOrigin: %s - Data: %s' % (origin, data))
