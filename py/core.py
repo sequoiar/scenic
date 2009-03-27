@@ -54,14 +54,15 @@ class MivilleConfiguration(object):
     def __init__(self, dictionary=None):
         self.verbose = False
         # network
-        #self.com_chan_port = 37054
-        #self.telnet_port = 14444
+        self.com_chan_port = 37054
+        self.telnet_port = 14444
         self.connector_port = 2222
-        #self.web_port = 8080
+        self.web_port = 8080
         #self.midi_port = 44000
-        #self.ipcp_port = 999999999999
+        # self.ipcp_port = 999999999999
         self.port_numbers_offset = 0
         self.listen_to_interfaces = '' # means all interfaces
+        self.ui_network_interfaces = ['127.0.0.1']
         # ['127.0.0.1'] # default is only local host
         # files
         #self.miville_home = "~/.miville"
@@ -95,7 +96,7 @@ class Core(Subject):
         Subject.__init__(self)
         self.config = config_object
         self.uis = None
-        self.com_chan_port = 37054
+        self.com_chan_port = self.config.com_chan_port + self.config.port_numbers_offset 
         self.api = api.ControllerApi(self.notify)
         self.api.core = self 
         # much important is to start the devices modules
@@ -112,8 +113,6 @@ class Core(Subject):
         # and makes the application crash. 
         # maybe something more elegant could be done.
         self.connectors = connectors.load_connectors(self.api)
-        if len(sys.argv) > 1:
-            self.com_chan_port += 1
         com_chan.start(connectors.connections, self.com_chan_port)
         self.api._start(self)
         
@@ -124,14 +123,28 @@ class Core(Subject):
         self.uis = common.load_modules(common.find_modules('ui'))
         count = 0
         for mod in self.uis:
+            if mod.__name__.find('cli') != -1:
+                port = self.config.telnet_port + self.config.port_numbers_offset
+            elif mod.__name__.find('web') != 1:
+                port = self.config.web_port + self.config.port_numbers_offset
+            else: 
+                log.error('unknown user interface')
             try:
-                if len(sys.argv) > 1:
-                    mod.start(self, int(sys.argv[1]) + count)
-                    count += 10
-                else:
-                    mod.start(self)
-            except:
-                log.error('Unable to start UI module %s.' % mod.__name__)
+                mod.start(self, port)
+            except Exception, e:
+                log.error('Unable to start UI module %s. %s' % (mod.__name__, e)) # traceback please
+        
+        # self.uis = common.load_modules(common.find_modules('ui'))
+        # count = 0
+        # for mod in self.uis:
+        #     try:
+        #         if len(sys.argv) > 1:
+        #             mod.start(self, int(sys.argv[1]) + count)
+        #             count += 10
+        #         else:
+        #             mod.start(self)
+        #     except Exception, e:
+        #         log.error('Unable to start UI module %s. %s' % (mod.__name__, e)) # traceback please
 
     def find_engines(self):
         """

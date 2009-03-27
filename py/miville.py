@@ -19,6 +19,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Starting point of miville from the command line.
+"""
+
 from core import *
 from optparse import OptionParser
 __version__ = "0.1 alpha"
@@ -35,19 +39,27 @@ if __name__ == '__main__':
     parser.add_option("-o", "--offset", dest="offset", default=0, type="int", \
         help="Specifies an offset for port numbers to be changed..")
     parser.add_option("-i", "--interfaces", type="string", action="append", \
-        help="""Listens only to those interfaces IP. Use this flag many times if needed. Example: -i 127.0.0.1 -i 10.10.10.55""")
+        help="""Communication channel listen only to those network interfaces IP. Use this flag many times if needed. Default is all. Example: -i 127.0.0.1 -i 10.10.10.55""")
+    parser.add_option("-I", "--ui-interfaces", type="string", action="append", \
+        help="""User interfaces listen only to those network interfaces IP. Use this flag many times if needed. Default is localhost only. Example: -i 127.0.0.1 -i 10.10.10.55""")
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", \
         help="Sets the output to be verbose.")
     (options, args) = parser.parse_args()
     
     # configure miville
     config = MivilleConfiguration()
+    # network interfaces for the communication channel
     if type(options.interfaces) is list:
-        # print "INTERFACES: %s" % (options.interfaces)
         if type(config.listen_to_interfaces) is list:
-            config.listen_to_interfaces.append(options.interfaces) # a list
+            config.listen_to_interfaces.append(options.interfaces)
         else:
             config.listen_to_interfaces = options.interfaces
+    # network interfaces for the user interfaces
+    if type(options.ui_interfaces) is list:
+        if type(config.ui_network_interfaces) is list:
+            config.ui_network_interfaces.append(options.ui_interfaces)
+        else:
+            config.ui_network_interfaces = options.ui_interfaces
 
     log.start()
     log.info('Starting Miville...')
@@ -56,7 +68,7 @@ if __name__ == '__main__':
         if terminal.find:
             hostname = socket.gethostname()
             sys.stdout.write(']2;miville on ' + hostname + '')
-
+    
     try:
         main(config)
         reactor.run()
