@@ -28,10 +28,11 @@
 #include <map>
 #include <vector>
 #include <sstream>
-
+#include <iostream>
 /// container class for variable types used by MapMsg 
 class StrIntFloat
 {
+friend std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
     public:
         StrIntFloat()
             : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(),key_(){}
@@ -65,6 +66,7 @@ class StrIntFloat
         std::string key_;
 };
 
+std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
 
 class MapMsg;
 namespace Parser

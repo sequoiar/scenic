@@ -171,7 +171,7 @@ short pof::run(int argc, char **argv)
             std::string videoDevice = ""; 
 
             if (options["videodevice"]) 
-                videoDevice = (std::string) options["videodevice"]; 
+                videoDevice = static_cast<std::string>(options["videodevice"]); 
 
             int videoBitrate = 3000000;
             if (options["videobitrate"]) 
@@ -196,7 +196,7 @@ short pof::run(int argc, char **argv)
 
             std::string audioLocation = "";
             if (options["audiodevice"])
-                audioLocation = (std::string) options["audiodevice"];
+                audioLocation = static_cast<std::string>(options["audiodevice"]);
 
             AudioSourceConfig aConfig(options["audiosource"], audioLocation, numChannels);
             aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], options["audioport"]);
@@ -209,9 +209,9 @@ short pof::run(int argc, char **argv)
         playback::start();
 
         if (!disableVideo)
-            assert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + (int)options["videoport"], videofactory::MSG_ID, vTx->getCaps()));
+            assert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + static_cast<int>(options["videoport"]), videofactory::MSG_ID, vTx->getCaps()));
         if (!disableAudio)
-            assert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + (int)options["audioport"], audiofactory::MSG_ID, aTx->getCaps()));
+            assert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + static_cast<int>(options["audioport"]), audiofactory::MSG_ID, aTx->getCaps()));
 
         BLOCK();
         assert(playback::isPlaying() or playback::quitted());
@@ -224,15 +224,15 @@ short pof::run(int argc, char **argv)
 
 void onExit(void)
 {
-    LOG_INFO("\x1b[r\x1b[10BBuilt on " << __DATE__ << " at " << __TIME__);
+    ;//LOG_INFO("\x1b[r\x1b[10BBuilt on " << __DATE__ << " at " << __TIME__);
 }
 
 
 int main(int argc, char **argv)
 {
     int ret = 0;
-    atexit (onExit);
-    LOG_INFO("\x1b[0;10r\x1b[2JBuilt on " << __DATE__ << " at " << __TIME__);
+    //atexit (onExit);
+    //LOG_INFO("\x1b[0;10r\x1b[2JBuilt on " << __DATE__ << " at " << __TIME__);
     try {
         set_handler();
         ret = pof::run(argc, argv);
@@ -241,7 +241,7 @@ int main(int argc, char **argv)
     {
         ret = 1;
     }
-    LOG_INFO("\x1b[r\x1b[10BBuilt on " << __DATE__ << " at " << __TIME__);
+    //LOG_INFO("\x1b[r\x1b[10BBuilt on " << __DATE__ << " at " << __TIME__);
     return ret;
 }
 

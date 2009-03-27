@@ -23,6 +23,26 @@
 #include "mapMsg.h"
 static MapMsg::Subscriber* pf = 0;
 
+std::ostream& operator<< (std::ostream& os, const StrIntFloat& var)
+{
+    switch(var.type_)
+    {
+        case 'n':   
+            THROW_ERROR("Var has no type");
+            break;
+        case 'i':
+            os << var.i_;
+            break;
+        case 's':
+            os << var.s_;
+            break;
+        case 'f':
+            os << var.f_;
+            break;
+    }
+    return os;
+}
+
 MapMsg::Subscriber::Subscriber()
 {
     pf = this;
