@@ -326,7 +326,7 @@ def start(api):
     :param api: miville's api
     """
     global PORT
-    PORT = api.core.config.connector_port + api.core.config.port_numbers_offset 
+    PORT = api.core.config.connector_port + api.core.config.port_numbers_offset
     #if len(sys.argv) > 1:
     #    PORT += 1
     server_factory = BasicServerFactory()

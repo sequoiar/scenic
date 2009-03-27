@@ -1469,7 +1469,7 @@ class CliView(Observer):
         self.controller.remote = data[1]
 
     def _ask_timeout(self, origin, data):
-        self.write(data)
+        self.write('You didn\'t answer soon enough to %s. Connection closed.' % data)
         self.controller.block = False
         self.controller.remote = None
 
@@ -1519,7 +1519,7 @@ class CliView(Observer):
             }, 
             "error")
         """
-        if type(data) is dict:
+        if isinstance(data, dict):
             msg = "Error: \n"
             # mandatory arguments
             for k in data.keys():

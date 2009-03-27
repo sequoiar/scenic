@@ -126,7 +126,7 @@ class ControllerApi(object):
         """
         Wraps reactor.listenTCP
         """
-        if type(interfaces) is not list:
+        if not isinstance(interfaces, list):
             # '' mean all interfaces
             interface = interfaces
             log.debug("listenTCP:%s %s %s %s" % (port, factory, listen_queue_size, interface))

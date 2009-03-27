@@ -49,14 +49,14 @@ if __name__ == '__main__':
     # configure miville
     config = MivilleConfiguration()
     # network interfaces for the communication channel
-    if type(options.interfaces) is list:
-        if type(config.listen_to_interfaces) is list:
+    if isinstance(options.interfaces, list):
+        if isinstance(config.listen_to_interfaces, list):
             config.listen_to_interfaces.append(options.interfaces)
         else:
             config.listen_to_interfaces = options.interfaces
     # network interfaces for the user interfaces
-    if type(options.ui_interfaces) is list:
-        if type(config.ui_network_interfaces) is list:
+    if isinstance(options.ui_interfaces, list):
+        if isinstance(config.ui_network_interfaces, list):
             config.ui_network_interfaces.append(options.ui_interfaces)
         else:
             config.ui_network_interfaces = options.ui_interfaces

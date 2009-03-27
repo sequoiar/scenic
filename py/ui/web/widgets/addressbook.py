@@ -112,7 +112,7 @@ class Addressbook(Widget):
         if self.connections.has_key(data):
             del self.connections[data]
         caption = 'You didn\'t answer soon enough.'
-        body = 'Connection closed.'
+        body = 'Connection closed with %s.' % data
         self.callRemote('ask_timeout', caption, body)
     
     def rc_accept(self, connection):
