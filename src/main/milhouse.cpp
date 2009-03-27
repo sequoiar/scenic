@@ -231,7 +231,7 @@ void onExit(void)
 int main(int argc, char **argv)
 {
     int ret = 0;
-    //atexit (onExit);
+    atexit (onExit);
     //LOG_INFO("\x1b[0;10r\x1b[2JBuilt on " << __DATE__ << " at " << __TIME__);
     try {
         set_handler();
