@@ -5,7 +5,7 @@ import sys
 
 from twisted.internet import reactor 
 
-import core as miville
+import core #  as miville
 from utils.observer import Observer
 from ui.cli import CliView
 import devices
@@ -90,19 +90,19 @@ def get_color(c=None):
 
 updates = []
 last = None
-core = None
+# core = None
 api = None
 me = None
 view = None
 
 def main():
-    global core, api, me, view
-    miville.main(MivilleConfiguration())
+    global api, me, view
+    core.main(core.MivilleConfiguration())
     go(0.5)
-    core = miville.core
-    api = miville.core.api
+    # core = miville.core
+    api = core.core.api
     me = IPythonController()
-    view = IPythonView(core, me)
+    view = IPythonView(core.core, me)
     #print "iMiville is ready for anything."
 
 if __name__ == '__main__':
