@@ -60,6 +60,9 @@ if __name__ == '__main__':
             config.ui_network_interfaces.append(options.ui_interfaces)
         else:
             config.ui_network_interfaces = options.ui_interfaces
+       
+    # set the port offset        
+    config.port_numbers_offset = options.offset
 
     log.start()
     log.info('Starting Miville...')
