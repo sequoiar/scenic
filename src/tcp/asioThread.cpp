@@ -47,14 +47,15 @@ using boost::asio::buffer;
 using boost::asio::placeholders::error;
 using boost::asio::placeholders::bytes_transferred;
 
+
 class tcp_session
 {
     public:
         tcp_session(io_service& io_service, QueuePair& queue)
             : socket_(io_service),queue_(queue), welcome_(),
-            t_(io_service, boost::posix_time::millisec(1))
+            t_(io_service, boost::posix_time::millisec(1)),msg_str()
         {
-            t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
+        t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
         }
 
         tcp::socket& socket()
@@ -65,9 +66,9 @@ class tcp_session
         void start()
         {
             welcome_ = "welcome.\nREADY:\n"; 
-                async_write(socket_, buffer(welcome_),
-                        boost::bind(&tcp_session::write_cb, this,
-                            error));
+            async_write(socket_, buffer(welcome_),
+                    boost::bind(&tcp_session::write_cb, this,
+                        error));
         }
 
         void read_cb(const error_code& err,
@@ -92,6 +93,7 @@ class tcp_session
             }
             else
             {
+                t_.cancel();
                 delete this;
             }
         }
@@ -103,28 +105,34 @@ class tcp_session
                 socket_.async_read_some(buffer(data_, max_length),
                         boost::bind(&tcp_session::read_cb, this, 
                             error, bytes_transferred));
+                t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1));
+                t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
             }
             else
             {
+                t_.cancel();
                 delete this;
             }
         }
 
-        void handle_timer(const error_code& /*error*/)
+        void handle_timer(const error_code& err)
         {
-            t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1));
-            t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
-            MapMsg msg;
-            std::string msg_str;
-            msg = queue_.timed_pop(1);
-            if(!msg.cmd().empty())
+            if (!err)
             {
-                Parser::stringify(msg, msg_str);
-#if 0
-                async_write(socket_, buffer(msg_str),
-                        boost::bind(&tcp_session::write_cb, this,
-                            error));
-#endif
+                MapMsg msg;
+                msg = queue_.timed_pop(1);
+                if(!msg.cmd().empty())
+                {
+                    Parser::stringify(msg, msg_str);
+                    async_write(socket_, buffer(msg_str),
+                            boost::bind(&tcp_session::write_cb, this,
+                                error));
+                }
+                else
+                {
+                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1));
+                    t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
+                }
             }
         }
     private:
@@ -134,6 +142,7 @@ class tcp_session
         QueuePair& queue_;
         std::string welcome_;
         boost::asio::deadline_timer t_;
+        std::string msg_str;
 };
 
 class tcp_server
@@ -143,14 +152,14 @@ class tcp_server
             : io_service_(io_service),
             acceptor_(io_service, tcp::endpoint(tcp::v4(), port)), queue_(queue),
             t_(io_service, boost::posix_time::seconds(1))
-        {
-            tcp_session* new_tcp_session = new tcp_session(io_service_,queue_);
-            acceptor_.async_accept(new_tcp_session->socket(),
-                    boost::bind(&tcp_server::handle_accept, this, new_tcp_session, 
-                        error));
-            t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
-            //t_.async_wait(tcp_server::handle_timer);
-        }
+    {
+        tcp_session* new_tcp_session = new tcp_session(io_service_,queue_);
+        acceptor_.async_accept(new_tcp_session->socket(),
+                boost::bind(&tcp_server::handle_accept, this, new_tcp_session, 
+                    error));
+        t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
+        //t_.async_wait(tcp_server::handle_timer);
+    }
 
 
 
@@ -193,11 +202,11 @@ class udp_server
         udp_server(io_service& io_service, short port)
             : io_service_(io_service),
             socket_(io_service, udp::endpoint(udp::v4(), port)), sender_endpoint_()
-        {
-            socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_, 
-                    boost::bind(&udp_server::handle_receive_from, this, 
-                        error, bytes_transferred));
-        }
+    {
+        socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_, 
+                boost::bind(&udp_server::handle_receive_from, this, 
+                    error, bytes_transferred));
+    }
 
         void handle_receive_from(const error_code& err,
                 size_t bytes_recvd)
@@ -246,7 +255,7 @@ int asio_thread::main()
         using namespace std; // For atoi.
         tcp_server s(io_service, port_,queue_);
         udp_server us(io_service, port_);
-    
+
         io_service.run();
 #endif
     }
