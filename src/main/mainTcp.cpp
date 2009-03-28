@@ -37,7 +37,7 @@ class MainModule
 
         MainModule(bool send, int port)
             : tcpThread_(MsgThreadFactory::Tcp(port, true)),
-              gstThread_(MsgThreadFactory::Gst(send)), asio_thread_(new asio_thread()),
+              gstThread_(MsgThreadFactory::Gst(send)), asio_thread_(new asio_thread(port)),
               func(gstThread_), msg_count(0){}
 
         ~MainModule()
