@@ -30,6 +30,10 @@
 class asio_thread : public MsgThread 
 {
     int main();
+    int port_;
+public:
+    asio_thread(int port): port_(port){}
+
 };
 
 #endif //_ASIO_THREAD_H_

@@ -29,7 +29,8 @@
 
 #include <cstdlib>
 #include <iostream>
-
+#include "util.h"
+#include "parser.h"
 #include "asioThread.h"
 
 #ifdef HAVE_BOOST_ASIO
@@ -50,8 +51,10 @@ class tcp_session
 {
     public:
         tcp_session(io_service& io_service, QueuePair& queue)
-            : socket_(io_service),queue_(queue), welcome_()
+            : socket_(io_service),queue_(queue), welcome_(),
+            t_(io_service, boost::posix_time::millisec(1))
         {
+            t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
         }
 
         tcp::socket& socket()
@@ -72,15 +75,20 @@ class tcp_session
         {
             if (!err)
             {
-                static char c('a');
-                c++;
-                MapMsg m("data");
-                data_[0] = c;
-                m["str"] = data_;
-                queue_.push(m);
+                MapMsg mapMsg;
+                if(Parser::tokenize(data_, mapMsg))
+                    queue_.push(mapMsg);
+                else
+                    LOG_WARNING("Bad Msg Received.");
+
+                socket_.async_read_some(buffer(data_, max_length),
+                        boost::bind(&tcp_session::read_cb, this, 
+                            error, bytes_transferred));
+#if 0
                 async_write(socket_, buffer(data_, bytes_transferred),
                         boost::bind(&tcp_session::write_cb, this,
                             error));
+#endif
             }
             else
             {
@@ -102,12 +110,30 @@ class tcp_session
             }
         }
 
+        void handle_timer(const error_code& /*error*/)
+        {
+            t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1));
+            t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
+            MapMsg msg;
+            std::string msg_str;
+            msg = queue_.timed_pop(1);
+            if(!msg.cmd().empty())
+            {
+                Parser::stringify(msg, msg_str);
+#if 0
+                async_write(socket_, buffer(msg_str),
+                        boost::bind(&tcp_session::write_cb, this,
+                            error));
+#endif
+            }
+        }
     private:
         tcp::socket socket_;
         enum { max_length = 1024 };
         char data_[max_length];
         QueuePair& queue_;
         std::string welcome_;
+        boost::asio::deadline_timer t_;
 };
 
 class tcp_server
@@ -149,9 +175,7 @@ class tcp_server
         {
             t_.expires_at(t_.expires_at() + boost::posix_time::seconds(1));
             t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
-            MapMsg msg;
-            msg = queue_.timed_pop(1);
-            if(msg.cmd() == "quit")
+            if(MsgThread::isQuitted())
                 THROW_END_THREAD("bye");
         }
 
@@ -220,8 +244,8 @@ int asio_thread::main()
         io_service io_service;
 
         using namespace std; // For atoi.
-        tcp_server s(io_service, 1111,queue_);
-        udp_server us(io_service, 1111);
+        tcp_server s(io_service, port_,queue_);
+        udp_server us(io_service, port_);
     
         io_service.run();
 #endif
