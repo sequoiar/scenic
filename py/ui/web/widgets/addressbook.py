@@ -19,6 +19,9 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 
 
+# System import
+import time
+
 #App imports
 from ui.web.web import Widget, expose
 from utils import log
@@ -79,11 +82,19 @@ class Addressbook(Widget):
         log.debug('SCOrigin: %s - Data: %s' % (origin, data))
         if origin is self:
             if data.has_key('exception'):
-                self.callRemote('status', '%s with %s. Error: %s' % (data['msg'], data['name'], data['exception']))
+                self.callRemote('update_status',
+                                data['name'],
+                                '%s with %s' % (data['msg'], data['name']),
+                                '%s with %s%s. Error: %s' % (data['msg'],
+                                                             data['address'],
+                                                             port,
+                                                             data['exception']))
             elif not data.has_key('name'):
                 self.write(data['msg'])
         if not data.has_key('exception') and data.has_key('name'):
-            self.callRemote('status', '%s with %s...' % (data['msg'], data['name']))
+            self.callRemote('update_status',
+                            data['name'],
+                            '%s with %s...' % (data['msg'], data['name']))
 
     def cb_connection_failed(self, origin, data):
         log.debug('CFOrigin: %s - Data: %s' % (origin, data))
@@ -91,21 +102,26 @@ class Addressbook(Widget):
             port = ':%s' % data['port']
         else:
             port = ''
-        self.callRemote('status', data['name'], '%s with %s' % (data['msg'], data['name']),
-                        '%s with %s%s. Error: %s' % (data['msg'], data['address'], port, data['exception']))
+        self.callRemote('update_status',
+                        data['name'],
+                        '%s with %s' % (data['msg'], data['name']),
+                        '%s with %s%s. Error: %s' % (data['msg'],
+                                                     data['address'],
+                                                     port,
+                                                     data['exception']))
 
     def cb_ask(self, origin, data):
         log.debug('ASKOrigin: %s - Data: %s' % (origin, data))
-        if len(data) > 2:
-            caption = '%s is inviting you.<br /><em>(address: %s)</em>' % (data[2], data[0])
+        if data.has_key('name'):
+            caption = '%s is inviting you.<br /><em>(address: %s)</em>' % (data['name'], data['address'])
         else:
-            caption = '%s is inviting you.' % data[0]
+            caption = '%s is inviting you.' % data['address']
         body = 'Do you accept?'
-        if self.connections.has_key(data[0]):
-            log.warning('%s was already in connections!?!' % data[0])
+        if self.connections.has_key(data['address']):
+            log.warning('%s was already in connections!?!' % data['address'])
         else:
-            self.connections[data[0]] = data[1]
-        self.callRemote('ask', data[0], caption, body)
+            self.connections[data['address']] = data['connection']
+        self.callRemote('ask', data['address'], caption, body)
     
     def cb_ask_timeout(self, origin, data):
         log.debug('ASKTOOrigin: %s - Data: %s' % (origin, data))
@@ -113,7 +129,10 @@ class Addressbook(Widget):
             del self.connections[data]
         caption = 'You didn\'t answer soon enough.'
         body = 'Connection closed with %s.' % data
-        self.callRemote('ask_timeout', caption, body)
+        self.callRemote('notification', caption, body)
+        
+    def cb_answer(self, origin, data):
+        self.callRemote('update_status', data['name'], data['msg'])
     
     def rc_accept(self, connection):
         if self.connections.has_key(connection):
@@ -136,8 +155,31 @@ class Addressbook(Widget):
         return False
     
     def cb_info(self, origin, data):
-        log.debug('IOrigin: %s - Data: %s' % (origin, data))
-#        self.callRemote('status', data)
+        if isinstance(data, dict):
+            if data.has_key('context'):
+                moment = time.strftime('%X')
+                if data['context'] == 'auto-answer':
+                    self.callRemote('notification',
+                                    data['msg'],
+                                    'with %s at %s.' % (data['name'], moment))
+                    self.callRemote('update_status',
+                                    data['name'],
+                                    'Connected',
+                                    'Connection made by auto-answer at %s.' % moment)
+                elif data['context'] == 'connection_closed':
+                    if data.has_key('name'):
+                        contact = data['name']
+                    else:
+                        contact = data['address']
+                    self.callRemote('notification',
+                                    data['msg'],
+                                    'by %s at %s.' % (contact, moment))
+                    self.callRemote('update_status',
+                                    data['name'],
+                                    'Connection closed',
+                                    '%s by %s at %s.' % (data['msg'], contact, moment))
+        else:
+            log.debug('IOrigin: %s - Data: %s' % (origin, data))
 
     def rc_add_contact(self, name, address, port):
         self.api.add_contact(self, name, address, port)

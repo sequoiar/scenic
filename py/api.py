@@ -675,15 +675,15 @@ class ControllerApi(object):
                 # 'context' key could be removed, since we know the 
                 # 'key' arg is 'start_connection'
                 self.notify(caller, {'name':contact.name, 
-                                 'address':contact.address,
-                                 'msg':'Trying to connect',
-                                 'context':'connection'}) 
+                                     'address':contact.address,
+                                     'msg':'Trying to connect',
+                                     'context':'connection'})
             except ConnectionError, err:
                 self.notify(caller, {'name':contact.name, 
-                                 'address':contact.address,
-                                 'exception':'%s' % err,
-                                 'msg':'Connection failed',
-                                 'context':'connection'})
+                                     'address':contact.address,
+                                     'exception':'%s' % err,
+                                     'msg':'Connection failed',
+                                     'context':'connection'})
         else:
             self.notify(caller, {'msg':'No contact selected',
                                  'context':'connection'})

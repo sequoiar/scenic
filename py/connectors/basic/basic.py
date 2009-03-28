@@ -22,9 +22,11 @@ between 2 running miville software. (with a contact)
 
 It is the session initialization routine. 
 
-The client takes the initiative. (ASK) The server receives it and responds with ACCEPT or REFUSE.
+The client takes the initiative. (ASK) The server receives it and responds
+with ACCEPT or REFUSE.
 
-The connector.basic package is a good example of a simple way to establish a connection between two miville software. 
+The connector.basic package is a good example of a simple way to establish
+a connection between two miville software. 
 """
 
 # System imports
@@ -50,7 +52,7 @@ WAITING = 1
 
 class BasicServer(LineReceiver):
     """
-    The session initialization protocol for miville. - server side
+    The session initialization protocol for miville - server side
     """
     def __init__(self):
         self.api = None
@@ -65,14 +67,26 @@ class BasicServer(LineReceiver):
             contact = self.api.find_contact(self.addr.host, self.client_port, 'basic')
             if contact:
                 if contact.auto_answer:
-                    self.api.notify(self, 'Contact %s:%s is now connected (it was in auto-answer mode).' % (self.addr.host, self.__class__.__name__), 'info')
+                    self.api.notify(self,
+                                    {'name':contact.name,
+                                     'address':self.addr.host,
+                                     'msg':'Now connected (by auto-answer)',
+                                     'context':'auto-answer'},
+                                    'info')
                     self.accept()
                 else:
                     self.state = WAITING
-                    self.api.notify(self, (self.addr.host, self, contact.name), 'ask')
+                    self.api.notify(self,
+                                    {'address':self.addr.host,
+                                     'connection':self,
+                                     'name':contact.name},
+                                    'ask')
             else:
                 self.state = WAITING
-                self.api.notify(self, (self.addr.host, self), 'ask')
+                self.api.notify(self,
+                                {'address':self.addr.host,
+                                 'connection':self},
+                                'ask')
         elif line[0:4] == "STOP":
             try:    #TODO: to this correctly
                 self.api.stop_streams(self)
@@ -86,8 +100,18 @@ class BasicServer(LineReceiver):
                     contact.connection.cleanup()
                     if contact.auto_created:
                         self.api.delete_contact(self, contact.name)
-#            self.state = IDLE
-            self.api.notify(self, 'Connection was stopped by the other side (%s)' % self.addr.host, 'answer')
+                self.api.notify(self,
+                                {'name':contact.name,
+                                 'address':contact.address,
+                                 'msg':'Connection has been closed',
+                                 'context':'connection_closed'},
+                                'info')
+            else:
+                self.api.notify(self,
+                                {'address':self.addr.host,
+                                 'msg':'Connection has been closed',
+                                 'context':'connection_closed'},
+                               'info')
         else:
             log.info('Bad command receive from %s.' % self.addr.host)
 

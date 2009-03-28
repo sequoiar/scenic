@@ -81,6 +81,7 @@ Addressbook.methods(
 	// So put the least dependants at the top and more dependants at the bottom.
 	function notify_controllers(self, event){
 		self.upd_list(event);
+		self.upd_status(event);
 		self.upd_edit_btn(event);
 		self.upd_connect_btn(event);
 		self.upd_fields(event);
@@ -251,7 +252,7 @@ Addressbook.methods(
 	},
 
 	// show prompt telling that the invitation is now over 
-	function ask_timeout(self, caption, body) {
+	function notification(self, caption, body) {
 		if (self.ask_win) {
 			self.ask_win.hide(); // TODO: should dispose also
 		}
@@ -273,8 +274,9 @@ Addressbook.methods(
 		StickyWin.alert('Error', msg);
 	},
 
-	function status(self, contact, msg, details) {
-		// check if owner is null
+	// Update the connection status of contacts.
+	function update_status(self, contact, msg, details) {
+		// check if contact exist in the list and get it
 		var owner = self.list.getElement('li[name=' + contact + ']')
 		if (owner) {
 			owner.set('status', msg);
@@ -288,12 +290,21 @@ Addressbook.methods(
 			dbug.info(details);
 		}
 		if (contact == self.selected) {
-			self.status.set('text', msg);
-			if (details == null) {
-				self.status.set('title', '');
-			} else {
-				self.status.set('title', details);
-			}
+			self.notify_controllers('update_status');
+		}
+	},
+
+	// Update the connection status line.
+	function upd_status(self, event) {
+		// list of events that "status" should react to
+		if (['contact_selected', 'update_status'].contains(event)) {
+			self.status.set('text', self.selected_li.get('status'));
+			self.status.set('title', self.selected_li.get('error'));
+		} else if (['add_contact',
+					'contact_unselected',
+					'save_contact'].contains(event)) {
+			self.status.set('text', '');
+			self.status.set('title', '');
 		}
 	},
 
@@ -441,8 +452,6 @@ Addressbook.methods(
 				
 			// TODO: update
 //			self.joinState(state);
-			self.status.set('text', self.selected_li.get('status'));
-			self.status.set('title', self.selected_li.get('error'));
 			self.cleanFields();
 		} else if (['add_contact', 'contact_unselected'].contains(event)) {
 			self.unselect_contact();
@@ -662,23 +671,6 @@ Addressbook.methods(
 			
 		}
 	}
-
-
-	//////////////////////////////////////////////////////////////////
-
-
-/*	function joinState(self, state) {
-		if (state == 0) {
-			self.join_btn.disabled = false;							
-			self.join_btn.value = self.join_str;							
-		} else if (state > 0 && state < 3) {
-			self.join_btn.disabled = false;
-			self.join_btn.value = self.unjoin_str;							
-		} else {
-			self.join_btn.disabled = true;
-			self.join_btn.value = self.join_str;							
-		}
-	},*/
 
 );
 

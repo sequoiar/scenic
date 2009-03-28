@@ -6,7 +6,8 @@ EVENTS
 -edit_contact
 -add_contact
 -save_contact
--remove_contact*
+-remove_contact* -> do a contact_selected or contact_unselected
+-status_changed
 
 
 CONTROLLERS
@@ -17,3 +18,4 @@ CONTROLLERS
 -fields
 -add
 -remove
+-status

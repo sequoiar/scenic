@@ -1494,10 +1494,22 @@ class CliView(Observer):
             self.write('%s with %s...' % (data['msg'], data['name']))
 
     def _info(self, origin, data):
-        self.write(data)
+        if isinstance(data, dict):
+            if data.has_key('context'):
+                if data['context'] == 'auto-answer':
+                    self.write('%s with %s.' % (data['msg'], data['name']))
+                if data['context'] == 'connection_closed':
+                    if data.has_key('name'):
+                        contact = data['name']
+                    else:
+                        contact = data['address']
+                    self.write('%s by %s.' % (data['msg'], contact))
+        else:
+            self.write(data)
     
     def _connection_failed(self, origin, data):
-        self.write('%s. %s:%s %s Are you both connected to the internet ?' % (data['msg'], data['address'], data['port'], data['exception']))
+        self.write('%s for %s:%s %s.'
+                   % (data['msg'], data['address'], data['port'], data['exception']))
     
     def _error(self, origin, data):
         """
@@ -1529,7 +1541,7 @@ class CliView(Observer):
             self.write(data)
 
     def _answer(self, origin, data):
-        self.write('\n' + data)
+        self.write('\n%s by %s.' (data['msg'], data['name']))
 
     def _connectionMade(self, origin, data):
         self.write(data[0])

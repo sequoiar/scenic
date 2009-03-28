@@ -97,7 +97,9 @@ class Connection(object):
 #            port = com_chan.PORT
         self.remote_com_chan_port = int(port)
         self._accepted()
-        self.api.notify(self, 'The invitation has been accepted by %s. (%s)' % (self.contact.name, self.contact.address), 'answer')
+        self.api.notify(self, {'name':self.contact.name,
+                               'address':self.contact.address,
+                               'msg':'The invitation has been accepted'},'answer')
         self.setup()
 
     def _accepted(self):
@@ -105,7 +107,9 @@ class Connection(object):
 
     def refused(self):
         self._refused()
-        self.api.notify(self, 'The invitation to %s (%s) was refused.' % (self.contact.name, self.contact.address), 'answer')
+        self.api.notify(self, {'name':self.contact.name,
+                               'address':self.contact.address,
+                               'msg':'The invitation was refused'},'answer')
         self.cleanup()
 
     def _refused(self):
@@ -113,7 +117,9 @@ class Connection(object):
 
     def timeout(self):
         self.cleanup()
-        self.api.notify(self, 'Timeout, the other side didn\'t respond soon enough.', 'answer')
+        self.api.notify(self, {'name':self.contact.name,
+                               'address':self.contact.address,
+                               'msg':'Timeout, we got no answer'},'answer')
 
     def connection_failed(self, err=None):
         self.cleanup()
@@ -156,9 +162,12 @@ class Connection(object):
 
     def not_attached(self, client):
         log.error('Could not start the communication channel. Closing connection')
-        self.api.notify(self,
-                    'Connection failed. Address: %s | Port: %s' % (self.contact.address, self.contact.port),
-                    'info')
+        self.api.notify(self, {'address':self.contact.address, 
+                               'port':self.contact.port,
+                               'name':self.contact.name,
+                               'exception':'Could not start the communication channel. Closing the connection.',
+                               'msg':'Connection failed',
+                               'context':'connection'}, 'connection_failed')
         self.stop()
 
     def com_chan_started_client(self):
