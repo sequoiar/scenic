@@ -25,6 +25,25 @@
 
 #include "tcp/asioThread.h"
 
+class Logger
+    : public Log::Subscriber
+{
+    public:
+        Logger(MsgThread& tcp)
+            : queue_(tcp.getQueue()){}
+        QueuePair& queue_;
+        void operator()(LogLevel&, std::string& msg);
+};
+
+
+void Logger::operator()(LogLevel& level, std::string& msg)
+{
+    MapMsg m("log");
+    m["level"] = level;
+    m["msg"] = msg;
+    queue_.push(m);
+}
+
 /** Main command line entry point
  * launches the threads and dispatches
  * MapMsg between the threads
@@ -38,7 +57,8 @@ class MainModule
         MainModule(bool send, int port)
             : tcpThread_(MsgThreadFactory::Tcp(port, true)),
               gstThread_(MsgThreadFactory::Gst(send)), asio_thread_(new asio_thread(port)),
-              func(gstThread_), msg_count(0){}
+              func(gstThread_), msg_count(0)
+        {}
 
         ~MainModule()
         {
@@ -72,16 +92,17 @@ bool MainModule::run()
 //            THROW_ERROR("asioThread not running");
         QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
-        QueuePair &asio_queue = asio_thread_->getQueue();
+//        QueuePair &tcp_queue = asio_thread_->getQueue();
 
+        Logger logger_(*tcpThread_);
         while(!signalFlag())
         {
             MapMsg tmsg = tcp_queue.timed_pop(2000);
             MapMsg gmsg = gst_queue.timed_pop(2000);
-            MapMsg amsg = asio_queue.timed_pop(2);
+            //MapMsg amsg = asio_queue.timed_pop(2);
 
-            if(amsg.cmd() == "data")
-                LOG_DEBUG(std::string(amsg["str"]));
+            //if(amsg.cmd() == "data")
+            //    LOG_DEBUG(std::string(amsg["str"]));
 
             if (!gmsg.cmd().empty())
                 tcp_queue.push(gmsg);

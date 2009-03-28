@@ -26,26 +26,19 @@
 #include <string.h>
 
 class TcpLog
-    : public Log::Subscriber
+   // : public Log::Subscriber
 {
     public:
-        TcpLog(TcpThread& tcp)
-            : tcp_(tcp){}
-        TcpThread& tcp_;
-        void operator()(LogLevel&, std::string& msg);
+        TcpLog(){}
+        void operator()(LogLevel&, std::string&){}
+        void hold(){}
+        void enable(){}
 };
 
-
-void TcpLog::operator()(LogLevel& level, std::string& msg)
-{
-    MapMsg m("log");
-    m["level"] = level;
-    m["msg"] = msg;
-    tcp_.send(m);
-}
+std::auto_ptr<TcpLog> lf_(new TcpLog());
 
 TcpThread::TcpThread(int inport, bool logF)            
-: serv_(inport), logFlag_(logF), lf_(new TcpLog(*this))
+: serv_(inport), logFlag_(logF)
 {
 }
 

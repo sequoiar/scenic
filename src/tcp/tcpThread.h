@@ -42,7 +42,6 @@ class TcpThread
 
         TcpServer serv_;
         bool logFlag_;
-        std::auto_ptr<Log::Subscriber> lf_;
 
         ///No Copy Constructor
         TcpThread(const TcpThread& );
