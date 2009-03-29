@@ -692,14 +692,21 @@ class ControllerApi(object):
         if contact == None:
             contact = self.adb.get_current()
         if contact and contact.name in self.adb.contacts:
-            result = connectors.stop_connection(contact)
-            self.notify(caller, result, 'info')
+            try:
+                connectors.stop_connection(contact)
+                self.notify(caller, {'msg':'Connection stopped',
+                                     'name':contact.name})
+            except ConnectionError, err:
+                self.notify(caller, {'msg':'Cannot stop connection',
+                                     'name':contact.name,
+                                     'exception':'%s' % err})
         else:
-            self.notify(caller, 'Cannot stop connection. No valid contact selected.', 'info')
+            self.notify(caller, {'msg':'Cannot stop connection',
+                                 'exception':'No contact selected'})
 
     def accept_connection(self, caller, connection):
         connection.accept()
-        self.notify(caller, 'Begining to receive...', 'info')
+        self.notify(caller, 'Now connected.', 'info')
 
     def refuse_connection(self, caller, connection):
         connection.refuse()

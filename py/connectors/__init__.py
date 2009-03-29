@@ -134,9 +134,9 @@ class Connection(object):
         if self.contact.state > DISCONNECTED and self.contact.state < DISCONNECTING:
             self.contact.state = DISCONNECTING
             self._stop()
-            return 'Connection with %s stopped.' % self.contact.name
+#            return 'Connection with %s stopped.' % self.contact.name
         else:
-            return 'Cannot disconnect, not connected.'
+            raise ConnectionError, 'There is no connection'
 
     def _stop(self):
         raise NotImplementedError, '_stop() method not implemented for this connector: %s.' % self.contact.connector
@@ -223,8 +223,6 @@ class Connection(object):
         except KeyError:
             pass
 
-    def __del__(self):
-        log.debug("__del__")
 
 def create_connection(contact, api):
     """

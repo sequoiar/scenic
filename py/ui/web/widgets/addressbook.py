@@ -90,7 +90,7 @@ class Addressbook(Widget):
                                                              port,
                                                              data['exception']))
             elif not data.has_key('name'):
-                self.write(data['msg'])
+                self.callRemote('error', data['msg'])
         if not data.has_key('exception') and data.has_key('name'):
             self.callRemote('update_status',
                             data['name'],
@@ -146,6 +146,20 @@ class Addressbook(Widget):
             del self.connections[connection]
         return False
     
+    def cb_stop_connection(self, origin, data):
+        if origin is self and data.has_key('exception'):
+            if data.has_key('name'):
+                self.callRemote('error',
+                                '%s with %s. Reason: %s.' % (data['msg'],
+                                                             data['name'],
+                                                             data['exception']))
+            else:
+                self.callRemote('error',
+                                '%s. Reason: %s.' % (data['msg'],
+                                                     data['exception']))
+        if not data.has_key('exception'):
+            self.callRemote('update_status', data['name'], data['msg'])
+        
     def rc_stop_connection(self, name):
         contact = self.api.get_contact(name)
         if isinstance(contact, Exception):
