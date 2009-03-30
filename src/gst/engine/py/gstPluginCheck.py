@@ -20,6 +20,9 @@
 # along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
 #
 
+""" Checks this host to ensure all gstreamer plugins needed by milhouse
+are installed """
+
 import sys
 
 try:
@@ -27,36 +30,81 @@ try:
     pygst.require('0.10')
     import gst
 except ImportError:
-    print "import gst failed, gst-python must be installed before running this script"
+    print "import failed, please install gst-python"
     sys.exit(0)
 
-GST_PLUGINS = ['level', 'audioconvert', 'alsasink', 'pulsesink', 
-            'decodebin', 'capsfilter', 'dvdemux', 'queue', 'ffmpegcolorspace', 
-            'x264enc', 'ffdec_h264', 'ffdec_h263', 'ffenc_h263', 'ffenc_mpeg4', 
-            'ffdec_mpeg4', 'vorbisenc', 'vorbisdec', 'lame', 'mad', 'glupload', 
-            'glimagesink', 'interleave', 'gstrtpbin', 'rtph264pay', 'rtph264depay', 
-            'rtph263pay', 'rtph263depay', 'rtpmp4vpay', 'rtpmp4vdepay', 
-            'rtpL16pay', 'rtpL16depay', 'rtpmpapay', 'rtpmpadepay', 'udpsrc', 'udpsink', 
-            'xvimagesink', 'ximagesink', 'dvdec', 'audiotestsrc', 'filesrc', 'alsasrc', 
-            'jackaudiosrc', 'dv1394src', 'pulsesrc', 'jackaudiosink', 'alsasink', 'pulsesink', 
-            'videotestsrc', 'v4l2src', 'rtpvorbispay', 'rtpvorbisdepay', 'deinterlace2']
+GST_PLUGINS = [
+            'level', 
+            'audioconvert', 
+            'alsasink', 
+            'pulsesink', 
+            'decodebin', 
+            'capsfilter', 
+            'dvdemux', 
+            'queue', 
+            'ffmpegcolorspace', 
+            'x264enc', 
+            'ffdec_h264', 
+            'ffdec_h263', 
+            'ffenc_h263', 
+            'ffenc_mpeg4', 
+            'ffdec_mpeg4', 
+            'vorbisenc', 
+            'vorbisdec', 
+            'lame', 
+            'mad', 
+            'glupload',
+            'glimagesink', 
+            'interleave', 
+            'gstrtpbin', 
+            'rtph264pay', 
+            'rtph264depay', 
+            'rtph263pay', 
+            'rtph263depay', 
+            'rtpmp4vpay', 
+            'rtpmp4vdepay', 
+            'rtpL16pay', 
+            'rtpL16depay', 
+            'rtpmpapay', 
+            'rtpmpadepay', 
+            'udpsrc', 
+            'udpsink', 
+            'xvimagesink', 
+            'ximagesink', 
+            'dvdec', 
+            'audiotestsrc', 
+            'filesrc', 
+            'alsasrc', 
+            'jackaudiosrc', 
+            'dv1394src', 
+            'pulsesrc', 
+            'jackaudiosink', 
+            'alsasink', 
+            'pulsesink', 
+            'videotestsrc', 
+            'v4l2src', 
+            'rtpvorbispay', 
+            'rtpvorbisdepay', 
+            'deinterlace2'
+            ]
 
-missingPlugins = []
+MISSING_PLUGINS = []
 
 for plug in GST_PLUGINS:
     if gst.element_factory_find(plug) is None: 
         print "Error: plugin " + plug + " is NOT installed"
-        missingPlugins.append(plug)
+        MISSING_PLUGINS.append(plug)
     else:
         print plug + " installed"
 
 print "-------------------------------"
-if missingPlugins == []:
+if MISSING_PLUGINS == []:
     print "All necessary plugins installed"
 else:
     print "The following gstreamer plugins need to be installed: "
-    for plug in missingPlugins:
+    for plug in MISSING_PLUGINS:
         print plug
-    print "You may have to install the corresponding development headers (i.e. lib<MODULE>-dev) " 
+    print "You may have to install the corresponding development headers \
+    (i.e. lib<MODULE>-dev)" 
     print "before building the missing gstreamer plugins"
         
