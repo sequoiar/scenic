@@ -106,15 +106,16 @@ def install_dir(filename, dirname=None):
     filename = to_utf(filename).strip()
     dirname = to_utf(dirname).strip()
     if not filename:
-        raise InstallFileError, 'File name <%s> is not valid.' % filename
+        raise InstallFileError, 'File name <%s> is not valid.' % (filename)
     if not dirname:
-        raise InstallFileError, 'Directory name <%s> is not valid.' % dirname
+        raise InstallFileError, 'Directory name <%s> is not valid.' % (dirname)
     dirpath = os.path.join(os.environ['HOME'], dirname)
     if not os.path.isdir(dirpath):
         try:
             os.makedirs(dirpath)
+            log.info('creating directory %s' % (dirpath))
         except:
-            log.warning('Could not create the directory %s.' % dirpath)
+            log.warning('Could not create the directory %s.' % (dirpath))
             raise InstallFileError, 'Could not create the directory %s.' % dirpath
     return os.path.join(dirpath, filename)
      

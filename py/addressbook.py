@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# Sropulpof
-# # # # # # Copyright (C) 2008 Société des arts technologiques (SAT)
+# 
+# Miville
+# Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -11,17 +11,17 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# Sropulpof is distributed in the hope that it will be useful,
+# Miville is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof. If not, see <http:#www.gnu.org/licenses/>.
-"""
-This module deal with the Address Book and its contacts.
-"""
+# along with Miville. If not, see <http://www.gnu.org/licenses/>.
 
+"""
+This module deals with the address book and its contacts.
+"""
 
 # System imports
 try:
@@ -43,7 +43,6 @@ from errors import AddressBookError, AddressBookNameError
 from connectors.states import DISCONNECTED, CONNECTED 
 
 log = log.start('debug', 1, 0, 'adb')
-
 
 
 class AddressBook(object):
@@ -263,8 +262,9 @@ class AddressBook(object):
         """
         try:
             adb_file = open(self.filename, 'r')
+            log.info("Opening address book file %s in read mode." % (self.filename))
         except IOError:
-            log.info('Address Book file %s not found.' % self.filename)
+            log.warning('Address Book file %s not found.' % self.filename)
         else:
             serialized = False
             version = re.findall('v(\d+)\.(\d+)', adb_file.readline())
@@ -276,7 +276,7 @@ class AddressBook(object):
                     try:
                         self.contacts = unjelly(eval(adb_file.read().replace('\n', '').replace('\t', '')))
                     except:
-                        log.warning('Unable to read the Address Book file %s. Bad format.' % self.filename)
+                        log.error('Unable to read the Address Book file %s. Bad format.' % self.filename)
                     else:
                         serialized = True
             else:
@@ -284,7 +284,7 @@ class AddressBook(object):
                 try:
                     self.contacts = pickle.load(adb_file)
                 except:
-                    log.warning('Unable to read the Address Book file %s. Bad format.' % self.filename)
+                    log.error('Unable to read the Address Book file %s. Bad format.' % self.filename)
                 else:
                     serialized = True
             if serialized:
@@ -306,8 +306,9 @@ class AddressBook(object):
         if self.contacts:
             try:
                 adb_file = open(self.filename, 'w')
+                log.info("Opening address book file %s in write mode." % (self.filename))
             except:
-                log.warning('Could not open the Address Book file %s.' % self.filename)
+                log.error('Could not open the Address Book file %s in write mode.' % self.filename)
                 raise AddressBookError, 'Could not open the Address Book file %s.' % self.filename
             else:
                 # make a copy of contacts dict to remove the connection attribute
