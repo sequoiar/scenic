@@ -48,7 +48,7 @@ os.system(cmd)
 
 #TC-1 Access Interface
 
-class Test_001_TC1_Access_Interface(testing.TelnetBaseTest):
+class Test_TC1_Access_Interface(testing.TelnetBaseTest):
    
 
     def test_01_yes(self):
@@ -57,7 +57,7 @@ class Test_001_TC1_Access_Interface(testing.TelnetBaseTest):
 
 
 
-class Test_002_TC2_List_Contacts(testing.TelnetBaseTest):
+class Test_TC2_List_Contacts(testing.TelnetBaseTest):
 
     
     def test_01_list_contacts_empty(self): 
@@ -88,7 +88,7 @@ class Test_002_TC2_List_Contacts(testing.TelnetBaseTest):
         time.sleep(2)
 
 
-class Test_003_TC_3_Select_Contacts(testing.TelnetBaseTest):
+class Test_TC3_Select_Contacts(testing.TelnetBaseTest):
 
     def test_01_select_contact(self): 
         self.tst("contacts --add contact1 10.10.10.10","Contact added")
@@ -101,7 +101,7 @@ class Test_003_TC_3_Select_Contacts(testing.TelnetBaseTest):
         time.sleep(2)             
        
 
-class Test_004_Add_Contacts(testing.TelnetBaseTest):
+class Test_TC4_Add_Contacts(testing.TelnetBaseTest):
 
     def test_01_add_contact(self): 
         self.tst("contacts --add contact1 10.10.10.10","Contact added")
@@ -122,7 +122,7 @@ class Test_004_Add_Contacts(testing.TelnetBaseTest):
         
     
       
-class Test_005_Delete_Contacts(testing.TelnetBaseTest): 
+class Test_TC5_Delete_Contacts(testing.TelnetBaseTest): 
     def test_01_select_contact(self):   
         self.tst("contacts --add  contact1 10.10.10.10","Contact added")
         self.tst("contacts --select contact1","Contact selected")       
@@ -135,13 +135,13 @@ class Test_005_Delete_Contacts(testing.TelnetBaseTest):
 
 
 
-class Test_006_TC7_Load_default_settings(testing.TelnetBaseTest): 
+class Test_TC6_Load_default_settings(testing.TelnetBaseTest): 
     def test_01_load_settings(self):   
         self.tst("s --load","Settings loaded")
         self.tst("s -x","GLOBAL SETTINGS:")        
         time.sleep(2)
 
-class Test_007_Modify_Contacts(testing.TelnetBaseTest): 
+class Test_TC7_Modify_Contacts(testing.TelnetBaseTest): 
     
     def test_01_modify_selected_name(self):
         self.tst("contacts --add  contact1 10.10.10.10","Contact added")
@@ -178,7 +178,7 @@ class Test_007_Modify_Contacts(testing.TelnetBaseTest):
         time.sleep(2)
 
 
-class Test_008_Duplicate_contact(testing.TelnetBaseTest): 
+class Test_TC8_Duplicate_contact(testing.TelnetBaseTest): 
     def test_01_duplicate_selected(self):
         self.tst("contacts --add  test1 10.10.10.10","Contact added")
         self.tst("contacts --select test1","Contact selected")        
@@ -191,7 +191,17 @@ class Test_008_Duplicate_contact(testing.TelnetBaseTest):
         self.sleep()
         
 
-class Test_09_Establish_transmission(testing.TelnetBaseTest): 
+class Test_TC9_Join(testing.TelnetBaseTest): 
+
+    def test_01_join(self): 
+        
+        self.tst("contacts --select  bloup","Contact selected")
+        self.tst("j -s ", "")
+
+
+
+class Test_TC_10_Automatic_connection(testing.TelnetBaseTest): 
+     
     def test_01_create_remote_contact(self):   
         stdin, stdout, stderr = os.popen3("ssh bloup")
         
@@ -202,12 +212,7 @@ class Test_09_Establish_transmission(testing.TelnetBaseTest):
         stdout.close()
         stderr.close()
 
-    def test_02_join(self): 
-        
-        self.tst("contacts --select  bloup","Contact selected")
-        self.tst("j -s ", "")
-
-    def test_03_stream(self):
+    def test_02_stream(self):
         self.tst("streams --start bloup", "")
         time.sleep(50)
     
