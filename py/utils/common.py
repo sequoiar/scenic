@@ -38,6 +38,8 @@ from i18n import to_utf
 
 log = log.start('debug', 1, 0, 'common')
 
+# this path is overriden by the core at startup !
+MIVILLE_HOME = '.sropulpof'
 
 def get_def_name(level=2):
     """
@@ -91,12 +93,16 @@ def find_callbacks(obj, prefix=None):
                 callbacks[attr[1:]] = getattr(obj, attr)
     return callbacks
 
-def install_dir(filename, dirname='.sropulpof'):
+def install_dir(filename, dirname=None):
     """
     Return the complete path.
     (home directory + the application directory + the filename)
     Check before if the directory exist and try to create it if not.
     """
+    global MIVILLE_HOME
+
+    if dirname is None:
+        dirname = MIVILLE_HOME 
     filename = to_utf(filename).strip()
     dirname = to_utf(dirname).strip()
     if not filename:

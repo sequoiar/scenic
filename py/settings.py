@@ -67,6 +67,10 @@ from twisted.internet import reactor
 
 log = log.start('debug', 1, 0, 'settings')
 
+# These file names are overriden by Miville's Core !
+PRESETS_FILENAME = "presets.sets"
+SETTINGS_FILENAME = "settings.sets"
+
 # All settings with id under 10000 are presets. Those with ID over
 # 10000 are user settings. (changed by the user)
 first_global_id = 10000
@@ -246,8 +250,11 @@ class Settings(object):
         Default location of this file is ~/.sropulpof/presets.sets
         If not present, it loads presets.sets
         """
-        presets_file_name       = install_dir("presets.sets")
-        user_settings_file_name = install_dir("settings.sets")
+        global PRESETS_FILENAME
+        global SETTINGS_FILENAME
+
+        presets_file_name       = install_dir(PRESETS_FILENAME) #"presets.sets")
+        user_settings_file_name = install_dir(SETTINGS_FILENAME) # "settings.sets")
         
         # settings are saved as tuple()
         presets = {}

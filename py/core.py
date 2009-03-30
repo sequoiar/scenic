@@ -52,7 +52,7 @@ class MivilleConfiguration(object):
     This class is not actually used yet.
     """
     def __init__(self, dictionary=None):
-        self.verbose = False
+        self.verbose = False # useless so far
         # network
         self.com_chan_port = 37054
         self.telnet_port = 14444
@@ -63,11 +63,12 @@ class MivilleConfiguration(object):
         # self.ipcp_port = 999999999999
         self.port_numbers_offset = 0
         self.listen_to_interfaces = '' # means all interfaces
-        self.ui_network_interfaces = ['127.0.0.1']
-        # ['127.0.0.1'] # default is only local host
+        self.ui_network_interfaces = ['127.0.0.1'] # default is only local host
         # files
-        #self.miville_home = "~/.miville"
+        self.miville_home = ".sropulpof" # TODO: change for .miville # prefixed by ~/
         self.addressbook_filename = 'sropulpof.adb' # TODO: "contacts.txt"
+        self.settings_presets_filename = "presets.sets"
+        self.settings_filename = "settings.sets"
         
         # update the attributes to match passed dict
         if dictionary is not None:
@@ -108,6 +109,8 @@ class Core(Subject):
         self.adb = addressbook.AddressBook(self.config.addressbook_filename, self.api)
         self.engines = self.find_engines()
         # create the settings collection
+        settings.PRESETS_FILENAME = self.config.settings_presets_filename
+        settings.SETTINGS_FILENAME = self.config.settings_filename
         self.settings = settings.Settings()
         #self.curr_setting = self.settings.select()
         # TODO: causes a couldn't listen error if another miville runs on the same port. 
