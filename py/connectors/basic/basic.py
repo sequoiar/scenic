@@ -101,8 +101,8 @@ class BasicServer(LineReceiver):
             if contact:
                 if contact.connection:
                     contact.connection.cleanup()
-                    if contact.auto_created:
-                        self.api.delete_contact(self, contact.name)
+                if contact.auto_created:
+                    self.api.delete_contact(self, contact.name)
                 self.api.notify(self,
                                 {'name':contact.name,
                                  'address':contact.address,

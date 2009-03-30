@@ -26,8 +26,10 @@ import time
 from ui.web.web import Widget, expose
 from utils import log
 from utils.i18n import to_utf
+from errors import *
 
 log = log.start('debug', 1, 0, 'web_adb')
+
 
 
 class Addressbook(Widget):
@@ -54,7 +56,10 @@ class Addressbook(Widget):
         sorted_keys = sorted(contacts_dict, key=unicode.lower)
         for key in sorted_keys:
             contact = contacts_dict[key]
-            adb.append((contact.name, contact.state))
+            adb.append({'name':contact.name,
+                        'state':contact.state,
+                        'auto_answer':contact.auto_answer,
+                        'auto_created':contact.auto_created})
         log.info('receive update: %r' % self)
         self.callRemote('update_list', adb)
         
@@ -65,10 +70,13 @@ class Addressbook(Widget):
     def cb_get_contact(self, origin, data):
         log.debug('GCOrigin: %s - Data: %s' % (origin, data))
         if origin is self:
-            contact_info = data.__dict__.copy()
-            if contact_info.has_key('connection'):  # TODO: deal properly with auto created contact
-                del contact_info['connection']
-            self.callRemote('show_contact_info', contact_info)
+            if isinstance(data, AddressBookError):
+                log.info('%s' % data);
+            else:
+                contact_info = data.__dict__.copy()
+                if contact_info.has_key('connection'):  # TODO: deal properly with auto created contact
+                    del contact_info['connection']
+                self.callRemote('show_contact_info', contact_info)
 
     def rc_start_connection(self, name):
         contact = self.api.get_contact(name)
@@ -213,5 +221,13 @@ class Addressbook(Widget):
             self.callRemote('error', data.message)
 
     cb_add_contact = cb_modify_contact
+    
+    def rc_keep_contact(self, name, new_name):
+        self.api.save_client_contact(self, name, new_name)
+        return False
+    
+    def cb_save_client_contact(self, origin, data):
+        if origin is self and isinstance(data, Exception):
+            self.callRemote('error', '%s' % data)
         
     expose(locals())

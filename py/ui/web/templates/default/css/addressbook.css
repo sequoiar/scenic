@@ -82,6 +82,11 @@ div.button_disabled:hover {
 	width: 0px;
 }
 
+li.auto_created {
+	font-style: italic;
+	color: #414141;
+}
+
 /* THE PART LINE */
 
 

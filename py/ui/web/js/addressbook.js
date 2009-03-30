@@ -28,6 +28,7 @@ Addressbook.methods(
 		// Get string translations. TODO: (maybe we can do this automatically?)
 		self.save_str = $('js_adb_save').get('text');
 		self.edit_str = $('js_adb_edit').get('text');
+		self.keep_str = $('js_adb_keep').get('text');
 		self.connect_str = $('js_adb_join').get('text');
 		self.disconnect_str = $('js_adb_unjoin').get('text');
 		self.accept_str = $('js_adb_accept').get('text');
@@ -90,12 +91,20 @@ Addressbook.methods(
 	},
 
 	// Return the state contact li element or null. 
-	function get_selected_state(self) {
+	function get_selected_attr(self, attr) {
 		if (self.selected_li) {
-			return self.selected_li.get('state');
+			return self.selected_li.get(attr);
 		} else {
-			return null;
+			return undefined;
 		}
+	},
+
+	// save the name of the selected contact. 
+	function update_selected(self, name) {
+		self.selected = name;
+		Cookie.write('adb_selected', self.selected, {
+			duration: 365
+		});
 	},
 
 
@@ -113,19 +122,23 @@ Addressbook.methods(
 		var previous = null;
 		// current selected li element
 		var selected = null;
+		self.selected_li = null;
 		
 		// list of contact names coming from the server
 		var server_list = contacts.map(function(item, index){
-			return item[0];
+			return item['name'];
 		});
 		
 		// list of contact names on the client side
 		var client_list = self.list.getChildren('li').get('name');
-		
 		// remove on the client side deleted contacts  
 		client_list.each(function(item){
 			if (item && !server_list.contains(item)) {
 				self.list.getElement('li[name=' + item + ']').dispose();
+				// update the selected contact to null if we delete the selected one
+				if (item == self.selected) {
+					self.update_selected(null);
+				}
 			}
 		});
 		
@@ -137,18 +150,29 @@ Addressbook.methods(
 			counter += 1;
 			
 			// update info
-			if (client_list.contains(item[0])) {
-				var li = self.list.getElement('li[name=' + item[0] + ']');
-				li.set('state', item[1]);
+			if (client_list.contains(item['name'])) {
+				var li = self.list.getElement('li[name=' + item['name'] + ']');
+				li.set('state', item['state']);
+				li.set('auto_answer', (item['auto_answer'] ? 'true' : ''));
+				li.set('auto_created', (item['auto_created'] ? 'true' : ''));
+				if (item['auto_created']) {
+					if (!li.hasClass('auto_created')) {
+						li.addClass('auto_created');
+					}
+				} else {
+					li.removeClass('auto_created');
+				}
 				
 			// add the new contact
 			} else {
 				var li = new Element('li', {
-					'class': 'color_selectable',
+					'class': (item['auto_created'] ? 'auto_created color_selectable' : 'color_selectable'),
 					'html': '',
-					'text': item[0],
-					'name': item[0],
-					'state': item[1],
+					'text': item['name'],
+					'name': item['name'],
+					'state': item['state'],
+				    'auto_answer': (item['auto_answer'] ? 'true' : ''),
+					'auto_created': (item['auto_created'] ? 'true' : ''),
 					'status': '',
 					'error': '',
 					'events': {
@@ -188,14 +212,14 @@ Addressbook.methods(
 			var conn_state = li.getChildren()[0];
 			conn_state.removeClass('spinner_small');
 			conn_state.removeClass('conn_connected');
-			if (item[1] > 0 && item[1] < 3) {
+			if (item['state'] > 0 && item['state'] < 3) {
 				conn_state.addClass('spinner_small');
-			} else if (item[1] == 3) {
+			} else if (item['state'] == 3) {
 				conn_state.addClass('conn_connected');
 			}
 			
 			// keep the current selected li element
-			if (item[0] == self.selected) {
+			if (item['name'] == self.selected) {
 				self.selected_li = li;
 			}
 		})
@@ -210,6 +234,26 @@ Addressbook.methods(
 		return false;
 	},
 	
+	// Update the connection status of contacts.
+	function update_status(self, contact, msg, details) {
+		// check if contact exist in the list and get it
+		var owner = self.list.getElement('li[name=' + contact + ']')
+		if (owner) {
+			owner.set('status', msg);
+			if (details == null) {
+				owner.set('error', '');
+			} else {
+				owner.set('error', details);
+				dbug.info(details);
+			}
+			if (contact == self.selected) {
+				self.notify_controllers('update_status');
+			}
+		} else {
+			dbug.info('NO owner - Contact: ' + contact);
+		}
+	},
+
 	// show selected contact info coming from the server in fields 
 	function show_contact_info(self, contact) {
 		self.name_fld.value = contact.name;
@@ -274,40 +318,6 @@ Addressbook.methods(
 		StickyWin.alert('Error', msg);
 	},
 
-	// Update the connection status of contacts.
-	function update_status(self, contact, msg, details) {
-		// check if contact exist in the list and get it
-		var owner = self.list.getElement('li[name=' + contact + ']')
-		if (owner) {
-			owner.set('status', msg);
-		} else {
-			dbug.info('Owner: ' + owner + ' Contact: ' + contact);
-		}
-		if (details == null) {
-			owner.set('error', '');
-		} else {
-			owner.set('error', details);
-			dbug.info(details);
-		}
-		if (contact == self.selected) {
-			self.notify_controllers('update_status');
-		}
-	},
-
-	// Update the connection status line.
-	function upd_status(self, event) {
-		// list of events that "status" should react to
-		if (['contact_selected', 'update_status'].contains(event)) {
-			self.status.set('text', self.selected_li.get('status'));
-			self.status.set('title', self.selected_li.get('error'));
-		} else if (['add_contact',
-					'contact_unselected',
-					'save_contact'].contains(event)) {
-			self.status.set('text', '');
-			self.status.set('title', '');
-		}
-	},
-
 
 	//////////////////////
 	/* Call from Client */
@@ -327,39 +337,27 @@ Addressbook.methods(
 			self.selected_li = contact;
 			self.new_modify = null;
 			// save the selected contact name
-			self.selected = contact.get('name');
-			Cookie.write('adb_selected', self.selected, {
-				duration: 365
-			});
+			self.update_selected(contact.get('name'));
 			
 			// notify the controllers of this selection
 			self.notify_controllers('contact_selected');
 			notify('adb', 'selection', self.selected);
-			
 		}
 	},
 
 	// no contact is selected
-	function contact_unselected(self) {
-		// pass if it's the same contact (but not if in edit mode)
-		if (contact != self.selected_li || self.edit_btn.value == self.save_str) {
-			self.selected_li = contact;
-			self.new_modify = null;
-			// save the selected contact name
-			self.selected = contact.get('name');
-			Cookie.write('adb_selected', self.selected, {
-				duration: 365
-			});
-			
-			// notify the controllers of this selection
-			self.notify_controllers('contact_selected');
-			notify('adb', 'selection', self.selected);
-		}
+	function contact_unselect(self) {
+		self.notify_controllers('contact_unselected');
+		self.selected_li = null;
+		self.update_selected(null);
+		
+		// notify the controllers of this selection
+		notify('adb', 'selection', self.selected);
 	},
 
 	// edit contact info
 	function edit_contact(self) {
-		if (self.get_selected_state() == 0) {
+		if (self.get_selected_attr('state') == 0) {
 			self.new_modify = 'modify';
 			self.notify_controllers('edit_contact');
 		}
@@ -384,6 +382,10 @@ Addressbook.methods(
 							self.name_fld.value,
 							self.address_fld.value,
 							self.port_fld.value);
+		} else if (self.new_modify == 'keep') {
+			self.callRemote('rc_keep_contact',
+							self.selected,
+							self.name_fld.value);
 		}
 		// update the selected name
 		self.selected = self.name_fld.value;
@@ -391,6 +393,12 @@ Addressbook.methods(
 		self.notify_controllers('save_contact');
 	},
 
+	// keep an auto-created contact
+	function keep_contact(self) {
+		self.new_modify = 'keep';
+		self.notify_controllers('keep_contact');
+	},
+	
 	// remove a contact from the list
 	function remove_contact(self) {
 		// test if there's a contact selected
@@ -402,15 +410,12 @@ Addressbook.methods(
 				new_selection = self.selected_li.getNext('li');
 			}
 			var removed = self.selected;
-			if (new_selection) {
-				self.selected = new_selection.get('name');
 			// if it's the last contact, select nothing			
-			} else {
-				self.selected = null;
+			var selected = null;
+			if (new_selection) {
+				selected = new_selection.get('name');
 			}
-			Cookie.write('adb_selected', self.selected, {
-				duration: 365
-			});
+			self.update_selected(selected);
 			self.callRemote('rc_remove_contact', removed);
 		}
 	},
@@ -465,6 +470,20 @@ Addressbook.methods(
 			curr_selection.removeClass('color_selected');
 		}
 //		self.cleanFields();
+	},
+
+	// Update the connection status line.
+	function upd_status(self, event) {
+		// list of events that "status" should react to
+		if (['contact_selected', 'update_status'].contains(event)) {
+			self.status.set('text', self.selected_li.get('status'));
+			self.status.set('title', self.selected_li.get('error'));
+		} else if (['add_contact',
+					'contact_unselected',
+					'save_contact'].contains(event)) {
+			self.status.set('text', '');
+			self.status.set('title', '');
+		}
 	},
 
 	// Update contact fields
@@ -550,7 +569,8 @@ Addressbook.methods(
 			var button_state = 'disabled';
 
 			// get the state of other controls necessary to find the state
-			var contact_state = self.get_selected_state();	// state of selected contact
+			var contact_state = self.get_selected_attr('state');	// state of selected contact
+			
 			if (contact_state == 0 && self.edit_btn.value == self.edit_str) {
 				button_state = 'enabled';	
 			}
@@ -573,22 +593,36 @@ Addressbook.methods(
 		if (['contact_selected', 'contact_unselected'].contains(event)) {
 			// set the default states
 			var button_state = 'enabled';
+			var auto_created = false;
 			
 			// get the state of other controls necessary to find the state
-			var contact_state = self.get_selected_state();	// state of selected contact
-			if (contact_state != 0) {
+			var contact_state = self.get_selected_attr('state');	// state of selected contact
+			var contact_auto_created = self.get_selected_attr('auto_created');	// auto_created of selected contact
+			if (contact_auto_created && event == 'contact_selected') {
+			    auto_created = true;
+			}
+
+			if (contact_state != 0 && !auto_created) {
 				button_state = 'disabled';	
 			}
 			
 			// set the state of the button
-			self.edit_btn.value = self.edit_str;
 			self.edit_btn.removeEvents('click');
 			if (button_state == 'enabled') {
+				if (auto_created) {
+					self.edit_btn.value = self.keep_str;
+					self.remove_btn.addEvent('click', function(){
+						self.keep_contact();
+					});
+				} else {
+					self.edit_btn.value = self.edit_str;
+					self.edit_btn.addEvent('click', function(){
+						self.edit_contact();
+					});
+				}
 				self.edit_btn.disabled = false;
-				self.edit_btn.addEvent('click', function(){
-					self.edit_contact();
-				});
 			} else {
+				self.edit_btn.value = self.edit_str;
 				self.edit_btn.disabled = true;
 			}
 
@@ -599,6 +633,7 @@ Addressbook.methods(
 			self.edit_btn.addEvent('click', function(){
 				self.save_contact();
 			});
+		}
 			
 
 			
@@ -625,7 +660,6 @@ Addressbook.methods(
 			}*/
 			
 			
-		}
 	},
 
 	// Update connect/disconnect button state.
@@ -642,9 +676,9 @@ Addressbook.methods(
 			var button_name = self.connect_str;
 
 			// get the state of other controls necessary to find the state
-			var contact_state = self.get_selected_state();	// state of selected contact
-			if (contact_state >= 0 && self.edit_btn.value == self.edit_str) {
-				button_state = 'enabled';	
+			var contact_state = self.get_selected_attr('state');	// state of selected contact
+			if (contact_state >= 0 && (self.edit_btn.value == self.edit_str || self.edit_btn.value == self.keep_str)) {
+				button_state = 'enabled';
 			}
 
 			// set the state of the button

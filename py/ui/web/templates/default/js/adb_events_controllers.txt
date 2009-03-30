@@ -4,6 +4,7 @@ EVENTS
 -contact_selected
 -contact_unselected
 -edit_contact
+-keep_contact
 -add_contact
 -save_contact
 -remove_contact* -> do a contact_selected or contact_unselected

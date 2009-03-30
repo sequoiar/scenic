@@ -27,6 +27,10 @@
 			</tr>
 			<tr>
 				<td></td>
+				<td><label for="adb_auto_answer">Auto-answer: </label><input id="adb_auto_answer" type="checkbox" disabled="false" /></td>
+			</tr>
+			<tr>
+				<td></td>
 				<td><input class="js_help button" id="adb_edit" disabled="true" type="button" value="Edit" /></td>
 			</tr>
 		</table>
@@ -42,6 +46,7 @@
 	<!-- Javascript translation -->
 	<span n:render="i18n" id="js_adb_save" class="adb js_str">Save</span>
 	<span n:render="i18n" id="js_adb_edit" class="adb js_str">Edit</span>
+	<span n:render="i18n" id="js_adb_keep" class="adb js_str">Keep</span>
 	<span n:render="i18n" id="js_adb_join" class="adb js_str">Connect</span>
 	<span n:render="i18n" id="js_adb_unjoin" class="adb js_str">Disconnect</span>
 	<span n:render="i18n" id="js_adb_accept" class="adb js_str">Accept</span>
