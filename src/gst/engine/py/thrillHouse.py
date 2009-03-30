@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# thrillHouse.py
+# thrillhouse.py
 # Copyright (C) 2008-2009 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
@@ -21,6 +21,10 @@
 # along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+"""
+Series of tests for the milhouse command line.
+"""
+
 import sys, os
 
 import signal
@@ -28,24 +32,24 @@ import time
 
 from twisted.python.reflect import prefixedMethods
 
-pidrecv = 0
-pidsend = 0
+PID_RECV = 0
+PID_SEND = 0
 
 class Arg(object): # new style!!
     """ Base class for our argument classes """
     def __init__(self):
         """ Init with address and timeout defaults """
         self.address = '127.0.0.1'   # always need this guy
-        self.timeout = 10000
+        self.timeout = 5000
     
     def __str__(self):
         """ Returns a list of this class' data members and their values, 
         formatted as command line arguments """
         result = ''
-        for k, v in self.__dict__.iteritems():
-            if v is True:
-                v = ''  # boolean members need only have keys be present, value is always true
-            result = result + ' --' + k + ' ' + str(v) 
+        for key, val in self.__dict__.iteritems():
+            if val is True:
+                val = ''  # boolean members don't need values in output string
+            result = result + ' --' + key + ' ' + str(val) 
         return result
 
 
@@ -67,7 +71,7 @@ class AudioArg(Arg):
         self.audioport = 10000
 
 
-class VideosendArg(VideoArg):
+class VideoSendArg(VideoArg):
     """ Class for video only sending args """
     def __init__(self):
         """ Default for videosource is v4l2src, the video4linux2 plugin """
@@ -75,7 +79,7 @@ class VideosendArg(VideoArg):
         self.videosource = 'v4l2src'
 
 
-class VideorecvArg(VideoArg):
+class VideoRecvArg(VideoArg):
     """ Class for video only receiving args """
     def __init__(self):
         """ Default for videosink is xvimagesink, the xvideo output plugin """
@@ -84,16 +88,17 @@ class VideorecvArg(VideoArg):
         self.videosink = 'xvimagesink'
 
 
-class AudiosendArg(AudioArg):
+class AudioSendArg(AudioArg):
     """ Class for audio only sending args """
     def __init__(self):
-        """ Default for audiosrc is 8 channel jackaudiosrc, the jack input plugin """
+        """ Default for audiosrc is 8 channel jackaudiosrc, 
+         the jack input plugin """
         AudioArg.__init__(self)
         self.audiosource = 'jackaudiosrc'
         self.numchannels = 8
 
 
-class AudiorecvArg(AudioArg):
+class AudioRecvArg(AudioArg):
     """ Class for audio only receiving args """
     def __init__(self):
         """ Default for audiosink is jackaudiosink, the jack output plugin """
@@ -101,29 +106,36 @@ class AudiorecvArg(AudioArg):
         self.audiosink = 'jackaudiosink'
 
 
-class AudioVideorecvArg(AudiorecvArg, VideorecvArg):
+class AudioVideoRecvArg(AudioRecvArg, VideoRecvArg):
     """ Class for audio and video receiving args """
     def __init__(self):
-        AudiorecvArg.__init__(self)
-        VideorecvArg.__init__(self)
+        """ Calls init for our parent classes """
+        AudioRecvArg.__init__(self)
+        VideoRecvArg.__init__(self)
 
 
-class AudioVideosendArg(AudiosendArg, VideosendArg):
+class AudioVideoSendArg(AudioSendArg, VideoSendArg):
     """ Class for audio and video sending args """
     def __init__(self):
-        AudiosendArg.__init__(self)
-        VideosendArg.__init__(self)
+        """ Calls init for our parent classes """
+        AudioSendArg.__init__(self)
+        VideoSendArg.__init__(self)
 
 
 class MilhouseTests():
+    """ Class containing the tests and some helper methods """
     def __init__(self):
-        signal.signal(signal.SIGINT, self.receiveInterrupt)
+        """ Installs interrupt signal handler """
+        signal.signal(signal.SIGINT, self.handle_interrupt)
 
     @staticmethod
     def countdown(warning):
+        """ Prints a countdown telling the client to start or stop 
+            jack, depending on the input warning """
         countdown = 1
         while countdown > 0:
-            print 'PLEASE ' + warning + ' JACK SERVER NOW, YOU HAVE ' + str(countdown) + ' SECONDS' 
+            print 'PLEASE ' + warning + ' JACK SERVER NOW, YOU HAVE ' \
+                + str(countdown) + ' SECONDS' 
             time.sleep(1)
             countdown -= 1
 
@@ -132,71 +144,72 @@ class MilhouseTests():
         """Returns default send and receive args"""
 
         if argtype is 'audio':
-            return AudiorecvArg(), AudiosendArg()
+            return AudioRecvArg(), AudioSendArg()
         elif argtype is 'video':
-            return VideorecvArg(), VideosendArg()
+            return VideoRecvArg(), VideoSendArg()
         elif argtype is 'audiovideo':
-            return AudioVideorecvArg(), AudioVideosendArg()
+            return AudioVideoRecvArg(), AudioVideoSendArg()
         else:
             raise Exception('unexpected argtype ' + argtype)
 
     @staticmethod
-    def receiveInterrupt(signum, stack):
-        print 'Received interrupt, killing all child processes'
+    def handle_interrupt(signum, stack):
+        """ Handles SIGINT and kills child processes """
+        print 'Got interrupt, killing all child processes'
         try: 
-            os.kill(pidrecv, signal.SIGKILL)
+            os.kill(PID_RECV, signal.SIGKILL)
         except OSError:
-            pass
+            print "No process with pid " + PID_RECV
         try:
-            os.kill(pidsend, signal.SIGKILL)
+            os.kill(PID_SEND, signal.SIGKILL)
         except OSError:
-            pass
+            print "No process with pid " + PID_SEND 
         sys.exit(0)
 
     @staticmethod
-    def runTest(recv, send):
+    def run(recv, send):
         """ This method is used by our helpers to create a receiver
             process and a sender process, and wait on them. """
-        pidrecv = os.fork()
+        PID_RECV = os.fork()
 
-        if pidrecv == 0:
+        if PID_RECV == 0:
             os.system('milhouse -r ' +  str(recv))
             sys.exit(0)
         else:
             # parent
-            pidsend = os.fork()
-            if pidsend == 0:
+            PID_SEND = os.fork()
+            if PID_SEND == 0:
                 os.system('milhouse -s ' +  str(send))
                 sys.exit(0)
             else:
                 # parent
-                os.waitpid(pidsend, 0)
+                os.waitpid(PID_SEND, 0)
                 print 'END OF TEST'
 
     def test_01_defaults(self):
         """ Test with default args and 5 second timeout """
         self.countdown('START')
 
-        recv, send= self.argfactory('audiovideo')
-        self.runTest(recv, send)
+        recv, send = self.argfactory('audiovideo')
+        self.run(recv, send)
 
-    def test_02_jack(self):
+    def test_02_audio(self):
         """ Test with 1-8 channels and 5 second timeout for jack """
         self.countdown('START')
 
-        recv, send= self.argfactory('audio')
-        for c in xrange(1, 9): 
-            send.numchannels = c
-            self.runTest(recv, send) 
+        recv, send = self.argfactory('audio')
+        for chan in xrange(1, 9): 
+            send.numchannels = chan
+            self.run(recv, send) 
     
     def test_03_dv(self):
         """ Test dv inputs """
         self.countdown('START')
 
-        recv, send= self.argfactory('audiovideo')
+        recv, send = self.argfactory('audiovideo')
         send.videosource = 'dv1394src'
         send.audiosource = 'dv1394src'
-        self.runTest(recv, send)
+        self.run(recv, send)
    
     def test_04_alsa(self):
         """ Test with 1-8 channels for alsa with a 5 second timeout """
@@ -205,36 +218,37 @@ class MilhouseTests():
         recv, send = self.argfactory('audio')
         send.audiosource = 'alsasrc'
         recv.audiosink = 'alsasink'
-        for c in xrange(1, 9): 
-            send.numchannels = c
-            self.runTest(recv, send)
+        for chan in xrange(1, 9): 
+            send.numchannels = chan
+            self.run(recv, send)
 
     def test_05_pulse(self):
         """ Test with 1-6 channels for pulse with a 5 second timeout """
         self.countdown('STOP')
 
-        recv, send= self.argfactory('audio')
+        recv, send = self.argfactory('audio')
         send.audiosource = 'pulsesrc'
         recv.audiosink = 'pulsesink'
-        for c in xrange(1, 9): 
-            send.numchannels = c
-            self.runTest(recv, send)
+        for chan in xrange(1, 9): 
+            send.numchannels = chan
+            self.run(recv, send)
 
 
     def test_06_vorbis(self):
-        """ Test with 1-8 channels for vorbis with jack with a 5 second timeout """
+        """ Test with 1-8 channels for vorbis with a 5 second timeout """
         self.countdown('START')
 
         audiocodec = 'vorbis'
         recv, send = self.argfactory('audio')
         send.audiocodec = audiocodec
         recv.audiocodec = audiocodec
-        for c in xrange(1, 9): 
-            send.numchannels = c
-            self.runTest(recv, send)
+        for chan in xrange(1, 9): 
+            send.numchannels = chan
+            self.run(recv, send)
 
     def test_07_dv_vorbis(self):
-        """ Test with 1-8 channels for vorbis with dv and jack with a 5 second timeout """
+        """ Test with 1-8 channels for vorbis with dv and jack with a 5 
+            second timeout """
         self.countdown('START')
 
         audiocodec = 'vorbis'
@@ -243,9 +257,9 @@ class MilhouseTests():
         send.audiocodec = audiocodec
         send.videosource = 'dv1394src'
         recv.audiocodec = audiocodec
-        for c in xrange(1, 9): 
-            send.numchannels = c
-            self.runTest(recv, send)
+        for chan in xrange(1, 9): 
+            send.numchannels = chan
+            self.run(recv, send)
     
     def test_08_videotestsrc_h264(self):
         """ Test h264 with videotestsrc """
@@ -255,7 +269,7 @@ class MilhouseTests():
         videocodec = 'h264'
         send.videocodec = videocodec
         recv.videocodec = videocodec
-        self.runTest(recv, send) 
+        self.run(recv, send) 
         
     def test_09_testsrc_glimagesink(self):
         """ Test glimagesink """
@@ -263,65 +277,66 @@ class MilhouseTests():
         recv, send = self.argfactory('video')
         send.videosource = 'videotestsrc'
         recv.videosink = 'glimagesink'
-        self.runTest(recv, send)
+        self.run(recv, send)
 
     def test_12_ximagesink(self):
         """ Test with ximagesink"""
         recv, send = self.argfactory('video')
 
         recv.videosink = 'ximagesink'
-        self.runTest(recv, send)
+        self.run(recv, send)
     
     def test_13_glimagesink(self):
         """ Test with glimagesink """
 
         recv, send = self.argfactory('video')
         recv.videosink = 'glimagesink'
-        self.runTest(recv, send)
+        self.run(recv, send)
 
     def test_14_dv1394src_ximagesink(self):
-        """ Test dv with ximagesink"""
+        """ Test dv with ximagesink """
 
         recv, send = self.argfactory('video')
         send.videosource = 'dv1394src'
         recv.videosink = 'ximagesink'
-        self.runTest(recv, send)
+        self.run(recv, send)
 
     def test_15_dv1394src_glimagesink(self):
-        """ Test dv with glimagesink"""
+        """ Test dv with glimagesink """
 
         recv, send = self.argfactory('video')
         send.videosource = 'dv1394src'
         recv.videosink = 'glimagesink'
-        self.runTest(recv, send)
+        self.run(recv, send)
 
-    def test_16_videoOnly_deinterlace(self):
+    def test_16_deinterlace(self):
         """ Test with just video deinterlaced """
 
         recv, send = self.argfactory('video')
         send.deinterlace = True
-        self.runTest(recv, send)
+        self.run(recv, send)
 
-    def test_17_videoOnly_deinterlace_glimagesink(self):
+    def test_17_deinterlace_glimagesink(self):
         """ Test with just video deinterlaced to glimagesink """
 
         recv, send = self.argfactory('video')
         send.deinterlace = True
         recv.videosink = 'glimagesink'
-        self.runTest(recv, send)
+        self.run(recv, send)
 
     def test_18_videotestsrc(self):
         """ Test videotestsrc """
 
         recv, send = self.argfactory('video')
         send.videosource = 'videotestsrc'
-        self.runTest(recv, send)
+        self.run(recv, send)
 
 
-# here we run all the tests thanks to the wonders of reflective programming
-tests = prefixedMethods(MilhouseTests(), 'test_16')
+if __name__ == '__main__':
+    # here we run all the tests thanks to the wonders of reflective programming
+    TESTS = prefixedMethods(MilhouseTests(), 'test_16')
 
-for test in tests:
-    print 'TEST: '  + test.__doc__
-    test()
-    
+    for test in TESTS:
+        print 'TEST: '  + test.__doc__
+        test()
+        
