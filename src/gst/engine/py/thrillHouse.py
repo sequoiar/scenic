@@ -34,14 +34,14 @@ pidTx = 0
 class Arg(object): # new style!!
     """ Base class for our argument classes """
     def __init__(self):
-        self.address = "127.0.0.1"   # always need this guy
+        self.address = '127.0.0.1'   # always need this guy
         self.timeout = 10000
     
     def __str__(self):
-        result = ""
+        result = ''
         for k, v in self.__dict__.iteritems():
             if v is True:
-                v = ""
+                v = ''
             result = result + ' --' + k + ' ' + str(v) # get list of members, properly formatted
         return result
 
@@ -50,7 +50,7 @@ class VideoArg(Arg):
     """ Base class for our video argument classes """
     def __init__(self):
         Arg.__init__(self)
-        self.videocodec = "mpeg4"
+        self.videocodec = 'mpeg4'
         self.videoport = 11000
 
 
@@ -58,7 +58,7 @@ class AudioArg(Arg):
     """ Base class for our Audio argument classes """
     def __init__(self):
         Arg.__init__(self)
-        self.audiocodec = "raw"
+        self.audiocodec = 'raw'
         self.audioport = 10000
 
 
@@ -66,7 +66,7 @@ class VideoTxArg(VideoArg):
     """ Class for video only sending args """
     def __init__(self):
         VideoArg.__init__(self)
-        self.videosource = "v4l2src"
+        self.videosource = 'v4l2src'
 
 
 class VideoRxArg(VideoArg):
@@ -74,14 +74,14 @@ class VideoRxArg(VideoArg):
     def __init__(self):
         VideoArg.__init__(self)
         self.screen = 0
-        self.videosink = "xvimagesink"
+        self.videosink = 'xvimagesink'
 
 
 class AudioTxArg(AudioArg):
     """ Class for audio only sending args """
     def __init__(self):
         AudioArg.__init__(self)
-        self.audiosource = "jackaudiosrc"
+        self.audiosource = 'jackaudiosrc'
         self.numchannels = 8
 
 
@@ -89,7 +89,7 @@ class AudioRxArg(AudioArg):
     """ Class for audio only receiving args """
     def __init__(self):
         AudioArg.__init__(self)
-        self.audiosink = "jackaudiosink"
+        self.audiosink = 'jackaudiosink'
 
 
 class AudioVideoRxArg(AudioRxArg, VideoRxArg):
@@ -114,22 +114,22 @@ class MilhouseTests():
     def countdown(warning):
         countdown = 1
         while countdown > 0:
-            print "PLEASE " + warning + " JACK SERVER NOW, YOU HAVE " + str(countdown) + " SECONDS" 
+            print 'PLEASE ' + warning + ' JACK SERVER NOW, YOU HAVE ' + str(countdown) + ' SECONDS' 
             time.sleep(1)
             countdown -= 1
 
     @staticmethod
-    def argFactory(argtype):
-        "Returns default send and receive args"
+    def argfactory(argtype):
+        """Returns default send and receive args"""
 
-        if argtype is "audio":
+        if argtype is 'audio':
             return AudioRxArg(), AudioTxArg()
-        elif argtype is "video":
+        elif argtype is 'video':
             return VideoRxArg(), VideoTxArg()
-        elif argtype is "audiovideo":
+        elif argtype is 'audiovideo':
             return AudioVideoRxArg(), AudioVideoTxArg()
         else:
-            raise Exception("unexpected argtype " + argtype)
+            raise Exception('unexpected argtype ' + argtype)
 
     @staticmethod
     def receiveInterrupt(signum, stack):
@@ -145,19 +145,19 @@ class MilhouseTests():
         sys.exit(0)
 
     @staticmethod
-    def runTest(rxArgs, txArgs):
+    def runTest(rx, tx):
         """ This method is used by our helpers to create a receiver
             process and a sender process, and wait on them. """
         pidRx = os.fork()
 
         if pidRx == 0:
-            os.system('milhouse -r ' +  str(rxArgs))
+            os.system('milhouse -r ' +  str(rx))
             sys.exit(0)
         else:
             # parent
             pidTx = os.fork()
             if pidTx == 0:
-                os.system('milhouse -s ' +  str(txArgs))
+                os.system('milhouse -s ' +  str(tx))
                 sys.exit(0)
             else:
                 # parent
@@ -166,153 +166,153 @@ class MilhouseTests():
 
     def test_01_defaults(self):
         """ Test with default args and 5 second timeout """
-        self.countdown("START")
+        self.countdown('START')
 
-        rxArgs, txArgs = self.argFactory("audiovideo")
-        self.runTest(rxArgs, txArgs)
+        rx, tx= self.argfactory('audiovideo')
+        self.runTest(rx, tx)
 
     def test_02_jack(self):
         """ Test with 1-8 channels and 5 second timeout for jack """
-        self.countdown("START")
+        self.countdown('START')
 
-        rxArgs, txArgs = self.argFactory("audio")
+        rx, tx= self.argfactory('audio')
         for c in xrange(1, 9): 
-            txArgs.numchannels = c
-            self.runTest(rxArgs, txArgs) 
+            tx.numchannels = c
+            self.runTest(rx, tx) 
     
     def test_03_dv(self):
         """ Test dv inputs """
-        self.countdown("START")
+        self.countdown('START')
 
-        rxArgs, txArgs = self.argFactory("audiovideo")
-        txArgs.videosource = "dv1394src"
-        txArgs.audiosource = "dv1394src"
-        self.runTest(rxArgs, txArgs)
+        rx, tx= self.argfactory('audiovideo')
+        tx.videosource = 'dv1394src'
+        tx.audiosource = 'dv1394src'
+        self.runTest(rx, tx)
    
     def test_04_alsa(self):
         """ Test with 1-8 channels for alsa with a 5 second timeout """
-        self.countdown("STOP")
+        self.countdown('STOP')
 
-        rxArgs, txArgs = self.argFactory("audio")
-        txArgs.audiosource = 'alsasrc'
-        rxArgs.audiosink = 'alsasink'
+        rx, tx = self.argfactory('audio')
+        tx.audiosource = 'alsasrc'
+        rx.audiosink = 'alsasink'
         for c in xrange(1, 9): 
-            txArgs.numchannels = c
-            self.runTest(rxArgs, txArgs)
+            tx.numchannels = c
+            self.runTest(rx, tx)
 
     def test_05_pulse(self):
         """ Test with 1-6 channels for pulse with a 5 second timeout """
-        self.countdown("STOP")
+        self.countdown('STOP')
 
-        rxArgs, txArgs = self.argFactory("audio")
-        txArgs.audiosource = 'pulsesrc'
-        rxArgs.audiosink = 'pulsesink'
+        rx, tx= self.argfactory('audio')
+        tx.audiosource = 'pulsesrc'
+        rx.audiosink = 'pulsesink'
         for c in xrange(1, 9): 
-            txArgs.numchannels = c
-            self.runTest(rxArgs, txArgs)
+            tx.numchannels = c
+            self.runTest(rx, tx)
 
 
     def test_06_vorbis(self):
         """ Test with 1-8 channels for vorbis with jack with a 5 second timeout """
-        self.countdown("START")
+        self.countdown('START')
 
         audiocodec = 'vorbis'
-        rxArgs, txArgs = self.argFactory("audio")
-        txArgs.audiocodec = audiocodec
-        rxArgs.audiocodec = audiocodec
+        rx, tx = self.argfactory('audio')
+        tx.audiocodec = audiocodec
+        rx.audiocodec = audiocodec
         for c in xrange(1, 9): 
-            txArgs.numchannels = c
-            self.runTest(rxArgs, txArgs)
+            tx.numchannels = c
+            self.runTest(rx, tx)
 
     def test_07_dv_vorbis(self):
         """ Test with 1-8 channels for vorbis with dv and jack with a 5 second timeout """
-        self.countdown("START")
+        self.countdown('START')
 
         audiocodec = 'vorbis'
         
-        rxArgs, txArgs = self.argFactory("audiovideo")
-        txArgs.audiocodec = audiocodec
-        txArgs.videosource = 'dv1394src'
-        rxArgs.audiocodec = audiocodec
+        rx, tx = self.argfactory('audiovideo')
+        tx.audiocodec = audiocodec
+        tx.videosource = 'dv1394src'
+        rx.audiocodec = audiocodec
         for c in xrange(1, 9): 
-            txArgs.numchannels = c
-            self.runTest(rxArgs, txArgs)
+            tx.numchannels = c
+            self.runTest(rx, tx)
     
     def test_08_videotestsrc_h264(self):
         """ Test h264 with videotestsrc """
 
-        rxArgs, txArgs = self.argFactory('video')
-        txArgs.videosource = 'videotestsrc'
+        rx, tx = self.argfactory('video')
+        tx.videosource = 'videotestsrc'
         videocodec = 'h264'
-        txArgs.videocodec = videocodec
-        rxArgs.videocodec = videocodec
-        self.runTest(rxArgs, txArgs) 
+        tx.videocodec = videocodec
+        rx.videocodec = videocodec
+        self.runTest(rx, tx) 
         
     def test_09_testsrc_glimagesink(self):
         """ Test glimagesink """
 
-        rxArgs, txArgs = self.argFactory('video')
-        txArgs.videosource = 'videotestsrc'
-        rxArgs.videosink = 'glimagesink'
-        self.runTest(rxArgs, txArgs)
+        rx, tx = self.argfactory('video')
+        tx.videosource = 'videotestsrc'
+        rx.videosink = 'glimagesink'
+        self.runTest(rx, tx)
 
     def test_12_ximagesink(self):
         """ Test with ximagesink"""
-        rxArgs, txArgs = self.argFactory('video')
+        rx, tx = self.argfactory('video')
 
-        rxArgs.videosink = 'ximagesink'
-        self.runTest(rxArgs, txArgs)
+        rx.videosink = 'ximagesink'
+        self.runTest(rx, tx)
     
     def test_13_glimagesink(self):
         """ Test with glimagesink """
 
-        rxArgs, txArgs = self.argFactory('video')
-        rxArgs.videosink = 'glimagesink'
-        self.runTest(rxArgs, txArgs)
+        rx, tx = self.argfactory('video')
+        rx.videosink = 'glimagesink'
+        self.runTest(rx, tx)
 
     def test_14_dv1394src_ximagesink(self):
         """ Test dv with ximagesink"""
 
-        rxArgs, txArgs = self.argFactory('video')
-        txArgs.videosource = 'dv1394src'
-        rxArgs.videosink = 'ximagesink'
-        self.runTest(rxArgs, txArgs)
+        rx, tx = self.argfactory('video')
+        tx.videosource = 'dv1394src'
+        rx.videosink = 'ximagesink'
+        self.runTest(rx, tx)
 
     def test_15_dv1394src_glimagesink(self):
         """ Test dv with glimagesink"""
 
-        rxArgs, txArgs = self.argFactory('video')
-        txArgs.videosource = 'dv1394src'
-        rxArgs.videosink = 'glimagesink'
-        self.runTest(rxArgs, txArgs)
+        rx, tx = self.argfactory('video')
+        tx.videosource = 'dv1394src'
+        rx.videosink = 'glimagesink'
+        self.runTest(rx, tx)
 
     def test_16_videoOnly_deinterlace(self):
         """ Test with just video deinterlaced """
 
-        rxArgs, txArgs = self.argFactory('video')
-        txArgs.deinterlace = True
-        self.runTest(rxArgs, txArgs)
+        rx, tx = self.argfactory('video')
+        tx.deinterlace = True
+        self.runTest(rx, tx)
 
     def test_17_videoOnly_deinterlace_glimagesink(self):
         """ Test with just video deinterlaced to glimagesink """
 
-        rxArgs, txArgs = self.argFactory('video')
-        txArgs.deinterlace = True
-        rxArgs.videosink = 'glimagesink'
-        self.runTest(rxArgs, txArgs)
+        rx, tx = self.argfactory('video')
+        tx.deinterlace = True
+        rx.videosink = 'glimagesink'
+        self.runTest(rx, tx)
 
     def test_18_videotestsrc(self):
         """ Test videotestsrc """
 
-        rxArgs, txArgs = self.argFactory('video')
-        txArgs.videosource = 'videotestsrc'
-        self.runTest(rxArgs, txArgs)
+        rx, tx = self.argfactory('video')
+        tx.videosource = 'videotestsrc'
+        self.runTest(rx, tx)
 
 
 # here we run all the tests thanks to the wonders of reflective programming
-tests = prefixedMethods(MilhouseTests(), 'test_17')
+tests = prefixedMethods(MilhouseTests(), 'test_16')
 
 for test in tests:
-    print "TEST: "  + test.__doc__
+    print 'TEST: '  + test.__doc__
     test()
     
