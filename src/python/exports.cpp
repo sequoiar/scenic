@@ -25,6 +25,7 @@
 #include <boost/python.hpp>
 #define USE_SMART_PTR //Factories return a shared_ptr
 #include "util.h"
+#include "gutil.h"
 
 
 using namespace boost::python;
@@ -47,5 +48,8 @@ BOOST_PYTHON_MODULE(milhouse)
     class_ < GstWrapConfig, bases<MsgWrapConfig> >("GstWrapConfig") ;
     class_ < ThreadWrap, boost::noncopyable > ("ThreadWrap",init < MsgWrapConfig*, dictMessageHandler* > ())
         .def("send", &ThreadWrap::send) ;
+
+    def("tcpSendBuffer", tcpSendBuffer);
+    def("setHandler", set_handler); 
 }
 
