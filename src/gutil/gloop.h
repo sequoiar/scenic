@@ -27,7 +27,7 @@
 
 namespace gutil {
     /// ms to run - 0 is forever
-    void runMainLoop(unsigned int ms);
+    void runMainLoop(int ms);
     int killMainLoop(gpointer data = NULL);
 }
 

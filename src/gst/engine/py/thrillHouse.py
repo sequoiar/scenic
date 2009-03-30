@@ -11,10 +11,11 @@ pidRx = 0
 pidTx = 0
 
 class Arg(object): # new style!!
+    """ Base class for our argument classes """
     def __init__(self):
         self.address = "127.0.0.1"   # always need this guy
     
-    def argString(self):
+    def __str__(self):
         result = ""
         for k, v in self.__dict__.iteritems():
             result = result + ' --' + k + ' ' + str(v) # get list of members, properly formatted
@@ -22,6 +23,7 @@ class Arg(object): # new style!!
 
 
 class VideoArg(Arg):
+    """ Base class for our video argument classes """
     def __init__(self):
         Arg.__init__(self)
         self.videocodec = "mpeg4"
@@ -29,6 +31,7 @@ class VideoArg(Arg):
 
 
 class AudioArg(Arg):
+    """ Base class for our Audio argument classes """
     def __init__(self):
         Arg.__init__(self)
         self.audiocodec = "raw"
@@ -36,20 +39,22 @@ class AudioArg(Arg):
 
 
 class VideoTxArg(VideoArg):
+    """ Class for video only sending args """
     def __init__(self):
         VideoArg.__init__(self)
         self.videosource = "v4l2src"
 
 
 class VideoRxArg(VideoArg):
+    """ Class for video only receiving args """
     def __init__(self):
         VideoArg.__init__(self)
-        self.fullscreen = False
         self.screen = 0
         self.videosink = "xvimagesink"
 
 
 class AudioTxArg(AudioArg):
+    """ Class for audio only sending args """
     def __init__(self):
         AudioArg.__init__(self)
         self.audiosource = "jackaudiosrc"
@@ -57,27 +62,28 @@ class AudioTxArg(AudioArg):
 
 
 class AudioRxArg(AudioArg):
+    """ Class for audio only receiving args """
     def __init__(self):
         AudioArg.__init__(self)
         self.audiosink = "jackaudiosink"
 
 
+class AudioVideoRxArg(AudioRxArg, VideoRxArg):
+    """ Class for audio and video receiving args """
+    def __init__(self):
+        AudioRxArg.__init__(self)
+        VideoRxArg.__init__(self)
+
+class AudioVideoTxArg(AudioTxArg, VideoTxArg):
+    """ Class for audio and video sending args """
+    def __init__(self):
+        AudioTxArg.__init__(self)
+        VideoTxArg.__init__(self)
+
+
 class MilhouseTests():
     def __init__(self):
         signal.signal(signal.SIGINT, self.receiveInterrupt)
-
-    @staticmethod
-    def timeouts():
-        """ Returns tuple of timeout arguments """
-        timeout = '-o 40000'
-        return timeout, timeout
-
-    @staticmethod
-    def defaultArgs():
-        """ Returns default argumens for receiver and sender processes """
-            rxArgs = {}
-            txArgs = {}
-            ip = "127.0.0.1"
 
     @staticmethod
     def countdown(warning):
@@ -86,6 +92,18 @@ class MilhouseTests():
             print "PLEASE " + warning + " JACK SERVER NOW, YOU HAVE " + str(countdown) + " SECONDS" 
             time.sleep(1)
             countdown -= 1
+
+    @staticmethod
+    def argFactory(argtype):
+        "Returns default send and receive args"
+         if argtype is "audio":
+            return AudioRxArg(), AudioTxArg()
+         elif argtype is "video":
+            return VideoRxArg(), VideoTxArg()
+         elif argtype is "audiovideo":
+            return AudioVideoRxArg(), AudioVideoTxArg()
+         else:
+             raise Exception("unexpected argtype " + argtype)
 
     @staticmethod
     def receiveInterrupt(signum, stack):
@@ -124,7 +142,7 @@ class MilhouseTests():
         """ Test with default args and 5 second timeout """
         self.countdown("START")
 
-        rxArgs, txArgs = self.timeouts()
+        rxArgs, txArgs = argFactory("audiovideo")
         self.runTest(rxArgs, txArgs)
 
     def test_02_jack(self):
@@ -259,9 +277,9 @@ class MilhouseTests():
 
 
 # here we run all the tests thanks to the wonders of reflective programming
-tests = prefixedMethods(MilhouseTests(), 'test_08')
+tests = prefixedMethods(MilhouseTests(), 'test_01')
 
 for test in tests:
     print "TEST: "  + test.__doc__
     test()
-
+    

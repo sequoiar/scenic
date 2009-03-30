@@ -53,7 +53,7 @@ int gutil::checkSignal(gpointer /*data*/)
 }
 
 /// ms to run - 0 is forever
-void gutil::runMainLoop(unsigned int ms)
+void gutil::runMainLoop(int ms)
 {
     loop_ = g_main_loop_new (NULL, FALSE);                       
     if(ms)
