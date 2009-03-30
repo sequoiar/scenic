@@ -122,5 +122,5 @@ class Test_01_Ping(DualLocalBaseTest):
         self.client.sendline("ping")
         self.client.sendline("")
         self.sleep(0.2)
-        #self.expectTest('pong', 'Did not receive pong answer.')
+        self.expectTest('pong', 'Did not receive pong answer.')
         # XXX disabled for now !

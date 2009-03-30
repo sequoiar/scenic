@@ -231,7 +231,7 @@ class ComChanCheck:
             return failure.Failure(error.UnauthorizedLogin())
 
 # functions 
-def start(conns, port=PORT):
+def start(api, conns, port=PORT, interfaces=''):
     """
     Starts the module for miville's use.
     
@@ -239,11 +239,12 @@ def start(conns, port=PORT):
     "param port: port number.
     """
     global connections
+
     connections = conns
     realm = ComChanRealm()
     checker = ComChanCheck()
     p = portal.Portal(realm, [checker])
-    reactor.listenTCP(port, pb.PBServerFactory(p))
+    api.listen_tcp(port, pb.PBServerFactory(p), interfaces)
 
 def connect(name, address, port=PORT):
     """

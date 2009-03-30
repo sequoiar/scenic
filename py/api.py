@@ -1,6 +1,7 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# Sropulpof
+# 
+# Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
@@ -10,13 +11,13 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# Sropulpof is distributed in the hope that it will be useful,
+# Miville is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof. If not, see <http:#www.gnu.org/licenses/>.
+# along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 Public API of Miville
@@ -105,9 +106,7 @@ class ControllerApi(object):
         
         Some attributes are defined here, but should be defined in __init__ 
         """
-        
         self.settings = core.settings
-        
         self.core = core
         self.adb = core.adb
 #        self.all_streams = core.curr_setting.streams
@@ -115,16 +114,16 @@ class ControllerApi(object):
 #        self.streams = self.all_streams[self.curr_streams]
         self.connectors = core.connectors
         self.connection = None
-        #self.network_tester = 
-        network.start(self)  # TODO: move to core.
-        pinger.start(self)   # TODO: move to core.
+        network.start(self, self.core.config.iperf_port + self.core.config.port_numbers_offset, self.core.config.listen_to_interfaces)
+        pinger.start(self)
         firewire.start(self)
         settings.init_connection_listeners(self)
-    ### Contacts ###
     
-    def listen_tcp(self, port, factory, listen_queue_size=50, interfaces=''):
+    def listen_tcp(self, port, factory, interfaces='', listen_queue_size=50):
         """
         Wraps reactor.listenTCP
+
+        The order of arguments is different !
         """
         if not isinstance(interfaces, list):
             # '' mean all interfaces
@@ -137,6 +136,7 @@ class ControllerApi(object):
                 reactor.listenTCP(port, factory, listen_queue_size, interface)
 
 
+    ### Contacts ###
     def get_contacts(self, caller):
         """
         Get the list of all the contacts.
@@ -931,9 +931,11 @@ class ControllerApi(object):
         
         :param contact: addressbook.Contact object.
         """
+        self.notify(caller, 'Trying to ping... ', 'info')
         try:
             if contact is None:
                 contact = self.get_contact()
+                self.notify(caller, '...with contact %s.' % (contact.name), 'info')
         except AddressBookError, e:
             self.notify(caller, "Please select a contact prior to start a pinger test." + e.message, "error")
         else:
@@ -941,18 +943,23 @@ class ControllerApi(object):
             try:
                 if contact.state != addressbook.CONNECTED: 
                     self.notify(caller, "Please connect to a contact prior to start a pinger test.", "error")
+                else:
+                    connected = True
             except NameError:
                 self.notify(caller, "Please connect to a contact prior to start a pinger test.", "error")
             if connected:
                 com_chan = None 
+                self.notify(caller, '...to which we are connected.', 'info')
                 try:
                     com_chan = contact.connection.com_chan
+                    self.notify(caller, 'Using a com_chan.', 'info')
                 except Exception, e:
                     msg = "No com_chan in pinger_start(): " + e.message
                     debug.error(msg)
                     self.notify(caller, msg, "error")
                 else:
                     remote_addr = contact.address
+                    self.notify(caller, 'Remote IP is %s' % (remote_addr), 'info')
                     try:
                         ping = pinger.get_pinger_for_contact(contact.name)
                     except KeyError, e:
@@ -962,5 +969,5 @@ class ControllerApi(object):
                         if ret:
                             self.notify(caller, "Starting pinger test with contact %s" % (contact.name), "info")
                         else:
-                            self.notify(caller, "An error occuring while trying to pinger test.", "error")
+                            self.notify(caller, "An error occuring while trying to do a pinger test.", "error")
 

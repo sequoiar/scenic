@@ -13,6 +13,7 @@ TESTS = test/solo_test_telnet_settings.py \
 		test/test_log.py \
 		test/test_network.py \
 		test/test_observer.py \
+		test/check_ping.py \
 		test/test_telnet_milhouse.py
 		
 		

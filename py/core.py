@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+#
 # Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -58,6 +58,7 @@ class MivilleConfiguration(object):
         self.telnet_port = 14444
         self.connector_port = 2222
         self.web_port = 8080
+        self.iperf_port = 5001 # iperf's default
         #self.midi_port = 44000
         # self.ipcp_port = 999999999999
         self.port_numbers_offset = 0
@@ -112,8 +113,8 @@ class Core(Subject):
         # TODO: causes a couldn't listen error if another miville runs on the same port. 
         # and makes the application crash. 
         # maybe something more elegant could be done.
-        self.connectors = connectors.load_connectors(self.api)
-        com_chan.start(connectors.connections, self.com_chan_port)
+        self.connectors = connectors.load_connectors(self.api, self.config.connector_port + self.config.port_numbers_offset, self.config.listen_to_interfaces)
+        com_chan.start(self.api, connectors.connections, self.com_chan_port, self.config.listen_to_interfaces)
         self.api._start(self)
         
     def load_uis(self):
@@ -123,6 +124,7 @@ class Core(Subject):
         self.uis = common.load_modules(common.find_modules('ui'))
         count = 0
         for mod in self.uis:
+            interfaces = self.config.listen_to_interfaces
             if mod.__name__.find('cli') != -1:
                 port = self.config.telnet_port + self.config.port_numbers_offset
             elif mod.__name__.find('web') != 1:
@@ -130,7 +132,7 @@ class Core(Subject):
             else: 
                 log.error('unknown user interface')
             try:
-                mod.start(self, port)
+                mod.start(self, port, interfaces)
             except Exception, e:
                 log.error('Unable to start UI module %s. %s' % (mod.__name__, e)) # traceback please
 

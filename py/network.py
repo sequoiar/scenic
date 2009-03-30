@@ -794,7 +794,7 @@ def get_tester_for_contact(contact_name=None):
 
 
 # functions ---------------------------------------------
-def start(subject):
+def start(subject, port=None, interfaces=''):
     """
     Initial setup of the whole module for miville's use.
     
@@ -802,7 +802,8 @@ def start(subject):
     Returns a NetworkTester instance with the server started.
     """
     global _api
-
+    
+    # TODO: use port and interfaces arguments
     try:
         executable = commands.find_command("iperf", 
             "`iperf` command not found. Please see https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting for installation instructions.")

@@ -1,6 +1,8 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Sropulpof
-# # Copyright (C) 2008 Société des arts technoligiques (SAT)
+# 
+# Miville
+# Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -9,13 +11,14 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# Sropulpof is distributed in the hope that it will be useful,
+# Miville is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+# along with Miville.  If not, see <http://www.gnu.org/licenses/>.
+
 """
 The BasicServer and BasicClient protocols are used to negociate the connection 
 between 2 running miville software. (with a contact)
@@ -343,22 +346,23 @@ class ConnectionBasic(Connection):
 
 
 
-def start(api):
+def start(api, port, interfaces=''):
     """
     Starts the Basic connector protocol for miville. 
     
     :param api: miville's api
     """
     global PORT
-    PORT = api.core.config.connector_port + api.core.config.port_numbers_offset
+    PORT = port
+    #PORT = api.core.config.connector_port + api.core.config.port_numbers_offset
     #if len(sys.argv) > 1:
     #    PORT += 1
     server_factory = BasicServerFactory()
     server_factory.api = api
     
     # listen TCP
-    interfaces = api.core.config.listen_to_interfaces
-    listen_queue_size = 50
+    #interfaces = api.core.config.listen_to_interfaces
+    #listen_queue_size = 50
 
-    api.listen_tcp(PORT, server_factory, listen_queue_size, interfaces)
+    api.listen_tcp(PORT, server_factory, interfaces)
 

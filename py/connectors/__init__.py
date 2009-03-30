@@ -216,8 +216,7 @@ class Connection(object):
         try:
             self.com_chan.connection = None
         except:
-            # TODO: remove this print
-            print "errrreur deleting com_chan"
+            log.debug("Could not delete com_chan connection.")
         try:
             del connections[self.address]
         except KeyError:
@@ -280,7 +279,7 @@ def receive_connection(address, port=None):
         contact = adb.add(name, address, port,)
 
 
-def load_connectors(api):
+def load_connectors(api, port, interfaces=''):
     """
     On startup, loads all modules that are part of this package.
     """ 
@@ -288,7 +287,7 @@ def load_connectors(api):
     for module in modules:
         name = module.__name__.rpartition('.')[2]
         try:
-            module.start(api)
+            module.start(api, port, interfaces)
         except Exception, e:
             log.error('Connector \'%s\' failed to start. %s' % (name, e))
             raise # TODO: remove me !
