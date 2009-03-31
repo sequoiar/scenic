@@ -1,6 +1,6 @@
 include $(top_srcdir)/globals.mak
 
-SUBDIRS = connectors devices maugis protocols streams ui utils engines
+SUBDIRS = connectors devices maugis protocols ui utils engines
 
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 trial
 TESTS = test/solo_test_telnet_settings.py \

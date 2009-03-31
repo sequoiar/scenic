@@ -79,9 +79,16 @@ class DualLocalBaseTest(testing.TelnetBaseTest):
                 # if testing.CHANGE_HOME_PATH:
                 TMP_NAME = tempfile.mktemp() # some unique name that looks like "/tmp/xxxxxxxx"
                 os.mkdir(TMP_NAME)
+                os.environ['HOME'] = TMP_NAME
                 os.mkdir("%s/.sropulpof" % (TMP_NAME))
+                print "mkdir %s/.sropulpof" % (TMP_NAME)
+
                 shutil.copyfile('../test/configs/contacts.adb', '%s/.sropulpof/sropulpof.adb' % (TMP_NAME))
+                print 'Copying a file to %s/.sropulpof/sropulpof.adb' % (TMP_NAME)
+
                 shutil.copyfile('../test/configs/settings.sets', '%s/.sropulpof/settings.sets'% (TMP_NAME))
+                print 'Copying a file to %s/.sropulpof/settings.sets' % (TMP_NAME)
+
                 miville['home'] = TMP_NAME
                 miville['command'] = "%s -o %s" % (miville['command'], miville['port_offset'])
                 if testing.VERBOSE_SERVER:

@@ -28,7 +28,7 @@ from twisted.python.modules import getModule
 # App imports
 import ui
 import api
-import streams
+#import streams
 from utils import log, Subject, common
 import addressbook
 import settings
@@ -107,7 +107,7 @@ class Core(Subject):
         self.load_uis()
         # TODO: rename this addressbook !
         self.adb = addressbook.AddressBook(self.config.addressbook_filename, self.api)
-        self.engines = self.find_engines()
+        #self.engines = self.find_engines()
         # create the settings collection
         settings.PRESETS_FILENAME = self.config.settings_presets_filename
         settings.SETTINGS_FILENAME = self.config.settings_filename
@@ -139,16 +139,16 @@ class Core(Subject):
             except Exception, e:
                 log.error('Unable to start UI module %s. %s' % (mod.__name__, e)) # traceback please
 
-    def find_engines(self):
-        """
-        Find all the different audio/video/data engines
-        """
-        engines = {}
-        for kind in ('audio', 'video'):
-            mods = getModule('streams.' + kind).iterModules()
-            for engine in mods:
-                engines[engine.name] = engine
-        return engines
+#     def find_engines(self):
+#         """
+#         Find all the different audio/video/data engines
+#         """
+#         engines = {}
+#         for kind in ('audio', 'video'):
+#             mods = getModule('streams.' + kind).iterModules()
+#             for engine in mods:
+#                 engines[engine.name] = engine
+#         return engines
 
 
 
