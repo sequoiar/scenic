@@ -23,7 +23,7 @@
 import time
 
 #App imports
-from ui.web.web import Widget, expose
+from miville.ui.web.web import Widget, expose
 from miville.utils import log
 from miville.utils.i18n import to_utf
 from miville.errors import *

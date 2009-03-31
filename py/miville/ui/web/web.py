@@ -115,7 +115,7 @@ def import_widgets():
     Import all the widget modules found in the widgets directory
     and add render_<widget> method to the Index class for each.
     """
-    package = 'ui.web.widgets'
+    package = 'miville.ui.web.widgets'
     for widget in getModule(package).iterModules():
         if widget.isPackage():
             medias = getModule(widget.name).iterModules()
