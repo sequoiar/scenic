@@ -22,3 +22,18 @@
 """
 This package contains all the modules for the miville application. 
 """
+# this list might be useless
+__all__ = [
+    'addressbook',
+    'api', 
+    'connectors',
+    'core', 
+    'devices', 
+    'engines',
+    'errors', 
+    'network',
+    'protocols',
+    'settings', 
+    'ui', 
+    'utils'
+    ]

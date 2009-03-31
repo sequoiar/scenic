@@ -23,8 +23,11 @@
 Starting point of miville from the command line.
 """
 
-from miville.core import *
+#import sys
+#print sys.path
 from optparse import OptionParser
+from miville.core import *
+
 __version__ = "0.1 alpha"
 
 if __name__ == '__main__':
