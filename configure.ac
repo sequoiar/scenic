@@ -180,18 +180,19 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile
                  py/Makefile
                  py/maugis/Makefile
-                 py/connectors/Makefile
-                 py/connectors/basic/Makefile
-                 py/connectors/sip/Makefile
-                 py/devices/Makefile
-                 py/protocols/Makefile
-                 py/engines/Makefile
-                 py/streams/Makefile
-                 py/streams/audio/Makefile
-                 py/streams/video/Makefile
-                 py/streams/data/Makefile
-                 py/ui/Makefile
-                 py/utils/Makefile
+                 py/miville/Makefile
+                 py/miville/connectors/Makefile
+                 py/miville/connectors/basic/Makefile
+                 py/miville/connectors/sip/Makefile
+                 py/miville/devices/Makefile
+                 py/miville/protocols/Makefile
+                 py/miville/engines/Makefile
+                 py/miville/streams/Makefile
+                 py/miville/streams/audio/Makefile
+                 py/miville/streams/video/Makefile
+                 py/miville/streams/data/Makefile
+                 py/miville/ui/Makefile
+                 py/miville/utils/Makefile
                  src/include/Makefile
                  src/util/Makefile
                  src/gutil/Makefile

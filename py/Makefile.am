@@ -1,3 +1,7 @@
+include $(top_srcdir)/globals.mak 
+
+SUBDIRS = miville maugis 
+
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 trial
 
 TESTS = test/test_com_chan.py \
