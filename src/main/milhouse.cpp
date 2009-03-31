@@ -71,6 +71,7 @@ short pof::run(int argc, char **argv)
     options.addString("audiosource", 'e', "audiosource", "jackaudiosrc alsasrc pulsesrc");
     options.addString("videosource", 'u', "videosource", "v4l2src v4lsrc dv1394src");
     options.addInt("timeout", 'z', "timeout", "time in ms to wait before quitting, 0 means run indefinitely");
+    options.addInt("audio_buffer_usec", 'b', "audiobuffer", "length of receiver's audio buffer in microseconds, must be > 10000");
 
     //telnetServer param
     options.addInt("serverport", 'y', "run as server", "port to listen on");
@@ -137,8 +138,12 @@ short pof::run(int argc, char **argv)
             if (options["audiodevice"])
                 audioLocation = static_cast<std::string>(options["audiodevice"]);
 
+            int audioBufferUsec = audiofactory::AUDIO_BUFFER_USEC;
+            if (options["audio_buffer_usec"])
+                audioBufferUsec = options["audio_buffer_usec"];
             aRx = audiofactory::buildAudioReceiver(options["address"], options["audiocodec"], 
-                    options["audioport"], options["audiosink"], audioLocation, audiofactory::AUDIO_BUFFER_USEC);
+                    options["audioport"], options["audiosink"], audioLocation, 
+                    static_cast<unsigned long long>(audioBufferUsec));
         }
 
 #ifdef CONFIG_DEBUG_LOCAL
@@ -215,9 +220,11 @@ short pof::run(int argc, char **argv)
         playback::start();
 
         if (!disableVideo)
-            assert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + static_cast<int>(options["videoport"]), videofactory::MSG_ID, vTx->getCaps()));
+            assert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + static_cast<int>(options["videoport"]), 
+                        videofactory::MSG_ID, vTx->getCaps()));
         if (!disableAudio)
-            assert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + static_cast<int>(options["audioport"]), audiofactory::MSG_ID, aTx->getCaps()));
+            assert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + static_cast<int>(options["audioport"]), 
+                        audiofactory::MSG_ID, aTx->getCaps()));
 
         int timeout = 0;
         if (options["timeout"]) // run for finite amount of time

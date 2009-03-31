@@ -104,6 +104,7 @@ class AudioRecvArg(AudioArg):
         """ Default for audiosink is jackaudiosink, the jack output plugin """
         AudioArg.__init__(self)
         self.audiosink = 'jackaudiosink'
+        self.audio_buffer_usec = 30000  # longer for test safety
 
 
 class AudioVideoRecvArg(AudioRecvArg, VideoRecvArg):
