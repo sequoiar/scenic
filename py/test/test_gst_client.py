@@ -22,8 +22,8 @@
 from twisted.trial import unittest
 from twisted.internet import reactor 
 
-from streams import gst_client
-from streams.video.gst import VideoGst
+from engines import base_gst
+from engines import audiovideogst
 from miville.settings import Settings, GlobalSetting, MediaSetting
 import miville.utils.log
 import time
@@ -92,7 +92,7 @@ class Test_GST_client(unittest.TestCase):
         # create video settings
         address = "127.0.0.1"
         go(0.1)
-        global_setting.start_streaming(listener, address)
+        global_setting.start_streaming(listener, address, 'toto')
         go(5.0)
         
         global_setting.stop_streaming()
