@@ -252,7 +252,6 @@ class MilhouseTests():
         self.countdown('START')
 
         audiocodec = 'vorbis'
-        
         recv, send = self.argfactory('audiovideo')
         send.audiocodec = audiocodec
         send.videosource = 'dv1394src'
@@ -331,10 +330,17 @@ class MilhouseTests():
         send.videosource = 'videotestsrc'
         self.run(recv, send)
 
+    def test_19_videotestsrc_jack(self):
+        """ Test videotestsrc with audio """
+
+        recv, send = self.argfactory('audiovideo')
+        send.videosource = 'videotestsrc'
+        self.run(recv, send)
+
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_01')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_19')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__
