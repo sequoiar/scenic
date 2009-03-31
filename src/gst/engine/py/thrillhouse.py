@@ -341,7 +341,7 @@ class MilhouseTests():
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_19')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_18')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

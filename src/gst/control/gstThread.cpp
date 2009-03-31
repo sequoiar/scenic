@@ -131,6 +131,11 @@ int GstThread::main()
             {
                 queue_.push(f);
             }
+            else if (s == "rtpstats")
+            {
+                // FIXME: MAKE SURE THIS WORKS
+                queue_.push(f);
+            }
             else
                 LOG_WARNING("Unknown Command.");
         }
