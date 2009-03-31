@@ -405,6 +405,7 @@ class CliController(TelnetServer):
                 address = None
                 port = None
                 setting = None
+                auto_answer = None
                 for i, arg in enumerate(args):
                     if i > 0:
                         if '=' in arg:
@@ -419,6 +420,8 @@ class CliController(TelnetServer):
                                 port = value
                             elif key == 'setting':
                                 setting = value
+                            elif key == 'auto_answer':
+                                auto_answer = value
                             else:
                                 self.write("Unable to change %s: unexisting property" % (key) , False)
                         elif new_name == None: #if no key=value pair, resolution order:
@@ -429,8 +432,10 @@ class CliController(TelnetServer):
                             port = arg
                         elif name == None:
                             name = arg
+                        elif auto_answer == None:
+                            auto_answer = arg
 
-                self.core.modify_contact(self, name, new_name, address, port, setting)
+                self.core.modify_contact(self, name, new_name, address, port, auto_answer=auto_answer, setting=setting)
             else:
                 self.write('You need to give at least one argument.', True)
         elif options.duplicate:

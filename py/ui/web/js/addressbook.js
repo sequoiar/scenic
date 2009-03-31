@@ -262,7 +262,6 @@ Addressbook.methods(
 		self.address_fld.value = contact.address;
 		self.port_fld.value = contact.port;
 		self.auto_answer_chk.checked = contact.auto_answer;
-		dbug.info(contact.auto_answer);
 	},
 
 	// show prompt asking to accept an invitation to connect 
@@ -547,14 +546,12 @@ Addressbook.methods(
 				self.auto_answer_chk.checked = false;
 			}
 			self.auto_answer_chk.disabled = false;
-			dbug.info(self.auto_answer_chk);
 		} else if (event == 'contact_unselected') {
 			// clear the checkbox
 			self.auto_answer_chk.checked = false;
 			self.auto_answer_chk.disabled = true;
 		} else if (event == 'contact_selected') {
 			// clear the checkbox
-//			self.auto_answer_chk.checked = false;
 			self.auto_answer_chk.disabled = true;
 		}
 	},
