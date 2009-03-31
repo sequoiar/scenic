@@ -212,12 +212,12 @@ class Index(LivePage, Observer):
     addSlash = True
     
     base_path = os.getcwdu()
-    
+
     # serve some static files
-    child_jslib = static.File('ui/web/js/')
-    child_css = static.File('ui/web/templates/default/css/')
-    child_js = static.File('ui/web/templates/default/js/')
-    child_img = static.File('ui/web/templates/default/img/')
+    child_jslib = static.File(path.join(base_path, 'miville/ui/web/js/'))
+    child_css = static.File(path.join(base_path, 'miville/ui/web/templates/default/css/'))
+    child_js = static.File(path.join(base_path, 'miville/ui/web/templates/default/js/'))
+    child_img = static.File(path.join(base_path, 'miville/ui/web/templates/default/img/'))
 
 #    render_i18n = i18nrender()
 
@@ -230,11 +230,11 @@ class Index(LivePage, Observer):
 
         # load base XML file
         self.docFactory = loaders.xmlfile(path.join(path.dirname(__file__), 'index.xml'))
-        
+
 # not use anymore ?
 #        if self.template:
 #            self.child_template = static.File(path.join('ui/web/templates', self.template))
-  
+
         LivePage.__init__(self)
 
     def renderHTTP(self, ctx):
@@ -273,7 +273,7 @@ class Index(LivePage, Observer):
         """
         base_path = path.dirname(__file__)
         template_path = path.join(base_path, 'templates/default/xml/index.xml')
-        # if we don'T use default template check if there's a valid index.xml
+        # if we don't use default template check if there's a valid index.xml
         # in the choose template directory and set the path accordinally
         if self.template:
             tmp_path = path.join(base_path, 'templates', self.template, 'xml/index.xml')
@@ -396,13 +396,14 @@ class Widget(LiveFragment):
         """
 
         self.docFactory = ['']  # not sure if it's a good idea ?
+        base_path = path.dirname(__file__)
         class_name = self.__class__.__name__
         tmpl_name = 'xml/%s.xml' % small_name(class_name)
-        tmpl_path = path.join(path.dirname(__file__), 'templates')
+        tmpl_path = path.join(base_path, 'templates')
         if template and path.isfile(path.join(tmpl_path, template, tmpl_name)):
-            self.docFactory = loaders.xmlfile(path.join('ui/web/templates/', template, tmpl_name))
+            self.docFactory = loaders.xmlfile(path.join(tmpl_path, template, tmpl_name))
         elif path.isfile(path.join(tmpl_path, 'default', tmpl_name)):
-            self.docFactory = loaders.xmlfile(path.join('ui/web/templates/default', tmpl_name))
+            self.docFactory = loaders.xmlfile(path.join(tmpl_path, 'default', tmpl_name))
         else:
             log.error("Didn't found any valid %s.xml template." % small_name(class_name))
         # add the JS class for this widget
