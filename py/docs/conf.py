@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Sropulpof documentation build configuration file, created by
+# Miville documentation build configuration file, created by
 # sphinx-quickstart on Thu Nov 13 10:59:46 2008.
 #
 # This file is execfile()d with the current directory set to its containing dir.

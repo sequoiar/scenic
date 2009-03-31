@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Sropulpof
+# Miville
 # # # # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
@@ -10,13 +10,13 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# Sropulpof is distributed in the hope that it will be useful,
+# Miville is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+# along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 # System imports
 import os, resource, signal, time, sys, select
@@ -27,9 +27,9 @@ from twisted.python import procutils
 
 
 # App imports
-from protocols import ipcp
-from utils import log
-from utils.common import get_def_name
+from miville.protocols import ipcp
+from miville.utils import log
+from miville.utils.common import get_def_name
 
 log = log.start('debug', 1, 0, 'gst_client')
 

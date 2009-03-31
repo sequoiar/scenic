@@ -40,10 +40,10 @@ from twisted.internet import reactor, protocol, error
 from twisted.protocols.basic import LineReceiver
 
 # App imports
-from utils import log
-from connectors import Connection
-from connectors.states import *
-import errors
+from miville.utils import log
+from miville.connectors import Connection
+from miville.connectors.states import *
+from miville import errors
 
 log = log.start('debug', 1, 0, 'basic')
 

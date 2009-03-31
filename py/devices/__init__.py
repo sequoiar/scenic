@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 from devices import *
-from errors import CommandNotFoundError
-# TODO: from utils import find_modules, load_modules
+from miville.errors import CommandNotFoundError
+# TODO: from miville.utils import find_modules, load_modules
 
 # drivers
-import v4l2
-import jackd
+from miville.devices import v4l2
+from miville.devices import jackd
 
 def start(api):
     try:

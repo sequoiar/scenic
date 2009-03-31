@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Sropulpof
+# Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
@@ -10,13 +10,13 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# Sropulpof is distributed in the hope that it will be useful,
+# Miville is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+# along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 This module is a regroupment of different functions that can be use
@@ -32,9 +32,9 @@ from twisted.python.modules import getModule
 from twisted.python.filepath import FilePath
 
 # App import
-from utils import log
-from errors import InstallFileError
-from i18n import to_utf
+from miville.utils import log
+from miville.errors import InstallFileError
+from miville.utils.i18n import to_utf
 
 log = log.start('debug', 1, 0, 'common')
 
@@ -52,7 +52,7 @@ def find_modules(kind):
     Find all the different modules of this kind available
     """
     mods = []
-    all_mods = getModule(kind).iterModules()
+    all_mods = getModule('miville.' + kind).iterModules()
     for mod in all_mods:
         if mod.isPackage() and not FilePath(mod.filePath.dirname() + '/off').exists():
             mods.append(mod)

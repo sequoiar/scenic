@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Sropulpof
+# Miville
 # Copyright (C) 2008 Société des arts technoligiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
@@ -11,13 +11,13 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# Sropulpof is distributed in the hope that it will be useful,
+# Miville is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+# along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # System imports
@@ -32,12 +32,12 @@ import twisted
 # deal with older version of twisted (in Ubuntu and other)
 version = int(twisted.__version__.split('.')[0])
 if version < 8:
-    from utils.twisted_old import PythonLoggingObserver
+    from miville.utils.twisted_old import PythonLoggingObserver
     tw_log.PythonLoggingObserver = PythonLoggingObserver
 
 # App import
-import utils.common
-from errors import InstallFileError
+import miville.utils.common
+from miville.errors import InstallFileError
 
 #TODO: Specified the level by output
 
@@ -63,7 +63,7 @@ def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
         logger.addHandler(so_handler)
     if to_file:
         try:
-            log_file = utils.common.install_dir('sropulpof.log')
+            log_file = miville.utils.common.install_dir('sropulpof.log')
         except InstallFileError, err:
             print "Logging module ERROR\t%s" % err
         else:

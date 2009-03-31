@@ -36,11 +36,11 @@ import copy
 from twisted.spread.jelly import jelly, unjelly
 
 # App imports
-from utils import log
-from utils import common
-from utils.i18n import to_utf
-from errors import AddressBookError, AddressBookNameError
-from connectors.states import DISCONNECTED, CONNECTED 
+from miville.utils import log
+from miville.utils import common
+from miville.utils.i18n import to_utf
+from miville.errors import AddressBookError, AddressBookNameError
+from miville.connectors.states import DISCONNECTED, CONNECTED 
 
 log = log.start('debug', 1, 0, 'adb')
 

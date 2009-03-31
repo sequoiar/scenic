@@ -1,6 +1,6 @@
 import pypm
 from twisted.internet import protocol, reactor, task, defer
-from utils import log
+from miville.utils import log
 import time
 from midiObject import MidiNote
 from RTPClient import RTPClient

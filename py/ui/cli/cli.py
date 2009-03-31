@@ -60,10 +60,10 @@ except ImportError:
     raise ImportError, 'If you want to use the Telnet interface, you need to install twisted.conch.'
 
 #App imports
-from utils import Observer, log # also imports Observer and Subject from utils/observer.py
+from miville.utils import Observer, log # also imports Observer and Subject from miville.utils/observer.py
 
-from utils.i18n import to_utf
-from utils.common import find_callbacks
+from miville.utils.i18n import to_utf
+from miville.utils.common import find_callbacks
 # from streams.stream import AudioStream, VideoStream, DataStream
 
 
@@ -1697,8 +1697,8 @@ def start(subject, port=14444, interfaces=''):
 
 # this only runs if the module was *not* imported
 if __name__ == '__main__':
-    from utils import Subject
-    from utils import log as logging
+    from miville.utils import Subject
+    from miville.utils import log as logging
     logging.start()
     start(Subject()) # will not work, since some attributes are missing. (core) 
     reactor.run()

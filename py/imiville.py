@@ -5,10 +5,10 @@ import sys
 
 from twisted.internet import reactor 
 
-import core #  as miville
-from utils.observer import Observer
-from ui.cli import CliView
-import devices
+from miville import core #  as miville
+from miville.utils.observer import Observer
+from miville.ui.cli import CliView
+from miville import devices
 
 """
 Miville for ipython.

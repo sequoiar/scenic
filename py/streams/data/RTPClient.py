@@ -1,5 +1,5 @@
 import cPickle
-from utils import log
+from miville.utils import log
 import time
 
 import pypm

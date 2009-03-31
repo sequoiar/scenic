@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Sropulpof
+# Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
@@ -11,13 +11,13 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# Sropulpof is distributed in the hope that it will be useful,
+# Miville is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+# along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 from twisted.trial import unittest
 import os
@@ -25,17 +25,17 @@ import shutil
 import copy
 import tempfile
 
-import addressbook
-from addressbook import AddressBook, Contact, ip_range
-from errors import AddressBookError, InstallFileError
-from utils.i18n import to_utf
-import utils.log
+from miville import addressbook
+from miville.addressbook import AddressBook, Contact, ip_range
+from miville.errors import AddressBookError, InstallFileError
+from miville.utils.i18n import to_utf
+import miville.utils.log
 print os.environ['LANG']
 ALPHABET = 'abcdefghijklmnopqrstuvwxyz_@ ABCDEFÙ1234\'2345-678"9."0!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ~'
 UALPHABET = u'2abcdefghijklmnopqrstuvwxyz_@ ABCDEFÙ1234\'2345-678"9."0!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ~'
 
 del addressbook.log
-addressbook.log = utils.log.start('error', 1, 0, 'adb')
+addressbook.log = miville.utils.log.start('error', 1, 0, 'adb')
 
 class DummyApi(object):
     def get_contacts(self, caller):

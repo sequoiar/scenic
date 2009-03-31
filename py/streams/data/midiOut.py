@@ -5,7 +5,7 @@ from midiObject import MidiNote
 from listCirc import MidiTimeCirc
 from ringBuffer import myRingBuffer
 import pypm
-from utils import log
+from miville.utils import log
 import time
 
 INPUT = 0

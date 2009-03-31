@@ -23,7 +23,7 @@
 Starting point of miville from the command line.
 """
 
-from core import *
+from miville.core import *
 from optparse import OptionParser
 __version__ = "0.1 alpha"
 

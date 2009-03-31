@@ -4,7 +4,7 @@ from twisted.internet.protocol import DatagramProtocol
 import cPickle
 from struct import pack, unpack
 import time
-from utils import log
+from miville.utils import log
 from listCirc import DelayCirc
 from ringBuffer import myRingBuffer
 from midiOut import MidiOut

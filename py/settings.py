@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
-# Sropulpof
+# Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
@@ -11,13 +11,13 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# Sropulpof is distributed in the hope that it will be useful,
+# Miville is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof.  If not, see <http://www.gnu.org/licenses/>.
+# along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 Audio/video/data settings handling for miville. (configuration)
@@ -54,13 +54,13 @@ import re # used when reading settings file
 import pprint
 
 
-from utils import log
-from utils.i18n import to_utf
-from errors import *
-import connectors
-from utils.common import install_dir
+from miville.utils import log
+from miville.utils.i18n import to_utf
+from miville.errors import *
+from miville import connectors
+from miville.utils.common import install_dir
 # persistence is not futile
-from engines import create_channel
+from miville.engines import create_channel
 
 from twisted.spread.jelly import jelly, unjelly
 from twisted.internet import reactor

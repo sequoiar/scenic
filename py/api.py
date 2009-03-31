@@ -51,18 +51,18 @@ import sys
 import pprint 
 
 # App imports
-from errors import *
-import connectors
-from connectors.states import *
-import devices
-from devices import firewire
-import network
-import addressbook # for network_test_*
-from protocols import pinger
+from miville.errors import *
+from miville import connectors
+from miville.connectors.states import *
+from miville import devices
+from miville.devices import firewire
+from miville import network
+from miville import addressbook # for network_test_*
+from miville.protocols import pinger
 import repr
 import settings
 
-from utils import log
+from miville.utils import log
 log = log.start('error', 1, 0, 'api') # added by hugo
 
 from twisted.internet import reactor

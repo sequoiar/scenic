@@ -28,14 +28,14 @@ from twisted.python.modules import getModule
 
 # App imports
 import ui
-import api
+from miville import api
 #import streams
-from utils import log, Subject, common
-import addressbook
+from miville.utils import log, Subject, common
+from miville import addressbook
 import settings
-from protocols import com_chan
-import connectors
-import devices
+from miville.protocols import com_chan
+from miville import connectors
+from miville import devices
 import socket
 
 from twisted.internet.error import CannotListenError
