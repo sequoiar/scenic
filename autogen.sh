@@ -25,4 +25,6 @@ aclocal -I m4
 autoheader
 autoconf -f
 automake -a -f -Wno-portability 
-#./configure $@
+if [ ! "x$BUILDBOT" = "x" ]; then
+    ./configure $@
+fi
