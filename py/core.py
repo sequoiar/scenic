@@ -137,7 +137,7 @@ class Core(Subject):
             try:
                 mod.start(self, port, interfaces)
             except Exception, e:
-                log.error('Unable to start UI module %s. %s' % (mod.__name__, e)) # traceback please
+                log.error('Unable to start UI module %s. %s %s' % (mod.__name__, e, sys.exc_info())) # traceback please
 
 #     def find_engines(self):
 #         """
