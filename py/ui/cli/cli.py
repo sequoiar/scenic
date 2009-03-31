@@ -64,7 +64,7 @@ from utils import Observer, log # also imports Observer and Subject from utils/o
 
 from utils.i18n import to_utf
 from utils.common import find_callbacks
-from streams.stream import AudioStream, VideoStream, DataStream
+# from streams.stream import AudioStream, VideoStream, DataStream
 
 
 log = log.start('info', 1, 0, 'cli')
@@ -1422,12 +1422,13 @@ class CliView(Observer):
                 names.append('------------')
             if streams:
                 for stream in streams:
-                    kind = '?'
-                    if isinstance(stream[1], AudioStream):
-                        kind = 'audio'
-                    elif isinstance(stream[1], VideoStream):
-                        kind = 'video'
-                    names.append(stream[0] + ' (' + kind + ')')
+                     kind = '?'
+                # TODO ! 
+                #     if isinstance(stream[1], AudioStream):
+                #         kind = 'audio'
+                #     elif isinstance(stream[1], VideoStream):
+                #         kind = 'video'
+                     names.append(stream[0] + ' (' + kind + ')')
             else:
                 names.append('There is no stream.')
             self.write("\n".join(names))
