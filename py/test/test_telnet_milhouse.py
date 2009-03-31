@@ -141,7 +141,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         telnet_rx_port = 1250
         telnet_tx_port = 1350
         
-        rx_init_cmd = "audio_init:" + self._get_start_command('vorbis', 12005, "127.0.0.1")
+        rx_init_cmd = "audio_init:" + self._get_start_command('vorbis', 12005, "127.0.0.1", audio_buffer_usec=30000)
         self.verb( "RX:>" + rx_init_cmd)
         tx_init_cmd =  "audio_init:" + self._get_start_command ('vorbis', 12005, "127.0.0.1", source=audio_src, channels=2)
         self.verb( "TX:>" + tx_init_cmd)
@@ -179,7 +179,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         telnet_tx_port = 1370
         
         rx_video_init_cmd = "video_init:" + self._get_start_command('mpeg4',   12007, "127.0.0.1")
-        rx_audio_init_cmd = "audio_init:" + self._get_start_command('raw', 12107, "127.0.0.1", channels =2)        
+        rx_audio_init_cmd = "audio_init:" + self._get_start_command('raw', 12107, "127.0.0.1",  audio_buffer_usec=30000)        
         self.verb( 'RX video: ' + rx_video_init_cmd )
         self.verb( 'RX audio: ' + rx_audio_init_cmd )
         
@@ -191,11 +191,9 @@ class Test_telnet_milhouse(jimbo.Nelson):
                  
         self.start_propulseart_rx(telnet_rx_port)
         self.start_propulseart_tx(telnet_tx_port)
-        
-
+    
         self.tst_rx(rx_video_init_cmd , video_init_ok )
         self.tst_rx(rx_audio_init_cmd , audio_init_ok  )
-        
         
         self.tst_tx(tx_video_init_cmd, video_init_ok)
         self.tst_tx(tx_audio_init_cmd , audio_init_ok)
