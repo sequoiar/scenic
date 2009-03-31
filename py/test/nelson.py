@@ -80,7 +80,13 @@ def generate_html(test_class):
             body += """<h2>%s</h2>
                     <p>%s</p>
                     <img src='%s' align='middle' />
-                    """ % (member_name, description, image)  
+                    
+                    <p><a href="%s_rx.txt">receiver log</a>
+                    <p><a href="%s_telnet_rx.txt">receiver telnet log</a>
+                    <p><a href="%s_rx.txt">receiver log</a>
+                    <p><a href="%s_telnet_rx.txt">receiver telnet log</a>
+                                        
+                    """ % (member_name, description, image,member_name,member_name,member_name,member_name)  
   
     description = test_class.__doc__
     html = """<html>
@@ -181,7 +187,7 @@ class Nelson(unittest.TestCase):
     
 
    
-    def _stream_duration(self, delay):
+    def stream_duration(self, delay):
         """
         Adds a line to the sequence diagram
         """ 
@@ -338,6 +344,8 @@ msc
         err = errorMsg or 'The command did not return: "%s" as expected' % expected
         self._expectTest(client, expected, err)
     
+    def verb(self,msg=''):
+        verb(msg)
 
 def prompt(str, prompt = ">"):
     return prompt + str + ''
