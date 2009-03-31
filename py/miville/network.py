@@ -1,6 +1,6 @@
 #!/usr/bin/env python 
-## -*- coding: utf-8 -*-
-
+# -*- coding: utf-8 -*-
+#
 # Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -63,6 +63,7 @@ from miville.utils import log
 from miville.utils import commands
 from miville import connectors
 from miville.errors import CommandNotFoundError
+
 log = log.start('info', 1, True, 'network') # LOG TO FILE = True
 # CHANGE IT TO debug LEVEL TO GET MORE OUTPUT
 

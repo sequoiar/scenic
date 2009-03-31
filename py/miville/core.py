@@ -21,24 +21,24 @@
 
 import sys
 import traceback
+import socket
 
 # Twisted imports
 from twisted.internet import reactor, task
 from twisted.python.modules import getModule
+from twisted.internet.error import CannotListenError
 
 # App imports
-import ui
+from miville import ui
 from miville import api
 #import streams
 from miville.utils import log, Subject, common
 from miville import addressbook
-import settings
+from miville import settings
 from miville.protocols import com_chan
 from miville import connectors
 from miville import devices
-import socket
 
-from twisted.internet.error import CannotListenError
 
 # module variables
 core = None

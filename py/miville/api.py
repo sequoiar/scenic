@@ -49,6 +49,9 @@ self.api.notify(
 
 import sys
 import pprint 
+import repr
+
+from twisted.internet import reactor
 
 # App imports
 from miville.errors import *
@@ -59,13 +62,11 @@ from miville.devices import firewire
 from miville import network
 from miville import addressbook # for network_test_*
 from miville.protocols import pinger
-import repr
-import settings
-
+from miville import settings
 from miville.utils import log
+
 log = log.start('error', 1, 0, 'api') # added by hugo
 
-from twisted.internet import reactor
 
 def modify(who, name_of_who, what, new_value):
     """
