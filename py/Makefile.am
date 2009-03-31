@@ -10,12 +10,13 @@ TESTS = test/test_com_chan.py \
 
 
 # to update to new path
-#        test/test_common.py \
-
+#        test/test_common.py 
+#
 # broken telnet executable: 
-#        test/check_ping.py \
-#        test/solo_test_preset_settings.py \
-#        test/solo_test_telnet_settings.py \
-
+#        test/check_ping.py 
+#        test/solo_test_preset_settings.py 
+#        test/solo_test_telnet_settings.py 
+#
 # not much useful:
-#        test/test_network.py \
+#        test/test_network.py 
+#
