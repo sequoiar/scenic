@@ -78,7 +78,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         self.tst_tx(tx_init_msg, video_init_ok)
         self.tst_tx("start:", start_ok) # start streaming
         self.stream_duration(5.)
-        self.tst_tx("stop:", stop_ok)
+        self.tst_tx("stop:", stop_but_not_ok)
         
     def test_03_simple_video_receiver(self):
         """
