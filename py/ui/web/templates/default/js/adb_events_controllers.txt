@@ -17,6 +17,7 @@ CONTROLLERS
 -edit
 -connect
 -fields
+-auto_answer
 -add
 -remove
 -status

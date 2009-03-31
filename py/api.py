@@ -192,19 +192,19 @@ class ControllerApi(object):
         """
         return self.adb.client_contact(address, port)
 
-    def save_client_contact(self, caller, name=None, new_name=None):
+    def save_client_contact(self, caller, name=None, new_name=None, auto_answer=False):
         """
         Saved permanently an auto created contact to the Address Book.
         If no name is given, the selected is use. If new_name is given the
         contact will be saved under this new name.
         """
         try:
-            result = self.adb.save_client_contact(name, new_name)
+            result = self.adb.save_client_contact(name, new_name, auto_answer)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)
 
-    def add_contact(self, caller, name, address, port=None, auto_created=False):
+    def add_contact(self, caller, name, address, port=None, auto_created=False, auto_answer=False):
         """
         Adds a contact to the Address Book.
         
@@ -216,7 +216,7 @@ class ControllerApi(object):
         on problems.
         """
         try:
-            result = self.adb.add(name, address, port, auto_created)
+            result = self.adb.add(name, address, port, auto_created, auto_answer)
         except AddressBookError, err:
             result = err
         self.notify(caller, result) # implicit key: 'add_contact'
@@ -233,13 +233,13 @@ class ControllerApi(object):
             result = err
         self.notify(caller, result) # implicit key: 'delete_contact'
 
-    def modify_contact(self, caller, name=None, new_name=None, address=None, port=None, setting = None):
+    def modify_contact(self, caller, name=None, new_name=None, address=None, port=None, auto_answer=None, setting=None):
         """
         Changes one or more attributes of a contact.
         If no name is given, modify the selected contact.
         """
         try:
-            result = self.adb.modify(name, new_name, address, port, setting)
+            result = self.adb.modify(name, new_name, address, port, auto_answer, setting)
         except AddressBookError, err:
             result = err
         self.notify(caller, result)

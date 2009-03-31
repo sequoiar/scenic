@@ -203,16 +203,16 @@ class Addressbook(Widget):
         else:
             log.debug('IOrigin: %s - Data: %s' % (origin, data))
 
-    def rc_add_contact(self, name, address, port):
-        self.api.add_contact(self, name, address, port)
+    def rc_add_contact(self, name, address, port, auto_answer):
+        self.api.add_contact(self, name, address, port, auto_answer=auto_answer)
         return False
     
     def rc_remove_contact(self, name):
         self.api.delete_contact(self, name)
         return False
     
-    def rc_modify_contact(self, name, new_name, address, port):
-        self.api.modify_contact(self, name, new_name, address, port)
+    def rc_modify_contact(self, name, new_name, address, port, auto_answer):
+        self.api.modify_contact(self, name, new_name, address, port, auto_answer)
         return False
     
     def cb_modify_contact(self, origin, data):
@@ -222,8 +222,8 @@ class Addressbook(Widget):
 
     cb_add_contact = cb_modify_contact
     
-    def rc_keep_contact(self, name, new_name):
-        self.api.save_client_contact(self, name, new_name)
+    def rc_keep_contact(self, name, new_name, auto_answer):
+        self.api.save_client_contact(self, name, new_name, auto_answer)
         return False
     
     def cb_save_client_contact(self, origin, data):

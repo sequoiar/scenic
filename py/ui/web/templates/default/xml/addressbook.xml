@@ -27,7 +27,7 @@
 			</tr>
 			<tr>
 				<td></td>
-				<td><label for="adb_auto_answer">Auto-answer: </label><input id="adb_auto_answer" type="checkbox" disabled="false" /></td>
+				<td id="adb_auto_answer_cell"><input id="adb_auto_answer" type="checkbox" /><label n:render="i18n" for="adb_auto_answer"> Auto-answer</label></td>
 			</tr>
 			<tr>
 				<td></td>

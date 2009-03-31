@@ -69,7 +69,7 @@ class AddressBook(object):
         self.read()
         Contact.adb = self
 
-    def add(self, name, address, port=None, auto_created=False, connector=None, setting=0):
+    def add(self, name, address, port=None, auto_created=False, auto_answer=False, connector=None, setting=0):
         """
         Adds a contact to the Address Book.
         
@@ -83,7 +83,7 @@ class AddressBook(object):
         name = to_utf(name)
         if name in self.contacts:
             raise AddressBookNameError, 'Name %s already in Address Book' % name
-        self.contacts[name] = Contact(name, address, port, auto_created, connector, setting)
+        self.contacts[name] = Contact(name, address, port, auto_created, auto_answer, connector, setting)
         log.debug("adding contact %s %s" % (name, address))
         self.write()
         return True
@@ -100,7 +100,7 @@ class AddressBook(object):
         self.write()
         return True
 
-    def modify(self, name=None, new_name=None, address=None, port=None, setting=None, connector=None):
+    def modify(self, name=None, new_name=None, address=None, port=None, auto_answer=None, setting=None, connector=None):
         """
         Changes one or more attributes of a contact.
         If no name is given, modify the selected contact.
@@ -124,6 +124,8 @@ class AddressBook(object):
         contact.set_port(port)
         contact.set_address(address)
         contact.assign_connector(connector)
+        if auto_answer != None:
+            contact.auto_answer = auto_answer
         contact.setting = setting
         
         self.write()
@@ -225,7 +227,7 @@ class AddressBook(object):
         self.selected = contact.name
         return contact
 
-    def save_client_contact(self, name=None, new_name=None):
+    def save_client_contact(self, name=None, new_name=None, auto_answer=False):
         """
         Saved permanently an auto created contact to the Address Book.
         If no name is given, the selected is use. If new_name is given the
@@ -235,8 +237,8 @@ class AddressBook(object):
         if not contact.auto_created:
             raise AddressBookError, 'This contact \'%s\' is already saved.' % contact.name
         contact.auto_created = False
-        if new_name != None:
-            self.modify(contact.name, new_name)
+        if new_name != None or auto_answer == True:
+            self.modify(contact.name, new_name, auto_answer=auto_answer)
         self.write()
 
     def _get_name(self, name):
@@ -349,7 +351,7 @@ class Contact(object):
     """
     adb = None
 
-    def __init__(self, name, address, port=None, auto_created=False, connector=None, setting=0):
+    def __init__(self, name, address, port=None, auto_created=False, auto_answer=False, connector=None, setting=0):
         """
         Name and address are mandatory, port is optional and if connector is
         None, it will be deduce from the address type. Setting is set to 0
@@ -368,7 +370,7 @@ class Contact(object):
         self.connector = None
         self.state = DISCONNECTED
         self.auto_created = auto_created
-        self.auto_answer = True
+        self.auto_answer = auto_answer
         self.connection = None
 
         self.set_address(address)

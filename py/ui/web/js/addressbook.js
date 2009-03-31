@@ -23,6 +23,7 @@ Addressbook.methods(
 		self.address_fld = $('adb_address');
 		self.port_fld = $('adb_port');
 		self.contact_flds = [self.name_fld, self.address_fld, self.port_fld]
+		self.auto_answer_chk = $('adb_auto_answer');
 		self.edit_btn = $('adb_edit');
 
 		// Get string translations. TODO: (maybe we can do this automatically?)
@@ -85,6 +86,7 @@ Addressbook.methods(
 		self.upd_status(event);
 		self.upd_edit_btn(event);
 		self.upd_connect_btn(event);
+		self.upd_auto_answer_chk(event);
 		self.upd_fields(event);
 		self.upd_add_btn(event);
 		self.upd_remove_btn(event);
@@ -153,7 +155,7 @@ Addressbook.methods(
 			if (client_list.contains(item['name'])) {
 				var li = self.list.getElement('li[name=' + item['name'] + ']');
 				li.set('state', item['state']);
-				li.set('auto_answer', (item['auto_answer'] ? 'true' : ''));
+		//		li.set('auto_answer', (item['auto_answer'] ? 'true' : ''));
 				li.set('auto_created', (item['auto_created'] ? 'true' : ''));
 				if (item['auto_created']) {
 					if (!li.hasClass('auto_created')) {
@@ -171,7 +173,7 @@ Addressbook.methods(
 					'text': item['name'],
 					'name': item['name'],
 					'state': item['state'],
-				    'auto_answer': (item['auto_answer'] ? 'true' : ''),
+//				    'auto_answer': (item['auto_answer'] ? 'true' : ''),
 					'auto_created': (item['auto_created'] ? 'true' : ''),
 					'status': '',
 					'error': '',
@@ -259,6 +261,8 @@ Addressbook.methods(
 		self.name_fld.value = contact.name;
 		self.address_fld.value = contact.address;
 		self.port_fld.value = contact.port;
+		self.auto_answer_chk.checked = contact.auto_answer;
+		dbug.info(contact.auto_answer);
 	},
 
 	// show prompt asking to accept an invitation to connect 
@@ -375,17 +379,20 @@ Addressbook.methods(
 			self.callRemote('rc_add_contact',
 							self.name_fld.value,
 							self.address_fld.value,
-							self.port_fld.value);
+							self.port_fld.value,
+							self.auto_answer_chk.checked);
 		} else if (self.new_modify == 'modify') {
 			self.callRemote('rc_modify_contact',
 							self.selected,
 							self.name_fld.value,
 							self.address_fld.value,
-							self.port_fld.value);
+							self.port_fld.value,
+							self.auto_answer_chk.checked);
 		} else if (self.new_modify == 'keep') {
 			self.callRemote('rc_keep_contact',
 							self.selected,
-							self.name_fld.value);
+							self.name_fld.value,
+							self.auto_answer_chk.checked);
 		}
 		// update the selected name
 		self.selected = self.name_fld.value;
@@ -507,6 +514,11 @@ Addressbook.methods(
 				elem.value = '';
 			});
 			self.set_fields_state('disabled');
+		} else if (event == 'keep_contact') {
+			self.name_fld.disabled = false;
+			self.name_fld.select();
+			self.address_fld.disabled = true;
+			self.port_fld.disabled = true;
 		}
 	},
 
@@ -526,11 +538,33 @@ Addressbook.methods(
 		self.edit_btn.value = self.edit_str;
 	},
 
+	// Update auto_answer checkbox state
+	function upd_auto_answer_chk(self, event) {
+		// list of events that "fields" should react to
+		if (event == 'edit_contact' || event == 'add_contact' || event == 'keep_contact') {
+			if (event == 'add_contact' || event == 'keep_contact') {
+				// clear the checkbox
+				self.auto_answer_chk.checked = false;
+			}
+			self.auto_answer_chk.disabled = false;
+			dbug.info(self.auto_answer_chk);
+		} else if (event == 'contact_unselected') {
+			// clear the checkbox
+			self.auto_answer_chk.checked = false;
+			self.auto_answer_chk.disabled = true;
+		} else if (event == 'contact_selected') {
+			// clear the checkbox
+//			self.auto_answer_chk.checked = false;
+			self.auto_answer_chk.disabled = true;
+		}
+	},
+
 	// Update add button state
 	function upd_add_btn(self, event) {
 		// list of events that "add" should react to
 		if (['contact_selected',
 			 'edit_contact',
+			 'keep_contact',
 			 'contact_unselected'].contains(event)) {
 			// set the default state
 			var button_state = 'enabled';
@@ -564,6 +598,7 @@ Addressbook.methods(
 		if (['contact_selected',
 			 'edit_contact',
 			 'add_contact',
+			 'keep_contact',
 			 'contact_unselected'].contains(event)) {
 			// set the default state
 			var button_state = 'disabled';
@@ -611,7 +646,7 @@ Addressbook.methods(
 			if (button_state == 'enabled') {
 				if (auto_created) {
 					self.edit_btn.value = self.keep_str;
-					self.remove_btn.addEvent('click', function(){
+					self.edit_btn.addEvent('click', function(){
 						self.keep_contact();
 					});
 				} else {
@@ -626,7 +661,7 @@ Addressbook.methods(
 				self.edit_btn.disabled = true;
 			}
 
-		} else if (event == 'edit_contact' || event == 'add_contact') {
+		} else if (['edit_contact', 'add_contact', 'keep_contact'].contains(event)) {
 			self.edit_btn.removeEvents('click');
 			self.edit_btn.disabled = false;
 			self.edit_btn.value = self.save_str;
@@ -668,6 +703,7 @@ Addressbook.methods(
 		if (['contact_selected',
 			 'edit_contact',
 			 'add_contact',
+			 'keep_contact',
 			 'save_contact',
 			 'contact_unselected'].contains(event)) {
 
@@ -679,6 +715,10 @@ Addressbook.methods(
 			var contact_state = self.get_selected_attr('state');	// state of selected contact
 			if (contact_state >= 0 && (self.edit_btn.value == self.edit_str || self.edit_btn.value == self.keep_str)) {
 				button_state = 'enabled';
+			}
+			
+			if (contact_state > 0) {
+				button_name = self.disconnect_str;
 			}
 
 			// set the state of the button

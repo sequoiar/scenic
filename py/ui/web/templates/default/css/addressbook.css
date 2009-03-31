@@ -57,6 +57,10 @@
 	text-align: right;
 }
 
+#adb_fields input {
+	padding: 1px 2px;
+}
+
 .button:hover {
 	cursor: pointer;
 }
@@ -86,6 +90,20 @@ li.auto_created {
 	font-style: italic;
 	color: #414141;
 }
+
+#adb_auto_answer_cell {
+	text-align: left;
+}
+
+#adb_auto_answer_cell input {
+	margin: 0;
+}
+
+#adb_auto_answer_cell label {
+	position: relative;
+	top: -3px;
+}
+
 
 /* THE PART LINE */
 
