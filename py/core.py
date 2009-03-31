@@ -20,6 +20,7 @@
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+import traceback
 
 # Twisted imports
 from twisted.internet import reactor, task
@@ -138,6 +139,7 @@ class Core(Subject):
                 mod.start(self, port, interfaces)
             except Exception, e:
                 log.error('Unable to start UI module %s. %s %s' % (mod.__name__, e, sys.exc_info())) # traceback please
+                traceback.print_exc()
 
 #     def find_engines(self):
 #         """
