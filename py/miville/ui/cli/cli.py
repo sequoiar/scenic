@@ -1470,9 +1470,14 @@ class CliView(Observer):
             self.write("\n".join(msg))
 
     def _ask(self, origin, data):
-        self.write('\n%s is inviting you. Do you accept? [Y/n]: ' % data[0], False)
         self.controller.block = self.controller._ask
-        self.controller.remote = data[1]
+        self.controller.remote = data['connection']
+
+        if data.has_key('name'):
+            caption = '%s is inviting you. (address: %s) Do you accept? [Y/n]:' % (data['name'], data['address'])
+        else:
+            caption = '%s is inviting you. Do you accept? [Y/n]:' % data['address']
+        self.write(caption, False)
 
     def _ask_timeout(self, origin, data):
         self.write('You didn\'t answer soon enough to %s. Connection closed.' % data)
