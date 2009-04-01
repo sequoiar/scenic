@@ -109,7 +109,7 @@ def install_dir(filename, dirname=None):
         raise InstallFileError, 'File name <%s> is not valid.' % (filename)
     if not dirname:
         raise InstallFileError, 'Directory name <%s> is not valid.' % (dirname)
-    dirpath = os.path.join(os.environ['HOME'], dirname)
+    dirpath = dirname # XXX removed $HOME from here. os.path.join(os.environ['HOME'], dirname)
     if not os.path.isdir(dirpath):
         try:
             os.makedirs(dirpath)

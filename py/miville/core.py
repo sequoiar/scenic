@@ -19,6 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+The core of miville loads most of its modules and start some servers.
+
+See also the api.py for more modules init and servers startup.
+
+Contains the core configuration of miville.
+"""
+import os
 import sys
 import traceback
 import socket
@@ -38,7 +46,6 @@ from miville import settings
 from miville.protocols import com_chan
 from miville import connectors
 from miville import devices
-
 
 # module variables
 core = None
@@ -66,10 +73,10 @@ class MivilleConfiguration(object):
         self.listen_to_interfaces = '' # means all interfaces
         self.ui_network_interfaces = ['127.0.0.1'] # default is only local host
         # files
-        self.miville_home = ".sropulpof" # TODO: change for .miville # prefixed by ~/
+        self.miville_home = os.path.expanduser("~/.sropulpof") # TODO: change for .miville # prefixed by ~/
         self.addressbook_filename = 'sropulpof.adb' # TODO: "contacts.txt"
-        self.settings_presets_filename = "presets.sets"
-        self.settings_filename = "settings.sets"
+        self.settings_presets_filename = "presets.sets" # TODO: presets.txt
+        self.settings_filename = "settings.sets" # TODO: settings.txt
         
         # update the attributes to match passed dict
         if dictionary is not None:
@@ -98,6 +105,7 @@ class Core(Subject):
         """
         Subject.__init__(self)
         self.config = config_object
+        common.MIVILLE_HOME = self.config.miville_home
         self.uis = None
         self.com_chan_port = self.config.com_chan_port + self.config.port_numbers_offset 
         self.api = api.ControllerApi(self.notify)
@@ -137,6 +145,11 @@ class Core(Subject):
                 log.error('unknown user interface')
             try:
                 mod.start(self, port, interfaces)
+            except CannotListenError, e:
+                log.error('Unable to start UI module %s. %s %s' % (mod.__name__, e, sys.exc_info())) # traceback please
+                log.error("Port unavailable. There is probably an other miville running on this machine. Try with -o option.")
+                log.error("Exiting.")
+                exit(1) # ends the program
             except Exception, e:
                 log.error('Unable to start UI module %s. %s %s' % (mod.__name__, e, sys.exc_info())) # traceback please
                 traceback.print_exc()

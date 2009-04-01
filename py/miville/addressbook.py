@@ -290,6 +290,7 @@ class AddressBook(object):
                 else:
                     serialized = True
             if serialized:
+                log.info("Successfully loaded the addressbook.")
                 # get the selected contact and remove it from the contacts dict
                 self.selected = self.contacts['_selected']
                 del self.contacts['_selected']

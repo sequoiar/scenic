@@ -324,7 +324,7 @@ class Settings(object):
             if k >= first_user_setting_id:
                 user_media_settings[k] = med
         
-        filename = install_dir("settings.sets")
+        filename = install_dir(SETTINGS_FILENAME) # "settings.sets")
         
         # little hack to  create a preset file
         stuff = (user_global_settings, user_media_settings)  
