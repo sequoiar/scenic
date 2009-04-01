@@ -153,7 +153,7 @@ class Connection(object):
         
         """
         self.com_chan = channel
-        self.com_chan.owner = self # added for when there is an error and we need to delete the com_chan.
+        self.com_chan.set_connection(self) # added for when there is an error and we need to delete the com_chan.
         self.contact.state = CONNECTED
         if client == 'server':
             self.com_chan_started_server()

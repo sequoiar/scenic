@@ -39,7 +39,7 @@ from twisted.cred import portal, checkers, credentials, error
 from twisted.spread import pb
 from twisted.spread.pb import DeadReferenceError
 from twisted.python import failure
-
+from twisted.spread.jelly import globalSecurity
 # App imports
 from miville.utils import log
 
@@ -145,7 +145,21 @@ class ComChannel(object):
             del self.methods[name]
         else:
             log.debug('Could not delete the method %s because is not registered.' % name)
-            
+
+    def set_connection(self, owner):
+        self.owner = owner
+
+
+class ComChanClientFactory(pb.PBClientFactory):
+    def __init__(self, com_chan, unsafeTracebacks=False, security=globalSecurity):
+        self.com_chan = com_chan
+        pb.PBClientFactory.__init__(self, unsafeTracebacks, security)
+    
+    def clientConnectionLost(self, connector, reason, reconnecting=0):
+        """On com_chan lost, close the connection object of this contact."""
+        self.com_chan.owner.cleanup(True)
+        pb.PBClientFactory.clientConnectionLost(self, connector, reason, reconnecting)
+
 
 class ComChanClient(pb.Referenceable, ComChannel):
     """
@@ -156,17 +170,16 @@ class ComChanClient(pb.Referenceable, ComChannel):
     remote_main = ComChannel.main
     
     def connect(self, name, address, port=37054):
-        self.factory = pb.PBClientFactory()
+        self.factory = ComChanClientFactory(self)
         reactor.connectTCP(address, port, self.factory)
         deferred = self.factory.login(credentials.UsernamePassword(name, "pofword"), client=self)
         deferred.addCallback(self.attached)
         return deferred
 
     def disconnect(self):
-        #print "COMCHAN_DISCONNECTED in ComChanClient"
         self.owner.cleanup(True) # arg = called by com_chan
         self.factory.disconnect()
-
+        
 
 class ComChanRealm:
     """
@@ -229,6 +242,7 @@ class ComChanCheck:
         else:
             log.debug('Unauthorized login')
             return failure.Failure(error.UnauthorizedLogin())
+
 
 # functions 
 def start(api, conns, port=PORT, interfaces=''):
