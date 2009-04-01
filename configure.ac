@@ -187,10 +187,6 @@ AC_CONFIG_FILES([Makefile
                  py/miville/devices/Makefile
                  py/miville/protocols/Makefile
                  py/miville/engines/Makefile
-                 py/miville/streams/Makefile
-                 py/miville/streams/audio/Makefile
-                 py/miville/streams/video/Makefile
-                 py/miville/streams/data/Makefile
                  py/miville/ui/Makefile
                  py/miville/utils/Makefile
                  src/include/Makefile

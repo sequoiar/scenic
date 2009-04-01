@@ -1,4 +1,4 @@
 include $(top_srcdir)/globals.mak 
 
-SUBDIRS = connectors devices engines protocols streams ui utils
+SUBDIRS = connectors devices engines protocols ui utils
 
