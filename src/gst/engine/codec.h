@@ -199,11 +199,14 @@ class Mpeg4Encoder : public VideoEncoder
 {
     public:
         Mpeg4Encoder();
+        ~Mpeg4Encoder();
 
     private:
         void init();
         _GstElement *deinterlace_;
         _GstElement *queue_;
+        _GstElement *sinkQueue_;
+        _GstElement *srcQueue_;
         _GstElement *colorspc_;
         _GstElement *sinkElement() 
         { 
@@ -212,6 +215,7 @@ class Mpeg4Encoder : public VideoEncoder
             else
                 return deinterlace_; 
         }
+        _GstElement *srcElement() { return srcQueue_; }
 
         RtpPay* createPayloader() const;
         

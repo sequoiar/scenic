@@ -256,19 +256,33 @@ RtpPay* H263Decoder::createDepayloader() const
 
 /// Constructor 
 Mpeg4Encoder::Mpeg4Encoder() : 
-    deinterlace_(0), queue_(0), colorspc_(0)
+    deinterlace_(0), queue_(0), sinkQueue_(0), srcQueue_(0), colorspc_(0)
 {}
 
 
+/// Destructor 
+Mpeg4Encoder::~Mpeg4Encoder()
+{
+    Pipeline::Instance()->remove(&colorspc_);
+    Pipeline::Instance()->remove(&deinterlace_);
+    Pipeline::Instance()->remove(&queue_);
+    Pipeline::Instance()->remove(&srcQueue_);
+    Pipeline::Instance()->remove(&sinkQueue_);
+}
+
+/// Sets up either deinterlace->queue->colorspace->queue->encoder->queue
+/// or colorspace->queue->encoder->queue
 void Mpeg4Encoder::init()
 {
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
+    sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
 
     if (doDeinterlace_)
     {
-        LOG_DEBUG("DO THE DEINTERLACE");
+        LOG_DEBUG("Applying Deinterlacing filter to video");
         deinterlace_ = Pipeline::Instance()->makeElement("deinterlace2", NULL);
         queue_ = Pipeline::Instance()->makeElement("queue", NULL);
         gstlinkable::link(deinterlace_, queue_);
@@ -277,7 +291,11 @@ void Mpeg4Encoder::init()
     else
         g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
 
-    gstlinkable::link(colorspc_, codec_);
+    // Create separate thread for encoding, should yield better performance on multicore machines
+    //gstlinkable::link(colorspc_, codec_);
+    gstlinkable::link(colorspc_, sinkQueue_);
+    gstlinkable::link(sinkQueue_, codec_);
+    gstlinkable::link(codec_, srcQueue_);       
 }
 
 
