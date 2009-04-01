@@ -94,8 +94,6 @@ def generate_html(test_class):
                     <h3>Server terminal logs (YMMV)</h3>
                     <p><a href="%s_rx.txt">receiver log</a>
                     <p><a href="%s_tx.txt">sender log</a>
-                    
-                                        
                     """ % (member_name, description, image,member_name,member_name,member_name,member_name,member_name)  
             msc2png(member_name)
     description = test_class.__doc__
