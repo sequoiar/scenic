@@ -153,7 +153,8 @@ class ComChannel(object):
 class ComChanClientFactory(pb.PBClientFactory):
     def __init__(self, com_chan, unsafeTracebacks=False, security=globalSecurity):
         self.com_chan = com_chan
-        pb.PBClientFactory.__init__(self, unsafeTracebacks, security)
+        # TODO: commented the two arguments in the next line since only one is expected
+        pb.PBClientFactory.__init__(self) # , unsafeTracebacks, security)
     
     def clientConnectionLost(self, connector, reason, reconnecting=0):
         """On com_chan lost, close the connection object of this contact."""
