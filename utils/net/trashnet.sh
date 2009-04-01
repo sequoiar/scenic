@@ -1,17 +1,18 @@
 #!/bin/bash
-# run this script as root to create 1% packet loss conditions between SOURCE_IP an DEST IP
 #
-usage () 
-{
-    echo "Usage: sudo trashNet.sh <INTERFACE> <SOURCE_HOST> <DEST_HOST>"
-}
+# run this script as root to create packet loss conditions (defaults to 1%)
+# between SOURCE_IP an DEST IP
+#
 
+usage () {
+    echo "Usage: sudo $(basename $0) <INTERFACE> <SOURCE_HOST> <DEST_HOST> [PACKET_LOSS]"
+} 
 
 if [ $# -lt 1 ]
 then
     echo "Invalid arguments."
     usage
-    exit
+    exit 1
 fi
 
 if [ $1 = "--help" ]
@@ -24,12 +25,24 @@ if [ $# -lt 3 ]
 then
     echo "Invalid arguments."
     usage
-    exit
+    exit 1
 fi
 
 INTERFACE=$1
 SOURCE_HOST=$2
 DEST_HOST=$3
+PACKET_LOSS=${4:-1}
+
+if [ $PACKET_LOSS -gt 10 ]
+then
+    echo "Come on\! More than 10%?"
+    exit 1
+elif [ $PACKET_LOSS -lt 0 ]
+then
+    echo "Come on\! Negative packet loss?"
+    exit 1
+fi
+
 
 echo "Trashing connection between src ${SOURCE_HOST} and dest ${DEST_HOST} on interface ${INTERFACE}"
 
@@ -38,7 +51,7 @@ tc qdisc del dev ${INTERFACE} root
 # root node
 tc qdisc add dev ${INTERFACE} root handle 1: prio bands 10
 # netem qdisc
-tc qdisc add dev ${INTERFACE} parent 1:1 handle 10: netem loss 1%
+tc qdisc add dev ${INTERFACE} parent 1:1 handle 10: netem loss ${PACKET_LOSS}%
 tc filter add dev ${INTERFACE} protocol ip parent 1:0 prio 1 u32 match ip src ${SOURCE_HOST}/32 match ip dst ${DEST_HOST}/32 flowid 10:1
 # other qdisc
 tc qdisc add dev ${INTERFACE} parent 1:2 handle 20: pfifo

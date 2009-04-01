@@ -2,7 +2,7 @@
 
 usage () 
 {
-    echo "Usage: cleanNet.sh <INTERFACE>"
+    echo "Usage: $(basename $0) <INTERFACE>"
 }
 
 
