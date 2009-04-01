@@ -42,8 +42,9 @@ import os
 import time
 import sys
 import inspect
-
 import repr
+
+import commands
 
 # global constants
 
@@ -65,6 +66,12 @@ def verb(to_print=''):
     #if VERBOSE_CLIENT:
     print to_print
 
+def msc2png(test_name):
+    cmd = "mscgen -T png -i %s.msc -o %s.png" % (test_name, test_name)
+    status = commands.getstatusoutput(cmd)
+    output = status[1]
+    
+
 def generate_html(test_class):    
     members = dir(test_class)
     title = test_class.__name__
@@ -80,14 +87,17 @@ def generate_html(test_class):
             body += """<h2>%s</h2>
                     <p>%s</p>
                     <img src='%s' align='middle' />
+                    <p><a href="%s.msc">Sequence diagram source</a>
+                    <h3>Telnet logs</h3>
+                    <p><a href="%s_telnet_tx.txt">sender telnet log</a>
+                    <p><a href="%s_telnet_rx.txt">receiver telnet log</a>
+                    <h3>Server terminal logs (YMMV)</h3>
+                    <p><a href="%s_rx.txt">receiver log</a>
+                    <p><a href="%s_tx.txt">sender log</a>
                     
-                    <p><a href="%s_rx.txt">receiver log</a>
-                    <p><a href="%s_telnet_rx.txt">receiver telnet log</a>
-                    <p><a href="%s_rx.txt">receiver log</a>
-                    <p><a href="%s_telnet_rx.txt">receiver telnet log</a>
                                         
-                    """ % (member_name, description, image,member_name,member_name,member_name,member_name)  
-  
+                    """ % (member_name, description, image,member_name,member_name,member_name,member_name,member_name)  
+            msc2png(member_name)
     description = test_class.__doc__
     html = """<html>
     <head>
