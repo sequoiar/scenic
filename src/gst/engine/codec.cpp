@@ -356,9 +356,11 @@ RawEncoder::RawEncoder()
 
 void RawEncoder::init()
 {
+    // HACK ATTACK: it's simpler to have this placeholder element
+    // that pretends to be an aconv, and it has no
+    // effect, but this isn't very smart.
     aconv_ = Pipeline::Instance()->makeElement("identity", NULL);
     g_object_set(aconv_, "silent", TRUE, NULL);
-    //AudioConvertedEncoder::init();
 }
 
 /// Creates an RtpL16Payloader 

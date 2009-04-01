@@ -1,11 +1,11 @@
 #!/bin/bash
 #
 # run this script as root to create packet loss conditions (defaults to 1%)
-# between SOURCE_IP an DEST IP
+# between this host's ip and DEST IP
 #
 
 usage () {
-    echo "Usage: sudo $(basename $0) <INTERFACE> <SOURCE_HOST> <DEST_HOST> [PACKET_LOSS]"
+    echo "Usage: sudo $(basename $0) <INTERFACE> <DEST_HOST> [PACKET_LOSS]"
 } 
 
 if [ $# -lt 1 ]
@@ -21,7 +21,7 @@ then
     exit
 fi
 
-if [ $# -lt 3 ]
+if [ $# -lt 2 ]
 then
     echo "Invalid arguments."
     usage
@@ -29,9 +29,9 @@ then
 fi
 
 INTERFACE=$1
-SOURCE_HOST=$2
-DEST_HOST=$3
-PACKET_LOSS=${4:-1}
+DEST_HOST=$2
+PACKET_LOSS=${3:-1}
+SOURCE_HOST=$( ifconfig ${INTERFACE} | awk '/inet addr/ { sub(/addr:/,"",$2);print $2}' )
 
 if [ $PACKET_LOSS -gt 10 ]
 then

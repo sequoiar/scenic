@@ -138,6 +138,7 @@ class H264Encoder : public VideoEncoder
         _GstElement *deinterlace_;
         _GstElement *queue_;
         _GstElement *colorspc_;
+
         _GstElement *sinkElement() 
         { 
             if (doDeinterlace_)
@@ -208,6 +209,7 @@ class Mpeg4Encoder : public VideoEncoder
         _GstElement *sinkQueue_;
         _GstElement *srcQueue_;
         _GstElement *colorspc_;
+
         _GstElement *sinkElement() 
         { 
             if (!doDeinterlace_)
@@ -215,6 +217,7 @@ class Mpeg4Encoder : public VideoEncoder
             else
                 return deinterlace_; 
         }
+
         _GstElement *srcElement() { return srcQueue_; }
 
         RtpPay* createPayloader() const;
