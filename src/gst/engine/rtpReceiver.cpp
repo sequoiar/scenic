@@ -234,6 +234,7 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 }
 
 
+#ifdef CONFIG_DEBUG_LOCAL
 void RtpReceiver::updateLatencyCb(GtkAdjustment *adj)
 {
     unsigned val = static_cast<unsigned>(adj->value);
@@ -289,4 +290,5 @@ void RtpReceiver::createLatencyControl()
     gtk_widget_show (control_);
     madeControl_ = true;
 }
+#endif
 

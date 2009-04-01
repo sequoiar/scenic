@@ -54,7 +54,6 @@ class RtpReceiver
         static std::string getMediaType(_GstPad *pad);
         static void cb_new_src_pad(_GstElement * element, _GstPad * srcPad, void *data);
         static void createLatencyControl();
-        static void updateLatencyCb(_GtkAdjustment *adj);
         static const int MIN_LATENCY = 1;
         static const int INIT_LATENCY = 3;
         static const int MAX_LATENCY = 400;
@@ -64,6 +63,7 @@ class RtpReceiver
         static std::list<_GstElement *> depayloaders_;
 
 #ifdef CONFIG_DEBUG_LOCAL
+        static void updateLatencyCb(_GtkAdjustment *adj);
         static bool madeControl_;
         static _GtkWidget *control_;
 #endif
