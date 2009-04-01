@@ -31,7 +31,7 @@ from miville.protocols import ipcp
 from miville.utils import log
 from miville.utils.common import get_def_name
 
-log = log.start('debug', 1, 0, 'gst_client')
+log = log.start('info', 1, 0, 'gst_client')
 
 
 STOPPED = 0
@@ -102,31 +102,55 @@ class GstServer(object):
         log.debug(msg)
         self.conn = conn
         self.conn.connectionLost = self.connection_lost
-        self.conn.add_callback(self.gst_log, 'log')
         # Our GST keywords
+        self.conn.add_callback(self.gst_log, 'log')
         self.conn.add_callback(self.gst_video_init, 'video_init')
         self.conn.add_callback(self.gst_audio_init, 'audio_init')
         self.conn.add_callback(self.gst_start, 'start')
         self.conn.add_callback(self.gst_audio_init, 'stop')
+        self.conn.add_callback(self.gst_success, 'success')
+        self.conn.add_callback(self.gst_failure, 'failure')
+        
         self.change_state(CONNECTED)
         log.info('GST inter-process link created')
         
     def gst_video_init(self, **args):
-        log.debug('GST VIDEO INIT acknowledged:  args %s' %  str(args) )
+        log.info('GST VIDEO INIT acknowledged:  args %s' %  str(args) )
         self.change_state(STREAMINIT)
 
     def gst_start(self,  **args):
-        log.debug('GST START acknowledged [%s]... our ticket is: %d' % (ack,id) )
+        log.info('GST START acknowledged... our args %s' % str(args) )
         self.change_state(STREAMING)
         
-
     def gst_stop(self,  **args):
-        log.debug('GST STOP acknowledged [%s]... our ticket is: %d' % (ack,id) )
+        log.info('GST STOP acknowledged ... our args %s' % str(args) )
         self.change_state(STREAMSTOPPED)
 
     def gst_audio_init(self,  **args):
-        log.debug('GST AUDIO INIT acknowledged [%s]... our ticket is: %d' % (ack,id) )
+        log.info('GST AUDIO INIT acknowledged our args %s' % str(args) )
         self.change_state(STREAMINIT)
+
+    def gst_success(self, **args):
+        log.info('GST success :-)  args %s' %  str(args) )
+        self.change_state(STREAMINIT)
+
+    def gst_failure(self, **args):
+        log.debug('GST failure :-(  args %s' %  str(args) )
+        self.change_state(STREAMINIT)
+
+    def gst_log(self, level, msg):
+        msg = 'GstServer.gst_log: %s' % msg.partition(': ')[2].strip()
+        if level == 10:
+            log.debug(msg)
+        elif level == 30:
+            log.warning(msg)
+        elif level == 40:
+            log.error(msg)
+        elif level == 50:
+            log.critical(msg)
+        else:
+            log.info(msg)
+
 
     def connection_failed(self, conn):
         msg = 'GstServer.connection_failed: Address: %s, Port: %s' % (self.address, self.port)
@@ -243,18 +267,6 @@ class GstServer(object):
             else:
                 log.critical('The GST process cannot be ready to connect (from add_callback).')
 
-    def gst_log(self, level, msg):
-        msg = 'GstServer.gst_log: %s' % msg.partition(': ')[2].strip()
-        if level == 10:
-            log.debug(msg)
-        elif level == 30:
-            log.warning(msg)
-        elif level == 40:
-            log.error(msg)
-        elif level == 50:
-            log.critical(msg)
-        else:
-            log.info(msg)
 
 
 class GstClient(BaseGst):
