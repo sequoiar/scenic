@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+# 
 # Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -20,24 +20,21 @@
 
 """
 Devices handling and Driver base classes.
-
-------------
-
-Usage for test purposes::
-
-    $ cd py/
-    $ export PYTHONPATH=$PWD
-    $ python devices/devices.py
-
-To run unit tests:: 
-
-    $ trial test/test_devices.py
-    
 """
 
-
+# 
+# ------------
+# 
+# Usage for test purposes::
+# 
+#     $ cd py/
+#     $ export PYTHONPATH=$PWD
+#     $ python devices/devices.py
+# 
+# To run unit tests:: 
+# 
+#     $ trial test/test_devices.py
 #TODO: retrieve former implementation of the shellprocessprotocol and put it in utils/shell
-
 #TODO: you want to test that a failing condition occurs? use self.assertFailure
 
 # System imports
@@ -47,7 +44,8 @@ import os, sys
 from twisted.internet import reactor #, protocol
 from twisted.internet.error import AlreadyCalled, AlreadyCancelled # for when we cancel twice an event.
 # App imports
-from miville.utils import log, commands
+from miville.utils import log
+from miville.utils import commands
 from miville.errors import DeviceError
 
 log = log.start('debug', 1, 0, 'devices')
@@ -322,7 +320,7 @@ class Attribute(object):
     def __init__(self, name, value=None, default=None):
         self.device = None
         self.name = name
-        self._value = value # TODO: make private. 
+        self._value = value 
         self.default = default
     
     def __str__(self):

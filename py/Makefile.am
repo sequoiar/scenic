@@ -10,14 +10,15 @@ TESTS = test/test_com_chan.py \
         test/test_i18n.py \
         test/test_log.py \
         test/test_observer.py \
-        test/test_telnet_milhouse.py
+        test/test_telnet_milhouse.py \
+        test/check_ping.py \
+        test/check_devices_settings.py 
 
 
 # to update to new path
 #        test/test_common.py 
 #
 # broken telnet executable: 
-#        test/check_ping.py 
 #        test/solo_test_preset_settings.py 
 #        test/solo_test_telnet_settings.py 
 #
