@@ -24,7 +24,7 @@
 #include "msgThreadFactory.h"
 
 #include "tcp/asioThread.h"
-
+#if 0
 class Logger
     : public Log::Subscriber
 {
@@ -43,7 +43,7 @@ void Logger::operator()(LogLevel& level, std::string& msg)
     m["msg"] = msg;
     queue_.push(m);
 }
-
+#endif 
 /** Main command line entry point
  * launches the threads and dispatches
  * MapMsg between the threads
@@ -94,7 +94,9 @@ bool MainModule::run()
         QueuePair &tcp_queue = tcpThread_->getQueue();
 //        QueuePair &tcp_queue = asio_thread_->getQueue();
 
+#if 0
         Logger logger_(*tcpThread_);
+#endif
         while(!signalFlag())
         {
             MapMsg tmsg = tcp_queue.timed_pop(2000);
