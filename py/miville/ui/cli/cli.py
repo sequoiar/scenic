@@ -421,7 +421,12 @@ class CliController(TelnetServer):
                             elif key == 'setting':
                                 setting = value
                             elif key == 'auto_answer':
-                                auto_answer = value
+                                if value in (1, 'True', 'true', 'TRUE'):
+                                    auto_answer = True
+                                elif value in (0, 'False', 'false', 'FALSE'):
+                                    auto_answer = False
+                                else:
+                                    self.write("Not a valid value for auto_answer", False)
                             else:
                                 self.write("Unable to change %s: unexisting property" % (key) , False)
                         elif new_name == None: #if no key=value pair, resolution order:
@@ -433,7 +438,12 @@ class CliController(TelnetServer):
                         elif name == None:
                             name = arg
                         elif auto_answer == None:
-                            auto_answer = arg
+                            if arg in (1, 'True', 'true', 'TRUE'):
+                                auto_answer = True
+                            elif arg in (0, 'False', 'false', 'FALSE'):
+                                auto_answer = False
+                            else:
+                                self.write("Not a valid value for auto_answer", False)
 
                 self.core.modify_contact(self, name, new_name, address, port, auto_answer=auto_answer, setting=setting)
             else:
