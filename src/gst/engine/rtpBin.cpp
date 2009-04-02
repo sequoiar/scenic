@@ -34,8 +34,11 @@
 #endif
 
 GstElement *RtpBin::rtpbin_ = 0;
-unsigned int RtpBin::sessionCount_ = 0;
+int RtpBin::sessionCount_ = 0;
 bool RtpBin::destroyed_ = false;
+
+
+std::vector<std::string> RtpBin::sessionNames_;
 
 void RtpBin::init()
 {
@@ -57,14 +60,15 @@ void RtpBin::init()
 
 void RtpBin::parseSourceStats(GObject * source, int sessionId)
 {
+    g_print("\nSESSION ID: %s_%d\n", sessionNames_[sessionId].c_str(), sessionId);
     GstStructure *stats;
 
     // get the source stats
     g_object_get(source, "stats", &stats, NULL);
     
     /* simply dump the stats structure */
-    //    gchar *str = gst_structure_to_string (stats);
-    //    g_print ("source stats: %s\n", str);
+    // gchar *str = gst_structure_to_string (stats);
+    // g_print ("source stats: %s\n", str);
     const GValue *val = gst_structure_get_value(stats, "internal");
 
     if (g_value_get_boolean(val))   // is-internal
@@ -80,11 +84,10 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
         return; // otherwise we don't care about internal sources
     }
 
-    g_print("SESSION %d:\n", sessionId);
     guint32 jitter = g_value_get_uint(gst_structure_get_value(stats, "rb-jitter"));
     g_print("JITTER: %" G_GUINT32_FORMAT "\n", jitter);
-    gint32 packetLoss = g_value_get_int(gst_structure_get_value(stats, "rb-packetslost"));
-    g_print("PACKETS LOST: %" G_GINT32_FORMAT "\n", packetLoss);
+    gint32 packetsLost = g_value_get_int(gst_structure_get_value(stats, "rb-packetslost"));
+    g_print("PACKETS LOST: %" G_GINT32_FORMAT "\n", packetsLost);
 
     // free structures
     gst_structure_free (stats);
@@ -111,9 +114,8 @@ gboolean RtpBin::printStatsCallback(gpointer data)
 
     GstElement *rtpbin = static_cast<GstElement*>(data);
 
-    g_print("/*----------------------------------------------*/\n");  
     // get sessions
-    for (unsigned int sessionId = 0; sessionId < sessionCount_; ++sessionId)
+    for (int sessionId = 0; sessionId < sessionCount_; ++sessionId)
     {
         g_signal_emit_by_name(rtpbin, "get-internal-session", sessionId, &session);
 

@@ -23,6 +23,8 @@
 #ifndef _RTP_BIN_H_
 #define _RTP_BIN_H_
 
+#include <vector>
+
 class RemoteConfig;
 class _GstElement;
 class _GObject;
@@ -39,8 +41,9 @@ class RtpBin
 
         static _GstElement *rtpbin_;
         static bool destroyed_;
-        static unsigned int sessionCount_;
+        static int sessionCount_;
         _GstElement *rtcp_sender_, *rtcp_receiver_;
+        static std::vector<std::string> sessionNames_;
 
     private:
         static int printStatsCallback(void * rtpbin);

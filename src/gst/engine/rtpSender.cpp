@@ -23,6 +23,8 @@
 #include "util.h"
 
 #include <gst/gst.h>
+#include <algorithm>
+
 #include "pipeline.h"
 #include "gstLinkable.h"
 #include "rtpSender.h"
@@ -33,6 +35,8 @@
 RtpSender::~RtpSender()
 {
     Pipeline::Instance()->remove(&rtp_sender_);
+    // FIXME GROSS!
+    sessionNames_.erase(sessionNames_.begin() + (sessionCount_ - 1));
 }
 
 
@@ -45,6 +49,7 @@ std::string RtpSender::getCaps() const
 void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
 {
     RtpBin::init();
+    sessionNames_.push_back(config.codec());
 
     GstPad *send_rtp_sink;
     GstPad *send_rtp_src;
