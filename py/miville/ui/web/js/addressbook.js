@@ -2,7 +2,33 @@
 
 Addressbook = Nevow.Athena.Widget.subclass('Addressbook');
 
+/**
+ * This is subclass of Nevow.Athena.Widget.
+ * It represent the addressbook interface.
+ * 
+ * This class is seperated in 5 parts:
+ *  - initialisation (__init__)
+ *  - utility methods
+ *  - methods call from the server
+ *  - methods call from the client interface
+ *  - methods responsible of updating interface elements (buttons, etc.) state.
+ * 
+ * When an event occur notify_controllers is call with an event name as argument.
+ * notify_controllers propagate the event to all controllers.
+ * Each controller is responsible to update is state in function of the event
+ * it receive.
+ * 
+ * @class Addressbook
+ * @member Nevow.Athena.Widget
+ */
 Addressbook.methods(
+    /**
+     * Initialisation method.
+     *
+     * @constructor
+     * @member Addressbook
+     * @param node The DOM node that hold the widget associated with this class.
+     */
     function __init__(self, node) {
         Addressbook.upcall(self, "__init__", node);
 
@@ -75,12 +101,22 @@ Addressbook.methods(
 	/* Utility functions */
 	///////////////////////
 	
-	// Notify all the controllers (buttons/fields/etc) state when an event call this method.
-	// For every controller you want to be notify you have to call to the method
-	// that update the controller from here.
-	// !Achtung! the order theses controller methods are call can be very important
-	// if the state of a controller is dependant of the state of another controller.
-	// So put the least dependants at the top and more dependants at the bottom.
+	/**
+	 * Notify all the controllers (buttons/fields/etc) state when an event call
+	 * this method.
+	 * 
+	 * For every controller you want to be notify you have to call the method
+	 * that update the controller from here.
+	 * 
+	 * **!Achtung!** the order theses controller methods are call can be very
+	 * important if the state of a controller is dependant of the state
+	 * of another controller.
+	 * 
+	 * So put the least dependants at the top and more dependants at the bottom.
+	 * 
+	 * @member Addressbook
+     * @param {string} event The event that fire the notification.
+	 */
 	function notify_controllers(self, event){
 		self.upd_list(event);
 		self.upd_status(event);
@@ -92,7 +128,13 @@ Addressbook.methods(
 		self.upd_remove_btn(event);
 	},
 
-	// Return the state contact li element or null. 
+	/**
+	 * Return the attribute specified of the contact li element or null.
+	 * 
+	 * @member Addressbook
+     * @param {string} attr The name of the attribute you want.
+     * @return The value of the attribute.
+	 */
 	function get_selected_attr(self, attr) {
 		if (self.selected_li) {
 			return self.selected_li.get(attr);
@@ -101,7 +143,12 @@ Addressbook.methods(
 		}
 	},
 
-	// save the name of the selected contact. 
+	/**
+	 * Save the name of the selected contact.
+	 * 
+	 * @member Addressbook
+     * @param {string} name The name of the newly selected contact.
+     */
 	function update_selected(self, name) {
 		self.selected = name;
 		Cookie.write('adb_selected', self.selected, {
@@ -114,8 +161,15 @@ Addressbook.methods(
 	/* Call from Server */
 	//////////////////////
 
-	// Update the contact list to reflect the state of the server.
-	// Changed only what was changed.
+	/**
+	 * Update the contact list to reflect the state of the server.
+	 * (call from server)
+	 * 
+	 * Changed only what was changed.
+	 * 
+	 * @member Addressbook
+     * @param {array} contacts An array of contacts object. 
+	 */
     function update_list(self, contacts) {
 		// maybe we will have to deal with the scroll position in the future
 		// dbug.info(self.list.getScroll().y);
@@ -236,7 +290,15 @@ Addressbook.methods(
 		return false;
 	},
 	
-	// Update the connection status of contacts.
+	/**
+	 * Update the connection status of the contacts.
+	 * (call from server)
+	 * 
+	 * @member Addressbook
+     * @param {string} contact The name of the contact that have to be updated. 
+     * @param {string} msg The new status message for the contact. 
+     * @param {string} details The new details (complete error message) for the contact. 
+	 */
 	function update_status(self, contact, msg, details) {
 		// check if contact exist in the list and get it
 		var owner = self.list.getElement('li[name=' + contact + ']')
@@ -256,7 +318,13 @@ Addressbook.methods(
 		}
 	},
 
-	// show selected contact info coming from the server in fields 
+	/**
+	 * Show selected contact info coming from the server in info fields.
+	 * (call from the server)
+	 * 
+	 * @member Addressbook
+	 * @param {contact object} contact
+	 */
 	function show_contact_info(self, contact) {
 		self.name_fld.value = contact.name;
 		self.address_fld.value = contact.address;
@@ -264,7 +332,15 @@ Addressbook.methods(
 		self.auto_answer_chk.checked = contact.auto_answer;
 	},
 
-	// show prompt asking to accept an invitation to connect 
+	/**
+	 * Show prompt asking to accept an invitation to connect.
+	 * (call from the server)
+	 * 
+	 * @member Addressbook
+	 * @param {string} connection The name of the connection who ask.
+	 * @param {string} caption The caption of the notification window.
+	 * @param {string} body The text body of the notification window.
+	 */
 	function ask(self, connection, caption, body) {
 		dbug.info(caption + body);
 		// TODO: add support for many requests at the same time
@@ -298,7 +374,14 @@ Addressbook.methods(
 		self.ask_win.connection = connection;
 	},
 
-	// show prompt telling that the invitation is now over 
+	/**
+	 * Show prompt telling that the invitation is now over.
+	 * (call from server)
+	 * 
+	 * @member Addressbook
+	 * @param {string} caption The caption of the notification window.
+	 * @param {string} body The text body of the notification window.
+	 */
 	function notification(self, caption, body) {
 		if (self.ask_win) {
 			self.ask_win.hide(); // TODO: should dispose also
@@ -326,14 +409,28 @@ Addressbook.methods(
 	/* Call from Client */
 	//////////////////////
 	
-	// get info from others widgets
+	/**
+	 * Get info from others widgets.
+	 * (call from the client)
+	 * 
+	 * @member Addressbook
+	 * @param {string} caller The short name of the widget.
+	 * @param {string} key The name of the receive information.
+	 * @param value The receive information.
+	 */
 	function update(self, caller, key, value) {
 		dbug.info(caller);
 		dbug.info(key);
 		dbug.info(value);
 	},
 
-	// one contact is selected
+    /**
+     * One contact is selected.
+	 * (call from the client)
+     *
+     * @member Addressbook
+     * @param {DOM node} contact The <li> node of the selected contact.
+     */
 	function contact_selected(self, contact) {
 		// pass if it's the same contact (but not if in edit mode)
 		if (contact != self.selected_li || self.edit_btn.value == self.save_str) {
@@ -348,7 +445,12 @@ Addressbook.methods(
 		}
 	},
 
-	// no contact is selected
+    /**
+     * No contact is selected.
+	 * (call from the client)
+     *
+     * @member Addressbook
+     */
 	function contact_unselect(self) {
 		self.notify_controllers('contact_unselected');
 		self.selected_li = null;
@@ -358,7 +460,12 @@ Addressbook.methods(
 		notify('adb', 'selection', self.selected);
 	},
 
-	// edit contact info
+    /**
+     * Edit contact info.
+	 * (call from the client)
+     *
+     * @member Addressbook
+     */
 	function edit_contact(self) {
 		if (self.get_selected_attr('state') == 0) {
 			self.new_modify = 'modify';
@@ -366,13 +473,23 @@ Addressbook.methods(
 		}
 	},
 
-	// add a new contact
+    /**
+     * Add a new contact.
+	 * (call from the client)
+     *
+     * @member Addressbook
+     */
 	function add_contact(self) {
 		self.new_modify = 'new';
 		self.notify_controllers('add_contact');
 	},
 	
-	// save a contact (for a new or a modified contact) 
+    /**
+     * Save a contact (for a new, modified and keeped contact). 
+	 * (call from the client)
+     *
+     * @member Addressbook
+     */
 	function save_contact(self) {
 		if (self.new_modify == 'new') {
 			self.callRemote('rc_add_contact',
@@ -399,13 +516,23 @@ Addressbook.methods(
 		self.notify_controllers('save_contact');
 	},
 
-	// keep an auto-created contact
+    /**
+     * Keep (save) an auto-created contact.
+	 * (call from the client)
+     *
+     * @member Addressbook
+     */
 	function keep_contact(self) {
 		self.new_modify = 'keep';
 		self.notify_controllers('keep_contact');
 	},
 	
-	// remove a contact from the list
+    /**
+     * Remove a contact from the list.
+	 * (call from the client)
+     *
+     * @member Addressbook
+     */
 	function remove_contact(self) {
 		// test if there's a contact selected
 		if (self.selected_li) {
@@ -426,20 +553,35 @@ Addressbook.methods(
 		}
 	},
 	
-	// cancel contact info editing on cancel key down
+    /**
+     * Cancel contact info editing on cancel key down.
+	 * (call from the client)
+     *
+     * @member Addressbook
+     */
 	function cancel_edit_flds(self) {
 		if (self.selected_li) {
 			self.notify_controllers('contact_selected');
 		}
 	},
 
-	// start a connection with a contact
+    /**
+     * Start a connection with a contact.
+	 * (call from the client)
+     *
+     * @member Addressbook
+     */
 	function connect(self) {
 		self.callRemote('rc_start_connection', self.selected);
 		dbug.info(self.selected);
 	},
 	
-	// stop a connection with a contact
+    /**
+     * Stop a connection with a contact.
+	 * (call from the client)
+     *
+     * @member Addressbook
+     */
 	function disconnect(self) {
 		self.callRemote('rc_stop_connection', self.selected);
 		dbug.info(self.selected);
@@ -450,7 +592,12 @@ Addressbook.methods(
 	/* Update controllers */
 	////////////////////////
 
-	// Update the interface in function of the selected contact.
+    /**
+     * Update the contacts list in function of the selected contact.
+     *
+     * @member Addressbook
+     * @param {string} event The event that trigger the update.
+     */
 	function upd_list(self, event) {
 		// list of events that "list" should react to
 		if (event == 'contact_selected') {
@@ -469,7 +616,11 @@ Addressbook.methods(
 		}
 	},
 
-	// Unselect contact from the list (display update)
+    /**
+     * Unselect contact from the list (display update).
+     *
+     * @member Addressbook
+     */
 	function unselect_contact(self) {
 		var curr_selection = self.list.getElements('li.color_selected')
 		if (curr_selection) {
@@ -478,7 +629,12 @@ Addressbook.methods(
 //		self.cleanFields();
 	},
 
-	// Update the connection status line.
+    /**
+     * Update the connection status line.
+     *
+     * @member Addressbook
+     * @param {string} event The event that trigger the update.
+     */
 	function upd_status(self, event) {
 		// list of events that "status" should react to
 		if (['contact_selected', 'update_status'].contains(event)) {
@@ -492,7 +648,12 @@ Addressbook.methods(
 		}
 	},
 
-	// Update contact fields
+    /**
+     * Update the contact fields.
+     *
+     * @member Addressbook
+     * @param {string} event The event that trigger the update.
+     */
 	function upd_fields(self, event) {
 		// list of events that "fields" should react to
 		if (event == 'contact_selected') {
@@ -521,7 +682,12 @@ Addressbook.methods(
 		}
 	},
 
-	// Enable/disabled the contact info fields
+    /**
+     * Enable/disabled the contact info fields.
+     *
+     * @member Addressbook
+     * @param {string} state The desired state (enable or disable).
+     */
 	function set_fields_state(self, state) {
 		var value = true;
 		if (state == 'enable') value = false;
@@ -537,7 +703,12 @@ Addressbook.methods(
 		self.edit_btn.value = self.edit_str;
 	},
 
-	// Update auto_answer checkbox state
+    /**
+     * Update auto_answer checkbox state.
+     *
+     * @member Addressbook
+     * @param {string} event The event that trigger the update.
+     */
 	function upd_auto_answer_chk(self, event) {
 		// list of events that "fields" should react to
 		if (event == 'edit_contact' || event == 'add_contact' || event == 'keep_contact') {
@@ -556,7 +727,12 @@ Addressbook.methods(
 		}
 	},
 
-	// Update add button state
+    /**
+     * Update add button state.
+     *
+     * @member Addressbook
+     * @param {string} event The event that trigger the update.
+     */
 	function upd_add_btn(self, event) {
 		// list of events that "add" should react to
 		if (['contact_selected',
@@ -589,7 +765,12 @@ Addressbook.methods(
 		}
 	},
 
-	// Update remove button state.
+    /**
+     * Update remove button state.
+     *
+     * @member Addressbook
+     * @param {string} event The event that trigger the update.
+     */
 	function upd_remove_btn(self, event) {
 		// list of events that "remove" should react to
 		if (['contact_selected',
@@ -620,7 +801,12 @@ Addressbook.methods(
 		}
 	},
 
-	// Update edit/save button state.
+    /**
+     * Update edit/save button state.
+     *
+     * @member Addressbook
+     * @param {string} event The event that trigger the update.
+     */
 	function upd_edit_btn(self, event) {
 		if (['contact_selected', 'contact_unselected'].contains(event)) {
 			// set the default states
@@ -694,7 +880,12 @@ Addressbook.methods(
 			
 	},
 
-	// Update connect/disconnect button state.
+    /**
+     * Update connect/disconnect button state.
+     *
+     * @member Addressbook
+     * @param {string} event The event that trigger the update.
+     */
 	function upd_connect_btn(self, event) {
 		// list of events that "connect" should react to
 		if (['contact_selected',

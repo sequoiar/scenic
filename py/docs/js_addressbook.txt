@@ -1,0 +1,287 @@
+Addressbook Documentation
+=========================
+
+This page contains the Addressbook Javascript Module documentation.
+
+The :mod:`addressbook` Module
+-----------------------------
+
+
+.. class:: Addressbook(node)
+
+   Bases: :class:`Nevow.Athena.Widget`
+
+   This is subclass of Nevow.Athena.Widget.
+   It represent the addressbook interface.
+   
+   This class is seperated in 5 parts:
+    - initialisation (__init__)
+    - utility methods
+    - methods call from the server
+    - methods call from the client interface
+    - methods responsible of updating interface elements (buttons, etc.) state.
+   
+   When an event occur notify_controllers is call with an event name as argument.
+   notify_controllers propagate the event to all controllers.
+   Each controller is responsible to update is state in function of the event
+   it receive.
+
+   :param node: The DOM node that hold the widget associated with this class.
+
+
+   .. method:: notify_controllers(event)
+
+      Notify all the controllers (buttons/fields/etc) state when an event call
+      this method.
+      
+      For every controller you want to be notify you have to call the method
+      that update the controller from here.
+      
+      **!Achtung!** the order theses controller methods are call can be very
+      important if the state of a controller is dependant of the state
+      of another controller.
+      
+      So put the least dependants at the top and more dependants at the bottom.
+
+      :param event: The event that fire the notification.
+      :type event: string
+
+
+   .. method:: get_selected_attr(attr)
+
+      Return the attribute specified of the contact li element or null.
+
+      :param attr: The name of the attribute you want.
+      :type attr: string
+      :return: value of the attribute.
+
+
+   .. method:: update_selected(name)
+
+      Save the name of the selected contact.
+
+      :param name: The name of the newly selected contact.
+      :type name: string
+
+
+   .. method:: update_list(contacts)
+
+      Update the contact list to reflect the state of the server.
+      (call from server)
+      
+      Changed only what was changed.
+
+      :param contacts: An array of contacts object.
+      :type contacts: array
+
+
+   .. method:: update_status(contact, msg, details)
+
+      Update the connection status of the contacts.
+      (call from server)
+
+      :param contact: The name of the contact that have to be updated.
+      :type contact: string
+      :param msg: The new status message for the contact.
+      :type msg: string
+      :param details: The new details (complete error message) for the contact.
+      :type details: string
+
+
+   .. method:: show_contact_info(contact)
+
+      Show selected contact info coming from the server in info fields.
+      (call from the server)
+
+      :param contact:
+      :type contact: contact object
+
+
+   .. method:: ask(connection, caption, body)
+
+      Show prompt asking to accept an invitation to connect.
+      (call from the server)
+
+      :param connection: The name of the connection who ask.
+      :type connection: string
+      :param caption: The caption of the notification window.
+      :type caption: string
+      :param body: The text body of the notification window.
+      :type body: string
+
+
+   .. method:: notification(caption, body)
+
+      Show prompt telling that the invitation is now over.
+      (call from server)
+
+      :param caption: The caption of the notification window.
+      :type caption: string
+      :param body: The text body of the notification window.
+      :type body: string
+
+
+   .. method:: update(caller, key, value)
+
+      Get info from others widgets.
+      (call from the client)
+
+      :param caller: The short name of the widget.
+      :type caller: string
+      :param key: The name of the receive information.
+      :type key: string
+      :param value: The receive information.
+
+
+   .. method:: contact_selected(contact)
+
+      One contact is selected.
+      (call from the client)
+
+      :param contact: The <li> node of the selected contact.
+      :type contact: DOM node
+
+
+   .. method:: contact_unselect()
+
+      No contact is selected.
+      (call from the client)
+
+
+
+   .. method:: edit_contact()
+
+      Edit contact info.
+      (call from the client)
+
+
+
+   .. method:: add_contact()
+
+      Add a new contact.
+      (call from the client)
+
+
+
+   .. method:: save_contact()
+
+      Save a contact (for a new, modified and keeped contact). 
+      (call from the client)
+
+
+
+   .. method:: keep_contact()
+
+      Keep (save) an auto-created contact.
+      (call from the client)
+
+
+
+   .. method:: remove_contact()
+
+      Remove a contact from the list.
+      (call from the client)
+
+
+
+   .. method:: cancel_edit_flds()
+
+      Cancel contact info editing on cancel key down.
+      (call from the client)
+
+
+
+   .. method:: connect()
+
+      Start a connection with a contact.
+      (call from the client)
+
+
+
+   .. method:: disconnect()
+
+      Stop a connection with a contact.
+      (call from the client)
+
+
+
+   .. method:: upd_list(event)
+
+      Update the contacts list in function of the selected contact.
+
+      :param event: The event that trigger the update.
+      :type event: string
+
+
+   .. method:: unselect_contact()
+
+      Unselect contact from the list (display update).
+
+
+
+   .. method:: upd_status(event)
+
+      Update the connection status line.
+
+      :param event: The event that trigger the update.
+      :type event: string
+
+
+   .. method:: upd_fields(event)
+
+      Update the contact fields.
+
+      :param event: The event that trigger the update.
+      :type event: string
+
+
+   .. method:: set_fields_state(state)
+
+      Enable/disabled the contact info fields.
+
+      :param state: The desired state (enable or disable).
+      :type state: string
+
+
+   .. method:: upd_auto_answer_chk(event)
+
+      Update auto_answer checkbox state.
+
+      :param event: The event that trigger the update.
+      :type event: string
+
+
+   .. method:: upd_add_btn(event)
+
+      Update add button state.
+
+      :param event: The event that trigger the update.
+      :type event: string
+
+
+   .. method:: upd_remove_btn(event)
+
+      Update remove button state.
+
+      :param event: The event that trigger the update.
+      :type event: string
+
+
+   .. method:: upd_edit_btn(event)
+
+      Update edit/save button state.
+
+      :param event: The event that trigger the update.
+      :type event: string
+
+
+   .. method:: upd_connect_btn(event)
+
+      Update connect/disconnect button state.
+
+      :param event: The event that trigger the update.
+      :type event: string
+
+
+
+
