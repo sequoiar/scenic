@@ -33,7 +33,7 @@
 #endif
 
 #undef LOG_LEVEL
-#define LOG_LEVEL ASSERT_FAIL+1
+#define LOG_LEVEL CRITICAL
 
 bool logLevelIsValid(LogLevel level)
 {

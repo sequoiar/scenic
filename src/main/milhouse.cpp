@@ -86,7 +86,7 @@ short pof::run(int argc, char **argv)
     }
 
     if ((!options["sender"] and !options["receiver"]) or (options["sender"] and options["receiver"]))
-        THROW_ERROR("argument error: must be sender OR receiver. see --help"); 
+        THROW_CRITICAL("argument error: must be sender OR receiver. see --help"); 
 
     if(options["serverport"])
         return telnetServer(options["sender"], options["serverport"]);
@@ -100,20 +100,20 @@ short pof::run(int argc, char **argv)
         LOG_DEBUG("Audio disabled.");
 
     if (disableVideo and disableAudio)
-        THROW_ERROR("argument error: must provide video and/or audio parameters. see --help");
+        THROW_CRITICAL("argument error: must provide video and/or audio parameters. see --help");
 
     if(!options["address"]) 
-        THROW_ERROR("argument error: missing address. see --help");
+        THROW_CRITICAL("argument error: missing address. see --help");
 
     if(!disableVideo and !options["videocodec"])
-        THROW_ERROR("argument error: missing videocodec. see --help");
+        THROW_CRITICAL("argument error: missing videocodec. see --help");
     if(!disableVideo and !options["videoport"])
-        THROW_ERROR("argument error: missing videoport. see --help");
+        THROW_CRITICAL("argument error: missing videoport. see --help");
 
     if(!disableAudio and !options["audiocodec"])
-        THROW_ERROR("argument error: missing audiocodec. see --help");
+        THROW_CRITICAL("argument error: missing audiocodec. see --help");
     if(!disableAudio and !options["audioport"])
-        THROW_ERROR("argument error: missing audioport. see --help");
+        THROW_CRITICAL("argument error: missing audioport. see --help");
 
     if (options["receiver"]) 
     {
@@ -124,7 +124,7 @@ short pof::run(int argc, char **argv)
         if (!disableVideo)       
         {
             if(!options["videosink"])
-                THROW_ERROR("argument error: missing videosink. see --help");
+                THROW_CRITICAL("argument error: missing videosink. see --help");
 
             vRx = videofactory::buildVideoReceiver(options["address"], options["videocodec"], 
                     options["videoport"], options["screen"], options["videosink"]);
@@ -132,7 +132,7 @@ short pof::run(int argc, char **argv)
         if (!disableAudio)
         {
             if(!options["audiosink"])
-                THROW_ERROR("argument error: missing audiosink. see --help");
+                THROW_CRITICAL("argument error: missing audiosink. see --help");
 
             // FIXME: we should distinguish between device and location
             std::string audioLocation = "";
@@ -181,7 +181,7 @@ short pof::run(int argc, char **argv)
         if (!disableVideo)
         {
             if (!options["videosource"])
-                THROW_ERROR("argument error: missing --videosource. see --help");
+                THROW_CRITICAL("argument error: missing --videosource. see --help");
 
             std::string videoDevice = ""; 
 
@@ -203,7 +203,7 @@ short pof::run(int argc, char **argv)
         if (!disableAudio)
         {
             if (!options["audiosource"])
-                THROW_ERROR("argument error: missing --audiosource. see --help");
+                THROW_CRITICAL("argument error: missing --audiosource. see --help");
 
             int numChannels = 2;
             if (options["numchannels"]) 
