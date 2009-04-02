@@ -86,7 +86,7 @@ class AddressBook(object):
         self.contacts[name] = Contact(name, address, port, auto_created, auto_answer, connector, setting)
         log.debug("adding contact %s %s" % (name, address))
         self.write()
-        return True
+        return name
 
     def delete(self, name=None):
         """
@@ -129,7 +129,7 @@ class AddressBook(object):
         contact.setting = setting
         
         self.write()
-        return True
+        return new_name
 
     def duplicate(self, name=None, new_name=None):
         """
@@ -237,9 +237,12 @@ class AddressBook(object):
         if not contact.auto_created:
             raise AddressBookError, 'This contact \'%s\' is already saved.' % contact.name
         contact.auto_created = False
+        return_name = name
         if new_name != None or auto_answer == True:
-            self.modify(contact.name, new_name, auto_answer=auto_answer)
-        self.write()
+            return_name = self.modify(contact.name, new_name, auto_answer=auto_answer)
+        else:
+            self.write()
+        return return_name
 
     def _get_name(self, name):
         """

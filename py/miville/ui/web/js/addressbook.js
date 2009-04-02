@@ -19,7 +19,7 @@ Addressbook = Nevow.Athena.Widget.subclass('Addressbook');
  * it receive.
  * 
  * @class Addressbook
- * @member Nevow.Athena.Widget
+ * @base Nevow.Athena.Widget
  */
 Addressbook.methods(
     /**
@@ -36,7 +36,7 @@ Addressbook.methods(
 		// Get the selected cookie.
 		self.selected = Cookie.read('adb_selected');
 		self.selected_li = null;
-		self.new_modify = null;
+		self.edit_type = null;
 		self.ask_win = null;
 		
 		// Get elements.
@@ -60,6 +60,7 @@ Addressbook.methods(
 		self.disconnect_str = $('js_adb_unjoin').get('text');
 		self.accept_str = $('js_adb_accept').get('text');
 		self.refuse_str = $('js_adb_refuse').get('text');
+		self.optional_str = $('js_adb_optional').get('text');
 		
 		// Set translations.	TODO: #maybe call notify_controllers('init')
 		self.edit_btn.value = self.edit_str;
@@ -87,6 +88,15 @@ Addressbook.methods(
 			elem.addEvent('escape', function(event){
 				self.cancel_edit_flds();
 			});
+		});
+		
+		// Add event to port field.
+		self.port_fld.addEvent('focus', function(event) {
+			self.unset_optional(self.port_fld);
+		});
+		
+		self.port_fld.addEvent('blur', function(event) {
+			self.set_optional(self.port_fld);
 		});
 		
 		// Get the contact list from the server.
@@ -156,6 +166,34 @@ Addressbook.methods(
 		});
 	},
 
+	/**
+	 * Remove the 'optional' word from the specified field.
+	 * 
+     * @member Addressbook
+	 * @param {Text input DOM object} field
+	 */
+	function unset_optional(self, field) {
+		if (field.value == self.optional_str) {
+			field.value = '';
+		}
+		field.removeClass('color_optional');
+	},
+	
+	/**
+	 * Add the 'optional' word in the specified field.
+	 * 
+     * @member Addressbook
+	 * @param {Text input DOM object} field
+	 */
+	function set_optional(self, field) {
+		if (field.value == '') {
+			field.value = self.optional_str;
+			if (!field.hasClass('color_optional')) {
+				field.addClass('color_optional');
+			}
+		}
+	},		
+
 
 	//////////////////////
 	/* Call from Server */
@@ -187,6 +225,7 @@ Addressbook.methods(
 		
 		// list of contact names on the client side
 		var client_list = self.list.getChildren('li').get('name');
+		
 		// remove on the client side deleted contacts  
 		client_list.each(function(item){
 			if (item && !server_list.contains(item)) {
@@ -279,8 +318,10 @@ Addressbook.methods(
 				self.selected_li = li;
 			}
 		})
-
-		if (self.selected_li){
+		dbug.info(self.edit_type);
+		dbug.info(self.selected_li);
+		if (self.selected_li && (self.edit_type != 'new' || self.edit_type == 'keep')){
+			dbug.info('ICII');
 			// update the display of selected contact info and button states
 			self.notify_controllers('contact_selected');
 		} else {
@@ -396,10 +437,32 @@ Addressbook.methods(
 		});
 	},
 
-
+	/**
+	 * Called when the contact is successfully saved.
+	 * (call from the server)
+	 */
+	function contact_saved(self, contact) {
+		self.edit_type = null;
+		
+		// update the selected name
+		if (self.selected != contact) {
+			var li = self.list.getElement('li[name=' + contact + ']');
+			if (li) {
+				self.contact_selected(li);
+			}
+			self.notify_controllers('save_contact');
+		} else {
+			self.notify_controllers('save_contact');
+		}
+	},
 
 	///////////////////////////////////////////////////////////////
 	
+	/**
+	 * Error window to be redone.
+	 * 
+	 * @param {string} msg
+	 */
 	function error(self, msg) {
 		StickyWin.alert('Error', msg);
 	},
@@ -412,6 +475,8 @@ Addressbook.methods(
 	/**
 	 * Get info from others widgets.
 	 * (call from the client)
+	 * 
+	 * (no function for the moment)
 	 * 
 	 * @member Addressbook
 	 * @param {string} caller The short name of the widget.
@@ -435,7 +500,7 @@ Addressbook.methods(
 		// pass if it's the same contact (but not if in edit mode)
 		if (contact != self.selected_li || self.edit_btn.value == self.save_str) {
 			self.selected_li = contact;
-			self.new_modify = null;
+//			self.edit_type = null;
 			// save the selected contact name
 			self.update_selected(contact.get('name'));
 			
@@ -468,7 +533,7 @@ Addressbook.methods(
      */
 	function edit_contact(self) {
 		if (self.get_selected_attr('state') == 0) {
-			self.new_modify = 'modify';
+			self.edit_type = 'modify';
 			self.notify_controllers('edit_contact');
 		}
 	},
@@ -480,7 +545,7 @@ Addressbook.methods(
      * @member Addressbook
      */
 	function add_contact(self) {
-		self.new_modify = 'new';
+		self.edit_type = 'new';
 		self.notify_controllers('add_contact');
 	},
 	
@@ -491,29 +556,43 @@ Addressbook.methods(
      * @member Addressbook
      */
 	function save_contact(self) {
-		if (self.new_modify == 'new') {
-			self.callRemote('rc_add_contact',
-							self.name_fld.value,
-							self.address_fld.value,
-							self.port_fld.value,
-							self.auto_answer_chk.checked);
-		} else if (self.new_modify == 'modify') {
-			self.callRemote('rc_modify_contact',
-							self.selected,
-							self.name_fld.value,
-							self.address_fld.value,
-							self.port_fld.value,
-							self.auto_answer_chk.checked);
-		} else if (self.new_modify == 'keep') {
-			self.callRemote('rc_keep_contact',
-							self.selected,
-							self.name_fld.value,
-							self.auto_answer_chk.checked);
+		var validate = true;
+		if (self.isEmpty.test(self.name_fld)) {
+			validate = false;
+			self.name_fld.addClass('notify');
+			dbug.info(self.isEmpty.getError(self.name_fld));
 		}
-		// update the selected name
-		self.selected = self.name_fld.value;
+		if (self.isEmpty.test(self.address_fld)) {
+			validate = false;
+			self.address_fld.addClass('notify');
+			dbug.info(self.isEmpty.getError(self.address_fld));
+		}
 		
-		self.notify_controllers('save_contact');
+		if (validate) {
+			var port = self.port_fld.value;
+			if (port == self.optional_str) {
+				port = '';
+			}
+			if (self.edit_type == 'new') {
+				self.callRemote('rc_add_contact',
+								self.name_fld.value,
+								self.address_fld.value,
+								port,
+								self.auto_answer_chk.checked);
+			} else if (self.edit_type == 'modify') {
+					self.callRemote('rc_modify_contact',
+									self.selected,
+									self.name_fld.value,
+									self.address_fld.value,
+									port,
+									self.auto_answer_chk.checked);
+			} else if (self.edit_type == 'keep') {
+					self.callRemote('rc_keep_contact',
+									self.selected,
+									self.name_fld.value,
+									self.auto_answer_chk.checked);
+			}
+		}
 	},
 
     /**
@@ -523,7 +602,7 @@ Addressbook.methods(
      * @member Addressbook
      */
 	function keep_contact(self) {
-		self.new_modify = 'keep';
+		self.edit_type = 'keep';
 		self.notify_controllers('keep_contact');
 	},
 	
@@ -608,9 +687,6 @@ Addressbook.methods(
 			// update the buttons state
 			var state = self.selected_li.get('state');
 				
-			// TODO: update
-//			self.joinState(state);
-			self.cleanFields();
 		} else if (['add_contact', 'contact_unselected'].contains(event)) {
 			self.unselect_contact();
 		}
@@ -626,7 +702,6 @@ Addressbook.methods(
 		if (curr_selection) {
 			curr_selection.removeClass('color_selected');
 		}
-//		self.cleanFields();
 	},
 
     /**
@@ -657,7 +732,10 @@ Addressbook.methods(
 	function upd_fields(self, event) {
 		// list of events that "fields" should react to
 		if (event == 'contact_selected') {
+			self.name_fld.removeClass('notify');
+			self.address_fld.removeClass('notify');
 			self.set_fields_state('disabled');
+			self.unset_optional(self.port_fld);
 			self.callRemote('rc_get_contact', self.selected);
 		} else if (event == 'edit_contact' || event == 'add_contact') {
 			if (event == 'add_contact') {
@@ -666,14 +744,19 @@ Addressbook.methods(
 					elem.value = '';
 				});
 			}
+			
+			self.set_optional(self.port_fld);
 			self.set_fields_state('enable');
 			self.name_fld.select();
 		} else if (event == 'contact_unselected') {
 			// clear the contact info fields
-			self.contact_flds.each(function(elem) {
-				elem.value = '';
-			});
+			if (self.edit_type == null) {
+				self.contact_flds.each(function(elem) {
+					elem.value = '';
+				});
+			}
 			self.set_fields_state('disabled');
+			self.unset_optional(self.port_fld);
 		} else if (event == 'keep_contact') {
 			self.name_fld.disabled = false;
 			self.name_fld.select();
@@ -694,13 +777,6 @@ Addressbook.methods(
 		self.contact_flds.each(function(elem) {
 			elem.disabled = value;
 		});
-	},
-
-	function cleanFields(self) {
-		self.name_fld.removeClass('notify');
-		self.address_fld.removeClass('notify');
-		self.set_fields_state('disabled');
-		self.edit_btn.value = self.edit_str;
 	},
 
     /**
@@ -851,33 +927,7 @@ Addressbook.methods(
 			self.edit_btn.addEvent('click', function(){
 				self.save_contact();
 			});
-		}
-			
-
-			
-		/*	if (self.edit_btn.value == self.save_str) {
-				var validate = true;
-				if (self.isEmpty.test(self.name_fld)) {
-					validate = false;
-					self.name_fld.addClass('notify');
-					dbug.info(self.isEmpty.getError(self.name_fld));
-				}
-				if (self.isEmpty.test(self.address_fld)) {
-					validate = false;
-					self.address_fld.addClass('notify');
-				}
-				if (validate) {
-					self.edit_btn.value = self.edit_str;
-					self.fieldState(true);
-					if (self.selected) {
-						self.modifyContact();
-					} else {
-						self.addContact();
-					}
-				}
-			}*/
-			
-			
+		}			
 	},
 
     /**
@@ -930,7 +980,6 @@ Addressbook.methods(
 			
 			// set the name of the button
 			self.connect_btn.value = button_name;							
-			
 		}
 	}
 

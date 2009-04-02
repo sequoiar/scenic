@@ -217,17 +217,21 @@ class Addressbook(Widget):
     
     def cb_modify_contact(self, origin, data):
         log.debug('MCOrigin: %s - Data: %s' % (origin, data))
-        if origin is self and isinstance(data, Exception):
-            self.callRemote('error', data.message)
+        if origin is self:
+            if isinstance(data, Exception):
+                self.callRemote('error', data.message)
+            else:
+                self.callRemote('contact_saved', data)
 
     cb_add_contact = cb_modify_contact
+    cb_save_client_contact = cb_modify_contact
     
     def rc_keep_contact(self, name, new_name, auto_answer):
         self.api.save_client_contact(self, name, new_name, auto_answer)
         return False
     
-    def cb_save_client_contact(self, origin, data):
-        if origin is self and isinstance(data, Exception):
-            self.callRemote('error', '%s' % data)
+#    def cb_save_client_contact(self, origin, data):
+#        if origin is self and isinstance(data, Exception):
+#            self.callRemote('error', '%s' % data)
         
     expose(locals())

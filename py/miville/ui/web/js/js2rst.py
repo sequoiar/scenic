@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import pyjsdoc as js
+import pyjsdoc
 import sys
 
 for arg in sys.argv[1:]:
 	try:
-		module = js.FileDoc(arg, js.read_file(arg))
+		module = pyjsdoc.FileDoc(arg, pyjsdoc.read_file(arg))
 	except:
-		print 'Problème avec ' + arg
+		print 'Problem with ' + arg
 	else:
 		name = module.name.title().rpartition('.')[0]
 		caption = name + ' Documentation'

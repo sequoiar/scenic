@@ -39,6 +39,10 @@ input.notify {
 	background-color: #ffd75a;
 }
 
+.color_optional {
+	color: #818181;
+}
+
 .section {
 	border: dotted 1px #999;
 	padding: 10px;

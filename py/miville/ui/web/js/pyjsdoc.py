@@ -617,6 +617,8 @@ class FileDoc(object):
         is_first = True
         for comment, next_line in get_doc_comments(file_text):
             raw = parse_comment(strip_stars(comment), next_line)
+#            print raw
+#            print '\n'
 
             if 'fileoverview' in raw:
                 obj = ModuleDoc(raw)

@@ -51,4 +51,5 @@
 	<span n:render="i18n" id="js_adb_unjoin" class="adb js_str">Disconnect</span>
 	<span n:render="i18n" id="js_adb_accept" class="adb js_str">Accept</span>
 	<span n:render="i18n" id="js_adb_refuse" class="adb js_str">Refuse</span>
+	<span n:render="i18n" id="js_adb_optional" class="adb js_str">optional</span>
 </div>
