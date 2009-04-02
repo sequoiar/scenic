@@ -32,6 +32,9 @@
 #define LOG_LEVEL INFO
 #endif
 
+#undef LOG_LEVEL
+#define LOG_LEVEL ASSERT_FAIL+1
+
 bool logLevelIsValid(LogLevel level)
 {
     switch (level)
