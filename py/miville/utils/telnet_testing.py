@@ -315,7 +315,7 @@ def start():
     if START_SERVER:
         sys.stdout.write(get_color('MAGENTA'))
         try:
-            #delete ~/.sropulpof/sropulpof.adb
+            #delete ~/.miville/addressbook.txt
             #orig_home = os.environ['HOME']
             if CHANGE_HOME_PATH:
                 TMP_NAME = tempfile.mktemp()
@@ -329,8 +329,8 @@ def start():
             print "SERVER_COMMAND:", SERVER_COMMAND 
             print "VERBOSE_SERVER"
             print "You should try this:"
-            print "tail -f %s/.sropulpof/sropulpof.log" % (TMP_NAME)
-            # os.remove('%s/.sropulpof/sropulpof.adb' % (TMP_NAME))
+            print "tail -f %s/.miville/miville.log" % (TMP_NAME)
+            # os.remove('%s/.miville/addressbook.txt' % (TMP_NAME))
         sys.stdout.write(get_color())
         global_server = start_process(SERVER_COMMAND, VERBOSE_SERVER, "S>", 'BLUE')
 

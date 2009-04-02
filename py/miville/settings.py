@@ -24,7 +24,7 @@ Audio/video/data settings handling for miville. (configuration)
 
 State Saving
 ============
-Settings are saved in the ~/.scropulpof/settings.sets file.
+Settings are saved in the ~/.miville/settings.txt file.
 there is a dict. all settings with id under 10000 are presets. Those with ID over
 10000 are user settings. (changed by the user)
 
@@ -68,8 +68,8 @@ from twisted.internet import reactor
 log = log.start('debug', 1, 0, 'settings')
 
 # These file names are overriden by Miville's Core !
-PRESETS_FILENAME = "presets.sets"
-SETTINGS_FILENAME = "settings.sets"
+PRESETS_FILENAME = "presets.txt"
+SETTINGS_FILENAME = "settings.txt"
 
 # All settings with id under 10000 are presets. Those with ID over
 # 10000 are user settings. (changed by the user)
@@ -247,14 +247,14 @@ class Settings(object):
         """
         Loads presets from the settings state saving file.
         
-        Default location of this file is ~/.sropulpof/presets.sets
-        If not present, it loads presets.sets
+        Default location of this file is ~/.miville/presets.txt
+        If not present, it loads presets.txt
         """
         global PRESETS_FILENAME
         global SETTINGS_FILENAME
 
-        presets_file_name       = install_dir(PRESETS_FILENAME) #"presets.sets")
-        user_settings_file_name = install_dir(SETTINGS_FILENAME) # "settings.sets")
+        presets_file_name       = install_dir(PRESETS_FILENAME) #"presets.txt")
+        user_settings_file_name = install_dir(SETTINGS_FILENAME) # "settings.txt")
         
         # settings are saved as tuple()
         presets = {}
@@ -324,7 +324,7 @@ class Settings(object):
             if k >= first_user_setting_id:
                 user_media_settings[k] = med
         
-        filename = install_dir(SETTINGS_FILENAME) # "settings.sets")
+        filename = install_dir(SETTINGS_FILENAME) # "settings.txt")
         
         # little hack to  create a preset file
         stuff = (user_global_settings, user_media_settings)  

@@ -42,7 +42,7 @@ testing.start()
 
         
 
-cmd = 'cp ~/.sropulpof/settings.sets /var/tmp/.sropulpof'
+cmd = 'cp ~/.miville/settings.txt /var/tmp/.miville'
 os.system(cmd)
 
 

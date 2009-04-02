@@ -327,7 +327,7 @@ class Test_1_AddressBook(testing.TelnetBaseTest):
 #         Assign a preset to a contact
 #         """
 #         
-#         # os.path.expanduser("~")+"/.sropulpof/sropulpof.preset"
+#         # os.path.expanduser("~")+"/.miville/sropulpof.preset"
 #         path = "/usr/share/sropulpof/globalSettings.presets"
 #         self.assertTrue(os.path.exists(path), 'Global Preset file "%s" is missing' % path)
 # 

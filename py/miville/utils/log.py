@@ -63,7 +63,7 @@ def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
         logger.addHandler(so_handler)
     if to_file:
         try:
-            log_file = miville.utils.common.install_dir('sropulpof.log')
+            log_file = miville.utils.common.install_dir('miville.log')
         except InstallFileError, err:
             print "Logging module ERROR\t%s" % err
         else:

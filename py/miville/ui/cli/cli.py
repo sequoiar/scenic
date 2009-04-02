@@ -107,7 +107,7 @@ class TelnetServer(recvline.HistoricRecvLine):
         self.terminal.nextLine = self.next_line
         recvline.HistoricRecvLine.connectionMade(self)
         try:
-            self.history_file = open('%s/.sropulpof/.cli_history_%s-%s' % 
+            self.history_file = open('%s/.miville/.cli_history_%s-%s' % 
                                     (os.environ['HOME'],
                                      self.addr.host,
                                      self.terminal.transport.getHost().port),
@@ -140,7 +140,7 @@ class TelnetServer(recvline.HistoricRecvLine):
             self.historyLines.append(line)
             try:
                 #TODO: create a general manager for managing the verification/creation of the prefs directory
-                self.history_file = open('%s/.sropulpof/.cli_history_%s-%s' % 
+                self.history_file = open('%s/.miville/.cli_history_%s-%s' % 
                             (os.environ['HOME'],
                              self.addr.host,
                              self.terminal.transport.getHost().port),

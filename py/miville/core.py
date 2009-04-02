@@ -73,10 +73,10 @@ class MivilleConfiguration(object):
         self.listen_to_interfaces = '' # means all interfaces
         self.ui_network_interfaces = ['127.0.0.1'] # default is only local host
         # files
-        self.miville_home = os.path.expanduser("~/.sropulpof") # TODO: change for .miville # prefixed by ~/
-        self.addressbook_filename = 'sropulpof.adb' # TODO: "contacts.txt"
-        self.settings_presets_filename = "presets.sets" # TODO: presets.txt
-        self.settings_filename = "settings.sets" # TODO: settings.txt
+        self.miville_home = os.path.expanduser("~/.miville") # TODO: change for ~/.miville
+        self.addressbook_filename = 'addressbook.txt' # TODO: "contacts.txt"
+        self.settings_presets_filename = "presets.txt" # TODO: presets.txt
+        self.settings_filename = "settings.txt" # TODO: settings.txt
         
         # update the attributes to match passed dict
         if dictionary is not None:

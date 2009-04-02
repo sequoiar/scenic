@@ -39,7 +39,7 @@ from miville.utils.i18n import to_utf
 log = log.start('debug', 1, 0, 'common')
 
 # this path is overriden by the core at startup !
-MIVILLE_HOME = '.sropulpof'
+MIVILLE_HOME = '.miville'
 
 def get_def_name(level=2):
     """
