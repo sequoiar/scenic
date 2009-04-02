@@ -44,10 +44,10 @@ class RtpReceiver
         RtpReceiver() : rtp_receiver_(0), depayloader_(0) {}
         ~RtpReceiver();
         void setCaps(const char* capsStr);
-        static void setLatency(int latency);
         void checkSampleRate();
 
         void add(RtpPay * depayloader, const ReceiverConfig & config);
+        static void setLatency(int latency);
 
     private:
         static _GstPad *getMatchingDepayloaderSinkPad(_GstPad *srcPad);

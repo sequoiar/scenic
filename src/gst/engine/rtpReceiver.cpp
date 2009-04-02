@@ -179,7 +179,6 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     // rule of thumb: 2-3 times the maximum network jitter
     setLatency(INIT_LATENCY);
 
-
     GstPad *recv_rtp_sink;
     GstPad *send_rtcp_src;
     GstPad *recv_rtcp_sink;
@@ -232,7 +231,6 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     createLatencyControl();
 #endif
 }
-
 
 #ifdef CONFIG_DEBUG_LOCAL
 void RtpReceiver::updateLatencyCb(GtkAdjustment *adj)

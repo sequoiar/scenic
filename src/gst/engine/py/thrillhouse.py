@@ -337,11 +337,18 @@ class MilhouseTests():
         recv, send = self.argfactory('audiovideo')
         send.videosource = 'videotestsrc'
         self.run(recv, send)
+    
+    def test_20_rtpjitterbuffer(self):
+        """ Test videotestsrc with audio """
+
+        recv, send = self.argfactory('audiovideo')
+        recv.jitterbuffer = 300
+        self.run(recv, send)
 
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_16')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_01')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

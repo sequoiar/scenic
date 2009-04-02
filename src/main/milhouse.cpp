@@ -72,6 +72,7 @@ short pof::run(int argc, char **argv)
     options.addString("videosource", 'u', "videosource", "v4l2src v4lsrc dv1394src");
     options.addInt("timeout", 'z', "timeout", "time in ms to wait before quitting, 0 means run indefinitely");
     options.addInt("audio_buffer_usec", 'b', "audiobuffer", "length of receiver's audio buffer in microseconds, must be > 10000");
+    options.addInt("jitterbuffer", 'g', "jitterbuffer", "length of receiver's rtp jitterbuffers in milliseconds, must be > 1");
 
     //telnetServer param
     options.addInt("serverport", 'y', "run as server", "port to listen on");
@@ -151,6 +152,9 @@ short pof::run(int argc, char **argv)
 #endif
 
         playback::start();
+
+        if (options["jitterbuffer"])
+            RtpReceiver::setLatency(options["jitterbuffer"]);
 
         if (!disableVideo)
         {
