@@ -508,12 +508,11 @@ class GlobalSetting(object):
         # self.stop_streaming()
         receiver_procs_params, sender_procs_params = self._split_gst_parameters(address)
         
-        remote_address  = settings_channel.contact.address
+        remote_address  = settings_channel.com_chan.owner.localhost
+        log.debug("REMOTE ADDRESS: " + str(remote_address) )
         remote_sender_procs_params, remote_receiver_procs_params = self._split_gst_parameters(remote_address)
         # send settings to remote miville
         settings_channel.start_local_gst_processes(receiver_procs_params,  sender_procs_params)
-        
-        
         settings_channel.send_message("remote_gst_params",[remote_receiver_procs_params, remote_sender_procs_params ] )
         
         

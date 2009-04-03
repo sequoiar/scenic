@@ -89,7 +89,7 @@ class GstChannel(object):
             self.start_local_gst_processes(rx_params, tx_params )
             
         else:
-            log.error("Unknown key in settings channel: " + key +  " args: %s"  % str(args) )
+            log.error("Unknown message in settings channel: " + key +  " args: %s"  % str(args) )
     
     def _start_stream_engines(self, engines):
         """

@@ -31,7 +31,7 @@ from miville.protocols import ipcp
 from miville.utils import log
 from miville.utils.common import get_def_name
 
-log = log.start('info', 1, 0, 'gst_client')
+log = log.start('info', 1, 0, 'base_gst')
 
 
 STOPPED = 0
@@ -97,10 +97,11 @@ class GstServer(object):
                    STREAMINIT:'STREAMINIT', STREAMING:'STREAMING'}
          log.debug('GstServer state changed from %s to %s handle: %s ' % (all_states[old_state], all_states[new_state], str(self) ))
 
-    def connection_ready(self, conn):
+    def connection_ready(self, ipcp):
         msg = 'GstServer.connection_ready: Address: %s, Port: %s, conn %s' % (self.address, self.port, str(conn) )
         log.debug(msg)
-        self.conn = conn
+        log.info('CONN: %s %s' % (ipcp, ipcp.__dict__))
+        self.conn = ipcp
         self.conn.connectionLost = self.connection_lost
         # Our GST keywords
         self.conn.add_callback(self.gst_log, 'log')
@@ -323,10 +324,9 @@ class GstProcessProtocol(protocol.ProcessProtocol):
             
     def outReceived(self, data):
         log.debug('GstProcessProtocol.outReceived server state: %d, data %s' % (self.server.state, str(data) ) )
-        
+        log.info('   milhouse out: "%s" from %s' % (data, str(self)) )
         if self.server.state < RUNNING:
             lines = data.split('\n')
-            log.debug('   outReceived: %s' % lines)
             for line in lines:
                 if line.strip() == 'READY':
                     self.server.change_state(RUNNING)

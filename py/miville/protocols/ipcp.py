@@ -34,6 +34,7 @@ log = log.start('info', 1, 0, 'ipcp')
 
 class IPCP(LineReceiver):
     def __init__(self):
+        log.info("IPCP.__init__ " + str(self) )
         self.r = re.compile(r'("([^"\\]|\\.)*"|[^ ]+)')
         self.callbacks = {}
 
@@ -129,7 +130,7 @@ class IPCP(LineReceiver):
                 if parg:
                     line.append(parg)
         line = ' '.join(line)
-        log.info('IPCP.send_cmd: ' + line)
+        log.info('IPCP.send_cmd: "' + line + '" from ' + str(self) )
         self.sendLine(line)
 
     def _process_arg(self, arg):

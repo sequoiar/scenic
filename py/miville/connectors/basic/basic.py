@@ -153,7 +153,7 @@ class BasicServer(LineReceiver):
             contact.state = CONNECTING
             self.sendLine('ACCEPT %s' % self.api.get_com_chan_port())
         self.transport.loseConnection()
-
+        
 
 class BasicServerFactory(protocol.ServerFactory):
 
@@ -280,7 +280,8 @@ class ConnectionBasic(Connection):
 
     def _accepted(self):
         global PORT
-        self.local_name = '%s:%s' % (self.connection.transport.getHost().host, PORT)
+        self.localhost = self.connection.transport.getHost().host
+        self.local_port = PORT
         self._close_connection()
 #        Connection.accepted(self)
 #        self.send_settings()
