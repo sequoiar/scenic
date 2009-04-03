@@ -47,10 +47,7 @@ import repr
 import commands
 
 # global constants
-
 EXECUTABLE = "milhouse" 
-# used to be "propulseart"
-#video_src = "videotestsrc"
 video_src = "videotestsrc"
 audio_src = 'audiotestsrc'
 
@@ -59,12 +56,12 @@ audio_src = 'audiotestsrc'
 # ---------------------------------------------------------------------
 # config 
 
-waiting_delay = 1.0 # seconds before starting telnet client after server start
+waiting_delay = 1.0 
 
 class InitArgs(object):
 
     def __init__(self, cmd):
-        self.command = cmd
+        self._command = cmd
         self.bitrate=None
         self.source=None
         self.codec=None 
@@ -77,10 +74,11 @@ class InitArgs(object):
                 return '"' + msg + '"'
             return str(msg)
         
-        result = self.command + ": " 
+        result = self._command + ": " 
         for key, val in self.__dict__.iteritems():
-            if val is not None:
-                result = result + ' ' + key + '=' + get_val_as_string(val) 
+            if not key.startswith("_"): 
+                if val is not None:
+                    result = result + ' ' + key + '=' + get_val_as_string(val) 
         return result    
 
 class AudioInit(InitArgs):
@@ -104,7 +102,22 @@ def msc2png(test_name):
     status = commands.getstatusoutput(cmd)
     output = status[1]
     
+def bash_it(cmd):
+    """
+    Executes a bash string 
 
+    You can use pipes and other shell goodies.
+    """
+    status = commands.getstatusoutput(cmd)
+    output = status[1]
+    print cmd
+    lines = output.split("\n")
+    for line in lines:
+        if line.find(cmd) == -1:
+            print line
+    print
+    
+    
 def generate_html(test_class):    
     members = dir(test_class)
     title = test_class.__name__
@@ -156,15 +169,9 @@ def start_process(command, logfile=None):
     directory = os.getcwd()
     try:
 
-        #print 'Current working dir: ' + directory
-        #if isVerbose:
         print 'starting process "%s"' % (command)
         process = pexpect.spawn(command, timeout=0.1, logfile=logfile)
-        #process.logfile=sys.stdout
-        #if logfile != None:
-        #process.logfile=logfile
-        
-            
+
         time.sleep(waiting_delay) # seconds
         if (process.isalive() == False):
             print "Error starting client '%s': not alive yet :-(" % command
@@ -216,21 +223,6 @@ class Nelson(unittest.TestCase):
         
         msc_string = ""
     
-#    def _get_start_command(self, codec, port, address, 
-#                           bitrate=None, 
-#                           source =None, 
-#                           channels=None,
-#                           audio_buffer_usec=None):
-#         s = ' codec="%s" port=%d address="%s"' %  (codec, port, address)
-#         if bitrate:
-#             s += ' bitrate=%d' % bitrate
-#         if source:
-#             s += ' source="%s"' % source
-#         if channels:
-#             s += ' channels=%d' % channels    
-#         return s
-    
-
    
     def stream_duration(self, delay):
         """
@@ -246,6 +238,7 @@ class Nelson(unittest.TestCase):
     Telnet system test case parent class
     """
     def setUp(self):
+        bash_it("ps aux | grep " + EXECUTABLE)
         self.tx_telnet = None
         self.tx_server = None
         self.tx_telnet_log = None
@@ -388,11 +381,7 @@ msc
             
         pump_me(self.tx_server)
         pump_me(self.rx_server)
-        #pump_me(self.tx_telnet)
-        #pump_me(self.rx_telnet)    
-            
-         
-            
+
             
     def tst_tx(self,command, expected, errorMsg = None):
         self.assertNotEqual(self.tx_telnet, None, "Sender telnet process is None!")
