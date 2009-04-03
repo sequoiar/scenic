@@ -126,10 +126,11 @@ def start_process(command, logfile=None):
         #print 'Current working dir: ' + directory
         #if isVerbose:
         print 'starting process "%s"' % (command)
-        process = pexpect.spawn(command)
+        process = pexpect.spawn(command, logfile=logfile)
         #process.logfile=sys.stdout
         #if logfile != None:
-        process.logfile=logfile
+        #process.logfile=logfile
+        
             
         time.sleep(waiting_delay) # seconds
         if (process.isalive() == False):
@@ -172,8 +173,8 @@ class Nelson(unittest.TestCase):
         self.rx_telnet = None
         self.rx_server = None
         
-        self.rx_logfile = None
-        self.tx_logfile = None
+        self.rx_server_log = None
+        self.tx_server_log = None
         self.rx_telnet_log = None
         self.tx_telnet_log = None
         
@@ -209,11 +210,14 @@ class Nelson(unittest.TestCase):
     def setUp(self):
         self.tx_telnet = None
         self.tx_server = None
-        self.tx_logfile = None 
+        self.tx_telnet_log = None
+        self.tx_server_log= None
+        
         self.rx_telnet = None
         self.rx_server = None    
         self.rx_telnet_log = None
-        self.tx_telnet_log = None      
+        self.rx_server_log= None
+        
         self.msc = """
 msc
 {        
@@ -236,15 +240,17 @@ msc
         """
         Destructor for each test. 
         """
+        self._pump_up_the_files()
+        
         self.msc += '\n}'
         short_dia_file_name = self._testMethodName+".msc"
         self._save_string_to_file(self.msc,short_dia_file_name)
-        
         index = generate_html(self.__class__)
         self._save_string_to_file(index, 'index.html')
         
-        command = "quit:"
         
+        command = "quit:"
+                      
         if self.tx_telnet != None:
             self.tx_telnet.sendline(command)
             kill_process(self.tx_telnet)
@@ -259,11 +265,11 @@ msc
         if self.rx_server != None:
             kill_process(self.tx_server)  
         
-        if self.rx_logfile != None:
-            self.rx_logfile.close()
+        if self.rx_server_log != None:
+            self.rx_server_log.close()
 
-        if self.tx_logfile != None:
-            self.tx_logfile.close()
+        if self.tx_server_log != None:
+            self.tx_server_log.close()
         
         if self.rx_telnet_log != None:
             self.rx_telnet_log.close()
@@ -298,7 +304,7 @@ msc
         server_command = "%s -%s --serverport %d" % (EXECUTABLE,  mode, port) 
         client_command = 'telnet localhost %d' % port
         server = start_process(server_command, server_log)
-        time.sleep(2)
+        time.sleep(1.)
         telnet = start_process(client_command,telnet_log )
         self.msc += 'test:>%s [label="$> %s"];\n' % (serv_name, server_command)
         self.msc += 'test:>%s [label="$> %s"];\n' % (tel_name, client_command)
@@ -306,21 +312,21 @@ msc
         
     def start_propulseart_rx(self, port):
         server_logfilename = os.path.realpath(self._testMethodName + "_rx.txt")
-        self.rx_logfile = open(server_logfilename , 'w')
+        self.rx_server_log = open(server_logfilename , 'w')
         telnet_logfilename = os.path.realpath(self._testMethodName + "_telnet_rx.txt")
         self.rx_telnet_log = open(telnet_logfilename , 'w')
         
-        (server, telnet) = self._start_propulseart('r', port, 'gst_rx', 'telnet_rx', self.rx_logfile, self.rx_telnet_log)
+        (server, telnet) = self._start_propulseart('r', port, 'gst_rx', 'telnet_rx', self.rx_server_log, self.rx_telnet_log)
         self.rx_telnet = telnet
         self.rx_server = server
         
     def start_propulseart_tx(self, port):
-        logfilename = os.path.realpath(self._testMethodName + "_rx.txt")
-        self.tx_logfile = open(logfilename , 'w')
+        logfilename = os.path.realpath(self._testMethodName + "_tx.txt")
+        self.tx_server_log = open(logfilename , 'w')
         telnet_logfilename = os.path.realpath(self._testMethodName + "_telnet_tx.txt")
         self.tx_telnet_log = open(telnet_logfilename , 'w')       
         
-        (server, telnet) = self._start_propulseart('s', port, 'gst_tx', 'telnet_tx', self.tx_logfile, self.tx_telnet_log)
+        (server, telnet) = self._start_propulseart('s', port, 'gst_tx', 'telnet_tx', self.tx_server_log, self.tx_telnet_log)
         self.tx_telnet = telnet
         self.tx_server = server
     
@@ -331,6 +337,21 @@ msc
     def _add_sequence_response(self, source, destination, message):
         ping = message.replace('"','\\"')
         self.msc += '%s>>%s [label="%s"];\n' % (source, destination, ping)
+    
+    def _pump_up_the_files(self):
+        def pump_me(what):
+            if what != None:
+                #what.read_nonblocking(size=10000, timeout=1)
+                what.readline()
+                pass
+            
+        pump_me(self.tx_server)
+        pump_me(self.rx_server)
+        #pump_me(self.tx_telnet)
+        #pump_me(self.rx_telnet)    
+            
+         
+            
             
     def tst_tx(self,command, expected, errorMsg = None):
         self.assertNotEqual(self.tx_telnet, None, "Sender telnet process is None!")
@@ -338,6 +359,7 @@ msc
         #self._add_sequence('test', 'telnet_tx', command)
         self._add_sequence('telnet_tx', 'gst_tx', command)
         self._add_sequence_response('gst_tx', 'telnet_tx', expected)
+        
           
     def tst_rx(self,command, expected, errorMsg = None):
         self.assertNotEqual(self.rx_telnet, None, "Receiver telnet process is None!")
@@ -345,12 +367,16 @@ msc
         #self._add_sequence('test', 'telnet_rx', command)
         self._add_sequence('telnet_rx', 'gst_rx', command)
         self._add_sequence_response('gst_rx', 'telnet_rx', expected)
-                
+        
+         
     def _tst(self, client, command, expected, errorMsg = None):
+        #self._pump_up_the_files()
         client.sendline(command)
         time.sleep(0.025)
+        self._pump_up_the_files()
         err = errorMsg or 'The command did not return: "%s" as expected' % expected
         self._expectTest(client, expected, err)
+        
     
     def verb(self,msg=''):
         verb(msg)
