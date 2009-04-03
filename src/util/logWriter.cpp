@@ -51,7 +51,7 @@ bool logLevelIsValid(LogLevel level)
     }
 }
 
-
+#ifdef COLOR_OUTPUT
 std::string logLevelStr(LogLevel level)
 {
     std::string lstr;
@@ -84,6 +84,39 @@ std::string logLevelStr(LogLevel level)
     lstr += "\x1b[0m: ";
     return lstr;
 }
+#else
+std::string logLevelStr(LogLevel level)
+{
+    std::string lstr;
+    switch (level)
+    {
+        case DEBUG:
+            lstr = "DEBUG";
+            break;
+        case INFO:
+            lstr = "INFO";
+            break;
+        case THROW:
+            lstr = "THROW";
+            break;
+        case WARNING:
+            lstr = "WARNING";
+            break;
+        case ERROR:
+            lstr = "ERROR";
+            break;
+        case CRITICAL:
+            lstr = "CRITICAL";
+            break;
+        case ASSERT_FAIL:
+            lstr = "ASSERT_FAIL";
+            break;
+        default:
+            lstr = "INVALID LOG LEVEL";
+    }
+    return lstr;
+}
+#endif
 
 static Log::Subscriber emptyLogSubscriber;
 static Log::Subscriber* lf = &emptyLogSubscriber;
@@ -159,10 +192,10 @@ void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &
      
     if(level == DEBUG || level == INFO)
     {
-        std::cout << strerr;
+//        std::cout << strerr;
         return;
     }
-    std::cerr << strerr;
+//    std::cerr << strerr;
     if(level < THROW)
         return;
 
