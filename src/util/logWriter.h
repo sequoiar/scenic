@@ -52,6 +52,7 @@ enum LogLevel {
 #define THROW_ERROR(msg)      THROW_(msg, ERROR,0)
 #define THROW_CRITICAL(msg)   THROW_(msg, CRITICAL,0)
 #define LOG_INFO(msg)       LOG(msg, INFO)
+#define LOG_ERROR(msg)       LOG(msg, ERROR)
 #define LOG_WARNING(msg)    LOG(msg, WARNING)
 #define LOG_DEBUG(msg)      LOG(msg, DEBUG)
 
