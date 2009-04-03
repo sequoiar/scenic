@@ -98,7 +98,7 @@ class GstServer(object):
          log.debug('GstServer state changed from %s to %s handle: %s ' % (all_states[old_state], all_states[new_state], str(self) ))
 
     def connection_ready(self, ipcp):
-        msg = 'GstServer.connection_ready: Address: %s, Port: %s, conn %s' % (self.address, self.port, str(conn) )
+        msg = 'GstServer.connection_ready: Address: %s, Port: %s, conn %s' % (self.address, self.port, str(ipcp) )
         log.debug(msg)
         log.info('CONN: %s %s' % (ipcp, ipcp.__dict__))
         self.conn = ipcp
