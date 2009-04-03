@@ -38,11 +38,9 @@ testing.START_SERVER = False # You must start miville manually on both local and
 testing.start()
 
 
-
-
         
 
-cmd = 'cp ~/.miville/settings.txt /var/tmp/.miville'
+cmd = 'cp ~/src/miville/trunk/py/test/configs/settings.sets /var/tmp/.sropulpof'
 os.system(cmd)
 
 
@@ -163,7 +161,7 @@ class Test_TC7_Modify_Contacts(testing.TelnetBaseTest):
 
     def test_05_modify_port(self):
         self.tst("contacts --select contact1 ","Contact selected")
-        self.tst("contacts --modify port=22222 ","Contact modified")
+        self.tst("contacts --modify port=2222","Contact modified")
         time.sleep(2)
 
     def test_06_modify_no_argument(self):
@@ -174,6 +172,7 @@ class Test_TC7_Modify_Contacts(testing.TelnetBaseTest):
     def test_07_modify_settings(self):
         self.tst("contacts --add bloup 10.10.10.72","Contact added")
         self.tst("contacts --select bloup","Contact selected")
+        self.tst("contacts --modify port=2222","Contact modified")
         self.tst("contacts --modify setting=10000 ","Contact modified")
         time.sleep(2)
 
@@ -193,15 +192,6 @@ class Test_TC8_Duplicate_contact(testing.TelnetBaseTest):
 
 class Test_TC9_Join(testing.TelnetBaseTest): 
 
-    def test_01_join(self): 
-        
-        self.tst("contacts --select  bloup","Contact selected")
-        self.tst("j -s ", "")
-
-
-
-class Test_TC_10_Automatic_connection(testing.TelnetBaseTest): 
-     
     def test_01_create_remote_contact(self):   
         stdin, stdout, stderr = os.popen3("ssh bloup")
         
@@ -210,9 +200,21 @@ class Test_TC_10_Automatic_connection(testing.TelnetBaseTest):
         stdin.write("""exit\n""")
         stdin.close()
         stdout.close()
-        stderr.close()
+        stderr.close()    
 
-    def test_02_stream(self):
+
+    def test_02_join(self): 
+        
+        self.tst("contacts --select  bloup","Contact selected")
+        self.tst("j -s ", "")
+        time.sleep(5)
+
+
+class Test_TC_10_Automatic_connection(testing.TelnetBaseTest): 
+     
+    
+
+    def test_01_stream(self):
         self.tst("streams --start bloup", "")
         time.sleep(50)
     
