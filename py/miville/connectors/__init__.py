@@ -68,7 +68,10 @@ class Connection(object):
     def __init__(self, contact, api):
         self.api = api
         self.com_chan = None
-        self.local_name = None
+        
+        self.localhost = None
+        self.local_port = None
+        
         self.contact = contact
         self.remote_com_chan_port = com_chan.PORT
         contact.state = DISCONNECTED
@@ -143,7 +146,8 @@ class Connection(object):
 
     def setup(self):
         self.contact.state = CONNECTING
-        channel, deferred = com_chan.connect(self.local_name, self.contact.address, self.remote_com_chan_port)
+        local_name = '%s:%s' % (self.localhost, self.local_port)
+        channel, deferred = com_chan.connect(local_name, self.contact.address, self.remote_com_chan_port)
         deferred.addCallback(self.attached, channel)
         deferred.addErrback(self.not_attached)
 
