@@ -54,7 +54,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
     The tests starts and stop various propulseart processes in sender and receiver mode,
     and controls them via a telnet protocol.  
     """
- 
+
     def test_02_simple_video_sender(self):
         """
         create a video sender process that waits for connections. The 
@@ -69,7 +69,15 @@ class Test_telnet_milhouse(jimbo.Nelson):
         telnet_tx_port = 1220
         stream_port = 12020 
         bitrate = 3000000
-        tx_init_msg = "video_init:" + self._get_start_command('h264', stream_port, "127.0.0.1", bitrate=bitrate, source=video_src)
+        
+        video_init = jimbo.VideoInit()
+        video_init.codec = 'h264'
+        video_init.port = stream_port
+        video_init.address = "127.0.0.1"
+        video_init.bitrate=bitrate
+        video_init.source=video_src
+        tx_init_msg = video_init.to_string()
+        
         self.verb('')
         self.verb( tx_init_msg) 
         # start process and a telnet on port 1200 for control
@@ -77,7 +85,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         # start a sender on port 12000
         self.tst_tx(tx_init_msg, video_init_ok)
         self.tst_tx("start:", start_ok) # start streaming
-        self.stream_duration(15.)
+        self.stream_duration(2.)
         self.tst_tx("stop:", stop_but_not_ok)
         
     def test_03_simple_video_receiver(self):
@@ -85,8 +93,12 @@ class Test_telnet_milhouse(jimbo.Nelson):
         Same as test2, but this time the process is started in receiver mode
         """
         telnet_rx_port = 1230
-        stream_port = 12030 
-        rx_init_msg = "video_init:" + self._get_start_command('h264', stream_port, "127.0.0.1")
+        rx_video_init = jimbo.VideoInit()
+        rx_video_init.port = 12030
+        rx_video_init.address = "127.0.0.1"
+        rx_video_init.codec = 'h264'
+        
+        rx_init_msg = rx_video_init.to_string()
         self.verb('')
         self.verb(rx_init_msg)
         self.start_propulseart_rx(telnet_rx_port)
@@ -94,7 +106,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         self.tst_rx(rx_init_msg, video_init_ok)
         self.tst_rx("start:", start_ok) # start streaming
         
-        self.stream_duration(15.)
+        self.stream_duration(2.)
         
         self.tst_rx("stop:", stop_ok)
  
@@ -106,15 +118,23 @@ class Test_telnet_milhouse(jimbo.Nelson):
         This test should check for actual transfered data when the command is available.
         """
         self.verb('')
-        
-        
+        telnet_tx_port = 1340
         telnet_rx_port = 1240
-        rx_init_command = "video_init:" + self._get_start_command('h264', 12040, "127.0.0.1")
+        
+        rx_video_init = jimbo.VideoInit()
+        rx_video_init.port = 12040
+        rx_video_init.address =  "127.0.0.1"
+        rx_video_init.codec = 'mpeg4' 
+        rx_init_command = rx_video_init.to_string()
         self.verb("RX> " + rx_init_command)
         
-        bitrate = 3000000
-        telnet_tx_port = 1340
-        tx_init_command = "video_init:" + self._get_start_command('h264', 12040, "127.0.0.1", bitrate=bitrate,source=video_src)  
+        tx_video_init = jimbo.VideoInit()
+        tx_video_init.bitrate = 3000000
+        tx_video_init.codec = rx_video_init.codec
+        tx_video_init.address = "127.0.0.1"
+        tx_video_init.port = rx_video_init.port
+        tx_video_init.source=video_src
+        tx_init_command = tx_video_init.to_string()
         self.verb( "TX> " + tx_init_command)
         
         self.start_propulseart_rx(telnet_rx_port)
@@ -141,13 +161,25 @@ class Test_telnet_milhouse(jimbo.Nelson):
         telnet_rx_port = 1250
         telnet_tx_port = 1350
         
-        rx_init_cmd = "audio_init:" + self._get_start_command('vorbis', 12005, "127.0.0.1", audio_buffer_usec=30000)
+        rx_init = jimbo.AudioInit()
+        rx_init.codec = 'vorbis'
+        rx_init.port = telnet_rx_port
+        rx_init.address = "127.0.0.1"
+        rx_init.audio_buffer_usec = 30000
+        rx_init_cmd = rx_init.to_string()
         self.verb( "RX:>" + rx_init_cmd)
-        tx_init_cmd =  "audio_init:" + self._get_start_command ('vorbis', 12005, "127.0.0.1", source=audio_src, channels=2)
+        
+        tx_init = jimbo.AudioInit()
+        tx_init.codec = 'vorbis'
+        tx_init.port = telnet_rx_port
+        tx_init.address = "127.0.0.1"
+        tx_init.source=audio_src 
+        tx_init.channels=2
+        tx_init_cmd = rx_init.to_string()
         self.verb( "TX:>" + tx_init_cmd)
         self.start_propulseart_rx(telnet_rx_port)
         self.start_propulseart_tx(telnet_tx_port)
-        # self.tst_rx( self.get_audio_start(12000) , 'audio_start audio_start()' )
+        
         self.tst_rx(rx_init_cmd, audio_init_ok )
         self.tst_tx(tx_init_cmd, audio_init_ok)
         # make it so
@@ -156,7 +188,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         # check for transfered data
         # should be well above 0 bytes at this point
         
-        self.verb("DATA is flowing... or is it?")
+        
         self.stream_duration(15.)
         # cleanup and go home
         self.verb("stopping the streaming...")
@@ -178,14 +210,40 @@ class Test_telnet_milhouse(jimbo.Nelson):
         telnet_rx_port = 1270
         telnet_tx_port = 1370
         
-        rx_video_init_cmd = "video_init:" + self._get_start_command('mpeg4',   12007, "127.0.0.1")
-        rx_audio_init_cmd = "audio_init:" + self._get_start_command('raw', 12107, "127.0.0.1",  audio_buffer_usec=30000)        
+        rx_video_init = jimbo.VideoInit()
+        rx_video_init.codec = 'mpeg4'
+        rx_video_init.address = "127.0.0.1"
+        rx_video_init.port = 12007
+        rx_video_init_cmd = rx_video_init.to_string()
+        
+        rx_audio_init = jimbo.AudioInit()
+        rx_audio_init.audio_buffer_usec = 30000
+        rx_audio_init.codec = 'raw'
+        rx_audio_init.port = 12107
+        rx_audio_init.address = "127.0.0.1"
+        rx_audio_init_cmd = rx_audio_init.to_string()
+                
+        # = "video_init:" + self._get_start_command(,   12007, )
+           
         self.verb( 'RX video: ' + rx_video_init_cmd )
         self.verb( 'RX audio: ' + rx_audio_init_cmd )
         
-        bitrate = 3000000
-        tx_video_init_cmd = "video_init:" + self._get_start_command('mpeg4',   12007, "127.0.0.1", bitrate=bitrate, source=video_src)
-        tx_audio_init_cmd = "audio_init:" + self._get_start_command('raw', 12107, "127.0.0.1", source=audio_src, channels =2)   
+        tx_video_init = jimbo.VideoInit()
+        tx_video_init.bitrate = 3000000
+        tx_video_init.codec = rx_video_init.codec
+        tx_video_init.port = rx_video_init.port
+        tx_video_init.address = "127.0.0.1"
+        tx_video_init.source = video_src
+        
+        tx_audio_init = jimbo.AudioInit()
+        tx_audio_init.codec = rx_audio_init.codec
+        tx_audio_init.address = rx_audio_init.address
+        tx_audio_init.port = rx_audio_init.port
+        tx_audio_init.source=audio_src
+        tx_audio_init.channels =2
+        
+        tx_video_init_cmd = tx_video_init.to_string()
+        tx_audio_init_cmd = tx_audio_init.to_string()
         self.verb(  'TX video: ' + tx_video_init_cmd)
         self.verb(  'TX audio: ' + tx_audio_init_cmd)
                  
@@ -199,7 +257,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         self.tst_tx(tx_audio_init_cmd , audio_init_ok)
                 
         self.tst_tx( 'start:', start_ok )
-        time.sleep(1)
+        time.sleep(0.5)
         self.tst_rx( 'start:', start_ok )
        
         self.stream_duration(15.)

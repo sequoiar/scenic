@@ -59,7 +59,40 @@ audio_src = 'audiotestsrc'
 # ---------------------------------------------------------------------
 # config 
 
-waiting_delay = 1.0 # seconds before starting client after server start
+waiting_delay = 1.0 # seconds before starting telnet client after server start
+
+class InitArgs(object):
+
+    def __init__(self, cmd):
+        self.command = cmd
+        self.bitrate=None
+        self.source=None
+        self.codec=None 
+        self.port=None 
+        self.address=None
+            
+    def to_string(self):
+        def get_val_as_string(msg):
+            if isinstance(msg,str):
+                return '"' + msg + '"'
+            return str(msg)
+        
+        result = self.command + ": " 
+        for key, val in self.__dict__.iteritems():
+            if val is not None:
+                result = result + ' ' + key + '=' + get_val_as_string(val) 
+        return result    
+
+class AudioInit(InitArgs):
+    def __init__(self):
+        InitArgs.__init__(self, "audio_init")
+        self.audio_buffer_usec = None
+        self.channels=None
+    
+    
+class VideoInit(InitArgs):
+    def __init__(self):
+        InitArgs.__init__(self , "video_init")
 
 
 def verb(to_print=''):
@@ -162,6 +195,9 @@ def kill_process(process):
 
 
 
+
+        
+        
 # ---------------------------------------------------------------------
 # System test classes
 class Nelson(unittest.TestCase):
@@ -180,19 +216,19 @@ class Nelson(unittest.TestCase):
         
         msc_string = ""
     
-    def _get_start_command(self, codec, port, address, 
-                           bitrate=None, 
-                           source =None, 
-                           channels=None,
-                           audio_buffer_usec=None):
-         s = ' codec="%s" port=%d address="%s"' %  (codec, port, address)
-         if bitrate:
-             s += ' bitrate=%d' % bitrate
-         if source:
-             s += ' source="%s"' % source
-         if channels:
-             s += ' channels=%d' % channels    
-         return s
+#    def _get_start_command(self, codec, port, address, 
+#                           bitrate=None, 
+#                           source =None, 
+#                           channels=None,
+#                           audio_buffer_usec=None):
+#         s = ' codec="%s" port=%d address="%s"' %  (codec, port, address)
+#         if bitrate:
+#             s += ' bitrate=%d' % bitrate
+#         if source:
+#             s += ' source="%s"' % source
+#         if channels:
+#             s += ' channels=%d' % channels    
+#         return s
     
 
    
@@ -200,6 +236,8 @@ class Nelson(unittest.TestCase):
         """
         Adds a line to the sequence diagram
         """ 
+    
+        print "Streaming for %s seconds DATA is flowing... or is it?" % (str(delay))
         time.sleep(delay)
         #self.msc += 'test:>test [label="waiting"];\n' % str(delay)
         self.msc += '---  [ label = "streaming data for %s seconds"]; \n' % str(delay)     
@@ -240,10 +278,8 @@ msc
         """
         Destructor for each test. 
         """
-        try:
-            self._pump_up_the_files()
-        except:
-            pass
+        
+        self._pump_up_the_files()
             
         self.msc += '\n}'
         short_dia_file_name = self._testMethodName+".msc"
@@ -344,9 +380,11 @@ msc
     def _pump_up_the_files(self):
         def pump_me(what):
             if what != None:
-                #what.read_nonblocking(size=10000, timeout=1)
-                what.readline()
-                pass
+                try:
+                    #what.read_nonblocking(size=10000, timeout=1)
+                    what.readline()
+                except pexpect.TIMEOUT:
+                    pass
             
         pump_me(self.tx_server)
         pump_me(self.rx_server)
