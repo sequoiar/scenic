@@ -26,6 +26,7 @@
 #include "pipeline.h"
 #include "dv1394.h"
 #include "busMsgHandler.h"
+#include <cstring>
 
 // NOTES:
 // Change verbose_ to true if you want Gstreamer to tell you everything that's going on
