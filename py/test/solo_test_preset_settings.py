@@ -80,7 +80,7 @@ class Test_001_Gen_Settings(testing.TelnetBaseTest):
         
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=codec:mpeg4'    , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=engine:Gst'     , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=GstPort:11111'         , 'modified')
+        self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=GstPort:12121'         , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=GstAddress:127.0.0.1'  , 'modified')
         self.tst("settings --type media --list"     , "mpeg4_basic_rx")
         
