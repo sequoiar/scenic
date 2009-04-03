@@ -32,9 +32,6 @@
 #define LOG_LEVEL INFO
 #endif
 
-#undef LOG_LEVEL
-#define LOG_LEVEL CRITICAL
-
 bool logLevelIsValid(LogLevel level)
 {
     switch (level)
