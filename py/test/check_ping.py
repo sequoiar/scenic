@@ -62,3 +62,7 @@ class Test_Ping(unittest.TestCase):
         self.local.expectTest("Starting", 'Did not start network test')
         self.remote.sleep(1.3)
         self.local.expectTest('jitter', 'Did not receive network test results.')
+
+    def test_99_kill_miville(self):
+        self.local.kill_miville_and_telnet()
+        self.remote.kill_miville_and_telnet()
