@@ -159,7 +159,7 @@ def start_process(command, logfile=None):
         #print 'Current working dir: ' + directory
         #if isVerbose:
         print 'starting process "%s"' % (command)
-        process = pexpect.spawn(command, logfile=logfile)
+        process = pexpect.spawn(command, timeout=0.1, logfile=logfile)
         #process.logfile=sys.stdout
         #if logfile != None:
         #process.logfile=logfile
