@@ -29,11 +29,10 @@ import sys
 import tempfile
 import shutil
 
-import miville.utils.telnet_testing as testing
+import test.lib_telnet_testing as testing
 
-testing.VERBOSE_CLIENT = True
+testing.VERBOSE_CLIENT = False
 testing.VERBOSE_SERVER = True
-
 
 class DualLocalBaseTest(testing.TelnetBaseTest):
     """
@@ -61,7 +60,8 @@ class DualLocalBaseTest(testing.TelnetBaseTest):
                 'verbose_server':False, 
                 'command':os.path.expanduser('../miville.py'), # XXX parent dir since trial changes os.getcwd()
                 'home':'', 
-                'process':None
+                'process':None,
+                'telnet_process':None
             }, 
             'second':{
                 'port_offset':1, 
@@ -69,7 +69,8 @@ class DualLocalBaseTest(testing.TelnetBaseTest):
                 'verbose_server':False, 
                 'command':os.path.expanduser('../miville.py'),
                 'home':'',
-                'process':None
+                'process':None, 
+                'telnet_process':None
             } 
         }
 
@@ -79,18 +80,17 @@ class DualLocalBaseTest(testing.TelnetBaseTest):
                 # if testing.CHANGE_HOME_PATH:
                 TMP_NAME = tempfile.mktemp() # some unique name that looks like "/tmp/xxxxxxxx"
                 os.mkdir(TMP_NAME)
-                os.environ['HOME'] = TMP_NAME
-                os.mkdir("%s/.miville" % (TMP_NAME))
-                print "mkdir %s/.miville" % (TMP_NAME)
-
-                shutil.copyfile('../test/configs/addressbook.txt', '%s/.miville/addressbook.txt' % (TMP_NAME))
-                print 'Copying a file to %s/.miville/addressbook.txt' % (TMP_NAME)
-
-                shutil.copyfile('../test/configs/settings.txt', '%s/.miville/settings.txt'% (TMP_NAME))
-                print 'Copying a file to %s/.miville/settings.txt' % (TMP_NAME)
-
                 miville['home'] = TMP_NAME
-                miville['command'] = "%s -o %s" % (miville['command'], miville['port_offset'])
+                
+                #os.environ['HOME'] = TMP_NAME
+                
+                shutil.copyfile('../test/configs/addressbook.txt', '%s/addressbook.txt' % (TMP_NAME))
+                print 'Copying a file to %s/addressbook.txt' % (TMP_NAME)
+
+                shutil.copyfile('../test/configs/settings.txt', '%s/settings.txt'% (TMP_NAME))
+                print 'Copying a file to %s/settings.txt' % (TMP_NAME)
+
+                miville['command'] = "%s -o %s -m %s" % (miville['command'], miville['port_offset'], miville['home'])
                 if testing.VERBOSE_SERVER:
                     print "pwd is ", os.environ['PWD']
                     print "current working directory", os.getcwd()
@@ -107,7 +107,12 @@ class DualLocalBaseTest(testing.TelnetBaseTest):
             print "VERBOSE_CLIENT"
             print "starting telnet client"
         # spwning a pexpect
-        self.client = testing.start_process(testing.CLIENT_COMMAND, testing.VERBOSE_CLIENT, "C>", 'CYAN')
+        self.telnets = []
+        # for miville in self.mivilles.values():
+        #     port_offset = miville['port_offset']
+        #     testing.SERVER_PORT + port_offset
+        #     miville['telnet_process'] = 
+        self.telnets.append(testing.start_process(testing.CLIENT_COMMAND, testing.VERBOSE_CLIENT, "C>", 'CYAN'))
         print "sleeping for 1 second...."
         self.sleep(1)
     
@@ -117,7 +122,6 @@ class DualLocalBaseTest(testing.TelnetBaseTest):
         """
         pass
 
-
 class Test_01_Ping(DualLocalBaseTest):
     """
     Tests for ping.
@@ -125,14 +129,15 @@ class Test_01_Ping(DualLocalBaseTest):
     pof> ping
     """
     def test_01_ping(self):
-        self.client.sendline("c -s Charlotte")
+        self.telnets[0].sendline("c -s Charlotte")
         self.sleep(0.1)
-        self.client.sendline("j -s")
+        self.telnets[0].sendline("j -s")
         self.sleep(0.4)
         # self.expectTest('accepted', 'Connection not successful.')
         self.sleep(0.1)
-        self.client.sendline("ping")
-        self.client.sendline("")
-        self.sleep(0.2)
+        self.telnets[0].sendline("ping")
+        self.telnets[0].sendline("")
+        self.sleep(2)
         # self.expectTest('pong', 'Did not receive pong answer.')
         # XXX disabled for now !
+

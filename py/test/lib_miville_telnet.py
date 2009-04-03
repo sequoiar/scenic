@@ -26,13 +26,14 @@ Usage :
 import unittest
 from test import lib_miville_telnet as libmi
 
-tester = libmi.MivilleTester(self)
+tester = libmi.MivilleTester()
 tester.start_miville_process()
 tester.start_telnet_process()
 
 class Test_ExampleOneMivilleTest(unittest.TestCase):
     def setUp(self):
         global tester
+        tester.unittest = self
         self.tester = tester
     def test_01_simple(self):
         self.tester.tst('c -l', 'pof:')
@@ -71,13 +72,13 @@ def println(s, endl=True):
         print "\n", ">>>>", s, # note the comma (",") at end of line
 
 class MivilleTester(object):
-    def __init__(self, unittest, **kwargs):
+    def __init__(self, **kwargs):
         """
         Update default options here
         """
-        self.unittest = unittest
+        self.unittest = None
         self.port_offset = 0
-        self.miville_command = "../miville.py"
+        self.miville_command = "./miville.py"
         self.use_tmp_home = False
         self.verbose = True
         self.log_prefix = ''
@@ -109,7 +110,7 @@ class MivilleTester(object):
         """
         Starts the miville server 
         """
-        command = "%s -o %s -m %s" % (self.miville_command, self.port_offset, self.miville_home)
+        command = "%s -o %s -m %s -C" % (self.miville_command, self.port_offset, self.miville_home)
         try:
             directory = os.getcwd()
             if self.verbose:
@@ -133,7 +134,7 @@ class MivilleTester(object):
         command = "telnet %s %s" % ("localhost", self.port_offset + 14444)
         try:
             self.telnet_process = pexpect.spawn(command, logfile=self.telnet_logfile, timeout=0.01) # ProcessOutputLogger(logPrefix, color)
-            sleep(0.5) # seconds
+            self.sleep(0.5) # seconds
             if self.is_running(self.telnet_process) == False:
                 raise Exception("Telnet could not be started. Not running. %s" % (command))
         except pexpect.ExceptionPexpect, e:
@@ -163,6 +164,13 @@ class MivilleTester(object):
             return False
         else:
             return process
+    def kill_miville_and_telnet(self):
+        if self.miville_process is not None:
+            self.kill_process(self.miville_process)
+            self.miville_process.close()
+        if self.telnet_process is not None:
+            self.kill_process(self.telnet_process)
+            self.telnet_process.close()
 
     def kill_process(self, process):
         """
@@ -260,15 +268,3 @@ def execute_bash_command_string(cmd):
 # 
 #     """
 #     pass
-
-class Test_OneMivilleTest(unittest.TestCase):
-    """
-    Base class for tests that start one miville and one telnet client 
-    """
-    def test_01_simple(self):
-        self.tester = MivilleTester(self)
-        self.tester.start_miville_process()
-        self.tester.start_telnet_process()
-        # def tst(self, command, expected, timeout=2, errorMsg = None):
-        self.tester.tst('c -l', 'toto')
-

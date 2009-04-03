@@ -328,6 +328,12 @@ class ControllerApi(object):
             result = err
         self.notify(caller, result)
     
+    def get_config(self, key):
+        """
+        get the value of a miville configuration option.
+        """
+        return self.core.config.__dict__[key]
+
     def list_stream_subgroup (self, caller, global_setting_name):
         try:
             result = None

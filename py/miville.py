@@ -49,6 +49,8 @@ if __name__ == '__main__':
         help="""Communication channel listen only to those network interfaces IP. Use this flag many times if needed. Default is all. Example: -i 127.0.0.1 -i 10.10.10.55""")
     parser.add_option("-m", "--miville-home", type="string", \
         help="Path to miville configuration files. (dot files)")
+    parser.add_option("-C", "--disable-escape-sequences", action="store_true", \
+        help="Disables ANSI escape sequences in shell and telnet clients.")
     parser.add_option("-I", "--ui-interfaces", type="string", action="append", \
         help="""User interfaces listen only to those network interfaces IP. Use this flag many times if needed. Default is localhost only. Example: -i 127.0.0.1 -i 10.10.10.55""")
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", \
@@ -71,6 +73,8 @@ if __name__ == '__main__':
             config.ui_network_interfaces = options.ui_interfaces
     if options.miville_home:
         config.miville_home = options.miville_home
+    if options.disable_escape_sequences: # in both telnet CLI and this shell
+        config.enable_escape_sequences = False
     # set the port offset        
     config.port_numbers_offset = options.offset
 
@@ -78,7 +82,7 @@ if __name__ == '__main__':
     log.info('Starting Miville...')
     # changes terminal title
     for terminal in ['xterm', 'rxvt']:
-        if terminal.find:
+        if terminal.find and config.enable_escape_sequences:
             hostname = socket.gethostname()
             sys.stdout.write(']2;miville on ' + hostname + '')
     try:

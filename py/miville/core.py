@@ -72,6 +72,7 @@ class MivilleConfiguration(object):
         self.port_numbers_offset = 0
         self.listen_to_interfaces = '' # means all interfaces
         self.ui_network_interfaces = ['127.0.0.1'] # default is only local host
+        self.enable_escape_sequences = True
         # files
         self.miville_home = os.path.expanduser("~/.miville") # TODO: change for ~/.miville
         self.addressbook_filename = 'addressbook.txt' # TODO: "contacts.txt"
@@ -139,6 +140,7 @@ class Core(Subject):
             interfaces = self.config.listen_to_interfaces
             if mod.__name__.find('cli') != -1:
                 port = self.config.telnet_port + self.config.port_numbers_offset
+                mod.enable_escape_sequences = self.config.enable_escape_sequences 
             elif mod.__name__.find('web') != 1:
                 port = self.config.web_port + self.config.port_numbers_offset
             else: 

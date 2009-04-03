@@ -89,7 +89,11 @@ class DeviceSettings(object):
     def list_actual_devices(self, kind="video"):
         """
         Returns list of the actual devices of a kind.
-
+        
         kinds can be "video", "audio" or "data"
         """
         pass
+        driver_kind = kind
+        driver_name = None
+        return devices.get_all_devices(driver_kind, driver_name)
+        

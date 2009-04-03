@@ -70,7 +70,7 @@ from miville.utils.common import find_callbacks
 log = log.start('info', 1, 0, 'cli')
 
 ESC = chr(27)
-
+enable_escape_sequences = True # disable this if you want not to show bold text, clear terminal page, etc.
 
 class TelnetServer(recvline.HistoricRecvLine):
     """A Telnet server to control the application from a command line interface."""
@@ -85,11 +85,14 @@ class TelnetServer(recvline.HistoricRecvLine):
         """
         This method overwrite the Twisted one because there's was a bug
         (Gnome-terminal was not scrolling at the bottom of the page).
-        Write a '\\\\n' instead of an ESC character.
+
+        Writes a '\\\\n' (new line char) instead of an ESC character.
         """
-        # It's really should be a '\n' in the docstring above but sphinx barf on it.
-        self.terminal.cursorPos.x = 0
-        self.terminal.cursorPos.y = min(self.terminal.cursorPos.y + 1, self.terminal.termSize.y - 1)
+        # It really should be a '\n' in the docstring above but sphinx barfs on it.
+        global enable_escape_sequences
+        if enable_escape_sequences:
+            self.terminal.cursorPos.x = 0
+            self.terminal.cursorPos.y = min(self.terminal.cursorPos.y + 1, self.terminal.termSize.y - 1)
         self.terminal.write('\n')
         
 
@@ -102,6 +105,7 @@ class TelnetServer(recvline.HistoricRecvLine):
             self.write_prompt()
 
     def connectionMade(self):
+        global enable_escape_sequences 
         self.addr = self.terminal.transport.getPeer()
         # overwrite twisted terminal.nextLine method with our own to fix a bug 
         self.terminal.nextLine = self.next_line
@@ -122,14 +126,15 @@ class TelnetServer(recvline.HistoricRecvLine):
             self.historyPosition = len(self.historyLines)
         t = self.terminal
         self.keyHandlers.update({'\x01': self.handle_HOME,
-                                 '\x05': self.handle_END,
+                                 '\x05': self.handle_END, # TODO add control-D for quit
                                  t.TAB: self.completion})
 
         log.info("%s is connecting in Telnet on port %s" % (self.addr.host, self.addr.port))
         self.write("Welcome to Sropulpof!")
         hostname = socket.gethostname()
-        msg = ']2;telnet miville to %s' % hostname
-        self.terminal.write("%s" % (msg.encode('utf-8')))
+        if enable_escape_sequences:
+            msg = ']2;telnet miville to %s' % hostname
+            self.terminal.write("%s" % (msg.encode('utf-8')))
         self.write_prompt()
 
     def handle_RETURN(self):
@@ -1678,10 +1683,18 @@ class CliView(Observer):
         
 
 def bold(msg):
-    return "%s[1m%s%s[0m" % (ESC, msg, ESC)
+    global enable_escape_sequences 
+    if enable_escape_sequences:
+        return "%s[1m%s%s[0m" % (ESC, msg, ESC)
+    else:
+        return msg
 
 def italic(msg):
-    return "%s[33m%s%s[0m" % (ESC, msg, ESC)
+    global enable_escape_sequences 
+    if enable_escape_sequences:
+        return "%s[33m%s%s[0m" % (ESC, msg, ESC)
+    else:
+        return msg
 
 def add_quotes(input):
     if ':' in input:
@@ -1706,6 +1719,10 @@ def start(subject, port=14444, interfaces=''):
                                                insults.ServerProtocol,
                                                CliController, subject)
     # subject is the core...
+
+    global enable_escape_sequences
+
+    enable_escape_sequences = subject.api.get_config('enable_escape_sequences')
     subject.api.listen_tcp(port, factory, interfaces) # subject.config.ui_network_interfaces)
     #reactor.listenTCP(port, factory)
 
