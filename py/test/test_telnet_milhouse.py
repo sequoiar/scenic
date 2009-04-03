@@ -26,7 +26,7 @@ Usage: trial test/systest_telnet.py
 
 pexpect expected strings are regular expression. See the re module.
 """ 
-import test.nelson as jimbo
+import test.lib_milhouse_ipcp as jimbo
 import time
 import os
 
@@ -77,7 +77,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         # start a sender on port 12000
         self.tst_tx(tx_init_msg, video_init_ok)
         self.tst_tx("start:", start_ok) # start streaming
-        self.stream_duration(5.)
+        self.stream_duration(15.)
         self.tst_tx("stop:", stop_but_not_ok)
         
     def test_03_simple_video_receiver(self):
@@ -94,7 +94,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         self.tst_rx(rx_init_msg, video_init_ok)
         self.tst_rx("start:", start_ok) # start streaming
         
-        self.stream_duration(5.)
+        self.stream_duration(15.)
         
         self.tst_rx("stop:", stop_ok)
  
@@ -125,7 +125,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         
         self.tst_rx("start:", start_ok)
         self.tst_tx("start:", start_ok)
-        self.stream_duration(8.)
+        self.stream_duration(18.)
         # check for transfered data
         # should be well above 0 bytes at this point
         
@@ -157,7 +157,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         # should be well above 0 bytes at this point
         
         self.verb("DATA is flowing... or is it?")
-        self.stream_duration(5.)
+        self.stream_duration(15.)
         # cleanup and go home
         self.verb("stopping the streaming...")
  
@@ -187,7 +187,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         tx_video_init_cmd = "video_init:" + self._get_start_command('mpeg4',   12007, "127.0.0.1", bitrate=bitrate, source=video_src)
         tx_audio_init_cmd = "audio_init:" + self._get_start_command('raw', 12107, "127.0.0.1", source=audio_src, channels =2)   
         self.verb(  'TX video: ' + tx_video_init_cmd)
-        self.verb( 'TX audio: ' + tx_audio_init_cmd)
+        self.verb(  'TX audio: ' + tx_audio_init_cmd)
                  
         self.start_propulseart_rx(telnet_rx_port)
         self.start_propulseart_tx(telnet_tx_port)
@@ -195,7 +195,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         self.tst_rx(rx_video_init_cmd , video_init_ok )
         self.tst_rx(rx_audio_init_cmd , audio_init_ok  )
         
-        self.tst_tx(tx_video_init_cmd, video_init_ok)
+        self.tst_tx(tx_video_init_cmd,  video_init_ok)
         self.tst_tx(tx_audio_init_cmd , audio_init_ok)
                 
         self.tst_tx( 'start:', start_ok )

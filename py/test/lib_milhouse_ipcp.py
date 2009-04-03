@@ -240,8 +240,11 @@ msc
         """
         Destructor for each test. 
         """
-        self._pump_up_the_files()
-        
+        try:
+            self._pump_up_the_files()
+        except:
+            pass
+            
         self.msc += '\n}'
         short_dia_file_name = self._testMethodName+".msc"
         self._save_string_to_file(self.msc,short_dia_file_name)
