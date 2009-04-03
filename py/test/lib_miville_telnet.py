@@ -153,14 +153,14 @@ class MivilleTester(object):
         Returns boolean
         """
         if process is None:
-            print "is_running: process is None"
+            # print "is_running: process is None"
             return False
         if process.isalive() == False:
             status = "no status available" 
             if process:
                 status = process.status
-            print "is_running: process.isalive() is False"
-            println("Error starting process: %s" % status)
+            #print "is_running: process.isalive() is False"
+            #println("Error starting process: %s" % status)
             return False
         else:
             return process
