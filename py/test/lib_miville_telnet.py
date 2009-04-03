@@ -46,6 +46,7 @@ import time
 import sys
 import tempfile
 import commands
+import string
 
 def get_color(color=None):
     """
@@ -164,13 +165,14 @@ class MivilleTester(object):
             return False
         else:
             return process
+
     def kill_miville_and_telnet(self):
         if self.miville_process is not None:
-            self.kill_process(self.miville_process)
+            self.telnet_process.close()
             self.miville_process.close()
+            self.kill_process(self.miville_process)
         if self.telnet_process is not None:
             self.kill_process(self.telnet_process)
-            self.telnet_process.close()
 
     def kill_process(self, process):
         """
@@ -204,6 +206,7 @@ class MivilleTester(object):
         self.unittest.assertEqual(index, 0, message)
         self.unittest.failIfEqual(index, 1, 'Problem : Unexpected EOF')
         self.unittest.failIfEqual(index, 2, 'Problem : Time out.')
+        self.sleep(0.01)
 
     def tst(self, command, expected, timeout=2, errorMsg=None):
         """
@@ -220,14 +223,15 @@ class MivilleTester(object):
     
     def flush(self):
         """
-        Flushes the output buffer of the process to stdout.
+        Flushes the output buffer of the process to stdout. (or a file)
         """
         for child in (self.telnet_process, self.miville_process):
             if child is not None:
-                try:
-                    child.readline()
-                except pexpect.TIMEOUT:
-                    pass
+                if child.isalive():
+                    try:
+                        child.readline()
+                    except pexpect.TIMEOUT:
+                        pass
 
     def sleep(self, duration=0.3):
         """
@@ -260,11 +264,33 @@ def execute_bash_command_string(cmd):
             print line
     print
 
-# def kill_all_running_miville(self):
-#     """
-#     Not implemented yet
-# 
-#     Kills all instances of running miville
-# 
-#     """
-#     pass
+
+def kill_all_running_miville():
+    """
+    Kills all instances of running miville.
+
+    (if there are some)
+    """
+    print "Checking for running miville instances......"
+    output = commands.getstatusoutput("ps aux | grep miville | grep -v grep | grep python")[1]
+    print output
+    lines = output.splitlines()
+    for line in lines:
+        try:
+            if line.find("python ./miville.py") != -1:
+                tokens = line.split()
+                proc = tokens[1]
+                pid = int(proc)
+                print "WARNING! WE NEED TO KILL A MIVILLE INSTANCE NOW. PID: %s"  % (proc)
+                print commands.getstatusoutput("kill %s" % (proc))[1]
+                time.sleep(0.1)
+                print commands.getstatusoutput("kill -KILL %s" % (proc))[1]
+                time.sleep(0.1)
+                os.kill(pid, 9)
+                time.sleep(0.1)
+        except IndexError, e:
+            raise
+        except TypeError, e:
+            raise
+        except OSError,e :
+            pass

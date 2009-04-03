@@ -6,17 +6,18 @@ TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 trial
 
 TESTS = test/test_com_chan.py \
         test/test_addressbook.py \
-        test/test_devices.py \
         test/test_i18n.py \
         test/test_log.py \
         test/test_observer.py \
+        test/check_ping.py \
+        test/check_miville_starts.py \
+        test/check_devices_settings.py \
         test/test_telnet_milhouse_sync.py \
         test/test_telnet_milhouse.py 
-#         test/check_ping.py \
-#         test/check_miville_starts.py \
-#         test/check_devices_settings.py 
 
-
+# new tests to fix (alex)
+#        test/test_devices.py \
+#
 # to update to new path
 #        test/test_common.py 
 #

@@ -21,9 +21,10 @@
 """
 Starts two miville and tests the protocols/pinger module.
 """
-import shutil
 import unittest
 from test import lib_miville_telnet as libmi
+
+libmi.kill_all_running_miville()
 
 local = libmi.MivilleTester(use_tmp_home=True)
 local.start_miville_process()
@@ -43,6 +44,7 @@ class Test_Ping(unittest.TestCase):
         self.remote = remote
 
     def test_01_ping(self):
+        # contacts we add might be already in their addressbook
         self.local.telnet_process.sendline("c -a Charlotte 127.0.0.1 2223")
         self.local.sleep(0.1)
         self.remote.telnet_process.sendline("c -a Pierre 127.0.0.1 2222")

@@ -590,7 +590,7 @@ def set_video_standard(caller, value=None):
     If value is None, sets it according to the time zone.
     """
     global managers
-
+    value = value.strip().lower()
     if value not in ['ntsc', 'pal', 'secam']:
         value = 'ntsc' # default
         try:
@@ -607,7 +607,8 @@ def set_video_standard(caller, value=None):
     try: 
         manager = managers[driver_kind]
     except KeyError:
-        self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
+        # self.notify(caller, 'No such kind of driver: %s' % (driver_kind), 'info')
+        log.error('No such kind of driver: %s' % (driver_kind))
     else:
         devices_list = []
         # for every video driver.

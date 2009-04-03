@@ -28,6 +28,8 @@ This is also a demo of the new test lib
 import unittest
 from test import lib_miville_telnet as libmi
 
+libmi.kill_all_running_miville()
+
 tester = libmi.MivilleTester()
 tester.start_miville_process()
 tester.start_telnet_process()
