@@ -60,7 +60,7 @@ void RtpBin::init()
 
 void RtpBin::parseSourceStats(GObject * source, int sessionId)
 {
-    g_print("\nSESSION ID: %s_%d\n", sessionNames_[sessionId].c_str(), sessionId);
+    LOG_DEBUG("SESSION ID: " << sessionNames_[sessionId] << "_" << sessionId);
     GstStructure *stats;
 
     // get the source stats
@@ -77,7 +77,7 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
         if (g_value_get_boolean(val))    // is-sender
         {
             guint64 bitrate = g_value_get_uint64(gst_structure_get_value(stats, "bitrate"));
-            g_print("BITRATE: %" G_GUINT64_FORMAT "\n", bitrate);
+            LOG_DEBUG("BITRATE: " << bitrate);
         }
 
         gst_structure_free (stats);

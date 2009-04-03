@@ -70,7 +70,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
 
                 gst_message_parse_error(msg, &err, &debug);
 
-                LOG_WARNING(err->message);
+                LOG_ERROR(err->message);
                 g_error_free(err);
 
                 if (debug) {
@@ -161,7 +161,56 @@ void Pipeline::makeVerbose()
     gchar *exclude_args = NULL;     // set args to be excluded from output
     gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
     g_signal_connect(pipeline_, "deep_notify",
-            G_CALLBACK(gst_object_default_deep_notify), exclude_list);
+            G_CALLBACK(deepNotifyCb), exclude_list);
+}
+
+
+void Pipeline::deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gchar ** excluded_props)
+{
+    GValue value; /* the important thing is that value.type = 0 */
+    memset(&value, 0, sizeof(value));
+    gchar *str = NULL;
+    gchar *name = NULL;
+
+    if (pspec->flags & G_PARAM_READABLE) 
+    {
+        /* let's not print these out for excluded properties... */
+        while (excluded_props != NULL && *excluded_props != NULL) 
+        {
+            if (strcmp (pspec->name, *excluded_props) == 0)
+                return;
+            excluded_props++;
+        }
+        g_value_init (&value, G_PARAM_SPEC_VALUE_TYPE (pspec));
+        g_object_get_property (G_OBJECT (orig), pspec->name, &value);
+
+        /* FIXME: handle flags */
+        if (G_IS_PARAM_SPEC_ENUM (pspec)) 
+        {
+            GEnumValue *enum_value;
+            GEnumClass *klass = G_ENUM_CLASS (g_type_class_ref (pspec->value_type));
+            enum_value = g_enum_get_value (klass, g_value_get_enum (&value));
+
+            str = g_strdup_printf ("%s (%d)", enum_value->value_nick,
+                    enum_value->value);
+            g_type_class_unref (klass);
+        } 
+        else 
+        {
+            str = g_strdup_value_contents (&value);
+        }
+        name = gst_object_get_path_string (orig);
+        LOG_DEBUG(name << ": " << pspec->name << " = " << str);
+        g_free(name);
+        g_free(str);
+        g_value_unset (&value);
+    } 
+    else 
+    {
+        name = gst_object_get_path_string (orig);
+        LOG_WARNING("Parameter " << pspec->name << " not readable in " << name << ".");
+        g_free (name);
+    }
 }
 
 
@@ -208,18 +257,19 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
         LOG_DEBUG("Element is live, no preroll");
         return true;
     }
-    else if (ret == GST_STATE_CHANGE_FAILURE) {
-        g_print ("Failed to start pipeline!\n");
+    else if (ret == GST_STATE_CHANGE_FAILURE) 
+    {
         GstBus *bus;
         bus = getBus();
 
         /* check if there is an error message with details on the bus */
         GstMessage *msg = gst_bus_poll(bus, GST_MESSAGE_ERROR, 0);
-        if (msg) {
+        if (msg) 
+        {
             GError *err = NULL;
 
             gst_message_parse_error(msg, &err, NULL);
-            g_print("ERROR: %s\n", err->message);
+            LOG_ERROR(err->message);
             g_error_free(err);
             gst_message_unref(msg);
         }
@@ -387,7 +437,7 @@ void Pipeline::seekTo(gint64 pos)
     if (!gst_element_seek (pipeline_, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
                 GST_SEEK_TYPE_SET, pos,
                 GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
-        THROW_ERROR("Seek failed!\n");
+        THROW_ERROR("Seek failed!");
     }
 }
 

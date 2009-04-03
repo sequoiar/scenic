@@ -64,6 +64,7 @@ class Pipeline
         static const unsigned int SAMPLE_RATE;
 
     private:
+        static void deepNotifyCb(GObject *object, GstObject *orig, GParamSpec *spec, gchar ** excluded_props);
         void init();
         void add(_GstElement * element);
         static void reset();

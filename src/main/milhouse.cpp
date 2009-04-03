@@ -45,9 +45,24 @@ namespace pof
 
 int telnetServer(int, int);
 
+
+class MilhouseLogger
+    : public Log::Subscriber
+{
+    public:
+        void operator()(LogLevel&, std::string& msg);
+};
+
+
+void MilhouseLogger::operator()(LogLevel& /*level*/, std::string& msg)
+{
+    std::cout << msg;
+}
+
 // 2way audio and video
 short pof::run(int argc, char **argv)
 {
+    MilhouseLogger logger; // just instantiate, his base class will know what to do 
     OptionArgs options;
 
     // add options here
