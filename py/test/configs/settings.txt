@@ -8,7 +8,7 @@ v1.0
 					['is_preset', 
 						['boolean', 'false']], 
 					['name', 
-						['unicode', 'vid_rxtx_oneway_setting']], 
+						['unicode', 'vid_2_way']], 
 					['selected_stream_subgroup', 
 						['None']], 
 					['stream_subgroups', 
