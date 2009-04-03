@@ -62,7 +62,6 @@ void MilhouseLogger::operator()(LogLevel& /*level*/, std::string& msg)
 // 2way audio and video
 short pof::run(int argc, char **argv)
 {
-    MilhouseLogger logger; // just instantiate, his base class will know what to do 
     OptionArgs options;
 
     // add options here
@@ -106,6 +105,7 @@ short pof::run(int argc, char **argv)
     if(options["serverport"])
         return telnetServer(options["sender"], options["serverport"]);
 
+    MilhouseLogger logger; // just instantiate, his base class will know what to do 
     int disableVideo = !options["videocodec"] and !options["videoport"];
     int disableAudio = !options["audiocodec"] and !options["audioport"];
 
