@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+#
 # Miville
 # Copyright (C) 2008 Société des arts technoligiques (SAT)
 # http://www.sat.qc.ca
@@ -21,123 +21,39 @@
 """
 Starts two miville and tests the protocols/pinger module.
 """
-import unittest
-import pexpect
-import os
-import time
-import sys
-import tempfile
 import shutil
+import unittest
+from test import lib_miville_telnet as libmi
 
-import miville.utils.telnet_testing as testing
+local = libmi.MivilleTester(use_tmp_home=True)
+local.start_miville_process()
+local.start_telnet_process()
 
-testing.VERBOSE_CLIENT = False
-testing.VERBOSE_SERVER = True
+remote = libmi.MivilleTester(use_tmp_home=True, port_offset=1)
+remote.start_miville_process()
+remote.start_telnet_process()
 
-class DualLocalBaseTest(testing.TelnetBaseTest):
-    """
-    Telnet test starting two miville processes.
-    """
-    def sleep(self, duration=0.1):
-        """
-        Waits a bit between each command.
-        :param duration: float seconds
-
-        REMOVED SOME PARTS OF THE METHOD COPIED FROM utils/telnet_testing.py
-        """
-        end = time.time() + duration
-        while time.time() < end:
-            time.sleep(0.001)
-
+class Test_Ping(unittest.TestCase):
     def setUp(self):
-        """
-        Starts two miville processes and one telnet client.
-        """
-        self.mivilles = {
-            'first':{
-                'port_offset':0, 
-                'contact_name':'Pierre', # Pierre Miville, 1st swiss in Nouvelle France !
-                'verbose_server':False, 
-                'command':os.path.expanduser('../miville.py'), # XXX parent dir since trial changes os.getcwd()
-                'home':'', 
-                'process':None,
-                'telnet_process':None
-            }, 
-            'second':{
-                'port_offset':1, 
-                'contact_name':'Charlotte', # Charlotte Maugis, his wife.
-                'verbose_server':False, 
-                'command':os.path.expanduser('../miville.py'),
-                'home':'',
-                'process':None, 
-                'telnet_process':None
-            } 
-        }
+        global local
+        global remote
+        remote.unittest = self
+        local.unittest = self
+        self.local = local
+        self.remote = remote
 
-        if testing.START_SERVER:
-            for miville in self.mivilles.values():
-                sys.stdout.write(testing.get_color('MAGENTA'))
-                # if testing.CHANGE_HOME_PATH:
-                TMP_NAME = tempfile.mktemp() # some unique name that looks like "/tmp/xxxxxxxx"
-                os.mkdir(TMP_NAME)
-                miville['home'] = TMP_NAME
-                
-                #os.environ['HOME'] = TMP_NAME
-                
-                shutil.copyfile('../test/configs/addressbook.txt', '%s/addressbook.txt' % (TMP_NAME))
-                print 'Copying a file to %s/addressbook.txt' % (TMP_NAME)
-
-                shutil.copyfile('../test/configs/settings.txt', '%s/settings.txt'% (TMP_NAME))
-                print 'Copying a file to %s/settings.txt' % (TMP_NAME)
-
-                miville['command'] = "%s -o %s -m %s" % (miville['command'], miville['port_offset'], miville['home'])
-                if testing.VERBOSE_SERVER:
-                    print "pwd is ", os.environ['PWD']
-                    print "current working directory", os.getcwd()
-                    print "miville command:", miville['command']
-                    print "using %s/ as a $HOME. (for adb and log)" % (miville['home'])
-                sys.stdout.write(testing.get_color())
-                # XXX : we do not want to change HOME in this test !!!!!
-                #os.environ['HOME'] = miville['home']
-                # spawning a pexpect
-                miville['process'] = testing.start_process(miville['command'], testing.VERBOSE_SERVER, "S>", 'BLUE')
-                print "sleeping for 1 second...."
-                time.sleep(1.0)
-        if testing.VERBOSE_CLIENT:
-            print "VERBOSE_CLIENT"
-            print "starting telnet client"
-        # spwning a pexpect
-        self.telnets = []
-        # for miville in self.mivilles.values():
-        #     port_offset = miville['port_offset']
-        #     testing.SERVER_PORT + port_offset
-        #     miville['telnet_process'] = 
-        self.telnets.append(testing.start_process(testing.CLIENT_COMMAND, testing.VERBOSE_CLIENT, "C>", 'CYAN'))
-        print "sleeping for 1 second...."
-        self.sleep(1)
-    
-    def tearDown(self):
-        """
-        Destructor for each test. 
-        """
-        pass
-
-class Test_01_Ping(DualLocalBaseTest):
-    """
-    Tests for ping.
-    
-    pof> ping
-    """
     def test_01_ping(self):
-        self.telnets[0].sendline("c -s Charlotte")
-        self.sleep(0.1)
-        self.telnets[0].sendline("j -s")
-        self.sleep(0.4)
-        # self.expectTest('accepted', 'Connection not successful.')
-        self.sleep(0.1)
-        self.telnets[0].sendline("ping")
-        self.telnets[0].sendline("")
-        self.sleep(2)
-        # self.expectTest('pong', 'Did not receive pong answer.')
-        # XXX disabled for now !
+        self.local.telnet_process.sendline("c -a Charlotte 127.0.0.1 2223")
+        self.local.sleep(0.1)
+        self.remote.telnet_process.sendline("c -a Pierre 127.0.0.1 2222")
+        self.remote.sleep(0.1)
+        self.local.telnet_process.sendline("c -s Charlotte")
+        self.local.sleep(0.1)
+        self.local.telnet_process.sendline("j -s")
+        # TODO: test do you accept
+        self.remote.telnet_process.sendline("Y")
+        self.remote.sleep(0.1)
+        self.local.expectTest('accepted', 'Connection not successful.')
+        self.local.telnet_process.sendline("ping")
+        self.local.expectTest('pong', 'Did not receive pong answer.')
 
