@@ -25,7 +25,7 @@ import unittest
 
 from miville.devices import settings
 
-class DualLocalBaseTest(unittest.TestCase):
+class Test_Simple_Device_Settings(unittest.TestCase):
     def test_01_base(self):
         str_attr = settings.StringAttribute("spam", "Hello I am a young girl")
         int_attr = settings.IntAttribute("egg", 456)

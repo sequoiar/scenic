@@ -29,7 +29,7 @@ import sys
 import tempfile
 import shutil
 
-import test.lib_telnet_testing as testing
+import miville.utils.telnet_testing as testing
 
 testing.VERBOSE_CLIENT = False
 testing.VERBOSE_SERVER = True
