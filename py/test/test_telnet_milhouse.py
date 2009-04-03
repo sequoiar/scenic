@@ -200,7 +200,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
  
         # check for data
         
-    def test_audio_video_synchronized(self): 
+    def xtest_06_audio_video_synchronized(self): 
         """
         This test is a streaming test where audio and video are streamed 
         simultaneously with synchronisation.
