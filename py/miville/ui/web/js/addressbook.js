@@ -500,7 +500,6 @@ Addressbook.methods(
 		// pass if it's the same contact (but not if in edit mode)
 		if (contact != self.selected_li || self.edit_btn.value == self.save_str) {
 			self.selected_li = contact;
-//			self.edit_type = null;
 			// save the selected contact name
 			self.update_selected(contact.get('name'));
 			

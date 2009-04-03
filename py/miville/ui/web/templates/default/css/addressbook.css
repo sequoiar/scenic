@@ -104,45 +104,14 @@ li.auto_created {
 	top: -3px;
 }
 
-
-/* THE PART LINE */
-
-
-.toto {
-	background: url(/img/network-error.png) no-repeat;
-	width: 16px;
+.closeSticky.button {
+	border: 1px #cdcdcd solid;
+	height: 18px;
+	background-color: #b2b2b2;
+	padding: 0 5px;
+	line-height: 30px;
+	font-size: 10px;
+	font-weight: bold;
+	margin: 0px 0px 0px 10px;
 }
 
-.cha {
-	background: url(/img/internet-group-chat.png) no-repeat;
-	width: 16px;
-	height: 16px;
-	float: right;
-	margin-left: 4px;
-}
-
-#contact_field {
-	width: 220px;
-	border-collapse: collapse;
-}
-
-#contact_field td {
-	font-size: 11px;
-	text-align: right;
-	padding: 2px;
-	border: 0;
-}
-
-#contact_field input {
-	border: 1px solid #b3bcc3;
-	padding: 0 2px;
-	background-color: transparent;
-	width: 150px;
-}
-
-#contact_field.active_field input {
-	border: 1px solid #999;
-	padding: 0 2px;
-	background-color: #FFF;
-}
- 

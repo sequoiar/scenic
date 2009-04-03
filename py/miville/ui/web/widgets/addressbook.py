@@ -121,7 +121,7 @@ class Addressbook(Widget):
     def cb_ask(self, origin, data):
         log.debug('ASKOrigin: %s - Data: %s' % (origin, data))
         if data.has_key('name'):
-            caption = '%s is inviting you.<br /><em>(address: %s)</em>' % (data['name'], data['address'])
+            caption = '%s is inviting you. <em>(address: %s)</em>' % (data['name'], data['address'])
         else:
             caption = '%s is inviting you.' % data['address']
         body = 'Do you accept?'
