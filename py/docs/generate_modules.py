@@ -81,7 +81,7 @@ def create_module_file(root, module, opts):
 
 def create_package_file(root, subroot, py_files, opts, subs=None):
     """Build the text of the file and write the file."""
-    package = root.rpartition('/')[2].lower()
+    package = os.path.split(root)[-1].lower()
     name = create_file_name(subroot, opts)
     if not opts.force and os.path.isfile(name):
         print 'File %s already exists.' % name

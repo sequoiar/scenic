@@ -3,8 +3,8 @@ Sip Documentation
 
 This page contains the Sip Package documentation.
 
-The :mod:`connectors.sip.sip` Modules
--------------------------------------
+The :mod:`sip` Module
+---------------------
 
 .. automodule:: connectors.sip.sip
     :members:

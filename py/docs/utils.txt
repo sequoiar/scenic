@@ -3,72 +3,80 @@ Utils Documentation
 
 This page contains the Utils Package documentation.
 
-The :mod:`utils.common` Modules
--------------------------------
+The :mod:`commands` Module
+--------------------------
+
+.. automodule:: utils.commands
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`common` Module
+------------------------
 
 .. automodule:: utils.common
     :members:
     :undoc-members:
     :show-inheritance:
 
-The :mod:`utils.coverage_report` Modules
-----------------------------------------
+The :mod:`coverage_report` Module
+---------------------------------
 
 .. automodule:: utils.coverage_report
     :members:
     :undoc-members:
     :show-inheritance:
 
-The :mod:`utils.i18n` Modules
------------------------------
+The :mod:`i18n` Module
+----------------------
 
 .. automodule:: utils.i18n
     :members:
     :undoc-members:
     :show-inheritance:
 
-The :mod:`utils.log` Modules
-----------------------------
+The :mod:`log` Module
+---------------------
 
 .. automodule:: utils.log
     :members:
     :undoc-members:
     :show-inheritance:
 
-The :mod:`utils.mediator` Modules
----------------------------------
+The :mod:`mediator` Module
+--------------------------
 
 .. automodule:: utils.mediator
     :members:
     :undoc-members:
     :show-inheritance:
 
-The :mod:`utils.observer` Modules
----------------------------------
+The :mod:`observer` Module
+--------------------------
 
 .. automodule:: utils.observer
     :members:
     :undoc-members:
     :show-inheritance:
 
-The :mod:`utils.shell` Modules
-------------------------------
+The :mod:`shell` Module
+-----------------------
 
 .. automodule:: utils.shell
     :members:
     :undoc-members:
     :show-inheritance:
 
-The :mod:`utils.singleton` Modules
-----------------------------------
+The :mod:`singleton` Module
+---------------------------
 
 .. automodule:: utils.singleton
     :members:
     :undoc-members:
     :show-inheritance:
 
-The :mod:`utils.twisted_old` Modules
-------------------------------------
+The :mod:`twisted_old` Module
+-----------------------------
 
 .. automodule:: utils.twisted_old
     :members:

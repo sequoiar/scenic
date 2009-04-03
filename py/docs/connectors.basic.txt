@@ -3,8 +3,8 @@ Basic Documentation
 
 This page contains the Basic Package documentation.
 
-The :mod:`connectors.basic.basic` Modules
------------------------------------------
+The :mod:`basic` Module
+-----------------------
 
 .. automodule:: connectors.basic.basic
     :members:

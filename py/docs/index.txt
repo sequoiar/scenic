@@ -12,6 +12,7 @@ Contents:
    
    api
    modules
+   javascript
    docs
    test_coverage
 

@@ -64,6 +64,22 @@ The :mod:`addressbook` Module
       :type name: string
 
 
+   .. method:: unset_optional(field)
+
+      Remove the 'optional' word from the specified field.
+
+      :param field:
+      :type field: Text input DOM object
+
+
+   .. method:: set_optional(field)
+
+      Add the 'optional' word in the specified field.
+
+      :param field:
+      :type field: Text input DOM object
+
+
    .. method:: update_list(contacts)
 
       Update the contact list to reflect the state of the server.
@@ -125,6 +141,8 @@ The :mod:`addressbook` Module
 
       Get info from others widgets.
       (call from the client)
+      
+      (no function for the moment)
 
       :param caller: The short name of the widget.
       :type caller: string
@@ -283,5 +301,20 @@ The :mod:`addressbook` Module
       :type event: string
 
 
+
+
+.. function:: contact_saved(self, contact)
+
+   Called when the contact is successfully saved.
+   (call from the server)
+
+
+
+.. function:: error(self, msg)
+
+   Error window to be redone.
+
+   :param msg:
+   :type msg: string
 
 

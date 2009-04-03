@@ -11,18 +11,50 @@ The :mod:`devices` Package
     :undoc-members:
     :show-inheritance:
 
-The :mod:`devices.devices` Modules
-----------------------------------
+The :mod:`devices` Module
+-------------------------
 
 .. automodule:: devices.devices
     :members:
     :undoc-members:
     :show-inheritance:
 
-The :mod:`devices.v4l` Modules
-------------------------------
+The :mod:`firewire` Module
+--------------------------
 
-.. automodule:: devices.v4l
+.. automodule:: devices.firewire
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`jackd` Module
+-----------------------
+
+.. automodule:: devices.jackd
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`settings` Module
+--------------------------
+
+.. automodule:: devices.settings
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`start_jackd` Module
+-----------------------------
+
+.. automodule:: devices.start_jackd
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`v4l2` Module
+----------------------
+
+.. automodule:: devices.v4l2
     :members:
     :undoc-members:
     :show-inheritance:

@@ -31,8 +31,8 @@ for arg in sys.argv[1:]:
 				if param_list:
 					klass_str += '(' + ', '.join(param_list) + ')'
 			print klass_str
-			if klass.parsed.has_key('member') and klass.parsed['member']:
-				print '\n   Bases: :class:`' + klass.parsed['member'] + '`'
+			if klass.parsed.has_key('base') and klass.parsed['base']:
+				print '\n   Bases: :class:`' + klass.parsed['base'] + '`'
 			print '\n   ' + klass.doc.replace('\n', '\n  ') + '\n'
 			if param_list:
 				for param in params:

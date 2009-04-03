@@ -1,7 +1,7 @@
-Miville Modules Documentation
-=============================
+Project Documentation
+=====================
 
-This page contains the Miville Modules  documentation.
+This page contains the Project Modules documentation.
 
 Modules:
 --------
@@ -9,15 +9,16 @@ Modules:
 .. toctree::
    :maxdepth: 4
 
+   __init__
    addressbook
    api
    connectors
+   core
    devices
+   engines
    errors
-   imiville
-   miville
+   network
    protocols
    settings
-   streams
    ui
    utils

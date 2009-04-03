@@ -3,8 +3,8 @@ Cli Documentation
 
 This page contains the Cli Package documentation.
 
-The :mod:`ui.cli.cli` Modules
------------------------------
+The :mod:`cli` Module
+---------------------
 
 .. automodule:: ui.cli.cli
     :members:

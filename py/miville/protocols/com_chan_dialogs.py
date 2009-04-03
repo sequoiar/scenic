@@ -88,7 +88,8 @@ def get_dialog_for_contact(caller, klass, contact_name):
     global dialogs_instances
     if klass not in dialog_classes:
         raise DialogError("Dialog class not in list of classes.")
-    return dialog_instances[klass.__name__][contact_name] = obj
+#    return dialog_instances[klass.__name__][contact_name] = obj # what's that ?
+    return dialog_instances[klass.__name__][contact_name]
 
 def on_disconnected(connection_handle):
     """

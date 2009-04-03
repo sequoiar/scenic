@@ -3,8 +3,15 @@ Web Documentation
 
 This page contains the Web Package documentation.
 
-The :mod:`ui.web.web` Modules
------------------------------
+Subpackages
+-----------
+
+.. toctree::
+
+    ui.web.widgets
+
+The :mod:`web` Module
+---------------------
 
 .. automodule:: ui.web.web
     :members:
