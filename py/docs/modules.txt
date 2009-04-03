@@ -9,7 +9,6 @@ Modules:
 .. toctree::
    :maxdepth: 4
 
-   __init__
    addressbook
    api
    connectors
@@ -17,6 +16,7 @@ Modules:
    devices
    engines
    errors
+   imiville
    network
    protocols
    settings
