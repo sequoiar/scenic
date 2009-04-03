@@ -57,3 +57,8 @@ class Test_Ping(unittest.TestCase):
         self.local.telnet_process.sendline("ping")
         self.local.expectTest('pong', 'Did not receive pong answer.')
 
+    def test_02_network_performance_test(self):
+        self.local.telnet_process.sendline("n -s -k dualtest -t 1")
+        self.local.expectTest("Starting", 'Did not start network test')
+        self.remote.sleep(1.3)
+        self.local.expectTest('jitter', 'Did not receive network test results.')
