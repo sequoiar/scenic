@@ -198,6 +198,8 @@ class Test_telnet_milhouse(jimbo.Nelson):
         self.tst_rx("stop:", stop_ok)
         
  
+<<<<<<< .mine
+ =======
         # check for data
         
     def xtest_06_audio_video_synchronized(self): 
@@ -265,3 +267,4 @@ class Test_telnet_milhouse(jimbo.Nelson):
         self.tst_rx("stop:", stop_but_not_ok) # CARAMBA!!!
         self.tst_tx("stop:", stop_ok)
        
+>>>>>>> .r2784
