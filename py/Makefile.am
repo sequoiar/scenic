@@ -11,10 +11,10 @@ TESTS = test/test_com_chan.py \
         test/test_log.py \
         test/test_observer.py \
         test/test_telnet_milhouse_sync.py \
-        test/test_telnet_milhouse.py \
-        test/check_ping.py \
-        test/check_miville_starts.py \
-        test/check_devices_settings.py 
+        test/test_telnet_milhouse.py 
+#         test/check_ping.py \
+#         test/check_miville_starts.py \
+#         test/check_devices_settings.py 
 
 
 # to update to new path
