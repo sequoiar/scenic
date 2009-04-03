@@ -381,6 +381,8 @@ msc
             
         pump_me(self.tx_server)
         pump_me(self.rx_server)
+        pump_me(self.tx_telnet)
+        pump_me(self.rx_telnet)
 
             
     def tst_tx(self,command, expected, errorMsg = None):
