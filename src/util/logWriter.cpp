@@ -169,8 +169,9 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
         logMsg << std::setfill('0') << std::setw(2) 
             << timeinfo->tm_hour <<":"<< std::setw(2) << timeinfo->tm_min 
             <<":" << std::setw(2) << timeinfo->tm_sec 
-            << " line" << std::setfill('0') << std::setw(5) << lineNum 
-            << logLevelStr(level) << msg << " " << functionName <<  "() in " << fileName << std::endl;
+            << ":line" << std::setfill('0') << std::setw(5) << lineNum  
+            << ":" << functionName <<  "():" << fileName 
+            << ":" << logLevelStr(level) << ":" << msg << std::endl;
 #else
         logMsg <<  msg <<  std::endl;
 #endif

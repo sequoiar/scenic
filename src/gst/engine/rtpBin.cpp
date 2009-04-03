@@ -85,9 +85,9 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
     }
 
     guint32 jitter = g_value_get_uint(gst_structure_get_value(stats, "rb-jitter"));
-    g_print("JITTER: %" G_GUINT32_FORMAT "\n", jitter);
+    LOG_DEBUG("JITTER: " << jitter);
     gint32 packetsLost = g_value_get_int(gst_structure_get_value(stats, "rb-packetslost"));
-    g_print("PACKETS LOST: %" G_GINT32_FORMAT "\n", packetsLost);
+    LOG_DEBUG("PACKETS LOST: " << packetsLost);
 
     // free structures
     gst_structure_free (stats);
