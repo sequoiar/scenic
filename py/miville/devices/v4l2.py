@@ -223,6 +223,7 @@ class Video4LinuxDriver(devices.VideoDriver):
                 norm = 'secam'
             command = ['v4l2-ctl', '--set-standard=' + norm, '-d', dev_name]
             ret = single_command_start(command, self.on_commands_results, 'attr_change', caller)             
+
         elif name == 'width' or name == 'height': 
             # --set-fmt-video=width=<w>,height=<h>
             # TODO: check if within range. fix if not
@@ -236,9 +237,12 @@ class Video4LinuxDriver(devices.VideoDriver):
             else:
                 height = val
                 width = attr.device.attributes['width'].get_value()
-            command = ['v4l2-ctl', '--set-fmt-video=width=%d,height=%d' % (width, height), '-d', dev_name]
-            ret = single_command_start(command, self.on_commands_results, 'attr_change', caller) 
-        
+            try:
+                command = ['v4l2-ctl', '--set-fmt-video=width=%d,height=%d' % (width, height), '-d', dev_name]
+                ret = single_command_start(command, self.on_commands_results, 'attr_change', caller) 
+            except TypeError, e:
+                log.error("devices.v4l2.on_attribute_change: Width/height value must be a int. %s %s" % (width, height))
+
         elif name == 'input': # --set-input=<num>
             # TODO parse data to get possible values
             # in order to puts them in an OptionsAttribute
@@ -249,9 +253,6 @@ class Video4LinuxDriver(devices.VideoDriver):
                 command = ['v4l2-ctl', '--set-input=' + index, '-d', dev_name]
                 ret = single_command_start(command, self.on_commands_results, 'attr_change', caller) 
  
-        if command is not None:
-            #TODO
-            pass
         return ret # Deferred
     
     def on_commands_results(self, results, commands, extra_arg=None, caller=None): 

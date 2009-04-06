@@ -47,6 +47,7 @@ from twisted.internet.error import AlreadyCalled, AlreadyCancelled # for when we
 from miville.utils import log
 from miville.utils import commands
 from miville.errors import DeviceError
+from miville.errors import CommandNotFoundError
 
 log = log.start('debug', 1, 0, 'devices')
 
@@ -382,7 +383,7 @@ class OptionsAttribute(Attribute):
     The value and default are indices. (int)
     
     A tuple is better since it is immutable. Indices are integers.
-    
+        # NOTE: for other types, it is more complicated. 
     If you want to get the index of a value, use attr.options.index(value)
     """
     kind = 'options'
@@ -569,9 +570,18 @@ def modify_attribute(caller, driver_kind, driver_name, device_name, attribute_na
     except KeyError:
         raise DeviceError('No such attribute: %s' % (attribute_name))
     try:
-        attribute.set_value(value, caller, 'device_modify_attribute') #'device_attributes_changed') # TODO : I think that key is not correct.
+        if attribute.kind is 'int':
+            value = int(value)
+        elif attribute.kind is 'boolean':
+            value = bool(value)
+        # NOTE: for other types, it is more complicated.
+        attribute.set_value(value, caller, 'device_modify_attribute') 
     except CommandNotFoundError, e:
         raise DeviceError(e.message)
+    except TypeError:
+        raise DeviceError("This value for this attribute must be a valid %s." % (attribute.kind))
+    except ValueError:
+        raise DeviceError("This value for this attribute must be a valid %s." % (attribute.kind))
     else:
         #self.notify(caller, attribute, 'device_attributes_changed') # TODO: make asynchronous
         driver.poll_now(caller, 'device_modify_attribute')
