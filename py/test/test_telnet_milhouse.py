@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Miville
-# Copyright (C) 2008 Société des arts technoligiques (SAT)
+# Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -26,7 +26,7 @@ Usage: trial test/systest_telnet.py
 
 pexpect expected strings are regular expression. See the re module.
 """ 
-import test.lib_milhouse_ipcp as jimbo
+import test.lib_milhouse_ipcp as testing
 import time
 import os
 
@@ -47,30 +47,31 @@ stop_ok =  'stop: ack="ok"'
 stop_but_not_ok =  ''
 
 
-class Test_telnet_milhouse(jimbo.Nelson):
+class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
     """
-    System test telnet propulseart:
-    Runs a series of streaming tests with propulseart.
-    The tests starts and stop various propulseart processes in sender and receiver mode,
+    Tests for the IPCP communication with milhouse process.
+
+    Runs a series of streaming tests with milhouse.
+    The tests starts and stop various milhouse processes in sender and receiver mode,
     and controls them via a telnet protocol.  
     """
 
     def test_02_simple_video_sender(self):
         """
-        create a video sender process that waits for connections. The 
-        process is controlled from port 1220 and its videostream is set on port
-        12020 
+        create a video sender process that waits for connections. 
+        
+        The process is controlled from port 1220 and its videostream 
+        is set on port 12020 
         The port numbers are printed for debuggind convenience.
         The process is then stopped without any streaming.
         
         This tests that the process exists and responds to basic commands.
         """
-        
         telnet_tx_port = 1220
         stream_port = 12020 
         bitrate = 3000000
         
-        video_init = jimbo.VideoInit()
+        video_init = testing.VideoInit()
         video_init.codec = 'h264'
         video_init.port = stream_port
         video_init.address = "127.0.0.1"
@@ -93,7 +94,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         Same as test2, but this time the process is started in receiver mode
         """
         telnet_rx_port = 1230
-        rx_video_init = jimbo.VideoInit()
+        rx_video_init = testing.VideoInit()
         rx_video_init.port = 12030
         rx_video_init.address = "127.0.0.1"
         rx_video_init.codec = 'h264'
@@ -121,14 +122,14 @@ class Test_telnet_milhouse(jimbo.Nelson):
         telnet_tx_port = 1340
         telnet_rx_port = 1240
         
-        rx_video_init = jimbo.VideoInit()
+        rx_video_init = testing.VideoInit()
         rx_video_init.port = 12040
         rx_video_init.address =  "127.0.0.1"
         rx_video_init.codec = 'mpeg4' 
         rx_init_command = rx_video_init.to_string()
         self.verb("RX> " + rx_init_command)
         
-        tx_video_init = jimbo.VideoInit()
+        tx_video_init = testing.VideoInit()
         tx_video_init.bitrate = 3000000
         tx_video_init.codec = rx_video_init.codec
         tx_video_init.address = "127.0.0.1"
@@ -161,7 +162,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         telnet_rx_port = 1250
         telnet_tx_port = 1350
         
-        rx_init = jimbo.AudioInit()
+        rx_init = testing.AudioInit()
         rx_init.codec = 'vorbis'
         rx_init.port = telnet_rx_port
         rx_init.address = "127.0.0.1"
@@ -169,7 +170,7 @@ class Test_telnet_milhouse(jimbo.Nelson):
         rx_init_cmd = rx_init.to_string()
         self.verb( "RX:>" + rx_init_cmd)
         
-        tx_init = jimbo.AudioInit()
+        tx_init = testing.AudioInit()
         tx_init.codec = 'vorbis'
         tx_init.port = telnet_rx_port
         tx_init.address = "127.0.0.1"

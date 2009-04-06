@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+# 
 # Miville
-# Copyright (C) 2008 Société des arts technoligiques (SAT)
+# Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -26,12 +26,11 @@ Usage: trial test/systest_telnet.py
 
 pexpect expected strings are regular expression. See the re module.
 """ 
-import test.lib_milhouse_ipcp as jimbo
+import test.lib_milhouse_ipcp as testing
 import time
 import os
 
 # global constants
-
 EXECUTABLE = "milhouse" 
 # used to be "propulseart"
 #video_src = "videotestsrc"
@@ -46,13 +45,11 @@ start_ok = 'start: ack="ok"'
 stop_ok =  'stop: ack="ok"'
 stop_but_not_ok =  ''
 
-
-class Test_against_the_machine(jimbo.Nelson):
+class Test_av_sync(testing.Milhouse_IPCP_Base_Test):
     """
-    System test telnet propulseart:
-    Runs a series of streaming tests with propulseart.
-    The tests starts and stop various propulseart processes in sender and receiver mode,
-    and controls them via a telnet protocol.  
+    One last test that does not work when done with the rest of the test suite.
+
+    See the tests in file test_telnet_milhouse.py
     """
     def test_06_audio_video_synchronized(self): 
         """
@@ -64,13 +61,13 @@ class Test_against_the_machine(jimbo.Nelson):
         telnet_rx_port = 1270
         telnet_tx_port = 1370
         
-        rx_video_init = jimbo.VideoInit()
+        rx_video_init = testing.VideoInit()
         rx_video_init.codec = 'mpeg4'
         rx_video_init.address = "127.0.0.1"
         rx_video_init.port = 12007
         rx_video_init_cmd = rx_video_init.to_string()
         
-        rx_audio_init = jimbo.AudioInit()
+        rx_audio_init = testing.AudioInit()
         rx_audio_init.audio_buffer_usec = 30000
         rx_audio_init.codec = 'raw'
         rx_audio_init.port = 12107
@@ -82,14 +79,14 @@ class Test_against_the_machine(jimbo.Nelson):
         self.verb( 'RX video: ' + rx_video_init_cmd )
         self.verb( 'RX audio: ' + rx_audio_init_cmd )
         
-        tx_video_init = jimbo.VideoInit()
+        tx_video_init = testing.VideoInit()
         tx_video_init.bitrate = 3000000
         tx_video_init.codec = rx_video_init.codec
         tx_video_init.port = rx_video_init.port
         tx_video_init.address = rx_video_init.address
         tx_video_init.source = video_src
         
-        tx_audio_init = jimbo.AudioInit()
+        tx_audio_init = testing.AudioInit()
         tx_audio_init.codec = rx_audio_init.codec
         tx_audio_init.address = rx_audio_init.address
         tx_audio_init.port = rx_audio_init.port

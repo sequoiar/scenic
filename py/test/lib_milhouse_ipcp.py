@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+#
 # Miville
-# Copyright (C) 2008 Société des arts technoligiques (SAT)
+# Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -20,7 +20,7 @@
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-System test for the GST telnet UI.
+Library for testing milhouse using IPCP commands.
 
 Historical note: Nelson is Milhouse's bully.
 His purpose it to abuse Milhouse into submission. 
@@ -43,7 +43,6 @@ import time
 import sys
 import inspect
 import repr
-
 import commands
 
 # global constants
@@ -51,15 +50,11 @@ EXECUTABLE = "milhouse"
 video_src = "videotestsrc"
 audio_src = 'audiotestsrc'
 
-
-
 # ---------------------------------------------------------------------
 # config 
-
 waiting_delay = 1.0 
 
 class InitArgs(object):
-
     def __init__(self, cmd):
         self._command = cmd
         self.bitrate=None
@@ -87,11 +82,9 @@ class AudioInit(InitArgs):
         self.audio_buffer_usec = None
         self.channels=None
     
-    
 class VideoInit(InitArgs):
     def __init__(self):
         InitArgs.__init__(self , "video_init")
-
 
 def verb(to_print=''):
     #if VERBOSE_CLIENT:
@@ -116,15 +109,14 @@ def bash_it(cmd):
         if line.find(cmd) == -1:
             print line
     print
-    
-    
+
 def generate_html(test_class):    
     members = dir(test_class)
     title = test_class.__name__
     body = ''
     name = ''
     
-    members= dir(test_class)
+    members = dir(test_class)
     for member_name in members:
         if member_name.startswith('test'):
             member = getattr(test_class, member_name)
@@ -181,8 +173,6 @@ def start_process(command, logfile=None):
     except pexpect.ExceptionPexpect, e:
         print "Error starting client: " + str(e)
 
-
-
 def kill_process(process):
     """
     Kills a pexpect.spawn object
@@ -198,17 +188,13 @@ def kill_process(process):
                     process.kill(9)
         except Exception, e:
             print "Error killing process", e
-        
 
-
-
-
-        
-        
 # ---------------------------------------------------------------------
 # System test classes
-class Nelson(unittest.TestCase):
-    
+class Milhouse_IPCP_Base_Test(unittest.TestCase):
+    """
+    Base class for testing milhouse using IPCP commands
+    """
     def __init__(self, *argvs):
         unittest.TestCase.__init__(self, *argvs )
         self.tx_telnet = None
@@ -222,14 +208,12 @@ class Nelson(unittest.TestCase):
         self.tx_telnet_log = None
         
         msc_string = ""
-    
    
     def stream_duration(self, delay):
         """
         Adds a line to the sequence diagram
         """ 
-    
-        print "Streaming for %s seconds DATA is flowing... or is it?" % (str(delay))
+        print "Streaming for %s seconds. There should be audio/video streaming occuring." % (str(delay))
         time.sleep(delay)
         #self.msc += 'test:>test [label="waiting"];\n' % str(delay)
         self.msc += '---  [ label = "streaming data for %s seconds"]; \n' % str(delay)     
@@ -255,8 +239,6 @@ msc
     test, telnet_tx, telnet_rx, gst_tx, gst_rx;
     
 """
-        
-        
     
     def _save_string_to_file(self, string_to_save, short_file_name):
         filepath = os.path.realpath(short_file_name)
@@ -391,7 +373,6 @@ msc
         #self._add_sequence('test', 'telnet_tx', command)
         self._add_sequence('telnet_tx', 'gst_tx', command)
         self._add_sequence_response('gst_tx', 'telnet_tx', expected)
-        
           
     def tst_rx(self,command, expected, errorMsg = None):
         self.assertNotEqual(self.rx_telnet, None, "Receiver telnet process is None!")
@@ -408,17 +389,13 @@ msc
         self._pump_up_the_files()
         err = errorMsg or 'The command did not return: "%s" as expected' % expected
         self._expectTest(client, expected, err)
-        
     
     def verb(self,msg=''):
+        """
+        Print a message
+        """
         verb(msg)
 
 def prompt(str, prompt = ">"):
     return prompt + str + ''
 
-# ---------------------------------------------------------------------
-
-
-
-
-  

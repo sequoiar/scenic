@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
+# 
 # Miville
-# Copyright (C) 2008 Soci�t� des arts technologiques (SAT)
+# Copyright (C) 2008 Societe des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -41,19 +41,17 @@ class TestCommon(unittest.TestCase):
         pass
     
     def test_find_modules(self):
-        res = common.find_modules('miville.ui')
+        res = common.find_modules('ui')
         #check if all user interface found are correctly formated
         for ui in res:
             if not ui.isPackage() or FilePath(ui.filePath.dirname() + '/off').exists():
                 self.fail("Some of user interface are incorrect or bad formated")
-        
         #check if it doesn't forget any interface???
         uis = []
-        mods = getModule('ui').iterModules()
+        mods = getModule('miville.ui').iterModules()
         for ui in mods:
             if ui.isPackage() and not FilePath(ui.filePath.dirname() + '/off').exists():
                 uis.append(ui)
-                
         assert(res == uis ), self.fail("find_modules didn't get all ui ")        
                 
         
@@ -77,6 +75,3 @@ class TestCommon(unittest.TestCase):
             if len(vv) >= 2 : 
                 if vv[0]=='_' and vv[1]=='_' :
                     self.fail("problem detecting good callbacks")
-
-        #compare res with function list of r
-        

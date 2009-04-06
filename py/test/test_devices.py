@@ -138,9 +138,9 @@ class Test_02_devices_jackd(unittest.TestCase):
         # app.miville.exit()
         pass
 
-    def disable_kill_jackd(self):
+    def test_04_disable_kill_jackd(self):
         """
         Should be tested more
         """
-        app.api.api.devices_toggle_kill_jackd_enabled(0)
+        app.api.devices_toggle_kill_jackd_enabled(0)
 
