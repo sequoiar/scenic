@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Miville
-# Copyright (C) 2008 Société des arts technoligiques (SAT)
+# Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -38,29 +38,42 @@ testing.START_SERVER = False # You must start miville manually on both local and
 testing.start()
 
 
-stdin, stdout, stderr = os.popen3("ssh bloup")
-stdin.write("""cd /home/scormier/src/miville/trunk/py;trial test/dist_telnet_sys_test7b.py\n""")
-time.sleep(5)        
-stdin.write("""exit\n""")
-stdin.close()
-stdout.close()
-stderr.close()
+#stdin, stdout, stderr = os.popen3("ssh bloup")
+#stdin.write("""cd /home/scormier/src/miville/trunk/py;trial test/dist_telnet_sys_test7b.py\n""")
+#time.sleep(5)        
+#stdin.write("""exit\n""")
+#stdin.close()
+#stdout.close()
+#stderr.close()
         
 
-
-
+class Test_tc1_video_tx_setting(testing.TelnetBaseTest):
+    
+    def test_01_yes(self):
+        self.expectTest('pof: ', 'The default prompt is not appearing.')
+        
+    
+remote_address = os.environ['MIVILLE_TEST_REMOTE_HOST']
+remote_contact = os.environ['MIVILLE_TEST_REMOTE_CONTACT']
 
 class Test_001_network_streaming(testing.TelnetBaseTest):
    
 
     def test_01_yes(self):
         self.expectTest('pof: ', 'The default prompt is not appearing.')
-
+        self.tst("contacts --add %s %s" % (remote_contact, remote_address), "Contact added")
+        self.tst("settings --type media --add media_tc1", "Media setting added")
+        self.tst('settings --type media --mediasetting media_tc1  --modify settings=codec:mpeg4'           , 'modified')
+        self.tst('settings --type media --mediasetting media_tc1  --modify settings=bitrate:3072000'       , 'modified')
+        self.tst('settings --type media --mediasetting media_tc1  --modify settings=engine:Gst'            , 'modified')
+        self.tst('settings --type media --mediasetting media_tc1  --modify settings=GstPort:11111'         , 'modified')
+        self.tst('settings --type media --mediasetting media_tc1  --modify settings=GstAddress:127.0.0.1'  , 'modified')
+        self.tst('settings --save'  , 'saved')
     
 ################################Receiver settings###############################################
     
         
-    def test_02_settings(self):
+    def z_test_02_settings(self):
         print
         print "HOME IS: " + os.environ['HOME']
         # add a contact
