@@ -24,8 +24,8 @@ Starts one miville and tests the devices module.
 import unittest
 from test import lib_miville_telnet as libmi
 
+# initialization
 libmi.kill_all_running_miville()
-
 local = libmi.MivilleTester(use_tmp_home=True)
 local.start_miville_process()
 local.start_telnet_process()
@@ -35,16 +35,25 @@ class Test_Devices(unittest.TestCase):
         global local
         local.unittest = self
         self.local = local
+        self.tst = self.local.tst
 
     def test_01_v4l2(self):
+        """
+        Tests the Video4linux 2 driver 
+        """
         self.local.telnet_process.sendline("devices -k video -t v4l2 -l")
         index = self.local.telnet_process.expect(["Devices for driver", "No device"])
-        if index == 0: # else there is no device
-            self.local.tst("changed", "devices -k video -t v4l2 d /dev/video0 -m norm pal")
-            self.local.tst("changed", "devices -k video -t v4l2 d /dev/video0 -m norm ntsc")
+        if index == 0: # if there is a device
+            self.tst("devices -k video -t v4l2 d /dev/video0 -m norm pal", "changed")
+            self.tst("devices -k video -t v4l2 d /dev/video0 -m norm ntsc", "changed")
 
     def test_02_jackd(self):
+        """
+        Tests the JACK driver
+        """
         self.local.telnet_process.sendline("devices -k audio -t jackd -l")
         index = self.local.telnet_process.expect(["Devices for driver", "No device"])
-        if index == 0: # else there is no device
-            pass
+        if index == 0: # if there is a device
+            self.tst("devices -k audio -t jackd -d default -a", "rate")
+            self.tst("devices -k audio -t jackd -d default -m rate 48000", "not possible")
+            
