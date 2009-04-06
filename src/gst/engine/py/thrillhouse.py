@@ -345,10 +345,30 @@ class MilhouseTests():
         recv.jitterbuffer = 300
         self.run(recv, send)
 
+    def test_21_videotestsrc_audiotestsrc(self):
+        """ Test videotestsrc with audio """
+
+        recv, send = self.argfactory('audiovideo')
+        send.videosource = 'videotestsrc'
+        send.audiosource = 'audiotestsrc'
+        self.run(recv, send)
+
+    def test_22_vorbis_audiotestsrc_v4l2src(self):
+        """ Test with 1-8 channels for vorbis with a 5 second timeout """
+        self.countdown('START')
+
+        audiocodec = 'vorbis'
+        recv, send = self.argfactory('audiovideo')
+        send.audiocodec = audiocodec
+        recv.audiocodec = audiocodec
+        for chan in xrange(1, 9): 
+            send.numchannels = chan
+            self.run(recv, send)
+
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_19')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_22')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

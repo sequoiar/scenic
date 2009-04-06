@@ -93,7 +93,10 @@ InterleavedAudioSource::InterleavedAudioSource(const AudioSourceConfig &config) 
 
 /// Destructor 
 InterleavedAudioSource::~InterleavedAudioSource() 
-{}
+{
+    Pipeline::Instance()->remove(aconvs_);
+    Pipeline::Instance()->remove(sources_);
+}
 
 
 /// Overridden source initializer, which must initialize this object's Interleave object 

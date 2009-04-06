@@ -320,14 +320,26 @@ RtpPay* Mpeg4Decoder::createDepayloader() const
 
 
 /// Constructor 
-VorbisEncoder::VorbisEncoder() 
+VorbisEncoder::VorbisEncoder() : srcQueue_(0), sinkQueue_(0)
 {}
+
+
+/// Destructor 
+VorbisEncoder::~VorbisEncoder() 
+{
+    Pipeline::Instance()->remove(&sinkQueue_); 
+    Pipeline::Instance()->remove(&srcQueue_); 
+}
 
 void VorbisEncoder::init()
 {
     AudioConvertedEncoder::init();
+    sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL); 
     codec_ = Pipeline::Instance()->makeElement("vorbisenc", NULL);
-    gstlinkable::link(aconv_, codec_);
+    srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL); 
+    gstlinkable::link(aconv_, sinkQueue_);
+    gstlinkable::link(sinkQueue_, codec_);
+    gstlinkable::link(codec_, srcQueue_);
 }
 
 

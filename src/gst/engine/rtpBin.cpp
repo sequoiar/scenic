@@ -60,7 +60,6 @@ void RtpBin::init()
 
 void RtpBin::parseSourceStats(GObject * source, int sessionId)
 {
-    LOG_DEBUG("SESSION ID: " << sessionNames_[sessionId] << "_" << sessionId);
     GstStructure *stats;
 
     // get the source stats
@@ -77,7 +76,7 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
         if (g_value_get_boolean(val))    // is-sender
         {
             guint64 bitrate = g_value_get_uint64(gst_structure_get_value(stats, "bitrate"));
-            LOG_DEBUG("BITRATE: " << bitrate);
+            LOG_DEBUG(sessionNames_[sessionId] << "_" << sessionId << ":BITRATE: " << bitrate);
         }
 
         gst_structure_free (stats);
@@ -85,9 +84,9 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
     }
 
     guint32 jitter = g_value_get_uint(gst_structure_get_value(stats, "rb-jitter"));
-    LOG_DEBUG("JITTER: " << jitter);
+    LOG_DEBUG(sessionNames_[sessionId] << "_" << sessionId << ":JITTER: " << jitter);
     gint32 packetsLost = g_value_get_int(gst_structure_get_value(stats, "rb-packetslost"));
-    LOG_DEBUG("PACKETS LOST: " << packetsLost);
+    LOG_DEBUG(sessionNames_[sessionId] << "_" << sessionId << ":PACKETS LOST: " << packetsLost);
 
     // free structures
     gst_structure_free (stats);

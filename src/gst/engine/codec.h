@@ -245,8 +245,13 @@ class VorbisEncoder : public AudioConvertedEncoder
         VorbisEncoder();
 
     private:
+        _GstElement *srcQueue_;
+        _GstElement *sinkQueue_;
+        ~VorbisEncoder();
         void init();
         RtpPay* createPayloader() const;
+
+        _GstElement* srcElement() { return srcQueue_; }
 
         /// No Copy Constructor 
         VorbisEncoder(const VorbisEncoder&);     
