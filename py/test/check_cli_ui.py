@@ -33,22 +33,7 @@ from test import lib_miville_telnet as libmi
 local = libmi.MivilleTester(use_tmp_home=True)
 local.start_miville_process()
 local.start_telnet_process()
-# import unittest
-# import pexpect
-# import os
-# import time
-# import sys
-# 
-# import test.lib_deprecated_miville_telnet as testing
 
-# starts the miville server internally !
-# testing.VERBOSE_CLIENT = False
-# testing.VERBOSE_SERVER = False
-# testing.START_SERVER = True  
-# 
-# testing.start()
-
-# test classes
 class Test_0_cli(unittest.TestCase):
     """
     General tests for the CLI
@@ -368,25 +353,25 @@ class Test_5_Devices(unittest.TestCase):
         local.unittest = self
         self.local = local
         self.client = local.telnet_process
-    def test_99_kill_miville(self):
-        self.local.kill_miville_and_telnet()
     #######################################
     def test_01_list(self):
         self.client.sendline("devices -k video -l")
 
-    def DISABLED_test_01_list_v4l2_devices(self):
-        self.client.sendline("devices -k video -l")
-        #self.local.expectTest('/dev/video0.', 'Warning: no v4l2 device appearing in the CLI.')
+#     def DISABLED_test_01_list_v4l2_devices(self):
+#         self.client.sendline("devices -k video -l")
+#         #self.local.expectTest('/dev/video0.', 'Warning: no v4l2 device appearing in the CLI.')
+# 
+#     def DISABLED_test_02_modify_v4l2_attribute(self):
+#         self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -a")
+#         #self.local.expectTest('norm', 'v4l2 device doesn\'t have a norm attribute.')
+#        
+#         self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -m norm pal")
+#         self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -a")
+#         #self.local.expectTest('PAL', 'Could not modify device attribute.')
+#        
+#         self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -m norm ntsc")
+#         self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -a")
+#         #self.local.expectTest('NTSC', 'Could not modify device attribute.')
 
-    def DISABLED_test_02_modify_v4l2_attribute(self):
-        self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -a")
-        #self.local.expectTest('norm', 'v4l2 device doesn\'t have a norm attribute.')
-       
-        self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -m norm pal")
-        self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -a")
-        #self.local.expectTest('PAL', 'Could not modify device attribute.')
-       
-        self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -m norm ntsc")
-        self.client.sendline("devices -k video -t v4l2 -d /dev/video0 -a")
-        #self.local.expectTest('NTSC', 'Could not modify device attribute.')
-
+    def test_99_kill_miville(self):
+        self.local.kill_miville_and_telnet()
