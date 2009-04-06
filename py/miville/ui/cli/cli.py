@@ -673,8 +673,8 @@ class CliController(TelnetServer):
 
         if options.description:
             cp.print_description()
-        elif options.stop:
-            self.core.network_test_stop(caller)
+        #elif options.stop:
+        #    self.core.network_test_stop(caller)
         elif  options.start:
             if options.kind:
                 kind = options.kind
