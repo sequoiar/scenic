@@ -56,7 +56,7 @@ class MainModule
 
         MainModule(bool send, int port)
             : tcpThread_(MsgThreadFactory::Tcp(port, true)),
-              gstThread_(MsgThreadFactory::Gst(send)), asio_thread_(new asio_thread(port)),
+              gstThread_(MsgThreadFactory::Gst(send)),
               func(gstThread_), msg_count(0)
         {}
 
@@ -64,13 +64,11 @@ class MainModule
         {
             delete gstThread_; 
             delete tcpThread_; 
-            delete asio_thread_;
         }
 
     private:
         MsgThread* tcpThread_;
         MsgThread* gstThread_;
-        MsgThread* asio_thread_;
         MainSubscriber func;
         int msg_count;
 
@@ -88,11 +86,8 @@ bool MainModule::run()
             THROW_ERROR("GstThread not running");
         if(tcpThread_ == 0 or !tcpThread_->run())
             THROW_ERROR("TcpThread not running");
-//        if(asio_thread_ == 0 or !asio_thread_->run())
-//            THROW_ERROR("asioThread not running");
         QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
-//        QueuePair &tcp_queue = asio_thread_->getQueue();
 
 #if 0
         Logger logger_(*tcpThread_);

@@ -31,8 +31,9 @@ class asio_thread : public MsgThread
 {
     int main();
     int port_;
+    bool log_;
 public:
-    asio_thread(int port): port_(port){}
+    asio_thread(int port,bool log): port_(port),log_(log){}
 
 };
 

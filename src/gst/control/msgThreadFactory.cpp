@@ -23,12 +23,17 @@
 
 #include "msgThreadFactory.h"
 #include "tcp/tcpThread.h"
+#include "tcp/asioThread.h"
 #include "gstSenderThread.h"
 #include "gstReceiverThread.h"
 
 MsgThread* MsgThreadFactory::Tcp(int port, bool log)
 {
+#ifdef HAVE_BOOST_ASIO
+    return ( new asio_thread(port, log) );
+#else
     return ( new TcpThread(port, log) );
+#endif
 }
 
 

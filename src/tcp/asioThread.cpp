@@ -55,7 +55,7 @@ class tcp_session
             : socket_(io_service),queue_(queue), welcome_(),
             t_(io_service, boost::posix_time::millisec(1)),msg_str()
         {
-        t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
+        //t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
         }
 
         tcp::socket& socket()
@@ -124,6 +124,7 @@ class tcp_session
                 if(!msg.cmd().empty())
                 {
                     Parser::stringify(msg, msg_str);
+                    msg_str+='\n';
                     async_write(socket_, buffer(msg_str),
                             boost::bind(&tcp_session::write_cb, this,
                                 error));
