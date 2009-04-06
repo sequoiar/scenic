@@ -12,6 +12,7 @@ TESTS = test/test_addressbook.py \
         test/test_i18n.py \
         test/test_log.py \
         test/test_observer.py \
+        test/check_cli_ui.py \
         test/check_milhouse_ipcp.py \
         test/check_milhouse_ipcp_sync.py \
         test/check_ping.py \
