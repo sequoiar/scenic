@@ -652,7 +652,8 @@ class CliController(TelnetServer):
         # booleans (action)
         cp.add_option("-z", "--description", action='store_true', help="Displays description") # TODO: add examples
         cp.add_option("-s", "--start", action='store_true', help="Starts a test")
-        cp.add_option("-q", "--stop", action='store_true', help="Stops the current test")
+        # TODO: implement this
+        #cp.add_option("-q", "--stop", action='store_true', help="Stops the current test")
         #cp.add_option("-h", "--help", action='store_true', help="Displays help")
         
         # strings options

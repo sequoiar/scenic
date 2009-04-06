@@ -131,6 +131,7 @@ def _parse_iperf_output(lines):
     for line in lines:
         if line.find("WARNING: did not receive ack of last datagram after 10 tries.") != -1:
             # error !!
+            log.info("iperf output : " + str(lines))
             raise NetworkError("Impossible to reach remote iperf server.")
         elif line.startswith("2"): # date
             #print line
@@ -152,6 +153,7 @@ def _parse_iperf_output(lines):
                     word_index += 1
                 was_ok = True
     if not was_ok:
+        log.info("iperf output : " + str(lines))
         raise NetworkError("Could not get satisfying iperf output.")
     return ret
 # XXX former algo : 

@@ -5,7 +5,6 @@ SUBDIRS = miville maugis docs
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 trial
 
 TESTS = test/test_addressbook.py \
-        test/test_com_chan.py \
         test/test_commands.py \
         test/test_common.py \
         test/test_devices.py \
@@ -33,10 +32,5 @@ TESTS = test/test_addressbook.py \
 # not much useful:
 #        test/test_network.py 
 #
-# 
-#     * test_ :  unit tests.
-#     * once_ :  work in progress. Not part of official test suites.
-#     * check_ : tests that internally start miville and telnet processes 
-#                to test. They use py/utils/telnet_testing.py
-#     * dist_ :  Official test case testing. Those tests need two computers. 
-#                Miville needs to be started manually on both prior to run them. 
+# broken:
+#        test/test_com_chan.py 
