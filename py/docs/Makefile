@@ -11,7 +11,7 @@ PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d _build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: all help clean distclean html web pickle htmlhelp latex changes linkcheck
+.PHONY: all help clean distclean html web pickle htmlhelp latex changes linkcheck 
 
 all:
 
@@ -28,6 +28,10 @@ help:
 
 clean:
 	-rm -rf _build/*
+
+distclean: clean
+
+moreclean: clean
 
 html:
 	mkdir -p _build/html _build/doctrees
@@ -72,3 +76,8 @@ linkcheck:
 	@echo
 	@echo "Link check complete; look for any errors in the above output " \
 	      "or in _build/linkcheck/output.txt."
+
+check:
+
+install:
+
