@@ -18,40 +18,38 @@ Purpose
 
 Scripts to run test cases via telnet to satify system tests between two machines.
 
+Prerequisites
++++++++++++++
+
+Bothe machines must be configured with ssh automatic login
+
+
 Files
 +++++
 
-start_miville.sh
-dist_telnet_sys_test1.py
-dist_telnet_sys_test2.py
+miville.py
+telnet_redux_state_machine.py
+dist_telnet_sys_test7b.py
 
 Instructions
 ------------
 
-Mofify line 41 of systest_telnet.py to fit IP address on each machine
+
+Run miville.py on each machine
 
 ::
 
-	client_command = 'telnet IP address %s' % server_port
+	user@machine:~/src/miville/trunk/py/test/$python miville.py
 
 
-Run the start_miville.sh on each machine
 
-::
+Insert remote machine name in the concerned tests 
 
-	user@machine:~/src/miville/trunk/py/test/$sh miville.sh
-
-
-Mofify line 41 of each dist_telnet_sys_test*.py to fit user and IP address on each machine.
-
-::
-	self.tst("contacts --add user IP address", "Contact added")
-
-Run the scripts on each machine, starting with the receiver.
+Run the scripts on local machine
 
 ::
 
-	user@machine:~/src/miville/trunk/py/$trial test/dist_telnet_sys_test1.py
+	user@machine:~/src/miville/trunk/py/$trial test/telnet_redux_state_machine_test.py
 
 
 
