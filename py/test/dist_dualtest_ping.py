@@ -33,7 +33,7 @@ import os
 import time
 import sys
 
-import miville.utils.telnet_testing as testing
+import test.lib_deprecated_miville_telnet as testing
 
 testing.VERBOSE_CLIENT = False #True
 testing.VERBOSE_SERVER = False

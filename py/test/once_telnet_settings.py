@@ -26,7 +26,7 @@ Usage: trial test/systest_settings.py
 
 import os
 import sys
-import miville.utils.telnet_testing as testing
+import test.lib_deprecated_miville_telnet as testing
 
 # starts the miville server internally !
 testing.VERBOSE_CLIENT = False
