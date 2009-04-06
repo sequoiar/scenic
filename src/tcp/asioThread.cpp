@@ -55,7 +55,6 @@ class tcp_session
             : socket_(io_service),queue_(queue), welcome_(),
             t_(io_service, boost::posix_time::millisec(1)),msg_str()
         {
-        //t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
         }
 
         tcp::socket& socket()
@@ -85,11 +84,6 @@ class tcp_session
                 socket_.async_read_some(buffer(data_, max_length),
                         boost::bind(&tcp_session::read_cb, this, 
                             error, bytes_transferred));
-#if 0
-                async_write(socket_, buffer(data_, bytes_transferred),
-                        boost::bind(&tcp_session::write_cb, this,
-                            error));
-#endif
             }
             else
             {
@@ -153,14 +147,13 @@ class tcp_server
             : io_service_(io_service),
             acceptor_(io_service, tcp::endpoint(tcp::v4(), port)), queue_(queue),
             t_(io_service, boost::posix_time::seconds(1))
-    {
-        tcp_session* new_tcp_session = new tcp_session(io_service_,queue_);
-        acceptor_.async_accept(new_tcp_session->socket(),
-                boost::bind(&tcp_server::handle_accept, this, new_tcp_session, 
-                    error));
-        t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
-        //t_.async_wait(tcp_server::handle_timer);
-    }
+        {
+            tcp_session* new_tcp_session = new tcp_session(io_service_,queue_);
+            acceptor_.async_accept(new_tcp_session->socket(),
+                    boost::bind(&tcp_server::handle_accept, this, new_tcp_session, 
+                        error));
+            t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
+        }
 
 
 

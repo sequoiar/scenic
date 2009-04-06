@@ -10,17 +10,17 @@ milhouse_la_SOURCES = exports.cpp pyMsgThread.cpp \
 
 
 
-milhouse_la_LDFLAGS = -version-info 1:1:1 -module
+milhouse_la_LDFLAGS = -version-info 1:1:1 -module $(BOOST_LDFLAGS)
 
 # add your libs i.e. ../hello/libhello.la  
 milhouse_la_LIBADD =  -l$(BOOST_PYTHON_LIB) $(GLIB_LIBS) \
-						   $(ALL_GST_LIBS) $(JACK_LIBS) $(src)/tcp/libtcp.a \
+						   $(ALL_GST_LIBS) $(JACK_LIBS) $(BOOST_ASIO_LIB) \
 						   $(src)/gst/control/libgstthread.a \
 						   $(src)/gst/engine/libgst.a $(GTK_LIBS) \
 						   $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(src)/util/libutil.a \
-						   $(src)/gutil/libgutil.a  $(BOOST_THREAD_LIB)
+						   $(src)/gutil/libgutil.a  $(BOOST_THREAD_LIB) $(src)/tcp/libtcp.a 
 
-milhouse_la_CPPFLAGS = -I$(PYTHON_INCLUDE_DIR) $(AM_CPPFLAGS)
+milhouse_la_CPPFLAGS = -I$(PYTHON_INCLUDE_DIR) $(AM_CPPFLAGS) $(BOOST_CPPFLAGS)
 
 #Oinstall-libLTLIBRARIES: $(lib_LTLIBRARIES)
 #   	@$(NORMAL_INSTALL)
