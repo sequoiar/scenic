@@ -181,11 +181,18 @@ def start_process(command, logfile=None):
 
 def kill_process(process):
     """
-    Kills a pexpect.spawn object
+    Close and kills a pexpect.spawn object
     
     See kill -l for flags
     """
     if process != None:
+        try: 
+            if (process.isalive() == True):
+                verb( "closing %s" % process.name )
+                process.close()
+        except Exception, e:
+            verb( "Error killing process", e )
+
         try:
             if (process.isalive() == True):
                 process.kill(15)
@@ -219,7 +226,7 @@ class Milhouse_IPCP_Base_Test(unittest.TestCase):
         """
         Adds a line to the sequence diagram
         """ 
-        print "Streaming for %s seconds. There should be audio/video streaming occuring." % (str(delay))
+        verb( "Streaming for %s seconds. There should be audio/video streaming occuring." % (str(delay)) )
         time.sleep(delay)
         #self.msc += 'test:>test [label="waiting"];\n' % str(delay)
         self.msc += '---  [ label = "streaming data for %s seconds"]; \n' % str(delay)     
@@ -260,7 +267,7 @@ msc
         Destructor for each test. 
         """
         
-        self._pump_up_the_files()
+        self._flush_process_output()
             
         self.msc += '\n}'
         short_dia_file_name = self._testMethodName+".msc"
@@ -277,13 +284,17 @@ msc
              
         if self.tx_server != None:
             kill_process(self.tx_server)
+        else:
+            verb("Weird, %s is not running anymore" % self.tx_server ) 
                       
         if self.rx_telnet != None:
             self.rx_telnet.sendline(command)
             kill_process(self.rx_telnet)
              
         if self.rx_server != None:
-            kill_process(self.tx_server)  
+            kill_process(self.rx_server)  
+        else:
+            verb("Weird, %s is not running anymore" % self.rx_server ) 
         
         if self.rx_server_log != None:
             self.rx_server_log.close()
@@ -358,19 +369,18 @@ msc
         ping = message.replace('"','\\"')
         self.msc += '%s>>%s [label="%s"];\n' % (source, destination, ping)
     
-    def _pump_up_the_files(self):
-        def pump_me(what):
+    def _flush_process_output(self):
+        def flush_process(what):
             if what != None:
                 try:
-                    #what.read_nonblocking(size=10000, timeout=1)
                     what.readline()
                 except pexpect.TIMEOUT:
                     pass
             
-        pump_me(self.tx_server)
-        pump_me(self.rx_server)
-        pump_me(self.tx_telnet)
-        pump_me(self.rx_telnet)
+        flush_process(self.tx_server)
+        flush_process(self.rx_server)
+        flush_process(self.tx_telnet)
+        flush_process(self.rx_telnet)
 
             
     def tst_tx(self,command, expected, errorMsg = None):
@@ -391,16 +401,10 @@ msc
     def _tst(self, client, command, expected, errorMsg = None):
         client.sendline(command)
         time.sleep(0.025)
-        self._pump_up_the_files()
+        self._flush_process_output()
         err = errorMsg or 'The command did not return: "%s" as expected' % expected
         self._expectTest(client, expected, err)
     
-    def verb(self,msg=''):
-        """
-        Print a message
-        """
-        verb(msg)
-
 def prompt(str, prompt = ">"):
     return prompt + str + ''
 
