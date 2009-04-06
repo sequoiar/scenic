@@ -136,30 +136,60 @@ std::string VideoEncoder::supportedCaps() const
     return "ANY";
 }
 
-/// Constructor 
-H264Encoder::H264Encoder() : 
-    deinterlace_(0), queue_(0), colorspc_(0), sinkQueue_(0), srcQueue_(0)
+VideoEncoder::VideoEncoder() : doDeinterlace_(false), colorspc_(0), sinkQueue_(0), srcQueue_(0),
+    deinterlace_(0)
 {}
 
 
 /// Destructor 
-H264Encoder::~H264Encoder()
+VideoEncoder::~VideoEncoder()
 {
     Pipeline::Instance()->remove(&colorspc_);
     Pipeline::Instance()->remove(&deinterlace_);
-    Pipeline::Instance()->remove(&queue_);
+    Pipeline::Instance()->remove(&srcQueue_);
+    Pipeline::Instance()->remove(&sinkQueue_);
 }
+
+
+void VideoEncoder::init()
+{
+    assert(codec_ != 0);
+    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
+    sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    
+    if (doDeinterlace_)
+    {
+        LOG_DEBUG("DO THE DEINTERLACE");
+        deinterlace_ = Pipeline::Instance()->makeElement("deinterlace2", NULL);
+        gstlinkable::link(deinterlace_, colorspc_);
+    }
+    else
+        g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
+
+    // Create separate thread for encoding, should yield better performance on multicore machines
+    gstlinkable::link(colorspc_, sinkQueue_);
+    gstlinkable::link(sinkQueue_, codec_);
+    gstlinkable::link(codec_, srcQueue_);       
+}
+
+
+/// Constructor 
+H264Encoder::H264Encoder() {}
+
+
+/// Destructor 
+H264Encoder::~H264Encoder()
+{}
 
 // FIXME: push up common stuff to VideoEncoder base class
 
 void H264Encoder::init()
 {
-    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
-
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
-    sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
-    srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    VideoEncoder::init();
 
+    // threads: 1-4, 0 for automatic 
 #ifdef HAVE_BOOST_THREAD        // more portable
     int numThreads = boost::thread::hardware_concurrency();
 #else
@@ -176,25 +206,7 @@ void H264Encoder::init()
 
     g_object_set(codec_, "threads", numThreads, NULL);
     //g_object_set(codec_, "byte-stream", TRUE, NULL);
-
     // subme: subpixel motion estimation 1=fast, 6=best
-    // threads: 1-4, 0 for automatic 
-
-    if (doDeinterlace_)
-    {
-        LOG_DEBUG("DO THE DEINTERLACE");
-        deinterlace_ = Pipeline::Instance()->makeElement("deinterlace2", NULL);
-        queue_ = Pipeline::Instance()->makeElement("queue", NULL);
-        gstlinkable::link(deinterlace_, queue_);
-        gstlinkable::link(queue_, colorspc_);
-    }
-    else
-        g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
-
-    // Create separate thread for encoding, should yield better performance on multicore machines
-    gstlinkable::link(colorspc_, sinkQueue_);
-    gstlinkable::link(sinkQueue_, codec_);
-    gstlinkable::link(codec_, srcQueue_);       
 }
 
 
@@ -227,16 +239,13 @@ RtpPay* H264Decoder::createDepayloader() const
 
 
 /// Constructor 
-H263Encoder::H263Encoder() : 
-    colorspc_(0), sinkQueue_(0), srcQueue_(0)
+H263Encoder::H263Encoder()
 {}
 
 
 /// Destructor 
 H263Encoder::~H263Encoder()
-{
-    Pipeline::Instance()->remove(&colorspc_);
-}
+{}
 
 
 std::string H263Encoder::supportedCaps() const
@@ -248,14 +257,8 @@ std::string H263Encoder::supportedCaps() const
 
 void H263Encoder::init()
 {
-    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
-
     codec_ = Pipeline::Instance()->makeElement("ffenc_h263", NULL);
-//    sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
- //   srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
-
-    // Create separate thread for encoding, should yield better performance on multicore machines
-    gstlinkable::link(colorspc_, codec_);
+    VideoEncoder::init();
 }
 
 
@@ -280,46 +283,19 @@ RtpPay* H263Decoder::createDepayloader() const
 
 
 /// Constructor 
-Mpeg4Encoder::Mpeg4Encoder() : 
-    deinterlace_(0), queue_(0), sinkQueue_(0), srcQueue_(0), colorspc_(0)
-{}
+Mpeg4Encoder::Mpeg4Encoder() {}
 
 
 /// Destructor 
 Mpeg4Encoder::~Mpeg4Encoder()
-{
-    Pipeline::Instance()->remove(&colorspc_);
-    Pipeline::Instance()->remove(&deinterlace_);
-    Pipeline::Instance()->remove(&queue_);
-    Pipeline::Instance()->remove(&srcQueue_);
-    Pipeline::Instance()->remove(&sinkQueue_);
-}
+{}
 
 /// Sets up either deinterlace->queue->colorspace->queue->encoder->queue
 /// or colorspace->queue->encoder->queue
 void Mpeg4Encoder::init()
 {
-    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
-
     codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
-    sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
-    srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
-
-    if (doDeinterlace_)
-    {
-        LOG_DEBUG("Applying Deinterlacing filter to video");
-        deinterlace_ = Pipeline::Instance()->makeElement("deinterlace2", NULL);
-        queue_ = Pipeline::Instance()->makeElement("queue", NULL);
-        gstlinkable::link(deinterlace_, queue_);
-        gstlinkable::link(queue_, colorspc_);
-    }
-    else
-        g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
-
-    // Create separate thread for encoding, should yield better performance on multicore machines
-    gstlinkable::link(colorspc_, sinkQueue_);
-    gstlinkable::link(sinkQueue_, codec_);
-    gstlinkable::link(codec_, srcQueue_);       
+    VideoEncoder::init();
 }
 
 
@@ -392,7 +368,7 @@ RawEncoder::RawEncoder()
 
 void RawEncoder::init()
 {
-    // HACK ATTACK: it's simpler to have this placeholder element
+    // FIXME: HACK ATTACK: it's simpler to have this placeholder element
     // that pretends to be an aconv, and it has no
     // effect, but this isn't very smart.
     aconv_ = Pipeline::Instance()->makeElement("identity", NULL);
@@ -425,6 +401,27 @@ void LameEncoder::init()
     AudioConvertedEncoder::init();
     codec_ = Pipeline::Instance()->makeElement("lame", NULL);
     gstlinkable::link(aconv_, codec_);
+    // check that aconv has 1 or 2 channels only on its src pad
+    checkNumChannels();
+}
+
+void LameEncoder::checkNumChannels()
+{
+    // this is messed up, maybe needs to be playing?
+#if 0
+    GstPad *srcPad = gst_element_get_static_pad(aconv_, "src");
+    LOG_DEBUG(gst_caps_to_string(gst_pad_get_negotiated_caps(srcPad)));
+    GstStructure *structure = gst_caps_get_structure(gst_pad_get_negotiated_caps(srcPad), 0);
+
+    const GValue *val = gst_structure_get_value(structure, "channels");
+    int numChannels = g_value_get_int(val);
+    LOG_DEBUG("WE have " << numChannels);
+
+    if (numChannels < 1 or numChannels > 2)
+        THROW_ERROR("Cannot have less than one channel or more than 2 channels for mp3 audio");
+    
+    gst_object_unref(srcPad);
+#endif
 }
 
 

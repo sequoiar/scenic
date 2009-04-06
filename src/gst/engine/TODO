@@ -1,5 +1,5 @@
+-push up all deinterlace/queue stuff to VideoEncoder base class
 -test and write about latency rtp issues/testing with netem scripts and so on
--encapsulate resolution/capsfiltering for video in ONE PLACE
 -use mapmsg to get stats to hugo
 -fix glvideosink's black at startup/until fullscreen bug
 -teeing video and audio, start with tests

@@ -117,13 +117,34 @@ class AudioConvertedDecoder : public Decoder
 class VideoEncoder : public Encoder 
 {
     public: 
-        VideoEncoder() : doDeinterlace_(false) {};
+        VideoEncoder();
+        ~VideoEncoder();
         void doDeinterlace() { doDeinterlace_ = true; }
         virtual bool supportsCaps(const std::string & srcCaps) const;  // default: support any caps
         virtual std::string supportedCaps() const;
+        virtual void init() = 0;
 
-    protected:
+    private:
         bool doDeinterlace_;
+        _GstElement *colorspc_;
+        _GstElement *sinkQueue_;
+        _GstElement *srcQueue_;
+        _GstElement *deinterlace_;
+        
+        _GstElement *sinkElement() 
+        { 
+            if (doDeinterlace_)
+                return deinterlace_;
+            else
+                return colorspc_;
+        }
+
+        _GstElement *srcElement() { return srcQueue_; }
+
+        /// No Copy Constructor
+        VideoEncoder(const VideoEncoder&);     
+        /// No Assignment Operator
+        VideoEncoder& operator=(const VideoEncoder&);     
 };
 
 /// Encoder that encodes raw video into H.264 using the x264 encoder
@@ -135,29 +156,8 @@ class H264Encoder : public VideoEncoder
 
     private:
         ~H264Encoder();
-
         void init();
-        
         RtpPay* createPayloader() const;
-        _GstElement *deinterlace_;
-        _GstElement *queue_;
-        _GstElement *colorspc_;
-        _GstElement *sinkQueue_;
-        _GstElement *srcQueue_;
-
-        _GstElement *sinkElement() 
-        { 
-            if (doDeinterlace_)
-                return deinterlace_;
-            else
-                return colorspc_;
-        }
-        _GstElement *srcElement() { return srcQueue_; }
-        
-        /// No Copy Constructor
-        H264Encoder(const H264Encoder&);     
-        /// No Assignment Operator
-        H264Encoder& operator=(const H264Encoder&);     
 };
 
 /// Decoder that decodes H.264 into raw video using the ffdec_h264 decoder.
@@ -183,17 +183,6 @@ class H263Encoder : public VideoEncoder
         void init();
         
         RtpPay* createPayloader() const;
-
-        _GstElement *colorspc_;
-        _GstElement *sinkQueue_;
-        _GstElement *srcQueue_;
-        _GstElement *sinkElement() { return colorspc_; }
-        //_GstElement *srcElement() { return srcQueue_; }
-
-        /// No Copy Constructor
-        H263Encoder(const H263Encoder&);     
-        /// No Assignment Operator
-        H263Encoder& operator=(const H263Encoder&);     
 };
 
 /// Decoder that decodes H.263 into raw video using the ffmpeg hq263 decoder.
@@ -215,28 +204,7 @@ class Mpeg4Encoder : public VideoEncoder
 
     private:
         void init();
-        _GstElement *deinterlace_;
-        _GstElement *queue_;
-        _GstElement *sinkQueue_;
-        _GstElement *srcQueue_;
-        _GstElement *colorspc_;
-
-        _GstElement *sinkElement() 
-        { 
-            if (!doDeinterlace_)
-                return colorspc_; 
-            else
-                return deinterlace_; 
-        }
-
-        _GstElement *srcElement() { return srcQueue_; }
-
         RtpPay* createPayloader() const;
-        
-        /// No Copy Constructor
-        Mpeg4Encoder(const Mpeg4Encoder&);     
-        /// No Assignment Operator
-        Mpeg4Encoder& operator=(const Mpeg4Encoder&);     
 };
 
 
@@ -321,12 +289,8 @@ class LameEncoder : public AudioConvertedEncoder
 
     private:
         void init();
+        void checkNumChannels();
         RtpPay* createPayloader() const;
-
-        /// No Copy Constructor 
-        LameEncoder(const LameEncoder&);     
-        /// No Assignment Operator 
-        LameEncoder& operator=(const LameEncoder&);     
 };
 
 /// Decoder that decodes mpeg to raw audio.
@@ -338,11 +302,6 @@ class MadDecoder : public AudioConvertedDecoder
     private:
         void init();
         RtpPay* createDepayloader() const;
-
-        /// No Copy Constructor 
-        MadDecoder(const MadDecoder&);     
-        ///No Assignment Operator
-        MadDecoder& operator=(const MadDecoder&);     
 };
 
 #endif //_CODEC_H_

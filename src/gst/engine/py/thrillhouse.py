@@ -40,7 +40,7 @@ class Arg(object): # new style!!
     def __init__(self):
         """ Init with address and timeout defaults """
         self.address = '127.0.0.1'   # always need this guy
-        self.timeout = 100000
+        self.timeout = 10000
     
     def __str__(self):
         """ Returns a list of this class' data members and their values, 
@@ -360,6 +360,7 @@ class MilhouseTests():
         audiocodec = 'vorbis'
         recv, send = self.argfactory('audiovideo')
         send.audiocodec = audiocodec
+        send.audiosource = 'audiotestsrc'
         recv.audiocodec = audiocodec
         for chan in xrange(1, 9): 
             send.numchannels = chan
@@ -389,19 +390,40 @@ class MilhouseTests():
             send.numchannels = chan
             self.run(recv, send)
 
-    def test_25_h263_videotestsrc(self):
-        """ Test videotestsrc with h263 with a 5 second timeout """
+    def test_25_h263_v4l2src(self):
+        """ Test v4l2src with h263 """
         
         videocodec = 'h263'
         recv, send = self.argfactory('video')
         send.videocodec = videocodec
         recv.videocodec = videocodec
         self.run(recv, send)
+    
+    def test_26_h263_deinterlace(self):
+        """ Test v4l2src with h263 """
+        
+        videocodec = 'h263'
+        recv, send = self.argfactory('video')
+        send.videocodec = videocodec
+        recv.videocodec = videocodec
+        send.deinterlace = True
+        self.run(recv, send)
+
+    def test_27_mp3_v4l2src(self):
+        """ Test mp3 with v4l """
+        audiocodec = 'mp3'
+        recv, send = self.argfactory('audiovideo')
+        send.audiocodec = audiocodec
+        send.numchannels = 2
+        recv.audiocodec = audiocodec
+        self.run(recv, send)
+
+
 
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_25')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_27')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__
