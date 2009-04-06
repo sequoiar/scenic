@@ -40,7 +40,7 @@ class Arg(object): # new style!!
     def __init__(self):
         """ Init with address and timeout defaults """
         self.address = '127.0.0.1'   # always need this guy
-        self.timeout = 10000
+        self.timeout = 100000
     
     def __str__(self):
         """ Returns a list of this class' data members and their values, 
@@ -365,10 +365,34 @@ class MilhouseTests():
             send.numchannels = chan
             self.run(recv, send)
 
+    def test_23_raw_h264_v4l2src(self):
+        """ Test with 1-8 channels for raw with h264 with a 5 second timeout """
+        self.countdown('START')
+
+        videocodec = 'h264'
+        recv, send = self.argfactory('audiovideo')
+        send.videocodec = videocodec
+        recv.videocodec = videocodec
+        for chan in xrange(1, 9): 
+            send.numchannels = chan
+            self.run(recv, send)
+    
+    def test_24_raw_h263_v4l2src(self):
+        """ Test with 1-8 channels for raw with h263 with a 5 second timeout """
+        self.countdown('START')
+
+        videocodec = 'h263'
+        recv, send = self.argfactory('audiovideo')
+        send.videocodec = videocodec
+        recv.videocodec = videocodec
+        for chan in xrange(1, 9): 
+            send.numchannels = chan
+            self.run(recv, send)
+
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_22')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_23')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

@@ -138,6 +138,8 @@ class H264Encoder : public VideoEncoder
         _GstElement *deinterlace_;
         _GstElement *queue_;
         _GstElement *colorspc_;
+        _GstElement *sinkQueue_;
+        _GstElement *srcQueue_;
 
         _GstElement *sinkElement() 
         { 
@@ -146,6 +148,7 @@ class H264Encoder : public VideoEncoder
             else
                 return colorspc_;
         }
+        _GstElement *srcElement() { return srcQueue_; }
         
         /// No Copy Constructor
         H264Encoder(const H264Encoder&);     
@@ -177,7 +180,10 @@ class H263Encoder : public VideoEncoder
         RtpPay* createPayloader() const;
 
         _GstElement *colorspc_;
+        _GstElement *sinkQueue_;
+        _GstElement *srcQueue_;
         _GstElement *sinkElement() { return colorspc_; }
+        //_GstElement *srcElement() { return srcQueue_; }
 
         /// No Copy Constructor
         H263Encoder(const H263Encoder&);     

@@ -128,7 +128,7 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
 
 /// Constructor 
 H264Encoder::H264Encoder() : 
-    deinterlace_(0), queue_(0), colorspc_(0)
+    deinterlace_(0), queue_(0), colorspc_(0), sinkQueue_(0), srcQueue_(0)
 {}
 
 
@@ -147,6 +147,8 @@ void H264Encoder::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
+    sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
 
 #ifdef HAVE_BOOST_THREAD        // more portable
     int numThreads = boost::thread::hardware_concurrency();
@@ -179,7 +181,10 @@ void H264Encoder::init()
     else
         g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
 
-    gstlinkable::link(colorspc_, codec_);
+    // Create separate thread for encoding, should yield better performance on multicore machines
+    gstlinkable::link(colorspc_, sinkQueue_);
+    gstlinkable::link(sinkQueue_, codec_);
+    gstlinkable::link(codec_, srcQueue_);       
 }
 
 
@@ -213,7 +218,7 @@ RtpPay* H264Decoder::createDepayloader() const
 
 /// Constructor 
 H263Encoder::H263Encoder() : 
-    colorspc_(0)
+    colorspc_(0), sinkQueue_(0), srcQueue_(0)
 {}
 
 
@@ -229,7 +234,10 @@ void H263Encoder::init()
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
 
     codec_ = Pipeline::Instance()->makeElement("ffenc_h263", NULL);
+//    sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
+ //   srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
 
+    // Create separate thread for encoding, should yield better performance on multicore machines
     gstlinkable::link(colorspc_, codec_);
 }
 
@@ -292,7 +300,6 @@ void Mpeg4Encoder::init()
         g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
 
     // Create separate thread for encoding, should yield better performance on multicore machines
-    //gstlinkable::link(colorspc_, codec_);
     gstlinkable::link(colorspc_, sinkQueue_);
     gstlinkable::link(sinkQueue_, codec_);
     gstlinkable::link(codec_, srcQueue_);       
