@@ -187,6 +187,11 @@ class Test_TC8_Duplicate_contact(testing.TelnetBaseTest):
 
     def test_02_duplicate_named(self):
         self.tst("c -d  test2 test1", "Contact duplicated")
+        self.tst("contacts --erase contact1","Contact deleted")
+        self.tst("contacts --erase contact3","Contact deleted")
+        self.tst("contacts --erase test1","Contact deleted")
+        self.tst("contacts --erase test1_copy","Contact deleted")
+        self.tst("contacts --erase test2","Contact deleted")
         self.sleep()
         
 
@@ -195,7 +200,7 @@ class Test_TC9_Join(testing.TelnetBaseTest):
     def test_01_create_remote_contact(self):   
         stdin, stdout, stderr = os.popen3("ssh bloup")
         
-        stdin.write("""cd /home/scormier/src/miville/trunk/py;trial test/dist_telnet_sys_test7b.py\n""")
+        stdin.write("""cd /home/scormier/src/miville/trunk/py;trial\n""")
         time.sleep(5)        
         stdin.write("""exit\n""")
         stdin.close()
