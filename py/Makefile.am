@@ -12,8 +12,8 @@ TESTS = test/test_addressbook.py \
         test/test_i18n.py \
         test/test_log.py \
         test/test_observer.py \
-        test/test_telnet_milhouse_sync.py \
-        test/test_telnet_milhouse.py 
+        test/check_milhouse_ipcp.py \
+        test/check_milhouse_ipcp_sync.py \
         test/check_ping.py \
         test/check_devices.py \
         test/check_miville_starts.py \
