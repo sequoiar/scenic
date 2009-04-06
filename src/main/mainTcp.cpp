@@ -89,9 +89,7 @@ bool MainModule::run()
         QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
 
-#if 0
         Logger logger_(*tcpThread_);
-#endif
         while(!signalFlag())
         {
             MapMsg tmsg = tcp_queue.timed_pop(2000);
