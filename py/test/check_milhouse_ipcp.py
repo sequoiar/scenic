@@ -72,15 +72,15 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         bitrate = 3000000
         
         video_init = testing.VideoInit()
-        video_init.codec = 'h264'
+        video_init.codec = 'mpeg4'
         video_init.port = stream_port
         video_init.address = "127.0.0.1"
         video_init.bitrate=bitrate
         video_init.source=video_src
         tx_init_msg = video_init.to_string()
         
-        self.verb('')
-        self.verb( tx_init_msg) 
+        testing.verb('')
+        testing.verb( tx_init_msg) 
         # start process and a telnet on port 1200 for control
         self.start_propulseart_tx(telnet_tx_port) 
         # start a sender on port 12000
@@ -97,11 +97,11 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         rx_video_init = testing.VideoInit()
         rx_video_init.port = 12030
         rx_video_init.address = "127.0.0.1"
-        rx_video_init.codec = 'h264'
+        rx_video_init.codec = 'mpeg4'
         
         rx_init_msg = rx_video_init.to_string()
-        self.verb('')
-        self.verb(rx_init_msg)
+        testing.verb('')
+        testing.verb(rx_init_msg)
         self.start_propulseart_rx(telnet_rx_port)
         
         self.tst_rx(rx_init_msg, video_init_ok)
@@ -118,7 +118,7 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         
         This test should check for actual transfered data when the command is available.
         """
-        self.verb('')
+        testing.verb('')
         telnet_tx_port = 1340
         telnet_rx_port = 1240
         
@@ -127,7 +127,7 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         rx_video_init.address =  "127.0.0.1"
         rx_video_init.codec = 'mpeg4' 
         rx_init_command = rx_video_init.to_string()
-        self.verb("RX> " + rx_init_command)
+        testing.verb("RX> " + rx_init_command)
         
         tx_video_init = testing.VideoInit()
         tx_video_init.bitrate = 3000000
@@ -136,7 +136,7 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         tx_video_init.port = rx_video_init.port
         tx_video_init.source=video_src
         tx_init_command = tx_video_init.to_string()
-        self.verb( "TX> " + tx_init_command)
+        testing.verb( "TX> " + tx_init_command)
         
         self.start_propulseart_rx(telnet_rx_port)
         self.start_propulseart_tx(telnet_tx_port)
@@ -158,7 +158,7 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         Streaming audio test betweeen 2 instances of propulseart.
         """
         
-        self.verb('')
+        testing.verb('')
         telnet_rx_port = 1250
         telnet_tx_port = 1350
         
@@ -168,7 +168,7 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         rx_init.address = "127.0.0.1"
         rx_init.audio_buffer_usec = 30000
         rx_init_cmd = rx_init.to_string()
-        self.verb( "RX:>" + rx_init_cmd)
+        testing.verb( "RX:>" + rx_init_cmd)
         
         tx_init = testing.AudioInit()
         tx_init.codec = 'vorbis'
@@ -177,7 +177,7 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         tx_init.source=audio_src 
         tx_init.channels=2
         tx_init_cmd = rx_init.to_string()
-        self.verb( "TX:>" + tx_init_cmd)
+        testing.verb( "TX:>" + tx_init_cmd)
         self.start_propulseart_rx(telnet_rx_port)
         self.start_propulseart_tx(telnet_tx_port)
         
@@ -192,7 +192,7 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         
         self.stream_duration(5.)
         # cleanup and go home
-        self.verb("stopping the streaming...")
+        testing.verb("stopping the streaming...")
  
  
         self.tst_tx("stop:", stop_but_not_ok) # CARAMBA!
