@@ -33,4 +33,4 @@ moreclean:
 
 distclean: clean
 
-.PHONY: html doxygen install clean moreclean
+.PHONY: all html doxygen install check clean moreclean distclean
