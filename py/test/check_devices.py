@@ -57,3 +57,5 @@ class Test_Devices(unittest.TestCase):
             self.tst("devices -k audio -t jackd -d default -a", "rate")
             self.tst("devices -k audio -t jackd -d default -m rate 48000", "not possible")
             
+    def test_99_kill_miville(self):
+        self.local.kill_miville_and_telnet()

@@ -9,6 +9,7 @@ TESTS = test/test_addressbook.py \
         test/test_commands.py \
         test/test_common.py \
         test/test_devices.py \
+        test/test_devices_settings.py 
         test/test_i18n.py \
         test/test_log.py \
         test/test_observer.py \
@@ -18,7 +19,6 @@ TESTS = test/test_addressbook.py \
         test/check_ping.py \
         test/check_devices.py \
         test/check_miville_starts.py \
-        test/check_devices_settings.py \
 
 # new tests to fix (alex)
 #        test/test_devices.py \
