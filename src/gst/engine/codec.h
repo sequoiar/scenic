@@ -28,6 +28,7 @@
 class _GstElement;
 class RtpPay;
 
+
 /** 
  *  Abstract base class that wraps a single GstElement, and which exposes both a source and sink.
  */
@@ -118,6 +119,9 @@ class VideoEncoder : public Encoder
     public: 
         VideoEncoder() : doDeinterlace_(false) {};
         void doDeinterlace() { doDeinterlace_ = true; }
+        virtual bool supportsCaps(const std::string & srcCaps) const;  // default: support any caps
+        virtual std::string supportedCaps() const;
+
     protected:
         bool doDeinterlace_;
 };
@@ -171,6 +175,7 @@ class H263Encoder : public VideoEncoder
 {
     public: 
         H263Encoder();
+        std::string supportedCaps() const;
 
     private:
         ~H263Encoder();

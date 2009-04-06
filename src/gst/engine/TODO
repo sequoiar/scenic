@@ -1,6 +1,6 @@
 -test and write about latency rtp issues/testing with netem scripts and so on
--cleanup rtpbin stats reporting, use mapmsg to get stats to hugo, make a map of sessions that gets defined as rtp sessions are
-created (and don't forget to trash them when you're done)
+-encapsulate resolution/capsfiltering for video in ONE PLACE
+-use mapmsg to get stats to hugo
 -fix glvideosink's black at startup/until fullscreen bug
 -teeing video and audio, start with tests
 

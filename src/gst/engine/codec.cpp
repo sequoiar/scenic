@@ -78,7 +78,6 @@ void Encoder::setBitrate(unsigned bitrate)
     }
 }
 
-
 /// Posts bitrate using MapMsg
 void Encoder::postBitrate()
 {
@@ -90,6 +89,7 @@ void Encoder::postBitrate()
     mapMsg["value"] = msgStream.str();
     mapMsg.post();
 }
+
 
 /// Constructor 
 AudioConvertedEncoder::AudioConvertedEncoder() : 
@@ -125,6 +125,16 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
     Pipeline::Instance()->remove(&aconv_);
 }
 
+bool VideoEncoder::supportsCaps(const std::string & srcCaps) const 
+{ 
+    // default: support any caps
+    return supportedCaps() == "ANY" || srcCaps == supportedCaps(); 
+} 
+
+std::string VideoEncoder::supportedCaps() const 
+{
+    return "ANY";
+}
 
 /// Constructor 
 H264Encoder::H264Encoder() : 
@@ -226,6 +236,13 @@ H263Encoder::H263Encoder() :
 H263Encoder::~H263Encoder()
 {
     Pipeline::Instance()->remove(&colorspc_);
+}
+
+
+std::string H263Encoder::supportedCaps() const
+{
+    // FIXME: hard coded for now
+    return std::string("video/x-raw-yuv, width=352, height=288, pixel-aspect-ratio=10/11");
 }
 
 

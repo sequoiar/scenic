@@ -69,7 +69,7 @@ std::string AudioSource::getCapsFilterCapsString()
 }
 
 
-void AudioSource::setupCapsFilter(GstElement* &aconv, GstElement* &capsFilter)
+void AudioSource::initCapsFilter(GstElement* &aconv, GstElement* &capsFilter)
 {
     // setup capsfilter
     GstCaps *caps = 0;
@@ -317,7 +317,7 @@ void AudioAlsaSource::sub_init()
     else
         g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
 
-    setupCapsFilter(aconv_, capsFilter_);
+    initCapsFilter(aconv_, capsFilter_);
 }
 
 
@@ -341,7 +341,7 @@ void AudioPulseSource::sub_init()
 {
     AudioSource::sub_init();
 
-    setupCapsFilter(aconv_, capsFilter_);
+    initCapsFilter(aconv_, capsFilter_);
 }
 
 
@@ -376,7 +376,7 @@ void AudioJackSource::sub_init()
     if (Jack::autoForcedSupported(source_))
         g_object_set(G_OBJECT(source_), "connect", 2, NULL);
     
-    setupCapsFilter(aconv_, capsFilter_);
+    initCapsFilter(aconv_, capsFilter_);
 
     if (Pipeline::SAMPLE_RATE != Jack::samplerate())
         THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()

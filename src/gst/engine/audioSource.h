@@ -57,7 +57,7 @@ class AudioSource : public GstLinkableSource
         /// Caps used by any source with a capsfilter
         std::string getCapsFilterCapsString();
 
-        void setupCapsFilter(GstElement* &aconv, GstElement* &capsfilter);
+        void initCapsFilter(GstElement* &aconv, GstElement* &capsfilter);
 
     private:
         

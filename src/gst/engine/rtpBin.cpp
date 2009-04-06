@@ -49,7 +49,7 @@ void RtpBin::init()
 
         // uncomment this to print stats
 #if RTP_REPORTING
-        g_timeout_add(5000 /* ms */, 
+        g_timeout_add(REPORTING_PERIOD_MS /* ms */, 
                 static_cast<GSourceFunc>(printStatsCallback),
                 static_cast<gpointer>(rtpbin_));
 #endif

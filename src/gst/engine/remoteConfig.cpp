@@ -48,7 +48,7 @@ VideoEncoder * SenderConfig::createVideoEncoder() const
     if (codec_ == "h264")
         return new H264Encoder();
     else if (codec_ == "h263")
-        return new H263Encoder();
+        return new H263Encoder();       // set caps from here?
     else if (codec_ == "mpeg4")
         return new Mpeg4Encoder();
     else

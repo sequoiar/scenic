@@ -62,6 +62,13 @@ void VideoSender::init_codec()
         encoder_->doDeinterlace();
     encoder_->init();
     encoder_->setBitrate(videoConfig_.bitrate());
+    if (not encoder_->supportsCaps(source_->srcCaps()))
+    {
+        LOG_DEBUG("Encoder does not support " << source_->srcCaps() << ", setting to " <<
+                encoder_->supportedCaps());
+        source_->setCapsFilter(encoder_->supportedCaps());
+    }
+
     gstlinkable::link(*source_, *encoder_);// FIXME: this shouldn't happen for VideoFileSource
 }
 

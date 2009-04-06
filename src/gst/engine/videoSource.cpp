@@ -32,7 +32,7 @@
 
 /// Constructor
 VideoSource::VideoSource(const VideoSourceConfig &config) : 
-    config_(config), source_(0) 
+    config_(config), source_(0), capsFilter_(0)
 {}
 
 
@@ -46,16 +46,45 @@ void VideoSource::init()
 /// Destructor
 VideoSource::~VideoSource()
 {
+    Pipeline::Instance()->remove(&capsFilter_);
     Pipeline::Instance()->remove(&source_);
+}
+
+std::string VideoSource::defaultSrcCaps() const
+{
+    std::ostringstream capsStr;
+    capsStr << "video/x-raw-yuv, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
+        << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; 
+    assert(capsStr.str() == "video/x-raw-yuv, width=720, height=480, pixel-aspect-ratio=10/11"); 
+    return capsStr.str();
+}
+
+std::string VideoSource::srcCaps() const
+{
+    return defaultSrcCaps();
+}
+
+
+/// Sets caps on capsfilter
+void VideoSource::setCapsFilter(const std::string &capsStr)
+{
+    assert(capsFilter_ != 0);
+    if (capsStr.empty())
+        THROW_ERROR("Can't set capsfilter to empty string");
+    
+    if (capsStr == "ANY")   // don't bother setting caps
+        THROW_ERROR("Trying to set caps to dummy value");
+
+    GstCaps *videoCaps = gst_caps_from_string(capsStr.c_str());
+    g_object_set(G_OBJECT(capsFilter_), "caps", videoCaps, NULL);
+
+    gst_caps_unref(videoCaps);
 }
 
 
 /// Constructor
 VideoTestSource::VideoTestSource(const VideoSourceConfig &config) : 
-    VideoSource(config),
-    capsFilter_(0),
-    width_(720),
-    height_(480)
+    VideoSource(config)
 {}
 
 void VideoTestSource::init()
@@ -64,32 +93,14 @@ void VideoTestSource::init()
     g_object_set(G_OBJECT(source_), "is-live", FALSE, NULL); // necessary for clocked callback to work
     
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
-    filterCaps();
     gstlinkable::link(source_, capsFilter_);
-}
-
-
-// optionally called to force resolution
-void VideoTestSource::filterCaps()
-{
-    assert(capsFilter_);
-    // otherwise videotestsrc defaults to 320 by 240
-    std::ostringstream capsStr;
-    capsStr << "video/x-raw-yuv, width=" << width_ << ", height=" << height_; 
-
-    GstCaps *videoCaps = gst_caps_from_string(capsStr.str().c_str());
-    g_object_set(G_OBJECT(capsFilter_), "caps", videoCaps, NULL);
-
-    gst_caps_unref(videoCaps);
-    
+    setCapsFilter(srcCaps());
 }
 
 
 /// Destructor
 VideoTestSource::~VideoTestSource()
-{
-    Pipeline::Instance()->remove(&capsFilter_);
-}
+{}
 
 
 /// Constructor
@@ -213,12 +224,6 @@ void VideoV4lSource::init()
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
 
-    // fixes bug with image being distorted geometrically
-    std::string capsStr("video/x-raw-yuv, width=720, height=480, pixel-aspect-ratio=10/11"); 
-
-    GstCaps *videoCaps = gst_caps_from_string(capsStr.c_str());
-    g_object_set(G_OBJECT(capsFilter_), "caps", videoCaps, NULL);
-
-    gst_caps_unref(videoCaps);
+    setCapsFilter(srcCaps());
 }
 

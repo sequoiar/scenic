@@ -46,6 +46,7 @@ class RtpBin
         static std::vector<std::string> sessionNames_;
 
     private:
+        static const int REPORTING_PERIOD_MS = 5000;
         static int printStatsCallback(void * rtpbin);
         static void printSourceStats(_GObject *source);
         static void parseSourceStats(_GObject * source, int sessionId);

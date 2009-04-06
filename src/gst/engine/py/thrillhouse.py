@@ -389,10 +389,19 @@ class MilhouseTests():
             send.numchannels = chan
             self.run(recv, send)
 
+    def test_25_h263_videotestsrc(self):
+        """ Test videotestsrc with h263 with a 5 second timeout """
+        
+        videocodec = 'h263'
+        recv, send = self.argfactory('video')
+        send.videocodec = videocodec
+        recv.videocodec = videocodec
+        self.run(recv, send)
+
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_23')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_25')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

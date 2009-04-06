@@ -35,11 +35,19 @@ class VideoSource
     public:
         ~VideoSource();
         virtual void init();
+        virtual std::string srcCaps() const;
+        void setCapsFilter(const std::string &srcCaps);
 
     protected:
         explicit VideoSource(const VideoSourceConfig &config);
         const VideoSourceConfig &config_;
         _GstElement *source_;
+        _GstElement *capsFilter_;
+        static const int WIDTH = 720;
+        static const int HEIGHT = 480;
+        static const int PIX_ASPECT_NUM = 10;
+        static const int PIX_ASPECT_DENOM = 11;
+        std::string defaultSrcCaps() const;
 
     private:
         _GstElement *srcElement() { return source_; }
@@ -57,10 +65,6 @@ class VideoTestSource
     private:
         ~VideoTestSource();
         _GstElement *srcElement() { return capsFilter_; }
-
-        _GstElement *capsFilter_;
-        unsigned long width_;
-        unsigned long height_;
         void init();
 
         /// No Copy Constructor
@@ -112,10 +116,9 @@ class VideoV4lSource
 {
     public:
         explicit VideoV4lSource(const VideoSourceConfig &config)
-            : VideoSource(config), capsFilter_(0), expectedStandard_("NTSC") {}
+            : VideoSource(config), expectedStandard_("NTSC") {}
     private:
         void init();
-        _GstElement *capsFilter_;
         std::string expectedStandard_;
         _GstElement *srcElement() { return capsFilter_; }
         VideoV4lSource(const VideoV4lSource&);     //No Copy Constructor
