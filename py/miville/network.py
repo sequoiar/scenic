@@ -93,32 +93,34 @@ _TIMEOUT = 30.0 # timeout in seconds max to wait before calling _timeout.
 """
 This dict explains the 2nd line of the output of `iperf -y c -u -c <host>`
 """
-iperf_results_indices = {
-    0:["datetime_YmdHis", "str"], # 0 str
-    1:["remote_ip", "str"], # 1 str                         # XXX local is actually remote... since it is the local remote server... 
-    2:["remote_port", "int"], # 2 int
-    3:["local_ip", "str"], # 3 str
-    4:["local_port", "int"], # 4 int
-    5:["transfert_ID", "int"], # 5 int 
-    6:["start_and_end_time", "str"], # 6 str #%.1f-%.1f
-    # ------------------------ end of first line.
-    #                          2nd line has more:
-    7:["total_length", "int"], # 8 long int
-    8:["speed", "int"], # 9 long int 
-    9:["jitter", "float"], # 10 float 
-    10:["count_errors", "int"], # 11 int
-    11:["count_datagrams", "int"], # 12 int 
-    12:["percent_errors", "float"], # 13 float
-    13:["count_out_of_order", "int"] # 14 int
-}
 
 # functions ------------------------------------------------------
 def _parse_iperf_output(lines):
     """
-    Parses the output of iperf -c <host> -u
-
+    Parses the output of iperf -c <host> -u -t <time> -y c -b <bandwidth>
+    
     Might raise NetworkError
+    
+    Returns a dict.
     """
+    iperf_results_indices = {
+        0:["datetime_YmdHis", "str"], # 0 str
+        1:["remote_ip", "str"], # 1 str                         # XXX local is actually remote... since it is the local remote server... 
+        2:["remote_port", "int"], # 2 int
+        3:["local_ip", "str"], # 3 str
+        4:["local_port", "int"], # 4 int
+        5:["transfert_ID", "int"], # 5 int 
+        6:["start_and_end_time", "str"], # 6 str #%.1f-%.1f
+        # ------------------------ end of first line.
+        #                          2nd line has more:
+        7:["total_length", "int"], # 8 long int
+        8:["speed", "int"], # 9 long int 
+        9:["jitter", "float"], # 10 float 
+        10:["count_errors", "int"], # 11 int
+        11:["count_datagrams", "int"], # 12 int 
+        12:["percent_errors", "float"], # 13 float
+        13:["count_out_of_order", "int"] # 14 int
+    }
     ret = {}
 #     keys = ['datetime', 'local ip', 'local port', 'remote ip', 'remote port', 'test index', 
 #            'interval', 'transfer', 'bandwidth', 
