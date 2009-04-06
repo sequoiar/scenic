@@ -146,7 +146,7 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         
         self.tst_rx("start:", start_ok)
         self.tst_tx("start:", start_ok)
-        self.stream_duration(18.)
+        self.stream_duration(5.)
         # check for transfered data
         # should be well above 0 bytes at this point
         
@@ -190,7 +190,7 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         # should be well above 0 bytes at this point
         
         
-        self.stream_duration(15.)
+        self.stream_duration(5.)
         # cleanup and go home
         self.verb("stopping the streaming...")
  

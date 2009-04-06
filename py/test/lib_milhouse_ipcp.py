@@ -86,16 +86,23 @@ class VideoInit(InitArgs):
     def __init__(self):
         InitArgs.__init__(self , "video_init")
 
-def verb(to_print=''):
-    #if VERBOSE_CLIENT:
-    print to_print
+def verb(arg):
+    if get_env_var('MILHOUSE_VERBOSITY'):
+        print arg
+
+def get_env_var(key):
+    try:
+        value = os.environ[key]
+        return value
+    except KeyError:
+        return False
 
 def msc2png(test_name):
     cmd = "mscgen -T png -i %s.msc -o %s.png" % (test_name, test_name)
     status = commands.getstatusoutput(cmd)
     output = status[1]
     
-def bash_it(cmd):
+def shellcmd(cmd):
     """
     Executes a bash string 
 
@@ -103,12 +110,11 @@ def bash_it(cmd):
     """
     status = commands.getstatusoutput(cmd)
     output = status[1]
-    print cmd
+    verb(cmd)
     lines = output.split("\n")
     for line in lines:
         if line.find(cmd) == -1:
-            print line
-    print
+            verb(line)
 
 def generate_html(test_class):    
     members = dir(test_class)
@@ -161,17 +167,17 @@ def start_process(command, logfile=None):
     directory = os.getcwd()
     try:
 
-        print 'starting process "%s"' % (command)
+        verb( 'starting process "%s"' % (command) )
         process = pexpect.spawn(command, timeout=0.1, logfile=logfile)
 
         time.sleep(waiting_delay) # seconds
         if (process.isalive() == False):
-            print "Error starting client '%s': not alive yet :-(" % command
+            verb( "Error starting client '%s': not alive yet :-(" % command )
             process.kill(9)
         else:
             return process
     except pexpect.ExceptionPexpect, e:
-        print "Error starting client: " + str(e)
+        verb( "Error starting client: " + str(e) )
 
 def kill_process(process):
     """
@@ -187,7 +193,7 @@ def kill_process(process):
                 if (process.isalive() == True):
                     process.kill(9)
         except Exception, e:
-            print "Error killing process", e
+            verb( "Error killing process", e )
 
 # ---------------------------------------------------------------------
 # System test classes
@@ -222,7 +228,7 @@ class Milhouse_IPCP_Base_Test(unittest.TestCase):
     Telnet system test case parent class
     """
     def setUp(self):
-        bash_it("ps aux | grep " + EXECUTABLE)
+        shellcmd("ps aux | grep " + EXECUTABLE)
         self.tx_telnet = None
         self.tx_server = None
         self.tx_telnet_log = None
@@ -383,7 +389,6 @@ msc
         
          
     def _tst(self, client, command, expected, errorMsg = None):
-        #self._pump_up_the_files()
         client.sendline(command)
         time.sleep(0.025)
         self._pump_up_the_files()
