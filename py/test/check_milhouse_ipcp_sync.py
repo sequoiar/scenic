@@ -57,7 +57,7 @@ class Test_av_sync(testing.Milhouse_IPCP_Base_Test):
         simultaneously with synchronisation.
         The commands for this test are not implemented yet.
         """
-        self.verb('')
+        testing.verb('')
         telnet_rx_port = 1270
         telnet_tx_port = 1370
         
@@ -76,8 +76,8 @@ class Test_av_sync(testing.Milhouse_IPCP_Base_Test):
                 
         # = "video_init:" + self._get_start_command(,   12007, )
            
-        self.verb( 'RX video: ' + rx_video_init_cmd )
-        self.verb( 'RX audio: ' + rx_audio_init_cmd )
+        testing.verb( 'RX video: ' + rx_video_init_cmd )
+        testing.verb( 'RX audio: ' + rx_audio_init_cmd )
         
         tx_video_init = testing.VideoInit()
         tx_video_init.bitrate = 3000000
@@ -95,8 +95,8 @@ class Test_av_sync(testing.Milhouse_IPCP_Base_Test):
         
         tx_video_init_cmd = tx_video_init.to_string()
         tx_audio_init_cmd = tx_audio_init.to_string()
-        self.verb(  'TX video: ' + tx_video_init_cmd)
-        self.verb(  'TX audio: ' + tx_audio_init_cmd)
+        testing.verb(  'TX video: ' + tx_video_init_cmd)
+        testing.verb(  'TX audio: ' + tx_audio_init_cmd)
                  
         self.start_propulseart_rx(telnet_rx_port)
         self.start_propulseart_tx(telnet_tx_port)
@@ -111,7 +111,7 @@ class Test_av_sync(testing.Milhouse_IPCP_Base_Test):
         time.sleep(0.5)
         self.tst_rx( 'start:', start_ok )
        
-        self.stream_duration(15.)
+        self.stream_duration(5)
         # check number of packets TBD
         self.tst_rx("stop:", stop_but_not_ok) # CARAMBA!!!
         self.tst_tx("stop:", stop_ok)
