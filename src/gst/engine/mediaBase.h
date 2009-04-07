@@ -22,24 +22,6 @@
 #ifndef _MEDIA_BASE_H_
 #define _MEDIA_BASE_H_
 
-
-class LocalBase     // local bins
-{
-    public:
-        virtual void init();
-        LocalBase() : initialized_(false) {};
-        virtual ~LocalBase(){};
-
-    private:
-        virtual void init_source() = 0;
-        virtual void init_sink() = 0;
-        bool initialized_;
-
-        LocalBase(const LocalBase&);     //No Copy Constructor
-        LocalBase& operator=(const LocalBase&);     //No Assignment Operator
-};
-
-
 class SenderBase 
 {
     public: 

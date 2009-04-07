@@ -25,15 +25,6 @@
 #include "mediaBase.h"
 
 
-void LocalBase::init()  // template method
-{
-    assert(!initialized_);
-    // these methods are defined in subclasses
-    init_source();
-    init_sink();
-    initialized_ = true;
-}
-
 void SenderBase::init()  // template method
 {
     // these methods are defined in subclasses
