@@ -26,11 +26,12 @@ from test import lib_miville_telnet as libmi
 
 libmi.kill_all_running_miville()
 
-local = libmi.MivilleTester(use_tmp_home=True)
+fname = __file__.split('.')[0]
+local = libmi.MivilleTester(use_tmp_home=True, logfile_prefix=fname + "local")
 local.start_miville_process()
 local.start_telnet_process()
 
-remote = libmi.MivilleTester(use_tmp_home=True, port_offset=1)
+remote = libmi.MivilleTester(use_tmp_home=True, port_offset=1, logfile_prefix=fname + "remote")
 remote.start_miville_process()
 remote.start_telnet_process()
 
@@ -46,25 +47,28 @@ class Test_Ping(unittest.TestCase):
     def test_01_ping(self):
         # contacts we add might be already in their addressbook
         self.local.telnet_process.sendline("c -a Charlotte 127.0.0.1 2223")
-        self.local.sleep(0.1)
+        self.local.expectTest("added")
         self.remote.telnet_process.sendline("c -a Pierre 127.0.0.1 2222")
-        self.remote.sleep(0.1)
+        self.remote.expectTest("added")
         self.local.telnet_process.sendline("c -s Charlotte")
-        self.local.sleep(0.1)
+        self.local.expectTest("selected")
         self.local.telnet_process.sendline("j -s")
-        # TODO: test do you accept
+        self.remote.expectTest("Do you accept")
         self.remote.telnet_process.sendline("Y")
-        self.remote.sleep(0.1)
         self.local.expectTest('accepted', 'Connection not successful.')
         self.local.telnet_process.sendline("ping")
         self.local.expectTest('pong', 'Did not receive pong answer.')
 
     def test_02_network_performance_test(self):
-        self.local.telnet_process.sendline("n -s -k dualtest -t 1")
+        self.local.telnet_process.sendline("n -s -k dualtest -t 1") # network test for 1 second
         self.local.expectTest("Starting", 'Did not start network test')
-        self.remote.sleep(1.3)
-        self.local.expectTest('jitter', 'Did not receive network test results.')
+        self.local.expectTest('jitter', 'Did not receive network test results.', 1.3)
 
     def test_99_kill_miville(self):
         self.local.kill_miville_and_telnet()
         self.remote.kill_miville_and_telnet()
+
+        local.telnet_logfile.close()
+        local.miville_logfile.close()
+        remote.telnet_logfile.close()
+        remote.miville_logfile.close()

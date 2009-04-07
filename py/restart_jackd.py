@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
 # Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -29,30 +30,20 @@ import subprocess
 JACKD_BIN = "/usr/bin/jackd"
 USAGE = "-dalsa -dhw:0 -r44100 -p1024 -n2"
 
-def _validate_arg(arg):
-    """
-    Makes sure a command line argument does not contain any forbidden characters
-    :param arg: string
-    :return: string the validated arg
-    """
-    forbidden = ("|", "&", "\\", "@", "!", "*", "/", "'", '"', "(", ")", "^", ",", "?")
-    for char in forbidden:
-        arg = arg.replace(char, "")
-    return arg
-
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print "Error: Not enough arguments to start jackd"
         print "Usage:", sys.argv[0], USAGE
-        sys.exit(0)
+        sys.exit(1)
 
     args = sys.argv[1:]
-    for i in range(len(args)):
-        args[i] = _validate_arg(args[i])
     args.insert(0, JACKD_BIN)
     # start the process
-    print "starting " + JACKD_BIN
-    pid = subprocess.Popen(args).pid
-    # TODO : manage if there is an error
+    try:
+        pid = subprocess.Popen(args).pid
+    except OSError, e:
+        print "Error starting JACK", e
+        sys.exit(1)
     print pid
+    sys.exit(0)
 

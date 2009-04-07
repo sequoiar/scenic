@@ -29,12 +29,8 @@ Attributes of its (jackd) devices:
 * command line string that started it.
 * buffer size
 
-"quand jackd est faché, lui toujours faire ainsi"
-
 WARNING: For now, only supports short options to jackd. (such as "-d alsa" and not "--driver alsa")
 """
-#TODO: 
-# ----------------------------------------------------------
 # System imports
 import os
 import sys
@@ -59,6 +55,8 @@ log = logger.start('debug', 1, 0, 'devices_jackd')
 
 _state_printed_jackd_is_frozen = False
 _enable_kill_jackd = True
+
+RESTART_JACKD_SCRIPT = "restart_jackd.py" # TODO: move to some other location at install time !
 
 def _parse_jack_lsp(lines):
     """
@@ -404,7 +402,7 @@ class JackDriver(devices.AudioDriver):
         Starts jackd again
         """
         log.info("resurrecting jackd")
-        commands_to_start = [["/usr/bin/python", "./devices/start_jackd.py"]] # TODO : maybe specify the absolute path?
+        commands_to_start = [["/usr/bin/python", RESTART_JACKD_SCRIPT]] # TODO : maybe specify the absolute path?
         #print "starting /usr/bin/python ./devices/start_jackd.py" + str(args.split())
         for arg in args.strip().split():
             commands_to_start[0].append(arg) 
@@ -439,75 +437,75 @@ if __name__ == '__name__':
     print "JACK infos:"
     pprint.pprint(jackd_get_infos())
 
-"""
-#!/bin/bash
-cd ~/bin
-
-function var_declaration {
-    for $(seq 1 8); do
-        export JACK_SYSTEM_OUT$i="alsa_pcm:playback_$i"
-        export JACK_SYSTEM_IN$i="alsa_pcm:capture_$i"
-    done
-}
-
-function list_jack_ports {
-    if [ "x$1" = "x" ]; then
-        :
-    else
-        jack_lsp | grep $1 | sort
-    fi
-}
-
-# MIDI ports
-function find_midi_port {
-    # arg1 = [o|i] (input/ouput)
-    # arg2 = searched_string
-    # TODO: Verify the args
-    echo $(aconnect -l$1 | awk "/client.*$2/ { print \$2 "0" }" )
-}
-
-pd_midi_in=$(find_midi_port o Pure)
-oxygen_midi_out=$(find_midi_port i Oxygen)
-
-aconnect $oxygen_midi_out $pd_midi_in
-
-
-# Audio ports
-# TODO: check if pof is running
-
-# set the prefixes
-pof_out=$(jack_lsp  | egrep pof.*:out | sed 's/:.*$//' | uniq | sed 's/$/:out_jackaudiosink0_/')
-pof_in=$(jack_lsp  | egrep pof.*:in | sed 's/:.*$//' | uniq | sed 's/$/:in_jackaudiosrc/')
-
-pd_out=$(jack_lsp  | egrep pure_data.*:out | sed 's/:.*$//' | uniq | sed 's/$/:output/')
-pd_in=$(jack_lsp  | egrep pure_data.*:in | sed 's/:.*$//' | uniq | sed 's/$/:input/')
-
-system_out="system:capture_"
-system_in="system:playback_"
-
-# doo da sheet
-set -x
-
-jack_connect ${pof_out}5 ${system_in}1
-sleep 2
-jack_connect ${pof_out}5 ${system_in}4
-sleep 2
-
-for i in $(seq 1 4)
-do
-    j=$((i-1))
-    jack_connect ${pd_out}$i ${system_in}$i 2>/dev/null
-    sleep 2
-    jack_connect ${pd_out}$i ${pof_in}${j}_1 2>/dev/null
-    sleep 2
-done
-
-for i in $(seq 1 3)
-do
-    jack_connect ${system_out}$i ${pd_in}${i}
-    sleep 2
-done
-jack_connect ${system_out}1 ${pof_in}4_1
-"""
-
-
+# ----------------------------------------------
+# #!/bin/bash
+# cd ~/bin
+# 
+# function var_declaration {
+#     for $(seq 1 8); do
+#         export JACK_SYSTEM_OUT$i="alsa_pcm:playback_$i"
+#         export JACK_SYSTEM_IN$i="alsa_pcm:capture_$i"
+#     done
+# }
+# 
+# function list_jack_ports {
+#     if [ "x$1" = "x" ]; then
+#         :
+#     else
+#         jack_lsp | grep $1 | sort
+#     fi
+# }
+# 
+# # MIDI ports
+# function find_midi_port {
+#     # arg1 = [o|i] (input/ouput)
+#     # arg2 = searched_string
+#     # TODO: Verify the args
+#     echo $(aconnect -l$1 | awk "/client.*$2/ { print \$2 "0" }" )
+# }
+# 
+# pd_midi_in=$(find_midi_port o Pure)
+# oxygen_midi_out=$(find_midi_port i Oxygen)
+# 
+# aconnect $oxygen_midi_out $pd_midi_in
+# 
+# 
+# # Audio ports
+# # TODO: check if pof is running
+# 
+# # set the prefixes
+# pof_out=$(jack_lsp  | egrep pof.*:out | sed 's/:.*$//' | uniq | sed 's/$/:out_jackaudiosink0_/')
+# pof_in=$(jack_lsp  | egrep pof.*:in | sed 's/:.*$//' | uniq | sed 's/$/:in_jackaudiosrc/')
+# 
+# pd_out=$(jack_lsp  | egrep pure_data.*:out | sed 's/:.*$//' | uniq | sed 's/$/:output/')
+# pd_in=$(jack_lsp  | egrep pure_data.*:in | sed 's/:.*$//' | uniq | sed 's/$/:input/')
+# 
+# system_out="system:capture_"
+# system_in="system:playback_"
+# 
+# # doo da sheet
+# set -x
+# 
+# jack_connect ${pof_out}5 ${system_in}1
+# sleep 2
+# jack_connect ${pof_out}5 ${system_in}4
+# sleep 2
+# 
+# for i in $(seq 1 4)
+# do
+#     j=$((i-1))
+#     jack_connect ${pd_out}$i ${system_in}$i 2>/dev/null
+#     sleep 2
+#     jack_connect ${pd_out}$i ${pof_in}${j}_1 2>/dev/null
+#     sleep 2
+# done
+# 
+# for i in $(seq 1 3)
+# do
+#     jack_connect ${system_out}$i ${pd_in}${i}
+#     sleep 2
+# done
+# jack_connect ${system_out}1 ${pof_in}4_1
+# 
+# 
+# 

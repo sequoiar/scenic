@@ -166,10 +166,8 @@ def start_process(command, logfile=None):
     display = os.environ['DISPLAY']
     directory = os.getcwd()
     try:
-
-        verb( 'starting process "%s"' % (command) )
+        verb('starting process "%s"' % (command))
         process = pexpect.spawn(command, timeout=0.1, logfile=logfile)
-
         time.sleep(waiting_delay) # seconds
         if (process.isalive() == False):
             verb( "Error starting client '%s': not alive yet :-(" % command )

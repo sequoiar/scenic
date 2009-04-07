@@ -85,8 +85,8 @@ class MivilleTester(object):
         self.miville_command = "./miville.py"
         self.use_tmp_home = False
         self.verbose = True
-        self.log_prefix = ''
         self.color = 'CYAN'
+        self.logfile_prefix = "default"
         self.telnet_logfile = sys.stdout #child.logfile 
         self.miville_logfile = sys.stdout #child.logfile 
         #override attributes
@@ -123,7 +123,7 @@ class MivilleTester(object):
                 self.miville_process = pexpect.spawn(command, logfile=self.miville_logfile, timeout=0.01) # ProcessOutputLogger(logPrefix, color)
             else:
                 self.miville_process = pexpect.spawn(command)
-            self.sleep(0.9) # seconds
+            self.miville_process.expect(["Miville is now ready"], 2.0) # self.sleep(0.9) # seconds
             if self.is_running(self.miville_process) == False:
                 raise Exception("Process %s could not be started. Not running. Is an other miville running at the same time?" % (command))
         except pexpect.ExceptionPexpect, e:
@@ -170,12 +170,11 @@ class MivilleTester(object):
             return process
 
     def kill_miville_and_telnet(self):
-        if self.miville_process is not None:
-            self.telnet_process.close()
-            self.miville_process.close()
-            self.kill_process(self.miville_process)
-        if self.telnet_process is not None:
-            self.kill_process(self.telnet_process)
+        # todo quit
+        self.sleep(0.3)
+        for process in [self.telnet_process, self.miville_process]:
+            if process is not None:
+                self.kill_process(process)
 
     def kill_process(self, process):
         """
@@ -184,17 +183,25 @@ class MivilleTester(object):
         See kill -l for flags
         """
         print "KILLING process" # + str(process)
-        try:
-            if self.is_running(process) == True:
-                process.kill(15)
-                self.sleep(0.3)
-                if is_running(process) == True:
-                    process.kill(9)
-        except Exception, e:
-            print "Error killing process", e
-            raise
+        if process is not None:
+            process.close()
+            now = time.time()
+            while process.isalive() == True:
+                self.sleep(0.01)
+                # dont' wait for isalive for more than 2 seconds
+                if time.time() > (now + 2):
+                    break
+            try:
+                if self.is_running(process) == True:
+                    process.kill(15)
+                    self.sleep(0.3)
+                    if is_running(process) == True:
+                        process.kill(9)
+            except Exception, e:
+                print "Error killing process", e
+                raise
 
-    def expectTest(self, expected, message, timeout=2):
+    def expectTest(self, expected, message=None, timeout=2):
         """
         Fails a test if the expected regex value is not read from the client output.
         
@@ -203,6 +210,8 @@ class MivilleTester(object):
         
         Succeeds otherwise.
         """
+        if message is None:
+            message = "Expected %s but did not get it." % (expected)
         # other listed expectations are child classes of Exception
         index = self.telnet_process.expect([expected, pexpect.EOF, pexpect.TIMEOUT], timeout=timeout) # 2 seconds max
         #self.evalTest(index, message)
@@ -297,3 +306,31 @@ def kill_all_running_miville():
             raise
         except OSError,e :
             pass
+
+def get_env_variable(key):
+    """
+    Returns the value of an environment variable.
+    
+    Catches the errors in case there are some.
+    """
+    ret = None
+    try:
+        ret = os.environ[key]
+    except KeyError:
+        pass
+    return ret
+
+def get_test_remote_host():
+    """
+    Returns the configured remote miville host IP for a test.
+
+    Used for testing with two computers.
+    Looks for environment variables.
+    Example in bash:
+    export MIVILLE_TEST_REMOTE_HOST="10.10.10.65" 
+    """
+    ret = get_env_variable('MIVILLE_TEST_REMOTE_HOST')
+    if ret is None:
+        ret = '127.0.0.1' # default
+    return ret
+
