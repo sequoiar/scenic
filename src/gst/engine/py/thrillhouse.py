@@ -414,16 +414,39 @@ class MilhouseTests():
         audiocodec = 'mp3'
         recv, send = self.argfactory('audiovideo')
         send.audiocodec = audiocodec
-        send.numchannels = 2
         recv.audiocodec = audiocodec
         self.run(recv, send)
 
+    def test_28_wrong_ports(self):
+        """ Feed equal videoport and audioport values to milhouse """
+        recv, send = self.argfactory('audiovideo')
+        recv.audioport = 10000
+        recv.videoport = 10000
+        send.audioport = 10000
+        send.videoport = 10000
+        self.run(recv, send)
+    
+    def test_29_wrong_channels_mp3(self):
+        """ Feed wrong number of channels to milhouse for mp3 """
+        recv, send = self.argfactory('audio')
+        audiocodec = 'mp3'
+        recv.audiocodec = audiocodec
+        send.audiocodec = audiocodec
+        send.numchannels = 3
+        self.run(recv, send)
 
-
+    def test_30_right_channels_mp3(self):
+        """ Feed wrong number of channels to milhouse for mp3 """
+        recv, send = self.argfactory('audio')
+        audiocodec = 'mp3'
+        recv.audiocodec = audiocodec
+        send.audiocodec = audiocodec
+        send.numchannels = 2
+        self.run(recv, send)
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_27')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_01')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

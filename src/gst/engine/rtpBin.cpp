@@ -38,7 +38,7 @@ int RtpBin::sessionCount_ = 0;
 bool RtpBin::destroyed_ = false;
 
 
-std::vector<std::string> RtpBin::sessionNames_;
+std::map<int, std::string> RtpBin::sessionNames_;
 
 void RtpBin::init()
 {

@@ -23,7 +23,7 @@
 #ifndef _RTP_BIN_H_
 #define _RTP_BIN_H_
 
-#include <vector>
+#include <map>
 
 class RemoteConfig;
 class _GstElement;
@@ -36,14 +36,19 @@ class RtpBin
         void init();
 
     protected:
-        RtpBin() : rtcp_sender_(0), rtcp_receiver_(0) { ++sessionCount_; }
+        RtpBin() : rtcp_sender_(0), rtcp_receiver_(0), sessionId_(-1) 
+        { 
+            ++sessionCount_; 
+            sessionId_ = sessionCount_ - 1;  // 0 based
+        }
         static const char *padStr(const char *padName);
 
         static _GstElement *rtpbin_;
         static bool destroyed_;
         static int sessionCount_;
         _GstElement *rtcp_sender_, *rtcp_receiver_;
-        static std::vector<std::string> sessionNames_;
+        int sessionId_;
+        static std::map<int, std::string> sessionNames_;
 
     private:
         static const int REPORTING_PERIOD_MS = 5000;

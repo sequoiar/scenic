@@ -27,7 +27,7 @@
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "rtpSender.h"
-#include "audioLevel.h"
+//#include "audioLevel.h"
 
 class AudioSource;
 class Encoder;
@@ -45,7 +45,7 @@ class AudioSender
 
     private:
         void init_source();
-        void init_level();
+// void init_level();
         void init_codec();
         void init_payloader();
 
@@ -53,7 +53,7 @@ class AudioSender
         const SenderConfig remoteConfig_;
         RtpSender session_;
         AudioSource *source_;
-        AudioLevel level_;
+        //AudioLevel level_;
 
         Encoder *encoder_;
         RtpPay *payloader_;

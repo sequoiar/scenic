@@ -35,8 +35,7 @@
 RtpSender::~RtpSender()
 {
     Pipeline::Instance()->remove(&rtp_sender_);
-    // FIXME GROSS!
-    sessionNames_.erase(sessionNames_.begin() + (sessionCount_ - 1));
+    sessionNames_.erase(sessionId_); // remove session name by id
 }
 
 
@@ -49,7 +48,7 @@ std::string RtpSender::getCaps() const
 void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
 {
     RtpBin::init();
-    sessionNames_.push_back(config.codec());
+    sessionNames_[sessionId_] = config.codec();
 
     GstPad *send_rtp_sink;
     GstPad *send_rtp_src;

@@ -35,10 +35,16 @@ AudioSender::AudioSender(const AudioSourceConfig aConfig, const SenderConfig rCo
     remoteConfig_(rConfig), 
     session_(), 
     source_(0), 
-    level_(), 
+    //level_(), 
     encoder_(0), 
     payloader_(0)
-{}
+{
+    if (remoteConfig_.codec() == "mp3")
+    {
+        if (audioConfig_.numChannels() < 1 or audioConfig_.numChannels() > 2)
+            THROW_CRITICAL("MP3 only accepts 1 or 2 channels, not " << audioConfig_.numChannels());
+    }
+}
 
 /// Destructor 
 AudioSender::~AudioSender()
@@ -64,11 +70,13 @@ void AudioSender::init_source()
 }
 
 
+#if 0
 void AudioSender::init_level()
 {
     level_.init();
     gstlinkable::link(*source_, level_);
 }
+#endif
 
 
 void AudioSender::init_codec()

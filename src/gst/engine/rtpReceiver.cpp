@@ -55,8 +55,7 @@ RtpReceiver::~RtpReceiver()
     // make sure we found it and remove it
     assert(iter != depayloaders_.end());
     depayloaders_.erase(iter);
-    // FIXME GROSS!
-    sessionNames_.erase(sessionNames_.begin() + (sessionCount_ - 1));
+    sessionNames_.erase(sessionId_);
 
 #ifdef CONFIG_DEBUG_LOCAL
     if (control_)
@@ -177,7 +176,7 @@ GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(GstPad *srcPad)
 void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 {
     RtpBin::init();
-    sessionNames_.push_back(config.codec());
+    sessionNames_[sessionId_] = config.codec();
 
     // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
     // rule of thumb: 2-3 times the maximum network jitter

@@ -26,12 +26,7 @@
 #define _PORTS_H_
 
 namespace ports {
-        static const int A_PORT = 12345; // arbitrary port numbers
-        static const int V_PORT = 23456;
-        // FIXME: get rid of AUDIO_CAPS_PORT and VIDEO_CAPS_PORT
-        static const int AUDIO_CAPS_PORT = 34567; 
-        static const int VIDEO_CAPS_PORT = 45678; 
-        static const int CAPS_OFFSET = 20;
+        static const int CAPS_OFFSET = 9;
 }
 
 #endif // _PORTS_H_

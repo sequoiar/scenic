@@ -401,29 +401,7 @@ void LameEncoder::init()
     AudioConvertedEncoder::init();
     codec_ = Pipeline::Instance()->makeElement("lame", NULL);
     gstlinkable::link(aconv_, codec_);
-    // check that aconv has 1 or 2 channels only on its src pad
-    checkNumChannels();
 }
-
-void LameEncoder::checkNumChannels()
-{
-    // this is messed up, maybe needs to be playing?
-#if 0
-    GstPad *srcPad = gst_element_get_static_pad(aconv_, "src");
-    LOG_DEBUG(gst_caps_to_string(gst_pad_get_negotiated_caps(srcPad)));
-    GstStructure *structure = gst_caps_get_structure(gst_pad_get_negotiated_caps(srcPad), 0);
-
-    const GValue *val = gst_structure_get_value(structure, "channels");
-    int numChannels = g_value_get_int(val);
-    LOG_DEBUG("WE have " << numChannels);
-
-    if (numChannels < 1 or numChannels > 2)
-        THROW_ERROR("Cannot have less than one channel or more than 2 channels for mp3 audio");
-    
-    gst_object_unref(srcPad);
-#endif
-}
-
 
 /// Constructor
 MadDecoder::MadDecoder()

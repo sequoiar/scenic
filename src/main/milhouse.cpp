@@ -130,6 +130,10 @@ short pof::run(int argc, char **argv)
     if(!disableAudio and !options["audioport"])
         THROW_CRITICAL("argument error: missing audioport. see --help");
 
+    if (!disableAudio and !disableVideo)
+        if (static_cast<int>(options["videoport"]) == static_cast<int>(options["audioport"]))
+            THROW_CRITICAL("Videoport and audioport cannot be equal");
+
     if (options["receiver"]) 
     {
         LOG_DEBUG("Running as receiver");
@@ -274,8 +278,9 @@ int main(int argc, char **argv)
         set_handler();
         ret = pof::run(argc, argv);
     }
-    catch (std::exception)
+    catch (Except e)
     {
+        std::cout << e.msg_ << std::endl;
         ret = 1;
     }
     //LOG_INFO("\x1b[r\x1b[10BBuilt on " << __DATE__ << " at " << __TIME__);
