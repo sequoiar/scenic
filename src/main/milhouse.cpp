@@ -29,8 +29,6 @@
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
 
-#define BLOCK(x) gutil::runMainLoop(x); 
-
 namespace pof 
 {
     short run(int argc, char **argv);
@@ -181,11 +179,11 @@ short pof::run(int argc, char **argv)
                 vRx->makeFullscreen();
         }
 
-        int timeout = 0;
+        int timeout = 0;    // default: run indefinitely
         if (options["timeout"]) // run for finite amount of time
             timeout = options["timeout"];
         
-        BLOCK(timeout);
+        gutil::runMainLoop(timeout);
 
         assert(playback::isPlaying() or playback::quitted());
 
@@ -253,7 +251,7 @@ short pof::run(int argc, char **argv)
         if (options["timeout"]) // run for finite amount of time
             timeout = options["timeout"];
         
-        BLOCK(timeout);
+        gutil::runMainLoop(timeout);
         
         assert(playback::isPlaying() or playback::quitted());
 

@@ -40,7 +40,7 @@ class Arg(object): # new style!!
     def __init__(self):
         """ Init with address and timeout defaults """
         self.address = '127.0.0.1'   # always need this guy
-        self.timeout = 10000
+        self.timeout = 100000
     
     def __str__(self):
         """ Returns a list of this class' data members and their values, 
@@ -104,7 +104,6 @@ class AudioRecvArg(AudioArg):
         """ Default for audiosink is jackaudiosink, the jack output plugin """
         AudioArg.__init__(self)
         self.audiosink = 'jackaudiosink'
-        self.audio_buffer_usec = 30000  # longer for test safety
 
 
 class AudioVideoRecvArg(AudioRecvArg, VideoRecvArg):

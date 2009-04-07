@@ -30,7 +30,7 @@
 class AudioSource;
 class AudioSink;
 
-/// Immutable class that is used to parameterize AudioLocal and AudioSender objects. 
+/// Immutable class that is used to parameterize AudioSender objects. 
 class AudioSourceConfig
 {
     public:
