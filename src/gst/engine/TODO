@@ -1,4 +1,3 @@
--keep a list of all active ports and throw an exception if we try to reuse used ports
 -test and write about latency rtp issues/testing with netem scripts and so on
 -use mapmsg to get stats to hugo
 -fix glvideosink's black at startup/until fullscreen bug

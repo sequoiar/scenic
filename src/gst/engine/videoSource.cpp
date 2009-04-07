@@ -105,7 +105,7 @@ VideoTestSource::~VideoTestSource()
 
 /// Constructor
 VideoFileSource::VideoFileSource(const VideoSourceConfig &config) : 
-    VideoSource(config), decoder_(0) 
+    VideoSource(config), decoder_(0), queue_(0) 
 {}
 
 void VideoFileSource::init()
@@ -116,15 +116,17 @@ void VideoFileSource::init()
     assert(config_.fileExists());
     g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
     gstlinkable::link(source_, decoder_);
+    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
+
 
     // bind callback
     g_signal_connect(decoder_, "new-decoded-pad",
             G_CALLBACK(VideoFileSource::cb_new_src_pad),
-            static_cast<void *>(this));
+            static_cast<void *>(queue_));
 }
 
 
-void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/, void * /*data*/)
+void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/, void * data)
 {
     if (gst_pad_is_linked(srcPad))
     {
@@ -134,20 +136,10 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
     GstStructure *str;
     GstPad *sinkPad;
     GstCaps *caps;
-    GstElement *sinkElement;
+    // now we can link our queue to our new decodebin element
+    GstElement *sinkElement = static_cast<GstElement*>(data);
 
-    // FIXME: HACK ATTACK!!!!
-    // looks for element named colorspc in pipeline, which 
-    // will be the case for VideoSender. for VideoLocal, 
-    // it will look for videosink. 
-    sinkElement = Pipeline::Instance()->findElement("colorspc");
 
-    if (!sinkElement)       // we're local!
-    {
-        sinkElement = Pipeline::Instance()->findElement("videosink");
-        g_object_set(G_OBJECT(sinkElement), "sync", TRUE, NULL);
-    }
-    
     assert(sinkElement);
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
 
@@ -177,6 +169,7 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
 VideoFileSource::~VideoFileSource()
 {
     Pipeline::Instance()->remove(&decoder_);
+    Pipeline::Instance()->remove(&queue_);
 }
 
 

@@ -81,10 +81,11 @@ class VideoFileSource
 
     private:
         ~VideoFileSource();
-        _GstElement *srcElement() { return 0; }      // FIXME: HACK
+        _GstElement *srcElement() { return queue_; }      
         void init();
 
         _GstElement *decoder_;
+        _GstElement *queue_;
         static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, int last,
                                    void *data);
 
