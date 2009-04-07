@@ -32,7 +32,6 @@
 namespace pof 
 {
     short run(int argc, char **argv);
-    const short NUM_CHANNELS = 2;
 
 #ifdef HAVE_BOOST
     using namespace boost;

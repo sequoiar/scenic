@@ -40,7 +40,7 @@ class Arg(object): # new style!!
     def __init__(self):
         """ Init with address and timeout defaults """
         self.address = '127.0.0.1'   # always need this guy
-        self.timeout = 100000
+        self.timeout = 10000000
     
     def __str__(self):
         """ Returns a list of this class' data members and their values, 
@@ -443,9 +443,14 @@ class MilhouseTests():
         send.numchannels = 2
         self.run(recv, send)
 
+    def test_31_raw_only(self):
+        """ Just audio """
+        recv, send = self.argfactory('audio')
+        self.run(recv, send)
+
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_01')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_31')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__
