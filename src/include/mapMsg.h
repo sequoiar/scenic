@@ -46,6 +46,7 @@ friend std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
         operator double ()const;
         operator bool ()const;
 
+        bool operator==(const StrIntFloat& sif);
         bool operator==(const std::string& in);
         StrIntFloat& operator=(const std::string& in);
         StrIntFloat& operator=(const int& in);
@@ -53,7 +54,7 @@ friend std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
         StrIntFloat& operator=(const double& in);
         StrIntFloat& operator=(const std::vector<double>& in);
 
-        StrIntFloat(const StrIntFloat& sif_);
+        StrIntFloat(const StrIntFloat& sif);
         StrIntFloat& operator=(const StrIntFloat& in);
     private:
         char type_;

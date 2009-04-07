@@ -131,7 +131,7 @@ short pof::run(int argc, char **argv)
         THROW_CRITICAL("argument error: missing audioport. see --help");
 
     if (!disableAudio and !disableVideo)
-        if (static_cast<int>(options["videoport"]) == static_cast<int>(options["audioport"]))
+        if (options["videoport"] == options["audioport"])
             THROW_CRITICAL("Videoport and audioport cannot be equal");
 
     if (options["receiver"]) 

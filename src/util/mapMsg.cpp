@@ -111,6 +111,19 @@ StrIntFloat::operator double ()const {
     TYPE_CHECKMSG(f_,double);
 }
 
+bool StrIntFloat::operator==(const StrIntFloat& in) {
+    if(type_ != in.type_) return false;
+    switch(type_)
+    {
+        case 's': return (s_ == in.s_);
+        case 'i': return (i_ == in.i_);
+        case 'f': return (f_ == in.f_);
+
+
+    }
+    return false;
+}
+
 bool StrIntFloat::operator==(const std::string& in) {
     if(type_ != 's') return false;
     return (s_ == in);
