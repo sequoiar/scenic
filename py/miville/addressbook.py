@@ -108,7 +108,7 @@ class AddressBook(object):
         name = self._get_name(name)
         contact = self.contacts[name]
 
-        if new_name is None and setting is None and address is None and port is None:
+        if new_name is None and setting is None and address is None and port is None and auto_answer is None:
             raise AddressBookError, 'No property to change.'
 
         new_name = to_utf(new_name)
