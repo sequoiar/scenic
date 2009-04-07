@@ -191,7 +191,7 @@ def kill_process(process):
                 verb( "closing %s" % process.name )
                 process.close()
         except Exception, e:
-            verb( "Error killing process", e )
+            verb( "Error killing process" +  str(e) )
 
         try:
             if (process.isalive() == True):
@@ -200,7 +200,7 @@ def kill_process(process):
                 if (process.isalive() == True):
                     process.kill(9)
         except Exception, e:
-            verb( "Error killing process", e )
+            verb( "Error killing process" + str(e) )
 
 # ---------------------------------------------------------------------
 # System test classes
