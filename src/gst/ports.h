@@ -26,6 +26,8 @@
 #define _PORTS_H_
 
 namespace ports {
+        static const int RTCP_FIRST_OFFSET = 1;
+        static const int RTCP_SECOND_OFFSET = 5;
         static const int CAPS_OFFSET = 9;
 }
 

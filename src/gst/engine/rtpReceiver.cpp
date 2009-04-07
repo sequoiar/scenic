@@ -196,11 +196,11 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     g_object_set(rtp_receiver_, "port", config.port(), NULL);
 
     rtcp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
-    g_object_set(rtcp_receiver_, "port", config.port() + 1, NULL);
+    g_object_set(rtcp_receiver_, "port", config.rtcpFirstPort(), NULL);
 
     rtcp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
     g_object_set(rtcp_sender_, "host", config.remoteHost(), "port",
-            config.port() + 5, "sync", FALSE, "async", FALSE, NULL);
+            config.rtcpSecondPort(), "sync", FALSE, "async", FALSE, NULL);
 
     assert(recv_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_")));
     assert(send_rtcp_src = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_")));

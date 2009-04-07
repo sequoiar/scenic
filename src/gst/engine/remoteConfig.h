@@ -24,15 +24,17 @@
 #define _REMOTE_CONFIG_H_
 
 #include <string>
+#include <set>
+#include "../ports.h"
 
 class Encoder;
 class VideoEncoder;
 class Decoder;
 
 /** 
- *      Immutable class that is used to setup rtp using objects.
- *
+ *      Immutable class that is used to setup rtp
  */
+
 class RemoteConfig 
 {
     public:
@@ -44,12 +46,17 @@ class RemoteConfig
         RemoteConfig(const RemoteConfig& m)
             : codec_(m.codec_), remoteHost_(m.remoteHost_), port_(m.port_) {}
 
-        virtual ~RemoteConfig() {}
+        virtual ~RemoteConfig(){};
 
         int port() const { return port_; }
+        int rtcpFirstPort() const { return port_ + ports::RTCP_FIRST_OFFSET; }
+        int rtcpSecondPort() const { return port_ + ports::RTCP_SECOND_OFFSET; }
+        int capsPort() const { return port_ + ports::CAPS_OFFSET; }
         const char *remoteHost() const { return remoteHost_.c_str(); }
         bool hasCodec() const { return !codec_.empty(); }
         std::string codec() const { return codec_; }
+        void checkPorts() const;
+        void cleanupPorts() const;
 
     protected:
 
@@ -58,6 +65,7 @@ class RemoteConfig
         const int port_;
         static const int PORT_MIN;
         static const int PORT_MAX;
+        static std::set<int> usedPorts_;
 
     private:
         RemoteConfig& operator=(const RemoteConfig&); //No Assignment Operator

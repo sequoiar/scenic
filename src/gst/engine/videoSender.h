@@ -36,12 +36,8 @@ class VideoSender
     : public SenderBase 
 {
     public:
-         VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig) 
-            : videoConfig_(vConfig), remoteConfig_(rConfig), session_(), source_(0), 
-            encoder_(0), payloader_(0) {}
-
+         VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig);
         ~VideoSender();
-
         std::string getCaps() const;
 
     private:

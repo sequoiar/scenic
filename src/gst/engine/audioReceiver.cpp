@@ -44,11 +44,13 @@ AudioReceiver::AudioReceiver(const AudioSinkConfig aConfig, const ReceiverConfig
     sink_(0)
 { 
     assert(remoteConfig_.hasCodec()); 
+    remoteConfig_.checkPorts();
 }
 
 /// Destructor 
 AudioReceiver::~AudioReceiver()
 {
+    remoteConfig_.cleanupPorts();
     delete sink_;
     delete decoder_;
     delete depayloader_;

@@ -63,11 +63,11 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     g_object_set(rtp_sender_, "host", config.remoteHost(), "port", config.port(), NULL);
     
     rtcp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
-    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.port() + 1,
+    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.rtcpFirstPort(),
                  "sync", FALSE, "async", FALSE, NULL);
 
     rtcp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
-    g_object_set(rtcp_receiver_, "port", config.port() + 5, NULL);
+    g_object_set(rtcp_receiver_, "port", config.rtcpSecondPort(), NULL);
     
 
     // FIXME: are the padStr calls necessary for request pads, or will the send_rtp_sink_%d pattern suffice?

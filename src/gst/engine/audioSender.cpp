@@ -39,6 +39,7 @@ AudioSender::AudioSender(const AudioSourceConfig aConfig, const SenderConfig rCo
     encoder_(0), 
     payloader_(0)
 {
+    remoteConfig_.checkPorts();
     if (remoteConfig_.codec() == "mp3")
     {
         if (audioConfig_.numChannels() < 1 or audioConfig_.numChannels() > 2)
@@ -49,6 +50,7 @@ AudioSender::AudioSender(const AudioSourceConfig aConfig, const SenderConfig rCo
 /// Destructor 
 AudioSender::~AudioSender()
 {
+    remoteConfig_.cleanupPorts();
     delete payloader_;
     delete encoder_;
     delete source_;

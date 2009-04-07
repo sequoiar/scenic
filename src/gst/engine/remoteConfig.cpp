@@ -30,13 +30,50 @@
 const int RemoteConfig::PORT_MIN = 1024;
 const int RemoteConfig::PORT_MAX = 65000;
 
+
+std::set<int> RemoteConfig::usedPorts_;
         
 RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remoteHost__,
         int port__) : codec_(codec__), remoteHost_(remoteHost__), port_(port__)
 {
+}
+
+
+// Can't be called from destructor, as sometime this object is copied and
+// we don't want the ports destroyed prematurely
+void RemoteConfig::cleanupPorts() const
+{
+    usedPorts_.erase(capsPort());
+    usedPorts_.erase(rtcpSecondPort());
+    usedPorts_.erase(rtcpFirstPort());
+    usedPorts_.erase(port());
+}
+
+
+/// Make sure there are no port clashes (at least as far as this gst process can tell)
+void RemoteConfig::checkPorts() const
+{
     if (port_ < PORT_MIN || port_ > PORT_MAX)
         THROW_ERROR("Invalid port " << port_ << ", must be in range [" 
                 << PORT_MIN << "," << PORT_MAX << "]");  
+
+    if (usedPorts_.find(port()) != usedPorts_.end())
+        THROW_ERROR("Invalid port " << port() << ", already in use");
+
+    if (usedPorts_.find(rtcpFirstPort()) != usedPorts_.end())
+        THROW_ERROR("Invalid port " << port() << ", its rtcp port " << rtcpFirstPort() << " is already in use");
+
+    if (usedPorts_.find(rtcpSecondPort()) != usedPorts_.end())
+        THROW_ERROR("Invalid port " << port() << ", its rtcp port " << rtcpSecondPort() << " is already in use");
+
+    if (usedPorts_.find(capsPort()) != usedPorts_.end())
+        THROW_ERROR("Invalid port " << port() << ", its caps port " << capsPort() << " is already in use");
+
+    // add our ports now that we know they're available
+    usedPorts_.insert(port());
+    usedPorts_.insert(rtcpFirstPort());
+    usedPorts_.insert(rtcpSecondPort());
+    usedPorts_.insert(capsPort());
 }
 
 

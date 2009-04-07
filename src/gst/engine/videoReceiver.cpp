@@ -41,10 +41,12 @@ VideoReceiver::VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig
     gotCaps_(false) 
 {
     assert(remoteConfig_.hasCodec()); 
+    remoteConfig_.checkPorts();
 }
 
 VideoReceiver::~VideoReceiver()
 {
+    remoteConfig_.cleanupPorts();
     delete sink_;
     delete depayloader_;
     delete decoder_;

@@ -31,6 +31,14 @@
 #include "remoteConfig.h"
 #include "codec.h"
 
+/// Constructor
+VideoSender::VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig) : 
+    videoConfig_(vConfig), remoteConfig_(rConfig), session_(), source_(0), 
+    encoder_(0), payloader_(0) 
+{
+    remoteConfig_.checkPorts();
+}
+
 
 /// Returns the capabilities of this VideoSender's RtpSession 
 std::string VideoSender::getCaps() const
@@ -42,6 +50,7 @@ std::string VideoSender::getCaps() const
 
 VideoSender::~VideoSender()
 {
+    remoteConfig_.cleanupPorts();
     delete payloader_;
     delete encoder_;
     delete source_;
