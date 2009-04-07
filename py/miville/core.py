@@ -62,7 +62,7 @@ class MivilleConfiguration(object):
     def __init__(self, dictionary=None):
         self.verbose = False # useless so far
         # network
-        self.com_chan_port = 37054
+        self.com_chan_port = 31054
         self.telnet_port = 14444
         self.connector_port = 2222
         self.web_port = 8080
@@ -98,9 +98,6 @@ class Core(Subject):
     def __init__(self, config_object):
         """
         defines attributes and does the startup routine.
-
-        If Miville is started by any argument on the CLI, its basic connector will listen on port 
-        37055 instead of the default 37054. Useful for debugging.
 
         :arg config: MivilleConfiguration instance.
         """

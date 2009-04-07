@@ -46,7 +46,7 @@ from miville.utils import log
 log = log.start('debug', 1, True, 'com_chan') # LOG TO FILE = True
 
 # constants
-PORT = 37054
+PORT = 31054
 
 # module's globals
 # dict of Connection instances.
@@ -172,7 +172,7 @@ class ComChanClient(pb.Referenceable, ComChannel):
     """
     remote_main = ComChannel.main
     
-    def connect(self, name, address, port=37054):
+    def connect(self, name, address, port=31054):
         self.factory = ComChanClientFactory(self)
         reactor.connectTCP(address, port, self.factory)
         deferred = self.factory.login(credentials.UsernamePassword(name, "pofword"), client=self)
