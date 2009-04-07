@@ -4,7 +4,6 @@ SUBDIRS = miville maugis docs
 
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 trial
 
-#        test/check_ping.py \
 TESTS = test/test_addressbook.py \
         test/test_commands.py \
         test/test_common.py \
@@ -18,6 +17,8 @@ TESTS = test/test_addressbook.py \
         test/check_milhouse_ipcp_sync.py \
         test/check_devices.py \
         test/check_miville_starts.py 
+
+# temporarily removed: check_ping.py
 
 # new tests to fix (alex)
 #        test/test_devices.py \
