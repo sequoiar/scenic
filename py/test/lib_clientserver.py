@@ -34,7 +34,7 @@ import sys
 import tempfile
 import commands
 import string
-from miville.utils.common import get_def_name
+# from miville.utils.common import get_def_name
 
 # module variables
 VERBOSE = False
@@ -69,6 +69,16 @@ def make_tmp_dir():
     if VERBOSE:
         print "Created %s/ directory." % (tmp)
     return tmp
+
+def open_logfile(self, path, filename):
+    """
+    Opens a file name to write and returns its handle. 
+    If the directory doesn't exist, creates it.
+    """
+    os.makedirs(path)
+    fullpath = os.path.join(path, filename)
+    return open(fullpath, 'w')
+
 
 def shell_command(txt):
     """
@@ -192,7 +202,7 @@ class Process(object):
             return False
         return self.child.isalive()
 
-    def start_process(self):
+    def start(self):
         """
         Starts the process
         """
@@ -207,9 +217,10 @@ class Process(object):
         except pexpect.ExceptionPexpect, e:
             echo("Error starting process %s." % (command))
             raise
-        # self.sleep(0.5) # seconds
+        # TODO: rm me
+        self.sleep(0.5) # seconds
         if not self.is_running():
-            raise Exception("Process could not be started. Not running. Is an other similar process already running ? %s" % (self.command))
+            raise Exception("Process could not be started. Not running. Is an other similar process already running ? %s" % (command))
     
     def expect_test(self, expected, message=None, timeout=-1):
         """
@@ -256,7 +267,7 @@ class Process(object):
         end = time.time() + duration
         while time.time() < end:
             time.sleep(0.01)
-            self.flush()
+            self.flush_output()
 
     def make_command(self):
         """
@@ -271,11 +282,14 @@ class ClientServerTester(object):
     """
     SERVER_CLASS = Process
     CLIENT_CLASS = Process
-    def __init__(self, **kwargs):
+    def __init__(self, name, **kwargs):
         """
         Update default options here
+
+        :param name: Used as a prefix for log files.
         """
         global VERBOSE
+        self.name = name
         self.verbose = VERBOSE
         self.logfile_prefix = "default_" # TODO: use caller file name
         self.client_logfile = sys.stdout
@@ -284,10 +298,8 @@ class ClientServerTester(object):
         self.server_kwargs = {}
         self.client_kwargs = {}
         self.__dict__.update(kwargs)
-        self.server = None
         self.client = None
-        self.server = self.SERVER_CLASS(**self.server_kwargs)
-        self.client = self.CLIENT_CLASS(**self.client_kwargs)
+        self.server = None
     
     def setup(test_case):
         """
@@ -297,11 +309,16 @@ class ClientServerTester(object):
         self.test_case = test_case
         for child in (self.client, self.server):
             child.test_case = test_case
+    def prepare(self):
+        raise NotImplementedError()
 
     def start(self):
         """
         Starts server and client processes.
         """
+        self.prepare()
+        self.server = self.SERVER_CLASS(**self.server_kwargs)
+        self.client = self.CLIENT_CLASS(**self.client_kwargs)
         self.server.start()
         self.client.start()
 
@@ -341,29 +358,41 @@ class TelnetMivilleTester(ClientServerTester):
     SERVER_CLASS = MivilleProcess
     CLIENT_CLASS = TelnetProcess
 
-    def __init__(self, **kwargs):
+
+    def __init__(self, **kwargs): # name, port_offset=0, make_tmp_home=False):
+        # TODO: manage log files.
         self.port_offset = 0
         self.miville_home = "~/.miville"
-        self.server_kwargs = {}
-        self.client_kwargs = {}
+        self.make_tmp_home = False
         ClientServerTester(self, **kwargs)
 
-# -------------- TODO ----------------------
-class MilhouseProcess(Process):
-    """
-    milhouse server process
-    """
-    def make_command(self):
-        return ""
+    def prepare(self):
+        if self.make_tmp_home:
+            self.miville_home['miville_home'] = make_tmp_dir()
+        self.server_kwargs = {
+            'port_offset':self.port_offset, 
+            'miville_home':self.miville_home
+        }
+        self.client_kwargs = {
+            'port':14444 + self.port_offset
+        }
 
-class TelnetMilhouseTester(ClientServerTester):
-    """
-    Tests milhouse with telnet
-    """
-    SERVER_CLASS = MilhouseProcess
-    CLIENT_CLASS = TelnetProcess
-
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
-        ClientServerTester(self, **kwargs)
-
+# # -------------- TODO ----------------------
+# class MilhouseProcess(Process):
+#     """
+#     milhouse server process
+#     """
+#     def make_command(self):
+#         return ""
+# 
+# class TelnetMilhouseTester(ClientServerTester):
+#     """
+#     Tests milhouse with telnet
+#     """
+#     SERVER_CLASS = MilhouseProcess
+#     CLIENT_CLASS = TelnetProcess
+# 
+#     def __init__(self, name, **kwargs):
+#         self.__dict__.update(kwargs)
+#         ClientServerTester(self, name, **kwargs)
+# 

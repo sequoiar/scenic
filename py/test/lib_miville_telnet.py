@@ -123,7 +123,7 @@ class MivilleTester(object):
                 self.miville_process = pexpect.spawn(command, logfile=self.miville_logfile, timeout=0.01) # ProcessOutputLogger(logPrefix, color)
             else:
                 self.miville_process = pexpect.spawn(command)
-            self.miville_process.expect(["Miville is now ready"], 2.0) # self.sleep(0.9) # seconds
+            self.miville_process.expect(["Miville is ready"], 2.0) # self.sleep(0.9) # seconds
             if self.is_running(self.miville_process) == False:
                 raise Exception("Process %s could not be started. Not running. Is an other miville running at the same time?" % (command))
         except pexpect.ExceptionPexpect, e:
