@@ -25,10 +25,14 @@ from miville.engines import audiovideogst
 
 log = log.start('debug', 1, 0, 'gstchannel')
 
+# Notitification for stream process state change (1 notif per streaming session)
+#  timeout: tbd 5 sec 
+#  info: state, contact name, error message
+#        states are: stopped, starting, started
+#        
 def _create_stream_engines( listener, mode, procs_params):
     """
-    Returns list of new stream engines. 
-    
+    Returns list of new stream engines.    
     AudioVideoGst instances.
     """
     engines = []
@@ -44,10 +48,15 @@ def _create_stream_engines( listener, mode, procs_params):
                     engine =  audiovideogst.AudioVideoGst()
                 else:
                     raise StreamsError, 'Engine "%s" is not supported' %  engine_name
-
             engine.apply_settings(listener, mode, stream_name, stream_params)
         engines.append(engine)
     return engines
+
+
+REMOTE_STREAMING_CMD = "start_streaming"
+STOP_RECEIVERS_CMD   = "stop_receivers"
+RECEIVERS_STOPPED    = "receivers_stopped"
+STOP_SENDERS_CMD     = "stop_senders"
 
 
 class GstChannel(object):
@@ -68,7 +77,39 @@ class GstChannel(object):
         self.sender_procs_params = None
         self.receiver_engines = None
         self.sender_engines = None
-        
+    
+    def initiate_streaming(self, rx_params, tx_params, rx_remote_params, tx_remote_params):
+        self.receiver_procs_params = rx_params
+        self.sender_procs_params = tx_params
+        self.start_local_gst_processes(self.receiver_procs_params,  self.sender_procs_params)
+        self.send_message(REMOTE_STREAMING_CMD,[rx_remote_params, tx_remote_params] )
+    
+    def terminate_streaming(self):
+        """
+        Quits the milhouse processes. this initiates a sequence of events:
+            local rx processes are stopped
+            STOP_RECEIVERS_CMD msg sent to the remote miville
+            remote miville stops both rx and tx processes 
+            RECEIVERS_STOPPED msg sent back to the local miville
+            local miville stops tx processes
+        """
+        self._stop_local_rx_procs()
+        self.send_message(STOP_RECEIVERS_CMD)
+    
+    def _stop_local_rx_procs(self):
+        log.info("Stopping rx processes")
+        for engine in engines:
+            if engine.mode.upper().startswith("RECEIVE"):
+                engine.stop_streaming()    
+    
+    def _stop_local_tx_procs(self):
+        log.info("Stop tx processes")
+        for engine in engines:
+            if engine.mode.upper().startswith("SEND"):
+                engine.stop_streaming()        
+    
+    
+    
     def on_remote_message(self, key, args=None):
         """
         Called by the com_chan whenever a message is received from the remote contact 
@@ -81,12 +122,23 @@ class GstChannel(object):
         """
         caller = None
         log.debug('GstChannel.on_remote_message: %s : %s' %  (key, str(args) )  )
-            
-        if key == "remote_gst_params":
-            self.api.notify(caller, "Got remote params", "info" )
+        if key == "remote_gst_stop":
+            self.api.notify(caller, "Got remote stop streaming message")
+                
+        if key == REMOTE_STREAMING_CMD:
+            self.api.notify(caller, "Got remote GST parameters", "info" )
             rx_params = args[0]
             tx_params = args[1]
+            self.api.notify(caller, "Starting GST processes", "info" )
             self.start_local_gst_processes(rx_params, tx_params )
+        
+        elif key ==  STOP_RECEIVERS_CMD:
+            self._stop_local_rx_procs()
+            self.send_message(RECEIVERS_STOPPED)
+            self._stop_local_tx_procs()
+            
+        elif key ==  RECEIVERS_STOPPED:
+            self._stop_local_tx_procs()
             
         else:
             log.error("Unknown message in settings channel: " + key +  " args: %s"  % str(args) )
@@ -99,9 +151,8 @@ class GstChannel(object):
             log.debug('GstChannel._start_stream_engines: ' + str(engine))
             engine.start_streaming()
             
-    def stop_streaming(self):
-        pass # TODO 
-        
+  
+            
     def start_local_gst_processes(self, rx_params, tx_params):
         """
         creates processses and send init messages
@@ -122,7 +173,6 @@ class GstChannel(object):
         log.debug( pprint.pformat(self.sender_procs_params)) 
         self.sender_engines = _create_stream_engines(self.api, 'send', self.sender_procs_params)
         self._start_stream_engines(self.sender_engines)        
-        
             
     def send_message(self, key, args_list=[]):
         """

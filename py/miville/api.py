@@ -592,67 +592,52 @@ class ControllerApi(object):
         
 
     ### Streams ###
-
+    
     def start_streams(self, caller, contact_name):
+        try:
+            contact, global_setting, settings_com_channel  = self._get__settings_com_chan_from_contact_name(contact_name)
+            global_setting.start_streaming(self, contact.address, settings_com_channel)
+            self.notify(caller, "streaming started")
+        except AddressBookError, e:
+                self.notify(caller, "Please select a contact prior to start streaming." + e.message, "error")   
+        except SettingsError, err:
+            self.notify(caller, err)
+        except StreamsError, err:
+            self.notify(caller, err)
+            
+    def stop_streams(self, caller, contact_name):
+        """
+        Stop all the sub-streams. (audio, video and data)
+        """
+        try:
+            contact, global_setting, settings_com_channel  = self._get__settings_com_chan_from_contact_name(contact_name)
+            global_setting.stop_streaming(contact.address, settings_com_channel)
+            self.notify(caller, "streaming stopped")
+        except AddressBookError, e:
+                self.notify(caller, "Please select a contact prior to stop streaming." + e.message, "error")   
+        except SettingsError, err:
+            self.notify(caller, err)
+        except StreamsError, err:
+            self.notify(caller, err)
+                        
+    def _get__settings_com_chan_from_contact_name(self, contact_name):
         """
         Starts all the sub-streams. (audio, video and data)
                 
         address: string or None (IP)
         """
-        log.info("start_streams: ")
-        try:
-            contact = self.adb.get_contact(contact_name)    
-            if contact.state != addressbook.CONNECTED: 
-                self.notify(caller, "You must be joined with the contact prior to start streaming.", "error")
-            else:
-                com_chan = None 
-                try:
-                    com_chan = contact.connection.com_chan
-                except Exception, e:
-                    msg = "No com_chan in start_streams(): " + e.message
-                    debug.error(msg)
-                    self.notify(caller, msg, "error")
-                else:
-                    remote_addr = contact.address
-                    try:
-                        settings_com_channel = settings.get_settings_channel_for_contact(contact.name)
-                    except KeyError, e:
-                        self.notify(caller, "No settings channel for contact", "error")
-                    else:
-                        id = contact.setting
-                        global_setting = self.settings.get_global_setting_from_id(id)
-                        address = contact.address
-                        global_setting.start_streaming(self, address, settings_com_channel)
-                        self.notify(caller, "streaming started") 
-        except AddressBookError, e:
-                self.notify(caller, "Please select a contact prior to start streaming." + e.message, "error")   
-        except SettingsError, err:
-            self.notify(caller, err)    
-        except StreamsError, err:
-            self.notify(caller, err)    
         
-
-    def stop_streams(self, caller, contact_name = None):
-        """
-        Stop all the sub-streams. (audio, video and data)
-        """
-        result = True
+        caller = None
+        contact = self.adb.get_contact(contact_name)    
+        if contact.state != addressbook.CONNECTED:
+            raise AddressBookError, "You must be joined with the contact prior to start streaming."
         try:
-            contact = self.adb.contacts[self.adb.selected]
-            id = contact.setting
-            
-            global_setting = self.settings.global_settings[id] # might cause KeyError
-            
-            address = contact.address
-            log.info("stop_streams: ")
-            global_setting.stop_streaming() #self, address)
-            
-        except SettingsError, err:
-            result = err
+            settings_com_channel = settings.get_settings_channel_for_contact(contact_name)
         except KeyError, e:
-            log.error("KeyError in stop_streams : " + e.message)
-        self.notify(caller, result)   
-
+            raise StreamsError, "No settings channel for contact"
+        id  = contact.setting
+        global_setting = self.settings.get_global_setting_from_id(id)
+        return contact, global_setting, settings_com_channel 
 
     ### Connect ###
     def start_connection(self, caller, contact=None):

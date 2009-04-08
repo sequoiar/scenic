@@ -33,17 +33,14 @@ log = log.start('debug', 1, 0, 'videoGst')
 class AudioVideoGst(GstClient):
          
     def apply_settings(self, listener, mode, stream_name, parameters ):
-       
+       self.mode = mode
        gst_parameters = []
-       
        for k,v in parameters.iteritems():
            if k not in ['engine','gst_address','gst_port']:
                gst_parameters.append( (k, v) )      
-       
        log.debug('AudioVideoGst.apply_settings ' + str(gst_parameters))
        gst_address = parameters['gst_address']
        gst_port = parameters['gst_port']
-       
        self.setup_gst_client(mode, gst_port, gst_address)
        if stream_name.upper().startswith('VIDEO'):
            self._send_cmd('video_init', gst_parameters)

@@ -117,8 +117,7 @@ def on_com_chan_connected(connection_handle, role="client"):
     chan.com_chan.add(callback, 'Gst')
     chan.api = _api
     chan.remote_addr = contact.address
-    
-    
+        
     _settings_channels_dict[chan.contact.name] = chan
     log.debug("settings.on_com_chan_connected: settings_chans: " + str(_settings_channels_dict))
     
@@ -167,7 +166,9 @@ class Settings(object):
         self.selected_media_setting = None
         #self.current_global_id = 0  [i for i in l if i<20]
         self.media_settings = media_settings
-    
+        self.load() # RTF File
+        
+        
     @staticmethod
     def get_media_setting_from_id(id):
         if media_settings.keys().__contains__(id):
@@ -497,7 +498,7 @@ class GlobalSetting(object):
         """
         Starts the audio/video/data streaming between two miville programs. 
 
-        this is where the arguments to the sropulpof processes are exchanged. 
+        this is where the arguments to the milhouse processes are exchanged. 
         A stream can be of audio or video type. 
         
         first, the settings are browsed and sorted between receiver an sender
@@ -512,18 +513,17 @@ class GlobalSetting(object):
         log.debug("REMOTE ADDRESS: " + str(remote_address) )
         remote_sender_procs_params, remote_receiver_procs_params = self._split_gst_parameters(remote_address)
         # send settings to remote miville
-        settings_channel.start_local_gst_processes(receiver_procs_params,  sender_procs_params)
-        settings_channel.send_message("remote_gst_params",[remote_receiver_procs_params, remote_sender_procs_params ] )
+        settings_channel.initiate_streaming(receiver_procs_params, sender_procs_params, remote_receiver_procs_params, remote_sender_procs_params)
         
-        
-    def stop_streaming(self):
+    def stop_streaming(self, address, settings_channel):
         """
         Stops the audio/video/data streams.
+        
+        Sends a stop command to the remote milhouse
+        For aesthetic reasons, receiver procecess are terminated before the senders 
         """
-        for id, group in self.stream_subgroups.iteritems():
-            if group.enabled:
-                log.info("stopping streaming with ") # TODO: add contact name
-                group.stop_streaming()
+        settings_channel.terminate_streaming()
+        
         
     def _get_stream_subgroup_id_from_name(self, name):
         for id in self.stream_subgroups.keys():
@@ -538,7 +538,6 @@ class GlobalSetting(object):
     
     def modify_global_setting(self, prop, value):
         modify('self', prop, value)
-        
         
     def list_stream_subgroup(self):
          return (self.stream_subgroups, self.selected_stream_subgroup)
@@ -587,10 +586,6 @@ class StreamSubgroup(object):
         self.selected_media_stream = None
         # these ids insure that every media stream has a unique name 
         self.media_stream_ids = {}
-
-    def stop_streaming(self):
-        for stream in self.media_streams:
-            stream.stop_streaming()
     
     def _find_media_stream(self, name):
         for m in self.media_streams:
@@ -716,23 +711,15 @@ class VideoStream(MediaStream):
         params = {}
         id = self.setting
         media_setting = Settings.get_media_setting_from_id(id)
-        params['port'] = self.port
-        params['engine'] = media_setting.settings['engine']
-        params['codec'] = media_setting.settings['codec']
-        params['source'] = media_setting.settings['source']
-        params['bitrate'] = int(media_setting.settings['bitrate'])
+        
         params['gst_port'] = int(media_setting.settings['GstPort'])
         params['gst_address'] = media_setting.settings['GstAddress']
+        params['port'] = self.port
+        for k,v in media_setting.settings.iteritems():
+            if not k.upper().startswith('gst'):
+                params[k] = media_setting.settings[k]   
         return params
      
-    def start_streaming(self):
-        log.info("VideoStream start_streaming: " + self.name)
-        self.engine.start_streaming()  
-    
-    def stop_streaming(self):
-        self.engine.stop_streaming()
-        self.engine = None
-        self.listener = None
 
 
 class AudioStream(VideoStream):

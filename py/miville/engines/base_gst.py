@@ -95,9 +95,10 @@ class GstServer(object):
          all_states = {-1:'NOTHING', STOPPED:'STOPPED', STARTING:'STARTING', RUNNING:'RUNNING', 
                    CONNECTING:'CONNECTING', CONNECTED:'CONNECTED', STREAMSTOPPED: 'STREAMSTOPPED',
                    STREAMINIT:'STREAMINIT', STREAMING:'STREAMING'}
-         log.debug('GstServer state changed from %s to %s handle: %s ' % (all_states[old_state], all_states[new_state], str(self) ))
+         log.info('GstServer state changed from %s to %s handle: %s ' % (all_states[old_state], all_states[new_state], str(self) ))
 
     def connection_ready(self, ipcp):
+        log.info("CONNECTION ready")
         msg = 'GstServer.connection_ready: Address: %s, Port: %s, conn %s' % (self.address, self.port, str(ipcp) )
         log.debug(msg)
         log.info('CONN: %s %s' % (ipcp, ipcp.__dict__))
@@ -223,7 +224,7 @@ class GstServer(object):
             if self.conn != None:
                 if self.state >= CONNECTED :
                     (cmd, args) = self.commands.pop()
-                    log.debug('GstServer._process_cmd: ' + cmd + " args: " + str(args) )
+                    log.info('GstServer._process_cmd: ' + cmd + " args: " + str(args) )
                     if args != None:
                         self.conn.send_cmd(cmd, *args)
                     else:
@@ -324,7 +325,7 @@ class GstProcessProtocol(protocol.ProcessProtocol):
             
     def outReceived(self, data):
         log.debug('GstProcessProtocol.outReceived server state: %d, data %s' % (self.server.state, str(data) ) )
-        log.info('   milhouse out: "%s" from %s' % (data, str(self)) )
+        log.info('GstProcessProtocol.outReceived: "%s" from %s' % (data, str(self)) )
         if self.server.state < RUNNING:
             lines = data.split('\n')
             for line in lines:
