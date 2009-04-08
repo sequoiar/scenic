@@ -127,10 +127,12 @@ int GstThread::main()
                     queue_.push(r);
                 }
             }
+#if 0
             else if(s == "levels")
             {
                 queue_.push(f);
             }
+#endif
             else if (s == "rtpstats")
             {
                 // FIXME: MAKE SURE THIS WORKS

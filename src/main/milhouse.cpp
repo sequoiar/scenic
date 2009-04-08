@@ -84,6 +84,7 @@ short pof::run(int argc, char **argv)
     options.addInt("timeout", 'z', "timeout", "time in ms to wait before quitting, 0 means run indefinitely");
     options.addInt("audio_buffer_usec", 'b', "audiobuffer", "length of receiver's audio buffer in microseconds, must be > 10000");
     options.addInt("jitterbuffer", 'g', "jitterbuffer", "length of receiver's rtp jitterbuffers in milliseconds, must be > 1");
+    options.addBool("enable_controls", 'j', "enable gui controls for jitter buffer");
 
     //telnetServer param
     options.addInt("serverport", 'y', "run as server", "port to listen on");
@@ -98,6 +99,9 @@ short pof::run(int argc, char **argv)
 
     if ((!options["sender"] and !options["receiver"]) or (options["sender"] and options["receiver"]))
         THROW_CRITICAL("argument error: must be sender OR receiver. see --help"); 
+
+    if (options["enable_controls"])
+        RtpReceiver::enableControl();
 
     if(options["serverport"])
         return telnetServer(options["sender"], options["serverport"]);

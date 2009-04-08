@@ -33,16 +33,19 @@
 #include "rtpReceiver.h"
 #include "remoteConfig.h"
 
-
-#ifdef CONFIG_DEBUG_LOCAL
 #include <gtk/gtk.h>
-GtkWidget *RtpReceiver::control_ = 0;
+
+bool RtpReceiver::controlEnabled_ = false;
 bool RtpReceiver::madeControl_ = false;
-#endif
+GtkWidget *RtpReceiver::control_ = 0;
 
 
 std::list<GstElement *> RtpReceiver::depayloaders_;
 
+void RtpReceiver::enableControl() 
+{ 
+    controlEnabled_ = true; 
+}
 
 RtpReceiver::~RtpReceiver()
 {
@@ -57,7 +60,6 @@ RtpReceiver::~RtpReceiver()
     depayloaders_.erase(iter);
     sessionNames_.erase(sessionId_);
 
-#ifdef CONFIG_DEBUG_LOCAL
     if (control_)
     {
         madeControl_ = false;
@@ -65,7 +67,6 @@ RtpReceiver::~RtpReceiver()
         LOG_DEBUG("RTP jitterbuffer control window destroyed");
         control_ = 0;
     }
-#endif
 }
 
 
@@ -230,12 +231,10 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
     gst_object_unref(GST_OBJECT(rtpReceiverSrc));
 
-#ifdef CONFIG_DEBUG_LOCAL
-    createLatencyControl();
-#endif
+    if (controlEnabled_)
+        createLatencyControl();
 }
 
-#ifdef CONFIG_DEBUG_LOCAL
 void RtpReceiver::updateLatencyCb(GtkAdjustment *adj)
 {
     unsigned val = static_cast<unsigned>(adj->value);
@@ -291,5 +290,4 @@ void RtpReceiver::createLatencyControl()
     gtk_widget_show (control_);
     madeControl_ = true;
 }
-#endif
 

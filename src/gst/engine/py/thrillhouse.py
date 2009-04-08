@@ -41,6 +41,7 @@ class Arg(object): # new style!!
         """ Init with address and timeout defaults """
         self.address = '127.0.0.1'   # always need this guy
         self.timeout = 10000000
+        self.enable_controls = True
     
     def __str__(self):
         """ Returns a list of this class' data members and their values, 
@@ -450,7 +451,7 @@ class MilhouseTests():
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_31')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_01')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

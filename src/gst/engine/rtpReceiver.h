@@ -32,10 +32,8 @@ class _GstElement;
 class _GstPad;
 class RtpPay;
 
-#ifdef CONFIG_DEBUG_LOCAL
 class _GtkAdjustment;
 class _GtkWidget;
-#endif
 
 class RtpReceiver
     : public RtpBin
@@ -48,6 +46,7 @@ class RtpReceiver
 
         void add(RtpPay * depayloader, const ReceiverConfig & config);
         static void setLatency(int latency);
+        static void enableControl();
 
     private:
         static _GstPad *getMatchingDepayloaderSinkPad(_GstPad *srcPad);
@@ -62,11 +61,10 @@ class RtpReceiver
         _GstElement *depayloader_;
         static std::list<_GstElement *> depayloaders_;
 
-#ifdef CONFIG_DEBUG_LOCAL
         static void updateLatencyCb(_GtkAdjustment *adj);
         static bool madeControl_;
         static _GtkWidget *control_;
-#endif
+        static bool controlEnabled_;
 
         RtpReceiver(const RtpReceiver&); //No Copy Constructor
         RtpReceiver& operator=(const RtpReceiver&); //No Assignment Operator
