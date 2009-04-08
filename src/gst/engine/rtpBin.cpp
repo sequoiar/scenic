@@ -141,11 +141,11 @@ gboolean RtpBin::printStatsCallback(gpointer data)
 
 const char *RtpBin::padStr(const char *padName)
 {
-    assert(sessionCount_ > 0);
+    assert(sessionCount_ > 0);  // we have a session going
     std::string result(padName);
     std::stringstream istream;
 
-    istream << sessionCount_ - 1;        // 0-based
+    istream << sessionId_;       // 0-based
     result = result + istream.str();
     return result.c_str();
 }

@@ -28,12 +28,15 @@
 #include "busMsgHandler.h"
 #include <cstring>
 
+#include <gtk/gtk.h>
+
 // NOTES:
 // Change verbose_ to true if you want Gstreamer to tell you everything that's going on
 // in the pipeline
 // This class uses the Singleton pattern
 
 Pipeline *Pipeline::instance_ = 0;
+bool Pipeline::controlEnabled_ = false;
 
 const unsigned int Pipeline::SAMPLE_RATE = 48000;
 
@@ -51,6 +54,14 @@ Pipeline::~Pipeline()
 {
     stop();
     gst_object_unref(GST_OBJECT(pipeline_));
+    if (control_)
+    {
+        madeControl_ = false;
+        gtk_widget_destroy(control_);
+        LOG_DEBUG("RTP jitterbuffer control window destroyed");
+        control_ = 0;
+        controlEnabled_ = false;
+    }
 }
 
 
@@ -122,7 +133,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
 
 void Pipeline::init()
 {
-    if (!pipeline_)
+    if (pipeline_ == 0)
     {
         gst_init(0, NULL);
         assert(pipeline_ = gst_pipeline_new("pipeline"));
@@ -137,6 +148,69 @@ void Pipeline::init()
         bus = getBus();
         gst_bus_add_watch(bus, GstBusFunc(bus_call), static_cast<gpointer>(this));
         gst_object_unref(bus);
+        if (controlEnabled_)
+            createControl();
+    }
+}
+
+
+void Pipeline::createControl()
+{
+    if (madeControl_)
+    {
+        LOG_WARNING("Control already created, not doing it again");
+        return;
+    }
+    
+    static bool gtk_initialized = false;
+    if (!gtk_initialized)
+    {
+        gtk_init(0, NULL);
+        gtk_initialized = true;
+    }
+    
+    GtkWidget *box1;
+    GtkWidget *playButton;
+    const int WIDTH = 100;
+    const int HEIGHT = 70;
+
+    /* Standard window-creating stuff */
+    GtkWidget *control = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    playButton = gtk_button_new_with_label("Pause");
+    gtk_window_set_default_size(GTK_WINDOW(control), WIDTH, HEIGHT);
+    gtk_window_set_title (GTK_WINDOW (control), "Playback control");
+
+    box1 = gtk_vbox_new (FALSE, 0);
+    gtk_container_add (GTK_CONTAINER (control), box1);
+
+    gtk_signal_connect (GTK_OBJECT (playButton), "clicked",
+            GTK_SIGNAL_FUNC(playButtonCb), NULL);
+
+    gtk_box_pack_start (GTK_BOX (box1), playButton, TRUE, TRUE, 0);
+    gtk_widget_show (playButton);
+    gtk_widget_show (box1);
+    gtk_widget_show (control);
+
+    madeControl_ = true;
+}
+
+
+void Pipeline::playButtonCb(GtkButton *button)
+{
+    gchar *label;
+    g_object_get(button, "label", &label, NULL);
+
+    if (std::string(label) == "Play")
+    {
+        gtk_button_set_label(button, "Pause");
+        Instance()->start();
+        LOG_DEBUG("Playing");
+    }
+    else if (std::string(label) == "Pause")
+    {
+        gtk_button_set_label(button, "Play");
+        Instance()->pause();
+        LOG_DEBUG("Paused");
     }
 }
 
@@ -308,6 +382,7 @@ void Pipeline::pause()
 {
     if (isPaused())        // only needs to be paused once
         return;
+    makeReady();
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
     assert(checkStateChange(ret)); // set it to paused
     LOG_DEBUG("Now paused");
@@ -412,11 +487,6 @@ GstElement *Pipeline::makeElement(const char *factoryName, const char *elementNa
     return element;
 }
 
-GstElement *Pipeline::findElement(const char *name) const
-{
-    return gst_bin_get_by_name(GST_BIN(pipeline_), name);
-}
-
 
 void Pipeline::subscribe(BusMsgHandler *obj)
 {
@@ -464,4 +534,5 @@ const char* Pipeline::getElementPadCaps(GstElement *element, const char * padNam
     gst_caps_unref(caps);
     return result;
 }
+
 

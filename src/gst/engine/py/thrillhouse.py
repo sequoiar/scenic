@@ -41,7 +41,7 @@ class Arg(object): # new style!!
         """ Init with address and timeout defaults """
         self.address = '127.0.0.1'   # always need this guy
         self.timeout = 10000000
-        self.enable_controls = True
+        #self.enable_controls = True
     
     def __str__(self):
         """ Returns a list of this class' data members and their values, 

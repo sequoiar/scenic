@@ -101,7 +101,10 @@ short pof::run(int argc, char **argv)
         THROW_CRITICAL("argument error: must be sender OR receiver. see --help"); 
 
     if (options["enable_controls"])
+    {
         RtpReceiver::enableControl();
+        //playback::enableControl();  
+    }
 
     if(options["serverport"])
         return telnetServer(options["sender"], options["serverport"]);

@@ -70,7 +70,7 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     g_object_set(rtcp_receiver_, "port", config.rtcpSecondPort(), NULL);
     
 
-    // FIXME: are the padStr calls necessary for request pads, or will the send_rtp_sink_%d pattern suffice?
+    // padStr adds a session id to the pad name, so we get the pad for this session
     send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_"));
     assert(send_rtp_sink);
     send_rtp_src = gst_element_get_static_pad(rtpbin_, padStr("send_rtp_src_"));
@@ -93,9 +93,10 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     
     // release request and static pads (in reverse order)
     gst_object_unref(GST_OBJECT(send_rtp_src)); // static pad
-    gst_object_unref(GST_OBJECT(send_rtp_sink));
-    gst_object_unref(GST_OBJECT(send_rtcp_src));
-    gst_object_unref(GST_OBJECT(recv_rtcp_sink));
+    // release request pads
+    gst_element_release_request_pad(rtpbin_, send_rtp_sink);
+    gst_element_release_request_pad(rtpbin_, send_rtcp_src);
+    gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);
 
     // release static pads (in reverse order)
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));

@@ -65,3 +65,8 @@ bool playback::quitted()
     return Pipeline::Instance()->quitted();
 }
 
+
+void playback::enableControl()
+{
+    Pipeline::enableControl();
+}

@@ -41,7 +41,7 @@ class RtpBin
             ++sessionCount_; 
             sessionId_ = sessionCount_ - 1;  // 0 based
         }
-        static const char *padStr(const char *padName);
+        const char *padStr(const char *padName);
 
         static _GstElement *rtpbin_;
         static bool destroyed_;
