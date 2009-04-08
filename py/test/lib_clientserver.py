@@ -37,7 +37,7 @@ import string
 # from miville.utils.common import get_def_name
 
 # module variables
-VERBOSE = False
+VERBOSE = True
 
 def echo(s, endl=True):
     """
@@ -212,15 +212,16 @@ class Process(object):
             if self.verbose:
                 echo('Current working dir: ' + directory)
                 echo('Starting \"%s\"' % command)
-            self.miville_process = pexpect.spawn(command, logfile=self.logfile, timeout=self.timeout_expect) 
+            #self.miville_process = pexpect.spawn(command, logfile=self.logfile, timeout=self.timeout_expect) 
+            self.child = pexpect.spawn(command, logfile=self.logfile, timeout=self.timeout_expect) 
             # TODO : add expectation here.
+            self.sleep(0.5) # seconds
         except pexpect.ExceptionPexpect, e:
             echo("Error starting process %s." % (command))
             raise
-        # TODO: rm me
-        self.sleep(0.5) # seconds
         if not self.is_running():
-            raise Exception("Process could not be started. Not running. Is an other similar process already running ? %s" % (command))
+            print "Process could not be started. Not running. Is an other similar process already running ? %s" % (command)
+            #raise Exception("Process could not be started. Not running. Is an other similar process already running ? %s" % (command))
     
     def expect_test(self, expected, message=None, timeout=-1):
         """
@@ -301,7 +302,7 @@ class ClientServerTester(object):
         self.client = None
         self.server = None
     
-    def setup(test_case):
+    def setup(self,test_case):
         """
         Should be called in the setUp method of unittest.TestCase classes.
         :param test_case: unittest.TestCase instance. Typically self. 
@@ -345,6 +346,7 @@ class MivilleProcess(Process):
     def __init__(self, **kwargs):
         self.port_offset = 0
         self.miville_home = "~/.miville"
+        self.make_tmp_home = False
         Process.__init__(self, **kwargs)
 
     def make_command(self):
@@ -364,7 +366,7 @@ class TelnetMivilleTester(ClientServerTester):
         self.port_offset = 0
         self.miville_home = "~/.miville"
         self.make_tmp_home = False
-        ClientServerTester(self, **kwargs)
+        ClientServerTester.__init__(self, **kwargs)
 
     def prepare(self):
         if self.make_tmp_home:
@@ -377,22 +379,38 @@ class TelnetMivilleTester(ClientServerTester):
             'port':14444 + self.port_offset
         }
 
-# # -------------- TODO ----------------------
-# class MilhouseProcess(Process):
-#     """
-#     milhouse server process
-#     """
-#     def make_command(self):
-#         return ""
-# 
-# class TelnetMilhouseTester(ClientServerTester):
-#     """
-#     Tests milhouse with telnet
-#     """
-#     SERVER_CLASS = MilhouseProcess
-#     CLIENT_CLASS = TelnetProcess
-# 
-#     def __init__(self, name, **kwargs):
-#         self.__dict__.update(kwargs)
-#         ClientServerTester(self, name, **kwargs)
-# 
+class MilhouseProcess(Process):
+    """
+    milhouse tcp server process
+    """
+    def __init__(self, **kwargs): # mode=[r|s], serverport=9000
+        if ( self.mode != "r" or self.mode != "s" ):  # s|r: sender or receiver
+            raise NoMode
+        # milhouse should always start with port between 9000 and 9999
+        if ( self.serverport < 9000 or self.serverport > 9999):  
+            raise BadServerPort
+        Process.__init__(self, **kwargs)
+
+    def make_command(self):
+        command = "milhouse -%s --serverport %s" % (self.mode, self.serverport)
+        return command
+
+class TelnetMilhouseTester(ClientServerTester):
+    """
+    Tests milhouse with telnet
+    """
+    SERVER_CLASS = MilhouseProcess
+    CLIENT_CLASS = TelnetProcess
+    
+    def __init__(self, name, **kwargs):
+        self.__dict__.update(kwargs)
+        ClientServerTester(self, name, **kwargs)
+    
+    def prepare(self):
+        self.server_kwargs = {
+            'mode':self.mode, 
+            'serverport':self.serverport
+        }
+        self.client_kwargs = {
+            'port':9000 
+        }

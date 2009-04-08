@@ -27,11 +27,11 @@ from test import lib_clientserver as clientserver
 fname = __file__.split('.')[0]
 logdir = "test/log/1" # put your build number here (env var)
 
-local = clientserver.TelnetMivilleTester(use_tmp_home=True)
+local = clientserver.TelnetMivilleTester(name='local', use_tmp_home=True)
 # logdir=logdir, logfilename=fname + "local", use_tmp_home=True)
 local.start()
 
-remote = clientserver.TelnetMivilleTester(use_tmp_home=True, port_offset=1)
+remote = clientserver.TelnetMivilleTester(name='remote', use_tmp_home=True, port_offset=1)
 # port_offset=1, logdir=logdir, logfilename=fname + "remote", use_tmp_home=True)
 remote.start()
 
