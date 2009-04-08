@@ -37,7 +37,7 @@ import string
 # from miville.utils.common import get_def_name
 
 # module variables
-VERBOSE = True
+VERBOSE = False
 
 def echo(s, endl=True):
     """
@@ -218,7 +218,6 @@ class Process(object):
             if self.verbose:
                 echo('Current working dir: ' + directory)
                 echo('Starting \"%s\"' % command)
-            #self.miville_process = pexpect.spawn(command, logfile=self.logfile, timeout=self.timeout_expect) 
             self.child = pexpect.spawn(command, logfile=self.logfile, timeout=self.timeout_expect) 
             # TODO : add expectation here.
             self.sleep(0.4) # seconds
@@ -226,8 +225,7 @@ class Process(object):
             echo("Error starting process %s." % (command))
             raise
         if not self.is_running():
-            print "Process could not be started. Not running. Is an other similar process already running ? %s" % (command)
-            #raise Exception("Process could not be started. Not running. Is an other similar process already running ? %s" % (command))
+            raise Exception("Process could not be started. Not running. Is an other similar process already running ? %s" % (command))
     
     def expect_test(self, expected, message=None, timeout=-1):
         """
@@ -302,9 +300,9 @@ class ClientServerTester(object):
         self.client_logfile = sys.stdout
         self.server_logfile = sys.stdout
         self.test_case = None
-        self.server_kwargs = {}
-        self.client_kwargs = {}
         self.__dict__.update(kwargs)
+        self.server_kwargs = {'logfile':self.server_logfile}
+        self.client_kwargs = {'logfile':self.client_logfile}
         self.client = None
         self.server = None
     
@@ -383,10 +381,12 @@ class TelnetMivilleTester(ClientServerTester):
         if self.use_tmp_home:
             self.miville_home = use_tmp_dir()
         self.server_kwargs = {
+            'logfile':self.server_logfile, 
             'port_offset':self.port_offset, 
             'miville_home':self.miville_home
         }
         self.client_kwargs = {
+            'logfile':self.client_logfile, 
             'port':14444 + self.port_offset
         }
 

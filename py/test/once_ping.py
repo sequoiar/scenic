@@ -23,15 +23,16 @@ Starts two miville and tests the protocols/pinger module.
 """
 import unittest
 from test import lib_clientserver as clientserver
+import os
 
 fname = __file__.split('.')[0]
 logdir = "test/log/1" # put your build number here (env var)
-
-local = clientserver.TelnetMivilleTester(name='local', use_tmp_home=True)
+devnull = open(os.devnull, 'w')
+local = clientserver.TelnetMivilleTester(name='local', client_logfile=devnull, server_logfile=devnull, use_tmp_home=True)
 # logdir=logdir, logfilename=fname + "local", use_tmp_home=True)
 local.start()
 
-remote = clientserver.TelnetMivilleTester(name='remote', use_tmp_home=True, port_offset=1)
+remote = clientserver.TelnetMivilleTester(name='remote', client_logfile=devnull, server_logfile=devnull, use_tmp_home=True, port_offset=1)
 # port_offset=1, logdir=logdir, logfilename=fname + "remote", use_tmp_home=True)
 remote.start()
 
@@ -65,11 +66,8 @@ class Test_Ping(unittest.TestCase):
         self.local.client.expect_test('jitter', 'Did not receive network test results.', 1.3)
 
     def test_99_close(self):
-        print 'done'
-        print self.local
-        print self.remote
-        #try:
-        #    self.local.kill_client_and_server()
-        #    self.remote.kill_client_and_server()
-        #except Exception, e:
-        #    print e.message
+        try:
+            self.local.kill_client_and_server()
+            self.remote.kill_client_and_server()
+        except Exception, e:
+            print e.message
