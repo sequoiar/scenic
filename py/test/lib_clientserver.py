@@ -191,8 +191,14 @@ class Process(object):
         if self.child is not None:
             self.child.delayafterclose = self.delayafterclose
             # TODO: delayafterterminate
-            self.child.close()
-            self.logfile.close()
+            try:
+                self.child.close()
+                if self.logfile is not sys.stdout:
+                    self.logfile.close()
+            except IOError, e:
+                echo(e.value)
+            except ValueError, e:
+                echo(e.value)
     
     def is_running(self):
         """
@@ -215,7 +221,7 @@ class Process(object):
             #self.miville_process = pexpect.spawn(command, logfile=self.logfile, timeout=self.timeout_expect) 
             self.child = pexpect.spawn(command, logfile=self.logfile, timeout=self.timeout_expect) 
             # TODO : add expectation here.
-            self.sleep(0.9) # seconds
+            self.sleep(0.4) # seconds
         except pexpect.ExceptionPexpect, e:
             echo("Error starting process %s." % (command))
             raise
@@ -325,7 +331,12 @@ class ClientServerTester(object):
 
     def kill_client_and_server(self):
         for child in [self.client, self.server]:
-            child.kill()
+            if child is not None:
+                try:
+                    child.kill()
+                except Exception, e:
+                    echo(e.message)
+            
 
 class TelnetProcess(Process):
     """

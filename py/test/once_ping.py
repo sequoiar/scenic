@@ -65,5 +65,11 @@ class Test_Ping(unittest.TestCase):
         self.local.client.expect_test('jitter', 'Did not receive network test results.', 1.3)
 
     def test_99_close(self):
-        self.local.kill_client_and_server()
-        self.remote.kill_client_and_server()
+        print 'done'
+        print self.local
+        print self.remote
+        #try:
+        #    self.local.kill_client_and_server()
+        #    self.remote.kill_client_and_server()
+        #except Exception, e:
+        #    print e.message
