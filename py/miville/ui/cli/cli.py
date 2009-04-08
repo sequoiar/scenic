@@ -1192,13 +1192,13 @@ class CliView(Observer):
                     msg.append(italic(bold(contact.name + ":")))
                 else:
                     msg.append(contact.name + ":")
-                msg.append("\taddress    : %s" % contact.address)
+                msg.append("\taddress     : %s" % contact.address)
                 #if contact.port:
-                msg.append("\tport       : %s" % str(contact.port))
+                msg.append("\tport        : %s" % str(contact.port))
                 #if contact.kind:
-                msg.append("\tkind       : %s" % str(contact.kind))
+                msg.append("\tkind        : %s" % str(contact.kind))
                 msg.append("\tauto_answer : %s" % str(contact.auto_answer))
-                msg.append("\tsetting    : %s" % str(contact.setting))
+                msg.append("\tsetting     : %s" % str(contact.setting))
             msg_out = "\n".join(msg)
             self.write(msg_out)
 
