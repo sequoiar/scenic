@@ -36,6 +36,9 @@ AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
         enable_debug=yes)
 
+AC_ARG_ENABLE([asio], [ **************** 
+  --enable-asio build asio],,enable_asio=no)
+  
 AC_MSG_WARN([${ac_prefix}])
 # Checks for library functions.
 
@@ -143,7 +146,9 @@ AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
 
 AX_BOOST_BASE([1.34])
 AX_BOOST_THREAD
+if test  "x${enable_asio}" = "xyes"; then
 AX_BOOST_ASIO
+fi
 
 AX_BOOST_PYTHON
 AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes")
@@ -239,6 +244,6 @@ if test "x${no_glu}" = "xyes" ; then
 AC_MSG_NOTICE([Not building OpenGL support])
 fi
 
-if test "x${ax_cv_boost_asio}" != "xyes" ; then
+if test "x${ax_cv_boost_asio}" != "xyes" -a "x${enable-asio}" == "xyes" ; then
     AC_MSG_WARN([Missing boost::asio])
 fi
