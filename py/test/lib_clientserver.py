@@ -58,7 +58,7 @@ def die():
     echo("EXITING")
     sys.exit(1)
 
-def make_tmp_dir():
+def use_tmp_dir():
     """
     Creates a temporary dir in /tmp/ and return its path.
     """
@@ -346,7 +346,7 @@ class MivilleProcess(Process):
     def __init__(self, **kwargs):
         self.port_offset = 0
         self.miville_home = "~/.miville"
-        self.make_tmp_home = False
+        self.use_tmp_home = False
         Process.__init__(self, **kwargs)
 
     def make_command(self):
@@ -361,16 +361,16 @@ class TelnetMivilleTester(ClientServerTester):
     CLIENT_CLASS = TelnetProcess
 
 
-    def __init__(self, **kwargs): # name, port_offset=0, make_tmp_home=False):
+    def __init__(self, **kwargs): # name, port_offset=0, use_tmp_home=False):
         # TODO: manage log files.
         self.port_offset = 0
         self.miville_home = "~/.miville"
-        self.make_tmp_home = False
+        self.use_tmp_home = False
         ClientServerTester.__init__(self, **kwargs)
 
     def prepare(self):
-        if self.make_tmp_home:
-            self.miville_home['miville_home'] = make_tmp_dir()
+        if self.use_tmp_home:
+            self.miville_home = use_tmp_dir()
         self.server_kwargs = {
             'port_offset':self.port_offset, 
             'miville_home':self.miville_home
