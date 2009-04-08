@@ -187,7 +187,7 @@ class Process(object):
         
         See kill -l for flags
         """
-        echo("KILLING process %s" % (self.command))
+        echo("KILLING process")
         if self.child is not None:
             self.child.delayafterclose = self.delayafterclose
             # TODO: delayafterterminate
@@ -215,7 +215,7 @@ class Process(object):
             #self.miville_process = pexpect.spawn(command, logfile=self.logfile, timeout=self.timeout_expect) 
             self.child = pexpect.spawn(command, logfile=self.logfile, timeout=self.timeout_expect) 
             # TODO : add expectation here.
-            self.sleep(0.5) # seconds
+            self.sleep(0.9) # seconds
         except pexpect.ExceptionPexpect, e:
             echo("Error starting process %s." % (command))
             raise
@@ -379,38 +379,38 @@ class TelnetMivilleTester(ClientServerTester):
             'port':14444 + self.port_offset
         }
 
-class MilhouseProcess(Process):
-    """
-    milhouse tcp server process
-    """
-    def __init__(self, **kwargs): # mode=[r|s], serverport=9000
-        if ( self.mode != "r" or self.mode != "s" ):  # s|r: sender or receiver
-            raise NoMode
-        # milhouse should always start with port between 9000 and 9999
-        if ( self.serverport < 9000 or self.serverport > 9999):  
-            raise BadServerPort
-        Process.__init__(self, **kwargs)
-
-    def make_command(self):
-        command = "milhouse -%s --serverport %s" % (self.mode, self.serverport)
-        return command
-
-class TelnetMilhouseTester(ClientServerTester):
-    """
-    Tests milhouse with telnet
-    """
-    SERVER_CLASS = MilhouseProcess
-    CLIENT_CLASS = TelnetProcess
-    
-    def __init__(self, name, **kwargs):
-        self.__dict__.update(kwargs)
-        ClientServerTester(self, name, **kwargs)
-    
-    def prepare(self):
-        self.server_kwargs = {
-            'mode':self.mode, 
-            'serverport':self.serverport
-        }
-        self.client_kwargs = {
-            'port':9000 
-        }
+# class MilhouseProcess(Process):
+#     """
+#     milhouse tcp server process
+#     """
+#     def __init__(self, **kwargs): # mode=[r|s], serverport=9000
+#         if ( self.mode != "r" or self.mode != "s" ):  # s|r: sender or receiver
+#             raise NoMode
+#         # milhouse should always start with port between 9000 and 9999
+#         if ( self.serverport < 9000 or self.serverport > 9999):  
+#             raise BadServerPort
+#         Process.__init__(self, **kwargs)
+# 
+#     def make_command(self):
+#         command = "milhouse -%s --serverport %s" % (self.mode, self.serverport)
+#         return command
+# 
+# class TelnetMilhouseTester(ClientServerTester):
+#     """
+#     Tests milhouse with telnet
+#     """
+#     SERVER_CLASS = MilhouseProcess
+#     CLIENT_CLASS = TelnetProcess
+#     
+#     def __init__(self, name, **kwargs):
+#         # self.__dict__.update(kwargs)
+#         ClientServerTester(self, name, **kwargs)
+#     
+#     def prepare(self):
+#         self.server_kwargs = {
+#             'mode':self.mode, 
+#             'serverport':self.serverport
+#         }
+#         self.client_kwargs = {
+#             'port':9000 
+#         }
