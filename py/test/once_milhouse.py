@@ -64,7 +64,7 @@ class Test_Milhouse(unittest.TestCase):
 
     def test_02_single_audio_transmission(self):
         # we test with one milhouse sending, one receiving
-        self.receiver.client.child.sendline('audio_init: codec="raw" port=10000 address="127.0.0.1" channels=2')
+        self.receiver.client.child.sendline('audio_init: codec="raw" port=10000 address="127.0.0.1" channels=2 audio_buffer_usec=50000')
         self.receiver.client.expect_test('audio_init: ack="ok"', 'receiver init command failed')
         self.sender.client.child.sendline('audio_init: codec="raw" port=10000 address="127.0.0.1" source="audiotestsrc" channels=2')
         self.sender.client.expect_test('audio_init: ack="ok"', 'sender init command failed', 1)
