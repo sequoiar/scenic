@@ -489,7 +489,7 @@ class CliController(TelnetServer):
     def _streams(self, line):
         cp = CliParser(self, prog=line[0], description="Manage the wrapper stream.")
         cp.add_option("-s", "--start", type="string", help="Start streaming with specified contact")
-        cp.add_option("-i", "--stop", "--interrupt", action='store_true', help="Stop a stream of playing")
+        cp.add_option("-i", "--stop", "--interrupt", type="string", help="Stop a stream of playing")
         cp.add_option("-z", "--description", action='store_true', help="Display description")
         
         (options, args) = cp.parse_args(line)
@@ -498,7 +498,8 @@ class CliController(TelnetServer):
             contact_name = options.start
             self.core.start_streams(self, contact_name)
         elif options.stop:
-            self.core.stop_streams(self)
+            contact_name = options.stop
+            self.core.stop_streams(self, contact_name)
         elif options.description:
             cp.print_description()
         else:
@@ -1191,12 +1192,13 @@ class CliView(Observer):
                     msg.append(italic(bold(contact.name + ":")))
                 else:
                     msg.append(contact.name + ":")
-                msg.append("\taddress: %s" % contact.address)
+                msg.append("\taddress    : %s" % contact.address)
                 #if contact.port:
-                msg.append("\tport   : %s" % str(contact.port))
+                msg.append("\tport       : %s" % str(contact.port))
                 #if contact.kind:
-                msg.append("\tkind   : %s" % str(contact.kind))
-                msg.append("\tsetting   : %s" % str(contact.setting))
+                msg.append("\tkind       : %s" % str(contact.kind))
+                msg.append("\tauto_answer : %s" % str(contact.auto_answer))
+                msg.append("\tsetting    : %s" % str(contact.setting))
             msg_out = "\n".join(msg)
             self.write(msg_out)
 
