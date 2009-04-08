@@ -124,7 +124,8 @@ class IPCP(LineReceiver):
             if isinstance(arg, tuple):
                 parg = self._process_arg(arg[1])
                 if parg:
-                    line.append(arg[0] + '=' + parg)
+                    process_key = self._process_arg(arg[0])
+                    line.append(process_key + '=' + parg)
             else:
                 parg = self._process_arg(arg)
                 if parg:
