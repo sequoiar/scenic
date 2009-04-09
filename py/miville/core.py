@@ -126,7 +126,7 @@ class Core(Subject):
         self.connectors = connectors.load_connectors(self.api, self.config.connector_port + self.config.port_numbers_offset, self.config.listen_to_interfaces)
         com_chan.start(self.api, connectors.connections, self.com_chan_port, self.config.listen_to_interfaces)
         self.api._start(self)
-        print "\nMiville is ready." # This is the only "print" allowed in the Miville application
+        print "Miville is ready." # This is the only "print" allowed in the Miville application
         
     def load_uis(self):
         """
