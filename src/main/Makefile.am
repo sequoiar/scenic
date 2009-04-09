@@ -5,7 +5,7 @@ bin_PROGRAMS = milhouse
 milhouse_SOURCES = milhouse.cpp mainTcp.cpp subversion.cpp
 
 subversion.cpp: 
-	@echo "const char* svnver = \"" `svnversion` "\";" >> subversion.cpp; 
+	@echo "const char* svnver =\""`svnversion`"\";" >> subversion.cpp; 
 
 #CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(GTK_CFLAGS) $(GL_CFLAGS) $(GLU_CFLAGS)
 #LDADD = $(src)/gst/engine/libgst.a $(ALL_GST_LIBS) $(JACK_LIBS) $(src)/tcp/libtcp.a \
