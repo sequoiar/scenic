@@ -95,8 +95,8 @@ short pof::run(int argc, char **argv)
     {
         //LOG_INFO("version " << PACKAGE_VERSION << '\b' << RELEASE_CANDIDATE);
         //LOG_INFO("version " << "$GlobalRev$" << '\b' << "$Date$");
-        LOG_INFO("Last changed $Date$ ");
-        LOG_INFO("Svn Revision:");
+        std::cout << "Last changed $Date$ " << std::endl;
+        std::cout << "Svn Revision: " << std::endl;
         execlp("svnversion", "svnversion", (char *)0);
         return 0;
     }
