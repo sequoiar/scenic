@@ -81,6 +81,37 @@ class TelnetServer(recvline.HistoricRecvLine):
         self.shortcuts = None
         self.history_file = None
 
+    def terminalSize(self, width, height):
+        """
+        Overwrite terminalSize to remove the screen reset.
+        """
+        # XXX - Clear the previous input line, redraw it at the new
+        # cursor position
+#        self.terminal.eraseDisplay()
+#        self.terminal.cursorHome()
+        self.width = width
+        self.height = height
+#        self.drawInputLine()
+
+    def initializeScreen(self):
+        """
+        Overwrite initializeScreen to remove the screen reset.
+        """
+        # Hmm, state sucks.  Oh well.
+        # For now we will just take over the whole terminal.
+#        self.terminal.reset()
+#        self.terminal.write(self.ps[self.pn])
+        # XXX Note: I would prefer to default to starting in insert
+        # mode, however this does not seem to actually work!  I do not
+        # know why.  This is probably of interest to implementors
+        # subclassing RecvLine.
+
+        # XXX XXX Note: But the unit tests all expect the initial mode
+        # to be insert right now.  Fuck, there needs to be a way to
+        # query the current mode or something.
+        # self.setTypeoverMode()
+        self.setInsertMode()
+
     def next_line(self):
         """
         This method overwrite the Twisted one because there's was a bug
