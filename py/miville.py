@@ -91,5 +91,6 @@ if __name__ == '__main__':
     except CannotListenError, e:
         log.error(str(e))
         exit(1)
+    print "Miville has quit."
     exit(0)
 
