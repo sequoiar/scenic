@@ -1,5 +1,8 @@
 SUBDIRS = notes test figures figures/test
-all: 
+
+subversion.cpp: 
+	@svnversion >> subversion.cpp
+all: subversion.cpp
 	@for i in $(SUBDIRS); do \
         echo "make all in $$i..."; \
         (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) all); done
