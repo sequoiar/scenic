@@ -115,8 +115,7 @@ void OptionArgs::parse(int argc, char **argv)
     GOptionEntry *pGOptions;
 
     context = g_option_context_new (0);
-    //g_option_context_set_summary(context, PACKAGE " ver. " PACKAGE_VERSION);
-    g_option_context_set_summary(context, "SVN $GlobalRev: 2886 $LastChangedDate$");
+    g_option_context_set_summary(context, PACKAGE " ver. " PACKAGE_VERSION);
 
     pGOptions = getArray();
     g_option_context_add_main_entries(context, pGOptions, NULL);

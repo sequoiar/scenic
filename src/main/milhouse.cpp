@@ -93,7 +93,11 @@ short pof::run(int argc, char **argv)
 
     if(options["version"])
     {
-        LOG_INFO("version " << PACKAGE_VERSION << '\b' << RELEASE_CANDIDATE);
+        //LOG_INFO("version " << PACKAGE_VERSION << '\b' << RELEASE_CANDIDATE);
+        //LOG_INFO("version " << "$GlobalRev$" << '\b' << "$Date$");
+        LOG_INFO("Last changed $Date$ ");
+        LOG_INFO("Svn Revision:");
+        execlp("svnversion", "svnversion", (char *)0);
         return 0;
     }
 
