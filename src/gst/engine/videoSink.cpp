@@ -159,7 +159,7 @@ void XvImageSink::init()
         gtk_initialized = true;
     }
 
-    sink_ = Pipeline::Instance()->makeElement("xvimagesink", "videosink");
+    sink_ = Pipeline::Instance()->makeElement("xvimagesink", NULL);
     prepareSink();
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -212,9 +212,9 @@ XvImageSink::~XvImageSink()
 void XImageSink::init()
 {
     // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
-    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
+    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL);
 
-    sink_ = Pipeline::Instance()->makeElement("ximagesink", "videosink");
+    sink_ = Pipeline::Instance()->makeElement("ximagesink", NULL);
     g_object_set(sink_, "pixel-aspect-ratio", "10/11", NULL);
     g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
     //    prepareSink();

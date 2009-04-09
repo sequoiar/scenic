@@ -126,6 +126,7 @@ class VideoEncoder : public Encoder
 
     private:
         bool doDeinterlace_;
+        //_GstElement *videorate_;
         _GstElement *colorspc_;
         _GstElement *sinkQueue_;
         _GstElement *srcQueue_;
@@ -133,13 +134,12 @@ class VideoEncoder : public Encoder
         
         _GstElement *sinkElement() 
         { 
-            if (doDeinterlace_)
-                return deinterlace_;
-            else
-                return colorspc_;
+            return sinkQueue_;
         }
-
-        _GstElement *srcElement() { return srcQueue_; }
+        _GstElement *srcElement() 
+        { 
+            return srcQueue_;
+        }
 
         /// No Copy Constructor
         VideoEncoder(const VideoEncoder&);     

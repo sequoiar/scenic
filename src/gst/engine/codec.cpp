@@ -146,18 +146,19 @@ VideoEncoder::~VideoEncoder()
 {
     Pipeline::Instance()->remove(&colorspc_);
     Pipeline::Instance()->remove(&deinterlace_);
-    Pipeline::Instance()->remove(&srcQueue_);
     Pipeline::Instance()->remove(&sinkQueue_);
+    Pipeline::Instance()->remove(&srcQueue_);
 }
 
 
 void VideoEncoder::init()
 {
     assert(codec_ != 0);
-    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
     sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
-    srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
-    
+    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
+
+    gstlinkable::link(sinkQueue_, colorspc_);
+
     if (doDeinterlace_)
     {
         LOG_DEBUG("DO THE DEINTERLACE");
@@ -168,9 +169,9 @@ void VideoEncoder::init()
         g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
 
     // Create separate thread for encoding, should yield better performance on multicore machines
-    gstlinkable::link(colorspc_, sinkQueue_);
-    gstlinkable::link(sinkQueue_, codec_);
-    gstlinkable::link(codec_, srcQueue_);       
+    gstlinkable::link(colorspc_, codec_);
+    srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    gstlinkable::link(codec_, srcQueue_);
 }
 
 
@@ -187,8 +188,6 @@ H264Encoder::~H264Encoder()
 void H264Encoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
-    VideoEncoder::init();
-
     // threads: 1-4, 0 for automatic 
 #ifdef HAVE_BOOST_THREAD        // more portable
     int numThreads = boost::thread::hardware_concurrency();
@@ -207,6 +206,7 @@ void H264Encoder::init()
     g_object_set(codec_, "threads", numThreads, NULL);
     //g_object_set(codec_, "byte-stream", TRUE, NULL);
     // subme: subpixel motion estimation 1=fast, 6=best
+    VideoEncoder::init();
 }
 
 
