@@ -91,13 +91,15 @@ short pof::run(int argc, char **argv)
 
     options.parse(argc, argv);
 
+    if(options["serverport"])
+        return telnetServer(options["sender"], options["serverport"]);
+
+    MilhouseLogger logger; // just instantiate, his base class will know what to do 
     if(options["version"])
     {
-        //LOG_INFO("version " << PACKAGE_VERSION << '\b' << RELEASE_CANDIDATE);
+        LOG_INFO("version " << PACKAGE_VERSION <<  " Svn Revision: " << SVNVERSION << std::endl);
         //LOG_INFO("version " << "$GlobalRev$" << '\b' << "$Date$");
-        std::cout << "Last changed $Date$ " << std::endl;
-        std::cout << "Svn Revision (WARNING, THIS IS CHECKED AT RUNTIME: " << std::endl;
-        execlp("svnversion", "svnversion", (char *)0);
+        //execlp("svnversion", "svnversion", (char *)0);
         return 0;
     }
 
@@ -110,10 +112,6 @@ short pof::run(int argc, char **argv)
         //playback::enableControl();  
     }
 
-    if(options["serverport"])
-        return telnetServer(options["sender"], options["serverport"]);
-
-    MilhouseLogger logger; // just instantiate, his base class will know what to do 
     int disableVideo = !options["videocodec"] and !options["videoport"];
     int disableAudio = !options["audiocodec"] and !options["audioport"];
 
