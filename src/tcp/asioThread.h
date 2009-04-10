@@ -29,7 +29,7 @@
 
 class asio_thread : public MsgThread 
 {
-    int main();
+    void main();
     int port_;
     bool log_;
 public:

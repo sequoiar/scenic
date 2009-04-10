@@ -59,7 +59,7 @@ static std::string get_line(std::string& msg)
 }
 
 
-int TcpThread::main()
+void TcpThread::main()
 {
     bool quit = false;
     std::string msg;
@@ -122,7 +122,6 @@ int TcpThread::main()
         mapMsg["exception"] = CriticalExcept(e.msg_, e.errno_);
         queue_.push(mapMsg);
     }
-    return 0;
 }
 
 

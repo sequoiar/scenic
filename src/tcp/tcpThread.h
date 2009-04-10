@@ -37,7 +37,7 @@ class TcpThread
         bool socket_connect_send(const std::string& addr, MapMsg& msg);
  
     private:
-        int main();
+        void main();
         bool gotQuit();
 
         TcpServer serv_;

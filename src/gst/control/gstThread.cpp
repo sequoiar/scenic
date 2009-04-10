@@ -44,7 +44,7 @@ void GstSenderThread::start(MapMsg& )
     if(ff[1])
         ff[1](audio_->getCaps());
 } 
-int GstThread::main()
+void GstThread::main()
 {
     bool done = false;
     bool flipflop = false;
@@ -143,7 +143,6 @@ int GstThread::main()
         }
     }
 
-    return 0;
 }
 
 

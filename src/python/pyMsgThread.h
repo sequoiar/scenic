@@ -37,7 +37,7 @@ class PythonThread
 
     public:
         PythonThread(QueuePair& q,dictMessageHandler* msgH):q_(q),msgH_(*msgH){}
-        int main();
+        void main();
         
 };
 

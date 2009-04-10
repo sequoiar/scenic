@@ -237,7 +237,7 @@ class udp_server
 
 
 
-int asio_thread::main()
+void asio_thread::main()
 {
 
 
@@ -257,6 +257,5 @@ int asio_thread::main()
     {
     }
 
-    return 0;
 }
 

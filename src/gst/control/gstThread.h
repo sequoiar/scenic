@@ -42,7 +42,7 @@ class GstThread
 
 
     private:
-        int main();
+        void main();
 
         /// No Copy Constructor 
         GstThread(const GstThread&); 

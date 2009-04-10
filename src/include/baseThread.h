@@ -20,13 +20,12 @@
 #ifndef __BASE_THREAD_H__
 #define __BASE_THREAD_H__
 
-#include <glib.h>
 #include <string>
 #include <set>
 #include <algorithm>
+#include <boost/thread.hpp>
 #include "baseModule.h"
 #include "queuePair.h"
-
 /// glib thread construct with async queues 
 template < class T >
 class BaseThread
@@ -41,13 +40,12 @@ class BaseThread
 
         static void broadcastQuit();
         static bool isQuitted();
+        virtual void main() { }
     protected:
-        virtual int main() { return 0; }
-        static void *thread_main(void *pThreadObj);
+        void operator()(){main();}
         virtual bool ready() { return true; }
         static void postQuit(BaseThread<T>* bt);
-        //static void postQuit(typename std::set< BaseThread < T > *>::iterator& curThread);
-        GThread *th_;
+        boost::thread *th_;
         QueuePair_ < T > queue_;
         QueuePair_ < T > flippedQueue_;
 
@@ -112,24 +110,28 @@ BaseThread < T >::~BaseThread()
         flippedQueue_.push(t);
         LOG_DEBUG("Thread Stoping " << this);
         allThreads_.erase(this);
-        g_thread_join(th_);
+        th_->join();
     }
 }
 
 
-/// thread creation 
 template < class T >
-GThread * thread_create(void *(thread) (void *), T t, GError ** err)
+class thread_create
 {
-    return (g_thread_create(thread, static_cast < void *>(t), TRUE, err));
-}
+    BaseThread<T>* th_;
+    public:
+        thread_create(BaseThread<T>* t):th_(t){}
 
+        void operator()()
+        {
+            th_->main();
+        }
+};
 
 /// entry point calls thread_create 
 template < class T >
 bool BaseThread < T >::run()
 {
-    GError *err = 0;
     if (th_)
     {
         LOG_WARNING("Thread already Running.");
@@ -138,8 +140,7 @@ bool BaseThread < T >::run()
     //No thread yet
     if(!ready())
         return false;
-
-    th_ = thread_create(BaseThread::thread_main, this, &err);
+    th_ = new boost::thread(thread_create<T>(this));
     LOG_DEBUG("Thread Started " << this);
 
     if (!th_)       //BaseThread failed
@@ -151,16 +152,6 @@ bool BaseThread < T >::run()
                     //returns before this thread starts
     return true;
 }
-
-/// thread entry point 
-template < class T >
-void *BaseThread < T >::thread_main(void *pThreadObj)
-{
-    return reinterpret_cast<void *>(
-            static_cast < BaseThread * >(pThreadObj)->main()
-            );
-}
-
 
 #endif
 

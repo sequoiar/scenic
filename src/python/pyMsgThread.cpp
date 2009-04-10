@@ -103,7 +103,7 @@ bool ThreadWrap::send(boost::python::dict dt)
 }
 
 
-int PythonThread::main()
+void PythonThread::main()
 {
     LOG_INFO("Python Thread");
     for(;;)
@@ -120,7 +120,6 @@ int PythonThread::main()
         PyGILState_Release(state);
 
     }
-    return 0; 
 }
 
 
