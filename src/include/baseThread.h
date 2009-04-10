@@ -23,7 +23,14 @@
 #include <string>
 #include <set>
 #include <algorithm>
+
+#include "config.h"
+#ifdef HAVE_BOOST
 #include <boost/thread.hpp>
+#else
+#include <glib.h>
+#endif
+
 #include "baseModule.h"
 #include "queuePair.h"
 /// glib thread construct with async queues 
@@ -42,10 +49,15 @@ class BaseThread
         static bool isQuitted();
         virtual void main() { }
     protected:
+        static void *thread_main(void *pThreadObj);
         void operator()(){main();}
         virtual bool ready() { return true; }
         static void postQuit(BaseThread<T>* bt);
+#ifdef HAVE_BOOST
         boost::thread *th_;
+#else
+        GThread *th_;
+#endif
         QueuePair_ < T > queue_;
         QueuePair_ < T > flippedQueue_;
 
@@ -110,11 +122,15 @@ BaseThread < T >::~BaseThread()
         flippedQueue_.push(t);
         LOG_DEBUG("Thread Stoping " << this);
         allThreads_.erase(this);
+#ifdef HAVE_BOOST
         th_->join();
+#else
+        g_thread_join(th_);
+#endif
     }
 }
 
-
+#ifdef HAVE_BOOST
 template < class T >
 class thread_create
 {
@@ -127,6 +143,16 @@ class thread_create
             th_->main();
         }
 };
+#else
+/// thread entry point 
+template < class T >
+void *BaseThread < T >::thread_main(void *pThreadObj)
+{
+    return reinterpret_cast<void *>(
+            static_cast < BaseThread * >(pThreadObj)->main()
+            );
+}
+#endif
 
 /// entry point calls thread_create 
 template < class T >
@@ -140,7 +166,13 @@ bool BaseThread < T >::run()
     //No thread yet
     if(!ready())
         return false;
+
+#ifdef HAVE_BOOST
     th_ = new boost::thread(thread_create<T>(this));
+#else
+    th_ = thread_create(BaseThread::thread_main, this, &err);
+#endif
+
     LOG_DEBUG("Thread Started " << this);
 
     if (!th_)       //BaseThread failed
