@@ -35,7 +35,7 @@ Addressbook.methods(
 		// State variables
 		// Get the selected cookie.
 		self.selected = Cookie.read('adb_selected');
-		self.selected_li = null;
+		self.selected_li = undefined;
 		self.edit_type = null;
 		self.ask_win = null;
 		
@@ -98,18 +98,22 @@ Addressbook.methods(
 		self.port_fld.addEvent('blur', function(event) {
 			self.set_optional(self.port_fld);
 		});
-		
-		// Get the contact list from the server.
-        self.callRemote("rc_get_list");
-		
+
 		// Register to the widgets communicator.
 		register('adb', self);
+
+		// Get the contact list from the server (only when all the page is loaded).
+		window.addEvent('domready', function() {
+	        self.callRemote("rc_get_list");
+		});
     },  
 
 
-	///////////////////////
-	/* Utility functions */
-	///////////////////////
+	/**
+	 * -----------------
+	 * Utility functions
+	 * -----------------
+	 */
 	
 	/**
 	 * Notify all the controllers (buttons/fields/etc) state when an event call
@@ -146,7 +150,7 @@ Addressbook.methods(
      * @return The value of the attribute.
 	 */
 	function get_selected_attr(self, attr) {
-		if (self.selected_li) {
+		if (self.selected_li != null) {
 			return self.selected_li.get(attr);
 		} else {
 			return undefined;
@@ -195,9 +199,11 @@ Addressbook.methods(
 	},		
 
 
-	//////////////////////
-	/* Call from Server */
-	//////////////////////
+	/**
+	 * ----------------
+	 * Call from Server
+	 * ----------------
+	 */
 
 	/**
 	 * Update the contact list to reflect the state of the server.
@@ -216,7 +222,7 @@ Addressbook.methods(
 		var previous = null;
 		// current selected li element
 		var selected = null;
-		self.selected_li = null;
+		var selected_li = null;
 		
 		// list of contact names coming from the server
 		var server_list = contacts.map(function(item, index){
@@ -248,7 +254,6 @@ Addressbook.methods(
 			if (client_list.contains(item['name'])) {
 				var li = self.list.getElement('li[name=' + item['name'] + ']');
 				li.set('state', item['state']);
-		//		li.set('auto_answer', (item['auto_answer'] ? 'true' : ''));
 				li.set('auto_created', (item['auto_created'] ? 'true' : ''));
 				if (item['auto_created']) {
 					if (!li.hasClass('auto_created')) {
@@ -266,7 +271,6 @@ Addressbook.methods(
 					'text': item['name'],
 					'name': item['name'],
 					'state': item['state'],
-//				    'auto_answer': (item['auto_answer'] ? 'true' : ''),
 					'auto_created': (item['auto_created'] ? 'true' : ''),
 					'status': '',
 					'error': '',
@@ -315,19 +319,31 @@ Addressbook.methods(
 			
 			// keep the current selected li element
 			if (item['name'] == self.selected) {
-				self.selected_li = li;
+				selected_li = li;
 			}
 		})
-		dbug.info(self.edit_type);
-		dbug.info(self.selected_li);
-		if (self.selected_li && (self.edit_type != 'new' || self.edit_type == 'keep')){
-			dbug.info('ICII');
-			// update the display of selected contact info and button states
-			self.notify_controllers('contact_selected');
+		
+		// if first update simulate contact selection or unselection.
+		if (self.selected_li == undefined) {
+			if (selected_li != null) {
+				self.contact_selected(selected_li);
+			} else {
+				self.contact_unselect();
+			}
+		
+		// after first update do the normal notification
 		} else {
-			// or if no selection, clear the info and update button states
-			self.notify_controllers('contact_unselected');
+			self.selected_li = selected_li;
+	
+			if (selected_li && (self.edit_type != 'new' || self.edit_type == 'keep')){
+				// update the display of selected contact info and button states
+				self.notify_controllers('contact_selected');
+			} else {
+				// or if no selection, clear the info and update button states
+				self.notify_controllers('contact_unselected');
+			}
 		}
+		
 		return false;
 	},
 	
@@ -468,9 +484,11 @@ Addressbook.methods(
 	},
 
 
-	//////////////////////
-	/* Call from Client */
-	//////////////////////
+	/**
+	 * ----------------
+	 * Call from Client
+	 * ----------------
+	 */
 	
 	/**
 	 * Get info from others widgets.
@@ -505,7 +523,7 @@ Addressbook.methods(
 			
 			// notify the controllers of this selection
 			self.notify_controllers('contact_selected');
-			notify('adb', 'selection', self.selected);
+			notify('adb', 'selection', self.selected_li);
 		}
 	},
 
@@ -521,7 +539,7 @@ Addressbook.methods(
 		self.update_selected(null);
 		
 		// notify the controllers of this selection
-		notify('adb', 'selection', self.selected);
+		notify('adb', 'selection', self.selected_li);
 	},
 
     /**
@@ -613,7 +631,7 @@ Addressbook.methods(
      */
 	function remove_contact(self) {
 		// test if there's a contact selected
-		if (self.selected_li) {
+		if (self.selected_li != null) {
 			// get the previous contact in the list
 			var new_selection = self.selected_li.getPrevious('li');
 			// if the selected contact is the first one get the next one
@@ -638,7 +656,7 @@ Addressbook.methods(
      * @member Addressbook
      */
 	function cancel_edit_flds(self) {
-		if (self.selected_li) {
+		if (self.selected_li != null) {
 			self.notify_controllers('contact_selected');
 		}
 	},
@@ -666,9 +684,11 @@ Addressbook.methods(
 	},
 	
 
-	////////////////////////
-	/* Update controllers */
-	////////////////////////
+	/**
+	 * ------------------
+	 * Update controllers
+	 * ------------------
+	 */
 
     /**
      * Update the contacts list in function of the selected contact.

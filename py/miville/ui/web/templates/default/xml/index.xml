@@ -5,6 +5,13 @@
 			<div n:render="addressbook">ADDRESSBOOK place holder</div>
 		</div>
 		
+		<div id="strm" class="color_two">
+			<div n:render="streams">STREAMS place holder</div>
+		</div>
+		
+		<div id="index_right_pan">
+		</div>
+		
 		<div id="help">
 			<div n:render="help">HELP place holder</div>
 		</div>

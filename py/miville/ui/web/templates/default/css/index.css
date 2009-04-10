@@ -19,6 +19,24 @@ h3 {
 	padding: 20px;
 }
 
+#index_right_pan {
+	position: absolute;
+	top: 0px;
+/*	height: 0px;*/
+	left: 300px;
+	right: 0px;
+	padding: 0px;
+}
+
+#strm {
+	position: absolute;
+	top: 0px;
+/*	height: 0px;*/
+	left: 300px;
+	right: 0px;
+	padding: 6px 20px;
+}
+
 .help_str, .js_str {
 	display: none;
 }
@@ -29,6 +47,8 @@ h3 {
 	left: 300px;
 	right: 0px;
 }
+
+
 
 /*************************************/
 /* LINE BETWEEN THE GOOD AND THE BAD */

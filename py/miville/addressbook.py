@@ -34,6 +34,7 @@ import copy
 
 # Twisted imports
 from twisted.spread.jelly import jelly, unjelly
+from twisted.internet import reactor
 
 # App imports
 from miville.utils import log
@@ -66,6 +67,7 @@ class AddressBook(object):
         self.dup_suffix = '_copy'
         self.contacts = {}
         self.selected = None
+        self.delayed_write = None
         self.read()
         Contact.adb = self
 
@@ -81,6 +83,8 @@ class AddressBook(object):
         on problems.
         """
         name = to_utf(name)
+        print name
+        print self.contacts
         if name in self.contacts:
             raise AddressBookNameError, 'Name %s already in Address Book' % name
         self.contacts[name] = Contact(name, address, port, auto_created, auto_answer, connector, setting)
@@ -128,8 +132,11 @@ class AddressBook(object):
             contact.auto_answer = auto_answer
         contact.setting = setting
         
-        self.write()
-        return new_name
+#        self.write()
+        if new_name:
+            return new_name
+        else:
+            return name
 
     def duplicate(self, name=None, new_name=None):
         """
@@ -157,7 +164,7 @@ class AddressBook(object):
         self.contacts[name_copy] = copy.copy(self.contacts[name])
         self.contacts[name_copy].name = name_copy
 
-        self.write()
+#        self.write()
         return True
 
     def select(self, name):
@@ -240,8 +247,8 @@ class AddressBook(object):
         return_name = name
         if new_name != None or auto_answer == True:
             return_name = self.modify(contact.name, new_name, auto_answer=auto_answer)
-        else:
-            self.write()
+#        else:
+#            self.write()
         return return_name
 
     def _get_name(self, name):
@@ -303,6 +310,8 @@ class AddressBook(object):
                 for contact in self.contacts.values():
                     contact.connection = None
                     contact.state = DISCONNECTED
+                    if self.minor == 0:
+                        contact.stream_state = 0
             adb_file.close()
 
     def write(self, state=True):
@@ -310,6 +319,9 @@ class AddressBook(object):
         Write back to disk the Address Book. Raise error on problems.
         """
         if self.contacts:
+            # notify the observers that the addressbook as change
+            self.api.get_contacts(self)
+
             try:
                 adb_file = open(self.filename, 'w')
                 log.info("Opening address book file %s in write mode." % (self.filename))
@@ -326,12 +338,14 @@ class AddressBook(object):
                         if hasattr(contacts[name], 'connection'):
                             contacts[name].connection = None
                             del contacts[name].connection
+                        if not state:
+                            contacts[name].stream_state = 0
                 # add the selected contact to the dict
                 contacts['_selected'] = self.selected
                 if self.major == 1:
                     dump = repr(jelly(contacts))
                     level = 0
-                    nice_dump = ['v1.0\n']
+                    nice_dump = ['v1.1\n']
                     for char in dump:
                         if char == '[':
                             if level > 0:
@@ -345,9 +359,6 @@ class AddressBook(object):
                     pickle.dump(contacts, adb_file, 1)
                 adb_file.close()
                 
-            # notify the observers that the addressbook as change
-            self.api.get_contacts(self)
-
 
 class Contact(object):
     """
@@ -376,6 +387,7 @@ class Contact(object):
         self.auto_created = auto_created
         self.auto_answer = auto_answer
         self.connection = None
+        self.stream_state = 0
 
         self.set_address(address)
         self.set_port(port)
@@ -388,7 +400,7 @@ class Contact(object):
 
     def __setattr__(self, name, value):
         """
-        Catch any attribute changes and call Addressbook.write() (and api.notify())
+        Catch all attribute changes and call Addressbook.write() (and api.notify())
         on change.
         """
         if name == 'setting':
@@ -396,16 +408,28 @@ class Contact(object):
                 value = int(value)
                 
         write = False
-        if name == 'state' and self.adb:
-            state = getattr(self, 'state', None)
-            if state != value and state is not None:
+        if self.adb and name in ('name',
+                                    'address',
+                                    'port',
+                                    'kind',
+                                    'state',
+                                    'stream_state',
+                                    'auto_answer',
+                                    'setting',
+                                    'connector'):
+            current_value = getattr(self, name, None)
+            if current_value != value and current_value is not None:
                 write = True
-                log.debug('Write on state change: %s - %s - %s' % (self.state, value, self.name))
-        object.__setattr__(self, name, value)
-        if write:
-            self.adb.write()
-        
+                log.debug('Write on %s change: %s - %s - %s' % (name, current_value, value, self.name))
 
+        object.__setattr__(self, name, value)
+        
+        if write:
+            if self.adb.delayed_write and self.adb.delayed_write.active():
+                self.adb.delayed_write.reset(0.001)
+            else:
+                self.adb.delayed_write = reactor.callLater(0.001, self.adb.write)
+        
     def set_address(self, address):
         """
         Set the address attribute of the contact in function of is kind

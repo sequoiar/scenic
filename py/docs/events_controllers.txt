@@ -1,0 +1,57 @@
+
+======================
+Events and controllers
+======================
+
+Events that trigger an update of the web interface and controllers
+(buttons, fields, list, etc) of each widget that have to be updated.
+
+Addressbook
+-----------
+
+**Events**
+
+From UI:
+	- contact_selected
+	- contact_unselected
+	- edit_contact
+	- keep_contact
+	- add_contact
+	- save_contact
+	- remove_contact* -> do a contact_selected or contact_unselected
+
+From server:
+	- status_changed
+
+**Controllers**
+
+- list
+- edit
+- connect
+- fields
+- auto_answer
+- add
+- remove
+- status
+
+
+Streams
+-------
+
+**Events**
+
+From UI:
+	- contact_selected
+	- contact_unselected
+	- edit_contact
+	- add_contact
+	- save_contact
+
+From server:
+	- stream_status_changed
+	- test_status_changed
+
+**Controllers**
+
+- start
+- global_settings

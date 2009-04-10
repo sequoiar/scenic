@@ -11,3 +11,12 @@ Scripts:
 
    js_addressbook
    js_utils
+
+Informations:
+-------------
+
+.. toctree::
+   :maxdepth: 4
+
+   events_controllers
+   
