@@ -594,10 +594,15 @@ class ControllerApi(object):
     ### Streams ###
     
     def start_streams_tmp(self, caller, contact_name):
-        self.notify(caller, 2)
+        log.debug('START')
+        contact = self.get_contact(contact_name)
+        contact.stream_state = 2
+#        self.notify(caller, 2)
         
     def stop_streams_tmp(self, caller, contact_name):
-        self.notify(caller, 0)
+        contact = self.get_contact(contact_name)
+        contact.stream_state = 0
+#        self.notify(caller, 0)
         
         
     def start_streams(self, caller, contact_name):

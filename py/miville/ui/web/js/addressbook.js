@@ -254,6 +254,7 @@ Addressbook.methods(
 			if (client_list.contains(item['name'])) {
 				var li = self.list.getElement('li[name=' + item['name'] + ']');
 				li.set('state', item['state']);
+				li.set('stream_state', item['stream_state']);
 				li.set('auto_created', (item['auto_created'] ? 'true' : ''));
 				if (item['auto_created']) {
 					if (!li.hasClass('auto_created')) {
@@ -272,6 +273,7 @@ Addressbook.methods(
 					'name': item['name'],
 					'state': item['state'],
 					'auto_created': (item['auto_created'] ? 'true' : ''),
+					'stream_state': item['stream_state'],
 					'status': '',
 					'error': '',
 					'events': {
@@ -342,6 +344,7 @@ Addressbook.methods(
 				// or if no selection, clear the info and update button states
 				self.notify_controllers('contact_unselected');
 			}
+			notify('adb', 'selection', self.selected_li);
 		}
 		
 		return false;

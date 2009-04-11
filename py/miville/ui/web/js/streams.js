@@ -68,7 +68,7 @@ Streams.methods(
 	 * 
 	 * So put the least dependants at the top and more dependants at the bottom.
 	 * 
-	 * @member Help
+	 * @member Streams
      * @param {string} event The event that fire the notification.
 	 */
 	function notify_controllers(self, event){
@@ -89,7 +89,7 @@ Streams.methods(
 	 * 
 	 * Call when a contact is selected.
 	 * 
-	 * @member Help
+	 * @member Streams
 	 * @param {string} caller The short name of the widget.
 	 * @param {string} key The name of the receive information.
 	 * @param value The receive information.
@@ -110,6 +110,26 @@ Streams.methods(
 	},
 
 	/**
+	 * Start the streams of this contact.
+	 * (call from the client)
+	 * 
+	 * @member Streams
+	 */
+	function start_streams(self) {
+		self.callRemote('rc_start_streams', self.contact.get('name'));
+	},
+
+	/**
+	 * Stop the streams of this contact.
+	 * (call from the client)
+	 * 
+	 * @member Streams
+	 */
+	function stop_streams(self) {
+		self.callRemote('rc_stop_streams', self.contact.get('name'));
+	},
+
+	/**
 	 * ------------------
 	 * Update controllers
 	 * ------------------
@@ -118,7 +138,7 @@ Streams.methods(
     /**
      * Update the start button in function of the selected contact.
      *
-     * @member Help
+     * @member Streams
      * @param {string} event The event that trigger the update.
      */
 	function upd_start_btn(self, event) {
@@ -130,11 +150,34 @@ Streams.methods(
 			var button_name = self.start_str;
 			
 			// get the state of other controls necessary to find the state
-			
+			var stream_state = self.contact.get('stream_state');
 
-				
-		//} else if (event == 'contact_unselected') {
-		//	self.unselect_contact();
+			self.start_btn.removeEvents('click');
+			if (stream_state == 0) {
+				button_state = 'enabled';
+				self.start_btn.addEvent('click', function(){
+					self.start_streams();
+				});
+			} else if (stream_state == 1) {
+				button_name = self.stop_str;
+			} else {
+				button_state = 'enabled';
+				button_name = self.stop_str;
+				self.start_btn.addEvent('click', function(){
+					self.stop_streams();
+				});
+			}
+			
+			self.start_btn.value = button_name;
+			
+			if (button_state == 'enabled') {
+				self.start_btn.disabled = false;
+			} else {
+				self.start_btn.disabled = true;
+			}
+		} else if (event == 'contact_unselected') {
+			self.start_btn.disabled = true;
+			self.start_btn.value = self.start_str;
 		}
 	}
 
