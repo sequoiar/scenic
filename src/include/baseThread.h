@@ -25,7 +25,7 @@
 #include <algorithm>
 
 #include "config.h"
-#ifdef HAVE_BOOST
+#ifdef HAVE_BOOST_THREAD
 #include <boost/thread.hpp>
 #else
 #include <glib.h>
@@ -53,7 +53,7 @@ class BaseThread
         void operator()(){main();}
         virtual bool ready() { return true; }
         static void postQuit(BaseThread<T>* bt);
-#ifdef HAVE_BOOST
+#ifdef HAVE_BOOST_THREAD
         boost::thread *th_;
 #else
         GThread *th_;
@@ -122,7 +122,7 @@ BaseThread < T >::~BaseThread()
         flippedQueue_.push(t);
         LOG_DEBUG("Thread Stoping " << this);
         allThreads_.erase(this);
-#ifdef HAVE_BOOST
+#ifdef HAVE_BOOST_THREAD
         th_->join();
 #else
         g_thread_join(th_);
@@ -130,7 +130,7 @@ BaseThread < T >::~BaseThread()
     }
 }
 
-#ifdef HAVE_BOOST
+#ifdef HAVE_BOOST_THREAD
 template < class T >
 class thread_create
 {
@@ -167,7 +167,7 @@ bool BaseThread < T >::run()
     if(!ready())
         return false;
 
-#ifdef HAVE_BOOST
+#ifdef HAVE_BOOST_THREAD
     th_ = new boost::thread(thread_create<T>(this));
 #else
     th_ = thread_create(BaseThread::thread_main, this, &err);
