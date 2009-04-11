@@ -13,7 +13,7 @@ milhouse_la_SOURCES = exports.cpp pyMsgThread.cpp \
 milhouse_la_LDFLAGS = -version-info 1:1:1 -module $(BOOST_LDFLAGS)
 
 # add your libs i.e. ../hello/libhello.la  
-milhouse_la_LIBADD =  -l$(BOOST_PYTHON_LIB) $(GLIB_LIBS) \
+milhouse_la_LIBADD =  -l$(BOOST_PYTHON_LIB)-mt $(GLIB_LIBS) \
 						   $(ALL_GST_LIBS) $(JACK_LIBS) $(BOOST_ASIO_LIB) \
 						   $(src)/gst/control/libgstthread.a \
 						   $(src)/gst/engine/libgst.a $(GTK_LIBS) \
