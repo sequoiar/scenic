@@ -145,12 +145,18 @@ class thread_create
 };
 #else
 /// thread entry point 
+
+template < class T >
+GThread * thread_create(void *(thread)(void *),T t, GError **err)
+{
+    return (g_thread_create(thread, static_cast < void *>(t), TRUE, err)); 
+}
+
 template < class T >
 void *BaseThread < T >::thread_main(void *pThreadObj)
 {
-    return reinterpret_cast<void *>(
-            static_cast < BaseThread * >(pThreadObj)->main()
-            );
+    static_cast < BaseThread * >(pThreadObj)->main();
+    return 0;
 }
 #endif
 
@@ -170,6 +176,7 @@ bool BaseThread < T >::run()
 #ifdef HAVE_BOOST_THREAD
     th_ = new boost::thread(thread_create<T>(this));
 #else
+    GError *err = 0;
     th_ = thread_create(BaseThread::thread_main, this, &err);
 #endif
 
