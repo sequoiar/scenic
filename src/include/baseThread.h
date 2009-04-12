@@ -30,7 +30,6 @@
 #else
 #include <glib.h>
 #endif
-
 #include "baseModule.h"
 #include "queuePair.h"
 /// glib thread construct with async queues 
