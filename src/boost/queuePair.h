@@ -24,7 +24,8 @@
 #define __BOOST_QUEUE_PAIR_H__
 
 #include "util.h"
-#include "boost/date_time/posix_time/posix_time.hpp" 
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/thread/condition_variable.hpp>
 #include <queue>
 /** wraps pair of glib GAsyncQueue 
  * * provides cast void* to T* 
@@ -34,7 +35,8 @@ class QueuePair_
 {
     public:
         QueuePair_ < T > ()
-            :first_(0),second_(0), destroyQueues_(false) {}
+            :first_(0),second_(0), destroyQueues_(false),
+        cond(),mut(),data_ready(){}
         ~QueuePair_ < T > ();
         
         ///pop element or return T() if timeout
@@ -48,13 +50,16 @@ class QueuePair_
         T* pop_() { return queue_pop(); }
         void push_(T* t) { queue_push(t); }
 
-        void queue_push(T *t){ second_->push(t);}
-        T* queue_pop(){T* ret =first_->front(); first_->pop(); return ret;}
-        T* queue_pop(boost::posix_time::ptime){T* ret =first_->front(); first_->pop(); return ret;}
-
+        void queue_push(T *t);//{ second_->push(t);}
+        T* queue_pop(boost::posix_time::ptime tm);
+        T* queue_pop() { return queue_pop(0); }
         T *timed_pop_(int ms);
 
         bool destroyQueues_;
+        boost::condition_variable cond;
+        boost::mutex mut;
+        bool data_ready;
+
 
         /** No Copy Constructor */
         QueuePair_(const QueuePair_& in);
@@ -62,6 +67,41 @@ class QueuePair_
         QueuePair_& operator=(const QueuePair_&);
 };
 
+template < class T >
+void QueuePair_< T >::queue_push(T *t)
+{ 
+    {
+    boost::lock_guard<boost::mutex> lock(mut);
+    second_->push(t);
+    data_ready=true;
+    }
+    cond.notify_one();
+}
+
+template < class T >
+T* QueuePair_< T >::queue_pop(boost::posix_time::ptime tm)
+{
+    T* ret;
+    if(first_->empty())
+    {
+        if(!tm.is_not_a_date_time())
+            while(tm < boost::posix_time::microsec_clock::local_time())
+            {
+                boost::unique_lock<boost::mutex> lock(mut);
+                while(!data_ready)
+                    cond.wait(lock);
+
+                if(!first_->empty())
+                    break;
+            }
+    }
+    if(!first_->empty())
+    {
+        ret = first_->front(); 
+        first_->pop();
+    }
+    return ret;
+}
 
 template < class T >
 void QueuePair_< T >::flip(QueuePair_< T > &in)
@@ -109,19 +149,16 @@ QueuePair_ < T >::~QueuePair_()
 {
     if (destroyQueues_)
     {
-        T *t;
         while(!first_->empty()) 
         {
-            t = first_->front();
+            delete(first_->front());
             first_->pop();
-            delete t;
         }
 
         while(!second_->empty()) 
         {
-            t = first_->front();
+            delete(second_->front());
             second_->pop();
-            delete t;
         }
 
         delete first_;
