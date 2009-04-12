@@ -30,6 +30,7 @@
 #else
 #include <glib.h>
 #endif
+
 #include "baseModule.h"
 #include "queuePair.h"
 /// glib thread construct with async queues 
@@ -106,8 +107,10 @@ template < class T >
 BaseThread < T >::BaseThread()
     : th_(0), queue_(), flippedQueue_()
 {
+#ifndef HAVE_BOOST_THREAD
     if (!g_thread_supported ())
         g_thread_init (NULL);
+#endif
     queue_.init();
     flippedQueue_.flip(queue_);
     allThreads_.insert(this);

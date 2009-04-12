@@ -21,6 +21,7 @@
  */
 
 #include "util.h"
+#include <glib.h>
 
 #include "engine/mediaBase.h"
 #include "gstThread.h"

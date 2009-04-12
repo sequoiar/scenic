@@ -24,37 +24,17 @@
 #define __BOOST_QUEUE_PAIR_H__
 
 #include "util.h"
-
-#include <glib.h>
-
-/// holds pointers to GAsyncQueues 
-class BaseQueuePair
-{
-    public:
-        BaseQueuePair(GAsyncQueue* f, GAsyncQueue* s)
-            : first_(f), second_(s){}
-        virtual ~BaseQueuePair(){}
-
-    protected:
-        GAsyncQueue *first_, *second_;
-
-    private:
-        /** No Copy Constructor */
-        BaseQueuePair(const BaseQueuePair& in);
-        /** No Assignment Operator */
-        BaseQueuePair& operator=(const BaseQueuePair&);
-};
-
+#include "boost/date_time/posix_time/posix_time.hpp" 
+#include <queue>
 /** wraps pair of glib GAsyncQueue 
  * * provides cast void* to T* 
  * * note:object of type T must be copyable */
 template < class T >
 class QueuePair_
-    : public BaseQueuePair
 {
     public:
         QueuePair_ < T > ()
-            : BaseQueuePair(0, 0), destroyQueues_(false) {}
+            :first_(0),second_(0), destroyQueues_(false) {}
         ~QueuePair_ < T > ();
         
         ///pop element or return T() if timeout
@@ -64,8 +44,13 @@ class QueuePair_
         void init();
 
     private:
-        T* pop_() { return (static_cast < T* > (g_async_queue_pop(first_))); }
-        void push_(T* t) { g_async_queue_push(second_, t); }
+        std::queue<T*> *first_, *second_;
+        T* pop_() { return queue_pop(); }
+        void push_(T* t) { queue_push(t); }
+
+        void queue_push(T *t){ second_->push(t);}
+        T* queue_pop(){T* ret =first_->front(); first_->pop(); return ret;}
+        T* queue_pop(boost::posix_time::ptime){T* ret =first_->front(); first_->pop(); return ret;}
 
         T *timed_pop_(int ms);
 
@@ -91,11 +76,11 @@ void QueuePair_< T >::flip(QueuePair_< T > &in)
 template < class T >
 T * QueuePair_ < T >::timed_pop_(int ms)
 {
-    GTimeVal t;
+    using namespace boost::posix_time;
+    ptime t = microsec_clock::local_time();
 
-    g_get_current_time(&t);
-    g_time_val_add(&t, ms);
-    return (static_cast < T* > (g_async_queue_timed_pop(first_, &t)));
+    ptime t2 = t + milliseconds(ms);
+    return queue_pop(t2);// (static_cast < T* > (g_async_queue_timed_pop(first_, &t)));
 }
 
 template < class T >
@@ -125,22 +110,20 @@ QueuePair_ < T >::~QueuePair_()
     if (destroyQueues_)
     {
         T *t;
-        do
+        while(!first_->empty()) 
         {
-            t = static_cast<T*>(g_async_queue_try_pop(first_));
+            //t = first_->pop();
             delete t;
         }
-        while(t);
 
-        do
+        while(!second_->empty()) 
         {
-            t = static_cast<T*>(g_async_queue_try_pop(second_));
+            //t = second_->pop();
             delete t;
         }
-        while(t);
 
-        g_async_queue_unref(first_);
-        g_async_queue_unref(second_);
+        delete first_;
+        delete second_;
     }
 }
 
@@ -152,8 +135,8 @@ void QueuePair_ < T >::init()
     if (first_ != 0 || second_ != 0)
         THROW_CRITICAL("CALLED QueuePair::init() on non empty QueuePair. QueuePair::flip was probably called.");
 
-    first_ = g_async_queue_new();
-    second_ = g_async_queue_new();
+    first_ = new std::queue<T*>();
+    second_ = new std::queue<T*>();
     destroyQueues_ = true;
 }
 
