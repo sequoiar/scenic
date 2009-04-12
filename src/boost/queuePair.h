@@ -112,13 +112,15 @@ QueuePair_ < T >::~QueuePair_()
         T *t;
         while(!first_->empty()) 
         {
-            //t = first_->pop();
+            t = first_->front();
+            first_->pop();
             delete t;
         }
 
         while(!second_->empty()) 
         {
-            //t = second_->pop();
+            t = first_->front();
+            second_->pop();
             delete t;
         }
 
