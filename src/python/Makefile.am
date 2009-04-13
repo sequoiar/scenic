@@ -18,7 +18,7 @@ milhouse_la_LIBADD =  -l$(BOOST_PYTHON_LIB)-mt $(GLIB_LIBS) \
 						   $(src)/gst/control/libgstthread.a \
 						   $(src)/gst/engine/libgst.a $(GTK_LIBS) \
 						   $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(src)/util/libutil.a \
-						   $(src)/gutil/libgutil.a $(src)/gutil/libbutil.a $(BOOST_THREAD_LIB) $(src)/tcp/libtcp.a 
+						   $(src)/gutil/libgutil.a $(src)/boost/libbutil.a $(BOOST_THREAD_LIB) $(src)/tcp/libtcp.a 
 
 milhouse_la_CPPFLAGS = -I$(PYTHON_INCLUDE_DIR) $(AM_CPPFLAGS) $(BOOST_CPPFLAGS)
 
