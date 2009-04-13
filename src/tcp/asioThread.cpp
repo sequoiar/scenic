@@ -53,7 +53,7 @@ class tcp_session
     public:
         tcp_session(io_service& io_service, QueuePair& queue)
             : socket_(io_service),queue_(queue), welcome_(),
-            t_(io_service, boost::posix_time::millisec(1)),msg_str()
+            t_(io_service, boost::posix_time::millisec(1))
     {
         LOG_DEBUG("CONSTR");
     }
@@ -69,6 +69,8 @@ class tcp_session
             async_write(socket_, buffer(welcome_),
                     boost::bind(&tcp_session::write_cb, this,
                         error));
+            t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1000));
+            t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
         }
 
         void read_cb(const error_code& err,
@@ -96,14 +98,11 @@ class tcp_session
 
         void write_cb(const error_code& err)
         {
-            LOG_DEBUG("WRITE_CB");
             if (!err)
             {
                 socket_.async_read_some(buffer(data_, max_length),
                         boost::bind(&tcp_session::read_cb, this, 
                             error, bytes_transferred));
-                //t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1));
-                //t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
             }
             else
             {
@@ -114,22 +113,24 @@ class tcp_session
 
         void handle_timer(const error_code& err)
         {
-            LOG_DEBUG("TIMER");
             if (!err)
             {
                 MapMsg msg;
-                msg = queue_.timed_pop(1000000);
+                msg = queue_.timed_pop(1);
                 if(!msg.cmd().empty())
                 {
+                    std::string msg_str;
                     Parser::stringify(msg, msg_str);
                     msg_str+='\n';
                     async_write(socket_, buffer(msg_str),
                             boost::bind(&tcp_session::write_cb, this,
                                 error));
+                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(10));
+                    t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
                 }
                 else
                 {
-                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1));
+                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1000));
                     t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
                 }
             }
@@ -141,7 +142,6 @@ class tcp_session
         QueuePair& queue_;
         std::string welcome_;
         boost::asio::deadline_timer t_;
-        std::string msg_str;
 };
 
 class tcp_server

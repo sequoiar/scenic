@@ -38,7 +38,7 @@ MapMsg* QueuePair_::queue_pop(int micro_secs)
     MapMsg* ret=0;
     boost::xtime xt;
     xtime_get(&xt,boost::TIME_UTC);
-    xt.nsec += micro_secs*1000;
+    xt.nsec += micro_secs*1000000;
 
     boost::unique_lock<boost::mutex> lock(mut);
     while(!data_ready)
@@ -74,7 +74,6 @@ MapMsg QueuePair_::timed_pop(int microsec)
     MapMsg *s = queue_pop(microsec);
 
     if (s) {
-        LOG_DEBUG("");
         n = *s;
         delete s;
     }
