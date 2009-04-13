@@ -94,7 +94,7 @@ bool MainModule::run()
         while(!signalFlag())
         {
             LOG_DEBUG("MAINLOOP");
-            MapMsg tmsg = tcp_queue.timed_pop(2000000);
+            MapMsg tmsg = tcp_queue.timed_pop(2000);
             MapMsg gmsg = gst_queue.timed_pop(2000);
             //MapMsg amsg = asio_queue.timed_pop(2);
 
