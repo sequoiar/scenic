@@ -38,7 +38,10 @@ class Logger
 
 void Logger::operator()(LogLevel& level, std::string& msg)
 {
-    std::cout << level << msg;
+    MapMsg m("log");
+    m["level"] = level;
+    m["msg"] = msg;
+    queue_.push(m);
 }
 
 /** Main command line entry point
@@ -79,7 +82,6 @@ bool MainModule::run()
     try
     {
         set_handler();
-        Logger logger_(*tcpThread_);
         if(gstThread_ == 0 or !gstThread_->run())
             THROW_ERROR("GstThread not running");
         if(tcpThread_ == 0 or !tcpThread_->run())
@@ -87,6 +89,7 @@ bool MainModule::run()
         QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
 
+        Logger logger_(*tcpThread_);
         while(!signalFlag())
         {
             MapMsg tmsg = tcp_queue.timed_pop(2000);
