@@ -69,7 +69,7 @@ class tcp_session
             async_write(socket_, buffer(welcome_),
                     boost::bind(&tcp_session::write_cb, this,
                         error));
-            t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1000));
+            t_.expires_at(t_.expires_at() + boost::posix_time::millisec(10));
             t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
         }
 
@@ -125,12 +125,12 @@ class tcp_session
                     async_write(socket_, buffer(msg_str),
                             boost::bind(&tcp_session::write_cb, this,
                                 error));
-                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(10));
+                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1));
                     t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
                 }
                 else
                 {
-                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1000));
+                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(10));
                     t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
                 }
             }
