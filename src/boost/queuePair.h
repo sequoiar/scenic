@@ -52,7 +52,7 @@ class QueuePair_
 
         void queue_push(T *t);//{ second_->push(t);}
         T* queue_pop(boost::posix_time::ptime tm);
-        T* queue_pop() { return queue_pop(0); }
+        T* queue_pop() { return queue_pop(boost::posix_time::microsec_clock::local_time()); }
         T *timed_pop_(int ms);
 
         bool destroyQueues_;
@@ -82,25 +82,27 @@ template < class T >
 T* QueuePair_< T >::queue_pop(boost::posix_time::ptime tm)
 {
     T* ret;
-    if(first_->empty())
-    {
-        if(!tm.is_not_a_date_time())
-            while(tm < boost::posix_time::microsec_clock::local_time())
-            {
-                boost::unique_lock<boost::mutex> lock(mut);
-                while(!data_ready)
-                    cond.wait(lock);
+    LOG_INFO(":");
+    boost::xtime xt;
+    xtime_get(&xt,boost::TIME_UTC);
+    xt.sec += 1;
 
-                if(!first_->empty())
-                    break;
-            }
-    }
+    boost::unique_lock<boost::mutex> lock(mut);
+    while(!data_ready)
+        if(tm.is_not_a_date_time())
+            cond.wait(lock);
+        else
+            if(!cond.timed_wait(lock,xt))
+                break;
+
     if(!first_->empty())
     {
         ret = first_->front(); 
         first_->pop();
+        data_ready=false;
+        return ret;
     }
-    return ret;
+    return 0;
 }
 
 template < class T >
