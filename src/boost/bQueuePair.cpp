@@ -35,7 +35,7 @@ void QueuePair_::queue_push(MapMsg *t)
 
 MapMsg* QueuePair_::queue_pop(int micro_secs)
 {
-    MapMsg* ret;
+    MapMsg* ret=0;
     boost::xtime xt;
     xtime_get(&xt,boost::TIME_UTC);
     xt.nsec += micro_secs*1000;
@@ -49,10 +49,11 @@ MapMsg* QueuePair_::queue_pop(int micro_secs)
     {
         ret = first_->front(); 
         first_->pop();
-        data_ready=false;
-        return ret;
     }
-    return 0;
+    if(first_->empty())
+        data_ready=false;
+
+    return ret;
 }
 
 
