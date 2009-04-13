@@ -88,24 +88,20 @@ bool MainModule::run()
             THROW_ERROR("GstThread not running");
         if(tcpThread_ == 0 or !tcpThread_->run())
             THROW_ERROR("TcpThread not running");
+
         QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
 
         while(!signalFlag())
         {
-            LOG_DEBUG("MAINLOOP");
             MapMsg tmsg = tcp_queue.timed_pop(2000);
             MapMsg gmsg = gst_queue.timed_pop(2000);
-            //MapMsg amsg = asio_queue.timed_pop(2);
-
-            //if(amsg.cmd() == "data")
-            //    LOG_DEBUG(std::string(amsg["str"]));
 
             if (!gmsg.cmd().empty())
                 tcp_queue.push(gmsg);
             if (tmsg.cmd().empty())
                 continue;
-            LOG_DEBUG(std::string(tmsg.cmd()));
+
             if (tmsg.cmd() == "quit")
             {
                 MsgThread::broadcastQuit();
@@ -116,7 +112,7 @@ bool MainModule::run()
             else
             {
                 tmsg["id"] = ++msg_count;
-              //  gst_queue.push(tmsg);
+                gst_queue.push(tmsg);
                 tmsg["ack"] = "ok";
                 tcp_queue.push(tmsg);
             }
