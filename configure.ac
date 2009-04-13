@@ -198,6 +198,7 @@ AC_CONFIG_FILES([Makefile
                  src/include/Makefile
                  src/util/Makefile
                  src/gutil/Makefile
+                 src/boost/Makefile
                  src/tcp/Makefile
                  src/gst/Makefile
                  src/gst/engine/Makefile

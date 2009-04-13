@@ -26,11 +26,10 @@
 #include "baseThread.h"
 #include "mapMsg.h"
 
-typedef QueuePair_<MapMsg> QueuePair;
 
 /** template specialization of BaseThread with MapMsg */
 class MsgThread
-    : public BaseThread<MapMsg>
+    : public BaseThread
 {
 
 };
