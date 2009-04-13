@@ -130,8 +130,9 @@ AX_PYTHON
 AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
 
 AX_BOOST_BASE([1.34])
-AX_BOOST_THREAD
 if test  "x${enable_asio}" = "xyes"; then
+AX_BOOST_THREAD
+AX_BOOST_SYSTEM
 AX_BOOST_ASIO
 fi
 
