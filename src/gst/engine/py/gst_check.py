@@ -39,9 +39,12 @@ except ImportError:
 p = Popen(["./find_elements.sh"], stdout=PIPE)
 output = p.communicate()[0]
 
+# FIXME: is this really the best way?
 GST_PLUGINS = output.split('\n')    # turn our string into a list
 GST_PLUGINS.remove("")  # get rid of empty entries
 GST_PLUGINS = set(GST_PLUGINS)  # get rid of duplicate entries
+GST_PLUGINS = list(GST_PLUGINS)  
+GST_PLUGINS.sort() # sort
 
 MISSING_PLUGINS = []
 
