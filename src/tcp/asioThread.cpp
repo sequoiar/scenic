@@ -59,7 +59,7 @@ class tcp_session
     }
         ~tcp_session()
         {
-            LOG_DEBUG("DESTR");
+            io_service_.stop();
         }
         tcp::socket& socket()
         {
@@ -94,7 +94,6 @@ class tcp_session
             else
             {
                 std::cout << "here" << std::endl;
-                io_service_.stop();
                 delete this;
             }
         }
