@@ -159,8 +159,8 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         """
         
         testing.verb('')
-        telnet_rx_port = 1250
-        telnet_tx_port = 1350
+        telnet_rx_port = 1250 # GstPort in miville
+        telnet_tx_port = 1350 # GstPort in miville
         
         rx_init = testing.AudioInit()
         rx_init.codec = 'vorbis'
@@ -188,7 +188,6 @@ class Test_milhouse_ipcp(testing.Milhouse_IPCP_Base_Test):
         self.tst_tx("start:", start_ok)
         # check for transfered data
         # should be well above 0 bytes at this point
-        
         
         self.stream_duration(5.)
         # cleanup and go home
