@@ -177,9 +177,9 @@ class Process(object):
         self.delayafterclose = 0.2 # important to override this in child classes
         self.timeout_expect = 0.9
         self.expected_when_started = ""  #TODO
+        self.test_case = None # important : must be a valid TestCase instance. Should be overriden by kwargs
         self.__dict__.update(kwargs)
         self.child = None # pexpect.spawn object
-        self.test_case = None # important : must be a valid TestCase instance.
 
     def kill(self):
         """
@@ -229,11 +229,10 @@ class Process(object):
             if self.logfile is not None:
                 kwargs['logfile'] = self.logfile
             self.child = pexpect.spawn(command, **kwargs) 
-            # if self.expected_when_started != "":
-            #     self.expect_test(self.expected_when_started, "process did not output: %s" % self.expected_when_started, timeout=2.0)
-            # else:
-            #     self.sleep(0.9)
-            self.sleep(0.9)
+            if self.expected_when_started != "":
+                self.expect_test(self.expected_when_started, "process did not output: %s" % self.expected_when_started, 2.0)
+            else:
+                self.sleep(0.9)
         except pexpect.ExceptionPexpect, e:
             echo("Error starting process %s." % (command), self.verbose)
             raise
@@ -312,11 +311,8 @@ class ClientServerTester(object):
 
         :param name: Used as a prefix for log files.
         """
-        #self.name = name
         self.verbose = False
-        #self.logfile_prefix = "default_" # TODO: use caller file name
         self.test_case = None
-        self.logfile = None
         self.logname = 'default' # the only thing the user must set...
         self.__dict__.update(kwargs)
         self.log_to_file = not self.verbose
@@ -342,9 +338,6 @@ class ClientServerTester(object):
             self.start_server()
         if self.client is None:
             self.start_client()
-        for child in (self.client, self.server):
-            if child is not None:
-                child.test_case = test_case
 
     def start_server(self, **kwargs):
         """
@@ -369,6 +362,7 @@ class ClientServerTester(object):
         :param kwargs: **kwargs for child
         """
         kwargs['logfile_name'] = self.logfile_name
+        kwargs['test_case'] = self.test_case  #IMPORTANT
         kwargs['logfile_path'] = self.logfile_path
         kwargs['verbose'] = self.verbose
         self.__dict__[which] = klass(**kwargs)
@@ -401,8 +395,8 @@ class TelnetProcess(Process):
         self.port_offset = 0
         self.host = "localhost"
         self.port = 14444
+        kwargs['expected_when_started'] = "pof"
         Process.__init__(self, **kwargs)
-        self.expected_when_started = "pof"
         echo("starting %s(%s)" % (self.__class__.__name__, kwargs), self.verbose)
 
     def make_command(self):
@@ -416,8 +410,8 @@ class MivilleProcess(Process):
         self.port_offset = 0
         self.miville_home = "~/.miville"
         self.use_tmp_home = True
+        kwargs['expected_when_started'] = "Miville is ready"
         Process.__init__(self, **kwargs)
-        self.expected_when_started = "Miville is ready"
         if self.use_tmp_home:
             self.miville_home = create_tmp_dir()
             echo("MIVILLE HOME : %s" % (self.miville_home), self.verbose)
@@ -452,9 +446,9 @@ class TelnetMivilleTester(ClientServerTester):
         :param kwargs: **kwargs for child
         """
         if which == 'client':
-            attrs_to_pass = ['port_offset', 'verbose', 'logfile']
+            attrs_to_pass = ['port_offset']
         elif which == 'server':
-            attrs_to_pass = ['port_offset', 'miville_home', 'use_tmp_home', 'verbose', 'logfile']
+            attrs_to_pass = ['port_offset', 'miville_home', 'use_tmp_home']
         for attr_name in attrs_to_pass:
             kwargs[attr_name] = self.__dict__[attr_name]
         ClientServerTester._start_child(self, which, klass, **kwargs)
@@ -466,8 +460,8 @@ class MilhouseProcess(Process):
     def __init__(self, **kwargs): # mode=[r|s], serverport=9000
         self.mode = 't'
         self.serverport = '8000'
+        kwargs['expected_when_started'] = ""
         Process.__init__(self, **kwargs)
-        self.expected_when_started = "" # please enter your expectations here
 
     def make_command(self):
         return "milhouse -%s --serverport %s" % (self.mode, self.serverport)
