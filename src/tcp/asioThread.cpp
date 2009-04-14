@@ -194,7 +194,6 @@ class tcp_server
             else
             {
                 std::cout << "here5" << std::endl;
-                delete this;
             }
         }
 
