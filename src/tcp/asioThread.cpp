@@ -55,7 +55,7 @@ class tcp_session
             : io_service_(io_service),socket_(io_service),queue_(queue), welcome_(),
             t_(io_service, boost::posix_time::millisec(1))
     {
-        LOG_DEBUG("CONSTR");
+        std::cout << "READY\n";
     }
         ~tcp_session()
         {
@@ -69,7 +69,6 @@ class tcp_session
         void start()
         {
             welcome_ = "READY:\n"; 
-            std::cout << "READY\n";
             async_write(socket_, buffer(welcome_),
                     boost::bind(&tcp_session::write_cb, this, error));
             socket_.async_read_some(buffer(data_, max_length),
