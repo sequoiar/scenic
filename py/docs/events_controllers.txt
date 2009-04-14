@@ -45,11 +45,11 @@ From UI:
 	- contact_unselected
 	- edit_contact
 	- add_contact
-	- save_contact
+	- save_contact = contact_selected
 
 From server:
-	- stream_status_changed
-	- test_status_changed
+	- stream_status_changed = status_changed = call contact_[un]selected
+	- test_status_changed = status_changed
 
 **Controllers**
 

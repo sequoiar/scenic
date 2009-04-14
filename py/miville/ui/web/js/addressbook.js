@@ -475,7 +475,6 @@ Addressbook.methods(
 		}
 	},
 
-	///////////////////////////////////////////////////////////////
 	
 	/**
 	 * Error window to be redone.
@@ -541,7 +540,7 @@ Addressbook.methods(
 		self.selected_li = null;
 		self.update_selected(null);
 		
-		// notify the controllers of this selection
+		// notify the widgets of this selection
 		notify('adb', 'selection', self.selected_li);
 	},
 
@@ -555,6 +554,9 @@ Addressbook.methods(
 		if (self.get_selected_attr('state') == 0) {
 			self.edit_type = 'modify';
 			self.notify_controllers('edit_contact');
+
+			// notify the widgets of this
+			notify('adb', 'edit', self.selected_li);
 		}
 	},
 
@@ -567,6 +569,9 @@ Addressbook.methods(
 	function add_contact(self) {
 		self.edit_type = 'new';
 		self.notify_controllers('add_contact');
+
+		// notify the widgets of this
+		notify('adb', 'add', null);
 	},
 	
     /**
@@ -661,6 +666,9 @@ Addressbook.methods(
 	function cancel_edit_flds(self) {
 		if (self.selected_li != null) {
 			self.notify_controllers('contact_selected');
+			
+			// notify other widgets
+			notify('adb', 'cancel_edit', self.selected_li);
 		}
 	},
 

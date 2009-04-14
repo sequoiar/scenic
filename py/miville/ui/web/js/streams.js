@@ -99,12 +99,16 @@ Streams.methods(
 		dbug.info(caller);
 		dbug.info(key);
 		dbug.info(value);
-		if (key == 'selection') {
+		if (caller == 'adb') {
 			self.contact = value;
-			if (value == null) {
+			if (['selection', 'cancel_edit'].contains(key)) {
+				if (value == null) {
+					self.notify_controllers('contact_unselected');
+				} else {
+					self.notify_controllers('contact_selected');
+				}
+			} else if (['edit', 'add'].contains(key)) {
 				self.notify_controllers('contact_unselected');
-			} else {
-				self.notify_controllers('contact_selected');
 			}
 		}
 	},
@@ -143,7 +147,7 @@ Streams.methods(
      */
 	function upd_start_btn(self, event) {
 		// list of events that "list" should react to
-		if (event == 'contact_selected') {
+		if ('contact_selected' == event) {
 			
 			// set the default state
 			var button_state = 'disabled';
@@ -175,7 +179,8 @@ Streams.methods(
 			} else {
 				self.start_btn.disabled = true;
 			}
-		} else if (event == 'contact_unselected') {
+		} else if (['contact_unselected',
+					'add_contact'].contains(event)) {
 			self.start_btn.disabled = true;
 			self.start_btn.value = self.start_str;
 		}
