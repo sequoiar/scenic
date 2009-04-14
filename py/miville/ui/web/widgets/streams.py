@@ -40,11 +40,11 @@ class Streams(Widget):
 #        self.connections = {}
         
     def rc_start_streams(self, contact):
-        self.api.start_streams_tmp(self, contact)
+        self.api.start_streams(self, contact)
         return False
         
     def rc_stop_streams(self, contact):
-        self.api.stop_streams_tmp(self, contact)
+        self.api.stop_streams(self, contact)
         return False
         
 #    def cb_get_contactss(self, origin, data):

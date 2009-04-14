@@ -593,22 +593,23 @@ class ControllerApi(object):
 
     ### Streams ###
     
-    def start_streams_tmp(self, caller, contact_name):
-        log.debug('START')
-        contact = self.get_contact(contact_name)
-        contact.stream_state = 2
-#        self.notify(caller, 2)
-        
-    def stop_streams_tmp(self, caller, contact_name):
-        contact = self.get_contact(contact_name)
-        contact.stream_state = 0
-#        self.notify(caller, 0)
+#    def start_streams_tmp(self, caller, contact_name):
+#        log.debug('START')
+#        contact = self.get_contact(contact_name)
+#        contact.stream_state = 2
+##        self.notify(caller, 2)
+#        
+#    def stop_streams_tmp(self, caller, contact_name):
+#        contact = self.get_contact(contact_name)
+#        contact.stream_state = 0
+##        self.notify(caller, 0)
         
         
     def start_streams(self, caller, contact_name):
         try:
             contact, global_setting, settings_com_channel  = self._get__settings_com_chan_from_contact_name(contact_name)
             global_setting.start_streaming(self, contact.address, settings_com_channel)
+            contact.stream_state = 2
             self.notify(caller, "streaming started")
         except AddressBookError, e:
                 self.notify(caller, "Please select a contact prior to start streaming." + e.message, "error")   
@@ -624,6 +625,7 @@ class ControllerApi(object):
         try:
             contact, global_setting, settings_com_channel  = self._get__settings_com_chan_from_contact_name(contact_name)
             global_setting.stop_streaming(contact.address, settings_com_channel)
+            contact.stream_state = 0
             self.notify(caller, "streaming stopped")
         except AddressBookError, e:
                 self.notify(caller, "Please select a contact prior to stop streaming." + e.message, "error")   
