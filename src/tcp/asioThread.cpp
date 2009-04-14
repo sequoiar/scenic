@@ -52,7 +52,7 @@ class tcp_session
 {
     public:
         tcp_session(io_service& io_service, QueuePair& queue)
-            : socket_(io_service),queue_(queue), welcome_(),
+            : io_service_(io_service),socket_(io_service),queue_(queue), welcome_(),
             t_(io_service, boost::posix_time::millisec(1))
     {
         LOG_DEBUG("CONSTR");
@@ -94,6 +94,7 @@ class tcp_session
             else
             {
                 std::cout << "here" << std::endl;
+                io_service_.stop();
                 delete this;
             }
         }
@@ -120,11 +121,18 @@ class tcp_session
                 msg = queue_.timed_pop(1);
                 if(!msg.cmd().empty())
                 {
-                    std::string msg_str;
-                    Parser::stringify(msg, msg_str);
-                    msg_str+='\n';
-                    async_write(socket_, buffer(msg_str),
-                            boost::bind(&tcp_session::write_cb, this, error));
+                    if(msg.cmd() == "quit")
+                    {
+                        socket_.close();
+                    }
+                    else
+                    {
+                        std::string msg_str;
+                        Parser::stringify(msg, msg_str);
+                        msg_str+='\n';
+                        async_write(socket_, buffer(msg_str),
+                                boost::bind(&tcp_session::write_cb, this, error));
+                    }
                 }
                 else
                 {
@@ -138,6 +146,7 @@ class tcp_session
             }
         }
     private:
+        io_service& io_service_;
         tcp::socket socket_;
         enum { max_length = 1024 };
         char data_[max_length];
@@ -189,7 +198,8 @@ class tcp_server
                 t_.expires_at(t_.expires_at() + boost::posix_time::seconds(1));
                 t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
                 if(MsgThread::isQuitted())
-                    THROW_END_THREAD("bye");
+                    io_service_.stop();
+                    //THROW_END_THREAD("bye");
             }
             else
             {
@@ -261,7 +271,6 @@ void asio_thread::main()
 #ifdef HAVE_BOOST_ASIO
         io_service io_service;
 
-        using namespace std; // For atoi.
         tcp_server s(io_service, port_,queue_);
         udp_server us(io_service, port_);
 
