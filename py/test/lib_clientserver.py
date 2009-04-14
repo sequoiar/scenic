@@ -37,19 +37,27 @@ import string
 # from miville.utils.common import get_def_name
 
 # module variables
-VERBOSE = False
+VERBOSE = False # you can override this from your test
 
-def echo(s, endl=True):
+def make_test_name(filename):
+    """
+    Returns the name of this test file.
+    Usage: name = make_test_name(__file__)
+    """
+    return filename.split('/')[-1].split('.')[0]
+
+def echo(s, verbose=None):
     """
     Prints a line to standard output with a prefix.
     """
     global VERBOSE
-    if VERBOSE:
-        if endl:
+    if verbose is True:
+        print s
+    elif verbose is False:
+        pass
+    else:
+        if VERBOSE:
             print s
-        else:
-            print s, 
-            # note the comma (",") at end of line
 
 def die():
     """
@@ -70,12 +78,15 @@ def use_tmp_dir():
         print "Created %s/ directory." % (tmp)
     return tmp
 
-def open_logfile(self, path, filename):
+def open_logfile(path, filename):
     """
     Opens a file name to write and returns its handle. 
     If the directory doesn't exist, creates it.
     """
-    os.makedirs(path)
+    try:
+        os.makedirs(path)
+    except OSError, e:
+        pass
     fullpath = os.path.join(path, filename)
     return open(fullpath, 'w')
 
@@ -119,6 +130,7 @@ def get_test_remote_host():
     Example in bash:
     export MIVILLE_TEST_REMOTE_HOST="10.10.10.65" 
     """
+    #TODO: test and use
     ret = get_env_variable('MIVILLE_TEST_REMOTE_HOST')
     if ret is None:
         ret = '127.0.0.1' # default
@@ -164,23 +176,23 @@ class Process(object):
     Manages a process using pexpect.
     """
     def __init__(self, **kwargs):
-        global VERBOSE
+        #global VERBOSE
         self.logfile = sys.stdout
-        self.verbose = VERBOSE
-        self.logfile_suffix = ""
-        self.delayafterclose = 0.1 # important to override this in child classes
-        self.timeout_expect = 0.1
-        self.expected_when_started = ""
-        self.test_case = None # important : must be a valid TestCase instance.
-        self.LOGFILE_EXTENSION = "txt"
+        self.verbose = False
+        #self.logfile_suffix = ""
+        self.delayafterclose = 0.2 # important to override this in child classes
+        self.timeout_expect = 0.9
+        self.expected_when_started = ""  #TODO
+        #self.LOGFILE_EXTENSION = "txt"
         self.__dict__.update(kwargs)
         self.child = None # pexpect.spawn object
+        self.test_case = None # important : must be a valid TestCase instance.
     
-    def open_logfile(self, filename):
-        """
-        Opens the log file in write mode
-        """
-        self.logfile = open("%s%s.%s" % (filename, self.logfile_suffix, self.LOGFILE_EXTENSION), 'w')
+    #    def open_logfile(self, filename):
+    #        """
+    #        Opens the log file in write mode
+    #        """
+    #        self.logfile = open("%s%s.%s" % (filename, self.logfile_suffix, self.LOGFILE_EXTENSION), 'w')
 
     def kill(self):
         """
@@ -188,18 +200,18 @@ class Process(object):
         
         See kill -l for flags
         """
-        echo("KILLING process")
+        echo("KILLING process", self.verbose)
         if self.child is not None:
             self.child.delayafterclose = self.delayafterclose
             # TODO: delayafterterminate
             try:
                 self.child.close()
                 if self.logfile is not sys.stdout:
-                    self.logfile.close()
+                    pass # self.logfile.close()
             except IOError, e:
-                echo(e.value)
+                echo(e.value, self.verbose)
             except ValueError, e:
-                echo(e.value)
+                echo(e.value, self.verbose)
     
     def is_running(self):
         """
@@ -217,19 +229,25 @@ class Process(object):
         try:
             directory = os.getcwd()
             if self.verbose:
-                echo('Current working dir: ' + directory)
-                echo('Starting \"%s\"' % command)
+                echo('Current working dir: ' + directory, self.verbose)
+                echo('Starting \"%s\"' % command, self.verbose)
             self.child = pexpect.spawn(command, logfile=self.logfile, timeout=self.timeout_expect) 
-            # TODO : add expectation here.
-            try:
-                self.expect_test(self.expected_when_started, "process did not output: %s" % self.expected_when_started, timeout=0.5)
-            except:
-                self.sleep(0.4) # seconds
+            # if self.expected_when_started != '':
+            #     try:
+            #         self.expect_test(self.expected_when_started, "process did not output: %s" % self.expected_when_started, timeout=0.5)
+            #     except:
+            #         # TODO : add expectation here.
+            #         self.sleep(0.4) # seconds
+            self.sleep(0.9) # seconds
         except pexpect.ExceptionPexpect, e:
-            echo("Error starting process %s." % (command))
+            echo("Error starting process %s." % (command), self.verbose)
             raise
         if not self.is_running():
-            raise Exception("Process could not be started. Not running. Is an other similar process already running ? %s" % (command))
+            pass
+            # raise Exception("Child process is not running. Is an other similar process already running ? Command used : %s" % (command))
+    
+    def sendline(self, line):
+        self.child.sendline(line)
     
     def expect_test(self, expected, message=None, timeout=-1):
         """
@@ -244,6 +262,7 @@ class Process(object):
             message = "Expected %s but did not get it." % (expected)
         if timeout == -1:
             timeout = self.timeout_expect
+        self.flush_output()
         # other listed expectations are child classes of Exception
         index = self.child.expect([expected, pexpect.EOF, pexpect.TIMEOUT], timeout=timeout) # 2 seconds max
         self.test_case.assertEqual(index, 0, message)
@@ -282,7 +301,7 @@ class Process(object):
         """
         :return string: Shell command to execute in order to start this process.
         """
-        raise NotImplementedError("You should override this method")
+        raise NotImplementedError("You must override this method")
 # ---------------------------------------------------
 
 class ClientServerTester(object):
@@ -291,66 +310,82 @@ class ClientServerTester(object):
     """
     SERVER_CLASS = Process
     CLIENT_CLASS = Process
-    def __init__(self, name, **kwargs):
+
+    def __init__(self, **kwargs):
         """
         Update default options here
 
         :param name: Used as a prefix for log files.
         """
-        global VERBOSE
-        self.name = name
-        self.verbose = VERBOSE
-        self.logfile_prefix = "default_" # TODO: use caller file name
-        self.client_logfile = sys.stdout
-        self.server_logfile = sys.stdout
+        #self.name = name
+        self.verbose = False
+        #self.logfile_prefix = "default_" # TODO: use caller file name
         self.test_case = None
         self.__dict__.update(kwargs)
-        self.server_kwargs = {'logfile':self.server_logfile}
-        self.client_kwargs = {'logfile':self.client_logfile}
         self.client = None
         self.server = None
     
-    def setup(self,test_case):
+    def setup(self, test_case):
         """
         Should be called in the setUp method of unittest.TestCase classes.
         :param test_case: unittest.TestCase instance. Typically self. 
         """
         self.test_case = test_case
         for child in (self.client, self.server):
-            child.test_case = test_case
-    def prepare(self):
-        raise NotImplementedError()
+            if child is not None:
+                child.test_case = test_case
 
-    def start(self):
+    def start_server(self, **kwargs):
         """
-        Starts server and client processes.
+        Factory for server process
+        :param kwargs: **kwargs for child
         """
-        self.prepare()
-        self.server = self.SERVER_CLASS(**self.server_kwargs)
-        self.client = self.CLIENT_CLASS(**self.client_kwargs)
-        self.server.start()
-        self.client.start()
+        self._start_child('server', self.SERVER_CLASS, **kwargs)
+        #time.sleep(0.8)
 
-    def kill_client_and_server(self):
+    def start_client(self, **kwargs):
+        """
+        Factory for client process
+        :param kwargs: **kwargs for child
+        """
+        self._start_child('client', self.CLIENT_CLASS, **kwargs)
+    
+    def _start_child(self, which, klass, **kwargs):
+        """
+        Called by self.start_server and self.start_client
+        :param which: "client" or "server"
+        :param klass: self.SERVER_CLASS or self.CLIENT_CLASS
+        :param kwargs: **kwargs for child
+        """
+        #kwargs['verbose'] = self.verbose
+        # echo("starting %s(%s)" % (klass.__name__, kwargs))
+        self.__dict__[which] = klass(**kwargs)
+        self.__dict__[which].start()
+
+    def kill_children(self):
+        """
+        Stops all children processes
+        """
         for child in [self.client, self.server]:
             if child is not None:
                 try:
                     child.kill()
                 except Exception, e:
-                    echo(e.message)
-            
+                    echo(e.message, self.verbose)
 
 class TelnetProcess(Process):
     """
     telnet client process
     """
     def __init__(self, **kwargs):
+        self.port_offset = 0
         self.host = "localhost"
         self.port = 14444
         Process.__init__(self, **kwargs)
+        echo("starting %s(%s)" % (self.__class__.__name__, kwargs), self.verbose)
 
     def make_command(self):
-        return "telnet %s %d" % (self.host, self.port)
+        return "telnet %s %d" % (self.host, self.port + self.port_offset)
 
 class MivilleProcess(Process):
     """
@@ -361,10 +396,13 @@ class MivilleProcess(Process):
         self.miville_home = "~/.miville"
         self.use_tmp_home = False
         Process.__init__(self, **kwargs)
+        if self.use_tmp_home:
+            self.miville_home = use_tmp_dir()
+            echo("MIVILLE HOME : %s" % (self.miville_home), self.verbose)
+        echo("starting %s(%s)" % (self.__class__.__name__, kwargs), self.verbose)
 
     def make_command(self):
-        command = "./miville.py -o %s -m %s -C" % (self.port_offset, os.path.expanduser(self.miville_home))
-        return command
+        return  "./miville.py -o %s -m %s -C" % (self.port_offset, os.path.expanduser(self.miville_home))
 
 class TelnetMivilleTester(ClientServerTester):
     """
@@ -373,7 +411,6 @@ class TelnetMivilleTester(ClientServerTester):
     SERVER_CLASS = MivilleProcess
     CLIENT_CLASS = TelnetProcess
 
-
     def __init__(self, **kwargs): # name, port_offset=0, use_tmp_home=False):
         # TODO: manage log files.
         self.port_offset = 0
@@ -381,18 +418,22 @@ class TelnetMivilleTester(ClientServerTester):
         self.use_tmp_home = False
         ClientServerTester.__init__(self, **kwargs)
 
-    def prepare(self):
-        if self.use_tmp_home:
-            self.miville_home = use_tmp_dir()
-        self.server_kwargs = {
-            'logfile':self.server_logfile, 
-            'port_offset':self.port_offset, 
-            'miville_home':self.miville_home
-        }
-        self.client_kwargs = {
-            'logfile':self.client_logfile, 
-            'port':14444 + self.port_offset
-        }
+    def _start_child(self, which, klass, **kwargs):
+        """
+        We specify attributes of self to pass to children
+        
+        Called by self.start_server and self.start_client
+        :param which: "client" or "server"
+        :param klass: self.SERVER_CLASS or self.CLIENT_CLASS
+        :param kwargs: **kwargs for child
+        """
+        if which == 'client':
+            attrs_to_pass = ['port_offset', 'verbose']
+        elif which == 'server':
+            attrs_to_pass = ['port_offset', 'miville_home', 'use_tmp_home', 'verbose']
+        for attr_name in attrs_to_pass:
+            kwargs[attr_name] = self.__dict__[attr_name]
+        ClientServerTester._start_child(self, which, klass, **kwargs)
 
 class MilhouseProcess(Process):
     """
@@ -404,8 +445,7 @@ class MilhouseProcess(Process):
         Process.__init__(self, **kwargs)
 
     def make_command(self):
-        command = "milhouse -%s --serverport %s" % (self.mode, self.serverport)
-        return command
+        return "milhouse -%s --serverport %s" % (self.mode, self.serverport)
 
 class TelnetMilhouseTester(ClientServerTester):
     """
@@ -419,13 +459,19 @@ class TelnetMilhouseTester(ClientServerTester):
         self.serverport = '0'
         ClientServerTester.__init__(self, **kwargs)
     
-    def prepare(self):
-        self.server_kwargs = {
-            'logfile':self.server_logfile, 
-            'mode':self.mode, 
-            'serverport':self.serverport
-        }
-        self.client_kwargs = {
-            'logfile':self.client_logfile, 
-            'port':self.serverport 
-        }
+    def _start_child(self, which, klass, **kwargs):
+        """
+        We specify attributes of self to pass to children
+        
+        Called by self.start_server and self.start_client
+        :param which: "client" or "server"
+        :param klass: self.SERVER_CLASS or self.CLIENT_CLASS
+        :param kwargs: **kwargs for child
+        """
+        if which == 'client':
+            kwargs['port'] = self.serverport
+        elif which == 'server':
+            kwargs['serverport'] = self.serverport
+            kwargs['mode'] = self.mode
+        ClientServerTester._start_child(self, which, klass, **kwargs)
+

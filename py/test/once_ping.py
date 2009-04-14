@@ -24,50 +24,53 @@ Starts two miville and tests the protocols/pinger module.
 import unittest
 from test import lib_clientserver as clientserver
 import os
+import sys
 
-fname = __file__.split('.')[0]
-logdir = "test/log/1" # put your build number here (env var)
-devnull = open(os.devnull, 'w')
-local = clientserver.TelnetMivilleTester(name='local', client_logfile=devnull, server_logfile=devnull, use_tmp_home=True)
-# logdir=logdir, logfilename=fname + "local", use_tmp_home=True)
-local.start()
+#log_dir = "/tmp/miville_test"
+#log_file_name = "%s.log" % (clientserver.make_test_name(__file__))
+# CHOOSE YOUR LOG FILE HERE
+logfile = open(os.devnull, 'w')
+#logfile = sys.stdout
+#logfile = clientserver.open_logfile(log_dir, log_file_name)
+# TODO build number
 
-remote = clientserver.TelnetMivilleTester(name='remote', client_logfile=devnull, server_logfile=devnull, use_tmp_home=True, port_offset=1)
-# port_offset=1, logdir=logdir, logfilename=fname + "remote", use_tmp_home=True)
-remote.start()
+clientserver.kill_all_zombie_processes()
+local_tester = clientserver.TelnetMivilleTester(port_offset=0, use_tmp_home=True, verbose=False)
+local_tester.start_server(logfile=logfile)
+local_tester.start_client(logfile=logfile)
+remote_tester = clientserver.TelnetMivilleTester(port_offset=1, use_tmp_home=True)
+remote_tester.start_server(logfile=logfile)
+remote_tester.start_client(logfile=logfile)
 
 class Test_Ping(unittest.TestCase):
     def setUp(self):
-        global local
-        global remote
-        self.local = local
-        self.remote = remote
+        global local_tester 
+        global remote_tester 
+        self.local = local_tester  # TODO: self.local_client = local_tester.client
+        self.remote = remote_tester 
         self.local.setup(self)
         self.remote.setup(self)
 
     def test_01_ping(self):
         # contacts we add might be already in their addressbook
-        self.local.client.child.sendline("c -a Charlotte 127.0.0.1 2223")
+        self.local.client.sendline("c -a Charlotte 127.0.0.1 2223")
         self.local.client.expect_test("added")
-        self.remote.client.child.sendline("c -a Pierre 127.0.0.1 2222")
+        self.remote.client.sendline("c -a Pierre 127.0.0.1 2222")
         self.remote.client.expect_test("added")
-        self.local.client.child.sendline("c -s Charlotte")
+        self.local.client.sendline("c -s Charlotte")
         self.local.client.expect_test("selected")
-        self.local.client.child.sendline("j -s")
+        self.local.client.sendline("j -s")
         self.remote.client.expect_test("Do you accept")
-        self.remote.client.child.sendline("Y")
+        self.remote.client.sendline("Y")
         self.local.client.expect_test('accepted', 'Connection not successful.')
-        self.local.client.child.sendline("ping")
+        self.local.client.sendline("ping")
         self.local.client.expect_test('pong', 'Did not receive pong answer.')
 
     def test_02_network_performance_test(self):
-        self.local.client.child.sendline("n -s -k dualtest -t 1") # network test for 1 second
+        self.local.client.sendline("n -s -k dualtest -t 1") # network test for 1 second
         self.local.client.expect_test("Starting", 'Did not start network test')
         self.local.client.expect_test('jitter', 'Did not receive network test results.', 1.3)
 
     def test_99_close(self):
-        try:
-            self.local.kill_client_and_server()
-            self.remote.kill_client_and_server()
-        except Exception, e:
-            print e.message
+        self.local.kill_children()
+        self.remote.kill_children()
