@@ -36,17 +36,9 @@ import sys
 import tempfile
 import commands
 import string
-# from miville.utils.common import get_def_name
 
 # module variables
 VERBOSE = False # you can override this from your test
-
-def make_test_name(filename):
-    """
-    Returns the name of this test file.
-    Usage: name = make_test_name(__file__)
-    """
-    return filename.split('/')[-1].split('.')[0]
 
 def echo(s, verbose=None):
     """
@@ -68,7 +60,7 @@ def die():
     echo("EXITING")
     sys.exit(1)
 
-def use_tmp_dir():
+def create_tmp_dir():
     """
     Creates a temporary dir in /tmp/ and return its path.
     """
@@ -178,23 +170,16 @@ class Process(object):
     Manages a process using pexpect.
     """
     def __init__(self, **kwargs):
-        #global VERBOSE
-        self.logfile = sys.stdout
+        self.logfile = None
         self.verbose = False
-        #self.logfile_suffix = ""
+        self.logfile_path = "."
+        self.logfile_name = "default.log"
         self.delayafterclose = 0.2 # important to override this in child classes
         self.timeout_expect = 0.9
         self.expected_when_started = ""  #TODO
-        #self.LOGFILE_EXTENSION = "txt"
         self.__dict__.update(kwargs)
         self.child = None # pexpect.spawn object
         self.test_case = None # important : must be a valid TestCase instance.
-    
-    #    def open_logfile(self, filename):
-    #        """
-    #        Opens the log file in write mode
-    #        """
-    #        self.logfile = open("%s%s.%s" % (filename, self.logfile_suffix, self.LOGFILE_EXTENSION), 'w')
 
     def kill(self):
         """
@@ -227,20 +212,26 @@ class Process(object):
         """
         Starts the process
         """
+        if self.logfile is None: 
+            if self.verbose:
+                self.logfile = sys.stdout
+            else:
+                self.logfile = open_logfile(self.logfile_path, self.logfile_name)
         command = self.make_command()
         try:
             directory = os.getcwd()
             if self.verbose:
                 echo('Current working dir: ' + directory, self.verbose)
                 echo('Starting \"%s\"' % command, self.verbose)
-            self.child = pexpect.spawn(command, logfile=self.logfile, timeout=self.timeout_expect) 
-            # if self.expected_when_started != '':
-            #     try:
-            #         self.expect_test(self.expected_when_started, "process did not output: %s" % self.expected_when_started, timeout=0.5)
-            #     except:
-            #         # TODO : add expectation here.
-            #         self.sleep(0.4) # seconds
-            self.sleep(0.9) # seconds
+            kwargs = {
+                'timeout':self.timeout_expect
+                }
+            if self.logfile is not None:
+                kwargs['logfile'] = self.logfile
+            self.child = pexpect.spawn(command, **kwargs) 
+            if self.expected_when_started != '':
+                self.expect_test(self.expected_when_started, "process did not output: %s" % self.expected_when_started, timeout=0.9)
+            self.sleep(0.9)
         except pexpect.ExceptionPexpect, e:
             echo("Error starting process %s." % (command), self.verbose)
             raise
@@ -323,17 +314,32 @@ class ClientServerTester(object):
         self.verbose = False
         #self.logfile_prefix = "default_" # TODO: use caller file name
         self.test_case = None
-        self.logfile = sys.stdout
+        self.logfile = None
+        self.logname = 'default' # the only thing the user must set...
         self.__dict__.update(kwargs)
+        self.log_to_file = not self.verbose
         self.client = None
         self.server = None
+        self.logfile_path = "../_trial_log"
+        self.logfile_name = "default.log" # overriden !
     
     def setup(self, test_case):
         """
         Should be called in the setUp method of unittest.TestCase classes.
         :param test_case: unittest.TestCase instance. Typically self. 
         """
+        if self.log_to_file:
+            self.logfile_name = "%s.%s.%s.%s.log" % (
+                test_case.__class__.__module__, 
+                test_case.__class__.__name__, 
+                test_case._testMethodName, 
+                self.logname 
+                )
         self.test_case = test_case
+        if self.server is None:
+            self.start_server()
+        if self.client is None:
+            self.start_client()
         for child in (self.client, self.server):
             if child is not None:
                 child.test_case = test_case
@@ -344,7 +350,6 @@ class ClientServerTester(object):
         :param kwargs: **kwargs for child
         """
         self._start_child('server', self.SERVER_CLASS, **kwargs)
-        #time.sleep(0.8)
 
     def start_client(self, **kwargs):
         """
@@ -353,13 +358,6 @@ class ClientServerTester(object):
         """
         self._start_child('client', self.CLIENT_CLASS, **kwargs)
 
-    # one-to-one mapping of methods: ----------------
-    def send_expect(self, command, expected, timeout=-1, message=None):
-        self.client.send_expect(command, expected, timeout, message)
-    def sendline(self, line):
-        self.client.sendline(line)
-    def expect_test(self, expected, message=None, timeout=-1):
-        self.client.expect_test(expected, message, timeout)
     
     def _start_child(self, which, klass, **kwargs):
         """
@@ -368,8 +366,9 @@ class ClientServerTester(object):
         :param klass: self.SERVER_CLASS or self.CLIENT_CLASS
         :param kwargs: **kwargs for child
         """
-        #kwargs['verbose'] = self.verbose
-        # echo("starting %s(%s)" % (klass.__name__, kwargs))
+        kwargs['logfile_name'] = self.logfile_name
+        kwargs['logfile_path'] = self.logfile_path
+        kwargs['verbose'] = self.verbose
         self.__dict__[which] = klass(**kwargs)
         self.__dict__[which].start()
 
@@ -384,6 +383,14 @@ class ClientServerTester(object):
                 except Exception, e:
                     echo(e.message, self.verbose)
 
+    # one-to-one mapping of methods: ----------------
+    def send_expect(self, command, expected, timeout=-1, message=None):
+        self.client.send_expect(command, expected, timeout, message)
+    def sendline(self, line):
+        self.client.sendline(line)
+    def expect_test(self, expected, message=None, timeout=-1):
+        self.client.expect_test(expected, message, timeout)
+
 class TelnetProcess(Process):
     """
     telnet client process
@@ -392,6 +399,7 @@ class TelnetProcess(Process):
         self.port_offset = 0
         self.host = "localhost"
         self.port = 14444
+        self.expected_when_started = "pof"
         Process.__init__(self, **kwargs)
         echo("starting %s(%s)" % (self.__class__.__name__, kwargs), self.verbose)
 
@@ -405,10 +413,11 @@ class MivilleProcess(Process):
     def __init__(self, **kwargs):
         self.port_offset = 0
         self.miville_home = "~/.miville"
-        self.use_tmp_home = False
+        self.use_tmp_home = True
+        self.expected_when_started = "Miville is ready"
         Process.__init__(self, **kwargs)
         if self.use_tmp_home:
-            self.miville_home = use_tmp_dir()
+            self.miville_home = create_tmp_dir()
             echo("MIVILLE HOME : %s" % (self.miville_home), self.verbose)
         echo("starting %s(%s)" % (self.__class__.__name__, kwargs), self.verbose)
 
@@ -422,11 +431,13 @@ class TelnetMivilleTester(ClientServerTester):
     SERVER_CLASS = MivilleProcess
     CLIENT_CLASS = TelnetProcess
 
-    def __init__(self, **kwargs): # name, port_offset=0, use_tmp_home=False):
-        # TODO: manage log files.
+    def __init__(self, **kwargs):
+        """
+        Custom attributes for this tester.
+        """
         self.port_offset = 0
         self.miville_home = "~/.miville"
-        self.use_tmp_home = False
+        self.use_tmp_home = True
         ClientServerTester.__init__(self, **kwargs)
 
     def _start_child(self, which, klass, **kwargs):
@@ -445,13 +456,6 @@ class TelnetMivilleTester(ClientServerTester):
         for attr_name in attrs_to_pass:
             kwargs[attr_name] = self.__dict__[attr_name]
         ClientServerTester._start_child(self, which, klass, **kwargs)
-
-    def setup(self, test_case):
-        if self.server is None:
-            self.start_server()
-        if self.client is None:
-            self.start_client()
-        ClientServerTester.setup(self, test_case)
 
 class MilhouseProcess(Process):
     """

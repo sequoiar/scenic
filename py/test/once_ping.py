@@ -22,29 +22,20 @@
 Starts two miville and tests the protocols/pinger module.
 """
 import unittest
-from test import lib_clientserver as testing
+from test import lib_clientserver as clientserver
 import os
 import sys
 import time
 
 class Test_Ping(unittest.TestCase):
     def setUp(self):
-        #print "------------------ test -----------------------------"
-        #print "current directory:", os.getenv('PWD')
-        testing.VERBOSE = False
-        # CHOOSE YOUR LOG FILE HERE
-        #log_dir = "/tmp/miville_test"
-        #log_file_name = "%s.log" % (clientserver.make_test_name(__file__))
         #logfile = clientserver.open_logfile(log_dir, log_file_name)
-        logfile = open(os.devnull, 'w')
+        #logfile = open(os.devnull, 'w')
         #logfile = sys.stdout
-        #print "\n"
-        #for level in range(100):
-        #    print "LEVEL:", level, sys._getframe(level).f_code.co_name
-        testing.kill_all_zombie_processes()
-        self.local = testing.TelnetMivilleTester(port_offset=0, use_tmp_home=True, verbose=testing.VERBOSE, logfile=logfile)
+        clientserver.kill_all_zombie_processes()
+        self.local = clientserver.TelnetMivilleTester(port_offset=0, verbose=False, logname='local')
         self.local.setup(self)
-        self.remote = testing.TelnetMivilleTester(port_offset=1, use_tmp_home=True, verbose=testing.VERBOSE, logfile=logfile)
+        self.remote = clientserver.TelnetMivilleTester(port_offset=1, verbose=False, logname='remote')
         self.remote.setup(self)
         self.local.sendline("c -l")
         self.local.send_expect("c -a Charlotte 127.0.0.1 2223", "added")
@@ -60,9 +51,9 @@ class Test_Ping(unittest.TestCase):
         # contacts we add might be already in their addressbook
         self.local.send_expect("ping", "pong")
 
-    def test_02_network_performance_test(self):
-        self.local.sendline("n -s -k dualtest -t 1") # network test for 1 second
-        self.local.expect_test("Starting", 'Could not start network test')
+    def test_02_network(self):
+        # network test for 1 second
+        self.local.send_expect("n -s -k dualtest -t 1", "Starting") 
         self.local.expect_test('jitter', 'Did not receive network test results.', 1.3)
 
     def tearDown(self):
