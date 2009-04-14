@@ -23,15 +23,9 @@ Starts two miville and tests the protocols/pinger module.
 """
 import unittest
 from test import lib_clientserver as clientserver
-import os
-import sys
-import time
 
 class Test_Ping(unittest.TestCase):
     def setUp(self):
-        #logfile = clientserver.open_logfile(log_dir, log_file_name)
-        #logfile = open(os.devnull, 'w')
-        #logfile = sys.stdout
         clientserver.kill_all_zombie_processes()
         self.local = clientserver.TelnetMivilleTester(port_offset=0, verbose=False, logname='local')
         self.local.setup(self)
