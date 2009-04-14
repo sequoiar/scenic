@@ -25,6 +25,8 @@ Library for testing a client and a server.
 Use cases:
  * telnet and miville
  * telnet and milhouse
+
+Miville executable directory must be in your PATH and PYTHONPATH.
 """ 
 import unittest
 import pexpect
@@ -259,7 +261,7 @@ class Process(object):
         Succeeds otherwise.
         """
         if message is None:
-            message = "Expected %s but did not get it." % (expected)
+            message = "Expected \"%s\" but did not get it." % (expected)
         if timeout == -1:
             timeout = self.timeout_expect
         self.flush_output()
@@ -321,6 +323,7 @@ class ClientServerTester(object):
         self.verbose = False
         #self.logfile_prefix = "default_" # TODO: use caller file name
         self.test_case = None
+        self.logfile = sys.stdout
         self.__dict__.update(kwargs)
         self.client = None
         self.server = None
@@ -349,6 +352,7 @@ class ClientServerTester(object):
         :param kwargs: **kwargs for child
         """
         self._start_child('client', self.CLIENT_CLASS, **kwargs)
+
     # one-to-one mapping of methods: ----------------
     def send_expect(self, command, expected, timeout=-1, message=None):
         self.client.send_expect(command, expected, timeout, message)
@@ -409,7 +413,7 @@ class MivilleProcess(Process):
         echo("starting %s(%s)" % (self.__class__.__name__, kwargs), self.verbose)
 
     def make_command(self):
-        return  "./miville.py -o %s -m %s -C" % (self.port_offset, os.path.expanduser(self.miville_home))
+        return "miville.py -o %s -m %s -C" % (self.port_offset, os.path.expanduser(self.miville_home))
 
 class TelnetMivilleTester(ClientServerTester):
     """
@@ -435,12 +439,19 @@ class TelnetMivilleTester(ClientServerTester):
         :param kwargs: **kwargs for child
         """
         if which == 'client':
-            attrs_to_pass = ['port_offset', 'verbose']
+            attrs_to_pass = ['port_offset', 'verbose', 'logfile']
         elif which == 'server':
-            attrs_to_pass = ['port_offset', 'miville_home', 'use_tmp_home', 'verbose']
+            attrs_to_pass = ['port_offset', 'miville_home', 'use_tmp_home', 'verbose', 'logfile']
         for attr_name in attrs_to_pass:
             kwargs[attr_name] = self.__dict__[attr_name]
         ClientServerTester._start_child(self, which, klass, **kwargs)
+
+    def setup(self, test_case):
+        if self.server is None:
+            self.start_server()
+        if self.client is None:
+            self.start_client()
+        ClientServerTester.setup(self, test_case)
 
 class MilhouseProcess(Process):
     """
