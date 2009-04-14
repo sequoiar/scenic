@@ -71,6 +71,8 @@ class Test_Milhouse(unittest.TestCase):
         self.sender.expect_test('DEBUG:quit', 'Command not acknowledged')
 
     def tearDown(self):
+        self.receiver.sendline('quit:')
+        self.sender.sendline('quit:')
         self.sender.kill_children()
         self.receiver.kill_children()
 

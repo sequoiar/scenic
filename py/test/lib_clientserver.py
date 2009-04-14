@@ -176,6 +176,7 @@ class Process(object):
         self.logfile_name = "default.log"
         self.delayafterclose = 0.2 # important to override this in child classes
         self.timeout_expect = 0.9
+        self.maxread = 2000
         self.expected_when_started = ""  #TODO
         self.test_case = None # important : must be a valid TestCase instance. Should be overriden by kwargs
         self.__dict__.update(kwargs)
@@ -224,13 +225,16 @@ class Process(object):
                 echo('Current working dir: ' + directory, self.verbose)
                 echo('Starting \"%s\"' % command, self.verbose)
             kwargs = {
-                'timeout':self.timeout_expect
+                'timeout':self.timeout_expect,
+                'maxread':self.maxread
                 }
             if self.logfile is not None:
                 kwargs['logfile'] = self.logfile
             self.child = pexpect.spawn(command, **kwargs) 
             if self.expected_when_started != "":
-                self.expect_test(self.expected_when_started, "process did not output: %s" % self.expected_when_started, 2.0)
+                # self.expect_test(self.expected_when_started, "process did not output: %s" % self.expected_when_started, 2.0)
+                index = self.child.expect(self.expected_when_started, timeout=self.timeout_expect)
+                self.test_case.assertEqual(index, 0, "Process is not ready")
             else:
                 self.sleep(0.9)
         except pexpect.ExceptionPexpect, e:
@@ -414,7 +418,7 @@ class TelnetForMilhouseProcess(TelnetProcess):
     telnet client process specific to Milhouse's use.
     """
     def __init__(self, **kwargs):
-        kwargs['expected_when_started'] = "log"
+        kwargs['expected_when_started'] = "log:"
         TelnetProcess.__init__(self, **kwargs)
 
 class MivilleProcess(Process):
@@ -475,7 +479,8 @@ class MilhouseProcess(Process):
     def __init__(self, **kwargs): # mode=[r|s], serverport=9000
         self.mode = 't'
         self.serverport = '8000'
-        kwargs['expected_when_started'] = "ready"
+        kwargs['maxread'] = 1
+        kwargs['expected_when_started'] = "READY"
         Process.__init__(self, **kwargs)
 
     def make_command(self):
