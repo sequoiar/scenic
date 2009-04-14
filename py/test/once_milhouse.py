@@ -31,9 +31,9 @@ fname = __file__.split('.')[0]
 class Test_Milhouse(unittest.TestCase):
     def setUp(self):
 
-        self.sender = clientserver.TelnetMilhouseTester(name='sender', mode='s', serverport=9000, expected_when_started="log: ")
+        self.sender = clientserver.TelnetMilhouseTester(name='sender', mode='s', serverport=9000)
         self.sender.setup(self)
-        self.receiver = clientserver.TelnetMilhouseTester(name='receiver', mode='r', serverport=9001, expected_when_started="log: ")
+        self.receiver = clientserver.TelnetMilhouseTester(name='receiver', mode='r', serverport=9001)
         self.receiver.setup(self)
 
     def test_01_basic_milhouse_control(self):
@@ -71,6 +71,6 @@ class Test_Milhouse(unittest.TestCase):
         self.sender.expect_test('DEBUG:quit', 'Command not acknowledged')
 
     def tearDown(self):
-        self.local.kill_children()
-        self.remote.kill_children()
+        self.sender.kill_children()
+        self.receiver.kill_children()
 

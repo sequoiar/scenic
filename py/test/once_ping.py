@@ -27,9 +27,9 @@ from test import lib_clientserver as clientserver
 class Test_Ping(unittest.TestCase):
     def setUp(self):
         clientserver.kill_all_zombie_processes()
-        self.local = clientserver.TelnetMivilleTester(port_offset=0, verbose=False, logname='local')
+        self.local = clientserver.TelnetMivilleTester(port_offset=0, verbose=False, name='local')
         self.local.setup(self)
-        self.remote = clientserver.TelnetMivilleTester(port_offset=1, verbose=False, logname='remote')
+        self.remote = clientserver.TelnetMivilleTester(port_offset=1, verbose=False, name='remote')
         self.remote.setup(self)
         self.local.sendline("c -l")
         self.local.send_expect("c -a Charlotte 127.0.0.1 2223", "added")
