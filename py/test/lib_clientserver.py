@@ -269,7 +269,7 @@ class Process(object):
         self.test_case.failIfEqual(index, 1, 'Problem : Unexpected EOF')
         self.test_case.failIfEqual(index, 2, 'Problem : Time out.')
 
-    def send_and_expect(self, command, expected, timeout=-1, message=None):
+    def send_expect(self, command, expected, timeout=-1, message=None):
         """
         Sends a text string and tests for an expected reply.
         Wraps self.child.sendline and self.expect_test.
@@ -349,6 +349,13 @@ class ClientServerTester(object):
         :param kwargs: **kwargs for child
         """
         self._start_child('client', self.CLIENT_CLASS, **kwargs)
+    # one-to-one mapping of methods: ----------------
+    def send_expect(self, command, expected, timeout=-1, message=None):
+        self.client.send_expect(command, expected, timeout, message)
+    def sendline(self, line):
+        self.client.sendline(line)
+    def expect_test(self, expected, message=None, timeout=-1):
+        self.client.expect_test(expected, message, timeout)
     
     def _start_child(self, which, klass, **kwargs):
         """

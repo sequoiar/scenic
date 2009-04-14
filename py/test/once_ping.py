@@ -46,31 +46,28 @@ class Test_Ping(unittest.TestCase):
     def setUp(self):
         global local_tester 
         global remote_tester 
-        self.local = local_tester  # TODO: self.local_client = local_tester.client
+        self.local = local_tester 
         self.remote = remote_tester 
         self.local.setup(self)
         self.remote.setup(self)
 
     def test_01_ping(self):
         # contacts we add might be already in their addressbook
-        self.local.client.sendline("c -a Charlotte 127.0.0.1 2223")
-        self.local.client.expect_test("added")
-        self.remote.client.sendline("c -a Pierre 127.0.0.1 2222")
-        self.remote.client.expect_test("added")
-        self.local.client.sendline("c -s Charlotte")
-        self.local.client.expect_test("selected")
-        self.local.client.sendline("j -s")
-        self.remote.client.expect_test("Do you accept")
-        self.remote.client.sendline("Y")
-        self.local.client.expect_test('accepted', 'Connection not successful.')
-        self.local.client.sendline("ping")
-        self.local.client.expect_test('pong', 'Did not receive pong answer.')
+        self.local.send_expect("c -a Charlotte 127.0.0.1 2223", "added")
+        self.remote.send_expect("c -a Pierre 127.0.0.1 2222", "added")
+        self.local.send_expect("c -s Charlotte", "selected")
+        self.local.sendline("j -s")
+        self.remote.expect_test("Do you accept")
+        self.remote.sendline("Y")
+        self.local.expect_test('accepted', 'Connection not successful.')
+        self.local.send_expect("ping", "pong")
 
     def test_02_network_performance_test(self):
-        self.local.client.sendline("n -s -k dualtest -t 1") # network test for 1 second
-        self.local.client.expect_test("Starting", 'Did not start network test')
-        self.local.client.expect_test('jitter', 'Did not receive network test results.', 1.3)
+        self.local.sendline("n -s -k dualtest -t 1") # network test for 1 second
+        self.local.expect_test("Starting", 'Could not start network test')
+        self.local.expect_test('jitter', 'Did not receive network test results.', 1.3)
 
     def test_99_close(self):
         self.local.kill_children()
         self.remote.kill_children()
+
