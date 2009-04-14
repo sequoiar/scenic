@@ -386,6 +386,7 @@ class MilhouseTests():
         recv, send = self.argfactory('audiovideo')
         send.videocodec = videocodec
         recv.videocodec = videocodec
+        send.videobitrate = 3000000
         for chan in xrange(1, 9): 
             send.numchannels = chan
             self.run(recv, send)
@@ -451,7 +452,7 @@ class MilhouseTests():
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_23')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_24')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

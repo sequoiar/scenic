@@ -24,6 +24,7 @@
 are installed """
 
 import sys
+from subprocess import *
 
 try:
     import pygst
@@ -33,60 +34,14 @@ except ImportError:
     print "import failed, please install gst-python"
     sys.exit(0)
 
-GST_PLUGINS = [
-            'level', 
-            'audioconvert', 
-            'alsasink', 
-            'pulsesink', 
-            'decodebin', 
-            'capsfilter', 
-            'dvdemux', 
-            'queue', 
-            'ffmpegcolorspace', 
-            'x264enc', 
-            'ffdec_h264', 
-            'ffdec_h263', 
-            'ffenc_h263', 
-            'ffenc_mpeg4', 
-            'ffdec_mpeg4', 
-            'vorbisenc', 
-            'vorbisdec', 
-            'lame', 
-            'mad', 
-            'glupload',
-            'glimagesink', 
-            'interleave', 
-            'gstrtpbin', 
-            'rtph264pay', 
-            'rtph264depay', 
-            'rtph263pay', 
-            'rtph263depay', 
-            'rtpmp4vpay', 
-            'rtpmp4vdepay', 
-            'rtpL16pay', 
-            'rtpL16depay', 
-            'rtpmpapay', 
-            'rtpmpadepay', 
-            'udpsrc', 
-            'udpsink', 
-            'xvimagesink', 
-            'ximagesink', 
-            'dvdec', 
-            'audiotestsrc', 
-            'filesrc', 
-            'alsasrc', 
-            'jackaudiosrc', 
-            'dv1394src', 
-            'pulsesrc', 
-            'jackaudiosink', 
-            'alsasink', 
-            'pulsesink', 
-            'videotestsrc', 
-            'v4l2src', 
-            'rtpvorbispay', 
-            'rtpvorbisdepay', 
-            'deinterlace2'
-            ]
+# call our shell script to parse cpp files and determine which gst elements we 
+# use
+p = Popen(["./find_elements.sh"], stdout=PIPE)
+output = p.communicate()[0]
+
+GST_PLUGINS = output.split('\n')    # turn our string into a list
+GST_PLUGINS.remove("")  # get rid of empty entries
+GST_PLUGINS = set(GST_PLUGINS)  # get rid of duplicate entries
 
 MISSING_PLUGINS = []
 
@@ -99,7 +54,7 @@ for plug in GST_PLUGINS:
 
 print "-------------------------------"
 if MISSING_PLUGINS == []:
-    print "All necessary plugins installed"
+    print "All " + str(len(GST_PLUGINS)) + " necessary plugins installed"
 else:
     print "The following gstreamer plugins need to be installed: "
     for plug in MISSING_PLUGINS:

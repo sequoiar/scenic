@@ -205,7 +205,7 @@ void AudioFileSource::sub_init()
     g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
 
     decoder_ = Pipeline::Instance()->makeElement("decodebin", NULL);
-    decoder_ = Pipeline::Instance()->makeElement("aconv", NULL);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     g_signal_connect(decoder_, "new-decoded-pad",
             G_CALLBACK(AudioFileSource::cb_new_src_pad),
@@ -290,6 +290,7 @@ void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
 AudioFileSource::~AudioFileSource()
 {
     Pipeline::Instance()->remove(&decoder_);
+    Pipeline::Instance()->remove(&aconv_);
 }
 
 
@@ -362,7 +363,7 @@ AudioJackSource::~AudioJackSource()
 
 void AudioJackSource::sub_init()
 {
-    source_ = Pipeline::Instance()->makeElement("jackaudiosrc", NULL);  // because of fastjackaudiosrc
+    AudioSource::sub_init();
 
     if (!Jack::is_running())
         THROW_ERROR("Jack is not running");
