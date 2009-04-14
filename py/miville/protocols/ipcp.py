@@ -124,7 +124,10 @@ class IPCP(LineReceiver):
             if isinstance(arg, tuple):
                 parg = self._process_arg(arg[1])
                 if parg:
-                    process_key = self._process_arg(arg[0])
+                    
+                    process_key = arg[0].encode('ascii', 'backslashreplace')
+                    log.info("IPCP.send_cmd: " + str(args) )
+                    log.info("IPCP.send_cmd: process_key[" + str(process_key) + "] = [" + parg + "]" )
                     line.append(process_key + '=' + parg)
             else:
                 parg = self._process_arg(arg)
