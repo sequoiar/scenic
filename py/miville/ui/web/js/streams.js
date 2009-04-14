@@ -155,21 +155,24 @@ Streams.methods(
 			
 			// get the state of other controls necessary to find the state
 			var stream_state = self.contact.get('stream_state');
+			var connection_state = self.contact.get('state').toInt();
 
 			self.start_btn.removeEvents('click');
-			if (stream_state == 0) {
-				button_state = 'enabled';
-				self.start_btn.addEvent('click', function(){
-					self.start_streams();
-				});
-			} else if (stream_state == 1) {
-				button_name = self.stop_str;
-			} else {
-				button_state = 'enabled';
-				button_name = self.stop_str;
-				self.start_btn.addEvent('click', function(){
-					self.stop_streams();
-				});
+			if ([0, 3].contains(connection_state)) {
+				if (stream_state == 0) {
+					button_state = 'enabled';
+					self.start_btn.addEvent('click', function(){
+						self.start_streams();
+					});
+				} else if (stream_state == 1) {
+					button_name = self.stop_str;
+				} else {
+					button_state = 'enabled';
+					button_name = self.stop_str;
+					self.start_btn.addEvent('click', function(){
+						self.stop_streams();
+					});
+				}
 			}
 			
 			self.start_btn.value = button_name;
