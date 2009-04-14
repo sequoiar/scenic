@@ -98,7 +98,7 @@ class GstChannel(object):
     
     def _stop_local_rx_procs(self):
         log.info("Stopping rx processes")
-        for engine in engines:
+        for engine in self.engines:
             if engine.mode.upper().startswith("RECEIVE"):
                 engine.stop_streaming()    
     
