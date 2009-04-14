@@ -7,6 +7,7 @@ TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 trial
 TESTS = test/test_addressbook.py \
         test/test_commands.py \
         test/test_common.py \
+        test/once_ping.py \
         test/test_devices.py \
         test/test_devices_settings.py \
         test/test_i18n.py \

@@ -229,8 +229,10 @@ class Process(object):
             if self.logfile is not None:
                 kwargs['logfile'] = self.logfile
             self.child = pexpect.spawn(command, **kwargs) 
-            if self.expected_when_started != '':
-                self.expect_test(self.expected_when_started, "process did not output: %s" % self.expected_when_started, timeout=0.9)
+            # if self.expected_when_started != "":
+            #     self.expect_test(self.expected_when_started, "process did not output: %s" % self.expected_when_started, timeout=2.0)
+            # else:
+            #     self.sleep(0.9)
             self.sleep(0.9)
         except pexpect.ExceptionPexpect, e:
             echo("Error starting process %s." % (command), self.verbose)
@@ -399,8 +401,8 @@ class TelnetProcess(Process):
         self.port_offset = 0
         self.host = "localhost"
         self.port = 14444
-        self.expected_when_started = "pof"
         Process.__init__(self, **kwargs)
+        self.expected_when_started = "pof"
         echo("starting %s(%s)" % (self.__class__.__name__, kwargs), self.verbose)
 
     def make_command(self):
@@ -414,8 +416,8 @@ class MivilleProcess(Process):
         self.port_offset = 0
         self.miville_home = "~/.miville"
         self.use_tmp_home = True
-        self.expected_when_started = "Miville is ready"
         Process.__init__(self, **kwargs)
+        self.expected_when_started = "Miville is ready"
         if self.use_tmp_home:
             self.miville_home = create_tmp_dir()
             echo("MIVILLE HOME : %s" % (self.miville_home), self.verbose)
@@ -465,6 +467,7 @@ class MilhouseProcess(Process):
         self.mode = 't'
         self.serverport = '8000'
         Process.__init__(self, **kwargs)
+        self.expected_when_started = "" # please enter your expectations here
 
     def make_command(self):
         return "milhouse -%s --serverport %s" % (self.mode, self.serverport)
