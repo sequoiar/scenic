@@ -57,7 +57,10 @@ class tcp_session
     {
         LOG_DEBUG("CONSTR");
     }
-
+        ~tcp_session()
+        {
+            LOG_DEBUG("DESTR");
+        }
         tcp::socket& socket()
         {
             return socket_;
@@ -65,18 +68,18 @@ class tcp_session
 
         void start()
         {
-            welcome_ = "welcome.\nREADY:\n"; 
+            welcome_ = "READY:\n"; 
+            std::cout << "READY\n";
             async_write(socket_, buffer(welcome_),
-                    boost::bind(&tcp_session::write_cb, this,
-                        error));
-            t_.expires_at(t_.expires_at() + boost::posix_time::millisec(10));
-            t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
+                    boost::bind(&tcp_session::write_cb, this, error));
+            socket_.async_read_some(buffer(data_, max_length),
+                    boost::bind(&tcp_session::read_cb, this, 
+                    error, bytes_transferred));
         }
 
         void read_cb(const error_code& err,
                 size_t bytes_transferred)
         {
-            LOG_DEBUG("READ_CB");
             if (!err)
             {
                 MapMsg mapMsg;
@@ -84,14 +87,13 @@ class tcp_session
                     queue_.push(mapMsg);
                 else
                     LOG_WARNING("Bad Msg Received.");
-
                 socket_.async_read_some(buffer(data_, max_length),
                         boost::bind(&tcp_session::read_cb, this, 
                             error, bytes_transferred));
             }
             else
             {
-                t_.cancel();
+                std::cout << "here" << std::endl;
                 delete this;
             }
         }
@@ -100,13 +102,12 @@ class tcp_session
         {
             if (!err)
             {
-                socket_.async_read_some(buffer(data_, max_length),
-                        boost::bind(&tcp_session::read_cb, this, 
-                            error, bytes_transferred));
+                t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1));
+                t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
             }
             else
             {
-                t_.cancel();
+                std::cout << "here2" << std::endl;
                 delete this;
             }
         }
@@ -123,16 +124,17 @@ class tcp_session
                     Parser::stringify(msg, msg_str);
                     msg_str+='\n';
                     async_write(socket_, buffer(msg_str),
-                            boost::bind(&tcp_session::write_cb, this,
-                                error));
-                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1));
-                    t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
+                            boost::bind(&tcp_session::write_cb, this, error));
                 }
                 else
                 {
                     t_.expires_at(t_.expires_at() + boost::posix_time::millisec(10));
                     t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
                 }
+            }
+            else
+            {
+                std::cout << "here3" << std::endl;
             }
         }
     private:
@@ -152,13 +154,12 @@ class tcp_server
             acceptor_(io_service, tcp::endpoint(tcp::v4(), port)), queue_(queue),
             t_(io_service, boost::posix_time::seconds(1))
     {
-        tcp_session* new_tcp_session = new tcp_session(io_service_,queue_);
+        tcp_session* new_tcp_session = new tcp_session(io_service_,queue_); 
         acceptor_.async_accept(new_tcp_session->socket(),
                 boost::bind(&tcp_server::handle_accept, this, new_tcp_session, 
                     error));
         t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
     }
-
 
 
         void handle_accept(tcp_session* new_tcp_session,
@@ -167,23 +168,34 @@ class tcp_server
             if (!err)
             {
                 new_tcp_session->start();
+#if 0
                 new_tcp_session = new tcp_session(io_service_,queue_);
                 acceptor_.async_accept(new_tcp_session->socket(),
                         boost::bind(&tcp_server::handle_accept, this, new_tcp_session,
                             error));
+#endif
             }
             else
             {
+                std::cout << "here4" << std::endl;
                 delete new_tcp_session;
             }
         }
 
-        void handle_timer(const error_code& /*error*/)
+        void handle_timer(const error_code& err)
         {
-            t_.expires_at(t_.expires_at() + boost::posix_time::seconds(1));
-            t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
-            if(MsgThread::isQuitted())
-                THROW_END_THREAD("bye");
+            if (!err)
+            {
+                t_.expires_at(t_.expires_at() + boost::posix_time::seconds(1));
+                t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
+                if(MsgThread::isQuitted())
+                    THROW_END_THREAD("bye");
+            }
+            else
+            {
+                std::cout << "here5" << std::endl;
+                delete this;
+            }
         }
 
     private:
