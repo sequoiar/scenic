@@ -395,12 +395,27 @@ class TelnetProcess(Process):
         self.port_offset = 0
         self.host = "localhost"
         self.port = 14444
-        kwargs['expected_when_started'] = "pof"
         Process.__init__(self, **kwargs)
         echo("starting %s(%s)" % (self.__class__.__name__, kwargs), self.verbose)
 
     def make_command(self):
         return "telnet %s %d" % (self.host, self.port + self.port_offset)
+
+class TelnetForMivilleProcess(TelnetProcess):
+    """
+    telnet client process specific to Miville's use.
+    """
+    def __init__(self, **kwargs):
+        kwargs['expected_when_started'] = "pof"
+        TelnetProcess.__init__(self, **kwargs)
+
+class TelnetForMilhouseProcess(TelnetProcess):
+    """
+    telnet client process specific to Milhouse's use.
+    """
+    def __init__(self, **kwargs):
+        kwargs['expected_when_started'] = "log"
+        TelnetProcess.__init__(self, **kwargs)
 
 class MivilleProcess(Process):
     """
@@ -425,7 +440,7 @@ class TelnetMivilleTester(ClientServerTester):
     Tests miville with telnet
     """
     SERVER_CLASS = MivilleProcess
-    CLIENT_CLASS = TelnetProcess
+    CLIENT_CLASS = TelnetForMivilleProcess
 
     def __init__(self, **kwargs):
         """
@@ -460,7 +475,7 @@ class MilhouseProcess(Process):
     def __init__(self, **kwargs): # mode=[r|s], serverport=9000
         self.mode = 't'
         self.serverport = '8000'
-        kwargs['expected_when_started'] = "log: "
+        kwargs['expected_when_started'] = "ready"
         Process.__init__(self, **kwargs)
 
     def make_command(self):
@@ -471,7 +486,7 @@ class TelnetMilhouseTester(ClientServerTester):
     Tests milhouse with telnet
     """
     SERVER_CLASS = MilhouseProcess
-    CLIENT_CLASS = TelnetProcess
+    CLIENT_CLASS = TelnetForMilhouseProcess
     
     def __init__(self, **kwargs):
         self.mode ='t'
