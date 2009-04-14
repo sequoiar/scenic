@@ -313,7 +313,7 @@ class ClientServerTester(object):
         """
         self.verbose = False
         self.test_case = None
-        self.logname = 'default' # the only thing the user must set...
+        self.name = 'default' # the only thing the user must set...
         self.__dict__.update(kwargs)
         self.log_to_file = not self.verbose
         self.client = None
@@ -331,7 +331,7 @@ class ClientServerTester(object):
                 test_case.__class__.__module__, 
                 test_case.__class__.__name__, 
                 test_case._testMethodName, 
-                self.logname 
+                self.name 
                 )
         self.test_case = test_case
         if self.server is None:
@@ -460,7 +460,7 @@ class MilhouseProcess(Process):
     def __init__(self, **kwargs): # mode=[r|s], serverport=9000
         self.mode = 't'
         self.serverport = '8000'
-        kwargs['expected_when_started'] = ""
+        kwargs['expected_when_started'] = "log: "
         Process.__init__(self, **kwargs)
 
     def make_command(self):
