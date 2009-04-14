@@ -64,6 +64,17 @@ Element.Events.escape = {
     }
 };
 
+
+/**
+ * Return the current Mootools version number as an int.
+ * 
+ * @return {int} For "1.2.1" you will get 121.
+ */
+function get_version() {
+	return parseInt(MooTools.version.split('.').join(''))	
+}
+
+
 /**
  * Overwrite Mootools Selectors.RegExps.splitter to fix a bug with element
  * attribute with some space character in the value.
@@ -75,56 +86,59 @@ Element.Events.escape = {
  * 
  * @addon
  */
-
-Selectors.RegExps.splitter = (/\s*([^\s~+>\[\(]+((?:\[[^\]]*\]|\([^\)]*\)))*)\s*([\s~+>])/g);
-
-Selectors.Utils.search = function(self, expression, local){
-	var splitters = [];
-
-		var selectors = (expression.trim() + ' ').replace(Selectors.RegExps.splitter, function(m0, m1, m2, m3){
-			splitters.push(m3);
-			return m1 + ':)';
-		}).split(':)');
-
-	var items, filtered, item;
-
-		for (var i = 0, l = selectors.length - 1; i < l; i++){
-
-		var selector = selectors[i];
-
-		if (i == 0 && Selectors.RegExps.quick.test(selector)){
-			items = self.getElementsByTagName(selector);
-			continue;
-		}
-
-		var splitter = splitters[i - 1];
-
-		var tagid = Selectors.Utils.parseTagAndID(selector);
-		var tag = tagid[0], id = tagid[1];
-
-		if (i == 0){
-			items = Selectors.Utils.getByTagAndID(self, tag, id);
-		} else {
-			var uniques = {}, found = [];
-			for (var j = 0, k = items.length; j < k; j++) found = Selectors.Getters[splitter](found, items[j], tag, id, uniques);
-			items = found;
-		}
-
-		var parsed = Selectors.Utils.parseSelector(selector);
-
-		if (parsed){
-			filtered = [];
-			for (var m = 0, n = items.length; m < n; m++){
-				item = items[m];
-				if (Selectors.Utils.filter(item, parsed, local)) filtered.push(item);
+if (get_version() <= 121) {
+	Selectors.RegExps.splitter = (/\s*([^\s~+>\[\(]+((?:\[[^\]]*\]|\([^\)]*\)))*)\s*([\s~+>])/g);
+	
+	Selectors.Utils.search = function(self, expression, local){
+		var splitters = [];
+	
+			var selectors = (expression.trim() + ' ').replace(Selectors.RegExps.splitter, function(m0, m1, m2, m3){
+				splitters.push(m3);
+				return m1 + ':)';
+			}).split(':)');
+	
+		var items, filtered, item;
+	
+			for (var i = 0, l = selectors.length - 1; i < l; i++){
+	
+			var selector = selectors[i];
+	
+			if (i == 0 && Selectors.RegExps.quick.test(selector)){
+				items = self.getElementsByTagName(selector);
+				continue;
 			}
-			items = filtered;
+	
+			var splitter = splitters[i - 1];
+	
+			var tagid = Selectors.Utils.parseTagAndID(selector);
+			var tag = tagid[0], id = tagid[1];
+	
+			if (i == 0){
+				items = Selectors.Utils.getByTagAndID(self, tag, id);
+			} else {
+				var uniques = {}, found = [];
+				for (var j = 0, k = items.length; j < k; j++) found = Selectors.Getters[splitter](found, items[j], tag, id, uniques);
+				items = found;
+			}
+	
+			var parsed = Selectors.Utils.parseSelector(selector);
+	
+			if (parsed){
+				filtered = [];
+				for (var m = 0, n = items.length; m < n; m++){
+					item = items[m];
+					if (Selectors.Utils.filter(item, parsed, local)) filtered.push(item);
+				}
+				items = filtered;
+			}
+	
 		}
-
+	
+		return items;
+	
 	}
-
-	return items;
-
 }
+
+
 
 
