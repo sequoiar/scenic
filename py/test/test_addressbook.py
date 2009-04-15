@@ -30,12 +30,16 @@ from miville.addressbook import AddressBook, Contact, ip_range
 from miville.errors import AddressBookError, InstallFileError
 from miville.utils.i18n import to_utf
 import miville.utils.log
-print os.environ['LANG']
+# print os.environ['LANG']
 ALPHABET = 'abcdefghijklmnopqrstuvwxyz_@ ABCDEFÙ1234\'2345-678"9."0!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ~'
 UALPHABET = u'2abcdefghijklmnopqrstuvwxyz_@ ABCDEFÙ1234\'2345-678"9."0!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ~'
 
 del addressbook.log
 addressbook.log = miville.utils.log.start('error', 1, 0, 'adb')
+
+# Let's create a temporary folder for the miville home, to store the addressbook.
+from test.lib_clientserver import create_tmp_dir
+miville.utils.common.MIVILLE_HOME = create_tmp_dir()
 
 class DummyApi(object):
     def get_contacts(self, caller):

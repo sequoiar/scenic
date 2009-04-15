@@ -83,8 +83,8 @@ class AddressBook(object):
         on problems.
         """
         name = to_utf(name)
-        print name
-        print self.contacts
+        #print name
+        #print self.contacts
         if name in self.contacts:
             raise AddressBookNameError, 'Name %s already in Address Book' % name
         self.contacts[name] = Contact(name, address, port, auto_created, auto_answer, connector, setting)
