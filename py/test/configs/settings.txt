@@ -8,7 +8,7 @@ v1.0
 					['is_preset', 
 						['boolean', 'false']], 
 					['name', 
-						['unicode', 'vid_2_way']], 
+						['unicode', 'Video Full Duplex']], 
 					['selected_stream_subgroup', 
 						['None']], 
 					['stream_subgroups', 
@@ -39,7 +39,7 @@ v1.0
 														['enabled', 
 															['boolean', 'true']], 
 														['setting', 10000], 
-														['port', 6666], 
+														['port', 10000], 
 														['sync_group', 'master']]]]], 
 										['selected_media_stream', 
 											['None']], 
@@ -71,7 +71,7 @@ v1.0
 														['enabled', 
 															['boolean', 'true']], 
 														['setting', 10001], 
-														['port', 6699], 
+														['port', 10010], 
 														['sync_group', 'master']]]]], 
 										['selected_media_stream', 
 											['None']], 
@@ -91,7 +91,7 @@ v1.0
 								['unicode', '127.0.0.1']], 
 							[
 								['unicode', 'GstPort'], 
-								['unicode', '11112']], 
+								['unicode', '9000']], 
 							[
 								['unicode', 'source'], 
 								['unicode', 'v4l2src']], 
@@ -105,7 +105,7 @@ v1.0
 					['is_preset', 
 						['boolean', 'false']], 
 					['name', 
-						['unicode', 'mpeg4_basic_rx']]]]], 
+						['unicode', 'mpeg4_receive']]]]], 
 		[10001, 
 			['miville.settings.MediaSetting', 
 				['dictionary', 
@@ -119,7 +119,7 @@ v1.0
 								['unicode', '127.0.0.1']], 
 							[
 								['unicode', 'GstPort'], 
-								['unicode', '11113']], 
+								['unicode', '9001']], 
 							[
 								['unicode', 'source'], 
 								['unicode', 'v4l2src']], 
@@ -133,4 +133,4 @@ v1.0
 					['is_preset', 
 						['boolean', 'false']], 
 					['name', 
-						['unicode', 'mpeg4_basic_tx']]]]]]]
+						['unicode', 'mpeg4_transmit']]]]]]]
