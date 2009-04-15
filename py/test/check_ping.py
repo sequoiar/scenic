@@ -48,7 +48,7 @@ class Test_Ping(unittest.TestCase):
     def test_02_network(self):
         # network test for 1 second
         self.local.send_expect("n -s -k dualtest -t 1", "Starting") 
-        self.local.expect_test('jitter', 'Did not receive network test results.', 1.3)
+        self.local.expect_test('jitter', 'Did not receive network test results.', 4.0) # 4 seconds for more comfort
 
     def tearDown(self):
         self.local.kill_children()
