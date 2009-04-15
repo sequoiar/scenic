@@ -424,7 +424,21 @@ class ControllerApi(object):
             result = err
         self.notify(caller, result)
         
-        
+    def _is_int(self,s):
+        try:
+            i = int(s)
+            return i
+        except ValueError:
+            return None
+
+    def _is_float(self,s):
+        try:
+            f = float(s)
+            return f
+        except ValueError:
+            return None
+            
+       
     def modify_media_setting (self, caller, name, attribute, value):
         try:
             result = None
@@ -433,11 +447,21 @@ class ControllerApi(object):
             if attribute == 'settings':
                 toks = value.partition(':')
                 key = toks[0]
-                val = toks[2]
-                if not val:
+                string_value = toks[2]
+                # this removes the setting element because the 
+                # content is None
+                if not string_value:
                     x.settings.pop(key)
                 else:
-                    x.settings[key] = val
+                    # first, check for a number:
+                    typed_value = self._is_int(string_value)
+                    if typed_value == None: 
+                       typed_value = self._is_float(string_value) 
+                       if typed_value == None:
+                           # not a float, not an int ...it's a string!
+                           typed_value = string_value
+                           
+                    x.settings[key] = typed_value
             else:
                 cmd = modify(x, 'x', attribute, value)
                 exec(cmd) 
