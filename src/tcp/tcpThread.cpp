@@ -187,6 +187,7 @@ std::string tcpGetBuffer(int port, int &id)
             {
                 if(f.cmd() == "quit")
                 {
+                    sleep(2); //FIXME: OUCH RACE COND ON QUIT!
                     THROW_ERROR("quit in tcpGetBuffer");
                 }
                 if(f.cmd() == "buffer")
