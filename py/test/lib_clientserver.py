@@ -418,6 +418,8 @@ class TelnetForMilhouseProcess(TelnetProcess):
     def __init__(self, **kwargs):
         kwargs['expected_when_started'] = "log:"
         TelnetProcess.__init__(self, **kwargs)
+    def stop(self):
+        self.send_expect('stop:', 'stop: ack="ok"')
 
 class MivilleProcess(Process):
     """
@@ -512,3 +514,11 @@ class TelnetMilhouseTester(ClientServerTester):
             kwargs['mode'] = self.mode
         ClientServerTester._start_child(self, which, klass, **kwargs)
 
+    def stop(self):
+        self.send_expect('stop:', 'stop: ack="ok"')
+
+    def start(self):
+        self.send_expect('start:', 'start: ack="ok"')
+
+    def quit(self):
+        self.send_expect('quit:', 'postQuit')

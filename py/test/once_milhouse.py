@@ -35,47 +35,40 @@ class Test_MilhouseOneWay(unittest.TestCase):
         self.receiver = clientserver.TelnetMilhouseTester(name='receiver', mode='r', serverport=9001)
         self.receiver.setup(self)
 
+    def proceed(self):
+        self.receiver.start()
+        self.sender.start()
+        time.sleep(5)
+        self.receiver.stop()
+        self.sender.stop()
+
     def test_01_basic_milhouse_control(self):
         self.sender.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1"', 'audio_init: ack="ok"')
 
-    def test_02_single_audio_transmission_10sec(self):
+    def test_02_audio_transmission_5sec(self):
         # we test with one milhouse sending, one receiving
         self.receiver.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1" channels=2 audio_buffer_usec=50000', 'audio_init: ack="ok"')
         self.sender.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
-        self.receiver.send_expect('start:', 'start: ack="ok"')
-        self.sender.send_expect('start:', 'start: ack="ok"')
-        time.sleep(10)
-        self.receiver.send_expect('stop:', 'stop: ack="ok"')
-        self.sender.send_expect('stop:', 'stop: ack="ok"')
+        self.proceed()
     
-    def test_03_single_video_transmission_10sec(self):
+    def test_03_video_transmission_5sec(self):
         # we test with one milhouse sending, one receiving
         self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
         self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"', 'video_init: ack="ok"')
-        self.receiver.send_expect('start:', 'start: ack="ok"')
-        self.sender.send_expect('start:', 'start: ack="ok"')
-        time.sleep(10)
-        self.receiver.send_expect('stop:', 'stop: ack="ok"')
-        self.sender.send_expect('stop:', 'stop: ack="ok"')
-    
-    def test_04_audio_video_transmission_10sec(self):
+        self.proceed()
+        
+    def test_04_audio_video_transmission_5sec(self):
         # we test with one milhouse sending, one receiving
         # If we init video first on one end, we must init it first on the other end
         self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
         self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"', 'video_init: ack="ok"')
         self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" channels=2 audio_buffer_usec=50000', 'audio_init: ack="ok"')
         self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
-        self.receiver.send_expect('start:', 'start: ack="ok"')
-        self.sender.send_expect('start:', 'start: ack="ok"')
-        time.sleep(10)
-        self.receiver.send_expect('stop:', 'stop: ack="ok"')
-        self.sender.send_expect('stop:', 'stop: ack="ok"')
+        self.proceed()
     
     def tearDown(self):
-        self.receiver.sendline('quit:')
-        self.receiver.expect_test('postQuit', 'receiver quit command failed')
-        self.sender.sendline('quit:')
-        self.sender.expect_test('postQuit', 'sender quit command failed')
-        self.sender.kill_children()
+        self.receiver.quit()
+        self.sender.quit()
         self.receiver.kill_children()
+        self.sender.kill_children()
 
