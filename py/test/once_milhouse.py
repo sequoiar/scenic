@@ -30,51 +30,46 @@ fname = __file__.split('.')[0]
 
 class Test_MilhouseOneWay(unittest.TestCase):
     def setUp(self):
-
         self.sender = clientserver.TelnetMilhouseTester(name='sender', mode='s', serverport=9000)
         self.sender.setup(self)
         self.receiver = clientserver.TelnetMilhouseTester(name='receiver', mode='r', serverport=9001)
         self.receiver.setup(self)
 
     def test_01_basic_milhouse_control(self):
-        self.sender.sendline('audio_init: codec="raw" port=10000 address="127.0.0.1" ')
-        self.sender.expect_test('audio_init: ack="ok"', 'receiver init command failed')
+        self.sender.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1"', 'audio_init: ack="ok"')
 
     def test_02_single_audio_transmission_10sec(self):
         # we test with one milhouse sending, one receiving
-        self.receiver.sendline('audio_init: codec="raw" port=10000 address="127.0.0.1" channels=2 audio_buffer_usec=50000')
-        self.receiver.expect_test('audio_init: ack="ok"', 'receiver init command failed')
-        self.sender.sendline('audio_init: codec="raw" port=10000 address="127.0.0.1" source="audiotestsrc" channels=2')
-        self.sender.expect_test('audio_init: ack="ok"', 'sender init command failed', 1)
-        self.receiver.sendline('start:')
-        self.receiver.expect_test('start: ack="ok"', 'receiver start command failed', 1)
-        self.sender.sendline('start:')
-        self.sender.expect_test('start: ack="ok"', 'sender start command failed', 1)
+        self.receiver.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1" channels=2 audio_buffer_usec=50000', 'audio_init: ack="ok"')
+        self.sender.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
+        self.receiver.send_expect('start:', 'start: ack="ok"')
+        self.sender.send_expect('start:', 'start: ack="ok"')
         time.sleep(10)
-        self.receiver.sendline('stop:')
-        self.receiver.expect_test('stop: ack="ok"', 'receiver stop command failed', 1)
-        self.sender.sendline('stop:')
-        self.sender.expect_test('stop: ack="ok"', 'sender stop command failed', 1)
+        self.receiver.send_expect('stop:', 'stop: ack="ok"')
+        self.sender.send_expect('stop:', 'stop: ack="ok"')
     
-    def test_03_single_video_transmission(self):
-        self.sender.sendline('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"')
-        self.sender.expect_test('video_init: ack="ok"', 'receiver init command failed')
-
-    def test_04_single_audio_transmission_10sec(self):
+    def test_03_single_video_transmission_10sec(self):
         # we test with one milhouse sending, one receiving
-        self.receiver.sendline('video_init: codec="mpeg4" port=10000 address="127.0.0.1"')
-        self.receiver.expect_test('video_init: ack="ok"', 'receiver init command failed')
-        self.sender.sendline('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"')
-        self.sender.expect_test('video_init: ack="ok"', 'sender init command failed', 1)
-        self.receiver.sendline('start:')
-        self.receiver.expect_test('start: ack="ok"', 'receiver start command failed', 1)
-        self.sender.sendline('start:')
-        self.sender.expect_test('start: ack="ok"', 'sender start command failed', 1)
+        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"', 'video_init: ack="ok"')
+        self.receiver.send_expect('start:', 'start: ack="ok"')
+        self.sender.send_expect('start:', 'start: ack="ok"')
         time.sleep(10)
-        self.receiver.sendline('stop:')
-        self.receiver.expect_test('stop: ack="ok"', 'receiver stop command failed', 1)
-        self.sender.sendline('stop:')
-        self.sender.expect_test('stop: ack="ok"', 'sender stop command failed', 1)
+        self.receiver.send_expect('stop:', 'stop: ack="ok"')
+        self.sender.send_expect('stop:', 'stop: ack="ok"')
+    
+    def test_04_audio_video_transmission_10sec(self):
+        # we test with one milhouse sending, one receiving
+        # If we init video first on one end, we must init it first on the other end
+        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"', 'video_init: ack="ok"')
+        self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" channels=2 audio_buffer_usec=50000', 'audio_init: ack="ok"')
+        self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
+        self.receiver.send_expect('start:', 'start: ack="ok"')
+        self.sender.send_expect('start:', 'start: ack="ok"')
+        time.sleep(10)
+        self.receiver.send_expect('stop:', 'stop: ack="ok"')
+        self.sender.send_expect('stop:', 'stop: ack="ok"')
     
     def tearDown(self):
         self.receiver.sendline('quit:')

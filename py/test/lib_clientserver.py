@@ -232,17 +232,15 @@ class Process(object):
                 kwargs['logfile'] = self.logfile
             self.child = pexpect.spawn(command, **kwargs) 
             if self.expected_when_started != "":
-                # self.expect_test(self.expected_when_started, "process did not output: %s" % self.expected_when_started, 2.0)
                 index = self.child.expect(self.expected_when_started, timeout=self.timeout_expect)
                 self.test_case.assertEqual(index, 0, "Process is not ready")
             else:
-                self.sleep(0.9)
+                self.sleep(self.timeout_expect)
         except pexpect.ExceptionPexpect, e:
             echo("Error starting process %s." % (command), self.verbose)
             raise
         if not self.is_running():
-            pass
-            # raise Exception("Child process is not running. Is an other similar process already running ? Command used : %s" % (command))
+            raise Exception("Child process is not running. Is an other similar process already running ? Command used : %s" % (command))
     
     def sendline(self, line):
         self.child.sendline(line)
