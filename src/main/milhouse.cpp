@@ -98,8 +98,6 @@ short pof::run(int argc, char **argv)
     if(options["version"])
     {
         LOG_INFO("version " << PACKAGE_VERSION <<  " Svn Revision: " << SVNVERSION << std::endl);
-        //LOG_INFO("version " << "$GlobalRev$" << '\b' << "$Date$");
-        //execlp("svnversion", "svnversion", (char *)0);
         return 0;
     }
 

@@ -1,3 +1,4 @@
+-figure out what's up with deinterlace
 -test and write about latency rtp issues/testing with netem scripts and so on
 -use mapmsg to get stats to hugo
 -fix glvideosink's black at startup/until fullscreen bug

@@ -157,16 +157,18 @@ void VideoEncoder::init()
     sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
 
-    gstlinkable::link(sinkQueue_, colorspc_);
-
     if (doDeinterlace_)
     {
         LOG_DEBUG("DO THE DEINTERLACE");
         deinterlace_ = Pipeline::Instance()->makeElement("deinterlace2", NULL);
+        gstlinkable::link(sinkQueue_, deinterlace_);
         gstlinkable::link(deinterlace_, colorspc_);
     }
     else
+    {
+        gstlinkable::link(sinkQueue_, colorspc_);
         g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
+    }
 
     // Create separate thread for encoding, should yield better performance on multicore machines
     gstlinkable::link(colorspc_, codec_);

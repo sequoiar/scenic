@@ -245,7 +245,7 @@ void RtpReceiver::updateLatencyCb(GtkAdjustment *adj)
 /* makes the latency window */
 void RtpReceiver::createLatencyControl()
 {
-    if (madeControl_)
+    if (madeControl_)   // one control sets all jitterbuffers
         return;
 
     static bool gtk_initialized = false;
