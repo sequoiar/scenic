@@ -37,7 +37,7 @@ AC_ARG_ENABLE([debug], [
         enable_debug=yes)
 
 AC_ARG_ENABLE([asio], [ **************** 
-  --enable-asio build asio],,enable_asio=no)
+  --enable-asio build asio],,enable_asio=yes)
   
 AC_MSG_WARN([${ac_prefix}])
 # Checks for library functions.
