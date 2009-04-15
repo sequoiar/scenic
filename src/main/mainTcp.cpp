@@ -111,10 +111,11 @@ bool MainModule::run()
                 throw tmsg["exception"].except();
             else
             {
-                tmsg["id"] = ++msg_count;
+                MapMsg ret(tmsg.cmd());
+                tmsg["id"] = ret["id"] = ++msg_count;
                 gst_queue.push(tmsg);
-                tmsg["ack"] = "ok";
-                tcp_queue.push(tmsg);
+                ret["ack"] = "ok";
+                tcp_queue.push(ret);
             }
         }
     }
@@ -148,3 +149,4 @@ int telnetServer(int s,int p)
 
     return 0;
 }
+
