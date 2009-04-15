@@ -94,8 +94,8 @@ bool MainModule::run()
 
         while(!signalFlag())
         {
-            MapMsg tmsg = tcp_queue.timed_pop(100);
-            MapMsg gmsg = gst_queue.timed_pop(1);
+            MapMsg tmsg = tcp_queue.timed_pop(1);
+            MapMsg gmsg = gst_queue.timed_pop(1000);
 
             if (!gmsg.cmd().empty())
                 tcp_queue.push(gmsg);
