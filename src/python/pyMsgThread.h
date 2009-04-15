@@ -25,7 +25,7 @@
 
 #include <Python.h>
 #include <boost/python.hpp>
-#include "msgThreadFactory.h"
+#include "main/msgThreadFactory.h"
 #include "pyCallback.h"
 
 /// Used my ThreadWrap to poll and post to python

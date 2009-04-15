@@ -24,8 +24,8 @@
 #include "msgThreadFactory.h"
 #include "tcp/tcpThread.h"
 #include "tcp/asioThread.h"
-#include "gstSenderThread.h"
-#include "gstReceiverThread.h"
+#include "gst/control/gstSenderThread.h"
+#include "gst/control/gstReceiverThread.h"
 
 MsgThread* MsgThreadFactory::Tcp(int port, bool log)
 {
