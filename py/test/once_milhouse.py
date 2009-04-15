@@ -28,7 +28,7 @@ import time
 
 fname = __file__.split('.')[0]
 
-class Test_Milhouse(unittest.TestCase):
+class Test_MilhouseOneWay(unittest.TestCase):
     def setUp(self):
 
         self.sender = clientserver.TelnetMilhouseTester(name='sender', mode='s', serverport=9000)
@@ -37,20 +37,10 @@ class Test_Milhouse(unittest.TestCase):
         self.receiver.setup(self)
 
     def test_01_basic_milhouse_control(self):
-        self.receiver.sendline('audio_init: codec="raw" port=10000 address="127.0.0.1" ')
-        self.receiver.expect_test('audio_init: ack="ok"', 'receiver init command failed')
-        self.receiver.sendline('quit:')
-        self.receiver.expect_test('DEBUG:quit', 'Command not acknowledged')
-        time.sleep(2)
+        self.sender.sendline('audio_init: codec="raw" port=10000 address="127.0.0.1" ')
+        self.sender.expect_test('audio_init: ack="ok"', 'receiver init command failed')
 
-    def test_02_single_audio_transmission(self):
-        self.receiver.sendline('audio_init: codec="raw" port=10000 address="127.0.0.1" ')
-        self.receiver.expect_test('audio_init: ack="ok"', 'receiver init command failed')
-        self.receiver.sendline('quit:')
-        self.receiver.expect_test('DEBUG:quit', 'Command not acknowledged')
-        time.sleep(1)
-
-    def test_03_single_audio_transmission(self):
+    def test_02_single_audio_transmission_10sec(self):
         # we test with one milhouse sending, one receiving
         self.receiver.sendline('audio_init: codec="raw" port=10000 address="127.0.0.1" channels=2 audio_buffer_usec=50000')
         self.receiver.expect_test('audio_init: ack="ok"', 'receiver init command failed')
@@ -60,19 +50,37 @@ class Test_Milhouse(unittest.TestCase):
         self.receiver.expect_test('start: ack="ok"', 'receiver start command failed', 1)
         self.sender.sendline('start:')
         self.sender.expect_test('start: ack="ok"', 'sender start command failed', 1)
-        time.sleep(15)
+        time.sleep(10)
         self.receiver.sendline('stop:')
         self.receiver.expect_test('stop: ack="ok"', 'receiver stop command failed', 1)
         self.sender.sendline('stop:')
         self.sender.expect_test('stop: ack="ok"', 'sender stop command failed', 1)
-        self.receiver.sendline('quit:')
-        self.receiver.expect_test('DEBUG:quit', 'receiver quit command failed')
-        self.sender.sendline('quit:')
-        self.sender.expect_test('DEBUG:quit', 'Command not acknowledged')
+    
+    def test_03_single_video_transmission(self):
+        self.sender.sendline('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"')
+        self.sender.expect_test('video_init: ack="ok"', 'receiver init command failed')
 
+    def test_04_single_audio_transmission_10sec(self):
+        # we test with one milhouse sending, one receiving
+        self.receiver.sendline('video_init: codec="mpeg4" port=10000 address="127.0.0.1"')
+        self.receiver.expect_test('video_init: ack="ok"', 'receiver init command failed')
+        self.sender.sendline('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"')
+        self.sender.expect_test('video_init: ack="ok"', 'sender init command failed', 1)
+        self.receiver.sendline('start:')
+        self.receiver.expect_test('start: ack="ok"', 'receiver start command failed', 1)
+        self.sender.sendline('start:')
+        self.sender.expect_test('start: ack="ok"', 'sender start command failed', 1)
+        time.sleep(10)
+        self.receiver.sendline('stop:')
+        self.receiver.expect_test('stop: ack="ok"', 'receiver stop command failed', 1)
+        self.sender.sendline('stop:')
+        self.sender.expect_test('stop: ack="ok"', 'sender stop command failed', 1)
+    
     def tearDown(self):
         self.receiver.sendline('quit:')
+        self.receiver.expect_test('postQuit', 'receiver quit command failed')
         self.sender.sendline('quit:')
+        self.sender.expect_test('postQuit', 'sender quit command failed')
         self.sender.kill_children()
         self.receiver.kill_children()
 
