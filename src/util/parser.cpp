@@ -22,10 +22,8 @@
 #include "util.h"
 #include <sstream>
 #include <vector>
-#include "parser.h"
 #include "mapMsg.h"
 
-using namespace Parser;
 
 typedef std::string::size_type POS;
 
@@ -119,7 +117,7 @@ static bool contains(const std::string& in, char c)
 }
 
 
-bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
+bool MapMsg::tokenize(const std::string& str, MapMsg &cmd_map)
 {
     std::string::size_type tok_end;
     std::string lstr = str;                                         //copy in str to local string
@@ -205,8 +203,9 @@ bool Parser::tokenize(const std::string& str, MapMsg &cmd_map)
 }
 
 
-bool Parser::stringify(MapMsg& cmd_map, std::string& rstr)
+bool MapMsg::stringify(const MapMsg& const_cmd_map, std::string& rstr)
 {
+    MapMsg& cmd_map = const_cast<MapMsg&>(const_cmd_map);
     std::stringstream sstr;
     rstr.clear();
     //locate "command" and output value to str

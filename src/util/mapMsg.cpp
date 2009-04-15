@@ -23,6 +23,13 @@
 #include "mapMsg.h"
 static MapMsg::Subscriber* pf = 0;
 
+std::ostream& operator<< (std::ostream& os, const MapMsg& msg)
+{
+    std::string str;
+    msg.stringify(str);
+    os << str;
+    return os;
+}
 std::ostream& operator<< (std::ostream& os, const StrIntFloat& var)
 {
     switch(var.type_)
@@ -42,6 +49,7 @@ std::ostream& operator<< (std::ostream& os, const StrIntFloat& var)
     }
     return os;
 }
+
 
 MapMsg::Subscriber::Subscriber()
 {

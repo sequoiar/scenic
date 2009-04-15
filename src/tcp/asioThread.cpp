@@ -30,7 +30,6 @@
 #include <cstdlib>
 #include <iostream>
 #include "util.h"
-#include "parser.h"
 #include "asioThread.h"
 
 #ifdef HAVE_BOOST_ASIO
@@ -82,7 +81,7 @@ class tcp_session
             if (!err)
             {
                 MapMsg mapMsg;
-                if(Parser::tokenize(data_, mapMsg))
+                if(mapMsg.tokenize(data_))
                     queue_.push(mapMsg);
                 else
                     LOG_WARNING("Bad Msg Received.");
@@ -126,7 +125,7 @@ class tcp_session
                     else
                     {
                         std::string msg_str;
-                        Parser::stringify(msg, msg_str);
+                        msg.stringify(msg_str);
                         msg_str+='\n';
                         async_write(socket_, buffer(msg_str),
                                 boost::bind(&tcp_session::write_cb, this, error));

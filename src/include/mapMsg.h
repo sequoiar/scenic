@@ -69,13 +69,6 @@ friend std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
 
 std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
 
-class MapMsg;
-namespace Parser
-{
-bool stringify(MapMsg& cmd_map, std::string& str);
-}
-
-
 
 /// key/value map where value is a string, a float, an int, a vector StrIntFloat
 class MapMsg
@@ -84,7 +77,7 @@ public:
     typedef std::map<std::string, StrIntFloat> MapMsg_;
     typedef const std::pair<const std::string,StrIntFloat>* Item;
 private:
-    friend bool Parser::stringify(MapMsg& cmd_map, std::string& str);
+    friend std::ostream& operator<< (std::ostream& os, const MapMsg&);
     friend Item GetBegin(MapMsg& m);
     friend Item GetNext(MapMsg& m);
 
@@ -95,12 +88,17 @@ public:
     MapMsg(std::string command):map_(),it_(){ cmd() = command;}
     StrIntFloat &cmd() { return (*this)["command"]; }
     StrIntFloat &operator[](const std::string& str);
+    bool tokenize(const std::string& str)
+    {   return tokenize(str,*this); }
+    bool stringify(std::string& str) const
+    {   return stringify(*this,str); }
 private:
+    static bool tokenize(const std::string& str, MapMsg &cmd_map);
+    static bool stringify(const MapMsg& cmd_map, std::string& rstr);
     Item begin();
     Item next();
 public:
     void clear(){map_.clear();}
-
 
 
 /** Used by code that needs to post messages but does not use 
@@ -118,6 +116,7 @@ public:
     };
 };
 
+std::ostream& operator<< (std::ostream& os, const MapMsg&);
 
 #endif
 

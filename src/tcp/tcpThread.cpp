@@ -21,7 +21,6 @@
 
 #include "util.h"
 #include "tcpThread.h"
-#include "parser.h"
 #include <errno.h>
 #include <string.h>
 
@@ -91,7 +90,7 @@ void TcpThread::main()
                             do
                             {
                                 MapMsg mapMsg;
-                                if(Parser::tokenize(line, mapMsg))
+                                if(mapMsg.tokenize(line))
                                     queue_.push(mapMsg);
                                 else
                                     LOG_WARNING("Bad Msg Received.");
@@ -148,7 +147,7 @@ bool TcpThread::send(MapMsg& msg)
         try
         {
             lf_->hold(); // to insure no recursive calls due to log message calling send
-            Parser::stringify(msg, msg_str);
+            msg.stringify(msg_str);
             ret = serv_.send(msg_str);
             lf_->enable();
 
@@ -168,7 +167,7 @@ bool TcpThread::send(MapMsg& msg)
 bool TcpThread::socket_connect_send(const std::string& addr, MapMsg& msg)
 {
     std::string msg_str;
-    Parser::stringify(msg, msg_str);
+    msg.stringify(msg_str);
     return serv_.socket_connect_send(addr, msg_str);
 }
 
@@ -225,7 +224,7 @@ bool tcpSendBuffer(const std::string ip, int port, int id, const std::string cap
     const int MAX_TRIES = 100;
 
     std::string msg_str;
-    Parser::stringify(msg, msg_str);
+    msg.stringify(msg_str);
     for(int i = 0; i < MAX_TRIES; ++i)
     {
         if(MsgThread::isQuitted())

@@ -24,7 +24,6 @@
 #define _SINGLE_BUFFER_H_
 
 #include "tcp/tcpThread.h"
-#include "tcp/parser.h"
 
 
 #endif // _SINGLE_BUFFER_H_
