@@ -215,19 +215,28 @@ class udp_sender
 {
     public:
         udp_sender(io_service& io_service, std::string ip, std::string port, std::string buff)
-            : io_service_(io_service),buff_(buff),
+            : io_service_(io_service),buff_(buff),t_(io_service, boost::posix_time::seconds(1)),
             socket_(io_service, udp::endpoint(udp::v4(), 0)),
         sender_endpoint_(),resolver(io_service),query(udp::v4(), ip.c_str(), port.c_str()),iterator(resolver.resolve(query))
     {
-        socket_.async_send_to(buffer(buff_),*iterator, boost::bind(&udp_sender::handle_send_to,this,error,bytes_transferred));
-
+        //socket_.async_send_to(buffer(buff_),*iterator, boost::bind(&udp_sender::handle_send_to,this,error,bytes_transferred));
+        t_.async_wait(boost::bind(&udp_sender::handle_timer,this, error));
     }
 
-        void handle_send_to(const error_code& , size_t /*bytes_sent*/)
+        void handle_send_to(const error_code& err, size_t /*bytes_sent*/)
         {
+            if(err){
+                LOG_DEBUG("err");
+            } 
+            else
+            {
+                LOG_DEBUG("!err");
             socket_.async_receive_from(buffer(data_,max_length),sender_endpoint_,
                 boost::bind(&udp_sender::handle_receive_from, this, 
                     error, bytes_transferred));
+                t_.expires_at(t_.expires_at() + boost::posix_time::seconds(1));
+                t_.async_wait(boost::bind(&udp_sender::handle_timer,this, error));
+            }
         }
 
         void handle_receive_from(const error_code& err,
@@ -235,11 +244,32 @@ class udp_sender
         {
             if (!err && bytes_recvd > 0)
             {
+                io_service_.stop();
                 LOG_DEBUG(data_);
+            }
+            else
+            {
+                LOG_DEBUG("");
+            }
+        }
+        
+        void handle_timer(const error_code& err)
+        {
+            if (!err)
+            {
+                if(MsgThread::isQuitted())
+                    io_service_.stop();
+               
+                socket_.async_send_to(buffer(buff_),*iterator, boost::bind(&udp_sender::handle_send_to,this,error,bytes_transferred));
+            }
+            else
+            {
+                std::cout << "here5" << std::endl;
             }
         }
         io_service& io_service_; 
         std::string buff_;
+        boost::asio::deadline_timer t_;
         udp::socket socket_;
         udp::endpoint sender_endpoint_;
         udp::resolver resolver;
