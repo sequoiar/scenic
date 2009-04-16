@@ -30,6 +30,8 @@
 #include "dv1394.h"
 #include "v4l2util.h"
 
+#include "fileSource.h"
+
 /// Constructor
 VideoSource::VideoSource(const VideoSourceConfig &config) : 
     config_(config), source_(0), capsFilter_(0)
@@ -105,77 +107,24 @@ VideoTestSource::~VideoTestSource()
 
 /// Constructor
 VideoFileSource::VideoFileSource(const VideoSourceConfig &config) : 
-    VideoSource(config), decoder_(0), queue_(0) 
+    VideoSource(config), identity_(0)
 {}
 
 void VideoFileSource::init()
 {
-    VideoSource::init();
-    decoder_ = Pipeline::Instance()->makeElement("decodebin", NULL);
-
     assert(config_.fileExists());
-    g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
-    gstlinkable::link(source_, decoder_);
-    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
-
-
-    // bind callback
-    g_signal_connect(decoder_, "new-decoded-pad",
-            G_CALLBACK(VideoFileSource::cb_new_src_pad),
-            static_cast<void *>(queue_));
+    identity_ = Pipeline::Instance()->makeElement("identity", NULL);
+    g_object_set(identity_, "silent", TRUE, NULL);
+    
+    GstElement * queue = FileSource::acquire(config_.location(), FileSource::VIDEO);
+    gstlinkable::link(queue, identity_);
 }
-
-
-void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/, void * data)
-{
-    if (gst_pad_is_linked(srcPad))
-    {
-        LOG_DEBUG("Pad is already linked.");
-        return;
-    }
-    else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
-    {
-        LOG_DEBUG("Pad is not a source");
-        return;
-    }
-
-    GstStructure *str;
-    GstPad *sinkPad;
-    GstCaps *caps;
-    // now we can link our queue to our new decodebin element
-    GstElement *sinkElement = static_cast<GstElement*>(data);
-
-
-    assert(sinkElement);
-    sinkPad = gst_element_get_static_pad(sinkElement, "sink");
-
-    if (GST_PAD_IS_LINKED(sinkPad))
-    {
-        g_object_unref(sinkPad);        // don't link more than once
-        return;
-    }
-    /* check media type */
-    caps = gst_pad_get_caps(srcPad);
-    str = gst_caps_get_structure(caps, 0);
-    if (!g_strrstr(gst_structure_get_name(str), "video"))
-    {
-        gst_caps_unref(caps);
-        gst_object_unref(sinkPad);
-        return;
-    }
-    gst_caps_unref(caps);
-
-    LOG_DEBUG("VideoFileSource: linking new srcpad and sinkpad.");
-    assert(gstlinkable::link_pads(srcPad, sinkPad));
-    gst_object_unref(sinkPad);
-}
-
 
 /// Destructor
 VideoFileSource::~VideoFileSource()
 {
-    Pipeline::Instance()->remove(&decoder_);
-    Pipeline::Instance()->remove(&queue_);
+    Pipeline::Instance()->remove(&identity_);
+    FileSource::release(config_.location(), FileSource::VIDEO);
 }
 
 

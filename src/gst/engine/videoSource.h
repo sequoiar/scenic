@@ -81,13 +81,11 @@ class VideoFileSource
 
     private:
         ~VideoFileSource();
-        _GstElement *srcElement() { return queue_; }      
+        _GstElement *srcElement() { return identity_; }      
         void init();
 
-        _GstElement *decoder_;
-        _GstElement *queue_;
-        static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, int last,
-                                   void *data);
+        // FIXME: get rid of this
+        _GstElement *identity_;
 
         /// No Copy Constructor
         VideoFileSource(const VideoFileSource&);     

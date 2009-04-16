@@ -454,16 +454,39 @@ class MilhouseTests():
         """ audiofile, uncompressed  """
         recv, send = self.argfactory('audio')
         send.audiosource = "filesrc"
-        send.audiodevice = "/var/tmp/things.mp3"
+        send.audiodevice = "/var/tmp/movie.avi"
         if os.path.exists(send.audiodevice):
             self.run(recv, send)
         else:
             print "No such file, skipping this test"
             
+    def test_33_raw_audiofile_videofile_different(self):
+        """ audiofile, sent in raw with different videofile """
+        recv, send = self.argfactory('audiovideo')
+        send.audiosource = "filesrc"
+        send.videosource = "filesrc"
+        send.audiodevice = "/var/tmp/things.mp3"
+        send.videodevice = "/var/tmp/mandela.ogg"
+        if os.path.exists(send.audiodevice) and os.path.exists(send.videodevice):
+            self.run(recv, send)
+        else:
+            print "No such files, skipping this test"
+
+    def test_34_raw_audiofile_videofile_same(self):
+        """ one file is source for both video and audio """
+        recv, send = self.argfactory('audiovideo')
+        send.audiosource = "filesrc"
+        send.videosource = "filesrc"
+        send.audiodevice = "/var/tmp/movie.avi"
+        send.videodevice = send.audiodevice
+        if os.path.exists(send.audiodevice):
+            self.run(recv, send)
+        else:
+            print "No such files, skipping this test"
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_01')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_34')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

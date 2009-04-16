@@ -147,17 +147,11 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
          
         bool handleBusMsg(_GstMessage *msg);
         
-        static void cb_new_src_pad(GstElement * srcElement, 
-                                   GstPad * srcPad, 
-                                   gboolean last,
-                                   void *data);
         void loop(int nTimes);
         GstElement *srcElement() { return aconv_; }
         void sub_init();
 
         void restartPlayback();
-        GstElement *decoder_;
-        GstElement *queue_;
         GstElement *aconv_;
         int loopCount_;
         static const int LOOP_INFINITE;

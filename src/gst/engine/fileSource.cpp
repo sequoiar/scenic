@@ -65,7 +65,7 @@ bool FileSource::instanceExists(const std::string &location)
 
 /// checks to see if an instance is already available, or creates a new one if needed.
 // FIXME: maybe this should just return the appropriate queue instead of the class?
-GstElement * FileSource::acquire(const std::string &location, const std::string &mediaType)
+GstElement * FileSource::acquire(const std::string &location, MEDIA_TYPE mediaType)
 {
     GstElement *queue;
 
@@ -75,27 +75,33 @@ GstElement * FileSource::acquire(const std::string &location, const std::string 
         fileSources_[location]->init(location);
     }
     
-    if (mediaType == "video")
-    {
-        assert(fileSources_[location]->videoQueue_ == 0);
+    if (fileSources_[location]->videoQueue_ == 0)
         fileSources_[location]->videoQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
-        queue = fileSources_[location]->videoQueue_;
-    }
-    else if (mediaType == "audio")
-    {   
-        assert(fileSources_[location]->audioQueue_ == 0);
+
+    if (fileSources_[location]->audioQueue_ == 0)
         fileSources_[location]->audioQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
-        queue = fileSources_[location]->audioQueue_;
-      }
-    else 
-        THROW_ERROR("Unknown media type" << mediaType); 
+
+    switch (mediaType)
+    {
+        case VIDEO:
+            {
+                queue = fileSources_[location]->videoQueue_;
+                break;
+            }
+
+        case AUDIO:
+            {   
+                queue = fileSources_[location]->audioQueue_;
+                break;
+            }
+    }
 
     return queue;
 }
  
 
 // called by client
-void FileSource::release(const std::string &location, const std::string &mediaType)
+void FileSource::release(const std::string &location, MEDIA_TYPE mediaType)
 {
     if (not instanceExists(location))
     {
@@ -103,10 +109,16 @@ void FileSource::release(const std::string &location, const std::string &mediaTy
         return;
     }
     
-    if (mediaType == "video")
+    switch (mediaType) 
+    {
+        case VIDEO:
         fileSources_[location]->removeVideo();
-    else if (mediaType == "audio")
+        break;
+
+        case AUDIO:
         fileSources_[location]->removeAudio();
+        break;
+    }
 
     if (not fileSources_[location]->isLinked()) // no more objects using the filesource
         fileSources_.erase(location);
@@ -143,9 +155,15 @@ void FileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, g
     str = gst_caps_get_structure(caps, 0);
 
     if (g_strrstr(gst_structure_get_name(str), "video"))
+    {
+        LOG_DEBUG("Got video pad");
         sinkElement = context->videoQueue_;
+    }
     else if (g_strrstr(gst_structure_get_name(str), "audio"))
+    {
+        LOG_DEBUG("Got audio pad");
         sinkElement = context->audioQueue_;
+    }
     else 
     {
         gst_caps_unref(caps);
