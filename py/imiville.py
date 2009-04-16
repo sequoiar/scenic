@@ -90,7 +90,7 @@ class IPythonView(CliView):
             print "------------------------------------------------------------------------------"
             sys.stdout.write(get_color('BLACK'))
             # CliView.update(self, origin, key, value)
-            if key in self.calleback:
+            if key in self.callback:
                 self.callbacks[key](origin, value)
             else:
                 print "Could not find callback in CliView - maybe just a imiville.py bug"
