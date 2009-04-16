@@ -2,18 +2,19 @@
 		
 		<div id="index_left_pan" class="color_one">
 			<h1>Propulseart</h1>
-			<div n:render="addressbook">ADDRESSBOOK place holder</div>
+			<div n:render="addressbook">ADDRESSBOOK placeholder</div>
+			<div n:render="network_testing">NETWORK TESTING placeholder</div>
 		</div>
 		
 		<div id="strm" class="color_two">
-			<div n:render="streams">STREAMS place holder</div>
+			<div n:render="streams">STREAMS placeholder</div>
 		</div>
 		
 		<div id="index_right_pan">
 		</div>
 		
 		<div id="help">
-			<div n:render="help">HELP place holder</div>
+			<div n:render="help">HELP placeholder</div>
 		</div>
 		
 	</body>

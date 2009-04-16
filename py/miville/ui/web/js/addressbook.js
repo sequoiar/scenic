@@ -319,6 +319,16 @@ Addressbook.methods(
 				conn_state.addClass('conn_connected');
 			}
 			
+			// update the stream/test state icon
+			var stream_state = li.getChildren()[1];
+			stream_state.removeClass('spinner_small');
+			stream_state.removeClass('streaming');
+			if (item['stream_state'] == 1) {
+				stream_state.addClass('spinner_small');
+			} else if (item['stream_state'] == 2) {
+				stream_state.addClass('streaming');
+			}
+			
 			// keep the current selected li element
 			if (item['name'] == self.selected) {
 				selected_li = li;

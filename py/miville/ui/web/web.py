@@ -185,10 +185,12 @@ def small_name(name):
         ClassName -> class_name
     """
     chars = list(name)
+    new_chars = []
     for i, char in enumerate(chars):
         if i > 0 and char.isupper():
-            chars.insert(i, '_')
-    return ''.join(chars).lower()
+            new_chars.append('_')
+        new_chars.append(char)
+    return ''.join(new_chars).lower()
 
 def create_css(href):
     """

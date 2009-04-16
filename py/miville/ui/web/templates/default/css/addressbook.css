@@ -29,6 +29,10 @@
 	background-image: url(/img/network-transmit-receive.png);
 }
 
+.streaming {
+	background-image: url(/img/mail-send-receive.png);
+}
+
 #adb_add {
 	float: left;
 	width: 22px;

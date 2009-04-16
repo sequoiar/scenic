@@ -35,7 +35,6 @@ function notify(caller, key, value) {
 	});
 }
 
-
 /**
  * Event stuff
  */
