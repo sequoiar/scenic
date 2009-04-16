@@ -25,7 +25,7 @@
 #include <string.h>
 
 #ifndef HAVE_BOOST_ASIO
-
+#include <tr1/memory>
 class TcpLog
    // : public Log::Subscriber
 {
@@ -36,7 +36,7 @@ class TcpLog
         void enable(){}
 };
 
-std::auto_ptr<TcpLog> lf_(new TcpLog());
+std::tr1::shared_ptr<TcpLog> lf_(new TcpLog());
 
 TcpThread::TcpThread(int inport, bool logF)            
 : serv_(inport), logFlag_(logF)

@@ -33,8 +33,9 @@ class asio_thread : public MsgThread
     int port_;
     bool log_;
 public:
+#ifdef HAVE_BOOST_ASIO
     asio_thread(int port,bool log): port_(port),log_(log){}
-
+#endif
 };
 
 #endif //_ASIO_THREAD_H_
