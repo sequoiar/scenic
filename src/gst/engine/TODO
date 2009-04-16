@@ -1,4 +1,4 @@
--fix filesrc, make it more like dv1394src
+-make filesrc more like dv1394src
 -make mtu on payloaders adjustable
 -test and write about latency rtp issues/testing with netem scripts and so on
 -use mapmsg to get stats to hugo

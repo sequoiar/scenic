@@ -270,11 +270,7 @@ void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, g
     GstPad *sinkPad;
     GstCaps *caps;
     AudioFileSource * context = static_cast<AudioFileSource*>(data);
-    if (context->decoder_ != srcElement)
-    {
-        LOG_DEBUG("Source Element does not match this object's decoder");
-        return;
-    }
+    assert(context->decoder_ == srcElement);    
 
     // now we can link our queue to our new decodebin element
     GstElement *sinkElement = context->queue_;

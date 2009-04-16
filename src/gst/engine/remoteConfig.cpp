@@ -39,8 +39,8 @@ RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remote
 }
 
 
-// Can't be called from destructor, as sometime this object is copied and
-// we don't want the ports destroyed prematurely
+// Can't be called from destructor, must be called by this object's owner/client, 
+// as sometime this object is copied and we don't want the ports destroyed prematurely
 void RemoteConfig::cleanupPorts() const
 {
     usedPorts_.erase(capsPort());

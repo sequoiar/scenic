@@ -22,9 +22,6 @@
 #ifndef _DV1394_H_
 #define _DV1394_H_
 
-#include "gstLinkable.h"
-
-
 class _GstElement;
 class _GstPad;
 

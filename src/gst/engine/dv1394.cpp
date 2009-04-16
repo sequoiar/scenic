@@ -22,6 +22,7 @@
 
 #include "dv1394.h"
 #include "raw1394Util.h"
+#include "gstLinkable.h"
 #include "pipeline.h"
 #include "util.h"
 
@@ -89,15 +90,14 @@ void Dv1394::setVideoSink(GstElement *videoSink)
 
 void Dv1394::unsetVideoSink()
 {
-    videoSink_  = 0;
+    videoSink_  = 0; // removed from pipeline by owner
 }
 
 
 void Dv1394::unsetAudioSink()
 {
-    audioSink_  = 0;
+    audioSink_  = 0; // removed from pipeline by owner
 }
-
 
 
 /// Called due to incoming dv stream, either video or audio, links appropriately
