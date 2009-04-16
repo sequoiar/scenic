@@ -47,6 +47,25 @@ class Streams(Widget):
         self.api.stop_streams(self, contact)
         return False
         
+    def rc_update_settings(self):
+        self.api.list_global_setting(self)
+        return False
+        
+    def cb_list_global_setting(self, origin, data):
+        preset_settings = {}
+        user_settings = {}
+        for id, setting in data[0].items():
+            if setting.is_preset:
+                preset_settings[id] = setting.name 
+            else:
+                user_settings[id] = setting.name 
+            log.debug('LIST GLOB: %s' % id)
+            log.debug('LIST GLOB: %s' % setting.name)
+            log.debug('LIST GLOB: %s' % setting.is_preset)
+        self.callRemote('update_settings', preset_settings, user_settings)
+        
+        
+        
 #    def cb_get_contactss(self, origin, data):
 #        """
 #        Maybe we should add a better sorting algorithm with collation support

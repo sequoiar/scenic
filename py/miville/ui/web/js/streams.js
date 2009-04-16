@@ -47,6 +47,8 @@ Streams.methods(
 		
 		// Register to the widgets communicator.
 		register('strm', self);
+		
+		self.callRemote('rc_update_settings');
 	},
 	
 	/**
@@ -75,6 +77,26 @@ Streams.methods(
 		self.upd_start_btn(event);
 	},
 
+	/**
+	 * ----------------
+	 * Call from Server
+	 * ----------------
+	 */
+
+	/**
+	 * Update the contact list to reflect the state of the server.
+	 * (call from server)
+	 * 
+	 * Changed only what was changed.
+	 * 
+	 * @member Addressbook
+     * @param {array} contacts An array of contacts object. 
+	 */
+    function update_settings(self, presets, users) {
+		dbug.info('SETTS');
+		dbug.info(presets);
+		dbug.info(users);
+	},
 
 
 	/**
@@ -187,6 +209,15 @@ Streams.methods(
 			self.start_btn.disabled = true;
 			self.start_btn.value = self.start_str;
 		}
+/*
+	},
+	
+	function upd_global_setts(self, event) {
+		if ('contact_selected' == event) {
+			self.get_setts()
+		}
+
+*/
 	}
 
 	
