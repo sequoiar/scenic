@@ -37,6 +37,7 @@ NetworkTesting.methods(
 		
 		// Get elements.
 		self.start_btn = $('nettest_start');
+		self.message_div = $('nettest_message');
 		
 		// Get string translations.
 		self.start_str = $('js_nettest_start').get('text'); // start string
@@ -78,16 +79,16 @@ NetworkTesting.methods(
 
 
 	/**
-	 * ----------------
-	 * Call from Client
-	 * ----------------
+	 * ------------------
+	 * Called from Client
+	 * ------------------
 	 */
 	
 	/**
 	 * Get info from others widgets.
 	 * (call from the client)
 	 * 
-	 * Call when a contact is selected.
+	 * Called when a contact is selected.
 	 * 
 	 * @member Streams
 	 * @param {string} caller The short name of the widget.
@@ -115,7 +116,7 @@ NetworkTesting.methods(
 	},
 
 	/**
-	 * Start the streams of this contact.
+	 * Starts the streams of this contact.
 	 * (call from the client)
 	 * 
 	 * @member Streams
@@ -126,7 +127,7 @@ NetworkTesting.methods(
 	},
 
 	/**
-	 * Stop the streams of this contact.
+	 * Stops the streams of this contact.
 	 * (call from the client)
 	 * 
 	 * @member Streams
@@ -142,42 +143,38 @@ NetworkTesting.methods(
 	 */
 
     /**
-     * Update the start button in function of the selected contact.
+     * Updates the start button according to the selected contact.
      *
      * @member Streams
      * @param {string} event The event that trigger the update.
      */
 	function upd_start_btn(self, event) 
     {
-		dbug.info(event);
+		dbug.info("event: " + event);
 		// list of events that "list" should react to
 		if (event == 'contact_selected') 
         {
 			// set the default state
-			var button_state = 'disabled';
+			var button_state = 'enabled'; // default...
 			var button_name = self.start_str; // "start" string that is i18nized
-			
 			// get the state of other controls necessary to find the state
 			var stream_state = self.contact.get('stream_state');
 			var connection_state = self.contact.get('state').toInt();
-
-			self.start_btn.removeEvents('click');
-			if ([0, 3].contains(connection_state)) 
-            {
-				if (stream_state == 0) 
-                {
+            dbug.info("connection_state: " + connection_state);
+            dbug.info("stream_state: " + stream_state);
+			
+            self.start_btn.removeEvents('click');
+			if ([0, 3].contains(connection_state)) {
+				if (stream_state == 0) {
 					button_state = 'enabled';
 					self.start_btn.addEvent('click', function() {
 						self.start_test();
 					});
-				} 
-                else if (stream_state == 1) 
-                {
+				} else if (stream_state == 1) {
+                    dbug.info("Seems like we are streaming. Disabling the nettest button.");
 					button_state = 'disabled';
 					button_name = self.start_str;
-				} 
-                else 
-                {
+				} else {
 					button_state = 'enabled';
 					button_name = self.stop_str;
 					self.start_btn.addEvent('click', function(){
@@ -185,25 +182,65 @@ NetworkTesting.methods(
 					});
 				}
 			}
-			
 			self.start_btn.value = button_name;
-			
-			if (button_state == 'enabled') 
-            {
+			if (button_state == 'enabled') {
 				self.start_btn.disabled = false;
-			} 
-            else 
-            {
+			} else {
 				self.start_btn.disabled = true;
 			}
-		} 
-        else if (['contact_unselected',
-					'add_contact'].contains(event)) 
-        {
+		} else if (['contact_unselected',
+					'add_contact'].contains(event)) {
 			self.start_btn.disabled = true;
 			self.start_btn.value = self.start_str;
 		}
-	}
+	},
 
-	
+	/**
+     * Called when a network test is done.
+	 * (called from server)
+	 * 
+	 * @member NetworkTesting
+     * @param {string} contact The name of the contact . 
+     * @param {string} msg Some string to display to the user... 
+     * @param {string} details A big dict with results. 
+	 */
+	function test_results(self, contact, data) {
+		// check if contact exist in the list and get it
+        //var owner = self.list.getElement('li[name=' + contact + ']')
+        //self.results_field; 
+        field = self.message_div;
+        //self.message_div.innerHTML = msg;
+        var h1 = new Element('strong').appendText('Performance Test results with ' + contact).injectInside(self.message_div);
+        var pre = new Element('pre').appendText(data).injectInside(self.message_div);
+        /*
+        if (data.local) {
+            txt = "From local to remote"
+            var p = new Element('p').appendText(txt).injectInside(self.message_div);
+            var ul = new Element('ul').appendText(txt).injectInside(self.message_div);
+        for host_name in ['local', 'remote']:
+            if data.has_key(host_name):
+                if host_name == "local":
+                else:
+                    txt += "From remote to local" + "\n"
+                host_data = data[host_name]
+                for k in host_data:
+                    txt += "\t%s: %s\n" % (k, str(host_data[k]))
+        */
+        /*
+		if (field) {
+			field.set('status', msg);
+			if (details == null) {
+				owner.set('error', '');
+			} else {
+				owner.set('error', details);
+				dbug.info(details);
+			}
+			if (contact == self.selected) {
+				self.notify_controllers('test_results');
+			}
+		} else {
+			dbug.info('NO owner - Contact: ' + contact);
+		}
+        */
+	}
 );

@@ -37,15 +37,17 @@ class NetworkTesting(Widget):
         # default values 
         caller = self
         bandwidth = 10 # M
-        duration = 10 # s
+        duration = 1 # s
         kind = "dualtest"
+        log.debug("trying to get contact object for %s" % (contact))
+        log.debug(type(contact))
         try:
-            contact = self.api.get_contact(self, contact) # we need the object, not the name
+            contact_obj = self.api.get_contact(contact) # we need the object, not the name
         except AddressBookError, e:
-            log.error(e.message)
-        
-        log.debug("widget is trying to start network testing with %s" % (contact))
-        self.api.network_test_start(caller, bandwidth, duration, kind, contact)
+            log.error("AddressBookError %s" % e.message)
+        else:
+            log.debug("widget is trying to start network testing with %s" % (contact_obj))
+            self.api.network_test_start(caller, bandwidth, duration, kind, contact_obj)
         return False # we must do this for rc_* methods
         
     def rc_stop_test(self, contact):
@@ -53,7 +55,11 @@ class NetworkTesting(Widget):
         return False
         
     def cb_network_test_start(self, origin, data):
-        log.debug("started network test")
+        # data is a string
+        # data could be {message, contact_name, duration}
+        log.debug("started network test" + str(origin) + str(data))
+        #log.debug("origin:" + str(origin))
+        #log.debug("data:" + str(data))
 
     def cb_network_test_done(self, origin, data):
         """
@@ -62,17 +68,17 @@ class NetworkTesting(Widget):
         :param data: a dict with iperf statistics
         """
         contact_name = data['contact'].name
-        txt = "\n" + "Network test results with %s" % contact_name +" :\n"
         for host_name in ['local', 'remote']:
             if data.has_key(host_name):
                 if host_name == "local":
                     txt += "From local to remote" + "\n"
-                else: # remote
+                else:
                     txt += "From remote to local" + "\n"
                 host_data = data[host_name]
                 for k in host_data:
                     txt += "\t%s: %s\n" % (k, str(host_data[k]))
         log.debug(txt)
+        self.callRemote('test_results', contact_name, txt) # data)
     
     def cb_network_test_error(self, origin, data):
         """
@@ -82,11 +88,8 @@ class NetworkTesting(Widget):
         self.api.notify(
             caller, 
             {
-            'address':self.contact.address, 
-            'port':self.contact.port,
-            'exception':'%s' % err,
             'msg':'Connection failed',
-            'context':'connection'
+            'exception':'%s' % err,
             }, 
             "error")
         """
@@ -95,8 +98,8 @@ class NetworkTesting(Widget):
             # mandatory arguments
             for k in data.keys():
                 msg += "  %s\n" % (data[k])
-            log.debug(msg)
+            log.error(msg)
         else:
-            log.debug(data)
+            log.error(data)
                 
     expose(locals())

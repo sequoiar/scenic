@@ -1694,6 +1694,35 @@ class CliView(Observer):
                     msg.append("\t%s" % (device.name))
         self.write("\n".join(msg), True)
     
+    def _network_test_error(self, origin, data):
+        """
+        Similar to the "info" key, but for error messages to the users.
+        
+        There are 2 ways to use this notify key. 
+         * with a string argument
+         * with a dict argument. Mandatory keys are: 'msg' and 'context'
+        
+        Example ::
+        self.api.notify(
+            caller, 
+            {
+            'address':self.contact.address, 
+            'port':self.contact.port,
+            'exception':'%s' % err,
+            'msg':'Connection failed',
+            'context':'connection'
+            }, 
+            "error")
+        """
+        if isinstance(data, dict):
+            msg = "Error: \n"
+            # mandatory arguments
+            for k in data.keys():
+                msg += "  %s\n" % (data[k])
+            self.write(msg)
+        else:
+            self.write(data)
+
     def _network_test_start(self, origin, data):
         self._info(origin, data)
 

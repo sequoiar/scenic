@@ -946,6 +946,7 @@ class ControllerApi(object):
                     else:
                         ret = tester.start_test(caller, bandwidth, duration, kind) # TODO: dont need com_chan arg anymore
                         if ret:
+                            log.debug("Will notify observer that we are starting a network test")
                             self.notify(caller, "Starting network performance test with contact %s for %d seconds..." % (contact.name, duration), "network_test_start")
                         else:
                             self.notify(caller, "An error occuring while trying to start network test.", "network_test_error")
