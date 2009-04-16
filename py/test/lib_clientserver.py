@@ -363,10 +363,10 @@ class ClientServerTester(object):
         :param klass: self.SERVER_CLASS or self.CLIENT_CLASS
         :param kwargs: **kwargs for child
         """
-        kwargs['logfile_name'] = self.logfile_name
         kwargs['test_case'] = self.test_case  #IMPORTANT
         kwargs['logfile_path'] = self.logfile_path
         kwargs['verbose'] = self.verbose
+        kwargs['logfile_name'] = self.name
         self.__dict__[which] = klass(**kwargs)
         self.__dict__[which].start()
 

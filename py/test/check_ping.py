@@ -27,9 +27,9 @@ from test import lib_clientserver as clientserver
 class Test_Ping(unittest.TestCase):
     def setUp(self):
         clientserver.kill_all_zombie_processes()
-        self.local = clientserver.TelnetMivilleTester(port_offset=0, verbose=False, logname='local')
+        self.local = clientserver.TelnetMivilleTester(port_offset=0, verbose=False, name='local')
         self.local.setup(self)
-        self.remote = clientserver.TelnetMivilleTester(port_offset=1, verbose=False, logname='remote')
+        self.remote = clientserver.TelnetMivilleTester(port_offset=1, verbose=False, name='remote')
         self.remote.setup(self)
         self.local.sendline("c -l")
         self.local.send_expect("c -a Charlotte 127.0.0.1 2223", "added")
@@ -48,7 +48,7 @@ class Test_Ping(unittest.TestCase):
     def test_02_network(self):
         # network test for 1 second
         self.local.send_expect("n -s -k dualtest -t 1", "Starting") 
-        self.local.expect_test('jitter', 'Did not receive network test results.', 4.0) # 4 seconds for more comfort
+        self.local.expect_test('jitter', 'Did not receive network test results.', 9.0) # 9 seconds for more comfort
 
     def tearDown(self):
         self.local.kill_children()
