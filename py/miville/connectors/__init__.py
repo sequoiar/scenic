@@ -22,6 +22,8 @@ Please write a description here
 """
 
 from twisted.internet import task
+from twisted.internet import defer
+
 # App imports
 from miville.errors import ConnectorError, ConnectionError
 from miville.connectors.states import *
@@ -80,6 +82,7 @@ class Connection(object):
         if port == None:
             port = self.api.get_default_port(self.contact.connector)
         self.address = '%s:%s' % (self.contact.address, port)
+        self.deferred_connection = defer.Deferred()
         if self.address in connections:
             #raise ConnectionError, 'Cannot connect. This address \'%s\' already have a connection (%s). %s' % (self.address, self.contact.name, str(connections))
             log.error('This address \'%s\' already have a connection (%s). %s. Connecting anyways.' % (self.address, self.contact.name, str(connections)))
@@ -89,6 +92,7 @@ class Connection(object):
         if self.contact.state == DISCONNECTED:
             self.contact.state = ASKING
             self._start()
+            return self.deferred_connection
         else:
             raise ConnectionError, 'A connection is already established.'
 
@@ -159,19 +163,22 @@ class Connection(object):
         self.com_chan = channel
         self.com_chan.set_connection(self) # added for when there is an error and we need to delete the com_chan.
         self.contact.state = CONNECTED
+        self.deferred_connection.callback(True)
         if client == 'server':
             self.com_chan_started_server()
         else:
             self.com_chan_started_client()
 
     def not_attached(self, client):
-        log.error('Could not start the communication channel. Closing connection')
-        self.api.notify(self, {'address':self.contact.address, 
-                               'port':self.contact.port,
-                               'name':self.contact.name,
-                               'exception':'Could not start the communication channel. Closing the connection.',
-                               'msg':'Connection failed',
-                               'context':'connection'}, 'connection_failed')
+        answer = {'address':self.contact.address, 
+                  'port':self.contact.port,
+                  'name':self.contact.name,
+                  'exception':'Could not start the communication channel. Closing the connection.',
+                  'msg':'Connection failed',
+                  'context':'connection'}
+        log.error(answer['exception'])
+        self.deferred_connection.errback(answer)
+        self.api.notify(self, answer, 'connection_failed')
         self.stop()
 
     def com_chan_started_client(self):
@@ -212,7 +219,7 @@ class Connection(object):
             self.com_chan.disconnect()
         if self.contact.state == DISCONNECTING:
             try:    # TODO: do this correctly
-                self.api.stop_streams(self)
+                self.api.stop_streams(self, self.contact.name)
             except:
                 pass
         self.contact.state = DISCONNECTED
@@ -305,9 +312,12 @@ def register_callback(key, callback, event="connect"):
     """
     registers a callback for "disconnect" or "connect" event.
     
-    :param callback: a function of method to call. Its first argument will be the com_chan object. If it is a "connect" callback, its second argument will be the string "server" or "client"
+    :param callback: a function of method to call. Its first argument will be
+    the com_chan object. If it is a "connect" callback, its second argument will
+    be the string "server" or "client"
     
-    If you ever want to unregister a callback, do it manually or write an other function for it.
+    If you ever want to unregister a callback, do it manually or write an other
+    function for it.
     """
     #TODO: check if a callback with the same key is not already register
     # (or do not use key at all?)

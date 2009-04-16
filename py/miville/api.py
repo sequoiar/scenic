@@ -617,31 +617,48 @@ class ControllerApi(object):
 
     ### Streams ###
     
-#    def start_streams_tmp(self, caller, contact_name):
-#        log.debug('START')
-#        contact = self.get_contact(contact_name)
-#        contact.stream_state = 2
-##        self.notify(caller, 2)
-#        
-#    def stop_streams_tmp(self, caller, contact_name):
-#        contact = self.get_contact(contact_name)
-#        contact.stream_state = 0
-##        self.notify(caller, 0)
-        
+    def start_streams_tmp(self, caller, contact_name):
+        contact = self.get_contact(contact_name)
+        if contact:
+            if contact.state == CONNECTED:
+                contact.stream_state = 2 # STARTED
+            elif contact.state == DISCONNECTED:
+                deferred = self.start_connection(caller, contact)
+                deferred.addCallback(self.start_streams_from_defer, caller, contact_name)
+                deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
+    
+    def start_streams_from_defer(self, defer_result, caller, contact_name):
+#        self.start_streams_tmp(caller, contact_name)
+        self.start_streams(caller, contact_name)
+    
+    def start_connection_error_from_defer(self, error, caller, contact_name):
+        log.debug('Defer error: %s' % error)
+        self.notify(caller, error)
+    
+    def stop_streams_tmp(self, caller, contact_name):
+        contact = self.get_contact(contact_name)
+        contact.stream_state = 0        
         
     def start_streams(self, caller, contact_name):
-        try:
-            contact, global_setting, settings_com_channel  = self._get__settings_com_chan_from_contact_name(contact_name)
-            global_setting.start_streaming(self, contact.address, settings_com_channel)
-            contact.stream_state = 2
-            self.notify(caller, "streaming started")
-        except AddressBookError, e:
-                self.notify(caller, "Please select a contact prior to start streaming." + e.message, "error")   
-        except SettingsError, err:
-            self.notify(caller, err)
-        except StreamsError, err:
-            self.notify(caller, err)
-            
+        contact = self.get_contact(contact_name)
+        if contact:
+            if contact.state == CONNECTED:
+                try:
+                    contact, global_setting, settings_com_channel  = self._get__settings_com_chan_from_contact_name(contact_name)
+                    global_setting.start_streaming(self, contact.address, settings_com_channel)
+                    contact.stream_state = 2
+                    self.notify(caller, "streaming started")
+                except AddressBookError, e:
+                        self.notify(caller, "Please select a contact prior to start streaming." + e.message, "error")   
+                except SettingsError, err:
+                    self.notify(caller, err)
+                except StreamsError, err:
+                    self.notify(caller, err)
+            elif contact.state == DISCONNECTED:
+                deferred = self.start_connection(caller, contact)
+                deferred.addCallback(self.start_streams_from_defer, caller, contact_name)
+                deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
+                            
     def stop_streams(self, caller, contact_name):
         """
         Stop all the sub-streams. (audio, video and data)
@@ -698,7 +715,7 @@ class ControllerApi(object):
         if contact and contact.name in self.adb.contacts:
             try:
                 connection = connectors.create_connection(contact, self)
-                connection.start()
+                deferred = connection.start()
                 # key is 'start_connection'
                 # now, we use a dict, not a string in order to give
                 # good visual feedback for the web UI.
@@ -708,6 +725,7 @@ class ControllerApi(object):
                                      'address':contact.address,
                                      'msg':'Trying to connect',
                                      'context':'connection'})
+                return deferred
             except ConnectionError, err:
                 self.notify(caller, {'name':contact.name, 
                                      'address':contact.address,
