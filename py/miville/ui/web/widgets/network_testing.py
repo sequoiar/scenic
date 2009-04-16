@@ -46,12 +46,57 @@ class NetworkTesting(Widget):
         
         log.debug("widget is trying to start network testing with %s" % (contact))
         self.api.network_test_start(caller, bandwidth, duration, kind, contact)
-        return False
+        return False # we must do this for rc_* methods
         
     def rc_stop_test(self, contact):
         log.debug("network testing stop is not implemented yet")
         return False
         
-    #def cb_something(self, args):
+    def cb_network_test_start(self, origin, data):
+        log.debug("started network test")
+
+    def cb_network_test_done(self, origin, data):
+        """
+        Results of a network test. 
+        See network.py
+        :param data: a dict with iperf statistics
+        """
+        contact_name = data['contact'].name
+        txt = "\n" + "Network test results with %s" % contact_name +" :\n"
+        for host_name in ['local', 'remote']:
+            if data.has_key(host_name):
+                if host_name == "local":
+                    txt += "From local to remote" + "\n"
+                else: # remote
+                    txt += "From remote to local" + "\n"
+                host_data = data[host_name]
+                for k in host_data:
+                    txt += "\t%s: %s\n" % (k, str(host_data[k]))
+        log.debug(txt)
+    
+    def cb_network_test_error(self, origin, data):
+        """
+        :param data: dict or string
+
+        Example ::
+        self.api.notify(
+            caller, 
+            {
+            'address':self.contact.address, 
+            'port':self.contact.port,
+            'exception':'%s' % err,
+            'msg':'Connection failed',
+            'context':'connection'
+            }, 
+            "error")
+        """
+        if isinstance(data, dict):
+            msg = "Error: \n"
+            # mandatory arguments
+            for k in data.keys():
+                msg += "  %s\n" % (data[k])
+            log.debug(msg)
+        else:
+            log.debug(data)
                 
     expose(locals())

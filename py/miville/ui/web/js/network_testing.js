@@ -122,6 +122,7 @@ NetworkTesting.methods(
 	 */
 	function start_test(self) {
 		self.callRemote('rc_start_test', self.contact.get('name'));
+        self.start_btn.disabled = true;
 	},
 
 	/**
@@ -146,10 +147,12 @@ NetworkTesting.methods(
      * @member Streams
      * @param {string} event The event that trigger the update.
      */
-	function upd_start_btn(self, event) {
+	function upd_start_btn(self, event) 
+    {
 		dbug.info(event);
 		// list of events that "list" should react to
-		if ('contact_selected' == event) {
+		if (event == 'contact_selected') 
+        {
 			// set the default state
 			var button_state = 'disabled';
 			var button_name = self.start_str; // "start" string that is i18nized
@@ -159,16 +162,22 @@ NetworkTesting.methods(
 			var connection_state = self.contact.get('state').toInt();
 
 			self.start_btn.removeEvents('click');
-			if ([0, 3].contains(connection_state)) {
-				if (stream_state == 0) {
+			if ([0, 3].contains(connection_state)) 
+            {
+				if (stream_state == 0) 
+                {
 					button_state = 'enabled';
-					self.start_btn.addEvent('click', function(){
+					self.start_btn.addEvent('click', function() {
 						self.start_test();
 					});
-				} else if (stream_state == 1) {
+				} 
+                else if (stream_state == 1) 
+                {
 					button_state = 'disabled';
 					button_name = self.start_str;
-				} else {
+				} 
+                else 
+                {
 					button_state = 'enabled';
 					button_name = self.stop_str;
 					self.start_btn.addEvent('click', function(){
@@ -179,13 +188,18 @@ NetworkTesting.methods(
 			
 			self.start_btn.value = button_name;
 			
-			if (button_state == 'enabled') {
+			if (button_state == 'enabled') 
+            {
 				self.start_btn.disabled = false;
-			} else {
+			} 
+            else 
+            {
 				self.start_btn.disabled = true;
 			}
-		} else if (['contact_unselected',
-					'add_contact'].contains(event)) {
+		} 
+        else if (['contact_unselected',
+					'add_contact'].contains(event)) 
+        {
 			self.start_btn.disabled = true;
 			self.start_btn.value = self.start_str;
 		}

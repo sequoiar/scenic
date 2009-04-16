@@ -388,6 +388,16 @@ class ClientServerTester(object):
         self.client.sendline(line)
     def expect_test(self, expected, message=None, timeout=-1):
         self.client.expect_test(expected, message, timeout)
+    def sleep(self, duration=0.1):
+        """
+        Non-blocking sleep that flushes the output.
+        """
+        end = time.time() + duration
+        while time.time() < end:
+            if self.client is not None:
+                self.client.sleep(0.01)
+            if self.server is not None:
+                self.server.sleep(0.01)
 
 class TelnetProcess(Process):
     """
@@ -479,7 +489,6 @@ class MilhouseProcess(Process):
     def __init__(self, **kwargs): # mode=[r|s], serverport=9000
         self.mode = 't'
         self.serverport = '8000'
-        kwargs['maxread'] = 1
         kwargs['expected_when_started'] = "READY"
         Process.__init__(self, **kwargs)
 

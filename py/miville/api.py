@@ -913,12 +913,12 @@ class ControllerApi(object):
         except AddressBookError:
         #    contact = None
         #if contact is None:
-            self.notify(caller, "Please select a contact prior to start a network test.", "error")
+            self.notify(caller, "Please select a contact prior to start a network test.", "network_test_error")
         else:
             #pprint.pprint(contact.__dict__)
             
             if contact.state != addressbook.CONNECTED: 
-                self.notify(caller, "Please connect to a contact prior to start a network test.", "error")
+                self.notify(caller, "Please connect to a contact prior to start a network test.", "network_test_error")
             else:
                 #log.debug("connector : " + str(contact.connector))
                 # com_chan = None 
@@ -937,18 +937,18 @@ class ControllerApi(object):
                 try:
                     tester = network.get_tester_for_contact(contact.name)
                 except KeyError, e:
-                    self.notify(caller, "No network tester for contact", "error")
+                    self.notify(caller, "No network tester for contact", "network_test_error")
                 else:
                     try:
                         kind = kinds[kind]
                     except KeyError:
-                        self.notify(caller, "Could not start network test: Invalid kind of test \"%s\"." % kind, "error")
+                        self.notify(caller, "Could not start network test: Invalid kind of test \"%s\"." % kind, "network_test_error")
                     else:
                         ret = tester.start_test(caller, bandwidth, duration, kind) # TODO: dont need com_chan arg anymore
                         if ret:
-                            self.notify(caller, "Starting network performance test with contact %s for %d seconds..." % (contact.name, duration), "info")
+                            self.notify(caller, "Starting network performance test with contact %s for %d seconds..." % (contact.name, duration), "network_test_start")
                         else:
-                            self.notify(caller, "An error occuring while trying to start network test.", "error")
+                            self.notify(caller, "An error occuring while trying to start network test.", "network_test_error")
 
 #     def network_test_stop(self, caller):
 #         """

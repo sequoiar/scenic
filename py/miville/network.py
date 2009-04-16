@@ -393,7 +393,7 @@ class NetworkTester(object):
         # TODO: remove com_chan argument
         # TODO: remove address argument
         if self.state != STATE_IDLE or _is_currently_busy :
-            self.notify_api(caller, "error", "A network test is already in process.")
+            self.notify_api(caller, "network_test_error", "A network test is already in process.")
             return False
         else:
             self.current_stats_local = None # dict
@@ -469,7 +469,7 @@ class NetworkTester(object):
             commands.single_command_start(command, callback, extra_arg, self.current_caller)
         except CommandNotFoundError, e: 
             log.error("CommandNotFoundError %s" % e.message)
-            self.notify_api(self.current_caller, "error", e.message)
+            self.notify_api(self.current_caller, "network_test_error", e.message)
         else:
            self.state = self.current_kind # set the state to the current kind
 
@@ -565,7 +565,7 @@ class NetworkTester(object):
                 self.timeout_call_later_id = reactor.callLater(_TIMEOUT, self._timeout) # XXX FIXME
         
         elif key == "busy": # from B
-            self.notify_api(self.current_caller, "error", "Network test not possible. Remote peer is busy.")
+            self.notify_api(self.current_caller, "network_test_error", "Network test not possible. Remote peer is busy.")
             self._when_done()
             self._stop_iperf_server_process()
 
@@ -697,7 +697,7 @@ class NetworkTester(object):
                         iperf_stats = _parse_iperf_output(stdout.splitlines())
                         log.debug("iperf results: %s" % stdout)
                     except NetworkError, e:
-                        self.notify_api(caller, 'error', e.message)
+                        self.notify_api(caller, 'network_test_error', e.message)
                         log.error("NetworkError in on_iperf_command_results" + e.message) # XXX
                     else:    
                         kind = extra_arg['kind']
@@ -717,7 +717,7 @@ class NetworkTester(object):
                             self._send_message("stop")
                         self.state = STATE_IDLE 
                 else:
-                    self.notify_api(caller, "error", "Network performance : Unknown error.") 
+                    self.notify_api(caller, "network_test_error", "Network performance : Unknown error.") 
     
     def _send_message(self, key, args_list=[]):
         """

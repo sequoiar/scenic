@@ -1694,6 +1694,9 @@ class CliView(Observer):
                     msg.append("\t%s" % (device.name))
         self.write("\n".join(msg), True)
     
+    def _network_test_start(self, origin, data):
+        self._info(origin, data)
+
     def _network_test_done(self, origin, data):
         """
         Results of a network test. 
