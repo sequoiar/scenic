@@ -216,22 +216,37 @@ class udp_sender
     public:
         udp_sender(io_service& io_service, std::string ip, std::string port, std::string buff)
             : io_service_(io_service),buff_(buff),
-            socket_(io_service, udp::endpoint(udp::v4(), 0)),resolver(io_service),query(udp::v4(), ip.c_str(), port.c_str()),iterator(resolver.resolve(query))
+            socket_(io_service, udp::endpoint(udp::v4(), 0)),
+        sender_endpoint_(),resolver(io_service),query(udp::v4(), ip.c_str(), port.c_str()),iterator(resolver.resolve(query))
     {
         socket_.async_send_to(buffer(buff_),*iterator, boost::bind(&udp_sender::handle_send_to,this,error,bytes_transferred));
 
     }
 
-        void handle_send_to(const error_code& , size_t bytes_sent)
+        void handle_send_to(const error_code& , size_t /*bytes_sent*/)
         {
-            LOG_DEBUG("sent:" << bytes_sent);
+            socket_.async_receive_from(buffer(data_,max_length),sender_endpoint_,
+                boost::bind(&udp_sender::handle_receive_from, this, 
+                    error, bytes_transferred));
+        }
+
+        void handle_receive_from(const error_code& err,
+                size_t bytes_recvd)
+        {
+            if (!err && bytes_recvd > 0)
+            {
+                LOG_DEBUG(data_);
+            }
         }
         io_service& io_service_; 
         std::string buff_;
         udp::socket socket_;
+        udp::endpoint sender_endpoint_;
         udp::resolver resolver;
         udp::resolver::query query;
         udp::resolver::iterator iterator;
+        enum { max_length = 1024 };
+        char data_[max_length];
 };
 
 class udp_server
@@ -252,9 +267,9 @@ class udp_server
             if (!err && bytes_recvd > 0)
             {
                 buff_ = data_;
-                //socket_.async_send_to(buffer(data_, bytes_recvd), sender_endpoint_,
-                //        boost::bind(&udp_server::handle_send_to, this,
-                //            error, bytes_transferred));
+                socket_.async_send_to(buffer("ok"), sender_endpoint_,
+                        boost::bind(&udp_server::handle_send_to, this,
+                            error, bytes_transferred));
             }
             else
             {
@@ -266,9 +281,7 @@ class udp_server
 
         void handle_send_to(const error_code& , size_t )//bytes_sent)
         {
-            socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_,
-                    boost::bind(&udp_server::handle_receive_from, this,
-                        error, bytes_transferred));
+            LOG_DEBUG("DONE");
         }
 
     private:
