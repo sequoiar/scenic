@@ -67,12 +67,11 @@ class tcp_session
 
         void start()
         {
-            welcome_ = "READY:\n"; 
-            async_write(socket_, buffer(welcome_),
-                    boost::bind(&tcp_session::write_cb, this, error));
             socket_.async_read_some(buffer(data_, max_length),
                     boost::bind(&tcp_session::read_cb, this, 
                         error, bytes_transferred));
+            t_.expires_at(t_.expires_at() + boost::posix_time::millisec(10));
+            t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
         }
 
         void read_cb(const error_code& err,
