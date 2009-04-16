@@ -133,6 +133,12 @@ void VideoFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
         LOG_DEBUG("Pad is already linked.");
         return;
     }
+    else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
+    {
+        LOG_DEBUG("Pad is not a source");
+        return;
+    }
+
     GstStructure *str;
     GstPad *sinkPad;
     GstCaps *caps;

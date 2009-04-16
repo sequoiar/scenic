@@ -449,10 +449,17 @@ class MilhouseTests():
         """ Just audio """
         recv, send = self.argfactory('audio')
         self.run(recv, send)
+    
+    def test_32_raw_audiofile(self):
+        """ audiofile, uncompressed  """
+        recv, send = self.argfactory('audio')
+        send.audiosource = "filesrc"
+        send.audiodevice = "/var/tmp/things.mp3"
+        self.run(recv, send)
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_25')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_32')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

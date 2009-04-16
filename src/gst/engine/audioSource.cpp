@@ -185,7 +185,7 @@ AudioTestSource::~AudioTestSource()
 const int AudioFileSource::LOOP_INFINITE = -1;
 
 /// Constructor 
-AudioFileSource::AudioFileSource(const AudioSourceConfig &config) : AudioSource(config), decoder_(0), aconv_(0), loopCount_(0) 
+AudioFileSource::AudioFileSource(const AudioSourceConfig &config) : AudioSource(config), decoder_(0), queue_(0), aconv_(0), loopCount_(0) 
 {}
 
 void AudioFileSource::loop(int nTimes)
@@ -199,21 +199,26 @@ void AudioFileSource::loop(int nTimes)
 void AudioFileSource::sub_init()
 {
     AudioSource::sub_init();
+    decoder_ = Pipeline::Instance()->makeElement("decodebin", NULL);
 
     assert(config_.fileExists());
 
     g_object_set(G_OBJECT(source_), "location", config_.location(), NULL);
-
-    decoder_ = Pipeline::Instance()->makeElement("decodebin", NULL);
+    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
     aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
-
+    gstlinkable::link(source_, decoder_);
+    
+    // decodebin will be linked to queue in this callback 
+    // bind callback
     g_signal_connect(decoder_, "new-decoded-pad",
             G_CALLBACK(AudioFileSource::cb_new_src_pad),
-            static_cast<void *>(aconv_));
+            static_cast<void *>(this));
+
+    gstlinkable::link(queue_, aconv_);
+
+
     // register this filesrc to handle EOS msg and loop if specified
     Pipeline::Instance()->subscribe(this);
-    
-    gstlinkable::link(source_, decoder_);
 }
 
 
@@ -247,7 +252,7 @@ void AudioFileSource::restartPlayback()
 
 
 /// Handles decoders' dynamically created pad(s) by linking them to the rest of the pipeline 
-void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/,
+void AudioFileSource::cb_new_src_pad(GstElement * srcElement, GstPad * srcPad, gboolean /*last*/,
         gpointer data)
 {
     if (gst_pad_is_linked(srcPad))
@@ -260,12 +265,24 @@ void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
         LOG_DEBUG("Pad is not a source");
         return;
     }
-    GstElement *sinkElement = static_cast<GstElement*>(data);
+
     GstStructure *str;
     GstPad *sinkPad;
     GstCaps *caps;
+    AudioFileSource * context = static_cast<AudioFileSource*>(data);
+    if (context->decoder_ != srcElement)
+    {
+        LOG_DEBUG("Source Element does not match this object's decoder");
+        return;
+    }
 
+    // now we can link our queue to our new decodebin element
+    GstElement *sinkElement = context->queue_;
+    
+
+    assert(sinkElement);
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
+
     if (GST_PAD_IS_LINKED(sinkPad))
     {
         g_object_unref(sinkPad);
@@ -274,7 +291,8 @@ void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
     /* check media type */
     caps = gst_pad_get_caps(srcPad);
     str = gst_caps_get_structure(caps, 0);
-    if (!g_strrstr(gst_structure_get_name(str), "audio")) {
+    if (!g_strrstr(gst_structure_get_name(str), "audio")) 
+    {
         gst_caps_unref(caps);
         gst_object_unref(srcPad);
         return;
@@ -290,7 +308,7 @@ void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcP
 AudioFileSource::~AudioFileSource()
 {
     Pipeline::Instance()->remove(&decoder_);
-    Pipeline::Instance()->remove(&aconv_);
+    Pipeline::Instance()->remove(&queue_);
 }
 
 
