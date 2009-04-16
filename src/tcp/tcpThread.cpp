@@ -24,6 +24,8 @@
 #include <errno.h>
 #include <string.h>
 
+#ifndef HAVE_BOOST_ASIO
+
 class TcpLog
    // : public Log::Subscriber
 {
@@ -87,6 +89,7 @@ void TcpThread::main()
                         if(serv_.recv(msg))
                         {
                             std::string line = get_line(msg);
+                            LOG_DEBUG(line);
                             do
                             {
                                 MapMsg mapMsg;
@@ -248,4 +251,4 @@ bool tcpSendBuffer(const std::string ip, int port, int id, const std::string cap
     return ret;
 }
 
-
+#endif

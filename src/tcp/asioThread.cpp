@@ -211,12 +211,34 @@ class tcp_server
         boost::asio::deadline_timer t_;
 };
 
+class udp_sender
+{
+    public:
+        udp_sender(io_service& io_service, std::string ip, std::string port, std::string buff)
+            : io_service_(io_service),buff_(buff),
+            socket_(io_service, udp::endpoint(udp::v4(), 0)),resolver(io_service),query(udp::v4(), ip.c_str(), port.c_str()),iterator(resolver.resolve(query))
+    {
+        socket_.async_send_to(buffer(buff_),*iterator, boost::bind(&udp_sender::handle_send_to,this,error,bytes_transferred));
+
+    }
+
+        void handle_send_to(const error_code& , size_t bytes_sent)
+        {
+            LOG_DEBUG("sent:" << bytes_sent);
+        }
+        io_service& io_service_; 
+        std::string buff_;
+        udp::socket socket_;
+        udp::resolver resolver;
+        udp::resolver::query query;
+        udp::resolver::iterator iterator;
+};
 
 class udp_server
 {
     public:
-        udp_server(io_service& io_service, short port)
-            : io_service_(io_service),
+        udp_server(io_service& io_service, short port, std::string& buff)
+            : io_service_(io_service),port_(port),buff_(buff),
             socket_(io_service, udp::endpoint(udp::v4(), port)), sender_endpoint_()
     {
         socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_, 
@@ -229,9 +251,10 @@ class udp_server
         {
             if (!err && bytes_recvd > 0)
             {
-                socket_.async_send_to(buffer(data_, bytes_recvd), sender_endpoint_,
-                        boost::bind(&udp_server::handle_send_to, this,
-                            error, bytes_transferred));
+                buff_ = data_;
+                //socket_.async_send_to(buffer(data_, bytes_recvd), sender_endpoint_,
+                //        boost::bind(&udp_server::handle_send_to, this,
+                //            error, bytes_transferred));
             }
             else
             {
@@ -249,12 +272,56 @@ class udp_server
         }
 
     private:
-        io_service& io_service_;
+        io_service& io_service_; 
+        short port_; std::string& buff_;
         udp::socket socket_;
         udp::endpoint sender_endpoint_;
         enum { max_length = 1024 };
         char data_[max_length];
 };
+
+
+std::string tcpGetBuffer(int port, int &id)
+{
+    std::string buff;
+        io_service io_service;
+        udp_server us(io_service, port,buff);
+        io_service.run();
+
+    MapMsg msg;
+    msg.tokenize(buff);
+    if(msg.cmd() == "buffer")
+    {
+                    id = msg["id"];
+                    buff = static_cast<std::string>(msg["str"]);
+
+    }
+        return buff;
+}
+#include <sstream>
+bool tcpSendBuffer(std::string ip, int port, int id, std::string caps)
+{
+    bool ret = false;
+    LOG_INFO("got ip=" << ip << " port=" << port << " id=" << 
+            id << " caps=" << caps);
+    MapMsg msg("buffer");
+
+    msg["str"] = caps;
+    msg["id"] = id;
+    std::ostringstream str;
+    str << port;
+    std::string msg_str;
+    msg.stringify(msg_str);
+    LOG_DEBUG("!!!!!!!!"<<str);
+        io_service io_service;
+
+
+        udp_sender us(io_service,ip,str.str(),  msg_str);
+        io_service.run();
+        ret = true;
+    return ret;
+}
+
 #endif
 
 
@@ -269,7 +336,6 @@ void asio_thread::main()
         io_service io_service;
 
         tcp_server s(io_service, port_,queue_);
-        udp_server us(io_service, port_);
 
         io_service.run();
 #endif

@@ -23,7 +23,15 @@
 #ifndef _TCP_THREAD_H_
 #define _TCP_THREAD_H_
 
-#include <memory>
+#include "config.h"
+
+
+
+#ifdef HAVE_BOOST_ASIO
+
+#include "asioThread.h"
+typedef asio_thread TcpThread;
+#else
 #include "msgThread.h"
 #include "tcpServer.h"
 /// tcp server in a thread - also provides log message dispatching
@@ -48,10 +56,10 @@ class TcpThread
         ///No Assignment Operator
         TcpThread& operator=(const TcpThread&); 
 };
-
+#endif
 
 std::string tcpGetBuffer(int port, int &id);
-bool tcpSendBuffer(const std::string ip, int port, int id, const std::string caps);
+bool tcpSendBuffer(std::string ip, int port, int id, std::string caps);
 
 #endif // _TCP_THREAD_H_
 
