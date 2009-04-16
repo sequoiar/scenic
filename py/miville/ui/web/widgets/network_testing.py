@@ -29,17 +29,27 @@ from miville.errors import *
 
 log = log.start('debug', 1, 0, 'web_nettest')
 
-
-
 class NetworkTesting(Widget):
     """
+    Web widget for network performance testing with remote contacts.
     """
     def rc_start_test(self, contact):
-        self.api.start_streams_tmp(self, contact)
+        # default values 
+        caller = self
+        bandwidth = 10 # M
+        duration = 10 # s
+        kind = "dualtest"
+        try:
+            contact = self.api.get_contact(self, contact) # we need the object, not the name
+        except AddressBookError, e:
+            log.error(e.message)
+        
+        log.debug("widget is trying to start network testing with %s" % (contact))
+        self.api.network_test_start(caller, bandwidth, duration, kind, contact)
         return False
         
     def rc_stop_test(self, contact):
-        self.api.stop_streams_tmp(self, contact)
+        log.debug("network testing stop is not implemented yet")
         return False
         
     #def cb_something(self, args):

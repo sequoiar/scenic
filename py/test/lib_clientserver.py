@@ -172,7 +172,7 @@ class Process(object):
     def __init__(self, **kwargs):
         self.logfile = None
         self.verbose = False
-        self.logfile_path = "."
+        self.logfile_path = "." # overriden by the tester
         self.logfile_name = "default.log"
         self.delayafterclose = 0.2 # important to override this in child classes
         self.timeout_expect = 0.9
@@ -329,7 +329,7 @@ class ClientServerTester(object):
         :param test_case: unittest.TestCase instance. Typically self. 
         """
         if self.log_to_file:
-            self.logfile_name = "%s.%s.%s.%s.log" % (
+            self.logfile_name = "%s.%s.%s.%s" % (
                 test_case.__class__.__module__, 
                 test_case.__class__.__name__, 
                 test_case._testMethodName, 
@@ -366,7 +366,7 @@ class ClientServerTester(object):
         kwargs['test_case'] = self.test_case  #IMPORTANT
         kwargs['logfile_path'] = self.logfile_path
         kwargs['verbose'] = self.verbose
-        kwargs['logfile_name'] = self.name
+        kwargs['logfile_name'] = "%s.%s.log" % (self.logfile_name, which) # this is correct. do not change this
         self.__dict__[which] = klass(**kwargs)
         self.__dict__[which].start()
 

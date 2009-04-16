@@ -33,20 +33,20 @@ NetworkTesting.methods(
         NetworkTesting.upcall(self, "__init__", node);
 		
 		// State variables
-/*		self.contact = null;
+		self.contact = null;
 		
 		// Get elements.
 		self.start_btn = $('nettest_start');
 		
 		// Get string translations.
-		self.start_str = $('js_nettest_start').get('text');
-		self.stop_str = $('js_nettest_stop').get('text');
+		self.start_str = $('js_nettest_start').get('text'); // start string
+		self.stop_str = $('js_nettest_stop').get('text'); // stop string
 		
 		// Set translations.
 		self.start_btn.value = self.start_str;
 		
 		// Register to the widgets communicator.
-		register('nettest', self);*/
+		register('nettest', self);
 	},
 	
 	/**
@@ -99,9 +99,10 @@ NetworkTesting.methods(
 		dbug.info(caller);
 		dbug.info(key);
 		dbug.info(value);
-	/*	if (caller == 'adb') {
+		if (caller == 'adb') {
 			self.contact = value;
-			if (['selection', 'cancel_edit'].contains(key)) {
+			// cancel_edit & selection keys : 
+            if (['selection', 'cancel_edit'].contains(key)) {
 				if (value == null) {
 					self.notify_controllers('contact_unselected');
 				} else {
@@ -110,7 +111,7 @@ NetworkTesting.methods(
 			} else if (['edit', 'add'].contains(key)) {
 				self.notify_controllers('contact_unselected');
 			}
-		}*/
+		}
 	},
 
 	/**
@@ -147,12 +148,11 @@ NetworkTesting.methods(
      */
 	function upd_start_btn(self, event) {
 		dbug.info(event);
-		/*// list of events that "list" should react to
+		// list of events that "list" should react to
 		if ('contact_selected' == event) {
-			
 			// set the default state
 			var button_state = 'disabled';
-			var button_name = self.start_str;
+			var button_name = self.start_str; // "start" string that is i18nized
 			
 			// get the state of other controls necessary to find the state
 			var stream_state = self.contact.get('stream_state');
@@ -163,15 +163,16 @@ NetworkTesting.methods(
 				if (stream_state == 0) {
 					button_state = 'enabled';
 					self.start_btn.addEvent('click', function(){
-						self.start_streams();
+						self.start_test();
 					});
 				} else if (stream_state == 1) {
-					button_name = self.stop_str;
+					button_state = 'disabled';
+					button_name = self.start_str;
 				} else {
 					button_state = 'enabled';
 					button_name = self.stop_str;
 					self.start_btn.addEvent('click', function(){
-						self.stop_streams();
+						self.stop_test();
 					});
 				}
 			}
@@ -187,7 +188,7 @@ NetworkTesting.methods(
 					'add_contact'].contains(event)) {
 			self.start_btn.disabled = true;
 			self.start_btn.value = self.start_str;
-		}*/
+		}
 	}
 
 	
