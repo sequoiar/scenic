@@ -624,8 +624,9 @@ class ControllerApi(object):
                 contact.stream_state = 2 # STARTED
             elif contact.state == DISCONNECTED:
                 deferred = self.start_connection(caller, contact)
-                deferred.addCallback(self.start_streams_from_defer, caller, contact_name)
-                deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
+                if deferred:
+                    deferred.addCallback(self.start_streams_from_defer, caller, contact_name)
+                    deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
     
     def start_streams_from_defer(self, defer_result, caller, contact_name):
 #        self.start_streams_tmp(caller, contact_name)
@@ -656,8 +657,9 @@ class ControllerApi(object):
                     self.notify(caller, err)
             elif contact.state == DISCONNECTED:
                 deferred = self.start_connection(caller, contact)
-                deferred.addCallback(self.start_streams_from_defer, caller, contact_name)
-                deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
+                if deferred:
+                    deferred.addCallback(self.start_streams_from_defer, caller, contact_name)
+                    deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
                             
     def stop_streams(self, caller, contact_name):
         """
