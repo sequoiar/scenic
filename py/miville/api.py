@@ -64,6 +64,7 @@ from miville import addressbook # for network_test_*
 from miville.protocols import pinger
 from miville import settings
 from miville.utils import log
+from miville.utils.common import string_to_number 
 
 log = log.start('error', 1, 0, 'api') # added by hugo
 
@@ -424,44 +425,30 @@ class ControllerApi(object):
             result = err
         self.notify(caller, result)
         
-    def _is_int(self,s):
-        try:
-            i = int(s)
-            return i
-        except ValueError:
-            return None
 
-    def _is_float(self,s):
-        try:
-            f = float(s)
-            return f
-        except ValueError:
-            return None
             
        
     def modify_media_setting (self, caller, name, attribute, value):
+            
         try:
             result = None
             log.info("modify_media_setting")
             x = self.settings.get_media_setting(name)
             if attribute == 'settings':
-                toks = value.partition(':')
-                key = toks[0]
-                string_value = toks[2]
+                key, sep, string_value = value.partition(':')
+#                key = toks[0]
+#                string_value = toks[2]
                 # this removes the setting element because the 
                 # content is None
                 if not string_value:
                     x.settings.pop(key)
                 else:
                     # first, check for a number:
-                    typed_value = self._is_int(string_value)
-                    if typed_value == None: 
-                       typed_value = self._is_float(string_value) 
-                       if typed_value == None:
-                           # not a float, not an int ...it's a string!
-                           typed_value = string_value
-                           
-                    x.settings[key] = typed_value
+                    num = string_to_number(string_value)
+                    if num == None:
+                        x.settings[key] = string_value
+                    else:
+                        x.settings[key] = num
             else:
                 cmd = modify(x, 'x', attribute, value)
                 exec(cmd) 
