@@ -55,10 +55,10 @@ VideoSource::~VideoSource()
 std::string VideoSource::defaultSrcCaps() const
 {
     std::ostringstream capsStr;
-    capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
-        << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; 
-    //assert(capsStr.str() == "video/x-raw-yuv, width=720, height=480, pixel-aspect-ratio=10/11"); 
-    assert(capsStr.str() == "video/x-raw-yuv, format=(fourcc)I420, width=640, height=480, pixel-aspect-ratio=1/1"); 
+    /*capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
+        << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; */
+    capsStr << "video/x-raw-yuv, width=" << WIDTH << ", height=" << HEIGHT;
+    assert(capsStr.str() == "video/x-raw-yuv, width=640, height=480"); 
     return capsStr.str();
 }
 

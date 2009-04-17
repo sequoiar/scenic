@@ -51,8 +51,6 @@ class VideoSource
         */
         static const int WIDTH = 640;
         static const int HEIGHT = 480;
-        static const int PIX_ASPECT_NUM = 1;
-        static const int PIX_ASPECT_DENOM = 1;
         std::string defaultSrcCaps() const;
 
     private:
