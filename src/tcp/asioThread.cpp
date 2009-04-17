@@ -84,6 +84,7 @@ class tcp_session
                     queue_.push(mapMsg);
                 else
                     LOG_WARNING("Bad Msg Received.");
+                memset(data_, 0, max_length);
                 socket_.async_read_some(buffer(data_, max_length),
                         boost::bind(&tcp_session::read_cb, this, 
                             error, bytes_transferred));
