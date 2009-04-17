@@ -209,7 +209,8 @@ class GstServer(object):
         try:
             status = os.waitpid(self.process.pid, 0)
         except:
-            log.debug('Process %s already dead %s %s' % (str(self.process.pid) , str(pid), str(self)) )
+            pass
+            #log.debug('Process %s already dead %s %s' % (str(self.process.pid) ,  str(self)) )
         else:
             if status[1] != 0:
                 pid = self.process.pid
