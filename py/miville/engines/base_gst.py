@@ -141,18 +141,7 @@ class GstServer(object):
         self.change_state(STREAMINIT)
 
     def gst_log(self, level, msg):
-        s = msg.partition(': ')[2].strip()
-        msg = 'GstServer.gst_log: %s %s' % (s, str(self))
-        if level == 10:
-            log.debug(msg)
-        elif level == 30:
-            log.warning(msg)
-        elif level == 40:
-            log.error(msg)
-        elif level == 50:
-            log.critical(msg)
-        else:
-            log.info(msg)
+        log.info('GST success log  [%s] %s' %  (str(args), str(self)) )
 
 
     def connection_failed(self, conn):
