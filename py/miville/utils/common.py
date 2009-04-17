@@ -41,6 +41,20 @@ log = log.start('debug', 1, 0, 'common')
 # this path is overriden by the core at startup !
 MIVILLE_HOME = os.path.expanduser('~/.miville')
 
+def string_to_number(value):
+    """
+    Returns a number or None if the string
+    is not a integer or a float 
+    """
+    if value.isdigit():
+        new_value = int(value)
+        return new_value
+    try:
+        new_value = float(value)
+    except:
+        return None
+    return None    
+
 def get_def_name(level=2):
     """
     Finds who called the caller of this function
