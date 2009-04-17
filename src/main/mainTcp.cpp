@@ -42,7 +42,7 @@ void Logger::operator()(LogLevel& level, std::string& msg)
     m["level"] = level;
     m["msg"] = msg;
     queue_.push(m);
-    //std::cout << level << " "<< msg;
+    std::cout << level << " "<< msg;
 }
 
 /** Main command line entry point
@@ -94,29 +94,34 @@ bool MainModule::run()
 
         while(!signalFlag())
         {
-            MapMsg tmsg = tcp_queue.timed_pop(1);
-            MapMsg gmsg = gst_queue.timed_pop(1000);
-
-            if (!gmsg.cmd().empty())
+            MapMsg gmsg = gst_queue.timed_pop(1);
+            while(!gmsg.cmd().empty()){
                 tcp_queue.push(gmsg);
-            if (tmsg.cmd().empty())
-                continue;
-
-            if (tmsg.cmd() == "quit")
+                gmsg = gst_queue.timed_pop(1);
+            }
+            MapMsg tmsg = tcp_queue.timed_pop(1);
+            while(!tmsg.cmd().empty())
             {
-                MsgThread::broadcastQuit();
+                if (tmsg.cmd() == "quit")
+                {
+                    MsgThread::broadcastQuit();
+                    break;
+                }
+                if (tmsg.cmd() == "exception")
+                    throw tmsg["exception"].except();
+                else
+                {
+                    MapMsg ret(tmsg.cmd());
+                    tmsg["id"] = ret["id"] = ++msg_count;
+                    gst_queue.push(tmsg);
+                    ret["ack"] = "ok";
+                    tcp_queue.push(ret);
+                }
+                tmsg = tcp_queue.timed_pop(1);
+            }
+            if(tmsg.cmd() == "quit")
                 break;
-            }
-            if (tmsg.cmd() == "exception")
-                throw tmsg["exception"].except();
-            else
-            {
-                MapMsg ret(tmsg.cmd());
-                tmsg["id"] = ret["id"] = ++msg_count;
-                gst_queue.push(tmsg);
-                ret["ack"] = "ok";
-                tcp_queue.push(ret);
-            }
+            usleep(100);
         }
     }
     catch(ErrorExcept e)

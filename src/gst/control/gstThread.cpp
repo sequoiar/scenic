@@ -58,8 +58,10 @@ void GstThread::main()
         //std::cout << (flipflop ? "-\r" : " \r");
         flipflop = !flipflop;
         //std::cout.flush();
-        MapMsg f = queue_.timed_pop(1000);
-            
+        MapMsg f = queue_.timed_pop(1);
+        
+        do
+        {
         if(play_id && playback::isPlaying())
         {
             MapMsg r("success");
@@ -142,6 +144,9 @@ void GstThread::main()
             else
                 LOG_WARNING("Unknown Command.");
         }
+    f = queue_.timed_pop(1);
+    }while(f.cmd());
+        usleep(200);
     }
 
 }

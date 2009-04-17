@@ -70,7 +70,7 @@ class tcp_session
             socket_.async_read_some(buffer(data_, max_length),
                     boost::bind(&tcp_session::read_cb, this, 
                         error, bytes_transferred));
-            t_.expires_at(t_.expires_at() + boost::posix_time::millisec(10));
+            t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1));
             t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
         }
 
@@ -120,7 +120,7 @@ class tcp_session
                 {
                     if(msg.cmd() == "quit")
                     {
-                        socket_.close();
+                        LOG_DEBUG("quit goes here");
                     }
                     else
                     {
@@ -133,7 +133,7 @@ class tcp_session
                 }
                 else
                 {
-                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(10));
+                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1000));
                     t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
                 }
             }
@@ -196,6 +196,7 @@ class tcp_server
                 t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
                 if(MsgThread::isQuitted())
                     io_service_.stop();
+
             }
             else
             {
