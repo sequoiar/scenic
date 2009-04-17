@@ -479,19 +479,22 @@ class GlobalSetting(object):
                     procs = sender_procs
                     
                 for stream in group.media_streams:
-                    if stream.enabled:
-                        proc_params = None
-                        if not sender_procs.has_key(stream.sync_group):
-                            procs[stream.sync_group]  = {}
-                            proc_params = procs[stream.sync_group]
-                        else:
-                            if not receiver_procs.has_key(stream.sync_group):
-                               procs[stream.sync_group]  = {}
-                               proc_params = procs[stream.sync_group]
-                        # proc_params now points to a valid dict.
-                        params = stream.get_init_params()
-                        params['address'] = address
-                        proc_params[stream.name]= params
+                    if not isinstance(stream, VideoStream):
+                        log.info("GlobalSetting._split_gst_parameters: stream " + stream.name + " is not a GST stream..." )
+                    else:
+                        if stream.enabled:
+                            proc_params = None
+                            if not sender_procs.has_key(stream.sync_group):
+                                procs[stream.sync_group]  = {}
+                                proc_params = procs[stream.sync_group]
+                            else:
+                                if not receiver_procs.has_key(stream.sync_group):
+                                   procs[stream.sync_group]  = {}
+                                   proc_params = procs[stream.sync_group]
+                            # proc_params now points to a valid dict.
+                            params = stream.get_init_params()
+                            params['address'] = address
+                            proc_params[stream.name]= params
         return receiver_procs, sender_procs           
     
     def start_streaming(self, listener, address, settings_channel):
@@ -688,11 +691,21 @@ class MediaStream(object):
     # make create a class  (aka static)method     
     create = staticmethod(_create)
 
+class MidiStream(MediaStream):
+    """
+    Contains data settings informations.
+    """    
+    MediaStream.media_stream_kinds['midi'] = 'MidiStream'
+    
+    
 class DataStream(MediaStream):
     """
     Contains data settings informations.
     """    
     MediaStream.media_stream_kinds['data'] = 'DataStream'
+    
+    def get_init_params(self):
+        return {}
 
 class VideoStream(MediaStream):
     """
