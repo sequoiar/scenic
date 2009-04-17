@@ -140,7 +140,7 @@ class GstServer(object):
         log.debug('GST failure :-(  args %s %s' %  (str(args), str(self)) )
         self.change_state(STREAMINIT)
 
-    def gst_log(self, level, msg):
+    def gst_log(self, **args):
         log.info('GST success log  [%s] %s' %  (str(args), str(self)) )
 
 
