@@ -47,20 +47,18 @@ class QueuePair_
         void push(MapMsg pt);
         void flip(QueuePair_& in);
         void init();
+        bool ready();
 
     private:
         std::queue<MapMsg*> *first_, *second_;
-        MapMsg* pop_() { return queue_pop(); }
-        void push_(MapMsg* t) { queue_push(t); }
 
-        void queue_push(MapMsg *t);//{ second_->push(t);}
+        void queue_push(MapMsg *t);
         MapMsg* queue_pop(int ms);
-        MapMsg* queue_pop() { return queue_pop(0); }
 
         bool destroyQueues_;
         boost::condition_variable cond;
         boost::mutex mut;
-        bool data_ready;
+        volatile bool data_ready;
 
 
         /** No Copy Constructor */

@@ -129,14 +129,20 @@ void TcpThread::main()
 
 bool TcpThread::gotQuit()
 {
-    MapMsg f = queue_.timed_pop(2000);
-    std::string command;
-    if(f.cmd().empty())
-        return false;
-    if(f.cmd() == "quit")
-        return true;
-    else
-        send(f);
+    if(queue_.ready())
+    {
+        MapMsg f = queue_.timed_pop(1);
+        std::string command;
+        if(!f.cmd().empty())
+        {
+            if(f.cmd() == "quit")
+                return true;
+            
+            send(f);
+            return false;
+        }
+    }
+    usleep(25000);
     return false;
 }
 

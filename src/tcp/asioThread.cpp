@@ -113,21 +113,25 @@ class tcp_session
         {
             if (!err)
             {
-                MapMsg msg;
-                msg = queue_.timed_pop(1);
-                if(!msg.cmd().empty())
+                if(queue_.ready())
                 {
-                    if(msg.cmd() == "quit")
+                    MapMsg msg = queue_.timed_pop(1);
+                    if(!msg.cmd().empty())
                     {
-                        LOG_DEBUG("quit goes here");
+                        if(msg.cmd() == "quit")
+                        {
+                            LOG_DEBUG("quit goes here");
+                        }
+                        else
+                        {
+                            std::string msg_str;
+                            msg.stringify(msg_str);
+                            msg_str+='\n';
+                            async_write(socket_, buffer(msg_str), boost::bind(&tcp_session::write_cb, this, error));
+                        }
                     }
                     else
-                    {
-                        std::string msg_str;
-                        msg.stringify(msg_str);
-                        msg_str+='\n';
-                        async_write(socket_, buffer(msg_str), boost::bind(&tcp_session::write_cb, this, error));
-                    }
+                        THROW_ERROR("queue.ready() but msg empty!");
                 }
                 else
                 {

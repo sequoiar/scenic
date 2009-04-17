@@ -22,6 +22,12 @@
 #include "queuePair.h"
 
 #ifdef HAVE_BOOST_THREAD
+bool QueuePair_::ready()
+{
+    boost::lock_guard<boost::mutex> lock(mut);
+    return !first_->empty();
+}
+
 void QueuePair_::queue_push(MapMsg *t)
 { 
     {
@@ -85,7 +91,7 @@ void QueuePair_::push(MapMsg pt)
 {
     MapMsg *t = new MapMsg(pt);
 
-    push_(t);
+    queue_push(t);
 }
 
 

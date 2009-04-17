@@ -43,6 +43,7 @@ class gQueuePair_
         void push(MapMsg pt);
         void flip(gQueuePair_& in);
         void init();
+        bool ready(){ return true;}
 
     private:
         GAsyncQueue *first_, *second_;

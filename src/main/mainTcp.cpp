@@ -94,34 +94,39 @@ bool MainModule::run()
 
         while(!signalFlag())
         {
-            MapMsg gmsg = gst_queue.timed_pop(1);
-            while(!gmsg.cmd().empty()){
-                tcp_queue.push(gmsg);
-                gmsg = gst_queue.timed_pop(1);
-            }
-            MapMsg tmsg = tcp_queue.timed_pop(1);
-            while(!tmsg.cmd().empty())
+            if(gst_queue.ready())
             {
-                if (tmsg.cmd() == "quit")
-                {
-                    MsgThread::broadcastQuit();
-                    break;
+                MapMsg gmsg = gst_queue.timed_pop(1);
+                while(!gmsg.cmd().empty()){
+                    tcp_queue.push(gmsg);
+                    gmsg = gst_queue.timed_pop(1);
                 }
-                if (tmsg.cmd() == "exception")
-                    throw tmsg["exception"].except();
-                else
-                {
-                    MapMsg ret(tmsg.cmd());
-                    tmsg["id"] = ret["id"] = ++msg_count;
-                    gst_queue.push(tmsg);
-                    ret["ack"] = "ok";
-                    tcp_queue.push(ret);
-                }
-                tmsg = tcp_queue.timed_pop(1);
             }
-            if(tmsg.cmd() == "quit")
-                break;
-            usleep(100);
+            if(tcp_queue.ready())
+            {
+                MapMsg tmsg = tcp_queue.timed_pop(1);
+                while(!tmsg.cmd().empty())
+                {
+                    if (tmsg.cmd() == "quit")
+                    {
+                        MsgThread::broadcastQuit();
+                        LOG_INFO("Normal Program Termination in Progress");
+                        return 0;
+                    }
+                    if (tmsg.cmd() == "exception")
+                        throw tmsg["exception"].except();
+                    else
+                    {
+                        MapMsg ret(tmsg.cmd());
+                        tmsg["id"] = ret["id"] = ++msg_count;
+                        gst_queue.push(tmsg);
+                        ret["ack"] = "ok";
+                        tcp_queue.push(ret);
+                    }
+                    tmsg = tcp_queue.timed_pop(1);
+                }
+            }
+            usleep(10000);
         }
     }
     catch(ErrorExcept e)
@@ -132,7 +137,6 @@ bool MainModule::run()
             throw Except(e);
         return -1;
     }
-    LOG_INFO("Normal Program Termination in Progress");
     return 0;
 }
 

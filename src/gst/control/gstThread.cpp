@@ -58,6 +58,9 @@ void GstThread::main()
         //std::cout << (flipflop ? "-\r" : " \r");
         flipflop = !flipflop;
         //std::cout.flush();
+    
+        if(queue_.ready())
+        {
         MapMsg f = queue_.timed_pop(1);
         
         do
@@ -146,7 +149,8 @@ void GstThread::main()
         }
     f = queue_.timed_pop(1);
     }while(f.cmd());
-        usleep(200);
+    }
+    usleep(25000);
     }
 
 }
