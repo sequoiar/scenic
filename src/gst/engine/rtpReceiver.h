@@ -53,9 +53,9 @@ class RtpReceiver
         static std::string getMediaType(_GstPad *pad);
         static void cb_new_src_pad(_GstElement * element, _GstPad * srcPad, void *data);
         static void createLatencyControl();
-        static const int MIN_LATENCY = 1;
-        static const int INIT_LATENCY = 3;
-        static const int MAX_LATENCY = 400;
+        static const int MIN_LATENCY = 1; // ms
+        static const int INIT_LATENCY = 3;   // ms
+        static const int MAX_LATENCY = 400; // ms
 
         _GstElement *rtp_receiver_;
         _GstElement *depayloader_;

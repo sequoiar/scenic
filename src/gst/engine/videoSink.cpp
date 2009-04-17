@@ -36,8 +36,8 @@
 #include <gdk/gdkx.h>
 #include <X11/extensions/Xinerama.h>
 
-const unsigned int GtkVideoSink::WIDTH = 720;
-const unsigned int GtkVideoSink::HEIGHT = 528;
+//const unsigned int GtkVideoSink::WIDTH = 640;
+//const unsigned int GtkVideoSink::HEIGHT = 480;
 
 void VideoSink::destroySink()
 {

@@ -23,25 +23,113 @@
 #include "util.h"
 
 #include <gst/gst.h>
+#include <gtk/gtk.h>
 #include "rtpPay.h"
 #include "pipeline.h"
 
-
-const long long Payloader::MAX_PTIME = 2000000LL;
 
 RtpPay::~RtpPay()
 {
     Pipeline::Instance()->remove(&rtpPay_);
 }
 
+const long long Payloader::MAX_PTIME = 2000000LL;
+bool Payloader::controlEnabled_ = false;
+GtkWidget *Payloader::control_ = 0;
+
+
+Payloader::~Payloader()
+{
+    if (control_)
+    {
+        gtk_widget_destroy(control_);
+        LOG_DEBUG("RTP jitterbuffer control window destroyed");
+        control_ = 0;
+    }
+}
+
+void Payloader::enableControl() 
+{ 
+    controlEnabled_ = true; 
+}
+
+
+
 void Payloader::init()
 {
-    g_object_set(G_OBJECT(rtpPay_), "max-ptime", Payloader::MAX_PTIME, NULL);
+    if (controlEnabled_)
+        createMTUControl();
 }
+
+void Payloader::setMTU(unsigned long long mtu)
+{
+    if (mtu < MIN_MTU or mtu > MAX_MTU)
+        THROW_ERROR("Invalid MTU " << mtu << ", must be in range [" 
+                << MIN_MTU << "-" << MAX_MTU << "]");
+
+    assert(rtpPay_);
+    g_object_set(G_OBJECT(rtpPay_), "mtu", mtu, NULL);
+}
+
+
+void Payloader::createMTUControl()
+{
+    static bool gtk_initialized = false;
+    if (!gtk_initialized)
+    {
+        gtk_init(0, NULL);
+        gtk_initialized = true;
+    }
+
+    GtkWidget *box1;
+    GtkWidget *hscale;
+    GtkObject *adj;
+    const int WIDTH = 400;
+    const int HEIGHT = 70;
+
+    /* Standard window-creating stuff */
+    control_ = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_default_size(GTK_WINDOW(control_), WIDTH, HEIGHT);
+    gtk_window_set_title (GTK_WINDOW (control_), "MTU Size");
+
+    box1 = gtk_vbox_new (FALSE, 0);
+    gtk_container_add (GTK_CONTAINER (control_), box1);
+
+    /* value, lower, upper, step_increment, page_increment, page_size */
+    /* Note that the page_size value only makes a difference for
+     * scrollbar widgets, and the highest value you'll get is actually
+     * (upper - page_size). */
+
+    adj = gtk_adjustment_new (INIT_MTU, MIN_MTU, MAX_MTU + 1, 1.0, 1.0, 1.0);
+
+    gtk_signal_connect (GTK_OBJECT (adj), "value_changed",
+            GTK_SIGNAL_FUNC(updateMTUCb), static_cast<void*>(this));
+
+
+    hscale = gtk_hscale_new (GTK_ADJUSTMENT (adj));
+    // Signal emitted only when value is done changing
+    gtk_range_set_update_policy (GTK_RANGE (hscale), 
+            GTK_UPDATE_DISCONTINUOUS);
+    gtk_box_pack_start (GTK_BOX (box1), hscale, TRUE, TRUE, 0);
+    gtk_widget_show (hscale);
+    gtk_widget_show (box1);
+    gtk_widget_show (control_);
+}
+
+
+void Payloader::updateMTUCb(GtkAdjustment *adj, gpointer data)
+{
+    Payloader *context = static_cast<Payloader*>(data);
+    unsigned val = static_cast<unsigned>(adj->value);
+    g_print("Setting mtu to %u\n", val);
+    context->setMTU(val);
+}
+
 
 void H264Payloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtph264pay", NULL);
+    Payloader::init();
 }
 
 
@@ -55,6 +143,7 @@ void H264Depayloader::init()
 void H263Payloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtph263pay", NULL);
+    Payloader::init();
 }
 
 
@@ -67,6 +156,7 @@ void H263Depayloader::init()
 void Mpeg4Payloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpmp4vpay", NULL);
+    Payloader::init();
 }
 
 
@@ -79,6 +169,7 @@ void Mpeg4Depayloader::init()
 void VorbisPayloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpvorbispay", NULL);
+    g_object_set(G_OBJECT(rtpPay_), "max-ptime", Payloader::MAX_PTIME, NULL);
     Payloader::init();
 }
 
@@ -92,6 +183,7 @@ void VorbisDepayloader::init()
 void L16Payloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpL16pay", NULL);
+    g_object_set(G_OBJECT(rtpPay_), "max-ptime", Payloader::MAX_PTIME, NULL);
     Payloader::init();
 }
 
@@ -105,6 +197,7 @@ void L16Depayloader::init()
 void MpaPayloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpmpapay", NULL);
+    Payloader::init();
 }
 
 

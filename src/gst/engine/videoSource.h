@@ -43,10 +43,16 @@ class VideoSource
         const VideoSourceConfig &config_;
         _GstElement *source_;
         _GstElement *capsFilter_;
+        /*
         static const int WIDTH = 720;
         static const int HEIGHT = 480;
         static const int PIX_ASPECT_NUM = 10;
         static const int PIX_ASPECT_DENOM = 11;
+        */
+        static const int WIDTH = 640;
+        static const int HEIGHT = 480;
+        static const int PIX_ASPECT_NUM = 1;
+        static const int PIX_ASPECT_DENOM = 1;
         std::string defaultSrcCaps() const;
 
     private:

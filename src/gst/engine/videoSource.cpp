@@ -55,9 +55,10 @@ VideoSource::~VideoSource()
 std::string VideoSource::defaultSrcCaps() const
 {
     std::ostringstream capsStr;
-    capsStr << "video/x-raw-yuv, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
+    capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
         << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; 
-    assert(capsStr.str() == "video/x-raw-yuv, width=720, height=480, pixel-aspect-ratio=10/11"); 
+    //assert(capsStr.str() == "video/x-raw-yuv, width=720, height=480, pixel-aspect-ratio=10/11"); 
+    assert(capsStr.str() == "video/x-raw-yuv, format=(fourcc)I420, width=640, height=480, pixel-aspect-ratio=1/1"); 
     return capsStr.str();
 }
 
@@ -73,11 +74,12 @@ void VideoSource::setCapsFilter(const std::string &capsStr)
     assert(capsFilter_ != 0);
     if (capsStr.empty())
         THROW_ERROR("Can't set capsfilter to empty string");
-    
+
     if (capsStr == "ANY")   // don't bother setting caps
         THROW_ERROR("Trying to set caps to dummy value");
 
     GstCaps *videoCaps = gst_caps_from_string(capsStr.c_str());
+    LOG_DEBUG("Seting caps to " << gst_caps_to_string(videoCaps));
     g_object_set(G_OBJECT(capsFilter_), "caps", videoCaps, NULL);
 
     gst_caps_unref(videoCaps);
@@ -93,7 +95,7 @@ void VideoTestSource::init()
 {
     VideoSource::init();
     g_object_set(G_OBJECT(source_), "is-live", FALSE, NULL); // necessary for clocked callback to work
-    
+
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
     setCapsFilter(srcCaps());
@@ -115,7 +117,7 @@ void VideoFileSource::init()
     assert(config_.fileExists());
     identity_ = Pipeline::Instance()->makeElement("identity", NULL);
     g_object_set(identity_, "silent", TRUE, NULL);
-    
+
     GstElement * queue = FileSource::acquire(config_.location(), FileSource::VIDEO);
     gstlinkable::link(queue, identity_);
 }
@@ -159,7 +161,7 @@ void VideoV4lSource::init()
     // set a v4l2src if given to config as an arg, otherwise use default
     if (config_.hasLocation() and config_.fileExists())
         g_object_set(G_OBJECT(source_), "device", config_.location(), NULL);
-    
+
     gchar *deviceStr;
     g_object_get(G_OBJECT(source_), "device", &deviceStr, NULL);
 

@@ -106,8 +106,13 @@ short pof::run(int argc, char **argv)
 
     if (options["enable_controls"])
     {
-        RtpReceiver::enableControl();
-        //playback::enableControl();  
+        if (options["receiver"] )
+        {
+            RtpReceiver::enableControl();
+        }
+        else    // sender
+            RtpSender::enableControl();
+        //playback::enableControl();  // still doesn't work properly
     }
 
     int disableVideo = !options["videocodec"] and !options["videoport"];
@@ -188,7 +193,7 @@ short pof::run(int argc, char **argv)
         int timeout = 0;    // default: run indefinitely
         if (options["timeout"]) // run for finite amount of time
             timeout = options["timeout"];
-        
+
         gutil::runMainLoop(timeout);
 
         assert(playback::isPlaying() or playback::quitted());
@@ -256,9 +261,9 @@ short pof::run(int argc, char **argv)
         int timeout = 0;
         if (options["timeout"]) // run for finite amount of time
             timeout = options["timeout"];
-        
+
         gutil::runMainLoop(timeout);
-        
+
         assert(playback::isPlaying() or playback::quitted());
 
         playback::stop();

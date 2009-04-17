@@ -32,6 +32,11 @@
 #include "remoteConfig.h"
 
 
+void RtpSender::enableControl()
+{
+    Payloader::enableControl();
+}
+
 RtpSender::~RtpSender()
 {
     Pipeline::Instance()->remove(&rtp_sender_);

@@ -38,6 +38,7 @@ class RtpSender
         void checkSampleRate();
 
         std::string getCaps() const;
+        static void enableControl();
 
         ~RtpSender();
 
