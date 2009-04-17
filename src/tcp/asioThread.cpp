@@ -86,8 +86,7 @@ class tcp_session
                     LOG_WARNING("Bad Msg Received.");
                 memset(data_, 0, max_length);
                 socket_.async_read_some(buffer(data_, max_length),
-                        boost::bind(&tcp_session::read_cb, this, 
-                            error, bytes_transferred));
+                        boost::bind(&tcp_session::read_cb, this, error, bytes_transferred));
             }
             else
             {
@@ -127,13 +126,12 @@ class tcp_session
                         std::string msg_str;
                         msg.stringify(msg_str);
                         msg_str+='\n';
-                        async_write(socket_, buffer(msg_str),
-                                boost::bind(&tcp_session::write_cb, this, error));
+                        async_write(socket_, buffer(msg_str), boost::bind(&tcp_session::write_cb, this, error));
                     }
                 }
                 else
                 {
-                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(1000));
+                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(25));
                     t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
                 }
             }
