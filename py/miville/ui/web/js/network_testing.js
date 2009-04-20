@@ -75,9 +75,7 @@ NetworkTesting.methods(
 	function notify_controllers(self, event){
 		self.upd_start_btn(event);
 	},
-
-
-
+    
 	/**
 	 * ------------------
 	 * Called from Client
@@ -124,6 +122,10 @@ NetworkTesting.methods(
 	function start_test(self) {
 		self.callRemote('rc_start_test', self.contact.get('name'));
         self.start_btn.disabled = true;
+        self.message_div.innerHTML = "";
+        var img = new Element('img').setProperty('src', 'img/macthrob-small.png').injectInside(self.message_div);
+        img.setProperty("style", "position:relative;top:4px;");
+        var span = new Element('span').appendText(" Test in progress...").injectInside(self.message_div);
 	},
 
 	/**
@@ -175,6 +177,7 @@ NetworkTesting.methods(
 					button_state = 'disabled';
 					button_name = self.start_str;
 				} else {
+                    dbug.info("Enabling the nettest button.");
 					button_state = 'enabled';
 					button_name = self.stop_str;
 					self.start_btn.addEvent('click', function(){
@@ -199,19 +202,50 @@ NetworkTesting.methods(
      * Called when a network test is done.
 	 * (called from server)
 	 * 
+     * See miville/network.py for the list of fields received from Python.
+     *
 	 * @member NetworkTesting
      * @param {string} contact The name of the contact . 
      * @param {string} msg Some string to display to the user... 
      * @param {string} details A big dict with results. 
 	 */
-	function test_results(self, contact, data) {
+	function test_results(self, contact, data, local_data, remote_data) {
+        dbug.info("NETTEST: test_results called");
 		// check if contact exist in the list and get it
         //var owner = self.list.getElement('li[name=' + contact + ']')
-        //self.results_field; 
-        field = self.message_div;
-        //self.message_div.innerHTML = msg;
-        var h1 = new Element('strong').appendText('Performance Test results with ' + contact).injectInside(self.message_div);
-        var pre = new Element('pre').appendText(data).injectInside(self.message_div);
+        self.message_div.innerHTML = "";
+        var h1 = new Element('strong').appendText('Performance Test Results with ' + contact).injectInside(self.message_div);
+        
+        var txt = "";
+        
+        if (local_data != null) {
+            if (local_data.test_kind == 1) {
+                txt += "Unidirectional from local to remote \n\n";
+            } else if (local_data.test_kind == 2) {
+                txt += "Bidirectional Sequential \n\n";
+            } else if (local_data.test_kind == 3) {
+                txt += "Bidirectional Simultaneous \n\n";
+            }
+            txt += "From local to remote \n";
+            txt += "  Bandwidth : " + (local_data.speed / 1000000.0) + " Mbps\n";
+            txt += "  Jitter : " + local_data.jitter + " ms\n";
+            txt += "  Packet loss : " + local_data.percent_errors + " %\n";
+            // TODO : latency
+            txt += "\n";
+        }
+        if (remote_data != null) {
+            txt += "From remote to local \n";
+            txt += "  Bandwidth : " + (remote_data.speed / 1000000.0) + " Mbps\n";
+            txt += "  Jitter : " + remote_data.jitter + " ms\n";
+            txt += "  Packet loss : " + remote_data.percent_errors + " %\n";
+            // TODO : latency
+            txt += "\n";
+        }
+        // txt += data;
+        var pre = new Element('pre').appendText(txt).injectInside(self.message_div);
+        // TODO: check if a contact to which we are connected is selected.
+        self.start_btn.disabled = false;
+        // two keys to data: 'local' and 'remote'. each is a dict with keys:
         /*
         if (data.local) {
             txt = "From local to remote"

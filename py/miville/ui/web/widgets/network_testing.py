@@ -20,6 +20,7 @@
 
 # System import
 import time
+import pprint
 
 #App imports
 from miville.ui.web.web import Widget, expose
@@ -68,17 +69,28 @@ class NetworkTesting(Widget):
         :param data: a dict with iperf statistics
         """
         contact_name = data['contact'].name
+        local_data = None
+        remote_data = None
+        txt = ""
         for host_name in ['local', 'remote']:
             if data.has_key(host_name):
                 if host_name == "local":
                     txt += "From local to remote" + "\n"
+                    local_data = data[host_name]
                 else:
                     txt += "From remote to local" + "\n"
+                    remote_data = data[host_name]
                 host_data = data[host_name]
                 for k in host_data:
                     txt += "\t%s: %s\n" % (k, str(host_data[k]))
-        log.debug(txt)
-        self.callRemote('test_results', contact_name, txt) # data)
+        #log.debug(txt)
+        #pprint.pprint(data)
+        #raw_data = {} 
+        if data.has_key('local'):
+            local_data = data['local']
+        if data.has_key('remote'):
+            remote_data = data['remote']
+        self.callRemote('test_results', contact_name, txt, local_data, remote_data) # data)
     
     def cb_network_test_error(self, origin, data):
         """
