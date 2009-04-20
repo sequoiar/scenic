@@ -1,4 +1,5 @@
--test and write about latency rtp issues/testing with netem scripts and so on
+-fix device/location nonesense in milhouse
+-write about latency rtp issues/testing with netem scripts and so on
 -use mapmsg to get stats to hugo
 -fix glvideosink's black at startup/until fullscreen bug
 -teeing video and audio, start with tests

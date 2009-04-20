@@ -74,7 +74,9 @@ short pof::run(int argc, char **argv)
     options.addBool("fullscreen", 'f', "default to fullscreen");
     options.addBool("deinterlace", 'o', "deinterlace video");
     options.addString("videodevice", 'd', "device", "/dev/video0 /dev/video1");
-    options.addString("audiodevice", 'q', "audio device", "hw:0 hw:2 plughw:0 plughw:2 filename");
+    options.addString("audiodevice", 'q', "audio device", "hw:0 hw:2 plughw:0 plughw:2");
+    options.addString("videofile", 0, "video file", "filename");
+    options.addString("audiofile", 0, "audio file", "filename");
     options.addInt("screen", 'n', "screen", "xinerama screen num");
     options.addBool("version", 'w', "version number");
     options.addInt("numchannels", 'c', "numchannels", "2");
@@ -107,10 +109,8 @@ short pof::run(int argc, char **argv)
     if (options["enable_controls"])
     {
         if (options["receiver"] )
-        {
             RtpReceiver::enableControl();
-        }
-        else    // sender
+        else if (options["sender"])   // sender
             RtpSender::enableControl();
         //playback::enableControl();  // still doesn't work properly
     }

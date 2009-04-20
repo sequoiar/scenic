@@ -29,6 +29,10 @@
 #include "remoteConfig.h"
 #include "pipeline.h"
 
+// for posting 
+#include "mapMsg.h"
+#include <sstream>
+
 #ifdef CONFIG_DEBUG_LOCAL
 #define RTP_REPORTING 1
 #endif
@@ -61,6 +65,9 @@ void RtpBin::init()
 void RtpBin::parseSourceStats(GObject * source, int sessionId)
 {
     GstStructure *stats;
+    std::stringstream idStr, paramStr;
+    MapMsg mapMsg("rtp");
+    idStr << sessionNames_[sessionId] << "_" << sessionId;
 
     // get the source stats
     g_object_get(source, "stats", &stats, NULL);
@@ -76,7 +83,10 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
         if (g_value_get_boolean(val))    // is-sender
         {
             guint64 bitrate = g_value_get_uint64(gst_structure_get_value(stats, "bitrate"));
-            LOG_DEBUG(sessionNames_[sessionId] << "_" << sessionId << ":BITRATE: " << bitrate);
+            paramStr << ":BITRATE: " << bitrate;
+
+            mapMsg["stats"] = idStr.str() + paramStr.str();
+            mapMsg.post();
         }
 
         gst_structure_free (stats);
@@ -84,9 +94,18 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
     }
 
     guint32 jitter = g_value_get_uint(gst_structure_get_value(stats, "rb-jitter"));
-    LOG_DEBUG(sessionNames_[sessionId] << "_" << sessionId << ":JITTER: " << jitter);
+    paramStr << ":JITTER: " << jitter;
+    mapMsg["stats"] = idStr.str() + paramStr.str();
+    LOG_DEBUG(mapMsg["stats"]);
+    mapMsg.post();
+
+    paramStr.str(""); // reset
+
     gint32 packetsLost = g_value_get_int(gst_structure_get_value(stats, "rb-packetslost"));
-    LOG_DEBUG(sessionNames_[sessionId] << "_" << sessionId << ":PACKETS LOST: " << packetsLost);
+    idStr << ":PACKETS LOST: " << packetsLost;
+    mapMsg["stats"] = idStr.str() + paramStr.str();
+    LOG_DEBUG(mapMsg["stats"]);
+    mapMsg.post();
 
     // free structures
     gst_structure_free (stats);

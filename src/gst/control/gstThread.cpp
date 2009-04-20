@@ -139,7 +139,7 @@ void GstThread::main()
                 queue_.push(f);
             }
 #endif
-            else if (s == "rtpstats")
+            else if (s == "rtp")
             {
                 // FIXME: MAKE SURE THIS WORKS
                 queue_.push(f);
