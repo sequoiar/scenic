@@ -65,7 +65,7 @@ from miville.engines import create_channel
 from twisted.spread.jelly import jelly, unjelly
 from twisted.internet import reactor
 
-log = log.start('debug', 1, 0, 'settings')
+log = log.start('info', 1, 0, 'settings')
 
 # These file names are overriden by Miville's Core !
 PRESETS_FILENAME = "presets.txt"
@@ -173,7 +173,7 @@ class Settings(object):
     def get_media_setting_from_id(id):
         if media_settings.keys().__contains__(id):
             return media_settings[id]
-        raise SettingsError, ""
+        raise SettingsError, 'The media setting id "' + str(id) + '" does not exist' 
 
     @staticmethod
     def _load_nice_object_from_file(filename, major_version):

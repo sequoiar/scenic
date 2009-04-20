@@ -66,7 +66,7 @@ from miville import settings
 from miville.utils import log
 from miville.utils.common import string_to_number 
 
-log = log.start('error', 1, 0, 'api') # added by hugo
+log = log.start('info', 1, 0, 'api') # added by hugo
 
 
 def modify(who, name_of_who, what, new_value):
@@ -628,6 +628,7 @@ class ControllerApi(object):
         contact.stream_state = 0        
         
     def start_streams(self, caller, contact_name):
+        log.info('ControllerApi.start_streams, contact= ' + str(contact_name))
         contact = self.get_contact(contact_name)
         if contact:
             if contact.state == CONNECTED:
@@ -652,6 +653,7 @@ class ControllerApi(object):
         """
         Stop all the sub-streams. (audio, video and data)
         """
+        log.info('ControllerApi.start_streams, contact= ' + str(contact_name))
         try:
             contact, global_setting, settings_com_channel  = self._get__settings_com_chan_from_contact_name(contact_name)
             global_setting.stop_streaming(contact.address, settings_com_channel)

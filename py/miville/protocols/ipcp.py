@@ -60,7 +60,7 @@ class IPCP(LineReceiver):
         log.info('Connection made to the server.')
     
     def lineReceived(self, line):
-        log.debug("Line received: %s" % line)
+        log.info("IPCP.lineReceived: %s" % line)
         cmd, sep, args = line.partition(':')
         if cmd not in self.callbacks:
             log.info('Command %s not in callback list.' % cmd)

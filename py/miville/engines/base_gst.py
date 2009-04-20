@@ -31,8 +31,7 @@ from miville.protocols import ipcp
 from miville.utils import log
 from miville.utils.common import get_def_name
 
-log = log.start('debug', 1, 0, 'base_gst')
-
+log = log.start('info', 1, 0, 'base_gst')
 
 STOPPED = 0
 STARTING = 1
@@ -112,6 +111,7 @@ class GstServer(object):
         self.conn.add_callback(self.gst_audio_init, 'stop')
         self.conn.add_callback(self.gst_success, 'success')
         self.conn.add_callback(self.gst_failure, 'failure')
+        self.conn.add_callback(self.gst_rtp, 'rtp')
         
         self.change_state(CONNECTED)
         log.info('GST inter-process link created')
@@ -141,7 +141,10 @@ class GstServer(object):
         self.change_state(STREAMINIT)
 
     def gst_log(self, **args):
-        log.info('GST success log  [%s] %s' %  (str(args), str(self)) )
+        log.info('GST log  [%s] %s' %  (str(args), str(self)) )
+
+    def gst_rtp(self, **args):
+        log.info('GST RTP stats  [%s] %s' %  (str(args), str(self)) )
 
 
     def connection_failed(self, conn):
