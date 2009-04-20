@@ -38,6 +38,8 @@ NetworkTesting.methods(
 		// Get elements.
 		self.start_btn = $('nettest_start');
 		self.message_div = $('nettest_message');
+        self.duration_fld = $('nettest_duration');
+        self.bandwidth_fld = $('nettest_bandwidth');
 		
 		// Get string translations.
 		self.start_str = $('js_nettest_start').get('text'); // start string
@@ -120,6 +122,10 @@ NetworkTesting.methods(
 	 * @member Streams
 	 */
 	function start_test(self) {
+        // TODO: add duration, bandwidth and kind
+        var duration = self.duration_fld.value;
+        var bandwidth = self.bandwidth_fld.value;
+
 		self.callRemote('rc_start_test', self.contact.get('name'));
         self.start_btn.disabled = true;
         self.message_div.innerHTML = "";
@@ -130,7 +136,7 @@ NetworkTesting.methods(
 
 	/**
 	 * Stops the streams of this contact.
-	 * (call from the client)
+	 * (called from the client)
 	 * 
 	 * @member Streams
 	 */

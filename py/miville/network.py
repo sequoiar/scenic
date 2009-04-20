@@ -80,6 +80,8 @@ STATE_QUERIED = 5
 STATE_WAITING_REMOTE_ANSWER = 6
 STATE_ANSWERED_OK = 7
 
+SUPPORTED_VERSIONS = ['2.0.4', '2.0.5']
+_version_is_supported = False
 #---------------------- module variables ---------------------------
 # IMPORTANT MODULE VARIABLES
 # there can be only one network test at a time.
@@ -389,9 +391,15 @@ class NetworkTester(object):
         :return success: boolean
         """
         global _is_currently_busy 
+        global _version_is_supported
+        global SUPPORTED_VERSIONS
 
         # TODO: remove com_chan argument
         # TODO: remove address argument
+        if not _version_is_supported:
+            self.notify_api(caller, "network_test_error", "Please update iperf. Supported versions : %s." % (SUPPORTED_VERSIONS))
+            log.error("Please update iperf. Supported versions : %s." % (SUPPORTED_VERSIONS))
+            return False
         if self.state != STATE_IDLE or _is_currently_busy :
             self.notify_api(caller, "network_test_error", "A network test is already in process.")
             return False
@@ -796,7 +804,46 @@ def get_tester_for_contact(contact_name=None):
         return ret
 
 
+def check_iperf_version():
+    """
+    Checks iperf version on startup.
+    No network test will be possibl if version string is no in SUPPORTED_VERSIONS list.
+    """
+    command = ["iperf", "-v"]
+    callback = _on_iperf_version_results
+    extra_arg = None
+    caller = None
+    try:
+        commands.single_command_start(command, callback, extra_arg, caller)
+    except CommandNotFoundError, e: 
+        log.error("CommandNotFoundError %s" % e.message)
 
+def _on_iperf_version_results(results, commands, extra_arg, caller):
+    """
+    Called once iperf -v is done.
+    """
+    global _version_is_supported # defaults to False
+    global SUPPORTED_VERSIONS
+
+    for i in range(len(results)): # should have a len() of 1
+        result = results[i]
+        success, results_infos = result
+        command = commands[i]
+        if isinstance(results_infos, failure.Failure):
+            log.error("FAILURE in _on_iperf_version_results: " + str(results_infos.getErrorMessage()))
+            log.error("No suitable iperf version.")
+        else:
+            stdout, stderr, signal_or_code = results_infos
+            if success:
+                try:
+                    actual_version = stderr.split()[2] # version info in stderr, not stdout !!!!!!
+                except IndexError:
+                    log.error("No suitable iperf version. IndexError" + str(results_infos))
+                else:
+                    for version in SUPPORTED_VERSIONS:
+                        if actual_version.startswith(version):
+                            log.info("Successfully found a suitable iperf version : " + actual_version)
+                            _version_is_supported = True
 
 # functions ---------------------------------------------
 def start(subject, port=None, interfaces=''):
@@ -816,6 +863,8 @@ def start(subject, port=None, interfaces=''):
         if subject is not None:
             subject.notify(subject, e.message, "error") # notifies the user. But therer are no users at startup
         log.error(e.message)
+    else:
+        reactor.callLater(0, check_iperf_version)
     # tester = NetworkTester()
     _api = subject
     

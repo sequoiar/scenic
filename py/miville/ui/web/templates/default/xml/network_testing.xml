@@ -8,11 +8,11 @@
         <table style="width:100%; padding:10px; font-size:11px;">
             <tr>
                 <td align="right">Bandwidth: </td>
-                <td><input type="text" value="10" style="width: 40px;text-align: right;font-size:11px;" disabled="True" /> Mbps</td>
+                <td><input type="text" id="nettest_bandwidth" value="10" style="width: 40px;text-align: right;font-size:11px;" /> Mbps</td>
             </tr>
             <tr>
                 <td align="right">Test duration: </td>
-                <td><input type="text" value="1"  style="width: 40px;text-align: right;font-size:11px;" disabled="True" /> seconds</td>
+                <td><input type="text" id="nettest_duration" value="1"  style="width: 40px;text-align: right;font-size:11px;" /> seconds</td>
             </tr>
             <tr>
                 <td align="right">Mode:</td>
