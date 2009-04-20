@@ -64,7 +64,7 @@ from miville.utils import commands
 from miville import connectors
 from miville.errors import CommandNotFoundError
 
-log = log.start('info', 1, True, 'network') # LOG TO FILE = True
+log = log.start('debug', 1, True, 'network') # LOG TO FILE = True
 # CHANGE IT TO debug LEVEL TO GET MORE OUTPUT
 
 # -------------------- constants -----------------------------------
@@ -302,8 +302,8 @@ class NetworkTester(object):
         self.current_stats_remote = None # dict
         self.current_com_chan = None # com_chan
         self.current_kind = None
-        self.current_latency = 0 # milliseconds
-        self.current_ping_started_time  = 0 # UNIX timestamp
+        self.current_latency = 0 # seconds
+        self.current_ping_started_time  = 0 # UNIX timestamp in seconds
         self.current_results_sent = False
         # -------- settings
         # TODO use those 2 vars:
@@ -516,11 +516,11 @@ class NetworkTester(object):
 
     def _get_time_now(self):
         """
-        Returns current UNIT time in seconds.
+        Returns current UNIX time in seconds.
         
         (it is a float)
         """
-        return time.time() # * 1000.0 #  in ms
+        return time.time() # in seconds
     
     def _cancel_timeout(self):
         """
@@ -592,6 +592,7 @@ class NetworkTester(object):
                     'latency':self.current_latency #, 
                     #'remote_addr':self.current_remote_addr
                 }
+                log.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX latency: %f seconds." % (self.current_latency / 2.0))
                 self._send_message("start", [self.current_kind, params])
                 wait_for = self.current_latency
                 log.debug("Will start iperf client in %f seconds" % wait_for)
@@ -674,15 +675,23 @@ class NetworkTester(object):
                     ok = False
                 else:
                     results['remote'] = self.current_stats_remote
+                    key = 'remote'
+                    results[key]['contact'] = str(self.current_contact)
+                    results[key]['latency'] = self.current_latency / 2.0
+                    print str(self.current_contact)
             if must_have_local:
                 if self.current_stats_local is None:
                     ok = False
                 else:
                     results['local'] = self.current_stats_local
+                    key = 'local'
+                    results[key]['contact'] = str(self.current_contact) # TODO: remove duplicate code here.
+                    results[key]['latency'] = self.current_latency / 2.0
             if ok:
                 results['contact'] = self.current_contact
                 self.notify_api(self.current_caller, "network_test_done", results)
                 self.current_results_sent = True
+                # XXXX debug._when_done()
                 self._when_done()
         else:
             log.debug("results were already sent to observers.")

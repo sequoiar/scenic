@@ -220,7 +220,18 @@ NetworkTesting.methods(
 			self.start_btn.value = self.start_str;
 		}
 	},
-
+	/**
+     * Called when a network test error occurs.
+	 * (called from python server)
+	 * 
+	 * @member NetworkTesting
+     * @param {string} Error message.
+	 */
+    function nettest_error(self, error_text) {
+        self.message_div.innerHTML = "" + error_text;
+        var p = new Element('p').appendText('Performance Test Results with ' + contact).injectInside(self.message_div);
+        self.start_btn.disabled = false;
+    },
 	/**
      * Called when a network test is done.
 	 * (called from server)
@@ -240,28 +251,41 @@ NetworkTesting.methods(
         var h1 = new Element('strong').appendText('Performance Test Results with ' + contact).injectInside(self.message_div);
         
         var txt = "";
+        var latency = 0.0;
+        var kind = 0;
+
+        if (local_data != null) {
+            latency = local_data.latency * 1000.0;
+            kind = local_data.kind;
+        } else {
+            latency = remote_data.latency * 1000.0;
+            kind = remote_data.kind;
+        }
+        // TODO: i18nize
+        if (kind == 1) {
+            txt += "Unidirectional from local to remote \n";
+        } else if (kind == 2) {
+            txt += "Bidirectional Sequential \n";
+        } else if (kind == 3) {
+            txt += "Bidirectional Simultaneous \n";
+        }
+        txt += "ComChan Latency : " + latency + " ms !\n\n";
+        // TODO : latency by wrapping ping
         
         if (local_data != null) {
-            if (local_data.test_kind == 1) {
-                txt += "Unidirectional from local to remote \n\n";
-            } else if (local_data.test_kind == 2) {
-                txt += "Bidirectional Sequential \n\n";
-            } else if (local_data.test_kind == 3) {
-                txt += "Bidirectional Simultaneous \n\n";
-            }
             txt += "From local to remote \n";
             txt += "  Bandwidth : " + (local_data.speed / 1000000.0) + " Mbps\n";
             txt += "  Jitter : " + local_data.jitter + " ms\n";
             txt += "  Packet loss : " + local_data.percent_errors + " %\n";
-            // TODO : latency
             txt += "\n";
         }
         if (remote_data != null) {
+            if (local_data == null) {
+            }
             txt += "From remote to local \n";
             txt += "  Bandwidth : " + (remote_data.speed / 1000000.0) + " Mbps\n";
             txt += "  Jitter : " + remote_data.jitter + " ms\n";
             txt += "  Packet loss : " + remote_data.percent_errors + " %\n";
-            // TODO : latency
             txt += "\n";
         }
         // txt += data;

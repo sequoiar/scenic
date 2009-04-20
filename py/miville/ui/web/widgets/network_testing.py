@@ -105,13 +105,19 @@ class NetworkTesting(Widget):
             }, 
             "error")
         """
+        txt = ""
         if isinstance(data, dict):
-            msg = "Error: \n"
+            msg = "Network Test Error: "
             # mandatory arguments
             for k in data.keys():
                 msg += "  %s\n" % (data[k])
             log.error(msg)
+            txt = msg
         else:
             log.error(data)
+            txt = data
+        self.callRemote('nettest_error', txt) # data)
+        log.debug("self.callRemote('nettest_error', txt)")
                 
     expose(locals())
+
