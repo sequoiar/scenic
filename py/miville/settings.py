@@ -484,13 +484,11 @@ class GlobalSetting(object):
                     else:
                         if stream.enabled:
                             proc_params = None
-                            if not sender_procs.has_key(stream.sync_group):
+                            if not procs.has_key(stream.sync_group):
                                 procs[stream.sync_group]  = {}
-                                proc_params = procs[stream.sync_group]
-                            else:
-                                if not receiver_procs.has_key(stream.sync_group):
-                                   procs[stream.sync_group]  = {}
-                                   proc_params = procs[stream.sync_group]
+                                
+                            proc_params = procs[stream.sync_group]
+                            proc_params = procs[stream.sync_group]
                             # proc_params now points to a valid dict.
                             params = stream.get_init_params()
                             params['address'] = address
@@ -669,7 +667,7 @@ class MediaStream(object):
        self.sync_group = "master"
        # media setting id
        self.setting = None
-       self.engine = None
+#       self.engine = None
        
     def _create(media_stream_kind, media_stream_ids):
         """
