@@ -80,7 +80,11 @@ STATE_QUERIED = 5
 STATE_WAITING_REMOTE_ANSWER = 6
 STATE_ANSWERED_OK = 7
 
-SUPPORTED_VERSIONS = ['2.0.4', '2.0.5']
+# supported versions of iperf : (see `iperf -v`)
+SUPPORTED_VERSIONS = [
+    'iperf version 2.0.4+svnr43 (7 Apr 2008) pthreads', 
+    'iperf version 2.0.4 (7 Apr 2008) pthreads'
+    ]
 _version_is_supported = False
 #---------------------- module variables ---------------------------
 # IMPORTANT MODULE VARIABLES
@@ -836,13 +840,14 @@ def _on_iperf_version_results(results, commands, extra_arg, caller):
             stdout, stderr, signal_or_code = results_infos
             if success:
                 try:
-                    actual_version = stderr.split()[2] # version info in stderr, not stdout !!!!!!
+                    actual_version = stderr.splitlines()[0] # version info in stderr, not stdout !!!!!!
                 except IndexError:
-                    log.error("No suitable iperf version. IndexError" + str(results_infos))
+                    log.error("No suitable iperf version.")
+                    # TODO: notify
                 else:
                     for version in SUPPORTED_VERSIONS:
                         if actual_version.startswith(version):
-                            log.info("Successfully found a suitable iperf version : " + actual_version)
+                            log.info("Successfully found a suitable iperf version : \"%s\"" % (actual_version))
                             _version_is_supported = True
 
 # functions ---------------------------------------------

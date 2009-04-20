@@ -1,7 +1,15 @@
 // import Nevow.Athena
 
 NetworkTesting = Nevow.Athena.Widget.subclass('NetworkTesting');
+/*
+ *
+var RE = /^\d*$/;
+document.write(RE.test(2)); //true
+document.write(RE.test('')); //true
+document.write(RE.test('a')); //false
 
+The regular expression in the preceding example specifies that the string being tested must have zero or more digit characters. Anything else is invalid.
+ */
 /**
  * This is subclass of Nevow.Athena.Widget.
  * It represent the Network testing interface.
@@ -50,6 +58,15 @@ NetworkTesting.methods(
 		
 		// Register to the widgets communicator.
 		register('nettest', self);
+        /*
+		// Create the empty field validator. TODO: (move to utils?)
+		self.isEmpty = new InputValidator('required', {
+		    errorMsg: 'This field is required.',
+		    test: function(field) {
+		        return ((field.value == null) || (field.value.length == 0));
+		    }
+		});
+        */
 	},
 	
 	/**
