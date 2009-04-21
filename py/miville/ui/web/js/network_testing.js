@@ -58,9 +58,10 @@ NetworkTesting.methods(
 		
 		// Register to the widgets communicator.
 		register('nettest', self);
-        /*
+        
 		// Create the empty field validator. TODO: (move to utils?)
-		self.isEmpty = new InputValidator('required_number', {
+        // uses clientcide
+		self.is_number = new InputValidator('required_number', {
 		    errorMsg: 'This field is required and must be a number.',
 		    test: function(field) {
                 var regexp = /^\d+$/; // REGEX: digit or empty
@@ -73,7 +74,6 @@ NetworkTesting.methods(
                 }
 		    }
 		});
-        */
 	},
 	
 	/**

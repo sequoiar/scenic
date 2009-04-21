@@ -272,6 +272,7 @@ class Process(object):
         """
         self.child.sendline(command)
         self.expect_test(expected, message, timeout)
+        # self.flush_output()
     
     def flush_output(self):
         """
@@ -354,7 +355,6 @@ class ClientServerTester(object):
         :param kwargs: **kwargs for child
         """
         self._start_child('client', self.CLIENT_CLASS, **kwargs)
-
     
     def _start_child(self, which, klass, **kwargs):
         """

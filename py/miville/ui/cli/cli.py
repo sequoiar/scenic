@@ -691,6 +691,7 @@ class CliController(TelnetServer):
         # strings options
         cp.add_option("-k", "--kind", type='string', help="Kind of network test. (locaotoremote | remotetolocal tradeoff | dualtest)")
         #cp.add_option("-c", "--contact", type='string', help="Specifies a contact to test with")
+        cp.add_option("-u", "--unit", type='string', help="Unit for bandwidth. Either M or K.")
         
         # int options
         cp.add_option("-b", "--bandwidth", type="int", help="Bandwidth in megabits. (default:1)")
@@ -702,6 +703,7 @@ class CliController(TelnetServer):
         duration = 10 
         kind = "localtoremote"
         caller = self
+        unit = 'M'
 
         if options.description:
             cp.print_description()
@@ -714,7 +716,9 @@ class CliController(TelnetServer):
                 bandwidth = options.bandwidth
             if options.time:
                 duration = options.time
-            self.core.network_test_start(caller, bandwidth, duration, kind)
+            if options.unit:
+                unit = options.unit
+            self.core.network_test_start(caller, bandwidth, duration, kind, None, unit)
         else: # options.help
             cp.print_help()
         self.write_prompt()

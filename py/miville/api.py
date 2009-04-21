@@ -885,7 +885,7 @@ class ControllerApi(object):
         self.notify(caller, devices_list, 'devices_list') # with a dict
     
     # network test use cases ----------------------------------------------------
-    def network_test_start(self, caller, bandwidth=1, duration=10, kind="localtoremote", contact=None):
+    def network_test_start(self, caller, bandwidth=1, duration=10, kind="localtoremote", contact=None, unit='M'):
         """
         Tries to start a network test with currently connected contact.
         
@@ -896,6 +896,7 @@ class ControllerApi(object):
         :param duration: in seconds
         :param kind: string "localtoremote","remotetolocal",  "tradeoff" or "dualtest"
         :param contact: addressbook.Contact object.
+        :param unit: either 'M' or 'K' for megabits and kilobits.
         """
         # TODO: accept a contact name instead of contact object ? 
         try:
@@ -935,7 +936,7 @@ class ControllerApi(object):
                     except KeyError:
                         self.notify(caller, "Could not start network test: Invalid kind of test \"%s\"." % kind, "network_test_error")
                     else:
-                        ret = tester.start_test(caller, bandwidth, duration, kind) # TODO: dont need com_chan arg anymore
+                        ret = tester.start_test(caller, bandwidth, duration, kind, unit) # TODO: dont need com_chan arg anymore
                         if ret:
                             log.debug("Will notify observer that we are starting a network test")
                             self.notify(caller, "Starting network performance test with contact %s for %d seconds..." % (contact.name, duration), "network_test_start")

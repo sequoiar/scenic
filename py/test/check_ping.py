@@ -31,10 +31,14 @@ class Test_Ping(unittest.TestCase):
         self.local.setup(self)
         self.remote = clientserver.TelnetMivilleTester(port_offset=1, verbose=False, name='remote')
         self.remote.setup(self)
+        #self.local.sendline("c -e Charlotte") # just in case there are contacts with those names
+        #self.remote.sendline("c -e Pierre")
         self.local.sendline("c -l")
         self.local.send_expect("c -a Charlotte 127.0.0.1 2223", "added")
         self.remote.sendline("c -l")
         self.remote.send_expect("c -a Pierre 127.0.0.1 2222", "added")
+        #self.remote.send_expect("c -s Pierre", "selected")
+        #self.remote.send_expect("c -m auto_answer=true", "modified")
         self.local.send_expect("c -s Charlotte", "selected")
         self.local.sendline("j -s")
         self.remote.expect_test("Do you accept")
@@ -47,11 +51,19 @@ class Test_Ping(unittest.TestCase):
 
     def test_02_network(self):
         # network test for 1 second
-        self.local.send_expect("n -s -k dualtest -t 1", "Starting") 
-        # self.local.expect_test('jitter', 'Did not receive network test results.', 3.0) # more seconds for more comfort
-        self.local.sleep(3)
+        # we must make sure this timeout is not greater than the time it will take to make the test.
+        self.local.send_expect("n -s -k dualtest -t 1 -b 30", "Starting", 0.5) # 4 seconds !
+        # -u M
+        # -u K
+        self.local.sleep(1.0)
+        #self.local.expect_test('test results', 'Did not receive network test results.', 3.0) # more seconds for more comfort
+        # self.local.sleep(3)
 
     def tearDown(self):
+        self.local.sendline("c -e Charlotte")
+        self.remote.sendline("c -e Pierre")
+        self.local.sendline("quit")
+        self.remote.sendline("quit")
         self.local.kill_children()
         self.remote.kill_children()
 

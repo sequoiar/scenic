@@ -80,6 +80,9 @@ STATE_QUERIED = 5
 STATE_WAITING_REMOTE_ANSWER = 6
 STATE_ANSWERED_OK = 7
 
+MEGABITS = 'M'
+KILOBITS = 'K'
+
 # supported versions of iperf : (see `iperf -v`)
 SUPPORTED_VERSIONS = [
     'iperf version 2.0.4+svnr43 (7 Apr 2008) pthreads', 
@@ -305,6 +308,7 @@ class NetworkTester(object):
         self.current_latency = 0 # seconds
         self.current_ping_started_time  = 0 # UNIX timestamp in seconds
         self.current_results_sent = False
+        self.current_unit = MEGABITS
         # -------- settings
         # TODO use those 2 vars:
         self.accept_timeout = 20 # timeout before auto rejecting dualtest query
@@ -381,7 +385,7 @@ class NetworkTester(object):
             pass
         return ret
 
-    def start_test(self, caller, bandwidth_megabits=1, duration=10, kind=KIND_UNIDIRECTIONAL): # start_client
+    def start_test(self, caller, bandwidth_megabits=1, duration=10, kind=KIND_UNIDIRECTIONAL, unit=MEGABITS): # start_client
         """
         Method called from the core API to try to start a network test.
         
@@ -392,6 +396,7 @@ class NetworkTester(object):
         :param bandwidth_megabits: int
         :param server_addr: str DEPRECATED PARAM
         :param kind: int Must match one of the constants in this module. 
+        :param unit: one-char string. Either 'M' or 'K'. (MEGABITS or KILOBITS) 
         :return success: boolean
         """
         global _is_currently_busy 
@@ -414,6 +419,10 @@ class NetworkTester(object):
             self.current_duration = duration # seconds
             self.current_caller = caller # instance
             self.current_results_sent = False
+            if unit is not MEGABITS and unit is not KILOBITS:
+                log.error("Invalid unit for bandwidth: %s" % (unit))
+                unit = MEGABITS
+            self.current_unit = unit
             # XXX
             # if com_chan is not None:
             #     log.debug("Using comm channel %s." % (com_chan))
@@ -458,9 +467,10 @@ class NetworkTester(object):
             "-c", self.current_remote_addr, # ip
             "-t", "%d" % self.current_duration, # duration
             "-y", "c", # CSV output
-            "-u", # UDP
-            "-b", "%dM" % self.current_bandwidth # bandwidth (megabits)
-        ] 
+            "-u" # UDP
+        ]
+        command.append("-b")
+        command.append("%d%s" % (self.current_bandwidth, self.current_unit)) # bandwidth (megabits)
         if self.current_kind == KIND_TRADEOFF:
             command.append("-r") # tradeoff.
             # all other test kinds are using the default unidirectional iperf client.
@@ -468,7 +478,8 @@ class NetworkTester(object):
             'ip': self.current_remote_addr, #server_addr, 
             'bandwidth': self.current_bandwidth, # bandwidth_megabits, 
             'duration': self.current_duration, 
-            'kind': self.current_kind 
+            'kind': self.current_kind,
+            'unit': self.current_unit, 
         }
         # make sure all our agrs are string !!
         for i in range(len(command)):
@@ -589,7 +600,8 @@ class NetworkTester(object):
                 params = {
                     'duration':self.current_duration,
                     'bandwidth':self.current_bandwidth,
-                    'latency':self.current_latency #, 
+                    'latency':self.current_latency,
+                    'unit':self.current_unit,
                     #'remote_addr':self.current_remote_addr
                 }
                 log.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX latency: %f seconds." % (self.current_latency / 2.0))
@@ -616,6 +628,7 @@ class NetworkTester(object):
                 self.current_duration = params['duration']
                 self.current_bandwidth = params['bandwidth']
                 self.current_latency = params['latency']
+                self.current_unit = params['unit']
                 #self.current_remote_addr = params['remote_addr'] # IMPORTANT 
                 #self.current_remote_addr = self._get_remote_addr() # TODO XXX Make more sturdy
                 wait_for = self.current_latency / 2.0
