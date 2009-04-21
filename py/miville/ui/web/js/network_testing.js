@@ -60,10 +60,17 @@ NetworkTesting.methods(
 		register('nettest', self);
         /*
 		// Create the empty field validator. TODO: (move to utils?)
-		self.isEmpty = new InputValidator('required', {
-		    errorMsg: 'This field is required.',
+		self.isEmpty = new InputValidator('required_number', {
+		    errorMsg: 'This field is required and must be a number.',
 		    test: function(field) {
-		        return ((field.value == null) || (field.value.length == 0));
+                var regexp = /^\d+$/; // REGEX: digit or empty
+                if (field.value == null) {
+                    return false;
+                } else if (field.value.length == 0) {
+                    return false;
+                } else {
+                    return regexp.test(field.value);
+                }
 		    }
 		});
         */
@@ -255,7 +262,7 @@ NetworkTesting.methods(
         var kind = 0;
 
         if (local_data != null) {
-            latency = local_data.latency * 1000.0;
+            latency = local_data.latency * 1000.0; // from s to ms
             kind = local_data.kind;
         } else {
             latency = remote_data.latency * 1000.0;
@@ -293,20 +300,6 @@ NetworkTesting.methods(
         // TODO: check if a contact to which we are connected is selected.
         self.start_btn.disabled = false;
         // two keys to data: 'local' and 'remote'. each is a dict with keys:
-        /*
-        if (data.local) {
-            txt = "From local to remote"
-            var p = new Element('p').appendText(txt).injectInside(self.message_div);
-            var ul = new Element('ul').appendText(txt).injectInside(self.message_div);
-        for host_name in ['local', 'remote']:
-            if data.has_key(host_name):
-                if host_name == "local":
-                else:
-                    txt += "From remote to local" + "\n"
-                host_data = data[host_name]
-                for k in host_data:
-                    txt += "\t%s: %s\n" % (k, str(host_data[k]))
-        */
         /*
 		if (field) {
 			field.set('status', msg);
