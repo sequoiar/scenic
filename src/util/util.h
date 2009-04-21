@@ -23,8 +23,11 @@
 #ifndef _HOST_IP_H_
 #define _HOST_IP_H_
 
+#include <string>
 /// Linux external interface dotted ip address. 
 const char *get_host_ip();
+bool fileExists(const std::string &fullyQualifiedPathName);
+
 
 #endif // _HOST_IP_H_
 

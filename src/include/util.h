@@ -23,9 +23,9 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__
 
-#include "util/logWriter.h"
 #include "lassert.h"
-#include "util/hostIP.h"
+#include "util/logWriter.h"
+#include "util/util.h"
 #include "util/sigint.h"
 
 

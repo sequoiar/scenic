@@ -20,11 +20,12 @@
  *
  */
 
-#include "hostIP.h"
+#include "util.h"
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <fstream>
 
 const char *get_host_ip()
 {
@@ -52,4 +53,16 @@ const char *get_host_ip()
 
     close (s);
     return ip;
+}
+
+
+bool fileExists(const std::string &path)
+{
+    std::fstream in;
+    in.open(path.c_str(), std::fstream::in);
+    if (in.fail()) // file doesn't exist
+        return false;
+ 
+    in.close();
+    return true;
 }

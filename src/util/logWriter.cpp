@@ -20,7 +20,7 @@
  *
  */
 
-#include "util.h"
+#include "logWriter.h"
 
 #include <iostream>
 #include <ctime>
