@@ -85,6 +85,7 @@ gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 
 gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 {
+#if 0
     static GTimeVal current_time;
     static glong last_sec = current_time.tv_sec;
     static glong last_usec = current_time.tv_usec;
@@ -105,6 +106,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
         nbFrames = 0;
         last_sec = current_time.tv_sec;
     }
+#endif
 
     glEnable(GL_DEPTH_TEST);
     glMatrixMode(GL_MODELVIEW);

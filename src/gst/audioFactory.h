@@ -47,7 +47,7 @@ namespace audiofactory
                         const std::string &codec, 
                         int port, 
                         const std::string &sink,
-                        const std::string &location,
+                        const std::string &deviceName,
                         int audioBufferTime);
 }
 
@@ -69,10 +69,10 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
                                   const std::string &codec, 
                                   int port, 
                                   const std::string &sink,
-                                  const std::string &location,
+                                  const std::string &deviceName,
                                   int audioBufferTime)
 {
-    AudioSinkConfig aConfig(sink, location, audioBufferTime);
+    AudioSinkConfig aConfig(sink, deviceName, audioBufferTime);
     int id;
     int audioCapsPort = port + ports::CAPS_OFFSET;
     LOG_DEBUG("Waiting for audio caps on port: " << audioCapsPort);
@@ -113,10 +113,10 @@ namespace audiofactory
                        const std::string &codec, 
                        int port, 
                        const std::string &sink,
-                       const std::string &location,
+                       const std::string &deviceName,
                        int audioBufferTime)
     {
-        return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink, location, audioBufferTime));
+        return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink, deviceName, audioBufferTime));
     }
 }
 

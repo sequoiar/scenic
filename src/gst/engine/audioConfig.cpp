@@ -22,16 +22,16 @@
 
 #include "util.h"
 
-#include <fstream>
 #include "audioConfig.h"
 #include "audioSource.h"
 #include "audioSink.h"
 
 ///  Constuctor sets by default loop to LOOP_NONE, but has file location specified 
 AudioSourceConfig::AudioSourceConfig(const std::string & source__, 
+        const std::string & deviceName__,
         const std::string & location__,
         int numChannels__) : 
-    source_(source__), location_(location__), numChannels_(numChannels__)
+    source_(source__), deviceName_(deviceName__), location_(location__), numChannels_(numChannels__)
 {
     if (source_.empty())
         THROW_ERROR("No source specified");
@@ -42,7 +42,7 @@ AudioSourceConfig::AudioSourceConfig(const std::string & source__,
 
 /// Copy constructor 
 AudioSourceConfig::AudioSourceConfig(const AudioSourceConfig& m) : 
-    source_(m.source_), location_(m.location_), numChannels_(m.numChannels_)
+    source_(m.source_), deviceName_(m.deviceName_), location_(m.location_), numChannels_(m.numChannels_)
 {}
 
 
@@ -79,42 +79,36 @@ AudioSource* AudioSourceConfig::createSource() const
 }
 
 
-/// Returns c-style string specifying the location (either filename or device descriptor) 
+/// Returns c-style string specifying the location (filename) 
 const char* AudioSourceConfig::location() const
 {
     return location_.c_str();
 }
 
 
-/// Returns true if location indicates an existing, readable file/device. 
-bool AudioSourceConfig::fileExists() const
+/// Returns c-style string specifying the device (i.e. plughw:0)
+const char* AudioSourceConfig::deviceName() const
 {
-    if (location_.empty())
-    {
-        LOG_DEBUG("No location specified");
-        return false;
-    }
+    return deviceName_.c_str();
+}
 
-    std::fstream in;
-    in.open(location(), std::fstream::in);
 
-    if (in.fail())
-        THROW_ERROR("File does not exist and/or is not readable.");
-
-    in.close();
-    return true;
+/// Returns true if location indicates an existing, readable file/device. 
+bool AudioSourceConfig::locationExists() const
+{
+    return fileExists(location_);
 }
 
 /// Constructor 
-AudioSinkConfig::AudioSinkConfig(const std::string & sink__, const std::string & location__, unsigned long long bufferTime__) : 
-    sink_(sink__), location_(location__), bufferTime_(bufferTime__)
+AudioSinkConfig::AudioSinkConfig(const std::string & sink__, const std::string & deviceName__, unsigned long long bufferTime__) : 
+    sink_(sink__), deviceName_(deviceName__), bufferTime_(bufferTime__)
 {
     if (bufferTime_ < MIN_BUFFER_TIME)
         THROW_ERROR("Audio sink buffer time " << bufferTime_ << " is too low, must be greater than " << MIN_BUFFER_TIME);
 }
 
 /// Copy constructor 
-AudioSinkConfig::AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_), location_(m.location_), bufferTime_(m.bufferTime_) 
+AudioSinkConfig::AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_), deviceName_(m.deviceName_), bufferTime_(m.bufferTime_) 
 {}
 
 /// Factory method that creates an AudioSink based on this object's sink_ string 
@@ -133,14 +127,14 @@ AudioSink* AudioSinkConfig::createSink() const
     }
 }
 
-/// Returns c-style string specifying the location (either filename or device descriptor) 
-const char* AudioSinkConfig::location() const
+/// Returns c-style string specifying the device used
+const char* AudioSinkConfig::deviceName() const
 {
-    return location_.c_str();
+    return deviceName_.c_str();
 }
 
 
-/// Returns buffer time, which must be an unsigned long long for gstreamer's audiosink's to accept it safely
+/// Returns buffer time, which must be an unsigned long long for gstreamer's audiosink to accept it safely
 unsigned long long AudioSinkConfig::bufferTime() const
 {
     return bufferTime_;

@@ -33,14 +33,17 @@ class VideoSourceConfig
         //* for source (remote) w/ location i.e. filename or url */
         VideoSourceConfig(const std::string &source__, 
                           const int bitrate__, 
+                          const std::string &deviceName__, 
                           const std::string &location__, 
                           const bool doDeinterlace__)
-            : source_(source__), bitrate_(bitrate__), location_(location__), doDeinterlace_(doDeinterlace__) 
+            : source_(source__), bitrate_(bitrate__), deviceName_(deviceName__),
+            location_(location__), doDeinterlace_(doDeinterlace__) 
         {}
 
         //* copy constructor */
         VideoSourceConfig(const VideoSourceConfig& m)
-            : source_(m.source_), bitrate_(m.bitrate_), location_(m.location_), doDeinterlace_(m.doDeinterlace_)
+            : source_(m.source_), bitrate_(m.bitrate_), deviceName_(m.deviceName_), location_(m.location_), 
+            doDeinterlace_(m.doDeinterlace_)
         {}
 
         VideoSource* createSource() const;  // factory method
@@ -50,12 +53,16 @@ class VideoSourceConfig
         bool doDeinterlace() const { return doDeinterlace_; }
 
         bool hasLocation() const { return !location_.empty(); }
-        bool fileExists() const;
+        bool hasDeviceName() const { return !deviceName_.empty(); }
+        bool locationExists() const;
+        bool deviceExists() const;
         const char *location() const;
+        const char *deviceName() const;
 
     private:
         const std::string source_;
         const int bitrate_;
+        const std::string deviceName_;
         const std::string location_;
         const bool doDeinterlace_;
         /// No Assignment Operator 

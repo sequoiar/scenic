@@ -58,7 +58,6 @@ std::string VideoSource::defaultSrcCaps() const
     /*capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
         << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; */
     capsStr << "video/x-raw-yuv, width=" << WIDTH << ", height=" << HEIGHT;
-    assert(capsStr.str() == "video/x-raw-yuv, width=640, height=480"); 
     return capsStr.str();
 }
 
@@ -114,7 +113,7 @@ VideoFileSource::VideoFileSource(const VideoSourceConfig &config) :
 
 void VideoFileSource::init()
 {
-    assert(config_.fileExists());
+    assert(config_.locationExists());
     identity_ = Pipeline::Instance()->makeElement("identity", NULL);
     g_object_set(identity_, "silent", TRUE, NULL);
 
@@ -159,11 +158,11 @@ void VideoV4lSource::init()
 {
     VideoSource::init();
     // set a v4l2src if given to config as an arg, otherwise use default
-    if (config_.hasLocation() and config_.fileExists())
-        g_object_set(G_OBJECT(source_), "device", config_.location(), NULL);
+    if (config_.hasDeviceName() && config_.deviceExists())
+        g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
 
     gchar *deviceStr;
-    g_object_get(G_OBJECT(source_), "device", &deviceStr, NULL);
+    g_object_get(G_OBJECT(source_), "device", &deviceStr, NULL);    // get actual used device
 
     std::string deviceString(deviceStr);        // stay safe from memory leaks
     g_free(deviceStr);

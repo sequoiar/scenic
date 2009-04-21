@@ -36,6 +36,7 @@ class AudioSourceConfig
     public:
         
         AudioSourceConfig(const std::string & source__,     
+                          const std::string & deviceName__,
                           const std::string & location__,
                           int numChannels__);
         
@@ -45,9 +46,13 @@ class AudioSourceConfig
 
         int numChannels() const;
 
+        bool hasDeviceName() const { return !deviceName_.empty(); }
+        bool hasLocation() const { return !location_.empty(); }
+
+        const char *deviceName() const;
         const char *location() const;
 
-        bool fileExists() const;
+        bool locationExists() const;
          
         AudioSource* createSource() const;
 
@@ -55,6 +60,7 @@ class AudioSourceConfig
         /// No Assignment Operator 
         AudioSourceConfig& operator=(const AudioSourceConfig&); 
         const std::string source_;
+        const std::string deviceName_;
         const std::string location_;
         const int numChannels_;
 };
@@ -63,18 +69,19 @@ class AudioSourceConfig
 class AudioSinkConfig 
 {
     public:
-        AudioSinkConfig(const std::string & sink__, const std::string & location__, unsigned long long bufferTime);
+        AudioSinkConfig(const std::string & sink__, const std::string & deviceName__, unsigned long long bufferTime);
         
         AudioSinkConfig(const AudioSinkConfig & m); 
 
         AudioSink* createSink() const;
-        const char *location() const;
+        bool hasDeviceName() const { return !deviceName_.empty(); }
+        const char *deviceName() const;
         unsigned long long bufferTime() const;
         static const unsigned long long MIN_BUFFER_TIME = 10000LL;
 
     private:
         const std::string sink_;
-        const std::string location_;
+        const std::string deviceName_;
         const unsigned long long bufferTime_;
 };
 

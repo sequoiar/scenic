@@ -26,6 +26,7 @@
 #include "videoConfig.h"
 #include "videoSource.h"
 #include "videoSink.h"
+
 #ifdef CONFIG_GL
 #include "glVideoSink.h"
 #endif
@@ -46,26 +47,32 @@ VideoSource * VideoSourceConfig::createSource() const
         THROW_ERROR(source_ << " is an invalid source!");
             
     LOG_DEBUG("Video source options: " << source_ << ", bitrate: " << bitrate_ << ", deinterlace: " 
-            << (doDeinterlace() ? "true" : "false") << ", location: " << location_);
+            << (doDeinterlace() ? "true" : "false") << ", location: " << location_ << ", device: " << deviceName_);
     return 0;
 }
 
 
-bool VideoSourceConfig::fileExists() const
+bool VideoSourceConfig::locationExists() const
 {
-    std::fstream in;
-    in.open(location_.c_str(), std::fstream::in);
-    if (in.fail()) // file doesn't exist
-        return false;
+    return fileExists(location_);
+}
 
-    in.close();
-    return true;
+
+
+bool VideoSourceConfig::deviceExists() const
+{
+    return fileExists(deviceName_);
 }
 
 
 const char* VideoSourceConfig::location() const
 {
     return location_.c_str();
+}
+
+const char* VideoSourceConfig::deviceName() const
+{
+    return deviceName_.c_str();
 }
 
 

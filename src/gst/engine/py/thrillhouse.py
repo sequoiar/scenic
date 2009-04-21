@@ -454,8 +454,8 @@ class MilhouseTests():
         """ audiofile, uncompressed  """
         recv, send = self.argfactory('audio')
         send.audiosource = "filesrc"
-        send.audiodevice = "/var/tmp/movie.avi"
-        if os.path.exists(send.audiodevice):
+        send.audiolocation = "/var/tmp/movie.avi"
+        if os.path.exists(send.audiolocation):
             self.run(recv, send)
         else:
             print "No such file, skipping this test"
@@ -465,9 +465,9 @@ class MilhouseTests():
         recv, send = self.argfactory('audiovideo')
         send.audiosource = "filesrc"
         send.videosource = "filesrc"
-        send.audiodevice = "/var/tmp/things.mp3"
-        send.videodevice = "/var/tmp/mandela.ogg"
-        if os.path.exists(send.audiodevice) and os.path.exists(send.videodevice):
+        send.audiolocation = "/var/tmp/things.mp3"
+        send.videolocation = "/var/tmp/mandela.ogg"
+        if os.path.exists(send.audiolocation) and os.path.exists(send.videolocation):
             self.run(recv, send)
         else:
             print "No such files, skipping this test"
@@ -477,9 +477,9 @@ class MilhouseTests():
         recv, send = self.argfactory('audiovideo')
         send.audiosource = "filesrc"
         send.videosource = "filesrc"
-        send.audiodevice = "/var/tmp/movie.avi"
-        send.videodevice = send.audiodevice
-        if os.path.exists(send.audiodevice):
+        send.audiolocation = "/var/tmp/trailer_1080p.ogg"
+        send.videolocation = send.audiolocation
+        if os.path.exists(send.audiolocation):
             self.run(recv, send)
         else:
             print "No such files, skipping this test"
@@ -488,11 +488,19 @@ class MilhouseTests():
         """ Just audio """
         recv, send = self.argfactory('video')
         self.run(recv, send)
+    
+
+    def test_36_videofile_only(self):
+        """ Just audio """
+        recv, send = self.argfactory('video')
+        send.videosource = "filesrc"
+        send.videolocation = "/var/tmp/trailer_1080p.ogg"
+        self.run(recv, send)
 
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_13')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_34')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

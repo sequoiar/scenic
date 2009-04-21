@@ -198,7 +198,7 @@ void AudioFileSource::loop(int nTimes)
 
 void AudioFileSource::sub_init()
 {
-    assert(config_.fileExists());
+    assert(config_.locationExists());
 
     aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
     
@@ -266,8 +266,8 @@ void AudioAlsaSource::sub_init()
     if (Jack::is_running())
         THROW_ERROR("Jack is running, ALSA unavailable");
 
-    if (config_.location() != std::string(""))
-        g_object_set(G_OBJECT(source_), "device", config_.location(), NULL);
+    if (config_.hasDeviceName())
+        g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
     else
         g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
 
@@ -321,11 +321,6 @@ void AudioJackSource::sub_init()
     if (!Jack::is_running())
         THROW_ERROR("Jack is not running");
 
-#if 0
-    // uncomment to turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
-    // jackOut -> jackIn -> jackOut ->jackIn.....
-    g_object_set(G_OBJECT(source_), "connect", 0, NULL);
-#endif
     // use auto-forced connect mode if available
     if (Jack::autoForcedSupported(source_))
         g_object_set(G_OBJECT(source_), "connect", 2, NULL);

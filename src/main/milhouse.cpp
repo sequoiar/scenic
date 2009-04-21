@@ -75,8 +75,8 @@ short pof::run(int argc, char **argv)
     options.addBool("deinterlace", 'o', "deinterlace video");
     options.addString("videodevice", 'd', "device", "/dev/video0 /dev/video1");
     options.addString("audiodevice", 'q', "audio device", "hw:0 hw:2 plughw:0 plughw:2");
-    options.addString("videofile", 0, "video file", "filename");
-    options.addString("audiofile", 0, "audio file", "filename");
+    options.addString("videolocation", 0, "video file location", "<filename>");
+    options.addString("audiolocation", 0, "audio file location", "<filename>");
     options.addInt("screen", 'n', "screen", "xinerama screen num");
     options.addBool("version", 'w', "version number");
     options.addInt("numchannels", 'c', "numchannels", "2");
@@ -126,22 +126,8 @@ short pof::run(int argc, char **argv)
     if (disableVideo and disableAudio)
         THROW_CRITICAL("argument error: must provide video and/or audio parameters. see --help");
 
-    if(!options["address"]) 
-        THROW_CRITICAL("argument error: missing address. see --help");
-
-    if(!disableVideo and !options["videocodec"])
-        THROW_CRITICAL("argument error: missing videocodec. see --help");
-    if(!disableVideo and !options["videoport"])
-        THROW_CRITICAL("argument error: missing videoport. see --help");
-
-    if(!disableAudio and !options["audiocodec"])
-        THROW_CRITICAL("argument error: missing audiocodec. see --help");
-    if(!disableAudio and !options["audioport"])
-        THROW_CRITICAL("argument error: missing audioport. see --help");
-
-    if (!disableAudio and !disableVideo)
-        if (options["videoport"] == options["audioport"])
-            THROW_CRITICAL("Videoport and audioport cannot be equal");
+    if (options["videoport"] == options["audioport"])
+        THROW_CRITICAL("Videoport and audioport cannot be equal"); // Fail early, other port checks do happen later too
 
     if (options["receiver"]) 
     {
@@ -151,27 +137,21 @@ short pof::run(int argc, char **argv)
 
         if (!disableVideo)       
         {
-            if(!options["videosink"])
-                THROW_CRITICAL("argument error: missing videosink. see --help");
-
             vRx = videofactory::buildVideoReceiver(options["address"], options["videocodec"], 
                     options["videoport"], options["screen"], options["videosink"]);
         }
         if (!disableAudio)
         {
-            if(!options["audiosink"])
-                THROW_CRITICAL("argument error: missing audiosink. see --help");
-
             // FIXME: we should distinguish between device and location
-            std::string audioLocation = "";
+            std::string audioDevice = "";
             if (options["audiodevice"])
-                audioLocation = static_cast<std::string>(options["audiodevice"]);
+                audioDevice = static_cast<std::string>(options["audiodevice"]);
 
             int audioBufferUsec = audiofactory::AUDIO_BUFFER_USEC;
             if (options["audio_buffer_usec"])
                 audioBufferUsec = options["audio_buffer_usec"];
             aRx = audiofactory::buildAudioReceiver(options["address"], options["audiocodec"], 
-                    options["audioport"], options["audiosink"], audioLocation, 
+                    options["audioport"], options["audiosink"], audioDevice, 
                     static_cast<unsigned long long>(audioBufferUsec));
         }
 
@@ -208,21 +188,18 @@ short pof::run(int argc, char **argv)
 
         if (!disableVideo)
         {
-            if (!options["videosource"])
-                THROW_CRITICAL("argument error: missing --videosource. see --help");
-
-            std::string videoDevice = ""; 
-
+            std::string videoDevice, videoLocation;
             if (options["videodevice"]) 
                 videoDevice = static_cast<std::string>(options["videodevice"]); 
+            if (options["videolocation"]) 
+                videoLocation = static_cast<std::string>(options["videolocation"]); 
 
             int videoBitrate = 3000000;
             if (options["videobitrate"]) 
                 videoBitrate = options["videobitrate"];
-            LOG_DEBUG("VIDEOBITRATE IS " << videoBitrate);
 
             VideoSourceConfig vConfig(options["videosource"], videoBitrate, 
-                    videoDevice, options["deinterlace"]);
+                    videoDevice, videoLocation, options["deinterlace"]);
 
             vTx = videofactory::buildVideoSender(vConfig, options["address"], options["videocodec"], 
                     options["videoport"]);
@@ -230,18 +207,17 @@ short pof::run(int argc, char **argv)
 
         if (!disableAudio)
         {
-            if (!options["audiosource"])
-                THROW_CRITICAL("argument error: missing --audiosource. see --help");
+            std::string audioDevice, audioLocation;
+            if (options["audiodevice"]) 
+                audioDevice = static_cast<std::string>(options["audiodevice"]); 
+            if (options["audiolocation"]) 
+                audioLocation = static_cast<std::string>(options["audiolocation"]); 
 
             int numChannels = 2;
             if (options["numchannels"]) 
                 numChannels = options["numchannels"];
 
-            std::string audioLocation = "";
-            if (options["audiodevice"])
-                audioLocation = static_cast<std::string>(options["audiodevice"]);
-
-            AudioSourceConfig aConfig(options["audiosource"], audioLocation, numChannels);
+            AudioSourceConfig aConfig(options["audiosource"], audioDevice, audioLocation, numChannels);
             aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], options["audioport"]);
         }
 

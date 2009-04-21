@@ -34,7 +34,7 @@
 #include <sstream>
 
 #ifdef CONFIG_DEBUG_LOCAL
-#define RTP_REPORTING 1
+#define RTP_REPORTING 0
 #endif
 
 GstElement *RtpBin::rtpbin_ = 0;
@@ -96,7 +96,6 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
     guint32 jitter = g_value_get_uint(gst_structure_get_value(stats, "rb-jitter"));
     paramStr << ":JITTER: " << jitter;
     mapMsg["stats"] = idStr.str() + paramStr.str();
-    LOG_DEBUG(mapMsg["stats"]);
     mapMsg.post();
 
     paramStr.str(""); // reset
@@ -104,7 +103,6 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
     gint32 packetsLost = g_value_get_int(gst_structure_get_value(stats, "rb-packetslost"));
     idStr << ":PACKETS LOST: " << packetsLost;
     mapMsg["stats"] = idStr.str() + paramStr.str();
-    LOG_DEBUG(mapMsg["stats"]);
     mapMsg.post();
 
     // free structures

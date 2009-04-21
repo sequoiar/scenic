@@ -238,19 +238,14 @@ void GstSenderThread::video_start(MapMsg& msg)
         //VideoSourceConfig config("dv1394src");
         //SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
         LOG_INFO("video_init");
-        const std::string VIDEO_DEVICE = "";
-        const bool DO_DEINTERLACE = false;
+        std::string videoDevice, videoLocation;
+        if(!msg["location"].empty())
+            videoLocation = static_cast<std::string>(msg["location"]);
+        if(!msg["device"].empty())
+            videoDevice = static_cast<std::string>(msg["device"]);
 
-        if(msg["location"].empty())
-        {
-            VideoSourceConfig config(msg["source"], msg["bitrate"], VIDEO_DEVICE, DO_DEINTERLACE);
-            video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
-        }
-        else
-        {
-            VideoSourceConfig config(msg["source"], msg["bitrate"], std::string(msg["location"]), DO_DEINTERLACE);
-            video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
-        }
+        VideoSourceConfig config(msg["source"], msg["bitrate"], videoDevice, videoLocation, msg["deinterlace"]);
+        video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
 
         ff[0] = boost::bind(tcpSendBuffer, msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, videofactory::MSG_ID, _1);
         //sender->getCaps());
@@ -273,19 +268,18 @@ void GstSenderThread::audio_start(MapMsg& msg)
     try
     {
         AudioSender* asender;
+        LOG_INFO("audio_init");
+        std::string audioDevice, audioLocation;
+        
+        if(!msg["location"].empty())
+            audioLocation = static_cast<std::string>(msg["location"]);
+        if(!msg["device"].empty())
+            audioDevice = static_cast<std::string>(msg["device"]);
 
 //        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
-        if(msg["location"].empty())
-        {
-            std::string AUDIO_LOCATION = "";
-            AudioSourceConfig config(msg["source"], AUDIO_LOCATION, msg["channels"]);
-            audio_ = asender = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
-        }
-        else
-        {
-            AudioSourceConfig config(msg["source"], msg["location"], msg["channels"]);
-            audio_ = asender = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
-        }
+        AudioSourceConfig config(msg["source"], audioDevice, audioLocation, msg["channels"]);
+        audio_ = asender = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
+
         ff[1] = boost::bind(tcpSendBuffer,msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, audiofactory::MSG_ID, _1);
         //Build Caps Msg
  //       MapMsg caps("caps");
