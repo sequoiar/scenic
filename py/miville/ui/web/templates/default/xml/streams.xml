@@ -13,4 +13,6 @@
 	<!-- Javascript translation -->
 	<span n:render="i18n" id="js_strm_start" class="strm js_str">Start</span>
 	<span n:render="i18n" id="js_strm_stop" class="strm js_str">Stop</span>
+	<span n:render="i18n" id="js_strm_user" class="strm js_str">User settings</span>
+	<span n:render="i18n" id="js_strm_preset" class="strm js_str">Preset settings</span>
 </div>

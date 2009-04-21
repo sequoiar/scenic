@@ -34,11 +34,6 @@ log = log.start('debug', 1, 0, 'web_strm')
 class Streams(Widget):
     """
     """
-        
-#    def __init__(self, api, template):
-#        Widget.__init__(self, api, template)
-#        self.connections = {}
-        
     def rc_start_streams(self, contact):
         self.api.start_streams(self, contact)
         return False
@@ -52,37 +47,19 @@ class Streams(Widget):
         return False
         
     def cb_list_global_setting(self, origin, data):
-        preset_settings = {}
-        user_settings = {}
+        preset_settings = []
+        user_settings = []
         for id, setting in data[0].items():
             if setting.is_preset:
-                preset_settings[id] = setting.name 
+                preset_settings.append({'id':id, 'name':setting.name}) 
             else:
-                user_settings[id] = setting.name 
+                user_settings.append({'id':id, 'name':setting.name}) 
             log.debug('LIST GLOB: %s' % id)
             log.debug('LIST GLOB: %s' % setting.name)
             log.debug('LIST GLOB: %s' % setting.is_preset)
+        preset_settings.sort(key=lambda x:(x['name'].lower))
+        user_settings.sort(key=lambda x:(x['name'].lower))
         self.callRemote('update_settings', preset_settings, user_settings)
         
         
-        
-#    def cb_get_contactss(self, origin, data):
-#        """
-#        Maybe we should add a better sorting algorithm with collation support
-#        and/or natural order. See:
-#        http://jtauber.com/2006/02/13/pyuca.py
-#        http://www.codinghorror.com/blog/archives/001018.html
-#        """
-#        adb = []
-#        contacts_dict = data[0]
-#        sorted_keys = sorted(contacts_dict, key=unicode.lower)
-#        for key in sorted_keys:
-#            contact = contacts_dict[key]
-#            adb.append({'name':contact.name,
-#                        'state':contact.state,
-#                        'auto_answer':contact.auto_answer,
-#                        'auto_created':contact.auto_created})
-#        log.info('receive update: %r' % self)
-#        self.callRemote('update_list', adb)
-                
     expose(locals())

@@ -37,10 +37,13 @@ Streams.methods(
 		
 		// Get elements.
 		self.start_btn = $('strm_start');
+		self.global_slct = $('strm_global_setts');
 		
 		// Get string translations.
 		self.start_str = $('js_strm_start').get('text');
 		self.stop_str = $('js_strm_stop').get('text');
+		self.user_str = $('js_strm_user').get('text');
+		self.preset_str = $('js_strm_preset').get('text');
 		
 		// Set translations.
 		self.start_btn.value = self.start_str;
@@ -93,9 +96,41 @@ Streams.methods(
      * @param {array} contacts An array of contacts object. 
 	 */
     function update_settings(self, presets, users) {
-		dbug.info('SETTS');
-		dbug.info(presets);
-		dbug.info(users);
+		if (users.length > 0 || presets.length > 0) {
+			self.global_slct.empty();
+			self.global_slct.disabled = false;
+		}
+
+		if (users.length > 0) {
+			var optgroup = new Element('optgroup', {
+				'label': self.user_str
+			});
+			optgroup.inject(self.global_slct);
+			
+			users.each(function(setting){
+				var opt = new Element('option', {
+					'html': setting.name,
+					'value': setting.id
+				});
+				opt.inject(optgroup);
+			});
+		}
+		
+		if (presets.length > 0) {
+			var optgroup = new Element('optgroup', {
+				'label': self.preset_str
+			});
+			optgroup.inject(self.global_slct);
+			
+			presets.each(function(setting){
+				var opt = new Element('option', {
+					'html': setting.name,
+					'value': setting.id
+				});
+				opt.inject(self.global_slct);
+			});
+		}
+		
 	},
 
 
