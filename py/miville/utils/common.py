@@ -47,13 +47,11 @@ def string_to_number(value):
     is not a integer or a float 
     """
     if value.isdigit():
-        new_value = int(value)
-        return new_value
+        return int(value)
     try:
-        new_value = float(value)
+        return float(value)
     except:
         return None
-    return None    
 
 def get_def_name(level=2):
     """
