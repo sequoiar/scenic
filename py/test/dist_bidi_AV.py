@@ -63,10 +63,10 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
 
         # add global setting
 
-        self.tst("settings --type global --add video_receiver_rxtx_twoway_setting", "Global setting added")
-        self.tst("settings --type global --add video_transmit_rxtx_twoway_setting", "Global setting added")
-        self.tst("settings --type global --add audio_receiver_rxtx_twoway_setting", "Global setting added")
-        self.tst("settings --type global --add audio_transmit_rxtx_twoway_setting", "Global setting added")
+        self.tst("settings --type global --add video_rx", "Global setting added")
+        self.tst("settings --type global --add video_tx", "Global setting added")
+        self.tst("settings --type global --add audio_rx", "Global setting added")
+        self.tst("settings --type global --add audio_tx", "Global setting added")
         #self.tst("settings --type global --globalsetting transmit_rxtx_twoway_setting --modify communication='2way'", "modified")
         #self.tst("settings --type global --globalsetting receiver_rxtx_twoway_setting --modify communication='2way'", "modified")
         
@@ -90,20 +90,20 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=codec:mpeg4'           , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=bitrate:2048000'       , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=engine:Gst'            , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=GstPort:11111'         , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=GstAddress:127.0.0.1'  , 'modified')
+        #self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=GstPort:11111'         , 'modified')
+        #self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=GstAddress:127.0.0.1'  , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=source:v4l2src'   , 'modified') 
 
 
         # add subgroup
-        self.tst("settings --type streamsubgroup -g video_receiver_rxtx_twoway_setting --add recv", "subgroup added")
-        self.tst("settings --type streamsubgroup -g video_receiver_rxtx_twoway_setting --subgroup recv --modify enabled=True","modified")     
-        self.tst("settings --type streamsubgroup -g video_receiver_rxtx_twoway_setting --subgroup recv --modify mode='receive'","modified")                                                                                      
+        self.tst("settings --type streamsubgroup -g video_rx --add recv", "subgroup added")
+        self.tst("settings --type streamsubgroup -g video_rx --subgroup recv --modify enabled=True","modified")     
+        self.tst("settings --type streamsubgroup -g video_rx --subgroup recv --modify mode='receive'","modified")                                                                                      
         #add media stream        
-        self.tst("settings --type stream --globalsetting video_receiver_rxtx_twoway_setting --subgroup recv --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting video_receiver_rxtx_twoway_setting --subgroup recv --mediastream video01 --modify setting=10000", "modified")
-        self.tst("settings --type stream --globalsetting video_receiver_rxtx_twoway_setting --subgroup recv --mediastream video01 --modify port=6666", "modified")        
-        self.tst("settings --type stream --globalsetting video_receiver_rxtx_twoway_setting --subgroup recv --mediastream video01 --modify enabled=True", "modified")
+        self.tst("settings --type stream --globalsetting video_rx --subgroup recv --add video", "Media stream added")         
+        self.tst("settings --type stream --globalsetting video_rx --subgroup recv --mediastream video01 --modify setting=10000", "modified")
+        self.tst("settings --type stream --globalsetting video_rx --subgroup recv --mediastream video01 --modify port=6666", "modified")        
+        self.tst("settings --type stream --globalsetting video_rx --subgroup recv --mediastream video01 --modify enabled=True", "modified")
 
 
 #################################################################################################
@@ -115,23 +115,23 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst("settings --type media --add audio_basic_rx", "Media setting added")
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=codec:raw', 'modified')    
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=engine:Gst', 'modified')
-        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=GstPort:22222' , 'modified')
-        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=GstAddress:127.0.0.1', 'modified')
+        #self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=GstPort:22222' , 'modified')
+        #self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=GstAddress:127.0.0.1', 'modified')
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=source:audiotestsrc', 'modified') 
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=channels:2', 'modified')
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=audio_buffer_usec:30000', 'modified')                                                                      
         
 
          # add subgroup
-        self.tst("settings --type streamsubgroup -g audio_receiver_rxtx_twoway_setting --add recv", "subgroup added")
-        self.tst("settings --type streamsubgroup -g audio_receiver_rxtx_twoway_setting --subgroup recv --modify enabled=True","modified")     
-        self.tst("settings --type streamsubgroup -g audio_receiver_rxtx_twoway_setting --subgroup recv --modify mode='receive'","modified")         
+        self.tst("settings --type streamsubgroup -g audio_rx --add recv", "subgroup added")
+        self.tst("settings --type streamsubgroup -g audio_rx --subgroup recv --modify enabled=True","modified")     
+        self.tst("settings --type streamsubgroup -g audio_rx --subgroup recv --modify mode='receive'","modified")         
 
         #add media stream        
-        self.tst("settings --type stream --globalsetting audio_receiver_rxtx_twoway_setting --subgroup recv --add audio", "Media stream added")         
-        self.tst("settings --type stream --globalsetting audio_receiver_rxtx_twoway_setting --subgroup recv --mediastream audio01 --modify setting=10001", "modified")
-        self.tst("settings --type stream --globalsetting audio_receiver_rxtx_twoway_setting --subgroup recv --mediastream audio01 --modify port=6686", "modified")        
-        self.tst("settings --type stream --globalsetting audio_receiver_rxtx_twoway_setting --subgroup recv --mediastream audio01 --modify enabled=True", "modified")
+        self.tst("settings --type stream --globalsetting audio_rx --subgroup recv --add audio", "Media stream added")         
+        self.tst("settings --type stream --globalsetting audio_rx --subgroup recv --mediastream audio01 --modify setting=10001", "modified")
+        self.tst("settings --type stream --globalsetting audio_rx --subgroup recv --mediastream audio01 --modify port=6686", "modified")        
+        self.tst("settings --type stream --globalsetting audio_rx --subgroup recv --mediastream audio01 --modify enabled=True", "modified")
 
         
         
@@ -154,20 +154,20 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=codec:mpeg4'           , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=bitrate:2048000'       , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=engine:Gst'            , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=GstPort:33333'         , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=GstAddress:127.0.0.1'  , 'modified')
+        #self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=GstPort:33333'         , 'modified')
+        #self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=GstAddress:127.0.0.1'  , 'modified')
         self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=source:v4l2src'   , 'modified')       
 
         # add subgroup
-        self.tst("settings --type streamsubgroup -g video_transmit_rxtx_twoway_setting --add send", "subgroup added")
-        self.tst("settings --type streamsubgroup -g video_transmit_rxtx_twoway_setting --subgroup send --modify enabled=True","modified")      
-        self.tst("settings --type streamsubgroup -g video_transmit_rxtx_twoway_setting --subgroup send --modify mode='send'","modified")                                                                                       
+        self.tst("settings --type streamsubgroup -g video_tx --add send", "subgroup added")
+        self.tst("settings --type streamsubgroup -g video_tx --subgroup send --modify enabled=True","modified")      
+        self.tst("settings --type streamsubgroup -g video_tx --subgroup send --modify mode='send'","modified")                                                                                       
         
         #add media stream        
-        self.tst("settings --type stream --globalsetting video_transmit_rxtx_twoway_setting --subgroup send --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting video_transmit_rxtx_twoway_setting --subgroup send --mediastream video01 --modify setting=10002", "modified")
-        self.tst("settings --type stream --globalsetting video_transmit_rxtx_twoway_setting --subgroup send --mediastream video01 --modify port=7000", "modified")        
-        self.tst("settings --type stream --globalsetting video_transmit_rxtx_twoway_setting --subgroup send --mediastream video01 --modify enabled=True", "modified")
+        self.tst("settings --type stream --globalsetting video_tx --subgroup send --add video", "Media stream added")         
+        self.tst("settings --type stream --globalsetting video_tx --subgroup send --mediastream video01 --modify setting=10002", "modified")
+        self.tst("settings --type stream --globalsetting video_tx --subgroup send --mediastream video01 --modify port=7000", "modified")        
+        self.tst("settings --type stream --globalsetting video_tx --subgroup send --mediastream video01 --modify enabled=True", "modified")
 
 #################################################################################################
     #####################AUDIO    
@@ -181,21 +181,21 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst("settings --type media --add audio_basic_tx", "Media setting added")
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=codec:raw'           , 'modified')
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=engine:Gst'            , 'modified')
-        self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=GstPort:33333'         , 'modified')
-        self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=GstAddress:127.0.0.1'  , 'modified')
+        #self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=GstPort:33333'         , 'modified')
+        #self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=GstAddress:127.0.0.1'  , 'modified')
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=source:audiotestsrc'   , 'modified')       
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=channels:2', 'modified')
 
         # add subgroup
-        self.tst("settings --type streamsubgroup -g audio_transmit_rxtx_twoway_setting --add send", "subgroup added")
-        self.tst("settings --type streamsubgroup -g audio_transmit_rxtx_twoway_setting --subgroup send --modify enabled=True","modified")      
-        self.tst("settings --type streamsubgroup -g audio_transmit_rxtx_twoway_setting --subgroup send --modify mode='send'","modified")                                                                                    
+        self.tst("settings --type streamsubgroup -g audio_tx --add send", "subgroup added")
+        self.tst("settings --type streamsubgroup -g audio_tx --subgroup send --modify enabled=True","modified")      
+        self.tst("settings --type streamsubgroup -g audio_tx --subgroup send --modify mode='send'","modified")                                                                                    
         
         #add media stream        
-        self.tst("settings --type stream --globalsetting audio_transmit_rxtx_twoway_setting --subgroup send --add audio", "Media stream added")         
-        self.tst("settings --type stream --globalsetting audio_transmit_rxtx_twoway_setting --subgroup send --mediastream audio01 --modify setting=10003", "modified")
-        self.tst("settings --type stream --globalsetting audio_transmit_rxtx_twoway_setting --subgroup send --mediastream audio01 --modify port=7200", "modified")        
-        self.tst("settings --type stream --globalsetting audio_transmit_rxtx_twoway_setting --subgroup send --mediastream audio01 --modify enabled=True", "modified")
+        self.tst("settings --type stream --globalsetting audio_tx --subgroup send --add audio", "Media stream added")         
+        self.tst("settings --type stream --globalsetting audio_tx --subgroup send --mediastream audio01 --modify setting=10003", "modified")
+        self.tst("settings --type stream --globalsetting audio_tx --subgroup send --mediastream audio01 --modify port=7200", "modified")        
+        self.tst("settings --type stream --globalsetting audio_tx --subgroup send --mediastream audio01 --modify enabled=True", "modified")
 
 
 ####################################################################################################################
