@@ -43,7 +43,7 @@ class AudioVideoGst(GstClient):
        for k,v in parameters.iteritems():
            if k not in ['engine','gst_address','gst_port']:
                gst_parameters.append( (k, v) )      
-       log.debug('AudioVideoGst.apply_settings ' + str(gst_parameters))
+       log.debug('AudioVideoGst.apply_settings group:' + str(group_name) + ' stream: ' + str(stream_name) + ' params: ' + str(gst_parameters))
        gst_address =  '127.0.0.1' # parameters['gst_address']
        gst_port =  gst_ipcp_port_gen.generate_new_port() # parameters['gst_port']
               
