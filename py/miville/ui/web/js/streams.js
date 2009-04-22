@@ -78,6 +78,7 @@ Streams.methods(
 	 */
 	function notify_controllers(self, event){
 		self.upd_start_btn(event);
+		self.upd_global_slct(event);
 	},
 
 	/**
@@ -127,7 +128,7 @@ Streams.methods(
 					'html': setting.name,
 					'value': setting.id
 				});
-				opt.inject(self.global_slct);
+				opt.inject(optgroup);
 			});
 		}
 		
@@ -244,15 +245,17 @@ Streams.methods(
 			self.start_btn.disabled = true;
 			self.start_btn.value = self.start_str;
 		}
-/*
+
 	},
 	
-	function upd_global_setts(self, event) {
+	function upd_global_slct(self, event) {
 		if ('contact_selected' == event) {
-			self.get_setts()
+			var setting = self.contact.get('setting')
+			dbug.info('ICI');
+			dbug.info(setting);
+			self.global_slct.selectedIndex = 0;
 		}
 
-*/
 	}
 
 	

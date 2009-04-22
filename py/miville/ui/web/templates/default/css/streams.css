@@ -5,6 +5,10 @@
 
 #strm_global_setts {
 	width: 150px;
+	margin-left: 10px;
+}
+
+#strm_presets {
 	margin-left: 40px;
 }
 

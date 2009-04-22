@@ -59,6 +59,7 @@ class Addressbook(Widget):
             adb.append({'name':contact.name,
                         'state':contact.state,
                         'auto_answer':contact.auto_answer,
+                        'setting':contact.setting,
                         'auto_created':contact.auto_created,
                         'stream_state':contact.stream_state})
         log.info('receive update: %r' % self)

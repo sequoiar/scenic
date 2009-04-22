@@ -255,6 +255,7 @@ Addressbook.methods(
 				var li = self.list.getElement('li[name=' + item['name'] + ']');
 				li.set('state', item['state']);
 				li.set('stream_state', item['stream_state']);
+				li.set('setting', item['setting']);
 				li.set('auto_created', (item['auto_created'] ? 'true' : ''));
 				if (item['auto_created']) {
 					if (!li.hasClass('auto_created')) {
@@ -272,6 +273,7 @@ Addressbook.methods(
 					'text': item['name'],
 					'name': item['name'],
 					'state': item['state'],
+					'setting': item['setting'],
 					'auto_created': (item['auto_created'] ? 'true' : ''),
 					'stream_state': item['stream_state'],
 					'status': '',

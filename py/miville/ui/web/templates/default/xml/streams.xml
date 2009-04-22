@@ -3,6 +3,7 @@
     n:render="liveFragment">
 	<h3 n:render="i18n">Streams</h3>
 	<input type="button" id="strm_start" value="Start" class="js_help button" disabled="true"></input>
+	<span id="strm_presets" n:render="i18n">Presets:</span>
 	<select id="strm_global_setts" disabled="disabled">
 		<option n:render="i18n">No settings loaded</option>
 	</select>
