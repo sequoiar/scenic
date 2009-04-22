@@ -452,6 +452,44 @@ class Settings(object):
         self.selected_media_setting = name
         return True
 
+def get_init_params(avstream):
+    params = {}
+    id = avstream.setting
+    media_setting = Settings.get_media_setting_from_id(id)
+    params['port'] = avstream.port
+    for k,v in media_setting.settings.iteritems():
+            params[k] = media_setting.settings[k]
+    return params
+
+def split_gst_parameters(global_setting, address):
+    receiver_procs = {}
+    sender_procs = {}
+    
+    for id, group in global_setting.stream_subgroups.iteritems():
+        if group.enabled:
+            # procs is used to select between rx and tx process groups
+            procs = receiver_procs
+            s = group.mode.upper()
+            if s.startswith('SEND'):
+                procs = sender_procs
+                
+            for stream in group.media_streams:
+                if not isinstance(stream, VideoStream):
+                    log.info("split_gst_parameters: stream " + stream.name + " is not a GST stream..." )
+                else:
+                    if stream.enabled:
+                        proc_params = None
+                        if not procs.has_key(stream.sync_group):
+                            procs[stream.sync_group]  = {}
+                            
+                        proc_params = procs[stream.sync_group]
+                        proc_params = procs[stream.sync_group]
+                        # proc_params now points to a valid dict.
+                        params = get_init_params(stream)
+                        params['address'] = address
+                        proc_params[stream.name]= params
+    return receiver_procs, sender_procs
+    
 class GlobalSetting(object):
     """
     Global setting instances contain a list of stream subgroups (see StreamSubGroup class).
@@ -466,35 +504,6 @@ class GlobalSetting(object):
         self.communication = ''
         log.info("GlobalSetting__init__ " + name)
     
-    def _split_gst_parameters(self, address):
-        receiver_procs = {}
-        sender_procs = {}
-        
-        for id, group in self.stream_subgroups.iteritems():
-            if group.enabled:
-                # procs is used to select between rx and tx process groups
-                procs = receiver_procs
-                s = group.mode.upper()
-                if s.startswith('SEND'):
-                    procs = sender_procs
-                    
-                for stream in group.media_streams:
-                    if not isinstance(stream, VideoStream):
-                        log.info("GlobalSetting._split_gst_parameters: stream " + stream.name + " is not a GST stream..." )
-                    else:
-                        if stream.enabled:
-                            proc_params = None
-                            if not procs.has_key(stream.sync_group):
-                                procs[stream.sync_group]  = {}
-                                
-                            proc_params = procs[stream.sync_group]
-                            proc_params = procs[stream.sync_group]
-                            # proc_params now points to a valid dict.
-                            params = stream.get_init_params()
-                            params['address'] = address
-                            proc_params[stream.name]= params
-        return receiver_procs, sender_procs           
-    
     def start_streaming(self, listener, address, settings_channel):
         """
         Starts the audio/video/data streaming between two miville programs. 
@@ -508,11 +517,11 @@ class GlobalSetting(object):
         """
         # TODO first making sure the stream is off...
         # self.stop_streaming()
-        receiver_procs_params, sender_procs_params = self._split_gst_parameters(address)
+        receiver_procs_params, sender_procs_params = split_gst_parameters(self, address)
         
         remote_address  = settings_channel.com_chan.owner.localhost
         log.debug("REMOTE ADDRESS: " + str(remote_address) )
-        remote_sender_procs_params, remote_receiver_procs_params = self._split_gst_parameters(remote_address)
+        remote_sender_procs_params, remote_receiver_procs_params = split_gst_parameters(self, remote_address)
         # send settings to remote miville
         settings_channel.initiate_streaming(receiver_procs_params, sender_procs_params, remote_receiver_procs_params, remote_sender_procs_params)
         
@@ -701,9 +710,8 @@ class DataStream(MediaStream):
     Contains data settings informations.
     """    
     MediaStream.media_stream_kinds['data'] = 'DataStream'
-    
-    def get_init_params(self):
-        return {}
+ 
+
 
 class VideoStream(MediaStream):
     """
@@ -718,18 +726,7 @@ class VideoStream(MediaStream):
         log.error(msg)
         raise SettingsError, msg
 
-    def get_init_params(self):
-        params = {}
-        id = self.setting
-        media_setting = Settings.get_media_setting_from_id(id)
-        
-#        params['gst_port'] = int(media_setting.settings['GstPort'])
-#        params['gst_address'] = media_setting.settings['GstAddress']
-        params['port'] = self.port
-        for k,v in media_setting.settings.iteritems():
-#            if not k.lower().startswith('gst'):
-                params[k] = media_setting.settings[k]
-        return params
+
      
 
 
