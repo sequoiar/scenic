@@ -64,7 +64,6 @@ bool FileSource::instanceExists(const std::string &location)
 }   
 
 /// checks to see if an instance is already available, or creates a new one if needed.
-// FIXME: maybe this should just return the appropriate queue instead of the class?
 GstElement * FileSource::acquire(const std::string &location, MEDIA_TYPE mediaType)
 {
     GstElement *queue = 0;

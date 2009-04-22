@@ -78,7 +78,7 @@ void VideoSender::init_codec()
         source_->setCapsFilter(encoder_->supportedCaps());
     }
 
-    gstlinkable::link(*source_, *encoder_);// FIXME: this shouldn't happen for VideoFileSource
+    gstlinkable::link(*source_, *encoder_);
 }
 
 

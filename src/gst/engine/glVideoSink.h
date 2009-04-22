@@ -69,7 +69,7 @@ class GLImageSink
                 void *data);
 
         static const GLfloat STEP;
-        static GLfloat x_;     // FIXME: separate out gl stuff into separate class
+        static GLfloat x_;     
         static GLfloat y_;
         static GLfloat z_;
         static GLfloat leftCrop_;

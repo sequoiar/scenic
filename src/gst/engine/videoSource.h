@@ -88,7 +88,7 @@ class VideoFileSource
         _GstElement *srcElement() { return identity_; }      
         void init();
 
-        // FIXME: get rid of this
+        // FIXME: maybe just use the queue we acquire?
         _GstElement *identity_;
 
         /// No Copy Constructor

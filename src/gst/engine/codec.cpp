@@ -250,7 +250,8 @@ H263Encoder::~H263Encoder()
 
 std::string H263Encoder::supportedCaps() const
 {
-    // FIXME: hard coded for now
+    // FIXME: this is the only resolution that v4l and h263 can agree on, as h263 only supports
+    // a small set of resolutions
     return std::string("video/x-raw-yuv, width=352, height=288, pixel-aspect-ratio=10/11");
 }
 

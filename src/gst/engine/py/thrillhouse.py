@@ -504,6 +504,7 @@ class MilhouseTests():
         recv, send = self.argfactory('audiovideo')
         send.deinterlace = True
         self.run(recv, send)
+    
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming

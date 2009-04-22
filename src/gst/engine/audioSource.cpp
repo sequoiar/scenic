@@ -159,11 +159,10 @@ void AudioTestSource::sub_init()
             G_TYPE_BOOLEAN, TRUE, "width", G_TYPE_INT, 32, "depth", G_TYPE_INT, 32, "rate", G_TYPE_INT, 
             Pipeline::SAMPLE_RATE, "channels", G_TYPE_INT, 1, NULL);
 
-    // is-live must be true for clocked callback to work properly?
     for (src = sources_.begin(); src != sources_.end() and channelIdx != config_.numChannels(); ++src, ++channelIdx)
     {
         GstPad *pad;
-        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", FREQUENCY[0][channelIdx], "is-live", FALSE, NULL);
+        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", FREQUENCY[0][channelIdx], NULL);
         assert(pad = gst_element_get_static_pad(*src, "src"));
         assert(gst_pad_set_caps(pad, caps));
         g_object_unref(pad);
