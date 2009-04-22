@@ -34,6 +34,7 @@ Streams.methods(
 		
 		// State variables
 		self.contact = null;
+		self.empty = true;
 		
 		// Get elements.
 		self.start_btn = $('strm_start');
@@ -98,38 +99,43 @@ Streams.methods(
 	 */
     function update_settings(self, presets, users) {
 		if (users.length > 0 || presets.length > 0) {
+			self.empty = false;
 			self.global_slct.empty();
 			self.global_slct.disabled = false;
-		}
-
-		if (users.length > 0) {
-			var optgroup = new Element('optgroup', {
-				'label': self.user_str
-			});
-			optgroup.inject(self.global_slct);
 			
-			users.each(function(setting){
-				var opt = new Element('option', {
-					'html': setting.name,
-					'value': setting.id
+			if (users.length > 0) {
+				var optgroup = new Element('optgroup', {
+					'label': self.user_str
 				});
-				opt.inject(optgroup);
-			});
-		}
-		
-		if (presets.length > 0) {
-			var optgroup = new Element('optgroup', {
-				'label': self.preset_str
-			});
-			optgroup.inject(self.global_slct);
+				optgroup.inject(self.global_slct);
+				
+				users.each(function(setting){
+					var opt = new Element('option', {
+						'html': setting.name,
+						'value': setting.id
+					});
+					opt.inject(optgroup);
+				});
+			}
 			
-			presets.each(function(setting){
-				var opt = new Element('option', {
-					'html': setting.name,
-					'value': setting.id
+			if (presets.length > 0) {
+				var optgroup = new Element('optgroup', {
+					'label': self.preset_str
 				});
-				opt.inject(optgroup);
-			});
+				optgroup.inject(self.global_slct);
+				
+				presets.each(function(setting){
+					var opt = new Element('option', {
+						'html': setting.name,
+						'value': setting.id
+					});
+					opt.inject(optgroup);
+				});
+			}
+			
+		} else {
+			self.empty = false;
+			self.global_slct.disabled = true;
 		}
 		
 	},
@@ -260,21 +266,28 @@ Streams.methods(
 	},
 	
 	function upd_global_slct(self, event) {
+		self.global_slct.removeEvents('change');
 		if ('contact_selected' == event) {
 			var setting = self.contact.get('setting')
 			if (setting) {
 				self.global_slct.set('inputValue', setting);
 			} else {
-				dbug.info('We have a problem Roger: setting = 0');
+				dbug.info('We have a problem Roger: setting = null');
 			}
-			self.global_slct.removeEvents('change');
 			self.global_slct.addEvent('change', function(){
 				self.set_setting();
 			});
-			self.global_slct.disabled = false;
+			
+			if (self.empty || self.contact.get('stream_state') != 0 || self.contact.get('auto_created') == 'true') {
+				self.global_slct.disabled = true;
+			} else {
+				self.global_slct.disabled = false;
+			}
+
+		} else if (['contact_unselected',
+					'add_contact'].contains(event)) {
+			self.global_slct.disabled = true;
 		}
-
 	}
-
 	
 );
