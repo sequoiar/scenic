@@ -37,7 +37,7 @@ def _create_stream_engines( listener, mode, procs_params):
     """
     engines = []
     for group_name, sync_group in procs_params.iteritems():
-        log.debug(" sync group: " + group_name) 
+        log.debug(" sync group [" + group_name + "]") 
         engine = None
         for stream_name, stream_params in sync_group.iteritems():
             log.debug("  stream: " + stream_name)
@@ -48,7 +48,7 @@ def _create_stream_engines( listener, mode, procs_params):
                     engine =  audiovideogst.AudioVideoGst()
                 else:
                     raise StreamsError, 'Engine "%s" is not supported' %  engine_name
-            engine.apply_settings(listener, mode, stream_name, stream_params)
+            engine.apply_settings(listener,mode, group_name, stream_name, stream_params)
         engines.append(engine)
     return engines
 

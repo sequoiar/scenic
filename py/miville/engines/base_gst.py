@@ -31,6 +31,7 @@ from miville.protocols import ipcp
 from miville.utils import log
 from miville.utils.common import get_def_name
 
+
 log = log.start('info', 1, 0, 'base_gst')
 
 STOPPED = 0
@@ -68,15 +69,15 @@ class BaseGst(object):
 
 class GstServer(object):
 
-    def __init__(self, mode, port, address): #address='127.0.0.1'
-        log.info("GstServer.__init__(mode = %s, port=%d, address=%s)" % (mode, port, address))
+    def __init__(self, mode, port, address):
+        self.port = port
+        self.address = address
+        self.mode = mode
+        log.info("GstServer.__init__(mode = %s, port=%d, address=%s)" % (self.mode, self.port, self.address))
         self.process = None
         self.conn = None
         self.state = -1
         self.change_state(STOPPED)
-        self.mode = mode
-        self.port = port
-        self.address = address
         self.commands = []
 
     def connect(self):
@@ -112,12 +113,22 @@ class GstServer(object):
         self.conn.add_callback(self.gst_success, 'success')
         self.conn.add_callback(self.gst_failure, 'failure')
         self.conn.add_callback(self.gst_rtp, 'rtp')
-        
+          
         self.change_state(CONNECTED)
         log.info('GST inter-process link created')
+    
+    def _log_with_id(self, msg):
+        
+        
+        try:
+            a = 3
+        except exceptions.AttributeError:
+            pass
+        
+        s = "GstServer" % (self.mode)
         
     def gst_video_init(self, **args):
-        log.info('GST VIDEO INIT acknowledged:  args %s %s' %  (str(args), str(self))  )
+        log.info('GST VIDEO INIT acknowledged:  args %s %s' %  ( str(args), str(self))  )
         self.change_state(STREAMINIT)
 
     def gst_start(self,  **args):
@@ -270,7 +281,7 @@ class GstClient(BaseGst):
     def __init__(self):
         log.debug("GstClient __init__  " + str(self))
     
-    def setup_gst_client(self, mode, port, address): # self, api, mode, port,address='127.0.0.1'
+    def setup_gst_client(self, mode, port, address): 
         log.debug('GstClient.setup_gst_client '+ str(self))
         self._gst = GstServer(mode, port, address)
         self._gst.start_process()

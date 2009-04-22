@@ -27,6 +27,11 @@ from miville.engines.base_gst import GstClient
 from miville.utils import log
 from miville.protocols.ipcp import parse 
 from miville.errors import *
+from miville.utils.common import PortNumberGenerator
+
+
+gst_ipcp_port_gen = PortNumberGenerator(9000, 1)
+gst_av_port_gen = PortNumberGenerator(10000, 10)
 
 log = log.start('debug', 1, 0, 'videoGst')
 
@@ -39,8 +44,9 @@ class AudioVideoGst(GstClient):
            if k not in ['engine','gst_address','gst_port']:
                gst_parameters.append( (k, v) )      
        log.debug('AudioVideoGst.apply_settings ' + str(gst_parameters))
-       gst_address = parameters['gst_address']
-       gst_port = parameters['gst_port']
+       gst_address =  '127.0.0.1' # parameters['gst_address']
+       gst_port =  gst_ipcp_port_gen.generate_new_port() # parameters['gst_port']
+              
        self.setup_gst_client(mode, gst_port, gst_address)
        if stream_name.upper().startswith('VIDEO'):
            self._send_cmd('video_init', gst_parameters)

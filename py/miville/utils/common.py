@@ -41,6 +41,42 @@ log = log.start('debug', 1, 0, 'common')
 # this path is overriden by the core at startup !
 MIVILLE_HOME = os.path.expanduser('~/.miville')
 
+_allocated_ports = []
+
+class PortNumberGenerator(object):
+    
+    def __init__(self, first_port, increment):
+        self.first_port = first_port
+        self.current_port = None
+        self.increment = increment
+    
+    def get_current_port(self):
+        return self.current_port
+    
+    def generate_new_ports(self, count):
+        ports = []
+        for i in range(count):
+            x = self.generate_new_port()
+            ports.append(x)
+        return ports
+        
+    def generate_new_port(self):
+        global _allocated_ports 
+        found = False
+        candidate = self.current_port
+        if not self.current_port:
+            candidate = self.first_port - self.increment
+        
+        while not found:
+            candidate += self.increment
+            if candidate not in _allocated_ports:
+                self.current_port = candidate
+                _allocated_ports.append(self.current_port)
+                found = True
+                
+        return self.get_current_port()
+
+
 def string_to_number(value):
     """
     Returns a number or None if the string
