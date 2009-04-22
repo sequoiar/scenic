@@ -67,7 +67,7 @@ bool FileSource::instanceExists(const std::string &location)
 // FIXME: maybe this should just return the appropriate queue instead of the class?
 GstElement * FileSource::acquire(const std::string &location, MEDIA_TYPE mediaType)
 {
-    GstElement *queue;
+    GstElement *queue = 0;
 
     if (not instanceExists(location))  // make new FileSource if needed
     {
@@ -144,7 +144,7 @@ bool FileSource::isLinked()
 void FileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/, void * data)
 {
     GstStructure *str;
-    GstPad *sinkPad;
+    GstPad *sinkPad = 0;
     GstCaps *caps;
     // now we can link our queue to our new decodebin element
     FileSource *context = static_cast<FileSource*>(data); // data is the FileSource we want

@@ -23,3 +23,5 @@ libgst_a_SOURCES = mediaBase.cpp \
 				   audioLevel.h glVideoSink.h playback.h dv1394.h v4l2util.h fileSource.h
 
 libgst_a_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS)
+
+CXXFLAGS += -O3

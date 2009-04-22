@@ -135,8 +135,6 @@ int discoverAVC(int* port, octlet_t* guid)
 				{
 					rom1394_free_directory(&rom_dir);
 					THROW_ERROR("error reading config rom directory for node " << i);
-                    // /TODO: note: never gets to continue
-					continue;
 				}
 				if (((rom1394_get_node_type(&rom_dir) == ROM1394_NODE_TYPE_AVC) and 
 				         avc1394_check_subunit_type(handle, i, AVC1394_SUBUNIT_TYPE_VCR)) or 

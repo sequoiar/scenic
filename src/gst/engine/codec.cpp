@@ -185,8 +185,6 @@ H264Encoder::H264Encoder() {}
 H264Encoder::~H264Encoder()
 {}
 
-// FIXME: push up common stuff to VideoEncoder base class
-
 void H264Encoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);

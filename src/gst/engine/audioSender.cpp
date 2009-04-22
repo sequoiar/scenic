@@ -97,6 +97,6 @@ void AudioSender::init_payloader()
     payloader_->init();
 
     gstlinkable::link(*encoder_, *payloader_);
-    session_.add(payloader_, remoteConfig_);   // FIXME: session should take RtpPay pointer
+    session_.add(payloader_, remoteConfig_);   
 }
 

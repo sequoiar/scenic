@@ -497,10 +497,17 @@ class MilhouseTests():
         send.videolocation = "/var/tmp/trailer_1080p.ogg"
         self.run(recv, send)
 
+    def test_37_audio_deinterlaced_video(self):
+        """ Test with default args and 5 second timeout """
+        self.countdown('START')
+
+        recv, send = self.argfactory('audiovideo')
+        send.deinterlace = True
+        self.run(recv, send)
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_34')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_37')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__
