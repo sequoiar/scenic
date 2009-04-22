@@ -56,7 +56,7 @@ Streams.methods(
 	
 	/**
 	 * -----------------
-	 * Utility functions
+	 * Utility methods
 	 * -----------------
 	 */
 	
@@ -192,6 +192,17 @@ Streams.methods(
 	},
 
 	/**
+	 * Save the newly selected global settings in the selected contact.
+	 * (call from the client)
+	 * 
+	 * @member Streams
+	 */
+	function set_setting(self) {
+		var setting = self.global_slct.get('inputValue');
+		self.callRemote('rc_set_setting', self.contact.get('name'), setting);
+	},
+
+	/**
 	 * ------------------
 	 * Update controllers
 	 * ------------------
@@ -251,9 +262,16 @@ Streams.methods(
 	function upd_global_slct(self, event) {
 		if ('contact_selected' == event) {
 			var setting = self.contact.get('setting')
-			dbug.info('ICI');
-			dbug.info(setting);
-			self.global_slct.selectedIndex = 0;
+			if (setting) {
+				self.global_slct.set('inputValue', setting);
+			} else {
+				dbug.info('We have a problem Roger: setting = 0');
+			}
+			self.global_slct.removeEvents('change');
+			self.global_slct.addEvent('change', function(){
+				self.set_setting();
+			});
+			self.global_slct.disabled = false;
 		}
 
 	}

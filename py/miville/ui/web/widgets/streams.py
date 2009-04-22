@@ -46,6 +46,10 @@ class Streams(Widget):
         self.api.list_global_setting(self)
         return False
         
+    def rc_set_setting(self, contact, setting):
+        self.api.modify_contact(self, contact, setting=setting)
+        return False
+        
     def cb_list_global_setting(self, origin, data):
         preset_settings = []
         user_settings = []
