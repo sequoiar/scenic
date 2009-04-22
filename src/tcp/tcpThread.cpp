@@ -142,7 +142,7 @@ bool TcpThread::gotQuit()
             return false;
         }
     }
-    usleep(25000);
+    usleep(MILLISEC_WAIT*1000);
     return false;
 }
 
@@ -189,7 +189,7 @@ std::string tcpGetBuffer(int port, int &id)
     QueuePair& queue = tcp.getQueue();
     for(;;)
     {
-        MapMsg f = queue.timed_pop(2000);
+        MapMsg f = queue.timed_pop(1);
         if(f.cmd())
         {
             try
@@ -213,6 +213,10 @@ std::string tcpGetBuffer(int port, int &id)
                 if (f.cmd() == "quit")
                     throw e;
             }
+        }
+        else
+        {
+            usleep(MILLISEC_WAIT*1000);
         }
     }
     return ret;

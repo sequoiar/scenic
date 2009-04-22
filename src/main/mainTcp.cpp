@@ -126,7 +126,7 @@ bool MainModule::run()
                     tmsg = tcp_queue.timed_pop(1);
                 }
             }
-            usleep(10000);
+            usleep(MILLISEC_WAIT*1000);
         }
     }
     catch(ErrorExcept e)

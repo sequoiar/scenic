@@ -147,7 +147,7 @@ void GstThread::main()
     f = queue_.timed_pop(1);
     }while(f.cmd());
     }
-    usleep(25000);
+    usleep(MILLISEC_WAIT*1000);
     }
 
 }

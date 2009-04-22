@@ -36,6 +36,9 @@ AC_ARG_ENABLE([debug], [
   --enable-debug  debug symbols, build test programs, stricter compile ],, 
         enable_debug=yes)
 
+AC_ARG_ENABLE([millisec_wait], [ --enable-millisec-wait=(millisecs) thread sleep time],,millisec_wait=10)
+AC_DEFINE_UNQUOTED(MILLISEC_WAIT,[${millisec_wait}], wait time)
+
 AC_ARG_ENABLE([asio], [ **************** 
   --enable-asio build asio],,enable_asio=yes)
   

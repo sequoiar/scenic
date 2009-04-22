@@ -135,7 +135,7 @@ class tcp_session
                 }
                 else
                 {
-                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(25));
+                    t_.expires_at(t_.expires_at() + boost::posix_time::millisec(MILLISEC_WAIT));
                     t_.async_wait(boost::bind(&tcp_session::handle_timer,this, error));
                 }
             }
