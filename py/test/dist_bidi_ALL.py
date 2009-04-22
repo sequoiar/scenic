@@ -178,13 +178,15 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         #add media stream        
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --add video", "Media stream added")         
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream video01 --modify setting=10000", "modified")
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream video01 --modify port=6696", "modified")        
+        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream video01 --modify port=6696", "modified")
+        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream video01 --modify sync_group=\"video\"", "modified")        
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream video01 --modify enabled=True", "modified")
 
                                                                                  
         #add media stream        
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --add audio", "Media stream added")         
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream audio01 --modify setting=10001", "modified")
+        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream audio01 --modify sync_group=\"audio\"", "modified")
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream audio01 --modify port=6666", "modified")        
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream audio01 --modify enabled=True", "modified")
 
@@ -283,13 +285,15 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         #add media stream        
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --add video", "Media stream added")         
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream video01 --modify setting=10002", "modified")
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream video01 --modify port=6680", "modified")        
+        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream video01 --modify port=6680", "modified") 
+        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream video01 --modify sync_group=\"video\"", "modified")       
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream video01 --modify enabled=True", "modified")
 
         
         #add media stream        
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --add audio", "Media stream added")         
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream audio01 --modify setting=10003", "modified")
+        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream video01 --modify sync_group=\"audio\"", "modified")
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream audio01 --modify port=7200", "modified")        
         self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream audio01 --modify enabled=True", "modified")
 
