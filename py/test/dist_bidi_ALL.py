@@ -76,7 +76,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         #10005        
         ###Audio Two way
         self.tst("settings --type global --add audio_rxtx", "Global setting added")
-        #10007
+        #10006
         ####AV Two way sync
         self.tst("settings --type global --add AV_rxtx", "Global setting added")
         
@@ -90,9 +90,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         
 ################################VIDEO###############################################
 
-        
-        # set the global setting id of the contact to allgdb _tx_setting's id
-        #self.tst("contacts --modify setting=10000","Contact modified") 
+      
        
         # add media receiver setting 
         self.tst("settings --type media --add mpeg4_basic_rx", "Media setting added")
@@ -267,12 +265,12 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
   # add subgroup
         self.tst("settings --type streamsubgroup -g audio_rxtx --add send", "subgroup added")
         self.tst("settings --type streamsubgroup -g audio_rxtx --subgroup send --modify enabled=True","modified")     
-        self.tst("settings --type streamsubgroup -g audio_rxtx --subgroup send --modify mode='receive'","modified")                                                                                      
+        self.tst("settings --type streamsubgroup -g audio_rxtx --subgroup send --modify mode='send'","modified")                                                                                      
         #add media stream        
-        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup send --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup send --mediastream video01 --modify setting=10003", "modified")
-        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup send --mediastream video01 --modify port=6666", "modified")        
-        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup send --mediastream video01 --modify enabled=True", "modified")
+        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup send --add audio", "Media stream added")         
+        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup send --mediastream audio01 --modify setting=10003", "modified")
+        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup send --mediastream audio01 --modify port=6686", "modified")        
+        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup send --mediastream audio01 --modify enabled=True", "modified")
 
 
 ################For two way video and audio ##########
