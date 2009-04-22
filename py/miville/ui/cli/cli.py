@@ -64,6 +64,7 @@ from miville.utils import Observer, log # also imports Observer and Subject from
 
 from miville.utils.i18n import to_utf
 from miville.utils.common import find_callbacks
+from miville.settings import Settings
 # from streams.stream import AudioStream, VideoStream, DataStream
 
 
@@ -1107,22 +1108,25 @@ class CliView(Observer):
             else:
                 got_some = False
                 (global_settings, media_settings) = data
-                txt = "\nGLOBAL SETTINGS:\n"
+                txt = "GLOBAL SETTINGS:\n"
                 for k, v in global_settings.iteritems():
-                    txt += " [" + str(k) + "] " + v.name + "\n"
+                    txt += "\n[" + str(k) + "] global setting  " + v.name + "\n"
                     for gid,group in v.stream_subgroups.iteritems():
-                        txt += "  [" + str(gid) + "] " + group.name + "\n"
+                        txt += "  [" + str(gid) + "] stream sub group " + group.name + "\n"
                         txt += "   enabled: " + str(group.enabled) + "\n"
                         txt += "   mode: " + str(group.mode) + "\n"
                         for stream in group.media_streams:
-                            txt += "   " + stream.name + "\n"
+                            txt += "   [" + stream.name + "] stream\n"
                             txt += "    enabled: " + str(stream.enabled) + "\n"
                             txt += "    sync: " + stream.sync_group + "\n"
-                            txt += "    port: %s\n" % str(stream.port) + "\n"
+                            txt += "    port: " + str(stream.port) + "\n"
                             txt += "    media setting: %s\n" % str(stream.setting)
-
+                            media_setting = Settings.get_media_setting_from_id(stream.setting)
+                            txt += "      [" + str(media_setting.id) + "] media setting '" + media_setting.name + "'\n"
+                            for key, value in media_setting.settings.iteritems():
+                                txt += "       %s : %s\n" % (key, str(value))
                         
-                txt += "\nMEDIA SETTINGS...\n"
+                txt += "\nAll MEDIA SETTINGS...\n"
                 for k, v in media_settings.iteritems():
                     txt += " [" + str(k) + "] " + v.name + "\n"
                     for key, value in v.settings.iteritems():
