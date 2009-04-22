@@ -402,6 +402,10 @@ class NetworkTester(object):
         global _is_currently_busy 
         global _version_is_supported
         global SUPPORTED_VERSIONS
+        log.debug('start_test: b=%s t=%s k=%s u=%s' % (bandwidth_megabits, duration, kind, unit))
+        if kind is KIND_TRADEOFF:
+            log.error('tradeoff is not supported for now !')
+            return False
 
         # TODO: remove com_chan argument
         # TODO: remove address argument
@@ -419,7 +423,8 @@ class NetworkTester(object):
             self.current_duration = duration # seconds
             self.current_caller = caller # instance
             self.current_results_sent = False
-            if unit is not MEGABITS and unit is not KILOBITS:
+            unit = unit.strip().upper()
+            if unit != MEGABITS and unit != KILOBITS:
                 log.error("Invalid unit for bandwidth: %s" % (unit))
                 unit = MEGABITS
             self.current_unit = unit
@@ -470,6 +475,7 @@ class NetworkTester(object):
             "-u" # UDP
         ]
         command.append("-b")
+        log.debug("current unit " + self.current_unit)
         command.append("%d%s" % (self.current_bandwidth, self.current_unit)) # bandwidth (megabits)
         if self.current_kind == KIND_TRADEOFF:
             command.append("-r") # tradeoff.
@@ -604,7 +610,7 @@ class NetworkTester(object):
                     'unit':self.current_unit,
                     #'remote_addr':self.current_remote_addr
                 }
-                log.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX latency: %f seconds." % (self.current_latency / 2.0))
+                # log.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX latency: %f seconds." % (self.current_latency / 2.0))
                 self._send_message("start", [self.current_kind, params])
                 wait_for = self.current_latency
                 log.debug("Will start iperf client in %f seconds" % wait_for)
@@ -670,7 +676,6 @@ class NetworkTester(object):
          * 'remote' : stats for remote to local
          * 'contact' : the name of the contact the test has been done with.
         """
-        # TODO: use
         #self.remote_results_timeout = 5 # how many extra seconds over the duration of a test to wait for remote stats before giving up.
         if not self.current_results_sent:
             must_have_local = True
@@ -691,6 +696,7 @@ class NetworkTester(object):
                     key = 'remote'
                     results[key]['contact'] = str(self.current_contact)
                     results[key]['latency'] = self.current_latency / 2.0
+                    results[key]['unit'] = self.current_unit
                     print str(self.current_contact)
             if must_have_local:
                 if self.current_stats_local is None:
@@ -700,6 +706,7 @@ class NetworkTester(object):
                     key = 'local'
                     results[key]['contact'] = str(self.current_contact) # TODO: remove duplicate code here.
                     results[key]['latency'] = self.current_latency / 2.0
+                    results[key]['unit'] = self.current_unit
             if ok:
                 results['contact'] = self.current_contact
                 self.notify_api(self.current_caller, "network_test_done", results)
@@ -842,7 +849,8 @@ def check_iperf_version():
     try:
         commands.single_command_start(command, callback, extra_arg, caller)
     except CommandNotFoundError, e: 
-        log.error("CommandNotFoundError %s" % e.message)
+        pass
+        # log.error("CommandNotFoundError %s" % e.message)
 
 def _on_iperf_version_results(results, commands, extra_arg, caller):
     """

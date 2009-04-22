@@ -68,7 +68,7 @@ from miville.settings import Settings
 # from streams.stream import AudioStream, VideoStream, DataStream
 
 
-log = log.start('info', 1, 0, 'cli')
+log = log.start('debug', 1, 0, 'cli')
 
 ESC = chr(27)
 enable_escape_sequences = True # disable this if you want not to show bold text, clear terminal page, etc.
@@ -705,7 +705,7 @@ class CliController(TelnetServer):
         kind = "localtoremote"
         caller = self
         unit = 'M'
-
+        log.debug('------------ CLI : query for network test ----------')
         if options.description:
             cp.print_description()
         #elif options.stop:
@@ -719,6 +719,7 @@ class CliController(TelnetServer):
                 duration = options.time
             if options.unit:
                 unit = options.unit
+                log.debug('CLI IPERF unit ' + unit)
             self.core.network_test_start(caller, bandwidth, duration, kind, None, unit)
         else: # options.help
             cp.print_help()

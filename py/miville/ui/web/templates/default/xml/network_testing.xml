@@ -8,20 +8,23 @@
         <table style="width:100%; padding:10px; font-size:11px;">
             <tr>
                 <td align="right">Bandwidth: </td>
-                <td><input type="text" id="nettest_bandwidth" value="10" style="width: 40px;text-align: right;font-size:11px;" /> Mbps</td>
+                <td><input type="text" id="nettest_bandwidth" value="10" style="width: 50px;text-align: right;font-size:11px;" /> <select style="font-size:11px; width: 80px;" id="nettest_unit">
+                <option selected="true" value="M">Mbps</option>
+                <option value="K">Kbps</option>
+                </select></td>
             </tr>
             <tr>
                 <td align="right">Test duration: </td>
-                <td><input type="text" id="nettest_duration" value="1"  style="width: 40px;text-align: right;font-size:11px;" /> seconds</td>
+                <td><input type="text" id="nettest_duration" value="10"  style="width: 40px;text-align: right;font-size:11px;" /> seconds</td>
             </tr>
             <tr>
                 <td align="right">Mode:</td>
                 <td>
-                    <select style="font-size:11px;width: 140px;">
-                        <option>from local to remote</option>
-                        <option>from remote to local</option>
-                        <option>bidirectionnal sequential</option>
-                        <option selected="true">bidirectional simultaneous</option>
+                    <select style="font-size:11px;width: 140px;" id="nettest_kind">
+                        <option value="localtoremote">from local to remote</option>
+                        <option value="remotetolocal">from remote to local</option>
+                        <option value="tradeoff">bidirectionnal sequential</option>
+                        <option value="dualtest" selected="true">bidirectional simultaneous</option>
                     </select>
                 </td>
             </tr>

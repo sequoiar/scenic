@@ -1,3 +1,21 @@
+// Miville
+// Copyright (C) 2008 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
+//
+// This file is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// Miville is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Miville. If not, see <http://www.gnu.org/licenses/>.
+
 // import Nevow.Athena
 
 NetworkTesting = Nevow.Athena.Widget.subclass('NetworkTesting');
@@ -48,6 +66,8 @@ NetworkTesting.methods(
 		self.message_div = $('nettest_message');
         self.duration_fld = $('nettest_duration');
         self.bandwidth_fld = $('nettest_bandwidth');
+        self.unit_popup = $('nettest_unit');
+        self.kind_popup = $('nettest_kind');
 		
 		// Get string translations.
 		self.start_str = $('js_nettest_start').get('text'); // start string
@@ -64,7 +84,7 @@ NetworkTesting.methods(
 		self.is_number = new InputValidator('required_number', {
 		    errorMsg: 'This field is required and must be a number.',
 		    test: function(field) {
-                var regexp = /^\d+$/; // REGEX: digit or empty
+                var regexp = /^\d+$/;
                 if (field.value == null) {
                     return false;
                 } else if (field.value.length == 0) {
@@ -147,16 +167,41 @@ NetworkTesting.methods(
 	 */
 	function start_test(self) {
         // TODO: add duration, bandwidth and kind
-        var duration = self.duration_fld.value;
-        var bandwidth = self.bandwidth_fld.value;
+		var valid = true;
 
-		self.callRemote('rc_start_test', self.contact.get('name'));
-        self.start_btn.disabled = true;
-        self.message_div.innerHTML = "";
-        var img = new Element('img').setProperty('src', 'img/macthrob-small.png').injectInside(self.message_div);
-        img.setProperty("style", "position:relative;top:4px;");
-        var span = new Element('span').appendText(" Test in progress...").injectInside(self.message_div);
-	},
+        // validation
+		//self.is_number
+        self.duration_fld = $('nettest_duration');
+        self.bandwidth_fld = $('nettest_bandwidth');
+        // input validation
+		if (self.is_number.test(self.bandwidth_fld) == false) {
+			valid = false;
+			self.bandwidth_fld.addClass('notify'); // makes it red
+			dbug.info(self.is_number.getError(self.bandwidth_fld));
+		}
+		if (self.is_number.test(self.duration_fld) == false) {
+			valid = false;
+			self.duration_fld.addClass('notify'); // makes it red
+			dbug.info(self.is_number.getError(self.duration_fld));
+		}
+        if (valid == true) {
+            var duration = parseInt(self.duration_fld.value);
+            var bandwidth = parseInt(self.bandwidth_fld.value);
+            var unit = self.unit_popup.value;
+            var kind = self.kind_popup.value;
+
+			self.bandwidth_fld.removeClass('notify'); // remove the red
+			self.duration_fld.removeClass('notify'); // remove the red
+			dbug.info('bw:' + bandwidth + " dur:" + duration + ' unit:' + unit + ' kind:' + kind);
+            self.callRemote('rc_start_test', self.contact.get('name'), bandwidth, duration, kind, unit);
+            self.start_btn.disabled = true;
+            self.message_div.innerHTML = "";
+            var img = new Element('img').setProperty('src', 'img/macthrob-small.png').injectInside(self.message_div);
+            img.setProperty("style", "position:relative;top:4px;");
+            var span = new Element('span').appendText(" Test in progress...").injectInside(self.message_div);
+	    }
+    },
+
 
 	/**
 	 * Stops the streams of this contact.
@@ -227,6 +272,17 @@ NetworkTesting.methods(
 			self.start_btn.value = self.start_str;
 		}
 	},
+    /**
+     * Error message that makes the whole window black
+     *
+     * Should be called when invalid info is given by the user.
+     *
+	 * @member NetworkTesting
+     * @param {string} Error message.
+     */
+    function blackscreen_error(self, msg) {
+    	StickyWin.alert('Error', msg);
+    },
 	/**
      * Called when a network test error occurs.
 	 * (called from python server)
@@ -235,8 +291,8 @@ NetworkTesting.methods(
      * @param {string} Error message.
 	 */
     function nettest_error(self, error_text) {
-        self.message_div.innerHTML = "" + error_text;
-        var p = new Element('p').appendText('Performance Test Results with ' + contact).injectInside(self.message_div);
+        self.message_div.innerHTML = ""
+        var p = new Element('p').appendText(error_text).injectInside(self.message_div);
         self.start_btn.disabled = false;
     },
 	/**
@@ -250,12 +306,12 @@ NetworkTesting.methods(
      * @param {string} msg Some string to display to the user... 
      * @param {string} details A big dict with results. 
 	 */
-	function test_results(self, contact, data, local_data, remote_data) {
+	function test_results(self, contact_name, local_data, remote_data) {
         dbug.info("NETTEST: test_results called");
 		// check if contact exist in the list and get it
-        //var owner = self.list.getElement('li[name=' + contact + ']')
+        //var owner = self.list.getElement('li[name=' + contact_name + ']')
         self.message_div.innerHTML = "";
-        var h1 = new Element('strong').appendText('Performance Test Results with ' + contact).injectInside(self.message_div);
+        var h1 = new Element('strong').appendText('Performance Test Results with ' + contact_name).injectInside(self.message_div);
         
         var txt = "";
         var latency = 0.0;
@@ -287,8 +343,6 @@ NetworkTesting.methods(
             txt += "\n";
         }
         if (remote_data != null) {
-            if (local_data == null) {
-            }
             txt += "From remote to local \n";
             txt += "  Bandwidth : " + (remote_data.speed / 1000000.0) + " Mbps\n";
             txt += "  Jitter : " + remote_data.jitter + " ms\n";
@@ -309,11 +363,11 @@ NetworkTesting.methods(
 				owner.set('error', details);
 				dbug.info(details);
 			}
-			if (contact == self.selected) {
+			if (contact_name == self.selected) {
 				self.notify_controllers('test_results');
 			}
 		} else {
-			dbug.info('NO owner - Contact: ' + contact);
+			dbug.info('NO owner - Contact: ' + contact_name);
 		}
         */
 	}

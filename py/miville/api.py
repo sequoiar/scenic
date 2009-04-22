@@ -66,9 +66,9 @@ from miville import settings
 from miville.utils import log
 from miville.utils.common import string_to_number 
 
-log = log.start('info', 1, 0, 'api') # added by hugo
+log = log.start('debug', 1, 0, 'api') # added by hugo
 
-
+# TODO: remove this function from here please ! 
 def modify(who, name_of_who, what, new_value):
     """
     Given an object reference, returns a command that modifies the value of a member
@@ -898,6 +898,14 @@ class ControllerApi(object):
         :param contact: addressbook.Contact object.
         :param unit: either 'M' or 'K' for megabits and kilobits.
         """
+        unit = unit.strip().upper()
+        if unit == 'M':
+            unit = network.MEGABITS
+        elif unit == 'K':
+            unit = network.KILOBITS
+        else:
+            unit = network.MEGABITS
+            log.error('network_test_start: invalid unit : ' + unit + ' Changed to M.')
         # TODO: accept a contact name instead of contact object ? 
         try:
             if contact is None:
@@ -936,7 +944,10 @@ class ControllerApi(object):
                     except KeyError:
                         self.notify(caller, "Could not start network test: Invalid kind of test \"%s\"." % kind, "network_test_error")
                     else:
-                        ret = tester.start_test(caller, bandwidth, duration, kind, unit) # TODO: dont need com_chan arg anymore
+                        log.debug('iperf bandwidth unit : ' + unit)
+                        log.debug('network_test_start %s %s %s %s %s' %  (caller, bandwidth, duration, kind, unit))
+                        ret = tester.start_test(caller, bandwidth, duration, kind, unit)
+                        # TODO: dont need com_chan arg anymore
                         if ret:
                             log.debug("Will notify observer that we are starting a network test")
                             self.notify(caller, "Starting network performance test with contact %s for %d seconds..." % (contact.name, duration), "network_test_start")
