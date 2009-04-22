@@ -723,11 +723,11 @@ class VideoStream(MediaStream):
         id = self.setting
         media_setting = Settings.get_media_setting_from_id(id)
         
-        params['gst_port'] = int(media_setting.settings['GstPort'])
-        params['gst_address'] = media_setting.settings['GstAddress']
+#        params['gst_port'] = int(media_setting.settings['GstPort'])
+#        params['gst_address'] = media_setting.settings['GstAddress']
         params['port'] = self.port
         for k,v in media_setting.settings.iteritems():
-            if not k.lower().startswith('gst'):
+#            if not k.lower().startswith('gst'):
                 params[k] = media_setting.settings[k]
         return params
      
