@@ -37,7 +37,7 @@ log = log.start('debug', 1, 0, 'videoGst')
 
 class AudioVideoGst(GstClient):
          
-    def apply_settings(self, listener, mode, stream_name, parameters ):
+    def apply_settings(self, listener, mode, group_name, stream_name, parameters ):
        self.mode = mode
        gst_parameters = []
        for k,v in parameters.iteritems():
