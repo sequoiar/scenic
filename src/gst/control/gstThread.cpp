@@ -140,10 +140,7 @@ void GstThread::main()
             }
 #endif
             else if (s == "rtp")
-            {
-                // FIXME: MAKE SURE THIS WORKS
                 queue_.push(f);
-            }
             else
                 LOG_WARNING("Unknown Command.");
         }
@@ -178,7 +175,7 @@ void GstReceiverThread::video_start(MapMsg& msg)
     try
     {
         LOG_INFO("video_init");
-        const int SCREEN_NUM = 0;
+        const int SCREEN_NUM = 0;       
         const char *VIDEO_SINK = "xvimagesink";
         video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], SCREEN_NUM, VIDEO_SINK);
 //        queue_.push(MapMsg("video_started"));
@@ -232,7 +229,6 @@ void GstSenderThread::video_start(MapMsg& msg)
 {
     delete video_;
     video_ = 0;
-    VideoSender* sender;
     try
     {
         //VideoSourceConfig config("dv1394src");
@@ -245,7 +241,7 @@ void GstSenderThread::video_start(MapMsg& msg)
             videoDevice = static_cast<std::string>(msg["device"]);
 
         VideoSourceConfig config(msg["source"], msg["bitrate"], videoDevice, videoLocation, msg["deinterlace"]);
-        video_ = sender = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
+        video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
 
         ff[0] = boost::bind(tcpSendBuffer, msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, videofactory::MSG_ID, _1);
         //sender->getCaps());
@@ -267,7 +263,6 @@ void GstSenderThread::audio_start(MapMsg& msg)
     audio_ = 0;
     try
     {
-        AudioSender* asender;
         LOG_INFO("audio_init");
         std::string audioDevice, audioLocation;
         
@@ -278,7 +273,7 @@ void GstSenderThread::audio_start(MapMsg& msg)
 
 //        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
         AudioSourceConfig config(msg["source"], audioDevice, audioLocation, msg["channels"]);
-        audio_ = asender = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
+        audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
 
         ff[1] = boost::bind(tcpSendBuffer,msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, audiofactory::MSG_ID, _1);
         //Build Caps Msg
