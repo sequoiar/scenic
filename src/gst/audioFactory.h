@@ -25,7 +25,7 @@
 #define _AUDIO_FACTORY_H_
 
 #include "gst/engine.h"
-#include "tcp/singleBuffer.h"
+#include "tcp/tcpThread.h"
 
 #include "ports.h"
 
