@@ -5,3 +5,4 @@ noinst_LIBRARIES = libtcp.a
 libtcp_a_SOURCES = tcpServer.cpp tcpThread.cpp asioThread.cpp
 
 libtcp_a_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS) 
+AM_CXXFLAGS = -Wno-effc++

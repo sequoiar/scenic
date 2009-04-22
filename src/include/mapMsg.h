@@ -29,10 +29,13 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+
+class MapMsg;
 /// container class for variable types used by MapMsg 
 class StrIntFloat
 {
 friend std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
+friend class MapMsg;
     public:
         StrIntFloat()
             : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(),key_(){}
@@ -63,8 +66,7 @@ friend std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
         double f_;
         Except e_;
         std::vector<double> F_;
-    public: //HACK
-        std::string key_;
+        std::string key_; //HACK
 };
 
 std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
@@ -76,30 +78,13 @@ class MapMsg
 public:
     typedef std::map<std::string, StrIntFloat> MapMsg_;
     typedef const std::pair<const std::string,StrIntFloat>* Item;
-private:
-    friend std::ostream& operator<< (std::ostream& os, const MapMsg&);
-    friend Item GetBegin(MapMsg& m);
-    friend Item GetNext(MapMsg& m);
-
-    MapMsg_ map_;
-    MapMsg_::const_iterator it_;
-public:
     MapMsg():map_(),it_(){}
     MapMsg(std::string command):map_(),it_(){ cmd() = command;}
     StrIntFloat &cmd() { return (*this)["command"]; }
     StrIntFloat &operator[](const std::string& str);
-    bool tokenize(const std::string& str)
-    {   return tokenize(str,*this); }
-    bool stringify(std::string& str) const
-    {   return stringify(*this,str); }
-private:
-    static bool tokenize(const std::string& str, MapMsg &cmd_map);
-    static bool stringify(const MapMsg& cmd_map, std::string& rstr);
-    Item begin();
-    Item next();
-public:
+    bool tokenize(const std::string& str) {   return tokenize(str,*this); }
+    bool stringify(std::string& str) const {   return stringify(*this,str); }
     void clear(){map_.clear();}
-
 
 /** Used by code that needs to post messages but does not use 
  * a MsgThread class (gst/audioLevel.cpp) send a MapMsg to Subscriber */
@@ -114,6 +99,18 @@ public:
             virtual void operator()(MapMsg&){}
             virtual ~Subscriber();
     };
+private:
+    friend std::ostream& operator<< (std::ostream& os, const MapMsg&);
+    friend Item GetBegin(MapMsg& m);
+    friend Item GetNext(MapMsg& m);
+
+    MapMsg_ map_;
+    MapMsg_::const_iterator it_;
+    static bool tokenize(const std::string& str, MapMsg &cmd_map);
+    static bool stringify(const MapMsg& cmd_map, std::string& rstr);
+    Item begin();
+    Item next();
+
 };
 
 std::ostream& operator<< (std::ostream& os, const MapMsg&);
