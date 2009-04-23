@@ -72,8 +72,6 @@ void VideoReceiver::init_depayloader()
     gstlinkable::link(*depayloader_, *decoder_);
 
     session_.add(depayloader_, remoteConfig_);
-
-    //session_.setCaps(decoder_->getCaps());
 }
 
 

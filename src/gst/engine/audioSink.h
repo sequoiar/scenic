@@ -37,8 +37,6 @@ class AudioSink : public GstLinkableSink
         
         ~AudioSink();
        
-        std::string getCaps();
-
         virtual void init() = 0;
 
     protected:
@@ -46,6 +44,8 @@ class AudioSink : public GstLinkableSink
         const static unsigned long long BUFFER_TIME;
 
     private:
+        static bool signalHandlerAttached_;
+        static void FPE_ExceptionHandler(int nSig, int nErrType, int *pnReglist);
         _GstElement *sinkElement() { return sink_; }
 
         /// No Copy Constructor 

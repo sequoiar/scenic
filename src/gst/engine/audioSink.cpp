@@ -23,6 +23,7 @@
 #include "util.h"
 
 #include <gst/gst.h>
+#include <signal.h>
 #include "audioSink.h"
 #include "audioConfig.h"
 #include "jackUtils.h"
@@ -31,11 +32,19 @@
 
 // const unsigned long long AudioSink::BUFFER_TIME = 10000LL; better
 // const unsigned long long AudioSink::BUFFER_TIME = 30000LL; safer 
+bool AudioSink::signalHandlerAttached_ = false;
         
 /// Constructor 
 AudioSink::AudioSink() : 
     sink_(0)
-{}
+{
+    // attach floating point exception signal handler
+    if (!signalHandlerAttached_)
+    {
+        signal(SIGFPE, (void (*)(int))FPE_ExceptionHandler);
+        signalHandlerAttached_ = true;
+    }
+}
 
 /// Destructor 
 AudioSink::~AudioSink()
@@ -43,11 +52,44 @@ AudioSink::~AudioSink()
     Pipeline::Instance()->remove(&sink_);
 }
 
-/// Returns this AudioSink's caps 
-std::string AudioSink::getCaps()
+
+/// This is just declared here because if the buffer-time property for our sink is 
+/// set to low it causes a system level floating point exception, that can only be
+/// caught by a signal hander.
+void AudioSink::FPE_ExceptionHandler(int /*nSig*/, int nErrType, int * /*pnReglist*/)
 {
-    return Pipeline::Instance()->getElementPadCaps(sink_, "sink");
+    std::string jackWarning(": this COULD be because the buffer-time of an audiosink is too low");
+    switch(nErrType)
+    {
+        case FPE_INTDIV:  
+            THROW_ERROR("Integer divide by zero" << jackWarning);
+            break;
+        case FPE_INTOVF:  
+            THROW_ERROR("Integer overflow" << jackWarning);
+            break;
+        case FPE_FLTDIV:  
+            THROW_ERROR("Floating-point divide by zero" << jackWarning);
+            break;
+        case FPE_FLTOVF:  
+            THROW_ERROR("Floating-point overflow" << jackWarning);
+            break;
+        case FPE_FLTUND: 
+            THROW_ERROR("Floating-point underflow" << jackWarning);
+            break;
+        case FPE_FLTRES:
+            THROW_ERROR("Floating-point inexact result" << jackWarning);
+            break;
+        case FPE_FLTINV: 
+            THROW_ERROR("Invalid floating-point operation" << jackWarning);
+            break;
+        case FPE_FLTSUB:
+            THROW_ERROR("Subscript out of range" << jackWarning);
+            break;
+        default:
+            THROW_ERROR("Got floating point exception" << jackWarning);
+    }
 }
+
 
 /// Constructor 
 AudioAlsaSink::AudioAlsaSink(const AudioSinkConfig &config) : 
