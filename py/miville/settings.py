@@ -452,16 +452,9 @@ class Settings(object):
         self.selected_media_setting = name
         return True
 
-def get_init_params(avstream):
-    params = {}
-    id = avstream.setting
-    media_setting = Settings.get_media_setting_from_id(id)
-    params['port'] = avstream.port
-    for k,v in media_setting.settings.iteritems():
-            params[k] = media_setting.settings[k]
-    return params
 
 def split_gst_parameters(global_setting, address):
+    
     receiver_procs = {}
     sender_procs = {}
     
@@ -485,7 +478,15 @@ def split_gst_parameters(global_setting, address):
                         proc_params = procs[stream.sync_group]
                         proc_params = procs[stream.sync_group]
                         # proc_params now points to a valid dict.
-                        params = get_init_params(stream)
+
+                        # get params from media stream
+                        params = {}
+                        media_setting = Settings.get_media_setting_from_id(stream.setting)
+                        params['port'] = stream.port
+                        for k,v in media_setting.settings.iteritems():
+                                params[k] = media_setting.settings[k]
+                        
+                        
                         params['address'] = address
                         proc_params[stream.name]= params
     return receiver_procs, sender_procs
