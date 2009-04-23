@@ -305,9 +305,9 @@ NetworkTesting.methods(
      * See miville/network.py for the list of fields received from Python.
      *
 	 * @member NetworkTesting
-     * @param {string} contact The name of the contact . 
-     * @param {string} msg Some string to display to the user... 
-     * @param {string} details A big dict with results. 
+     * @param {string} contact_name The name of the contact . 
+     * @param {string} local_data Dict/object with iperf stats.
+     * @param {string} remote_data Dict/object with iperf stats.
 	 */
 	function test_results(self, contact_name, local_data, remote_data) {
         dbug.info("NETTEST: test_results called");
@@ -316,7 +316,6 @@ NetworkTesting.methods(
         self.message_div.empty(); // innerHTML = "";
         var h1 = new Element('strong').appendText('Performance Test Results with ' + contact_name).inject(self.message_div);
         
-        var txt = "";
         var latency = 0.0;
         var kind = 0;
 
@@ -327,7 +326,9 @@ NetworkTesting.methods(
             latency = remote_data.latency * 1000.0;
             kind = remote_data.kind;
         }
-        // TODO: i18nize
+        var ul = new Element('ul', {'class':'basic_list js_help'}).inject(self.message_div);
+        var li = new Element('li', {'class':'nettest_title'}).appendText('Peformance Test Results with ' + contact_name).inject(ul); // TODO: i18n !
+        var txt = "";
         if (kind == 1) {
             txt += "Unidirectional from local to remote \n";
         } else if (kind == 2) {
@@ -335,25 +336,34 @@ NetworkTesting.methods(
         } else if (kind == 3) {
             txt += "Bidirectional Simultaneous \n";
         }
-        txt += "ComChan Latency : " + latency + " ms !\n\n";
+        var li = new Element('li', {'class':'nettest_subtitle'}).appendText(txt).inject(ul);
+        // TODO: i18n !
+        //txt += "ComChan Latency : " + latency + " ms !\n\n";
         // TODO : latency by wrapping ping
         
         if (local_data != null) {
-            txt += "From local to remote \n";
-            txt += "  Bandwidth : " + (local_data.speed / 1000000.0) + " Mbps\n";
-            txt += "  Jitter : " + local_data.jitter + " ms\n";
-            txt += "  Packet loss : " + local_data.percent_errors + " %\n";
-            txt += "\n";
+            var txt = "From local to remote";
+            var li = new Element('li', {'class':'nettest_subtitle'}).appendText(txt).inject(ul);
+            var txt = "  Bandwidth : " + (local_data.speed / 1000000.0) + " Mbps";
+            var li = new Element('li', {'class':'nettest_result'}).appendText(txt).inject(ul);
+
+            var txt = "  Jitter : " + local_data.jitter + " ms\n";
+            var li = new Element('li', {'class':'nettest_result'}).appendText(txt).inject(ul);
+            var txt = "  Packet loss : " + local_data.percent_errors + " %";
+            var li = new Element('li', {'class':'nettest_result'}).appendText(txt).inject(ul);
         }
         if (remote_data != null) {
-            txt += "From remote to local \n";
-            txt += "  Bandwidth : " + (remote_data.speed / 1000000.0) + " Mbps\n";
-            txt += "  Jitter : " + remote_data.jitter + " ms\n";
-            txt += "  Packet loss : " + remote_data.percent_errors + " %\n";
-            txt += "\n";
+            var txt = "From remote to local \n";
+            var li = new Element('li', {'class':'nettest_subtitle'}).appendText(txt).inject(ul);
+            var txt = "  Bandwidth : " + (remote_data.speed / 1000000.0) + " Mbps\n";
+            var li = new Element('li', {'class':'nettest_result'}).appendText(txt).inject(ul);
+            var txt = "  Jitter : " + remote_data.jitter + " ms\n";
+            var li = new Element('li', {'class':'nettest_result'}).appendText(txt).inject(ul);
+            var txt = "  Packet loss : " + remote_data.percent_errors + " %\n";
+            var li = new Element('li', {'class':'nettest_result'}).appendText(txt).inject(ul);
         }
         // txt += data;
-        var pre = new Element('pre').appendText(txt).inject(self.message_div);
+        // var pre = new Element('pre').appendText(txt).inject(self.message_div);
         // TODO: check if a contact to which we are connected is selected.
         self.start_btn.disabled = false;
         // two keys to data: 'local' and 'remote'. each is a dict with keys:

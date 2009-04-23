@@ -4,23 +4,23 @@
     <!-- The actual HTML template -->
     <br />
 	<h3 n:render="i18n">Network Testing</h3>
-    <div id="nettest" style="border:1px dotted #999;">
-        <table style="width:100%; padding:10px; font-size:11px;">
+    <div id="nettest">
+        <table>
             <tr>
                 <td align="right">Bandwidth: </td>
-                <td><input type="text" id="nettest_bandwidth" value="10" style="width: 50px;text-align: right;font-size:11px;" /> <select style="font-size:11px; width: 80px;" id="nettest_unit">
+                <td><input type="text" id="nettest_bandwidth" value="10" /> <select id="nettest_unit">
                 <option selected="true" value="M">Mbps</option>
                 <option value="K">Kbps</option>
                 </select></td>
             </tr>
             <tr>
                 <td align="right">Test duration: </td>
-                <td><input type="text" id="nettest_duration" value="10"  style="width: 40px;text-align: right;font-size:11px;" /> seconds</td>
+                <td><input type="text" id="nettest_duration" value="10"   /> seconds</td>
             </tr>
             <tr>
                 <td align="right">Mode:</td>
                 <td>
-                    <select style="font-size:11px;width: 140px;" id="nettest_kind">
+                    <select id="nettest_kind">
                         <option value="localtoremote">from local to remote</option>
                         <option value="remotetolocal">from remote to local</option>
                         <option value="tradeoff">bidirectionnal sequential</option>
