@@ -124,13 +124,14 @@ class VideoEncoder : public Encoder
         virtual std::string supportedCaps() const;
         virtual void init() = 0;
 
-    private:
+    protected:
         bool doDeinterlace_;
-        //_GstElement *videorate_;
         _GstElement *colorspc_;
         _GstElement *sinkQueue_;
         _GstElement *srcQueue_;
         _GstElement *deinterlace_;
+
+    private:
         
         _GstElement *sinkElement() 
         { 

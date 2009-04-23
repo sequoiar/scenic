@@ -259,7 +259,23 @@ std::string H263Encoder::supportedCaps() const
 void H263Encoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("ffenc_h263", NULL);
-    VideoEncoder::init();
+    sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
+
+    if (doDeinterlace_)
+    {
+        LOG_DEBUG("DO THE DEINTERLACE");
+        deinterlace_ = Pipeline::Instance()->makeElement("deinterlace2", NULL);
+        gstlinkable::link(sinkQueue_, deinterlace_);
+        gstlinkable::link(deinterlace_, colorspc_);
+    }
+    else
+        gstlinkable::link(sinkQueue_, colorspc_);
+
+    // Create separate thread for encoding, should yield better performance on multicore machines
+    gstlinkable::link(colorspc_, codec_);
+    srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    gstlinkable::link(codec_, srcQueue_);
 }
 
 
