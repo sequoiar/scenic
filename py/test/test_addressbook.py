@@ -309,27 +309,7 @@ class Test_3_AddressBook(unittest.TestCase):
             self.assertNotIn('Guenièvre Temps-Dur', adb.contacts)
             self.assertEqual(adb.selected, None, 'After removing the selected contact, selected should be None, got %s' % adb.selected)
             
-    def test_6_duplicate(self):
-        try:
-            adb = AddressBook(self.base_file, self.api)
-            adb.add('Jules', [])
-            adb.add('Guenièvre Temps-Dur', [])
-        except AddressBookError:
-            pass
-        else:
-            self.assertRaises(AddressBookError, adb.duplicate)
-            adb.select('Jules')
-            adb.duplicate()
-            self.assertIn('Jules' + adb.dup_suffix, adb.contacts)
-            self.assertRaises(AddressBookError, adb.duplicate, 'Vlimeux')
-            adb.duplicate('Guenièvre Temps-Dur')
-            self.assertIn(to_utf('Guenièvre Temps-Dur') + adb.dup_suffix, adb.contacts)
-            
-            adb.duplicate(new_name='dup_test')
-            self.assertIn('dup_test', adb.contacts)
-            self.assertRaises(AddressBookError, adb.duplicate, new_name='Jules')
-        
-    def test_7_modify(self):
+    def test_6_modify(self):
         try:
             adb = AddressBook(self.base_file, self.api)
             adb.add('Jules', [])
