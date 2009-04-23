@@ -22,6 +22,7 @@ from miville.utils import log
 from miville.errors import *
 import pprint
 from miville.engines import audiovideogst
+import miville.settings
 
 log = log.start('debug', 1, 0, 'gstchannel')
 
@@ -30,6 +31,49 @@ log = log.start('debug', 1, 0, 'gstchannel')
 #  info: state, contact name, error message
 #        states are: stopped, starting, started
 #        
+
+
+def split_gst_parameters(global_setting, address):
+    """
+    Walks the global setting to harvest all the necessary
+    gst parameters that will make their way to milhouse.
+    """
+    receiver_procs = {}
+    sender_procs = {}
+    
+    for id, group in global_setting.stream_subgroups.iteritems():
+        if group.enabled:
+            # procs is used to select between rx and tx process groups
+            procs = receiver_procs
+            s = group.mode.upper()
+            if s.startswith('SEND'):
+                procs = sender_procs
+                
+            for stream in group.media_streams:
+                if stream.enabled:
+                    proc_params = None
+                    if not procs.has_key(stream.sync_group):
+                        procs[stream.sync_group]  = {}
+                    proc_params = procs[stream.sync_group]
+                    proc_params = procs[stream.sync_group]
+                    # proc_params now points to a valid dict.
+                    # get params from media stream
+                    media_setting = miville.settings.Settings.get_media_setting_from_id(stream.setting)
+                    if media_setting.settings.has_key('engine'):
+                        engine_name =  media_setting.settings['engine']
+                        if engine_name.upper().startswith('GST'):
+                            params = {}
+                            params['port'] = stream.port
+                            for k,v in media_setting.settings.iteritems():
+                                    params[k] = media_setting.settings[k]
+        
+                            params['address'] = address
+                            proc_params[stream.name]= params
+    return receiver_procs, sender_procs
+
+
+
+
 def _create_stream_engines( listener, mode, procs_params):
     """
     Returns list of new stream engines.    
@@ -77,16 +121,35 @@ class GstChannel(object):
         self.sender_procs_params = None
         self.receiver_engines = None
         self.sender_engines = None
-    
-    def initiate_streaming(self, rx_params, tx_params, rx_remote_params, tx_remote_params):
-        self.receiver_procs_params = rx_params
-        self.sender_procs_params = tx_params
-        self.start_local_gst_processes(self.receiver_procs_params,  self.sender_procs_params)
-        self.send_message(REMOTE_STREAMING_CMD,[rx_remote_params, tx_remote_params] )
-    
-    def terminate_streaming(self):
+
+    def start_streaming(self, global_setting, address):
         """
-        Quits the milhouse processes. this initiates a sequence of events:
+        Starts the audio/video/data streaming between two miville programs. 
+    
+        this is where the arguments to the milhouse processes are exchanged. 
+        A stream can be of audio or video type. 
+        
+        first, the settings are browsed and sorted between receiver an sender
+        processes (local and remote), according to the streams type and
+        sync groups. Then the settings are sent to the engines (pobably GST)
+        """
+        # TODO first making sure the stream is off...
+        # self.stop_streaming()
+        receiver_procs_params, sender_procs_params = split_gst_parameters(global_setting, address)
+        remote_address  = self.com_chan.owner.localhost
+        log.debug("REMOTE ADDRESS: " + str(remote_address) )
+        remote_sender_procs_params, remote_receiver_procs_params = split_gst_parameters(global_setting, remote_address)
+        # send settings to remote miville
+        self.initiate_streaming(receiver_procs_params, sender_procs_params, remote_receiver_procs_params, remote_sender_procs_params)
+
+    def stop_streaming(self, address):
+        """
+        Stops the audio/video/data streams.
+        
+        Sends a stop command to the remote milhouse
+        For aesthetic reasons, receiver procecess are terminated before the senders 
+        
+        Here's the sequence of events:
             local rx processes are stopped
             STOP_RECEIVERS_CMD msg sent to the remote miville
             remote miville stops both rx and tx processes 
@@ -95,6 +158,15 @@ class GstChannel(object):
         """
         self._stop_local_rx_procs()
         self.send_message(STOP_RECEIVERS_CMD)
+     
+    def initiate_streaming(self, rx_params, tx_params, rx_remote_params, tx_remote_params):
+        self.receiver_procs_params = rx_params
+        self.sender_procs_params = tx_params
+        self.start_local_gst_processes(self.receiver_procs_params,  self.sender_procs_params)
+        self.send_message(REMOTE_STREAMING_CMD,[rx_remote_params, tx_remote_params] )
+    
+
+
     
     def _stop_local_rx_procs(self):
         log.info("Stopping rx processes")
