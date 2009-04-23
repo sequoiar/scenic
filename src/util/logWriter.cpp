@@ -207,24 +207,41 @@ void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &
     throw(AssertExcept(strerr));
 
 }
-
+#define BACKTRACE
 #ifdef BACKTRACE
 #include <signal.h>
 #include <execinfo.h>
-
+#include <cxxabi.h>
+#include <dlfcn.h>
+#include <stdlib.h>
 void assert_throw(__const char *__assertion, __const char *__file,
                            unsigned int __line, __const char *__function)
 {
-  void *trace[16];
-  char **messages = (char **)NULL;
-  int i, trace_size = 0;
+    void *trace[16];
+    char **messages = (char **)NULL;
+    int status, i, trace_size = 0;
+    Dl_info dlinfo;
+    const char *symname;
+    char *demangled;
 
-  trace_size = backtrace(trace, 16);
-  std::cout << trace_size << std::endl;
-  messages = backtrace_symbols(trace, trace_size);
-  for (i=0; i < trace_size; ++i)
-        std::cerr << messages[i] << std::endl;
-  cerr_log_throw( __assertion, ASSERT_FAIL, __file, __function, __line,0);
+    trace_size = backtrace(trace, 16);
+    messages = backtrace_symbols(trace, trace_size);
+    for (i=0; i < trace_size; ++i)
+    {
+        if(!dladdr(trace[i], &dlinfo))
+            continue;
+
+        symname = dlinfo.dli_sname;
+        demangled = abi::__cxa_demangle(symname, NULL, 0, &status);
+        if(status == 0 && demangled)
+            symname = demangled;
+
+        std::cerr << "object:" << dlinfo.dli_fname << " function:" <<  symname << std::endl;
+
+        if (demangled)
+            free(demangled);
+    }
+    cerr_log_throw( __assertion, ASSERT_FAIL, __file, __function, __line,0);
 }
 #else
 
