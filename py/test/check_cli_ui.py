@@ -76,17 +76,17 @@ class Test_1_AddressBook(unittest.TestCase):
         self.client.sendline("c -s Juliette")
         self.local.expectTest('Contact selected', 'Contact couln\'t be selected')
 
-    def test_05_duplicate_selected(self):
-        self.client.sendline("c -d Henriette")
-        self.local.expectTest('Contact duplicated', 'Selected contact cannot be duplicated')
-
-    def test_06_duplicate_named(self):
-        self.client.sendline("c -d Mariette Juliette")
-        self.local.expectTest('Contact duplicated', 'Specified contact cannot be duplicated')
+#     def test_05_duplicate_selected(self):
+#         self.client.sendline("c -d Henriette")
+#         self.local.expectTest('Contact duplicated', 'Selected contact cannot be duplicated')
+# 
+#     def test_06_duplicate_named(self):
+#         self.client.sendline("c -d Mariette Juliette")
+#         self.local.expectTest('Contact duplicated', 'Specified contact cannot be duplicated')
 
     def test_07_modify_selected_name(self):
-        self.client.sendline("c -s Mariette")
-        self.client.sendline("c -m Luciette")
+        self.client.sendline("c -s Juliette")
+        self.client.sendline("c -m Annie")
         self.local.expectTest('Contact modified', 'Selected contact name cannot be modified')
 
     def test_08_modify_selected_ip(self):
@@ -94,11 +94,11 @@ class Test_1_AddressBook(unittest.TestCase):
         self.local.expectTest('Contact modified', 'Selected contact name cannot be modified')
 
     def test_09_modify_selected_name_and_ip(self):
-        self.client.sendline("c -m Annette 192.168.30.30")
+        self.client.sendline("c -m Annie 192.168.30.30")
         self.local.expectTest('modified', 'Selected contact name cannot be modified')
 
     def test_98_erase_contact(self):
-        self.client.sendline("c -e Juliette")
+        self.client.sendline("c -e Annie")
         self.local.expectTest('Contact deleted', 'Error while trying to erase contact')
 
     def test_99_delete_invalid_contact(self):
