@@ -41,7 +41,7 @@ from twisted.internet import reactor
 from miville.utils import log
 from miville.utils import common
 from miville.utils.i18n import to_utf
-from miville.errors import AddressBookError, AddressBookNameError
+from miville.errors import AddressBookError, AddressBookNameError, AddressBookAddressError
 from miville.connectors.states import DISCONNECTED, CONNECTED 
 
 log = log.start('debug', 1, 0, 'adb')
@@ -88,6 +88,9 @@ class AddressBook(object):
         #print self.contacts
         if name in self.contacts:
             raise AddressBookNameError, 'Name %s already in Address Book' % name
+        address_taken = self.find_contact(address, port, connector)
+        if address_taken:
+            raise AddressBookAddressError, 'The contact %s already have this address' % address_taken.name
         self.contacts[name] = Contact(name, address, port, auto_created, auto_answer, connector, setting)
         log.debug("adding contact %s %s" % (name, address))
         self.write()
@@ -115,6 +118,10 @@ class AddressBook(object):
 
         if new_name is None and setting is None and address is None and port is None and auto_answer is None:
             raise AddressBookError, 'No property to change.'
+
+        address_taken = self.find_contact((address or contact.address), (port or contact.port), (connector or contact.connector))
+        if address_taken and address_taken.name != contact.name:
+            raise AddressBookAddressError, 'The contact %s already have this address' % address_taken.name
 
         new_name = to_utf(new_name)
         if new_name and new_name != name:

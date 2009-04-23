@@ -49,6 +49,13 @@ class AddressBookNameError(AddressBookError):
     """
     pass
 
+class AddressBookAddressError(AddressBookError):
+    """
+    Sub Exception Class for the address book.
+    Address (combination of address and port ?and connector?) already in address book.
+    """
+    pass
+
 ### Utils ###
 
 class InstallFileError(Exception):
