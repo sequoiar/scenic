@@ -176,7 +176,7 @@ class Process(object):
         self.logfile_name = "default.log"
         self.delayafterclose = 0.2 # important to override this in child classes
         self.timeout_expect = 0.9
-        self.maxread = 2000
+#         self.maxread = 2000
         self.expected_when_started = ""  #TODO
         self.test_case = None # important : must be a valid TestCase instance. Should be overriden by kwargs
         self.__dict__.update(kwargs)
@@ -226,7 +226,7 @@ class Process(object):
                 echo('Starting \"%s\"' % command, self.verbose)
             kwargs = {
                 'timeout':self.timeout_expect,
-                'maxread':self.maxread
+#                 'maxread':self.maxread
                 }
             if self.logfile is not None:
                 kwargs['logfile'] = self.logfile
