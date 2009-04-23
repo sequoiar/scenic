@@ -36,7 +36,7 @@ Streams.methods(
 		self.contact = null;
 		self.empty = true;
 		
-		// Get elements.
+		// Get DOM elements.
 		self.start_btn = $('strm_start');
 		self.global_slct = $('strm_global_setts');
 		
@@ -52,8 +52,10 @@ Streams.methods(
 		// Register to the widgets communicator.
 		register('strm', self);
 		
+		// Request the settings list
 		self.callRemote('rc_update_settings');
 	},
+
 	
 	/**
 	 * -----------------
@@ -82,6 +84,7 @@ Streams.methods(
 		self.upd_global_slct(event);
 	},
 
+
 	/**
 	 * ----------------
 	 * Call from Server
@@ -89,13 +92,12 @@ Streams.methods(
 	 */
 
 	/**
-	 * Update the contact list to reflect the state of the server.
+	 * Update the global settings menu to reflect the state of the server.
 	 * (call from server)
 	 * 
-	 * Changed only what was changed.
-	 * 
 	 * @member Addressbook
-     * @param {array} contacts An array of contacts object. 
+     * @param {array} presets An array of preset setting object. 
+     * @param {array} users An array of user setting object. 
 	 */
     function update_settings(self, presets, users) {
 		if (users.length > 0 || presets.length > 0) {
@@ -103,7 +105,9 @@ Streams.methods(
 			self.global_slct.empty();
 			self.global_slct.disabled = false;
 			
+			// populate the user settings
 			if (users.length > 0) {
+				// add the user section title
 				var optgroup = new Element('optgroup', {
 					'label': self.user_str
 				});
@@ -118,7 +122,9 @@ Streams.methods(
 				});
 			}
 			
+			// populate the user settings
 			if (presets.length > 0) {
+				// add the preset section title
 				var optgroup = new Element('optgroup', {
 					'label': self.preset_str
 				});
@@ -134,6 +140,7 @@ Streams.methods(
 			}
 			
 		} else {
+			// if there's no setting, disabled the menu
 			self.empty = false;
 			self.global_slct.disabled = true;
 		}
@@ -159,11 +166,8 @@ Streams.methods(
 	 * @param value The receive information.
 	 */
 	function update(self, caller, key, value) {
-		dbug.info('STREAM');
-		dbug.info(caller);
-		dbug.info(key);
-		dbug.info(value);
 		if (caller == 'adb') {
+			// keep reference of the selected contact
 			self.contact = value;
 			if (['selection', 'cancel_edit'].contains(key)) {
 				if (value == null) {
@@ -232,6 +236,7 @@ Streams.methods(
 			var stream_state = self.contact.get('stream_state');
 			var connection_state = self.contact.get('state').toInt();
 
+			// add event to the button
 			self.start_btn.removeEvents('click');
 			if ([0, 3].contains(connection_state)) {
 				if (stream_state == 0) {
@@ -250,8 +255,10 @@ Streams.methods(
 				}
 			}
 			
+			// set the name
 			self.start_btn.value = button_name;
 			
+			// set the state
 			if (button_state == 'enabled') {
 				self.start_btn.disabled = false;
 			} else {
@@ -265,9 +272,16 @@ Streams.methods(
 
 	},
 	
+    /**
+     * Update the global settings menu in function of the selected contact.
+     *
+     * @member Streams
+     * @param {string} event The event that trigger the update.
+     */
 	function upd_global_slct(self, event) {
 		self.global_slct.removeEvents('change');
 		if ('contact_selected' == event) {
+			// get the setting id of the selected contact
 			var setting = self.contact.get('setting')
 			if (setting) {
 				self.global_slct.set('inputValue', setting);
@@ -278,6 +292,8 @@ Streams.methods(
 				self.set_setting();
 			});
 			
+			// enable or disable the menu in function the state of the stream,
+			// the contact type (auto_created) or if the menu is empty
 			if (self.empty || self.contact.get('stream_state') != 0 || self.contact.get('auto_created') == 'true') {
 				self.global_slct.disabled = true;
 			} else {
