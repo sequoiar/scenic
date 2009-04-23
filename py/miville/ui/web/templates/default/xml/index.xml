@@ -3,7 +3,9 @@
 		<div id="index_left_pan" class="color_one">
 			<h1>Propulseart</h1>
 			<div n:render="addressbook">ADDRESSBOOK placeholder</div>
-			<div n:render="network_testing">NETWORK TESTING placeholder</div>
+            <div id="nettest">
+                <div n:render="network_testing">NETWORK TESTING placeholder</div>
+            </div>
 		</div>
 		
 		<div id="strm" class="color_two">

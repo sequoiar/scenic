@@ -68,8 +68,10 @@ NetworkTesting.methods(
         self.bandwidth_fld = $('nettest_bandwidth');
         self.unit_popup = $('nettest_unit');
         self.kind_popup = $('nettest_kind');
+        self.progress_img = $('nettest_progress');
 		
 		// Get string translations.
+        // TODO : use only translated strings in the GUI.
 		self.start_str = $('js_nettest_start').get('text'); // start string
 		self.stop_str = $('js_nettest_stop').get('text'); // stop string
 		
@@ -81,6 +83,7 @@ NetworkTesting.methods(
         
 		// Create the empty field validator. TODO: (move to utils?)
         // uses clientcide
+        // TODO: display error msg 
 		self.is_number = new InputValidator('required_number', {
 		    errorMsg: 'This field is required and must be a number.',
 		    test: function(field) {
@@ -195,10 +198,10 @@ NetworkTesting.methods(
 			dbug.info('bw:' + bandwidth + " dur:" + duration + ' unit:' + unit + ' kind:' + kind);
             self.callRemote('rc_start_test', self.contact.get('name'), bandwidth, duration, kind, unit);
             self.start_btn.disabled = true;
-            self.message_div.innerHTML = "";
-            var img = new Element('img').setProperty('src', 'img/macthrob-small.png').injectInside(self.message_div);
+            self.message_div.empty(); // innerHTML = "";
+            var img = new Element('img').setProperty('src', 'img/macthrob-small.png').inject(self.message_div);
             img.setProperty("style", "position:relative;top:4px;");
-            var span = new Element('span').appendText(" Test in progress...").injectInside(self.message_div);
+            var span = new Element('span').appendText(" Test in progress...").inject(self.message_div);
 	    }
     },
 
@@ -291,8 +294,8 @@ NetworkTesting.methods(
      * @param {string} Error message.
 	 */
     function nettest_error(self, error_text) {
-        self.message_div.innerHTML = ""
-        var p = new Element('p').appendText(error_text).injectInside(self.message_div);
+        self.message_div.empty(); // innerHTML = ""
+        var p = new Element('p').appendText(error_text).inject(self.message_div);
         self.start_btn.disabled = false;
     },
 	/**
@@ -310,8 +313,8 @@ NetworkTesting.methods(
         dbug.info("NETTEST: test_results called");
 		// check if contact exist in the list and get it
         //var owner = self.list.getElement('li[name=' + contact_name + ']')
-        self.message_div.innerHTML = "";
-        var h1 = new Element('strong').appendText('Performance Test Results with ' + contact_name).injectInside(self.message_div);
+        self.message_div.empty(); // innerHTML = "";
+        var h1 = new Element('strong').appendText('Performance Test Results with ' + contact_name).inject(self.message_div);
         
         var txt = "";
         var latency = 0.0;
@@ -350,7 +353,7 @@ NetworkTesting.methods(
             txt += "\n";
         }
         // txt += data;
-        var pre = new Element('pre').appendText(txt).injectInside(self.message_div);
+        var pre = new Element('pre').appendText(txt).inject(self.message_div);
         // TODO: check if a contact to which we are connected is selected.
         self.start_btn.disabled = false;
         // two keys to data: 'local' and 'remote'. each is a dict with keys:

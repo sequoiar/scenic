@@ -34,24 +34,12 @@
                     <input type="button" id="nettest_start" value="Start" class="js_help button" disabled="true"></input>
                 </td>
             </tr>
-            <!-- TODO: use this tr span -->
-            <!--
-            <tr>
-                <td colspan="2" style="font-size:10px;color:#555;">
-                    <span id="nettest_stats" style="visibility:hidden;float:left;">
-                        <img src="img/macthrob-small.png" style="position:relative;top:4px;" /> 
-                        Testing from local to remote
-                    </span>
-                </td>
-            </tr>
-            -->
         </table>
         <div style="border-top: 1px dotted #999;padding: 5px;font-size:11px" id="net_results">
-            <!-- <b style="font-size:12px;">Results</b><br />-->
-            <!-- Packet Lost: 0,02 %<br />
-            Jitter: 3 ms<br />
-            Bandwidth: 2533 Mbps<br />
-            Latency: 2 ms</div> -->
+            <!-- TEST IN PROGRESS IMAGE -->
+            <div>
+                    <div id="nettest_progress" class="basic_icon" />
+            </div>
             <!-- MESSAGE -->
             <div id="nettest_message" style="text-size:smaller;">
                 No test results.

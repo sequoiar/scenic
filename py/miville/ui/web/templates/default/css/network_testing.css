@@ -1,7 +1,26 @@
-/*
-#strm h3 {
-	margin: 0px 0px 10px;
-	color: #FFFFFF;
+.nettest_progress { /* test in progress icon */
+	background-image: url(/img/macthrob-small.png);
 }
-
-*/
+.color_nettest_results {
+    background-color: #eee;  
+}
+.nettest_key {
+    float: left;
+}
+.nettest_value {
+    float: right;
+}
+.nettest_title { /* test results with ... */
+    background-color: #FFF;
+    text-align: center;
+}
+.nettest_subtitle { /* from local to remote */
+    background-color: #FFF;
+    font-weight: bold;
+}
+.nettest_error {
+    text-color: #f00;
+}
+#nettest_start {
+    float: right;
+}

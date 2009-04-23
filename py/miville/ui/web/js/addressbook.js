@@ -68,7 +68,7 @@ Addressbook.methods(
 
 		// Create new base elements.
 		self.conn_icon = new Element('div', {
-			'class': 'conn_icon'
+			'class': 'basic_icon'
 		});
 				
 		// Create the empty field validator. TODO: (move to utils?)

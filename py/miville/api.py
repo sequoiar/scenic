@@ -68,12 +68,12 @@ from miville.utils.common import string_to_number
 
 log = log.start('debug', 1, 0, 'api') # added by hugo
 
-# TODO: remove this function from here please ! 
 def modify(who, name_of_who, what, new_value):
     """
     Given an object reference, returns a command that modifies the value of a member
     of that object. this command string can then be used by exec to do its work
     """
+    # TODO: remove this function from here please ! 
     members = dir(who)
     if not what in members:
         raise SettingsError, "Property \"" + what + "\" does not exist"

@@ -68,3 +68,31 @@ input.notify {
 	background-image: url(/img/spinner32.png);
 	background-repeat: no-repeat;
 }*/
+
+.basic_list {
+	overflow: auto;
+	background-color: #FFF;
+	border: solid 1px #999;
+	font-size: 11px;
+	position: relative;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.basic_list li {
+	height: 16px;
+	padding: 2px 4px;
+	position: relative;
+}
+
+.basic_icon {
+	background-color: transparent;
+	background-repeat: no-repeat;
+	width: 16px;
+	height: 16px;
+	float: right;
+	margin-left: 4px;
+}
+
+

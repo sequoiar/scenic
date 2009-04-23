@@ -3,7 +3,7 @@
     n:render="liveFragment">
 	<h3 n:render="i18n">Connections</h3>
 	<div class="section">
-		<ul class="js_help" id="adb_list">
+		<ul class="js_help basic_list" id="adb_list">
 		</ul>
 		<div id="adb_status" class="color_text_fade">
 		</div>
