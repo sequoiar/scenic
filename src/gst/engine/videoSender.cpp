@@ -44,7 +44,7 @@ VideoSender::VideoSender(const VideoSourceConfig vConfig, const SenderConfig rCo
 std::string VideoSender::getCaps() const
 { 
     std::string capsStr = session_.getCaps();
-    assert(capsStr != "");
+    tassert(capsStr != "");
     return capsStr;
 }
 
@@ -59,14 +59,14 @@ VideoSender::~VideoSender()
 
 void VideoSender::init_source()
 {
-    assert(source_ = videoConfig_.createSource());
+    tassert(source_ = videoConfig_.createSource());
     source_->init();
 }
 
 
 void VideoSender::init_codec()
 {
-    assert(encoder_ = remoteConfig_.createVideoEncoder());
+    tassert(encoder_ = remoteConfig_.createVideoEncoder());
     if (videoConfig_.doDeinterlace())
         encoder_->doDeinterlace();
     encoder_->init();
@@ -84,7 +84,7 @@ void VideoSender::init_codec()
 
 void VideoSender::init_payloader()       
 {
-    assert(payloader_ = encoder_->createPayloader());
+    tassert(payloader_ = encoder_->createPayloader());
     payloader_->init();
     gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_, remoteConfig_);

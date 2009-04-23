@@ -74,7 +74,7 @@ void AudioSource::initCapsFilter(GstElement* &aconv, GstElement* &capsFilter)
     // setup capsfilter
     GstCaps *caps = 0;
     caps = gst_caps_from_string(getCapsFilterCapsString().c_str());
-    assert(caps);
+    tassert(caps);
     capsFilter = Pipeline::Instance()->makeElement("capsfilter", NULL);
     aconv = Pipeline::Instance()->makeElement("audioconvert", NULL);
     g_object_set(G_OBJECT(capsFilter), "caps", caps, NULL);
@@ -163,8 +163,8 @@ void AudioTestSource::sub_init()
     {
         GstPad *pad;
         g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", FREQUENCY[0][channelIdx], NULL);
-        assert(pad = gst_element_get_static_pad(*src, "src"));
-        assert(gst_pad_set_caps(pad, caps));
+        tassert(pad = gst_element_get_static_pad(*src, "src"));
+        tassert(gst_pad_set_caps(pad, caps));
         g_object_unref(pad);
 
     }
@@ -197,7 +197,7 @@ void AudioFileSource::loop(int nTimes)
 
 void AudioFileSource::sub_init()
 {
-    assert(config_.locationExists());
+    tassert(config_.locationExists());
 
     aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
     

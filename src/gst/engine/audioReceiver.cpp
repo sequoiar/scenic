@@ -43,7 +43,7 @@ AudioReceiver::AudioReceiver(const AudioSinkConfig aConfig, const ReceiverConfig
     level_(), 
     sink_(0)
 { 
-    assert(remoteConfig_.hasCodec()); 
+    tassert(remoteConfig_.hasCodec()); 
     remoteConfig_.checkPorts();
 }
 
@@ -59,14 +59,14 @@ AudioReceiver::~AudioReceiver()
 
 void AudioReceiver::init_codec()
 {
-    assert(decoder_ = remoteConfig_.createAudioDecoder());
+    tassert(decoder_ = remoteConfig_.createAudioDecoder());
     decoder_->init();
 }
 
 
 void AudioReceiver::init_depayloader()
 {
-    assert(depayloader_ = decoder_->createDepayloader());
+    tassert(depayloader_ = decoder_->createDepayloader());
     depayloader_->init();
     gstlinkable::link(*depayloader_, *decoder_);
     session_.add(depayloader_, remoteConfig_);
@@ -84,13 +84,13 @@ void AudioReceiver::init_level()
 
 void AudioReceiver::init_sink()
 {
-    assert(sink_ = audioConfig_.createSink());
+    tassert(sink_ = audioConfig_.createSink());
     sink_->init();
     //gstlinkable::link(level_, *sink_);   
     gstlinkable::link(*decoder_, *sink_);   
     setCaps();
-    assert(gotCaps_);
-    assert(remoteConfig_.capsMatchCodec()); 
+    tassert(gotCaps_);
+    tassert(remoteConfig_.capsMatchCodec()); 
 }
 
 /// Used to set this AudioReceiver's RtpReceiver's caps 

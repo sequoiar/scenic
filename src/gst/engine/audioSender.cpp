@@ -60,13 +60,13 @@ AudioSender::~AudioSender()
 std::string AudioSender::getCaps() const
 { 
     std::string capsStr = session_.getCaps();
-    assert(capsStr != "");
+    tassert(capsStr != "");
     return capsStr;
 }
 
 void AudioSender::init_source()
 {
-    assert(source_ = audioConfig_.createSource());
+    tassert(source_ = audioConfig_.createSource());
     source_->init();
     //init_level();
 }
@@ -83,7 +83,7 @@ void AudioSender::init_level()
 
 void AudioSender::init_codec()
 {
-    assert(encoder_ = remoteConfig_.createAudioEncoder());
+    tassert(encoder_ = remoteConfig_.createAudioEncoder());
     encoder_->init();
 
     //gstlinkable::link(level_, *encoder_);
@@ -93,7 +93,7 @@ void AudioSender::init_codec()
 
 void AudioSender::init_payloader()   
 {
-    assert(payloader_ = encoder_->createPayloader());
+    tassert(payloader_ = encoder_->createPayloader());
     payloader_->init();
 
     gstlinkable::link(*encoder_, *payloader_);

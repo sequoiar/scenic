@@ -302,10 +302,10 @@ void GLImageSink::init()
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    
-    assert(window_);
+    tassert(window_);
 
     GdkDisplay* display = gdk_display_get_default();
-    assert(display);
+    tassert(display);
     int n;
     XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display),&n);
     if(!xine)

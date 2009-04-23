@@ -25,12 +25,9 @@
 
 #define ASSERT_THROWS   
 
-#include <assert.h>
 #ifdef ASSERT_THROWS
-
-#undef assert
-
-#define assert(expr)                                                        \
+#include <cassert>
+#define tassert(expr)                                                        \
     ((expr)                             \
      ?__ASSERT_VOID_CAST (0)            \
      :  assert_throw(__STRING(expr), __FILE__, __LINE__, __ASSERT_FUNCTION))

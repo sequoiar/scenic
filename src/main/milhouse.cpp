@@ -176,7 +176,7 @@ short pof::run(int argc, char **argv)
 
         gutil::runMainLoop(timeout);
 
-        assert(playback::isPlaying() or playback::quitted());
+        tassert(playback::isPlaying() or playback::quitted());
 
         playback::stop();
     }
@@ -228,10 +228,10 @@ short pof::run(int argc, char **argv)
         playback::start();
 
         if (!disableVideo)
-            assert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + static_cast<int>(options["videoport"]), 
+            tassert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + static_cast<int>(options["videoport"]), 
                         videofactory::MSG_ID, vTx->getCaps()));
         if (!disableAudio)
-            assert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + static_cast<int>(options["audioport"]), 
+            tassert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + static_cast<int>(options["audioport"]), 
                         audiofactory::MSG_ID, aTx->getCaps()));
 
         int timeout = 0;
@@ -240,7 +240,7 @@ short pof::run(int argc, char **argv)
 
         gutil::runMainLoop(timeout);
 
-        assert(playback::isPlaying() or playback::quitted());
+        tassert(playback::isPlaying() or playback::quitted());
 
         playback::stop();
     }

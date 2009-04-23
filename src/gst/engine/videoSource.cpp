@@ -70,7 +70,7 @@ std::string VideoSource::srcCaps() const
 /// Sets caps on capsfilter
 void VideoSource::setCapsFilter(const std::string &capsStr)
 {
-    assert(capsFilter_ != 0);
+    tassert(capsFilter_ != 0);
     if (capsStr.empty())
         THROW_ERROR("Can't set capsfilter to empty string");
 
@@ -113,7 +113,7 @@ VideoFileSource::VideoFileSource(const VideoSourceConfig &config) :
 
 void VideoFileSource::init()
 {
-    assert(config_.locationExists());
+    tassert(config_.locationExists());
     identity_ = Pipeline::Instance()->makeElement("identity", NULL);
     g_object_set(identity_, "silent", TRUE, NULL);
 

@@ -28,7 +28,7 @@
 void SenderBase::init()  // template method
 {
     // these methods are defined in subclasses
-    assert(!initialized_);
+    tassert(!initialized_);
     init_source();
     init_codec();
     init_payloader();
@@ -38,7 +38,7 @@ void SenderBase::init()  // template method
 void ReceiverBase::init()  // template method
 {
     // these methods are defined in subclasses
-    assert(!initialized_);
+    tassert(!initialized_);
     init_codec();
     init_depayloader();
     init_sink();

@@ -158,7 +158,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
 
 const char *RtpBin::padStr(const char *padName)
 {
-    assert(sessionCount_ > 0);  // we have a session going
+    tassert(sessionCount_ > 0);  // we have a session going
     std::string result(padName);
     std::stringstream istream;
 
@@ -176,7 +176,7 @@ RtpBin::~RtpBin()
     --sessionCount_;
     if (sessionCount_ <= 0) // destroy if no streams are present
     {
-        assert(sessionCount_ == 0);
+        tassert(sessionCount_ == 0);
         Pipeline::Instance()->remove(&rtpbin_);
         rtpbin_ = 0;
         destroyed_ = true;

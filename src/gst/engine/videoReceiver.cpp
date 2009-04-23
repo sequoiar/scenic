@@ -40,7 +40,7 @@ VideoReceiver::VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig
     sink_(0), 
     gotCaps_(false) 
 {
-    assert(remoteConfig_.hasCodec()); 
+    tassert(remoteConfig_.hasCodec()); 
     remoteConfig_.checkPorts();
 }
 
@@ -59,14 +59,14 @@ void VideoReceiver::makeFullscreen()
 
 void VideoReceiver::init_codec()
 {
-    assert(decoder_ = remoteConfig_.createVideoDecoder());
+    tassert(decoder_ = remoteConfig_.createVideoDecoder());
     decoder_->init();
 }
 
 
 void VideoReceiver::init_depayloader()
 {
-    assert(depayloader_ = decoder_->createDepayloader());
+    tassert(depayloader_ = decoder_->createDepayloader());
     depayloader_->init();
 
     gstlinkable::link(*depayloader_, *decoder_);
@@ -77,12 +77,12 @@ void VideoReceiver::init_depayloader()
 
 void VideoReceiver::init_sink()
 {
-    assert(sink_ = videoConfig_.createSink());
+    tassert(sink_ = videoConfig_.createSink());
     sink_->init();
     gstlinkable::link(*decoder_, *sink_);
     setCaps();
-    assert(gotCaps_);
-    assert(remoteConfig_.capsMatchCodec()); 
+    tassert(gotCaps_);
+    tassert(remoteConfig_.capsMatchCodec()); 
 }
 
 /// Used to set this VideoReceiver's RtpReceiver's caps 

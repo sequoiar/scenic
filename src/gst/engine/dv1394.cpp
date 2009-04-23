@@ -76,14 +76,14 @@ void Dv1394::reset()
 
 void Dv1394::setAudioSink(GstElement *audioSink)
 {
-    assert(audioSink);
+    tassert(audioSink);
     audioSink_ = audioSink;
 }
 
 
 void Dv1394::setVideoSink(GstElement *videoSink)
 {
-    assert(videoSink);
+    tassert(videoSink);
     videoSink_ = videoSink;
 }
 
@@ -134,7 +134,7 @@ void Dv1394::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, void 
         return;
     }
     LOG_DEBUG("Dv1394: linking new srcpad to sinkpad.");
-    assert(gstlinkable::link_pads(srcPad, sinkPad));
+    tassert(gstlinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 

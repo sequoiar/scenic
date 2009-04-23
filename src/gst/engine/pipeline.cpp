@@ -136,7 +136,7 @@ void Pipeline::init()
     if (pipeline_ == 0)
     {
         gst_init(0, NULL);
-        assert(pipeline_ = gst_pipeline_new("pipeline"));
+        tassert(pipeline_ = gst_pipeline_new("pipeline"));
 
         // this will be used as a reference for future
         // pipeline synchronization
@@ -361,7 +361,7 @@ void Pipeline::start()
     if (isPlaying())        // only needs to be started once
         return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
-    assert(checkStateChange(ret)); // set it to playing
+    tassert(checkStateChange(ret)); // set it to playing
     LOG_DEBUG("Now playing");
 }
 
@@ -372,7 +372,7 @@ void Pipeline::makeReady()
     if (isReady())        // only needs to be started once
         return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_READY);
-    assert(checkStateChange(ret)); // set it to playing
+    tassert(checkStateChange(ret)); // set it to playing
     LOG_DEBUG("Now ready");
 }
 
@@ -384,7 +384,7 @@ void Pipeline::pause()
         return;
     makeReady();
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
-    assert(checkStateChange(ret)); // set it to paused
+    tassert(checkStateChange(ret)); // set it to paused
     LOG_DEBUG("Now paused");
 }
 
@@ -394,7 +394,7 @@ void Pipeline::stop()
     if (isStopped())        // only needs to be stopped once
         return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
-    assert(checkStateChange(ret)); // set it to paused
+    tassert(checkStateChange(ret)); // set it to paused
     LOG_DEBUG("Now stopped/null");
 }
 
@@ -411,13 +411,13 @@ void Pipeline::remove(GstElement **element) // guarantees that original pointer 
     stop();
     if (*element)
     {
-        assert(gst_bin_remove(GST_BIN(pipeline_), *element));
+        tassert(gst_bin_remove(GST_BIN(pipeline_), *element));
         *element = NULL;
         --refCount_;
 
         if (refCount_ <= 0)
         {
-            assert(refCount_ == 0);
+            tassert(refCount_ == 0);
             Dv1394::reset();
             reset();
         }
@@ -435,14 +435,14 @@ void Pipeline::remove(std::vector<GstElement*> &elementVec)
         {
             if (*iter)
             {
-                assert(gst_bin_remove(GST_BIN(pipeline_), *iter));
+                tassert(gst_bin_remove(GST_BIN(pipeline_), *iter));
                 *iter = NULL;
                 --refCount_;
             }
         }
         if (refCount_ <= 0)
         {
-            assert(refCount_ == 0);
+            tassert(refCount_ == 0);
             reset();
         }
     }
@@ -515,12 +515,12 @@ void Pipeline::seekTo(gint64 pos)
 
 const char* Pipeline::getElementPadCaps(GstElement *element, const char * padName) const
 {
-    assert(isPlaying() or isPaused());
+    tassert(isPlaying() or isPaused());
 
     GstPad *pad;
     GstCaps *caps;
 
-    assert(pad = gst_element_get_pad(GST_ELEMENT(element), padName));
+    tassert(pad = gst_element_get_pad(GST_ELEMENT(element), padName));
 
     do
         caps = gst_pad_get_negotiated_caps(pad);

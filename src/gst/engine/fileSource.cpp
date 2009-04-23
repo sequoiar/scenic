@@ -171,11 +171,11 @@ void FileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, g
     }
     gst_caps_unref(caps);
 
-    assert(sinkElement);
+    tassert(sinkElement);
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
 
     LOG_DEBUG("linking new srcpad and sinkpad.");
-    assert(gstlinkable::link_pads(srcPad, sinkPad));
+    tassert(gstlinkable::link_pads(srcPad, sinkPad));
     gst_object_unref(sinkPad);
 }
 

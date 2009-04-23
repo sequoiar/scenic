@@ -53,7 +53,7 @@ Codec::~Codec()
 /// Returns bitrate property for this encoder
 int Encoder::getBitrate()
 {
-    assert(codec_);
+    tassert(codec_);
     unsigned bitrate; 
     g_object_get(G_OBJECT(codec_), "bitrate", &bitrate, NULL);
     return bitrate;
@@ -62,7 +62,7 @@ int Encoder::getBitrate()
 /// Sets bitrate property for this encoder
 void Encoder::setBitrate(unsigned bitrate)
 {
-    assert(codec_);
+    tassert(codec_);
     // if pipeline is playing, we need to set it to ready to make 
     // the bitrate change actually take effect
     if (Pipeline::Instance()->isPlaying())
@@ -81,7 +81,7 @@ void Encoder::setBitrate(unsigned bitrate)
 /// Posts bitrate using MapMsg
 void Encoder::postBitrate()
 {
-    assert(codec_);
+    tassert(codec_);
     MapMsg mapMsg("bitrate");
     std::string codecName(gst_element_factory_get_longname(gst_element_get_factory(codec_)));
     std::stringstream msgStream; 
@@ -153,7 +153,7 @@ VideoEncoder::~VideoEncoder()
 
 void VideoEncoder::init()
 {
-    assert(codec_ != 0);
+    tassert(codec_ != 0);
     sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
 

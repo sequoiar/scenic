@@ -29,7 +29,7 @@ void ParserTester::tokenize_test()
 {
     std::string str = "init: it=103945 mystring=\"\\\"bar you\\\"\" Hellotab=1.1 2.2 ";
     MapMsg mymap;
-    assert(Parser::tokenize(str, mymap));
+    tassert(Parser::tokenize(str, mymap));
 }
 
 
@@ -42,10 +42,10 @@ void ParserTester::roundtrip_test()
 //    std::string str = "init: it=103945 mystring=\"\\\"bar you\\\"\" Hellotab=1.1";
 
     MapMsg mymap;
-    assert(Parser::tokenize(arg, mymap));
+    tassert(Parser::tokenize(arg, mymap));
 
     std::string out;
-    assert(Parser::stringify(mymap, out));
+    tassert(Parser::stringify(mymap, out));
     LOG_DEBUG(out);
 }
 

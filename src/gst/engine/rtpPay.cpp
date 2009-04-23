@@ -67,7 +67,7 @@ void Payloader::setMTU(unsigned long long mtu)
         THROW_ERROR("Invalid MTU " << mtu << ", must be in range [" 
                 << MIN_MTU << "-" << MAX_MTU << "]");
 
-    assert(rtpPay_);
+    tassert(rtpPay_);
     g_object_set(G_OBJECT(rtpPay_), "mtu", mtu, NULL);
 }
 
