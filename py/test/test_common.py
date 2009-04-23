@@ -25,6 +25,7 @@ from twisted.trial import unittest
 from twisted.python.filepath import FilePath
 from twisted.python.modules import getModule
 from miville.utils import common
+from miville.utils.common import PortNumberGenerator
 
 class ToTestCallback():
     def __init__(self):
@@ -35,11 +36,41 @@ class ToTestCallback():
     
     def __bad_test(self):
         pass
-       
+
+class TestSimple(unittest.TestCase):
+    
+    def test_port_generator(self):
+        
+        porc = PortNumberGenerator(33,17)
+        x = porc.get_current_port()
+        self.assertTrue(x == None)
+        x1 = porc.generate_new_port()
+        self.assertTrue(x1 == 33)
+        y = porc.generate_new_port()
+        self.assertTrue(y == 50)
+        z = porc.get_current_port()
+        self.assertTrue(z == 50)
+        w = porc.generate_new_port()
+        self.assertTrue(w == 67)
+        w1 = porc.generate_new_port()
+        self.assertTrue(w1 == 84)
+        # conflict.. 67 is already taken
+        jerzy = PortNumberGenerator(67,1)
+        jx = jerzy.get_current_port()
+        self.assertTrue(jx == None)
+        jy = jerzy.generate_new_port()
+        self.assertTrue(jy == 68)
+        
+        jzs = jerzy.generate_new_ports(17)
+        self.assertTrue(len(jzs) == 17)
+        self.assertTrue(84 not in jzs)
+        
+           
 class TestCommon(unittest.TestCase):
+
     def setUp(self):
         pass
-    
+        
     def test_find_modules(self):
         res = common.find_modules('ui')
         #check if all user interface found are correctly formated
