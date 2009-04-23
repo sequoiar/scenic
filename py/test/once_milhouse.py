@@ -75,6 +75,14 @@ class Test_MilhouseOneWay(unittest.TestCase):
         self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
         self.proceed()
 
+    def test_06_audio_dv1394src_transmission_5sec(self):
+        # we test with one milhouse sending, one receiving
+        # If we init video first on one end, we must init it first on the other end
+        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="dv1394src"', 'video_init: ack="ok"')
+        self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" audio_buffer_usec=50000', 'audio_init: ack="ok"')
+        self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="dv1394src" channels=2', 'audio_init: ack="ok"')
+        self.proceed()
     
     def tearDown(self):
         self.receiver.quit()
