@@ -28,11 +28,7 @@
 #include <assert.h>
 #ifdef ASSERT_THROWS
 
-#include <assert.h>
-
-#ifdef assert
 #undef assert
-#endif
 
 #define assert(expr)                                                        \
     ((expr)                             \

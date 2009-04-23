@@ -208,10 +208,29 @@ void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &
 
 }
 
+#ifdef BACKTRACE
+#include <signal.h>
+#include <execinfo.h>
+
+void assert_throw(__const char *__assertion, __const char *__file,
+                           unsigned int __line, __const char *__function)
+{
+  void *trace[16];
+  char **messages = (char **)NULL;
+  int i, trace_size = 0;
+
+  trace_size = backtrace(trace, 16);
+  std::cout << trace_size << std::endl;
+  messages = backtrace_symbols(trace, trace_size);
+  for (i=0; i < trace_size; ++i)
+        std::cerr << messages[i] << std::endl;
+  cerr_log_throw( __assertion, ASSERT_FAIL, __file, __function, __line,0);
+}
+#else
 
 void assert_throw(__const char *__assertion, __const char *__file,
                            unsigned int __line, __const char *__function)
 {
     cerr_log_throw( __assertion, ASSERT_FAIL, __file, __function, __line,0);
 }
-
+#endif
