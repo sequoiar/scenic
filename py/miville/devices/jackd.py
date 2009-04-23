@@ -50,7 +50,6 @@ from miville.utils.commands import *
 from miville.errors import DeviceError
 from miville.utils import log as logger
 
-warnings.simplefilter("ignore", DeprecationWarning)
 log = logger.start('debug', 1, 0, 'devices_jackd')
 
 _state_printed_jackd_is_frozen = False

@@ -10,6 +10,7 @@ Scripts:
    :maxdepth: 4
 
    js_addressbook
+   js_streams
    js_utils
 
 Informations:

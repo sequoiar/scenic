@@ -31,6 +31,7 @@ except ImportError:
 import re
 from types import UnicodeType
 import copy
+import warnings
 
 # Twisted imports
 from twisted.spread.jelly import jelly, unjelly
@@ -140,10 +141,13 @@ class AddressBook(object):
 
     def duplicate(self, name=None, new_name=None):
         """
+        *This function is deprecated*
+        
         Adds a copy of the named contact in the Address Book and add the string
         ' (copy)' to is name if no new name is given, else give the new name.
         If no name is given, copy the selected contact.
         """
+        warnings.warn("Addressbook.duplicate is deprecated. Duplication of a contact is highly prohibithed because there's should be only one contact for each pair of address:port.", DeprecationWarning)
         name = self._get_name(name)
         new_name = to_utf(new_name)
         if new_name in self.contacts:
