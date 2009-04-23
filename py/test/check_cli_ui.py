@@ -72,23 +72,19 @@ class Test_1_AddressBook(unittest.TestCase):
         self.client.sendline("c -l") 
         self.local.expectTest('Juliette:', 'The contact that has just been added is not appearing.')
 
-    def test_04_add_duplicate(self):
-        self.client.sendline("c -a Juliette 192.168.20.20")
-        self.local.expectTest('Could not add contact.', 'Double entry shouldn\'t have been made.')
-
-    def test_05_select(self):
+    def test_04_select(self):
         self.client.sendline("c -s Juliette")
         self.local.expectTest('Contact selected', 'Contact couln\'t be selected')
 
-    def test_06_duplicate_selected(self):
+    def test_05_duplicate_selected(self):
         self.client.sendline("c -d Henriette")
         self.local.expectTest('Contact duplicated', 'Selected contact cannot be duplicated')
 
-    def test_07_duplicate_named(self):
+    def test_06_duplicate_named(self):
         self.client.sendline("c -d Mariette Juliette")
         self.local.expectTest('Contact duplicated', 'Specified contact cannot be duplicated')
 
-    def test_08_modify_selected_name(self):
+    def test_07_modify_selected_name(self):
         self.client.sendline("c -s Mariette")
         self.client.sendline("c -m Luciette")
         self.local.expectTest('Contact modified', 'Selected contact name cannot be modified')
