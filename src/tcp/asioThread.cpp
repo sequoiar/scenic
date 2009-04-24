@@ -334,8 +334,9 @@ class udp_server
             if (!err)
             {
                 if(MsgThread::isQuitted())
+                {
                     io_service_.stop();
-                
+                }
                 t_.expires_at(t_.expires_at() + boost::posix_time::seconds(1));
                 t_.async_wait(boost::bind(&udp_server::handle_timer,this, error));
             }
@@ -359,8 +360,11 @@ std::string tcpGetBuffer(int port, int &id)
 {
     std::string buff;
     io_service io_service;
+    id = 0;
     udp_server us(io_service, port,buff,id);
     io_service.run();
+    if(id == 0)
+        THROW_ERROR("Bad id");
 
     return buff;
 }
