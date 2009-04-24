@@ -13,21 +13,24 @@
 }
 .nettest_list {
     border: none;
-    max-height: 150px;
+    max-height: 220px;
     overflow-y: auto; 
     background-color: transparent;
 }
 .nettest_key {
+    padding-left:20px;
     float: left;
+    width:120px; /* #left_pan 260px */
 }
 .nettest_value {
-    float: right;
+    float: left;
 }
 .nettest_title { /* test results with ... */
-    text-align: center;
+    text-align: left;
+    border-bottom: dotted 1px #666;
 }
 .nettest_subtitle { /* from local to remote */
-    text-align: center;
+    text-align: left;
 
 }
 .nettest_error {
