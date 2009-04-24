@@ -364,14 +364,14 @@ NetworkTesting.methods(
         if (local_data != null) {
             var txt = "From local to remote";
             var li = new Element('li', {'class':'nettest_subtitle'}).appendText(txt).inject(ul);
-            self._insert_result_li(ul, "Bandwidth", (local_data.speed / 1000000.0) + " Mbps");
+            self._insert_result_li(ul, "Bandwidth", (local_data.speed / 1000000.0).toFixed(2) + " Mbps");
             self._insert_result_li(ul, "Jitter", local_data.jitter + " ms");
             self._insert_result_li(ul, "Packet loss", local_data.percent_errors + " %");
         }
         if (remote_data != null) {
             var txt = "From remote to local \n";
             var li = new Element('li', {'class':'nettest_subtitle'}).appendText(txt).inject(ul);
-            self._insert_result_li(ul, "Bandwidth", (remote_data.speed / 1000000.0) + " Mbps");
+            self._insert_result_li(ul, "Bandwidth", (remote_data.speed / 1000000.0).toFixed(2)  + " Mbps");
             self._insert_result_li(ul, "Jitter", remote_data.jitter + " ms");
             self._insert_result_li(ul, "Packet loss", remote_data.percent_errors + " %");
         }
