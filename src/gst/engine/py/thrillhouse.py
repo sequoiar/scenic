@@ -379,7 +379,7 @@ class MilhouseTests():
             self.run(recv, send)
     
     def test_24_raw_h263_v4l2src(self):
-        """ Test with 1-8 channels for raw with h263 with a 5 second timeout """
+        """ Test with 8 channels for raw with h263 with a 5 second timeout """
         self.countdown('START')
 
         videocodec = 'h263'
@@ -387,9 +387,7 @@ class MilhouseTests():
         send.videocodec = videocodec
         recv.videocodec = videocodec
         send.videobitrate = 3000000
-        for chan in xrange(1, 9): 
-            send.numchannels = chan
-            self.run(recv, send)
+        self.run(recv, send)
 
     def test_25_h263_v4l2src(self):
         """ Test v4l2src with h263 """
@@ -494,7 +492,8 @@ class MilhouseTests():
         """ Just audio """
         recv, send = self.argfactory('video')
         send.videosource = "filesrc"
-        send.videolocation = "/var/tmp/trailer_1080p.ogg"
+        if os.path.exists(send.videolocation):
+            send.videolocation = "/var/tmp/trailer_1080p.ogg"
         self.run(recv, send)
 
     def test_37_audio_deinterlaced_video(self):
@@ -508,7 +507,7 @@ class MilhouseTests():
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_38')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_24')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

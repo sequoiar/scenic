@@ -1,4 +1,4 @@
--Catch jackaudiosink's floating point exception when buffer is too low
+-replace h263 with h263p, test!!!
 -write about latency rtp issues/testing with netem scripts and so on
 -fix glvideosink's black at startup/until fullscreen bug
 -teeing video and audio, start with tests

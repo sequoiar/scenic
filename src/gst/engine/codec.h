@@ -120,8 +120,6 @@ class VideoEncoder : public Encoder
         VideoEncoder();
         ~VideoEncoder();
         void doDeinterlace() { doDeinterlace_ = true; }
-        virtual bool supportsCaps(const std::string & srcCaps) const;  // default: support any caps
-        virtual std::string supportedCaps() const;
         virtual void init() = 0;
 
     protected:
@@ -176,7 +174,6 @@ class H263Encoder : public VideoEncoder
 {
     public: 
         H263Encoder();
-        std::string supportedCaps() const;
 
     private:
         ~H263Encoder();

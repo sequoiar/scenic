@@ -142,14 +142,14 @@ void H264Depayloader::init()
 
 void H263Payloader::init()
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtph263pay", NULL);
+    rtpPay_ = Pipeline::Instance()->makeElement("rtph263ppay", NULL);
     Payloader::init();
 }
 
 
 void H263Depayloader::init()
 {
-    rtpPay_ = Pipeline::Instance()->makeElement("rtph263depay", NULL);
+    rtpPay_ = Pipeline::Instance()->makeElement("rtph263pdepay", NULL);
 }
 
 

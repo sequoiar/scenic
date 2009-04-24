@@ -156,6 +156,9 @@ Decoder * ReceiverConfig::createAudioDecoder() const
     LOG_DEBUG("Audio decoder " << codec_ << " built"); 
 }
 
+/// This function makes sure that the caps set on this receiver by a sender, match the codec
+/// that it expects. If it fails, it is probably due to a mismatch of codecs between sender and
+/// receiver, or a change in the caps specification for a given codec from gstreamer.
 bool ReceiverConfig::capsMatchCodec() const
 {
     GstStructure *structure = gst_caps_get_structure(gst_caps_from_string(caps_.c_str()), 0);
@@ -172,7 +175,7 @@ bool ReceiverConfig::capsMatchCodec() const
         return true;
     else if (encodingName == "H264" and codec_ == "h264")
         return true;
-    else if (encodingName == "H263" and codec_ == "h263")
+    else if (encodingName == "H263-1998" and codec_ == "h263")
         return true;
     else
     {

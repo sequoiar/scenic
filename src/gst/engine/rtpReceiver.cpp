@@ -94,7 +94,6 @@ void RtpReceiver::checkSampleRate()
 {
     GstPad *srcPad = gst_element_get_pad(rtp_receiver_, "src");
     GstCaps *srcCaps = gst_pad_get_negotiated_caps(srcPad);
-    //GstBase::checkCapsSampleRate(srcCaps);
     gst_caps_unref(srcCaps);
     gst_object_unref(srcPad);
 }
@@ -121,8 +120,6 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
         LOG_DEBUG("Wrong pad");
         return;
     }
-    // FIXME: We only have this really moderately stupid method of comparing the caps of all
-    // the sinks that have been attached to RtpReceiver's in general (stored in a static list) against those of the new pad.
     GstPad *sinkPad = getMatchingDepayloaderSinkPad(srcPad);
 
     if (gst_pad_is_linked(sinkPad)) // only link once
@@ -158,6 +155,7 @@ GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(GstPad *srcPad)
     sinkPad = gst_element_get_static_pad(depayloaders_.front(), "sink");
 
     // match depayloader to rtp pad by media type
+    // FIXME: what if we have two video depayloaders? two audio depayloaders?
 
     std::list<GstElement *>::iterator iter = depayloaders_.begin();
     std::string srcMediaType(getMediaType(srcPad));

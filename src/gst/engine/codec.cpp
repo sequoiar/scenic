@@ -125,16 +125,6 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
     Pipeline::Instance()->remove(&aconv_);
 }
 
-bool VideoEncoder::supportsCaps(const std::string & srcCaps) const 
-{ 
-    // default: support any caps
-    return supportedCaps() == "ANY" || srcCaps == supportedCaps(); 
-} 
-
-std::string VideoEncoder::supportedCaps() const 
-{
-    return "ANY";
-}
 
 VideoEncoder::VideoEncoder() : doDeinterlace_(false), colorspc_(0), sinkQueue_(0), srcQueue_(0),
     deinterlace_(0)
@@ -151,6 +141,8 @@ VideoEncoder::~VideoEncoder()
 }
 
 
+/// Sets up either deinterlace->colorspace->queue->encoder->queue
+/// or colorspace->queue->encoder->queue
 void VideoEncoder::init()
 {
     tassert(codec_ != 0);
@@ -188,6 +180,7 @@ H264Encoder::~H264Encoder()
 void H264Encoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
+
     // threads: 1-4, 0 for automatic 
 #ifdef HAVE_BOOST_THREAD        // more portable
     int numThreads = boost::thread::hardware_concurrency();
@@ -248,18 +241,10 @@ H263Encoder::~H263Encoder()
 {}
 
 
-std::string H263Encoder::supportedCaps() const
-{
-    // FIXME: this is the only resolution that v4l and h263 can agree on, as h263 only supports
-    // a small set of resolutions
-    return std::string("video/x-raw-yuv, width=352, height=288, pixel-aspect-ratio=10/11");
-}
-
-
 void H263Encoder::init()
 {
-    codec_ = Pipeline::Instance()->makeElement("ffenc_h263", NULL);
     sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    codec_ = Pipeline::Instance()->makeElement("ffenc_h263p", NULL);    // replaced with newer version
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
 
     if (doDeinterlace_)
@@ -270,7 +255,7 @@ void H263Encoder::init()
         gstlinkable::link(deinterlace_, colorspc_);
     }
     else
-        gstlinkable::link(sinkQueue_, colorspc_);
+        gstlinkable::link(sinkQueue_, colorspc_);   // interlaced not supported by codec
 
     // Create separate thread for encoding, should yield better performance on multicore machines
     gstlinkable::link(colorspc_, codec_);
@@ -307,8 +292,6 @@ Mpeg4Encoder::Mpeg4Encoder() {}
 Mpeg4Encoder::~Mpeg4Encoder()
 {}
 
-/// Sets up either deinterlace->queue->colorspace->queue->encoder->queue
-/// or colorspace->queue->encoder->queue
 void Mpeg4Encoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
