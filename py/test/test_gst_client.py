@@ -22,11 +22,11 @@
 from twisted.trial import unittest
 from twisted.internet import reactor 
 
-from engines import base_gst
-from engines import audiovideogst
+
 from miville.settings import Settings, GlobalSetting, MediaSetting
 import miville.utils.log
 import time
+import miville.engines
 
 #del gst_client.log
 #gst_client.log = miville.utils.log.start('error', 1, 0, 'gst')
@@ -72,6 +72,7 @@ class GstTestListener(object):
 
 class Test_GST_client(unittest.TestCase):
 
+
     def test_01_simple_video_sender(self):
         settings = Settings()
         global_setting = GlobalSetting('gs_simple_video_sender')
@@ -91,58 +92,58 @@ class Test_GST_client(unittest.TestCase):
         listener = GstTestListener()
         # create video settings
         address = "127.0.0.1"
-        go(0.1)
-        global_setting.start_streaming(listener, address, 'toto')
-        go(5.0)
-        
-        global_setting.stop_streaming()
-        go(1.0)
+#        go(0.1)
+#        #global_setting.start_streaming(listener, address, 'toto')
+#        go(5.0)
+#        
+#        #global_setting.stop_streaming()
+#        go(1.0)
         
 
-    def xtest_02_simple_video_rx_tx(self):        
-        tx_settings = Settings()
-        tx_global_setting = GlobalSetting('gs_simple_video_tx')
-        tx_global_setting.communication = 'bidirectional'
-        tx_global_setting.add_stream_subgroup('send')
-        tx_subgroup = tx_global_setting.get_stream_subgroup('send')
-        tx_subgroup.enabled = True
-        tx_subgroup.port = 14000
-        tx_subgroup.mode  = 'send'
-        tx_video_stream =  tx_subgroup.add_media_stream('video')
-        tx_video_stream.enabled = True
-        
-        id, tx_media_setting_mpeg4_basic = create_simple_video_rx_setting(tx_settings)
-        tx_video_stream.setting = tx_media_setting_mpeg4_basic.id
-        
-        tx_listener = GstTestListener()
-        go(0.1)
-        rx_settings = Settings()
-        rx_global_setting = GlobalSetting('gs_simple_video_rx')
-        rx_global_setting.communication = 'bidirectional'
-        rx_global_setting.add_stream_subgroup('receive')
-        rx_subgroup = rx_global_setting.get_stream_subgroup('receive')
-        rx_subgroup.enabled = True
-        rx_subgroup.port = 14000
-        rx_subgroup.mode  = 'receive'
-        rx_video_stream =  rx_subgroup.add_media_stream('video')
-        rx_video_stream.enabled = True
-        
-        id, tx_media_setting_mpeg4_basic = create_simple_video_tx_setting(rx_settings)
-        tx_video_stream.setting = tx_media_setting_mpeg4_basic.id
-        
-        tx_listener = GstTestListener()
-        
-        go(0.1)
-        tx_global_setting.start_streaming(tx_listener, "127.0.0.1")
-        go(0.5)
-        rx_global_setting.start_streaming(tx_listener, "127.0.0.1")
-        go(5.0)
-        
-        
-        tx_global_setting.stop_streaming()
-        go(0.1)
-        rx_global_setting.stop_streaming()
-        go(0.5)
+#    def xtest_02_simple_video_rx_tx(self):        
+#        tx_settings = Settings()
+#        tx_global_setting = GlobalSetting('gs_simple_video_tx')
+#        tx_global_setting.communication = 'bidirectional'
+#        tx_global_setting.add_stream_subgroup('send')
+#        tx_subgroup = tx_global_setting.get_stream_subgroup('send')
+#        tx_subgroup.enabled = True
+#        tx_subgroup.port = 14000
+#        tx_subgroup.mode  = 'send'
+#        tx_video_stream =  tx_subgroup.add_media_stream('video')
+#        tx_video_stream.enabled = True
+#        
+#        id, tx_media_setting_mpeg4_basic = create_simple_video_rx_setting(tx_settings)
+#        tx_video_stream.setting = tx_media_setting_mpeg4_basic.id
+#        
+#        tx_listener = GstTestListener()
+#        go(0.1)
+#        rx_settings = Settings()
+#        rx_global_setting = GlobalSetting('gs_simple_video_rx')
+#        rx_global_setting.communication = 'bidirectional'
+#        rx_global_setting.add_stream_subgroup('receive')
+#        rx_subgroup = rx_global_setting.get_stream_subgroup('receive')
+#        rx_subgroup.enabled = True
+#        rx_subgroup.port = 14000
+#        rx_subgroup.mode  = 'receive'
+#        rx_video_stream =  rx_subgroup.add_media_stream('video')
+#        rx_video_stream.enabled = True
+#        
+#        id, tx_media_setting_mpeg4_basic = create_simple_video_tx_setting(rx_settings)
+#        tx_video_stream.setting = tx_media_setting_mpeg4_basic.id
+#        
+#        tx_listener = GstTestListener()
+#        
+#        go(0.1)
+#        tx_global_setting.start_streaming(tx_listener, "127.0.0.1")
+#        go(0.5)
+#        rx_global_setting.start_streaming(tx_listener, "127.0.0.1")
+#        go(5.0)
+#        
+#        
+#        tx_global_setting.stop_streaming()
+#        go(0.1)
+#        rx_global_setting.stop_streaming()
+#        go(0.5)
   
         
         
