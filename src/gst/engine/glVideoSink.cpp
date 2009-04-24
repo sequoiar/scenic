@@ -85,29 +85,6 @@ gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 
 gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 {
-#if 0
-    static GTimeVal current_time;
-    static glong last_sec = current_time.tv_sec;
-    static glong last_usec = current_time.tv_usec;
-    static gint nbFrames = 0;  
-
-    g_get_current_time (&current_time);
-    if((current_time.tv_sec - last_sec < 1) and (current_time.tv_usec - last_usec < 5000))
-    {	
-        usleep((current_time.tv_usec - last_usec) >> 1);
-        return FALSE;
-    }
-    nbFrames++ ;
-    last_usec = current_time.tv_usec ;	
-    if ((current_time.tv_sec - last_sec) >= 1)
-    {
-        LOG_DEBUG("GRAPHIC FPS = " << nbFrames << std::endl);
-
-        nbFrames = 0;
-        last_sec = current_time.tv_sec;
-    }
-#endif
-
     glEnable(GL_DEPTH_TEST);
     glMatrixMode(GL_MODELVIEW);
     
@@ -142,6 +119,7 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
         glVertex3f(2 * aspectRatio,  1.0f, 0.0f);
         glVertex3f(aspectRatio,  1.0f, 0.0f);
     glEnd();
+
     glEnable (GL_TEXTURE_RECTANGLE_ARB);
     glBindTexture (GL_TEXTURE_RECTANGLE_ARB, texture);
     glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -224,7 +202,6 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             LOG_DEBUG("Resetting GL texture position");
             resetGLparams();
             break;
-        case GDK_q:
         case GDK_Q:
             // Quit application, this quits the main loop
             // (if there is one)
