@@ -29,7 +29,7 @@
                 </td>
             </tr>
             <tr>
-                <td align="right">
+                <td align="right" colspan="2">
                     <!-- start button -->
                     <input type="button" id="nettest_start" value="Start" class="js_help button" style="float:right;" disabled="true"></input>
                     <!-- TEST IN PROGRESS IMAGE -->
