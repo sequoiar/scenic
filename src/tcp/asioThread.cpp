@@ -246,11 +246,11 @@ class udp_sender
             if (!err && bytes_recvd > 0)
             {
                 io_service_.stop();
-                LOG_DEBUG(data_);
+                LOG_DEBUG("Got data:" << data_);
             }
             else
             {
-                LOG_DEBUG("");
+                LOG_DEBUG("Got err or bytes = 0");
             }
         }
 
@@ -285,11 +285,12 @@ class udp_server
     public:
         udp_server(io_service& io_service, short port, std::string& buff,int& id)
             : io_service_(io_service),port_(port),buff_(buff),id_(id),
-            socket_(io_service, udp::endpoint(udp::v4(), port)), sender_endpoint_()
+            socket_(io_service, udp::endpoint(udp::v4(), port)), sender_endpoint_(),t_(io_service, boost::posix_time::seconds(1))
     {
         socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_, 
                 boost::bind(&udp_server::handle_receive_from, this, 
                     error, bytes_transferred));
+        t_.async_wait(boost::bind(&udp_server::handle_timer,this, error));
     }
 
         void handle_receive_from(const error_code& err,
@@ -328,6 +329,21 @@ class udp_server
             LOG_DEBUG("DONE");
         }
 
+        void handle_timer(const error_code& err)
+        {
+            if (!err)
+            {
+                if(MsgThread::isQuitted())
+                    io_service_.stop();
+                
+                t_.expires_at(t_.expires_at() + boost::posix_time::seconds(1));
+                t_.async_wait(boost::bind(&udp_server::handle_timer,this, error));
+            }
+            else
+            {
+                std::cout << "ERRRR" << std::endl;
+            }
+        }
     private:
         io_service& io_service_; 
         short port_; std::string& buff_;int& id_;
@@ -335,6 +351,7 @@ class udp_server
         udp::endpoint sender_endpoint_;
         enum { max_length = 1024 };
         char data_[max_length];
+        boost::asio::deadline_timer t_;
 };
 
 
