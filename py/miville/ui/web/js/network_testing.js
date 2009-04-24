@@ -199,8 +199,12 @@ NetworkTesting.methods(
             self.callRemote('rc_start_test', self.contact.get('name'), bandwidth, duration, kind, unit);
             self.start_btn.disabled = true;
             self.message_div.empty(); // innerHTML = "";
-            var img = new Element('img').setProperty('src', 'img/macthrob-small.png').inject(self.message_div);
-            img.setProperty("style", "position:relative;top:4px;");
+            //var img = new Element('img').setProperty('src', 'img/macthrob-small.png').inject(self.message_div);
+            //self.progress_img.setProperty
+            //img.setProperty("style", "position:relative;top:4px;");
+			if (! self.progress_img.hasClass('nettest_progress')) { 
+                self.progress_img.addClass('nettest_progress');
+            }
             var span = new Element('span').appendText(" Test in progress...").inject(self.message_div);
 	    }
     },
@@ -297,6 +301,14 @@ NetworkTesting.methods(
         self.message_div.empty(); // innerHTML = ""
         var p = new Element('p').appendText(error_text).inject(self.message_div);
         self.start_btn.disabled = false;
+        if (self.progress_img.hasClass('nettest_progress')) { 
+            self.progress_img.removeClass('nettest_progress');
+        }
+    },
+    function _insert_result_li(self, ul, key, val) {
+        var li = new Element('li', {'class':'nettest_result'}).inject(ul);
+        var span = new Element('span', {'class':'nettest_key'}).appendText(key + " : ").inject(li);
+        var span = new Element('span', {'class':'nettest_value'}).appendText(val).inject(li);
     },
 	/**
      * Called when a network test is done.
@@ -310,78 +322,61 @@ NetworkTesting.methods(
      * @param {string} remote_data Dict/object with iperf stats.
 	 */
 	function test_results(self, contact_name, local_data, remote_data) {
+        if (self.progress_img.hasClass('nettest_progress')) { 
+            self.progress_img.removeClass('nettest_progress');
+        }
         dbug.info("NETTEST: test_results called");
 		// check if contact exist in the list and get it
         //var owner = self.list.getElement('li[name=' + contact_name + ']')
         self.message_div.empty(); // innerHTML = "";
-        var h1 = new Element('strong').appendText('Performance Test Results with ' + contact_name).inject(self.message_div);
         
         var latency = 0.0;
         var kind = 0;
 
         if (local_data != null) {
             latency = local_data.latency * 1000.0; // from s to ms
-            kind = local_data.kind;
+            kind = local_data.test_kind;
         } else {
             latency = remote_data.latency * 1000.0;
-            kind = remote_data.kind;
+            kind = remote_data.test_kind;
         }
-        var ul = new Element('ul', {'class':'basic_list js_help'}).inject(self.message_div);
+        dbug.info("NETTEST kind is " + kind);
+        self.message_div.empty();
+        var ul = new Element('ul', {'class':'basic_list js_help nettest_list'}).inject(self.message_div);
         var li = new Element('li', {'class':'nettest_title'}).appendText('Peformance Test Results with ' + contact_name).inject(ul); // TODO: i18n !
+
+        var latency = 0.0;
         var txt = "";
         if (kind == 1) {
-            txt += "Unidirectional from local to remote \n";
+            txt += "Unidirectional from local to remote";
         } else if (kind == 2) {
-            txt += "Bidirectional Sequential \n";
+            txt += "Bidirectional Sequential";
         } else if (kind == 3) {
-            txt += "Bidirectional Simultaneous \n";
+            txt += "Bidirectional Simultaneous";
+        } else {
+            txt += "Unknown kind of test.";
         }
         var li = new Element('li', {'class':'nettest_subtitle'}).appendText(txt).inject(ul);
-        // TODO: i18n !
         //txt += "ComChan Latency : " + latency + " ms !\n\n";
         // TODO : latency by wrapping ping
         
         if (local_data != null) {
             var txt = "From local to remote";
             var li = new Element('li', {'class':'nettest_subtitle'}).appendText(txt).inject(ul);
-            var txt = "  Bandwidth : " + (local_data.speed / 1000000.0) + " Mbps";
-            var li = new Element('li', {'class':'nettest_result'}).appendText(txt).inject(ul);
-
-            var txt = "  Jitter : " + local_data.jitter + " ms\n";
-            var li = new Element('li', {'class':'nettest_result'}).appendText(txt).inject(ul);
-            var txt = "  Packet loss : " + local_data.percent_errors + " %";
-            var li = new Element('li', {'class':'nettest_result'}).appendText(txt).inject(ul);
+            self._insert_result_li(ul, "Bandwidth", (local_data.speed / 1000000.0) + " Mbps");
+            self._insert_result_li(ul, "Jitter", local_data.jitter + " ms");
+            self._insert_result_li(ul, "Packet loss", local_data.percent_errors + " %");
         }
         if (remote_data != null) {
             var txt = "From remote to local \n";
             var li = new Element('li', {'class':'nettest_subtitle'}).appendText(txt).inject(ul);
-            var txt = "  Bandwidth : " + (remote_data.speed / 1000000.0) + " Mbps\n";
-            var li = new Element('li', {'class':'nettest_result'}).appendText(txt).inject(ul);
-            var txt = "  Jitter : " + remote_data.jitter + " ms\n";
-            var li = new Element('li', {'class':'nettest_result'}).appendText(txt).inject(ul);
-            var txt = "  Packet loss : " + remote_data.percent_errors + " %\n";
-            var li = new Element('li', {'class':'nettest_result'}).appendText(txt).inject(ul);
+            self._insert_result_li(ul, "Bandwidth", (remote_data.speed / 1000000.0) + " Mbps");
+            self._insert_result_li(ul, "Jitter", remote_data.jitter + " ms");
+            self._insert_result_li(ul, "Packet loss", remote_data.percent_errors + " %");
         }
         // txt += data;
         // var pre = new Element('pre').appendText(txt).inject(self.message_div);
         // TODO: check if a contact to which we are connected is selected.
         self.start_btn.disabled = false;
-        // two keys to data: 'local' and 'remote'. each is a dict with keys:
-        /*
-		if (field) {
-			field.set('status', msg);
-			if (details == null) {
-				owner.set('error', '');
-			} else {
-				owner.set('error', details);
-				dbug.info(details);
-			}
-			if (contact_name == self.selected) {
-				self.notify_controllers('test_results');
-			}
-		} else {
-			dbug.info('NO owner - Contact: ' + contact_name);
-		}
-        */
 	}
 );

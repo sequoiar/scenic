@@ -4,7 +4,7 @@
     <!-- The actual HTML template -->
     <br />
 	<h3 n:render="i18n">Network Testing</h3>
-    <div id="nettest">
+    <div id="nettest" class="section">
         <table>
             <tr>
                 <td align="right">Bandwidth: </td>
@@ -29,17 +29,15 @@
                 </td>
             </tr>
             <tr>
-                <td>
+                <td align="right">
                     <!-- start button -->
-                    <input type="button" id="nettest_start" value="Start" class="js_help button" disabled="true"></input>
+                    <input type="button" id="nettest_start" value="Start" class="js_help button" style="float:right;" disabled="true"></input>
+                    <!-- TEST IN PROGRESS IMAGE -->
+                    <div id="nettest_progress" class="basic_icon" />
                 </td>
             </tr>
         </table>
-        <div style="border-top: 1px dotted #999;padding: 5px;font-size:11px" id="net_results">
-            <!-- TEST IN PROGRESS IMAGE -->
-            <div>
-                    <div id="nettest_progress" class="basic_icon" />
-            </div>
+        <div id="nettest_results">
             <!-- MESSAGE -->
             <div id="nettest_message" style="text-size:smaller;">
                 No test results.

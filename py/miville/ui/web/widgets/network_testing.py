@@ -73,6 +73,7 @@ class NetworkTesting(Widget):
         remote_data = None
         if data.has_key('local'):
             local_data = data['local']
+            log.debug('test kind : ' + str(data['local']['test_kind']))
         if data.has_key('remote'):
             remote_data = data['remote']
         self.callRemote('test_results', contact_name, local_data, remote_data)

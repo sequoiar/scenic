@@ -6,11 +6,15 @@
     padding:10px; 
     font-size:11px;
 }
-#nettest_progress { /* test in progress icon */
-	background-image: url(/img/macthrob-small.png);
+.nettest_progress { /* test in progress icon */
+	background-image: url(/img/spinner16.png); /* macthrob-small.png); */
 }
 .nettest_results {
     background-color: #eee;  
+}
+.nettest_list {
+    max-height: 150px;
+    overflow-y: scroll;
 }
 .nettest_key {
     float: left;
@@ -23,8 +27,9 @@
     text-align: center;
 }
 .nettest_subtitle { /* from local to remote */
-    background-color: #FFF;
-    font-weight: bold;
+    background-color: #eee;
+    text-align: center;
+
 }
 .nettest_error {
     text-color: #f00;
@@ -50,3 +55,4 @@
     font-size:11px;
     width: 140px;
 }
+
