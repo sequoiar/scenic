@@ -343,7 +343,8 @@ NetworkTesting.methods(
         dbug.info("NETTEST kind is " + kind);
         self.message_div.empty();
         var ul = new Element('ul', {'class':'basic_list js_help nettest_list'}).inject(self.message_div);
-        var li = new Element('li', {'class':'nettest_title'}).appendText('Peformance Test Results with ' + contact_name).inject(ul); // TODO: i18n !
+        var li = new Element('li', {'class':'nettest_title'}).appendText('Peformance Test Results with ').inject(ul); 
+        var b = new Element('b').appendText(contact_name).inject(li)
 
         var latency = 0.0;
         var txt = "";
@@ -356,7 +357,7 @@ NetworkTesting.methods(
         } else {
             txt += "Unknown kind of test.";
         }
-        var li = new Element('li', {'class':'nettest_subtitle'}).appendText(txt).inject(ul);
+        var li = new Element('li', {'class':'nettest_subtitle'}).appendText("(" + txt + ")").inject(ul);
         //txt += "ComChan Latency : " + latency + " ms !\n\n";
         // TODO : latency by wrapping ping
         
