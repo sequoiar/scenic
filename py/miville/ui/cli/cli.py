@@ -1122,10 +1122,13 @@ class CliView(Observer):
                             txt += "    sync: " + stream.sync_group + "\n"
                             txt += "    port: " + str(stream.port) + "\n"
                             txt += "    media setting: %s\n" % str(stream.setting)
-                            media_setting = Settings.get_media_setting_from_id(stream.setting)
-                            txt += "      [" + str(media_setting.id) + "] media setting '" + media_setting.name + "'\n"
-                            for key, value in media_setting.settings.iteritems():
-                                txt += "       %s : %s\n" % (key, str(value))
+                            try:
+                                media_setting = Settings.get_media_setting_from_id(stream.setting)
+                                txt += "      [" + str(media_setting.id) + "] media setting '" + media_setting.name + "'\n"
+                                for key, value in media_setting.settings.iteritems():
+                                    txt += "       %s : %s\n" % (key, str(value))
+                            except:
+                                txt += "     media setting N/A\n"
                         
                 txt += "\nAll MEDIA SETTINGS...\n"
                 for k, v in media_settings.iteritems():
