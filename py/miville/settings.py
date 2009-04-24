@@ -54,6 +54,8 @@ import re # used when reading settings file
 import pprint
 
 
+
+
 from miville.utils import log
 from miville.utils.i18n import to_utf
 from miville.errors import *
@@ -228,7 +230,7 @@ class Settings(object):
                 raise SettingsError, msg
         else:
             if major_version == current_major_version_number:
-                log.info("Saving object jelly: " + str(object) )
+                log.debug("Saving object jelly: " + str(object) )
                 jello = jelly(object)
                 dump = repr(jello)
                 level = 0
@@ -257,7 +259,10 @@ class Settings(object):
         global PRESETS_FILENAME
         global SETTINGS_FILENAME
 
-        presets_file_name       = install_dir(PRESETS_FILENAME) #"presets.txt")
+        
+        directory = os.path.dirname(__file__)
+        
+        presets_file_name       = os.path.join(directory,  PRESETS_FILENAME) #"presets.txt")
         user_settings_file_name = install_dir(SETTINGS_FILENAME) # "settings.txt")
         
         # settings are saved as tuple()
@@ -269,12 +274,15 @@ class Settings(object):
         if os.path.exists(presets_file_name):
             log.info("Loading object jelly from: " + presets_file_name)
             presets = Settings._load_nice_object_from_file(presets_file_name, current_major_version_number)
+        else:
+            log.error('Preset file "%s" is missing.' % presets_file_name)
         
         # user settings file is optional...
         if os.path.exists(user_settings_file_name):
             log.info("Loading object jelly from: " + user_settings_file_name)
             user_settings = Settings._load_nice_object_from_file(user_settings_file_name, current_major_version_number)
-        
+        else:
+            log.error('User settings file "%s" is missing.' % user_settings_file_name)
         # load presets and then user global settings
         if presets:
             presets_globals = presets[0]

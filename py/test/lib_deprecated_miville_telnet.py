@@ -55,8 +55,9 @@ try:
     REMOTE_HOST = os.environ['MIVILLE_TEST_REMOTE_HOST']
     REMOTE_CONTACT_NAME = os.environ['MIVILLE_TEST_REMOTE_CONTACT']
 except KeyError:
-    raise Exception("You must define the env variables defined in py/test/config_test.sh")
-
+    #raise Exception("You must define the env variables defined in py/test/config_test.sh")
+    print "Warning: you have not defined the env variables defined in py/test/config_test.sh"
+    
 # if len(sys.argv) == 3:
 #     global server_port
 #     address = sys.argv[2]
@@ -69,6 +70,9 @@ def get_color(color=None):
     Colors can be either 'BLUE' or 'MAGENTA' or None
     colors = {'BLACK':30, 'RED':31, 'GREEN':32, 'YELLOW':33, 'BLUE':34, 'MAGENTA':35, 'CYAN':36, 'WHITE':37}
     """
+    if not os.environ.has_key('TERM'):
+        return ''
+    
     if os.environ['TERM'] not in ['xterm', 'xterm-color', 'rxvt', 'rxvt-unicode']:
         return ''
     colors = {'BLACK':30, 'RED':31, 'GREEN':32, 'YELLOW':33, 'BLUE':34, 'MAGENTA':35, 'CYAN':36, 'WHITE':37}
@@ -235,7 +239,7 @@ class TelnetBaseTest(unittest.TestCase):
             if is_running(self.server) is False:
                 self.server = start_process(SERVER_COMMAND, VERBOSE_SERVER, "S>", 'CYAN')
         if is_running(self.client) is False:
-            self.client = start_process(CLIENT_COMMAND, VERBOSE_CLIENT, "C>", 'MAGENTA')
+            self.client = start_process(CLIENT_COMMAND, VERBOSE_CLIENT, "", 'MAGENTA')
         self.sleep()
 
     def tearDown(self):
@@ -335,5 +339,5 @@ def start():
         global_server = start_process(SERVER_COMMAND, VERBOSE_SERVER, "S>", 'BLUE')
 
     time.sleep(1.0)
-    global_client = start_process(CLIENT_COMMAND, VERBOSE_CLIENT, "C>", 'CYAN')
+    global_client = start_process(CLIENT_COMMAND, VERBOSE_CLIENT, "", 'CYAN')
 

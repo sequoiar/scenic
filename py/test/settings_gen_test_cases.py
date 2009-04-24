@@ -74,19 +74,21 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=channels:2', 'modified')
 
 
-    def _add_media_setting(self, ):
-
+    def _add_media_stream(self, global_setting, group, type, setting, port = None):
+        #add media stream        
+        self.tst("settings --type stream --globalsetting %s --subgroup %s --add %s" % (global_setting, group, type), "Media stream added")         
+        self.tst("settings --type stream --globalsetting %s --subgroup %s --mediastream %s01 --modify setting=%d"   % (global_setting, group, type, setting), "modified")
+        self.tst("settings --type stream --globalsetting %s --subgroup %s --mediastream %s01 --modify enabled=True" % (global_setting, group, type), "modified")
+        if port != None:
+            self.tst("settings --type stream --globalsetting %s --subgroup %s --mediastream %s01 --modify port=%d"  % (global_setting, group, type, port),  "modified")        
+        
     def _add_global_setting_video_rx(self):
         self.tst("settings --type global --add video_rx", "Global setting added")
         # add subgroup
         self.tst("settings --type streamsubgroup -g video_rx --add recv", "subgroup added")
         self.tst("settings --type streamsubgroup -g video_rx --subgroup recv --modify enabled=True","modified")     
         self.tst("settings --type streamsubgroup -g video_rx --subgroup recv --modify mode='receive'","modified")                                                                                      
-        #add media stream        
-        self.tst("settings --type stream --globalsetting video_rx --subgroup recv --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting video_rx --subgroup recv --mediastream video01 --modify setting=10000", "modified")
-        self.tst("settings --type stream --globalsetting video_rx --subgroup recv --mediastream video01 --modify port=6666", "modified")        
-        self.tst("settings --type stream --globalsetting video_rx --subgroup recv --mediastream video01 --modify enabled=True", "modified")
+        self._add_media_stream('video_rx', 'recv', 'video', 10000, 6666 )
 
     def _add_global_setting_video_tx(self):
         self.tst("settings --type global --add video_tx", "Global setting added")
@@ -94,26 +96,19 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
         self.tst("settings --type streamsubgroup -g video_tx --add send", "subgroup added")
         self.tst("settings --type streamsubgroup -g video_tx --subgroup send --modify enabled=True","modified")      
         self.tst("settings --type streamsubgroup -g video_tx --subgroup send --modify mode='send'","modified")                                                                                       
-        #add media stream        
-        self.tst("settings --type stream --globalsetting video_tx --subgroup send --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting video_tx --subgroup send --mediastream video01 --modify setting=10002", "modified")
-        self.tst("settings --type stream --globalsetting video_tx --subgroup send --mediastream video01 --modify port=7000", "modified")        
-        self.tst("settings --type stream --globalsetting video_tx --subgroup send --mediastream video01 --modify enabled=True", "modified")     
-
-
-
+        #add media stream   
+        self._add_media_stream('video_tx', 'send', 'video', 10002, 7000 )     
+        
     def _add_global_setting_audio_rx(self):   
         self.tst("settings --type global --add audio_rx", "Global setting added")
          # add subgroup
+        
         self.tst("settings --type streamsubgroup -g audio_rx --add recv", "subgroup added")
         self.tst("settings --type streamsubgroup -g audio_rx --subgroup recv --modify enabled=True","modified")     
         self.tst("settings --type streamsubgroup -g audio_rx --subgroup recv --modify mode='receive'","modified")         
-
-        #add media stream        
-        self.tst("settings --type stream --globalsetting audio_rx --subgroup recv --add audio", "Media stream added")         
-        self.tst("settings --type stream --globalsetting audio_rx --subgroup recv --mediastream audio01 --modify setting=10001", "modified")
-        self.tst("settings --type stream --globalsetting audio_rx --subgroup recv --mediastream audio01 --modify port=6686", "modified")        
-        self.tst("settings --type stream --globalsetting audio_rx --subgroup recv --mediastream audio01 --modify enabled=True", "modified")
+        
+        #add media stream     
+        self._add_media_stream('audio_rx', 'recv', 'audio', 10001, 6686 )    
 
     def _add_global_setting_audio_tx(self):
         self.tst("settings --type global --add audio_tx", "Global setting added")
@@ -121,12 +116,9 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
         self.tst("settings --type streamsubgroup -g audio_tx --add send", "subgroup added")
         self.tst("settings --type streamsubgroup -g audio_tx --subgroup send --modify enabled=True","modified")      
         self.tst("settings --type streamsubgroup -g audio_tx --subgroup send --modify mode='send'","modified")                                                                                      
-        #add media streams        
-        self.tst("settings --type stream --globalsetting audio_tx --subgroup send --add audio", "Media stream added")         
-        self.tst("settings --type stream --globalsetting audio_tx --subgroup send --mediastream audio01 --modify setting=10003", "modified")
-        self.tst("settings --type stream --globalsetting audio_tx --subgroup send --mediastream audio01 --modify port=7200", "modified")        
-        self.tst("settings --type stream --globalsetting audio_tx --subgroup send --mediastream audio01 --modify enabled=True", "modified")
-
+        #add media streams   
+        self._add_media_stream('audio_tx', 'send', 'audio', 10003,  7200)     
+       
     def _add_global_setting_video_rxtx(self):        
         ###Video Two way           
         self.tst("settings --type global --add video_rxtx", "Global setting added")
@@ -134,21 +126,16 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
         self.tst("settings --type streamsubgroup -g video_rxtx --add recv", "subgroup added")
         self.tst("settings --type streamsubgroup -g video_rxtx --subgroup recv --modify enabled=True","modified")     
         self.tst("settings --type streamsubgroup -g video_rxtx --subgroup recv --modify mode='receive'","modified")                                                                                      
-        #add media stream        
-        self.tst("settings --type stream --globalsetting video_rxtx --subgroup recv --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting video_rxtx --subgroup recv --mediastream video01 --modify setting=10000", "modified")
-        self.tst("settings --type stream --globalsetting video_rxtx --subgroup recv --mediastream video01 --modify port=6666", "modified")        
-        self.tst("settings --type stream --globalsetting video_rxtx --subgroup recv --mediastream video01 --modify enabled=True", "modified")
+        #add media stream      
+        self._add_media_stream('video_rxtx', 'recv', 'video', 10000,  6666)   
+
         # add subgroup
         self.tst("settings --type streamsubgroup -g video_rxtx --add send", "subgroup added")
         self.tst("settings --type streamsubgroup -g video_rxtx --subgroup send --modify enabled=True","modified")      
         self.tst("settings --type streamsubgroup -g video_rxtx --subgroup send --modify mode='send'","modified")                                                                                       
         
-        #add media stream        
-        self.tst("settings --type stream --globalsetting video_rxtx --subgroup send --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting video_rxtx --subgroup send --mediastream video01 --modify setting=10002", "modified")
-        self.tst("settings --type stream --globalsetting video_rxtx --subgroup send --mediastream video01 --modify port=7000", "modified")        
-        self.tst("settings --type stream --globalsetting video_rxtx --subgroup send --mediastream video01 --modify enabled=True", "modified")         
+        #add media stream     
+        self._add_media_stream('video_rxtx', 'send', 'video', 10002,  7000)    
 
     def _add_global_setting_audio_rxtx(self):
         ###Audio Two way
@@ -157,21 +144,15 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
         self.tst("settings --type streamsubgroup -g audio_rxtx --add recv", "subgroup added")
         self.tst("settings --type streamsubgroup -g audio_rxtx --subgroup recv --modify enabled=True","modified")     
         self.tst("settings --type streamsubgroup -g audio_rxtx --subgroup recv --modify mode='receive'","modified")                                                                                      
-        #add media stream        
-        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup recv --add audio", "Media stream added")         
-        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup recv --mediastream audio01 --modify setting=10001", "modified")
-        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup recv --mediastream audio01 --modify port=6666", "modified")        
-        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup recv --mediastream audio01 --modify enabled=True", "modified")
+        #add media stream  
+        self._add_media_stream('audio_rxtx', 'recv', 'audio', 10001, 6666 )       
         # add subgroup
         self.tst("settings --type streamsubgroup -g audio_rxtx --add send", "subgroup added")
         self.tst("settings --type streamsubgroup -g audio_rxtx --subgroup send --modify enabled=True","modified")     
         self.tst("settings --type streamsubgroup -g audio_rxtx --subgroup send --modify mode='receive'","modified")                                                                                      
-        #add media stream        
-        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup send --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup send --mediastream video01 --modify setting=10003", "modified")
-        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup send --mediastream video01 --modify port=6666", "modified")        
-        self.tst("settings --type stream --globalsetting audio_rxtx --subgroup send --mediastream video01 --modify enabled=True", "modified")
-       
+        #add media stream    
+        self._add_media_stream('audio_rxtx', 'send', 'video', 10003,  6677)     
+      
     def _add_global_setting_AV_rxtx(self):
         ####AV Two way sync
         self.tst("settings --type global --add AV_rxtx", "Global setting added")
@@ -180,33 +161,23 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
         self.tst("settings --type streamsubgroup -g AV_rxtx --subgroup recv --modify enabled=True","modified")     
         self.tst("settings --type streamsubgroup -g AV_rxtx --subgroup recv --modify mode='receive'","modified")                                                                                      
         # add media streams rx video     
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream video01 --modify setting=10000", "modified")
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream video01 --modify port=6696", "modified")        
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream video01 --modify enabled=True", "modified")                                                                    
+        self._add_media_stream('AV_rxtx', 'recv', 'video', 10000, 6696) 
+       
         # add media streams rx audio   
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --add audio", "Media stream added")         
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream audio01 --modify setting=10001", "modified")
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream audio01 --modify port=6666", "modified")        
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup recv --mediastream audio01 --modify enabled=True", "modified")        
+        self._add_media_stream('AV_rxtx', 'recv', 'audio', 10001,  6666) 
+
         ###AV Two way not sync
         # add subgroup
         self.tst("settings --type streamsubgroup -g AV_rxtx --add send", "subgroup added")
         self.tst("settings --type streamsubgroup -g AV_rxtx --subgroup send --modify enabled=True","modified")     
         self.tst("settings --type streamsubgroup -g AV_rxtx --subgroup send --modify mode='send'","modified")                                                                                      
         #add media stream        
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream video01 --modify setting=10002", "modified")
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream video01 --modify port=6680", "modified")        
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream video01 --modify enabled=True", "modified")
+        self._add_media_stream('AV_rxtx', 'send', 'video', 10002, 6680 ) 
+
         #add media stream        
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --add audio", "Media stream added")         
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream audio01 --modify setting=10003", "modified")
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream audio01 --modify port=7200", "modified")        
-        self.tst("settings --type stream --globalsetting AV_rxtx --subgroup send --mediastream audio01 --modify enabled=True", "modified")
+        self._add_media_stream('AV_rxtx', 'send', 'audio', 10003,  7200) 
         
-    def _add_contact(self, name, address, settings):
-        
+    def _add_contact(self, name, address, settings): 
         port = 2222
         for i in settings:
             contact = name
@@ -272,7 +243,7 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
         self.tst("settings --save", "saved")
         print 'test_03_global_settings DONE'
 
-    def test_04_contacts(self):  
+    def atest_04_contacts(self):  
         # add a contacts
         settings = range(10000, 10007)
         self._add_contact('brrr', '10.10.10.65',  settings)
