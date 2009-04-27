@@ -33,6 +33,7 @@ log = log.start('debug', 1, 0, 'web_strm')
 
 class Streams(Widget):
     """
+    Web widget to choose settings and start streaming audio/video.
     """
     def rc_start_streams(self, contact):
         self.api.start_streams(self, contact)

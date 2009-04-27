@@ -623,6 +623,10 @@ class ControllerApi(object):
         self.start_streams(caller, contact_name)
     
     def start_connection_error_from_defer(self, error, caller, contact_name):
+        """
+        Called from deferred returned by start_connection when start_streams() was called without
+        being connected to a contact.
+        """
         log.debug('Defer error: %s' % error)
         self.notify(caller, error)
     
