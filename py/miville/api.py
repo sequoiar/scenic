@@ -63,11 +63,14 @@ from miville import network
 from miville import addressbook # for network_test_*
 from miville.protocols import pinger
 from miville import settings
+from miville import engines
 from miville.utils import log
 from miville.utils.common import string_to_number 
 
 log = log.start('debug', 1, 0, 'api') # added by hugo
 
+
+    
 def modify(who, name_of_who, what, new_value):
     """
     Given an object reference, returns a command that modifies the value of a member
@@ -119,7 +122,7 @@ class ControllerApi(object):
         network.start(self, self.core.config.iperf_port + self.core.config.port_numbers_offset, self.core.config.listen_to_interfaces)
         pinger.start(self)
         firewire.start(self)
-        settings.init_connection_listeners(self)
+        engines.init_connection_listeners(self)
     
     def listen_tcp(self, port, factory, interfaces='', listen_queue_size=50):
         """
@@ -633,7 +636,7 @@ class ControllerApi(object):
         if contact:
             if contact.state == CONNECTED:
                 try:
-                    contact, global_setting, settings_com_channel  = self._get__settings_com_chan_from_contact_name(contact_name)
+                    contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
                     settings_com_channel.start_streaming( global_setting, contact.address)
                     # global_setting.start_streaming(self, contact.address, settings_com_channel)
                     contact.stream_state = 2
@@ -656,7 +659,7 @@ class ControllerApi(object):
         """
         log.info('ControllerApi.start_streams, contact= ' + str(contact_name))
         try:
-            contact, global_setting, settings_com_channel  = self._get__settings_com_chan_from_contact_name(contact_name)
+            contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
             settings_com_channel.stop_streaming( contact.address)
             contact.stream_state = 0
             self.notify(caller, "streaming stopped")
@@ -667,7 +670,7 @@ class ControllerApi(object):
         except StreamsError, err:
             self.notify(caller, err)
                         
-    def _get__settings_com_chan_from_contact_name(self, contact_name):
+    def _get_gst_com_chan_from_contact_name(self, contact_name):
         """
         Starts all the sub-streams. (audio, video and data)
                 
@@ -679,7 +682,7 @@ class ControllerApi(object):
         if contact.state != addressbook.CONNECTED:
             raise AddressBookError, "You must be joined with the contact prior to start streaming."
         try:
-            settings_com_channel = settings.get_settings_channel_for_contact(contact_name)
+            settings_com_channel = engines.get_channel_for_contact('Gst',contact_name)
         except KeyError, e:
             raise StreamsError, "No settings channel for contact"
         id  = contact.setting

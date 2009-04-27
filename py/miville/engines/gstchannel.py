@@ -32,6 +32,69 @@ log = log.start('debug', 1, 0, 'gstchannel')
 #        states are: stopped, starting, started
 #        
 
+_gst_channels_dict = {}
+_api = None
+
+
+def set_api(api):
+    global _api
+    _api = api
+    
+
+def create_channel(engine_name):
+    log.debug('engines.create_channel: ' + str(engine_name) )
+    engine_name = str(engine_name)
+    if engine_name.upper() == 'GST':
+        chan = GstChannel()
+        return chan
+    raise StreamsError, 'Engine "%s" has no communication channel' %  engine_name
+
+  
+def on_com_chan_connected(connection_handle, role="client"):
+    """
+    Called when a new connection with a contact is made.
+    
+    Called from the Connector class in its com_chan_started_client or com_chan_started_server method.
+
+    registers the com_chan callback for settings transferts.
+    
+    :param connection_handle: connectors.Connection object.
+    :param role: string "client" or "server"
+    We actually do not care if this miville is a com_chan client or server.
+    """
+    global _api
+    global _gst_channels_dict
+
+    log.debug("settings.on_com_chan_connected")
+    
+    contact = connection_handle.contact
+    
+    chan = create_channel('Gst')
+    chan.contact = contact
+    chan.com_chan = connection_handle.com_chan
+    
+    callback = chan.on_remote_message
+    chan.com_chan.add(callback, 'Gst')
+    chan.api = _api
+    chan.remote_addr = contact.address
+        
+    _gst_channels_dict[chan.contact.name] = chan
+    log.debug("settings.on_com_chan_connected: settings_chans: " + str(_gst_channels_dict))
+    
+
+def on_com_chan_disconnected(connection_handle):
+    """
+    Called when a connection is stopped
+    """
+    global _gst_channels_dict
+    try:
+        del _gst_channels_dict[connection_handle.contact.name]
+        log.debug("settings.on_com_chan_disconnected: settings_chans: " + str(_gst_channels_dict))
+    except KeyError, e:
+        log.error("error in on_com_chan_disconnected : KeyError " + e.message)        
+
+def get_gst_channel_for_contact(contact):
+    return _gst_channels_dict[contact]
 
 def split_gst_parameters(global_setting, address):
     """

@@ -98,6 +98,7 @@ try:
     from nevow.athena import LivePage, LiveFragment, expose as nevow_expose
     from nevow.i18n import render as i18nrender
     from nevow.i18n import _, I18NConfig
+    from nevow import rend
 except ImportError:
     raise ImportError, 'If you want to use the Web interface, you need to install Nevow.'
 
@@ -105,6 +106,8 @@ except ImportError:
 from miville.utils import Observer, log
 from miville.utils.i18n import to_utf
 from miville.utils.common import find_callbacks
+
+from settingspage import SettingsPage
 
 log = log.start('debug', 1, 0, 'web')
 
@@ -237,6 +240,12 @@ class Index(LivePage, Observer):
 #            self.child_template = static.File(path.join('ui/web/templates', self.template))
 
         LivePage.__init__(self)
+
+
+    def childFactory(self, ctx, name):
+        log.info("childFactory %s %s" % (ctx, name) )
+        if name.lower().startswith("settings"):
+            return SettingsPage()
 
     def renderHTTP(self, ctx):
         """

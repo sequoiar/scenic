@@ -22,17 +22,30 @@
 # App imports
 from miville.engines import base_gst
 from miville.engines import audiovideogst 
+from miville.engines import gstchannel
+
 import gstchannel
 from miville.utils import log
 from miville.errors import *
+from miville import connectors
 
 log = log.start('debug', 1, 0, 'engines')
 
-def create_channel(engine_name):
-    log.debug('settings.create_channel: ' + str(engine_name) )
+
+def init_connection_listeners(api):
+    """
+    Registers the callbacks to the com_chan. 
+
+    This function must be called from the API.
+    """
+    log.debug("engines.init_connection_listeners")
+    connectors.register_callback("gst_on_connect", gstchannel.on_com_chan_connected, event="connect")
+    connectors.register_callback("gst_on_disconnect", gstchannel.on_com_chan_disconnected, event="disconnect")
+    gstchannel.set_api(api)
+
+def get_channel_for_contact(engine_name, contact):
+    log.debug("engines.get_channel_for_contact engine='%s' contact='%s'" %  (engine_name, contact) )    
     engine_name = str(engine_name)
     if engine_name.upper() == 'GST':
-        chan = gstchannel.GstChannel()
-        return chan
-    raise StreamsError, 'Engine "%s" has no communication channel' %  engine_name
-
+        return gstchannel.get_gst_channel_for_contact(contact)
+    

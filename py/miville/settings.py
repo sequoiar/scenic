@@ -62,7 +62,7 @@ from miville.errors import *
 from miville import connectors
 from miville.utils.common import install_dir
 # persistence is not futile
-from miville.engines import create_channel
+
 
 from twisted.spread.jelly import jelly, unjelly
 from twisted.internet import reactor
@@ -87,70 +87,7 @@ media_settings = {}
 
 
 _api = None
-_settings_channels_dict = {}
 
-
-
-
-   
-  
-def on_com_chan_connected(connection_handle, role="client"):
-    """
-    Called when a new connection with a contact is made.
-    
-    Called from the Connector class in its com_chan_started_client or com_chan_started_server method.
-
-    registers the com_chan callback for settings transferts.
-    
-    :param connection_handle: connectors.Connection object.
-    :param role: string "client" or "server"
-    We actually do not care if this miville is a com_chan client or server.
-    """
-    global _api
-    global _settings_channels_dict
-    global COM_CHAN_KEY
-
-    log.debug("settings.on_com_chan_connected")
-    
-    contact = connection_handle.contact
-    
-    chan = create_channel('Gst')
-    chan.contact = contact
-    chan.com_chan = connection_handle.com_chan
-    
-    callback = chan.on_remote_message
-    chan.com_chan.add(callback, 'Gst')
-    chan.api = _api
-    chan.remote_addr = contact.address
-        
-    _settings_channels_dict[chan.contact.name] = chan
-    log.debug("settings.on_com_chan_connected: settings_chans: " + str(_settings_channels_dict))
-    
-def init_connection_listeners(api):
-    """
-    Registers the callbacks to the com_chan. 
-
-    This function must be called from the API.
-    """
-    global _api
-    _api = api
-    log.debug("settings.init_connection_listeners")
-    connectors.register_callback("settings_on_connect", on_com_chan_connected, event="connect")
-    connectors.register_callback("settings_on_disconnect", on_com_chan_disconnected, event="disconnect")
-
-def on_com_chan_disconnected(connection_handle):
-    """
-    Called when a connection is stopped
-    """
-    global _settings_channels_dict
-    try:
-        del _settings_channels_dict[connection_handle.contact.name]
-        log.debug("settings.on_com_chan_disconnected: settings_chans: " + str(_settings_channels_dict))
-    except KeyError, e:
-        log.error("error in on_com_chan_disconnected : KeyError " + e.message)        
-
-def get_settings_channel_for_contact(contact):
-    return _settings_channels_dict[contact]
 
   
 class Settings(object):
