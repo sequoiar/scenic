@@ -327,6 +327,7 @@ class udp_server
         void handle_send_to(const error_code& , size_t )//bytes_sent)
         {
             LOG_DEBUG("DONE");
+            io_service_.stop();
         }
 
         void handle_timer(const error_code& err)
