@@ -215,13 +215,13 @@ class Index(LivePage, Observer):
     
     addSlash = True
     
-    base_path = os.getcwdu()
-
+    # base_path = os.getcwdu()
+    base_path = unicode(os.path.dirname(__file__))
     # serve some static files
-    child_jslib = static.File(path.join(base_path, 'miville/ui/web/js/'))
-    child_css = static.File(path.join(base_path, 'miville/ui/web/templates/default/css/'))
-    child_js = static.File(path.join(base_path, 'miville/ui/web/templates/default/js/'))
-    child_img = static.File(path.join(base_path, 'miville/ui/web/templates/default/img/'))
+    child_jslib = static.File(path.join(base_path, 'js/'))
+    child_css = static.File(path.join(base_path, 'templates/default/css/'))
+    child_js = static.File(path.join(base_path, 'templates/default/js/'))
+    child_img = static.File(path.join(base_path, 'templates/default/img/'))
 
 #    render_i18n = i18nrender()
 
@@ -307,7 +307,7 @@ class Index(LivePage, Observer):
         Add javascript and css import to the page header.
         """
 
-        base_path = path.dirname(__file__).replace(self.base_path + '/', '')
+        base_path = path.dirname(__file__).replace(self.base_path + '/', '') # ????
         templates_path = path.join(base_path, 'templates')
 
         widgets = self.list_widgets()

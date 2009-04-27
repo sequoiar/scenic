@@ -24,13 +24,16 @@
 Installation script for Miville.
 --------------------------------
 
-Usage::
+For developpers::
+  python setup.py build
+  sudo python setup.py develop --prefix=/usr/local
+  sudo python setup.py develop --prefix=/usr/local --uninstall
+
+For users::
   python setup.py build
   sudo python setup.py install --prefix=/usr/local
 
-For developpers::
-  sudo python setup.py develop --prefix=/usr/local
-  sudo python setup.py develop --prefix=/usr/local --uninstall
+(There is no easy way to uninstall a Python package once installed...)
 """
 from setuptools import find_packages
 from setuptools import setup
@@ -48,14 +51,13 @@ setup(
     license = "GPL",
     platforms = ["any"],
     zip_safe = False,
-    packages = find_packages(exclude=["test", "docs", "_trial_temp"]),
-    #package_data = {
-    #    "":["*.ttf", "*.rst", "*.png", "*.jpg", "*.css", "*.xml", "*.js", "*/*/*/*/*/*/*.css", "*/*/*/*/*.css"]
-    #}
+    packages = find_packages(exclude=["test", "docs", "_trial_temp", "miville.py"]),
     include_package_data = True,    # include everything in source control
     # ...but exclude Makefile.am from all packages
     exclude_package_data = { '': ['Makefile.am'] },
     )
-
+# ---------------------------
 #test_suite='nose.collector',
-    
+#package_data = {
+#    "":["*.ttf", "*.rst", "*.png", "*.jpg", "*.css", "*.xml", "*.js", "*/*/*/*/*/*/*.css", "*/*/*/*/*.css"]
+#}
