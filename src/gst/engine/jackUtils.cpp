@@ -26,6 +26,7 @@
 #include <gst/gst.h>
 
 #include "jackUtils.h"
+#include "pipeline.h"
 
 bool Jack::is_running()
 {
@@ -135,3 +136,14 @@ bool Jack::autoForcedSupported(GstElement *jackElement)
     return found;
 }
 
+
+/// Check that jack is running and is at the right sample rate
+void Jack::ensureReady()
+{
+    if (!Jack::is_running())
+        THROW_CRITICAL("Jack is not running");
+
+    if (Pipeline::SAMPLE_RATE != Jack::samplerate())
+        THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
+                << " does not match default sample rate " << Pipeline::SAMPLE_RATE);
+}

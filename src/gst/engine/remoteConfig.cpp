@@ -36,6 +36,9 @@ std::set<int> RemoteConfig::usedPorts_;
 RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remoteHost__,
         int port__) : codec_(codec__), remoteHost_(remoteHost__), port_(port__)
 {
+    LOG_DEBUG("Remote host is " << remoteHost_);
+    LOG_DEBUG("Codec is " << remoteHost_);
+    LOG_DEBUG("Port is " << port_);
 }
 
 

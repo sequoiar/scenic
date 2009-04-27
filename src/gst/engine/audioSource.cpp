@@ -262,9 +262,6 @@ void AudioAlsaSource::sub_init()
 {
     AudioSource::sub_init();
 
-    if (Jack::is_running())
-        THROW_ERROR("Jack is running, ALSA unavailable");
-
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
     else
@@ -302,7 +299,8 @@ void AudioPulseSource::sub_init()
 /// Constructor 
 AudioJackSource::AudioJackSource(const AudioSourceConfig &config) : 
     AudioSource(config), capsFilter_(0), aconv_(0)
-{}
+{
+}
 
 
 /// Destructor 
@@ -317,18 +315,11 @@ void AudioJackSource::sub_init()
 {
     AudioSource::sub_init();
 
-    if (!Jack::is_running())
-        THROW_ERROR("Jack is not running");
-
     // use auto-forced connect mode if available
     if (Jack::autoForcedSupported(source_))
         g_object_set(G_OBJECT(source_), "connect", 2, NULL);
     
     initCapsFilter(aconv_, capsFilter_);
-
-    if (Pipeline::SAMPLE_RATE != Jack::samplerate())
-        THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
-                << " does not match default sample rate " << Pipeline::SAMPLE_RATE);
 }
 
 

@@ -25,6 +25,7 @@
 #include "audioConfig.h"
 #include "audioSource.h"
 #include "audioSink.h"
+#include "jackUtils.h"
 
 ///  Constuctor sets by default loop to LOOP_NONE, but has file location specified 
 AudioSourceConfig::AudioSourceConfig(const std::string & source__, 
@@ -34,9 +35,11 @@ AudioSourceConfig::AudioSourceConfig(const std::string & source__,
     source_(source__), deviceName_(deviceName__), location_(location__), numChannels_(numChannels__)
 {
     if (source_.empty())
-        THROW_ERROR("No source specified");
+        THROW_CRITICAL("No source specified");
     if(numChannels_ < 1 or numChannels_ > 8)
-        THROW_ERROR("Invalid number of channels");
+        THROW_CRITICAL("Invalid number of channels");
+    if (source_ == "jackaudiosrc")  // FIXME: this has to happen early but it's gross to have it here
+        Jack::ensureReady();
 }
 
 
@@ -74,7 +77,7 @@ AudioSource* AudioSourceConfig::createSource() const
     else if (source_ == "pulsesrc")
         return new AudioPulseSource(*this);
     else 
-        THROW_ERROR(source_ << " is an invalid source");
+        THROW_CRITICAL(source_ << " is an invalid source");
     return 0;
 }
 
@@ -104,7 +107,10 @@ AudioSinkConfig::AudioSinkConfig(const std::string & sink__, const std::string &
     sink_(sink__), deviceName_(deviceName__), bufferTime_(bufferTime__)
 {
     if (bufferTime_ < MIN_BUFFER_TIME)
-        THROW_ERROR("Audio sink buffer time " << bufferTime_ << " is too low, must be greater than " << MIN_BUFFER_TIME);
+        THROW_CRITICAL("Audio sink buffer time " << bufferTime_ << " is too low, must be greater than " << MIN_BUFFER_TIME);
+
+    if (sink_ == "jackaudiosink")   // this has to happen early but this is pretty gross
+        Jack::ensureReady();
 }
 
 /// Copy constructor 
@@ -122,7 +128,7 @@ AudioSink* AudioSinkConfig::createSink() const
         return new AudioPulseSink(*this);
     else
     {
-        THROW_ERROR(sink_ << " is an invalid sink");
+        THROW_CRITICAL(sink_ << " is an invalid sink");
         return 0;
     }
 }

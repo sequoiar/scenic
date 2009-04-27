@@ -161,8 +161,6 @@ AudioJackSink::~AudioJackSink()
 /// Initialization method
 void AudioJackSink::init()
 {
-    if (!Jack::is_running())
-        THROW_CRITICAL("Jack is not running");
 
     sink_ = Pipeline::Instance()->makeElement("jackaudiosink", NULL);
     // uncomment to turn off autoconnect
@@ -173,9 +171,5 @@ void AudioJackSink::init()
 
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-
-    if (Pipeline::SAMPLE_RATE != Jack::samplerate())
-        THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
-                << " does not match default sample rate " << Pipeline::SAMPLE_RATE);
 }
 

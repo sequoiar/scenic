@@ -27,6 +27,7 @@ class _GstElement;
 /// Utility functions for jack related issues. 
 namespace Jack {
 
+    void ensureReady();
     bool is_running();
     bool autoForcedSupported(_GstElement *jackElement);
     unsigned int samplerate();
