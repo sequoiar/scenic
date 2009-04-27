@@ -18,8 +18,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
+"""
+Python logging utility.
 
+Wraps the logging module and Twisted's python.log module.
 
+"""
 # System imports
 import logging
 import sys
@@ -44,6 +48,9 @@ from miville.errors import InstallFileError
 LoggerClass = logging.getLoggerClass()
 
 class CoreLogger(LoggerClass):
+    """
+    Overrides the logger class in tyhe logging module.
+    """
     def debug(self, msg=None, *args):
         # if there is no msg get the name of method/function
         if not msg:
@@ -52,8 +59,14 @@ class CoreLogger(LoggerClass):
 
 logging.setLoggerClass(CoreLogger)
 
-
 def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
+    """
+    Starts the logging for a single module.
+
+    The programmer can choose the level from which to log.
+    Example : is level is INFO, the DEBUG messages (lower level) will not be displayed
+    but the CRITICAL ones will.
+    """
     logger = logging.getLogger(log_name)
     formatter = logging.Formatter('%(asctime)s %(name)-8s %(levelname)-8s %(message)s')
     set_level(level, log_name)
@@ -78,9 +91,15 @@ def start(level='info', to_stdout=1, to_file=0, log_name='twisted'):
         return logging.getLogger(log_name)
 
 def stop():
+    """
+    Stops logging for a single module.
+    """
     logging.shutdown()
 
 def set_level(level, logger='twisted'):
+    """
+    Sets the logging level for a single file. 
+    """
     levels = {'critical':logging.CRITICAL,  # 50
               'error':logging.ERROR,        # 40
               'warning':logging.WARNING,    # 30
@@ -93,23 +112,35 @@ def set_level(level, logger='twisted'):
         print "%s it's not a valid log level." % (level) #ERR ?
 
 def critical(msg):
+    """
+    Logs a message with CRITICAL level. (highest)
+    """
     tw_log.msg(msg, logLevel=logging.CRITICAL)
 
 def error(msg):
+    """
+    Logs a message with ERROR level. (2nd) 
+    """
     tw_log.msg(msg, logLevel=logging.ERROR)
 
 def warning(msg):
+    """
+    Logs a message with WARNING level. (3rd)
+    """
     tw_log.msg(msg, logLevel=logging.WARNING)
 
 def info(msg):
+    """
+    Logs a message with INFO level. (4th)
+    """
     tw_log.msg(msg)
 #    logging.info(msg)
 
-def debug(msg):
+def debug(msg): 
+    """
+    Logs a message with DEBUG level. (5th and last level)
+    """
     tw_log.msg(msg, logLevel=logging.DEBUG)
-        
-
-
        
 if __name__ == "__main__":
     start('warning', 1, 1)
