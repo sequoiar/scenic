@@ -46,6 +46,21 @@ using boost::asio::buffer;
 using boost::asio::placeholders::error;
 using boost::asio::placeholders::bytes_transferred;
 
+static std::string get_line(std::string& msg)
+{
+    std::string ret;
+    std::string::size_type pos = msg.find_first_of("\n\r");
+    if(pos != std::string::npos)
+    {
+        ret = msg.substr(0, pos+2);
+        msg.erase(0, pos+2);
+    }
+    else{
+        ret = msg;
+        msg.clear();
+    }
+    return ret;
+}
 
 class tcp_session
 {
@@ -79,11 +94,26 @@ class tcp_session
         {
             if (!err)
             {
+                std::string msgs(data_);
+                std::string line = get_line(msgs);
+                LOG_DEBUG(line);
+                do
+                {
+                    MapMsg mapMsg;
+                    if(mapMsg.tokenize(line))
+                        queue_.push(mapMsg);
+                    else
+                        LOG_WARNING("Bad Msg Received.");
+                    line = get_line(msgs);
+                }
+                while(!line.empty());
+#if 0
                 MapMsg mapMsg;
                 if(mapMsg.tokenize(data_))
                     queue_.push(mapMsg);
                 else
                     LOG_WARNING("Bad Msg Received.");
+#endif
                 memset(data_, 0, max_length);
                 socket_.async_read_some(buffer(data_, max_length),
                         boost::bind(&tcp_session::read_cb, this, error, bytes_transferred));
