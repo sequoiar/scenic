@@ -44,34 +44,9 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
     def test_01_yes(self):
         self.expectTest('pof: ', 'The default prompt is not appearing.')
     
-    def _add_media_setting_mpeg4_basic_rx(self, source):
-        self.tst("settings --type media --add mpeg4_basic_rx", "Media setting added")
-        self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=codec:mpeg4'           , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=bitrate:2048000'       , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=engine:Gst'            , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_rx  --modify settings=source:%s' % source  , 'modified') 
-        
-    def _add_media_setting_audio_basic_rx(self):
-        self.tst("settings --type media --add audio_basic_rx", "Media setting added")
-        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=codec:raw', 'modified')    
-        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=engine:Gst', 'modified')
-        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=source:audiotestsrc', 'modified') 
-        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=channels:2', 'modified')
-        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=audio_buffer_usec:30000', 'modified')                                                                      
+    
 
-    def _add_media_setting_mpeg4_basic_tx(self, source):
-        self.tst("settings --type media --add mpeg4_basic_tx", "Media setting added")
-        self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=codec:mpeg4'           , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=bitrate:2048000'       , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=engine:Gst'            , 'modified')
-        self.tst('settings --type media --mediasetting mpeg4_basic_tx  --modify settings=source:%s' % source   , 'modified')       
-
-    def _add_media_setting_audio_basic_tx(self):
-        self.tst("settings --type media --add audio_basic_tx", "Media setting added")
-        self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=codec:raw'           , 'modified')
-        self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=engine:Gst'            , 'modified')
-        self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=source:audiotestsrc'   , 'modified')       
-        self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=channels:2', 'modified')
+    
 
 
     def _add_media_stream(self, global_setting, group, type, setting, port = None):
@@ -82,13 +57,13 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
         if port != None:
             self.tst("settings --type stream --globalsetting %s --subgroup %s --mediastream %s01 --modify port=%d"  % (global_setting, group, type, port),  "modified")        
         
-    def _add_global_setting_video_rx(self):
+    def _add_global_setting_video_rx(self, name, setting, port):
         self.tst("settings --type global --add video_rx", "Global setting added")
         # add subgroup
         self.tst("settings --type streamsubgroup -g video_rx --add recv", "subgroup added")
         self.tst("settings --type streamsubgroup -g video_rx --subgroup recv --modify enabled=True","modified")     
         self.tst("settings --type streamsubgroup -g video_rx --subgroup recv --modify mode='receive'","modified")                                                                                      
-        self._add_media_stream('video_rx', 'recv', 'video', 10000, 6666 )
+        self._add_media_stream('video_rx', 'recv', 'video', setting , port)
 
     def _add_global_setting_video_tx(self):
         self.tst("settings --type global --add video_tx", "Global setting added")
@@ -190,38 +165,86 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
             self.tst("contacts --modify port=%d" % port,"Contact modified") 
             self.tst("contacts --modify setting=%d" % i,"Contact modified")
     
+    def  _add_media_settings_audio_rxtx(self, name, codec, channels, source):
+        self.media_settings.append("%s_tx" % name)
+        self.tst("settings --type media --add %s_tx" % name, "Media setting added")
+        self.tst('settings --type media --mediasetting %s_tx  --modify settings=codec:%s' % (name,codec) , 'modified')
+        self.tst('settings --type media --mediasetting %s_tx  --modify settings=engine:Gst' % (name) , 'modified')
+        self.tst('settings --type media --mediasetting %s_tx  --modify settings=source:%s' % (name,source)    , 'modified')       
+        self.tst('settings --type media --mediasetting %s_tx  --modify settings=channels:%d' % (name, channels) , 'modified')         
+            
+        self.media_settings.append("%s_rx" % name)
+        self.tst("settings --type media --add %s_rx" % name , "Media setting added")
+        self.tst('settings --type media --mediasetting %s_rx  --modify settings=codec:%s' % (name,codec) , 'modified')    
+        self.tst('settings --type media --mediasetting %s_rx  --modify settings=engine:Gst'% (name), 'modified')
+        self.tst('settings --type media --mediasetting %s_rx  --modify settings=source:%s' % (name, source) , 'modified') 
+        self.tst('settings --type media --mediasetting %s_rx  --modify settings=channels:%d' % (name, channels) , 'modified')
+        self.tst('settings --type media --mediasetting %s_rx  --modify settings=audio_buffer_usec:30000' % (name), 'modified')              
+
+
+    def  _add_media_settings_video_rxtx(self, name, codec, source, bitrate):
+
+        self.media_settings.append("%s_rx" % name)
+        self.tst("settings --type media --add %s_rx" % name, "Media setting added")
+        self.tst('settings --type media --mediasetting %s_rx  --modify settings=codec:%s' % (name,codec)          , 'modified')
+        self.tst('settings --type media --mediasetting %s_rx  --modify settings=bitrate:2048000' % name       , 'modified')
+        self.tst('settings --type media --mediasetting %s_rx  --modify settings=engine:Gst'  % name          , 'modified')
+        self.tst('settings --type media --mediasetting %s_rx  --modify settings=source:%s' % ( name , source)  , 'modified') 
+                                                             
+
+        self.media_settings.append("%s_tx" % name)
+        self.tst("settings --type media --add %s_tx" % name, "Media setting added")
+        self.tst('settings --type media --mediasetting %s_tx  --modify settings=codec:%s' % (name,codec)           , 'modified')
+        self.tst('settings --type media --mediasetting %s_tx  --modify settings=bitrate:%d' % (name,bitrate)      , 'modified')
+        self.tst('settings --type media --mediasetting %s_tx  --modify settings=engine:Gst'   % name         , 'modified')
+        self.tst('settings --type media --mediasetting %s_tx  --modify settings=source:%s' % (name, source)   , 'modified')       
+        
+
+
     def test_02_media_settings(self):
         
-        #video_src = 'v4l2src'
-        video_src = 'videotestsrc'
+        videosrc = 'v4l2src'
+        #videosrc = 'videotestsrc'
         
         print
         print "HOME IS: " + os.environ['HOME']
         
-        # add media setting video rx 
-        # 10 000
-        self._add_media_setting_mpeg4_basic_rx(video_src)
+        self.media_settings = []
+        
+        self._add_media_settings_video_rxtx("video_mpeg4", "mpeg4", videosrc, 3000000 )
+        self._add_media_settings_video_rxtx("video_h263", "h263", videosrc, 3000000)
+                
+              
+        self._add_media_settings_audio_rxtx("audio_raw2", "raw", 2, "audiotestsrc")
+        self._add_media_settings_audio_rxtx("audio_raw4", "raw", 4, "audiotestsrc")
+        self._add_media_settings_audio_rxtx("audio_raw6", "raw", 6, "audiotestsrc")
+        self._add_media_settings_audio_rxtx("audio_raw8", "raw", 8, "audiotestsrc")
+        self._add_media_settings_audio_rxtx("audio_mp3", "mp3", 2, "audiotestsrc")
+        self._add_media_settings_audio_rxtx("audio_vorbis2", "vorbis", 2, "audiotestsrc")
+        self._add_media_settings_audio_rxtx("audio_vorbis4", "vorbis", 4, "audiotestsrc")
+        self._add_media_settings_audio_rxtx("audio_vorbis6", "vorbis", 6, "audiotestsrc")
+        self._add_media_settings_audio_rxtx("audio_vorbis8", "vorbis", 8, "audiotestsrc")
+        
 
-        # add media setting audio rx
-        # 10 001 
-        self._add_media_setting_audio_basic_rx()
+        counter = 10000
+        for media in  self.media_settings:       
+            print "media[%5d] %s" % (counter,media)
+            counter += 1
 
         # mpeg4_basic_tx     
         # 10 002
-        self._add_media_setting_mpeg4_basic_tx(video_src)
-
-        # add media setting audio_basic_tx
-        # 10 003
-        self._add_media_setting_audio_basic_tx()
+        
         self.tst("settings --save", "saved")
         # audio_rxtx
         
 
 
-    def test_03_global_settings(self):
+    def atest_03_global_settings(self):
         # add global setting
         # 10 000
-        self._add_global_setting_video_rx()
+        setting_id = 10000 + self.media_settings.index('video_mpeg4_rx')
+        self._add_global_setting_video_rx('vid_rx_mp4', setting_id, 6666)
+        
         self.tst("settings --save", "saved")
         # 10 001
         self._add_global_setting_video_tx()
@@ -245,7 +268,7 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
 
     def atest_04_contacts(self):  
         # add a contacts
-        settings = range(10000, 10007)
+        settings = [10000]
         self._add_contact('brrr', '10.10.10.65',  settings)
         self._add_contact('tzing', '10.10.10.66', settings)
         self._add_contact('krrt', '10.10.10.64', settings)
