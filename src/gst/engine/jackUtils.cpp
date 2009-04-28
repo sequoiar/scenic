@@ -143,7 +143,35 @@ void Jack::ensureReady()
     if (!Jack::is_running())
         THROW_CRITICAL("Jack is not running");
 
-    if (Pipeline::SAMPLE_RATE != Jack::samplerate())
-        THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
+    if (Pipeline::SAMPLE_RATE != samplerate())
+        THROW_CRITICAL("Jack's sample rate of " << samplerate()
                 << " does not match default sample rate " << Pipeline::SAMPLE_RATE);
 }
+
+
+unsigned int Jack::framesPerPeriod() 
+{
+    if (!is_running())
+        THROW_ERROR("JACK server not running, cannot compare sample rates.");
+
+    jack_client_t *client;
+    jack_status_t status;
+    client = jack_client_open ("AudioJackSource", JackNoStartServer, &status);
+    jack_nframes_t framesPerPeriod = jack_get_buffer_size(client);
+    jack_client_close(client);
+
+    return framesPerPeriod;
+}
+
+// DEPENDS ON sample rate and frames per period, doesn't appear to depend on periods per buffer
+unsigned long long Jack::minBufferTime()
+{
+    const unsigned long long USECS_PER_SEC = 1000000LL;
+    return  ((framesPerPeriod() / static_cast<float>(samplerate())) * USECS_PER_SEC); 
+}
+
+unsigned long long Jack::safeBufferTime()
+{
+    return minBufferTime() + SAFETY_OFFSET;
+}
+

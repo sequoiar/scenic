@@ -110,8 +110,8 @@ void AudioAlsaSink::init()
     audioconvert_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     sink_ = Pipeline::Instance()->makeElement("alsasink", NULL);
+
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
-    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
     else
@@ -138,7 +138,6 @@ void AudioPulseSink::init()
 
     sink_ = Pipeline::Instance()->makeElement("pulsesink", NULL);
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
-    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
     else
@@ -161,15 +160,24 @@ AudioJackSink::~AudioJackSink()
 /// Initialization method
 void AudioJackSink::init()
 {
-
     sink_ = Pipeline::Instance()->makeElement("jackaudiosink", NULL);
+
     // uncomment to turn off autoconnect
     //g_object_set(G_OBJECT(sink_), "connect", 0, NULL);
     // use auto-forced connect mode if available
     if (Jack::autoForcedSupported(sink_))
         g_object_set(G_OBJECT(sink_), "connect", 2, NULL);
 
-    g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
-    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    if (config_.bufferTime() < Jack::safeBufferTime())
+    {
+        LOG_WARNING("Buffer time " << config_.bufferTime() << " is too low, using " << Jack::safeBufferTime() << " instead");
+        g_object_set(G_OBJECT(sink_), "buffer-time", Jack::safeBufferTime(), NULL);
+    }
+    else
+        g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
+
+    unsigned long long val;
+    g_object_get(sink_, "buffer-time", &val, NULL);
+    LOG_DEBUG("Buffer time is " << val);
 }
 

@@ -386,7 +386,7 @@ class MilhouseTests():
         recv, send = self.argfactory('audiovideo')
         send.videocodec = videocodec
         recv.videocodec = videocodec
-        send.videobitrate = 3000000
+        send.videobitrate = 1000000
         self.run(recv, send)
 
     def test_25_h263_v4l2src(self):
@@ -504,10 +504,15 @@ class MilhouseTests():
         send.deinterlace = True
         self.run(recv, send)
     
+    def test_38_bufferTime(self):
+        """ Test bigger audiobuffer """
+
+        recv, send = self.argfactory('audiovideo')
+        self.run(recv, send)
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_01')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_24')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__
