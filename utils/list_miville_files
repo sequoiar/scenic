@@ -1,3 +1,10 @@
 #!/bin/bash
-find miville -type f | grep -v .svn | grep -v Makefile | grep -v \*.pyc
+
+if [ -d py ];
+then
+    for ext in py txt xml css js png jpg;
+    do 
+        find py/miville -type f -name \*.$ext
+    done
+fi
 
