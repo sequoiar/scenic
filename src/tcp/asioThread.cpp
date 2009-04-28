@@ -126,7 +126,7 @@ class tcp_session
                         {
                             std::string msg_str;
                             msg.stringify(msg_str);
-                            msg_str+='\n';
+                            msg_str+="\x0D\x0A";
                             async_write(socket_, buffer(msg_str), boost::bind(&tcp_session::write_cb, this, error));
                         }
                     }
