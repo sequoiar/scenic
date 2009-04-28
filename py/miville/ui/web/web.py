@@ -107,7 +107,8 @@ from miville.utils import Observer, log
 from miville.utils.i18n import to_utf
 from miville.utils.common import find_callbacks
 
-from settingspage import SettingsPage
+from miville.ui.web.pages.settingspage import SettingsPage
+from miville.ui.web.pages.gstpage import GstPage
 
 log = log.start('debug', 1, 0, 'web')
 
@@ -246,6 +247,9 @@ class Index(LivePage, Observer):
         log.info("childFactory %s %s" % (ctx, name) )
         if name.lower().startswith("settings"):
             return SettingsPage()
+        if name.lower().startswith("gst"):
+            return GstPage()
+        
 
     def renderHTTP(self, ctx):
         """
