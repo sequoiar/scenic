@@ -58,12 +58,12 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
             self.tst("settings --type stream --globalsetting %s --subgroup %s --mediastream %s01 --modify port=%d"  % (global_setting, group, type, port),  "modified")        
         
     def _add_global_setting_video_rx(self, name, setting, port):
-        self.tst("settings --type global --add video_rx", "Global setting added")
+        self.tst("settings --type global --add %s" % name, "Global setting added")
         # add subgroup
-        self.tst("settings --type streamsubgroup -g video_rx --add recv", "subgroup added")
-        self.tst("settings --type streamsubgroup -g video_rx --subgroup recv --modify enabled=True","modified")     
-        self.tst("settings --type streamsubgroup -g video_rx --subgroup recv --modify mode='receive'","modified")                                                                                      
-        self._add_media_stream('video_rx', 'recv', 'video', setting , port)
+        self.tst("settings --type streamsubgroup -g %s --add recv" % name, "subgroup added")
+        self.tst("settings --type streamsubgroup -g %s --subgroup recv --modify enabled=True" % name,"modified")     
+        self.tst("settings --type streamsubgroup -g %s --subgroup recv --modify mode='receive'" % name,  "modified" )                                                                                      
+        self._add_media_stream(name, 'recv', 'video', setting , port)
 
     def _add_global_setting_video_tx(self):
         self.tst("settings --type global --add video_tx", "Global setting added")
@@ -236,15 +236,17 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
         
         self.tst("settings --save", "saved")
         # audio_rxtx
-        
+        self.add_global_settings()
 
 
-    def atest_03_global_settings(self):
+    def add_global_settings(self):
         # add global setting
-        # 10 000
+        # 10 000             
         setting_id = 10000 + self.media_settings.index('video_mpeg4_rx')
         self._add_global_setting_video_rx('vid_rx_mp4', setting_id, 6666)
-        
+        setting_id = 10000 + self.media_settings.index('video_h263_rx')
+        self._add_global_setting_video_rx('vid_rx_h263', setting_id, 6666)
+
         self.tst("settings --save", "saved")
         # 10 001
         self._add_global_setting_video_tx()
