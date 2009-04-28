@@ -93,6 +93,9 @@ def on_com_chan_disconnected(connection_handle):
     except KeyError, e:
         log.error("error in on_com_chan_disconnected : KeyError " + e.message)        
 
+def get_all_gst_channels():
+    return _gst_channels_dict
+    
 def get_gst_channel_for_contact(contact):
     return _gst_channels_dict[contact]
 
@@ -133,8 +136,6 @@ def split_gst_parameters(global_setting, address):
                             params['address'] = address
                             proc_params[stream.name]= params
     return receiver_procs, sender_procs
-
-
 
 
 def _create_stream_engines( listener, mode, procs_params):
@@ -233,16 +234,21 @@ class GstChannel(object):
     
     def _stop_local_rx_procs(self):
         log.info("Stopping rx processes")
-        for engine in self.receiver_engines:
-            if engine.mode.upper().startswith("RECEIVE"):
-                engine.stop_streaming()    
+        if self.receiver_engines :
+            for engine in self.receiver_engines:
+                if engine.mode.upper().startswith("RECEIVE"):
+                    engine.stop_streaming()
+        else:
+            log.error("No rx processes to stop")
     
     def _stop_local_tx_procs(self):
         log.info("Stop tx processes")
-        for engine in self.sender_engines:
-            if engine.mode.upper().startswith("SEND"):
-                engine.stop_streaming()        
-    
+        if self.sender_engines:
+            for engine in self.sender_engines:
+                if engine.mode.upper().startswith("SEND"):
+                    engine.stop_streaming()        
+        else:
+            log.error("No tx processes to stop")
     
     
     def on_remote_message(self, key, args=None):

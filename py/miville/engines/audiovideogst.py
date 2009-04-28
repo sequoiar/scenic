@@ -39,6 +39,10 @@ class AudioVideoGst(GstClient):
          
     def apply_settings(self, listener, mode, group_name, stream_name, parameters ):
        self.mode = mode
+       self.group_name = group_name
+       self.stream_name = stream_name
+       self.commands = []
+       
        gst_parameters = []
        for k,v in parameters.iteritems():
            if k not in ['engine','gst_address','gst_port']:
@@ -49,11 +53,16 @@ class AudioVideoGst(GstClient):
               
        self.setup_gst_client(mode, gst_port, gst_address)
        if stream_name.upper().startswith('VIDEO'):
-           self._send_cmd('video_init', gst_parameters)
+           self._send_command('video_init', gst_parameters)
        elif stream_name.upper().startswith('AUDIO'):
-           self._send_cmd('audio_init', gst_parameters)
+           self._send_command('audio_init', gst_parameters)
        else:
           raise StreamsError, 'Engine AudioVideoGst does not support "%s" parameters' %  stream_name 
+
+    def _send_command(self, cmd, params):
+        self._send_cmd(cmd, params)
+        tupple_of_fine_stuff = (cmd, params)
+        self.commands.append(tupple_of_fine_stuff)
 
     def start_streaming(self):
         """function start_sending
