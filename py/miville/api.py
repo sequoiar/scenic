@@ -608,6 +608,9 @@ class ControllerApi(object):
     ### Streams ###
     
     def start_streams_tmp(self, caller, contact_name):
+        """
+        DEPRECATED
+        """
         contact = self.get_contact(contact_name)
         if contact:
             if contact.state == CONNECTED:
@@ -615,12 +618,17 @@ class ControllerApi(object):
             elif contact.state == DISCONNECTED:
                 deferred = self.start_connection(caller, contact)
                 if deferred:
-                    deferred.addCallback(self.start_streams_from_defer, caller, contact_name)
+                    deferred.addCallback(self.start_streams_from_deferred, caller, contact_name)
                     deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
     
-    def start_streams_from_defer(self, defer_result, caller, contact_name):
-#        self.start_streams_tmp(caller, contact_name)
-        self.start_streams(caller, contact_name)
+    def start_streams_from_deferred(self, defer_result, caller, contact_name):
+        """
+        Called from deferred returned by start_connection when start_streams() was called without
+        being connected to a contact.
+        """
+#        self.start_streams_tmp(caller, contact_name) DEPRECATED
+        log.info('start_streams_from_deferred %s %s %s' % (defer_result, caller, contact_name))
+        reactor.callLater(1, self.start_streams, caller, contact_name) # let's wait a few seconds more
     
     def start_connection_error_from_defer(self, error, caller, contact_name):
         """
@@ -654,7 +662,7 @@ class ControllerApi(object):
             elif contact.state == DISCONNECTED:
                 deferred = self.start_connection(caller, contact)
                 if deferred:
-                    deferred.addCallback(self.start_streams_from_defer, caller, contact_name)
+                    deferred.addCallback(self.start_streams_from_deferred, caller, contact_name)
                     deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
                             
     def stop_streams(self, caller, contact_name):

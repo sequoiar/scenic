@@ -56,6 +56,9 @@ class NetworkTesting(Widget):
         return False # we must do this for rc_* methods
         
     def cb_network_test_start(self, origin, data):
+        """
+        TODO: Should changed the appearance of widget here
+        """
         # data is a string
         # data could be {message, contact_name, duration}
         log.debug("started network test" + str(origin) + str(data))
