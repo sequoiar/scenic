@@ -6,5 +6,7 @@ then
     do 
         find py/miville -type f -name \*.$ext
     done
+    find py -name Makefile.in -or -name Makefile.am
+    find py/docs -name \*.txt
 fi
 
