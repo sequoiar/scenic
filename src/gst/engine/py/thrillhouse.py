@@ -464,7 +464,7 @@ class MilhouseTests():
         send.audiosource = "filesrc"
         send.videosource = "filesrc"
         send.audiolocation = "/var/tmp/things.mp3"
-        send.videolocation = "/var/tmp/mandela.ogg"
+        send.videolocation = "/var/tmp/trailer_1080p.ogg"
         if os.path.exists(send.audiolocation) and os.path.exists(send.videolocation):
             self.run(recv, send)
         else:
@@ -513,7 +513,7 @@ class MilhouseTests():
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_38')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_33')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

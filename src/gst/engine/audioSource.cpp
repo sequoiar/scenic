@@ -201,7 +201,7 @@ void AudioFileSource::sub_init()
 
     aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
     
-    GstElement * queue = FileSource::acquire(config_.location(), FileSource::AUDIO);
+    GstElement * queue = FileSource::acquireAudio(config_.location());
     gstlinkable::link(queue, aconv_);
 
     // register this filesrc to handle EOS msg and loop if specified
@@ -242,7 +242,7 @@ void AudioFileSource::restartPlayback()
 AudioFileSource::~AudioFileSource()
 {
     Pipeline::Instance()->remove(&aconv_);
-    FileSource::release(config_.location(), FileSource::AUDIO);
+    FileSource::releaseAudio(config_.location());
 }
 
 

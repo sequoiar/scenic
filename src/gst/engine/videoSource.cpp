@@ -117,7 +117,7 @@ void VideoFileSource::init()
     identity_ = Pipeline::Instance()->makeElement("identity", NULL);
     g_object_set(identity_, "silent", TRUE, NULL);
 
-    GstElement * queue = FileSource::acquire(config_.location(), FileSource::VIDEO);
+    GstElement * queue = FileSource::acquireVideo(config_.location());
     gstlinkable::link(queue, identity_);
 }
 
@@ -125,7 +125,7 @@ void VideoFileSource::init()
 VideoFileSource::~VideoFileSource()
 {
     Pipeline::Instance()->remove(&identity_);
-    FileSource::release(config_.location(), FileSource::VIDEO);
+    FileSource::releaseVideo(config_.location());
 }
 
 

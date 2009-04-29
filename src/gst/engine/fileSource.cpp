@@ -64,10 +64,24 @@ bool FileSource::instanceExists(const std::string &location)
 }   
 
 /// checks to see if an instance is already available, or creates a new one if needed.
-GstElement * FileSource::acquire(const std::string &location, MEDIA_TYPE mediaType)
+GstElement * FileSource::acquireAudio(const std::string &location)
 {
-    GstElement *queue = 0;
+    if (not instanceExists(location))  // make new FileSource if needed
+    {
+        fileSources_[location] = new FileSource();
+        fileSources_[location]->init(location);
+    }
+    
+    if (fileSources_[location]->audioQueue_ == 0)
+        fileSources_[location]->audioQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
 
+    return fileSources_[location]->audioQueue_;
+}
+
+
+/// checks to see if an instance is already available, or creates a new one if needed.
+GstElement * FileSource::acquireVideo(const std::string &location)
+{
     if (not instanceExists(location))  // make new FileSource if needed
     {
         fileSources_[location] = new FileSource();
@@ -77,30 +91,12 @@ GstElement * FileSource::acquire(const std::string &location, MEDIA_TYPE mediaTy
     if (fileSources_[location]->videoQueue_ == 0)
         fileSources_[location]->videoQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
 
-    if (fileSources_[location]->audioQueue_ == 0)
-        fileSources_[location]->audioQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
-
-    switch (mediaType)
-    {
-        case VIDEO:
-            {
-                queue = fileSources_[location]->videoQueue_;
-                break;
-            }
-
-        case AUDIO:
-            {   
-                queue = fileSources_[location]->audioQueue_;
-                break;
-            }
-    }
-
-    return queue;
+    return fileSources_[location]->videoQueue_;
 }
  
 
 // called by client
-void FileSource::release(const std::string &location, MEDIA_TYPE mediaType)
+void FileSource::releaseAudio(const std::string &location)
 {
     if (not instanceExists(location))
     {
@@ -108,16 +104,23 @@ void FileSource::release(const std::string &location, MEDIA_TYPE mediaType)
         return;
     }
     
-    switch (mediaType) 
-    {
-        case VIDEO:
-        fileSources_[location]->removeVideo();
-        break;
+    fileSources_[location]->removeAudio();
 
-        case AUDIO:
-        fileSources_[location]->removeAudio();
-        break;
+    if (not fileSources_[location]->isLinked()) // no more objects using the filesource
+        fileSources_.erase(location);
+}
+
+
+// called by client
+void FileSource::releaseVideo(const std::string &location)
+{
+    if (not instanceExists(location))
+    {
+        LOG_WARNING("Trying to call release on non existent FileSource object");
+        return;
     }
+    
+    fileSources_[location]->removeVideo();
 
     if (not fileSources_[location]->isLinked()) // no more objects using the filesource
         fileSources_.erase(location);
@@ -147,6 +150,7 @@ void FileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, g
     GstCaps *caps;
     // now we can link our queue to our new decodebin element
     FileSource *context = static_cast<FileSource*>(data); // data is the FileSource we want
+
     GstElement *sinkElement = NULL;
 
     /* check media type of new srcPad, make sure we link the right one */
@@ -171,7 +175,12 @@ void FileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, g
     }
     gst_caps_unref(caps);
 
-    tassert(sinkElement);
+    if (sinkElement == 0)
+    {
+        LOG_WARNING("Not expecting this decoded stream, ignoring");
+        return;
+    }
+
     sinkPad = gst_element_get_static_pad(sinkElement, "sink");
 
     LOG_DEBUG("linking new srcpad and sinkpad.");

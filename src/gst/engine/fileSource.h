@@ -31,11 +31,11 @@ class _GstPad;
 class FileSource
 {
     public:
-        enum MEDIA_TYPE {VIDEO, AUDIO};
-        static _GstElement * acquire(const std::string &location, MEDIA_TYPE mediaType);
-        static void release(const std::string &location, MEDIA_TYPE mediaType);
+        static _GstElement * acquireAudio(const std::string &location);
+        static _GstElement * acquireVideo(const std::string &location);
+        static void releaseAudio(const std::string &location);
+        static void releaseVideo(const std::string &location);
         
-
     private:
         FileSource();
         ~FileSource();
