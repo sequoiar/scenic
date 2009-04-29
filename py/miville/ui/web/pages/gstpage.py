@@ -46,18 +46,24 @@ log = log.start('debug', 1, 0, 'web')
 def print_engine(engine):
     txt = ""
     txt += "<h3>" + str(engine) + "</h3>"
-    txt += "<p>mode  = " + engine.mode
-    txt += "<p>group = " + engine.group_name
-    txt += "<p>stream= " + engine.stream_name
+    txt += "<p>mode  = " + engine.mode + "</p>"
+    txt += "<p>group = " + engine.group_name + "</p>"
+    txt += "<p>stream= " + engine.stream_name + "</p>"
+    
+    txt += "<p>process= " + str(engine.proc_path) + "</p>"
+    txt += "<p>args   = " + str(engine.args)  + "</p>"
+    txt += "<p>pid    = " + str(engine.pid) + "</p>"
+    
     for cmd in engine.commands:
         command = cmd[0]
         txt += "<p><b>" + command + ": </b>"
         params = cmd[1]
-        for p in params:
-            v = str(p[1])
-            if isinstance(p[1], str) or isinstance(p[1], unicode):
-                v = '"' + v + '"'
-            txt += str(p[0]) + "= <i>" + v + "</i> "
+        if params:
+            for p in params:
+                v = str(p[1])
+                if isinstance(p[1], str) or isinstance(p[1], unicode):
+                    v = '"' + v + '"'
+                txt += str(p[0]) + "= <i>" + v + "</i> "
         txt += "</p>"      
     return txt
 
@@ -70,16 +76,22 @@ def print_channel(channel):
     txt = "<h3>Remote address: " + channel.remote_addr + "</h3>"
     
     counter = 0
-    for sync_group, params in channel.receiver_procs_params.iteritems():
-        engine = channel.receiver_engines[counter]
-        counter += 1
-        txt += print_proc_params(params, "Rx process " + str(counter), engine)
+    if not channel.receiver_procs_params:
+        txt += "<p>No active rx process</p>"
+    else:
+        for sync_group, params in channel.receiver_procs_params.iteritems():
+            engine = channel.receiver_engines[counter]
+            counter += 1
+            txt += print_proc_params(params, "Rx process " + str(counter), engine)
         
     counter = 0
-    for sync_group, params in channel.sender_procs_params.iteritems():
-        engine = channel.sender_engines[counter]
-        counter += 1
-        txt += print_proc_params(params, "Tx process " + str(counter), engine) 
+    if not channel.sender_procs_params:
+        txt += "<p>No active tx process</p>"
+    else:
+        for sync_group, params in channel.sender_procs_params.iteritems():
+            engine = channel.sender_engines[counter]
+            counter += 1
+            txt += print_proc_params(params, "Tx process " + str(counter), engine) 
     
     channel.sender_engines
     return txt
@@ -88,7 +100,7 @@ def print_gst():
     txt = "<h1>Propulseart Gst engines</h1>"
     channels_dict = get_all_gst_channels()
     for contact, channel in channels_dict.iteritems():
-        txt = "<h2>Contact: %s</2>" % contact
+        txt += "<h2>Contact: %s</2>" % contact
         txt += print_channel(channel)
     return txt
 
