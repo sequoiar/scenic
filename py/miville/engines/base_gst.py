@@ -42,7 +42,7 @@ CONNECTED = 4
 STREAMSTOPPED = 5
 STREAMINIT = 6
 STREAMING = 7
-
+FAILURE = 100
 
 
 streaming_server_process_name = "milhouse"
@@ -69,7 +69,7 @@ class BaseGst(object):
 
 class GstServer(object):
 
-    def __init__(self, mode, port, address, callback):
+    def __init__(self, mode, port, address, callback_dict):
         self.port = port
         self.address = address
         self.mode = mode
@@ -79,7 +79,7 @@ class GstServer(object):
         self.state = -1
         self.change_state(STOPPED)
         self.commands = []
-        self.callback = callback
+        self.callback_dict = callback_dict
 
     def connect(self):
         log.debug("GstServer.connect")
@@ -89,14 +89,23 @@ class GstServer(object):
             deferred.addCallback(self.connection_ready)
             deferred.addErrback(self.connection_failed)
 
+    def get_state_str(self, state):
+        all_states = {-1:'NOTHING', STOPPED:'STOPPED', STARTING:'STARTING', RUNNING:'RUNNING', 
+                   CONNECTING:'CONNECTING', CONNECTED:'CONNECTED', STREAMSTOPPED: 'STREAMSTOPPED',
+                   STREAMINIT:'STREAMINIT', STREAMING:'STREAMING', FAILURE:'FAILURE'}
+        s = all_states[state]
+        return s
+    
+    def get_status(self):
+        s = self.get_state_str(self.state)
+        return s
+        
     def change_state(self, new_state):
          old_state = self.state
          self.state = new_state
-         
-         all_states = {-1:'NOTHING', STOPPED:'STOPPED', STARTING:'STARTING', RUNNING:'RUNNING', 
-                   CONNECTING:'CONNECTING', CONNECTED:'CONNECTED', STREAMSTOPPED: 'STREAMSTOPPED',
-                   STREAMINIT:'STREAMINIT', STREAMING:'STREAMING'}
-         log.info('GstServer state changed from %s to %s handle: %s ' % (all_states[old_state], all_states[new_state], str(self) ))
+         old_str = self.get_state_str(old_state)
+         new_str = self.get_state_str(new_state)
+         log.info('GstServer state changed from %s to %s handle: %s ' % ( old_str, new_str, str(self) ))
 
     def connection_ready(self, ipcp):
         log.info("CONNECTION ready %s" % str(self))
@@ -105,68 +114,14 @@ class GstServer(object):
         log.info('CONN: %s %s' % (ipcp, ipcp.__dict__))
         self.conn = ipcp
         self.conn.connectionLost = self.connection_lost
-        # Our GST keywords
-#        self.conn.add_callback(self.gst_log, 'log')
-#        self.conn.add_callback(self.gst_video_init, 'video_init')
-#        self.conn.add_callback(self.gst_audio_init, 'audio_init')
-#        self.conn.add_callback(self.gst_start, 'start')
-#        self.conn.add_callback(self.gst_audio_init, 'stop')
-#        self.conn.add_callback(self.gst_success, 'success')
-#        self.conn.add_callback(self.gst_failure, 'failure')
-#        self.conn.add_callback(self.gst_rtp, 'rtp')
-        
-        self.conn.add_callback(self.callback, 'log')
-        self.conn.add_callback(self.callback, 'video_init')
-        self.conn.add_callback(self.callback, 'audio_init')
-        self.conn.add_callback(self.callback, 'start')
-        self.conn.add_callback(self.callback, 'stop')
-        self.conn.add_callback(self.callback, 'success')
-        self.conn.add_callback(self.callback, 'failure')
-        self.conn.add_callback(self.callback, 'rtp')
+
+        for key, callback  in self.callback_dict.iteritems():
+            self.conn.add_callback(callback, key)
           
         self.change_state(CONNECTED)
         log.info('GST inter-process link created')
     
-    def _log_with_id(self, msg):
         
-        
-        try:
-            a = 3
-        except exceptions.AttributeError:
-            pass
-        
-        s = "GstServer" % (self.mode)
-        
-    def gst_video_init(self, **args):
-        log.info('GST VIDEO INIT acknowledged:  args %s %s' %  ( str(args), str(self))  )
-        self.change_state(STREAMINIT)
-
-    def gst_start(self,  **args):
-        log.info('GST START acknowledged... our args %s  %s' % (str(args), str(self)) )
-        self.change_state(STREAMING)
-        
-    def gst_stop(self,  **args):
-        log.info('GST STOP acknowledged ... our args %s  %s' % (str(args), str(self)) )
-        self.change_state(STREAMSTOPPED)
-
-    def gst_audio_init(self,  **args):
-        log.info('GST AUDIO INIT acknowledged our args %s  %s' % (str(args), str(self)) )
-        self.change_state(STREAMINIT)
-
-    def gst_success(self, **args):
-        log.info('GST success :-)  args %s %s' %  (str(args), str(self)) )
-        self.change_state(STREAMINIT)
-
-    def gst_failure(self, **args):
-        log.debug('GST failure :-(  args %s %s' %  (str(args), str(self)) )
-        self.change_state(STREAMINIT)
-
-    def gst_log(self, **args):
-        log.info('GST log  [%s] %s' %  (str(args), str(self)) )
-
-    def gst_rtp(self, **args):
-        log.info('GST RTP stats  [%s] %s' %  (str(args), str(self)) )
-
 
     def connection_failed(self, conn):
         msg = 'GstServer.connection_failed: Address: %s, Port: %s %s' % (self.address, self.port, str(self))
@@ -291,11 +246,10 @@ class GstClient(BaseGst):
     def __init__(self):
         log.debug("GstClient __init__  " + str(self))
     
-    def setup_gst_client(self, mode, port, address): 
+    def setup_gst_client(self, mode, port, address, callbacks_dict): 
         log.debug('GstClient.setup_gst_client '+ str(self))
-        self._gst = GstServer(mode, port, address, self.gst_callback)
-        self.proc_path, self.args, self.pid = self._gst.start_process()
-        
+        self.gst_server = GstServer(mode, port, address, callbacks_dict)
+        self.proc_path, self.args, self.pid = self.gst_server.start_process()
         log.debug('GstClient.setup_gst_client done')
         
  
@@ -304,20 +258,20 @@ class GstClient(BaseGst):
         msg += " args: " + str(args)
         msg += ' handle: ' + str(self)
         log.debug(msg)
-        self._gst.send_cmd(cmd, args, callback)
+        self.gst_server.send_cmd(cmd, args, callback)
 
     def _add_callback(self, cmd, name=None):
         log.debug('GstClient._add_callback'+ str(self))
-        self._gst.add_callback(cmd, name)
+        self.gst_server.add_callback(cmd, name)
 
     def _del_callback(self, callback=None):
         log.debug('GstClient._del_callback'+ str(self))
-        self._gst.del_callback(callback)
+        self.gst_server.del_callback(callback)
 
     def stop_process(self):
         log.debug('GstClient.stop_process'+ str(self))
-        if self._gst.state > 0:
-            self._gst.kill()
+        if self.gst_server.state > 0:
+            self.gst_server.kill()
 
 
 class GstProcessProtocol(protocol.ProcessProtocol):

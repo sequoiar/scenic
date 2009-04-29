@@ -29,6 +29,7 @@ from miville.protocols.ipcp import parse
 from miville.errors import *
 from miville.utils.common import PortNumberGenerator
 
+import miville.engines.base_gst
 
 gst_ipcp_port_gen = PortNumberGenerator(9000, 1)
 gst_av_port_gen = PortNumberGenerator(10000, 10)
@@ -48,6 +49,8 @@ class AudioVideoGst(GstClient):
        self.pid = None
        
        
+       
+       
        gst_parameters = []
        for k,v in parameters.iteritems():
            if k not in ['engine','gst_address','gst_port']:
@@ -55,8 +58,18 @@ class AudioVideoGst(GstClient):
        log.debug('AudioVideoGst.apply_settings group:' + str(group_name) + ' stream: ' + str(stream_name) + ' params: ' + str(gst_parameters))
        gst_address =  '127.0.0.1' # parameters['gst_address']
        gst_port =  gst_ipcp_port_gen.generate_new_port() # parameters['gst_port']
+       
+       callbacks = {'log'       :self.gst_log,
+                    'video_init':self.gst_video_init, 
+                    'audio_init':self.gst_audio_init, 
+                    'start'     :self.gst_start, 
+                    'stop'      :self.gst_audio_init,
+                    'success'   :self.gst_success,
+                    'failure'   :self.gst_failure,
+                    'rtp'       :self.gst_rtp 
+                    }
               
-       self.setup_gst_client(mode, gst_port, gst_address)
+       self.setup_gst_client(mode, gst_port, gst_address, callbacks)
        if stream_name.upper().startswith('VIDEO'):
            self._send_command('video_init', gst_parameters)
        elif stream_name.upper().startswith('AUDIO'):
@@ -64,13 +77,45 @@ class AudioVideoGst(GstClient):
        else:
           raise StreamsError, 'Engine AudioVideoGst does not support "%s" parameters' %  stream_name 
 
+    def get_status(self):
+        s = self.gst_server.get_status()
+        return s
+        
     def _send_command(self, cmd, params = None):
         self._send_cmd(cmd, params)
         tupple_of_fine_stuff = (cmd, params)
         self.commands.append(tupple_of_fine_stuff)
 
-    def gst_callback(self, **args):
-        log.info('AudioVideoGst.gst_callback [%s] %s' %  (str(args), str(self)) )
+    def gst_video_init(self, **args):
+        log.info('GST VIDEO INIT acknowledged:  args %s %s' %  ( str(args), str(self))  )
+        self.gst_server.change_state(miville.engines.base_gst.STREAMINIT)
+
+    def gst_start(self,  **args):
+        log.info('GST START acknowledged... our args %s  %s' % (str(args), str(self)) )
+        self.gst_server.change_state(miville.engines.base_gst.STREAMING)
+        
+    def gst_stop(self,  **args):
+        log.info('GST STOP acknowledged ... our args %s  %s' % (str(args), str(self)) )
+        self.gst_server.change_state(miville.engines.base_gst.STREAMSTOPPED)
+
+    def gst_audio_init(self,  **args):
+        log.info('GST AUDIO INIT acknowledged our args %s  %s' % (str(args), str(self)) )
+        self.gst_server.change_state(miville.engines.base_gst.STREAMINIT)
+
+    def gst_success(self, **args):
+        log.info('GST success :-)  args %s %s' %  (str(args), str(self)) )
+        self.gst_server.change_state(miville.engines.base_gst.STREAMINIT)
+
+    def gst_failure(self, **args):
+        log.debug('GST failure :-(  args %s %s' %  (str(args), str(self)) )
+        self.gst_server.change_state(miville.engines.base_gst.FAILURE)
+
+    def gst_log(self, **args):
+        log.info('GST log  [%s] %s' %  (str(args), str(self)) )
+
+    def gst_rtp(self, **args):
+        for key in args:
+            log.debug("   arg[%s] = %s" % (key, args[key]) )
 
     def start_streaming(self):
         """function start_sending
