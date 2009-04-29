@@ -69,7 +69,7 @@ class BaseGst(object):
 
 class GstServer(object):
 
-    def __init__(self, mode, port, address):
+    def __init__(self, mode, port, address, callback):
         self.port = port
         self.address = address
         self.mode = mode
@@ -79,6 +79,7 @@ class GstServer(object):
         self.state = -1
         self.change_state(STOPPED)
         self.commands = []
+        self.callback = callback
 
     def connect(self):
         log.debug("GstServer.connect")
@@ -105,14 +106,23 @@ class GstServer(object):
         self.conn = ipcp
         self.conn.connectionLost = self.connection_lost
         # Our GST keywords
-        self.conn.add_callback(self.gst_log, 'log')
-        self.conn.add_callback(self.gst_video_init, 'video_init')
-        self.conn.add_callback(self.gst_audio_init, 'audio_init')
-        self.conn.add_callback(self.gst_start, 'start')
-        self.conn.add_callback(self.gst_audio_init, 'stop')
-        self.conn.add_callback(self.gst_success, 'success')
-        self.conn.add_callback(self.gst_failure, 'failure')
-        self.conn.add_callback(self.gst_rtp, 'rtp')
+#        self.conn.add_callback(self.gst_log, 'log')
+#        self.conn.add_callback(self.gst_video_init, 'video_init')
+#        self.conn.add_callback(self.gst_audio_init, 'audio_init')
+#        self.conn.add_callback(self.gst_start, 'start')
+#        self.conn.add_callback(self.gst_audio_init, 'stop')
+#        self.conn.add_callback(self.gst_success, 'success')
+#        self.conn.add_callback(self.gst_failure, 'failure')
+#        self.conn.add_callback(self.gst_rtp, 'rtp')
+        
+        self.conn.add_callback(self.callback, 'log')
+        self.conn.add_callback(self.callback, 'video_init')
+        self.conn.add_callback(self.callback, 'audio_init')
+        self.conn.add_callback(self.callback, 'start')
+        self.conn.add_callback(self.callback, 'stop')
+        self.conn.add_callback(self.callback, 'success')
+        self.conn.add_callback(self.callback, 'failure')
+        self.conn.add_callback(self.callback, 'rtp')
           
         self.change_state(CONNECTED)
         log.info('GST inter-process link created')
@@ -189,7 +199,7 @@ class GstServer(object):
                     log.info(msg)
                     self.process = reactor.spawnProcess(protocol, proc_path, args, os.environ, usePTY=True)
                     log.info("Process spawned pid=" + str(self.process.pid)  + " "+ str(self))
-                    
+                    return proc_path, args, self.process.pid
                 except Exception, e:
                     log.critical('Cannot start the GST application "%s": %s %s' % (streaming_server_process_name, str(e), str(self) ) )
             else:
@@ -283,8 +293,9 @@ class GstClient(BaseGst):
     
     def setup_gst_client(self, mode, port, address): 
         log.debug('GstClient.setup_gst_client '+ str(self))
-        self._gst = GstServer(mode, port, address)
-        self._gst.start_process()
+        self._gst = GstServer(mode, port, address, self.gst_callback)
+        self.proc_path, self.args, self.pid = self._gst.start_process()
+        
         log.debug('GstClient.setup_gst_client done')
         
  

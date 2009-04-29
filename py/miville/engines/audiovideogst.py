@@ -43,6 +43,11 @@ class AudioVideoGst(GstClient):
        self.stream_name = stream_name
        self.commands = []
        
+       self.args = None
+       self.proc_path = None
+       self.pid = None
+       
+       
        gst_parameters = []
        for k,v in parameters.iteritems():
            if k not in ['engine','gst_address','gst_port']:
@@ -59,20 +64,23 @@ class AudioVideoGst(GstClient):
        else:
           raise StreamsError, 'Engine AudioVideoGst does not support "%s" parameters' %  stream_name 
 
-    def _send_command(self, cmd, params):
+    def _send_command(self, cmd, params = None):
         self._send_cmd(cmd, params)
         tupple_of_fine_stuff = (cmd, params)
         self.commands.append(tupple_of_fine_stuff)
+
+    def gst_callback(self, **args):
+        log.info('AudioVideoGst.gst_callback [%s] %s' %  (str(args), str(self)) )
 
     def start_streaming(self):
         """function start_sending
          address: string
         """
-        self._send_cmd('start')
+        self._send_command('start')
 
     def stop_streaming(self):
         """function stop_sending
         """
-        self._send_cmd('stop')
+        self._send_command('stop')
         self.stop_process()
         

@@ -229,8 +229,6 @@ class GstChannel(object):
         self.start_local_gst_processes(self.receiver_procs_params,  self.sender_procs_params)
         self.send_message(REMOTE_STREAMING_CMD,[rx_remote_params, tx_remote_params] )
     
-
-
     
     def _stop_local_rx_procs(self):
         log.info("Stopping rx processes")
