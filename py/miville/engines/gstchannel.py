@@ -137,7 +137,6 @@ def split_gst_parameters(global_setting, address):
                             proc_params[stream.name]= params
     return receiver_procs, sender_procs
 
-
 def _create_stream_engines( listener, mode, procs_params):
     """
     Returns list of new stream engines.    
@@ -160,12 +159,10 @@ def _create_stream_engines( listener, mode, procs_params):
         engines.append(engine)
     return engines
 
-
 REMOTE_STREAMING_CMD = "start_streaming"
 STOP_RECEIVERS_CMD   = "stop_receivers"
 RECEIVERS_STOPPED    = "receivers_stopped"
 STOP_SENDERS_CMD     = "stop_senders"
-
 
 class GstChannel(object):
     """
@@ -228,8 +225,7 @@ class GstChannel(object):
         self.sender_procs_params = tx_params
         self.start_local_gst_processes(self.receiver_procs_params,  self.sender_procs_params)
         self.send_message(REMOTE_STREAMING_CMD,[rx_remote_params, tx_remote_params] )
-    
-    
+        
     def _stop_local_rx_procs(self):
         log.info("Stopping rx processes")
         if self.receiver_engines :
@@ -247,8 +243,7 @@ class GstChannel(object):
                     engine.stop_streaming()        
         else:
             log.error("No tx processes to stop")
-    
-    
+      
     def on_remote_message(self, key, args=None):
         """
         Called by the com_chan whenever a message is received from the remote contact 
@@ -289,8 +284,6 @@ class GstChannel(object):
         for engine in engines:
             log.debug('GstChannel._start_stream_engines: ' + str(engine))
             engine.start_streaming()
-            
-  
             
     def start_local_gst_processes(self, rx_params, tx_params):
         """
