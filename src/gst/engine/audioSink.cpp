@@ -30,8 +30,6 @@
 #include "pipeline.h"
 #include "alsa.h"
 
-// const unsigned long long AudioSink::BUFFER_TIME = 10000LL; better
-// const unsigned long long AudioSink::BUFFER_TIME = 30000LL; safer 
 bool AudioSink::signalHandlerAttached_ = false;
         
 /// Constructor 

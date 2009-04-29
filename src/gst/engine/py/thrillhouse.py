@@ -483,13 +483,13 @@ class MilhouseTests():
             print "No such files, skipping this test"
 
     def test_35_v4l2_only(self):
-        """ Just audio """
+        """ Just v4l2 """
         recv, send = self.argfactory('video')
         self.run(recv, send)
     
 
     def test_36_videofile_only(self):
-        """ Just audio """
+        """ Just video file """
         recv, send = self.argfactory('video')
         send.videosource = "filesrc"
         if os.path.exists(send.videolocation):
@@ -505,14 +505,15 @@ class MilhouseTests():
         self.run(recv, send)
     
     def test_38_bufferTime(self):
-        """ Test bigger audiobuffer """
+        """ Test smaller audiobuffer to make sure the corrections is happening """
 
         recv, send = self.argfactory('audiovideo')
+        recv.audio_buffer_usec = 11333
         self.run(recv, send)
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_24')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_38')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

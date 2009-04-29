@@ -27,7 +27,6 @@
 #include "audioSink.h"
 #include "jackUtils.h"
 
-///  Constuctor sets by default loop to LOOP_NONE, but has file location specified 
 AudioSourceConfig::AudioSourceConfig(const std::string & source__, 
         const std::string & deviceName__,
         const std::string & location__,
@@ -102,15 +101,13 @@ bool AudioSourceConfig::locationExists() const
     return fileExists(location_);
 }
 
+
 /// Constructor 
 AudioSinkConfig::AudioSinkConfig(const std::string & sink__, const std::string & deviceName__, unsigned long long bufferTime__) : 
     sink_(sink__), deviceName_(deviceName__), bufferTime_(bufferTime__)
 {
-    if (bufferTime_ < MIN_BUFFER_TIME)
-        THROW_CRITICAL("Audio sink buffer time " << bufferTime_ << " is too low, must be greater than " << MIN_BUFFER_TIME);
-
-    if (sink_ == "jackaudiosink")   // this has to happen early but this is pretty gross
-        Jack::ensureReady();
+    if (sink_ == "jackaudiosink") // FIXME: it's good for this to happen early 
+        Jack::ensureReady();      // (before waiting on caps) but having it here is pretty gross
 }
 
 /// Copy constructor 

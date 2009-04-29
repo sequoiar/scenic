@@ -77,8 +77,7 @@ class AudioSinkConfig
         bool hasDeviceName() const { return !deviceName_.empty(); }
         const char *deviceName() const;
         unsigned long long bufferTime() const;
-        // based on 64 frames/second at 48000 frames/sec + 10000 usecs of extra buffering
-        static const unsigned long long MIN_BUFFER_TIME = 11333LL;  
+        static const unsigned long long DEFAULT_BUFFER_TIME = 10000LL;
 
     private:
         const std::string sink_;
