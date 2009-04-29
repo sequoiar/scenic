@@ -37,14 +37,27 @@ void GstThread::start(MapMsg&)
     playback::start();
 }
 
+
 void GstSenderThread::start(MapMsg& )
 { 
     playback::start();
-    if(ff[0])
-        ff[0](video_->getCaps());
-    if(ff[1])
-        ff[1](audio_->getCaps());
+    if(videoFirst)
+    {
+        if(ff[0])
+            ff[0](video_->getCaps());
+        if(ff[1])
+            ff[1](audio_->getCaps());
+    }
+    else
+    {
+        if(ff[1])
+            ff[1](audio_->getCaps());
+        if(ff[0])
+            ff[0](video_->getCaps());
+    }
 } 
+
+
 void GstThread::main()
 {
     bool done = false;
@@ -157,6 +170,7 @@ GstReceiverThread::~GstReceiverThread()
     delete audio_;
 }
 
+
 void GstReceiverThread::video_init(MapMsg& msg)
 {
     delete video_;
@@ -205,13 +219,12 @@ void GstReceiverThread::audio_init(MapMsg& msg)
 }
 
 
-
-
 GstSenderThread::~GstSenderThread()
 {
     delete video_;
     delete audio_;
 }
+
 
 void GstSenderThread::video_init(MapMsg& msg)
 {
@@ -228,6 +241,10 @@ void GstSenderThread::video_init(MapMsg& msg)
 
         VideoSourceConfig config(msg["source"], msg["bitrate"], videoDevice, videoLocation, msg["deinterlace"]);
         video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
+        if(ff[1])
+            videoFirst = false;
+        else
+            videoFirst = true;
 
         ff[0] = boost::bind(tcpSendBuffer, msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, videofactory::MSG_ID, _1);
     }
@@ -257,7 +274,7 @@ void GstSenderThread::audio_init(MapMsg& msg)
 
         AudioSourceConfig config(msg["source"], audioDevice, audioLocation, msg["channels"]);
         audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
-
+         
         ff[1] = boost::bind(tcpSendBuffer,msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, audiofactory::MSG_ID, _1);
     }
     catch(Except e)
