@@ -48,16 +48,12 @@ void GstSenderThread::start(MapMsg& )
 void GstThread::main()
 {
     bool done = false;
-    bool flipflop = false;
     int play_id = 0;
     int stop_id = 0;
     while(!done)
     {
         if(g_main_context_iteration(NULL, FALSE))
             continue;
-        //std::cout << (flipflop ? "-\r" : " \r");
-        flipflop = !flipflop;
-        //std::cout.flush();
     
         if(queue_.ready())
         {
@@ -93,7 +89,7 @@ void GstThread::main()
             {
                 try
                 {
-                    audio_start(f);
+                    audio_init(f);
                     MapMsg r("success");
                     r["id"] = f["id"];
                     queue_.push(r);
@@ -120,7 +116,7 @@ void GstThread::main()
             {
                 try
                 {
-                    video_start(f);
+                    video_init(f);
                     MapMsg r("success");
                     r["id"] = f["id"];
                     queue_.push(r);
@@ -133,12 +129,6 @@ void GstThread::main()
                     queue_.push(r);
                 }
             }
-#if 0
-            else if(s == "levels")
-            {
-                queue_.push(f);
-            }
-#endif
             else if (s == "rtp")
                 queue_.push(f);
             else
@@ -167,7 +157,7 @@ GstReceiverThread::~GstReceiverThread()
     delete audio_;
 }
 
-void GstReceiverThread::video_start(MapMsg& msg)
+void GstReceiverThread::video_init(MapMsg& msg)
 {
     delete video_;
     video_ = 0;
@@ -178,7 +168,6 @@ void GstReceiverThread::video_start(MapMsg& msg)
         const int SCREEN_NUM = 0;       
         const char *VIDEO_SINK = "xvimagesink";
         video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], SCREEN_NUM, VIDEO_SINK);
-//        queue_.push(MapMsg("video_started"));
     }
     catch(Except e)
     {
@@ -190,7 +179,7 @@ void GstReceiverThread::video_start(MapMsg& msg)
 }
 
 
-void GstReceiverThread::audio_start(MapMsg& msg)
+void GstReceiverThread::audio_init(MapMsg& msg)
 {
     delete audio_;
     audio_ = 0;
@@ -205,7 +194,6 @@ void GstReceiverThread::audio_start(MapMsg& msg)
 
         audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], 
                 AUDIO_SINK, AUDIO_LOCATION, audioBufferTime);
-//        queue_.push(MapMsg("audio_started"));
     }
     catch(Except e)
     {
@@ -225,14 +213,12 @@ GstSenderThread::~GstSenderThread()
     delete audio_;
 }
 
-void GstSenderThread::video_start(MapMsg& msg)
+void GstSenderThread::video_init(MapMsg& msg)
 {
     delete video_;
     video_ = 0;
     try
     {
-        //VideoSourceConfig config("dv1394src");
-        //SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
         LOG_INFO("video_init");
         std::string videoDevice, videoLocation;
         if(!msg["location"].empty())
@@ -244,8 +230,6 @@ void GstSenderThread::video_start(MapMsg& msg)
         video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
 
         ff[0] = boost::bind(tcpSendBuffer, msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, videofactory::MSG_ID, _1);
-        //sender->getCaps());
-//        ff[0]();
     }
     catch(Except e)
     {
@@ -257,7 +241,7 @@ void GstSenderThread::video_start(MapMsg& msg)
 }
 
 
-void GstSenderThread::audio_start(MapMsg& msg)
+void GstSenderThread::audio_init(MapMsg& msg)
 {
     delete audio_;
     audio_ = 0;
@@ -271,16 +255,10 @@ void GstSenderThread::audio_start(MapMsg& msg)
         if(!msg["device"].empty())
             audioDevice = static_cast<std::string>(msg["device"]);
 
-//        SenderConfig rConfig(msg["codec"], msg["address"], msg["port"]);
         AudioSourceConfig config(msg["source"], audioDevice, audioLocation, msg["channels"]);
         audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
 
         ff[1] = boost::bind(tcpSendBuffer,msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, audiofactory::MSG_ID, _1);
-        //Build Caps Msg
- //       MapMsg caps("caps");
- //       caps["caps_str"] = asender->getCaps();
-        //Forward to tcp
- //       queue_.push(caps);
     }
     catch(Except e)
     {

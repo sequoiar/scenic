@@ -37,9 +37,9 @@ class GstSenderThread
         virtual void start(MapMsg& ); 
     private:
         /// incomming audio_start request 
-        void audio_start(MapMsg& msg);
+        void audio_init(MapMsg& msg);
         /// incomming video_start request 
-        void video_start(MapMsg& msg);
+        void video_init(MapMsg& msg);
 
         SenderBase* video_;
         SenderBase* audio_;
