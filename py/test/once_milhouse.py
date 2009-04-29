@@ -28,10 +28,6 @@ import time
 
 fname = __file__.split('.')[0]
 
-#FIXME: presently the video_init messages have to happen before the audio_init msgs
-# see https://svn.sat.qc.ca/trac/miville/ticket/96
-#
-
 
 class Test_MilhouseOneWay(unittest.TestCase):
     def setUp(self):

@@ -1,4 +1,5 @@
--set buffer-time based on latency/buffer, i.e. latency of 2.67 ms should have something greater than 1333 microsecs
+-tickets!!!
+-make sure no exceptions can be thrown from destructors
 -figure out what happens if jack settings differ between machines
 -try and clean up videosink based on examples of such
 -write about latency rtp issues/testing with netem scripts and so on
