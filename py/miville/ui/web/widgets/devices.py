@@ -121,7 +121,7 @@ class Devices(Widget):
                         else:
                             a_opts = "default=%s" % (attr.default)
                         attr_list.append({'name':a_name, 'value':a_value, 'kind':a_kind, 'options':a_opts})
-                        lines.append("/%s/%s/%s/%s (%s) = %s" % (dr_kind, dr_name, dev_name, a_name, a_kind, a_value)) # , a_opts))
+                        lines.append("/%s/%s: %s %s=%s (%s)" % (dr_kind, dr_name, dev_name, a_name, a_value, a_kind)) # , a_opts))
                     lines.append('')
                     devs.append({'kind':dr_kind, 'driver_name':dr_name, 'device_name':dev_name, 'attributes':attr_list})
             self.callRemote('rc_devices_list_all', "\n".join(lines), devs)
