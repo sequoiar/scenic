@@ -5,6 +5,10 @@
     <br />
 	<h3 n:render="i18n">Devices</h3>
     <div id="devices" class="section">
+        <div id="deviceswidget_devices">
+            No device to list.
+        </div>
+        <!--
         <table>
             <tr>
                 <td>
@@ -27,6 +31,7 @@
                 </td>
             </tr>
         </table>
+        -->
 	</div>
 
     <!-- ####################### -->

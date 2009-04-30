@@ -88,6 +88,7 @@ def _parse_v4l2_ctl_all(lines):
                     results['height'] = dimen[1]
                 elif key == 'Video input':
                     results['input'] = value.split('(')[1].split(')')[0] # 0 (Composite0)
+                    # log.debug('V4L2 input: ' + results['input'])
                     # TODO : possibilities are Composite0, Composite1, 
                 # norm
             elif category == "Video Standard":
@@ -99,6 +100,10 @@ def _parse_v4l2_ctl_all(lines):
                 elif norm.startswith('SECAM-'):
                     norm = 'secam'
                 results['norm'] = norm
+        elif line.find("Video input") == 0:
+            results['input'] = line.split('(')[1].split(')')[0]
+            # log.debug('V4L2 input: ' + results['input'])
+            # TODO : possibilities are Composite0, Composite1, 
         elif line.find(":") > 0:
             try:
                 category = line.split(':')[0]
@@ -251,7 +256,7 @@ class Video4LinuxDriver(devices.VideoDriver):
             #inputs = ['Composite0', 'Composite1', 'S-Video'] # 'Composite2', 
             if val in attr.options:
                 index = attr.options.index(val)
-                command = ['v4l2-ctl', '--set-input=' + index, '-d', dev_name]
+                command = ['v4l2-ctl', '--set-input=' + str(index), '-d', dev_name]
                 ret = single_command_start(command, self.on_commands_results, 'attr_change', caller) 
  
         return ret # Deferred
@@ -324,7 +329,7 @@ class Video4LinuxDriver(devices.VideoDriver):
                             # Composite0, Composite1,  Composite2, S-Video
                             #attr = devices.OptionsAttribute(key, , 0, ['Composite0', 'Composite1', 'S-Video']) # 'Composite2'
                             #device.add_attribute(attr)
-                            device.attributes[key].set_value(value, False)
+                            device.attributes[key]._value = value # set_value(value)
                         elif key == "norm":
                             attr = devices.OptionsAttribute(key, dic[key], 'ntsc', ['ntsc', 'pal', 'secam'])
                             device.add_attribute(attr) # we could check if value is valid

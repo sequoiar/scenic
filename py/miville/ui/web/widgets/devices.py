@@ -55,6 +55,27 @@ class Devices(Widget):
         devs = self.api.devices_list(caller, kind)
         return False # we must do this for rc_* methods
     
+    def rc_devices_list_all(self):
+        """
+        TODO: will notify with 'info' key if there is an error.
+        """
+        log.debug('Will call api.devices_list_all')
+        devs = self.api.devices_list_all(self)
+        return False
+    
+    def cb_devices_removed(self, origin, data):
+        """These might cause troubles if attributes change too often."""
+        log.debug('cb_devices_removed')
+        self.api.devices_list_all(self)
+    def cb_devices_added(self, origin, data):
+        """These might cause troubles if attributes change too often."""
+        log.debug('cb_devices_added')
+        self.api.devices_list_all(self)
+    def cb_device_attributes_changed(self, origin, data):
+        """These might cause troubles if attributes change too often."""
+        log.debug('cb_device_attributes_changed')
+        self.api.devices_list_all(self)
+
     def cb_devices_list(self, origin, data):
         """
         Devices list for one kind of driver. (video or audio)
@@ -72,6 +93,38 @@ class Devices(Widget):
                 log.debug("cb_devices_list" + msg)
                 devices_list = msg
                 self.callRemote('rc_devices_list', driver_name, devices_list)
+
+    def cb_devices_list_all(self, origin, data):
+        """
+        :data: list of devices
+        they all belong to the same driver.
+        """
+        log.debug('Got answer from api.devices_list_all')
+        lines = []
+        devs = []
+        if origin is self:
+            if len(data) == 0:
+                lines.append("No devices to list.")
+            else:
+                for device in data:
+                    dr_kind = device.driver.kind
+                    dr_name = device.driver.name
+                    dev_name = device.name
+                    attributes = device.attributes.values()
+                    attr_list = []
+                    for attr in attributes:
+                        a_name = attr.name
+                        a_value = attr.get_value()
+                        a_kind = attr.kind # int, string, boolean, options
+                        if a_kind == 'options':
+                            a_opts = "options=%s" % (attr.options)
+                        else:
+                            a_opts = "default=%s" % (attr.default)
+                        attr_list.append({'name':a_name, 'value':a_value, 'kind':a_kind, 'options':a_opts})
+                        lines.append("/%s/%s/%s/%s (%s) = %s" % (dr_kind, dr_name, dev_name, a_name, a_kind, a_value)) # , a_opts))
+                    lines.append('')
+                    devs.append({'kind':dr_kind, 'driver_name':dr_name, 'device_name':dev_name, 'attributes':attr_list})
+            self.callRemote('rc_devices_list_all', "\n".join(lines), devs)
 
 #     def rc_device_list_attributes(self, driver_kind, driver_name, device_name): 
 #         """

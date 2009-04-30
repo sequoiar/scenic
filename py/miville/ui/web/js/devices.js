@@ -35,10 +35,10 @@ Devices.methods(
 		self.contact = null;
 		
 		// Get elements.
-		self.list_v4l2_btn = $('deviceswidget_list_v4l2');
-		self.list_jackd_btn = $('deviceswidget_list_jackd');
-		self.jackd_div = $('deviceswidget_jackd');
-        self.v4l2_div = $('deviceswidget_v4l2');
+		//self.list_v4l2_btn = $('deviceswidget_list_v4l2');
+		//self.list_jackd_btn = $('deviceswidget_list_jackd');
+		self.devices_div = $('deviceswidget_devices');
+        //self.v4l2_div = $('deviceswidget_v4l2');
         //self.v4l2_input_popup = $('deviceswidget_unit');
 		
 		// Get string translations.
@@ -50,13 +50,15 @@ Devices.methods(
 		
 		// Register to the widgets communicator.
 		register('deviceswidget', self);
+        self.callRemote('rc_devices_list_all');
 
-        self.list_jackd_btn.addEvent('click', function(){
-            self.devices_list('audio');
-        });
-        self.list_v4l2_btn.addEvent('click', function(){
-            self.devices_list('video');
-        });
+        //self.list_jackd_btn.addEvent('click', function(){
+        //    self.devices_list('audio');
+        //    self.devices_list_all();
+        //});
+        //self.list_v4l2_btn.addEvent('click', function(){
+        //    self.devices_list('video');
+        //});
 	},
 	
 	/**
@@ -125,12 +127,59 @@ Devices.methods(
     },
 
 	/**
+     * Refreshes the list of all devices attributes.
+	 * (called from the js client)
+	 * 
+	 * @member Devices
+	 */
+	function devices_list_all(self) {
+        self.callRemote('rc_devices_list_all');
+    },
+	/**
 	 * ------------------
 	 * Update controllers
 	 * ------------------
 	 */
     // nothing here for now.
 
+	/**
+     * 
+     *
+	 * (called from Python)
+     *
+	 * @member Devices
+     * @param {list} lines List of text lines to display.
+	 */
+	function rc_devices_list_all(self, txt, devs_list) {
+        dbug.info("DEVICES: rc_devices_list_all called");
+        self.devices_div.empty();
+        var p = new Element('pre').appendText('' + txt).inject(self.devices_div); 
+        
+        // var txt = "";
+        // txt += devs_list.toString();
+        // if (devs_list.length == 0) {
+        //     var p = new Element('p').appendText('No devices to list').inject(self.devices_div); 
+        // } else {
+        //     for (var dev in devs_list) {
+        //         txt += dev.kind + '/';
+        //         txt += dev.driver_name + '/';
+        //         txt += dev.device_name + ' \n';
+        //         for (var attr in dev.attributes) {
+        //             txt += "    " + attr.name + "=";
+        //             if (attr.kind == 'int' || attr.kind == 'float') {
+        //                 txt += (attr.value).toString();
+        //                 // int, string, boolean, options
+        //             } else {
+        //                 txt += attr.value;
+        //             }
+        //             if (attr.kind == 'options') {
+        //                 txt += attr.options.toString();
+        //             }
+        //         }
+        //     }
+        // }
+        // var p = new Element('pre').appendText('' + txt).inject(self.devices_div); 
+	},
 	/**
      * 
      *
