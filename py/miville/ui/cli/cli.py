@@ -622,6 +622,7 @@ class CliController(TelnetServer):
         
         # booleans (action)
         cp.add_option("-l", "--list", action='store_true', help="Lists all the drivers and devices: devices -l")
+        cp.add_option("-L", "--list-all", action='store_true', help="Lists everything. No arg needed.")
         cp.add_option("-a", "--attributes", action='store_true', help="Lists attributes for a device: devices -t v4l2 -d /dev/video0 -a")
         cp.add_option("-z", "--description", action='store_true', help="Displays description")
        
@@ -634,7 +635,12 @@ class CliController(TelnetServer):
         cp.add_option("-m", "--modify", type="string", help="Modifies the value of an attribute: devices -t v4l2 -d /dev/video0 -m norm ntsc")
         
         (options, args) = cp.parse_args(line)
+        
         # USE CASES:
+        # 0) devices_list_all
+        if options.list_all:
+            self.core.devices_list_all(self)
+            return 
         # 1) devices_list
         if options.list:
             if options.kind:
@@ -1706,6 +1712,31 @@ class CliView(Observer):
                     msg.append("\t%s" % (device.name))
         self.write("\n".join(msg), True)
     
+    def _devices_list_all(self, origin, data):
+        """
+        :data: list of devices
+        they all belong to the same driver.
+        """
+        lines = []
+        if origin is self.controller:
+            if len(data) == 0:
+                lines.append("No devices to list.")
+            else:
+                for device in data:
+                    dr_kind = device.driver.kind
+                    dr_name = device.driver.name
+                    attributes = device.attributes.values()
+                    for attr in attributes:
+                        a_name = attr.name
+                        a_value = attr.get_value()
+                        a_kind = attr.kind # int, string, boolean, options
+                        if a_kind == 'options':
+                            a_opts = "options=%s" % (attr.options)
+                        else:
+                            a_opts = "default=%s" % (attr.default)
+                        lines.append("/%s/%s/%s (%s) = %s %s" % (dr_kind, dr_name, a_name, a_kind, a_value, a_opts))
+        self.write("\n".join(lines), True)
+
     def _network_test_error(self, origin, data):
         """
         Similar to the "info" key, but for error messages to the users.

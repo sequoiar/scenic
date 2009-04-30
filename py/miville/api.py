@@ -809,6 +809,17 @@ class ControllerApi(object):
             self.notify(caller, e.message, 'info') # TODO: there should be a 'user_error' key.
         # TODO: modify method name in CLI
 
+    def devices_list_all(self, caller):
+        """
+        Gets the list of all devices.
+        """
+        devices_list = []
+        for manager in devices.managers.values():
+            for driver in manager.drivers.values():
+                for device in driver.devices.values():
+                    devices_list.append(device)
+        self.notify(caller, devices_list, 'devices_list_all')
+
     def devices_list(self, caller, driver_kind):
         """
         Gets the list of devices for a driver_kind.

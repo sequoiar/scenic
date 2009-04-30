@@ -127,7 +127,8 @@ def _parse_v4l2_ctl_list_inputs(lines):
                 pass
             else:
                 if key == 'Name':
-                    inputs.append(value)
+                    inputs.append(value.strip())
+    log.debug('v4l2 inputs: %s' % (inputs))
     return inputs
 # ---------------------------------------------------------
 
@@ -335,7 +336,7 @@ class Video4LinuxDriver(devices.VideoDriver):
                 else:
                     lines = results.splitlines()
                     inputs = _parse_v4l2_ctl_list_inputs(lines)
-                    device.attributes['input'].options = lines
+                    device.attributes['input'].options = inputs
                     
         #log.info('v4l driver: command %s returned.', str(command))
         #print results
