@@ -157,9 +157,9 @@ class Driver(object): #shell.ShellCommander):
                 for attr_name in dev.attributes:
                     attr = dev.attributes[attr_name]
                     try:
-                        old_attr = old_devices[attr_name]
-                    except KeyError:
-                        pass
+                        old_attr = old_devices[dev_name].attributes[attr_name]
+                    except KeyError, e:
+                        log.error("_on_done_devices_polling: " + e.message)
                     else:
                         if attr.get_value() != old_attr.get_value():
                             attr_changed[attr.name] = attr
@@ -169,6 +169,7 @@ class Driver(object): #shell.ShellCommander):
         if len(removed) > 0:
             self._call_event_listener('devices_removed', removed, caller) # dict
         if len(attr_changed) > 0:
+            log.debug('will call device_attributes_changed. Driver: ' + self.name)
             self._call_event_listener('device_attributes_changed', attr_changed.values(), caller) # dict
         # print "calling on_devices_list"
         #print "calling", self._call_event_listener, 'on_devices_list'

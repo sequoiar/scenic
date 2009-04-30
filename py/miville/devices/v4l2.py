@@ -86,8 +86,8 @@ def _parse_v4l2_ctl_all(lines):
                     dimen = value.split('/')
                     results['width'] = dimen[0]
                     results['height'] = dimen[1]
-                elif key == 'Video input':
-                    results['input'] = value.split('(')[1].split(')')[0] # 0 (Composite0)
+                #elif key == 'Video input':
+                #    results['input'] = value.split('(')[1].split(')')[0] # 0 (Composite0)
                     # log.debug('V4L2 input: ' + results['input'])
                     # TODO : possibilities are Composite0, Composite1, 
                 # norm
@@ -101,7 +101,10 @@ def _parse_v4l2_ctl_all(lines):
                     norm = 'secam'
                 results['norm'] = norm
         elif line.find("Video input") == 0:
-            results['input'] = line.split('(')[1].split(')')[0]
+            try:
+                results['input'] = line.split('(')[1].split(')')[0]
+            except KeyError, e:
+                log.error("_parse_v4l2_ctl_all: " + e.message)
             # log.debug('V4L2 input: ' + results['input'])
             # TODO : possibilities are Composite0, Composite1, 
         elif line.find(":") > 0:
@@ -133,7 +136,7 @@ def _parse_v4l2_ctl_list_inputs(lines):
             else:
                 if key == 'Name':
                     inputs.append(value.strip())
-    log.debug('v4l2 inputs: %s' % (inputs))
+    # log.debug('v4l2 inputs: %s' % (inputs))
     return inputs
 # ---------------------------------------------------------
 
