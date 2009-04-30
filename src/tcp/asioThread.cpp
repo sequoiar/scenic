@@ -381,7 +381,7 @@ class udp_server
         short port_; std::string& buff_;int& id_;
         udp::socket socket_;
         udp::endpoint sender_endpoint_;
-        enum { max_length = 1024 };
+        enum { max_length = 1024*8 };
         char data_[max_length];
         boost::asio::deadline_timer t_;
 };
