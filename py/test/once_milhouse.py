@@ -91,13 +91,56 @@ class Test_MilhouseOneWay(unittest.TestCase):
         self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="dv1394src" channels=2', 'audio_init: ack="ok"')
         self.proceed()
 
-    def test_09_filesrc_raw(self):
-        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
-        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="dv1394src"', 'video_init: ack="ok"')
+    def test_09_jackaudiosrc_raw(self):
         self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
-        self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="dv1394src" channels=2', 'audio_init: ack="ok"')
+        self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="jackaudiosrc" channels=8', 'audio_init: ack="ok"')
         self.proceed()
 
+    def test_10_videotestsrc_h264(self):
+        self.receiver.send_expect('video_init: codec="h264" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+        self.sender.send_expect('video_init: codec="h264" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"', 'video_init: ack="ok"')
+        self.proceed()
+
+    def test_11_videotestsrc_h263(self):
+        self.receiver.send_expect('video_init: codec="h263" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+        self.sender.send_expect('video_init: codec="h263" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"', 'video_init: ack="ok"')
+        self.proceed()
+
+    def test_12_audiotestsrc_mp3(self):
+        self.receiver.send_expect('video_init: codec="mp3" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+        self.sender.send_expect('video_init: codec="mp3" port=10000 address="127.0.0.1" source="audiotestsrc"', 'video_init: ack="ok"')
+        self.proceed()
+    
+    def test_13_audiotestsrc_vorbis(self):
+        self.receiver.send_expect('video_init: codec="vorbis" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+        self.sender.send_expect('video_init: codec="vorbis" port=10000 address="127.0.0.1" source="audiotestsrc"', 'video_init: ack="ok"')
+        self.proceed()
+
+    def test_14_videotestsrc_mpeg4_deinterlace(self):
+        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc" deinterlace', 'video_init: ack="ok"')
+        self.proceed()
+    
+    def test_15_videotestsrc_mpeg4_jitterbuffer(self):
+        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1" jitterbuffer=60', 'video_init: ack="ok"')
+        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc" deinterlace', 'video_init: ack="ok"')
+        self.proceed()
+    
+    def test_16_jackaudiosrc_raw_audiobuffer(self):
+        self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" buffer_usec=20000', 'audio_init: ack="ok"')
+        self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="jackaudiosrc" channels=8', 'audio_init: ack="ok"')
+        self.proceed()
+
+
+    def test_17_filesrc_raw(self):
+        self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
+        self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="filesrc" location="/usr/share/example-content/ubuntu\ sax.ogg"', 'audio_init: ack="ok"')
+        self.proceed()
+
+    def test_18_filesrc_mpeg4(self):
+        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="filesrc" location="fake"', 'video_init: ack="ok"')
+        self.proceed()
     
     def tearDown(self):
         self.receiver.quit()
