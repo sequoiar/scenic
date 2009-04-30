@@ -34,7 +34,7 @@ log = log.start('info', 1, 0, 'ipcp')
 
 class IPCP(LineReceiver):
     def __init__(self):
-        log.info("IPCP.__init__ " + str(self) )
+        log.debug("IPCP.__init__ " + str(self) )
         self.r = re.compile(r'("([^"\\]|\\.)*"|[^ ]+)')
         self.callbacks = {}
 
@@ -60,7 +60,7 @@ class IPCP(LineReceiver):
         log.info('Connection made to the server.')
     
     def lineReceived(self, line):
-        log.info("IPCP.lineReceived: %s" % line)
+        log.debug("IPCP.lineReceived: %s" % line)
         cmd, sep, args = line.partition(':')
         if cmd not in self.callbacks:
             log.info('Command %s not in callback list.' % cmd)

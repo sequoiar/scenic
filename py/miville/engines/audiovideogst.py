@@ -28,13 +28,27 @@ from miville.utils import log
 from miville.protocols.ipcp import parse 
 from miville.errors import *
 from miville.utils.common import PortNumberGenerator
-
 import miville.engines.base_gst
+from datetime import datetime
+
 
 gst_ipcp_port_gen = PortNumberGenerator(9000, 1)
 gst_av_port_gen = PortNumberGenerator(10000, 10)
 
 log = log.start('debug', 1, 0, 'videoGst')
+
+
+class RingBuffer:
+    def __init__(self, size):
+        self.data = [None for i in xrange(size)]
+
+    def append(self, x):
+        self.data.pop(0)
+        self.data.append(x)
+
+    def get(self):
+        return self.data
+
 
 class AudioVideoGst(GstClient):
          
@@ -47,10 +61,9 @@ class AudioVideoGst(GstClient):
        self.args = None
        self.proc_path = None
        self.pid = None
-       
-       
-       
-       
+       self.rtp_stats = {}
+       self.logger = RingBuffer(20)
+            
        gst_parameters = []
        for k,v in parameters.iteritems():
            if k not in ['engine','gst_address','gst_port']:
@@ -104,19 +117,41 @@ class AudioVideoGst(GstClient):
 
     def gst_success(self, **args):
         log.info('GST success :-)  args %s %s' %  (str(args), str(self)) )
-        self.gst_server.change_state(miville.engines.base_gst.STREAMINIT)
+        self.gst_server.change_state(miville.engines.base_gst.STREAMING)
 
     def gst_failure(self, **args):
         log.debug('GST failure :-(  args %s %s' %  (str(args), str(self)) )
         self.gst_server.change_state(miville.engines.base_gst.FAILURE)
 
     def gst_log(self, **args):
-        log.info('GST log  [%s] %s' %  (str(args), str(self)) )
+        log_message = (str(args))
+        src = str(self)
+        info = 'GST log pid %s [%s] %s' %  (self.pid, log_message, src)  
+        log.info(info ) 
+        self.logger.append(log_message)
 
     def gst_rtp(self, **args):
-        for key in args:
-            log.debug("   arg[%s] = %s" % (key, args[key]) )
-
+        if args.has_key('stats'):
+            rtp_string = args['stats']
+            tokens = rtp_string.split(':')
+            if len(tokens) == 3:
+                stream = tokens[0]
+                stat = tokens[1]
+                value = tokens[2]
+                self.set_rtp_stats(stream, stat, value)
+    
+    def set_rtp_stats(self, stream, stat, value):
+        timestamp = datetime.now()
+        data = (timestamp, value)
+        if not self.rtp_stats.has_key(stream):
+            self.rtp_stats[stream] = {}
+        if not self.rtp_stats[stream].has_key(stat):
+            self.rtp_stats[stream][stat] = RingBuffer(10)
+            
+        self.rtp_stats[stream][stat].append( data )
+        
+    
+            
     def start_streaming(self):
         """function start_sending
          address: string

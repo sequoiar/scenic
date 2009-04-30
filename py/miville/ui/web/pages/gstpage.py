@@ -42,6 +42,23 @@ from miville.errors import *
 
 log = log.start('debug', 1, 0, 'web')
 
+def print_engine_log(engine):
+    txt = "<h3>Log</h3>"
+    for index,msg in enumerate(engine.logger.get()):
+        txt += "<p><b>%d</b>%s</p>" % (index+1, msg)
+    return txt
+
+def print_engine_rtp_stats(engine):
+    for stream, stat in engine.rtp_stats.iteritems():
+        txt = "<h4>RTP stats for %s</h4>" % stream
+        for name, ring in stat.iteritems():
+            for val in ring.get():
+                if val != None:
+                    timestamp = val[0]
+                    timestamp_str = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+                    value = val[1]
+                    txt += "<p>%s %s = %s</p>" % (timestamp_str, name, value)
+    return txt
 
 def print_engine(engine):
     txt = ""
@@ -49,11 +66,10 @@ def print_engine(engine):
     txt += "<p>mode  = " + engine.mode + "</p>"
     txt += "<p>group = " + engine.group_name + "</p>"
     txt += "<p>stream= " + engine.stream_name + "</p>"
-    
     txt += "<p>process= " + str(engine.proc_path) + "</p>"
     txt += "<p>args   = " + str(engine.args)  + "</p>"
     txt += "<p>pid    = " + str(engine.pid) + "</p>"
-    
+    txt += "<p>state  = " + str(engine.get_status()) + "</p>"
     for cmd in engine.commands:
         command = cmd[0]
         txt += "<p><b>" + command + ": </b>"
@@ -64,7 +80,11 @@ def print_engine(engine):
                 if isinstance(p[1], str) or isinstance(p[1], unicode):
                     v = '"' + v + '"'
                 txt += str(p[0]) + "= <i>" + v + "</i> "
-        txt += "</p>"      
+        txt += "</p>"  
+        
+    txt += print_engine_rtp_stats(engine)
+    txt += print_engine_log(engine)
+    
     return txt
 
 def print_proc_params(params, proc_name, engine):
