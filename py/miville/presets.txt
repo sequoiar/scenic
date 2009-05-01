@@ -295,7 +295,7 @@ v1.0
 												['VideoStream', 1]]], 
 										['enabled', 
 											['boolean', 'true']], 
-										['mode', 'receive'], 
+										['mode', 'send'], 
 										['media_streams', 
 											['list', 
 												['miville.settings.VideoStream', 
