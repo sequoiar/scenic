@@ -31,70 +31,78 @@ fname = __file__.split('.')[0]
 
 class Test_MilhouseOneWay(unittest.TestCase):
     def setUp(self):
-        self.sender = clientserver.TelnetMilhouseTester(name='sender', mode='s', serverport=9000)
-        self.sender.setup(self)
         self.receiver = clientserver.TelnetMilhouseTester(name='receiver', mode='r', serverport=9001)
         self.receiver.setup(self)
+        self.sender = clientserver.TelnetMilhouseTester(name='sender', mode='s', serverport=9000)
+        self.sender.setup(self)
 
-    def proceed(self):
+    def proceed(self, rxCommands = [], txCommands = []):
+        """ Proceed with or without extra commands to be called once we've started """
         self.receiver.start()
         self.sender.start()
+
+#       # dispatch commands to be given while we're playing
+#       for com in rxCommands:
+#           self.receiver.send_expect(com)
+#       for com in txCommands:
+#           self.sender.send_expect(com)
+
         time.sleep(5)
         self.receiver.stop()
         self.sender.stop()
 
-    def test_01_basic_milhouse_control(self):
-        self.sender.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1"', 'audio_init: ack="ok"')
+#   def test_01_basic_milhouse_control(self):
+#       self.sender.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1"', 'audio_init: ack="ok"')
 
-    def test_02_audiotestsrc_raw(self):
-        # we test with one milhouse sending, one receiving
-        self.receiver.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1"', 'audio_init: ack="ok"')
-        self.sender.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
-        self.proceed()
-    
-    def test_03_videotestsrc_mpeg4(self):
-        # we test with one milhouse sending, one receiving
-        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
-        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"', 'video_init: ack="ok"')
-        self.proceed()
-        
-    def test_04_videotestsrc_mpeg4_audiotestsrc_raw(self):
-        # we test with one milhouse sending, one receiving
-        # If we init video first on one end, we must init it first on the other end
-        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
-        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"', 'video_init: ack="ok"')
-        self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
-        self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
-        self.proceed()
+#   def test_02_audiotestsrc_raw(self):
+#       # we test with one milhouse sending, one receiving
+#       self.receiver.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1"', 'audio_init: ack="ok"')
+#       self.sender.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
+#       self.proceed()
+#   
+#   def test_03_videotestsrc_mpeg4(self):
+#       # we test with one milhouse sending, one receiving
+#       self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+#       self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"', 'video_init: ack="ok"')
+#       self.proceed()
+#       
+#   def test_04_videotestsrc_mpeg4_audiotestsrc_raw(self):
+#       # we test with one milhouse sending, one receiving
+#       # If we init video first on one end, we must init it first on the other end
+#       self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+#       self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"', 'video_init: ack="ok"')
+#       self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
+#       self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
+#       self.proceed()
 
-    def test_05_v4l2_mpeg4_audiotestsrc_raw(self):
-        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
-        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="v4l2src"', 'video_init: ack="ok"')
-        self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
-        self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
-        self.proceed()
+#   def test_05_v4l2_mpeg4_audiotestsrc_raw(self):
+#       self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+#       self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="v4l2src"', 'video_init: ack="ok"')
+#       self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
+#       self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
+#       self.proceed()
 
-    def test_06_dv1394src_mpeg4(self):
-        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
-        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="dv1394src"', 'video_init: ack="ok"')
-        self.proceed()
+#   def test_06_dv1394src_mpeg4(self):
+#       self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+#       self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="dv1394src"', 'video_init: ack="ok"')
+#       self.proceed()
 
-    def test_07_dv1394src_raw(self):
-        self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
-        self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="dv1394src" channels=2', 'audio_init: ack="ok"')
-        self.proceed()
+#   def test_07_dv1394src_raw(self):
+#       self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
+#       self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="dv1394src" channels=2', 'audio_init: ack="ok"')
+#       self.proceed()
 
-    def test_08_dv1394src_mpeg4_dv1394src_raw(self):
-        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
-        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="dv1394src"', 'video_init: ack="ok"')
-        self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
-        self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="dv1394src" channels=2', 'audio_init: ack="ok"')
-        self.proceed()
+#   def test_08_dv1394src_mpeg4_dv1394src_raw(self):
+#       self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+#       self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="dv1394src"', 'video_init: ack="ok"')
+#       self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
+#       self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="dv1394src" channels=2', 'audio_init: ack="ok"')
+#       self.proceed()
 
-    def test_09_jackaudiosrc_raw(self):
-        self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
-        self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="jackaudiosrc" channels=8', 'audio_init: ack="ok"')
-        self.proceed()
+#   def test_09_jackaudiosrc_raw(self):
+#       self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
+#       self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="jackaudiosrc" channels=8', 'audio_init: ack="ok"')
+#       self.proceed()
 
     def test_10_videotestsrc_h264(self):
         self.receiver.send_expect('video_init: codec="h264" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
@@ -118,30 +126,30 @@ class Test_MilhouseOneWay(unittest.TestCase):
 
     def test_14_videotestsrc_mpeg4_deinterlace(self):
         self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
-        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc" deinterlace', 'video_init: ack="ok"')
+        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc" deinterlace=1', 'video_init: ack="ok"')
         self.proceed()
     
     def test_15_videotestsrc_mpeg4_jitterbuffer(self):
-        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1" jitterbuffer=60', 'video_init: ack="ok"')
-        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc" deinterlace', 'video_init: ack="ok"')
-        self.proceed()
+        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"', 'video_init: ack="ok"')
+        self.proceed(rxCommands = 'jitterbuffer: latency=60')
     
     def test_16_jackaudiosrc_raw_audiobuffer(self):
-        self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" buffer_usec=20000', 'audio_init: ack="ok"')
+        self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" audio_buffer_usec=20000', 'audio_init: ack="ok"')
         self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="jackaudiosrc" channels=8', 'audio_init: ack="ok"')
         self.proceed()
 
 
-    def test_17_filesrc_raw(self):
-        self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
-        self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="filesrc" location="/usr/share/example-content/ubuntu\ sax.ogg"', 'audio_init: ack="ok"')
-        self.proceed()
+ #   def test_17_filesrc_raw(self):
+ #      self.receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
+ #      self.sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="filesrc" location="/usr/share/example-content/ubuntu\ sax.ogg"', 'audio_init: ack="ok"')
+ #      self.proceed()
 
-    def test_18_filesrc_mpeg4(self):
-        self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
-        self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="filesrc" location="fake"', 'video_init: ack="ok"')
-        self.proceed()
-    
+ #  def test_18_filesrc_mpeg4(self):
+ #      self.receiver.send_expect('video_init: codec="mpeg4" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
+ #      self.sender.send_expect('video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="filesrc" location="fake"', 'video_init: ack="ok"')
+ #      self.proceed()
+   
     def tearDown(self):
         self.receiver.quit()
         self.sender.quit()
@@ -172,10 +180,10 @@ class Test_MilhouseTwoWay(unittest.TestCase):
 
     def test_01_audio_transmission_5sec(self):
         # we test with one milhouse sending, one receiving
-        self.local_receiver.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1"', 'audio_init: ack="ok"')
-        self.remote_receiver.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
-        self.local_sender.send_expect('audio_init: codec="raw" port=10000 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
-        self.remote_sender.send_expect('audio_init: codec="raw" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
+        self.local_receiver.send_expect('audio_init: codec="vorbis" port=10000 address="127.0.0.1"', 'audio_init: ack="ok"')
+        self.remote_receiver.send_expect('audio_init: codec="vorbis" port=10010 address="127.0.0.1"', 'audio_init: ack="ok"')
+        self.local_sender.send_expect('audio_init: codec="vorbis" port=10000 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
+        self.remote_sender.send_expect('audio_init: codec="vorbis" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2', 'audio_init: ack="ok"')
         self.proceed()
 
     def test_02_video_transmission_5sec(self):

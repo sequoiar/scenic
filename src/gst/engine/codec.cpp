@@ -37,6 +37,8 @@
 #include "pipeline.h"
 #include "mapMsg.h"
 
+#include "rtpReceiver.h"
+
 /// Constructor 
 Codec::Codec() : 
     codec_(0) 
@@ -181,6 +183,7 @@ void H264Encoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
 
+
     // threads: 1-4, 0 for automatic 
 #ifdef HAVE_BOOST_THREAD        // more portable
     int numThreads = boost::thread::hardware_concurrency();
@@ -191,12 +194,15 @@ void H264Encoder::init()
     int numThreads = sysconf(_SC_NPROCESSORS_ONLN);
 #endif // HAVE_BOOST_THREAD
 
-    if (numThreads > 1) // don't hog all the cores
-        --numThreads;   
+    // numthreads should be 2 or 1.
+    if (numThreads > 2) // don't hog all the cores
+        numThreads = 2;
     else if (numThreads == 0)
         numThreads = 1;
 
+    LOG_DEBUG("Using " << numThreads << " threads");
     g_object_set(codec_, "threads", numThreads, NULL);
+
     //g_object_set(codec_, "byte-stream", TRUE, NULL);
     // subme: subpixel motion estimation 1=fast, 6=best
     VideoEncoder::init();
@@ -227,6 +233,13 @@ void H264Decoder::init()
 RtpPay* H264Decoder::createDepayloader() const
 {
     return new H264Depayloader();
+}
+
+
+/// Increase jitterbuffer size
+void H264Decoder::adjustJitterBuffer() 
+{
+    RtpReceiver::setLatency(DEFAULT_JITTER_BUFFER_MS);
 }
 
 

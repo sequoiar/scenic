@@ -75,6 +75,7 @@ class Decoder : public Codec
     public:
         /// Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type 
         virtual RtpPay* createDepayloader() const = 0;
+        virtual void adjustJitterBuffer() {}; // buy default, do nothing
 };
 
 /// Abstract child of encoder that wraps audioconvert functionality
@@ -165,6 +166,8 @@ class H264Decoder : public Decoder
     private: 
         void init();
         RtpPay* createDepayloader() const;
+        void adjustJitterBuffer(); 
+        static const unsigned long long DEFAULT_JITTER_BUFFER_MS = 20;
 };
 
 

@@ -83,6 +83,7 @@ void VideoReceiver::init_sink()
     setCaps();
     tassert(gotCaps_);
     tassert(remoteConfig_.capsMatchCodec()); 
+    decoder_->adjustJitterBuffer(); // increase jitterbuffer as needed
 }
 
 /// Used to set this VideoReceiver's RtpReceiver's caps 

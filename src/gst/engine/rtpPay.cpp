@@ -121,7 +121,6 @@ void Payloader::updateMTUCb(GtkAdjustment *adj, gpointer data)
 {
     Payloader *context = static_cast<Payloader*>(data);
     unsigned val = static_cast<unsigned>(adj->value);
-    g_print("Setting mtu to %u\n", val);
     context->setMTU(val);
 }
 

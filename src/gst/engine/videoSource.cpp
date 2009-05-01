@@ -78,7 +78,7 @@ void VideoSource::setCapsFilter(const std::string &capsStr)
         THROW_ERROR("Trying to set caps to dummy value");
 
     GstCaps *videoCaps = gst_caps_from_string(capsStr.c_str());
-    LOG_DEBUG("Seting caps to " << gst_caps_to_string(videoCaps));
+    LOG_DEBUG("Setting caps to " << gst_caps_to_string(videoCaps));
     g_object_set(G_OBJECT(capsFilter_), "caps", videoCaps, NULL);
 
     gst_caps_unref(videoCaps);

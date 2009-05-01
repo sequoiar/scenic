@@ -236,7 +236,7 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 void RtpReceiver::updateLatencyCb(GtkAdjustment *adj)
 {
     unsigned val = static_cast<unsigned>(adj->value);
-    g_print("Setting latency to %d\n", val);
+    LOG_DEBUG("Setting latency to " << val);
     setLatency(val);
 }
 

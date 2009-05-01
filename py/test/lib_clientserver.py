@@ -530,4 +530,4 @@ class TelnetMilhouseTester(ClientServerTester):
         self.send_expect('start:', 'start: ack="ok"')
 
     def quit(self):
-        self.send_expect('quit:', 'postQuit')
+        self.send_expect('quit:', '')
