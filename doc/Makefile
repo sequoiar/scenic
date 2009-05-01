@@ -14,8 +14,10 @@ doxygen:
 	@doxygen
 
 install:
-	mkdir -p $(PREFIX)/share/doc/doxygen
-	cp -rfv html $(PREFIX)/share/doc/doxygen
+	@if test -e html; then \
+	mkdir -p $(PREFIX)/share/doc/doxygen \
+	cp -rfv html $(PREFIX)/share/doc/doxygen; \
+	fi
 
 check:
 	@echo tests for docs?
