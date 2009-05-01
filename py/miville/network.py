@@ -228,8 +228,7 @@ def _parse_iperf_output(lines):
 # XXX timestamp format : 
 # "%Y%m%d%H%M%S"
 
-
-class NetworkError(Exception):
+lass NetworkError(Exception):
     """
     Any error due to network testing (with iperf).
     """
@@ -270,7 +269,7 @@ class IperfServerProcessProtocol(protocol.ProcessProtocol):
 
     def processEnded(self, status):
         #print self.prefix, "Ended iperf server, status %d" % status.value.exitCode
-        log.info("Success ! The iperf server process is done. exit code : %r %s" % (status.value.exitCode, status.getErrorMessage()))
+        log.info("processEnded: Good. The IperfServerProcess is done. exit code : %r %s" % (status.value.exitCode, status.getErrorMessage()))
         #print "STOP REACTOR"
         #reactor.stop()
         try:
@@ -328,15 +327,21 @@ class NetworkTester(object):
         except AttributeError, e:
             log.error("Error in kill_server_process: %s" % e.message)
         except ProcessExitedAlready, e:
-            log.debug("Successfuly killed the iperf server. (%s)" % e.message)
+            log.debug("ProcessExitedAlready Successfuly killed the iperf server. (%s)" % e.message)
             #self.state = STATE_IDLE
             self.iperf_server_is_running = False
         else:
             if sig == 15: # (first time)
                 reactor.callLater(verify_timeout, self.kill_server_process, process_transport, 9)
-                self.iperf_server_is_running = False
+                # self.iperf_server_is_running = False
             else: # sig = 9 (second time)
                 process_transport.loseConnection()
+                
+                try:
+                    process_transport.transport.loseConnection()
+                    log.info('Closing Iperf server process :: process_transport.transport.loseConnection()')
+                except NameError, e:
+                    log.error('NameError: ' + e.message)
                 self.iperf_server_is_running = False
         #TODO: make sure we do not start again the process !!!!!!!!!!!
 

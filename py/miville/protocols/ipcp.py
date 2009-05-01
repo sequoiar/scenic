@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+# 
 # Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -19,6 +19,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+The IPCP protocol is the Inter-Process Protocol used to communicate
+between miville and milhouse. It is a home-brewed protocol based on 
+TCP and ASCII.
+"""
 import re
 from types import NoneType, FunctionType, InstanceType
 
@@ -31,8 +36,12 @@ from miville.utils import log
 
 log = log.start('info', 1, 0, 'ipcp')
 
-
 class IPCP(LineReceiver):
+    """
+    The IPCP protocol is the Inter-Process Protocol used to communicate
+    between miville and milhouse. It is a home-brewed protocol based on 
+    TCP and ASCII.
+    """
     def __init__(self):
         log.debug("IPCP.__init__ " + str(self) )
         self.r = re.compile(r'("([^"\\]|\\.)*"|[^ ]+)')
@@ -156,7 +165,6 @@ class IPCP(LineReceiver):
     def connectionLost(self, reason=protocol.connectionDone):
         log.info('Lost the server connection.')
 
-
 def parse(args):
     data = args.strip() + " "
     args = {}
@@ -241,7 +249,6 @@ def find_equal(data):
         args[attr] = data[start:end]
         start = end + 1
     return args
-        
       
 def connect(addr, port, timeout=2, bindAddress=None):
     client_creator = protocol.ClientCreator(reactor, IPCP)
@@ -250,8 +257,6 @@ def connect(addr, port, timeout=2, bindAddress=None):
 
 def connection_failed(protocol):
     log.warning("Connection failed! %s" % protocol.getErrorMessage())        
-        
-
 
 def grrr(test):
     print test
@@ -270,7 +275,6 @@ def connectionReady(protocol):
     reactor.callLater(10, protocol.sendLine, 'Coco')
     reactor.callLater(20, reactor.stop)
 
-
 if __name__ == "__main__":
     # Client example
     # Create creator and connect
@@ -278,3 +282,4 @@ if __name__ == "__main__":
     deferred.addCallback(connectionReady)
     deferred.addErrback(connection_failed)
     reactor.run()
+

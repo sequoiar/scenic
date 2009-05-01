@@ -9,11 +9,11 @@ Addressbook = Nevow.Athena.Widget.subclass('Addressbook');
  * This class is seperated in 5 parts:
  *  - initialisation (__init__)
  *  - utility methods
- *  - methods call from the server
- *  - methods call from the client interface
+ *  - methods called from the python server
+ *  - methods called from the javascript client interface
  *  - methods responsible of updating interface elements (buttons, etc.) state.
  * 
- * When an event occur notify_controllers is call with an event name as argument.
+ * When an event occur notify_controllers is called with an event name as argument.
  * notify_controllers propagate the event to all controllers.
  * Each controller is responsible to update is state in function of the event
  * it receive.
@@ -130,6 +130,15 @@ Addressbook.methods(
 	 * 
 	 * @member Addressbook
      * @param {string} event The event that fire the notification.
+     *
+     * Possible event names for this widget are :
+     *  - 'add_contact'
+     *  - 'contact_selected'
+     *  - 'contact_unselected'
+     *  - 'edit_contact'
+     *  - 'keep_contact'
+     *  - 'save_contact'
+     *  - 'update_status'
 	 */
 	function notify_controllers(self, event){
 		self.upd_list(event);
@@ -143,7 +152,7 @@ Addressbook.methods(
 	},
 
 	/**
-	 * Return the attribute specified of the contact li element or null.
+	 * Returns the attribute specified of the contact li element or null.
 	 * 
 	 * @member Addressbook
      * @param {string} attr The name of the attribute you want.
@@ -158,7 +167,7 @@ Addressbook.methods(
 	},
 
 	/**
-	 * Save the name of the selected contact.
+	 * Saves the name of the selected contact.
 	 * 
 	 * @member Addressbook
      * @param {string} name The name of the newly selected contact.
@@ -171,7 +180,7 @@ Addressbook.methods(
 	},
 
 	/**
-	 * Remove the 'optional' word from the specified field.
+	 * Removes the 'optional' word from the specified field.
 	 * 
      * @member Addressbook
 	 * @param {Text input DOM object} field
@@ -200,13 +209,13 @@ Addressbook.methods(
 
 
 	/**
-	 * ----------------
-	 * Call from Server
-	 * ----------------
+	 * -------------------------
+	 * Called from python Server
+	 * -------------------------
 	 */
 
 	/**
-	 * Update the contact list to reflect the state of the server.
+	 * Updates the contact list to reflect the state of the server.
 	 * (call from server)
 	 * 
 	 * Changed only what was changed.
@@ -500,13 +509,13 @@ Addressbook.methods(
 
 	/**
 	 * ----------------
-	 * Call from Client
+	 * Called from Javascript Client
 	 * ----------------
 	 */
 	
 	/**
 	 * Get info from others widgets.
-	 * (call from the client)
+	 * (called from the client)
 	 * 
 	 * (no function for the moment)
 	 * 
@@ -523,7 +532,7 @@ Addressbook.methods(
 
     /**
      * One contact is selected.
-	 * (call from the client)
+	 * (called from the javascript client)
      *
      * @member Addressbook
      * @param {DOM node} contact The <li> node of the selected contact.
@@ -543,7 +552,7 @@ Addressbook.methods(
 
     /**
      * No contact is selected.
-	 * (call from the client)
+	 * (called from the javascipt client)
      *
      * @member Addressbook
      */
@@ -558,7 +567,7 @@ Addressbook.methods(
 
     /**
      * Edit contact info.
-	 * (call from the client)
+	 * (called from the javascript client)
      *
      * @member Addressbook
      */
@@ -574,7 +583,7 @@ Addressbook.methods(
 
     /**
      * Add a new contact.
-	 * (call from the client)
+	 * (called from the javascript client)
      *
      * @member Addressbook
      */
@@ -588,7 +597,7 @@ Addressbook.methods(
 	
     /**
      * Save a contact (for a new, modified and keeped contact). 
-	 * (call from the client)
+	 * (called from the javascript client)
      *
      * @member Addressbook
      */
@@ -634,7 +643,7 @@ Addressbook.methods(
 
     /**
      * Keep (save) an auto-created contact.
-	 * (call from the client)
+	 * (called from the javascript client)
      *
      * @member Addressbook
      */
@@ -645,7 +654,7 @@ Addressbook.methods(
 	
     /**
      * Remove a contact from the list.
-	 * (call from the client)
+	 * (called from the javascript client)
      *
      * @member Addressbook
      */
@@ -671,7 +680,7 @@ Addressbook.methods(
 	
     /**
      * Cancel contact info editing on cancel key down.
-	 * (call from the client)
+	 * (called from the javascript client)
      *
      * @member Addressbook
      */
@@ -686,7 +695,7 @@ Addressbook.methods(
 
     /**
      * Start a connection with a contact.
-	 * (call from the client)
+	 * (called from the javascript client)
      *
      * @member Addressbook
      */
@@ -697,7 +706,7 @@ Addressbook.methods(
 	
     /**
      * Stop a connection with a contact.
-	 * (call from the client)
+	 * (called from the javascript client)
      *
      * @member Addressbook
      */

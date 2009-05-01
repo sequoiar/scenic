@@ -17,7 +17,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
+"""
+Everything that should be used by a programmer from the miville.engines packages 
+is in this engines.audiovideogst module. 
 
+This modules controls the milhouse processes according to the 
+settings that miville has set up. 
+"""
 
 # Twisted imports
 from twisted.internet import reactor, protocol, defer
@@ -31,14 +37,17 @@ from miville.utils.common import PortNumberGenerator
 import miville.engines.base_gst
 from datetime import datetime
 
-
 gst_ipcp_port_gen = PortNumberGenerator(9000, 1)
 gst_av_port_gen = PortNumberGenerator(10000, 10)
 
 log = log.start('debug', 1, 0, 'videoGst')
 
-
 class RingBuffer:
+    """
+    For RTP statistics and log messages
+
+    Keeps "size" number of strings.
+    """
     def __init__(self, size):
         self.data = [None for i in xrange(size)]
 
@@ -49,9 +58,10 @@ class RingBuffer:
     def get(self):
         return self.data
 
-
 class AudioVideoGst(GstClient):
-         
+    """
+    Interface to the milhouse process.
+    """
     def apply_settings(self, listener, mode, group_name, stream_name, parameters ):
        self.mode = mode
        self.group_name = group_name
@@ -150,8 +160,6 @@ class AudioVideoGst(GstClient):
             
         self.rtp_stats[stream][stat].append( data )
         
-    
-            
     def start_streaming(self):
         """function start_sending
          address: string

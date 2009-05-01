@@ -18,7 +18,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Miville. If not, see <http://www.gnu.org/licenses/>.
 
-
 # System import
 import time
 
@@ -30,12 +29,18 @@ from miville.errors import *
 
 log = log.start('debug', 1, 0, 'web_adb')
 
-
-
 class Addressbook(Widget):
     """
+    Addressbook widget for the miville web ui.
+    
+    Manages contacts and connection state with each contact.
+    Also displays a streaming icon. 
+
+    Streaming and network testing should be mutually exclusive.
+
+     * rc_ methods are called from js/adressbook.js
+     * cb_ methods are called from miville/api.py
     """
-        
     def __init__(self, api, template):
         Widget.__init__(self, api, template)
         self.connections = {}
@@ -46,6 +51,8 @@ class Addressbook(Widget):
         
     def cb_get_contacts(self, origin, data):
         """
+        Called from Python API when get_contacts notification is triggered
+
         Maybe we should add a better sorting algorithm with collation support
         and/or natural order. See:
         http://jtauber.com/2006/02/13/pyuca.py
@@ -70,6 +77,9 @@ class Addressbook(Widget):
         return False
     
     def cb_get_contact(self, origin, data):
+        """
+        Called from Python API when get_contact notification is triggered
+        """
         log.debug('GCOrigin: %s - Data: %s' % (origin, data))
         if origin is self:
             if isinstance(data, AddressBookError):
@@ -89,6 +99,9 @@ class Addressbook(Widget):
         return False
     
     def cb_start_connection(self, origin, data):
+        """
+        Called from Python API when start_connection notification is triggered
+        """
         log.debug('SCOrigin: %s - Data: %s' % (origin, data))
         if origin is self:
             if data.has_key('exception'):
@@ -107,6 +120,9 @@ class Addressbook(Widget):
                             '%s with %s...' % (data['msg'], data['name']))
 
     def cb_connection_failed(self, origin, data):
+        """
+        Called from Python API when connection_failed notification is triggered
+        """
         log.debug('CFOrigin: %s - Data: %s' % (origin, data))
         if data['port']:
             port = ':%s' % data['port']
@@ -121,6 +137,9 @@ class Addressbook(Widget):
                                                      data['exception']))
 
     def cb_ask(self, origin, data):
+        """
+        Called from Python API when ask notification is triggered
+        """
         log.debug('ASKOrigin: %s - Data: %s' % (origin, data))
         if data.has_key('name'):
             caption = '%s is inviting you. <em>(address: %s)</em>' % (data['name'], data['address'])
@@ -134,6 +153,9 @@ class Addressbook(Widget):
         self.callRemote('ask', data['address'], caption, body)
     
     def cb_ask_timeout(self, origin, data):
+        """
+        Called from Python API when ask_timeout notification is triggered
+        """
         log.debug('ASKTOOrigin: %s - Data: %s' % (origin, data))
         if self.connections.has_key(data):
             del self.connections[data]
@@ -142,6 +164,9 @@ class Addressbook(Widget):
         self.callRemote('notification', caption, body)
         
     def cb_answer(self, origin, data):
+        """
+        Called from Python API when answer notification is triggered
+        """
         self.callRemote('update_status', data['name'], data['msg'])
     
     def rc_accept(self, connection):
@@ -157,6 +182,9 @@ class Addressbook(Widget):
         return False
     
     def cb_stop_connection(self, origin, data):
+        """
+        Called from Python API when stop_connection notification is triggered
+        """
         if origin is self and data.has_key('exception'):
             if data.has_key('name'):
                 self.callRemote('error',
@@ -179,6 +207,9 @@ class Addressbook(Widget):
         return False
     
     def cb_info(self, origin, data):
+        """
+        Called from Python API when info notification is triggered
+        """
         if isinstance(data, dict):
             if data.has_key('context'):
                 moment = time.strftime('%X')
@@ -218,6 +249,9 @@ class Addressbook(Widget):
         return False
     
     def cb_modify_contact(self, origin, data):
+        """
+        Called from Python API when modify_contact notification is triggered
+        """
         log.debug('MCOrigin: %s - Data: %s' % (origin, data))
         if origin is self:
             if isinstance(data, Exception):

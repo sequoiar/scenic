@@ -29,29 +29,50 @@ from miville.errors import *
 
 log = log.start('debug', 1, 0, 'web_strm')
 
-
-
 class Streams(Widget):
     """
     Web widget to choose settings and start streaming audio/video.
     """
     def rc_start_streams(self, contact):
+        """
+        Starts the streams
+
+        Called from the javascript widget.
+        """
         self.api.start_streams(self, contact)
         return False
         
     def rc_stop_streams(self, contact):
+        """
+        Stops the streams
+
+        Called from the javascript widget.
+        """
         self.api.stop_streams(self, contact)
         return False
         
     def rc_update_settings(self):
+        """
+        Updates the settings
+
+        Called from the javascript widget.
+        """
         self.api.list_global_setting(self)
         return False
         
     def rc_set_setting(self, contact, setting):
+        """
+        Modifies the settings for a contact
+
+        Called from the javascript client.
+        """
         self.api.modify_contact(self, contact, setting=setting)
         return False
         
     def cb_list_global_setting(self, origin, data):
+        """
+        Called from the python API when 'list_global_settings' notification occurs
+        """
         preset_settings = []
         user_settings = []
         for id, setting in data[0].items():

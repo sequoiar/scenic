@@ -78,6 +78,10 @@ Streams.methods(
 	 * 
 	 * @member Streams
      * @param {string} event The event that fire the notification.
+     *
+     * Possible event names :
+     *  - 'contact_selected'
+     *  - 'contact_unselected'
 	 */
 	function notify_controllers(self, event){
 		self.upd_start_btn(event);
@@ -86,9 +90,9 @@ Streams.methods(
 
 
 	/**
-	 * ----------------
-	 * Call from Server
-	 * ----------------
+	 * -----------------------------
+	 * Called from the python Server
+	 * -----------------------------
 	 */
 
 	/**
@@ -149,21 +153,25 @@ Streams.methods(
 
 
 	/**
-	 * ----------------
-	 * Call from Client
-	 * ----------------
+	 * -----------------------------
+	 * Called from javascript Client
+	 * -----------------------------
 	 */
 	
 	/**
-	 * Get info from others widgets.
-	 * (call from the client)
+	 * Info received from others widgets.
+	 * (called from the javascript client)
 	 * 
-	 * Call when a contact is selected.
+	 * Called when a contact is selected.
 	 * 
 	 * @member Streams
 	 * @param {string} caller The short name of the widget.
 	 * @param {string} key The name of the receive information.
 	 * @param value The receive information.
+     *
+     * Possible update keys : 
+     *  - 'selection'
+     *  - 'cancel_edit'
 	 */
 	function update(self, caller, key, value) {
 		if (caller == 'adb') {
@@ -219,10 +227,15 @@ Streams.methods(
 	 */
 
     /**
-     * Update the start button in function of the selected contact.
+     * Updates the start button in function of the selected contact.
      *
      * @member Streams
      * @param {string} event The event that trigger the update.
+     *
+     * Possible keys: 
+     *  - 'contact_selected'
+     *  - 'contact_unselected'
+     *  - 'add_contact'
      */
 	function upd_start_btn(self, event) {
 		// list of events that "list" should react to
@@ -273,10 +286,15 @@ Streams.methods(
 	},
 	
     /**
-     * Update the global settings menu in function of the selected contact.
+     * Updates the global settings menu in function of the selected contact.
      *
      * @member Streams
      * @param {string} event The event that trigger the update.
+     *
+     * Possible keys: 
+     *  - 'contact_selected'
+     *  - 'contact_unselected'
+     *  - 'add_contact'
      */
 	function upd_global_slct(self, event) {
 		self.global_slct.removeEvents('change');

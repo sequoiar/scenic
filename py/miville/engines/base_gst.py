@@ -25,12 +25,10 @@ import os, resource, signal, time, sys, select
 from twisted.internet import reactor, protocol, defer, abstract
 from twisted.python import procutils
 
-
 # App imports
 from miville.protocols import ipcp
 from miville.utils import log
 from miville.utils.common import get_def_name
-
 
 log = log.start('info', 1, 0, 'base_gst')
 
@@ -44,10 +42,13 @@ STREAMINIT = 6
 STREAMING = 7
 FAILURE = 100
 
-
+# name of the process to start
 streaming_server_process_name = "milhouse"
 
 class BaseGst(object):
+    """
+    Just a bunch of getter and setter for attributes for the milhouse processes.
+    """
     def get_attr(self, name):
         """
         name: string
@@ -68,7 +69,11 @@ class BaseGst(object):
         return False, name, value
 
 class GstServer(object):
+    """
+    Class that communicates with the milhouse process using the the IPCP protocol. 
 
+    The Inter-process Communication protocol is based on TCP lines of ASCII characters.
+    """
     def __init__(self, mode, port, address, callback_dict):
         self.port = port
         self.address = address
@@ -121,8 +126,6 @@ class GstServer(object):
         self.change_state(CONNECTED)
         log.info('GST inter-process link created')
     
-        
-
     def connection_failed(self, conn):
         msg = 'GstServer.connection_failed: Address: %s, Port: %s %s' % (self.address, self.port, str(self))
         log.info(msg + " "  + str(self))
@@ -203,15 +206,11 @@ class GstServer(object):
         if len(self.commands) > 0:
             if self.state > STOPPED:
                 reactor.callLater(1, self._process_cmd)
-        
-        
 
     def send_cmd(self, cmd, args=None, callback=None, timer=None, timeout=3):
         log.debug('GstServer.send_cmd state: ' + str(self.state) + " cmd: " +  cmd + " args: " + str(args)+ "pid " + str(self.process.pid) + " " + str(self) )
         self.commands.insert(0, (cmd,args) )
         self._process_cmd()
-
-
 
     def del_callback(self, callback=None):
         log.debug('GstServer.del_callback ' + str(self))
@@ -239,10 +238,10 @@ class GstServer(object):
             else:
                 log.critical('The GST process cannot be ready to connect (from add_callback).' + str(self))
 
-
-
 class GstClient(BaseGst):
-    
+    """
+    Manages a GstServer instance.
+    """
     def __init__(self):
         log.debug("GstClient __init__  " + str(self))
     
@@ -252,7 +251,6 @@ class GstClient(BaseGst):
         self.proc_path, self.args, self.pid = self.gst_server.start_process()
         log.debug('GstClient.setup_gst_client done')
         
- 
     def _send_cmd(self, cmd, args=None, callback=None):
         msg = 'GstClient._send_cmd cmd:'+ cmd
         msg += " args: " + str(args)
@@ -273,9 +271,10 @@ class GstClient(BaseGst):
         if self.gst_server.state > 0:
             self.gst_server.kill()
 
-
 class GstProcessProtocol(protocol.ProcessProtocol):
-    
+    """
+    Manages a milhouse process.
+    """
     # add command stack
     # add state info
     
@@ -287,7 +286,6 @@ class GstProcessProtocol(protocol.ProcessProtocol):
         log.info('GstProcessProtocol.connectionMade: GST process started.')
         reactor.callLater(5, self.check_process)
         
-
     def check_process(self):
         if self.server.state < RUNNING:
             log.critical('GstProcessProtocol.check_process: The GST process cannot be ready to connect.')
@@ -307,10 +305,4 @@ class GstProcessProtocol(protocol.ProcessProtocol):
     def processEnded(self, status):
         self.server.change_state(STOPPED)
         log.info('GstProcessProtocol.processEnded: GST process ended. Message: %s' % status)
-
-
-
-
-
-
 
