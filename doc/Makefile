@@ -1,8 +1,6 @@
 SUBDIRS = notes test figures figures/test
 
-subversion.cpp: 
-	@svnversion >> subversion.cpp
-all: subversion.cpp
+all: 
 	@for i in $(SUBDIRS); do \
         echo "make all in $$i..."; \
         (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) all); done
@@ -16,9 +14,8 @@ doxygen:
 	@doxygen
 
 install:
-	@for i in $(SUBDIRS); do \
-        echo "Installing in $$i..."; \
-        (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) install); done
+	mkdir -p $(PREFIX)/share/doc/doxygen
+	cp -rfv html $(PREFIX)/share/doc/doxygen
 
 check:
 	@echo tests for docs?

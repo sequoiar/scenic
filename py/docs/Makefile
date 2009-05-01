@@ -80,4 +80,5 @@ linkcheck:
 check:
 
 install:
-
+	mkdir -p /share/doc/sphinx
+	cp -fvr _build/html/ $(PREFIX)/share/doc/sphinx
