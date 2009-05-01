@@ -189,7 +189,7 @@ class tcp_server
     public:
         tcp_server(io_service& io_service, short port, QueuePair& queue)
             : io_service_(io_service),
-            acceptor_(io_service, tcp::endpoint(tcp::v4(), port)), queue_(queue),
+            acceptor_(io_service, tcp::endpoint(boost::asio::ip::address_v4::loopback(), port)), queue_(queue),
             t_(io_service, boost::posix_time::seconds(1))
     {
         tcp_session* new_tcp_session = new tcp_session(io_service_,queue_); 
