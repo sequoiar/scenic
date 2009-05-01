@@ -49,8 +49,9 @@ def print_engine_log(engine):
     return txt
 
 def print_engine_rtp_stats(engine):
+    txt = ""
     for stream, stat in engine.rtp_stats.iteritems():
-        txt = "<h4>RTP stats for %s</h4>" % stream
+        txt += "<h4>RTP stats for %s</h4>" % stream
         for name, ring in stat.iteritems():
             for val in ring.get():
                 if val != None:
