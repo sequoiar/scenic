@@ -29,7 +29,7 @@ class GstThread
     : public MsgThread
 {
     protected:
-        GstThread(){}
+        GstThread():stop_id(0),play_id(0){}
         /// incomming audio_start request 
         virtual void audio_init(MapMsg& msg) = 0;
         /// incomming video_start request 
@@ -38,11 +38,15 @@ class GstThread
         void stop(MapMsg& ); 
         /// incomming start request 
         virtual void start(MapMsg& ); 
+        /// subclass specific message handling
+        virtual bool subHandleMsg(MapMsg&){ return false;}
 
 
-
+    int stop_id;
+    int play_id;
     private:
         void main();
+        void handleMsg(MapMsg& msg);
 
         /// No Copy Constructor 
         GstThread(const GstThread&); 

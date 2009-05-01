@@ -57,100 +57,105 @@ void GstSenderThread::start(MapMsg& )
     }
 } 
 
+void GstThread::handleMsg(MapMsg &msg)
+{
+    std::string s(msg.cmd());
+    if(s == "audio_init")
+    {
+        try
+        {
+            audio_init(msg);
+            MapMsg r("success");
+            r["id"] = msg["id"];
+            queue_.push(r);
+        }
+        catch(Except e)
+        {
+            MapMsg r("failure");
+            r["id"] = msg["id"];
+            r["errmsg"] = e.msg_;
+            queue_.push(r);
+        }
+    }
+    else if(s == "stop")
+    {
+        stop(msg);
+        stop_id = msg["id"];
+    }
+    else if(s == "start")
+    {
+        start(msg);
+        play_id = msg["id"];
+    }
+    else if(s == "video_init")
+    {
+        try
+        {
+            video_init(msg);
+            MapMsg r("success");
+            r["id"] = msg["id"];
+            queue_.push(r);
+        }
+        catch(Except e)
+        {
+            MapMsg r("failure");
+            r["id"] = msg["id"];
+            r["errmsg"] = e.msg_;
+            queue_.push(r);
+        }
+    }
+    else if (s == "rtp")
+        queue_.push(msg);
+    else
+        LOG_WARNING("Unknown Command.");
+}
 
 void GstThread::main()
 {
     bool done = false;
-    int play_id = 0;
-    int stop_id = 0;
     while(!done)
     {
         if(g_main_context_iteration(NULL, FALSE))
             continue;
-    
+
         if(queue_.ready())
         {
-        MapMsg f = queue_.timed_pop(1);
-        
-        do
-        {
-        if(play_id && playback::isPlaying())
-        {
-            MapMsg r("success");
-            r["id"] = play_id;
-            queue_.push(r);
-            play_id = 0;
-        }
-        if(stop_id && !playback::isPlaying())
-        {
-            MapMsg r("success");
-            r["id"] = stop_id;
-            queue_.push(r);
-            stop_id = 0;
-        }
+            MapMsg f = queue_.timed_pop(1);
 
-        if(f.cmd())
-        {
-            std::string s(f.cmd());
+            do
+            {
+                if(play_id && playback::isPlaying())
+                {
+                    MapMsg r("success");
+                    r["id"] = play_id;
+                    queue_.push(r);
+                    play_id = 0;
+                }
+                if(stop_id && !playback::isPlaying())
+                {
+                    MapMsg r("success");
+                    r["id"] = stop_id;
+                    queue_.push(r);
+                    stop_id = 0;
+                }
 
-            if(s == "quit")
-            {
-                queue_.push(f);
-                done = true;
-            }
-            else if(s == "audio_init")
-            {
-                try
+                if(f.cmd())
                 {
-                    audio_init(f);
-                    MapMsg r("success");
-                    r["id"] = f["id"];
-                    queue_.push(r);
+                    if(f.cmd() == "quit")
+                    {
+                        queue_.push(f);
+                        done = true;
+                        break;
+                    }
+                    
+                    if(!subHandleMsg(f))
+                        handleMsg(f);
+
                 }
-                catch(Except e)
-                {
-                    MapMsg r("failure");
-                    r["id"] = f["id"];
-                    r["errmsg"] = e.msg_;
-                    queue_.push(r);
-                }
-            }
-            else if(s == "stop")
-            {
-                stop(f);
-                stop_id = f["id"];
-            }
-            else if(s == "start")
-            {
-                start(f);
-                play_id = f["id"];
-            }
-            else if(s == "video_init")
-            {
-                try
-                {
-                    video_init(f);
-                    MapMsg r("success");
-                    r["id"] = f["id"];
-                    queue_.push(r);
-                }
-                catch(Except e)
-                {
-                    MapMsg r("failure");
-                    r["id"] = f["id"];
-                    r["errmsg"] = e.msg_;
-                    queue_.push(r);
-                }
-            }
-            else if (s == "rtp")
-                queue_.push(f);
-            else
-                LOG_WARNING("Unknown Command.");
+                f = queue_.timed_pop(1);
+            }while(f.cmd());
         }
-    f = queue_.timed_pop(1);
-    }while(f.cmd());
-    }
-    usleep(MILLISEC_WAIT*1000);
+        usleep(MILLISEC_WAIT*1000);
     }
 
 }
