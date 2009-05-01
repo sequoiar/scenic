@@ -53,6 +53,8 @@ if __name__ == '__main__':
         help="Disables ANSI escape sequences in shell and telnet clients.")
     parser.add_option("-I", "--ui-interfaces", type="string", action="append", \
         help="""User interfaces listen only to those network interfaces IP. Use this flag many times if needed. Default is localhost only. Example: -i 127.0.0.1 -i 10.10.10.55""")
+    parser.add_option("-a", "--all-interfaces", action="store_true", \
+        help="""Makes user interfaces listen to all network interfaces.""")
     parser.add_option("-v", "--verbose", dest="verbose", action="store_true", \
         help="Sets the output to be verbose.")
     (options, args) = parser.parse_args()
@@ -71,6 +73,8 @@ if __name__ == '__main__':
             config.ui_network_interfaces.append(options.ui_interfaces)
         else:
             config.ui_network_interfaces = options.ui_interfaces
+    if options.all_interfaces:
+        config.ui_network_interfaces = ''
     if options.miville_home:
         config.miville_home = options.miville_home
     if options.verbose:
