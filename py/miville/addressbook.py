@@ -281,7 +281,7 @@ class AddressBook(object):
 
     def read(self):
         """
-        Read the Address Book file (.adb) from the disk.
+        Reads the Address Book file (.adb) from the disk.
         """
         try:
             adb_file = open(self.filename, 'r')
@@ -313,12 +313,17 @@ class AddressBook(object):
             if serialized:
                 log.info("Successfully loaded the addressbook.")
                 # get the selected contact and remove it from the contacts dict
-                self.selected = self.contacts['_selected']
-                del self.contacts['_selected']
+                try:
+                    self.selected = self.contacts['_selected']
+                    del self.contacts['_selected']
+                    log.info('remove _selected pseudo-contact')
+                except KeyError, e:
+                    log.error(e.message)
                 # add the connection attributes to all the contacts
                 # and set the state to DISCONNECTD (change this in the future
                 # to support recovery)
                 for contact in self.contacts.values():
+                    log.info('Contact %s has been set to DISCONNECTED'  % (contact.name))
                     contact.connection = None
                     contact.state = DISCONNECTED
                     if self.minor == 0:

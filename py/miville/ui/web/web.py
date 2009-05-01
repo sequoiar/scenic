@@ -120,26 +120,33 @@ def import_widgets():
     and add render_<widget> method to the Index class for each.
     """
     package = 'miville.ui.web.widgets'
+    loaded = []
+    # TODO: fix weird bug. All widgets are loaded 3 times
     for widget in getModule(package).iterModules():
-        if widget.isPackage():
-            medias = getModule(widget.name).iterModules()
-            for media in medias:
-                try:
-                    mod = media.load()
-                except:
-                    log.error('Unable to load the module %s' % media.name)
-                else:
-                    if hasattr(mod, 'render'):
-                        widgets_mod.append(mod)
-        else:
-            try:
-                mod = widget.load()
-                log.debug('Loaded the module %s' % widget.name)
-            except:
-                log.error('Unable to load the module %s' % widget.name)
+        if widget.name not in loaded:
+            log.debug('Will load widget %s %s %s' % (widget, widget.name, widget.filePath.path))
+            log.debug("%s" % (loaded))
+            loaded.append("%s" % (widget.name))
+            
+            if widget.isPackage():
+                medias = getModule(widget.name).iterModules()
+                for media in medias:
+                    try:
+                        mod = media.load()
+                    except:
+                        log.error('Unable to load the module %s' % media.name)
+                    else:
+                        if hasattr(mod, 'render'):
+                            widgets_mod.append(mod)
             else:
-                if hasattr(mod, camel_name(mod.__name__.replace(package, '')[1:])):
-                    widgets_mod.append(mod)
+                try:
+                    mod = widget.load()
+                    log.debug('Loaded the module %s' % widget.name)
+                except:
+                    log.error('Unable to load the module %s' % widget.name)
+                else:
+                    if hasattr(mod, camel_name(mod.__name__.replace(package, '')[1:])):
+                        widgets_mod.append(mod)
                 
     # for each widget add a render_<widget> method to the Index class
     for widget in widgets_mod:
