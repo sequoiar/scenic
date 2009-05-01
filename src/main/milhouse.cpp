@@ -93,6 +93,8 @@ short pof::run(int argc, char **argv)
 
     options.parse(argc, argv);
 
+    std::cout << "Ver:" << PACKAGE_VERSION << " Rev #" << SVNVERSION << std::endl;
+
     if(options["serverport"])
         return telnetServer(options["sender"], options["serverport"]);
 

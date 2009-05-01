@@ -254,14 +254,14 @@ class udp_sender
         t_.async_wait(boost::bind(&udp_sender::handle_timer,this, error));
     }
 
-        void handle_send_to(const error_code& err, size_t /*bytes_sent*/)
+        void handle_send_to(const error_code& err, size_t bytes_sent)
         {
             if(err){
                 LOG_DEBUG("err");
             } 
             else
             {
-                LOG_DEBUG("!err");
+                LOG_DEBUG("MSG Sent " << bytes_sent);
                 socket_.async_receive_from(buffer(data_,max_length),sender_endpoint_,
                         boost::bind(&udp_sender::handle_receive_from, this, 
                             error, bytes_transferred));
@@ -290,7 +290,7 @@ class udp_sender
             {
                 if(MsgThread::isQuitted())
                     io_service_.stop();
-
+                
                 socket_.async_send_to(buffer(buff_),*iterator, boost::bind(&udp_sender::handle_send_to,this,error,bytes_transferred));
             }
             else
@@ -329,6 +329,7 @@ class udp_server
             if (!err && bytes_recvd > 0)
             {
                 MapMsg msg;
+                LOG_DEBUG("MSG: bytes_recvd " << bytes_recvd);
                 msg.tokenize(data_);
                 if(msg.cmd() == "buffer")
                 {
