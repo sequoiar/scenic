@@ -73,6 +73,8 @@ if __name__ == '__main__':
             config.ui_network_interfaces = options.ui_interfaces
     if options.miville_home:
         config.miville_home = options.miville_home
+    if options.verbose:
+        config.verbose = options.verbose
     if options.disable_escape_sequences: # in both telnet CLI and this shell
         config.enable_escape_sequences = False
     # set the port offset        

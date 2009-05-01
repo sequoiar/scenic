@@ -126,6 +126,12 @@ class Core(Subject):
         self.connectors = connectors.load_connectors(self.api, self.config.connector_port + self.config.port_numbers_offset, self.config.listen_to_interfaces)
         com_chan.start(self.api, connectors.connections, self.com_chan_port, self.config.listen_to_interfaces)
         self.api._start(self)
+        if self.config.verbose:
+            print 'Current Miville configuration: '
+            for k in sorted(self.config.__dict__):
+                v = self.config.__dict__[k]
+                print "        %30s  :  %s" % (k, v)
+
         print "Miville is ready." # This is the only "print" allowed in the Miville application
         
     def load_uis(self):
@@ -135,7 +141,8 @@ class Core(Subject):
         self.uis = common.load_modules(common.find_modules('ui'))
         count = 0
         for mod in self.uis:
-            interfaces = self.config.listen_to_interfaces
+            # interfaces = self.config.listen_to_interfaces
+            interfaces = self.config.ui_network_interfaces
             if mod.__name__.find('cli') != -1:
                 port = self.config.telnet_port + self.config.port_numbers_offset
                 mod.enable_escape_sequences = self.config.enable_escape_sequences 
