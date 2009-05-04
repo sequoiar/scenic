@@ -122,7 +122,7 @@ bool MapMsg::tokenize(const std::string& str, MapMsg &cmd_map)
     std::string::size_type tok_end;
     std::string lstr = str;                                         //copy in str to local string
     cmd_map.clear();                                                //clear output map
-
+    LOG_DEBUG(str);
     tok_end = lstr.find_first_of(':');                              //search for ":"
     if(tok_end == lstr.size())                                      //if : not found return error
         THROW_ERROR("No command found.");
