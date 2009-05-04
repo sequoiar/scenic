@@ -78,13 +78,14 @@ class GstServer(object):
         self.port = port
         self.address = address
         self.mode = mode
-        log.info("GstServer.__init__(mode = %s, port=%d, address=%s)" % (self.mode, self.port, self.address))
+        log.debug("GstServer.__init__(mode = %s, port=%d, address=%s)" % (self.mode, self.port, self.address))
         self.process = None
         self.conn = None
         self.state = -1
         self.change_state(STOPPED)
         self.commands = []
         self.callback_dict = callback_dict
+        self.version_str = None
 
     def connect(self):
         log.debug("GstServer.connect")
@@ -110,13 +111,13 @@ class GstServer(object):
          self.state = new_state
          old_str = self.get_state_str(old_state)
          new_str = self.get_state_str(new_state)
-         log.info('GstServer state changed from %s to %s handle: %s ' % ( old_str, new_str, str(self) ))
+         log.debug('GstServer state changed from %s to %s handle: %s ' % ( old_str, new_str, str(self) ))
 
     def connection_ready(self, ipcp):
-        log.info("CONNECTION ready %s" % str(self))
+        log.debug("CONNECTION ready %s" % str(self))
         msg = 'GstServer.connection_ready: Address: %s, Port: %s, conn %s' % (self.address, self.port, str(ipcp) )
-        log.info(msg)
-        log.info('CONN: %s %s' % (ipcp, ipcp.__dict__))
+        log.debug(msg)
+        log.debug('CONN: %s %s' % (ipcp, ipcp.__dict__))
         self.conn = ipcp
         self.conn.connectionLost = self.connection_lost
 
@@ -124,18 +125,18 @@ class GstServer(object):
             self.conn.add_callback(callback, key)
           
         self.change_state(CONNECTED)
-        log.info('GST inter-process link created')
+        log.debug('GST inter-process link created')
     
     def connection_failed(self, conn):
         msg = 'GstServer.connection_failed: Address: %s, Port: %s %s' % (self.address, self.port, str(self))
-        log.info(msg + " "  + str(self))
+        log.debug(msg + " "  + str(self))
         ipcp.connection_failed(conn)
         self.kill()
 
     def connection_lost(self, reason=protocol.connectionDone):
         self.kill()
         self.conn.del_callback('log')
-        log.info('Lost the server connection. Reason:\n%s %s' % (reason, str(self) ) )
+        log.debug('Lost the server connection. Reason:\n%s %s' % (reason, str(self) ) )
 
     def start_process(self):
         log.debug("GstServer.start_process... %s " % str(self) )
@@ -154,9 +155,9 @@ class GstServer(object):
                     proc_path = path[0]
                     msg = "Start process> path: %s, protocol: %s args: %s %s" % (proc_path, protocol, str(args), str(self))
                     # print msg
-                    log.info(msg)
+                    log.debug(msg)
                     self.process = reactor.spawnProcess(protocol, proc_path, args, os.environ, usePTY=True)
-                    log.info("Process spawned pid=" + str(self.process.pid)  + " "+ str(self))
+                    log.debug("Process spawned pid=" + str(self.process.pid)  + " "+ str(self))
                     return proc_path, args, self.process.pid
                 except Exception, e:
                     log.critical('Cannot start the GST application "%s": %s %s' % (streaming_server_process_name, str(e), str(self) ) )
@@ -197,12 +198,11 @@ class GstServer(object):
             if self.conn != None:
                 if self.state >= CONNECTED :
                     (cmd, args) = self.commands.pop()
-                    log.info('\n\n\nGstServer._process_cmd: \n  ' + cmd + "\n  args: " + str(args) + "\n  pid " + str(self.process.pid)  + " " + str(self) + '\n\n')
+                    log.debug('\n\n\nGstServer._process_cmd: \n  ' + cmd + "\n  args: " + str(args) + "\n  pid " + str(self.process.pid)  + " " + str(self) + '\n\n')
                     if args != None:
                         self.conn.send_cmd(cmd, *args)
                     else:
-                        self.conn.send_cmd(cmd)
-        
+                        self.conn.send_cmd(cmd)      
         if len(self.commands) > 0:
             if self.state > STOPPED:
                 reactor.callLater(1, self._process_cmd)
@@ -249,6 +249,7 @@ class GstClient(BaseGst):
         log.debug('GstClient.setup_gst_client '+ str(self))
         self.gst_server = GstServer(mode, port, address, callbacks_dict)
         self.proc_path, self.args, self.pid = self.gst_server.start_process()
+        self.version_str = self.gst_server.version_str
         log.debug('GstClient.setup_gst_client done')
         
     def _send_cmd(self, cmd, args=None, callback=None):
@@ -273,19 +274,16 @@ class GstClient(BaseGst):
 
 class GstProcessProtocol(protocol.ProcessProtocol):
     """
-    Manages a milhouse process.
+    Protocol for milhouse process management.
     """
-    # add command stack
-    # add state info
-    
+
     def __init__(self, server):
         log.debug('GstProcessProtocol.__init__: %s' % str(server))
         self.server = server
 
     def connectionMade(self):
-        log.info('GstProcessProtocol.connectionMade: GST process started.')
+        log.debug('GstProcessProtocol.connectionMade: GST process started.')
         reactor.callLater(5, self.check_process)
-        
     def check_process(self):
         if self.server.state < RUNNING:
             log.critical('GstProcessProtocol.check_process: The GST process cannot be ready to connect.')
@@ -293,10 +291,12 @@ class GstProcessProtocol(protocol.ProcessProtocol):
             
     def outReceived(self, data):
         log.debug('GstProcessProtocol.outReceived server state: %d, data %s' % (self.server.state, str(data) ) )
-        log.info('GstProcessProtocol.outReceived: "%s" from %s' % (data, str(self)) )
         if self.server.state < RUNNING:
             lines = data.split('\n')
             for line in lines:
+                if line.strip().startswith("Ver:"):
+                    self.server.version_str = line.split("Ver:")[1] 
+                    
                 if line.strip() == 'READY':
                     self.server.change_state(RUNNING)
                     self.server.connect()
@@ -304,5 +304,5 @@ class GstProcessProtocol(protocol.ProcessProtocol):
 
     def processEnded(self, status):
         self.server.change_state(STOPPED)
-        log.info('GstProcessProtocol.processEnded: GST process ended. Message: %s' % status)
+        log.debug('GstProcessProtocol.processEnded: GST process ended. Message: %s' % status)
 

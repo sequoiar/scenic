@@ -132,7 +132,6 @@ def split_gst_parameters(global_setting, address):
                             params['port'] = stream.port
                             for k,v in media_setting.settings.iteritems():
                                     params[k] = media_setting.settings[k]
-        
                             params['address'] = address
                             proc_params[stream.name]= params
     return receiver_procs, sender_procs
@@ -152,10 +151,11 @@ def _create_stream_engines( listener, mode, procs_params):
             if engine == None:
                 # engine is a AudioVideoGst instance
                 if engine_name.upper() == 'GST':
-                    engine =  audiovideogst.AudioVideoGst()
+                    engine =  audiovideogst.AudioVideoGst(mode, group_name)
                 else:
                     raise StreamsError, 'Engine "%s" is not supported' %  engine_name
-            engine.apply_settings(listener,mode, group_name, stream_name, stream_params)
+            
+            engine.apply_stream_settings(stream_name, stream_params)
         engines.append(engine)
     return engines
 

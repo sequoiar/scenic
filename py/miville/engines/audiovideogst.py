@@ -40,7 +40,7 @@ from datetime import datetime
 gst_ipcp_port_gen = PortNumberGenerator(9000, 1)
 gst_av_port_gen = PortNumberGenerator(10000, 10)
 
-log = log.start('debug', 1, 0, 'videoGst')
+log = log.start('info', 1, 0, 'audiovideogst')
 
 class RingBuffer:
     """
@@ -62,10 +62,15 @@ class AudioVideoGst(GstClient):
     """
     Interface to the milhouse process.
     """
-    def apply_settings(self, listener, mode, group_name, stream_name, parameters ):
+    
+    def __init__(self, mode, group_name):
+        self._apply_settings(mode, group_name)
+    
+    def _apply_settings(self, mode, group_name):
+       
        self.mode = mode
        self.group_name = group_name
-       self.stream_name = stream_name
+       self.stream_names = []
        self.commands = []
        
        self.args = None
@@ -73,15 +78,11 @@ class AudioVideoGst(GstClient):
        self.pid = None
        self.rtp_stats = {}
        self.logger = RingBuffer(20)
+       self.version = ""
+       self.gst_address =  '127.0.0.1'
+       self.gst_port = gst_ipcp_port_gen.generate_new_port()
+       self.acknowledgments = []
             
-       gst_parameters = []
-       for k,v in parameters.iteritems():
-           if k not in ['engine','gst_address','gst_port']:
-               gst_parameters.append( (k, v) )      
-       log.debug('AudioVideoGst.apply_settings group:' + str(group_name) + ' stream: ' + str(stream_name) + ' params: ' + str(gst_parameters))
-       gst_address =  '127.0.0.1' # parameters['gst_address']
-       gst_port =  gst_ipcp_port_gen.generate_new_port() # parameters['gst_port']
-       
        callbacks = {'log'       :self.gst_log,
                     'video_init':self.gst_video_init, 
                     'audio_init':self.gst_audio_init, 
@@ -90,18 +91,34 @@ class AudioVideoGst(GstClient):
                     'success'   :self.gst_success,
                     'failure'   :self.gst_failure,
                     'rtp'       :self.gst_rtp 
-                    }
-              
-       self.setup_gst_client(mode, gst_port, gst_address, callbacks)
-       if stream_name.upper().startswith('VIDEO'):
+                    }       
+       log.info('')
+       self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks)
+       
+       
+    
+    def apply_stream_settings(self, stream_name, parameters ):
+        self.stream_names.append(stream_name)
+        gst_parameters = []
+        non_gst_params = ['engine']
+        for k,v in parameters.iteritems():
+            if k not in non_gst_params:
+                gst_parameters.append( (k, v) )      
+            log.info('AudioVideoGst.apply_stream_settings stream: ' + str(stream_name) + ' params: ' + str(gst_parameters))
+        
+        if stream_name.upper().startswith('VIDEO'):
            self._send_command('video_init', gst_parameters)
-       elif stream_name.upper().startswith('AUDIO'):
+        elif stream_name.upper().startswith('AUDIO'):
            self._send_command('audio_init', gst_parameters)
-       else:
-          raise StreamsError, 'Engine AudioVideoGst does not support "%s" parameters' %  stream_name 
-
+        else:
+           raise StreamsError, 'Engine AudioVideoGst does not support "%s" parameters' %  stream_name 
+      
     def get_status(self):
         s = self.gst_server.get_status()
+        return s
+    
+    def get_version_str(self):
+        s = self.gst_server.version_str
         return s
         
     def _send_command(self, cmd, params = None):
@@ -110,34 +127,52 @@ class AudioVideoGst(GstClient):
         self.commands.append(tupple_of_fine_stuff)
 
     def gst_video_init(self, **args):
-        log.info('GST VIDEO INIT acknowledged:  args %s %s' %  ( str(args), str(self))  )
+        timestamp = datetime.now()
+        info = 'video_init  "%s"' % str(args)
+        self.acknowledgments.append((timestamp, info))
+        log.debug('%s %s' %  (info, str(self)) )        
         self.gst_server.change_state(miville.engines.base_gst.STREAMINIT)
 
     def gst_start(self,  **args):
-        log.info('GST START acknowledged... our args %s  %s' % (str(args), str(self)) )
+        timestamp = datetime.now()
+        info = 'start  "%s"' % str(args)
+        self.acknowledgments.append((timestamp, info))
+        log.debug('%s %s' %  (info, str(self)) )
         self.gst_server.change_state(miville.engines.base_gst.STREAMING)
         
     def gst_stop(self,  **args):
-        log.info('GST STOP acknowledged ... our args %s  %s' % (str(args), str(self)) )
+        timestamp = datetime.now()
+        info = 'stop  "%s"' % str(args)
+        self.acknowledgments.append((timestamp, info) )
+        log.debug('%s %s' %  (info, str(self)) )
         self.gst_server.change_state(miville.engines.base_gst.STREAMSTOPPED)
 
     def gst_audio_init(self,  **args):
-        log.info('GST AUDIO INIT acknowledged our args %s  %s' % (str(args), str(self)) )
+        timestamp = datetime.now()
+        info = 'audio_init  "%s"' % str(args)
+        self.acknowledgments.append((timestamp, info))
+        log.debug('%s %s' %  (info, str(self)) )
         self.gst_server.change_state(miville.engines.base_gst.STREAMINIT)
 
     def gst_success(self, **args):
-        log.info('GST success :-)  args %s %s' %  (str(args), str(self)) )
+        timestamp = datetime.now()
+        info = 'Success :-(  "%s"' % str(args)
+        self.acknowledgments.append((timestamp, info))
+        log.debug('%s %s' %  (info, str(self)) )
         self.gst_server.change_state(miville.engines.base_gst.STREAMING)
 
     def gst_failure(self, **args):
-        log.debug('GST failure :-(  args %s %s' %  (str(args), str(self)) )
+        timestamp = datetime.now()
+        info = 'failure :-(  "%s"' % str(args)
+        self.acknowledgments.append((timestamp, info))
+        log.debug('%s %s' %  (info, str(self)) )
         self.gst_server.change_state(miville.engines.base_gst.FAILURE)
 
     def gst_log(self, **args):
         log_message = (str(args))
         src = str(self)
         info = 'GST log pid %s [%s] %s' %  (self.pid, log_message, src)  
-        log.info(info ) 
+        log.debug(info ) 
         self.logger.append(log_message)
 
     def gst_rtp(self, **args):

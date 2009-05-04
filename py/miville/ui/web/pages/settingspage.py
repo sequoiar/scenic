@@ -51,6 +51,7 @@ from miville.utils.common import find_callbacks
 
 from miville.settings import global_settings
 from miville.settings import media_settings
+from miville.settings import Settings
 from miville.errors import *
 
 
@@ -72,7 +73,8 @@ def print_settings():
                 txt += "<p>    port: " + str(stream.port) + "</p>"
                 txt += "<p>    media setting: %s\n" % str(stream.setting)
                 try:
-                    media_setting = Settings.get_media_setting_from_id(stream.setting)
+                    id = stream.setting
+                    media_setting = Settings.get_media_setting_from_id(id)
                     txt += "      <h5>[" + str(media_setting.id) + "] media setting '" + media_setting.name + "</h5>"
                     for key, value in media_setting.settings.iteritems():
                         txt += "<p>       %s : %s</p>" % (key, str(value))
