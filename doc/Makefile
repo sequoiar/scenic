@@ -19,6 +19,9 @@ install:
 	cp -rfv html $(PREFIX)/share/doc/doxygen; \
 	fi
 
+uninstall:
+	rm -rf /share/doc/doxygen
+
 check:
 	@echo tests for docs?
 

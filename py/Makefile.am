@@ -22,6 +22,11 @@ TESTS = test/test_addressbook.py \
 install-exec-hook:
 		cp -fvr miville/ $(PREFIX)/lib/python2.5
 		cp -fv miville.py $(PREFIX)/bin/miville
+
+uninstall-hook:
+		rm -rf $(PREFIX)/lib/python2.5/miville
+		rm -rf $(PREFIX)/bin/miville
+
 # temporarily removed: check_ping.py
 # not much useful:
 #        test/test_network.py 

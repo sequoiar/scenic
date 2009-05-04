@@ -82,3 +82,6 @@ check:
 install:
 	mkdir -p $(PREFIX)/share/doc/sphinx
 	-cp -fvr _build/html/ $(PREFIX)/share/doc/sphinx
+
+uninstall:
+	rm -rf $(PREFIX)/share/doc/sphinx	
