@@ -13,7 +13,7 @@ libgst_a_SOURCES = mediaBase.cpp \
 				   codec.cpp rtpPay.cpp audioConfig.cpp remoteConfig.cpp \
 				   videoReceiver.cpp videoSender.cpp videoSource.cpp raw1394Util.cpp \
 				   audioLevel.cpp glVideoSink.cpp playback.cpp dv1394.cpp v4l2util.cpp fileSource.cpp \
-                   mediaBase.h busMsgHandler.h\
+                   mediaBase.h busMsgHandler.h ../ports.h \
 				   audioSender.h audioReceiver.h $(inc)/alsa.h\
 				   videoConfig.h rtpBin.h pipeline.h \
 				   rtpSender.h rtpReceiver.h audioSource.h \

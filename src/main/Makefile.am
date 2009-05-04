@@ -2,7 +2,7 @@ include $(top_srcdir)/globals.mak
 
 bin_PROGRAMS = milhouse
 
-milhouse_SOURCES = milhouse.cpp mainTcp.cpp msgThreadFactory.cpp
+milhouse_SOURCES = milhouse.cpp mainTcp.cpp msgThreadFactory.cpp msgThreadFactory.h
 
 milhouse_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(GTK_CFLAGS) $(GL_CFLAGS) $(GLU_CFLAGS) -D SVNVERSION=\"$(shell svnversion)\"
 LDADD = $(src)/gst/control/libgstthread.a $(src)/gst/engine/libgst.a $(ALL_GST_LIBS) $(JACK_LIBS) $(src)/tcp/libtcp.a \

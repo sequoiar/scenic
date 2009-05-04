@@ -17,6 +17,8 @@ all:
 
 distclean:
 
+distdir:
+
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
 	@echo "  html      to make standalone HTML files"

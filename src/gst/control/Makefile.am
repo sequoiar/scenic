@@ -5,5 +5,5 @@ endif
 
 noinst_LIBRARIES= libgstthread.a
 
-libgstthread_a_SOURCES = gstThread.cpp
+libgstthread_a_SOURCES = gstThread.cpp gstReceiverThread.h gstSenderThread.h gstThread.h ../videoFactory.h ../audioFactory.h ../engine.h
 

@@ -2,7 +2,7 @@ include $(top_srcdir)/globals.mak
 
 noinst_LIBRARIES= libgutil.a
 
-libgutil_a_SOURCES = optionArgs.cpp gloop.cpp gQueuePair.cpp\
-                     optionArgs.h gloop.h \
+libgutil_a_SOURCES = optionArgs.cpp gloop.cpp gQueuePair.cpp \
+                     optionArgs.h gloop.h queuePair.h \
                      $(inc)/gutil.h 
 

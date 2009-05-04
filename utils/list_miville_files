@@ -8,5 +8,6 @@ then
     done
     find py -name Makefile.in -or -name Makefile.am
     find py/docs -name \*.txt
+    echo "py/docs/Makefile"
 fi
 

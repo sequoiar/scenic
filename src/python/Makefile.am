@@ -5,7 +5,7 @@ TESTS = test.py
 
 lib_LTLIBRARIES = milhouse.la
 
-milhouse_la_SOURCES = exports.cpp pyMsgThread.cpp ../main/msgThreadFactory.cpp
+milhouse_la_SOURCES = exports.cpp pyMsgThread.cpp ../main/msgThreadFactory.cpp pyCallback.h pyMsgThread.h
 
 
 
