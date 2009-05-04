@@ -162,7 +162,7 @@ class GstServer(object):
                 except Exception, e:
                     log.critical('Cannot start the GST application "%s": %s %s' % (streaming_server_process_name, str(e), str(self) ) )
             else:
-                log.critical('Cannot find the GST application: %s %s' % streaming_server_process_name, str(self) )
+                log.critical('Cannot find the GST application: %s %s' % (streaming_server_process_name, self)  )
         else:
             log.error("GstServer.start_process: not in proper state for starting %s" % str(self))
 
