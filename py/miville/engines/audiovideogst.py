@@ -64,10 +64,7 @@ class AudioVideoGst(GstClient):
     """
     
     def __init__(self, mode, group_name):
-        self._apply_settings(mode, group_name)
-    
-    def _apply_settings(self, mode, group_name):
-       
+
        self.mode = mode
        self.group_name = group_name
        self.stream_names = []
@@ -95,8 +92,6 @@ class AudioVideoGst(GstClient):
        log.info('')
        self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks)
        
-       
-    
     def apply_stream_settings(self, stream_name, parameters ):
         self.stream_names.append(stream_name)
         gst_parameters = []

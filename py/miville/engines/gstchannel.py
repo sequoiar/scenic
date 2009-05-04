@@ -106,9 +106,10 @@ def split_gst_parameters(global_setting, address):
     """
     receiver_procs = {}
     sender_procs = {}
-    
+    log.debug("split_gst_parameters global setting %s" % global_setting.name)
     for id, group in global_setting.stream_subgroups.iteritems():
         if group.enabled:
+            log.debug("split_gst_parameters group: %s " % group.name)
             # procs is used to select between rx and tx process groups
             procs = receiver_procs
             s = group.mode.upper()
@@ -117,6 +118,7 @@ def split_gst_parameters(global_setting, address):
                 
             for stream in group.media_streams:
                 if stream.enabled:
+                    log.debug("split_gst_parameters stream: %s " % stream.name)
                     proc_params = None
                     if not procs.has_key(stream.sync_group):
                         procs[stream.sync_group]  = {}
@@ -126,6 +128,7 @@ def split_gst_parameters(global_setting, address):
                     # get params from media stream
                     media_setting = miville.settings.Settings.get_media_setting_from_id(stream.setting)
                     if media_setting.settings.has_key('engine'):
+                        log.debug("split_gst_parameters media setting: %s " % media_setting.name)
                         engine_name =  media_setting.settings['engine']
                         if engine_name.upper().startswith('GST'):
                             params = {}
@@ -141,12 +144,13 @@ def _create_stream_engines( listener, mode, procs_params):
     Returns list of new stream engines.    
     AudioVideoGst instances.
     """
+    log.info("gstchannel._create_stream_engines")
     engines = []
     for group_name, sync_group in procs_params.iteritems():
-        log.debug(" sync group [" + group_name + "]") 
+        log.info(" sync group [" + group_name + "]") 
         engine = None
         for stream_name, stream_params in sync_group.iteritems():
-            log.debug("  stream: " + stream_name)
+            log.info("  stream: " + stream_name)
             engine_name = stream_params['engine']
             if engine == None:
                 # engine is a AudioVideoGst instance
@@ -243,6 +247,8 @@ class GstChannel(object):
                     engine.stop_streaming()        
         else:
             log.error("No tx processes to stop")
+        caller = None
+        self.api.notify(caller, {'started':False, 'msg':"streaming stopped"}, "stop_streams") 
       
     def on_remote_message(self, key, args=None):
         """
@@ -304,7 +310,9 @@ class GstChannel(object):
         log.debug("   Initialize SENDING PROCESSES:")
         log.debug( pprint.pformat(self.sender_procs_params)) 
         self.sender_engines = _create_stream_engines(self.api, 'send', self.sender_procs_params)
-        self._start_stream_engines(self.sender_engines)        
+        self._start_stream_engines(self.sender_engines)
+        caller = None
+        self.api.notify(caller, {'started':True, 'msg':"streaming started"}, "start_streams") 
             
     def send_message(self, key, args_list=[]):
         """
