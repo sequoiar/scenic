@@ -236,6 +236,12 @@ Streams.methods(
      *  - 'contact_selected'
      *  - 'contact_unselected'
      *  - 'add_contact'
+     *
+     * If key is adb.'contact_selected', checks the connection state. 
+     * If we are streaming, sets the button accordingly.
+     * (if state = 0 or 3)
+     *
+     * See miville/connectors/states.py
      */
 	function upd_start_btn(self, event) {
 		// list of events that "list" should react to
@@ -252,6 +258,9 @@ Streams.methods(
 			// add event to the button
 			self.start_btn.removeEvents('click');
 			if ([0, 3].contains(connection_state)) {
+                // "start" if:
+                // 0: DISCONNECTED
+                // 3: CONNECTED
 				if (stream_state == 0) {
 					button_state = 'enabled';
 					self.start_btn.addEvent('click', function(){

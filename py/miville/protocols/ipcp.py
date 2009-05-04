@@ -72,7 +72,7 @@ class IPCP(LineReceiver):
         log.debug("IPCP.lineReceived: %s" % line)
         cmd, sep, args = line.partition(':')
         if cmd not in self.callbacks:
-            log.info('Command %s not in callback list.' % cmd)
+            log.error('Command %s not in callback list.' % cmd)
         else:
             data = args.strip() + " "   #TODO: use the parse function instead
             args = {}
@@ -119,7 +119,7 @@ class IPCP(LineReceiver):
                         try:
                             value = float(value)
                         except:
-                            log.info('Invalid type for received argument %s=%s.' % (attr, value))
+                            log.error('Invalid type for received argument %s=%s.' % (attr, value))
                 args[attr] = value
                 start = end + 1
             log.debug("Received: " + cmd + repr(args))
@@ -135,15 +135,15 @@ class IPCP(LineReceiver):
                 if parg:
                     
                     process_key = arg[0].encode('ascii', 'backslashreplace')
-                    log.info("IPCP.send_cmd: " + str(args) )
-                    log.info("IPCP.send_cmd: process_key[" + str(process_key) + "] = [" + parg + "]" )
+                    log.debug("IPCP.send_cmd: " + str(args) )
+                    log.debug("IPCP.send_cmd: process_key[" + str(process_key) + "] = [" + parg + "]" )
                     line.append(process_key + '=' + parg)
             else:
                 parg = self._process_arg(arg)
                 if parg:
                     line.append(parg)
         line = ' '.join(line)
-        log.info('IPCP.send_cmd: "' + line + '" from ' + str(self) )
+        log.debug('IPCP.send_cmd: "' + line + '" from ' + str(self) )
         self.sendLine(line)
 
     def _process_arg(self, arg):

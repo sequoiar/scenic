@@ -1518,7 +1518,7 @@ class CliView(Observer):
             self.write('Unable to select %s as the master stream, it does\'nt exist.' % name)
 
     def _start_streams(self, origin, data):
-        self.write(data)
+        self.write(str(data))
 
     def _stop_streams(self, origin, data):
         self.write(data)

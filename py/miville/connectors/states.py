@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+# 
 # Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -17,14 +17,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 CONNECTIONS STATE CONSTANTS
 """
 DISCONNECTED = 0
 ASKING = 1
-CONNECTING = 2
-CONNECTED = 3
+CONNECTING = 2      
+CONNECTED = 3        # streaming  ! (I guess)
 DISCONNECTING = 4
 HUNGUP = 5
 

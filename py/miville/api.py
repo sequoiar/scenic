@@ -636,13 +636,15 @@ class ControllerApi(object):
         being connected to a contact.
         """
         log.debug('Defer error: %s' % error)
-        self.notify(caller, error)
     
     def stop_streams_tmp(self, caller, contact_name):
         contact = self.get_contact(contact_name)
         contact.stream_state = 0        
         
     def start_streams(self, caller, contact_name):
+        """
+        Starts audio/video streaming with a contact. 
+        """
         log.info('ControllerApi.start_streams, contact= ' + str(contact_name))
         contact = self.get_contact(contact_name)
         if contact:
@@ -652,9 +654,10 @@ class ControllerApi(object):
                     settings_com_channel.start_streaming( global_setting, contact.address)
                     # global_setting.start_streaming(self, contact.address, settings_com_channel)
                     contact.stream_state = 2
-                    self.notify(caller, "streaming started")
+                    self.notify(caller, {'streaming':True, 'msg':"streaming started", 'contact_name':contact_name}, "start_streams") # key = start_streams
                 except AddressBookError, e:
-                        self.notify(caller, "Please select a contact prior to start streaming." + e.message, "error")   
+                    self.notify(caller, "Please select a contact prior to start streaming." + e.message, "error")   
+                    #TODO: change key for 'streams_error'
                 except SettingsError, err:
                     self.notify(caller, err)
                 except StreamsError, err:
@@ -676,7 +679,8 @@ class ControllerApi(object):
             contact.stream_state = 0
             self.notify(caller, "streaming stopped")
         except AddressBookError, e:
-                self.notify(caller, "Please select a contact prior to stop streaming." + e.message, "error")   
+            self.notify(caller, "Please select a contact prior to stop streaming." + e.message, "error")   
+            #TODO: change key for 'streams_error'
         except SettingsError, err:
             self.notify(caller, err)
         except StreamsError, err:
@@ -688,7 +692,6 @@ class ControllerApi(object):
                 
         address: string or None (IP)
         """
-        
         caller = None
         contact = self.adb.get_contact(contact_name)    
         if contact.state != addressbook.CONNECTED:

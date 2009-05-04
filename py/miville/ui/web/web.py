@@ -405,6 +405,9 @@ class Widget(LiveFragment):
     
     *Note: we use the deprecated LiveFragment instead of LiveElement because
     i18n need the context, so it doesn't work with LiveElement.* 
+
+    Every method of a Widget that starts with "cb_" catches a callback for Miville 
+    Subject notification.
     """
 
     # add the translation renderer
