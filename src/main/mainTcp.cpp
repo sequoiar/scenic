@@ -42,7 +42,7 @@ void Logger::operator()(LogLevel& level, std::string& msg)
     m["level"] = level;
     m["msg"] = msg;
     queue_.push(m);
-    std::cout << level << " "<< msg;
+    std::cout << level << " "<< msg << std::endl;
 }
 
 /** Main command line entry point
