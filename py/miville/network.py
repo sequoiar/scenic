@@ -228,7 +228,7 @@ def _parse_iperf_output(lines):
 # XXX timestamp format : 
 # "%Y%m%d%H%M%S"
 
-lass NetworkError(Exception):
+class NetworkError(Exception):
     """
     Any error due to network testing (with iperf).
     """
