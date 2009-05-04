@@ -48,21 +48,20 @@ using boost::asio::placeholders::bytes_transferred;
 
 static std::string get_line(std::string& msg)
 {
-    std::string ret;
-    std::string::size_type pos = msg.find("\n");
-    std::string::size_type pos2 = msg.find("\r");
+    std::string ret=msg;
+    std::string::size_type pos = msg.find_first_of("\r\n");
     int count = 0;
-
-    if(pos !=  std::string::npos)
+    if(pos != std::string::npos)
+    {
         count++;
-
-    if(pos2 !=  std::string::npos)
-        count++;
-
+        if(msg[pos+1] == '\r' or msg[pos+1] == '\n')
+            count++;
     ret = msg.substr(0, pos+count);
-    msg.erase(0, pos+count);
-    ret = msg;
-    msg.clear();
+    msg = msg.substr(pos+count);
+    }
+    else
+        msg.clear();
+
     return ret;
 }
 
