@@ -36,17 +36,21 @@ class Logger
 };
 
 
-void Logger::operator()(LogLevel& , std::string& msg)
+#ifdef MAPLOGS
+void Logger::operator()(LogLevel& level, std::string& msg)
 {
-#if 0
     MapMsg m("log");
     m["level"] = level;
     m["msg"] = msg;
     queue_.push(m);
-#endif
     std::cout << msg;// << std::endl;
 }
-
+#else
+void Logger::operator()(LogLevel& , std::string& msg)
+{
+    std::cout << msg;// << std::endl;
+}
+#endif
 /** Main command line entry point
  * launches the threads and dispatches
  * MapMsg between the threads
