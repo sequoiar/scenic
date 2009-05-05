@@ -102,8 +102,8 @@ class Streams(Widget):
                 log.warning('TODO:self.callRemote()')
             else:
                 log.warning('TODO:self.callRemote()')
-        except IndexError:
-            log.error("IndexError: data in start_streams should be a dict")
+        except:
+            log.error("IndexError or KeyError: data in start_streams should be a dict")
 
     def cb_stop_streams(self, origin, data):
         """
