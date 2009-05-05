@@ -766,6 +766,7 @@ class ControllerApi(object):
     def accept_connection(self, caller, connection):
         connection.accept()
         self.notify(caller, 'Now connected.', 'info')
+        self.notify(caller, {'connection':connection}, 'accept_connection')
 
     def refuse_connection(self, caller, connection):
         connection.refuse()

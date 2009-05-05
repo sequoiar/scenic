@@ -41,7 +41,7 @@ Addressbook.methods(
 		
 		// Get elements.
         self.list = $('adb_list');
-		self.status = $('adb_status');
+		self.status = $('adb_status'); // the adb_status message div
 		self.add_btn = $('adb_add');
 		self.remove_btn = $('adb_remove');
 		self.connect_btn = $('adb_join');

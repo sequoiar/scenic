@@ -80,7 +80,7 @@ class Addressbook(Widget):
         """
         Called from Python API when get_contact notification is triggered
         """
-        log.debug('GCOrigin: %s - Data: %s' % (origin, data))
+        log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'get_contact'))
         if origin is self:
             if isinstance(data, AddressBookError):
                 log.info('%s' % data);
@@ -102,7 +102,7 @@ class Addressbook(Widget):
         """
         Called from Python API when start_connection notification is triggered
         """
-        log.debug('SCOrigin: %s - Data: %s' % (origin, data))
+        log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'start_connection'))
         if origin is self:
             if data.has_key('exception'):
                 self.callRemote('update_status',
@@ -123,7 +123,7 @@ class Addressbook(Widget):
         """
         Called from Python API when connection_failed notification is triggered
         """
-        log.debug('CFOrigin: %s - Data: %s' % (origin, data))
+        log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'connection_failed'))
         if data['port']:
             port = ':%s' % data['port']
         else:
@@ -140,7 +140,7 @@ class Addressbook(Widget):
         """
         Called from Python API when ask notification is triggered
         """
-        log.debug('ASKOrigin: %s - Data: %s' % (origin, data))
+        log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'ask'))
         if data.has_key('name'):
             caption = '%s is inviting you. <em>(address: %s)</em>' % (data['name'], data['address'])
         else:
@@ -156,7 +156,7 @@ class Addressbook(Widget):
         """
         Called from Python API when ask_timeout notification is triggered
         """
-        log.debug('ASKTOOrigin: %s - Data: %s' % (origin, data))
+        log.debug('notify(\'%s\', \'%s\', \'ask_timeout\')' % (origin, data))
         if self.connections.has_key(data):
             del self.connections[data]
         caption = 'You didn\'t answer soon enough.'
@@ -174,7 +174,13 @@ class Addressbook(Widget):
             self.api.accept_connection(self, self.connections[connection])
             del self.connections[connection]
         return False
-    
+
+    def cb_accept_connection(self, origin, data):
+        basic_server = data['connection'] # BasicServer instance
+        contact = self.api.client_contact(basic_server.addr.host, basic_server.client_port)
+        # contact = connection.contact
+        self.callRemote('update_status', contact.name, "Connected.", "You accepted the connection.")
+
     def rc_refuse(self, connection):
         if self.connections.has_key(connection):
             self.api.refuse_connection(self, self.connections[connection])
@@ -234,7 +240,7 @@ class Addressbook(Widget):
                                     'Connection closed',
                                     '%s by %s at %s.' % (data['msg'], contact, moment))
         else:
-            log.debug('IOrigin: %s - Data: %s' % (origin, data))
+            log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'info'))
 
     def rc_add_contact(self, name, address, port, auto_answer):
         self.api.add_contact(self, name, address, port, auto_answer=auto_answer)
@@ -252,7 +258,7 @@ class Addressbook(Widget):
         """
         Called from Python API when modify_contact notification is triggered
         """
-        log.debug('MCOrigin: %s - Data: %s' % (origin, data))
+        log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'modify_contact'))
         if origin is self:
             if isinstance(data, Exception):
                 self.callRemote('error', data.message)
@@ -283,7 +289,7 @@ class Addressbook(Widget):
          * 'contact_name' : str
          * 'msg': str
         """
-        log.debug("START_STREAMS " + str(data))
+        log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'start_streams'))
         #  START_STREAMS {'started': True, 'msg': 'streaming started'}
         try:
             started = data['started'] is True
@@ -295,6 +301,7 @@ class Addressbook(Widget):
                 contact = self.api.get_contact(contact_name)
                 log.debug('contact.stream_state:%s %s' % (contact_name, contact.stream_state))
                 self.api.get_contacts(self)
+                self.callRemote('update_status', contact_name, 'Streaming', 'Currently streaming.')
                 # updates list
             else:
                 log.warning('TODO:self.callRemote()')
@@ -311,6 +318,7 @@ class Addressbook(Widget):
          * 'msg': str
         """
         log.debug("STOP_STREAMS " + str(data))
+        log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'stop_streams'))
         try:
             stopped = data['stopped'] is True
             if stopped:
@@ -320,6 +328,7 @@ class Addressbook(Widget):
                 #self.api.select_contact(self, contact_name)
                 contact = self.api.get_contact(contact_name)
                 log.debug('contact.stream_state:%s %s' % (contact_name, contact.stream_state))
+                self.callRemote('update_status', contact_name, 'Stopped streaming', 'Stopped streaming.')
                 self.api.get_contacts(self)  # updates list
             else:
                 log.warning('TODO:self.callRemote()')
