@@ -69,7 +69,7 @@ class Addressbook(Widget):
                         'setting':contact.setting,
                         'auto_created':contact.auto_created,
                         'stream_state':contact.stream_state})
-        log.info('receive update: %r' % self)
+        log.info('receive update: get_contacts %r %s' % (self, data))
         self.callRemote('update_list', adb)
         
     def rc_get_contact(self, name):
@@ -269,5 +269,62 @@ class Addressbook(Widget):
 #    def cb_save_client_contact(self, origin, data):
 #        if origin is self and isinstance(data, Exception):
 #            self.callRemote('error', '%s' % data)
+    
+
+    def cb_start_streams(self, origin, data):
+        """
+        Called once miville has started to stream.
+
+        This is to update the streaming status on B's side.
+        (whan A initiates the streams, and B is passive)
         
+        The 'start_streams' notification should contain a dict with keys:
+         * 'started : bool
+         * 'contact_name' : str
+         * 'msg': str
+        """
+        log.debug("START_STREAMS " + str(data))
+        #  START_STREAMS {'started': True, 'msg': 'streaming started'}
+        try:
+            started = data['started'] is True
+            if started:
+                #log.warning('TODO:self.callRemote()')
+                contact_name = data['contact_name']
+                #self.api.select_contact(self, contact_name)
+                self.callRemote('update_selected', contact_name) # works ! selects the contact to which we stream
+                contact = self.api.get_contact(contact_name)
+                log.debug('contact.stream_state:%s %s' % (contact_name, contact.stream_state))
+                self.api.get_contacts(self)
+                # updates list
+            else:
+                log.warning('TODO:self.callRemote()')
+        except KeyError, e:
+            log.error("KeyError: data in start_streams should be a dict with key" + e.message) 
+
+    def cb_stop_streams(self, origin, data):
+        """
+        Called once miville has stropped streaming.
+
+        The 'start_streams' notification should contain a dict with keys:
+         * 'started : bool
+         * 'contact_name' : str
+         * 'msg': str
+        """
+        log.debug("STOP_STREAMS " + str(data))
+        try:
+            stopped = data['stopped'] is True
+            if stopped:
+                #log.warning('TODO:self.callRemote()')
+                contact_name = data['contact_name']
+                self.callRemote('update_selected', contact_name)
+                #self.api.select_contact(self, contact_name)
+                contact = self.api.get_contact(contact_name)
+                log.debug('contact.stream_state:%s %s' % (contact_name, contact.stream_state))
+                self.api.get_contacts(self)  # updates list
+            else:
+                log.warning('TODO:self.callRemote()')
+        except KeyError, e:
+            log.error("KeyError: data in start_streams should be a dict with key" + e.message) 
+
+
     expose(locals())

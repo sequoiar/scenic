@@ -144,6 +144,7 @@ def import_widgets():
                     log.debug('Loaded the module %s' % widget.name)
                 except:
                     log.error('Unable to load the module %s' % widget.name)
+                    raise
                 else:
                     if hasattr(mod, camel_name(mod.__name__.replace(package, '')[1:])):
                         widgets_mod.append(mod)

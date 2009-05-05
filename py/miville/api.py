@@ -677,7 +677,8 @@ class ControllerApi(object):
             contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
             settings_com_channel.stop_streaming( contact.address)
             contact.stream_state = 0
-            self.notify(caller, "streaming stopped")
+            #self.notify(caller, "streaming stopped")
+            self.notify(caller, {'stopped':True, 'msg':"streaming stopped"})
         except AddressBookError, e:
             self.notify(caller, "Please select a contact prior to stop streaming." + e.message, "error")   
             #TODO: change key for 'streams_error'

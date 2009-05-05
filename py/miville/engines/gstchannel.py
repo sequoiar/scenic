@@ -312,7 +312,8 @@ class GstChannel(object):
         self.sender_engines = _create_stream_engines(self.api, 'send', self.sender_procs_params)
         self._start_stream_engines(self.sender_engines)
         caller = None
-        self.api.notify(caller, {'started':True, 'msg':"streaming started"}, "start_streams") 
+        self.api.notify(caller, {'started':True, 'contact_name':self.contact.name, 'msg':"streaming started"}, "start_streams") 
+        self.contact.stream_state = 2 # IMPORTANT !
             
     def send_message(self, key, args_list=[]):
         """

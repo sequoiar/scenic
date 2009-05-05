@@ -87,28 +87,5 @@ class Streams(Widget):
         user_settings.sort(key=lambda x:(x['name'].lower))
         self.callRemote('update_settings', preset_settings, user_settings)
         
-    def cb_start_streams(self, origin, data):
-        """
-        Called once miville has started to stream.
-
-        This is to update the streaming status on B's side.
-        (whan A initiates the streams, and B is passive)
-        """
-        log.debug("START_STREAMS " + str(data))
-        #  START_STREAMS {'started': True, 'msg': 'streaming started'}
-        try:
-            started = data['streaming'] is True
-            if started:
-                log.warning('TODO:self.callRemote()')
-            else:
-                log.warning('TODO:self.callRemote()')
-        except:
-            log.error("IndexError or KeyError: data in start_streams should be a dict")
-
-    def cb_stop_streams(self, origin, data):
-        """
-        Called once miville has stropped streaming.
-        """
-        log.debug("STOP_STREAMS " + str(data))
 
     expose(locals())

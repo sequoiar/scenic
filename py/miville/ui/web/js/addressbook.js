@@ -216,7 +216,7 @@ Addressbook.methods(
 
 	/**
 	 * Updates the contact list to reflect the state of the server.
-	 * (call from server)
+	 * (called from ui/web/widgets/addressbook.py)
 	 * 
 	 * Changed only what was changed.
 	 * 
@@ -389,7 +389,7 @@ Addressbook.methods(
 				owner.set('error', '');
 			} else {
 				owner.set('error', details);
-				dbug.info(details);
+				dbug.info('Contact status error msg details: ' + details);
 			}
 			if (contact == self.selected) {
 				self.notify_controllers('update_status');
