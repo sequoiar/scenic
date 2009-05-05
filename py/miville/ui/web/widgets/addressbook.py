@@ -334,6 +334,8 @@ class Addressbook(Widget):
                 log.warning('TODO:self.callRemote()')
         except KeyError, e:
             log.error("KeyError: data in start_streams should be a dict with key" + e.message) 
+        except Exception, e:
+            log.error('Error in cb_stop_streams : ' + e.message)
 
 
     expose(locals())
