@@ -99,7 +99,6 @@ class tcp_session
             {
                 std::string msgs(data_);
                 std::string line = get_line(msgs);
-                LOG_DEBUG(line);
                 do
                 {
                     MapMsg mapMsg;

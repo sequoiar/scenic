@@ -216,7 +216,6 @@ void GstReceiverThread::audio_init(MapMsg& msg)
     }
     catch(Except e)
     {
-        LOG_WARNING(e.msg_);
         delete audio_;
         audio_ = 0;
         throw(e);
