@@ -24,7 +24,13 @@
 are installed """
 
 import sys
+from os import chdir, environ
+from os.path import abspath, dirname
 from subprocess import *
+
+script_directory = abspath(dirname(__file__))
+environ['PATH'] += ":" + script_directory
+chdir(script_directory)
 
 try:
     import pygst
@@ -36,7 +42,7 @@ except ImportError:
 
 # call our shell script to parse cpp files and determine which gst elements we 
 # use
-p = Popen(["./find_elements.sh"], stdout=PIPE)
+p = Popen(["find_elements.sh"], stdout=PIPE)
 output = p.communicate()[0]
 
 # FIXME: is this really the best way?
