@@ -68,6 +68,7 @@ class GtkVideoSink
         static const unsigned int WIDTH = 640;
         static const unsigned int HEIGHT = 480;
 
+        static void destroy_cb(_GtkWidget * /*widget*/, void *data);
         Window getXWindow();
         void prepareSink();
         static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);

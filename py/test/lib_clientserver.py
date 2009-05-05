@@ -271,6 +271,7 @@ class Process(object):
         Wraps self.child.sendline and self.expect_test.
         """
         self.child.sendline(command)
+        print 'SENDING LINE ' + command
         self.expect_test(expected, message, timeout)
         # self.flush_output()
     

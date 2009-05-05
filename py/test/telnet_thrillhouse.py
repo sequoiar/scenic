@@ -20,33 +20,37 @@
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 """ Run two milhouse servers before running this:
-milhouse -r --serverport 11111
-milhouse -s --serverport 22222
+milhouse -r --serverport xxxxx
+milhouse -s --serverport xxxx
 """
 
 import telnetlib
 import time
 
 
-receiverServerport = 11111
-senderServerport = 22222
+receiverServerport = 9000
+senderServerport = 9001
 
 receiverTn = telnetlib.Telnet('localhost', receiverServerport)
 senderTn = telnetlib.Telnet('localhost', senderServerport)
 
-receiverTn.write('video_init: codec="h264" port=10000 address="127.0.0.1"')
-senderTn.write('video_init: codec="h264" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"')
+receiverTn.write('video_init: codec="h264" port=10000 address="127.0.0.1"\n')
 
-receiverTn.write('start:')
-senderTn.write('start:')
+senderTn.write('video_init: codec="h264" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"\n')
+
+
+receiverTn.write('start:\n')
+senderTn.write('start:\n')
+
 
 # wait a while
 time.sleep(10)
 
 
-receiverTn.write('stop:')
-senderTn.write('stop:')
+receiverTn.write('stop:\n')
+senderTn.write('stop:\n')
 
-receiverTn.write('quit:')
-senderTn.write('quit:')
+receiverTn.write('quit:\n')
+senderTn.write('quit:\n')
+
 

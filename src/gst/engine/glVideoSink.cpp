@@ -308,6 +308,8 @@ void GLImageSink::init()
             G_CALLBACK(key_press_event_cb), NULL);
     g_signal_connect(G_OBJECT(window_), "scroll-event",
             G_CALLBACK(mouse_wheel_cb), NULL);
+    g_signal_connect(G_OBJECT(window_), "delete-event",
+            G_CALLBACK(destroy_cb),static_cast<gpointer>(this));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     gtk_widget_set_events(window_, GDK_SCROLL_MASK);
 

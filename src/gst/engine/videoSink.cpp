@@ -48,6 +48,15 @@ Window GtkVideoSink::getXWindow()
 }
 
 
+void GtkVideoSink::destroy_cb(GtkWidget * /*widget*/, gpointer data)
+{
+    LOG_DEBUG("Window closed, quitting.");
+    playback::quit();
+    GtkVideoSink *context = static_cast<GtkVideoSink*>(data);
+    context->window_ = 0;
+}
+
+
 gboolean GtkVideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
 {
     GtkVideoSink *context = static_cast<GtkVideoSink*>(data);
@@ -174,7 +183,7 @@ void XvImageSink::init()
                 " width:" << xine[j].width << 
                 " height:" << xine[j].height);
         if (j == screen_num_) 
-            gtk_window_move(GTK_WINDOW(window_), xine[j].x_org,xine[j].y_org);
+            gtk_window_move(GTK_WINDOW(window_), xine[j].x_org, xine[j].y_org);
     }
 
     gtk_window_set_default_size(GTK_WINDOW(window_), GtkVideoSink::WIDTH, GtkVideoSink::HEIGHT);
@@ -187,6 +196,8 @@ void XvImageSink::init()
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event",
             G_CALLBACK(XvImageSink::key_press_event_cb), NULL);
+    g_signal_connect(G_OBJECT(window_), "destroy",
+            G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
 
     showWindow();
 }

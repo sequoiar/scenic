@@ -200,7 +200,7 @@ void H264Encoder::init()
     else if (numThreads == 0)
         numThreads = 1;
 
-    LOG_DEBUG("Using " << numThreads << " threads");
+//    LOG_DEBUG("Using " << numThreads << " threads");
     g_object_set(codec_, "threads", numThreads, NULL);
 
     //g_object_set(codec_, "byte-stream", TRUE, NULL);

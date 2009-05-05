@@ -53,6 +53,8 @@ void playback::quit()
     stop();
     Pipeline::Instance()->notifyQuitted();
     gutil::killMainLoop();
+    MapMsg quitMsg("quit");
+    quitMsg.post();
 }
 
 void playback::makeVerbose()
