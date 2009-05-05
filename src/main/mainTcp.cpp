@@ -36,13 +36,15 @@ class Logger
 };
 
 
-void Logger::operator()(LogLevel& level, std::string& msg)
+void Logger::operator()(LogLevel& , std::string& msg)
 {
+#if 0
     MapMsg m("log");
     m["level"] = level;
     m["msg"] = msg;
     queue_.push(m);
-    std::cout << level << " "<< msg;// << std::endl;
+#endif
+    std::cout << msg;// << std::endl;
 }
 
 /** Main command line entry point
