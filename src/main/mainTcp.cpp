@@ -104,6 +104,12 @@ bool MainModule::run()
             {
                 MapMsg gmsg = gst_queue.timed_pop(1);
                 while(!gmsg.cmd().empty()){
+                    if (gmsg.cmd() == "quit")
+                    {
+                        MsgThread::broadcastQuit();
+                        LOG_INFO("Program Termination in Progress FROM GST");
+                        return 0;
+                    }
                     tcp_queue.push(gmsg);
                     gmsg = gst_queue.timed_pop(1);
                 }
