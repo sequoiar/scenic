@@ -1,7 +1,17 @@
 #!/usr/bin/env python
 """ Run two milhouse servers as well as telnet clients """
 
-import multiprocessing 
+try:
+    import multiprocessing 
+except ImportError:
+    print "import failed, please install multiprocessing: \nsudo easy-install multiprocessing"
+    sys.exit(1)
+
+try:
+    from twisted.python.reflect import prefixedMethods
+except ImportError:
+    print "import failed, please install twisted: http://twistedmatrix.com/trac/"
+    sys.exit(1)
 
 from time import sleep
 import os
@@ -10,7 +20,6 @@ import os
 import telnetlib
 import socket
 import time
-
 
 
 def serverWorker(args):
@@ -41,7 +50,7 @@ def createClients():
 
     serverUp = False
 
-    while not serverUp:
+    while not serverUp:     # loop until server responds
         try: 
             rxClient = telnetlib.Telnet('localhost', receiverServerport)
             serverUp = True
@@ -49,7 +58,7 @@ def createClients():
                 pass
 
     serverUp = False
-    while not serverUp:
+    while not serverUp:     # loop until server responds
         try: 
             txClient = telnetlib.Telnet('localhost', senderServerport)
             serverUp = True
@@ -59,12 +68,12 @@ def createClients():
     return rxClient, txClient
 
 
-def runClients(rxTn, txTn):
+def runClients(rxTn, txTn, rxArg, txArg):
     TEST_LENGTH = 10
-    rxTn.write('video_init: codec="h264" port=10000 address="127.0.0.1"\n')
+    rxTn.write(rxArg + '\n')
     rxTn.read_until('video_init: ack="ok"')
 
-    txTn.write('video_init: codec="h264" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"\n')
+    txTn.write(txArg + '\n')
     txTn.read_until('video_init: ack="ok"')
 
     rxTn.write('start:\n')
@@ -73,7 +82,7 @@ def runClients(rxTn, txTn):
     txTn.read_until('start: ack="ok"')
 
     # wait a while
-    time.sleep(TEST_LENGTH)
+    sleep(TEST_LENGTH)
 
     rxTn.write('stop:\n')
     rxTn.read_until('stop: ack="ok"')
@@ -83,9 +92,36 @@ def runClients(rxTn, txTn):
     rxTn.write('quit:\n')
     txTn.write('quit:\n')
 
-
-if __name__ == '__main__':
+def proceed(rxArg, txArg):
     createServers()
     rx, tx = createClients()
-    runClients(rx, tx)
+    runClients(rx, tx, rxArg, txArg)
 
+class TelnetTests(object):
+    def __init__(self):
+        pass
+
+    def test01_videotestsrc_h264(self):
+        rxArg = 'video_init: codec="h264" port=10000 address="127.0.0.1"'
+        txArg = 'video_init: codec="h264" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"'
+        proceed(rxArg, txArg)
+
+    def test02_videotestsrc_h263(self):
+        rxArg = 'video_init: codec="h263" port=10000 address="127.0.0.1"'
+        txArg = 'video_init: codec="h263" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"'
+        proceed(rxArg, txArg)
+
+    def test03_videotestsrc_mpeg4(self):
+        rxArg = 'video_init: codec="mpeg4" port=10000 address="127.0.0.1"'
+        txArg = 'video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"'
+        proceed(rxArg, txArg)
+
+if __name__ == '__main__':
+    # here we run all the tests thanks to the wonders of reflective programming
+    tests = prefixedMethods(TelnetTests(), 'test')
+
+    for test in tests:
+        print '/*----------------------------------------------*/'
+        print 'RUNNING TEST: '  + test.__name__
+        print '/*----------------------------------------------*/'
+        test()
