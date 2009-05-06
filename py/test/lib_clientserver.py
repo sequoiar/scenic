@@ -175,7 +175,7 @@ class Process(object):
         self.logfile_path = "." # overriden by the tester
         self.logfile_name = "default.log"
         self.delayafterclose = 0.2 # important to override this in child classes
-        self.timeout_expect = 0.9
+        self.timeout_expect = 0.9 
 #         self.maxread = 2000
         self.expected_when_started = ""  #TODO
         self.test_case = None # important : must be a valid TestCase instance. Should be overriden by kwargs
@@ -270,10 +270,10 @@ class Process(object):
         Sends a text string and tests for an expected reply.
         Wraps self.child.sendline and self.expect_test.
         """
-        print 'SENDING ' + command + '\n'
-        self.child.sendline(command + '\n')
+        print 'ASEND' + command  + '\n'
+        self.child.sendline(command + '\n') 
         self.expect_test(expected, message, timeout)
-        # self.flush_output()
+        self.flush_output()
     
     def flush_output(self):
         """
@@ -427,7 +427,7 @@ class TelnetForMilhouseProcess(TelnetProcess):
     telnet client process specific to Milhouse's use.
     """
     def __init__(self, **kwargs):
-        kwargs['expected_when_started'] = "log:"
+        #kwargs['expected_when_started'] = "log:"
         TelnetProcess.__init__(self, **kwargs)
     def stop(self):
         self.send_expect('stop:', 'stop: ack="ok"')
@@ -490,7 +490,7 @@ class MilhouseProcess(Process):
     def __init__(self, **kwargs): # mode=[r|s], serverport=9000
         self.mode = 't'
         self.serverport = '8000'
-        kwargs['expected_when_started'] = "READY"
+        #kwargs['expected_when_started'] = "READY"
         Process.__init__(self, **kwargs)
 
     def make_command(self):
@@ -506,7 +506,7 @@ class TelnetMilhouseTester(ClientServerTester):
     def __init__(self, **kwargs):
         self.mode ='t'
         self.serverport = '0'
-        self.timeout_expect = 1 
+        self.timeout_expect = 2 
         ClientServerTester.__init__(self, **kwargs)
     
     def _start_child(self, which, klass, **kwargs):

@@ -38,9 +38,7 @@ class Test_MilhouseOneWay(unittest.TestCase):
 
     def proceed(self, rxCommands = [], txCommands = []):
         """ Proceed with or without extra commands to be called once we've started """
-        time.sleep(2)
         self.receiver.send_expect('start:', 'start: ack="ok"')
-        time.sleep(2)
         self.sender.send_expect('start:', 'start: ack="ok"')
         
         #self.receiver.start()
@@ -53,7 +51,7 @@ class Test_MilhouseOneWay(unittest.TestCase):
 #           self.sender.send_expect(com)
 
         print 'sleeping'
-        time.sleep(5)
+        time.sleep(10)
         #self.receiver.stop()
         #self.sender.stop()
         self.receiver.send_expect('stop:', 'stop: ack="ok"')
@@ -115,9 +113,7 @@ class Test_MilhouseOneWay(unittest.TestCase):
 
     def test_10_videotestsrc_h264(self):
         self.receiver.send_expect('video_init: codec="h264" port=10000 address="127.0.0.1"', 'video_init: ack="ok"')
-        time.sleep(2)
-        self.sender.send_expect('video_init: codec="h264" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"', 'success:')
-        time.sleep(2)
+        self.sender.send_expect('video_init: codec="h264" bitrate=3000000 port=10000 address="127.0.0.1" source="v4l2src"', 'success:')
         self.proceed()
 
 #   def test_11_videotestsrc_h263(self):

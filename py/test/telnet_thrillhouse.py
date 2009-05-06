@@ -30,25 +30,31 @@ import time
 
 receiverServerport = 9000
 senderServerport = 9001
+TIMEOUT = 10
 
 receiverTn = telnetlib.Telnet('localhost', receiverServerport)
 senderTn = telnetlib.Telnet('localhost', senderServerport)
 
 receiverTn.write('video_init: codec="h264" port=10000 address="127.0.0.1"\n')
+receiverTn.read_until('video_init: ack="ok"')
 
 senderTn.write('video_init: codec="h264" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"\n')
-
+senderTn.read_until('video_init: ack="ok"')
 
 receiverTn.write('start:\n')
+receiverTn.read_until('start: ack="ok"')
 senderTn.write('start:\n')
+senderTn.read_until('start: ack="ok"')
 
 
 # wait a while
-time.sleep(10)
+time.sleep(TIMEOUT)
 
 
 receiverTn.write('stop:\n')
+receiverTn.read_until('stop: ack="ok"')
 senderTn.write('stop:\n')
+senderTn.read_until('stop: ack="ok"')
 
 receiverTn.write('quit:\n')
 senderTn.write('quit:\n')
