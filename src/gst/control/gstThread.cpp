@@ -290,4 +290,20 @@ void GstSenderThread::audio_init(MapMsg& msg)
     }
 }
 
+bool GstReceiverThread::subHandleMsg(MapMsg &msg)
+{
+    std::string s(msg.cmd());
+    if (s == "jitterbuffer")
+    {
+        updateJitterBuffer(msg);
+        return true;    // no one else should handle this
+    }
+    else 
+        return false;
+}
+
+void GstReceiverThread::updateJitterBuffer(MapMsg &msg)
+{
+    RtpReceiver::setLatency(msg["latency"]);
+}
 

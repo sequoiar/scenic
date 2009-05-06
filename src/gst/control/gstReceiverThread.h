@@ -58,6 +58,9 @@ class GstReceiverThread
         void audio_init(MapMsg& msg);
         /// incomming video_start request 
         void video_init(MapMsg& msg);
+        /// handle messages 
+        bool subHandleMsg(MapMsg&);
+        void updateJitterBuffer(MapMsg&);
         
         ReceiverBase* video_;
         ReceiverBase* audio_;

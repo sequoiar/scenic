@@ -270,8 +270,8 @@ class Process(object):
         Sends a text string and tests for an expected reply.
         Wraps self.child.sendline and self.expect_test.
         """
-        self.child.sendline(command)
-        print 'SENDING LINE ' + command
+        print 'SENDING ' + command + '\n'
+        self.child.sendline(command + '\n')
         self.expect_test(expected, message, timeout)
         # self.flush_output()
     
@@ -506,6 +506,7 @@ class TelnetMilhouseTester(ClientServerTester):
     def __init__(self, **kwargs):
         self.mode ='t'
         self.serverport = '0'
+        self.timeout_expect = 1 
         ClientServerTester.__init__(self, **kwargs)
     
     def _start_child(self, which, klass, **kwargs):
