@@ -69,10 +69,11 @@ class IPCP(LineReceiver):
         log.info('Connection made to the server.')
     
     def lineReceived(self, line):
-        log.debug("IPCP.lineReceived: %s" % line)
+        log.info("IPCP.lineReceived: '%s'" % line)
         cmd, sep, args = line.partition(':')
         if cmd not in self.callbacks:
-            log.error('Command %s not in callback list.' % cmd)
+            l = len(cmd.strip())
+            log.info('Command [%s] not in callback list. len %d' % (cmd,l) )
         else:
             data = args.strip() + " "   #TODO: use the parse function instead
             args = {}
@@ -240,7 +241,6 @@ def find_equal(data):
                         temp_s = temp_e + 1
             except:
                 break
-            
         else:
             try:
                 end = data.index(' ', start)
