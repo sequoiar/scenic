@@ -426,7 +426,6 @@ bool tcpSendBuffer(std::string ip, int port, int id, std::string caps)
     return ret;
 }
 
-#endif
 
 
 
@@ -436,13 +435,11 @@ void asio_thread::main()
 
     try
     {
-#ifdef HAVE_BOOST_ASIO
         io_service io_service;
 
         tcp_server s(io_service, port_,queue_);
 
         io_service.run();
-#endif
     }
     catch (Except)
     {
@@ -450,3 +447,4 @@ void asio_thread::main()
 
 }
 
+#endif
