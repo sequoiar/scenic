@@ -40,99 +40,128 @@ from miville.engines.gstchannel import get_all_gst_channels
 from miville.errors import *
 
 
-log = log.start('debug', 1, 0, 'web')
+log = log.start('debug', 1, 0, 'gstpage')
 
 def print_engine_log(engine):
-    txt = "<h3>Log</h3>"
-    for index,msg in enumerate(engine.logger.get()):
-        txt += "<p><b>%d</b>%s</p>" % (index+1, msg)
+    txt = ""
+    try:
+        txt += "<h3>Log</h3>"
+        for index,msg in enumerate(engine.logger.get()):
+            txt += "<p><b>%d</b>  %s</p>" % (index+1, msg)
+    except Exception, e:
+        txt += "<h2>ERROR in print_engine_log: %s </h2>" % e
     return txt
 
 def print_engine_acks(engine):
-    txt = "<h3>Acknowledgments:</h3>"
-    for item in engine.acknowledgments:
-        timestamp = item[0]
-        msg = item[1]
-        timestamp_str = timestamp.strftime("%Y-%m-%d %H:%M:%S")
-        txt += "<p><b>%s</b> %s</p>" % (timestamp_str, msg)
+    
+    txt = ""
+    try:
+        txt += "<h3>Acknowledgments:</h3>"
+        for item in engine.acknowledgments:
+            timestamp = item[0]
+            msg = item[1]
+            timestamp_str = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            txt += "<p><b>%s</b> %s</p>" % (timestamp_str, msg)
+    except Exception, e:
+        txt += "<h2>ERROR in print_engine_acks: %s </h2>" % e    
     return txt
 
 def print_engine_rtp_stats(engine):
     txt = ""
-    for stream, stat in engine.rtp_stats.iteritems():
-        txt += "<h4>RTP stats for %s</h4>" % stream
-        for name, ring in stat.iteritems():
-            stats = ring.get()
-            for index,val in enumerate(stats):
-                if val == None:
-                    txt += "<p><b>%d</b> None</p>" % (index+1)
-                else:
-                    timestamp = val[0]
-                    timestamp_str = timestamp.strftime("%Y-%m-%d %H:%M:%S")
-                    value = val[1]
-                    txt += "<p><b>%d</b> %s %s = %s</p>" % (index+1, timestamp_str, name, value)
+    try:
+        txt += "<h3>RTP stats</h3>"
+        for stream, stat in engine.rtp_stats.iteritems():
+            txt += "<h4>RTP stats for %s</h4>" % stream
+            for name, ring in stat.iteritems():
+                stats = ring.get()
+                for index,val in enumerate(stats):
+                    if val == None:
+                        txt += "<p><b>%d</b> None</p>" % (index+1)
+                    else:
+                        timestamp = val[0]
+                        timestamp_str = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+                        value = val[1]
+                        txt += "<p><b>%d</b>  %s %s = %s</p>" % (index+1, timestamp_str, name, value)
+    except Exception, e:
+        txt += "<h2>ERROR in print_engine_rtp_stats: %s </h2>" % e
+    return txt
+
+
+def print_engine_summary(engine):
+    txt = ""
+    try:
+        txt += "<h3>" + str(engine) + "</h3>"
+        txt += "<p>mode   = " + engine.mode + "</p>"
+        txt += "<p>group  = " + engine.group_name + "</p>"
+        txt += "<p>streams= " + str(engine.stream_names) + "</p>"
+        txt += "<p>process= " + str(engine.proc_path) + "</p>"
+        txt += "<p>args   = " + str(engine.args)  + "</p>"
+        txt += "<p>pid    = " + str(engine.pid) + "</p>"
+        txt += "<p>state  = " + str(engine.get_status()) + "</p>"
+        txt += "<p>port   = " + str(engine.gst_port) + "</p>"
+        txt += "<p>ip     = " + str(engine.gst_address) + "</p>"
+        txt += "<p>version= " + str(engine.get_version_str()) + "</p>"
+    except Exception, e:
+        txt += "<h2>ERROR in print_engine_summary: %s </h2>" % e
     return txt
 
 def print_engine(engine):
     txt = ""
-    txt += "<h3>" + str(engine) + "</h3>"
-    txt += "<p>mode   = " + engine.mode + "</p>"
-    txt += "<p>group  = " + engine.group_name + "</p>"
-    txt += "<p>streams= " + str(engine.stream_names) + "</p>"
-    txt += "<p>process= " + str(engine.proc_path) + "</p>"
-    txt += "<p>args   = " + str(engine.args)  + "</p>"
-    txt += "<p>pid    = " + str(engine.pid) + "</p>"
-    txt += "<p>state  = " + str(engine.get_status()) + "</p>"
-    txt += "<p>port   = " + str(engine.gst_port) + "</p>"
-    txt += "<p>ip     = " + str(engine.gst_address) + "</p>"
-    txt += "<p>version= " + str(engine.get_version_str()) + "</p>"
-    for cmd in engine.commands:
-        command = cmd[0]
-        txt += "<p><b>" + command + ": </b>"
-        params = cmd[1]
-        if params:
-            for p in params:
-                v = str(p[1])
-                if isinstance(p[1], str) or isinstance(p[1], unicode):
-                    v = '"' + v + '"'
-                txt += str(p[0]) + "= <i>" + v + "</i> "
-        txt += "</p>"  
-    
-    txt += print_engine_acks(engine)    
-    txt += print_engine_rtp_stats(engine)
-    txt += print_engine_log(engine)
-    
+    try:
+        txt += print_engine_summary(engine)
+        for cmd in engine.commands:
+            command = cmd[0]
+            txt += "<p><b>" + command + ": </b>"
+            params = cmd[1]
+            if params:
+                for p in params:
+                    v = str(p[1])
+                    if isinstance(p[1], str) or isinstance(p[1], unicode):
+                        v = '"' + v + '"'
+                    txt += str(p[0]) + "= <i>" + v + "</i> "
+            txt += "</p>"  
+        
+        txt += print_engine_acks(engine)    
+        txt += print_engine_rtp_stats(engine)
+        txt += print_engine_log(engine)
+    except Exception, e:
+        txt += "<h2>ERROR in print_engine: %s </h2>" % e
     return txt
 
 def print_proc_params(params, proc_name, engine):
-    txt = "<h2>" + proc_name + "</h2>"
+    txt = ""
+    txt += "<h2>" + proc_name + "</h2>"
     txt += print_engine(engine)
     return txt
 
 def print_channel(channel):
-    txt = "<h3>Remote address: " + channel.remote_addr + "</h3>"
-    rx_counter = len(channel.receiver_procs_params)
-    tx_counter = len(channel.sender_procs_params)
-    txt += "<p><b><i>%d Rx processe(s), %d Tx processe(s)</i></b></p>" % (rx_counter, tx_counter)
-    counter = 0
-    if not channel.receiver_procs_params:
-        txt += "<p>No active rx process</p>"
-    else:
-        for sync_group, params in channel.receiver_procs_params.iteritems():
-            engine = channel.receiver_engines[counter]
-            counter += 1
-            txt += print_proc_params(params, "Rx process " + str(counter), engine)
+    txt = ""
+    try:
+        txt += "<p>Remote address: " + channel.remote_addr + "</p>"
+        rx_counter = len(channel.receiver_procs_params)
+        tx_counter = len(channel.sender_procs_params)
+        txt += "<p><b><i>%d Rx processe(s), %d Tx processe(s)</i></b></p>" % (rx_counter, tx_counter)
+        counter = 0
+        if not channel.receiver_procs_params:
+            txt += "<p>No active rx process</p>"
+        else:
+            for sync_group, params in channel.receiver_procs_params.iteritems():
+                engine = channel.receiver_engines[counter]
+                counter += 1
+                txt += print_proc_params(params, "Rx process " + str(counter), engine)
+            
+        counter = 0
+        if not channel.sender_procs_params:
+            txt += "<p>No active tx process</p>"
+        else:
+            for sync_group, params in channel.sender_procs_params.iteritems():
+                engine = channel.sender_engines[counter]
+                counter += 1
+                txt += print_proc_params(params, "Tx process " + str(counter), engine) 
         
-    counter = 0
-    if not channel.sender_procs_params:
-        txt += "<p>No active tx process</p>"
-    else:
-        for sync_group, params in channel.sender_procs_params.iteritems():
-            engine = channel.sender_engines[counter]
-            counter += 1
-            txt += print_proc_params(params, "Tx process " + str(counter), engine) 
-    
-    channel.sender_engines
+        channel.sender_engines
+    except Exception, e:
+        txt += "<h2>ERROR in print_channel: %s </h2>" % e
     return txt
 
 def print_gst():
