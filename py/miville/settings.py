@@ -438,8 +438,9 @@ class GlobalSetting(object):
     def add_stream_subgroup(self, name):
         if not name:
             raise SettingsError, 'Stream subgroup must have a unique name'
-        if self.stream_subgroups.has_key(name):
-            raise SettingsError, 'Stream subgroup "%s" already exists' % name
+        for id,group in self.stream_subgroups.iteritems():
+            if group.name == name:
+                raise SettingsError, 'Stream subgroup "%s" already exists' % name
         try:
             new_guy = StreamSubgroup(name)
             new_id = 1
