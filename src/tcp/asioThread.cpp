@@ -26,7 +26,6 @@
  */
 
 
-
 #include <cstdlib>
 #include <iostream>
 #include "util.h"
@@ -36,6 +35,7 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <sstream>
 
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
@@ -45,7 +45,9 @@ using boost::asio::async_write;
 using boost::asio::buffer;
 using boost::asio::placeholders::error;
 using boost::asio::placeholders::bytes_transferred;
+using boost::asio::ip;
 
+///pull first line from msg  -returns first line 
 static std::string get_line(std::string& msg)
 {
     std::string ret=msg;
@@ -56,8 +58,8 @@ static std::string get_line(std::string& msg)
         count++;
         if(msg[pos+1] == '\r' or msg[pos+1] == '\n')
             count++;
-    ret = msg.substr(0, pos+count);
-    msg = msg.substr(pos+count);
+        ret = msg.substr(0, pos+count);
+        msg = msg.substr(pos+count);
     }
     else
         msg.clear();
@@ -65,6 +67,7 @@ static std::string get_line(std::string& msg)
     return ret;
 }
 
+///The session once connected -- session must send READY
 class tcp_session
 {
     public:
@@ -109,13 +112,7 @@ class tcp_session
                     line = get_line(msgs);
                 }
                 while(!line.empty());
-#if 0
-                MapMsg mapMsg;
-                if(mapMsg.tokenize(data_))
-                    queue_.push(mapMsg);
-                else
-                    LOG_WARNING("Bad Msg Received.");
-#endif
+
                 memset(data_, 0, max_length);
                 socket_.async_read_some(buffer(data_, max_length),
                         boost::bind(&tcp_session::read_cb, this, error, bytes_transferred));
@@ -150,16 +147,13 @@ class tcp_session
                     MapMsg msg = queue_.timed_pop(1);
                     if(!msg.cmd().empty())
                     {
-                        if(msg.cmd() == "quit")
-                        {
-                            LOG_DEBUG("quit goes here");
-                        }
-                        else
+                        if(!msg.cmd() == "quit")
                         {
                             std::string msg_str;
                             msg.stringify(msg_str);
                             msg_str+="\x0D\x0A";
-                            async_write(socket_, buffer(msg_str), boost::bind(&tcp_session::write_cb, this, error));
+                            async_write(socket_, buffer(msg_str), 
+                                    boost::bind(&tcp_session::write_cb, this, error));
                         }
                     }
                     else
@@ -176,6 +170,7 @@ class tcp_session
                 std::cout << "here3" << std::endl;
             }
         }
+
     private:
         io_service& io_service_;
         tcp::socket socket_;
@@ -190,9 +185,9 @@ class tcp_server
 {
     public:
         tcp_server(io_service& io_service, short port, QueuePair& queue)
-            : io_service_(io_service),
-            acceptor_(io_service, tcp::endpoint(boost::asio::ip::address_v4::loopback(), port)), queue_(queue),
-            t_(io_service, boost::posix_time::seconds(1))
+            : io_service_(io_service), acceptor_ ( io_service, 
+                    tcp::endpoint(ip::address_v4::loopback(), port)), //Note: loopback only endpoint 
+            queue_(queue), t_(io_service, boost::posix_time::seconds(1))
     {
         tcp_session* new_tcp_session = new tcp_session(io_service_,queue_); 
         acceptor_.async_accept(new_tcp_session->socket(),
@@ -206,20 +201,9 @@ class tcp_server
                 const error_code& err)
         {
             if (!err)
-            {
                 new_tcp_session->start();
-#if 0
-                new_tcp_session = new tcp_session(io_service_,queue_);
-                acceptor_.async_accept(new_tcp_session->socket(),
-                        boost::bind(&tcp_server::handle_accept, this, new_tcp_session,
-                            error));
-#endif
-            }
             else
-            {
-                std::cout << "here4" << std::endl;
                 delete new_tcp_session;
-            }
         }
 
         void handle_timer(const error_code& err)
@@ -230,11 +214,6 @@ class tcp_server
                 t_.async_wait(boost::bind(&tcp_server::handle_timer,this, error));
                 if(MsgThread::isQuitted())
                     io_service_.stop();
-
-            }
-            else
-            {
-                std::cout << "here5" << std::endl;
             }
         }
 
@@ -249,9 +228,9 @@ class udp_sender
 {
     public:
         udp_sender(io_service& io_service, std::string ip, std::string port, std::string buff)
-            : io_service_(io_service),buff_(buff),t_(io_service, boost::posix_time::seconds(1)),
-            socket_(io_service, udp::endpoint(udp::v4(), 0)),
-            sender_endpoint_(),resolver(io_service),query(udp::v4(), ip.c_str(), port.c_str()),iterator(resolver.resolve(query))
+            : io_service_(io_service), buff_(buff), t_(io_service, boost::posix_time::seconds(1)),
+            socket_(io_service, udp::endpoint(udp::v4(), 0)), sender_endpoint_(),
+            resolver(io_service),query(udp::v4(), ip.c_str(), port.c_str()), iterator(resolver.resolve(query))
     {
         t_.async_wait(boost::bind(&udp_sender::handle_timer,this, error));
     }
@@ -292,7 +271,7 @@ class udp_sender
             {
                 if(MsgThread::isQuitted())
                     io_service_.stop();
-                
+
                 socket_.async_send_to(buffer(buff_),*iterator, boost::bind(&udp_sender::handle_send_to,this,error,bytes_transferred));
             }
             else
@@ -300,6 +279,8 @@ class udp_sender
                 std::cout << "here5" << std::endl;
             }
         }
+
+    private:
         io_service& io_service_; 
         std::string buff_;
         boost::asio::deadline_timer t_;
@@ -394,7 +375,7 @@ std::string tcpGetBuffer(int port, int &id)
 
     return buff;
 }
-#include <sstream>
+
 bool tcpSendBuffer(std::string ip, int port, int id, std::string caps)
 {
     bool ret = false;
