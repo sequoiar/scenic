@@ -304,6 +304,6 @@ bool GstReceiverThread::subHandleMsg(MapMsg &msg)
 
 void GstReceiverThread::updateJitterBuffer(MapMsg &msg)
 {
-    RtpReceiver::setLatency(msg["latency"]);
+    RtpReceiver::setLatency(msg["latency_msec"]);
 }
 

@@ -55,7 +55,7 @@ class RtpReceiver
         static void createLatencyControl();
         static const int MIN_LATENCY = 1; // ms
         static const int INIT_LATENCY = 5;   // ms
-        static const int MAX_LATENCY = 400; // ms
+        static const int MAX_LATENCY = 5000; // ms
 
         _GstElement *rtp_receiver_;
         _GstElement *depayloader_;
