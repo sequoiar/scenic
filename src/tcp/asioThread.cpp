@@ -340,21 +340,13 @@ class udp_server
                     socket_.async_send_to(buffer("ok"), sender_endpoint_,
                             boost::bind(&udp_server::handle_send_to, this,
                                 error, bytes_transferred));
-                }
-                else
-                {
-                    socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_,
-                            boost::bind(&udp_server::handle_receive_from, this,
-                                error, bytes_transferred));
 
+                    return;
                 }
             }
-            else
-            {
-                socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_,
-                        boost::bind(&udp_server::handle_receive_from, this,
-                            error, bytes_transferred));
-            }
+            socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_,
+                    boost::bind(&udp_server::handle_receive_from, this,
+                        error, bytes_transferred));
         }
 
         void handle_send_to(const error_code& , size_t )//bytes_sent)
@@ -406,8 +398,7 @@ std::string tcpGetBuffer(int port, int &id)
 bool tcpSendBuffer(std::string ip, int port, int id, std::string caps)
 {
     bool ret = false;
-    LOG_INFO("got ip=" << ip << " port=" << port << " id=" << 
-            id << " caps=" << caps);
+    LOG_INFO("got ip=" << ip << " port=" << port << " id=" << id << " caps=" << caps);
     MapMsg msg("buffer");
 
     msg["str"] = caps;
@@ -416,7 +407,7 @@ bool tcpSendBuffer(std::string ip, int port, int id, std::string caps)
     str << port;
     std::string msg_str;
     msg.stringify(msg_str);
-    LOG_DEBUG("!!!!!!!!"<<str);
+
     io_service io_service;
 
 
