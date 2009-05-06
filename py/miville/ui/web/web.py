@@ -109,6 +109,7 @@ from miville.utils.common import find_callbacks
 
 from miville.ui.web.pages.settingspage import SettingsPage
 from miville.ui.web.pages.gstpage import GstPage
+from miville.ui.web.pages.procspage import ProcsPage
 
 log = log.start('debug', 1, 0, 'web')
 
@@ -257,7 +258,8 @@ class Index(LivePage, Observer):
             return SettingsPage()
         if name.lower().startswith("gst"):
             return GstPage()
-        
+        if name.lower().startswith("procs"):
+            return ProcsPage()
 
     def renderHTTP(self, ctx):
         """
