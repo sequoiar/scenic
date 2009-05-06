@@ -24,7 +24,7 @@ import pprint
 from miville.engines import audiovideogst
 import miville.settings
 
-log = log.start('debug', 1, 0, 'gstchannel')
+log = log.start('info', 1, 0, 'gstchannel')
 
 # Notitification for stream process state change (1 notif per streaming session)
 #  timeout: tbd 5 sec 
