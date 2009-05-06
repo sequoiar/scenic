@@ -40,7 +40,7 @@ AC_ARG_ENABLE([millisecwait], [ --enable-millisecwait=(millisecs) thread sleep t
 AC_DEFINE_UNQUOTED(MILLISEC_WAIT,[${enable_millisecwait}], wait time)
 
 AC_ARG_ENABLE([logs], [ --enable-logs enable logs in msg queues],,enable_logs=no)
-if test "x${enable_logs}"; then
+if test "x${enable_logs}" = "xfalse" ; then
     AC_DEFINE(MAPLOGS,[],[send logs to listeners])
 fi
 
