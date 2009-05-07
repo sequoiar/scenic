@@ -44,8 +44,8 @@ class Test_Devices(unittest.TestCase):
         self.local.telnet_process.sendline("devices -k video -t v4l2 -l")
         index = self.local.telnet_process.expect(["Devices for driver", "No device"])
         if index == 0: # if there is a device
-            self.tst("devices -k video -t v4l2 d /dev/video0 -m norm pal", "changed")
-            self.tst("devices -k video -t v4l2 d /dev/video0 -m norm ntsc", "changed")
+            self.tst("devices -k video -t v4l2 -d /dev/video0 -m norm pal", "changed")
+            self.tst("devices -k video -t v4l2 -d /dev/video0 -m norm ntsc", "changed")
 
     def test_02_jackd(self):
         """
