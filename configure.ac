@@ -39,13 +39,13 @@ AC_ARG_ENABLE([debug], [
 AC_ARG_ENABLE([millisecwait], [ --enable-millisecwait=(millisecs) thread sleep time],,enable_millisecwait=10)
 AC_DEFINE_UNQUOTED(MILLISEC_WAIT,[${enable_millisecwait}], wait time)
 
-AC_ARG_ENABLE([logs], [ --enable-logs enable logs in msg queues],,enable_logs=no)
+AC_ARG_ENABLE([logs], [ --enable-logs enable logs in msg queues],,enable_logs=yes)
 if test "x${enable_logs}" = "xfalse" ; then
     AC_DEFINE(MAPLOGS,[],[send logs to listeners])
 fi
 
 AC_ARG_ENABLE([asio], [ **************** 
-  --enable-asio build asio],,enable_asio=yes)
+  --enable-asio build asio],,enable_asio=no)
   
 
 AC_MSG_WARN([${ac_prefix}])
