@@ -199,51 +199,326 @@ class TelnetTests(object):
     def __init__(self):
         pass
 
-    def test01_videotestsrc_mpeg4(self):
+    def test_videotestsrc_mpeg4(self):
         rxVideoArg, txVideoArg = argfactory('video')
         proceed(rxVideoArg, txVideoArg)
 
-    def test02_videotestsrc_h264(self):
+    def test_videotestsrc_h264(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         proceed(rxVideoArg, txVideoArg)
 
-    def test03_videotestsrc_h263(self):
+    def test_videotestsrc_h263(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
         proceed(rxVideoArg, txVideoArg)
 
-    def test05_v4l2src_h264(self):
+    def test_dv1394src_mpeg4(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = 'dv1394src'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_dv1394src_h264(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
-        rxVideoArg.source = "v4l2src"
+        txVideoArg.source = "dv1394src"
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_dv1394src_h263(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "dv1394src"
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_v4l2src_mpeg4(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_v4l2src_h264(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
         txVideoArg.source = "v4l2src"
         proceed(rxVideoArg, txVideoArg)
     
-   #def test06_v4l2src_h263(self):
-   #    rxVideoArg = 'video_init: codec="h263" port=10000 address="127.0.0.1"'
-   #    txVideoArg = 'video_init: codec="h263" bitrate=3000000 port=10000 address="127.0.0.1" source="v4l2src"'
-   #    proceed(rxVideoArg, txVideoArg)
-   #
-   #def test07_v4l2src_mpeg4(self):
-   #    rxVideoArg = 'video_init: codec="mpeg4" port=10000 address="127.0.0.1"'
-   #    txVideoArg = 'video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="v4l2src"'
-   #    proceed(rxVideoArg, txVideoArg)
-   #
-   #def test08_videotestsrc_mpeg4_audiotestsrc_raw(self):
-   #    rxVideoArg = 'video_init: codec="mpeg4" port=10000 address="127.0.0.1"'
-   #    txVideoArg = 'video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"'
-   #    rxAudioArg = 'audio_init: codec="raw" port=10010 address="127.0.0.1"'
-   #    txAudioArg = 'audio_init: codec="raw" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2'
-   #    proceed(rxVideoArg, txVideoArg, rxAudioArg, txAudioArg)
+    def test_v4l2src_h263(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "v4l2src"
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_mpeg4_deinterlace(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.deinterlace = True
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_h264_deinterlace(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.deinterlace = True
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_h263_deinterlace(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.deinterlace = True
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_v4l2src_mpeg4_deinterlace(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_v4l2src_h264_deinterlace(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        proceed(rxVideoArg, txVideoArg)
+    
+    def test_v4l2src_h263_deinterlace(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_mpeg4_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_h264_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_h263_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_dv1394src_mpeg4_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = 'dv1394src'
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_dv1394src_h264_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_dv1394src_h263_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_v4l2src_mpeg4_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_v4l2src_h264_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+    
+    def test_v4l2src_h263_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_mpeg4_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_h264_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_h263_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_v4l2src_mpeg4_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_v4l2src_h264_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+    
+    def test_v4l2src_h263_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_mpeg4_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_h264_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_h263_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_dv1394src_mpeg4_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = 'dv1394src'
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_dv1394src_h264_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_dv1394src_h263_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_v4l2src_mpeg4_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_v4l2src_h264_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+    
+    def test_v4l2src_h263_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_mpeg4_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_h264_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_videotestsrc_h263_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_v4l2src_mpeg4_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
+    def test_v4l2src_h264_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+    
+    def test_v4l2src_h263_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(rxVideoArg, txVideoArg)
+
 
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    tests = prefixedMethods(TelnetTests(), 'test02')
+    tests = prefixedMethods(TelnetTests(), 'test08')
 
     for test in tests:
         print '/*----------------------------------------------*/'
