@@ -19,7 +19,10 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #include "queuePair.h"
+#ifdef HAVE_BOOST_ASIO
+
 
 bool QueuePair_::ready()
 {
@@ -124,4 +127,4 @@ void QueuePair_::init()
     second_ = new std::queue<MapMsg>();
     destroyQueues_ = true;
 }
-
+#endif
