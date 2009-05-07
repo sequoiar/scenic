@@ -98,6 +98,7 @@ def runClients(rxTn, txTn, args):
     txTn.write('start:\n')
     txTn.read_until('start: ack="ok"')
 
+
     # let the test run a bit
     TEST_LENGTH = 10
     sleep(TEST_LENGTH)
@@ -1559,7 +1560,7 @@ class AudioVideoTests(object):
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    tests = prefixedMethods(AudioVideoTests(), 'test_')
+    tests = prefixedMethods(AudioVideoTests(), 'test_audiotestsrc_vorbis_jackaudiosink_videotestsrc_h264_xvimagesin')
 
     for test in tests:
         print '/*----------------------------------------------*/'
