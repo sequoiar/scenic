@@ -66,24 +66,32 @@ def createClients():
     return rxClient, txClient
 
 
-def runClients(rxTn, txTn, rxVideoArg, txVideoArg, rxAudioArg, txAudioArg):
+def runClients(rxTn, txTn, args):
     """ Here our telnet clients issue their commands to their respective milhouse servers """
 
-    if rxVideoArg is not None:
-        rxTn.write(str(rxVideoArg) + '\n')
+    if 'rxVideoArg' in args:
+        rxTn.write(str(args['rxVideoArg']) + '\n')
         rxTn.read_until('video_init: ack="ok"')
+    else:
+        print 'Video disabled'
 
-    if txVideoArg is not None:
-        txTn.write(str(txVideoArg) + '\n')
+    if 'txVideoArg' in args:
+        txTn.write(str(args['txVideoArg']) + '\n')
         txTn.read_until('video_init: ack="ok"')
+    else:
+        print 'Video disabled'
     
-    if rxAudioArg is not None:
-        rxTn.write(str(rxAudioArg) + '\n')
+    if 'rxAudioArg' in args:
+        rxTn.write(str(args['rxAudioArg']) + '\n')
         rxTn.read_until('audio_init: ack="ok"')
+    else:
+        print 'Audio disabled'
 
-    if txAudioArg is not None:
-        txTn.write(str(txAudioArg) + '\n')
+    if 'txAudioArg' in args:
+        txTn.write(str(args['txAudioArg']) + '\n')
         txTn.read_until('audio_init: ack="ok"')
+    else:
+        print 'Audio disabled'
 
     rxTn.write('start:\n')
     rxTn.read_until('start: ack="ok"')
@@ -102,10 +110,10 @@ def runClients(rxTn, txTn, rxVideoArg, txVideoArg, rxAudioArg, txAudioArg):
     rxTn.write('quit:\n')
     txTn.write('quit:\n')
 
-def proceed(rxVideoArg = None, txVideoArg = None, rxAudioArg = None, txAudioArg = None):
+def proceed(args):
     createServers()
     rxTn, txTn = createClients()
-    runClients(rxTn, txTn, rxVideoArg, txVideoArg, rxAudioArg, txAudioArg)
+    runClients(rxTn, txTn, args)
 
 
 class Arg(object): # new style!!
@@ -170,10 +178,10 @@ class VideoRecvArg(VideoArg):
 class AudioSendArg(AudioArg):
     """ Class for audio only sending args """
     def __init__(self):
-        """ Default for audiosrc is 8 channel jackaudiosrc, 
+        """ Default for audiosrc is 8 channel audiotestsrc, 
          the jack input plugin """
         AudioArg.__init__(self)
-        self.source = 'jackaudiosrc'
+        self.source = 'audiotestsrc'
         self.channels = 8
 
 
@@ -195,88 +203,88 @@ def argfactory(argtype):
         raise Exception('unexpected argtype ' + argtype)
 
 
-class TelnetTests(object):
+class VideoTests(object):
     def __init__(self):
         pass
 
     def test_videotestsrc_mpeg4_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h264_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h263_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_dv1394src_mpeg4_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = 'dv1394src'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_dv1394src_h264_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         txVideoArg.source = "dv1394src"
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_dv1394src_h263_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
         txVideoArg.source = "dv1394src"
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_mpeg4_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = "v4l2src"
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_h264_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         txVideoArg.source = "v4l2src"
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
     def test_v4l2src_h263_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
         txVideoArg.source = "v4l2src"
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_mpeg4_deinterlace(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.deinterlace = True
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h264_deinterlace(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         txVideoArg.deinterlace = True
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h263_deinterlace(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
         txVideoArg.deinterlace = True
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_mpeg4_deinterlace(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = "v4l2src"
         txVideoArg.deinterlace = True
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_h264_deinterlace(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -284,7 +292,7 @@ class TelnetTests(object):
         txVideoArg.codec = "h264"
         txVideoArg.source = "v4l2src"
         txVideoArg.deinterlace = True
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
     def test_v4l2src_h263_deinterlace(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -292,32 +300,32 @@ class TelnetTests(object):
         txVideoArg.codec = "h263"
         txVideoArg.source = "v4l2src"
         txVideoArg.deinterlace = True
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_mpeg4_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h264_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h263_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_dv1394src_mpeg4_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = 'dv1394src'
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_dv1394src_h264_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -325,7 +333,7 @@ class TelnetTests(object):
         txVideoArg.codec = "h264"
         txVideoArg.source = "dv1394src"
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_dv1394src_h263_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -333,13 +341,13 @@ class TelnetTests(object):
         txVideoArg.codec = "h263"
         txVideoArg.source = "dv1394src"
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_mpeg4_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = "v4l2src"
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_h264_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -347,7 +355,7 @@ class TelnetTests(object):
         txVideoArg.codec = "h264"
         txVideoArg.source = "v4l2src"
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
     def test_v4l2src_h263_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -355,13 +363,13 @@ class TelnetTests(object):
         txVideoArg.codec = "h263"
         txVideoArg.source = "v4l2src"
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_mpeg4_deinterlace_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h264_deinterlace_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -369,7 +377,7 @@ class TelnetTests(object):
         txVideoArg.codec = "h264"
         txVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h263_deinterlace_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -377,14 +385,14 @@ class TelnetTests(object):
         txVideoArg.codec = "h263"
         txVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_mpeg4_deinterlace_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = "v4l2src"
         txVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_h264_deinterlace_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -393,7 +401,7 @@ class TelnetTests(object):
         txVideoArg.source = "v4l2src"
         txVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
     def test_v4l2src_h263_deinterlace_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -402,32 +410,32 @@ class TelnetTests(object):
         txVideoArg.source = "v4l2src"
         txVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_mpeg4_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h264_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h263_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_dv1394src_mpeg4_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = 'dv1394src'
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_dv1394src_h264_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -435,7 +443,7 @@ class TelnetTests(object):
         txVideoArg.codec = "h264"
         txVideoArg.source = "dv1394src"
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_dv1394src_h263_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -443,13 +451,13 @@ class TelnetTests(object):
         txVideoArg.codec = "h263"
         txVideoArg.source = "dv1394src"
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_mpeg4_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = "v4l2src"
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_h264_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -457,7 +465,7 @@ class TelnetTests(object):
         txVideoArg.codec = "h264"
         txVideoArg.source = "v4l2src"
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
     def test_v4l2src_h263_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -465,13 +473,13 @@ class TelnetTests(object):
         txVideoArg.codec = "h263"
         txVideoArg.source = "v4l2src"
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_mpeg4_deinterlace_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h264_deinterlace_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -479,7 +487,7 @@ class TelnetTests(object):
         txVideoArg.codec = "h264"
         txVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h263_deinterlace_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -487,14 +495,14 @@ class TelnetTests(object):
         txVideoArg.codec = "h263"
         txVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_mpeg4_deinterlace_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = "v4l2src"
         txVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_h264_deinterlace_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -503,7 +511,7 @@ class TelnetTests(object):
         txVideoArg.source = "v4l2src"
         txVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
     def test_v4l2src_h263_deinterlace_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
@@ -512,90 +520,92 @@ class TelnetTests(object):
         txVideoArg.source = "v4l2src"
         txVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
 
-
+class AudioTests(object):
+    def __init__(self):
+        pass
 
     def test_audiotestsrc_raw_jackaudiosink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
-        for channel in xrange(1, 8):
+        for channel in xrange(1, 9):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
 
     def test_jackaudiosrc_raw_jackaudiosink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         txAudioArg.source = "jackaudiosrc"
-        for channel in xrange(1, 8):
+        for channel in xrange(1, 9):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
     
     def test_dv1394src_raw_jackaudiosink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         txAudioArg.source = "dv1394src"
-        for channel in xrange(1, 2):
+        for channel in xrange(1, 3):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
 
     def test_audiotestsrc_vorbis_jackaudiosink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         rxAudioArg.codec = "vorbis"
         txAudioArg.codec = rxAudioArg.codec
-        for channel in xrange(1, 8):
+        for channel in xrange(1, 9):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
 
     def test_jackaudiosrc_vorbis_jackaudiosink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         txAudioArg.source = "jackaudiosrc"
         rxAudioArg.codec = "vorbis"
         txAudioArg.codec = rxAudioArg.codec
-        for channel in xrange(1, 8):
+        for channel in xrange(1, 9):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
 
     def test_dv1394src_vorbis_jackaudiosink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         txAudioArg.source = "dv1394src"
         rxAudioArg.codec = "vorbis"
         txAudioArg.codec = rxAudioArg.codec
-        for channel in xrange(1, 2):
+        for channel in xrange(1, 3):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
 
     def test_audiotestsrc_mp3_jackaudiosink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         rxAudioArg.codec = "mp3"
         txAudioArg.codec = rxAudioArg.codec
-        for channel in xrange(1, 2):
+        for channel in xrange(1, 3):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
 
     def test_jackaudiosrc_mp3_jackaudiosink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         txAudioArg.source = "jackaudiosrc"
         rxAudioArg.codec = "mp3"
         txAudioArg.codec = rxAudioArg.codec
-        for channel in xrange(1, 2):
+        for channel in xrange(1, 3):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
 
     def test_dv1394src_mp3_jackaudiosink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         txAudioArg.source = "dv1394src"
         rxAudioArg.codec = "mp3"
         txAudioArg.codec = rxAudioArg.codec
-        for channel in xrange(1, 2):
+        for channel in xrange(1, 3):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
 
     def test_alsasrc_raw_alsasink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         rxAudioArg.sink = "alsasink"
         txAudioArg.source = "alsasrc"
-        for channel in xrange(1, 8):
+        for channel in xrange(1, 9):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
 
     def test_alsasrc_vorbis_alsasink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
@@ -603,9 +613,9 @@ class TelnetTests(object):
         txAudioArg.source = "alsasrc"
         rxAudioArg.codec = "vorbis"
         txAudioArg.codec = rxAudioArg.codec
-        for channel in xrange(1, 8):
+        for channel in xrange(1, 9):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
     
     def test_alsasrc_mp3_alsasink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
@@ -613,17 +623,17 @@ class TelnetTests(object):
         txAudioArg.source = "alsasrc"
         rxAudioArg.codec = "mp3"
         txAudioArg.codec = rxAudioArg.codec
-        for channel in xrange(1, 2):
+        for channel in xrange(1, 3):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
 
     def test_pulsesrc_raw_pulsesink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         rxAudioArg.sink = "pulsesink"
         txAudioArg.source = "pulsesrc"
-        for channel in xrange(1, 8):
+        for channel in xrange(1, 9):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
 
     def test_alsasrc_vorbis_alsasink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
@@ -631,9 +641,9 @@ class TelnetTests(object):
         txAudioArg.source = "pulsesrc"
         rxAudioArg.codec = "vorbis"
         txAudioArg.codec = rxAudioArg.codec
-        for channel in xrange(1, 8):
+        for channel in xrange(1, 9):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
     
     def test_alsasrc_mp3_alsasink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
@@ -641,14 +651,25 @@ class TelnetTests(object):
         txAudioArg.source = "pulsesrc"
         rxAudioArg.codec = "mp3"
         txAudioArg.codec = rxAudioArg.codec
-        for channel in xrange(1, 2):
+        for channel in xrange(1, 3):
             txAudioArg.channels = channel
-            proceed(rxAudioArg, txAudioArg)
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+class AudioVideoTests(object):
+    def __init__(self):
+        pass
+    
+    def test_audiotestsrc_raw_jackaudiosink_videotestsrc_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    tests = prefixedMethods(TelnetTests(), 'test08')
+    tests = prefixedMethods(AudioVideoTests(), 'test_')
 
     for test in tests:
         print '/*----------------------------------------------*/'
