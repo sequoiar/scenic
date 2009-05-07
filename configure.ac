@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT(MILHOUSE, 0.1.2)
-AC_DEFINE(RELEASE_CANDIDATE,["-a2"],[rc version num])
+AC_DEFINE(RELEASE_CANDIDATE,["-b1"],[rc version num])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
@@ -39,13 +39,13 @@ AC_ARG_ENABLE([debug], [
 AC_ARG_ENABLE([millisecwait], [ --enable-millisecwait=(millisecs) thread sleep time],,enable_millisecwait=10)
 AC_DEFINE_UNQUOTED(MILLISEC_WAIT,[${enable_millisecwait}], wait time)
 
-AC_ARG_ENABLE([logs], [ --enable-logs enable logs in msg queues],,enable_logs=yes)
+AC_ARG_ENABLE([logs], [ --enable-logs enable logs in msg queues],,enable_logs=no)
 if test "x${enable_logs}" = "xfalse" ; then
     AC_DEFINE(MAPLOGS,[],[send logs to listeners])
 fi
 
 AC_ARG_ENABLE([asio], [ **************** 
-  --enable-asio build asio],,enable_asio=no)
+  --enable-asio build asio],,enable_asio=yes)
   
 
 AC_MSG_WARN([${ac_prefix}])
