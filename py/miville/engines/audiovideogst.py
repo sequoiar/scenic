@@ -90,7 +90,7 @@ class AudioVideoGst(GstClient):
                     'rtp'       :self.gst_rtp 
                     }       
        log.info('')
-       self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks)
+       self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks, self.gst_state_change_callback)
        
     def apply_stream_settings(self, stream_name, parameters ):
         self.stream_names.append(stream_name)
@@ -151,7 +151,7 @@ class AudioVideoGst(GstClient):
 
     def gst_success(self, **args):
         timestamp = datetime.now()
-        info = 'Success :-(  "%s"' % str(args)
+        info = 'Success :-)  "%s"' % str(args)
         self.acknowledgments.append((timestamp, info))
         log.debug('%s %s' %  (info, str(self)) )
         self.gst_server.change_state(miville.engines.base_gst.STREAMING)
@@ -179,6 +179,11 @@ class AudioVideoGst(GstClient):
                 stat = tokens[1]
                 value = tokens[2]
                 self.set_rtp_stats(stream, stat, value)
+    
+    def gst_state_change_callback(self, old_state, new_state, old_str, new_str):
+        timestamp = datetime.now()
+        info = 'GST state change  "%s" to "%s"' % (old_str, new_str)
+        self.acknowledgments.append((timestamp, info))
     
     def set_rtp_stats(self, stream, stat, value):
         timestamp = datetime.now()
