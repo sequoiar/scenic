@@ -15,15 +15,12 @@ except ImportError:
 
 from time import sleep
 import os
-
-
 import telnetlib
 import socket
-import time
 
 
 def serverWorker(args):
-    """ milhouse servers """
+    """ a serverWorker will run milhouse as its own process """
     command = 'milhouse ' + args
     os.system(command)
     print 'PROCESS ' + command + ' HAS EXITTED'
@@ -45,6 +42,7 @@ def createServers():
 
 
 def createClients():
+    """ Create telnet clients which will interact with our servers using telnetlib """
     receiverServerport = 9000
     senderServerport = 9001
 
@@ -68,20 +66,32 @@ def createClients():
     return rxClient, txClient
 
 
-def runClients(rxTn, txTn, rxArg, txArg):
-    TEST_LENGTH = 10
-    rxTn.write(rxArg + '\n')
-    rxTn.read_until('video_init: ack="ok"')
+def runClients(rxTn, txTn, rxVideoArg, txVideoArg, rxAudioArg, txAudioArg):
+    """ Here our telnet clients issue their commands to their respective milhouse servers """
 
-    txTn.write(txArg + '\n')
-    txTn.read_until('video_init: ack="ok"')
+    if rxVideoArg is not None:
+        rxTn.write(str(rxVideoArg) + '\n')
+        rxTn.read_until('video_init: ack="ok"')
+
+    if txVideoArg is not None:
+        txTn.write(str(txVideoArg) + '\n')
+        txTn.read_until('video_init: ack="ok"')
+    
+    if rxAudioArg is not None:
+        rxTn.write(str(rxAudioArg) + '\n')
+        rxTn.read_until('audio_init: ack="ok"')
+
+    if txAudioArg is not None:
+        txTn.write(str(txAudioArg) + '\n')
+        txTn.read_until('audio_init: ack="ok"')
 
     rxTn.write('start:\n')
     rxTn.read_until('start: ack="ok"')
     txTn.write('start:\n')
     txTn.read_until('start: ack="ok"')
 
-    # wait a while
+    # let the test run a bit
+    TEST_LENGTH = 10
     sleep(TEST_LENGTH)
 
     rxTn.write('stop:\n')
@@ -92,33 +102,148 @@ def runClients(rxTn, txTn, rxArg, txArg):
     rxTn.write('quit:\n')
     txTn.write('quit:\n')
 
-def proceed(rxArg, txArg):
+def proceed(rxVideoArg = None, txVideoArg = None, rxAudioArg = None, txAudioArg = None):
     createServers()
-    rx, tx = createClients()
-    runClients(rx, tx, rxArg, txArg)
+    rxTn, txTn = createClients()
+    runClients(rxTn, txTn, rxVideoArg, txVideoArg, rxAudioArg, txAudioArg)
+
+
+class Arg(object): # new style!!
+    """ Base class for our argument classes """
+    def __init__(self):
+        """ Init with address and timeout defaults """
+        self.address = '127.0.0.1'   # always need this guy
+    
+    def argString(self):
+        """ Returns a list of this class' data members and their values, 
+        formatted as command line arguments """
+        result = '_init:'
+        for key, val in self.__dict__.iteritems():
+            if val is True:
+                val = 1  # boolean members don't need values in output string
+            elif isinstance(val, str):
+                result = result + ' ' + key + '=' + '"' + str(val) + '"'
+            else:
+                result = result + ' ' + key + '=' + str(val) 
+        return result
+
+
+class VideoArg(Arg):
+    """ Base class for our video argument classes """
+    def __init__(self):
+        """ Defaults are mpeg4 videocodec and 11000 for videoport """
+        Arg.__init__(self)
+        self.codec = 'mpeg4'
+        self.port = 11000
+    
+    def __str__(self):
+        return 'video'  + self.argString()
+
+
+class AudioArg(Arg):
+    """ Base class for our Audio argument classes """
+    def __init__(self):
+        """ Defaults are uncompressed (raw) audio and 10000 for audioport """
+        Arg.__init__(self)
+        self.codec = 'raw'
+        self.port = 10000
+
+    def __str__(self):
+        return 'audio'  + self.argString()
+
+class VideoSendArg(VideoArg):
+    """ Class for video only sending args """
+    def __init__(self):
+        """ Default for videosource is videotestsrc """
+        VideoArg.__init__(self)
+        self.source = 'videotestsrc'
+        self.bitrate = 3000000
+
+class VideoRecvArg(VideoArg):
+    """ Class for video only receiving args """
+    def __init__(self):
+        """ Default for videosink is xvimagesink, the xvideo output plugin """
+        VideoArg.__init__(self)
+        self.sink = 'xvimagesink'
+
+
+class AudioSendArg(AudioArg):
+    """ Class for audio only sending args """
+    def __init__(self):
+        """ Default for audiosrc is 8 channel jackaudiosrc, 
+         the jack input plugin """
+        AudioArg.__init__(self)
+        self.source = 'jackaudiosrc'
+        self.channels = 8
+
+
+class AudioRecvArg(AudioArg):
+    """ Class for audio only receiving args """
+    def __init__(self):
+        """ Default for audiosink is jackaudiosink, the jack output plugin """
+        AudioArg.__init__(self)
+        self.sink = 'jackaudiosink'
+
+
+def argfactory(argtype):
+    """Returns default send and receive args"""
+    if argtype is 'audio':
+        return AudioRecvArg(), AudioSendArg()
+    elif argtype is 'video':
+        return VideoRecvArg(), VideoSendArg()
+    else:
+        raise Exception('unexpected argtype ' + argtype)
+
 
 class TelnetTests(object):
     def __init__(self):
         pass
 
-    def test01_videotestsrc_h264(self):
-        rxArg = 'video_init: codec="h264" port=10000 address="127.0.0.1"'
-        txArg = 'video_init: codec="h264" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"'
-        proceed(rxArg, txArg)
+    def test01_videotestsrc_mpeg4(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        proceed(rxVideoArg, txVideoArg)
 
-    def test02_videotestsrc_h263(self):
-        rxArg = 'video_init: codec="h263" port=10000 address="127.0.0.1"'
-        txArg = 'video_init: codec="h263" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"'
-        proceed(rxArg, txArg)
+    def test02_videotestsrc_h264(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        proceed(rxVideoArg, txVideoArg)
 
-    def test03_videotestsrc_mpeg4(self):
-        rxArg = 'video_init: codec="mpeg4" port=10000 address="127.0.0.1"'
-        txArg = 'video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"'
-        proceed(rxArg, txArg)
+    def test03_videotestsrc_h263(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        proceed(rxVideoArg, txVideoArg)
+
+    def test05_v4l2src_h264(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        rxVideoArg.source = "v4l2src"
+        txVideoArg.source = "v4l2src"
+        proceed(rxVideoArg, txVideoArg)
+    
+   #def test06_v4l2src_h263(self):
+   #    rxVideoArg = 'video_init: codec="h263" port=10000 address="127.0.0.1"'
+   #    txVideoArg = 'video_init: codec="h263" bitrate=3000000 port=10000 address="127.0.0.1" source="v4l2src"'
+   #    proceed(rxVideoArg, txVideoArg)
+   #
+   #def test07_v4l2src_mpeg4(self):
+   #    rxVideoArg = 'video_init: codec="mpeg4" port=10000 address="127.0.0.1"'
+   #    txVideoArg = 'video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="v4l2src"'
+   #    proceed(rxVideoArg, txVideoArg)
+   #
+   #def test08_videotestsrc_mpeg4_audiotestsrc_raw(self):
+   #    rxVideoArg = 'video_init: codec="mpeg4" port=10000 address="127.0.0.1"'
+   #    txVideoArg = 'video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"'
+   #    rxAudioArg = 'audio_init: codec="raw" port=10010 address="127.0.0.1"'
+   #    txAudioArg = 'audio_init: codec="raw" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2'
+   #    proceed(rxVideoArg, txVideoArg, rxAudioArg, txAudioArg)
+
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    tests = prefixedMethods(TelnetTests(), 'test')
+    tests = prefixedMethods(TelnetTests(), 'test02')
 
     for test in tests:
         print '/*----------------------------------------------*/'
