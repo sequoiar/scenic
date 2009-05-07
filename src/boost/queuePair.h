@@ -50,10 +50,10 @@ class QueuePair_
         bool ready();
 
     private:
-        std::queue<MapMsg*> *first_, *second_;
+        std::queue<MapMsg> *first_, *second_;
 
-        void queue_push(MapMsg *t);
-        MapMsg* queue_pop(int ms);
+//        void queue_push(MapMsg t);
+//        MapMsg queue_pop(int ms);
 
         bool destroyQueues_;
         boost::condition_variable cond;

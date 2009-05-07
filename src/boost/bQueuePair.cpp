@@ -21,14 +21,13 @@
  */
 #include "queuePair.h"
 
-#ifdef HAVE_BOOST_THREAD
 bool QueuePair_::ready()
 {
     boost::lock_guard<boost::mutex> lock(mut);
     return !first_->empty();
 }
 
-void QueuePair_::queue_push(MapMsg *t)
+void QueuePair_::push(MapMsg t)
 { 
     {
     boost::lock_guard<boost::mutex> lock(mut);
@@ -39,9 +38,9 @@ void QueuePair_::queue_push(MapMsg *t)
 }
 
 
-MapMsg* QueuePair_::queue_pop(int micro_secs)
+MapMsg QueuePair_::timed_pop(int micro_secs)
 {
-    MapMsg* ret=0;
+    MapMsg ret;
     boost::xtime xt;
     xtime_get(&xt,boost::TIME_UTC);
     xt.nsec += micro_secs*1000000;
@@ -50,7 +49,6 @@ MapMsg* QueuePair_::queue_pop(int micro_secs)
     while(!data_ready)
         if(!cond.timed_wait(lock,xt))
             break;
-
     if(!first_->empty())
     {
         ret = first_->front(); 
@@ -73,11 +71,11 @@ void QueuePair_::flip(QueuePair_ &in)
 }
 
 
-
+#if 0
 MapMsg QueuePair_::timed_pop(int microsec)
 {
     MapMsg n;
-    MapMsg *s = queue_pop(microsec);
+    MapMsg s = queue_pop(microsec);
 
     if (s) {
         n = *s;
@@ -86,13 +84,13 @@ MapMsg QueuePair_::timed_pop(int microsec)
     return n;
 }
 
-
 void QueuePair_::push(MapMsg pt)
 {
     MapMsg *t = new MapMsg(pt);
 
     queue_push(t);
 }
+#endif
 
 
 QueuePair_::~QueuePair_()
@@ -101,13 +99,11 @@ QueuePair_::~QueuePair_()
     {
         while(!first_->empty()) 
         {
-            delete(first_->front());
             first_->pop();
         }
 
         while(!second_->empty()) 
         {
-            delete(second_->front());
             second_->pop();
         }
 
@@ -124,9 +120,8 @@ void QueuePair_::init()
     if (first_ != 0 || second_ != 0)
         THROW_CRITICAL("CALLED QueuePair::init() on non empty QueuePair. QueuePair::flip was probably called.");
 
-    first_ = new std::queue<MapMsg*>();
-    second_ = new std::queue<MapMsg*>();
+    first_ = new std::queue<MapMsg>();
+    second_ = new std::queue<MapMsg>();
     destroyQueues_ = true;
 }
 
-#endif

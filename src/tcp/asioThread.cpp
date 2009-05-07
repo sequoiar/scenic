@@ -45,7 +45,7 @@ using boost::asio::async_write;
 using boost::asio::buffer;
 using boost::asio::placeholders::error;
 using boost::asio::placeholders::bytes_transferred;
-using boost::asio::ip;
+using boost::asio::ip::address_v4;
 
 ///pull first line from msg  -returns first line 
 static std::string get_line(std::string& msg)
@@ -150,7 +150,7 @@ class tcp_session
                     MapMsg msg = queue_.timed_pop(1);
                     if(!msg.cmd().empty())
                     {
-                        if(!msg.cmd() == "quit")
+                        if(!(msg.cmd() == "quit"))
                         {
                             std::string msg_str;
                             msg.stringify(msg_str);
@@ -189,7 +189,7 @@ class tcp_server
     public:
         tcp_server(io_service& io_service, short port, QueuePair& queue)
             : io_service_(io_service), 
-            acceptor_ ( io_service, tcp::endpoint(ip::address_v4::loopback(), port)), //Note: loopback only endpoint 
+            acceptor_ ( io_service, tcp::endpoint(address_v4::loopback(), port)), //Note: loopback only endpoint 
             queue_(queue), 
             t_(io_service, boost::posix_time::seconds(1))
     {
