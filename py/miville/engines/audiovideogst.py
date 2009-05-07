@@ -91,6 +91,7 @@ class AudioVideoGst(GstClient):
                     }       
        log.info('')
        self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks, self.gst_state_change_callback)
+       self._send_command('loglevel', 10)
        
     def apply_stream_settings(self, stream_name, parameters ):
         self.stream_names.append(stream_name)

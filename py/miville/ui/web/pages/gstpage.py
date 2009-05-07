@@ -113,7 +113,10 @@ def print_engine(engine):
             command = cmd[0]
             txt += "<p><b>" + command + ": </b>"
             params = cmd[1]
-            if params:
+            # check if its iterable
+            if not getattr(params, '__iter__', False):
+                txt += str("<i>" + str(params) + "</i> ")
+            else:
                 for p in params:
                     v = str(p[1])
                     if isinstance(p[1], str) or isinstance(p[1], unicode):
