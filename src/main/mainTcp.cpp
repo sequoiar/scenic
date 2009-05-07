@@ -30,19 +30,24 @@ class Logger
 {
     public:
         Logger(MsgThread& tcp)
-            : queue_(tcp.getQueue()){}
+            : queue_(tcp.getQueue()),level_(){}
         QueuePair& queue_;
         void operator()(LogLevel&, std::string& msg);
+        void setLevel(int level){ level_ = level;}
+        int level_;
 };
 
 
 #ifdef MAPLOGS
 void Logger::operator()(LogLevel& level, std::string& msg)
 {
+    if(level_)
+    {
     MapMsg m("log");
     m["level"] = level;
     m["msg"] = msg;
     queue_.push(m);
+    }
     std::cout << msg;// << std::endl;
 }
 #else
@@ -119,6 +124,11 @@ bool MainModule::run()
                 MapMsg tmsg = tcp_queue.timed_pop(1);
                 while(!tmsg.cmd().empty())
                 {
+                    if(tmsg.cmd() == "loglevel")
+                    {
+                        logger_.setLevel(tmsg["level"]);
+                        
+                    }else
                     if (tmsg.cmd() == "quit")
                     {
                         MsgThread::broadcastQuit();
