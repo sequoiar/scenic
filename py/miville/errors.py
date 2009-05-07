@@ -23,7 +23,7 @@
 
 class StreamsError(Exception):
     """
-    Master Exception Class for the settings.
+    Master Exception Class for the streams.
     """
     pass
 

@@ -20,7 +20,7 @@
 
 # System import
 import time
-
+import traceback
 #App imports
 from miville.ui.web.web import Widget, expose
 from miville.utils import log
@@ -91,7 +91,13 @@ class Addressbook(Widget):
                 self.callRemote('show_contact_info', contact_info)
 
     def rc_start_connection(self, name):
+        """
+        connects to a remote contact.
+
+        called from Javascript widget
+        """
         contact = self.api.get_contact(name)
+
         if isinstance(contact, Exception):
             self.callRemote('error', contact.message)
         else:
@@ -291,22 +297,32 @@ class Addressbook(Widget):
         """
         log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'start_streams'))
         #  START_STREAMS {'started': True, 'msg': 'streaming started'}
-        try:
-            started = data['started'] is True
-            if started:
-                #log.warning('TODO:self.callRemote()')
-                contact_name = data['contact_name']
-                #self.api.select_contact(self, contact_name)
-                self.callRemote('update_selected', contact_name) # works ! selects the contact to which we stream
-                contact = self.api.get_contact(contact_name)
-                log.debug('contact.stream_state:%s %s' % (contact_name, contact.stream_state))
-                self.api.get_contacts(self)
-                self.callRemote('update_status', contact_name, 'Streaming', 'Currently streaming.')
-                # updates list
+        if isinstance(data, Exception):
+            log.error('Could not start streaming ' + data.message)
+            contact = self.api.get_contact()
+            if isinstance(contact, Exception):
+                log.error('Could not get current contact: ' + contact.message)
             else:
-                log.warning('TODO:self.callRemote()')
-        except KeyError, e:
-            log.error("KeyError: data in start_streams should be a dict with key" + e.message) 
+                contact_name = contact.name
+                self.callRemote('update_status', contact_name, 'Could not start streaming. (%s)' % (data.__class__.__name__), 'Could not start streaming: ' + data.message)
+                traceback.print_exc()
+        else:
+            try:
+                started = data['started'] is True
+                if started:
+                    #log.warning('TODO:self.callRemote()')
+                    contact_name = data['contact_name']
+                    #self.api.select_contact(self, contact_name)
+                    self.callRemote('update_selected', contact_name) # works ! selects the contact to which we stream
+                    contact = self.api.get_contact(contact_name)
+                    log.debug('contact.stream_state:%s %s' % (contact_name, contact.stream_state))
+                    self.api.get_contacts(self)
+                    self.callRemote('update_status', contact_name, 'Streaming', 'Currently streaming.')
+                    # updates list
+                else:
+                    log.warning('TODO:self.callRemote()')
+            except KeyError, e:
+                log.error("KeyError: data in start_streams should be a dict with key" + e.message) 
 
     def cb_stop_streams(self, origin, data):
         """

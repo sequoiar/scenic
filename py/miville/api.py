@@ -646,7 +646,10 @@ class ControllerApi(object):
         Starts audio/video streaming with a contact. 
         """
         log.info('ControllerApi.start_streams, contact= ' + str(contact_name))
+        log.warning('selecting contact %s. Maybe this should be deprecated.' % (contact_name))
         contact = self.get_contact(contact_name)
+
+        self.select_contact(caller, contact_name) # !!!!
         if contact:
             if contact.state == CONNECTED:
                 try:
@@ -656,11 +659,13 @@ class ControllerApi(object):
                     contact.stream_state = 2
                     self.notify(caller, {'streaming':True, 'msg':"streaming started", 'contact_name':contact_name}, "start_streams") # key = start_streams
                 except AddressBookError, e:
-                    self.notify(caller, "Please select a contact prior to start streaming." + e.message, "error")   
+                    self.notify(caller, "AddressbookadError while trying to start streaming:" + e.message, "error")   
                     #TODO: change key for 'streams_error'
                 except SettingsError, err:
                     self.notify(caller, err)
                 except StreamsError, err:
+                    self.notify(caller, err)
+                except Exception, err:
                     self.notify(caller, err)
             elif contact.state == DISCONNECTED:
                 deferred = self.start_connection(caller, contact)

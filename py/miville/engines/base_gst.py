@@ -45,6 +45,12 @@ FAILURE = 100
 # name of the process to start
 streaming_server_process_name = "milhouse"
 
+class GstError(Exception):
+    """
+    Any error that is critical and makes it impossible to stream using GST
+    """
+    pass
+
 class BaseGst(object):
     """
     Just a bunch of getter and setter for attributes for the milhouse processes.
@@ -142,6 +148,9 @@ class GstServer(object):
         log.debug('Lost the server connection. Reason:\n%s %s' % (reason, str(self) ) )
 
     def start_process(self):
+        """
+        Might throw a GstError
+        """
         log.debug("GstServer.start_process... %s " % str(self) )
         #if self.state < RUNNING: self.state = RUNNING    # Uncomment this line to start the GST process "by hand"
         if self.state < STARTING:
@@ -163,11 +172,17 @@ class GstServer(object):
                     log.debug("Process spawned pid=" + str(self.process.pid)  + " "+ str(self))
                     return proc_path, args, self.process.pid
                 except Exception, e:
-                    log.critical('Cannot start the GST application "%s": %s %s' % (streaming_server_process_name, str(e), str(self) ) )
+                    msg = 'Cannot start the GST application "%s": %s %s' % (streaming_server_process_name, str(e), str(self))
+                    log.critical(msg)
+                    raise GstError(msg)
             else:
-                log.critical('Cannot find the GST application: %s %s' % (streaming_server_process_name, self)  )
+                msg = 'Cannot find the GST application: %s %s' % (streaming_server_process_name, self)
+                log.critical(msg)
+                raise GstError(msg)
         else:
-            log.error("GstServer.start_process: not in proper state for starting %s" % str(self))
+            msg = "GstServer.start_process: not in proper state for starting %s" % str(self)
+            log.error(msg)
+            raise GstError(msg)
 
     def kill(self):
         log.debug("GstServer.kill %s" % str(self))
@@ -251,7 +266,10 @@ class GstClient(BaseGst):
     def setup_gst_client(self, mode, port, address, callbacks_dict, state_change_callback): 
         log.debug('GstClient.setup_gst_client '+ str(self))
         self.gst_server = GstServer(mode, port, address, callbacks_dict, state_change_callback)
-        self.proc_path, self.args, self.pid = self.gst_server.start_process()
+        try:
+            self.proc_path, self.args, self.pid = self.gst_server.start_process()
+        except GstError, e: 
+            log.error('Could not start GST process: ' + e.message)
         self.version_str = self.gst_server.version_str
         log.debug('GstClient.setup_gst_client done')
         
