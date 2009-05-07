@@ -199,54 +199,54 @@ class TelnetTests(object):
     def __init__(self):
         pass
 
-    def test_videotestsrc_mpeg4(self):
+    def test_videotestsrc_mpeg4_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         proceed(rxVideoArg, txVideoArg)
 
-    def test_videotestsrc_h264(self):
+    def test_videotestsrc_h264_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         proceed(rxVideoArg, txVideoArg)
 
-    def test_videotestsrc_h263(self):
+    def test_videotestsrc_h263_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
         proceed(rxVideoArg, txVideoArg)
 
-    def test_dv1394src_mpeg4(self):
+    def test_dv1394src_mpeg4_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = 'dv1394src'
         proceed(rxVideoArg, txVideoArg)
 
-    def test_dv1394src_h264(self):
+    def test_dv1394src_h264_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         txVideoArg.source = "dv1394src"
         proceed(rxVideoArg, txVideoArg)
 
-    def test_dv1394src_h263(self):
+    def test_dv1394src_h263_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
         txVideoArg.source = "dv1394src"
         proceed(rxVideoArg, txVideoArg)
 
-    def test_v4l2src_mpeg4(self):
+    def test_v4l2src_mpeg4_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = "v4l2src"
         proceed(rxVideoArg, txVideoArg)
 
-    def test_v4l2src_h264(self):
+    def test_v4l2src_h264_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         txVideoArg.source = "v4l2src"
         proceed(rxVideoArg, txVideoArg)
     
-    def test_v4l2src_h263(self):
+    def test_v4l2src_h263_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
@@ -514,6 +514,136 @@ class TelnetTests(object):
         rxVideoArg.sink = 'ximagesink'
         proceed(rxVideoArg, txVideoArg)
 
+
+
+
+    def test_audiotestsrc_raw_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        for channel in xrange(1, 8):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+
+    def test_jackaudiosrc_raw_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        txAudioArg.source = "jackaudiosrc"
+        for channel in xrange(1, 8):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+    
+    def test_dv1394src_raw_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        txAudioArg.source = "dv1394src"
+        for channel in xrange(1, 2):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+
+    def test_audiotestsrc_vorbis_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 8):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+
+    def test_jackaudiosrc_vorbis_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 8):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+
+    def test_dv1394src_vorbis_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 2):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+
+    def test_audiotestsrc_mp3_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 2):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+
+    def test_jackaudiosrc_mp3_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 2):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+
+    def test_dv1394src_mp3_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 2):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+
+    def test_alsasrc_raw_alsasink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "alsasink"
+        txAudioArg.source = "alsasrc"
+        for channel in xrange(1, 8):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+
+    def test_alsasrc_vorbis_alsasink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "alsasink"
+        txAudioArg.source = "alsasrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 8):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+    
+    def test_alsasrc_mp3_alsasink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "alsasink"
+        txAudioArg.source = "alsasrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 2):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+
+    def test_pulsesrc_raw_pulsesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "pulsesink"
+        txAudioArg.source = "pulsesrc"
+        for channel in xrange(1, 8):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+
+    def test_alsasrc_vorbis_alsasink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "pulsesink"
+        txAudioArg.source = "pulsesrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 8):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
+    
+    def test_alsasrc_mp3_alsasink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "pulsesink"
+        txAudioArg.source = "pulsesrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 2):
+            txAudioArg.channels = channel
+            proceed(rxAudioArg, txAudioArg)
 
 
 if __name__ == '__main__':
