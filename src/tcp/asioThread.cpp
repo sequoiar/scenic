@@ -72,7 +72,10 @@ class tcp_session
 {
     public:
         tcp_session(io_service& io_service, QueuePair& queue)
-            : io_service_(io_service),socket_(io_service),queue_(queue), welcome_(),
+            : io_service_(io_service),
+            socket_(io_service),
+            queue_(queue), 
+            welcome_(),
             t_(io_service, boost::posix_time::millisec(1))
     {
         std::cout << "READY\n";
@@ -185,9 +188,10 @@ class tcp_server
 {
     public:
         tcp_server(io_service& io_service, short port, QueuePair& queue)
-            : io_service_(io_service), acceptor_ ( io_service, 
-                    tcp::endpoint(ip::address_v4::loopback(), port)), //Note: loopback only endpoint 
-            queue_(queue), t_(io_service, boost::posix_time::seconds(1))
+            : io_service_(io_service), 
+            acceptor_ ( io_service, tcp::endpoint(ip::address_v4::loopback(), port)), //Note: loopback only endpoint 
+            queue_(queue), 
+            t_(io_service, boost::posix_time::seconds(1))
     {
         tcp_session* new_tcp_session = new tcp_session(io_service_,queue_); 
         acceptor_.async_accept(new_tcp_session->socket(),
@@ -228,9 +232,13 @@ class udp_sender
 {
     public:
         udp_sender(io_service& io_service, std::string ip, std::string port, std::string buff)
-            : io_service_(io_service), buff_(buff), t_(io_service, boost::posix_time::seconds(1)),
-            socket_(io_service, udp::endpoint(udp::v4(), 0)), sender_endpoint_(),
-            resolver(io_service),query(udp::v4(), ip.c_str(), port.c_str()), iterator(resolver.resolve(query))
+            : io_service_(io_service), 
+            buff_(buff), 
+            t_(io_service, boost::posix_time::seconds(1)),
+            socket_(io_service, udp::endpoint(udp::v4(), 0)), 
+            sender_endpoint_(),
+            resolver(io_service),
+            query(udp::v4(), ip.c_str(), port.c_str()), iterator(resolver.resolve(query))
     {
         t_.async_wait(boost::bind(&udp_sender::handle_timer,this, error));
     }
@@ -297,8 +305,13 @@ class udp_server
 {
     public:
         udp_server(io_service& io_service, short port, std::string& buff,int& id)
-            : io_service_(io_service),port_(port),buff_(buff),id_(id),
-            socket_(io_service, udp::endpoint(udp::v4(), port)), sender_endpoint_(),t_(io_service, boost::posix_time::seconds(1))
+            : io_service_(io_service),
+            port_(port),
+            buff_(buff),
+            id_(id),
+            socket_(io_service, udp::endpoint(udp::v4(), port)), 
+            sender_endpoint_(),
+            t_(io_service, boost::posix_time::seconds(1))
     {
         socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_, 
                 boost::bind(&udp_server::handle_receive_from, this, 
