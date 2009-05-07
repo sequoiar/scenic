@@ -955,7 +955,7 @@ class ControllerApi(object):
             #pprint.pprint(contact.__dict__)
             
             if contact.state != addressbook.CONNECTED: 
-                self.notify(caller, "Please connect to a contact prior to start a network test.", "network_test_error")
+                self.notify(caller, "You are not connected to this contact.", "network_test_error")
             else:
                 #log.debug("connector : " + str(contact.connector))
                 # com_chan = None 
@@ -989,14 +989,32 @@ class ControllerApi(object):
                             log.debug("Will notify observer that we are starting a network test")
                             self.notify(caller, "Starting network performance test with contact %s for %d seconds..." % (contact.name, duration), "network_test_start")
                         else:
-                            self.notify(caller, "An error occuring while trying to start network test.", "network_test_error")
+                            # the API has already been notified with network_test_error key
+                            pass
+                            # self.notify(caller, "An error occuring while trying to start network test.", "network_test_error")
 
-#     def network_test_stop(self, caller):
-#         """
-#         Interrupts suddenly the network test.
-#         """
-#         #TODO
-#         pass
+    def network_test_abort(self, caller, contact_name=None):
+        """
+        Interrupts suddenly the network test.
+        """
+        try:
+            if contact_name is None:
+                contact = self.get_contact()
+            else:
+                contact = self.get_contact(contact_name)
+        except AddressBookError:
+            self.notify(caller, "Please select a contact prior to stop a network test.", "network_test_error")
+        else:
+            if contact.state != addressbook.CONNECTED: 
+                self.notify(caller, "You are not connected to this contact.", "network_test_error")
+            else:
+                try:
+                    tester = network.get_tester_for_contact(contact.name)
+                except KeyError, e:
+                    self.notify(caller, "No network tester for contact", "network_test_error")
+                else:
+                    tester.abort_test(caller)
+                    
 # 
 #     def network_test_enable_autoaccept(self, caller, enabled=True):
 #         """

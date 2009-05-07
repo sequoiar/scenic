@@ -130,12 +130,14 @@ NetworkTesting.methods(
 		dbug.info(key);
 		dbug.info(value);
 		if (caller == 'adb') {
-			self.contact = value;
 			// cancel_edit & selection keys : 
             if (['selection', 'cancel_edit'].contains(key)) {
 				if (value == null) {
 					self.notify_controllers('contact_unselected');
+                    //test_aborted
 				} else {
+                    self.contact = value;
+		            dbug.info('contact selected: ' + value);
 					self.notify_controllers('contact_selected');
 				}
 			} else if (['edit', 'add'].contains(key)) {
@@ -179,27 +181,39 @@ NetworkTesting.methods(
 			self.duration_fld.removeClass('notify'); // remove the red
 			dbug.info('bw:' + bandwidth + " dur:" + duration + ' unit:' + unit + ' kind:' + kind);
             self.callRemote('rc_start_test', self.contact.get('name'), bandwidth, duration, kind, unit);
-            self.start_btn.disabled = true;
-            self.message_div.empty(); // innerHTML = "";
-            //var img = new Element('img').setProperty('src', 'img/macthrob-small.png').inject(self.message_div);
-            //self.progress_img.setProperty
-            //img.setProperty("style", "position:relative;top:4px;");
-			if (! self.progress_img.hasClass('nettest_progress')) { 
-                self.progress_img.addClass('nettest_progress');
-            }
-            var span = new Element('span').appendText(" Test in progress...").inject(self.message_div);
+            // this will call self.make_look_like_test_occurs
 	    }
     },
-
-
+    /**
+     * Changes the appearance of this widget when a test starts
+     * (called from the python widget)
+     * @members NetworkTesting
+     */
+    function make_look_like_test_occurs(self, message) {
+		self.start_btn.value = self.stop_str;
+        self.start_btn.disabled = false;
+        self.start_btn.removeEvents('click');
+        self.start_btn.addEvent('click', function() {
+            self.abort_test();
+        });
+        self.message_div.empty(); // innerHTML = "";
+        //var img = new Element('img').setProperty('src', 'img/macthrob-small.png').inject(self.message_div);
+        //self.progress_img.setProperty
+        //img.setProperty("style", "position:relative;top:4px;");
+        if (! self.progress_img.hasClass('nettest_progress')) { 
+            self.progress_img.addClass('nettest_progress');
+        }
+        var span = new Element('span').appendText(message).inject(self.message_div);
+    },
+    
 	/**
 	 * Stops the streams of this contact.
 	 * (called from the client)
 	 * 
 	 * @member Streams
 	 */
-	function stop_test(self) {
-		self.callRemote('rc_stop_test', self.contact.get('name'));
+	function abort_test(self) {
+		self.callRemote('rc_abort_test', self.contact.get('name'));
 	},
 
 	/**
@@ -218,7 +232,7 @@ NetworkTesting.methods(
     {
 		dbug.info("event: " + event);
 		// list of events that "list" should react to
-		if (event == 'contact_selected') 
+		if (['contact_selected', 'test_aborted', 'test_done'].contains(event)) 
         {
 			// set the default state
 			var button_state = 'enabled'; // default...
@@ -245,7 +259,7 @@ NetworkTesting.methods(
 					button_state = 'enabled';
 					button_name = self.stop_str;
 					self.start_btn.addEvent('click', function(){
-						self.stop_test();
+						self.abort_test();
 					});
 				}
 			}
@@ -286,6 +300,7 @@ NetworkTesting.methods(
         if (self.progress_img.hasClass('nettest_progress')) { 
             self.progress_img.removeClass('nettest_progress');
         }
+		self.notify_controllers('test_aborted');
     },
     function _insert_result_li(self, ul, key, val) {
         var li = new Element('li', {'class':'nettest_result'}).inject(ul);
@@ -304,6 +319,7 @@ NetworkTesting.methods(
      * @param {string} remote_data Dict/object with iperf stats.
 	 */
 	function test_results(self, contact_name, local_data, remote_data) {
+		self.start_btn.value = self.start_str;
         if (self.progress_img.hasClass('nettest_progress')) { 
             self.progress_img.removeClass('nettest_progress');
         }
@@ -360,6 +376,7 @@ NetworkTesting.methods(
         // txt += data;
         // var pre = new Element('pre').appendText(txt).inject(self.message_div);
         // TODO: check if a contact to which we are connected is selected.
-        self.start_btn.disabled = false;
+        // self.start_btn.disabled = false;
+		self.notify_controllers('test_done');
 	}
 );

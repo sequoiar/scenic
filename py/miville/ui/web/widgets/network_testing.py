@@ -51,19 +51,24 @@ class NetworkTesting(Widget):
             self.api.network_test_start(caller, bandwidth, duration, kind, contact_obj, unit)
         return False # we must do this for rc_* methods
         
-    def rc_stop_test(self, contact):
-        log.debug("network testing stop is not implemented yet")
+    def rc_abort_test(self, contact_name):
+        log.debug('rc_abort_test ' + contact_name)
+        # log.debug("network testing stop is not implemented yet")
+        self.api.network_test_abort(self, contact_name)
         return False # we must do this for rc_* methods
         
     def cb_network_test_start(self, origin, data):
         """
         TODO: Should changed the appearance of widget here
+
+        data is a string
         """
         # data is a string
         # data could be {message, contact_name, duration}
         log.debug("started network test" + str(origin) + str(data))
         #log.debug("origin:" + str(origin))
         #log.debug("data:" + str(data))
+        self.callRemote('make_look_like_test_occurs', str(data))
 
     def cb_network_test_done(self, origin, data):
         """
@@ -71,7 +76,7 @@ class NetworkTesting(Widget):
         See network.py
         :param data: a dict with iperf statistics
         """
-        contact_name = data['contact'].name
+        contact_name = data['contact']
         local_data = None
         remote_data = None
         if data.has_key('local'):
