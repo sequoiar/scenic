@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(MILHOUSE, 0.1.2)
-AC_DEFINE(RELEASE_CANDIDATE,["-b1"],[rc version num])
+AC_INIT(MILHOUSE, 0.1.3)
+AC_DEFINE(RELEASE_CANDIDATE,["-a1"],[rc version num])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
@@ -138,7 +138,7 @@ AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
 AX_PYTHON
 AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
 
-AX_BOOST_BASE([1.34])
+AX_BOOST_BASE([1.35])
 if test  "x${enable_asio}" = "xyes"; then
 AX_BOOST_THREAD
 AX_BOOST_SYSTEM
