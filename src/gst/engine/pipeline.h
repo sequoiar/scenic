@@ -1,6 +1,8 @@
 
 // pipeline.h
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -29,6 +31,8 @@ class _GstElement;
 class _GstPad;
 class _GstBus;
 class _GstMessage;
+class _GtkWidget;
+class _GtkButton;
 class BusMsgHandler;
 
 class Pipeline
@@ -45,20 +49,28 @@ class Pipeline
         void remove(_GstElement ** element);
         void remove(std::vector < _GstElement * >&elementVec);
         bool isPlaying() const;
+        bool isReady() const;
         bool isPaused() const;
+        bool isStopped() const;
         void seekTo(gint64 pos);
         void start();
         void pause();
+        void makeReady();
         void stop();
+        void notifyQuitted() { quitted_ = true; }
+        bool quitted() { return quitted_; }
+        void makeVerbose();
+        void createControl();
         const char *getElementPadCaps(GstElement *element, const char *padName) const;
+        static void enableControl() { controlEnabled_ = true; }
 
-        _GstElement *findElement(const char *name) const;
         static const unsigned int SAMPLE_RATE;
 
     private:
+        static void deepNotifyCb(GObject *object, GstObject *orig, GParamSpec *spec, gchar ** excluded_props);
         void init();
         void add(_GstElement * element);
-        void reset();
+        static void reset();
         _GstBus* getBus() const;
         GstClock* clock() const;
 
@@ -68,18 +80,22 @@ class Pipeline
         Pipeline(const Pipeline&);
         Pipeline& operator=(const Pipeline&);
 
-        Pipeline() : pipeline_(0), startTime_(0), verbose_(true), handlers_(), refCount_(0) {}
+        Pipeline() : pipeline_(0), startTime_(0), handlers_(), refCount_(0), quitted_(false), madeControl_(false), control_(0) {}
+
         ~Pipeline();
         static Pipeline *instance_;
 
-        void make_verbose();
         void updateListeners(GstMessage *msg);
+        static void playButtonCb(_GtkButton *button);
 
         _GstElement *pipeline_;
         GstClockTime startTime_;
-        bool verbose_;
         std::vector<BusMsgHandler*> handlers_;
         int refCount_;
+        bool quitted_;
+        static bool controlEnabled_;
+        bool madeControl_;
+        _GtkWidget  *control_;
 };
 
 #endif // _PIPELINE_H_

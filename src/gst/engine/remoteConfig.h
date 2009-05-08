@@ -1,6 +1,8 @@
 
 // remoteConfig.h
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -18,19 +20,20 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file
- *      Immutable class that is used to setup rtp using objects.
- *
- */
-
 #ifndef _REMOTE_CONFIG_H_
 #define _REMOTE_CONFIG_H_
 
 #include <string>
+#include <set>
+#include "../ports.h"
 
 class Encoder;
+class VideoEncoder;
 class Decoder;
-const int NUM_CODECS = 4;
+
+/** 
+ *      Immutable class that is used to setup rtp
+ */
 
 class RemoteConfig 
 {
@@ -43,11 +46,17 @@ class RemoteConfig
         RemoteConfig(const RemoteConfig& m)
             : codec_(m.codec_), remoteHost_(m.remoteHost_), port_(m.port_) {}
 
-        virtual ~RemoteConfig() {}
+        virtual ~RemoteConfig(){};
 
         int port() const { return port_; }
+        int rtcpFirstPort() const { return port_ + ports::RTCP_FIRST_OFFSET; }
+        int rtcpSecondPort() const { return port_ + ports::RTCP_SECOND_OFFSET; }
+        int capsPort() const { return port_ + ports::CAPS_OFFSET; }
         const char *remoteHost() const { return remoteHost_.c_str(); }
         bool hasCodec() const { return !codec_.empty(); }
+        std::string codec() const { return codec_; }
+        void checkPorts() const;
+        void cleanupPorts() const;
 
     protected:
 
@@ -56,7 +65,7 @@ class RemoteConfig
         const int port_;
         static const int PORT_MIN;
         static const int PORT_MAX;
-        static const std::string VALID_CODECS[NUM_CODECS];
+        static std::set<int> usedPorts_;
 
     private:
         RemoteConfig& operator=(const RemoteConfig&); //No Assignment Operator
@@ -74,7 +83,8 @@ class SenderConfig : public RemoteConfig
             : RemoteConfig(m)
         {}
 
-        Encoder* createEncoder() const;
+        VideoEncoder* createVideoEncoder() const;
+        Encoder* createAudioEncoder() const;
 };
 
 
@@ -90,9 +100,11 @@ class ReceiverConfig : public RemoteConfig
             : RemoteConfig(m), caps_(m.caps_)
         {}
 
-        Decoder* createDecoder() const;
+        Decoder* createVideoDecoder() const;
+        Decoder* createAudioDecoder() const;
 
         const char *caps() const { return caps_.c_str(); }
+        bool capsMatchCodec() const;
 
     private:
         const std::string caps_;

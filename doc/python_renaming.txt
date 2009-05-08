@@ -1,0 +1,44 @@
+
+
+
+###### PARSE IMPORTS ########
+find -name \*.py  -exec /bin/grep -rI  import  {} \; | sort | uniq
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+############### UNDO #################
+rm -rf py
+svn up 
+
+###### FIND/REPLACE #####
+sed -i -f renaming.sed $(cat renaming_files_list.txt)
+
+for d in connectors devices protocols streams ui utils
+do 
+    mv -i py/$d py/miville/$d
+done;
+
+for f in addressbook.py api.py errors.py core.py network.py settings.py
+do 
+    mv -i py/$f py/miville/$f 
+done;
+find -name \*.pyc -exec rm {} \;
+./py/miville.py;
+
+
+
+
+
+
+

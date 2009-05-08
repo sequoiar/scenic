@@ -1,6 +1,8 @@
 
 // busMsgHandler.h
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -24,9 +26,9 @@
 
 class _GstMessage;
 
-/** \class BusMsgHandler
+/** 
 * Abstract interface which requires its implementors to provide 
-* functionality to handle messages posted on the bus. Variation of
+* functionality to handle messages posted on the bus. Variation on
 * the Observer and Chain of Responsibility patterns.
 */
 

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ -d py ];
+then
+    for ext in py txt xml css js png jpg;
+    do 
+        find py/miville -type f -name \*.$ext
+    done
+    find py -name Makefile.in -or -name Makefile.am
+    find py/docs -name \*.txt
+    echo "py/docs/Makefile"
+fi
+

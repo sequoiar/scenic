@@ -1,5 +1,7 @@
 /* GTHREAD-QUEUE-PAIR - Library of Thread Queue Routines for GLIB
- * Copyright 2008  Koya Charles & Tristan Matthews
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,11 +19,10 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <glib.h>
-#include <iostream>
+#include "util.h"
+
 #include "baseModule.h"
-#include "logWriter.h"
-#include "gutil/optionArgs.h"
+#include "gutil.h"
 
 class DModule
     : public BaseModule

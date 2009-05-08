@@ -1,5 +1,7 @@
 /* TcpThread.cpp
- * Copyright 2008  Koya Charles & Tristan Matthews
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This library is free software; you can redisttribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,34 +19,27 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <iostream>
+#include "util.h"
 #include "tcpThread.h"
-#include "logWriter.h"
-#include "parser.h"
 #include <errno.h>
 #include <string.h>
 
-class TcpLogger
-    : public logger::Subscriber
+#ifndef HAVE_BOOST_ASIO
+#include <tr1/memory>
+class TcpLog
+   // : public Log::Subscriber
 {
     public:
-        TcpLogger(TcpThread& tcp)
-            : tcp_(tcp){}
-        TcpThread& tcp_;
-        void operator()(LogLevel&, std::string& msg);
+        TcpLog(){}
+        void operator()(LogLevel&, std::string&){}
+        void hold(){}
+        void enable(){}
 };
 
-
-void TcpLogger::operator()(LogLevel& level, std::string& msg)
-{
-    MapMsg m("log");
-    m["level"] = level;
-    m["msg"] = msg;
-    tcp_.send(m);
-}
+std::tr1::shared_ptr<TcpLog> lf_(new TcpLog());
 
 TcpThread::TcpThread(int inport, bool logF)            
-: serv_(inport), logFlag_(logF), lf_(new TcpLogger(*this))
+: serv_(inport), logFlag_(logF)
 {
 }
 
@@ -65,7 +60,7 @@ static std::string get_line(std::string& msg)
 }
 
 
-int TcpThread::main()
+void TcpThread::main()
 {
     bool quit = false;
     std::string msg;
@@ -78,39 +73,40 @@ int TcpThread::main()
             while(!serv_.accept())
             {
                 if((quit = gotQuit()))
-                    return 0;
-                usleep(10000);
+                    break;
             }
-            try
+            if(!quit)
             {
-                LOG_INFO("Got Connection.");
-                if(logFlag_)
-                    lf_->enable();
-                while(serv_.connected())
+                try
                 {
-                    if((quit = gotQuit()))
-                        break;
-                    if(serv_.recv(msg))
+                    LOG_INFO("Got Connection.");
+                    if(logFlag_)
+                        lf_->enable();
+                    while(serv_.connected())
                     {
-                        std::string line = get_line(msg);
-                        do
+                        if((quit = gotQuit()))
+                            break;
+                        if(serv_.recv(msg))
                         {
-                            MapMsg mapMsg;
-                            if(Parser::tokenize(line, mapMsg))
-                                queue_.push(mapMsg);
-                            else
-                                LOG_WARNING("Bad Msg Received.");
-                            line = get_line(msg);
+                            std::string line = get_line(msg);
+                            LOG_DEBUG(line);
+                            do
+                            {
+                                MapMsg mapMsg;
+                                if(mapMsg.tokenize(line))
+                                    queue_.push(mapMsg);
+                                else
+                                    LOG_WARNING("Bad Msg Received.");
+                                line = get_line(msg);
+                            }
+                            while(!line.empty());
                         }
-                        while(!line.empty());
                     }
-                    else
-                        usleep(1000);
                 }
-            }
-            catch(Except e)
-            {
-                LOG_DEBUG( "CAUGHT " << e.msg_);
+                catch(Except e)
+                {
+                    LOG_DEBUG( "CAUGHT " << e.msg_);
+                }
             }
             if(logFlag_)
                 lf_->hold();
@@ -128,20 +124,25 @@ int TcpThread::main()
         mapMsg["exception"] = CriticalExcept(e.msg_, e.errno_);
         queue_.push(mapMsg);
     }
-    return 0;
 }
 
 
 bool TcpThread::gotQuit()
 {
-    MapMsg f = queue_.timed_pop(1);
-    std::string command;
-    if(f["command"].empty())
-        return false;
-    if(f["command"].get(command)&& command == "quit")
-        return true;
-    else
-        send(f);
+    if(queue_.ready())
+    {
+        MapMsg f = queue_.timed_pop(1);
+        std::string command;
+        if(!f.cmd().empty())
+        {
+            if(f.cmd() == "quit")
+                return true;
+            
+            send(f);
+            return false;
+        }
+    }
+    usleep(MILLISEC_WAIT*1000);
     return false;
 }
 
@@ -149,24 +150,25 @@ bool TcpThread::gotQuit()
 bool TcpThread::send(MapMsg& msg)
 {
     std::string msg_str;
-    bool ret;
-    lf_->hold(); // to insure no recursive calls due to log message calling send
-    try
+    bool ret= false;
+    if(th_)
     {
-        Parser::stringify(msg, msg_str);
-        ret = serv_.send(msg_str);
-        lf_->enable();
+        try
+        {
+            lf_->hold(); // to insure no recursive calls due to log message calling send
+            msg.stringify(msg_str);
+            ret = serv_.send(msg_str);
+            lf_->enable();
 
+        }
+        catch(ErrorExcept e)
+        {
+            LOG_DEBUG(msg.cmd() << " Error at Send. Cancelled. " << strerror(e.errno_));
+            lf_->enable();
+            //if(e.errno_ == EBADF) //Bad File Descriptor
+            //    throw (e);
+        }
     }
-    catch(ErrorExcept e)
-    {
-        LOG_DEBUG(std::string(msg["command"]) << " Error at Send. Cancelled. " <<
-                  strerror(e.errno_));
-        lf_->enable();
-        if(e.errno_ == EBADF) //Bad File Descriptor
-            throw (e);
-    }
-
     return ret;
 }
 
@@ -174,8 +176,89 @@ bool TcpThread::send(MapMsg& msg)
 bool TcpThread::socket_connect_send(const std::string& addr, MapMsg& msg)
 {
     std::string msg_str;
-    Parser::stringify(msg, msg_str);
+    msg.stringify(msg_str);
     return serv_.socket_connect_send(addr, msg_str);
 }
 
 
+std::string tcpGetBuffer(int port, int &id)
+{
+    std::string ret;
+    TcpThread tcp(port);
+    tcp.run();
+    QueuePair& queue = tcp.getQueue();
+    for(;;)
+    {
+        MapMsg f = queue.timed_pop(1);
+        if(f.cmd())
+        {
+            try
+            {
+                if(f.cmd() == "quit")
+                {
+                    sleep(2); //FIXME: OUCH RACE COND ON QUIT!
+                    THROW_ERROR("quit in tcpGetBuffer");
+                }
+                if(f.cmd() == "buffer")
+                {
+                    id = f["id"];
+                    ret = static_cast<std::string>(f["str"]);
+                    break;
+                }
+                else
+                    LOG_INFO("Unknown msg.");
+            }
+            catch(ErrorExcept e)
+            {
+                if (f.cmd() == "quit")
+                    throw e;
+            }
+        }
+        else
+        {
+            usleep(MILLISEC_WAIT*1000);
+        }
+    }
+    return ret;
+}
+
+#include <errno.h>
+
+bool tcpSendBuffer(const std::string ip, int port, int id, const std::string caps)
+{
+    bool ret = false;
+    LOG_INFO("got ip=" << ip << " port=" << port << " id=" << 
+            id << " caps=" << caps);
+    MapMsg msg("buffer");
+
+    TcpServer tcp(port);
+    msg["str"] = caps;
+    msg["id"] = id;
+
+    const int MAX_TRIES = 100;
+
+    std::string msg_str;
+    msg.stringify(msg_str);
+    for(int i = 0; i < MAX_TRIES; ++i)
+    {
+        if(MsgThread::isQuitted())
+            break;
+        try
+        {
+            ret = tcp.socket_connect_send(ip, msg_str);
+            if(ret)
+                break;
+        }
+        catch(ErrorExcept e)
+        {
+           if(e.errno_ == ECONNREFUSED ) 
+               LOG_DEBUG("GOT ECONNREFUSED");
+           else
+               break;
+        }
+        usleep(100000);
+    }
+    return ret;
+}
+
+#endif

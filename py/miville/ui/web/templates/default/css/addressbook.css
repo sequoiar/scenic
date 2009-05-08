@@ -1,0 +1,98 @@
+#adb_list {
+	height: 100px;
+}
+
+.conn_connected {
+	background-image: url(/img/network-transmit-receive.png);
+}
+
+.streaming {
+	background-image: url(/img/mail-send-receive.png);
+}
+
+#adb_add {
+	float: left;
+	width: 22px;
+	height: 22px;
+	background-image: url(/img/list-add.png);
+	background-repeat: no-repeat;
+}
+
+#adb_remove {
+	float: left;
+	width: 22px;
+	height: 22px;
+	background-image: url(/img/list-remove.png);
+	background-repeat: no-repeat;
+}
+
+#adb_join {
+	position: absolute;
+	right: 0px;
+	margin-right: 32px;
+}
+
+#adb_fields {
+	clear: both;
+	font-size: 11px;
+	text-align: right;
+}
+
+#adb_fields input {
+	padding: 1px 2px;
+}
+
+.button:hover {
+	cursor: pointer;
+}
+
+div.button:hover {
+	background-color: #d2dce5;
+}
+
+div.button_disabled:hover {
+	cursor: default;
+	background-color: transparent;
+}
+
+#adb_status {
+	height: 22px;
+	line-height: 22px;
+	font-size: 10px;
+}
+
+#adb_status_icon {
+	float: left;
+	height: 22px;
+	width: 0px;
+}
+
+li.auto_created {
+	font-style: italic;
+	color: #414141;
+}
+
+#adb_auto_answer_cell {
+	text-align: left;
+}
+
+#adb_auto_answer_cell input {
+	margin: 0;
+}
+
+#adb_auto_answer_cell label {
+	position: relative;
+	top: -3px;
+}
+
+.closeSticky.button {
+	border: 1px #cdcdcd solid;
+	height: 18px;
+	background-color: #b2b2b2;
+	padding: 0 5px;
+	line-height: 30px;
+	font-size: 10px;
+	font-weight: bold;
+	margin: 0px 0px 0px 10px;
+}
+

@@ -1,5 +1,7 @@
 /* GTHREAD-QUEUE-PAIR - Library of Thread Queue Routines for GLIB
- * Copyright 2008  Koya Charles & Tristan Matthews
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,12 +19,10 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <glib.h>
-#include <iostream>
+#include "util.h"
 #include "baseThread.h"
 #include "stdMsg.h"
-#include "optionArgs.h"
-#include "logWriter.h"
+#include "gutil.h"
 
 typedef QueuePair_<StdMsg> QueuePair;
 
@@ -86,7 +86,7 @@ int my_main (int argc, char** argv)
             break;
         }
     }
-    std::cout << "Done!" << std::endl;
+    LOG_INFO("Done!");
     return 0;
 }
 

@@ -1,5 +1,7 @@
 // mediaBase.h
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -20,34 +22,19 @@
 #ifndef _MEDIA_BASE_H_
 #define _MEDIA_BASE_H_
 
-
-class LocalBase     // local bins
-{
-    public:
-        virtual void init();
-        LocalBase(){};
-        virtual ~LocalBase(){};
-
-    private:
-        virtual void init_source() = 0;
-        virtual void init_sink() = 0;
-
-        LocalBase(const LocalBase&);     //No Copy Constructor
-        LocalBase& operator=(const LocalBase&);     //No Assignment Operator
-};
-
-
 class SenderBase 
 {
     public: 
         void init();
-        SenderBase(){};
+        SenderBase() : initialized_(false) {};
         virtual ~SenderBase(){};
 
+        virtual std::string getCaps() const = 0;
     private:
         virtual void init_source() = 0;
         virtual void init_codec() = 0;
         virtual void init_payloader() = 0;
+        bool initialized_;
 
         SenderBase(const SenderBase&);     //No Copy Constructor
         SenderBase& operator=(const SenderBase&);     //No Assignment Operator
@@ -57,13 +44,14 @@ class ReceiverBase
 {
     public: 
         void init();
-        ReceiverBase(){};
+        ReceiverBase() : initialized_(false) {};
         virtual ~ReceiverBase(){};
 
     private:
         virtual void init_codec() = 0;
         virtual void init_depayloader() = 0;
         virtual void init_sink() = 0;
+        bool initialized_;
 
         ReceiverBase(const ReceiverBase&);     //No Copy Constructor
         ReceiverBase& operator=(const ReceiverBase&);     //No Assignment Operator

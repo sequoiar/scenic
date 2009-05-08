@@ -1,91 +1,114 @@
-// audioSource.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews
-//
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
+/* audioSource.cpp
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
+ *
+ * This file is part of [propulse]ART.
+ *
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-#include <string>
-#include <sstream>
-#include <cassert>
+#include "util.h"
+
 #include "gstLinkable.h"
-#include "logWriter.h"
 #include "audioSource.h"
 #include "audioConfig.h"
 #include "jackUtils.h"
-#include "raw1394Util.h"
 #include "pipeline.h"
 #include "alsa.h"
+#include "dv1394.h"
+#include "fileSource.h"
 
+#include <iostream>
 
+/// Constructor 
+AudioSource::AudioSource(const AudioSourceConfig &config) : 
+    config_(config), 
+    source_(0)
+{}
 
 void AudioSource::init()
 {
-    init_source();
     sub_init();
-    link_elements();
 }
 
-
-void AudioSource::init_source()
+/// Initialize source_
+void AudioSource::sub_init()
 {
-    sources_.push_back(Pipeline::Instance()->makeElement(config_.source(), NULL));
-    aconvs_.push_back(Pipeline::Instance()->makeElement("audioconvert", NULL));
+    source_ = Pipeline::Instance()->makeElement(config_.source(), NULL);
 }
 
 
+/// Destructor 
 AudioSource::~AudioSource()
+{
+    Pipeline::Instance()->remove(&source_);
+}
+
+
+std::string AudioSource::getCapsFilterCapsString()
+{
+    // force proper number of channels on output
+    std::ostringstream capsStr;
+    capsStr << "audio/x-raw-int, channels=" << config_.numChannels() 
+        << ", clock-rate=" << Pipeline::SAMPLE_RATE;
+    LOG_DEBUG("Audiosource caps = " << capsStr.str());
+    return capsStr.str();
+}
+
+
+void AudioSource::initCapsFilter(GstElement* &aconv, GstElement* &capsFilter)
+{
+    // setup capsfilter
+    GstCaps *caps = 0;
+    caps = gst_caps_from_string(getCapsFilterCapsString().c_str());
+    tassert(caps);
+    capsFilter = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    aconv = Pipeline::Instance()->makeElement("audioconvert", NULL);
+    g_object_set(G_OBJECT(capsFilter), "caps", caps, NULL);
+
+    gst_caps_unref(caps);
+    
+    gstlinkable::link(source_, aconv);
+    gstlinkable::link(aconv, capsFilter);
+}
+
+
+/// Constructor 
+InterleavedAudioSource::InterleavedAudioSource(const AudioSourceConfig &config) : 
+    AudioSource(config), interleave_(config_), sources_(), aconvs_()
+{}
+
+/// Destructor 
+InterleavedAudioSource::~InterleavedAudioSource() 
 {
     Pipeline::Instance()->remove(aconvs_);
     Pipeline::Instance()->remove(sources_);
 }
 
 
-void AudioSource::link_elements()
-{
-    gstlinkable::link(sources_, aconvs_);
-}
-
-
-gboolean AudioSource::base_callback(GstClock *, GstClockTime, GstClockID, gpointer user_data)
-{
-    return (static_cast<AudioSource*>(user_data)->callback());     // deferred to subclass
-}
-
-
-void InterleavedAudioSource::init()
+/// Overridden source initializer, which must initialize this object's Interleave object 
+void InterleavedAudioSource::sub_init()
 {
     interleave_.init();
-    init_source();
-    sub_init();
-    link_elements();
-}
 
-
-void InterleavedAudioSource::init_source()
-{
     for (int channelIdx = 0; channelIdx < config_.numChannels(); channelIdx++)
     {
         sources_.push_back(Pipeline::Instance()->makeElement(config_.source(), NULL));
         aconvs_.push_back(Pipeline::Instance()->makeElement("audioconvert", NULL));
     }
-}
-
-
-void InterleavedAudioSource::link_elements()
-{
     gstlinkable::link(sources_, aconvs_);
     gstlinkable::link(aconvs_, interleave_);
 }
@@ -95,10 +118,19 @@ const double AudioTestSource::FREQUENCY[2][8] =
 {{200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0},
     {300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0, 1000.0}};
 
+/// Constructor 
+AudioTestSource::AudioTestSource(const AudioSourceConfig &config) : 
+    InterleavedAudioSource(config), 
+    clockId_(0), 
+    offset_(0) 
+{}
 
-gboolean AudioTestSource::callback()
+
+/// Asynchronous timed callback which will periodically toggle the frequency output by each channel 
+gboolean AudioTestSource::timedCallback(GstClock *, GstClockTime, GstClockID, gpointer user_data)
 {
-    toggle_frequency();
+    AudioTestSource * context = static_cast<AudioTestSource*>(user_data);
+    context->toggle_frequency();
     return TRUE;
 }
 
@@ -116,6 +148,8 @@ void AudioTestSource::toggle_frequency()
 
 void AudioTestSource::sub_init()
 {
+    InterleavedAudioSource::sub_init();
+
     GstIter src;
 
     const double GAIN = 1.0 / config_.numChannels();        // so sum of tones' amplitude equals 1.0
@@ -125,62 +159,63 @@ void AudioTestSource::sub_init()
             G_TYPE_BOOLEAN, TRUE, "width", G_TYPE_INT, 32, "depth", G_TYPE_INT, 32, "rate", G_TYPE_INT, 
             Pipeline::SAMPLE_RATE, "channels", G_TYPE_INT, 1, NULL);
 
-    // is-live must be true for clocked callback to work properly
-    for (src = sources_.begin(); src != sources_.end() && channelIdx != config_.numChannels(); ++src, ++channelIdx)
+    for (src = sources_.begin(); src != sources_.end() and channelIdx != config_.numChannels(); ++src, ++channelIdx)
     {
         GstPad *pad;
-        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", FREQUENCY[0][channelIdx], "is-live", TRUE, NULL);
-        assert(pad = gst_element_get_static_pad(*src, "src"));
-        assert(gst_pad_set_caps(pad, caps));
+        g_object_set(G_OBJECT(*src), "volume", GAIN, "freq", FREQUENCY[0][channelIdx], NULL);
+        tassert(pad = gst_element_get_static_pad(*src, "src"));
+        tassert(gst_pad_set_caps(pad, caps));
         g_object_unref(pad);
 
     }
 
     gst_caps_unref(caps);
 
-    clockId_ = Pipeline::Instance()->add_clock_callback(base_callback, this);
+    clockId_ = Pipeline::Instance()->add_clock_callback(timedCallback, this);
 }
 
-
+/// Destructor 
 AudioTestSource::~AudioTestSource()
 {
     Pipeline::Instance()->remove_clock_callback(clockId_);
 }
 
 
-AudioFileSource::AudioFileSource(const AudioSourceConfig &config) : AudioSource(config), decoders_(), loopCount_(0) 
+const int AudioFileSource::LOOP_INFINITE = -1;
+
+/// Constructor 
+AudioFileSource::AudioFileSource(const AudioSourceConfig &config) : AudioSource(config), aconv_(0), loopCount_(0) 
+{}
+
+void AudioFileSource::loop(int nTimes)
 {
-    loopCount_ = config_.loop();
+    if (nTimes < -1)
+        THROW_ERROR("Loop setting must be either >= 0 , or -1 for infinite looping");
+
+    loopCount_ = nTimes;
 }
 
 void AudioFileSource::sub_init()
 {
-    assert(config_.fileExists());
+    tassert(config_.locationExists());
 
-    g_object_set(G_OBJECT(sources_[0]), "location", config_.location(), NULL);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
+    
+    GstElement * queue = FileSource::acquireAudio(config_.location());
+    gstlinkable::link(queue, aconv_);
 
-    decoders_.push_back(Pipeline::Instance()->makeElement("decodebin", NULL));
-
-    GstIter dec = decoders_.begin();
-    GstIter aconv = aconvs_.begin();
-    for (; aconv != aconvs_.end(), dec != decoders_.end(); ++dec, ++aconv)
-    {
-        g_signal_connect(*dec, "new-decoded-pad",
-                G_CALLBACK(AudioFileSource::cb_new_src_pad),
-                static_cast<void *>(*aconv));
-    }
     // register this filesrc to handle EOS msg and loop if specified
     Pipeline::Instance()->subscribe(this);
 }
 
 
-
+/// Handles EOS signal from bus, which may mean repeating playback of the file 
 bool AudioFileSource::handleBusMsg(_GstMessage *msg)
 {
     if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_EOS)
     {
         LOG_DEBUG("Got end of stream, here's where we should playback if needed");
-        if (loopCount_ > 0 || loopCount_ == AudioSourceConfig::LOOP_INFINITE)
+        if (loopCount_ > 0 or loopCount_ == AudioFileSource::LOOP_INFINITE)
         {
             LOG_DEBUG("playback about to restart, " << loopCount_ << " times to go");
             restartPlayback();
@@ -202,214 +237,115 @@ void AudioFileSource::restartPlayback()
         loopCount_--;
 }
 
-void AudioFileSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, gboolean /*last*/,
-        gpointer data)
-{
-    if (gst_pad_is_linked(srcPad))
-    {
-        LOG_DEBUG("Pad is already linked.");
-        return;
-    }
-    else if (gst_pad_get_direction(srcPad) != GST_PAD_SRC)
-    {
-        LOG_DEBUG("Pad is not a source");
-        return;
-    }
-    GstElement *sinkElement = static_cast<GstElement*>(data);
-    GstStructure *str;
-    GstPad *sinkPad;
-    GstCaps *caps;
 
-    sinkPad = gst_element_get_static_pad(sinkElement, "sink");
-    if (GST_PAD_IS_LINKED(sinkPad))
-    {
-        g_object_unref(sinkPad);
-        return;
-    }
-    /* check media type */
-    caps = gst_pad_get_caps(srcPad);
-    str = gst_caps_get_structure(caps, 0);
-    if (!g_strrstr(gst_structure_get_name(str), "audio")) {
-        gst_caps_unref(caps);
-        gst_object_unref(srcPad);
-        return;
-    }
-    gst_caps_unref(caps);
-
-    assert(gstlinkable::link_pads(srcPad, sinkPad));
-    gst_object_unref(sinkPad);
-}
-
-
-void AudioFileSource::link_elements()
-{
-    gstlinkable::link(sources_, decoders_);
-}
-
-
+/// Destructor 
 AudioFileSource::~AudioFileSource()
 {
-    Pipeline::Instance()->remove(decoders_);
+    Pipeline::Instance()->remove(&aconv_);
+    FileSource::releaseAudio(config_.location());
 }
 
 
+/// Constructor 
+AudioAlsaSource::AudioAlsaSource(const AudioSourceConfig &config) : 
+    AudioSource(config), capsFilter_(0), aconv_(0)
+{}
+
+/// Destructor 
 AudioAlsaSource::~AudioAlsaSource()
 {
+    Pipeline::Instance()->remove(&aconv_);
     Pipeline::Instance()->remove(&capsFilter_);
 }
 
-
 void AudioAlsaSource::sub_init()
 {
-    if (Jack::is_running())
-        THROW_ERROR("Jack is running, ALSA unavailable");
-    g_object_set(G_OBJECT(sources_[0]), "device", Alsa::DEVICE_NAME, NULL);
-    
-    // otherwise alsasrc defaults to 2 channels when using plughw
-    std::ostringstream capsStr;
-    capsStr << "audio/x-raw-int, channels=" << config_.numChannels() 
-        << ", clock-rate=" << Pipeline::SAMPLE_RATE;
-         
-    GstCaps *alsaCaps = gst_caps_from_string(capsStr.str().c_str());
-    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
-    g_object_set(G_OBJECT(capsFilter_), "caps", alsaCaps, NULL);
+    AudioSource::sub_init();
 
-    gst_caps_unref(alsaCaps);
+    if (config_.hasDeviceName())
+        g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
+    else
+        g_object_set(G_OBJECT(source_), "device", alsa::DEVICE_NAME, NULL);
+
+    initCapsFilter(aconv_, capsFilter_);
 }
 
 
-void AudioAlsaSource::link_elements()
-{
-    gstlinkable::link(sources_, aconvs_);
-    gstlinkable::link(aconvs_[0], capsFilter_);
-}
+/// Constructor 
+AudioPulseSource::AudioPulseSource(const AudioSourceConfig &config) : 
+    AudioSource(config), 
+    capsFilter_(0),
+    aconv_(0)
+{}
 
 
+/// Destructor 
 AudioPulseSource::~AudioPulseSource()
 {
+    Pipeline::Instance()->remove(&aconv_);
     Pipeline::Instance()->remove(&capsFilter_);
 }
 
 
 void AudioPulseSource::sub_init()
 {
-    std::ostringstream capsStr;
-    g_object_set(G_OBJECT(sources_[0]), "device", Alsa::DEVICE_NAME, NULL);
-    capsStr << "audio/x-raw-int, channels=" << config_.numChannels()
-        << ", clock-rate=" << Pipeline::SAMPLE_RATE;
-         
-    GstCaps *pulseCaps = gst_caps_from_string(capsStr.str().c_str());
-    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
-    g_object_set(G_OBJECT(capsFilter_), "caps", pulseCaps, NULL);
-    gst_caps_unref(pulseCaps);
+    AudioSource::sub_init();
+
+    initCapsFilter(aconv_, capsFilter_);
 }
 
 
-void AudioPulseSource::link_elements()
+
+/// Constructor 
+AudioJackSource::AudioJackSource(const AudioSourceConfig &config) : 
+    AudioSource(config), capsFilter_(0), aconv_(0)
 {
-    gstlinkable::link(sources_, aconvs_);
-    gstlinkable::link(aconvs_[0], capsFilter_);
 }
 
+
+/// Destructor 
+AudioJackSource::~AudioJackSource()
+{
+    Pipeline::Instance()->remove(&aconv_);
+    Pipeline::Instance()->remove(&capsFilter_);
+}
 
 
 void AudioJackSource::sub_init()
 {
-    if (!Jack::is_running())
-        THROW_ERROR("Jack is not running");
+    AudioSource::sub_init();
 
-#if 0
-    // turn off autoconnect to avoid Jack-killing input-output feedback loop, i.e.
-    // jackOut -> jackIn -> jackOut ->jackIn.....
-    for (GstIter src = sources_.begin(); src != sources_.end(); ++src)
-        g_object_set(G_OBJECT(*src), "connect", 0, NULL);
-#endif
-
-    if (Pipeline::SAMPLE_RATE != Jack::samplerate())
-        THROW_CRITICAL("Jack's sample rate of " << Jack::samplerate()
-                << " does not match default sample rate " << Pipeline::SAMPLE_RATE);
+    // use auto-forced connect mode if available
+    if (Jack::autoForcedSupported(source_))
+        g_object_set(G_OBJECT(source_), "connect", 2, NULL);
+    
+    initCapsFilter(aconv_, capsFilter_);
 }
 
 
+/// Constructor 
+AudioDvSource::AudioDvSource(const AudioSourceConfig &config) : 
+    AudioSource(config), 
+    queue_(0),
+    aconv_(0)
+{}
+
+
+/// Destructor 
 AudioDvSource::~AudioDvSource()
 {
-    if (Pipeline::Instance()->findElement(config_.source()) != NULL)
-        Pipeline::Instance()->remove(sources_);
-    if (Pipeline::Instance()->findElement("dvdemux") != NULL)
-        Pipeline::Instance()->remove(&demux_);
-    sources_[0] = NULL;
     Pipeline::Instance()->remove(&queue_);
-}
-
-void AudioDvSource::init_source()
-{
-    if (!Raw1394::cameraIsReady())
-        THROW_ERROR("Camera is not ready.");
-
-    sources_.push_back(Pipeline::Instance()->findElement(config_.source()));  // see if it already exists from VideoDvSource
-    dvIsNew_ = sources_[0] == NULL;
-
-    if (dvIsNew_)
-        sources_[0] = Pipeline::Instance()->makeElement(config_.source(), config_.source());
-
-    aconvs_.push_back(Pipeline::Instance()->makeElement("audioconvert", NULL));
+    Dv1394::Instance()->unsetAudioSink();
 }
 
 
 void AudioDvSource::sub_init()
 {
-    demux_ = Pipeline::Instance()->findElement("dvdemux");
-    dvIsNew_ = demux_ == NULL;
-    if (dvIsNew_)
-        demux_ = Pipeline::Instance()->makeElement("dvdemux", "dvdemux");
-    else
-        assert(demux_);
-    
     queue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
-    // demux srcpad must be linked to queue sink pad at runtime
-    g_signal_connect(demux_, "pad-added",
-            G_CALLBACK(AudioDvSource::cb_new_src_pad),
-            static_cast<void *>(queue_));
+    // Now the Dv1394 will be able to link this queue to the dvdemux when the audio pad is created
+    Dv1394::Instance()->setAudioSink(queue_);
+    gstlinkable::link(queue_, aconv_);
 }
-
-
-void AudioDvSource::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, void *data)
-{
-    if (std::string("video") == gst_pad_get_name(srcPad))
-    {
-        LOG_DEBUG("Ignoring video stream from DV");
-        return;
-    }
-    else if (std::string("audio") == gst_pad_get_name(srcPad))
-    {
-        LOG_DEBUG("Got audio stream from DV");
-    }
-    else{
-        LOG_DEBUG("Ignoring unknown stream from DV");
-        return;
-    }
-    GstElement *sinkElement = static_cast<GstElement *>(data);
-    GstPad *sinkPad;
-
-    sinkPad = gst_element_get_static_pad(sinkElement, "sink");
-
-    if (GST_PAD_IS_LINKED(sinkPad))
-    {
-        g_object_unref(sinkPad);        // don't link more than once
-        return;
-    }
-    LOG_DEBUG("AudioDvSource: linking new srcpad to sinkpad.");
-    assert(gstlinkable::link_pads(srcPad, sinkPad));
-    gst_object_unref(sinkPad);
-}
-
-
-void AudioDvSource::link_elements()
-{
-    if (dvIsNew_)
-        gstlinkable::link(sources_[0], demux_);
-    gstlinkable::link(queue_, aconvs_[0]);
-}
-
 

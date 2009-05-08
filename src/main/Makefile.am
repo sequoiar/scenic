@@ -1,9 +1,12 @@
-include $(top_srcdir)/src/globals.mak
+include $(top_srcdir)/globals.mak
 
-bin_PROGRAMS = allMain
+bin_PROGRAMS = milhouse
 
-allMain_SOURCES = main.cpp mainTcp.cpp sropulpof.cpp
+milhouse_SOURCES = milhouse.cpp mainTcp.cpp msgThreadFactory.cpp msgThreadFactory.h
 
-LDADD = $(src)/gutil/libGUtil.a $(src)/gst/control/libgstthread.a  $(GLIB_LIBS) $(ALL_GST_LIBS) $(JACK_LIBS) $(src)/tcp/libtcp.a $(src)/gst/engine/libgst.a $(LIBLO_LIBS) $(GTK_LIBS) $(LIBUTIL) $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS)
+milhouse_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(GTK_CFLAGS) $(GL_CFLAGS) $(GLU_CFLAGS) -D SVNVERSION=\"$(shell svnversion)\"
+LDADD = $(src)/gst/control/libgstthread.a $(src)/gst/engine/libgst.a $(ALL_GST_LIBS) $(JACK_LIBS) $(src)/tcp/libtcp.a \
+		$(GTK_LIBS) $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(src)/gutil/libgutil.a $(src)/boost/libbutil.a $(BOOST_ASIO_LIB) \
+		$(BOOST_LDFLAGS) $(BOOST_THREAD_LIB) $(BOOST_SYSTEM_LIB)  $(LIBUTIL)      
 
-allMain_CPPFLAGS= $(AM_CPPFLAGS)  $(GST_CFLAGS) $(GTK_CFLAGS) $(GL_CFLAGS) $(GLU_CFLAGS)
+#CXXFLAGS += -O3

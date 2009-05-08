@@ -1,5 +1,7 @@
 /* exports.cpp
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -18,27 +20,36 @@
  *
  */
 
-/** \file
- *      This file exposes class to python 
- *
- *
- *      Exposes object modules to python interpreter.
- *
- */
-
 #include <iostream>
 #include <Python.h>
 #include <boost/python.hpp>
+#define USE_SMART_PTR //Factories return a shared_ptr
+#include "util.h"
+#include "gutil.h"
 
 
 using namespace boost::python;
 
-#if 0
-BOOST_PYTHON_MODULE(libpyhello)
+#include "tcp/tcpThread.h"
+#include "pyMsgThread.h"
+
+/** 
+ * This file exposes class to python 
+ 
+ * Exposes object modules to python interpreter, available by calling "from libmilhouse import *".
+ *
+ */
+BOOST_PYTHON_MODULE(milhouse)
 {
-    class_ < Hello > ("Hello")
-        .def("greet", &Hello::greet)
-        .def("set_name",&Hello::set_name);
+
+    class_ < dictMessageHandler, boost::noncopyable, boost::shared_ptr<HandlerWrapper> > ("DictHandler") ;
+    class_ < MsgWrapConfig > ("MsgWrapConfig", no_init) ;
+    class_ < TcpWrapConfig, bases<MsgWrapConfig> >("TcpWrapConfig",init <int, bool> ()) ;
+    class_ < GstWrapConfig, bases<MsgWrapConfig> >("GstWrapConfig") ;
+    class_ < ThreadWrap, boost::noncopyable > ("ThreadWrap",init < MsgWrapConfig*, dictMessageHandler* > ())
+        .def("send", &ThreadWrap::send) ;
+
+    def("tcpSendBuffer", tcpSendBuffer);
+    def("setHandler", set_handler); 
 }
-#endif
 

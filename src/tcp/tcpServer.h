@@ -1,5 +1,7 @@
 /* tcpServer.h
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -25,7 +27,10 @@
 
 #define BUFFSIZE     16
 
-/// The tcp server class 
+/** A simple server in the internet domain using TCP
+ *
+ *  The port number is passed as an argument
+ */
 class TcpServer
 {
     public:
@@ -44,6 +49,9 @@ class TcpServer
         bool set_non_blocking(int sockfd);
 
         bool connected(){return connected_;}
+
+        int getFD(){ return newsockfd;}
+        ~TcpServer(){ close(); }
     private:
         int sockfd, newsockfd;
 

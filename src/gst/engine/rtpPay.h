@@ -1,5 +1,7 @@
 // rtpPay.h
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -30,7 +32,7 @@ class RtpPay : public GstLinkableFilter
 
         RtpPay() : rtpPay_(0) {}
         virtual void init() = 0;
-        ~RtpPay();
+        virtual ~RtpPay();
         
         _GstElement *srcElement() { return rtpPay_; }
         _GstElement *sinkElement() { return rtpPay_; }
@@ -45,15 +47,39 @@ class RtpPay : public GstLinkableFilter
         RtpPay& operator=(const RtpPay&);     //No Assignment Operator
 };
 
+class _GtkAdjustment;
+class _GtkWidget;
 
 class Payloader : public RtpPay
 {
-    protected: 
-        // amount of time to let Use max-ptime to limit the amount of 
-        // vorbis packets in an RTP packet. Reduces latency
-        static const long long MAX_PTIME;
+    public:
+        static void enableControl();
+    protected:
         void init() = 0;
+        virtual ~Payloader();
+        static const long long MAX_PTIME;
+
+    private:
+        // Use max-ptime to limit the amount of 
+        // encoded media packets in an RTP packet. Reduces latency
+        void setMTU(unsigned long long mtu);
+        // hardcoded in gst-plugins-base/gst-libs/gst/rtp/gstbasertppayload.c
+        static const unsigned long long INIT_MTU = 1400;    
+        static const unsigned long long MIN_MTU = 28;    
+        static const unsigned long long MAX_MTU = 14000;
+
+        void createMTUControl();
+        static void updateMTUCb(_GtkAdjustment *adj, void *data);
+
+        static bool controlEnabled_;
+        static _GtkWidget *control_;
 };
+
+
+class Depayloader : public RtpPay
+{
+};
+
 
 class H264Payloader : public Payloader
 {
@@ -62,7 +88,35 @@ class H264Payloader : public Payloader
 };
 
 
-class H264Depayloader : public RtpPay
+class H264Depayloader : public Depayloader
+{
+    private: 
+        void init();
+};
+
+
+class H263Payloader : public Payloader
+{
+    private: 
+        void init();
+};
+
+
+class H263Depayloader : public Depayloader
+{
+    private: 
+        void init();
+};
+
+
+class Mpeg4Payloader : public Payloader
+{
+    private: 
+        void init();
+};
+
+
+class Mpeg4Depayloader : public Depayloader
 {
     private: 
         void init();
@@ -76,7 +130,7 @@ class VorbisPayloader : public Payloader
 };
 
 
-class VorbisDepayloader : public RtpPay
+class VorbisDepayloader : public Depayloader 
 {
     private: 
         void init();
@@ -89,7 +143,7 @@ class L16Payloader : public Payloader
         void init();
 };
 
-class L16Depayloader : public RtpPay
+class L16Depayloader : public Depayloader 
 {
     private: 
         void init();
@@ -102,7 +156,7 @@ class MpaPayloader : public Payloader
         void init();
 };
 
-class MpaDepayloader : public RtpPay
+class MpaDepayloader : public Depayloader
 {
     private: 
         void init();

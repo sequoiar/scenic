@@ -1,0 +1,5 @@
+Medias Documentation
+====================
+
+This page contains the Medias Package documentation.
+

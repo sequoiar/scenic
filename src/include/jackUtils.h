@@ -1,5 +1,7 @@
 /* jackUtils.h
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  * This file is part of [propulse]ART.
  *
  * [propulse]ART is free software: you can redistribute it and/or modify
@@ -20,12 +22,18 @@
 #ifndef _JACK_UTILS_H_
 #define _JACK_UTILS_H_
 
+class _GstElement;
+
 /// Utility functions for jack related issues. 
 namespace Jack {
-
+    void ensureReady();
     bool is_running();
+    bool autoForcedSupported(_GstElement *jackElement);
     unsigned int samplerate();
-
+    unsigned int framesPerPeriod();
+    unsigned long long minBufferTime();
+    unsigned long long safeBufferTime();
+    const unsigned long long SAFETY_OFFSET = 10000LL;   // extra buffering
 }
 
 #endif //  _JACK_UTILS_H_

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Sropulpof
+# Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
@@ -11,32 +11,42 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# Sropulpof is distributed in the hope that it will be useful,
+# Miville is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+# along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 from twisted.trial import unittest
 import os
 import shutil
 import copy
+import tempfile
 
-import addressbook
-from addressbook import AddressBook, Contact, ip_range
-from errors import AddressBookError
-from utils.i18n import to_utf
-import utils.log
-
+from miville import addressbook
+from miville.addressbook import AddressBook, Contact, ip_range
+from miville.errors import AddressBookError, InstallFileError
+from miville.utils.i18n import to_utf
+import miville.utils.log
+# print os.environ['LANG']
 ALPHABET = 'abcdefghijklmnopqrstuvwxyz_@ ABCDEFÙ1234\'2345-678"9."0!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ~'
 UALPHABET = u'2abcdefghijklmnopqrstuvwxyz_@ ABCDEFÙ1234\'2345-678"9."0!?=+%$()[]{}#<>€£éèêëà§çπ‡Ò∂ƒﬁ~'
 
 del addressbook.log
-addressbook.log = utils.log.start('error', 1, 0, 'adb')
+addressbook.log = miville.utils.log.start('error', 1, 0, 'adb')
 
+# Let's create a temporary folder for the miville home, to store the addressbook.
+from test.lib_clientserver import create_tmp_dir
+miville.utils.common.MIVILLE_HOME = create_tmp_dir()
 
+class DummyApi(object):
+    def get_contacts(self, caller):
+        pass
+    
+    def get_default_port(self, connector):
+        return 2222
             
 class Test_1_Ip_range(unittest.TestCase):
     
@@ -84,19 +94,19 @@ class Test_2_Contact(unittest.TestCase):
             
     def test_2_kind_address(self):
         addresses = (('', False),
-                     ('240.123.123.123', True, 'ip'),
-                     ('23.123.45.222', True, 'ip'),
+                     ('240.123.123.123', True, 'ip', 'basic'),
+                     ('23.123.45.222', True, 'ip', 'basic'),
                      ('23.423.45.222', False),
-                     ('233.123.45.222', True, 'multicast'),
-                     ([], True, 'group'),
-                     ('345@23.123.45.222', True, 'sip_ip'),
+                     ('233.123.45.222', True, 'multicast', 'basic'),
+                     ([], True, 'group', None),
+                     ('345@23.123.45.222', True, 'sip_ip', 'sip'),
                      ('gros toto@23.123.45.222', False),
-                     ('etienne@23.123.45.222', True, 'sip_ip'),
-                     ('George@amuse.toi.com', True, 'sip_name'),
+                     ('etienne@23.123.45.222', True, 'sip_ip', 'sip'),
+                     ('George@amuse.toi.com', True, 'sip_name', 'sip'),
                      ('Éloi@23.123.45.222', False),
                      (u'Étienne@23.123.45.222', False),
-                     (u'23.123.45.222', True, 'ip'),
-                     (u'Jean@23.123.45.222', True, 'sip_ip')
+                     (u'23.123.45.222', True, 'ip', 'basic'),
+                     (u'Jean@23.123.45.222', True, 'sip_ip', 'sip')
                      )
         
         for address in addresses:
@@ -109,6 +119,7 @@ class Test_2_Contact(unittest.TestCase):
             else:
                 self.assertEqual(contact.kind, address[2], 'Bad kind for this address: %s. (%s, %s)' % (address[0], contact.kind, address[2]))
                 self.assertEqual(contact.address, address[0], 'In and out not matching for this address: %s -> %s.' % (address[0], contact.kind))
+                self.assertEqual(contact.connector, address[3], 'In and out not matching for this connector: %s -> %s.' % (address[0], contact.kind))
                 del contact
                 
             self.assertEqual(test_result, address[1], 'Problem validating address: %s. (%s, %s)' % (address[0], test_result, address[1]))
@@ -212,31 +223,28 @@ class Test_3_AddressBook(unittest.TestCase):
                   }
     
     base_file = 'test'
+    
+    api = DummyApi()
 
     def setUp(self):
         self.orig_home = os.environ['HOME']
-        os.environ['HOME'] = '/var/tmp'
+        self.tmp_dir = tempfile.mkdtemp()
+        os.environ['HOME'] = self.tmp_dir
 
     def tearDown(self):
-        for filename in self.filenames:
-            strip_filename = filename.lstrip()
-            if strip_filename:
-                shutil.rmtree(os.environ['HOME'] + '/.' + strip_filename, True)
-        shutil.rmtree(os.environ['HOME'] + '/.' + self.base_file, True)
-        os.environ['HOME'] = self.orig_home        
+        os.environ['HOME'] = self.orig_home
+        shutil.rmtree(self.tmp_dir, True)      
         
     def test_1_init(self):
         for filename, result in self.filenames.items():
-            strip_filename = filename.lstrip()
+            strip_filename = filename.strip()
             try:
-                adb = AddressBook(filename)
+                adb = AddressBook(filename, self.api)
                 if adb:
                     test_result = True
-            except AddressBookError:
+            except InstallFileError:
                 test_result = False
             else:
-                adb_filename = to_utf(os.environ['HOME'] + '/.' + strip_filename + '/' + strip_filename + '.adb')
-                self.assertEqual(adb.filename, adb_filename, 'In and out filename not matching: %s -> %s' % (adb_filename, adb.filename))
                 del adb
             
             self.assertEqual(result, test_result, 'Problem validating AddressBook creation. <%s> %s:%s' % (filename, result, test_result))
@@ -244,8 +252,8 @@ class Test_3_AddressBook(unittest.TestCase):
     def test_2_read_write_add(self):
         for filename, result in self.filenames.items():
             try:
-                adb = AddressBook(filename)
-            except AddressBookError:
+                adb = AddressBook(filename, self.api)
+            except InstallFileError:
                 pass
             else:
                 result = adb.add('Jean', []) # Should add at least one contact to write the file. Very simple contact.
@@ -262,18 +270,18 @@ class Test_3_AddressBook(unittest.TestCase):
                         
     def test_3_select(self):
         try:
-            adb = AddressBook(self.base_file)
+            adb = AddressBook(self.base_file, self.api)
             adb.add('Jules', [])
         except AddressBookError:
             pass
         else:
             self.assertRaises(AddressBookError, adb.select, 'Marion')
             adb.select('Jules')
-            self.assertEqual(adb.contacts['_selected'], 'Jules', 'Selection of contact did not work: selected \'Jules\' got %s' % adb.contacts['_selected'])
+            self.assertEqual(adb.selected, 'Jules', 'Selection of contact did not work: selected \'Jules\' got %s' % adb.selected)
             
     def test_4_get_current(self):
         try:
-            adb = AddressBook(self.base_file)
+            adb = AddressBook(self.base_file, self.api)
             adb.add('Jules', [])
         except AddressBookError:
             pass
@@ -284,7 +292,7 @@ class Test_3_AddressBook(unittest.TestCase):
             
     def test_5_delete(self):
         try:
-            adb = AddressBook(self.base_file)
+            adb = AddressBook(self.base_file, self.api)
             adb.add('Jules', [])
             adb.select('Jules')
             adb.add('Guenièvre Temps-Dur', [])
@@ -294,36 +302,16 @@ class Test_3_AddressBook(unittest.TestCase):
             self.assertRaises(AddressBookError, adb.delete, 'Vlimeux')
             adb.delete('Jules')
             self.assertNotIn('Jules', adb.contacts)
-            self.assertEqual(adb.contacts['_selected'], None, 'After removing the selected contact, selected should be None, got %s' % adb.contacts['_selected'])
+            self.assertEqual(adb.selected, None, 'After removing the selected contact, selected should be None, got %s' % adb.selected)
             self.assertRaises(AddressBookError, adb.delete)
             adb.select('Guenièvre Temps-Dur')
             adb.delete()          
             self.assertNotIn('Guenièvre Temps-Dur', adb.contacts)
-            self.assertEqual(adb.contacts['_selected'], None, 'After removing the selected contact, selected should be None, got %s' % adb.contacts['_selected'])
+            self.assertEqual(adb.selected, None, 'After removing the selected contact, selected should be None, got %s' % adb.selected)
             
-    def test_6_duplicate(self):
+    def test_6_modify(self):
         try:
-            adb = AddressBook(self.base_file)
-            adb.add('Jules', [])
-            adb.add('Guenièvre Temps-Dur', [])
-        except AddressBookError:
-            pass
-        else:
-            self.assertRaises(AddressBookError, adb.duplicate)
-            adb.select('Jules')
-            adb.duplicate()
-            self.assertIn('Jules' + adb.dup_suffix, adb.contacts)
-            self.assertRaises(AddressBookError, adb.duplicate, 'Vlimeux')
-            adb.duplicate('Guenièvre Temps-Dur')
-            self.assertIn(to_utf('Guenièvre Temps-Dur') + adb.dup_suffix, adb.contacts)
-            
-            adb.duplicate(new_name='dup_test')
-            self.assertIn('dup_test', adb.contacts)
-            self.assertRaises(AddressBookError, adb.duplicate, new_name='Jules')
-        
-    def test_7_modify(self):
-        try:
-            adb = AddressBook(self.base_file)
+            adb = AddressBook(self.base_file, self.api)
             adb.add('Jules', [])
             adb.add('Guenièvre Temps-Dur', [])
         except AddressBookError:
@@ -332,9 +320,9 @@ class Test_3_AddressBook(unittest.TestCase):
             self.assertRaises(AddressBookError, adb.modify)
             adb.select('Jules')
             orig_contact = copy.copy(adb.get_current())
-            adb.modify()
+            self.assertRaises(AddressBookError, adb.modify)
             self.assertEqual(orig_contact.__dict__, adb.get_current().__dict__, 'The contact is not supposed to be modify but it is.')
-            adb.modify('Jules')
+            self.assertRaises(AddressBookError, adb.modify, 'Jules')
             self.assertEqual(orig_contact.__dict__, adb.get_current().__dict__, 'The contact is not supposed to be modify but it is.')
             self.assertRaises(AddressBookError, adb.modify, 'Guenièvre Temps-Dur', 'Jules')
             orig_contact = adb.contacts[u'Guenièvre Temps-Dur']

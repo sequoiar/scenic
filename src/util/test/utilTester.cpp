@@ -1,5 +1,4 @@
-#include <cassert>
-#include "logWriter.h"
+#include "util.h"
 #include "mapMsg.h"
 
 int main(int, char**)
@@ -12,6 +11,6 @@ int main(int, char**)
     MapMsg msg("try");
     msg["vector"] = v;
     v2 = msg["vector"];
-    assert(v == v2);
+    tassert(v == v2);
     return 0;
 }

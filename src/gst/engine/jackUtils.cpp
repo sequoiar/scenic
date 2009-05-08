@@ -1,26 +1,32 @@
+/* jackUtils.cpp
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
+ *
+ * This file is part of [propulse]ART.
+ *
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-// jackUtils.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews
-//
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
+#include "util.h"
 
 #include <jack/jack.h>
+#include <gst/gst.h>
+
 #include "jackUtils.h"
-#include "logWriter.h"
+#include "pipeline.h"
 
 bool Jack::is_running()
 {
@@ -33,7 +39,7 @@ bool Jack::is_running()
 
     client = jack_client_open ("AudioJackSource", JackNoStartServer, &status);
 
-    if (client == NULL && (status & JackServerFailed))
+    if (client == NULL and (status & JackServerFailed))
     {
         LOG_DEBUG("JACK server not running");
         return false;
@@ -104,5 +110,68 @@ unsigned int Jack::samplerate()
     jack_client_close(client);
 
     return jackRate;
+}
+
+
+bool Jack::autoForcedSupported(GstElement *jackElement)
+{
+    GParamSpecEnum *enum_property; 
+    enum_property = G_PARAM_SPEC_ENUM(g_object_class_find_property(G_OBJECT_GET_CLASS(jackElement), "connect"));
+    GEnumClass *enum_class = enum_property->enum_class;
+    GEnumValue *enum_value;
+    gint value;
+    bool found = false;
+
+    for (value = enum_class->minimum; value <= enum_class->maximum; value++) 
+    {
+        if ((enum_value = g_enum_get_value(enum_class, value))) 
+        {
+            if (std::string("auto-forced") == enum_value->value_nick)
+                found = true;
+        }
+    }
+    if (!found)
+        LOG_WARNING("Jack element " << GST_ELEMENT_NAME(jackElement) << "is out of date, please update gst-plugins-bad");
+
+    return found;
+}
+
+
+/// Check that jack is running and is at the right sample rate
+void Jack::ensureReady()
+{
+    if (!Jack::is_running())
+        THROW_CRITICAL("Jack is not running");
+
+    if (Pipeline::SAMPLE_RATE != samplerate())
+        THROW_CRITICAL("Jack's sample rate of " << samplerate()
+                << " does not match default sample rate " << Pipeline::SAMPLE_RATE);
+}
+
+
+unsigned int Jack::framesPerPeriod() 
+{
+    if (!is_running())
+        THROW_ERROR("JACK server not running, cannot compare sample rates.");
+
+    jack_client_t *client;
+    jack_status_t status;
+    client = jack_client_open ("AudioJackSource", JackNoStartServer, &status);
+    jack_nframes_t framesPerPeriod = jack_get_buffer_size(client);
+    jack_client_close(client);
+
+    return framesPerPeriod;
+}
+
+// DEPENDS ON sample rate and frames per period, doesn't appear to depend on periods per buffer
+unsigned long long Jack::minBufferTime()
+{
+    const unsigned long long USECS_PER_SEC = 1000000LL;
+    return  ((framesPerPeriod() / static_cast<float>(samplerate())) * USECS_PER_SEC); 
+}
+
+unsigned long long Jack::safeBufferTime()
+{
+    return minBufferTime() + SAFETY_OFFSET;
 }
 

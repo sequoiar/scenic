@@ -1,5 +1,7 @@
 /* audioReceiver.h
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -20,19 +22,17 @@
 #ifndef _AUDIO_RECEIVER_H_
 #define _AUDIO_RECEIVER_H_
 
-#include <cassert>
 #include "mediaBase.h"
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "rtpReceiver.h"
 #include "audioLevel.h"
-#include "logWriter.h"
 
 class RtpPay;
 class Decoder;
 class AudioSink;
 
-/** \class AudioReceiver
+/** 
  * An audio pipeline derived from ReceiverBase that receives audio over rtp,
  * decodes/converts it as needed and pushes it to its sink.
  */
@@ -40,26 +40,18 @@ class AudioReceiver
     : public ReceiverBase
 {
     public:
-        /** Constructor parameterized by an AudioSinkConfig 
-         * and a ReceiverConfig */
         AudioReceiver(const AudioSinkConfig aConfig, 
-                      const ReceiverConfig rConfig)
-            : audioConfig_(aConfig), remoteConfig_(rConfig), session_(), 
-              gotCaps_(false),depayloader_(0), decoder_(0), level_(), sink_(0)
-        { assert(remoteConfig_.hasCodec()); }
+                      const ReceiverConfig rConfig);
 
-        /// Destructor 
         ~AudioReceiver();
 
     private:
-        /// Implementation of ReceiverBase's template method initialization 
         void init_codec();
         void init_depayloader();
         void init_level();
         void init_sink();
         
-        /// Used to set this AudioReceiver's RtpReceiver's caps 
-        void set_caps(); 
+        void setCaps(); 
 
         const AudioSinkConfig audioConfig_;
         const ReceiverConfig remoteConfig_;

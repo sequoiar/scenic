@@ -1,5 +1,7 @@
 /* alsa.h
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -22,7 +24,7 @@
 #define _ALSA_H_
 
 /// alsa device name constant 
-namespace Alsa {
+namespace alsa {
     static const char *DEVICE_NAME = "plughw:0";
 }
 

@@ -1,5 +1,7 @@
 /* tcpThread.h
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -18,11 +20,20 @@
  *
  */
 
-#include <memory>
-#include "logWriter.h"
+#ifndef _TCP_THREAD_H_
+#define _TCP_THREAD_H_
+
+#include "config.h"
+
+
+
+#ifdef HAVE_BOOST_ASIO
+
+#include "asioThread.h"
+typedef asio_thread TcpThread;
+#else
 #include "msgThread.h"
 #include "tcpServer.h"
-
 /// tcp server in a thread - also provides log message dispatching
 class TcpThread
     : public MsgThread
@@ -31,18 +42,24 @@ class TcpThread
         TcpThread(int inport, bool logF=false);
         ~TcpThread(){}
         bool send(MapMsg& msg);
-
         bool socket_connect_send(const std::string& addr, MapMsg& msg);
-
+ 
     private:
-        int main();
+        void main();
         bool gotQuit();
 
         TcpServer serv_;
         bool logFlag_;
-        std::auto_ptr<logger::Subscriber> lf_;
 
-        TcpThread(const TcpThread&);            //No Copy Constructor
-        TcpThread& operator=(const TcpThread&); //No Assignment Operator
+        ///No Copy Constructor
+        TcpThread(const TcpThread& );
+        ///No Assignment Operator
+        TcpThread& operator=(const TcpThread&); 
 };
+#endif
+
+std::string tcpGetBuffer(int port, int &id);
+bool tcpSendBuffer(std::string ip, int port, int id, std::string caps);
+
+#endif // _TCP_THREAD_H_
 

@@ -1,5 +1,7 @@
-/* GstReceiverThread.h
- * Copyright 2008 Koya Charles & Tristan Matthews 
+/* gstReceiverThread.h
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -18,12 +20,32 @@
  *
  */
 
+#ifndef _GST_RECEIVER_THREAD_H_
+#define _GST_RECEIVER_THREAD_H_
+
 #include <glib.h>
 #include <iostream>
 #include "gstThread.h"
 class ReceiverBase;
 
-/// MapMsg handler thread that calls GST media functionality
+/**MapMsg handler thread that calls GST media functionality
+ *
+ *
+ \msc 
+  miville,gst;
+
+    miville->gst [label="audio_init:"];
+    gst->miville [label="audio_init: ack=ok"];
+    miville->gst [label="video_init:"];
+    gst->miville [label="video_init: ack=ok"];
+    miville->gst [label="start:"];
+    gst->miville [label="start: ack=ok"];
+    --- [label="receiving stream(s)"];
+    miville->gst [label="stop"];
+    gst->miville [label="stop: ack=ok"];
+    --- [label="stopped receiving stream(s)"];
+ \endmsc
+*/
 class GstReceiverThread
     : public GstThread
 {
@@ -33,9 +55,12 @@ class GstReceiverThread
         ~GstReceiverThread();
     private:
         /// incomming audio_start request 
-        bool audio_start(MapMsg& msg);
+        void audio_init(MapMsg& msg);
         /// incomming video_start request 
-        bool video_start(MapMsg& msg);
+        void video_init(MapMsg& msg);
+        /// handle messages 
+        bool subHandleMsg(MapMsg&);
+        void updateJitterBuffer(MapMsg&);
         
         ReceiverBase* video_;
         ReceiverBase* audio_;
@@ -46,4 +71,6 @@ class GstReceiverThread
         GstReceiverThread& operator=(const GstReceiverThread&); 
 };
 
+
+#endif // _GST_RECEIVER_THREAD_H_
 

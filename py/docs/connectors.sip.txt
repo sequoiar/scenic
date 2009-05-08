@@ -1,0 +1,13 @@
+Sip Documentation
+=================
+
+This page contains the Sip Package documentation.
+
+The :mod:`sip` Module
+---------------------
+
+.. automodule:: connectors.sip.sip
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

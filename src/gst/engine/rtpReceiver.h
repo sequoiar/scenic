@@ -1,6 +1,8 @@
 
 // rtpReceiver.h
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -21,6 +23,7 @@
 #ifndef _RTP_RECEIVER_H_
 #define _RTP_RECEIVER_H_
 
+#include "config.h"
 #include <list>
 #include "rtpBin.h"
 
@@ -29,24 +32,39 @@ class _GstElement;
 class _GstPad;
 class RtpPay;
 
+class _GtkAdjustment;
+class _GtkWidget;
+
 class RtpReceiver
     : public RtpBin
 {
     public:
         RtpReceiver() : rtp_receiver_(0), depayloader_(0) {}
         ~RtpReceiver();
-        void set_caps(const char* capsStr);
+        void setCaps(const char* capsStr);
         void checkSampleRate();
 
         void add(RtpPay * depayloader, const ReceiverConfig & config);
+        static void setLatency(int latency);
+        static void enableControl();
 
     private:
-        static _GstPad *get_matching_sink_pad(_GstPad *srcPad);
+        static _GstPad *getMatchingDepayloaderSinkPad(_GstPad *srcPad);
+        static std::string getMediaType(_GstPad *pad);
         static void cb_new_src_pad(_GstElement * element, _GstPad * srcPad, void *data);
+        static void createLatencyControl();
+        static const int MIN_LATENCY = 1; // ms
+        static const int INIT_LATENCY = 5;   // ms
+        static const int MAX_LATENCY = 5000; // ms
 
         _GstElement *rtp_receiver_;
         _GstElement *depayloader_;
-        static std::list<_GstElement *> usedDepayloaders_;
+        static std::list<_GstElement *> depayloaders_;
+
+        static void updateLatencyCb(_GtkAdjustment *adj);
+        static bool madeControl_;
+        static _GtkWidget *control_;
+        static bool controlEnabled_;
 
         RtpReceiver(const RtpReceiver&); //No Copy Constructor
         RtpReceiver& operator=(const RtpReceiver&); //No Assignment Operator

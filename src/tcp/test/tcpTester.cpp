@@ -1,9 +1,8 @@
-#include <cassert>
+#include "util.h"
 #include <iostream>
 #include <stdlib.h>
 #include "tcp/tcpThread.h"
 #include "tcp/parser.h"
-#include "logWriter.h"
 
 int main(int argc, char** argv)
 {
@@ -23,8 +22,8 @@ int main(int argc, char** argv)
             try
             {
                 MapMsg f = queue.timed_pop(1000000);
-                std::string command;
-                if(f["command"].get(command))
+                std::string command(f.cmd());
+                if(!command.empty())
                 {
                     if(command == "quit")
                         break;

@@ -1,5 +1,7 @@
 /* main.cpp
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -18,25 +20,42 @@
  *
  */
 
-#include "gst/msgThreadFactory.h"
-#include "logWriter.h"
+#include "util.h"
+#include "msgThreadFactory.h"
 
-///Instance will register a particular MsgThread as a MapMsg handler
-class MainSubscriber
-    : public msg::Subscriber
+#include "tcp/asioThread.h"
+
+class Logger
+    : public Log::Subscriber
 {
-    MsgThread &t_;
     public:
-        MainSubscriber(MsgThread* pt)
-            : t_(*pt)
-        {}
-
-        void operator()(MapMsg& msg)
-        {
-            t_.getQueue().push(msg);
-        }
+        Logger(MsgThread& tcp)
+            : queue_(tcp.getQueue()),level_(){}
+        QueuePair& queue_;
+        void operator()(LogLevel&, std::string& msg);
+        void setLevel(int level){ level_ = level;}
+        int level_;
 };
 
+
+#ifdef MAPLOGS
+void Logger::operator()(LogLevel& level, std::string& msg)
+{
+    if(level_ >= level)
+    {
+    MapMsg m("log");
+    m["level"] = level;
+    m["msg"] = msg;
+    queue_.push(m);
+    }
+    std::cout << msg;// << std::endl;
+}
+#else
+void Logger::operator()(LogLevel& , std::string& msg)
+{
+    std::cout << msg;// << std::endl;
+}
+#endif
 /** Main command line entry point
  * launches the threads and dispatches
  * MapMsg between the threads
@@ -50,43 +69,24 @@ class MainModule
         MainModule(bool send, int port)
             : tcpThread_(MsgThreadFactory::Tcp(port, true)),
               gstThread_(MsgThreadFactory::Gst(send)),
-              func(gstThread_){}
+              func(gstThread_), msg_count(0)
+        {}
 
-        ~MainModule(){delete gstThread_; delete tcpThread_;}
+        ~MainModule()
+        {
+            delete gstThread_; 
+            delete tcpThread_; 
+        }
+
     private:
         MsgThread* tcpThread_;
         MsgThread* gstThread_;
         MainSubscriber func;
+        int msg_count;
 
         MainModule(MainModule&);    //No Copy Constructor
         MainModule& operator=(const MainModule&);
 };
-
-#include <signal.h>
-static bool signal_flag = false;
-static void handler(int /*sig*/, siginfo_t* /* si*/, void* /* unused*/)
-{
-    LOG_INFO("Got SIGINT going down!");
-    signal_flag = true;
-
-    struct sigaction sa;
-    sa.sa_flags = SA_SIGINFO;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_sigaction = NULL;
-    if (sigaction(SIGINT, &sa, NULL) == -1)
-        THROW_ERROR("Cannot register SIGINT handler");
-}
-
-
-static void set_handler()
-{
-    struct sigaction sa;
-    sa.sa_flags = SA_SIGINFO;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_sigaction = handler;
-    if (sigaction(SIGINT, &sa, NULL) == -1)
-        THROW_ERROR("Cannot register SIGINT handler");
-}
 
 
 bool MainModule::run()
@@ -94,32 +94,61 @@ bool MainModule::run()
     try
     {
         set_handler();
-        if(gstThread_ == 0 || !gstThread_->run())
+        Logger logger_(*tcpThread_);
+        if(gstThread_ == 0 or !gstThread_->run())
             THROW_ERROR("GstThread not running");
-        if(tcpThread_ == 0 || !tcpThread_->run())
+        if(tcpThread_ == 0 or !tcpThread_->run())
             THROW_ERROR("TcpThread not running");
+
         QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
 
-        while(!signal_flag)
+        while(!signalFlag())
         {
-            MapMsg tmsg = tcp_queue.timed_pop(1);
-            MapMsg gmsg = gst_queue.timed_pop(1000);
-
-            if (!gmsg["command"].empty())
-                tcp_queue.push(gmsg);
-            if (tmsg["command"].empty())
-                continue;
-            std::string command;
-            if(!tmsg["command"].get(command))
-                continue;
-            LOG_DEBUG(std::string(tmsg["command"]));
-            if (command == "quit")
-                break;
-            if (command == "exception")
-                throw tmsg["exception"].except();
-            else
-                gst_queue.push(tmsg);
+            if(gst_queue.ready())
+            {
+                MapMsg gmsg = gst_queue.timed_pop(1);
+                while(!gmsg.cmd().empty()){
+                    if (gmsg.cmd() == "quit")
+                    {
+                        MsgThread::broadcastQuit();
+                        LOG_INFO("Program Termination in Progress FROM GST");
+                        return 0;
+                    }
+                    tcp_queue.push(gmsg);
+                    gmsg = gst_queue.timed_pop(1);
+                }
+            }
+            if(tcp_queue.ready())
+            {
+                MapMsg tmsg = tcp_queue.timed_pop(1);
+                while(!tmsg.cmd().empty())
+                {
+                    if(tmsg.cmd() == "loglevel")
+                    {
+                        logger_.setLevel(tmsg["level"]);
+                        
+                    }else
+                    if (tmsg.cmd() == "quit")
+                    {
+                        MsgThread::broadcastQuit();
+                        LOG_INFO("Normal Program Termination in Progress");
+                        return 0;
+                    }
+                    if (tmsg.cmd() == "exception")
+                        throw tmsg["exception"].except();
+                    else
+                    {
+                        MapMsg ret(tmsg.cmd());
+                        tmsg["id"] = ret["id"] = ++msg_count;
+                        gst_queue.push(tmsg);
+                        ret["ack"] = "ok";
+                        tcp_queue.push(ret);
+                    }
+                    tmsg = tcp_queue.timed_pop(1);
+                }
+            }
+            usleep(MILLISEC_WAIT*1000);
         }
     }
     catch(ErrorExcept e)
@@ -130,30 +159,15 @@ bool MainModule::run()
             throw Except(e);
         return -1;
     }
-    LOG_INFO("Normal Program Termination in Progress");
     return 0;
 }
 
 
-static int port, send;
-void parseArgs(int argc, char** argv)
-{
-    if(argc != 3)
-        THROW_CRITICAL("Invalid command line arguments -- 0/1 for receive/send and a port");
-    if(sscanf(argv[1], "%d", &send) != 1 || send < 0 || send > 1)
-        THROW_CRITICAL("Invalid command line arguments -- Send flag must 0 or 1");
-    if(sscanf(argv[2], "%d", &port) != 1 || port < 1024 || port > 65000)
-        THROW_CRITICAL(
-            "Invalid command line arguments -- Port must be in the range of 1024-65000");
-}
-
-
-int mainTcp (int argc, char** argv)
+int telnetServer(int s,int p)
 {
     try
     {
-        parseArgs(argc, argv);
-        MainModule m(send, port);
+        MainModule m(s,p);
 
         while(m.run())
         {}
@@ -166,5 +180,4 @@ int mainTcp (int argc, char** argv)
 
     return 0;
 }
-
 

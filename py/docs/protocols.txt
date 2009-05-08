@@ -1,0 +1,45 @@
+Protocols Documentation
+=======================
+
+This page contains the Protocols Package documentation.
+
+The :mod:`com_chan` Module
+--------------------------
+
+.. automodule:: protocols.com_chan
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`com_chan_dialogs` Module
+----------------------------------
+
+.. automodule:: protocols.com_chan_dialogs
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`ipcp` Module
+----------------------
+
+.. automodule:: protocols.ipcp
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`ipcp_server` Module
+-----------------------------
+
+.. automodule:: protocols.ipcp_server
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`pinger` Module
+------------------------
+
+.. automodule:: protocols.pinger
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

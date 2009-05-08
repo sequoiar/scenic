@@ -1,5 +1,7 @@
 /* MapMsg.h
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -21,39 +23,41 @@
 #ifndef __MAP_MSG_H__
 #define __MAP_MSG_H__
 
-#include "logWriter.h"
+#include "util.h"
 #include <string>
 #include <map>
 #include <vector>
 #include <sstream>
+#include <iostream>
 
+class MapMsg;
 /// container class for variable types used by MapMsg 
 class StrIntFloat
 {
+friend std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
+friend class MapMsg;
     public:
-        StrIntFloat();
+        StrIntFloat()
+            : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(),key_(){}
         char get_type() const; 
         bool empty() const;
-        std::string c_str()const;
         Except except()const { return e_;}
 
-        operator std::string ()const;
+        operator std::string () const;
         operator std::vector<double> () const;
         operator int ()const;
         operator double ()const;
+        operator bool ()const;
 
-        bool get(std::string& s) const;
-        bool get(int& i) const;
-        bool get(double& f) const;
-        bool get(Except& e) const;
-
+        bool operator==(const StrIntFloat& sif);
+        bool operator==(const std::string& in);
         StrIntFloat& operator=(const std::string& in);
         StrIntFloat& operator=(const int& in);
-        StrIntFloat& operator=(const double& in);
         StrIntFloat& operator=(const Except& in);
+        StrIntFloat& operator=(const double& in);
         StrIntFloat& operator=(const std::vector<double>& in);
 
-        StrIntFloat(const StrIntFloat& sif_);
+        StrIntFloat(const StrIntFloat& sif);
         StrIntFloat& operator=(const StrIntFloat& in);
     private:
         char type_;
@@ -62,45 +66,31 @@ class StrIntFloat
         double f_;
         Except e_;
         std::vector<double> F_;
-    public: //HACK
-        std::string key_;
+        std::string key_; //HACK
 };
+
+std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
 
 
 /// key/value map where value is a string, a float, an int, a vector StrIntFloat
 class MapMsg
 {
-    typedef std::map<std::string, StrIntFloat> MapMsg_;
-    MapMsg_ map_;
-    MapMsg_::const_iterator it_;
 public:
+    typedef std::map<std::string, StrIntFloat> MapMsg_;
+    typedef const std::pair<const std::string,StrIntFloat>* Item;
     MapMsg():map_(),it_(){}
-    MapMsg(std::string cmd):map_(),it_(){ map_["command"] = cmd;}
-
-    StrIntFloat& operator[](const std::string& str)
-    {    
-        StrIntFloat& sif = map_[str];
-        sif.key_ = str; 
-        return sif;
-    }
+    MapMsg(std::string command):map_(),it_(){ cmd() = command;}
+    StrIntFloat &cmd() { return (*this)["command"]; }
+    StrIntFloat &operator[](const std::string& str);
+    bool tokenize(const std::string& str) {   return tokenize(str,*this); }
+    bool stringify(std::string& str) const {   return stringify(*this,str); }
     void clear(){map_.clear();}
-    const std::pair<const std::string,StrIntFloat>* begin(){it_ =map_.begin(); return &(*it_);}
-    const std::pair<const std::string,StrIntFloat>* next()
-    { 
-        if (++it_ != map_.end())
-            return &(*it_);
-        else 
-            return 0;
-    }
-};
 
+/** Used by code that needs to post messages but does not use 
+ * a MsgThread class (gst/audioLevel.cpp) send a MapMsg to Subscriber */
 
-/** Used by code that need msg posting but does not use 
- * a MsgThread class eg. gst/audioLevel.cpp */
-namespace msg
-{
-    /// to send a MapMsg to Subscriber 
-    bool post(MapMsg& msg);
+    bool post();
+
     /// MapMsg will go to most recent registered  
     class Subscriber
     {
@@ -109,8 +99,21 @@ namespace msg
             virtual void operator()(MapMsg&){}
             virtual ~Subscriber();
     };
-}
+private:
+    friend std::ostream& operator<< (std::ostream& os, const MapMsg&);
+    friend Item GetBegin(MapMsg& m);
+    friend Item GetNext(MapMsg& m);
 
+    MapMsg_ map_;
+    MapMsg_::const_iterator it_;
+    static bool tokenize(const std::string& str, MapMsg &cmd_map);
+    static bool stringify(const MapMsg& cmd_map, std::string& rstr);
+    Item begin();
+    Item next();
+
+};
+
+std::ostream& operator<< (std::ostream& os, const MapMsg&);
 
 #endif
 

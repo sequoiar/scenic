@@ -1,8 +1,8 @@
-include $(top_srcdir)/src/globals.mak
+include $(top_srcdir)/globals.mak
 
 bin_PROGRAMS = threadTester argsTester 
 
 threadTester_SOURCES = thread.cpp
 argsTester_SOURCES = test.cpp
 
-LDADD = ../libGUtil.a $(LIBUTIL) $(GLIB_LIBS)
+LDADD = ../libgutil.a $(LIBUTIL) $(GLIB_LIBS)

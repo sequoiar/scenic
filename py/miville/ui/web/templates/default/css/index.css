@@ -1,0 +1,512 @@
+html, body {
+	margin: 0px;
+	padding: 0px;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
+
+h3 {
+	margin-bottom: 5px;
+}
+
+#index_left_pan {
+	position: absolute;
+	top: 0px;
+/*	bottom: 22px; for chat*/
+	bottom: 0px;
+	width: 260px;
+	padding: 20px;
+}
+
+#index_right_pan {
+	position: absolute;
+	top: 0px;
+/*	height: 0px;*/
+	left: 300px;
+	right: 0px;
+	padding: 0px;
+}
+
+#strm {
+	position: absolute;
+	top: 0px;
+/*	height: 0px;*/
+	left: 300px;
+	right: 0px;
+	padding: 6px 20px;
+}
+
+#devs { /* devices div */
+	position: absolute;
+	top: 150px;
+/*	height: 0px;*/
+	left: 300px;
+	right: 0px;
+	padding: 6px 20px;
+}
+.help_str, .js_str {
+	display: none;
+}
+
+#help {
+	position: absolute;
+	bottom: 0px;
+	left: 300px;
+	right: 0px;
+}
+
+
+
+/*************************************/
+/* LINE BETWEEN THE GOOD AND THE BAD */
+/*************************************/
+
+#media_but {
+	position: absolute;
+	left: 50px;
+	height: 30px;
+	width: 160px;
+	background-color: #afc4c4;
+}
+
+#network_but {
+	position: absolute;
+	left: 250px;
+	height: 30px;
+	width: 160px;
+	background-color: #adaec4;
+}
+
+
+#right_pan {
+	background-color: #F8f8f9;
+	position: absolute;
+	top: 0px;
+	bottom: 22px;
+	left: 300px;
+	right: 0px;
+	overflow: auto;
+}
+
+#chat {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	background: #fff;
+	width: 300px;
+}
+
+#chat_cont {
+	position: relative;
+	height: 100px;
+	overflow: hidden;
+	padding: 5px 10px 0;
+	background-color: #F6F6F6;
+}
+
+#help_cont {
+	position: relative;
+	height: 50px;
+	overflow: hidden;
+	background: #ffe;
+}
+
+#help_cont p {
+	padding: 0 20px;
+	font-size: 11px;
+}
+
+#contacts {
+	border: dotted 1px #999;
+	padding: 10px;
+}
+
+#contacts_list {
+	height: 100px;
+	overflow: auto;
+	background-color: #FFF;
+	border: solid 1px #999;
+	font-size: 11px;
+}
+
+#contacts table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+#contacts td {
+	border-bottom: 1px dotted #999;
+	height: 16px;
+	padding: 2px 4px;
+}
+
+h3 span-dis {
+	background-color: #FFF;
+	border: 1px solid #999;
+	padding: 0 3px;
+}
+
+td.active {
+	background: url(../img/network-transmit-receive.png) no-repeat;
+	width: 16px;
+}
+
+td.toto {
+	background: url(../img/network-error.png) no-repeat;
+	width: 16px;
+}
+
+td.chati {
+	background: url(../img/internet-group-chat.png) no-repeat;
+	width: 16px;
+}
+
+#contact_field {
+	width: 220px;
+	border-collapse: collapse;
+}
+
+#contact_field td {
+	font-size: 11px;
+	text-align: right;
+	padding: 2px;
+	border: 0;
+}
+
+#contact_field input {
+	border: 1px solid #b3bcc3;
+	padding: 0 2px;
+	background-color: transparent;
+	width: 150px;
+}
+
+#contact_field.active_field input {
+	border: 1px solid #999;
+	padding: 0 2px;
+	background-color: #FFF;
+}
+
+#status {
+	margin-top: 13px;
+	background-color: #c0f4c5;
+	text-align: center;
+	font-size: 13px;
+	line-height: 20px;
+	height: 20px;
+}
+
+table.graph {
+	width: auto;
+	border-collapse: collapse;
+}
+
+table.graph td {
+	font-size: 9px;
+	padding: 1px 2px 0 0;
+}
+
+table.graph th {
+	text-align: left;
+}
+
+table.graph tr.info_type td {
+	border-bottom: 1px dotted #999;
+	padding: 4px 2px 0px 0;
+}
+
+table.graph td.way {
+	padding-left: 2px;
+}
+
+.black {
+	width: 50px;
+	height: 43px;
+	background-color: #000;
+}
+
+input.save {
+	display:none;
+	font-size: 11px;
+}
+
+.bottom_title {
+	position: relative;
+	background-color: #333;
+	height: 18px;
+	padding: 2px 30px 2px;
+	color: #FFF;
+	font-weight: bold;
+	font-size: 14px;
+}
+
+.substat {
+	position: relative;
+	height: 18px;
+	padding: 2px 20px 2px;
+	color: #000;
+	font-size: 11px;
+	border-bottom: 1px dotted #999;
+}
+
+.subnetstat {
+	position: relative;
+	height: 16px;
+	padding: 2px 20px 0px;
+	color: #000;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+#contact_details_cont, #substatus_cont {
+	border-bottom: 1px dotted #999;
+}
+
+.bot_triangle {
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	left: 5px;
+	top: 3px;
+	background: url(../img/triangle_up_0.png) no-repeat;
+}
+
+.bot_triangle:hover {
+	background: url(../img/triangle_up_1.png) no-repeat;
+	cursor: pointer;
+}
+
+.bot_triangle_up {
+	background: url(../img/triangle_0.png) no-repeat;
+}
+
+.bot_triangle_up:hover {
+	background: url(../img/triangle_1.png) no-repeat;
+}
+
+.bot_trianble {
+	position: absolute;
+	width: 12px;
+	height: 12px;
+	left: 5px;
+	top: 3px;
+	background: url(../img/trianble_up_0.png) no-repeat;
+}
+
+.bot_trianble:hover {
+	background: url(../img/trianble_up_1.png) no-repeat;
+	cursor: pointer;
+}
+
+.bot_trianble_up {
+	background: url(../img/trianble_0.png) no-repeat;
+}
+
+.bot_trianble_up:hover {
+	background: url(../img/trianble_1.png) no-repeat;
+}
+
+#media_thumb {
+	position: absolute;
+	right: 0px;
+	margin-top: -30px;
+	height: 30px;
+	width: 300px;
+}
+
+#network {
+	position: inherit;
+	display: none;
+	margin-top: 30px;
+}
+
+.module {
+	margin: 20px 0;
+}
+
+#modules_pan { 
+	position: inherit;
+	padding-bottom: 22px;
+	margin-top: 105px;
+}
+
+#status_pan {
+	background-color: #e1e8eb;
+	position: relative;
+	padding: 0px;
+	width: 125px;
+	margin-left: 300px;
+	height: 2000px;
+}
+
+#stat_pan_but:hover {
+	cursor:pointer;
+}
+
+input, select, textarea {
+	border: 1px solid #999;
+}
+
+input.but, #contact_field input.but {
+	border: 2px #F0F0F0 outset;
+}
+
+#modules_tab {
+	position: fixed;
+	background-color: #6679b9;
+/*
+	height: 30px;
+
+*/	line-height: 30px;
+	padding: 0;
+/*
+	width: 69%;
+*/
+	right: 16px;
+	left: 300px;
+	z-index: 100000;
+	color: #FFF;
+}
+ 
+#network_tab { 
+	background-color: #adaec4;
+	height: 30px;
+	line-height: 30px;
+	padding: 0 20px;
+}
+
+ul#sortables {
+	width: 800px;
+	margin: 0;
+	padding: 0;
+}
+ 
+li.module {
+	list-style: none;
+}
+
+.mod_title {
+	position: relative;
+	background-color: #333;
+	height: 20px;
+	padding: 2px 30px 2px;
+	color: #FFF;
+	font-weight: bold;
+	font-size: 14px;
+	cursor: move;
+}
+
+.mod_title select {
+	position: absolute;
+	height: 16px;
+	left: 145px;
+	top: 3px;
+	z-index: 100000;
+	font-size: 10px;
+}
+
+.subsettings {
+	border: 1px dotted #999;
+	padding: 10px;
+	
+}
+
+.controls {
+	position: relative;
+	border: 1px solid #ddd;
+/*	height: 100px;*/
+	padding: 5px 10px 10px;
+	font-size: 11px;
+}
+
+.controls select {
+	font-size: 11px;
+}
+
+.controls input {
+	font-size: 11px;
+	width: 50px;
+}
+
+.sett {
+	position: relative;
+	padding-top: 2px;
+	padding-left: 20px;
+}
+
+.close {
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	right: 5px;
+	top: 3px;
+	background: url(../img/close_0.png) no-repeat;
+}
+
+.close:hover {
+	background: url(../img/close_1.png) no-repeat;
+	cursor: pointer;
+}
+
+.triangle {
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	left: 5px;
+	top: 3px;
+	background: url(../img/triangle_0.png) no-repeat;
+}
+
+.triangle:hover {
+	background: url(../img/triangle_1.png) no-repeat;
+	cursor: pointer;
+}
+
+.triangle_up {
+	background: url(../img/triangle_up_0.png) no-repeat;
+}
+
+.triangle_up:hover {
+	background: url(../img/triangle_up_1.png) no-repeat;
+}
+
+.text_but {
+	font-weight: bold;
+	text-align: center;
+	font-size: 13px;
+	line-height: 30px;
+}
+
+.text_but:hover {
+	cursor: pointer;
+}
+
+.sub_sec {
+	border: 1px solid #CCC;
+	padding: 10px;
+	margin-right: 10px;
+	width: 322px;
+	margin-bottom: 10px;
+}
+
+.sub_sec td:first-child {
+	text-align: right;
+	padding-right: 5px;
+}
+.sub_sec td {
+	padding-bottom: 5px;
+}
+
+/* MODULES */
+
+#audio_loc .mod_title, #thumb_audio_loc {
+	background-color: #a8c0b2;
+}
+
+#data_loc .mod_title, #thumb_data_loc {
+	background-color: #a1bac9;
+}
+
+#video_loc .mod_title, #thumb_video_loc {
+	background-color: #b4b9c6;
+}

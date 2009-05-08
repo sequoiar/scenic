@@ -1,6 +1,8 @@
 
 // videoReceiver.h
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -34,11 +36,9 @@ class VideoReceiver
     : public ReceiverBase
 {
     public:
-        VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig rConfig)
-            : videoConfig_(vConfig), remoteConfig_(rConfig), session_(), depayloader_(0), 
-            decoder_(0), sink_(0) {}
+        VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig rConfig);
 
-        VideoSink *getVideoSink() { return sink_; }
+        void makeFullscreen();
 
         ~VideoReceiver();
 
@@ -47,6 +47,7 @@ class VideoReceiver
         void init_codec();
         void init_depayloader();
         void init_sink();
+        void setCaps();
 
         const VideoSinkConfig videoConfig_;
         const ReceiverConfig remoteConfig_;
@@ -55,6 +56,7 @@ class VideoReceiver
         RtpPay *depayloader_; 
         Decoder *decoder_;
         VideoSink *sink_;
+        bool gotCaps_;
 
         VideoReceiver(const VideoReceiver&); //No Copy Constructor
         VideoReceiver& operator=(const VideoReceiver&); //No Assignment Operator
