@@ -124,6 +124,17 @@ void Payloader::updateMTUCb(GtkAdjustment *adj, gpointer data)
     context->setMTU(val);
 }
 
+void TheoraPayloader::init()
+{
+    rtpPay_ = Pipeline::Instance()->makeElement("rtptheorapay", NULL);
+    Payloader::init();
+}
+
+
+void TheoraDepayloader::init()
+{
+    rtpPay_ = Pipeline::Instance()->makeElement("rtptheoradepay", NULL);
+}
 
 void H264Payloader::init()
 {

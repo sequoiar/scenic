@@ -526,11 +526,41 @@ class MilhouseTests():
         for chan in xrange(1, 9): 
             send.numchannels = chan
             self.run(recv, send)
+    
+    def test_40_vorbis_audiotestsrc_videotestsrc_theora(self):
+        """ Test with 1-8 channels for vorbis with a 5 second timeout """
+        self.countdown('START')
+
+        recv, send = self.argfactory('audiovideo')
+        send.audiocodec = 'vorbis'
+        send.audiosource = 'audiotestsrc'
+        send.videosource= 'videotestsrc'
+        recv.audiocodec = send.audiocodec
+        send.videocodec = 'theora'
+        recv.videocodec = send.videocodec
+        for chan in xrange(1, 9): 
+            send.numchannels = chan
+            self.run(recv, send)
+    
+    def test_41_raw_jackaudiosrc_v4l2src_theora(self):
+        """ Test with 1-8 channels for vorbis with a 5 second timeout """
+        self.countdown('START')
+
+        recv, send = self.argfactory('audiovideo')
+        send.audiocodec = 'raw'
+        send.audiosource = 'jackaudiosrc'
+        send.videosource= 'v4l2src'
+        recv.audiocodec = send.audiocodec
+        send.videocodec = 'theora'
+        recv.videocodec = send.videocodec
+        for chan in xrange(8, 9): 
+            send.numchannels = chan
+            self.run(recv, send)
 
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_39')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_41')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

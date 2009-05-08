@@ -87,6 +87,8 @@ VideoEncoder * SenderConfig::createVideoEncoder() const
         return new H263Encoder();       // set caps from here?
     else if (codec_ == "mpeg4")
         return new Mpeg4Encoder();
+    else if (codec_ == "theora")
+        return new TheoraEncoder();
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");
@@ -127,6 +129,8 @@ Decoder * ReceiverConfig::createVideoDecoder() const
         return new H263Decoder();
     else if (codec_ == "mpeg4")
         return new Mpeg4Decoder();
+    else if (codec_ == "theora")
+        return new TheoraDecoder();
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");
@@ -175,6 +179,8 @@ bool ReceiverConfig::capsMatchCodec() const
     else if (encodingName == "H264" and codec_ == "h264")
         return true;
     else if (encodingName == "H263-1998" and codec_ == "h263")
+        return true;
+    else if (encodingName == "THEORA" and codec_ == "theora")
         return true;
     else
     {

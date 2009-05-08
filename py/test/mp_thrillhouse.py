@@ -19,51 +19,49 @@ import telnetlib
 import socket
 
 
-def serverWorker(args):
-    """ a serverWorker will run milhouse as its own process """
+def milhouse_worker(args):
+    """ a milhouse_worker will run milhouse as its own process """
     command = 'milhouse ' + args
     os.system(command)
+    print '/*----------------------------------------------*/'
     print 'PROCESS ' + command + ' HAS EXITTED'
+    print '/*----------------------------------------------*/'
     return
 
 
 def createServers():
     """ Create workers which will wrap our milhouse server processes """
     workers = []
-    # create receiver server
-    p = multiprocessing.Process(target=serverWorker, args=('-r --serverport 9000',))
-    workers.append(p)
-    p.start()
-
-    # create sender server
-    p = multiprocessing.Process(target=serverWorker, args=('-s --serverport 9001',))
-    workers.append(p)
-    p.start()
+    commands = ['-r --serverport 9000', '-s --serverport 9001']
+    for command in commands: 
+        # create server
+        p = multiprocessing.Process(target=milhouse_worker, args=(command,))
+        workers.append(p)
+        p.start()
 
 
 def createClients():
     """ Create telnet clients which will interact with our servers using telnetlib """
-    receiverServerport = 9000
-    senderServerport = 9001
+    rx_server_port = 9000
+    tx_server_port = 9001
 
-    serverUp = False
+    rx_server_up, tx_server_up = False, False
 
-    while not serverUp:     # loop until server responds
+    while not rx_server_up:     # loop until server responds
         try: 
-            rxClient = telnetlib.Telnet('localhost', receiverServerport)
-            serverUp = True
+            rx_client = telnetlib.Telnet('localhost', rx_server_port)
+            rx_server_up = True
         except socket.error:
                 pass
 
-    serverUp = False
-    while not serverUp:     # loop until server responds
+    while not tx_server_up:     # loop until server responds
         try: 
-            txClient = telnetlib.Telnet('localhost', senderServerport)
-            serverUp = True
+            tx_client = telnetlib.Telnet('localhost', tx_server_port)
+            tx_server_up = True
         except socket.error:
                 pass
 
-    return rxClient, txClient
+    return rx_client, tx_client
 
 
 def runClients(rxTn, txTn, args):

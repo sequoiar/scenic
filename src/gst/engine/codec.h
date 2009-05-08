@@ -218,6 +218,32 @@ class Mpeg4Decoder: public Decoder
 };
 
 
+/// Encoder that encodes raw video into mpeg4 using the ffmpeg mpeg4 encoder
+class TheoraEncoder : public VideoEncoder
+{
+    public:
+        TheoraEncoder();
+        ~TheoraEncoder();
+        void setBitrate(unsigned);
+
+    private:
+        static const int MAX_SPEED_LEVEL = 2;
+        static const int MIN_SPEED_LEVEL = 0;
+        static const int SPEED_LEVEL = MAX_SPEED_LEVEL;
+        void init();
+        RtpPay* createPayloader() const;
+};
+
+
+/// Decoder that decodes mpeg4 into raw video using the ffmpeg mpeg4 decoder.
+class TheoraDecoder: public Decoder
+{
+    private: 
+        void init();
+        RtpPay* createDepayloader() const;
+};
+
+
 /// Encoder that encodes raw audio using the vorbis encoder.
 class VorbisEncoder : public AudioConvertedEncoder 
 {
