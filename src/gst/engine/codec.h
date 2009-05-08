@@ -167,7 +167,7 @@ class H264Decoder : public Decoder
         void init();
         RtpPay* createDepayloader() const;
         void adjustJitterBuffer(); 
-        static const unsigned long long DEFAULT_JITTER_BUFFER_MS = 20;
+        static const unsigned long long DEFAULT_JITTER_BUFFER_MS = 30;
 };
 
 

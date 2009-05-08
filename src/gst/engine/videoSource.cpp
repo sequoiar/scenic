@@ -93,7 +93,7 @@ VideoTestSource::VideoTestSource(const VideoSourceConfig &config) :
 void VideoTestSource::init()
 {
     VideoSource::init();
-    g_object_set(G_OBJECT(source_), "is-live", FALSE, NULL); // necessary for clocked callback to work
+    g_object_set(G_OBJECT(source_), "is-live", TRUE, NULL); // necessary for clocked callback to work
 
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
