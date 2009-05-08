@@ -128,6 +128,7 @@ class Arg(object): # new style!!
         for key, val in self.__dict__.iteritems():
             if val is True:
                 val = 1  # boolean members don't need values in output string
+                result = result + ' ' + key + '=' + str(val) 
             elif isinstance(val, str):
                 result = result + ' ' + key + '=' + '"' + str(val) + '"'
             else:
@@ -280,39 +281,39 @@ class VideoTests(object):
         txVideoArg.source = "v4l2src"
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
-    def test_videotestsrc_mpeg4_deinterlace(self):
+    def test_videotestsrc_mpeg4_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
-    def test_videotestsrc_h264_deinterlace(self):
+    def test_videotestsrc_h264_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         txVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
-    def test_videotestsrc_theora_deinterlace(self):
+    def test_videotestsrc_theora_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "theora"
         txVideoArg.codec = "theora"
         txVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
-    def test_videotestsrc_h263_deinterlace(self):
+    def test_videotestsrc_h263_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
         txVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
-    def test_v4l2src_mpeg4_deinterlace(self):
+    def test_v4l2src_mpeg4_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = "v4l2src"
         txVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
-    def test_v4l2src_h264_deinterlace(self):
+    def test_v4l2src_h264_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
@@ -320,7 +321,7 @@ class VideoTests(object):
         txVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
-    def test_v4l2src_theora_deinterlace(self):
+    def test_v4l2src_theora_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "theora"
         txVideoArg.codec = "theora"
@@ -328,7 +329,7 @@ class VideoTests(object):
         txVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
-    def test_v4l2src_h263_deinterlace(self):
+    def test_v4l2src_h263_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
@@ -1989,7 +1990,7 @@ class AudioVideoTests(object):
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    tests = prefixedMethods(AudioVideoTests(), 'test_audiotestsrc_raw_jackaudiosink_videotestsrc_theora_xvimagesin')
+    tests = prefixedMethods(VideoTests(), 'test_v4l2src_theora_deinterlace')
 
     for test in tests:
         print '/*----------------------------------------------*/'

@@ -557,10 +557,26 @@ class MilhouseTests():
             send.numchannels = chan
             self.run(recv, send)
 
+    def test_42_raw_jackaudiosrc_v4l2src_theora_deinterlace(self):
+        """ Test with 1-8 channels for vorbis with a 5 second timeout """
+        self.countdown('START')
+
+        recv, send = self.argfactory('audiovideo')
+        send.audiocodec = 'raw'
+        send.audiosource = 'jackaudiosrc'
+        send.videosource= 'v4l2src'
+        recv.audiocodec = send.audiocodec
+        send.videocodec = 'theora'
+        recv.videocodec = send.videocodec
+        send.deinterlace = True
+        for chan in xrange(8, 9): 
+            send.numchannels = chan
+            self.run(recv, send)
+
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_41')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_42')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__
