@@ -41,7 +41,7 @@ class Logger
 #ifdef MAPLOGS
 void Logger::operator()(LogLevel& level, std::string& msg)
 {
-    if(level_)
+    if(level_ >= level)
     {
     MapMsg m("log");
     m["level"] = level;
