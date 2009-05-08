@@ -343,15 +343,17 @@ TheoraEncoder::~TheoraEncoder()
 void TheoraEncoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("theoraenc", NULL);
-    g_object_set(G_OBJECT(codec_), "speed-level", SPEED_LEVEL, NULL);
+    g_object_set(G_OBJECT(codec_), "speed-level", MAX_SPEED_LEVEL, NULL);
+    g_object_set(G_OBJECT(codec_), "quality", QUALITY, NULL);
     VideoEncoder::init();
 }
 
 
 /// Overridden to convert from bit/s to kbit/s
-void TheoraEncoder::setBitrate(unsigned newBitrate)
+void TheoraEncoder::setBitrate(unsigned /*newBitrate*/)
 {
-    Encoder::setBitrate(newBitrate * 0.001);
+    LOG_WARNING("Using quality, not bitrate. This function has no effect.");
+    //Encoder::setBitrate(newBitrate * 0.001);
 }
 
 
