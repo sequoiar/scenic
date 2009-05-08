@@ -229,7 +229,7 @@ class TheoraEncoder : public VideoEncoder
     private:
         static const int MAX_SPEED_LEVEL = 2;
         static const int MIN_SPEED_LEVEL = 0;
-        static const int QUALITY = 15;
+        static const int QUALITY = 20;
         void init();
         RtpPay* createPayloader() const;
 };
