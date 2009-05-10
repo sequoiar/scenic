@@ -24,6 +24,8 @@
 
 #include "gutil.h"
 
+#include <cstdlib>
+
 /** RAII all resources will be cleaned here
  * since we store our int pointers inside 
  * GOptionEntrys we need to clear them out one by one 
@@ -120,9 +122,18 @@ void OptionArgs::parse(int argc, char **argv)
     pGOptions = getArray();
     g_option_context_add_main_entries(context, pGOptions, NULL);
 
+    bool noArgs = argc == 1;
+
     if (!g_option_context_parse (context, &argc, &argv, &error)) {
         g_option_context_free(context);
         THROW_CRITICAL("option parsing failed: " << error->message);
+    }
+    
+    if (noArgs)      // no arguments given, print help
+    {
+        std::cout << g_option_context_get_help(context, TRUE, NULL);
+        g_option_context_free(context);
+        exit(0);
     }
     g_option_context_free(context);
 
@@ -158,7 +169,6 @@ void OptionArgs::parse(int argc, char **argv)
                 break;
         }
     }
-
 }
 
 
