@@ -420,7 +420,7 @@ v1.0
 								['unicode', 'Gst']], 
 							[
 								['unicode', 'source'], 
-								['unicode', 'v4l2src']], 
+								['unicode', 'videotestsrc']], 
 							[
 								['unicode', 'codec'], 
 								['unicode', 'mpeg4']], 
@@ -464,7 +464,7 @@ v1.0
 								['unicode', 'Gst']], 
 							[
 								['unicode', 'source'], 
-								['unicode', 'v4l2src']], 
+								['unicode', 'videotestsrc']], 
 							[
 								['unicode', 'codec'], 
 								['unicode', 'mpeg4']], 
