@@ -650,28 +650,33 @@ class ControllerApi(object):
         contact = self.get_contact(contact_name)
 
         self.select_contact(caller, contact_name) # !!!!
-        if contact:
-            if contact.state == CONNECTED:
-                try:
-                    contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
-                    settings_com_channel.start_streaming( global_setting, contact.address)
-                    # global_setting.start_streaming(self, contact.address, settings_com_channel)
-                    contact.stream_state = 2
-                    self.notify(caller, {'streaming':True, 'msg':"streaming started", 'contact_name':contact_name}, "start_streams") # key = start_streams
-                except AddressBookError, e:
-                    self.notify(caller, "AddressbookadError while trying to start streaming:" + e.message, "error")   
-                    #TODO: change key for 'streams_error'
-                except SettingsError, err:
-                    self.notify(caller, err)
-                except StreamsError, err:
-                    self.notify(caller, err)
-                except Exception, err:
-                    self.notify(caller, err)
-            elif contact.state == DISCONNECTED:
-                deferred = self.start_connection(caller, contact)
-                if deferred:
-                    deferred.addCallback(self.start_streams_from_deferred, caller, contact_name)
-                    deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
+        if not isinstance(contact, Exception):
+            if contact is not None:
+                
+                if contact.state == CONNECTED:
+                    try:
+                        contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
+                        settings_com_channel.start_streaming( global_setting, contact.address)
+                        # global_setting.start_streaming(self, contact.address, settings_com_channel)
+                        contact.stream_state = 2
+                        self.notify(caller, {'streaming':True, 'msg':"streaming started", 'contact_name':contact_name}, "start_streams") # key = start_streams
+                    except AddressBookError, e:
+                        self.notify(caller, "AddressbookadError while trying to start streaming:" + e.message, "error")   
+                        #TODO: change key for 'streams_error'
+                    except SettingsError, err:
+                        self.notify(caller, err)
+                    except StreamsError, err:
+                        self.notify(caller, err)
+                    except Exception, err:
+                        self.notify(caller, err)
+                elif contact.state == DISCONNECTED:
+                    deferred = self.start_connection(caller, contact)
+                    if deferred:
+                        deferred.addCallback(self.start_streams_from_deferred, caller, contact_name)
+                        deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
+        else:
+            log.error('Error in start_streams', contact.message)
+            self.notify(caller, contact)
                             
     def stop_streams(self, caller, contact_name):
         """
