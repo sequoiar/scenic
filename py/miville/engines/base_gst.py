@@ -234,10 +234,10 @@ class GstServer(object):
                     log.debug('GstServer._process_cmd: %s  Args: %s  Pid: %s  Self: %s' % (cmd, args, self.process.pid, self))
                     if args != None:
                         # XXX
-                        if isinstance(args, (tuple, list)):
-                            self.conn.send_cmd(cmd, *args)
-                        else:
-                            self.conn.send_cmd(cmd, args)
+                        #if isinstance(args, (tuple, list)):
+                        #    self.conn.send_cmd(cmd, *args)
+                        #else:
+                        self.conn.send_cmd(cmd, args)
                     else:
                         self.conn.send_cmd(cmd)      
         if len(self.commands) > 0:
