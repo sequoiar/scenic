@@ -45,6 +45,12 @@ FAILURE = 100
 # name of the process to start
 streaming_server_process_name = "milhouse"
 
+class GstError(Exception):
+    """
+    Any error that is critical and makes it impossible to stream using GST
+    """
+    pass
+
 class BaseGst(object):
     """
     Just a bunch of getter and setter for attributes for the milhouse processes.
@@ -74,7 +80,7 @@ class GstServer(object):
 
     The Inter-process Communication protocol is based on TCP lines of ASCII characters.
     """
-    def __init__(self, mode, port, address, callback_dict):
+    def __init__(self, mode, port, address, callback_dict, state_change_callback):
         self.port = port
         self.address = address
         self.mode = mode
@@ -82,10 +88,12 @@ class GstServer(object):
         self.process = None
         self.conn = None
         self.state = -1
+        self.state_change_callback = state_change_callback
         self.change_state(STOPPED)
         self.commands = []
         self.callback_dict = callback_dict
         self.version_str = None
+        
 
     def connect(self):
         log.debug("GstServer.connect")
@@ -112,6 +120,7 @@ class GstServer(object):
          old_str = self.get_state_str(old_state)
          new_str = self.get_state_str(new_state)
          log.debug('GstServer state changed from %s to %s handle: %s ' % ( old_str, new_str, str(self) ))
+         self.state_change_callback(old_state, new_state, old_str, new_str)
 
     def connection_ready(self, ipcp):
         log.debug("CONNECTION ready %s" % str(self))
@@ -139,6 +148,9 @@ class GstServer(object):
         log.debug('Lost the server connection. Reason:\n%s %s' % (reason, str(self) ) )
 
     def start_process(self):
+        """
+        Might throw a GstError
+        """
         log.debug("GstServer.start_process... %s " % str(self) )
         #if self.state < RUNNING: self.state = RUNNING    # Uncomment this line to start the GST process "by hand"
         if self.state < STARTING:
@@ -160,11 +172,17 @@ class GstServer(object):
                     log.debug("Process spawned pid=" + str(self.process.pid)  + " "+ str(self))
                     return proc_path, args, self.process.pid
                 except Exception, e:
-                    log.critical('Cannot start the GST application "%s": %s %s' % (streaming_server_process_name, str(e), str(self) ) )
+                    msg = 'Cannot start the GST application "%s": %s %s' % (streaming_server_process_name, str(e), str(self))
+                    log.critical(msg)
+                    raise GstError(msg)
             else:
-                log.critical('Cannot find the GST application: %s %s' % (streaming_server_process_name, self)  )
+                msg = 'Cannot find the GST application: %s %s' % (streaming_server_process_name, self)
+                log.critical(msg)
+                raise GstError(msg)
         else:
-            log.error("GstServer.start_process: not in proper state for starting %s" % str(self))
+            msg = "GstServer.start_process: not in proper state for starting %s" % str(self)
+            log.error(msg)
+            raise GstError(msg)
 
     def kill(self):
         log.debug("GstServer.kill %s" % str(self))
@@ -245,10 +263,13 @@ class GstClient(BaseGst):
     def __init__(self):
         log.debug("GstClient __init__  " + str(self))
     
-    def setup_gst_client(self, mode, port, address, callbacks_dict): 
+    def setup_gst_client(self, mode, port, address, callbacks_dict, state_change_callback): 
         log.debug('GstClient.setup_gst_client '+ str(self))
-        self.gst_server = GstServer(mode, port, address, callbacks_dict)
-        self.proc_path, self.args, self.pid = self.gst_server.start_process()
+        self.gst_server = GstServer(mode, port, address, callbacks_dict, state_change_callback)
+        try:
+            self.proc_path, self.args, self.pid = self.gst_server.start_process()
+        except GstError, e: 
+            log.error('Could not start GST process: ' + e.message)
         self.version_str = self.gst_server.version_str
         log.debug('GstClient.setup_gst_client done')
         

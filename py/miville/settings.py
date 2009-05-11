@@ -20,7 +20,7 @@
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Audio/video/data settings handling for miville. (configuration)
+Settings (configuration) handling for miville audio/video streams.
 
 State Saving
 ============
@@ -31,18 +31,20 @@ there is a dict. all settings with id under 10000 are presets. Those with ID ove
 Streaming initialization 
 ========================
 In get_init_params, we turn the media settings into the arguments for the 
-sropulpof process. 
+milhouse process. 
 
 Types of Settings
 =================
  * A Media Setting is related to a audio or video stream
  * A global setting is linked to a contact in the addressbook. 
- * A devices setting has to deal with the harware configuration in the devices packages.
  * A preset is how we call a default factory setting. 
+
+Not yet implemented : A devices setting has to deal with the harware configuration in the devices packages.
 
 Design Notes
 ============
  * Stream subgroup instances contain media streams. (audio and video)
+ * the presets.txt in the miville package contains the presets.
 
 Usage
 =====
@@ -53,16 +55,11 @@ import os
 import re # used when reading settings file
 import pprint
 
-
-
-
 from miville.utils import log
 from miville.utils.i18n import to_utf
 from miville.errors import *
 from miville import connectors
 from miville.utils.common import install_dir
-# persistence is not futile
-
 
 from twisted.spread.jelly import jelly, unjelly
 from twisted.internet import reactor
@@ -85,22 +82,18 @@ current_major_version_number = 1 # TODO: replace with __version__
 global_settings = {}
 media_settings = {}
 
-
 _api = None
 
-
-  
 class Settings(object):
     """
-    Settings handling utilities. 
-    
-    Contains method/function to : 
+    Settings handling static methods. 
+
+    Contains _static_ methods to : 
      * read the presets from file
      * merge them with user settings
      * etc.
 
     Settings instances contain global settings and media settings.
-    quote: 'Use defaults, Luke!', 0B1knob ... a long time ago
     """
     def __init__(self):
         self.global_settings = global_settings
@@ -109,10 +102,14 @@ class Settings(object):
         #self.current_global_id = 0  [i for i in l if i<20]
         self.media_settings = media_settings
         self.load() # RTF File
-        
-        
+
     @staticmethod
     def get_media_setting_from_id(id):
+        """
+        Returns a media setting. 
+        
+        Raises a SettingsError if setting id not found.
+        """
         if media_settings.keys().__contains__(id):
             return media_settings[id]
         raise SettingsError, 'The media setting id "' + str(id) + '" does not exist' 
@@ -120,7 +117,7 @@ class Settings(object):
     @staticmethod
     def _load_nice_object_from_file(filename, major_version):
         """
-        this 'private' method loads an object from a text file, using the 
+        This 'private' method loads an object from a text file, using the 
         nice representation (dict with line breaks and tabs)
         """
         object = {}
@@ -195,10 +192,8 @@ class Settings(object):
         """
         global PRESETS_FILENAME
         global SETTINGS_FILENAME
-
         
         directory = os.path.dirname(__file__)
-        
         presets_file_name       = os.path.join(directory,  PRESETS_FILENAME) #"presets.txt")
         user_settings_file_name = install_dir(SETTINGS_FILENAME) # "settings.txt")
         
@@ -292,7 +287,7 @@ class Settings(object):
         id = self._get_global_setting_id_from_name(name)
         return self.global_settings[id]
     
-    def  pretty_list_settings(self):
+    def pretty_list_settings(self):
          return (self.global_settings, self.media_settings)
         
     def list_global_setting(self):
@@ -360,7 +355,6 @@ class Settings(object):
         self.selected_global_setting = name
         return True
        
-       
     def description_global_setting(self, name):
         raise SettingsError, 'This command is not implemented yet' 
         return True
@@ -400,14 +394,22 @@ class Settings(object):
         self.selected_media_setting = name
         return True
 
-
-
-    
 class GlobalSetting(object):
     """
-    Global setting instances contain a list of stream subgroups (see StreamSubGroup class).
-    subgroups, in turn, contain streams settings (see MediaStream class)
-    A global setting is the first level of settings...
+    Global setting instances contain a list of stream subgroups (see the StreamSubGroup class).
+    StreamSubGroup instances, in turn, contain streams settings (see MediaStream class)
+    A global setting is the first level of settings.
+    Each contact should be linked to a GlobalSetting id.
+
+    For example :
+     * contact "Roger":
+       * GlobalSetting 1
+         * StreamSubgroup 2
+           * MediaStream 4
+           * MediaStream 5
+         * StreamSubgroup 3
+           * MediaStream 6
+           * MediaStream 7
     """
     def __init__(self, name):
         self.is_preset = False
@@ -416,7 +418,6 @@ class GlobalSetting(object):
         self.name = name
         self.communication = ''
         log.info("GlobalSetting__init__ " + name)
-        
         
     def _get_stream_subgroup_id_from_name(self, name):
         for id in self.stream_subgroups.keys():
@@ -462,7 +463,6 @@ class GlobalSetting(object):
         id = self._get_stream_subgroup_id_from_name(name)
         self.selected_media_setting = name
         return True
-
 
 class StreamSubgroup(object):
     """
@@ -523,7 +523,6 @@ class MediaSetting(object):
 
     A media setting is for audio/video streams. 
     """
-    
     def __init__(self, name, id):
         self.id = id
         self.name = name
@@ -536,7 +535,7 @@ class MediaStream(object):
     Each media stream instance references a media setting. The MediaStream class
     is a a base class for each stream type: AudioStream, DataStream, VideoStream...
 
-    = Synchronization =
+    Synchronization
 
     A sync_group is an attribute of the media stream. Its default value is 'master'. 
     This is for when we want the audio and video not to be in sync. 
@@ -588,14 +587,11 @@ class MidiStream(MediaStream):
     """    
     MediaStream.media_stream_kinds['midi'] = 'MidiStream'
     
-    
 class DataStream(MediaStream):
     """
     Contains data settings informations.
     """    
     MediaStream.media_stream_kinds['data'] = 'DataStream'
- 
-
 
 class VideoStream(MediaStream):
     """
@@ -610,13 +606,10 @@ class VideoStream(MediaStream):
         log.error(msg)
         raise SettingsError, msg
 
-
-     
-
-
 class AudioStream(VideoStream):
     """
     Contains Audio Settings information
     """
     MediaStream.media_stream_kinds['audio']= 'AudioStream'
     pass
+

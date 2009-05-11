@@ -95,6 +95,10 @@ short pof::run(int argc, char **argv)
 
     std::cout << "Ver:" << PACKAGE_VERSION << " Rev #" << SVNVERSION << std::endl;
 
+    if (argc == 1)  // we printed help msg in parse, no need to continue
+        return 0;
+
+
     if(options["serverport"])
         return telnetServer(options["sender"], options["serverport"]);
 

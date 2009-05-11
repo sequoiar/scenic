@@ -19,76 +19,83 @@ import telnetlib
 import socket
 
 
-def serverWorker(args):
-    """ a serverWorker will run milhouse as its own process """
+def milhouse_worker(args):
+    """ a milhouse_worker will run milhouse as its own process """
     command = 'milhouse ' + args
     os.system(command)
+    print '/*----------------------------------------------*/'
     print 'PROCESS ' + command + ' HAS EXITTED'
+    print '/*----------------------------------------------*/'
     return
 
 
 def createServers():
     """ Create workers which will wrap our milhouse server processes """
     workers = []
-    # create receiver server
-    p = multiprocessing.Process(target=serverWorker, args=('-r --serverport 9000',))
-    workers.append(p)
-    p.start()
-
-    # create sender server
-    p = multiprocessing.Process(target=serverWorker, args=('-s --serverport 9001',))
-    workers.append(p)
-    p.start()
+    commands = ['-r --serverport 9000', '-s --serverport 9001']
+    for command in commands: 
+        # create server
+        p = multiprocessing.Process(target=milhouse_worker, args=(command,))
+        workers.append(p)
+        p.start()
 
 
 def createClients():
     """ Create telnet clients which will interact with our servers using telnetlib """
-    receiverServerport = 9000
-    senderServerport = 9001
+    rx_server_port = 9000
+    tx_server_port = 9001
 
-    serverUp = False
+    rx_server_up, tx_server_up = False, False
 
-    while not serverUp:     # loop until server responds
+    while not rx_server_up:     # loop until server responds
         try: 
-            rxClient = telnetlib.Telnet('localhost', receiverServerport)
-            serverUp = True
+            rx_client = telnetlib.Telnet('localhost', rx_server_port)
+            rx_server_up = True
         except socket.error:
                 pass
 
-    serverUp = False
-    while not serverUp:     # loop until server responds
+    while not tx_server_up:     # loop until server responds
         try: 
-            txClient = telnetlib.Telnet('localhost', senderServerport)
-            serverUp = True
+            tx_client = telnetlib.Telnet('localhost', tx_server_port)
+            tx_server_up = True
         except socket.error:
                 pass
 
-    return rxClient, txClient
+    return rx_client, tx_client
 
 
-def runClients(rxTn, txTn, rxVideoArg, txVideoArg, rxAudioArg, txAudioArg):
+def runClients(rxTn, txTn, args):
     """ Here our telnet clients issue their commands to their respective milhouse servers """
 
-    if rxVideoArg is not None:
-        rxTn.write(str(rxVideoArg) + '\n')
+    if 'rxVideoArg' in args:
+        rxVideoArg = str(args['rxVideoArg'])
+        print "SENDING " + rxVideoArg
+        rxTn.write(rxVideoArg + '\n')
         rxTn.read_until('video_init: ack="ok"')
 
-    if txVideoArg is not None:
-        txTn.write(str(txVideoArg) + '\n')
+    if 'txVideoArg' in args:
+        txVideoArg = str(args['txVideoArg'])
+        print "SENDING " + txVideoArg
+        txTn.write(txVideoArg + '\n')
         txTn.read_until('video_init: ack="ok"')
     
-    if rxAudioArg is not None:
-        rxTn.write(str(rxAudioArg) + '\n')
+    if 'rxAudioArg' in args:
+        rxAudioArg = str(args['rxAudioArg'])
+        print "SENDING " + rxAudioArg
+        rxTn.write(rxAudioArg + '\n')
         rxTn.read_until('audio_init: ack="ok"')
 
-    if txAudioArg is not None:
-        txTn.write(str(txAudioArg) + '\n')
+    if 'txAudioArg' in args:
+        txAudioArg = str(args['txAudioArg']) 
+        print "SENDING " + txAudioArg
+        txTn.write(txAudioArg + '\n')
         txTn.read_until('audio_init: ack="ok"')
 
     rxTn.write('start:\n')
     rxTn.read_until('start: ack="ok"')
     txTn.write('start:\n')
     txTn.read_until('start: ack="ok"')
+
 
     # let the test run a bit
     TEST_LENGTH = 10
@@ -102,10 +109,10 @@ def runClients(rxTn, txTn, rxVideoArg, txVideoArg, rxAudioArg, txAudioArg):
     rxTn.write('quit:\n')
     txTn.write('quit:\n')
 
-def proceed(rxVideoArg = None, txVideoArg = None, rxAudioArg = None, txAudioArg = None):
+def proceed(args):
     createServers()
     rxTn, txTn = createClients()
-    runClients(rxTn, txTn, rxVideoArg, txVideoArg, rxAudioArg, txAudioArg)
+    runClients(rxTn, txTn, args)
 
 
 class Arg(object): # new style!!
@@ -121,6 +128,7 @@ class Arg(object): # new style!!
         for key, val in self.__dict__.iteritems():
             if val is True:
                 val = 1  # boolean members don't need values in output string
+                result = result + ' ' + key + '=' + str(val) 
             elif isinstance(val, str):
                 result = result + ' ' + key + '=' + '"' + str(val) + '"'
             else:
@@ -170,10 +178,10 @@ class VideoRecvArg(VideoArg):
 class AudioSendArg(AudioArg):
     """ Class for audio only sending args """
     def __init__(self):
-        """ Default for audiosrc is 8 channel jackaudiosrc, 
+        """ Default for audiosrc is 8 channel audiotestsrc, 
          the jack input plugin """
         AudioArg.__init__(self)
-        self.source = 'jackaudiosrc'
+        self.source = 'audiotestsrc'
         self.channels = 8
 
 
@@ -195,55 +203,1794 @@ def argfactory(argtype):
         raise Exception('unexpected argtype ' + argtype)
 
 
-class TelnetTests(object):
+class VideoTests(object):
     def __init__(self):
         pass
 
-    def test01_videotestsrc_mpeg4(self):
+    def test_videotestsrc_mpeg4_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_videotestsrc_theora_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
-    def test02_videotestsrc_h264(self):
+    def test_videotestsrc_h264_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
-    def test03_videotestsrc_h263(self):
+    def test_videotestsrc_h263_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
-        proceed(rxVideoArg, txVideoArg)
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
-    def test05_v4l2src_h264(self):
+    def test_dv1394src_mpeg4_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = 'dv1394src'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_dv1394src_h264_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
-        rxVideoArg.source = "v4l2src"
-        txVideoArg.source = "v4l2src"
-        proceed(rxVideoArg, txVideoArg)
+        txVideoArg.source = "dv1394src"
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
-   #def test06_v4l2src_h263(self):
-   #    rxVideoArg = 'video_init: codec="h263" port=10000 address="127.0.0.1"'
-   #    txVideoArg = 'video_init: codec="h263" bitrate=3000000 port=10000 address="127.0.0.1" source="v4l2src"'
-   #    proceed(rxVideoArg, txVideoArg)
-   #
-   #def test07_v4l2src_mpeg4(self):
-   #    rxVideoArg = 'video_init: codec="mpeg4" port=10000 address="127.0.0.1"'
-   #    txVideoArg = 'video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="v4l2src"'
-   #    proceed(rxVideoArg, txVideoArg)
-   #
-   #def test08_videotestsrc_mpeg4_audiotestsrc_raw(self):
-   #    rxVideoArg = 'video_init: codec="mpeg4" port=10000 address="127.0.0.1"'
-   #    txVideoArg = 'video_init: codec="mpeg4" bitrate=3000000 port=10000 address="127.0.0.1" source="videotestsrc"'
-   #    rxAudioArg = 'audio_init: codec="raw" port=10010 address="127.0.0.1"'
-   #    txAudioArg = 'audio_init: codec="raw" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2'
-   #    proceed(rxVideoArg, txVideoArg, rxAudioArg, txAudioArg)
+    def test_dv1394src_theora_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        txVideoArg.source = "dv1394src"
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
+    def test_dv1394src_h263_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "dv1394src"
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_mpeg4_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_h264_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "v4l2src"
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_theora_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        txVideoArg.source = "v4l2src"
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_v4l2src_h263_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "v4l2src"
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_mpeg4_deinterlace_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.deinterlace = True
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_h264_deinterlace_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.deinterlace = True
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_theora_deinterlace_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        txVideoArg.deinterlace = True
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_h263_deinterlace_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.deinterlace = True
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_mpeg4_deinterlace_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_h264_deinterlace_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_v4l2src_theora_deinterlace_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_h263_deinterlace_xvimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_mpeg4_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_h264_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_theora_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_h263_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_dv1394src_mpeg4_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = 'dv1394src'
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_dv1394src_h264_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_theora_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_dv1394src_h263_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_mpeg4_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_h264_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_v4l2src_theora_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_v4l2src_h263_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_mpeg4_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_h264_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_videotestsrc_h264_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_h263_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_mpeg4_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_h264_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_v4l2src_theora_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_v4l2src_h263_deinterlace_glimagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'glimagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_mpeg4_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_h264_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_theora_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_h263_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_dv1394src_mpeg4_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = 'dv1394src'
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_dv1394src_h264_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_dv1394src_theora_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_dv1394src_h263_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_mpeg4_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_h264_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_v4l2src_theora_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_v4l2src_h263_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_mpeg4_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_h264_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_theora_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "thera"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_videotestsrc_h263_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_mpeg4_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_v4l2src_h264_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = "h264"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_v4l2src_theora_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = "theora"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_v4l2src_h263_deinterlace_ximagesink(self):
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = "h263"
+        txVideoArg.source = "v4l2src"
+        txVideoArg.deinterlace = True
+        rxVideoArg.sink = 'ximagesink'
+        proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+
+class AudioTests(object):
+    def __init__(self):
+        pass
+
+    def test_audiotestsrc_raw_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+    def test_jackaudiosrc_raw_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        txAudioArg.source = "jackaudiosrc"
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+    
+    def test_dv1394src_raw_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        txAudioArg.source = "dv1394src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+    def test_audiotestsrc_vorbis_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+    def test_jackaudiosrc_vorbis_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+    def test_dv1394src_vorbis_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+    def test_audiotestsrc_mp3_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+    def test_jackaudiosrc_mp3_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+    def test_dv1394src_mp3_jackaudiosink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+class AudioNoJackTests(object):
+    def __init__(self):
+        pass
+
+    def test_alsasrc_raw_alsasink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "alsasink"
+        txAudioArg.source = "alsasrc"
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+    def test_alsasrc_vorbis_alsasink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "alsasink"
+        txAudioArg.source = "alsasrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+    
+    def test_alsasrc_mp3_alsasink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "alsasink"
+        txAudioArg.source = "alsasrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+    def test_pulsesrc_raw_pulsesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "pulsesink"
+        txAudioArg.source = "pulsesrc"
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+    def test_pulsesrc_vorbis_pulsesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "pulsesink"
+        txAudioArg.source = "pulsesrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+    
+    def test_pulsesrc_mp3_pulsesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "pulsesink"
+        txAudioArg.source = "pulsesrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+
+class AudioVideoTests(object):
+    def __init__(self):
+        pass
+    
+    def test_audiotestsrc_raw_jackaudiosink_videotestsrc_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_raw_jackaudiosink_videotestsrc_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_raw_jackaudiosink_videotestsrc_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_vorbis_jackaudiosink_videotestsrc_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_vorbis_jackaudiosink_videotestsrc_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_vorbis_jackaudiosink_videotestsrc_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_mp3_jackaudiosink_videotestsrc_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_mp3_jackaudiosink_videotestsrc_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_mp3_jackaudiosink_videotestsrc_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+
+    def test_audiotestsrc_raw_jackaudiosink_v4l2src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_raw_jackaudiosink_v4l2src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        txVideoArg.source = "v4l2src"
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_raw_jackaudiosink_v4l2src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        txVideoArg.source = "v4l2src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_vorbis_jackaudiosink_v4l2src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_vorbis_jackaudiosink_v4l2src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_vorbis_jackaudiosink_v4l2src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_mp3_jackaudiosink_v4l2src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_mp3_jackaudiosink_v4l2src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_mp3_jackaudiosink_v4l2src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_audiotestsrc_raw_jackaudiosink_dv1394src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "dv1394src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_raw_jackaudiosink_dv1394src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        txVideoArg.source = "dv1394src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_raw_jackaudiosink_dv1394src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        txVideoArg.source = "dv1394src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_vorbis_jackaudiosink_dv1394src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_vorbis_jackaudiosink_dv1394src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_vorbis_jackaudiosink_dv1394src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_mp3_jackaudiosink_dv1394src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_mp3_jackaudiosink_dv1394src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_mp3_jackaudiosink_dv1394src_mpeg4_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_audiotestsrc_raw_jackaudiosink_videotestsrc_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_raw_jackaudiosink_videotestsrc_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_raw_jackaudiosink_videotestsrc_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_vorbis_jackaudiosink_videotestsrc_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_vorbis_jackaudiosink_videotestsrc_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_vorbis_jackaudiosink_videotestsrc_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_mp3_jackaudiosink_videotestsrc_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_mp3_jackaudiosink_videotestsrc_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_mp3_jackaudiosink_videotestsrc_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+
+    def test_audiotestsrc_raw_jackaudiosink_v4l2src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_raw_jackaudiosink_v4l2src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_raw_jackaudiosink_v4l2src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_vorbis_jackaudiosink_v4l2src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_vorbis_jackaudiosink_v4l2src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_vorbis_jackaudiosink_v4l2src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_mp3_jackaudiosink_v4l2src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_mp3_jackaudiosink_v4l2src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_mp3_jackaudiosink_v4l2src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_audiotestsrc_raw_jackaudiosink_dv1394src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_raw_jackaudiosink_dv1394src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_raw_jackaudiosink_dv1394src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_vorbis_jackaudiosink_dv1394src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_vorbis_jackaudiosink_dv1394src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_vorbis_jackaudiosink_dv1394src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_mp3_jackaudiosink_dv1394src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_mp3_jackaudiosink_dv1394src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_mp3_jackaudiosink_dv1394src_h264_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h264"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_raw_jackaudiosink_videotestsrc_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_raw_jackaudiosink_videotestsrc_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_raw_jackaudiosink_videotestsrc_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_vorbis_jackaudiosink_videotestsrc_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_vorbis_jackaudiosink_videotestsrc_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_vorbis_jackaudiosink_videotestsrc_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_mp3_jackaudiosink_videotestsrc_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_mp3_jackaudiosink_videotestsrc_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_mp3_jackaudiosink_videotestsrc_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+
+    def test_audiotestsrc_raw_jackaudiosink_v4l2src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_raw_jackaudiosink_v4l2src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_raw_jackaudiosink_v4l2src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_vorbis_jackaudiosink_v4l2src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_vorbis_jackaudiosink_v4l2src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_vorbis_jackaudiosink_v4l2src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_mp3_jackaudiosink_v4l2src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_mp3_jackaudiosink_v4l2src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_mp3_jackaudiosink_v4l2src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_audiotestsrc_raw_jackaudiosink_dv1394src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_raw_jackaudiosink_dv1394src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_raw_jackaudiosink_dv1394src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_vorbis_jackaudiosink_dv1394src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_vorbis_jackaudiosink_dv1394src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_vorbis_jackaudiosink_dv1394src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_mp3_jackaudiosink_dv1394src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_mp3_jackaudiosink_dv1394src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_mp3_jackaudiosink_dv1394src_theora_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "theora"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_raw_jackaudiosink_videotestsrc_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_raw_jackaudiosink_videotestsrc_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_raw_jackaudiosink_videotestsrc_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_vorbis_jackaudiosink_videotestsrc_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_vorbis_jackaudiosink_videotestsrc_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_vorbis_jackaudiosink_videotestsrc_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_mp3_jackaudiosink_videotestsrc_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_mp3_jackaudiosink_videotestsrc_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_mp3_jackaudiosink_videotestsrc_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+
+    def test_audiotestsrc_raw_jackaudiosink_v4l2src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_raw_jackaudiosink_v4l2src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_raw_jackaudiosink_v4l2src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_vorbis_jackaudiosink_v4l2src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_vorbis_jackaudiosink_v4l2src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_vorbis_jackaudiosink_v4l2src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_mp3_jackaudiosink_v4l2src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_mp3_jackaudiosink_v4l2src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_mp3_jackaudiosink_v4l2src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "v4l2src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+
+    def test_audiotestsrc_raw_jackaudiosink_dv1394src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_raw_jackaudiosink_dv1394src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_raw_jackaudiosink_dv1394src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_vorbis_jackaudiosink_dv1394src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_vorbis_jackaudiosink_dv1394src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 9):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_vorbis_jackaudiosink_dv1394src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_audiotestsrc_mp3_jackaudiosink_dv1394src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_jackaudiosrc_mp3_jackaudiosink_dv1394src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "jackaudiosrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
+    
+    def test_dv1394src_mp3_jackaudiosink_dv1394src_h263_xvimagesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.source = "dv1394src"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        txVideoArg.source = "dv1394src"
+        rxVideoArg.codec = "h263"
+        txVideoArg.codec = rxVideoArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    tests = prefixedMethods(TelnetTests(), 'test02')
+    tests = prefixedMethods(VideoTests(), 'test_v4l2src_theora_deinterlace')
 
     for test in tests:
         print '/*----------------------------------------------*/'

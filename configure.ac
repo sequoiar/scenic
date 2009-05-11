@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT(MILHOUSE, 0.1.2)
-AC_DEFINE(RELEASE_CANDIDATE,["-a2"],[rc version num])
+AC_DEFINE(RELEASE_CANDIDATE,["-b1"],[rc version num])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
@@ -40,12 +40,12 @@ AC_ARG_ENABLE([millisecwait], [ --enable-millisecwait=(millisecs) thread sleep t
 AC_DEFINE_UNQUOTED(MILLISEC_WAIT,[${enable_millisecwait}], wait time)
 
 AC_ARG_ENABLE([logs], [ --enable-logs enable logs in msg queues],,enable_logs=yes)
-if test "x${enable_logs}" = "xfalse" ; then
+if test "x${enable_logs}" = "xyes" ; then
     AC_DEFINE(MAPLOGS,[],[send logs to listeners])
 fi
 
-AC_ARG_ENABLE([asio], [ **************** 
-  --enable-asio build asio],,enable_asio=no)
+#AC_ARG_ENABLE([asio], [ **************** 
+#  --enable-asio build asio],,enable_asio=yes)
   
 
 AC_MSG_WARN([${ac_prefix}])
@@ -135,19 +135,6 @@ AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
 #AC_SUBST(PYTHON_CFLAGS)
 #AC_SUBST(PYTHON_LIBS)
 
-AX_PYTHON
-AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
-
-AX_BOOST_BASE([1.34])
-if test  "x${enable_asio}" = "xyes"; then
-AX_BOOST_THREAD
-AX_BOOST_SYSTEM
-AX_BOOST_ASIO
-fi
-
-AX_BOOST_PYTHON
-AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes")
-
 AX_CHECK_GL
 AX_CHECK_GLU
 
@@ -165,13 +152,6 @@ fi
 if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
     CXXFLAGS="-g -O0 -rdynamic -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
-
-#Trying to set CPPUNIT_LIBS using pkg-config
-PKG_CHECK_MODULES(CPPUNIT, cppunit, have_cppunit=true, have_cppunit=false)
-if test "x${have_cppunit}" = "xfalse" ; then
-    AC_MSG_WARN([libcppunit not found.-- ])
-fi
-
 fi
 
 CXXFLAGS+=" -fPIC "
@@ -235,18 +215,6 @@ AC_CONFIG_FILES([
 AC_OUTPUT
 echo
 
-if test  "$ac_cv_boost_python" != "yes"   ; then
-AC_MSG_NOTICE([Not building python directories -- python or boost-python not found ])
-fi
-
-if test  "x${enable_debug}" = "xyes" -a "x${have_cppunit}" = "xfalse"  ; then
-AC_MSG_NOTICE([Not building test directories -- no cppunit found])
-fi
-
-#if test  "x${enable_sip}" = "xyes" -a "x${have_libpj}" = "xfalse"  ; then
-#AC_MSG_NOTICE([Not building sip directory -- libpj missing])
-#fi
-
 if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
 AC_MSG_NOTICE([Not building 1394 support])
 fi
@@ -255,6 +223,3 @@ if test "x${no_glu}" = "xyes" ; then
 AC_MSG_NOTICE([Not building OpenGL support])
 fi
 
-if test "x${ax_cv_boost_asio}" != "xyes" -a "x${enable-asio}" == "xyes" ; then
-    AC_MSG_WARN([Missing boost::asio])
-fi

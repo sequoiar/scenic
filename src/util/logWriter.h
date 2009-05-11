@@ -118,6 +118,7 @@ namespace Log
             void hold();
             Subscriber();
             virtual void operator()(LogLevel&, std::string &){}
+            virtual void setLevel(int){}
             virtual ~Subscriber();
     };
 }

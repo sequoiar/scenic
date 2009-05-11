@@ -646,27 +646,37 @@ class ControllerApi(object):
         Starts audio/video streaming with a contact. 
         """
         log.info('ControllerApi.start_streams, contact= ' + str(contact_name))
+        log.warning('selecting contact %s. Maybe this should be deprecated.' % (contact_name))
         contact = self.get_contact(contact_name)
-        if contact:
-            if contact.state == CONNECTED:
-                try:
-                    contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
-                    settings_com_channel.start_streaming( global_setting, contact.address)
-                    # global_setting.start_streaming(self, contact.address, settings_com_channel)
-                    contact.stream_state = 2
-                    self.notify(caller, {'streaming':True, 'msg':"streaming started", 'contact_name':contact_name}, "start_streams") # key = start_streams
-                except AddressBookError, e:
-                    self.notify(caller, "Please select a contact prior to start streaming." + e.message, "error")   
-                    #TODO: change key for 'streams_error'
-                except SettingsError, err:
-                    self.notify(caller, err)
-                except StreamsError, err:
-                    self.notify(caller, err)
-            elif contact.state == DISCONNECTED:
-                deferred = self.start_connection(caller, contact)
-                if deferred:
-                    deferred.addCallback(self.start_streams_from_deferred, caller, contact_name)
-                    deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
+
+        self.select_contact(caller, contact_name) # !!!!
+        if not isinstance(contact, Exception):
+            if contact is not None:
+                
+                if contact.state == CONNECTED:
+                    try:
+                        contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
+                        settings_com_channel.start_streaming( global_setting, contact.address)
+                        # global_setting.start_streaming(self, contact.address, settings_com_channel)
+                        contact.stream_state = 2
+                        self.notify(caller, {'streaming':True, 'msg':"streaming started", 'contact_name':contact_name}, "start_streams") # key = start_streams
+                    except AddressBookError, e:
+                        self.notify(caller, "AddressbookadError while trying to start streaming:" + e.message, "error")   
+                        #TODO: change key for 'streams_error'
+                    except SettingsError, err:
+                        self.notify(caller, err)
+                    except StreamsError, err:
+                        self.notify(caller, err)
+                    except Exception, err:
+                        self.notify(caller, err)
+                elif contact.state == DISCONNECTED:
+                    deferred = self.start_connection(caller, contact)
+                    if deferred:
+                        deferred.addCallback(self.start_streams_from_deferred, caller, contact_name)
+                        deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
+        else:
+            log.error('Error in start_streams', contact.message)
+            self.notify(caller, contact)
                             
     def stop_streams(self, caller, contact_name):
         """
@@ -950,7 +960,7 @@ class ControllerApi(object):
             #pprint.pprint(contact.__dict__)
             
             if contact.state != addressbook.CONNECTED: 
-                self.notify(caller, "Please connect to a contact prior to start a network test.", "network_test_error")
+                self.notify(caller, "You are not connected to this contact.", "network_test_error")
             else:
                 #log.debug("connector : " + str(contact.connector))
                 # com_chan = None 
@@ -984,14 +994,32 @@ class ControllerApi(object):
                             log.debug("Will notify observer that we are starting a network test")
                             self.notify(caller, "Starting network performance test with contact %s for %d seconds..." % (contact.name, duration), "network_test_start")
                         else:
-                            self.notify(caller, "An error occuring while trying to start network test.", "network_test_error")
+                            # the API has already been notified with network_test_error key
+                            pass
+                            # self.notify(caller, "An error occuring while trying to start network test.", "network_test_error")
 
-#     def network_test_stop(self, caller):
-#         """
-#         Interrupts suddenly the network test.
-#         """
-#         #TODO
-#         pass
+    def network_test_abort(self, caller, contact_name=None):
+        """
+        Interrupts suddenly the network test.
+        """
+        try:
+            if contact_name is None:
+                contact = self.get_contact()
+            else:
+                contact = self.get_contact(contact_name)
+        except AddressBookError:
+            self.notify(caller, "Please select a contact prior to stop a network test.", "network_test_error")
+        else:
+            if contact.state != addressbook.CONNECTED: 
+                self.notify(caller, "You are not connected to this contact.", "network_test_error")
+            else:
+                try:
+                    tester = network.get_tester_for_contact(contact.name)
+                except KeyError, e:
+                    self.notify(caller, "No network tester for contact", "network_test_error")
+                else:
+                    tester.abort_test(caller)
+                    
 # 
 #     def network_test_enable_autoaccept(self, caller, enabled=True):
 #         """

@@ -29,20 +29,16 @@ class _GstElement;
 class RtpPay : public GstLinkableFilter
 {
     public:
-
         RtpPay() : rtpPay_(0) {}
         virtual void init() = 0;
         virtual ~RtpPay();
-        
         _GstElement *srcElement() { return rtpPay_; }
         _GstElement *sinkElement() { return rtpPay_; }
 
     protected:
-
         _GstElement *rtpPay_;
 
     private:
-
         RtpPay(const RtpPay&);     //No Copy Constructor
         RtpPay& operator=(const RtpPay&);     //No Assignment Operator
 };
@@ -78,6 +74,20 @@ class Payloader : public RtpPay
 
 class Depayloader : public RtpPay
 {
+};
+
+
+class TheoraPayloader : public Payloader
+{
+    private: 
+        void init();
+};
+
+
+class TheoraDepayloader : public Depayloader
+{
+    private: 
+        void init();
 };
 
 

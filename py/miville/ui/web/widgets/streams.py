@@ -38,7 +38,9 @@ class Streams(Widget):
         Starts the streams
 
         Called from the javascript widget.
+        :param contact: name of the contact
         """
+        # self.api.select_contact(self, contact)
         self.api.start_streams(self, contact)
         return False
         

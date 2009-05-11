@@ -149,7 +149,11 @@ def _create_stream_engines( listener, mode, procs_params):
     for group_name, sync_group in procs_params.iteritems():
         log.info(" sync group [" + group_name + "]") 
         engine = None
-        for stream_name, stream_params in sync_group.iteritems():
+        #for stream_name, stream_params in sync_group.iteritems():
+	stream_names = sync_group.keys()
+	stream_names.reverse() # we want reverse lexical order for our streams (i.e audio before video)
+        for stream_name in stream_names:
+            stream_params = sync_group[stream_name]
             log.info("  stream: " + stream_name)
             engine_name = stream_params['engine']
             if engine == None:

@@ -113,7 +113,10 @@ def print_engine(engine):
             command = cmd[0]
             txt += "<p><b>" + command + ": </b>"
             params = cmd[1]
-            if params:
+            # check if its iterable
+            if not getattr(params, '__iter__', False):
+                txt += str("<i>" + str(params) + "</i> ")
+            else:
                 for p in params:
                     v = str(p[1])
                     if isinstance(p[1], str) or isinstance(p[1], unicode):
@@ -138,9 +141,16 @@ def print_channel(channel):
     txt = ""
     try:
         txt += "<p>Remote address: " + channel.remote_addr + "</p>"
-        rx_counter = len(channel.receiver_procs_params)
-        tx_counter = len(channel.sender_procs_params)
-        txt += "<p><b><i>%d Rx processe(s), %d Tx processe(s)</i></b></p>" % (rx_counter, tx_counter)
+        txt += "<p>contact %s</p>" % channel.contact.name
+        txt += "<p>setting %s</p>" % channel.contact.setting
+        
+        rx_counter = 0
+        tx_counter = 0
+        if channel.receiver_procs_params:
+            rx_counter = len(channel.receiver_procs_params)
+        if channel.sender_procs_params:
+            tx_counter = len(channel.sender_procs_params)
+        txt += "<p><b><i>%d Rx process(es), %d Tx process(es)</i></b></p>" % (rx_counter, tx_counter)
         counter = 0
         if not channel.receiver_procs_params:
             txt += "<p>No active rx process</p>"

@@ -333,6 +333,47 @@ RtpPay* Mpeg4Decoder::createDepayloader() const
 
 
 /// Constructor 
+TheoraEncoder::TheoraEncoder() {}
+
+
+/// Destructor 
+TheoraEncoder::~TheoraEncoder()
+{}
+
+void TheoraEncoder::init()
+{
+    codec_ = Pipeline::Instance()->makeElement("theoraenc", NULL);
+    g_object_set(G_OBJECT(codec_), "speed-level", MAX_SPEED_LEVEL, NULL);
+    g_object_set(G_OBJECT(codec_), "quality", QUALITY, NULL);
+    VideoEncoder::init();
+}
+
+
+/// Overridden to convert from bit/s to kbit/s
+void TheoraEncoder::setBitrate(unsigned /*newBitrate*/)
+{
+    LOG_WARNING("Using quality, not bitrate. This function has no effect.");
+    //Encoder::setBitrate(newBitrate * 0.001);
+}
+
+
+RtpPay* TheoraEncoder::createPayloader() const
+{
+    return new TheoraPayloader();
+}
+
+
+void TheoraDecoder::init()
+{
+    codec_ = Pipeline::Instance()->makeElement("theoradec", NULL);
+}
+
+RtpPay* TheoraDecoder::createDepayloader() const
+{
+    return new TheoraDepayloader();
+}
+
+/// Constructor 
 VorbisEncoder::VorbisEncoder() : srcQueue_(0), sinkQueue_(0)
 {}
 

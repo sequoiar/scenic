@@ -167,7 +167,7 @@ class H264Decoder : public Decoder
         void init();
         RtpPay* createDepayloader() const;
         void adjustJitterBuffer(); 
-        static const unsigned long long DEFAULT_JITTER_BUFFER_MS = 20;
+        static const unsigned long long DEFAULT_JITTER_BUFFER_MS = 30;
 };
 
 
@@ -211,6 +211,32 @@ class Mpeg4Encoder : public VideoEncoder
 
 /// Decoder that decodes mpeg4 into raw video using the ffmpeg mpeg4 decoder.
 class Mpeg4Decoder: public Decoder
+{
+    private: 
+        void init();
+        RtpPay* createDepayloader() const;
+};
+
+
+/// Encoder that encodes raw video into mpeg4 using the ffmpeg mpeg4 encoder
+class TheoraEncoder : public VideoEncoder
+{
+    public:
+        TheoraEncoder();
+        ~TheoraEncoder();
+        void setBitrate(unsigned);
+
+    private:
+        static const int MAX_SPEED_LEVEL = 2;
+        static const int MIN_SPEED_LEVEL = 0;
+        static const int QUALITY = 20;
+        void init();
+        RtpPay* createPayloader() const;
+};
+
+
+/// Decoder that decodes mpeg4 into raw video using the ffmpeg mpeg4 decoder.
+class TheoraDecoder: public Decoder
 {
     private: 
         void init();
