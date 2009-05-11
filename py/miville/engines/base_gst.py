@@ -210,25 +210,39 @@ class GstServer(object):
                 except OSError:
                     pass # no such process
 
+    def send_cmd(self, cmd, args=None, callback=None, timer=None, timeout=3):
+        """
+        Sends a IPCP command to milhouse.
+
+        It uses a ring buffer of commands. (a FIFO) 
+        """
+        log.debug('GstServer.send_cmd state: ' + str(self.state) + " cmd: " +  cmd + " args: " + str(args)+ "pid " + str(self.process.pid) + " " + str(self) )
+        self.commands.insert(0, (cmd, args))
+        self._process_cmd()
+
     def _process_cmd(self): 
+        """
+        Called from send_cmd.
+
+        For each command to send to milhouse, sends it.
+        """
         log.debug('.')   
         if len(self.commands) > 0:
             if self.conn != None:
                 if self.state >= CONNECTED :
                     (cmd, args) = self.commands.pop()
-                    log.debug('\n\n\nGstServer._process_cmd: \n  ' + cmd + "\n  args: " + str(args) + "\n  pid " + str(self.process.pid)  + " " + str(self) + '\n\n')
+                    log.debug('GstServer._process_cmd: %s  Args: %s  Pid: %s  Self: %s' % (cmd, args, self.process.pid, self))
                     if args != None:
-                        self.conn.send_cmd(cmd, *args)
+                        # XXX
+                        if isinstance(args, (tuple, list)):
+                            self.conn.send_cmd(cmd, *args)
+                        else:
+                            self.conn.send_cmd(cmd, args)
                     else:
                         self.conn.send_cmd(cmd)      
         if len(self.commands) > 0:
             if self.state > STOPPED:
                 reactor.callLater(1, self._process_cmd)
-
-    def send_cmd(self, cmd, args=None, callback=None, timer=None, timeout=3):
-        log.debug('GstServer.send_cmd state: ' + str(self.state) + " cmd: " +  cmd + " args: " + str(args)+ "pid " + str(self.process.pid) + " " + str(self) )
-        self.commands.insert(0, (cmd,args) )
-        self._process_cmd()
 
     def del_callback(self, callback=None):
         log.debug('GstServer.del_callback ' + str(self))
