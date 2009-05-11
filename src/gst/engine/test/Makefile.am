@@ -1,9 +1,9 @@
 include $(top_srcdir)/globals.mak
 
-bin_PROGRAMS = allTester
-allTester_SOURCES = test.cpp  
+#bin_PROGRAMS = allTester
+#allTester_SOURCES = test.cpp  
 #syncTestSuite.cpp rtpSyncTestSuite.cpp videoTestSuite.cpp rtpVideoTestSuite.cpp rtpAudioTestSuite.cpp audioTestSuite.cpp gstTestSuite.cpp main.cpp 
 
-LDADD = $(ALL_GST_LIBS) $(CPPUNIT_LIBS) $(JACK_LIBS) $(GTK_LIBS) ../libgst.a $(src)/gutil/libgutil.a $(src)/tcp/libtcp.a $(LIBUTIL) $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS)
+#LDADD = $(ALL_GST_LIBS) $(CPPUNIT_LIBS) $(JACK_LIBS) $(GTK_LIBS) ../libgst.a $(src)/gutil/libgutil.a $(src)/tcp/libtcp.a $(LIBUTIL) $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS)
 #allTester_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GL_CFLAGS) $(GLU_CFLAGS)
 
