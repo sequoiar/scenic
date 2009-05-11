@@ -123,3 +123,22 @@ void RtpSender::checkSampleRate()
 }
 
 
+void RtpSender::subParseSourceStats(const std::string &idStr, GstStructure *stats)
+{
+    const GValue *val = gst_structure_get_value(stats, "internal");
+    if (g_value_get_boolean(val))   // is-internal
+    {
+        val = gst_structure_get_value(stats, "is-sender");
+        if (g_value_get_boolean(val))    // is-sender
+        {
+            printStatsVal(idStr, "bitrate", "guint64", ":BITRATE: ", stats);
+            printStatsVal(idStr, "octets-sent", "guint64", ":OCTETS-SENT:", stats);
+            printStatsVal(idStr, "packets-sent", "guint64", ":PACKETS-SENT:", stats);
+        }
+
+        return; // otherwise we don't care about internal sources
+    }
+    printStatsVal(idStr, "rb-jitter", "guint32", ":JITTER: ", stats);
+    printStatsVal(idStr, "rb-packetslost", "gint32", ":PACKETS LOST: ", stats);
+}
+

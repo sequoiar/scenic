@@ -45,6 +45,7 @@ class RtpSender
         void add(RtpPay * payloader, const SenderConfig & config);
 
     private:
+        virtual void subParseSourceStats(const std::string &idStr, _GstStructure *stats);
         _GstElement *rtp_sender_;
         RtpSender(const RtpSender&); //No Copy Constructor
         RtpSender& operator=(const RtpSender&); //No Assignment Operator

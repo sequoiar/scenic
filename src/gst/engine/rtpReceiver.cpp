@@ -289,3 +289,14 @@ void RtpReceiver::createLatencyControl()
     madeControl_ = true;
 }
 
+
+void RtpReceiver::subParseSourceStats(const std::string &idStr, GstStructure *stats)
+{
+    const GValue *val = gst_structure_get_value(stats, "internal");
+    if (g_value_get_boolean(val))   // is-internal
+        return;
+    
+    printStatsVal(idStr, "octets-received", "guint64", ":OCTETS-RECEIVED:", stats);
+    printStatsVal(idStr, "packets-received", "guint64", ":PACKETS-RECEIVED:", stats);
+}
+

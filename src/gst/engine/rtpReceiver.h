@@ -49,6 +49,7 @@ class RtpReceiver
         static void enableControl();
 
     private:
+        virtual void subParseSourceStats(const std::string &idStr, _GstStructure *stats);
         static _GstPad *getMatchingDepayloaderSinkPad(_GstPad *srcPad);
         static std::string getMediaType(_GstPad *pad);
         static void cb_new_src_pad(_GstElement * element, _GstPad * srcPad, void *data);

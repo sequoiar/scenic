@@ -54,25 +54,41 @@ void RtpBin::init()
         // uncomment this to print stats
         g_timeout_add(REPORTING_PERIOD_MS /* ms */, 
                 static_cast<GSourceFunc>(printStatsCallback),
-                static_cast<gpointer>(rtpbin_));
+                static_cast<gpointer>(this));
     }
     // DON'T USE THE DROP-ON-LATENCY SETTING, WILL CAUSE AUDIO TO DROP OUT WITH LITTLE OR NO FANFARE
 }
 
 
-void RtpBin::printStatsVal(const std::string &idStr, const char *key, const std::string &formatStr, GstStructure *stats)
+void RtpBin::printStatsVal(const std::string &idStr, const char *key, const std::string &type, const std::string &formatStr, GstStructure *stats)
 {
     MapMsg mapMsg;
     std::stringstream paramStr;
-    guint32 val = g_value_get_uint(gst_structure_get_value(stats, key));
-    paramStr << formatStr << val;
+    if (type == "guint64")
+    {
+        guint64 val = g_value_get_uint64(gst_structure_get_value(stats, key));
+        paramStr << formatStr << val;
+    }
+    else if (type == "guint32")
+    {
+        guint32 val = g_value_get_uint(gst_structure_get_value(stats, key));
+        paramStr << formatStr << val;
+    }
+    else if (type == "gint32")
+    {
+        gint32 val = g_value_get_int(gst_structure_get_value(stats, key));
+        paramStr << formatStr << val;
+    }
+    else
+        THROW_ERROR("FUCKKKCKCKKCCKCKC");
+
     mapMsg["stats"] = idStr + paramStr.str();
     LOG_DEBUG(mapMsg["stats"]);
     mapMsg.post();
 }
 
 
-void RtpBin::parseSourceStats(GObject * source, int sessionId)
+void RtpBin::parseSourceStats(GObject * source, int sessionId, RtpBin *context)
 {
     GstStructure *stats;
     std::stringstream idStr;
@@ -85,19 +101,8 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
     /* simply dump the stats structure */
     // gchar *str = gst_structure_to_string (stats);
     // g_print ("source stats: %s\n", str);
-    const GValue *val = gst_structure_get_value(stats, "internal");
 
-    if (g_value_get_boolean(val))   // is-internal
-    {
-        val = gst_structure_get_value(stats, "is-sender");
-        if (g_value_get_boolean(val))    // is-sender
-            printStatsVal(idStr.str(), "bitrate", ":BITRATE: ", stats);
-
-        gst_structure_free (stats);
-        return; // otherwise we don't care about internal sources
-    }
-    printStatsVal(idStr.str(), "rb-jitter", ":JITTER: ", stats);
-    printStatsVal(idStr.str(), "rb-packetslost", ":PACKETS LOST: ", stats);
+    context->subParseSourceStats(idStr.str(), stats);  // let our subclasses parse the stats
 
     // free structures
     gst_structure_free (stats);
@@ -122,12 +127,12 @@ gboolean RtpBin::printStatsCallback(gpointer data)
     GValue *val;
     guint i;
 
-    GstElement *rtpbin = static_cast<GstElement*>(data);
+    RtpBin *context = static_cast<RtpBin*>(data);
 
     // get sessions
     for (int sessionId = 0; sessionId < sessionCount_; ++sessionId)
     {
-        g_signal_emit_by_name(rtpbin, "get-internal-session", sessionId, &session);
+        g_signal_emit_by_name(context->rtpbin_, "get-internal-session", sessionId, &session);
 
         // parse stats of all the sources in the session, this include the internal source
         g_object_get(session, "sources", &arrayOfSources, NULL);
@@ -139,7 +144,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
             val = g_value_array_get_nth(arrayOfSources, i);
             source = static_cast<GObject*>(g_value_get_object(val));
 
-            parseSourceStats(source, sessionId);
+            parseSourceStats(source, sessionId, context);
         }
         g_value_array_free(arrayOfSources);
 

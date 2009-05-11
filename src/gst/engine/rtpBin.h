@@ -50,13 +50,14 @@ class RtpBin
         _GstElement *rtcp_sender_, *rtcp_receiver_;
         int sessionId_;
         static std::map<int, std::string> sessionNames_;
+        virtual void subParseSourceStats(const std::string &idStr, _GstStructure *stats) = 0;
+        static void printStatsVal(const std::string &idStr, const char *key, const std::string &type, const std::string &formatStr, _GstStructure *stats);
 
     private:
         static const int REPORTING_PERIOD_MS = 8000;
-        static void printStatsVal(const std::string &idStr, const char *key, const std::string &formatStr, _GstStructure *stats);
         static int printStatsCallback(void * rtpbin);
         static void printSourceStats(_GObject *source);
-        static void parseSourceStats(_GObject * source, int sessionId);
+        static void parseSourceStats(_GObject * source, int sessionId, RtpBin *context);
 
         RtpBin(const RtpBin&); //No Copy Constructor
         RtpBin& operator=(const RtpBin&); //No Assignment Operator
