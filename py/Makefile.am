@@ -20,13 +20,13 @@ TESTS = test/test_addressbook.py \
         test/check_miville_starts.py \
         test/check_miville_settings.py
 
-install-exec-hook:
-		cp -fvr miville/ $(PREFIX)/lib/python2.5
-		cp -fv miville.py $(PREFIX)/bin/miville
+#install-exec-hook:
+#		cp -fvr miville/ $(DESTDIR)/$(PREFIX)/lib/python2.5
+#		cp -fv miville.py $(DESTDIR)/$(PREFIX)/bin/miville
 
-uninstall-hook:
-		rm -rf $(PREFIX)/lib/python2.5/miville
-		rm -rf $(PREFIX)/bin/miville
+#uninstall-hook:
+#		rm -rf $(DESTDIR)/$(PREFIX)/lib/python2.5/miville
+#		rm -rf $(DESTDIR)/$(PREFIX)/bin/miville
 
 # temporarily removed: check_ping.py
 # not much useful:
