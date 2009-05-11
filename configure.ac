@@ -44,10 +44,6 @@ if test "x${enable_logs}" = "xyes" ; then
     AC_DEFINE(MAPLOGS,[],[send logs to listeners])
 fi
 
-#AC_ARG_ENABLE([asio], [ **************** 
-#  --enable-asio build asio],,enable_asio=yes)
-  
-
 AC_MSG_WARN([${ac_prefix}])
 # Checks for library functions.
 
@@ -138,7 +134,7 @@ AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
 AX_PYTHON
 AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
 
-AX_BOOST_BASE([1.34])
+AX_BOOST_BASE([1.35])
 AX_BOOST_THREAD
 AX_BOOST_SYSTEM
 AX_BOOST_ASIO
@@ -174,7 +170,7 @@ CXXFLAGS+=" -fPIC "
 #
 #AM_CONDITIONAL([SIP],test "x${enable_sip}" = "xyes" -a "x{have_libpj}" = "xtrue" )
 #AM_CONDITIONAL([IEEE1394],test "x{have_libavc1394}" = "xtrue" -a "x{have_libraw1394}" = "xtrue" )
-AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes" -a "x${have_cppunit}" = "xtrue" )
+AM_CONDITIONAL([PROJ_DEBUG],test "x${enable_debug}" = "xyes")
 
 if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
 AC_MSG_NOTICE([undef CONFIG_IEEE1394])
