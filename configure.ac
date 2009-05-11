@@ -230,14 +230,6 @@ if test  "$ac_cv_boost_python" != "yes"   ; then
 AC_MSG_NOTICE([Not building python directories -- python or boost-python not found ])
 fi
 
-if test  "x${enable_debug}" = "xyes" -a "x${have_cppunit}" = "xfalse"  ; then
-AC_MSG_NOTICE([Not building test directories -- no cppunit found])
-fi
-
-#if test  "x${enable_sip}" = "xyes" -a "x${have_libpj}" = "xfalse"  ; then
-#AC_MSG_NOTICE([Not building sip directory -- libpj missing])
-#fi
-
 if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then
 AC_MSG_NOTICE([Not building 1394 support])
 fi
@@ -246,6 +238,3 @@ if test "x${no_glu}" = "xyes" ; then
 AC_MSG_NOTICE([Not building OpenGL support])
 fi
 
-if test "x${ax_cv_boost_asio}" != "xyes" -a "x${enable-asio}" == "xyes" ; then
-    AC_MSG_WARN([Missing boost::asio])
-fi
