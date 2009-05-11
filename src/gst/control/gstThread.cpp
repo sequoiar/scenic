@@ -184,9 +184,8 @@ void GstReceiverThread::video_init(MapMsg& msg)
     try
     {
         LOG_INFO("video_init");
-        const int SCREEN_NUM = 0;       
         const char *VIDEO_SINK = "xvimagesink";
-        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], SCREEN_NUM, VIDEO_SINK);
+        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], msg["screen"], VIDEO_SINK);
     }
     catch(Except e)
     {
