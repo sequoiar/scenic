@@ -80,7 +80,7 @@ void RtpBin::printStatsVal(const std::string &idStr, const char *key, const std:
         paramStr << formatStr << val;
     }
     else
-        THROW_ERROR("FUCKKKCKCKKCCKCKC");
+        THROW_ERROR("Unknown type");
 
     mapMsg["stats"] = idStr + paramStr.str();
     LOG_DEBUG(mapMsg["stats"]);
