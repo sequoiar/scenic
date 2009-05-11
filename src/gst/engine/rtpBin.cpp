@@ -80,7 +80,7 @@ void RtpBin::printStatsVal(const std::string &idStr, const char *key, const std:
         paramStr << formatStr << val;
     }
     else
-        THROW_ERROR("Unknown type");
+        THROW_ERROR("Unexpected type");
 
     mapMsg["stats"] = idStr + paramStr.str();
     LOG_DEBUG(mapMsg["stats"]);
@@ -93,7 +93,6 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId, RtpBin *context)
     GstStructure *stats;
     std::stringstream idStr;
     idStr << sessionNames_[sessionId] << "_" << sessionId;
-    MapMsg mapMsg("rtp");
 
     // get the source stats
     g_object_get(source, "stats", &stats, NULL);
