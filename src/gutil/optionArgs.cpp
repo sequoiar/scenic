@@ -133,8 +133,9 @@ void OptionArgs::parse(int argc, char **argv)
     {
         std::cout << g_option_context_get_help(context, TRUE, NULL);
         g_option_context_free(context);
-        exit(0);
+        return;
     }
+
     g_option_context_free(context);
 
     for(Options::iterator it = options_.begin(); it != options_.end(); ++it)
