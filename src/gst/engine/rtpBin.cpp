@@ -60,12 +60,24 @@ void RtpBin::init()
 }
 
 
+void RtpBin::printStatsVal(const std::string &idStr, const char *key, const std::string &formatStr, GstStructure *stats)
+{
+    MapMsg mapMsg;
+    std::stringstream paramStr;
+    guint32 val = g_value_get_uint(gst_structure_get_value(stats, key));
+    paramStr << formatStr << val;
+    mapMsg["stats"] = idStr + paramStr.str();
+    LOG_DEBUG(mapMsg["stats"]);
+    mapMsg.post();
+}
+
+
 void RtpBin::parseSourceStats(GObject * source, int sessionId)
 {
     GstStructure *stats;
-    std::stringstream idStr, paramStr;
-    MapMsg mapMsg("rtp");
+    std::stringstream idStr;
     idStr << sessionNames_[sessionId] << "_" << sessionId;
+    MapMsg mapMsg("rtp");
 
     // get the source stats
     g_object_get(source, "stats", &stats, NULL);
@@ -79,32 +91,13 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId)
     {
         val = gst_structure_get_value(stats, "is-sender");
         if (g_value_get_boolean(val))    // is-sender
-        {
-            guint64 bitrate = g_value_get_uint64(gst_structure_get_value(stats, "bitrate"));
-            paramStr << ":BITRATE: " << bitrate;
-
-            mapMsg["stats"] = idStr.str() + paramStr.str();
-            LOG_DEBUG(mapMsg["stats"]);
-            mapMsg.post();
-        }
+            printStatsVal(idStr.str(), "bitrate", ":BITRATE: ", stats);
 
         gst_structure_free (stats);
         return; // otherwise we don't care about internal sources
     }
-
-    guint32 jitter = g_value_get_uint(gst_structure_get_value(stats, "rb-jitter"));
-    paramStr << ":JITTER: " << jitter;
-    mapMsg["stats"] = idStr.str() + paramStr.str();
-    LOG_DEBUG(mapMsg["stats"]);
-    mapMsg.post();
-
-    paramStr.str(""); // reset
-
-    gint32 packetsLost = g_value_get_int(gst_structure_get_value(stats, "rb-packetslost"));
-    idStr << ":PACKETS LOST: " << packetsLost;
-    mapMsg["stats"] = idStr.str() + paramStr.str();
-    LOG_DEBUG(mapMsg["stats"]);
-    mapMsg.post();
+    printStatsVal(idStr.str(), "rb-jitter", ":JITTER: ", stats);
+    printStatsVal(idStr.str(), "rb-packetslost", ":PACKETS LOST: ", stats);
 
     // free structures
     gst_structure_free (stats);

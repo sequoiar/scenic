@@ -27,6 +27,7 @@
 
 class RemoteConfig;
 class _GstElement;
+class _GstStructure;
 class _GObject;
 
 class RtpBin
@@ -52,6 +53,7 @@ class RtpBin
 
     private:
         static const int REPORTING_PERIOD_MS = 8000;
+        static void printStatsVal(const std::string &idStr, const char *key, const std::string &formatStr, _GstStructure *stats);
         static int printStatsCallback(void * rtpbin);
         static void printSourceStats(_GObject *source);
         static void parseSourceStats(_GObject * source, int sessionId);
