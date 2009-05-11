@@ -676,9 +676,9 @@ class ControllerApi(object):
                         if deferred:
                             deferred.addCallback(self.start_streams_from_deferred, caller, contact_name)
                             deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
-                except AdressBookError, err:
+                except AddressBookError, err:
                     self.notify(caller, err)
-                    
+                    log.error('start_streams: ' + err.message)
         else:
             log.error('Error in start_streams', contact.message)
             self.notify(caller, contact)

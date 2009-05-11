@@ -43,7 +43,7 @@ class IPCP(LineReceiver):
     TCP and ASCII.
     """
     def __init__(self):
-        log.debug("IPCP.__init__ " + str(self) )
+        log.debug("IPCP.__init__ " + str(self))
         self.r = re.compile(r'("([^"\\]|\\.)*"|[^ ]+)')
         self.callbacks = {}
 
@@ -124,7 +124,7 @@ class IPCP(LineReceiver):
                 args[attr] = value
                 start = end + 1
             log.debug("Received: " + cmd + repr(args))
-            log.debug("Callback " + str(self.callbacks[cmd]) )
+            log.debug("Callback " + str(self.callbacks[cmd]))
             self.callbacks[cmd](**args)
     
     def send_cmd(self, cmd, *args):
@@ -136,15 +136,15 @@ class IPCP(LineReceiver):
                 if parg:
                     
                     process_key = arg[0].encode('ascii', 'backslashreplace')
-                    log.debug("IPCP.send_cmd: " + str(args) )
-                    log.debug("IPCP.send_cmd: process_key[" + str(process_key) + "] = [" + parg + "]" )
+                    log.debug("IPCP.send_cmd: " + str(args))
+                    log.debug("IPCP.send_cmd: process_key[" + str(process_key) + "] = [" + parg + "]")
                     line.append(process_key + '=' + parg)
             else:
                 parg = self._process_arg(arg)
                 if parg:
                     line.append(parg)
         line = ' '.join(line)
-        log.debug('IPCP.send_cmd: "' + line + '" from ' + str(self) )
+        log.debug('IPCP.send_cmd: "' + line + '" from ' + str(self))
         self.sendLine(line)
 
     def _process_arg(self, arg):

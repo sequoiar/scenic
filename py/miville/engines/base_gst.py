@@ -232,17 +232,18 @@ class GstServer(object):
                 if self.state >= CONNECTED :
                     (cmd, args) = self.commands.pop()
                     log.debug('GstServer._process_cmd: %s  Args: %s  Pid: %s  Self: %s' % (cmd, args, self.process.pid, self))
-                    if args != None:
+                    if args is not None:
                         # XXX
-                        #if isinstance(args, (tuple, list)):
-                        #    self.conn.send_cmd(cmd, *args)
-                        #else:
-                        self.conn.send_cmd(cmd, args)
+                        if isinstance(args, (tuple, list)):
+                            self.conn.send_cmd(cmd, *args)
+                        else:
+                            self.conn.send_cmd(cmd, args)
                     else:
                         self.conn.send_cmd(cmd)      
         if len(self.commands) > 0:
             if self.state > STOPPED:
                 reactor.callLater(1, self._process_cmd)
+                # waits 1.0 second before next command to be sent
 
     def del_callback(self, callback=None):
         log.debug('GstServer.del_callback ' + str(self))

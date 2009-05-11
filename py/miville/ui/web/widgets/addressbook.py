@@ -336,7 +336,12 @@ class Addressbook(Widget):
         log.debug("STOP_STREAMS " + str(data))
         log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'stop_streams'))
         try:
-            stopped = data['stopped'] is True
+            try:
+                stopped = data['stopped'] is True
+            except KeyError, e:
+                log.error("KeyError: data in start_streams should be a dict with key" + e.message) 
+            else:
+                stopped = True
             if stopped:
                 #log.warning('TODO:self.callRemote()')
                 contact_name = data['contact_name']
@@ -348,8 +353,6 @@ class Addressbook(Widget):
                 self.api.get_contacts(self)  # updates list
             else:
                 log.warning('TODO:self.callRemote()')
-        except KeyError, e:
-            log.error("KeyError: data in start_streams should be a dict with key" + e.message) 
         except Exception, e:
             log.error('Error in cb_stop_streams : ' + e.message)
 
