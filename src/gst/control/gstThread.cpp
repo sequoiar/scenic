@@ -186,10 +186,10 @@ void GstReceiverThread::video_init(MapMsg& msg)
         LOG_INFO("video_init");
         const int SCREEN = msg["screen"] ? msg["screen"] : 0;
         std::string VIDEO_SINK;
-        if(!msg["device"])
+        if(!msg["sink"])
             VIDEO_SINK = "xvimagesink";
         else
-            VIDEO_SINK = std::string(msg["device"]);
+            VIDEO_SINK = std::string(msg["sink"]);
 
         video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], SCREEN, VIDEO_SINK);
     }
@@ -212,10 +212,10 @@ void GstReceiverThread::audio_init(MapMsg& msg)
     {
         std::string AUDIO_SINK, AUDIO_LOCATION;
         int audioBufferTime = audiofactory::AUDIO_BUFFER_USEC;
-        if(!msg["device"])
+        if(!msg["sink"])
             AUDIO_SINK = "jackaudiosink";
         else
-            AUDIO_SINK = std::string(msg["device"]);
+            AUDIO_SINK = std::string(msg["sink"]);
         if(!msg["device"])
             AUDIO_LOCATION = "";
         else

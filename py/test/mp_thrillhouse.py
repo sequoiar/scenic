@@ -67,6 +67,18 @@ def createClients():
 def runClients(rxTn, txTn, args):
     """ Here our telnet clients issue their commands to their respective milhouse servers """
 
+    if 'rxAudioArg' in args:
+        rxAudioArg = str(args['rxAudioArg'])
+        print "SENDING " + rxAudioArg
+        rxTn.write(rxAudioArg + '\n')
+        rxTn.read_until('audio_init: ack="ok"')
+
+    if 'txAudioArg' in args:
+        txAudioArg = str(args['txAudioArg']) 
+        print "SENDING " + txAudioArg
+        txTn.write(txAudioArg + '\n')
+        txTn.read_until('audio_init: ack="ok"')
+    
     if 'rxVideoArg' in args:
         rxVideoArg = str(args['rxVideoArg'])
         print "SENDING " + rxVideoArg
@@ -79,17 +91,6 @@ def runClients(rxTn, txTn, args):
         txTn.write(txVideoArg + '\n')
         txTn.read_until('video_init: ack="ok"')
     
-    if 'rxAudioArg' in args:
-        rxAudioArg = str(args['rxAudioArg'])
-        print "SENDING " + rxAudioArg
-        rxTn.write(rxAudioArg + '\n')
-        rxTn.read_until('audio_init: ack="ok"')
-
-    if 'txAudioArg' in args:
-        txAudioArg = str(args['txAudioArg']) 
-        print "SENDING " + txAudioArg
-        txTn.write(txAudioArg + '\n')
-        txTn.read_until('audio_init: ack="ok"')
 
     rxTn.write('start:\n')
     rxTn.read_until('start: ack="ok"')
@@ -1990,7 +1991,7 @@ class AudioVideoTests(object):
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    tests = prefixedMethods(VideoTests(), 'test_v4l2src_theora_deinterlace')
+    tests = prefixedMethods(VideoTests(), 'test_v4l2src_theora_glimagesin')
 
     for test in tests:
         print '/*----------------------------------------------*/'

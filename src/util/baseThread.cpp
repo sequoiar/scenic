@@ -70,7 +70,7 @@ BaseThread::~BaseThread()
     if (th_){
         MapMsg t("quit"); //TODO: this is forcing the 
         flippedQueue_.push(t);
-        LOG_DEBUG("Thread Stoping " << this);
+        LOG_DEBUG("Thread Stopping " << this);
         allThreads_.erase(this);
 #ifdef HAVE_BOOST_THREAD
         th_->join();
