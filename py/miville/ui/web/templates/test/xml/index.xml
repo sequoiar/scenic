@@ -1,0 +1,8 @@
+	<body xmlns:n="http://nevow.com/ns/nevow/0.1">
+		<h3>Voici le beau body</h3>
+		<div n:render="asfa"></div>
+		<div n:render="dfj"></div>
+		<div n:render="bnmb"></div>
+		<div n:render="rthfg">
+		<div n:render="fg"></div></div>
+	</body>

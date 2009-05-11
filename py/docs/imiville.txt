@@ -1,0 +1,12 @@
+Imiville Documentation
+======================
+
+This page contains the Imiville Module documentation.
+
+The :mod:`imiville` Module
+--------------------------
+
+.. automodule:: imiville
+    :members:
+    :undoc-members:
+    :show-inheritance:

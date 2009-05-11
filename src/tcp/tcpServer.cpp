@@ -1,5 +1,7 @@
 // tcpServer.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -17,29 +19,22 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/** \file
- *  A simple server in the internet domain using TCP
- *
- *  The port number is passed as an argument
- */
 
+#include "util.h"
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <string.h>
+#include <cstring>
 #include <error.h>
 #include <errno.h>
 
-#include <string>
-#include "logWriter.h"
 #include "tcpServer.h"
-#include <sstream>
 
 #define ALLOW_ANY_ADDR
 #ifdef ALLOW_ANY_ADDR
@@ -91,7 +86,8 @@ bool TcpServer::socket_connect_send(const std::string& addr, const std::string& 
     if (connect(ssockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
     {
         ::close(ssockfd);
-        THROW_ERRNO("Cannot Connect to peer. " <<  strerror(errno), errno);
+        return false;
+        //THROW_ERRNO("Cannot Connect to peer. " <<  strerror(errno), errno);
     }
     int n=0;
     n = ::write(ssockfd, msg.c_str(), msg.size());

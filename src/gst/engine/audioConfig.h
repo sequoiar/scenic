@@ -1,5 +1,8 @@
+
 /* audioConfig.h
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -17,95 +20,69 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 #ifndef _AUDIO_LOCAL_CONFIG_H_
 #define _AUDIO_LOCAL_CONFIG_H_
 
 #include <string>
-#include "logWriter.h"
 
 // forward declarations
 class AudioSource;
 class AudioSink;
 
-/// Immutable class that is used to parameterize AudioLocal and AudioSender objects. 
+/// Immutable class that is used to parameterize AudioSender objects. 
 class AudioSourceConfig
 {
     public:
-        /// Constructor sets by default location to an empty string and loop to LOOP_NONE 
-        AudioSourceConfig(const std::string & source__, int numChannels__, int loop__ = LOOP_NONE)
-            : source_(source__), location_(""), numChannels_(numChannels__), loop_(loop__)
-        {
-            if (source_.empty())
-                THROW_ERROR("No source specified");
-            if(numChannels_ < 1 || numChannels_ > 8)
-                THROW_ERROR("Invalid number of channels");
-        }
-        /** 
-         * Constuctor sets by default loop to LOOP_NONE, but has file location specified */
-        AudioSourceConfig(const std::string & source__, const std::string & location__,
-                int numChannels__, int loop__ = LOOP_NONE)
-            : source_(source__), location_(location__), numChannels_(numChannels__) , loop_(loop__)
-        {}
-        /** 
-         * Copy constructor */
-        AudioSourceConfig(const AudioSourceConfig& m)
-            : source_(m.source_), location_(m.location_), numChannels_(m.numChannels_) , loop_(m.loop_) 
-        {}
+        
+        AudioSourceConfig(const std::string & source__,     
+                          const std::string & deviceName__,
+                          const std::string & location__,
+                          int numChannels__);
+        
+        AudioSourceConfig(const AudioSourceConfig& m);
 
-        /// Returns c-style string specifying the source 
         const char *source() const;
-        /** 
-         * Returns number of channels */
-        int numChannels() const { return numChannels_; }
-        /** 
-         * Returns number of times file will be played */
-        int loop() const { return loop_; }
-        /** 
-         * Returns c-style string specifying the location 
-         * (either filename or device descriptor) */
+
+        int numChannels() const;
+
+        bool hasDeviceName() const { return !deviceName_.empty(); }
+        bool hasLocation() const { return !location_.empty(); }
+
+        const char *deviceName() const;
         const char *location() const;
-        /** 
-         * Returns true if location indicates an existing, readable file. */
-        bool fileExists() const;
+
+        bool locationExists() const;
          
-        /// Factory method that creates an AudioSource based on this object's source_ string 
         AudioSource* createSource() const;
 
-        /** Enum representing two possible loop settings, any other will correspond 
-         * to the finite number of times to playback. */
-        enum LOOP_SETTING 
-        { 
-            LOOP_INFINITE = -1,
-            LOOP_NONE = 0
-        };
-        
     private:
         /// No Assignment Operator 
         AudioSourceConfig& operator=(const AudioSourceConfig&); 
         const std::string source_;
+        const std::string deviceName_;
         const std::string location_;
         const int numChannels_;
-        const int loop_;
 };
 
 ///  Immutable class that is used to parametrize AudioReceiver objects.  
 class AudioSinkConfig 
 {
     public:
-        /// Constructor 
-        AudioSinkConfig(const std::string & sink__)
-            : sink_(sink__)
-        {}
-        /** 
-         * Copy constructor */
-        AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_) 
-        {}
+        AudioSinkConfig(const std::string & sink__, const std::string & deviceName__, unsigned long long bufferTime);
+        
+        AudioSinkConfig(const AudioSinkConfig & m); 
 
-        /// Factory method that creates an AudioSink based on this object's sink_ string 
         AudioSink* createSink() const;
+        bool hasDeviceName() const { return !deviceName_.empty(); }
+        const char *deviceName() const;
+        unsigned long long bufferTime() const;
+        static const unsigned long long DEFAULT_BUFFER_TIME = 10000LL;
 
     private:
         const std::string sink_;
+        const std::string deviceName_;
+        const unsigned long long bufferTime_;
 };
 
 #endif // _AUDIO_LOCAL_CONFIG_H_

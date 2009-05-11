@@ -1,5 +1,7 @@
 /* lassert.h
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -18,35 +20,21 @@
  *
  */
 
-/** \file 
- *      allows assert to throw an exception
- *
- */
-
 #ifndef __LASSERT_H__
 #define __LASSERT_H__
 
 #define ASSERT_THROWS   
 
-#ifndef ASSERT_THROWS
-#include <assert.h>
-#else //ASSERT_THROWS
-
-#include <assert.h>
-
-#ifdef assert
-#undef assert
-#endif
-
-#define assert(expr)                                                        \
+#ifdef ASSERT_THROWS
+#include <cassert>
+#define tassert(expr)                                                        \
     ((expr)                             \
      ?__ASSERT_VOID_CAST (0)            \
      :  assert_throw(__STRING(expr), __FILE__, __LINE__, __ASSERT_FUNCTION))
 
-
+///throws an exception in case of assertion failure
 void assert_throw(__const char *__assertion, __const char *__file,
                            unsigned int __line, __const char *__function);
-
 #endif  //ASSERT_THROWS
 
 #endif  //__LASSERT_H__

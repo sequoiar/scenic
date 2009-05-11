@@ -1,5 +1,7 @@
 /* gstThread.h
- * Copyright 2008  Koya Charles & Tristan Matthews
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,20 +29,24 @@ class GstThread
     : public MsgThread
 {
     protected:
-        GstThread(){}
+        GstThread():stop_id(0),play_id(0){}
         /// incomming audio_start request 
-        virtual bool audio_start(MapMsg& msg) = 0;
+        virtual void audio_init(MapMsg& msg) = 0;
         /// incomming video_start request 
-        virtual bool video_start(MapMsg& msg) = 0;
-        /// incomming audio_stop request 
-        void audio_stop(MapMsg& ); 
-        /// incomming video_stop request 
-        void video_stop(MapMsg& ); 
+        virtual void video_init(MapMsg& msg) = 0;
+        /// incomming stop request 
+        void stop(MapMsg& ); 
+        /// incomming start request 
+        virtual void start(MapMsg& ); 
+        /// subclass specific message handling
+        virtual bool subHandleMsg(MapMsg&){ return false;}
 
 
-
+    int stop_id;
+    int play_id;
     private:
-        int main();
+        void main();
+        void handleMsg(MapMsg& msg);
 
         /// No Copy Constructor 
         GstThread(const GstThread&); 

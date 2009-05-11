@@ -54,6 +54,7 @@
 #   Macro released by the Autoconf Macro Archive. When you make and
 #   distribute a modified version of the Autoconf Macro, you may extend this
 #   special exception to the GPL to apply to your modified version as well.
+#\locate $ax_python_bin/Python.h | sed -e s,/Python.h,,\]],
 
 AC_DEFUN([AX_PYTHON],
 [AC_MSG_CHECKING(for python build information)
@@ -63,9 +64,24 @@ AC_CHECK_PROGS(PYTHON_BIN, [$python])
 ax_python_bin=$PYTHON_BIN
 if test x$ax_python_bin != x; then
    AC_CHECK_LIB($ax_python_bin, main, ax_python_lib=$ax_python_bin, ax_python_lib=no)
-   AC_CHECK_HEADER([$ax_python_bin/Python.h],
-   [[ax_python_header=`locate $ax_python_bin/Python.h | sed -e s,/Python.h,,`]],
-   ax_python_header=no)
+   
+   if test -e [/usr/local/include/$ax_python_bin/Python.h]; then
+      AC_CHECK_HEADER([$ax_python_bin/Python.h],
+      [ax_python_header=/usr/local/include/$ax_python_bin],
+      ax_python_header=no)
+   else
+   if test -e [/usr/include/$ax_python_bin/Python.h]; then
+      AC_CHECK_HEADER([$ax_python_bin/Python.h],
+      [ax_python_header=/usr/include/$ax_python_bin],
+      ax_python_header=no)
+   else
+      AC_MSG_WARN([Python.h not found in /usr/include/$ax_python_bin doing !!bad!! locate as backup method.])
+      AC_CHECK_HEADER([$ax_python_bin/Python.h],
+      [ax_python_header=`locate $ax_python_bin/Python.h | sed -e s,/Python.h,,`],
+      ax_python_header=no)
+   fi
+   fi
+
    if test $ax_python_lib != no; then
      if test $ax_python_header != no; then
        break;

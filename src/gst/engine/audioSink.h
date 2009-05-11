@@ -1,5 +1,7 @@
 // audioSink.h
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -19,32 +21,31 @@
 
 #ifndef _AUDIO_SINK_H_
 #define _AUDIO_SINK_H_
+
 #include <string>
 #include "gstLinkable.h"
 
+// forward declarations
+class AudioSinkConfig;
 class _GstElement;
 
-/** \class AudioSink
- *  Abstract base class representing a sink for audio streams */
-class AudioSink 
-    : public GstLinkableSink
+/** Abstract base class representing a sink for audio streams */
+class AudioSink : public GstLinkableSink
 {
     public:
-        /// Constructor 
-        AudioSink()
-            : sink_(0) {};
-        /// Destructor 
+        AudioSink();
+        
         ~AudioSink();
-        ///  Returns this AudioSink's caps 
-        std::string getCaps();
-
+       
         virtual void init() = 0;
 
     protected:
         _GstElement *sink_;
+        const static unsigned long long BUFFER_TIME;
 
     private:
-        /// Returns this AudioSink's sink 
+        static bool signalHandlerAttached_;
+        static void FPE_ExceptionHandler(int nSig, int nErrType, int *pnReglist);
         _GstElement *sinkElement() { return sink_; }
 
         /// No Copy Constructor 
@@ -56,71 +57,58 @@ class AudioSink
 
 // FIXME: DRY!!! Either merge alsasink and pulsesink or pull out a common base class.
 
-/** \class AudioAlsaSink
- *  Concrete AudioSink class representing a sink to the ALSA interface */
-class AudioAlsaSink
-: public AudioSink
+/// Concrete AudioSink class representing a sink to the ALSA interface 
+class AudioAlsaSink : public AudioSink
 {
     public:
-        /// Constructor 
-        AudioAlsaSink() : audioconvert_(0) {};
-        /** 
-         * Destructor */
-        ~AudioAlsaSink();
-        /** 
-         * Object initialization method */
-        void init();
+        AudioAlsaSink(const AudioSinkConfig &config);
+        
     private:
+        ~AudioAlsaSink();
+        
+        void init();
         /** Returns this AudioAlsaSink's sink, which is an audioconverter, as 
          * raw-audio conversion happens before audio is output to ALSA */
         _GstElement *sinkElement() { return audioconvert_; }
         _GstElement *audioconvert_;
-        AudioAlsaSink(const AudioAlsaSink&);     //No Copy Constructor
-        AudioAlsaSink& operator=(const AudioAlsaSink&);     //No Assignment Operator
+
+        const AudioSinkConfig &config_;
+
+        /// No Copy Constructor
+        AudioAlsaSink(const AudioAlsaSink&);     
+        /// No Assignment Operator
+        AudioAlsaSink& operator=(const AudioAlsaSink&);     
 };
 
-/** \class AudioPulseSink
- *  Concrete AudioSink class representing a sink to the Pulse interface */
-
-class AudioPulseSink
-: public AudioSink
+/// Concrete AudioSink class representing a sink to the Pulse interface 
+class AudioPulseSink : public AudioSink
 {
     public:
-        /// Constructor 
-        AudioPulseSink() : audioconvert_(0) {};
-        /**
-         * Destructor */
+        AudioPulseSink(const AudioSinkConfig &config);
         ~AudioPulseSink();
-        /** 
-         * Object initialization method */
-        void init();
     private:
+        void init();
         _GstElement *sinkElement() { return audioconvert_; }
         _GstElement *audioconvert_;
-        AudioPulseSink(const AudioPulseSink&);     //No Copy Constructor
-        AudioPulseSink& operator=(const AudioPulseSink&);     //No Assignment Operator
+        const AudioSinkConfig &config_;
+        /// No Copy Constructor
+        AudioPulseSink(const AudioPulseSink&);     
+        /// No Assignment Operator
+        AudioPulseSink& operator=(const AudioPulseSink&);     
 };
 
-/** \class AudioJackSink
- *  Concrete AudioSink class representing a sink to the JACK audio connection kit */
-
-class AudioJackSink
-: public AudioSink
+/// Concrete AudioSink class representing a sink to the JACK audio connection kit 
+class AudioJackSink : public AudioSink
 {
     public:
-        /// Constructor 
-        AudioJackSink() {};
-        /** 
-         * Destructor */
-        ~AudioJackSink() {};
-        /** 
-         * Object initialization method */
-        void init();
+        AudioJackSink(const AudioSinkConfig &config);
+        ~AudioJackSink();
     private:
+        void init();
+        const AudioSinkConfig &config_;
         /// No Copy Constructor 
         AudioJackSink(const AudioJackSink&);     
-        /** 
-         * No Assignment Operator */
+        /// No Assignment Operator 
         AudioJackSink& operator=(const AudioJackSink&);     
 };
           

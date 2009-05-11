@@ -1,5 +1,7 @@
 /* videoSink.cpp
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -17,13 +19,16 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include <cassert>
+
+#include "util.h"
 
 #include <gst/interfaces/xoverlay.h>
 #include "gstLinkable.h"
 #include "videoSink.h"
-#include "logWriter.h"
 #include "pipeline.h"
+#include "playback.h"
+#include "gutil.h"
+
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
@@ -31,29 +36,36 @@
 #include <gdk/gdkx.h>
 #include <X11/extensions/Xinerama.h>
 
-const unsigned int VideoSink::WIDTH = 720;
-const unsigned int VideoSink::HEIGHT = 528;
 
 void VideoSink::destroySink()
 {
     Pipeline::Instance()->remove(&sink_);
 }
 
-Window VideoSink::getXWindow()
+Window GtkVideoSink::getXWindow()
 { 
     return GDK_WINDOW_XWINDOW(window_->window);
 }
 
 
-gboolean VideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
+void GtkVideoSink::destroy_cb(GtkWidget * /*widget*/, gpointer data)
 {
-    VideoSink *context = static_cast<VideoSink*>(data);
+    LOG_DEBUG("Window closed, quitting.");
+    playback::quit();
+    GtkVideoSink *context = static_cast<GtkVideoSink*>(data);
+    context->window_ = 0;
+}
+
+
+gboolean GtkVideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
+{
+    GtkVideoSink *context = static_cast<GtkVideoSink*>(data);
     gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(context->sink_), GDK_WINDOW_XWINDOW(widget->window));
     return TRUE;
 }
 
 
-void VideoSink::makeWindowBlack()
+void GtkVideoSink::makeWindowBlack()
 {
     GdkColor color;
     gdk_color_parse ("black", &color);
@@ -61,20 +73,29 @@ void VideoSink::makeWindowBlack()
 }
 
 
-void VideoSink::showWindow()
+void GtkVideoSink::showWindow()
 {
     makeWindowBlack();
-    gtk_window_set_title(GTK_WINDOW(window_), "Sropulpof");
+    gtk_window_set_title(GTK_WINDOW(window_), "Milhouse");
     gtk_widget_show_all(window_);
 }
 
 
-void VideoSink::toggleFullscreen(GtkWidget *widget)
+void GtkVideoSink::milhouseify(GtkWidget *widget)
 {
-#if 0
-    gboolean isFullscreen =
-        (gdk_window_get_state(GDK_WINDOW(widget->window)) == GDK_WINDOW_STATE_FULLSCREEN);
-#endif
+    static gboolean milhouseified = FALSE;
+
+    if (milhouseified == FALSE)
+    {
+        // add a nice background
+        gtk_widget_set_name(widget, "window");
+        gtk_rc_parse("milhouse.rc");
+    }
+}
+
+void GtkVideoSink::toggleFullscreen(GtkWidget *widget)
+{
+    // FIXME: this could be flipped if the window manager changes the fullscreen state
     static gboolean isFullscreen = FALSE;
 
     // toggle fullscreen state
@@ -83,29 +104,51 @@ void VideoSink::toggleFullscreen(GtkWidget *widget)
 }
 
 
-void VideoSink::makeFullscreen(GtkWidget *widget)
+void GtkVideoSink::makeFullscreen(GtkWidget *widget)
 {
+    gtk_window_stick(GTK_WINDOW(widget));           // window is visible on all workspaces
     gtk_window_fullscreen(GTK_WINDOW(widget));
 }
 
 
-void VideoSink::makeUnfullscreen(GtkWidget *widget)
+void GtkVideoSink::makeUnfullscreen(GtkWidget *widget)
 {
+    gtk_window_unstick(GTK_WINDOW(widget));           // window is not visible on all workspaces
     gtk_window_unfullscreen(GTK_WINDOW(widget));
+}
+
+
+void GtkVideoSink::prepareSink()
+{
+    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
+    g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
 }
 
 
 gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
-    if (event->keyval != 'f')
+    switch (event->keyval)
     {
-        LOG_DEBUG("user didn't hit f");
-        return TRUE;
-    }
-    else
-        LOG_DEBUG("you hit f");
+        case GDK_f:
+        case GDK_F:
+            toggleFullscreen(widget);
+            break;
 
-    toggleFullscreen(widget);
+        case GDK_M:
+            //milhouseify(widget);
+            break;
+
+        case GDK_Q:
+            // Quit application, this quits the main loop
+            // (if there is one)
+            LOG_INFO("Q key pressed, quitting.");
+            playback::quit();
+            break;
+
+        default:
+            break;
+    }
+
     return TRUE;
 }
 
@@ -114,21 +157,24 @@ void XvImageSink::init()
 {
     static bool gtk_initialized = false;
     if (!gtk_initialized)
+    {
         gtk_init(0, NULL);
-    sink_ = Pipeline::Instance()->makeElement("xvimagesink", "videosink");
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-    g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
+        gtk_initialized = true;
+    }
+
+    sink_ = Pipeline::Instance()->makeElement("xvimagesink", NULL);
+    prepareSink();
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    assert(window_);
+    tassert(window_);
 
     GdkDisplay* display = gdk_display_get_default();
-    assert(display);
+    tassert(display);
     int n;
-    XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display),&n);
-    if(!xine)
+    XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display), &n);
+    if (!xine)
         n = 0; // don't query ScreenInfo
-    for(int j=0;j<n;j++)
+    for (int j = 0; j < n; ++j)
     {
         LOG_INFO(   "req:" << screen_num_ << 
                 " screen:" << xine[j].screen_number << 
@@ -137,29 +183,33 @@ void XvImageSink::init()
                 " width:" << xine[j].width << 
                 " height:" << xine[j].height);
         if (j == screen_num_) 
-            gtk_window_move(GTK_WINDOW(window_),xine[j].x_org,xine[j].y_org);
+            gtk_window_move(GTK_WINDOW(window_), xine[j].x_org, xine[j].y_org);
     }
 
-    gtk_window_set_default_size(GTK_WINDOW(window_), VideoSink::WIDTH, VideoSink::HEIGHT);
-    gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
-    gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
+    gtk_window_set_default_size(GTK_WINDOW(window_), GtkVideoSink::WIDTH, GtkVideoSink::HEIGHT);
+    //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
+
+    //g_signal_connect(G_OBJECT(window_), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
 
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
                 expose_cb), static_cast<void*>(this));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event",
             G_CALLBACK(XvImageSink::key_press_event_cb), NULL);
+    g_signal_connect(G_OBJECT(window_), "destroy",
+            G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
+
     showWindow();
 }
 
 
 XvImageSink::~XvImageSink()
 {
-    VideoSink::destroySink();
+    GtkVideoSink::destroySink();
     if (window_)
     {
         gtk_widget_destroy(window_);
-        LOG_DEBUG("Widget destroyed");
+        LOG_DEBUG("Videosink window destroyed");
     }
 }
 
@@ -167,11 +217,12 @@ XvImageSink::~XvImageSink()
 void XImageSink::init()
 {
     // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
-    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", "colorspc");
+    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL);
 
-    sink_ = Pipeline::Instance()->makeElement("ximagesink", "videosink");
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-    g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
+    sink_ = Pipeline::Instance()->makeElement("ximagesink", NULL);
+    g_object_set(sink_, "pixel-aspect-ratio", "10/11", NULL);
+    g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
+    //    prepareSink();
 
     gstlinkable::link(colorspc_, sink_);
 }
@@ -182,5 +233,4 @@ XImageSink::~XImageSink()
     VideoSink::destroySink();
     Pipeline::Instance()->remove(&colorspc_);
 }
-
 

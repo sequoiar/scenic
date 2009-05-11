@@ -1,0 +1,20 @@
+Web Documentation
+=================
+
+This page contains the Web Package documentation.
+
+Subpackages
+-----------
+
+.. toctree::
+
+    ui.web.widgets
+
+The :mod:`web` Module
+---------------------
+
+.. automodule:: ui.web.web
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

@@ -1,5 +1,7 @@
 /* glVideoSink.cpp
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -17,15 +19,14 @@
  * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#include "config.h"
+
+#include "util.h"
+
 #ifdef CONFIG_GL
-#include <cassert>
-
 #include <gst/interfaces/xoverlay.h>
-
 #include "gstLinkable.h"
-#include "logWriter.h"
 #include "pipeline.h"
+#include "playback.h"
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
@@ -36,17 +37,18 @@
 #include <GL/glu.h>
 
 #include "glVideoSink.h"
+
         
-const GLfloat NTSC_VIDEO_RATIO = 4.0/3.0;
-const GLfloat GLImageSink::INIT_X = -.5*NTSC_VIDEO_RATIO; 
-const GLfloat GLImageSink::INIT_Y = -.5;
+const GLfloat NTSC_VIDEO_RATIO = 4.0 / 3.0;
+const GLfloat GLImageSink::INIT_X = -0.5 * NTSC_VIDEO_RATIO; 
+const GLfloat GLImageSink::INIT_Y = -0.5;
 const GLfloat GLImageSink::INIT_Z = -1.2175;
 
 const GLfloat GLImageSink::INIT_LEFT_CROP = 0.0;
 const GLfloat GLImageSink::INIT_RIGHT_CROP = 0.0;
 const GLfloat GLImageSink::INIT_BOTTOM_CROP = 0.0;
 const GLfloat GLImageSink::INIT_TOP_CROP = 0.0;
-const GLfloat GLImageSink::STEP = 0.001;
+const GLfloat GLImageSink::STEP = 0.1;
 
 GLfloat GLImageSink::x_ = INIT_X;
 GLfloat GLImageSink::y_ = INIT_Y;
@@ -59,25 +61,22 @@ GLfloat GLImageSink::bottomCrop_ = INIT_BOTTOM_CROP;
 
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
-    GLfloat vwinRatio = (gfloat)VideoSink::WIDTH/(gfloat)VideoSink::HEIGHT ;
-    g_print("WIDTH: %u, HEIGHT: %u", width, height);
+    GLfloat vwinRatio = (gfloat) WIDTH / (gfloat) HEIGHT ;
+    LOG_DEBUG("WIDTH: " << width << ", HEIGHT: " << height << std::endl);
     
-    //TODO:oldDOCS
+    // /TODO:oldDOCS
     // explain below -- ( screen x - ( needed x res)) == extra space
     //move origin to extra space / 2 -- so that quad is in the middle of screen
     //: Why  the disparity between 4/3 and videosink aspect?   
     if (width > height)
-        glViewport((width-height*vwinRatio)/2.0, 0, height*(vwinRatio),height);
+        glViewport((width - height * vwinRatio) * 0.5, 0, height * vwinRatio, height);
     else
-        glViewport(0, (height-(width*(1.0/vwinRatio)))/2.0, width, (float)width*(1.0/vwinRatio));
+        glViewport(0, (height - (width * (1.0 / vwinRatio))) * 0.5, width, (float) width * (1.0 / vwinRatio));
 
-    
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     
     gluPerspective(45, NTSC_VIDEO_RATIO , 0.1, 100);  
-
-
 
     glMatrixMode(GL_MODELVIEW);	
     return TRUE;
@@ -86,27 +85,6 @@ gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 
 gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 {
-    static GTimeVal current_time;
-    static glong last_sec = current_time.tv_sec;
-    static glong last_usec = current_time.tv_usec;
-    static gint nbFrames = 0;  
-
-    g_get_current_time (&current_time);
-    if((current_time.tv_sec - last_sec < 1) && (current_time.tv_usec - last_usec < 5000))
-    {	
-        usleep((current_time.tv_usec - last_usec) >> 1);
-        return FALSE;
-    }
-    nbFrames++ ;
-    last_usec = current_time.tv_usec ;	
-    if ((current_time.tv_sec - last_sec) >= 1)
-    {
-        LOG_DEBUG("GRAPHIC FPS = " << nbFrames << std::endl);
-
-        nbFrames = 0;
-        last_sec = current_time.tv_sec;
-    }
-
     glEnable(GL_DEPTH_TEST);
     glMatrixMode(GL_MODELVIEW);
     
@@ -137,10 +115,11 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
         glVertex3f(aspectRatio,0.0f,0.0f);
         glVertex3f(0.0f, 0.0f, 0.0f);
         glVertex3f(0.0f,  -1.0f, 0.0f);
-        glVertex3f(2*aspectRatio,  -1.0f, 0.0f); 
-        glVertex3f(2*aspectRatio,  1.0f, 0.0f);
+        glVertex3f(2 * aspectRatio,  -1.0f, 0.0f); 
+        glVertex3f(2 * aspectRatio,  1.0f, 0.0f);
         glVertex3f(aspectRatio,  1.0f, 0.0f);
     glEnd();
+
     glEnable (GL_TEXTURE_RECTANGLE_ARB);
     glBindTexture (GL_TEXTURE_RECTANGLE_ARB, texture);
     glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -168,59 +147,65 @@ gboolean GLImageSink::drawCallback(GLuint texture, GLuint width, GLuint height)
 gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer /*data*/)
 {
     switch (event->keyval) {
-        case 'f':
+        case GDK_f:
+        case GDK_F:
             toggleFullscreen(widget);
             break;
-        case 'x':
+        case GDK_x:
         case GDK_Right:
             x_ += STEP;
             break;
-        case 'X':
+        case GDK_X:
         case GDK_Left:
             x_ -= STEP;
             break;
-        case 'y':
+        case GDK_y:
         case GDK_Down:
             y_ += STEP;
             break;
-        case 'Y':
+        case GDK_Y:
         case GDK_Up:
             y_ -= STEP;
             break;
-        case 'z':
+        case GDK_z:
             z_ += STEP;
             break;
-        case 'Z':
+        case GDK_Z:
             z_ -= STEP;
             break;
-        case 'b':
+        case GDK_b:
             bottomCrop_ += STEP;
             break;
-        case 'B':
+        case GDK_B:
             bottomCrop_ -= STEP;
             break;
-        case 't':
+        case GDK_t:
             topCrop_ -= STEP;
             break;
-        case 'T':
+        case GDK_T:
             topCrop_ += STEP;
             break;
-        case 'r':
+        case GDK_r:
             rightCrop_ -= STEP;
             break;
-        case 'R':
+        case GDK_R:
             rightCrop_ += STEP;
             break;
-        case 'l':
+        case GDK_l:
             leftCrop_ += STEP;
             break;
-        case 'L':
+        case GDK_L:
             leftCrop_ -= STEP;
             break;
-        case 'c':
-        case 'C':
+        case GDK_c:
+        case GDK_C:
             LOG_DEBUG("Resetting GL texture position");
             resetGLparams();
+            break;
+        case GDK_Q:
+            // Quit application, this quits the main loop
+            // (if there is one)
+            playback::quit();
             break;
         default:
             g_print("unknown keypress %d", event->keyval);
@@ -276,8 +261,7 @@ GLImageSink::~GLImageSink()
 {
     resetGLparams();
 
-    Pipeline::Instance()->remove(&glUpload_);
-    VideoSink::destroySink();
+    GtkVideoSink::destroySink();
     if (window_)
     {
         gtk_widget_destroy(window_);
@@ -291,24 +275,19 @@ void GLImageSink::init()
     if (!gtk_initialized)
         gtk_init(0, NULL);
 
-    glUpload_ = Pipeline::Instance()->makeElement("glupload", "colorspace");
-
     sink_ = Pipeline::Instance()->makeElement("glimagesink", "videosink");
-    g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
-
-    gstlinkable::link(glUpload_, sink_);
+    //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    
-    assert(window_);
-
+    tassert(window_);
 
     GdkDisplay* display = gdk_display_get_default();
-    assert(display);
+    tassert(display);
     int n;
     XineramaScreenInfo* xine = XineramaQueryScreens(GDK_DISPLAY_XDISPLAY(display),&n);
     if(!xine)
         n = 0; // don't query ScreenInfo
-    for(int j=0;j<n;j++)
+    for(int j = 0; j < n; ++j)
     {
         LOG_INFO(   "req:" << screen_num_ << 
                 " screen:" << xine[j].screen_number << 
@@ -317,11 +296,11 @@ void GLImageSink::init()
                 " width:" << xine[j].width << 
                 " height:" << xine[j].height);
         if (j == screen_num_) 
-            gtk_window_move(GTK_WINDOW(window_),xine[j].x_org,xine[j].y_org);
+            gtk_window_move(GTK_WINDOW(window_), xine[j].x_org,xine[j].y_org);
     }
 
     gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
-    gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
+    //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
     gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(expose_cb), 
             static_cast<void*>(this));
@@ -329,12 +308,16 @@ void GLImageSink::init()
             G_CALLBACK(key_press_event_cb), NULL);
     g_signal_connect(G_OBJECT(window_), "scroll-event",
             G_CALLBACK(mouse_wheel_cb), NULL);
+    g_signal_connect(G_OBJECT(window_), "delete-event",
+            G_CALLBACK(destroy_cb),static_cast<gpointer>(this));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     gtk_widget_set_events(window_, GDK_SCROLL_MASK);
 
     /* configure elements */
     g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
     g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
+
     showWindow();
 }
 #endif //CONFIG_GL
+

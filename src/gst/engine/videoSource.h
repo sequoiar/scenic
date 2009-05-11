@@ -1,5 +1,7 @@
 // videoSource.h
-// Copyright 2008 Koya Charles & Tristan Matthews //
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 // This file is part of [propulse]ART.
 //
 // [propulse]ART is free software: you can redistribute it and/or modify
@@ -33,81 +35,81 @@ class VideoSource
     public:
         ~VideoSource();
         virtual void init();
+        virtual std::string srcCaps() const;
+        void setCapsFilter(const std::string &srcCaps);
 
     protected:
-        explicit VideoSource(const VideoSourceConfig &config)
-            : config_(config), source_(0) {}
-
+        explicit VideoSource(const VideoSourceConfig &config);
         const VideoSourceConfig &config_;
         _GstElement *source_;
+        _GstElement *capsFilter_;
+        /*
+        static const int WIDTH = 720;
+        static const int HEIGHT = 480;
+        static const int PIX_ASPECT_NUM = 10;
+        static const int PIX_ASPECT_DENOM = 11;
+        */
+        static const int WIDTH = 640;
+        static const int HEIGHT = 480;
+        std::string defaultSrcCaps() const;
 
     private:
-        static int base_callback(GstClock *clock, GstClockTime time, GstClockID id,
-                                      void *user_data);
-        virtual void sub_init() = 0;
-        virtual int callback() { return FALSE; }
         _GstElement *srcElement() { return source_; }
-        VideoSource(const VideoSource&);     //No Copy Constructor
-        VideoSource& operator=(const VideoSource&);     //No Assignment Operator
+        VideoSource(const VideoSource&);     ///No Copy Constructor
+        VideoSource& operator=(const VideoSource&);     ///No Assignment Operator
 };
 
 class VideoTestSource
     : public VideoSource
 {
     public:
-        explicit VideoTestSource(const VideoSourceConfig &config)
-            : VideoSource(config), clockId_(0) {}
+        explicit VideoTestSource(const VideoSourceConfig &config);
+        void filterCaps();
 
     private:
         ~VideoTestSource();
-        void sub_init();
-        int callback();
-        void toggle_colour();
+        _GstElement *srcElement() { return capsFilter_; }
+        void init();
 
-        GstClockID clockId_;
-        static const int BLACK;
-        static const int WHITE;
-
-        VideoTestSource(const VideoTestSource&);     //No Copy Constructor
-        VideoTestSource& operator=(const VideoTestSource&);     //No Assignment Operator
+        /// No Copy Constructor
+        VideoTestSource(const VideoTestSource&);     
+        /// No Assignment Operator
+        VideoTestSource& operator=(const VideoTestSource&);     
 };
 
 class VideoFileSource
     : public VideoSource
 {
     public:
-        explicit VideoFileSource(const VideoSourceConfig &config)
-            : VideoSource(config), decoder_(0) {}
+        explicit VideoFileSource(const VideoSourceConfig &config);
+
     private:
         ~VideoFileSource();
-        _GstElement *srcElement() { return 0; }      // FIXME: HACK
-        void sub_init();
+        _GstElement *srcElement() { return identity_; }      
+        void init();
 
-        _GstElement *decoder_;
-        static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, int last,
-                                   void *data);
+        // FIXME: maybe just use the queue we acquire?
+        _GstElement *identity_;
 
-        VideoFileSource(const VideoFileSource&);     //No Copy Constructor
-        VideoFileSource& operator=(const VideoFileSource&);     //No Assignment Operator
+        /// No Copy Constructor
+        VideoFileSource(const VideoFileSource&);     
+        /// No Assignment Operator
+        VideoFileSource& operator=(const VideoFileSource&);     
 };
 
 class VideoDvSource
     : public VideoSource
 {
     public:
-        explicit VideoDvSource(const VideoSourceConfig &config) 
-            : VideoSource(config), demux_(0), queue_(0), dvdec_(0), dvIsNew_(true) {}
+        explicit VideoDvSource(const VideoSourceConfig &config);
 
     private:
         ~VideoDvSource();
         
         _GstElement *srcElement() { return dvdec_; }
         void init();
-        void sub_init();
-        static void cb_new_src_pad(_GstElement * srcElement, _GstPad * srcPad, void *data);
 
-        _GstElement *demux_, *queue_, *dvdec_;
-        bool dvIsNew_;
+        _GstElement *queue_, *dvdec_;
         VideoDvSource(const VideoDvSource&);     //No Copy Constructor
         VideoDvSource& operator=(const VideoDvSource&);     //No Assignment Operator
 };
@@ -117,9 +119,11 @@ class VideoV4lSource
 {
     public:
         explicit VideoV4lSource(const VideoSourceConfig &config)
-            : VideoSource(config) {}
+            : VideoSource(config), expectedStandard_("NTSC") {}
     private:
-        void sub_init();
+        void init();
+        std::string expectedStandard_;
+        _GstElement *srcElement() { return capsFilter_; }
         VideoV4lSource(const VideoV4lSource&);     //No Copy Constructor
         VideoV4lSource& operator=(const VideoV4lSource&);     //No Assignment Operator
 };

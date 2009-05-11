@@ -1,4 +1,4 @@
-include $(top_srcdir)/src/globals.mak
+include $(top_srcdir)/globals.mak
 #if x86_64 pjsip must be built with -fPIC option see note below
 PJSIP_LIBS = -lpjsip -lpjsip-ua  -lpjlib-util -lpj -lpjsua -lpjsdp
 
@@ -29,8 +29,8 @@ libsip_la_SOURCES = \
 					sdp.h \
 					useragent.h \
 					session.h \
-					sipsession.h \
-					../util/util.cpp
+					sipsession.h 
+#					../util/util.cpp
 
 libsip_la_CPPFLAGS =  $(AM_CPPFLAGS) $(PJ_CFLAGS) -I$(PYTHON_INCLUDE_DIR) 
 libsip_la_LDFLAGS = $(PJSIP_LIBS) -lpthread  

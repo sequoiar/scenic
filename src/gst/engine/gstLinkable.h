@@ -1,6 +1,8 @@
 
 // gstLinkable.h
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -40,6 +42,7 @@ namespace gstlinkable
     void link(GstLinkableSource &src, GstLinkableSink &sink);
     void link(std::vector<_GstElement*> &sources, GstLinkableSink &sink);
     void link(GstLinkableSource &source, std::vector<_GstElement*> &sinks);
+    void tryLink(_GstElement *src, _GstElement *sink);
 }
 
 class GstLinkableSource 

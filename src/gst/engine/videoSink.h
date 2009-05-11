@@ -1,5 +1,7 @@
 // videoSink.h
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -28,47 +30,66 @@ class _GdkEventKey;
 class _GdkEventScroll;
 class _GstElement;
 
-class VideoSink
-    : public GstLinkableSink
+class VideoSink : public GstLinkableSink
 {
     public:
-        VideoSink()
-            : sink_(0), window_(0), screen_num_(0) {};
+       VideoSink()
+            : sink_(0) {};
         virtual ~VideoSink(){};
+        virtual void init() = 0;
+        virtual void makeFullscreen() = 0;
+        virtual void makeUnfullscreen() = 0; 
+        void destroySink();
+
+    protected:
+        _GstElement *sink_;
+
+    private:
+        _GstElement *sinkElement() { return sink_; }
+       VideoSink(const VideoSink&);     //No Copy Constructor
+       VideoSink& operator=(const VideoSink&);     //No Assignment Operator
+};
+
+class GtkVideoSink
+    : public VideoSink
+{
+    public:
+       GtkVideoSink(int screen_num)
+            : window_(0), screen_num_(screen_num) {};
+        virtual ~GtkVideoSink(){};
         void makeFullscreen() { makeFullscreen(window_); }
         void makeUnfullscreen() { makeUnfullscreen(window_); }
-        virtual void init() = 0;
         void showWindow();
 
         
     protected:
-        _GstElement *sink_;
         _GtkWidget *window_;
         int screen_num_;
-        static const unsigned int WIDTH;
-        static const unsigned int HEIGHT;
+        static const unsigned int WIDTH = 640;
+        static const unsigned int HEIGHT = 480;
 
+        static void destroy_cb(_GtkWidget * /*widget*/, void *data);
         Window getXWindow();
-        void destroySink();
+        void prepareSink();
         static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
         void makeWindowBlack();
         static void makeFullscreen(_GtkWidget *widget);
         static void makeUnfullscreen(_GtkWidget *widget);
         static void toggleFullscreen(_GtkWidget *widget);
+        static void milhouseify(_GtkWidget *widget);
 
     private:
-        _GstElement *sinkElement() { return sink_; }
 
-        VideoSink(const VideoSink&);     //No Copy Constructor
-        VideoSink& operator=(const VideoSink&);     //No Assignment Operator
+       GtkVideoSink(const GtkVideoSink&);     //No Copy Constructor
+       GtkVideoSink& operator=(const GtkVideoSink&);     //No Assignment Operator
 };
 
 
 class XvImageSink
-    : public VideoSink
+    : public GtkVideoSink
 {
     public:
-        XvImageSink() {};
+        XvImageSink(int screenNum) : GtkVideoSink(screenNum) {};
 
     private:
         void init();

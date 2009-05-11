@@ -1,5 +1,7 @@
 // videoSink.h
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -30,11 +32,11 @@
  */
 
 class GLImageSink
-: public VideoSink
+: public GtkVideoSink
 {
     public:
         /// Constructor 
-        GLImageSink(int screen_num = 0) : glUpload_(0){screen_num_ = screen_num;}
+        GLImageSink(int screen_num) : GtkVideoSink(screen_num) {}
 
     private:
 
@@ -43,7 +45,7 @@ class GLImageSink
         ~GLImageSink();
         void init();
 
-        _GstElement *sinkElement() { return glUpload_; }
+        _GstElement *sinkElement() { return sink_; }
 
         /** 
          * This method resets all of our static variables used for positioning our texture, 
@@ -66,9 +68,8 @@ class GLImageSink
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
 
-        _GstElement *glUpload_;
         static const GLfloat STEP;
-        static GLfloat x_;     // FIXME: separate out gl stuff into separate class
+        static GLfloat x_;     
         static GLfloat y_;
         static GLfloat z_;
         static GLfloat leftCrop_;

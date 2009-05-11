@@ -17,8 +17,8 @@
  * along with Sropulpof.  If not, see <http:*www.gnu.org*licenses*>.
  */
 
+#include "util.h"
 #include "useragent.h"
-#include "logWriter.h"
 
 #include <stdlib.h>
 #include <iostream>

@@ -1,0 +1,27 @@
+	<body xmlns:n="http://nevow.com/ns/nevow/0.1">
+		
+		<div id="index_left_pan" class="color_one">
+			<h1>Propulseart</h1>
+			<div n:render="addressbook">ADDRESSBOOK placeholder</div>
+            <div id="nettest">
+                <div n:render="network_testing">NETWORK TESTING placeholder</div>
+            </div>
+		</div>
+		
+		<div id="strm" class="color_two">
+			<div n:render="streams">STREAMS placeholder</div>
+		</div>
+		
+		<div id="devs">
+            <!-- see template/default/index.css -->
+            <div n:render="devices">DEVICES placeholder</div>
+        </div>
+        
+        <div id="index_right_pan">
+        </div>
+		
+		<div id="help">
+			<div n:render="help">HELP placeholder</div>
+		</div>
+		
+	</body>

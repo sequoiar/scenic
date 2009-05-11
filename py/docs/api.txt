@@ -1,0 +1,12 @@
+Api Documentation
+=================
+
+This page contains the Api Module documentation.
+
+The :mod:`api` Module
+---------------------
+
+.. automodule:: api
+    :members:
+    :undoc-members:
+    :show-inheritance:

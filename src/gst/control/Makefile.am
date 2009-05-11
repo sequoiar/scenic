@@ -1,11 +1,9 @@
-include $(top_srcdir)/src/globals.mak
+include $(top_srcdir)/globals.mak
 if PROJ_DEBUG
 SUBDIRS = . #test
 endif
 
 noinst_LIBRARIES= libgstthread.a
 
-libgstthread_a_SOURCES = gstReceiverThread.cpp gstSenderThread.cpp gstThread.cpp \
-					msgThreadFactory.cpp gstSenderThread.h gstReceiverThread.h \
-					gstThread.h msgThreadFactory.h
+libgstthread_a_SOURCES = gstThread.cpp gstReceiverThread.h gstSenderThread.h gstThread.h ../videoFactory.h ../audioFactory.h ../engine.h
 

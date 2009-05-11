@@ -1,174 +1,68 @@
-// util.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews 
-//     
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
-
-/** \file 
- *      Utility functions for logWriter 
+/* hostIP.cpp
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
+ *
+ * This file is part of [propulse]ART.
+ *
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
+#include "util.h"
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <fstream>
 
-#include <iostream>
-#include <time.h>
-#include <sstream>
-#include <stdlib.h>
-#include "config.h"
-#include "logWriter.h"
-#include "lassert.h"
-
-
-void assert_throw(__const char *__assertion, __const char *__file,
-                           unsigned int __line, __const char *__function)
+const char *get_host_ip()
 {
-    cerr_log_( __assertion, ASSERT_FAIL, __file, __function, __line,0);
-}
+    int i;
+    char *ip = 0;
+    int s = socket (PF_INET, SOCK_STREAM, 0);
+    if(s == -1)
+        return ip;
 
-bool logLevelIsValid(LogLevel level)
-{
-    switch (level)
+    for (i = 1;; i++)
     {
-        case DEBUG:
-        case INFO:
-        case WARNING:
-        case ERROR:
-        case CRITICAL:
-        case ASSERT_FAIL:
-            return true;
+        struct ifreq ifr;
+        struct sockaddr_in *sin = (struct sockaddr_in *) &ifr.ifr_addr;
+
+        ifr.ifr_ifindex = i;
+        if (ioctl (s, SIOCGIFNAME, &ifr) < 0)
             break;
-        default:
-            return false;
-            break;
+        /* now ifr.ifr_name is set */
+        if (ioctl (s, SIOCGIFADDR, &ifr) < 0)
+            continue;
+        ip = inet_ntoa (sin->sin_addr);         // seems to be thread safe
+                                                // but not reentrant
+                                                // under libc6 2+
     }
+
+    close (s);
+    return ip;
 }
 
 
-std::string logLevelStr(LogLevel level)
+bool fileExists(const std::string &path)
 {
-    std::string lstr;
-    switch (level)
-    {
-        case DEBUG:
-            lstr = "\x1b[32mDEBUG";
-            break;
-        case INFO:
-            lstr = "\x1b[34mINFO";
-            break;
-        case WARNING:
-            lstr = "\x1b[33mWARNING";
-            break;
-        case ERROR:
-            lstr = "\x1b[31mERROR";
-            break;
-        case CRITICAL:
-            lstr = "\x1b[41mCRITICAL";
-            break;
-        case ASSERT_FAIL:
-            lstr = "\x1b[41ASSERT_FAIL";
-            break;
-        default:
-            lstr = "INVALID LOG LEVEL";
-    }
-    lstr += "\x1b[0m: ";
-    return lstr;
-}
-
-static logger::Subscriber emptyLogSubscriber;
-static logger::Subscriber* lf = &emptyLogSubscriber;
-static bool hold_flag = false;
-
-
-logger::Subscriber::~Subscriber()
-{
-    lf = &emptyLogSubscriber;
-}
-
-
-void logger::Subscriber::hold()
-{
-    hold_flag = true;
-}
-
-
-void logger::Subscriber::enable()
-{
-    hold_flag = false;
-}
-
-logger::Subscriber::Subscriber()
-{
-    lf = this;
-}
-
-bool logLevelMatch(LogLevel level)
-{
-    if (level >= LOG_LEVEL && logLevelIsValid(level))
-        return true;
-    else
+    std::fstream in;
+    in.open(path.c_str(), std::fstream::in);
+    if (in.fail()) // file doesn't exist
         return false;
+ 
+    in.close();
+    return true;
 }
-
-
-std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
-                const std::string &functionName, int lineNum)
-{
-    std::ostringstream logMsg;
-    if (logLevelMatch(level))
-    {
-#ifdef CONFIG_DEBUG_LOCAL
-        time_t rawtime;
-        time( &rawtime );
-        struct tm * timeinfo = localtime(&rawtime);
-        //asctime adds a linefeed
-        logMsg << logLevelStr(level) << msg << " " << functionName <<  "() in " << fileName
-            << ":" << " line " << lineNum << " " <<asctime(timeinfo);
-#else
-        logMsg << logLevelStr(level) << msg << std::endl;
-#endif
-    }
-
-    return logMsg.str();
-}
-
-
-void cerr_log_( const std::string &msg, LogLevel level, const std::string &fileName,
-                const std::string &functionName, int lineNum,int err)
-{
-    std::string strerr = log_(msg,level,fileName,functionName,lineNum);
-
-    if(err == -1)
-        throw(Except(msg,0));
-    if(!hold_flag)
-        (*lf)(level,strerr);
-     
-    if(level == INFO)
-    {
-        std::cout << strerr;
-        return;
-    }
-    std::cerr << strerr;
-    if(level < ERROR)
-        return;
-
-    if(level < CRITICAL)
-        throw(ErrorExcept(strerr,err));
-    if(level < ASSERT_FAIL)
-        throw(CriticalExcept(strerr,err));
-    throw(AssertExcept(strerr));
-
-}
-
-

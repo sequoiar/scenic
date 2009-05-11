@@ -1,5 +1,7 @@
 /* gstSenderThread.h
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -22,6 +24,7 @@
 #define _GST_SENDER_THREAD_H_
 
 #include "gstThread.h"
+#include <boost/function.hpp>
 class SenderBase;
 /// MapMsg handler thread that calls GST media functionality
 class GstSenderThread
@@ -29,13 +32,14 @@ class GstSenderThread
 {
     public:
         GstSenderThread()
-            : video_(0), audio_(0) {}
+            : video_(0), audio_(0), videoFirst(0) {}
         ~GstSenderThread();
+        virtual void start(MapMsg& ); 
     private:
         /// incomming audio_start request 
-        bool audio_start(MapMsg& msg);
+        void audio_init(MapMsg& msg);
         /// incomming video_start request 
-        bool video_start(MapMsg& msg);
+        void video_init(MapMsg& msg);
 
         SenderBase* video_;
         SenderBase* audio_;
@@ -44,6 +48,8 @@ class GstSenderThread
         GstSenderThread(const GstSenderThread&); 
         /// No Assignment Operator 
         GstSenderThread& operator=(const GstSenderThread&); 
+        boost::function<void (std::string)> ff[2];
+        bool videoFirst;
 };
 
 #endif // _GST_SENDER_THREAD_H_

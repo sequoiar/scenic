@@ -1,5 +1,7 @@
 /* videoConfig.h
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -28,29 +30,41 @@ class VideoSink;
 class VideoSourceConfig
 {
     public:
-        //* for a simple source */
-        explicit VideoSourceConfig(const std::string &source__) 
-            : source_(source__), location_("") {}
-
         //* for source (remote) w/ location i.e. filename or url */
-        VideoSourceConfig(const std::string &source__, const std::string &location__)
-            : source_(source__), location_(location__)  {}
+        VideoSourceConfig(const std::string &source__, 
+                          const int bitrate__, 
+                          const std::string &deviceName__, 
+                          const std::string &location__, 
+                          const bool doDeinterlace__)
+            : source_(source__), bitrate_(bitrate__), deviceName_(deviceName__),
+            location_(location__), doDeinterlace_(doDeinterlace__) 
+        {}
 
         //* copy constructor */
         VideoSourceConfig(const VideoSourceConfig& m)
-            : source_(m.source_), location_(m.location_) {}
+            : source_(m.source_), bitrate_(m.bitrate_), deviceName_(m.deviceName_), location_(m.location_), 
+            doDeinterlace_(m.doDeinterlace_)
+        {}
 
         VideoSource* createSource() const;  // factory method
 
         const char *source() const { return source_.c_str(); }
+        int bitrate() const { return bitrate_; }
+        bool doDeinterlace() const { return doDeinterlace_; }
 
-        bool hasLocation() const { return location_.empty(); }
-        bool fileExists() const;
+        bool hasLocation() const { return !location_.empty(); }
+        bool hasDeviceName() const { return !deviceName_.empty(); }
+        bool locationExists() const;
+        bool deviceExists() const;
         const char *location() const;
+        const char *deviceName() const;
 
     private:
         const std::string source_;
+        const int bitrate_;
+        const std::string deviceName_;
         const std::string location_;
+        const bool doDeinterlace_;
         /// No Assignment Operator 
         VideoSourceConfig& operator=(const VideoSourceConfig&);     
 };
@@ -60,7 +74,7 @@ class VideoSinkConfig
 {
     public:
 
-        explicit VideoSinkConfig(const std::string & sink__, int screenNum = 0)
+        explicit VideoSinkConfig(const std::string & sink__, int screenNum)
             : sink_(sink__), screenNum_(screenNum)
         {}
 

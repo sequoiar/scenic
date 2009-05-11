@@ -1,6 +1,8 @@
 
 // videoSender.h
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -27,18 +29,16 @@
 #include "rtpSender.h"
 
 class VideoSource;
-class Encoder;
+class VideoEncoder;
 class RtpPay;
 
 class VideoSender
     : public SenderBase 
 {
     public:
-         VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig) 
-            : videoConfig_(vConfig), remoteConfig_(rConfig), session_(), source_(0), 
-            encoder_(0), payloader_(0) {}
-
+         VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig);
         ~VideoSender();
+        std::string getCaps() const;
 
     private:
         void init_source();
@@ -49,7 +49,7 @@ class VideoSender
         const SenderConfig remoteConfig_;
         RtpSender session_;
         VideoSource *source_;
-        Encoder *encoder_;
+        VideoEncoder *encoder_;
         RtpPay *payloader_; 
 
         // hidden

@@ -1,5 +1,7 @@
 // headerGPL.c
-// Copyright 2008 Koya Charles & Tristan Matthews
+// Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+// http://www.sat.qc.ca
+// All rights reserved.
 //
 // This file is part of [propulse]ART.
 //
@@ -25,9 +27,8 @@
  *      And more.
  *      And more.
  */
-#include "config.h"
-#include "optionArgs.h"
-#include "logWriter.h"
+#include "util.h"
+#include "gutil.h"
 
 int main (int argc, char **argv)
 {

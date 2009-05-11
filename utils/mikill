@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import commands
+
+
+def doit(cmd):
+	print cmd
+	status = commands.getstatusoutput(cmd)
+	output = status[1]
+	return output
+
+
+output = doit("ps aux |grep miville")
+print output
+lines = output.split("\n")
+print 
+print
+
+for line in lines:
+    if line.find("python") != -1:
+	print line
+	print
+
+    if line.find("python ./miville.py") != -1:
+	tokens = line.split()
+	proc = tokens[1]
+	#print "Proc = " + tokens[1]
+	print
+	cmd = "kill " + proc
+	print doit(cmd)
+	cmd = "kill -KILL " + proc
+	print doit(cmd)
+	
+	
+

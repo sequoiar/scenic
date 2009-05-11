@@ -1,9 +1,8 @@
-include $(top_srcdir)/src/globals.mak
-if PROJ_DEBUG
-SUBDIRS = . test
-endif
+include $(top_srcdir)/globals.mak
 
-noinst_LIBRARIES= libGUtil.a
+noinst_LIBRARIES= libgutil.a
 
-libGUtil_a_SOURCES = optionArgs.cpp
+libgutil_a_SOURCES = optionArgs.cpp gloop.cpp gQueuePair.cpp \
+                     optionArgs.h gloop.h queuePair.h \
+                     $(inc)/gutil.h 
 

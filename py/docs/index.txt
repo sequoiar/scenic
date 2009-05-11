@@ -1,0 +1,25 @@
+.. Miville documentation master file, created by sphinx-quickstart on Thu Nov 13 10:59:46 2008.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to Miville's documentation!
+===================================
+
+Contents:
+
+.. toctree::
+   :maxdepth: 3
+   
+   api
+   modules
+   javascript
+   docs
+   test_coverage
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+

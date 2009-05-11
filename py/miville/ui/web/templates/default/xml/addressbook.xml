@@ -1,0 +1,55 @@
+<div xmlns:n="http://nevow.com/ns/nevow/0.1"
+    xmlns:athena="http://divmod.org/ns/athena/0.7"
+    n:render="liveFragment">
+	<h3 n:render="i18n">Connections</h3>
+	<div class="section">
+		<ul class="js_help basic_list" id="adb_list">
+		</ul>
+		<div id="adb_status" class="color_text_fade">
+		</div>
+		<div>
+			<div class="js_help button" id="adb_add"><athena:handler event="onclick" handler="add_contact" /></div> 
+			<div class="js_help button button_disabled" id="adb_remove"></div>
+			<input type="button" id="adb_join" value="Connect" class="js_help button" disabled="true"><athena:handler event="onclick" handler="start_connection" /></input>
+		</div>
+		<table id="adb_fields">
+			<tr>
+				<td>Name: </td>
+				<td><input id="adb_name" type="text" disabled="true" /></td>
+			</tr>
+			<tr>
+				<td>Address: </td>
+				<td><input id="adb_address" type="text" disabled="true" /></td>
+			</tr>
+			<tr>
+				<td>Port: </td>
+				<td><input id="adb_port" type="text" disabled="true" /></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td id="adb_auto_answer_cell"><input id="adb_auto_answer" type="checkbox" /><label n:render="i18n" for="adb_auto_answer"> Auto-answer</label></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input class="js_help button" id="adb_edit" disabled="true" type="button" value="Edit" /></td>
+			</tr>
+		</table>
+	</div>
+
+	<!-- Help strings -->
+	<span n:render="i18n" id="help_adb_list" class="help_str" url="addressbook#list">This the list of the <i>contacts</i></span>
+	<span n:render="i18n" id="help_adb_add" class="help_str" url="addressbook#add">Add a new contact to the list</span>
+	<span n:render="i18n" id="help_adb_remove" class="help_str" url="addressbook#remove">Remove the selected contact from the list</span>
+	<span n:render="i18n" id="help_adb_join" class="help_str" url="addressbook#join">Connect the selected contact</span>
+	<span n:render="i18n" id="help_adb_edit" class="help_str" url="addressbook#edit">Edit the details of the selected contact</span>
+
+	<!-- Javascript translation -->
+	<span n:render="i18n" id="js_adb_save" class="adb js_str">Save</span>
+	<span n:render="i18n" id="js_adb_edit" class="adb js_str">Edit</span>
+	<span n:render="i18n" id="js_adb_keep" class="adb js_str">Keep</span>
+	<span n:render="i18n" id="js_adb_join" class="adb js_str">Connect</span>
+	<span n:render="i18n" id="js_adb_unjoin" class="adb js_str">Disconnect</span>
+	<span n:render="i18n" id="js_adb_accept" class="adb js_str">Accept</span>
+	<span n:render="i18n" id="js_adb_refuse" class="adb js_str">Refuse</span>
+	<span n:render="i18n" id="js_adb_optional" class="adb js_str">optional</span>
+</div>

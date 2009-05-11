@@ -1,0 +1,60 @@
+#nettest {
+    /* border:1px dotted #999; */
+}
+#nettest table {
+    width:100%; 
+    padding:10px; 
+    font-size:11px;
+}
+.nettest_progress { /* test in progress icon */
+	background-image: url(/img/spinner16.png); /* macthrob-small.png); */
+}
+.nettest_results {
+}
+.nettest_list {
+    border: none;
+    max-height: 220px;
+    overflow-y: auto; 
+    background-color: transparent;
+}
+.nettest_key {
+    padding-left:20px;
+    float: left;
+    width:120px; /* #left_pan 260px */
+}
+.nettest_value {
+    float: left;
+}
+.nettest_title { /* test results with ... */
+    text-align: left;
+    border-bottom: dotted 1px #666;
+}
+.nettest_subtitle { /* from local to remote */
+    text-align: left;
+
+}
+.nettest_error {
+    text-color: #f00;
+}
+#nettest_start {
+    float: right;
+}
+#nettest_bandwidth {
+     width: 50px;
+     text-align: right;
+     font-size:11px;
+}
+#nettest_duration {
+    width: 40px;
+    text-align: right;
+    font-size:11px;
+}
+#nettest_unit {
+    font-size:11px; 
+    width: 80px;
+}
+#nettest_kind {
+    font-size:11px;
+    width: 140px;
+}
+

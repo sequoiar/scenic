@@ -1,34 +1,42 @@
+/* pipeline.cpp
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
+ *
+ * This file is part of [propulse]ART.
+ *
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-// pipeline.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews
-//
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
+#include "util.h"
+
+#include <gst/gst.h>
+#include "pipeline.h"
+#include "dv1394.h"
+#include "busMsgHandler.h"
+#include <cstring>
+
+#include <gtk/gtk.h>
+
 // NOTES:
 // Change verbose_ to true if you want Gstreamer to tell you everything that's going on
 // in the pipeline
-
-#include <gst/gst.h>
-
-#include <cassert>
-#include "pipeline.h"
-#include "logWriter.h"
-#include "busMsgHandler.h"
+// This class uses the Singleton pattern
 
 Pipeline *Pipeline::instance_ = 0;
+bool Pipeline::controlEnabled_ = false;
 
 const unsigned int Pipeline::SAMPLE_RATE = 48000;
 
@@ -46,6 +54,14 @@ Pipeline::~Pipeline()
 {
     stop();
     gst_object_unref(GST_OBJECT(pipeline_));
+    if (control_)
+    {
+        madeControl_ = false;
+        gtk_widget_destroy(control_);
+        LOG_DEBUG("RTP jitterbuffer control window destroyed");
+        control_ = 0;
+        controlEnabled_ = false;
+    }
 }
 
 
@@ -56,8 +72,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
         case GST_MESSAGE_EOS:
             {
                 LOG_DEBUG("End-of-stream");
-                //Pipeline *context = static_cast<Pipeline*>(data);
-                Pipeline::Instance()->updateListeners(msg);
+                Instance()->updateListeners(msg);
                 break;
             }
         case GST_MESSAGE_ERROR:
@@ -67,7 +82,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
 
                 gst_message_parse_error(msg, &err, &debug);
 
-                LOG_WARNING(err->message);
+                LOG_ERROR(err->message);
                 g_error_free(err);
 
                 if (debug) {
@@ -94,11 +109,20 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
             }
         case GST_MESSAGE_ELEMENT:
             {
-                //Pipeline *context = static_cast<Pipeline*>(data);
-                //context->updateListeners(msg);
-                Pipeline::Instance()->updateListeners(msg);
+                Instance()->updateListeners(msg);
                 break;
             }
+
+        case GST_MESSAGE_LATENCY:
+            {
+                LOG_DEBUG("Latency change, recalculating latency for pipeline");
+                // when pipeline latency is changed, this msg is posted on the bus. we then have
+                // to explicitly tell the pipeline to recalculate its latency
+                if (!gst_bin_recalculate_latency (GST_BIN_CAST (Instance()->pipeline_)))
+                    LOG_WARNING("Could not reconfigure latency.");
+                break;
+            }
+
         default:
             break;
     }
@@ -109,13 +133,11 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
 
 void Pipeline::init()
 {
-    if (!pipeline_)
+    if (pipeline_ == 0)
     {
         gst_init(0, NULL);
-        assert(pipeline_ = gst_pipeline_new("pipeline"));
+        tassert(pipeline_ = gst_pipeline_new("pipeline"));
 
-        if (verbose_)
-            make_verbose();
         // this will be used as a reference for future
         // pipeline synchronization
         startTime_ = gst_clock_get_time(clock());
@@ -126,11 +148,73 @@ void Pipeline::init()
         bus = getBus();
         gst_bus_add_watch(bus, GstBusFunc(bus_call), static_cast<gpointer>(this));
         gst_object_unref(bus);
+        if (controlEnabled_)
+            createControl();
     }
 }
 
 
-// TODO: check if this is safe, we're destroying and recreating the pipeline
+void Pipeline::createControl()
+{
+    if (madeControl_)
+    {
+        LOG_WARNING("Control already created, not doing it again");
+        return;
+    }
+    
+    static bool gtk_initialized = false;
+    if (!gtk_initialized)
+    {
+        gtk_init(0, NULL);
+        gtk_initialized = true;
+    }
+    
+    GtkWidget *box1;
+    GtkWidget *playButton;
+    const int WIDTH = 100;
+    const int HEIGHT = 70;
+
+    /* Standard window-creating stuff */
+    GtkWidget *control = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    playButton = gtk_button_new_with_label("Pause");
+    gtk_window_set_default_size(GTK_WINDOW(control), WIDTH, HEIGHT);
+    gtk_window_set_title (GTK_WINDOW (control), "Playback control");
+
+    box1 = gtk_vbox_new (FALSE, 0);
+    gtk_container_add (GTK_CONTAINER (control), box1);
+
+    gtk_signal_connect (GTK_OBJECT (playButton), "clicked",
+            GTK_SIGNAL_FUNC(playButtonCb), NULL);
+
+    gtk_box_pack_start (GTK_BOX (box1), playButton, TRUE, TRUE, 0);
+    gtk_widget_show (playButton);
+    gtk_widget_show (box1);
+    gtk_widget_show (control);
+
+    madeControl_ = true;
+}
+
+
+void Pipeline::playButtonCb(GtkButton *button)
+{
+    gchar *label;
+    g_object_get(button, "label", &label, NULL);
+
+    if (std::string(label) == "Play")
+    {
+        gtk_button_set_label(button, "Pause");
+        Instance()->start();
+        LOG_DEBUG("Playing");
+    }
+    else if (std::string(label) == "Pause")
+    {
+        gtk_button_set_label(button, "Play");
+        Instance()->pause();
+        LOG_DEBUG("Paused");
+    }
+}
+
+
 // This can be a class method or a member method, it's a class method for the sake of 
 // looking like Instance()
 
@@ -146,21 +230,77 @@ void Pipeline::reset()
 }
 
 
-void Pipeline::make_verbose()
+void Pipeline::makeVerbose()
 {
     // Get verbose output
-    if (verbose_) {
-        gchar *exclude_args = NULL;     // set args to be excluded from output
-        gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
-        g_signal_connect(pipeline_, "deep_notify",
-                G_CALLBACK(gst_object_default_deep_notify), exclude_list);
+    gchar *exclude_args = NULL;     // set args to be excluded from output
+    gchar **exclude_list = exclude_args ? g_strsplit(exclude_args, ",", 0) : NULL;
+    g_signal_connect(pipeline_, "deep_notify",
+            G_CALLBACK(deepNotifyCb), exclude_list);
+}
+
+
+void Pipeline::deepNotifyCb(GObject * /*object*/, GstObject * orig, GParamSpec * pspec, gchar ** excluded_props)
+{
+    GValue value; /* the important thing is that value.type = 0 */
+    memset(&value, 0, sizeof(value));
+    gchar *str = NULL;
+    gchar *name = NULL;
+
+    if (pspec->flags & G_PARAM_READABLE) 
+    {
+        /* let's not print these out for excluded properties... */
+        while (excluded_props != NULL && *excluded_props != NULL) 
+        {
+            if (strcmp (pspec->name, *excluded_props) == 0)
+                return;
+            excluded_props++;
+        }
+        g_value_init (&value, G_PARAM_SPEC_VALUE_TYPE (pspec));
+        g_object_get_property (G_OBJECT (orig), pspec->name, &value);
+
+        /* FIXME: handle flags */
+        if (G_IS_PARAM_SPEC_ENUM (pspec)) 
+        {
+            GEnumValue *enum_value;
+            GEnumClass *klass = G_ENUM_CLASS (g_type_class_ref (pspec->value_type));
+            enum_value = g_enum_get_value (klass, g_value_get_enum (&value));
+
+            str = g_strdup_printf ("%s (%d)", enum_value->value_nick,
+                    enum_value->value);
+            g_type_class_unref (klass);
+        } 
+        else 
+        {
+            str = g_strdup_value_contents (&value);
+        }
+        name = gst_object_get_path_string (orig);
+        LOG_DEBUG(name << ": " << pspec->name << " = " << str);
+        g_free(name);
+        g_free(str);
+        g_value_unset (&value);
+    } 
+    else 
+    {
+        name = gst_object_get_path_string (orig);
+        LOG_WARNING("Parameter " << pspec->name << " not readable in " << name << ".");
+        g_free (name);
     }
 }
 
 
 bool Pipeline::isPlaying() const
 {
-    if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_PLAYING))
+    if (pipeline_ and (GST_STATE(pipeline_) == GST_STATE_PLAYING))
+        return true;
+    else
+        return false;
+}
+
+
+bool Pipeline::isReady() const
+{
+    if (pipeline_ and (GST_STATE(pipeline_) == GST_STATE_READY))
         return true;
     else
         return false;
@@ -169,11 +309,21 @@ bool Pipeline::isPlaying() const
 
 bool Pipeline::isPaused() const
 {
-    if (pipeline_ && (GST_STATE(pipeline_) == GST_STATE_PAUSED))
+    if (pipeline_ and (GST_STATE(pipeline_) == GST_STATE_PAUSED))
         return true;
     else
         return false;
 }
+
+
+bool Pipeline::isStopped() const
+{
+    if (pipeline_ and (GST_STATE(pipeline_) == GST_STATE_NULL))
+        return true;
+    else
+        return false;
+}
+
 
 bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 {
@@ -182,18 +332,19 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
         LOG_DEBUG("Element is live, no preroll");
         return true;
     }
-    else if (ret == GST_STATE_CHANGE_FAILURE) {
-        g_print ("Failed to start pipeline!\n");
+    else if (ret == GST_STATE_CHANGE_FAILURE) 
+    {
         GstBus *bus;
         bus = getBus();
 
         /* check if there is an error message with details on the bus */
         GstMessage *msg = gst_bus_poll(bus, GST_MESSAGE_ERROR, 0);
-        if (msg) {
+        if (msg) 
+        {
             GError *err = NULL;
 
             gst_message_parse_error(msg, &err, NULL);
-            g_print("ERROR: %s\n", err->message);
+            LOG_ERROR(err->message);
             g_error_free(err);
             gst_message_unref(msg);
         }
@@ -207,29 +358,44 @@ bool Pipeline::checkStateChange(GstStateChangeReturn ret) const
 
 void Pipeline::start()
 {
-    // GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
-    //assert(checkStateChange(ret)); // set it to paused
-    // wait_until_paused();
-    //LOG_DEBUG("Now paused");
-
+    if (isPlaying())        // only needs to be started once
+        return;
     GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PLAYING);
-    assert(checkStateChange(ret)); // set it to playing
-
-    //wait_until_playing();
-
+    tassert(checkStateChange(ret)); // set it to playing
     LOG_DEBUG("Now playing");
 }
 
 
+
+void Pipeline::makeReady()
+{
+    if (isReady())        // only needs to be started once
+        return;
+    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_READY);
+    tassert(checkStateChange(ret)); // set it to playing
+    LOG_DEBUG("Now ready");
+}
+
+
+
 void Pipeline::pause()
 {
-    gst_element_set_state(pipeline_, GST_STATE_PAUSED);
+    if (isPaused())        // only needs to be paused once
+        return;
+    makeReady();
+    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_PAUSED);
+    tassert(checkStateChange(ret)); // set it to paused
+    LOG_DEBUG("Now paused");
 }
 
 
 void Pipeline::stop()
 {
-    gst_element_set_state(pipeline_, GST_STATE_NULL);
+    if (isStopped())        // only needs to be stopped once
+        return;
+    GstStateChangeReturn ret = gst_element_set_state(pipeline_, GST_STATE_NULL);
+    tassert(checkStateChange(ret)); // set it to paused
+    LOG_DEBUG("Now stopped/null");
 }
 
 
@@ -245,13 +411,14 @@ void Pipeline::remove(GstElement **element) // guarantees that original pointer 
     stop();
     if (*element)
     {
-        assert(gst_bin_remove(GST_BIN(pipeline_), *element));
+        tassert(gst_bin_remove(GST_BIN(pipeline_), *element));
         *element = NULL;
         --refCount_;
 
         if (refCount_ <= 0)
         {
-            assert(refCount_ == 0);
+            tassert(refCount_ == 0);
+            Dv1394::reset();
             reset();
         }
     }
@@ -268,14 +435,14 @@ void Pipeline::remove(std::vector<GstElement*> &elementVec)
         {
             if (*iter)
             {
-                assert(gst_bin_remove(GST_BIN(pipeline_), *iter));
+                tassert(gst_bin_remove(GST_BIN(pipeline_), *iter));
                 *iter = NULL;
                 --refCount_;
             }
         }
         if (refCount_ <= 0)
         {
-            assert(refCount_ == 0);
+            tassert(refCount_ == 0);
             reset();
         }
     }
@@ -312,14 +479,12 @@ GstClock* Pipeline::clock() const
 GstElement *Pipeline::makeElement(const char *factoryName, const char *elementName) 
 {
     GstElement *element = gst_element_factory_make(factoryName, elementName);
-    assert(element);
+    if(!element)
+    {
+        THROW_ERROR("element not made. factoryName: " << factoryName << " elementName: " << elementName); 
+    }
     add(element);
     return element;
-}
-
-GstElement *Pipeline::findElement(const char *name) const
-{
-    return gst_bin_get_by_name(GST_BIN(pipeline_), name);
 }
 
 
@@ -343,19 +508,19 @@ void Pipeline::seekTo(gint64 pos)
     if (!gst_element_seek (pipeline_, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
                 GST_SEEK_TYPE_SET, pos,
                 GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
-        THROW_ERROR("Seek failed!\n");
+        THROW_ERROR("Seek failed!");
     }
 }
 
 
 const char* Pipeline::getElementPadCaps(GstElement *element, const char * padName) const
 {
-    assert(isPlaying() || isPaused());
+    tassert(isPlaying() or isPaused());
 
     GstPad *pad;
     GstCaps *caps;
 
-    assert(pad = gst_element_get_pad(GST_ELEMENT(element), padName));
+    tassert(pad = gst_element_get_pad(GST_ELEMENT(element), padName));
 
     do
         caps = gst_pad_get_negotiated_caps(pad);
@@ -369,4 +534,5 @@ const char* Pipeline::getElementPadCaps(GstElement *element, const char * padNam
     gst_caps_unref(caps);
     return result;
 }
+
 

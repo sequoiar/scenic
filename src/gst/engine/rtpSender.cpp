@@ -1,25 +1,29 @@
+/* rtpSender.cpp
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
+ *
+ * This file is part of [propulse]ART.
+ *
+ * [propulse]ART is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * [propulse]ART is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
 
-// rtpSender.cpp
-// Copyright 2008 Koya Charles & Tristan Matthews
-//
-// This file is part of [propulse]ART.
-//
-// [propulse]ART is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// [propulse]ART is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
-//
+#include "util.h"
 
 #include <gst/gst.h>
-#include <cassert>
+#include <algorithm>
 
 #include "pipeline.h"
 #include "gstLinkable.h"
@@ -28,9 +32,15 @@
 #include "remoteConfig.h"
 
 
+void RtpSender::enableControl()
+{
+    Payloader::enableControl();
+}
+
 RtpSender::~RtpSender()
 {
     Pipeline::Instance()->remove(&rtp_sender_);
+    sessionNames_.erase(sessionId_); // remove session name by id
 }
 
 
@@ -43,6 +53,7 @@ std::string RtpSender::getCaps() const
 void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
 {
     RtpBin::init();
+    sessionNames_[sessionId_] = config.codec();
 
     GstPad *send_rtp_sink;
     GstPad *send_rtp_src;
@@ -57,39 +68,40 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     g_object_set(rtp_sender_, "host", config.remoteHost(), "port", config.port(), NULL);
     
     rtcp_sender_ = Pipeline::Instance()->makeElement("udpsink", NULL);
-    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.port() + 1,
+    g_object_set(rtcp_sender_, "host", config.remoteHost(), "port", config.rtcpFirstPort(),
                  "sync", FALSE, "async", FALSE, NULL);
 
     rtcp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
-    g_object_set(rtcp_receiver_, "port", config.port() + 5, NULL);
+    g_object_set(rtcp_receiver_, "port", config.rtcpSecondPort(), NULL);
     
 
-    // FIXME: are the padStr calls necessary for request pads, or will the send_rtp_sink_%d pattern suffice?
+    // padStr adds a session id to the pad name, so we get the pad for this session
     send_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("send_rtp_sink_"));
-    assert(send_rtp_sink);
+    tassert(send_rtp_sink);
     send_rtp_src = gst_element_get_static_pad(rtpbin_, padStr("send_rtp_src_"));
-    assert(send_rtp_src);
+    tassert(send_rtp_src);
     send_rtcp_src = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_"));
-    assert(send_rtcp_src);
+    tassert(send_rtcp_src);
     recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_"));
-    assert(recv_rtcp_sink);
+    tassert(recv_rtcp_sink);
 
-    assert(payloadSrc = gst_element_get_static_pad(newSrc->srcElement(), "src"));
-    assert(rtpSenderSink = gst_element_get_static_pad(rtp_sender_, "sink"));
-    assert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
-    assert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
+    tassert(payloadSrc = gst_element_get_static_pad(newSrc->srcElement(), "src"));
+    tassert(rtpSenderSink = gst_element_get_static_pad(rtp_sender_, "sink"));
+    tassert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
+    tassert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
 
     // link pads
-    assert(gstlinkable::link_pads(payloadSrc, send_rtp_sink));
-    assert(gstlinkable::link_pads(send_rtp_src, rtpSenderSink));
-    assert(gstlinkable::link_pads(send_rtcp_src, rtcpSenderSink));
-    assert(gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink));
+    tassert(gstlinkable::link_pads(payloadSrc, send_rtp_sink));
+    tassert(gstlinkable::link_pads(send_rtp_src, rtpSenderSink));
+    tassert(gstlinkable::link_pads(send_rtcp_src, rtcpSenderSink));
+    tassert(gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink));
     
     // release request and static pads (in reverse order)
     gst_object_unref(GST_OBJECT(send_rtp_src)); // static pad
-    gst_object_unref(GST_OBJECT(send_rtp_sink));
-    gst_object_unref(GST_OBJECT(send_rtcp_src));
-    gst_object_unref(GST_OBJECT(recv_rtcp_sink));
+    // release request pads
+    gst_element_release_request_pad(rtpbin_, send_rtp_sink);
+    gst_element_release_request_pad(rtpbin_, send_rtcp_src);
+    gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);
 
     // release static pads (in reverse order)
     gst_object_unref(GST_OBJECT(rtcpReceiverSrc));

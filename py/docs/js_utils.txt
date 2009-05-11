@@ -1,0 +1,31 @@
+Utils Documentation
+===================
+
+This page contains the Utils Javascript Module documentation.
+
+The :mod:`utils` Module
+-----------------------
+
+
+
+.. function:: register(name, widget)
+
+   Register a widget.
+
+   :param name: The short name of the widget.
+   :type name: string
+   :param widget: Class instance of the widget.
+   :type widget: instance
+
+
+.. function:: notify(caller, key, value)
+
+   Notify all registered widgets (except the caller) of this event.
+
+   :param caller: The short name of the caller widget.
+   :type caller: string
+   :param key: The name of the receive information.
+   :type key: string
+   :param value: The receive information.
+
+

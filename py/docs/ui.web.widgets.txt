@@ -1,0 +1,28 @@
+Widgets Documentation
+=====================
+
+This page contains the Widgets Package documentation.
+
+Subpackages
+-----------
+
+.. toctree::
+
+    ui.web.widgets.medias
+
+The :mod:`addressbook` Module
+-----------------------------
+
+.. automodule:: ui.web.widgets.addressbook
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+The :mod:`help` Module
+----------------------
+
+.. automodule:: ui.web.widgets.help
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

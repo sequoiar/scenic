@@ -1,0 +1,13 @@
+Basic Documentation
+===================
+
+This page contains the Basic Package documentation.
+
+The :mod:`basic` Module
+-----------------------
+
+.. automodule:: connectors.basic.basic
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

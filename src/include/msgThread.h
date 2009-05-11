@@ -1,5 +1,7 @@
 /* msgThread.h
- * Copyright 2008 Koya Charles & Tristan Matthews 
+ * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
+ * http://www.sat.qc.ca
+ * All rights reserved.
  *
  * This file is part of [propulse]ART.
  *
@@ -24,13 +26,28 @@
 #include "baseThread.h"
 #include "mapMsg.h"
 
-typedef QueuePair_<MapMsg> QueuePair;
 
 /** template specialization of BaseThread with MapMsg */
 class MsgThread
-    : public BaseThread<MapMsg>
+    : public BaseThread
 {
 
+};
+
+///Instance will register a particular MsgThread as a MapMsg handler
+class MainSubscriber
+    : public MapMsg::Subscriber
+{
+    MsgThread &t_;
+    public:
+        MainSubscriber(MsgThread* pt)
+            : t_(*pt)
+        {}
+
+        void operator()(MapMsg& msg)
+        {
+            t_.getQueue().push(msg);
+        }
 };
 
 #endif

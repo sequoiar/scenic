@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
-# Sropulpof
-# Copyright (C) 2008 Soci�t� des arts technologiques (SAT)
+# 
+# Miville
+# Copyright (C) 2008 Societe des arts technologiques (SAT)
 # http://www.sat.qc.ca
 # All rights reserved.
 #
@@ -10,13 +10,13 @@
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# Sropulpof is distributed in the hope that it will be useful,
+# Miville is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+# along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 
 import os
@@ -24,7 +24,8 @@ import sys
 from twisted.trial import unittest
 from twisted.python.filepath import FilePath
 from twisted.python.modules import getModule
-from ui import common
+from miville.utils import common
+from miville.utils.common import PortNumberGenerator
 
 class ToTestCallback():
     def __init__(self):
@@ -35,33 +36,61 @@ class ToTestCallback():
     
     def __bad_test(self):
         pass
-       
+
+class TestSimple(unittest.TestCase):
+    
+    def test_port_generator(self):
+        
+        porc = PortNumberGenerator(33,17)
+        x = porc.get_current_port()
+        self.assertTrue(x == None)
+        x1 = porc.generate_new_port()
+        self.assertTrue(x1 == 33)
+        y = porc.generate_new_port()
+        self.assertTrue(y == 50)
+        z = porc.get_current_port()
+        self.assertTrue(z == 50)
+        w = porc.generate_new_port()
+        self.assertTrue(w == 67)
+        w1 = porc.generate_new_port()
+        self.assertTrue(w1 == 84)
+        # conflict.. 67 is already taken
+        jerzy = PortNumberGenerator(67,1)
+        jx = jerzy.get_current_port()
+        self.assertTrue(jx == None)
+        jy = jerzy.generate_new_port()
+        self.assertTrue(jy == 68)
+        
+        jzs = jerzy.generate_new_ports(17)
+        self.assertTrue(len(jzs) == 17)
+        self.assertTrue(84 not in jzs)
+        
+           
 class TestCommon(unittest.TestCase):
+
     def setUp(self):
         pass
-    
-    def test_find_all(self):
-        res = common.find_all()
+        
+    def test_find_modules(self):
+        res = common.find_modules('ui')
         #check if all user interface found are correctly formated
         for ui in res:
             if not ui.isPackage() or FilePath(ui.filePath.dirname() + '/off').exists():
                 self.fail("Some of user interface are incorrect or bad formated")
-        
         #check if it doesn't forget any interface???
         uis = []
-        mods = getModule('ui').iterModules()
+        mods = getModule('miville.ui').iterModules()
         for ui in mods:
             if ui.isPackage() and not FilePath(ui.filePath.dirname() + '/off').exists():
                 uis.append(ui)
-                
-        assert(res == uis ), self.fail("find_all didn't get all ui ")        
+        assert(res == uis ), self.fail("find_modules didn't get all ui ")        
                 
         
-    def test_load(self):
+    def dont_test_load_modules(self):
         """Test if all module find can be loaded
         """
-        uis = common.find_all()
-        loaded = common.load(uis)
+        uis = common.find_modules('ui')
+        loaded = common.load_modules(uis)
         uis_copied = []
         for ui in uis :
             uis_copied.append(ui.load())            
@@ -77,6 +106,3 @@ class TestCommon(unittest.TestCase):
             if len(vv) >= 2 : 
                 if vv[0]=='_' and vv[1]=='_' :
                     self.fail("problem detecting good callbacks")
-
-        #compare res with function list of r
-        

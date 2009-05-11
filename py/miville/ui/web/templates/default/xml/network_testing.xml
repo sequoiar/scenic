@@ -1,0 +1,58 @@
+<div xmlns:n="http://nevow.com/ns/nevow/0.1"
+    xmlns:athena="http://divmod.org/ns/athena/0.7"
+    n:render="liveFragment">
+    <!-- The actual HTML template -->
+    <br />
+	<h3 n:render="i18n">Network Testing</h3>
+    <div id="nettest" class="section">
+        <table>
+            <tr>
+                <td align="right">Bandwidth: </td>
+                <td><input type="text" id="nettest_bandwidth" value="10" /> <select id="nettest_unit">
+                <option selected="true" value="M">Mbps</option>
+                <option value="K">Kbps</option>
+                </select></td>
+            </tr>
+            <tr>
+                <td align="right">Test duration: </td>
+                <td><input type="text" id="nettest_duration" value="10"   /> seconds</td>
+            </tr>
+            <tr>
+                <td align="right">Mode:</td>
+                <td>
+                    <select id="nettest_kind">
+                        <option value="localtoremote">from local to remote</option>
+                        <option value="remotetolocal">from remote to local</option>
+                        <option value="tradeoff">bidirectionnal sequential</option>
+                        <option value="dualtest" selected="true">bidirectional simultaneous</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td align="right" colspan="2">
+                    <!-- start button -->
+                    <input type="button" id="nettest_start" value="Start" class="js_help button" style="float:right;" disabled="true"></input>
+                    <!-- TEST IN PROGRESS IMAGE -->
+                    <div id="nettest_progress" class="basic_icon" />
+                </td>
+            </tr>
+        </table>
+        <div id="nettest_results">
+            <!-- MESSAGE -->
+            <div id="nettest_message" style="text-size:smaller;">
+                No test results.
+            </div> <!-- We display the results here. -->
+        </div>
+	</div>
+
+    <!-- ####################### -->
+	<!-- Help strings -->
+	<span n:render="i18n" id="help_nettest_start" class="help_str" url="nettest#start">Starts a network performance test with a contact to which we are currently connected.</span>
+
+	<!-- Javascript translation -->
+	<span n:render="i18n" id="js_nettest_start" class="nettest js_str">Start</span>
+	<span n:render="i18n" id="js_nettest_stop" class="nettest js_str">Stop</span>
+	<span n:render="i18n" id="js_nettest_bandwidth" class="nettest js_str">Bandwidth</span>
+	<span n:render="i18n" id="js_nettest_duration" class="nettest js_str">Duration</span>
+	<span n:render="i18n" id="js_nettest_mode" class="nettest js_str">Mode</span>
+</div>

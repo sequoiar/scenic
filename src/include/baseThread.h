@@ -1,5 +1,4 @@
 /* baseThread.h
- * Copyright (C) 2008 Koya Charles, Tristan Matthews
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,110 +20,57 @@
 #ifndef __BASE_THREAD_H__
 #define __BASE_THREAD_H__
 
-#include <glib.h>
 #include <string>
+#include <set>
+#include <algorithm>
+
+#include "config.h"
 #include "baseModule.h"
 #include "queuePair.h"
+#ifdef HAVE_BOOST_THREAD
+#include <boost/thread.hpp>
+typedef QueuePair_ QueuePair;
+#else
+#include <glib.h>
+typedef gQueuePair_ QueuePair;
+#endif
 
 /// glib thread construct with async queues 
-template < class T >
+
 class BaseThread
     : public BaseModule
 {
     public:
-        BaseThread < T > ();
-        virtual ~BaseThread < T > ();
+        BaseThread ();
+        virtual ~BaseThread ();
 
-        QueuePair_ < T > &getQueue();
+        QueuePair &getQueue();
         bool run();
 
+        static void broadcastQuit();
+        static bool isQuitted();
+        virtual void main() { }
     protected:
-        virtual int main() { return 0; }
         static void *thread_main(void *pThreadObj);
+        void operator()(){main();}
         virtual bool ready() { return true; }
-
+        static void postQuit(BaseThread* bt);
+#ifdef HAVE_BOOST_THREAD
+        boost::thread *th_;
+#else
         GThread *th_;
-        QueuePair_ < T > queue_;
-        QueuePair_ < T > flippedQueue_;
+#endif
+        QueuePair queue_;
+        QueuePair flippedQueue_;
 
+        static std::set< BaseThread *> allThreads_;
+        static bool Quitted;
     private:
         /** No Copy Constructor */
         BaseThread(const BaseThread&); 
         /** No Assignment Operator */
         BaseThread& operator=(const BaseThread&); 
 };
-
-/// client access to async QueuePair 
-template < class T >
-QueuePair_ < T > &BaseThread < T >::getQueue()
-{
-    return flippedQueue_;
-}
-
-template < class T >
-BaseThread < T >::BaseThread()
-    : th_(0), queue_(), flippedQueue_()
-{
-    if (!g_thread_supported ())
-        g_thread_init (NULL);
-    queue_.init();
-    flippedQueue_.flip(queue_);
-}
-
-template < class T >
-BaseThread < T >::~BaseThread()
-{
-    if (th_){
-        T t("quit"); //TODO: this is forcing the template param to have char* constructor
-        flippedQueue_.push(t);
-        g_thread_join(th_);
-    }
-}
-
-
-/// thread creation 
-template < class T >
-GThread * thread_create(void *(thread) (void *), T t, GError ** err)
-{
-    return (g_thread_create(thread, static_cast < void *>(t), TRUE, err));
-}
-
-
-/// entry point calls thread_create 
-template < class T >
-bool BaseThread < T >::run()
-{
-    GError *err = 0;
-    if (th_)
-    {
-        LOG_WARNING("Thread already Running.");
-        return true;
-    }
-    //No thread yet
-    if(!ready())
-        return false;
-
-    th_ = thread_create(BaseThread::thread_main, this, &err);
-
-    if (!th_)       //BaseThread failed
-    {
-        THROW_CRITICAL("thread_create failed!");
-        return false;
-    }
-    usleep(1);      // Insure thread started or g_thread_join 
-                    //returns before this thread starts
-    return true;
-}
-
-/// thread entry point 
-template < class T >
-void *BaseThread < T >::thread_main(void *pThreadObj)
-{
-    return reinterpret_cast<void *>(
-            static_cast < BaseThread * >(pThreadObj)->main()
-            );
-}
-
 
 #endif
 
