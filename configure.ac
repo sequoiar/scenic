@@ -44,8 +44,8 @@ if test "x${enable_logs}" = "xyes" ; then
     AC_DEFINE(MAPLOGS,[],[send logs to listeners])
 fi
 
-AC_ARG_ENABLE([asio], [ **************** 
-  --enable-asio build asio],,enable_asio=yes)
+#AC_ARG_ENABLE([asio], [ **************** 
+#  --enable-asio build asio],,enable_asio=yes)
   
 
 AC_MSG_WARN([${ac_prefix}])
@@ -139,11 +139,9 @@ AX_PYTHON
 AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
 
 AX_BOOST_BASE([1.34])
-if test  "x${enable_asio}" = "xyes"; then
 AX_BOOST_THREAD
 AX_BOOST_SYSTEM
 AX_BOOST_ASIO
-fi
 
 AX_BOOST_PYTHON
 AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes")
@@ -165,13 +163,6 @@ fi
 if test "x${enable_debug}" = "xyes" ; then
     AC_DEFINE(CONFIG_DEBUG_LOCAL,[],[Debug define from configure])
     CXXFLAGS="-g -O0 -rdynamic -Wextra -Weffc++ -pedantic -Wfatal-errors -Werror -Wno-variadic-macros -Wno-long-long -Wall -Wshadow"
-
-#Trying to set CPPUNIT_LIBS using pkg-config
-PKG_CHECK_MODULES(CPPUNIT, cppunit, have_cppunit=true, have_cppunit=false)
-if test "x${have_cppunit}" = "xfalse" ; then
-    AC_MSG_WARN([libcppunit not found.-- ])
-fi
-
 fi
 
 CXXFLAGS+=" -fPIC "
