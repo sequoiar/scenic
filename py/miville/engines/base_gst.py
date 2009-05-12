@@ -30,7 +30,7 @@ from miville.protocols import ipcp
 from miville.utils import log
 from miville.utils.common import get_def_name
 
-log = log.start('info', 1, 0, 'base_gst')
+log = log.start('debug', 1, 0, 'base_gst')
 
 STOPPED = 0
 STARTING = 1
@@ -218,9 +218,11 @@ class GstServer(object):
                     (cmd, args) = self.commands.pop()
                     log.debug('\n\n\nGstServer._process_cmd: \n  ' + cmd + "\n  args: " + str(args) + "\n  pid " + str(self.process.pid)  + " " + str(self) + '\n\n')
                     if args != None:
-                        
-                        self.conn.send_cmd(cmd, *args)
-                        
+                        if isinstance(args, (tuple, list)):
+                            self.conn.send_cmd(cmd, *args)
+                        else:
+                            log.debug('IPCP command is not a tuple or list !!!!!!! : ' + type(cmd))
+                            self.conn.send_cmd(cmd, args)
                     else:
                         self.conn.send_cmd(cmd)      
         if len(self.commands) > 0:
