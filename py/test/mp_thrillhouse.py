@@ -17,6 +17,7 @@ from time import sleep
 import os
 import telnetlib
 import socket
+import sys
 
 
 def milhouse_worker(args):
@@ -99,7 +100,7 @@ def runClients(rxTn, txTn, args):
 
 
     # let the test run a bit
-    TEST_LENGTH = 10
+    TEST_LENGTH = 20
     sleep(TEST_LENGTH)
 
     rxTn.write('stop:\n')
@@ -1990,8 +1991,17 @@ class AudioVideoTests(object):
             proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
 if __name__ == '__main__':
+    if len(sys.argv) == 2:
+        prefix = sys.argv[1]
+    else:
+        prefix = 'test_v4l2src_theora_xvimage'
+
+    print "Running tests which start with '" + prefix + "'\n\n"
     # here we run all the tests thanks to the wonders of reflective programming
-    tests = prefixedMethods(VideoTests(), 'test_v4l2src_h263_xvimage')
+    tests = prefixedMethods(VideoTests(), prefix)
+
+    if tests == []:
+        print "No matching tests found."
 
     for test in tests:
         print '/*----------------------------------------------*/'
