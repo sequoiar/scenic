@@ -218,7 +218,9 @@ class GstServer(object):
                     (cmd, args) = self.commands.pop()
                     log.debug('\n\n\nGstServer._process_cmd: \n  ' + cmd + "\n  args: " + str(args) + "\n  pid " + str(self.process.pid)  + " " + str(self) + '\n\n')
                     if args != None:
-                        self.conn.send_cmd(cmd, args)
+                        
+                        self.conn.send_cmd(cmd, *args)
+                        
                     else:
                         self.conn.send_cmd(cmd)      
         if len(self.commands) > 0:
