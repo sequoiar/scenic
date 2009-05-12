@@ -129,6 +129,7 @@ class VideoEncoder : public Encoder
         _GstElement *sinkQueue_;
         _GstElement *srcQueue_;
         _GstElement *deinterlace_;
+        bool supportsInterlaced_;
 
     private:
         

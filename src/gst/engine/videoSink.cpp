@@ -186,13 +186,11 @@ void XvImageSink::init()
             gtk_window_move(GTK_WINDOW(window_), xine[j].x_org, xine[j].y_org);
     }
 
-    gtk_window_set_default_size(GTK_WINDOW(window_), GtkVideoSink::WIDTH, GtkVideoSink::HEIGHT);
+    gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
 
-    //g_signal_connect(G_OBJECT(window_), "destroy", G_CALLBACK(gutil::killMainLoop), NULL);
-
     g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
-                expose_cb), static_cast<void*>(this));
+                expose_cb), static_cast<gpointer>(this));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event",
             G_CALLBACK(XvImageSink::key_press_event_cb), NULL);

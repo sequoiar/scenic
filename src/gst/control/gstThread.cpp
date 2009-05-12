@@ -292,7 +292,7 @@ void GstSenderThread::audio_init(MapMsg& msg)
         AudioSourceConfig config(msg["source"], audioDevice, audioLocation, msg["channels"]);
         audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
          
-        ff[1] = boost::bind(tcpSendBuffer,msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, audiofactory::MSG_ID, _1);
+        ff[1] = boost::bind(tcpSendBuffer, msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, audiofactory::MSG_ID, _1);
     }
     catch(Except e)
     {

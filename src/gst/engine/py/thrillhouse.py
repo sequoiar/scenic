@@ -573,10 +573,21 @@ class MilhouseTests():
             send.numchannels = chan
             self.run(recv, send)
 
+    def test_43_v4l2src_theora_glimagesink(self):
+        """ Test with 1-8 channels for vorbis with a 5 second timeout """
+        self.countdown('START')
+
+        recv, send = self.argfactory('video')
+        send.videosource= 'v4l2src'
+        send.videocodec = 'theora'
+        recv.videocodec = send.videocodec
+        recv.videosink = 'glimagesink'
+        self.run(recv, send)
+
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_40')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_24')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

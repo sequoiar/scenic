@@ -1991,7 +1991,7 @@ class AudioVideoTests(object):
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    tests = prefixedMethods(VideoTests(), 'test_v4l2src_theora_glimagesin')
+    tests = prefixedMethods(VideoTests(), 'test_v4l2src_h263_xvimage')
 
     for test in tests:
         print '/*----------------------------------------------*/'

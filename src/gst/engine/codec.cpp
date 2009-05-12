@@ -129,7 +129,7 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
 
 
 VideoEncoder::VideoEncoder() : doDeinterlace_(false), colorspc_(0), sinkQueue_(0), srcQueue_(0),
-    deinterlace_(0)
+    deinterlace_(0), supportsInterlaced_(false)  // most codecs don't have this property
 {}
 
 
@@ -161,7 +161,8 @@ void VideoEncoder::init()
     else
     {
         gstlinkable::link(sinkQueue_, colorspc_);
-        g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
+        if (supportsInterlaced_)  // not all encoders have this property
+            g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
     }
 
     // Create separate thread for encoding, should yield better performance on multicore machines
@@ -182,7 +183,7 @@ H264Encoder::~H264Encoder()
 void H264Encoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
-
+    supportsInterlaced_ = true;
 
     // threads: 1-4, 0 for automatic 
 #ifdef HAVE_BOOST_THREAD        // more portable
@@ -245,7 +246,7 @@ void H264Decoder::adjustJitterBuffer()
 
 
 /// Constructor 
-H263Encoder::H263Encoder()
+H263Encoder::H263Encoder() 
 {}
 
 
@@ -256,24 +257,8 @@ H263Encoder::~H263Encoder()
 
 void H263Encoder::init()
 {
-    sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
     codec_ = Pipeline::Instance()->makeElement("ffenc_h263p", NULL);    // replaced with newer version
-    colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
-
-    if (doDeinterlace_)
-    {
-        LOG_DEBUG("DO THE DEINTERLACE");
-        deinterlace_ = Pipeline::Instance()->makeElement("deinterlace2", NULL);
-        gstlinkable::link(sinkQueue_, deinterlace_);
-        gstlinkable::link(deinterlace_, colorspc_);
-    }
-    else
-        gstlinkable::link(sinkQueue_, colorspc_);   // interlaced not supported by codec
-
-    // Create separate thread for encoding, should yield better performance on multicore machines
-    gstlinkable::link(colorspc_, codec_);
-    srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
-    gstlinkable::link(codec_, srcQueue_);
+    VideoEncoder::init();
 }
 
 
@@ -298,7 +283,8 @@ RtpPay* H263Decoder::createDepayloader() const
 
 
 /// Constructor 
-Mpeg4Encoder::Mpeg4Encoder() {}
+Mpeg4Encoder::Mpeg4Encoder() 
+{}
 
 
 /// Destructor 
@@ -308,6 +294,7 @@ Mpeg4Encoder::~Mpeg4Encoder()
 void Mpeg4Encoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
+    supportsInterlaced_ = true;
     VideoEncoder::init();
 }
 
