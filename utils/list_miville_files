@@ -1,13 +1,29 @@
 #!/bin/bash
 
+if [ $# = 0 ];
+then
+    PREFIX=/usr/local
+fi
+if [ $# = 1 ];
+then
+    PREFIX=$1
+fi
+if [ $# = 2 ];
+then
+    PREFIX=$1
+    DESTDIR=$2
+fi
+
+echo "PREFIX: " $PREFIX
+echo "DESTDIR: " $DESTDIR
+
 if [ -d py ];
 then
     for ext in py txt xml css js png jpg;
     do 
-        find py/miville -type f -name \*.$ext
+        find py/miville -type f -name \*.$ext -exec echo $DESTDIR$PREFIX/{} \;
     done
-    find py -name Makefile.in -or -name Makefile.am
-    find py/docs -name \*.txt
-    echo "py/docs/Makefile"
+    find py -name Makefile.in -or -name Makefile.am -exec echo $DESTDIR$PREFIX/{} \;
+    find py/docs -name \*.txt -exec echo $DESTDIR$PREFIX/{} \;
+    echo "$DESTDIR$PREFIX/py/docs/Makefile"
 fi
-
