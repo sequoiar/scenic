@@ -50,10 +50,10 @@ void GstSenderThread::start(MapMsg& )
     }
     else
     {
-        if(ff[0])
-            ff[0](audio_->getCaps());
         if(ff[1])
-            ff[1](video_->getCaps());
+            ff[1](audio_->getCaps());
+        if(ff[0])
+            ff[0](video_->getCaps());
     }
 } 
 
