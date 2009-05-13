@@ -585,11 +585,11 @@ class ControllerApi(object):
             result = err
         self.notify(caller, result)       
         
-    def save_settings (self, caller):
+    def save_settings (self, caller, offset=0):
         log.info("ControllerApi.save_settings")
         try:
             result = None
-            result = self.settings.save()
+            result = self.settings.save(offset)
         except SettingsError, err:
             result = err
         self.notify(caller, result)
