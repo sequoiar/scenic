@@ -99,7 +99,7 @@ class Settings(object):
         self.global_settings = global_settings
         self.selected_global_setting = None
         self.selected_media_setting = None
-        #self.current_global_id = 0  [i for i in l if i<20]
+        # self.current_global_id = 0  [i for i in l if i<20]
         self.media_settings = media_settings
         self.load() # RTF File
 
@@ -248,27 +248,54 @@ class Settings(object):
                     self.media_settings[k] = med
                 else:
                     log.error("Media user setting %d: '%s' clashes with preset" % (k,med.name))
+    
+    
                  
-    def save(self):
+    def save(self, id_offset = 0):
         """
-        Saves the current settings to a file. 
+        Saves the current settings to a file.
+        The id of the media settings and the global settings are offset by the
+        id_offset amount before the save. 
         """
+        
+        def offset_media_setting(media_setting, offset):
+            media_setting.id = media_setting.id + offset
+            
+                 
+        def offset_global_setting(global_setting, offset):
+            """
+            Offsets the media ids for each stream inside a global setting.
+            """
+            for group_id, group in global_setting.stream_subgroups.iteritems():
+                for stream in group.media_streams:        
+                    try:
+                        id = stream.setting
+                        media_setting = Settings.get_media_setting_from_id(id)
+                        stream.setting = stream.setting + offset
+                    except:
+                        stream.setting = 0
+            
+            
         user_media_settings = {} 
         user_global_settings =  {}
         
         first_user_setting_id = first_global_id
         
-        for k in self.global_settings.keys():
+        global_keys = self.global_settings.keys()
+        for k in global_keys:
             glob = self.global_settings[k]
-            if k >= first_user_setting_id: 
-                user_global_settings[k] = glob
+            if k >= first_user_setting_id:
+                log.info('Saving [%d] %s' % (k, glob.name) )
+                offset_global_setting(glob, id_offset)
+                user_global_settings[k + id_offset] = glob   
         
         for k in self.media_settings.keys():
             med = self.media_settings[k]
             if k >= first_user_setting_id:
-                user_media_settings[k] = med
+                offset_media_setting(med, id_offset)
+                user_media_settings[k+ id_offset] = med
         
-        filename = install_dir(SETTINGS_FILENAME) # "settings.txt")
+        filename = install_dir(SETTINGS_FILENAME) # "settings.txt"
         
         # little hack to  create a preset file
         stuff = (user_global_settings, user_media_settings)  
@@ -277,22 +304,22 @@ class Settings(object):
     def get_media_setting(self, name):
         id = self._get_media_setting_id_from_name(name)
         return self.media_settings[id]
-    
+
     def get_global_setting_from_id(self, id):
         if self.global_settings.has_key(id):
             return self.global_settings[id]
         raise SettingsError, 'The global setting ' + str(id) + ' does not exist'  
-    
+
     def get_global_setting(self, name):
         id = self._get_global_setting_id_from_name(name)
         return self.global_settings[id]
-    
+
     def pretty_list_settings(self):
          return (self.global_settings, self.media_settings)
-        
+
     def list_global_setting(self):
          return (self.global_settings, self.selected_global_setting)
-       
+   
     def add_global_setting(self, name):
         if not name:
             raise SettingsError, 'Global setting must have a unique name'
@@ -309,13 +336,13 @@ class Settings(object):
         finally:
             pass 
         return True
-    
+  
     def erase_global_setting(self, name):
         id = self._get_global_setting_id_from_name(name)
         if self.selected_global_setting == name:
             self.selected_global_setting = None
         del self.global_settings[id]
-       
+ 
     def modify_global_setting(self, global_setting_name, attribute, new_value):
         id = self._get_global_setting_id_from_name(global_setting_name)
         raise SettingsError, 'settings.py l 92 MODIFY : ' + global_setting_name + " " + attribute + " = " + new_value  
@@ -344,11 +371,6 @@ class Settings(object):
         if id == -1:
             raise SettingsError, 'Global setting "%s" does not exist' % name
         return id
-
-    def select_global_setting(self, name):
-        id = self._get_global_setting_id_from_name(name)
-        self.selected_global_setting = name
-        return True
             
     def select_global_setting(self, name):
         id = self._get_global_setting_id_from_name(name)
