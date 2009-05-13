@@ -1,6 +1,4 @@
 SUBDIRS = notes test figures figures/test
-PREFIX=
-DESTDIR=
 
 all: 
 	@for i in $(SUBDIRS); do \
@@ -17,8 +15,8 @@ doxygen:
 
 install:
 	@if test -e html; then \
-	mkdir -p $(DESTDIR)$(PREFIX)/share/doc/doxygen \
-	cp -rfv html $(DESTDIR)$(PREFIX)/share/doc/doxygen; \
+	mkdir -p $(DESTDIR)$(prefix)/share/doc/doxygen \
+	cp -rfv html $(DESTDIR)$(prefix)/share/doc/doxygen; \
 	fi
 
 uninstall:

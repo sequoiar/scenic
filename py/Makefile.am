@@ -1,6 +1,6 @@
 include $(top_srcdir)/globals.mak 
 
-SUBDIRS = miville maugis docs
+DIST_SUBDIRS = miville maugis docs
 
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 trial
 
@@ -19,6 +19,8 @@ TESTS = test/test_addressbook.py \
         test/check_devices.py \
         test/check_miville_starts.py \
         test/check_miville_settings.py
+
+#EXTRA_DIST: $(shell `../utils/list_miville_files`)
 
 install-exec-hook:
 		mkdir -p $(DESTDIR)$(prefix)/lib/python2.5/miville
