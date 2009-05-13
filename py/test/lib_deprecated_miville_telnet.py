@@ -295,7 +295,7 @@ class TelnetBaseTest(unittest.TestCase):
         self.client.sendline(command)
         err = errorMsg or 'The command did not return: "%s" as expected' % expected
         self.expectTest(expected, err)
-        time.sleep(0.1)
+        #time.sleep(0.05)
         #b = self.client.buffer.rstrip()
         #b = b.lstrip()
         #print "\n============================================"    

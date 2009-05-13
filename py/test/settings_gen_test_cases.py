@@ -245,143 +245,143 @@ class Test_Generate_Settings(testing.TelnetBaseTest):
     def add_global_settings(self):
     
 
-        # add global setting
-        #####MPEG4##########        
-        #10000      
-        #setting_id = 10000 + self.media_settings.index('video_mpeg4_rx')
-        #self._add_global_setting_video_rx('video_mpeg4_rx', setting_id, 6676)
-        #10001      
-        #setting_id = 10000 + self.media_settings.index('video_mpeg4_tx')
-        #self._add_global_setting_video_tx('video_mpeg4_tx', setting_id, 6686)
-        ##########H263#############
-        #10002
-        #setting_id = 10000 + self.media_settings.index('video_h263_rx')
-        #self._add_global_setting_video_rx('video_h263_rx', setting_id, 6696)
-        #10003
-        #setting_id = 10000 + self.media_settings.index('video_h263_tx')
-        #self._add_global_setting_video_tx('video_h263_tx', setting_id, 6716)
-        ##########H264#############
-        #10004
-        #setting_id = 10000 + self.media_settings.index('video_h264_rx')
-        #self._add_global_setting_video_rx('video_h264_rx', setting_id, 6696)
-        #10005
-        #setting_id = 10000 + self.media_settings.index('video_h263_tx')
-        #self._add_global_setting_video_tx('video_h264_tx', setting_id, 6716)
-                        
-        #########RAW####################        
-        #10006   
-        #setting_id = 10000 + self.media_settings.index('audio_raw2_tx')
-        #self._add_global_setting_audio_rx('audio_raw2_tx', setting_id, 6726)
-        #10007        
-        #setting_id = 10000 + self.media_settings.index('audio_raw2_rx')
-        #self._add_global_setting_audio_tx('audio_raw2_rx', setting_id, 6736)
-        #10008
-        #setting_id = 10000 + self.media_settings.index('audio_raw4_rx')
-        #self._add_global_setting_audio_rx('audio_raw4_rx', setting_id, 6746)
-        #10009
-        #setting_id = 10000 + self.media_settings.index('audio_raw4_tx')
-        #self._add_global_setting_audio_tx('audio_raw4_tx', setting_id, 6756)
-        #10010
-        #setting_id = 10000 + self.media_settings.index('audio_raw6_rx')
-        #self._add_global_setting_audio_rx('audio_raw6_rx', setting_id, 6766)
-        #10011
-        #setting_id = 10000 + self.media_settings.index('audio_raw6_tx')
-        #self._add_global_setting_audio_tx('audio_raw6_tx', setting_id, 6776)
-        #10012
-        #setting_id = 10000 + self.media_settings.index('audio_raw8_rx')
-        #self._add_global_setting_audio_rx('audio_raw8_rx', setting_id, 6786)
-        #10013
-        #setting_id = 10000 + self.media_settings.index('audio_raw8_tx')
-        #self._add_global_setting_audio_tx('audio_raw8_tx', setting_id, 6796)
-        ######################MP3############################
-        #10014
-        #setting_id = 10000 + self.media_settings.index('audio_mp3_tx')
-        #self._add_global_setting_audio_tx('audio_mp3_rx', setting_id, 6816)
-        #10015
-        #setting_id = 10000 + self.media_settings.index('audio_mp3_rx')
-        #self._add_global_setting_audio_rx('audio_mp3_tx', setting_id, 6826)
-        #########################VORBIS#######################################        
-        #10016
-        #setting_id = 10000 + self.media_settings.index('audio_vorbis2_rx')
-        #self._add_global_setting_audio_rx('audio_vorbis2_rx', setting_id, 6836)
-        #10017
-        #setting_id = 10000 + self.media_settings.index('audio_vorbis2_tx')
-        #self._add_global_setting_audio_tx('audio_vorbis2_tx', setting_id, 6846)
-        #10018
-        #setting_id = 10000 + self.media_settings.index('audio_vorbis4_rx')
-        #self._add_global_setting_audio_rx('audio_vorbis4_rx', setting_id, 6856)
-        #10019
-        #setting_id = 10000 + self.media_settings.index('audio_vorbis4_tx')
-        #self._add_global_setting_audio_tx('audio_vorbis4_tx', setting_id, 6866)
-        #10020
-        #setting_id = 10000 + self.media_settings.index('audio_vorbis6_rx')
-        #self._add_global_setting_audio_rx('audio_vorbis6_rx', setting_id, 6876)
-        #10021
-        #setting_id = 10000 + self.media_settings.index('audio_vorbis6_tx')
-        #self._add_global_setting_audio_tx('audio_vorbis6_tx', setting_id, 6886)        
-        #10022
-        #setting_id = 10000 + self.media_settings.index('audio_vorbis8_rx')
-        #self._add_global_setting_audio_rx('audio_vorbis8_rx', setting_id, 6896)
-        #10023
-        #setting_id = 10000 + self.media_settings.index('audio_vorbis8_tx')
-        #self._add_global_setting_audio_tx('audio_vorbis8_tx', setting_id, 6916)
-        ###########################RAW RX/TX############################################
-        #10024
-        #setting_id_tx = 10000 + self.media_settings.index('audio_raw8_tx')
-        #setting_id_rx = 10000 + self.media_settings.index('audio_raw8_rx')
-        #self._add_global_setting_audio_rxtx('audio_raw8_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
-        #10025
-        #setting_id_tx = 10000 + self.media_settings.index('audio_raw6_tx')
-        #setting_id_rx = 10000 + self.media_settings.index('audio_raw6_rx')
-        #self._add_global_setting_audio_rxtx('audio_raw6_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
-        #10026
-        #setting_id_tx = 10000 + self.media_settings.index('audio_raw4_tx')
-        #setting_id_rx = 10000 + self.media_settings.index('audio_raw4_rx')
-        #self._add_global_setting_audio_rxtx('audio_raw4_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
-        #10027
-        #setting_id_tx = 10000 + self.media_settings.index('audio_raw2_tx')
-        #setting_id_rx = 10000 + self.media_settings.index('audio_raw2_rx')
-        #self._add_global_setting_audio_rxtx('audio_raw2_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
-        
-        #############################MP3 RX/TX##############################
-        #10028
-        #setting_id_tx = 10000 + self.media_settings.index('audio_mp3_tx')
-        #setting_id_rx = 10000 + self.media_settings.index('audio_mp3_rx')
-        #self._add_global_setting_audio_rxtx('audio_mp3_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
 
-        ############################VORBIS RX/TX############################
-        #10029
-        #setting_id_tx = 10000 + self.media_settings.index('audio_vorbis2_tx')
-        #setting_id_rx = 10000 + self.media_settings.index('audio_vorbis2_rx')
-        #self._add_global_setting_audio_rxtx('audio_vorbis2_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
-        #10030
-        #setting_id_tx = 10000 + self.media_settings.index('audio_vorbis4_tx')
-        #setting_id_rx = 10000 + self.media_settings.index('audio_vorbis4_rx')
-        #self._add_global_setting_audio_rxtx('audio_vorbis4_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
-        #10031
-        #setting_id_tx = 10000 + self.media_settings.index('audio_vorbis6_tx')
-        #setting_id_rx = 10000 + self.media_settings.index('audio_vorbis6_rx')
-        #self._add_global_setting_audio_rxtx('audio_vorbis6_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
-        #10032
-        #setting_id_tx = 10000 + self.media_settings.index('audio_vorbis8_tx')
-        #setting_id_rx = 10000 + self.media_settings.index('audio_vorbis8_rx')
-        #self._add_global_setting_audio_rxtx('audio_vorbis8_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
-        ###############MPEG4 RX/TX######################        
-        #10033        
-        #setting_id_tx_video = 10000 + self.media_settings.index('video_mpeg4_tx')
-        #setting_id_rx_video = 10000 + self.media_settings.index('video_mpeg4_rx')
-        #self._add_global_setting_video_rxtx('video_mpeg4_rxtx', setting_id_tx_video, setting_id_rx_video, 9222, 10222)
+        #####MPEG4##########        
+        10000      
+        setting_id = 10000 + self.media_settings.index('video_mpeg4_rx')
+        self._add_global_setting_video_rx('video_mpeg4_rx', setting_id, 6676)
+        10001      
+        setting_id = 10000 + self.media_settings.index('video_mpeg4_tx')
+        self._add_global_setting_video_tx('video_mpeg4_tx', setting_id, 6686)
+        #########H263#############
+        10002
+        setting_id = 10000 + self.media_settings.index('video_h263_rx')
+        self._add_global_setting_video_rx('video_h263_rx', setting_id, 6696)
+        10003
+        setting_id = 10000 + self.media_settings.index('video_h263_tx')
+        self._add_global_setting_video_tx('video_h263_tx', setting_id, 6716)
+        #########H264#############
+        10004
+        setting_id = 10000 + self.media_settings.index('video_h264_rx')
+        self._add_global_setting_video_rx('video_h264_rx', setting_id, 6696)
+        10005
+        setting_id = 10000 + self.media_settings.index('video_h263_tx')
+        self._add_global_setting_video_tx('video_h264_tx', setting_id, 6716)
+                        
+        ########RAW####################        
+        10006   
+        setting_id = 10000 + self.media_settings.index('audio_raw2_tx')
+        self._add_global_setting_audio_rx('audio_raw2_tx', setting_id, 6726)
+        10007        
+        setting_id = 10000 + self.media_settings.index('audio_raw2_rx')
+        self._add_global_setting_audio_tx('audio_raw2_rx', setting_id, 6736)
+        10008
+        setting_id = 10000 + self.media_settings.index('audio_raw4_rx')
+        self._add_global_setting_audio_rx('audio_raw4_rx', setting_id, 6746)
+        10009
+        setting_id = 10000 + self.media_settings.index('audio_raw4_tx')
+        self._add_global_setting_audio_tx('audio_raw4_tx', setting_id, 6756)
+        10010
+        setting_id = 10000 + self.media_settings.index('audio_raw6_rx')
+        self._add_global_setting_audio_rx('audio_raw6_rx', setting_id, 6766)
+        10011
+        setting_id = 10000 + self.media_settings.index('audio_raw6_tx')
+        self._add_global_setting_audio_tx('audio_raw6_tx', setting_id, 6776)
+        10012
+        setting_id = 10000 + self.media_settings.index('audio_raw8_rx')
+        self._add_global_setting_audio_rx('audio_raw8_rx', setting_id, 6786)
+        10013
+        setting_id = 10000 + self.media_settings.index('audio_raw8_tx')
+        self._add_global_setting_audio_tx('audio_raw8_tx', setting_id, 6796)
+        #####################MP3############################
+        10014
+        setting_id = 10000 + self.media_settings.index('audio_mp3_tx')
+        self._add_global_setting_audio_tx('audio_mp3_rx', setting_id, 6816)
+        10015
+        setting_id = 10000 + self.media_settings.index('audio_mp3_rx')
+        self._add_global_setting_audio_rx('audio_mp3_tx', setting_id, 6826)
+        ########################VORBIS#######################################        
+        10016
+        setting_id = 10000 + self.media_settings.index('audio_vorbis2_rx')
+        self._add_global_setting_audio_rx('audio_vorbis2_rx', setting_id, 6836)
+        10017
+        setting_id = 10000 + self.media_settings.index('audio_vorbis2_tx')
+        self._add_global_setting_audio_tx('audio_vorbis2_tx', setting_id, 6846)
+        10018
+        setting_id = 10000 + self.media_settings.index('audio_vorbis4_rx')
+        self._add_global_setting_audio_rx('audio_vorbis4_rx', setting_id, 6856)
+        10019
+        setting_id = 10000 + self.media_settings.index('audio_vorbis4_tx')
+        self._add_global_setting_audio_tx('audio_vorbis4_tx', setting_id, 6866)
+        10020
+        setting_id = 10000 + self.media_settings.index('audio_vorbis6_rx')
+        self._add_global_setting_audio_rx('audio_vorbis6_rx', setting_id, 6876)
+        10021
+        setting_id = 10000 + self.media_settings.index('audio_vorbis6_tx')
+        self._add_global_setting_audio_tx('audio_vorbis6_tx', setting_id, 6886)        
+        10022
+        setting_id = 10000 + self.media_settings.index('audio_vorbis8_rx')
+        self._add_global_setting_audio_rx('audio_vorbis8_rx', setting_id, 6896)
+        10023
+        setting_id = 10000 + self.media_settings.index('audio_vorbis8_tx')
+        self._add_global_setting_audio_tx('audio_vorbis8_tx', setting_id, 6916)
+        ##########################RAW RX/TX############################################
+        10024
+        setting_id_tx = 10000 + self.media_settings.index('audio_raw8_tx')
+        setting_id_rx = 10000 + self.media_settings.index('audio_raw8_rx')
+        self._add_global_setting_audio_rxtx('audio_raw8_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
+        10025
+        setting_id_tx = 10000 + self.media_settings.index('audio_raw6_tx')
+        setting_id_rx = 10000 + self.media_settings.index('audio_raw6_rx')
+        self._add_global_setting_audio_rxtx('audio_raw6_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
+        10026
+        setting_id_tx = 10000 + self.media_settings.index('audio_raw4_tx')
+        setting_id_rx = 10000 + self.media_settings.index('audio_raw4_rx')
+        self._add_global_setting_audio_rxtx('audio_raw4_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
+        10027
+        setting_id_tx = 10000 + self.media_settings.index('audio_raw2_tx')
+        setting_id_rx = 10000 + self.media_settings.index('audio_raw2_rx')
+        self._add_global_setting_audio_rxtx('audio_raw2_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
         
-        #################H263 RX/TX########################
-        #10034        
-        #setting_id_tx_video = 10000 + self.media_settings.index('video_h263_tx')
-        #setting_id_rx_video = 10000 + self.media_settings.index('video_h263_rx')
-        #self._add_global_setting_video_rxtx('video_h263_rxtx', setting_id_tx_video, setting_id_rx_video, 9222, 10222)
-        #################H264 RX/TX########################
-        #10035        
-        #setting_id_tx_video = 10000 + self.media_settings.index('video_h264_tx')
-        #setting_id_rx_video = 10000 + self.media_settings.index('video_h264_rx')
-        #self._add_global_setting_video_rxtx('video_h264_rxtx', setting_id_tx_video, setting_id_rx_video, 9222, 10222)
+        ############################MP3 RX/TX##############################
+        10028
+        setting_id_tx = 10000 + self.media_settings.index('audio_mp3_tx')
+        setting_id_rx = 10000 + self.media_settings.index('audio_mp3_rx')
+        self._add_global_setting_audio_rxtx('audio_mp3_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
+
+        ###########################VORBIS RX/TX############################
+        10029
+        setting_id_tx = 10000 + self.media_settings.index('audio_vorbis2_tx')
+        setting_id_rx = 10000 + self.media_settings.index('audio_vorbis2_rx')
+        self._add_global_setting_audio_rxtx('audio_vorbis2_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
+        10030
+        setting_id_tx = 10000 + self.media_settings.index('audio_vorbis4_tx')
+        setting_id_rx = 10000 + self.media_settings.index('audio_vorbis4_rx')
+        self._add_global_setting_audio_rxtx('audio_vorbis4_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
+        10031
+        setting_id_tx = 10000 + self.media_settings.index('audio_vorbis6_tx')
+        setting_id_rx = 10000 + self.media_settings.index('audio_vorbis6_rx')
+        self._add_global_setting_audio_rxtx('audio_vorbis6_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
+        10032
+        setting_id_tx = 10000 + self.media_settings.index('audio_vorbis8_tx')
+        setting_id_rx = 10000 + self.media_settings.index('audio_vorbis8_rx')
+        self._add_global_setting_audio_rxtx('audio_vorbis8_rxtx', setting_id_rx, setting_id_tx , 7222, 8222)
+        ##############MPEG4 RX/TX######################        
+        10033        
+        setting_id_tx_video = 10000 + self.media_settings.index('video_mpeg4_tx')
+        setting_id_rx_video = 10000 + self.media_settings.index('video_mpeg4_rx')
+        self._add_global_setting_video_rxtx('video_mpeg4_rxtx', setting_id_tx_video, setting_id_rx_video, 9222, 10222)
+        
+        ################H263 RX/TX########################
+        10034        
+        setting_id_tx_video = 10000 + self.media_settings.index('video_h263_tx')
+        setting_id_rx_video = 10000 + self.media_settings.index('video_h263_rx')
+        self._add_global_setting_video_rxtx('video_h263_rxtx', setting_id_tx_video, setting_id_rx_video, 9222, 10222)
+        ################H264 RX/TX########################
+        10035        
+        setting_id_tx_video = 10000 + self.media_settings.index('video_h264_tx')
+        setting_id_rx_video = 10000 + self.media_settings.index('video_h264_rx')
+        self._add_global_setting_video_rxtx('video_h264_rxtx', setting_id_tx_video, setting_id_rx_video, 9222, 10222)
 
         
     
