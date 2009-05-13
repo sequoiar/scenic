@@ -91,6 +91,8 @@ void AudioReceiver::init_sink()
     setCaps();
     tassert(gotCaps_);
     tassert(remoteConfig_.capsMatchCodec()); 
+    if (decoder_->adjustsBufferTime())
+        sink_->adjustBufferTime(decoder_->minimumBufferTime()); // increase jitterbuffer as needed
 }
 
 /// Used to set this AudioReceiver's RtpReceiver's caps 

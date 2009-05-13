@@ -1,4 +1,3 @@
--tickets!!!
 -make sure no exceptions can be thrown from destructors
 -figure out what happens if jack settings differ between machines
 -try and clean up videosink based on examples of such

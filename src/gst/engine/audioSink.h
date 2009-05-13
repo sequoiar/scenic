@@ -37,6 +37,7 @@ class AudioSink : public GstLinkableSink
         
         ~AudioSink();
        
+        virtual void adjustBufferTime(unsigned long long) { THROW_ERROR("Unimplemented"); }
         virtual void init() = 0;
 
     protected:
@@ -103,6 +104,7 @@ class AudioJackSink : public AudioSink
     public:
         AudioJackSink(const AudioSinkConfig &config);
         ~AudioJackSink();
+        void adjustBufferTime(unsigned long long);
     private:
         void init();
         const AudioSinkConfig &config_;

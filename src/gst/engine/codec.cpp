@@ -391,6 +391,11 @@ RtpPay* VorbisEncoder::createPayloader() const
 }
 
 
+unsigned long long VorbisDecoder::minimumBufferTime()
+{
+    return MIN_BUFFER_USEC;
+}
+
 void VorbisDecoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("vorbisdec", NULL);

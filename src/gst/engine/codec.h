@@ -76,6 +76,8 @@ class Decoder : public Codec
         /// Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type 
         virtual RtpPay* createDepayloader() const = 0;
         virtual void adjustJitterBuffer() {}; // buy default, do nothing
+        virtual bool adjustsBufferTime() { return false; }
+        virtual unsigned long long minimumBufferTime() { THROW_ERROR("Unimplemented"); return 0; }
 };
 
 /// Abstract child of encoder that wraps audioconvert functionality
@@ -269,9 +271,13 @@ class VorbisEncoder : public AudioConvertedEncoder
 /// Decoder that decodes vorbis into raw audio using the vorbis decoder.
 class VorbisDecoder : public Decoder
 {
+    public: 
+        bool adjustsBufferTime() { return true; }
+        unsigned long long minimumBufferTime();
     private: 
         void init();
         RtpPay* createDepayloader() const;
+        static const unsigned long long MIN_BUFFER_USEC = 100000;
 };
 
 /// Encoder that simply performs datatype conversion on raw audio.

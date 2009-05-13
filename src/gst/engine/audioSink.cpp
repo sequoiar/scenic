@@ -179,3 +179,11 @@ void AudioJackSink::init()
     LOG_DEBUG("Buffer time is " << val);
 }
 
+void AudioJackSink::adjustBufferTime(unsigned long long bufferTime)
+{
+    g_object_set(sink_, "buffer-time", bufferTime, NULL);
+    unsigned long long val;
+    g_object_get(sink_, "buffer-time", &val, NULL);
+    LOG_DEBUG("Buffer time is " << val);
+}
+

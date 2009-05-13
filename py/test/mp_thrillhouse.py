@@ -1995,11 +1995,11 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         prefix = sys.argv[1]
     else:
-        prefix = 'test_v4l2src_theora_glimage'
+        prefix = 'test_dv1394src_raw'
 
     print "Running tests which start with '" + prefix + "'\n\n"
     # here we run all the tests thanks to the wonders of reflective programming
-    tests = prefixedMethods(VideoTests(), prefix)
+    tests = prefixedMethods(AudioTests(), prefix)
 
     if tests == []:
         print "No matching tests found."

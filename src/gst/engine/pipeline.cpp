@@ -413,13 +413,15 @@ void Pipeline::remove(GstElement **element) // guarantees that original pointer 
     stop();
     if (*element)
     {
-        tassert(gst_bin_remove(GST_BIN(pipeline_), *element));
+        if (!gst_bin_remove(GST_BIN(pipeline_), *element))
+            LOG_WARNING("Could not remove element " << GST_ELEMENT_NAME(element));
         *element = NULL;
         --refCount_;
 
         if (refCount_ <= 0)
         {
-            tassert(refCount_ == 0);
+            if (refCount_ != 0)
+                LOG_WARNING("Somehow refcount is less than zero");
             Dv1394::reset();
             reset();
         }
@@ -437,14 +439,16 @@ void Pipeline::remove(std::vector<GstElement*> &elementVec)
         {
             if (*iter)
             {
-                tassert(gst_bin_remove(GST_BIN(pipeline_), *iter));
+                if (!gst_bin_remove(GST_BIN(pipeline_), *iter))
+                    LOG_WARNING("Could not remove element " << GST_ELEMENT_NAME(*iter));
                 *iter = NULL;
                 --refCount_;
             }
         }
         if (refCount_ <= 0)
         {
-            tassert(refCount_ == 0);
+            if (refCount_ != 0)
+                LOG_WARNING("Somehow refcount is less than zero");
             reset();
         }
     }
