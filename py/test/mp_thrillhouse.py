@@ -7,6 +7,8 @@ except ImportError:
     print "import failed, please install multiprocessing: \nsudo easy-install multiprocessing"
     sys.exit(1)
 
+import sys
+
 try:
     from twisted.python.reflect import prefixedMethods
 except ImportError:
@@ -17,7 +19,6 @@ from time import sleep
 import os
 import telnetlib
 import socket
-import sys
 
 
 def milhouse_worker(args):
