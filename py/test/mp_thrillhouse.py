@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 """ Run two milhouse servers as well as telnet clients """
 
+import sys
+
 try:
     import multiprocessing 
 except ImportError:
     print "import failed, please install multiprocessing: \nsudo easy-install multiprocessing"
     sys.exit(1)
-
-import sys
 
 try:
     from twisted.python.reflect import prefixedMethods
