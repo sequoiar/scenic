@@ -24,6 +24,8 @@
 
 #include <X11/Xlib.h>
 #include "gstLinkable.h"
+#include "busMsgHandler.h"
+
 class _GtkWidget;
 class _GdkEventExpose;
 class _GdkEventKey;
@@ -86,10 +88,11 @@ class GtkVideoSink
 
 
 class XvImageSink
-    : public GtkVideoSink
+    : public GtkVideoSink, public BusMsgHandler
 {
     public:
         XvImageSink(int screenNum) : GtkVideoSink(screenNum) {};
+        bool handleBusMsg(_GstMessage *msg);
 
     private:
         void init();

@@ -57,13 +57,6 @@ void GtkVideoSink::destroy_cb(GtkWidget * /*widget*/, gpointer data)
 }
 
 
-gboolean GtkVideoSink::expose_cb(GtkWidget * widget, GdkEventExpose * /*event*/, gpointer data)
-{
-    GtkVideoSink *context = static_cast<GtkVideoSink*>(data);
-    gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(context->sink_), GDK_WINDOW_XWINDOW(widget->window));
-    return TRUE;
-}
-
 
 void GtkVideoSink::makeWindowBlack()
 {
@@ -153,6 +146,22 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
 }
 
 
+bool XvImageSink::handleBusMsg(GstMessage * message)
+{
+    // ignore anything but 'prepare-xwindow-id' element messages
+    if (GST_MESSAGE_TYPE (message) != GST_MESSAGE_ELEMENT)
+        return false;
+ 
+    if (!gst_structure_has_name(message->structure, "prepare-xwindow-id"))
+        return false;
+ 
+    LOG_DEBUG("Got prepare-xwindow-id msg");
+    gst_x_overlay_set_xwindow_id (GST_X_OVERLAY(GST_MESSAGE_SRC(message)), GDK_WINDOW_XWINDOW(window_->window));
+  
+    return true;
+}
+
+
 void XvImageSink::init()
 {
     static bool gtk_initialized = false;
@@ -189,8 +198,6 @@ void XvImageSink::init()
     gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
 
-    g_signal_connect(G_OBJECT(window_), "expose-event", G_CALLBACK(
-                expose_cb), static_cast<gpointer>(this));
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
     g_signal_connect(G_OBJECT(window_), "key-press-event",
             G_CALLBACK(XvImageSink::key_press_event_cb), NULL);
@@ -198,6 +205,8 @@ void XvImageSink::init()
             G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
 
     showWindow();
+    // register this level to handle prepare window id msg
+    Pipeline::Instance()->subscribe(this);
 }
 
 
