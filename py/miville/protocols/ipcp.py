@@ -34,7 +34,7 @@ from twisted.protocols.basic import LineReceiver
 # App imports
 from miville.utils import log
 
-log = log.start('info', 1, 0, 'ipcp')
+log = log.start('debug', 1, 0, 'ipcp')
 
 class IPCP(LineReceiver):
     """
@@ -134,18 +134,19 @@ class IPCP(LineReceiver):
             if isinstance(arg, tuple):
                 parg = self._process_arg(arg[1])
                 if parg:
-                    
                     process_key = arg[0].encode('ascii', 'backslashreplace')
-                    log.debug("IPCP.send_cmd: " + str(args))
-                    log.debug("IPCP.send_cmd: process_key[" + str(process_key) + "] = [" + parg + "]")
+                    #log.debug("IPCP.send_cmd: " + str(args))
+                    #log.debug("IPCP.send_cmd: process_key[" + str(process_key) + "] = [" + parg + "]")
                     line.append(process_key + '=' + parg)
             else:
                 parg = self._process_arg(arg)
                 if parg:
                     line.append(parg)
         line = ' '.join(line)
-        log.debug('IPCP.send_cmd: "' + line + '" from ' + str(self))
+        log.info('IPCP.send_cmd: "' + line + '" from ' + str(self))
         self.sendLine(line)
+        
+        
 
     def _process_arg(self, arg):
         if isinstance(arg, int) or isinstance(arg, float):
