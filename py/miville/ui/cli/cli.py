@@ -330,13 +330,17 @@ class CliController(TelnetServer):
         cp.add_option("-i", "--mediastream", type="string", help="The media stream name to use when editing media streams")
         
         cp.add_option("-x", "--xlist", action='store_true', help="List settings hierarchy")      
+        cp.add_option("-y", "--id_offset", type="string", help="Offset the ids by the given amount when saving settings")
         cp.add_option("-z", "--description", action='store_true', help="Display description")
         (options, args) = cp.parse_args(line)
         
         if options.xlist:
             self.core.pretty_list_settings(self)
         elif options.save:
-            self.core.save_settings(self)
+            offset = 0
+            if options.id_offset != None:
+                offset = int(options.id_offset)
+            self.core.save_settings(self, offset)
         elif options.load:
             self.core.load_settings(self)
         elif options.description:

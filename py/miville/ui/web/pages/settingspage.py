@@ -57,35 +57,55 @@ from miville.errors import *
 
 log = log.start('debug', 1, 0, 'web')
 
-def print_settings():
-
-    txt = "<h1>GLOBAL SETTINGS:</h1>"
-    for k, v in global_settings.iteritems():
-        txt += "<h2>[" + str(k) + "] global setting  " + v.name + "</h2>"
-        for gid,group in v.stream_subgroups.iteritems():
-            txt += "  <h3>[" + str(gid) + "] stream sub group " + group.name + "</h3>"
-            txt += "<p>   enabled: " + str(group.enabled) + "</p>"
-            txt += "<p>   mode: " + str(group.mode) + "</p>"
-            for stream in group.media_streams:
-                txt += "   <h4>[" + stream.name + "] stream</h4>"
-                txt += "<p>    enabled: " + str(stream.enabled) + "</p>"
-                txt += "<p>    sync: " + stream.sync_group + "</p>"
-                txt += "<p>    port: " + str(stream.port) + "</p>"
-                txt += "<p>    media setting: %s\n" % str(stream.setting)
-                try:
-                    id = stream.setting
-                    media_setting = Settings.get_media_setting_from_id(id)
-                    txt += "      <h5>[" + str(media_setting.id) + "] media setting '" + media_setting.name + "</h5>"
-                    for key, value in media_setting.settings.iteritems():
-                        txt += "<p>       %s : %s</p>" % (key, str(value))
-                except:
-                    txt += "<p>     media setting N/A</p>"
-            
-    txt += "<h1>All MEDIA SETTINGS...</h1>"
+def print_all_media_settings(media_settings):
+    txt = "<h1>All MEDIA SETTINGS...</h1>"
     for k, v in media_settings.iteritems():
         txt += "<p> [" + str(k) + "] " + v.name + "</p>"
         for key, value in v.settings.iteritems():
             txt += "<p>  %s : %s</p>" % (key, str(value))
+    return txt    
+
+def print_media_setting(media_setting):
+    txt = "      <h5>[" + str(media_setting.id) + "] media setting '" + media_setting.name + "</h5>"
+    for key, value in media_setting.settings.iteritems():
+        txt += "<p>       %s : %s</p>" % (key, str(value))
+    return txt
+
+def print_stream(stream):
+    txt = "   <h4>[" + stream.name + "] stream</h4>"
+    txt += "<p>    enabled: " + str(stream.enabled) + "</p>"
+    txt += "<p>    sync: " + stream.sync_group + "</p>"
+    txt += "<p>    port: " + str(stream.port) + "</p>"
+    #txt += "<p>    media setting: %s\n" % str(stream.setting)
+    return txt
+
+def print_stream_sub_group(group_id, group):
+    txt = "  <h3>[" + str(group_id) + "] stream sub group " + group.name + "</h3>"
+    txt += "<p>   enabled: " + str(group.enabled) + "</p>"
+    txt += "<p>   mode: " + str(group.mode) + "</p>"
+    return txt
+
+def print_global_setting(global_setting_id, global_setting):
+    txt = "<h2>[" + str(global_setting_id) + "] global setting  " + global_setting.name + "</h2>"
+    return txt
+    
+def print_settings():
+
+    txt = "<h1>GLOBAL SETTINGS:</h1>"
+    for k, global_setting in global_settings.iteritems():
+        txt += print_global_setting(k, global_setting)
+        for group_id,group in global_setting.stream_subgroups.iteritems():
+            txt += print_stream_sub_group(group_id, group)
+            for stream in group.media_streams:
+                txt += print_stream(stream)                
+                try:
+                    id = stream.setting
+                    media_setting = Settings.get_media_setting_from_id(id)
+                    txt += print_media_setting(media_setting)
+                except:
+                    txt += "<p>     media setting %s (not available)</p>" % stream.setting
+                    
+    txt += print_all_media_settings(media_settings)
     return txt
 
 

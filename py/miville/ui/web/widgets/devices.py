@@ -28,7 +28,7 @@ from miville.utils import log
 from miville.utils.i18n import to_utf
 from miville.errors import *
 
-log = log.start('debug', 1, 0, 'web_devices')
+log = log.start('info', 1, 0, 'web_devices')
 
 class Devices(Widget):
     """

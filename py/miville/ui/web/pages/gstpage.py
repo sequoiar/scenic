@@ -109,19 +109,23 @@ def print_engine(engine):
     txt = ""
     try:
         txt += print_engine_summary(engine)
+        txt += "<h3>Telnet commands</h3>"
         for cmd in engine.commands:
             command = cmd[0]
             txt += "<p><b>" + command + ": </b>"
             params = cmd[1]
-            # check if its iterable
-            if not getattr(params, '__iter__', False):
-                txt += str("<i>" + str(params) + "</i> ")
+            if params == None:
+                txt += str("<i>No parameter</i> ")
             else:
-                for p in params:
-                    v = str(p[1])
-                    if isinstance(p[1], str) or isinstance(p[1], unicode):
-                        v = '"' + v + '"'
-                    txt += str(p[0]) + "= <i>" + v + "</i> "
+                # check if its iterable
+                if not getattr(params, '__iter__', False):
+                    txt += str("<i>" + str(params) + "</i> ")
+                else:
+                    for p in params:
+                        v = str(p[1])
+                        if isinstance(p[1], str) or isinstance(p[1], unicode):
+                            v = '"' + v + '"'
+                        txt += str(p[0]) + "= <i>" + v + "</i> "
             txt += "</p>"  
         
         txt += print_engine_acks(engine)    
