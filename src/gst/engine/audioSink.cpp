@@ -88,6 +88,14 @@ void AudioSink::FPE_ExceptionHandler(int /*nSig*/, int nErrType, int * /*pnRegli
     }
 }
 
+void AudioSink::adjustBufferTime(unsigned long long bufferTime)
+{
+    g_object_set(sink_, "buffer-time", bufferTime, NULL);
+    unsigned long long val;
+    g_object_get(sink_, "buffer-time", &val, NULL);
+    LOG_DEBUG("Buffer time is " << val);
+}
+
 
 /// Constructor 
 AudioAlsaSink::AudioAlsaSink(const AudioSinkConfig &config) : 
@@ -174,14 +182,6 @@ void AudioJackSink::init()
     else
         g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
 
-    unsigned long long val;
-    g_object_get(sink_, "buffer-time", &val, NULL);
-    LOG_DEBUG("Buffer time is " << val);
-}
-
-void AudioJackSink::adjustBufferTime(unsigned long long bufferTime)
-{
-    g_object_set(sink_, "buffer-time", bufferTime, NULL);
     unsigned long long val;
     g_object_get(sink_, "buffer-time", &val, NULL);
     LOG_DEBUG("Buffer time is " << val);
