@@ -82,13 +82,15 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
 
                 gst_message_parse_error(msg, &err, &debug);
 
-                LOG_ERROR(err->message);
+                std::string errStr(err->message);
                 g_error_free(err);
 
                 if (debug) {
                     LOG_DEBUG("Debug details: " << debug);
                     g_free(debug);
                 }
+                THROW_CRITICAL(errStr);
+
                 break;
             }
         case GST_MESSAGE_WARNING:
