@@ -32,11 +32,12 @@
  */
 
 class GLImageSink
-: public GtkVideoSink
+: public GtkVideoSink, public BusMsgHandler
 {
     public:
         /// Constructor 
         GLImageSink(int screen_num) : GtkVideoSink(screen_num) {}
+        bool handleBusMsg(_GstMessage *msg);
 
     private:
 

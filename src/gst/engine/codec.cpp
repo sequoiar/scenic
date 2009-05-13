@@ -154,7 +154,7 @@ void VideoEncoder::init()
     if (doDeinterlace_)
     {
         LOG_DEBUG("DO THE DEINTERLACE");
-        deinterlace_ = Pipeline::Instance()->makeElement("deinterlace2", NULL);
+        deinterlace_ = Pipeline::Instance()->makeElement("deinterlace", NULL);
         gstlinkable::link(sinkQueue_, deinterlace_);
         gstlinkable::link(deinterlace_, colorspc_);
     }
