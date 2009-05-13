@@ -224,8 +224,8 @@ class GstServer(object):
                         if isinstance(args, (tuple, list)):
                             self.conn.send_cmd(cmd, *args)
                         else:
-                            args = [args]
-                        self.conn.send_cmd(cmd, *args)
+                            #log.debug('IPCP command is not a tuple or list !!!!!!! : ' + type(cmd)) 
+                            self.conn.send_cmd(cmd, args) 
                     else:
                         self.conn.send_cmd(cmd)      
         if len(self.commands) > 0:
