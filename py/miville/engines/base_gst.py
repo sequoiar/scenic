@@ -80,7 +80,7 @@ class GstServer(object):
 
     The Inter-process Communication protocol is based on TCP lines of ASCII characters.
     """
-    def __init__(self, mode, port, address, callback_dict, state_change_callback):
+    def __init__(self, mode, port, address, callback_dict, state_change_callback, output_callback):
         self.port = port
         self.address = address
         self.mode = mode
@@ -93,7 +93,7 @@ class GstServer(object):
         self.commands = []
         self.callback_dict = callback_dict
         self.version_str = None
-        
+        self.output_callback = output_callback # when milhouse spits a line
 
     def connect(self):
         log.debug("GstServer.connect")
@@ -113,6 +113,9 @@ class GstServer(object):
     def get_status(self):
         s = self.get_state_str(self.state)
         return s
+    
+    def process_output_callback(self, line):
+        log.info(line)
         
     def change_state(self, new_state):
          old_state = self.state
@@ -161,20 +164,20 @@ class GstServer(object):
                     mode_arg = "-s"
                 else:
                     mode_arg = "-r"
-                try:
-                    protocol = GstProcessProtocol(self)
-                    args = [path[0], mode_arg, "--serverport", str(self.port)]
-                    proc_path = path[0]
-                    msg = "Start process> path: %s, protocol: %s args: %s %s" % (proc_path, protocol, str(args), str(self))
-                    # print msg
-                    log.debug(msg)
-                    self.process = reactor.spawnProcess(protocol, proc_path, args, os.environ, usePTY=True)
-                    log.debug("Process spawned pid=" + str(self.process.pid)  + " "+ str(self))
-                    return proc_path, args, self.process.pid
-                except Exception, e:
-                    msg = 'Cannot start the GST application "%s": %s %s' % (streaming_server_process_name, str(e), str(self))
-                    log.critical(msg)
-                    raise GstError(msg)
+                #try:
+                protocol = GstProcessProtocol(self)
+                args = [path[0], mode_arg, "--serverport", str(self.port)]
+                proc_path = path[0]
+                msg = "Start process> path: %s, protocol: %s args: %s %s" % (proc_path, protocol, str(args), str(self))
+                # print msg
+                log.debug(msg)
+                self.process = reactor.spawnProcess(protocol, proc_path, args, os.environ, usePTY=True)
+                log.debug("Process spawned pid=" + str(self.process.pid)  + " "+ str(self))
+                return proc_path, args, self.process.pid
+                #except Exception, e:
+                #    msg = 'Cannot start the GST application "%s": %s %s' % (streaming_server_process_name, str(e), str(self))
+                #    log.critical(msg)
+                #    raise GstError(msg)
             else:
                 msg = 'Cannot find the GST application: %s %s' % (streaming_server_process_name, self)
                 log.critical(msg)
@@ -211,18 +214,18 @@ class GstServer(object):
                     pass # no such process
 
     def _process_cmd(self): 
-        log.debug('.')   
+        #log.debug('.')   
         if len(self.commands) > 0:
             if self.conn != None:
                 if self.state >= CONNECTED :
                     (cmd, args) = self.commands.pop()
-                    log.debug('\n\n\nGstServer._process_cmd: \n  ' + cmd + "\n  args: " + str(args) + "\n  pid " + str(self.process.pid)  + " " + str(self) + '\n\n')
+                    log.info('\n\n\nGstServer._process_cmd: \n  ' + cmd + "\n  args: " + str(args) + "\n  pid " + str(self.process.pid)  + " " + str(self) + '\n\n')
                     if args != None:
                         if isinstance(args, (tuple, list)):
                             self.conn.send_cmd(cmd, *args)
                         else:
-                            log.debug('IPCP command is not a tuple or list !!!!!!! : ' + type(cmd))
-                            self.conn.send_cmd(cmd, args)
+                            args = [args]
+                        self.conn.send_cmd(cmd, *args)
                     else:
                         self.conn.send_cmd(cmd)      
         if len(self.commands) > 0:
@@ -230,7 +233,10 @@ class GstServer(object):
                 reactor.callLater(1, self._process_cmd)
 
     def send_cmd(self, cmd, args=None, callback=None, timer=None, timeout=3):
-        log.debug('GstServer.send_cmd state: ' + str(self.state) + " cmd: " +  cmd + " args: " + str(args)+ "pid " + str(self.process.pid) + " " + str(self) )
+        pid_str = "no PID"
+        if self.process:
+            pid_str = str(self.process.pid)
+        log.debug('GstServer.send_cmd state: ' + str(self.state) + " cmd: " +  cmd + " args: " + str(args)+ "pid " + pid_str + " " + str(self) )
         self.commands.insert(0, (cmd,args) )
         self._process_cmd()
 
@@ -267,9 +273,9 @@ class GstClient(BaseGst):
     def __init__(self):
         log.debug("GstClient __init__  " + str(self))
     
-    def setup_gst_client(self, mode, port, address, callbacks_dict, state_change_callback): 
+    def setup_gst_client(self, mode, port, address, callbacks_dict, state_change_callback, process_output_callback): 
         log.debug('GstClient.setup_gst_client '+ str(self))
-        self.gst_server = GstServer(mode, port, address, callbacks_dict, state_change_callback)
+        self.gst_server = GstServer(mode, port, address, callbacks_dict, state_change_callback, process_output_callback)
         try:
             self.proc_path, self.args, self.pid = self.gst_server.start_process()
         except GstError, e: 
@@ -319,6 +325,7 @@ class GstProcessProtocol(protocol.ProcessProtocol):
         if self.server.state < RUNNING:
             lines = data.split('\n')
             for line in lines:
+                self.server.process_output_callback(line)
                 if line.strip().startswith("Ver:"):
                     self.server.version_str = line.split("Ver:")[1] 
                     
