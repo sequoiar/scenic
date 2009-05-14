@@ -75,6 +75,7 @@ class AudioVideoGst(GstClient):
        self.pid = None
        self.rtp_stats = {}
        self.logger = RingBuffer(20)
+       self.output_logger = RingBuffer(20)
        self.version = ""
        self.gst_address =  '127.0.0.1'
        self.gst_port = gst_ipcp_port_gen.generate_new_port()
@@ -90,8 +91,8 @@ class AudioVideoGst(GstClient):
                     'rtp'       :self.gst_rtp 
                     }       
        log.info('')
-       self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks, self.gst_state_change_callback)
-       self._send_command('loglevel', 10)
+       self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks, self.gst_state_change_callback, self.gst_proc_output)
+       #self._send_command('loglevel', 10)
        
     def apply_stream_settings(self, stream_name, parameters ):
         self.stream_names.append(stream_name)
@@ -180,6 +181,12 @@ class AudioVideoGst(GstClient):
                 stat = tokens[1]
                 value = tokens[2]
                 self.set_rtp_stats(stream, stat, value)
+    
+    def gst_proc_output(self, log_message):
+        src = str(self)
+        info = 'GST output: pid %s [%s] %s' %  (self.pid, log_message, src)  
+        log.debug(info ) 
+        self.output_logger.append(log_message)
     
     def gst_state_change_callback(self, old_state, new_state, old_str, new_str):
         timestamp = datetime.now()

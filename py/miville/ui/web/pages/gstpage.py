@@ -42,14 +42,24 @@ from miville.errors import *
 
 log = log.start('debug', 1, 0, 'gstpage')
 
-def print_engine_log(engine):
+def print_engine_process_log(engine):
     txt = ""
     try:
-        txt += "<h3>Log</h3>"
+        txt += "<h3>Process output log</h3>"
+        for index,msg in enumerate(engine.output_logger.get()):
+            txt += "<p><b>%d</b>  %s</p>" % (index+1, msg)
+    except Exception, e:
+        txt += "<h2>ERROR in print_engine_process_log: %s </h2>" % e
+    return txt
+
+def print_engine_telnet_log(engine):
+    txt = ""
+    try:
+        txt += "<h3>Telnet log</h3>"
         for index,msg in enumerate(engine.logger.get()):
             txt += "<p><b>%d</b>  %s</p>" % (index+1, msg)
     except Exception, e:
-        txt += "<h2>ERROR in print_engine_log: %s </h2>" % e
+        txt += "<h2>ERROR in print_engine_telnet_log: %s </h2>" % e
     return txt
 
 def print_engine_acks(engine):
@@ -130,7 +140,8 @@ def print_engine(engine):
         
         txt += print_engine_acks(engine)    
         txt += print_engine_rtp_stats(engine)
-        txt += print_engine_log(engine)
+        txt += print_engine_telnet_log(engine)
+        txt += print_engine_process_log(engine)       
     except Exception, e:
         txt += "<h2>ERROR in print_engine: %s </h2>" % e
     return txt

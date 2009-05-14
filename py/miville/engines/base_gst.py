@@ -30,7 +30,7 @@ from miville.protocols import ipcp
 from miville.utils import log
 from miville.utils.common import get_def_name
 
-log = log.start('debug', 1, 0, 'base_gst')
+log = log.start('info', 1, 0, 'base_gst')
 
 STOPPED = 0
 STARTING = 1
@@ -80,7 +80,7 @@ class GstServer(object):
 
     The Inter-process Communication protocol is based on TCP lines of ASCII characters.
     """
-    def __init__(self, mode, port, address, callback_dict, state_change_callback):
+    def __init__(self, mode, port, address, callback_dict, state_change_callback, proc_output_callback):
         self.port = port
         self.address = address
         self.mode = mode
@@ -92,6 +92,7 @@ class GstServer(object):
         self.change_state(STOPPED)
         self.commands = []
         self.callback_dict = callback_dict
+        self.proc_output_callback = proc_output_callback
         self.version_str = None
         
 
@@ -146,6 +147,10 @@ class GstServer(object):
         self.kill()
         self.conn.del_callback('log')
         log.debug('Lost the server connection. Reason:\n%s %s' % (reason, str(self) ) )
+
+    def process_output_received(self, line):
+        #log.info('GstServer.process_output_received: %s' % line)
+        self.proc_output_callback(line)
 
     def start_process(self):
         """
@@ -211,17 +216,16 @@ class GstServer(object):
                     pass # no such process
 
     def _process_cmd(self): 
-        log.debug('.')   
+        #log.debug('.')   
         if len(self.commands) > 0:
             if self.conn != None:
                 if self.state >= CONNECTED :
                     (cmd, args) = self.commands.pop()
-                    log.debug('\n\n\nGstServer._process_cmd: \n  ' + cmd + "\n  args: " + str(args) + "\n  pid " + str(self.process.pid)  + " " + str(self) + '\n\n')
+                    log.debug('GstServer._process_cmd:  ' + cmd + "  args: " + str(args) + "  pid " + str(self.process.pid)  + " " + str(self) + '\n\n')
                     if args != None:
                         if isinstance(args, (tuple, list)):
                             self.conn.send_cmd(cmd, *args)
                         else:
-                            log.debug('IPCP command is not a tuple or list !!!!!!! : ' + type(cmd))
                             self.conn.send_cmd(cmd, args)
                     else:
                         self.conn.send_cmd(cmd)      
@@ -267,9 +271,9 @@ class GstClient(BaseGst):
     def __init__(self):
         log.debug("GstClient __init__  " + str(self))
     
-    def setup_gst_client(self, mode, port, address, callbacks_dict, state_change_callback): 
+    def setup_gst_client(self, mode, port, address, callbacks_dict, state_change_callback, proc_output_callback): 
         log.debug('GstClient.setup_gst_client '+ str(self))
-        self.gst_server = GstServer(mode, port, address, callbacks_dict, state_change_callback)
+        self.gst_server = GstServer(mode, port, address, callbacks_dict, state_change_callback, proc_output_callback)
         try:
             self.proc_path, self.args, self.pid = self.gst_server.start_process()
         except GstError, e: 
@@ -316,8 +320,11 @@ class GstProcessProtocol(protocol.ProcessProtocol):
             
     def outReceived(self, data):
         log.debug('GstProcessProtocol.outReceived server state: %d, data %s' % (self.server.state, str(data) ) )
+        lines = data.split('\n')
+        for line in lines:
+            self.server.process_output_received(line)
+            
         if self.server.state < RUNNING:
-            lines = data.split('\n')
             for line in lines:
                 if line.strip().startswith("Ver:"):
                     self.server.version_str = line.split("Ver:")[1] 

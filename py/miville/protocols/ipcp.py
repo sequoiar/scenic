@@ -34,7 +34,7 @@ from twisted.protocols.basic import LineReceiver
 # App imports
 from miville.utils import log
 
-log = log.start('debug', 1, 0, 'ipcp')
+log = log.start('info', 1, 0, 'ipcp')
 
 class IPCP(LineReceiver):
     """
