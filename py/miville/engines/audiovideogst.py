@@ -90,16 +90,10 @@ class AudioVideoGst(GstClient):
                     'rtp'       :self.gst_rtp 
                     }       
        log.info('')
-       self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks, self.gst_state_change_callback, self.process_output_callback)
+       self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks, self.gst_state_change_callback)
        self._send_command('loglevel', 10)
     
-    def process_output_callback(self):
-        log_message = (str(self))
-        src = str(self)
-        info = 'GST output pid %s [%s] %s' %  (self.pid, log_message, src)  
-        log.debug(info ) 
-        self.logger.append(log_message)
-       
+      
     def apply_stream_settings(self, stream_name, parameters ):
         self.stream_names.append(stream_name)
         gst_parameters = []
