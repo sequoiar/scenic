@@ -128,20 +128,18 @@ class VideoEncoder : public Encoder
     protected:
         bool doDeinterlace_;
         _GstElement *colorspc_;
-        _GstElement *sinkQueue_;
-        _GstElement *srcQueue_;
         _GstElement *deinterlace_;
         bool supportsInterlaced_;
+        _GstElement *queue_;
 
     private:
         
         _GstElement *sinkElement() 
         { 
-            return sinkQueue_;
-        }
-        _GstElement *srcElement() 
-        { 
-            return srcQueue_;
+            if (doDeinterlace_)
+                return queue_;
+            else 
+                return colorspc_;
         }
 
         /// No Copy Constructor
@@ -254,18 +252,9 @@ class VorbisEncoder : public AudioConvertedEncoder
         VorbisEncoder();
 
     private:
-        _GstElement *srcQueue_;
-        _GstElement *sinkQueue_;
         ~VorbisEncoder();
         void init();
         RtpPay* createPayloader() const;
-
-        _GstElement* srcElement() { return srcQueue_; }
-
-        /// No Copy Constructor 
-        VorbisEncoder(const VorbisEncoder&);     
-        ///No Assignment Operator
-        VorbisEncoder& operator=(const VorbisEncoder&);     
 };
 
 /// Decoder that decodes vorbis into raw audio using the vorbis decoder.
@@ -290,11 +279,6 @@ class RawEncoder : public AudioConvertedEncoder
     private:
         void init();
         RtpPay* createPayloader() const;
-    
-        /// No Copy Constructor 
-        RawEncoder(const RawEncoder&);     
-        ///No Assignment Operator
-        RawEncoder& operator=(const RawEncoder&);     
 };
 
 /// Decoder that simply performs datatype conversion on raw audio.
@@ -307,11 +291,6 @@ class RawDecoder : public AudioConvertedDecoder
         RtpPay* createDepayloader() const;
 
         _GstElement *sinkElement() { return aconv_; }
-        
-        ///No Copy Constructor
-        RawDecoder(const RawDecoder&);     
-        ///No Assignment Operator
-        RawDecoder& operator=(const RawDecoder&);     
 };
 
 
@@ -324,7 +303,14 @@ class LameEncoder : public AudioConvertedEncoder
     private:
         void init();
         void checkNumChannels();
+        _GstElement *mp3parse_;
         RtpPay* createPayloader() const;
+        _GstElement *srcElement() { return mp3parse_; }
+        
+        ///No Copy Constructor
+        LameEncoder(const LameEncoder&);     
+        ///No Assignment Operator
+        LameEncoder& operator=(const LameEncoder&);     
 };
 
 /// Decoder that decodes mpeg to raw audio.

@@ -281,6 +281,7 @@ GLImageSink::~GLImageSink()
         gtk_widget_destroy(window_);
         LOG_DEBUG("Widget destroyed");
     }
+    Pipeline::Instance()->remove(&queue_);
 }
 
 void GLImageSink::init()
@@ -289,7 +290,10 @@ void GLImageSink::init()
     if (!gtk_initialized)
         gtk_init(0, NULL);
 
+    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    g_object_set(queue_, "max-size-buffers", MAX_QUEUE_BUFFERS, NULL);
     sink_ = Pipeline::Instance()->makeElement("glimagesink", NULL);
+    gstlinkable::link(queue_, sink_);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    

@@ -63,7 +63,7 @@ std::string AudioSource::getCapsFilterCapsString()
     // force proper number of channels on output
     std::ostringstream capsStr;
     capsStr << "audio/x-raw-int, channels=" << config_.numChannels() 
-        << ", clock-rate=" << Pipeline::SAMPLE_RATE;
+        << ", rate=" << Pipeline::SAMPLE_RATE;
     LOG_DEBUG("Audiosource caps = " << capsStr.str());
     return capsStr.str();
 }

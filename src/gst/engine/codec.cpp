@@ -128,8 +128,8 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
 }
 
 
-VideoEncoder::VideoEncoder() : doDeinterlace_(false), colorspc_(0), sinkQueue_(0), srcQueue_(0),
-    deinterlace_(0), supportsInterlaced_(false)  // most codecs don't have this property
+VideoEncoder::VideoEncoder() : doDeinterlace_(false), colorspc_(0),
+    deinterlace_(0), supportsInterlaced_(false), queue_(0)  // most codecs don't have this property
 {}
 
 
@@ -138,8 +138,6 @@ VideoEncoder::~VideoEncoder()
 {
     Pipeline::Instance()->remove(&colorspc_);
     Pipeline::Instance()->remove(&deinterlace_);
-    Pipeline::Instance()->remove(&sinkQueue_);
-    Pipeline::Instance()->remove(&srcQueue_);
 }
 
 
@@ -148,27 +146,24 @@ VideoEncoder::~VideoEncoder()
 void VideoEncoder::init()
 {
     tassert(codec_ != 0);
-    sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
 
     if (doDeinterlace_)
     {
         LOG_DEBUG("DO THE DEINTERLACE");
+        queue_ = Pipeline::Instance()->makeElement("queue", NULL);
         deinterlace_ = Pipeline::Instance()->makeElement("deinterlace", NULL);
-        gstlinkable::link(sinkQueue_, deinterlace_);
+        gstlinkable::link(queue_, deinterlace_);
         gstlinkable::link(deinterlace_, colorspc_);
     }
     else
     {
-        gstlinkable::link(sinkQueue_, colorspc_);
         if (supportsInterlaced_)  // not all encoders have this property
             g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
     }
 
     // Create separate thread for encoding, should yield better performance on multicore machines
     gstlinkable::link(colorspc_, codec_);
-    srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL);
-    gstlinkable::link(codec_, srcQueue_);
 }
 
 
@@ -361,26 +356,19 @@ RtpPay* TheoraDecoder::createDepayloader() const
 }
 
 /// Constructor 
-VorbisEncoder::VorbisEncoder() : srcQueue_(0), sinkQueue_(0)
+VorbisEncoder::VorbisEncoder() 
 {}
 
 
 /// Destructor 
 VorbisEncoder::~VorbisEncoder() 
-{
-    Pipeline::Instance()->remove(&sinkQueue_); 
-    Pipeline::Instance()->remove(&srcQueue_); 
-}
+{}
 
 void VorbisEncoder::init()
 {
     AudioConvertedEncoder::init();
-    sinkQueue_ = Pipeline::Instance()->makeElement("queue", NULL); 
     codec_ = Pipeline::Instance()->makeElement("vorbisenc", NULL);
-    srcQueue_ = Pipeline::Instance()->makeElement("queue", NULL); 
-    gstlinkable::link(aconv_, sinkQueue_);
-    gstlinkable::link(sinkQueue_, codec_);
-    gstlinkable::link(codec_, srcQueue_);
+    gstlinkable::link(aconv_, codec_);
 }
 
 
@@ -439,14 +427,16 @@ RtpPay* RawDecoder::createDepayloader() const
 }
 
 /// Constructor
-LameEncoder::LameEncoder()
+LameEncoder::LameEncoder() : mp3parse_(0)
 {}
 
 void LameEncoder::init()
 {
     AudioConvertedEncoder::init();
-    codec_ = Pipeline::Instance()->makeElement("lame", NULL);
+    codec_ = Pipeline::Instance()->makeElement("lamemp3enc", NULL);
+    mp3parse_ = Pipeline::Instance()->makeElement("mp3parse", NULL);
     gstlinkable::link(aconv_, codec_);
+    gstlinkable::link(codec_, mp3parse_);
 }
 
 /// Constructor

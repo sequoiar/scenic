@@ -44,10 +44,10 @@ class VideoSink : public GstLinkableSink
         void destroySink();
 
     protected:
+        const static int MAX_QUEUE_BUFFERS = 3;
         _GstElement *sink_;
 
     private:
-        _GstElement *sinkElement() { return sink_; }
        VideoSink(const VideoSink&);     //No Copy Constructor
        VideoSink& operator=(const VideoSink&);     //No Assignment Operator
 };
@@ -91,11 +91,13 @@ class XvImageSink
     : public GtkVideoSink, public BusMsgHandler
 {
     public:
-        XvImageSink(int screenNum) : GtkVideoSink(screenNum) {};
+        XvImageSink(int screenNum) : GtkVideoSink(screenNum), queue_(0) {};
         bool handleBusMsg(_GstMessage *msg);
 
     private:
+        _GstElement *queue_;
         void init();
+        _GstElement *sinkElement() { return queue_; }
         ~XvImageSink();
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);

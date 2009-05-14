@@ -314,6 +314,7 @@ class MilhouseTests():
 
         recv, send = self.argfactory('video')
         send.deinterlace = True
+        send.videosource = 'videotestsrc'
         self.run(recv, send)
 
     def test_17_deinterlace_glimagesink(self):
@@ -441,6 +442,7 @@ class MilhouseTests():
         recv.audiocodec = audiocodec
         send.audiocodec = audiocodec
         send.numchannels = 2
+        send.audiosource = "audiotestsrc"
         self.run(recv, send)
 
     def test_31_raw_only(self):
@@ -583,11 +585,23 @@ class MilhouseTests():
         recv.videocodec = send.videocodec
         recv.videosink = 'glimagesink'
         self.run(recv, send)
+    
+    def test_44_v4l2src_theora_deinterlace_xvimagesink(self):
+        """ Test with 1-8 channels for vorbis with a 5 second timeout """
+        self.countdown('START')
+
+        recv, send = self.argfactory('video')
+        send.videosource= 'v4l2src'
+        send.videocodec = 'theora'
+        recv.videocodec = send.videocodec
+        recv.videosink = 'xvimagesink'
+        send.deinterlace = True
+        self.run(recv, send)
 
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_24')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_16')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__
