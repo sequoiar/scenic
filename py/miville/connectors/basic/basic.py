@@ -91,10 +91,11 @@ class BasicServer(LineReceiver):
                                  'connection':self},
                                 'ask')
         elif line[0:4] == "STOP":
-            try:    #TODO: to this correctly
-                self.api.stop_streams(self)
-            except:
-                pass
+            #try:    #TODO: to this correctly
+            contact = self.api.find_contact(self.addr.host, self.client_port, 'basic')
+            self.api.stop_streams(self, contact.name) # ARG MUST BE THE CURRENT CONTACT FOR THAT STREAM
+            #except Exception, e:
+            #    log.error('ERROR : ' + str(type(e)) + ' ' + e.message)
             self.set_port(line)
             contact = self.api.find_contact(self.addr.host, self.client_port, 'basic')
             self.transport.loseConnection()

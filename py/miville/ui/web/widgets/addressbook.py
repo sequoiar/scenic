@@ -108,22 +108,27 @@ class Addressbook(Widget):
         """
         Called from Python API when start_connection notification is triggered
         """
+        port = "PORT" # TODO FIXME XXX where should that var come from ?
         log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'start_connection'))
         if origin is self:
             if data.has_key('exception'):
-                self.callRemote('update_status',
-                                data['name'],
-                                '%s with %s' % (data['msg'], data['name']),
-                                '%s with %s%s. Error: %s' % (data['msg'],
-                                                             data['address'],
-                                                             port,
-                                                             data['exception']))
+                self.callRemote(
+                    'update_status',
+                    data['name'],
+                    '%s with %s' % (data['msg'], data['name']),
+                    '%s with %s%s. Error: %s' % (
+                        data['msg'],
+                        data['address'],
+                        port,
+                        data['exception']
+                        )
+                    )
             elif not data.has_key('name'):
                 self.callRemote('error', data['msg'])
         if not data.has_key('exception') and data.has_key('name'):
             self.callRemote('update_status',
-                            data['name'],
-                            '%s with %s...' % (data['msg'], data['name']))
+                data['name'],
+                '%s with %s...' % (data['msg'], data['name']))
 
     def cb_connection_failed(self, origin, data):
         """
@@ -328,14 +333,16 @@ class Addressbook(Widget):
         """
         Called once miville has stropped streaming.
 
-        The 'start_streams' notification should contain a dict with keys:
-         * 'started : bool
+        The 'stop_streams' notification should contain a dict with keys:
+         * 'stopped' : bool
          * 'contact_name' : str
          * 'msg': str
         """
         log.debug("STOP_STREAMS " + str(data))
         log.debug('notify(\'%s\', \'%s\', \'%s\')' % (origin, data, 'stop_streams'))
         try:
+            if type(data) is str:
+                log.error("KeyError: data in stop_streams should be a dict !") 
             try:
                 stopped = data['stopped'] is True
             except KeyError, e:

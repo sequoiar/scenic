@@ -34,6 +34,7 @@ from miville.utils import log
 from miville.protocols.ipcp import parse 
 from miville.errors import *
 from miville.utils.common import PortNumberGenerator
+from miville.utils import stack
 import miville.engines.base_gst
 from datetime import datetime
 
@@ -208,6 +209,7 @@ class AudioVideoGst(GstClient):
          address: string
         """
         self._send_command('start')
+        stack.print_stack() # XXX this is very verbose !
 
     def stop_streaming(self):
         """function stop_sending

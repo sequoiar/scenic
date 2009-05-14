@@ -262,7 +262,7 @@ class GstServer(object):
                 delay = 0.5
                 reactor.callLater(delay, self.add_callback, cmd, name, timer)
             else:
-                log.critical('The GST process cannot be ready to connect (from add_callback).' + str(self))
+                log.critical('add_callback: The GST process is not ready to connect.' + str(self))
 
 class GstClient(BaseGst):
     """
@@ -313,9 +313,10 @@ class GstProcessProtocol(protocol.ProcessProtocol):
     def connectionMade(self):
         log.debug('GstProcessProtocol.connectionMade: GST process started.')
         reactor.callLater(5, self.check_process)
+
     def check_process(self):
         if self.server.state < RUNNING:
-            log.critical('GstProcessProtocol.check_process: The GST process cannot be ready to connect.')
+            log.critical('GstProcessProtocol.check_process: The GST process is not RUNNING.')
             self.server.kill()
             
     def outReceived(self, data):

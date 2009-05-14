@@ -640,6 +640,7 @@ class ControllerApi(object):
     def stop_streams_tmp(self, caller, contact_name):
         contact = self.get_contact(contact_name)
         contact.stream_state = 0        
+        log.debug('stop_streams_tmp called. Doesnt really stop the streams ! FIXME')
         
     def start_streams(self, caller, contact_name):
         """
@@ -649,10 +650,9 @@ class ControllerApi(object):
         log.warning('selecting contact %s. Maybe this should be deprecated.' % (contact_name))
         contact = self.get_contact(contact_name)
 
-        self.select_contact(caller, contact_name) # !!!!
+        self.select_contact(caller, contact_name) # THIS WILL CAUSE VERY WEIRD BUGS in CLI FIXME XXX TODO !!!!
         if not isinstance(contact, Exception):
             if contact is not None:
-                
                 if contact.state == CONNECTED:
                     try:
                         contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
@@ -661,7 +661,7 @@ class ControllerApi(object):
                         contact.stream_state = 2
                         self.notify(caller, {'streaming':True, 'msg':"streaming started", 'contact_name':contact_name}, "start_streams") # key = start_streams
                     except AddressBookError, e:
-                        self.notify(caller, "AddressbookadError while trying to start streaming:" + e.message, "error")   
+                        self.notify(caller, AddressBookError("Addressbook Error while trying to start streaming:" + e.message)) #, "error")   
                         #TODO: change key for 'streams_error'
                     except SettingsError, err:
                         self.notify(caller, err)
@@ -688,9 +688,9 @@ class ControllerApi(object):
             settings_com_channel.stop_streaming( contact.address)
             contact.stream_state = 0
             #self.notify(caller, "streaming stopped")
-            self.notify(caller, {'stopped':True, 'msg':"streaming stopped"})
+            self.notify(caller, {'stopped':True, 'msg':"streaming stopped"}) # FIXME XXX TODO: should not be called from here but from the engines.
         except AddressBookError, e:
-            self.notify(caller, "Please select a contact prior to stop streaming." + e.message, "error")   
+            self.notify(caller, AddressBookError("Please select a contact prior to stop streaming." + e.message)) #, "error")
             #TODO: change key for 'streams_error'
         except SettingsError, err:
             self.notify(caller, err)

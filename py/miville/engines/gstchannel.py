@@ -253,7 +253,7 @@ class GstChannel(object):
         else:
             log.error("No tx processes to stop")
         caller = None
-        self.api.notify(caller, {'started':False, 'msg':"streaming stopped"}, "stop_streams") 
+        self.api.notify(caller, {'stopped':True, 'msg':"streaming stopped"}, "stop_streams") 
       
     def on_remote_message(self, key, args=None):
         """
