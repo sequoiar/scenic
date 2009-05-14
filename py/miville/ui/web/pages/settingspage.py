@@ -59,20 +59,24 @@ log = log.start('debug', 1, 0, 'web')
 
 def print_all_media_settings(media_settings):
     txt = "<h1>All MEDIA SETTINGS...</h1>"
+    txt += "<ul>"
     for k, v in media_settings.iteritems():
-        txt += "<p> [" + str(k) + "] " + v.name + "</p>"
+        txt += "<li> [" + str(k) + "] " + v.name + "</li>"
+        txt += "<ul>"
         for key, value in v.settings.iteritems():
-            txt += "<p>  %s : %s</p>" % (key, str(value))
+            txt += "<li>  %s : %s</li>" % (key, str(value))
+        txt += "</ul>"
+    txt += "</ul>"
     return txt    
 
 def print_media_setting(media_setting):
-    txt = "      <h5>[" + str(media_setting.id) + "] media setting '" + media_setting.name + "</h5>"
+    txt = "<h5>[" + str(media_setting.id) + "] media setting \"" + media_setting.name + "\"</h5>"
     for key, value in media_setting.settings.iteritems():
         txt += "<p>       %s : %s</p>" % (key, str(value))
     return txt
 
 def print_stream(stream):
-    txt = "   <h4>[" + stream.name + "] stream</h4>"
+    txt = " <h4>[" + stream.name + "] stream</h4>"
     txt += "<p>    enabled: " + str(stream.enabled) + "</p>"
     txt += "<p>    sync: " + stream.sync_group + "</p>"
     txt += "<p>    port: " + str(stream.port) + "</p>"
@@ -80,7 +84,7 @@ def print_stream(stream):
     return txt
 
 def print_stream_sub_group(group_id, group):
-    txt = "  <h3>[" + str(group_id) + "] stream sub group " + group.name + "</h3>"
+    txt = " <h3>[" + str(group_id) + "] stream sub group " + group.name + "</h3>"
     txt += "<p>   enabled: " + str(group.enabled) + "</p>"
     txt += "<p>   mode: " + str(group.mode) + "</p>"
     return txt
