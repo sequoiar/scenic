@@ -123,6 +123,8 @@ class VideoV4lSource
     private:
         void init();
         std::string expectedStandard_;
+        std::string deviceStr() const;
+        std::string srcCaps() const;
         _GstElement *srcElement() { return capsFilter_; }
         VideoV4lSource(const VideoV4lSource&);     //No Copy Constructor
         VideoV4lSource& operator=(const VideoV4lSource&);     //No Assignment Operator

@@ -161,20 +161,36 @@ void VideoV4lSource::init()
     if (config_.hasDeviceName() && config_.deviceExists())
         g_object_set(G_OBJECT(source_), "device", config_.deviceName(), NULL);
 
-    gchar *deviceStr;
-    g_object_get(G_OBJECT(source_), "device", &deviceStr, NULL);    // get actual used device
+    if (!v4l2util::checkStandard(expectedStandard_, deviceStr()))
+        LOG_WARNING("V4l2 device " << deviceStr() << " is not set to expected standard " << expectedStandard_);
 
-    std::string deviceString(deviceStr);        // stay safe from memory leaks
-    g_free(deviceStr);
-
-    if (!v4l2util::checkStandard(expectedStandard_, deviceString))
-        LOG_WARNING("V4l2 device " << deviceString << " is not set to expected standard " << expectedStandard_);
-
-    v4l2util::printCaptureFormat(deviceString);
+    LOG_DEBUG("v4l width is " << v4l2util::captureWidth(deviceStr()));
+    LOG_DEBUG("v4l height is " << v4l2util::captureHeight(deviceStr()));
 
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
 
     setCapsFilter(srcCaps());
+}
+
+
+std::string VideoV4lSource::deviceStr() const
+{
+    gchar *device_cstr;
+    g_object_get(G_OBJECT(source_), "device", &device_cstr, NULL);    // get actual used device
+
+    std::string deviceString(device_cstr);        // stay safe from memory leaks
+    g_free(device_cstr);
+    return deviceString;
+}
+
+
+std::string VideoV4lSource::srcCaps() const
+{
+    std::ostringstream capsStr;
+    /*capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
+      << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; */
+    capsStr << "video/x-raw-yuv, width=" << v4l2util::captureWidth(deviceStr()) << ", height=" << v4l2util::captureHeight(deviceStr());
+    return capsStr.str();
 }
 

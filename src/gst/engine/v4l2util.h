@@ -31,6 +31,8 @@ namespace v4l2util
     std::string field2s(int val);
     std::string num2s(unsigned num);
     std::string colorspace2s(int val);
+    unsigned captureWidth(const std::string &device);
+    unsigned captureHeight(const std::string &device);
 }
 
 #endif // _V4L2UTIL_H_

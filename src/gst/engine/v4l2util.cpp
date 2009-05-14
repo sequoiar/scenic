@@ -66,6 +66,7 @@ bool v4l2util::checkStandard(const std::string &expected, const std::string &dev
                 result = (result or (expected == (*iter).first)); // can have multiple positives, hence the or
     }
 
+    close(fd);
     return result;
 }
 
@@ -135,8 +136,52 @@ void v4l2util::printCaptureFormat(const std::string &device)
         printf("\tSize Image    : %u\n", vfmt.fmt.pix.sizeimage);
         printf("\tColorspace    : %s\n", colorspace2s(vfmt.fmt.pix.colorspace).c_str());
     }
+    close(fd);
 }
 
+
+unsigned v4l2util::captureWidth(const std::string &device)
+{
+    v4l2_format vfmt;
+    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    int fd = -1;
+
+    if ((fd = open(device.c_str(), O_RDWR)) < 0) 
+        THROW_ERROR("Failed to open " << device);
+
+    if (doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT") == 0)
+    {
+         return vfmt.fmt.pix.width;
+    }
+    else
+    {
+        THROW_CRITICAL("IOCTL failed.");
+        return 0;
+    }
+    close(fd);
+}
+
+
+unsigned v4l2util::captureHeight(const std::string &device)
+{
+    v4l2_format vfmt;
+    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    int fd = -1;
+
+    if ((fd = open(device.c_str(), O_RDWR)) < 0) 
+        THROW_ERROR("Failed to open " << device);
+
+    if (doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT") == 0)
+    {
+         return vfmt.fmt.pix.height;
+    }
+    else
+    {
+        THROW_CRITICAL("IOCTL failed.");
+        return 0;
+    }
+    close(fd);
+}
 
 std::string v4l2util::colorspace2s(int val)
 {
