@@ -107,17 +107,15 @@ class tcp_session
                 std::string line = get_line(msgs);
                 do
                 {
-                    MapMsg mapMsg;
                     try
                     {
-                    if(mapMsg.tokenize(line))
+                        MapMsg mapMsg;
+                        mapMsg.tokenize(line);
                         queue_.push(mapMsg);
-                    else
-                        LOG_WARNING("Bad Msg Received.");
                     }
                     catch(ErrorExcept)
                     {
-                       LOG_DEBUG("tokenize problem"); 
+                       LOG_DEBUG("Could not tokenize string --- continuing"); 
                     }
                     line = get_line(msgs);
                 }

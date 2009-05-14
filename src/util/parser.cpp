@@ -116,7 +116,7 @@ static bool contains(const std::string& in, char c)
 }
 
 
-bool MapMsg::tokenize(const std::string& str, MapMsg &cmd_map)
+void MapMsg::tokenize(const std::string& str, MapMsg &cmd_map)
 {
     std::string::size_type tok_end;
     std::string lstr = str;                                         //copy in str to local string
@@ -127,9 +127,9 @@ bool MapMsg::tokenize(const std::string& str, MapMsg &cmd_map)
     cmd_map.cmd() = lstr.substr(0, tok_end);                        //insert command into map
     erase_to_end_of_whitespace(lstr);                               //set lstring beyond command
     if(lstr.empty())
-        return true;
-    //loop until break or return
-    for(;;)
+        return;
+    
+    for(;;)                                                         //loop until break 
     {
         tok_end = lstr.find_first_of('=');                          //search of "="
         if(tok_end == std::string::npos)                            //if not found no more
@@ -149,7 +149,8 @@ bool MapMsg::tokenize(const std::string& str, MapMsg &cmd_map)
             lstr.erase(0, end_quote);
             erase_to_end_of_whitespace(lstr);                       //set lstring beyond command
         }
-        else{                                                       // doesn't look like a string
+        else
+        {                                                           // doesn't look like a string
             std::vector<double> vd;
             std::vector<int> vi;
             for(;;)
@@ -197,7 +198,7 @@ bool MapMsg::tokenize(const std::string& str, MapMsg &cmd_map)
             break;
     }
 
-    return true;
+    return;
 }
 
 

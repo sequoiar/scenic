@@ -82,8 +82,8 @@ public:
     MapMsg(std::string command):map_(),it_(){ cmd() = command;}
     StrIntFloat &cmd() { return (*this)["command"]; }
     StrIntFloat &operator[](const std::string& str);
-    bool tokenize(const std::string& str) {   return tokenize(str,*this); }
-    bool stringify(std::string& str) const {   return stringify(*this,str); }
+    void tokenize(const std::string& str) { tokenize(str,*this); }
+    bool stringify(std::string& str) const { return stringify(*this,str); }
     void clear(){map_.clear();}
 
 /** Used by code that needs to post messages but does not use 
@@ -106,7 +106,7 @@ private:
 
     MapMsg_ map_;
     MapMsg_::const_iterator it_;
-    static bool tokenize(const std::string& str, MapMsg &cmd_map);
+    static void tokenize(const std::string& str, MapMsg &cmd_map);
     static bool stringify(const MapMsg& cmd_map, std::string& rstr);
     Item begin();
     Item next();
