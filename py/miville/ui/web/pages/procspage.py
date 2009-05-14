@@ -107,6 +107,7 @@ def print_procs():
     lines += ps('ps ax | grep miville')
     lines += ps('ps ax | grep milhouse')
     lines += ps('ps ax | grep iperf')
+    lines += ps('ps ax | grep jack')
     s += "</p><p>".join(lines) + "</p>"    
     return s
 

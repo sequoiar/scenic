@@ -101,7 +101,6 @@ def print_global_setting(global_setting_id, global_setting):
     return txt
     
 def print_settings():
-
     txt = "<h1>GLOBAL SETTINGS:</h1>"
     txt += '\n\n<ul>\n'
     for k, global_setting in global_settings.iteritems():
@@ -120,7 +119,7 @@ def print_settings():
                     txt += print_media_setting(media_setting)
                     txt += "</ul>\n"
                 except:
-                    txt += "   <li>     media setting %s (not available)</li>" % stream.setting
+                    txt += "<li>media setting %s (not available)</li>" % stream.setting
                 txt += "</ul>\n"
             txt += "</ul>\n"
     txt += "</ul>"                
