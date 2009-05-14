@@ -122,9 +122,9 @@ bool MapMsg::tokenize(const std::string& str, MapMsg &cmd_map)
     std::string lstr = str;                                         //copy in str to local string
     cmd_map.clear();                                                //clear output map
     tok_end = lstr.find_first_of(':');                              //search for ":"
-    if(tok_end == lstr.size())                                      //if : not found return error
+    if(tok_end == std::string::npos)                                      //if : not found return error
         THROW_ERROR("No command found.");
-    cmd_map.cmd() = lstr.substr(0, tok_end);                   //insert command into map
+    cmd_map.cmd() = lstr.substr(0, tok_end);                        //insert command into map
     erase_to_end_of_whitespace(lstr);                               //set lstring beyond command
     if(lstr.empty())
         return true;
@@ -149,7 +149,7 @@ bool MapMsg::tokenize(const std::string& str, MapMsg &cmd_map)
             lstr.erase(0, end_quote);
             erase_to_end_of_whitespace(lstr);                       //set lstring beyond command
         }
-        else{
+        else{                                                       // doesn't look like a string
             std::vector<double> vd;
             std::vector<int> vi;
             for(;;)

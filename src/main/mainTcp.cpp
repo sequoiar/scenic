@@ -33,7 +33,7 @@ class Logger
             : queue_(tcp.getQueue()),level_(){}
         QueuePair& queue_;
         void operator()(LogLevel&, std::string& msg);
-        void setLevel(int level){ level_ = level;}
+        void setLevel(int level){ LOG_DEBUG(level); level_ = level;}
         int level_;
 };
 
@@ -124,26 +124,34 @@ bool MainModule::run()
                 MapMsg tmsg = tcp_queue.timed_pop(1);
                 while(!tmsg.cmd().empty())
                 {
-                    if(tmsg.cmd() == "loglevel")
+                    try
                     {
-                        logger_.setLevel(tmsg["level"]);
-                        
-                    }else
-                    if (tmsg.cmd() == "quit")
-                    {
-                        MsgThread::broadcastQuit();
-                        LOG_INFO("Normal Program Termination in Progress");
-                        return 0;
+                        if(tmsg.cmd() == "loglevel")
+                        {
+                            logger_.setLevel(tmsg["level"]);
+                        }
+                        else if (tmsg.cmd() == "quit")
+                        {
+                            MsgThread::broadcastQuit();
+                            LOG_INFO("Normal Program Termination in Progress");
+                            return 0;
+                        }
+                        else if (tmsg.cmd() == "exception")
+                        {
+                            throw tmsg["exception"].except();
+                        }
+                        else
+                        {
+                            MapMsg ret(tmsg.cmd());
+                            tmsg["id"] = ret["id"] = ++msg_count;
+                            gst_queue.push(tmsg);
+                            ret["ack"] = "ok";
+                            tcp_queue.push(ret);
+                        }
                     }
-                    if (tmsg.cmd() == "exception")
-                        throw tmsg["exception"].except();
-                    else
+                    catch(ErrorExcept e)
                     {
-                        MapMsg ret(tmsg.cmd());
-                        tmsg["id"] = ret["id"] = ++msg_count;
-                        gst_queue.push(tmsg);
-                        ret["ack"] = "ok";
-                        tcp_queue.push(ret);
+                        LOG_DEBUG("MAIN LOOP EXCEPT:" << e.msg_);
                     }
                     tmsg = tcp_queue.timed_pop(1);
                 }
@@ -169,8 +177,8 @@ int telnetServer(int s,int p)
     {
         MainModule m(s,p);
 
-        while(m.run())
-        {}
+        m.run();
+        
     }
     catch(Except e)
     {

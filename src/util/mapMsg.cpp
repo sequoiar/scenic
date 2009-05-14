@@ -77,10 +77,10 @@ bool MapMsg::post()
 #define TYPE_CHECKMSG(gtype,xtype) \
     const char* t = #gtype; \
     char tt = t[0];\
-    if(type_ == 'n') QUIET_THROW("Parameter " << key_ << " missing."); \
+    if(type_ == 'n') THROW_ERROR("Parameter " << key_ << " missing."); \
     else \
         if(type_ != tt) \
-        QUIET_THROW("Parameter " << key_ << " should be " << #xtype << " not " << T_EXPAND(type_) << "." );\
+        THROW_ERROR("Parameter " << key_ << " should be " << #xtype << " not " << T_EXPAND(type_) << "." );\
     return gtype   
 
 bool StrIntFloat::empty() const {
@@ -196,6 +196,11 @@ MapMsg::Item MapMsg::begin()
 StrIntFloat &MapMsg::operator[](const std::string& str)
 {    
     StrIntFloat &sif = map_[str];
+#if 0
+    tassert(sif.type_ != 'n');
+    if(sif.type_ == 'n')
+        THROW_ERROR("argument " << str << " not does not exist");
+#endif
     sif.key_ = str; 
     return sif;
 }

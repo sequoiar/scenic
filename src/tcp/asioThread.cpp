@@ -108,10 +108,17 @@ class tcp_session
                 do
                 {
                     MapMsg mapMsg;
+                    try
+                    {
                     if(mapMsg.tokenize(line))
                         queue_.push(mapMsg);
                     else
                         LOG_WARNING("Bad Msg Received.");
+                    }
+                    catch(ErrorExcept)
+                    {
+                       LOG_DEBUG("tokenize problem"); 
+                    }
                     line = get_line(msgs);
                 }
                 while(!line.empty());

@@ -114,6 +114,7 @@ void *BaseThread::thread_main(void *pThreadObj)
 
 bool BaseThread::run()
 {
+    tassert(!th_);
     if (th_)
     {
         LOG_WARNING("Thread already Running.");
