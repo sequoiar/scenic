@@ -209,6 +209,7 @@ class AudioVideoGst(GstClient):
          address: string
         """
         self._send_command('start')
+        print '\nAudioVideoGst.start_streaming() stack :'
         stack.print_stack() # XXX this is very verbose !
 
     def stop_streaming(self):
