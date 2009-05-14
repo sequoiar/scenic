@@ -35,8 +35,7 @@ class _GstElement;
 class VideoSink : public GstLinkableSink
 {
     public:
-       VideoSink()
-            : sink_(0) {};
+       VideoSink() : sink_(0) {};
         virtual ~VideoSink(){};
         virtual void init() = 0;
         virtual void makeFullscreen() = 0;
@@ -44,7 +43,6 @@ class VideoSink : public GstLinkableSink
         void destroySink();
 
     protected:
-        const static int MAX_QUEUE_BUFFERS = 3;
         _GstElement *sink_;
 
     private:
@@ -91,13 +89,12 @@ class XvImageSink
     : public GtkVideoSink, public BusMsgHandler
 {
     public:
-        XvImageSink(int screenNum) : GtkVideoSink(screenNum), queue_(0) {};
+        XvImageSink(int screenNum) : GtkVideoSink(screenNum) {};
         bool handleBusMsg(_GstMessage *msg);
 
     private:
-        _GstElement *queue_;
         void init();
-        _GstElement *sinkElement() { return queue_; }
+        _GstElement *sinkElement() { return sink_; }
         ~XvImageSink();
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);

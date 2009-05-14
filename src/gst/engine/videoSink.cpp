@@ -171,11 +171,8 @@ void XvImageSink::init()
         gtk_initialized = true;
     }
 
-    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
-    g_object_set(queue_, "max-size-buffers", MAX_QUEUE_BUFFERS, NULL);
     sink_ = Pipeline::Instance()->makeElement("xvimagesink", NULL);
     prepareSink();
-    gstlinkable::link(queue_, sink_);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     tassert(window_);
@@ -221,7 +218,6 @@ XvImageSink::~XvImageSink()
         gtk_widget_destroy(window_);
         LOG_DEBUG("Videosink window destroyed");
     }
-    Pipeline::Instance()->remove(&queue_);
 }
 
 

@@ -122,30 +122,54 @@ class VideoEncoder : public Encoder
     public: 
         VideoEncoder();
         ~VideoEncoder();
-        void doDeinterlace() { doDeinterlace_ = true; }
         virtual void init() = 0;
 
     protected:
-        bool doDeinterlace_;
         _GstElement *colorspc_;
-        _GstElement *deinterlace_;
         bool supportsInterlaced_;
-        _GstElement *queue_;
 
     private:
         
         _GstElement *sinkElement() 
         { 
-            if (doDeinterlace_)
-                return queue_;
-            else 
-                return colorspc_;
+            return colorspc_;
         }
 
         /// No Copy Constructor
         VideoEncoder(const VideoEncoder&);     
         /// No Assignment Operator
         VideoEncoder& operator=(const VideoEncoder&);     
+};
+
+
+class VideoDecoder : public Decoder 
+{
+    public: 
+        VideoDecoder();
+        ~VideoDecoder();
+        void doDeinterlace() { doDeinterlace_ = true; }
+        virtual void init() = 0;
+        virtual void adjustJitterBuffer();
+    
+    protected:
+        bool doDeinterlace_;
+        _GstElement *colorspc_;
+        _GstElement *deinterlace_;
+        _GstElement *queue_;
+        static const unsigned long long DEFAULT_JITTER_BUFFER_MS = 40;
+
+    private:
+        const static int MAX_QUEUE_BUFFERS = 3;
+        
+        _GstElement *srcElement() 
+        { 
+            return queue_;
+        }
+
+        /// No Copy Constructor
+        VideoDecoder(const VideoDecoder&);     
+        /// No Assignment Operator
+        VideoDecoder& operator=(const VideoDecoder&);     
 };
 
 /// Encoder that encodes raw video into H.264 using the x264 encoder
@@ -162,13 +186,12 @@ class H264Encoder : public VideoEncoder
 };
 
 /// Decoder that decodes H.264 into raw video using the ffdec_h264 decoder.
-class H264Decoder : public Decoder
+class H264Decoder : public VideoDecoder
 {
     private: 
         void init();
         RtpPay* createDepayloader() const;
         void adjustJitterBuffer(); 
-        static const unsigned long long DEFAULT_JITTER_BUFFER_MS = 30;
 };
 
 
@@ -188,7 +211,7 @@ class H263Encoder : public VideoEncoder
 };
 
 /// Decoder that decodes H.263 into raw video using the ffmpeg hq263 decoder.
-class H263Decoder : public Decoder
+class H263Decoder : public VideoDecoder
 {
     private: 
         void init();
@@ -211,7 +234,7 @@ class Mpeg4Encoder : public VideoEncoder
 
 
 /// Decoder that decodes mpeg4 into raw video using the ffmpeg mpeg4 decoder.
-class Mpeg4Decoder: public Decoder
+class Mpeg4Decoder: public VideoDecoder
 {
     private: 
         void init();
@@ -237,7 +260,7 @@ class TheoraEncoder : public VideoEncoder
 
 
 /// Decoder that decodes mpeg4 into raw video using the ffmpeg mpeg4 decoder.
-class TheoraDecoder: public Decoder
+class TheoraDecoder: public VideoDecoder
 {
     private: 
         void init();
@@ -299,10 +322,10 @@ class LameEncoder : public AudioConvertedEncoder
 {
     public:
         LameEncoder();
+        ~LameEncoder();
 
     private:
         void init();
-        void checkNumChannels();
         _GstElement *mp3parse_;
         RtpPay* createPayloader() const;
         _GstElement *srcElement() { return mp3parse_; }

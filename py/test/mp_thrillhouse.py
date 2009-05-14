@@ -286,34 +286,34 @@ class VideoTests(object):
 
     def test_videotestsrc_mpeg4_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h264_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_theora_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "theora"
         txVideoArg.codec = "theora"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_h263_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_mpeg4_deinterlace_xvimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = "v4l2src"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_h264_deinterlace_xvimagesink(self):
@@ -321,7 +321,7 @@ class VideoTests(object):
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         txVideoArg.source = "v4l2src"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
     def test_v4l2src_theora_deinterlace_xvimagesink(self):
@@ -329,7 +329,7 @@ class VideoTests(object):
         rxVideoArg.codec = "theora"
         txVideoArg.codec = "theora"
         txVideoArg.source = "v4l2src"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_h263_deinterlace_xvimagesink(self):
@@ -337,7 +337,7 @@ class VideoTests(object):
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
         txVideoArg.source = "v4l2src"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_videotestsrc_mpeg4_glimagesink(self):
@@ -428,7 +428,7 @@ class VideoTests(object):
 
     def test_videotestsrc_mpeg4_deinterlace_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
@@ -436,7 +436,7 @@ class VideoTests(object):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
@@ -444,7 +444,7 @@ class VideoTests(object):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "theora"
         txVideoArg.codec = "theora"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
@@ -452,14 +452,14 @@ class VideoTests(object):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_mpeg4_deinterlace_glimagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = "v4l2src"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
@@ -468,7 +468,7 @@ class VideoTests(object):
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         txVideoArg.source = "v4l2src"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
@@ -477,7 +477,7 @@ class VideoTests(object):
         rxVideoArg.codec = "theora"
         txVideoArg.codec = "theora"
         txVideoArg.source = "v4l2src"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
@@ -486,7 +486,7 @@ class VideoTests(object):
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
         txVideoArg.source = "v4l2src"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'glimagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
@@ -578,7 +578,7 @@ class VideoTests(object):
 
     def test_videotestsrc_mpeg4_deinterlace_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
@@ -586,7 +586,7 @@ class VideoTests(object):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
@@ -594,7 +594,7 @@ class VideoTests(object):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "theora"
         txVideoArg.codec = "thera"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
@@ -602,14 +602,14 @@ class VideoTests(object):
         rxVideoArg, txVideoArg = argfactory('video')
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
     def test_v4l2src_mpeg4_deinterlace_ximagesink(self):
         rxVideoArg, txVideoArg = argfactory('video')
         txVideoArg.source = "v4l2src"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 
@@ -618,7 +618,7 @@ class VideoTests(object):
         rxVideoArg.codec = "h264"
         txVideoArg.codec = "h264"
         txVideoArg.source = "v4l2src"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
@@ -627,7 +627,7 @@ class VideoTests(object):
         rxVideoArg.codec = "theora"
         txVideoArg.codec = "theora"
         txVideoArg.source = "v4l2src"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
@@ -636,7 +636,7 @@ class VideoTests(object):
         rxVideoArg.codec = "h263"
         txVideoArg.codec = "h263"
         txVideoArg.source = "v4l2src"
-        txVideoArg.deinterlace = True
+        rxVideoArg.deinterlace = True
         rxVideoArg.sink = 'ximagesink'
         proceed(dict(rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
 

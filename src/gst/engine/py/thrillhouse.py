@@ -313,15 +313,14 @@ class MilhouseTests():
         """ Test with just video deinterlaced """
 
         recv, send = self.argfactory('video')
-        send.deinterlace = True
-        send.videosource = 'videotestsrc'
+        recv.deinterlace = True
         self.run(recv, send)
 
     def test_17_deinterlace_glimagesink(self):
         """ Test with just video deinterlaced to glimagesink """
 
         recv, send = self.argfactory('video')
-        send.deinterlace = True
+        recv.deinterlace = True
         recv.videosink = 'glimagesink'
         self.run(recv, send)
 
@@ -406,7 +405,7 @@ class MilhouseTests():
         recv, send = self.argfactory('video')
         send.videocodec = videocodec
         recv.videocodec = videocodec
-        send.deinterlace = True
+        recv.deinterlace = True
         self.run(recv, send)
 
     def test_27_mp3_v4l2src(self):
@@ -503,7 +502,7 @@ class MilhouseTests():
         self.countdown('START')
 
         recv, send = self.argfactory('audiovideo')
-        send.deinterlace = True
+        recv.deinterlace = True
         self.run(recv, send)
     
     def test_38_bufferTime(self):
@@ -570,7 +569,7 @@ class MilhouseTests():
         recv.audiocodec = send.audiocodec
         send.videocodec = 'theora'
         recv.videocodec = send.videocodec
-        send.deinterlace = True
+        recv.deinterlace = True
         for chan in xrange(8, 9): 
             send.numchannels = chan
             self.run(recv, send)
@@ -595,13 +594,13 @@ class MilhouseTests():
         send.videocodec = 'theora'
         recv.videocodec = send.videocodec
         recv.videosink = 'xvimagesink'
-        send.deinterlace = True
+        recv.deinterlace = True
         self.run(recv, send)
 
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_35')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_01')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

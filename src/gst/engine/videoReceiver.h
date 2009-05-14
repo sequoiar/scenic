@@ -29,7 +29,7 @@
 #include "rtpReceiver.h"
 
 class RtpPay;
-class Decoder;
+class VideoDecoder;
 class VideoSink;
 
 class VideoReceiver
@@ -54,7 +54,7 @@ class VideoReceiver
         RtpReceiver session_;
 
         RtpPay *depayloader_; 
-        Decoder *decoder_;
+        VideoDecoder *decoder_;
         VideoSink *sink_;
         bool gotCaps_;
 

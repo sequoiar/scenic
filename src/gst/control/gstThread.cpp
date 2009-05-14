@@ -191,7 +191,7 @@ void GstReceiverThread::video_init(MapMsg& msg)
         else
             VIDEO_SINK = std::string(msg["sink"]);
 
-        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], SCREEN, VIDEO_SINK);
+        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], SCREEN, VIDEO_SINK, msg["deinterlace"]);
     }
     catch(Except e)
     {
@@ -256,7 +256,7 @@ void GstSenderThread::video_init(MapMsg& msg)
         if(msg["device"])
             videoDevice = std::string(msg["device"]);
 
-        VideoSourceConfig config(msg["source"], msg["bitrate"], videoDevice, videoLocation, msg["deinterlace"]);
+        VideoSourceConfig config(msg["source"], msg["bitrate"], videoDevice, videoLocation);
         video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
         if(ff[1])
             videoFirst = false;

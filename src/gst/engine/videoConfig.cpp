@@ -46,8 +46,8 @@ VideoSource * VideoSourceConfig::createSource() const
     else 
         THROW_ERROR(source_ << " is an invalid source!");
             
-    LOG_DEBUG("Video source options: " << source_ << ", bitrate: " << bitrate_ << ", deinterlace: " 
-            << (doDeinterlace() ? "true" : "false") << ", location: " << location_ << ", device: " << deviceName_);
+    LOG_DEBUG("Video source options: " << source_ << ", bitrate: " << bitrate_ << ", location: " 
+            << location_ << ", device: " << deviceName_);
     return 0;
 }
 

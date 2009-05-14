@@ -36,18 +36,17 @@ class GLImageSink
 {
     public:
         /// Constructor 
-        GLImageSink(int screen_num) : GtkVideoSink(screen_num), queue_(0) {}
+        GLImageSink(int screen_num) : GtkVideoSink(screen_num) {}
         bool handleBusMsg(_GstMessage *msg);
 
     private:
-        _GstElement *queue_;
 
         /** 
          * Destructor */
         ~GLImageSink();
         void init();
 
-        _GstElement *sinkElement() { return queue_; }
+        _GstElement *sinkElement() { return sink_; }
 
         /** 
          * This method resets all of our static variables used for positioning our texture, 

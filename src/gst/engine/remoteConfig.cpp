@@ -118,7 +118,7 @@ Encoder * SenderConfig::createAudioEncoder() const
 }
 
 
-Decoder * ReceiverConfig::createVideoDecoder() const
+VideoDecoder * ReceiverConfig::createVideoDecoder() const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make decoder without codec being specified.");

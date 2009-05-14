@@ -29,6 +29,7 @@
 
 class Encoder;
 class VideoEncoder;
+class VideoDecoder;
 class Decoder;
 
 /** 
@@ -100,7 +101,7 @@ class ReceiverConfig : public RemoteConfig
             : RemoteConfig(m), caps_(m.caps_)
         {}
 
-        Decoder* createVideoDecoder() const;
+        VideoDecoder* createVideoDecoder() const;
         Decoder* createAudioDecoder() const;
 
         const char *caps() const { return caps_.c_str(); }

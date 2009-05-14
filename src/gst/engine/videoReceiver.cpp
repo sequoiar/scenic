@@ -60,6 +60,8 @@ void VideoReceiver::makeFullscreen()
 void VideoReceiver::init_codec()
 {
     tassert(decoder_ = remoteConfig_.createVideoDecoder());
+    if (videoConfig_.doDeinterlace())
+        decoder_->doDeinterlace();
     decoder_->init();
 }
 

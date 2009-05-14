@@ -34,23 +34,20 @@ class VideoSourceConfig
         VideoSourceConfig(const std::string &source__, 
                           const int bitrate__, 
                           const std::string &deviceName__, 
-                          const std::string &location__, 
-                          const bool doDeinterlace__)
+                          const std::string &location__) 
             : source_(source__), bitrate_(bitrate__), deviceName_(deviceName__),
-            location_(location__), doDeinterlace_(doDeinterlace__) 
+            location_(location__)
         {}
 
         //* copy constructor */
         VideoSourceConfig(const VideoSourceConfig& m)
-            : source_(m.source_), bitrate_(m.bitrate_), deviceName_(m.deviceName_), location_(m.location_), 
-            doDeinterlace_(m.doDeinterlace_)
+            : source_(m.source_), bitrate_(m.bitrate_), deviceName_(m.deviceName_), location_(m.location_) 
         {}
 
         VideoSource* createSource() const;  // factory method
 
         const char *source() const { return source_.c_str(); }
         int bitrate() const { return bitrate_; }
-        bool doDeinterlace() const { return doDeinterlace_; }
 
         bool hasLocation() const { return !location_.empty(); }
         bool hasDeviceName() const { return !deviceName_.empty(); }
@@ -64,7 +61,6 @@ class VideoSourceConfig
         const int bitrate_;
         const std::string deviceName_;
         const std::string location_;
-        const bool doDeinterlace_;
         /// No Assignment Operator 
         VideoSourceConfig& operator=(const VideoSourceConfig&);     
 };
@@ -74,21 +70,23 @@ class VideoSinkConfig
 {
     public:
 
-        explicit VideoSinkConfig(const std::string & sink__, int screenNum)
-            : sink_(sink__), screenNum_(screenNum)
+        VideoSinkConfig(const std::string & sink__, int screenNum, bool doDeinterlace__)
+            : sink_(sink__), screenNum_(screenNum), doDeinterlace_(doDeinterlace__)
         {}
 
         // copy constructor
         VideoSinkConfig(const VideoSinkConfig & m) 
-            : sink_(m.sink_) , screenNum_(m.screenNum_)
+            : sink_(m.sink_) , screenNum_(m.screenNum_), doDeinterlace_(m.doDeinterlace_)
         {}
 
         VideoSink* createSink() const;
+        bool doDeinterlace() const { return doDeinterlace_; }
 
     private:
 
         const std::string sink_;
         const int screenNum_;
+        bool doDeinterlace_;
 };
 
 #endif // _VIDEO_CONFIG_H_

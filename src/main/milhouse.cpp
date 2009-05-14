@@ -144,7 +144,7 @@ short pof::run(int argc, char **argv)
         if (!disableVideo)       
         {
             vRx = videofactory::buildVideoReceiver(options["address"], options["videocodec"], 
-                    options["videoport"], options["screen"], options["videosink"]);
+                    options["videoport"], options["screen"], options["videosink"], options["deinterlace"]);
         }
         if (!disableAudio)
         {
@@ -205,7 +205,7 @@ short pof::run(int argc, char **argv)
                 videoBitrate = options["videobitrate"];
 
             VideoSourceConfig vConfig(options["videosource"], videoBitrate, 
-                    videoDevice, videoLocation, options["deinterlace"]);
+                    videoDevice, videoLocation);
 
             vTx = videofactory::buildVideoSender(vConfig, options["address"], options["videocodec"], 
                     options["videoport"]);

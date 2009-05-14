@@ -281,7 +281,6 @@ GLImageSink::~GLImageSink()
         gtk_widget_destroy(window_);
         LOG_DEBUG("Widget destroyed");
     }
-    Pipeline::Instance()->remove(&queue_);
 }
 
 void GLImageSink::init()
@@ -290,10 +289,7 @@ void GLImageSink::init()
     if (!gtk_initialized)
         gtk_init(0, NULL);
 
-    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
-    g_object_set(queue_, "max-size-buffers", MAX_QUEUE_BUFFERS, NULL);
     sink_ = Pipeline::Instance()->makeElement("glimagesink", NULL);
-    gstlinkable::link(queue_, sink_);
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
 
     window_ = gtk_window_new(GTK_WINDOW_TOPLEVEL);    
@@ -331,8 +327,8 @@ void GLImageSink::init()
     gtk_widget_set_events(window_, GDK_SCROLL_MASK);
 
     /* configure elements */
-    g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
-    g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
+    //g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
+    //g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
     showWindow();
 
     // register this level to handle prepare window id msg

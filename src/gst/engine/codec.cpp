@@ -128,8 +128,7 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
 }
 
 
-VideoEncoder::VideoEncoder() : doDeinterlace_(false), colorspc_(0),
-    deinterlace_(0), supportsInterlaced_(false), queue_(0)  // most codecs don't have this property
+VideoEncoder::VideoEncoder() : colorspc_(0), supportsInterlaced_(false)  // most codecs don't have this property
 {}
 
 
@@ -137,34 +136,65 @@ VideoEncoder::VideoEncoder() : doDeinterlace_(false), colorspc_(0),
 VideoEncoder::~VideoEncoder()
 {
     Pipeline::Instance()->remove(&colorspc_);
-    Pipeline::Instance()->remove(&deinterlace_);
 }
 
 
-/// Sets up either deinterlace->colorspace->queue->encoder->queue
-/// or colorspace->queue->encoder->queue
 void VideoEncoder::init()
 {
     tassert(codec_ != 0);
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
 
-    if (doDeinterlace_)
-    {
-        LOG_DEBUG("DO THE DEINTERLACE");
-        queue_ = Pipeline::Instance()->makeElement("queue", NULL);
-        deinterlace_ = Pipeline::Instance()->makeElement("deinterlace", NULL);
-        gstlinkable::link(queue_, deinterlace_);
-        gstlinkable::link(deinterlace_, colorspc_);
-    }
-    else
-    {
-        if (supportsInterlaced_)  // not all encoders have this property
-            g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
-    }
+    if (supportsInterlaced_)  // not all encoders have this property
+        g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
 
-    // Create separate thread for encoding, should yield better performance on multicore machines
     gstlinkable::link(colorspc_, codec_);
 }
+
+
+VideoDecoder::VideoDecoder() : doDeinterlace_(false), colorspc_(0), deinterlace_(0), queue_(0)
+{}
+
+
+/// Destructor 
+VideoDecoder::~VideoDecoder()
+{
+    Pipeline::Instance()->remove(&colorspc_);
+    Pipeline::Instance()->remove(&deinterlace_);
+    Pipeline::Instance()->remove(&queue_);
+}
+
+
+/// Sets up either decoder->queue->colorspace->deinterlace
+/// or just decoder->queue
+void VideoDecoder::init()
+{
+    tassert(codec_ != 0);
+    queue_ = Pipeline::Instance()->makeElement("queue", NULL);
+    g_object_set(queue_, "max-size-buffers", MAX_QUEUE_BUFFERS, NULL);
+    g_object_set(queue_, "max-size-bytes", 0, NULL);
+    g_object_set(queue_, "max-size-time", 0LL, NULL);
+    if (doDeinterlace_)
+    {
+        colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
+        LOG_DEBUG("DO THE DEINTERLACE");
+        deinterlace_ = Pipeline::Instance()->makeElement("deinterlace", NULL);
+        gstlinkable::link(codec_, colorspc_);
+        gstlinkable::link(colorspc_, deinterlace_);
+        gstlinkable::link(deinterlace_, queue_);
+    }
+    else
+        gstlinkable::link(codec_, queue_);
+
+}
+
+
+/// Increase jitterbuffer size
+void VideoDecoder::adjustJitterBuffer() 
+{
+    if (doDeinterlace_)
+        RtpReceiver::setLatency(DEFAULT_JITTER_BUFFER_MS);
+}
+
 
 
 /// Constructor 
@@ -222,6 +252,7 @@ RtpPay* H264Encoder::createPayloader() const
 void H264Decoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("ffdec_h264", NULL);
+    VideoDecoder::init();
 }
 
 
@@ -267,6 +298,7 @@ RtpPay* H263Encoder::createPayloader() const
 void H263Decoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("ffdec_h263", NULL);
+    VideoDecoder::init();
 }
 
 
@@ -304,6 +336,7 @@ RtpPay* Mpeg4Encoder::createPayloader() const
 void Mpeg4Decoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("ffdec_mpeg4", NULL);
+    VideoDecoder::init();
 }
 
 
@@ -348,6 +381,7 @@ RtpPay* TheoraEncoder::createPayloader() const
 void TheoraDecoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("theoradec", NULL);
+    VideoDecoder::init();
 }
 
 RtpPay* TheoraDecoder::createDepayloader() const
@@ -429,6 +463,13 @@ RtpPay* RawDecoder::createDepayloader() const
 /// Constructor
 LameEncoder::LameEncoder() : mp3parse_(0)
 {}
+
+
+/// Destructor
+LameEncoder::~LameEncoder()
+{
+    Pipeline::Instance()->remove(&mp3parse_);
+}
 
 void LameEncoder::init()
 {

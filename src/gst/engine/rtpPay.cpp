@@ -33,7 +33,6 @@ RtpPay::~RtpPay()
     Pipeline::Instance()->remove(&rtpPay_);
 }
 
-const long long Payloader::MAX_PTIME = 2000000LL;
 bool Payloader::controlEnabled_ = false;
 GtkWidget *Payloader::control_ = 0;
 

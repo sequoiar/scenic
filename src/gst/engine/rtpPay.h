@@ -53,7 +53,7 @@ class Payloader : public RtpPay
     protected:
         void init() = 0;
         virtual ~Payloader();
-        static const long long MAX_PTIME;
+        static const long long MAX_PTIME = 2000000LL;
 
     private:
         // Use max-ptime to limit the amount of 
