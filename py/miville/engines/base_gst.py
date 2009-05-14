@@ -80,7 +80,7 @@ class GstServer(object):
 
     The Inter-process Communication protocol is based on TCP lines of ASCII characters.
     """
-    def __init__(self, mode, port, address, callback_dict, state_change_callback, output_callback):
+    def __init__(self, mode, port, address, callback_dict, state_change_callback):
         self.port = port
         self.address = address
         self.mode = mode
@@ -93,7 +93,7 @@ class GstServer(object):
         self.commands = []
         self.callback_dict = callback_dict
         self.version_str = None
-        self.output_callback = output_callback # when milhouse spits a line
+
 
     def connect(self):
         log.debug("GstServer.connect")
@@ -113,9 +113,6 @@ class GstServer(object):
     def get_status(self):
         s = self.get_state_str(self.state)
         return s
-    
-    def process_output_callback(self, line):
-        log.info(line)
         
     def change_state(self, new_state):
          old_state = self.state
@@ -273,9 +270,9 @@ class GstClient(BaseGst):
     def __init__(self):
         log.debug("GstClient __init__  " + str(self))
     
-    def setup_gst_client(self, mode, port, address, callbacks_dict, state_change_callback, process_output_callback): 
+    def setup_gst_client(self, mode, port, address, callbacks_dict, state_change_callback): 
         log.debug('GstClient.setup_gst_client '+ str(self))
-        self.gst_server = GstServer(mode, port, address, callbacks_dict, state_change_callback, process_output_callback)
+        self.gst_server = GstServer(mode, port, address, callbacks_dict, state_change_callback)
         try:
             self.proc_path, self.args, self.pid = self.gst_server.start_process()
         except GstError, e: 
@@ -325,7 +322,6 @@ class GstProcessProtocol(protocol.ProcessProtocol):
         if self.server.state < RUNNING:
             lines = data.split('\n')
             for line in lines:
-                #self.server.process_output_callback(line)
                 if line.strip().startswith("Ver:"):
                     self.server.version_str = line.split("Ver:")[1] 
                     
