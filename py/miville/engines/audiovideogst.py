@@ -91,7 +91,7 @@ class AudioVideoGst(GstClient):
                     }       
        log.info('')
        self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks, self.gst_state_change_callback, self.process_output_callback)
-       self._send_command('loglevel', 100)
+       self._send_command('loglevel', 10)
     
     def process_output_callback(self):
         log_message = (str(self))
