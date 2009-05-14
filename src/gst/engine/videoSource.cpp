@@ -170,6 +170,8 @@ void VideoV4lSource::init()
     if (!v4l2util::checkStandard(expectedStandard_, deviceString))
         LOG_WARNING("V4l2 device " << deviceString << " is not set to expected standard " << expectedStandard_);
 
+    v4l2util::printCaptureFormat(deviceString);
+
     capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
     gstlinkable::link(source_, capsFilter_);
 

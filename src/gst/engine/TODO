@@ -1,9 +1,7 @@
 -make sure no exceptions can be thrown from destructors
 -get rid of queues around encoders!!!!
--add small queue between videodecoder and videosink (3 buffers)
 -move deinterlace to right before sink
 -figure out what happens if jack settings differ between machines
--try and clean up videosink based on examples of such
 -write about latency rtp issues/testing with netem scripts and so on
 -fix glvideosink's black at startup/until fullscreen bug
 -teeing video and audio, start with tests

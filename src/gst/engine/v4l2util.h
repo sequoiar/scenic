@@ -26,6 +26,11 @@
 namespace v4l2util
 {
     bool checkStandard(const std::string &expected, const std::string &device);
+    void printCaptureFormat(const std::string &device);
+    std::string fcc2s(unsigned int val);
+    std::string field2s(int val);
+    std::string num2s(unsigned num);
+    std::string colorspace2s(int val);
 }
 
 #endif // _V4L2UTIL_H_
