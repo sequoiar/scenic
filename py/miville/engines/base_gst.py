@@ -325,7 +325,7 @@ class GstProcessProtocol(protocol.ProcessProtocol):
         if self.server.state < RUNNING:
             lines = data.split('\n')
             for line in lines:
-                self.server.process_output_callback(line)
+                #self.server.process_output_callback(line)
                 if line.strip().startswith("Ver:"):
                     self.server.version_str = line.split("Ver:")[1] 
                     
