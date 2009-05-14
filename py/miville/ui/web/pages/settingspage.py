@@ -70,35 +70,44 @@ def print_all_media_settings(media_settings):
     return txt    
 
 def print_media_setting(media_setting):
-    txt = "<h5>[" + str(media_setting.id) + "] media setting \"" + media_setting.name + "\"</h5>"
+    txt = "<li>[" + str(media_setting.id) + "] media setting \"" + media_setting.name + "\"</li>"
+    txt += "<ul>"
     for key, value in media_setting.settings.iteritems():
-        txt += "<p>       %s : %s</p>" % (key, str(value))
+        txt += "<li>%s : %s</li>" % (key, str(value))
+    txt += "</ul>"
     return txt
 
 def print_stream(stream):
-    txt = " <h4>[" + stream.name + "] stream</h4>"
-    txt += "<p>    enabled: " + str(stream.enabled) + "</p>"
-    txt += "<p>    sync: " + stream.sync_group + "</p>"
-    txt += "<p>    port: " + str(stream.port) + "</p>"
+    txt = " <li>[" + stream.name + "] stream</li>"
+    txt += "<ul>"
+    txt += "    <li>enabled: " + str(stream.enabled) + "</li>"
+    txt += "    <li>sync: " + stream.sync_group      + "</li>"
+    txt += "    <li>port: " + str(stream.port)       + "</li>"
+    txt += "</ul>"
     #txt += "<p>    media setting: %s\n" % str(stream.setting)
     return txt
 
 def print_stream_sub_group(group_id, group):
-    txt = " <h3>[" + str(group_id) + "] stream sub group " + group.name + "</h3>"
-    txt += "<p>   enabled: " + str(group.enabled) + "</p>"
-    txt += "<p>   mode: " + str(group.mode) + "</p>"
+    txt = " <li>[" + str(group_id) + "] stream sub group " + group.name + "</li>"
+    txt += "<ul>"
+    txt += "<li>enabled: " + str(group.enabled) + "</li>"
+    txt += "<li>mode: " + str(group.mode) + "</li>"
+    txt += "</ul>"
     return txt
 
 def print_global_setting(global_setting_id, global_setting):
-    txt = "<h2>[" + str(global_setting_id) + "] global setting  " + global_setting.name + "</h2>"
+    txt = "<li>[" + str(global_setting_id) + "] global setting  " + global_setting.name + "</li>"
     return txt
     
 def print_settings():
 
     txt = "<h1>GLOBAL SETTINGS:</h1>"
+    txt += '<ul id="adoptme">'
     for k, global_setting in global_settings.iteritems():
+        
         txt += print_global_setting(k, global_setting)
         for group_id,group in global_setting.stream_subgroups.iteritems():
+            txt += "<ul>"
             txt += print_stream_sub_group(group_id, group)
             for stream in group.media_streams:
                 txt += print_stream(stream)                
@@ -108,15 +117,105 @@ def print_settings():
                     txt += print_media_setting(media_setting)
                 except:
                     txt += "<p>     media setting %s (not available)</p>" % stream.setting
-                    
+            txt += "</ul>"
+    txt += "</ul>"                
     txt += print_all_media_settings(media_settings)
     return txt
 
+
+def get_doc():
+    
+    head = """
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" version="-//W3C//DTD XHTML 1.1//EN" xml:lang="en">
+
+<head>
+
+<title>mooTree 2</title>
+
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<link rel="stylesheet" href="mootree.css" type="text/css" media="screen" />
+
+<script type="text/javascript" src="mootools/mootools-1.2-core.js"></script>
+<script type="text/javascript" src="mootree.js"></script>
+
+<script type="text/javascript">
+
+var tree;
+
+window.onload = function() {
+    
+    tree = new MooTreeControl({
+        div: 'mytree',
+        mode: 'folders',
+        grid: true,
+        onSelect: function(node, state) {
+            if (state) window.alert('url: ' + node.data.url);
+        }
+    },{
+        text: 'Root Node',
+        open: true
+    });
+    
+}
+
+
+</script>
+
+</head>
+
+<body>
+
+<h2>mooTree 2</h2>
+<h4>example 2: adopting a tree from a structure of ul/li elements</h4>
+
+<p>
+    This demonstrates adoption of a tree from a structure of ul/li elements
+    in your document.
+</p>
+
+<p>
+
+    Note that the properties of the a-tag in each li element are stored in the
+    node's data-object with the same name - for example, data.href contains
+    the href attribute.
+</p>
+<p>
+    The onSelect event of the tree in this example simply displays the url in an
+    alert, but you would probably want to, for example, set the location.href of
+    an iframe, or do some AJAX operation, or something else.
+</p>
+
+<p id="hideme">
+    <a href="#" onclick="$('hideme').style.display='none'; tree.adopt('adoptme'); return false">click here</a> to adopt the structure below...
+</p>
+
+<div id="mytree">
+</div>
+
+<p>
+    <input type="button" value=" expand all " onclick="tree.expand()" />
+    <input type="button" value=" collapse all " onclick="tree.collapse()" />
+</p>
+"""
+
+    toes = """
+
+
+</body>
+
+</html>
+
+"""
+    return head, toes
 
 class SettingsPage(rend.Page):
     def renderHTTP(self, ctx):
         
         beau_body =  print_settings()
+        
+#        head, footer = get_doc()
+#        html = head
         
         html = u"""
         <html>
@@ -124,8 +223,9 @@ class SettingsPage(rend.Page):
         <body>
         
             """
-        html += beau_body     
         
+        html += beau_body     
+#        html += footer
         html += u"""
         
         </body>
