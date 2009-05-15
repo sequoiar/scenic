@@ -156,7 +156,7 @@ class VideoDecoder : public Decoder
         _GstElement *colorspc_;
         _GstElement *deinterlace_;
         _GstElement *queue_;
-        static const unsigned long long DEFAULT_JITTER_BUFFER_MS = 40;
+        static const unsigned long long JITTER_BUFFER_MS = 60;
 
     private:
         const static int MAX_QUEUE_BUFFERS = 3;

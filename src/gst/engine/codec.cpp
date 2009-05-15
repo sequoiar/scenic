@@ -192,7 +192,7 @@ void VideoDecoder::init()
 void VideoDecoder::adjustJitterBuffer() 
 {
     if (doDeinterlace_)
-        RtpReceiver::setLatency(DEFAULT_JITTER_BUFFER_MS);
+        RtpReceiver::setLatency(JITTER_BUFFER_MS);
 }
 
 
@@ -266,7 +266,7 @@ RtpPay* H264Decoder::createDepayloader() const
 /// Increase jitterbuffer size
 void H264Decoder::adjustJitterBuffer() 
 {
-    RtpReceiver::setLatency(DEFAULT_JITTER_BUFFER_MS);
+    RtpReceiver::setLatency(JITTER_BUFFER_MS);
 }
 
 

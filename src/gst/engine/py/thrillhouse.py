@@ -503,6 +503,7 @@ class MilhouseTests():
 
         recv, send = self.argfactory('audiovideo')
         recv.deinterlace = True
+        recv.jitterbuffer = 60
         self.run(recv, send)
     
     def test_38_bufferTime(self):
@@ -600,7 +601,7 @@ class MilhouseTests():
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_01')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_37')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

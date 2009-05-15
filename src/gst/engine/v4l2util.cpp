@@ -41,6 +41,20 @@ static int doioctl(int fd, long request, void *parm, const std::string &name)
     return retVal;
 }
 
+static v4l2_format captureFormat(const std::string &device)
+{
+    v4l2_format vfmt;
+    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    int fd = -1;
+
+    if ((fd = open(device.c_str(), O_RDWR)) < 0) 
+        THROW_ERROR("Failed to open " << device);
+
+    tassert(doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT") == 0);
+    close(fd);
+    return vfmt;
+}
+
 /// Check current standard of v4l2 device to make sure it is what we expect
 bool v4l2util::checkStandard(const std::string &expected, const std::string &device)
 {
@@ -120,90 +134,51 @@ std::string v4l2util::fcc2s(unsigned int val)
 
 void v4l2util::printCaptureFormat(const std::string &device)
 {
-    v4l2_format vfmt;
-    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    int fd = -1;
+    v4l2_format vfmt = captureFormat(device);
 
-    if ((fd = open(device.c_str(), O_RDWR)) < 0) 
-        THROW_ERROR("Failed to open " << device << ": ");// << strerror(errno));
-
-    if (doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT") == 0)
-    {
-        printf("\tWidth/Height  : %u/%u\n", vfmt.fmt.pix.width, vfmt.fmt.pix.height);
-        printf("\tPixel Format  : %s\n", fcc2s(vfmt.fmt.pix.pixelformat).c_str());
-        printf("\tField         : %s\n", field2s(vfmt.fmt.pix.field).c_str());
-        printf("\tBytes per Line: %u\n", vfmt.fmt.pix.bytesperline);
-        printf("\tSize Image    : %u\n", vfmt.fmt.pix.sizeimage);
-        printf("\tColorspace    : %s\n", colorspace2s(vfmt.fmt.pix.colorspace).c_str());
-    }
-    close(fd);
+    printf("\tWidth/Height  : %u/%u\n", vfmt.fmt.pix.width, vfmt.fmt.pix.height);
+    printf("\tPixel Format  : %s\n", fcc2s(vfmt.fmt.pix.pixelformat).c_str());
+    printf("\tField         : %s\n", field2s(vfmt.fmt.pix.field).c_str());
+    printf("\tBytes per Line: %u\n", vfmt.fmt.pix.bytesperline);
+    printf("\tSize Image    : %u\n", vfmt.fmt.pix.sizeimage);
+    printf("\tColorspace    : %s\n", colorspace2s(vfmt.fmt.pix.colorspace).c_str());
 }
 
 
 unsigned v4l2util::captureWidth(const std::string &device)
 {
-    v4l2_format vfmt;
-    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    int fd = -1;
-
-    if ((fd = open(device.c_str(), O_RDWR)) < 0) 
-        THROW_ERROR("Failed to open " << device);
-
-    if (doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT") == 0)
-    {
-         return vfmt.fmt.pix.width;
-    }
-    else
-    {
-        THROW_CRITICAL("IOCTL failed.");
-        return 0;
-    }
-    close(fd);
+    v4l2_format vfmt = captureFormat(device);
+    return vfmt.fmt.pix.width;
 }
 
 
 unsigned v4l2util::captureHeight(const std::string &device)
 {
-    v4l2_format vfmt;
-    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    int fd = -1;
-
-    if ((fd = open(device.c_str(), O_RDWR)) < 0) 
-        THROW_ERROR("Failed to open " << device);
-
-    if (doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT") == 0)
-    {
-         return vfmt.fmt.pix.height;
-    }
-    else
-    {
-        THROW_CRITICAL("IOCTL failed.");
-        return 0;
-    }
-    close(fd);
+    v4l2_format vfmt = captureFormat(device);
+    return vfmt.fmt.pix.height;
 }
 
 std::string v4l2util::colorspace2s(int val)
 {
-        switch (val) {
+    switch (val) {
         case V4L2_COLORSPACE_SMPTE170M:
-                return "Broadcast NTSC/PAL (SMPTE170M/ITU601)";
+            return "Broadcast NTSC/PAL (SMPTE170M/ITU601)";
         case V4L2_COLORSPACE_SMPTE240M:
-                return "1125-Line (US) HDTV (SMPTE240M)";
+            return "1125-Line (US) HDTV (SMPTE240M)";
         case V4L2_COLORSPACE_REC709:
-                return "HDTV and modern devices (ITU709)";
+            return "HDTV and modern devices (ITU709)";
         case V4L2_COLORSPACE_BT878:
-                return "Broken Bt878";
+            return "Broken Bt878";
         case V4L2_COLORSPACE_470_SYSTEM_M:
-                return "NTSC/M (ITU470/ITU601)";
+            return "NTSC/M (ITU470/ITU601)";
         case V4L2_COLORSPACE_470_SYSTEM_BG:
-                return "PAL/SECAM BG (ITU470/ITU601)";
+            return "PAL/SECAM BG (ITU470/ITU601)";
         case V4L2_COLORSPACE_JPEG:
-                return "JPEG (JFIF/ITU601)";
+            return "JPEG (JFIF/ITU601)";
         case V4L2_COLORSPACE_SRGB:
-                return "SRGB";
+            return "SRGB";
         default:
-                return "Unknown (" + num2s(val) + ")";
-        }
+            return "Unknown (" + num2s(val) + ")";
+    }
 }
 
