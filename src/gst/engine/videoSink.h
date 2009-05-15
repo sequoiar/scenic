@@ -43,6 +43,7 @@ class VideoSink : public GstLinkableSink
         void destroySink();
 
     protected:
+        void prepareSink();
         _GstElement *sink_;
 
     private:
@@ -70,7 +71,6 @@ class GtkVideoSink
 
         static void destroy_cb(_GtkWidget * /*widget*/, void *data);
         Window getXWindow();
-        void prepareSink();
         static int expose_cb(_GtkWidget *widget, _GdkEventExpose *event, void *data);
         void makeWindowBlack();
         static void makeFullscreen(_GtkWidget *widget);

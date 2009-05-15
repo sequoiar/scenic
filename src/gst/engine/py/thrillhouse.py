@@ -598,10 +598,27 @@ class MilhouseTests():
         recv.deinterlace = True
         self.run(recv, send)
 
+    def test_45_deinterlace_ximagesink(self):
+        """ Test with ximagesink"""
+        recv, send = self.argfactory('video')
+
+        recv.videosink = 'ximagesink'
+        recv.deinterlace = True
+        self.run(recv, send)
+    
+    def test_46_theora_ximagesink(self):
+        """ Test with ximagesink"""
+        recv, send = self.argfactory('video')
+
+        recv.videosink = 'ximagesink'
+        recv.videocodec = 'theora' 
+        recv.deinterlace = True
+        send.videocodec = recv.videocodec
+        self.run(recv, send)
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_37')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_46')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

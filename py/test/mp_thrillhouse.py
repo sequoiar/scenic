@@ -1995,7 +1995,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         prefix = sys.argv[1]
     else:
-        prefix = 'test_v4l2src'
+        prefix = 'test_'
 
     print "Running tests which start with '" + prefix + "'\n\n"
     # here we run all the tests thanks to the wonders of reflective programming

@@ -111,7 +111,7 @@ void GtkVideoSink::makeUnfullscreen(GtkWidget *widget)
 }
 
 
-void GtkVideoSink::prepareSink()
+void VideoSink::prepareSink()
 {
     //g_object_set(G_OBJECT(sink_), "sync", FALSE, NULL);
     g_object_set(G_OBJECT(sink_), "force-aspect-ratio", TRUE, NULL);
@@ -225,11 +225,8 @@ void XImageSink::init()
 {
     // ximagesink only supports rgb and not yuv colorspace, so we need a converter here
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL);
-
     sink_ = Pipeline::Instance()->makeElement("ximagesink", NULL);
-    g_object_set(sink_, "pixel-aspect-ratio", "10/11", NULL);
-    g_object_set(sink_, "force-aspect-ratio", TRUE, NULL);
-    //    prepareSink();
+    prepareSink();
 
     gstlinkable::link(colorspc_, sink_);
 }
