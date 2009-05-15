@@ -8,5 +8,6 @@ ACLOCAL_AMFLAGS = -I m4
 dist-hook:
 		./utils/list_miville_files $(top_distdir) 
 		install -D utils/list_miville_files $(top_distdir)/utils/list_miville_files
-	    install -D doc/Makefile $(top_distdir)/doc/Makefile
-	    install -D py/docs/Makefile $(top_distdir)/py/docs/Makefile
+#install -D doc/Makefile $(top_distdir)/doc/Makefile
+	    find doc/ -exec install -D {} $(top_distdir)/{} \;
+	    find py/docs/ -exec install -D {} $(top_distdir)/{} \;

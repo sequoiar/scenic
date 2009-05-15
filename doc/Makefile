@@ -15,7 +15,8 @@ doxygen:
 
 install:
 	@if test -e html; then \
-	mkdir -p $(DESTDIR)$(prefix)/share/doc/doxygen \
+    echo INSTALLING docs at $(DESTDIR)$(prefix); \
+	mkdir -p $(DESTDIR)$(prefix)/share/doc/doxygen; \
 	cp -rfv html $(DESTDIR)$(prefix)/share/doc/doxygen; \
 	fi
 
