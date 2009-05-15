@@ -115,7 +115,7 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
         LOG_DEBUG("Pad is not a source");
         return;
     }
-    else if (strncmp(gst_pad_get_name(srcPad), "recv_rtp_src", 12))
+    else if (std::string(gst_pad_get_name(srcPad)).compare(0,12,"recv_rtp_src"))
     {
         LOG_DEBUG("Wrong pad");
         return;

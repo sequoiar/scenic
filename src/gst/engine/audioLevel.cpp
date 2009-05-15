@@ -77,8 +77,9 @@ bool AudioLevel::handleBusMsg(GstMessage *msg)
     const GstStructure *s = gst_message_get_structure(msg);
     const gchar *name = gst_structure_get_name(s);
     std::vector<double> rmsValues;
+    const std::string levelStr = "level";
 
-    if (strncmp(name, "level", strlen("level")) == 0) {   // this is level's msg
+    if (std::string(name).compare(0, levelStr.length(), levelStr)) {   // this is level's msg
         guint channels;
         double rmsDb;
         const GValue *list;
