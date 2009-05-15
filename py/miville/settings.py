@@ -308,7 +308,7 @@ class Settings(object):
     def get_global_setting_from_id(self, id):
         if self.global_settings.has_key(id):
             return self.global_settings[id]
-        raise SettingsError, 'The global setting ' + str(id) + ' does not exist'  
+        raise SettingsError('The global setting ' + str(id) + ' does not exist')
 
     def get_global_setting(self, name):
         id = self._get_global_setting_id_from_name(name)

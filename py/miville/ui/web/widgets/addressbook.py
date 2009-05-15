@@ -343,23 +343,26 @@ class Addressbook(Widget):
         try:
             if type(data) is str:
                 log.error("KeyError: data in stop_streams should be a dict !") 
-            try:
-                stopped = data['stopped'] is True
-            except KeyError, e:
-                log.error("KeyError: data in start_streams should be a dict with key" + e.message) 
+            elif isinstance(data, Exception):
+                log.error('Error trying to stop streams: ' + data.message)
             else:
-                stopped = True
-            if stopped:
-                #log.warning('TODO:self.callRemote()')
-                contact_name = data['contact_name']
-                self.callRemote('update_selected', contact_name)
-                #self.api.select_contact(self, contact_name)
-                contact = self.api.get_contact(contact_name)
-                log.debug('contact.stream_state:%s %s' % (contact_name, contact.stream_state))
-                self.callRemote('update_status', contact_name, 'Stopped streaming', 'Stopped streaming.')
-                self.api.get_contacts(self)  # updates list
-            else:
-                log.warning('TODO:self.callRemote()')
+                try:
+                    stopped = data['stopped'] is True
+                except KeyError, e:
+                    log.error("KeyError: data in start_streams should be a dict with key" + e.message) 
+                else:
+                    stopped = True
+                if stopped:
+                    #log.warning('TODO:self.callRemote()')
+                    contact_name = data['contact_name']
+                    self.callRemote('update_selected', contact_name)
+                    #self.api.select_contact(self, contact_name)
+                    contact = self.api.get_contact(contact_name)
+                    log.debug('contact.stream_state:%s %s' % (contact_name, contact.stream_state))
+                    self.callRemote('update_status', contact_name, 'Stopped streaming', 'Stopped streaming.')
+                    self.api.get_contacts(self)  # updates list
+                else:
+                    log.warning('TODO:self.callRemote()')
         except Exception, e:
             log.error('Error in cb_stop_streams : ' + e.message)
 

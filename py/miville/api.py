@@ -680,13 +680,13 @@ class ControllerApi(object):
                             
     def stop_streams(self, caller, contact_name):
         """
-        Stop all the sub-streams. (audio, video and data)
+        Stop all the streams (audio, video and data) for a given contact.
         """
         log.info('ControllerApi.start_streams, contact= ' + str(contact_name))
         try:
             contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
-            settings_com_channel.stop_streaming( contact.address)
-            contact.stream_state = 0
+            settings_com_channel.stop_streaming(contact.address)
+            contact.stream_state = 0 # FIXME
             #self.notify(caller, "streaming stopped")
             self.notify(caller, {'stopped':True, 'msg':"streaming stopped"}) # FIXME XXX TODO: should not be called from here but from the engines.
         except AddressBookError, e:
