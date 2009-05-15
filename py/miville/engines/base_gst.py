@@ -53,7 +53,7 @@ class GstError(Exception):
 
 class BaseGst(object):
     """
-    Just a bunch of getter and setter for attributes for the milhouse processes.
+    Attributes for milhouse IPCP controls.
     """
     def get_attr(self, name):
         """
@@ -76,9 +76,8 @@ class BaseGst(object):
 
 class GstServer(object):
     """
-    Class that communicates with the milhouse process using the the IPCP protocol. 
-
-    The Inter-process Communication protocol is based on TCP lines of ASCII characters.
+    Class that start a milhouse process.
+    
     """
     def __init__(self, mode, port, address, callback_dict, state_change_callback, proc_output_callback):
         self.port = port
@@ -94,7 +93,6 @@ class GstServer(object):
         self.callback_dict = callback_dict
         self.proc_output_callback = proc_output_callback
         self.version_str = None
-        
 
     def connect(self):
         log.debug("GstServer.connect")
@@ -156,6 +154,7 @@ class GstServer(object):
         """
         Might throw a GstError
         """
+        log.info('<<<<<<<<<<< STARTING MILHOUSE PROCESS >>>>>>>>>>>')
         log.debug("GstServer.start_process... %s " % str(self) )
         #if self.state < RUNNING: self.state = RUNNING    # Uncomment this line to start the GST process "by hand"
         if self.state < STARTING:
@@ -170,6 +169,7 @@ class GstServer(object):
                     protocol = GstProcessProtocol(self)
                     args = [path[0], mode_arg, "--serverport", str(self.port)]
                     proc_path = path[0]
+
                     msg = "Start process> path: %s, protocol: %s args: %s %s" % (proc_path, protocol, str(args), str(self))
                     # print msg
                     log.debug(msg)
@@ -266,12 +266,21 @@ class GstServer(object):
 
 class GstClient(BaseGst):
     """
-    Manages a GstServer instance.
+    Start a GstServer (milhouse process) and communicates with it using the IPCP protocol. 
+
+    The Inter-process Communication protocol is based on TCP lines of ASCII characters.
     """
     def __init__(self):
         log.debug("GstClient __init__  " + str(self))
+        
+        # FIXME : how come there was no attributes in __init__ ???!?:%^&
+        self.gst_server = None
+        self.version_str = ''
     
     def setup_gst_client(self, mode, port, address, callbacks_dict, state_change_callback, proc_output_callback): 
+        """
+        Should throw an error if no success.
+        """
         log.debug('GstClient.setup_gst_client '+ str(self))
         self.gst_server = GstServer(mode, port, address, callbacks_dict, state_change_callback, proc_output_callback)
         try:
@@ -303,9 +312,8 @@ class GstClient(BaseGst):
 
 class GstProcessProtocol(protocol.ProcessProtocol):
     """
-    Protocol for milhouse process management.
+    Manages a milhouse process and its stdin/stdout streams.
     """
-
     def __init__(self, server):
         log.debug('GstProcessProtocol.__init__: %s' % str(server))
         self.server = server
@@ -320,20 +328,23 @@ class GstProcessProtocol(protocol.ProcessProtocol):
             self.server.kill()
             
     def outReceived(self, data):
+        """
+        Text received from milhouse stdout
+        """
         log.debug('GstProcessProtocol.outReceived server state: %d, data %s' % (self.server.state, str(data) ) )
         lines = data.split('\n')
         for line in lines:
             self.server.process_output_received(line)
-            
         if self.server.state < RUNNING:
             for line in lines:
                 if line.strip().startswith("Ver:"):
                     self.server.version_str = line.split("Ver:")[1] 
-                    
                 if line.strip() == 'READY':
                     self.server.change_state(RUNNING)
                     self.server.connect()
-                    break    
+                    break
+        else:
+            print lines
 
     def processEnded(self, status):
         self.server.change_state(STOPPED)

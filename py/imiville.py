@@ -29,6 +29,7 @@ from miville import core #  as miville
 from miville.utils.observer import Observer
 from miville.ui.cli import CliView
 from miville import devices
+from miville.utils.common import find_callbacks
 
 """
 Miville for ipython.
@@ -74,7 +75,14 @@ class IPythonView(CliView):
         #Observer.__init__(self, subject)
         #self.controller = controller
         CliView.__init__(self, subject, controller)
+        self.callbacks = find_callbacks(self)
         self.verbose = True
+        if self.verbose:
+            print '----------------------------'
+            print 'CliView callbacks:'
+            for k, v in self.callbacks.items():
+                print k, v
+            print '----------------------------'
         
     def update(self, origin, key, value):
         global updates, last
@@ -90,7 +98,7 @@ class IPythonView(CliView):
             print "------------------------------------------------------------------------------"
             sys.stdout.write(get_color('BLACK'))
             # CliView.update(self, origin, key, value)
-            if key in self.callback:
+            if key in self.callbacks:
                 self.callbacks[key](origin, value)
             else:
                 print "Could not find callback in CliView - maybe just a imiville.py bug"

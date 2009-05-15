@@ -18,6 +18,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Communication channel for the streaming infos between two miville contacts.
+"""
 from miville.utils import log
 from miville.errors import *
 import pprint
@@ -253,7 +256,7 @@ class GstChannel(object):
         else:
             log.error("No tx processes to stop")
         caller = None
-        self.api.notify(caller, {'stopped':True, 'msg':"streaming stopped"}, "stop_streams") 
+        self.api.notify(caller, {'stopped':True, 'msg':"streaming stopped", "contact_name":None}, "stop_streams") 
       
     def on_remote_message(self, key, args=None):
         """

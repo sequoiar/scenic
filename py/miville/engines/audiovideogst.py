@@ -121,7 +121,7 @@ class AudioVideoGst(GstClient):
         
     def _send_command(self, cmd, params = None):
         self._send_cmd(cmd, params)
-        tupple_of_fine_stuff = (cmd, params)
+        tupple_of_fine_stuff = (cmd, params) # FIXME WTF
         self.commands.append(tupple_of_fine_stuff)
 
     def gst_video_init(self, **args):
@@ -205,8 +205,12 @@ class AudioVideoGst(GstClient):
         self.rtp_stats[stream][stat].append( data )
         
     def start_streaming(self):
-        """function start_sending
-         address: string
+        """
+        Sends the message to milhouse so that it starts streaming. 
+        Milhouse must be already running.
+
+        function start_sending
+        address: string
         """
         self._send_command('start')
         print '\nAudioVideoGst.start_streaming() stack :'
