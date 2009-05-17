@@ -23,6 +23,7 @@
 #ifndef _LOG_WRITER_H_
 #define _LOG_WRITER_H_
 
+#include "except.h"
 #include <string>
 #include <sstream>
 #include "config.h"
@@ -37,16 +38,6 @@
 #define LOG(msg, level)     LOG_(msg,level,0)
 #endif
 
-/** higher values are more critical */
-enum LogLevel {
-    NONE = 0,
-    DEBUG = 10,
-    INFO = 20,THROW = 35, 
-    WARNING = 30,
-    ERROR = 40,
-    CRITICAL = 50,
-    ASSERT_FAIL = 60
-};
 #define THROW_ERRNO(msg,err)      THROW_(msg, ERROR,err)
 #define THROW_END_THREAD(msg)  THROW_(msg, THROW,0)
 #define THROW_ERROR(msg)      THROW_(msg, ERROR,0)
@@ -57,41 +48,6 @@ enum LogLevel {
 #define LOG_DEBUG(msg)      LOG(msg, DEBUG)
 
 #define COUT_LOG(msg)       LOG(msg, NONE)
-/** base exception class */
-class Except : public std::exception
-{
-public:
-    LogLevel log_;
-    std::string msg_;
-    int errno_;
-
-    Except(std::string log_msg,int err):log_(WARNING),msg_(log_msg),errno_(err){}
-    Except():log_(NONE),msg_(),errno_(0){}
-    virtual ~Except() throw(){}
-};
-
-/** Recovery is possible */
-class ErrorExcept : public Except
-{
-public:
-    ErrorExcept(std::string log_msg, int err=0):Except(log_msg,err){log_ = ERROR;}
-
-};
-
-/** Tries to cleanup before exit */
-class CriticalExcept : public Except
-{
-public:
-    CriticalExcept(std::string log_msg, int err=0):Except(log_msg,err){ log_ = CRITICAL;}
-};
-
-/** Assertion failed */
-class AssertExcept : public CriticalExcept
-{
-public:
-    AssertExcept(std::string log_msg):CriticalExcept(log_msg){log_ = ASSERT_FAIL;}
-};
-
 /**  
  *      Utility functions for logWriter 
  *

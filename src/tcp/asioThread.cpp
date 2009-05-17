@@ -426,19 +426,18 @@ bool tcpSendBuffer(std::string ip, int port, int id, std::string caps)
 void asio_thread::main()
 {
 
-
     try
     {
         io_service io_service;
-
         tcp_server s(io_service, port_,queue_);
 
         io_service.run();
     }
-    catch (Except)
+    catch (std::exception e)
     {
+        LOG_ERROR("caught exception:" << e.what());
     }
-
+    
 }
 
 #endif
