@@ -1995,14 +1995,15 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         prefix = sys.argv[1]
     else:
-        prefix = 'test_'
+        prefix = 'test_pulsesrc_raw_pulsesin'
 
     print "Running tests which start with '" + prefix + "'\n\n"
     # here we run all the tests thanks to the wonders of reflective programming
     tests = []
-    #tests = prefixedMethods(AudioTests(), prefix)
+    tests = prefixedMethods(AudioTests(), prefix)
     tests += prefixedMethods(VideoTests(), prefix)
-    #tests += prefixedMethods(AudioTests(), prefix)
+    tests += prefixedMethods(AudioVideoTests(), prefix)
+    tests += prefixedMethods(AudioNoJackTests(), prefix)
 
     if tests == []:
         print "No matching tests found."

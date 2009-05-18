@@ -146,8 +146,8 @@ void AudioPulseSink::init()
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
     if (config_.hasDeviceName())
         g_object_set(G_OBJECT(sink_), "device", config_.deviceName(), NULL);
-    else
-        g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
+//    else
+ //       g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
 
 
     gstlinkable::link(audioconvert_, sink_);
