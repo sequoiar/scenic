@@ -126,11 +126,7 @@ bool MainModule::run()
                 {
                     try
                     {
-                        if(tmsg.cmd() == "loglevel")
-                        {
-                            logger_.setLevel(tmsg["level"]);
-                        }
-                        else if (tmsg.cmd() == "quit")
+                        if (tmsg.cmd() == "quit")
                         {
                             MsgThread::broadcastQuit();
                             LOG_INFO("Normal Program Termination in Progress");
@@ -140,14 +136,21 @@ bool MainModule::run()
                         {
                             throw tmsg["exception"].except();
                         }
+
+                        MapMsg ret(tmsg.cmd());
+                        tmsg["id"] = ret["id"] = ++msg_count;
+
+                        if(tmsg.cmd() == "loglevel")
+                        {
+                            logger_.setLevel(tmsg["level"]);
+                        }
                         else
                         {
-                            MapMsg ret(tmsg.cmd());
-                            tmsg["id"] = ret["id"] = ++msg_count;
                             gst_queue.push(tmsg);
-                            ret["ack"] = "ok";
-                            tcp_queue.push(ret);
                         }
+
+                        ret["ack"] = "ok";
+                        tcp_queue.push(ret);
                     }
                     catch(ErrorExcept e)
                     {
