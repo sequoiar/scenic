@@ -359,7 +359,7 @@ void TheoraEncoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("theoraenc", NULL);
     setSpeedLevel(MAX_SPEED_LEVEL);
-    setQuality(INIT_QUALITY);
+    //setQuality(INIT_QUALITY);
     VideoEncoder::init();
 }
 
