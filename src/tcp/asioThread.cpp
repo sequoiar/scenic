@@ -36,7 +36,7 @@
 #include <boost/asio.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
-
+#pragma GCC diagnostic ignored "-Weffc++"
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
 using boost::asio::io_service;
