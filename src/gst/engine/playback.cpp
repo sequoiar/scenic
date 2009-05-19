@@ -68,7 +68,3 @@ bool playback::quitted()
 }
 
 
-void playback::enableControl()
-{
-    Pipeline::enableControl();
-}

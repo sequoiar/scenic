@@ -64,6 +64,8 @@ class Encoder : public Codec
         int getBitrate();
         void postBitrate();
         virtual void setBitrate(unsigned bitrate);
+    protected:
+        virtual void setBitrateInKbs(unsigned bitrate);
 };
 
 /** 

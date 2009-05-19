@@ -235,10 +235,16 @@ void H264Encoder::init()
 }
 
 
+void Encoder::setBitrateInKbs(unsigned newBitrate)
+{
+    static const double KB_PER_BIT = 0.001;
+    Encoder::setBitrate(newBitrate * KB_PER_BIT);
+}
+
 /// Overridden to convert from bit/s to kbit/s
 void H264Encoder::setBitrate(unsigned newBitrate)
 {
-    Encoder::setBitrate(newBitrate * 0.001);
+    Encoder::setBitrateInKbs(newBitrate);
 }
 
 
@@ -368,7 +374,7 @@ void TheoraEncoder::init()
 void TheoraEncoder::setBitrate(unsigned newBitrate)
 {
     //LOG_WARNING("Using quality, not bitrate. This function has no effect.");
-    Encoder::setBitrate(newBitrate * 0.001);
+    Encoder::setBitrateInKbs(newBitrate);
 }
 
 

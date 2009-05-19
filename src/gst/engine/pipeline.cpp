@@ -36,7 +36,6 @@
 // This class uses the Singleton pattern
 
 Pipeline *Pipeline::instance_ = 0;
-bool Pipeline::controlEnabled_ = false;
 
 const unsigned int Pipeline::SAMPLE_RATE = 48000;
 
@@ -54,14 +53,6 @@ Pipeline::~Pipeline()
 {
     stop();
     gst_object_unref(GST_OBJECT(pipeline_));
-    if (control_)
-    {
-        madeControl_ = false;
-        gtk_widget_destroy(control_);
-        LOG_DEBUG("RTP jitterbuffer control window destroyed");
-        control_ = 0;
-        controlEnabled_ = false;
-    }
 }
 
 
@@ -150,71 +141,9 @@ void Pipeline::init()
         bus = getBus();
         gst_bus_add_watch(bus, GstBusFunc(bus_call), static_cast<gpointer>(this));
         gst_object_unref(bus);
-        if (controlEnabled_)
-            createControl();
     }
 }
 
-
-void Pipeline::createControl()
-{
-    if (madeControl_)
-    {
-        LOG_WARNING("Control already created, not doing it again");
-        return;
-    }
-    
-    static bool gtk_initialized = false;
-    if (!gtk_initialized)
-    {
-        gtk_init(0, NULL);
-        gtk_initialized = true;
-    }
-    
-    GtkWidget *box1;
-    GtkWidget *playButton;
-    const int WIDTH = 100;
-    const int HEIGHT = 70;
-
-    /* Standard window-creating stuff */
-    GtkWidget *control = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    playButton = gtk_button_new_with_label("Pause");
-    gtk_window_set_default_size(GTK_WINDOW(control), WIDTH, HEIGHT);
-    gtk_window_set_title (GTK_WINDOW (control), "Playback control");
-
-    box1 = gtk_vbox_new (FALSE, 0);
-    gtk_container_add (GTK_CONTAINER (control), box1);
-
-    gtk_signal_connect (GTK_OBJECT (playButton), "clicked",
-            GTK_SIGNAL_FUNC(playButtonCb), NULL);
-
-    gtk_box_pack_start (GTK_BOX (box1), playButton, TRUE, TRUE, 0);
-    gtk_widget_show (playButton);
-    gtk_widget_show (box1);
-    gtk_widget_show (control);
-
-    madeControl_ = true;
-}
-
-
-void Pipeline::playButtonCb(GtkButton *button)
-{
-    gchar *label;
-    g_object_get(button, "label", &label, NULL);
-
-    if (std::string(label) == "Play")
-    {
-        gtk_button_set_label(button, "Pause");
-        Instance()->start();
-        LOG_DEBUG("Playing");
-    }
-    else if (std::string(label) == "Pause")
-    {
-        gtk_button_set_label(button, "Play");
-        Instance()->pause();
-        LOG_DEBUG("Paused");
-    }
-}
 
 
 // This can be a class method or a member method, it's a class method for the sake of 

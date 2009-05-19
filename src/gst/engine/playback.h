@@ -31,7 +31,6 @@ namespace playback {
         void makeVerbose();
         void quit();
         bool quitted();
-        void enableControl();
 }
 
 #endif // _PLAYBACK_H_

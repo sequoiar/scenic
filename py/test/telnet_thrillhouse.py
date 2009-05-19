@@ -780,6 +780,18 @@ class AudioNoJackTests(object):
 class AudioVideoTests(object):
     def __init__(self):
         pass
+
+    def smoke_test(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        txAudioArg.channels = 8
+        txAudioArg.source = 'jackaudiosrc'
+        rxAudioArg.sink = 'jackaudiosink'
+        txVideoArg.source = 'v4l2src'
+        rxVideoArg.sink = 'xvimagesink'
+        rxAudioArg.codec = txAudioArg.codec = 'raw'
+        rxVideoArg.codec = txVideoArg.codec = 'theora'
+        proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
     def test_audiotestsrc_raw_jackaudiosink_videotestsrc_mpeg4_xvimagesink(self):
         rxAudioArg, txAudioArg = argfactory('audio')

@@ -70,8 +70,8 @@ class AudioAlsaSink : public AudioSink
         void init();
         /** Returns this AudioAlsaSink's sink, which is an audioconverter, as 
          * raw-audio conversion happens before audio is output to ALSA */
-        _GstElement *sinkElement() { return audioconvert_; }
-        _GstElement *audioconvert_;
+        _GstElement *sinkElement() { return aconv_; }
+        _GstElement *aconv_;
 
         const AudioSinkConfig &config_;
 
@@ -89,8 +89,8 @@ class AudioPulseSink : public AudioSink
         ~AudioPulseSink();
     private:
         void init();
-        _GstElement *sinkElement() { return audioconvert_; }
-        _GstElement *audioconvert_;
+        _GstElement *sinkElement() { return aconv_; }
+        _GstElement *aconv_;
         const AudioSinkConfig &config_;
         /// No Copy Constructor
         AudioPulseSink(const AudioPulseSink&);     

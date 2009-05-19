@@ -118,7 +118,6 @@ short pof::run(int argc, char **argv)
             RtpReceiver::enableControl();
         else if (options["sender"])   // sender
             RtpSender::enableControl();
-        //playback::enableControl();  // still doesn't work properly
     }
 
     int disableVideo = !options["videocodec"] and !options["videoport"];

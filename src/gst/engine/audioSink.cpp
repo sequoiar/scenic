@@ -99,13 +99,13 @@ void AudioSink::adjustBufferTime(unsigned long long bufferTime)
 
 /// Constructor 
 AudioAlsaSink::AudioAlsaSink(const AudioSinkConfig &config) : 
-    audioconvert_(0), config_(config)
+    aconv_(0), config_(config)
 {}
 
 /// Destructor
 AudioAlsaSink::~AudioAlsaSink()
 {
-    Pipeline::Instance()->remove(&audioconvert_);
+    Pipeline::Instance()->remove(&aconv_);
 }
 
 void AudioAlsaSink::init()
@@ -113,7 +113,7 @@ void AudioAlsaSink::init()
     if (Jack::is_running())
         THROW_CRITICAL("Jack is running, you must stop jack server before using alsasink");
 
-    audioconvert_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     sink_ = Pipeline::Instance()->makeElement("alsasink", NULL);
 
@@ -124,23 +124,23 @@ void AudioAlsaSink::init()
         g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
 
 
-    gstlinkable::link(audioconvert_, sink_);
+    gstlinkable::link(aconv_, sink_);
 }
 
 /// Constructor 
 AudioPulseSink::AudioPulseSink(const AudioSinkConfig &config) : 
-    audioconvert_(0), config_(config) 
+    aconv_(0), config_(config) 
 {}
 
 /// Destructor 
 AudioPulseSink::~AudioPulseSink()
 {
-    Pipeline::Instance()->remove(&audioconvert_);
+    Pipeline::Instance()->remove(&aconv_);
 }
 
 void AudioPulseSink::init()
 {
-    audioconvert_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
 
     sink_ = Pipeline::Instance()->makeElement("pulsesink", NULL);
     g_object_set(G_OBJECT(sink_), "buffer-time", config_.bufferTime(), NULL);
@@ -150,7 +150,7 @@ void AudioPulseSink::init()
  //       g_object_set(G_OBJECT(sink_), "device", alsa::DEVICE_NAME, NULL);
 
 
-    gstlinkable::link(audioconvert_, sink_);
+    gstlinkable::link(aconv_, sink_);
 }
 
 /// Constructor 

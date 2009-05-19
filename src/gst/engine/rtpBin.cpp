@@ -83,7 +83,7 @@ void RtpBin::printStatsVal(const std::string &idStr, const char *key, const std:
         THROW_ERROR("Unexpected type");
 
     mapMsg["stats"] = idStr + paramStr.str();
-    LOG_DEBUG(mapMsg["stats"]);
+    LOG_INFO(mapMsg["stats"]);
     mapMsg.post();
 }
 

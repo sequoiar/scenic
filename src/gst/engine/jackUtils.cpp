@@ -40,10 +40,7 @@ bool Jack::is_running()
     client = jack_client_open ("AudioJackSource", JackNoStartServer, &status);
 
     if (client == NULL and (status & JackServerFailed))
-    {
-        LOG_DEBUG("JACK server not running");
         return false;
-    }
     if (client == NULL) 
     {
         switch (status)
