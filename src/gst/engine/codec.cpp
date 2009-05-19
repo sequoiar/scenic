@@ -192,7 +192,7 @@ void VideoDecoder::init()
 void VideoDecoder::adjustJitterBuffer() 
 {
     if (doDeinterlace_)
-        RtpReceiver::setLatency(JITTER_BUFFER_MS);
+        RtpReceiver::setLatency(LONGER_JITTER_BUFFER_MS);
 }
 
 
@@ -266,7 +266,7 @@ RtpPay* H264Decoder::createDepayloader() const
 /// Increase jitterbuffer size
 void H264Decoder::adjustJitterBuffer() 
 {
-    RtpReceiver::setLatency(JITTER_BUFFER_MS);
+    RtpReceiver::setLatency(LONGER_JITTER_BUFFER_MS);
 }
 
 
@@ -358,18 +358,39 @@ TheoraEncoder::~TheoraEncoder()
 void TheoraEncoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("theoraenc", NULL);
-    g_object_set(G_OBJECT(codec_), "speed-level", MAX_SPEED_LEVEL, NULL);
-    g_object_set(G_OBJECT(codec_), "quality", QUALITY, NULL);
+    setSpeedLevel(MAX_SPEED_LEVEL);
+    setQuality(INIT_QUALITY);
     VideoEncoder::init();
 }
 
 
 /// Overridden to convert from bit/s to kbit/s
-void TheoraEncoder::setBitrate(unsigned /*newBitrate*/)
+void TheoraEncoder::setBitrate(unsigned newBitrate)
 {
-    LOG_WARNING("Using quality, not bitrate. This function has no effect.");
-    //Encoder::setBitrate(newBitrate * 0.001);
+    //LOG_WARNING("Using quality, not bitrate. This function has no effect.");
+    Encoder::setBitrate(newBitrate * 0.001);
 }
+
+
+// theora specific
+void TheoraEncoder::setQuality(int quality)
+{
+    tassert(codec_ != 0);
+    if (quality < MIN_QUALITY or quality > MAX_QUALITY)
+        THROW_ERROR("Quality must be in range [" << MIN_QUALITY << "-" << MAX_QUALITY << "]");
+    g_object_set(codec_, "quality", quality, NULL);
+}
+
+
+// theora specific
+void TheoraEncoder::setSpeedLevel(int speedLevel)
+{
+    tassert(codec_ != 0);
+    if (speedLevel < MIN_SPEED_LEVEL or speedLevel > MAX_SPEED_LEVEL)
+        THROW_ERROR("Speed-level must be in range [" << MIN_SPEED_LEVEL << "-" << MAX_SPEED_LEVEL << "]");
+    g_object_set(codec_, "speed-level", speedLevel, NULL);
+}
+
 
 
 RtpPay* TheoraEncoder::createPayloader() const

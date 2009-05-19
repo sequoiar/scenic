@@ -138,7 +138,7 @@ bool Jack::autoForcedSupported(GstElement *jackElement)
 
 
 /// Check that jack is running and is at the right sample rate
-void Jack::ensureReady()
+void Jack::assertReady()
 {
     if (!Jack::is_running())
         THROW_CRITICAL("Jack is not running");

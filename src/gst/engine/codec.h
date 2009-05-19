@@ -156,7 +156,7 @@ class VideoDecoder : public Decoder
         _GstElement *colorspc_;
         _GstElement *deinterlace_;
         _GstElement *queue_;
-        static const unsigned long long JITTER_BUFFER_MS = 60;
+        static const unsigned long long LONGER_JITTER_BUFFER_MS = 60;
 
     private:
         const static int MAX_QUEUE_BUFFERS = 3;
@@ -177,7 +177,7 @@ class H264Encoder : public VideoEncoder
 {
     public: 
         H264Encoder();
-        void setBitrate(unsigned);
+        void setBitrate(unsigned bitrate);
 
     private:
         ~H264Encoder();
@@ -248,12 +248,16 @@ class TheoraEncoder : public VideoEncoder
     public:
         TheoraEncoder();
         ~TheoraEncoder();
-        void setBitrate(unsigned);
+        void setBitrate(unsigned bitrate);
+        void setQuality(int quality);
+        void setSpeedLevel(int speedLevel);
 
     private:
         static const int MAX_SPEED_LEVEL = 2;
         static const int MIN_SPEED_LEVEL = 0;
-        static const int QUALITY = 20;
+        static const int MIN_QUALITY = 0;
+        static const int MAX_QUALITY = 63;  // defined in plugin
+        static const int INIT_QUALITY = 20;
         void init();
         RtpPay* createPayloader() const;
 };

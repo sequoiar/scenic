@@ -38,7 +38,7 @@ AudioSourceConfig::AudioSourceConfig(const std::string & source__,
     if(numChannels_ < 1 or numChannels_ > 8)
         THROW_CRITICAL("Invalid number of channels");
     if (source_ == "jackaudiosrc")  // FIXME: this has to happen early but it's gross to have it here
-        Jack::ensureReady();
+        Jack::assertReady();
 }
 
 
@@ -107,7 +107,7 @@ AudioSinkConfig::AudioSinkConfig(const std::string & sink__, const std::string &
     sink_(sink__), deviceName_(deviceName__), bufferTime_(bufferTime__)
 {
     if (sink_ == "jackaudiosink") // FIXME: it's good for this to happen early 
-        Jack::ensureReady();      // (before waiting on caps) but having it here is pretty gross
+        Jack::assertReady();      // (before waiting on caps) but having it here is pretty gross
 }
 
 /// Copy constructor 
