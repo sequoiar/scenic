@@ -165,7 +165,7 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
 #ifdef CONFIG_DEBUG_LOCAL
         ptime now = microsec_clock::local_time();
         if(level >= INFO and level < WARNING)
-            logMsg << now << " --- " << msg << std::endl;
+            logMsg << now << ":" << logLevelStr(level) << ":" << msg << std::endl;
         else
             logMsg << now << ":line" << std::setfill('0') << std::setw(5) << lineNum << ":" << functionName 
                 <<  "():" << fileName << ":" << logLevelStr(level) << ":" << msg << std::endl;
