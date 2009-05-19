@@ -153,8 +153,9 @@ bool logLevelMatch(LogLevel level)
         return false;
 }
 
-#include <iomanip>
-
+#include<iomanip>
+#include<boost/date_time/posix_time/posix_time.hpp>
+using namespace boost::posix_time;
 std::string log_(const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, int lineNum)
 {
@@ -162,16 +163,23 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
     if (logLevelMatch(level))
     {
 #ifdef CONFIG_DEBUG_LOCAL
+        ptime now = microsec_clock::local_time();
+        if(level >= INFO and level < WARNING)
+            logMsg << now << " --- " << msg << std::endl;
+        else
+            logMsg << now << ":line" << std::setfill('0') << std::setw(5) << lineNum << ":" << functionName 
+                <<  "():" << fileName << ":" << logLevelStr(level) << ":" << msg << std::endl;
+#if 0
         time_t rawtime;
         time( &rawtime );
         struct tm * timeinfo = localtime(&rawtime);
-        //asctime adds a linefeed
         logMsg << std::setfill('0') << std::setw(2) 
             << timeinfo->tm_hour <<":"<< std::setw(2) << timeinfo->tm_min 
-            <<":" << std::setw(2) << timeinfo->tm_sec 
+            <<":" << std::setw(2) << timeinfo->tm_sec << std::setw(2) << timeinfo->tm_millisec << 
             << ":line" << std::setfill('0') << std::setw(5) << lineNum  
             << ":" << functionName <<  "():" << fileName 
             << ":" << logLevelStr(level) << ":" << msg << std::endl;
+#endif
 #else
         logMsg <<  msg <<  std::endl;
 #endif
