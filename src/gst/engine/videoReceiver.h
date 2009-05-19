@@ -38,9 +38,8 @@ class VideoReceiver
     public:
         VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig rConfig);
 
-        void makeFullscreen();
-
         ~VideoReceiver();
+        void toggleFullscreen();
 
     private:
 

@@ -40,6 +40,7 @@ class VideoSink : public GstLinkableSink
         virtual void init() = 0;
         virtual void makeFullscreen() = 0;
         virtual void makeUnfullscreen() = 0; 
+        virtual void toggleFullscreen() = 0; 
         void destroySink();
 
     protected:
@@ -58,6 +59,7 @@ class GtkVideoSink
        GtkVideoSink(int screen_num)
             : window_(0), screen_num_(screen_num) {};
         virtual ~GtkVideoSink(){};
+        void toggleFullscreen() { toggleFullscreen(window_); }
         void makeFullscreen() { makeFullscreen(window_); }
         void makeUnfullscreen() { makeUnfullscreen(window_); }
         void showWindow();
@@ -114,6 +116,7 @@ class XImageSink
         ~XImageSink();
         void init();
         // FIXME: need to implement this support in ximagesink
+        void toggleFullscreen() {}
         void makeFullscreen() {}
         void makeUnfullscreen() {}
 

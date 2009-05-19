@@ -173,7 +173,7 @@ short pof::run(int argc, char **argv)
         if (!disableVideo)
         {
             if(options["fullscreen"])
-                vRx->makeFullscreen();
+                vRx->toggleFullscreen();
         }
 
         int timeout = 0;    // default: run indefinitely
