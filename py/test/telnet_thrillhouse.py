@@ -93,12 +93,10 @@ def runClients(rxTn, txTn, args):
         txTn.write(txVideoArg + '\n')
         txTn.read_until('video_init: ack="ok"')
     
-
     rxTn.write('start:\n')
     rxTn.read_until('start: ack="ok"')
     txTn.write('start:\n')
     txTn.read_until('start: ack="ok"')
-
 
     # let the test run a bit
     TEST_LENGTH = 20
@@ -776,6 +774,67 @@ class AudioNoJackTests(object):
         for channel in xrange(1, 3):
             txAudioArg.channels = channel
             proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+    
+    def test_audiotestsrc_mp3_pulsesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "pulsesink"
+        txAudioArg.source = "audiotestsrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+    
+    def test_audiotestsrc_mp3_alsasink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "alsasink"
+        txAudioArg.source = "audiotestsrc"
+        rxAudioArg.codec = "mp3"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 3):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+    
+    def test_audiotestsrc_raw_pulsesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "pulsesink"
+        txAudioArg.source = "audiotestsrc"
+        rxAudioArg.codec = "raw"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 6):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+    
+    def test_audiotestsrc_raw_alsasink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "alsasink"
+        txAudioArg.source = "audiotestsrc"
+        rxAudioArg.codec = "raw"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 8):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+    
+    def test_audiotestsrc_vorbis_alsasink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "alsasink"
+        txAudioArg.source = "audiotestsrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 8):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+    
+    def test_audiotestsrc_vorbis_pulsesink(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxAudioArg.sink = "pulsesink"
+        txAudioArg.source = "audiotestsrc"
+        rxAudioArg.codec = "vorbis"
+        txAudioArg.codec = rxAudioArg.codec
+        for channel in xrange(1, 6):
+            txAudioArg.channels = channel
+            proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg))
+    
 
 class AudioVideoTests(object):
     def __init__(self):
@@ -2007,7 +2066,7 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         prefix = sys.argv[1]
     else:
-        prefix = 'test_pulsesrc_raw_pulsesin'
+        prefix = 'test_audiotestsrc_mp3_alsasin'
 
     print "Running tests which start with '" + prefix + "'\n\n"
     # here we run all the tests thanks to the wonders of reflective programming
