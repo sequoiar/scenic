@@ -38,8 +38,6 @@ class VideoSink : public GstLinkableSink
        VideoSink() : sink_(0) {};
         virtual ~VideoSink(){};
         virtual void init() = 0;
-        virtual void makeFullscreen() = 0;
-        virtual void makeUnfullscreen() = 0; 
         virtual void toggleFullscreen() = 0; 
         void destroySink();
 
@@ -60,8 +58,6 @@ class GtkVideoSink
             : window_(0), screen_num_(screen_num) {};
         virtual ~GtkVideoSink(){};
         void toggleFullscreen() { toggleFullscreen(window_); }
-        void makeFullscreen() { makeFullscreen(window_); }
-        void makeUnfullscreen() { makeUnfullscreen(window_); }
         void showWindow();
 
         
@@ -78,7 +74,6 @@ class GtkVideoSink
         static void makeFullscreen(_GtkWidget *widget);
         static void makeUnfullscreen(_GtkWidget *widget);
         static void toggleFullscreen(_GtkWidget *widget);
-        static void milhouseify(_GtkWidget *widget);
 
     private:
 
@@ -115,10 +110,8 @@ class XImageSink
     private:
         ~XImageSink();
         void init();
-        // FIXME: need to implement this support in ximagesink
+        // FIXME: need to implement this support in ximagesink. maybe impossible?
         void toggleFullscreen() {}
-        void makeFullscreen() {}
-        void makeUnfullscreen() {}
 
         _GstElement *sinkElement() { return colorspc_; }
         _GstElement *colorspc_;

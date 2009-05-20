@@ -2,7 +2,6 @@
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
- *
  * This file is part of [propulse]ART.
  *
  * [propulse]ART is free software: you can redistribute it and/or modify
@@ -74,18 +73,6 @@ void GtkVideoSink::showWindow()
 }
 
 
-void GtkVideoSink::milhouseify(GtkWidget *widget)
-{
-    static gboolean milhouseified = FALSE;
-
-    if (milhouseified == FALSE)
-    {
-        // add a nice background
-        gtk_widget_set_name(widget, "window");
-        gtk_rc_parse("milhouse.rc");
-    }
-}
-
 void GtkVideoSink::toggleFullscreen(GtkWidget *widget)
 {
     // FIXME: this could be flipped if the window manager changes the fullscreen state
@@ -127,10 +114,6 @@ gboolean XvImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             toggleFullscreen(widget);
             break;
 
-        case GDK_M:
-            //milhouseify(widget);
-            break;
-
         case GDK_Q:
             // Quit application, this quits the main loop
             // (if there is one)
@@ -156,7 +139,7 @@ bool XvImageSink::handleBusMsg(GstMessage * message)
         return false;
  
     LOG_DEBUG("Got prepare-xwindow-id msg");
-    gst_x_overlay_set_xwindow_id (GST_X_OVERLAY(GST_MESSAGE_SRC(message)), GDK_WINDOW_XWINDOW(window_->window));
+    gst_x_overlay_set_xwindow_id(GST_X_OVERLAY(GST_MESSAGE_SRC(message)), GDK_WINDOW_XWINDOW(window_->window));
   
     return true;
 }
