@@ -154,7 +154,7 @@ bool MainModule::run()
                     }
                     catch(ErrorExcept e)
                     {
-                        LOG_DEBUG("MAIN LOOP EXCEPT:" << e.msg_);
+                        LOG_DEBUG("MAIN LOOP EXCEPT:" << e.what());
                     }
                     tmsg = tcp_queue.timed_pop(1);
                 }
@@ -165,9 +165,9 @@ bool MainModule::run()
     catch(ErrorExcept e)
     {
         static int count = 0;
-        LOG_WARNING("Abnormal Main Exception:" << e.msg_);
-        if (++count > 100)
-            throw Except(e);
+        LOG_WARNING("Abnormal Main Exception:" << e.what());
+        if (++count > 5)
+            throw e;
         return -1;
     }
     return 0;
@@ -183,10 +183,10 @@ int telnetServer(int s,int p)
         m.run();
         
     }
-    catch(Except e)
+    catch(std::exception e)
     {
-        if (e.log_ == ASSERT_FAIL)
-            return 1;
+        LOG_ERROR("Major Exception:" << e.what());
+        return 1;
     }
 
     return 0;

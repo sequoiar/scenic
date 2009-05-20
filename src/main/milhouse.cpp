@@ -255,7 +255,7 @@ short pof::run(int argc, char **argv)
 
 void onExit(void)
 {
-    ;//LOG_INFO("\x1b[r\x1b[10BBuilt on " << __DATE__ << " at " << __TIME__);
+    std::cout << "bye." << std::endl;
 }
 
 
@@ -263,17 +263,16 @@ int main(int argc, char **argv)
 {
     int ret = 0;
     atexit (onExit);
-    //LOG_INFO("\x1b[0;10r\x1b[2JBuilt on " << __DATE__ << " at " << __TIME__);
+    LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
     try {
         set_handler();
         ret = pof::run(argc, argv);
     }
-    catch (Except e)
+    catch (std::exception e)
     {
-        std::cout << e.msg_ << std::endl;
+        std::cout << "Main Thread LEAVING with exception: " << e.what() << std::endl;
         ret = 1;
     }
-    //LOG_INFO("\x1b[r\x1b[10BBuilt on " << __DATE__ << " at " << __TIME__);
     return ret;
 }
 

@@ -73,9 +73,10 @@ void GstThread::handleMsg(MapMsg &msg)
         {
             MapMsg r("failure");
             r["id"] = msg["id"];
-            r["errmsg"] = e.msg_;
+            r["errmsg"] = e.what();
             queue_.push(r);
         }
+        
     }
     else if(s == "stop")
     {
@@ -100,7 +101,7 @@ void GstThread::handleMsg(MapMsg &msg)
         {
             MapMsg r("failure");
             r["id"] = msg["id"];
-            r["errmsg"] = e.msg_;
+            r["errmsg"] = e.what();
             queue_.push(r);
         }
     }
@@ -193,9 +194,9 @@ void GstReceiverThread::video_init(MapMsg& msg)
 
         video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], SCREEN, VIDEO_SINK, msg["deinterlace"]);
     }
-    catch(Except e)
+    catch(ErrorExcept e)
     {
-        LOG_WARNING(e.msg_);
+        LOG_WARNING(e.what());
         delete video_;
         video_ = 0;
         throw(e);
@@ -227,7 +228,7 @@ void GstReceiverThread::audio_init(MapMsg& msg)
         audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], 
                 AUDIO_SINK, AUDIO_LOCATION, audioBufferTime);
     }
-    catch(Except e)
+    catch(ErrorExcept e)
     {
         delete audio_;
         audio_ = 0;
@@ -265,9 +266,9 @@ void GstSenderThread::video_init(MapMsg& msg)
 
         ff[0] = boost::bind(tcpSendBuffer, msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, videofactory::MSG_ID, _1);
     }
-    catch(Except e)
+    catch(ErrorExcept e)
     {
-        LOG_WARNING(e.msg_);
+        LOG_WARNING(e.what());
         delete video_;
         video_ = 0;
         throw(e);
@@ -294,9 +295,9 @@ void GstSenderThread::audio_init(MapMsg& msg)
          
         ff[1] = boost::bind(tcpSendBuffer, msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, audiofactory::MSG_ID, _1);
     }
-    catch(Except e)
+    catch(ErrorExcept e)
     {
-        LOG_WARNING(e.msg_);
+        LOG_ERROR(e.what());
         delete audio_;
         audio_ = 0;
         throw(e);

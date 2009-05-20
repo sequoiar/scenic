@@ -39,8 +39,8 @@ bool logLevelIsValid(LogLevel level)
         case DEBUG:
         case INFO:
         case WARNING:
-        case THROW:
         case ERROR:
+        case THROW: 
         case CRITICAL:
         case ASSERT_FAIL:
             return true;
@@ -145,7 +145,7 @@ Log::Subscriber::Subscriber()
     lf = this;
 }
 
-bool logLevelMatch(LogLevel level)
+bool xlogLevelMatch(LogLevel level)
 {
     if (level >= LOG_LEVEL && logLevelIsValid(level))
         return true;
@@ -160,59 +160,40 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
                 const std::string &functionName, int lineNum)
 {
     std::ostringstream logMsg;
-    if (logLevelMatch(level))
-    {
 #ifdef CONFIG_DEBUG_LOCAL
-        ptime now = microsec_clock::local_time();
-        if(level >= INFO and level < WARNING)
-            logMsg << now << ":" << logLevelStr(level) << ":" << msg << std::endl;
-        else
-            logMsg << now << ":line" << std::setfill('0') << std::setw(5) << lineNum << ":" << functionName 
-                <<  "():" << fileName << ":" << logLevelStr(level) << ":" << msg << std::endl;
-#if 0
-        time_t rawtime;
-        time( &rawtime );
-        struct tm * timeinfo = localtime(&rawtime);
-        logMsg << std::setfill('0') << std::setw(2) 
-            << timeinfo->tm_hour <<":"<< std::setw(2) << timeinfo->tm_min 
-            <<":" << std::setw(2) << timeinfo->tm_sec << std::setw(2) << timeinfo->tm_millisec << 
-            << ":line" << std::setfill('0') << std::setw(5) << lineNum  
-            << ":" << functionName <<  "():" << fileName 
-            << ":" << logLevelStr(level) << ":" << msg << std::endl;
-#endif
+    ptime now = microsec_clock::local_time();
+    if(level >= INFO and level < WARNING)
+        logMsg << now << ":" << logLevelStr(level) << ":" << msg << std::endl;
+    else
+        logMsg << now << ":line" << std::setfill('0') << std::setw(5) << lineNum << ":" << functionName 
+            <<  "():" << fileName << ":" << logLevelStr(level) << ":" << msg << std::endl;
 #else
-        logMsg <<  msg <<  std::endl;
+    logMsg <<  msg <<  std::endl;
 #endif
-    }
 
     return logMsg.str();
 }
 
-
+//TODO DOCUMENT THIS
 void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, int lineNum,int err)
 {
     std::string strerr = log_(msg,level,fileName,functionName,lineNum);
 
-    if(err == -1)
-        throw(Except(msg,0));
-    if(!hold_flag)
+    if(err == -1) //TODO Is this used?
+        throw(Except(msg.c_str(),0));
+
+    if(!hold_flag)//TODO check logger  
         (*lf)(level,strerr);
      
-    if(level == DEBUG || level == INFO)
-    {
-//        std::cout << strerr;
-        return;
-    }
-//    std::cerr << strerr;
     if(level < THROW)
         return;
 
     if(level < CRITICAL)
-        throw(ErrorExcept(strerr,err));
+        throw(ErrorExcept(strerr.c_str(),err));
     if(level < ASSERT_FAIL)
-        throw(CriticalExcept(strerr,err));
-    throw(AssertExcept(strerr));
+        throw(CriticalExcept(strerr.c_str()));
+    throw(AssertExcept(strerr.c_str()));
 
 }
 #define BACKTRACE
@@ -222,8 +203,8 @@ void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &
 #include <cxxabi.h>
 #include <dlfcn.h>
 #include <stdlib.h>
-void assert_throw(__const char *__assertion, __const char *__file,
-                           unsigned int __line, __const char *__function)
+
+void backtrace()
 {
     void *trace[16];
     char **messages = (char **)NULL;
@@ -249,13 +230,13 @@ void assert_throw(__const char *__assertion, __const char *__file,
         if (demangled)
             free(demangled);
     }
-    cerr_log_throw( __assertion, ASSERT_FAIL, __file, __function, __line,0);
 }
 #else
-
+void backtrace(){}
+#endif
 void assert_throw(__const char *__assertion, __const char *__file,
                            unsigned int __line, __const char *__function)
 {
+    backtrace();
     cerr_log_throw( __assertion, ASSERT_FAIL, __file, __function, __line,0);
 }
-#endif

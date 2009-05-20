@@ -37,13 +37,14 @@
  */
 
 
-/// higher values are more important 
+/// higher values are more severe 
 enum LogLevel {
     NONE = 0,
     DEBUG = 10,
-    INFO = 20,THROW = 35, 
+    INFO = 20,
     WARNING = 30,
     ERROR = 40,
+    THROW = 45,         //those below throw 
     CRITICAL = 50,
     ASSERT_FAIL = 60
 };
@@ -53,20 +54,23 @@ class Except : public virtual std::exception
 {
 public:
     LogLevel log_;
-    std::string msg_;
-    int errno_;
+    int errno_; //TODO used?
 
-    Except(std::string log_msg,int err):log_(WARNING),msg_(log_msg),errno_(err){}
-    Except():log_(NONE),msg_(),errno_(0){}
-    const char * what(){ return msg_.c_str();}
-    virtual ~Except() throw(){}
+    Except(const char* log_msg,int err):log_(WARNING),errno_(err){
+        for(int i=0;i<256 and log_msg[i];++i)
+            buff[i] = log_msg[i];
+    }
+    Except():log_(NONE),errno_(0){}
+    char buff[256];
+    const char * what(){ return buff;}
+    virtual ~Except() throw() {}
 };
 
-/** Recovery is possible */
+/** Recovery should be possible */
 class ErrorExcept : public Except
 {
 public:
-    ErrorExcept(std::string log_msg, int err=0):Except(log_msg,err){log_ = ERROR;}
+    ErrorExcept(const char* log_msg, int err=0):Except(log_msg,err){log_ = ERROR;}
 
 };
 
@@ -74,14 +78,14 @@ public:
 class CriticalExcept : public Except
 {
 public:
-    CriticalExcept(std::string log_msg, int err=0):Except(log_msg,err){ log_ = CRITICAL;}
+    CriticalExcept(const char* log_msg, int err=0):Except(log_msg,err){ log_ = CRITICAL;}
 };
 
 /** Assertion failed */
 class AssertExcept : public CriticalExcept
 {
 public:
-    AssertExcept(std::string log_msg):CriticalExcept(log_msg){log_ = ASSERT_FAIL;}
+    AssertExcept(const char* log_msg):CriticalExcept(log_msg){log_ = ASSERT_FAIL;}
 };
 
 #endif
