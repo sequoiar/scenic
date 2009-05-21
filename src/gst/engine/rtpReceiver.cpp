@@ -58,7 +58,6 @@ RtpReceiver::~RtpReceiver()
     // make sure we found it and remove it
     tassert(iter != depayloaders_.end());
     depayloaders_.erase(iter);
-    sessionNames_.erase(sessionId_);
 
     if (control_)
     {
@@ -101,10 +100,7 @@ void RtpReceiver::checkSampleRate()
 
 void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, void * /* data*/)
 {
-    // FIXME: Once this callback is attached to the pad-added signal, it gets called like crazy, any time any pad
-    // is added (regardless of whether or not it's a dynamic pad) to rtpbin.
-    //GstElement *depayloader = static_cast<GstElement*>(data);
-
+    static const std::string expectedPadPrefix = "recv_rtp_src";
     if (gst_pad_is_linked(srcPad))
     {
         LOG_DEBUG("Pad is already linked");
@@ -114,8 +110,8 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
     {
         LOG_DEBUG("Pad is not a source");
         return;
-    }
-    else if (std::string(gst_pad_get_name(srcPad)).compare(0,12,"recv_rtp_src"))
+    } // don't look at the full name
+    else if (std::string(gst_pad_get_name(srcPad)).compare(0, expectedPadPrefix.length(), expectedPadPrefix))
     {
         LOG_DEBUG("Wrong pad");
         return;
@@ -175,7 +171,7 @@ GstPad *RtpReceiver::getMatchingDepayloaderSinkPad(GstPad *srcPad)
 void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 {
     RtpBin::init();
-    sessionNames_[sessionId_] = config.codec();
+    registerSession(config.codec());
 
     // KEEP THIS LOW OR SUFFER THE CONSEQUENCES
     // rule of thumb: 2-3 times the maximum network jitter
@@ -290,13 +286,13 @@ void RtpReceiver::createLatencyControl()
 }
 
 
-void RtpReceiver::subParseSourceStats(const std::string &idStr, GstStructure *stats)
+void RtpReceiver::subParseSourceStats(GstStructure *stats)
 {
     const GValue *val = gst_structure_get_value(stats, "internal");
     if (g_value_get_boolean(val))   // is-internal
         return;
     
-    printStatsVal(idStr, "octets-received", "guint64", ":OCTETS-RECEIVED:", stats);
-    printStatsVal(idStr, "packets-received", "guint64", ":PACKETS-RECEIVED:", stats);
+    printStatsVal(sessionName_, "octets-received", "guint64", ":OCTETS-RECEIVED:", stats);
+    printStatsVal(sessionName_, "packets-received", "guint64", ":PACKETS-RECEIVED:", stats);
 }
 

@@ -42,7 +42,7 @@ int RtpBin::sessionCount_ = 0;
 bool RtpBin::destroyed_ = false;
 
 
-std::map<int, std::string> RtpBin::sessionNames_;
+std::map<int, RtpBin*> RtpBin::sessions_;
 
 void RtpBin::init()
 {
@@ -54,7 +54,7 @@ void RtpBin::init()
         // uncomment this to print stats
         g_timeout_add(REPORTING_PERIOD_MS /* ms */, 
                 static_cast<GSourceFunc>(printStatsCallback),
-                static_cast<gpointer>(this));
+                NULL);
     }
     // DON'T USE THE DROP-ON-LATENCY SETTING, WILL CAUSE AUDIO TO DROP OUT WITH LITTLE OR NO FANFARE
 }
@@ -88,11 +88,9 @@ void RtpBin::printStatsVal(const std::string &idStr, const char *key, const std:
 }
 
 
-void RtpBin::parseSourceStats(GObject * source, int sessionId, RtpBin *context)
+void RtpBin::parseSourceStats(GObject * source, RtpBin *context)
 {
     GstStructure *stats;
-    std::stringstream idStr;
-    idStr << sessionNames_[sessionId] << "_" << sessionId;
 
     // get the source stats
     g_object_get(source, "stats", &stats, NULL);
@@ -101,7 +99,7 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId, RtpBin *context)
     // gchar *str = gst_structure_to_string (stats);
     // g_print ("source stats: %s\n", str);
 
-    context->subParseSourceStats(idStr.str(), stats);  // let our subclasses parse the stats
+    context->subParseSourceStats(stats);  // let our subclasses parse the stats
 
     // free structures
     gst_structure_free (stats);
@@ -110,7 +108,7 @@ void RtpBin::parseSourceStats(GObject * source, int sessionId, RtpBin *context)
 
 
 // callback to print the rtp stats 
-gboolean RtpBin::printStatsCallback(gpointer data)
+gboolean RtpBin::printStatsCallback(gpointer /*data*/)
 {
     if (sessionCount_ <= 0) // no sessions o print yet
         return TRUE; 
@@ -126,12 +124,10 @@ gboolean RtpBin::printStatsCallback(gpointer data)
     GValue *val;
     guint i;
 
-    RtpBin *context = static_cast<RtpBin*>(data);
-
     // get sessions
     for (int sessionId = 0; sessionId < sessionCount_; ++sessionId)
     {
-        g_signal_emit_by_name(context->rtpbin_, "get-internal-session", sessionId, &session);
+        g_signal_emit_by_name(rtpbin_, "get-internal-session", sessionId, &session);
 
         // parse stats of all the sources in the session, this include the internal source
         g_object_get(session, "sources", &arrayOfSources, NULL);
@@ -143,7 +139,7 @@ gboolean RtpBin::printStatsCallback(gpointer data)
             val = g_value_array_get_nth(arrayOfSources, i);
             source = static_cast<GObject*>(g_value_get_object(val));
 
-            parseSourceStats(source, sessionId, context);
+            parseSourceStats(source, sessions_[sessionId]);
         }
         g_value_array_free(arrayOfSources);
 
@@ -168,16 +164,32 @@ const char *RtpBin::padStr(const char *padName)
 
 RtpBin::~RtpBin()
 {
-    Pipeline::Instance()->remove(&rtcp_sender_);
+    unregisterSession();
+    Pipeline::Instance()->remove(&rtcp_sender_);    // a pair for each session
     Pipeline::Instance()->remove(&rtcp_receiver_);
 
     --sessionCount_;
-    if (sessionCount_ <= 0) // destroy if no streams are present
+    if (sessionCount_ == 0) // destroy if no streams are present
     {
-        tassert(sessionCount_ == 0);
-        Pipeline::Instance()->remove(&rtpbin_);
+        Pipeline::Instance()->remove(&rtpbin_); // one shared by all sessions
         rtpbin_ = 0;
         destroyed_ = true;
     }
+    else if (sessionCount_ < 0)
+        LOG_WARNING("Rtp session count is somehow less than zero!!!");
 }
 
+
+void RtpBin::registerSession(const std::string &codec)
+{
+    std::stringstream sessionName;
+    sessionName << codec << "_" << sessionId_;
+    sessionName_ = sessionName.str();
+    sessions_[sessionId_] = this;
+}
+
+void RtpBin::unregisterSession()
+{
+    // does NOT call this->destructor (and that's a good thing)
+    sessions_.erase(sessionId_); // remove session name by id
+}

@@ -37,27 +37,28 @@ class RtpBin
         void init();
 
     protected:
-        RtpBin() : rtcp_sender_(0), rtcp_receiver_(0), sessionId_(-1) 
-        { 
-            ++sessionCount_; 
-            sessionId_ = sessionCount_ - 1;  // 0 based
-        }
+        RtpBin() : rtcp_sender_(0), rtcp_receiver_(0), sessionId_((++sessionCount_) - 1), sessionName_()  // 0 based
+        {}
         const char *padStr(const char *padName);
 
+        void registerSession(const std::string &codec);
+        void unregisterSession();
         static _GstElement *rtpbin_;
         static bool destroyed_;
         static int sessionCount_;
         _GstElement *rtcp_sender_, *rtcp_receiver_;
         int sessionId_;
-        static std::map<int, std::string> sessionNames_;
-        virtual void subParseSourceStats(const std::string &idStr, _GstStructure *stats) = 0;
-        static void printStatsVal(const std::string &idStr, const char *key, const std::string &type, const std::string &formatStr, _GstStructure *stats);
+        std::string sessionName_;
+        static std::map<int, RtpBin*> sessions_;
+        virtual void subParseSourceStats(_GstStructure *stats) = 0;
+        void printStatsVal(const std::string &idStr, const char *key, const std::string &type, 
+                const std::string &formatStr, _GstStructure *stats);
 
     private:
         static const int REPORTING_PERIOD_MS = 8000;
         static int printStatsCallback(void * rtpbin);
         static void printSourceStats(_GObject *source);
-        static void parseSourceStats(_GObject * source, int sessionId, RtpBin *context);
+        static void parseSourceStats(_GObject * source, RtpBin *context);
 
         RtpBin(const RtpBin&); //No Copy Constructor
         RtpBin& operator=(const RtpBin&); //No Assignment Operator

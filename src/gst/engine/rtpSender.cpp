@@ -24,6 +24,7 @@
 
 #include <gst/gst.h>
 #include <algorithm>
+#include <sstream>
 
 #include "pipeline.h"
 #include "gstLinkable.h"
@@ -40,7 +41,6 @@ void RtpSender::enableControl()
 RtpSender::~RtpSender()
 {
     Pipeline::Instance()->remove(&rtp_sender_);
-    sessionNames_.erase(sessionId_); // remove session name by id
 }
 
 
@@ -53,7 +53,7 @@ std::string RtpSender::getCaps() const
 void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
 {
     RtpBin::init();
-    sessionNames_[sessionId_] = config.codec();
+    registerSession(config.codec());
 
     GstPad *send_rtp_sink;
     GstPad *send_rtp_src;
@@ -123,7 +123,7 @@ void RtpSender::checkSampleRate()
 }
 
 
-void RtpSender::subParseSourceStats(const std::string &idStr, GstStructure *stats)
+void RtpSender::subParseSourceStats(GstStructure *stats)
 {
     const GValue *val = gst_structure_get_value(stats, "internal");
     if (g_value_get_boolean(val))   // is-internal
@@ -131,14 +131,13 @@ void RtpSender::subParseSourceStats(const std::string &idStr, GstStructure *stat
         val = gst_structure_get_value(stats, "is-sender");
         if (g_value_get_boolean(val))    // is-sender
         {
-            printStatsVal(idStr, "bitrate", "guint64", ":BITRATE: ", stats);
-            printStatsVal(idStr, "octets-sent", "guint64", ":OCTETS-SENT:", stats);
-            printStatsVal(idStr, "packets-sent", "guint64", ":PACKETS-SENT:", stats);
+            printStatsVal(sessionName_, "bitrate", "guint64", ":BITRATE: ", stats);
+            printStatsVal(sessionName_, "octets-sent", "guint64", ":OCTETS-SENT:", stats);
+            printStatsVal(sessionName_, "packets-sent", "guint64", ":PACKETS-SENT:", stats);
         }
-
         return; // otherwise we don't care about internal sources
     }
-    printStatsVal(idStr, "rb-jitter", "guint32", ":JITTER: ", stats);
-    printStatsVal(idStr, "rb-packetslost", "gint32", ":PACKETS LOST: ", stats);
+    printStatsVal(sessionName_, "rb-jitter", "guint32", ":JITTER: ", stats);
+    printStatsVal(sessionName_, "rb-packetslost", "gint32", ":PACKETS LOST: ", stats);
 }
 
