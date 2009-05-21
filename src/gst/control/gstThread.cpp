@@ -41,20 +41,25 @@ void GstThread::start(MapMsg&)
 void GstSenderThread::start(MapMsg& )
 { 
     playback::start();
-    if(videoFirst)
+    if(!hasPlayed_)
     {
-        if(ff[0])
-            ff[0](video_->getCaps());
-        if(ff[1])
-            ff[1](audio_->getCaps());
+        if(videoFirst)
+        {
+            if(ff[0])
+                ff[0](video_->getCaps());
+            if(ff[1])
+                ff[1](audio_->getCaps());
+        }
+        else
+        {
+            if(ff[1])
+                ff[1](audio_->getCaps());
+            if(ff[0])
+                ff[0](video_->getCaps());
+        }
     }
-    else
-    {
-        if(ff[1])
-            ff[1](audio_->getCaps());
-        if(ff[0])
-            ff[0](video_->getCaps());
-    }
+
+    hasPlayed_ = true;
 } 
 
 void GstThread::handleMsg(MapMsg &msg)

@@ -29,7 +29,7 @@ class GstThread
     : public MsgThread
 {
     protected:
-        GstThread():stop_id(0),play_id(0){}
+        GstThread():stop_id(0),play_id(0),hasPlayed_(0){}
         /// incomming audio_start request 
         virtual void audio_init(MapMsg& msg) = 0;
         /// incomming video_start request 
@@ -44,6 +44,7 @@ class GstThread
 
     int stop_id;
     int play_id;
+    bool hasPlayed_;
     private:
         void main();
         void handleMsg(MapMsg& msg);
