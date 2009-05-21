@@ -49,7 +49,7 @@ class Test_Ping(unittest.TestCase):
         # contacts we add might be already in their addressbook
         self.local.send_expect("ping", "pong")
 
-    def test_02_network(self):
+    def NOtest_02_network(self):
         # network test for 1 second
         # we must make sure this timeout is not greater than the time it will take to make the test.
         self.local.send_expect("n -s -k dualtest -t 1 -b 30", "Starting", 0.5) # 4 seconds !
