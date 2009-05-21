@@ -224,17 +224,17 @@ bool MapMsg::stringify(const MapMsg& const_cmd_map, std::string& rstr)
             {
                 //the value is a string, delimit with "
                 case 's':
-                    sstr << "\"" << strEsq(it->second) << "\"";     //Escape the string contents
+                    sstr << "\"" << strEsq(it->second.str()) << "\"";     //Escape the string contents
                     break;
 
                 //the value is integer, generate string from int
                 case 'i':
-                    sstr << int(it->second);
+                    sstr << it->second;
                     break;
 
                 //the value is a float generate string from float
                 case 'f':
-                    sstr << double(it->second);
+                    sstr << it->second;
                     break;
 
                 case 'F':

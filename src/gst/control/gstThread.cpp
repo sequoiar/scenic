@@ -64,8 +64,7 @@ void GstSenderThread::start(MapMsg& )
 
 void GstThread::handleMsg(MapMsg &msg)
 {
-    std::string s(msg.cmd());
-    if(s == "audio_init")
+    if(msg.cmd() == "audio_init")
     {
         try
         {
@@ -83,17 +82,17 @@ void GstThread::handleMsg(MapMsg &msg)
         }
         
     }
-    else if(s == "stop")
+    else if(msg.cmd() == "stop")
     {
         stop(msg);
         stop_id = msg["id"];
     }
-    else if(s == "start")
+    else if(msg.cmd() == "start")
     {
         start(msg);
         play_id = msg["id"];
     }
-    else if(s == "video_init")
+    else if(msg.cmd() == "video_init")
     {
         try
         {
@@ -110,7 +109,7 @@ void GstThread::handleMsg(MapMsg &msg)
             queue_.push(r);
         }
     }
-    else if (s == "rtp")
+    else if (msg.cmd() == "rtp")
         queue_.push(msg);
     else
         LOG_WARNING("Unknown Command.");
@@ -195,7 +194,7 @@ void GstReceiverThread::video_init(MapMsg& msg)
         if(!msg["sink"])
             VIDEO_SINK = "xvimagesink";
         else
-            VIDEO_SINK = std::string(msg["sink"]);
+            VIDEO_SINK = msg["sink"].str();
 
         video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], SCREEN, VIDEO_SINK, msg["deinterlace"]);
     }
@@ -291,9 +290,9 @@ void GstSenderThread::audio_init(MapMsg& msg)
         std::string audioDevice, audioLocation;
         
         if(msg["location"])
-            audioLocation = std::string(msg["location"]);
+            audioLocation = msg["location"].str();
         if(msg["device"])
-            audioDevice = std::string(msg["device"]);
+            audioDevice = msg["device"].str();
 
         AudioSourceConfig config(msg["source"], audioDevice, audioLocation, msg["channels"]);
         audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
@@ -311,14 +310,13 @@ void GstSenderThread::audio_init(MapMsg& msg)
 
 bool GstReceiverThread::subHandleMsg(MapMsg &msg)
 {
-    std::string s(msg.cmd());
-    if (s == "jitterbuffer")
+    if (msg.cmd() == "jitterbuffer")
     {
         updateJitterBuffer(msg);
         return true;    // no one else should handle this
     }
-    else 
-        return false;
+
+    return false;
 }
 
 void GstReceiverThread::updateJitterBuffer(MapMsg &msg)

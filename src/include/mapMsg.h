@@ -42,7 +42,8 @@ friend class MapMsg;
         char get_type() const; 
         bool empty() const;
         Except except()const { return e_;}
-
+    
+        std::string str() const { return s_; }
         operator std::string () const;
         operator std::vector<double> () const;
         operator int ()const;
@@ -68,7 +69,7 @@ friend class MapMsg;
         std::vector<double> F_;
         std::string key_; //HACK
 };
-
+//void operator= (std::string& , const StrIntFloat& in);
 std::ostream& operator<< (std::ostream& os, const StrIntFloat&);
 
 

@@ -22,7 +22,6 @@
 
 #include "mapMsg.h"
 static MapMsg::Subscriber* pf = 0;
-
 std::ostream& operator<< (std::ostream& os, const MapMsg& msg)
 {
     std::string str;
