@@ -99,14 +99,32 @@ def runClients(rxTn, txTn, args):
     txTn.read_until('start: ack="ok"')
 
     # let the test run a bit
-    TEST_LENGTH = 20
+    TEST_LENGTH = 12
     sleep(TEST_LENGTH)
 
     rxTn.write('stop:\n')
     rxTn.read_until('stop: ack="ok"')
     txTn.write('stop:\n')
     txTn.read_until('stop: ack="ok"')
+    
+    # let the test run a bit
+    TEST_LENGTH = 5 
+    sleep(TEST_LENGTH)
+    
+    rxTn.write('start:\n')
+    rxTn.read_until('start: ack="ok"')
+    txTn.write('start:\n')
+    txTn.read_until('start: ack="ok"')
+    
+    # let the test run a bit
+    TEST_LENGTH = 12
+    sleep(TEST_LENGTH)
 
+    rxTn.write('stop:\n')
+    rxTn.read_until('stop: ack="ok"')
+    txTn.write('stop:\n')
+    txTn.read_until('stop: ack="ok"')
+    
     rxTn.write('quit:\n')
     txTn.write('quit:\n')
 

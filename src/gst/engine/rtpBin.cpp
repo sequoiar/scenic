@@ -110,14 +110,16 @@ void RtpBin::parseSourceStats(GObject * source, RtpBin *context)
 // callback to print the rtp stats 
 gboolean RtpBin::printStatsCallback(gpointer /*data*/)
 {
-    if (sessionCount_ <= 0) // no sessions o print yet
-        return TRUE; 
-
     if (destroyed_)
     {
         LOG_DEBUG("No active rtpsessions, unregistering reporting callback");
         return FALSE;
     }
+    else if (sessionCount_ <= 0) // no sessions to print yet
+        return TRUE; 
+    else if (not Pipeline::Instance()->isPlaying())
+        return TRUE; // not playing yet
+
 
     GObject *session;
     GValueArray *arrayOfSources;
