@@ -340,7 +340,7 @@ class udp_server
                 if(msg.cmd() == "buffer")
                 {
                     id_ = msg["id"];
-                    buff_ = static_cast<std::string>(msg["str"]);
+                    buff_ = msg["str"];
                     socket_.async_send_to(buffer("ok"), sender_endpoint_,
                             boost::bind(&udp_server::handle_send_to, this,
                                 error, bytes_transferred));
@@ -437,6 +437,7 @@ void asio_thread::main()
     catch (std::exception e)
     {
         LOG_ERROR("caught exception:" << e.what());
+        queue_.push(MapMsg("quit"));
     }
     
 }
