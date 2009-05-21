@@ -1781,7 +1781,7 @@ class CliView(Observer):
         """
         #print "UI/CLI/CLI: " 
         #print data
-        contact_name = data['contact'].name
+        contact_name = data['contact']
         txt = "\n" + bold("Network test results with %s" % contact_name) +" :\n"
         for host_name in ['local', 'remote']:
             if data.has_key(host_name):

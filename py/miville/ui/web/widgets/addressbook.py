@@ -320,7 +320,7 @@ class Addressbook(Widget):
                     #self.api.select_contact(self, contact_name)
                     self.callRemote('update_selected', contact_name) # works ! selects the contact to which we stream
                     contact = self.api.get_contact(contact_name)
-                    log.debug('contact.stream_state:%s %s' % (contact_name, contact.stream_state))
+                    log.debug('(contact name=%s).stream_state: %s' % (contact_name, contact.stream_state))
                     self.api.get_contacts(self)
                     self.callRemote('update_status', contact_name, 'Streaming', 'Currently streaming.')
                     # updates list
