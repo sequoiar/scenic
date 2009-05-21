@@ -99,26 +99,23 @@ def runClients(rxTn, txTn, args):
     txTn.read_until('start: ack="ok"')
 
     # let the test run a bit
-    TEST_LENGTH = 12
+    TEST_LENGTH = 10
     sleep(TEST_LENGTH)
 
-    rxTn.write('stop:\n')
-    rxTn.read_until('stop: ack="ok"')
-    txTn.write('stop:\n')
-    txTn.read_until('stop: ack="ok"')
-    
-    # let the test run a bit
-    TEST_LENGTH = 5 
-    sleep(TEST_LENGTH)
-    
-    rxTn.write('start:\n')
-    rxTn.read_until('start: ack="ok"')
-    txTn.write('start:\n')
-    txTn.read_until('start: ack="ok"')
-    
-    # let the test run a bit
-    TEST_LENGTH = 12
-    sleep(TEST_LENGTH)
+    if 'restart' in args:
+        txTn.write('stop:\n')
+        txTn.read_until('stop: ack="ok"')
+        
+        # let the test run a bit
+        TEST_LENGTH = 10
+        sleep(TEST_LENGTH)
+        
+        txTn.write('start:\n')
+        txTn.read_until('start: ack="ok"')
+        
+        # let the test run a bit
+        TEST_LENGTH = 40 
+        sleep(TEST_LENGTH)
 
     rxTn.write('stop:\n')
     rxTn.read_until('stop: ack="ok"')
@@ -858,7 +855,7 @@ class AudioVideoTests(object):
     def __init__(self):
         pass
 
-    def smoke_test(self):
+    def isaifsmoke_test(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         rxVideoArg, txVideoArg = argfactory('video')
         txAudioArg.channels = 8
@@ -870,6 +867,11 @@ class AudioVideoTests(object):
         rxVideoArg.codec = txVideoArg.codec = 'theora'
         proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg))
     
+    def test_restart(self):
+        rxAudioArg, txAudioArg = argfactory('audio')
+        rxVideoArg, txVideoArg = argfactory('video')
+        proceed(dict(rxAudioArg=rxAudioArg, txAudioArg=txAudioArg, rxVideoArg=rxVideoArg, txVideoArg=txVideoArg, restart=''))
+
     def test_audiotestsrc_raw_jackaudiosink_videotestsrc_mpeg4_xvimagesink(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         rxVideoArg, txVideoArg = argfactory('video')
