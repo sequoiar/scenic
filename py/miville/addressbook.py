@@ -326,6 +326,7 @@ class AddressBook(object):
                     log.info('Contact %s has been set to DISCONNECTED'  % (contact.name))
                     contact.connection = None
                     contact.state = DISCONNECTED
+                    contact.stream_state = 0
                     if self.minor == 0:
                         contact.stream_state = 0
             adb_file.close()
