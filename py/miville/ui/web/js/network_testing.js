@@ -180,7 +180,11 @@ NetworkTesting.methods(
 			self.bandwidth_fld.removeClass('notify'); // remove the red
 			self.duration_fld.removeClass('notify'); // remove the red
 			dbug.info('bw:' + bandwidth + " dur:" + duration + ' unit:' + unit + ' kind:' + kind);
-            self.callRemote('rc_start_test', self.contact.get('name'), bandwidth, duration, kind, unit);
+            if (self.contact != null) {
+                self.callRemote('rc_start_test', self.contact.get('name'), bandwidth, duration, kind, unit);
+            } else {
+                dbug.info('self.contact is nul !!!');
+            }
             // this will call self.make_look_like_test_occurs
 	    }
     },
