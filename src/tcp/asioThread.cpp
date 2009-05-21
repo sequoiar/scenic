@@ -129,6 +129,7 @@ class tcp_session
             }
             else
             {
+                queue_.push(MapMsg("quit"));
                 std::cout << "here" << std::endl;
                 delete this;
             }

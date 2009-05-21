@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <map>
 #include <string>
-#include "tcp/parser.h"
 #include "mapMsg.h"
 
 
@@ -29,7 +28,7 @@ void ParserTester::tokenize_test()
 {
     std::string str = "init: it=103945 mystring=\"\\\"bar you\\\"\" Hellotab=1.1 2.2 ";
     MapMsg mymap;
-    tassert(Parser::tokenize(str, mymap));
+    mymap.tokenize(str);
 }
 
 
@@ -42,10 +41,10 @@ void ParserTester::roundtrip_test()
 //    std::string str = "init: it=103945 mystring=\"\\\"bar you\\\"\" Hellotab=1.1";
 
     MapMsg mymap;
-    tassert(Parser::tokenize(arg, mymap));
+    mymap.tokenize(arg);
 
     std::string out;
-    tassert(Parser::stringify(mymap, out));
+    mymap.stringify(out);
     LOG_DEBUG(out);
 }
 
