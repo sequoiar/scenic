@@ -56,12 +56,9 @@ void MilhouseLogger::operator()(LogLevel& /*level*/, std::string& msg)
     std::cout << msg;
 }
 
-// 2way audio and video
-short pof::run(int argc, char **argv)
-{
-    OptionArgs options;
 
-    // add options here
+void addOptions(OptionArgs &options)
+{
     options.addBool("receiver", 'r', "receiver");
     options.addBool("sender", 's', "sender");
     options.addString("address", 'i', "address", "provide ip address of remote host");
@@ -87,17 +84,21 @@ short pof::run(int argc, char **argv)
     options.addInt("audio_buffer_usec", 'b', "audiobuffer", "length of receiver's audio buffer in microseconds, must be > 10000");
     options.addInt("jitterbuffer", 'g', "jitterbuffer", "length of receiver's rtp jitterbuffers in milliseconds, must be > 1");
     options.addBool("enable_controls", 'j', "enable gui controls for jitter buffer");
-
     //telnetServer param
     options.addInt("serverport", 'y', "run as server", "port to listen on");
+}
 
+
+short pof::run(int argc, char **argv)
+{
+    OptionArgs options;
+    addOptions(options);
     options.parse(argc, argv);
 
     std::cout << "Ver:" << PACKAGE_VERSION << " Rev #" << SVNVERSION << std::endl;
 
     if (argc == 1)  // we printed help msg in parse, no need to continue
         return 0;
-
 
     if(options["serverport"])
         return telnetServer(options["sender"], options["serverport"]);
