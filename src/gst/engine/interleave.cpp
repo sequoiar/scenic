@@ -24,17 +24,17 @@
 
 #include <cstring>      // for memset
 #include <gst/audio/multichannel.h>
-#include "interleave.h"
+#include "audioSource.h"
 #include "pipeline.h"
 #include "audioConfig.h"
 
-Interleave::~Interleave()
+InterleavedAudioSource::Interleave::~Interleave()
 {
     Pipeline::Instance()->remove(&interleave_);
 }
 
 
-void Interleave::set_channel_layout()
+void InterleavedAudioSource::Interleave::set_channel_layout()
 {
     GValue val;
     memset(&val, 0, sizeof(val));
@@ -60,7 +60,7 @@ void Interleave::set_channel_layout()
 }
 
 
-void Interleave::init()
+void InterleavedAudioSource::Interleave::init()
 {
     interleave_ = Pipeline::Instance()->makeElement("interleave", NULL);
     set_channel_layout();
@@ -68,7 +68,7 @@ void Interleave::init()
 
 
 // courtesy of vorbisenc.c
-const GstAudioChannelPosition Interleave::VORBIS_CHANNEL_POSITIONS[][8] = {
+const GstAudioChannelPosition InterleavedAudioSource::Interleave::VORBIS_CHANNEL_POSITIONS[][8] = {
     {                           /* Mono */
         GST_AUDIO_CHANNEL_POSITION_FRONT_MONO
     },

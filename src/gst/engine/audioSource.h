@@ -22,8 +22,8 @@
 #ifndef _AUDIO_SOURCE_H_
 #define _AUDIO_SOURCE_H_
 
+#include <gst/audio/multichannel.h>
 #include "gstLinkable.h"
-#include "interleave.h"
 #include "busMsgHandler.h"
 
 // forward declarations
@@ -73,24 +73,47 @@ class AudioSource : public GstLinkableSource
  * Abstract child of AudioSource whose audio frames must be interleaved before pushing audio further down pipeline.
  */
 
-class InterleavedAudioSource
-    : public AudioSource
+class InterleavedAudioSource : public AudioSource
 {
+    private:
+        class Interleave : public GstLinkableFilter
+        {
+            public:
+                /** The interleave functionality used to be part of the same class
+                 * as InterleavedAudioSource. When subdividing one class into two
+                 * separate classes, it make sense for them to be friends. Also
+                 * InterleavedAudioSource's internals are safe
+                 * as InterleavedAudioSource's children will not have access here. */
+                explicit Interleave(const AudioSourceConfig &config)
+                    : interleave_(0), config_(config) {}
+                ~Interleave();
+                void init();
+
+                GstElement *srcElement() { return interleave_; }
+                GstElement *sinkElement() { return interleave_; }
+
+            private:
+                GstElement *interleave_;
+                const AudioSourceConfig &config_;
+                static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
+                void set_channel_layout();
+                Interleave(const Interleave&);     //No Copy Constructor
+                Interleave& operator=(const Interleave&);     //No Assignment Operator
+        };
+
+        GstElement *srcElement() { return interleave_.srcElement(); }
+
     protected:
         /// Object initializer 
         void sub_init();
 
         explicit InterleavedAudioSource(const AudioSourceConfig &config);
-        
+
         ~InterleavedAudioSource();
 
         /// Object which performs the interleaving of this source's channels 
         Interleave interleave_;
         std::vector<GstElement*> sources_, aconvs_;
-
-    private:
-        
-        GstElement *srcElement() { return interleave_.srcElement(); }
 };
 
 /** 
@@ -104,16 +127,16 @@ class AudioTestSource : public InterleavedAudioSource
 {
     public:
         explicit AudioTestSource(const AudioSourceConfig &config);
-        
+
     private:
         void sub_init();
 
         ~AudioTestSource();
 
-        static gboolean timedCallback(GstClock *clock, 
-                                      GstClockTime time, 
-                                      GstClockID id,
-                                      gpointer user_data);
+        static int timedCallback(GstClock *clock, 
+                GstClockTime time, 
+                GstClockID id,
+                void *user_data);
         void toggle_frequency();
 
         GstClockID clockId_;
@@ -144,9 +167,9 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
 
     private:
         ~AudioFileSource();
-         
-        bool handleBusMsg(_GstMessage *msg);
-        
+
+        bool handleBusMsg(GstMessage *msg);
+
         void loop(int nTimes);
         GstElement *srcElement() { return aconv_; }
         void sub_init();
@@ -155,7 +178,7 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
         GstElement *aconv_;
         int loopCount_;
         static const int LOOP_INFINITE;
-        
+
         /// No Copy Constructor
         AudioFileSource(const AudioFileSource&);     
         /// No Assignment Operator
@@ -197,7 +220,7 @@ class AudioPulseSource : public AudioSource
         AudioPulseSource(const AudioSourceConfig &config);
     private:
         ~AudioPulseSource();
-    
+
         void sub_init();
         GstElement *srcElement() { return capsFilter_; }
 
@@ -218,7 +241,7 @@ class AudioJackSource : public AudioSource
 {
     public:
         AudioJackSource(const AudioSourceConfig &config);
-    
+
     private:
         ~AudioJackSource();
 
@@ -247,7 +270,7 @@ class AudioDvSource : public AudioSource
 {
     public:
         explicit AudioDvSource(const AudioSourceConfig &config);
-    
+
     private:
         ~AudioDvSource();
         void sub_init();
