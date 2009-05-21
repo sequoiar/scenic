@@ -19,15 +19,16 @@
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Communication channel for the streaming infos between two miville contacts.
+Communication channel for the streaming/settings infos between two miville contacts.
 """
+import sys
 from miville.utils import log
 from miville.errors import *
 import pprint
 from miville.engines import audiovideogst
 import miville.settings
 
-log = log.start('info', 1, 0, 'gstchannel')
+log = log.start('debug', 1, 0, 'gstchannel')
 
 # Notitification for stream process state change (1 notif per streaming session)
 #  timeout: tbd 5 sec 
@@ -43,14 +44,15 @@ def set_api(api):
     global _api
     _api = api
     
-
-def create_channel(engine_name):
-    log.debug('engines.create_channel: ' + str(engine_name) )
-    engine_name = str(engine_name)
-    if engine_name.upper() == 'GST':
-        chan = GstChannel()
-        return chan
-    raise StreamsError, 'Engine "%s" has no communication channel' %  engine_name
+# this is totally retard (see WTF !!@)
+# def create_channel(engine_name):
+#     log.debug('engines.create_channel: ' + str(engine_name) )
+#     engine_name = str(engine_name)
+#     if engine_name.upper() == 'GST':
+#         chan = GstChannel()
+#         return chan
+#     print 'Don\'t make me work.'
+#     raise StreamsError, 'Engine "%s" has no communication channel' %  engine_name
 
   
 def on_com_chan_connected(connection_handle, role="client"):
@@ -72,15 +74,22 @@ def on_com_chan_connected(connection_handle, role="client"):
     
     contact = connection_handle.contact
     
-    chan = create_channel('Gst')
+    #chan = create_channel('Gst') WTF !!@
+    # self.com_chan = None
+    # self.contact = None
+    # self.api = None
+    # self.caller = None
+    # self.remote_addr = None    
+    chan = GstChannel()
     chan.contact = contact
     chan.com_chan = connection_handle.com_chan
-    
-    callback = chan.on_remote_message
-    chan.com_chan.add(callback, 'Gst')
     chan.api = _api
     chan.remote_addr = contact.address
+    chan.send_message('SEND_ME_MY_IP', [contact.address])
         
+    callback = chan.on_remote_message
+    chan.com_chan.add(callback, 'Gst')
+    
     _gst_channels_dict[chan.contact.name] = chan
     log.debug("settings.on_com_chan_connected: settings_chans: " + str(_gst_channels_dict))
     
@@ -106,10 +115,17 @@ def split_gst_parameters(global_setting, address):
     """
     Walks the global setting to harvest all the necessary
     gst parameters that will make their way to milhouse.
+
+    This is called in A's miville. (the initiator)
+    This is a VERY IMPORTANT function.
+
+    :param global_setting: GlobalSetting object 
+    :param address: ip addr string. The ip of B. 
     """
     receiver_procs = {}
     sender_procs = {}
-    log.debug("split_gst_parameters global setting %s" % global_setting.name)
+    log.debug("split_gst_parameters: global setting %s" % global_setting.name)
+    log.debug("split_gst_parameters: address of B : %s" % str(address))
     for id, group in global_setting.stream_subgroups.iteritems():
         if group.enabled:
             log.debug("split_gst_parameters group: %s " % group.name)
@@ -144,8 +160,14 @@ def split_gst_parameters(global_setting, address):
 
 def _create_stream_engines( listener, mode, procs_params):
     """
+    This is where contact B starts streaming to A when A decides it is time to start streaming.
+
+    Uses the communication channel.
+
     Returns list of new stream engines.    
     AudioVideoGst instances.
+    
+    VERY IMPORTANT METHOD !
     """
     log.info("gstchannel._create_stream_engines")
     engines = []
@@ -166,7 +188,7 @@ def _create_stream_engines( listener, mode, procs_params):
                     engine =  audiovideogst.AudioVideoGst(mode, group_name)
                 else:
                     raise StreamsError, 'Engine "%s" is not supported' %  engine_name
-            
+            # sends the command to the new Milhouse process.
             engine.apply_stream_settings(stream_name, stream_params)
         engines.append(engine)
     return engines
@@ -189,15 +211,16 @@ class GstChannel(object):
         self.api = None
         self.caller = None
         self.remote_addr = None    
+        self.my_addr = None    
         
         self.receiver_procs_params = None
         self.sender_procs_params = None
         self.receiver_engines = None
         self.sender_engines = None
 
-    def start_streaming(self, global_setting, address):
+    def start_streaming(self, global_setting, contact):
         """
-        Starts the audio/video/data streaming between two miville programs. 
+        Host "A" starts the audio/video/data streaming between two miville programs. 
     
         this is where the arguments to the milhouse processes are exchanged. 
         A stream can be of audio or video type. 
@@ -205,15 +228,56 @@ class GstChannel(object):
         first, the settings are browsed and sorted between receiver an sender
         processes (local and remote), according to the streams type and
         sync groups. Then the settings are sent to the engines (pobably GST)
+        
+        Also, here is called initiate_streaming, which sends a message to 
+        B, telling him to (sudo) start to transmit.
         """
         # TODO first making sure the stream is off...
         # self.stop_streaming()
+        address = contact.address
         receiver_procs_params, sender_procs_params = split_gst_parameters(global_setting, address)
-        remote_address  = self.com_chan.owner.localhost
-        log.debug("REMOTE ADDRESS: " + str(remote_address) )
-        remote_sender_procs_params, remote_receiver_procs_params = split_gst_parameters(global_setting, remote_address)
+        connection_basic = self.com_chan.owner
+        local_ip = self.my_addr
+        # local_ip = None
+        # try:
+        #     if connection_basic.localhost is not None:
+        #         # BasicClient instance
+        #         protocol_obj = connection_basic.connection
+        #         print 'protocol_obj:', protocol_obj
+        #         local_ip = protocol_obj.transport.getHost().host
+        #         protocol_obj.localhost = local_ip
+        #         connection_basic.localhost = local_ip
+        #         print 'local_ip:', local_ip
+        # except AttributeError, e:
+        #     print e.message
+        #     print sys.exc_info()
+        # #OLD: local_ip  = connection_basic.localhost
+
+        print('---------------- gstchannel.start_streaming -------------------')
+        print("AALEXXX ::: address of A: (me) " + str(local_ip))
+        print("AALEXXX ::: address of B: " + str(address))
+        print('-----------------------------------')
+        # on brr when brr connects and tzing starts:
+        #AALEXXX ::: remote_address: None
+        #AALEXXX ::: address: 10.10.10.66
+
+        # XXX FIXME HACK ! aalex was here
+        #ORIGINAL form hugo : remote_sender_procs_params, remote_receiver_procs_params = split_gst_parameters(global_setting, remote_address)
+        remote_sender_procs_params, remote_receiver_procs_params = split_gst_parameters(global_setting, local_ip)
+        #remote_sender_procs_params, remote_receiver_procs_params = split_gst_parameters(global_setting, address)
         # send settings to remote miville
-        self.initiate_streaming(receiver_procs_params, sender_procs_params, remote_receiver_procs_params, remote_sender_procs_params)
+        self.initiate_streaming(receiver_procs_params, sender_procs_params, remote_receiver_procs_params, remote_sender_procs_params, contact.address)
+
+    def initiate_streaming(self, rx_params, tx_params, rx_remote_params, tx_remote_params, contact_addr):
+        """
+        A initiates the streaming.
+        
+        Sends a message to B with REMOTE_STREAMING_CMD key.
+        """
+        self.receiver_procs_params = rx_params
+        self.sender_procs_params = tx_params
+        self.start_local_gst_processes(self.receiver_procs_params,  self.sender_procs_params)
+        self.send_message(REMOTE_STREAMING_CMD, [rx_remote_params, tx_remote_params, contact_addr])
 
     def stop_streaming(self, address):
         """
@@ -221,7 +285,6 @@ class GstChannel(object):
         
         Sends a stop command to the remote milhouse
         For aesthetic reasons, receiver procecess are terminated before the senders 
-        
         Here's the sequence of events:
             local rx processes are stopped
             STOP_RECEIVERS_CMD msg sent to the remote miville
@@ -231,12 +294,6 @@ class GstChannel(object):
         """
         self._stop_local_rx_procs()
         self.send_message(STOP_RECEIVERS_CMD)
-     
-    def initiate_streaming(self, rx_params, tx_params, rx_remote_params, tx_remote_params):
-        self.receiver_procs_params = rx_params
-        self.sender_procs_params = tx_params
-        self.start_local_gst_processes(self.receiver_procs_params,  self.sender_procs_params)
-        self.send_message(REMOTE_STREAMING_CMD,[rx_remote_params, tx_remote_params] )
         
     def _stop_local_rx_procs(self):
         log.info("Stopping rx processes")
@@ -277,7 +334,9 @@ class GstChannel(object):
             self.api.notify(caller, "Got remote GST parameters", "info" )
             rx_params = args[0]
             tx_params = args[1]
+            remote_ip = args[2] #self.remote_addr
             self.api.notify(caller, "Starting GST processes", "info" )
+            log.debug("on_remote_message got REMOTE_STREAMING_CMD: will call start_local_gst_processes(%s, %s)" % (str(rx_params), str(tx_params)))
             self.start_local_gst_processes(rx_params, tx_params )
         
         elif key ==  STOP_RECEIVERS_CMD:
@@ -287,6 +346,14 @@ class GstChannel(object):
             
         elif key ==  RECEIVERS_STOPPED:
             self._stop_local_tx_procs()
+
+        elif key =='SEND_ME_MY_IP':
+            self.my_addr = args[0]
+            print 'XXXXXXXXXXXXXXXXX my ip is ', self.my_addr
+            self.send_message('YOUR_IP_IS', [self.remote_addr])
+        elif key =='YOUR_IP_IS':
+            self.my_addr = args[0]
+            print 'XXXXXXXXXXXXXXXXX my ip is ', self.my_addr
             
         else:
             log.error("Unknown message in settings channel: " + key +  " args: %s"  % str(args) )

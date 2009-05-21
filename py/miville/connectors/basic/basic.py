@@ -176,7 +176,6 @@ class BasicServerFactory(protocol.ServerFactory):
         p.api = self.api
         return p
 
-
 class BasicClient(LineReceiver):
     """
     The session initialization protocol for miville. - client side
@@ -213,6 +212,11 @@ class BasicClient(LineReceiver):
 class ConnectionBasic(Connection):
     """
     Connection that uses the "connectors.basic" protocol.
+
+    There is one com_chan per connectionBasic instance. 
+    A maximum of one ConnectionBasic instance per contact.
+
+    The self.connection attribute is actually a BasicClient instance. It has a transport attribute.
     """
     def __init__(self, contact, api):
         Connection.__init__(self, contact, api)
@@ -229,23 +233,16 @@ class ConnectionBasic(Connection):
         deferred = client_creator.connectTCP(self.contact.address, port, timeout=2)
         deferred.addCallback(self._connection_ready)
         deferred.addErrback(self._connection_failed)
-    
-    # Class attribtues, wich are aliases for some method names.
-    _start = _create_connection
-
-    _stop = _create_connection
-    
-    stop_connecting = Connection.stop
 
     def _connection_ready(self, connection):
-        global PORT
         """
         Callback for when we are connected sucessfully.
+        The connection argument is actually a BasicClient instance.
         """
+        global PORT
         self._state = CONNECTED
-        self.connection = connection    # Maybe private ???
+        self.connection = connection
         self.connection.connectionLost = self._connection_lost
-
         if self.contact.state == ASKING:
             self.connection.add_callback('ACCEPT', self.accepted)
             self.connection.add_callback('REFUSE', self.refused)
@@ -277,11 +274,11 @@ class ConnectionBasic(Connection):
         except (error.AlreadyCalled, error.AlreadyCancelled), err:
             log.debug(err)
         self.connection.transport.loseConnection()
-        self.connection = None
 
     def _accepted(self):
         global PORT
         self.localhost = self.connection.transport.getHost().host
+        log.debug('\n\n\nXXXX ConnectionBasic.localhost = ' + str(self.localhost))
         self.local_port = PORT
         self._close_connection()
 #        Connection.accepted(self)
@@ -308,7 +305,6 @@ class ConnectionBasic(Connection):
             self.api.add_stream(self, name, kind, engine)
             for attr, value in stream.items():
                 self.api.set_stream(self, name, kind, attr, value)
-
         self.api.start_streams(self, None, self.com_chan)
 
     def send_settings(self):
@@ -323,19 +319,14 @@ class ConnectionBasic(Connection):
             kind = self.api.streams.get_kind(stream)
             if not kind:
                 continue
-
             engine = stream.__module__.rpartition('.')[2]
             params = {'name':name.partition('_')[2], 'engine':engine}
             for key, value in stream.__dict__.items():
                 if (key[0] != '_' and value):
                     params[key] = value
-
             settings[kind] = params
-
         self.com_chan.callRemote('ConnectionBasic.settings', settings)
         self.api.start_streams(self, self.contact.address, self.com_chan)
-
-    _refused = _close_connection
 
     def timeout(self):
         self._close_connection()
@@ -345,8 +336,12 @@ class ConnectionBasic(Connection):
         self._close_connection()
         self.cleanup()
         return 'Connection with %s stopped.' % self.contact.name
-
-
+    
+    # Methods borrowed or renamed, which are aliases for some method names.
+    _start = _create_connection
+    _stop = _create_connection
+    _refused = _close_connection
+    stop_connecting = Connection.stop
 
 def start(api, port, interfaces=''):
     """
@@ -361,10 +356,40 @@ def start(api, port, interfaces=''):
     #    PORT += 1
     server_factory = BasicServerFactory()
     server_factory.api = api
-    
     # listen TCP
     #interfaces = api.core.config.listen_to_interfaces
     #listen_queue_size = 50
-
     api.listen_tcp(PORT, server_factory, interfaces)
 
+
+
+
+# TODO:
+# # adapted from Tahoe: finds a single publically-visible address, or None.
+# # Tahoe also uses code to run /bin/ifconfig (or equivalent) to find other
+# # addresses, but that's a bit heavy for this. Note that this runs
+# # synchronously. Also note that this doesn't require the reactor to be
+# # running.
+# def get_local_ip_for(target='A.ROOT-SERVERS.NET'):
+#     """Find out what our IP address is for use by a given target.
+#  
+#     @return: the IP address as a dotted-quad string which could be used by
+#               to connect to us. It might work for them, it might not. If
+#               there is no suitable address (perhaps we don't currently have an
+#               externally-visible interface), this will return None.
+#     """
+#     try:
+#         target_ipaddr = socket.gethostbyname(target)
+#     except socket.gaierror:
+#         # DNS isn't running
+#         return None
+#     udpprot = protocol.DatagramProtocol()
+#     port = reactor.listenUDP(0, udpprot)
+#     try:
+#         udpprot.transport.connect(target_ipaddr, 7)
+#         localip = udpprot.transport.getHost().host
+#     except socket.error:
+#         # no route to that host
+#         localip = None
+#     port.stopListening() # note, this returns a Deferred
+#     return localip

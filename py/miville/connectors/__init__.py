@@ -71,7 +71,7 @@ class Connection(object):
         self.api = api
         self.com_chan = None
         
-        self.localhost = None
+        self.localhost = None # XXX overriden in Basic.Connector._accepted()
         self.local_port = None
         
         self.contact = contact
@@ -87,6 +87,8 @@ class Connection(object):
             #raise ConnectionError, 'Cannot connect. This address \'%s\' already have a connection (%s). %s' % (self.address, self.contact.name, str(connections))
             log.error('This address \'%s\' already have a connection (%s). %s. Connecting anyways.' % (self.address, self.contact.name, str(connections)))
         connections[self.address] = self
+    def get_local_ip(self):
+        return self.localhost
 
     def start(self):
         if self.contact.state == DISCONNECTED:

@@ -96,6 +96,11 @@ class AudioVideoGst(GstClient):
        #self._send_command('loglevel', 10)
        
     def apply_stream_settings(self, stream_name, parameters ):
+        """
+        Sends commands to the milhouse process applying the setting.
+        
+        VERY IMPORTANT METHOD !
+        """
         self.stream_names.append(stream_name)
         gst_parameters = []
         non_gst_params = ['engine']
@@ -212,9 +217,10 @@ class AudioVideoGst(GstClient):
         function start_sending
         address: string
         """
+        log.debug('audiovideogst.start_streaming()')
         self._send_command('start')
-        print '\nAudioVideoGst.start_streaming() stack :'
-        stack.print_stack() # XXX this is very verbose !
+        #print '\nAudioVideoGst.start_streaming() stack :'
+        #stack.print_stack() # XXX this is very verbose !
 
     def stop_streaming(self):
         """function stop_sending

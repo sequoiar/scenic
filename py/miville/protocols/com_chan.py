@@ -163,12 +163,11 @@ class ComChanClientFactory(pb.PBClientFactory):
         self.com_chan.owner.cleanup(True)
         pb.PBClientFactory.clientConnectionLost(self, connector, reason, reconnecting)
 
-
 class ComChanClient(pb.Referenceable, ComChannel):
     """
     ComChan on client side.
 
-    Slightly different on initialization time.
+    Slightly different on initialization time. (host A)
     """
     remote_main = ComChannel.main
     
@@ -182,7 +181,6 @@ class ComChanClient(pb.Referenceable, ComChannel):
     def disconnect(self):
         self.owner.cleanup(True) # arg = called by com_chan
         self.factory.disconnect()
-        
 
 class ComChanRealm:
     """
@@ -214,7 +212,6 @@ class ComChanContact(pb.Avatar, ComChannel):
         self.owner.cleanup()
         self.remote = None
 
-
 class ComChanCheck:
     """
     Verifies the authentification for an avatar with its credentials. 
@@ -245,7 +242,6 @@ class ComChanCheck:
         else:
             log.debug('Unauthorized login')
             return failure.Failure(error.UnauthorizedLogin())
-
 
 # functions 
 def start(api, conns, port=PORT, interfaces=''):

@@ -656,7 +656,7 @@ class ControllerApi(object):
                 if contact.state == CONNECTED:
                     try:
                         contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
-                        settings_com_channel.start_streaming( global_setting, contact.address)
+                        settings_com_channel.start_streaming(global_setting, contact)
                         # global_setting.start_streaming(self, contact.address, settings_com_channel)
                         contact.stream_state = 2
                         self.notify(caller, {'streaming':True, 'msg':"streaming started", 'contact_name':contact_name}, "start_streams") # key = start_streams
