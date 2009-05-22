@@ -94,9 +94,11 @@ short pof::run(int argc, char **argv)
     OptionArgs options;
     addOptions(options);
     options.parse(argc, argv);
-
+#ifdef SVNVERSION
     std::cout << "Ver:" << PACKAGE_VERSION << " Rev #" << SVNVERSION << std::endl;
-
+#else
+    std::cout << "Ver:" << PACKAGE_VERSION << " Rev #" << SVNVERSION << std::endl;
+#endif
     if (argc == 1)  // we printed help msg in parse, no need to continue
         return 0;
 

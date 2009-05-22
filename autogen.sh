@@ -27,4 +27,6 @@ autoconf -f
 automake -a -f -Wno-portability 
 if [ ! "x$BUILDBOT" = "x" ]; then
     ./configure $@
+else
+    ./configure $@ --enable-svn-revision
 fi

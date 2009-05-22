@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT(MILHOUSE, 0.1.2)
-AC_DEFINE(RELEASE_CANDIDATE,["-b1"],[rc version num])
+AC_INIT(MILHOUSE, 0.1.3)
+AC_DEFINE(RELEASE_CANDIDATE,["-c1"],[rc version num])
 AC_CONFIG_HEADER([src/config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AC_PROG_LIBTOOL
@@ -39,6 +39,8 @@ AC_ARG_ENABLE([debug], [
 AC_ARG_ENABLE([millisecwait], [ --enable-millisecwait=(millisecs) thread sleep time],,enable_millisecwait=10)
 AC_DEFINE_UNQUOTED(MILLISEC_WAIT,[${enable_millisecwait}], wait time)
 
+AC_ARG_ENABLE([svn-revision], [ --enable-svn-revision ],,enable_svn_revision=no)
+AM_CONDITIONAL([SVN],test "x${enable_svn_revision}" = "xyes")
 AC_ARG_ENABLE([logs], [ --enable-logs enable logs in msg queues],,enable_logs=yes)
 if test "x${enable_logs}" = "xyes" ; then
     AC_DEFINE(MAPLOGS,[],[send logs to listeners])
