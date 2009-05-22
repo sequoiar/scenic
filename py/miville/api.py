@@ -717,8 +717,9 @@ class ControllerApi(object):
         try:
             global_setting = self.settings.get_global_setting_from_id(id)
         except SettingsError, err:
-            log.error('SettingError :' + err.message)
-            global_setting = None
+            raise
+            #log.error('SettingError :' + err.message)
+            #global_setting = None
         return contact, global_setting, settings_com_channel 
 
     ### Connect ###
