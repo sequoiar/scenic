@@ -703,6 +703,7 @@ class ControllerApi(object):
         Starts all the sub-streams. (audio, video and data)
                 
         address: string or None (IP)
+        TO BE REMOVED FROM THE MAIN API
         """
         caller = None
         contact = self.adb.get_contact(contact_name)    
@@ -713,7 +714,11 @@ class ControllerApi(object):
         except KeyError, e:
             raise StreamsError, "No settings channel for contact"
         id  = contact.setting
-        global_setting = self.settings.get_global_setting_from_id(id)
+        try:
+            global_setting = self.settings.get_global_setting_from_id(id)
+        except SettingsError, err:
+            log.error('SettingError :' + err.message)
+            global_setting = None
         return contact, global_setting, settings_com_channel 
 
     ### Connect ###
