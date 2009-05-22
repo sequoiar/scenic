@@ -97,7 +97,7 @@ short pof::run(int argc, char **argv)
 #ifdef SVNVERSION
     std::cout << "Ver:" << PACKAGE_VERSION << " Rev #" << SVNVERSION << std::endl;
 #else
-    std::cout << "Ver:" << PACKAGE_VERSION << " Rev #" << SVNVERSION << std::endl;
+    std::cout << "Ver:" << PACKAGE_VERSION << std::endl;
 #endif
     if (argc == 1)  // we printed help msg in parse, no need to continue
         return 0;
@@ -108,7 +108,11 @@ short pof::run(int argc, char **argv)
     MilhouseLogger logger; // just instantiate, his base class will know what to do 
     if(options["version"])
     {
-        LOG_INFO("version " << PACKAGE_VERSION <<  " Svn Revision: " << SVNVERSION << std::endl);
+#ifdef SVNVERSION
+            LOG_INFO("version " << PACKAGE_VERSION <<  " Svn Revision: " << SVNVERSION << std::endl);
+#else
+            LOG_INFO("version " << PACKAGE_VERSION << std::endl);
+#endif
         return 0;
     }
 

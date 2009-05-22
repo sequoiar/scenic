@@ -11,7 +11,7 @@ PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d _build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: all help clean distclean html web pickle htmlhelp latex changes linkcheck 
+.PHONY: all help clean distclean html web pickle htmlhelp latex changes linkcheck install
 
 all:
 
@@ -81,9 +81,9 @@ linkcheck:
 
 check:
 
-install:
-	mkdir -p $(PREFIX)/share/doc/sphinx
-	-cp -fvr _build/html/ $(PREFIX)/share/doc/sphinx
+install: html
+	#mkdir -p $(DESTDIR)$(prefix)/share/doc/sphinx
+	#cp -fvr _build/html/ $(DESTDIR)$(prefix)/share/doc/sphinx
 
 uninstall:
 	rm -rf $(PREFIX)/share/doc/sphinx	
