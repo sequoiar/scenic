@@ -57,8 +57,11 @@ public:
     int errno_; //TODO used?
 
     Except(const char* log_msg,int err):log_(WARNING),errno_(err){
-        for(int i=0;i<256 and log_msg[i];++i)
+        int i;
+        for(i=0;i<255 and log_msg[i];++i)
             buff[i] = log_msg[i];
+        for(;i<256;++i)
+            buff[i] = 0;
     }
     Except():log_(NONE),errno_(0){}
     char buff[256];
