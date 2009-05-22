@@ -91,7 +91,6 @@ class AudioVideoGst(GstClient):
                     'failure'   :self.gst_failure,
                     'rtp'       :self.gst_rtp 
                     }       
-       log.info('')
        self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks, self.gst_state_change_callback, self.gst_proc_output)
        #self._send_command('loglevel', 10)
        
@@ -227,4 +226,5 @@ class AudioVideoGst(GstClient):
         """
         self._send_command('stop')
         self.stop_process()
+
         

@@ -313,7 +313,13 @@ class GstChannel(object):
         else:
             log.error("No tx processes to stop")
         caller = None
-        self.api.notify(caller, {'stopped':True, 'msg':"streaming stopped", "contact_name":None}, "stop_streams") 
+        self.notify_stopped()
+    def notify_stopped(self):
+        """
+        Notifies the API that we stopped streaming
+        """
+        self.contact.stream_state = 0
+        self.api.notify(caller, {'stopped':True, 'msg':"streaming stopped", "contact_name":self.contact.name}, "stop_streams") 
       
     def on_remote_message(self, key, args=None):
         """
@@ -349,11 +355,11 @@ class GstChannel(object):
 
         elif key =='SEND_ME_MY_IP':
             self.my_addr = args[0]
-            print 'XXXXXXXXXXXXXXXXX my ip is ', self.my_addr
+            log.debug('XXXXXXXXXXXXXXXXX my ip is ' + str(self.my_addr))
             self.send_message('YOUR_IP_IS', [self.remote_addr])
         elif key =='YOUR_IP_IS':
             self.my_addr = args[0]
-            print 'XXXXXXXXXXXXXXXXX my ip is ', self.my_addr
+            log.debug('XXXXXXXXXXXXXXXXX my ip is ' + str( self.my_addr))
             
         else:
             log.error("Unknown message in settings channel: " + key +  " args: %s"  % str(args) )
