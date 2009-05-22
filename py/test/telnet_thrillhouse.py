@@ -855,7 +855,7 @@ class AudioVideoTests(object):
     def __init__(self):
         pass
 
-    def isaifsmoke_test(self):
+    def smoke_test(self):
         rxAudioArg, txAudioArg = argfactory('audio')
         rxVideoArg, txVideoArg = argfactory('video')
         txAudioArg.channels = 8
