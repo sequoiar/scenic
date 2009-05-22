@@ -266,18 +266,21 @@ class GstChannel(object):
         remote_sender_procs_params, remote_receiver_procs_params = split_gst_parameters(global_setting, local_ip)
         #remote_sender_procs_params, remote_receiver_procs_params = split_gst_parameters(global_setting, address)
         # send settings to remote miville
-        self.initiate_streaming(receiver_procs_params, sender_procs_params, remote_receiver_procs_params, remote_sender_procs_params, contact.address)
+        self.initiate_streaming(receiver_procs_params, sender_procs_params, remote_receiver_procs_params, remote_sender_procs_params, contact.address, contact)
 
-    def initiate_streaming(self, rx_params, tx_params, rx_remote_params, tx_remote_params, contact_addr):
+    def initiate_streaming(self, rx_params, tx_params, rx_remote_params, tx_remote_params, contact_addr, contact):
         """
         A initiates the streaming.
         
         Sends a message to B with REMOTE_STREAMING_CMD key.
+
+        Sends it our setting name, as seen from here.
         """
         self.receiver_procs_params = rx_params
         self.sender_procs_params = tx_params
-        self.start_local_gst_processes(self.receiver_procs_params,  self.sender_procs_params)
-        self.send_message(REMOTE_STREAMING_CMD, [rx_remote_params, tx_remote_params, contact_addr])
+        setting_name = self.api.settings.get_global_setting_from_id(self.contact.setting).name
+        self.start_local_gst_processes(self.receiver_procs_params,  self.sender_procs_params, setting_name)
+        self.send_message(REMOTE_STREAMING_CMD, [rx_remote_params, tx_remote_params, contact_addr, setting_name])
 
     def stop_streaming(self, address):
         """
@@ -314,11 +317,13 @@ class GstChannel(object):
             log.error("No tx processes to stop")
         caller = None
         self.notify_stopped()
+
     def notify_stopped(self):
         """
         Notifies the API that we stopped streaming
         """
         self.contact.stream_state = 0
+        caller = None
         self.api.notify(caller, {'stopped':True, 'msg':"streaming stopped", "contact_name":self.contact.name}, "stop_streams") 
       
     def on_remote_message(self, key, args=None):
@@ -341,9 +346,10 @@ class GstChannel(object):
             rx_params = args[0]
             tx_params = args[1]
             remote_ip = args[2] #self.remote_addr
+            setting_name = args[3]
             self.api.notify(caller, "Starting GST processes", "info" )
             log.debug("on_remote_message got REMOTE_STREAMING_CMD: will call start_local_gst_processes(%s, %s)" % (str(rx_params), str(tx_params)))
-            self.start_local_gst_processes(rx_params, tx_params )
+            self.start_local_gst_processes(rx_params, tx_params, setting_name)
         
         elif key ==  STOP_RECEIVERS_CMD:
             self._stop_local_rx_procs()
@@ -372,7 +378,7 @@ class GstChannel(object):
             log.debug('GstChannel._start_stream_engines: ' + str(engine))
             engine.start_streaming()
             
-    def start_local_gst_processes(self, rx_params, tx_params):
+    def start_local_gst_processes(self, rx_params, tx_params, setting_name=''):
         """
         creates processses and send init messages
         """
@@ -392,8 +398,19 @@ class GstChannel(object):
         log.debug( pprint.pformat(self.sender_procs_params)) 
         self.sender_engines = _create_stream_engines(self.api, 'send', self.sender_procs_params)
         self._start_stream_engines(self.sender_engines)
+        self.notify_started(setting_name)
+
+    def notify_started(self, setting_name=''):
+        """
+        Notifies the observers that we started to stream.
+        """
         caller = None
-        self.api.notify(caller, {'started':True, 'contact_name':self.contact.name, 'msg':"streaming started"}, "start_streams") 
+        self.api.notify(caller, {
+            'started':True, 
+            'contact_name':self.contact.name,
+            'setting_name':setting_name,
+            'msg':"streaming started"
+            }, "start_streams") 
         self.contact.stream_state = 2 # IMPORTANT !
             
     def send_message(self, key, args_list=[]):
@@ -407,3 +424,4 @@ class GstChannel(object):
             self.com_chan.callRemote('Gst', key, args_list)
         except AttributeError, e:
             log.error("Could not send message to remote: " + e.message)
+

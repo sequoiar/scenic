@@ -322,7 +322,8 @@ class Addressbook(Widget):
                     contact = self.api.get_contact(contact_name)
                     log.debug('(contact name=%s).stream_state: %s' % (contact_name, contact.stream_state))
                     self.api.get_contacts(self)
-                    self.callRemote('update_status', contact_name, 'Streaming', 'Currently streaming.')
+                    setting_name = data['setting_name']
+                    self.callRemote('update_status', contact_name, 'Streaming (%s)' % (setting_name), 'Currently streaming. (%s)' % (setting_name))
                     # updates list
                 else:
                     log.warning('TODO:self.callRemote()')
