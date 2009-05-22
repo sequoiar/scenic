@@ -43,8 +43,8 @@ enum LogLevel {
     DEBUG = 10,
     INFO = 20,
     WARNING = 30,
+    THROW = 35,         //those below can throw 
     ERROR = 40,
-    THROW = 45,         //those below throw 
     CRITICAL = 50,
     ASSERT_FAIL = 60
 };
