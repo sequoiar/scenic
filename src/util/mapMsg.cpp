@@ -88,7 +88,7 @@ bool StrIntFloat::empty() const {
 
 char StrIntFloat::get_type() const { return type_;}
 
-StrIntFloat::operator std::string () const {   
+StrIntFloat::operator const std::string& () const {   
     TYPE_CHECKMSG(s_,string);
 }
 
@@ -99,7 +99,6 @@ StrIntFloat::operator std::vector<double> () const {
 StrIntFloat::operator int ()const {
     TYPE_CHECKMSG(i_,integer);
 }
-
 StrIntFloat::operator bool ()const {
     if(type_ == 'n')
         return false;
@@ -113,11 +112,11 @@ StrIntFloat::operator bool ()const {
 
     return true;  
 }
-
+#if 0
 StrIntFloat::operator double ()const {
     TYPE_CHECKMSG(f_,double);
 }
-
+#endif
 bool StrIntFloat::operator==(const StrIntFloat& in) {
     if(type_ != in.type_) return false;
     switch(type_)

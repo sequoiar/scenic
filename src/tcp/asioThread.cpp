@@ -54,17 +54,22 @@ static std::string get_line(std::string& msg)
 {
     std::string ret=msg;
     std::string::size_type pos = msg.find_first_of("\r\n");
-    int count = 0;
     if(pos != std::string::npos)
     {
-        count++;
+        int count = 1;
         if(msg[pos+1] == '\r' or msg[pos+1] == '\n')
             count++;
         ret = msg.substr(0, pos+count);
         msg = msg.substr(pos+count);
+        if(ret.find_first_not_of(" \r\n\t") == std::string::npos)
+            ret.clear();
     }
     else
+    {
         msg.clear();
+        ret.clear();
+    }
+
 
     return ret;
 }

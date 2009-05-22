@@ -44,10 +44,10 @@ friend class MapMsg;
         Except except()const { return e_;}
     
         std::string str() const { return s_; }
-        operator std::string () const;
+        operator const std::string& () const;
         operator std::vector<double> () const;
         operator int ()const;
-        operator double ()const;
+        //operator double ()const;
         operator bool ()const;
 
         bool operator==(const StrIntFloat& sif);

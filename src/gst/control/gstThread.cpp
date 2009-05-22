@@ -188,15 +188,12 @@ void GstReceiverThread::video_init(MapMsg& msg)
  
     try
     {
-        LOG_INFO("video_init");
-        const int SCREEN = msg["screen"] ? msg["screen"] : 0;
-        std::string VIDEO_SINK;
+        if(!msg["screen"])
+            msg["screen"] = 0;
         if(!msg["sink"])
-            VIDEO_SINK = "xvimagesink";
-        else
-            VIDEO_SINK = msg["sink"].str();
+            msg["sink"] = "xvimagesink";
 
-        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], SCREEN, VIDEO_SINK, msg["deinterlace"]);
+        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], msg["screen"], msg["sink"], msg["deinterlace"]);
     }
     catch(ErrorExcept e)
     {
@@ -215,22 +212,18 @@ void GstReceiverThread::audio_init(MapMsg& msg)
 
     try
     {
-        std::string AUDIO_SINK, AUDIO_LOCATION;
         int audioBufferTime = audiofactory::AUDIO_BUFFER_USEC;
         if(!msg["sink"])
-            AUDIO_SINK = "jackaudiosink";
-        else
-            AUDIO_SINK = std::string(msg["sink"]);
-        if(!msg["device"])
-            AUDIO_LOCATION = "";
-        else
-            AUDIO_LOCATION = std::string(msg["device"]); 
+            msg["sink"] = "jackaudiosink";
 
+        if(!msg["device"])
+            msg["device"] = "";
+        
         if (msg["audio_buffer_usec"]) // take specified buffer time if present, otherwise use default
             audioBufferTime = msg["audio_buffer_usec"];
 
         audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], 
-                AUDIO_SINK, AUDIO_LOCATION, audioBufferTime);
+                msg["sink"], msg["device"], audioBufferTime);
     }
     catch(ErrorExcept e)
     {
@@ -254,21 +247,19 @@ void GstSenderThread::video_init(MapMsg& msg)
     video_ = 0;
     try
     {
-        LOG_INFO("video_init");
-        std::string videoDevice, videoLocation;
-        if(msg["location"])
-            videoLocation = std::string(msg["location"]);
-        if(msg["device"])
-            videoDevice = std::string(msg["device"]);
+        if(!msg["location"])
+            msg["location"] = "";
+        if(!msg["device"])
+            msg["device"] = "";
 
-        VideoSourceConfig config(msg["source"], msg["bitrate"], videoDevice, videoLocation);
+        VideoSourceConfig config(msg["source"], msg["bitrate"], msg["device"], msg["location"]);
         video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
         if(ff[1])
             videoFirst = false;
         else
             videoFirst = true;
 
-        ff[0] = boost::bind(tcpSendBuffer, msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, videofactory::MSG_ID, _1);
+        ff[0] = boost::bind(tcpSendBuffer, msg["address"], msg["port"] + ports::CAPS_OFFSET, videofactory::MSG_ID, _1);
     }
     catch(ErrorExcept e)
     {
@@ -287,17 +278,16 @@ void GstSenderThread::audio_init(MapMsg& msg)
     try
     {
         LOG_INFO("audio_init");
-        std::string audioDevice, audioLocation;
         
-        if(msg["location"])
-            audioLocation = msg["location"].str();
-        if(msg["device"])
-            audioDevice = msg["device"].str();
+        if(!msg["location"])
+            msg["location"] = "";
+        if(!msg["device"])
+            msg["device"] = "";
 
-        AudioSourceConfig config(msg["source"], audioDevice, audioLocation, msg["channels"]);
+        AudioSourceConfig config(msg["source"], msg["device"], msg["location"], msg["channels"]);
         audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
          
-        ff[1] = boost::bind(tcpSendBuffer, msg["address"], static_cast<int>(msg["port"]) + ports::CAPS_OFFSET, audiofactory::MSG_ID, _1);
+        ff[1] = boost::bind(tcpSendBuffer, msg["address"], msg["port"] + ports::CAPS_OFFSET, audiofactory::MSG_ID, _1);
     }
     catch(ErrorExcept e)
     {

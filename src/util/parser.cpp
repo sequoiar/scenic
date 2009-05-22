@@ -96,9 +96,9 @@ static POS get_end_of_quoted_string(const std::string& str)
 
 static void erase_to_end_of_whitespace(std::string &in)
 {
-    POS pos = in.find_first_of(' ');
+    POS pos = in.find_first_of(" \n\r\t");
     in.erase(0, pos);
-    pos = in.find_first_not_of(' ');
+    pos = in.find_first_not_of(" \n\r\t");
     if(pos != std::string::npos)
         in.erase(0, pos);
 }
@@ -127,7 +127,7 @@ void MapMsg::tokenize(const std::string& str, MapMsg &cmd_map)
     cmd_map.cmd() = lstr.substr(0, tok_end);                        //insert command into map
     erase_to_end_of_whitespace(lstr);                               //set lstring beyond command
     if(lstr.empty())
-        return;
+        THROW_ERROR("No command found.");
     
     for(;;)                                                         //loop until break 
     {

@@ -52,11 +52,9 @@ boost::python::dict makeDict(MapMsg& m)
                 d.setdefault(it->first.c_str(),int(it->second));
                 break;
             case 'f':
-                d.setdefault(it->first.c_str(),double(it->second));
-                break;
             case 'F':
-                break;
             case 'e':
+                THROW_ERROR("NOT IMPLEMENTED");
                 break;
 //                default:
 //                    THROW_ERROR("Command " << it->first
