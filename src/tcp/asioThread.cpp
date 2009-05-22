@@ -295,6 +295,8 @@ class udp_sender
                 if(MsgThread::isQuitted())
                     io_service_.stop();
 
+                LOG_DEBUG("trying to send");
+
                 socket_.async_send_to(buffer(buff_),*iterator, boost::bind(&udp_sender::handle_send_to,this,error,bytes_transferred));
             }
             else
