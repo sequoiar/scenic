@@ -92,7 +92,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst("settings --type media --add audio_basic_rx", "Media setting added")
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=codec:raw', 'modified')    
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=engine:Gst', 'modified')
-        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=source:audiotestsrc', 'modified') 
+        self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=source:jackaudiosrc', 'modified') 
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=channels:8', 'modified')
         self.tst('settings --type media --mediasetting audio_basic_rx  --modify settings=audio_buffer_usec:30000', 'modified')      
 
@@ -245,7 +245,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         self.tst("settings --type media --add audio_basic_tx", "Media setting added")
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=codec:raw'           , 'modified')
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=engine:Gst'            , 'modified')
-        self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=source:audiotestsrc'   , 'modified')       
+        self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=source:jackaudiosrc'   , 'modified')       
         self.tst('settings --type media --mediasetting audio_basic_tx  --modify settings=channels:8', 'modified')
 
 
