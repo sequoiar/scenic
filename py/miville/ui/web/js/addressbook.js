@@ -51,6 +51,7 @@ Addressbook.methods(
 		self.contact_flds = [self.name_fld, self.address_fld, self.port_fld]
 		self.auto_answer_chk = $('adb_auto_answer');
 		self.edit_btn = $('adb_edit');
+		self.error_div = $('adb_error_msg');
 
 		// Get string translations. TODO: (maybe we can do this automatically?)
 		self.save_str = $('js_adb_save').get('text');
@@ -247,7 +248,8 @@ Addressbook.methods(
 				self.list.getElement('li[name=' + item + ']').dispose();
 				// update the selected contact to null if we delete the selected one
 				if (item == self.selected) {
-					self.update_selected(null);
+					//self.update_selected(null);
+					self.update_selected(self, null);
 				}
 			}
 		});
@@ -503,7 +505,9 @@ Addressbook.methods(
 	 * @param {string} msg
 	 */
 	function error(self, msg) {
-		StickyWin.alert('Error', msg);
+        self.error_div.empty();
+        var span = new Element('span').appendText(msg).inject(self.error_div);
+		//StickyWin.alert('Error', msg);
 	},
 
 
@@ -638,6 +642,7 @@ Addressbook.methods(
 									self.name_fld.value,
 									self.auto_answer_chk.checked);
 			}
+            self.error('');
 		}
 	},
 
@@ -673,7 +678,8 @@ Addressbook.methods(
 			if (new_selection) {
 				selected = new_selection.get('name');
 			}
-			self.update_selected(selected);
+			//self.update_selected(selected);
+			self.update_selected(self, selected);
 			self.callRemote('rc_remove_contact', removed);
 		}
 	},

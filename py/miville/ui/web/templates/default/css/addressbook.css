@@ -96,3 +96,6 @@ li.auto_created {
 	margin: 0px 0px 0px 10px;
 }
 
+#adb_error_msg {
+    color: #900;
+}
