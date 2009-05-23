@@ -161,9 +161,9 @@ class tcp_session
                 if(queue_.ready())
                 {
                     MapMsg msg = queue_.timed_pop(1);
-                    if(!msg.cmd().empty())
+                    if(msg())
                     {
-                        if(!(msg.cmd() == "quit"))
+                        if(!(msg() == "quit"))
                         {
                             std::string msg_str;
                             msg.stringify(msg_str);
@@ -343,7 +343,7 @@ class udp_server
                 MapMsg msg;
                 LOG_DEBUG("MSG: bytes_recvd " << bytes_recvd);
                 msg.tokenize(data_);
-                if(msg.cmd() == "buffer")
+                if(msg() == "buffer")
                 {
                     id_ = msg["id"];
                     buff_ = msg["str"].str();

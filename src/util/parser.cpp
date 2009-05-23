@@ -124,7 +124,7 @@ void MapMsg::tokenize(const std::string& str, MapMsg &cmd_map)
     tok_end = lstr.find_first_of(':');                              //search for ":"
     if(tok_end == std::string::npos)                                      //if : not found return error
         THROW_ERROR("No command found.");
-    cmd_map.cmd() = lstr.substr(0, tok_end);                        //insert command into map
+    cmd_map() = lstr.substr(0, tok_end);                        //insert command into map
     erase_to_end_of_whitespace(lstr);                               //set lstring beyond command
     if(lstr.empty())
         THROW_ERROR("No command found.");
@@ -208,7 +208,7 @@ bool MapMsg::stringify(const MapMsg& const_cmd_map, std::string& rstr)
     std::stringstream sstr;
     rstr.clear();
     //locate "command" and output value to str
-    sstr << cmd_map.cmd() << ":";
+    sstr << cmd_map() << ":";
     const std::pair<const std::string, StrIntFloat>* it;
 
     //for each pair in the map

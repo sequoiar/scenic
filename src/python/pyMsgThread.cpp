@@ -77,23 +77,24 @@ ThreadWrap::ThreadWrap(MsgWrapConfig* conf,dictMessageHandler* hd):
 bool ThreadWrap::send(boost::python::dict dt)
 {     
     MapMsg m;
-    boost::python::list l = dt.items();
-    int n = boost::python::extract<int>(l.attr("__len__")());
+    using namespace boost::python;
+    list l = dt.items();
+    int n = extract<int>(l.attr("__len__")());
     LOG_DEBUG(n);
         
     for ( int i = 0; i < n; i++ )
     {
         std::string skey,sval;
-        boost::python::tuple val = (boost::python::extract<boost::python::tuple>(l[i]));
-        skey = boost::python::extract<std::string>(val[0]);
-        if(boost::python::extract<std::string>(val[1]).check()){
-            m[skey] = boost::python::extract<std::string>(val[1]); 
+        tuple val = (extract<tuple>(l[i]));
+        skey = extract<std::string>(val[0]);
+        if(extract<std::string>(val[1]).check()){
+            m[skey] = extract<std::string>(val[1]); 
         }else
-        if(boost::python::extract<int>(val[1]).check()){
-            m[skey] = boost::python::extract<int>(val[1]); 
+        if(extract<int>(val[1]).check()){
+            m[skey] = extract<int>(val[1]); 
         }
         q_.push(m);
-        //sval = boost::python::extract<std::string>(val[1]);
+        //sval = extract<std::string>(val[1]);
         //m[skey] = sval;
         LOG_DEBUG(skey << ">>" << sval);
     }
@@ -107,9 +108,9 @@ void PythonThread::main()
     for(;;)
     {
         MapMsg m = q_.timed_pop(10);
-        if(!m.cmd())
+        if(!m())
             continue;
-        if(m.cmd() == "quit")
+        if(m() == "quit")
             break;
 
         PyGILState_STATE state = PyGILState_Ensure();

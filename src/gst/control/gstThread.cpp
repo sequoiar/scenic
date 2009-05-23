@@ -64,7 +64,7 @@ void GstSenderThread::start(MapMsg& )
 
 void GstThread::handleMsg(MapMsg &msg)
 {
-    if(msg.cmd() == "audio_init")
+    if(msg() == "audio_init")
     {
         try
         {
@@ -82,17 +82,17 @@ void GstThread::handleMsg(MapMsg &msg)
         }
         
     }
-    else if(msg.cmd() == "stop")
+    else if(msg() == "stop")
     {
         stop(msg);
         stop_id = msg["id"];
     }
-    else if(msg.cmd() == "start")
+    else if(msg() == "start")
     {
         start(msg);
         play_id = msg["id"];
     }
-    else if(msg.cmd() == "video_init")
+    else if(msg() == "video_init")
     {
         try
         {
@@ -109,7 +109,7 @@ void GstThread::handleMsg(MapMsg &msg)
             queue_.push(r);
         }
     }
-    else if (msg.cmd() == "rtp")
+    else if (msg() == "rtp")
         queue_.push(msg);
     else
         LOG_WARNING("Unknown Command.");
@@ -144,9 +144,9 @@ void GstThread::main()
                     stop_id = 0;
                 }
 
-                if(f.cmd())
+                if(f())
                 {
-                    if(f.cmd() == "quit")
+                    if(f() == "quit")
                     {
                         queue_.push(f);
                         done = true;
@@ -158,7 +158,7 @@ void GstThread::main()
 
                 }
                 f = queue_.timed_pop(1);
-            }while(f.cmd());
+            }while(f());
         }
         usleep(MILLISEC_WAIT*1000);
     }
@@ -300,7 +300,7 @@ void GstSenderThread::audio_init(MapMsg& msg)
 
 bool GstReceiverThread::subHandleMsg(MapMsg &msg)
 {
-    if (msg.cmd() == "jitterbuffer")
+    if (msg() == "jitterbuffer")
     {
         updateJitterBuffer(msg);
         return true;    // no one else should handle this

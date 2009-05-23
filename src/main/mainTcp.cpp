@@ -108,8 +108,8 @@ bool MainModule::run()
             if(gst_queue.ready())
             {
                 MapMsg gmsg = gst_queue.timed_pop(1);
-                while(!gmsg.cmd().empty()){
-                    if (gmsg.cmd() == "quit")
+                while(gmsg()){
+                    if (gmsg() == "quit")
                     {
                         MsgThread::broadcastQuit();
                         LOG_INFO("Program Termination in Progress FROM GST");
@@ -122,25 +122,25 @@ bool MainModule::run()
             if(tcp_queue.ready())
             {
                 MapMsg tmsg = tcp_queue.timed_pop(1);
-                while(!tmsg.cmd().empty())
+                while(tmsg())
                 {
                     try
                     {
-                        if (tmsg.cmd() == "quit")
+                        if (tmsg() == "quit")
                         {
                             MsgThread::broadcastQuit();
                             LOG_INFO("Normal Program Termination in Progress");
                             return 0;
                         }
-                        else if (tmsg.cmd() == "exception")
+                        else if (tmsg() == "exception")
                         {
                             throw tmsg["exception"].except();
                         }
 
-                        MapMsg ret(tmsg.cmd());
+                        MapMsg ret(tmsg());
                         tmsg["id"] = ret["id"] = ++msg_count;
 
-                        if(tmsg.cmd() == "loglevel")
+                        if(tmsg() == "loglevel")
                         {
                             logger_.setLevel(tmsg["level"]);
                         }

@@ -40,7 +40,7 @@ friend class MapMsg;
         StrIntFloat()
             : type_('n'), s_(), i_(0), f_(0.0),e_(),F_(),key_(){}
         char get_type() const; 
-        bool empty() const;
+//        bool empty() const;
         Except except()const { return e_;}
     
         std::string str() const { return s_; }
@@ -80,8 +80,8 @@ public:
     typedef std::map<std::string, StrIntFloat> MapMsg_;
     typedef const std::pair<const std::string,StrIntFloat>* Item;
     MapMsg():map_(),it_(){}
-    MapMsg(std::string command):map_(),it_(){ cmd() = command;}
-    StrIntFloat &cmd() { return (*this)["command"]; }
+    MapMsg(std::string command):map_(),it_(){ (*this)() = command;}
+    StrIntFloat &operator()() { return (*this)["command"]; }
     StrIntFloat &operator[](const std::string& str);
     void tokenize(const std::string& str) { tokenize(str,*this); }
     bool stringify(std::string& str) const { return stringify(*this,str); }

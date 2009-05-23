@@ -82,9 +82,11 @@ bool MapMsg::post()
         THROW_ERROR("Parameter " << key_ << " should be " << #xtype << " not " << T_EXPAND(type_) << "." );\
     return gtype   
 
+#if 0
 bool StrIntFloat::empty() const {
     return type_ == 'n';
 }
+#endif
 
 char StrIntFloat::get_type() const { return type_;}
 
