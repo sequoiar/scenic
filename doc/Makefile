@@ -13,7 +13,7 @@ html: doxygen
 doxygen:
 	@doxygen
 
-install:
+install: html
 	@if test -e html; then \
     echo INSTALLING docs at $(DESTDIR)$(prefix); \
 	mkdir -p $(DESTDIR)$(prefix)/share/doc/doxygen; \
