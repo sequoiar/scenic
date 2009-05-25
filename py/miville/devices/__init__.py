@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+import sys
 
-from devices import *
+from miville.devices.devices import *
 from miville.errors import CommandNotFoundError
 # TODO: from miville.utils import find_modules, load_modules
 
@@ -23,8 +24,11 @@ def stop():
     The idea is to call the destructors of every drivers in order to 
     remove any reactor.callLater
     """
-    del devices.managers['audio'].drivers['jackd']
-    del devices.managers['video'].drivers['v4l2']
+    try:
+        del devices.managers['audio'].drivers['jackd']
+        del devices.managers['video'].drivers['v4l2']
+    except:
+        print sys.exc_info()
 
 # def load_drivers(api):
 #     # TODO !!!

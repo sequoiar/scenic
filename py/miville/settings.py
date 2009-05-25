@@ -207,14 +207,14 @@ class Settings(object):
             log.info("Loading object jelly from: " + presets_file_name)
             presets = Settings._load_nice_object_from_file(presets_file_name, current_major_version_number)
         else:
-            log.error('Preset file "%s" is missing.' % presets_file_name)
+            log.warning('Preset file "%s" is missing.' % presets_file_name)
         
         # user settings file is optional...
         if os.path.exists(user_settings_file_name):
             log.info("Loading object jelly from: " + user_settings_file_name)
             user_settings = Settings._load_nice_object_from_file(user_settings_file_name, current_major_version_number)
         else:
-            log.error('User settings file "%s" is missing.' % user_settings_file_name)
+            log.warning('User settings file "%s" is missing.' % user_settings_file_name)
         # load presets and then user global settings
         if presets:
             presets_globals = presets[0]

@@ -244,13 +244,13 @@ def create_connection(contact, api):
     if contact.kind == 'group':
         raise NotImplementedError, 'Group contact not implemented for the moment.'
     if contact.state > DISCONNECTED:
-        raise ConnectionError, 'Contact \'%s\' already engage in a connection. State: %s.' % (contact.name, contact.state)
+        raise ConnectionError, 'Contact \'%s\' already engaged in a connection. State: %s.' % (contact.name, contact.state)
 #    if contact.name in connections:
 #        raise ConnectionError, 'Can not connect. This contact \'%s\' already have a connection.' % contact.name
     if not contact.connector:
         raise ConnectorError, 'Cannot connect. No connector specified for that contact.'
     if contact.connector not in connectors:
-        raise ConnectorError, 'Cannot connect. Connector \'%s\' not available.' % contact.connector
+        raise ConnectorError, 'Cannot connect. Connector \'%s\' module has not been loaded by miville.' % contact.connector
 
     klass = getattr(connectors[contact.connector], 'Connection' + contact.connector.title())
     contact.connection = klass(contact, api)
