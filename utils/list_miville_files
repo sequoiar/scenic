@@ -26,4 +26,5 @@ then
     find py -name Makefile.in -or -name Makefile.am -exec install -D {} $DESTDIR$PREFIX{} \;
     find py/docs -name \*.txt -exec install -D {} $DESTDIR$PREFIX{} \;
     install -D "py/docs/Makefile" "$DESTDIR${PREFIX}py/docs/Makefile"
+    install -D "py/miville.py" "$DESTDIR${PREFIX}py/miville.py"
 fi

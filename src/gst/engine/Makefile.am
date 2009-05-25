@@ -17,7 +17,7 @@ libgst_a_SOURCES = mediaBase.cpp \
 				   audioSender.h audioReceiver.h $(inc)/alsa.h\
 				   videoConfig.h rtpBin.h pipeline.h \
 				   rtpSender.h rtpReceiver.h audioSource.h \
-				   interleave.h gstLinkable.h videoSink.h audioSink.h $(inc)/jackUtils.h \
+				   gstLinkable.h videoSink.h audioSink.h $(inc)/jackUtils.h \
 				   codec.h rtpPay.h audioConfig.h remoteConfig.h \
 				   videoReceiver.h videoSender.h videoSource.h raw1394Util.h \
 				   audioLevel.h glVideoSink.h playback.h dv1394.h v4l2util.h fileSource.h
