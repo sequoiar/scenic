@@ -396,7 +396,7 @@ v1.0
 								['unicode', 'Gst']], 
 							[
 								['unicode', 'source'], 
-								['unicode', 'audiotestsrc']], 
+								['unicode', 'jackaudiosrc']], 
 							[
 								['unicode', 'codec'], 
 								['unicode', 'raw']], 
@@ -503,7 +503,7 @@ v1.0
 								['unicode', 'Gst']], 
 							[
 								['unicode', 'source'], 
-								['unicode', 'audiotestsrc']], 
+								['unicode', 'jackaudiosrc']], 
 							[
 								['unicode', 'codec'], 
 								['unicode', 'raw']], 
