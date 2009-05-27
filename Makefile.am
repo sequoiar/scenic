@@ -12,8 +12,7 @@ dist-hook:
 	    find doc/ -exec install -D {} $(top_distdir)/{} \;
 	    find py/docs/ -exec install -D {} $(top_distdir)/{} \;
 install-exec-hook:
-	    mkdir -p $(DESTDIR)$(prefix)/share/doc/sphinx
-	    cp -fvr py/docs/_build/html/ $(DESTDIR)$(prefix)/share/doc/sphinx
+	@if test -e doc/html; then mkdir -p $(DESTDIR)$(prefix)/share/doc/sphinx; cp -fvr py/docs/_build/html/ $(DESTDIR)$(prefix)/share/doc/sphinx; fi
 	@if test -e doc/html; then \
     echo INSTALLING docs at $(DESTDIR)$(prefix); \
 	mkdir -p $(DESTDIR)$(prefix)/share/doc/doxygen; \

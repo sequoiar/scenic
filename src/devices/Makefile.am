@@ -1,6 +1,6 @@
-include $(top_srcdir)/globals.mak
+#include $(top_srcdir)/globals.mak
 
-bin_PROGRAMS = firereset
-firereset_SOURCES = firereset.c
+#bin_PROGRAMS = firereset
+#firereset_SOURCES = firereset.c
 
-LDADD = $(LIBAVC1394_LIBS) 
+#LDADD = $(LIBAVC1394_LIBS) 

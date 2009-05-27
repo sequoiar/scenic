@@ -35,11 +35,15 @@ distclean: clean
 
 moreclean: clean
 
-html:
+html:	
+	if [ -z `which $(SPHINXBUILD)` ] ; then      
+	@echo "Sphinx Not found!"
+	else
 	mkdir -p _build/html _build/doctrees
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
 	@echo
 	@echo "Build finished. The HTML pages are in _build/html."
+	fi
 
 pickle:
 	mkdir -p _build/pickle _build/doctrees
@@ -81,7 +85,7 @@ linkcheck:
 
 check:
 
-install: html
+install: 
 	#mkdir -p $(DESTDIR)$(prefix)/share/doc/sphinx
 	#cp -fvr _build/html/ $(DESTDIR)$(prefix)/share/doc/sphinx
 

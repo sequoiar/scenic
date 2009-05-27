@@ -22,6 +22,7 @@
 #ifndef _AUDIO_SOURCE_H_
 #define _AUDIO_SOURCE_H_
 
+#pragma GCC diagnostic ignored "-pedantic"
 #include <gst/audio/multichannel.h>
 #include "gstLinkable.h"
 #include "busMsgHandler.h"

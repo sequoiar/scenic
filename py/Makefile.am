@@ -27,9 +27,7 @@ install-exec-hook:
 		cp -fvr miville/ $(DESTDIR)$(prefix)/lib/python2.5
 		mkdir -p $(DESTDIR)$(prefix)/bin
 		cp -fv miville.py $(DESTDIR)$(prefix)/bin/miville
-	    mkdir -p $(DESTDIR)$(prefix)/share/doc/miville/sphinx
-	    cp -fvr docs/_build/html/ $(DESTDIR)$(prefix)/share/doc/miville/sphinx
-
+	if test -d docs/_build/html; then mkdir -p $(DESTDIR)$(prefix)/share/doc/miville/sphinx; cp -fvr docs/_build/html/ $(DESTDIR)$(prefix)/share/doc/miville/sphinx; fi
 uninstall-hook:
 		rm -rf $(DESTDIR)$(prefix)/lib/python2.5/miville
 		rm -rf $(DESTDIR)$(prefix)/bin/miville

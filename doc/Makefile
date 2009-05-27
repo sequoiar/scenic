@@ -11,9 +11,9 @@ html: doxygen
         (cd $$i; $(MAKE) $(MFLAGS) $(MYMAKEFLAGS) html); done
 	
 doxygen:
-	@doxygen
+	@if [ -z `which doxygen` ]; then echo "No Doxygen!"; else doxygen; fi
 
-install: html
+install: 
 	@if test -e html; then \
     echo INSTALLING docs at $(DESTDIR)$(prefix); \
 	mkdir -p $(DESTDIR)$(prefix)/share/doc/doxygen; \
