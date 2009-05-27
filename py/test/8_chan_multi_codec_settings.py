@@ -156,7 +156,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         
         #add media stream        
         self.tst("settings --type stream --globalsetting h263_rxtx --subgroup recv --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting h263_rxtx --subgroup recv --mediastream video01 --modify setting=10001", "modified")
+        self.tst("settings --type stream --globalsetting h263_rxtx --subgroup recv --mediastream video01 --modify setting=10002", "modified")
         self.tst("settings --type stream --globalsetting h263_rxtx --subgroup recv --mediastream video01 --modify port=6696", "modified")        
         self.tst("settings --type stream --globalsetting h263_rxtx --subgroup recv --mediastream video01 --modify enabled=True", "modified")
 
@@ -188,7 +188,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         
         #add media stream        
         self.tst("settings --type stream --globalsetting h264_rxtx --subgroup recv --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting h264_rxtx --subgroup recv --mediastream video01 --modify setting=10001", "modified")
+        self.tst("settings --type stream --globalsetting h264_rxtx --subgroup recv --mediastream video01 --modify setting=10003", "modified")
         self.tst("settings --type stream --globalsetting h264_rxtx --subgroup recv --mediastream video01 --modify port=6696", "modified")        
         self.tst("settings --type stream --globalsetting h264_rxtx --subgroup recv --mediastream video01 --modify enabled=True", "modified")
 
@@ -220,7 +220,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
         
         #add media stream        
         self.tst("settings --type stream --globalsetting theora_rxtx --subgroup recv --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting theora_rxtx --subgroup recv --mediastream video01 --modify setting=10001", "modified")
+        self.tst("settings --type stream --globalsetting theora_rxtx --subgroup recv --mediastream video01 --modify setting=10004", "modified")
         self.tst("settings --type stream --globalsetting theora_rxtx --subgroup recv --mediastream video01 --modify port=6696", "modified")        
         self.tst("settings --type stream --globalsetting theora_rxtx --subgroup recv --mediastream video01 --modify enabled=True", "modified")
 
@@ -306,7 +306,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
 
         #add media stream        
         self.tst("settings --type stream --globalsetting h263_rxtx --subgroup send --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting h263_rxtx --subgroup send --mediastream video01 --modify setting=10001", "modified")
+        self.tst("settings --type stream --globalsetting h263_rxtx --subgroup send --mediastream video01 --modify setting=10002", "modified")
         self.tst("settings --type stream --globalsetting h263_rxtx --subgroup send --mediastream video01 --modify port=6680", "modified")        
         self.tst("settings --type stream --globalsetting h263_rxtx --subgroup send --mediastream video01 --modify enabled=True", "modified")
         
@@ -338,7 +338,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
 
         #add media stream        
         self.tst("settings --type stream --globalsetting h264_rxtx --subgroup send --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting h264_rxtx --subgroup send --mediastream video01 --modify setting=10001", "modified")
+        self.tst("settings --type stream --globalsetting h264_rxtx --subgroup send --mediastream video01 --modify setting=10003", "modified")
         self.tst("settings --type stream --globalsetting h264_rxtx --subgroup send --mediastream video01 --modify port=6680", "modified")        
         self.tst("settings --type stream --globalsetting h264_rxtx --subgroup send --mediastream video01 --modify enabled=True", "modified")
 
@@ -370,7 +370,7 @@ class Test_001_network_streaming(testing.TelnetBaseTest):
 
         #add media stream        
         self.tst("settings --type stream --globalsetting theora_rxtx --subgroup send --add video", "Media stream added")         
-        self.tst("settings --type stream --globalsetting theora_rxtx --subgroup send --mediastream video01 --modify setting=10001", "modified")
+        self.tst("settings --type stream --globalsetting theora_rxtx --subgroup send --mediastream video01 --modify setting=10004", "modified")
         self.tst("settings --type stream --globalsetting theora_rxtx --subgroup send --mediastream video01 --modify port=6680", "modified")        
         self.tst("settings --type stream --globalsetting theora_rxtx --subgroup send --mediastream video01 --modify enabled=True", "modified")
         
