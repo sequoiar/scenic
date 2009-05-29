@@ -9,16 +9,16 @@ all:
 html: $(HTML_TARGETS)
 
 %_dot.png: %.dot
-		dot -Tpng $< > $@
+		-dot -Tpng $< > $@
 
 %_dot.svg: %.dot
-		dot -Tsvg $< > $@
+		-dot -Tsvg $< > $@
 
 %_msc.png: %.msc
-		mscgen -T png -i $< -o $@
+		-mscgen -T png -i $< -o $@
 
 %_msc.svg: %.msc 
-		mscgen -T svg -i $< -o $@
+		-mscgen -T svg -i $< -o $@
 
 install:
 
