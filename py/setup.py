@@ -19,10 +19,11 @@ For distribution packages::
 """
 from setuptools import find_packages
 from setuptools import setup
+__version__ = "0.1.3-a"
 
 setup(
     name = "miville",
-    version = "0.1.3-a2",
+    version = __version__,
     author = "SAT",
     author_email = "info@sat.qc.ca",
     url = "http://www.sat.qc.ca",
@@ -30,7 +31,7 @@ setup(
     long_description = """Miville software, a component of the PropulseART project
     Requires: twisted, nevow.""",
     install_requires = ['twisted'], # , 'nevow'], 'nevow' is installed even if ubuntu package is preset. Disabling it from dependecies for now.
-    scripts = ["restart_jackd.py"], #, "osc_send.py", "osc_receive.py"],
+    scripts = ["restart_jackd.py"], #, "miville.py"
     license = "GPL",
     platforms = ["any"],
     zip_safe = False,

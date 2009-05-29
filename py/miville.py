@@ -33,7 +33,8 @@ See the MivilleConfiguration class in miville/core.py
 from optparse import OptionParser
 from miville.core import *
 
-__version__ = "0.1 alpha"
+__version__ = "0.1.3-a"
+VERSION = __version__
 
 if __name__ == '__main__':
     """
