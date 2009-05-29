@@ -23,13 +23,13 @@ TESTS = test/test_addressbook.py \
 #EXTRA_DIST: $(shell `../utils/list_miville_files`)
 
 install-exec-hook:
-		mkdir -p $(DESTDIR)$(prefix)/lib/python2.5/miville
-		cp -fvr miville/ $(DESTDIR)$(prefix)/lib/python2.5
+		mkdir -p $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville
+		find -not -regex ".*(akefile).*" -not -regex ".*svn.*" -exec cp -fv {} $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville/ \;
 		mkdir -p $(DESTDIR)$(prefix)/bin
 		cp -fv miville.py $(DESTDIR)$(prefix)/bin/miville
 	if test -d docs/_build/html; then mkdir -p $(DESTDIR)$(prefix)/share/doc/miville/sphinx; cp -fvr docs/_build/html/ $(DESTDIR)$(prefix)/share/doc/miville/sphinx; fi
 uninstall-hook:
-		rm -rf $(DESTDIR)$(prefix)/lib/python2.5/miville
+		rm -rf $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville
 		rm -rf $(DESTDIR)$(prefix)/bin/miville
 
 # temporarily removed: check_ping.py
