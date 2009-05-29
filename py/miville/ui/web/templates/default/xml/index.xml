@@ -1,7 +1,7 @@
 	<body xmlns:n="http://nevow.com/ns/nevow/0.1">
 		
 		<div id="index_left_pan" class="color_one">
-			<h1>Telesceno</h1>
+			<h1>PropulseART</h1>
 			<div n:render="addressbook">ADDRESSBOOK placeholder</div>
             <div id="nettest">
                 <div n:render="network_testing">NETWORK TESTING placeholder</div>
