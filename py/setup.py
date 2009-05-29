@@ -31,6 +31,7 @@ setup(
     long_description = """Miville software, a component of the PropulseART project
     Requires: twisted, nevow.""",
     install_requires = ['twisted'], # , 'nevow'], 'nevow' is installed even if ubuntu package is preset. Disabling it from dependecies for now.
+    # see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=475440
     scripts = ["restart_jackd.py"], #, "miville.py"
     license = "GPL",
     platforms = ["any"],
