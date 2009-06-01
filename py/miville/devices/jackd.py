@@ -76,9 +76,9 @@ def _parse_jack_lsp(lines):
             line = line.strip()
             name = line.split(":")[1]
             if line.startswith("system:capture"):
-                system_sinks.append(name)
-            elif line.startswith("system:playback"):
                 system_sources.append(name)
+            elif line.startswith("system:playback"):
+                system_sinks.append(name)
         ret['nb_sys_sinks'] = len(system_sinks)
         ret['nb_sys_sources'] = len(system_sources)
         #ret['sample_rate'] = 48000 # TODO
