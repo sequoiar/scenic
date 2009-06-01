@@ -20,6 +20,7 @@
 
 # System import
 import time
+import os
 import pprint
 
 #App imports
@@ -129,6 +130,10 @@ class Devices(Widget):
                             lines.append("    - %15s = %15s" % (a_name, a_value))
                     lines.append('')
                     devs.append({'kind':dr_kind, 'driver_name':dr_name, 'device_name':dev_name, 'attributes':attr_list})
+            try:
+                devs.append('DISPLAY: ' + os.environ['DISPLAY'])
+            except KeyError:
+                log.error('No $DISPLAY environment variable.')
             self.callRemote('rc_devices_list_all', "\n".join(lines), devs)
 
 #     def rc_device_list_attributes(self, driver_kind, driver_name, device_name): 

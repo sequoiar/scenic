@@ -21,6 +21,10 @@ from setuptools import find_packages
 from setuptools import setup
 __version__ = "0.1.3-a"
 
+#packages = find_packages(exclude=["test/*", "miville.py"]),
+#print 'PACKAGES:', packages
+packages = ['miville', 'miville.connectors', 'miville.utils', 'miville.ui', 'miville.devices', 'miville.protocols', 'miville.engines', 'miville.connectors.basic', 'miville.connectors.sip', 'miville.ui.cli', 'miville.ui.web', 'miville.ui.web.pages', 'miville.ui.web.widgets', 'miville.ui.web.widgets.medias']
+
 setup(
     name = "miville",
     version = __version__,
@@ -32,14 +36,14 @@ setup(
     Requires: twisted, nevow.""",
     install_requires = ['twisted'], # , 'nevow'], 'nevow' is installed even if ubuntu package is preset. Disabling it from dependecies for now.
     # see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=475440
-    scripts = ["restart_jackd.py"], #, "miville.py"
+    scripts = ["restart_jackd.py", "bin/miville"], #, "miville.py"
     license = "GPL",
     platforms = ["any"],
     zip_safe = False,
-    packages = ['miville'],
-    #packages = find_packages(exclude=["test/*", "miville.py"]),
+    #packages = ['miville'],
+    packages = packages,
     package_data = {
-        "":["*.rst", "*.png", "*.jpg", ".css", ".js", ".xml", 'txt']
+        "":["*.rst", "*.png", "*.jpg", ".css", ".js", ".xml", 'txt', 'off']
     }
     )
 
