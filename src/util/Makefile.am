@@ -1,4 +1,5 @@
 include $(top_srcdir)/globals.mak
+SUBDIRS= . test
 
 noinst_LIBRARIES= libutil.a
 

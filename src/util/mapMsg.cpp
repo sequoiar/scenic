@@ -52,11 +52,13 @@ std::ostream& operator<< (std::ostream& os, const StrIntFloat& var)
 
 MapMsg::Subscriber::Subscriber()
 {
+    LOG_DEBUG("Registered a subscriber");
     pf = this;
 }
 
 MapMsg::Subscriber::~Subscriber()
 {
+    LOG_DEBUG("Un Registered a subscriber");
     pf = 0;
 }
 
