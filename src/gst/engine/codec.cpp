@@ -83,7 +83,8 @@ void Encoder::postBitrate()
 {
     tassert(codec_);
     MapMsg mapMsg("bitrate");
-    mapMsg["value"] = std::string(gst_element_factory_get_longname(gst_element_get_factory(codec_))) 
+    mapMsg["value"] = 
+        std::string(gst_element_factory_get_longname(gst_element_get_factory(codec_))) 
         + ": " +  boost::lexical_cast< std::string >(getBitrate());
     mapMsg.post();
 }
@@ -201,20 +202,17 @@ H264Encoder::H264Encoder() {}
 H264Encoder::~H264Encoder()
 {}
 
+// POSIX specific hardware thread info 
+// http://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
+// int numThreads = sysconf(_SC_NPROCESSORS_ONLN);
+
 void H264Encoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
     supportsInterlaced_ = true;
 
-    // threads: 1-4, 0 for automatic 
-#ifdef HAVE_BOOST_THREAD        // more portable
+    // hardware threads: 1-n, 0 for automatic 
     int numThreads = boost::thread::hardware_concurrency();
-#else
-    // set threads variable equal to number of processors online 
-    // (POSIX specific). see
-    // http://stackoverflow.com/questions/150355/programmatically-find-the-number-of-cores-on-a-machine
-    int numThreads = sysconf(_SC_NPROCESSORS_ONLN);
-#endif // HAVE_BOOST_THREAD
 
     // numthreads should be 2 or 1.
     if (numThreads > 2) // don't hog all the cores
