@@ -82,7 +82,7 @@ class MivilleTester(object):
         """
         self.unittest = None
         self.port_offset = 0
-        self.miville_command = "./miville.py"
+        self.miville_command = "./pmiville.py"
         self.use_tmp_home = False
         self.verbose = True
         self.color = 'CYAN'
@@ -289,7 +289,7 @@ def kill_all_running_miville():
     lines = output.splitlines()
     for line in lines:
         try:
-            if line.find("python ./miville.py") != -1:
+            if line.find("python ./pmiville.py") != -1:
                 tokens = line.split()
                 proc = tokens[1]
                 pid = int(proc)

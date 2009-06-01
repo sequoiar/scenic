@@ -145,7 +145,7 @@ def kill_all_zombie_processes():
     lines = output.splitlines()
     for line in lines:
         try:
-            if line.find("python ../miville.py") != -1:
+            if line.find("python ../pmiville.py") != -1:
                 tokens = line.split()
                 proc = tokens[1]
                 pid = int(proc)
@@ -434,7 +434,7 @@ class TelnetForMilhouseProcess(TelnetProcess):
 
 class MivilleProcess(Process):
     """
-    miville.py server process
+    pmiville.py server process
     """
     def __init__(self, **kwargs):
         self.port_offset = 0
@@ -448,7 +448,7 @@ class MivilleProcess(Process):
         echo("starting %s(%s)" % (self.__class__.__name__, kwargs), self.verbose)
 
     def make_command(self):
-        return "../miville.py -o %s -m %s -C" % (self.port_offset, os.path.expanduser(self.miville_home))
+        return "../pmiville.py -o %s -m %s -C" % (self.port_offset, os.path.expanduser(self.miville_home))
 
 class TelnetMivilleTester(ClientServerTester):
     """

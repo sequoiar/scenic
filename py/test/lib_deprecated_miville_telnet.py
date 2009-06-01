@@ -41,7 +41,7 @@ import commands
 # ---------------------------------------------------------------------
 # config 
 SERVER_PORT = "14444" # port to which connect using telnet
-SERVER_COMMAND = os.path.expanduser("./miville.py")
+SERVER_COMMAND = os.path.expanduser("./pmiville.py")
 CLIENT_COMMAND = 'telnet localhost %s' % SERVER_PORT
 #WAITING_DELAY = 1.0 # seconds before starting client after server start
 

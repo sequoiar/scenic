@@ -27,9 +27,15 @@ corresponding miville configuration variables.
 
 See the MivilleConfiguration class in miville/core.py
 """
-
-#import sys
+import sys
+#import os
+#pardir = os.path.join(os.path.split(os.path.dirname(__file__))[-1])
+pardir = '.'
+#print 'pardir:', pardir
+sys.path.append(pardir)
 #print sys.path
+
+
 from optparse import OptionParser
 from miville.core import *
 
