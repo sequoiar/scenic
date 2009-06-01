@@ -28,9 +28,7 @@
 
 #include "util.h"
 
-#ifdef HAVE_BOOST_THREAD  // needs config.h, in util.h
 #include <boost/thread/thread.hpp>
-#endif // HAVE_BOOST_THREAD
 
 #include "codec.h"
 #include "rtpPay.h"
@@ -85,10 +83,8 @@ void Encoder::postBitrate()
 {
     tassert(codec_);
     MapMsg mapMsg("bitrate");
-    std::string codecName(gst_element_factory_get_longname(gst_element_get_factory(codec_)));
-    std::stringstream msgStream; 
-    msgStream << codecName << ": " << getBitrate();
-    mapMsg["value"] = msgStream.str();
+    mapMsg["value"] = std::string(gst_element_factory_get_longname(gst_element_get_factory(codec_))) 
+        + ": " +  boost::lexical_cast< std::string >(getBitrate());
     mapMsg.post();
 }
 
