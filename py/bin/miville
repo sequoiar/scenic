@@ -33,6 +33,7 @@ import sys
 pardir = '.'
 #print 'pardir:', pardir
 sys.path.append(pardir)
+sys.path.append('..')
 #print sys.path
 
 
