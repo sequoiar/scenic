@@ -152,7 +152,7 @@ def import_widgets():
                 
     # for each widget add a render_<widget> method to the Index class
     for widget in widgets_mod:
-        name = widget.__name__.replace(package, '')[1:].replace('.', '_')
+        name = str(widget.__name__.replace(package, '')[1:].replace('.', '_'))
         setattr(Index, 'render_' + name, widget_factory(widget))
 
 def widget_factory(mod):
