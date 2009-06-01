@@ -258,9 +258,16 @@ class Addressbook(Widget):
         return False
     
     def rc_remove_contact(self, name):
+        log.debug('rc_remove_contact')
         self.api.delete_contact(self, name)
         return False
-    
+
+    def cb_delete_contact(self, origin, data): 
+        """
+        We need this in order to know that we successfully deleted a contact.
+        """
+        self.api.get_contacts(self)
+
     def rc_modify_contact(self, name, new_name, address, port, auto_answer):
         self.api.modify_contact(self, name, new_name, address, port, auto_answer)
         return False
@@ -332,7 +339,7 @@ class Addressbook(Widget):
 
     def cb_stop_streams(self, origin, data):
         """
-        Called once miville has stropped streaming.
+        Called once miville has stopped streaming.
 
         The 'stop_streams' notification should contain a dict with keys:
          * 'stopped' : bool
