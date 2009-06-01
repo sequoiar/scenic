@@ -217,6 +217,7 @@ AC_CONFIG_FILES([Makefile
 #                 src/gst/engine/test.old/Makefile
 
 AC_CONFIG_FILES([
+                 src/util/test/Makefile
                  src/tcp/test/Makefile
                  src/gst/engine/test/Makefile
                  ])
