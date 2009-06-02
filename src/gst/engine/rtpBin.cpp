@@ -31,7 +31,7 @@
 
 // for posting 
 #include "mapMsg.h"
-#include <sstream>
+#include <boost/lexical_cast.hpp>
 
 #ifdef CONFIG_DEBUG_LOCAL
 #define RTP_REPORTING 0
@@ -63,26 +63,26 @@ void RtpBin::init()
 void RtpBin::printStatsVal(const std::string &idStr, const char *key, const std::string &type, const std::string &formatStr, GstStructure *stats)
 {
     MapMsg mapMsg;
-    std::stringstream paramStr;
+    std::string paramStr("");
     if (type == "guint64")
     {
         guint64 val = g_value_get_uint64(gst_structure_get_value(stats, key));
-        paramStr << formatStr << val;
+        paramStr += formatStr + boost::lexical_cast<std::string>(val);
     }
     else if (type == "guint32")
     {
         guint32 val = g_value_get_uint(gst_structure_get_value(stats, key));
-        paramStr << formatStr << val;
+        paramStr += formatStr + boost::lexical_cast<std::string>(val);
     }
     else if (type == "gint32")
     {
         gint32 val = g_value_get_int(gst_structure_get_value(stats, key));
-        paramStr << formatStr << val;
+        paramStr += formatStr + boost::lexical_cast<std::string>(val);
     }
     else
         THROW_ERROR("Unexpected type");
 
-    mapMsg["stats"] = idStr + paramStr.str();
+    mapMsg["stats"] = idStr + paramStr;
     LOG_INFO(mapMsg["stats"]);
     mapMsg.post();
 }
@@ -156,10 +156,7 @@ const char *RtpBin::padStr(const char *padName)
 {
     tassert(sessionCount_ > 0);  // we have a session going
     std::string result(padName);
-    std::stringstream istream;
-
-    istream << sessionId_;       // 0-based
-    result = result + istream.str();
+    result = result + boost::lexical_cast<std::string>(sessionId_);
     return result.c_str();
 }
 
@@ -184,9 +181,9 @@ RtpBin::~RtpBin()
 
 void RtpBin::registerSession(const std::string &codec)
 {
-    std::stringstream sessionName;
-    sessionName << codec << "_" << sessionId_;
-    sessionName_ = sessionName.str();
+    std::string sessionName("");
+    sessionName += codec + "_" + boost::lexical_cast<std::string>(sessionId_);
+    sessionName_ = sessionName;
     sessions_[sessionId_] = this;
 }
 
