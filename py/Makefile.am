@@ -1,6 +1,6 @@
 include $(top_srcdir)/globals.mak 
 SUBDIRS = docs
-DIST_SUBDIRS = miville maugis
+DIST_SUBDIRS = miville maugis docs
 
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 trial
 

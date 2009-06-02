@@ -8,8 +8,9 @@ milhouse_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(GTK_CFLAGS) $(GL_CFLAGS) $(GLU
 else
 milhouse_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(GTK_CFLAGS) $(GL_CFLAGS) $(GLU_CFLAGS) 
 endif
-LDADD = $(src)/gst/control/libgstthread.a $(src)/gst/engine/libgst.a $(ALL_GST_LIBS) $(JACK_LIBS) $(src)/tcp/libtcp.a \
-		$(GTK_LIBS) $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(src)/gutil/libgutil.a $(src)/boost/libbutil.a $(BOOST_ASIO_LIB) \
-		$(BOOST_LDFLAGS) $(BOOST_THREAD_LIB) $(BOOST_SYSTEM_LIB)  $(LIBUTIL)      
+LDADD = $(top_builddir)/src/gst/control/libgstthread.la $(top_builddir)/src/gst/engine/libgst.la $(ALL_GST_LIBS) $(JACK_LIBS) \
+        $(top_builddir)/src/tcp/libtcp.la \
+		$(GTK_LIBS) $(LIBAVC1394_LIBS) $(GL_LIBS) $(GLU_LIBS) $(top_builddir)/src/boost/libbutil.la $(BOOST_ASIO_LIB) \
+		$(BOOST_LDFLAGS) $(BOOST_THREAD_LIB) $(BOOST_SYSTEM_LIB) $(LIBUTIL) $(top_builddir)/src/gutil/libgutil.la
 
 #CXXFLAGS += -O3

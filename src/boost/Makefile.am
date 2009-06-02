@@ -1,6 +1,6 @@
 include $(top_srcdir)/globals.mak
 
-noinst_LIBRARIES= libbutil.a
+lib_LTLIBRARIES= libbutil.la
 
-libbutil_a_SOURCES = bQueuePair.cpp queuePair.h
+libbutil_la_SOURCES = bQueuePair.cpp queuePair.h
 

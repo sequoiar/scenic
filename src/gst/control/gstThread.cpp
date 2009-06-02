@@ -23,10 +23,10 @@
 #include "util.h"
 #include <glib.h>
 
-#include "engine/mediaBase.h"
+#include "../engine/mediaBase.h"
 #include "gstThread.h"
 #include "gstSenderThread.h"
-#include "engine/playback.h"
+#include "../engine/playback.h"
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>

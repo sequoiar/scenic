@@ -3,9 +3,9 @@ if PROJ_DEBUG
 SUBDIRS = . test
 endif
 
-noinst_LIBRARIES = libgst.a
+lib_LTLIBRARIES = libgst.la
 
-libgst_a_SOURCES = mediaBase.cpp \
+libgst_la_SOURCES = mediaBase.cpp \
 				   audioSender.cpp audioReceiver.cpp \
 				   videoConfig.cpp rtpBin.cpp pipeline.cpp \
 				   rtpSender.cpp rtpReceiver.cpp audioSource.cpp \
@@ -22,6 +22,6 @@ libgst_a_SOURCES = mediaBase.cpp \
 				   videoReceiver.h videoSender.h videoSource.h raw1394Util.h \
 				   audioLevel.h glVideoSink.h playback.h dv1394.h v4l2util.h fileSource.h
 
-libgst_a_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS)
+libgst_la_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS)
 
 #CXXFLAGS += -O3

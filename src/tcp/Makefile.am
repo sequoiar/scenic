@@ -1,7 +1,7 @@
 include $(top_srcdir)/globals.mak
 SUBDIRS = . test
-noinst_LIBRARIES = libtcp.a
+lib_LTLIBRARIES = libtcp.la
 
-libtcp_a_SOURCES = tcpServer.cpp tcpThread.cpp asioThread.cpp tcpServer.h tcpThread.h asioThread.h
+libtcp_la_SOURCES = tcpServer.cpp tcpThread.cpp asioThread.cpp tcpServer.h tcpThread.h asioThread.h
 
-libtcp_a_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS) 
+libtcp_la_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS) 

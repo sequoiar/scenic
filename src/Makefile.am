@@ -5,4 +5,4 @@ include $(top_srcdir)/globals.mak
 if BOOST_PYTHON
 PYTHONDIR = python
 endif
-SUBDIRS = include util gutil boost tcp gst main devices $(PYTHONDIR) $(SIPDIR)
+SUBDIRS = include boost util gutil tcp gst main devices $(PYTHONDIR) $(SIPDIR)

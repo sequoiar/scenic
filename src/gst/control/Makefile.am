@@ -3,7 +3,9 @@ if PROJ_DEBUG
 SUBDIRS = . #test
 endif
 
-noinst_LIBRARIES= libgstthread.a
+lib_LTLIBRARIES= libgstthread.la
 
-libgstthread_a_SOURCES = gstThread.cpp gstReceiverThread.h gstSenderThread.h gstThread.h ../videoFactory.h ../audioFactory.h ../engine.h
+libgstthread_la_SOURCES = gstThread.cpp gstReceiverThread.h gstSenderThread.h gstThread.h $(src)/gst/videoFactory.h \
+                          $(src)/gst/audioFactory.h $(src)/gst/engine.h
+
 
