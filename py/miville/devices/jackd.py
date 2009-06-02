@@ -81,6 +81,7 @@ def _parse_jack_lsp(lines):
                 system_sinks.append(name)
         ret['nb_sys_sinks'] = len(system_sinks)
         ret['nb_sys_sources'] = len(system_sources)
+        #log.debug('sys_sinks, sys_sources:%d %d' % (len(system_sinks), len(system_sources)))
         #ret['sample_rate'] = 48000 # TODO
         #ret['server_name'] = "SPAM" # TODO
     return ret
