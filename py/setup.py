@@ -24,7 +24,34 @@ __version__ = "0.1.3-a"
 #packages = find_packages(exclude=["test", "miville.py"]),
 #print 'PACKAGES:', packages
 #packages = ['miville', 'miville.connectors', 'miville.utils', 'miville.ui', 'miville.devices', 'miville.protocols', 'miville.engines', 'miville.connectors.basic', 'miville.connectors.sip', 'miville.ui.cli', 'miville.ui.web', 'miville.ui.web.pages', 'miville.ui.web.widgets', 'miville.ui.web.widgets.medias']
-packages = ['miville', 'miville.connectors', 'miville.utils', 'miville.ui', 'miville.devices', 'miville.protocols', 'miville.engines', 'miville.connectors.basic', 'miville.connectors.sip', 'miville.ui.cli', 'miville.ui.web', 'miville.ui.web.pages', 'miville.ui.web.templates', 'miville.ui.web.js', 'miville.ui.web.img', 'miville.ui.web.css', 'miville.ui.web.tpl', 'miville.ui.web.widgets', 'miville.ui.web.templates.default', 'miville.ui.web.tpl.js', 'miville.ui.web.tpl.xml', 'miville.ui.web.tpl.img', 'miville.ui.web.tpl.css', 'miville.ui.web.widgets.medias', 'miville.ui.web.templates.default.js', 'miville.ui.web.templates.default.xml', 'miville.ui.web.templates.default.img', 'miville.ui.web.templates.default.css']
+#packages = ['miville', 'miville.connectors', 'miville.utils', 'miville.ui', 'miville.devices', 'miville.protocols', 'miville.engines', 'miville.connectors.basic', 'miville.connectors.sip', 'miville.ui.cli', 'miville.ui.web', 'miville.ui.web.pages', 'miville.ui.web.templates', 'miville.ui.web.js', 'miville.ui.web.img', 'miville.ui.web.css',  'miville.ui.web.widgets', 'miville.ui.web.templates.default', 'miville.ui.web.widgets.medias', 'miville.ui.web.templates.default.js', 'miville.ui.web.templates.default.xml', 'miville.ui.web.templates.default.img', 'miville.ui.web.templates.default.css']
+
+packages = [
+    'miville',
+    'miville.connectors',
+    'miville.utils',
+    'miville.ui',
+    'miville.devices',
+    'miville.protocols',
+    'miville.engines',
+    'miville.connectors.basic',
+    'miville.connectors.sip',
+    'miville.ui.cli',
+    'miville.ui.web',
+    'miville.ui.web.pages',
+    'miville.ui.web.templates',
+    'miville.ui.web.js',
+    'miville.ui.web.img',
+    'miville.ui.web.css',
+    'miville.ui.web.widgets',
+    'miville.ui.web.templates.default',
+    'miville.ui.web.widgets.medias',
+    'miville.ui.web.templates.default.js',
+    'miville.ui.web.templates.default.xml',
+    'miville.ui.web.templates.default.img',
+    'miville.ui.web.templates.default.css',
+    ]
+
 
 setup(
     name = "miville",
