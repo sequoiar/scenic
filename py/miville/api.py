@@ -692,7 +692,6 @@ class ControllerApi(object):
         try:
             contact, global_setting, settings_com_channel  = self._get_gst_com_chan_from_contact_name(contact_name)
             settings_com_channel.stop_streaming(contact.address)
-            contact.stream_state = 0 # FIXME
             #self.notify(caller, "streaming stopped")
             # self.notify(caller, {'stopped':True, 'msg':"streaming stopped"}) # FIXME XXX TODO: should not be called from here but from the engines.
         except AddressBookError, e:
@@ -702,6 +701,8 @@ class ControllerApi(object):
             self.notify(caller, err)
         except StreamsError, err:
             self.notify(caller, err)
+        # this should be done in a more standard way. FIXME XXX TODO
+        contact.stream_state = 0 # FIXME
                         
     def _get_gst_com_chan_from_contact_name(self, contact_name):
         """

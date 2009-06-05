@@ -369,7 +369,7 @@ class GstChannel(object):
                 log.error(e.message)
                 self.notify_error(e)
                 #def stop_streaming(self, address):
-            self.send_message('COULD_NOT_START_STREAMING', [str(self.remote_addr)])
+                self.send_message('COULD_NOT_START_STREAMING', [str(self.remote_addr)])
 
         elif key == 'COULD_NOT_START_STREAMING':
             address = args[0]
