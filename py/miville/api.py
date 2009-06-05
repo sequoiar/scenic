@@ -694,7 +694,7 @@ class ControllerApi(object):
             settings_com_channel.stop_streaming(contact.address)
             contact.stream_state = 0 # FIXME
             #self.notify(caller, "streaming stopped")
-            self.notify(caller, {'stopped':True, 'msg':"streaming stopped"}) # FIXME XXX TODO: should not be called from here but from the engines.
+            # self.notify(caller, {'stopped':True, 'msg':"streaming stopped"}) # FIXME XXX TODO: should not be called from here but from the engines.
         except AddressBookError, e:
             self.notify(caller, AddressBookError("Please select a contact prior to stop streaming." + e.message)) #, "error")
             #TODO: change key for 'streams_error'

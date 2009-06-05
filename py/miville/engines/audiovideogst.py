@@ -33,6 +33,7 @@ from miville.engines.base_gst import GstClient
 from miville.utils import log
 from miville.protocols.ipcp import parse 
 from miville.errors import *
+from miville.engines.base_gst import GstError
 from miville.utils.common import PortNumberGenerator
 from miville.utils import stack
 import miville.engines.base_gst
@@ -65,35 +66,39 @@ class AudioVideoGst(GstClient):
     """
     
     def __init__(self, mode, group_name):
-
-       self.mode = mode
-       self.group_name = group_name
-       self.stream_names = []
-       self.commands = []
-       
-       self.args = None
-       self.proc_path = None
-       self.pid = None
-       self.rtp_stats = {}
-       self.logger = RingBuffer(20)
-       self.output_logger = RingBuffer(20)
-       self.version = ""
-       self.gst_address =  '127.0.0.1'
-       self.gst_port = gst_ipcp_port_gen.generate_new_port()
-       self.acknowledgments = []
-            
-       callbacks = {'log'       :self.gst_log,
-                    'video_init':self.gst_video_init, 
-                    'audio_init':self.gst_audio_init, 
-                    'start'     :self.gst_start, 
-                    'stop'      :self.gst_audio_init,
-                    'success'   :self.gst_success,
-                    'failure'   :self.gst_failure,
-                    'rtp'       :self.gst_rtp 
-                    }       
-       self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks, self.gst_state_change_callback, self.gst_proc_output)
-       #self._send_command('loglevel', 10)
-       
+        self.mode = mode
+        self.group_name = group_name
+        self.stream_names = []
+        self.commands = []
+        
+        self.args = None
+        self.proc_path = None
+        self.pid = None
+        self.rtp_stats = {}
+        self.logger = RingBuffer(20)
+        self.output_logger = RingBuffer(20)
+        self.version = ""
+        self.gst_address =  '127.0.0.1'
+        self.gst_port = gst_ipcp_port_gen.generate_new_port()
+        self.acknowledgments = []
+             
+        callbacks = {'log'       :self.gst_log,
+                     'video_init':self.gst_video_init, 
+                     'audio_init':self.gst_audio_init, 
+                     'start'     :self.gst_start, 
+                     'stop'      :self.gst_audio_init,
+                     'success'   :self.gst_success,
+                     'failure'   :self.gst_failure,
+                     'rtp'       :self.gst_rtp 
+                     }       
+        try:
+            self.setup_gst_client(mode, self.gst_port, self.gst_address, callbacks, self.gst_state_change_callback, self.gst_proc_output)
+        except GstError, e:
+            log.error(e.message)
+            raise
+        
+        #self._send_command('loglevel', 10)
+        
     def apply_stream_settings(self, stream_name, parameters ):
         """
         Sends commands to the milhouse process applying the setting.

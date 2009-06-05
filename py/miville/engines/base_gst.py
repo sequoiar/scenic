@@ -181,7 +181,7 @@ class GstServer(object):
                     log.critical(msg)
                     raise GstError(msg)
             else:
-                msg = 'Cannot find the GST application: %s %s' % (streaming_server_process_name, self)
+                msg = 'Cannot find the GST application: %s' % (streaming_server_process_name)
                 log.critical(msg)
                 raise GstError(msg)
         else:
@@ -287,6 +287,7 @@ class GstClient(BaseGst):
             self.proc_path, self.args, self.pid = self.gst_server.start_process()
         except GstError, e: 
             log.error('Could not start GST process: ' + e.message)
+            raise GstError('Could not start GST process. ' + str(e.message))
         self.version_str = self.gst_server.version_str
         log.debug('GstClient.setup_gst_client done')
         

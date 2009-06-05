@@ -22,10 +22,13 @@
 Communication channel for the streaming/settings infos between two miville contacts.
 """
 import sys
+from twisted.internet import reactor
+import pprint
+
 from miville.utils import log
 from miville.errors import *
-import pprint
 from miville.engines import audiovideogst
+from miville.engines.base_gst import GstError
 import miville.settings
 
 log = log.start('debug', 1, 0, 'gstchannel')
@@ -185,9 +188,13 @@ def _create_stream_engines( listener, mode, procs_params):
             if engine == None:
                 # engine is a AudioVideoGst instance
                 if engine_name.upper() == 'GST':
-                    engine =  audiovideogst.AudioVideoGst(mode, group_name)
+                    try:
+                        engine =  audiovideogst.AudioVideoGst(mode, group_name)
+                    except GstError, e:
+                        log.error(e.message)
+                        raise
                 else:
-                    raise StreamsError, 'Engine "%s" is not supported' %  engine_name
+                    raise StreamsError, 'Engine "%s" is not supported' % (engine_name)
             # sends the command to the new Milhouse process.
             engine.apply_stream_settings(stream_name, stream_params)
         engines.append(engine)
@@ -253,10 +260,11 @@ class GstChannel(object):
         #     print sys.exc_info()
         # #OLD: local_ip  = connection_basic.localhost
 
-        print('---------------- gstchannel.start_streaming -------------------')
-        print("AALEXXX ::: address of A: (me) " + str(local_ip))
-        print("AALEXXX ::: address of B: " + str(address))
-        print('-----------------------------------')
+        # print('---------------- gstchannel.start_streaming -------------------')
+        log.debug('gstchannel.start_streaming: local_ip: %s, remote_ip: %s' % (local_ip, address))
+        # print("AALEXXX ::: address of A: (me) " + str(local_ip))
+        # print("AALEXXX ::: address of B: " + str(address))
+        # print('-----------------------------------')
         # on brr when brr connects and tzing starts:
         #AALEXXX ::: remote_address: None
         #AALEXXX ::: address: 10.10.10.66
@@ -279,8 +287,13 @@ class GstChannel(object):
         self.receiver_procs_params = rx_params
         self.sender_procs_params = tx_params
         setting_name = self.api.settings.get_global_setting_from_id(self.contact.setting).name
-        self.start_local_gst_processes(self.receiver_procs_params,  self.sender_procs_params, setting_name)
-        self.send_message(REMOTE_STREAMING_CMD, [rx_remote_params, tx_remote_params, contact_addr, setting_name])
+        try:
+            self.start_local_gst_processes(self.receiver_procs_params,  self.sender_procs_params, setting_name)
+        except GstError, e:
+            self.notify_error(e)
+            #raise
+        else:
+            self.send_message(REMOTE_STREAMING_CMD, [rx_remote_params, tx_remote_params, contact_addr, setting_name])
 
     def stop_streaming(self, address):
         """
@@ -297,6 +310,7 @@ class GstChannel(object):
         """
         self._stop_local_rx_procs()
         self.send_message(STOP_RECEIVERS_CMD)
+        self.notify_stopped()
         
     def _stop_local_rx_procs(self):
         log.info("Stopping rx processes")
@@ -316,7 +330,7 @@ class GstChannel(object):
         else:
             log.error("No tx processes to stop")
         caller = None
-        self.notify_stopped()
+        # self.notify_stopped()
 
     def notify_stopped(self):
         """
@@ -349,20 +363,37 @@ class GstChannel(object):
             setting_name = args[3]
             self.api.notify(caller, "Starting GST processes", "info" )
             log.debug("on_remote_message got REMOTE_STREAMING_CMD: will call start_local_gst_processes(%s, %s)" % (str(rx_params), str(tx_params)))
-            self.start_local_gst_processes(rx_params, tx_params, setting_name)
+            try:
+                self.start_local_gst_processes(rx_params, tx_params, setting_name)
+            except GstError, e:
+                log.error(e.message)
+                self.notify_error(e)
+                #def stop_streaming(self, address):
+            self.send_message('COULD_NOT_START_STREAMING', [str(self.remote_addr)])
+
+        elif key == 'COULD_NOT_START_STREAMING':
+            address = args[0]
+            log.error('remote contact could not start streaming.')
+            self.contact.stream_state = 0 # IMPORTANT !!!!!!!!!
+            self.api.notify(None, GstError("Remote contact could not start streaming."), "start_streams")
+            #reactor.callLater(4, self.stop_streaming, address)
+            self._stop_local_rx_procs()
         
-        elif key ==  STOP_RECEIVERS_CMD:
+        elif key == STOP_RECEIVERS_CMD:
             self._stop_local_rx_procs()
             self.send_message(RECEIVERS_STOPPED)
             self._stop_local_tx_procs()
+            self.notify_stopped()
             
-        elif key ==  RECEIVERS_STOPPED:
+        elif key == RECEIVERS_STOPPED:
             self._stop_local_tx_procs()
+            self.notify_stopped()
 
         elif key =='SEND_ME_MY_IP':
             self.my_addr = args[0]
             log.debug('XXXXXXXXXXXXXXXXX my ip is ' + str(self.my_addr))
             self.send_message('YOUR_IP_IS', [self.remote_addr])
+
         elif key =='YOUR_IP_IS':
             self.my_addr = args[0]
             log.debug('XXXXXXXXXXXXXXXXX my ip is ' + str( self.my_addr))
@@ -376,6 +407,7 @@ class GstChannel(object):
         """
         for engine in engines:
             log.debug('GstChannel._start_stream_engines: ' + str(engine))
+            # send IPCP message "start"
             engine.start_streaming()
             
     def start_local_gst_processes(self, rx_params, tx_params, setting_name=''):
@@ -390,15 +422,20 @@ class GstChannel(object):
 
         log.debug("   Initialize RECEIVING PROCESSES:")
         log.debug( pprint.pformat(self.receiver_procs_params)) 
-        self.receiver_engines = _create_stream_engines(self.api, 'receive', self.receiver_procs_params)
-        self._start_stream_engines(self.receiver_engines)
-        
-        log.debug("   GstChannel.on_remote_message: received gst_receiver_params: %s" % str(self.sender_procs_params) )
-        log.debug("   Initialize SENDING PROCESSES:")
-        log.debug( pprint.pformat(self.sender_procs_params)) 
-        self.sender_engines = _create_stream_engines(self.api, 'send', self.sender_procs_params)
-        self._start_stream_engines(self.sender_engines)
-        self.notify_started(setting_name)
+        try:
+            self.receiver_engines = _create_stream_engines(self.api, 'receive', self.receiver_procs_params)
+        except GstError, e:
+            #self.notify_error(e)
+            raise
+        else:
+            self._start_stream_engines(self.receiver_engines)
+            
+            log.debug("   GstChannel.on_remote_message: received gst_receiver_params: %s" % str(self.sender_procs_params) )
+            log.debug("   Initialize SENDING PROCESSES:")
+            log.debug( pprint.pformat(self.sender_procs_params)) 
+            self.sender_engines = _create_stream_engines(self.api, 'send', self.sender_procs_params)
+            self._start_stream_engines(self.sender_engines)
+            self.notify_started(setting_name)
 
     def notify_started(self, setting_name=''):
         """
@@ -412,6 +449,12 @@ class GstChannel(object):
             'msg':"streaming started"
             }, "start_streams") 
         self.contact.stream_state = 2 # IMPORTANT !
+
+    def notify_error(self, exc, caller=None):
+        """
+        Notifies the api with start_streams key and an exception as data.
+        """
+        self.api.notify(caller, exc, "start_streams")
             
     def send_message(self, key, args_list=[]):
         """

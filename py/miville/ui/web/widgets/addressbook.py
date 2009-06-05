@@ -316,7 +316,7 @@ class Addressbook(Widget):
                 log.error('Could not get current contact: ' + contact.message)
             else:
                 contact_name = contact.name
-                self.callRemote('update_status', contact_name, 'Could not start streaming. (%s)\n%s' % (data.__class__.__name__, data.message), 'Could not start streaming. (%s) %s' % (data.__class__.__name__, data.message))
+                self.callRemote('update_status', contact_name, '%s: %s' % (data.__class__.__name__, data.message), 'Could not start streaming. (%s) %s' % (data.__class__.__name__, data.message))
                 traceback.print_exc()
         else:
             try:
