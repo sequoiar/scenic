@@ -227,13 +227,18 @@ class ControllerApi(object):
         self.notify(caller, result) # implicit key: 'add_contact'
         return result
 
-    def delete_contact(self, caller, name=None):
+    def delete_contact(self, caller, contact_name=None):
         """
         Deletes the named contact from the Address Book or the selected
         if no name is given.
         """
         try:
-            result = self.adb.delete(name)
+            contact = self.get_contact(contact_name)
+            if isinstance(contact, AddressBookError):
+                raise contact
+            if contact.state == CONNECTED:
+                raise AddressBookError('Please disconnect from contact prior to delete it.')
+            result = self.adb.delete(contact_name)
         except AddressBookError, err:
             result = err
         self.notify(caller, result) # implicit key: 'delete_contact'

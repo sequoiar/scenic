@@ -1,18 +1,34 @@
 #!/usr/bin/env python
-""" Run two milhouse servers as well as telnet clients """
+"""
+Runs two milhouse servers as well as telnet clients to make tests.
+
+Usage : execute the file. This is not a unit test for trial
+
+Argument is the prefix of the test name to test. Default is 'test_audiotestsrc_mp3_alsasin'. 
+Possible choices are the prefixes of methods that can be found in the following classes: 
+ * AudioTests
+ * VideoTests
+ * AudioVideoTests
+ * AudioNoJackTests
+
+Examples::
+ ./test/telnet_thrillhouse.py ''
+
+"""
 
 import sys
 
 try:
     import multiprocessing 
 except ImportError:
-    print "import failed, please install multiprocessing: \nsudo easy-install multiprocessing"
+    print "import failed, please install multiprocessing: \nsudo easy_install multiprocessing"
     sys.exit(1)
 
 try:
     from twisted.python.reflect import prefixedMethods
 except ImportError:
     print "import failed, please install twisted: http://twistedmatrix.com/trac/"
+    print "sudo apt-get install python-twisted"
     sys.exit(1)
 
 from time import sleep
@@ -22,7 +38,9 @@ import socket
 
 
 def milhouse_worker(args):
-    """ a milhouse_worker will run milhouse as its own process """
+    """ 
+    a milhouse_worker will run milhouse as its own process 
+    """
     command = 'milhouse ' + args
     os.system(command)
     print '/*----------------------------------------------*/'
@@ -32,7 +50,9 @@ def milhouse_worker(args):
 
 
 def createServers():
-    """ Create workers which will wrap our milhouse server processes """
+    """ 
+    Create workers which will wrap our milhouse server processes 
+    """
     workers = []
     commands = ['-r --serverport 9000', '-s --serverport 9001']
     for command in commands: 
@@ -43,7 +63,9 @@ def createServers():
 
 
 def createClients():
-    """ Create telnet clients which will interact with our servers using telnetlib """
+    """ 
+    Create telnet clients which will interact with our servers using telnetlib 
+    """
     rx_server_port = 9000
     tx_server_port = 9001
 
@@ -67,8 +89,9 @@ def createClients():
 
 
 def runClients(rxTn, txTn, args):
-    """ Here our telnet clients issue their commands to their respective milhouse servers """
-
+    """ 
+    Here our telnet clients issue their commands to their respective milhouse servers 
+    """
     if 'rxAudioArg' in args:
         rxAudioArg = str(args['rxAudioArg'])
         print "SENDING " + rxAudioArg
@@ -132,14 +155,20 @@ def proceed(args):
 
 
 class Arg(object): # new style!!
-    """ Base class for our argument classes """
+    """
+    Base class for our argument classes 
+    """
     def __init__(self):
-        """ Init with address and timeout defaults """
+        """ 
+        Init with address and timeout defaults 
+        """
         self.address = '127.0.0.1'   # always need this guy
     
     def argString(self):
-        """ Returns a list of this class' data members and their values, 
-        formatted as command line arguments """
+        """ 
+        Returns a list of this class' data members and their values, 
+        formatted as command line arguments 
+        """
         result = '_init:'
         for key, val in self.__dict__.iteritems():
             if val is True:
@@ -153,9 +182,13 @@ class Arg(object): # new style!!
 
 
 class VideoArg(Arg):
-    """ Base class for our video argument classes """
+    """
+    Base class for our video argument classes 
+    """
     def __init__(self):
-        """ Defaults are mpeg4 videocodec and 11000 for videoport """
+        """ 
+        Defaults are mpeg4 videocodec and 11000 for videoport 
+        """
         Arg.__init__(self)
         self.codec = 'mpeg4'
         self.port = 11000
@@ -165,9 +198,13 @@ class VideoArg(Arg):
 
 
 class AudioArg(Arg):
-    """ Base class for our Audio argument classes """
+    """
+    Base class for our Audio argument classes 
+    """
     def __init__(self):
-        """ Defaults are uncompressed (raw) audio and 10000 for audioport """
+        """ 
+        Defaults are uncompressed (raw) audio and 10000 for audioport 
+        """
         Arg.__init__(self)
         self.codec = 'raw'
         self.port = 10000
@@ -176,33 +213,47 @@ class AudioArg(Arg):
         return 'audio'  + self.argString()
 
 class VideoSendArg(VideoArg):
-    """ Class for video only sending args """
+    """
+    Class for video only sending args 
+    """
     def __init__(self):
-        """ Default for videosource is videotestsrc """
+        """ 
+        Default for videosource is videotestsrc 
+        """
         VideoArg.__init__(self)
         self.source = 'videotestsrc'
         self.bitrate = 3000000
 
 class VideoRecvArg(VideoArg):
-    """ Class for video only receiving args """
+    """
+    Class for video only receiving args 
+    """
     def __init__(self):
-        """ Default for videosink is xvimagesink, the xvideo output plugin """
+        """ 
+        Default for videosink is xvimagesink, the xvideo output plugin 
+        """
         VideoArg.__init__(self)
         self.sink = 'xvimagesink'
 
 
 class AudioSendArg(AudioArg):
-    """ Class for audio only sending args """
+    """
+    Class for audio only sending args 
+    """
     def __init__(self):
-        """ Default for audiosrc is 8 channel audiotestsrc, 
-         the jack input plugin """
+        """ 
+        Default for audiosrc is 8 channel audiotestsrc, 
+        the jack input plugin 
+        """
         AudioArg.__init__(self)
         self.source = 'audiotestsrc'
         self.channels = 8
 
 
 class AudioRecvArg(AudioArg):
-    """ Class for audio only receiving args """
+    """
+    Class for audio only receiving args 
+    """
     def __init__(self):
         """ Default for audiosink is jackaudiosink, the jack output plugin """
         AudioArg.__init__(self)
@@ -210,7 +261,9 @@ class AudioRecvArg(AudioArg):
 
 
 def argfactory(argtype):
-    """Returns default send and receive args"""
+    """
+    Returns default send and receive args
+    """
     if argtype is 'audio':
         return AudioRecvArg(), AudioSendArg()
     elif argtype is 'video':
@@ -2087,7 +2140,7 @@ if __name__ == '__main__':
         prefix = sys.argv[1]
     else:
         prefix = 'test_audiotestsrc_mp3_alsasin'
-
+    print 'Welcome to the thrillhouse milhouse tester.'
     print "Running tests which start with '" + prefix + "'\n\n"
     # here we run all the tests thanks to the wonders of reflective programming
     tests = []
