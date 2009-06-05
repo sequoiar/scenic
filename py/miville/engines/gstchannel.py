@@ -26,12 +26,23 @@ from twisted.internet import reactor
 import pprint
 
 from miville.utils import log
+from miville.utils.commands import find_command
 from miville.errors import *
 from miville.engines import audiovideogst
 from miville.engines.base_gst import GstError
 import miville.settings
 
 log = log.start('debug', 1, 0, 'gstchannel')
+
+def _check_for_milhouse():
+    try:
+        tmp = find_command('milhouse')
+    except:
+        log.error("milhouse command not found. Please install milhouse. See the documentation.")
+    else:
+        log.info("Succesfully found the milhouse command.")
+
+reactor.callLater(0, _check_for_milhouse)
 
 # Notitification for stream process state change (1 notif per streaming session)
 #  timeout: tbd 5 sec 
