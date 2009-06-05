@@ -378,6 +378,7 @@ class GstChannel(object):
             self.api.notify(None, GstError("Remote contact could not start streaming."), "start_streams")
             #reactor.callLater(4, self.stop_streaming, address)
             self._stop_local_rx_procs()
+            self._stop_local_tx_procs()
         
         elif key == STOP_RECEIVERS_CMD:
             self._stop_local_rx_procs()
