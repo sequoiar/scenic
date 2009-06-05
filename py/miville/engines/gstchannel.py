@@ -33,14 +33,16 @@ from miville.engines.base_gst import GstError
 import miville.settings
 
 log = log.start('debug', 1, 0, 'gstchannel')
-
+COMMAND_FOUND = False
 def _check_for_milhouse():
+    global COMMAND_FOUND
     try:
         tmp = find_command('milhouse')
     except:
         log.error("milhouse command not found. Please install milhouse. See the documentation.")
     else:
         log.info("Succesfully found the milhouse command.")
+        COMMAND_FOUND = True
 
 reactor.callLater(0, _check_for_milhouse)
 
@@ -305,6 +307,7 @@ class GstChannel(object):
             #raise
         else:
             self.send_message(REMOTE_STREAMING_CMD, [rx_remote_params, tx_remote_params, contact_addr, setting_name])
+            contact.stream_state = 2
 
     def stop_streaming(self, address):
         """
@@ -426,14 +429,16 @@ class GstChannel(object):
         """
         creates processses and send init messages
         """
+        global COMMAND_FOUND
         log.debug("GstChannel.start_local_gst_processes")
         self.receiver_procs_params = rx_params
         self.sender_procs_params = tx_params
         log.debug("   RX params :" + str(rx_params))
         log.debug("   TX params :" + str(tx_params))
-
         log.debug("   Initialize RECEIVING PROCESSES:")
         log.debug( pprint.pformat(self.receiver_procs_params)) 
+        if not COMMAND_FOUND:
+            raise GstError('The milhouse command could not be found.')
         try:
             self.receiver_engines = _create_stream_engines(self.api, 'receive', self.receiver_procs_params)
         except GstError, e:
