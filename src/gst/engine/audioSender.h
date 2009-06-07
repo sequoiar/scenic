@@ -31,7 +31,7 @@
 
 class AudioSource;
 class Encoder;
-class RtpPay;
+class Payloader;
 
 class AudioSender
     : public SenderBase 
@@ -56,7 +56,7 @@ class AudioSender
         //AudioLevel level_;
 
         Encoder *encoder_;
-        RtpPay *payloader_;
+        Payloader *payloader_;
 
         /// No Copy Constructor
         AudioSender(const AudioSender&); 

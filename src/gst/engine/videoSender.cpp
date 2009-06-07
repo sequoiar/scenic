@@ -43,7 +43,7 @@ VideoSender::VideoSender(const VideoSourceConfig vConfig, const SenderConfig rCo
 /// Returns the capabilities of this VideoSender's RtpSession 
 std::string VideoSender::getCaps() const
 { 
-    std::string capsStr = session_.getCaps();
+    std::string capsStr = payloader_->getCaps();
     tassert(capsStr != "");
     return capsStr;
 }

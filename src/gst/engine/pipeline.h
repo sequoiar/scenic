@@ -58,7 +58,6 @@ class Pipeline
         void notifyQuitted() { quitted_ = true; }
         bool quitted() { return quitted_; }
         void makeVerbose();
-        const char *getElementPadCaps(GstElement *element, const char *padName) const;
 
         static const unsigned int SAMPLE_RATE;
 

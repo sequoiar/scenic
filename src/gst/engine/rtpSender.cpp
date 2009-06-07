@@ -44,12 +44,6 @@ RtpSender::~RtpSender()
 }
 
 
-std::string RtpSender::getCaps() const
-{
-    return Pipeline::Instance()->getElementPadCaps(rtp_sender_, "sink");
-}
-
-
 void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
 {
     RtpBin::init();

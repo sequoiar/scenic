@@ -243,7 +243,7 @@ void H264Encoder::setBitrate(unsigned newBitrate)
 
 
 /// Creates an h.264 rtp payloader 
-RtpPay* H264Encoder::createPayloader() const
+Payloader* H264Encoder::createPayloader() const
 {
     return new H264Payloader();
 }
@@ -289,7 +289,7 @@ void H263Encoder::init()
 
 
 /// Creates an h.263 rtp payloader 
-RtpPay* H263Encoder::createPayloader() const
+Payloader* H263Encoder::createPayloader() const
 {
     return new H263Payloader();
 }
@@ -327,7 +327,7 @@ void Mpeg4Encoder::init()
 
 
 /// Creates an h.264 rtp payloader 
-RtpPay* Mpeg4Encoder::createPayloader() const
+Payloader* Mpeg4Encoder::createPayloader() const
 {
     return new Mpeg4Payloader();
 }
@@ -393,7 +393,7 @@ void TheoraEncoder::setSpeedLevel(int speedLevel)
 
 
 
-RtpPay* TheoraEncoder::createPayloader() const
+Payloader* TheoraEncoder::createPayloader() const
 {
     return new TheoraPayloader();
 }
@@ -428,7 +428,7 @@ void VorbisEncoder::init()
 
 
 /// Creates an RtpVorbisPayloader 
-RtpPay* VorbisEncoder::createPayloader() const
+Payloader* VorbisEncoder::createPayloader() const
 {
     return new VorbisPayloader();
 }
@@ -465,7 +465,7 @@ void RawEncoder::init()
 }
 
 /// Creates an RtpL16Payloader 
-RtpPay* RawEncoder::createPayloader() const
+Payloader* RawEncoder::createPayloader() const
 {
     return new L16Payloader();
 }
@@ -515,7 +515,7 @@ void MadDecoder::init()
 
 /** 
  * Creates an RtpMpaPayloader */
-RtpPay* LameEncoder::createPayloader() const
+Payloader* LameEncoder::createPayloader() const
 {
     return new MpaPayloader();
 }

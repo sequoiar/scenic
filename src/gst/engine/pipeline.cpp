@@ -448,26 +448,3 @@ void Pipeline::seekTo(gint64 pos)
 }
 
 
-const char* Pipeline::getElementPadCaps(GstElement *element, const char * padName) const
-{
-    tassert(isPlaying() or isPaused());
-
-    GstPad *pad;
-    GstCaps *caps;
-
-    tassert(pad = gst_element_get_pad(GST_ELEMENT(element), padName));
-
-    do
-        caps = gst_pad_get_negotiated_caps(pad);
-    while (caps == NULL);
-
-    // goes until caps are initialized
-
-    gst_object_unref(pad);
-
-    const char *result = gst_caps_to_string(caps);
-    gst_caps_unref(caps);
-    return result;
-}
-
-

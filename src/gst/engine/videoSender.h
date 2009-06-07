@@ -30,7 +30,7 @@
 
 class VideoSource;
 class VideoEncoder;
-class RtpPay;
+class Payloader;
 
 class VideoSender
     : public SenderBase 
@@ -50,7 +50,7 @@ class VideoSender
         RtpSender session_;
         VideoSource *source_;
         VideoEncoder *encoder_;
-        RtpPay *payloader_; 
+        Payloader *payloader_; 
 
         // hidden
 

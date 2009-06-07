@@ -57,7 +57,7 @@ AudioSender::~AudioSender()
 /// Returns the capabilities of this AudioSender's RtpSession 
 std::string AudioSender::getCaps() const
 { 
-    std::string capsStr = session_.getCaps();
+    std::string capsStr = payloader_->getCaps();
     tassert(capsStr != "");
     return capsStr;
 }

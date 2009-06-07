@@ -50,9 +50,10 @@ class Payloader : public RtpPay
 {
     public:
         static void enableControl();
-    protected:
-        void init() = 0;
+        std::string getCaps() const;
         virtual ~Payloader();
+        void init() = 0;
+    protected:
         static const long long MAX_PTIME = 2000000LL;
 
     private:
