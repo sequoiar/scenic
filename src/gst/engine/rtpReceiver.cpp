@@ -197,33 +197,29 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     g_object_set(rtcp_sender_, "host", config.remoteHost(), "port",
             config.rtcpSecondPort(), "sync", FALSE, "async", FALSE, NULL);
 
-    tassert(recv_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_")));
-    tassert(send_rtcp_src = gst_element_get_request_pad(rtpbin_, padStr("send_rtcp_src_")));
-    tassert(recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
-
+  /* now link all to the rtpbin, start by getting an RTP sinkpad for session n */
     tassert(rtpReceiverSrc = gst_element_get_static_pad(rtp_receiver_, "src"));
-    tassert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
-    tassert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
-
+    tassert(recv_rtp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtp_sink_")));
     tassert(gstlinkable::link_pads(rtpReceiverSrc, recv_rtp_sink));
+    gst_object_unref(rtpReceiverSrc);
+
+    /* get an RTCP sinkpad in session n */
+    tassert(rtcpReceiverSrc = gst_element_get_static_pad(rtcp_receiver_, "src"));
+    tassert(recv_rtcp_sink = gst_element_get_request_pad(rtpbin_, padStr("recv_rtcp_sink_")));
     tassert(gstlinkable::link_pads(rtcpReceiverSrc, recv_rtcp_sink));
+    gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
+
+    /* get an RTCP srcpad for sending RTCP back to the sender */
+    tassert(send_rtcp_src = gst_element_get_request_pad (rtpbin_, padStr("send_rtcp_src_")));
+    tassert(rtcpSenderSink = gst_element_get_static_pad(rtcp_sender_, "sink"));
     tassert(gstlinkable::link_pads(send_rtcp_src, rtcpSenderSink));
+    gst_object_unref(rtcpSenderSink);
 
     depayloaders_.push_back(depayloader_);
     // when pad is created, it must be linked to new sink
     g_signal_connect(rtpbin_, "pad-added", 
             G_CALLBACK(RtpReceiver::cb_new_src_pad), 
             NULL);
-
-    // release request pads (in reverse order)
-    gst_element_release_request_pad(rtpbin_, recv_rtcp_sink);
-    gst_element_release_request_pad(rtpbin_, send_rtcp_src);
-    gst_element_release_request_pad(rtpbin_, recv_rtp_sink);
-
-    // release static pads (in reverse order)
-    gst_object_unref(GST_OBJECT(rtcpSenderSink));
-    gst_object_unref(GST_OBJECT(rtcpReceiverSrc));
-    gst_object_unref(GST_OBJECT(rtpReceiverSrc));
 
     if (controlEnabled_)
         createLatencyControl();
