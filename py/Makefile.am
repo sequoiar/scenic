@@ -23,7 +23,7 @@ TESTS = test/test_addressbook.py \
 #EXTRA_DIST: $(shell `../utils/list_miville_files`)
 
 install-exec-hook:
-		mkdir -p $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville
+		install -D $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville
 		find -not -regex ".*(akefile).*" -not -regex ".*svn.*" -exec install -D {} $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville/{} \;
 		mkdir -p $(DESTDIR)$(prefix)/bin
 		cp -fv $(top_srcdir)/py/bin/miville $(DESTDIR)$(prefix)/bin/miville
