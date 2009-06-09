@@ -235,6 +235,7 @@ class ControllerApi(object):
         try:
             contact = self.get_contact(contact_name)
             if isinstance(contact, AddressBookError):
+                print sys.exc_info()
                 raise contact
             if contact.state == CONNECTED:
                 raise AddressBookError('Please disconnect from contact prior to delete it.')

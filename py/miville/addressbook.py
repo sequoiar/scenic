@@ -90,7 +90,7 @@ class AddressBook(object):
             raise AddressBookNameError, 'Name %s already in Address Book' % name
         address_taken = self.find_contact(address, port, connector)
         if address_taken:
-            raise AddressBookAddressError, 'The contact %s already have this address' % address_taken.name
+            raise AddressBookAddressError, 'The contact %s is already using this address.' % address_taken.name
         self.contacts[name] = Contact(name, address, port, auto_created, auto_answer, connector, setting)
         log.debug("adding contact %s %s" % (name, address))
         self.write()
@@ -121,7 +121,7 @@ class AddressBook(object):
 
         address_taken = self.find_contact((address or contact.address), (port or contact.port), (connector or contact.connector))
         if address_taken and address_taken.name != contact.name:
-            raise AddressBookAddressError, 'The contact %s already have this address' % address_taken.name
+            raise AddressBookAddressError, 'A contact already uses the address "%s"' % address_taken.name
 
         new_name = to_utf(new_name)
         if new_name and new_name != name:
