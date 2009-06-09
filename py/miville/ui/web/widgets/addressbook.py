@@ -44,6 +44,7 @@ class Addressbook(Widget):
     def __init__(self, api, template):
         Widget.__init__(self, api, template)
         self.connections = {}
+        self._currently_selected_contact = None # adding this to avoid using api.select_contact
         
     def rc_get_list(self):
         self.api.get_contacts(self)
@@ -294,6 +295,14 @@ class Addressbook(Widget):
 #        if origin is self and isinstance(data, Exception):
 #            self.callRemote('error', '%s' % data)
     
+    def cb_will_start_streams_with_contact(self, origin, data):
+        """
+        Triggered from the Streams widget so that we know with who we try to start streaming.
+        
+        adding this to avoid using api.select_contactt 
+        """
+        contact = data
+        self._currently_selected_contact = contact
 
     def cb_start_streams(self, origin, data):
         """
@@ -311,9 +320,12 @@ class Addressbook(Widget):
         #  START_STREAMS {'started': True, 'msg': 'streaming started'}
         if isinstance(data, Exception):
             log.error('Could not start streaming ' + data.message)
-            contact = self.api.get_contact()
-            if isinstance(contact, Exception):
-                log.error('Could not get current contact: ' + contact.message)
+            #contact = self.api.get_contact() # TODO FIXME XXX WEIRD BUG OCCURS MAYBE
+            contact = self._currently_selected_contact
+            if contact is None:
+                log.error('Could not detect with which contact we are starting to stream.')
+            #if isinstance(contact, Exception):
+            #    log.error('Could not get current contact: ' + contact.message)
             else:
                 contact_name = contact.name
                 self.callRemote('update_status', contact_name, '%s: %s' % (data.__class__.__name__, data.message), 'Could not start streaming. (%s) %s' % (data.__class__.__name__, data.message))

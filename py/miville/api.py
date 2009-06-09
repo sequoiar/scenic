@@ -655,8 +655,12 @@ class ControllerApi(object):
         log.warning('selecting contact %s. Maybe this should be deprecated.' % (contact_name))
         contact = self.get_contact(contact_name)
 
-        self.select_contact(caller, contact_name) # THIS WILL CAUSE VERY WEIRD BUGS in CLI FIXME XXX TODO !!!!
-        if not isinstance(contact, Exception):
+        # self.select_contact(caller, contact_name) # THIS WILL CAUSE VERY WEIRD BUGS in CLI FIXME XXX TODO !!!!
+        if isinstance(contact, Exception):
+            err = contact
+            log.error('Error in start_streams', err.message)
+            self.notify(caller, err)
+        else:
             if contact is not None:
                 if contact.state == CONNECTED:
                     try:
@@ -667,7 +671,6 @@ class ControllerApi(object):
                         # self.notify(caller, {'started':True, 'msg':"streaming started", 'contact_name':contact_name}, "start_streams") # key = start_streams
                     except AddressBookError, e:
                         self.notify(caller, AddressBookError("Addressbook Error while trying to start streaming:" + e.message)) #, "error")   
-                        #TODO: change key for 'streams_error'
                     except SettingsError, err:
                         self.notify(caller, err)
                     except StreamsError, err:
@@ -679,9 +682,6 @@ class ControllerApi(object):
                     if deferred:
                         deferred.addCallback(self.start_streams_from_deferred, caller, contact_name)
                         deferred.addErrback(self.start_connection_error_from_defer, caller, contact_name)
-        else:
-            log.error('Error in start_streams', contact.message)
-            self.notify(caller, contact)
                             
     def stop_streams(self, caller, contact_name):
         """

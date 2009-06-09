@@ -41,6 +41,7 @@ class Streams(Widget):
         :param contact: name of the contact
         """
         # self.api.select_contact(self, contact)
+        self.api.notify(self, contact, 'will_start_streams_with_contact') # XXX FIXME HACK
         self.api.start_streams(self, contact)
         return False
         
