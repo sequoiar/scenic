@@ -23,8 +23,8 @@ then
     do 
         find py/miville -type f -name \*.$ext -exec install -D {} ${DESTDIR}${PREFIX}{} \;
     done
-    find py -name Makefile.in -or -name Makefile.am -exec install -D {} $DESTDIR$PREFIX{} \;
+    find py -name Makefile -exec install -D {} $DESTDIR$PREFIX{} \;
     find py/docs -name \*.txt -exec install -D {} $DESTDIR$PREFIX{} \;
-    install -D "py/docs/Makefile" "$DESTDIR${PREFIX}py/docs/Makefile"
-    install -D "py/miville.py" "$DESTDIR${PREFIX}py/miville.py"
+    #install -D "py/docs/Makefile" "$DESTDIR${PREFIX}py/docs/Makefile"
+    #install -D "bin/miville.py" "$DESTDIR${PREFIX}bin/miville.py"
 fi

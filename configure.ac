@@ -182,8 +182,15 @@ AC_DEFINE(CONFIG_IEEE1394,[],[IEEE1934 define from configure])
 AC_MSG_NOTICE([define CONFIG_IEEE1394])
 fi
 AC_CONFIG_FILES([Makefile
+		 doc/Makefile
+		 doc/notes/Makefile
+		 doc/test/Makefile
+		 doc/network/Makefile
+		 doc/figures/Makefile
+		 doc/figures/test/Makefile
                  src/Makefile
                  py/Makefile
+                 py/docs/Makefile
                  py/maugis/Makefile
                  py/miville/Makefile
                  py/miville/connectors/Makefile

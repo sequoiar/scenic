@@ -26,8 +26,8 @@ install-exec-hook:
 		mkdir -p $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville
 		find -not -regex ".*(akefile).*" -not -regex ".*svn.*" -exec install -D {} $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville/{} \;
 		mkdir -p $(DESTDIR)$(prefix)/bin
-		cp -fv bin/miville $(DESTDIR)$(prefix)/bin/miville
-	if test -d docs/_build/html; then mkdir -p $(DESTDIR)$(prefix)/share/doc/miville/sphinx; cp -fvr docs/_build/html/ $(DESTDIR)$(prefix)/share/doc/miville/sphinx; fi
+		cp -fv $(top_srcdir)/py/bin/miville $(DESTDIR)$(prefix)/bin/miville
+	if test -d docs/_build/html; then mkdir -p $(DESTDIR)$(prefix)/share/doc/miville/sphinx; cp -fvr $(top_srcdir)/docs/_build/html/ $(DESTDIR)$(prefix)/share/doc/miville/sphinx; fi
 uninstall-hook:
 		rm -rf $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville
 		rm -rf $(DESTDIR)$(prefix)/bin/miville
