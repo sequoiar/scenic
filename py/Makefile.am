@@ -23,10 +23,11 @@ TESTS = test/test_addressbook.py \
 #EXTRA_DIST: $(shell `../utils/list_miville_files`)
 
 install-exec-hook:
-		install -D $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville
-		find -not -regex ".*(akefile).*" -not -regex ".*svn.*" -exec install -D {} $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville/{} \;
-		mkdir -p $(DESTDIR)$(prefix)/bin
-		cp -fv $(top_srcdir)/py/bin/miville $(DESTDIR)$(prefix)/bin/miville
+		export PYTHONPATH=$(DESTDIR)$(prefix)/lib/python2.5/site-packages
+		python setup.py build
+		python setup.py install --prefix=$(DESTDIR)$(prefix)
+
+		install $(top_srcdir)/py/bin/miville $(DESTDIR)$(prefix)/bin/miville
 	if test -d docs/_build/html; then mkdir -p $(DESTDIR)$(prefix)/share/doc/miville/sphinx; cp -fvr $(top_srcdir)/docs/_build/html/ $(DESTDIR)$(prefix)/share/doc/miville/sphinx; fi
 uninstall-hook:
 		rm -rf $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville
