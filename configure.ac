@@ -133,16 +133,34 @@ AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
 #AC_SUBST(PYTHON_CFLAGS)
 #AC_SUBST(PYTHON_LIBS)
 
-AX_PYTHON
-AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
 
 AX_BOOST_BASE([1.35])
 AX_BOOST_THREAD
 AX_BOOST_SYSTEM
 AX_BOOST_ASIO
 AX_BOOST_UNIT_TEST_FRAMEWORK
+if test "x$with_boost_python" != "x" ; then 
+    AX_PYTHON
+    AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
+    if test "x$with_boost_python" = "xyes" ; then
+        with_boost_python=no
+    fi
+    LDFLAGS_SAVE=$LDFLAGS
+    LDFLAGS=-l$PYTHON_LIB $LDFLAGS
+    AX_BOOST_PYTHON
+    if test "x$BOOST_PYTHON_LIB" = "x" ; then
+    	if test "x$with_boost_python" = "xno" ; then
+           with_boost_python=mt
+	else
+	   with_boost_python=$with_boost_python-mt
+	fi
+	AX_BOOST_PYTHON
+    fi
+    LDFLAGS=$LDFLAGS_SAVE
+fi
 
-AX_BOOST_PYTHON
+
+
 AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes")
 
 AX_CHECK_GL
@@ -234,8 +252,8 @@ AC_CONFIG_FILES([
 AC_OUTPUT
 echo
 
-if test  "$ac_cv_boost_python" != "yes"   ; then
-AC_MSG_NOTICE([Not building python directories -- python or boost-python not found ])
+if test  "$ac_cv_boost_python" == "yes"   ; then
+AC_MSG_NOTICE([Building python module])
 fi
 
 if test "x${have_libavc1394}" = "xfalse" -o "x${have_libavc1394}" = "xfalse" ; then

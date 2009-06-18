@@ -1,5 +1,5 @@
 # ===========================================================================
-#            http://autoconf-archive.cryp.to/ax_boost_python.html
+#         http://www.nongnu.org/autoconf-archive/ax_boost_python.html
 # ===========================================================================
 #
 # SYNOPSIS
@@ -21,11 +21,7 @@
 #   In order to ensure that the Python headers are specified on the include
 #   path, this macro requires AX_PYTHON to be called.
 #
-# LAST MODIFICATION
-#
-#   2008-04-12
-#
-# COPYLEFT
+# LICENSE
 #
 #   Copyright (c) 2008 Michael Tindal
 #
@@ -51,9 +47,9 @@
 #   all other use of the material that constitutes the Autoconf Macro.
 #
 #   This special exception to the GPL applies to versions of the Autoconf
-#   Macro released by the Autoconf Macro Archive. When you make and
-#   distribute a modified version of the Autoconf Macro, you may extend this
-#   special exception to the GPL to apply to your modified version as well.
+#   Macro released by the Autoconf Archive. When you make and distribute a
+#   modified version of the Autoconf Macro, you may extend this special
+#   exception to the GPL to apply to your modified version as well.
 
 AC_DEFUN([AX_BOOST_PYTHON],
 [AC_REQUIRE([AX_PYTHON])dnl
@@ -83,7 +79,7 @@ if test "$ac_cv_boost_python" = "yes"; then
      ax_boost_python_lib=boost_python-$with_boost_python
    fi])
   for ax_lib in $ax_python_lib $ax_boost_python_lib boost_python; do
-    BOOST_PYTHON_LIB=boost_python
+    AC_CHECK_LIB($ax_lib, exit, [BOOST_PYTHON_LIB=$ax_lib break])
   done
   AC_SUBST(BOOST_PYTHON_LIB)
 fi
