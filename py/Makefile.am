@@ -5,7 +5,6 @@ DIST_SUBDIRS = miville maugis docs
 TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 trial
         
 	
-	#BADTEST-BAD#test/check_ping.py \ 
 TESTS = test/test_addressbook.py \
         test/test_commands.py \
         test/test_common.py \
