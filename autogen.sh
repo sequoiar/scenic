@@ -25,6 +25,6 @@ aclocal -I m4
 autoheader
 autoconf -f
 automake -a -f -Wno-portability 
-if [ ! "x$BUILDBOT" = "x" ]; then
+if [ ! "x$LOGNAME" = "xbbslave" ]; then
     ./configure $@ --enable-svn-revision
 fi
