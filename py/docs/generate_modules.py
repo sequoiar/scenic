@@ -30,19 +30,23 @@ import optparse
 
 
 # automodule options
-options = ['members',
+OPTIONS = ['members',
             'undoc-members',
 #            'inherited-members', # disable because there's a bug in sphinx
             'show-inheritance']
+
 
 def create_file_name(base, opts):
     """Create file name from base name, path and suffix"""
     return os.path.join(opts.destdir, "%s.%s" % (base, opts.suffix))
 
-def write_directive(module):
+def write_directive(module, package=None):
     """Create the automodule directive and add the options"""
-    directive = '.. automodule:: %s\n' % module
-    for option in options:
+    if package:
+        directive = '.. automodule:: %s.%s\n' % (package, module)
+    else:
+        directive = '.. automodule:: %s\n' % module
+    for option in OPTIONS:
         directive += '    :%s:\n' % option
     return directive
 
@@ -62,16 +66,16 @@ def title_line(title, char):
     """ Underline the title with the character pass, with the right length."""
     return '%s\n%s\n\n' % (title, len(title) * char)
 
-def create_module_file(root, module, opts):
+def create_module_file(package, module, opts):
     """Build the text of the file and write the file."""
     name = create_file_name(module, opts)
     if not opts.force and os.path.isfile(name):
         print 'File %s already exists.' % name
-    elif check_for_code('%s/%s.py' % (root, module)):   # don't build the file if there's no code in it
-        print 'Creating file %s for module.' % name
+    else:
+        print 'Creating file %s (module).' % name
         text = write_heading(module)
         text += write_sub(module)
-        text += write_directive(module)
+        text += write_directive(module, package)
 
         # write the file
         if not opts.dryrun:       
@@ -79,20 +83,20 @@ def create_module_file(root, module, opts):
             fd.write(text)
             fd.close()
 
-def create_package_file(root, subroot, py_files, opts, subs=None):
+def create_package_file(root, master_package, subroot, py_files, opts, subs=None):
     """Build the text of the file and write the file."""
     package = os.path.split(root)[-1].lower()
     name = create_file_name(subroot, opts)
     if not opts.force and os.path.isfile(name):
         print 'File %s already exists.' % name
     else:
-        print 'Creating file %s for package.' % name
+        print 'Creating file %s (package).' % name
         text = write_heading(package, 'Package')
         if subs == None:
             subs = []
         else:
             # build a list of directories that are package (they contain an __init_.py file)
-            subs = [sub for sub in subs if os.path.isfile('%s/%s/__init__.py' % (root, sub))]
+            subs = [sub for sub in subs if os.path.isfile(os.path.join(root, sub, '__init__.py'))]
             # if there's some package directories, add a TOC for theses subpackages
             if subs:
                 text += title_line('Subpackages', '-')
@@ -103,16 +107,16 @@ def create_package_file(root, subroot, py_files, opts, subs=None):
                     
         # add each package's module
         for py_file in py_files:
-            if not check_for_code('%s/%s' % (root, py_file)):
+            if not check_for_code(os.path.join(root, py_file)):
                 # don't build the file if there's no code in it
                 continue
-            py_file = py_file[:-3]
+            py_file = os.path.splitext(py_file)[0]
             py_path = '%s.%s' % (subroot, py_file)
             kind = "Module"
             if py_file == '__init__':
                 kind = "Package"
             text += write_sub(kind == 'Package' and package or py_file, kind)
-            text += write_directive(kind == "Package" and subroot or py_path)
+            text += write_directive(kind == "Package" and subroot or py_path, master_package)
             text += '\n'
 
         # write the file
@@ -138,6 +142,11 @@ def recurse_tree(path, excludes, opts):
     Look for every file in the directory tree and create the corresponding
     ReST files.
     """
+    package_name = None
+    # check if the base directory is a package and get is name
+    if '__init__.py' in os.listdir(path):
+        package_name = os.path.abspath(path).split(os.path.sep)[-1]
+    
     toc = []
     excludes = format_excludes(path, excludes)
     tree = os.walk(path, False)
@@ -147,24 +156,34 @@ def recurse_tree(path, excludes, opts):
         # remove hidden ('.') and private ('_') directories
         subs = [sub for sub in subs if sub[0] not in ['.', '_']]
         # check if there's valid files to process
+        # TODO: could add check for windows hidden files
         if "/." in root or "/_" in root \
         or not py_files \
         or check_excludes(root, excludes):
             continue
-        subroot = root[len(path):].lstrip('/').replace('/', '.')
+        subroot = root[len(path):].lstrip(os.path.sep).replace(os.path.sep, '.')
         if root == path:
             # we are at the root level so we create only modules
             for py_file in py_files:
-                module = py_file[:-3]
-                create_module_file(root, module, opts)
-                toc.append(module)
+                module = os.path.splitext(py_file)[0]
+                # add the module if it contains code
+                if check_for_code(os.path.join(path, '%s.py' % module)):
+                    create_module_file(package_name, module, opts)
+                    toc.append(module)
         elif not subs and "__init__.py" in py_files:
             # we are in a package without sub package
-            create_package_file(root, subroot, py_files, opts=opts)
-            toc.append(subroot)
+            # check if there's only an __init__.py file
+            if len(py_files) == 1:
+                # check if there's code in the __init__.py file
+                if check_for_code(os.path.join(root, '__init__.py')):
+                    create_package_file(root, package_name, subroot, py_files, opts=opts)
+                    toc.append(subroot)
+            else:
+                create_package_file(root, package_name, subroot, py_files, opts=opts)
+                toc.append(subroot)
         elif "__init__.py" in py_files:
             # we are in package with subpackage(s)
-            create_package_file(root, subroot, py_files, opts, subs)
+            create_package_file(root, package_name, subroot, py_files, opts, subs)
             toc.append(subroot)
             
     # create the module's index
@@ -189,7 +208,7 @@ def modules_toc(modules, opts, name='modules'):
     modules.sort()
     prev_module = ''
     for module in modules:
-        # look if the module is a subpackage and, if yes,  ignore it
+        # look if the module is a subpackage and, if yes, ignore it
         if module.startswith(prev_module + '.'):
             continue
         prev_module = module
@@ -209,10 +228,10 @@ def format_excludes(path, excludes):
     """
     f_excludes = []
     for exclude in excludes:
-        if exclude[0] != '/' and exclude[:len(path)] != path:
-            exclude = '%s/%s' % (path, exclude)
+        if not os.path.isabs(exclude) and exclude[:len(path)] != path:
+            exclude = os.path.join(path, exclude)
         # remove trailing slash
-        f_excludes.append(exclude.rstrip('/'))
+        f_excludes.append(exclude.rstrip(os.path.sep))
     return f_excludes
 
 def check_excludes(root, excludes):
@@ -228,12 +247,14 @@ def check_py_file(files):
     """
     Return a list with only the python scripts (remove all other files). 
     """
-    py_files = [fich for fich in files if fich[-3:] == '.py']
+    py_files = [fich for fich in files if os.path.splitext(fich)[1] == '.py']
     return py_files
 
 
-if __name__ == '__main__':
-
+def main():
+    """
+    Parse and check the command line arguments
+    """
     parser = optparse.OptionParser(usage="""usage: %prog [options] <package path> [exclude paths, ...]
     
 Note: By default this script will not overwrite already created files.""")
@@ -249,10 +270,19 @@ Note: By default this script will not overwrite already created files.""")
         parser.error("package path is required.")
     else:
         if os.path.isdir(args[0]):
-            # if there's some exclude arguments, build the list of excludes
-            excludes = args[1:]
-            recurse_tree(args[0], excludes, opts)
+            # check if the output destination is a valid directory
+            if opts.destdir and os.path.isdir(opts.destdir):
+                # if there's some exclude arguments, build the list of excludes
+                excludes = args[1:]
+                recurse_tree(args[0], excludes, opts)
+            else:
+                print '%s is not a valid output destination directory.' % opts.destdir
         else:
             print '%s is not a valid directory.' % args
             
             
+
+
+if __name__ == '__main__':
+    main()
+    
