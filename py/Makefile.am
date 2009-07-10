@@ -23,12 +23,15 @@ TESTS = test/test_addressbook.py \
 #EXTRA_DIST: $(shell `../utils/list_miville_files`)
 
 install-exec-hook:
-		export PYTHONPATH=$(DESTDIR)$(prefix)/lib/python2.5/site-packages
-		python setup.py build
-		python setup.py install --prefix=$(DESTDIR)$(prefix)
+		PYTHONPATH=$(DESTDIR)$(prefix)/lib/python2.5/site-packages python setup.py build
+		PYTHONPATH=$(DESTDIR)$(prefix)/lib/python2.5/site-packages python setup.py install --prefix=$(DESTDIR)$(prefix)
 
 		install $(top_srcdir)/py/bin/miville $(DESTDIR)$(prefix)/bin/miville
-	if test -d docs/_build/html; then mkdir -p $(DESTDIR)$(prefix)/share/doc/miville/sphinx; cp -fvr $(top_srcdir)/docs/_build/html/ $(DESTDIR)$(prefix)/share/doc/miville/sphinx; fi
+		if [ -d docs/_build/html ]; then \
+			mkdir -p $(DESTDIR)$(prefix)/share/doc/miville ; \
+			install -d $(top_srcdir)/py/docs/_build/html $(DESTDIR)$(prefix)/share/doc/miville/sphinx ; \
+		fi
+
 uninstall-hook:
 		rm -rf $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville
 		rm -rf $(DESTDIR)$(prefix)/bin/miville
