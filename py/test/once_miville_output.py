@@ -77,7 +77,7 @@ class MivilleTester(object):
         """
         self.unittest = unittest
         self.port_offset = 0
-        self.miville_command = "../pmiville.py"
+        self.miville_command = "../mivilled"
         self.use_tmp_home = False
         self.verbose = True
         self.log_prefix = ''
