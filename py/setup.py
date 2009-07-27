@@ -2,8 +2,6 @@
 """
 Miville Installation script
 -------------------
-NOTE: The miville.py script is not installed by this script.
-      miville.py must renamed to /usr/local/bin/miville by the autotools
 
 Usage::
   python setup.py build
@@ -21,13 +19,12 @@ from setuptools import find_packages
 from setuptools import setup
 __version__ = "0.1.3-a"
 
+# how I generated that list : 
 #packages = find_packages(exclude=["test", "miville.py"]),
 #print 'PACKAGES:', packages
-#packages = ['miville', 'miville.connectors', 'miville.utils', 'miville.ui', 'miville.devices', 'miville.protocols', 'miville.engines', 'miville.connectors.basic', 'miville.connectors.sip', 'miville.ui.cli', 'miville.ui.web', 'miville.ui.web.pages', 'miville.ui.web.widgets', 'miville.ui.web.widgets.medias']
-#packages = ['miville', 'miville.connectors', 'miville.utils', 'miville.ui', 'miville.devices', 'miville.protocols', 'miville.engines', 'miville.connectors.basic', 'miville.connectors.sip', 'miville.ui.cli', 'miville.ui.web', 'miville.ui.web.pages', 'miville.ui.web.templates', 'miville.ui.web.js', 'miville.ui.web.img', 'miville.ui.web.css',  'miville.ui.web.widgets', 'miville.ui.web.templates.default', 'miville.ui.web.widgets.medias', 'miville.ui.web.templates.default.js', 'miville.ui.web.templates.default.xml', 'miville.ui.web.templates.default.img', 'miville.ui.web.templates.default.css']
 
 packages = [
-    'miville',
+#    'miville',
     'miville.connectors',
     'miville.utils',
     'miville.ui',
@@ -62,7 +59,9 @@ setup(
     description = "Miville, interface to the milhouse streaming tool.",
     long_description = """Miville software, a component of the PropulseART project
     Requires: twisted, nevow.""",
-    install_requires = ['twisted'], # , 'nevow'], 'nevow' is installed even if ubuntu package is preset. Disabling it from dependecies for now.
+    install_requires = ['twisted'], # , 'nevow']
+    # The dependency to the 'nevow' package is not specified here, since there is a bug 
+    # in nevow, which installs it using easy_install even when the nevow ubuntu package is already installed. 
     # see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=475440
     scripts = ["restart_jackd.py", "mivilled"], #, "miville.py"
     license = "GPL",

@@ -26,15 +26,17 @@ install-exec-hook:
 		PYTHONPATH=$(DESTDIR)$(prefix)/lib/python2.5/site-packages python setup.py build
 		PYTHONPATH=$(DESTDIR)$(prefix)/lib/python2.5/site-packages python setup.py install --prefix=$(DESTDIR)$(prefix)
 
-		install $(top_srcdir)/py/bin/miville $(DESTDIR)$(prefix)/bin/miville
 		if [ -d docs/_build/html ]; then \
 			mkdir -p $(DESTDIR)$(prefix)/share/doc/miville ; \
 			install -d $(top_srcdir)/py/docs/_build/html $(DESTDIR)$(prefix)/share/doc/miville/sphinx ; \
 		fi
 
 uninstall-hook:
-		rm -rf $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville
-		rm -rf $(DESTDIR)$(prefix)/bin/miville
+		awk '/miville/ { system("rm -rf " $1) }' $(DESTDIR)$(prefix)/lib/python2.5/site-packages/easy-install.pth 
+		sed -i '/miville-.*egg/d' $(DESTDIR)$(prefix)/lib/python2.5/site-packages/easy-install.pth 
+		rm -rf $(DESTDIR)$(prefix)/bin/mivilled
+		rm -rf $(DESTDIR)$(prefix)/bin/restart_jackd.py
+		rm -rf $(DESTDIR)$(prefix)/share/doc/miville/sphinx
 
 # temporarily removed: check_ping.py
 # not much useful:

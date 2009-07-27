@@ -21,7 +21,7 @@ install:
 	fi
 
 uninstall:
-	rm -rf /share/doc/doxygen
+	rm -rf $(DESTDIR)$(prefix)/share/doc/doxygen
 
 check:
 	@echo tests for docs?
