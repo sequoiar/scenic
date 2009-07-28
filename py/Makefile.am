@@ -25,11 +25,13 @@ TESTS = test/test_addressbook.py \
 install-exec-hook:
 		PYTHONPATH=$(DESTDIR)$(prefix)/lib/python2.5/site-packages python setup.py build
 		PYTHONPATH=$(DESTDIR)$(prefix)/lib/python2.5/site-packages python setup.py install --prefix=$(DESTDIR)$(prefix)
-
 		if [ -d docs/_build/html ]; then \
 			mkdir -p $(DESTDIR)$(prefix)/share/doc/miville ; \
 			install -d $(top_srcdir)/py/docs/_build/html $(DESTDIR)$(prefix)/share/doc/miville/sphinx ; \
 		fi
+# python setup.py build
+# python setup.py install --prefix=$(DESTDIR)$(prefix)
+# THIS IS BROKEN !! FIXME
 
 uninstall-hook:
 		awk '/miville/ { system("rm -rf " $1) }' $(DESTDIR)$(prefix)/lib/python2.5/site-packages/easy-install.pth 

@@ -24,7 +24,7 @@ __version__ = "0.1.3-a"
 #print 'PACKAGES:', packages
 
 packages = [
-#    'miville',
+    'miville',
     'miville.connectors',
     'miville.utils',
     'miville.ui',
