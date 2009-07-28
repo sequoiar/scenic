@@ -1,0 +1,48 @@
+[DESCRIPTION]
+Milhouse is a High-Quality Bi-Directional Audio/Video Streaming Tool
+
+[SYNOPSIS]
+milhouse [options]
+
+[EXAMPLES]
+First start the receiver :
+  
+  export DISPLAY=:0.1
+  HOST=10.10.10.165
+  milhouse -r --address ${HOST} --audioport 12000 --audiocodec raw  \
+    --audiosink jackaudiosink --videoport 13000 --videocodec mpeg4 \
+    --videosink xvimagesink --enable_controls
+
+Then, start the sender :
+
+  HOST=10.10.10.165
+  milhouse -s --address ${HOST} --audioport 10000 --audiocodec raw \
+    --audiosource jackaudiosrc -c 2 --videoport 11000 --videocodec mpeg4 \
+    --videosource v4l2src
+
+[AUTHOR]
+Society for Arts and Technology
+
+[REPORTING BUGS]
+https://svn.sat.qc.ca/trac/miville
+
+[COPYRIGHT]
+Milhouse
+Copyright (C) 2008-2009 Society for Arts and Technologies (SAT)
+http://www.sat.qc.ca
+All rights reserved.
+
+This file is part of [propulse]ART.
+
+[propulse]ART is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+[propulse]ART is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
