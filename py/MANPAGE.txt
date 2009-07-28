@@ -1,0 +1,51 @@
+[DESCRIPTION]
+The Miville Audio/Video Streaming Software for GNU/Linux
+
+[SYNOPSIS]
+mivilled [options]
+
+[EXAMPLES]
+Miville is intended to be run as a daemon started by the user in a X11 session. 
+You can start it in a shell in the background as an automatically started script
+when you log in. 
+
+  mivilled -v &
+
+You can choose the network interface under which miville will listen 
+for the HTTP of telnet user interfaces. They are specified with the -I flag.
+
+  mivilled -I 10.10.10.55
+
+You can specify a port offset for all UI ports. 
+
+  mivilled -o 1
+
+You can make miville listen to all network interfaces on your computer. 
+This is insecure but easier to use. 
+
+  mivilled -a
+
+[AUTHOR]
+Society for Arts and Technology
+
+[REPORTING BUGS]
+https://svn.sat.qc.ca/trac/miville
+
+[COPYRIGHT]
+Miville
+Copyright (C) 2008 Society for Arts and Technology (SAT)
+http://www.sat.qc.ca
+All rights reserved.
+
+This file is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+Miville is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Miville.  If not, see <http://www.gnu.org/licenses/>.

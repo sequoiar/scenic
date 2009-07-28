@@ -29,6 +29,8 @@ install-exec-hook:
 			mkdir -p $(DESTDIR)$(prefix)/share/doc/miville ; \
 			install -d $(top_srcdir)/py/docs/_build/html $(DESTDIR)$(prefix)/share/doc/miville/sphinx ; \
 		fi
+		help2man -N -i MANPAGE.txt -n "The Miville Audio/Video Streaming Software for GNU/Linux" mivilled > mivilled.1
+		install mivilled.1 $(DESTDIR)$(prefix)/share/man/man1/mivilled.1
 # python setup.py build
 # python setup.py install --prefix=$(DESTDIR)$(prefix)
 # THIS IS BROKEN !! FIXME
@@ -39,6 +41,7 @@ uninstall-hook:
 		rm -rf $(DESTDIR)$(prefix)/bin/mivilled
 		rm -rf $(DESTDIR)$(prefix)/bin/restart_jackd.py
 		rm -rf $(DESTDIR)$(prefix)/share/doc/miville/sphinx
+		rm -f $(DESTDIR)$(prefix)/share/man/man1/mivilled.1
 
 # temporarily removed: check_ping.py
 # not much useful:
