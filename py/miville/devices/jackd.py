@@ -57,6 +57,38 @@ _enable_kill_jackd = True
 
 RESTART_JACKD_SCRIPT = "restart_jackd.py" # TODO: move to some other location at install time !
 
+def double_fork(args):
+    """
+    Starts a process and double fork so init (PID 1) becomes
+    the parent pid.
+    """
+    # TODO: should return/raise in case of error/success
+    # or at least process ID... ?
+    # print("The magic of the double fork.")
+    if os.fork() != 0: # die if not in the child process 
+        return 
+        # sys.exit(0)
+    os.umask(0) # set current process' file creation mode to octal 000
+    os.setsid() # setsid runs a program in a new session. 
+    if os.fork() != 0: # die if not the child process 
+        sys.exit(0)
+    # execute the command line to start jackd using the same stdout, stderr and stdin as the parent process.
+    # last chance to print something on the current stdin
+    print "Executing the %s command in a double fork." % (str(args))
+    #print "JACK should be running."
+    #print "ps aux | grep jackd | grep -v grep"
+    sys.stdout.flush()
+    sys.stderr.flush()
+    stdin = file('/dev/null', 'r')
+    stdout = file('/dev/null', 'a+')
+    stderr = file('/dev/null', 'a+', 0)
+    # dup2(int oldfd, int newfd)
+    # create a copy of the file descriptors.
+    os.dup2(stdin.fileno(), sys.stdin.fileno())
+    os.dup2(stdout.fileno(), sys.stdout.fileno())
+    os.dup2(stderr.fileno(), sys.stderr.fileno())
+    os.execv(args[0], args) # TODO: use execve to send os.environ
+
 def _parse_jack_lsp(lines):
     """
     Parses the output of the `jack_lsp` command.
@@ -199,6 +231,7 @@ def jackd_get_infos():
                     ret[i]["cmdline"] += " " + arg
             i += 1 # very important...
     return ret
+
 
 class JackDriver(devices.AudioDriver):
     """
@@ -395,8 +428,20 @@ class JackDriver(devices.AudioDriver):
         else:
             if caller is not None:
                 self.api.notify(caller, "Killed -9 jackd", "info")
-        reactor.callLater(1.0, self._resurrect_jackd, caller, args, pid)
+        #reactor.callLater(1.0, self._resurrect_jackd, caller, args, pid)
+        reactor.callLater(1.0, self._resurrect2_jackd, args)
 
+    def _resurrect2_jackd(self, str_args):
+        """
+        New version using the double fork.
+        """
+        argv = ["jackd"] # TODO: store which jackd and use the same !!!
+        for arg in str_args.strip().split():
+            argv.append(arg)
+        double_fork(argv)
+        log.info("We did restart jackd.")
+        
+        
     def _resurrect_jackd(self, caller, args, pid):
         """
         Starts jackd again
@@ -437,75 +482,3 @@ if __name__ == '__name__':
     print "JACK infos:"
     pprint.pprint(jackd_get_infos())
 
-# ----------------------------------------------
-# #!/bin/bash
-# cd ~/bin
-# 
-# function var_declaration {
-#     for $(seq 1 8); do
-#         export JACK_SYSTEM_OUT$i="alsa_pcm:playback_$i"
-#         export JACK_SYSTEM_IN$i="alsa_pcm:capture_$i"
-#     done
-# }
-# 
-# function list_jack_ports {
-#     if [ "x$1" = "x" ]; then
-#         :
-#     else
-#         jack_lsp | grep $1 | sort
-#     fi
-# }
-# 
-# # MIDI ports
-# function find_midi_port {
-#     # arg1 = [o|i] (input/ouput)
-#     # arg2 = searched_string
-#     # TODO: Verify the args
-#     echo $(aconnect -l$1 | awk "/client.*$2/ { print \$2 "0" }" )
-# }
-# 
-# pd_midi_in=$(find_midi_port o Pure)
-# oxygen_midi_out=$(find_midi_port i Oxygen)
-# 
-# aconnect $oxygen_midi_out $pd_midi_in
-# 
-# 
-# # Audio ports
-# # TODO: check if pof is running
-# 
-# # set the prefixes
-# pof_out=$(jack_lsp  | egrep pof.*:out | sed 's/:.*$//' | uniq | sed 's/$/:out_jackaudiosink0_/')
-# pof_in=$(jack_lsp  | egrep pof.*:in | sed 's/:.*$//' | uniq | sed 's/$/:in_jackaudiosrc/')
-# 
-# pd_out=$(jack_lsp  | egrep pure_data.*:out | sed 's/:.*$//' | uniq | sed 's/$/:output/')
-# pd_in=$(jack_lsp  | egrep pure_data.*:in | sed 's/:.*$//' | uniq | sed 's/$/:input/')
-# 
-# system_out="system:capture_"
-# system_in="system:playback_"
-# 
-# # doo da sheet
-# set -x
-# 
-# jack_connect ${pof_out}5 ${system_in}1
-# sleep 2
-# jack_connect ${pof_out}5 ${system_in}4
-# sleep 2
-# 
-# for i in $(seq 1 4)
-# do
-#     j=$((i-1))
-#     jack_connect ${pd_out}$i ${system_in}$i 2>/dev/null
-#     sleep 2
-#     jack_connect ${pd_out}$i ${pof_in}${j}_1 2>/dev/null
-#     sleep 2
-# done
-# 
-# for i in $(seq 1 3)
-# do
-#     jack_connect ${system_out}$i ${pd_in}${i}
-#     sleep 2
-# done
-# jack_connect ${system_out}1 ${pof_in}4_1
-# 
-# 
-# 

@@ -64,6 +64,7 @@ class MivilleConfiguration(object):
         # network
         self.com_chan_port = 31054
         self.telnet_port = 14444
+        self.restart_jackd = False
         self.connector_port = 2222
         self.web_port = 8080
         self.iperf_port = 5001 # iperf's default

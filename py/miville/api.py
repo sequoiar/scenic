@@ -123,6 +123,7 @@ class ControllerApi(object):
         pinger.start(self)
         firewire.start(self)
         engines.init_connection_listeners(self)
+        self.devices_toggle_kill_jackd_enabled(self.get_config("restart_jackd"))
     
     def listen_tcp(self, port, factory, interfaces='', listen_queue_size=50):
         """

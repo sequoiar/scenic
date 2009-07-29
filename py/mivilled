@@ -58,6 +58,8 @@ if __name__ == '__main__':
         help="Path to miville configuration files. (dot files)")
     parser.add_option("-C", "--disable-escape-sequences", action="store_true", \
         help="Disables ANSI escape sequences in shell and telnet clients.")
+    parser.add_option("-j", "--restart-jackd", action="store_true", \
+        help="Enables the restarting of jackd when it hangs or crashes.")
     parser.add_option("-I", "--ui-interfaces", type="string", action="append", \
         help="""User interfaces listen only to those network interfaces IP. Use this flag many times if needed. Default is localhost only. Example: -i 127.0.0.1 -i 10.10.10.55""")
     parser.add_option("-a", "--all-interfaces", action="store_true", \
@@ -86,6 +88,8 @@ if __name__ == '__main__':
         config.miville_home = options.miville_home
     if options.verbose:
         config.verbose = options.verbose
+    if options.restart_jackd:
+        config.restart_jackd = True
     if options.disable_escape_sequences: # in both telnet CLI and this shell
         config.enable_escape_sequences = False
     # set the port offset        
