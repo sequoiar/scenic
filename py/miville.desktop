@@ -8,5 +8,6 @@ Exec=miville
 Icon=/home/simonp/src/miville/trunk/py/miville.png
 Terminal=true
 Type=Application
-Categories=System;RemoteAccess;Network;
+Categories=Application;Network;
+GenericName=Telesceno Web Interface
 GenericName[en_CA]=Telesceno Web Interface

@@ -7,6 +7,8 @@
 
 import os
 import sys
+from re import search
+from commands import getoutput
 from time import sleep
 
 try:
@@ -18,17 +20,31 @@ except:
  
 user_bin_path.insert(0, os.curdir + os.sep + os.path.curdir)
 
-miville_bin = ''
+# Searching for mivilled
+mivilled_bin = ''
 for p in user_bin_path: 
-    _miville_bin = os.path.join(p, 'mivilled')
-    if os.path.isfile(_miville_bin):
+    _mivilled_bin = os.path.join(p, 'mivilled')
+    if os.path.isfile(_mivilled_bin):
         # oct(5) is r-x permission for any user
-        if ( oct(os.stat(_miville_bin).st_mode & 5 ) == oct(5) ):
-            miville_bin = _miville_bin
+        if (oct(os.stat(_mivilled_bin).st_mode & 5) == oct(5)):
+            mivilled_bin = _mivilled_bin
 
-if ( miville_bin == ''):
-    sys.stderr.write('No mivilled executable found')
+if (mivilled_bin == ''):
+    sys.stderr.write('No mivilledd executable found')
     sys.exit(1)
+
+ps = getoutput('ps auwx')
+
+mivilled_is_running = False           
+for p in ps.split('\n'):
+    line = p.split()
+    try:
+        matched = search('mivilled', line[11])
+        if (matched is not None ):
+            mivilled_is_running = True           
+            break
+    except IndexError:
+        pass
 
 pid = os.fork()
 if (pid == 0):
@@ -37,5 +53,7 @@ if (pid == 0):
     os.execl("/usr/bin/firefox", "firefox", "http://localhost:8080")
 else:
     # parent
-    os.execl(miville_bin, "mivilled")
-
+    if (mivilled_is_running is not True):   
+        os.execl(mivilled_bin, "mivilled")
+    else:
+        os.execvp("sh", [ "sh", "-c", "echo 'mivilled is already running' | less" ])
