@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=Miville
+GenericName=Telesceno Web Interface
+Comment=Start a miville server and a Firefox client
+Exec=miville
+Icon=/home/simonp/src/miville/trunk/py/miville.png
+Terminal=true
+Type=Application
+Categories=System;RemoteAccess;Network;
+GenericName[en_CA]=Telesceno Web Interface

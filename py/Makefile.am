@@ -22,26 +22,37 @@ TESTS = test/test_addressbook.py \
 
 #EXTRA_DIST: $(shell `../utils/list_miville_files`)
 
+# FIXME
+# python2.5/site-packages should be provided by autotools 
+
 install-exec-hook:
+		[ -d $(DESTDIR)$(prefix)/lib/python2.5/site-packages ] || mkdir -p $(DESTDIR)$(prefix)/lib/python2.5/site-packages
 		PYTHONPATH=$(DESTDIR)$(prefix)/lib/python2.5/site-packages python setup.py build
 		PYTHONPATH=$(DESTDIR)$(prefix)/lib/python2.5/site-packages python setup.py install --prefix=$(DESTDIR)$(prefix)
+		install -m 755 -D miville-wrapper $(DESTDIR)$(prefix)/bin/miville
+		install -m 644 -D miville.desktop $(DESTDIR)$(prefix)/share/applications/miville.desktop
+		install -m 644 -D miville.png $(DESTDIR)$(prefix)/share/pixmaps/miville.png
 		if [ -d docs/_build/html ]; then \
 			mkdir -p $(DESTDIR)$(prefix)/share/doc/miville ; \
 			install -d $(top_srcdir)/py/docs/_build/html $(DESTDIR)$(prefix)/share/doc/miville/sphinx ; \
 		fi
-		help2man -N -i MANPAGE.txt -n "The Miville Audio/Video Streaming Software for GNU/Linux" mivilled > mivilled.1
-		install mivilled.1 $(DESTDIR)$(prefix)/share/man/man1/mivilled.1
-# python setup.py build
-# python setup.py install --prefix=$(DESTDIR)$(prefix)
+# mivilled --help output is no good for help2man
+# help2man -N -i MANPAGE.txt -n "The Miville Audio/Video Streaming Software for GNU/Linux" mivilled > mivilled.1
+# install -D -m 644 mivilled.1 $(DESTDIR)$(prefix)/share/man/man1/mivilled.1
+#
 # THIS IS BROKEN !! FIXME
 
 uninstall-hook:
 		awk '/miville/ { system("rm -rf " $1) }' $(DESTDIR)$(prefix)/lib/python2.5/site-packages/easy-install.pth 
 		sed -i '/miville-.*egg/d' $(DESTDIR)$(prefix)/lib/python2.5/site-packages/easy-install.pth 
-		rm -rf $(DESTDIR)$(prefix)/bin/mivilled
-		rm -rf $(DESTDIR)$(prefix)/bin/restart_jackd.py
+		rm -rf $(DESTDIR)$(prefix)/lib/python2.5/site-packages/miville-*.egg
+		rm -f $(DESTDIR)$(prefix)/bin/mivilled
+		rm -f $(DESTDIR)$(prefix)/bin/miville
+		rm -f $(DESTDIR)$(prefix)/bin/restart_jackd.py
 		rm -rf $(DESTDIR)$(prefix)/share/doc/miville/sphinx
 		rm -f $(DESTDIR)$(prefix)/share/man/man1/mivilled.1
+		rm -f $(DESTDIR)$(prefix)/share/applications/miville.desktop
+		rm -f $(DESTDIR)$(prefix)/share/pixmaps/miville.png
 
 # temporarily removed: check_ping.py
 # not much useful:
