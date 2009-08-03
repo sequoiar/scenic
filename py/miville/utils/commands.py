@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+# 
 # Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -19,7 +20,7 @@
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Classes for handling commands (processes).
+Classes and (mostly) functions for handling commands (processes).
 """
 #TODO: Improve errors, exceptions and failures handling. 
 
@@ -32,8 +33,11 @@ try:
 except ImportError:
     import StringIO
 
-from twisted.internet import reactor, defer, protocol
-from twisted.python import procutils, failure
+from twisted.internet import reactor
+from twisted.internet import protocol
+from twisted.internet import defer
+from twisted.python import failure
+from twisted.python import procutils
 #from twisted.internet import utils
 
 # App imports

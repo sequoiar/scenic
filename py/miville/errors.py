@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+#
 # Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -17,10 +18,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
-
-
+"""
+Exceptions that might be raised within the miville software.
+"""
 ### Settings ###
-
 class StreamsError(Exception):
     """
     Master Exception Class for the streams.
@@ -35,7 +36,6 @@ class SettingsError(Exception):
     pass
 
 ### Address Book ###
-
 class AddressBookError(Exception):
     """
     Master Exception Class for the address book.
@@ -57,15 +57,12 @@ class AddressBookAddressError(AddressBookError):
     pass
 
 ### Utils ###
-
 class InstallFileError(Exception):
     """
     Exception with a preference file.
     """
 
-
 ### Connection ###
-
 class ConnectionError(Exception):
     """
     Master Exception Class for the Connection module.
@@ -90,5 +87,4 @@ class DeviceError(Exception):
     Can be raised at Device.prepare() or when polling.
     """
     pass
-
 

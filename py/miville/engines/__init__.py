@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+# 
 # Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -26,11 +27,10 @@ from miville.engines import gstchannel
 
 import gstchannel
 from miville.utils import log
-from miville.errors import *
+# from miville.errors import *
 from miville import connectors
 
 log = log.start('debug', 1, 0, 'engines')
-
 
 def init_connection_listeners(api):
     """
@@ -44,6 +44,12 @@ def init_connection_listeners(api):
     gstchannel.set_api(api)
 
 def get_channel_for_contact(engine_name, contact):
+    """
+    Returns a com_chan for the starting of milhouse process.
+    :param engine_name: str "GST". Totally useless argument. 
+    :param contact: miville.addressbook.Contact object.
+    """
+    # TODO: get rid of engine_name argument
     log.debug("engines.get_channel_for_contact engine='%s' contact='%s'" %  (engine_name, contact) )    
     engine_name = str(engine_name)
     if engine_name.upper() == 'GST':

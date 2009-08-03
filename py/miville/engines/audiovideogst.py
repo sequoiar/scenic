@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Miville
@@ -18,59 +19,81 @@
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 """
-Everything that should be used by a programmer from the miville.engines packages 
-is in this engines.audiovideogst module. 
-
 This modules controls the milhouse processes according to the 
 settings that miville has set up. 
+
+Everything that should be used by a programmer from the miville.engines packages 
+is in this engines.audiovideogst module. 
 """
+# system imports
+from datetime import datetime
 
 # Twisted imports
-from twisted.internet import reactor, protocol, defer
+from twisted.internet import defer
+from twisted.internet import reactor
+from twisted.internet import protocol 
 
 # App imports
 from miville.engines.base_gst import GstClient
 from miville.utils import log
 from miville.protocols.ipcp import parse 
-from miville.errors import *
+from miville.errors import StreamsError
 from miville.engines.base_gst import GstError
 from miville.utils.common import PortNumberGenerator
 from miville.utils import stack
-import miville.engines.base_gst
-from datetime import datetime
+from  miville.engines import base_gst # for constants.
 
 gst_ipcp_port_gen = PortNumberGenerator(9000, 1)
 gst_av_port_gen = PortNumberGenerator(10000, 10)
 
 log = log.start('info', 1, 0, 'audiovideogst')
 
-class RingBuffer:
+class RingBuffer(object):
     """
-    For RTP statistics and log messages
+    FIFO buffer for RTP statistics and log messages
 
     Keeps "size" number of strings.
+
+    TODO: get rid of this buggy class that can lead to data loss. See the append method.
     """
+    # TODO
     def __init__(self, size):
+        """
+        Creates a list of size elements that are None.
+        """
         self.data = [None for i in xrange(size)]
 
     def append(self, x):
+        """
+        Removes the first element in the list and adds the provided element at the end of the list.
+        FIXME: some data loss can occur here !!!
+        """
+        # FIXME
         self.data.pop(0)
         self.data.append(x)
 
     def get(self):
+        """
+        Returns the whole list of items in the buffer.
+        """
         return self.data
 
 class AudioVideoGst(GstClient):
     """
-    Interface to the milhouse process.
-    """
+    Interface to the milhouse process. All the IPCP commands are here.
     
+    GstClient is a simple class which starts a milhouse process and communicates with is using IPCP.
+    Here, all the actual IPCP commands used to control milhouse are defined. 
+    """
     def __init__(self, mode, group_name):
+        """
+        :param mode: XXX ?
+        :param group_name: I think this is for when you want the audio to be in sync or not with the video.
+        """
         self.mode = mode
         self.group_name = group_name
         self.stream_names = []
         self.commands = []
-        
         self.args = None
         self.proc_path = None
         self.pid = None
@@ -80,8 +103,7 @@ class AudioVideoGst(GstClient):
         self.version = ""
         self.gst_address =  '127.0.0.1'
         self.gst_port = gst_ipcp_port_gen.generate_new_port()
-        self.acknowledgments = []
-             
+        self.acknowledgments = [] # list of (timestamp, string) tuples
         callbacks = {'log'       :self.gst_log,
                      'video_init':self.gst_video_init, 
                      'audio_init':self.gst_audio_init, 
@@ -96,7 +118,6 @@ class AudioVideoGst(GstClient):
         except GstError, e:
             log.error(e.message)
             raise
-        
         #self._send_command('loglevel', 10)
         
     def apply_stream_settings(self, stream_name, parameters ):
@@ -112,7 +133,6 @@ class AudioVideoGst(GstClient):
             if k not in non_gst_params:
                 gst_parameters.append( (k, v) )      
             log.info('AudioVideoGst.apply_stream_settings stream: ' + str(stream_name) + ' params: ' + str(gst_parameters))
-        
         if stream_name.upper().startswith('VIDEO'):
            self._send_command('video_init', gst_parameters)
         elif stream_name.upper().startswith('AUDIO'):
@@ -121,61 +141,77 @@ class AudioVideoGst(GstClient):
            raise StreamsError, 'Engine AudioVideoGst does not support "%s" parameters' %  stream_name 
       
     def get_status(self):
+        """
+        Returns status (string?)
+        """
         s = self.gst_server.get_status()
         return s
     
     def get_version_str(self):
+        """
+        Returns version of the IPCP protocol??? 
+        """
         s = self.gst_server.version_str
         return s
         
     def _send_command(self, cmd, params = None):
+        """
+        Wraps GstClient._send_cmd. Sends a IPCP command.
+        """
         self._send_cmd(cmd, params)
-        tupple_of_fine_stuff = (cmd, params) # FIXME WTF
+        tupple_of_fine_stuff = (cmd, params) # FIXME Change this variable name
         self.commands.append(tupple_of_fine_stuff)
 
     def gst_video_init(self, **args):
+        # TODO: explicit arguments !
         timestamp = datetime.now()
         info = 'video_init  "%s"' % str(args)
         self.acknowledgments.append((timestamp, info))
         log.debug('%s %s' %  (info, str(self)) )        
-        self.gst_server.change_state(miville.engines.base_gst.STREAMINIT)
+        self.gst_server.change_state(base_gst.STREAMINIT)
 
     def gst_start(self,  **args):
+        # TODO: explicit arguments !
         timestamp = datetime.now()
         info = 'start  "%s"' % str(args)
         self.acknowledgments.append((timestamp, info))
         log.debug('%s %s' %  (info, str(self)) )
-        self.gst_server.change_state(miville.engines.base_gst.STREAMING)
+        self.gst_server.change_state(base_gst.STREAMING)
         
     def gst_stop(self,  **args):
+        # TODO: explicit arguments !
         timestamp = datetime.now()
         info = 'stop  "%s"' % str(args)
         self.acknowledgments.append((timestamp, info) )
         log.debug('%s %s' %  (info, str(self)) )
-        self.gst_server.change_state(miville.engines.base_gst.STREAMSTOPPED)
+        self.gst_server.change_state(base_gst.STREAMSTOPPED)
 
     def gst_audio_init(self,  **args):
+        # TODO: explicit arguments !
         timestamp = datetime.now()
         info = 'audio_init  "%s"' % str(args)
         self.acknowledgments.append((timestamp, info))
         log.debug('%s %s' %  (info, str(self)) )
-        self.gst_server.change_state(miville.engines.base_gst.STREAMINIT)
+        self.gst_server.change_state(base_gst.STREAMINIT)
 
     def gst_success(self, **args):
+        # TODO: explicit arguments !
         timestamp = datetime.now()
         info = 'Success :-)  "%s"' % str(args)
         self.acknowledgments.append((timestamp, info))
         log.debug('%s %s' %  (info, str(self)) )
-        self.gst_server.change_state(miville.engines.base_gst.STREAMING)
+        self.gst_server.change_state(base_gst.STREAMING)
 
     def gst_failure(self, **args):
+        # TODO: explicit arguments !
         timestamp = datetime.now()
         info = 'failure :-(  "%s"' % str(args)
         self.acknowledgments.append((timestamp, info))
         log.debug('%s %s' %  (info, str(self)) )
-        self.gst_server.change_state(miville.engines.base_gst.FAILURE)
+        self.gst_server.change_state(base_gst.FAILURE)
 
     def gst_log(self, **args):
+        # TODO: explicit arguments !
         log_message = (str(args))
         src = str(self)
         info = 'GST log pid %s [%s] %s' %  (self.pid, log_message, src)  
@@ -183,6 +219,7 @@ class AudioVideoGst(GstClient):
         self.logger.append(log_message)
 
     def gst_rtp(self, **args):
+        # TODO: explicit arguments !
         if args.has_key('stats'):
             rtp_string = args['stats']
             tokens = rtp_string.split(':')
@@ -215,11 +252,8 @@ class AudioVideoGst(GstClient):
         
     def start_streaming(self):
         """
-        Sends the message to milhouse so that it starts streaming. 
+        Sends the "start" message to milhouse so that it starts streaming. 
         Milhouse must be already running.
-
-        function start_sending
-        address: string
         """
         log.debug('audiovideogst.start_streaming()')
         self._send_command('start')
@@ -227,7 +261,8 @@ class AudioVideoGst(GstClient):
         #stack.print_stack() # XXX this is very verbose !
 
     def stop_streaming(self):
-        """function stop_sending
+        """
+        Sends the "stop" command to milhouse.
         """
         self._send_command('stop')
         self.stop_process()

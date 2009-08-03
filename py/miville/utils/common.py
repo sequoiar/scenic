@@ -17,12 +17,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 This module is a regroupment of different functions that can be use
 by any other modules.
 """
-
 # System imports
 import sys
 import os
@@ -44,8 +42,14 @@ MIVILLE_HOME = os.path.expanduser('~/.miville')
 _allocated_ports = []
 
 class PortNumberGenerator(object):
-    
+    """
+    Allocates TCP/UDP port numbers using a global variable to store the already allocated ports.
+    """
     def __init__(self, first_port, increment):
+        """
+        :param first_port: First port offset to allocate ports
+        :param increment: space between each allocated port.
+        """
         self.first_port = first_port
         self.current_port = None
         self.increment = increment
@@ -97,8 +101,16 @@ def get_def_name(level=2):
     
 def find_modules(kind):
     """
-    Find all the different modules of this kind available
+    Find all the different modules/packages of a kind available
+    
+    This is an implementation of a system for dynamically loaded python plugins.
+    
+    IMPORTANT : If a file named "off" is in a package directory, it doesn't load that package.
+
+    :param kind: str The name of the package to look in.
     """
+    # FIXME: this is not very elegant, and not python-like at all. (sorry etienned)
+    # FIXME: it caused us a lot of troubles so far
     mods = []
     all_mods = getModule('miville.' + kind).iterModules()
     for mod in all_mods:
@@ -110,6 +122,7 @@ def load_modules(mods):
     """
     Load/import all the different user interfaces available
     """    
+    # FIXME : lots of bugs due to this function !! 
     loaded_mods = []
     for mod in mods:
         try:
@@ -143,7 +156,8 @@ def find_callbacks(obj, prefix=None):
 
 def install_dir(filename, dirname=None):
     """
-    Return the complete path.
+    Return the complete path of the miville configuration directory. (~/.miville)
+    
     (home directory + the application directory + the filename)
     Check before if the directory exist and try to create it if not.
     """
@@ -167,4 +181,3 @@ def install_dir(filename, dirname=None):
             raise InstallFileError, 'Could not create the directory %s.' % dirpath
     return os.path.join(dirpath, filename)
      
-

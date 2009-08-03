@@ -25,7 +25,9 @@ between miville and milhouse. It is a home-brewed protocol based on
 TCP and ASCII.
 """
 import re
-from types import NoneType, FunctionType, InstanceType
+from types import FunctionType
+from types import NoneType
+from types import InstanceType
 
 # twisted imports
 from twisted.internet import reactor, protocol, defer
@@ -278,6 +280,8 @@ def find_equal(data):
     return args
       
 if __name__ == "__main__":
+    # I think these were just test functions. I moved them in __main__. 
+    # It might cause a problem...
     # test stuff.
     def connect(addr, port, timeout=2, bindAddress=None):
         client_creator = protocol.ClientCreator(reactor, IPCP)

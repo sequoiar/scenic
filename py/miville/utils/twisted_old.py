@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+# 
 # Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -17,14 +18,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
+"""
+Backport of some twisted functionnalities. 
 
-
+This file should be renamed to something like "twisted_backport.py"
+"""
 # System imports
 import logging
 
 # Twisted imports
 from twisted.python.log import *
-
 
 # Taken directly from Twisted 8.1.0
 def _safeFormat(fmtString, fmtDict):
@@ -51,7 +54,6 @@ def _safeFormat(fmtString, fmtDict):
             except:
                 text = 'PATHOLOGICAL ERROR IN BOTH FORMAT STRING AND MESSAGE DETAILS, MESSAGE LOST'
     return text
-
 
 def textFromEventDict(eventDict):
     """
@@ -85,7 +87,6 @@ def textFromEventDict(eventDict):
     else:
         text = ' '.join(map(reflect.safe_str, edm))
     return text
-
 
 class PythonLoggingObserver(object):
     """

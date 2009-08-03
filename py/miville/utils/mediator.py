@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+# 
 # Miville
 # Copyright (C) 2008 Société des arts technologiques (SAT)
 # http://www.sat.qc.ca
@@ -17,11 +18,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
+"""
+Mediator pattern implementation.
+"""
+# TODO : are we using this at all ? I think not.
 
-
-# this is the base class mediator, implemented
-# as a template pattern. The main controller should inherit from this.
 class Mediator:
+    """
+    This is the base class mediator, implemented as a template pattern. 
+    The main controller should inherit from this.
+    """
     def __init__(self):
         pass
 
@@ -32,10 +38,11 @@ class Mediator:
     def _colleague_changed(self, colleague, event):
         """Template pattern polymorphic method, intended to be inherited"""
     
-
-# this is the base class colleague, implemented
-# as a template pattern. The input classes should inherit from this.
 class Colleague:
+    """
+    this is the base class colleague, implemented
+    as a template pattern. The input classes should inherit from this.
+    """
     def __init__(self, mediator):
         self.mediator = mediator
 
@@ -59,10 +66,11 @@ class ColleagueExample(Colleague):
         self.changed(self, event)
        
 
-# main controller of the application
 class MediatorExample(Mediator):
-    """The MainFrame of the application"""
-    
+    """
+    The MainFrame of the application
+    main controller of the application
+    """
     def __init__(self):
         Mediator.__init__(self)
 
@@ -81,3 +89,4 @@ class MediatorExample(Mediator):
 
     def connect(self, colleague, addr):
         print "Connecting to %s" % (addr)
+

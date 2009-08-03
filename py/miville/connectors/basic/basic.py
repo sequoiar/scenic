@@ -31,12 +31,13 @@ with ACCEPT or REFUSE.
 The connector.basic package is a good example of a simple way to establish
 a connection between two miville software. 
 """
-
 # System imports
 import sys
 
 # Twisted imports
-from twisted.internet import reactor, protocol, error
+from twisted.internet import reactor
+from twisted.internet import protocol
+from twisted.internet import error
 from twisted.protocols.basic import LineReceiver
 
 # App imports
