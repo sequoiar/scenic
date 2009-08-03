@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
 # Miville
@@ -21,6 +22,7 @@
 """
 Devices settings for Miville.
 """
+# FIXME: this file is not used yet
 from miville import devices
 from miville.errors import DeviceError
 from miville.utils import log

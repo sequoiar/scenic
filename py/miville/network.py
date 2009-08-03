@@ -18,7 +18,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 Network performance tests manager using iperf.
 
@@ -39,12 +38,13 @@ See https://svn.sat.qc.ca/trac/miville/wiki/NetworkTesting
     local:  'iperf -c 10.10.10.66 -t 1 -y c -u -b 1M'
     remote: 'iperf -c 10.10.10.68 -t 1 -y c -u -b 1M'
 """
-
+# system import
 import os
 import sys
 import time
 import warnings 
 
+# twisted imports
 from twisted.internet import reactor
 from twisted.internet import protocol
 from twisted.internet import defer
@@ -58,6 +58,7 @@ try:
     # Emitted when IReactorProcess.spawnProcess is called in a way which may result in termination of the created child process not being reported.  
 except ImportError:
     pass # needs twisted version higher than the one shipped with ubuntu 8.04
+
 # App imports
 from miville.utils import log
 from miville.utils import commands

@@ -278,18 +278,30 @@ def find_equal(data):
         args[attr] = data[start:end]
         start = end + 1
     return args
+
+def connect(addr, port, timeout=2, bindAddress=None):
+    """
+    Connects using the IPCP protocol. 
+    Returns a deferred.    
+
+    Super important method !!
+    """
+    client_creator = protocol.ClientCreator(reactor, IPCP)
+    deferred = client_creator.connectTCP(addr, port, timeout, bindAddress)
+    return deferred
+
+def connection_failed(protocol):
+    """
+    To be called in case of a failure.
+    
+    Super important method !!
+    """
+    log.warning("Connection failed! %s" % protocol.getErrorMessage())        
       
 if __name__ == "__main__":
     # I think these were just test functions. I moved them in __main__. 
     # It might cause a problem...
     # test stuff.
-    def connect(addr, port, timeout=2, bindAddress=None):
-        client_creator = protocol.ClientCreator(reactor, IPCP)
-        deferred = client_creator.connectTCP(addr, port, timeout, bindAddress)
-        return deferred
-
-    def connection_failed(protocol):
-        log.warning("Connection failed! %s" % protocol.getErrorMessage())        
 
     def grrr(test):
         print test

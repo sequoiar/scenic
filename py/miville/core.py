@@ -18,7 +18,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 The core of miville loads most of its modules and start some servers.
 
@@ -79,7 +78,6 @@ class MivilleConfiguration(object):
         self.addressbook_filename = 'addressbook.txt' # TODO: "contacts.txt"
         self.settings_presets_filename = "presets.txt" # TODO: presets.txt
         self.settings_filename = "settings.txt" # TODO: settings.txt
-        
         # update the attributes to match passed dict
         if dictionary is not None:
             self.update_dict(dictionary)
@@ -90,7 +88,6 @@ class MivilleConfiguration(object):
     def print_values(self):
         for key, value in self.__dict__.items():
             print "%20s: %s" % (key, value)
-
 
 class Core(Subject):
     """
@@ -173,16 +170,12 @@ class Core(Subject):
 #                 engines[engine.name] = engine
 #         return engines
 
-
-
 def main(config_object):    
     """
     Startup of the application.
     """
     global core
-    
     core = Core(config_object)
-    
 #    l = task.LoopingCall(chk_ob, core)
 #    l.start(2.0, False)
 
