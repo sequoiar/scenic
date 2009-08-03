@@ -77,6 +77,8 @@ def on_commands_error(command_failure, commands, extra_arg=None):
         #pprint.pprint({'failure':command_failure, 'commands':commands, 'extra_arg':extra_arg})
         #print "@@@@@@@@@"
         test.fail('on_commands_error() with error: %s' % (command_failure.value.message))
+    else:
+        pass # has generated an error as expected.
     
 class Test_1_Commands(unittest.TestCase):
     """
@@ -87,14 +89,21 @@ class Test_1_Commands(unittest.TestCase):
         test = self
     
     def test_1_find_commands(self):
+        """
+        tries to find a commond that exists, and one that doesn't
+        """
         aconnect = commands.find_command('aconnect') # should work
         try:
             commands.find_command('spam_egg_bacon_ham')
-            self.fail('Did not realize that we are trying to find an unexisting command.')
         except commands.CommandNotFoundError:
             pass # successfully found error
+        else:
+            self.fail('Did not realize that we are trying to find an unexisting command.')
     
     def test_2_ls_and_echo(self):
+        """
+        tests the ls and echo commands 
+        """
         all_commands = [
                 ['echo', 'spam'],
                 ['ls', '-l']
@@ -103,9 +112,10 @@ class Test_1_Commands(unittest.TestCase):
             'echo': 'spam', 
             'ls': 'test.log'
             }
-        return commands.commands_start(all_commands, on_commands_results, extra_arg) # sets the callback
+        deferred = commands.commands_start(all_commands, on_commands_results, extra_arg) # sets the callback
+        return deferred
     
-    def test_3_handle_errors(self):
+    def XXtest_3_handle_errors(self):
         # TODO should fail ?
         all_commands = ['aconnect', 'egg']
         extra_arg = 'should generate an error'
@@ -113,6 +123,5 @@ class Test_1_Commands(unittest.TestCase):
             deferred = commands.commands_start(all_commands, on_commands_results, extra_arg).addErrback(on_commands_error)
             return deferred
         except commands.CommandNotFoundError:
-            pass 
-        
-
+            # pass 
+            raise
