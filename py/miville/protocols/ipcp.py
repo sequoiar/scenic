@@ -48,6 +48,9 @@ class IPCP(LineReceiver):
         self.callbacks = {}
 
     def add_callback(self, cmd, name=None):
+        """
+        Registers a callback function for an incoming IPCP message. 
+        """
         if not name:
             name = cmd.im_class.__name__ + '/' + cmd.__name__
         if name not in self.callbacks:
@@ -57,6 +60,9 @@ class IPCP(LineReceiver):
         log.debug('Callback list: ' + repr(self.callbacks))
             
     def del_callback(self, name):
+        """
+        Deletes a callback function for an incoming IPCP message. 
+        """
         if isinstance(name, InstanceType):
             name = cmd.im_class.__name__ + '/' + cmd.__name__
         if name in self.callbacks:
@@ -66,9 +72,16 @@ class IPCP(LineReceiver):
         #log.debug('Callback list: ' + repr(self.callbacks))
               
     def connectionMade(self):
+        """
+        Called when a connection is made.
+        """
         log.info('Connection made to the server.')
     
     def lineReceived(self, line):
+        """
+        Called when a line of ASCII text is received via TCP. 
+        This is where IPCP parsing occurs.
+        """
         log.info("IPCP.lineReceived: '%s'" % line)
         cmd, sep, args = line.partition(':')
         if cmd not in self.callbacks:
@@ -128,6 +141,10 @@ class IPCP(LineReceiver):
             self.callbacks[cmd](**args)
     
     def send_cmd(self, cmd, *args):
+        """
+        Sends a IPCP command. 
+        This is where IPCP protocol generation occurs. 
+        """
         line = []
         line.append(cmd + ":")
         for arg in args:
@@ -145,10 +162,12 @@ class IPCP(LineReceiver):
         line = ' '.join(line)
         log.info('IPCP.send_cmd: "' + line + '" from ' + str(self))
         self.sendLine(line)
-        
-        
 
     def _process_arg(self, arg):
+        """
+        Processes the arguments to a IPCP command. 
+        Generates a correctly formatted IPCP command. 
+        """
         if isinstance(arg, int) or isinstance(arg, float):
             return str(arg)
         elif isinstance(arg, unicode):
@@ -165,9 +184,15 @@ class IPCP(LineReceiver):
         return None
 
     def connectionLost(self, reason=protocol.connectionDone):
+        """
+        Called when the TCP connection is closed.
+        """
         log.info('Lost the server connection.')
 
 def parse(args):
+    """
+    TODO: should be used by IPCP.lineReceived()
+    """
     data = args.strip() + " "
     args = {}
     attr_s = 0
@@ -195,7 +220,6 @@ def parse(args):
                 temp_s = temp_e + 1
             if out:
                 break
-            
         else:
             end = data.find(' ', start)
             if end == -1:
@@ -205,7 +229,6 @@ def parse(args):
             value = value.replace('\\\\', '\\') \
                          .replace('\\=', '=') \
                          .replace('\\"', '"')
-
         else:
             if value.isdigit():
                 value = int(value)
@@ -219,6 +242,9 @@ def parse(args):
     return args
 
 def find_equal(data):
+    """
+    TODO: I think this function is not used anywhere.
+    """
     data = data.strip() + " "
     args = {}
     attr_s = 0
@@ -251,32 +277,33 @@ def find_equal(data):
         start = end + 1
     return args
       
-def connect(addr, port, timeout=2, bindAddress=None):
-    client_creator = protocol.ClientCreator(reactor, IPCP)
-    deferred = client_creator.connectTCP(addr, port, timeout, bindAddress)
-    return deferred
-
-def connection_failed(protocol):
-    log.warning("Connection failed! %s" % protocol.getErrorMessage())        
-
-def grrr(test):
-    print test
-    print "yes!"
-
-def test(arg1, arg2, arg3):
-    print "perte"
-    print arg1, arg2, arg3
-
-# When connected, send a line
-def connectionReady(protocol):
-    protocol.add_callback('You', test)
-    protocol.connectionLost = grrr
-    protocol.sendLine('Hey there')
-    protocol.send_cmd('test', 23.3, 34, 'gros bouton', 1)
-    reactor.callLater(10, protocol.sendLine, 'Coco')
-    reactor.callLater(20, reactor.stop)
-
 if __name__ == "__main__":
+    # test stuff.
+    def connect(addr, port, timeout=2, bindAddress=None):
+        client_creator = protocol.ClientCreator(reactor, IPCP)
+        deferred = client_creator.connectTCP(addr, port, timeout, bindAddress)
+        return deferred
+
+    def connection_failed(protocol):
+        log.warning("Connection failed! %s" % protocol.getErrorMessage())        
+
+    def grrr(test):
+        print test
+        print "yes!"
+
+    def test(arg1, arg2, arg3):
+        print "perte"
+        print arg1, arg2, arg3
+
+    # When connected, send a line
+    def connectionReady(protocol):
+        protocol.add_callback('You', test)
+        protocol.connectionLost = grrr
+        protocol.sendLine('Hey there')
+        protocol.send_cmd('test', 23.3, 34, 'gros bouton', 1)
+        reactor.callLater(10, protocol.sendLine, 'Coco')
+        reactor.callLater(20, reactor.stop)
+
     # Client example
     # Create creator and connect
     deferred = connect('127.0.0.1', 2222)

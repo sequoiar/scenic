@@ -696,14 +696,18 @@ class ControllerApi(object):
             #self.notify(caller, "streaming stopped")
             # self.notify(caller, {'stopped':True, 'msg':"streaming stopped"}) # FIXME XXX TODO: should not be called from here but from the engines.
         except AddressBookError, e:
+            log.error("AddressBookError in stop_streams: " + str(e))
             self.notify(caller, AddressBookError("Please select a contact prior to stop streaming." + e.message)) #, "error")
             #TODO: change key for 'streams_error'
         except SettingsError, err:
+            log.error("SettingsError in stop_streams: " + str(e))
             self.notify(caller, err)
         except StreamsError, err:
+            log.error("StreamsError in stop_streams: " + str(e))
             self.notify(caller, err)
-        # this should be done in a more standard way. FIXME XXX TODO
-        contact.stream_state = 0 # FIXME
+        else:
+            # this should be done in a more standard way. FIXME XXX TODO
+            contact.stream_state = 0 # FIXME
                         
     def _get_gst_com_chan_from_contact_name(self, contact_name):
         """
