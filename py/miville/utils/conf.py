@@ -23,7 +23,29 @@
 Module for configuration state saving.
 
 Inspired by GConf.
+
+The programmer use the methods of the Client command usign twisted callbacks and errbacks.
+The Database contains Schemas and States. A state contains Entries. The entries are of the 
+"type" of a Schema. For instance, you would create an Entry called 
+"/video/device/0/number" whose Schema would be called "Video Device Number" with type \
+"int" and a default value of 0. You would then create a "default" State, for example which 
+contain a "/video/device/0/number" with 0 as a value. You would then duplicate this state 
+to a new one named "modified", for example. In that state, you might want to choose an 
+other value for the "/video/device/0/number", such as 1.
+
+This way, you can manage different states of your configuration options. 
+These can be used as presets, or edited by the user.
+
+The IClient interface can be implemented using GConf later if needed, since the design of 
+this module is inspired from GConf.
+
+Installation::
+  
+  sudo apt-get install python-twisted 
 """
+# TODO: call Client.file_save() and Client.file_load() periodically.
+# TODO: change api for Client.state_duplicate()
+# TODO: change the syntax of the state file so that it is pure python
 
 import os
 import pprint
@@ -35,6 +57,10 @@ from twisted.internet.defer import succeed
 from twisted.internet.defer import fail
 from twisted.python.failure import Failure
 # from twisted.spread import jelly
+
+DEFAULT_FILE_NAME = "~/.ratsconf"
+DEFAULT_STATE_NAME = "default"
+_single_database = None # singleton
 
 class ConfError(Exception):
     """
@@ -54,25 +80,68 @@ class IClient(Interface):
     notifieds = Attribute("""List of callbacks to be notified when an attribute's value changes.""")
     def __init__(self):
         pass
+    
+    def schema_add(self, name="default", default="default", type="str", desc=""):
+        """  
+        Adds a new schema.
+        Returns Deferred
+        """
+        pass
+    
+    def schema_remove(self, name):
+        """ 
+        Removes an entry in the current state.
+        returns Deferred 
+        """
+        pass
+
+    def schema_get(self, name):
+        """
+        Gets a schema by its name.    
+        returns Deferred 
+        """
+        pass
 
     def entry_get(self, key):
-        """ returns Deferred """
+        """
+        Gets an entry by its key.    
+        returns Deferred 
+        """
         pass
 
     def entry_set(self, key, value):
-        """  returns Deferred """
+        """
+        Sets the value of an entry in the currently selected state.
+        returns Deferred 
+        """
         pass
 
     def entry_add(self, key, value, schema_name):
-        """  returns Deferred """
+        """
+        Adds an entry in the current state.
+        returns Deferred
+        """
         pass
 
     def entry_remove(self, key):
-        """  returns Deferred """
+        """  
+        Removes an entry from the current state.
+        returns Deferred 
+        """
         pass
 
     def entry_default(self, key):
-        """  returns Deferred """
+        """
+        Sets an entry value to its default.
+        returns Deferred 
+        """
+        pass
+    
+    def entry_list(self):
+        """
+        List all entries in the current state.
+        Returns Deferred.
+        """
         pass
 
     def notified_add(self, key, callback, *user_data):
@@ -84,35 +153,58 @@ class IClient(Interface):
         pass
 
     def state_add(self, name, desc=""):
-        """  returns Deferred """
+        """  
+        Creates a new empty state.
+        returns Deferred 
+        
+        Also selects the newly created state.
+        """
         pass
 
     def state_save(self, name):
-        """  returns Deferred """
+        """
+        Saves the currently selected state to the database.
+        returns Deferred 
+        """
+        # TODO: does not save to file for now. Save it !
         pass
 
     def state_load(self, name):
-        """  returns Deferred """
+        """
+        Selects a state
+        returns Deferred 
+        """
         pass
 
     def state_default(self) :
-        """  returns Deferred """
+        """  
+        Selects the default state.
+        returns Deferred 
+        """
         pass
     
     def state_set_default(self, name):
-        """  returns Deferred """
+        """
+        Changes the default state.
+        Does not switch to it, though.
+        returns Deferred 
+        """
         pass
 
     def state_list(self):
-        """  returns Deferred """
-        pass
-
-    def state_add(self, state):
-        """  returns Deferred """
+        """
+        List all states instances in the database.
+        returns Deferred 
+        """
         pass
     
     def state_duplicate(self, name, desc=""):
-        """  returns Deferred """
+        """  
+        Creates a new state, duplicating the previously selected one.
+        returns Deferred 
+        
+        Also selects the newly created state.
+        """
         pass
 
     def file_load(self):
@@ -155,9 +247,6 @@ def _create_failure(message_or_error=None, method_called=None):
         error = ConfError(str(message_or_error), method_called)
     return fail(Failure(error))
 
-DEFAULT_FILE_NAME = "~/.ratsconf"
-DEFAULT_STATE_NAME = "default"
-_single_database = None # singleton
 
 class Client(object):
     implements(IClient)
@@ -267,7 +356,7 @@ class Client(object):
 
     def entry_remove(self, key):
         """ 
-        Removes an entry in the current state.
+        Removes an entry from the current state.
         returns Deferred 
         """
         try:
@@ -344,23 +433,28 @@ class Client(object):
         """
         # TODO: duplicate current state?
         # TODO: move current_state_name to the Client ?
-        previous_state = self.current_state_name
-        if self.db.states.has_key(name):
-            return _create_failure("State %s already exists." % (name), "state_new")
-        else:
-            self.db.states[name] = State(name, desc)
-            self.current_state_name = name
-            try:
-                for entry in self._get_state(previous_state).entries.values():
-                    self.db.states[name].entries[entry.key] = entry
-            except ConfError, e:
-                return _create_failure(e, "state_duplicate")
-            
-                # TODO
-            return _create_success(name, "state_new")
+        # TODO: remove desc argument ?
+        try:
+            previous_state = self.current_state_name
+            if self.db.states.has_key(name):
+                return _create_failure("State %s already exists." % (name), "state_new")
+            else:
+                self.db.states[name] = State(name, desc)
+                self.current_state_name = name
+                try:
+                    for entry in self._get_state(previous_state).entries.values():
+                        self.db.states[name].entries[entry.key] = entry
+                except ConfError, e:
+                    return _create_failure(e, "state_duplicate")
+                return _create_success(name, "state_new")
+        except ConfError, e:
+            return _create_failure(e, "state_duplicate")
 
     def state_save(self, name):
-        """  returns Deferred """
+        """
+        Saves the currently selected state to the database.
+        returns Deferred 
+        """
         # Nothing to do for now.
         # TODO: save to file?
         return _create_success(True, "state_save")
@@ -377,7 +471,10 @@ class Client(object):
             return _create_failure("Not such state: %s." % (name), "state_load")
 
     def state_default(self) :
-        """  returns Deferred """
+        """  
+        Selects the default state.
+        returns Deferred 
+        """
         name = self.db.default_state_name
         if self.db.states.has_key(name):
             self.current_state_name = name
@@ -386,7 +483,11 @@ class Client(object):
             return _create_failure("Not such state: %s." % (name), "state_default")
     
     def state_set_default(self, name):
-        """  returns Deferred """
+        """
+        Changes the default state.
+        Does not switch to it, though.
+        returns Deferred 
+        """
         if self.db.states.has_key(name):
             self.db.default_state_name = name
             return _create_success(name, "state_set_default")
@@ -394,12 +495,18 @@ class Client(object):
             return _create_failure("Not such state: %s." % (name), "state_set_default")
 
     def state_list(self):
-        """  returns Deferred """
+        """
+        List all states instances in the database.
+        returns Deferred 
+        """
         states = self.db.states.values()
         return _create_success(states, "state_list")
     
     def entry_default(self, key):
-        """  returns Deferred """
+        """
+        Sets an entry value to its default.
+        returns Deferred 
+        """
         try:
             entry = self._get_entry(key)
             schema = self._get_schema(entry.schema_name)
