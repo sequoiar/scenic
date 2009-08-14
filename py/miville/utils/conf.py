@@ -19,6 +19,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Module for configuration state saving.
+
+Inspired by GConf.
+"""
+
 import os
 import pprint
 from zope.interface import implements 
@@ -38,6 +44,7 @@ class ConfError(Exception):
         Exception.__init__(self, message)
         self.method_called = method_called
 
+
 class IClient(Interface):
     """
     Client to the Configuration server.
@@ -56,7 +63,7 @@ class IClient(Interface):
         """  returns Deferred """
         pass
 
-    def entry_add(self, key, value, schema_name, writable):
+    def entry_add(self, key, value, schema_name):
         """  returns Deferred """
         pass
 
@@ -76,7 +83,7 @@ class IClient(Interface):
         """  returns  """
         pass
 
-    def state_new(self, name):
+    def state_add(self, name, desc=""):
         """  returns Deferred """
         pass
 
@@ -102,6 +109,22 @@ class IClient(Interface):
 
     def state_add(self, state):
         """  returns Deferred """
+        pass
+    
+    def state_duplicate(self, name, desc=""):
+        """  returns Deferred """
+        pass
+
+    def file_load(self):
+        """
+        Reads the config in a file. 
+        """
+        pass
+    
+    def file_save(self):
+        """
+        Saves the config to a file.
+        """
         pass
 
 class Success(object):
@@ -146,9 +169,11 @@ class Client(object):
     # You can only call Deferred.callback or Deferred.errback once.
     def __init__(self):
         global _single_database
+        global DEFAULT_STATE_NAME
         if _single_database is None:
             _single_database = Database()
         self.db = _single_database
+        self.current_state_name = DEFAULT_STATE_NAME
         self.notifieds = []
     
     def _get_state(self, name=None):
@@ -157,16 +182,21 @@ class Client(object):
         No deferred here.
         """
         if name is None:
-            name = self.db.default_state_name
+            name = self.current_state_name
         try:
             state = self.db.states[name]
             return state
         except KeyError:
-            raise ConfError("No such state: %s" % (name))
+            try:
+                name = self.db.default_state_name
+                state = self.db.states[name]
+                return state
+            except KeyError:
+                raise ConfError("No such state: %s" % (name))
 
     def _get_entry(self, key):
         """
-        Returns and entry from the current state, identified by its key.
+        Returns an entry from the current state, identified by its key.
         No deferred here.
         """
         state = self._get_state()
@@ -187,7 +217,7 @@ class Client(object):
         except KeyError:
             raise ConfError("No such schema: %s" % (name))
         
-    def schema_add(self, name="default", default="default", type=str, desc=""):
+    def schema_add(self, name="default", default="default", type="str", desc=""):
         """  
         Adds a new schema.
         returns Deferred 
@@ -277,7 +307,14 @@ class Client(object):
             entry = self._get_entry(key)
             #if type(value) is not type(entry.value):
             schema = self._get_schema(entry.schema_name)
-            entry.value = schema.type(value)
+            cast = str # default
+            if schema.type == "str":
+                cast = str
+            elif schema.type == "int":
+                cast = int
+            elif schema.type == "float":
+                cast = float # TODO: more casting types.
+            entry.value = cast(value)
             return _create_success(key, "entry_set")
         except ValueError, e:
             return _create_failure("Wrong type %s of %s for entry %s." % (type(value), value, key))
@@ -295,7 +332,7 @@ class Client(object):
             return _create_failure("State %s already exists." % (name), "state_new")
         else:
             self.db.states[name] = State(name, desc)
-            self.db.current_state_name = name
+            self.current_state_name = name
             return _create_success(name, "state_new")
 
     def state_duplicate(self, name, desc=""):
@@ -307,12 +344,12 @@ class Client(object):
         """
         # TODO: duplicate current state?
         # TODO: move current_state_name to the Client ?
-        previous_state = self.db.current_state_name
+        previous_state = self.current_state_name
         if self.db.states.has_key(name):
             return _create_failure("State %s already exists." % (name), "state_new")
         else:
             self.db.states[name] = State(name, desc)
-            self.db.current_state_name = name
+            self.current_state_name = name
             try:
                 for entry in self._get_state(previous_state).entries.values():
                     self.db.states[name].entries[entry.key] = entry
@@ -334,7 +371,7 @@ class Client(object):
         returns Deferred 
         """
         if self.db.states.has_key(name):
-            self.db.current_state_name = name
+            self.current_state_name = name
             return _create_success(name, "state_load")
         else:
             return _create_failure("Not such state: %s." % (name), "state_load")
@@ -343,7 +380,7 @@ class Client(object):
         """  returns Deferred """
         name = self.db.default_state_name
         if self.db.states.has_key(name):
-            self.db.current_state_name = name
+            self.current_state_name = name
             return _create_success(name, "state_default")
         else:
             return _create_failure("Not such state: %s." % (name), "state_default")
@@ -379,61 +416,105 @@ class Client(object):
 #        """  returns  """
 #        pass
 
-    def serial_save(self, filename, obj):
+    def file_save(self):
         """
-        Saves any python data type to a file.
-
-        Might throw an SerializeError
+        Saves conf to a file.
         """
         #TODO
-        li = jelly.jelly(obj)
+        filename = self.db.file_name
+        lines = []
+        lines.append("# \n")
+        lines.append("# This file has a custom format. See miville/utils/conf.py \n")
+        lines.append("# The first word is the class of the object.\n")
+        lines.append("# After the '|' character, the dict enumerates its attributes values.\n")
+        lines.append("# Comment lines start with the '#' character.\n")
+        
+        lines.append("# SCHEMAS ----- \n")
+        for schema in self.db.schemas.values():
+            lines.append("%s | %s\n" % ("Schema", {"name":schema.name, "default":schema.default, "type":schema.type, "desc":schema.desc}))
+        lines.append("# STATES ----- \n")
+        for state in self.db.states.values():
+            lines.append("# ----- \n")
+            lines.append("%s | %s\n" % ("State", {"name":state.name, "desc":state.desc}))
+            for entry in state.entries.values():
+                lines.append("%s | %s\n" % ("Entry", {"key":entry.key, "value":entry.value, "schema_name":entry.schema_name}))
         try:
             f = open(filename, 'w')
-            f.write(pprint.pformat(li))
+            f.writelines(lines)
             f.close()
         except IOError, e:
-            raise SerializeError(e.message)
+            raise ConfError(str(e))
         except OSError, e:
-            raise SerializeError(e.message)
+            raise ConfError(str(e))
 
-    def serial_load(self, filename):
+    def file_load(self):
         """
-        Loads any python data type from a file.
+        Loads conf from a file.
+        """
+        filename = self.db.file_name
+        schemas = {}
+        states = {}
+        last_state = None
+        default_state_name = None
+        try:
+            try:
+                f = open(filename, 'r')
+                lines = f.readlines()
+                f.close()
+            except IOError, e:
+                raise ConfError(str(e))
+            except OSError, e:
+                raise ConfError(str(e))
+            for line in lines:
+                if not line.startswith("#"):
+                    keyval = line.split("|")
+                    class_name = keyval[0].strip()
+                    data = keyval[1].strip()
+                    if class_name == "Schema":
+                        kwargs = eval(data) # dict
+                        schema = Schema(**kwargs)
+                        schemas[schema.name] = schema
+                    elif class_name == "State":
+                        kwargs = eval(data) # dict
+                        state = State(**kwargs)
+                        states[state.name] = state
+                        last_state = state.name
+                    elif class_name == "Entry":
+                        kwargs = eval(data) # dict
+                        if last_state is None:
+                            raise ConfError("No state to put that entry in." + str(line))
+                        else:
+                            state = states[last_state]
+                            entry = Entry(**kwargs)
+                            state.entries[entry.key] = entry
+                    elif class_name == "default_state_name":
+                        default_state_name = data # str
+            self.db.states = states
+            self.db.schemas = schemas
+            self.db.default_state_name = default_state_name
+        except ConfError, e:
+            _create_failure(e, "file_load")
+        except SyntaxError, e:
+            _create_failure("Error parsing config file : %s" % (str(e)))
 
-        Might throw an UnserializeError
-        """
-        try:
-            f = open(filename, 'r')
-            li = eval(f.read()) # do this only on trusted data !
-            f.close()
-        except IOError, e:
-            raise UnserializeError(e.message)
-        except OSError, e:
-            raise UnserializeError(e.message)
-        try:
-            obj = jelly.unjelly(li)
-        except jelly.InsecureJelly, e:
-            raise UnserializeError(e.message)
-        except AttributeError, e:
-            raise UnserializeError(e.message)
-        else:
-            return obj
 class Database(object):
     """
     Database for the simple client.
     Contains states of entries
     """
-    def __init__(self, file_name=None):
+    def __init__(self, file_name=None, default_state_name=None, states={}, schemas={}):
         global DEFAULT_FILE_NAME
-        global DEFAULT_STATE_NAME
         if file_name is None:
             file_name = os.path.expanduser(DEFAULT_FILE_NAME)
+        if default_state_name is None:
+            default_state_name = DEFAULT_STATE_NAME
         self.file_name = file_name
-        self.default_state_name = DEFAULT_STATE_NAME
-        self.current_state_name = self.default_state_name
-        self.states = {} # name: instance pairs
-        self.schemas = {} # name: instance pairs
-        self.states[DEFAULT_STATE_NAME] = State(DEFAULT_STATE_NAME, "Default state.")
+        self.default_state_name = default_state_name 
+        self.states = states # name: instance pairs
+        self.schemas = schemas # name: instance pairs
+        if len(self.states) == 0:
+            self.states[DEFAULT_STATE_NAME] = State(DEFAULT_STATE_NAME, "Default state.")
+        
     def __str__(self):
         text = "DB with schemas:\n%s\nStates:\n%s\n" % (self.states, self.schemas)
         text += "current_state:%s\nDefault state:%s\n" % (self.current_state, self.default_state_name)
@@ -474,7 +555,7 @@ class Schema(object):
     """
     Kind of entry.
     """
-    def __init__(self, name="default", default="value", type=str, desc=""):
+    def __init__(self, name="default", default="value", type="str", desc=""):
         self.name = name # 
         self.default = default # 
         self.type = type # 
@@ -493,7 +574,7 @@ if __name__ == "__main__":
         print("-------------")
         
     client = Client()
-    client.schema_add("foo_bar_size", default=1, type=int, desc="Foo bar")
+    client.schema_add("foo_bar_size", default=1, type="int", desc="Foo bar")
     client.entry_add("/foo/bar/0/size", 2, "foo_bar_size")
     client.entry_add("/foo/bar/1/size", 2, "foo_bar_size")
     client.entry_list().addCallback(print_entries)
@@ -505,4 +586,9 @@ if __name__ == "__main__":
     #serial_save(client.db.file_name, client.db)
     #restored_db = serial_load(client.db.file_name)
     #print(db)
-    
+    print("Saving to file...")
+    client.file_save()
+    print("Loading from file..")
+    client.file_load()
+    client.entry_list().addCallback(print_entries)
+
