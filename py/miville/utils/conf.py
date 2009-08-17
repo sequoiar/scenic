@@ -43,6 +43,7 @@ Installation::
   
   sudo apt-get install python-twisted 
 """
+# TODO: create valid python code using repr() (and parsed by eval())
 # TODO: call Client.file_save() and Client.file_load() periodically.
 # TODO: change api for Client.state_duplicate()
 # TODO: change the syntax of the state file so that it is pure python
