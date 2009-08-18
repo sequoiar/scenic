@@ -17,6 +17,7 @@ TESTS = test/test_addressbook.py \
         test/check_milhouse_ipcp.py \
         test/check_milhouse_ipcp_sync.py \
         test/check_devices.py \
+        test/check_conf.py \
         test/check_miville_starts.py \
         test/check_miville_settings.py
 
