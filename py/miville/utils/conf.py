@@ -50,13 +50,9 @@ Installation::
 
 import os
 import pprint
-from zope.interface import implements 
-from zope.interface import Interface
-from zope.interface import Attribute
-from twisted.internet.defer import Deferred
-from twisted.internet.defer import succeed
-from twisted.internet.defer import fail
-from twisted.python.failure import Failure
+import zope.interface
+from twisted.internet import defer
+from twisted.python import failure
 # from twisted.spread import jelly
 
 DEFAULT_FILE_NAME = "~/.ratsconf"
@@ -73,13 +69,13 @@ class ConfError(Exception):
         self.method_called = method_called
         self.keywords = keywords
 
-class IClient(Interface):
+class IClient(zope.interface.Interface):
     """
     Client to the Configuration server.
     
     Inspired by Gconf, using twisted for the MVC pattern.
     """
-    # notifieds = Attribute("""List of callbacks to be notified when an attribute's value changes.""")
+    # notifieds = zope.interface.Attribute("""List of callbacks to be notified when an attribute's value changes.""")
     def __init__(self):
         pass
     
@@ -89,7 +85,12 @@ class IClient(Interface):
         Returns Deferred
         """
         pass
-    
+    def field_list(self):
+        """
+        Lists the fields. 
+        Returns Deferred.
+        """
+        pass
     def field_remove(self, name):
         """ 
         Removes an entry in the current profile.
@@ -200,6 +201,15 @@ class IClient(Interface):
         """
         pass
     
+    def profile_remove(self, name):
+        """
+        Remove a profile instance in the database.
+        returns Deferred 
+        Selects the default profile after removal. 
+        It is not possible to remote the default profile.
+        """
+        pass
+
     def profile_duplicate(self, name, desc=""):
         """  
         Creates a new profile, duplicating the previously selected one.
@@ -235,7 +245,7 @@ def _create_success(result=None, method_called=None, **keywords):
     Returns a successful Deferred instance with a Success instance 
     as argument to its callbacks.
     """
-    return succeed(Success(result, method_called, **keywords))
+    return defer.succeed(Success(result, method_called, **keywords))
 
 def _create_failure(message_or_error=None, method_called=None, **keywords):
     """
@@ -247,11 +257,11 @@ def _create_failure(message_or_error=None, method_called=None, **keywords):
         error.method_called = method_called
     else:
         error = ConfError(str(message_or_error), method_called, **keywords)
-    return fail(Failure(error))
+    return defer.fail(failure.Failure(error))
 
 class Client(object):
     # TODO: rename to ConfClient ?
-    implements(IClient)
+    zope.interface.implements(IClient)
     """
     Simple configuration client.
     """
@@ -331,6 +341,14 @@ class Client(object):
             self.db.fields[name] = Field(name=name, default=default, type=type, desc=desc)
             return _create_success(name, "field_add")
 
+    def field_list(self):
+        """
+        Lists fields. (as dict)
+        Returns a Deferred.
+        """
+        # TODO: rename to plural (fields_list)
+        return _create_success(self.db.fields, "field_list")
+
     def field_remove(self, name):
         """ 
         Removes an entry in the current profile.
@@ -339,7 +357,7 @@ class Client(object):
         # TODO: check is any entry uses it.
         try:
             field = self._get_field(name)
-            del self.db.field[name]
+            del self.db.fields[name]
             return _create_success(name, "field_remove")
         except ConfError, e:
             return _create_failure(e, "field_remove")
@@ -433,12 +451,12 @@ class Client(object):
         
         Also selects the newly created profile.
         """
-        if self.db.has_key(name):
-            return _create_failure("Profile %s already exists." % (name), "profile_new")
+        if self.db.profiles.has_key(name):
+            return _create_failure("Profile %s already exists." % (name), "profile_add")
         else:
             self.db.profiles[name] = Profile(name, desc)
             self.current_profile_name = name
-            return _create_success(name, "profile_new")
+            return _create_success(name, "profile_add")
 
     def profile_duplicate(self, name, desc=""):
         """  
@@ -516,6 +534,23 @@ class Client(object):
         profiles = self.db.profiles.values()
         return _create_success(profiles, "profile_list")
     
+    def profile_remove(self, name):
+        """
+        Removes a profile instances from the database.
+        returns Deferred 
+        Selects the default profile after removal. 
+        It is not possible to remote the default profile.
+        """
+        if name == DEFAULT_PROFILE_NAME:
+            return _create_failure("It is not possible to remove the default profile.", "profile_remove")
+        else:
+            try:
+                profile = self._get_profile(name)
+                del self.db.profiles[name]
+                return _create_success(name, "profile_remove")
+            except KeyError, e:
+                return _create_failure("Not such profile: %s." % (name), "profile_remove")
+        
     def entry_default(self, name):
         """
         Sets an entry value to its default.

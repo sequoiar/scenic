@@ -22,6 +22,7 @@
 Tests for the conf module.
 """
 from twisted.trial import unittest
+from twisted.internet import defer
 from miville.utils import conf
 
 # data is persistent in database between each test.
@@ -33,24 +34,88 @@ class Test_01_Conf(unittest.TestCase):
         pass
     def test_01_create_field(self):
         return self.client.field_add("/egg", type="int", desc="Egg")
+
+    def test_01_validate_duplicate_fields(self):
+        def _callback(result, test_case):
+            test_case.fail("Should raise error.")
+        def _errback(result, test_case):
+            pass
+        deferred = self.client.field_add("/egg", type="int", desc="Egg")
+        deferred.addCallback(_callback, self)
+        deferred.addErrback(_errback, self)
+        return deferred
+    
     def test_02_create_field(self):
         return self.client.field_add("/ham", type="int", desc="Ham")
+
     def test_03_add_entry(self):
         return self.client.entry_add("/egg", 2)
+
     def test_04_add_entry(self):
         return self.client.entry_add("/ham", 2)
+
     def test_05_list_entries(self):
-        return self.client.entry_list()
+        def _check(result, test_case):
+            result = result.value
+            for key in ["/egg", "/ham"]:
+                if not result.has_key(key):
+                    test_case.fail("Key not found: %s" % (key))
+        return self.client.entry_list().addCallback(_check, self)
+
     def test_06_entry_to_default(self):
         return self.client.entry_default("/ham")
+
     def test_07_duplicate_profile(self):
         return self.client.profile_duplicate("other") # using the "other" profile
+
     def test_08_add_entry(self):
         return self.client.entry_add("/egg", 3)
+
     def test_09_save(self):
         return self.client.file_save()
+
     def test_10_load(self):
         return self.client.file_load()
-    def test_11_list_entries(self):
-        return self.client.entry_list()
 
+    def test_11_list_entries(self):
+        def _check(result, test_case):
+            result = result.value
+            for key in ["/egg", "/ham"]:
+                if not result.has_key(key):
+                    test_case.fail("Entry not found, but should be there: %s" % (key))
+        return self.client.entry_list().addCallback(_check, self)
+
+    def test_12_new_profile(self):
+        return self.client.profile_add("one more")
+
+    def test_13_list_profiles(self):
+        def _check(result, test_case):
+            result = result.value
+            for key in ["default", "other", "one more"]:
+                if not result.has_key(key):
+                    test_case.fail("Profile not found, but should be there: %s" % (key))
+        return self.client.profile_list()
+
+    def test_14_remove_field(self):
+        return self.client.field_remove("/egg")
+
+    def test_15_list_fields(self):
+        def _check(result, test_case):
+            result = result.value
+            for there in ["/ham"]:
+                if not result.has_key(there):
+                    test_case.fail("Field not found, but should be there: %s" % (there))
+            for not_there in ["/egg"]:
+                if result.has_key(not_there):
+                    test_case.fail("Field found, but should not be there: %s" % (not_there))
+        return self.client.field_list().addCallback(_check, self)
+
+    def test_16_remove_profile(self):
+        return self.client.profile_remove("other")
+
+    def test_17_trial(self):
+        def _callback(result, test_case):
+            pass #print(result)
+            # test_case.fail()
+        return defer.Deferred().addCallback(_callback, self).callback("It works")
+    
