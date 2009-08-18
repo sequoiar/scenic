@@ -47,6 +47,7 @@ Installation::
 # TODO: call Client.file_save() and Client.file_load() periodically.
 # TODO: change api for Client.profile_duplicate()
 # TODO: change the syntax of the profile file so that it is pure python
+# TODO: fields should not be saved/loaded in the config file.
 
 import os
 import pprint
@@ -276,6 +277,7 @@ class Client(object):
         self.db = _single_database
         self.current_profile_name = DEFAULT_PROFILE_NAME
         self.notifieds = []
+        self._parser_class = DefaultConfigFileParser
     
     def _get_profile(self, name=None):
         """
@@ -334,7 +336,6 @@ class Client(object):
         Adds a new field.
         returns Deferred 
         """
-        # TODO: put default after after type
         if self.db.fields.has_key(name):
             return _create_failure("Field %s already exists." % (name), "field_add")
         else:
@@ -354,7 +355,7 @@ class Client(object):
         Removes an entry in the current profile.
         returns Deferred 
         """
-        # TODO: check is any entry uses it.
+        # TODO: check if any entry uses it.
         try:
             field = self._get_field(name)
             del self.db.fields[name]
@@ -576,8 +577,49 @@ class Client(object):
         """
         Saves conf to a file.
         """
-        #TODO
-        filename = self.db.file_name
+        parser = self._parser_class()
+        parser.file_save(self.db)
+
+    def file_load(self):
+        """
+        Loads conf from a file.
+        """
+        parser = self._parser_class()
+        parser.file_load(self.db)
+
+class IConfigFileParser(zope.interface.Interface):
+    """
+    Config file parser/writer.
+    """
+    # database = zope.interface.Attribute("""The database.""")
+
+    def file_load(self, database):
+        """
+        loads the config to the database, erasing previous data.
+        Returns a Deferred
+        """
+        pass
+    
+    def file_save(self, database):
+        """
+        Saves the database to the file. 
+        Returns a Deferred
+        """
+        pass
+
+class DefaultConfigFileParser(object):
+    """
+    Default config file layout.
+    """
+    zope.interface.implements(IConfigFileParser)
+    
+    def file_save(self, database):
+        """
+        Saves the database to the file. 
+        Returns a Deferred
+        """
+        # TODO: fields should not be saved/loaded in the config file.
+        filename = database.file_name
         lines = []
         lines.append("# \n")
         lines.append("# This file has a custom format. See miville/utils/conf.py \n")
@@ -585,10 +627,10 @@ class Client(object):
         lines.append("# After the '|' character, the dict enumerates its attributes values.\n")
         lines.append("# Comment lines start with the '#' character.\n")
         lines.append("# SCHEMAS ----- \n")
-        for field in self.db.fields.values():
+        for field in database.fields.values():
             lines.append("%s | %s\n" % ("Field", {"name":field.name, "default":field.default, "type":field.type, "desc":field.desc}))
         lines.append("# PROFILES ----- \n")
-        for profile in self.db.profiles.values():
+        for profile in database.profiles.values():
             lines.append("# ----- \n")
             lines.append("%s | %s\n" % ("Profile", {"name":profile.name, "desc":profile.desc}))
             for entry in profile.entries.values():
@@ -602,11 +644,15 @@ class Client(object):
         except OSError, e:
             raise ConfError(str(e))
 
-    def file_load(self):
+    def file_load(self, database):
         """
-        Loads conf from a file.
+        loads the config to the database, erasing previous data.
+        Returns a Deferred
         """
-        filename = self.db.file_name
+        # TODO: fields should not be saved/loaded in the config file.
+        database.profiles = {}
+        database.fields = {}
+        filename = database.file_name
         fields = {}
         profiles = {}
         last_profile = None
@@ -644,13 +690,13 @@ class Client(object):
                             profile.entries[entry.field_name] = entry
                     elif class_name == "default_profile_name":
                         default_profile_name = data # str
-            self.db.profiles = profiles
-            self.db.fields = fields
-            self.db.default_profile_name = default_profile_name
+            database.profiles = profiles
+            database.fields = fields
+            database.default_profile_name = default_profile_name
         except ConfError, e:
             _create_failure(e, "file_load")
         except SyntaxError, e:
-            _create_failure("Error parsing config file : %s" % (str(e)))
+            _create_failure("Error parsing config file : %s" % (str(e)), "file_load")
 
 class Database(object):
     """
