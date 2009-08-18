@@ -20,20 +20,20 @@
 # along with Miville.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-Module for configuration state saving.
+Module for configuration profile saving.
 
 Inspired by GConf.
 
 The programmer use the methods of the Client command usign twisted callbacks and errbacks.
-The Database contains Schemas and States. A state contains Entries. The entries are of the 
-"type" of a Schema. For instance, you would create an Entry called 
-"/video/device/0/number" whose Schema would be called "Video Device Number" with type \
-"int" and a default value of 0. You would then create a "default" State, for example which 
-contain a "/video/device/0/number" with 0 as a value. You would then duplicate this state 
-to a new one named "modified", for example. In that state, you might want to choose an 
+The Database contains Fields and Profiles. A profile contains Entries. The entries are of the 
+"type" of a Field. For instance, you would create an Entry called 
+"/video/device/0/number" whose Field would be called "Video Device Number" with type \
+"int" and a default value of 0. You would then create a "default" Profile, for example which 
+contain a "/video/device/0/number" with 0 as a value. You would then duplicate this profile 
+to a new one named "modified", for example. In that profile, you might want to choose an 
 other value for the "/video/device/0/number", such as 1.
 
-This way, you can manage different states of your configuration options. 
+This way, you can manage different profiles of your configuration options. 
 These can be used as presets, or edited by the user.
 
 The IClient interface can be implemented using GConf later if needed, since the design of 
@@ -45,8 +45,8 @@ Installation::
 """
 # TODO: create valid python code using repr() (and parsed by eval())
 # TODO: call Client.file_save() and Client.file_load() periodically.
-# TODO: change api for Client.state_duplicate()
-# TODO: change the syntax of the state file so that it is pure python
+# TODO: change api for Client.profile_duplicate()
+# TODO: change the syntax of the profile file so that it is pure python
 
 import os
 import pprint
@@ -60,17 +60,18 @@ from twisted.python.failure import Failure
 # from twisted.spread import jelly
 
 DEFAULT_FILE_NAME = "~/.ratsconf"
-DEFAULT_STATE_NAME = "default"
+DEFAULT_PROFILE_NAME = "default"
+# GLOBAL_PROFILE_NAME = "GLOBAL"
 _single_database = None # singleton
 
 class ConfError(Exception):
     """
     Any error that can occur within this module.
     """
-    def __init__(self, message, method_called=None) :
+    def __init__(self, message, method_called=None, **keywords):
         Exception.__init__(self, message)
         self.method_called = method_called
-
+        self.keywords = keywords
 
 class IClient(Interface):
     """
@@ -78,60 +79,60 @@ class IClient(Interface):
     
     Inspired by Gconf, using twisted for the MVC pattern.
     """
-    notifieds = Attribute("""List of callbacks to be notified when an attribute's value changes.""")
+    # notifieds = Attribute("""List of callbacks to be notified when an attribute's value changes.""")
     def __init__(self):
         pass
     
-    def schema_add(self, name="default", default="default", type="str", desc=""):
+    def field_add(self, name="default", type="str", default=None, desc=""):
         """  
-        Adds a new schema.
+        Adds a new field.
         Returns Deferred
         """
         pass
     
-    def schema_remove(self, name):
+    def field_remove(self, name):
         """ 
-        Removes an entry in the current state.
+        Removes an entry in the current profile.
         returns Deferred 
         """
         pass
 
-    def schema_get(self, name):
+    def field_get(self, name):
         """
-        Gets a schema by its name.    
+        Gets a field by its name.    
         returns Deferred 
         """
         pass
 
-    def entry_get(self, key):
+    def entry_get(self, field_name):
         """
-        Gets an entry by its key.    
+        Gets an entry by its name.    
         returns Deferred 
         """
         pass
 
-    def entry_set(self, key, value):
+    def entry_set(self, field_name, value):
         """
-        Sets the value of an entry in the currently selected state.
+        Sets the value of an entry in the currently selected profile.
         returns Deferred 
         """
         pass
 
-    def entry_add(self, key, value, schema_name):
+    def entry_add(self, field_name, value):
         """
-        Adds an entry in the current state.
+        Adds an entry in the current profile.
         returns Deferred
         """
         pass
 
-    def entry_remove(self, key):
+    def entry_remove(self, field_name):
         """  
-        Removes an entry from the current state.
+        Removes an entry from the current profile.
         returns Deferred 
         """
         pass
 
-    def entry_default(self, key):
+    def entry_default(self, field_name):
         """
         Sets an entry value to its default.
         returns Deferred 
@@ -140,71 +141,71 @@ class IClient(Interface):
     
     def entry_list(self):
         """
-        List all entries in the current state.
+        List all entries in the current profile.
         Returns Deferred.
         """
         pass
 
-    def notified_add(self, key, callback, *user_data):
-        """  returns  """
-        pass
+#     def notified_add(self, name, callback, *user_data):
+#         """  returns  """
+#         pass
+# 
+#     def notified_remove(self, name):
+#         """  returns  """
+#         pass
 
-    def notified_remove(self, key):
-        """  returns  """
-        pass
-
-    def state_add(self, name, desc=""):
+    def profile_add(self, name, desc=""):
         """  
-        Creates a new empty state.
+        Creates a new empty profile.
         returns Deferred 
         
-        Also selects the newly created state.
+        Also selects the newly created profile.
         """
         pass
 
-    def state_save(self, name):
+    def profile_save(self, name):
         """
-        Saves the currently selected state to the database.
+        Saves the currently selected profile to the database.
         returns Deferred 
         """
         # TODO: does not save to file for now. Save it !
         pass
 
-    def state_load(self, name):
+    def profile_load(self, name):
         """
-        Selects a state
+        Selects a profile
         returns Deferred 
         """
         pass
 
-    def state_default(self) :
+    def profile_default(self) :
         """  
-        Selects the default state.
+        Selects the default profile.
         returns Deferred 
         """
         pass
     
-    def state_set_default(self, name):
+    def profile_set_default(self, name):
         """
-        Changes the default state.
+        Changes the default profile.
         Does not switch to it, though.
         returns Deferred 
         """
         pass
 
-    def state_list(self):
+    def profile_list(self):
         """
-        List all states instances in the database.
+        List all profiles instances in the database.
         returns Deferred 
         """
         pass
     
-    def state_duplicate(self, name, desc=""):
+    def profile_duplicate(self, name, desc=""):
         """  
-        Creates a new state, duplicating the previously selected one.
+        Creates a new profile, duplicating the previously selected one.
         returns Deferred 
         
-        Also selects the newly created state.
+        Also selects the newly created profile.
         """
         pass
 
@@ -224,19 +225,19 @@ class Success(object):
     """
     Simple successful result.
     """
-    def __init__(self, value=None, method_called=None, *user_args):
+    def __init__(self, value=None, method_called=None, **keywords):
         self.value = value
         self.method_called = method_called
-        self.user_args = user_args
+        self.keywords = keywords
 
-def _create_success(result=None, method_called=None):
+def _create_success(result=None, method_called=None, **keywords):
     """
     Returns a successful Deferred instance with a Success instance 
     as argument to its callbacks.
     """
-    return succeed(Success(result, method_called))
+    return succeed(Success(result, method_called, **keywords))
 
-def _create_failure(message_or_error=None, method_called=None):
+def _create_failure(message_or_error=None, method_called=None, **keywords):
     """
     Returns a failed deferred instance.
     """
@@ -245,282 +246,294 @@ def _create_failure(message_or_error=None, method_called=None):
         error = message_or_error
         error.method_called = method_called
     else:
-        error = ConfError(str(message_or_error), method_called)
+        error = ConfError(str(message_or_error), method_called, **keywords)
     return fail(Failure(error))
 
-
 class Client(object):
+    # TODO: rename to ConfClient ?
     implements(IClient)
     """
-    Simple configuration client that uses twisted's Jelly for its backend.
+    Simple configuration client.
     """
     # return a Deferred object already called back with the value of result
     # return defer.succeed(result)
     # You can only call Deferred.callback or Deferred.errback once.
     def __init__(self):
         global _single_database
-        global DEFAULT_STATE_NAME
+        global DEFAULT_PROFILE_NAME
         if _single_database is None:
             _single_database = Database()
         self.db = _single_database
-        self.current_state_name = DEFAULT_STATE_NAME
+        self.current_profile_name = DEFAULT_PROFILE_NAME
         self.notifieds = []
     
-    def _get_state(self, name=None):
+    def _get_profile(self, name=None):
         """
-        :return: current state instance or raise ConfError.
+        :return: current profile instance or raise ConfError.
         No deferred here.
         """
         if name is None:
-            name = self.current_state_name
+            name = self.current_profile_name
         try:
-            state = self.db.states[name]
-            return state
+            profile = self.db.profiles[name]
+            return profile
         except KeyError:
             try:
-                name = self.db.default_state_name
-                state = self.db.states[name]
-                return state
+                name = self.db.default_profile_name
+                profile = self.db.profiles[name]
+                return profile
             except KeyError:
-                raise ConfError("No such state: %s" % (name))
-
-    def _get_entry(self, key):
-        """
-        Returns an entry from the current state, identified by its key.
-        No deferred here.
-        """
-        state = self._get_state()
+                raise ConfError("No such profile: %s" % (name))
+    
+    def _get_default_profile(self):
         try:
-            entry = state.entries[key]
-            return entry
-        except KeyError:
-            raise ConfError("No such entry: %s" % (key))
-
-    def _get_schema(self, name):
-        """
-        :return: current schema instance or raise ConfError.
-        No deferred here.
-        """
-        try:
-            schema = self.db.schemas[name]
-            return schema
-        except KeyError:
-            raise ConfError("No such schema: %s" % (name))
+            return self.db.profiles[DEFAULT_PROFILE_NAME]
+        except KeyError, e:
+            raise ConfError("No such profile: %s" % (DEFAULT_PROFILE_NAME))
         
-    def schema_add(self, name="default", default="default", type="str", desc=""):
+    def _get_entry(self, field_name):
+        """
+        Returns an entry from the current profile, identified by its name.
+        No deferred here.
+
+        May raise a ConfError
+        """
+        profile = self._get_profile()
+        try:
+            return profile.entries[field_name]
+        except KeyError:
+            profile = self._get_default_profile()
+            try:
+                return profile.entries[field_name]
+            except KeyError:
+                raise ConfError("No such entry: %s" % (name))
+
+    def _get_field(self, name):
+        """
+        :return: current field instance or raise ConfError.
+        No deferred here.
+        """
+        try:
+            field = self.db.fields[name]
+            return field
+        except KeyError:
+            raise ConfError("No such field: %s" % (name))
+        
+    def field_add(self, name="default", type="str", default=None, desc=""):
         """  
-        Adds a new schema.
+        Adds a new field.
         returns Deferred 
         """
-        if self.db.schemas.has_key(name):
-            return _create_failure("Schema %s already exists." % (name), "schema_add")
+        # TODO: put default after after type
+        if self.db.fields.has_key(name):
+            return _create_failure("Field %s already exists." % (name), "field_add")
         else:
-            self.db.schemas[name] = Schema(name, default, type, desc)
-            return _create_success(name, "schema_add")
+            self.db.fields[name] = Field(name=name, default=default, type=type, desc=desc)
+            return _create_success(name, "field_add")
 
-    def schema_remove(self, name):
+    def field_remove(self, name):
         """ 
-        Removes an entry in the current state.
+        Removes an entry in the current profile.
         returns Deferred 
         """
         # TODO: check is any entry uses it.
         try:
-            schema = self._get_schema(name)
-            del self.db.schema[name]
-            return _create_success(key, "schema_remove")
+            field = self._get_field(name)
+            del self.db.field[name]
+            return _create_success(name, "field_remove")
         except ConfError, e:
-            return _create_failure(e, "schema_remove")
+            return _create_failure(e, "field_remove")
 
-    def schema_get(self, name):
+    def field_get(self, name):
         """
-        Gets a schema by its name.    
+        Gets a field by its name.    
         returns Deferred 
         """
         try:
-            ret = self._get_schema(name)
-            return _create_success("schema_get", ret)
+            ret = self._get_field(name)
+            return _create_success("field_get", ret)
         except ConfError, e:
-            return _create_failure(e, "schema_get")
+            return _create_failure(e, "field_get")
 
-    def entry_add(self, key, value, schema_name):
+    def entry_add(self, field_name, value):
         """  
-        Adds an entry in the current state.
+        Adds an entry in the current profile.
         returns Deferred 
         """
+        # if self.db.fields.has_key(name):
         try:
-            state = self._get_state()
-            schema = self._get_schema(schema_name) # check if schema exists
-            state.entries[key] = Entry(key, value, schema_name)
-            return _create_success(key, "entry_add")
+            profile = self._get_profile() # current one (state machine)
+            field = self._get_field(field_name) # check if field exists
+            profile.entries[field_name] = Entry(field_name, value) # field_name
+            return _create_success(field_name, "entry_add")
         except ConfError, e:
             return _create_failure(e, "entry_add")
 
-    def entry_remove(self, key):
+    def entry_remove(self, name):
         """ 
-        Removes an entry from the current state.
+        Removes an entry from the current profile.
         returns Deferred 
         """
         try:
-            state = self._get_state()
-            entry = self._get_entry(key)
-            del state.entries[key]
-            return _create_success(key, "entry_remove")
+            profile = self._get_profile()
+            entry = self._get_entry(name)
+            del profile.entries[name]
+            return _create_success(name, "entry_remove")
         except ConfError, e:
             return _create_failure(e, "entry_remove")
 
-    def entry_get(self, key):
+    def entry_get(self, field_name):
         """
-        Gets an entry by its key.    
+        Gets an entry value by its name.    
         returns Deferred 
         """
+        # TODO: value, not the entry itself.
         try:
-            ret = self._get_entry(key)
+            ret = self._get_entry(field_name)
             return _create_success(ret, "entry_get")
         except ConfError, e:
             return _create_failure(e, "entry_get")
     
     def entry_list(self):
         try:
-            state = self._get_state()
-            entries = state.entries
+            profile = self._get_profile()
+            entries = profile.entries
             return _create_success(entries, "entry_list")
         except ConfError, e:
             return _create_failure(e, "entry_list")
             
 
-    def entry_set(self, key, value):
+    def entry_set(self, name, value):
         """  
         Sets the value of an entry.
         returns Deferred 
         """
         try:
-            entry = self._get_entry(key)
+            entry = self._get_entry(name)
             #if type(value) is not type(entry.value):
-            schema = self._get_schema(entry.schema_name)
+            field = self._get_field(entry.field_name)
             cast = str # default
-            if schema.type == "str":
+            if field.type == "str":
                 cast = str
-            elif schema.type == "int":
+            elif field.type == "int":
                 cast = int
-            elif schema.type == "float":
+            elif field.type == "float":
                 cast = float # TODO: more casting types.
             entry.value = cast(value)
-            return _create_success(key, "entry_set")
+            return _create_success(name, "entry_set")
         except ValueError, e:
-            return _create_failure("Wrong type %s of %s for entry %s." % (type(value), value, key))
+            return _create_failure("Wrong type %s of %s for entry %s." % (type(value), value, name))
         except ConfError, e:
             return _create_failure(e, "entry_set")
 
-    def state_add(self, name, desc=""):
+    def profile_add(self, name, desc=""):
         """  
-        Creates a new empty state.
+        Creates a new empty profile.
         returns Deferred 
         
-        Also selects the newly created state.
+        Also selects the newly created profile.
         """
         if self.db.has_key(name):
-            return _create_failure("State %s already exists." % (name), "state_new")
+            return _create_failure("Profile %s already exists." % (name), "profile_new")
         else:
-            self.db.states[name] = State(name, desc)
-            self.current_state_name = name
-            return _create_success(name, "state_new")
+            self.db.profiles[name] = Profile(name, desc)
+            self.current_profile_name = name
+            return _create_success(name, "profile_new")
 
-    def state_duplicate(self, name, desc=""):
+    def profile_duplicate(self, name, desc=""):
         """  
-        Creates a new state, duplicating the previously selected one.
+        Creates a new profile, duplicating the previously selected one.
         returns Deferred 
         
-        Also selects the newly created state.
+        Also selects the newly created profile.
         """
-        # TODO: duplicate current state?
-        # TODO: move current_state_name to the Client ?
+        # TODO: duplicate current profile?
+        # TODO: move current_profile_name to the Client ?
         # TODO: remove desc argument ?
         try:
-            previous_state = self.current_state_name
-            if self.db.states.has_key(name):
-                return _create_failure("State %s already exists." % (name), "state_new")
+            previous_profile = self.current_profile_name
+            if self.db.profiles.has_key(name):
+                return _create_failure("Profile %s already exists." % (name), "profile_new")
             else:
-                self.db.states[name] = State(name, desc)
-                self.current_state_name = name
+                self.db.profiles[name] = Profile(name, desc)
+                self.current_profile_name = name
                 try:
-                    for entry in self._get_state(previous_state).entries.values():
-                        self.db.states[name].entries[entry.key] = entry
+                    for entry in self._get_profile(previous_profile).entries.values():
+                        self.db.profiles[name].entries[entry.field_name] = entry
                 except ConfError, e:
-                    return _create_failure(e, "state_duplicate")
-                return _create_success(name, "state_new")
+                    return _create_failure(e, "profile_duplicate")
+                return _create_success(name, "profile_new")
         except ConfError, e:
-            return _create_failure(e, "state_duplicate")
+            return _create_failure(e, "profile_duplicate")
 
-    def state_save(self, name):
+    def profile_save(self, name):
         """
-        Saves the currently selected state to the database.
+        Saves the currently selected profile to the database.
         returns Deferred 
         """
         # Nothing to do for now.
         # TODO: save to file?
-        return _create_success(True, "state_save")
+        return _create_success(True, "profile_save")
 
-    def state_load(self, name):
+    def profile_load(self, name):
         """
-        Selects a state
+        Selects a profile
         returns Deferred 
         """
-        if self.db.states.has_key(name):
-            self.current_state_name = name
-            return _create_success(name, "state_load")
+        # TODO: rename profile_select?
+        if self.db.profiles.has_key(name):
+            self.current_profile_name = name
+            return _create_success(name, "profile_load")
         else:
-            return _create_failure("Not such state: %s." % (name), "state_load")
+            return _create_failure("Not such profile: %s." % (name), "profile_load")
 
-    def state_default(self) :
+    def profile_default(self) :
         """  
-        Selects the default state.
+        Selects the default profile.
         returns Deferred 
         """
-        name = self.db.default_state_name
-        if self.db.states.has_key(name):
-            self.current_state_name = name
-            return _create_success(name, "state_default")
-        else:
-            return _create_failure("Not such state: %s." % (name), "state_default")
+        #TODO: rename to profile_load_default?
+        name = self.db.default_profile_name
+        return self.profile_load(name)
     
-    def state_set_default(self, name):
+    def profile_set_default(self, name):
         """
-        Changes the default state.
+        Changes the default profile.
         Does not switch to it, though.
         returns Deferred 
         """
-        if self.db.states.has_key(name):
-            self.db.default_state_name = name
-            return _create_success(name, "state_set_default")
+        if self.db.profiles.has_key(name):
+            self.db.default_profile_name = name
+            return _create_success(name, "profile_set_default")
         else:
-            return _create_failure("Not such state: %s." % (name), "state_set_default")
+            return _create_failure("Not such profile: %s." % (name), "profile_set_default")
 
-    def state_list(self):
+    def profile_list(self):
         """
-        List all states instances in the database.
+        List all profiles instances in the database.
         returns Deferred 
         """
-        states = self.db.states.values()
-        return _create_success(states, "state_list")
+        profiles = self.db.profiles.values()
+        return _create_success(profiles, "profile_list")
     
-    def entry_default(self, key):
+    def entry_default(self, name):
         """
         Sets an entry value to its default.
         returns Deferred 
         """
         try:
-            entry = self._get_entry(key)
-            schema = self._get_schema(entry.schema_name)
-            entry.value = schema.default
-            return _create_success(key, "entry_default")
+            entry = self._get_entry(name)
+            field = self._get_field(entry.field_name)
+            entry.value = field.default
+            return _create_success(name, "entry_default")
         except ConfError, e:
             return _create_failure(e, "entry_default")
 
-#    def notified_add(self, key, callback, *user_data):
+#    def notified_add(self, name, callback, *user_data):
 #        """  returns  """
 #        pass
 
-#    def notified_remove(self, key):
+#    def notified_remove(self, name):
 #        """  returns  """
 #        pass
 
@@ -536,16 +549,15 @@ class Client(object):
         lines.append("# The first word is the class of the object.\n")
         lines.append("# After the '|' character, the dict enumerates its attributes values.\n")
         lines.append("# Comment lines start with the '#' character.\n")
-        
         lines.append("# SCHEMAS ----- \n")
-        for schema in self.db.schemas.values():
-            lines.append("%s | %s\n" % ("Schema", {"name":schema.name, "default":schema.default, "type":schema.type, "desc":schema.desc}))
-        lines.append("# STATES ----- \n")
-        for state in self.db.states.values():
+        for field in self.db.fields.values():
+            lines.append("%s | %s\n" % ("Field", {"name":field.name, "default":field.default, "type":field.type, "desc":field.desc}))
+        lines.append("# PROFILES ----- \n")
+        for profile in self.db.profiles.values():
             lines.append("# ----- \n")
-            lines.append("%s | %s\n" % ("State", {"name":state.name, "desc":state.desc}))
-            for entry in state.entries.values():
-                lines.append("%s | %s\n" % ("Entry", {"key":entry.key, "value":entry.value, "schema_name":entry.schema_name}))
+            lines.append("%s | %s\n" % ("Profile", {"name":profile.name, "desc":profile.desc}))
+            for entry in profile.entries.values():
+                lines.append("%s | %s\n" % ("Entry", {"field_name":entry.field_name, "value":entry.value}))
         try:
             f = open(filename, 'w')
             f.writelines(lines)
@@ -560,10 +572,10 @@ class Client(object):
         Loads conf from a file.
         """
         filename = self.db.file_name
-        schemas = {}
-        states = {}
-        last_state = None
-        default_state_name = None
+        fields = {}
+        profiles = {}
+        last_profile = None
+        default_profile_name = None
         try:
             try:
                 f = open(filename, 'r')
@@ -575,31 +587,31 @@ class Client(object):
                 raise ConfError(str(e))
             for line in lines:
                 if not line.startswith("#"):
-                    keyval = line.split("|")
-                    class_name = keyval[0].strip()
-                    data = keyval[1].strip()
-                    if class_name == "Schema":
+                    nameval = line.split("|")
+                    class_name = nameval[0].strip()
+                    data = nameval[1].strip()
+                    if class_name == "Field":
                         kwargs = eval(data) # dict
-                        schema = Schema(**kwargs)
-                        schemas[schema.name] = schema
-                    elif class_name == "State":
+                        field = Field(**kwargs)
+                        fields[field.name] = field
+                    elif class_name == "Profile":
                         kwargs = eval(data) # dict
-                        state = State(**kwargs)
-                        states[state.name] = state
-                        last_state = state.name
+                        profile = Profile(**kwargs)
+                        profiles[profile.name] = profile
+                        last_profile = profile.name
                     elif class_name == "Entry":
                         kwargs = eval(data) # dict
-                        if last_state is None:
-                            raise ConfError("No state to put that entry in." + str(line))
+                        if last_profile is None:
+                            raise ConfError("No profile to put that entry in." + str(line))
                         else:
-                            state = states[last_state]
+                            profile = profiles[last_profile]
                             entry = Entry(**kwargs)
-                            state.entries[entry.key] = entry
-                    elif class_name == "default_state_name":
-                        default_state_name = data # str
-            self.db.states = states
-            self.db.schemas = schemas
-            self.db.default_state_name = default_state_name
+                            profile.entries[entry.field_name] = entry
+                    elif class_name == "default_profile_name":
+                        default_profile_name = data # str
+            self.db.profiles = profiles
+            self.db.fields = fields
+            self.db.default_profile_name = default_profile_name
         except ConfError, e:
             _create_failure(e, "file_load")
         except SyntaxError, e:
@@ -608,70 +620,80 @@ class Client(object):
 class Database(object):
     """
     Database for the simple client.
-    Contains states of entries
+    Contains profiles of entries
     """
-    def __init__(self, file_name=None, default_state_name=None, states={}, schemas={}):
+    def __init__(self, file_name=None, default_profile_name=None, profiles={}, fields={}):
         global DEFAULT_FILE_NAME
         if file_name is None:
             file_name = os.path.expanduser(DEFAULT_FILE_NAME)
-        if default_state_name is None:
-            default_state_name = DEFAULT_STATE_NAME
+        if default_profile_name is None:
+            default_profile_name = DEFAULT_PROFILE_NAME
         self.file_name = file_name
-        self.default_state_name = default_state_name 
-        self.states = states # name: instance pairs
-        self.schemas = schemas # name: instance pairs
-        if len(self.states) == 0:
-            self.states[DEFAULT_STATE_NAME] = State(DEFAULT_STATE_NAME, "Default state.")
+        self.default_profile_name = default_profile_name 
+        self.profiles = profiles # name: instance pairs
+        self.fields = fields # name: instance pairs
+        if len(self.profiles) == 0:
+            self.profiles[DEFAULT_PROFILE_NAME] = Profile(DEFAULT_PROFILE_NAME, "Default profile.")
+            # self.profiles[GLOBAL_PROFILE_NAME] = Profile(GLOBAL_PROFILE_NAME, "Global profile.")
         
     def __str__(self):
-        text = "DB with schemas:\n%s\nStates:\n%s\n" % (self.states, self.schemas)
-        text += "current_state:%s\nDefault state:%s\n" % (self.current_state, self.default_state_name)
+        text = "DB with fields:\n%s\nProfiles:\n%s\n" % (self.profiles, self.fields)
+        text += "current_profile:%s\nDefault profile:%s\n" % (self.current_profile, self.default_profile_name)
         return text
 
 class ChangedNotification(object):
-    def __init__(self, method_called=None, new_value=None, old_value=None, key=None) :
+    def __init__(self, method_called=None, new_value=None, old_value=None, name=None) :
         self.method_called = method_called
         self.new_value = new_value
         self.old_value = old_value
-        self.key = key
+        self.name = name
 
-class State(object):
+class Profile(object):
     """
-    Snapshot of the set of states.
+    Snapshot of the set of profiles.
     """
     def __init__(self, name, desc="") :
         self.name = name
         self.desc = desc
-        self.entries = {} # key:instance 
+        self.entries = {} # field_names:instance 
     
     def __str__(self):
-        return "State: %s (%s).\nEntries: %s\n" % (str(self.entries))
+        return "Profile: %s (%s).\nEntries: %s\n" % (str(self.entries))
 
 class Entry(object):
     """
     One config option value.
     """
-    def __init__(self, key, value, schema_name=None):
-        self.key = key
+    def __init__(self, field_name, value): #, field_name=None):
+        #self.name = name
+        self.field_name = field_name 
         self.value = value
-        self.schema_name = schema_name 
 
     def __str__(self):
-        return "Entry %s: %s (%s)" % (self.key, self.value, self.schema_name)
+        return "Entry %s: %s" % (self.field_name, self.value)
+        #, self.field_name)
 
-class Schema(object):
+class Field(object):
     """
     Kind of entry.
     """
-    def __init__(self, name="default", default="value", type="str", desc=""):
+    def __init__(self, name="default", default=None, type="str", desc=""):
         self.name = name # 
-        self.default = default # 
         self.type = type # 
+        self.default = default # 
         self.desc = desc # 
+        if self.default is None:
+            if self.type == "int":
+                self.default = 0
+            elif self.type == "float":
+                self.default = 0.
+            elif self.type == "str":
+                self.default = ""
         # self.writable = True # 
         # self._owner = None # 
+
     def __str__(self):
-        return "Schema %s (%s) (%s) with default=%s." % (self.name, self.type, self.desc, self.default)
+        return "Field %s (%s) (%s) with default=%s." % (self.name, self.type, self.desc, self.default)
 
 if __name__ == "__main__":
     def print_entries(result):
@@ -682,14 +704,18 @@ if __name__ == "__main__":
         print("-------------")
         
     client = Client()
-    client.schema_add("foo_bar_size", default=1, type="int", desc="Foo bar")
-    client.entry_add("/foo/bar/0/size", 2, "foo_bar_size")
-    client.entry_add("/foo/bar/1/size", 2, "foo_bar_size")
+    # default profile --------------------
+    client.field_add("/foo/bar/0/size", type="int", default=1, desc="Foo bar")
+    client.field_add("/foo/bar/1/size", type="int", default=1, desc="Foo bar")
+    client.entry_add("/foo/bar/0/size", 2)
+    client.entry_add("/foo/bar/1/size", 2)
     client.entry_list().addCallback(print_entries)
     # no need to run reactor since everything is synchronous so far.
-    client.entry_default("/foo/bar/1/size")
     client.entry_list().addCallback(print_entries)
-    client.state_duplicate("other")
+    client.profile_duplicate("other") # --------------------------
+    client.entry_default("/foo/bar/1/size")
+    client.entry_add("/foo/bar/0/size", 2)
+    client.entry_list().addCallback(print_entries)
     #print("JELLY SAVE TO: %s" % (client.db.file_name))
     #serial_save(client.db.file_name, client.db)
     #restored_db = serial_load(client.db.file_name)
