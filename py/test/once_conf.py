@@ -24,8 +24,17 @@ Tests for the conf module.
 from twisted.trial import unittest
 from twisted.internet import defer
 from miville.utils import conf
+import tempfile
+from twisted.python import failure
 
+conf.DEFAULT_FILE_NAME = tempfile.mktemp()
 # data is persistent in database between each test.
+
+class TestError(Exception):
+    """
+    Error raised by a test case.
+    """
+    pass
 
 class Test_01_Conf(unittest.TestCase):
     def setUp(self):
@@ -35,11 +44,18 @@ class Test_01_Conf(unittest.TestCase):
     def test_01_create_field(self):
         return self.client.field_add("/egg", type="int", desc="Egg")
 
-    def test_01_validate_duplicate_fields(self):
+    def test_02_validate_duplicate_fields(self):
+        """
+        This test makes sure the Deferred triggers a Failure.
+        It was not easy to figure out, so please copy and paste.
+        """
         def _callback(result, test_case):
-            test_case.fail("Should raise error.")
+            return failure.Failure(TestError("Calling field_add() should have raised a failure."))
         def _errback(result, test_case):
-            pass
+            if isinstance(result.value, TestError):
+                return result # a failure
+            else:
+                return True # instead of return result
         deferred = self.client.field_add("/egg", type="int", desc="Egg")
         deferred.addCallback(_callback, self)
         deferred.addErrback(_errback, self)
@@ -60,6 +76,7 @@ class Test_01_Conf(unittest.TestCase):
             for key in ["/egg", "/ham"]:
                 if not result.has_key(key):
                     test_case.fail("Key not found: %s" % (key))
+            return result
         return self.client.entry_list().addCallback(_check, self)
 
     def test_06_entry_to_default(self):
@@ -83,6 +100,7 @@ class Test_01_Conf(unittest.TestCase):
             for key in ["/egg", "/ham"]:
                 if not result.has_key(key):
                     test_case.fail("Entry not found, but should be there: %s" % (key))
+            return result
         return self.client.entry_list().addCallback(_check, self)
 
     def test_12_new_profile(self):
@@ -94,6 +112,7 @@ class Test_01_Conf(unittest.TestCase):
             for key in ["default", "other", "one more"]:
                 if not result.has_key(key):
                     test_case.fail("Profile not found, but should be there: %s" % (key))
+            return result
         return self.client.profile_list()
 
     def test_14_remove_field(self):
@@ -108,6 +127,7 @@ class Test_01_Conf(unittest.TestCase):
             for not_there in ["/egg"]:
                 if result.has_key(not_there):
                     test_case.fail("Field found, but should not be there: %s" % (not_there))
+            return result
         return self.client.field_list().addCallback(_check, self)
 
     def test_16_remove_profile(self):
