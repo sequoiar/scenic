@@ -64,6 +64,7 @@ if __name__ == "__main__":
         # child
         sleep(2)
         os.execl("/usr/bin/firefox", "firefox", "http://localhost:8080")
+        #os.execl("/usr/bin/prism", "prism", "-webapp", "miville@sat.qc.ca")
     else:
         # parent
         if mivilled_is_running is not True:   
