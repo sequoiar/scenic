@@ -78,8 +78,8 @@ linkcheck:
 check:
 
 install: 
-	echo mkdir -p $(DESTDIR)$(prefix)/share/doc/sphinx
-	echo cp -fvr _build/html/ $(DESTDIR)$(prefix)/share/doc/sphinx
+	echo mkdir -p $(DESTDIR)$(docdir)/sphinx
+	echo cp -fvr _build/html/ $(DESTDIR)$(docdir)/sphinx
 
 uninstall:
-	rm -rf $(PREFIX)/share/doc/sphinx	
+	rm -rf $(DESTDIR)$(docdir)/sphinx

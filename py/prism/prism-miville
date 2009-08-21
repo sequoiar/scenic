@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# Script created by Fabien Tassin <fta@sofaraway.org> in Sept 2007.
+
+XULRUNNER=/usr/bin/xulrunner-1.9
+WEBRUNNER=/usr/share/prism
+WEBAPPDIR=/usr/share/prism/apps
+
+if [ "$1" = "-d" ] ; then
+  DEBUG="-console -jsconsole"
+  shift
+fi
+
+if [ "Z$1" != Z ] && [ "`echo $1 | sed -e 's/.*\.//'`" = "webapp" ] ; then
+  WEBAPP=`echo $1 | sed -e 's,^file://,,'`
+  FILE=$WEBAPP
+else
+  APPNAME=`basename $0 | sed -e 's/\.sh$//; s/prism-//'`
+  if [ -f $WEBAPPDIR/$APPNAME.webapp ] ; then
+    FILE=$WEBAPPDIR/$APPNAME.webapp
+  else
+    ARGS=$@
+  fi
+fi
+
+if [ "Z$FILE" != "Z" ] ; then
+  # If this webapp has already been extracted, run it by its id rather than
+  # by its filename that unpacks it at each run.
+  # It's important to preserve the json file for window size and position.
+  ARGS="-webapp $FILE"
+  if [ -f $FILE ] ; then
+    ID=`unzip -p $FILE webapp.ini | grep ^id= | cut -d= -f2 | tr -d '\r'`
+    if [ -d $HOME/.prism ] ; then
+      PROFILE=`grep -E '^Path=.*default' $HOME/.prism/profiles.ini | cut -d= -f2`
+      DIR=$HOME/.prism/$PROFILE/webapps/$ID
+      if [ -d $DIR ] ; then
+        # The webapp already exists. Check for the png icon.
+        WNAME=`grep -E '^icon=' $DIR/webapp.ini | cut -d= -f2 | tr -d '\r'`
+        if [ ! -f $DIR/icons/default/$WNAME.png ] ; then
+          ( cd $DIR/icons/default ; unzip $FILE $WNAME.png )
+        fi
+        ARGS="-webapp $ID"
+      fi
+    fi
+  fi
+fi
+
+exec $XULRUNNER $WEBRUNNER/application.ini $DEBUG $ARGS

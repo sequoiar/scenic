@@ -209,6 +209,7 @@ AC_CONFIG_FILES([Makefile
                  py/Makefile
                  py/docs/Makefile
                  py/maugis/Makefile
+                 py/prism/Makefile
                  py/miville/Makefile
                  py/miville/connectors/Makefile
                  py/miville/connectors/basic/Makefile
