@@ -6,7 +6,7 @@ TESTS_ENVIRONMENT = LANG=en_CA.UTF-8 trial
         
 all: miville.webapp
 
-miville.webapp:
+miville.webapp: webapp.ini
 	@zip miville.webapp webapp.ini localstore.json
 	
 TESTS = test/test_addressbook.py \

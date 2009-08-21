@@ -132,7 +132,7 @@ AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
 
 #AC_SUBST(PYTHON_CFLAGS)
 #AC_SUBST(PYTHON_LIBS)
-
+AX_PYTHON
 
 AX_BOOST_BASE([1.35])
 AX_BOOST_THREAD
@@ -140,7 +140,6 @@ AX_BOOST_SYSTEM
 AX_BOOST_ASIO
 AX_BOOST_UNIT_TEST_FRAMEWORK
 if test "x$with_boost_python" != "x" ; then 
-    AX_PYTHON
     AM_PATH_PYTHON(2.4, have_python=true,have_python=false)
     if test "x$with_boost_python" = "xyes" ; then
         with_boost_python=no
