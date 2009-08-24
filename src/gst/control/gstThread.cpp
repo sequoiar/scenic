@@ -31,6 +31,33 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 
+/**
+ * The IPCP protocol is a home-made TCP ASCII protocol similar to telnet. 
+ *
+ * It is used to allow milhouse to be controlled by an other process, such as Python. (miville)
+ *
+ * The syntax is similar to a Python dict, but not quite. The command is either "audio_init" or
+ * "video_init", followed by a colon (":") and the list of key-value pairs, separated by spaces. 
+ * The UNIX endline character (13) is used to separate the messages. 
+ *
+ * Both the receiver thread and the sender thread receive an ASCII string that look similar, but with 
+ * different arguments. They both accept the command "audio_init" and "video_init".
+ *
+ * A typical message to the sender and receiver thread is a string that looks like those examples below. 
+ *
+ * Messages to the SENDER :
+ * 
+ *   audio_init: codec="raw" port=10010 address="127.0.0.1" source="audiotestsrc" channels=2 ack="ok"
+ *   video_init: codec="mpeg4" port=12007 address="127.0.0.1" bitrate=??? source="videotestsrc" device="" location=""
+ *
+ * Messages to the RECEIVER : 
+ *
+ *   audio_init: codec="raw" port=10010 address="127.0.0.1" channels=2  sink="jackaudiosink" device="" audio_buffer_usec=""
+ *   video_init: codec="mpeg4" port=12007 address="127.0.0.1" bitrate=??? source=??? screen=0 sink="xvimagesink" deinterlace=???
+ *
+ * They also accept the message "start", "stop" and "rtp". They answer with a bunch of messages in the same fashion. 
+ * Name, the "success" and "failure" messages. 
+ */
 void GstThread::stop(MapMsg& ){ playback::stop();} 
 void GstThread::start(MapMsg&)
 {
@@ -179,7 +206,6 @@ GstReceiverThread::~GstReceiverThread()
     delete video_;
     delete audio_;
 }
-
 
 void GstReceiverThread::video_init(MapMsg& msg)
 {
