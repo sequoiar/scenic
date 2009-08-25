@@ -36,6 +36,7 @@
 
 #include <GL/glu.h>
 
+#include "videoSource.h"
 #include "glVideoSink.h"
 
         
@@ -76,7 +77,7 @@ bool GLImageSink::handleBusMsg(GstMessage * message)
 
 gboolean GLImageSink::reshapeCallback(GLuint width, GLuint height)
 {
-    GLfloat vwinRatio = (gfloat) WIDTH / (gfloat) HEIGHT ;
+    GLfloat vwinRatio = (gfloat) VideoSource::WIDTH / (gfloat) VideoSource::HEIGHT ;
     LOG_DEBUG("WIDTH: " << width << ", HEIGHT: " << height << std::endl);
     
     // /TODO:oldDOCS
@@ -313,7 +314,7 @@ void GLImageSink::init()
             gtk_window_move(GTK_WINDOW(window_), xine[j].x_org, xine[j].y_org);
     }
 
-    gtk_window_set_default_size(GTK_WINDOW(window_), WIDTH, HEIGHT);
+    gtk_window_set_default_size(GTK_WINDOW(window_), VideoSource::WIDTH, VideoSource::HEIGHT);
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
     gtk_window_stick(GTK_WINDOW(window_));           // window is visible on all workspaces
     g_signal_connect(G_OBJECT(window_), "key-press-event",

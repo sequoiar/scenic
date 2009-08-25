@@ -64,8 +64,6 @@ class GtkVideoSink
     protected:
         _GtkWidget *window_;
         int screen_num_;
-        static const unsigned int WIDTH = 640;
-        static const unsigned int HEIGHT = 480;
 
         static void destroy_cb(_GtkWidget * /*widget*/, void *data);
         Window getXWindow();

@@ -37,14 +37,14 @@ class VideoSource
         virtual void init();
         virtual std::string srcCaps() const;
         void setCapsFilter(const std::string &srcCaps);
+        static const int WIDTH = 640;
+        static const int HEIGHT = 480;
 
     protected:
         explicit VideoSource(const VideoSourceConfig &config);
         const VideoSourceConfig &config_;
         _GstElement *source_;
         _GstElement *capsFilter_;
-        static const int WIDTH = 640;
-        static const int HEIGHT = 480;
         std::string defaultSrcCaps() const;
 
     private:
