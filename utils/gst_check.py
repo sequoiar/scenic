@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2008 Société des arts technologiques (SAT)
+# http://www.sat.qc.ca
+# All rights reserved.
+#
+# This file is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# Sropulpof is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Sropulpof.  If not, see <http:#www.gnu.org/licenses/>.
+#
+
+""" Checks this host to ensure all gstreamer plugins needed by milhouse
+are installed """
+
+import glob
+import os
+import sys
+import re
+
+try:
+    import pygst
+    pygst.require('0.10')
+    import gst
+except ImportError:
+    print("import failed, please install gst-python")
+    sys.exit(1)
+
+# Get the full path to cpp files relative to the script location
+cwd = os.path.dirname(os.path.realpath(__file__))
+cpp_files = glob.glob(os.path.realpath(cwd + "/../src/gst/engine") + "/*.cpp")
+if ( len(cpp_files) == 0):
+    sys.stderr.write("No cpp files found. Make sure the script is located within source directory \"utils\".")
+    sys.exit(2)
+    
+# List of tuples where first item is the match object, second is 
+matches = [
+    re.compile(r"^.*makeElement\(\""), 
+    re.compile(r"^.*source_ \ ==\ \""),
+    re.compile(r"^.*sink_ \ ==\ \""),
+]
+
+end = re.compile(r"\".*$")
+
+gst_plugins = []
+missing_plugins = []
+
+# Scan for files and retrieve used gst elements
+for source_file in cpp_files:
+    try:
+        f = open(source_file)
+        for line in f:
+            for m in matches:
+                if (m.search(line) is not None):
+                    """ 
+                    1) We strip the line
+                    2) We substitute the match with the empty string
+                    3) We strip all characters after the double quote    
+                    """
+                    gst_plugins.append((end.sub("", m.sub("", line.strip()))))
+
+    except IOError, e:
+        sys.stderr.write(e)
+    finally:
+        f.close()
+
+gst_plugins = list(set(gst_plugins))
+gst_plugins.sort()
+
+for plugin in gst_plugins:
+    if gst.element_factory_find(plugin) is None: 
+        print("Error: plugin " + plugin + " is NOT installed")
+        missing_plugins.append(plugin)
+    else:
+        print(plugin + " installed")
+print("-------------------------------")
+if len(missing_plugins) == 0:
+    print("All " + str(len(gst_plugins)) + " necessary plugins installed")
+else:
+    print("The following gstreamer plugins need to be installed: ")
+    for plugin in missing_plugins:
+        print(plugin)
+    print("You may have to install the corresponding development headers \
+    (i.e. lib<MODULE>-dev)")
+    print("before building the missing gstreamer plugins")
