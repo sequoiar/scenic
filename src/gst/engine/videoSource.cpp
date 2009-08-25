@@ -23,6 +23,7 @@
 #include "util.h"
 
 #include "gstLinkable.h"
+#include "videoSize.h"
 #include "videoSource.h"
 #include "pipeline.h"
 #include "videoConfig.h"
@@ -57,7 +58,7 @@ std::string VideoSource::defaultSrcCaps() const
     std::ostringstream capsStr;
     /*capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
         << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; */
-    capsStr << "video/x-raw-yuv, width=" << WIDTH << ", height=" << HEIGHT;
+    capsStr << "video/x-raw-yuv, width=" << VideoSize::WIDTH << ", height=" << VideoSize::HEIGHT;
     return capsStr.str();
 }
 

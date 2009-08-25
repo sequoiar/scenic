@@ -20,7 +20,7 @@ libgst_la_SOURCES = mediaBase.cpp \
 				   gstLinkable.h videoSink.h audioSink.h $(inc)/jackUtils.h \
 				   codec.h rtpPay.h audioConfig.h remoteConfig.h \
 				   videoReceiver.h videoSender.h videoSource.h raw1394Util.h \
-				   audioLevel.h glVideoSink.h playback.h dv1394.h v4l2util.h fileSource.h
+				   audioLevel.h glVideoSink.h playback.h dv1394.h v4l2util.h fileSource.h videoSize.h
 
 libgst_la_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS)
 
