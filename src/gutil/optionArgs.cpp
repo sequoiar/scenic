@@ -126,6 +126,8 @@ void OptionArgs::parse(int argc, char **argv)
 
     if (!g_option_context_parse (context, &argc, &argv, &error)) {
         g_option_context_free(context);
+        // FIXME: hack because the exception message never gets printed
+        std::cerr << "option parsing failed: " << error->message << std::endl;
         THROW_CRITICAL("option parsing failed: " << error->message);
     }
     

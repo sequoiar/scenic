@@ -20,6 +20,9 @@
  *
  */
 
+
+#include <cstdlib>
+
 #include "util.h"
 
 #include "gutil.h"
@@ -93,7 +96,9 @@ short pof::run(int argc, char **argv)
 {
     OptionArgs options;
     addOptions(options);
+
     options.parse(argc, argv);
+
 #ifdef SVNVERSION
     std::cout << "Ver:" << PACKAGE_VERSION << " Rev #" << SVNVERSION << std::endl;
 #else
@@ -106,6 +111,9 @@ short pof::run(int argc, char **argv)
         return telnetServer(options["sender"], options["serverport"]);
 
     MilhouseLogger logger; // just instantiate, his base class will know what to do 
+
+    LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
+
     if(options["version"])
     {
 #ifdef SVNVERSION
@@ -258,7 +266,6 @@ short pof::run(int argc, char **argv)
     }
     return 0;
 }
-#include <stdlib.h>
 
 void onExit(void)
 {
@@ -270,7 +277,6 @@ int main(int argc, char **argv)
 {
     int ret = 0;
     atexit (onExit);
-    LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
     try {
         set_handler();
         ret = pof::run(argc, argv);
