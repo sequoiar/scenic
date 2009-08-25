@@ -63,8 +63,14 @@ if __name__ == "__main__":
     if pid == 0:
         # child
         sleep(2)
-        os.execl("/usr/bin/firefox", "firefox", "http://localhost:8080")
-        #os.execl("/usr/bin/prism", "prism", "-webapp", "miville@sat.qc.ca")
+        if os.path.isfile("/usr/bin/prism"):
+            try:
+                os.execlp("prism-miville", "prism-miville")
+            except OSError, e:
+                sys.stderr.write("prism-miville: " + e.strerror)
+                sys.exit(1)
+        else:
+            os.execl("/usr/bin/firefox", "firefox", "http://localhost:8080")
     else:
         # parent
         if mivilled_is_running is not True:   

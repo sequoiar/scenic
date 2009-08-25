@@ -41,8 +41,12 @@ cpp_files = glob.glob(os.path.realpath(cwd + "/../src/gst/engine") + "/*.cpp")
 if ( len(cpp_files) == 0):
     sys.stderr.write("No cpp files found. Make sure the script is located within source directory \"utils\".")
     sys.exit(2)
-    
-# List of tuples where first item is the match object, second is 
+
+""" List of matches
+codec_ = Pipeline::Instance()->makeElement("theoraenc", NULL);
+if (source_ == "videotestsrc")
+if (sink_ == "xvimagesink")
+"""
 matches = [
     re.compile(r"^.*makeElement\(\""), 
     re.compile(r"^.*source_ \ ==\ \""),
@@ -62,6 +66,7 @@ for source_file in cpp_files:
             for m in matches:
                 if (m.search(line) is not None):
                     """ 
+                    We want to push the element name in the gst_plugins list:
                     1) We strip the line
                     2) We substitute the match with the empty string
                     3) We strip all characters after the double quote    
