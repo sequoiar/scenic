@@ -270,10 +270,11 @@ class ConnectionBasic(Connection):
         log.info('Basic connector is done. %s' % (reason.getErrorMessage()))
 
     def _close_connection(self):
-        try:
-            self._timeout.cancel()
-        except (error.AlreadyCalled, error.AlreadyCancelled), err:
-            log.debug(err)
+        if self._timeout is not None:
+            try:
+                self._timeout.cancel()
+            except (error.AlreadyCalled, error.AlreadyCancelled), err:
+                log.debug(err)
         self.connection.transport.loseConnection()
 
     def _accepted(self):
