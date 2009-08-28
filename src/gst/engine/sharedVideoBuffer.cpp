@@ -38,6 +38,12 @@ void SharedVideoBuffer::pushSentinel()
     hasSentinel_ = true;
 }
 
+
+void SharedVideoBuffer::removeSentinel()
+{
+    hasSentinel_ = false;
+}
+
 // notify the consumer process that there is a new buffer
 void SharedVideoBuffer::notifyConsumer()
 {

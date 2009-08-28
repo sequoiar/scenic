@@ -22,6 +22,8 @@ class SharedVideoBuffer
         void pushBuffer(unsigned char *newBuffer, size_t size);
 
         void pushSentinel();
+       
+        void removeSentinel();
         
         void notifyConsumer();
 
