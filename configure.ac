@@ -75,6 +75,14 @@ if test "x${have_gstreamer_audio}" = "xfalse" ; then
     AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
 fi
 
+
+#Trying to set GSTAPP using pkg-config
+PKG_CHECK_MODULES(GSTAPP, gstreamer-app-0.10, have_gstreamer_app=true, have_gstreamer_app=false)
+if test "x${have_gstreamer_app}" = "xfalse" ; then
+    AC_MSG_ERROR([missing pkg -  libgstreamer-plugins-base0.10-dev  ])
+fi
+
+
 #Trying to set JACK using pkg-config
 PKG_CHECK_MODULES(JACK, jack >= 0.99.10, have_jack=true, have_jack=false)
 if test "x${have_jack}" = "xfalse" ; then
@@ -100,7 +108,7 @@ if test "x${have_libraw1394}" = "xfalse" ; then
 	AC_MSG_ERROR([missing pkg - libraw1394-dev ])
 fi
 
-AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS")
+AC_SUBST(ALL_GST_LIBS, "$GST_LIBS $GSTAUDIO_LIBS $GSTAPP_LIBS")
 #AC_SUBST(ALL_GST_LIBS)
 
 #if test "x${enable_sip}" = "xyes" ; then
@@ -138,6 +146,7 @@ AX_BOOST_BASE([1.35])
 AX_BOOST_THREAD
 AX_BOOST_SYSTEM
 AX_BOOST_ASIO
+AX_BOOST_DATE_TIME
 AX_BOOST_UNIT_TEST_FRAMEWORK
 if test "x$with_boost_python" != "x" ; then 
     AM_PATH_PYTHON(2.4, have_python=true,have_python=false)

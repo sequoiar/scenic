@@ -54,7 +54,7 @@ VideoReceiver::~VideoReceiver()
 
 void VideoReceiver::toggleFullscreen()
 {
-    sink_->toggleFullscreen();
+    sink_->sendMessage("fullscreen");
 }
 
 void VideoReceiver::init_codec()

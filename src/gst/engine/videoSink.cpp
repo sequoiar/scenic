@@ -42,6 +42,11 @@ void VideoSink::destroySink()
     Pipeline::Instance()->remove(&sink_);
 }
 
+void VideoSink::defaultMessage(const std::string &message)
+{
+    LOG_ERROR("Unimplemented message " << message);
+}
+
 Window GtkVideoSink::getXWindow()
 { 
     return GDK_WINDOW_XWINDOW(window_->window);
@@ -96,6 +101,15 @@ void GtkVideoSink::makeUnfullscreen(GtkWidget *widget)
 {
     gtk_window_unstick(GTK_WINDOW(widget));           // window is not visible on all workspaces
     gtk_window_unfullscreen(GTK_WINDOW(widget));
+}
+
+
+void GtkVideoSink::handleMessage(const std::string &message)
+{
+    if (message == "fullscreen")
+        toggleFullscreen();
+    else
+        VideoSink::defaultMessage(message);
 }
 
 
@@ -220,5 +234,11 @@ XImageSink::~XImageSink()
 {
     VideoSink::destroySink();
     Pipeline::Instance()->remove(&colorspc_);
+}
+
+
+void XImageSink::handleMessage(const std::string &message)
+{
+    VideoSink::defaultMessage(message);
 }
 

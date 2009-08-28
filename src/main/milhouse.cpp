@@ -176,7 +176,7 @@ short pof::run(int argc, char **argv)
         }
 
 #ifdef CONFIG_DEBUG_LOCAL
-        playback::makeVerbose();
+        //playback::makeVerbose();
 #endif
 
         playback::start();

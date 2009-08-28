@@ -26,6 +26,7 @@
 #include "videoConfig.h"
 #include "videoSource.h"
 #include "videoSink.h"
+#include "sharedVideoSink.h"
 
 #ifdef CONFIG_GL
 #include "glVideoSink.h"
@@ -86,6 +87,8 @@ VideoSink * VideoSinkConfig::createSink() const
     else if (sink_ == "glimagesink")
         return new GLImageSink(screenNum_);
 #endif
+    else if (sink_ == "sharedvideosink")
+        return new SharedVideoSink();
     else
         THROW_ERROR(sink_ << " is an invalid sink");
     

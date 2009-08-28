@@ -38,30 +38,32 @@ class VideoSink : public GstLinkableSink
        VideoSink() : sink_(0) {};
         virtual ~VideoSink(){};
         virtual void init() = 0;
-        virtual void toggleFullscreen() = 0; 
-        void destroySink();
+        void sendMessage(const std::string &message) { handleMessage(message); } 
 
     protected:
+        virtual void destroySink();
+        virtual void defaultMessage(const std::string &message);
         void prepareSink();
         _GstElement *sink_;
 
     private:
-       VideoSink(const VideoSink&);     //No Copy Constructor
-       VideoSink& operator=(const VideoSink&);     //No Assignment Operator
+        virtual void handleMessage(const std::string &message) = 0;
+        VideoSink(const VideoSink&);     //No Copy Constructor
+        VideoSink& operator=(const VideoSink&);     //No Assignment Operator
 };
 
 class GtkVideoSink
-    : public VideoSink
+: public VideoSink
 {
     public:
-       GtkVideoSink(int screen_num)
+        GtkVideoSink(int screen_num)
             : window_(0), screen_num_(screen_num) {};
         virtual ~GtkVideoSink(){};
-        void toggleFullscreen() { toggleFullscreen(window_); }
         void showWindow();
 
-        
+
     protected:
+        void toggleFullscreen() { toggleFullscreen(window_); }
         _GtkWidget *window_;
         int screen_num_;
 
@@ -74,14 +76,15 @@ class GtkVideoSink
         static void toggleFullscreen(_GtkWidget *widget);
 
     private:
+        virtual void handleMessage(const std::string &message);
 
-       GtkVideoSink(const GtkVideoSink&);     //No Copy Constructor
-       GtkVideoSink& operator=(const GtkVideoSink&);     //No Assignment Operator
+        GtkVideoSink(const GtkVideoSink&);     //No Copy Constructor
+        GtkVideoSink& operator=(const GtkVideoSink&);     //No Assignment Operator
 };
 
 
 class XvImageSink
-    : public GtkVideoSink, public BusMsgHandler
+: public GtkVideoSink, public BusMsgHandler
 {
     public:
         XvImageSink(int screenNum) : GtkVideoSink(screenNum) {};
@@ -106,10 +109,9 @@ class XImageSink
         XImageSink() : colorspc_(0) {};
 
     private:
+        virtual void handleMessage(const std::string &message);
         ~XImageSink();
         void init();
-        // FIXME: need to implement this support in ximagesink. maybe impossible?
-        void toggleFullscreen() {}
 
         _GstElement *sinkElement() { return colorspc_; }
         _GstElement *colorspc_;
