@@ -34,30 +34,43 @@
 #include <boost/interprocess/sync/scoped_lock.hpp>
 
 
+using boost::interprocess::shared_memory_object;
+using boost::interprocess::read_write;
+using std::tr1::shared_ptr;
+
+
 const std::string SharedVideoSink::id_("shared_memory");
 
-SharedVideoSink::SharedVideoSink() : colorspc_(0), shm_(0), region_(0), sharedBuffer_(0)
+
+shared_ptr<shared_memory_object> SharedVideoSink::createSharedMemory()
 {
-    using boost::interprocess::shared_memory_object;
     using boost::interprocess::create_only;
-    using boost::interprocess::read_write;
-    using boost::interprocess::mapped_region;
 
-    // Erase previously shared memory
-    shared_memory_object::remove(id_.c_str());
-
+    removeSharedMemory();
     // create a shared memory object
-    shm_ = new shared_memory_object(create_only, id_.c_str(), read_write);
-
+    shared_ptr<shared_memory_object> shm(new shared_memory_object(create_only, id_.c_str(), read_write)); 
     // set size
-    shm_->truncate(sizeof(shared_data));
+    shm->truncate(sizeof(shared_data));
+    return shm;
+}
 
-    // map the whole shared memory in this process
-    region_ = new mapped_region(*shm_, read_write);
 
+bool SharedVideoSink::removeSharedMemory()
+{
+    // Erase previously shared memory
+    return shared_memory_object::remove(id_.c_str());
+}
+
+
+SharedVideoSink::SharedVideoSink() : 
+    colorspc_(0), 
+    shm_(createSharedMemory()), 
+    region_(*shm_, read_write), // map the whole shared memory in this process
+    sharedBuffer_(0)
+{
     // get the address of the mapped region
-    void *addr = region_->get_address();
-        
+    void *addr = region_.get_address();
+
     // construct the shared structure in memory with placement new
     sharedBuffer_ = new (addr) shared_data;
 }
@@ -68,22 +81,18 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
     using boost::interprocess::scoped_lock;
     using boost::interprocess::interprocess_mutex;
     using boost::interprocess::interprocess_exception;
-    using boost::interprocess::shared_memory_object;
 
     static unsigned long long bufferCount = 0;
     GstBuffer *buffer = 0;
     guint size;
-    
+
     try
     {
         /* get the buffer from appsink */
         buffer = gst_app_sink_pull_buffer(GST_APP_SINK(elt));
 
         // lock the mutex
-        std::cout << "ACQUIRING LOCK\n";
         scoped_lock<interprocess_mutex> lock(context->sharedBuffer_->getMutex());
-        std::cout << "ACQUIRED LOCK\n";
-
         // if a buffer has been pushed, wait until the consumer tells us
         // it's consumed it
         context->sharedBuffer_->waitOnConsumer(lock);
@@ -106,7 +115,7 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
     }
     catch (interprocess_exception &ex)
     {
-        shared_memory_object::remove(id_.c_str());
+        removeSharedMemory();
         g_print("%s\n", ex.what());
         /* we don't need the appsink buffer anymore */
         gst_buffer_unref(buffer);
@@ -139,13 +148,9 @@ void SharedVideoSink::init()
 
 SharedVideoSink::~SharedVideoSink()
 {
-    using boost::interprocess::shared_memory_object;
-
     destroySink();
     Pipeline::Instance()->remove(&colorspc_);
     shared_memory_object::remove(id_.c_str());
-    delete shm_;
-    delete region_;
 }
 
 

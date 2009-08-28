@@ -58,7 +58,6 @@ void shared_data::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
 {
     while (bufferIn_)
     {
-        std::cout << "WAITING ON CONSUMER\n";
         conditionFull_.wait(lock);
     }
 }
