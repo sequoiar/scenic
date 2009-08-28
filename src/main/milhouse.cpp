@@ -72,6 +72,7 @@ void addOptions(OptionArgs &options)
     options.addInt("audioport", 't', "audioport", "portnum");
     options.addInt("videoport", 'p', "videoport", "portnum");
     options.addBool("fullscreen", 'f', "default to fullscreen");
+    options.addString("shared_video_id", 'B', "shared video buffer id", "shared_memory");
     options.addBool("deinterlace", 'o', "deinterlace video");
     options.addString("videodevice", 'd', "device", "/dev/video0 /dev/video1");
     options.addString("audiodevice", 'q', "audio device", "hw:0 hw:2 plughw:0 plughw:2");
@@ -135,6 +136,7 @@ short pof::run(int argc, char **argv)
             RtpSender::enableControl();
     }
 
+    // Must have these arguments
     int disableVideo = !options["videocodec"] and !options["videoport"];
     int disableAudio = !options["audiocodec"] and !options["audioport"];
 
@@ -157,8 +159,11 @@ short pof::run(int argc, char **argv)
 
         if (!disableVideo)       
         {
+            if (!options["shared_video_id"])
+                    options["shared_video_id"] = "shared_memory";
+
             vRx = videofactory::buildVideoReceiver(options["address"], options["videocodec"], 
-                    options["videoport"], options["screen"], options["videosink"], options["deinterlace"]);
+                    options["videoport"], options["screen"], options["videosink"], options["deinterlace"], options["shared_video_id"]);
         }
         if (!disableAudio)
         {

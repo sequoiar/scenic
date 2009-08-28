@@ -39,32 +39,30 @@ using boost::interprocess::read_write;
 using std::tr1::shared_ptr;
 
 
-const std::string SharedVideoSink::id_("shared_memory");
-
-
-shared_ptr<shared_memory_object> SharedVideoSink::createSharedMemory()
+shared_ptr<shared_memory_object> SharedVideoSink::createSharedMemory(const std::string &id)
 {
     using boost::interprocess::create_only;
 
-    removeSharedMemory();
+    removeSharedMemory(id);
     // create a shared memory object
-    shared_ptr<shared_memory_object> shm(new shared_memory_object(create_only, id_.c_str(), read_write)); 
+    shared_ptr<shared_memory_object> shm(new shared_memory_object(create_only, id.c_str(), read_write)); 
     // set size
     shm->truncate(sizeof(SharedVideoBuffer));
     return shm;
 }
 
 
-bool SharedVideoSink::removeSharedMemory()
+bool SharedVideoSink::removeSharedMemory(const std::string &id)
 {
     // Erase previously shared memory
-    return shared_memory_object::remove(id_.c_str());
+    return shared_memory_object::remove(id.c_str());
 }
 
 
-SharedVideoSink::SharedVideoSink() : 
+SharedVideoSink::SharedVideoSink(const std::string &id) : 
+    id_(id),
     colorspc_(0), 
-    shm_(createSharedMemory()), 
+    shm_(createSharedMemory(id_)), 
     region_(*shm_, read_write), // map the whole shared memory in this process
     sharedBuffer_(0)
 {
@@ -115,7 +113,7 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
     }
     catch (interprocess_exception &ex)
     {
-        removeSharedMemory();
+        removeSharedMemory(context->id_);
         g_print("%s\n", ex.what());
         /* we don't need the appsink buffer anymore */
         gst_buffer_unref(buffer);
@@ -150,7 +148,7 @@ SharedVideoSink::~SharedVideoSink()
 {
     destroySink();
     Pipeline::Instance()->remove(&colorspc_);
-    shared_memory_object::remove(id_.c_str());
+    removeSharedMemory(id_);
 }
 
 

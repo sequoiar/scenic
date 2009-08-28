@@ -88,7 +88,7 @@ VideoSink * VideoSinkConfig::createSink() const
         return new GLImageSink(screenNum_);
 #endif
     else if (sink_ == "sharedvideosink")
-        return new SharedVideoSink();
+        return new SharedVideoSink(sharedVideoId_);
     else
         THROW_ERROR(sink_ << " is an invalid sink");
     

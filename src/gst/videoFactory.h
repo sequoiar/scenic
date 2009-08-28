@@ -36,7 +36,8 @@ namespace videofactory
 
     static VideoReceiver* 
     buildVideoReceiver_(const std::string &ip, const std::string &codec, int port, 
-            int screen_num, const std::string &sink, bool deinterlace);
+            int screen_num, const std::string &sink, bool deinterlace, 
+            const std::string &sharedVideoId);
 
     static VideoSender* 
     buildVideoSender_(const VideoSourceConfig vConfig, 
@@ -64,10 +65,11 @@ videofactory::buildVideoReceiver_(const std::string &ip,
                                   int port, 
                                   int screen_num, 
                                   const std::string &sink,
-                                  bool deinterlace)
+                                  bool deinterlace,
+                                  const std::string &sharedVideoId)
 {
     assert(!sink.empty());
-    VideoSinkConfig vConfig(sink, screen_num, deinterlace);
+    VideoSinkConfig vConfig(sink, screen_num, deinterlace, sharedVideoId);
     int id;
     int videoCapsPort = port + ports::CAPS_OFFSET;
     LOG_DEBUG("Waiting for video caps on port: " << videoCapsPort);
@@ -99,9 +101,10 @@ namespace videofactory
                        int port, 
                        int screen_num, 
                        const std::string &sink,
-                       bool deinterlace)
+                       bool deinterlace,
+                       const std::string &sharedVideoId)
     {
-        return shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, screen_num, sink, deinterlace));
+        return shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, screen_num, sink, deinterlace, sharedVideoId));
     }
 
     static shared_ptr<VideoSender> 

@@ -1,4 +1,5 @@
 #include "./sharedVideoBuffer.h"
+#include "gutil.h"
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/thread.hpp>

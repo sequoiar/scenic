@@ -70,13 +70,13 @@ class VideoSinkConfig
 {
     public:
 
-        VideoSinkConfig(const std::string & sink__, int screenNum, bool doDeinterlace__)
-            : sink_(sink__), screenNum_(screenNum), doDeinterlace_(doDeinterlace__)
+        VideoSinkConfig(const std::string & sink__, int screenNum, bool doDeinterlace__, const std::string & sharedVideoId__)
+            : sink_(sink__), screenNum_(screenNum), doDeinterlace_(doDeinterlace__), sharedVideoId_(sharedVideoId__)
         {}
 
         // copy constructor
         VideoSinkConfig(const VideoSinkConfig & m) 
-            : sink_(m.sink_) , screenNum_(m.screenNum_), doDeinterlace_(m.doDeinterlace_)
+            : sink_(m.sink_) , screenNum_(m.screenNum_), doDeinterlace_(m.doDeinterlace_), sharedVideoId_(m.sharedVideoId_)
         {}
 
         VideoSink* createSink() const;
@@ -87,6 +87,7 @@ class VideoSinkConfig
         const std::string sink_;
         const int screenNum_;
         bool doDeinterlace_;
+        const std::string sharedVideoId_;
 };
 
 #endif // _VIDEO_CONFIG_H_

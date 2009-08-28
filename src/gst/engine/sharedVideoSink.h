@@ -34,7 +34,7 @@ class SharedVideoBuffer;
 class SharedVideoSink : public VideoSink 
 {
     public:
-        SharedVideoSink();
+        SharedVideoSink(const std::string& sharedId_);
         virtual ~SharedVideoSink();
         virtual void init();
 
@@ -42,16 +42,15 @@ class SharedVideoSink : public VideoSink
          
         virtual void handleMessage(const std::string &message);
         void prepareSink();
-        static std::tr1::shared_ptr<boost::interprocess::shared_memory_object> createSharedMemory();
-        static bool removeSharedMemory();
+        static std::tr1::shared_ptr<boost::interprocess::shared_memory_object> createSharedMemory(const std::string &id);
+        static bool removeSharedMemory(const std::string &id);
         _GstElement *sinkElement() { return colorspc_; }
 
+        const std::string id_;
         _GstElement *colorspc_;
         std::tr1::shared_ptr<boost::interprocess::shared_memory_object> shm_;
         boost::interprocess::mapped_region region_;
         SharedVideoBuffer *sharedBuffer_;
-
-        static const std::string id_;
 
         static void onNewBuffer(_GstElement *elt, SharedVideoSink *context);
         SharedVideoSink(const SharedVideoSink&);
