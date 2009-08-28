@@ -96,9 +96,7 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
         context->sharedBuffer_->waitOnConsumer(lock);
 
         if (context->sharedBuffer_->hasSentinel())
-        {
             g_print("Pushed %lld buffers, should be quitting.\n", bufferCount);
-        }
         else    
         {
             std::cout << "PUSHING THE BUFFER\n";

@@ -622,6 +622,7 @@ class MilhouseTests():
 
         recv.videosink = 'sharedvideosink'
         recv.videocodec = 'theora' 
+        recv.shared_video_id = 'shared_memory1'
         send.videocodec = recv.videocodec
         self.run(recv, send)
 

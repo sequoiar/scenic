@@ -1,3 +1,4 @@
+-crash for real with a t_assert
 -make sure no exceptions can be thrown from destructors
 -figure out what happens if jack settings differ between machines
 -write about latency rtp issues/testing with netem scripts and so on
