@@ -28,7 +28,7 @@ bool SharedVideoBuffer::hasSentinel() const
 void SharedVideoBuffer::pushBuffer(unsigned char *newBuffer, size_t size)
 {
     // FIXME: dynamically sized buffer, changed by parameter size
-    assert(size == BUFFER_SIZE);
+    tassert(size == BUFFER_SIZE);
     memcpy(pixels, newBuffer, size);
 }
 
