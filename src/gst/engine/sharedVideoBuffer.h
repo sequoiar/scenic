@@ -1,17 +1,17 @@
-#ifndef _SHARED_DATA_H_
-#define _SHARED_DATA_H_
+#ifndef _SHARED_VIDEO_BUFFER_H_
+#define _SHARED_VIDEO_BUFFER_H_
 
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 
-class shared_data
+class SharedVideoBuffer
 {
     public:
         static const int WIDTH = 640;
         static const int HEIGHT = 480;
         static const double ASPECT_RATIO;
 
-        shared_data();
+        SharedVideoBuffer();
 
         boost::interprocess::interprocess_mutex & getMutex();
 
@@ -56,4 +56,4 @@ class shared_data
         bool hasSentinel_;
 };
 
-#endif // _SHARED_DATA_H_
+#endif // _SHARED_VIDEO_BUFFER_H_

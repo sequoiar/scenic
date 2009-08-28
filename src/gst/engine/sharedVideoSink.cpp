@@ -21,7 +21,7 @@
  */
 
 #include "./sharedVideoSink.h"
-#include "./shared_data.h"
+#include "./sharedVideoBuffer.h"
 #include "util.h"
 
 #include "./gstLinkable.h"
@@ -50,7 +50,7 @@ shared_ptr<shared_memory_object> SharedVideoSink::createSharedMemory()
     // create a shared memory object
     shared_ptr<shared_memory_object> shm(new shared_memory_object(create_only, id_.c_str(), read_write)); 
     // set size
-    shm->truncate(sizeof(shared_data));
+    shm->truncate(sizeof(SharedVideoBuffer));
     return shm;
 }
 
@@ -72,7 +72,7 @@ SharedVideoSink::SharedVideoSink() :
     void *addr = region_.get_address();
 
     // construct the shared structure in memory with placement new
-    sharedBuffer_ = new (addr) shared_data;
+    sharedBuffer_ = new (addr) SharedVideoBuffer;
 }
 
 

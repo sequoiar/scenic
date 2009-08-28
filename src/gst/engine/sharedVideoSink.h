@@ -29,7 +29,7 @@
 
 class _GtkWidget;
 class _GstElement;
-class shared_data;
+class SharedVideoBuffer;
 
 class SharedVideoSink : public VideoSink 
 {
@@ -49,7 +49,7 @@ class SharedVideoSink : public VideoSink
         _GstElement *colorspc_;
         std::tr1::shared_ptr<boost::interprocess::shared_memory_object> shm_;
         boost::interprocess::mapped_region region_;
-        shared_data *sharedBuffer_;
+        SharedVideoBuffer *sharedBuffer_;
 
         static const std::string id_;
 
