@@ -22,6 +22,7 @@
 #ifndef _VIDEO_SINK_H_
 #define _VIDEO_SINK_H_
 
+#include <string>
 #include <X11/Xlib.h>
 #include "gstLinkable.h"
 #include "busMsgHandler.h"
@@ -38,7 +39,7 @@ class VideoSink : public GstLinkableSink
        VideoSink() : sink_(0) {};
         virtual ~VideoSink(){};
         virtual void init() = 0;
-        void sendMessage(const std::string &message) { handleMessage(message); } 
+        void sendMessage(const std::string &message) { handleMessage(message); }
 
     protected:
         virtual void destroySink();
