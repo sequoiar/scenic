@@ -17,7 +17,7 @@ class SharedVideoBuffer
 
         unsigned char* pixelsAddress();
         
-        bool doPush() const;
+        bool isPushing() const;
         
         void pushBuffer(unsigned char *newBuffer, size_t size);
 

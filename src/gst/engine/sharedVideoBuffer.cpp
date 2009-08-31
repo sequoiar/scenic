@@ -21,7 +21,7 @@ unsigned char* SharedVideoBuffer::pixelsAddress()
     return pixels;
 }
 
-bool SharedVideoBuffer::doPush() const
+bool SharedVideoBuffer::isPushing() const
 {
     return doPush_;
 }
