@@ -102,7 +102,6 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
         // it's consumed it
         context->sharedBuffer_->waitOnConsumer(lock);
 
-        std::cout << "PUSHING THE BUFFER\n";
         // push the buffer
         size = GST_BUFFER_SIZE (buffer);
         context->sharedBuffer_->pushBuffer(GST_BUFFER_DATA(buffer), size);
