@@ -88,24 +88,23 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
     {
         /* get the buffer from appsink */
         buffer = gst_app_sink_pull_buffer(GST_APP_SINK(elt));
-        size = GST_BUFFER_SIZE (buffer);
 
         // lock the mutex
         scoped_lock<interprocess_mutex> lock(context->sharedBuffer_->getMutex());
-        
-        if (context->sharedBuffer_->hasSentinel())
-        {
-            g_print("Pushed %lld buffers, should stop pushing for now.\n", bufferCount);
-            return;
-        }
 
         // if a buffer has been pushed, wait until the consumer tells us
         // it's consumed it
         context->sharedBuffer_->waitOnConsumer(lock);
 
-        // push the buffer
-        context->sharedBuffer_->pushBuffer(GST_BUFFER_DATA(buffer), size);
-        ++bufferCount;
+        if (context->sharedBuffer_->hasSentinel())
+            g_print("Pushed %lld buffers, should stop pushing for now.\n", bufferCount);
+        else
+        {
+            // push the buffer
+            size = GST_BUFFER_SIZE (buffer);
+            context->sharedBuffer_->pushBuffer(GST_BUFFER_DATA(buffer), size);
+            ++bufferCount;
+        }
 
         context->sharedBuffer_->notifyConsumer();
         // mutex is released here (goes out of scope)
