@@ -82,7 +82,7 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
 
     static unsigned long long bufferCount = 0;
     GstBuffer *buffer = 0;
-    guint size;
+    size_t size;
 
     try
     {
@@ -153,6 +153,6 @@ SharedVideoSink::~SharedVideoSink()
 
 void SharedVideoSink::handleMessage(const std::string &message)
 {
-    VideoSink::defaultMessage(message);
+    VideoSink::defaultHandler(message);
 }
 

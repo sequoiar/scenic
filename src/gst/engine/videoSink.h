@@ -43,7 +43,7 @@ class VideoSink : public GstLinkableSink
 
     protected:
         virtual void destroySink();
-        virtual void defaultMessage(const std::string &message);
+        virtual void defaultHandler(const std::string &message);
         void prepareSink();
         _GstElement *sink_;
 

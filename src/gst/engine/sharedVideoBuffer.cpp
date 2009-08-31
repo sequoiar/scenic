@@ -29,7 +29,11 @@ bool SharedVideoBuffer::isPushing() const
 void SharedVideoBuffer::pushBuffer(unsigned char *newBuffer, size_t size)
 {
     // FIXME: dynamically sized buffer, changed by parameter size
-    tassert(size == BUFFER_SIZE);
+    if (size != BUFFER_SIZE)
+    {
+        std::cerr << "Cannot push unexpected video buffer size " << size << " to shared buffer\n";
+        return;
+    }
     memcpy(pixels, newBuffer, size);
 }
 
