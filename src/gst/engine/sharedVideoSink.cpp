@@ -97,7 +97,7 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
         // reacquired when this process is notified by the consumer.
         context->sharedBuffer_->waitOnConsumer(lock);
 
-        if (context->sharedBuffer_->doPush())
+        if (!context->sharedBuffer_->isPushing())
             g_print("Pushed %lld buffers, should stop pushing for now.\n", bufferCount);
         else
         {
