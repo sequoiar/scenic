@@ -88,6 +88,7 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
     {
         /* get the buffer from appsink */
         buffer = gst_app_sink_pull_buffer(GST_APP_SINK(elt));
+        size = GST_BUFFER_SIZE (buffer);
 
         // lock the mutex
         scoped_lock<interprocess_mutex> lock(context->sharedBuffer_->getMutex());
@@ -103,7 +104,6 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
         context->sharedBuffer_->waitOnConsumer(lock);
 
         // push the buffer
-        size = GST_BUFFER_SIZE (buffer);
         context->sharedBuffer_->pushBuffer(GST_BUFFER_DATA(buffer), size);
         ++bufferCount;
 

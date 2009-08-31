@@ -622,13 +622,32 @@ class MilhouseTests():
 
         recv.videosink = 'sharedvideosink'
         recv.videocodec = 'theora' 
+        recv.shared_video_id = 'shared_memory'
+        send.videocodec = recv.videocodec
+        self.run(recv, send)
+    
+    def test_48_theora_sharedvideosink_shared_id(self):
+        """ Test with sharedvideosink with id shared_memory1 """
+        recv, send = self.argfactory('video')
+
+        recv.videosink = 'sharedvideosink'
+        recv.videocodec = 'theora' 
         recv.shared_video_id = 'shared_memory1'
+        send.videocodec = recv.videocodec
+        self.run(recv, send)
+
+    def test_49_mpeg4_sharedvideosink_shared_id(self):
+        """ Test with sharedvideosink """
+        recv, send = self.argfactory('video')
+
+        recv.videosink = 'sharedvideosink'
+        recv.videocodec = 'mpeg4' 
         send.videocodec = recv.videocodec
         self.run(recv, send)
 
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_47')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_49')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

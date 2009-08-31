@@ -63,7 +63,7 @@ void SharedVideoBuffer::notifyProducer()
 
 void SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
 {
-    while (bufferIn_)
+    if (bufferIn_)
     {
         conditionFull_.wait(lock);
     }
@@ -73,7 +73,7 @@ void SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
 // wait for buffer to be pushed if it's currently empty
 void SharedVideoBuffer::waitOnProducer(scoped_lock<interprocess_mutex> &lock)
 {
-    while (!bufferIn_)
+    if (!bufferIn_)
     {
         conditionEmpty_.wait(lock);
     }
