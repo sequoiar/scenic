@@ -636,7 +636,7 @@ class MilhouseTests():
         send.videocodec = recv.videocodec
         self.run(recv, send)
 
-    def test_49_mpeg4_sharedvideosink_shared_id(self):
+    def test_49_mpeg4_sharedvideosink(self):
         """ Test with sharedvideosink """
         recv, send = self.argfactory('video')
 
@@ -645,9 +645,28 @@ class MilhouseTests():
         send.videocodec = recv.videocodec
         self.run(recv, send)
 
+    def test_50_h264_sharedvideosink(self):
+        """ Test with sharedvideosink """
+        recv, send = self.argfactory('video')
+
+        recv.videosink = 'sharedvideosink'
+        recv.videocodec = 'h264' 
+        send.videocodec = recv.videocodec
+        self.run(recv, send)
+
+    def test_51_h263_sharedvideosink(self):
+        """ Test with sharedvideosink """
+        recv, send = self.argfactory('video')
+
+        recv.videosink = 'sharedvideosink'
+        recv.videocodec = 'h263' 
+        send.videocodec = recv.videocodec
+        self.run(recv, send)
+
+
 if __name__ == '__main__':
     # here we run all the tests thanks to the wonders of reflective programming
-    TESTS = prefixedMethods(MilhouseTests(), 'test_47')
+    TESTS = prefixedMethods(MilhouseTests(), 'test_51')
 
     for test in TESTS:
         print 'TEST: '  + test.__doc__

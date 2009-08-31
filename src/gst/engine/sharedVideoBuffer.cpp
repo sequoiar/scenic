@@ -8,7 +8,7 @@ const double SharedVideoBuffer::ASPECT_RATIO = SharedVideoBuffer::WIDTH / Shared
 
 using namespace boost::interprocess;
 
-SharedVideoBuffer::SharedVideoBuffer() : mutex_(), conditionEmpty_(), conditionFull_(), bufferIn_(false), doPush_(false)
+SharedVideoBuffer::SharedVideoBuffer() : mutex_(), conditionEmpty_(), conditionFull_(), bufferIn_(false), doPush_(true)
 {}
 
 interprocess_mutex & SharedVideoBuffer::getMutex()
