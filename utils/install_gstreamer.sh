@@ -36,46 +36,30 @@ for uri_path in /gstreamer/gstreamer-0.10.23.tar.bz2 \
                 /gst-plugins-bad/gst-plugins-bad-0.10.13.tar.bz2 \
                 /gst-plugins-ugly/gst-plugins-ugly-0.10.12.tar.bz2 \
                 /gst-ffmpeg/gst-ffmpeg-0.10.8.tar.bz2 \
-                /gst-python/gst-python-0.10.15.tar.bz2
+                /gst-python/gst-python-0.10.15.tar.bz2 \
+                /gst-plugins-gl/gst-plugins-gl-0.10.1.tar.bz2
 do
     wget -c http://gstreamer.freedesktop.org/src/$uri_path
 done
 
-# No tarball yet for gst-plugins-gl
-if [ -d "${DOWNLOAD_DIR}/gst-plugins-gl" ]; then
-    pushd gst-plugins-gl
-    git reset --hard
-    git pull
-    popd
-else
-    git clone git://anongit.freedesktop.org/gstreamer/gst-plugins-gl
-fi
-
 # Build!
-for module in gstreamer-0.10.23 gst-plugins-base-0.10.23 gst-plugins-good-0.10.15 gst-plugins-bad-0.10.13 gst-plugins-ugly-0.10.12 gst-python-0.10.15 gst-ffmpeg-0.10.8 gst-plugins-gl
+for module in gstreamer-0.10.23 gst-plugins-base-0.10.23 gst-plugins-good-0.10.15 gst-plugins-bad-0.10.13 gst-plugins-ugly-0.10.12 gst-python-0.10.15 gst-ffmpeg-0.10.8 gst-plugins-gl-0.10.1
 do
     echo "]2;Now building $module"
     echo "########################################"
     echo "Now building $module"
     echo "########################################"
     echo $PWD
-    if [ "x$module" == "xgst-plugins-gl" ]
-    then
-        pushd ${module}
-        make clean
-        ./autogen.sh --disable-docbook --disable-gtk-doc # we don't need the docs
-    else
-        tar xjf ${module}.tar.bz2
-        pushd ${module}
-        make clean
-        ./configure --disable-docbook --disable-gtk-doc
-    fi
+    tar xjf ${module}.tar.bz2
+    pushd ${module}
+    make clean
+    ./configure --disable-docbook --disable-gtk-doc
     make
     sudo $MAKEINSTALL
     popd
     echo "Done building $module"
-done
+    done
 
-echo "Installation completed, but who knows"
-echo "Life is full of surprises"
-echo "Downloaded files are in " $DOWNLOAD_DIR   
+    echo "Installation completed, but who knows"
+    echo "Life is full of surprises"
+    echo "Downloaded files are in " $DOWNLOAD_DIR   
