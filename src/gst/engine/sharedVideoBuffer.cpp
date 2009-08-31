@@ -8,7 +8,7 @@ const double SharedVideoBuffer::ASPECT_RATIO = SharedVideoBuffer::WIDTH / Shared
 
 using namespace boost::interprocess;
 
-SharedVideoBuffer::SharedVideoBuffer() : mutex_(), conditionEmpty_(), conditionFull_(), bufferIn_(false), hasSentinel_(false)
+SharedVideoBuffer::SharedVideoBuffer() : mutex_(), conditionEmpty_(), conditionFull_(), bufferIn_(false), doPush_(false)
 {}
 
 interprocess_mutex & SharedVideoBuffer::getMutex()
@@ -21,9 +21,9 @@ unsigned char* SharedVideoBuffer::pixelsAddress()
     return pixels;
 }
 
-bool SharedVideoBuffer::hasSentinel() const
+bool SharedVideoBuffer::doPush() const
 {
-    return hasSentinel_;
+    return doPush_;
 }
 
 void SharedVideoBuffer::pushBuffer(unsigned char *newBuffer, size_t size)
@@ -33,15 +33,15 @@ void SharedVideoBuffer::pushBuffer(unsigned char *newBuffer, size_t size)
     memcpy(pixels, newBuffer, size);
 }
 
-void SharedVideoBuffer::pushSentinel()
+void SharedVideoBuffer::stopPushing()
 {
-    hasSentinel_ = true;
+    doPush_ = false;
 }
 
 
-void SharedVideoBuffer::removeSentinel()
+void SharedVideoBuffer::startPushing()
 {
-    hasSentinel_ = false;
+    doPush_ = true;
 }
 
 // notify the consumer process that there is a new buffer

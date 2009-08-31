@@ -17,13 +17,13 @@ class SharedVideoBuffer
 
         unsigned char* pixelsAddress();
         
-        bool hasSentinel() const;
+        bool doPush() const;
         
         void pushBuffer(unsigned char *newBuffer, size_t size);
 
-        void pushSentinel();
+        void stopPushing();
        
-        void removeSentinel();
+        void startPushing();
         
         void notifyConsumer();
 
@@ -55,7 +55,7 @@ class SharedVideoBuffer
         bool bufferIn_;
 
         // has either process signalled that it wants to quit?
-        bool hasSentinel_;
+        bool doPush_;
 };
 
 #endif // _SHARED_VIDEO_BUFFER_H_

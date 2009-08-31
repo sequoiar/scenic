@@ -93,10 +93,11 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
         scoped_lock<interprocess_mutex> lock(context->sharedBuffer_->getMutex());
 
         // if a buffer has been pushed, wait until the consumer tells us
-        // it's consumed it
+        // it's consumed it. note that upon waiting the mutex is released and will be
+        // reacquired when this process is notified by the consumer.
         context->sharedBuffer_->waitOnConsumer(lock);
 
-        if (context->sharedBuffer_->hasSentinel())
+        if (context->sharedBuffer_->doPush())
             g_print("Pushed %lld buffers, should stop pushing for now.\n", bufferCount);
         else
         {
