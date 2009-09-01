@@ -110,6 +110,7 @@ class ReceiverConfig : public RemoteConfig
         const char *multicastInterface() const { return multicastInterface_.c_str(); }
         const char *caps() const { return caps_.c_str(); }
         bool capsMatchCodec() const;
+        bool hasMulticastInterface() const { return multicastInterface_ != ""; }
 
     private:
         const std::string multicastInterface_;

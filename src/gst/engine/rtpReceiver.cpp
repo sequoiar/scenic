@@ -85,6 +85,7 @@ void RtpReceiver::setCaps(const char *capsStr)
     GstCaps *caps;
     tassert(caps = gst_caps_from_string(capsStr));
     g_object_set(G_OBJECT(rtp_receiver_), "caps", caps, NULL);
+
     gst_caps_unref(caps);
 }
 
@@ -189,6 +190,13 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
 
     rtp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
     g_object_set(rtp_receiver_, "port", config.port(), NULL);
+
+    // this is a multicast session
+    if (config.hasMulticastInterface())
+    {
+        g_object_set(rtp_receiver_, "multicast-group", config.remoteHost(), 
+                "multicast-interface", config.multicastInterface(), NULL);
+    }
 
     rtcp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
     g_object_set(rtcp_receiver_, "port", config.rtcpFirstPort(), NULL);
