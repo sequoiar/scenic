@@ -220,8 +220,10 @@ void GstReceiverThread::video_init(MapMsg& msg)
             msg["sink"] = "xvimagesink";
         if(!msg["shared_video_id"])
             msg["shared_video_id"] = "shared_memory";
+        if(!msg["multicast_interface"])
+            msg["multicast_interface"] = "eth0";
 
-        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], msg["screen"], msg["sink"], msg["deinterlace"], msg["shared_video_id"]);
+        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], msg["screen"], msg["sink"], msg["deinterlace"], msg["shared_video_id"], msg["multicast_interface"]);
     }
     catch(ErrorExcept e)
     {

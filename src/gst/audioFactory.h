@@ -76,7 +76,7 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
     int id;
     int audioCapsPort = port + ports::CAPS_OFFSET;
     LOG_DEBUG("Waiting for audio caps on port: " << audioCapsPort);
-    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(audioCapsPort, id)); // get caps from remote sender
+    ReceiverConfig rConfig(codec, ip, port, "", tcpGetBuffer(audioCapsPort, id)); // get caps from remote sender
     assert(id == MSG_ID);
     AudioReceiver* rx = new AudioReceiver(aConfig, rConfig);
     rx->init();

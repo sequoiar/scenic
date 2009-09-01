@@ -87,6 +87,7 @@ void addOptions(OptionArgs &options)
     options.addInt("timeout", 'z', "timeout", "time in ms to wait before quitting, 0 means run indefinitely");
     options.addInt("audio_buffer_usec", 'b', "audiobuffer", "length of receiver's audio buffer in microseconds, must be > 10000");
     options.addInt("jitterbuffer", 'g', "jitterbuffer", "length of receiver's rtp jitterbuffers in milliseconds, must be > 1");
+    options.addString("multicast_interface", 'I', "multicast_interface", "interface to use for multicast, defaults to eth0");
     options.addBool("enable_controls", 'j', "enable gui controls for jitter buffer");
     //telnetServer param
     options.addInt("serverport", 'y', "run as server", "port to listen on");
@@ -162,8 +163,13 @@ short pof::run(int argc, char **argv)
             if (!options["shared_video_id"])
                     options["shared_video_id"] = "shared_memory";
 
+            if (!options["multicast_interface"])
+                options["multicast_interface"] = "eth0";
+
             vRx = videofactory::buildVideoReceiver(options["address"], options["videocodec"], 
-                    options["videoport"], options["screen"], options["videosink"], options["deinterlace"], options["shared_video_id"]);
+                    options["videoport"], options["screen"], 
+                    options["videosink"], options["deinterlace"], 
+                    options["shared_video_id"], options["multicast_interface"]);
         }
         if (!disableAudio)
         {

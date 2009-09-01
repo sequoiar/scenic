@@ -94,20 +94,25 @@ class ReceiverConfig : public RemoteConfig
     public:
         ReceiverConfig(const std::string &codec__,
                 const std::string &remoteHost__,    
-                int port__, const std::string &caps__) : RemoteConfig(codec__, remoteHost__, port__), caps_(caps__)
+                int port__, 
+                const std::string &multicastInterface__,
+                const std::string &caps__) : RemoteConfig(codec__, remoteHost__, port__), 
+        multicastInterface_(multicastInterface__), caps_(caps__)
     {}
 
         ReceiverConfig(const ReceiverConfig & m) 
-            : RemoteConfig(m), caps_(m.caps_)
+            : RemoteConfig(m), multicastInterface_(m.multicastInterface_), caps_(m.caps_)
         {}
 
         VideoDecoder* createVideoDecoder() const;
         Decoder* createAudioDecoder() const;
 
+        const char *multicastInterface() const { return multicastInterface_.c_str(); }
         const char *caps() const { return caps_.c_str(); }
         bool capsMatchCodec() const;
 
     private:
+        const std::string multicastInterface_;
         const std::string caps_;
 };
 

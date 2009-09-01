@@ -37,7 +37,7 @@ namespace videofactory
     static VideoReceiver* 
     buildVideoReceiver_(const std::string &ip, const std::string &codec, int port, 
             int screen_num, const std::string &sink, bool deinterlace, 
-            const std::string &sharedVideoId);
+            const std::string &sharedVideoId, const std::string &multicastInterface);
 
     static VideoSender* 
     buildVideoSender_(const VideoSourceConfig vConfig, 
@@ -66,14 +66,15 @@ videofactory::buildVideoReceiver_(const std::string &ip,
                                   int screen_num, 
                                   const std::string &sink,
                                   bool deinterlace,
-                                  const std::string &sharedVideoId)
+                                  const std::string &sharedVideoId,
+                                  const std::string &multicastInterface)
 {
     assert(!sink.empty());
     VideoSinkConfig vConfig(sink, screen_num, deinterlace, sharedVideoId);
     int id;
     int videoCapsPort = port + ports::CAPS_OFFSET;
     LOG_DEBUG("Waiting for video caps on port: " << videoCapsPort);
-    ReceiverConfig rConfig(codec, ip, port, tcpGetBuffer(videoCapsPort, id)); // get caps from remote sender
+    ReceiverConfig rConfig(codec, ip, port, multicastInterface, tcpGetBuffer(videoCapsPort, id)); // get caps from remote sender
     assert(id == MSG_ID);
     VideoReceiver* rx = new VideoReceiver(vConfig, rConfig);
     rx->init();
@@ -102,9 +103,11 @@ namespace videofactory
                        int screen_num, 
                        const std::string &sink,
                        bool deinterlace,
-                       const std::string &sharedVideoId)
+                       const std::string &sharedVideoId,
+                       const std::string &multicastInterface)
     {
-        return shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, screen_num, sink, deinterlace, sharedVideoId));
+        return shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, 
+                    screen_num, sink, deinterlace, sharedVideoId, multicastInterface));
     }
 
     static shared_ptr<VideoSender> 
