@@ -196,6 +196,8 @@ void RtpReceiver::add(RtpPay * depayloader, const ReceiverConfig & config)
     {
         g_object_set(rtp_receiver_, "multicast-group", config.remoteHost(), 
                 "multicast-iface", config.multicastInterface(), NULL);
+        LOG_WARNING("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        LOG_WARNING("USING IFACE " << config.multicastInterface());
     }
 
     rtcp_receiver_ = Pipeline::Instance()->makeElement("udpsrc", NULL);
