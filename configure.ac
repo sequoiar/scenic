@@ -174,6 +174,8 @@ AM_CONDITIONAL([BOOST_PYTHON], test "$ac_cv_boost_python" = "yes")
 AX_CHECK_GL
 AX_CHECK_GLU
 
+AC_PROG_HELP2MAN
+
 if test "x${no_gl}" = "xyes" ; then
     AC_MSG_WARN([Missing OpenGL try some of mesa-common-dev libgl1-mesa-swx11-dev, xorg-driver-fglrx-dev nvidia-glx-new-dev.])
 fi
