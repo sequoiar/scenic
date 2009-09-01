@@ -242,18 +242,21 @@ void GstReceiverThread::audio_init(MapMsg& msg)
 
     try
     {
-        int audioBufferTime = audiofactory::AUDIO_BUFFER_USEC;
         if(!msg["sink"])
             msg["sink"] = "jackaudiosink";
 
         if(!msg["device"])
             msg["device"] = "";
         
-        if (msg["audio_buffer_usec"]) // take specified buffer time if present, otherwise use default
-            audioBufferTime = msg["audio_buffer_usec"];
+        if (!msg["audio_buffer_usec"]) // take specified buffer time if present, otherwise use default
+            msg["audio_buffer_usec"] = audiofactory::AUDIO_BUFFER_USEC;
+
+        if(!msg["multicast_interface"])
+            msg["multicast_interface"] = "";
+
 
         audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], 
-                msg["sink"], msg["device"], audioBufferTime);
+                msg["sink"], msg["device"], msg["audio_buffer_usec"], msg["multicast_interface"]);
     }
     catch(ErrorExcept e)
     {

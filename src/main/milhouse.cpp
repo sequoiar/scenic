@@ -158,13 +158,14 @@ short pof::run(int argc, char **argv)
         shared_ptr<VideoReceiver> vRx;
         shared_ptr<AudioReceiver> aRx;
 
+
+        if (!options["multicast_interface"])
+            options["multicast_interface"] = "";
+
         if (!disableVideo)       
         {
             if (!options["shared_video_id"])
                     options["shared_video_id"] = "shared_memory";
-
-            if (!options["multicast_interface"])
-                options["multicast_interface"] = "";
 
             vRx = videofactory::buildVideoReceiver(options["address"], options["videocodec"], 
                     options["videoport"], options["screen"], 
@@ -183,11 +184,11 @@ short pof::run(int argc, char **argv)
                 audioBufferUsec = options["audio_buffer_usec"];
             aRx = audiofactory::buildAudioReceiver(options["address"], options["audiocodec"], 
                     options["audioport"], options["audiosink"], audioDevice, 
-                    static_cast<unsigned long long>(audioBufferUsec));
+                    static_cast<unsigned long long>(audioBufferUsec), options["multicast_interface"]);
         }
 
 #ifdef CONFIG_DEBUG_LOCAL
-        //playback::makeVerbose();
+        playback::makeVerbose();
 #endif
 
         playback::start();

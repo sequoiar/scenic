@@ -48,7 +48,8 @@ namespace audiofactory
                         int port, 
                         const std::string &sink,
                         const std::string &deviceName,
-                        int audioBufferTime);
+                        int audioBufferTime,
+                        const std::string &multicastInterface);
 }
 
 
@@ -70,13 +71,14 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
                                   int port, 
                                   const std::string &sink,
                                   const std::string &deviceName,
-                                  int audioBufferTime)
+                                  int audioBufferTime,
+                                  const std::string &multicastInterface)
 {
     AudioSinkConfig aConfig(sink, deviceName, audioBufferTime);
     int id;
     int audioCapsPort = port + ports::CAPS_OFFSET;
     LOG_DEBUG("Waiting for audio caps on port: " << audioCapsPort);
-    ReceiverConfig rConfig(codec, ip, port, "", tcpGetBuffer(audioCapsPort, id)); // get caps from remote sender
+    ReceiverConfig rConfig(codec, ip, port, multicastInterface, tcpGetBuffer(audioCapsPort, id)); // get caps from remote sender
     assert(id == MSG_ID);
     AudioReceiver* rx = new AudioReceiver(aConfig, rConfig);
     rx->init();
@@ -114,9 +116,11 @@ namespace audiofactory
                        int port, 
                        const std::string &sink,
                        const std::string &deviceName,
-                       int audioBufferTime)
+                       int audioBufferTime,
+                       const std::string &multicastInterface)
     {
-        return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink, deviceName, audioBufferTime));
+        return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink, 
+                    deviceName, audioBufferTime, multicastInterface));
     }
 }
 
