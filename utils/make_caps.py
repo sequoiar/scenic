@@ -33,13 +33,31 @@ import gobject
 WIDTH = 640
 HEIGHT = 480
 
-codec_dict = {'theoraenc':'rtptheorapay','ffenc_mpeg4':'rtpmp4vpay','x264enc':'rtph264pay','ffenc_h263p':'rtph263ppay'}
+class CodecData(object):
+    """ Holds codec name, encoder/decoder names, payloader name and caps string """
+    def __init__(self, codec, encoder, decoder, payloader):
+        self.codec = codec
+        self.encoder = encoder
+        self.decoder = decoder
+        self.payloader = payloader
+        self.caps = ''
+    def __str__(self):
+        return self.caps
 
-for codec, pay in codec_dict.iteritems():
+
+codec_dict = {
+    'theora' : CodecData('theora', 'theoraenc', 'theoradec', 'rtptheorapay'), 
+    'mpeg4'  : CodecData('mpeg4', 'ffenc_mpeg4', 'ffdec_mpeg4', 'rtpmp4vpay'),
+    'h264'   : CodecData('h264', 'x264enc', 'ffdec_h264', 'rtph264pay'),
+    'h263'   : CodecData('h263', 'ffenc_h263p', 'ffdec_h263p', 'rtph263ppay')
+}
+
+
+for codecName, codec in codec_dict.iteritems():
     print '/*----------------------------------------------*/' 
-    print 'CAPS FOR ENCODER ' + codec + ':'
+    print 'CAPS FOR CODEC ' + codecName + ':'
     launch_line = "v4l2src ! video/x-raw-yuv, width=%d, height=%d ! %s ! %s name=payloader ! fakesink" \
-    % (WIDTH, HEIGHT, codec, pay)
+    % (WIDTH, HEIGHT, codec.encoder, codec.payloader)
     pipeline = gst.parse_launch(launch_line)
     pipeline.set_state(gst.STATE_PLAYING)
     mainloop = gobject.MainLoop()
@@ -52,5 +70,6 @@ for codec, pay in codec_dict.iteritems():
     while caps is None:
         caps = srcpad.get_negotiated_caps()
         
-    print caps.to_string()
+    codec.caps = caps.to_string().split(', ssrc')[0].strip()
+    print codec
     pipeline.set_state(gst.STATE_NULL)
