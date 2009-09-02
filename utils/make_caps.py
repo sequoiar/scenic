@@ -34,11 +34,10 @@ WIDTH = 640
 HEIGHT = 480
 
 class CodecData(object):
-    """ Holds codec name, encoder/decoder names, payloader name and caps string """
-    def __init__(self, codec, encoder, decoder, payloader):
+    """ Holds codec name, encoder names, payloader name and caps string """
+    def __init__(self, codec, encoder, payloader):
         self.codec = codec
         self.encoder = encoder
-        self.decoder = decoder
         self.payloader = payloader
         self.caps = ''
     def __str__(self):
@@ -46,10 +45,10 @@ class CodecData(object):
 
 
 codec_dict = {
-    'theora' : CodecData('theora', 'theoraenc', 'theoradec', 'rtptheorapay'), 
-    'mpeg4'  : CodecData('mpeg4', 'ffenc_mpeg4', 'ffdec_mpeg4', 'rtpmp4vpay'),
-    'h264'   : CodecData('h264', 'x264enc', 'ffdec_h264', 'rtph264pay'),
-    'h263'   : CodecData('h263', 'ffenc_h263p', 'ffdec_h263p', 'rtph263ppay')
+    'theora' : CodecData('theora', 'theoraenc', 'rtptheorapay'), 
+    'mpeg4'  : CodecData('mpeg4', 'ffenc_mpeg4','rtpmp4vpay'),
+    'h264'   : CodecData('h264', 'x264enc', 'rtph264pay'),
+    'h263'   : CodecData('h263', 'ffenc_h263p', 'rtph263ppay')
 }
 
 
@@ -73,3 +72,18 @@ for codecName, codec in codec_dict.iteritems():
     codec.caps = caps.to_string().split(', ssrc')[0].strip()
     print codec
     pipeline.set_state(gst.STATE_NULL)
+
+
+
+
+try:
+    file = open('caps.txt', 'w')
+
+    for codecName, codec in codec_dict.iteritems():
+        file.write(codecName + '\n')
+        file.write(codec.caps + '\n\n\n')
+
+except IOError, e:
+    sys.stderr.write(e)
+finally:
+        file.close()
