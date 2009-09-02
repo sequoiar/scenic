@@ -279,7 +279,7 @@ short pof::run(int argc, char **argv)
     return 0;
 }
 
-void onExit(void)
+void onExit()
 {
     std::cout << "bye." << std::endl;
 }

@@ -238,5 +238,5 @@ void assert_throw(__const char *__assertion, __const char *__file,
                            unsigned int __line, __const char *__function)
 {
     backtrace();
-    cerr_log_throw( __assertion, ASSERT_FAIL, __file, __function, __line,0);
+    cerr_log_throw(__assertion, ASSERT_FAIL, __file, __function, __line, 0);
 }

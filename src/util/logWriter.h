@@ -89,7 +89,7 @@ namespace Log
             do{                         \
             std::ostringstream mangle84579568749576948;      \
             mangle84579568749576948 << msg;                  \
-            cerr_log_throw(mangle84579568749576948.str(), level, __FILE__, __FUNCTION__, __LINE__,err);    \
+            cerr_log_throw(mangle84579568749576948.str(), level, __FILE__, __FUNCTION__, __LINE__, err);    \
             }                           \
             while(0)
 
