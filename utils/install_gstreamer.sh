@@ -9,7 +9,7 @@
 #  3. gst-python 0.10.16
 #  4. gst-plugin-good 0.10.16
 #  5. gst-plugin-bad 0.10.14
-#  6. gst-plugin-ugly 0.10.13
+#  6. gst-plugin-ugly 0.10.12
 #  7. gst-ffmpeg 0.10.10.8
 
 DOWNLOAD_DIR=~/src/gstreamer-src
@@ -42,7 +42,7 @@ do
 done
 
 # Build!
-for module in gstreamer-0.10.24 gst-plugins-base-0.10.24 gst-plugins-good-0.10.16 gst-plugins-bad-0.10.14 gst-plugins-ugly-0.10.14 gst-python-0.10.16 gst-ffmpeg-0.10.8 gst-plugins-gl-0.10.1
+for module in gstreamer-0.10.24 gst-plugins-base-0.10.24 gst-plugins-good-0.10.16 gst-plugins-bad-0.10.14 gst-plugins-ugly-0.10.12 gst-python-0.10.16 gst-ffmpeg-0.10.8 gst-plugins-gl-0.10.1
 do
     echo "]2;Now building $module"
     echo "########################################"
