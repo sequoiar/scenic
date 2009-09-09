@@ -17,6 +17,6 @@ SUBDIRS = include boost util gutil tcp gst main devices $(PYTHONDIR) $(SIPDIR)
 caps:
 	@$(top_srcdir)/utils/make_caps.py
 
-install-exec-hook:
+install-exec-hook: caps
 	mkdir -p -m 755 $(DESTDIR)$(pkgdatadir)
 	install -m 644 caps.txt $(DESTDIR)$(pkgdatadir)/caps.txt

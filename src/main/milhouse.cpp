@@ -87,6 +87,7 @@ void addOptions(OptionArgs &options)
     options.addInt("timeout", 'z', "timeout", "time in ms to wait before quitting, 0 means run indefinitely");
     options.addInt("audio_buffer_usec", 'b', "audiobuffer", "length of receiver's audio buffer in microseconds, must be > 10000");
     options.addInt("jitterbuffer", 'g', "jitterbuffer", "length of receiver's rtp jitterbuffers in milliseconds, must be > 1");
+    options.addInt("camera_number", 'G', "camera_number", "camera id for dc1394");
     options.addString("multicast_interface", 'I', "multicast_interface", "interface to use for multicast");
     options.addBool("enable_controls", 'j', "enable gui controls for jitter buffer");
     //telnetServer param
@@ -221,7 +222,6 @@ short pof::run(int argc, char **argv)
 
         if (!disableVideo)
         {
-            std::string videoDevice, videoLocation;
             if (!options["videodevice"]) 
                 options["videodevice"] = ""; 
             if (!options["videolocation"]) 
@@ -230,8 +230,11 @@ short pof::run(int argc, char **argv)
             if (!options["videobitrate"]) 
                 options["videobitrate"] = 3000000;
 
+            if (!options["camera-number"])
+                options["camera-number"] = -1;
+
             VideoSourceConfig vConfig(options["videosource"], options["videobitrate"],
-                    options["videodevice"], options["videoLocation"]);
+                    options["videodevice"], options["videolocation"], options["camera_number"]);
 
             vTx = videofactory::buildVideoSender(vConfig, options["address"], options["videocodec"], 
                     options["videoport"]);

@@ -47,8 +47,8 @@ class VideoSource
 
     private:
         _GstElement *srcElement() { return source_; }
-        VideoSource(const VideoSource&);     ///No Copy Constructor
-        VideoSource& operator=(const VideoSource&);     ///No Assignment Operator
+        VideoSource(const VideoSource&);
+        VideoSource& operator=(const VideoSource&);
 };
 
 class VideoTestSource
@@ -102,8 +102,8 @@ class VideoDvSource
         void init();
 
         _GstElement *queue_, *dvdec_;
-        VideoDvSource(const VideoDvSource&);     //No Copy Constructor
-        VideoDvSource& operator=(const VideoDvSource&);     //No Assignment Operator
+        VideoDvSource(const VideoDvSource&);
+        VideoDvSource& operator=(const VideoDvSource&);
 };
 
 class VideoV4lSource
@@ -118,9 +118,24 @@ class VideoV4lSource
         std::string deviceStr() const;
         std::string srcCaps() const;
         _GstElement *srcElement() { return capsFilter_; }
-        VideoV4lSource(const VideoV4lSource&);     //No Copy Constructor
-        VideoV4lSource& operator=(const VideoV4lSource&);     //No Assignment Operator
+        VideoV4lSource(const VideoV4lSource&);
+        VideoV4lSource& operator=(const VideoV4lSource&);
+};
+
+
+
+class VideoDc1394Source
+    : public VideoSource
+{
+    public:
+        explicit VideoDc1394Source(const VideoSourceConfig &config)
+            : VideoSource(config) {}
+    private:
+        void init();
+        std::string srcCaps() const;
+        _GstElement *srcElement() { return capsFilter_; }
+        VideoDc1394Source(const VideoDc1394Source&);
+        VideoDc1394Source& operator=(const VideoDc1394Source&);
 };
 
 #endif //_VIDEO_SOURCE_H_
-

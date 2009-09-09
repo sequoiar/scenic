@@ -32,6 +32,7 @@
 #include "v4l2util.h"
 
 #include "fileSource.h"
+#include "videoSize.h"
 
 /// Constructor
 VideoSource::VideoSource(const VideoSourceConfig &config) : 
@@ -58,7 +59,7 @@ std::string VideoSource::defaultSrcCaps() const
     std::ostringstream capsStr;
     /*capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
         << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; */
-    capsStr << "video/x-raw-yuv, width=" << VideoSize::WIDTH << ", height=" << VideoSize::HEIGHT;
+    capsStr << "video/x-raw-yuv, width=" << videosize::WIDTH << ", height=" << videosize::HEIGHT;
     return capsStr.str();
 }
 
@@ -192,6 +193,30 @@ std::string VideoV4lSource::srcCaps() const
     /*capsStr << "video/x-raw-yuv, format=(fourcc)I420, width=" << WIDTH << ", height=" << HEIGHT << ", pixel-aspect-ratio=" 
       << PIX_ASPECT_NUM << "/" << PIX_ASPECT_DENOM; */
     capsStr << "video/x-raw-yuv, width=" << v4l2util::captureWidth(deviceStr()) << ", height=" << v4l2util::captureHeight(deviceStr());
+    return capsStr.str();
+}
+
+
+void VideoDc1394Source::init()
+{
+    VideoSource::init();
+    
+    if (config_.hasCameraNumber())
+        g_object_set(G_OBJECT(source_), "camera-number", config_.cameraNumber(), NULL);
+
+    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    gstlinkable::link(source_, capsFilter_);
+
+    setCapsFilter(srcCaps());
+}
+
+
+
+std::string VideoDc1394Source::srcCaps() const
+{
+    std::ostringstream capsStr;
+    capsStr << "video/x-raw-yuv, width=" << videosize::WIDTH 
+        << ", height=" << videosize::HEIGHT << ", framerate=30/1";
     return capsStr.str();
 }
 

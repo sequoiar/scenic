@@ -34,6 +34,7 @@
 
 VideoSource * VideoSourceConfig::createSource() const
 {
+    // FIXME: should derived class specific arguments just be passed in here to their constructors?
     if (source_ == "videotestsrc")
         return new VideoTestSource(*this);
     else if (source_ == "v4l2src")
@@ -44,6 +45,8 @@ VideoSource * VideoSourceConfig::createSource() const
         return new VideoDvSource(*this);
     else if (source_ == "filesrc")
         return new VideoFileSource(*this);
+    else if (source_ == "dc1394src")
+        return new VideoDc1394Source(*this);
     else 
         THROW_ERROR(source_ << " is an invalid source!");
             

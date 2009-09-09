@@ -287,8 +287,10 @@ void GstSenderThread::video_init(MapMsg& msg)
             msg["location"] = "";
         if(!msg["device"])
             msg["device"] = "";
+        if(!msg["camera_number"])
+            msg["camera_number"] = -1;
 
-        VideoSourceConfig config(msg["source"], msg["bitrate"], msg["device"], msg["location"]);
+        VideoSourceConfig config(msg["source"], msg["bitrate"], msg["device"], msg["location"], msg["camera_number"]);
         video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
         if(ff[1])
             videoFirst = false;

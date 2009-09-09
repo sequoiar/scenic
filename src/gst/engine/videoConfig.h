@@ -32,16 +32,21 @@ class VideoSourceConfig
     public:
         //* for source (remote) w/ location i.e. filename or url */
         VideoSourceConfig(const std::string &source__, 
-                          const int bitrate__, 
+                          int bitrate__, 
                           const std::string &deviceName__, 
-                          const std::string &location__) 
+                          const std::string &location__,
+                          int cameraNumber__) 
             : source_(source__), bitrate_(bitrate__), deviceName_(deviceName__),
-            location_(location__)
+            location_(location__), cameraNumber_(cameraNumber__)
         {}
 
         //* copy constructor */
-        VideoSourceConfig(const VideoSourceConfig& m)
-            : source_(m.source_), bitrate_(m.bitrate_), deviceName_(m.deviceName_), location_(m.location_) 
+        VideoSourceConfig(const VideoSourceConfig& m) : 
+            source_(m.source_), 
+            bitrate_(m.bitrate_), 
+            deviceName_(m.deviceName_), 
+            location_(m.location_), 
+            cameraNumber_(m.cameraNumber_) 
         {}
 
         VideoSource* createSource() const;  // factory method
@@ -51,6 +56,8 @@ class VideoSourceConfig
 
         bool hasLocation() const { return !location_.empty(); }
         bool hasDeviceName() const { return !deviceName_.empty(); }
+        bool hasCameraNumber() const { return cameraNumber_ != -1; }
+        int cameraNumber() const { return cameraNumber_; }
         bool locationExists() const;
         bool deviceExists() const;
         const char *location() const;
@@ -61,6 +68,7 @@ class VideoSourceConfig
         const int bitrate_;
         const std::string deviceName_;
         const std::string location_;
+        const int cameraNumber_;
         /// No Assignment Operator 
         VideoSourceConfig& operator=(const VideoSourceConfig&);     
 };

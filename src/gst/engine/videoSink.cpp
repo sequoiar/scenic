@@ -193,7 +193,7 @@ void XvImageSink::init()
             gtk_window_move(GTK_WINDOW(window_), xine[j].x_org, xine[j].y_org);
     }
 
-    gtk_window_set_default_size(GTK_WINDOW(window_), VideoSize::WIDTH, VideoSize::HEIGHT);
+    gtk_window_set_default_size(GTK_WINDOW(window_), videosize::WIDTH, videosize::HEIGHT);
     //gtk_window_set_decorated(GTK_WINDOW(window_), FALSE);   // gets rid of border/title
 
     gtk_widget_set_events(window_, GDK_KEY_PRESS_MASK);
