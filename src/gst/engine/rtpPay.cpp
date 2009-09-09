@@ -180,6 +180,7 @@ void H263Depayloader::init()
 void Mpeg4Payloader::init()
 {
     rtpPay_ = Pipeline::Instance()->makeElement("rtpmp4vpay", NULL);
+    g_object_set(rtpPay_, "send-config", TRUE, NULL);
     Payloader::init();
 }
 

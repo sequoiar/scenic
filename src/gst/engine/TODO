@@ -1,3 +1,6 @@
+-receiver will have to know how many channels it's getting to correctly guess caps
+-need a profile per channel possibility
+-use milhouse command line to generate caps
 -caps will come from a file
 -crash for real with a t_assert
 -make sure no exceptions can be thrown from destructors

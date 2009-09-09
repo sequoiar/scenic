@@ -41,11 +41,12 @@ class RemoteConfig
     public:
         RemoteConfig(const std::string &codec__, 
                 const std::string &remoteHost__,
-                int port__); 
+                int port__,
+                int msgId__); 
 
         // copy constructor
         RemoteConfig(const RemoteConfig& m)
-            : codec_(m.codec_), remoteHost_(m.remoteHost_), port_(m.port_) {}
+            : codec_(m.codec_), remoteHost_(m.remoteHost_), port_(m.port_), msgId_(m.msgId_) {}
 
         virtual ~RemoteConfig(){};
 
@@ -64,6 +65,7 @@ class RemoteConfig
         const std::string codec_;
         const std::string remoteHost_;
         const int port_;
+        const int msgId_;
         static const int PORT_MIN;
         static const int PORT_MAX;
         static std::set<int> usedPorts_;
@@ -77,7 +79,8 @@ class SenderConfig : public RemoteConfig
     public:
         SenderConfig(const std::string &codec__,
                 const std::string &remoteHost__,    
-                int port__) : RemoteConfig(codec__, remoteHost__, port__)
+                int port__,
+                int msgId__) : RemoteConfig(codec__, remoteHost__, port__, msgId__)
     {}
 
         SenderConfig(const SenderConfig & m) 
@@ -86,6 +89,8 @@ class SenderConfig : public RemoteConfig
 
         VideoEncoder* createVideoEncoder() const;
         Encoder* createAudioEncoder() const;
+
+        void sendMessage(const std::string &msg);
 };
 
 
@@ -96,7 +101,8 @@ class ReceiverConfig : public RemoteConfig
                 const std::string &remoteHost__,    
                 int port__, 
                 const std::string &multicastInterface__,
-                const std::string &caps__) : RemoteConfig(codec__, remoteHost__, port__), 
+                const std::string &caps__,
+                int msgId__) : RemoteConfig(codec__, remoteHost__, port__, msgId__), 
         multicastInterface_(multicastInterface__), caps_(caps__)
     {}
 
@@ -111,10 +117,11 @@ class ReceiverConfig : public RemoteConfig
         const char *caps() const { return caps_.c_str(); }
         bool capsMatchCodec() const;
         bool hasMulticastInterface() const { return multicastInterface_ != ""; }
+        void receiveCaps();
 
     private:
         const std::string multicastInterface_;
-        const std::string caps_;
+        std::string caps_;
 };
 
 #endif // _REMOTE_CONFIG_H_

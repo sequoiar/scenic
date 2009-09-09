@@ -174,17 +174,18 @@ short pof::run(int argc, char **argv)
         }
         if (!disableAudio)
         {
-            // FIXME: we should distinguish between device and location
-            std::string audioDevice = "";
-            if (options["audiodevice"])
-                audioDevice = static_cast<std::string>(options["audiodevice"]);
+            if (!options["numchannels"]) 
+                options["numchannels"] = 2;
 
-            int audioBufferUsec = audiofactory::AUDIO_BUFFER_USEC;
-            if (options["audio_buffer_usec"])
-                audioBufferUsec = options["audio_buffer_usec"];
+            if (!options["audiodevice"])
+                options["audiodevice"] = "";
+
+            if (!options["audio_buffer_usec"])
+                options["audio_buffer_usec"] = audiofactory::AUDIO_BUFFER_USEC;
+
             aRx = audiofactory::buildAudioReceiver(options["address"], options["audiocodec"], 
-                    options["audioport"], options["audiosink"], audioDevice, 
-                    static_cast<unsigned long long>(audioBufferUsec), options["multicast_interface"]);
+                    options["audioport"], options["audiosink"], options["audiodevice"], 
+                    options["audio_buffer_usec"], options["multicast_interface"], options["numchannels"]);
         }
 
 #ifdef CONFIG_DEBUG_LOCAL
@@ -221,17 +222,16 @@ short pof::run(int argc, char **argv)
         if (!disableVideo)
         {
             std::string videoDevice, videoLocation;
-            if (options["videodevice"]) 
-                videoDevice = static_cast<std::string>(options["videodevice"]); 
-            if (options["videolocation"]) 
-                videoLocation = static_cast<std::string>(options["videolocation"]); 
+            if (!options["videodevice"]) 
+                options["videodevice"] = ""; 
+            if (!options["videolocation"]) 
+                options["videolocation"] = ""; 
 
-            int videoBitrate = 3000000;
-            if (options["videobitrate"]) 
-                videoBitrate = options["videobitrate"];
+            if (!options["videobitrate"]) 
+                options["videobitrate"] = 3000000;
 
-            VideoSourceConfig vConfig(options["videosource"], videoBitrate, 
-                    videoDevice, videoLocation);
+            VideoSourceConfig vConfig(options["videosource"], options["videobitrate"],
+                    options["videodevice"], options["videoLocation"]);
 
             vTx = videofactory::buildVideoSender(vConfig, options["address"], options["videocodec"], 
                     options["videoport"]);
@@ -239,17 +239,16 @@ short pof::run(int argc, char **argv)
 
         if (!disableAudio)
         {
-            std::string audioDevice, audioLocation;
-            if (options["audiodevice"]) 
-                audioDevice = static_cast<std::string>(options["audiodevice"]); 
-            if (options["audiolocation"]) 
-                audioLocation = static_cast<std::string>(options["audiolocation"]); 
+            if (!options["audiodevice"]) 
+                options["audiodevice"] = ""; 
+            if (!options["audiolocation"]) 
+                options["audiolocation"] = ""; 
 
-            int numChannels = 2;
-            if (options["numchannels"]) 
-                numChannels = options["numchannels"];
+            if (!options["numchannels"]) 
+                options["numchannels"] = 2;
 
-            AudioSourceConfig aConfig(options["audiosource"], audioDevice, audioLocation, numChannels);
+            AudioSourceConfig aConfig(options["audiosource"], options["audiodevice"], 
+                    options["audiolocation"], options["numchannels"]);
             aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], options["audioport"]);
         }
 
@@ -258,13 +257,6 @@ short pof::run(int argc, char **argv)
 #endif
 
         playback::start();
-
-        if (!disableVideo)
-            tassert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + static_cast<int>(options["videoport"]), 
-                        videofactory::MSG_ID, vTx->getCaps()));
-        if (!disableAudio)
-            tassert(tcpSendBuffer(options["address"], ports::CAPS_OFFSET + static_cast<int>(options["audioport"]), 
-                        audiofactory::MSG_ID, aTx->getCaps()));
 
         int timeout = 0;
         if (options["timeout"]) // run for finite amount of time

@@ -27,11 +27,8 @@
 #include "ports.h"
 #include "gst/engine.h"
 
-#include "tcp/tcpThread.h"
-
 namespace videofactory
 {
-    // FIXME: this sucks!!!!!!!!!!!!!!!!! replace with OSC-style path
     static const int MSG_ID = 2;
 
     static VideoReceiver* 
@@ -52,7 +49,7 @@ videofactory::buildVideoSender_(const VideoSourceConfig vConfig,
                                 const std::string &codec, 
                                 int port)
 {
-    SenderConfig rConfig(codec, ip, port);
+    SenderConfig rConfig(codec, ip, port, MSG_ID); 
     VideoSender* tx = new VideoSender(vConfig, rConfig);
     tx->init(); 
     return tx;
@@ -71,11 +68,17 @@ videofactory::buildVideoReceiver_(const std::string &ip,
 {
     assert(!sink.empty());
     VideoSinkConfig vConfig(sink, screen_num, deinterlace, sharedVideoId);
-    int id;
-    int videoCapsPort = port + ports::CAPS_OFFSET;
-    LOG_DEBUG("Waiting for video caps on port: " << videoCapsPort);
-    ReceiverConfig rConfig(codec, ip, port, multicastInterface, tcpGetBuffer(videoCapsPort, id)); // get caps from remote sender
-    assert(id == MSG_ID);
+    std::string caps(CapsParser::getVideoCaps(codec)); // get caps here
+    assert(caps != "");
+    
+    ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID); 
+    // FIXME: codec class should have list of codecs that need live caps update
+    if (codec == "theora")
+    {
+        LOG_INFO("Waiting for " << codec << " caps from other host");
+        rConfig.receiveCaps();  // wait for new caps from sender
+    }
+
     VideoReceiver* rx = new VideoReceiver(vConfig, rConfig);
     rx->init();
     return rx;

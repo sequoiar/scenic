@@ -101,6 +101,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
                 break;
             }
         case GST_MESSAGE_ELEMENT:
+        case GST_MESSAGE_APPLICATION:
             {
                 Instance()->updateListeners(msg);
                 break;

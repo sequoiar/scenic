@@ -1,5 +1,4 @@
-
-/* engine.h
+/* capsParser.h
  * Copyright (C) 2008-2009 Société des arts technologiques (SAT)
  * http://www.sat.qc.ca
  * All rights reserved.
@@ -22,18 +21,17 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef _ENGINE_H_
-#define _ENGINE_H_
+#ifndef _CAPS_PARSER_H_
+#define _CAPS_PARSER_H_
 
-#include "gst/engine/audioSender.h"
-#include "gst/engine/audioReceiver.h"
-#include "gst/engine/videoSender.h"
-#include "gst/engine/videoReceiver.h"
-#include "gst/engine/audioConfig.h"
-#include "gst/engine/videoConfig.h"
-#include "gst/engine/remoteConfig.h"
-#include "gst/engine/playback.h"
-#include "gst/engine/videoSink.h"
-#include "gst/engine/capsParser.h"
+#include <string>
 
-#endif // _ENGINE_H_
+class CapsParser {
+    private:
+        static std::string getCapsFromFile(const char *filename, const std::string &codec);
+    public:
+        static std::string getVideoCaps(const std::string &codec);
+        static std::string getAudioCaps(const std::string &codec);
+};
+
+#endif // _CAPS_PARSER_H_

@@ -18,3 +18,4 @@ install-exec-hook:
 	mkdir -p $(DESTDIR)$(prefix)/share/doc/doxygen; \
 	cp -rfv doc/html $(DESTDIR)$(prefix)/share/doc/doxygen; \
 	fi
+

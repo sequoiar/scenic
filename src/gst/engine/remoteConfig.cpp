@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <gst/gst.h>
 #include "remoteConfig.h"
+#include "tcp/tcpThread.h"
 #include "codec.h"
 
 const int RemoteConfig::PORT_MIN = 1024;
@@ -34,7 +35,8 @@ const int RemoteConfig::PORT_MAX = 65000;
 std::set<int> RemoteConfig::usedPorts_;
         
 RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remoteHost__,
-        int port__) : codec_(codec__), remoteHost_(remoteHost__), port_(port__)
+        int port__, int msgId__) : 
+    codec_(codec__), remoteHost_(remoteHost__), port_(port__), msgId_(msgId__)
 {}
 
 
@@ -49,7 +51,7 @@ void RemoteConfig::cleanupPorts() const
 }
 
 
-/// Make sure there are no port clashes (at least as far as this gst process can tell)
+/// Make sure there are no port clashes (at least as far as this process can tell)
 void RemoteConfig::checkPorts() const
 {
     if (port_ < PORT_MIN || port_ > PORT_MAX)
@@ -115,6 +117,17 @@ Encoder * SenderConfig::createAudioEncoder() const
         return 0;
     }
     LOG_DEBUG("Audio encoder " << codec_ << " built"); 
+}
+
+
+void SenderConfig::sendMessage(const std::string &message)
+{
+    LOG_DEBUG("\n\n\n MESSAGE " << message << "for " 
+            << remoteHost_ << " on port " << capsPort() 
+            << " with id " << msgId_ << "\n\n\n\n");
+
+    tassert(tcpSendBuffer(remoteHost_, capsPort(), 
+                        msgId_, message));
 }
 
 
@@ -189,5 +202,15 @@ bool ReceiverConfig::capsMatchCodec() const
         LOG_WARNING("Caps don't match codec");
         return false;
     }
+}
+
+
+void ReceiverConfig::receiveCaps()
+{
+    int id;
+    // this blocks
+    std::string msg(tcpGetBuffer(capsPort(), id));
+    tassert(id == msgId_);
+    caps_ = msg;
 }
 

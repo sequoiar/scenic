@@ -60,7 +60,11 @@ void RtpBin::init()
 }
 
 
-void RtpBin::printStatsVal(const std::string &idStr, const char *key, const std::string &type, const std::string &formatStr, GstStructure *stats)
+void RtpBin::printStatsVal(const std::string &idStr, 
+        const char *key, 
+        const std::string &type, 
+        const std::string &formatStr, 
+        GstStructure *stats)
 {
     MapMsg mapMsg;
     std::string paramStr("");

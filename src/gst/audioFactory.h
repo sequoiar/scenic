@@ -25,16 +25,14 @@
 #define _AUDIO_FACTORY_H_
 
 #include "gst/engine.h"
-#include "tcp/tcpThread.h"
 
 #include "ports.h"
 
 
 namespace audiofactory
 {
-    // FIXME: this sucks!!!!!!!!!!!!!!!!! replace with OSC-style path
-    static const int MSG_ID = 1;
     static const int AUDIO_BUFFER_USEC = AudioSinkConfig::DEFAULT_BUFFER_TIME;
+    static const int MSG_ID = 1;
 
     static AudioSender* 
     buildAudioSender_(const AudioSourceConfig aConfig, 
@@ -49,7 +47,8 @@ namespace audiofactory
                         const std::string &sink,
                         const std::string &deviceName,
                         int audioBufferTime,
-                        const std::string &multicastInterface);
+                        const std::string &multicastInterface,
+                        int numChannels);
 }
 
 
@@ -59,7 +58,7 @@ audiofactory::buildAudioSender_(const AudioSourceConfig aConfig,
                                 const std::string &codec, 
                                 int port)
 {
-    SenderConfig rConfig(codec, ip, port);
+    SenderConfig rConfig(codec, ip, port, MSG_ID);
     AudioSender* tx = new AudioSender(aConfig, rConfig);
     tx->init();
     return tx;
@@ -72,14 +71,22 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
                                   const std::string &sink,
                                   const std::string &deviceName,
                                   int audioBufferTime,
-                                  const std::string &multicastInterface)
+                                  const std::string &multicastInterface,
+                                  int numChannels)
 {
     AudioSinkConfig aConfig(sink, deviceName, audioBufferTime);
-    int id;
-    int audioCapsPort = port + ports::CAPS_OFFSET;
-    LOG_DEBUG("Waiting for audio caps on port: " << audioCapsPort);
-    ReceiverConfig rConfig(codec, ip, port, multicastInterface, tcpGetBuffer(audioCapsPort, id)); // get caps from remote sender
-    assert(id == MSG_ID);
+    std::string caps(CapsParser::getAudioCaps(codec)); // get caps here
+    tassert(caps != "");
+    ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID);
+
+    // FIXME: codec class should have list of codecs that need live caps update
+    // FIXME: also we shouldn't have to receive caps for non-stereo 
+    if (codec == "vorbis" or numChannels != 2)
+    {
+        LOG_INFO("Waiting for " << codec << " caps from other host");
+        rConfig.receiveCaps();  // wait for new caps from sender
+    }
+
     AudioReceiver* rx = new AudioReceiver(aConfig, rConfig);
     rx->init();
     return rx;
@@ -117,10 +124,11 @@ namespace audiofactory
                        const std::string &sink,
                        const std::string &deviceName,
                        int audioBufferTime,
-                       const std::string &multicastInterface)
+                       const std::string &multicastInterface,
+                       int numChannels)
     {
         return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink, 
-                    deviceName, audioBufferTime, multicastInterface));
+                    deviceName, audioBufferTime, multicastInterface, numChannels));
     }
 }
 

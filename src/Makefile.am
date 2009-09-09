@@ -13,3 +13,10 @@ SUBDIRS = include boost util gutil tcp gst main devices $(PYTHONDIR) $(SIPDIR)
 # 
 # uninstall-hook:
 # 		rm -f $(DESTDIR)$(prefix)/share/man/man1/milhouse.1
+
+caps:
+	@$(top_srcdir)/utils/make_caps.py
+
+install-exec-hook:
+	mkdir -p -m 755 $(DESTDIR)$(pkgdatadir)
+	install -m 644 caps.txt $(DESTDIR)$(pkgdatadir)/caps.txt

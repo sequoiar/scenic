@@ -242,21 +242,24 @@ void GstReceiverThread::audio_init(MapMsg& msg)
 
     try
     {
-        if(!msg["sink"])
+        if (!msg["sink"])
             msg["sink"] = "jackaudiosink";
 
-        if(!msg["device"])
+        if (!msg["device"])
             msg["device"] = "";
         
         if (!msg["audio_buffer_usec"]) // take specified buffer time if present, otherwise use default
             msg["audio_buffer_usec"] = audiofactory::AUDIO_BUFFER_USEC;
 
-        if(!msg["multicast_interface"])
+        if (!msg["multicast_interface"])
             msg["multicast_interface"] = "";
+
+        if (!msg["numchannels"])
+            msg["numchannels"] = 2;
 
 
         audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], 
-                msg["sink"], msg["device"], msg["audio_buffer_usec"], msg["multicast_interface"]);
+                msg["sink"], msg["device"], msg["audio_buffer_usec"], msg["multicast_interface"], msg["numchannels"]);
     }
     catch(ErrorExcept e)
     {
@@ -291,8 +294,6 @@ void GstSenderThread::video_init(MapMsg& msg)
             videoFirst = false;
         else
             videoFirst = true;
-
-        ff[0] = boost::bind(tcpSendBuffer, msg["address"], msg["port"] + ports::CAPS_OFFSET, videofactory::MSG_ID, _1);
     }
     catch(ErrorExcept e)
     {
@@ -319,8 +320,6 @@ void GstSenderThread::audio_init(MapMsg& msg)
 
         AudioSourceConfig config(msg["source"], msg["device"], msg["location"], msg["channels"]);
         audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
-         
-        ff[1] = boost::bind(tcpSendBuffer, msg["address"], msg["port"] + ports::CAPS_OFFSET, audiofactory::MSG_ID, _1);
     }
     catch(ErrorExcept e)
     {

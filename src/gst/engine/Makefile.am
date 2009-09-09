@@ -13,7 +13,7 @@ libgst_la_SOURCES = mediaBase.cpp \
 				   codec.cpp rtpPay.cpp audioConfig.cpp remoteConfig.cpp \
 				   videoReceiver.cpp videoSender.cpp videoSource.cpp raw1394Util.cpp \
 				   audioLevel.cpp glVideoSink.cpp playback.cpp dv1394.cpp v4l2util.cpp fileSource.cpp \
-				   sharedVideoSink.cpp sharedVideoBuffer.cpp \
+				   sharedVideoSink.cpp sharedVideoBuffer.cpp capsParser.cpp \
                    mediaBase.h busMsgHandler.h ../ports.h \
 				   audioSender.h audioReceiver.h $(inc)/alsa.h\
 				   videoConfig.h rtpBin.h pipeline.h \
@@ -22,8 +22,8 @@ libgst_la_SOURCES = mediaBase.cpp \
 				   codec.h rtpPay.h audioConfig.h remoteConfig.h \
 				   videoReceiver.h videoSender.h videoSource.h raw1394Util.h \
 				   audioLevel.h glVideoSink.h playback.h dv1394.h v4l2util.h \
-				   fileSource.h videoSize.h sharedVideoSink.h sharedVideoBuffer.h
+				   fileSource.h videoSize.h sharedVideoSink.h sharedVideoBuffer.h capsParser.h
 
-libgst_la_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS)
+libgst_la_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS) -D__DATA_DIR__=$(pkgdatadir)
 
 #CXXFLAGS += -O3
