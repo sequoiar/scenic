@@ -69,7 +69,8 @@ videofactory::buildVideoReceiver_(const std::string &ip,
     assert(!sink.empty());
     VideoSinkConfig vConfig(sink, screen_num, deinterlace, sharedVideoId);
     std::string caps(CapsParser::getVideoCaps(codec)); // get caps here
-    assert(caps != "");
+    if (caps == "")
+        THROW_CRITICAL("Could not find caps for codec " << codec);
     
     ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID); 
     // FIXME: codec class should have list of codecs that need live caps update

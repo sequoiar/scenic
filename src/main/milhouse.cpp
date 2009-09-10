@@ -32,6 +32,8 @@
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
 
+#include "milhouseLogger.h"
+
 namespace pof 
 {
     short run(int argc, char **argv);
@@ -44,20 +46,6 @@ namespace pof
 }
 
 int telnetServer(int, int);
-
-
-class MilhouseLogger
-    : public Log::Subscriber
-{
-    public:
-        void operator()(LogLevel&, std::string& msg);
-};
-
-
-void MilhouseLogger::operator()(LogLevel& /*level*/, std::string& msg)
-{
-    std::cout << msg;
-}
 
 
 void addOptions(OptionArgs &options)
@@ -204,10 +192,8 @@ short pof::run(int argc, char **argv)
 
         if (!disableVideo)
         {
-#if 0
             if(options["fullscreen"])
                 MessageDispatcher::getInstance()->sendMessage("fullscreen");
-#endif
         }
 
         int timeout = 0;    // default: run indefinitely
