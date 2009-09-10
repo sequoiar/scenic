@@ -23,6 +23,7 @@
 #include "util.h"
 #include "messageDispatcher.h"
 #include "messageHandler.h"
+#include <algorithm>
 
 MessageDispatcher *MessageDispatcher::instance_ = 0;
 
