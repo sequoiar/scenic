@@ -100,8 +100,6 @@ void RtpSender::add(RtpPay * newSrc, const SenderConfig & config)
     RtpBin::init();
     config_ = std::tr1::shared_ptr<SenderConfig>(new SenderConfig(config));
     registerSession(config_->codec());
-    // register this rtpSender to handle new caps msg
-    Pipeline::Instance()->subscribe(this);
 
     GstPad *send_rtp_sink;
     GstPad *send_rtp_src;

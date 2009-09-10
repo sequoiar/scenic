@@ -35,5 +35,6 @@
 #include "gst/engine/playback.h"
 #include "gst/engine/videoSink.h"
 #include "gst/engine/capsParser.h"
+#include "gst/engine/messageDispatcher.h"
 
 #endif // _ENGINE_H_

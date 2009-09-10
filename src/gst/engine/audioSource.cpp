@@ -203,9 +203,6 @@ void AudioFileSource::sub_init()
     
     GstElement * queue = FileSource::acquireAudio(config_.location());
     gstlinkable::link(queue, aconv_);
-
-    // register this filesrc to handle EOS msg and loop if specified
-    Pipeline::Instance()->subscribe(this);
 }
 
 
@@ -298,7 +295,7 @@ void AudioPulseSource::sub_init()
 
 /// Constructor 
 AudioJackSource::AudioJackSource(const AudioSourceConfig &config) : 
-    AudioSource(config), capsFilter_(0), aconv_(0)
+    AudioSource(config), capsFilter_(0), aconv_(0), disableAutoConnect_(false)
 {
 }
 
@@ -320,6 +317,18 @@ void AudioJackSource::sub_init()
         g_object_set(G_OBJECT(source_), "connect", 2, NULL);
     
     initCapsFilter(aconv_, capsFilter_);
+}
+
+
+bool AudioJackSource::handleMessage(const std::string &message)
+{
+    assert(source_);
+    if (message == "disable_jack_autoconnect")
+    {
+        g_object_set(G_OBJECT(source_), "connect", 0, NULL);
+        return true;
+    }
+    return false;
 }
 
 

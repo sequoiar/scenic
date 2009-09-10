@@ -26,6 +26,7 @@
 #include <gst/audio/multichannel.h>
 #include "gstLinkable.h"
 #include "busMsgHandler.h"
+#include "messageHandler.h"
 
 // forward declarations
 class AudioSourceConfig;
@@ -238,7 +239,7 @@ class AudioPulseSource : public AudioSource
  *  and interleaves incoming jack buffers into one multichannel stream.
  */
 
-class AudioJackSource : public AudioSource
+class AudioJackSource : public AudioSource, public MessageHandler
 {
     public:
         AudioJackSource(const AudioSourceConfig &config);
@@ -246,11 +247,13 @@ class AudioJackSource : public AudioSource
     private:
         ~AudioJackSource();
 
+        bool handleMessage(const std::string &message);
         GstElement *srcElement() { return capsFilter_; }
         void sub_init();
 
         GstElement *capsFilter_;
         GstElement *aconv_;
+        bool disableAutoConnect_;
         /// No Copy Constructor
         AudioJackSource(const AudioJackSource&);     
         /// No Assignment Operator

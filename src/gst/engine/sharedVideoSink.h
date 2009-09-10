@@ -40,7 +40,6 @@ class SharedVideoSink : public VideoSink
 
     private:
          
-        virtual void handleMessage(const std::string &message);
         void prepareSink();
         static std::tr1::shared_ptr<boost::interprocess::shared_memory_object> createSharedMemory(const std::string &id);
         static bool removeSharedMemory(const std::string &id);

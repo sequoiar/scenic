@@ -80,7 +80,7 @@ def generate_caps(profiles):
         while caps is None:
             caps = srcpad.get_negotiated_caps()
             
-        profile.caps = caps.to_string().split(', ssrc')[0].strip()
+        profile.caps = caps.to_string()#.split(', ssrc')[0].strip()
 
         #print codec
         pipeline.set_state(gst.STATE_NULL)

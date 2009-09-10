@@ -10,11 +10,11 @@ libgst_la_SOURCES = mediaBase.cpp \
 				   videoConfig.cpp rtpBin.cpp pipeline.cpp \
 				   rtpSender.cpp rtpReceiver.cpp audioSource.cpp \
 				   interleave.cpp gstLinkable.cpp videoSink.cpp audioSink.cpp jackUtils.cpp \
-				   codec.cpp rtpPay.cpp audioConfig.cpp remoteConfig.cpp \
+				   codec.cpp rtpPay.cpp audioConfig.cpp remoteConfig.cpp messageDispatcher.cpp messageHandler.cpp \
 				   videoReceiver.cpp videoSender.cpp videoSource.cpp raw1394Util.cpp \
 				   audioLevel.cpp glVideoSink.cpp playback.cpp dv1394.cpp v4l2util.cpp fileSource.cpp \
-				   sharedVideoSink.cpp sharedVideoBuffer.cpp capsParser.cpp \
-                   mediaBase.h busMsgHandler.h ../ports.h \
+				   sharedVideoSink.cpp sharedVideoBuffer.cpp capsParser.cpp busMsgHandler.cpp \
+                   mediaBase.h messageDispatcher.h messageHandler.h busMsgHandler.h ../ports.h \
 				   audioSender.h audioReceiver.h $(inc)/alsa.h\
 				   videoConfig.h rtpBin.h pipeline.h \
 				   rtpSender.h rtpReceiver.h audioSource.h \

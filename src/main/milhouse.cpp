@@ -90,6 +90,7 @@ void addOptions(OptionArgs &options)
     options.addInt("camera_number", 'G', "camera_number", "camera id for dc1394");
     options.addString("multicast_interface", 'I', "multicast_interface", "interface to use for multicast");
     options.addBool("enable_controls", 'j', "enable gui controls for jitter buffer");
+    options.addBool("disable_jack_autoconnect", 'J', "disable jack's autoconnection");
     //telnetServer param
     options.addInt("serverport", 'y', "run as server", "port to listen on");
 }
@@ -187,6 +188,9 @@ short pof::run(int argc, char **argv)
             aRx = audiofactory::buildAudioReceiver(options["address"], options["audiocodec"], 
                     options["audioport"], options["audiosink"], options["audiodevice"], 
                     options["audio_buffer_usec"], options["multicast_interface"], options["numchannels"]);
+
+            if (options["disable_jack_autoconnect"])
+                MessageDispatcher::getInstance()->sendMessage("disable_jack_autoconnect");
         }
 
 #ifdef CONFIG_DEBUG_LOCAL
@@ -200,8 +204,10 @@ short pof::run(int argc, char **argv)
 
         if (!disableVideo)
         {
+#if 0
             if(options["fullscreen"])
-                vRx->toggleFullscreen();
+                MessageDispatcher::getInstance()->sendMessage("fullscreen");
+#endif
         }
 
         int timeout = 0;    // default: run indefinitely
@@ -253,6 +259,9 @@ short pof::run(int argc, char **argv)
             AudioSourceConfig aConfig(options["audiosource"], options["audiodevice"], 
                     options["audiolocation"], options["numchannels"]);
             aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], options["audioport"]);
+
+            if (options["disable_jack_autoconnect"])
+                MessageDispatcher::getInstance()->sendMessage("disable_jack_autoconnect");
         }
 
 #ifdef CONFIG_DEBUG_LOCAL

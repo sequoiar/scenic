@@ -29,6 +29,7 @@
 #include "videoSink.h"
 #include "codec.h"
 #include "rtpPay.h"
+#include "messageDispatcher.h"
 
     
 VideoReceiver::VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig rConfig) : 
@@ -52,10 +53,6 @@ VideoReceiver::~VideoReceiver()
     delete decoder_;
 }
 
-void VideoReceiver::toggleFullscreen()
-{
-    sink_->sendMessage("fullscreen");
-}
 
 void VideoReceiver::init_codec()
 {

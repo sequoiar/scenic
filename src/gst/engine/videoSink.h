@@ -26,6 +26,7 @@
 #include <X11/Xlib.h>
 #include "gstLinkable.h"
 #include "busMsgHandler.h"
+#include "messageHandler.h"
 
 class _GtkWidget;
 class _GdkEventExpose;
@@ -39,22 +40,19 @@ class VideoSink : public GstLinkableSink
        VideoSink() : sink_(0) {};
         virtual ~VideoSink(){};
         virtual void init() = 0;
-        void sendMessage(const std::string &message) { handleMessage(message); }
 
     protected:
         virtual void destroySink();
-        virtual void defaultHandler(const std::string &message);
         void prepareSink();
         _GstElement *sink_;
 
     private:
-        virtual void handleMessage(const std::string &message) = 0;
         VideoSink(const VideoSink&);     //No Copy Constructor
         VideoSink& operator=(const VideoSink&);     //No Assignment Operator
 };
 
 class GtkVideoSink
-: public VideoSink
+: public VideoSink, public MessageHandler
 {
     public:
         GtkVideoSink(int screen_num)
@@ -77,7 +75,7 @@ class GtkVideoSink
         static void toggleFullscreen(_GtkWidget *widget);
 
     private:
-        virtual void handleMessage(const std::string &message);
+        virtual bool handleMessage(const std::string &message);
 
         GtkVideoSink(const GtkVideoSink&);     //No Copy Constructor
         GtkVideoSink& operator=(const GtkVideoSink&);     //No Assignment Operator
@@ -110,7 +108,6 @@ class XImageSink
         XImageSink() : colorspc_(0) {};
 
     private:
-        virtual void handleMessage(const std::string &message);
         ~XImageSink();
         void init();
 

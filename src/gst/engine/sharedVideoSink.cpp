@@ -150,9 +150,3 @@ SharedVideoSink::~SharedVideoSink()
     removeSharedMemory(id_);
 }
 
-
-void SharedVideoSink::handleMessage(const std::string &message)
-{
-    VideoSink::defaultHandler(message);
-}
-

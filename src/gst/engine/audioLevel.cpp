@@ -48,9 +48,6 @@ void AudioLevel::init()
 {
     level_ = Pipeline::Instance()->makeElement("level", NULL);
     g_object_set(G_OBJECT(level_), "interval", 1000000000LL, "message", emitMessages_, NULL);
-
-    // register this level to handle level msg
-    Pipeline::Instance()->subscribe(this);
 }
 
 

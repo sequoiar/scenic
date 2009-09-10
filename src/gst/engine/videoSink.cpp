@@ -42,11 +42,6 @@ void VideoSink::destroySink()
     Pipeline::Instance()->remove(&sink_);
 }
 
-void VideoSink::defaultHandler(const std::string &message)
-{
-    LOG_ERROR("Unimplemented handler for message " << message);
-}
-
 Window GtkVideoSink::getXWindow()
 { 
     return GDK_WINDOW_XWINDOW(window_->window);
@@ -104,12 +99,14 @@ void GtkVideoSink::makeUnfullscreen(GtkWidget *widget)
 }
 
 
-void GtkVideoSink::handleMessage(const std::string &message)
+bool GtkVideoSink::handleMessage(const std::string &message)
 {
     if (message == "fullscreen")
+    {
         toggleFullscreen();
-    else
-        VideoSink::defaultHandler(message);
+        return true;
+    }
+    return false;
 }
 
 
@@ -203,8 +200,6 @@ void XvImageSink::init()
             G_CALLBACK(destroy_cb), static_cast<gpointer>(this));
 
     showWindow();
-    // register this level to handle prepare window id msg
-    Pipeline::Instance()->subscribe(this);
 }
 
 
@@ -234,11 +229,5 @@ XImageSink::~XImageSink()
 {
     VideoSink::destroySink();
     Pipeline::Instance()->remove(&colorspc_);
-}
-
-
-void XImageSink::handleMessage(const std::string &message)
-{
-    VideoSink::defaultHandler(message);
 }
 

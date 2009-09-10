@@ -35,11 +35,15 @@ class _GstMessage;
 class BusMsgHandler
 {
     public:
-    /// This method is called by the GstBus listener when it has a new msg. 
-    virtual bool handleBusMsg(_GstMessage *msg) = 0;
-    /** 
-     * Destructor */
-    virtual ~BusMsgHandler() {};
+        /// This method is called by the GstBus listener when it has a new msg. 
+        virtual bool handleBusMsg(_GstMessage *msg) = 0;
+        
+        /** 
+         * Destructor */
+        
+    protected:
+        BusMsgHandler();
+        virtual ~BusMsgHandler();
 };
 
 #endif // _BUS_MSG_HANDLER_H_ 

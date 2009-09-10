@@ -331,9 +331,6 @@ void GLImageSink::init()
     //g_object_set(G_OBJECT(sink_), "client-reshape-callback", G_CALLBACK(reshapeCallback), NULL);
     //g_object_set(G_OBJECT(sink_), "client-draw-callback", G_CALLBACK(drawCallback), NULL);  
     showWindow();
-
-    // register this level to handle prepare window id msg
-    Pipeline::Instance()->subscribe(this);
 }
 
 #endif //CONFIG_GL

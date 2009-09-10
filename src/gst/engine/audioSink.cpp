@@ -187,3 +187,15 @@ void AudioJackSink::init()
     LOG_DEBUG("Buffer time is " << val);
 }
 
+
+bool AudioJackSink::handleMessage(const std::string &message)
+{
+    assert(sink_);
+    if (message == "disable_jack_autoconnect")
+    {
+        g_object_set(G_OBJECT(sink_), "connect", 0, NULL);
+        return true;
+    }
+    return false;
+}
+

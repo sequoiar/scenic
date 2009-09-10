@@ -27,6 +27,7 @@
 #include "remoteConfig.h"
 #include "rtpReceiver.h"
 #include "audioLevel.h"
+#include "messageHandler.h"
 
 class RtpPay;
 class Decoder;

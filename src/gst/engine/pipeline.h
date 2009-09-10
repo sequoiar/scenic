@@ -40,6 +40,7 @@ class Pipeline
         static Pipeline * Instance();
         _GstElement *makeElement(const char *factoryName, const char *elementName);
         void subscribe(BusMsgHandler *obj);
+        void unsubscribe(BusMsgHandler *obj);
 
         GstClockID add_clock_callback(GstClockCallback callback, void *user_data);
         void remove_clock_callback(GstClockID clockId);

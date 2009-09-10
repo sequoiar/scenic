@@ -24,6 +24,7 @@
 
 #include <string>
 #include "gstLinkable.h"
+#include "messageHandler.h"
 
 // forward declarations
 class AudioSinkConfig;
@@ -99,12 +100,13 @@ class AudioPulseSink : public AudioSink
 };
 
 /// Concrete AudioSink class representing a sink to the JACK audio connection kit 
-class AudioJackSink : public AudioSink
+class AudioJackSink : public AudioSink, public MessageHandler
 {
     public:
         AudioJackSink(const AudioSinkConfig &config);
         ~AudioJackSink();
     private:
+        bool handleMessage(const std::string &message);
         void init();
         const AudioSinkConfig &config_;
         /// No Copy Constructor 

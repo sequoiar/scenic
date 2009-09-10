@@ -430,8 +430,25 @@ void Pipeline::subscribe(BusMsgHandler *obj)
 }
 
 
+void Pipeline::unsubscribe(BusMsgHandler *obj)
+{
+    // remove the busmsghandler from the list
+
+    // find the busmsghandler in the list
+    std::vector<BusMsgHandler*>::iterator iter;
+    iter = find( handlers_.begin(), handlers_.end(), obj);
+
+    // assert that we were able to find the handler 
+    assert(iter != handlers_.end() );
+
+    // remove it
+    handlers_.erase(iter);
+}
+
+
 void Pipeline::updateListeners(GstMessage *msg)
 {
+    // TODO: are we guaranteed that these are in a callable state?
     for (std::vector<BusMsgHandler*>::iterator iter = handlers_.begin(); 
             iter != handlers_.end(); ++iter)
         if ((*iter)->handleBusMsg(msg))
