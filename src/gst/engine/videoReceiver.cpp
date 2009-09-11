@@ -81,7 +81,7 @@ void VideoReceiver::init_sink()
     gstlinkable::link(*decoder_, *sink_);
     setCaps();
     tassert(gotCaps_);
-    tassert(remoteConfig_.capsMatchCodec()); 
+    //tassert(remoteConfig_.capsMatchCodec()); 
     decoder_->adjustJitterBuffer(); // increase jitterbuffer as needed
 }
 
