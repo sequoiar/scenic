@@ -29,6 +29,7 @@
 #include "codec.h"
 #include "rtpPay.h"
 
+
 /// Constructor 
 AudioSender::AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig) : 
     audioConfig_(aConfig), 
@@ -96,5 +97,38 @@ void AudioSender::init_payloader()
 
     gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_, remoteConfig_);   
+}
+
+
+
+/** 
+ * The new caps message is posted on the bus by the src pad of our udpsink, 
+ * received by this rtpsender, and dispatched. */
+bool AudioSender::handleBusMsg(GstMessage *msg)
+{
+    const GstStructure *s = gst_message_get_structure(msg);
+    const gchar *name = gst_structure_get_name(s);
+
+    if (std::string(name) == "caps-changed") 
+    {   
+        // this is our msg
+        const gchar *newCapsStr = gst_structure_get_string(s, "caps");
+        tassert(newCapsStr);
+        std::string str(newCapsStr);
+
+        const std::string ENCODING_NAME("VORBIS");
+        const std::string key("encoding-name=(string)");
+        size_t pos = str.find(key) + key.length();
+
+        if (str.compare(pos, ENCODING_NAME.length(), ENCODING_NAME))
+            return false; // not our encoding
+        
+        LOG_DEBUG("Sending caps for codec " << ENCODING_NAME);
+        remoteConfig_.sendMessage(std::string(newCapsStr));
+
+        return true;
+    }
+
+    return false;           // this wasn't our msg, someone else should handle it
 }
 

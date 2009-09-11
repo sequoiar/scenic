@@ -24,22 +24,19 @@
 #define _RTP_SENDER_H_
 
 #include <string>
-#include <tr1/memory>
 #include "rtpBin.h"
-#include "busMsgHandler.h"
 
 class SenderConfig;
 class _GstElement;
 class _GstPad;
 class _GParamSpec;
-class _GstMessage;
 class RtpPay;
 
 class RtpSender
-    : public RtpBin, public BusMsgHandler
+    : public RtpBin//, public BusMsgHandler
 {
     public:
-        RtpSender() : rtp_sender_(0), config_() {}
+        RtpSender() : rtp_sender_(0) {}
         void checkSampleRate();
 
         static void enableControl();
@@ -50,8 +47,6 @@ class RtpSender
 
     private:
         _GstElement *rtp_sender_;
-        std::tr1::shared_ptr<SenderConfig> config_;
-        bool handleBusMsg(_GstMessage *msg);
         static void sendCapsChanged(_GstPad *pad, _GParamSpec *pspec, RtpSender *context);
         virtual void subParseSourceStats(_GstStructure *stats);
         RtpSender(const RtpSender&); //No Copy Constructor

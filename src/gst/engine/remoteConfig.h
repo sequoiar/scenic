@@ -89,8 +89,7 @@ class SenderConfig : public RemoteConfig
 
         VideoEncoder* createVideoEncoder() const;
         Encoder* createAudioEncoder() const;
-
-        void sendMessage(const std::string &msg);
+        void sendMessage(const std::string &msg) const;
 };
 
 

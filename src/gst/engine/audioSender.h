@@ -27,11 +27,13 @@
 #include "audioConfig.h"
 #include "remoteConfig.h"
 #include "rtpSender.h"
+#include "busMsgHandler.h"
 //#include "audioLevel.h"
 
 class AudioSource;
 class Encoder;
 class Payloader;
+class _GstMessage;
 
 class AudioSender
     : public SenderBase 
@@ -44,6 +46,7 @@ class AudioSender
         std::string getCaps() const;
 
     private:
+        bool handleBusMsg(_GstMessage *msg);
         void init_source();
 // void init_level();
         void init_codec();

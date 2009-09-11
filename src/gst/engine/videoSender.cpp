@@ -31,6 +31,8 @@
 #include "remoteConfig.h"
 #include "codec.h"
 
+
+
 /// Constructor
 VideoSender::VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig) : 
     videoConfig_(vConfig), remoteConfig_(rConfig), session_(), source_(0), 
@@ -80,5 +82,38 @@ void VideoSender::init_payloader()
     payloader_->init();
     gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_, remoteConfig_);
+}
+
+
+
+/** 
+ * The new caps message is posted on the bus by the src pad of our udpsink, 
+ * received by this rtpsender, and dispatched. */
+bool VideoSender::handleBusMsg(GstMessage *msg)
+{
+    const GstStructure *s = gst_message_get_structure(msg);
+    const gchar *name = gst_structure_get_name(s);
+
+    if (std::string(name) == "caps-changed") 
+    {   
+        // this is our msg
+        const gchar *newCapsStr = gst_structure_get_string(s, "caps");
+        tassert(newCapsStr);
+        std::string str(newCapsStr);
+
+        const std::string ENCODING_NAME("THEORA");
+        const std::string key("encoding-name=(string)");
+        size_t pos = str.find(key) + key.length();
+
+        if (str.compare(pos, ENCODING_NAME.length(), ENCODING_NAME))
+            return false; // not our encoding
+        
+        LOG_DEBUG("Sending caps for codec " << ENCODING_NAME);
+        remoteConfig_.sendMessage(std::string(newCapsStr));
+
+        return true;
+    }
+
+    return false;           // this wasn't our msg, someone else should handle it
 }
 

@@ -120,7 +120,7 @@ Encoder * SenderConfig::createAudioEncoder() const
 }
 
 
-void SenderConfig::sendMessage(const std::string &message)
+void SenderConfig::sendMessage(const std::string &message) const
 {
     LOG_DEBUG("\n\n\n MESSAGE " << message << "for " 
             << remoteHost_ << " on port " << capsPort() 
@@ -199,7 +199,8 @@ bool ReceiverConfig::capsMatchCodec() const
         return true;
     else
     {
-        LOG_WARNING("Caps don't match codec");
+        LOG_WARNING("Caps encoding name " << encodingName <<
+                " doesn't match codec " << codec_);
         return false;
     }
 }

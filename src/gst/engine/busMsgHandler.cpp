@@ -26,7 +26,6 @@
 #include "pipeline.h"
 
 
-
 /** 
 * Abstract interface which requires its implementors to provide 
 * functionality to handle messages posted on the bus. Variation on

@@ -27,13 +27,15 @@
 #include "videoConfig.h"
 #include "remoteConfig.h"
 #include "rtpSender.h"
+#include "busMsgHandler.h"
 
 class VideoSource;
 class VideoEncoder;
 class Payloader;
+class _GstMessage;
 
 class VideoSender
-    : public SenderBase 
+    : public SenderBase, public BusMsgHandler
 {
     public:
          VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig);
@@ -41,6 +43,7 @@ class VideoSender
         std::string getCaps() const;
 
     private:
+        bool handleBusMsg(_GstMessage *msg);
         void init_source();
         void init_codec();
         void init_payloader();
