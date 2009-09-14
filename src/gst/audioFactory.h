@@ -25,6 +25,7 @@
 #define _AUDIO_FACTORY_H_
 
 #include "gst/engine.h"
+#include <boost/lexical_cast.hpp>
 
 #include "ports.h"
 
@@ -74,14 +75,19 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
                                   const std::string &multicastInterface,
                                   int numChannels)
 {
+    using boost::lexical_cast;
+
     AudioSinkConfig aConfig(sink, deviceName, audioBufferTime);
-    std::string caps(CapsParser::getAudioCaps(codec)); // get caps here
-    tassert(caps != "");
+    std::string profile = codec + "_" + 
+        lexical_cast<std::string>(numChannels) + "_" + 
+        lexical_cast<std::string>(playback::sampleRate());
+    LOG_DEBUG("Looking for profile " << profile);
+    std::string caps(CapsParser::getAudioCaps(profile)); // get caps here
     ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID);
 
     // FIXME: codec class should have list of codecs that need live caps update
     // FIXME: also we shouldn't have to receive caps for non-stereo 
-    if (codec == "vorbis" or numChannels != 2)
+    if (codec == "vorbis" or caps == "")
     {
         LOG_INFO("Waiting for " << codec << " caps from other host");
         rConfig.receiveCaps();  // wait for new caps from sender

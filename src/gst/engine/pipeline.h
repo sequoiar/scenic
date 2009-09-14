@@ -60,7 +60,7 @@ class Pipeline
         bool quitted() { return quitted_; }
         void makeVerbose();
 
-        static const unsigned int SAMPLE_RATE;
+        static const unsigned int SAMPLE_RATE = 48000;
 
     private:
         static void deepNotifyCb(GObject *object, GstObject *orig, GParamSpec *spec, gchar ** excluded_props);

@@ -1,5 +1,6 @@
 #include "./capsParser.h"
 
+#include "util.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -9,12 +10,14 @@
 #define STRINGIFY(x) #x
 
 
+/// Video profile is in format <codec>
 std::string CapsParser::getVideoCaps(const std::string &profile)
 {
     return getCapsFromFile(XSTRINGIFY(__DATA_DIR__) "/caps.txt", profile);
 }
 
 
+/// Audio profile is in format <codec>_<channels>_<samplerate>
 std::string CapsParser::getAudioCaps(const std::string &profile)
 {
     return getCapsFromFile(XSTRINGIFY(__DATA_DIR__) "/caps.txt", profile);
@@ -45,10 +48,13 @@ std::string CapsParser::getCapsFromFile(const char *filename, const std::string 
         capsFile.close();
     }
     else 
-        std::cerr << "Unable to open file " << filename << std::endl;
+        LOG_ERROR("Unable to open file " << filename);
 
     if (not foundCaps)
+    {
+        LOG_WARNING("Could not find caps for profile " << profile);
         return "";
+    }
     
     return line;
 }

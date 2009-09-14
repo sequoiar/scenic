@@ -172,6 +172,31 @@ Decoder * ReceiverConfig::createAudioDecoder() const
     LOG_DEBUG("Audio decoder " << codec_ << " built"); 
 }
 
+
+bool RemoteConfig::capsMatchCodec(const std::string &encodingName, const std::string &codec)
+{
+    if (encodingName == "VORBIS" and codec == "vorbis")
+        return true;
+    else if (encodingName == "L16" and codec == "raw")
+        return true;
+    else if (encodingName == "MPA" and codec == "mp3")
+        return true;
+    else if (encodingName == "MP4V-ES" and codec == "mpeg4")
+        return true;
+    else if (encodingName == "H264" and codec == "h264")
+        return true;
+    else if (encodingName == "H263-1998" and codec == "h263")
+        return true;
+    else if (encodingName == "THEORA" and codec == "theora")
+        return true;
+    else
+    {
+        LOG_WARNING("Caps encoding name " << encodingName <<
+                " doesn't match codec " << codec);
+        return false;
+    }
+}
+
 /// This function makes sure that the caps set on this receiver by a sender, match the codec
 /// that it expects. If it fails, it is probably due to a mismatch of codecs between sender and
 /// receiver, or a change in the caps specification for a given codec from gstreamer.
@@ -183,26 +208,7 @@ bool ReceiverConfig::capsMatchCodec() const
     const GValue *str = gst_structure_get_value(structure, "encoding-name");
     std::string encodingName(g_value_get_string(str));
 
-    if (encodingName == "VORBIS" and codec_ == "vorbis")
-        return true;
-    else if (encodingName == "L16" and codec_ == "raw")
-        return true;
-    else if (encodingName == "MPA" and codec_ == "mp3")
-        return true;
-    else if (encodingName == "MP4V-ES" and codec_ == "mpeg4")
-        return true;
-    else if (encodingName == "H264" and codec_ == "h264")
-        return true;
-    else if (encodingName == "H263-1998" and codec_ == "h263")
-        return true;
-    else if (encodingName == "THEORA" and codec_ == "theora")
-        return true;
-    else
-    {
-        LOG_WARNING("Caps encoding name " << encodingName <<
-                " doesn't match codec " << codec_);
-        return false;
-    }
+    return RemoteConfig::capsMatchCodec(encodingName, codec_);
 }
 
 

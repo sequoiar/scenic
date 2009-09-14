@@ -31,6 +31,7 @@ namespace playback {
         void makeVerbose();
         void quit();
         bool quitted();
+        int sampleRate();
 }
 
 #endif // _PLAYBACK_H_

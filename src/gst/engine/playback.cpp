@@ -67,4 +67,7 @@ bool playback::quitted()
     return Pipeline::Instance()->quitted();
 }
 
-
+int playback::sampleRate()
+{
+    return Pipeline::SAMPLE_RATE;
+}

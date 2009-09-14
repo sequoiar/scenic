@@ -33,8 +33,7 @@ import gobject
 class Profile(object):
     """ Holds codec name, encoder names, payloader name and caps string """
     filename = 'caps.txt'
-    def __init__(self, codec, encoder, payloader):
-        self.codec = codec
+    def __init__(self, encoder, payloader):
         self.encoder = encoder
         self.payloader = payloader
         self.caps = ''
@@ -43,8 +42,8 @@ class Profile(object):
 
 class VideoProfile(Profile):
     """ Holds codec name, encoder names, payloader name and caps string """
-    def __init__(self, codec, encoder, payloader, width=640, height=480):
-        Profile.__init__(self, codec, encoder, payloader)
+    def __init__(self, encoder, payloader, width=640, height=480):
+        Profile.__init__(self, encoder, payloader)
         self.width = width
         self.height = height
         self.src = "videotestsrc ! video/x-raw-yuv, width=%d, height=%d" % (self.width, self.height) 
@@ -53,37 +52,35 @@ class VideoProfile(Profile):
 
 class AudioProfile(Profile):
     """ Holds codec name, encoder names, payloader name, num channels and caps string """
-
-    def __init__(self, codec, encoder, payloader, channels=2, rate=48000):
-        Profile.__init__(self, codec, encoder, payloader)
+    def __init__(self, encoder, payloader, channels=2, rate=48000):
+        Profile.__init__(self, encoder, payloader)
         self.channels = channels
         self.rate = rate
         self.src = "audiotestsrc ! audio/x-raw-int, channels=%d, rate=%d ! audioconvert " % (self.channels, self.rate)
 
 
-def generate_caps(profiles):
+def generate_caps(profile_name, profile):
     """ Generate caps for a set of profiles """
-    for profile_name, profile in profiles.iteritems():
-        #print ('/*----------------------------------------------*/' )
-        #print ('CAPS FOR CODEC ' + codecName + ':')
-        launch_line = profile.src + " ! %s ! %s name=payloader ! fakesink" \
-        % (profile.encoder, profile.payloader)
-        pipeline = gst.parse_launch(launch_line)
-        pipeline.set_state(gst.STATE_PLAYING)
-        mainloop = gobject.MainLoop()
+    #print ('/*----------------------------------------------*/' )
+    #print ('CAPS FOR CODEC ' + codecName + ':')
+    launch_line = profile.src + " ! %s ! %s name=payloader ! fakesink sync=false" \
+    % (profile.encoder, profile.payloader)
+    pipeline = gst.parse_launch(launch_line)
+    pipeline.set_state(gst.STATE_PLAYING)
+    mainloop = gobject.MainLoop()
 
-        payloader = pipeline.get_by_name("payloader")
-        srcpad = payloader.get_static_pad("src")
+    payloader = pipeline.get_by_name("payloader")
+    srcpad = payloader.get_static_pad("src")
 
+    caps = srcpad.get_negotiated_caps()
+
+    while caps is None:
         caps = srcpad.get_negotiated_caps()
+        
+    profile.caps = caps.to_string().split(', ssrc')[0].strip()
 
-        while caps is None:
-            caps = srcpad.get_negotiated_caps()
-            
-        profile.caps = caps.to_string()#.split(', ssrc')[0].strip()
-
-        #print codec
-        pipeline.set_state(gst.STATE_NULL)
+    #print codec
+    pipeline.set_state(gst.STATE_NULL)
 
     return profiles 
 
@@ -105,16 +102,33 @@ def save_caps(profiles, filename):
 
 
 profiles = {
-    'theora' : VideoProfile('theora', 'theoraenc', 'rtptheorapay'), 
-    'mpeg4'  : VideoProfile('mpeg4', 'ffenc_mpeg4','rtpmp4vpay'),
-    'h264'   : VideoProfile('h264', 'x264enc', 'rtph264pay'),
-    'h263'   : VideoProfile('h263', 'ffenc_h263p', 'rtph263ppay'),
-    'vorbis' : AudioProfile('vorbis', 'vorbisenc', 'rtpvorbispay'), 
-    'mp3'    : AudioProfile('mp3', 'lame', 'rtpmpapay'),
-    'raw'    : AudioProfile('raw', 'identity', 'rtpL16pay')
+    'theora' : VideoProfile('theoraenc', 'rtptheorapay'), 
+    'mpeg4'  : VideoProfile('ffenc_mpeg4','rtpmp4vpay'),
+    'h264'   : VideoProfile('x264enc', 'rtph264pay'),
+    'h263'   : VideoProfile('ffenc_h263p', 'rtph263ppay'),
+}
+
+encoders = {
+    'vorbis' : 'vorbisenc',
+    'mp3' : 'lame',
+    'raw' : 'identity silent=true'
+}
+
+payloaders = {
+    'vorbis' : 'rtpvorbispay',
+    'mp3' : 'rtpmpapay',
+    'raw' : 'rtpL16pay'
 }
 
 
-profiles = generate_caps(profiles)
-save_caps(profiles, Profile.filename)
+rate = 48000
+for codec in ('raw', 'vorbis', 'mp3'):
+    for channels in xrange(1, 3):
+        profile_name = codec + '_%d_%d' % (channels, rate)
+        profiles[profile_name] = AudioProfile(encoders[codec], payloaders[codec], channels, rate)
 
+
+for profile_name, profile in profiles.iteritems():
+    profile = generate_caps(profile_name, profile)
+    
+save_caps(profiles, Profile.filename)

@@ -62,7 +62,7 @@ class Encoder : public Codec
     public:
         /// Abstract Factory method that will create payloaders corresponding to this Encoder's codec type 
         virtual Payloader* createPayloader() const = 0;
-        int getBitrate();
+        int getBitrate() const;
         void postBitrate();
         virtual void setBitrate(unsigned bitrate);
     protected:

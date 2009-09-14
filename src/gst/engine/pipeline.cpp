@@ -38,8 +38,6 @@
 
 Pipeline *Pipeline::instance_ = 0;
 
-const unsigned int Pipeline::SAMPLE_RATE = 48000;
-
 Pipeline * Pipeline::Instance()
 {
     if (instance_ == 0) {

@@ -51,7 +51,7 @@ Codec::~Codec()
 
 
 /// Returns bitrate property for this encoder
-int Encoder::getBitrate()
+int Encoder::getBitrate() const
 {
     tassert(codec_);
     unsigned bitrate; 
@@ -85,7 +85,7 @@ void Encoder::postBitrate()
     MapMsg mapMsg("bitrate");
     mapMsg["value"] = 
         std::string(gst_element_factory_get_longname(gst_element_get_factory(codec_))) 
-        + ": " +  boost::lexical_cast< std::string >(getBitrate());
+        + ": " +  boost::lexical_cast<std::string>(getBitrate());
     mapMsg.post();
 }
 

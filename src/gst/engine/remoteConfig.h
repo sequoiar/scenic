@@ -49,6 +49,7 @@ class RemoteConfig
             : codec_(m.codec_), remoteHost_(m.remoteHost_), port_(m.port_), msgId_(m.msgId_) {}
 
         virtual ~RemoteConfig(){};
+        static bool capsMatchCodec(const std::string &encodingName, const std::string &codec);
 
         int port() const { return port_; }
         int rtcpFirstPort() const { return port_ + ports::RTCP_FIRST_OFFSET; }
