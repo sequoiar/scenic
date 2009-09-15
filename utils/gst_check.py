@@ -49,8 +49,8 @@ if (sink_ == "xvimagesink")
 """
 matches = [
     re.compile(r"^.*makeElement\(\""), 
-    re.compile(r"^.*source_ \ ==\ \""),
-    re.compile(r"^.*sink_ \ ==\ \""),
+    re.compile(r"^.*source_ == \""),
+    re.compile(r"^.*sink_ == \""),
 ]
 
 end = re.compile(r"\".*$")
@@ -80,6 +80,11 @@ for source_file in cpp_files:
 
 gst_plugins = list(set(gst_plugins))
 gst_plugins.sort()
+
+try:
+    gst_plugins.remove('sharedvideosink')
+except:
+    pass
 
 for plugin in gst_plugins:
     if gst.element_factory_find(plugin) is None: 
