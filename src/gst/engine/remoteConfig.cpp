@@ -190,11 +190,7 @@ bool RemoteConfig::capsMatchCodec(const std::string &encodingName, const std::st
     else if (encodingName == "THEORA" and codec == "theora")
         return true;
     else
-    {
-        LOG_WARNING("Caps encoding name " << encodingName <<
-                " doesn't match codec " << codec);
         return false;
-    }
 }
 
 /// This function makes sure that the caps set on this receiver by a sender, match the codec

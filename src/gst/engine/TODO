@@ -1,12 +1,11 @@
--write audio caps "by hand" (from strings) not pipeline because gst-multichannel is multi-crappy
--caps changed signal never happens for audio
--receiver will have to know how many channels it's getting to correctly guess caps
--need a profile per channel possibility
--use milhouse command line to generate caps
--caps will come from a file
--crash for real with a t_assert
--make sure no exceptions can be thrown from destructors
--figure out what happens if jack settings differ between machines
--write about latency rtp issues/testing with netem scripts and so on
--teeing video and audio, start with tests
+NTA:
+-complete table at https://svn.sat.qc.ca/trac/miville/wiki/TestingCodecMatrix
+-test with prerelease tarball of gstffmpeg=0.10.8.2 http://gstreamer.freedesktop.org/src/gst-ffmpeg/pre/gst-ffmpeg-0.10.8.2.tar.gz
+-add flag to explicitly send/receive caps on command line
+-make sure that if we quit with interrupt, everything especially shared memory is cleaned up
 
+HELLO_WORLD:
+-get sendCaps stuff out of gst/control (aka telnet)
+-use milhouse command line to generate caps
+-Get rid of singletons, rather have an application space all the necessary objects can listen.
+-make sure no exceptions can be thrown from destructors
