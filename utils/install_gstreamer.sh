@@ -10,7 +10,7 @@
 #  4. gst-plugin-good 0.10.16
 #  5. gst-plugin-bad 0.10.14
 #  6. gst-plugin-ugly 0.10.12
-#  7. gst-ffmpeg 0.10.10.8
+#  7. gst-ffmpeg 0.10.10.7
 
 DOWNLOAD_DIR=~/src/gstreamer-src
 if [ ! -d $DOWNLOAD_DIR ]
@@ -34,7 +34,7 @@ for uri_path in /gstreamer/gstreamer-0.10.24.tar.bz2 \
                 /gst-plugins-good/gst-plugins-good-0.10.16.tar.bz2 \
                 /gst-plugins-bad/gst-plugins-bad-0.10.14.tar.bz2 \
                 /gst-plugins-ugly/gst-plugins-ugly-0.10.12.tar.bz2 \
-                /gst-ffmpeg/gst-ffmpeg-0.10.8.tar.bz2 \
+                /gst-ffmpeg/gst-ffmpeg-0.10.7.tar.bz2 \
                 /gst-python/gst-python-0.10.16.tar.bz2 \
                 /gst-plugins-gl/gst-plugins-gl-0.10.1.tar.bz2
 do
@@ -42,7 +42,7 @@ do
 done
 
 # Build!
-for module in gstreamer-0.10.24 gst-plugins-base-0.10.24 gst-plugins-good-0.10.16 gst-plugins-bad-0.10.14 gst-plugins-ugly-0.10.12 gst-python-0.10.16 gst-ffmpeg-0.10.8 gst-plugins-gl-0.10.1
+for module in gstreamer-0.10.24 gst-plugins-base-0.10.24 gst-plugins-good-0.10.16 gst-plugins-bad-0.10.14 gst-plugins-ugly-0.10.12 gst-python-0.10.16 gst-ffmpeg-0.10.7 gst-plugins-gl-0.10.1
 do
     echo "]2;Now building $module"
     echo "########################################"
