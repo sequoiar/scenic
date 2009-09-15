@@ -69,12 +69,10 @@ videofactory::buildVideoReceiver_(const std::string &ip,
     assert(!sink.empty());
     VideoSinkConfig vConfig(sink, screen_num, deinterlace, sharedVideoId);
     std::string caps(CapsParser::getVideoCaps(codec)); // get caps here
-    if (caps == "")
-        THROW_CRITICAL("Could not find caps for codec " << codec);
     
     ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID); 
-    // FIXME: codec class should have list of codecs that need live caps update
-    if (codec == "theora")
+    
+    if (caps == "") // couldn't find caps, need them from other host
     {
         LOG_INFO("Waiting for " << codec << " caps from other host");
         rConfig.receiveCaps();  // wait for new caps from sender

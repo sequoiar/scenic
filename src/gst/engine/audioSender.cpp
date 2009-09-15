@@ -104,7 +104,7 @@ void AudioSender::init_payloader()
 
 /** 
  * The new caps message is posted on the bus by the src pad of our udpsink, 
- * received by this rtpsender, and dispatched. */
+ * received by this audiosender, and sent to our other host if needed. */
 bool AudioSender::handleBusMsg(GstMessage *msg)
 {
     const GstStructure *s = gst_message_get_structure(msg);
@@ -112,7 +112,7 @@ bool AudioSender::handleBusMsg(GstMessage *msg)
 
     if (std::string(name) == "caps-changed") 
     {   
-        LOG_DEBUG("got caps changed signal");
+        LOG_DEBUG("Got caps changed signal");
         // this is our msg
         const gchar *newCapsStr = gst_structure_get_string(s, "caps");
         tassert(newCapsStr);
@@ -124,7 +124,7 @@ bool AudioSender::handleBusMsg(GstMessage *msg)
 
         if (!RemoteConfig::capsMatchCodec(encodingName, remoteConfig_.codec()))
                 return false;   // not our caps, ignore it
-        else if (remoteConfig_.codec() == "vorbis" or audioConfig_.numChannels() > 2)
+        else if (remoteConfig_.codec() == "vorbis")  // our codec which needs the caps to be sent
         {
             LOG_DEBUG("Sending caps for codec " << remoteConfig_.codec());
             remoteConfig_.sendMessage(std::string(newCapsStr));

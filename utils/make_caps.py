@@ -102,27 +102,24 @@ def save_caps(profiles, filename):
 
 
 profiles = {
-    'theora' : VideoProfile('theoraenc', 'rtptheorapay'), 
     'mpeg4'  : VideoProfile('ffenc_mpeg4','rtpmp4vpay'),
     'h264'   : VideoProfile('x264enc', 'rtph264pay'),
     'h263'   : VideoProfile('ffenc_h263p', 'rtph263ppay'),
 }
 
 encoders = {
-    'vorbis' : 'vorbisenc',
     'mp3' : 'lame',
     'raw' : 'identity silent=true'
 }
 
 payloaders = {
-    'vorbis' : 'rtpvorbispay',
     'mp3' : 'rtpmpapay',
     'raw' : 'rtpL16pay'
 }
 
 
 rate = 48000
-for codec in ('raw', 'vorbis', 'mp3'):
+for codec in ('raw', 'mp3'):
     for channels in xrange(1, 3):
         profile_name = codec + '_%d_%d' % (channels, rate)
         profiles[profile_name] = AudioProfile(encoders[codec], payloaders[codec], channels, rate)

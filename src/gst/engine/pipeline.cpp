@@ -429,16 +429,15 @@ void Pipeline::subscribe(BusMsgHandler *obj)
 }
 
 
+/// Remove the busmsghandler from the list
 void Pipeline::unsubscribe(BusMsgHandler *obj)
 {
-    // remove the busmsghandler from the list
-
     // find the busmsghandler in the list
     std::vector<BusMsgHandler*>::iterator iter;
     iter = std::find(handlers_.begin(), handlers_.end(), obj);
 
     // assert that we were able to find the handler 
-    assert(iter != handlers_.end() );
+    tassert(iter != handlers_.end());
 
     // remove it
     handlers_.erase(iter);
@@ -463,5 +462,4 @@ void Pipeline::seekTo(gint64 pos)
         THROW_ERROR("Seek failed!");
     }
 }
-
 

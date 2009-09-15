@@ -36,7 +36,7 @@ class Payloader;
 class _GstMessage;
 
 class AudioSender
-    : public SenderBase 
+    : public SenderBase, public BusMsgHandler
 {
     public:
         AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig);

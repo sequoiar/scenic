@@ -78,16 +78,14 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
     using boost::lexical_cast;
 
     AudioSinkConfig aConfig(sink, deviceName, audioBufferTime);
-    std::string profile = codec + "_" + 
+    const std::string profile = codec + "_" + 
         lexical_cast<std::string>(numChannels) + "_" + 
         lexical_cast<std::string>(playback::sampleRate());
     LOG_DEBUG("Looking for profile " << profile);
     std::string caps(CapsParser::getAudioCaps(profile)); // get caps here
     ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID);
 
-    // FIXME: codec class should have list of codecs that need live caps update
-    // FIXME: also we shouldn't have to receive caps for non-stereo 
-    if (codec == "vorbis" or caps == "")
+    if (caps == "") // couldn't find caps, need them from other host
     {
         LOG_INFO("Waiting for " << codec << " caps from other host");
         rConfig.receiveCaps();  // wait for new caps from sender
