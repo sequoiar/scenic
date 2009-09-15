@@ -35,25 +35,24 @@ GST_UGLY=gst-plugins-ugly-0.10.12
 GST_FFMPEG=gst-ffmpeg-0.10.7
 GST_PYTHON=gst-python-0.10.16
 GST_GL=gst-plugins-gl-0.10.1
-MODULES=$(GST_CORE) $(GST_BASE) $(GST_GOOD) $(GST_BAD) $(GST_UGLY) \
-        $(GST_FFMPEG) $(GST_PYTHON) $(GST_GL)
+MODULES="$GST_CORE $GST_BASE $GST_GOOD $GST_BAD $GST_UGLY $GST_FFMPEG $GST_PYTHON $GST_GL"
 
 # Downloads
 cd $DOWNLOAD_DIR
-for uri_path in /gstreamer/$(GST_CORE).tar.bz2 \
-                /gst-plugins-base/$(GST_BASE).tar.bz2 \
-                /gst-plugins-good/$(GST_GOOD).tar.bz2 \
-                /gst-plugins-bad/$(GST_BAD).tar.bz2 \
-                /gst-plugins-ugly/$(GST_UGLY).tar.bz2 \
-                /gst-ffmpeg/$(GST_FFMPEG).tar.bz2 \
-                /gst-python/$(GST_PYTHON).tar.bz2 \
-                /gst-plugins-gl/$(GST_GL).tar.bz2
+for uri_path in gstreamer/$GST_CORE.tar.bz2 \
+                gst-plugins-base/$GST_BASE.tar.bz2 \
+                gst-plugins-good/$GST_GOOD.tar.bz2 \
+                gst-plugins-bad/$GST_BAD.tar.bz2 \
+                gst-plugins-ugly/$GST_UGLY.tar.bz2 \
+                gst-ffmpeg/$GST_FFMPEG.tar.bz2 \
+                gst-python/$GST_PYTHON.tar.bz2 \
+                gst-plugins-gl/$GST_GL.tar.bz2
 do
     wget -c http://gstreamer.freedesktop.org/src/$uri_path
 done
 
 # Build!
-for module is $(MODULES)
+for module in $MODULES
 do
     echo "]2;Now building $module"
     echo "########################################"
