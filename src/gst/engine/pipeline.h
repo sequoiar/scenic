@@ -36,6 +36,7 @@ class BusMsgHandler;
 class Pipeline
 {
     public:
+        static bool isAlive() { return instance_ != 0; }
         /// This is the single point of access to the singleton instance of this pipeline
         static Pipeline * Instance();
         _GstElement *makeElement(const char *factoryName, const char *elementName);

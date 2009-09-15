@@ -39,6 +39,9 @@ BusMsgHandler::BusMsgHandler()
 
 BusMsgHandler::~BusMsgHandler() 
 {
-    Pipeline::Instance()->unsubscribe(this);
+    // FIXME: not clean, but at least this way if we go down out of order due to siginit
+    // we don't recreate the pipeline just to remove ourselves
+    if (Pipeline::isAlive())
+        Pipeline::Instance()->unsubscribe(this);
 }
 
