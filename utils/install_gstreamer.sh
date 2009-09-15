@@ -27,22 +27,33 @@ else
     MAKEINSTALL=$(which makeinstall)
 fi
 
+GST_CORE=gstreamer-0.10.24
+GST_BASE=gst-plugins-base-0.10.24
+GST_GOOD=gst-plugins-good-0.10.16
+GST_BAD=gst-plugins-bad-0.10.14
+GST_UGLY=gst-plugins-ugly-0.10.12
+GST_FFMPEG=gst-ffmpeg-0.10.7
+GST_PYTHON=gst-python-0.10.16
+GST_GL=gst-plugins-gl-0.10.1
+MODULES=$(GST_CORE) $(GST_BASE) $(GST_GOOD) $(GST_BAD) $(GST_UGLY) \
+        $(GST_FFMPEG) $(GST_PYTHON) $(GST_GL)
+
 # Downloads
 cd $DOWNLOAD_DIR
-for uri_path in /gstreamer/gstreamer-0.10.24.tar.bz2 \
-                /gst-plugins-base/gst-plugins-base-0.10.24.tar.bz2 \
-                /gst-plugins-good/gst-plugins-good-0.10.16.tar.bz2 \
-                /gst-plugins-bad/gst-plugins-bad-0.10.14.tar.bz2 \
-                /gst-plugins-ugly/gst-plugins-ugly-0.10.12.tar.bz2 \
-                /gst-ffmpeg/gst-ffmpeg-0.10.7.tar.bz2 \
-                /gst-python/gst-python-0.10.16.tar.bz2 \
-                /gst-plugins-gl/gst-plugins-gl-0.10.1.tar.bz2
+for uri_path in /gstreamer/$(GST_CORE).tar.bz2 \
+                /gst-plugins-base/$(GST_BASE).tar.bz2 \
+                /gst-plugins-good/$(GST_GOOD).tar.bz2 \
+                /gst-plugins-bad/$(GST_BAD).tar.bz2 \
+                /gst-plugins-ugly/$(GST_UGLY).tar.bz2 \
+                /gst-ffmpeg/$(GST_FFMPEG).tar.bz2 \
+                /gst-python/$(GST_PYTHON).tar.bz2 \
+                /gst-plugins-gl/$(GST_GL).tar.bz2
 do
     wget -c http://gstreamer.freedesktop.org/src/$uri_path
 done
 
 # Build!
-for module in gstreamer-0.10.24 gst-plugins-base-0.10.24 gst-plugins-good-0.10.16 gst-plugins-bad-0.10.14 gst-plugins-ugly-0.10.12 gst-python-0.10.16 gst-ffmpeg-0.10.7 gst-plugins-gl-0.10.1
+for module is $(MODULES)
 do
     echo "]2;Now building $module"
     echo "########################################"
@@ -59,6 +70,6 @@ do
     echo "Done building $module"
     done
 
-    echo "Installation completed, but who knows"
-    echo "Life is full of surprises"
-    echo "Downloaded files are in " $DOWNLOAD_DIR   
+echo "Installation completed, but who knows"
+echo "Life is full of surprises"
+echo "Downloaded files are in " $DOWNLOAD_DIR   
