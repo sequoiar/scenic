@@ -5,6 +5,8 @@ NTA:
 -make sure that if we quit with interrupt, everything especially shared memory is cleaned up
 
 HELLO_WORLD:
+-find out if h264 caps can be as simple as gst-plugins good examples would
+have us believe
 -get sendCaps stuff out of gst/control (aka telnet)
 -use milhouse command line to generate caps
 -Get rid of singletons, rather have an application space all the necessary objects can listen.
