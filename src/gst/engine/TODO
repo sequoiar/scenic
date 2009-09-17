@@ -1,5 +1,4 @@
 NTA:
--complete table at https://svn.sat.qc.ca/trac/miville/wiki/TestingCodecMatrix
 -test with prerelease tarball of gstffmpeg=0.10.8.2 http://gstreamer.freedesktop.org/src/gst-ffmpeg/pre/gst-ffmpeg-0.10.8.2.tar.gz
 -add flag to explicitly send/receive caps on command line
 -make sure that if we quit with interrupt, everything especially shared memory is cleaned up
