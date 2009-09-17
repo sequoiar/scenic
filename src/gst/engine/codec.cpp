@@ -165,6 +165,8 @@ VideoDecoder::~VideoDecoder()
 /// or just decoder->queue
 void VideoDecoder::init()
 {
+    enum {ALL = 0, TOP, BOTTOM}; // deinterlace produces all fields, or top, bottom
+
     tassert(codec_ != 0);
     queue_ = Pipeline::Instance()->makeElement("queue", NULL);
     g_object_set(queue_, "max-size-buffers", MAX_QUEUE_BUFFERS, NULL);
@@ -175,7 +177,7 @@ void VideoDecoder::init()
         colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
         LOG_DEBUG("DO THE DEINTERLACE");
         deinterlace_ = Pipeline::Instance()->makeElement("deinterlace", NULL);
-        g_object_set(deinterlace_, "fields", "top", NULL);
+        g_object_set(deinterlace_, "fields", TOP, NULL);
         gstlinkable::link(codec_, colorspc_);
         gstlinkable::link(colorspc_, deinterlace_);
         gstlinkable::link(deinterlace_, queue_);
