@@ -324,7 +324,7 @@ Mpeg4Encoder::~Mpeg4Encoder()
 void Mpeg4Encoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
-    supportsInterlaced_ = true;
+    //supportsInterlaced_ = true; this causes stuttering
     VideoEncoder::init();
 }
 
