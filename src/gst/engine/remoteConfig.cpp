@@ -122,7 +122,7 @@ Encoder * SenderConfig::createAudioEncoder() const
 
 void SenderConfig::sendMessage(const std::string &message) const
 {
-    LOG_DEBUG("\n\n\n MESSAGE " << message << "for " 
+    LOG_DEBUG("\n\n\nSendin tcp msg for host " 
             << remoteHost_ << " on port " << capsPort() 
             << " with id " << msgId_ << "\n\n\n\n");
 

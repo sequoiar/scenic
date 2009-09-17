@@ -351,7 +351,7 @@ RtpPay* Mpeg4Decoder::createDepayloader() const
 
 
 /// Constructor 
-TheoraEncoder::TheoraEncoder() {}
+TheoraEncoder::TheoraEncoder() : usingQualitySetting_(true) {}
 
 
 /// Destructor 
@@ -362,7 +362,8 @@ void TheoraEncoder::init()
 {
     codec_ = Pipeline::Instance()->makeElement("theoraenc", NULL);
     setSpeedLevel(MAX_SPEED_LEVEL);
-    //setQuality(INIT_QUALITY);
+    if (usingQualitySetting_)
+        setQuality(INIT_QUALITY);
     VideoEncoder::init();
 }
 
@@ -370,8 +371,10 @@ void TheoraEncoder::init()
 /// Overridden to convert from bit/s to kbit/s
 void TheoraEncoder::setBitrate(unsigned newBitrate)
 {
-    //LOG_WARNING("Using quality, not bitrate. This function has no effect.");
-    Encoder::setBitrateInKbs(newBitrate);
+    if (usingQualitySetting_)
+        LOG_WARNING("Using quality, not bitrate. This function has no effect.");
+    else
+        Encoder::setBitrateInKbs(newBitrate);
 }
 
 

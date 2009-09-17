@@ -261,6 +261,7 @@ class TheoraEncoder : public VideoEncoder
         static const int MIN_QUALITY = 0;
         static const int MAX_QUALITY = 63;  // defined in plugin
         static const int INIT_QUALITY = 20;
+        bool usingQualitySetting_;
         void init();
         Payloader* createPayloader() const;
 };
