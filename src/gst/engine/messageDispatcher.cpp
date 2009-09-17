@@ -30,33 +30,34 @@ MessageDispatcher *MessageDispatcher::instance_ = 0;
 
 MessageDispatcher * MessageDispatcher::getInstance()
 {
-    if (instance_ == 0) {
+    if (instance_ == 0) 
+    {
         instance_ = new MessageDispatcher();
     }
     return instance_;
 }
 
 
-void MessageDispatcher::sendMessage(const std::string &message)
+void MessageDispatcher::sendMessage(const std::string &path)
 {
-    updateHandlers(message);
+    getInstance()->updateHandlers(path);
 }
 
 
-void MessageDispatcher::updateHandlers(const std::string &message)
+void MessageDispatcher::updateHandlers(const std::string &path)
 {
     std::vector<MessageHandler*>::iterator iter;
     for (iter = handlers_.begin(); iter != handlers_.end(); ++iter)
-        if ((*iter)->handleMessage(message))    // one replied true
+        if ((*iter)->handleMessage(path))    // one replied true
             break;
     if (iter == handlers_.end())
-        LOG_WARNING("Message " << message << " was not handled");
+        LOG_DEBUG("Message " << path << " may not have been handled");
 }
 
 
 void MessageDispatcher::subscribe(MessageHandler *obj)
 {
-    handlers_.push_back(obj);
+    getInstance()->handlers_.push_back(obj);
 }
 
 
@@ -66,12 +67,13 @@ void MessageDispatcher::unsubscribe(MessageHandler *obj)
 
     // find the busmsghandler in the list
     std::vector<MessageHandler*>::iterator iter;
-    iter = std::find(handlers_.begin(), handlers_.end(), obj);
+    iter = std::find(getInstance()->handlers_.begin(), 
+            getInstance()->handlers_.end(), obj);
 
     // assert that we were able to find the handler 
-    assert(iter != handlers_.end() );
+    assert(iter != getInstance()->handlers_.end() );
 
     // remove it
-    handlers_.erase(iter);
+    getInstance()->handlers_.erase(iter);
 }
 

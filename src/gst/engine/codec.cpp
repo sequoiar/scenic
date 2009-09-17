@@ -351,7 +351,7 @@ RtpPay* Mpeg4Decoder::createDepayloader() const
 
 
 /// Constructor 
-TheoraEncoder::TheoraEncoder() : usingQualitySetting_(true) {}
+TheoraEncoder::TheoraEncoder() : usingQualitySetting_(false) {}
 
 
 /// Destructor 

@@ -24,6 +24,7 @@
 #define _MESSAGE_DISPATCHER_H_
 
 #include <vector>
+#include <string>
 
 class MessageHandler;
 
@@ -31,13 +32,13 @@ class MessageDispatcher
 {
     public:
         /// This is the single point of access to the singleton instance of this messagedispatcher
-        static MessageDispatcher * getInstance();
-        void subscribe(MessageHandler *obj);
-        void unsubscribe(MessageHandler *obj);
-        void sendMessage(const std::string &message);    // could also overload with a version that has an argument map
+        static void subscribe(MessageHandler *obj);
+        static void unsubscribe(MessageHandler *obj);
+        static void sendMessage(const std::string &path);    // could also overload with a version that has an argument map
 
     private:
-        void updateHandlers(const std::string &message);
+        static MessageDispatcher * getInstance();
+        void updateHandlers(const std::string &path);
         std::vector<MessageHandler*> handlers_;
         
         MessageDispatcher() : handlers_() {}

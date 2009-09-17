@@ -247,7 +247,7 @@ class AudioJackSource : public AudioSource, public MessageHandler
     private:
         ~AudioJackSource();
 
-        bool handleMessage(const std::string &message);
+        bool handleMessage(const std::string &path);
         GstElement *srcElement() { return capsFilter_; }
         void sub_init();
 

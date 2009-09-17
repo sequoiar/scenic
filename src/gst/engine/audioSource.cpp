@@ -320,10 +320,10 @@ void AudioJackSource::sub_init()
 }
 
 
-bool AudioJackSource::handleMessage(const std::string &message)
+bool AudioJackSource::handleMessage(const std::string &path)
 {
     assert(source_);
-    if (message == "disable_jack_autoconnect")
+    if (path == "disable_jack_autoconnect")
     {
         g_object_set(G_OBJECT(source_), "connect", 0, NULL);
         return true;

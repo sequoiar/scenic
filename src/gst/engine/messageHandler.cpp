@@ -25,11 +25,13 @@
 
 MessageHandler::MessageHandler()
 {
-    MessageDispatcher::getInstance()->subscribe(this);
+    // FIXME: maybe this should be called explicitly in derived classes when all members
+    // are in a callable state?
+    MessageDispatcher::subscribe(this);
 }
 
 MessageHandler::~MessageHandler()
 {
-    MessageDispatcher::getInstance()->unsubscribe(this);
+    MessageDispatcher::unsubscribe(this);
 }
 

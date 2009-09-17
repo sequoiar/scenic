@@ -10,8 +10,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * [propulse]ART is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * [propulse]ART is distributed in the hope that it will be useful, * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -178,7 +177,7 @@ short pof::run(int argc, char **argv)
                     options["audio_buffer_usec"], options["multicast_interface"], options["numchannels"]);
 
             if (options["disable_jack_autoconnect"])
-                MessageDispatcher::getInstance()->sendMessage("disable_jack_autoconnect");
+                MessageDispatcher::sendMessage("disable_jack_autoconnect");
         }
 
 #ifdef CONFIG_DEBUG_LOCAL
@@ -193,7 +192,7 @@ short pof::run(int argc, char **argv)
         if (!disableVideo)
         {
             if(options["fullscreen"])
-                MessageDispatcher::getInstance()->sendMessage("fullscreen");
+                MessageDispatcher::sendMessage("fullscreen");
         }
 
         int timeout = 0;    // default: run indefinitely
@@ -247,7 +246,7 @@ short pof::run(int argc, char **argv)
             aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], options["audioport"]);
 
             if (options["disable_jack_autoconnect"])
-                MessageDispatcher::getInstance()->sendMessage("disable_jack_autoconnect");
+                MessageDispatcher::sendMessage("disable_jack_autoconnect");
         }
 
 #ifdef CONFIG_DEBUG_LOCAL

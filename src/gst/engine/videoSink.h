@@ -75,7 +75,7 @@ class GtkVideoSink
         static void toggleFullscreen(_GtkWidget *widget);
 
     private:
-        virtual bool handleMessage(const std::string &message);
+        virtual bool handleMessage(const std::string &path);
 
         GtkVideoSink(const GtkVideoSink&);     //No Copy Constructor
         GtkVideoSink& operator=(const GtkVideoSink&);     //No Assignment Operator
