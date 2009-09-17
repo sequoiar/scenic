@@ -175,7 +175,7 @@ void VideoDecoder::init()
         colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
         LOG_DEBUG("DO THE DEINTERLACE");
         deinterlace_ = Pipeline::Instance()->makeElement("deinterlace", NULL);
-        g_object_set(deinterlace_, "fields", top, NULL);
+        g_object_set(deinterlace_, "fields", "top", NULL);
         gstlinkable::link(codec_, colorspc_);
         gstlinkable::link(colorspc_, deinterlace_);
         gstlinkable::link(deinterlace_, queue_);
