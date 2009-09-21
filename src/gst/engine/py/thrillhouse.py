@@ -50,7 +50,8 @@ class Arg(object): # new style!!
         for key, val in self.__dict__.iteritems():
             if val is True:
                 val = ''  # boolean members don't need values in output string
-            result = result + ' --' + key + ' ' + str(val) 
+            # replace underscores from member names with dashes for commandline
+            result = result + ' --' + key.replace('_', '-') + ' ' + str(val) 
         return result
 
 
