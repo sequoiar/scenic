@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <boost/lexical_cast.hpp>
 
 // expand macro and stringify it
 #define XSTRINGIFY(x) STRINGIFY(x)
@@ -18,8 +19,13 @@ std::string CapsParser::getVideoCaps(const std::string &profile)
 
 
 /// Audio profile is in format <codec>_<channels>_<samplerate>
-std::string CapsParser::getAudioCaps(const std::string &profile)
+std::string CapsParser::getAudioCaps(const std::string &codec, int numChannels, int sampleRate)
 {
+    using boost::lexical_cast;
+
+    const std::string profile = codec + "_" + 
+        lexical_cast<std::string>(numChannels) + "_" + 
+        lexical_cast<std::string>(sampleRate);
     return getCapsFromFile(XSTRINGIFY(__DATA_DIR__) "/caps.txt", profile);
 }
 
@@ -55,7 +61,7 @@ std::string CapsParser::getCapsFromFile(const char *filename, const std::string 
         LOG_WARNING("Could not find caps for profile " << profile);
         return "";
     }
-    
+
     return line;
 }
 

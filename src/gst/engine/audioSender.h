@@ -39,7 +39,7 @@ class AudioSender
     : public SenderBase, public BusMsgHandler
 {
     public:
-        AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig);
+        AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig, bool capsOutOfBand);
 
         ~AudioSender();
 
@@ -53,7 +53,7 @@ class AudioSender
         void init_payloader();
 
         const AudioSourceConfig audioConfig_;
-        const SenderConfig remoteConfig_;
+        SenderConfig remoteConfig_;
         RtpSender session_;
         AudioSource *source_;
         //AudioLevel level_;

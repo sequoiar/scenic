@@ -76,7 +76,19 @@ void RemoteConfig::checkPorts() const
     usedPorts_.insert(rtcpSecondPort());
     usedPorts_.insert(capsPort());
 }
+        
 
+SenderConfig::SenderConfig(const std::string &codec__,
+        const std::string &remoteHost__,    
+        int port__,
+        int msgId__) : RemoteConfig(codec__, remoteHost__, port__, msgId__)
+{}
+
+
+
+SenderConfig::SenderConfig(const SenderConfig & m) : 
+    RemoteConfig(m)
+{}
 
 VideoEncoder * SenderConfig::createVideoEncoder() const
 {
@@ -127,7 +139,7 @@ void SenderConfig::sendMessage(const std::string &message) const
             << " with id " << msgId_ << "\n\n\n\n");
 
     tassert(tcpSendBuffer(remoteHost_, capsPort(), 
-                        msgId_, message));
+                msgId_, message));
 }
 
 

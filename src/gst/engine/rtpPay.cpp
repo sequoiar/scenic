@@ -183,11 +183,24 @@ void Mpeg4Payloader::init()
     rtpPay_ = Pipeline::Instance()->makeElement("rtpmp4vpay", NULL);
     // this will send config header in rtp packets
     g_object_set(rtpPay_, "send-config", TRUE, NULL);
+
     // this means that our payloader will output bufferlists instead of
     // 1 packet per buffer. this will allow downstream elements that are bufferlist aware
     // to avoid unneeded memcpys
     g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
     Payloader::init();
+}
+
+
+bool Mpeg4Payloader::handleMessage(const std::string &path)
+{
+    if (path == "disable-send-config")
+    {
+        assert(rtpPay_);
+        g_object_set(rtpPay_, "send-config", FALSE, NULL);
+        return true;
+    }
+    return false;
 }
 
 

@@ -223,7 +223,7 @@ void GstReceiverThread::video_init(MapMsg& msg)
         if(!msg["multicast_interface"])
             msg["multicast_interface"] = "";
 
-        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], msg["screen"], msg["sink"], msg["deinterlace"], msg["shared_video_id"], msg["multicast_interface"]);
+        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], msg["screen"], msg["sink"], msg["deinterlace"], msg["shared_video_id"], msg["multicast_interface"], msg["caps-out-of-band"]);
     }
     catch(ErrorExcept e)
     {
@@ -259,7 +259,8 @@ void GstReceiverThread::audio_init(MapMsg& msg)
 
 
         audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], 
-                msg["sink"], msg["device"], msg["audio_buffer_usec"], msg["multicast_interface"], msg["numchannels"]);
+                msg["sink"], msg["device"], msg["audio_buffer_usec"], msg["multicast_interface"], 
+                msg["numchannels"], msg["caps-out-of-band"]);
     }
     catch(ErrorExcept e)
     {
@@ -291,7 +292,7 @@ void GstSenderThread::video_init(MapMsg& msg)
             msg["camera_number"] = -1;
 
         VideoSourceConfig config(msg["source"], msg["bitrate"], msg["device"], msg["location"], msg["camera_number"]);
-        video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
+        video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"], msg["caps-out-of-band"]);
         if(ff[1])
             videoFirst = false;
         else
@@ -321,7 +322,7 @@ void GstSenderThread::audio_init(MapMsg& msg)
             msg["device"] = "";
 
         AudioSourceConfig config(msg["source"], msg["device"], msg["location"], msg["channels"]);
-        audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
+        audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"], msg["caps-out-of-band"]);
     }
     catch(ErrorExcept e)
     {

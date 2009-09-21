@@ -25,7 +25,6 @@
 #define _AUDIO_FACTORY_H_
 
 #include "gst/engine.h"
-#include <boost/lexical_cast.hpp>
 
 #include "ports.h"
 
@@ -39,7 +38,8 @@ namespace audiofactory
     buildAudioSender_(const AudioSourceConfig aConfig, 
                       const std::string &ip, 
                       const std::string &codec, 
-                      int port);
+                      int port,
+                      bool capsOutOfBand);
 
     static AudioReceiver*
     buildAudioReceiver_(const std::string &ip, 
@@ -49,7 +49,8 @@ namespace audiofactory
                         const std::string &deviceName,
                         int audioBufferTime,
                         const std::string &multicastInterface,
-                        int numChannels);
+                        int numChannels,
+                        bool capsOutOfBand);
 }
 
 
@@ -57,10 +58,11 @@ static AudioSender*
 audiofactory::buildAudioSender_(const AudioSourceConfig aConfig, 
                                 const std::string &ip, 
                                 const std::string &codec, 
-                                int port)
+                                int port,
+                                bool capsOutOfBand)
 {
     SenderConfig rConfig(codec, ip, port, MSG_ID);
-    AudioSender* tx = new AudioSender(aConfig, rConfig);
+    AudioSender* tx = new AudioSender(aConfig, rConfig, capsOutOfBand);
     tx->init();
     return tx;
 }
@@ -73,19 +75,15 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
                                   const std::string &deviceName,
                                   int audioBufferTime,
                                   const std::string &multicastInterface,
-                                  int numChannels)
+                                  int numChannels,
+                                  bool capsOutOfBand)
 {
-    using boost::lexical_cast;
-
     AudioSinkConfig aConfig(sink, deviceName, audioBufferTime);
-    const std::string profile = codec + "_" + 
-        lexical_cast<std::string>(numChannels) + "_" + 
-        lexical_cast<std::string>(playback::sampleRate());
-    LOG_DEBUG("Looking for profile " << profile);
-    std::string caps(CapsParser::getAudioCaps(profile)); // get caps here
+
+    std::string caps(CapsParser::getAudioCaps(codec, numChannels, playback::sampleRate())); // get caps here
     ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID);
 
-    if (caps == "") // couldn't find caps, need them from other host
+    if (caps == "" or capsOutOfBand) // couldn't find caps, need them from other host or we explicitly been told to send caps
     {
         LOG_INFO("Waiting for " << codec << " caps from other host");
         rConfig.receiveCaps();  // wait for new caps from sender
@@ -116,9 +114,10 @@ namespace audiofactory
     buildAudioSender(const AudioSourceConfig aConfig, 
                      const std::string &ip, 
                      const std::string &codec, 
-                     int port)
+                     int port, 
+                     bool capsOutOfBand)
     {
-        return shared_ptr<AudioSender>(buildAudioSender_(aConfig, ip, codec, port));
+        return shared_ptr<AudioSender>(buildAudioSender_(aConfig, ip, codec, port, capsOutOfBand));
     }
 
     static shared_ptr<AudioReceiver> 
@@ -129,10 +128,11 @@ namespace audiofactory
                        const std::string &deviceName,
                        int audioBufferTime,
                        const std::string &multicastInterface,
-                       int numChannels)
+                       int numChannels,
+                       bool capsOutOfBand)
     {
         return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink, 
-                    deviceName, audioBufferTime, multicastInterface, numChannels));
+                    deviceName, audioBufferTime, multicastInterface, numChannels, capsOutOfBand));
     }
 }
 

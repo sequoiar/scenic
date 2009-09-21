@@ -30,14 +30,16 @@
 #include "videoConfig.h"
 #include "remoteConfig.h"
 #include "codec.h"
-
+#include "capsParser.h"
+#include "messageDispatcher.h"
 
 
 /// Constructor
-VideoSender::VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig) : 
+VideoSender::VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig, bool capsOutOfBand) : 
     videoConfig_(vConfig), remoteConfig_(rConfig), session_(), source_(0), 
     encoder_(0), payloader_(0) 
 {
+    capsOutOfBand_ = capsOutOfBand;
     remoteConfig_.checkPorts();
 }
 
@@ -80,6 +82,8 @@ void VideoSender::init_payloader()
 {
     tassert(payloader_ = encoder_->createPayloader());
     payloader_->init();
+    if (capsOutOfBand_) // tell payloader not to send config string in header since we're sending caps
+        MessageDispatcher::sendMessage("disable-send-config");
     gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_, remoteConfig_);
 }
@@ -88,9 +92,13 @@ void VideoSender::init_payloader()
 
 /** 
  * The new caps message is posted on the bus by the src pad of our udpsink, 
- * received by this rtpsender, and dispatched. */
+ * received by this videosender, and dispatched. */
 bool VideoSender::handleBusMsg(GstMessage *msg)
 {
+    /// The stages involved are:
+    /// 1) check that this is a caps-changed msg
+    /// 2) FIXME: check that it's this videosender's msg by looking at the encoder name, need a more robust way of asserting that this is the intended handler
+    /// 3) if the caps are not already cached, send them to the receiver
     const GstStructure *s = gst_message_get_structure(msg);
     const gchar *name = gst_structure_get_name(s);
 
@@ -101,17 +109,20 @@ bool VideoSender::handleBusMsg(GstMessage *msg)
         tassert(newCapsStr);
         std::string str(newCapsStr);
 
-        const std::string ENCODING_NAME("THEORA");
-        const std::string key("encoding-name=(string)");
-        size_t pos = str.find(key) + key.length();
-
-        if (str.compare(pos, ENCODING_NAME.length(), ENCODING_NAME))
-            return false; // not our encoding
+        GstStructure *structure = gst_caps_get_structure(gst_caps_from_string(str.c_str()), 0);
+        const GValue *encodingStr = gst_structure_get_value(structure, "encoding-name");
+        std::string encodingName(g_value_get_string(encodingStr));
         
-        LOG_DEBUG("Sending caps for codec " << ENCODING_NAME);
-        remoteConfig_.sendMessage(std::string(newCapsStr));
-
-        return true;
+        if (!RemoteConfig::capsMatchCodec(encodingName, remoteConfig_.codec()))
+                return false;   // not our caps, ignore it
+        if (capsOutOfBand_ or CapsParser::getVideoCaps(remoteConfig_.codec()) == "") // caps aren't already cached 
+        {
+            LOG_DEBUG("Sending caps for codec " << remoteConfig_.codec());
+            remoteConfig_.sendMessage(std::string(newCapsStr));
+            return true;
+        }
+        else
+            return true;    // these were our caps, but we didn't need to send caps as they're already cached
     }
 
     return false;           // this wasn't our msg, someone else should handle it

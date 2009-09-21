@@ -59,7 +59,7 @@ void addOptions(OptionArgs &options)
     options.addInt("audioport", 't', "audioport", "portnum");
     options.addInt("videoport", 'p', "videoport", "portnum");
     options.addBool("fullscreen", 'f', "default to fullscreen");
-    options.addString("shared_video_id", 'B', "shared video buffer id", "shared_memory");
+    options.addString("shared-video-id", 'B', "shared video buffer id", "shared_memory");
     options.addBool("deinterlace", 'o', "deinterlace video");
     options.addString("videodevice", 'd', "device", "/dev/video0 /dev/video1");
     options.addString("audiodevice", 'q', "audio device", "hw:0 hw:2 plughw:0 plughw:2");
@@ -72,12 +72,13 @@ void addOptions(OptionArgs &options)
     options.addString("audiosource", 'e', "audiosource", "jackaudiosrc alsasrc pulsesrc");
     options.addString("videosource", 'u', "videosource", "v4l2src v4lsrc dv1394src");
     options.addInt("timeout", 'z', "timeout", "time in ms to wait before quitting, 0 means run indefinitely");
-    options.addInt("audio_buffer_usec", 'b', "audiobuffer", "length of receiver's audio buffer in microseconds, must be > 10000");
+    options.addInt("audio-buffer-usec", 'b', "audiobuffer", "length of receiver's audio buffer in microseconds, must be > 10000");
     options.addInt("jitterbuffer", 'g', "jitterbuffer", "length of receiver's rtp jitterbuffers in milliseconds, must be > 1");
-    options.addInt("camera_number", 'G', "camera_number", "camera id for dc1394");
-    options.addString("multicast_interface", 'I', "multicast_interface", "interface to use for multicast");
-    options.addBool("enable_controls", 'j', "enable gui controls for jitter buffer");
-    options.addBool("disable_jack_autoconnect", 'J', "disable jack's autoconnection");
+    options.addInt("camera-number", 'G', "camera_number", "camera id for dc1394");
+    options.addString("multicast-interface", 'I', "multicast_interface", "interface to use for multicast");
+    options.addBool("enable-controls", 'j', "enable gui controls for jitter buffer");
+    options.addBool("disable-jack-autoconnect", 'J', "disable jack's autoconnection");
+    options.addBool("caps-out-of-band", 'C', "send/receive caps out of band, default=false");
     //telnetServer param
     options.addInt("serverport", 'y', "run as server", "port to listen on");
 }
@@ -118,7 +119,7 @@ short pof::run(int argc, char **argv)
     if ((!options["sender"] and !options["receiver"]) or (options["sender"] and options["receiver"]))
         THROW_CRITICAL("argument error: must be sender OR receiver. see --help"); 
 
-    if (options["enable_controls"])
+    if (options["enable-controls"])
     {
         if (options["receiver"] )
             RtpReceiver::enableControl();
@@ -148,18 +149,19 @@ short pof::run(int argc, char **argv)
         shared_ptr<AudioReceiver> aRx;
 
 
-        if (!options["multicast_interface"])
-            options["multicast_interface"] = "";
+        if (!options["multicast-interface"])
+            options["multicast-interface"] = "";
 
         if (!disableVideo)       
         {
-            if (!options["shared_video_id"])
-                    options["shared_video_id"] = "shared_memory";
+            if (!options["shared-video-id"])
+                    options["shared-video-id"] = "shared_memory";
 
             vRx = videofactory::buildVideoReceiver(options["address"], options["videocodec"], 
                     options["videoport"], options["screen"], 
                     options["videosink"], options["deinterlace"], 
-                    options["shared_video_id"], options["multicast_interface"]);
+                    options["shared-video-id"], options["multicast-interface"], 
+                    options["caps-out-of-band"]);
         }
         if (!disableAudio)
         {
@@ -169,15 +171,16 @@ short pof::run(int argc, char **argv)
             if (!options["audiodevice"])
                 options["audiodevice"] = "";
 
-            if (!options["audio_buffer_usec"])
-                options["audio_buffer_usec"] = audiofactory::AUDIO_BUFFER_USEC;
+            if (!options["audio-buffer-usec"])
+                options["audio-buffer-usec"] = audiofactory::AUDIO_BUFFER_USEC;
 
             aRx = audiofactory::buildAudioReceiver(options["address"], options["audiocodec"], 
                     options["audioport"], options["audiosink"], options["audiodevice"], 
-                    options["audio_buffer_usec"], options["multicast_interface"], options["numchannels"]);
+                    options["audio-buffer-usec"], options["multicast-interface"], 
+                    options["numchannels"], options["caps-out-of-band"]);
 
-            if (options["disable_jack_autoconnect"])
-                MessageDispatcher::sendMessage("disable_jack_autoconnect");
+            if (options["disable-jack-autoconnect"])
+                MessageDispatcher::sendMessage("disable-jack-autoconnect");
         }
 
 #ifdef CONFIG_DEBUG_LOCAL
@@ -225,10 +228,10 @@ short pof::run(int argc, char **argv)
                 options["camera-number"] = -1;
 
             VideoSourceConfig vConfig(options["videosource"], options["videobitrate"],
-                    options["videodevice"], options["videolocation"], options["camera_number"]);
+                    options["videodevice"], options["videolocation"], options["camera-number"]);
 
             vTx = videofactory::buildVideoSender(vConfig, options["address"], options["videocodec"], 
-                    options["videoport"]);
+                    options["videoport"], options["caps-out-of-band"]);
         }
 
         if (!disableAudio)
@@ -243,10 +246,11 @@ short pof::run(int argc, char **argv)
 
             AudioSourceConfig aConfig(options["audiosource"], options["audiodevice"], 
                     options["audiolocation"], options["numchannels"]);
-            aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], options["audioport"]);
+            aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], 
+                    options["audioport"], options["caps-out-of-band"]);
 
-            if (options["disable_jack_autoconnect"])
-                MessageDispatcher::sendMessage("disable_jack_autoconnect");
+            if (options["disable-jack-autoconnect"])
+                MessageDispatcher::sendMessage("disable-jack-autoconnect");
         }
 
 #ifdef CONFIG_DEBUG_LOCAL

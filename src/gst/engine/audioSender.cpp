@@ -28,10 +28,12 @@
 #include "pipeline.h"
 #include "codec.h"
 #include "rtpPay.h"
+#include "capsParser.h"
+#include "playback.h"
 
 
 /// Constructor 
-AudioSender::AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig) : 
+AudioSender::AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig, bool capsOutOfBand) : 
     audioConfig_(aConfig), 
     remoteConfig_(rConfig), 
     session_(), 
@@ -40,6 +42,8 @@ AudioSender::AudioSender(const AudioSourceConfig aConfig, const SenderConfig rCo
     encoder_(0), 
     payloader_(0)
 {
+    capsOutOfBand_ = capsOutOfBand;
+
     remoteConfig_.checkPorts();
     if (remoteConfig_.codec() == "mp3")
         if (audioConfig_.numChannels() < 1 or audioConfig_.numChannels() > 2)
@@ -124,14 +128,15 @@ bool AudioSender::handleBusMsg(GstMessage *msg)
 
         if (!RemoteConfig::capsMatchCodec(encodingName, remoteConfig_.codec()))
                 return false;   // not our caps, ignore it
-        else if (remoteConfig_.codec() == "vorbis")  // our codec which needs the caps to be sent
-        {
-            LOG_DEBUG("Sending caps for codec " << remoteConfig_.codec());
+        else if (capsOutOfBand_ or CapsParser::getAudioCaps(remoteConfig_.codec(), 
+                    audioConfig_.numChannels(), playback::sampleRate()) == "") 
+        { 
+            // this profile needs the caps to be sent
             remoteConfig_.sendMessage(std::string(newCapsStr));
             return true;
         }
         else
-            return true;       // was our codec, but we don't need to send caps for it
+            return true;       // was our caps, but we don't need to send caps for it
     }
 
     return false;           // this wasn't our msg, someone else should handle it

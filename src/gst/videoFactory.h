@@ -32,13 +32,19 @@ namespace videofactory
     static const int MSG_ID = 2;
 
     static VideoReceiver* 
-    buildVideoReceiver_(const std::string &ip, const std::string &codec, int port, 
-            int screen_num, const std::string &sink, bool deinterlace, 
-            const std::string &sharedVideoId, const std::string &multicastInterface);
+    buildVideoReceiver_(const std::string &ip, 
+            const std::string &codec, 
+            int port, 
+            int screen_num, 
+            const std::string &sink, 
+            bool deinterlace, 
+            const std::string &sharedVideoId, 
+            const std::string &multicastInterface,
+            bool capsOutOfBand);
 
     static VideoSender* 
     buildVideoSender_(const VideoSourceConfig vConfig, 
-            const std::string &ip, const std::string &codec, int port);
+            const std::string &ip, const std::string &codec, int port, bool capsOutOfBand);
 }
 
 
@@ -47,10 +53,11 @@ VideoSender*
 videofactory::buildVideoSender_(const VideoSourceConfig vConfig, 
                                 const std::string &ip, 
                                 const std::string &codec, 
-                                int port)
+                                int port,
+                                bool capsOutOfBand)
 {
     SenderConfig rConfig(codec, ip, port, MSG_ID); 
-    VideoSender* tx = new VideoSender(vConfig, rConfig);
+    VideoSender* tx = new VideoSender(vConfig, rConfig, capsOutOfBand);
     tx->init(); 
     return tx;
 }
@@ -64,7 +71,8 @@ videofactory::buildVideoReceiver_(const std::string &ip,
                                   const std::string &sink,
                                   bool deinterlace,
                                   const std::string &sharedVideoId,
-                                  const std::string &multicastInterface)
+                                  const std::string &multicastInterface,
+                                  bool capsOutOfBand)
 {
     assert(!sink.empty());
     VideoSinkConfig vConfig(sink, screen_num, deinterlace, sharedVideoId);
@@ -72,7 +80,7 @@ videofactory::buildVideoReceiver_(const std::string &ip,
     
     ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID); 
     
-    if (caps == "") // couldn't find caps, need them from other host
+    if (caps == "" or capsOutOfBand) // couldn't find caps, need them from other host
     {
         LOG_INFO("Waiting for " << codec << " caps from other host");
         rConfig.receiveCaps();  // wait for new caps from sender
@@ -106,19 +114,21 @@ namespace videofactory
                        const std::string &sink,
                        bool deinterlace,
                        const std::string &sharedVideoId,
-                       const std::string &multicastInterface)
+                       const std::string &multicastInterface,
+                       bool capsOutOfBand)
     {
         return shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, 
-                    screen_num, sink, deinterlace, sharedVideoId, multicastInterface));
+                    screen_num, sink, deinterlace, sharedVideoId, multicastInterface, capsOutOfBand));
     }
 
     static shared_ptr<VideoSender> 
     buildVideoSender(const VideoSourceConfig vConfig, 
                      const std::string &ip, 
                      const std::string &codec, 
-                     int port)
+                     int port,
+                     bool capsOutOfBand)
     {
-        return shared_ptr<VideoSender>(buildVideoSender_(vConfig, ip, codec, port));
+        return shared_ptr<VideoSender>(buildVideoSender_(vConfig, ip, codec, port, capsOutOfBand));
     }
 
 }

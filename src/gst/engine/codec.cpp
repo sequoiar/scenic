@@ -165,6 +165,7 @@ VideoDecoder::~VideoDecoder()
 /// or just decoder->queue
 void VideoDecoder::init()
 {
+    // FIXME: should be settable
     enum {ALL = 0, TOP, BOTTOM}; // deinterlace produces all fields, or top, bottom
 
     tassert(codec_ != 0);

@@ -35,7 +35,7 @@ AudioSourceConfig::AudioSourceConfig(const std::string & source__,
 {
     if (source_.empty())
         THROW_CRITICAL("No source specified");
-    if(numChannels_ < 1 or numChannels_ > 8)
+    if(numChannels_ < 1)
         THROW_CRITICAL("Invalid number of channels");
     if (source_ == "jackaudiosrc")  // FIXME: this has to happen early but it's gross to have it here
         Jack::assertReady();

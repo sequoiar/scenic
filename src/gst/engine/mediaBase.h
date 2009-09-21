@@ -26,10 +26,12 @@ class SenderBase
 {
     public: 
         void init();
-        SenderBase() : initialized_(false) {};
+        SenderBase() : capsOutOfBand_(false), initialized_(false) {};
         virtual ~SenderBase(){};
 
         virtual std::string getCaps() const = 0;
+    protected:
+        bool capsOutOfBand_;
     private:
         virtual void init_source() = 0;
         virtual void init_codec() = 0;

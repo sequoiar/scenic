@@ -81,16 +81,14 @@ class SenderConfig : public RemoteConfig
         SenderConfig(const std::string &codec__,
                 const std::string &remoteHost__,    
                 int port__,
-                int msgId__) : RemoteConfig(codec__, remoteHost__, port__, msgId__)
-    {}
+                int msgId__);
 
-        SenderConfig(const SenderConfig & m) 
-            : RemoteConfig(m)
-        {}
+        SenderConfig(const SenderConfig & m);
 
         VideoEncoder* createVideoEncoder() const;
         Encoder* createAudioEncoder() const;
-        void sendMessage(const std::string &msg) const;
+
+        void sendMessage(const std::string &message) const;
 };
 
 

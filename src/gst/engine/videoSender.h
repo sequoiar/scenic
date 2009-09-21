@@ -38,7 +38,7 @@ class VideoSender
     : public SenderBase, public BusMsgHandler
 {
     public:
-         VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig);
+        VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig, bool capsOutOfBand);
         ~VideoSender();
         std::string getCaps() const;
 
@@ -49,7 +49,7 @@ class VideoSender
         void init_payloader();
 
         const VideoSourceConfig videoConfig_;
-        const SenderConfig remoteConfig_;
+        SenderConfig remoteConfig_;
         RtpSender session_;
         VideoSource *source_;
         VideoEncoder *encoder_;

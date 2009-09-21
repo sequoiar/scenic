@@ -23,6 +23,7 @@
 #define _PAYLOADER_H_
 
 #include "gstLinkable.h"
+#include "messageHandler.h"
 
 class _GstElement;
 
@@ -120,10 +121,11 @@ class H263Depayloader : public Depayloader
 };
 
 
-class Mpeg4Payloader : public Payloader
+class Mpeg4Payloader : public Payloader, public MessageHandler
 {
     private: 
         void init();
+        bool handleMessage(const std::string &path); 
 };
 
 
