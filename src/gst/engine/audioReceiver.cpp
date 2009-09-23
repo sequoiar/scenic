@@ -33,7 +33,7 @@
 
 /** Constructor parameterized by an AudioSinkConfig 
  * and a ReceiverConfig */
-AudioReceiver::AudioReceiver(const AudioSinkConfig aConfig, const ReceiverConfig rConfig) : 
+AudioReceiver::AudioReceiver(AudioSinkConfig aConfig, ReceiverConfig rConfig) : 
     audioConfig_(aConfig), 
     remoteConfig_(rConfig), 
     session_(), 

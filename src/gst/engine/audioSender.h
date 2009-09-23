@@ -39,7 +39,7 @@ class AudioSender
     : public SenderBase
 {
     public:
-        AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig, bool capsOutOfBand);
+        AudioSender(AudioSourceConfig aConfig, SenderConfig rConfig, bool capsOutOfBand);
 
         ~AudioSender();
 

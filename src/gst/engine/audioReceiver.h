@@ -41,8 +41,8 @@ class AudioReceiver
     : public ReceiverBase
 {
     public:
-        AudioReceiver(const AudioSinkConfig aConfig, 
-                      const ReceiverConfig rConfig);
+        AudioReceiver(AudioSinkConfig aConfig, 
+                      ReceiverConfig rConfig);
 
         ~AudioReceiver();
 

@@ -33,7 +33,7 @@
 
 
 /// Constructor 
-AudioSender::AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig, bool capsOutOfBand) : 
+AudioSender::AudioSender(AudioSourceConfig aConfig, SenderConfig rConfig, bool capsOutOfBand) : 
     SenderBase(rConfig, capsOutOfBand),
     audioConfig_(aConfig), 
     session_(), 

@@ -34,7 +34,7 @@
 
 
 /// Constructor
-VideoSender::VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig, bool capsOutOfBand) : 
+VideoSender::VideoSender(VideoSourceConfig vConfig, SenderConfig rConfig, bool capsOutOfBand) : 
     SenderBase(rConfig, capsOutOfBand), videoConfig_(vConfig), session_(), source_(0), 
     encoder_(0), payloader_(0) 
 {}

@@ -31,7 +31,7 @@ class SenderBase : public BusMsgHandler
 {
     public: 
         void init();
-        SenderBase(const SenderConfig rConfig, bool capsOutOfBand);
+        SenderBase(SenderConfig rConfig, bool capsOutOfBand);
         virtual ~SenderBase();
         bool handleBusMsg(_GstMessage *msg);
 

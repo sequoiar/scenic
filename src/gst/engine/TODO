@@ -1,13 +1,11 @@
 NTA:
 -make sure that if we quit with interrupt, everything especially shared memory is cleaned up
--add flag to explicitly send/receive caps on command line
+-no audioconvert if jack and vorbis are being used
+-use smart ptrs more
 
 HELLO_WORLD:
 -pass map msg around more so we don't get giant parameter lists as per videofactory/audiofactory
 -use more message passing, try mike's approach of path=ClassName, args[0]=handler_method, args[1-n]...
--find out if h264 caps can be as simple as gst-plugins good examples would
-have us believe
--get sendCaps stuff out of gst/control (aka telnet)
 -use milhouse command line to generate caps
 -Get rid of singletons, rather have an application space all the necessary objects can listen.
 -make sure no exceptions can be thrown from destructors

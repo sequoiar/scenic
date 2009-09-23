@@ -26,7 +26,7 @@
 #include <gst/gst.h>
 
 
-SenderBase::SenderBase(const SenderConfig rConfig, bool capsOutOfband) : 
+SenderBase::SenderBase(SenderConfig rConfig, bool capsOutOfband) : 
     remoteConfig_(rConfig), capsOutOfBand_(capsOutOfband), initialized_(false) 
 {
     remoteConfig_.checkPorts();

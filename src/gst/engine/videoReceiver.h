@@ -36,7 +36,7 @@ class VideoReceiver
     : public ReceiverBase
 {
     public:
-        VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig rConfig);
+        VideoReceiver(VideoSinkConfig vConfig, ReceiverConfig rConfig);
 
         ~VideoReceiver();
         void toggleFullscreen();

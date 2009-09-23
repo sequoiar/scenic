@@ -37,7 +37,7 @@ class VideoSender
     : public SenderBase
 {
     public:
-        VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig, bool capsOutOfBand);
+        VideoSender(VideoSourceConfig vConfig, SenderConfig rConfig, bool capsOutOfBand);
         ~VideoSender();
 
     private:

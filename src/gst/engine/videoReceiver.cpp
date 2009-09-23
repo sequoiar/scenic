@@ -32,7 +32,7 @@
 #include "messageDispatcher.h"
 
     
-VideoReceiver::VideoReceiver(const VideoSinkConfig vConfig, const ReceiverConfig rConfig) : 
+VideoReceiver::VideoReceiver(VideoSinkConfig vConfig, ReceiverConfig rConfig) : 
     videoConfig_(vConfig), 
     remoteConfig_(rConfig), 
     session_(), 
