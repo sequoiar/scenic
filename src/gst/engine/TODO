@@ -4,6 +4,7 @@ NTA:
 -add flag to explicitly send/receive caps on command line
 
 HELLO_WORLD:
+-pass map msg around more so we don't get giant parameter lists as per videofactory/audiofactory
 -use more message passing, try mike's approach of path=ClassName, args[0]=handler_method, args[1-n]...
 -find out if h264 caps can be as simple as gst-plugins good examples would
 have us believe

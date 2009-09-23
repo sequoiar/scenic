@@ -81,13 +81,13 @@ void RemoteConfig::checkPorts() const
 SenderConfig::SenderConfig(const std::string &codec__,
         const std::string &remoteHost__,    
         int port__,
-        int msgId__) : RemoteConfig(codec__, remoteHost__, port__, msgId__)
+        int msgId__) : RemoteConfig(codec__, remoteHost__, port__, msgId__), message_("")
 {}
 
 
 
 SenderConfig::SenderConfig(const SenderConfig & m) : 
-    RemoteConfig(m)
+    RemoteConfig(m), message_(m.message_)
 {}
 
 VideoEncoder * SenderConfig::createVideoEncoder() const
@@ -132,14 +132,17 @@ Encoder * SenderConfig::createAudioEncoder() const
 }
 
 
-void SenderConfig::sendMessage(const std::string &message) const
+gboolean SenderConfig::sendMessage(gpointer data) 
 {
-    LOG_DEBUG("\n\n\nSendin tcp msg for host " 
-            << remoteHost_ << " on port " << capsPort() 
-            << " with id " << msgId_ << "\n\n\n\n");
+    SenderConfig *context = static_cast<SenderConfig*>(data);
+    LOG_DEBUG("\n\n\nSending tcp msg for host " 
+            << context->remoteHost_ << " on port " << context->capsPort() 
+            << " with id " << context->msgId_ << "\n\n\n\n");
 
-    tassert(tcpSendBuffer(remoteHost_, capsPort(), 
-                msgId_, message));
+    if (tcpSendBuffer(context->remoteHost_, context->capsPort(), context->msgId_, context->message_))
+        return FALSE;    // message got through, don't need to send it again
+    else
+        return TRUE;    // no connection made, try again later
 }
 
 
@@ -225,7 +228,7 @@ void ReceiverConfig::receiveCaps()
     int id;
     // this blocks
     std::string msg(tcpGetBuffer(capsPort(), id));
-    tassert(id == msgId_);
+    //tassert(id == msgId_);
     caps_ = msg;
 }
 

@@ -118,7 +118,9 @@ bool VideoSender::handleBusMsg(GstMessage *msg)
         if (capsOutOfBand_ or CapsParser::getVideoCaps(remoteConfig_.codec()) == "") // caps aren't already cached 
         {
             LOG_DEBUG("Sending caps for codec " << remoteConfig_.codec());
-            remoteConfig_.sendMessage(std::string(newCapsStr));
+            //remoteConfig_.sendMessage(std::string(newCapsStr));
+            remoteConfig_.setMessage(std::string(newCapsStr));
+            g_timeout_add(500 /* ms */, static_cast<GSourceFunc>(SenderConfig::sendMessage), &remoteConfig_);
             return true;
         }
         else

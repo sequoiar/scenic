@@ -131,8 +131,10 @@ bool AudioSender::handleBusMsg(GstMessage *msg)
         else if (capsOutOfBand_ or CapsParser::getAudioCaps(remoteConfig_.codec(), 
                     audioConfig_.numChannels(), playback::sampleRate()) == "") 
         { 
+            LOG_DEBUG("Sending caps for codec " << remoteConfig_.codec());
             // this profile needs the caps to be sent
-            remoteConfig_.sendMessage(std::string(newCapsStr));
+            remoteConfig_.setMessage(std::string(newCapsStr));
+            g_timeout_add(500 /* ms */, static_cast<GSourceFunc>(SenderConfig::sendMessage), &remoteConfig_);
             return true;
         }
         else
