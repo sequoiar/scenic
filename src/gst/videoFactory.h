@@ -79,8 +79,10 @@ videofactory::buildVideoReceiver_(const std::string &ip,
     std::string caps(CapsParser::getVideoCaps(codec)); // get caps here
     
     ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID); 
+
+    capsOutOfBand = capsOutOfBand or (caps == "");
     
-    if (caps == "" or capsOutOfBand) // couldn't find caps, need them from other host
+    if (capsOutOfBand) // couldn't find caps, need them from other host
     {
         LOG_INFO("Waiting for " << codec << " caps from other host");
         rConfig.receiveCaps();  // wait for new caps from sender

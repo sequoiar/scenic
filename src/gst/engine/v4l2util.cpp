@@ -50,7 +50,9 @@ static v4l2_format captureFormat(const std::string &device)
     if ((fd = open(device.c_str(), O_RDWR)) < 0) 
         THROW_ERROR("Failed to open " << device);
 
-    tassert(doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT") == 0);
+    if (!(doioctl(fd, VIDIOC_G_FMT, &vfmt, "VIDIOC_G_FMT") == 0))
+        LOG_WARNING("IOctl VIDIOC_G_FMT failed");
+
     close(fd);
     return vfmt;
 }
