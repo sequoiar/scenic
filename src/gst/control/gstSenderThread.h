@@ -32,7 +32,7 @@ class GstSenderThread
 {
     public:
         GstSenderThread()
-            : video_(0), audio_(0), videoFirst(0) {}
+            : video_(0), audio_(0) {}
         ~GstSenderThread();
         virtual void start(MapMsg& ); 
     private:
@@ -48,8 +48,6 @@ class GstSenderThread
         GstSenderThread(const GstSenderThread&); 
         /// No Assignment Operator 
         GstSenderThread& operator=(const GstSenderThread&); 
-        boost::function<void (std::string)> ff[2];
-        bool videoFirst;
 };
 
 #endif // _GST_SENDER_THREAD_H_

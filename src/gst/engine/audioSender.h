@@ -36,24 +36,21 @@ class Payloader;
 class _GstMessage;
 
 class AudioSender
-    : public SenderBase, public BusMsgHandler
+    : public SenderBase
 {
     public:
         AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig, bool capsOutOfBand);
 
         ~AudioSender();
 
-        std::string getCaps() const;
-
     private:
-        bool handleBusMsg(_GstMessage *msg);
         void init_source();
 // void init_level();
         void init_codec();
         void init_payloader();
+        virtual bool capsAreCached() const;
 
         const AudioSourceConfig audioConfig_;
-        SenderConfig remoteConfig_;
         RtpSender session_;
         AudioSource *source_;
         //AudioLevel level_;

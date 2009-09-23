@@ -68,23 +68,6 @@ void GstThread::start(MapMsg&)
 void GstSenderThread::start(MapMsg& )
 { 
     playback::start();
-    if(!hasPlayed_)
-    {
-        if(videoFirst)
-        {
-            if(ff[0])
-                ff[0](video_->getCaps());
-            if(ff[1])
-                ff[1](audio_->getCaps());
-        }
-        else
-        {
-            if(ff[1])
-                ff[1](audio_->getCaps());
-            if(ff[0])
-                ff[0](video_->getCaps());
-        }
-    }
 
     hasPlayed_ = true;
 } 
@@ -293,14 +276,10 @@ void GstSenderThread::video_init(MapMsg& msg)
 
         VideoSourceConfig config(msg["source"], msg["bitrate"], msg["device"], msg["location"], msg["camera_number"]);
         video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"], msg["caps-out-of-band"]);
-        if(ff[1])
-            videoFirst = false;
-        else
-            videoFirst = true;
     }
     catch(ErrorExcept e)
     {
-        LOG_WARNING(e.what());
+        LOG_ERROR(e.what());
         delete video_;
         video_ = 0;
         throw(e);
@@ -333,6 +312,7 @@ void GstSenderThread::audio_init(MapMsg& msg)
     }
 }
 
+/// Receiver specific messages
 bool GstReceiverThread::subHandleMsg(MapMsg &msg)
 {
     if (msg() == "jitterbuffer")

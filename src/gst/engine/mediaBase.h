@@ -22,20 +22,28 @@
 #ifndef _MEDIA_BASE_H_
 #define _MEDIA_BASE_H_
 
-class SenderBase 
+#include "remoteConfig.h"
+#include "busMsgHandler.h"
+
+class _GstMessage;
+
+class SenderBase : public BusMsgHandler
 {
     public: 
         void init();
-        SenderBase() : capsOutOfBand_(false), initialized_(false) {};
-        virtual ~SenderBase(){};
+        SenderBase(const SenderConfig rConfig, bool capsOutOfBand);
+        virtual ~SenderBase();
+        bool handleBusMsg(_GstMessage *msg);
 
-        virtual std::string getCaps() const = 0;
     protected:
+        SenderConfig remoteConfig_;
         bool capsOutOfBand_;
+
     private:
         virtual void init_source() = 0;
         virtual void init_codec() = 0;
         virtual void init_payloader() = 0;
+        virtual bool capsAreCached() const = 0;
         bool initialized_;
 
         SenderBase(const SenderBase&);     //No Copy Constructor

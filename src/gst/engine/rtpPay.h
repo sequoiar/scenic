@@ -51,7 +51,6 @@ class Payloader : public RtpPay
 {
     public:
         static void enableControl();
-        std::string getCaps() const;
         virtual ~Payloader();
         void init() = 0;
     protected:

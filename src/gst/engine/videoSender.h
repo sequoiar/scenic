@@ -25,7 +25,6 @@
 
 #include "mediaBase.h"
 #include "videoConfig.h"
-#include "remoteConfig.h"
 #include "rtpSender.h"
 #include "busMsgHandler.h"
 
@@ -35,21 +34,19 @@ class Payloader;
 class _GstMessage;
 
 class VideoSender
-    : public SenderBase, public BusMsgHandler
+    : public SenderBase
 {
     public:
         VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig, bool capsOutOfBand);
         ~VideoSender();
-        std::string getCaps() const;
 
     private:
-        bool handleBusMsg(_GstMessage *msg);
         void init_source();
         void init_codec();
         void init_payloader();
+        virtual bool capsAreCached() const;
 
         const VideoSourceConfig videoConfig_;
-        SenderConfig remoteConfig_;
         RtpSender session_;
         VideoSource *source_;
         VideoEncoder *encoder_;

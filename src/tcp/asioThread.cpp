@@ -462,7 +462,6 @@ class tcp_receiver
         acceptor_(io_service, tcp::endpoint(tcp::v4(), port)),
         buffer_(buffer)
     {
-        LOG_DEBUG("New tcp receiver");
         session_ptr new_session(new tcp_receiver_session(io_service_, buffer_));
         acceptor_.async_accept(new_session->socket(),
                 boost::bind(&tcp_receiver::handle_accept, this, new_session,
@@ -500,7 +499,6 @@ std::string tcpGetBuffer(int port, int &/*id*/)
     tcp_receiver receiver(io_service, port, buffer);
 
     io_service.run();
-    LOG_DEBUG("FINISHED Waiting for " << buffer);
 
     return buffer;
 }
@@ -536,7 +534,7 @@ bool tcpSendBuffer(std::string ip, int port, int /*id*/, std::string caps)
         }
         else
         {
-            LOG_DEBUG("No caps receiver ready yet, will try again later...");
+            LOG_DEBUG("No tcp receiver ready yet, will try again later...");
         }
     }
     return success;

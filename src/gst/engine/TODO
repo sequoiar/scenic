@@ -1,5 +1,4 @@
 NTA:
--since caps change is asynchronous, caps send/receive must be as well. this is broken currently, i.e. using vorbis and theora together breaks.
 -make sure that if we quit with interrupt, everything especially shared memory is cleaned up
 -add flag to explicitly send/receive caps on command line
 

@@ -34,37 +34,34 @@
 
 /// Constructor 
 AudioSender::AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig, bool capsOutOfBand) : 
+    SenderBase(rConfig, capsOutOfBand),
     audioConfig_(aConfig), 
-    remoteConfig_(rConfig), 
     session_(), 
     source_(0), 
     //level_(), 
     encoder_(0), 
     payloader_(0)
 {
-    capsOutOfBand_ = capsOutOfBand;
-
-    remoteConfig_.checkPorts();
     if (remoteConfig_.codec() == "mp3")
         if (audioConfig_.numChannels() < 1 or audioConfig_.numChannels() > 2)
             THROW_CRITICAL("MP3 only accepts 1 or 2 channels, not " << audioConfig_.numChannels());
 }
 
+
+bool AudioSender::capsAreCached() const
+{
+    return CapsParser::getAudioCaps(remoteConfig_.codec(), 
+            audioConfig_.numChannels(), 
+            playback::sampleRate()) != "";
+}
+
+
 /// Destructor 
 AudioSender::~AudioSender()
 {
-    remoteConfig_.cleanupPorts();
     delete payloader_;
     delete encoder_;
     delete source_;
-}
-
-/// Returns the capabilities of this AudioSender's RtpSession 
-std::string AudioSender::getCaps() const
-{ 
-    std::string capsStr = payloader_->getCaps();
-    tassert(capsStr != "");
-    return capsStr;
 }
 
 void AudioSender::init_source()
@@ -101,46 +98,5 @@ void AudioSender::init_payloader()
 
     gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_, remoteConfig_);   
-}
-
-
-
-
-/** 
- * The new caps message is posted on the bus by the src pad of our udpsink, 
- * received by this audiosender, and sent to our other host if needed. */
-bool AudioSender::handleBusMsg(GstMessage *msg)
-{
-    const GstStructure *s = gst_message_get_structure(msg);
-    const gchar *name = gst_structure_get_name(s);
-
-    if (std::string(name) == "caps-changed") 
-    {   
-        LOG_DEBUG("Got caps changed signal");
-        // this is our msg
-        const gchar *newCapsStr = gst_structure_get_string(s, "caps");
-        tassert(newCapsStr);
-        std::string str(newCapsStr);
-
-        GstStructure *structure = gst_caps_get_structure(gst_caps_from_string(str.c_str()), 0);
-        const GValue *encodingStr = gst_structure_get_value(structure, "encoding-name");
-        std::string encodingName(g_value_get_string(encodingStr));
-
-        if (!RemoteConfig::capsMatchCodec(encodingName, remoteConfig_.codec()))
-                return false;   // not our caps, ignore it
-        else if (capsOutOfBand_ or CapsParser::getAudioCaps(remoteConfig_.codec(), 
-                    audioConfig_.numChannels(), playback::sampleRate()) == "") 
-        { 
-            LOG_DEBUG("Sending caps for codec " << remoteConfig_.codec());
-            // this profile needs the caps to be sent
-            remoteConfig_.setMessage(std::string(newCapsStr));
-            g_timeout_add(500 /* ms */, static_cast<GSourceFunc>(SenderConfig::sendMessage), &remoteConfig_);
-            return true;
-        }
-        else
-            return true;       // was our caps, but we don't need to send caps for it
-    }
-
-    return false;           // this wasn't our msg, someone else should handle it
 }
 

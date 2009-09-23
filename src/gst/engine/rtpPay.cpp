@@ -53,25 +53,10 @@ void Payloader::enableControl()
 }
 
 
-
 void Payloader::init()
 {
     if (controlEnabled_)
         createMTUControl();
-}
-
-
-std::string Payloader::getCaps() const
-{
-    GstCaps *caps;
-    GstPad *pad = gst_element_get_static_pad(rtpPay_, "src");
-    do 
-        g_object_get(G_OBJECT(pad), "caps", &caps, NULL);
-    while (caps == NULL);
-//    gst_object_unref(GST_OBJECT(pad)); // static pad
-    std::string result(gst_caps_to_string(caps));
-    LOG_INFO("GOT CAPS " << result);
-    return result;
 }
 
 

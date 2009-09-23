@@ -23,10 +23,19 @@
 #include "util.h"
 
 #include "mediaBase.h"
+#include <gst/gst.h>
 
+
+SenderBase::SenderBase(const SenderConfig rConfig, bool capsOutOfband) : 
+    remoteConfig_(rConfig), capsOutOfBand_(capsOutOfband), initialized_(false) 
+{
+    remoteConfig_.checkPorts();
+}
 
 void SenderBase::init()  // template method
 {
+    capsOutOfBand_ = capsOutOfBand_ or !capsAreCached();
+
     // these methods are defined in subclasses
     tassert(!initialized_);
     init_source();
@@ -34,6 +43,51 @@ void SenderBase::init()  // template method
     init_payloader();
     initialized_ = true;
 }
+
+
+/** 
+ * The new caps message is posted on the bus by the src pad of our udpsink, 
+ * received by this audiosender, and sent to our other host if needed. */
+bool SenderBase::handleBusMsg(GstMessage *msg)
+{
+    const GstStructure *s = gst_message_get_structure(msg);
+    const gchar *name = gst_structure_get_name(s);
+
+    if (std::string(name) == "caps-changed") 
+    {   
+        // this is our msg
+        const gchar *newCapsStr = gst_structure_get_string(s, "caps");
+        tassert(newCapsStr);
+        std::string str(newCapsStr);
+
+        GstStructure *structure = gst_caps_get_structure(gst_caps_from_string(str.c_str()), 0);
+        const GValue *encodingStr = gst_structure_get_value(structure, "encoding-name");
+        std::string encodingName(g_value_get_string(encodingStr));
+
+        if (!RemoteConfig::capsMatchCodec(encodingName, remoteConfig_.codec()))
+            return false;   // not our caps, ignore it
+        else if (capsOutOfBand_) 
+        { 
+            LOG_DEBUG("Sending caps for codec " << remoteConfig_.codec());
+
+            remoteConfig_.setMessage(std::string(newCapsStr));
+            enum {MESSAGE_SEND_TIMEOUT = 500};
+            g_timeout_add(MESSAGE_SEND_TIMEOUT /* ms */, static_cast<GSourceFunc>(SenderConfig::sendMessage), &remoteConfig_);
+            return true;
+        }
+        else
+            return true;       // was our caps, but we don't need to send caps for it
+    }
+
+    return false;           // this wasn't our msg, someone else should handle it
+}
+
+
+SenderBase::~SenderBase()
+{
+    remoteConfig_.cleanupPorts();
+}
+
 
 void ReceiverBase::init()  // template method
 {

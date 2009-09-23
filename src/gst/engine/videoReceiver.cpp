@@ -88,7 +88,6 @@ void VideoReceiver::init_sink()
 /// Used to set this VideoReceiver's RtpReceiver's caps 
 void VideoReceiver::setCaps() 
 { 
-    //session_.setCaps(decoder_->getCaps()); // initialize to default
     session_.setCaps(remoteConfig_.caps()); 
     gotCaps_ = true;
 }
