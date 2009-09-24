@@ -45,9 +45,6 @@ class SenderBase : public BusMsgHandler
         virtual void init_payloader() = 0;
         virtual bool capsAreCached() const = 0;
         bool initialized_;
-
-        SenderBase(const SenderBase&);     //No Copy Constructor
-        SenderBase& operator=(const SenderBase&);     //No Assignment Operator
 };
 
 class ReceiverBase 
@@ -62,9 +59,6 @@ class ReceiverBase
         virtual void init_depayloader() = 0;
         virtual void init_sink() = 0;
         bool initialized_;
-
-        ReceiverBase(const ReceiverBase&);     //No Copy Constructor
-        ReceiverBase& operator=(const ReceiverBase&);     //No Assignment Operator
 };
 
 #endif // _MEDIA_BASE_H_

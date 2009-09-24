@@ -28,13 +28,15 @@
 #include "rtpSender.h"
 #include "busMsgHandler.h"
 
+#include "noncopyable.h"
+
 class VideoSource;
 class VideoEncoder;
 class Payloader;
 class _GstMessage;
 
 class VideoSender
-    : public SenderBase
+    : public SenderBase, boost::noncopyable
 {
     public:
         VideoSender(VideoSourceConfig vConfig, SenderConfig rConfig, bool capsOutOfBand);
@@ -51,11 +53,6 @@ class VideoSender
         VideoSource *source_;
         VideoEncoder *encoder_;
         Payloader *payloader_; 
-
-        // hidden
-
-        VideoSender(const VideoSender&); //No Copy Constructor
-        VideoSender& operator=(const VideoSender&); //No Assignment Operator
 };
 
 #endif

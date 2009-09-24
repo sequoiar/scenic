@@ -22,10 +22,12 @@
 #ifndef _DV1394_H_
 #define _DV1394_H_
 
+#include "noncopyable.h"
+
 class _GstElement;
 class _GstPad;
 
-class Dv1394
+class Dv1394 : boost::noncopyable
 {
     public:
         /// This is the single point of access to the singleton instance of this Dv1394 object
@@ -47,9 +49,6 @@ class Dv1394
         _GstElement *audioSink_;
         _GstElement *videoSink_;
         static Dv1394 *instance_;
-
-        Dv1394(const Dv1394&);     //No Copy Constructor
-        Dv1394& operator=(const Dv1394&);     //No Assignment Operator
 };
 
 #endif //_DV1394_H_

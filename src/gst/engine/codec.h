@@ -24,6 +24,8 @@
 
 #include "gstLinkable.h"
 
+#include "noncopyable.h"
+
 // forward declarations
 class _GstElement;
 class RtpPay;
@@ -33,7 +35,7 @@ class Payloader;
 /** 
  *  Abstract base class that wraps a single GstElement, and which exposes both a source and sink.
  */
-class Codec : public GstLinkableFilter
+class Codec : public GstLinkableFilter, boost::noncopyable
 {
     public:
         Codec();
@@ -46,11 +48,6 @@ class Codec : public GstLinkableFilter
     private:
         _GstElement *srcElement() { return codec_; }
         _GstElement *sinkElement() { return codec_; }
-
-        /// No Copy Constructor
-        Codec(const Codec&);     
-        /// No Assignment Operator
-        Codec& operator=(const Codec&);     
 };
 
 /** 
@@ -95,11 +92,6 @@ class AudioConvertedEncoder : public Encoder
 
     private:
         _GstElement *sinkElement() { return aconv_; }
-    
-        /// No Copy Constructor 
-        AudioConvertedEncoder(const AudioConvertedEncoder&);     
-        ///No Assignment Operator
-        AudioConvertedEncoder& operator=(const AudioConvertedEncoder&);     
 };
 
 
@@ -113,11 +105,6 @@ class AudioConvertedDecoder : public Decoder
 
     private:
         _GstElement *srcElement() { return aconv_; }
-
-        ///No Copy Constructor
-        AudioConvertedDecoder(const AudioConvertedDecoder&);     
-        ///No Assignment Operator
-        AudioConvertedDecoder & operator=(const AudioConvertedDecoder&);     
 };
 
 class VideoEncoder : public Encoder 
@@ -137,11 +124,6 @@ class VideoEncoder : public Encoder
         { 
             return colorspc_;
         }
-
-        /// No Copy Constructor
-        VideoEncoder(const VideoEncoder&);     
-        /// No Assignment Operator
-        VideoEncoder& operator=(const VideoEncoder&);     
 };
 
 
@@ -168,11 +150,6 @@ class VideoDecoder : public Decoder
         { 
             return queue_;
         }
-
-        /// No Copy Constructor
-        VideoDecoder(const VideoDecoder&);     
-        /// No Assignment Operator
-        VideoDecoder& operator=(const VideoDecoder&);     
 };
 
 /// Encoder that encodes raw video into H.264 using the x264 encoder

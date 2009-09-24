@@ -1,5 +1,4 @@
-
-// rtpSender.h
+// noncopyable.h
 // Copyright (C) 2008-2009 Société des arts technologiques (SAT)
 // http://www.sat.qc.ca
 // All rights reserved.
@@ -20,36 +19,11 @@
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#ifndef _RTP_SENDER_H_
-#define _RTP_SENDER_H_
+#ifndef __NONCOPYABLE_H__
+#define __NONCOPYABLE_H__
 
-#include <string>
-#include "rtpBin.h"
+// Turn off Weffc++ diagnostic for noncopyable and unfortunately any file that includes it
+#pragma GCC diagnostic ignored "-Weffc++"
+#include <boost/noncopyable.hpp>
 
-class SenderConfig;
-class _GstElement;
-class _GstPad;
-class _GParamSpec;
-class RtpPay;
-
-class RtpSender
-    : public RtpBin
-{
-    public:
-        RtpSender() : rtp_sender_(0) {}
-        void checkSampleRate();
-
-        static void enableControl();
-
-        ~RtpSender();
-
-        void add(RtpPay * payloader, const SenderConfig & config);
-
-    private:
-        _GstElement *rtp_sender_;
-        static void sendCapsChanged(_GstPad *pad, _GParamSpec *pspec, RtpSender *context);
-        virtual void subParseSourceStats(_GstStructure *stats);
-};
-
-#endif // _RTP_SENDER_H_
-
+#endif // __NONCOPYABLE

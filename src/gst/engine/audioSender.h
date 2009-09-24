@@ -29,6 +29,7 @@
 #include "rtpSender.h"
 #include "busMsgHandler.h"
 //#include "audioLevel.h"
+#include "noncopyable.h"
 
 class AudioSource;
 class Encoder;
@@ -36,7 +37,7 @@ class Payloader;
 class _GstMessage;
 
 class AudioSender
-    : public SenderBase
+    : public SenderBase, boost::noncopyable
 {
     public:
         AudioSender(AudioSourceConfig aConfig, SenderConfig rConfig, bool capsOutOfBand);
@@ -57,11 +58,6 @@ class AudioSender
 
         Encoder *encoder_;
         Payloader *payloader_;
-
-        /// No Copy Constructor
-        AudioSender(const AudioSender&); 
-        /// No Assignment Operator
-        AudioSender& operator=(const AudioSender&); 
 };
 
 #endif // _AUDIO_SENDER_H_

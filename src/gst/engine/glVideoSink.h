@@ -1,4 +1,4 @@
-// videoSink.h
+// glVideoSink.h
 // Copyright (C) 2008-2009 Société des arts technologiques (SAT)
 // http://www.sat.qc.ca
 // All rights reserved.
@@ -87,11 +87,6 @@ class GLImageSink
         static const GLfloat INIT_TOP_CROP;
         static int window_width_;
         static int window_height_;
-        
-        /// No Copy Constructor 
-        GLImageSink(const GLImageSink&);     
-        /// No Assignment Operator 
-        GLImageSink& operator=(const GLImageSink&);     
 };
 
 #endif //_GL_VIDEO_SINK_H_

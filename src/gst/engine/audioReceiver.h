@@ -29,6 +29,8 @@
 #include "audioLevel.h"
 #include "messageHandler.h"
 
+#include "noncopyable.h"
+
 class RtpPay;
 class Decoder;
 class AudioSink;
@@ -38,7 +40,7 @@ class AudioSink;
  * decodes/converts it as needed and pushes it to its sink.
  */
 class AudioReceiver
-    : public ReceiverBase
+    : public ReceiverBase, boost::noncopyable
 {
     public:
         AudioReceiver(AudioSinkConfig aConfig, 
@@ -63,11 +65,6 @@ class AudioReceiver
         Decoder *decoder_;
         AudioLevel level_;
         AudioSink *sink_;
-
-        /// No Copy Constructor 
-        AudioReceiver(const AudioReceiver&); 
-        /// No Assignment Operator 
-        AudioReceiver& operator=(const AudioReceiver&); 
 };
 
 #endif // _AUDIO_RECEIVER_H_

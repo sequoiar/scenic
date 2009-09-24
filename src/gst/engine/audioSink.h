@@ -26,12 +26,14 @@
 #include "gstLinkable.h"
 #include "messageHandler.h"
 
+#include "noncopyable.h"
+
 // forward declarations
 class AudioSinkConfig;
 class _GstElement;
 
 /** Abstract base class representing a sink for audio streams */
-class AudioSink : public GstLinkableSink
+class AudioSink : public GstLinkableSink, boost::noncopyable
 {
     public:
         AudioSink();
@@ -49,12 +51,6 @@ class AudioSink : public GstLinkableSink
         static bool signalHandlerAttached_;
         static void FPE_ExceptionHandler(int nSig, int nErrType, int *pnReglist);
         _GstElement *sinkElement() { return sink_; }
-
-        /// No Copy Constructor 
-        AudioSink(const AudioSink&);     
-        /**
-         * No Assignment Constructor */
-        AudioSink& operator=(const AudioSink&);     
 };
 
 // FIXME: DRY!!! Either merge alsasink and pulsesink or pull out a common base class.
@@ -75,11 +71,6 @@ class AudioAlsaSink : public AudioSink
         _GstElement *aconv_;
 
         const AudioSinkConfig &config_;
-
-        /// No Copy Constructor
-        AudioAlsaSink(const AudioAlsaSink&);     
-        /// No Assignment Operator
-        AudioAlsaSink& operator=(const AudioAlsaSink&);     
 };
 
 /// Concrete AudioSink class representing a sink to the Pulse interface 
@@ -93,10 +84,6 @@ class AudioPulseSink : public AudioSink
         _GstElement *sinkElement() { return aconv_; }
         _GstElement *aconv_;
         const AudioSinkConfig &config_;
-        /// No Copy Constructor
-        AudioPulseSink(const AudioPulseSink&);     
-        /// No Assignment Operator
-        AudioPulseSink& operator=(const AudioPulseSink&);     
 };
 
 /// Concrete AudioSink class representing a sink to the JACK audio connection kit 
@@ -109,10 +96,6 @@ class AudioJackSink : public AudioSink, public MessageHandler
         bool handleMessage(const std::string &message);
         void init();
         const AudioSinkConfig &config_;
-        /// No Copy Constructor 
-        AudioJackSink(const AudioJackSink&);     
-        /// No Assignment Operator 
-        AudioJackSink& operator=(const AudioJackSink&);     
 };
           
 

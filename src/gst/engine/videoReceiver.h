@@ -56,9 +56,6 @@ class VideoReceiver
         VideoDecoder *decoder_;
         VideoSink *sink_;
         bool gotCaps_;
-
-        VideoReceiver(const VideoReceiver&); //No Copy Constructor
-        VideoReceiver& operator=(const VideoReceiver&); //No Assignment Operator
 };
 
 #endif

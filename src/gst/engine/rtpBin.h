@@ -25,12 +25,14 @@
 
 #include <map>
 
+#include "noncopyable.h"
+
 class RemoteConfig;
 class _GstElement;
 class _GstStructure;
 class _GObject;
 
-class RtpBin
+class RtpBin : boost::noncopyable
 {
     public:
         virtual ~RtpBin();
@@ -59,9 +61,6 @@ class RtpBin
         static int printStatsCallback(void * rtpbin);
         static void printSourceStats(_GObject *source);
         static void parseSourceStats(_GObject * source, RtpBin *context);
-
-        RtpBin(const RtpBin&); //No Copy Constructor
-        RtpBin& operator=(const RtpBin&); //No Assignment Operator
 };
 
 #endif // _RTP_BIN_H_

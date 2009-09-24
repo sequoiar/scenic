@@ -25,9 +25,11 @@
 #include "gstLinkable.h"
 #include "messageHandler.h"
 
+#include "noncopyable.h"
+
 class _GstElement;
 
-class RtpPay : public GstLinkableFilter
+class RtpPay : public GstLinkableFilter, boost::noncopyable
 {
     public:
         RtpPay() : rtpPay_(0) {}
@@ -38,10 +40,6 @@ class RtpPay : public GstLinkableFilter
 
     protected:
         _GstElement *rtpPay_;
-
-    private:
-        RtpPay(const RtpPay&);     //No Copy Constructor
-        RtpPay& operator=(const RtpPay&);     //No Assignment Operator
 };
 
 class _GtkAdjustment;

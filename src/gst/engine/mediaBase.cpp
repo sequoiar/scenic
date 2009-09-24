@@ -48,6 +48,7 @@ void SenderBase::init()  // template method
 /** 
  * The new caps message is posted on the bus by the src pad of our udpsink, 
  * received by this audiosender, and sent to our other host if needed. */
+// FIXME: move this all in to SenderConfig
 bool SenderBase::handleBusMsg(GstMessage *msg)
 {
     const GstStructure *s = gst_message_get_structure(msg);
