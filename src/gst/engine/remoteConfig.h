@@ -92,7 +92,7 @@ class SenderConfig : public RemoteConfig
         static int sendMessage(void *data);
 
     private:
-        mutable std::string message_;
+        std::string message_;
 };
 
 
@@ -104,12 +104,12 @@ class ReceiverConfig : public RemoteConfig
                 int port__, 
                 const std::string &multicastInterface__,
                 const std::string &caps__,
-                int msgId__) : RemoteConfig(codec__, remoteHost__, port__, msgId__), 
-        multicastInterface_(multicastInterface__), caps_(caps__)
-    {}
+                int msgId__,
+                bool capsOutOfBand); 
 
         ReceiverConfig(const ReceiverConfig & m) 
-            : RemoteConfig(m), multicastInterface_(m.multicastInterface_), caps_(m.caps_)
+            : RemoteConfig(m), multicastInterface_(m.multicastInterface_), caps_(m.caps_),
+            capsOutOfBand_(m.capsOutOfBand_)
         {}
 
         VideoDecoder* createVideoDecoder() const;
@@ -124,6 +124,7 @@ class ReceiverConfig : public RemoteConfig
     private:
         const std::string multicastInterface_;
         std::string caps_;
+        bool capsOutOfBand_;
 };
 
 #endif // _REMOTE_CONFIG_H_

@@ -134,7 +134,7 @@ Encoder * SenderConfig::createAudioEncoder() const
 
 gboolean SenderConfig::sendMessage(gpointer data) 
 {
-    SenderConfig *context = static_cast<SenderConfig*>(data);
+    const SenderConfig *context = static_cast<const SenderConfig*>(data);
     LOG_DEBUG("\n\n\nSending tcp msg for host " 
             << context->remoteHost_ << " on port " << context->capsPort() 
             << " with id " << context->msgId_ << "\n\n\n\n");
@@ -145,6 +145,23 @@ gboolean SenderConfig::sendMessage(gpointer data)
         return TRUE;    // no connection made, try again later
 }
 
+
+ReceiverConfig::ReceiverConfig(const std::string &codec__,
+        const std::string &remoteHost__,    
+        int port__, 
+        const std::string &multicastInterface__,
+        const std::string &caps__,
+        int msgId__,
+        bool capsOutOfBand__) : RemoteConfig(codec__, remoteHost__, port__, msgId__), 
+    multicastInterface_(multicastInterface__), caps_(caps__), 
+    capsOutOfBand_(capsOutOfBand__ or caps_ == "")
+{
+    if (capsOutOfBand_) // couldn't find caps, need them from other host or we explicitly been told to send caps
+    {
+        LOG_INFO("Waiting for " << codec__ << " caps from other host");
+        receiveCaps();  // wait for new caps from sender
+    }
+}
 
 VideoDecoder * ReceiverConfig::createVideoDecoder() const
 {

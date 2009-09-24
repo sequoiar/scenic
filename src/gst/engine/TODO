@@ -1,7 +1,8 @@
 NTA:
--make sure that if we quit with interrupt, everything especially shared memory is cleaned up
+-make sure that if we quit, everything especially shared memory is cleaned up
 -no audioconvert if jack and vorbis are being used
 -use smart ptrs more
+-if we have a sender and receiver going, the receiver should for now gracefully ignore subsequent senders after the first sender goes out
 
 HELLO_WORLD:
 -pass map msg around more so we don't get giant parameter lists as per videofactory/audiofactory

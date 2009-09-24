@@ -72,7 +72,8 @@ bool SenderBase::handleBusMsg(GstMessage *msg)
 
             remoteConfig_.setMessage(std::string(newCapsStr));
             enum {MESSAGE_SEND_TIMEOUT = 500};
-            g_timeout_add(MESSAGE_SEND_TIMEOUT /* ms */, static_cast<GSourceFunc>(SenderConfig::sendMessage), &remoteConfig_);
+            g_timeout_add(MESSAGE_SEND_TIMEOUT /* ms */, static_cast<GSourceFunc>(SenderConfig::sendMessage), 
+                    static_cast<gpointer>(&remoteConfig_));
             return true;
         }
         else

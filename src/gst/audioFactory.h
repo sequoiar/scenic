@@ -81,15 +81,7 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
     AudioSinkConfig aConfig(sink, deviceName, audioBufferTime);
 
     std::string caps(CapsParser::getAudioCaps(codec, numChannels, playback::sampleRate())); // get caps here
-    ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID);
-
-    capsOutOfBand = capsOutOfBand or (caps == "");
-
-    if (capsOutOfBand) // couldn't find caps, need them from other host or we explicitly been told to send caps
-    {
-        LOG_INFO("Waiting for " << codec << " caps from other host");
-        rConfig.receiveCaps();  // wait for new caps from sender
-    }
+    ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID, capsOutOfBand);
 
     AudioReceiver* rx = new AudioReceiver(aConfig, rConfig);
     rx->init();
