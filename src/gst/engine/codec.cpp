@@ -38,55 +38,65 @@
 #include "rtpReceiver.h"
 
 /// Constructor 
-Codec::Codec() : 
-    codec_(0) 
+Encoder::Encoder() : encoder_(0)
 {}
 
 
 /// Destructor 
-Codec::~Codec()
+Encoder::~Encoder()
 {
-    Pipeline::Instance()->remove(&codec_);
+    Pipeline::Instance()->remove(&encoder_);
 }
-
 
 /// Returns bitrate property for this encoder
 int Encoder::getBitrate() const
 {
-    tassert(codec_);
+    tassert(encoder_);
     unsigned bitrate; 
-    g_object_get(G_OBJECT(codec_), "bitrate", &bitrate, NULL);
+    g_object_get(G_OBJECT(encoder_), "bitrate", &bitrate, NULL);
     return bitrate;
 }
 
 /// Sets bitrate property for this encoder
 void Encoder::setBitrate(unsigned bitrate)
 {
-    tassert(codec_);
+    tassert(encoder_);
     // if pipeline is playing, we need to set it to ready to make 
     // the bitrate change actually take effect
     if (Pipeline::Instance()->isPlaying())
     {
         Pipeline::Instance()->makeReady();
-        g_object_set(G_OBJECT(codec_), "bitrate", bitrate, NULL);
+        g_object_set(G_OBJECT(encoder_), "bitrate", bitrate, NULL);
         Pipeline::Instance()->start();
     }
     else
     {
         LOG_DEBUG("SETTING BITRATE TO " << bitrate);
-        g_object_set(G_OBJECT(codec_), "bitrate", bitrate, NULL);
+        g_object_set(G_OBJECT(encoder_), "bitrate", bitrate, NULL);
     }
 }
 
 /// Posts bitrate using MapMsg
 void Encoder::postBitrate()
 {
-    tassert(codec_);
+    tassert(encoder_);
     MapMsg mapMsg("bitrate");
     mapMsg["value"] = 
-        std::string(gst_element_factory_get_longname(gst_element_get_factory(codec_))) 
+        std::string(gst_element_factory_get_longname(gst_element_get_factory(encoder_))) 
         + ": " +  boost::lexical_cast<std::string>(getBitrate());
     mapMsg.post();
+}
+
+
+/// Constructor 
+Decoder::Decoder() : decoder_(0)
+{}
+
+
+/// Destructor 
+Decoder::~Decoder()
+{
+    Pipeline::Instance()->remove(&decoder_);
 }
 
 
@@ -138,13 +148,13 @@ VideoEncoder::~VideoEncoder()
 
 void VideoEncoder::init()
 {
-    tassert(codec_ != 0);
+    tassert(encoder_ != 0);
     colorspc_ = Pipeline::Instance()->makeElement("ffmpegcolorspace", NULL); 
 
     if (supportsInterlaced_)  // not all encoders have this property
-        g_object_set(codec_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
+        g_object_set(encoder_, "interlaced", TRUE, NULL); // true if we are going to encode interlaced material
 
-    gstlinkable::link(colorspc_, codec_);
+    gstlinkable::link(colorspc_, encoder_);
 }
 
 
@@ -168,7 +178,7 @@ void VideoDecoder::init()
     // FIXME: should be settable
     enum {ALL = 0, TOP, BOTTOM}; // deinterlace produces all fields, or top, bottom
 
-    tassert(codec_ != 0);
+    tassert(decoder_ != 0);
     queue_ = Pipeline::Instance()->makeElement("queue", NULL);
     g_object_set(queue_, "max-size-buffers", MAX_QUEUE_BUFFERS, NULL);
     g_object_set(queue_, "max-size-bytes", 0, NULL);
@@ -179,12 +189,12 @@ void VideoDecoder::init()
         LOG_DEBUG("DO THE DEINTERLACE");
         deinterlace_ = Pipeline::Instance()->makeElement("deinterlace", NULL);
         g_object_set(deinterlace_, "fields", TOP, NULL);
-        gstlinkable::link(codec_, colorspc_);
+        gstlinkable::link(decoder_, colorspc_);
         gstlinkable::link(colorspc_, deinterlace_);
         gstlinkable::link(deinterlace_, queue_);
     }
     else
-        gstlinkable::link(codec_, queue_);
+        gstlinkable::link(decoder_, queue_);
 
 }
 
@@ -212,7 +222,7 @@ H264Encoder::~H264Encoder()
 
 void H264Encoder::init()
 {
-    codec_ = Pipeline::Instance()->makeElement("x264enc", NULL);
+    encoder_ = Pipeline::Instance()->makeElement("x264enc", NULL);
     supportsInterlaced_ = true;
 
     // hardware threads: 1-n, 0 for automatic 
@@ -225,7 +235,7 @@ void H264Encoder::init()
         numThreads = 1;
 
 //    LOG_DEBUG("Using " << numThreads << " threads");
-    g_object_set(codec_, "threads", numThreads, NULL);
+    g_object_set(encoder_, "threads", numThreads, NULL);
 
     //g_object_set(codec_, "byte-stream", TRUE, NULL);
     // subme: subpixel motion estimation 1=fast, 6=best
@@ -255,7 +265,7 @@ Payloader* H264Encoder::createPayloader() const
 
 void H264Decoder::init()
 {
-    codec_ = Pipeline::Instance()->makeElement("ffdec_h264", NULL);
+    decoder_ = Pipeline::Instance()->makeElement("ffdec_h264", NULL);
     VideoDecoder::init();
 }
 
@@ -287,7 +297,7 @@ H263Encoder::~H263Encoder()
 
 void H263Encoder::init()
 {
-    codec_ = Pipeline::Instance()->makeElement("ffenc_h263p", NULL);    // replaced with newer version
+    encoder_ = Pipeline::Instance()->makeElement("ffenc_h263p", NULL);    // replaced with newer version
     VideoEncoder::init();
 }
 
@@ -301,7 +311,7 @@ Payloader* H263Encoder::createPayloader() const
 
 void H263Decoder::init()
 {
-    codec_ = Pipeline::Instance()->makeElement("ffdec_h263", NULL);
+    decoder_ = Pipeline::Instance()->makeElement("ffdec_h263", NULL);
     VideoDecoder::init();
 }
 
@@ -324,7 +334,7 @@ Mpeg4Encoder::~Mpeg4Encoder()
 
 void Mpeg4Encoder::init()
 {
-    codec_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
+    encoder_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
     //supportsInterlaced_ = true; this may cause stuttering
     VideoEncoder::init();
 }
@@ -339,7 +349,7 @@ Payloader* Mpeg4Encoder::createPayloader() const
 
 void Mpeg4Decoder::init()
 {
-    codec_ = Pipeline::Instance()->makeElement("ffdec_mpeg4", NULL);
+    decoder_ = Pipeline::Instance()->makeElement("ffdec_mpeg4", NULL);
     VideoDecoder::init();
 }
 
@@ -361,7 +371,7 @@ TheoraEncoder::~TheoraEncoder()
 
 void TheoraEncoder::init()
 {
-    codec_ = Pipeline::Instance()->makeElement("theoraenc", NULL);
+    encoder_ = Pipeline::Instance()->makeElement("theoraenc", NULL);
     setSpeedLevel(MAX_SPEED_LEVEL);
     if (usingQualitySetting_)
         setQuality(INIT_QUALITY);
@@ -382,20 +392,20 @@ void TheoraEncoder::setBitrate(unsigned newBitrate)
 // theora specific
 void TheoraEncoder::setQuality(int quality)
 {
-    tassert(codec_ != 0);
+    tassert(encoder_ != 0);
     if (quality < MIN_QUALITY or quality > MAX_QUALITY)
         THROW_ERROR("Quality must be in range [" << MIN_QUALITY << "-" << MAX_QUALITY << "]");
-    g_object_set(codec_, "quality", quality, NULL);
+    g_object_set(encoder_, "quality", quality, NULL);
 }
 
 
 // theora specific
 void TheoraEncoder::setSpeedLevel(int speedLevel)
 {
-    tassert(codec_ != 0);
+    tassert(encoder_ != 0);
     if (speedLevel < MIN_SPEED_LEVEL or speedLevel > MAX_SPEED_LEVEL)
         THROW_ERROR("Speed-level must be in range [" << MIN_SPEED_LEVEL << "-" << MAX_SPEED_LEVEL << "]");
-    g_object_set(codec_, "speed-level", speedLevel, NULL);
+    g_object_set(encoder_, "speed-level", speedLevel, NULL);
 }
 
 
@@ -408,7 +418,7 @@ Payloader* TheoraEncoder::createPayloader() const
 
 void TheoraDecoder::init()
 {
-    codec_ = Pipeline::Instance()->makeElement("theoradec", NULL);
+    decoder_ = Pipeline::Instance()->makeElement("theoradec", NULL);
     VideoDecoder::init();
 }
 
@@ -429,8 +439,8 @@ VorbisEncoder::~VorbisEncoder()
 void VorbisEncoder::init()
 {
     AudioConvertedEncoder::init();
-    codec_ = Pipeline::Instance()->makeElement("vorbisenc", NULL);
-    gstlinkable::link(aconv_, codec_);
+    encoder_ = Pipeline::Instance()->makeElement("vorbisenc", NULL);
+    gstlinkable::link(aconv_, encoder_);
 }
 
 
@@ -448,7 +458,7 @@ unsigned long long VorbisDecoder::minimumBufferTime()
 
 void VorbisDecoder::init()
 {
-    codec_ = Pipeline::Instance()->makeElement("vorbisdec", NULL);
+    decoder_ = Pipeline::Instance()->makeElement("vorbisdec", NULL);
 }
 
 /// Creates an RtpVorbisDepayloader 
@@ -502,10 +512,10 @@ LameEncoder::~LameEncoder()
 void LameEncoder::init()
 {
     AudioConvertedEncoder::init();
-    codec_ = Pipeline::Instance()->makeElement("lamemp3enc", NULL);
+    encoder_ = Pipeline::Instance()->makeElement("lamemp3enc", NULL);
     mp3parse_ = Pipeline::Instance()->makeElement("mp3parse", NULL);
-    gstlinkable::link(aconv_, codec_);
-    gstlinkable::link(codec_, mp3parse_);
+    gstlinkable::link(aconv_, encoder_);
+    gstlinkable::link(encoder_, mp3parse_);
 }
 
 /// Constructor
@@ -516,8 +526,8 @@ MadDecoder::MadDecoder()
 void MadDecoder::init()
 {
     AudioConvertedDecoder::init();
-    codec_ = Pipeline::Instance()->makeElement("mad", NULL);
-    gstlinkable::link(codec_, aconv_);
+    decoder_ = Pipeline::Instance()->makeElement("mad", NULL);
+    gstlinkable::link(decoder_, aconv_);
 }
 
 /** 
