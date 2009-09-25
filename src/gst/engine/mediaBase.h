@@ -23,27 +23,27 @@
 #define _MEDIA_BASE_H_
 
 #include "remoteConfig.h"
-#include "busMsgHandler.h"
+
+#include <boost/shared_ptr.hpp>
 
 class _GstMessage;
 
-class SenderBase : public BusMsgHandler
+class SenderBase 
 {
     public: 
         void init();
-        SenderBase(SenderConfig rConfig, bool capsOutOfBand);
+        SenderBase(boost::shared_ptr<SenderConfig> rConfig);
         virtual ~SenderBase();
-        bool handleBusMsg(_GstMessage *msg);
+        bool capsAreCached() { return checkCaps(); }
 
     protected:
-        SenderConfig remoteConfig_;
-        bool capsOutOfBand_;
+        boost::shared_ptr<SenderConfig> remoteConfig_;
 
     private:
+        virtual bool checkCaps() const = 0;
         virtual void init_source() = 0;
         virtual void init_codec() = 0;
         virtual void init_payloader() = 0;
-        virtual bool capsAreCached() const = 0;
         bool initialized_;
 };
 

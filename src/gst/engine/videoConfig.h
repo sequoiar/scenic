@@ -40,15 +40,6 @@ class VideoSourceConfig
             location_(location__), cameraNumber_(cameraNumber__)
         {}
 
-        //* copy constructor */
-        VideoSourceConfig(const VideoSourceConfig& m) : 
-            source_(m.source_), 
-            bitrate_(m.bitrate_), 
-            deviceName_(m.deviceName_), 
-            location_(m.location_), 
-            cameraNumber_(m.cameraNumber_) 
-        {}
-
         VideoSource* createSource() const;  // factory method
 
         const char *source() const { return source_.c_str(); }
@@ -69,8 +60,6 @@ class VideoSourceConfig
         const std::string deviceName_;
         const std::string location_;
         const int cameraNumber_;
-        /// No Assignment Operator 
-        VideoSourceConfig& operator=(const VideoSourceConfig&);     
 };
 
 
@@ -80,11 +69,6 @@ class VideoSinkConfig
 
         VideoSinkConfig(const std::string & sink__, int screenNum, bool doDeinterlace__, const std::string & sharedVideoId__)
             : sink_(sink__), screenNum_(screenNum), doDeinterlace_(doDeinterlace__), sharedVideoId_(sharedVideoId__)
-        {}
-
-        // copy constructor
-        VideoSinkConfig(const VideoSinkConfig & m) 
-            : sink_(m.sink_) , screenNum_(m.screenNum_), doDeinterlace_(m.doDeinterlace_), sharedVideoId_(m.sharedVideoId_)
         {}
 
         VideoSink* createSink() const;

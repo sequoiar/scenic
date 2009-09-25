@@ -25,17 +25,16 @@
 #include "mediaBase.h"
 #include <gst/gst.h>
 
+using boost::shared_ptr;
 
-SenderBase::SenderBase(SenderConfig rConfig, bool capsOutOfband) : 
-    remoteConfig_(rConfig), capsOutOfBand_(capsOutOfband), initialized_(false) 
+SenderBase::SenderBase(shared_ptr<SenderConfig> rConfig) : 
+    remoteConfig_(rConfig), initialized_(false)
 {
-    remoteConfig_.checkPorts();
+    remoteConfig_->checkPorts();
 }
 
 void SenderBase::init()  // template method
 {
-    capsOutOfBand_ = capsOutOfBand_ or !capsAreCached();
-
     // these methods are defined in subclasses
     tassert(!initialized_);
     init_source();
@@ -45,6 +44,7 @@ void SenderBase::init()  // template method
 }
 
 
+#if 0
 /** 
  * The new caps message is posted on the bus by the src pad of our udpsink, 
  * received by this audiosender, and sent to our other host if needed. */
@@ -83,11 +83,12 @@ bool SenderBase::handleBusMsg(GstMessage *msg)
 
     return false;           // this wasn't our msg, someone else should handle it
 }
+#endif
 
 
 SenderBase::~SenderBase()
 {
-    remoteConfig_.cleanupPorts();
+    remoteConfig_->cleanupPorts();
 }
 
 

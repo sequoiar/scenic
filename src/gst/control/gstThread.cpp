@@ -274,8 +274,11 @@ void GstSenderThread::video_init(MapMsg& msg)
         if(!msg["camera_number"])
             msg["camera_number"] = -1;
 
-        VideoSourceConfig config(msg["source"], msg["bitrate"], msg["device"], msg["location"], msg["camera_number"]);
-        video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"], msg["caps-out-of-band"]);
+        shared_ptr<VideoSourceConfig> config(new VideoSourceConfig(msg["source"], msg["bitrate"], 
+                    msg["device"], msg["location"], msg["camera_number"]));
+
+        video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], 
+                msg["port"], msg["caps-out-of-band"]);
     }
     catch(ErrorExcept e)
     {
@@ -300,8 +303,11 @@ void GstSenderThread::audio_init(MapMsg& msg)
         if(!msg["device"])
             msg["device"] = "";
 
-        AudioSourceConfig config(msg["source"], msg["device"], msg["location"], msg["channels"]);
-        audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"], msg["caps-out-of-band"]);
+        shared_ptr<AudioSourceConfig> config(new AudioSourceConfig(msg["source"], msg["device"], 
+                    msg["location"], msg["channels"]));
+
+        audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], 
+                msg["port"], msg["caps-out-of-band"]);
     }
     catch(ErrorExcept e)
     {

@@ -436,11 +436,11 @@ void Pipeline::unsubscribe(BusMsgHandler *obj)
     std::vector<BusMsgHandler*>::iterator iter;
     iter = std::find(handlers_.begin(), handlers_.end(), obj);
 
-    // assert that we were able to find the handler 
-    tassert(iter != handlers_.end());
-
-    // remove it
-    handlers_.erase(iter);
+    // make sure that we were able to find the handler 
+    if (iter == handlers_.end())
+        LOG_ERROR("Could not find this bus message handler in the list of bus message handlers");
+    else // remove it
+        handlers_.erase(iter);
 }
 
 

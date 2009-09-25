@@ -28,6 +28,8 @@
 #include "remoteConfig.h"
 #include "rtpReceiver.h"
 
+#include <boost/shared_ptr.hpp>
+
 class RtpPay;
 class VideoDecoder;
 class VideoSink;
@@ -36,7 +38,8 @@ class VideoReceiver
     : public ReceiverBase
 {
     public:
-        VideoReceiver(VideoSinkConfig vConfig, ReceiverConfig rConfig);
+        VideoReceiver(boost::shared_ptr<VideoSinkConfig> vConfig, 
+                boost::shared_ptr<ReceiverConfig> rConfig);
 
         ~VideoReceiver();
         void toggleFullscreen();
@@ -48,8 +51,8 @@ class VideoReceiver
         void init_sink();
         void setCaps();
 
-        const VideoSinkConfig videoConfig_;
-        const ReceiverConfig remoteConfig_;
+        boost::shared_ptr<VideoSinkConfig> videoConfig_;
+        boost::shared_ptr<ReceiverConfig> remoteConfig_;
         RtpReceiver session_;
 
         RtpPay *depayloader_; 

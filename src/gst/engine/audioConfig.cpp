@@ -42,12 +42,6 @@ AudioSourceConfig::AudioSourceConfig(const std::string & source__,
 }
 
 
-/// Copy constructor 
-AudioSourceConfig::AudioSourceConfig(const AudioSourceConfig& m) : 
-    source_(m.source_), deviceName_(m.deviceName_), location_(m.location_), numChannels_(m.numChannels_)
-{}
-
-
 /// Returns c-style string specifying the source 
 const char *AudioSourceConfig::source() const
 {
@@ -109,10 +103,6 @@ AudioSinkConfig::AudioSinkConfig(const std::string & sink__, const std::string &
     if (sink_ == "jackaudiosink") // FIXME: it's good for this to happen early 
         Jack::assertReady();      // (before waiting on caps) but having it here is pretty gross
 }
-
-/// Copy constructor 
-AudioSinkConfig::AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_), deviceName_(m.deviceName_), bufferTime_(m.bufferTime_) 
-{}
 
 /// Factory method that creates an AudioSink based on this object's sink_ string 
 AudioSink* AudioSinkConfig::createSink() const

@@ -32,16 +32,20 @@
 #include "capsParser.h"
 #include "messageDispatcher.h"
 
+#include <boost/shared_ptr.hpp>
+
+using boost::shared_ptr;
 
 /// Constructor
-VideoSender::VideoSender(VideoSourceConfig vConfig, SenderConfig rConfig, bool capsOutOfBand) : 
-    SenderBase(rConfig, capsOutOfBand), videoConfig_(vConfig), session_(), source_(0), 
+VideoSender::VideoSender(shared_ptr<VideoSourceConfig> vConfig, 
+        shared_ptr<SenderConfig> rConfig) : 
+    SenderBase(rConfig), videoConfig_(vConfig), session_(), source_(0), 
     encoder_(0), payloader_(0) 
 {}
 
-bool VideoSender::capsAreCached() const
+bool VideoSender::checkCaps() const
 {
-    return CapsParser::getVideoCaps(remoteConfig_.codec()) != ""; 
+    return CapsParser::getVideoCaps(remoteConfig_->codec()) != ""; 
 }
 
 VideoSender::~VideoSender()
@@ -54,16 +58,16 @@ VideoSender::~VideoSender()
 
 void VideoSender::init_source()
 {
-    tassert(source_ = videoConfig_.createSource());
+    tassert(source_ = videoConfig_->createSource());
     source_->init();
 }
 
 
 void VideoSender::init_codec()
 {
-    tassert(encoder_ = remoteConfig_.createVideoEncoder());
+    tassert(encoder_ = remoteConfig_->createVideoEncoder());
     encoder_->init();
-    encoder_->setBitrate(videoConfig_.bitrate());
+    encoder_->setBitrate(videoConfig_->bitrate());
 
     gstlinkable::link(*source_, *encoder_);
 }
@@ -73,9 +77,9 @@ void VideoSender::init_payloader()
 {
     tassert(payloader_ = encoder_->createPayloader());
     payloader_->init();
-    if (capsOutOfBand_) // tell payloader not to send config string in header since we're sending caps
+    if (remoteConfig_->capsOutOfBand()) // tell payloader not to send config string in header since we're sending caps
         MessageDispatcher::sendMessage("disable-send-config");
     gstlinkable::link(*encoder_, *payloader_);
-    session_.add(payloader_, remoteConfig_);
+    session_.add(payloader_, *remoteConfig_);
 }
 

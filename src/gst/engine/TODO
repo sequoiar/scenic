@@ -1,4 +1,5 @@
 NTA:
+-use shared ptrs instead of copying things that shouldn't be copied
 -make sure that if we quit, everything especially shared memory is cleaned up
 -use boost signals.slots instead of current msg passing/handling 
 -no audioconvert if jack and vorbis are being used

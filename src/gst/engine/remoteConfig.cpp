@@ -81,14 +81,11 @@ void RemoteConfig::checkPorts() const
 SenderConfig::SenderConfig(const std::string &codec__,
         const std::string &remoteHost__,    
         int port__,
-        int msgId__) : RemoteConfig(codec__, remoteHost__, port__, msgId__), message_("")
+        int msgId__) : 
+    RemoteConfig(codec__, remoteHost__, port__, msgId__), message_(""), 
+    capsOutOfBand_(true)
 {}
 
-
-
-SenderConfig::SenderConfig(const SenderConfig & m) : 
-    RemoteConfig(m), message_(m.message_)
-{}
 
 VideoEncoder * SenderConfig::createVideoEncoder() const
 {
@@ -144,6 +141,47 @@ gboolean SenderConfig::sendMessage(gpointer data)
     else
         return TRUE;    // no connection made, try again later
 }
+
+
+/** 
+ * The new caps message is posted on the bus by the src pad of our udpsink, 
+ * received by this audiosender, and sent to our other host if needed. */
+// FIXME: move this all in to SenderConfig
+bool SenderConfig::handleBusMsg(GstMessage *msg)
+{
+    const GstStructure *s = gst_message_get_structure(msg);
+    const gchar *name = gst_structure_get_name(s);
+
+    if (std::string(name) == "caps-changed") 
+    {   
+        // this is our msg
+        const gchar *newCapsStr = gst_structure_get_string(s, "caps");
+        tassert(newCapsStr);
+        std::string str(newCapsStr);
+
+        GstStructure *structure = gst_caps_get_structure(gst_caps_from_string(str.c_str()), 0);
+        const GValue *encodingStr = gst_structure_get_value(structure, "encoding-name");
+        std::string encodingName(g_value_get_string(encodingStr));
+
+        if (!capsMatchCodec(encodingName, codec()))
+            return false;   // not our caps, ignore it
+        else if (capsOutOfBand_) 
+        { 
+            LOG_DEBUG("Sending caps for codec " << codec());
+
+            message_ = std::string(newCapsStr);
+            enum {MESSAGE_SEND_TIMEOUT = 500};
+            g_timeout_add(MESSAGE_SEND_TIMEOUT /* ms */, static_cast<GSourceFunc>(SenderConfig::sendMessage), 
+                    static_cast<gpointer>(this));
+            return true;
+        }
+        else
+            return true;       // was our caps, but we don't need to send caps for it
+    }
+
+    return false;           // this wasn't our msg, someone else should handle it
+}
+
 
 
 ReceiverConfig::ReceiverConfig(const std::string &codec__,
@@ -248,4 +286,3 @@ void ReceiverConfig::receiveCaps()
     //tassert(id == msgId_);
     caps_ = msg;
 }
-

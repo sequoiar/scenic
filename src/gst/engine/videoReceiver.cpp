@@ -31,8 +31,12 @@
 #include "rtpPay.h"
 #include "messageDispatcher.h"
 
+#include <boost/shared_ptr.hpp>
+
+using boost::shared_ptr;
     
-VideoReceiver::VideoReceiver(VideoSinkConfig vConfig, ReceiverConfig rConfig) : 
+VideoReceiver::VideoReceiver(shared_ptr<VideoSinkConfig> vConfig, 
+        shared_ptr<ReceiverConfig> rConfig) : 
     videoConfig_(vConfig), 
     remoteConfig_(rConfig), 
     session_(), 
@@ -41,13 +45,13 @@ VideoReceiver::VideoReceiver(VideoSinkConfig vConfig, ReceiverConfig rConfig) :
     sink_(0), 
     gotCaps_(false) 
 {
-    tassert(remoteConfig_.hasCodec()); 
-    remoteConfig_.checkPorts();
+    tassert(remoteConfig_->hasCodec()); 
+    remoteConfig_->checkPorts();
 }
 
 VideoReceiver::~VideoReceiver()
 {
-    remoteConfig_.cleanupPorts();
+    remoteConfig_->cleanupPorts();
     delete sink_;
     delete depayloader_;
     delete decoder_;
@@ -56,8 +60,8 @@ VideoReceiver::~VideoReceiver()
 
 void VideoReceiver::init_codec()
 {
-    tassert(decoder_ = remoteConfig_.createVideoDecoder());
-    if (videoConfig_.doDeinterlace())
+    tassert(decoder_ = remoteConfig_->createVideoDecoder());
+    if (videoConfig_->doDeinterlace())
         decoder_->doDeinterlace();
     decoder_->init();
 }
@@ -70,25 +74,25 @@ void VideoReceiver::init_depayloader()
 
     gstlinkable::link(*depayloader_, *decoder_);
 
-    session_.add(depayloader_, remoteConfig_);
+    session_.add(depayloader_, *remoteConfig_);
 }
 
 
 void VideoReceiver::init_sink()
 {
-    tassert(sink_ = videoConfig_.createSink());
+    tassert(sink_ = videoConfig_->createSink());
     sink_->init();
     gstlinkable::link(*decoder_, *sink_);
     setCaps();
     tassert(gotCaps_);
-    tassert(remoteConfig_.capsMatchCodec()); 
+    tassert(remoteConfig_->capsMatchCodec()); 
     decoder_->adjustJitterBuffer(); // increase jitterbuffer as needed
 }
 
 /// Used to set this VideoReceiver's RtpReceiver's caps 
 void VideoReceiver::setCaps() 
 { 
-    session_.setCaps(remoteConfig_.caps()); 
+    session_.setCaps(remoteConfig_->caps()); 
     gotCaps_ = true;
 }
 

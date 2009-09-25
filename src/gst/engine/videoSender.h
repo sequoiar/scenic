@@ -30,6 +30,8 @@
 
 #include "noncopyable.h"
 
+#include <boost/shared_ptr.hpp>
+
 class VideoSource;
 class VideoEncoder;
 class Payloader;
@@ -39,16 +41,17 @@ class VideoSender
     : public SenderBase, boost::noncopyable
 {
     public:
-        VideoSender(VideoSourceConfig vConfig, SenderConfig rConfig, bool capsOutOfBand);
+        VideoSender(boost::shared_ptr<VideoSourceConfig> vConfig, 
+                boost::shared_ptr<SenderConfig> rConfig);
         ~VideoSender();
 
     private:
         void init_source();
         void init_codec();
         void init_payloader();
-        virtual bool capsAreCached() const;
+        virtual bool checkCaps() const;
 
-        const VideoSourceConfig videoConfig_;
+        boost::shared_ptr<VideoSourceConfig> videoConfig_;
         RtpSender session_;
         VideoSource *source_;
         VideoEncoder *encoder_;

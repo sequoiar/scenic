@@ -27,6 +27,8 @@
 #include <set>
 #include "../ports.h"
 
+#include "busMsgHandler.h"
+
 class Encoder;
 class VideoEncoder;
 class VideoDecoder;
@@ -43,11 +45,7 @@ class RemoteConfig
                 const std::string &remoteHost__,
                 int port__,
                 int msgId__); 
-
-        // copy constructor
-        RemoteConfig(const RemoteConfig& m)
-            : codec_(m.codec_), remoteHost_(m.remoteHost_), port_(m.port_), msgId_(m.msgId_) {}
-
+        
         virtual ~RemoteConfig(){};
         static bool capsMatchCodec(const std::string &encodingName, const std::string &codec);
 
@@ -75,7 +73,7 @@ class RemoteConfig
         RemoteConfig& operator=(const RemoteConfig&); //No Assignment Operator
 };
 
-class SenderConfig : public RemoteConfig
+class SenderConfig : public RemoteConfig, public BusMsgHandler
 {
     public:
         SenderConfig(const std::string &codec__,
@@ -83,16 +81,17 @@ class SenderConfig : public RemoteConfig
                 int port__,
                 int msgId__);
 
-        SenderConfig(const SenderConfig & m);
-
         VideoEncoder* createVideoEncoder() const;
         Encoder* createAudioEncoder() const;
-
-        void setMessage(const std::string &msg) { message_ = msg; }
-        static int sendMessage(void *data);
+        bool capsOutOfBand() { return capsOutOfBand_; }
+        void capsOutOfBand(bool capsOutOfBand__) { capsOutOfBand_ = capsOutOfBand__; }
 
     private:
+        static int sendMessage(void *data);
+
         std::string message_;
+        bool capsOutOfBand_;
+        bool handleBusMsg(_GstMessage *msg);
 };
 
 
@@ -106,11 +105,6 @@ class ReceiverConfig : public RemoteConfig
                 const std::string &caps__,
                 int msgId__,
                 bool capsOutOfBand); 
-
-        ReceiverConfig(const ReceiverConfig & m) 
-            : RemoteConfig(m), multicastInterface_(m.multicastInterface_), caps_(m.caps_),
-            capsOutOfBand_(m.capsOutOfBand_)
-        {}
 
         VideoDecoder* createVideoDecoder() const;
         Decoder* createAudioDecoder() const;

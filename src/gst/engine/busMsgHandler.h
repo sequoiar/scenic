@@ -26,13 +26,15 @@
 
 class _GstMessage;
 
+#include "noncopyable.h"
+
 /** 
 * Abstract interface which requires its implementors to provide 
 * functionality to handle messages posted on the bus. Variation on
 * the Observer and Chain of Responsibility patterns.
 */
 
-class BusMsgHandler
+class BusMsgHandler : boost::noncopyable
 {
     public:
         /// This method is called by the GstBus listener when it has a new msg. 

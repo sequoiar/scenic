@@ -31,6 +31,8 @@
 
 #include "noncopyable.h"
 
+#include <boost/shared_ptr.hpp>
+
 class RtpPay;
 class Decoder;
 class AudioSink;
@@ -43,8 +45,8 @@ class AudioReceiver
     : public ReceiverBase, boost::noncopyable
 {
     public:
-        AudioReceiver(AudioSinkConfig aConfig, 
-                      ReceiverConfig rConfig);
+        AudioReceiver(boost::shared_ptr<AudioSinkConfig> aConfig, 
+                      boost::shared_ptr<ReceiverConfig> rConfig);
 
         ~AudioReceiver();
 
@@ -56,8 +58,8 @@ class AudioReceiver
         
         void setCaps(); 
 
-        const AudioSinkConfig audioConfig_;
-        const ReceiverConfig remoteConfig_;
+        boost::shared_ptr<AudioSinkConfig> audioConfig_;
+        boost::shared_ptr<ReceiverConfig> remoteConfig_;
 
         RtpReceiver session_;
         bool gotCaps_;

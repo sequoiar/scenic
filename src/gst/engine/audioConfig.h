@@ -57,8 +57,6 @@ class AudioSourceConfig
         AudioSource* createSource() const;
 
     private:
-        /// No Assignment Operator 
-        AudioSourceConfig& operator=(const AudioSourceConfig&); 
         const std::string source_;
         const std::string deviceName_;
         const std::string location_;
@@ -66,13 +64,11 @@ class AudioSourceConfig
 };
 
 ///  Immutable class that is used to parametrize AudioReceiver objects.  
-class AudioSinkConfig 
+class AudioSinkConfig
 {
     public:
         AudioSinkConfig(const std::string & sink__, const std::string & deviceName__, unsigned long long bufferTime);
         
-        AudioSinkConfig(const AudioSinkConfig & m); 
-
         AudioSink* createSink() const;
         bool hasDeviceName() const { return !deviceName_.empty(); }
         const char *deviceName() const;

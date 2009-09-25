@@ -32,9 +32,12 @@
 #include "playback.h"
 
 
+using boost::shared_ptr;
+
 /// Constructor 
-AudioSender::AudioSender(AudioSourceConfig aConfig, SenderConfig rConfig, bool capsOutOfBand) : 
-    SenderBase(rConfig, capsOutOfBand),
+AudioSender::AudioSender(shared_ptr<AudioSourceConfig> aConfig, 
+        shared_ptr<SenderConfig> rConfig) : 
+    SenderBase(rConfig),
     audioConfig_(aConfig), 
     session_(), 
     source_(0), 
@@ -42,16 +45,16 @@ AudioSender::AudioSender(AudioSourceConfig aConfig, SenderConfig rConfig, bool c
     encoder_(0), 
     payloader_(0)
 {
-    if (remoteConfig_.codec() == "mp3")
-        if (audioConfig_.numChannels() < 1 or audioConfig_.numChannels() > 2)
-            THROW_CRITICAL("MP3 only accepts 1 or 2 channels, not " << audioConfig_.numChannels());
+    if (remoteConfig_->codec() == "mp3")
+        if (audioConfig_->numChannels() < 1 or audioConfig_->numChannels() > 2)
+            THROW_CRITICAL("MP3 only accepts 1 or 2 channels, not " << audioConfig_->numChannels());
 }
 
 
-bool AudioSender::capsAreCached() const
+bool AudioSender::checkCaps() const
 {
-    return CapsParser::getAudioCaps(remoteConfig_.codec(), 
-            audioConfig_.numChannels(), 
+    return CapsParser::getAudioCaps(remoteConfig_->codec(), 
+            audioConfig_->numChannels(), 
             playback::sampleRate()) != "";
 }
 
@@ -66,7 +69,7 @@ AudioSender::~AudioSender()
 
 void AudioSender::init_source()
 {
-    tassert(source_ = audioConfig_.createSource());
+    tassert(source_ = audioConfig_->createSource());
     source_->init();
     //init_level();
 }
@@ -83,7 +86,7 @@ void AudioSender::init_level()
 
 void AudioSender::init_codec()
 {
-    tassert(encoder_ = remoteConfig_.createAudioEncoder());
+    tassert(encoder_ = remoteConfig_->createAudioEncoder());
     encoder_->init();
 
     //gstlinkable::link(level_, *encoder_);
@@ -97,6 +100,6 @@ void AudioSender::init_payloader()
     payloader_->init();
 
     gstlinkable::link(*encoder_, *payloader_);
-    session_.add(payloader_, remoteConfig_);   
+    session_.add(payloader_, *remoteConfig_);   
 }
 

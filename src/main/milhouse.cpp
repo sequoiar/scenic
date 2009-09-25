@@ -227,8 +227,9 @@ short pof::run(int argc, char **argv)
             if (!options["camera-number"])
                 options["camera-number"] = -1;
 
-            VideoSourceConfig vConfig(options["videosource"], options["videobitrate"],
-                    options["videodevice"], options["videolocation"], options["camera-number"]);
+            shared_ptr<VideoSourceConfig> vConfig(new VideoSourceConfig(options["videosource"], 
+                        options["videobitrate"], options["videodevice"], options["videolocation"], 
+                        options["camera-number"]));
 
             vTx = videofactory::buildVideoSender(vConfig, options["address"], options["videocodec"], 
                     options["videoport"], options["caps-out-of-band"]);
@@ -244,8 +245,8 @@ short pof::run(int argc, char **argv)
             if (!options["numchannels"]) 
                 options["numchannels"] = 2;
 
-            AudioSourceConfig aConfig(options["audiosource"], options["audiodevice"], 
-                    options["audiolocation"], options["numchannels"]);
+            shared_ptr<AudioSourceConfig> aConfig(new AudioSourceConfig(options["audiosource"], 
+                        options["audiodevice"], options["audiolocation"], options["numchannels"]));
             aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], 
                     options["audioport"], options["caps-out-of-band"]);
 

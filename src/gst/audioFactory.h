@@ -28,6 +28,9 @@
 
 #include "ports.h"
 
+#include <boost/shared_ptr.hpp>
+
+using boost::shared_ptr;
 
 namespace audiofactory
 {
@@ -35,7 +38,7 @@ namespace audiofactory
     static const int MSG_ID = 1;
 
     static AudioSender* 
-    buildAudioSender_(const AudioSourceConfig aConfig, 
+    buildAudioSender_(shared_ptr<AudioSourceConfig> aConfig, 
                       const std::string &ip, 
                       const std::string &codec, 
                       int port,
@@ -55,14 +58,15 @@ namespace audiofactory
 
 
 static AudioSender*
-audiofactory::buildAudioSender_(const AudioSourceConfig aConfig, 
+audiofactory::buildAudioSender_(shared_ptr<AudioSourceConfig> aConfig, 
                                 const std::string &ip, 
                                 const std::string &codec, 
                                 int port,
                                 bool capsOutOfBand)
 {
-    SenderConfig rConfig(codec, ip, port, MSG_ID);
-    AudioSender* tx = new AudioSender(aConfig, rConfig, capsOutOfBand);
+    shared_ptr<SenderConfig> rConfig(new SenderConfig(codec, ip, port, MSG_ID));
+    AudioSender* tx = new AudioSender(aConfig, rConfig);
+    rConfig->capsOutOfBand(capsOutOfBand or !tx->capsAreCached());
     tx->init();
     return tx;
 }
@@ -78,10 +82,11 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
                                   int numChannels,
                                   bool capsOutOfBand)
 {
-    AudioSinkConfig aConfig(sink, deviceName, audioBufferTime);
+    shared_ptr<AudioSinkConfig> aConfig(new AudioSinkConfig(sink, deviceName, audioBufferTime));
 
     std::string caps(CapsParser::getAudioCaps(codec, numChannels, playback::sampleRate())); // get caps here
-    ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID, capsOutOfBand);
+    shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, ip, port, 
+                multicastInterface, caps, MSG_ID, capsOutOfBand));
 
     AudioReceiver* rx = new AudioReceiver(aConfig, rConfig);
     rx->init();
@@ -89,23 +94,11 @@ audiofactory::buildAudioReceiver_(const std::string &ip,
 }
 
 #ifdef USE_SMART_PTR
-#ifdef HAVE_BOOST
-#include <boost/shared_ptr.hpp>   // for boost::shared_ptr
-#else
-#include <tr1/memory>
-#endif
-    
+
 namespace audiofactory
 {
-#define USE_SHARED_PTR
-#ifdef HAVE_BOOST
-    using namespace boost;
-#else
-    using namespace std::tr1;
-#endif
-
     static shared_ptr<AudioSender> 
-    buildAudioSender(const AudioSourceConfig aConfig, 
+    buildAudioSender(shared_ptr<AudioSourceConfig> aConfig, 
                      const std::string &ip, 
                      const std::string &codec, 
                      int port, 
@@ -130,7 +123,7 @@ namespace audiofactory
     }
 }
 
-#endif // USE_SMART_PTR
 
+#endif // USE_SMART_PTR
 #endif // _AUDIO_FACTORY_H_
 

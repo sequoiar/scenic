@@ -31,16 +31,20 @@
 //#include "audioLevel.h"
 #include "noncopyable.h"
 
+#include <boost/shared_ptr.hpp>
+
 class AudioSource;
 class Encoder;
 class Payloader;
 class _GstMessage;
 
+
 class AudioSender
     : public SenderBase, boost::noncopyable
 {
     public:
-        AudioSender(AudioSourceConfig aConfig, SenderConfig rConfig, bool capsOutOfBand);
+        AudioSender(boost::shared_ptr<AudioSourceConfig> aConfig, 
+                boost::shared_ptr<SenderConfig> rConfig);
 
         ~AudioSender();
 
@@ -49,9 +53,9 @@ class AudioSender
 // void init_level();
         void init_codec();
         void init_payloader();
-        virtual bool capsAreCached() const;
+        virtual bool checkCaps() const;
 
-        const AudioSourceConfig audioConfig_;
+        boost::shared_ptr<AudioSourceConfig> audioConfig_;
         RtpSender session_;
         AudioSource *source_;
         //AudioLevel level_;

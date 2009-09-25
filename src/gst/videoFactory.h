@@ -27,6 +27,10 @@
 #include "ports.h"
 #include "gst/engine.h"
 
+#include <boost/shared_ptr.hpp>
+
+using boost::shared_ptr;
+
 namespace videofactory
 {
     static const int MSG_ID = 2;
@@ -43,21 +47,22 @@ namespace videofactory
             bool capsOutOfBand);
 
     static VideoSender* 
-    buildVideoSender_(const VideoSourceConfig vConfig, 
+    buildVideoSender_(shared_ptr<VideoSourceConfig> vConfig, 
             const std::string &ip, const std::string &codec, int port, bool capsOutOfBand);
 }
 
 
 
 VideoSender* 
-videofactory::buildVideoSender_(const VideoSourceConfig vConfig, 
+videofactory::buildVideoSender_(shared_ptr<VideoSourceConfig> vConfig, 
                                 const std::string &ip, 
                                 const std::string &codec, 
                                 int port,
                                 bool capsOutOfBand)
 {
-    SenderConfig rConfig(codec, ip, port, MSG_ID); 
-    VideoSender* tx = new VideoSender(vConfig, rConfig, capsOutOfBand);
+    shared_ptr<SenderConfig> rConfig(new SenderConfig(codec, ip, port, MSG_ID)); 
+    VideoSender* tx = new VideoSender(vConfig, rConfig);
+    rConfig->capsOutOfBand(capsOutOfBand or !tx->capsAreCached());
     tx->init(); 
     return tx;
 }
@@ -75,10 +80,12 @@ videofactory::buildVideoReceiver_(const std::string &ip,
                                   bool capsOutOfBand)
 {
     assert(!sink.empty());
-    VideoSinkConfig vConfig(sink, screen_num, deinterlace, sharedVideoId);
+    shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(sink, screen_num, 
+                deinterlace, sharedVideoId));
     std::string caps(CapsParser::getVideoCaps(codec)); // get caps here
     
-    ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID, capsOutOfBand); 
+    shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, ip, port, 
+                multicastInterface, caps, MSG_ID, capsOutOfBand)); 
     
     VideoReceiver* rx = new VideoReceiver(vConfig, rConfig);
     rx->init();
@@ -86,20 +93,9 @@ videofactory::buildVideoReceiver_(const std::string &ip,
 }
 
 #ifdef USE_SMART_PTR
-#ifdef HAVE_BOOST
-#include <boost/shared_ptr.hpp>   // for boost::shared_ptr
-#else
-#include <tr1/memory>
-#endif
 
 namespace videofactory
 {
-#ifdef HAVE_BOOST
-    using namespace boost;
-#else
-    using namespace std::tr1;
-#endif
-
     static shared_ptr<VideoReceiver> 
     buildVideoReceiver(const std::string &ip, 
                        const std::string &codec, 
@@ -116,7 +112,7 @@ namespace videofactory
     }
 
     static shared_ptr<VideoSender> 
-    buildVideoSender(const VideoSourceConfig vConfig, 
+    buildVideoSender(shared_ptr<VideoSourceConfig> vConfig, 
                      const std::string &ip, 
                      const std::string &codec, 
                      int port,
@@ -127,6 +123,6 @@ namespace videofactory
 
 }
 
-#endif //USE_SHARED_PTR
+#endif // USE_SMART_PTR
 #endif // _VIDEO_FACTORY_H_
 
