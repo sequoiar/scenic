@@ -186,14 +186,11 @@ void GstThread::main()
 
 GstReceiverThread::~GstReceiverThread()
 {
-    delete video_;
-    delete audio_;
 }
 
 void GstReceiverThread::video_init(MapMsg& msg)
 {
-    delete video_;
-    video_ = 0;
+    video_.reset();
  
     try
     {
@@ -206,13 +203,11 @@ void GstReceiverThread::video_init(MapMsg& msg)
         if(!msg["multicast_interface"])
             msg["multicast_interface"] = "";
 
-        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], msg["screen"], msg["sink"], msg["deinterlace"], msg["shared_video_id"], msg["multicast_interface"], msg["caps-out-of-band"]);
+        video_ = videofactory::buildVideoReceiver(msg["address"], msg["codec"], msg["port"], msg["screen"], msg["sink"], msg["deinterlace"], msg["shared_video_id"], msg["multicast_interface"], msg["caps-out-of-band"]);
     }
     catch(ErrorExcept e)
     {
         LOG_WARNING(e.what());
-        delete video_;
-        video_ = 0;
         throw(e);
     }
 }
@@ -220,8 +215,7 @@ void GstReceiverThread::video_init(MapMsg& msg)
 
 void GstReceiverThread::audio_init(MapMsg& msg)
 {
-    delete audio_;
-    audio_ = 0;
+    audio_.reset();
 
     try
     {
@@ -241,14 +235,12 @@ void GstReceiverThread::audio_init(MapMsg& msg)
             msg["numchannels"] = 2;
 
 
-        audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], 
+        audio_ = audiofactory::buildAudioReceiver(msg["address"], msg["codec"], msg["port"], 
                 msg["sink"], msg["device"], msg["audio_buffer_usec"], msg["multicast_interface"], 
                 msg["numchannels"], msg["caps-out-of-band"]);
     }
     catch(ErrorExcept e)
     {
-        delete audio_;
-        audio_ = 0;
         throw(e);
     }
 }
@@ -256,15 +248,13 @@ void GstReceiverThread::audio_init(MapMsg& msg)
 
 GstSenderThread::~GstSenderThread()
 {
-    delete video_;
-    delete audio_;
 }
 
 
 void GstSenderThread::video_init(MapMsg& msg)
 {
-    delete video_;
-    video_ = 0;
+    video_.reset();
+
     try
     {
         if(!msg["location"])
@@ -277,14 +267,12 @@ void GstSenderThread::video_init(MapMsg& msg)
         shared_ptr<VideoSourceConfig> config(new VideoSourceConfig(msg["source"], msg["bitrate"], 
                     msg["device"], msg["location"], msg["camera_number"]));
 
-        video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], 
+        video_ = videofactory::buildVideoSender(config, msg["address"], msg["codec"], 
                 msg["port"], msg["caps-out-of-band"]);
     }
     catch(ErrorExcept e)
     {
         LOG_ERROR(e.what());
-        delete video_;
-        video_ = 0;
         throw(e);
     }
 }
@@ -292,8 +280,8 @@ void GstSenderThread::video_init(MapMsg& msg)
 
 void GstSenderThread::audio_init(MapMsg& msg)
 {
-    delete audio_;
-    audio_ = 0;
+    audio_.reset();
+
     try
     {
         LOG_INFO("audio_init");
@@ -306,14 +294,12 @@ void GstSenderThread::audio_init(MapMsg& msg)
         shared_ptr<AudioSourceConfig> config(new AudioSourceConfig(msg["source"], msg["device"], 
                     msg["location"], msg["channels"]));
 
-        audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], 
+        audio_ = audiofactory::buildAudioSender(config, msg["address"], msg["codec"], 
                 msg["port"], msg["caps-out-of-band"]);
     }
     catch(ErrorExcept e)
     {
         LOG_ERROR(e.what());
-        delete audio_;
-        audio_ = 0;
         throw(e);
     }
 }

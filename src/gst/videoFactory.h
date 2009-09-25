@@ -24,105 +24,59 @@
 #ifndef _VIDEO_FACTORY_H_
 #define _VIDEO_FACTORY_H_
 
-#include "ports.h"
 #include "gst/engine.h"
 
 #include <boost/shared_ptr.hpp>
 
-using boost::shared_ptr;
 
 namespace videofactory
 {
+    using boost::shared_ptr;
     static const int MSG_ID = 2;
 
-    static VideoReceiver* 
-    buildVideoReceiver_(const std::string &ip, 
-            const std::string &codec, 
-            int port, 
-            int screen_num, 
-            const std::string &sink, 
-            bool deinterlace, 
-            const std::string &sharedVideoId, 
-            const std::string &multicastInterface,
-            bool capsOutOfBand);
-
-    static VideoSender* 
-    buildVideoSender_(shared_ptr<VideoSourceConfig> vConfig, 
-            const std::string &ip, const std::string &codec, int port, bool capsOutOfBand);
-}
-
-
-
-VideoSender* 
-videofactory::buildVideoSender_(shared_ptr<VideoSourceConfig> vConfig, 
-                                const std::string &ip, 
-                                const std::string &codec, 
-                                int port,
-                                bool capsOutOfBand)
-{
-    shared_ptr<SenderConfig> rConfig(new SenderConfig(codec, ip, port, MSG_ID)); 
-    VideoSender* tx = new VideoSender(vConfig, rConfig);
-    rConfig->capsOutOfBand(capsOutOfBand or !tx->capsAreCached());
-    tx->init(); 
-    return tx;
-}
-
-
-VideoReceiver*
-videofactory::buildVideoReceiver_(const std::string &ip, 
-                                  const std::string &codec, 
-                                  int port, 
-                                  int screen_num, 
-                                  const std::string &sink,
-                                  bool deinterlace,
-                                  const std::string &sharedVideoId,
-                                  const std::string &multicastInterface,
-                                  bool capsOutOfBand)
-{
-    assert(!sink.empty());
-    shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(sink, screen_num, 
-                deinterlace, sharedVideoId));
-    std::string caps(CapsParser::getVideoCaps(codec)); // get caps here
-    
-    shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, ip, port, 
-                multicastInterface, caps, MSG_ID, capsOutOfBand)); 
-    
-    VideoReceiver* rx = new VideoReceiver(vConfig, rConfig);
-    rx->init();
-    return rx;
-}
-
-#ifdef USE_SMART_PTR
-
-namespace videofactory
-{
     static shared_ptr<VideoReceiver> 
-    buildVideoReceiver(const std::string &ip, 
-                       const std::string &codec, 
-                       int port, 
-                       int screen_num, 
-                       const std::string &sink,
-                       bool deinterlace,
-                       const std::string &sharedVideoId,
-                       const std::string &multicastInterface,
-                       bool capsOutOfBand)
-    {
-        return shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, 
-                    screen_num, sink, deinterlace, sharedVideoId, multicastInterface, capsOutOfBand));
-    }
+        buildVideoReceiver(const std::string &ip, 
+                const std::string &codec, 
+                int port, 
+                int screen_num, 
+                const std::string &sink,
+                bool deinterlace,
+                const std::string &sharedVideoId,
+                const std::string &multicastInterface,
+                bool capsOutOfBand)
+        {
+            shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(sink, screen_num, 
+                        deinterlace, sharedVideoId));
+            std::string caps(CapsParser::getVideoCaps(codec)); // get caps here
+
+            shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, ip, port, 
+                        multicastInterface, caps, MSG_ID, capsOutOfBand)); 
+
+            shared_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
+            rx->init();
+
+            return rx;
+        }
+
 
     static shared_ptr<VideoSender> 
-    buildVideoSender(shared_ptr<VideoSourceConfig> vConfig, 
-                     const std::string &ip, 
-                     const std::string &codec, 
-                     int port,
-                     bool capsOutOfBand)
-    {
-        return shared_ptr<VideoSender>(buildVideoSender_(vConfig, ip, codec, port, capsOutOfBand));
-    }
+        buildVideoSender(shared_ptr<VideoSourceConfig> vConfig, 
+                const std::string &ip, 
+                const std::string &codec, 
+                int port,
+                bool capsOutOfBand)
+        {
+            shared_ptr<SenderConfig> rConfig(new SenderConfig(codec, ip, port, MSG_ID)); 
+            shared_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
+
+            rConfig->capsOutOfBand(capsOutOfBand or !tx->capsAreCached());
+
+            tx->init(); 
+
+            return tx;
+        }
 
 }
 
-#endif // USE_SMART_PTR
 #endif // _VIDEO_FACTORY_H_
 
