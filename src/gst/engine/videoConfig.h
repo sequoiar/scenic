@@ -24,22 +24,14 @@
 
 #include <string>
 
+class MapMsg;
 class VideoSource;
 class VideoSink;
 
 class VideoSourceConfig
 {
     public:
-        //* for source (remote) w/ location i.e. filename or url */
-        VideoSourceConfig(const std::string &source__, 
-                          int bitrate__, 
-                          const std::string &deviceName__, 
-                          const std::string &location__,
-                          int cameraNumber__) 
-            : source_(source__), bitrate_(bitrate__), deviceName_(deviceName__),
-            location_(location__), cameraNumber_(cameraNumber__)
-        {}
-
+        VideoSourceConfig(MapMsg &msg);
         VideoSource* createSource() const;  // factory method
 
         const char *source() const { return source_.c_str(); }

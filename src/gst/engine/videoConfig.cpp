@@ -21,6 +21,7 @@
  */
 
 #include "util.h"
+#include "mapMsg.h"
 
 #include <fstream>
 #include "videoConfig.h"
@@ -31,6 +32,15 @@
 #ifdef CONFIG_GL
 #include "glVideoSink.h"
 #endif
+
+VideoSourceConfig::VideoSourceConfig(MapMsg &msg) : 
+    source_(msg["source"]), 
+    bitrate_(msg["bitrate"]), 
+    deviceName_(msg["device"]),
+    location_(msg["location"]), 
+    cameraNumber_(msg["camera-number"])
+{}
+
 
 VideoSource * VideoSourceConfig::createSource() const
 {
@@ -49,7 +59,7 @@ VideoSource * VideoSourceConfig::createSource() const
         return new VideoDc1394Source(*this);
     else 
         THROW_ERROR(source_ << " is an invalid source!");
-            
+
     LOG_DEBUG("Video source options: " << source_ << ", bitrate: " << bitrate_ << ", location: " 
             << location_ << ", device: " << deviceName_);
     return 0;
@@ -94,7 +104,7 @@ VideoSink * VideoSinkConfig::createSink() const
         return new SharedVideoSink(sharedVideoId_);
     else
         THROW_ERROR(sink_ << " is an invalid sink");
-    
+
     LOG_DEBUG("Video sink " << sink_ << " built"); 
     return 0;
 }

@@ -27,20 +27,17 @@
 #include "gutil.h"
 #include "msgThreadFactory.h"
 
+#define __COMMAND_LINE__
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
+#undef __COMMAND_LINE__
 
 #include "milhouseLogger.h"
+
 
 namespace pof 
 {
     short run(int argc, char **argv);
-
-#ifdef HAVE_BOOST
-    using namespace boost;
-#else
-    using namespace std::tr1;
-#endif
 }
 
 int telnetServer(int, int);
@@ -85,6 +82,8 @@ void addOptions(OptionArgs &options)
 
 short pof::run(int argc, char **argv)
 {
+    using boost::shared_ptr;
+
     OptionArgs options;
     addOptions(options);
 
@@ -148,35 +147,15 @@ short pof::run(int argc, char **argv)
         shared_ptr<AudioReceiver> aRx;
 
 
-        if (!options["multicast-interface"])
-            options["multicast-interface"] = "";
-
         if (!disableVideo)       
         {
-            if (!options["shared-video-id"])
-                    options["shared-video-id"] = "shared_memory";
-
-            vRx = videofactory::buildVideoReceiver(options["address"], options["videocodec"], 
-                    options["videoport"], options["screen"], 
-                    options["videosink"], options["deinterlace"], 
-                    options["shared-video-id"], options["multicast-interface"], 
-                    options["caps-out-of-band"]);
+            MapMsg ipcp(videofactory::rxOptionsToIPCP(options));
+            vRx = videofactory::buildVideoReceiver(ipcp);
         }
         if (!disableAudio)
         {
-            if (!options["numchannels"]) 
-                options["numchannels"] = 2;
-
-            if (!options["audiodevice"])
-                options["audiodevice"] = "";
-
-            if (!options["audio-buffer-usec"])
-                options["audio-buffer-usec"] = audiofactory::AUDIO_BUFFER_USEC;
-
-            aRx = audiofactory::buildAudioReceiver(options["address"], options["audiocodec"], 
-                    options["audioport"], options["audiosink"], options["audiodevice"], 
-                    options["audio-buffer-usec"], options["multicast-interface"], 
-                    options["numchannels"], options["caps-out-of-band"]);
+            MapMsg ipcp(audiofactory::rxOptionsToIPCP(options));
+            aRx = audiofactory::buildAudioReceiver(ipcp);
 
             if (options["disable-jack-autoconnect"])
                 MessageDispatcher::sendMessage("disable-jack-autoconnect");
@@ -188,6 +167,7 @@ short pof::run(int argc, char **argv)
 
         playback::start();
 
+        /// These options are more like commands, they are dispatched after playback starts
         if (options["jitterbuffer"])
             RtpReceiver::setLatency(options["jitterbuffer"]);
 
@@ -197,11 +177,10 @@ short pof::run(int argc, char **argv)
                 MessageDispatcher::sendMessage("fullscreen");
         }
 
-        int timeout = 0;    // default: run indefinitely
-        if (options["timeout"]) // run for finite amount of time
-            timeout = options["timeout"];
+        if (!options["timeout"]) // run for infinite amount of time
+            options["timeout"] = 0;
 
-        gutil::runMainLoop(timeout);
+        gutil::runMainLoop(options["timeout"]);
 
         tassert(playback::isPlaying() or playback::quitted());
 
@@ -215,39 +194,14 @@ short pof::run(int argc, char **argv)
 
         if (!disableVideo)
         {
-            if (!options["videodevice"]) 
-                options["videodevice"] = ""; 
-            if (!options["videolocation"]) 
-                options["videolocation"] = ""; 
-
-            if (!options["videobitrate"]) 
-                options["videobitrate"] = 3000000;
-
-            if (!options["camera-number"])
-                options["camera-number"] = -1;
-
-            shared_ptr<VideoSourceConfig> vConfig(new VideoSourceConfig(options["videosource"], 
-                        options["videobitrate"], options["videodevice"], options["videolocation"], 
-                        options["camera-number"]));
-
-            vTx = videofactory::buildVideoSender(vConfig, options["address"], options["videocodec"], 
-                    options["videoport"], options["caps-out-of-band"]);
+            MapMsg ipcp(videofactory::txOptionsToIPCP(options));
+            vTx = videofactory::buildVideoSender(ipcp);
         }
 
         if (!disableAudio)
         {
-            if (!options["audiodevice"]) 
-                options["audiodevice"] = ""; 
-            if (!options["audiolocation"]) 
-                options["audiolocation"] = ""; 
-
-            if (!options["numchannels"]) 
-                options["numchannels"] = 2;
-
-            shared_ptr<AudioSourceConfig> aConfig(new AudioSourceConfig(options["audiosource"], 
-                        options["audiodevice"], options["audiolocation"], options["numchannels"]));
-            aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], 
-                    options["audioport"], options["caps-out-of-band"]);
+            MapMsg ipcp(audiofactory::txOptionsToIPCP(options));
+            aTx = audiofactory::buildAudioSender(ipcp);
 
             if (options["disable-jack-autoconnect"])
                 MessageDispatcher::sendMessage("disable-jack-autoconnect");
@@ -259,11 +213,10 @@ short pof::run(int argc, char **argv)
 
         playback::start();
 
-        int timeout = 0;
-        if (options["timeout"]) // run for finite amount of time
-            timeout = options["timeout"];
+        if (!options["timeout"]) // run for finite amount of time
+            options["timeout"] = 0;
 
-        gutil::runMainLoop(timeout);
+        gutil::runMainLoop(options["timeout"]);
 
         tassert(playback::isPlaying() or playback::quitted());
 

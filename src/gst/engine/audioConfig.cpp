@@ -21,17 +21,18 @@
  */
 
 #include "util.h"
+#include "mapMsg.h"
 
 #include "audioConfig.h"
 #include "audioSource.h"
 #include "audioSink.h"
 #include "jackUtils.h"
 
-AudioSourceConfig::AudioSourceConfig(const std::string & source__, 
-        const std::string & deviceName__,
-        const std::string & location__,
-        int numChannels__) : 
-    source_(source__), deviceName_(deviceName__), location_(location__), numChannels_(numChannels__)
+AudioSourceConfig::AudioSourceConfig(MapMsg &msg) :
+    source_(msg["source"]), 
+    deviceName_(msg["device"]), 
+    location_(msg["location"]), 
+    numChannels_(msg["numchannels"])
 {
     if (source_.empty())
         THROW_CRITICAL("No source specified");

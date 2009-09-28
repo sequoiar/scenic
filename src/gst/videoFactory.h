@@ -24,33 +24,87 @@
 #ifndef _VIDEO_FACTORY_H_
 #define _VIDEO_FACTORY_H_
 
+#include "util.h"
+#include "gutil.h"
+
 #include "gst/engine.h"
 
 #include <boost/shared_ptr.hpp>
-
 
 namespace videofactory
 {
     using boost::shared_ptr;
     static const int MSG_ID = 2;
 
-    static shared_ptr<VideoReceiver> 
-        buildVideoReceiver(const std::string &ip, 
-                const std::string &codec, 
-                int port, 
-                int screen_num, 
-                const std::string &sink,
-                bool deinterlace,
-                const std::string &sharedVideoId,
-                const std::string &multicastInterface,
-                bool capsOutOfBand)
-        {
-            shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(sink, screen_num, 
-                        deinterlace, sharedVideoId));
-            std::string caps(CapsParser::getVideoCaps(codec)); // get caps here
+#ifdef __COMMAND_LINE__
+    /// Convert command line options to ipcp
+    static MapMsg rxOptionsToIPCP(const OptionArgs &options)
+    {
+        // FIXME: remove unused keys
+        MapMsg ipcpMsg(options.toMapMsg());
+        ipcpMsg["port"] = ipcpMsg["videoport"];
+        ipcpMsg["codec"] = ipcpMsg["videocodec"];
+        ipcpMsg["sink"] = ipcpMsg["videosink"];
+        ipcpMsg["device"] = ipcpMsg["videodevice"];
+        ipcpMsg["location"] = ipcpMsg["videolocation"];
 
-            shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(codec, ip, port, 
-                        multicastInterface, caps, MSG_ID, capsOutOfBand)); 
+        return ipcpMsg;
+    }
+
+    /// Convert command line options to ipcp
+    static MapMsg txOptionsToIPCP(const OptionArgs &options)
+    {
+        MapMsg ipcpMsg(options.toMapMsg());
+        ipcpMsg["port"] = ipcpMsg["videoport"];
+        ipcpMsg["codec"] = ipcpMsg["videocodec"];
+        ipcpMsg["source"] = ipcpMsg["videosource"];
+        ipcpMsg["device"] = ipcpMsg["videodevice"];
+        ipcpMsg["location"] = ipcpMsg["videolocation"];
+        ipcpMsg["bitrate"] = ipcpMsg["videobitrate"];
+
+        return ipcpMsg;
+    }
+#endif // __COMMAND_LINE__
+
+    static void setRxDefaults(MapMsg &msg)
+    {
+        if (!msg["multicast-interface"])
+            msg["multicast-interface"] = "";
+        if (!msg["shared-video-id"])
+            msg["shared-video-id"] = "shared_memory";
+        if(!msg["screen"])
+            msg["screen"] = 0;
+        if(!msg["sink"])
+            msg["sink"] = "xvimagesink";
+    }
+
+    static void setTxDefaults(MapMsg &msg)
+    {
+            if (!msg["device"]) 
+                msg["device"] = ""; 
+            if (!msg["location"]) 
+                msg["location"] = ""; 
+            if (!msg["bitrate"]) 
+                msg["bitrate"] = 3000000;
+            if (!msg["camera-number"])
+                msg["camera-number"] = -1;
+    }
+
+
+    static shared_ptr<VideoReceiver> 
+        buildVideoReceiver(MapMsg &msg)
+        {
+            setRxDefaults(msg);
+            shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(msg["sink"],
+                        msg["screen"], msg["deinterlace"], 
+                        msg["shared-video-id"]));
+
+            // get caps here
+            std::string caps(CapsParser::getVideoCaps(msg["codec"]));
+
+            shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg["codec"],
+                        msg["address"], msg["port"], msg["multicast-interface"],
+                        caps, MSG_ID, msg["caps-out-of-band"])); 
 
             shared_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
             rx->init();
@@ -60,16 +114,17 @@ namespace videofactory
 
 
     static shared_ptr<VideoSender> 
-        buildVideoSender(shared_ptr<VideoSourceConfig> vConfig, 
-                const std::string &ip, 
-                const std::string &codec, 
-                int port,
-                bool capsOutOfBand)
+        buildVideoSender(MapMsg &msg)
         {
-            shared_ptr<SenderConfig> rConfig(new SenderConfig(codec, ip, port, MSG_ID)); 
+            setTxDefaults(msg);
+            shared_ptr<VideoSourceConfig> vConfig(new VideoSourceConfig(msg));
+
+            shared_ptr<SenderConfig> rConfig(new SenderConfig(msg["codec"], 
+                        msg["address"], msg["port"], MSG_ID)); 
             shared_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
 
-            rConfig->capsOutOfBand(capsOutOfBand or !tx->capsAreCached());
+            rConfig->capsOutOfBand(msg["caps-out-of-band"] 
+                    or !tx->capsAreCached());
 
             tx->init(); 
 

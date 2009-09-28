@@ -1,3 +1,2 @@
 Milhouse:
--Can't stream theora and vorbis simultaneously due to bug in caps negotiation.
 -For Ubuntu 9.04, one must use 127.0.0.1 instead of localhost for local connections

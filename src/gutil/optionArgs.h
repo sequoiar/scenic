@@ -45,6 +45,8 @@ class OptionArgs
         ///expose map interface
         StrIntFloat& operator[] (const std::string &key) { return store[key]; }
 
+        MapMsg toMapMsg() const { return store; }
+
     private:
         ///client assess store filled after parse is called
         MapMsg store;
