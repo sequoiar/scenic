@@ -29,6 +29,7 @@
 
 #include "busMsgHandler.h"
 
+class MapMsg;
 class Encoder;
 class VideoEncoder;
 class VideoDecoder;
@@ -41,9 +42,7 @@ class Decoder;
 class RemoteConfig 
 {
     public:
-        RemoteConfig(const std::string &codec__, 
-                const std::string &remoteHost__,
-                int port__,
+        RemoteConfig(MapMsg &msg,
                 int msgId__); 
         
         virtual ~RemoteConfig(){};
@@ -76,9 +75,7 @@ class RemoteConfig
 class SenderConfig : public RemoteConfig, public BusMsgHandler
 {
     public:
-        SenderConfig(const std::string &codec__,
-                const std::string &remoteHost__,    
-                int port__,
+        SenderConfig(MapMsg &msg,
                 int msgId__);
 
         VideoEncoder* createVideoEncoder() const;
@@ -98,13 +95,8 @@ class SenderConfig : public RemoteConfig, public BusMsgHandler
 class ReceiverConfig : public RemoteConfig
 {
     public:
-        ReceiverConfig(const std::string &codec__,
-                const std::string &remoteHost__,    
-                int port__, 
-                const std::string &multicastInterface__,
-                const std::string &caps__,
-                int msgId__,
-                bool capsOutOfBand); 
+        ReceiverConfig(MapMsg &msg, const std::string &caps__,
+                int msgId__); 
 
         VideoDecoder* createVideoDecoder() const;
         Decoder* createAudioDecoder() const;

@@ -63,9 +63,7 @@ class AudioSourceConfig
 class AudioSinkConfig
 {
     public:
-        AudioSinkConfig(const std::string & sink__, 
-                const std::string & deviceName__, 
-                unsigned long long bufferTime);
+        AudioSinkConfig(MapMsg &msg);
         
         AudioSink* createSink() const;
         bool hasDeviceName() const { return !deviceName_.empty(); }

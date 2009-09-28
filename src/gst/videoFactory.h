@@ -95,16 +95,12 @@ namespace videofactory
         buildVideoReceiver(MapMsg &msg)
         {
             setRxDefaults(msg);
-            shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(msg["sink"],
-                        msg["screen"], msg["deinterlace"], 
-                        msg["shared-video-id"]));
+            shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(msg));
 
             // get caps here
             std::string caps(CapsParser::getVideoCaps(msg["codec"]));
 
-            shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg["codec"],
-                        msg["address"], msg["port"], msg["multicast-interface"],
-                        caps, MSG_ID, msg["caps-out-of-band"])); 
+            shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID)); 
 
             shared_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
             rx->init();
@@ -119,8 +115,7 @@ namespace videofactory
             setTxDefaults(msg);
             shared_ptr<VideoSourceConfig> vConfig(new VideoSourceConfig(msg));
 
-            shared_ptr<SenderConfig> rConfig(new SenderConfig(msg["codec"], 
-                        msg["address"], msg["port"], MSG_ID)); 
+            shared_ptr<SenderConfig> rConfig(new SenderConfig(msg, MSG_ID)); 
             shared_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
 
             rConfig->capsOutOfBand(msg["caps-out-of-band"] 

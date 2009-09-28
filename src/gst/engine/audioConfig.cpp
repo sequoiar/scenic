@@ -98,8 +98,10 @@ bool AudioSourceConfig::locationExists() const
 
 
 /// Constructor 
-AudioSinkConfig::AudioSinkConfig(const std::string & sink__, const std::string & deviceName__, unsigned long long bufferTime__) : 
-    sink_(sink__), deviceName_(deviceName__), bufferTime_(bufferTime__)
+AudioSinkConfig::AudioSinkConfig(MapMsg &msg) : 
+    sink_(msg["sink"]), 
+    deviceName_(msg["device"]), 
+    bufferTime_(static_cast<int>(msg["audio-buffer-usec"]))
 {
     if (sink_ == "jackaudiosink") // FIXME: it's good for this to happen early 
         Jack::assertReady();      // (before waiting on caps) but having it here is pretty gross

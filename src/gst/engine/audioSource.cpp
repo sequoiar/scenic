@@ -295,7 +295,7 @@ void AudioPulseSource::sub_init()
 
 /// Constructor 
 AudioJackSource::AudioJackSource(const AudioSourceConfig &config) : 
-    AudioSource(config), capsFilter_(0), /*aconv_(0),*/ disableAutoConnect_(false)
+    AudioSource(config), capsFilter_(0)
 {
 }
 
@@ -303,7 +303,6 @@ AudioJackSource::AudioJackSource(const AudioSourceConfig &config) :
 /// Destructor 
 AudioJackSource::~AudioJackSource()
 {
-    //Pipeline::Instance()->remove(&aconv_);
     Pipeline::Instance()->remove(&capsFilter_);
 }
 

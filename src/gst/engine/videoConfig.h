@@ -59,9 +59,7 @@ class VideoSinkConfig
 {
     public:
 
-        VideoSinkConfig(const std::string & sink__, int screenNum, bool doDeinterlace__, const std::string & sharedVideoId__)
-            : sink_(sink__), screenNum_(screenNum), doDeinterlace_(doDeinterlace__), sharedVideoId_(sharedVideoId__)
-        {}
+        VideoSinkConfig(MapMsg &msg);
 
         VideoSink* createSink() const;
         bool doDeinterlace() const { return doDeinterlace_; }

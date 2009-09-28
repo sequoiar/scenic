@@ -106,8 +106,7 @@ namespace audiofactory
 
             shared_ptr<AudioSourceConfig> aConfig(new AudioSourceConfig(msg));           
 
-            shared_ptr<SenderConfig> rConfig(new SenderConfig(msg["codec"], 
-                        msg["address"], msg["port"], MSG_ID));
+            shared_ptr<SenderConfig> rConfig(new SenderConfig(msg, MSG_ID));
 
             shared_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
 
@@ -123,17 +122,12 @@ namespace audiofactory
         {
             setRxDefaults(msg);
 
-            int bufferTime = msg["audio-buffer-usec"];  // FIXME: hack to get around type problem
-            shared_ptr<AudioSinkConfig> aConfig(new AudioSinkConfig(msg["sink"],
-                        msg["device"], bufferTime));
+            shared_ptr<AudioSinkConfig> aConfig(new AudioSinkConfig(msg));
 
             std::string caps(CapsParser::getAudioCaps(msg["codec"],
                         msg["numchannels"], playback::sampleRate()));
 
-            shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg["codec"],
-                        msg["address"], msg["port"],
-                        msg["multicast-interface"],
-                        caps, MSG_ID, msg["caps-out-of-band"]));
+            shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID));
 
             shared_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
             rx->init();

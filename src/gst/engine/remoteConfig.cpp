@@ -34,9 +34,8 @@ const int RemoteConfig::PORT_MAX = 65000;
 
 std::set<int> RemoteConfig::usedPorts_;
         
-RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remoteHost__,
-        int port__, int msgId__) : 
-    codec_(codec__), remoteHost_(remoteHost__), port_(port__), msgId_(msgId__)
+RemoteConfig::RemoteConfig(MapMsg &msg, int msgId__) : 
+    codec_(msg["codec"]), remoteHost_(msg["address"]), port_(msg["port"]), msgId_(msgId__)
 {}
 
 
@@ -78,12 +77,9 @@ void RemoteConfig::checkPorts() const
 }
         
 
-SenderConfig::SenderConfig(const std::string &codec__,
-        const std::string &remoteHost__,    
-        int port__,
-        int msgId__) : 
-    RemoteConfig(codec__, remoteHost__, port__, msgId__), message_(""), 
-    capsOutOfBand_(true)
+SenderConfig::SenderConfig(MapMsg &msg, int msgId__) : 
+    RemoteConfig(msg, msgId__), message_(""), 
+    capsOutOfBand_(false)    // this will be determined later
 {}
 
 
@@ -184,19 +180,16 @@ bool SenderConfig::handleBusMsg(GstMessage *msg)
 
 
 
-ReceiverConfig::ReceiverConfig(const std::string &codec__,
-        const std::string &remoteHost__,    
-        int port__, 
-        const std::string &multicastInterface__,
+ReceiverConfig::ReceiverConfig(MapMsg &msg,
         const std::string &caps__,
-        int msgId__,
-        bool capsOutOfBand__) : RemoteConfig(codec__, remoteHost__, port__, msgId__), 
-    multicastInterface_(multicastInterface__), caps_(caps__), 
-    capsOutOfBand_(capsOutOfBand__ or caps_ == "")
+        int msgId__) : 
+    RemoteConfig(msg, msgId__), 
+    multicastInterface_(msg["multicast-interface"]), caps_(caps__), 
+    capsOutOfBand_(msg["caps-out-of-band"] or caps_ == "")
 {
     if (capsOutOfBand_) // couldn't find caps, need them from other host or we explicitly been told to send caps
     {
-        LOG_INFO("Waiting for " << codec__ << " caps from other host");
+        LOG_INFO("Waiting for " << codec_ << " caps from other host");
         receiveCaps();  // wait for new caps from sender
     }
 }
@@ -286,3 +279,4 @@ void ReceiverConfig::receiveCaps()
     //tassert(id == msgId_);
     caps_ = msg;
 }
+

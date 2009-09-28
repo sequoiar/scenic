@@ -232,8 +232,6 @@ class AudioJackSource : public AudioSource, public MessageHandler
         std::string getCapsFilterCapsString();
 
         GstElement *capsFilter_;
-//        GstElement *aconv_;
-        bool disableAutoConnect_;
 };
 
 

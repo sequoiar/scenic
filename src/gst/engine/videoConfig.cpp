@@ -90,6 +90,14 @@ const char* VideoSourceConfig::deviceName() const
 }
 
 
+VideoSinkConfig::VideoSinkConfig(MapMsg &msg) : 
+    sink_(msg["sink"]), 
+    screenNum_(msg["screen"]), 
+    doDeinterlace_(msg["deinterlace"]), 
+    sharedVideoId_(msg["shared-video-id"])
+{}
+
+
 VideoSink * VideoSinkConfig::createSink() const
 {
     if (sink_ == "xvimagesink")
