@@ -79,7 +79,7 @@ gboolean Pipeline::bus_call(GstBus * /*bus*/, GstMessage *msg, gpointer /*data*/
                     LOG_DEBUG("Debug details: " << debug);
                     g_free(debug);
                 }
-                THROW_CRITICAL(errStr);
+                THROW_CRITICAL(errStr); 
 
                 break;
             }

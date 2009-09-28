@@ -255,7 +255,7 @@ class TheoraDecoder: public VideoDecoder
 
 
 /// Encoder that encodes raw audio using the vorbis encoder.
-class VorbisEncoder : public AudioConvertedEncoder 
+class VorbisEncoder : public  Encoder
 {
     public: 
         VorbisEncoder();

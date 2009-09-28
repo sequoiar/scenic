@@ -59,7 +59,7 @@ class AudioSource : public GstLinkableSource, boost::noncopyable
         GstElement *source_;
 
         /// Caps used by any source with a capsfilter
-        std::string getCapsFilterCapsString();
+        virtual std::string getCapsFilterCapsString();
 
         void initCapsFilter(GstElement* &aconv, GstElement* &capsfilter);
 
@@ -228,9 +228,11 @@ class AudioJackSource : public AudioSource, public MessageHandler
         bool handleMessage(const std::string &path);
         GstElement *srcElement() { return capsFilter_; }
         void sub_init();
+        /// Caps used by any source with a capsfilter
+        std::string getCapsFilterCapsString();
 
         GstElement *capsFilter_;
-        GstElement *aconv_;
+//        GstElement *aconv_;
         bool disableAutoConnect_;
 };
 

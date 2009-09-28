@@ -438,9 +438,9 @@ VorbisEncoder::~VorbisEncoder()
 
 void VorbisEncoder::init()
 {
-    AudioConvertedEncoder::init();
+    //AudioConvertedEncoder::init();
     encoder_ = Pipeline::Instance()->makeElement("vorbisenc", NULL);
-    gstlinkable::link(aconv_, encoder_);
+    //gstlinkable::link(aconv_, encoder_);
 }
 
 
@@ -477,8 +477,8 @@ void RawEncoder::init()
     // FIXME: HACK ATTACK: it's simpler to have this placeholder element
     // that pretends to be an aconv, and it has no
     // effect, but this isn't very smart.
-    aconv_ = Pipeline::Instance()->makeElement("identity", NULL);
-    g_object_set(aconv_, "silent", TRUE, NULL);
+    aconv_ = Pipeline::Instance()->makeElement("audioconvert", NULL);
+    //g_object_set(aconv_, "silent", TRUE, NULL);
 }
 
 /// Creates an RtpL16Payloader 

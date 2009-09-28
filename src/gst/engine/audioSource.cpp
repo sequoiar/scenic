@@ -295,7 +295,7 @@ void AudioPulseSource::sub_init()
 
 /// Constructor 
 AudioJackSource::AudioJackSource(const AudioSourceConfig &config) : 
-    AudioSource(config), capsFilter_(0), aconv_(0), disableAutoConnect_(false)
+    AudioSource(config), capsFilter_(0), /*aconv_(0),*/ disableAutoConnect_(false)
 {
 }
 
@@ -303,10 +303,19 @@ AudioJackSource::AudioJackSource(const AudioSourceConfig &config) :
 /// Destructor 
 AudioJackSource::~AudioJackSource()
 {
-    Pipeline::Instance()->remove(&aconv_);
+    //Pipeline::Instance()->remove(&aconv_);
     Pipeline::Instance()->remove(&capsFilter_);
 }
 
+std::string AudioJackSource::getCapsFilterCapsString()
+{
+    // force proper number of channels on output
+    std::ostringstream capsStr;
+    capsStr << "audio/x-raw-float, channels=" << config_.numChannels() 
+        << ", rate=" << Pipeline::SAMPLE_RATE;
+    LOG_DEBUG("jackAudiosource caps = " << capsStr.str());
+    return capsStr.str();
+}
 
 void AudioJackSource::sub_init()
 {
@@ -316,7 +325,16 @@ void AudioJackSource::sub_init()
     if (Jack::autoForcedSupported(source_))
         g_object_set(G_OBJECT(source_), "connect", 2, NULL);
     
-    initCapsFilter(aconv_, capsFilter_);
+    // setup capsfilter
+    GstCaps *caps = 0;
+    caps = gst_caps_from_string(getCapsFilterCapsString().c_str());
+    tassert(caps);
+    capsFilter_ = Pipeline::Instance()->makeElement("capsfilter", NULL);
+    g_object_set(G_OBJECT(capsFilter_), "caps", caps, NULL);
+
+    gst_caps_unref(caps);
+    
+    gstlinkable::link(source_, capsFilter_);
 }
 
 
