@@ -70,24 +70,36 @@ namespace videofactory
     {
         if (!msg["multicast-interface"])
             msg["multicast-interface"] = "";
+
         if (!msg["shared-video-id"])
             msg["shared-video-id"] = "shared_memory";
+
         if(!msg["screen"])
             msg["screen"] = 0;
+
         if(!msg["sink"])
             msg["sink"] = "xvimagesink";
+
+        if (!msg["address"])
+            msg["address"] = "127.0.0.1";
     }
 
     static void setTxDefaults(MapMsg &msg)
     {
-            if (!msg["device"]) 
-                msg["device"] = ""; 
-            if (!msg["location"]) 
-                msg["location"] = ""; 
-            if (!msg["bitrate"]) 
-                msg["bitrate"] = 3000000;
-            if (!msg["camera-number"])
-                msg["camera-number"] = -1;
+        if (!msg["device"]) 
+            msg["device"] = ""; 
+
+        if (!msg["location"]) 
+            msg["location"] = ""; 
+
+        if (!msg["bitrate"]) 
+            msg["bitrate"] = 3000000;
+
+        if (!msg["camera-number"])
+            msg["camera-number"] = -1;
+
+        if (!msg["address"])
+            msg["address"] = "127.0.0.1";
     }
 
 

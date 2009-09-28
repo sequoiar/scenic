@@ -85,6 +85,9 @@ namespace audiofactory
         
         if (!msg["multicast-interface"])
             msg["multicast-interface"] = "";
+        
+        if (!msg["address"])
+            msg["address"] = "127.0.0.1";
     }
     
     static void setTxDefaults(MapMsg &msg)
@@ -97,6 +100,9 @@ namespace audiofactory
 
         if (!msg["location"])
             msg["location"] = "";
+        
+        if (!msg["address"])
+            msg["address"] = "127.0.0.1";
     }
 
     static shared_ptr<AudioSender> 

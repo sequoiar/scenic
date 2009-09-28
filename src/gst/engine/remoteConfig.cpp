@@ -130,7 +130,7 @@ gboolean SenderConfig::sendMessage(gpointer data)
     const SenderConfig *context = static_cast<const SenderConfig*>(data);
     LOG_DEBUG("\n\n\nSending tcp msg for host " 
             << context->remoteHost_ << " on port " << context->capsPort() 
-            << " with id " << context->msgId_ << "\n\n\n\n");
+            << " with id " << context->msgId_);
 
     if (tcpSendBuffer(context->remoteHost_, context->capsPort(), context->msgId_, context->message_))
         return FALSE;    // message got through, don't need to send it again

@@ -444,7 +444,7 @@ class tcp_receiver_session :
 
     private:
         tcp::socket socket_;
-        // FIXME: is this the best way of doing this? see boost/asio/examples/reference_counted.cpp
+        // FIXME: is this the best way of having a buffer? see boost/asio/examples/reference_counted.cpp
         enum { max_length = 8000 };
         char data_[max_length];
         std::string &receiverBuffer_;

@@ -224,7 +224,7 @@ gboolean GLImageSink::key_press_event_cb(GtkWidget *widget, GdkEventKey *event, 
             playback::quit();
             break;
         default:
-            g_print("unknown keypress %d", event->keyval);
+            LOG_DEBUG("unknown keypress " << event->keyval);
             break;
     }
 #if LOG_COORD_VARS
@@ -252,7 +252,7 @@ gboolean GLImageSink::mouse_wheel_cb(GtkWidget * /*widget*/, GdkEventScroll *eve
             z_ -= STEP;
             break;
         default:
-            g_print("Unhandled mouse wheel event");
+            LOG_DEBUG("Unhandled mouse wheel event");
             break;
     }
     return TRUE;
