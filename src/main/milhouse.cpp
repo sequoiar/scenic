@@ -74,7 +74,8 @@ void pof::addOptions(OptionArgs &options)
     options.addBool("enable-controls", 'j', "enable gui controls for jitter buffer");
     options.addBool("disable-jack-autoconnect", 'J', "disable jack's autoconnection");
     options.addBool("caps-out-of-band", 'C', "send/receive caps out of band, default=false");
-    options.addBool("verbose", 'V', "output verbose messages for gstreamer elements, default=false");
+    options.addString("debug", 'D', "debug", "level of logging verbosity (string/int) "
+            "[critical=1,error=2,warning=3,info=4,debug=5,gst-debug=6], default=info");
     //telnetServer param
     options.addInt("serverport", 'y', "run as server", "port to listen on");
 }
@@ -97,14 +98,17 @@ short pof::run(int argc, char **argv)
     if (argc == 1)  // we printed help msg in parse, no need to continue
         return 0;
 
-    if(options["serverport"])
+    if (!options["debug"])
+        options["debug"] = "info";
+
+    if (options["serverport"])
         return telnetServer(options["sender"], options["serverport"]);
 
-    MilhouseLogger logger; // just instantiate, his base class will know what to do 
+    MilhouseLogger logger(options["debug"]); // just instantiate, his base class will know what to do 
 
     LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
 
-    if(options["version"])
+    if (options["version"])
     {
 #ifdef SVNVERSION
             LOG_INFO("version " << PACKAGE_VERSION <<  " Svn Revision: " << SVNVERSION << std::endl);
@@ -138,7 +142,7 @@ short pof::run(int argc, char **argv)
         THROW_CRITICAL("argument error: must provide video and/or audio parameters. see --help");
 
     if (options["videoport"] == options["audioport"])
-        THROW_CRITICAL("Videoport and audioport cannot be equal"); // Fail early, other port checks do happen later too
+        THROW_CRITICAL("argument error: videoport and audioport cannot be equal"); // Fail early, other port checks do happen later too
 
     if (options["receiver"]) 
     {
@@ -161,7 +165,7 @@ short pof::run(int argc, char **argv)
                 MessageDispatcher::sendMessage("disable-jack-autoconnect");
         }
 
-        if (options["verbose"])
+        if (logger.gstDebug())
             playback::makeVerbose();
 
         playback::start();
@@ -206,7 +210,7 @@ short pof::run(int argc, char **argv)
                 MessageDispatcher::sendMessage("disable-jack-autoconnect");
         }
 
-        if (options["verbose"])
+        if (logger.gstDebug())
             playback::makeVerbose();
 
         playback::start();
@@ -225,7 +229,7 @@ short pof::run(int argc, char **argv)
 
 void onExit()
 {
-    std::cout << "bye." << std::endl;
+    std::cout << "Leaving Milhouse\n";
 }
 
 

@@ -29,12 +29,15 @@ class MilhouseLogger
     : public Log::Subscriber
 {
     public:
-        MilhouseLogger();
+        MilhouseLogger(const std::string &logLevel);
         ~MilhouseLogger();
         void operator()(LogLevel&, std::string& msg);
+        bool gstDebug() { return gstDebug_; }
     private:
         ConcurrentQueue<std::string> printQueue_;
         boost::thread printThread_;
         void printMessages();   // this runs in printThread
+        LogLevel argToLogLevel(const std::string &logLevel);
+        bool gstDebug_;
 };
 
