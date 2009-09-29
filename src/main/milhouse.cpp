@@ -19,7 +19,6 @@
  *
  */
 
-
 #include <cstdlib>
 
 #include "util.h"
@@ -34,16 +33,16 @@
 
 #include "milhouseLogger.h"
 
-
 namespace pof 
 {
     short run(int argc, char **argv);
+    void addOptions(OptionArgs &options);
 }
 
 int telnetServer(int, int);
 
 
-void addOptions(OptionArgs &options)
+void pof::addOptions(OptionArgs &options)
 {
     options.addBool("receiver", 'r', "receiver");
     options.addBool("sender", 's', "sender");
@@ -75,6 +74,7 @@ void addOptions(OptionArgs &options)
     options.addBool("enable-controls", 'j', "enable gui controls for jitter buffer");
     options.addBool("disable-jack-autoconnect", 'J', "disable jack's autoconnection");
     options.addBool("caps-out-of-band", 'C', "send/receive caps out of band, default=false");
+    options.addBool("verbose", 'V', "output verbose messages for gstreamer elements, default=false");
     //telnetServer param
     options.addInt("serverport", 'y', "run as server", "port to listen on");
 }
@@ -161,9 +161,8 @@ short pof::run(int argc, char **argv)
                 MessageDispatcher::sendMessage("disable-jack-autoconnect");
         }
 
-#ifdef CONFIG_DEBUG_LOCAL
-        //playback::makeVerbose();
-#endif
+        if (options["verbose"])
+            playback::makeVerbose();
 
         playback::start();
 
@@ -207,9 +206,8 @@ short pof::run(int argc, char **argv)
                 MessageDispatcher::sendMessage("disable-jack-autoconnect");
         }
 
-#ifdef CONFIG_DEBUG_LOCAL
-        //playback::makeVerbose();
-#endif
+        if (options["verbose"])
+            playback::makeVerbose();
 
         playback::start();
 

@@ -180,12 +180,12 @@ void XvImageSink::init()
         n = 0; // don't query ScreenInfo
     for (int j = 0; j < n; ++j)
     {
-        LOG_INFO(   "req:" << screen_num_ << 
-                " screen:" << xine[j].screen_number << 
-                " x:" << xine[j].x_org << 
-                " y:" << xine[j].y_org << 
-                " width:" << xine[j].width << 
-                " height:" << xine[j].height);
+        LOG_INFO(" req:"    << screen_num_ << 
+                 " screen:" << xine[j].screen_number << 
+                 " x:"      << xine[j].x_org << 
+                 " y:"      << xine[j].y_org << 
+                 " width:"  << xine[j].width << 
+                 " height:" << xine[j].height);
         if (j == screen_num_) 
             gtk_window_move(GTK_WINDOW(window_), xine[j].x_org, xine[j].y_org);
     }
