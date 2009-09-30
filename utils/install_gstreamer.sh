@@ -48,7 +48,7 @@ tar xzf $YASM.tar.gz
 pushd $YASM
 ./configure 
 make 
-$MAKEINSTALL
+sudo $MAKEINSTALL
 popd
 
 
@@ -58,7 +58,7 @@ tar xjf $X264.tar.bz2
 pushd $X264
 ./configure 
 make 
-$MAKEINSTALL
+sudo $MAKEINSTALL
 popd
 
 
