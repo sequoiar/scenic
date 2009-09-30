@@ -229,15 +229,16 @@ void H264Encoder::init()
     int numThreads = boost::thread::hardware_concurrency();
 
     // numthreads should be 2 or 1.
-    if (numThreads > 2) // don't hog all the cores
-        numThreads = 2;
+    if (numThreads > 3) // don't hog all the cores
+        numThreads = 3;
     else if (numThreads == 0)
         numThreads = 1;
 
 //    LOG_DEBUG("Using " << numThreads << " threads");
     g_object_set(encoder_, "threads", numThreads, NULL);
+    // See gst-plugins-good/tests/examples/rtp/*h264*.sh
+    g_object_set(encoder_, "byte-stream", TRUE, NULL);  
 
-    //g_object_set(codec_, "byte-stream", TRUE, NULL);
     // subme: subpixel motion estimation 1=fast, 6=best
     VideoEncoder::init();
 }
