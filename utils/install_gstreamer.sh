@@ -60,6 +60,7 @@ pushd $X264
 ./configure 
 make 
 sudo $MAKEINSTALL
+sudo ldconfig
 popd
 
 
@@ -70,6 +71,7 @@ pushd $DC1394
 ./configure
 make
 sudo $MAKEINSTALL
+sudo ldconfig
 popd
 
 
@@ -99,6 +101,7 @@ do
     ./configure --disable-docbook --disable-gtk-doc
     make
     sudo $MAKEINSTALL
+    sudo ldconfig
     popd
     echo "Done building $module"
     done
