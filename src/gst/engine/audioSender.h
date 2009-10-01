@@ -29,42 +29,39 @@
 #include "rtpSender.h"
 #include "busMsgHandler.h"
 //#include "audioLevel.h"
+#include "noncopyable.h"
+
+#include <boost/shared_ptr.hpp>
 
 class AudioSource;
 class Encoder;
 class Payloader;
 class _GstMessage;
 
+
 class AudioSender
-    : public SenderBase, public BusMsgHandler
+    : public SenderBase, boost::noncopyable
 {
     public:
-        AudioSender(const AudioSourceConfig aConfig, const SenderConfig rConfig);
+        AudioSender(boost::shared_ptr<AudioSourceConfig> aConfig, 
+                boost::shared_ptr<SenderConfig> rConfig);
 
         ~AudioSender();
 
-        std::string getCaps() const;
-
     private:
-        bool handleBusMsg(_GstMessage *msg);
         void init_source();
 // void init_level();
         void init_codec();
         void init_payloader();
+        virtual bool checkCaps() const;
 
-        const AudioSourceConfig audioConfig_;
-        const SenderConfig remoteConfig_;
+        boost::shared_ptr<AudioSourceConfig> audioConfig_;
         RtpSender session_;
         AudioSource *source_;
         //AudioLevel level_;
 
         Encoder *encoder_;
         Payloader *payloader_;
-
-        /// No Copy Constructor
-        AudioSender(const AudioSender&); 
-        /// No Assignment Operator
-        AudioSender& operator=(const AudioSender&); 
 };
 
 #endif // _AUDIO_SENDER_H_

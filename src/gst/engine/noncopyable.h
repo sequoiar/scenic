@@ -1,5 +1,4 @@
-
-// busMsgHandler.h
+// noncopyable.h
 // Copyright (C) 2008-2009 Société des arts technologiques (SAT)
 // http://www.sat.qc.ca
 // All rights reserved.
@@ -19,34 +18,12 @@
 // You should have received a copy of the GNU General Public License
 // along with [propulse]ART.  If not, see <http://www.gnu.org/licenses/>.
 //
-// Abstract interface that defines one method, handleBusMsg
 
-#ifndef _BUS_MSG_HANDLER_H_
-#define _BUS_MSG_HANDLER_H_
+#ifndef __NONCOPYABLE_H__
+#define __NONCOPYABLE_H__
 
-class _GstMessage;
+// Turn off Weffc++ diagnostic for noncopyable and unfortunately any file that includes it
+#pragma GCC diagnostic ignored "-Weffc++"
+#include <boost/noncopyable.hpp>
 
-#include "noncopyable.h"
-
-/** 
-* Abstract interface which requires its implementors to provide 
-* functionality to handle messages posted on the bus. Variation on
-* the Observer and Chain of Responsibility patterns.
-*/
-
-class BusMsgHandler : boost::noncopyable
-{
-    public:
-        /// This method is called by the GstBus listener when it has a new msg. 
-        virtual bool handleBusMsg(_GstMessage *msg) = 0;
-        
-        /** 
-         * Destructor */
-        
-    protected:
-        BusMsgHandler();
-        virtual ~BusMsgHandler();
-};
-
-#endif // _BUS_MSG_HANDLER_H_ 
-
+#endif // __NONCOPYABLE

@@ -25,10 +25,12 @@
 #include <map>
 #include <string>
 
+#include "noncopyable.h"
+
 class _GstElement;
 class _GstPad;
 
-class FileSource
+class FileSource : boost::noncopyable
 {
     public:
         static _GstElement * acquireAudio(const std::string &location);
@@ -53,9 +55,6 @@ class FileSource
         _GstElement *decodebin_;
         _GstElement *videoQueue_;
         _GstElement *audioQueue_;
-
-        FileSource(const FileSource&); // No copy constructor
-        FileSource& operator=(const FileSource&);   // no assignment operator
 };
 
 #endif // _FILE_SOURCE_H_

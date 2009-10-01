@@ -34,9 +34,8 @@ const int RemoteConfig::PORT_MAX = 65000;
 
 std::set<int> RemoteConfig::usedPorts_;
         
-RemoteConfig::RemoteConfig(const std::string &codec__, const std::string &remoteHost__,
-        int port__, int msgId__) : 
-    codec_(codec__), remoteHost_(remoteHost__), port_(port__), msgId_(msgId__)
+RemoteConfig::RemoteConfig(MapMsg &msg, int msgId__) : 
+    codec_(msg["codec"]), remoteHost_(msg["address"]), port_(msg["port"]), msgId_(msgId__)
 {}
 
 
@@ -76,6 +75,12 @@ void RemoteConfig::checkPorts() const
     usedPorts_.insert(rtcpSecondPort());
     usedPorts_.insert(capsPort());
 }
+        
+
+SenderConfig::SenderConfig(MapMsg &msg, int msgId__) : 
+    RemoteConfig(msg, msgId__), message_(""), 
+    capsOutOfBand_(false)    // this will be determined later
+{}
 
 
 VideoEncoder * SenderConfig::createVideoEncoder() const
@@ -120,16 +125,74 @@ Encoder * SenderConfig::createAudioEncoder() const
 }
 
 
-void SenderConfig::sendMessage(const std::string &message) const
+gboolean SenderConfig::sendMessage(gpointer data) 
 {
-    LOG_DEBUG("\n\n\nSendin tcp msg for host " 
-            << remoteHost_ << " on port " << capsPort() 
-            << " with id " << msgId_ << "\n\n\n\n");
+    const SenderConfig *context = static_cast<const SenderConfig*>(data);
+    LOG_DEBUG("\n\n\nSending tcp msg for host " 
+            << context->remoteHost_ << " on port " << context->capsPort() 
+            << " with id " << context->msgId_);
 
-    tassert(tcpSendBuffer(remoteHost_, capsPort(), 
-                        msgId_, message));
+    if (tcpSendBuffer(context->remoteHost_, context->capsPort(), context->msgId_, context->message_))
+        return FALSE;    // message got through, don't need to send it again
+    else
+        return TRUE;    // no connection made, try again later
 }
 
+
+/** 
+ * The new caps message is posted on the bus by the src pad of our udpsink, 
+ * received by this audiosender, and sent to our other host if needed. */
+// FIXME: move this all in to SenderConfig
+bool SenderConfig::handleBusMsg(GstMessage *msg)
+{
+    const GstStructure *s = gst_message_get_structure(msg);
+    const gchar *name = gst_structure_get_name(s);
+
+    if (std::string(name) == "caps-changed") 
+    {   
+        // this is our msg
+        const gchar *newCapsStr = gst_structure_get_string(s, "caps");
+        tassert(newCapsStr);
+        std::string str(newCapsStr);
+
+        GstStructure *structure = gst_caps_get_structure(gst_caps_from_string(str.c_str()), 0);
+        const GValue *encodingStr = gst_structure_get_value(structure, "encoding-name");
+        std::string encodingName(g_value_get_string(encodingStr));
+
+        if (!capsMatchCodec(encodingName, codec()))
+            return false;   // not our caps, ignore it
+        else if (capsOutOfBand_) 
+        { 
+            LOG_DEBUG("Sending caps for codec " << codec());
+
+            message_ = std::string(newCapsStr);
+            enum {MESSAGE_SEND_TIMEOUT = 500};
+            g_timeout_add(MESSAGE_SEND_TIMEOUT /* ms */, static_cast<GSourceFunc>(SenderConfig::sendMessage), 
+                    static_cast<gpointer>(this));
+            return true;
+        }
+        else
+            return true;       // was our caps, but we don't need to send caps for it
+    }
+
+    return false;           // this wasn't our msg, someone else should handle it
+}
+
+
+
+ReceiverConfig::ReceiverConfig(MapMsg &msg,
+        const std::string &caps__,
+        int msgId__) : 
+    RemoteConfig(msg, msgId__), 
+    multicastInterface_(msg["multicast-interface"]), caps_(caps__), 
+    capsOutOfBand_(msg["caps-out-of-band"] or caps_ == "")
+{
+    if (capsOutOfBand_) // couldn't find caps, need them from other host or we explicitly been told to send caps
+    {
+        LOG_INFO("Waiting for " << codec_ << " caps from other host");
+        receiveCaps();  // wait for new caps from sender
+    }
+}
 
 VideoDecoder * ReceiverConfig::createVideoDecoder() const
 {
@@ -213,7 +276,7 @@ void ReceiverConfig::receiveCaps()
     int id;
     // this blocks
     std::string msg(tcpGetBuffer(capsPort(), id));
-    tassert(id == msgId_);
+    //tassert(id == msgId_);
     caps_ = msg;
 }
 

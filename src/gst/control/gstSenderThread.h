@@ -24,7 +24,8 @@
 #define _GST_SENDER_THREAD_H_
 
 #include "gstThread.h"
-#include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
+
 class SenderBase;
 /// MapMsg handler thread that calls GST media functionality
 class GstSenderThread
@@ -32,7 +33,7 @@ class GstSenderThread
 {
     public:
         GstSenderThread()
-            : video_(0), audio_(0), videoFirst(0) {}
+            : video_(), audio_() {}
         ~GstSenderThread();
         virtual void start(MapMsg& ); 
     private:
@@ -41,15 +42,13 @@ class GstSenderThread
         /// incomming video_start request 
         void video_init(MapMsg& msg);
 
-        SenderBase* video_;
-        SenderBase* audio_;
+        boost::shared_ptr<SenderBase> video_;
+        boost::shared_ptr<SenderBase> audio_;
 
         /// No Copy Constructor 
         GstSenderThread(const GstSenderThread&); 
         /// No Assignment Operator 
         GstSenderThread& operator=(const GstSenderThread&); 
-        boost::function<void (std::string)> ff[2];
-        bool videoFirst;
 };
 
 #endif // _GST_SENDER_THREAD_H_

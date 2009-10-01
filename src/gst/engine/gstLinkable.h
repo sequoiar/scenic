@@ -51,10 +51,6 @@ class GstLinkableSource
         GstLinkableSource() {} 
         virtual ~GstLinkableSource() {} 
         virtual _GstElement *srcElement() = 0;
-
-    private:
-        GstLinkableSource(const GstLinkableSource&);     //No Copy Constructor
-        GstLinkableSource& operator=(const GstLinkableSource&);     //No Assignment Operator
 };
 
 
@@ -64,10 +60,6 @@ class GstLinkableSink
         GstLinkableSink() {}
         virtual ~GstLinkableSink() {} 
         virtual _GstElement *sinkElement() = 0;
-
-    private:
-        GstLinkableSink(const GstLinkableSink&);     //No Copy Constructor
-        GstLinkableSink& operator=(const GstLinkableSink&);     //No Assignment Operator
 };
 
 
@@ -76,10 +68,6 @@ class GstLinkableFilter
 {
     public:
         GstLinkableFilter() {} 
-
-    private:
-        GstLinkableFilter(const GstLinkableFilter&);     //No Copy Constructor
-        GstLinkableFilter& operator=(const GstLinkableFilter&);     //No Assignment Operator
 };
 
 #endif // _GST_LINKABLE_H_

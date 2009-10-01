@@ -23,6 +23,8 @@
 
 #include "gstLinkable.h"
 
+#include "noncopyable.h"
+
 #include <gst/gstclock.h>
 
 class VideoSourceConfig;
@@ -30,7 +32,7 @@ class _GstElement;
 class _GstPad;
 
 class VideoSource
-    : public GstLinkableSource
+    : public GstLinkableSource, boost::noncopyable
 {
     public:
         ~VideoSource();
@@ -47,8 +49,6 @@ class VideoSource
 
     private:
         _GstElement *srcElement() { return source_; }
-        VideoSource(const VideoSource&);
-        VideoSource& operator=(const VideoSource&);
 };
 
 class VideoTestSource
@@ -62,11 +62,6 @@ class VideoTestSource
         ~VideoTestSource();
         _GstElement *srcElement() { return capsFilter_; }
         void init();
-
-        /// No Copy Constructor
-        VideoTestSource(const VideoTestSource&);     
-        /// No Assignment Operator
-        VideoTestSource& operator=(const VideoTestSource&);     
 };
 
 class VideoFileSource
@@ -82,11 +77,6 @@ class VideoFileSource
 
         // FIXME: maybe just use the queue we acquire?
         _GstElement *identity_;
-
-        /// No Copy Constructor
-        VideoFileSource(const VideoFileSource&);     
-        /// No Assignment Operator
-        VideoFileSource& operator=(const VideoFileSource&);     
 };
 
 class VideoDvSource
@@ -102,8 +92,6 @@ class VideoDvSource
         void init();
 
         _GstElement *queue_, *dvdec_;
-        VideoDvSource(const VideoDvSource&);
-        VideoDvSource& operator=(const VideoDvSource&);
 };
 
 class VideoV4lSource
@@ -118,8 +106,6 @@ class VideoV4lSource
         std::string deviceStr() const;
         std::string srcCaps() const;
         _GstElement *srcElement() { return capsFilter_; }
-        VideoV4lSource(const VideoV4lSource&);
-        VideoV4lSource& operator=(const VideoV4lSource&);
 };
 
 
@@ -134,8 +120,6 @@ class VideoDc1394Source
         void init();
         std::string srcCaps() const;
         _GstElement *srcElement() { return capsFilter_; }
-        VideoDc1394Source(const VideoDc1394Source&);
-        VideoDc1394Source& operator=(const VideoDc1394Source&);
 };
 
 #endif //_VIDEO_SOURCE_H_

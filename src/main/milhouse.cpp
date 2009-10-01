@@ -19,7 +19,6 @@
  *
  */
 
-
 #include <cstdlib>
 
 #include "util.h"
@@ -27,64 +26,65 @@
 #include "gutil.h"
 #include "msgThreadFactory.h"
 
-#define USE_SMART_PTR //Factories return a shared_ptr 
+#define __COMMAND_LINE__
 #include "gst/videoFactory.h"
 #include "gst/audioFactory.h"
+#undef __COMMAND_LINE__
 
 #include "milhouseLogger.h"
 
 namespace pof 
 {
     short run(int argc, char **argv);
-
-#ifdef HAVE_BOOST
-    using namespace boost;
-#else
-    using namespace std::tr1;
-#endif
+    void addOptions(OptionArgs &options);
 }
 
 int telnetServer(int, int);
 
 
-void addOptions(OptionArgs &options)
+void pof::addOptions(OptionArgs &options)
 {
-    options.addBool("receiver", 'r', "receiver");
-    options.addBool("sender", 's', "sender");
-    options.addString("address", 'i', "address", "provide ip address of remote host");
-    options.addString("videocodec", 'v', "videocodec", "h264");
-    options.addString("audiocodec", 'a', "audiocodec", "vorbis raw mp3");
-    options.addString("videosink", 'k', "videosink", "xvimagesink glimagesink");
-    options.addString("audiosink", 'l', "audiosink", "jackaudiosink alsasink pulsesink");
-    options.addInt("audioport", 't', "audioport", "portnum");
-    options.addInt("videoport", 'p', "videoport", "portnum");
-    options.addBool("fullscreen", 'f', "default to fullscreen");
-    options.addString("shared_video_id", 'B', "shared video buffer id", "shared_memory");
-    options.addBool("deinterlace", 'o', "deinterlace video");
-    options.addString("videodevice", 'd', "device", "/dev/video0 /dev/video1");
-    options.addString("audiodevice", 'q', "audio device", "hw:0 hw:2 plughw:0 plughw:2");
-    options.addString("videolocation", 0, "video file location", "<filename>");
-    options.addString("audiolocation", 0, "audio file location", "<filename>");
-    options.addInt("screen", 'n', "screen", "xinerama screen num");
-    options.addBool("version", 'w', "version number");
-    options.addInt("numchannels", 'c', "numchannels", "2");
-    options.addInt("videobitrate", 'x', "videobitrate", "3000000");
-    options.addString("audiosource", 'e', "audiosource", "jackaudiosrc alsasrc pulsesrc");
-    options.addString("videosource", 'u', "videosource", "v4l2src v4lsrc dv1394src");
-    options.addInt("timeout", 'z', "timeout", "time in ms to wait before quitting, 0 means run indefinitely");
-    options.addInt("audio_buffer_usec", 'b', "audiobuffer", "length of receiver's audio buffer in microseconds, must be > 10000");
-    options.addInt("jitterbuffer", 'g', "jitterbuffer", "length of receiver's rtp jitterbuffers in milliseconds, must be > 1");
-    options.addInt("camera_number", 'G', "camera_number", "camera id for dc1394");
-    options.addString("multicast_interface", 'I', "multicast_interface", "interface to use for multicast");
-    options.addBool("enable_controls", 'j', "enable gui controls for jitter buffer");
-    options.addBool("disable_jack_autoconnect", 'J', "disable jack's autoconnection");
+    options.addBool("receiver", 'r', "");
+    options.addBool("sender", 's', "");
+    options.addString("address", 'i', "", "provide ip address of remote host");
+    options.addString("videocodec", 'v', "", "h264");
+    options.addString("audiocodec", 'a', "", "vorbis raw mp3");
+    options.addString("videosink", 'k', "", "xvimagesink glimagesink");
+    options.addString("audiosink", 'l', "", "jackaudiosink alsasink pulsesink");
+    options.addInt("audioport", 't', "", "portnum");
+    options.addInt("videoport", 'p', "", "portnum");
+    options.addBool("fullscreen", 'f', "");
+    options.addString("shared-video-id", 'B', "", "shared_memory");
+    options.addBool("deinterlace", 'o', "");
+    options.addString("videodevice", 'd', "", "/dev/video0 /dev/video1");
+    options.addString("audiodevice", 'q', "", "hw:0 hw:2 plughw:0 plughw:2");
+    options.addString("videolocation", 0, "", "<filename>");
+    options.addString("audiolocation", 0, "", "<filename>");
+    options.addInt("screen", 'n', "", "xinerama screen num");
+    options.addBool("version", 'w', "");
+    options.addInt("numchannels", 'c', "", "2");
+    options.addInt("videobitrate", 'x', "", "3000000");
+    options.addString("audiosource", 'e', "", "jackaudiosrc alsasrc pulsesrc");
+    options.addString("videosource", 'u', "", "v4l2src v4lsrc dv1394src");
+    options.addInt("timeout", 'z', "", "time in ms to wait before quitting, 0 means run indefinitely");
+    options.addInt("audio-buffer-usec", 'b', "", "length of receiver's audio buffer in microseconds, must be > 10000");
+    options.addInt("jitterbuffer", 'g', "", "length of receiver's rtp jitterbuffers in milliseconds, must be > 1");
+    options.addInt("camera-number", 'G', "", "camera id for dc1394");
+    options.addString("multicast-interface", 'I', "", "interface to use for multicast");
+    options.addBool("enable-controls", 'j', "");
+    options.addBool("disable-jack-autoconnect", 'J', "");
+    options.addBool("caps-out-of-band", 'C', "");
+    options.addString("debug", 'D', "", "level of logging verbosity (string/int) "
+            "[critical=1,error=2,warning=3,info=4,debug=5,gst-debug=6], default=info");
     //telnetServer param
-    options.addInt("serverport", 'y', "run as server", "port to listen on");
+    options.addInt("serverport", 'y', "", "run as server and listen on this port");
 }
 
 
 short pof::run(int argc, char **argv)
 {
+    using boost::shared_ptr;
+
     OptionArgs options;
     addOptions(options);
 
@@ -98,14 +98,17 @@ short pof::run(int argc, char **argv)
     if (argc == 1)  // we printed help msg in parse, no need to continue
         return 0;
 
-    if(options["serverport"])
+    if (!options["debug"])
+        options["debug"] = "info";
+
+    if (options["serverport"])
         return telnetServer(options["sender"], options["serverport"]);
 
-    MilhouseLogger logger; // just instantiate, his base class will know what to do 
+    MilhouseLogger logger(options["debug"]); // just instantiate, his base class will know what to do 
 
     LOG_INFO("Built on " << __DATE__ << " at " << __TIME__);
 
-    if(options["version"])
+    if (options["version"])
     {
 #ifdef SVNVERSION
             LOG_INFO("version " << PACKAGE_VERSION <<  " Svn Revision: " << SVNVERSION << std::endl);
@@ -118,7 +121,7 @@ short pof::run(int argc, char **argv)
     if ((!options["sender"] and !options["receiver"]) or (options["sender"] and options["receiver"]))
         THROW_CRITICAL("argument error: must be sender OR receiver. see --help"); 
 
-    if (options["enable_controls"])
+    if (options["enable-controls"])
     {
         if (options["receiver"] )
             RtpReceiver::enableControl();
@@ -139,7 +142,7 @@ short pof::run(int argc, char **argv)
         THROW_CRITICAL("argument error: must provide video and/or audio parameters. see --help");
 
     if (options["videoport"] == options["audioport"])
-        THROW_CRITICAL("Videoport and audioport cannot be equal"); // Fail early, other port checks do happen later too
+        THROW_CRITICAL("argument error: videoport and audioport cannot be equal"); // Fail early, other port checks do happen later too
 
     if (options["receiver"]) 
     {
@@ -148,44 +151,26 @@ short pof::run(int argc, char **argv)
         shared_ptr<AudioReceiver> aRx;
 
 
-        if (!options["multicast_interface"])
-            options["multicast_interface"] = "";
-
         if (!disableVideo)       
         {
-            if (!options["shared_video_id"])
-                    options["shared_video_id"] = "shared_memory";
-
-            vRx = videofactory::buildVideoReceiver(options["address"], options["videocodec"], 
-                    options["videoport"], options["screen"], 
-                    options["videosink"], options["deinterlace"], 
-                    options["shared_video_id"], options["multicast_interface"]);
+            MapMsg ipcp(videofactory::rxOptionsToIPCP(options));
+            vRx = videofactory::buildVideoReceiver(ipcp);
         }
         if (!disableAudio)
         {
-            if (!options["numchannels"]) 
-                options["numchannels"] = 2;
+            MapMsg ipcp(audiofactory::rxOptionsToIPCP(options));
+            aRx = audiofactory::buildAudioReceiver(ipcp);
 
-            if (!options["audiodevice"])
-                options["audiodevice"] = "";
-
-            if (!options["audio_buffer_usec"])
-                options["audio_buffer_usec"] = audiofactory::AUDIO_BUFFER_USEC;
-
-            aRx = audiofactory::buildAudioReceiver(options["address"], options["audiocodec"], 
-                    options["audioport"], options["audiosink"], options["audiodevice"], 
-                    options["audio_buffer_usec"], options["multicast_interface"], options["numchannels"]);
-
-            if (options["disable_jack_autoconnect"])
-                MessageDispatcher::sendMessage("disable_jack_autoconnect");
+            if (options["disable-jack-autoconnect"])
+                MessageDispatcher::sendMessage("disable-jack-autoconnect");
         }
 
-#ifdef CONFIG_DEBUG_LOCAL
-        //playback::makeVerbose();
-#endif
+        if (logger.gstDebug())
+            playback::makeVerbose();
 
         playback::start();
 
+        /// These options are more like commands, they are dispatched after playback starts
         if (options["jitterbuffer"])
             RtpReceiver::setLatency(options["jitterbuffer"]);
 
@@ -195,11 +180,10 @@ short pof::run(int argc, char **argv)
                 MessageDispatcher::sendMessage("fullscreen");
         }
 
-        int timeout = 0;    // default: run indefinitely
-        if (options["timeout"]) // run for finite amount of time
-            timeout = options["timeout"];
+        if (!options["timeout"]) // run for infinite amount of time
+            options["timeout"] = 0;
 
-        gutil::runMainLoop(timeout);
+        gutil::runMainLoop(options["timeout"]);
 
         tassert(playback::isPlaying() or playback::quitted());
 
@@ -213,53 +197,28 @@ short pof::run(int argc, char **argv)
 
         if (!disableVideo)
         {
-            if (!options["videodevice"]) 
-                options["videodevice"] = ""; 
-            if (!options["videolocation"]) 
-                options["videolocation"] = ""; 
-
-            if (!options["videobitrate"]) 
-                options["videobitrate"] = 3000000;
-
-            if (!options["camera-number"])
-                options["camera-number"] = -1;
-
-            VideoSourceConfig vConfig(options["videosource"], options["videobitrate"],
-                    options["videodevice"], options["videolocation"], options["camera_number"]);
-
-            vTx = videofactory::buildVideoSender(vConfig, options["address"], options["videocodec"], 
-                    options["videoport"]);
+            MapMsg ipcp(videofactory::txOptionsToIPCP(options));
+            vTx = videofactory::buildVideoSender(ipcp);
         }
 
         if (!disableAudio)
         {
-            if (!options["audiodevice"]) 
-                options["audiodevice"] = ""; 
-            if (!options["audiolocation"]) 
-                options["audiolocation"] = ""; 
+            MapMsg ipcp(audiofactory::txOptionsToIPCP(options));
+            aTx = audiofactory::buildAudioSender(ipcp);
 
-            if (!options["numchannels"]) 
-                options["numchannels"] = 2;
-
-            AudioSourceConfig aConfig(options["audiosource"], options["audiodevice"], 
-                    options["audiolocation"], options["numchannels"]);
-            aTx = audiofactory::buildAudioSender(aConfig, options["address"], options["audiocodec"], options["audioport"]);
-
-            if (options["disable_jack_autoconnect"])
-                MessageDispatcher::sendMessage("disable_jack_autoconnect");
+            if (options["disable-jack-autoconnect"])
+                MessageDispatcher::sendMessage("disable-jack-autoconnect");
         }
 
-#ifdef CONFIG_DEBUG_LOCAL
-        //playback::makeVerbose();
-#endif
+        if (logger.gstDebug())
+            playback::makeVerbose();
 
         playback::start();
 
-        int timeout = 0;
-        if (options["timeout"]) // run for finite amount of time
-            timeout = options["timeout"];
+        if (!options["timeout"]) // run for finite amount of time
+            options["timeout"] = 0;
 
-        gutil::runMainLoop(timeout);
+        gutil::runMainLoop(options["timeout"]);
 
         tassert(playback::isPlaying() or playback::quitted());
 
@@ -270,7 +229,9 @@ short pof::run(int argc, char **argv)
 
 void onExit()
 {
-    std::cout << "bye." << std::endl;
+#ifdef CONFIG_DEBUG_LOCAL
+    std::cerr << "Leaving Milhouse";
+#endif
 }
 
 

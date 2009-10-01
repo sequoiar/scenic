@@ -24,105 +24,121 @@
 #ifndef _VIDEO_FACTORY_H_
 #define _VIDEO_FACTORY_H_
 
-#include "ports.h"
+#include "util.h"
+#include "gutil.h"
+
 #include "gst/engine.h"
 
+#include <boost/shared_ptr.hpp>
+
 namespace videofactory
 {
+    using boost::shared_ptr;
     static const int MSG_ID = 2;
 
-    static VideoReceiver* 
-    buildVideoReceiver_(const std::string &ip, const std::string &codec, int port, 
-            int screen_num, const std::string &sink, bool deinterlace, 
-            const std::string &sharedVideoId, const std::string &multicastInterface);
-
-    static VideoSender* 
-    buildVideoSender_(const VideoSourceConfig vConfig, 
-            const std::string &ip, const std::string &codec, int port);
-}
-
-
-
-VideoSender* 
-videofactory::buildVideoSender_(const VideoSourceConfig vConfig, 
-                                const std::string &ip, 
-                                const std::string &codec, 
-                                int port)
-{
-    SenderConfig rConfig(codec, ip, port, MSG_ID); 
-    VideoSender* tx = new VideoSender(vConfig, rConfig);
-    tx->init(); 
-    return tx;
-}
-
-
-VideoReceiver*
-videofactory::buildVideoReceiver_(const std::string &ip, 
-                                  const std::string &codec, 
-                                  int port, 
-                                  int screen_num, 
-                                  const std::string &sink,
-                                  bool deinterlace,
-                                  const std::string &sharedVideoId,
-                                  const std::string &multicastInterface)
-{
-    assert(!sink.empty());
-    VideoSinkConfig vConfig(sink, screen_num, deinterlace, sharedVideoId);
-    std::string caps(CapsParser::getVideoCaps(codec)); // get caps here
-    
-    ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID); 
-    
-    if (caps == "") // couldn't find caps, need them from other host
+#ifdef __COMMAND_LINE__
+    /// Convert command line options to ipcp
+    static MapMsg rxOptionsToIPCP(const OptionArgs &options)
     {
-        LOG_INFO("Waiting for " << codec << " caps from other host");
-        rConfig.receiveCaps();  // wait for new caps from sender
+        // FIXME: remove unused keys
+        MapMsg ipcpMsg(options.toMapMsg());
+        ipcpMsg["port"] = ipcpMsg["videoport"];
+        ipcpMsg["codec"] = ipcpMsg["videocodec"];
+        ipcpMsg["sink"] = ipcpMsg["videosink"];
+        ipcpMsg["device"] = ipcpMsg["videodevice"];
+        ipcpMsg["location"] = ipcpMsg["videolocation"];
+
+        return ipcpMsg;
     }
 
-    VideoReceiver* rx = new VideoReceiver(vConfig, rConfig);
-    rx->init();
-    return rx;
-}
+    /// Convert command line options to ipcp
+    static MapMsg txOptionsToIPCP(const OptionArgs &options)
+    {
+        MapMsg ipcpMsg(options.toMapMsg());
+        ipcpMsg["port"] = ipcpMsg["videoport"];
+        ipcpMsg["codec"] = ipcpMsg["videocodec"];
+        ipcpMsg["source"] = ipcpMsg["videosource"];
+        ipcpMsg["device"] = ipcpMsg["videodevice"];
+        ipcpMsg["location"] = ipcpMsg["videolocation"];
+        ipcpMsg["bitrate"] = ipcpMsg["videobitrate"];
 
-#ifdef USE_SMART_PTR
-#ifdef HAVE_BOOST
-#include <boost/shared_ptr.hpp>   // for boost::shared_ptr
-#else
-#include <tr1/memory>
-#endif
+        return ipcpMsg;
+    }
+#endif // __COMMAND_LINE__
 
-namespace videofactory
-{
-#ifdef HAVE_BOOST
-    using namespace boost;
-#else
-    using namespace std::tr1;
-#endif
+    static void setRxDefaults(MapMsg &msg)
+    {
+        if (!msg["multicast-interface"])
+            msg["multicast-interface"] = "";
+
+        if (!msg["shared-video-id"])
+            msg["shared-video-id"] = "shared_memory";
+
+        if(!msg["screen"])
+            msg["screen"] = 0;
+
+        if(!msg["sink"])
+            msg["sink"] = "xvimagesink";
+
+        if (!msg["address"])
+            msg["address"] = "127.0.0.1";
+    }
+
+    static void setTxDefaults(MapMsg &msg)
+    {
+        if (!msg["device"]) 
+            msg["device"] = ""; 
+
+        if (!msg["location"]) 
+            msg["location"] = ""; 
+
+        if (!msg["bitrate"]) 
+            msg["bitrate"] = 3000000;
+
+        if (!msg["camera-number"])
+            msg["camera-number"] = -1;
+
+        if (!msg["address"])
+            msg["address"] = "127.0.0.1";
+    }
+
 
     static shared_ptr<VideoReceiver> 
-    buildVideoReceiver(const std::string &ip, 
-                       const std::string &codec, 
-                       int port, 
-                       int screen_num, 
-                       const std::string &sink,
-                       bool deinterlace,
-                       const std::string &sharedVideoId,
-                       const std::string &multicastInterface)
-    {
-        return shared_ptr<VideoReceiver>(buildVideoReceiver_(ip, codec, port, 
-                    screen_num, sink, deinterlace, sharedVideoId, multicastInterface));
-    }
+        buildVideoReceiver(MapMsg &msg)
+        {
+            setRxDefaults(msg);
+            shared_ptr<VideoSinkConfig> vConfig(new VideoSinkConfig(msg));
+
+            // get caps here
+            std::string caps(CapsParser::getVideoCaps(msg["codec"]));
+
+            shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID)); 
+
+            shared_ptr<VideoReceiver> rx(new VideoReceiver(vConfig, rConfig));
+            rx->init();
+
+            return rx;
+        }
+
 
     static shared_ptr<VideoSender> 
-    buildVideoSender(const VideoSourceConfig vConfig, 
-                     const std::string &ip, 
-                     const std::string &codec, 
-                     int port)
-    {
-        return shared_ptr<VideoSender>(buildVideoSender_(vConfig, ip, codec, port));
-    }
+        buildVideoSender(MapMsg &msg)
+        {
+            setTxDefaults(msg);
+            shared_ptr<VideoSourceConfig> vConfig(new VideoSourceConfig(msg));
+
+            shared_ptr<SenderConfig> rConfig(new SenderConfig(msg, MSG_ID)); 
+            shared_ptr<VideoSender> tx(new VideoSender(vConfig, rConfig));
+
+            rConfig->capsOutOfBand(msg["caps-out-of-band"] 
+                    or !tx->capsAreCached());
+
+            tx->init(); 
+
+            return tx;
+        }
 
 }
 
-#endif //USE_SHARED_PTR
 #endif // _VIDEO_FACTORY_H_
 

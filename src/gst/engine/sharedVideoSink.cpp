@@ -98,7 +98,7 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
         context->sharedBuffer_->waitOnConsumer(lock);
 
         if (!context->sharedBuffer_->isPushing())
-            g_print("Pushed %lld buffers, should stop pushing for now.\n", bufferCount);
+            LOG_DEBUG("Pushed " << bufferCount << " buffers, should stop pushing for now.\n");
         else
         {
             // push the buffer
@@ -113,7 +113,7 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
     catch (interprocess_exception &ex)
     {
         removeSharedMemory(context->id_);
-        g_print("%s\n", ex.what());
+        LOG_ERROR(ex.what());
         /* we don't need the appsink buffer anymore */
         gst_buffer_unref(buffer);
         return;
@@ -126,7 +126,7 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
 
 void SharedVideoSink::prepareSink()
 {
-    // FIXME: fixed caps are lame
+    // FIXME: fixed caps are lame, should be bpp=12 to allow for 4 dc1394 cameras on one firewire port
     GstCaps *videoCaps = gst_caps_from_string("video/x-raw-rgb, bpp=16, depth=16, width=640, height=480");
     g_object_set(G_OBJECT(sink_), "emit-signals", TRUE, "caps", videoCaps, NULL);
     g_signal_connect(sink_, "new-buffer", G_CALLBACK(onNewBuffer), this);

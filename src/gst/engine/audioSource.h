@@ -28,6 +28,8 @@
 #include "busMsgHandler.h"
 #include "messageHandler.h"
 
+#include "noncopyable.h"
+
 // forward declarations
 class AudioSourceConfig;
 
@@ -38,7 +40,7 @@ class AudioSourceConfig;
  *  need to have its audio frames interleaved.
  */
 
-class AudioSource : public GstLinkableSource
+class AudioSource : public GstLinkableSource, boost::noncopyable
 {
     public:
         ~AudioSource();
@@ -57,18 +59,13 @@ class AudioSource : public GstLinkableSource
         GstElement *source_;
 
         /// Caps used by any source with a capsfilter
-        std::string getCapsFilterCapsString();
+        virtual std::string getCapsFilterCapsString();
 
         void initCapsFilter(GstElement* &aconv, GstElement* &capsfilter);
 
     private:
         
         GstElement *srcElement() { return source_; }
-        
-        /// No Copy Constructor
-        AudioSource(const AudioSource&);     
-        /// No Assignment Operator
-        AudioSource& operator=(const AudioSource&);     
 };
 
 /** 
@@ -78,7 +75,7 @@ class AudioSource : public GstLinkableSource
 class InterleavedAudioSource : public AudioSource
 {
     private:
-        class Interleave : public GstLinkableFilter
+        class Interleave : public GstLinkableFilter, boost::noncopyable
         {
             public:
                 /** The interleave functionality used to be part of the same class
@@ -99,8 +96,6 @@ class InterleavedAudioSource : public AudioSource
                 const AudioSourceConfig &config_;
                 static const GstAudioChannelPosition VORBIS_CHANNEL_POSITIONS[][8];
                 void set_channel_layout();
-                Interleave(const Interleave&);     //No Copy Constructor
-                Interleave& operator=(const Interleave&);     //No Assignment Operator
         };
 
         GstElement *srcElement() { return interleave_.srcElement(); }
@@ -145,10 +140,6 @@ class AudioTestSource : public InterleavedAudioSource
         int offset_;
 
         static const double FREQUENCY[2][8];
-        /// No Copy Constructor
-        AudioTestSource(const AudioTestSource&);     
-        /// No Assignment Operator
-        AudioTestSource& operator=(const AudioTestSource&);     
 };
 
 /** 
@@ -180,11 +171,6 @@ class AudioFileSource : public AudioSource, public BusMsgHandler
         GstElement *aconv_;
         int loopCount_;
         static const int LOOP_INFINITE;
-
-        /// No Copy Constructor
-        AudioFileSource(const AudioFileSource&);     
-        /// No Assignment Operator
-        AudioFileSource& operator=(const AudioFileSource&);     
 };
 
 /** 
@@ -205,10 +191,6 @@ class AudioAlsaSource : public AudioSource
 
         GstElement *capsFilter_;
         GstElement *aconv_;
-        /// No Copy Constructor
-        AudioAlsaSource(const AudioAlsaSource&);     
-        /// No Assignment Operator
-        AudioAlsaSource& operator=(const AudioAlsaSource&);     
 };
 
 /** 
@@ -228,10 +210,6 @@ class AudioPulseSource : public AudioSource
 
         GstElement *capsFilter_;
         GstElement *aconv_;
-        /// No Copy Constructor
-        AudioPulseSource(const AudioPulseSource&);     
-        /// No Assignment Operator
-        AudioPulseSource& operator=(const AudioPulseSource&);     
 };
 
 /** 
@@ -250,14 +228,10 @@ class AudioJackSource : public AudioSource, public MessageHandler
         bool handleMessage(const std::string &path);
         GstElement *srcElement() { return capsFilter_; }
         void sub_init();
+        /// Caps used by any source with a capsfilter
+        std::string getCapsFilterCapsString();
 
         GstElement *capsFilter_;
-        GstElement *aconv_;
-        bool disableAutoConnect_;
-        /// No Copy Constructor
-        AudioJackSource(const AudioJackSource&);     
-        /// No Assignment Operator
-        AudioJackSource& operator=(const AudioJackSource&);     
 };
 
 
@@ -282,10 +256,6 @@ class AudioDvSource : public AudioSource
         GstElement *queue_;
         GstElement *aconv_;
         GstElement *srcElement() { return aconv_; }
-        /// No Copy Constructor
-        AudioDvSource(const AudioDvSource&);     
-        /// No Assignment Operator
-        AudioDvSource& operator=(const AudioDvSource&);     
 };
 
 #endif //_AUDIO_SOURCE_H_

@@ -24,119 +24,123 @@
 #ifndef _AUDIO_FACTORY_H_
 #define _AUDIO_FACTORY_H_
 
+#include "util.h"
+#include "mapMsg.h"
+
 #include "gst/engine.h"
-#include <boost/lexical_cast.hpp>
 
-#include "ports.h"
-
+#include <boost/shared_ptr.hpp>
 
 namespace audiofactory
 {
+    using boost::shared_ptr;
+
     static const int AUDIO_BUFFER_USEC = AudioSinkConfig::DEFAULT_BUFFER_TIME;
     static const int MSG_ID = 1;
 
-    static AudioSender* 
-    buildAudioSender_(const AudioSourceConfig aConfig, 
-                      const std::string &ip, 
-                      const std::string &codec, 
-                      int port);
 
-    static AudioReceiver*
-    buildAudioReceiver_(const std::string &ip, 
-                        const std::string &codec, 
-                        int port, 
-                        const std::string &sink,
-                        const std::string &deviceName,
-                        int audioBufferTime,
-                        const std::string &multicastInterface,
-                        int numChannels);
-}
-
-
-static AudioSender*
-audiofactory::buildAudioSender_(const AudioSourceConfig aConfig, 
-                                const std::string &ip, 
-                                const std::string &codec, 
-                                int port)
-{
-    SenderConfig rConfig(codec, ip, port, MSG_ID);
-    AudioSender* tx = new AudioSender(aConfig, rConfig);
-    tx->init();
-    return tx;
-}
-
-static AudioReceiver*
-audiofactory::buildAudioReceiver_(const std::string &ip, 
-                                  const std::string &codec, 
-                                  int port, 
-                                  const std::string &sink,
-                                  const std::string &deviceName,
-                                  int audioBufferTime,
-                                  const std::string &multicastInterface,
-                                  int numChannels)
-{
-    using boost::lexical_cast;
-
-    AudioSinkConfig aConfig(sink, deviceName, audioBufferTime);
-    const std::string profile = codec + "_" + 
-        lexical_cast<std::string>(numChannels) + "_" + 
-        lexical_cast<std::string>(playback::sampleRate());
-    LOG_DEBUG("Looking for profile " << profile);
-    std::string caps(CapsParser::getAudioCaps(profile)); // get caps here
-    ReceiverConfig rConfig(codec, ip, port, multicastInterface, caps, MSG_ID);
-
-    if (caps == "") // couldn't find caps, need them from other host
+#ifdef __COMMAND_LINE__
+    /// Convert command line options to ipcp
+    static MapMsg rxOptionsToIPCP(const OptionArgs &options)
     {
-        LOG_INFO("Waiting for " << codec << " caps from other host");
-        rConfig.receiveCaps();  // wait for new caps from sender
+        // FIXME: remove unused keys
+        MapMsg ipcpMsg(options.toMapMsg());
+        ipcpMsg["port"] = ipcpMsg["audioport"];
+        ipcpMsg["codec"] = ipcpMsg["audiocodec"];
+        ipcpMsg["sink"] = ipcpMsg["audiosink"];
+        ipcpMsg["device"] = ipcpMsg["audiodevice"];
+        ipcpMsg["location"] = ipcpMsg["audiolocation"];
+
+        return ipcpMsg;
     }
 
-    AudioReceiver* rx = new AudioReceiver(aConfig, rConfig);
-    rx->init();
-    return rx;
-}
+    /// Convert command line options to ipcp
+    static MapMsg txOptionsToIPCP(const OptionArgs &options)
+    {
+        MapMsg ipcpMsg(options.toMapMsg());
+        ipcpMsg["port"] = ipcpMsg["audioport"];
+        ipcpMsg["codec"] = ipcpMsg["audiocodec"];
+        ipcpMsg["source"] = ipcpMsg["audiosource"];
+        ipcpMsg["device"] = ipcpMsg["audiodevice"];
+        ipcpMsg["location"] = ipcpMsg["audiolocation"];
+        ipcpMsg["bitrate"] = ipcpMsg["audiobitrate"];
 
-#ifdef USE_SMART_PTR
-#ifdef HAVE_BOOST
-#include <boost/shared_ptr.hpp>   // for boost::shared_ptr
-#else
-#include <tr1/memory>
-#endif
+        return ipcpMsg;
+    }
+#endif // __COMMAND_LINE__
+
+    static void setRxDefaults(MapMsg &msg)
+    {
+        if (!msg["numchannels"]) 
+            msg["numchannels"] = 2;
+
+        if (!msg["device"])
+            msg["device"] = "";
+
+        if (!msg["audio-buffer-usec"])
+            msg["audio-buffer-usec"] = audiofactory::AUDIO_BUFFER_USEC;
+
+        if (!msg["sink"])
+            msg["sink"] = "jackaudiosink";
+        
+        if (!msg["multicast-interface"])
+            msg["multicast-interface"] = "";
+        
+        if (!msg["address"])
+            msg["address"] = "127.0.0.1";
+    }
     
-namespace audiofactory
-{
-#define USE_SHARED_PTR
-#ifdef HAVE_BOOST
-    using namespace boost;
-#else
-    using namespace std::tr1;
-#endif
+    static void setTxDefaults(MapMsg &msg)
+    {
+        if (!msg["numchannels"]) 
+            msg["numchannels"] = 2;
+
+        if (!msg["device"])
+            msg["device"] = "";
+
+        if (!msg["location"])
+            msg["location"] = "";
+        
+        if (!msg["address"])
+            msg["address"] = "127.0.0.1";
+    }
 
     static shared_ptr<AudioSender> 
-    buildAudioSender(const AudioSourceConfig aConfig, 
-                     const std::string &ip, 
-                     const std::string &codec, 
-                     int port)
-    {
-        return shared_ptr<AudioSender>(buildAudioSender_(aConfig, ip, codec, port));
-    }
+        buildAudioSender(MapMsg &msg)
+        {
+            setTxDefaults(msg);
+
+            shared_ptr<AudioSourceConfig> aConfig(new AudioSourceConfig(msg));           
+
+            shared_ptr<SenderConfig> rConfig(new SenderConfig(msg, MSG_ID));
+
+            shared_ptr<AudioSender> tx(new AudioSender(aConfig, rConfig));
+
+            rConfig->capsOutOfBand(msg["caps-out-of-band"] 
+                    or !tx->capsAreCached());
+
+            tx->init();
+            return tx;
+        }
 
     static shared_ptr<AudioReceiver> 
-    buildAudioReceiver(const std::string &ip, 
-                       const std::string &codec, 
-                       int port, 
-                       const std::string &sink,
-                       const std::string &deviceName,
-                       int audioBufferTime,
-                       const std::string &multicastInterface,
-                       int numChannels)
-    {
-        return shared_ptr<AudioReceiver>(buildAudioReceiver_(ip, codec, port, sink, 
-                    deviceName, audioBufferTime, multicastInterface, numChannels));
-    }
+        buildAudioReceiver(MapMsg &msg)
+        {
+            setRxDefaults(msg);
+
+            shared_ptr<AudioSinkConfig> aConfig(new AudioSinkConfig(msg));
+
+            std::string caps(CapsParser::getAudioCaps(msg["codec"],
+                        msg["numchannels"], playback::sampleRate()));
+
+            shared_ptr<ReceiverConfig> rConfig(new ReceiverConfig(msg, caps, MSG_ID));
+
+            shared_ptr<AudioReceiver> rx(new AudioReceiver(aConfig, rConfig));
+            rx->init();
+            return rx;
+        }
 }
 
-#endif // USE_SMART_PTR
 
 #endif // _AUDIO_FACTORY_H_
 

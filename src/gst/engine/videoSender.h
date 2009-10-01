@@ -25,9 +25,12 @@
 
 #include "mediaBase.h"
 #include "videoConfig.h"
-#include "remoteConfig.h"
 #include "rtpSender.h"
 #include "busMsgHandler.h"
+
+#include "noncopyable.h"
+
+#include <boost/shared_ptr.hpp>
 
 class VideoSource;
 class VideoEncoder;
@@ -35,30 +38,24 @@ class Payloader;
 class _GstMessage;
 
 class VideoSender
-    : public SenderBase, public BusMsgHandler
+    : public SenderBase, boost::noncopyable
 {
     public:
-         VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig);
+        VideoSender(boost::shared_ptr<VideoSourceConfig> vConfig, 
+                boost::shared_ptr<SenderConfig> rConfig);
         ~VideoSender();
-        std::string getCaps() const;
 
     private:
-        bool handleBusMsg(_GstMessage *msg);
         void init_source();
         void init_codec();
         void init_payloader();
+        virtual bool checkCaps() const;
 
-        const VideoSourceConfig videoConfig_;
-        const SenderConfig remoteConfig_;
+        boost::shared_ptr<VideoSourceConfig> videoConfig_;
         RtpSender session_;
         VideoSource *source_;
         VideoEncoder *encoder_;
         Payloader *payloader_; 
-
-        // hidden
-
-        VideoSender(const VideoSender&); //No Copy Constructor
-        VideoSender& operator=(const VideoSender&); //No Assignment Operator
 };
 
 #endif

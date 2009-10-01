@@ -42,9 +42,9 @@ class GstThread
         virtual bool subHandleMsg(MapMsg&){ return false;}
 
 
-    int stop_id;
-    int play_id;
-    bool hasPlayed_;
+        int stop_id;
+        int play_id;
+        bool hasPlayed_;
     private:
         void main();
         void handleMsg(MapMsg& msg);

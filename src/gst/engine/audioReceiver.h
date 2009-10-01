@@ -29,6 +29,10 @@
 #include "audioLevel.h"
 #include "messageHandler.h"
 
+#include "noncopyable.h"
+
+#include <boost/shared_ptr.hpp>
+
 class RtpPay;
 class Decoder;
 class AudioSink;
@@ -38,11 +42,11 @@ class AudioSink;
  * decodes/converts it as needed and pushes it to its sink.
  */
 class AudioReceiver
-    : public ReceiverBase
+    : public ReceiverBase, boost::noncopyable
 {
     public:
-        AudioReceiver(const AudioSinkConfig aConfig, 
-                      const ReceiverConfig rConfig);
+        AudioReceiver(boost::shared_ptr<AudioSinkConfig> aConfig, 
+                      boost::shared_ptr<ReceiverConfig> rConfig);
 
         ~AudioReceiver();
 
@@ -54,8 +58,8 @@ class AudioReceiver
         
         void setCaps(); 
 
-        const AudioSinkConfig audioConfig_;
-        const ReceiverConfig remoteConfig_;
+        boost::shared_ptr<AudioSinkConfig> audioConfig_;
+        boost::shared_ptr<ReceiverConfig> remoteConfig_;
 
         RtpReceiver session_;
         bool gotCaps_;
@@ -63,11 +67,6 @@ class AudioReceiver
         Decoder *decoder_;
         AudioLevel level_;
         AudioSink *sink_;
-
-        /// No Copy Constructor 
-        AudioReceiver(const AudioReceiver&); 
-        /// No Assignment Operator 
-        AudioReceiver& operator=(const AudioReceiver&); 
 };
 
 #endif // _AUDIO_RECEIVER_H_

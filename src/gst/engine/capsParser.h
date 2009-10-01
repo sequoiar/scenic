@@ -31,7 +31,7 @@ class CapsParser {
         static std::string getCapsFromFile(const char *filename, const std::string &codec);
     public:
         static std::string getVideoCaps(const std::string &codec);
-        static std::string getAudioCaps(const std::string &codec);
+        static std::string getAudioCaps(const std::string &codec, int numChannels, int sampleRate);
 };
 
 #endif // _CAPS_PARSER_H_

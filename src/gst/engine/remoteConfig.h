@@ -27,6 +27,9 @@
 #include <set>
 #include "../ports.h"
 
+#include "busMsgHandler.h"
+
+class MapMsg;
 class Encoder;
 class VideoEncoder;
 class VideoDecoder;
@@ -39,15 +42,9 @@ class Decoder;
 class RemoteConfig 
 {
     public:
-        RemoteConfig(const std::string &codec__, 
-                const std::string &remoteHost__,
-                int port__,
+        RemoteConfig(MapMsg &msg,
                 int msgId__); 
-
-        // copy constructor
-        RemoteConfig(const RemoteConfig& m)
-            : codec_(m.codec_), remoteHost_(m.remoteHost_), port_(m.port_), msgId_(m.msgId_) {}
-
+        
         virtual ~RemoteConfig(){};
         static bool capsMatchCodec(const std::string &encodingName, const std::string &codec);
 
@@ -75,40 +72,31 @@ class RemoteConfig
         RemoteConfig& operator=(const RemoteConfig&); //No Assignment Operator
 };
 
-class SenderConfig : public RemoteConfig
+class SenderConfig : public RemoteConfig, public BusMsgHandler
 {
     public:
-        SenderConfig(const std::string &codec__,
-                const std::string &remoteHost__,    
-                int port__,
-                int msgId__) : RemoteConfig(codec__, remoteHost__, port__, msgId__)
-    {}
-
-        SenderConfig(const SenderConfig & m) 
-            : RemoteConfig(m)
-        {}
+        SenderConfig(MapMsg &msg,
+                int msgId__);
 
         VideoEncoder* createVideoEncoder() const;
         Encoder* createAudioEncoder() const;
-        void sendMessage(const std::string &msg) const;
+        bool capsOutOfBand() { return capsOutOfBand_; }
+        void capsOutOfBand(bool capsOutOfBand__) { capsOutOfBand_ = capsOutOfBand__; }
+
+    private:
+        static int sendMessage(void *data);
+
+        std::string message_;
+        bool capsOutOfBand_;
+        bool handleBusMsg(_GstMessage *msg);
 };
 
 
 class ReceiverConfig : public RemoteConfig
 {
     public:
-        ReceiverConfig(const std::string &codec__,
-                const std::string &remoteHost__,    
-                int port__, 
-                const std::string &multicastInterface__,
-                const std::string &caps__,
-                int msgId__) : RemoteConfig(codec__, remoteHost__, port__, msgId__), 
-        multicastInterface_(multicastInterface__), caps_(caps__)
-    {}
-
-        ReceiverConfig(const ReceiverConfig & m) 
-            : RemoteConfig(m), multicastInterface_(m.multicastInterface_), caps_(m.caps_)
-        {}
+        ReceiverConfig(MapMsg &msg, const std::string &caps__,
+                int msgId__); 
 
         VideoDecoder* createVideoDecoder() const;
         Decoder* createAudioDecoder() const;
@@ -122,6 +110,7 @@ class ReceiverConfig : public RemoteConfig
     private:
         const std::string multicastInterface_;
         std::string caps_;
+        bool capsOutOfBand_;
 };
 
 #endif // _REMOTE_CONFIG_H_

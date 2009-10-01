@@ -27,13 +27,15 @@
 #include <gst/gstclock.h>
 #include <gst/gstelement.h>
 
+#include "noncopyable.h"
+
 class _GstElement;
 class _GstPad;
 class _GstBus;
 class _GstMessage;
 class BusMsgHandler;
 
-class Pipeline
+class Pipeline : boost::noncopyable
 {
     public:
         static bool isAlive() { return instance_ != 0; }
@@ -73,9 +75,6 @@ class Pipeline
 
         static gboolean bus_call(_GstBus *bus, _GstMessage *msg, void *data);
         bool checkStateChange(GstStateChangeReturn ret) const;
-
-        Pipeline(const Pipeline&);
-        Pipeline& operator=(const Pipeline&);
 
         Pipeline() : pipeline_(0), startTime_(0), handlers_(), refCount_(0), quitted_(false) {}
 

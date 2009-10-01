@@ -24,6 +24,8 @@
 
 #include "gstLinkable.h"
 
+#include "noncopyable.h"
+
 // forward declarations
 class _GstElement;
 class RtpPay;
@@ -31,56 +33,52 @@ class Payloader;
 
 
 /** 
- *  Abstract base class that wraps a single GstElement, and which exposes both a source and sink.
- */
-class Codec : public GstLinkableFilter
-{
-    public:
-        Codec();
-        ~Codec();
-        virtual void init() = 0;
-
-    protected:
-        _GstElement *codec_;
-
-    private:
-        _GstElement *srcElement() { return codec_; }
-        _GstElement *sinkElement() { return codec_; }
-
-        /// No Copy Constructor
-        Codec(const Codec&);     
-        /// No Assignment Operator
-        Codec& operator=(const Codec&);     
-};
-
-/** 
  *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
  *  and whose concrete subclasses will provide specifc encoding of raw media streams.
  */
-class Encoder : public Codec
+class Encoder : public GstLinkableFilter, boost::noncopyable
 {
     public:
+        Encoder();
+        virtual ~Encoder();
+        virtual void init () = 0;
         /// Abstract Factory method that will create payloaders corresponding to this Encoder's codec type 
         virtual Payloader* createPayloader() const = 0;
         int getBitrate() const;
         void postBitrate();
         virtual void setBitrate(unsigned bitrate);
+
     protected:
         virtual void setBitrateInKbs(unsigned bitrate);
+        _GstElement *encoder_;
+
+    private:
+        _GstElement *srcElement() { return encoder_; }
+        _GstElement *sinkElement() { return encoder_; }
 };
 
 /** 
  *  Abstract child of Codec that wraps a single GstElement, and which exposes both a source and sink 
  *  and whose concrete subclasses will provide specifc decoding of encoded media streams.
  */
-class Decoder : public Codec
+class Decoder : public GstLinkableFilter, boost::noncopyable
 {
     public:
+        Decoder();
+        virtual ~Decoder();
+        virtual void init () = 0;
         /// Abstract Factory method that will create depayloaders corresponding to this Decoder's codec type 
         virtual RtpPay* createDepayloader() const = 0;
         virtual void adjustJitterBuffer() {}; // buy default, do nothing
         virtual bool adjustsBufferTime() { return false; }
         virtual unsigned long long minimumBufferTime() { THROW_ERROR("Unimplemented"); return 0; }
+        
+    protected:
+        _GstElement *decoder_;
+
+    private:
+        _GstElement *srcElement() { return decoder_; }
+        _GstElement *sinkElement() { return decoder_; }
 };
 
 /// Abstract child of encoder that wraps audioconvert functionality
@@ -95,11 +93,6 @@ class AudioConvertedEncoder : public Encoder
 
     private:
         _GstElement *sinkElement() { return aconv_; }
-    
-        /// No Copy Constructor 
-        AudioConvertedEncoder(const AudioConvertedEncoder&);     
-        ///No Assignment Operator
-        AudioConvertedEncoder& operator=(const AudioConvertedEncoder&);     
 };
 
 
@@ -113,11 +106,6 @@ class AudioConvertedDecoder : public Decoder
 
     private:
         _GstElement *srcElement() { return aconv_; }
-
-        ///No Copy Constructor
-        AudioConvertedDecoder(const AudioConvertedDecoder&);     
-        ///No Assignment Operator
-        AudioConvertedDecoder & operator=(const AudioConvertedDecoder&);     
 };
 
 class VideoEncoder : public Encoder 
@@ -125,7 +113,7 @@ class VideoEncoder : public Encoder
     public: 
         VideoEncoder();
         ~VideoEncoder();
-        virtual void init() = 0;
+        virtual void init () = 0;
 
     protected:
         _GstElement *colorspc_;
@@ -137,11 +125,6 @@ class VideoEncoder : public Encoder
         { 
             return colorspc_;
         }
-
-        /// No Copy Constructor
-        VideoEncoder(const VideoEncoder&);     
-        /// No Assignment Operator
-        VideoEncoder& operator=(const VideoEncoder&);     
 };
 
 
@@ -168,11 +151,6 @@ class VideoDecoder : public Decoder
         { 
             return queue_;
         }
-
-        /// No Copy Constructor
-        VideoDecoder(const VideoDecoder&);     
-        /// No Assignment Operator
-        VideoDecoder& operator=(const VideoDecoder&);     
 };
 
 /// Encoder that encodes raw video into H.264 using the x264 encoder
@@ -277,7 +255,7 @@ class TheoraDecoder: public VideoDecoder
 
 
 /// Encoder that encodes raw audio using the vorbis encoder.
-class VorbisEncoder : public AudioConvertedEncoder 
+class VorbisEncoder : public  Encoder
 {
     public: 
         VorbisEncoder();

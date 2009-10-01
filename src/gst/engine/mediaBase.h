@@ -22,22 +22,29 @@
 #ifndef _MEDIA_BASE_H_
 #define _MEDIA_BASE_H_
 
+#include "remoteConfig.h"
+
+#include <boost/shared_ptr.hpp>
+
+class _GstMessage;
+
 class SenderBase 
 {
     public: 
         void init();
-        SenderBase() : initialized_(false) {};
-        virtual ~SenderBase(){};
+        SenderBase(boost::shared_ptr<SenderConfig> rConfig);
+        virtual ~SenderBase();
+        bool capsAreCached() { return checkCaps(); }
 
-        virtual std::string getCaps() const = 0;
+    protected:
+        boost::shared_ptr<SenderConfig> remoteConfig_;
+
     private:
+        virtual bool checkCaps() const = 0;
         virtual void init_source() = 0;
         virtual void init_codec() = 0;
         virtual void init_payloader() = 0;
         bool initialized_;
-
-        SenderBase(const SenderBase&);     //No Copy Constructor
-        SenderBase& operator=(const SenderBase&);     //No Assignment Operator
 };
 
 class ReceiverBase 
@@ -52,9 +59,6 @@ class ReceiverBase
         virtual void init_depayloader() = 0;
         virtual void init_sink() = 0;
         bool initialized_;
-
-        ReceiverBase(const ReceiverBase&);     //No Copy Constructor
-        ReceiverBase& operator=(const ReceiverBase&);     //No Assignment Operator
 };
 
 #endif // _MEDIA_BASE_H_

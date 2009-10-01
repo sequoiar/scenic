@@ -1,12 +1,14 @@
 NTA:
--make sure that if we quit with interrupt, everything especially shared memory is cleaned up
--add flag to explicitly send/receive caps on command line
+-see if v4l2 driver differences between hardy and > make a difference in timestamping issues
+-use osc style path for tcp messages
+-make sure that if we quit, everything especially shared memory is cleaned up
+-use boost signals.slots instead of current msg passing/handling 
+-if we have a sender and receiver going, the receiver should for now gracefully ignore subsequent senders after the first sender goes out
 
 HELLO_WORLD:
+-get non blocking input from command-line
+-rhythmbox uses autoaudiosink, should we? or just look at how autoaudiosink is implemented
 -use more message passing, try mike's approach of path=ClassName, args[0]=handler_method, args[1-n]...
--find out if h264 caps can be as simple as gst-plugins good examples would
-have us believe
--get sendCaps stuff out of gst/control (aka telnet)
 -use milhouse command line to generate caps
 -Get rid of singletons, rather have an application space all the necessary objects can listen.
 -make sure no exceptions can be thrown from destructors

@@ -28,13 +28,15 @@
 #include "busMsgHandler.h"
 #include "messageHandler.h"
 
+#include "noncopyable.h"
+
 class _GtkWidget;
 class _GdkEventExpose;
 class _GdkEventKey;
 class _GdkEventScroll;
 class _GstElement;
 
-class VideoSink : public GstLinkableSink
+class VideoSink : public GstLinkableSink, boost::noncopyable
 {
     public:
        VideoSink() : sink_(0) {};
@@ -45,10 +47,6 @@ class VideoSink : public GstLinkableSink
         virtual void destroySink();
         void prepareSink();
         _GstElement *sink_;
-
-    private:
-        VideoSink(const VideoSink&);     //No Copy Constructor
-        VideoSink& operator=(const VideoSink&);     //No Assignment Operator
 };
 
 class GtkVideoSink
@@ -76,9 +74,6 @@ class GtkVideoSink
 
     private:
         virtual bool handleMessage(const std::string &path);
-
-        GtkVideoSink(const GtkVideoSink&);     //No Copy Constructor
-        GtkVideoSink& operator=(const GtkVideoSink&);     //No Assignment Operator
 };
 
 
@@ -96,8 +91,6 @@ class XvImageSink
         static int key_press_event_cb(_GtkWidget *widget, _GdkEventKey *event,
                 void *data);
 
-        XvImageSink(const XvImageSink&);     //No Copy Constructor
-        XvImageSink& operator=(const XvImageSink&);     //No Assignment Operator
 };
 
 
@@ -113,8 +106,6 @@ class XImageSink
 
         _GstElement *sinkElement() { return colorspc_; }
         _GstElement *colorspc_;
-        XImageSink(const XImageSink&);     //No Copy Constructor
-        XImageSink& operator=(const XImageSink&);     //No Assignment Operator
 };
 
 

@@ -52,8 +52,6 @@ class SharedVideoSink : public VideoSink
         SharedVideoBuffer *sharedBuffer_;
 
         static void onNewBuffer(_GstElement *elt, SharedVideoSink *context);
-        SharedVideoSink(const SharedVideoSink&);
-        SharedVideoSink& operator=(const SharedVideoSink&);
 };
 
 #endif  // _SHARED_VIDEO_SINK_H_

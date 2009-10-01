@@ -28,31 +28,28 @@
 #include "videoSource.h"
 #include "rtpPay.h"
 #include "videoConfig.h"
-#include "remoteConfig.h"
 #include "codec.h"
+#include "capsParser.h"
+#include "messageDispatcher.h"
 
+#include <boost/shared_ptr.hpp>
 
+using boost::shared_ptr;
 
 /// Constructor
-VideoSender::VideoSender(const VideoSourceConfig vConfig, const SenderConfig rConfig) : 
-    videoConfig_(vConfig), remoteConfig_(rConfig), session_(), source_(0), 
+VideoSender::VideoSender(shared_ptr<VideoSourceConfig> vConfig, 
+        shared_ptr<SenderConfig> rConfig) : 
+    SenderBase(rConfig), videoConfig_(vConfig), session_(), source_(0), 
     encoder_(0), payloader_(0) 
+{}
+
+bool VideoSender::checkCaps() const
 {
-    remoteConfig_.checkPorts();
-}
-
-
-/// Returns the capabilities of this VideoSender's RtpSession 
-std::string VideoSender::getCaps() const
-{ 
-    std::string capsStr = payloader_->getCaps();
-    tassert(capsStr != "");
-    return capsStr;
+    return CapsParser::getVideoCaps(remoteConfig_->codec()) != ""; 
 }
 
 VideoSender::~VideoSender()
 {
-    remoteConfig_.cleanupPorts();
     delete payloader_;
     delete encoder_;
     delete source_;
@@ -61,16 +58,16 @@ VideoSender::~VideoSender()
 
 void VideoSender::init_source()
 {
-    tassert(source_ = videoConfig_.createSource());
+    tassert(source_ = videoConfig_->createSource());
     source_->init();
 }
 
 
 void VideoSender::init_codec()
 {
-    tassert(encoder_ = remoteConfig_.createVideoEncoder());
+    tassert(encoder_ = remoteConfig_->createVideoEncoder());
     encoder_->init();
-    encoder_->setBitrate(videoConfig_.bitrate());
+    encoder_->setBitrate(videoConfig_->bitrate());
 
     gstlinkable::link(*source_, *encoder_);
 }
@@ -80,40 +77,9 @@ void VideoSender::init_payloader()
 {
     tassert(payloader_ = encoder_->createPayloader());
     payloader_->init();
+    if (remoteConfig_->capsOutOfBand()) // tell payloader not to send config string in header since we're sending caps
+        MessageDispatcher::sendMessage("disable-send-config");
     gstlinkable::link(*encoder_, *payloader_);
-    session_.add(payloader_, remoteConfig_);
-}
-
-
-
-/** 
- * The new caps message is posted on the bus by the src pad of our udpsink, 
- * received by this rtpsender, and dispatched. */
-bool VideoSender::handleBusMsg(GstMessage *msg)
-{
-    const GstStructure *s = gst_message_get_structure(msg);
-    const gchar *name = gst_structure_get_name(s);
-
-    if (std::string(name) == "caps-changed") 
-    {   
-        // this is our msg
-        const gchar *newCapsStr = gst_structure_get_string(s, "caps");
-        tassert(newCapsStr);
-        std::string str(newCapsStr);
-
-        const std::string ENCODING_NAME("THEORA");
-        const std::string key("encoding-name=(string)");
-        size_t pos = str.find(key) + key.length();
-
-        if (str.compare(pos, ENCODING_NAME.length(), ENCODING_NAME))
-            return false; // not our encoding
-        
-        LOG_DEBUG("Sending caps for codec " << ENCODING_NAME);
-        remoteConfig_.sendMessage(std::string(newCapsStr));
-
-        return true;
-    }
-
-    return false;           // this wasn't our msg, someone else should handle it
+    session_.add(payloader_, *remoteConfig_);
 }
 

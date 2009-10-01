@@ -216,7 +216,7 @@ std::string tcpGetBuffer(int port, int &id)
         }
         else
         {
-            usleep(MILLISEC_WAIT*1000);
+            usleep(MILLISEC_WAIT * 1000);
         }
     }
     return ret;
@@ -256,7 +256,7 @@ bool tcpSendBuffer(const std::string ip, int port, int id, const std::string cap
            else
                break;
         }
-        usleep(100000);
+        usleep(MILLISEC_WAIT * 1000);
     }
     return ret;
 }

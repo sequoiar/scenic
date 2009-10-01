@@ -33,7 +33,7 @@ class _GParamSpec;
 class RtpPay;
 
 class RtpSender
-    : public RtpBin//, public BusMsgHandler
+    : public RtpBin
 {
     public:
         RtpSender() : rtp_sender_(0) {}
@@ -49,8 +49,6 @@ class RtpSender
         _GstElement *rtp_sender_;
         static void sendCapsChanged(_GstPad *pad, _GParamSpec *pspec, RtpSender *context);
         virtual void subParseSourceStats(_GstStructure *stats);
-        RtpSender(const RtpSender&); //No Copy Constructor
-        RtpSender& operator=(const RtpSender&); //No Assignment Operator
 };
 
 #endif // _RTP_SENDER_H_

@@ -58,7 +58,11 @@
  * They also accept the message "start", "stop" and "rtp". They answer with a bunch of messages in the same fashion. 
  * Name, the "success" and "failure" messages. 
  */
-void GstThread::stop(MapMsg& ){ playback::stop();} 
+void GstThread::stop(MapMsg& )
+{ 
+    playback::stop();
+} 
+
 void GstThread::start(MapMsg&)
 {
     playback::start();
@@ -68,23 +72,6 @@ void GstThread::start(MapMsg&)
 void GstSenderThread::start(MapMsg& )
 { 
     playback::start();
-    if(!hasPlayed_)
-    {
-        if(videoFirst)
-        {
-            if(ff[0])
-                ff[0](video_->getCaps());
-            if(ff[1])
-                ff[1](audio_->getCaps());
-        }
-        else
-        {
-            if(ff[1])
-                ff[1](audio_->getCaps());
-            if(ff[0])
-                ff[0](video_->getCaps());
-        }
-    }
 
     hasPlayed_ = true;
 } 
@@ -203,33 +190,19 @@ void GstThread::main()
 
 GstReceiverThread::~GstReceiverThread()
 {
-    delete video_;
-    delete audio_;
 }
 
 void GstReceiverThread::video_init(MapMsg& msg)
 {
-    delete video_;
-    video_ = 0;
+    video_.reset();
  
     try
     {
-        if(!msg["screen"])
-            msg["screen"] = 0;
-        if(!msg["sink"])
-            msg["sink"] = "xvimagesink";
-        if(!msg["shared_video_id"])
-            msg["shared_video_id"] = "shared_memory";
-        if(!msg["multicast_interface"])
-            msg["multicast_interface"] = "";
-
-        video_ = videofactory::buildVideoReceiver_(msg["address"], msg["codec"], msg["port"], msg["screen"], msg["sink"], msg["deinterlace"], msg["shared_video_id"], msg["multicast_interface"]);
+        video_ = videofactory::buildVideoReceiver(msg);
     }
     catch(ErrorExcept e)
     {
         LOG_WARNING(e.what());
-        delete video_;
-        video_ = 0;
         throw(e);
     }
 }
@@ -237,34 +210,14 @@ void GstReceiverThread::video_init(MapMsg& msg)
 
 void GstReceiverThread::audio_init(MapMsg& msg)
 {
-    delete audio_;
-    audio_ = 0;
+    audio_.reset();
 
     try
     {
-        if (!msg["sink"])
-            msg["sink"] = "jackaudiosink";
-
-        if (!msg["device"])
-            msg["device"] = "";
-        
-        if (!msg["audio_buffer_usec"]) // take specified buffer time if present, otherwise use default
-            msg["audio_buffer_usec"] = audiofactory::AUDIO_BUFFER_USEC;
-
-        if (!msg["multicast_interface"])
-            msg["multicast_interface"] = "";
-
-        if (!msg["numchannels"])
-            msg["numchannels"] = 2;
-
-
-        audio_ = audiofactory::buildAudioReceiver_(msg["address"], msg["codec"], msg["port"], 
-                msg["sink"], msg["device"], msg["audio_buffer_usec"], msg["multicast_interface"], msg["numchannels"]);
+        audio_ = audiofactory::buildAudioReceiver(msg);
     }
     catch(ErrorExcept e)
     {
-        delete audio_;
-        audio_ = 0;
         throw(e);
     }
 }
@@ -272,36 +225,20 @@ void GstReceiverThread::audio_init(MapMsg& msg)
 
 GstSenderThread::~GstSenderThread()
 {
-    delete video_;
-    delete audio_;
 }
 
 
 void GstSenderThread::video_init(MapMsg& msg)
 {
-    delete video_;
-    video_ = 0;
+    video_.reset();
+
     try
     {
-        if(!msg["location"])
-            msg["location"] = "";
-        if(!msg["device"])
-            msg["device"] = "";
-        if(!msg["camera_number"])
-            msg["camera_number"] = -1;
-
-        VideoSourceConfig config(msg["source"], msg["bitrate"], msg["device"], msg["location"], msg["camera_number"]);
-        video_ = videofactory::buildVideoSender_(config, msg["address"], msg["codec"], msg["port"]);
-        if(ff[1])
-            videoFirst = false;
-        else
-            videoFirst = true;
+        video_ = videofactory::buildVideoSender(msg);
     }
     catch(ErrorExcept e)
     {
-        LOG_WARNING(e.what());
-        delete video_;
-        video_ = 0;
+        LOG_ERROR(e.what());
         throw(e);
     }
 }
@@ -309,29 +246,20 @@ void GstSenderThread::video_init(MapMsg& msg)
 
 void GstSenderThread::audio_init(MapMsg& msg)
 {
-    delete audio_;
-    audio_ = 0;
+    audio_.reset();
+
     try
     {
-        LOG_INFO("audio_init");
-        
-        if(!msg["location"])
-            msg["location"] = "";
-        if(!msg["device"])
-            msg["device"] = "";
-
-        AudioSourceConfig config(msg["source"], msg["device"], msg["location"], msg["channels"]);
-        audio_ = audiofactory::buildAudioSender_(config, msg["address"], msg["codec"], msg["port"]);
+        audio_ = audiofactory::buildAudioSender(msg);
     }
     catch(ErrorExcept e)
     {
         LOG_ERROR(e.what());
-        delete audio_;
-        audio_ = 0;
         throw(e);
     }
 }
 
+/// Receiver specific messages
 bool GstReceiverThread::subHandleMsg(MapMsg &msg)
 {
     if (msg() == "jitterbuffer")
@@ -345,6 +273,6 @@ bool GstReceiverThread::subHandleMsg(MapMsg &msg)
 
 void GstReceiverThread::updateJitterBuffer(MapMsg &msg)
 {
-    RtpReceiver::setLatency(msg["latency_msec"]);
+    RtpReceiver::setLatency(msg["jitterbuffer"]);
 }
 

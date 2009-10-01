@@ -29,19 +29,15 @@
 // forward declarations
 class AudioSource;
 class AudioSink;
+class MapMsg;
 
 /// Immutable class that is used to parameterize AudioSender objects. 
 class AudioSourceConfig
 {
     public:
         
-        AudioSourceConfig(const std::string & source__,     
-                          const std::string & deviceName__,
-                          const std::string & location__,
-                          int numChannels__);
+        AudioSourceConfig(MapMsg &msg);     
         
-        AudioSourceConfig(const AudioSourceConfig& m);
-
         const char *source() const;
 
         int numChannels() const;
@@ -57,8 +53,6 @@ class AudioSourceConfig
         AudioSource* createSource() const;
 
     private:
-        /// No Assignment Operator 
-        AudioSourceConfig& operator=(const AudioSourceConfig&); 
         const std::string source_;
         const std::string deviceName_;
         const std::string location_;
@@ -66,13 +60,11 @@ class AudioSourceConfig
 };
 
 ///  Immutable class that is used to parametrize AudioReceiver objects.  
-class AudioSinkConfig 
+class AudioSinkConfig
 {
     public:
-        AudioSinkConfig(const std::string & sink__, const std::string & deviceName__, unsigned long long bufferTime);
+        AudioSinkConfig(MapMsg &msg);
         
-        AudioSinkConfig(const AudioSinkConfig & m); 
-
         AudioSink* createSink() const;
         bool hasDeviceName() const { return !deviceName_.empty(); }
         const char *deviceName() const;

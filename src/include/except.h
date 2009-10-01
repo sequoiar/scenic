@@ -52,43 +52,56 @@ enum LogLevel {
 /** base exception class */
 class Except : public virtual std::exception
 {
-public:
-    LogLevel log_;
-    int errno_; //TODO used?
+    public:
+        LogLevel log_;
+        int errno_; //TODO used?
 
-    Except(const char* log_msg,int err):log_(WARNING),errno_(err){
+        Except(const char* log_msg, int err) :
+            log_(WARNING), errno_(err)
+    {
         int i;
-        for(i=0;i<255 and log_msg[i];++i)
+        for(i = 0; i < 255 and log_msg[i]; ++i)
             buff[i] = log_msg[i];
-        for(;i<256;++i)
+        for(; i < 256; ++i)
             buff[i] = 0;
     }
-    Except():log_(NONE),errno_(0){}
-    char buff[256];
-    const char * what(){ return buff;}
-    virtual ~Except() throw() {}
+        Except() : 
+            log_(NONE), errno_(0)
+    {}
+        char buff[256];
+        const char * what() { return buff; }
+        virtual ~Except() throw() {}
 };
 
 /** Recovery should be possible */
 class ErrorExcept : public Except
 {
-public:
-    ErrorExcept(const char* log_msg, int err=0):Except(log_msg,err){log_ = ERROR;}
-
+    public:
+        ErrorExcept(const char* log_msg, int err = 0) : Except(log_msg, err)
+    {
+        log_ = ERROR;
+    }
 };
 
 /** Tries to cleanup before exit */
 class CriticalExcept : public Except
 {
-public:
-    CriticalExcept(const char* log_msg, int err=0):Except(log_msg,err){ log_ = CRITICAL;}
+    public:
+        CriticalExcept(const char* log_msg, int err = 0) : Except(log_msg,err)
+    { 
+        log_ = CRITICAL;
+    }
 };
 
 /** Assertion failed */
 class AssertExcept : public CriticalExcept
 {
-public:
-    AssertExcept(const char* log_msg):CriticalExcept(log_msg){log_ = ASSERT_FAIL;}
+    public:
+        AssertExcept(const char* log_msg) : 
+            CriticalExcept(log_msg)
+    {
+        log_ = ASSERT_FAIL;
+    }
 };
 
 #endif

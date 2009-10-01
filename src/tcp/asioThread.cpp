@@ -34,9 +34,13 @@
 #ifdef HAVE_BOOST_ASIO
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <sstream>
 #pragma GCC diagnostic ignored "-Weffc++"
+
 using boost::asio::ip::tcp;
 using boost::asio::ip::udp;
 using boost::asio::io_service;
@@ -69,7 +73,6 @@ static std::string get_line(std::string& msg)
         msg.clear();
         ret.clear();
     }
-
 
     return ret;
 }
@@ -243,6 +246,8 @@ class tcp_server
         boost::asio::deadline_timer t_;
 };
 
+#if 0
+
 class udp_sender
 {
     public:
@@ -255,12 +260,13 @@ class udp_sender
             resolver(io_service),
             query(udp::v4(), ip.c_str(), port.c_str()), iterator(resolver.resolve(query))
     {
-        t_.async_wait(boost::bind(&udp_sender::handle_timer,this, error));
+        t_.async_wait(boost::bind(&udp_sender::handle_timer, this, error));
     }
 
         void handle_send_to(const error_code& err, size_t bytes_sent)
         {
-            if(err){
+            if (err)
+            {
                 LOG_DEBUG("err");
             } 
             else
@@ -269,8 +275,9 @@ class udp_sender
                 socket_.async_receive_from(buffer(data_,max_length),sender_endpoint_,
                         boost::bind(&udp_sender::handle_receive_from, this, 
                             error, bytes_transferred));
+
                 t_.expires_at(t_.expires_at() + seconds(1));
-                t_.async_wait(boost::bind(&udp_sender::handle_timer,this, error));
+                t_.async_wait(boost::bind(&udp_sender::handle_timer, this, error));
             }
         }
 
@@ -295,8 +302,8 @@ class udp_sender
                 if(MsgThread::isQuitted())
                     io_service_.stop();
 
-
-                socket_.async_send_to(buffer(buff_),*iterator, boost::bind(&udp_sender::handle_send_to,this,error,bytes_transferred));
+                socket_.async_send_to(buffer(buff_), *iterator, 
+                        boost::bind(&udp_sender::handle_send_to, this, error, bytes_transferred));
             }
             else
             {
@@ -391,42 +398,147 @@ class udp_server
         boost::asio::deadline_timer t_;
 };
 
+#endif
 
-std::string tcpGetBuffer(int port, int &id)
+using boost::asio::ip::tcp;
+
+class tcp_receiver_session : 
+    public boost::enable_shared_from_this<tcp_receiver_session>
 {
-    std::string buff;
-    io_service io_service;
-    id = 0;
-    udp_server us(io_service, port,buff,id);
-    io_service.run();
-    if(id == 0)
-        THROW_ERROR("Bad id");
+    public:
+        tcp_receiver_session(boost::asio::io_service& io_service, std::string &receiverBuffer)
+            : socket_(io_service), receiverBuffer_(receiverBuffer)
+        {}
 
-    return buff;
+        tcp::socket& socket()
+        {
+            return socket_;
+        }
+
+        void start()
+        {
+            // shared_from_this gives shared_ptr to this, this way we cleanly avoid memory leaks
+            socket_.async_read_some(boost::asio::buffer(data_),
+                    boost::bind(&tcp_receiver_session::handle_receive_from, shared_from_this(),
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::bytes_transferred));
+        }
+
+        void handle_receive_from(const boost::system::error_code& error,
+                size_t bytes_transferred)
+        {
+            if (!error)
+            {
+                LOG_DEBUG("received " << bytes_transferred << " bytes");
+
+                std::ostringstream os;
+                os.write(data_, bytes_transferred);
+
+                // Got the message, now stop the service
+                socket_.get_io_service().stop();
+                receiverBuffer_ = os.str();
+            }
+            else
+                LOG_WARNING("Got error" << boost::system::system_error(error).what());
+        }
+
+    private:
+        tcp::socket socket_;
+        // FIXME: is this the best way of having a buffer? see boost/asio/examples/reference_counted.cpp
+        enum { max_length = 8000 };
+        char data_[max_length];
+        std::string &receiverBuffer_;
+};
+
+
+
+class tcp_receiver
+{
+    typedef boost::shared_ptr<tcp_receiver_session> session_ptr;
+
+    public:
+    tcp_receiver(boost::asio::io_service& io_service, int port, std::string &buffer) : 
+        io_service_(io_service),
+        acceptor_(io_service, tcp::endpoint(tcp::v4(), port)),
+        buffer_(buffer)
+    {
+        session_ptr new_session(new tcp_receiver_session(io_service_, buffer_));
+        acceptor_.async_accept(new_session->socket(),
+                boost::bind(&tcp_receiver::handle_accept, this, new_session,
+                    boost::asio::placeholders::error));
+    }
+
+    void handle_accept(session_ptr new_session,
+            const boost::system::error_code& error)
+    {
+        if (!error)
+        {
+            new_session->start();
+            new_session.reset(new tcp_receiver_session(io_service_, buffer_));
+            acceptor_.async_accept(new_session->socket(),
+                    boost::bind(&tcp_receiver::handle_accept, this, new_session,
+                        boost::asio::placeholders::error));
+        }
+        else
+            LOG_WARNING("Got error" << boost::system::system_error(error).what());
+    }
+
+    private:
+    boost::asio::io_service& io_service_;
+    tcp::acceptor acceptor_;
+    std::string &buffer_;
+};
+
+
+std::string tcpGetBuffer(int port, int &/*id*/)
+{
+    std::string buffer;
+    boost::asio::io_service io_service;
+
+    LOG_DEBUG("Waiting for msg on port " << port);
+    tcp_receiver receiver(io_service, port, buffer);
+
+    io_service.run();
+
+    return buffer;
 }
 
-bool tcpSendBuffer(std::string ip, int port, int id, std::string caps)
+
+bool tcpSendBuffer(std::string ip, int port, int /*id*/, std::string caps)
 {
-    bool ret = false;
-    LOG_INFO("got ip=" << ip << " port=" << port << " id=" << id << " caps=" << caps);
-    MapMsg msg("buffer");
+    using boost::lexical_cast;
 
-    msg["str"] = caps;
-    msg["id"] = id;
-    std::ostringstream str;
-    str << port;
-    std::string msg_str;
-    msg.stringify(msg_str);
+    boost::system::error_code err;
+    bool success = false;
 
-    io_service io_service;
+    try
+    {
+        boost::asio::io_service io_service;
 
+        tcp::resolver resolver(io_service);
+        tcp::resolver::query query(tcp::v4(), ip, lexical_cast<std::string>(port));
+        tcp::resolver::iterator iterator = resolver.resolve(query);
 
-    udp_sender us(io_service,ip,str.str(),  msg_str);
-    io_service.run();
-    ret = true;
-    return ret;
+        tcp::socket s(io_service);
+        err = s.connect(*iterator, err);
+
+        enum {SIZE = 6000};
+        boost::asio::write(s, boost::asio::buffer(caps));
+        success = true;
+    }
+    catch (std::exception& e)
+    {
+        if (err != boost::asio::error::connection_refused)  // don't throw exception if connection isn't there
+        {
+            throw e;
+        }
+        else
+        {
+            LOG_DEBUG("No tcp receiver ready yet, will try again later...");
+        }
+    }
+    return success;
 }
-
 
 
 
@@ -445,7 +557,7 @@ void asio_thread::main()
         LOG_ERROR("caught exception:" << e.what());
         queue_.push(MapMsg("quit"));
     }
-    
+
 }
 
 #endif

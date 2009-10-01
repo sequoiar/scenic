@@ -66,9 +66,6 @@ class RtpReceiver
         static bool madeControl_;
         static _GtkWidget *control_;
         static bool controlEnabled_;
-
-        RtpReceiver(const RtpReceiver&); //No Copy Constructor
-        RtpReceiver& operator=(const RtpReceiver&); //No Assignment Operator
 };
 
 #endif // _RTP_RECEIVER_H_

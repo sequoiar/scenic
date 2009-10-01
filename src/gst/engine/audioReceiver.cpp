@@ -31,9 +31,14 @@
 #include "codec.h"
 #include "audioSink.h"
 
+#include <boost/shared_ptr.hpp>
+
+using boost::shared_ptr;
+
 /** Constructor parameterized by an AudioSinkConfig 
  * and a ReceiverConfig */
-AudioReceiver::AudioReceiver(const AudioSinkConfig aConfig, const ReceiverConfig rConfig) : 
+AudioReceiver::AudioReceiver(shared_ptr<AudioSinkConfig> aConfig, 
+        shared_ptr<ReceiverConfig> rConfig) : 
     audioConfig_(aConfig), 
     remoteConfig_(rConfig), 
     session_(), 
@@ -43,14 +48,14 @@ AudioReceiver::AudioReceiver(const AudioSinkConfig aConfig, const ReceiverConfig
     level_(), 
     sink_(0)
 { 
-    tassert(remoteConfig_.hasCodec()); 
-    remoteConfig_.checkPorts();
+    tassert(remoteConfig_->hasCodec()); 
+    remoteConfig_->checkPorts();
 }
 
 /// Destructor 
 AudioReceiver::~AudioReceiver()
 {
-    remoteConfig_.cleanupPorts();
+    remoteConfig_->cleanupPorts();
     delete sink_;
     delete decoder_;
     delete depayloader_;
@@ -59,7 +64,7 @@ AudioReceiver::~AudioReceiver()
 
 void AudioReceiver::init_codec()
 {
-    tassert(decoder_ = remoteConfig_.createAudioDecoder());
+    tassert(decoder_ = remoteConfig_->createAudioDecoder());
     decoder_->init();
 }
 
@@ -69,28 +74,30 @@ void AudioReceiver::init_depayloader()
     tassert(depayloader_ = decoder_->createDepayloader());
     depayloader_->init();
     gstlinkable::link(*depayloader_, *decoder_);
-    session_.add(depayloader_, remoteConfig_);
+    session_.add(depayloader_, *remoteConfig_);
 
     //init_level();
 }
 
 
+#if 0
 void AudioReceiver::init_level()
 {
     level_.init();
     gstlinkable::link(*decoder_, level_);
 }
+#endif
 
 
 void AudioReceiver::init_sink()
 {
-    tassert(sink_ = audioConfig_.createSink());
+    tassert(sink_ = audioConfig_->createSink());
     sink_->init();
     //gstlinkable::link(level_, *sink_);   
     gstlinkable::link(*decoder_, *sink_);   
     setCaps();
     tassert(gotCaps_);
-    tassert(remoteConfig_.capsMatchCodec()); 
+    tassert(remoteConfig_->capsMatchCodec()); 
     if (decoder_->adjustsBufferTime())
         sink_->adjustBufferTime(decoder_->minimumBufferTime()); // increase jitterbuffer as needed
 }
@@ -98,7 +105,7 @@ void AudioReceiver::init_sink()
 /// Used to set this AudioReceiver's RtpReceiver's caps 
 void AudioReceiver::setCaps() 
 { 
-    session_.setCaps(remoteConfig_.caps()); 
+    session_.setCaps(remoteConfig_->caps()); 
     gotCaps_ = true;
 }
 

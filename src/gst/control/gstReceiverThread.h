@@ -25,6 +25,7 @@
 
 #include <glib.h>
 #include <iostream>
+#include <boost/shared_ptr.hpp>
 #include "gstThread.h"
 class ReceiverBase;
 
@@ -51,7 +52,7 @@ class GstReceiverThread
 {
     public:
         GstReceiverThread()
-            : video_(0), audio_(0) {}
+            : video_(), audio_() {}
         ~GstReceiverThread();
     private:
         /// incomming audio_start request 
@@ -62,8 +63,8 @@ class GstReceiverThread
         bool subHandleMsg(MapMsg&);
         void updateJitterBuffer(MapMsg&);
         
-        ReceiverBase* video_;
-        ReceiverBase* audio_;
+        boost::shared_ptr<ReceiverBase> video_;
+        boost::shared_ptr<ReceiverBase> audio_;
 
         /// No Copy Constructor 
         GstReceiverThread(const GstReceiverThread&); 

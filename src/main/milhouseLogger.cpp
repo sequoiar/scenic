@@ -25,9 +25,32 @@
 #include <boost/bind.hpp>
 
 
-MilhouseLogger::MilhouseLogger() : 
-    printQueue_(), printThread_(boost::bind<void>(boost::mem_fn(&MilhouseLogger::printMessages), boost::ref(*this)))
+MilhouseLogger::MilhouseLogger(const std::string &logLevel) : 
+    printQueue_(), printThread_(boost::bind<void>(boost::mem_fn(&MilhouseLogger::printMessages), boost::ref(*this))), 
+    gstDebug_(false)
 {
+    setLevel(argToLogLevel(logLevel));
+}
+
+
+LogLevel MilhouseLogger::argToLogLevel(const std::string &level)
+{
+    std::string upperCase(level);
+    std::transform(upperCase.begin(), upperCase.end(), upperCase.begin(), toupper);
+    std::map<std::string, LogLevel> strings;
+    strings["CRITICAL"] = strings["1"] = CRITICAL;
+    strings["ERROR"] = strings["2"] = ERROR;
+    strings["WARNING"] = strings["3"] =  WARNING;
+    strings["INFO"] = strings["4"] = INFO;
+    strings["DEBUG"] = strings["5"] = DEBUG; 
+
+    if (upperCase == "GST-DEBUG" or upperCase == "6")
+    {
+        gstDebug_ = true;
+        return DEBUG;
+    }
+    else
+        return strings[upperCase];
 }
 
 
@@ -41,7 +64,6 @@ MilhouseLogger::~MilhouseLogger()
 /// This is called in the main thread
 void MilhouseLogger::operator()(LogLevel& /*level*/, std::string& msg)
 {
-    //std::cout << msg;
     printQueue_.push(msg);
 //    boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 }
@@ -56,7 +78,7 @@ void MilhouseLogger::printMessages()
         
         if (msg != "quit:")
         {
-            std::cout << msg << std::endl;
+            std::cout << msg;
         }
         else  // got a sentinel
         {

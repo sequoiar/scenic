@@ -53,25 +53,10 @@ void Payloader::enableControl()
 }
 
 
-
 void Payloader::init()
 {
     if (controlEnabled_)
         createMTUControl();
-}
-
-
-std::string Payloader::getCaps() const
-{
-    GstCaps *caps;
-    GstPad *pad = gst_element_get_static_pad(rtpPay_, "src");
-    do 
-        g_object_get(G_OBJECT(pad), "caps", &caps, NULL);
-    while (caps == NULL);
-//    gst_object_unref(GST_OBJECT(pad)); // static pad
-    std::string result(gst_caps_to_string(caps));
-    LOG_INFO("GOT CAPS " << result);
-    return result;
 }
 
 
@@ -183,11 +168,24 @@ void Mpeg4Payloader::init()
     rtpPay_ = Pipeline::Instance()->makeElement("rtpmp4vpay", NULL);
     // this will send config header in rtp packets
     g_object_set(rtpPay_, "send-config", TRUE, NULL);
+
     // this means that our payloader will output bufferlists instead of
     // 1 packet per buffer. this will allow downstream elements that are bufferlist aware
     // to avoid unneeded memcpys
     g_object_set(rtpPay_, "buffer-list", TRUE, NULL);
     Payloader::init();
+}
+
+
+bool Mpeg4Payloader::handleMessage(const std::string &path)
+{
+    if (path == "disable-send-config")
+    {
+        assert(rtpPay_);
+        g_object_set(rtpPay_, "send-config", FALSE, NULL);
+        return true;
+    }
+    return false;
 }
 
 

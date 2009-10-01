@@ -21,31 +21,26 @@
  */
 
 #include "util.h"
+#include "mapMsg.h"
 
 #include "audioConfig.h"
 #include "audioSource.h"
 #include "audioSink.h"
 #include "jackUtils.h"
 
-AudioSourceConfig::AudioSourceConfig(const std::string & source__, 
-        const std::string & deviceName__,
-        const std::string & location__,
-        int numChannels__) : 
-    source_(source__), deviceName_(deviceName__), location_(location__), numChannels_(numChannels__)
+AudioSourceConfig::AudioSourceConfig(MapMsg &msg) :
+    source_(msg["source"]), 
+    deviceName_(msg["device"]), 
+    location_(msg["location"]), 
+    numChannels_(msg["numchannels"])
 {
     if (source_.empty())
         THROW_CRITICAL("No source specified");
-    if(numChannels_ < 1 or numChannels_ > 8)
+    if(numChannels_ < 1)
         THROW_CRITICAL("Invalid number of channels");
     if (source_ == "jackaudiosrc")  // FIXME: this has to happen early but it's gross to have it here
         Jack::assertReady();
 }
-
-
-/// Copy constructor 
-AudioSourceConfig::AudioSourceConfig(const AudioSourceConfig& m) : 
-    source_(m.source_), deviceName_(m.deviceName_), location_(m.location_), numChannels_(m.numChannels_)
-{}
 
 
 /// Returns c-style string specifying the source 
@@ -103,16 +98,14 @@ bool AudioSourceConfig::locationExists() const
 
 
 /// Constructor 
-AudioSinkConfig::AudioSinkConfig(const std::string & sink__, const std::string & deviceName__, unsigned long long bufferTime__) : 
-    sink_(sink__), deviceName_(deviceName__), bufferTime_(bufferTime__)
+AudioSinkConfig::AudioSinkConfig(MapMsg &msg) : 
+    sink_(msg["sink"]), 
+    deviceName_(msg["device"]), 
+    bufferTime_(static_cast<int>(msg["audio-buffer-usec"]))
 {
     if (sink_ == "jackaudiosink") // FIXME: it's good for this to happen early 
         Jack::assertReady();      // (before waiting on caps) but having it here is pretty gross
 }
-
-/// Copy constructor 
-AudioSinkConfig::AudioSinkConfig(const AudioSinkConfig & m) : sink_(m.sink_), deviceName_(m.deviceName_), bufferTime_(m.bufferTime_) 
-{}
 
 /// Factory method that creates an AudioSink based on this object's sink_ string 
 AudioSink* AudioSinkConfig::createSink() const
