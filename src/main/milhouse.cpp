@@ -44,40 +44,40 @@ int telnetServer(int, int);
 
 void pof::addOptions(OptionArgs &options)
 {
-    options.addBool("receiver", 'r', "receiver");
-    options.addBool("sender", 's', "sender");
-    options.addString("address", 'i', "address", "provide ip address of remote host");
-    options.addString("videocodec", 'v', "videocodec", "h264");
-    options.addString("audiocodec", 'a', "audiocodec", "vorbis raw mp3");
-    options.addString("videosink", 'k', "videosink", "xvimagesink glimagesink");
-    options.addString("audiosink", 'l', "audiosink", "jackaudiosink alsasink pulsesink");
-    options.addInt("audioport", 't', "audioport", "portnum");
-    options.addInt("videoport", 'p', "videoport", "portnum");
-    options.addBool("fullscreen", 'f', "default to fullscreen");
-    options.addString("shared-video-id", 'B', "shared video buffer id", "shared_memory");
-    options.addBool("deinterlace", 'o', "deinterlace video");
-    options.addString("videodevice", 'd', "device", "/dev/video0 /dev/video1");
-    options.addString("audiodevice", 'q', "audio device", "hw:0 hw:2 plughw:0 plughw:2");
-    options.addString("videolocation", 0, "video file location", "<filename>");
-    options.addString("audiolocation", 0, "audio file location", "<filename>");
-    options.addInt("screen", 'n', "screen", "xinerama screen num");
-    options.addBool("version", 'w', "version number");
-    options.addInt("numchannels", 'c', "numchannels", "2");
-    options.addInt("videobitrate", 'x', "videobitrate", "3000000");
-    options.addString("audiosource", 'e', "audiosource", "jackaudiosrc alsasrc pulsesrc");
-    options.addString("videosource", 'u', "videosource", "v4l2src v4lsrc dv1394src");
-    options.addInt("timeout", 'z', "timeout", "time in ms to wait before quitting, 0 means run indefinitely");
-    options.addInt("audio-buffer-usec", 'b', "audiobuffer", "length of receiver's audio buffer in microseconds, must be > 10000");
-    options.addInt("jitterbuffer", 'g', "jitterbuffer", "length of receiver's rtp jitterbuffers in milliseconds, must be > 1");
-    options.addInt("camera-number", 'G', "camera_number", "camera id for dc1394");
-    options.addString("multicast-interface", 'I', "multicast_interface", "interface to use for multicast");
-    options.addBool("enable-controls", 'j', "enable gui controls for jitter buffer");
-    options.addBool("disable-jack-autoconnect", 'J', "disable jack's autoconnection");
-    options.addBool("caps-out-of-band", 'C', "send/receive caps out of band, default=false");
-    options.addString("debug", 'D', "debug", "level of logging verbosity (string/int) "
+    options.addBool("receiver", 'r', "");
+    options.addBool("sender", 's', "");
+    options.addString("address", 'i', "", "provide ip address of remote host");
+    options.addString("videocodec", 'v', "", "h264");
+    options.addString("audiocodec", 'a', "", "vorbis raw mp3");
+    options.addString("videosink", 'k', "", "xvimagesink glimagesink");
+    options.addString("audiosink", 'l', "", "jackaudiosink alsasink pulsesink");
+    options.addInt("audioport", 't', "", "portnum");
+    options.addInt("videoport", 'p', "", "portnum");
+    options.addBool("fullscreen", 'f', "");
+    options.addString("shared-video-id", 'B', "", "shared_memory");
+    options.addBool("deinterlace", 'o', "");
+    options.addString("videodevice", 'd', "", "/dev/video0 /dev/video1");
+    options.addString("audiodevice", 'q', "", "hw:0 hw:2 plughw:0 plughw:2");
+    options.addString("videolocation", 0, "", "<filename>");
+    options.addString("audiolocation", 0, "", "<filename>");
+    options.addInt("screen", 'n', "", "xinerama screen num");
+    options.addBool("version", 'w', "");
+    options.addInt("numchannels", 'c', "", "2");
+    options.addInt("videobitrate", 'x', "", "3000000");
+    options.addString("audiosource", 'e', "", "jackaudiosrc alsasrc pulsesrc");
+    options.addString("videosource", 'u', "", "v4l2src v4lsrc dv1394src");
+    options.addInt("timeout", 'z', "", "time in ms to wait before quitting, 0 means run indefinitely");
+    options.addInt("audio-buffer-usec", 'b', "", "length of receiver's audio buffer in microseconds, must be > 10000");
+    options.addInt("jitterbuffer", 'g', "", "length of receiver's rtp jitterbuffers in milliseconds, must be > 1");
+    options.addInt("camera-number", 'G', "", "camera id for dc1394");
+    options.addString("multicast-interface", 'I', "", "interface to use for multicast");
+    options.addBool("enable-controls", 'j', "");
+    options.addBool("disable-jack-autoconnect", 'J', "");
+    options.addBool("caps-out-of-band", 'C', "");
+    options.addString("debug", 'D', "", "level of logging verbosity (string/int) "
             "[critical=1,error=2,warning=3,info=4,debug=5,gst-debug=6], default=info");
     //telnetServer param
-    options.addInt("serverport", 'y', "run as server", "port to listen on");
+    options.addInt("serverport", 'y', "", "run as server and listen on this port");
 }
 
 
@@ -229,7 +229,9 @@ short pof::run(int argc, char **argv)
 
 void onExit()
 {
-    std::cout << "Leaving Milhouse\n";
+#ifdef CONFIG_DEBUG_LOCAL
+    std::cerr << "Leaving Milhouse";
+#endif
 }
 
 

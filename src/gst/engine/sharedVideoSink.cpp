@@ -126,7 +126,7 @@ void SharedVideoSink::onNewBuffer(GstElement *elt, SharedVideoSink *context)
 
 void SharedVideoSink::prepareSink()
 {
-    // FIXME: fixed caps are lame
+    // FIXME: fixed caps are lame, should be bpp=12 to allow for 4 dc1394 cameras on one firewire port
     GstCaps *videoCaps = gst_caps_from_string("video/x-raw-rgb, bpp=16, depth=16, width=640, height=480");
     g_object_set(G_OBJECT(sink_), "emit-signals", TRUE, "caps", videoCaps, NULL);
     g_signal_connect(sink_, "new-buffer", G_CALLBACK(onNewBuffer), this);
