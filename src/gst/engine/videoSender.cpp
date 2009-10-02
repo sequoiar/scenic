@@ -21,6 +21,7 @@
  */
 
 #include "util.h"
+#include "mapMsg.h"
 
 #include "pipeline.h"
 #include "gstLinkable.h"
@@ -65,9 +66,11 @@ void VideoSender::init_source()
 
 void VideoSender::init_codec()
 {
-    tassert(encoder_ = remoteConfig_->createVideoEncoder());
+    MapMsg settings;
+    settings["bitrate"] = videoConfig_->bitrate();
+    settings["quality"] = videoConfig_->quality();
+    tassert(encoder_ = remoteConfig_->createVideoEncoder(settings));
     encoder_->init();
-    encoder_->setBitrate(videoConfig_->bitrate());
 
     gstlinkable::link(*source_, *encoder_);
 }
@@ -77,7 +80,8 @@ void VideoSender::init_payloader()
 {
     tassert(payloader_ = encoder_->createPayloader());
     payloader_->init();
-    if (remoteConfig_->capsOutOfBand()) // tell payloader not to send config string in header since we're sending caps
+    // tell rtpmp4vpay not to send config string in header since we're sending caps
+    if (remoteConfig_->capsOutOfBand() and remoteConfig_->codec() == "mpeg4") 
         MessageDispatcher::sendMessage("disable-send-config");
     gstlinkable::link(*encoder_, *payloader_);
     session_.add(payloader_, *remoteConfig_);

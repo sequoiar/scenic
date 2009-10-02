@@ -52,13 +52,13 @@ Encoder::~Encoder()
 int Encoder::getBitrate() const
 {
     tassert(encoder_);
-    unsigned bitrate; 
+    int bitrate; 
     g_object_get(G_OBJECT(encoder_), "bitrate", &bitrate, NULL);
     return bitrate;
 }
 
 /// Sets bitrate property for this encoder
-void Encoder::setBitrate(unsigned bitrate)
+void Encoder::setBitrate(int bitrate)
 {
     tassert(encoder_);
     // if pipeline is playing, we need to set it to ready to make 
@@ -135,7 +135,8 @@ AudioConvertedDecoder::~AudioConvertedDecoder()
 }
 
 
-VideoEncoder::VideoEncoder() : colorspc_(0), supportsInterlaced_(false)  // most codecs don't have this property
+VideoEncoder::VideoEncoder() :
+    colorspc_(0), supportsInterlaced_(false)  // most codecs don't have this property
 {}
 
 
@@ -209,7 +210,7 @@ void VideoDecoder::adjustJitterBuffer()
 
 
 /// Constructor 
-H264Encoder::H264Encoder() {}
+H264Encoder::H264Encoder(MapMsg &settings) : bitrate_(settings["bitrate"]) {}
 
 
 /// Destructor 
@@ -241,19 +242,21 @@ void H264Encoder::init()
 
     // subme: subpixel motion estimation 1=fast, 6=best
     VideoEncoder::init();
+
+    setBitrate(bitrate_);
 }
 
 
-void Encoder::setBitrateInKbs(unsigned newBitrate)
+void Encoder::setBitrateInKbs(int newBitrate)
 {
     static const double KB_PER_BIT = 0.001;
     Encoder::setBitrate(newBitrate * KB_PER_BIT);
 }
 
 /// Overridden to convert from bit/s to kbit/s
-void H264Encoder::setBitrate(unsigned newBitrate)
+void H264Encoder::setBitrate(int newBitrate)
 {
-    Encoder::setBitrateInKbs(newBitrate);
+    setBitrateInKbs(newBitrate);
 }
 
 
@@ -287,7 +290,7 @@ void H264Decoder::adjustJitterBuffer()
 
 
 /// Constructor 
-H263Encoder::H263Encoder() 
+H263Encoder::H263Encoder(MapMsg &settings) : bitrate_(settings["bitrate"])
 {}
 
 
@@ -300,6 +303,7 @@ void H263Encoder::init()
 {
     encoder_ = Pipeline::Instance()->makeElement("ffenc_h263p", NULL);    // replaced with newer version
     VideoEncoder::init();
+    setBitrate(bitrate_);
 }
 
 
@@ -325,7 +329,7 @@ RtpPay* H263Decoder::createDepayloader() const
 
 
 /// Constructor 
-Mpeg4Encoder::Mpeg4Encoder() 
+Mpeg4Encoder::Mpeg4Encoder(MapMsg &settings) : bitrate_(settings["bitrate"])
 {}
 
 
@@ -338,6 +342,7 @@ void Mpeg4Encoder::init()
     encoder_ = Pipeline::Instance()->makeElement("ffenc_mpeg4", NULL);
     //supportsInterlaced_ = true; this may cause stuttering
     VideoEncoder::init();
+    setBitrate(bitrate_);
 }
 
 
@@ -363,7 +368,7 @@ RtpPay* Mpeg4Decoder::createDepayloader() const
 
 
 /// Constructor 
-TheoraEncoder::TheoraEncoder() : usingQualitySetting_(false) {}
+TheoraEncoder::TheoraEncoder(MapMsg &settings) : bitrate_(settings["bitrate"]), quality_(settings["quality"]) {}
 
 
 /// Destructor 
@@ -374,19 +379,19 @@ void TheoraEncoder::init()
 {
     encoder_ = Pipeline::Instance()->makeElement("theoraenc", NULL);
     setSpeedLevel(MAX_SPEED_LEVEL);
-    if (usingQualitySetting_)
-        setQuality(INIT_QUALITY);
     VideoEncoder::init();
+    if (bitrate_)
+        setBitrate(bitrate_);
+    else
+        setQuality(quality_);
 }
 
 
 /// Overridden to convert from bit/s to kbit/s
-void TheoraEncoder::setBitrate(unsigned newBitrate)
+void TheoraEncoder::setBitrate(int newBitrate)
 {
-    if (usingQualitySetting_)
-        LOG_WARNING("Using quality, not bitrate. This function has no effect.");
-    else
-        Encoder::setBitrateInKbs(newBitrate);
+    LOG_DEBUG("Bitrate " << newBitrate);
+    Encoder::setBitrateInKbs(newBitrate);
 }
 
 
@@ -396,6 +401,7 @@ void TheoraEncoder::setQuality(int quality)
     tassert(encoder_ != 0);
     if (quality < MIN_QUALITY or quality > MAX_QUALITY)
         THROW_ERROR("Quality must be in range [" << MIN_QUALITY << "-" << MAX_QUALITY << "]");
+    LOG_DEBUG("Quality " << quality);
     g_object_set(encoder_, "quality", quality, NULL);
 }
 

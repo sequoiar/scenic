@@ -83,19 +83,19 @@ SenderConfig::SenderConfig(MapMsg &msg, int msgId__) :
 {}
 
 
-VideoEncoder * SenderConfig::createVideoEncoder() const
+VideoEncoder * SenderConfig::createVideoEncoder(MapMsg &settings) const
 {
     if (codec_.empty())
         THROW_ERROR("Can't make encoder without codec being specified.");
 
     if (codec_ == "h264")
-        return new H264Encoder();
+        return new H264Encoder(settings);
     else if (codec_ == "h263")
-        return new H263Encoder();       // set caps from here?
+        return new H263Encoder(settings);       // set caps from here?
     else if (codec_ == "mpeg4")
-        return new Mpeg4Encoder();
+        return new Mpeg4Encoder(settings);
     else if (codec_ == "theora")
-        return new TheoraEncoder();
+        return new TheoraEncoder(settings);
     else
     {
         THROW_ERROR(codec_ << " is an invalid codec!");

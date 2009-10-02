@@ -36,6 +36,7 @@
 VideoSourceConfig::VideoSourceConfig(MapMsg &msg) : 
     source_(msg["source"]), 
     bitrate_(msg["bitrate"]), 
+    quality_(msg["quality"]), 
     deviceName_(msg["device"]),
     location_(msg["location"]), 
     cameraNumber_(msg["camera-number"])

@@ -30,6 +30,7 @@
 class _GstElement;
 class RtpPay;
 class Payloader;
+class MapMsg;
 
 
 /** 
@@ -46,10 +47,10 @@ class Encoder : public GstLinkableFilter, boost::noncopyable
         virtual Payloader* createPayloader() const = 0;
         int getBitrate() const;
         void postBitrate();
-        virtual void setBitrate(unsigned bitrate);
+        virtual void setBitrate(int bitrate);
 
     protected:
-        virtual void setBitrateInKbs(unsigned bitrate);
+        virtual void setBitrateInKbs(int bitrate);
         _GstElement *encoder_;
 
     private:
@@ -157,13 +158,14 @@ class VideoDecoder : public Decoder
 class H264Encoder : public VideoEncoder
 {
     public: 
-        H264Encoder();
-        void setBitrate(unsigned bitrate);
+        H264Encoder(MapMsg &settings);
+        void setBitrate(int bitrate);
 
     private:
         ~H264Encoder();
         void init();
         Payloader* createPayloader() const;
+        int bitrate_;
 };
 
 /// Decoder that decodes H.264 into raw video using the ffdec_h264 decoder.
@@ -181,9 +183,10 @@ class H264Decoder : public VideoDecoder
 class H263Encoder : public VideoEncoder
 {
     public: 
-        H263Encoder();
+        H263Encoder(MapMsg &settings);
 
     private:
+        int bitrate_;
         ~H263Encoder();
 
         void init();
@@ -205,11 +208,12 @@ class H263Decoder : public VideoDecoder
 class Mpeg4Encoder : public VideoEncoder
 {
     public:
-        Mpeg4Encoder();
+        Mpeg4Encoder(MapMsg &settings);
         ~Mpeg4Encoder();
 
     private:
         void init();
+        int bitrate_;
         Payloader* createPayloader() const;
 };
 
@@ -227,9 +231,9 @@ class Mpeg4Decoder: public VideoDecoder
 class TheoraEncoder : public VideoEncoder
 {
     public:
-        TheoraEncoder();
+        TheoraEncoder(MapMsg &settings);
         ~TheoraEncoder();
-        void setBitrate(unsigned bitrate);
+        void setBitrate(int bitrate);
         void setQuality(int quality);
         void setSpeedLevel(int speedLevel);
 
@@ -239,9 +243,10 @@ class TheoraEncoder : public VideoEncoder
         static const int MIN_QUALITY = 0;
         static const int MAX_QUALITY = 63;  // defined in plugin
         static const int INIT_QUALITY = 20;
-        bool usingQualitySetting_;
         void init();
         Payloader* createPayloader() const;
+        int bitrate_;
+        int quality_;
 };
 
 

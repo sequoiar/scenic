@@ -58,12 +58,13 @@ void pof::addOptions(OptionArgs &options)
     options.addBool("deinterlace", 'o', "");
     options.addString("videodevice", 'd', "", "/dev/video0 /dev/video1");
     options.addString("audiodevice", 'q', "", "hw:0 hw:2 plughw:0 plughw:2");
-    options.addString("videolocation", 0, "", "<filename>");
-    options.addString("audiolocation", 0, "", "<filename>");
+    options.addString("videolocation", 'L', "", "<filename>");
+    options.addString("audiolocation", 'K', "", "<filename>");
     options.addInt("screen", 'n', "", "xinerama screen num");
     options.addBool("version", 'w', "");
     options.addInt("numchannels", 'c', "", "2");
     options.addInt("videobitrate", 'x', "", "3000000");
+    options.addInt("videoquality", 'X', "", "use quality setting instead of videobitrate, 0-63 (theora only)");
     options.addString("audiosource", 'e', "", "jackaudiosrc alsasrc pulsesrc");
     options.addString("videosource", 'u', "", "v4l2src v4lsrc dv1394src");
     options.addInt("timeout", 'z', "", "time in ms to wait before quitting, 0 means run indefinitely");

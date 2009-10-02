@@ -36,6 +36,7 @@ class VideoSourceConfig
 
         const char *source() const { return source_.c_str(); }
         int bitrate() const { return bitrate_; }
+        int quality() const { return quality_; }
 
         bool hasLocation() const { return !location_.empty(); }
         bool hasDeviceName() const { return !deviceName_.empty(); }
@@ -49,6 +50,7 @@ class VideoSourceConfig
     private:
         const std::string source_;
         const int bitrate_;
+        const int quality_;
         const std::string deviceName_;
         const std::string location_;
         const int cameraNumber_;

@@ -61,6 +61,7 @@ namespace videofactory
         ipcpMsg["device"] = ipcpMsg["videodevice"];
         ipcpMsg["location"] = ipcpMsg["videolocation"];
         ipcpMsg["bitrate"] = ipcpMsg["videobitrate"];
+        ipcpMsg["quality"] = ipcpMsg["videoquality"];
 
         return ipcpMsg;
     }
@@ -92,8 +93,21 @@ namespace videofactory
         if (!msg["location"]) 
             msg["location"] = ""; 
 
-        if (!msg["bitrate"]) 
-            msg["bitrate"] = 3000000;
+        // Only use quality if we're using theora or no bitrate has been set
+        if (msg["quality"])
+            if (msg["bitrate"])
+            {
+                LOG_WARNING("Ignoring quality setting for " << msg["codec"]);
+                msg["quality"] = 0;
+            }
+
+        // If quality is != 0, then we know that we're using theora from the previous check
+        if (!msg["bitrate"])
+        {
+            if (!msg["quality"])
+                msg["bitrate"] = 3000000; // quality and bitrate are mutually exclusive
+        }
+
 
         if (!msg["camera-number"])
             msg["camera-number"] = -1;

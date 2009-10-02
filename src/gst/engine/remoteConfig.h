@@ -78,7 +78,7 @@ class SenderConfig : public RemoteConfig, public BusMsgHandler
         SenderConfig(MapMsg &msg,
                 int msgId__);
 
-        VideoEncoder* createVideoEncoder() const;
+        VideoEncoder* createVideoEncoder(MapMsg &settings) const;
         Encoder* createAudioEncoder() const;
         bool capsOutOfBand() { return capsOutOfBand_; }
         void capsOutOfBand(bool capsOutOfBand__) { capsOutOfBand_ = capsOutOfBand__; }
