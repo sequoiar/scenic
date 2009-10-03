@@ -23,6 +23,7 @@
 
 #include "milhouseLogger.h"
 #include <boost/bind.hpp>
+#include <iostream>
 
 
 MilhouseLogger::MilhouseLogger(const std::string &logLevel) : 

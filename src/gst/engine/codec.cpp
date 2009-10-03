@@ -29,6 +29,7 @@
 #include "util.h"
 
 #include <boost/thread/thread.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "codec.h"
 #include "rtpPay.h"
