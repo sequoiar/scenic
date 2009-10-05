@@ -67,9 +67,12 @@ void SharedVideoBuffer::notifyProducer()
 
 void SharedVideoBuffer::waitOnConsumer(scoped_lock<interprocess_mutex> &lock)
 {
+    boost::system_time const timeout = boost::get_system_time() +
+        boost::posix_time::milliseconds(1);
+
     if (bufferIn_)
     {
-        conditionFull_.wait(lock);
+        conditionFull_.timed_wait(lock, timeout);
     }
 }
 

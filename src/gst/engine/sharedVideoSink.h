@@ -46,6 +46,7 @@ class SharedVideoSink : public VideoSink
         _GstElement *sinkElement() { return colorspc_; }
 
         const std::string id_;
+        static const int MAX_BUFFERS = 1;
         _GstElement *colorspc_;
         std::tr1::shared_ptr<boost::interprocess::shared_memory_object> shm_;
         boost::interprocess::mapped_region region_;
