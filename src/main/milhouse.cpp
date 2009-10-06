@@ -186,8 +186,6 @@ short pof::run(int argc, char **argv)
 
         gutil::runMainLoop(options["timeout"]);
 
-        tassert(playback::isPlaying() or playback::quitted());
-
         playback::stop();
     }
     else 
@@ -220,8 +218,6 @@ short pof::run(int argc, char **argv)
             options["timeout"] = 0;
 
         gutil::runMainLoop(options["timeout"]);
-
-        tassert(playback::isPlaying() or playback::quitted());
 
         playback::stop();
     }

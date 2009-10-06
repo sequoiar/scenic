@@ -42,12 +42,22 @@ using std::tr1::shared_ptr;
 shared_ptr<shared_memory_object> SharedVideoSink::createSharedMemory(const std::string &id)
 {
     using boost::interprocess::create_only;
+    using boost::interprocess::interprocess_exception;
+    shared_ptr<shared_memory_object> shm;
 
-    removeSharedMemory(id);
-    // create a shared memory object
-    shared_ptr<shared_memory_object> shm(new shared_memory_object(create_only, id.c_str(), read_write)); 
-    // set size
-    shm->truncate(sizeof(SharedVideoBuffer));
+    try 
+    {
+        removeSharedMemory(id);
+        // create a shared memory object
+        shm.reset(new shared_memory_object(create_only, id.c_str(), read_write)); 
+        // set size
+        shm->truncate(sizeof(SharedVideoBuffer));
+    }
+    catch (interprocess_exception &ex)
+    {
+        removeSharedMemory(id);
+        LOG_ERROR("Got interprocess exception " << ex.what());
+    }
     return shm;
 }
 

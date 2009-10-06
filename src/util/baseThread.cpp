@@ -55,10 +55,6 @@ QueuePair &BaseThread::getQueue()
 BaseThread::BaseThread()
     : th_(0), queue_(), flippedQueue_()
 {
-#ifndef HAVE_BOOST_THREAD
-    if (!g_thread_supported ())
-        g_thread_init (NULL);
-#endif
     queue_.init();
     flippedQueue_.flip(queue_);
     allThreads_.insert(this);
@@ -72,15 +68,10 @@ BaseThread::~BaseThread()
         flippedQueue_.push(t);
         LOG_DEBUG("Thread Stopping " << this);
         allThreads_.erase(this);
-#ifdef HAVE_BOOST_THREAD
+
         th_->join();
-#else
-        g_thread_join(th_);
-#endif
     }
 }
-
-#ifdef HAVE_BOOST_THREAD
 
 class thread_create
 {
@@ -93,22 +84,7 @@ class thread_create
             th_->main();
         }
 };
-#else
-/// thread entry point 
 
-
-GThread * thread_create(void *(thread)(void *),BaseThread* t, GError **err)
-{
-    return (g_thread_create(thread, static_cast < void *>(t), TRUE, err)); 
-}
-
-
-void *BaseThread::thread_main(void *pThreadObj)
-{
-    static_cast < BaseThread * >(pThreadObj)->main();
-    return 0;
-}
-#endif
 
 /// entry point calls thread_create 
 
@@ -124,12 +100,7 @@ bool BaseThread::run()
     if(!ready())
         return false;
 
-#ifdef HAVE_BOOST_THREAD
     th_ = new boost::thread(thread_create(this));
-#else
-    GError *err = 0;
-    th_ = thread_create(BaseThread::thread_main, this, &err);
-#endif
 
     LOG_DEBUG("Thread Started " << this);
 
