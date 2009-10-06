@@ -93,6 +93,9 @@ namespace videofactory
         if (!msg["location"]) 
             msg["location"] = ""; 
 
+        if (!msg["quality"])
+            msg["quality"] = 0;
+
         // Only use quality if we're using theora or no bitrate has been set
         if (msg["quality"])
             if (msg["bitrate"])

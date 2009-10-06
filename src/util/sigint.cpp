@@ -33,61 +33,25 @@ bool signal_handlers::signalFlag()
     return signal_flag;
 }
 
-static void interruptHandler(int /*sig*/, siginfo_t* /* si*/, void* /* unused*/)
+static void signalHandler(int sig, siginfo_t* /* si*/, void* /* unused*/)
 {
-    LOG_INFO("Got SIGINT going down!");
+    LOG_INFO("Got signal " << sig << ", going down!");
     signal_flag = true;
-
-    struct sigaction sa;
-    sa.sa_flags = SA_SIGINFO;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_sigaction = NULL;
-    if (sigaction(SIGINT, &sa, NULL) == -1)
-        THROW_ERROR("Cannot register SIGINT handler");
     MsgThread::broadcastQuit();
-}
-
-
-static void terminateHandler(int /*sig*/, siginfo_t* /* si*/, void* /* unused*/)
-{
-    LOG_INFO("Got SIGTERM going down!");
-    signal_flag = true;
-
-    struct sigaction sa;
-    sa.sa_flags = SA_SIGINFO;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_sigaction = NULL;
-    if (sigaction(SIGTERM, &sa, NULL) == -1)
-        THROW_ERROR("Cannot register SIGTERM handler");
-    MsgThread::broadcastQuit();
-}
-
-
-void setInterruptHandler()
-{
-    struct sigaction sa;
-    sa.sa_flags = SA_SIGINFO;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_sigaction = interruptHandler;
-    if (sigaction(SIGINT, &sa, NULL) == -1)
-        THROW_ERROR("Cannot register SIGINT handler");
-}
-
-
-
-void setTerminateHandler()
-{
-    struct sigaction sa;
-    sa.sa_flags = SA_SIGINFO;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_sigaction = terminateHandler;
-    if (sigaction(SIGTERM, &sa, NULL) == -1)
-        THROW_ERROR("Cannot register SIGTERM handler");
 }
 
 
 void signal_handlers::setHandlers()
 {
-    setInterruptHandler();
-    setTerminateHandler();
+    struct sigaction sa;
+    sa.sa_flags = SA_SIGINFO;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_sigaction = signalHandler;
+    const int NUM_SIGNALS = 5; 
+    const int signals[NUM_SIGNALS]  = {SIGHUP, SIGINT, SIGQUIT, SIGABRT, SIGTERM};
+    for (int sig = 0; sig != NUM_SIGNALS; ++sig)
+        if (sigaction(signals[sig], &sa, NULL) == -1)
+            THROW_ERROR("Cannot register signal " << signals[sig] 
+                    << " handler");
 }
+
