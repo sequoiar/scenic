@@ -33,13 +33,33 @@ bool signal_handlers::signalFlag()
     return signal_flag;
 }
 
+
+static std::string sigToString(int sig)
+{
+    switch (sig) // no need for breaks, fallthrough is impossible
+    {
+        case SIGHUP:
+            return "SIGHUP";
+        case SIGINT:
+            return "SIGINT";
+        case SIGQUIT:
+            return "SIGQUIT";
+        case SIGABRT:
+            return "SIGABRT";
+        case SIGTERM:
+            return "SIGTERM";
+        default:
+            return "";
+    }
+}
+
+
 static void signalHandler(int sig, siginfo_t* /* si*/, void* /* unused*/)
 {
-    LOG_INFO("Got signal " << sig << ", going down!");
+    LOG_INFO("Got signal " << sigToString(sig) << ", going down!");
     signal_flag = true;
     MsgThread::broadcastQuit();
 }
-
 
 void signal_handlers::setHandlers()
 {
@@ -51,7 +71,7 @@ void signal_handlers::setHandlers()
     const int signals[NUM_SIGNALS]  = {SIGHUP, SIGINT, SIGQUIT, SIGABRT, SIGTERM};
     for (int sig = 0; sig != NUM_SIGNALS; ++sig)
         if (sigaction(signals[sig], &sa, NULL) == -1)
-            THROW_ERROR("Cannot register signal " << signals[sig] 
+            THROW_ERROR("Cannot register signal " << sigToString(signals[sig]) 
                     << " handler");
 }
 

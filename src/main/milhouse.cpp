@@ -227,7 +227,7 @@ short pof::run(int argc, char **argv)
 void onExit()
 {
 #ifdef CONFIG_DEBUG_LOCAL
-    std::cerr << "Leaving Milhouse";
+    std::cerr << "Leaving Milhouse" << std::endl;
 #endif
 }
 
