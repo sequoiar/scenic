@@ -28,12 +28,12 @@
 
 static bool signal_flag = false;
 
-bool signalFlag()
+bool signal_handlers::signalFlag()
 {
     return signal_flag;
 }
 
-static void handler(int /*sig*/, siginfo_t* /* si*/, void* /* unused*/)
+static void interruptHandler(int /*sig*/, siginfo_t* /* si*/, void* /* unused*/)
 {
     LOG_INFO("Got SIGINT going down!");
     signal_flag = true;
@@ -48,13 +48,46 @@ static void handler(int /*sig*/, siginfo_t* /* si*/, void* /* unused*/)
 }
 
 
-void set_handler()
+static void terminateHandler(int /*sig*/, siginfo_t* /* si*/, void* /* unused*/)
+{
+    LOG_INFO("Got SIGTERM going down!");
+    signal_flag = true;
+
+    struct sigaction sa;
+    sa.sa_flags = SA_SIGINFO;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_sigaction = NULL;
+    if (sigaction(SIGTERM, &sa, NULL) == -1)
+        THROW_ERROR("Cannot register SIGTERM handler");
+    MsgThread::broadcastQuit();
+}
+
+
+void setInterruptHandler()
 {
     struct sigaction sa;
     sa.sa_flags = SA_SIGINFO;
     sigemptyset(&sa.sa_mask);
-    sa.sa_sigaction = handler;
+    sa.sa_sigaction = interruptHandler;
     if (sigaction(SIGINT, &sa, NULL) == -1)
         THROW_ERROR("Cannot register SIGINT handler");
 }
 
+
+
+void setTerminateHandler()
+{
+    struct sigaction sa;
+    sa.sa_flags = SA_SIGINFO;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_sigaction = terminateHandler;
+    if (sigaction(SIGTERM, &sa, NULL) == -1)
+        THROW_ERROR("Cannot register SIGTERM handler");
+}
+
+
+void signal_handlers::setHandlers()
+{
+    setInterruptHandler();
+    setTerminateHandler();
+}

@@ -93,7 +93,7 @@ bool MainModule::run()
 {
     try
     {
-        set_handler();
+        signal_handlers::setHandlers();
         Logger logger_(*tcpThread_);
         if(gstThread_ == 0 or !gstThread_->run())
             THROW_ERROR("GstThread not running");
@@ -103,7 +103,7 @@ bool MainModule::run()
         QueuePair &gst_queue = gstThread_->getQueue();
         QueuePair &tcp_queue = tcpThread_->getQueue();
 
-        while(!signalFlag())
+        while(!signal_handlers::signalFlag())
         {
             if(gst_queue.ready())
             {

@@ -21,6 +21,10 @@
  */
 #ifndef _SIGINT_H
 #define _SIGINT_H
-void set_handler();
-bool signalFlag();
+
+namespace signal_handlers {
+    void setHandlers();
+    bool signalFlag();
+}
+
 #endif

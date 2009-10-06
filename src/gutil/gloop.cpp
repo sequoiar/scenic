@@ -42,7 +42,7 @@ int gutil::killMainLoop(gpointer /*data*/)
 
 int gutil::checkSignal(gpointer /*data*/)
 {
-    if (signalFlag())
+    if (signal_handlers::signalFlag())
     {
         killMainLoop(NULL);
         //THROW_END_THREAD("Got signal flag in gloop");

@@ -237,7 +237,7 @@ int main(int argc, char **argv)
     int ret = 0;
     atexit (onExit);
     try {
-        set_handler();
+        signal_handlers::setHandlers();
         ret = pof::run(argc, argv);
     }
     catch (std::exception e)
