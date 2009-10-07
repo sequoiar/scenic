@@ -2,6 +2,9 @@ include $(top_srcdir)/globals.mak
 
 bin_PROGRAMS = milhouse
 
+#nodist_milhouse_SOURCES = $(top_srcdir)/src/include/caps.h
+#BUILT_SOURCES = $(top_srcdir)/src/include/caps.h
+
 milhouse_SOURCES = milhouse.cpp mainTcp.cpp msgThreadFactory.cpp msgThreadFactory.h milhouseLogger.cpp
 if SVN
 milhouse_CPPFLAGS= $(AM_CPPFLAGS) $(GST_CFLAGS) $(GTK_CFLAGS) $(GL_CFLAGS) $(GLU_CFLAGS) -D SVNVERSION=\"$(shell svnversion)\"

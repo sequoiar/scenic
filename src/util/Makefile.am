@@ -1,6 +1,7 @@
 include $(top_srcdir)/globals.mak
 SUBDIRS= . test
 
+	
 lib_LTLIBRARIES= libutil.la
 
 libutil_la_SOURCES = logWriter.cpp util.cpp mapMsg.cpp parser.cpp sigint.cpp baseThread.cpp \

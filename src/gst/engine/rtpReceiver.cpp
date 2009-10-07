@@ -121,12 +121,13 @@ void RtpReceiver::cb_new_src_pad(GstElement *  /*srcElement*/, GstPad * srcPad, 
 
     if (gst_pad_is_linked(sinkPad)) // only link once
     {
-        LOG_WARNING("sink pad is already linked.");
+        LOG_WARNING("sink pad is already linked, are you trying to connect a new sender to an "
+                "existing receiver that lost its sender?");
         gst_object_unref(sinkPad);
         return;
     }
 
-    tassert(gstlinkable::link_pads(srcPad, sinkPad));    // link our udpsrc to the corresponding depayloader
+    gstlinkable::link_pads(srcPad, sinkPad);    // link our udpsrc to the corresponding depayloader
 
     gst_object_unref(sinkPad);
 }

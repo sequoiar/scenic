@@ -5,7 +5,7 @@ endif
 
 lib_LTLIBRARIES = libgst.la
 
-libgst_la_SOURCES = mediaBase.cpp \
+libgst_la_SOURCES = caps.h mediaBase.cpp \
 				   audioSender.cpp audioReceiver.cpp \
 				   videoConfig.cpp rtpBin.cpp pipeline.cpp \
 				   rtpSender.cpp rtpReceiver.cpp audioSource.cpp \
@@ -24,6 +24,14 @@ libgst_la_SOURCES = mediaBase.cpp \
 				   audioLevel.h glVideoSink.h playback.h dv1394.h v4l2util.h \
 				   fileSource.h videoSize.h sharedVideoSink.h sharedVideoBuffer.h capsParser.h
 
-libgst_la_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS) -D__DATA_DIR__=$(pkgdatadir)
+BUILT_SOURCES = caps.h
+
+caps.h: $(top_srcdir)/utils/make_caps.py
+	$< $@
+
+clean-local:
+	rm -f caps.h
+		
+libgst_la_CPPFLAGS=$(AM_CPPFLAGS) $(GST_CFLAGS) $(JACK_CFLAGS) $(GTK_CFLAGS) $(GLU_CFLAGS) $(BOOST_CPPFLAGS)
 
 #CXXFLAGS += -O3

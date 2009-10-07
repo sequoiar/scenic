@@ -168,7 +168,7 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
         logMsg << now << ":line" << std::setfill('0') << std::setw(5) << lineNum << ":" << functionName 
             <<  "():" << fileName << ":" << logLevelStr(level) << ":" << msg << std::endl;
 #else
-    logMsg <<  msg <<  std::endl;
+    logMsg <<  logLevelStr(level) << ":" << msg <<  std::endl;
 #endif
 
     return logMsg.str();

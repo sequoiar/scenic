@@ -109,27 +109,27 @@ bool gstlinkable::link_pads(GstPad *srcPad, GstPad *sinkPad)
             break;
 
         case GST_PAD_LINK_WRONG_HIERARCHY:
-            THROW_ERROR("pads have no common grandparent");
+            THROW_CRITICAL("pads have no common grandparent");
             break;
 
         case GST_PAD_LINK_WAS_LINKED:
-            THROW_ERROR("pad was already linked");
+            THROW_CRITICAL("pad was already linked");
             break;
 
         case GST_PAD_LINK_WRONG_DIRECTION:
-            THROW_ERROR("pads have wrong direction");
+            THROW_CRITICAL("pads have wrong direction");
             break;
 
         case GST_PAD_LINK_NOFORMAT:
-            THROW_ERROR("pads do not have common format. Check if sample rates match.");
+            THROW_CRITICAL("pads do not have common format. Check if sample rates match.");
             break;
 
         case GST_PAD_LINK_NOSCHED:
-            THROW_ERROR("pads cannot cooperate in scheduling");
+            THROW_CRITICAL("pads cannot cooperate in scheduling");
             break;
 
         case GST_PAD_LINK_REFUSED:
-            THROW_ERROR("refused for some reason");
+            THROW_CRITICAL("refused for some reason");
             break;
 
         default:
