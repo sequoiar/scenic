@@ -1,0 +1,10 @@
+#!/usr/bin/env python
+# this starts miville from the services branch ... using Lunch
+# see https://svn.sat.qc.ca/trac/postures/wiki/Lunch
+
+add_command("~/src/miville/branches/services/py/mivilled -o 0", title="miville un", priority=1, sleep=1)
+add_command("~/src/miville/branches/services/py/mivilled -o 1", title="miville deux", priority=1, sleep=1)
+add_command("telnet localhost 14444", title="miville un", priority=2)
+add_command("telnet localhost 14445", title="miville deux", priority=2)
+
+
