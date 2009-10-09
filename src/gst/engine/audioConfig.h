@@ -45,6 +45,7 @@ class AudioSourceConfig
         bool hasDeviceName() const { return !deviceName_.empty(); }
         bool hasLocation() const { return !location_.empty(); }
 
+        const char *sourceName() const;
         const char *deviceName() const;
         const char *location() const;
 
@@ -54,6 +55,7 @@ class AudioSourceConfig
 
     private:
         const std::string source_;
+        const std::string sourceName_;
         const std::string deviceName_;
         const std::string location_;
         const int numChannels_;
@@ -67,12 +69,14 @@ class AudioSinkConfig
         
         AudioSink* createSink() const;
         bool hasDeviceName() const { return !deviceName_.empty(); }
+        const char *sinkName() const;
         const char *deviceName() const;
         unsigned long long bufferTime() const;
         static const unsigned long long DEFAULT_BUFFER_TIME = 11333LL;
 
     private:
         const std::string sink_;
+        const std::string sinkName_;
         const std::string deviceName_;
         const unsigned long long bufferTime_;
 };

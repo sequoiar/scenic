@@ -60,15 +60,16 @@ class Except : public virtual std::exception
             log_(WARNING), errno_(err)
     {
         int i;
-        for(i = 0; i < 255 and log_msg[i]; ++i)
+        for(i = 0; i < BUFFER_SIZE - 1 and log_msg[i]; ++i)
             buff[i] = log_msg[i];
-        for(; i < 256; ++i)
+        for(; i < BUFFER_SIZE; ++i)
             buff[i] = 0;
     }
         Except() : 
             log_(NONE), errno_(0)
     {}
-        char buff[256];
+        enum { BUFFER_SIZE = 255 };
+        char buff[BUFFER_SIZE];
         const char * what() { return buff; }
         virtual ~Except() throw() {}
 };

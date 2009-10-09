@@ -122,7 +122,7 @@ class Mpeg4Payloader : public Payloader, public MessageHandler
 {
     private: 
         void init();
-        bool handleMessage(const std::string &path); 
+        bool handleMessage(const std::string &path, const std::string &arguments); 
 };
 
 

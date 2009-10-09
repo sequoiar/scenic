@@ -88,6 +88,9 @@ namespace audiofactory
         
         if (!msg["address"])
             msg["address"] = "127.0.0.1";
+        
+        if (!msg["jack-client-name"])
+            msg["jack-client-name"] = "";
     }
     
     static void setTxDefaults(MapMsg &msg)
@@ -103,6 +106,9 @@ namespace audiofactory
         
         if (!msg["address"])
             msg["address"] = "127.0.0.1";
+
+        if (!msg["jack-client-name"])
+            msg["jack-client-name"] = "";
     }
 
     static shared_ptr<AudioSender> 

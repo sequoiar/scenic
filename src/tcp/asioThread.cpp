@@ -31,7 +31,6 @@
 #include "util.h"
 #include "asioThread.h"
 
-#ifdef HAVE_BOOST_ASIO
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
@@ -42,7 +41,6 @@
 #pragma GCC diagnostic ignored "-Weffc++"
 
 using boost::asio::ip::tcp;
-using boost::asio::ip::udp;
 using boost::asio::io_service;
 using boost::system::error_code;
 using boost::asio::async_write;
@@ -246,160 +244,6 @@ class tcp_server
         boost::asio::deadline_timer t_;
 };
 
-#if 0
-
-class udp_sender
-{
-    public:
-        udp_sender(io_service& io_service, std::string ip, std::string port, std::string buff)
-            : io_service_(io_service), 
-            buff_(buff), 
-            t_(io_service, seconds(1)),
-            socket_(io_service, udp::endpoint(udp::v4(), 0)), 
-            sender_endpoint_(),
-            resolver(io_service),
-            query(udp::v4(), ip.c_str(), port.c_str()), iterator(resolver.resolve(query))
-    {
-        t_.async_wait(boost::bind(&udp_sender::handle_timer, this, error));
-    }
-
-        void handle_send_to(const error_code& err, size_t bytes_sent)
-        {
-            if (err)
-            {
-                LOG_DEBUG("err");
-            } 
-            else
-            {
-                LOG_DEBUG("MSG Sent " << bytes_sent);
-                socket_.async_receive_from(buffer(data_,max_length),sender_endpoint_,
-                        boost::bind(&udp_sender::handle_receive_from, this, 
-                            error, bytes_transferred));
-
-                t_.expires_at(t_.expires_at() + seconds(1));
-                t_.async_wait(boost::bind(&udp_sender::handle_timer, this, error));
-            }
-        }
-
-        void handle_receive_from(const error_code& err,
-                size_t bytes_recvd)
-        {
-            if (!err && bytes_recvd > 0)
-            {
-                io_service_.stop();
-                LOG_DEBUG("Got data:" << data_);
-            }
-            else
-            {
-                LOG_DEBUG("Got err or bytes = 0");
-            }
-        }
-
-        void handle_timer(const error_code& err)
-        {
-            if (!err)
-            {
-                if(MsgThread::isQuitted())
-                    io_service_.stop();
-
-                socket_.async_send_to(buffer(buff_), *iterator, 
-                        boost::bind(&udp_sender::handle_send_to, this, error, bytes_transferred));
-            }
-            else
-            {
-                std::cout << "here5" << std::endl;
-            }
-        }
-
-    private:
-        io_service& io_service_; 
-        std::string buff_;
-        boost::asio::deadline_timer t_;
-        udp::socket socket_;
-        udp::endpoint sender_endpoint_;
-        udp::resolver resolver;
-        udp::resolver::query query;
-        udp::resolver::iterator iterator;
-        enum { max_length = 1024 };
-        char data_[max_length];
-};
-
-class udp_server
-{
-    public:
-        udp_server(io_service& io_service, short port, std::string& buff,int& id)
-            : io_service_(io_service),
-            port_(port),
-            buff_(buff),
-            id_(id),
-            socket_(io_service, udp::endpoint(udp::v4(), port)), 
-            sender_endpoint_(),
-            t_(io_service, seconds(1))
-    {
-        socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_, 
-                boost::bind(&udp_server::handle_receive_from, this, 
-                    error, bytes_transferred));
-        t_.async_wait(boost::bind(&udp_server::handle_timer,this, error));
-    }
-
-        void handle_receive_from(const error_code& err,
-                size_t bytes_recvd)
-        {
-            if (!err && bytes_recvd > 0)
-            {
-                MapMsg msg;
-                LOG_DEBUG("MSG: bytes_recvd " << bytes_recvd);
-                msg.tokenize(data_);
-                if(msg() == "buffer")
-                {
-                    id_ = msg["id"];
-                    buff_ = msg["str"].str();
-                    socket_.async_send_to(buffer("ok"), sender_endpoint_,
-                            boost::bind(&udp_server::handle_send_to, this,
-                                error, bytes_transferred));
-
-                    return;
-                }
-            }
-            socket_.async_receive_from(buffer(data_, max_length), sender_endpoint_,
-                    boost::bind(&udp_server::handle_receive_from, this,
-                        error, bytes_transferred));
-        }
-
-        void handle_send_to(const error_code& , size_t )//bytes_sent)
-        {
-            LOG_DEBUG("DONE");
-            io_service_.stop();
-        }
-
-        void handle_timer(const error_code& err)
-        {
-            if (!err)
-            {
-                if(MsgThread::isQuitted())
-                {
-                    io_service_.stop();
-                }
-                t_.expires_at(t_.expires_at() + seconds(1));
-                t_.async_wait(boost::bind(&udp_server::handle_timer,this, error));
-            }
-            else
-            {
-                std::cout << "ERRRR" << std::endl;
-            }
-        }
-    private:
-        io_service& io_service_; 
-        short port_; std::string& buff_;int& id_;
-        udp::socket socket_;
-        udp::endpoint sender_endpoint_;
-        enum { max_length = 1024*8 };
-        char data_[max_length];
-        boost::asio::deadline_timer t_;
-};
-
-#endif
-
 using boost::asio::ip::tcp;
 
 class tcp_receiver_session : 
@@ -407,8 +251,12 @@ class tcp_receiver_session :
 {
     public:
         tcp_receiver_session(boost::asio::io_service& io_service, std::string &receiverBuffer)
-            : socket_(io_service), receiverBuffer_(receiverBuffer)
-        {}
+            : socket_(io_service), receiverBuffer_(receiverBuffer),
+            timer_(io_service, millisec(1))
+        {
+            // periodically check if we've been quit/interrupted
+            timer_.async_wait(boost::bind(&tcp_receiver_session::handle_timer, this, error));
+        }
 
         tcp::socket& socket()
         {
@@ -422,6 +270,20 @@ class tcp_receiver_session :
                     boost::bind(&tcp_receiver_session::handle_receive_from, shared_from_this(),
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
+        }
+        
+        void handle_timer(const error_code& err)
+        {
+            if (!err)
+            {
+                timer_.expires_at(timer_.expires_at() + seconds(1));
+                timer_.async_wait(boost::bind(&tcp_receiver_session::handle_timer, this, error)); // schedule this check for later
+                if (MsgThread::isQuitted())
+                {
+                    socket_.get_io_service().stop();
+                    LOG_ERROR("Interrupted while waiting to receive caps");
+                }
+            }
         }
 
         void handle_receive_from(const boost::system::error_code& error,
@@ -448,6 +310,7 @@ class tcp_receiver_session :
         enum { max_length = 8000 };
         char data_[max_length];
         std::string &receiverBuffer_;
+        boost::asio::deadline_timer timer_;
 };
 
 
@@ -492,11 +355,11 @@ class tcp_receiver
 
 std::string tcpGetBuffer(int port, int &/*id*/)
 {
-    std::string buffer;
+    std::string buffer("");
     boost::asio::io_service io_service;
 
-    LOG_DEBUG("Waiting for msg on port " << port);
     tcp_receiver receiver(io_service, port, buffer);
+    LOG_DEBUG("Waiting for msg on port " << port);
 
     io_service.run();
 
@@ -548,7 +411,7 @@ void asio_thread::main()
     try
     {
         io_service io_service;
-        tcp_server s(io_service, port_,queue_);
+        tcp_server s(io_service, port_, queue_);
 
         io_service.run();
     }
@@ -560,4 +423,3 @@ void asio_thread::main()
 
 }
 
-#endif

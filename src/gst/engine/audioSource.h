@@ -225,7 +225,7 @@ class AudioJackSource : public AudioSource, public MessageHandler
     private:
         ~AudioJackSource();
 
-        bool handleMessage(const std::string &path);
+        bool handleMessage(const std::string &path, const std::string &arguments);
         GstElement *srcElement() { return capsFilter_; }
         void sub_init();
         /// Caps used by any source with a capsfilter

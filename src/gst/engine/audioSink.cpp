@@ -166,7 +166,7 @@ AudioJackSink::~AudioJackSink()
 /// Initialization method
 void AudioJackSink::init()
 {
-    sink_ = Pipeline::Instance()->makeElement("jackaudiosink", NULL);
+    sink_ = Pipeline::Instance()->makeElement("jackaudiosink", config_.sinkName());
 
     // uncomment to turn off autoconnect
     //g_object_set(G_OBJECT(sink_), "connect", 0, NULL);
@@ -188,10 +188,10 @@ void AudioJackSink::init()
 }
 
 
-bool AudioJackSink::handleMessage(const std::string &path)
+bool AudioJackSink::handleMessage(const std::string &path, const std::string &/*arguments*/)
 {
     assert(sink_);
-    if (path == "disable_jack_autoconnect")
+    if (path == "disable-jack-autoconnect")
     {
         g_object_set(G_OBJECT(sink_), "connect", 0, NULL);
         return true;

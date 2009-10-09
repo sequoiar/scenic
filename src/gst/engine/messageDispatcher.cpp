@@ -38,17 +38,17 @@ MessageDispatcher * MessageDispatcher::getInstance()
 }
 
 
-void MessageDispatcher::sendMessage(const std::string &path)
+void MessageDispatcher::sendMessage(const std::string &path, const std::string &arguments)
 {
-    getInstance()->updateHandlers(path);
+    getInstance()->updateHandlers(path, arguments);
 }
 
 
-void MessageDispatcher::updateHandlers(const std::string &path)
+void MessageDispatcher::updateHandlers(const std::string &path, const std::string &arguments)
 {
     std::vector<MessageHandler*>::iterator iter;
     for (iter = handlers_.begin(); iter != handlers_.end(); ++iter)
-        if ((*iter)->handleMessage(path))    // one replied true
+        if ((*iter)->handleMessage(path, arguments))    // one replied true
             break;
     if (iter == handlers_.end())
         LOG_DEBUG("Message " << path << " may not have been handled");

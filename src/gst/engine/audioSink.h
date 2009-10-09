@@ -93,7 +93,7 @@ class AudioJackSink : public AudioSink, public MessageHandler
         AudioJackSink(const AudioSinkConfig &config);
         ~AudioJackSink();
     private:
-        bool handleMessage(const std::string &message);
+        bool handleMessage(const std::string &message, const std::string &arguments);
         void init();
         const AudioSinkConfig &config_;
 };

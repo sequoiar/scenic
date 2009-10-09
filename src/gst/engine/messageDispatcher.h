@@ -34,11 +34,12 @@ class MessageDispatcher
         /// This is the single point of access to the singleton instance of this messagedispatcher
         static void subscribe(MessageHandler *obj);
         static void unsubscribe(MessageHandler *obj);
-        static void sendMessage(const std::string &path);    // could also overload with a version that has an argument map
+        static void sendMessage(const std::string &path, const std::string &arguments = "");    
+        // FIXME: make arguments a va_list or something
 
     private:
         static MessageDispatcher * getInstance();
-        void updateHandlers(const std::string &path);
+        void updateHandlers(const std::string &path, const std::string &arguments);
         std::vector<MessageHandler*> handlers_;
         
         MessageDispatcher() : handlers_() {}

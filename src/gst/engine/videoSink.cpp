@@ -99,7 +99,7 @@ void GtkVideoSink::makeUnfullscreen(GtkWidget *widget)
 }
 
 
-bool GtkVideoSink::handleMessage(const std::string &path)
+bool GtkVideoSink::handleMessage(const std::string &path, const std::string &/*arguments*/)
 {
     if (path == "fullscreen")
     {

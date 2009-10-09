@@ -178,19 +178,19 @@ std::string log_(const std::string &msg, LogLevel level, const std::string &file
 void cerr_log_throw( const std::string &msg, LogLevel level, const std::string &fileName,
                 const std::string &functionName, int lineNum,int err)
 {
-    std::string strerr = log_(msg,level,fileName,functionName,lineNum);
+    std::string strerr = log_(msg, level, fileName, functionName, lineNum);
 
     if(err == -1) //TODO Is this used?
-        throw(Except(msg.c_str(),0));
+        throw(Except(msg.c_str(), 0));
 
-    if(!hold_flag)//TODO check logger  
-        (*lf)(level,strerr);
-     
-    if(level < THROW)
+    if (!hold_flag)//TODO check logger  
+        (*lf)(level, strerr);
+
+    if (level < THROW)
         return;
 
     if(level < CRITICAL)
-        throw(ErrorExcept(strerr.c_str(),err));
+        throw(ErrorExcept(strerr.c_str(), err));
     if(level < ASSERT_FAIL)
         throw(CriticalExcept(strerr.c_str()));
     throw(AssertExcept(strerr.c_str()));

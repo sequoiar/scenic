@@ -73,7 +73,7 @@ class GtkVideoSink
         static void toggleFullscreen(_GtkWidget *widget);
 
     private:
-        virtual bool handleMessage(const std::string &path);
+        virtual bool handleMessage(const std::string &path, const std::string &arguments);
 };
 
 

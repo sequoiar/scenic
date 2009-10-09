@@ -1,4 +1,6 @@
 NTA:
+-name jack clients
+-set window title
 -create caps.h and caps.cpp, add check-caps command-line flag to verify that caps.h matches the caps we generate at runtime, and 
 provide info
 -use osc style path for tcp messages
@@ -6,6 +8,7 @@ provide info
 -if we have a sender and receiver going, the receiver should for now gracefully ignore subsequent senders after the first sender goes out
 
 HELLO_WORLD:
+-integrate MIDI
 -get non blocking input from command-line
 -rhythmbox uses autoaudiosink, should we? or just look at how autoaudiosink is implemented
 -use more message passing, try mike's approach of path=ClassName, args[0]=handler_method, args[1-n]...

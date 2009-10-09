@@ -30,6 +30,7 @@
 
 AudioSourceConfig::AudioSourceConfig(MapMsg &msg) :
     source_(msg["source"]), 
+    sourceName_(msg["jack-client-name"]),
     deviceName_(msg["device"]), 
     location_(msg["location"]), 
     numChannels_(msg["numchannels"])
@@ -83,6 +84,16 @@ const char* AudioSourceConfig::location() const
 }
 
 
+/// Returns c-style string specifying the source name
+const char* AudioSourceConfig::sourceName() const
+{
+    if (sourceName_ != "")
+        return sourceName_.c_str();
+    else
+        return 0;
+}
+
+
 /// Returns c-style string specifying the device (i.e. plughw:0)
 const char* AudioSourceConfig::deviceName() const
 {
@@ -100,6 +111,7 @@ bool AudioSourceConfig::locationExists() const
 /// Constructor 
 AudioSinkConfig::AudioSinkConfig(MapMsg &msg) : 
     sink_(msg["sink"]), 
+    sinkName_(msg["jack-client-name"]),
     deviceName_(msg["device"]), 
     bufferTime_(static_cast<int>(msg["audio-buffer-usec"]))
 {
@@ -122,6 +134,17 @@ AudioSink* AudioSinkConfig::createSink() const
         return 0;
     }
 }
+
+
+/// Returns c-style string specifying the source name
+const char* AudioSinkConfig::sinkName() const
+{
+    if (sinkName_ != "")
+        return sinkName_.c_str();
+    else
+        return 0;
+}
+
 
 /// Returns c-style string specifying the device used
 const char* AudioSinkConfig::deviceName() const

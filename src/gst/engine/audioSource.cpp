@@ -318,7 +318,7 @@ std::string AudioJackSource::getCapsFilterCapsString()
 
 void AudioJackSource::sub_init()
 {
-    AudioSource::sub_init();
+    source_ = Pipeline::Instance()->makeElement(config_.source(), config_.sourceName());
 
     // use auto-forced connect mode if available
     if (Jack::autoForcedSupported(source_))
@@ -337,10 +337,10 @@ void AudioJackSource::sub_init()
 }
 
 
-bool AudioJackSource::handleMessage(const std::string &path)
+bool AudioJackSource::handleMessage(const std::string &path, const std::string &/*arguments*/)
 {
     assert(source_);
-    if (path == "disable_jack_autoconnect")
+    if (path == "disable-jack-autoconnect")
     {
         g_object_set(G_OBJECT(source_), "connect", 0, NULL);
         return true;

@@ -47,7 +47,7 @@ void pof::addOptions(OptionArgs &options)
     options.addBool("receiver", 'r', "");
     options.addBool("sender", 's', "");
     options.addString("address", 'i', "", "provide ip address of remote host");
-    options.addString("videocodec", 'v', "", "h264");
+    options.addString("videocodec", 'v', "", "mpeg4 h263 h264 theora");
     options.addString("audiocodec", 'a', "", "vorbis raw mp3");
     options.addString("videosink", 'k', "", "xvimagesink glimagesink");
     options.addString("audiosink", 'l', "", "jackaudiosink alsasink pulsesink");
@@ -62,7 +62,7 @@ void pof::addOptions(OptionArgs &options)
     options.addString("audiolocation", 'K', "", "<filename>");
     options.addInt("screen", 'n', "", "xinerama screen num");
     options.addBool("version", 'w', "");
-    options.addInt("numchannels", 'c', "", "2");
+    options.addInt("numchannels", 'c', "", "1-8 raw, 1-2 mp3, 1-40 vorbis");
     options.addInt("videobitrate", 'x', "", "3000000");
     options.addInt("videoquality", 'X', "", "use quality setting instead of videobitrate, 0-63 (theora only)");
     options.addString("audiosource", 'e', "", "jackaudiosrc alsasrc pulsesrc");
@@ -74,6 +74,7 @@ void pof::addOptions(OptionArgs &options)
     options.addString("multicast-interface", 'I', "", "interface to use for multicast");
     options.addBool("enable-controls", 'j', "");
     options.addBool("disable-jack-autoconnect", 'J', "");
+    options.addString("jack-client-name", 'O', "", "name of jack-client");
     options.addBool("caps-out-of-band", 'C', "");
     options.addString("debug", 'D', "", "level of logging verbosity (string/int) "
             "[critical=1,error=2,warning=3,info=4,debug=5,gst-debug=6], default=info");

@@ -177,7 +177,7 @@ void Mpeg4Payloader::init()
 }
 
 
-bool Mpeg4Payloader::handleMessage(const std::string &path)
+bool Mpeg4Payloader::handleMessage(const std::string &path, const std::string &/*arguments*/)
 {
     if (path == "disable-send-config")
     {

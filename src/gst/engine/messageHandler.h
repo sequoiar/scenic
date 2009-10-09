@@ -36,7 +36,8 @@ class MessageHandler
     public:
         MessageHandler();
         virtual ~MessageHandler();
-        virtual bool handleMessage(const std::string &path) = 0;
+        virtual bool handleMessage(const std::string &path, 
+                const std::string &arguments) = 0;
 };
 
 #endif // _MESSAGE_HANDLER_H_ 
