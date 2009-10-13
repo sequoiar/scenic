@@ -3,11 +3,16 @@
 ; milhouse_postures01   -> pd_input0
 ; capture_p1            -> pd_input1
 ; milhouse_postures03   -> pd_input2
-; pd_output0            -> playback1
-; pd_output1            -> playback2
+; pd_output0            -> milhouse_postures02
+; pd_output1            -> playback1
+; pd_output2            -> playback2
 
 (connect-exclusive "milhouse.*:out_posture01_1" "pure_data.*:input0")
 (connect-exclusive "system:capture_1" "pure_data.*:input1")
 (connect-exclusive "milhouse.*:out_posture03_1" "pure_data.*:input2")
-(connect-exclusive "pure_data.*:output0" "system:playback_1")
-(connect-exclusive "pure_data.*:output1" "system:playback_2")
+(connect-exclusive "pure_data.*:output0" "milhouse.*:in_posture02_1")
+(connect-exclusive "pure_data.*:output1" "system:playback_1")
+(connect-exclusive "pure_data.*:output2" "system:playback_2")
+
+; Make this dummy connection so that PureData won't try and connect an additional capture port
+(connect-exclusive "system.*:capture_2" "system:playback_3")
