@@ -241,7 +241,7 @@ int main(int argc, char **argv)
         signal_handlers::setHandlers();
         ret = pof::run(argc, argv);
     }
-    catch (std::exception e)
+    catch (const std::exception &e)
     {
         std::cout << "Main Thread LEAVING with exception: " << e.what() << std::endl;
         ret = 1;
