@@ -1,5 +1,7 @@
 NTA:
--py script to generate jack.plumbing
+-fix exceptions/error messages
+-set resolution
+-set framerate
 -set window title
 -use boost.program_options
 -create caps.h and caps.cpp, add check-caps command-line flag to verify that caps.h matches the caps we generate at runtime, and 
