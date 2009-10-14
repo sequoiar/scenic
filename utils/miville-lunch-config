@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env lunch
 # this starts miville from the services branch ... using Lunch
 # see https://svn.sat.qc.ca/trac/postures/wiki/Lunch
 
